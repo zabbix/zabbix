@@ -51,11 +51,11 @@ class CConfiguration extends CApiService {
 	 * Validate input parameters for export() and exportCompare() methods.
 	 *
 	 * @param array $params
-	 * @param bool  $with_unlinked_parent_templates
+	 * @param bool  $is_compare
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateExport(array &$params, bool $with_unlinked_parent_templates = false): void {
+	private function validateExport(array &$params, bool $is_compare = false): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'format' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CExportWriterFactory::YAML, CExportWriterFactory::XML, CExportWriterFactory::JSON, CExportWriterFactory::RAW])],
 			'prettyprint' =>	['type' => API_BOOLEAN, 'default' => false],
@@ -70,7 +70,7 @@ class CConfiguration extends CApiService {
 			]]
 		]];
 
-		if ($with_unlinked_parent_templates) {
+		if ($is_compare) {
 			$api_input_rules['fields'] += ['unlink_parent_templates' => ['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL, 'default' => [], 'fields' => [
 				'templateid' => ['type' => API_ID],
 				'unlink_templateids' => ['type' => API_IDS]
@@ -341,7 +341,9 @@ class CConfiguration extends CApiService {
 			->getSchema();
 
 		// Normalize array keys and strings.
-		$data = (new CImportDataNormalizer($schema))->normalize($data);
+		$data = (new CImportDataNormalizer($schema))
+			->setPreview(true)
+			->normalize($data);
 
 		$adapter = new CImportDataAdapter();
 		$adapter->load($data);
@@ -422,7 +424,7 @@ class CConfiguration extends CApiService {
 
 		$unlink_templates_data = [];
 
-		if ($params['rules']['templateLinkage']['deleteMissing']) {
+		if (array_key_exists('templates', $import) && $params['rules']['templateLinkage']['deleteMissing']) {
 			$import_tmp_parent_tmp_names = [];
 
 			foreach ($import['templates'] as $template) {
@@ -465,7 +467,10 @@ class CConfiguration extends CApiService {
 		]);
 
 		// Normalize array keys and strings.
-		$export = (new CImportDataNormalizer($schema))->normalize($export);
+		$export = (new CImportDataNormalizer($schema))
+			->setPreview(true)
+			->normalize($export);
+
 		$export = $export['zabbix_export'];
 
 		$importcompare = new CConfigurationImportcompare($params['rules']);

@@ -132,7 +132,7 @@ foreach ($data['items'] as $item) {
 						_('Recovery'), ': ', $trigger['recovery_expression']
 					]
 					: $trigger['expression']
-			))->addClass(ZBX_STYLE_WORDWRAP),
+			))->addClass(ZBX_STYLE_WORDBREAK),
 			(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
 				->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
 		]);
@@ -148,7 +148,8 @@ foreach ($data['items'] as $item) {
 	}
 
 	// Trends
-	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
+	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT,
+			ITEM_VALUE_TYPE_BINARY])) {
 		$item['trends'] = '';
 	}
 
@@ -188,6 +189,12 @@ foreach ($data['items'] as $item) {
 
 	$disabled_by_lld = $disable_source == ZBX_DISABLE_SOURCE_LLD;
 
+	$host = $data['hostid'] == 0
+		? (new CLink($item['hosts'][0]['name']))
+			->setAttribute('data-hostid', $item['hosts'][0]['hostid'])
+			->addClass('js-edit-'.$data['context'])
+		: null;
+
 	$row = [
 		(new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']))
 			->setAttribute('data-actions', $can_execute ? 'execute' : null),
@@ -199,7 +206,7 @@ foreach ($data['items'] as $item) {
 					'backurl' => $list_url
 				])
 			),
-		$data['hostid'] != 0 ? null : $item['hosts'][0]['name'],
+		$host,
 		(new CCol($name))->addClass(ZBX_STYLE_WORDBREAK),
 		$item['triggers']
 			? [
@@ -327,7 +334,7 @@ $confirm_messages = [
 		'field_switches' => CItemData::filterSwitchingConfiguration(),
 		'form_name' => $form->getName(),
 		'hostids' => $data['filter_data']['filter_hostids'],
-		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')]
+		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')]
 	]).');
 '))
 	->setOnDocumentReady()

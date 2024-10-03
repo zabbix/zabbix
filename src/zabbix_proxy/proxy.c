@@ -238,6 +238,7 @@ int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_DBCONFIGWORKER */
 	0, /* ZBX_PROCESS_TYPE_PG_MANAGER */
 	1, /* ZBX_PROCESS_TYPE_BROWSERPOLLER */
+	0 /* ZBX_PROCESS_TYPE_HA_MANAGER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -1394,18 +1395,19 @@ static void	proxy_db_init(void)
 	}
 
 	zbx_db_init_autoincrement_options();
+	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": database is not a Zabbix database",
 				zbx_config_dbhigh->config_dbname);
-		exit(EXIT_FAILURE);
+		goto out;
 	}
 	else if (ZBX_DB_PROXY != db_type)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": Zabbix proxy cannot work with a"
 				" Zabbix server database", zbx_config_dbhigh->config_dbname);
-		exit(EXIT_FAILURE);
+		goto out;
 	}
 
 	zbx_db_check_character_set();
@@ -1415,8 +1417,9 @@ static void	proxy_db_init(void)
 	{
 #ifdef HAVE_SQLITE3
 		if (NOTSUPPORTED == version_check)
-			exit(EXIT_FAILURE);
+			goto out;
 
+		zbx_db_close();
 		zabbix_log(LOG_LEVEL_WARNING, "removing database file: \"%s\"", zbx_config_dbhigh->config_dbname);
 		zbx_db_deinit();
 
@@ -1428,9 +1431,11 @@ static void	proxy_db_init(void)
 		}
 
 		proxy_db_init();
+
+		return;
 #else
 		ZBX_UNUSED(version_check);
-		exit(EXIT_FAILURE);
+		goto out;
 #endif
 	}
 
@@ -1438,13 +1443,21 @@ static void	proxy_db_init(void)
 	zbx_db_table_prepare("items", NULL);
 	zbx_db_table_prepare("item_preproc", NULL);
 #endif
+	zbx_pb_init();
+	zbx_db_close();
+
+	return;
+out:
+	zbx_db_close();
+	exit(EXIT_FAILURE);
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t				listen_sock = {0};
 	char					*error = NULL;
-	int					i, ret;
+	int					i;
+	pid_t					pid;
 	zbx_rtc_t				rtc;
 	zbx_timespec_t				rtc_timeout = {1, 0};
 	zbx_on_exit_args_t			exit_args = {.rtc = NULL, .listen_sock = NULL};
@@ -1712,11 +1725,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-	proxy_db_init();
 
-	zbx_pb_init();
-	zbx_db_close();
+	proxy_db_init();
 	if (0 != config_forks[ZBX_PROCESS_TYPE_DISCOVERYMANAGER])
 		zbx_discoverer_init();
 
@@ -1777,6 +1787,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		rtc_process_request_func = rtc_process_request_ex_proxy_passive;
 	else
 		rtc_process_request_func = rtc_process_request_ex_proxy;
+
+	zbx_set_child_pids(zbx_threads, zbx_threads_num);
 
 	for (i = 0; i < zbx_threads_num; i++)
 	{
@@ -1927,13 +1939,16 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 
-		if (0 < (ret = waitpid((pid_t)-1, &i, WNOHANG)))
+		if (0 < (pid = waitpid((pid_t)-1, &i, WNOHANG)))
 		{
-			zbx_set_exiting_with_fail();
-			break;
+			if (SUCCEED == zbx_is_child_pid(pid, zbx_threads, zbx_threads_num))
+			{
+				zbx_set_exiting_with_fail();
+				break;
+			}
 		}
 
-		if (-1 == ret && EINTR != errno)
+		if (-1 == pid && EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
 			zbx_set_exiting_with_fail();

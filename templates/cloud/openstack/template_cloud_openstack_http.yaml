@@ -34,8 +34,8 @@ zabbix_export:
           key: openstack.identity.auth
           delay: '{$OPENSTACK.AUTH.INTERVAL}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             
             const request_path = '/v3/auth/tokens';
@@ -232,8 +232,8 @@ zabbix_export:
           key: openstack.nova.availability_zone.get
           delay: '{$OPENSTACK.NOVA.INTERVAL.AVAILABILITY_ZONE}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Gets a list of availability zones and its data.'
           preprocessing:
             - type: JSONPATH
@@ -256,8 +256,8 @@ zabbix_export:
           key: openstack.nova.hypervisors.get
           delay: '{$OPENSTACK.NOVA.INTERVAL.HYPERVISOR}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Gets a list of hypervisors and its data.'
           preprocessing:
             - type: JSONPATH
@@ -280,8 +280,8 @@ zabbix_export:
           key: openstack.nova.limits.get
           delay: '{$OPENSTACK.NOVA.INTERVAL.LIMITS}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Gets absolute limits for the project.'
           preprocessing:
             - type: JSONPATH
@@ -445,8 +445,8 @@ zabbix_export:
           key: openstack.nova.servers.get
           delay: '{$OPENSTACK.NOVA.INTERVAL.SERVERS}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Gets a list of servers.'
           preprocessing:
             - type: JSONPATH
@@ -469,8 +469,8 @@ zabbix_export:
           key: openstack.nova.services.get
           delay: '{$OPENSTACK.NOVA.INTERVAL.SERVICES}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Gets a list of compute services and its data.'
           preprocessing:
             - type: JSONPATH
@@ -493,8 +493,8 @@ zabbix_export:
           key: openstack.nova.tenant.get
           delay: '{$OPENSTACK.NOVA.INTERVAL.TENANTS}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             
             const request_path = '/os-simple-tenant-usage';
@@ -649,8 +649,8 @@ zabbix_export:
               key: 'openstack.nova.availability_zone.raw[{#ZONE_NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Raw data of the availability zone.'
               preprocessing:
                 - type: JSONPATH
@@ -747,8 +747,8 @@ zabbix_export:
               key: 'openstack.nova.hypervisors.raw[{#ID}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Raw data of the hypervisor.'
               preprocessing:
                 - type: JSONPATH
@@ -1031,8 +1031,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'openstack.nova.services.disabled.reason[{#ID}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Reason for disabling a service.'
               valuemap:
                 name: 'Compute service disabling reason'
@@ -1058,8 +1058,8 @@ zabbix_export:
               key: 'openstack.nova.services.raw[{#ID}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Raw data of the service.'
               preprocessing:
                 - type: JSONPATH
@@ -1213,8 +1213,8 @@ zabbix_export:
               key: 'openstack.nova.tenant.raw[{#TENANT_ID}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Raw data of the tenant.'
               preprocessing:
                 - type: JSONPATH

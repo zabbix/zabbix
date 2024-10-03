@@ -145,7 +145,7 @@ out:
   value: 'Cannot obtain hardware information.'
   return: 'SYSINFO_RET_FAIL'
 ---
-test case: "#5 File length 0 while actual frament length is bigger"
+test case: "#5 File length 0 while actual fragment length is bigger"
 in:
   param: 'system.hw.chassis[vendor]'
   file_len: 0

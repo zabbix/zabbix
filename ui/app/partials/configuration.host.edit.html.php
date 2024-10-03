@@ -24,7 +24,7 @@ $this->includeJsFile('configuration.host.edit.html.js.php');
 $host_is_discovered = ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
 
 $host_form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('host')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('host')))->removeId())
 	->setId($data['form_name'])
 	->setName($data['form_name'])
 	->setAction((new CUrl('zabbix.php'))
@@ -201,7 +201,7 @@ $host_tab
 			(new CMultiSelect([
 				'name' => 'groups[]',
 				'object_name' => 'hostGroup',
-				'disabled' => $host_is_discovered,
+				'readonly' => $host_is_discovered,
 				'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
 				'data' => $data['groups_ms'],
 				'popup' => [
@@ -410,8 +410,8 @@ $inventory_tab = (new CFormGrid())
 				->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
 				->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
 				->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
-				->setEnabled(!$host_is_discovered)
-				->setModern(true),
+				->setReadonly($host_is_discovered)
+				->setModern(),
 			$host_is_discovered ? new CInput('hidden', 'inventory_mode', $data['host']['inventory_mode']) : null
 		])
 	]);
@@ -423,7 +423,7 @@ foreach ($data['inventory_fields'] as $inventory_no => $inventory_field) {
 		$data['host']['inventory'][$field_name] = '';
 	}
 
-	if ($inventory_field['type'] == DB::FIELD_TYPE_TEXT) {
+	if ($inventory_field['type'] & DB::FIELD_TYPE_TEXT) {
 		$input_field = (new CTextArea('host_inventory['.$field_name.']', $data['host']['inventory'][$field_name]))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH);
 	}
@@ -482,7 +482,7 @@ $encryption_tab = (new CFormGrid())
 				->addValue(_('PSK'), HOST_ENCRYPTION_PSK)
 				->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
 				->setModern(true)
-				->setEnabled(!$host_is_discovered)
+				->setReadonly($host_is_discovered)
 		)
 	])
 	->addItem([
@@ -492,15 +492,15 @@ $encryption_tab = (new CFormGrid())
 				(new CCheckBox('tls_in_none'))
 					->setChecked(($tls_accept & HOST_ENCRYPTION_NONE))
 					->setLabel(_('No encryption'))
-					->setEnabled(!$host_is_discovered),
+					->setReadonly($host_is_discovered),
 				(new CCheckBox('tls_in_psk'))
 					->setChecked(($tls_accept & HOST_ENCRYPTION_PSK))
 					->setLabel(_('PSK'))
-					->setEnabled(!$host_is_discovered),
+					->setReadonly($host_is_discovered),
 				(new CCheckBox('tls_in_cert'))
 					->setChecked(($tls_accept & HOST_ENCRYPTION_CERTIFICATE))
 					->setLabel(_('Certificate'))
-					->setEnabled(!$host_is_discovered)
+					->setReadonly($host_is_discovered)
 			]))
 				->addClass(ZBX_STYLE_LIST_CHECK_RADIO),
 			new CInput('hidden', 'tls_accept', $tls_accept)

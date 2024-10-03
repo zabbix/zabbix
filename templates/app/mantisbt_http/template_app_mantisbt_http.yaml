@@ -27,8 +27,8 @@ zabbix_export:
           key: mantisbt.get.projects
           delay: 1h
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get projects from Mantis BT.'
           timeout: 30s
           url: '{$MANTIS.URL}/api/rest/projects/'
@@ -593,8 +593,8 @@ zabbix_export:
               key: 'mantisbt.get.issues[{#NAME}]'
               delay: 20m
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Getting project issues.'
               timeout: 30s
               url: '{$MANTIS.URL}/api/rest/issues?project_id={#ID}&page_size=0'

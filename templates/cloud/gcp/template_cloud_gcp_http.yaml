@@ -31,8 +31,8 @@ zabbix_export:
           type: DEPENDENT
           key: gcp.auth.err.check
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'A list of errors from API requests.'
           preprocessing:
             - type: JSONPATH
@@ -62,8 +62,8 @@ zabbix_export:
           key: gcp.authorization
           delay: '{$GCP.AUTH.FREQUENCY}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var auth_url = 'https://oauth2.googleapis.com/token',
             	issued = Math.floor(new Date().getTime() / 1000),
@@ -200,8 +200,8 @@ zabbix_export:
           key: gcp.cloudsql.instances.get
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'GCP Cloud SQL: Instances get.'
           preprocessing:
             - type: JAVASCRIPT
@@ -416,8 +416,8 @@ zabbix_export:
           key: gcp.gce.instances.get
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get GCP Compute Engine instances.'
           preprocessing:
             - type: JAVASCRIPT
@@ -574,8 +574,8 @@ zabbix_export:
           key: gcp.gce.quotas.get
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'GCP Compute Engine resource quotas available for the particular project.'
           preprocessing:
             - type: JAVASCRIPT
@@ -1243,8 +1243,8 @@ zabbix_export:
               key: 'gcp.gce.quota.single.raw[{#GCE.QUOTA.NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'GCP Compute Engine: Get metrics for [{#GCE.QUOTA.NAME}] quota.'
               preprocessing:
                 - type: JSONPATH
@@ -1799,8 +1799,8 @@ zabbix_export:
           key: gcp.cloudsql.mssql.db.get
           delay: '{$GCP.TIME.WINDOW}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var base_path = 'cloudsql.googleapis.com/database/sqlserver/transactions/',
             	arr = [],
@@ -1931,8 +1931,8 @@ zabbix_export:
                 - 10m
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
-          posts: '{"query":"cloudsql.googleapis.com/database/up | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
           status_codes: ''
+          posts: '{"query":"cloudsql.googleapis.com/database/up | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
           headers:
             - name: Content-Type
               value: application/json
@@ -2107,8 +2107,8 @@ zabbix_export:
                 - 10m
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
-          posts: '{"query":"cloudsql.googleapis.com/database/state | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
           status_codes: ''
+          posts: '{"query":"cloudsql.googleapis.com/database/state | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
           headers:
             - name: Content-Type
               value: application/json
@@ -2407,8 +2407,8 @@ zabbix_export:
           key: gcp.cloudsql.mssql.metrics.get
           delay: '{$GCP.TIME.WINDOW}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var base_path = 'cloudsql.googleapis.com/database/',
             	mssql_path = 'cloudsql.googleapis.com/database/sqlserver/',
@@ -2680,8 +2680,8 @@ zabbix_export:
           key: gcp.cloudsql.mssql.resources.get
           delay: '{$GCP.TIME.WINDOW}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var base_path = 'cloudsql.googleapis.com/database/sqlserver/transactions/',
             	arr = [],
@@ -2799,8 +2799,8 @@ zabbix_export:
           key: gcp.cloudsql.mssql.schedulers.get
           delay: '{$GCP.TIME.WINDOW}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var base_path = 'cloudsql.googleapis.com/database/sqlserver/schedulers/',
             	arr = [],
@@ -3058,8 +3058,8 @@ zabbix_export:
               key: 'gcp.cloudsql.mssql.db.raw[{#DB.NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data in raw format for the [{#DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
@@ -3173,8 +3173,8 @@ zabbix_export:
               key: 'gcp.cloudsql.mssql.resource.raw[{#RESOURCE.NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data in raw format for the [{#RESOURCE.NAME}] resource.'
               preprocessing:
                 - type: JSONPATH
@@ -3302,8 +3302,8 @@ zabbix_export:
               key: 'gcp.cloudsql.mssql.scheduler.raw[{#SCHEDULER.ID}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data in raw format associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].'
               preprocessing:
                 - type: JSONPATH
@@ -3702,8 +3702,8 @@ zabbix_export:
           key: gcp.cloudsql.mssql.repl.metrics.get
           delay: '{$GCP.TIME.WINDOW}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var base_path = 'cloudsql.googleapis.com/database/sqlserver/replication/',
             	obj = {},
@@ -4032,8 +4032,8 @@ zabbix_export:
                 - 10m
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
-          posts: '{"query":"cloudsql.googleapis.com/database/up | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
           status_codes: ''
+          posts: '{"query":"cloudsql.googleapis.com/database/up | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
           headers:
             - name: Content-Type
               value: application/json
@@ -4327,8 +4327,8 @@ zabbix_export:
                 - 10m
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
-          posts: '{"query":"cloudsql.googleapis.com/database/state | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
           status_codes: ''
+          posts: '{"query":"cloudsql.googleapis.com/database/state | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
           headers:
             - name: Content-Type
               value: application/json
@@ -4490,8 +4490,8 @@ zabbix_export:
           key: gcp.cloudsql.mysql.metrics.get
           delay: '{$GCP.TIME.WINDOW}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var base_path = 'cloudsql.googleapis.com/database/',
             	mysql_path = 'cloudsql.googleapis.com/database/mysql/',
@@ -5068,8 +5068,8 @@ zabbix_export:
           key: gcp.cloudsql.mysql.repl.metrics.get
           delay: '{$GCP.TIME.WINDOW}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var base_path = 'cloudsql.googleapis.com/database/replication/',
             	mysql_path = 'cloudsql.googleapis.com/database/mysql/replication/',
@@ -5555,8 +5555,8 @@ zabbix_export:
                 - 10m
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
-          posts: '{"query":"cloudsql.googleapis.com/database/up | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
           status_codes: ''
+          posts: '{"query":"cloudsql.googleapis.com/database/up | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
           headers:
             - name: Content-Type
               value: application/json
@@ -5731,8 +5731,8 @@ zabbix_export:
                 - 10m
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
-          posts: '{"query":"cloudsql.googleapis.com/database/state | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
           status_codes: ''
+          posts: '{"query":"cloudsql.googleapis.com/database/state | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
           headers:
             - name: Content-Type
               value: application/json
@@ -5894,8 +5894,8 @@ zabbix_export:
           key: gcp.cloudsql.pgsql.metrics.get
           delay: '{$GCP.TIME.WINDOW}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var base_path = 'cloudsql.googleapis.com/database/',
             	pgsql_path = 'cloudsql.googleapis.com/database/postgresql/',
@@ -6333,8 +6333,8 @@ zabbix_export:
               key: 'gcp.cloudsql.pgsql.db.metrics.get[{#PGSQL.DB.NAME}]'
               delay: '{$GCP.TIME.WINDOW}'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               params: |
                 var base_path = 'cloudsql.googleapis.com/database/postgresql/',
                 	obj = {};
@@ -7007,8 +7007,8 @@ zabbix_export:
           key: gcp.cloudsql.pgsql.repl.metrics.get
           delay: '{$GCP.TIME.WINDOW}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var base_path = 'cloudsql.googleapis.com/database/replication/',
             	pgsql_path = 'cloudsql.googleapis.com/database/postgresql/replication/',
@@ -7464,8 +7464,8 @@ zabbix_export:
           key: gcp.gce.disks.get
           delay: '{$GCP.TIME.WINDOW}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var base_path = 'compute.googleapis.com/instance/disk/',
             	base_paths = ['read_ops_count', 'read_bytes_count', 'write_bytes_count', 'write_ops_count'];
@@ -7891,8 +7891,8 @@ zabbix_export:
           key: gcp.gce.metrics.get
           delay: '{$GCP.TIME.WINDOW}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var base_path = 'compute.googleapis.com/',
             	value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'],
@@ -8498,8 +8498,8 @@ zabbix_export:
               key: 'gcp.gce.quota.single.raw[{#GCE.DISK.NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data in raw format for the disk with the name [{#GCE.DISK.NAME}].'
               preprocessing:
                 - type: JSONPATH

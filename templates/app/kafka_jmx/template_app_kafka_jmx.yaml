@@ -569,8 +569,8 @@ zabbix_export:
           name: Version
           type: JMX
           key: 'jmx["kafka.server:type=app-info","version"]'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Current version of broker.'
@@ -872,8 +872,8 @@ zabbix_export:
           name: 'ZooKeeper connection status'
           type: JMX
           key: 'jmx["kafka.server:type=SessionExpireListener,name=SessionState","Value"]'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           username: '{$KAFKA.USER}'
           password: '{$KAFKA.PASSWORD}'
           description: 'Connection status of broker''s ZooKeeper session.'

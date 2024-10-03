@@ -19,7 +19,7 @@
  * @var array $data
  */
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('valuemap')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('valuemap')))->removeId())
 	->setId('valuemap-edit-form')
 	->setName('valuemap-edit-form')
 	->addVar('action', $data['action'])

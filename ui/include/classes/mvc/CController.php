@@ -31,7 +31,7 @@ abstract class CController {
 	private $post_content_type = self::POST_CONTENT_TYPE_FORM;
 
 	/**
-	 * Action name, so that controller knows what action he is executing.
+	 * Action name, so that controller knows which action is being executed.
 	 *
 	 * @var string
 	 */
@@ -405,12 +405,12 @@ abstract class CController {
 	 */
 	private function checkCsrfToken(): bool {
 		if (!isRequestMethod('post') || !is_array($this->raw_input)
-				|| !array_key_exists(CCsrfTokenHelper::CSRF_TOKEN_NAME, $this->raw_input)) {
+				|| !array_key_exists(CSRF_TOKEN_NAME, $this->raw_input)) {
 			return false;
 		}
 
 		$skip = ['popup', 'massupdate'];
-		$csrf_token_form = $this->raw_input[CCsrfTokenHelper::CSRF_TOKEN_NAME];
+		$csrf_token_form = $this->raw_input[CSRF_TOKEN_NAME];
 
 		if (!is_string($csrf_token_form)) {
 			return false;

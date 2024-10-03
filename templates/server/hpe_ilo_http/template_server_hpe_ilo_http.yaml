@@ -33,8 +33,8 @@ zabbix_export:
           key: hpe.ilo.get_data
           delay: '{$ILO.INTERVAL}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var ilo = {
             	params: {},
@@ -343,8 +343,8 @@ zabbix_export:
           type: DEPENDENT
           key: hpe.ilo.get_data.check
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The data collection check.'
           preprocessing:
             - type: JSONPATH
@@ -398,8 +398,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.bios.current_version[{#SYSTEM_ID}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The current BIOS version of the computer system.'
               preprocessing:
                 - type: JSONPATH
@@ -435,8 +435,8 @@ zabbix_export:
               key: 'hpe.ilo.computer_system.get_data[{#SYSTEM_ID}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Get data about the computer system.'
               preprocessing:
                 - type: JSONPATH
@@ -457,8 +457,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.model[{#SYSTEM_ID}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The model name of the computer system.'
               preprocessing:
                 - type: JSONPATH
@@ -482,8 +482,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.computer_system.serial_number[{#SYSTEM_ID}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The serial number of the computer system.'
               preprocessing:
                 - type: JSONPATH
@@ -766,8 +766,8 @@ zabbix_export:
               key: 'hpe.ilo.controller.get_data[{#SYSTEM_ID}, {#STORAGE_ID}, {#CONTROLLER_ID}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Get data about the controller.'
               preprocessing:
                 - type: JSONPATH
@@ -796,8 +796,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.controller.model[{#SYSTEM_ID}, {#STORAGE_ID}, {#CONTROLLER_ID}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The model name of the controller.'
               preprocessing:
                 - type: JSONPATH
@@ -829,8 +829,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.controller.serial_number[{#SYSTEM_ID}, {#STORAGE_ID}, {#CONTROLLER_ID}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The serial number of the controller.'
               preprocessing:
                 - type: JSONPATH
@@ -1032,8 +1032,8 @@ zabbix_export:
               key: 'hpe.ilo.drive.get_data[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Get data about the drive.'
               preprocessing:
                 - type: JSONPATH
@@ -1100,8 +1100,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.drive.model[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The model name of the drive.'
               preprocessing:
                 - type: JSONPATH
@@ -1163,8 +1163,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.drive.serial_number[{#SYSTEM_ID}, {#STORAGE_ID}, {#DRIVE_ID}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The serial number of the drive.'
               preprocessing:
                 - type: JSONPATH
@@ -1352,8 +1352,8 @@ zabbix_export:
               key: 'hpe.ilo.fan.get_data[{#CHASSIS_ID}, {#FAN_ID}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Get data about the fan.'
               preprocessing:
                 - type: JSONPATH
@@ -1516,8 +1516,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.manager.firmware.current_version[{#MANAGER_ID}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The current firmware version of the manager.'
               preprocessing:
                 - type: JSONPATH
@@ -1553,8 +1553,8 @@ zabbix_export:
               key: 'hpe.ilo.manager.get_data[{#MANAGER_ID}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Get data about the manager.'
               preprocessing:
                 - type: JSONPATH
@@ -1575,8 +1575,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.manager.model[{#MANAGER_ID}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The model name of the manager.'
               preprocessing:
                 - type: JSONPATH
@@ -1737,8 +1737,8 @@ zabbix_export:
               key: 'hpe.ilo.psu.get_data[{#CHASSIS_ID}, {#PSU_ID}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Get data about the PSU.'
               preprocessing:
                 - type: JSONPATH
@@ -1805,8 +1805,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.psu.model[{#CHASSIS_ID}, {#PSU_ID}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The model name of the PSU.'
               preprocessing:
                 - type: JSONPATH
@@ -1832,8 +1832,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.ilo.psu.serial_number[{#CHASSIS_ID}, {#PSU_ID}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The serial number of the PSU.'
               preprocessing:
                 - type: JSONPATH
@@ -2005,8 +2005,8 @@ zabbix_export:
               key: 'hpe.ilo.sensor.get_data[{#CHASSIS_ID}, {#SENSOR_ID}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Get data about the sensor.'
               preprocessing:
                 - type: JSONPATH
@@ -2194,8 +2194,8 @@ zabbix_export:
               key: 'hpe.ilo.storage.get_data[{#SYSTEM_ID}, {#STORAGE_ID}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Get data about the storage.'
               preprocessing:
                 - type: JSONPATH
@@ -2369,8 +2369,8 @@ zabbix_export:
               key: 'hpe.ilo.volume.get_data[{#SYSTEM_ID}, {#STORAGE_ID}, {#VOLUME_ID}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Get data about the volume.'
               preprocessing:
                 - type: JSONPATH

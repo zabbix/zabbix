@@ -93,8 +93,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: asterisk.get_stats
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Asterisk system information in JSON format.'
           preprocessing:
             - type: JAVASCRIPT
@@ -765,8 +765,8 @@ zabbix_export:
           type: DEPENDENT
           key: asterisk.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Service version'
           preprocessing:
             - type: JSONPATH
@@ -876,8 +876,8 @@ zabbix_export:
               key: 'asterisk.iax.trunk.get[{#OBJECTNAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Raw data for an IAX trunk.'
               preprocessing:
                 - type: JSONPATH
@@ -895,8 +895,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'asterisk.iax.trunk.status[{#OBJECTNAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 IAX trunk status. Here are the possible states that a device state may have:
                 Unmonitored
@@ -976,8 +976,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'asterisk.pjsip.trunk.devicestate[{#OBJECTNAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 PJSIP trunk status. Here are the possible states that a device state may have:
                 Unavailable
@@ -1012,8 +1012,8 @@ zabbix_export:
               key: 'asterisk.pjsip.trunk.get[{#OBJECTNAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Raw data for a PJSIP trunk.'
               preprocessing:
                 - type: JSONPATH
@@ -1094,8 +1094,8 @@ zabbix_export:
               key: 'asterisk.queue.get[{#QUEUE}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Raw data for a queue.'
               preprocessing:
                 - type: JSONPATH
@@ -1176,8 +1176,8 @@ zabbix_export:
               key: 'asterisk.sip.trunk.get[{#OBJECTNAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Raw data for a SIP trunk.'
               preprocessing:
                 - type: JSONPATH
@@ -1195,8 +1195,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'asterisk.sip.trunk.status[{#OBJECTNAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 SIP trunk status. Here are the possible states that a device state may have:
                 Unmonitored

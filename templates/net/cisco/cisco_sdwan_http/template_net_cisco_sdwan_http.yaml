@@ -34,8 +34,8 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.auth.errors
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Item for gathering all the data item errors.'
           preprocessing:
             - type: JSONPATH
@@ -63,8 +63,8 @@ zabbix_export:
           key: sd_wan.authentication
           delay: '{$SDWAN.AUTH.FREQUENCY}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var params = JSON.parse(value),
             	request = new HttpRequest(),
@@ -178,8 +178,8 @@ zabbix_export:
           key: sd_wan.get.devices
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Item for gathering all devices from Cisco SD-WAN API.'
           preprocessing:
             - type: JAVASCRIPT
@@ -295,8 +295,8 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.get.devices.errors
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Item for gathering all the data item errors.'
           preprocessing:
             - type: JSONPATH
@@ -444,6 +444,7 @@ zabbix_export:
             - uuid: 8c53a2dded4a47cba1eb3398aff888d7
               host: '{#UUID}'
               name: '[{#TYPE}] {#NAME}'
+              inventory_mode: AUTOMATIC
               group_links:
                 - group:
                     name: Applications
@@ -471,7 +472,6 @@ zabbix_export:
                   dns: internal.ip
                 - ip: '{#IP}'
                   dns: external.ip
-              inventory_mode: AUTOMATIC
           master_item:
             key: sd_wan.get.devices
           lld_macro_paths:
@@ -636,8 +636,8 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.arch
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The architecture of the operating system.'
           inventory_link: OS_SHORT
           preprocessing:
@@ -862,8 +862,8 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.hostname
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The system host name.'
           inventory_link: NAME
           preprocessing:
@@ -1001,8 +1001,8 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.model
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The model name of the device.'
           inventory_link: MODEL
           preprocessing:
@@ -1019,8 +1019,8 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.os
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The device operating system.'
           inventory_link: OS
           preprocessing:
@@ -1105,8 +1105,8 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.role
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The device role in the network.'
           valuemap:
             name: Unknown
@@ -1126,8 +1126,8 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.serialnumber
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The device serial number.'
           inventory_link: SERIALNO_A
           preprocessing:
@@ -1181,8 +1181,8 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.state_descr
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The description of the device current state.'
           preprocessing:
             - type: JSONPATH
@@ -1231,8 +1231,8 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.device.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The version of the device software.'
           inventory_link: SOFTWARE_FULL
           preprocessing:
@@ -1252,8 +1252,8 @@ zabbix_export:
           type: SCRIPT
           key: sd_wan.get.device
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var params = JSON.parse(value),
             	request = new HttpRequest(),
@@ -1365,8 +1365,8 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.get.device.errors
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Item for gathering errors of the device item.'
           preprocessing:
             - type: JSONPATH
@@ -1393,8 +1393,8 @@ zabbix_export:
           type: SCRIPT
           key: sd_wan.get.interfaces
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var params = JSON.parse(value),
             	request = new HttpRequest(),
@@ -1515,8 +1515,8 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.get.interfaces.errors
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Item for gathering errors of the device interfaces.'
           preprocessing:
             - type: JSONPATH
@@ -1544,8 +1544,8 @@ zabbix_export:
           key: sd_wan.get.routes
           delay: '{$SDWAN.ROUTES.FREQUENCY}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var params = JSON.parse(value),
             	request = new HttpRequest(),
@@ -1717,8 +1717,8 @@ zabbix_export:
           type: DEPENDENT
           key: sd_wan.get.routes.errors
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Item for gathering errors of the device routes.'
           preprocessing:
             - type: JSONPATH
@@ -1791,8 +1791,8 @@ zabbix_export:
               key: 'sd_wan.device.fs.get_data["{#FSNAME}"]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Item for gathering data for the {#FSNAME} filesystem.'
               preprocessing:
                 - type: JAVASCRIPT
@@ -2017,8 +2017,8 @@ zabbix_export:
               key: 'sd_wan.device.if.get_data["{#IFKEY}"]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Item for gathering data for the {#IFNAME} interface.'
               preprocessing:
                 - type: JSONPATH
@@ -2501,8 +2501,8 @@ zabbix_export:
               key: 'sd_wan.routes.get_data[{#LOCAL},{#REMOTE}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Item for gathering data for the route {#LOCAL} => {#REMOTE}.'
               preprocessing:
                 - type: JSONPATH

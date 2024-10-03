@@ -287,8 +287,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'smart.disk.error[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'This metric will contain smartctl errors.'
               preprocessing:
                 - type: JSONPATH
@@ -452,8 +452,8 @@ zabbix_export:
               name: 'SMART [{#NAME}]: Get disk attributes'
               key: 'smart.disk.get[{#PATH},"{#RAIDTYPE}"]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               tags:
                 - tag: component
                   value: raw
@@ -518,8 +518,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'smart.disk.model[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -579,8 +579,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'smart.disk.sn[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -656,8 +656,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'smart.disk.test[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The disk is passed the SMART self-test or not.'
               preprocessing:
                 - type: JSONPATH

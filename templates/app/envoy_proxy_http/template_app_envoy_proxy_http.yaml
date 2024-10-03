@@ -230,8 +230,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: envoy.get_metrics
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get server metrics.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED

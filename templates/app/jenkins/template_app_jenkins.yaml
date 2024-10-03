@@ -26,8 +26,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: jenkins.computer_info
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           authtype: BASIC
           username: '{$JENKINS.USER}'
           password: '{$JENKINS.API.TOKEN}'
@@ -98,8 +98,8 @@ zabbix_export:
           type: DEPENDENT
           key: jenkins.disk_space.message
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The message will reference the first node which fails this check.  There may be other nodes that fail the check, but this health check is designed to fail fast.'
           preprocessing:
             - type: JSONPATH
@@ -168,8 +168,8 @@ zabbix_export:
           key: jenkins.gauges.raw
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Raw items for gauges metrics.'
           preprocessing:
             - type: JSONPATH
@@ -185,8 +185,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: jenkins.get_metrics
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -200,8 +200,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: jenkins.healthcheck
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -956,8 +956,8 @@ zabbix_export:
           key: jenkins.job_info
           delay: 5m
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           authtype: BASIC
           username: '{$JENKINS.USER}'
           password: '{$JENKINS.API.TOKEN}'
@@ -980,8 +980,8 @@ zabbix_export:
           key: jenkins.meters.raw
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Raw items for meters metrics.'
           preprocessing:
             - type: JSONPATH
@@ -1170,8 +1170,8 @@ zabbix_export:
           type: DEPENDENT
           key: jenkins.plugins.message
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The message of plugins health check.'
           preprocessing:
             - type: JSONPATH
@@ -1371,8 +1371,8 @@ zabbix_export:
           type: DEPENDENT
           key: jenkins.temporary_space.message
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The message will reference the first node which fails this check. There may be other nodes that fail the check, but this health check is designed to fail fast.'
           preprocessing:
             - type: JSONPATH
@@ -1415,8 +1415,8 @@ zabbix_export:
           type: DEPENDENT
           key: jenkins.thread_deadlock.message
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The message of thread deadlock health check.'
           preprocessing:
             - type: JSONPATH
@@ -1437,8 +1437,8 @@ zabbix_export:
           key: jenkins.timers.raw
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Raw items for timers metrics.'
           preprocessing:
             - type: JSONPATH
@@ -1454,8 +1454,8 @@ zabbix_export:
           type: DEPENDENT
           key: jenkins.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Version of Jenkins server.'
           preprocessing:
             - type: JSONPATH
@@ -1582,8 +1582,8 @@ zabbix_export:
               key: 'jenkins.computer.get[{#DISPLAY_NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Raw data for a computer.'
               preprocessing:
                 - type: JSONPATH
@@ -1650,8 +1650,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'jenkins.computer.offline.reason[{#DISPLAY_NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'If the computer was offline (either temporarily or not), will return the cause as a string (without user info). Empty string if the system was put offline without given a cause.'
               preprocessing:
                 - type: JSONPATH
@@ -1915,8 +1915,8 @@ zabbix_export:
               key: 'jenkins.job.get[{#NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Raw data for a job.'
               preprocessing:
                 - type: JSONPATH
@@ -1988,8 +1988,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'jenkins.last_build.result[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:

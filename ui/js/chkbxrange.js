@@ -108,7 +108,6 @@ var chkbxRange = {
 	 * @param e
 	 */
 	handleClick: function(e) {
-		e = e || window.event;
 		var checkbox = e.target;
 
 		PageRefresh.restart();
@@ -295,7 +294,13 @@ var chkbxRange = {
 					for (const [action, count] of Object.entries(actions)) {
 						// Checkbox data-actions attribute must match the button attribute.
 						if (button.dataset.required === action) {
-							button.disabled = (count == 0);
+							// Check if there is a minimum amount of checkboxes required to be selected.
+							if (button.dataset.requiredCount) {
+								button.disabled = (count < button.dataset.requiredCount);
+							}
+							else {
+								button.disabled = (count == 0);
+							}
 						}
 					}
 				}

@@ -33,8 +33,8 @@ zabbix_export:
           type: DEPENDENT
           key: hikvision_cam.boot_released_date
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -53,8 +53,8 @@ zabbix_export:
           type: DEPENDENT
           key: hikvision_cam.boot_version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           inventory_link: SOFTWARE_APP_E
           preprocessing:
             - type: JSONPATH
@@ -106,8 +106,8 @@ zabbix_export:
           type: DEPENDENT
           key: hikvision_cam.current_device_time
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -123,8 +123,8 @@ zabbix_export:
           type: DEPENDENT
           key: hikvision_cam.device_description
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           inventory_link: NOTES
           preprocessing:
             - type: JSONPATH
@@ -144,8 +144,8 @@ zabbix_export:
           type: DEPENDENT
           key: hikvision_cam.device_id
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -164,8 +164,8 @@ zabbix_export:
           type: DEPENDENT
           key: hikvision_cam.device_location
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           inventory_link: LOCATION
           preprocessing:
             - type: JSONPATH
@@ -185,8 +185,8 @@ zabbix_export:
           type: DEPENDENT
           key: hikvision_cam.device_name
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           inventory_link: NAME
           preprocessing:
             - type: JSONPATH
@@ -206,8 +206,8 @@ zabbix_export:
           type: DEPENDENT
           key: hikvision_cam.device_type
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           inventory_link: TYPE
           preprocessing:
             - type: JSONPATH
@@ -227,8 +227,8 @@ zabbix_export:
           type: DEPENDENT
           key: hikvision_cam.encoder_released_date
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           inventory_link: SOFTWARE_APP_D
           preprocessing:
             - type: JSONPATH
@@ -248,8 +248,8 @@ zabbix_export:
           type: DEPENDENT
           key: hikvision_cam.encoder_version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           inventory_link: SOFTWARE_APP_C
           preprocessing:
             - type: JSONPATH
@@ -269,8 +269,8 @@ zabbix_export:
           type: DEPENDENT
           key: hikvision_cam.firmware_released_date
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           inventory_link: SOFTWARE_APP_B
           preprocessing:
             - type: JSONPATH
@@ -290,8 +290,8 @@ zabbix_export:
           type: DEPENDENT
           key: hikvision_cam.firmware_version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           inventory_link: SOFTWARE_APP_A
           preprocessing:
             - type: JSONPATH
@@ -322,8 +322,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: hikvision_cam.get_info
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           authtype: DIGEST
           username: '{$USER}'
           password: '{$PASSWORD}'
@@ -377,8 +377,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: hikvision_cam.get_status
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           authtype: DIGEST
           username: '{$USER}'
           password: '{$PASSWORD}'
@@ -432,8 +432,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: hikvision_cam.get_streaming
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           authtype: DIGEST
           username: '{$USER}'
           password: '{$PASSWORD}'
@@ -487,8 +487,8 @@ zabbix_export:
           type: DEPENDENT
           key: hikvision_cam.hardware_version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -507,8 +507,8 @@ zabbix_export:
           type: DEPENDENT
           key: hikvision_cam.mac_address
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           inventory_link: MACADDRESS_A
           preprocessing:
             - type: JSONPATH
@@ -559,8 +559,8 @@ zabbix_export:
           type: DEPENDENT
           key: hikvision_cam.model
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           inventory_link: MODEL
           preprocessing:
             - type: JSONPATH
@@ -580,8 +580,8 @@ zabbix_export:
           type: DEPENDENT
           key: hikvision_cam.serial_number
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           inventory_link: SERIALNO_A
           preprocessing:
             - type: JSONPATH
@@ -612,8 +612,8 @@ zabbix_export:
           type: DEPENDENT
           key: hikvision_cam.support_beep
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -632,8 +632,8 @@ zabbix_export:
           type: DEPENDENT
           key: hikvision_cam.support_video_loss
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -652,8 +652,8 @@ zabbix_export:
           type: DEPENDENT
           key: hikvision_cam.system_contact
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           inventory_link: CONTACT
           preprocessing:
             - type: JSONPATH
@@ -673,8 +673,8 @@ zabbix_export:
           type: DEPENDENT
           key: hikvision_cam.telecontrol_id
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -791,8 +791,8 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'hikvision_cam.get_ptz[{#PTZ_CHANNEL_ID}]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               authtype: DIGEST
               username: '{$USER}'
               password: '{$PASSWORD}'
@@ -1017,8 +1017,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hikvision_cam.h264Profile[{#CHANNEL_ID}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1124,8 +1124,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hikvision_cam.snap_shot_image_type[{#CHANNEL_ID}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1197,8 +1197,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hikvision_cam.video_codec_type[{#CHANNEL_ID}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1223,8 +1223,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hikvision_cam.video_quality_control_type[{#CHANNEL_ID}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1299,8 +1299,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hikvision_cam.video_scan_type[{#CHANNEL_ID}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1381,8 +1381,8 @@ zabbix_export:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: LIKE
                   value: 'Invalid video stream resolution parameters'
-                  status: ENABLED
                   discover: NO_DISCOVER
+                  status: ENABLED
       tags:
         - tag: class
           value: device

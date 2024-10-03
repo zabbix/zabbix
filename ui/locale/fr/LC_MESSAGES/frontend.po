@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-28 19:22+0000\n"
+"PO-Revision-Date: 2024-09-19 18:34+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -955,6 +955,10 @@ msgstr "Ajouter une colonne"
 msgid "Add a new widget"
 msgstr "Ajouter un nouveau widget"
 
+#: widgets/navtree/Widget.php:34
+msgid "Add child element"
+msgstr "Ajouter un élément enfant"
+
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
 msgstr "Ajouter des éléments enfants"
@@ -988,6 +992,11 @@ msgstr "Ajouter des tags d'hôte"
 #: app/views/trigger.massupdate.php:155
 msgid "Add host trigger"
 msgstr "Ajouter un déclencheur à l'hôte"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
+msgid "Add item"
+msgstr "Ajouter un élément"
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1892,6 +1901,10 @@ msgstr "Nombre moyen de demandes d'écriture en attente sur le disque virtuel pe
 #: app/views/administration.authentication.edit.php:131
 msgid "Avoid easy-to-guess passwords"
 msgstr "Évitez les mots de passe faciles à deviner"
+
+#: jsLoader.php:172
+msgid "Awaiting data"
+msgstr "En attente de données"
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -3355,6 +3368,16 @@ msgstr "Impossible d'hériter de la règle LLD avec la clé \"%1$s\" du modèle 
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
 msgstr "Impossible d'hériter de la règle LLD avec la clé \"%1$s\" du modèle \"%2$s\" vers le modèle \"%3$s\", car un élément avec la même clé existe déjà."
+
+#: include/classes/api/services/CItemGeneral.php:684
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:685
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr ""
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
@@ -5415,6 +5438,10 @@ msgstr "Créer un type de média"
 #: app/views/popup.import.php:143 jsLoader.php:349
 msgid "Create new"
 msgstr "Créer un nouveau"
+
+#: jsLoader.php:372
+msgid "Create new report"
+msgstr "Créer un nouveau rapport"
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -9540,6 +9567,10 @@ msgstr[1] "Groupes d'hôtes supprimé"
 msgid "Host group elements"
 msgstr "Éléments du groupe d'hôtes"
 
+#: jsLoader.php:292
+msgid "Host group is not selected."
+msgstr "Le groupe d'hôtes n'est pas sélectionné."
+
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
 msgstr "Type d'étiquette du groupe d'hôtes"
@@ -9618,6 +9649,10 @@ msgstr "Inventaire d'hôtes"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "Aperçu d'inventaire d'hôtes"
+
+#: jsLoader.php:289
+msgid "Host is not selected."
+msgstr "L'hôte n'est pas sélectionné."
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -12504,6 +12539,10 @@ msgstr "Liste des proxys Zabbix avec nom, mode, cryptage, compression, version, 
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name, state (unknown/offline/online). Returns JSON."
 msgstr "Liste des proxys Zabbix avec nom, mode, cryptage, compression, version, dernière visite, nombre d'hôtes, nombre d'éléments, valeurs requises par seconde (vps), compatibilité (actuelle/obsolète/non prise en charge), délais d'attente, nom du groupe de proxy, état (inconnu/hors ligne/en ligne). Renvoie JSON."
 
+#: include/classes/data/CItemData.php:2935
+msgid "List of Zabbix proxy groups configuration data and real-time data. Configuration data includes proxy group name, failover delay, and minimum number of online proxies required for the group to be online. Real-time data includes number of online proxies, percentage of online proxies, and state of proxy group (unknown, offline, recovering, online, degrading). This item does not return groupless proxies. Returns JSON."
+msgstr "Liste des données de configuration et données temps réel des groupes proxy Zabbix. Les données de configuration incluent le nom du groupe de proxys, le délai de basculement et le nombre minimum de proxys en ligne requis pour que le groupe soit en ligne. Les données temps réel incluent le nombre de proxys en ligne, le pourcentage de proxys en ligne et l'état du groupe de proxys (inconnu, hors ligne, en récupération, en ligne, dégradé). Cet élément ne renvoie pas de proxys sans groupe. Retourne un JSON."
+
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Liste les périphériques de bloc et leur type. Retourne un JSON"
@@ -12936,6 +12975,10 @@ msgstr "Emplacement de l'étiquette de l'élément de carte"
 #: include/views/monitoring.sysmap.edit.php:243
 msgid "Map element label type"
 msgstr "Type d'étiquette de l'élément de carte"
+
+#: jsLoader.php:290
+msgid "Map is not selected."
+msgstr "La carte n'est pas sélectionnée."
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -15187,6 +15230,19 @@ msgstr "En ligne"
 #: app/views/administration.proxygroup.list.php:80
 msgid "Online proxies"
 msgstr "Proxys en ligne"
+
+#: include/classes/api/services/CUser.php:874
+#: include/classes/api/services/CUser.php:882
+#: include/classes/api/services/CUser.php:889
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr "Seuls les utilisateurs super-administrateurs ou administrateurs peuvent mettre à jour le paramètre \"%1$s\"."
+
+#: include/classes/api/services/CUser.php:812
+#: include/classes/api/services/CUser.php:853
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
+msgstr "Seuls les utilisateurs super-administrateurs peuvent mettre à jour le paramètre \"%1$s\"."
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -19481,7 +19537,7 @@ msgstr "Fonctions de chaîne de caractères"
 
 #: widgets/piechart/includes/WidgetForm.php:137
 msgid "Stroke width"
-msgstr ""
+msgstr "Largeur du trait"
 
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
@@ -20295,6 +20351,13 @@ msgstr "Thème"
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "Ces paramètres seront transmis au script en tant qu'arguments de ligne de commande dans l'ordre spécifié."
 
+#: app/controllers/CControllerDiscoveryEdit.php:175
+#, c-format
+msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
+msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
+msgstr[0] ""
+msgstr[1] ""
+
 #: include/func.inc.php:2566
 msgid "This day last week"
 msgstr "Ce jour la semaine dernière"
@@ -20854,6 +20917,10 @@ msgstr "Déclencheur dans l'état \"inconnu\""
 #, c-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "Le déclencheur du modèle \"%1$s\" a une dépendance au déclencheur du modèle \"%2$s\"."
+
+#: jsLoader.php:291
+msgid "Trigger is not selected."
+msgstr "Le déclencheur n’est pas sélectionné."
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -21904,6 +21971,11 @@ msgstr "Chaîne de caractères du \"user agent\""
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Un utilisateur ne peut pas s'ajouter à un groupe désactivé ou à un groupe sans accès GUI."
 
+#: include/classes/api/services/CUserGroup.php:673
+#: include/classes/api/services/CUser.php:843
+msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
+msgstr "L'utilisateur ne peut pas s'ajouter à un groupe désactivé ou à un groupe avec un accès GUI désactivé."
+
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
 msgid "User cannot change own role."
@@ -22039,6 +22111,10 @@ msgstr "La saisie de l'utilisateur a été testée avec succès."
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
 msgstr "Un utilisateur n'est pas autorisé à s'effacer lui-même."
+
+#: include/classes/api/services/CUser.php:1837
+msgid "User is not allowed to delete oneself."
+msgstr "L'utilisateur n'est pas autorisé à se supprimer."
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222
@@ -22907,6 +22983,10 @@ msgstr "Vue"
 msgid "View as"
 msgstr "Afficher comme"
 
+#: jsLoader.php:417
+msgid "View related reports"
+msgstr "Afficher les rapports associés"
+
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Taille de l'espace virtuel en octets ou en pourcentage du toutal. Retourne un entier pour les octets; un flottant pour les pourcentages"
@@ -23115,6 +23195,10 @@ msgstr "Le widget est obsolète."
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "Le widget est trop petit pour le nombre de colonnes et de lignes spécifié."
+
+#: jsLoader.php:205
+msgid "Widgets"
+msgstr "Widgets"
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
 #: include/views/configuration.graph.list.php:170
@@ -23487,6 +23571,10 @@ msgstr "Vous n'avez pas la permission d'accéder à cette page."
 #: include/classes/core/ZBase.php:763 include/func.inc.php:1709
 msgid "You must login to view this page."
 msgstr "Vous devez vous identifier pour accéder à cette page."
+
+#: jsLoader.php:287
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr "Vous devez avoir au moins une image téléchargée pour créer un élément de carte. Les images peuvent être téléchargées dans la section Administration->Général->Images."
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -25495,6 +25583,10 @@ msgstr "droite"
 #: app/controllers/CControllerPopupTriggerExpr.php:953
 msgid "right() - Returns the rightmost count characters"
 msgstr "right() - Retourne le nombre de caractères le plus à droite"
+
+#: widgets/navtree/Widget.php:41
+msgid "root"
+msgstr "racine"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"

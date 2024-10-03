@@ -26,8 +26,8 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.4.0
           key: bigip.contact
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: RFC1213-MIB
             The textual identification of the contact person
@@ -76,8 +76,8 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.6.0
           key: bigip.location
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: RFC1213-MIB
             The physical location of this node (e.g.,
@@ -96,8 +96,8 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.1.0
           key: bigip.model
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: RFC1213-MIB
             A textual description of the entity.  This value
@@ -120,8 +120,8 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.5.0
           key: bigip.name
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: RFC1213-MIB
             An administratively-assigned name for this
@@ -141,8 +141,8 @@ zabbix_export:
           snmp_oid: .1.3.6.1.4.1.3375.2.1.4.3.0
           key: bigip.product.build
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: F5-BIGIP-SYSTEM-MIB
             The product build number.
@@ -159,8 +159,8 @@ zabbix_export:
           snmp_oid: .1.3.6.1.4.1.3375.2.1.4.5.0
           key: bigip.product.date
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: F5-BIGIP-SYSTEM-MIB
             The product build date.
@@ -177,8 +177,8 @@ zabbix_export:
           snmp_oid: .1.3.6.1.4.1.3375.2.1.4.4.0
           key: bigip.product.edition
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: F5-BIGIP-SYSTEM-MIB
             The product edition.
@@ -195,8 +195,8 @@ zabbix_export:
           snmp_oid: .1.3.6.1.4.1.3375.2.1.4.1.0
           key: bigip.product.name
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: F5-BIGIP-SYSTEM-MIB
             The product name.
@@ -213,8 +213,8 @@ zabbix_export:
           snmp_oid: .1.3.6.1.4.1.3375.2.1.4.2.0
           key: bigip.product.version
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: F5-BIGIP-SYSTEM-MIB
             The product version.
@@ -231,8 +231,8 @@ zabbix_export:
           snmp_oid: .1.3.6.1.4.1.3375.2.1.3.3.3.0
           key: bigip.serialnumber
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: F5-BIGIP-SYSTEM-MIB
             Serial number
@@ -1412,8 +1412,8 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.4.1.3375.2.1.3.6.2.1.4.{#SNMPINDEX}'
               key: 'bigip.cpu.sensor.name[{#CPU.SENSOR.SLOT},{#CPU.SENSOR.INDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: F5-BIGIP-SYSTEM-MIB
                 Identifier for the CPU.

@@ -89,8 +89,8 @@ zabbix_export:
           key: proxmox.cluster.resources
           delay: 5m
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Resources index.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -111,8 +111,8 @@ zabbix_export:
           key: proxmox.cluster.status
           delay: 5m
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get cluster status information.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -294,8 +294,8 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'proxmox.lxc.get.data[{#LXC.ID}]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Get LXC status data.'
               url: 'https://{$PVE.URL.HOST}:{$PVE.URL.PORT}/api2/json/nodes/{#NODE.NAME}/{#LXC.ID}/status/current'
               headers:
@@ -468,8 +468,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'proxmox.lxc.vmstatus[{#LXC.ID}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Status of LXC container.'
               preprocessing:
                 - type: JSONPATH
@@ -647,8 +647,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'proxmox.node.kernelversion[{#NODE.NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Kernel version info.'
               preprocessing:
                 - type: JSONPATH
@@ -845,8 +845,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'proxmox.node.pveversion[{#NODE.NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'PVE manager version.'
               preprocessing:
                 - type: JSONPATH
@@ -922,8 +922,8 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'proxmox.node.rrd[{#NODE.NAME}]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Read node RRD statistics.'
               preprocessing:
                 - type: JAVASCRIPT
@@ -950,8 +950,8 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'proxmox.node.status[{#NODE.NAME}]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Read node status.'
               url: 'https://{$PVE.URL.HOST}:{$PVE.URL.PORT}/api2/json/nodes/{#NODE.NAME}/status'
               headers:
@@ -1011,8 +1011,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'proxmox.node.timezone[{#NODE.NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Time zone.'
               preprocessing:
                 - type: JSONPATH
@@ -1033,8 +1033,8 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'proxmox.node.time[{#NODE.NAME}]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Read server time and time zone settings.'
               url: 'https://{$PVE.URL.HOST}:{$PVE.URL.PORT}/api2/json/nodes/{#NODE.NAME}/time'
               headers:
@@ -1326,8 +1326,8 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'proxmox.qemu.get.data[{#QEMU.ID}]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Get VM status data.'
               url: 'https://{$PVE.URL.HOST}:{$PVE.URL.PORT}/api2/json/nodes/{#NODE.NAME}/{#QEMU.ID}/status/current'
               headers:
@@ -1500,8 +1500,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'proxmox.qemu.vmstatus[{#QEMU.ID}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Status of Virtual Machine.'
               preprocessing:
                 - type: JSONPATH
@@ -1618,8 +1618,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'proxmox.node.content[{#NODE.NAME},{#STORAGE.NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Allowed storage content types.'
               preprocessing:
                 - type: JSONPATH
@@ -1688,8 +1688,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'proxmox.node.plugintype[{#NODE.NAME},{#STORAGE.NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'More specific type, if available.'
               preprocessing:
                 - type: JSONPATH

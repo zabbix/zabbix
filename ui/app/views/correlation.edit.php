@@ -20,7 +20,7 @@
  */
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('correlation')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('correlation')))->removeId())
 	->setId('correlation-form')
 	->addVar('correlationid', $data['correlationid'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));

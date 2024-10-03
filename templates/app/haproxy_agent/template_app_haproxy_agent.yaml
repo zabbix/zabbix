@@ -45,8 +45,8 @@ zabbix_export:
           key: haproxy.get.nodes
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Array for LLD rules.'
           preprocessing:
             - type: JAVASCRIPT
@@ -99,8 +99,8 @@ zabbix_export:
           type: DEPENDENT
           key: haproxy.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: REGEX
               parameters:
@@ -177,8 +177,8 @@ zabbix_export:
           name: 'Get stats page'
           key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{$HAPROXY.STATS.HOST}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH}"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'HAProxy Statistics Report HTML'
           tags:
             - tag: component
@@ -187,8 +187,8 @@ zabbix_export:
           name: 'Get stats'
           key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{$HAPROXY.STATS.HOST}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH};csv"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'HAProxy Statistics Report in CSV format'
           preprocessing:
             - type: REGEX
@@ -553,8 +553,8 @@ zabbix_export:
               key: 'haproxy.backend.raw[{#PXNAME},{#SVNAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The raw data of the Backend with the name `{#PXNAME}`'
               preprocessing:
                 - type: JSONPATH
@@ -604,8 +604,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.backend.status[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 Possible values:
                 UP - The server is reporting as healthy.
@@ -797,8 +797,8 @@ zabbix_export:
                 - operationobject: ITEM_PROTOTYPE
                   operator: LIKE
                   value: 'Number of responses with codes'
-                  status: ENABLED
                   discover: NO_DISCOVER
+                  status: ENABLED
         - uuid: 69264415d8644ef597affd3dc95d42b2
           name: 'Frontend discovery'
           type: DEPENDENT
@@ -1055,8 +1055,8 @@ zabbix_export:
               key: 'haproxy.frontend.raw[{#PXNAME},{#SVNAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The raw data of the Frontend with the name `{#PXNAME}`'
               preprocessing:
                 - type: JSONPATH
@@ -1128,8 +1128,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.frontend.status[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 Possible values: OPEN, STOP.
                 When Status is OPEN, the frontend is operating normally and ready to receive traffic.
@@ -1258,8 +1258,8 @@ zabbix_export:
                 - operationobject: ITEM_PROTOTYPE
                   operator: LIKE
                   value: 'Number of responses with codes'
-                  status: ENABLED
                   discover: NO_DISCOVER
+                  status: ENABLED
         - uuid: a2f7f79b8f094afd93648f62f99d3369
           name: 'Server discovery'
           type: DEPENDENT
@@ -1384,8 +1384,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.check_status[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 Status of last health check, one of:
                 UNK     -> unknown
@@ -1745,8 +1745,8 @@ zabbix_export:
               key: 'haproxy.server.raw[{#PXNAME},{#SVNAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The raw data of the Server named `{#SVNAME}` and the proxy with the name `{#PXNAME}`'
               preprocessing:
                 - type: JSONPATH
@@ -1800,8 +1800,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'haproxy.server.status[{#PXNAME},{#SVNAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1995,8 +1995,8 @@ zabbix_export:
                 - operationobject: ITEM_PROTOTYPE
                   operator: LIKE
                   value: 'Number of responses with codes'
-                  status: ENABLED
                   discover: NO_DISCOVER
+                  status: ENABLED
       tags:
         - tag: class
           value: software

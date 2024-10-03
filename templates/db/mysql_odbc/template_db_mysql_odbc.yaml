@@ -30,8 +30,8 @@ zabbix_export:
           key: 'db.odbc.get[get_database,"{$MYSQL.DSN}"]'
           delay: 1h
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: 'show databases'
           username: '{$MYSQL.USER}'
           password: '{$MYSQL.PASSWORD}'
@@ -44,8 +44,8 @@ zabbix_export:
           type: ODBC
           key: 'db.odbc.get[get_replication,"{$MYSQL.DSN}"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: 'show slave status'
           username: '{$MYSQL.USER}'
           password: '{$MYSQL.PASSWORD}'
@@ -58,8 +58,8 @@ zabbix_export:
           type: ODBC
           key: 'db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: 'show global status'
           username: '{$MYSQL.USER}'
           password: '{$MYSQL.PASSWORD}'
@@ -100,8 +100,8 @@ zabbix_export:
           type: ODBC
           key: 'db.odbc.select[version,"{$MYSQL.DSN}"]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           params: 'select version()'
           username: '{$MYSQL.USER}'
           password: '{$MYSQL.PASSWORD}'
@@ -1260,8 +1260,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'mysql.slave_io_running["{#MASTER_HOST}"]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Whether the I/O thread for reading the master''s binary log is running. Normally, you want this to be `Yes` unless you have not yet started a replication or have explicitly stopped it with `STOP SLAVE`.'
               preprocessing:
                 - type: JSONPATH
@@ -1300,8 +1300,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'mysql.slave_sql_running["{#MASTER_HOST}"]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 Whether the SQL thread for executing events in the relay log is running.
                 As with the I/O thread, this should normally be `Yes`.
@@ -1334,8 +1334,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'mysql.slave_sql_running_state["{#MASTER_HOST}"]'
               delay: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Shows the state of the SQL driver threads.'
               preprocessing:
                 - type: JSONPATH
@@ -1355,8 +1355,8 @@ zabbix_export:
               key: 'mysql.slave_status["{#MASTER_HOST}"]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Gets status information on the essential parameters of the slave threads.'
               preprocessing:
                 - type: JSONPATH

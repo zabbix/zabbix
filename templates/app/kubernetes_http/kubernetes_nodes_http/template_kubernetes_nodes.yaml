@@ -31,8 +31,8 @@ zabbix_export:
           key: kube.nodes
           delay: 0;s00
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var Kube = {
             	params: {},
@@ -417,8 +417,8 @@ zabbix_export:
           type: DEPENDENT
           key: kube.nodes.check
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Data collection check.'
           preprocessing:
             - type: JSONPATH
@@ -470,8 +470,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.addresses.external_ip[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Typically the IP address of the node that is externally routable (available from outside the cluster).'
               preprocessing:
                 - type: JSONPATH
@@ -493,8 +493,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.addresses.internal_ip[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Typically the IP address of the node that is routable only within the cluster.'
               preprocessing:
                 - type: JSONPATH
@@ -802,8 +802,8 @@ zabbix_export:
               key: 'kube.node.get[{#NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Collecting and processing cluster by node [{#NAME}] data via Kubernetes API.'
               preprocessing:
                 - type: JSONPATH
@@ -821,8 +821,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.info.architecture[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Node architecture.'
               preprocessing:
                 - type: JSONPATH
@@ -843,8 +843,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.info.containerruntime[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 Container runtime.
                 
@@ -868,8 +868,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.info.kernelversion[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Node kernel version.'
               preprocessing:
                 - type: JSONPATH
@@ -890,8 +890,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.info.kubeletversion[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Version of Kubelet.'
               preprocessing:
                 - type: JSONPATH
@@ -912,8 +912,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.info.kubeproxyversion[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Version of KubeProxy.'
               preprocessing:
                 - type: JSONPATH
@@ -934,8 +934,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.info.operatingsystem[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Node operating system.'
               preprocessing:
                 - type: JSONPATH
@@ -956,8 +956,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.info.osversion[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Node OS image.'
               preprocessing:
                 - type: JSONPATH
@@ -978,8 +978,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.node.info.roles[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Node roles.'
               preprocessing:
                 - type: JSONPATH
@@ -1310,8 +1310,8 @@ zabbix_export:
               operations:
                 - operationobject: HOST_PROTOTYPE
                   operator: REGEXP
-                  status: ENABLED
                   discover: DISCOVER
+                  status: ENABLED
         - uuid: b9dd5b50208e415da509f61ec73451c1
           name: 'Pod discovery'
           type: DEPENDENT
@@ -1493,8 +1493,8 @@ zabbix_export:
               key: 'kube.pod.get[{#POD}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Collecting and processing cluster by node [{#NODE}] data via Kubernetes API.'
               preprocessing:
                 - type: JSONPATH

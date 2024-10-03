@@ -61,8 +61,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: travis.get_builds
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Getting builds using Travis API.'
           url: 'https://{$TRAVIS.API.URL}/builds'
           query_fields:
@@ -82,8 +82,8 @@ zabbix_export:
           name: 'Get health'
           type: HTTP_AGENT
           key: travis.get_health
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Getting home JSON using Travis API.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -128,8 +128,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: travis.get_jobs
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Getting jobs using Travis API.'
           url: 'https://{$TRAVIS.API.URL}/jobs'
           headers:
@@ -147,8 +147,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: travis.get_repos
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Getting repos using Travis API.'
           url: 'https://{$TRAVIS.API.URL}/repos'
           query_fields:
@@ -337,8 +337,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'travis.repo.description[{#SLUG}]'
               delay: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Description of Travis repo (git project description).'
               preprocessing:
                 - type: JSONPATH
@@ -359,8 +359,8 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'travis.repo.get_builds[{#SLUG}]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Getting builds of {#SLUG} using Travis API.'
               url: 'https://{$TRAVIS.API.URL}/repo/{#ID}/builds'
               query_fields:
@@ -383,8 +383,8 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'travis.repo.get_caches[{#SLUG}]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Getting caches of {#SLUG} using Travis API.'
               url: 'https://{$TRAVIS.API.URL}/repo/{#ID}/caches'
               query_fields:
@@ -469,8 +469,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'travis.repo.last_build.state[{#SLUG}]'
               delay: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Last build state in {#SLUG} repo.'
               preprocessing:
                 - type: JSONPATH

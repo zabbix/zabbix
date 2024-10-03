@@ -44,8 +44,8 @@ zabbix_export:
           key: yugabytedb.clusters.get
           delay: 1h
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var YugabyteDB = {
             	params: {},
@@ -131,8 +131,8 @@ zabbix_export:
           type: DEPENDENT
           key: yugabytedb.clusters.get.errors
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Item for gathering all the cluster item errors.'
           preprocessing:
             - type: JSONPATH
@@ -541,8 +541,8 @@ zabbix_export:
           key: yugabytedb.cluster.get
           delay: 10m
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var YugabyteDB = {
             	params: {},
@@ -630,8 +630,8 @@ zabbix_export:
           type: DEPENDENT
           key: yugabytedb.cluster.get.errors
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Item for gathering all the cluster item errors.'
           preprocessing:
             - type: JSONPATH
@@ -779,8 +779,8 @@ zabbix_export:
           type: SCRIPT
           key: yugabytedb.cluster.metric.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var YugabyteDB = {
             	params: {},
@@ -917,8 +917,8 @@ zabbix_export:
           type: DEPENDENT
           key: yugabytedb.cluster.metric.get.errors
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Item for gathering all the cluster item errors.'
           preprocessing:
             - type: JSONPATH
@@ -1058,8 +1058,8 @@ zabbix_export:
           type: SCRIPT
           key: yugabytedb.cluster.query.statistic.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var YugabyteDB = {
             	params: {},
@@ -1199,8 +1199,8 @@ zabbix_export:
           type: DEPENDENT
           key: yugabytedb.cluster.query.statistic.get.errors
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Item for gathering all the cluster query statistics item errors.'
           preprocessing:
             - type: JSONPATH
@@ -1244,8 +1244,8 @@ zabbix_export:
           type: DEPENDENT
           key: yugabytedb.cluster.software.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The current version of YugabyteDB installed on the cluster.'
           preprocessing:
             - type: JSONPATH
@@ -1458,8 +1458,8 @@ zabbix_export:
           type: DEPENDENT
           key: yugabytedb.cluster.ybc.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The current version of the YB controller installed on the cluster.'
           preprocessing:
             - type: JSONPATH
@@ -2007,8 +2007,8 @@ zabbix_export:
           key: yugabytedb.keyspace.get
           delay: 10m
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var YugabyteDB = {
             	params: {},
@@ -2120,8 +2120,8 @@ zabbix_export:
           type: DEPENDENT
           key: yugabytedb.keyspace.get.errors
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Item for gathering all the keyspace item errors.'
           preprocessing:
             - type: JSONPATH
@@ -2142,8 +2142,8 @@ zabbix_export:
           key: yugabytedb.node.get
           delay: 10m
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var YugabyteDB = {
             	params: {},
@@ -2230,8 +2230,8 @@ zabbix_export:
           type: DEPENDENT
           key: yugabytedb.node.get.errors
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Item for gathering all the node item errors.'
           preprocessing:
             - type: JSONPATH
@@ -2260,8 +2260,8 @@ zabbix_export:
               key: 'yugabytedb.keyspace.get[{#KEYSPACE.NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Get raw data about the keyspace [{#KEYSPACE.NAME}].'
               preprocessing:
                 - type: JSONPATH
@@ -2433,8 +2433,8 @@ zabbix_export:
               key: 'yugabytedb.node.get[{#NODE.NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Get raw data about the node [{#NODE.NAME}].'
               preprocessing:
                 - type: JSONPATH
@@ -2620,8 +2620,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'yugabytedb.node.region[{#NODE.NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The cloud information for the node [{#NODE.NAME}] about the region.'
               preprocessing:
                 - type: JSONPATH
@@ -2772,8 +2772,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'yugabytedb.node.zone[{#NODE.NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The cloud information for the node [{#NODE.NAME}] about the zone.'
               preprocessing:
                 - type: JSONPATH

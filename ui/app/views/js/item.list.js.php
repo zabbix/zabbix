@@ -117,6 +117,12 @@
 				else if (target.classList.contains('js-massdelete-item')) {
 					this.#delete(target, {itemids: itemids, context: this.context});
 				}
+				else if (target.classList.contains('js-edit-host')) {
+					this.editHost(e, target.dataset.hostid);
+				}
+				else if (target.classList.contains('js-edit-template')) {
+					this.editTemplate(e, target.dataset.hostid);
+				}
 			});
 			document.addEventListener('click', e => {
 				const target = e.target;
@@ -300,7 +306,7 @@
 				.catch(() => {
 					clearMessages();
 
-					const message_box = makeMessageBox('bad', [t('Unexpected server error.')]);
+					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
 
 					addMessage(message_box);
 				});

@@ -24,8 +24,8 @@ zabbix_export:
           name: Version
           type: JMX
           key: 'jmx["Catalina:type=Server",serverInfo]'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           username: '{$TOMCAT.USER}'
           password: '{$TOMCAT.PASSWORD}'
           description: 'The version of the Tomcat.'
@@ -68,8 +68,8 @@ zabbix_export:
               name: '{#JMXVALUE}: Gzip compression status'
               type: JMX
               key: 'jmx[{#JMXOBJ},compression]'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               username: '{$TOMCAT.USER}'
               password: '{$TOMCAT.PASSWORD}'
               description: 'Gzip compression status on {#JMXNAME}. Enabling gzip compression may save server bandwidth.'

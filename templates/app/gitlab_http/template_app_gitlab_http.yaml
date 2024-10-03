@@ -157,8 +157,8 @@ zabbix_export:
           type: DEPENDENT
           key: gitlab.deployments.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Version of the GitLab instance.'
           preprocessing:
             - type: JSONPATH
@@ -204,8 +204,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: gitlab.get_metrics
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:

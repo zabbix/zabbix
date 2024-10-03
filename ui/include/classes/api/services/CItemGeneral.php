@@ -85,11 +85,11 @@ abstract class CItemGeneral extends CApiService {
 	protected const VALUE_TYPE_FIELD_NAMES = [];
 
 	/**
-	 * Maximum number of inheritable items per iteration.
+	 * Maximum number of items per iteration.
 	 *
 	 * @var int
 	 */
-	protected const INHERIT_CHUNK_SIZE = 1000;
+	protected const CHUNK_SIZE = 1000;
 
 	/**
 	 * @abstract
@@ -681,8 +681,8 @@ abstract class CItemGeneral extends CApiService {
 
 						case ZBX_FLAG_DISCOVERY_RULE:
 							$error = $target_is_host
-								? _('Cannot inherit LDD rules with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
-								: _('Cannot inherit LDD rules with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on template "%4$s".');
+								? _('Cannot inherit LLD rules with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
+								: _('Cannot inherit LLD rules with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on template "%4$s".');
 							break;
 					}
 
@@ -716,20 +716,24 @@ abstract class CItemGeneral extends CApiService {
 		$last = 0;
 
 		foreach ($items as $i => $item) {
-			$hosts_chunks = array_chunk($tpl_links[$item['hostid']], self::INHERIT_CHUNK_SIZE, true);
+			$hosts_chunks = array_chunk($tpl_links[$item['hostid']], self::CHUNK_SIZE, true);
 
 			foreach ($hosts_chunks as $hosts) {
-				if ($chunks[$last]['size'] < self::INHERIT_CHUNK_SIZE) {
-					$_hosts = array_slice($hosts, 0, self::INHERIT_CHUNK_SIZE - $chunks[$last]['size'], true);
+				if ($chunks[$last]['size'] < self::CHUNK_SIZE) {
+					$_hosts = array_slice($hosts, 0, self::CHUNK_SIZE - $chunks[$last]['size'], true);
 
-					$can_add_hosts = true;
+					$can_add_hosts = !array_intersect_key($chunks[$last]['hosts'],
+						array_diff_key($tpl_links[$item['hostid']], $_hosts)
+					);
 
-					foreach ($chunks[$last]['item_indexes'] as $_i) {
-						$new_hosts = array_diff_key($_hosts, $chunks[$last]['hosts']);
+					if ($can_add_hosts) {
+						foreach ($chunks[$last]['item_indexes'] as $_i) {
+							$new_hosts = array_diff_key($_hosts, $chunks[$last]['hosts']);
 
-						if (array_intersect_key($tpl_links[$items[$_i]['hostid']], $new_hosts)) {
-							$can_add_hosts = false;
-							break;
+							if (array_intersect_key($tpl_links[$items[$_i]['hostid']], $new_hosts)) {
+								$can_add_hosts = false;
+								break;
+							}
 						}
 					}
 

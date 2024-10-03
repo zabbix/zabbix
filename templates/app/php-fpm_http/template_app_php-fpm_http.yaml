@@ -41,8 +41,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: php-fpm.get_ping
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           url: '{$PHP_FPM.SCHEME}://{$PHP_FPM.HOST}:{$PHP_FPM.PORT}/{$PHP_FPM.PING.PAGE}'
           retrieve_mode: BOTH
           tags:
@@ -53,8 +53,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: php-fpm.get_status
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           url: '{$PHP_FPM.SCHEME}://{$PHP_FPM.HOST}:{$PHP_FPM.PORT}/{$PHP_FPM.STATUS.PAGE}?json'
           tags:
             - tag: component
@@ -150,8 +150,8 @@ zabbix_export:
           type: DEPENDENT
           key: php-fpm.name
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The name of the current pool.'
           preprocessing:
             - type: JSONPATH
@@ -258,8 +258,8 @@ zabbix_export:
           type: DEPENDENT
           key: php-fpm.process_manager
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The method used by the process manager to control the number of child processes for this pool.'
           preprocessing:
             - type: JSONPATH
@@ -374,8 +374,8 @@ zabbix_export:
           type: DEPENDENT
           key: php-fpm.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The current version of the PHP. You can get it from the HTTP-Header "X-Powered-By"; it may not work if you have changed the default HTTP-headers.'
           preprocessing:
             - type: REGEX

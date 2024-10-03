@@ -27,8 +27,8 @@ zabbix_export:
           key: vault.check_mountpoint_discovery
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           preprocessing:
             - type: PROMETHEUS_TO_JSON
               parameters:
@@ -69,8 +69,8 @@ zabbix_export:
           key: vault.check_replication_discovery
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           preprocessing:
             - type: PROMETHEUS_TO_JSON
               parameters:
@@ -95,8 +95,8 @@ zabbix_export:
           key: vault.check_storage_discovery
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           preprocessing:
             - type: PROMETHEUS_TO_JSON
               parameters:
@@ -138,8 +138,8 @@ zabbix_export:
           key: vault.check_wal_discovery
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           preprocessing:
             - type: PROMETHEUS_TO_JSON
               parameters:
@@ -164,8 +164,8 @@ zabbix_export:
           key: vault.clear_metrics
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           preprocessing:
             - type: CHECK_JSON_ERROR
               parameters:
@@ -183,8 +183,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: vault.get_health
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -206,8 +206,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: vault.get_leader
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -226,8 +226,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: vault.get_metrics
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -247,8 +247,8 @@ zabbix_export:
           type: DEPENDENT
           key: vault.get_metrics.error
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Get metrics error.'
           preprocessing:
             - type: JSONPATH
@@ -283,8 +283,8 @@ zabbix_export:
           key: vault.get_tokens
           delay: 15m
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var params = JSON.parse(value);
             
@@ -443,8 +443,8 @@ zabbix_export:
           type: DEPENDENT
           key: vault.health.replication_dr_mode
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             Disaster recovery replication mode
             https://www.vaultproject.io/docs/enterprise/replication
@@ -466,8 +466,8 @@ zabbix_export:
           type: DEPENDENT
           key: vault.health.replication_performance_mode
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             Performance replication mode
             https://www.vaultproject.io/docs/enterprise/replication
@@ -546,8 +546,8 @@ zabbix_export:
           type: DEPENDENT
           key: vault.health.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Server version.'
           preprocessing:
             - type: JSONPATH
@@ -2253,8 +2253,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'vault.token_via_accessor.error["{#ACCESSOR}"]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Token lookup error text.'
               valuemap:
                 name: 'Vault flag'

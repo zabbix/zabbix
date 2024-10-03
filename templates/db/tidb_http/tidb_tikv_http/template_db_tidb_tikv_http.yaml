@@ -106,8 +106,8 @@ zabbix_export:
           key: tikv.coprocessor_requests.metrics
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get metrics of coprocessor requests.'
           preprocessing:
             - type: JSONPATH
@@ -290,8 +290,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: tikv.get_metrics
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get TiKV instance metrics.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -330,8 +330,8 @@ zabbix_export:
           key: tikv.grpc_msgs.metrics
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get QPS metrics in TiKV instance.'
           preprocessing:
             - type: JSONPATH
@@ -370,8 +370,8 @@ zabbix_export:
           key: tikv.messages.failure.metrics
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get metrics of reporting failure messages.'
           preprocessing:
             - type: JSONPATH
@@ -456,8 +456,8 @@ zabbix_export:
           key: tikv.scheduler.metrics
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get metrics of scheduler commands.'
           preprocessing:
             - type: JSONPATH
@@ -639,8 +639,8 @@ zabbix_export:
           key: tikv.store_size.metrics
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get capacity metrics of TiKV instance.'
           preprocessing:
             - type: JSONPATH
@@ -721,8 +721,8 @@ zabbix_export:
               key: 'tikv.coprocessor_request.metrics[{#REQ_TYPE}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Get metrics of {#REQ_TYPE} requests.'
               preprocessing:
                 - type: JSONPATH
@@ -1004,8 +1004,8 @@ zabbix_export:
                 - operationobject: TRIGGER_PROTOTYPE
                   operator: LIKE
                   value: 'Too many failure messages'
-                  status: ENABLED
                   discover: DISCOVER
+                  status: ENABLED
       tags:
         - tag: class
           value: database

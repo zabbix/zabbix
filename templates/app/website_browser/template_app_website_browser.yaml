@@ -25,8 +25,8 @@ zabbix_export:
           key: website.get.data
           delay: '{$WEBSITE.GET.DATA.INTERVAL}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             const Website = {
                 params: {},
@@ -103,8 +103,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.metrics.check
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Check that the performance counters of the requested website data has been received correctly.'
           preprocessing:
             - type: JSONPATH
@@ -135,8 +135,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.navigation.dns_lookup_time
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: s
           description: 'Measuring of time spent on DNS lookup (domainLookupEnd - domainLookupStart).'
           preprocessing:
@@ -159,8 +159,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.navigation.dom_content_loaded_time
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: s
           description: 'Measuring of time spent on DOM content loading (domContentLoadedEventEnd - domContentLoadedEventStart).'
           preprocessing:
@@ -183,8 +183,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.navigation.encoded_size
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: B
           description: 'Measuring of encoded size (encodedBodySize).'
           preprocessing:
@@ -204,8 +204,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.navigation.load_time
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: s
           description: 'Measuring of load finished time (loadEventEnd).'
           preprocessing:
@@ -241,8 +241,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.navigation.request_time
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: s
           description: 'Measuring of time spend on the request (responseStart - requestStart).'
           preprocessing:
@@ -265,8 +265,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.navigation.resource_fetch_time
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: s
           description: 'Measuring of time spent to fetch the resource (without redirects) (responseEnd - fetchStart).'
           preprocessing:
@@ -289,8 +289,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.navigation.response_time
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: s
           description: 'Measuring of time spend on the response (responseEnd - responseStart).'
           preprocessing:
@@ -313,8 +313,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.navigation.service_worker_processing_time
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: s
           description: 'Measuring of sum of time spend on browser''s service worker processing (fetchStart - workerStart).'
           preprocessing:
@@ -337,8 +337,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.navigation.tcp_handshake_time
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: s
           description: 'Measuring of time spent on TCP handshake (connectEnd - connectStart).'
           preprocessing:
@@ -361,8 +361,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.navigation.tls_negotiation_time
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: s
           description: 'Measuring of time spent on TLS negotiation (requestStart - secureConnectionStart).'
           preprocessing:
@@ -385,8 +385,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.navigation.total_size
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: B
           description: 'Measuring of total size (decodedBodySize).'
           preprocessing:
@@ -406,8 +406,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.navigation.transferred_size
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: B
           description: 'Measuring of transferred size (transferSize).'
           preprocessing:
@@ -427,8 +427,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.resource.dns_lookup_time
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: s
           description: 'Measuring of time spent on DNS lookup (domainLookupEnd - domainLookupStart).'
           preprocessing:
@@ -451,8 +451,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.resource.dom_content_loaded_time
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: s
           description: 'Measuring of time spent on DOM content loading (domContentLoadedEventEnd - domContentLoadedEventStart).'
           preprocessing:
@@ -475,8 +475,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.resource.encoded_size
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: B
           description: 'Measuring of encoded size (encodedBodySize).'
           preprocessing:
@@ -496,8 +496,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.resource.fetch_time
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: s
           description: 'Measuring of time spent to fetch the resource (without redirects) (responseEnd - fetchStart).'
           preprocessing:
@@ -520,8 +520,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.resource.load_time
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: s
           description: 'Measuring of load finished time (loadEventEnd).'
           preprocessing:
@@ -557,8 +557,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.resource.request_time
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: s
           description: 'Measuring of time spend on the request (responseStart - requestStart).'
           preprocessing:
@@ -581,8 +581,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.resource.response_time
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: s
           description: 'Measuring of time spend on the response (responseEnd - responseStart).'
           preprocessing:
@@ -605,8 +605,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.resource.service_worker_processing_time
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: s
           description: 'Measuring of sum of time spend on browser''s service worker processing (fetchStart - workerStart).'
           preprocessing:
@@ -629,8 +629,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.resource.tcp_handshake_time
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: s
           description: 'Measuring of time spent on TCP handshake (connectEnd - connectStart).'
           preprocessing:
@@ -653,8 +653,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.resource.tls_negotiation_time
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: s
           description: 'Measuring of time spent on TLS negotiation (requestStart - secureConnectionStart).'
           preprocessing:
@@ -677,8 +677,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.resource.total_size
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: B
           description: 'Measuring of total size (decodedBodySize).'
           preprocessing:
@@ -698,8 +698,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.resource.transferred_size
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: B
           description: 'Measuring of transferred size (transferSize).'
           preprocessing:
@@ -719,8 +719,8 @@ zabbix_export:
           type: DEPENDENT
           key: website.screenshot
           delay: '0'
-          trends: '0'
           value_type: BINARY
+          trends: '0'
           description: 'Website {$WEBSITE.DOMAIN} screenshot.'
           preprocessing:
             - type: JSONPATH

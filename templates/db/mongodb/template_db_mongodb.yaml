@@ -250,8 +250,8 @@ zabbix_export:
           name: 'Get collections usage stats'
           key: 'mongodb.collections.usage["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Returns usage statistics for each collection.'
           tags:
             - tag: component
@@ -739,8 +739,8 @@ zabbix_export:
           name: 'Get oplog stats'
           key: 'mongodb.oplog.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Returns status of the replica set, using data polled from the oplog.'
           tags:
             - tag: component
@@ -774,8 +774,8 @@ zabbix_export:
           name: 'Get Replica Set status'
           key: 'mongodb.rs.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Returns the replica set status from the point of view of the member where the method is run.'
           tags:
             - tag: component
@@ -786,8 +786,8 @@ zabbix_export:
           name: 'Get server status'
           key: 'mongodb.server.status["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Returns a database''s state.'
           tags:
             - tag: component
@@ -837,8 +837,8 @@ zabbix_export:
           name: 'MongoDB version'
           key: 'mongodb.version["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Version of the MongoDB server.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1413,8 +1413,8 @@ zabbix_export:
               name: 'MongoDB {#DBNAME}.{#COLLECTION}: Get collection stats {#DBNAME}.{#COLLECTION}'
               key: 'mongodb.collection.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}","{#COLLECTION}"]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Returns a variety of storage statistics for a given collection.'
               tags:
                 - tag: collection
@@ -1739,8 +1739,8 @@ zabbix_export:
               name: 'MongoDB {#DBNAME}: Get db stats {#DBNAME}'
               key: 'mongodb.db.stats["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}","{#DBNAME}"]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Returns statistics reflecting the database system''s state.'
               tags:
                 - tag: component
@@ -2239,9 +2239,9 @@ zabbix_export:
               type: DEPENDENT
               key: 'mongodb.rs.unhealthy[{#RS_NAME}]'
               delay: '0'
+              value_type: CHAR
               trends: '0'
               discover: NO_DISCOVER
-              value_type: CHAR
               description: 'The replicated nodes in current ReplicaSet with member health value  = 0.'
               preprocessing:
                 - type: JSONPATH
@@ -2325,13 +2325,13 @@ zabbix_export:
                 - operationobject: ITEM_PROTOTYPE
                   operator: LIKE
                   value: 'Number of replicas'
-                  status: ENABLED
                   discover: DISCOVER
+                  status: ENABLED
                 - operationobject: ITEM_PROTOTYPE
                   operator: LIKE
                   value: 'Number of unhealthy replicas'
-                  status: ENABLED
                   discover: DISCOVER
+                  status: ENABLED
                 - operationobject: ITEM_PROTOTYPE
                   operator: LIKE
                   value: 'Replication lag'
@@ -2339,8 +2339,8 @@ zabbix_export:
                 - operationobject: ITEM_PROTOTYPE
                   operator: LIKE
                   value: 'Unhealthy replicas'
-                  status: ENABLED
                   discover: DISCOVER
+                  status: ENABLED
             - name: 'Arbiter metrics'
               step: '2'
               filter:

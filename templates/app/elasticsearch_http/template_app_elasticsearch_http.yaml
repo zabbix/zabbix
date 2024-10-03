@@ -50,8 +50,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: es.cluster.get_health
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           authtype: BASIC
           username: '{$ELASTICSEARCH.USERNAME}'
           password: '{$ELASTICSEARCH.PASSWORD}'
@@ -66,8 +66,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: es.cluster.get_stats
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           authtype: BASIC
           username: '{$ELASTICSEARCH.USERNAME}'
           password: '{$ELASTICSEARCH.PASSWORD}'
@@ -457,8 +457,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: es.nodes.get_stats
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           authtype: BASIC
           username: '{$ELASTICSEARCH.USERNAME}'
           password: '{$ELASTICSEARCH.PASSWORD}'
@@ -611,8 +611,8 @@ zabbix_export:
               key: 'es.node.get.data[{#ES.NODE}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Returns cluster nodes statistics.'
               preprocessing:
                 - type: JSONPATH

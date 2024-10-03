@@ -158,8 +158,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: kubernetes.scheduler.get_metrics
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get raw metrics from Scheduler instance /metrics endpoint.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -389,9 +389,9 @@ zabbix_export:
               key: 'kubernetes.scheduler.e2e_scheduling_bucket[{#LE},"{#RESULT}"]'
               delay: '0'
               history: 1h
+              value_type: FLOAT
               trends: '0'
               discover: NO_DISCOVER
-              value_type: FLOAT
               description: 'E2e scheduling latency in seconds (scheduling algorithm + binding)'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
@@ -411,8 +411,8 @@ zabbix_export:
               name: '["{#RESULT}"]: e2e scheduling, p50'
               type: CALCULATED
               key: 'kubernetes.scheduler.e2e_scheduling_p50["{#RESULT}"]'
-              discover: NO_DISCOVER
               value_type: FLOAT
+              discover: NO_DISCOVER
               units: s
               params: 'bucket_percentile(//kubernetes.scheduler.e2e_scheduling_bucket[*,"{#RESULT}"],5m,50)'
               description: '50 percentile of e2e scheduling latency.'
@@ -425,8 +425,8 @@ zabbix_export:
               name: '["{#RESULT}"]: e2e scheduling, p90'
               type: CALCULATED
               key: 'kubernetes.scheduler.e2e_scheduling_p90["{#RESULT}"]'
-              discover: NO_DISCOVER
               value_type: FLOAT
+              discover: NO_DISCOVER
               units: s
               params: 'bucket_percentile(//kubernetes.scheduler.e2e_scheduling_bucket[*,"{#RESULT}"],5m,90)'
               description: '90 percentile of e2e scheduling latency.'
@@ -439,8 +439,8 @@ zabbix_export:
               name: '["{#RESULT}"]: e2e scheduling, p95'
               type: CALCULATED
               key: 'kubernetes.scheduler.e2e_scheduling_p95["{#RESULT}"]'
-              discover: NO_DISCOVER
               value_type: FLOAT
+              discover: NO_DISCOVER
               units: s
               params: 'bucket_percentile(//kubernetes.scheduler.e2e_scheduling_bucket[*,"{#RESULT}"],5m,95)'
               description: '95 percentile of e2e scheduling latency.'
@@ -453,8 +453,8 @@ zabbix_export:
               name: '["{#RESULT}"]: e2e scheduling, p99'
               type: CALCULATED
               key: 'kubernetes.scheduler.e2e_scheduling_p99["{#RESULT}"]'
-              discover: NO_DISCOVER
               value_type: FLOAT
+              discover: NO_DISCOVER
               units: s
               params: 'bucket_percentile(//kubernetes.scheduler.e2e_scheduling_bucket[*,"{#RESULT}"],5m,99)'
               description: '95 percentile of e2e scheduling latency.'
@@ -563,9 +563,9 @@ zabbix_export:
               key: 'kubernetes.scheduler.binding_duration[{#LE}]'
               delay: '0'
               history: 1h
+              value_type: FLOAT
               trends: '0'
               discover: NO_DISCOVER
-              value_type: FLOAT
               description: 'Binding latency in seconds.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
@@ -583,8 +583,8 @@ zabbix_export:
               name: 'Binding duration, p50'
               type: CALCULATED
               key: 'kubernetes.scheduler.binding_duration_p50[{#SINGLETON}]'
-              discover: NO_DISCOVER
               value_type: FLOAT
+              discover: NO_DISCOVER
               units: s
               params: 'bucket_percentile(//kubernetes.scheduler.binding_duration[*],5m,50)'
               description: '50 percentile of binding latency in seconds.'
@@ -595,8 +595,8 @@ zabbix_export:
               name: 'Binding duration, p90'
               type: CALCULATED
               key: 'kubernetes.scheduler.binding_duration_p90[{#SINGLETON}]'
-              discover: NO_DISCOVER
               value_type: FLOAT
+              discover: NO_DISCOVER
               units: s
               params: 'bucket_percentile(//kubernetes.scheduler.binding_duration[*],5m,90)'
               description: '90 percentile of binding latency in seconds.'
@@ -607,8 +607,8 @@ zabbix_export:
               name: 'Binding duration, p95'
               type: CALCULATED
               key: 'kubernetes.scheduler.binding_duration_p95[{#SINGLETON}]'
-              discover: NO_DISCOVER
               value_type: FLOAT
+              discover: NO_DISCOVER
               units: s
               params: 'bucket_percentile(//kubernetes.scheduler.binding_duration[*],5m,95)'
               description: '99 percentile of binding latency in seconds.'
@@ -619,8 +619,8 @@ zabbix_export:
               name: 'Binding duration, p99'
               type: CALCULATED
               key: 'kubernetes.scheduler.binding_duration_p99[{#SINGLETON}]'
-              discover: NO_DISCOVER
               value_type: FLOAT
+              discover: NO_DISCOVER
               units: s
               params: 'bucket_percentile(//kubernetes.scheduler.binding_duration[*],5m,99)'
               description: '95 percentile of binding latency in seconds.'
@@ -719,9 +719,9 @@ zabbix_export:
               key: 'kubernetes.scheduler.scheduling_algorithm_duration[{#LE}]'
               delay: '0'
               history: 1h
+              value_type: FLOAT
               trends: '0'
               discover: NO_DISCOVER
-              value_type: FLOAT
               description: 'Scheduling algorithm latency in seconds.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
@@ -739,8 +739,8 @@ zabbix_export:
               name: 'Scheduling algorithm duration, p50'
               type: CALCULATED
               key: 'kubernetes.scheduler.scheduling_algorithm_duration_p50[{#SINGLETON}]'
-              discover: NO_DISCOVER
               value_type: FLOAT
+              discover: NO_DISCOVER
               units: s
               params: 'bucket_percentile(//kubernetes.scheduler.scheduling_algorithm_duration[*],5m,50)'
               description: '50 percentile of scheduling algorithm latency in seconds.'
@@ -751,8 +751,8 @@ zabbix_export:
               name: 'Scheduling algorithm duration, p90'
               type: CALCULATED
               key: 'kubernetes.scheduler.scheduling_algorithm_duration_p90[{#SINGLETON}]'
-              discover: NO_DISCOVER
               value_type: FLOAT
+              discover: NO_DISCOVER
               units: s
               params: 'bucket_percentile(//kubernetes.scheduler.scheduling_algorithm_duration[*],5m,90)'
               description: '90 percentile of scheduling algorithm latency in seconds.'
@@ -763,8 +763,8 @@ zabbix_export:
               name: 'Scheduling algorithm duration, p95'
               type: CALCULATED
               key: 'kubernetes.scheduler.scheduling_algorithm_duration_p95[{#SINGLETON}]'
-              discover: NO_DISCOVER
               value_type: FLOAT
+              discover: NO_DISCOVER
               units: s
               params: 'bucket_percentile(//kubernetes.scheduler.scheduling_algorithm_duration[*],5m,95)'
               description: '95 percentile of scheduling algorithm latency in seconds.'
@@ -775,8 +775,8 @@ zabbix_export:
               name: 'Scheduling algorithm duration, p99'
               type: CALCULATED
               key: 'kubernetes.scheduler.scheduling_algorithm_duration_p99[{#SINGLETON}]'
-              discover: NO_DISCOVER
               value_type: FLOAT
+              discover: NO_DISCOVER
               units: s
               params: 'bucket_percentile(//kubernetes.scheduler.scheduling_algorithm_duration[*],5m,99)'
               description: '99 percentile of scheduling algorithm latency in seconds.'

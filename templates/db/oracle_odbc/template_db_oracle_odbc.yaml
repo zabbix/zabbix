@@ -31,8 +31,8 @@ zabbix_export:
           key: 'db.odbc.get[get_archivelog,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           delay: 1h
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             SELECT d.dest_name
             FROM v$archive_dest d , v$database db WHERE d.status != 'INACTIVE' AND db.log_mode = 'ARCHIVELOG';
@@ -48,8 +48,8 @@ zabbix_export:
           key: 'db.odbc.get[get_asm,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           delay: 1h
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: 'SELECT name AS dgname FROM v$asm_diskgroup;'
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
@@ -63,8 +63,8 @@ zabbix_export:
           key: 'db.odbc.get[get_db,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           delay: 1h
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: 'SELECT name as DBNAME, DECODE(CDB, ''YES'', ''CDB'', ''No-CDB'') AS TYPE  FROM V$DATABASE;'
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
@@ -77,8 +77,8 @@ zabbix_export:
           type: ODBC
           key: 'db.odbc.get[get_instance_state,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             SELECT
             INSTANCE_NAME,
@@ -101,8 +101,8 @@ zabbix_export:
           key: 'db.odbc.get[get_pdb,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           delay: 1h
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: 'SELECT name as DBNAME FROM V$PDBS;'
           username: '{$ORACLE.USER}'
           password: '{$ORACLE.PASSWORD}'
@@ -116,8 +116,8 @@ zabbix_export:
           key: 'db.odbc.get[get_system_metrics,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           delay: 0;m0-59
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             SELECT 'SYS::' || METRIC_NAME AS METRIC, ROUND(VALUE,3) as VALUE
              FROM V$SYSMETRIC WHERE GROUP_ID = 2
@@ -188,8 +188,8 @@ zabbix_export:
           key: 'db.odbc.get[get_tablespace,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
           delay: 1h
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             SELECT NVL(CON$NAME, 'DB') CON_NAME,
             TABLESPACE_NAME TABLESPACE,
@@ -591,8 +591,8 @@ zabbix_export:
           type: DEPENDENT
           key: oracle.instance_hostname
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The name of the host machine.'
           preprocessing:
             - type: JSONPATH
@@ -619,8 +619,8 @@ zabbix_export:
           type: DEPENDENT
           key: oracle.instance_name
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The name of the instance.'
           preprocessing:
             - type: JSONPATH
@@ -1410,8 +1410,8 @@ zabbix_export:
           type: DEPENDENT
           key: oracle.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The Oracle Server version.'
           preprocessing:
             - type: JSONPATH
@@ -1471,8 +1471,8 @@ zabbix_export:
               key: 'db.odbc.get[get_archivelog_{#DEST_NAME}_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               delay: 5m
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               params: |
                 SELECT
                 d.dest_name, DECODE (d.status, 'VALID',3, 'DEFERRED', 2, 'ERROR', 1, 0) AS status,
@@ -1498,8 +1498,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'oracle.archivelog_error["{#DEST_NAME}"]'
               delay: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Displays the error message.'
               preprocessing:
                 - type: JSONPATH
@@ -1588,15 +1588,15 @@ zabbix_export:
               type: ODBC
               key: 'db.odbc.get[get_asm_{#DGNAME}_stat,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               params: |
                 SELECT
                 name AS dgname,
                 ROUND(total_mb / DECODE(TYPE, 'NORMAL', 2, 'HIGH', 3, 'EXTERN', 1)*1024*1024) AS size_byte,
                 ROUND(usable_file_mb*1024*1024 ) AS free_size_byte,
                 ROUND(100-(usable_file_mb /(total_mb / DECODE(TYPE, 'NORMAL', 2, 'HIGH', 3, 'EXTERN', 1)))* 100, 2) AS used_percent
-                FROM v$asm_diskgroup
+                FROM v$asm_diskgroup_stat
                 WHERE name = '{#DGNAME}';
               username: '{$ORACLE.USER}'
               password: '{$ORACLE.PASSWORD}'
@@ -1728,8 +1728,8 @@ zabbix_export:
               type: ODBC
               key: 'db.odbc.get[get_cdb_{#DBNAME}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               params: |
                 SELECT name as DBNAME,
                 DECODE(open_mode, 'MOUNTED', 1, 'READ ONLY', 2, 'READ WRITE', 3, 'READ ONLY WITH APPLY', 4, 'MIGRATE', 5, 0) AS open_mode,
@@ -1932,8 +1932,8 @@ zabbix_export:
               type: ODBC
               key: 'db.odbc.get[get_pdb_{#DBNAME}_info,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               params: |
                 SELECT
                 name as DBNAME,
@@ -2034,8 +2034,8 @@ zabbix_export:
               type: ODBC
               key: 'db.odbc.get[get_{#CON_NAME}_tablespace_{#TABLESPACE}_stats,,"Driver={$ORACLE.DRIVER};DBQ=//{$ORACLE.HOST}:{$ORACLE.PORT}/{$ORACLE.SERVICE};"]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               params: |
                 SELECT df.CON_NAME,
                        df.TABLESPACE_NAME                  AS TABLESPACE,

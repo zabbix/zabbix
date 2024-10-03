@@ -29,8 +29,8 @@ zabbix_export:
           type: DEPENDENT
           key: nomad.client.nodes.api.response
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Client nodes API response message.'
           preprocessing:
             - type: JAVASCRIPT
@@ -73,8 +73,8 @@ zabbix_export:
           key: nomad.client.nodes.get
           delay: 1h
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Nomad clients data in raw format.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -117,8 +117,8 @@ zabbix_export:
           type: DEPENDENT
           key: nomad.region
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Current cluster region.'
           preprocessing:
             - type: JSONPATH
@@ -134,8 +134,8 @@ zabbix_export:
           type: DEPENDENT
           key: nomad.server.api.response
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Server-related (`operator/raft/configuration`, `agent/members`) APIs error response message.'
           preprocessing:
             - type: JSONPATH
@@ -167,8 +167,8 @@ zabbix_export:
           key: nomad.server.nodes.get
           delay: 1h
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var Nomad = {
             	setParams: function (params) {
@@ -1024,8 +1024,8 @@ zabbix_export:
           type: DEPENDENT
           key: nomad.client.data.api.response
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Monitoring API response message.'
           preprocessing:
             - type: JAVASCRIPT
@@ -1067,8 +1067,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: nomad.client.data.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Telemetry data in raw format.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -1096,8 +1096,8 @@ zabbix_export:
           type: DEPENDENT
           key: nomad.client.job.allocs.api.response
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Allocations API response message.'
           preprocessing:
             - type: JAVASCRIPT
@@ -1143,8 +1143,8 @@ zabbix_export:
           key: nomad.client.job.allocs.get
           delay: 1h
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Allocated jobs data in raw format.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -1254,8 +1254,8 @@ zabbix_export:
           key: nomad.client.metrics.get
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Nomad client metrics in raw format.'
           preprocessing:
             - type: JSONPATH
@@ -1272,8 +1272,8 @@ zabbix_export:
           type: DEPENDENT
           key: nomad.client.node.info.api.response
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Nodes API response message.'
           preprocessing:
             - type: JAVASCRIPT
@@ -1319,8 +1319,8 @@ zabbix_export:
           key: nomad.client.node.info.get
           delay: 1h
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Node info data in raw format.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -1440,8 +1440,8 @@ zabbix_export:
           type: DEPENDENT
           key: nomad.client.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Nomad client version.'
           preprocessing:
             - type: JSONPATH
@@ -2801,8 +2801,8 @@ zabbix_export:
           type: DEPENDENT
           key: nomad.raft.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Nomad raft version.'
           preprocessing:
             - type: JSONPATH
@@ -3372,8 +3372,8 @@ zabbix_export:
           type: DEPENDENT
           key: nomad.server.data.api.response
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Monitoring API response message.'
           preprocessing:
             - type: JAVASCRIPT
@@ -3415,8 +3415,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: nomad.server.data.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Telemetry data in raw format.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -3960,8 +3960,8 @@ zabbix_export:
           key: nomad.server.metrics.get
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Nomad server metrics in raw format.'
           preprocessing:
             - type: JSONPATH
@@ -5248,8 +5248,8 @@ zabbix_export:
           type: DEPENDENT
           key: nomad.server.stats.api.response
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Internal stats API response message.'
           preprocessing:
             - type: JAVASCRIPT
@@ -5295,8 +5295,8 @@ zabbix_export:
           key: nomad.server.stats.get
           delay: 1h
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Internal stats data in raw format.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -5412,8 +5412,8 @@ zabbix_export:
           type: DEPENDENT
           key: nomad.server.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Nomad server version.'
           preprocessing:
             - type: JSONPATH

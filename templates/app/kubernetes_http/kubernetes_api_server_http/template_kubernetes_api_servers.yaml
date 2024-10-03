@@ -242,8 +242,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: kubernetes.api.get_metrics
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get raw metrics from API instance /metrics endpoint.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -716,8 +716,8 @@ zabbix_export:
               name: 'Client certificate expiration, p1'
               type: CALCULATED
               key: 'kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]'
-              discover: NO_DISCOVER
               value_type: FLOAT
+              discover: NO_DISCOVER
               units: s
               params: 'bucket_percentile(//kubernetes.api.client_certificate_expiration_seconds_bucket[*],5m,1)'
               description: '1 percentile of the remaining lifetime on the certificate used to authenticate a request.'
@@ -751,9 +751,9 @@ zabbix_export:
               key: 'kubernetes.api.client_certificate_expiration_seconds_bucket[{#LE}]'
               delay: '0'
               history: 1h
+              value_type: FLOAT
               trends: '0'
               discover: NO_DISCOVER
-              value_type: FLOAT
               description: 'Distribution of the remaining lifetime on the certificate used to authenticate a request.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
@@ -1053,9 +1053,9 @@ zabbix_export:
               key: 'kubernetes.api.request_duration_seconds_bucket[{#LE},"{#VERB}"]'
               delay: '0'
               history: 1h
+              value_type: FLOAT
               trends: '0'
               discover: NO_DISCOVER
-              value_type: FLOAT
               description: 'Response latency distribution in seconds for each verb.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
@@ -1074,8 +1074,8 @@ zabbix_export:
               name: '["{#VERB}"] Requests, p50'
               type: CALCULATED
               key: 'kubernetes.api.request_duration_seconds_p50["{#VERB}"]'
-              discover: NO_DISCOVER
               value_type: FLOAT
+              discover: NO_DISCOVER
               units: s
               params: 'bucket_percentile(//kubernetes.api.request_duration_seconds_bucket[*,"{#VERB}"],5m,50)'
               description: '50 percentile of response latency distribution in seconds for each verb.'
@@ -1088,8 +1088,8 @@ zabbix_export:
               name: '["{#VERB}"] Requests, p90'
               type: CALCULATED
               key: 'kubernetes.api.request_duration_seconds_p90["{#VERB}"]'
-              discover: NO_DISCOVER
               value_type: FLOAT
+              discover: NO_DISCOVER
               units: s
               params: 'bucket_percentile(//kubernetes.api.request_duration_seconds_bucket[*,"{#VERB}"],5m,90)'
               description: '90 percentile of response latency distribution in seconds for each verb.'
@@ -1102,8 +1102,8 @@ zabbix_export:
               name: '["{#VERB}"] Requests, p95'
               type: CALCULATED
               key: 'kubernetes.api.request_duration_seconds_p95["{#VERB}"]'
-              discover: NO_DISCOVER
               value_type: FLOAT
+              discover: NO_DISCOVER
               units: s
               params: 'bucket_percentile(//kubernetes.api.request_duration_seconds_bucket[*,"{#VERB}"],5m,95)'
               description: '95 percentile of response latency distribution in seconds for each verb.'
@@ -1116,8 +1116,8 @@ zabbix_export:
               name: '["{#VERB}"] Requests, p99'
               type: CALCULATED
               key: 'kubernetes.api.request_duration_seconds_p99["{#VERB}"]'
-              discover: NO_DISCOVER
               value_type: FLOAT
+              discover: NO_DISCOVER
               units: s
               params: 'bucket_percentile(//kubernetes.api.request_duration_seconds_bucket[*,"{#VERB}"],5m,99)'
               description: '99 percentile of response latency distribution in seconds for each verb.'

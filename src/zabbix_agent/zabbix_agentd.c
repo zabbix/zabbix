@@ -297,12 +297,17 @@ static int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_SERVICEMAN */
 	0, /* ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER */
 	0, /* ZBX_PROCESS_TYPE_ODBCPOLLER */
+	0, /* ZBX_PROCESS_TYPE_CONNECTORMANAGER */
 	0, /* ZBX_PROCESS_TYPE_CONNECTORWORKER*/
+	0, /* ZBX_PROCESS_TYPE_DISCOVERYMANAGER */
 	0, /* ZBX_PROCESS_TYPE_HTTPAGENT_POLLER */
 	0, /* ZBX_PROCESS_TYPE_AGENT_POLLER */
+	0, /* ZBX_PROCESS_TYPE_SNMP_POLLER */
+	0, /* ZBX_PROCESS_TYPE_INTERNAL_POLLER */
 	0, /* ZBX_PROCESS_TYPE_DBCONFIGWORKER */
 	0, /* ZBX_PROCESS_TYPE_PG_MANAGER */
-	0 /* ZBX_PROCESS_TYPE_BROWSERPOLLER */
+	0, /* ZBX_PROCESS_TYPE_BROWSERPOLLER */
+	0 /* ZBX_PROCESS_TYPE_HA_MANAGER */
 };
 
 static char	*config_file	= NULL;
@@ -1223,7 +1228,7 @@ static void	signal_redirect_cb(int flags, zbx_signal_handler_f sigusr_handler)
 			}
 			else
 			{
-				if (scope < ZBX_PROCESS_TYPE_EXT_FIRST)
+				if (scope < ZBX_PROCESS_TYPE_COUNT)
 				{
 					zbx_signal_process_by_type(ZBX_RTC_GET_SCOPE(flags), ZBX_RTC_GET_DATA(flags),
 							flags, NULL);
@@ -1246,6 +1251,33 @@ static void	signal_redirect_cb(int flags, zbx_signal_handler_f sigusr_handler)
 				sigusr_handler(flags);
 	}
 #endif
+}
+#endif
+
+#ifndef _WINDOWS
+static int	wait_for_children(const ZBX_THREAD_HANDLE *pids, size_t pids_num)
+{
+	int	ws;
+	pid_t	pid;
+
+	pid = wait(&ws);
+
+	if (-1 == pid)
+	{
+		if (EINTR != errno)
+		{
+			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
+			zbx_set_exiting_with_fail();
+			return FAIL;
+		}
+
+		return SUCCEED;
+	}
+
+	if (FAIL == zbx_is_child_pid(pid, pids, pids_num))
+		return SUCCEED;
+
+	return FAIL;
 }
 #endif
 
@@ -1463,17 +1495,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		THIS_SHOULD_NEVER_HAPPEN;
 	}
 #else
+	zbx_set_child_pids(zbx_threads, zbx_threads_num);
 	zbx_unset_exit_on_terminate();
 
-	while (ZBX_IS_RUNNING() && -1 == wait(&i))	/* wait for any child to exit */
-	{
-		if (EINTR != errno)
-		{
-			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
-			zbx_set_exiting_with_fail();
-			break;
-		}
-	}
+	while (ZBX_IS_RUNNING() && SUCCEED == wait_for_children(zbx_threads, zbx_threads_num))
+		;
 
 	zbx_log_exit_signal();
 

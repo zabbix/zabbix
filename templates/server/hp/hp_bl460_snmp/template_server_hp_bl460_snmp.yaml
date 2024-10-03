@@ -31,8 +31,8 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'hp.server.contact[sysContact]'
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.
@@ -50,8 +50,8 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'hp.server.descr[sysDescr]'
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             A textual description of the entity. This value should
@@ -69,8 +69,8 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.2.2.4.2.0
           key: 'hp.server.hw.model[cpqSiProductName]'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: CPQSINFO-MIB
             The machine product name. The name of the machine used in this system.
@@ -87,8 +87,8 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.232.2.2.2.1.0
           key: 'hp.server.hw.serialnumber[cpqSiSysSerialNum]'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: CPQSINFO-MIB
             The serial number of the physical system unit. The string will be empty if the system does not report the serial number function.
@@ -139,8 +139,8 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'hp.server.location[sysLocation]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.
@@ -158,8 +158,8 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: 'hp.server.name[sysName]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.
@@ -205,8 +205,8 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'hp.server.objectid[sysObjectID]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
@@ -287,8 +287,8 @@ zabbix_export:
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
-          trends: '0'
           value_type: LOG
+          trends: '0'
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items.'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
@@ -705,8 +705,8 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.3.{#SNMPINDEX}'
               key: 'hp.server.hw.physicaldisk.model[cpqDaPhyDrvModel.{#SNMPINDEX}]'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: CPQIDA-MIB
                 Physical Drive Model. This is a text description of the physical drive.
@@ -727,8 +727,8 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.232.3.2.5.1.1.51.{#SNMPINDEX}'
               key: 'hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: CPQIDA-MIB
                 Physical Drive Serial Number.

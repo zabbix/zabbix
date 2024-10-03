@@ -20,7 +20,7 @@
  */
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('maintenance')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('maintenance')))->removeId())
 	->setId('maintenance-form')
 	->setName('maintenance_form')
 	->addVar('maintenanceid', $data['maintenanceid'] ?: 0)
@@ -81,7 +81,8 @@ $tags = (new CTable())
 				->addValue(_('And/Or'), MAINTENANCE_TAG_EVAL_TYPE_AND_OR)
 				->addValue(_('Or'), MAINTENANCE_TAG_EVAL_TYPE_OR)
 				->setModern()
-				->setEnabled($data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
+				->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
+				->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
 		))
 	)
 	->setFooter(
@@ -97,16 +98,19 @@ $tag_template = new CTemplateTag('tag-row-tmpl',
 		(new CTextBox('tags[#{rowNum}][tag]', '#{tag}', false, DB::getFieldLength('maintenance_tag', 'tag')))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			->setAttribute('placeholder', _('tag'))
-			->setReadonly(!$data['allowed_edit']),
+			->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
+			->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL),
 		(new CRadioButtonList('tags[#{rowNum}][operator]', MAINTENANCE_TAG_OPERATOR_LIKE))
 			->addValue(_('Contains'), MAINTENANCE_TAG_OPERATOR_LIKE)
 			->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
 			->setModern()
-			->setReadonly(!$data['allowed_edit']),
+			->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
+			->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL),
 		(new CTextBox('tags[#{rowNum}][value]', '#{value}', false, DB::getFieldLength('maintenance_tag', 'value')))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			->setAttribute('placeholder',  _('value'))
-			->setReadonly(!$data['allowed_edit']),
+			->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
+			->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL),
 		(new CButton('tags[#{rowNum}][remove]', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
@@ -169,7 +173,7 @@ $form->addItem(
 					'name' => 'groupids[]',
 					'object_name' => 'hostGroup',
 					'data' => $data['groups_ms'],
-					'disabled' => !$data['allowed_edit'],
+					'readonly' => !$data['allowed_edit'],
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'host_groups',
@@ -189,7 +193,7 @@ $form->addItem(
 					'name' => 'hostids[]',
 					'object_name' => 'hosts',
 					'data' => $data['hosts_ms'],
-					'disabled' => !$data['allowed_edit'],
+					'readonly' => !$data['allowed_edit'],
 					'popup' => [
 						'parameters' => [
 							'srctbl' => 'hosts',
@@ -215,6 +219,7 @@ $form->addItem(
 				(new CTextArea('description', $data['description']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setReadonly(!$data['allowed_edit'])
+					->setMaxlength(DB::getFieldLength('maintenances', 'description'))
 			)
 		])
 	);

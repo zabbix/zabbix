@@ -41,8 +41,8 @@ zabbix_export:
           type: JMX
           key: 'jmx.discovery[attributes,"com.atlassian.jira:type=jira.license"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           username: '{$JMX.USER}'
           password: '{$JMX.PASSWORD}'
           description: 'License data for the discovery rule.'
@@ -1603,7 +1603,7 @@ zabbix_export:
                       value: '1'
                     - type: STRING
                       name: reference
-                      value: AABAA
+                      value: AABAC
             - name: Mail
               widgets:
                 - type: item

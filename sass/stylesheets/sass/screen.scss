@@ -27,6 +27,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "base/common";
 
 @import "utils/indicator";
+@import "utils/locale";
 @import "utils/resizable";
 @import "utils/scrollable";
 @import "utils/sortable";
@@ -161,7 +162,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 
 		content: $zi-link-external-small;
 		position: absolute;
-		top: 0;
+		bottom: 1px;
 		right: calc(-#{$icon-small-size} - 2px);
 		font-size: $icon-small-size;
 	}
@@ -545,6 +546,13 @@ form {
 .wordbreak {
 	white-space: pre-wrap;
 	word-break: break-word;
+}
+
+.line-clamp {
+	display: -webkit-box;
+	overflow: hidden;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: var(--line-clamp);
 }
 
 // Filters.
@@ -1120,6 +1128,12 @@ select {
 				border-color: $form-border-color !important;
 			}
 		}
+
+		&:checked[readonly] + label span {
+			&::after {
+				border-color: $font-color !important;
+			}
+		}
 	}
 
 	&[type="radio"] {
@@ -1144,6 +1158,12 @@ select {
 		&:checked[disabled] + label span {
 			&::after {
 				background-color: $form-border-color !important;
+			}
+		}
+
+		&:checked[readonly] + label span {
+			&::after {
+				background-color: $font-color !important;
 			}
 		}
 	}
@@ -2071,6 +2091,7 @@ select {
 	.multilineinput-textarea {
 		flex: 1;
 		line-height: $line-height;
+		tab-size: 4;
 		resize: none;
 		white-space: pre;
 		padding: 0 5px;
@@ -2116,7 +2137,7 @@ select {
 	min-height: 24px;
 	overflow: hidden;
 	resize: none;
-	word-break: break-all;
+	word-break: break-word;
 	height: 24px;
 	line-height: 14px;
 	white-space: break-spaces;
@@ -3391,8 +3412,7 @@ svg {
 		flex: 1;
 		align-items: center;
 		display: flex;
-		line-height: 18px;
-		overflow: hidden;
+		line-height: 20px;
 		padding: 0 10px;
 		position: relative;
 	}
@@ -3408,18 +3428,24 @@ svg {
 			min-width: 55px;
 			text-align: center;
 		}
+
+		.count,
+		.name {
+			@extend %overflow-ellipsis;
+			width: 100%;
+		}
 	}
 
 	&.totals-list-vertical {
 		flex-direction: column;
+		min-width: min-content;
 
 		> div {
-			min-height: 21px;
-			padding-top: 3px;
-		}
-
-		.count {
-			margin-right: 5px;
+			column-gap: 5px;
+			min-height: 20px;
+			padding-top: 2px;
+			padding-bottom: 2px;
+			white-space: nowrap;
 		}
 	}
 }
@@ -3751,7 +3777,7 @@ svg {
 	.table-col-function { width: 85px; }
 	.table-col-draw-style { width: 85px; }
 	.table-col-y-axis-side { width: 85px; }
-	.table-col-colour { width: 55px; }
+	.table-col-color { width: 55px; }
 	.table-col-action { width: 55px; }
 }
 

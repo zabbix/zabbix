@@ -31,8 +31,8 @@ zabbix_export:
           type: IPMI
           key: ipmi.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'The master item that receives all sensors with values for LLD and dependent elements from BMC.'
           tags:
             - tag: component
@@ -64,8 +64,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'ipmi.state_text[{#SENSOR_ID}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'It is a state of the discrete IPMI sensor.'
               preprocessing:
                 - type: JSONPATH

@@ -276,8 +276,8 @@ zabbix_export:
           name: 'Get bgwriter'
           key: 'pgsql.bgwriter["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           history: 1h
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: |
             Collect all metrics from pg_stat_bgwriter:
             https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-BGWRITER-VIEW
@@ -320,8 +320,8 @@ zabbix_export:
           name: 'Config hash'
           key: 'pgsql.config.hash["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           delay: 15m
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'PostgreSQL configuration hash.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -463,8 +463,8 @@ zabbix_export:
           name: 'Get connections sum'
           key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: |
             Collect all metrics from pg_stat_activity:
             https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW
@@ -475,8 +475,8 @@ zabbix_export:
           name: 'Get dbstat'
           key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: |
             Collect all metrics from pg_stat_database per database:
             https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW
@@ -487,8 +487,8 @@ zabbix_export:
           name: 'Get locks'
           key: 'pgsql.locks["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: |
             Collect all metrics from pg_locks per database:
             https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES
@@ -560,8 +560,8 @@ zabbix_export:
           name: 'Get queries'
           key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{$PG.QUERY_ETIME.MAX.WARN}"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Collect all metrics by query execution time.'
           tags:
             - tag: component
@@ -692,8 +692,8 @@ zabbix_export:
           name: 'Get transactions'
           key: 'pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Collect metrics by transaction execution time.'
           tags:
             - tag: component
@@ -720,8 +720,8 @@ zabbix_export:
           name: Version
           key: 'pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'PostgreSQL version.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -759,8 +759,8 @@ zabbix_export:
           key: 'pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]'
           delay: 5m
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Collect write-ahead log (WAL) metrics.'
           tags:
             - tag: component
@@ -923,8 +923,8 @@ zabbix_export:
               key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Get dbstat metrics for database "{#DBNAME}".'
               preprocessing:
                 - type: JSONPATH
@@ -1184,8 +1184,8 @@ zabbix_export:
               name: 'DB [{#DBNAME}]: Get frozen XID'
               key: 'pgsql.frozenxid["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               tags:
                 - tag: component
                   value: raw
@@ -1223,8 +1223,8 @@ zabbix_export:
               key: 'pgsql.queries.get_metrics["{#DBNAME}"]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Get queries metrics for database "{#DBNAME}".'
               preprocessing:
                 - type: JSONPATH
@@ -1452,8 +1452,8 @@ zabbix_export:
               name: 'DB [{#DBNAME}]: Get scans'
               key: 'pgsql.scans["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Number of scans done for table/index in this database.'
               tags:
                 - tag: component

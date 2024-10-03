@@ -475,8 +475,8 @@ zabbix_export:
           name: 'Get status'
           key: 'memcached.stats["{$MEMCACHED.CONN.URI}"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           tags:
             - tag: component
               value: raw
@@ -512,8 +512,8 @@ zabbix_export:
           type: DEPENDENT
           key: memcached.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Version of the Memcached server'
           preprocessing:
             - type: JSONPATH

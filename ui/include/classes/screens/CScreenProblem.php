@@ -399,13 +399,15 @@ class CScreenProblem extends CScreenBase {
 		foreach ($problems as &$problem) {
 			foreach ($problem['suppression_data'] as &$data) {
 				if ($data['maintenanceid'] != 0) {
-					$data['maintenance_name'] = $maintenances[$data['maintenanceid']]['name'];
+					$data['maintenance_name'] = array_key_exists($data['maintenanceid'], $maintenances)
+						? $maintenances[$data['maintenanceid']]['name']
+						: _('Inaccessible maintenance');
 				}
-				elseif ($data['userid'] != 0 && array_key_exists($data['userid'], $users)) {
-					$data['username'] = getUserFullname($users[$data['userid']]);
-				}
-				else {
-					$data['username'] = _('Inaccessible user');
+
+				if ($data['userid'] != 0) {
+					$data['username'] = array_key_exists($data['userid'], $users)
+						? getUserFullname($users[$data['userid']])
+						: _('Inaccessible user');
 				}
 			}
 			unset($data);
@@ -1495,12 +1497,12 @@ class CScreenProblem extends CScreenBase {
 
 				if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 					$description[] = [_('Problem'), ': ', (new CDiv($trigger['expression_html']))
-						->addClass(ZBX_STYLE_WORDWRAP), BR()];
+						->addClass(ZBX_STYLE_WORDBREAK), BR()];
 					$description[] = [_('Recovery'), ': ', (new CDiv($trigger['recovery_expression_html']))
-						->addClass(ZBX_STYLE_WORDWRAP)];
+						->addClass(ZBX_STYLE_WORDBREAK)];
 				}
 				else {
-					$description[] = (new CDiv($trigger['expression_html']))->addClass(ZBX_STYLE_WORDWRAP);
+					$description[] = (new CDiv($trigger['expression_html']))->addClass(ZBX_STYLE_WORDBREAK);
 				}
 			}
 

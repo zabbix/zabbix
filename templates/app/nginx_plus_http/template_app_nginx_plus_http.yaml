@@ -26,8 +26,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: nginx.connections
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Returns the statistics of client connections.'
           url: '{$NGINX.API.ENDPOINT}/6/connections/'
           status_codes: '200,404'
@@ -114,8 +114,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: nginx.http.location_zones
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Returns the status information for each HTTP location zone.'
           url: '{$NGINX.API.ENDPOINT}/6/http/location_zones/'
           status_codes: '200,404'
@@ -129,8 +129,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: nginx.http.server_zones
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Returns the status information for each HTTP server zone.'
           url: '{$NGINX.API.ENDPOINT}/6/http/server_zones/'
           status_codes: '200,404'
@@ -144,8 +144,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: nginx.http.upstreams
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Returns the status of each HTTP upstream server group and its servers.'
           url: '{$NGINX.API.ENDPOINT}/6/http/upstreams/'
           status_codes: '200,404'
@@ -159,8 +159,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: nginx.info
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Return status of the NGINX running instance.'
           url: '{$NGINX.API.ENDPOINT}/6/nginx/'
           status_codes: '200,404'
@@ -174,8 +174,8 @@ zabbix_export:
           type: DEPENDENT
           key: nginx.info.address
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The address of the server that accepted status request.'
           preprocessing:
             - type: JSONPATH
@@ -194,8 +194,8 @@ zabbix_export:
           type: DEPENDENT
           key: nginx.info.error
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The description of NGINX errors.'
           preprocessing:
             - type: JSONPATH
@@ -285,8 +285,8 @@ zabbix_export:
           type: DEPENDENT
           key: nginx.info.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'A version number of NGINX.'
           preprocessing:
             - type: JSONPATH
@@ -316,8 +316,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: nginx.requests
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Returns the status of the client''s HTTP requests.'
           url: '{$NGINX.API.ENDPOINT}/6/http/requests/'
           status_codes: '200,404'
@@ -364,8 +364,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: nginx.resolvers
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Returns the status information for each Resolver zone.'
           url: '{$NGINX.API.ENDPOINT}/6/resolvers/'
           status_codes: '200,404'
@@ -379,8 +379,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: nginx.ssl
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Returns the SSL statistics.'
           url: '{$NGINX.API.ENDPOINT}/6/ssl/'
           status_codes: '200,404'
@@ -448,8 +448,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: nginx.stream.server_zones
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Returns the status information for each server zone configured in the "stream" directive.'
           url: '{$NGINX.API.ENDPOINT}/6/stream/server_zones/'
           status_codes: '200,404'
@@ -463,8 +463,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: nginx.stream.upstreams
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Returns status of each stream upstream server group and its servers.'
           url: '{$NGINX.API.ENDPOINT}/6/stream/upstreams/'
           status_codes: '200,404'
@@ -516,8 +516,8 @@ zabbix_export:
               key: 'nginx.http.location_zones.raw[{#NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The raw data of the location zone with the name `{#NAME}`.'
               preprocessing:
                 - type: JSONPATH
@@ -828,8 +828,8 @@ zabbix_export:
               key: 'nginx.http.server_zones.raw[{#NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The raw data of the HTTP server zone with the name `{#NAME}` .'
               preprocessing:
                 - type: JSONPATH
@@ -1222,8 +1222,8 @@ zabbix_export:
               key: 'nginx.http.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The raw data of the HTTP upstream with the name `[{#UPSTREAM}]`and peer with the name`[{#PEER}]`.'
               preprocessing:
                 - type: JSONPATH
@@ -1464,8 +1464,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'nginx.http.upstream.peer.state[{#UPSTREAM},{#PEER}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The current state, which may be one of “up”, “draining”, “down”, “unavail”, “checking”, and “unhealthy”.'
               preprocessing:
                 - type: JSONPATH
@@ -1639,8 +1639,8 @@ zabbix_export:
               key: 'nginx.http.upstreams.raw[{#NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The raw data of the HTTP upstream with the name `{#NAME}`.'
               preprocessing:
                 - type: JSONPATH
@@ -1677,8 +1677,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'nginx.http.upstreams.zone[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The name of the shared memory zone that keeps the group''s configuration and run-time state.'
               preprocessing:
                 - type: JSONPATH
@@ -1732,8 +1732,8 @@ zabbix_export:
               key: 'nginx.resolvers.raw[{#NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The raw data of the `Resolver` with the name `{#NAME}`.'
               preprocessing:
                 - type: JSONPATH
@@ -2134,8 +2134,8 @@ zabbix_export:
               key: 'nginx.stream.server_zones.raw[{#NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The raw data of server zone with the name `{#NAME}`, configured in the "stream" directive.'
               preprocessing:
                 - type: JSONPATH
@@ -2488,8 +2488,8 @@ zabbix_export:
               key: 'nginx.stream.upstream.peer.raw[{#UPSTREAM},{#PEER}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The raw data of the upstream with the name `[{#UPSTREAM}]`and peer with the name`[{#PEER}]`, configured in the "stream" directive.'
               preprocessing:
                 - type: JSONPATH
@@ -2576,8 +2576,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'nginx.stream.upstream.peer.state[{#UPSTREAM},{#PEER}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The current state, which may be one of “up”, “draining”, “down”, “unavail”, “checking”, and “unhealthy”.'
               preprocessing:
                 - type: JSONPATH
@@ -2685,8 +2685,8 @@ zabbix_export:
               key: 'nginx.stream.upstreams.raw[{#NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The raw data of the upstream with the name `[{#UPSTREAM}]`, configured in the "stream" directive.'
               preprocessing:
                 - type: JSONPATH
@@ -2722,8 +2722,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'nginx.stream.upstreams.zone[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:

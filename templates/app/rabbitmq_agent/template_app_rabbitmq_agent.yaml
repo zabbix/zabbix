@@ -429,8 +429,8 @@ zabbix_export:
           name: 'Get exchanges'
           key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/exchanges"]'
           history: 1h
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'The HTTP API endpoint that returns exchanges metrics.'
           preprocessing:
             - type: REGEX
@@ -444,8 +444,8 @@ zabbix_export:
           name: 'Get overview'
           key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           history: 1h
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'The HTTP API endpoint that returns cluster-wide metrics.'
           preprocessing:
             - type: REGEX
@@ -866,8 +866,8 @@ zabbix_export:
               key: 'rabbitmq.get_exchanges["{#VHOST}/{#EXCHANGE}/{#TYPE}"]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The HTTP API endpoint that returns [{#VHOST}][{#EXCHANGE}][{#TYPE}] exchanges metrics'
               preprocessing:
                 - type: JSONPATH
@@ -1101,8 +1101,8 @@ zabbix_export:
           name: 'Get processes summary'
           key: 'proc.get[{$RABBITMQ.PROCESS.NAME.PARAMETER},,,summary]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'The aggregated data of summary metrics for all processes.'
           tags:
             - tag: component
@@ -1253,8 +1253,8 @@ zabbix_export:
           type: DEPENDENT
           key: rabbitmq.node.overview.management_version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The version of the management plugin in use.'
           preprocessing:
             - type: JSONPATH
@@ -1273,8 +1273,8 @@ zabbix_export:
           type: DEPENDENT
           key: rabbitmq.node.overview.rabbitmq_version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The version of the RabbitMQ on the node, which processed this request.'
           preprocessing:
             - type: JSONPATH
@@ -1428,8 +1428,8 @@ zabbix_export:
           name: 'Get nodes'
           key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"]'
           history: 1h
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'The HTTP API endpoint that returns metrics of the nodes.'
           preprocessing:
             - type: REGEX
@@ -1443,8 +1443,8 @@ zabbix_export:
           name: 'Get node overview'
           key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/overview"]'
           history: 1h
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'The HTTP API endpoint that returns cluster-wide metrics.'
           preprocessing:
             - type: REGEX
@@ -1461,8 +1461,8 @@ zabbix_export:
           name: 'Get queues'
           key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
           history: 1h
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'The HTTP API endpoint that returns metrics of the queues metrics.'
           preprocessing:
             - type: REGEX
@@ -1774,8 +1774,8 @@ zabbix_export:
               key: 'rabbitmq.proc.get[{#RABBITMQ.NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The summary metrics aggregated by a process {#RABBITMQ.NAME}.'
               preprocessing:
                 - type: JSONPATH
@@ -1960,8 +1960,8 @@ zabbix_export:
               key: 'rabbitmq.get_exchanges["{#VHOST}/{#QUEUE}"]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The HTTP API endpoint that returns [{#VHOST}][{#QUEUE}] queue metrics'
               preprocessing:
                 - type: JSONPATH

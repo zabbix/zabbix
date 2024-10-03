@@ -249,7 +249,7 @@ class CConfigurationImport {
 					? ['uuid' => $item['uuid']]
 					: [];
 
-				if ($item['valuemap']) {
+				if (array_key_exists('valuemap', $item) && $item['valuemap']) {
 					$valuemaps_refs[$host][$item['valuemap']['name']] = [];
 				}
 			}
@@ -266,7 +266,7 @@ class CConfigurationImport {
 						? ['uuid' => $item_prototype['uuid']]
 						: [];
 
-					if (!empty($item_prototype['valuemap'])) {
+					if (array_key_exists('valuemap', $item_prototype) && $item_prototype['valuemap']) {
 						$valuemaps_refs[$host][$item_prototype['valuemap']['name']] = [];
 					}
 				}
@@ -818,16 +818,6 @@ class CConfigurationImport {
 
 				$levels[$level] = true;
 
-				$delay_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
-					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-					ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT,
-					ITEM_TYPE_BROWSER
-				];
-
-				if (!in_array($item['type'], $delay_types)) {
-					unset($item['delay']);
-				}
-
 				if (array_key_exists('interface_ref', $item) && $item['interface_ref']) {
 					$interfaceid = $this->referencer->findInterfaceidByRef($hostid, $item['interface_ref']);
 
@@ -843,7 +833,7 @@ class CConfigurationImport {
 
 				$item['valuemapid'] = 0;
 
-				if ($item['valuemap']) {
+				if (array_key_exists('valuemap', $item) && $item['valuemap']) {
 					$valuemapid = $this->referencer->findValuemapidByName($hostid, $item['valuemap']['name']);
 
 					if ($valuemapid === null) {
@@ -878,9 +868,11 @@ class CConfigurationImport {
 				}
 
 				foreach ($item['preprocessing'] as &$preprocessing_step) {
-					$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
+					if (array_key_exists('parameters', $preprocessing_step)) {
+						$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
 
-					unset($preprocessing_step['parameters']);
+						unset($preprocessing_step['parameters']);
+					}
 				}
 				unset($preprocessing_step);
 
@@ -1101,15 +1093,6 @@ class CConfigurationImport {
 					$discovery_rule['graph_prototypes'], $discovery_rule['host_prototypes']
 				);
 
-				$delay_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
-					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-					ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
-				];
-
-				if (!in_array($discovery_rule['type'], $delay_types)) {
-					unset($discovery_rule['delay']);
-				}
-
 				if (array_key_exists('interface_ref', $discovery_rule) && $discovery_rule['interface_ref']) {
 					$interfaceid = $this->referencer->findInterfaceidByRef($hostid, $discovery_rule['interface_ref']);
 
@@ -1167,34 +1150,13 @@ class CConfigurationImport {
 				}
 
 				foreach ($discovery_rule['preprocessing'] as &$preprocessing_step) {
-					$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
+					if (array_key_exists('parameters', $preprocessing_step)) {
+						$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
 
-					unset($preprocessing_step['parameters']);
+						unset($preprocessing_step['parameters']);
+					}
 				}
 				unset($preprocessing_step);
-
-				if (array_key_exists('filter', $discovery_rule)) {
-					foreach ($discovery_rule['filter']['conditions'] as &$condition) {
-						if ($discovery_rule['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-							unset($condition['formulaid']);
-						}
-					}
-					unset($condition);
-				}
-
-				foreach ($discovery_rule['overrides'] as &$override) {
-					if (!array_key_exists('filter', $override)) {
-						continue;
-					}
-
-					foreach ($override['filter']['conditions'] as &$condition) {
-						if ($override['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-							unset($condition['formulaid']);
-						}
-					}
-					unset($condition);
-				}
-				unset($override);
 
 				if ($itemid !== null) {
 					$discovery_rule['itemid'] = $itemid;
@@ -1301,7 +1263,7 @@ class CConfigurationImport {
 
 					$item_prototype['valuemapid'] = 0;
 
-					if ($item_prototype['valuemap']) {
+					if (array_key_exists('valuemap', $item_prototype) && $item_prototype['valuemap']) {
 						$valuemapid = $this->referencer->findValuemapidByName($hostid,
 							$item_prototype['valuemap']['name']
 						);
@@ -1355,9 +1317,11 @@ class CConfigurationImport {
 					}
 
 					foreach ($item_prototype['preprocessing'] as &$preprocessing_step) {
-						$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
+						if (array_key_exists('parameters', $preprocessing_step)) {
+							$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
 
-						unset($preprocessing_step['parameters']);
+							unset($preprocessing_step['parameters']);
+						}
 					}
 					unset($preprocessing_step);
 
@@ -1507,8 +1471,8 @@ class CConfigurationImport {
 
 			foreach ($discovery_rules as $discovery_rule) {
 				// If rule was not processed we should not create/update any of its prototypes.
-				if (array_key_exists($hostid, $processed_discovery_rules)
-						&& !array_key_exists($discovery_rule['key_'], $processed_discovery_rules[$hostid])) {
+				if (!array_key_exists($hostid, $processed_discovery_rules)
+						|| !array_key_exists($discovery_rule['key_'], $processed_discovery_rules[$hostid])) {
 					continue;
 				}
 
@@ -1899,9 +1863,23 @@ class CConfigurationImport {
 		$triggers_to_process_dependencies = [];
 
 		foreach ($this->getFormattedTriggers() as $trigger) {
-			$triggerid = null;
+			$hostids = $this->extractHostids($trigger);
 
-			$is_template_trigger = $this->isTemplateTrigger($trigger);
+			if (!$hostids) {
+				continue;
+			}
+
+			$triggerid = null;
+			$is_template_trigger = false;
+
+			foreach ($hostids as $hostid) {
+				if ($this->importedObjectContainer->isTemplateProcessed($hostid)) {
+					$is_template_trigger = true;
+				}
+				elseif (!$this->importedObjectContainer->isHostProcessed($hostid)) {
+					continue 2;
+				}
+			}
 
 			if ($is_template_trigger && array_key_exists('uuid', $trigger)) {
 				$triggerid = $this->referencer->findTriggeridByUuid($trigger['uuid']);
@@ -1952,35 +1930,35 @@ class CConfigurationImport {
 		$this->processTriggerDependencies($triggers_to_process_dependencies);
 	}
 
-	private function isTemplateTrigger(array $trigger): bool {
+	private function extractHostids(array $trigger): array {
 		$expression_parser = new CExpressionParser(['usermacros' => true]);
 
 		if ($expression_parser->parse($trigger['expression']) != CParser::PARSE_SUCCESS) {
-			return false;
+			return [];
 		}
 
-		foreach ($expression_parser->getResult()->getHosts() as $host) {
-			$host = $this->referencer->findTemplateidByHost($host);
+		$hosts = $expression_parser->getResult()->getHosts();
 
-			if ($host !== null) {
-				return true;
+		if ($trigger['recovery_expression'] !== '') {
+			if ($expression_parser->parse($trigger['recovery_expression']) != CParser::PARSE_SUCCESS) {
+				return [];
 			}
+
+			$hosts = array_merge($hosts, $expression_parser->getResult()->getHosts());
 		}
 
-		if ($trigger['recovery_expression'] === ''
-				|| $expression_parser->parse($trigger['recovery_expression']) != CParser::PARSE_SUCCESS) {
-			return false;
-		}
+		$hostids = [];
+		foreach (array_unique($hosts) as $host) {
+			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
-		foreach ($expression_parser->getResult()->getHosts() as $host) {
-			$host = $this->referencer->findTemplateidByHost($host);
-
-			if ($host !== null) {
-				return true;
+			if ($hostid === null) {
+				return [];
 			}
+
+			$hostids[] = $hostid;
 		}
 
-		return false;
+		return $hostids;
 	}
 
 	/**
@@ -2941,7 +2919,7 @@ class CConfigurationImport {
 			foreach ($items as $item) {
 				$resolved_masters_cache[$host_name][$item['key_']] = [
 					'type' => $item['type'],
-					$master_item_key => $item[$master_item_key]
+					$master_item_key => $item['type'] == ITEM_TYPE_DEPENDENT ? $item[$master_item_key] : []
 				];
 
 				if ($item['type'] == ITEM_TYPE_DEPENDENT && array_key_exists('key', $item[$master_item_key])) {

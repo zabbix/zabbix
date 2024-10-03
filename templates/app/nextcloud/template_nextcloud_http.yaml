@@ -139,8 +139,8 @@ zabbix_export:
           type: DEPENDENT
           key: nextcloud.serverinfo.apps.webserver
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Web server description.'
           preprocessing:
             - type: JSONPATH
@@ -250,8 +250,8 @@ zabbix_export:
           type: DEPENDENT
           key: nextcloud.serverinfo.db.type
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Database type.'
           preprocessing:
             - type: JSONPATH
@@ -271,8 +271,8 @@ zabbix_export:
           type: DEPENDENT
           key: nextcloud.serverinfo.db.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Database description.'
           preprocessing:
             - type: JSONPATH
@@ -338,8 +338,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: nextcloud.serverinfo.get_data
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           authtype: BASIC
           username: '{$NEXTCLOUD.USER.NAME}'
           password: '{$NEXTCLOUD.USER.PASSWORD}'
@@ -653,8 +653,8 @@ zabbix_export:
           type: DEPENDENT
           key: nextcloud.serverinfo.php.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'PHP version'
           preprocessing:
             - type: JSONPATH
@@ -685,8 +685,8 @@ zabbix_export:
           type: DEPENDENT
           key: nextcloud.serverinfo.status
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Server information API status'
           preprocessing:
             - type: JSONPATH
@@ -809,8 +809,8 @@ zabbix_export:
           type: DEPENDENT
           key: nextcloud.serverinfo.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Nextcloud service version.'
           preprocessing:
             - type: JSONPATH
@@ -863,8 +863,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'nextcloud.user.displayname[{#NEXTCLOUD.USER}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'User visible name.'
               preprocessing:
                 - type: JSONPATH
@@ -918,8 +918,8 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'nextcloud.user.get_data[{#NEXTCLOUD.USER}]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               authtype: BASIC
               username: '{$NEXTCLOUD.USER.NAME}'
               password: '{$NEXTCLOUD.USER.PASSWORD}'
@@ -1005,8 +1005,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'nextcloud.user.language[{#NEXTCLOUD.USER}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'User language.'
               preprocessing:
                 - type: JSONPATH
@@ -1181,8 +1181,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'nextcloud.user.storageLocation[{#NEXTCLOUD.USER}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The location of the user''s store.'
               preprocessing:
                 - type: JSONPATH

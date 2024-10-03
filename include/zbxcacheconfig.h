@@ -984,6 +984,7 @@ int	zbx_dc_get_proxy_nodata_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *nodat
 int	zbx_dc_get_proxy_delay_by_name(const char *name, int *delay, char **error);
 int	zbx_dc_get_proxy_lastaccess_by_name(const char *name, time_t *lastaccess, char **error);
 void	zbx_proxy_discovery_get(char **data);
+void	zbx_proxy_group_discovery_get(char **data);
 int	zbx_proxy_proxy_list_discovery_get(const zbx_vector_uint64_t *proxyids, char **data, char **error);
 
 unsigned int	zbx_dc_get_internal_action_count(void);
@@ -1469,6 +1470,8 @@ struct zbx_pg_group
 	zbx_uint64_t			proxy_groupid;
 	char				*name;
 	char				*failover_delay;
+#define ZBX_PG_PROXY_MIN_ONLINE_MIN	1
+#define ZBX_PG_PROXY_MIN_ONLINE_MAX	1000
 	char				*min_online;
 	zbx_uint64_t			revision;
 	zbx_uint64_t			hostmap_revision;
@@ -1502,5 +1505,8 @@ void	zbx_dc_set_proxy_failover_delay(const char *failover_delay);
 void	zbx_dc_set_proxy_lastonline(int lastonline);
 zbx_uint64_t	zbx_dc_get_proxy_group_revision(zbx_uint64_t proxy_groupid);
 zbx_uint64_t	zbx_dc_get_proxy_groupid(zbx_uint64_t proxyid);
+
+void	zbx_dc_set_itservices_num(int num);
+int	zbx_dc_get_itservices_num(void);
 
 #endif

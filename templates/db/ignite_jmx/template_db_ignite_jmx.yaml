@@ -749,8 +749,8 @@ zabbix_export:
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Version'
               type: JMX
               key: 'jmx["{#JMXOBJ}",FullVersion]'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               username: '{$IGNITE.USER}'
               password: '{$IGNITE.PASSWORD}'
               description: 'Version of Ignite instance.'
@@ -783,8 +783,8 @@ zabbix_export:
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Local node ID'
               type: JMX
               key: 'jmx["{#JMXOBJ}",LocalNodeId]'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               username: '{$IGNITE.USER}'
               password: '{$IGNITE.PASSWORD}'
               description: 'Unique identifier for this node within grid.'
@@ -953,8 +953,8 @@ zabbix_export:
               name: 'Ignite [{#JMXIGNITEINSTANCENAME}]: Coordinator'
               type: JMX
               key: 'jmx["{#JMXOBJ}",Coordinator]'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               username: '{$IGNITE.USER}'
               password: '{$IGNITE.PASSWORD}'
               description: 'Current coordinator UUID.'
@@ -1269,8 +1269,8 @@ zabbix_export:
               name: 'Cache group [{#JMXNAME}]: Caches'
               type: JMX
               key: 'jmx["{#JMXOBJ}",Caches]'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               username: '{$IGNITE.USER}'
               password: '{$IGNITE.PASSWORD}'
               description: 'List of caches.'

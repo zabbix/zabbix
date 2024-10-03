@@ -19,11 +19,9 @@
  * @var array $data
  */
 
-$csrf_token = CCsrfTokenHelper::get('discovery');
-
 // Create form.
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('discovery')))->removeId())
 	->setId('discoveryForm')
 	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
 	->addStyle('display: none;');
@@ -212,7 +210,10 @@ $check_template_default = (new CTemplateTag('dcheck-row-tmpl'))->addItem(
 			->setId('dcheckCell_#{dcheckid}'),
 		new CHorList([
 			(new CButtonLink(_('Edit')))->addClass('js-edit'),
-			(new CButtonLink(_('Remove')))->addClass('js-remove')
+			[
+				(new CButtonLink(_('Remove')))->addClass('js-remove'),
+				makeWarningIcon('#{warning}')
+			]
 		])
 	]))
 		->setId('dcheckRow_#{dcheckid}')
@@ -229,7 +230,7 @@ $form
 		(new CScriptTag('
 			drule_edit_popup.init('.json_encode([
 				'druleid' => $data['drule']['druleid'],
-				'dchecks' => $data['drule']['dchecks'],
+				'dchecks' => array_values($data['drule']['dchecks']),
 				'drule' => $data['drule']
 			], JSON_THROW_ON_ERROR).');
 		'))->setOnDocumentReady()

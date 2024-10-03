@@ -28,8 +28,8 @@ zabbix_export:
           key: sharepoint.get_dir
           delay: '{$SHAREPOINT.GET_INTERVAL}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             try {
             

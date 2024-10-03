@@ -276,7 +276,8 @@ int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	1, /* ZBX_PROCESS_TYPE_INTERNAL_POLLER */
 	1, /* ZBX_PROCESS_TYPE_DBCONFIGWORKER */
 	1, /* ZBX_PROCESS_TYPE_PG_MANAGER */
-	1 /* ZBX_PROCESS_TYPE_BROWSERPOLLER */
+	1, /* ZBX_PROCESS_TYPE_BROWSERPOLLER */
+	1, /* ZBX_PROCESS_TYPE_HA_MANAGER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -632,6 +633,9 @@ static int	get_process_info_by_thread(int local_server_num, unsigned char *local
 static void	zbx_set_defaults(void)
 {
 	config_startup_time = (int)time(NULL);
+
+	if (NULL != CONFIG_HA_NODE_NAME && '\0' != *CONFIG_HA_NODE_NAME)
+		zbx_config_dbhigh->read_only_recoverable = 1;
 
 	if (NULL == zbx_config_dbhigh->config_dbhost)
 		zbx_config_dbhigh->config_dbhost = zbx_strdup(zbx_config_dbhigh->config_dbhost, "localhost");
@@ -1212,9 +1216,9 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 
 		/* free vmware support */
 		zbx_vmware_destroy();
-
-		zbx_free_selfmon_collector();
 	}
+
+	zbx_free_selfmon_collector();
 
 	zbx_uninitialize_events();
 
@@ -1633,13 +1637,6 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	zbx_vps_monitor_init(config_vps_limit, config_vps_overcommit_limit);
 
-	if (SUCCEED != zbx_init_selfmon_collector(get_config_forks, &error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
-		zbx_free(error);
-		return FAIL;
-	}
-
 	if (0 != config_forks[ZBX_PROCESS_TYPE_VMWARE] && SUCCEED != zbx_vmware_init(&config_vmware_cache_size, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize VMware cache: %s", error);
@@ -1690,11 +1687,12 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	for (zbx_threads_num = 0, i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
 	{
-		/* skip threaded components */
+		/* skip HA manager that is started separately and threaded components */
 		switch (i)
 		{
 			case ZBX_PROCESS_TYPE_PREPROCESSOR:
 			case ZBX_PROCESS_TYPE_DISCOVERER:
+			case ZBX_PROCESS_TYPE_HA_MANAGER:
 				continue;
 		}
 
@@ -1709,6 +1707,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_set_exit_on_terminate();
 
 	thread_args.info.program_type = zbx_program_type;
+
+	zbx_set_child_pids(zbx_threads, zbx_threads_num);
 
 	for (i = 0; i < zbx_threads_num; i++)
 	{
@@ -2010,6 +2010,7 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 		zbx_thread_wait(zbx_threads[i]);
 	}
 
+	zbx_set_child_pids(NULL, 0);
 	zbx_free(zbx_threads);
 	zbx_free(threads_flags);
 
@@ -2030,7 +2031,6 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_tfc_destroy();
 	zbx_vc_destroy();
 	zbx_vmware_destroy();
-	zbx_free_selfmon_collector();
 	zbx_free_configuration_cache();
 	zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs, config_history_storage_pipelines);
 	zbx_deinit_remote_commands_cache();
@@ -2102,8 +2102,9 @@ static void	server_restart_ha(zbx_rtc_t *rtc)
 
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
-	char		*error = NULL, *smtp_auth_feature_status = NULL;
-	int		i, db_type, ret, ha_status_old;
+	char	*error = NULL, *smtp_auth_feature_status = NULL;
+	int	i, db_type, ha_status_old;
+	pid_t	pid;
 
 	zbx_socket_t		listen_sock = {0};
 	time_t			standby_warning_time;
@@ -2326,6 +2327,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	if (SUCCEED != zbx_init_selfmon_collector(get_config_forks, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	zbx_unset_exit_on_terminate();
 
 	ha_config->ha_node_name =	CONFIG_HA_NODE_NAME;
@@ -2501,13 +2509,18 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			}
 		}
 
-		if (0 < (ret = waitpid((pid_t)-1, &i, WNOHANG)))
+		if (0 < (pid = waitpid((pid_t)-1, &i, WNOHANG)))
 		{
-			zbx_set_exiting_with_fail();
-			break;
+			if (SUCCEED == zbx_is_child_pid(pid, zbx_threads, zbx_threads_num))
+			{
+				zbx_set_exiting_with_fail();
+				break;
+			}
+			else
+				zabbix_log(LOG_LEVEL_TRACE, "indirect child process exited");
 		}
 
-		if (-1 == ret && EINTR != errno)
+		if (-1 == pid && EINTR != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to wait on child processes: %s", zbx_strerror(errno));
 			zbx_set_exiting_with_fail();

@@ -956,6 +956,10 @@ msgstr ""
 msgid "Add a new widget"
 msgstr "Neues Widget hinzufügen"
 
+#: widgets/navtree/Widget.php:34
+msgid "Add child element"
+msgstr ""
+
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
 msgstr "Untergeordnete Elemente hinzufügen"
@@ -989,6 +993,11 @@ msgstr ""
 #: app/views/trigger.massupdate.php:155
 msgid "Add host trigger"
 msgstr "Host-auslöser hinzufügen"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
+msgid "Add item"
+msgstr ""
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1895,6 +1904,10 @@ msgstr "Durchschnittliche Anzahl ausstehender Schreibanforderungen an die virtue
 #: app/views/administration.authentication.edit.php:131
 msgid "Avoid easy-to-guess passwords"
 msgstr "Vermeiden Sie leicht zu erratende Passwörter"
+
+#: jsLoader.php:172
+msgid "Awaiting data"
+msgstr ""
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -3369,6 +3382,16 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:808
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:684
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:685
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
 msgstr ""
 
 #: include/classes/api/services/CItemPrototype.php:1220
@@ -5435,6 +5458,10 @@ msgstr "Neuer Medientyp"
 #: app/views/popup.import.php:143 jsLoader.php:349
 msgid "Create new"
 msgstr "Erstelle neues"
+
+#: jsLoader.php:372
+msgid "Create new report"
+msgstr ""
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -9574,6 +9601,10 @@ msgstr[1] "Hostgruppe gelöscht"
 msgid "Host group elements"
 msgstr "Elemente der Hostgruppe"
 
+#: jsLoader.php:292
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
 msgstr "Beschriftung Hostgruppe"
@@ -9652,6 +9683,10 @@ msgstr "Hostinventar"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "Überblick Hostinventar"
+
+#: jsLoader.php:289
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -12544,6 +12579,10 @@ msgstr ""
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name, state (unknown/offline/online). Returns JSON."
 msgstr ""
 
+#: include/classes/data/CItemData.php:2935
+msgid "List of Zabbix proxy groups configuration data and real-time data. Configuration data includes proxy group name, failover delay, and minimum number of online proxies required for the group to be online. Real-time data includes number of online proxies, percentage of online proxies, and state of proxy group (unknown, offline, recovering, online, degrading). This item does not return groupless proxies. Returns JSON."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Liste der Blockgeräte und ihres Typs. Rückgabe JSON"
@@ -12976,6 +13015,10 @@ msgstr "Ort der Beschriftung des Tafel-Elements"
 #: include/views/monitoring.sysmap.edit.php:243
 msgid "Map element label type"
 msgstr "Tafel-Element Beschriftungstyp"
+
+#: jsLoader.php:290
+msgid "Map is not selected."
+msgstr ""
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -15230,6 +15273,19 @@ msgstr ""
 
 #: app/views/administration.proxygroup.list.php:80
 msgid "Online proxies"
+msgstr ""
+
+#: include/classes/api/services/CUser.php:874
+#: include/classes/api/services/CUser.php:882
+#: include/classes/api/services/CUser.php:889
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:812
+#: include/classes/api/services/CUser.php:853
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
 msgstr ""
 
 #: include/classes/api/services/CDRule.php:509
@@ -20356,6 +20412,13 @@ msgstr "Thema"
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr ""
 
+#: app/controllers/CControllerDiscoveryEdit.php:175
+#, c-format
+msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
+msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
+msgstr[0] ""
+msgstr[1] ""
+
 #: include/func.inc.php:2566
 msgid "This day last week"
 msgstr "Heute vor einer Woche"
@@ -20916,6 +20979,10 @@ msgstr "Auslöser im Zustand \"unbekannt\""
 #, c-format
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "Auslöser in Vorlage \"%1$s\" hängt ab von Auslöser in Vorlage \"%2$s\"."
+
+#: jsLoader.php:291
+msgid "Trigger is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -21968,6 +22035,11 @@ msgstr "Zeichenfolge des Benutzeragenten"
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Benutzer kann sich nicht selbst eintragen in eine deaktiverte Gruppe oder eine ohne Zugriff auf die Oberfläche."
 
+#: include/classes/api/services/CUserGroup.php:673
+#: include/classes/api/services/CUser.php:843
+msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
+msgstr ""
+
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
 msgid "User cannot change own role."
@@ -22103,6 +22175,10 @@ msgstr ""
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
 msgstr "Benutzer darf sich nicht selbst löschen."
+
+#: include/classes/api/services/CUser.php:1837
+msgid "User is not allowed to delete oneself."
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222
@@ -22971,6 +23047,10 @@ msgstr "Ansicht"
 msgid "View as"
 msgstr "Ansicht als"
 
+#: jsLoader.php:417
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr ""
@@ -23181,6 +23261,10 @@ msgstr "Widget ist veraltet."
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "Das Widget ist zu klein für die angegebene Anzahl von Spalten und Zeilen."
+
+#: jsLoader.php:205
+msgid "Widgets"
+msgstr ""
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
 #: include/views/configuration.graph.list.php:170
@@ -23553,6 +23637,10 @@ msgstr "Sie haben keine Berechtigungen zum Zugriff auf diese Seite."
 #: include/classes/core/ZBase.php:763 include/func.inc.php:1709
 msgid "You must login to view this page."
 msgstr "Sie müssen sich anmelden um diese Seite sehen zu können."
+
+#: jsLoader.php:287
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -25558,6 +25646,10 @@ msgstr "rechts"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:953
 msgid "right() - Returns the rightmost count characters"
+msgstr ""
+
+#: widgets/navtree/Widget.php:41
+msgid "root"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966

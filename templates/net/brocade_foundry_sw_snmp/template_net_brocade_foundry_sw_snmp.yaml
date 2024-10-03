@@ -101,8 +101,8 @@ zabbix_export:
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
-          trends: '0'
           value_type: LOG
+          trends: '0'
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
@@ -114,8 +114,8 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.
@@ -157,8 +157,8 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             A textual description of the entity. This value should
@@ -177,8 +177,8 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.1991.1.1.2.1.11.0
           key: system.hw.firmware
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: FOUNDRY-SN-AGENT-MIB
             The version of the running software in the form'major.minor.maintenance[letters]'
@@ -206,8 +206,8 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.1991.1.1.1.1.2.0
           key: system.hw.serialnumber
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'MIB: FOUNDRY-SN-AGENT-MIB'
           inventory_link: SERIALNO_A
           preprocessing:
@@ -257,8 +257,8 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
@@ -276,8 +276,8 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
           delay: 15m
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.
@@ -326,8 +326,8 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
@@ -1859,8 +1859,8 @@ zabbix_export:
           type: SNMP_TRAP
           key: snmptrap.fallback
           delay: '0'
-          trends: '0'
           value_type: LOG
+          trends: '0'
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items'
           logtimefmt: 'hh:mm:sszyyyy/MM/dd'
           tags:
@@ -1872,8 +1872,8 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'system.contact[sysContact.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.
@@ -1915,8 +1915,8 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'system.descr[sysDescr.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             A textual description of the entity. This value should
@@ -1935,8 +1935,8 @@ zabbix_export:
           snmp_oid: 1.3.6.1.4.1.1991.1.1.2.1.11.0
           key: system.hw.firmware
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: FOUNDRY-SN-AGENT-MIB
             The version of the running software in the form 'major.minor.maintenance[letters]'
@@ -1987,8 +1987,8 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'system.location[sysLocation.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.
@@ -2006,8 +2006,8 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: system.name
           delay: 15m
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.
@@ -2056,8 +2056,8 @@ zabbix_export:
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'system.objectid[sysObjectID.0]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: SNMPv2-MIB
             The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.
@@ -2140,8 +2140,8 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.1991.1.1.1.4.1.1.2.{#SNMPINDEX}'
               key: 'system.hw.serialnumber[snChasUnitSerNum.{#SNMPINDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: FOUNDRY-SN-AGENT-MIB
                 The serial number of the chassis for each unit. If the serial number is unknown or unavailable then the value should be a zero length string.
@@ -2663,8 +2663,8 @@ zabbix_export:
               snmp_oid: '1.3.6.1.4.1.1991.1.1.3.31.2.1.1.5.{#SNMPINDEX}'
               key: 'system.hw.model[snStackingConfigUnitType.{#SNMPINDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: FOUNDRY-SN-STACKING-MIB
                 A description of the configured/active system type for each unit.

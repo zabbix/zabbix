@@ -46,6 +46,7 @@
 
 	int	zbx_fork(void);
 	void	zbx_child_fork(pid_t *pid);
+	int	zbx_is_child_pid(pid_t pid, const pid_t *child_pids, size_t child_pids_num);
 
 	#define ZBX_THREAD_ERROR		-1
 

@@ -157,8 +157,8 @@ zabbix_export:
               name: '{#UNIT.NAME}: Get unit info'
               key: 'systemd.unit.get["{#UNIT.NAME}"]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: |
                 Returns all properties of a systemd service unit.
                  Unit description: {#UNIT.DESCRIPTION}.
@@ -234,8 +234,8 @@ zabbix_export:
               name: '{#UNIT.NAME}: Get unit info'
               key: 'systemd.unit.get["{#UNIT.NAME}",Socket]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: |
                 Returns all properties of a systemd socket unit.
                  Unit description: {#UNIT.DESCRIPTION}.

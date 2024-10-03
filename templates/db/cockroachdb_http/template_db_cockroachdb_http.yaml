@@ -37,8 +37,8 @@ zabbix_export:
           type: DEPENDENT
           key: cockroachdb.cert.expire_date.ca
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: unixtime
           description: 'CA certificate expires at that date.'
           preprocessing:
@@ -71,8 +71,8 @@ zabbix_export:
           type: DEPENDENT
           key: cockroachdb.cert.expire_date.node
           delay: '0'
-          trends: '0'
           value_type: FLOAT
+          trends: '0'
           units: unixtime
           description: 'Node certificate expires at that date.'
           preprocessing:
@@ -438,8 +438,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: cockroachdb.get_metrics
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get raw metrics from the Prometheus endpoint.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -1250,8 +1250,8 @@ zabbix_export:
           type: DEPENDENT
           key: cockroachdb.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Build information.'
           preprocessing:
             - type: PROMETHEUS_PATTERN

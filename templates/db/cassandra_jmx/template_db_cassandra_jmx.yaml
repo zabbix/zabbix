@@ -26,8 +26,8 @@ zabbix_export:
           name: 'Cluster - Name'
           type: JMX
           key: 'jmx["org.apache.cassandra.db:type=StorageService","ClusterName"]'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           preprocessing:
@@ -42,8 +42,8 @@ zabbix_export:
           name: Version
           type: JMX
           key: 'jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"]'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           username: '{$CASSANDRA.USER}'
           password: '{$CASSANDRA.PASSWORD}'
           preprocessing:

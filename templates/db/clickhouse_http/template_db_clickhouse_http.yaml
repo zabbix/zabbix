@@ -121,8 +121,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: clickhouse.databases
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get information about databases.'
           preprocessing:
             - type: JSONPATH
@@ -147,8 +147,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: clickhouse.dictionaries
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get information about dictionaries.'
           preprocessing:
             - type: JSONPATH
@@ -727,8 +727,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: clickhouse.replicas
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get information about replicas.'
           preprocessing:
             - type: JSONPATH
@@ -848,8 +848,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: clickhouse.system.asynchronous_metrics
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get metrics that are calculated periodically in the background'
           preprocessing:
             - type: JSONPATH
@@ -874,8 +874,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: clickhouse.system.events
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get information about the number of events that have occurred in the system.'
           preprocessing:
             - type: JSONPATH
@@ -900,8 +900,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: clickhouse.system.metrics
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get metrics which can be calculated instantly, or have a current value format JSONEachRow'
           preprocessing:
             - type: JSONPATH
@@ -926,8 +926,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: clickhouse.system.settings
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get information about settings that are currently in use.'
           preprocessing:
             - type: JSONPATH
@@ -966,8 +966,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: clickhouse.tables
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get information about tables.'
           preprocessing:
             - type: JSONPATH
@@ -1032,8 +1032,8 @@ zabbix_export:
           name: Version
           type: HTTP_AGENT
           key: clickhouse.version
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Version of the server'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1287,8 +1287,8 @@ zabbix_export:
               key: 'clickhouse.db.info_raw["{#DB}"]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The item gets information about {#DB} database.'
               preprocessing:
                 - type: JSONPATH
@@ -1382,8 +1382,8 @@ zabbix_export:
               key: 'clickhouse.dictionary.info_raw["{#NAME}"]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The item gets information about {#NAME} dictionary.'
               preprocessing:
                 - type: JSONPATH
@@ -1484,8 +1484,8 @@ zabbix_export:
               key: 'clickhouse.replica.info_raw["{#DB}.{#TABLE}"]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The item gets information about replicas of {#TABLE} table of {#DB} database.'
               preprocessing:
                 - type: JSONPATH
@@ -1839,8 +1839,8 @@ zabbix_export:
               key: 'clickhouse.table.info_raw["{#DB}.{#TABLE}"]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The item gets information about {#TABLE} table of {#DB} database.'
               preprocessing:
                 - type: JSONPATH

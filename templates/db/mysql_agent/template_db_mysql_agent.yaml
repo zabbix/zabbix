@@ -506,8 +506,8 @@ zabbix_export:
           name: 'Get status variables'
           key: 'mysql.get_status_variables["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Gets server global status information.'
           tags:
             - tag: component
@@ -1021,8 +1021,8 @@ zabbix_export:
           name: Version
           key: 'mysql.version["{$MYSQL.HOST}","{$MYSQL.PORT}"]'
           delay: 15m
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'MySQL server version.'
           preprocessing:
             - type: REGEX
@@ -1238,8 +1238,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'mysql.slave_io_running["{#MASTER_HOST}"]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 Whether the I/O thread for reading the master's binary log is running.
                 Normally, you want this to be Yes unless you have not yet started replication or have
@@ -1281,8 +1281,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'mysql.slave_sql_running["{#MASTER_HOST}"]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 Whether the SQL thread for executing events in the relay log is running.
                 As with the I/O thread, this should normally be Yes.
@@ -1315,8 +1315,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'mysql.slave_sql_running_state["{#MASTER_HOST}"]'
               delay: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'This shows the state of the SQL driver threads.'
               preprocessing:
                 - type: XMLPATH
@@ -1334,8 +1334,8 @@ zabbix_export:
               name: 'Replication Slave status {#MASTER_HOST}'
               key: 'mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTER_HOST}"]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The item gets status information on the essential parameters of the slave threads.'
               tags:
                 - tag: component

@@ -31,8 +31,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: consul.get_catalog_services
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Catalog of services registered in a given datacenter.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -53,8 +53,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: consul.get_cluster_serf
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Get Serf Health Status for all agents in cluster.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -76,8 +76,8 @@ zabbix_export:
           name: 'Cluster leader'
           type: HTTP_AGENT
           key: consul.get_leader
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Current leader address.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -115,8 +115,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: consul.get_nodes
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Catalog of nodes registered in a given datacenter.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -372,8 +372,8 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'consul.get_service_stats["{#SERVICE_NAME}"]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Retrieve service instances providing the service indicated on the path.'
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED

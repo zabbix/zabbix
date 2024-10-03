@@ -212,8 +212,8 @@ zabbix_export:
           type: DEPENDENT
           key: nginx.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: REGEX
               parameters:
@@ -242,8 +242,8 @@ zabbix_export:
           name: 'Get processes summary'
           key: 'proc.get[{$NGINX.PROCESS.NAME.PARAMETER},,,summary]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'The aggregated data of summary metrics for all processes.'
           tags:
             - tag: component
@@ -252,8 +252,8 @@ zabbix_export:
           name: 'Get stub status page'
           key: 'web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"]'
           history: 1h
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: |
             The following status information is provided:
             `Active connections` - the current number of active client connections including waiting connections.
@@ -290,8 +290,8 @@ zabbix_export:
               key: 'nginx.proc.get[{#NGINX.NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The summary metrics aggregated by a process {#NGINX.NAME}.'
               preprocessing:
                 - type: JSONPATH

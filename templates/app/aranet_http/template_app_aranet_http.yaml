@@ -19,8 +19,8 @@ zabbix_export:
           type: SCRIPT
           key: aranet.get_data
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var Aranet = {
             	params: {},
@@ -303,8 +303,8 @@ zabbix_export:
           key: aranet.sensor.discovery
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Discovery for Aranet Cloud sensors'
           preprocessing:
             - type: JAVASCRIPT

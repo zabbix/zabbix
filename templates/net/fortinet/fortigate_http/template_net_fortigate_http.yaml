@@ -133,8 +133,8 @@ zabbix_export:
           type: DEPENDENT
           key: fgate.device.firmware
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Current version of the device firmware.'
           preprocessing:
             - type: JSONPATH
@@ -192,8 +192,8 @@ zabbix_export:
           type: DEPENDENT
           key: fgate.device.model
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The model name of the device.'
           preprocessing:
             - type: JSONPATH
@@ -217,8 +217,8 @@ zabbix_export:
           type: DEPENDENT
           key: fgate.device.serialnumber
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The device serial number.'
           preprocessing:
             - type: JSONPATH
@@ -250,8 +250,8 @@ zabbix_export:
           type: DEPENDENT
           key: fgate.device.vdom
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'Name of the current Virtual Domain.'
           preprocessing:
             - type: JSONPATH
@@ -270,8 +270,8 @@ zabbix_export:
           type: DEPENDENT
           key: fgate.firmware.data_errors
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Item for gathering errors of the device firmware info.'
           preprocessing:
             - type: JSONPATH
@@ -302,8 +302,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: fgate.firmware.get_data
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Item for gathering device firmware info from FortiGate API.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -419,8 +419,8 @@ zabbix_export:
           type: DEPENDENT
           key: fgate.fwp.data_errors
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Item for gathering errors of firewall policies.'
           preprocessing:
             - type: JSONPATH
@@ -451,8 +451,8 @@ zabbix_export:
           type: SCRIPT
           key: fgate.fwp.get_data
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var params = JSON.parse(value),
             	request = new HttpRequest(),
@@ -628,8 +628,8 @@ zabbix_export:
           type: DEPENDENT
           key: fgate.name
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The system host name.'
           preprocessing:
             - type: JSONPATH
@@ -661,8 +661,8 @@ zabbix_export:
           type: DEPENDENT
           key: fgate.netif.data_errors
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Item for gathering errors of network interfaces.'
           preprocessing:
             - type: JSONPATH
@@ -693,8 +693,8 @@ zabbix_export:
           type: SCRIPT
           key: fgate.netif.get_data
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var params = JSON.parse(value),
             	request = new HttpRequest(),
@@ -810,8 +810,8 @@ zabbix_export:
           type: DEPENDENT
           key: fgate.resources.data_errors
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Item for gathering errors of the device resources.'
           preprocessing:
             - type: JSONPATH
@@ -842,8 +842,8 @@ zabbix_export:
           type: SCRIPT
           key: fgate.resources.get_data
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var params = JSON.parse(value),
             	request = new HttpRequest(),
@@ -951,8 +951,8 @@ zabbix_export:
           type: DEPENDENT
           key: fgate.sdwan.data_errors
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Item for gathering errors of SD-WAN.'
           preprocessing:
             - type: JSONPATH
@@ -983,8 +983,8 @@ zabbix_export:
           type: SCRIPT
           key: fgate.sdwan.get_data
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var params = JSON.parse(value),
             	request = new HttpRequest(),
@@ -1136,8 +1136,8 @@ zabbix_export:
           type: DEPENDENT
           key: fgate.service.data_errors
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Item for gathering errors of the service licenses data.'
           preprocessing:
             - type: JSONPATH
@@ -1168,8 +1168,8 @@ zabbix_export:
           type: SCRIPT
           key: fgate.service.get_data
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var params = JSON.parse(value),
             	request = new HttpRequest(),
@@ -1296,8 +1296,8 @@ zabbix_export:
           type: DEPENDENT
           key: fgate.system.data_errors
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Item for gathering errors of the device system info.'
           preprocessing:
             - type: JSONPATH
@@ -1328,8 +1328,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: fgate.system.get_data
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Item for gathering device system info from FortiGate API.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
@@ -1490,8 +1490,8 @@ zabbix_export:
               key: 'fgate.fwp.get_data[{#FWUUID}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Item for gathering data for the {#FWNAME} firewall policy.'
               preprocessing:
                 - type: JSONPATH
@@ -1743,8 +1743,8 @@ zabbix_export:
               key: 'fgate.netif.get_data[{#IFKEY}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Item for gathering data for the {#IFKEY} interface.'
               preprocessing:
                 - type: JSONPATH
@@ -2199,8 +2199,8 @@ zabbix_export:
               key: 'fgate.sdwan_health.get_data["{#HID}.{#MID}"]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Item for gathering data about the {#IFNAME} interface in the {#NAME} health-check.'
               preprocessing:
                 - type: JSONPATH
@@ -2503,8 +2503,8 @@ zabbix_export:
               key: 'fgate.sdwan_member.get_data[{#ID}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Item for gathering data about the {#NAME} interface in the {#ZONE} zone.'
               preprocessing:
                 - type: JSONPATH
@@ -2867,8 +2867,8 @@ zabbix_export:
               key: 'fgate.service.get_data["{#KEY}"]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Item for gathering data about license for the {#NAME} service.'
               preprocessing:
                 - type: JSONPATH
@@ -2960,8 +2960,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'fgate.service.type["{#KEY}"]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Current type of the {#NAME} service.'
               preprocessing:
                 - type: JSONPATH
@@ -3005,8 +3005,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'fgate.service.update_method["{#KEY}"]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Current update method of the {#NAME} service.'
               preprocessing:
                 - type: JSONPATH
@@ -3028,8 +3028,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'fgate.service.update_result["{#KEY}"]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Last update result of the {#NAME} service.'
               preprocessing:
                 - type: JSONPATH
@@ -3073,8 +3073,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'fgate.service.version["{#KEY}"]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Current version of the {#NAME} service.'
               preprocessing:
                 - type: JSONPATH

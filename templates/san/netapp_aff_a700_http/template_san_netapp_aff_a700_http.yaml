@@ -24,8 +24,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: netapp.chassis.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           authtype: BASIC
           username: '{$USERNAME}'
           password: '{$PASSWORD}'
@@ -39,8 +39,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: netapp.cluster.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           authtype: BASIC
           username: '{$USERNAME}'
           password: '{$PASSWORD}'
@@ -54,8 +54,8 @@ zabbix_export:
           type: DEPENDENT
           key: netapp.cluster.location
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The location of the cluster.'
           preprocessing:
             - type: JSONPATH
@@ -74,8 +74,8 @@ zabbix_export:
           type: DEPENDENT
           key: netapp.cluster.name
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The name of the cluster.'
           preprocessing:
             - type: JSONPATH
@@ -478,8 +478,8 @@ zabbix_export:
           type: DEPENDENT
           key: netapp.cluster.status
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The status of the cluster: ok, error, partial_no_data, partial_no_response, partial_other_error, negative_delta, backfilled_data, inconsistent_delta_time, inconsistent_old_data.'
           preprocessing:
             - type: JSONPATH
@@ -509,8 +509,8 @@ zabbix_export:
           type: DEPENDENT
           key: netapp.cluster.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'This returns the cluster version information. When the cluster has more than one node, the cluster version is equivalent to the lowest of generation, major, and minor versions on all nodes.'
           preprocessing:
             - type: JSONPATH
@@ -540,8 +540,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: netapp.disks.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           authtype: BASIC
           username: '{$USERNAME}'
           password: '{$PASSWORD}'
@@ -555,8 +555,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: netapp.frus.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           authtype: BASIC
           username: '{$USERNAME}'
           password: '{$PASSWORD}'
@@ -584,8 +584,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: netapp.luns.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           authtype: BASIC
           username: '{$USERNAME}'
           password: '{$PASSWORD}'
@@ -599,8 +599,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: netapp.nodes.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           authtype: BASIC
           username: '{$USERNAME}'
           password: '{$PASSWORD}'
@@ -614,8 +614,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: netapp.ports.eth.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           authtype: BASIC
           username: '{$USERNAME}'
           password: '{$PASSWORD}'
@@ -629,8 +629,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: netapp.ports.fc.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           authtype: BASIC
           username: '{$USERNAME}'
           password: '{$PASSWORD}'
@@ -644,8 +644,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: netapp.svms.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           authtype: BASIC
           username: '{$USERNAME}'
           password: '{$PASSWORD}'
@@ -659,8 +659,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: netapp.volumes.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           authtype: BASIC
           username: '{$USERNAME}'
           password: '{$PASSWORD}'
@@ -684,8 +684,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'netapp.chassis.state[{#ID}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The chassis state: ok, error.'
               preprocessing:
                 - type: JSONPATH
@@ -740,8 +740,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'netapp.disk.state[{#NODENAME},{#DISKNAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The state of the disk. Possible values: broken, copy, maintenance, partner, pending, present, reconstructing, removed, spare, unfail, zeroing'
               preprocessing:
                 - type: JSONPATH
@@ -795,8 +795,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'netapp.chassis.fru.state[{#CHASSISID},{#FRUID}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The FRU state: ok, error.'
               preprocessing:
                 - type: JSONPATH
@@ -904,8 +904,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The state of the volume and aggregate that contain the LUN: online, aggregate_offline, volume_offline. LUNs are only available when their containers are available.'
               preprocessing:
                 - type: JSONPATH
@@ -940,8 +940,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'netapp.lun.status.state[{#SVMNAME},{#LUNNAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The state of the LUN. Normal states for a LUN are online and offline. Other states indicate errors. Possible values: foreign_lun_error, nvfail, offline, online, space_error.'
               preprocessing:
                 - type: JSONPATH
@@ -998,8 +998,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'netapp.node.version[{#NODENAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'This returns the cluster version information. When the cluster has more than one node, the cluster version is equivalent to the lowest of generation, major, and minor versions on all nodes.'
               preprocessing:
                 - type: JSONPATH
@@ -1031,8 +1031,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'netapp.nodes.controller.over_temperature[{#NODENAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Specifies whether the hardware is currently operating outside of its recommended temperature range. The hardware shuts down if the temperature exceeds critical thresholds. Possible values: over, normal'
               preprocessing:
                 - type: JSONPATH
@@ -1064,8 +1064,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'netapp.nodes.location[{#NODENAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The location of the node.'
               preprocessing:
                 - type: JSONPATH
@@ -1086,8 +1086,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'netapp.nodes.membership[{#NODENAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 Possible values:
                   available - If a node is available, this means it is detected on the internal cluster network and can be added to the cluster. Nodes that have a membership of “available” are not returned when a GET request is called when the cluster exists. A query on the “membership” property for available must be provided to scan for nodes on the cluster network. Nodes that have a membership of “available” are returned automatically before a cluster is created.
@@ -1112,8 +1112,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'netapp.nodes.state[{#NODENAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 State of the node:
                 up - Node is up and operational.
@@ -1211,8 +1211,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The operational state of the port. Possible values: up, down.'
               preprocessing:
                 - type: JSONPATH
@@ -1269,8 +1269,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'netapp.port.fc.description[{#NODENAME},{#FCPORTNAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'A description of the FC port.'
               preprocessing:
                 - type: JSONPATH
@@ -1293,8 +1293,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 The operational state of the FC port. Possible values:
                 startup - The port is booting up.
@@ -1361,8 +1361,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'netapp.svm.comment[{#SVMNAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The comment for the SVM.'
               preprocessing:
                 - type: JSONPATH
@@ -1383,8 +1383,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'netapp.svm.state[{#SVMNAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'SVM state: starting, running, stopping, stopped, deleting.'
               preprocessing:
                 - type: JSONPATH
@@ -1441,8 +1441,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'netapp.volume.comment[{#VOLUMENAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'A comment for the volume.'
               preprocessing:
                 - type: JSONPATH
@@ -1526,8 +1526,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'netapp.volume.state[{#VOLUMENAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Volume state. A volume can only be brought online if it is offline. Taking a volume offline removes its junction path. The ''mixed'' state applies to FlexGroup volumes only and cannot be specified as a target state. An ''error'' state implies that the volume is not in a state to serve data.'
               preprocessing:
                 - type: JSONPATH
@@ -1984,8 +1984,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'netapp.volume.svm_name[{#VOLUMENAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The volume belongs this SVM.'
               preprocessing:
                 - type: JSONPATH
@@ -2006,8 +2006,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'netapp.volume.type[{#VOLUMENAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 Type of the volume.
                 rw - read-write volume.

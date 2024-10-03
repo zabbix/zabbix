@@ -23,8 +23,8 @@ zabbix_export:
           name: 'Get process summary'
           key: 'proc.get[,,,summary]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'The summary of data metrics for all processes.'
           tags:
             - tag: component
@@ -57,8 +57,8 @@ zabbix_export:
               key: 'custom.proc.get[{#NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Summary metrics collected during the process {#NAME}.'
               preprocessing:
                 - type: JSONPATH

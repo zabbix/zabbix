@@ -239,8 +239,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: nginx.get_stub_status
           history: 1h
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: |
             The following status information is provided:
             `Active connections` - the current number of active client connections including waiting connections.
@@ -316,8 +316,8 @@ zabbix_export:
           type: DEPENDENT
           key: nginx.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: REGEX
               parameters:

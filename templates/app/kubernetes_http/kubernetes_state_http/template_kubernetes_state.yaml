@@ -30,8 +30,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: kube.componentstatuses
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -50,8 +50,8 @@ zabbix_export:
           type: SCRIPT
           key: kube.control_plane.lld
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var Kube = {
             	params: {},
@@ -275,8 +275,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: kube.livez
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -344,8 +344,8 @@ zabbix_export:
           type: SCRIPT
           key: kube.node.lld
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var Kube = {
             	params: {},
@@ -548,8 +548,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: kube.readyz
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -599,8 +599,8 @@ zabbix_export:
           type: SCRIPT
           key: kube.state.metrics
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var Kube = {
             	params: {},
@@ -826,8 +826,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.componentstatuses.healthy[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Cluster component healthy.'
               preprocessing:
                 - type: JSONPATH
@@ -845,7 +845,9 @@ zabbix_export:
                   value: healthy
               trigger_prototypes:
                 - uuid: 58828a692aa2418ba98c6d66a23f1506
-                  expression: 'count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],#3,,"True")<2 and length(last(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}]))>0'
+                  expression: 'count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],#2,"ne","True")=2 and length(last(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}]))>0'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],#3,"eq","True")=3'
                   name: 'Component [{#NAME}] is unhealthy'
                   priority: WARNING
                   tags:
@@ -1772,8 +1774,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.livez.healthcheck[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Result of livez healthcheck for component.'
               preprocessing:
                 - type: JSONPATH
@@ -1789,7 +1791,9 @@ zabbix_export:
                   value: '{#NAME}'
               trigger_prototypes:
                 - uuid: 9fcb23d29ac3481a8613515cc2cccfcf
-                  expression: 'count(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}]))>0'
+                  expression: 'count(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}],#2,"ne","ok")=2 and length(last(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}]))>0'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'count(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}],#3,"eq","ok")=3'
                   name: 'Livez [{#NAME}] is unhealthy'
                   priority: WARNING
                   tags:
@@ -3051,8 +3055,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'kube.readyz.healthcheck[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Result of readyz healthcheck for component.'
               preprocessing:
                 - type: JSONPATH
@@ -3068,7 +3072,9 @@ zabbix_export:
                   value: '{#NAME}'
               trigger_prototypes:
                 - uuid: 1a88c2cf94d3444c9e5320776b323ce6
-                  expression: 'count(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}]))>0'
+                  expression: 'count(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}],#2,"ne","ok")=2 and length(last(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}]))>0'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'count(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}],#3,"eq","ok")=3'
                   name: 'Readyz [{#NAME}] is unhealthy'
                   priority: WARNING
                   tags:

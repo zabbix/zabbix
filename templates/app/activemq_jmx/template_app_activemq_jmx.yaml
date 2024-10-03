@@ -45,8 +45,8 @@ zabbix_export:
               name: 'Broker {#JMXBROKERNAME}: Version'
               type: JMX
               key: 'jmx[{#JMXOBJ},BrokerVersion]'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               username: '{$ACTIVEMQ.USER}'
               password: '{$ACTIVEMQ.PASSWORD}'
               description: 'The version of the broker.'

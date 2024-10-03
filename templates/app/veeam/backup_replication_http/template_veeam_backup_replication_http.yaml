@@ -32,8 +32,8 @@ zabbix_export:
           type: DEPENDENT
           key: veeam.get.errors
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'The errors from API requests.'
           preprocessing:
             - type: JSONPATH
@@ -64,8 +64,8 @@ zabbix_export:
           key: veeam.get.metrics
           delay: 5m
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var Veeam = {
             	params: {},
@@ -220,8 +220,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.jobs.last.result[{#ID}]'
               delay: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The result of the session. The enums used: `None`, `Success`, `Warning`, `Failed`.'
               preprocessing:
                 - type: JSONPATH
@@ -252,8 +252,8 @@ zabbix_export:
               key: 'veeam.jobs.states.raw[{#ID}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Gets raw data from the job states with the name `[{#NAME}]`.'
               preprocessing:
                 - type: JSONPATH
@@ -271,8 +271,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.jobs.status[{#ID}]'
               delay: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The current status of the job. The enums used: `running`, `inactive`, `disabled`.'
               preprocessing:
                 - type: JSONPATH
@@ -356,8 +356,8 @@ zabbix_export:
               key: 'veeam.proxy.raw[{#NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Gets raw data collected by the proxy with the name `[{#NAME}]`, `[{#TYPE}]`.'
               preprocessing:
                 - type: JSONPATH
@@ -377,8 +377,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.proxy.server.name[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The name of the proxy server.'
               preprocessing:
                 - type: JSONPATH
@@ -397,8 +397,8 @@ zabbix_export:
               key: 'veeam.proxy.server.raw[{#NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Gets raw data collected by the proxy server.'
               preprocessing:
                 - type: JSONPATH
@@ -418,8 +418,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.proxy.server.type[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The type of the proxy server.'
               preprocessing:
                 - type: JSONPATH
@@ -482,8 +482,8 @@ zabbix_export:
               key: 'veeam.repositories.raw[{#NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Gets raw data from repository with the name: `[{#NAME}]`, `[{#TYPE}]`.'
               preprocessing:
                 - type: JSONPATH
@@ -589,8 +589,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.sessions.message[{#ID}]'
               delay: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'A message that explains the session result.'
               preprocessing:
                 - type: JSONPATH
@@ -632,8 +632,8 @@ zabbix_export:
               key: 'veeam.sessions.raw[{#ID}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Gets raw data from session with the name: `[{#NAME}]`, `[{#TYPE}]`.'
               preprocessing:
                 - type: JSONPATH
@@ -652,8 +652,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.sessions.result[{#ID}]'
               delay: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The result of the session. The enums used: `None`, `Success`, `Warning`, `Failed`.'
               preprocessing:
                 - type: JSONPATH
@@ -683,8 +683,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'veeam.sessions.state[{#ID}]'
               delay: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The state of the session. The enums used: `Stopped`, `Starting`, `Stopping`, `Working`, `Pausing`, `Resuming`, `WaitingTape`, `Idle`, `Postprocessing`, `WaitingRepository`, `WaitingSlot`.'
               preprocessing:
                 - type: JSONPATH

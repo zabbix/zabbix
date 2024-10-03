@@ -65,8 +65,8 @@ zabbix_export:
           type: DEPENDENT
           key: veeam.manager.get.errors
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'The errors from API requests.'
           preprocessing:
             - type: JSONPATH
@@ -97,8 +97,8 @@ zabbix_export:
           key: veeam.manager.get.metrics
           delay: 5m
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var Veeam = {
             	params: {},

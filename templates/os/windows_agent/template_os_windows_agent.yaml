@@ -23,8 +23,8 @@ zabbix_export:
           name: 'Host name of Zabbix agent running'
           key: agent.hostname
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -45,8 +45,8 @@ zabbix_export:
           name: 'Version of Zabbix agent running'
           key: agent.version
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -256,8 +256,8 @@ zabbix_export:
           name: 'System name'
           key: system.hostname
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The host name of the system.'
           inventory_link: NAME
           preprocessing:
@@ -303,8 +303,8 @@ zabbix_export:
           name: 'Operating system architecture'
           key: system.sw.arch
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The architecture of the operating system.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -317,8 +317,8 @@ zabbix_export:
           name: 'Operating system'
           key: system.sw.os
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           inventory_link: OS
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -385,8 +385,8 @@ zabbix_export:
           name: 'System description'
           key: system.uname
           delay: 15m
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'System description of the host.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -420,8 +420,8 @@ zabbix_export:
           name: 'Get filesystems'
           key: vfs.fs.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'The `vfs.fs.get` key acquires raw information set about the filesystems. Later to be extracted by preprocessing in dependent items.'
           tags:
             - tag: component
@@ -469,8 +469,8 @@ zabbix_export:
           name: 'Windows: Network interfaces WMI get'
           key: 'wmi.getall[root\cimv2,"select Name,Description,NetConnectionID,Speed,AdapterTypeId,NetConnectionStatus,GUID from win32_networkadapter where PhysicalAdapter=True and NetConnectionStatus>0"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Raw data of `win32_networkadapter.`'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1259,8 +1259,8 @@ zabbix_export:
               key: 'vfs.fs.dependent[{#FSNAME},data]'
               delay: '0'
               history: 1h
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Intermediate data of `{#FSNAME}` filesystem.'
               preprocessing:
                 - type: JSONPATH

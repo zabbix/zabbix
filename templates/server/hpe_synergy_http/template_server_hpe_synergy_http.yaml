@@ -30,8 +30,8 @@ zabbix_export:
           type: SCRIPT
           key: hpe.synergy.get.data
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var Synergy = {
             	params: {},
@@ -258,8 +258,8 @@ zabbix_export:
           key: hpe.synergy.get.datacenters
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Data of the datacenters.'
           preprocessing:
             - type: JSONPATH
@@ -277,8 +277,8 @@ zabbix_export:
           key: hpe.synergy.get.enclosures
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'A list of enclosures.'
           preprocessing:
             - type: JSONPATH
@@ -295,8 +295,8 @@ zabbix_export:
           type: DEPENDENT
           key: hpe.synergy.get.errors
           delay: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'A list of errors from API requests.'
           preprocessing:
             - type: JSONPATH
@@ -329,8 +329,8 @@ zabbix_export:
           key: hpe.synergy.get.ethernet_networks
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Data of the ethernet networks.'
           preprocessing:
             - type: JSONPATH
@@ -348,8 +348,8 @@ zabbix_export:
           key: hpe.synergy.get.fabrics
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Data of the fabrics.'
           preprocessing:
             - type: JSONPATH
@@ -367,8 +367,8 @@ zabbix_export:
           key: hpe.synergy.get.fc_networks
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Data of the FC networks.'
           preprocessing:
             - type: JSONPATH
@@ -386,8 +386,8 @@ zabbix_export:
           key: hpe.synergy.get.hypervisor_managers
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Data of the hypervisor managers.'
           preprocessing:
             - type: JSONPATH
@@ -405,8 +405,8 @@ zabbix_export:
           key: hpe.synergy.get.interconnects
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Data of the interconnects.'
           preprocessing:
             - type: JSONPATH
@@ -424,8 +424,8 @@ zabbix_export:
           key: hpe.synergy.get.logical_enclosures
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Data of the logical enclosures.'
           preprocessing:
             - type: JSONPATH
@@ -443,8 +443,8 @@ zabbix_export:
           key: hpe.synergy.get.racks
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Data of the racks.'
           preprocessing:
             - type: JSONPATH
@@ -462,8 +462,8 @@ zabbix_export:
           key: hpe.synergy.get.server_hardware
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Data of the server hardware.'
           preprocessing:
             - type: JSONPATH
@@ -481,8 +481,8 @@ zabbix_export:
           key: hpe.synergy.get.storage_pools
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Data of the storage pools.'
           preprocessing:
             - type: JSONPATH
@@ -500,8 +500,8 @@ zabbix_export:
           key: hpe.synergy.get.storage_systems
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Data of the storage systems.'
           preprocessing:
             - type: JSONPATH
@@ -519,8 +519,8 @@ zabbix_export:
           key: hpe.synergy.get.storage_volumes
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Data of the storage volumes.'
           preprocessing:
             - type: JSONPATH
@@ -538,8 +538,8 @@ zabbix_export:
           key: hpe.synergy.get.uplink_sets
           delay: '0'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Data of the uplink sets.'
           preprocessing:
             - type: JSONPATH
@@ -639,8 +639,8 @@ zabbix_export:
               key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data of the appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}].'
               preprocessing:
                 - type: JSONPATH
@@ -662,8 +662,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",model]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The model name of the appliance.'
               preprocessing:
                 - type: JSONPATH
@@ -686,8 +686,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",part_number]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The part number of the appliance.'
               preprocessing:
                 - type: JSONPATH
@@ -794,8 +794,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",serial_number]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The serial number of the appliance.'
               preprocessing:
                 - type: JSONPATH
@@ -818,8 +818,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",spare_part_number]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The spare part number of the appliance.'
               preprocessing:
                 - type: JSONPATH
@@ -946,8 +946,8 @@ zabbix_export:
               key: 'hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] data'
               preprocessing:
                 - type: JSONPATH
@@ -969,8 +969,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",hw_version]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The hardware version.'
               preprocessing:
                 - type: JSONPATH
@@ -993,8 +993,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",part_number]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The part number provided by the manufacturer.'
               preprocessing:
                 - type: JSONPATH
@@ -1083,8 +1083,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",serial_number]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'A serial number.'
               preprocessing:
                 - type: JSONPATH
@@ -1211,8 +1211,8 @@ zabbix_export:
               key: 'hpe.synergy.datacenter["{#NAME}",data]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data of the datacenter [{#NAME}].'
               preprocessing:
                 - type: JSONPATH
@@ -1426,8 +1426,8 @@ zabbix_export:
               key: 'hpe.synergy.device["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data of the device [{#ENCLOSURE_NAME}:{#BAY_NUMBER}].'
               preprocessing:
                 - type: JSONPATH
@@ -1449,8 +1449,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.device["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",model]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The model name of an unsupported device occupying the bay if available.'
               preprocessing:
                 - type: JSONPATH
@@ -1562,8 +1562,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.device["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",serial_number]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'If available, the serial number of any device occupying the bay.'
               preprocessing:
                 - type: JSONPATH
@@ -1631,8 +1631,8 @@ zabbix_export:
               key: 'hpe.synergy.enclosure["{#NAME}",data]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data of the enclosure [{#NAME}].'
               preprocessing:
                 - type: JSONPATH
@@ -1740,8 +1740,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.enclosure["{#NAME}",fw_baseline_name]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The name of the current firmware baseline.'
               preprocessing:
                 - type: JSONPATH
@@ -1848,8 +1848,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.enclosure["{#NAME}",model]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The enclosure model name, for example, "BladeSystem c7000 Enclosure G2.'
               preprocessing:
                 - type: JSONPATH
@@ -1870,8 +1870,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.enclosure["{#NAME}",part_number]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The part number of the enclosure.'
               preprocessing:
                 - type: JSONPATH
@@ -1974,8 +1974,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.enclosure["{#NAME}",serial_number]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The serial number of the enclosure.'
               preprocessing:
                 - type: JSONPATH
@@ -2238,8 +2238,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.enclosure["{#NAME}",type]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The type of the enclosure, for example, "C7000" or "SY12000" or "SDX".'
               preprocessing:
                 - type: JSONPATH
@@ -2341,8 +2341,8 @@ zabbix_export:
               key: 'hpe.synergy.ethernet.network["{#NAME}",data]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data of the ethernet network [{#NAME}].'
               preprocessing:
                 - type: JSONPATH
@@ -2362,8 +2362,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.ethernet.network["{#NAME}",state]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The current state of the resource.'
               preprocessing:
                 - type: JSONPATH
@@ -2484,8 +2484,8 @@ zabbix_export:
               key: 'hpe.synergy.fabric["{#NAME}",data]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data of the fabric [{#NAME}].'
               preprocessing:
                 - type: JSONPATH
@@ -2505,8 +2505,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.fabric["{#NAME}",state]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The current state of the resource.'
               preprocessing:
                 - type: JSONPATH
@@ -2627,8 +2627,8 @@ zabbix_export:
               key: 'hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data of the fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}].'
               preprocessing:
                 - type: JSONPATH
@@ -2650,8 +2650,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",model]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The common descriptive model of the fan.'
               preprocessing:
                 - type: JSONPATH
@@ -2674,8 +2674,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",part_number]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The part number of the fan.'
               preprocessing:
                 - type: JSONPATH
@@ -2782,8 +2782,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",serial_number]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The serial number of the fan.'
               preprocessing:
                 - type: JSONPATH
@@ -2806,8 +2806,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",spare_part_number]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The spare part number to be used when ordering an additional or replacement fan of this type.'
               preprocessing:
                 - type: JSONPATH
@@ -3024,8 +3024,8 @@ zabbix_export:
               key: 'hpe.synergy.fc.network["{#NAME}",data]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data of the FC network [{#NAME}].'
               preprocessing:
                 - type: JSONPATH
@@ -3045,8 +3045,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.fc.network["{#NAME}",state]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The current state of the resource.'
               preprocessing:
                 - type: JSONPATH
@@ -3167,8 +3167,8 @@ zabbix_export:
               key: 'hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}].'
               preprocessing:
                 - type: JSONPATH
@@ -3190,8 +3190,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",fw_version]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The firmware version of the manager.'
               preprocessing:
                 - type: JSONPATH
@@ -3491,8 +3491,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",model]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The model of the link module.'
               preprocessing:
                 - type: JSONPATH
@@ -3515,8 +3515,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",part_number]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The part number of the link module.'
               preprocessing:
                 - type: JSONPATH
@@ -3605,8 +3605,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",serial_number]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The serial number of the link module.'
               preprocessing:
                 - type: JSONPATH
@@ -3629,8 +3629,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",spare_part_number]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The spare part number of the link module.'
               preprocessing:
                 - type: JSONPATH
@@ -3757,8 +3757,8 @@ zabbix_export:
               key: 'hpe.synergy.hypervisor_manager["{#NAME}",data]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data of the hypervisor manager [{#NAME}].'
               preprocessing:
                 - type: JSONPATH
@@ -3819,8 +3819,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.hypervisor_manager["{#NAME}",state_reason]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Indicates the reason why the resource is in its current state.'
               preprocessing:
                 - type: JSONPATH
@@ -3951,8 +3951,8 @@ zabbix_export:
               key: 'hpe.synergy.interconnect["{#NAME}",data]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data of the interconnect [{#NAME}].'
               preprocessing:
                 - type: JSONPATH
@@ -3972,8 +3972,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.interconnect["{#NAME}",hw.health]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The health status of the interconnect hardware.'
               preprocessing:
                 - type: JSONPATH
@@ -3996,8 +3996,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.interconnect["{#NAME}",model]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The interconnect model.'
               preprocessing:
                 - type: JSONPATH
@@ -4018,8 +4018,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.interconnect["{#NAME}",part_number]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The part number of the interconnect.'
               preprocessing:
                 - type: JSONPATH
@@ -4060,8 +4060,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.interconnect["{#NAME}",serial_number]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The serial number of the interconnect.'
               preprocessing:
                 - type: JSONPATH
@@ -4082,8 +4082,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.interconnect["{#NAME}",spare_part_number]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The spare part number of the interconnect.'
               preprocessing:
                 - type: JSONPATH
@@ -4104,8 +4104,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.interconnect["{#NAME}",state]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The current state of the resource.'
               preprocessing:
                 - type: JSONPATH
@@ -4228,8 +4228,8 @@ zabbix_export:
               key: 'hpe.synergy.logical_enclosure["{#NAME}",data]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data of the logical enclosure [{#NAME}].'
               preprocessing:
                 - type: JSONPATH
@@ -4423,8 +4423,8 @@ zabbix_export:
               key: 'hpe.synergy.partition["{#PARTITION_ID}","{#ENCLOSURE_NAME}",data]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data of the partition [{#ENCLOSURE_NAME}:{#PARTITION_ID}].'
               preprocessing:
                 - type: JSONPATH
@@ -4686,8 +4686,8 @@ zabbix_export:
               key: 'hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",data]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data of the power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}].'
               preprocessing:
                 - type: JSONPATH
@@ -4709,8 +4709,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",model]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The common descriptive model of the power supply.'
               preprocessing:
                 - type: JSONPATH
@@ -4756,8 +4756,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",part_number]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The part number of the power supply.'
               preprocessing:
                 - type: JSONPATH
@@ -4837,8 +4837,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",serial_number]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The unique serial number of the power supply.'
               preprocessing:
                 - type: JSONPATH
@@ -4861,8 +4861,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",spare_part_number]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The spare part number to be used when ordering an additional or replacement power supply of this type.'
               preprocessing:
                 - type: JSONPATH
@@ -4989,8 +4989,8 @@ zabbix_export:
               key: 'hpe.synergy.rack["{#NAME}",data]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data of the rack [{#NAME}].'
               preprocessing:
                 - type: JSONPATH
@@ -5278,8 +5278,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.server_hardware.processor["{#LOCATION}",type]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The type of the CPU installed on this server hardware.'
               preprocessing:
                 - type: JSONPATH
@@ -5305,8 +5305,8 @@ zabbix_export:
               key: 'hpe.synergy.server_hardware["{#LOCATION}",data]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data of the server [{#SERVER_NAME}:{#LOCATION}].'
               preprocessing:
                 - type: JSONPATH
@@ -5364,8 +5364,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.server_hardware["{#LOCATION}",maintenance_state_reason]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'This field is set to Firmware update when the server is put under maintenance.'
               preprocessing:
                 - type: JSONPATH
@@ -5462,8 +5462,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.server_hardware["{#LOCATION}",model]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The model string of the full server hardware.'
               preprocessing:
                 - type: JSONPATH
@@ -5486,8 +5486,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.server_hardware["{#LOCATION}",part_number]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The part number for this server hardware.'
               preprocessing:
                 - type: JSONPATH
@@ -5563,8 +5563,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.server_hardware["{#LOCATION}",serial_number]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The serial number of the server hardware.'
               preprocessing:
                 - type: JSONPATH
@@ -5719,8 +5719,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.server_hardware["{#LOCATION}",state_reason]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 The reason for the current resource state of the server hardware. This only applies if the state is Unmanaged, otherwise it is set to NotApplicable. The allowable values are:
                 
@@ -5949,8 +5949,8 @@ zabbix_export:
               key: 'hpe.synergy.storage.pools["{#NAME}",data]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data of the storage pool [{#NAME}].'
               preprocessing:
                 - type: JSONPATH
@@ -6280,8 +6280,8 @@ zabbix_export:
               key: 'hpe.synergy.storage.system["{#NAME}",data]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data of the storage system [{#NAME}].'
               preprocessing:
                 - type: JSONPATH
@@ -6593,8 +6593,8 @@ zabbix_export:
               key: 'hpe.synergy.storage.volumes["{#NAME}",data]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data of the storage volume [{#NAME}].'
               preprocessing:
                 - type: JSONPATH
@@ -6867,8 +6867,8 @@ zabbix_export:
               key: 'hpe.synergy.uplink_set["{#NAME}",data]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Data of the uplink set [{#NAME}].'
               preprocessing:
                 - type: JSONPATH
@@ -6890,8 +6890,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'hpe.synergy.uplink_set["{#NAME}",state]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'The current state of the resource.'
               preprocessing:
                 - type: JSONPATH

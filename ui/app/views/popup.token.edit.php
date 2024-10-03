@@ -24,7 +24,7 @@ $url = (new CUrl('zabbix.php'))
 	->getUrl();
 
 $token_form = (new CForm('post', $url))
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('token')))->removeId())
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('token')))->removeId())
 	->setId('token_form')
 	->setName('token')
 	->addVar('admin_mode', $data['admin_mode'])
@@ -52,7 +52,7 @@ if ($data['admin_mode'] === '1') {
 		(new CLabel(_('User'), 'userid_ms'))->setAsteriskMark(),
 		new CFormField(
 			(new CMultiSelect([
-				'disabled' => ($data['tokenid'] != 0),
+				'readonly' => ($data['tokenid'] != 0),
 				'multiple' => false,
 				'name' => 'userid',
 				'object_name' => 'users',

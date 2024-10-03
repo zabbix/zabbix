@@ -301,7 +301,10 @@ int	expr_dc_get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char *
 	zbx_dc_interface_t	interface;
 
 	if (SUCCEED != (res = zbx_dc_config_get_interface(&interface, hostid, itemid)))
-		return res;
+	{
+		*replace_to = zbx_strdup(*replace_to, STR_UNKNOWN_VARIABLE);
+		return SUCCEED;
+	}
 
 	switch (request)
 	{
@@ -1112,9 +1115,9 @@ void	expr_db_get_rootcause(const zbx_db_service *service, char **replace_to)
 	zbx_vector_eventdata_destroy(&rootcauses);
 }
 
-void	expr_db_get_event_symptoms(const zbx_db_event *event, char **replace_to)
+int	expr_db_get_event_symptoms(const zbx_db_event *event, char **replace_to)
 {
-	int			i;
+	int			i, ret = FAIL;
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
 	zbx_vector_uint64_t	symptom_eventids;
@@ -1143,7 +1146,7 @@ void	expr_db_get_event_symptoms(const zbx_db_event *event, char **replace_to)
 		zbx_db_get_events_by_eventids(&symptom_eventids, &symptom_events);
 		eventdata_compose(&symptom_events, &symptoms);
 		zbx_vector_eventdata_sort(&symptoms, (zbx_compare_func_t)zbx_eventdata_compare);
-		zbx_eventdata_to_str(&symptoms, replace_to);
+		ret = zbx_eventdata_to_str(&symptoms, replace_to);
 
 		for (i = 0; i < symptoms.values_num; i++)
 			zbx_eventdata_free(&symptoms.values[i]);
@@ -1155,6 +1158,8 @@ void	expr_db_get_event_symptoms(const zbx_db_event *event, char **replace_to)
 	}
 
 	zbx_vector_uint64_destroy(&symptom_eventids);
+
+	return ret;
 }
 
 /******************************************************************************

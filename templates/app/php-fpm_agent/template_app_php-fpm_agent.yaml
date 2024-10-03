@@ -129,8 +129,8 @@ zabbix_export:
           type: DEPENDENT
           key: php-fpm.name
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The name of the current pool.'
           preprocessing:
             - type: JSONPATH
@@ -228,8 +228,8 @@ zabbix_export:
           type: DEPENDENT
           key: php-fpm.process_manager
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The method used by the process manager to control the number of child processes for this pool.'
           preprocessing:
             - type: JSONPATH
@@ -331,8 +331,8 @@ zabbix_export:
           type: DEPENDENT
           key: php-fpm.version
           delay: '0'
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: 'The current version of the PHP. You can get it from the HTTP-Header "X-Powered-By"; it may not work if you have changed the default HTTP-headers.'
           preprocessing:
             - type: REGEX
@@ -363,8 +363,8 @@ zabbix_export:
           name: 'Get processes summary'
           key: 'proc.get[{$PHP_FPM.PROCESS.NAME.PARAMETER},,,summary]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'The aggregated data of summary metrics for all processes.'
           tags:
             - tag: component
@@ -373,8 +373,8 @@ zabbix_export:
           name: php-fpm_ping
           key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.PING.PAGE}","{$PHP_FPM.PORT}"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           tags:
             - tag: component
               value: health
@@ -382,8 +382,8 @@ zabbix_export:
           name: 'Get status page'
           key: 'web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           preprocessing:
             - type: REGEX
               parameters:
@@ -412,8 +412,8 @@ zabbix_export:
               key: 'php-fpm.proc.get[{#PHP_FPM.NAME}]'
               delay: '0'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'The summary metrics aggregated by a process `{#PHP_FPM.NAME}`.'
               preprocessing:
                 - type: JSONPATH

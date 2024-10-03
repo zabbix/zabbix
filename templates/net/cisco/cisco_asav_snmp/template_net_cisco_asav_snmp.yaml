@@ -34,8 +34,8 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.4.0
           key: cisco.asav.contact
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: RFC1213-MIB
             The textual identification of the contact person
@@ -55,8 +55,8 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.6.0
           key: cisco.asav.location
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: RFC1213-MIB
             The physical location of this node (e.g.,
@@ -75,8 +75,8 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.1.0
           key: cisco.asav.model
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: RFC1213-MIB
             A textual description of the entity.  This value
@@ -99,8 +99,8 @@ zabbix_export:
           snmp_oid: .1.3.6.1.2.1.1.5.0
           key: cisco.asav.name
           delay: 1h
-          trends: '0'
           value_type: CHAR
+          trends: '0'
           description: |
             MIB: RFC1213-MIB
             An administratively-assigned name for this
@@ -338,8 +338,8 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.18.{#SNMPINDEX}'
               key: 'cisco.asav.net.if.descr[{#SNMPINDEX}]'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: IF-MIB
                 A textual string containing information about the interface
@@ -497,8 +497,8 @@ zabbix_export:
               type: SNMP_AGENT
               snmp_oid: '.1.3.6.1.2.1.31.1.1.1.1.{#SNMPINDEX}'
               key: 'cisco.asav.net.if.name[{#SNMPINDEX}]'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: CISCO-PORT-MIB
                 Descriptive name that identifies this port.
@@ -789,8 +789,8 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.47.1.1.1.1.2.{#SNMPINDEX}'
               key: 'cisco.asav.phys.description[{#SNMPINDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: ENTITY-MIB
                 A textual description of physical entity.  This object
@@ -813,8 +813,8 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.47.1.1.1.1.8.{#SNMPINDEX}'
               key: 'cisco.asav.phys.hw[{#SNMPINDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: ENTITY-MIB
                 The vendor-specific hardware revision string for the
@@ -844,8 +844,8 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.47.1.1.1.1.12.{#SNMPINDEX}'
               key: 'cisco.asav.phys.mfgname[{#SNMPINDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: ENTITY-MIB
                 The name of the manufacturer of this physical component.
@@ -874,8 +874,8 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.47.1.1.1.1.13.{#SNMPINDEX}'
               key: 'cisco.asav.phys.model[{#SNMPINDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: ENTITY-MIB
                 The vendor-specific model name identifier string associated
@@ -900,8 +900,8 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.47.1.1.1.1.7.{#SNMPINDEX}'
               key: 'cisco.asav.phys.name[{#SNMPINDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: ENTITY-MIB
                 The textual name of the physical entity.  The value of this
@@ -933,8 +933,8 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.47.1.1.1.1.11.{#SNMPINDEX}'
               key: 'cisco.asav.phys.sn[{#SNMPINDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: ENTITY-MIB
                 The vendor-specific serial number string for the physical
@@ -972,8 +972,8 @@ zabbix_export:
               snmp_oid: '.1.3.6.1.2.1.47.1.1.1.1.10.{#SNMPINDEX}'
               key: 'cisco.asav.phys.sw[{#SNMPINDEX}]'
               delay: 1h
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: |
                 MIB: ENTITY-MIB
                 The vendor-specific software revision string for the

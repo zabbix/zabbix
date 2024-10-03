@@ -32,8 +32,8 @@ zabbix_export:
           key: acronis.cpc.account_manager.get_token
           delay: '{$ACRONIS.CPC.AUTH.INTERVAL}'
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           authtype: BASIC
           username: '{$ACRONIS.CPC.AUTH.CLIENT.ID}'
           password: '{$ACRONIS.CPC.AUTH.SECRET}'
@@ -49,8 +49,8 @@ zabbix_export:
                   return JSON.stringify(list);
           timeout: 15s
           url: '{$ACRONIS.CPC.DATACENTER.URL}{$ACRONIS.CPC.PATH.ACCOUNT.MANAGEMENT}/idp/token'
-          posts: grant_type=client_credentials
           status_codes: ''
+          posts: grant_type=client_credentials
           http_proxy: '{$ACRONIS.CPC.HTTP.PROXY}'
           headers:
             - name: Content-Type
@@ -139,8 +139,8 @@ zabbix_export:
           key: acronis.cpc.alerts.get
           delay: 5m
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Fetches all alerts.'
           preprocessing:
             - type: JSONPATH
@@ -266,8 +266,8 @@ zabbix_export:
           key: acronis.cpc.customers.get
           delay: 5m
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Fetches all customers.'
           preprocessing:
             - type: JSONPATH
@@ -295,8 +295,8 @@ zabbix_export:
           type: HTTP_AGENT
           key: acronis.cpc.devices.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           description: 'Fetches all devices.'
           preprocessing:
             - type: JSONPATH
@@ -720,8 +720,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'acronis.cpc.device.agent.version[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Agent version for the device.'
               preprocessing:
                 - type: JSONPATH
@@ -1006,8 +1006,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'acronis.cpc.device.protection.name[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Protection plan name for device.'
               preprocessing:
                 - type: JSONPATH
@@ -1132,8 +1132,8 @@ zabbix_export:
               type: DEPENDENT
               key: 'acronis.cpc.device.protection.status[{#NAME}]'
               delay: '0'
-              trends: '0'
               value_type: CHAR
+              trends: '0'
               description: 'Protection status for device.'
               preprocessing:
                 - type: JSONPATH
@@ -1184,8 +1184,8 @@ zabbix_export:
               type: HTTP_AGENT
               key: 'acronis.cpc.device.res.status.raw[{#NAME}]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               description: 'Gets statuses for device resources.'
               preprocessing:
                 - type: JSONPATH

@@ -42,7 +42,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 
 	const DEFAULT_WIDGET = 'Default Item history Widget';
 	const DELETE_WIDGET = 'Widget for delete';
-	const DATA_WIDET = 'Widget for data check';
+	const DATA_WIDGET = 'Widget for data check';
 
 	protected static $dashboardid;
 	protected static $dashboard_create;
@@ -204,7 +204,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						'widgets' => [
 							[
 								'type' => 'itemhistory',
-								'name' => self::DATA_WIDET,
+								'name' => self::DATA_WIDGET,
 								'x' => 0,
 								'y' => 0,
 								'width' => 60,
@@ -223,7 +223,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
-										'value' => 'now'
+										'value' => 'now/d'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1627,29 +1627,29 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					]
 				]
 			],
-			// TODO: Uncomment after ZBX-24554 (4) is fixed.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'fields' => [
-//						'Name' => 'Time period = empty widget',
-//						'Advanced configuration' => true,
-//						'Time period' => 'Widget'
-//					],
-//					'Columns' => [
-//						[
-//							'fields' => [
-//								'Item' => [
-//									'values' => 'Text item',
-//									'context' => ['values' => 'Host for all item value types']
-//								]
-//							]
-//						]
-//					],
-//					'error' => 'Invalid parameter "Time period/Widget": cannot be empty.'
-//				]
-//			],
 			// #46.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Time period = empty widget',
+						'Advanced configuration' => true,
+						'Time period' => 'Widget'
+					],
+					'Columns' => [
+						[
+							'fields' => [
+								'Item' => [
+									'values' => 'Text item',
+									'context' => ['values' => 'Host for all item value types']
+								]
+							]
+						]
+					],
+					'error' => 'Invalid parameter "Time period/Widget": cannot be empty.'
+				]
+			],
+			// #47.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1676,7 +1676,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					]
 				]
 			],
-			// #47.
+			// #48.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1703,7 +1703,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					]
 				]
 			],
-			// #48.
+			// #49.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1724,7 +1724,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					]
 				]
 			],
-			// #49.
+			// #50.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1748,7 +1748,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'check_time' => 'now-1y – now-1M'
 				]
 			],
-			// #50.
+			// #51.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1771,7 +1771,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'check_time' => 'future'
 				]
 			],
-			// #51.
+			// #52.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1794,7 +1794,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'check_time' => 'past'
 				]
 			],
-			// #52.
+			// #53.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1818,7 +1818,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'error' => 'Minimum time period to display is 1 minute.'
 				]
 			],
-			// #53.
+			// #54.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1842,7 +1842,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'error' => 'Minimum time period to display is 1 minute.'
 				]
 			],
-			// #54.
+			// #55.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2429,15 +2429,15 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'result' => [
 						[
 							'Name' => 'Host name',
-							'Value' => 'lon'
+							'Value' => 'lon…'
 						],
 						[
 							'Name' => 'Host name',
-							'Value' => '<sp'
+							'Value' => '<sp…'
 						],
 						[
 							'Name' => 'Host name',
-							'Value' => '<b>'
+							'Value' => '<b>…'
 						],
 						[
 							'Name' => 'Master item',
@@ -2573,10 +2573,15 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'fields' => [
 						'Advanced configuration' => true,
 						'Time period' => 'Custom',
-						'From' => 'now-5d',
-						'To' => 'now'
+						'From' => date('Y-m-d H:i:s', strtotime('-5 days')),
+						'To' => date('Y-m-d H:i:s', strtotime('now'))
 					],
 					'initial_data' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('+1 hours')),
+							'Name' => 'Available memory in %',
+							'Value' => '82.0618 %' // Value rounding is expected.
+						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
 							'Name' => 'Host name',
@@ -2591,11 +2596,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 week')),
 							'Name' => 'Host name',
 							'Value' => STRING_255
-						],
-						[
-							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 month')),
-							'Name' => 'Available memory in %',
-							'Value' => '82.0618 %' // Value rounding is expected.
 						]
 					],
 					'result' => [
@@ -2614,7 +2614,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						['itemid' => '42227', 'values' => 'Zabbix Item history', 'time' => strtotime('now')],
 						['itemid' => '99142', 'values' => '7.777777', 'time' => strtotime('-80 seconds')],
 						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-1 week')],
-						['itemid' => '42244', 'values' => '82.061797', 'time' => strtotime('-1 month')]
+						['itemid' => '42244', 'values' => '82.061797', 'time' => strtotime('+1 hours')]
 					]
 				]
 			]
@@ -2645,7 +2645,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				'Show timestamp' => true,
 				'Time period' => 'Custom',
 				'From' => 'now-1y',
-				'To' => 'now'
+				'To' => 'now/d'
 			],
 			'columns' => [
 				'Host name' => ['id:display' => 'As is'],
@@ -2695,7 +2695,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 	 * @param array             $edit_columns     array of columns to be changed in test
 	 */
 	protected function widgetConfigurationChange($configuration, $dashboard, $edit_columns = []) {
-		$form = $dashboard->getWidget(self::DATA_WIDET)->edit();
+		$form = $dashboard->getWidget(self::DATA_WIDGET)->edit();
 		$form->fill($configuration);
 
 		if ($edit_columns !== []) {
@@ -2711,6 +2711,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		}
 
 		$form->submit();
+		$dashboard->getWidget(self::DATA_WIDGET);
 		$dashboard->save();
 		$dashboard->waitUntilReady();
 	}

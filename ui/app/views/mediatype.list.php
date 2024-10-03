@@ -33,7 +33,7 @@ $html_page = (new CHtmlPage())
 					->onClick(
 						'return PopUp("popup.import", {
 							rules_preset: "mediatype", '.
-							CCsrfTokenHelper::CSRF_TOKEN_NAME.': "'. CCsrfTokenHelper::get('import').
+							CSRF_TOKEN_NAME.': "'.CCsrfTokenHelper::get('import').
 						'"},{
 							dialogueid: "popup_import",
 							dialogue_class: "modal-popup-generic"
@@ -90,7 +90,7 @@ $media_type_table = (new CTableInfo())
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
 		_('Status'),
-		_('Used in actions'),
+		(new CColHeader(_('Used in actions')))->setColSpan(2),
 		_('Details'),
 		_('Action')
 	])
@@ -127,31 +127,39 @@ foreach ($data['mediatypes'] as $media_type) {
 	}
 
 	// action list
-	$action_links = [];
+	$action_count_total = '';
+	$actions = [];
 
-	if (count($media_type['actions']) > 0) {
+	if ($media_type['actions']) {
+		$action_count_total = (new CSpan($media_type['action_count_total']))->addClass(ZBX_STYLE_ENTITY_COUNT);
+
 		foreach ($media_type['actions'] as $action) {
-			$action_links[] = (new CLink($action['name']))
-				->addClass('js-action-edit')
-				->setAttribute('data-actionid', $action['actionid'])
-				->setAttribute('data-eventsource', $action['eventsource']);
-
-			$action_links[] = ', ';
+			$actions[] = $action['is_editable']
+				? (new CLink($action['name']))
+					->addClass('js-action-edit')
+					->setAttribute('data-actionid', $action['actionid'])
+					->setAttribute('data-eventsource', $action['eventsource'])
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_GREY)
+				: (new CSpan($action['name']))->addClass(ZBX_STYLE_GREY);
+			$actions[] = ', ';
 		}
-		array_pop($action_links);
-	}
-	else {
-		$action_links = '';
-	}
 
-	$action_column = (new CCol($action_links))->addStyle('white-space: normal;');
+		array_pop($actions);
+
+		if ($media_type['action_count_total'] > count($media_type['actions'])) {
+			$actions[] = [', ', HELLIP()];
+		}
+	}
 
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
 		? (new CLink(_('Enabled')))
+			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_GREEN)
 			->addClass('js-disable')
 			->setAttribute('data-mediatypeid', (int) $media_type['mediatypeid'])
 		: (new CLink(_('Disabled')))
+			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED)
 			->addClass('js-enable')
 			->setAttribute('data-mediatypeid', (int) $media_type['mediatypeid']);
@@ -173,7 +181,8 @@ foreach ($data['mediatypes'] as $media_type) {
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		CMediatypeHelper::getMediaTypes($media_type['typeid']),
 		$status,
-		$action_column,
+		(new CCol($action_count_total))->addClass(ZBX_STYLE_CELL_WIDTH),
+		$actions,
 		$details,
 		$test_link
 	]);
@@ -184,7 +193,6 @@ $media_type_form->addItem([
 	$media_type_table,
 	new CActionButtonList('action', 'mediatypeids', [
 		'mediatype.enable' => [
-
 			'content' => (new CSimpleButton(_('Enable')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->setId('js-massenable')

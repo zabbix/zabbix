@@ -130,8 +130,11 @@ $translate_strings = [
 	],
 	'class.dashboard.js' => [
 		'Actions' => _('Actions'),
-		'Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.' => _('Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.'),
-		'Cannot add widget: not enough free space on the dashboard.' => _('Cannot add widget: not enough free space on the dashboard.'),
+		'Add widget' => _('Add widget'),
+		'Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.' =>
+			_('Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.'),
+		'Cannot add widget: not enough free space on the dashboard.' =>
+			_('Cannot add widget: not enough free space on the dashboard.'),
 		'Cannot add widget: no widgets available.' => _('Cannot add widget: no widgets available.'),
 		'Cannot paste inaccessible widget.' => _('Cannot paste inaccessible widget.'),
 		'Copy' => _('Copy'),
@@ -141,6 +144,7 @@ $translate_strings = [
 		'Failed to update dashboard page properties.' => _('Failed to update dashboard page properties.'),
 		'Failed to update dashboard properties.' => _('Failed to update dashboard properties.'),
 		'Failed to update widget properties.' => _('Failed to update widget properties.'),
+		'Inaccessible widget' => _('Inaccessible widget'),
 		'Inaccessible widgets were not copied.' => _('Inaccessible widgets were not copied.'),
 		'Inaccessible widgets were not pasted.' => _('Inaccessible widgets were not pasted.'),
 		'Page %1$d' => _('Page %1$d'),
@@ -148,9 +152,6 @@ $translate_strings = [
 		'Properties' => _('Properties'),
 		'Start slideshow' => _('Start slideshow'),
 		'Stop slideshow' => _('Stop slideshow')
-	],
-	'class.dashboard.page.js' => [
-		'Inaccessible widget' => _('Inaccessible widget')
 	],
 	'class.dashboard.widget.placeholder.js' => [
 		'Add a new widget' => _('Add a new widget'),
@@ -168,6 +169,7 @@ $translate_strings = [
 		'10 minutes' => _n('%1$s minute', '%1$s minutes', 10),
 		'15 minutes' => _n('%1$s minute', '%1$s minutes', 15),
 		'Actions' => _('Actions'),
+		'Awaiting data' => _('Awaiting data'),
 		'Copy' => _('Copy'),
 		'Delete' => _('Delete'),
 		'Edit' => _('Edit'),
@@ -192,6 +194,7 @@ $translate_strings = [
 		'Refresh interval' => _('Refresh interval')
 	],
 	'class.widget-select.popup.js' => [
+		'Cancel' => _('Cancel'),
 		'Name' => _('Name'),
 		'No compatible widgets.' => _('No compatible widgets.'),
 		'Widget' => _('Widget')
@@ -199,6 +202,7 @@ $translate_strings = [
 	'class.widget-field.multiselect.js' => [
 		'Dashboard' => _('Dashboard'),
 		'Widget' => _('Widget'),
+		'Widgets' => _('Widgets'),
 		'Unavailable widget' => _('Unavailable widget'),
 		'Dashboard is used as data source.' => _('Dashboard is used as data source.'),
 		'Another widget is used as data source.' => _('Another widget is used as data source.')
@@ -207,18 +211,13 @@ $translate_strings = [
 		'Unavailable widget' => _('Unavailable widget')
 	],
 	'functions.js' => [
-		'Error' => _('Error'),
-		'Ok' => _('Ok'),
-		'Cancel' => _('Cancel'),
-		'S_CLOSE' => _('Close'),
-		'Execute' => _('Execute'),
-		'Execution confirmation' => _('Execution confirmation'),
+		'Close' => _('Close'),
+		'Details' => _('Details'),
 		'S_YEAR_SHORT' => _x('y', 'year short'),
 		'S_MONTH_SHORT' => _x('M', 'month short'),
 		'S_DAY_SHORT' => _x('d', 'day short'),
 		'S_HOUR_SHORT' => _x('h', 'hour short'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short'),
-		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
 		'Success message' => _('Success message'),
 		'Error message' => _('Error message'),
 		'Warning message' => _('Warning message')
@@ -280,27 +279,41 @@ $translate_strings = [
 		'S_PASTE' => _('Paste'),
 		'S_PASTE_SIMPLE' => _('Paste without external links'),
 		'S_INCORRECT_ELEMENT_MAP_LINK' => _('All links should have "Name" and "URL" specified'),
-		'S_EACH_URL_SHOULD_HAVE_UNIQUE' => _('Each URL should have a unique name. Please make sure there is only one URL named'),
+		'S_EACH_URL_SHOULD_HAVE_UNIQUE' =>
+			_('Each URL should have a unique name. Please make sure there is only one URL named'),
 		'S_DELETE_LINKS_BETWEEN_SELECTED_ELEMENTS_Q' => _('Delete links between selected elements?'),
 		'S_MACRO_EXPAND_ERROR' => _('Cannot expand macros.'),
-		'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
-		'S_COLOR_IS_NOT_CORRECT' => _('Color "%1$s" is not correct: expecting hexadecimal color code (6 symbols).')
+		'S_NO_IMAGES' =>
+			_('You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.'),
+		'S_COLOR_IS_NOT_CORRECT' => _('Color "%1$s" is not correct: expecting hexadecimal color code (6 symbols).'),
+		'Host is not selected.' => _('Host is not selected.'),
+		'Map is not selected.' => _('Map is not selected.'),
+		'Trigger is not selected.' => _('Trigger is not selected.'),
+		'Host group is not selected.' => _('Host group is not selected.')
+	],
+	'class.notification.js' => [
+		'S_PROBLEM_ON' => _('Problem on'),
+		'S_RESOLVED' => _('Resolved')
 	],
 	'class.notifications.js' => [
+		'Unexpected server error.' => _('Unexpected server error.')
+	],
+	'class.notification.collection.js' => [
 		'Mute for %1$s' => _('Mute for %1$s'),
-		'S_PROBLEM_ON' => _('Problem on'),
-		'S_RESOLVED' => _('Resolved'),
-		'S_CANNOT_SUPPORT_NOTIFICATION_AUDIO' => _('Cannot support notification audio for this device.'),
 		'S_CLOSE' => _('Close'),
+		'S_CANNOT_SUPPORT_NOTIFICATION_AUDIO' => _('Cannot support notification audio for this device.'),
 		'Snooze for %1$s' => _('Snooze for %1$s'),
-		'Unexpected server error.' => _('Unexpected server error.'),
 		'Unmute for %1$s' => _('Unmute for %1$s')
 	],
+	'class.overlay.js' => [
+		'Help' => _('Help'),
+		'S_CLOSE' => _('Close')
+	],
 	'class.cookie.js' => [
-		'S_MAX_COOKIE_SIZE_REACHED' => _('We are sorry, the maximum possible number of elements to remember has been reached.')
+		'S_MAX_COOKIE_SIZE_REACHED' =>
+			_('We are sorry, the maximum possible number of elements to remember has been reached.')
 	],
 	'class.coverride.js' => [
-		'S_COLOR' => _('color'),
 		'S_TIME_SHIFT' => _('time shift')
 	],
 	'class.cverticalaccordion.js' => [
@@ -343,18 +356,20 @@ $translate_strings = [
 		'%1$s, read only' => _x('%1$s, read only', 'screen reader'),
 		'Cannot be removed' => _x('Cannot be removed', 'screen reader'),
 		'Selected, %1$s in position %2$d of %3$d' => _x('Selected, %1$s in position %2$d of %3$d', 'screen reader'),
-		'Selected, %1$s, read only, in position %2$d of %3$d' => _x('Selected, %1$s, read only, in position %2$d of %3$d', 'screen reader'),
+		'Selected, %1$s, read only, in position %2$d of %3$d' =>
+			_x('Selected, %1$s, read only, in position %2$d of %3$d', 'screen reader'),
 		'More than %1$d matches for %2$s found' => _x('More than %1$d matches for %2$s found', 'screen reader'),
 		'%1$d matches for %2$s found' => _x('%1$d matches for %2$s found', 'screen reader'),
-		'%1$s preselected, use down,up arrow keys and enter to select' => _x('%1$s preselected, use down,up arrow keys and enter to select', 'screen reader')
+		'%1$s preselected, use down,up arrow keys and enter to select' =>
+			_x('%1$s preselected, use down,up arrow keys and enter to select', 'screen reader')
 	],
 	'menupopup.js' => [
 		'500 latest values' => _('500 latest values'),
 		'Actions' => _('Actions'),
-		'Update problem' => _('Update problem'),
-		'Configuration' => _('Configuration'),
 		'Clone' => _('Clone'),
+		'Configuration' => _('Configuration'),
 		'Create new' => _('Create new'),
+		'Create new report' => _('Create new report'),
 		'Create trigger' => _('Create trigger'),
 		'Create trigger prototype' => _('Create trigger prototype'),
 		'Create dependent item' => _('Create dependent item'),
@@ -370,11 +385,6 @@ $translate_strings = [
 		'Items' => _('Items'),
 		'Item prototype' => _('Item prototype'),
 		'Insert expression' => _('Insert expression'),
-		'Sharing' => _('Sharing'),
-		'Triggers' => _('Triggers'),
-		'Trigger status "OK"' => _('Trigger status "OK"'),
-		'Trigger status "Problem"' => _('Trigger status "Problem"'),
-		'Trigger prototypes' => _('Trigger prototypes'),
 		'Go to' => _('Go to'),
 		'Graph' => _('Graph'),
 		'Graphs' => _('Graphs'),
@@ -386,26 +396,35 @@ $translate_strings = [
 		'Last hour graph' => _('Last hour graph'),
 		'Last month graph' => _('Last month graph'),
 		'Last week graph' => _('Last week graph'),
-		'Problems' => _('Problems'),
-		'Problem' => _('Problem'),
+		'Links' => _('Links'),
 		'Mark as cause' => _('Mark as cause'),
 		'Mark selected as symptoms' => _('Mark selected as symptoms'),
+		'Problem' => _('Problem'),
+		'Problems' => _('Problems'),
+		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader'),
 		'Scripts' => _('Scripts'),
+		'Sharing' => _('Sharing'),
 		'Submap' => _('Submap'),
-		'S_TRIGGER' => _('Trigger'),
-		'URL' => _('URL'),
+		'Template' => _('Template'),
+		'Trigger' => _('Trigger'),
+		'Triggers' => _('Triggers'),
+		'Trigger status "OK"' => _('Trigger status "OK"'),
+		'Trigger status "Problem"' => _('Trigger status "Problem"'),
+		'Trigger prototypes' => _('Trigger prototypes'),
+		'Unexpected server error.' => _('Unexpected server error.'),
+		'Update problem' => _('Update problem'),
 		'Values' => _('Values'),
 		'View' => _('View'),
-		'Web' => _('Web'),
-		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader'),
-		'Unexpected server error.' => _('Unexpected server error.')
+		'View related reports' => _('View related reports'),
+		'Web' => _('Web')
 	],
 	'init.js' => [
 		'Debug' => _('Debug'),
 		'Hide debug' => _('Hide debug')
 	],
 	'items.js' => [
-		'To set a host interface select a single item type for all items' => _('To set a host interface select a single item type for all items'),
+		'To set a host interface select a single item type for all items' =>
+			_('To set a host interface select a single item type for all items'),
 		'No interface found' => _('No interface found'),
 		'Item type does not use interface' => _('Item type does not use interface')
 	],
@@ -416,9 +435,10 @@ $translate_strings = [
 	],
 	'class.csvggraph.js' => [
 		'S_DISPLAYING_FOUND' => _('Displaying %1$s of %2$s found'),
-		'S_MINUTE_SHORT' => _x('m', 'minute short')
+		'S_MINUTE_SHORT' => _x('m', 'minute short'),
+		'Unexpected server error.' => _('Unexpected server error.')
 	],
-	'class.csvggauge.js' => [
+	'class.svggauge.js' => [
 		'No data' => _('No data')
 	],
 	'class.svghoneycomb.js' => [
@@ -427,11 +447,7 @@ $translate_strings = [
 	'common.js' => [
 		'Cancel' => _('Cancel'),
 		'Ok' => _('Ok'),
-		'Unexpected server error.' => _('Unexpected server error.'),
-		'Any changes made in the current form will be lost.' => _('Any changes made in the current form will be lost.')
-	],
-	'component.z-select.js' => [
-		'All' => _('All')
+		'Unexpected server error.' => _('Unexpected server error.')
 	],
 	'macrovalue.js' => [
 		'Set new value' => _('Set new value'),

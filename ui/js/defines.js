@@ -12,6 +12,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
+const CSRF_TOKEN_NAME = '_csrf_token';
+
 const ZBX_STYLE_DISPLAY_NONE = 'display-none';
 
 const ZBX_STYLE_NO_DATA = 'no-data';
@@ -134,3 +137,5 @@ const GROUP_GUI_ACCESS_SYSTEM = 0;
 const GROUP_GUI_ACCESS_INTERNAL = 1;
 const GROUP_GUI_ACCESS_LDAP = 2;
 const GROUP_GUI_ACCESS_DISABLED = 3;
+
+const NAME_DELIMITER = ': ';

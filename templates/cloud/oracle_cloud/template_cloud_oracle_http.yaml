@@ -317,8 +317,8 @@ zabbix_export:
           type: SCRIPT
           key: oci.aut.db.metrics.frequent.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             function validateZabbixParams(requiredParams, allParams) {
             	requiredParams.forEach(function (field) {
@@ -552,8 +552,8 @@ zabbix_export:
           key: oci.aut.db.metrics.stats
           delay: 5m
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             function validateZabbixParams(requiredParams, allParams) {
             	requiredParams.forEach(function (field) {
@@ -761,8 +761,8 @@ zabbix_export:
           key: oci.aut.db.metrics.storage.stats
           delay: 60m
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             function validateZabbixParams(requiredParams, allParams) {
             	requiredParams.forEach(function (field) {
@@ -4278,8 +4278,8 @@ zabbix_export:
           type: SCRIPT
           key: oci.block.volume.metrics.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             function validateZabbixParams(requiredParams, allParams) {
             	requiredParams.forEach(function (field) {
@@ -5296,8 +5296,8 @@ zabbix_export:
           type: SCRIPT
           key: oci.boot.volume.metrics.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             function validateZabbixParams(requiredParams, allParams) {
             	requiredParams.forEach(function (field) {
@@ -8277,8 +8277,8 @@ zabbix_export:
           type: SCRIPT
           key: oci.compute.metrics.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             function validateZabbixParams(requiredParams, allParams) {
             	requiredParams.forEach(function (field) {
@@ -8756,8 +8756,8 @@ zabbix_export:
           type: SCRIPT
           key: oci.compute.vnic.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             function validateZabbixParams(requiredParams, allParams) {
             	requiredParams.forEach(function (field) {
@@ -9083,8 +9083,8 @@ zabbix_export:
               type: SCRIPT
               key: 'oci.compute.vnic.metrics.get[{#ID}]'
               history: '0'
-              trends: '0'
               value_type: TEXT
+              trends: '0'
               params: |
                 function validateZabbixParams(requiredParams, allParams) {
                 	requiredParams.forEach(function (field) {
@@ -11365,8 +11365,8 @@ zabbix_export:
           key: oci.vcn.subnets.get
           delay: 5m
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             function validateZabbixParams(requiredParams, allParams) {
             	requiredParams.forEach(function (field) {
@@ -11776,8 +11776,8 @@ zabbix_export:
           type: SCRIPT
           key: oci.obj.storage.metrics.frequent.get
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             function validateZabbixParams(requiredParams, allParams) {
             	requiredParams.forEach(function (field) {
@@ -11989,8 +11989,8 @@ zabbix_export:
           key: oci.obj.storage.metrics.hourly.get
           delay: 1h
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             function validateZabbixParams(requiredParams, allParams) {
             	requiredParams.forEach(function (field) {

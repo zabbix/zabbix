@@ -179,8 +179,8 @@ zabbix_export:
           key: cloudflare.get
           delay: 0;m01
           history: '0'
-          trends: '0'
           value_type: TEXT
+          trends: '0'
           params: |
             var Cloudflare = {
             	params: {},
