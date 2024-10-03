@@ -257,7 +257,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	size_t				data_size;
 	double				sec, last_template_cleanup_sec = 0, interval;
 	zbx_ipc_async_socket_t		rtc;
-	int				sleeptime = 0;
+	int				sleeptime;
 	zbx_synced_new_config_t		synced = ZBX_SYNCED_NEW_CONFIG_NO;
 	zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
@@ -284,8 +284,9 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zbx_dc_sync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, proxyconfig_args_in->config_vault,
 			proxyconfig_args_in->config_proxyconfig_frequency);
 
-	zbx_rtc_notify_finished_sync(proxyconfig_args_in->config_timeout, ZBX_RTC_CONFIG_SYNC_NOTIFY,
-			get_process_type_string(process_type), &rtc);
+	zbx_rtc_notify_finished_sync(proxyconfig_args_in->config_timeout, ZBX_RTC_CONFIG_SYNC_NOTIFY, get_process_type_string(process_type), &rtc);
+
+	sleeptime = (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == info->program_type ? ZBX_IPC_WAIT_FOREVER : 0);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -302,8 +303,6 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 			sleeptime = 0;
 		}
-
-		sleeptime = proxyconfig_args_in->config_proxyconfig_frequency;
 
 		sec = zbx_time();
 		zbx_update_env(get_process_type_string(process_type), sec);
@@ -333,6 +332,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 						get_process_type_string(process_type), zbx_time() - sec);
 			}
 
+			sleeptime = ZBX_IPC_WAIT_FOREVER;
 			continue;
 		}
 
@@ -354,6 +354,8 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 			proxyconfig_remove_unused_templates();
 			last_template_cleanup_sec = sec;
 		}
+
+		sleeptime = proxyconfig_args_in->config_proxyconfig_frequency;
 	}
 stop:
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
