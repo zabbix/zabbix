@@ -27,7 +27,6 @@
 #include "zbxstr.h"
 #include "zbxalgo.h"
 #include "zbxhistory.h"
-#include "zbxip.h"
 
 /******************************************************************************
  *                                                                            *
@@ -287,62 +286,6 @@ out:
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieve a particular value associated with the interface.        *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- ******************************************************************************/
-int	expr_dc_get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char **replace_to, int request)
-{
-	int			res;
-	zbx_dc_interface_t	interface;
-
-	if (SUCCEED != (res = zbx_dc_config_get_interface(&interface, hostid, itemid)))
-	{
-		*replace_to = zbx_strdup(*replace_to, STR_UNKNOWN_VARIABLE);
-		return SUCCEED;
-	}
-
-	switch (request)
-	{
-		case ZBX_REQUEST_HOST_IP:
-			if ('\0' != *interface.ip_orig && FAIL == zbx_is_ip(interface.ip_orig))
-				return FAIL;
-
-			*replace_to = zbx_strdup(*replace_to, interface.ip_orig);
-			break;
-		case ZBX_REQUEST_HOST_DNS:
-			if ('\0' != *interface.dns_orig && FAIL == zbx_is_ip(interface.dns_orig) &&
-					FAIL == zbx_validate_hostname(interface.dns_orig))
-			{
-				return FAIL;
-			}
-
-			*replace_to = zbx_strdup(*replace_to, interface.dns_orig);
-			break;
-		case ZBX_REQUEST_HOST_CONN:
-			if (FAIL == zbx_is_ip(interface.addr) &&
-					FAIL == zbx_validate_hostname(interface.addr))
-			{
-				return FAIL;
-			}
-
-			*replace_to = zbx_strdup(*replace_to, interface.addr);
-			break;
-		case ZBX_REQUEST_HOST_PORT:
-			*replace_to = zbx_strdup(*replace_to, interface.port_orig);
-			break;
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			res = FAIL;
-	}
-
-	return res;
-}
-
 int	expr_dc_get_host_value(zbx_uint64_t itemid, char **replace_to, int request)
 {
 	int		ret;
@@ -413,7 +356,7 @@ int	expr_db_get_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 		case ZBX_REQUEST_HOST_DNS:
 		case ZBX_REQUEST_HOST_CONN:
 		case ZBX_REQUEST_HOST_PORT:
-			return expr_dc_get_interface_value(0, itemid, replace_to, request);
+			return zbx_dc_get_interface_value(0, itemid, replace_to, request);
 		case ZBX_REQUEST_HOST_ID:
 		case ZBX_REQUEST_HOST_HOST:
 		case ZBX_REQUEST_HOST_NAME:

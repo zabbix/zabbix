@@ -1026,7 +1026,6 @@ typedef struct
 	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
 							/* by PSK identity */
 #endif
-	zbx_hashset_t		data_sessions;
 	zbx_hashset_t		drules;
 	zbx_hashset_t		dchecks;
 	zbx_hashset_t		httptests;

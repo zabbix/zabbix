@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-08-31 18:01+0000\n"
-"Last-Translator: Mehmet Oğuzhan ÖZKURT <oguzhan@oguzhanozkurt.com>\n"
+"PO-Revision-Date: 2024-09-18 07:37+0000\n"
+"Last-Translator: Suleyman Karatas <suleymankaratas1@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -2405,7 +2405,7 @@ msgstr "Kullanıcı eklenemiyor"
 #: app/controllers/CControllerUsergroupCreate.php:50
 #: app/controllers/CControllerUsergroupCreate.php:150
 msgid "Cannot add user group"
-msgstr ""
+msgstr "Kullanıcı grubu eklenemiyor"
 
 #: httpconf.php:199
 msgid "Cannot add web scenario"
@@ -2413,7 +2413,7 @@ msgstr "Web senaryosu eklenemiyor"
 
 #: jsLoader.php:135
 msgid "Cannot add widget: no widgets available."
-msgstr ""
+msgstr "Widget eklenemiyor: kullanılabilir widget yok."
 
 #: jsLoader.php:134
 msgid "Cannot add widget: not enough free space on the dashboard."
