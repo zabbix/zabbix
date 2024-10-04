@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-09-24T14:20:12Z'
+  date: '2024-10-04T08:20:03Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -13,7 +13,11 @@ zabbix_export:
         
         This template is designed for the effortless deployment Nutanix Cluster Prism Element monitoring and doesn't require any external scripts.
         
-        This templates is used in discovery and normally should not be manually linked to a host.
+        This templates can be used in discovery as well as manually linked to a host.
+        
+        To use this template as manually linked to a host, attach it to the host and set manually the value of '{$NUTANIX.CLUSTER.UUID}' macro.
+        For more details about getting UUID refer to the official documentation:
+        https://www.nutanixbible.com/19b-cli.html
         
         For more details about Nutanix Prism Element REST API, refer to the official documentation:
         https://www.nutanix.dev/api_reference/apis/prism_v2.html
@@ -32,11 +36,6 @@ zabbix_export:
           params: |
             var Nutanix = {
             	params: {},
-            	severity_mapping: [
-            		'kinfo',
-            		'kwarning',
-            		'kcritical'
-            	],
             
             	setParams: function (requiredParams, allParams) {
             		requiredParams.forEach(function (field) {
@@ -48,10 +47,7 @@ zabbix_export:
             		Nutanix.params = params;
             	},
             
-            	request: function (method, url, data) {
-            		if (typeof data === 'undefined' || data === null) {
-            			data = '';
-            		}
+            	request: function (url) {
             
             		var request = new HttpRequest();
             
@@ -63,84 +59,83 @@ zabbix_export:
             
             		Zabbix.log(4, '[ Nutanix ] Sending request: ' + url);
             
-            		if (method === 'post') {
-            			Zabbix.log(4, '[ Nutanix ] Sending data: ' + data);
-            			const response = request.get(url, JSON.stringify(data));
-            		} else {
-            			const response = request.get(url);
-            		}
+            		const response = request.get(url);
             
             		Zabbix.log(4, '[ Nutanix ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-            		if (request.getStatus() !== 200) {
+            		if (request.getStatus() < 200 || request.getStatus() >= 300) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
             		}
             
-            		if (response !== null) {
-            			try {
-            				response = JSON.parse(response);
-            			}
-            			catch (error) {
-            				throw 'Failed to parse response received from Nutanix PRISM API. Check debug log for more information.';
-            			}
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from Nutanix PRISM API. Check debug log for more information.';
             		}
             
             		return response;
             	},
             
-            	deduplicate_alerts: function (fullData) {
-            		var outputData = {};
-            		for (var entity in fullData.entities) {
+            	deduplicateAlerts: function (full_data) {
+            		const severity_mapping = [
+            			'kinfo',
+            			'kwarning',
+            			'kcritical'
+            		]
+            
+            		var output_data = {};
+            		for (var entity in full_data.entities) {
             	
-            			if (Nutanix.params.api_method != 'hosts') {
+            			if (Nutanix.params.api_method === 'clusters') {
             				if (result.entities[entity].node_uuid.split('-').length == 5) continue;
             			}
             
-            			var severity = Nutanix.severity_mapping.indexOf(fullData.entities[entity].severity.toLowerCase()),
-            				message = fullData.entities[entity].message,
-            				title = fullData.entities[entity].alert_title;
+            			var severity = severity_mapping.indexOf(full_data.entities[entity].severity.toLowerCase()),
+            				message = full_data.entities[entity].message,
+            				title = full_data.entities[entity].alert_title;
             	
-            			fullData.entities[entity].context_types.forEach(function(context, index) {
-            				message = message.replace('{' + context + '}', fullData.entities[entity].context_values[index]);
-            				title = title.replace('{' + context + '}', fullData.entities[entity].context_values[index]);
+            			full_data.entities[entity].context_types.forEach(function(context, index) {
+            				message = message.replace('{' + context + '}', full_data.entities[entity].context_values[index]);
+            				title = title.replace('{' + context + '}', full_data.entities[entity].context_values[index]);
             			});
             	
             			key = md5(title + message);
-            			if (key in outputData) {
-            				if (fullData.entities[entity].created_time_stamp_in_usecs > outputData[key].created) {
-            					outputData[key].created = fullData.entities[entity].created_time_stamp_in_usecs;
-            					outputData[key].severity = severity !== -1 ? severity : 3;
-            					outputData[key].state = fullData.entities[entity].resolved ? 0 : 1;
-            					outputData[key].message = fullData.entities[entity].detailed_message != '' ? fullData.entities[entity].detailed_message : message;
-            					outputData[key].last_id = fullData.entities[entity].id;
+            			if (key in output_data) {
+            				if (full_data.entities[entity].created_time_stamp_in_usecs > output_data[key].created) {
+            					output_data[key].created = full_data.entities[entity].created_time_stamp_in_usecs;
+            					output_data[key].severity = severity !== -1 ? severity : 3;
+            					output_data[key].state = full_data.entities[entity].resolved ? 0 : 1;
+            					output_data[key].message = full_data.entities[entity].detailed_message != '' ? full_data.entities[entity].detailed_message : message;
+            					output_data[key].last_id = full_data.entities[entity].id;
             				}
-            				outputData[key].count += 1;
+            				output_data[key].count += 1;
             			} else {
-            				outputData[key] = {
+            				output_data[key] = {
             					"name": title + ' - ' + message,
             					"title": title != '' ? title : message,
-            					"created": fullData.entities[entity].created_time_stamp_in_usecs,
+            					"created": full_data.entities[entity].created_time_stamp_in_usecs,
             					"severity": severity !== -1 ? severity : 3,
-            					"state": fullData.entities[entity].resolved ? 0 : 1,
-            					"message": fullData.entities[entity].detailed_message != '' ? fullData.entities[entity].detailed_message : message,
-            					"last_id": fullData.entities[entity].id,
+            					"state": full_data.entities[entity].resolved ? 0 : 1,
+            					"message": full_data.entities[entity].detailed_message != '' ? full_data.entities[entity].detailed_message : message,
+            					"last_id": full_data.entities[entity].id,
             					"count": 1
             				}
             			}
             		}
             
-            		return outputData;
+            		return output_data;
             	},
             
-            	clean_unsupported: function (fullStat) {
-            		var outputStat = {};
-            		for (var element in fullStat) {
-            			if (fullStat[element] != '-1') {
-            				outputStat[element] = fullStat[element];
+            	cleanUnsupported: function (full_stat) {
+            		var output_stat = {};
+            		for (var element in full_stat) {
+            			if (full_stat[element] !== '-1') {
+            				output_stat[element] = full_stat[element];
             			}
             		};
             		
-            		return outputStat;
+            		return output_stat;
             	}
             };
             
@@ -148,14 +143,10 @@ zabbix_export:
             	const params = JSON.parse(value);
             	Nutanix.setParams(['endpoint_host', 'endpoint_port', 'username', 'password', 'auth_type', 'api_method', 'target_uuid'], params);
             
-            	var url = 'https://' + Nutanix.params.endpoint_host + ':' + Nutanix.params.endpoint_port + '/PrismGateway/services/rest/v2.0/' + Nutanix.params.api_method + '/' + Nutanix.params.target_uuid + '/alerts';
-            	var result = Nutanix.request('GET', url, null);
+            	const url = 'https://' + Nutanix.params.endpoint_host + ':' + Nutanix.params.endpoint_port + '/PrismGateway/services/rest/v2.0/' + Nutanix.params.api_method + '/' + Nutanix.params.target_uuid + '/alerts',
+            		result = Nutanix.request(url);
             
-            	if (typeof result !== 'object') {
-            		throw 'Cannot get metrics data from Nutanix PRISM API. Check debug log for more information.';
-            	}
-            
-            	return JSON.stringify(Nutanix.deduplicate_alerts(result));
+            	return JSON.stringify(Nutanix.deduplicateAlerts(result));
             }
             catch (error) {
             	error += (String(error).endsWith('.')) ? '' : '.';
@@ -165,7 +156,7 @@ zabbix_export:
             }
             
           description: 'Get the data about alerts.'
-          timeout: 10s
+          timeout: '{$NUTANIX.TIMEOUT}'
           parameters:
             - name: api_method
               value: clusters
@@ -180,7 +171,7 @@ zabbix_export:
             - name: proxy
               value: '{$NUTANIX.PROXY}'
             - name: target_uuid
-              value: '{HOST.HOST}'
+              value: '{$NUTANIX.CLUSTER.UUID}'
             - name: username
               value: '{$NUTANIX.USER}'
           tags:
@@ -193,8 +184,8 @@ zabbix_export:
           delay: '0'
           history: 7d
           trends: '0'
-          value_type: CHAR
-          description: 'The data collection check.'
+          value_type: TEXT
+          description: 'The data collection check. Check the latest values for details.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -270,9 +261,6 @@ zabbix_export:
               parameters:
                 - $.stats.content_cache_num_dedup_ref_count_pph
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -295,9 +283,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -361,9 +346,6 @@ zabbix_export:
               parameters:
                 - $.stats.content_cache_num_lookups
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -473,9 +455,6 @@ zabbix_export:
               parameters:
                 - $.stats.controller_num_random_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -498,9 +477,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -518,9 +494,6 @@ zabbix_export:
               parameters:
                 - $.stats.controller_num_seq_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -543,9 +516,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -563,9 +533,6 @@ zabbix_export:
               parameters:
                 - $.stats.num_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -587,9 +554,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -612,9 +576,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -632,9 +593,6 @@ zabbix_export:
               parameters:
                 - $.stats.num_random_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -657,9 +615,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -677,9 +632,6 @@ zabbix_export:
               parameters:
                 - $.stats.num_read_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -701,9 +653,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -726,9 +675,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -751,9 +697,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -775,9 +718,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -800,9 +740,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -820,9 +757,6 @@ zabbix_export:
               parameters:
                 - $.stats.num_seq_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -845,9 +779,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -869,9 +800,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -894,9 +822,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -914,9 +839,6 @@ zabbix_export:
               parameters:
                 - $.stats.num_write_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -938,9 +860,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -963,9 +882,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -988,9 +904,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1009,9 +922,6 @@ zabbix_export:
               parameters:
                 - $.stats.num_iops
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1030,9 +940,6 @@ zabbix_export:
               parameters:
                 - $.stats.num_read_iops
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1052,9 +959,6 @@ zabbix_export:
               parameters:
                 - $.stats.num_write_iops
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1071,7 +975,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.usage_stats.["storage.capacity_bytes"]'
+                - '$.usage_stats.[''storage.capacity_bytes'']'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -1091,7 +995,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.usage_stats.["storage.free_bytes"]'
+                - '$.usage_stats.[''storage.free_bytes'']'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -1111,7 +1015,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.usage_stats.["storage.logical_usage_bytes"]'
+                - '$.usage_stats.[''storage.logical_usage_bytes'']'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -1131,7 +1035,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.usage_stats.["storage.usage_bytes"]'
+                - '$.usage_stats.[''storage.usage_bytes'']'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -1157,9 +1061,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1178,9 +1079,6 @@ zabbix_export:
               parameters:
                 - $.stats.total_transformed_usage_bytes
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1199,9 +1097,6 @@ zabbix_export:
               parameters:
                 - $.stats.total_untransformed_usage_bytes
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1215,7 +1110,7 @@ zabbix_export:
           history: 7d
           description: 'Whether the cluster is currently in an update state.'
           valuemap:
-            name: 'Nutanix: True / False'
+            name: 'Nutanix: Boolean'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1273,9 +1168,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1294,9 +1186,6 @@ zabbix_export:
               parameters:
                 - $.stats.hypervisor_num_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1318,9 +1207,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1343,9 +1229,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1363,9 +1246,6 @@ zabbix_export:
               parameters:
                 - $.stats.hypervisor_num_read_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1387,9 +1267,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1412,9 +1289,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1436,9 +1310,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1461,9 +1332,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1485,9 +1353,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1510,9 +1375,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1530,9 +1392,6 @@ zabbix_export:
               parameters:
                 - $.stats.hypervisor_num_write_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1554,9 +1413,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1579,9 +1435,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1600,9 +1453,6 @@ zabbix_export:
               parameters:
                 - $.stats.hypervisor_num_iops
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1620,9 +1470,6 @@ zabbix_export:
               parameters:
                 - $.stats.hypervisor_num_read_iops
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1641,9 +1488,6 @@ zabbix_export:
               parameters:
                 - $.stats.hypervisor_num_write_iops
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1666,9 +1510,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1691,9 +1532,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1709,11 +1547,6 @@ zabbix_export:
           params: |
             var Nutanix = {
             	params: {},
-            	severity_mapping: [
-            		'kinfo',
-            		'kwarning',
-            		'kcritical'
-            	],
             
             	setParams: function (requiredParams, allParams) {
             		requiredParams.forEach(function (field) {
@@ -1725,10 +1558,7 @@ zabbix_export:
             		Nutanix.params = params;
             	},
             
-            	request: function (method, url, data) {
-            		if (typeof data === 'undefined' || data === null) {
-            			data = '';
-            		}
+            	request: function (url) {
             
             		var request = new HttpRequest();
             
@@ -1740,84 +1570,83 @@ zabbix_export:
             
             		Zabbix.log(4, '[ Nutanix ] Sending request: ' + url);
             
-            		if (method === 'post') {
-            			Zabbix.log(4, '[ Nutanix ] Sending data: ' + data);
-            			const response = request.get(url, JSON.stringify(data));
-            		} else {
-            			const response = request.get(url);
-            		}
+            		const response = request.get(url);
             
             		Zabbix.log(4, '[ Nutanix ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-            		if (request.getStatus() !== 200) {
+            		if (request.getStatus() < 200 || request.getStatus() >= 300) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
             		}
             
-            		if (response !== null) {
-            			try {
-            				response = JSON.parse(response);
-            			}
-            			catch (error) {
-            				throw 'Failed to parse response received from Nutanix PRISM API. Check debug log for more information.';
-            			}
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from Nutanix PRISM API. Check debug log for more information.';
             		}
             
             		return response;
             	},
             
-            	deduplicate_alerts: function (fullData) {
-            		var outputData = {};
-            		for (var entity in fullData.entities) {
+            	deduplicateAlerts: function (full_data) {
+            		const severity_mapping = [
+            			'kinfo',
+            			'kwarning',
+            			'kcritical'
+            		]
+            
+            		var output_data = {};
+            		for (var entity in full_data.entities) {
             	
-            			if (Nutanix.params.api_method != 'hosts') {
+            			if (Nutanix.params.api_method === 'clusters') {
             				if (result.entities[entity].node_uuid.split('-').length == 5) continue;
             			}
             
-            			var severity = Nutanix.severity_mapping.indexOf(fullData.entities[entity].severity.toLowerCase()),
-            				message = fullData.entities[entity].message,
-            				title = fullData.entities[entity].alert_title;
+            			var severity = severity_mapping.indexOf(full_data.entities[entity].severity.toLowerCase()),
+            				message = full_data.entities[entity].message,
+            				title = full_data.entities[entity].alert_title;
             	
-            			fullData.entities[entity].context_types.forEach(function(context, index) {
-            				message = message.replace('{' + context + '}', fullData.entities[entity].context_values[index]);
-            				title = title.replace('{' + context + '}', fullData.entities[entity].context_values[index]);
+            			full_data.entities[entity].context_types.forEach(function(context, index) {
+            				message = message.replace('{' + context + '}', full_data.entities[entity].context_values[index]);
+            				title = title.replace('{' + context + '}', full_data.entities[entity].context_values[index]);
             			});
             	
             			key = md5(title + message);
-            			if (key in outputData) {
-            				if (fullData.entities[entity].created_time_stamp_in_usecs > outputData[key].created) {
-            					outputData[key].created = fullData.entities[entity].created_time_stamp_in_usecs;
-            					outputData[key].severity = severity !== -1 ? severity : 3;
-            					outputData[key].state = fullData.entities[entity].resolved ? 0 : 1;
-            					outputData[key].message = fullData.entities[entity].detailed_message != '' ? fullData.entities[entity].detailed_message : message;
-            					outputData[key].last_id = fullData.entities[entity].id;
+            			if (key in output_data) {
+            				if (full_data.entities[entity].created_time_stamp_in_usecs > output_data[key].created) {
+            					output_data[key].created = full_data.entities[entity].created_time_stamp_in_usecs;
+            					output_data[key].severity = severity !== -1 ? severity : 3;
+            					output_data[key].state = full_data.entities[entity].resolved ? 0 : 1;
+            					output_data[key].message = full_data.entities[entity].detailed_message != '' ? full_data.entities[entity].detailed_message : message;
+            					output_data[key].last_id = full_data.entities[entity].id;
             				}
-            				outputData[key].count += 1;
+            				output_data[key].count += 1;
             			} else {
-            				outputData[key] = {
+            				output_data[key] = {
             					"name": title + ' - ' + message,
             					"title": title != '' ? title : message,
-            					"created": fullData.entities[entity].created_time_stamp_in_usecs,
+            					"created": full_data.entities[entity].created_time_stamp_in_usecs,
             					"severity": severity !== -1 ? severity : 3,
-            					"state": fullData.entities[entity].resolved ? 0 : 1,
-            					"message": fullData.entities[entity].detailed_message != '' ? fullData.entities[entity].detailed_message : message,
-            					"last_id": fullData.entities[entity].id,
+            					"state": full_data.entities[entity].resolved ? 0 : 1,
+            					"message": full_data.entities[entity].detailed_message != '' ? full_data.entities[entity].detailed_message : message,
+            					"last_id": full_data.entities[entity].id,
             					"count": 1
             				}
             			}
             		}
             
-            		return outputData;
+            		return output_data;
             	},
             
-            	clean_unsupported: function (fullStat) {
-            		var outputStat = {};
-            		for (var element in fullStat) {
-            			if (fullStat[element] != '-1') {
-            				outputStat[element] = fullStat[element];
+            	cleanUnsupported: function (full_stat) {
+            		var output_stat = {};
+            		for (var element in full_stat) {
+            			if (full_stat[element] !== '-1') {
+            				output_stat[element] = full_stat[element];
             			}
             		};
             		
-            		return outputStat;
+            		return output_stat;
             	}
             };
             
@@ -1825,14 +1654,10 @@ zabbix_export:
             	const params = JSON.parse(value);
             	Nutanix.setParams(['endpoint_host', 'endpoint_port', 'username', 'password', 'auth_type', 'api_method', 'target_uuid'], params);
             
-            	var url = 'https://' + Nutanix.params.endpoint_host + ':' + Nutanix.params.endpoint_port + '/PrismGateway/services/rest/v2.0/' + Nutanix.params.api_method + '/' + Nutanix.params.target_uuid;
-            	var result = Nutanix.request('GET', url, null);
+            	const url = 'https://' + Nutanix.params.endpoint_host + ':' + Nutanix.params.endpoint_port + '/PrismGateway/services/rest/v2.0/' + Nutanix.params.api_method + '/' + Nutanix.params.target_uuid;
+            	var result = Nutanix.request(url);
             
-            	if (typeof result !== 'object') {
-            		throw 'Cannot get metrics data from Nutanix PRISM API. Check debug log for more information.';
-            	}
-            
-            	result.stats = Nutanix.clean_unsupported(result.stats);
+            	result.stats = Nutanix.cleanUnsupported(result.stats);
             
             	return JSON.stringify(result);
             }
@@ -1844,7 +1669,7 @@ zabbix_export:
             }
             
           description: 'Get the data about basic metrics.'
-          timeout: 10s
+          timeout: '{$NUTANIX.TIMEOUT}'
           parameters:
             - name: api_method
               value: clusters
@@ -1859,7 +1684,7 @@ zabbix_export:
             - name: proxy
               value: '{$NUTANIX.PROXY}'
             - name: target_uuid
-              value: '{HOST.HOST}'
+              value: '{$NUTANIX.CLUSTER.UUID}'
             - name: username
               value: '{$NUTANIX.USER}'
           tags:
@@ -1872,8 +1697,8 @@ zabbix_export:
           delay: '0'
           history: 7d
           trends: '0'
-          value_type: CHAR
-          description: 'The data collection check.'
+          value_type: TEXT
+          description: 'The data collection check. Check the latest values for details.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1948,9 +1773,6 @@ zabbix_export:
               parameters:
                 - $.stats.controller_num_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1972,9 +1794,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -1997,9 +1816,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -2017,9 +1833,6 @@ zabbix_export:
               parameters:
                 - $.stats.controller_num_read_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -2041,9 +1854,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -2065,9 +1875,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -2090,9 +1897,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -2115,9 +1919,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -2139,9 +1940,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -2164,9 +1962,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -2188,9 +1983,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -2212,9 +2004,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -2232,9 +2021,6 @@ zabbix_export:
               parameters:
                 - $.stats.controller_num_write_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -2256,9 +2042,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -2280,9 +2063,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -2305,9 +2085,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -2330,9 +2107,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -2351,9 +2125,6 @@ zabbix_export:
               parameters:
                 - $.stats.controller_num_iops
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -2372,9 +2143,6 @@ zabbix_export:
               parameters:
                 - $.stats.controller_num_read_iops
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -2393,9 +2161,6 @@ zabbix_export:
               parameters:
                 - $.stats.controller_num_write_iops
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -2412,7 +2177,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.usage_stats.["storage_tier.das-sata.capacity_bytes"]'
+                - '$.usage_stats.[''storage_tier.das-sata.capacity_bytes'']'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -2432,7 +2197,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.usage_stats.["storage_tier.das-sata.free_bytes"]'
+                - '$.usage_stats.[''storage_tier.das-sata.free_bytes'']'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -2452,7 +2217,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.usage_stats.["storage_tier.das-sata.usage_bytes"]'
+                - '$.usage_stats.[''storage_tier.das-sata.usage_bytes'']'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -2472,7 +2237,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.usage_stats.["storage_tier.ssd.capacity_bytes"]'
+                - '$.usage_stats.[''storage_tier.ssd.capacity_bytes'']'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -2492,7 +2257,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.usage_stats.["storage_tier.ssd.free_bytes"]'
+                - '$.usage_stats.[''storage_tier.ssd.free_bytes'']'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -2512,7 +2277,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.usage_stats.["storage_tier.ssd.usage_bytes"]'
+                - '$.usage_stats.[''storage_tier.ssd.usage_bytes'']'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -2559,9 +2324,6 @@ zabbix_export:
               parameters:
                 - $.stats.controller_total_transformed_usage_bytes
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.cluster.metric.get
           tags:
@@ -2573,6 +2335,22 @@ zabbix_export:
           type: DEPENDENT
           key: nutanix.cluster.alert.discovery
           delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#ALERT.NAME}'
+                value: '{$NUTANIX.ALERT.DISCOVERY.NAME.MATCHES}'
+                formulaid: A
+              - macro: '{#ALERT.NAME}'
+                value: '{$NUTANIX.ALERT.DISCOVERY.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              - macro: '{#ALERT.SEVERITY}'
+                value: '{$NUTANIX.ALERT.DISCOVERY.SEVERITY.MATCHES}'
+                formulaid: C
+              - macro: '{#ALERT.STATE}'
+                value: '{$NUTANIX.ALERT.DISCOVERY.STATE.MATCHES}'
+                formulaid: D
           description: |
             Discovery of all alerts.
             Alerts will be grouped based on the title. For each alert, in addition to the basic information, the number of activating and the last alert ID will be available.
@@ -2738,17 +2516,20 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  var jsonData = JSON.parse(value),
-                      outputData = [];
+                  const json_data = JSON.parse(value);
+                  var output_data = [];
                   
-                  for (var entity in jsonData) {
-                      outputData.push({
+                  for (var entity in json_data) {
+                      output_data.push({
                           "{#ALERT.KEY}": entity,
-                          "{#ALERT.NAME}": jsonData[entity].name.length > 50 ? jsonData[entity].name.substr(0, 50) + '...' : jsonData[entity].name
+                          "{#ALERT.STATE}": json_data[entity].state,
+                          "{#ALERT.TITLE}": json_data[entity].title,
+                          "{#ALERT.SEVERITY}": json_data[entity].severity,
+                          "{#ALERT.NAME}": json_data[entity].name.length > 50 ? json_data[entity].name.substr(0, 50) + '...' : json_data[entity].name
                       });
                   }
                   
-                  return JSON.stringify(outputData);
+                  return JSON.stringify(output_data);
                   
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -2761,8 +2542,22 @@ zabbix_export:
         - tag: target
           value: nutanix
         - tag: target
-          value: 'prism element'
+          value: prism-element
       macros:
+        - macro: '{$NUTANIX.ALERT.DISCOVERY.NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable Nutanix alerts by name.'
+        - macro: '{$NUTANIX.ALERT.DISCOVERY.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered Nutanix alerts by name.'
+        - macro: '{$NUTANIX.ALERT.DISCOVERY.SEVERITY.MATCHES}'
+          value: '.*'
+          description: 'Filter to exclude discovered Nutanix alerts by severity. Set all possible severities for filtering in range 0-2. "0" - Info, "1" - warning, "2" - Critical.'
+        - macro: '{$NUTANIX.ALERT.DISCOVERY.STATE.MATCHES}'
+          value: '.*'
+          description: 'Filter to exclude discovered Nutanix alerts by state. Set "1" for filter only problem alerts or "0" for resolved one.'
+        - macro: '{$NUTANIX.CLUSTER.UUID}'
+          description: 'UUID of the cluster.'
         - macro: '{$NUTANIX.PASSWORD}'
           type: SECRET_TEXT
           description: 'Nutanix API password.'
@@ -2774,6 +2569,9 @@ zabbix_export:
           description: 'Set the Nutanix API port here.'
         - macro: '{$NUTANIX.PROXY}'
           description: 'Sets the HTTP proxy value. If this macro is empty, then no proxy is used.'
+        - macro: '{$NUTANIX.TIMEOUT}'
+          value: 10s
+          description: 'API response timeout.'
         - macro: '{$NUTANIX.USER}'
           value: '<Put your API username here>'
           description: 'Nutanix API username.'
@@ -3706,7 +3504,7 @@ zabbix_export:
             - name: 'Nutanix Cluster: Storage Tier'
               widgets:
                 - type: GRAPH_CLASSIC
-                  name: 'Storage Tier: Free'
+                  name: 'Storage Tier: Das-sata'
                   width: '18'
                   height: '6'
                   fields:
@@ -3714,9 +3512,9 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'Nutanix Cluster Prism Element by HTTP'
-                        name: 'Nutanix Cluster: Storage Tier: Free, bytes'
+                        name: 'Nutanix Cluster: Storage Tier: Das-sata'
                 - type: GRAPH_CLASSIC
-                  name: 'Storage Tier: Usage'
+                  name: 'Storage Tier: SSD'
                   'y': '6'
                   width: '18'
                   height: '6'
@@ -3725,7 +3523,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'Nutanix Cluster Prism Element by HTTP'
-                        name: 'Nutanix Cluster: Storage Tier: Usage, bytes'
+                        name: 'Nutanix Cluster: Storage Tier: SSD'
                 - type: ITEM
                   name: 'Storage Tier: Das-sata free'
                   x: '18'
@@ -3760,43 +3558,9 @@ zabbix_export:
                       name: value_bold
                       value: '0'
                 - type: ITEM
-                  name: 'Storage Tier: SSD free'
-                  x: '18'
-                  'y': '3'
-                  width: '6'
-                  height: '3'
-                  hide_header: 'YES'
-                  fields:
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
-                      name: decimal_size
-                      value: '45'
-                    - type: STRING
-                      name: description
-                      value: 'Nutanix Cluster: Storage Tier: SSD free'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'Nutanix Cluster Prism Element by HTTP'
-                        key: nutanix.cluster.storage.controller.tier.ssd.free.bytes
-                    - type: INTEGER
-                      name: show
-                      value: '1'
-                    - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: units_bold
-                      value: '0'
-                    - type: INTEGER
-                      name: value_bold
-                      value: '0'
-                - type: ITEM
                   name: 'Storage Tier: Das-sata usage'
                   x: '18'
-                  'y': '6'
+                  'y': '3'
                   width: '6'
                   height: '3'
                   hide_header: 'YES'
@@ -3815,6 +3579,40 @@ zabbix_export:
                       value:
                         host: 'Nutanix Cluster Prism Element by HTTP'
                         key: nutanix.cluster.storage.controller.tier.das_sata.usage.bytes
+                    - type: INTEGER
+                      name: show
+                      value: '1'
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: value_bold
+                      value: '0'
+                - type: ITEM
+                  name: 'Storage Tier: SSD free'
+                  x: '18'
+                  'y': '6'
+                  width: '6'
+                  height: '3'
+                  hide_header: 'YES'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '45'
+                    - type: STRING
+                      name: description
+                      value: 'Nutanix Cluster: Storage Tier: SSD free'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Nutanix Cluster Prism Element by HTTP'
+                        key: nutanix.cluster.storage.controller.tier.ssd.free.bytes
                     - type: INTEGER
                       name: show
                       value: '1'
@@ -3880,6 +3678,15 @@ zabbix_export:
               newvalue: Ok
             - value: '1'
               newvalue: Problem
+        - uuid: 10ec1428fba54eeaabc6503361090761
+          name: 'Nutanix: Boolean'
+          mappings:
+            - value: '0'
+              newvalue: 'False'
+            - value: '1'
+              newvalue: 'True'
+            - value: '2'
+              newvalue: Unknown
         - uuid: 537aaf6158724960a2535913030f0138
           name: 'Nutanix: Cluster operation mode'
           mappings:
@@ -3895,15 +3702,6 @@ zabbix_export:
               newvalue: 'Switch to two node'
             - value: '5'
               newvalue: Unknown
-        - uuid: 10ec1428fba54eeaabc6503361090761
-          name: 'Nutanix: True / False'
-          mappings:
-            - value: '0'
-              newvalue: 'False'
-            - value: '1'
-              newvalue: 'True'
-            - value: '2'
-              newvalue: Unknown
     - uuid: 8ab5387c8887435587cce8383b2fc6c5
       template: 'Nutanix Host Prism Element by HTTP'
       name: 'Nutanix Host Prism Element by HTTP'
@@ -3912,7 +3710,12 @@ zabbix_export:
         
         This template is designed for the effortless deployment Nutanix Host Prism Element monitoring and doesn't require any external scripts.
         
-        This templates is used in discovery and normally should not be manually linked to a host.
+        This templates can be used in discovery as well as manually linked to a host.
+        
+        To use this template as manually linked to a host, attach it to the host and set manually the value of '{$NUTANIX.HOST.UUID}' macro.
+        For more details about getting UUID refer to the official documentation:
+        https://www.nutanixbible.com/19b-cli.html
+        
         
         For more details about Nutanix Prism Element REST API, refer to the official documentation:
         https://www.nutanix.dev/api_reference/apis/prism_v2.html
@@ -3931,11 +3734,6 @@ zabbix_export:
           params: |
             var Nutanix = {
             	params: {},
-            	severity_mapping: [
-            		'kinfo',
-            		'kwarning',
-            		'kcritical'
-            	],
             
             	setParams: function (requiredParams, allParams) {
             		requiredParams.forEach(function (field) {
@@ -3947,10 +3745,7 @@ zabbix_export:
             		Nutanix.params = params;
             	},
             
-            	request: function (method, url, data) {
-            		if (typeof data === 'undefined' || data === null) {
-            			data = '';
-            		}
+            	request: function (url) {
             
             		var request = new HttpRequest();
             
@@ -3962,84 +3757,83 @@ zabbix_export:
             
             		Zabbix.log(4, '[ Nutanix ] Sending request: ' + url);
             
-            		if (method === 'post') {
-            			Zabbix.log(4, '[ Nutanix ] Sending data: ' + data);
-            			const response = request.get(url, JSON.stringify(data));
-            		} else {
-            			const response = request.get(url);
-            		}
+            		const response = request.get(url);
             
             		Zabbix.log(4, '[ Nutanix ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-            		if (request.getStatus() !== 200) {
+            		if (request.getStatus() < 200 || request.getStatus() >= 300) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
             		}
             
-            		if (response !== null) {
-            			try {
-            				response = JSON.parse(response);
-            			}
-            			catch (error) {
-            				throw 'Failed to parse response received from Nutanix PRISM API. Check debug log for more information.';
-            			}
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from Nutanix PRISM API. Check debug log for more information.';
             		}
             
             		return response;
             	},
             
-            	deduplicate_alerts: function (fullData) {
-            		var outputData = {};
-            		for (var entity in fullData.entities) {
+            	deduplicateAlerts: function (full_data) {
+            		const severity_mapping = [
+            			'kinfo',
+            			'kwarning',
+            			'kcritical'
+            		]
+            
+            		var output_data = {};
+            		for (var entity in full_data.entities) {
             	
-            			if (Nutanix.params.api_method != 'hosts') {
+            			if (Nutanix.params.api_method === 'clusters') {
             				if (result.entities[entity].node_uuid.split('-').length == 5) continue;
             			}
             
-            			var severity = Nutanix.severity_mapping.indexOf(fullData.entities[entity].severity.toLowerCase()),
-            				message = fullData.entities[entity].message,
-            				title = fullData.entities[entity].alert_title;
+            			var severity = severity_mapping.indexOf(full_data.entities[entity].severity.toLowerCase()),
+            				message = full_data.entities[entity].message,
+            				title = full_data.entities[entity].alert_title;
             	
-            			fullData.entities[entity].context_types.forEach(function(context, index) {
-            				message = message.replace('{' + context + '}', fullData.entities[entity].context_values[index]);
-            				title = title.replace('{' + context + '}', fullData.entities[entity].context_values[index]);
+            			full_data.entities[entity].context_types.forEach(function(context, index) {
+            				message = message.replace('{' + context + '}', full_data.entities[entity].context_values[index]);
+            				title = title.replace('{' + context + '}', full_data.entities[entity].context_values[index]);
             			});
             	
             			key = md5(title + message);
-            			if (key in outputData) {
-            				if (fullData.entities[entity].created_time_stamp_in_usecs > outputData[key].created) {
-            					outputData[key].created = fullData.entities[entity].created_time_stamp_in_usecs;
-            					outputData[key].severity = severity !== -1 ? severity : 3;
-            					outputData[key].state = fullData.entities[entity].resolved ? 0 : 1;
-            					outputData[key].message = fullData.entities[entity].detailed_message != '' ? fullData.entities[entity].detailed_message : message;
-            					outputData[key].last_id = fullData.entities[entity].id;
+            			if (key in output_data) {
+            				if (full_data.entities[entity].created_time_stamp_in_usecs > output_data[key].created) {
+            					output_data[key].created = full_data.entities[entity].created_time_stamp_in_usecs;
+            					output_data[key].severity = severity !== -1 ? severity : 3;
+            					output_data[key].state = full_data.entities[entity].resolved ? 0 : 1;
+            					output_data[key].message = full_data.entities[entity].detailed_message != '' ? full_data.entities[entity].detailed_message : message;
+            					output_data[key].last_id = full_data.entities[entity].id;
             				}
-            				outputData[key].count += 1;
+            				output_data[key].count += 1;
             			} else {
-            				outputData[key] = {
+            				output_data[key] = {
             					"name": title + ' - ' + message,
             					"title": title != '' ? title : message,
-            					"created": fullData.entities[entity].created_time_stamp_in_usecs,
+            					"created": full_data.entities[entity].created_time_stamp_in_usecs,
             					"severity": severity !== -1 ? severity : 3,
-            					"state": fullData.entities[entity].resolved ? 0 : 1,
-            					"message": fullData.entities[entity].detailed_message != '' ? fullData.entities[entity].detailed_message : message,
-            					"last_id": fullData.entities[entity].id,
+            					"state": full_data.entities[entity].resolved ? 0 : 1,
+            					"message": full_data.entities[entity].detailed_message != '' ? full_data.entities[entity].detailed_message : message,
+            					"last_id": full_data.entities[entity].id,
             					"count": 1
             				}
             			}
             		}
             
-            		return outputData;
+            		return output_data;
             	},
             
-            	clean_unsupported: function (fullStat) {
-            		var outputStat = {};
-            		for (var element in fullStat) {
-            			if (fullStat[element] != '-1') {
-            				outputStat[element] = fullStat[element];
+            	cleanUnsupported: function (full_stat) {
+            		var output_stat = {};
+            		for (var element in full_stat) {
+            			if (full_stat[element] !== '-1') {
+            				output_stat[element] = full_stat[element];
             			}
             		};
             		
-            		return outputStat;
+            		return output_stat;
             	}
             };
             
@@ -4047,14 +3841,10 @@ zabbix_export:
             	const params = JSON.parse(value);
             	Nutanix.setParams(['endpoint_host', 'endpoint_port', 'username', 'password', 'auth_type', 'api_method', 'target_uuid'], params);
             
-            	var url = 'https://' + Nutanix.params.endpoint_host + ':' + Nutanix.params.endpoint_port + '/PrismGateway/services/rest/v2.0/' + Nutanix.params.api_method + '/' + Nutanix.params.target_uuid + '/alerts';
-            	var result = Nutanix.request('GET', url, null);
+            	const url = 'https://' + Nutanix.params.endpoint_host + ':' + Nutanix.params.endpoint_port + '/PrismGateway/services/rest/v2.0/' + Nutanix.params.api_method + '/' + Nutanix.params.target_uuid + '/alerts',
+            		result = Nutanix.request(url);
             
-            	if (typeof result !== 'object') {
-            		throw 'Cannot get metrics data from Nutanix PRISM API. Check debug log for more information.';
-            	}
-            
-            	return JSON.stringify(Nutanix.deduplicate_alerts(result));
+            	return JSON.stringify(Nutanix.deduplicateAlerts(result));
             }
             catch (error) {
             	error += (String(error).endsWith('.')) ? '' : '.';
@@ -4064,7 +3854,7 @@ zabbix_export:
             }
             
           description: 'Get the data about alerts.'
-          timeout: 10s
+          timeout: '{$NUTANIX.TIMEOUT}'
           parameters:
             - name: api_method
               value: hosts
@@ -4079,7 +3869,7 @@ zabbix_export:
             - name: proxy
               value: '{$NUTANIX.PROXY}'
             - name: target_uuid
-              value: '{HOST.HOST}'
+              value: '{$NUTANIX.HOST.UUID}'
             - name: username
               value: '{$NUTANIX.USER}'
           tags:
@@ -4092,8 +3882,8 @@ zabbix_export:
           delay: '0'
           history: 7d
           trends: '0'
-          value_type: CHAR
-          description: 'The data collection check.'
+          value_type: TEXT
+          description: 'The data collection check. Check the latest values for details.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -4128,9 +3918,6 @@ zabbix_export:
               parameters:
                 - $.stats.content_cache_num_dedup_ref_count_pph
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -4153,9 +3940,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -4219,9 +4003,6 @@ zabbix_export:
               parameters:
                 - $.stats.content_cache_num_lookups
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -4331,9 +4112,6 @@ zabbix_export:
               parameters:
                 - $.stats.controller_num_random_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -4356,9 +4134,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -4376,9 +4151,6 @@ zabbix_export:
               parameters:
                 - $.stats.controller_num_seq_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -4401,9 +4173,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -4419,11 +4188,6 @@ zabbix_export:
           params: |
             var Nutanix = {
             	params: {},
-            	severity_mapping: [
-            		'kinfo',
-            		'kwarning',
-            		'kcritical'
-            	],
             
             	setParams: function (requiredParams, allParams) {
             		requiredParams.forEach(function (field) {
@@ -4435,10 +4199,7 @@ zabbix_export:
             		Nutanix.params = params;
             	},
             
-            	request: function (method, url, data) {
-            		if (typeof data === 'undefined' || data === null) {
-            			data = '';
-            		}
+            	request: function (url) {
             
             		var request = new HttpRequest();
             
@@ -4450,84 +4211,83 @@ zabbix_export:
             
             		Zabbix.log(4, '[ Nutanix ] Sending request: ' + url);
             
-            		if (method === 'post') {
-            			Zabbix.log(4, '[ Nutanix ] Sending data: ' + data);
-            			const response = request.get(url, JSON.stringify(data));
-            		} else {
-            			const response = request.get(url);
-            		}
+            		const response = request.get(url);
             
             		Zabbix.log(4, '[ Nutanix ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-            		if (request.getStatus() !== 200) {
+            		if (request.getStatus() < 200 || request.getStatus() >= 300) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
             		}
             
-            		if (response !== null) {
-            			try {
-            				response = JSON.parse(response);
-            			}
-            			catch (error) {
-            				throw 'Failed to parse response received from Nutanix PRISM API. Check debug log for more information.';
-            			}
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from Nutanix PRISM API. Check debug log for more information.';
             		}
             
             		return response;
             	},
             
-            	deduplicate_alerts: function (fullData) {
-            		var outputData = {};
-            		for (var entity in fullData.entities) {
+            	deduplicateAlerts: function (full_data) {
+            		const severity_mapping = [
+            			'kinfo',
+            			'kwarning',
+            			'kcritical'
+            		]
+            
+            		var output_data = {};
+            		for (var entity in full_data.entities) {
             	
-            			if (Nutanix.params.api_method != 'hosts') {
+            			if (Nutanix.params.api_method === 'clusters') {
             				if (result.entities[entity].node_uuid.split('-').length == 5) continue;
             			}
             
-            			var severity = Nutanix.severity_mapping.indexOf(fullData.entities[entity].severity.toLowerCase()),
-            				message = fullData.entities[entity].message,
-            				title = fullData.entities[entity].alert_title;
+            			var severity = severity_mapping.indexOf(full_data.entities[entity].severity.toLowerCase()),
+            				message = full_data.entities[entity].message,
+            				title = full_data.entities[entity].alert_title;
             	
-            			fullData.entities[entity].context_types.forEach(function(context, index) {
-            				message = message.replace('{' + context + '}', fullData.entities[entity].context_values[index]);
-            				title = title.replace('{' + context + '}', fullData.entities[entity].context_values[index]);
+            			full_data.entities[entity].context_types.forEach(function(context, index) {
+            				message = message.replace('{' + context + '}', full_data.entities[entity].context_values[index]);
+            				title = title.replace('{' + context + '}', full_data.entities[entity].context_values[index]);
             			});
             	
             			key = md5(title + message);
-            			if (key in outputData) {
-            				if (fullData.entities[entity].created_time_stamp_in_usecs > outputData[key].created) {
-            					outputData[key].created = fullData.entities[entity].created_time_stamp_in_usecs;
-            					outputData[key].severity = severity !== -1 ? severity : 3;
-            					outputData[key].state = fullData.entities[entity].resolved ? 0 : 1;
-            					outputData[key].message = fullData.entities[entity].detailed_message != '' ? fullData.entities[entity].detailed_message : message;
-            					outputData[key].last_id = fullData.entities[entity].id;
+            			if (key in output_data) {
+            				if (full_data.entities[entity].created_time_stamp_in_usecs > output_data[key].created) {
+            					output_data[key].created = full_data.entities[entity].created_time_stamp_in_usecs;
+            					output_data[key].severity = severity !== -1 ? severity : 3;
+            					output_data[key].state = full_data.entities[entity].resolved ? 0 : 1;
+            					output_data[key].message = full_data.entities[entity].detailed_message != '' ? full_data.entities[entity].detailed_message : message;
+            					output_data[key].last_id = full_data.entities[entity].id;
             				}
-            				outputData[key].count += 1;
+            				output_data[key].count += 1;
             			} else {
-            				outputData[key] = {
+            				output_data[key] = {
             					"name": title + ' - ' + message,
             					"title": title != '' ? title : message,
-            					"created": fullData.entities[entity].created_time_stamp_in_usecs,
+            					"created": full_data.entities[entity].created_time_stamp_in_usecs,
             					"severity": severity !== -1 ? severity : 3,
-            					"state": fullData.entities[entity].resolved ? 0 : 1,
-            					"message": fullData.entities[entity].detailed_message != '' ? fullData.entities[entity].detailed_message : message,
-            					"last_id": fullData.entities[entity].id,
+            					"state": full_data.entities[entity].resolved ? 0 : 1,
+            					"message": full_data.entities[entity].detailed_message != '' ? full_data.entities[entity].detailed_message : message,
+            					"last_id": full_data.entities[entity].id,
             					"count": 1
             				}
             			}
             		}
             
-            		return outputData;
+            		return output_data;
             	},
             
-            	clean_unsupported: function (fullStat) {
-            		var outputStat = {};
-            		for (var element in fullStat) {
-            			if (fullStat[element] != '-1') {
-            				outputStat[element] = fullStat[element];
+            	cleanUnsupported: function (full_stat) {
+            		var output_stat = {};
+            		for (var element in full_stat) {
+            			if (full_stat[element] !== '-1') {
+            				output_stat[element] = full_stat[element];
             			}
             		};
             		
-            		return outputStat;
+            		return output_stat;
             	}
             };
             
@@ -4535,19 +4295,15 @@ zabbix_export:
             	const params = JSON.parse(value);
             	Nutanix.setParams(['endpoint_host', 'endpoint_port', 'username', 'password', 'auth_type', 'api_method', 'target_uuid'], params);
             
-            	var url = 'https://' + Nutanix.params.endpoint_host + ':' + Nutanix.params.endpoint_port + '/PrismGateway/services/rest/v2.0/' + Nutanix.params.api_method + '?search_attribute_list=node_uuid&search_string=' + Nutanix.params.target_uuid;
-            	var result = Nutanix.request('GET', url, null);
+            	const url = 'https://' + Nutanix.params.endpoint_host + ':' + Nutanix.params.endpoint_port + '/PrismGateway/services/rest/v2.0/' + Nutanix.params.api_method + '?search_attribute_list=node_uuid&search_string=' + Nutanix.params.target_uuid,
+            		result = Nutanix.request(url);
             
-            	if (typeof result !== 'object') {
-            		throw 'Cannot get metrics data from Nutanix PRISM API. Check debug log for more information.';
-            	}
-            
-            	var outputData = {};
+            	var output_data = {};
             	for (var entity in result.entities) {
-            		outputData[result.entities[entity].id] = result.entities[entity]
+            		output_data[result.entities[entity].id] = result.entities[entity]
             	}
             
-            	return JSON.stringify(outputData);
+            	return JSON.stringify(output_data);
             }
             catch (error) {
             	error += (String(error).endsWith('.')) ? '' : '.';
@@ -4557,7 +4313,7 @@ zabbix_export:
             }
             
           description: 'Get the data about installed disks.'
-          timeout: 10s
+          timeout: '{$NUTANIX.TIMEOUT}'
           parameters:
             - name: api_method
               value: disks
@@ -4572,7 +4328,7 @@ zabbix_export:
             - name: proxy
               value: '{$NUTANIX.PROXY}'
             - name: target_uuid
-              value: '{HOST.HOST}'
+              value: '{$NUTANIX.HOST.UUID}'
             - name: username
               value: '{$NUTANIX.USER}'
           tags:
@@ -4585,8 +4341,8 @@ zabbix_export:
           delay: '0'
           history: 7d
           trends: '0'
-          value_type: CHAR
-          description: 'The data collection check.'
+          value_type: TEXT
+          description: 'The data collection check. Check the latest values for details.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -4725,6 +4481,15 @@ zabbix_export:
           tags:
             - tag: component
               value: health
+          triggers:
+            - uuid: f10f4b560bd140cabb3beb4ee1dbbf78
+              expression: 'last(/Nutanix Host Prism Element by HTTP/nutanix.host.general.degraded)=1'
+              name: 'Nutanix Host: Host is in degraded status'
+              priority: HIGH
+              description: 'Host is in degraded status. The host may soon become unavailable.'
+              tags:
+                - tag: scope
+                  value: availability
         - uuid: 4b4eb846e4de4461a02d1d24fbcadef1
           name: 'Nutanix Host: General: IO'
           type: DEPENDENT
@@ -4740,9 +4505,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -4764,9 +4526,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -4789,9 +4548,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -4809,9 +4565,6 @@ zabbix_export:
               parameters:
                 - $.stats.num_random_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -4834,9 +4587,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -4854,9 +4604,6 @@ zabbix_export:
               parameters:
                 - $.stats.num_read_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -4878,9 +4625,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -4903,9 +4647,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -4928,9 +4669,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -4952,9 +4690,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -4977,9 +4712,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -4997,9 +4729,6 @@ zabbix_export:
               parameters:
                 - $.stats.num_seq_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5022,9 +4751,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5046,9 +4772,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5071,9 +4794,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5091,9 +4811,6 @@ zabbix_export:
               parameters:
                 - $.stats.num_write_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5115,9 +4832,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5140,9 +4854,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5165,9 +4876,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5186,9 +4894,6 @@ zabbix_export:
               parameters:
                 - $.stats.num_iops
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5207,9 +4912,6 @@ zabbix_export:
               parameters:
                 - $.stats.num_read_iops
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5229,9 +4931,6 @@ zabbix_export:
               parameters:
                 - $.stats.num_write_iops
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5295,7 +4994,7 @@ zabbix_export:
           history: 7d
           description: 'Whether the host is pending to reboot.'
           valuemap:
-            name: 'Nutanix: True / False'
+            name: 'Nutanix: Boolean'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5361,7 +5060,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.usage_stats.["storage.capacity_bytes"]'
+                - '$.usage_stats.[''storage.capacity_bytes'']'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -5381,7 +5080,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.usage_stats.["storage.free_bytes"]'
+                - '$.usage_stats.[''storage.free_bytes'']'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -5401,7 +5100,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.usage_stats.["storage.logical_usage_bytes"]'
+                - '$.usage_stats.[''storage.logical_usage_bytes'']'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -5421,7 +5120,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.usage_stats.["storage.usage_bytes"]'
+                - '$.usage_stats.[''storage.usage_bytes'']'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -5447,9 +5146,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5468,9 +5164,6 @@ zabbix_export:
               parameters:
                 - $.stats.total_transformed_usage_bytes
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5522,9 +5215,6 @@ zabbix_export:
               parameters:
                 - $.stats.total_untransformed_usage_bytes
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5623,9 +5313,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5644,9 +5331,6 @@ zabbix_export:
               parameters:
                 - $.stats.hypervisor_num_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5668,9 +5352,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5693,9 +5374,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5713,9 +5391,6 @@ zabbix_export:
               parameters:
                 - $.stats.hypervisor_num_read_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5737,9 +5412,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5762,9 +5434,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5786,9 +5455,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5811,9 +5477,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5835,9 +5498,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5860,9 +5520,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5880,9 +5537,6 @@ zabbix_export:
               parameters:
                 - $.stats.hypervisor_num_write_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5904,9 +5558,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5929,9 +5580,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5950,9 +5598,6 @@ zabbix_export:
               parameters:
                 - $.stats.hypervisor_num_iops
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5970,9 +5615,6 @@ zabbix_export:
               parameters:
                 - $.stats.hypervisor_num_read_iops
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -5991,9 +5633,6 @@ zabbix_export:
               parameters:
                 - $.stats.hypervisor_num_write_iops
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6016,9 +5655,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6083,9 +5719,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6122,11 +5755,6 @@ zabbix_export:
           params: |
             var Nutanix = {
             	params: {},
-            	severity_mapping: [
-            		'kinfo',
-            		'kwarning',
-            		'kcritical'
-            	],
             
             	setParams: function (requiredParams, allParams) {
             		requiredParams.forEach(function (field) {
@@ -6138,10 +5766,7 @@ zabbix_export:
             		Nutanix.params = params;
             	},
             
-            	request: function (method, url, data) {
-            		if (typeof data === 'undefined' || data === null) {
-            			data = '';
-            		}
+            	request: function (url) {
             
             		var request = new HttpRequest();
             
@@ -6153,84 +5778,83 @@ zabbix_export:
             
             		Zabbix.log(4, '[ Nutanix ] Sending request: ' + url);
             
-            		if (method === 'post') {
-            			Zabbix.log(4, '[ Nutanix ] Sending data: ' + data);
-            			const response = request.get(url, JSON.stringify(data));
-            		} else {
-            			const response = request.get(url);
-            		}
+            		const response = request.get(url);
             
             		Zabbix.log(4, '[ Nutanix ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-            		if (request.getStatus() !== 200) {
+            		if (request.getStatus() < 200 || request.getStatus() >= 300) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
             		}
             
-            		if (response !== null) {
-            			try {
-            				response = JSON.parse(response);
-            			}
-            			catch (error) {
-            				throw 'Failed to parse response received from Nutanix PRISM API. Check debug log for more information.';
-            			}
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from Nutanix PRISM API. Check debug log for more information.';
             		}
             
             		return response;
             	},
             
-            	deduplicate_alerts: function (fullData) {
-            		var outputData = {};
-            		for (var entity in fullData.entities) {
+            	deduplicateAlerts: function (full_data) {
+            		const severity_mapping = [
+            			'kinfo',
+            			'kwarning',
+            			'kcritical'
+            		]
+            
+            		var output_data = {};
+            		for (var entity in full_data.entities) {
             	
-            			if (Nutanix.params.api_method != 'hosts') {
+            			if (Nutanix.params.api_method === 'clusters') {
             				if (result.entities[entity].node_uuid.split('-').length == 5) continue;
             			}
             
-            			var severity = Nutanix.severity_mapping.indexOf(fullData.entities[entity].severity.toLowerCase()),
-            				message = fullData.entities[entity].message,
-            				title = fullData.entities[entity].alert_title;
+            			var severity = severity_mapping.indexOf(full_data.entities[entity].severity.toLowerCase()),
+            				message = full_data.entities[entity].message,
+            				title = full_data.entities[entity].alert_title;
             	
-            			fullData.entities[entity].context_types.forEach(function(context, index) {
-            				message = message.replace('{' + context + '}', fullData.entities[entity].context_values[index]);
-            				title = title.replace('{' + context + '}', fullData.entities[entity].context_values[index]);
+            			full_data.entities[entity].context_types.forEach(function(context, index) {
+            				message = message.replace('{' + context + '}', full_data.entities[entity].context_values[index]);
+            				title = title.replace('{' + context + '}', full_data.entities[entity].context_values[index]);
             			});
             	
             			key = md5(title + message);
-            			if (key in outputData) {
-            				if (fullData.entities[entity].created_time_stamp_in_usecs > outputData[key].created) {
-            					outputData[key].created = fullData.entities[entity].created_time_stamp_in_usecs;
-            					outputData[key].severity = severity !== -1 ? severity : 3;
-            					outputData[key].state = fullData.entities[entity].resolved ? 0 : 1;
-            					outputData[key].message = fullData.entities[entity].detailed_message != '' ? fullData.entities[entity].detailed_message : message;
-            					outputData[key].last_id = fullData.entities[entity].id;
+            			if (key in output_data) {
+            				if (full_data.entities[entity].created_time_stamp_in_usecs > output_data[key].created) {
+            					output_data[key].created = full_data.entities[entity].created_time_stamp_in_usecs;
+            					output_data[key].severity = severity !== -1 ? severity : 3;
+            					output_data[key].state = full_data.entities[entity].resolved ? 0 : 1;
+            					output_data[key].message = full_data.entities[entity].detailed_message != '' ? full_data.entities[entity].detailed_message : message;
+            					output_data[key].last_id = full_data.entities[entity].id;
             				}
-            				outputData[key].count += 1;
+            				output_data[key].count += 1;
             			} else {
-            				outputData[key] = {
+            				output_data[key] = {
             					"name": title + ' - ' + message,
             					"title": title != '' ? title : message,
-            					"created": fullData.entities[entity].created_time_stamp_in_usecs,
+            					"created": full_data.entities[entity].created_time_stamp_in_usecs,
             					"severity": severity !== -1 ? severity : 3,
-            					"state": fullData.entities[entity].resolved ? 0 : 1,
-            					"message": fullData.entities[entity].detailed_message != '' ? fullData.entities[entity].detailed_message : message,
-            					"last_id": fullData.entities[entity].id,
+            					"state": full_data.entities[entity].resolved ? 0 : 1,
+            					"message": full_data.entities[entity].detailed_message != '' ? full_data.entities[entity].detailed_message : message,
+            					"last_id": full_data.entities[entity].id,
             					"count": 1
             				}
             			}
             		}
             
-            		return outputData;
+            		return output_data;
             	},
             
-            	clean_unsupported: function (fullStat) {
-            		var outputStat = {};
-            		for (var element in fullStat) {
-            			if (fullStat[element] != '-1') {
-            				outputStat[element] = fullStat[element];
+            	cleanUnsupported: function (full_stat) {
+            		var output_stat = {};
+            		for (var element in full_stat) {
+            			if (full_stat[element] !== '-1') {
+            				output_stat[element] = full_stat[element];
             			}
             		};
             		
-            		return outputStat;
+            		return output_stat;
             	}
             };
             
@@ -6238,14 +5862,10 @@ zabbix_export:
             	const params = JSON.parse(value);
             	Nutanix.setParams(['endpoint_host', 'endpoint_port', 'username', 'password', 'auth_type', 'api_method', 'target_uuid'], params);
             
-            	var url = 'https://' + Nutanix.params.endpoint_host + ':' + Nutanix.params.endpoint_port + '/PrismGateway/services/rest/v2.0/' + Nutanix.params.api_method + '/' + Nutanix.params.target_uuid;
-            	var result = Nutanix.request('GET', url, null);
+            	const url = 'https://' + Nutanix.params.endpoint_host + ':' + Nutanix.params.endpoint_port + '/PrismGateway/services/rest/v2.0/' + Nutanix.params.api_method + '/' + Nutanix.params.target_uuid;
+            	var result = Nutanix.request(url);
             
-            	if (typeof result !== 'object') {
-            		throw 'Cannot get metrics data from Nutanix PRISM API. Check debug log for more information.';
-            	}
-            
-            	result.stats = Nutanix.clean_unsupported(result.stats);
+            	result.stats = Nutanix.cleanUnsupported(result.stats);
             
             	return JSON.stringify(result);
             }
@@ -6257,7 +5877,7 @@ zabbix_export:
             }
             
           description: 'Get the data about basic metrics.'
-          timeout: 10s
+          timeout: '{$NUTANIX.TIMEOUT}'
           parameters:
             - name: api_method
               value: hosts
@@ -6272,7 +5892,7 @@ zabbix_export:
             - name: proxy
               value: '{$NUTANIX.PROXY}'
             - name: target_uuid
-              value: '{HOST.HOST}'
+              value: '{$NUTANIX.HOST.UUID}'
             - name: username
               value: '{$NUTANIX.USER}'
           tags:
@@ -6285,8 +5905,8 @@ zabbix_export:
           delay: '0'
           history: 7d
           trends: '0'
-          value_type: CHAR
-          description: 'The data collection check.'
+          value_type: TEXT
+          description: 'The data collection check. Check the latest values for details.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6321,9 +5941,6 @@ zabbix_export:
               parameters:
                 - $.stats.controller_num_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6345,9 +5962,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6370,9 +5984,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6390,9 +6001,6 @@ zabbix_export:
               parameters:
                 - $.stats.controller_num_read_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6414,9 +6022,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6438,9 +6043,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6463,9 +6065,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6488,9 +6087,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6512,9 +6108,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6537,9 +6130,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6561,9 +6151,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6585,9 +6172,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6605,9 +6189,6 @@ zabbix_export:
               parameters:
                 - $.stats.controller_num_write_io
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6629,9 +6210,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6653,9 +6231,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6678,9 +6253,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1.0E-6'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6703,9 +6275,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '0.0001'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6724,9 +6293,6 @@ zabbix_export:
               parameters:
                 - $.stats.controller_num_iops
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6745,9 +6311,6 @@ zabbix_export:
               parameters:
                 - $.stats.controller_num_read_iops
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6766,9 +6329,6 @@ zabbix_export:
               parameters:
                 - $.stats.controller_num_write_iops
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6785,7 +6345,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.usage_stats.["storage_tier.das-sata.capacity_bytes"]'
+                - '$.usage_stats.[''storage_tier.das-sata.capacity_bytes'']'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -6805,7 +6365,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.usage_stats.["storage_tier.das-sata.free_bytes"]'
+                - '$.usage_stats.[''storage_tier.das-sata.free_bytes'']'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -6825,7 +6385,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.usage_stats.["storage_tier.das-sata.usage_bytes"]'
+                - '$.usage_stats.[''storage_tier.das-sata.usage_bytes'']'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -6845,7 +6405,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.usage_stats.["storage_tier.ssd.capacity_bytes"]'
+                - '$.usage_stats.[''storage_tier.ssd.capacity_bytes'']'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -6865,7 +6425,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.usage_stats.["storage_tier.ssd.free_bytes"]'
+                - '$.usage_stats.[''storage_tier.ssd.free_bytes'']'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -6885,7 +6445,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.usage_stats.["storage_tier.ssd.usage_bytes"]'
+                - '$.usage_stats.[''storage_tier.ssd.usage_bytes'']'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -6932,9 +6492,6 @@ zabbix_export:
               parameters:
                 - $.stats.controller_total_transformed_usage_bytes
               error_handler: DISCARD_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           master_item:
             key: nutanix.host.metric.get
           tags:
@@ -6946,6 +6503,22 @@ zabbix_export:
           type: DEPENDENT
           key: nutanix.host.alert.discovery
           delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#ALERT.NAME}'
+                value: '{$NUTANIX.ALERT.DISCOVERY.NAME.MATCHES}'
+                formulaid: A
+              - macro: '{#ALERT.NAME}'
+                value: '{$NUTANIX.ALERT.DISCOVERY.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              - macro: '{#ALERT.SEVERITY}'
+                value: '{$NUTANIX.ALERT.DISCOVERY.SEVERITY.MATCHES}'
+                formulaid: C
+              - macro: '{#ALERT.STATE}'
+                value: '{$NUTANIX.ALERT.DISCOVERY.STATE.MATCHES}'
+                formulaid: D
           description: |
             Discovery of all alerts.
             Alerts will be grouped based on the title. For each alert, in addition to the basic information, the number of activating and the last alert ID will be available.
@@ -7111,17 +6684,20 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  var jsonData = JSON.parse(value),
-                      outputData = [];
+                  const json_data = JSON.parse(value);
+                  var output_data = [];
                   
-                  for (var entity in jsonData) {
-                      outputData.push({
+                  for (var entity in json_data) {
+                      output_data.push({
                           "{#ALERT.KEY}": entity,
-                          "{#ALERT.NAME}": jsonData[entity].name.length > 50 ? jsonData[entity].name.substr(0, 50) + '...' : jsonData[entity].name
+                          "{#ALERT.STATE}": json_data[entity].state,
+                          "{#ALERT.TITLE}": json_data[entity].title,
+                          "{#ALERT.SEVERITY}": json_data[entity].severity,
+                          "{#ALERT.NAME}": json_data[entity].name.length > 50 ? json_data[entity].name.substr(0, 50) + '...' : json_data[entity].name
                       });
                   }
                   
-                  return JSON.stringify(outputData);
+                  return JSON.stringify(output_data);
                   
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -7134,7 +6710,7 @@ zabbix_export:
           description: 'Discovery of all disk.'
           item_prototypes:
             - uuid: 660ca0265176460090413cd91a29c821
-              name: 'Nutanix Host: Disk [{#DISK.SERIAL}]: Capacity, bytes'
+              name: 'Nutanix Host: Disk [{#DISK.SERIAL}]: Space: Total, bytes'
               type: DEPENDENT
               key: 'nutanix.host.disk.capacity.bytes["{#DISK.SERIAL}"]'
               delay: '0'
@@ -7144,7 +6720,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..["{#DISK.ID}"].usage_stats.[''storage.capacity_bytes''].first()'
+                    - '$.[''{#DISK.ID}''].usage_stats.[''storage.capacity_bytes'']'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 12h
@@ -7160,7 +6736,7 @@ zabbix_export:
                 - tag: serial
                   value: '{#DISK.SERIAL}'
             - uuid: e7a8aadc572648f38fdcba9eaaa9ef78
-              name: 'Nutanix Host: Disk [{#DISK.SERIAL}]: Free space, bytes'
+              name: 'Nutanix Host: Disk [{#DISK.SERIAL}]: Space: Free, bytes'
               type: DEPENDENT
               key: 'nutanix.host.disk.free.bytes["{#DISK.SERIAL}"]'
               delay: '0'
@@ -7170,7 +6746,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..["{#DISK.ID}"].usage_stats.[''storage.free_bytes''].first()'
+                    - '$.[''{#DISK.ID}''].usage_stats.[''storage.free_bytes'']'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -7197,13 +6773,10 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..["{#DISK.ID}"].stats.avg_io_latency_usecs.first()'
+                    - '$.[''{#DISK.ID}''].stats.avg_io_latency_usecs'
                 - type: MULTIPLIER
                   parameters:
                     - '1.0E-6'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
               master_item:
                 key: nutanix.host.disk.get
               tags:
@@ -7226,13 +6799,10 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..["{#DISK.ID}"].stats.io_bandwidth_kBps.first()'
+                    - '$.[''{#DISK.ID}''].stats.io_bandwidth_kBps'
                 - type: MULTIPLIER
                   parameters:
                     - '1024'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
               master_item:
                 key: nutanix.host.disk.get
               tags:
@@ -7255,10 +6825,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..["{#DISK.ID}"].stats.num_iops.first()'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
+                    - '$.[''{#DISK.ID}''].stats.num_iops'
               master_item:
                 key: nutanix.host.disk.get
               tags:
@@ -7271,7 +6838,7 @@ zabbix_export:
                 - tag: serial
                   value: '{#DISK.SERIAL}'
             - uuid: 2517600fc093419eab9cc822fa1454a6
-              name: 'Nutanix Host: Disk [{#DISK.SERIAL}]: Logical usage, bytes'
+              name: 'Nutanix Host: Disk [{#DISK.SERIAL}]: Space: Logical usage, bytes'
               type: DEPENDENT
               key: 'nutanix.host.disk.logical.usage.bytes["{#DISK.SERIAL}"]'
               delay: '0'
@@ -7281,7 +6848,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..["{#DISK.ID}"].usage_stats.[''storage.logical_usage_bytes''].first()'
+                    - '$.[''{#DISK.ID}''].usage_stats.[''storage.logical_usage_bytes'']'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -7304,11 +6871,11 @@ zabbix_export:
               history: 7d
               description: 'Whether the disk is online.'
               valuemap:
-                name: 'Nutanix: True / False'
+                name: 'Nutanix: Boolean'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..["{#DISK.ID}"].online.first()'
+                    - '$.[''{#DISK.ID}''].online'
                 - type: BOOL_TO_DECIMAL
                   parameters:
                     - ''
@@ -7345,7 +6912,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..["{#DISK.ID}"].disk_status.first()'
+                    - '$.[''{#DISK.ID}''].disk_status'
                 - type: JAVASCRIPT
                   parameters:
                     - |
@@ -7372,7 +6939,7 @@ zabbix_export:
                 - tag: serial
                   value: '{#DISK.SERIAL}'
             - uuid: 904596dcd2db4721bd923e325b8b889e
-              name: 'Nutanix Host: Disk [{#DISK.SERIAL}]: Used space, bytes'
+              name: 'Nutanix Host: Disk [{#DISK.SERIAL}]: Space: Used, bytes'
               type: DEPENDENT
               key: 'nutanix.host.disk.usage.bytes["{#DISK.SERIAL}"]'
               delay: '0'
@@ -7382,7 +6949,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..["{#DISK.ID}"].usage_stats.[''storage.usage_bytes''].first()'
+                    - '$.[''{#DISK.ID}''].usage_stats.[''storage.usage_bytes'']'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -7397,25 +6964,54 @@ zabbix_export:
                   value: '{#DISK.MOUNT.PATH}'
                 - tag: serial
                   value: '{#DISK.SERIAL}'
+          graph_prototypes:
+            - uuid: a9da4fc17600434b9abecd02a9e3d9f3
+              name: 'Nutanix Host: Disk [{#DISK.SERIAL}]: Space: Logical usage and Used'
+              graph_items:
+                - drawtype: GRADIENT_LINE
+                  color: 0040FF
+                  item:
+                    host: 'Nutanix Host Prism Element by HTTP'
+                    key: 'nutanix.host.disk.usage.bytes["{#DISK.SERIAL}"]'
+                - sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 00BFFF
+                  item:
+                    host: 'Nutanix Host Prism Element by HTTP'
+                    key: 'nutanix.host.disk.logical.usage.bytes["{#DISK.SERIAL}"]'
+            - uuid: a225393ead3e4218be09cc19ba84392e
+              name: 'Nutanix Host: Disk [{#DISK.SERIAL}]: Space: Total and Used'
+              graph_items:
+                - drawtype: GRADIENT_LINE
+                  color: 0040FF
+                  item:
+                    host: 'Nutanix Host Prism Element by HTTP'
+                    key: 'nutanix.host.disk.usage.bytes["{#DISK.SERIAL}"]'
+                - sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 00BFFF
+                  item:
+                    host: 'Nutanix Host Prism Element by HTTP'
+                    key: 'nutanix.host.disk.capacity.bytes["{#DISK.SERIAL}"]'
           master_item:
             key: nutanix.host.disk.get
           preprocessing:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  var jsonData = JSON.parse(value),
-                      outputData = [];
+                  const json_data = JSON.parse(value);
+                  var output_data = [];
                   
-                  for (var entity in jsonData) {
-                      outputData.push({
-                          "{#DISK.ID}": jsonData[entity].id,
-                          "{#DISK.SERIAL}": jsonData[entity].mount_path.split('/').pop(),
-                          "{#DISK.MOUNT.PATH}": jsonData[entity].mount_path,
-                          "{#DISK.LOCATION}": jsonData[entity].location
+                  for (var entity in json_data) {
+                      output_data.push({
+                          "{#DISK.ID}": json_data[entity].id,
+                          "{#DISK.SERIAL}": json_data[entity].mount_path.split('/').pop(),
+                          "{#DISK.MOUNT.PATH}": json_data[entity].mount_path,
+                          "{#DISK.LOCATION}": json_data[entity].location
                       });
                   };
                   
-                  return JSON.stringify(outputData);
+                  return JSON.stringify(output_data);
                   
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -7424,12 +7020,26 @@ zabbix_export:
         - tag: class
           value: software
         - tag: target
-          value: cluster
+          value: host
         - tag: target
           value: nutanix
         - tag: target
-          value: 'prism element'
+          value: prism-element
       macros:
+        - macro: '{$NUTANIX.ALERT.DISCOVERY.NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable Nutanix alerts by name.'
+        - macro: '{$NUTANIX.ALERT.DISCOVERY.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered Nutanix alerts by name.'
+        - macro: '{$NUTANIX.ALERT.DISCOVERY.SEVERITY.MATCHES}'
+          value: '.*'
+          description: 'Filter to exclude discovered Nutanix alerts by severity. Set all possible severities for filtering in range 0-2. "0" - Info, "1" - warning, "2" - Critical.'
+        - macro: '{$NUTANIX.ALERT.DISCOVERY.STATE.MATCHES}'
+          value: '.*'
+          description: 'Filter to exclude discovered Nutanix alerts by state. Set "1" for filter only problem alerts or "0" for resolved one.'
+        - macro: '{$NUTANIX.HOST.UUID}'
+          description: 'UUID of the host.'
         - macro: '{$NUTANIX.PASSWORD}'
           type: SECRET_TEXT
           description: 'Nutanix API password.'
@@ -7441,6 +7051,9 @@ zabbix_export:
           description: 'Set the Nutanix API port here.'
         - macro: '{$NUTANIX.PROXY}'
           description: 'Sets the HTTP proxy value. If this macro is empty, then no proxy is used.'
+        - macro: '{$NUTANIX.TIMEOUT}'
+          value: 10s
+          description: 'API response timeout.'
         - macro: '{$NUTANIX.USER}'
           value: '<Put your API username here>'
           description: 'Nutanix API username.'
@@ -8767,7 +8380,7 @@ zabbix_export:
             - name: 'Nutanix Host: Storage Tier'
               widgets:
                 - type: GRAPH_CLASSIC
-                  name: 'Storage Tier: Free'
+                  name: 'Storage Tier: Das-sata'
                   width: '18'
                   height: '6'
                   fields:
@@ -8775,9 +8388,9 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        name: 'Nutanix Host: Storage Tier: Free, bytes'
+                        name: 'Nutanix Host: Storage Tier: Das-sata'
                 - type: GRAPH_CLASSIC
-                  name: 'Storage Tier: Usage'
+                  name: 'Storage Tier: SSD'
                   'y': '6'
                   width: '18'
                   height: '6'
@@ -8786,7 +8399,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        name: 'Nutanix Host: Storage Tier: Usage, bytes'
+                        name: 'Nutanix Host: Storage Tier: SSD'
                 - type: ITEM
                   name: 'Storage Tier: Das-sata free'
                   x: '18'
@@ -8821,43 +8434,9 @@ zabbix_export:
                       name: value_bold
                       value: '0'
                 - type: ITEM
-                  name: 'Storage Tier: SSD free'
-                  x: '18'
-                  'y': '3'
-                  width: '6'
-                  height: '3'
-                  hide_header: 'YES'
-                  fields:
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
-                      name: decimal_size
-                      value: '45'
-                    - type: STRING
-                      name: description
-                      value: 'Nutanix Host: Storage Tier: SSD free'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'Nutanix Host Prism Element by HTTP'
-                        key: nutanix.host.storage.controller.tier.ssd.free.bytes
-                    - type: INTEGER
-                      name: show
-                      value: '1'
-                    - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: units_bold
-                      value: '0'
-                    - type: INTEGER
-                      name: value_bold
-                      value: '0'
-                - type: ITEM
                   name: 'Storage Tier: Das-sata usage'
                   x: '18'
-                  'y': '6'
+                  'y': '3'
                   width: '6'
                   height: '3'
                   hide_header: 'YES'
@@ -8876,6 +8455,40 @@ zabbix_export:
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
                         key: nutanix.host.storage.controller.tier.das_sata.usage.bytes
+                    - type: INTEGER
+                      name: show
+                      value: '1'
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: units_bold
+                      value: '0'
+                    - type: INTEGER
+                      name: value_bold
+                      value: '0'
+                - type: ITEM
+                  name: 'Storage Tier: SSD free'
+                  x: '18'
+                  'y': '6'
+                  width: '6'
+                  height: '3'
+                  hide_header: 'YES'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '45'
+                    - type: STRING
+                      name: description
+                      value: 'Nutanix Host: Storage Tier: SSD free'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Nutanix Host Prism Element by HTTP'
+                        key: nutanix.host.storage.controller.tier.ssd.free.bytes
                     - type: INTEGER
                       name: show
                       value: '1'
@@ -8925,47 +8538,24 @@ zabbix_export:
             - name: 'Nutanix Host: Disk'
               widgets:
                 - type: GRAPH_PROTOTYPE
-                  name: Capacity
+                  name: 'Space: Total and Used'
                   width: '12'
                   height: '6'
                   fields:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: ITEM_PROTOTYPE
-                      name: itemid
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: 'nutanix.host.disk.capacity.bytes["{#DISK.SERIAL}"]'
-                    - type: INTEGER
-                      name: source_type
-                      value: '3'
+                        name: 'Nutanix Host: Disk [{#DISK.SERIAL}]: Space: Total and Used'
                 - type: GRAPH_PROTOTYPE
-                  name: 'Logical usage'
+                  name: 'Space: Free'
                   'y': '6'
-                  width: '12'
+                  width: '24'
                   height: '6'
                   fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: ITEM_PROTOTYPE
-                      name: itemid
-                      value:
-                        host: 'Nutanix Host Prism Element by HTTP'
-                        key: 'nutanix.host.disk.logical.usage.bytes["{#DISK.SERIAL}"]'
-                    - type: INTEGER
-                      name: source_type
-                      value: '3'
-                - type: GRAPH_PROTOTYPE
-                  name: 'Free space'
-                  x: '12'
-                  width: '12'
-                  height: '6'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
                     - type: ITEM_PROTOTYPE
                       name: itemid
                       value:
@@ -8975,23 +8565,19 @@ zabbix_export:
                       name: source_type
                       value: '3'
                 - type: GRAPH_PROTOTYPE
-                  name: 'Used space'
+                  name: 'Space: Logical usage and Used'
                   x: '12'
-                  'y': '6'
                   width: '12'
                   height: '6'
                   fields:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: ITEM_PROTOTYPE
-                      name: itemid
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid
                       value:
                         host: 'Nutanix Host Prism Element by HTTP'
-                        key: 'nutanix.host.disk.usage.bytes["{#DISK.SERIAL}"]'
-                    - type: INTEGER
-                      name: source_type
-                      value: '3'
+                        name: 'Nutanix Host: Disk [{#DISK.SERIAL}]: Space: Logical usage and Used'
       valuemaps:
         - uuid: c2fbc73721564974adb6251fdb372f70
           name: 'Nutanix: Alert severity'
@@ -9011,6 +8597,15 @@ zabbix_export:
               newvalue: Ok
             - value: '1'
               newvalue: Problem
+        - uuid: 20773014179d419cae5306b0370d405c
+          name: 'Nutanix: Boolean'
+          mappings:
+            - value: '0'
+              newvalue: 'False'
+            - value: '1'
+              newvalue: 'True'
+            - value: '2'
+              newvalue: Unknown
         - uuid: 6e081d8e0e4e43f7914b311ce2925f82
           name: 'Nutanix: Degraded state'
           mappings:
@@ -9064,15 +8659,6 @@ zabbix_export:
               newvalue: Maintenance
             - value: '2'
               newvalue: Unknown
-        - uuid: 20773014179d419cae5306b0370d405c
-          name: 'Nutanix: True / False'
-          mappings:
-            - value: '0'
-              newvalue: 'False'
-            - value: '1'
-              newvalue: 'True'
-            - value: '2'
-              newvalue: Unknown
     - uuid: 0bb43a48a33f48ad910441384486edb4
       template: 'Nutanix Prism Element by HTTP'
       name: 'Nutanix Prism Element by HTTP'
@@ -9084,10 +8670,13 @@ zabbix_export:
         
         This template is designed for the effortless deployment Nutanix Prism Element monitoring and doesn't require any external scripts.
         
-        The "Nutanix Host Prism Element by HTTP" and "Nutanix Cluster Prism Element by HTTP" templates are used in discovery and normally should not be manually linked to a host.
+        The "Nutanix Host Prism Element by HTTP" and "Nutanix Cluster Prism Element by HTTP" templates are used in discovery but also can be manually linked to a host.
         
         For more details about Nutanix Prism Element REST API, refer to the official documentation:
         https://www.nutanix.dev/api_reference/apis/prism_v2.html
+        
+        For more details about difference between Nutanix API versions, refer to the official documentation:
+        https://www.nutanix.dev/api-versions/
         
         Generated by official Zabbix template tool "Templator"
       groups:
@@ -9104,11 +8693,6 @@ zabbix_export:
           params: |
             var Nutanix = {
             	params: {},
-            	severity_mapping: [
-            		'kinfo',
-            		'kwarning',
-            		'kcritical'
-            	],
             
             	setParams: function (requiredParams, allParams) {
             		requiredParams.forEach(function (field) {
@@ -9120,10 +8704,7 @@ zabbix_export:
             		Nutanix.params = params;
             	},
             
-            	request: function (method, url, data) {
-            		if (typeof data === 'undefined' || data === null) {
-            			data = '';
-            		}
+            	request: function (url) {
             
             		var request = new HttpRequest();
             
@@ -9135,84 +8716,83 @@ zabbix_export:
             
             		Zabbix.log(4, '[ Nutanix ] Sending request: ' + url);
             
-            		if (method === 'post') {
-            			Zabbix.log(4, '[ Nutanix ] Sending data: ' + data);
-            			const response = request.get(url, JSON.stringify(data));
-            		} else {
-            			const response = request.get(url);
-            		}
+            		const response = request.get(url);
             
             		Zabbix.log(4, '[ Nutanix ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-            		if (request.getStatus() !== 200) {
+            		if (request.getStatus() < 200 || request.getStatus() >= 300) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
             		}
             
-            		if (response !== null) {
-            			try {
-            				response = JSON.parse(response);
-            			}
-            			catch (error) {
-            				throw 'Failed to parse response received from Nutanix PRISM API. Check debug log for more information.';
-            			}
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from Nutanix PRISM API. Check debug log for more information.';
             		}
             
             		return response;
             	},
             
-            	deduplicate_alerts: function (fullData) {
-            		var outputData = {};
-            		for (var entity in fullData.entities) {
+            	deduplicateAlerts: function (full_data) {
+            		const severity_mapping = [
+            			'kinfo',
+            			'kwarning',
+            			'kcritical'
+            		]
+            
+            		var output_data = {};
+            		for (var entity in full_data.entities) {
             	
-            			if (Nutanix.params.api_method != 'hosts') {
+            			if (Nutanix.params.api_method === 'clusters') {
             				if (result.entities[entity].node_uuid.split('-').length == 5) continue;
             			}
             
-            			var severity = Nutanix.severity_mapping.indexOf(fullData.entities[entity].severity.toLowerCase()),
-            				message = fullData.entities[entity].message,
-            				title = fullData.entities[entity].alert_title;
+            			var severity = severity_mapping.indexOf(full_data.entities[entity].severity.toLowerCase()),
+            				message = full_data.entities[entity].message,
+            				title = full_data.entities[entity].alert_title;
             	
-            			fullData.entities[entity].context_types.forEach(function(context, index) {
-            				message = message.replace('{' + context + '}', fullData.entities[entity].context_values[index]);
-            				title = title.replace('{' + context + '}', fullData.entities[entity].context_values[index]);
+            			full_data.entities[entity].context_types.forEach(function(context, index) {
+            				message = message.replace('{' + context + '}', full_data.entities[entity].context_values[index]);
+            				title = title.replace('{' + context + '}', full_data.entities[entity].context_values[index]);
             			});
             	
             			key = md5(title + message);
-            			if (key in outputData) {
-            				if (fullData.entities[entity].created_time_stamp_in_usecs > outputData[key].created) {
-            					outputData[key].created = fullData.entities[entity].created_time_stamp_in_usecs;
-            					outputData[key].severity = severity !== -1 ? severity : 3;
-            					outputData[key].state = fullData.entities[entity].resolved ? 0 : 1;
-            					outputData[key].message = fullData.entities[entity].detailed_message != '' ? fullData.entities[entity].detailed_message : message;
-            					outputData[key].last_id = fullData.entities[entity].id;
+            			if (key in output_data) {
+            				if (full_data.entities[entity].created_time_stamp_in_usecs > output_data[key].created) {
+            					output_data[key].created = full_data.entities[entity].created_time_stamp_in_usecs;
+            					output_data[key].severity = severity !== -1 ? severity : 3;
+            					output_data[key].state = full_data.entities[entity].resolved ? 0 : 1;
+            					output_data[key].message = full_data.entities[entity].detailed_message != '' ? full_data.entities[entity].detailed_message : message;
+            					output_data[key].last_id = full_data.entities[entity].id;
             				}
-            				outputData[key].count += 1;
+            				output_data[key].count += 1;
             			} else {
-            				outputData[key] = {
+            				output_data[key] = {
             					"name": title + ' - ' + message,
             					"title": title != '' ? title : message,
-            					"created": fullData.entities[entity].created_time_stamp_in_usecs,
+            					"created": full_data.entities[entity].created_time_stamp_in_usecs,
             					"severity": severity !== -1 ? severity : 3,
-            					"state": fullData.entities[entity].resolved ? 0 : 1,
-            					"message": fullData.entities[entity].detailed_message != '' ? fullData.entities[entity].detailed_message : message,
-            					"last_id": fullData.entities[entity].id,
+            					"state": full_data.entities[entity].resolved ? 0 : 1,
+            					"message": full_data.entities[entity].detailed_message != '' ? full_data.entities[entity].detailed_message : message,
+            					"last_id": full_data.entities[entity].id,
             					"count": 1
             				}
             			}
             		}
             
-            		return outputData;
+            		return output_data;
             	},
             
-            	clean_unsupported: function (fullStat) {
-            		var outputStat = {};
-            		for (var element in fullStat) {
-            			if (fullStat[element] != '-1') {
-            				outputStat[element] = fullStat[element];
+            	cleanUnsupported: function (full_stat) {
+            		var output_stat = {};
+            		for (var element in full_stat) {
+            			if (full_stat[element] !== '-1') {
+            				output_stat[element] = full_stat[element];
             			}
             		};
             		
-            		return outputStat;
+            		return output_stat;
             	}
             };
             
@@ -9220,12 +8800,8 @@ zabbix_export:
             	const params = JSON.parse(value);
             	Nutanix.setParams(['endpoint_host', 'endpoint_port', 'username', 'password', 'auth_type', 'api_method'], params);
             
-            	var url = 'https://' + Nutanix.params.endpoint_host + ':' + Nutanix.params.endpoint_port + '/PrismGateway/services/rest/v2.0/' + Nutanix.params.api_method;
-            	var result = Nutanix.request('GET', url, null);
-            
-            	if (typeof result !== 'object') {
-            		throw 'Cannot get metrics data from Nutanix PRISM API. Check debug log for more information.';
-            	}
+            	const url = 'https://' + Nutanix.params.endpoint_host + ':' + Nutanix.params.endpoint_port + '/PrismGateway/services/rest/v2.0/' + Nutanix.params.api_method,
+            		result = Nutanix.request(url);
             
             	return JSON.stringify(result);
             }
@@ -9263,8 +8839,8 @@ zabbix_export:
           delay: '0'
           history: 7d
           trends: '0'
-          value_type: CHAR
-          description: 'The data collection check.'
+          value_type: TEXT
+          description: 'The data collection check. Check the latest values for details.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -9298,11 +8874,6 @@ zabbix_export:
           params: |
             var Nutanix = {
             	params: {},
-            	severity_mapping: [
-            		'kinfo',
-            		'kwarning',
-            		'kcritical'
-            	],
             
             	setParams: function (requiredParams, allParams) {
             		requiredParams.forEach(function (field) {
@@ -9314,10 +8885,7 @@ zabbix_export:
             		Nutanix.params = params;
             	},
             
-            	request: function (method, url, data) {
-            		if (typeof data === 'undefined' || data === null) {
-            			data = '';
-            		}
+            	request: function (url) {
             
             		var request = new HttpRequest();
             
@@ -9329,84 +8897,83 @@ zabbix_export:
             
             		Zabbix.log(4, '[ Nutanix ] Sending request: ' + url);
             
-            		if (method === 'post') {
-            			Zabbix.log(4, '[ Nutanix ] Sending data: ' + data);
-            			const response = request.get(url, JSON.stringify(data));
-            		} else {
-            			const response = request.get(url);
-            		}
+            		const response = request.get(url);
             
             		Zabbix.log(4, '[ Nutanix ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-            		if (request.getStatus() !== 200) {
+            		if (request.getStatus() < 200 || request.getStatus() >= 300) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
             		}
             
-            		if (response !== null) {
-            			try {
-            				response = JSON.parse(response);
-            			}
-            			catch (error) {
-            				throw 'Failed to parse response received from Nutanix PRISM API. Check debug log for more information.';
-            			}
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from Nutanix PRISM API. Check debug log for more information.';
             		}
             
             		return response;
             	},
             
-            	deduplicate_alerts: function (fullData) {
-            		var outputData = {};
-            		for (var entity in fullData.entities) {
+            	deduplicateAlerts: function (full_data) {
+            		const severity_mapping = [
+            			'kinfo',
+            			'kwarning',
+            			'kcritical'
+            		]
+            
+            		var output_data = {};
+            		for (var entity in full_data.entities) {
             	
-            			if (Nutanix.params.api_method != 'hosts') {
+            			if (Nutanix.params.api_method === 'clusters') {
             				if (result.entities[entity].node_uuid.split('-').length == 5) continue;
             			}
             
-            			var severity = Nutanix.severity_mapping.indexOf(fullData.entities[entity].severity.toLowerCase()),
-            				message = fullData.entities[entity].message,
-            				title = fullData.entities[entity].alert_title;
+            			var severity = severity_mapping.indexOf(full_data.entities[entity].severity.toLowerCase()),
+            				message = full_data.entities[entity].message,
+            				title = full_data.entities[entity].alert_title;
             	
-            			fullData.entities[entity].context_types.forEach(function(context, index) {
-            				message = message.replace('{' + context + '}', fullData.entities[entity].context_values[index]);
-            				title = title.replace('{' + context + '}', fullData.entities[entity].context_values[index]);
+            			full_data.entities[entity].context_types.forEach(function(context, index) {
+            				message = message.replace('{' + context + '}', full_data.entities[entity].context_values[index]);
+            				title = title.replace('{' + context + '}', full_data.entities[entity].context_values[index]);
             			});
             	
             			key = md5(title + message);
-            			if (key in outputData) {
-            				if (fullData.entities[entity].created_time_stamp_in_usecs > outputData[key].created) {
-            					outputData[key].created = fullData.entities[entity].created_time_stamp_in_usecs;
-            					outputData[key].severity = severity !== -1 ? severity : 3;
-            					outputData[key].state = fullData.entities[entity].resolved ? 0 : 1;
-            					outputData[key].message = fullData.entities[entity].detailed_message != '' ? fullData.entities[entity].detailed_message : message;
-            					outputData[key].last_id = fullData.entities[entity].id;
+            			if (key in output_data) {
+            				if (full_data.entities[entity].created_time_stamp_in_usecs > output_data[key].created) {
+            					output_data[key].created = full_data.entities[entity].created_time_stamp_in_usecs;
+            					output_data[key].severity = severity !== -1 ? severity : 3;
+            					output_data[key].state = full_data.entities[entity].resolved ? 0 : 1;
+            					output_data[key].message = full_data.entities[entity].detailed_message != '' ? full_data.entities[entity].detailed_message : message;
+            					output_data[key].last_id = full_data.entities[entity].id;
             				}
-            				outputData[key].count += 1;
+            				output_data[key].count += 1;
             			} else {
-            				outputData[key] = {
+            				output_data[key] = {
             					"name": title + ' - ' + message,
             					"title": title != '' ? title : message,
-            					"created": fullData.entities[entity].created_time_stamp_in_usecs,
+            					"created": full_data.entities[entity].created_time_stamp_in_usecs,
             					"severity": severity !== -1 ? severity : 3,
-            					"state": fullData.entities[entity].resolved ? 0 : 1,
-            					"message": fullData.entities[entity].detailed_message != '' ? fullData.entities[entity].detailed_message : message,
-            					"last_id": fullData.entities[entity].id,
+            					"state": full_data.entities[entity].resolved ? 0 : 1,
+            					"message": full_data.entities[entity].detailed_message != '' ? full_data.entities[entity].detailed_message : message,
+            					"last_id": full_data.entities[entity].id,
             					"count": 1
             				}
             			}
             		}
             
-            		return outputData;
+            		return output_data;
             	},
             
-            	clean_unsupported: function (fullStat) {
-            		var outputStat = {};
-            		for (var element in fullStat) {
-            			if (fullStat[element] != '-1') {
-            				outputStat[element] = fullStat[element];
+            	cleanUnsupported: function (full_stat) {
+            		var output_stat = {};
+            		for (var element in full_stat) {
+            			if (full_stat[element] !== '-1') {
+            				output_stat[element] = full_stat[element];
             			}
             		};
             		
-            		return outputStat;
+            		return output_stat;
             	}
             };
             
@@ -9414,12 +8981,8 @@ zabbix_export:
             	const params = JSON.parse(value);
             	Nutanix.setParams(['endpoint_host', 'endpoint_port', 'username', 'password', 'auth_type', 'api_method'], params);
             
-            	var url = 'https://' + Nutanix.params.endpoint_host + ':' + Nutanix.params.endpoint_port + '/PrismGateway/services/rest/v2.0/' + Nutanix.params.api_method;
-            	var result = Nutanix.request('GET', url, null);
-            
-            	if (typeof result !== 'object') {
-            		throw 'Cannot get metrics data from Nutanix PRISM API. Check debug log for more information.';
-            	}
+            	const url = 'https://' + Nutanix.params.endpoint_host + ':' + Nutanix.params.endpoint_port + '/PrismGateway/services/rest/v2.0/' + Nutanix.params.api_method,
+            		result = Nutanix.request(url);
             
             	return JSON.stringify(result);
             }
@@ -9457,8 +9020,8 @@ zabbix_export:
           delay: '0'
           history: 7d
           trends: '0'
-          value_type: CHAR
-          description: 'The data collection check.'
+          value_type: TEXT
+          description: 'The data collection check. Check the latest values for details.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -9492,11 +9055,6 @@ zabbix_export:
           params: |
             var Nutanix = {
             	params: {},
-            	severity_mapping: [
-            		'kinfo',
-            		'kwarning',
-            		'kcritical'
-            	],
             
             	setParams: function (requiredParams, allParams) {
             		requiredParams.forEach(function (field) {
@@ -9508,10 +9066,7 @@ zabbix_export:
             		Nutanix.params = params;
             	},
             
-            	request: function (method, url, data) {
-            		if (typeof data === 'undefined' || data === null) {
-            			data = '';
-            		}
+            	request: function (url) {
             
             		var request = new HttpRequest();
             
@@ -9523,84 +9078,83 @@ zabbix_export:
             
             		Zabbix.log(4, '[ Nutanix ] Sending request: ' + url);
             
-            		if (method === 'post') {
-            			Zabbix.log(4, '[ Nutanix ] Sending data: ' + data);
-            			const response = request.get(url, JSON.stringify(data));
-            		} else {
-            			const response = request.get(url);
-            		}
+            		const response = request.get(url);
             
             		Zabbix.log(4, '[ Nutanix ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-            		if (request.getStatus() !== 200) {
+            		if (request.getStatus() < 200 || request.getStatus() >= 300) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
             		}
             
-            		if (response !== null) {
-            			try {
-            				response = JSON.parse(response);
-            			}
-            			catch (error) {
-            				throw 'Failed to parse response received from Nutanix PRISM API. Check debug log for more information.';
-            			}
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from Nutanix PRISM API. Check debug log for more information.';
             		}
             
             		return response;
             	},
             
-            	deduplicate_alerts: function (fullData) {
-            		var outputData = {};
-            		for (var entity in fullData.entities) {
+            	deduplicateAlerts: function (full_data) {
+            		const severity_mapping = [
+            			'kinfo',
+            			'kwarning',
+            			'kcritical'
+            		]
+            
+            		var output_data = {};
+            		for (var entity in full_data.entities) {
             	
-            			if (Nutanix.params.api_method != 'hosts') {
+            			if (Nutanix.params.api_method === 'clusters') {
             				if (result.entities[entity].node_uuid.split('-').length == 5) continue;
             			}
             
-            			var severity = Nutanix.severity_mapping.indexOf(fullData.entities[entity].severity.toLowerCase()),
-            				message = fullData.entities[entity].message,
-            				title = fullData.entities[entity].alert_title;
+            			var severity = severity_mapping.indexOf(full_data.entities[entity].severity.toLowerCase()),
+            				message = full_data.entities[entity].message,
+            				title = full_data.entities[entity].alert_title;
             	
-            			fullData.entities[entity].context_types.forEach(function(context, index) {
-            				message = message.replace('{' + context + '}', fullData.entities[entity].context_values[index]);
-            				title = title.replace('{' + context + '}', fullData.entities[entity].context_values[index]);
+            			full_data.entities[entity].context_types.forEach(function(context, index) {
+            				message = message.replace('{' + context + '}', full_data.entities[entity].context_values[index]);
+            				title = title.replace('{' + context + '}', full_data.entities[entity].context_values[index]);
             			});
             	
             			key = md5(title + message);
-            			if (key in outputData) {
-            				if (fullData.entities[entity].created_time_stamp_in_usecs > outputData[key].created) {
-            					outputData[key].created = fullData.entities[entity].created_time_stamp_in_usecs;
-            					outputData[key].severity = severity !== -1 ? severity : 3;
-            					outputData[key].state = fullData.entities[entity].resolved ? 0 : 1;
-            					outputData[key].message = fullData.entities[entity].detailed_message != '' ? fullData.entities[entity].detailed_message : message;
-            					outputData[key].last_id = fullData.entities[entity].id;
+            			if (key in output_data) {
+            				if (full_data.entities[entity].created_time_stamp_in_usecs > output_data[key].created) {
+            					output_data[key].created = full_data.entities[entity].created_time_stamp_in_usecs;
+            					output_data[key].severity = severity !== -1 ? severity : 3;
+            					output_data[key].state = full_data.entities[entity].resolved ? 0 : 1;
+            					output_data[key].message = full_data.entities[entity].detailed_message != '' ? full_data.entities[entity].detailed_message : message;
+            					output_data[key].last_id = full_data.entities[entity].id;
             				}
-            				outputData[key].count += 1;
+            				output_data[key].count += 1;
             			} else {
-            				outputData[key] = {
+            				output_data[key] = {
             					"name": title + ' - ' + message,
             					"title": title != '' ? title : message,
-            					"created": fullData.entities[entity].created_time_stamp_in_usecs,
+            					"created": full_data.entities[entity].created_time_stamp_in_usecs,
             					"severity": severity !== -1 ? severity : 3,
-            					"state": fullData.entities[entity].resolved ? 0 : 1,
-            					"message": fullData.entities[entity].detailed_message != '' ? fullData.entities[entity].detailed_message : message,
-            					"last_id": fullData.entities[entity].id,
+            					"state": full_data.entities[entity].resolved ? 0 : 1,
+            					"message": full_data.entities[entity].detailed_message != '' ? full_data.entities[entity].detailed_message : message,
+            					"last_id": full_data.entities[entity].id,
             					"count": 1
             				}
             			}
             		}
             
-            		return outputData;
+            		return output_data;
             	},
             
-            	clean_unsupported: function (fullStat) {
-            		var outputStat = {};
-            		for (var element in fullStat) {
-            			if (fullStat[element] != '-1') {
-            				outputStat[element] = fullStat[element];
+            	cleanUnsupported: function (full_stat) {
+            		var output_stat = {};
+            		for (var element in full_stat) {
+            			if (full_stat[element] !== '-1') {
+            				output_stat[element] = full_stat[element];
             			}
             		};
             		
-            		return outputStat;
+            		return output_stat;
             	}
             };
             
@@ -9608,19 +9162,15 @@ zabbix_export:
             	const params = JSON.parse(value);
             	Nutanix.setParams(['endpoint_host', 'endpoint_port', 'username', 'password', 'auth_type', 'api_method'], params);
             
-            	var url = 'https://' + Nutanix.params.endpoint_host + ':' + Nutanix.params.endpoint_port + '/PrismGateway/services/rest/v2.0/' + Nutanix.params.api_method;
-            	var result = Nutanix.request('GET', url, null);
+            	const url = 'https://' + Nutanix.params.endpoint_host + ':' + Nutanix.params.endpoint_port + '/PrismGateway/services/rest/v2.0/' + Nutanix.params.api_method,
+            		result = Nutanix.request(url);
             
-            	if (typeof result !== 'object') {
-            		throw 'Cannot get metrics data from Nutanix PRISM API. Check debug log for more information.';
-            	}
-            
-            	var outputData = {};
+            	var output_data = {};
             	for (var entity in result.entities) {
-            		outputData[result.entities[entity].storage_container_uuid] = result.entities[entity]
+            		output_data[result.entities[entity].storage_container_uuid] = result.entities[entity]
             	}
             
-            	return JSON.stringify(outputData);
+            	return JSON.stringify(output_data);
             }
             catch (error) {
             	error += (String(error).endsWith('.')) ? '' : '.';
@@ -9656,8 +9206,8 @@ zabbix_export:
           delay: '0'
           history: 7d
           trends: '0'
-          value_type: CHAR
-          description: 'The data collection check.'
+          value_type: TEXT
+          description: 'The data collection check. Check the latest values for details.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -9686,7 +9236,17 @@ zabbix_export:
           type: DEPENDENT
           key: nutanix.clusters.discovery
           delay: '0'
-          description: 'Discovery of all guest file systems.'
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#NUTANIX.CLUSTER.NAME}'
+                value: '{$NUTANIX.CLUSTER.DISCOVERY.NAME.MATCHES}'
+                formulaid: A
+              - macro: '{#NUTANIX.CLUSTER.NAME}'
+                value: '{$NUTANIX.CLUSTER.DISCOVERY.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Discovery of all clusters.'
           host_prototypes:
             - uuid: c1f630a16e304dcda7771895344638c7
               host: '{#NUTANIX.CLUSTER.UUID}'
@@ -9696,6 +9256,10 @@ zabbix_export:
                     name: Templates/Applications
               templates:
                 - name: 'Nutanix Cluster Prism Element by HTTP'
+              macros:
+                - macro: '{$NUTANIX.CLUSTER.UUID}'
+                  value: '{#NUTANIX.CLUSTER.UUID}'
+                  description: 'UUID of the cluster.'
           master_item:
             key: nutanix.cluster.get
           preprocessing:
@@ -9705,17 +9269,16 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  var jsonData = JSON.parse(value),
-                      outputData = [];
+                  const json_data = JSON.parse(value);
                   
-                  jsonData.map(function(entity) {
-                      outputData.push({
+                  const result = json_data.map(function(entity) {
+                      return {
                           "{#NUTANIX.CLUSTER.NAME}": entity.name ? entity.name : entity.uuid,
                           "{#NUTANIX.CLUSTER.UUID}": entity.uuid
-                      });
+                      };
                   });
                   
-                  return JSON.stringify(outputData);
+                  return JSON.stringify(result);
                   
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -9725,7 +9288,17 @@ zabbix_export:
           type: DEPENDENT
           key: nutanix.host.discovery
           delay: '0'
-          description: 'Discovery of all guest file systems.'
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#NUTANIX.HOST.NAME}'
+                value: '{$NUTANIX.HOST.DISCOVERY.NAME.MATCHES}'
+                formulaid: A
+              - macro: '{#NUTANIX.HOST.NAME}'
+                value: '{$NUTANIX.HOST.DISCOVERY.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Discovery of all hosts.'
           host_prototypes:
             - uuid: 24ccbeb75dc949ccb6c094416618443b
               host: '{#NUTANIX.HOST.UUID}'
@@ -9735,6 +9308,10 @@ zabbix_export:
                     name: Templates/Applications
               templates:
                 - name: 'Nutanix Host Prism Element by HTTP'
+              macros:
+                - macro: '{$NUTANIX.HOST.UUID}'
+                  value: '{#NUTANIX.HOST.UUID}'
+                  description: 'UUID of the host.'
           master_item:
             key: nutanix.host.get
           preprocessing:
@@ -9744,19 +9321,17 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  var jsonData = JSON.parse(value),
-                      outputData = [];
+                  const json_data = JSON.parse(value);
                   
-                  jsonData.map(function(entity) {
-                      outputData.push({
+                  const result = json_data.map(function(entity) {
+                      return {
                           "{#NUTANIX.HOST.NAME}": entity.name ? entity.name : entity.uuid,
-                          "{#NUTANIX.HOST.UUID}": entity.uuid,
-                          "{#NUTANIX.HOST.IP}": entity.hypervisor_address ? entity.hypervisor_address : '',
-                          "{#NUTANIX.HOST.IPMI_IP}": entity.ipmi_address ? entity.ipmi_address : ''
-                      });
+                          "{#NUTANIX.HOST.UUID}": entity.uuid
+                      };
                   });
                   
-                  return JSON.stringify(outputData);
+                  return JSON.stringify(result);
+                  
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -9765,10 +9340,20 @@ zabbix_export:
           type: DEPENDENT
           key: nutanix.storage.container.discovery
           delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#STORAGE.CONTAINER.NAME}'
+                value: '{$NUTANIX.STORAGE.CONTAINER.DISCOVERY.NAME.MATCHES}'
+                formulaid: A
+              - macro: '{#STORAGE.CONTAINER.NAME}'
+                value: '{$NUTANIX.STORAGE.CONTAINER.DISCOVERY.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Discovery of all storage containers.'
           item_prototypes:
             - uuid: f0a6602489f54d5c8be85bb75ebd3e6f
-              name: 'Nutanix: Container [{#STORAGE.CONTAINER.NAME}]: Capacity, bytes'
+              name: 'Nutanix: Container [{#STORAGE.CONTAINER.NAME}]: Space: Total, bytes'
               type: DEPENDENT
               key: 'nutanix.storage.container.capacity.bytes["{#STORAGE.CONTAINER.UUID}"]'
               delay: '0'
@@ -9778,7 +9363,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..["{#STORAGE.CONTAINER.UUID}"].usage_stats.[''storage.capacity_bytes''].first()'
+                    - '$.[''{#STORAGE.CONTAINER.UUID}''].usage_stats.[''storage.capacity_bytes'']'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -9790,7 +9375,7 @@ zabbix_export:
                 - tag: container
                   value: '{#STORAGE.CONTAINER.NAME}'
             - uuid: dac6fb1aa0ee4d93ab67e1bd3374c412
-              name: 'Nutanix: Container [{#STORAGE.CONTAINER.NAME}]: Free space, bytes'
+              name: 'Nutanix: Container [{#STORAGE.CONTAINER.NAME}]: Space: Free, bytes'
               type: DEPENDENT
               key: 'nutanix.storage.container.free.bytes["{#STORAGE.CONTAINER.UUID}"]'
               delay: '0'
@@ -9800,7 +9385,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..["{#STORAGE.CONTAINER.UUID}"].usage_stats.[''storage.free_bytes''].first()'
+                    - '$.[''{#STORAGE.CONTAINER.UUID}''].usage_stats.[''storage.free_bytes'']'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -9821,7 +9406,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..["{#STORAGE.CONTAINER.UUID}"].replication_factor.first()'
+                    - '$.[''{#STORAGE.CONTAINER.UUID}''].replication_factor'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -9833,7 +9418,7 @@ zabbix_export:
                 - tag: container
                   value: '{#STORAGE.CONTAINER.NAME}'
             - uuid: 5d40812ff4f14146a5199edf271be1ec
-              name: 'Nutanix: Container [{#STORAGE.CONTAINER.NAME}]: Used space, bytes'
+              name: 'Nutanix: Container [{#STORAGE.CONTAINER.NAME}]: Space: Used, bytes'
               type: DEPENDENT
               key: 'nutanix.storage.container.usage.bytes["{#STORAGE.CONTAINER.UUID}"]'
               delay: '0'
@@ -9843,7 +9428,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..["{#STORAGE.CONTAINER.UUID}"].usage_stats.[''storage.usage_bytes''].first()'
+                    - '$.[''{#STORAGE.CONTAINER.UUID}''].usage_stats.[''storage.usage_bytes'']'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -9854,23 +9439,38 @@ zabbix_export:
                   value: storage
                 - tag: container
                   value: '{#STORAGE.CONTAINER.NAME}'
+          graph_prototypes:
+            - uuid: b067c9f9467b4760b43235aa453ee424
+              name: 'Nutanix: Container [{#STORAGE.CONTAINER.NAME}]: Space: Total and Used'
+              graph_items:
+                - drawtype: GRADIENT_LINE
+                  color: 0040FF
+                  item:
+                    host: 'Nutanix Prism Element by HTTP'
+                    key: 'nutanix.storage.container.usage.bytes["{#STORAGE.CONTAINER.UUID}"]'
+                - sortorder: '1'
+                  drawtype: GRADIENT_LINE
+                  color: 00BFFF
+                  item:
+                    host: 'Nutanix Prism Element by HTTP'
+                    key: 'nutanix.storage.container.capacity.bytes["{#STORAGE.CONTAINER.UUID}"]'
           master_item:
             key: nutanix.storage.container.get
           preprocessing:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  var jsonData = JSON.parse(value),
-                      outputData = [];
+                  const json_data = JSON.parse(value);
+                  var output_data = [];
                   
-                  for (var entity in jsonData) {
-                      outputData.push({
-                          "{#STORAGE.CONTAINER.UUID}": jsonData[entity].storage_container_uuid,
-                          "{#STORAGE.CONTAINER.NAME}": jsonData[entity].name
+                  for (var entity in json_data) {
+                      output_data.push({
+                          "{#STORAGE.CONTAINER.UUID}": json_data[entity].storage_container_uuid,
+                          "{#STORAGE.CONTAINER.NAME}": json_data[entity].name
                       });
                   }
                   
-                  return JSON.stringify(outputData);
+                  return JSON.stringify(output_data);
                   
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -9881,8 +9481,20 @@ zabbix_export:
         - tag: target
           value: nutanix
         - tag: target
-          value: 'prism element'
+          value: prism-element
       macros:
+        - macro: '{$NUTANIX.CLUSTER.DISCOVERY.NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable Nutanix clusters by name.'
+        - macro: '{$NUTANIX.CLUSTER.DISCOVERY.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered Nutanix clusters by name.'
+        - macro: '{$NUTANIX.HOST.DISCOVERY.NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable Nutanix hosts by name.'
+        - macro: '{$NUTANIX.HOST.DISCOVERY.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered Nutanix hosts by name.'
         - macro: '{$NUTANIX.PASSWORD}'
           type: SECRET_TEXT
           description: 'Nutanix API password.'
@@ -9894,6 +9506,12 @@ zabbix_export:
           description: 'Set the Nutanix API port here.'
         - macro: '{$NUTANIX.PROXY}'
           description: 'Sets the HTTP proxy value. If this macro is empty, then no proxy is used.'
+        - macro: '{$NUTANIX.STORAGE.CONTAINER.DISCOVERY.NAME.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable storage container by name.'
+        - macro: '{$NUTANIX.STORAGE.CONTAINER.DISCOVERY.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered storage container by name.'
         - macro: '{$NUTANIX.USER}'
           value: '<Put your API username here>'
           description: 'Nutanix API username.'
@@ -9922,20 +9540,14 @@ zabbix_export:
                 - type: GRAPH_PROTOTYPE
                   name: 'Free space'
                   'y': '6'
-                  width: '12'
+                  width: '24'
                   height: '6'
                   fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: ITEM_PROTOTYPE
-                      name: itemid
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid
                       value:
                         host: 'Nutanix Prism Element by HTTP'
-                        key: 'nutanix.storage.container.free.bytes["{#STORAGE.CONTAINER.UUID}"]'
-                    - type: INTEGER
-                      name: source_type
-                      value: '3'
+                        name: 'Nutanix: Container [{#STORAGE.CONTAINER.NAME}]: Space: Total and Used'
                 - type: GRAPH_PROTOTYPE
                   name: 'Replication factor'
                   x: '12'
@@ -9953,27 +9565,20 @@ zabbix_export:
                     - type: INTEGER
                       name: source_type
                       value: '3'
-                - type: GRAPH_PROTOTYPE
-                  name: 'Used space'
-                  x: '12'
-                  'y': '6'
-                  width: '12'
-                  height: '6'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: ITEM_PROTOTYPE
-                      name: itemid
-                      value:
-                        host: 'Nutanix Prism Element by HTTP'
-                        key: 'nutanix.storage.container.usage.bytes["{#STORAGE.CONTAINER.UUID}"]'
-                    - type: INTEGER
-                      name: source_type
-                      value: '3'
+  triggers:
+    - uuid: 95d69032f7d7426d8073524ecd72fcd4
+      expression: 'last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.redundancy.factor.current)<>last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.redundancy.factor.desired)'
+      name: 'Nutanix Cluster: Redundancy factor mismatched'
+      priority: HIGH
+      description: 'Current redundancy factor does not match the desired redundancy factor.'
+      tags:
+        - tag: scope
+          value: availability
   graphs:
     - uuid: 65515b97fe634d65a85a1d364887c67b
       name: 'Nutanix Cluster: Content Cache: Hit rate, %'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 0040FF
@@ -10288,6 +9893,21 @@ zabbix_export:
           item:
             host: 'Nutanix Cluster Prism Element by HTTP'
             key: nutanix.cluster.storage.controller.io.write.percent
+    - uuid: ac4df503b04a4f339c5d39bd72fd3832
+      name: 'Nutanix Cluster: Storage Tier: Das-sata'
+      type: STACKED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: 00BFFF
+          item:
+            host: 'Nutanix Cluster Prism Element by HTTP'
+            key: nutanix.cluster.storage.controller.tier.das_sata.free.bytes
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 0040FF
+          item:
+            host: 'Nutanix Cluster Prism Element by HTTP'
+            key: nutanix.cluster.storage.controller.tier.das_sata.usage.bytes
     - uuid: 1edd2ff1710649ed9e037b2a00dc9f22
       name: 'Nutanix Cluster: Storage Tier: Free, bytes'
       graph_items:
@@ -10302,14 +9922,15 @@ zabbix_export:
           item:
             host: 'Nutanix Cluster Prism Element by HTTP'
             key: nutanix.cluster.storage.controller.tier.ssd.free.bytes
-    - uuid: 0a45550d55c24cfdb7d45fc98dd305d8
-      name: 'Nutanix Cluster: Storage Tier: Usage, bytes'
+    - uuid: ff4e11828c9244c2b4021c826bec0700
+      name: 'Nutanix Cluster: Storage Tier: SSD'
+      type: STACKED
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 00BFFF
           item:
             host: 'Nutanix Cluster Prism Element by HTTP'
-            key: nutanix.cluster.storage.controller.tier.das_sata.usage.bytes
+            key: nutanix.cluster.storage.controller.tier.ssd.free.bytes
         - sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 0040FF
@@ -10318,6 +9939,8 @@ zabbix_export:
             key: nutanix.cluster.storage.controller.tier.ssd.usage.bytes
     - uuid: 10cc868569aa457194f23f000d76c42c
       name: 'Nutanix Host: Content Cache: Hit rate, %'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 0040FF
@@ -10629,7 +10252,8 @@ zabbix_export:
             host: 'Nutanix Host Prism Element by HTTP'
             key: nutanix.host.storage.controller.io.write.percent
     - uuid: c0740b2c536646ceb85aabeca052e2cb
-      name: 'Nutanix Host: Storage Tier: Free, bytes'
+      name: 'Nutanix Host: Storage Tier: Das-sata'
+      type: STACKED
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 00BFFF
@@ -10641,15 +10265,16 @@ zabbix_export:
           color: 0040FF
           item:
             host: 'Nutanix Host Prism Element by HTTP'
-            key: nutanix.host.storage.controller.tier.ssd.free.bytes
-    - uuid: 955f507dc01b4ec0842b998e33061b09
-      name: 'Nutanix Host: Storage Tier: Usage, bytes'
+            key: nutanix.host.storage.controller.tier.das_sata.usage.bytes
+    - uuid: 12fb09594c2f449182e641e5f12f32d0
+      name: 'Nutanix Host: Storage Tier: SSD'
+      type: STACKED
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 00BFFF
           item:
             host: 'Nutanix Host Prism Element by HTTP'
-            key: nutanix.host.storage.controller.tier.das_sata.usage.bytes
+            key: nutanix.host.storage.controller.tier.ssd.free.bytes
         - sortorder: '1'
           drawtype: GRADIENT_LINE
           color: 0040FF
