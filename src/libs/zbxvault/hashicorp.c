@@ -239,31 +239,30 @@ void	zbx_hashicorp_renew_token(const char *vault_url, const char *token, const c
 
 		if (FAIL == zbx_is_uint64(value, &ttl))
 		{
-			error = zbx_dsprintf(NULL, "\"%s\" is not a valid numeric",
-					ZBX_PROTO_TAG_LEASE_DURATION);
+			error = zbx_dsprintf(NULL, "\"%s\" is not a valid numeric", ZBX_PROTO_TAG_LEASE_DURATION);
 			goto out;
 		}
 
 		next_renew = zbx_time() + (double)ttl * 2 / 3;
-	}
 
-	if (FAIL == last_status)
-	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "Vault token renew is working again");
-	}
-	else
-	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Vault token renewed");
 	}
+
+	if (FAIL == last_status && 1 == renewable)
+		zabbix_log(LOG_LEVEL_WARNING, "Vault token renew is working again");
+
 	status = SUCCEED;
-
 out:
-
 	if (FAIL == status)
 	{
-		next_try_after_error = zbx_time() + 10;
-		if (SUCCEED == last_status && NULL != error)
-			zabbix_log(LOG_LEVEL_WARNING, "cannot renew vault token: %s", error);
+		next_try_after_error = zbx_time() + 60;
+		if (NULL != error)
+		{
+			if (SUCCEED == last_status)
+				zabbix_log(LOG_LEVEL_WARNING, "Vault token renew started to fail: %s", error);
+			else
+				zabbix_log(LOG_LEVEL_DEBUG, "Vault token renew failed: %s", error);
+		}
 	}
 
 	last_status = status;
