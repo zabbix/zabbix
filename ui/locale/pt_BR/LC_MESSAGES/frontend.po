@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-09-27 02:01+0000\n"
+"PO-Revision-Date: 2024-10-03 04:06+0000\n"
 "Last-Translator: Felipe L. Ewald <felipe.idj@hotmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -14041,8 +14041,8 @@ msgstr "Mapa de rede adicionado"
 #: sysmaps.php:265
 msgid "Network map deleted"
 msgid_plural "Network maps deleted"
-msgstr[0] "Mapa de rede excluído"
-msgstr[1] "Mapas de rede excluídos"
+msgstr[0] "Mapa de rede removido"
+msgstr[1] "Mapas de rede removidos"
 
 #: sysmaps.php:188
 msgid "Network map updated"
@@ -20869,7 +20869,7 @@ msgstr "URL do Trigger Script"
 #: app/views/action.list.php:32 include/classes/helpers/CMenuHelper.php:231
 #: include/classes/helpers/CRoleHelper.php:470
 msgid "Trigger actions"
-msgstr "Desabilitar ações?"
+msgstr "Ações de trigger"
 
 #: app/controllers/CControllerTriggerCreate.php:123
 msgid "Trigger added"
@@ -20892,8 +20892,8 @@ msgstr "Período de retenção dados de triggers"
 #: app/controllers/CControllerTriggerDelete.php:62
 msgid "Trigger deleted"
 msgid_plural "Triggers deleted"
-msgstr[0] "Gatilho excluído"
-msgstr[1] "Gatilhos excluídos"
+msgstr[0] "Trigger excluído"
+msgstr[1] "Triggers excluídos"
 
 #: tr_events.php:169
 msgid "Trigger details"
@@ -21047,8 +21047,8 @@ msgstr "Protótipo de trigger adicionado"
 #: app/controllers/CControllerTriggerPrototypeDelete.php:62
 msgid "Trigger prototype deleted"
 msgid_plural "Trigger prototypes deleted"
-msgstr[0] "Protótipo de gatilho excluído"
-msgstr[1] "Protótipos de gatilhos excluídos"
+msgstr[0] "Protótipo de trigger excluído"
+msgstr[1] "Protótipos de trigger excluídos"
 
 #: app/controllers/CControllerTriggerMassupdate.php:219
 #: app/controllers/CControllerTriggerPrototypeDisable.php:76
@@ -21090,8 +21090,8 @@ msgstr "Tags de gatilho"
 #: app/controllers/CControllerTriggerUpdate.php:147
 msgid "Trigger updated"
 msgid_plural "Triggers updated"
-msgstr[0] "Gatilho atualizado"
-msgstr[1] "Gatilhos atualizados"
+msgstr[0] "Trigger atualizada"
+msgstr[1] "Triggers atualizados"
 
 #: app/controllers/CControllerPopupGeneric.php:227
 #: app/controllers/CControllerPopupGeneric.php:241
@@ -21865,7 +21865,7 @@ msgstr "Use %{ref} no filtro de grupo para fazer referência ao valor desse atri
 
 #: app/views/administration.miscconfig.edit.php:123
 msgid "Use X-Frame-Options HTTP header"
-msgstr "Utilize o cabeçalho HTTP X-Frame-Options"
+msgstr "Usar o cabeçalho HTTP X-Frame-Options"
 
 #: app/partials/configuration.host.interface.row.php:222
 msgid "Use combined requests"
@@ -23121,8 +23121,8 @@ msgstr "Cenário web adicionado"
 #: httpconf.php:178 httpconf.php:417
 msgid "Web scenario deleted"
 msgid_plural "Web scenarios deleted"
-msgstr[0] "Cenário web excluído"
-msgstr[1] "Cenários web excluídos"
+msgstr[0] "Cenário web removido"
+msgstr[1] "Cenários web removidos"
 
 #: httpconf.php:386
 msgid "Web scenario disabled"
