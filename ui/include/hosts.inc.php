@@ -764,7 +764,7 @@ function isTemplate($hostId) {
  * @return array
  */
 function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
-	$user_macro_parser = new CUserMacroParser();
+	$user_macro_parser = new CUserMacroParser(['allow_regex' => true]);
 
 	$all_macros = [];
 	$global_macros = [];
@@ -1012,7 +1012,7 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
  * @return array
  */
 function mergeInheritedMacros(array $host_macros, array $inherited_macros): array {
-	$user_macro_parser = new CUserMacroParser();
+	$user_macro_parser = new CUserMacroParser(['allow_regex' => true]);
 	$inherit_order = ['parent_host', 'template', 'global'];
 
 	foreach ($inherited_macros as &$inherited_macro) {

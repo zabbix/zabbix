@@ -33,7 +33,25 @@ class CUserMacroParser extends CParser {
 	private $context_quoted = false;
 	private $regex = null;
 
-	public function __construct() {
+	/**
+	 * An options array.
+	 *
+	 * Supported options:
+	 *   'allow_regex' => false  Enable "regex:" context prefix. This prefix should be accessible in the user macro
+	 *                           configuration places (global-, template- and host-level macros) only.
+	 *
+	 * @var array
+	 */
+	private $options = [
+		'allow_regex' => false
+	];
+
+	/**
+	 * @param array $options
+	 */
+	public function __construct(array $options = []) {
+		$this->options = $options + $this->options;
+
 		$this->error_msgs['empty'] = _('macro is empty');
 		$this->error_msgs['unexpected_end'] = _('unexpected end of macro');
 	}
@@ -100,7 +118,7 @@ class CUserMacroParser extends CParser {
 		}
 		$p++;
 
-		if (preg_match("/^\s*".self::REGEX_PREFIX."/", substr($source, $p)) === 1) {
+		if ($this->options['allow_regex'] && preg_match("/^\s*".self::REGEX_PREFIX."/", substr($source, $p)) === 1) {
 			$has_regex = true;
 			$p += strpos(substr($source, $p), self::REGEX_PREFIX) + strlen(self::REGEX_PREFIX);
 		}

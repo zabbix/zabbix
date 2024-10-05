@@ -422,7 +422,7 @@ class CUserMacroParserTest extends TestCase {
 				'context' => null,
 				'regex' => '',
 				'error' => ''
-			]],
+			], ['allow_regex' => true]],
 			['{$MACRO: regex:""}', 0, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{$MACRO: regex:""}',
@@ -430,7 +430,7 @@ class CUserMacroParserTest extends TestCase {
 				'context' => null,
 				'regex' => '',
 				'error' => ''
-			]],
+			], ['allow_regex' => true]],
 			['{$MACRO: regex :""}', 0, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{$MACRO: regex :""}',
@@ -454,7 +454,7 @@ class CUserMacroParserTest extends TestCase {
 				'context' => null,
 				'regex' => '',
 				'error' => ''
-			]],
+			], ['allow_regex' => true]],
 			['{$MACRO:regex:"/^test/"}', 0, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{$MACRO:regex:"/^test/"}',
@@ -462,7 +462,7 @@ class CUserMacroParserTest extends TestCase {
 				'context' => null,
 				'regex' => '/^test/',
 				'error' => ''
-			]],
+			], ['allow_regex' => true]],
 			['{$MACRO:regex:"/([a-z])/i"}', 0, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{$MACRO:regex:"/([a-z])/i"}',
@@ -470,7 +470,7 @@ class CUserMacroParserTest extends TestCase {
 				'context' => null,
 				'regex' => '/([a-z])/i',
 				'error' => ''
-			]],
+			], ['allow_regex' => true]],
 			['{$MACRO:regex:/test/}', 0, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{$MACRO:regex:/test/}',
@@ -478,7 +478,7 @@ class CUserMacroParserTest extends TestCase {
 				'context' => null,
 				'regex' => '/test/',
 				'error' => ''
-			]],
+			], ['allow_regex' => true]],
 			['{$MACRO:regex: ^test}', 0, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{$MACRO:regex: ^test}',
@@ -486,7 +486,7 @@ class CUserMacroParserTest extends TestCase {
 				'context' => null,
 				'regex' => '^test',
 				'error' => ''
-			]],
+			], ['allow_regex' => true]],
 			['{$MACRO:regex: ^test }', 0, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{$MACRO:regex: ^test }',
@@ -494,7 +494,7 @@ class CUserMacroParserTest extends TestCase {
 				'context' => null,
 				'regex' => '^test ',
 				'error' => ''
-			]],
+			], ['allow_regex' => true]],
 			['{$MACRO:regex: "^test" }', 0, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{$MACRO:regex: "^test" }',
@@ -502,7 +502,7 @@ class CUserMacroParserTest extends TestCase {
 				'context' => null,
 				'regex' => '^test',
 				'error' => ''
-			]],
+			], ['allow_regex' => true]],
 			['{$MACRO:regex: "^test"}', 0, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{$MACRO:regex: "^test"}',
@@ -510,7 +510,7 @@ class CUserMacroParserTest extends TestCase {
 				'context' => null,
 				'regex' => '^test',
 				'error' => ''
-			]],
+			], ['allow_regex' => true]],
 			['{$MACRO:regex:"^"}', 0, [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{$MACRO:regex:"^"}',
@@ -518,6 +518,46 @@ class CUserMacroParserTest extends TestCase {
 				'context' => null,
 				'regex' => '^',
 				'error' => ''
+			], ['allow_regex' => true]],
+			['{$MACRO:regex:"}"}', 0, [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{$MACRO:regex:"}"}',
+				'macro' => 'MACRO',
+				'context' => null,
+				'regex' => '}',
+				'error' => ''
+			], ['allow_regex' => true]],
+			['{$MACRO:regex:}', 0, [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{$MACRO:regex:}',
+				'macro' => 'MACRO',
+				'context' => 'regex:',
+				'regex' => null,
+				'error' => ''
+			]],
+			['{$MACRO:regex:""}', 0, [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{$MACRO:regex:""}',
+				'macro' => 'MACRO',
+				'context' => 'regex:""',
+				'regex' => null,
+				'error' => ''
+			]],
+			['{$MACRO:regex:"/^test/"}', 0, [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{$MACRO:regex:"/^test/"}',
+				'macro' => 'MACRO',
+				'context' => 'regex:"/^test/"',
+				'regex' => null,
+				'error' => ''
+			]],
+			['{$MACRO:regex:"}"}', 0, [
+				'rc' => CParser::PARSE_SUCCESS_CONT,
+				'match' => '{$MACRO:regex:"}',
+				'macro' => 'MACRO',
+				'context' => 'regex:"',
+				'regex' => null,
+				'error' => 'incorrect syntax near ""}"'
 			]],
 			['', 0, [
 				'rc' => CParser::PARSE_FAIL,
@@ -920,13 +960,10 @@ class CUserMacroParserTest extends TestCase {
 	 * @param string $source
 	 * @param int    $pos
 	 * @param array  $expected
+	 * @param array  $options
 	 */
-	public function testParse($source, $pos, $expected) {
-		static $user_macro_parser = null;
-
-		if ($user_macro_parser === null) {
-			$user_macro_parser = new CUserMacroParser();
-		}
+	public function testParse($source, $pos, $expected, array $options = []) {
+		$user_macro_parser = new CUserMacroParser($options);
 
 		$this->assertSame($expected, [
 			'rc' => $user_macro_parser->parse($source, $pos),
