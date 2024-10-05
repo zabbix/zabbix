@@ -276,4 +276,46 @@ class CUserMacroParser extends CParser {
 	public function getRegex(): ?string {
 		return ($this->regex !== null && $this->context_quoted) ? $this->unquoteContext($this->regex) : $this->regex;
 	}
+
+	/**
+	 * Quotes special symbols in context.
+	 *
+	 * @param string $context
+	 * @param bool   $force_quote  true - enclose context in " even if it does not contain any special characters.
+	 *                             false - do nothing if the context does not contain any special characters.
+	 *
+	 * @return string
+	 */
+	private static function quoteContext(string $context, bool $force_quote = false): string {
+		$force_quote = $force_quote
+			|| (isset($context[0]) && (strpos(' "', $context[0]) !== false || strpos($context, '}') !== false));
+
+		return $force_quote ? '"'.strtr($context, '"', '\"').'"': $context;
+	}
+
+	/**
+	 * Returns the full macro without insignificant spaces around the context/regular expression.
+	 * The context/regular expression will be quoted only if it contains special characters.
+	 *
+	 * NOTE: To retrieve the original macro, use the getMatch() method.
+	 *
+	 * @return string
+	 */
+	public function getMinifiedMacro(): string {
+		if ($this->match === '') {
+			return '';
+		}
+
+		$macro = '{$'.$this->macro;
+
+		if ($this->context !== null) {
+			$macro .= ':'.self::quoteContext($this->getContext());
+		}
+
+		if ($this->regex !== null) {
+			$macro .= ':regex:'.self::quoteContext($this->getRegex());
+		}
+
+		return $macro.'}';
+	}
 }
