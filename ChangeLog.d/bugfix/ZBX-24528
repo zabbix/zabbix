@@ -1,1 +1,1 @@
-..F....... [ZBX-24528] fixed SQL errors being displayed to non-authorized users (jfreibergs)
+A.F....... [ZBX-24528] prevented SQL errors being displayed to non-authorized users (gcalenko, jfreibergs)
