@@ -217,7 +217,6 @@
 #define ZBX_PROTO_TAG_VARIANT			"variant"
 #define ZBX_PROTO_TAG_ACKNOWLEDGE		"acknowledge"
 #define ZBX_PROTO_TAG_UNACKNOWLEDGE		"unacknowledge"
-#define ZBX_PROTO_TAG_SUPPRESS_TILL		"suppress_till"
 #define ZBX_PROTO_TAG_UPDATE_SUPPPRESS		"update_suppress"
 #define ZBX_PROTO_TAG_UPDATE_UNSUPPPRESS	"update_unsuppress"
 #define ZBX_PROTO_TAG_UPDATE_MESSAGE		"update_message"

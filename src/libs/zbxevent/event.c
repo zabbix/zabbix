@@ -205,7 +205,7 @@ void	zbx_event_get_json_actions(const zbx_db_acknowledge *ack, const char *tz, c
 					zbx_date2str((time_t)ack->suppress_until, tz),
 					zbx_time2str((time_t)ack->suppress_until, tz));
 		}
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_SUPPRESS_TILL, suppress_until_buf, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_SUPPRESS_UNTIL, suppress_until_buf, ZBX_JSON_TYPE_STRING);
 		zbx_free(suppress_until_buf);
 	}
 
