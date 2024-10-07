@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-10-04T08:20:03Z'
+  date: '2024-10-07T10:58:12Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -204,7 +204,7 @@ zabbix_export:
               expression: 'length(last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.alert.get.check))>0'
               name: 'Nutanix Cluster: Failed to get alert data from API'
               priority: HIGH
-              description: 'Failed to get data from API. Check the debug log for more information.'
+              description: 'Failed to get data from API. Check the latest values for details.'
               tags:
                 - tag: scope
                   value: availability
@@ -1717,7 +1717,7 @@ zabbix_export:
               expression: 'length(last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.metric.get.check))>0'
               name: 'Nutanix Cluster: Failed to get metric data from API'
               priority: HIGH
-              description: 'Failed to get data from API. Check the debug log for more information.'
+              description: 'Failed to get data from API. Check the latest values for details.'
               tags:
                 - tag: scope
                   value: availability
@@ -3902,7 +3902,7 @@ zabbix_export:
               expression: 'length(last(/Nutanix Host Prism Element by HTTP/nutanix.host.alert.get.check))>0'
               name: 'Nutanix Host: Failed to get alert data from API'
               priority: HIGH
-              description: 'Failed to get data from API. Check the debug log for more information.'
+              description: 'Failed to get data from API. Check the latest values for details.'
               tags:
                 - tag: scope
                   value: availability
@@ -4361,7 +4361,7 @@ zabbix_export:
               expression: 'length(last(/Nutanix Host Prism Element by HTTP/nutanix.host.disk.get.check))>0'
               name: 'Nutanix Host: Failed to get disk data from API'
               priority: HIGH
-              description: 'Failed to get data from API. Check the debug log for more information.'
+              description: 'Failed to get data from API. Check the latest values for details.'
               tags:
                 - tag: scope
                   value: availability
@@ -5925,7 +5925,7 @@ zabbix_export:
               expression: 'length(last(/Nutanix Host Prism Element by HTTP/nutanix.host.metric.get.check))>0'
               name: 'Nutanix Host: Failed to get metric data from API'
               priority: HIGH
-              description: 'Failed to get data from API. Check the debug log for more information.'
+              description: 'Failed to get data from API. Check the latest values for details.'
               tags:
                 - tag: scope
                   value: availability
@@ -8859,7 +8859,7 @@ zabbix_export:
               expression: 'length(last(/Nutanix Prism Element by HTTP/nutanix.cluster.get.check))>0'
               name: 'Nutanix: Failed to get cluster data from API'
               priority: HIGH
-              description: 'Failed to get data from API. Check the debug log for more information.'
+              description: 'Failed to get data from API. Check the latest values for details.'
               tags:
                 - tag: scope
                   value: availability
@@ -9040,7 +9040,7 @@ zabbix_export:
               expression: 'length(last(/Nutanix Prism Element by HTTP/nutanix.host.get.check))>0'
               name: 'Nutanix: Failed to get host data from API'
               priority: HIGH
-              description: 'Failed to get data from API. Check the debug log for more information.'
+              description: 'Failed to get data from API. Check the latest values for details.'
               tags:
                 - tag: scope
                   value: availability
@@ -9226,7 +9226,7 @@ zabbix_export:
               expression: 'length(last(/Nutanix Prism Element by HTTP/nutanix.storage.container.get.check))>0'
               name: 'Nutanix: Failed to get storage container data from API'
               priority: HIGH
-              description: 'Failed to get data from API. Check the debug log for more information.'
+              description: 'Failed to get data from API. Check the latest values for details.'
               tags:
                 - tag: scope
                   value: availability
