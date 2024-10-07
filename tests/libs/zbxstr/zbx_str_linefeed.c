@@ -31,6 +31,7 @@ void	zbx_mock_test_entry(void **state)
 
 	char		*act_result = zbx_str_linefeed(src, maxline, delim);
 
+	zbx_replace_invalid_utf8(act_result);
 	zbx_mock_assert_str_eq("return value", exp_result, act_result);
 	zbx_free(act_result);
 }

@@ -43,9 +43,9 @@ test case: "6. Emoji"
 in:
   src: "❤❤❤❤❤❤❤❤❤❤"
   delim: ' '
-  maxline: 3
+  maxline: 2
 out:
-  string: "❤ ❤ ❤ ❤ ❤ ❤ ❤ ❤ ❤ ❤"
+  string: "? ?? ?? ? ?? ?? ? ?? ?? ? ?? ?? ? ?? ??" # in this test case function returns broken characters string, ? - replaced broken character
 ---
 test case: "7. Newlines"
 in:
