@@ -221,8 +221,8 @@
 #define ZBX_PROTO_TAG_UPDATE_UNSUPPPRESS	"update_unsuppress"
 #define ZBX_PROTO_TAG_UPDATE_MESSAGE		"update_message"
 #define ZBX_PROTO_TAG_UPDATE_SEVERITY		"update_severity"
-#define ZBX_PROTO_TAG_OLDSEVERITY		"oldseverity"
-#define ZBX_PROTO_TAG_NEWSEVERITY		"newseverity"
+#define ZBX_PROTO_TAG_OLDSEVERITY		"old_severity"
+#define ZBX_PROTO_TAG_NEWSEVERITY		"new_severity"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
