@@ -85,7 +85,9 @@ class testPageHostGraph extends CLegacyWebTest {
 		$count_graphs = CDBHelper::getCount($sql);
 
 		foreach ($breadcrumbs as $url => $text) {
-			$this->zbxTestAssertElementPresentXpath('//a[@href="'.$url.'"][text()="'.$text.'"]');
+			$this->assertTrue($this->query('xpath://a[@href="'.$url.'"][text()="'.$text.'"]')
+					->one()->isVisible()
+			);
 
 			// Check item and graph count.
 			if ($text === 'Items' || $text === 'Graphs') {
