@@ -60,12 +60,16 @@ try {
 catch (Exception $e) {
 	// decode input json request to get request's id
 	$jsonData = json_decode($data, true);
+	$user_type = CUser::$userData === null ? USER_TYPE_ZABBIX_USER : CUser::$userData['type'];
+	$message = ($e instanceof DBException && $user_type != USER_TYPE_SUPER_ADMIN)
+		? _('System error occurred. Please contact Zabbix administrator.')
+		: $e->getMessage();
 
 	$response = [
 		'jsonrpc' => '2.0',
 		'error' => [
 			'code' => 1,
-			'message' => $e->getMessage(),
+			'message' => $message,
 			'data' => ''
 		],
 		'id' => (isset($jsonData['id']) ? $jsonData['id'] : null)

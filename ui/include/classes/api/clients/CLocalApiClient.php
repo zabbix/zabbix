@@ -145,6 +145,10 @@ class CLocalApiClient extends CApiClient {
 				}
 			}
 
+			if ($e instanceof DBException) {
+				throw $e;
+			}
+
 			$response->errorCode = ($e instanceof APIException) ? $e->getCode() : ZBX_API_ERROR_INTERNAL;
 			$response->errorMessage = $e->getMessage();
 

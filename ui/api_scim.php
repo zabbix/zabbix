@@ -43,7 +43,16 @@ try {
 }
 catch (Throwable $e) {
 	$response = new HttpResponse();
-	$exception = $e instanceof APIException ? $e : new APIException(ZBX_API_ERROR_INTERNAL, $e->getMessage());
+	$user_type = CUser::$userData === null ? USER_TYPE_ZABBIX_USER : CUser::$userData['type'];
+
+	if ($e instanceof DBException && $user_type != USER_TYPE_SUPER_ADMIN) {
+		$exception = new APIException(ZBX_API_ERROR_INTERNAL,
+			_('System error occurred. Please contact Zabbix administrator.')
+		);
+	}
+	else {
+		$exception = $e instanceof APIException ? $e : new APIException(ZBX_API_ERROR_INTERNAL, $e->getMessage());
+	}
 
 	$response->setException($exception);
 }
