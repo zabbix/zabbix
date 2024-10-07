@@ -83,6 +83,35 @@ class testFormTrigger extends CLegacyWebTest {
 				'priority' => 0
 			]
 		);
+
+		// Data for the long item name trigger. Create a host with a long name.
+		self::$long_key_hostid = CDataHelper::call('host.create', [
+			'host' => STRING_128,
+			'groups' => [['groupid' => 6]]
+		])['hostids'][0];
+
+		// Create an item with a long key.
+		CDataHelper::call('item.create', [
+			[
+				'name' => 'test',
+				'key_' => STRING_2048,
+				'hostid' => self::$long_key_hostid,
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_FLOAT
+			]
+		]);
+
+		// Create triggers for update tests.
+		CDataHelper::call('trigger.create', [
+			[
+				'description' => 'Trigger for simple update',
+				'expression' => 'last(/'.STRING_128.'/'.STRING_2048.')=0'
+			],
+			[
+				'description' => 'Trigger for update',
+				'expression' => 'last(/'.STRING_128.'/'.STRING_2048.')>0'
+			]
+		]);
 	}
 
 	// Returns layout data
@@ -1290,62 +1319,6 @@ class testFormTrigger extends CLegacyWebTest {
 		}
 	}
 
-	/**
-	 * Create a host with a long name and an item with a long key for the following testcase.
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	protected function prepareCreateWithLongItemKey() {
-		// Create a host with a long name.
-		self::$long_key_hostid = CDataHelper::call('host.create', [
-			'host' => STRING_128,
-			'groups' => [['groupid' => 6]]
-		])['hostids'][0];
-
-		// Create an item with a long key.
-		CDataHelper::call('item.create', [
-			[
-				'name' => 'test',
-				'key_' => STRING_2048,
-				'hostid' => self::$long_key_hostid,
-				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_FLOAT
-			]
-		]);
-
-		// Create triggers for update tests.
-		CDataHelper::call('trigger.create', [
-			[
-				'description' => 'Trigger for simple update',
-				'expression' => 'last(/'.STRING_128.'/'.STRING_2048.')=0'
-			],
-			[
-				'description' => 'Trigger for update',
-				'expression' => 'last(/'.STRING_128.'/'.STRING_2048.')>0'
-			]
-		]);
-
-		// Create an LLD rule.
-		$ruleid = CDataHelper::call('discoveryrule.create', [
-			'name' => 'LLD for triggers',
-			'key_' => 'lld_key',
-			'hostid' => self::$long_key_hostid,
-			'type' => 3, // Simple check, doesn't need a reference to an interface
-			'delay' => '1m'
-		])['itemids'][0];
-
-		// Create an item prototype with a long key.
-		CDataHelper::call('itemprototype.create', [
-			'name' => 'test2',
-			'key_' => substr(STRING_6000, 0, 2038).'[{#MACRO}]',
-			'hostid' => self::$long_key_hostid,
-			'ruleid' => $ruleid,
-			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_FLOAT
-		]);
-	}
-
 	public function getCreateWithLongItemKeyData () {
 		return [
 			// Create trigger.
@@ -1377,7 +1350,7 @@ class testFormTrigger extends CLegacyWebTest {
 					],
 					'expected_db_expression' => '/^\{\d+\}>0 and \{\d+\}>0$/'
 				]
-			],
+			]
 		];
 	}
 
@@ -1386,7 +1359,6 @@ class testFormTrigger extends CLegacyWebTest {
 	 * The trigger expression is saved in a different format, so it should work regardless of length.
 	 * See ZBX-25182 for more information.
 	 *
-	 * @onBeforeOnce prepareCreateWithLongItemKey
 	 * @dataProvider getCreateWithLongItemKeyData
 	 *
 	 * @return void
@@ -1406,19 +1378,19 @@ class testFormTrigger extends CLegacyWebTest {
 			$this->page->query('button:Create trigger')->one()->click();
 		}
 
-		// Set the correct form data and save.
+		// Fill form data and save.
 		$dialog = COverlayDialogElement::find()->one();
 		$dialog->asForm()->fill(CTestArrayHelper::get($data, 'form_data', []));
 		$button = CTestArrayHelper::get($data, 'update', false) ? 'Update' : 'Add';
 		$dialog->getFooter()->query('button', $button)->one()->click();
 		COverlayDialogElement::ensureNotPresent();
 
-		// Get the new trigger's ID from UI.
+		// Get the saved trigger's ID from UI.
 		$link = CTestArrayHelper::get($data, 'form_data.Name', CTestArrayHelper::get($data, 'link_name'));
 		$triggerid = $this->page->query('link', $link)->one()->getAttribute('data-triggerid');
+
 		// Get the newly saved trigger's expression, as it is saved in the DB.
 		$db_expression = CDBHelper::getValue('SELECT expression FROM triggers WHERE triggerid = '.$triggerid);
-
 		// Assert by regex that the expression is saved in DB similar to this: "{100253}=0 and {100253}=0".
 		$this->assertEquals(1, preg_match($data['expected_db_expression'], $db_expression));
 	}
