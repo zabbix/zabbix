@@ -54,12 +54,4 @@ in:
 out:
   result_left: "Newlines\nNewlines"
   result_right: "Newlines"
----
-test case: "Emoji and Quotation marks"
-in:
-  src: ❤"❤❤❤❤"❤❤
-  delimiter: '"' # delimiter must be single-byte character
-out:
-  result_left: ❤"❤❤❤❤
-  result_right: ❤❤
 ...

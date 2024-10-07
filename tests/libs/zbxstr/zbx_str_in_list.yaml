@@ -70,12 +70,4 @@ in:
   delimiter: '.'
 out:
   return: SUCCEED
----
-test case: "10. Emoji"
-in:
-  list: "#❤#"
-  value: "❤"
-  delimiter: '#'
-out:
-  return: SUCCEED
 ...

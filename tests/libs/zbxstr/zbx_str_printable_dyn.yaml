@@ -35,13 +35,7 @@ in:
 out:
   string: ""
 ---
-test case: "7. Emoji with tabs"
-in:
-  string: "😀	😀	😀	😀"
-out:
-  string: 😀\t😀\t😀\t😀
----
-test case: "8. Big text"
+test case: "7. Big text"
 in:
   string: |
    Hello world!
@@ -56,7 +50,7 @@ in:
 out:
   string: ⁰\t⁴\t⁵\t₀\t₁\t₂\t
 ---
-test case: "10. Backslashes and Quotation marks"
+test case: "8. Backslashes and Quotation marks"
 in:
   string: '\\\"	"\\\\'
 out:

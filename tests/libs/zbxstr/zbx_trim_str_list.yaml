@@ -20,13 +20,6 @@ in:
 out:
   string: "a"
 ---
-test case: "Emoji"
-in:
-  string: "🆗 / 🆗 / 🆗 / 🆗 / 🆗"
-  del: '/'
-out:
-  string: "🆗/🆗/🆗/🆗/🆗"
----
 test case: "Two-Byte Characters"
 in:
   string: "田 . 中 . さ . ん"

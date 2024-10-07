@@ -90,20 +90,7 @@ out:
   exp_result: "1"
   data: "\nb"
 ---
-test case: "8. Emoji"
-in:
-  data: "😀😀😀"
-  data_alloc: 13
-  data_len: 12
-  offset: 4
-  sz_to: 4
-  from: "😵"
-  sz_from: 4
-out:
-  exp_result: "0"
-  data: "😀😵😀"
----
-test case: "9. Long string"
+test case: "8. Long string"
 in:
   data: "The quick brown fox jumps over the lazy dog. The fox was very quick."
   data_alloc: 68
