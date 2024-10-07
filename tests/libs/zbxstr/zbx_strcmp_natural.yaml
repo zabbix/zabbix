@@ -62,10 +62,10 @@ in:
 out:
   val: greater
 ---
-test case: "8. ❤️ 💔"
+test case: "8. ❤ 😅"
 in:
-  string1: "❤️"
-  string2: "💔"
+  string1: "❤"
+  string2: "😅"
 out:
   val: less
 ---
@@ -85,7 +85,7 @@ out:
 ---
 test case: "11. 4 and 2 bytes"
 in:
-  string1: "❤️"
+  string1: "❤"
   string2: "田"
 out:
   val: less

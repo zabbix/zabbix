@@ -45,7 +45,7 @@ in:
   buffer: &buffer
     -
 out:
-  return: 1
+  return: 1  # a quirk of zbx_utf8_char_len() for empty buffer
 ---
 test case: "Newline"
 in:

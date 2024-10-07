@@ -2,26 +2,29 @@
 test case: "Copy simple ASCII string"
 in:
   src: "Hello, World!"
-  dst: "Hello, World!"
+  dst: "-----, -----!"
   size: 20
 out:
   result: 13
+  string: "Hello, World!"
 ---
 test case: "Copy UTF-8 string"
 in:
   src: "Привет"
-  dst: "Привет"
+  dst: "----------------"
   size: 16
 out:
   result: 12
+  string: "Привет"
 ---
 test case: "Copy UTF-8 string with truncation"
 in:
   src: "Привет"
-  dst: "При"
+  dst: "--------"
   size: 8
 out:
   result: 6
+  string: "При"
 ---
 test case: "Copy empty string"
 in:
@@ -30,20 +33,23 @@ in:
   size: 10
 out:
   result: 0
+  string: ""
 ---
 test case: "Copy Emoji"
 in:
-  src: "❤️ 💔 💌 💕 💞 💓 💗 💖 💘 💝 💟 💜 💛 💚 💙"
-  dst: "❤️ 💔 💌 💕 💞 💓 💗 💖 💘 💝"
+  src: "❤❤❤❤❤❤❤❤"
+  dst: "------------------------------------------"
   size: 40
 out:
-  result: 37
+  result: 24
+  string: "❤❤❤❤❤❤❤❤"
 ---
 test case: "Copy Newlines"
 in:
   src: "\n\n\n\n\n"
-  dst: "\n\n\n\n\n"
+  dst: "------"
   size: 10
 out:
   result: 5
+  string: "\n\n\n\n\n"
 ...

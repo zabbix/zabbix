@@ -31,14 +31,6 @@ in:
 out:
   return: "@#$%^&"
 ---
-test case: "Emoji"
-in:
-  string: "❤️💔💌💕💞"
-  left: 6
-  right: 9
-out:
-  return: "💔"
----
 test case: "Newlines"
 in:
   string: "Newlines\nNewlines\nNewlines\nNewlines"

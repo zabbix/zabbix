@@ -32,8 +32,8 @@ void	zbx_mock_test_entry(void **state)
 	const char *comp = "NULL";
 
 	act_value = zbx_strcmp_null(
-		(strcmp(s1, comp) == 0 || (strcmp(s1, comp) == 0 && strcmp(s2, comp) == 0)) ? str_null : s1,
-		(strcmp(s2, comp) == 0 || (strcmp(s1, comp) == 0 && strcmp(s2, comp) == 0)) ? str_null : s2
+		(strcmp(s1, comp) == 0) ? str_null : s1,
+		(strcmp(s2, comp) == 0) ? str_null : s2
 	);
 
 	const char	*returned_result;

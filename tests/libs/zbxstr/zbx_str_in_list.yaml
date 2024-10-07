@@ -73,8 +73,8 @@ out:
 ---
 test case: "10. Emoji"
 in:
-  list: "❤️ 💔 💌 💕 💞 💓 💗 💖 #💘# 💝 💟 💜 💛 💚 💙"
-  value: "💘"
+  list: "#❤#"
+  value: "❤"
   delimiter: '#'
 out:
   return: SUCCEED

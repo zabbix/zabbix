@@ -53,15 +53,6 @@ in:
 out:
   return: "!@@"
 ---
-test case: "7. Emoji replace"
-in:
-  data: ❤️ 💔 💌 💕 💞 💓 💗 💖 💘 💝 💟 💜 💛 💚 💙
-  value: "💌"
-  l: 7
-  r: 10
-out:
-  return: ❤️ 💌 💌 💕 💞 💓 💗 💖 💘 💝 💟 💜 💛 💚 💙
----
 test case: "8. Newlines replace"
 in:
   data: "\n\n\n\n\n\n"

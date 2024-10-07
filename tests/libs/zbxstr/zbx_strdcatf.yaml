@@ -2,7 +2,7 @@
 test case: "1. One argument"
 in:
   arg_str: "Test"
-  arg_int: "15"
+  arg_int: "15"  # not used in this test.
   arg_number: "1"
 out:
   val: "This is string - Test"

@@ -25,11 +25,13 @@ void	zbx_mock_test_entry(void **state)
 	char		*dst =  zbx_strdup(NULL, zbx_mock_get_parameter_string("in.dst"));
 	size_t		size = zbx_mock_get_parameter_uint64("in.size");
 	size_t		exp_result = zbx_mock_get_parameter_uint64("out.result");
+	const char	*exp_output = zbx_mock_get_parameter_string("out.string");
 
 	ZBX_UNUSED(state);
 
 	size_t		act_result = zbx_strlcpy_utf8(dst, src, size);
 
 	zbx_mock_assert_uint64_eq("return value", exp_result, act_result);
+	zbx_mock_assert_str_eq("return value", exp_output, dst);
 	zbx_free(dst);
 }

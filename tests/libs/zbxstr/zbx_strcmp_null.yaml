@@ -41,10 +41,10 @@ in:
 out:
   val: equal
 ---
-test case: "7. Emoji "
+test case: "7. Emoji 3-bytes "
 in:
-  string1: ❤️ 💔 💌 💕 💞 💓 💗 💖 💘 💝 💟 💜 💛 💚 💙
-  string2: ❤️ 💔 💌 💕 💞 💓 💗 💖 💘 💝 💟 💜 💛 💚 💙
+  string1: ❤❤❤
+  string2: ❤❤❤
 out:
   val: equal
 ---
@@ -113,7 +113,7 @@ out:
 ---
 test case: "17. 4 and 2 bytes"
 in:
-  string1: "❤️"
+  string1: "❤"
   string2: "田"
 out:
   val: less

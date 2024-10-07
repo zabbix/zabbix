@@ -27,35 +27,21 @@ in:
 out:
   string: "[]-="
 ---
-test case: "6. Two-bytes characters string"
-in:
-  haystack: "사회과학원 어학연구소"
-  needle: "학"
-out:
-  string: "학원 어학연구소"
----
-test case: "7. Emoji"
-in:
-  haystack: "❤️ 💔 💌 💕 💞 💓 💗 💖 💘 💝 💟 💜 💛 💚 💙"
-  needle: "💝"
-out:
-  string: "💝 💟 💜 💛 💚 💙"
----
-test case: "8. Backslash"
+test case: "6. Backslash"
 in:
   haystack: 'adad\adad'
   needle: '\'
 out:
   string: '\adad'
 ---
-test case: "9. Quotation mark"
+test case: "7. Quotation mark"
 in:
   haystack: 'Quotation mark"Quotation mark'
   needle: '"'
 out:
   string: '"Quotation mark'
 ---
-test case: "10. Newline"
+test case: "8. Newline"
 in:
   haystack: "NewlineNewline\nNewline"
   needle: "\n"

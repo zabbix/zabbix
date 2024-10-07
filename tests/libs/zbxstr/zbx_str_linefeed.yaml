@@ -41,11 +41,11 @@ out:
 ---
 test case: "6. Emoji"
 in:
-  src: "❤️❤️❤️❤️❤️❤️❤️❤️❤️"
+  src: "❤❤❤❤❤❤❤❤❤❤"
   delim: ' '
-  maxline: 6
+  maxline: 3
 out:
-  string: "❤️ ❤️ ❤️ ❤️ ❤️ ❤️ ❤️ ❤️ ❤️"
+  string: "❤ ❤ ❤ ❤ ❤ ❤ ❤ ❤ ❤ ❤"
 ---
 test case: "7. Newlines"
 in:

@@ -57,9 +57,9 @@ out:
 ---
 test case: "Emoji and Quotation marks"
 in:
-  src: ❤️"❤️❤️❤️❤️"❤️❤️
+  src: ❤"❤❤❤❤"❤❤
   delimiter: '"'
 out:
-  result_left: "❤️"
-  result_right: ❤️❤️❤️❤️"❤️❤️
+  result_left: "❤"
+  result_right: ❤❤❤❤"❤❤
 ...
