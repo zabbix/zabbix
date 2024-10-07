@@ -180,6 +180,6 @@ void	zbx_dcsync_sql_start(zbx_dbsync_t *sync);
 void	zbx_dcsync_sql_end(zbx_dbsync_t *sync);
 void	zbx_dcsync_sync_start(zbx_dbsync_t *sync, zbx_uint64_t used_size);
 void	zbx_dcsync_sync_end(zbx_dbsync_t *sync, zbx_uint64_t used_size);
-void	zbx_dcsync_stats_dump(void);
+void	zbx_dcsync_stats_dump(const char *function_name);
 
 #endif /* BUILD_SRC_LIBS_ZBXDBCACHE_DBSYNC_H_ */

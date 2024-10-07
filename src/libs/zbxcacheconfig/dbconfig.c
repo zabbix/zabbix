@@ -8248,7 +8248,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() reindex    : " ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes.", __func__,
 				update_sec, update_size);
 
-		zbx_dcsync_stats_dump();
+		zbx_dcsync_stats_dump(__func__);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() proxies    : %d (%d slots)", __func__,
 				config->proxies.num_data, config->proxies.num_slots);

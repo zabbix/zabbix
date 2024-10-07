@@ -4373,14 +4373,14 @@ void	zbx_dcsync_sync_end(zbx_dbsync_t *sync, zbx_uint64_t used_size)
 	sync->sync_size += used_size - sync->used;
 }
 
-static void	dcsync_log_stats(const zbx_dbsync_t *sync)
+static void	dcsync_log_stats(const char *function_name, const zbx_dbsync_t *sync)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() %16s: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes ("
-			ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").", __func__, sync->from, sync->sql_time,
+			ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").", function_name, sync->from, sync->sql_time,
 			sync->sync_time, sync->sync_size, sync->add_num, sync->update_num, sync->remove_num);
 }
 
-void	zbx_dcsync_stats_dump(void)
+void	zbx_dcsync_stats_dump(const char *function_name)
 {
 	double		sync_time_total = 0, sql_time_total = 0;
 	zbx_int64_t	total_used = 0;
@@ -4389,7 +4389,7 @@ void	zbx_dcsync_stats_dump(void)
 	{
 		const zbx_dbsync_t *sync = dbsync_env.changelog_dbsyncs.values[i];
 
-		dcsync_log_stats(sync);
+		dcsync_log_stats(function_name, sync);
 		sql_time_total += sync->sql_time;
 		sync_time_total += sync->sync_time;
 		total_used += sync->sync_size;
@@ -4399,13 +4399,13 @@ void	zbx_dcsync_stats_dump(void)
 	{
 		const zbx_dbsync_t *sync = dbsync_env.dbsyncs.values[i];
 
-		dcsync_log_stats(sync);
+		dcsync_log_stats(function_name, sync);
 		sql_time_total += sync->sql_time;
 		sync_time_total += sync->sync_time;
 		total_used += sync->sync_size;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sql  : " ZBX_FS_DBL " sec.", __func__, sql_time_total);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sync : " ZBX_FS_DBL " sec.", __func__, sync_time_total);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() total memory difference: " ZBX_FS_I64 " bytes.", __func__, total_used);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sql  : " ZBX_FS_DBL " sec.", function_name, sql_time_total);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sync : " ZBX_FS_DBL " sec.", function_name, sync_time_total);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() total memory difference: " ZBX_FS_I64 " bytes.", function_name, total_used);
 }
