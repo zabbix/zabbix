@@ -22,6 +22,17 @@ class AllItemValueTypes {
 		$hosts = CDataHelper::call('host.create', [
 			'host' => self::HOST,
 			'groups' => [['groupid' => 4]],
+			'macros' => [
+				[
+					'macro' => '{$HOST_MACRO}',
+					'value' => 'Macro for macrofunction check://\\'
+				],
+				[
+					'macro' => '{$SECRET_MACRO}',
+					'value' => 'Secret value',
+					'type' => 1
+				]
+			],
 			'inventory_mode' => 0,
 			'inventory' => [
 				'alias' => 'Item_Types_Alias'

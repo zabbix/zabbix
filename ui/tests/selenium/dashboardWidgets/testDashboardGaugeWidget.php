@@ -42,6 +42,11 @@ class testDashboardGaugeWidget extends testWidgets {
 	const HOST = 'Host for all item value types';
 	const DELETE_GAUGE = 'Gauge for deleting';
 	const GAUGE_ITEM = 'Float item';
+	const GAUGE_MACROFUNCTIONS = 'Gauge for macrofunctions';
+	const HOST_MACRO = '{$HOST_MACRO}';
+	const HOST_MACRO_VALUE = 'Macro for macrofunction check://\\';
+	const SECRET_MACRO = '{$SECRET_MACRO}';
+	const SECRET_MACRO_VALUE = '*****';
 
 	/**
 	 * Id of the dashboard where gauge widget is created and updated.
@@ -49,6 +54,7 @@ class testDashboardGaugeWidget extends testWidgets {
 	 * @var integer
 	 */
 	protected static $dashboardid;
+	protected static $macrofunction_dashboardid;
 
 	protected static $update_gauge = 'Gauge for updating';
 
@@ -81,53 +87,82 @@ class testDashboardGaugeWidget extends testWidgets {
 		CDataHelper::addItemData($float_item_id, 50);
 
 		$dashboards = CDataHelper::call('dashboard.create', [
-			'name' => 'Gauge widget dashboard',
-			'auto_start' => 0,
-			'pages' => [
-				[
-					'name' => 'Gauge test page',
-					'widgets' => [
-						[
-							'type' => 'gauge',
-							'name' => self::$update_gauge,
-							'x' => 0,
-							'y' => 0,
-							'width' => 11,
-							'height' => 5,
-							'fields' => [
-								[
-									'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
-									'name' => 'itemid',
-									'value' => $float_item_id
+			[
+				'name' => 'Gauge widget dashboard',
+				'auto_start' => 0,
+				'pages' => [
+					[
+						'name' => 'Gauge test page',
+						'widgets' => [
+							[
+								'type' => 'gauge',
+								'name' => self::$update_gauge,
+								'x' => 0,
+								'y' => 0,
+								'width' => 11,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid',
+										'value' => $float_item_id
+									]
+								]
+							],
+							[
+								'type' => 'gauge',
+								'name' => self::DELETE_GAUGE,
+								'x' => 11,
+								'y' => 0,
+								'width' => 11,
+								'height' => 5,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid',
+										'value' => $float_item_id
+									]
 								]
 							]
-						],
-						[
-							'type' => 'gauge',
-							'name' => self::DELETE_GAUGE,
-							'x' => 11,
-							'y' => 0,
-							'width' => 11,
-							'height' => 5,
-							'view_mode' => 0,
-							'fields' => [
-								[
-									'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
-									'name' => 'itemid',
-									'value' => $float_item_id
+						]
+					],
+					[
+						'name' => 'Screenshot page'
+					]
+				]
+			],
+			[
+				'name' => 'Dashboard for macrofunctions',
+				'auto_start' => 0,
+				'pages' => [
+					[
+						'name' => 'Gauge for testing macrofunctions',
+						'widgets' => [
+							[
+								'type' => 'gauge',
+								'name' => self::GAUGE_MACROFUNCTIONS,
+								'x' => 0,
+								'y' => 0,
+								'width' => 20,
+								'height' => 6,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid',
+										'value' => $float_item_id
+									]
 								]
 							]
 						]
 					]
-				],
-				[
-					'name' => 'Screenshot page'
 				]
 			]
 		]);
 
 		$this->assertArrayHasKey('dashboardids', $dashboards);
 		self::$dashboardid = $dashboards['dashboardids'][0];
+		self::$macrofunction_dashboardid = $dashboards['dashboardids'][1];
 	}
 
 	public function testDashboardGaugeWidget_Layout() {
@@ -1270,5 +1305,112 @@ class testDashboardGaugeWidget extends testWidgets {
 		// Wait until the gauge is animated.
 		$this->query('xpath://div['.CXPathHelper::fromClass('is-ready').']')->waitUntilVisible();
 		$this->assertScreenshot($widget->query('class:dashboard-grid-widget-container')->one(), $data['screenshot_id']);
+	}
+
+	public static function getMacroFunctions() {
+		return [
+			// #0 Built-in macro with btoa() function.
+			[
+				[
+					'fields' => [
+						'Name' => self::GAUGE_MACROFUNCTIONS,
+						'Item' => self::GAUGE_ITEM,
+						'Advanced configuration' => true,
+						'id:description' => '{{ITEM.NAME}.btoa()}',
+						'id:desc_size' => 5
+					],
+					'result' => base64_encode(self::GAUGE_ITEM)
+				]
+			],
+			// #1 Host macro with btoa() function.
+			[
+				[
+					'fields' => [
+						'Name' => self::GAUGE_MACROFUNCTIONS,
+						'Item' => self::GAUGE_ITEM,
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::HOST_MACRO.'.btoa()}',
+						'id:desc_size' => 5
+					],
+					'result' => base64_encode(self::HOST_MACRO_VALUE)
+				]
+			],
+			// #2 Secret macro with btoa() function.
+			[
+				[
+					'fields' => [
+						'Name' => self::GAUGE_MACROFUNCTIONS,
+						'Item' => self::GAUGE_ITEM,
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::SECRET_MACRO.'.btoa()}',
+						'id:desc_size' => 5
+					],
+					'result' => 'KioqKioq'
+				]
+			],
+			// #3 Incorrectly used btoa() function.
+			[
+				[
+					'fields' => [
+						'Name' => self::GAUGE_MACROFUNCTIONS,
+						'Item' => self::GAUGE_ITEM,
+						'Advanced configuration' => true,
+						'id:description' => '{{ITEM.NAME}.btoa(\/\)}',
+						'id:desc_size' => 5
+					],
+					'result' => '*UNKNOWN*'
+				]
+			],
+			// #4 No arguments in regrepl() function.
+			[
+				[
+					'fields' => [
+						'Name' => self::GAUGE_MACROFUNCTIONS,
+						'Item' => self::GAUGE_ITEM,
+						'Advanced configuration' => true,
+						'id:description' => '{{ITEM.NAME}.regrepl()}',
+						'id:desc_size' => 5
+					],
+					'result' => '*UNKNOWN*'
+				]
+			],
+			// #5 Odd amount of arguments in regrepl() function.
+			[
+				[
+					'fields' => [
+						'Name' => self::GAUGE_MACROFUNCTIONS,
+						'Item' => self::GAUGE_ITEM,
+						'Advanced configuration' => true,
+						'id:description' => '{{ITEM.NAME}.regrepl(test, 1, test)}',
+						'id:desc_size' => 5
+					],
+					'result' => '*UNKNOWN*'
+				]
+			],
+			// #6 Regrepl with secret macro.
+			[
+				[
+					'fields' => [
+						'Name' => self::GAUGE_MACROFUNCTIONS,
+						'Item' => self::GAUGE_ITEM,
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::SECRET_MACRO.'.regrepl([abcde], test)}',
+						'id:desc_size' => 5
+					],
+					'result' => '******'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getMacroFunctions
+	 */
+	public function testDashboardGaugeWidget_CheckMacroFunctions($data) {
+		$this->setWidgetConfiguration(self::$macrofunction_dashboardid, self::GAUGE_MACROFUNCTIONS, $data['fields']);
+		CDashboardElement::find()->one()->save()->waitUntilReady();
+
+		// Check the resolution of macrofunction.
+		$this->assertEquals($data['result'], $this->query('css:.svg-gauge-description')->one()->getText());
 	}
 }
