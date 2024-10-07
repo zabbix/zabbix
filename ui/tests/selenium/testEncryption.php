@@ -31,9 +31,8 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 class testEncryption extends CWebTest {
 	const UPDATE_SAME_HOST = 'Same host with PSK Encryption';
 	const UPDATE_SAME_PROXY = 'Same proxy with PSK Encryption';
-
-	protected static $host_name = 'Host with PSK Encryption';
-	protected static $proxy_name = 'Proxy with PSK Encryption';
+	const HOST_NAME = 'Host with PSK Encryption';
+	const PROXY_NAME = 'Proxy with PSK Encryption';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -49,7 +48,7 @@ class testEncryption extends CWebTest {
 
 		CDataHelper::call('host.create', [
 				[
-					'host' => self::$host_name,
+					'host' => self::HOST_NAME,
 					'groups' => [['groupid' => $groupid]],
 					'tls_connect' => HOST_ENCRYPTION_PSK,
 					'tls_psk_identity' => 'host_identity',
@@ -107,7 +106,7 @@ class testEncryption extends CWebTest {
 
 		CDataHelper::call('proxy.create', [
 				[
-					'host' => self::$proxy_name,
+					'host' => self::PROXY_NAME,
 					'status' => HOST_STATUS_PROXY_ACTIVE,
 					'tls_accept' => HOST_ENCRYPTION_PSK,
 					'tls_psk_identity' => 'proxy_identity',
@@ -727,7 +726,7 @@ class testEncryption extends CWebTest {
 			if ($update) {
 				$object = $same
 					? ($data['object'] === 'host' ? self::UPDATE_SAME_HOST : self::UPDATE_SAME_PROXY)
-					: ($data['object'] === 'host' ? self::$host_name : self::$proxy_name);
+					: ($data['object'] === 'host' ? self::HOST_NAME : self::PROXY_NAME);
 
 				$this->query('link', $object)->waitUntilClickable()->one()->click();
 			}
