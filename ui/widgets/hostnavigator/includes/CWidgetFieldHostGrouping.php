@@ -47,32 +47,22 @@ class CWidgetFieldHostGrouping extends CWidgetField {
 			return $errors;
 		}
 
-		foreach ($this->getValue() as $value) {
-			if ($value['attribute'] != self::GROUP_BY_TAG_VALUE) {
-				continue;
-			}
+		$group_by = $this->getValue();
 
-			if ($value['tag_name'] === '') {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Group by'), _('tag cannot be empty'));
+		$result = array_filter($group_by, static function(array $row): bool {
+			return $row['attribute'] != self::GROUP_BY_TAG_VALUE || $row['tag_name'] !== '';
+		});
 
-				break;
-			}
+		if (count($result) < count($group_by)) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Group by'), _('tag cannot be empty'));
 		}
 
-		$unique_groupings = [];
+		$result = array_map(static function(array $row): string {
+			return implode(array_values($row));
+		}, $result);
 
-		foreach ($this->getValue() as $value) {
-			$attribute = $value['attribute'];
-			$tag_name = $attribute == self::GROUP_BY_TAG_VALUE ? $value['tag_name'] : '';
-
-			if (array_key_exists($attribute, $unique_groupings) && $unique_groupings[$attribute] === $tag_name) {
-				$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Group by'), _('rows must be unique'));
-
-				break;
-			}
-			else {
-				$unique_groupings[$attribute] = $tag_name;
-			}
+		if (count($result) != count(array_unique($result))) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Group by'), _('rows must be unique'));
 		}
 
 		return $errors;
