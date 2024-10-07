@@ -326,6 +326,31 @@ class ItemValueWidget {
 						]
 					]
 				]
+			],
+[
+				'name' => 'Dashboard for macro function check',
+				'pages' => [
+					[
+						'name' => 'Page for macrofunctions',
+						'widgets' => [
+							[
+								'type' => 'item',
+								'name' => 'Widget for macro function check',
+								'x' => 0,
+								'y' => 0,
+								'width' => 54,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid.0',
+										'value' => 42230 // Linux: CPU user time.
+									]
+								]
+							]
+						]
+					]
+				]
 			]
 		]);
 		$dashboardids = CDataHelper::getIds('name');

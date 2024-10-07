@@ -1313,8 +1313,6 @@ class testDashboardGaugeWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Name' => self::GAUGE_MACROFUNCTIONS,
-						'Item' => self::GAUGE_ITEM,
 						'Advanced configuration' => true,
 						'id:description' => '{{ITEM.NAME}.btoa()}',
 						'id:desc_size' => 5
@@ -1326,8 +1324,6 @@ class testDashboardGaugeWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Name' => self::GAUGE_MACROFUNCTIONS,
-						'Item' => self::GAUGE_ITEM,
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::HOST_MACRO.'.btoa()}',
 						'id:desc_size' => 5
@@ -1339,8 +1335,6 @@ class testDashboardGaugeWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Name' => self::GAUGE_MACROFUNCTIONS,
-						'Item' => self::GAUGE_ITEM,
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::SECRET_MACRO.'.btoa()}',
 						'id:desc_size' => 5
@@ -1352,8 +1346,6 @@ class testDashboardGaugeWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Name' => self::GAUGE_MACROFUNCTIONS,
-						'Item' => self::GAUGE_ITEM,
 						'Advanced configuration' => true,
 						'id:description' => '{{ITEM.NAME}.btoa(\/\)}',
 						'id:desc_size' => 5
@@ -1365,8 +1357,6 @@ class testDashboardGaugeWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Name' => self::GAUGE_MACROFUNCTIONS,
-						'Item' => self::GAUGE_ITEM,
 						'Advanced configuration' => true,
 						'id:description' => '{{ITEM.NAME}.regrepl()}',
 						'id:desc_size' => 5
@@ -1378,8 +1368,6 @@ class testDashboardGaugeWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Name' => self::GAUGE_MACROFUNCTIONS,
-						'Item' => self::GAUGE_ITEM,
 						'Advanced configuration' => true,
 						'id:description' => '{{ITEM.NAME}.regrepl(test, 1, test)}',
 						'id:desc_size' => 5
@@ -1391,8 +1379,6 @@ class testDashboardGaugeWidget extends testWidgets {
 			[
 				[
 					'fields' => [
-						'Name' => self::GAUGE_MACROFUNCTIONS,
-						'Item' => self::GAUGE_ITEM,
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::SECRET_MACRO.'.regrepl([abcde], test)}',
 						'id:desc_size' => 5

@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../common/testWidgets.php';
  *
  * @backup dashboard
  *
- * @dataSource WebScenarios, AllItemValueTypes, ItemValueWidget
+ * @dataSource WebScenarios, AllItemValueTypes, ItemValueWidget, GlobalMacros
  *
  * @onBefore prepareData
  */
@@ -50,7 +50,14 @@ class testDashboardItemValueWidget extends testWidgets {
 	const DASHBOARD_ZOOM = 'Dashboard for zoom filter check';
 	const DASHBOARD_THRESHOLD = 'Dashboard for threshold(s) check';
 	const DASHBOARD_AGGREGATION = 'Dashboard for aggregation function data check';
+	const DASHBOARD_MACRO_FUNCTIONS = 'Dashboard for macro function check';
 	const DATA_WIDGET = 'Widget for aggregation function data check';
+	const MACRO_FUNCTION_WIDGET = 'Widget for macro function check';
+	const GLOBAL_MACRO = '{$GLOBAL_MACRO_TEST}';
+	const GLOBAL_MACRO_VALUE = 'Macro for testing Macro functions 12345';
+	const GLOBAL_MACRO_UPPERCASE ='{$CASE_SENSITIVE_CHECK}';
+	const GLOBAL_MACRO_UPPERCASE_VALUE = 'TEST MACRO FUNCTION';
+	const GLOBAL_MACRO_SECRET ='{$SECRET_MACRO}';
 
 	/**
 	 * Get threshold table element with mapping set.
@@ -4229,6 +4236,101 @@ class testDashboardItemValueWidget extends testWidgets {
 	public function testDashboardItemValueWidget_CheckAvailableItems() {
 		$this->checkAvailableItems('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids[self::DASHBOARD],
 				'Item value'
+		);
+	}
+
+	public static function getMacroFunctions() {
+		return [
+			// #0 Built-in macro with btoa() function.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{{ITEM.NAME}.btoa()}',
+						'id:desc_size' => 5
+					],
+					'result' => base64_encode('CPU user time')
+				]
+			],
+			// #1 Host macro with btoa() function.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::GLOBAL_MACRO.'.btoa()}',
+						'id:desc_size' => 5
+					],
+					'result' => base64_encode(self::GLOBAL_MACRO_VALUE)
+				]
+			],
+			// #2 Secret macro with btoa() function.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::GLOBAL_MACRO_SECRET.'.btoa()}',
+						'id:desc_size' => 5
+					],
+					'result' => 'KioqKioq'
+				]
+			],
+			// #3 Incorrectly used btoa() function.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{{ITEM.NAME}.btoa(\/\)}',
+						'id:desc_size' => 5
+					],
+					'result' => '*UNKNOWN*'
+				]
+			],
+			// #4 No arguments in regrepl() function.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{{ITEM.NAME}.regrepl()}',
+						'id:desc_size' => 5
+					],
+					'result' => '*UNKNOWN*'
+				]
+			],
+			// #5 Odd amount of arguments in regrepl() function.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{{ITEM.NAME}.regrepl(test, 1, test)}',
+						'id:desc_size' => 5
+					],
+					'result' => '*UNKNOWN*'
+				]
+			],
+			// #6 Regrepl with secret macro.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::GLOBAL_MACRO_SECRET.'.regrepl([abcde], test)}',
+						'id:desc_size' => 5
+					],
+					'result' => '******'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getMacroFunctions
+	 */
+	public function testDashboardGaugeItemValueWidget_CheckMacroFunctions($data) {
+		$this->setWidgetConfiguration(self::$dashboardids[self::DASHBOARD_MACRO_FUNCTIONS], self::MACRO_FUNCTION_WIDGET, $data['fields']);
+		CDashboardElement::find()->one()->save()->waitUntilReady();
+
+		// Check the resolution of macrofunction.
+		$this->assertEquals($data['result'], $this->query('xpath://div[@class="bottom center item-description"]')
+				->one()->getText()
 		);
 	}
 }
