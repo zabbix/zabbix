@@ -155,6 +155,8 @@ error:
 	{
 		/* reset received config_revision to force full resync after data transfer failure */
 		zbx_dc_set_upstream_revision(0, 0);
+
+		zbx_addrs_failover(args->config_server_addrs);
 	}
 
 out:
