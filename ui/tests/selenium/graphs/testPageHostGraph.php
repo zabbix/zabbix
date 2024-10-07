@@ -726,8 +726,8 @@ class testPageHostGraph extends CLegacyWebTest {
 		$filter->submit();
 
 		if ($data['host'] === 'all') {
-			$this->zbxTestAssertElementPresentXpath(
-					'//button[@id="form"][@disabled][text()="Create graph (select host first)"]'
+			$this->assertTrue($this->query('xpath://button[@id="form"][@disabled][text()="Create graph (select host first)"]')
+					->one()->isVisible()
 			);
 		}
 

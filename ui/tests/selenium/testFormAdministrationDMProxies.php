@@ -255,6 +255,8 @@ class testFormAdministrationDMProxies extends CLegacyWebTest  {
 		}
 
 		$this->zbxTestClickButton('proxy.create');
+		$this->assertMessage($expected);
+
 		switch ($expected) {
 			case PROXY_GOOD:
 				$this->zbxTestTextNotPresent('Cannot add proxy');
