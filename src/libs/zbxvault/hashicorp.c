@@ -22,7 +22,6 @@
 
 #include "zbxkvs.h"
 #include "zbxjson.h"
-#include "zbxlog.h"
 #include "zbxtime.h"
 
 int	zbx_hashicorp_kvs_get(const char *vault_url, const char *prefix, const char *token, const char *ssl_cert_file,
@@ -153,7 +152,7 @@ void	zbx_hashicorp_renew_token(const char *vault_url, const char *token, const c
 
 	zbx_snprintf(header, sizeof(header), "X-Vault-Token: %s", token);
 
-	if (0 == next_renew)
+	if (0 == (unsigned long)next_renew)
 	{
 		url = zbx_dsprintf(NULL, "%s%s", vault_url, "/v1/auth/token/lookup-self");
 
