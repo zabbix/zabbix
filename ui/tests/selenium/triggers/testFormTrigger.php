@@ -1297,57 +1297,130 @@ class testFormTrigger extends CLegacyWebTest {
 	 * @throws Exception
 	 */
 	protected function prepareCreateWithLongItemKey() {
-		$hosts = CDataHelper::call('host.create', [
+		// Create a host with a long name.
+		self::$long_key_hostid = CDataHelper::call('host.create', [
 			'host' => STRING_128,
 			'groups' => [['groupid' => 6]]
-		]);
-		self::$long_key_hostid = $hosts['hostids'][0];
+		])['hostids'][0];
+
+		// Create an item with a long key.
 		CDataHelper::call('item.create', [
 			[
-				'hostid' => self::$long_key_hostid,
 				'name' => 'test',
 				'key_' => STRING_2048,
+				'hostid' => self::$long_key_hostid,
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			]
 		]);
+
+		// Create triggers for update tests.
+		CDataHelper::call('trigger.create', [
+			[
+				'description' => 'Trigger for simple update',
+				'expression' => 'last(/'.STRING_128.'/'.STRING_2048.')=0'
+			],
+			[
+				'description' => 'Trigger for update',
+				'expression' => 'last(/'.STRING_128.'/'.STRING_2048.')>0'
+			]
+		]);
+
+		// Create an LLD rule.
+		$ruleid = CDataHelper::call('discoveryrule.create', [
+			'name' => 'LLD for triggers',
+			'key_' => 'lld_key',
+			'hostid' => self::$long_key_hostid,
+			'type' => 3, // Simple check, doesn't need a reference to an interface
+			'delay' => '1m'
+		])['itemids'][0];
+
+		// Create an item prototype with a long key.
+		CDataHelper::call('itemprototype.create', [
+			'name' => 'test2',
+			'key_' => substr(STRING_6000, 0, 2038).'[{#MACRO}]',
+			'hostid' => self::$long_key_hostid,
+			'ruleid' => $ruleid,
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_FLOAT
+		]);
+	}
+
+	public function getCreateWithLongItemKeyData () {
+		return [
+			// Create trigger.
+			[
+				[
+					'form_data' => [
+						'Name' => 'Created trigger',
+						'Expression' => 'last(/'.STRING_128.'/'.STRING_2048.')=0 and last(/'.STRING_128.'/'.STRING_2048.')=0'
+					],
+					'expected_db_expression' => '/^\{\d+\}=0 and \{\d+\}=0$/'
+				]
+			],
+			// Simple update.
+			[
+				[
+					'update' => true,
+					'link_name' => 'Trigger for simple update',
+					'expected_db_expression' => '/^\{\d+\}=0$/'
+				]
+			],
+			// Update.
+			[
+				[
+					'update' => true,
+					'link_name' => 'Trigger for simple update',
+					'form_data' => [
+						'Name' => 'Updated trigger',
+						'Expression' => 'last(/'.STRING_128.'/'.STRING_2048.')>0 and last(/'.STRING_128.'/'.STRING_2048.')>0'
+					],
+					'expected_db_expression' => '/^\{\d+\}>0 and \{\d+\}>0$/'
+				]
+			],
+		];
 	}
 
 	/**
 	 * Test the special case where the host's name and item's key are very long.
-	 * The trigger expression is saved in a different format, so this should work.
+	 * The trigger expression is saved in a different format, so it should work regardless of length.
 	 * See ZBX-25182 for more information.
 	 *
-	 * @onBefore prepareCreateWithLongItemKey
+	 * @onBeforeOnce prepareCreateWithLongItemKey
+	 * @dataProvider getCreateWithLongItemKeyData
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function testFormTrigger_CreateWithLongItemKey() {
-		$trigger_name = 'Trigger for a long item key';
-
+	public function testFormTrigger_CreateWithLongItemKey($data) {
 		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&context=host&filter_hostids[0]='.
 				self::$long_key_hostid
 		);
 		$this->page->waitUntilReady();
 
-		$this->page->query('button:Create trigger')->one()->click();
+		// Open the correct form.
+		if (CTestArrayHelper::get($data, 'update', false)) {
+			$this->page->query('link', $data['link_name'])->one()->click();
+		}
+		else {
+			$this->page->query('button:Create trigger')->one()->click();
+		}
+
+		// Set the correct form data and save.
 		$dialog = COverlayDialogElement::find()->one();
-		$dialog->asForm()->fill([
-			'Name' => $trigger_name,
-			'Expression' => 'last(/'.STRING_128.'/'.STRING_2048.')=0 and last(/'.STRING_128.'/'.STRING_2048.')=0'
-		]);
-		$dialog->getFooter()->query('button:Add')->one()->click();
+		$dialog->asForm()->fill(CTestArrayHelper::get($data, 'form_data', []));
+		$button = CTestArrayHelper::get($data, 'update', false) ? 'Update' : 'Add';
+		$dialog->getFooter()->query('button', $button)->one()->click();
 		COverlayDialogElement::ensureNotPresent();
 
-
 		// Get the new trigger's ID from UI.
-		$triggerid = $this->page->query('link', $trigger_name)->one()->getAttribute('data-triggerid');
+		$link = CTestArrayHelper::get($data, 'form_data.Name', CTestArrayHelper::get($data, 'link_name'));
+		$triggerid = $this->page->query('link', $link)->one()->getAttribute('data-triggerid');
 		// Get the newly saved trigger's expression, as it is saved in the DB.
 		$db_expression = CDBHelper::getValue('SELECT expression FROM triggers WHERE triggerid = '.$triggerid);
 
-		// Assert that the trigger expression is saved in DB like this: "{100253}=0 and {100253}=0".
-		$this->assertEquals(1, preg_match('/^\{\d+\}=0.*\{\d+\}=0$/', $db_expression));
+		// Assert by regex that the expression is saved in DB similar to this: "{100253}=0 and {100253}=0".
+		$this->assertEquals(1, preg_match($data['expected_db_expression'], $db_expression));
 	}
 
 	/**
