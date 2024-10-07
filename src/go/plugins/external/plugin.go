@@ -100,7 +100,7 @@ func (p *Plugin) RegisterMetrics(config any) error {
 		func() error {
 			err = p.register()
 			if err != nil {
-				return errs.Wrap(err, "failed to register plugin")
+				return errs.Wrap(err, "failed plugin register request")
 			}
 
 			defer p.Stop()
@@ -246,7 +246,7 @@ func (p *Plugin) startPlugin(initial bool) (<-chan error, error) {
 
 				pluginExit <- errs.New("timeout while waiting for plugin process to exit, killed process")
 			case <-p.cmdWait:
-				p.Infof("plugin %q process exited", p.Path)
+				p.Debugf("plugin %q process exited", p.Path)
 
 				pluginExit <- nil
 			}
