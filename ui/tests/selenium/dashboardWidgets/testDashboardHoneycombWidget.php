@@ -61,10 +61,18 @@ class testDashboardHoneycombWidget extends testWidgets {
 	const DASHBOARD_FOR_MACRO_FUNCTIONS = 'Dashboard for testing macro functions';
 	const WIDGET_FOR_MACRO_FUNCTIONS = 'Widget for testing macro functions';
 	const USER_MACRO = '{$USER.MACRO}';
-	const USER_MACRO_VALUE = 'Macro function test 12345';
+	const USER_MACRO_VALUE = 'Test';
 	const USER_SECRET_MACRO = '{$SECRET.MACRO}';
 	const MACRO_CHAR = '{$MACRO.CHAR}';
+	const MACRO_HTML_ENCODE = '{$MACRO.HTML.ENCODE}';
+	const MACRO_HTML_ENCODE_VALUE = '<h1>"test&"</h1>';
+	const MACRO_HTML_DECODE = '{$MACRO.HTML.DECODE}';
+	const MACRO_HTML_DECODE_VALUE = '&lt;h1&gt;&quot;test&amp;&quot;&lt;/h1&gt;';
 	const MACRO_CHAR_VALUE = 'Тест 123 ŽzŠsšĒĀīī 🌴🌴🌴';
+	const MACRO_URL_ENCODE = '{$MACRO.URL.ENCODE}';
+	const MACRO_URL_ENCODE_VALUE = 'h://test.com/macro?functions=urlencode&urld=a';
+	const MACRO_URL_DECODE = '{$MACRO.URL.DECODE}';
+	const MACRO_URL_DECODE_VALUE = 'h%3A%2F%2Ftest.com%2Fmacro%3Ffunctions%3Durlencode%26urld%3Da';
 
 	public static function prepareHoneycombWidgetData() {
 		CDataHelper::call('hostgroup.create', [
@@ -753,6 +761,22 @@ class testDashboardHoneycombWidget extends testWidgets {
 			[
 				'macro' => self::MACRO_CHAR,
 				'value' => self::MACRO_CHAR_VALUE
+			],
+			[
+				'macro' => self::MACRO_HTML_ENCODE,
+				'value' => self::MACRO_HTML_ENCODE_VALUE
+			],
+			[
+				'macro' => self::MACRO_HTML_DECODE,
+				'value' => self::MACRO_HTML_DECODE_VALUE
+			],
+			[
+				'macro' => self::MACRO_URL_ENCODE,
+				'value' => self::MACRO_URL_ENCODE_VALUE
+			],
+			[
+				'macro' => self::MACRO_URL_DECODE,
+				'value' => self::MACRO_URL_DECODE_VALUE
 			]
 		]);
 	}
@@ -2322,150 +2346,133 @@ class testDashboardHoneycombWidget extends testWidgets {
 
 	public static function getMacroFunctions() {
 		return [
-			// #0 Built-in macro with btoa() function.
+			// #0 Arguments added to macro functions, which doesn't require such to be specified.
 			[
 				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
-						'id:primary_label' => '{{ITEM.NAME}.btoa()}',
+						'id:primary_label' => '{{ITEM.NAME}.btoa(\)}, {'.self::USER_MACRO.'.htmldecode(test)}, '.
+							'{'.self::USER_MACRO.'.htmlencode(test)}, {{ITEM.NAME}.lowercase([test])}, '.
+							'{{ITEM.NAME}.uppercase([test])}, {{ITEM.NAME}.urldecode([test])}, '.
+							'{'.self::USER_SECRET_MACRO.'.urlencode(\/)}',
 						'id:secondary_label_type' => 'Text',
-						'id:secondary_label' => '{{ITEM.NAME}.btoa()}'
+						'id:secondary_label' => '{{ITEM.NAME}.btoa(\)}, {'.self::USER_MACRO.'.htmldecode(test)}, '.
+							'{'.self::USER_MACRO.'.htmlencode(test)}, {{ITEM.NAME}.lowercase([test])}, '.
+							'{{ITEM.NAME}.uppercase([test])}, {{ITEM.NAME}.urldecode([test])}, '.
+							'{'.self::USER_SECRET_MACRO.'.urlencode(\/)}'
 					],
 					'result' => [
-						'primary' => base64_encode('Display item 5'),
-						'secondary' => base64_encode('Display item 5')
+						'primary' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*',
+						'secondary' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*'
 					]
 				]
 			],
-			// #1 User macro with btoa() function.
+			// #1 Check that secret macro value is not exposed by macro functions on the dashboard.
 			[
 				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
-						'id:primary_label' => '{'.self::USER_MACRO.'.btoa()}',
+						'id:primary_label' => '{'.self::USER_SECRET_MACRO.'.btoa()}, {'.self::USER_SECRET_MACRO.'.htmldecode()}, '.
+							'{'.self::USER_SECRET_MACRO.'.htmlencode()}, {'.self::USER_SECRET_MACRO.'.lowercase()}, '.
+							'{'.self::USER_SECRET_MACRO.'.uppercase()}, {'.self::USER_SECRET_MACRO.'.regrepl(a, b)}, '.
+							'{'.self::USER_SECRET_MACRO.'.tr(a-z, b)}, {'.self::USER_SECRET_MACRO.'.urldecode()}, '.
+							'{'.self::USER_SECRET_MACRO.'.urlencode()}',
 						'id:secondary_label_type' => 'Text',
-						'id:secondary_label' => '{'.self::USER_MACRO.'.btoa()}'
+						'id:secondary_label' => '{'.self::USER_SECRET_MACRO.'.btoa()}, {'.self::USER_SECRET_MACRO.'.htmldecode()}, '.
+							'{'.self::USER_SECRET_MACRO.'.htmlencode()}, {'.self::USER_SECRET_MACRO.'.lowercase()}, '.
+							'{'.self::USER_SECRET_MACRO.'.uppercase()}, {'.self::USER_SECRET_MACRO.'.regrepl(a, b)}, '.
+							'{'.self::USER_SECRET_MACRO.'.tr(a-z, b)}, {'.self::USER_SECRET_MACRO.'.urldecode()}, '.
+							'{'.self::USER_SECRET_MACRO.'.urlencode()}'
 					],
 					'result' => [
-						'primary' => base64_encode(self::USER_MACRO_VALUE),
-						'secondary' => base64_encode(self::USER_MACRO_VALUE)
+						'primary' => 'KioqKioq, ******, ******, ******, ******, ******, ******, ******, %2A%2A%2A%2A%2A%2A',
+						'secondary' => 'KioqKioq, ******, ******, ******, ******, ******, ******, ******, %2A%2A%2A%2A%2A%2A'
 					]
 				]
 			],
-			// #2 Secret macro with btoa() function.
+			// #0 Built-in macro with non-argument functions.
 			[
 				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
-						'id:primary_label' => '{'.self::USER_SECRET_MACRO.'.btoa()}',
+						'id:primary_label' => '{{ITEM.NAME}.btoa()}, {{ITEM.NAME}.htmldecode()}, {{ITEM.NAME}.htmlencode()}, '.
+							'{{ITEM.NAME}.lowercase()}, {{ITEM.NAME}.uppercase()}, {{ITEM.NAME}.urlencode()}, '.
+							'{{ITEM.NAME}.urldecode()}',
 						'id:secondary_label_type' => 'Text',
-						'id:secondary_label' => '{'.self::USER_SECRET_MACRO.'.btoa()}'
+						'id:secondary_label' => '{{ITEM.NAME}.btoa()}, {{ITEM.NAME}.htmldecode()}, {{ITEM.NAME}.htmlencode()}, '.
+							'{{ITEM.NAME}.lowercase()}, {{ITEM.NAME}.uppercase()}, {{ITEM.NAME}.urlencode()}, '.
+							'{{ITEM.NAME}.urldecode()}'
 					],
 					'result' => [
-						'primary' => 'KioqKioq',
-						'secondary' => 'KioqKioq'
+						'primary' => 'RGlzcGxheSBpdGVtIDU=, Display item 5, Display item 5, display item 5, '.
+							'DISPLAY ITEM 5, Display%20item%205, Display item 5',
+						'secondary' => 'RGlzcGxheSBpdGVtIDU=, Display item 5, Display item 5, display item 5, '.
+							'DISPLAY ITEM 5, Display%20item%205, Display item 5'
 					]
 				]
 			],
-			// #3 Incorrectly used btoa() function.
+			// #1 User macro with non-argument functions.
 			[
 				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
-						'id:primary_label' => '{'.self::USER_MACRO.'.btoa(,\/)}',
+						'id:primary_label' => '{'.self::USER_MACRO.'.btoa()}, {'.self::MACRO_HTML_ENCODE.'.htmlencode()}, '.
+							'{'.self::MACRO_HTML_DECODE.'.htmldecode()}, {'.self::MACRO_URL_ENCODE.'.urlencode()}, '.
+							'{'.self::MACRO_URL_DECODE.'.urldecode()}, {'.self::USER_MACRO.'.uppercase()}, '.
+							'{'.self::USER_MACRO.'.lowercase()}',
 						'id:secondary_label_type' => 'Text',
-						'id:secondary_label' => '{'.self::USER_SECRET_MACRO.'.btoa("test")}'
+						'id:secondary_label' => '{'.self::USER_MACRO.'.btoa()}, {'.self::MACRO_HTML_ENCODE.'.htmlencode()}, '.
+							'{'.self::MACRO_HTML_DECODE.'.htmldecode()}, {'.self::MACRO_URL_ENCODE.'.urlencode()}, '.
+							'{'.self::MACRO_URL_DECODE.'.urldecode()}, {'.self::USER_MACRO.'.uppercase()}, '.
+							'{'.self::USER_MACRO.'.lowercase()}'
 					],
 					'result' => [
-						'primary' => '*UNKNOWN*',
-						'secondary' => '*UNKNOWN*'
+						'primary' => base64_encode(self::USER_MACRO_VALUE).', '.self::MACRO_HTML_DECODE_VALUE.', '.
+							self::MACRO_HTML_ENCODE_VALUE.', '.self::MACRO_URL_DECODE_VALUE.', '.self::MACRO_URL_ENCODE_VALUE.
+							', TEST, test',
+						'secondary' => base64_encode(self::USER_MACRO_VALUE).', '.self::MACRO_HTML_DECODE_VALUE.', '.
+							self::MACRO_HTML_ENCODE_VALUE.', '.self::MACRO_URL_DECODE_VALUE.', '.self::MACRO_URL_ENCODE_VALUE.
+							', TEST, test'
 					]
 				]
 			],
-			// #4 No arguments in regrepl() function.
+			// #4 No arguments or odd argument number in regrepl() function.
 			[
 				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
-						'id:primary_label' => '{'.self::USER_MACRO.'.regrepl()}',
+						'id:primary_label' => '{'.self::USER_MACRO.'.regrepl()}, {'.self::MACRO_CHAR.'.regrepl([a])}',
 						'id:secondary_label_type' => 'Text',
-						'id:secondary_label' => '{'.self::MACRO_CHAR.'.regrepl(  )}'
+						'id:secondary_label' => '{'.self::MACRO_CHAR.'.regrepl(  )}, {{ITEM.NAME}.regrepl(1,2,3)}'
 					],
 					'result' => [
-						'primary' => '*UNKNOWN*',
-						'secondary' => '*UNKNOWN*'
+						'primary' => '*UNKNOWN*, *UNKNOWN*',
+						'secondary' => '*UNKNOWN*, *UNKNOWN*'
 					]
 				]
 			],
-			// #5 Odd amount of arguments in regrepl() function.
+			// #6 Check that regrepl() works with digits, multiple byte characters and is case-sensitive.
 			[
 				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
-						'id:primary_label' => '{{ITEM.NAME}.regrepl(1,2,3)}',
-						'id:secondary_label_type' => 'Text',
-						'id:secondary_label' => '{'.self::MACRO_CHAR.'.regrepl([a])}'
-					],
-					'result' => [
-						'primary' => '*UNKNOWN*',
-						'secondary' => '*UNKNOWN*'
-					]
-				]
-			],
-			// #6 Macro function regrepl() with secret macro.
-			[
-				[
-					'fields' => [
-						'Advanced configuration' => true,
-						'id:primary_label_type' => 'Text',
-						'id:primary_label' => '{'.self::USER_SECRET_MACRO.'.regrepl([a], b)}',
-						'id:secondary_label_type' => 'Text',
-						'id:secondary_label' => '{'.self::USER_SECRET_MACRO.'.regrepl("test", b)}'
-					],
-					'result' => [
-						'primary' => '******',
-						'secondary' => '******'
-					]
-				]
-			],
-			// #7 Check that regrepl() is case sensitive.
-			[
-				[
-					'fields' => [
-						'Advanced configuration' => true,
-						'id:primary_label_type' => 'Text',
-						'id:primary_label' => '{'.self::USER_MACRO.'.regrepl([a-z], "")}',
-						'id:secondary_label_type' => 'Text',
-						'id:secondary_label' => '{'.self::USER_MACRO.'.regrepl([A-Z], 1)}'
-					],
-					'result' => [
-						'primary' => 'M 12345',
-						'secondary' => '1acro function test 12345'
-					]
-				]
-			],
-			// #8 Check regrepl() with digits and multiple byte characters.
-			[
-				[
-					'fields' => [
-						'Advanced configuration' => true,
-						'id:primary_label_type' => 'Text',
-						'id:primary_label' => '{'.self::USER_MACRO.'.regrepl([[:digit:]], /)}',
+						'id:primary_label' => '{'.self::USER_MACRO.'.regrepl([[:digit:]], /, [A-Z], \)}',
 						'id:secondary_label_type' => 'Text',
 						'id:secondary_label' => '{'.self::MACRO_CHAR.'.regrepl(🌴, 🌝, [а-я], Q, \d, 🌞)}'
 					],
 					'result' => [
-						'primary' => 'Macro function test /////',
+						'primary' => '\acro function test /////',
 						'secondary' => 'ТQQQ 🌞🌞🌞 ŽzŠsšĒĀīī 🌝🌝🌝'
 					]
 				]
-			]
+			],
+			// #7 Check tr() with .
 		];
 	}
 
