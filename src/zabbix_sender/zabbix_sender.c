@@ -620,7 +620,7 @@ static char	*connect_callback(void *data)
 static	ZBX_THREAD_ENTRY(send_value, args)
 {
 	zbx_thread_sendval_args	*sendval_args = (zbx_thread_sendval_args *)((zbx_thread_args_t *)args)->args;
-	int			ret;
+	int			ret = FAIL, retries = sendval_args->addrs->values_num;
 	char			*data = NULL;
 #if !defined(_WINDOWS)
 	zbx_addr_t		*last_addr;
