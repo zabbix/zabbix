@@ -825,6 +825,7 @@ typedef struct
 	int			sync_start_ts;
 
 	unsigned int		internal_actions;		/* number of enabled internal actions */
+	int		        itservices_num;
 
 	/* maintenance processing management */
 	unsigned char		maintenance_update;		/* flag to trigger maintenance update by timers  */

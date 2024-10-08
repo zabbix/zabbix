@@ -205,6 +205,8 @@ void	disconnect_server(zbx_socket_t *sock);
 int	get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);
 int	put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved, char **error);
 
+void	zbx_addrs_failover(zbx_vector_ptr_t *addrs);
+
 #ifdef HAVE_IPV6
 #	define zbx_getnameinfo(sa, host, hostlen, serv, servlen, flags)		\
 			getnameinfo(sa, AF_INET == (sa)->sa_family ?		\

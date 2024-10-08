@@ -192,7 +192,7 @@ if ($data['is_item_testable']) {
 			(new CLabel(_('Authentication protocol'), 'label-authprotocol'))
 				->addClass('js-popup-row-snmpv3-authprotocol'),
 			(new CFormField(
-				(new CSelect('interfaces[details][authprotocol]'))
+				(new CSelect('interface[details][authprotocol]'))
 					->setValue((int) $data['inputs']['interface']['details']['authprotocol'])
 					->setFocusableElementId('label-authprotocol')
 					->addOptions(CSelect::createOptionsFromArray(getSnmpV3AuthProtocols()))
@@ -213,7 +213,7 @@ if ($data['is_item_testable']) {
 
 			(new CLabel(_('Privacy protocol'), 'label-privprotocol'))->addClass('js-popup-row-snmpv3-privprotocol'),
 			(new CFormField(
-				(new CSelect('interfaces[details][privprotocol]'))
+				(new CSelect('interface[details][privprotocol]'))
 					->setValue((int) $data['inputs']['interface']['details']['privprotocol'])
 					->setFocusableElementId('label-privprotocol')
 					->addOptions(CSelect::createOptionsFromArray(getSnmpV3PrivProtocols()))

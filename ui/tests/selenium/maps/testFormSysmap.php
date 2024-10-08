@@ -18,7 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -27,8 +30,24 @@ use Facebook\WebDriver\WebDriverBy;
  */
 class testFormSysmap extends CLegacyWebTest {
 
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
+
 	public $mapName = 'Test map 1';
 	public $edit_map_name = 'Local network';
+
+	public static function allMaps() {
+		return CDBHelper::getDataProvider('SELECT * FROM sysmaps');
+	}
 
 	public function testFormSysmap_Layout() {
 		$this->zbxTestLogin('sysmaps.php?form=Create+map');
@@ -287,7 +306,8 @@ class testFormSysmap extends CLegacyWebTest {
 			$user_id = $this->zbxTestGetAttributeValue("//div[@id='userid']//li[@data-id]", 'data-id');
 		}
 
-		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
+		$this->query('xpath://div[contains(@class, tfoot-buttons)]/button[@id="add"]')->waitUntilClickable()->one()->click();
+		$this->assertMessage($data['expected']);
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
@@ -330,6 +350,49 @@ class testFormSysmap extends CLegacyWebTest {
 					$this->zbxTestDropdownAssertSelected('show_unack', $select['problem_display']);
 				}
 			}
+		}
+	}
+
+	public function testFormSysmap_CancelCreate() {
+		$old_hash = CDBHelper::getHash('SELECT * FROM sysmaps ORDER BY sysmapid');
+		$this->page->login()->open('sysmaps.php');
+		$this->query('button:Create map')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+
+		$this->query('button:Cancel')->one()->click();
+		$this->page->waitUntilReady();
+
+		// Check that user is returned to maps page.
+		$this->page->assertHeader('Maps');
+
+		$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM sysmaps ORDER BY sysmapid'));
+	}
+
+	/**
+	 * @dataProvider allMaps
+	 */
+	public function testFormSysmap_SimpleUpdateProperties($map) {
+		$sql_maps_elements = 'SELECT * FROM sysmaps sm INNER JOIN sysmaps_elements sme ON'.
+				' sme.sysmapid = sm.sysmapid ORDER BY sme.selementid';
+		$sql_links_triggers = 'SELECT * FROM sysmaps_links sl INNER JOIN sysmaps_link_triggers slt ON'.
+				' slt.linkid = sl.linkid ORDER BY slt.linktriggerid';
+		$hash_maps_elements = CDBHelper::getHash($sql_maps_elements);
+		$hash_links_triggers = CDBHelper::getHash($sql_links_triggers);
+
+		$this->page->login()->open('sysmaps.php')->waitUntilReady();
+		$this->getTable()->findRow('Name', $map['name'])->getColumn('Actions')->query('link:Properties')->one()->click();
+		$this->page->assertHeader('Network maps');
+		$this->query('button:Update')->one()->click();
+		$this->page->assertHeader('Maps');
+		$this->assertMessage(TEST_GOOD, 'Network map updated');
+
+		$hash_data = [
+			$hash_maps_elements => $sql_maps_elements,
+			$hash_links_triggers => $sql_links_triggers
+		];
+
+		foreach ($hash_data as $old => $new) {
+			$this->assertEquals($old, CDBHelper::getHash($new));
 		}
 	}
 

@@ -228,9 +228,9 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		self::$zoom_dashboardid = $dashboards['dashboardids'][0];
 
 		// Create events and problems.
-		foreach (['Trigger Riga', 'Trigger Tallin', 'Trigger Vilnius', 'Trigger Oslo', 'Trigger Bergen'] as $name) {
-			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE);
-		}
+		CDBHelper::setTriggerProblem(['Trigger Riga', 'Trigger Tallin', 'Trigger Vilnius', 'Trigger Oslo', 'Trigger Bergen'],
+				TRIGGER_VALUE_TRUE
+		);
 	}
 
 	public static function getZoomWidgetData() {
@@ -328,6 +328,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		});
 
 		foreach ($widgets as $widget) {
+			CDashboardElement::find()->one()->getWidget($widget)->waitUntilReady();
 			$id = $widget.' '.$data['Tile provider'];
 			$element = $this->query("xpath://div[@class=\"dashboard-grid-widget\"]//h4[text()=".
 					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one();
