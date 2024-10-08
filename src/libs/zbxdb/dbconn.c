@@ -15,7 +15,6 @@
 #include "dbconn.h"
 #include "zbxcommon.h"
 #include "zbxdb.h"
-#include "zbx_dbversion_constants.h"
 #include "zbxthreads.h"
 #include "zbxalgo.h"
 #include "zbxnum.h"

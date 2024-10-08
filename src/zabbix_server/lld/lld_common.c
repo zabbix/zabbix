@@ -15,7 +15,6 @@
 #include "lld.h"
 
 #include "../server_constants.h"
-#include "zbxdbhigh.h"
 #include "audit/zbxaudit.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
