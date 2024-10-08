@@ -153,8 +153,8 @@ class testEncryption extends CWebTest {
 	 */
 	public static function getAutoregistrationData() {
 		return [
-			// #0 Same identity as host, different PSK.
-			[
+			// Same identity as host, different PSK.
+			'Host idendity, new PSK' => [
 				[
 					'expected' => TEST_BAD,
 					'object' => 'configuration',
@@ -167,8 +167,8 @@ class testEncryption extends CWebTest {
 					'db_query' => 'SELECT * FROM config_autoreg_tls'
 				]
 			],
-			// #1 Same identity as host, same PSK.
-			[
+			// Same identity as host, same PSK.
+			'Host idendity, host PSK' => [
 				[
 					'object' => 'configuration',
 					'url' => 'zabbix.php?action=autoreg.edit',
@@ -179,8 +179,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #2 Different identity as host, same PSK.
-			[
+			// Different identity as host, same PSK.
+			'New idendity, host PSK' => [
 				[
 					'object' => 'configuration',
 					'url' => 'zabbix.php?action=autoreg.edit',
@@ -191,8 +191,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #3 Same identity as proxy, different PSK.
-			[
+			// Same identity as proxy, different PSK.
+			'Proxy idendity, new PSK' => [
 				[
 					'expected' => TEST_BAD,
 					'object' => 'configuration',
@@ -205,8 +205,8 @@ class testEncryption extends CWebTest {
 					'db_query' => 'SELECT * FROM config_autoreg_tls'
 				]
 			],
-			// #4 Same identity as proxy, same PSK.
-			[
+			// Same identity as proxy, same PSK.
+			'Proxy idendity, proxy PSK' => [
 				[
 					'object' => 'configuration',
 					'url' => 'zabbix.php?action=autoreg.edit',
@@ -217,8 +217,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #5 New proxy identity, same PSK.
-			[
+			// New proxy identity, same PSK.
+			'New idendity, proxy PSK' => [
 				[
 					'object' => 'configuration',
 					'url' => 'zabbix.php?action=autoreg.edit',
@@ -229,8 +229,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #6 Unique identity and PSK.
-			[
+			// Unique identity and PSK.
+			'New idendity, new PSK' => [
 				[
 					'object' => 'configuration',
 					'url' => 'zabbix.php?action=autoreg.edit',
@@ -257,8 +257,8 @@ class testEncryption extends CWebTest {
 
 	public static function getUpdateSameObjectData() {
 		return [
-			// #0 Same autoregistration identity, different PSK.
-			[
+			// Same autoregistration identity, different PSK.
+			'Autoregistration identity, new PSK' => [
 				[
 					'object' => 'configuration',
 					'url' => 'zabbix.php?action=autoreg.edit',
@@ -269,8 +269,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #1 New autoregistration identity but old PSK.
-			[
+			// New autoregistration identity but old PSK.
+			'New identity, autoregistration PSK' => [
 				[
 					'object' => 'configuration',
 					'url' => 'zabbix.php?action=autoreg.edit',
@@ -281,8 +281,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #2 Same host identity, different PSK.
-			[
+			// Same host identity, different PSK.
+			'Host identity, new PSK' => [
 				[
 					'object' => 'host',
 					'url' => 'zabbix.php?action=host.list',
@@ -293,8 +293,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #3 New host identity, same PSK.
-			[
+			// New host identity, same PSK.
+			'New identity, host PSK' => [
 				[
 					'object' => 'host',
 					'url' => 'zabbix.php?action=host.list',
@@ -305,8 +305,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #4 Same proxy identity, different PSK.
-			[
+			// Same proxy identity, different PSK.
+			'Proxy identity, new PSK' => [
 				[
 					'object' => 'proxy',
 					'url' => 'zabbix.php?action=proxy.list',
@@ -321,8 +321,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #5 New proxy identity, same PSK.
-			[
+			// New proxy identity, same PSK.
+			'New identity, proxy PSK' => [
 				[
 					'object' => 'proxy',
 					'url' => 'zabbix.php?action=proxy.list',
@@ -341,8 +341,7 @@ class testEncryption extends CWebTest {
 	}
 
 	/**
-	 * Function for testing PSK update in Autoregistration, Hosts and Proxies,
-	 * where one field remains as is, and the second field changes.
+	 * Function for testing encryption update in Autoregistration, Hosts and Proxies.
 	 *
 	 * @dataProvider getUpdateSameObjectData
 	 *
@@ -355,8 +354,8 @@ class testEncryption extends CWebTest {
 	public static function getHostProxyData() {
 		return [
 			// Create/update Hosts.
-			// #0 Existing identity on other host and different PSK.
-			[
+			// Existing identity on other host and different PSK.
+			'Host: Host identity, new PSK' => [
 				[
 					'expected' => TEST_BAD,
 					'object' => 'host',
@@ -374,8 +373,8 @@ class testEncryption extends CWebTest {
 					'message_parameter' => '/1/tls_psk'
 				]
 			],
-			// #1 Same existing identity on other host and the same PSK.
-			[
+			// Same existing identity on other host and the same PSK.
+			'Host: Host identity, host PSK' => [
 				[
 					'object' => 'host',
 					'url' => 'zabbix.php?action=host.list',
@@ -390,8 +389,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #2 Different identity on other host and the same PSK.
-			[
+			// Different identity on other host and the same PSK.
+			'Host: New identity, host PSK' => [
 				[
 					'object' => 'host',
 					'url' => 'zabbix.php?action=host.list',
@@ -406,8 +405,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #3 Existing identity on proxy and different PSK.
-			[
+			// Existing identity on proxy and different PSK.
+			'Host: Proxy identity, new PSK' => [
 				[
 					'expected' => TEST_BAD,
 					'object' => 'host',
@@ -425,8 +424,8 @@ class testEncryption extends CWebTest {
 					'message_parameter' => '/1/tls_psk'
 				]
 			],
-			// #4 Same existing identity on proxy and same PSK.
-			[
+			// Same existing identity on proxy and same PSK.
+			'Host: Proxy identity, proxy PSK' => [
 				[
 					'object' => 'host',
 					'url' => 'zabbix.php?action=host.list',
@@ -441,8 +440,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #5 Different identity on other proxy and the same PSK.
-			[
+			// Different identity on other proxy and the same PSK.
+			'Host: New identity, proxy PSK' => [
 				[
 					'object' => 'host',
 					'url' => 'zabbix.php?action=host.list',
@@ -457,8 +456,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #6 Same autoregistration identity and different PSK.
-			[
+			// Same autoregistration identity and different PSK.
+			'Host: Autoregistration identity, new PSK' => [
 				[
 					'expected' => TEST_BAD,
 					'object' => 'host',
@@ -476,8 +475,8 @@ class testEncryption extends CWebTest {
 					'message_parameter' => '/1/tls_psk'
 				]
 			],
-			// #7 Same autoregistration identity and same PSK.
-			[
+			// Same autoregistration identity and same PSK.
+			'Host: Autoregistration identity and PSK' => [
 				[
 					'object' => 'host',
 					'url' => 'zabbix.php?action=host.list',
@@ -492,8 +491,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #8 Different autoregistration identity and same PSK.
-			[
+			// Different autoregistration identity and same PSK.
+			'Host: New identity, autoregistration PSK' => [
 				[
 					'object' => 'host',
 					'url' => 'zabbix.php?action=host.list',
@@ -508,8 +507,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #9 Unique host identity and unique PSK.
-			[
+			// Unique host identity and unique PSK.
+			'Host: New identity, new PSK' => [
 				[
 					'object' => 'host',
 					'url' => 'zabbix.php?action=host.list',
@@ -525,8 +524,8 @@ class testEncryption extends CWebTest {
 				]
 			],
 			// Create/update Proxies.
-			// #10 Existing identity on other host and different PSK.
-			[
+			// Existing identity on other host and different PSK.
+			'Proxy: host identity, new PSK' => [
 				[
 					'expected' => TEST_BAD,
 					'object' => 'proxy',
@@ -544,8 +543,8 @@ class testEncryption extends CWebTest {
 					'message_parameter' => '/1/tls_psk'
 				]
 			],
-			// #11 Same existing identity on other host and the same PSK.
-			[
+			// Same existing identity on other host and the same PSK.
+			'Proxy: host identity, host PSK' => [
 				[
 					'object' => 'proxy',
 					'url' => 'zabbix.php?action=proxy.list',
@@ -560,8 +559,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #12 Different identity on other host and the same PSK.
-			[
+			// Different identity on other host and the same PSK.
+			'Proxy: new identity, host PSK' => [
 				[
 					'object' => 'proxy',
 					'url' => 'zabbix.php?action=proxy.list',
@@ -576,8 +575,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #13 Existing identity on proxy and different PSK.
-			[
+			// Existing identity on proxy and different PSK.
+			'Proxy: proxy identity, new PSK' => [
 				[
 					'expected' => TEST_BAD,
 					'object' => 'proxy',
@@ -595,8 +594,8 @@ class testEncryption extends CWebTest {
 					'message_parameter' => '/1/tls_psk'
 				]
 			],
-			// #14 Same existing identity on proxy and same PSK.
-			[
+			// Same existing identity on proxy and same PSK.
+			'Proxy: proxy identity, proxy PSK' => [
 				[
 					'object' => 'proxy',
 					'url' => 'zabbix.php?action=proxy.list',
@@ -611,8 +610,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #15 Different identity on other proxy and the same PSK.
-			[
+			// Different identity on other proxy and the same PSK.
+			'Proxy: new identity, proxy PSK' => [
 				[
 					'object' => 'proxy',
 					'url' => 'zabbix.php?action=proxy.list',
@@ -627,8 +626,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #16 Same autoregistration identity and different PSK.
-			[
+			// Same autoregistration identity and different PSK.
+			'Proxy: autoregistration identity, new PSK' => [
 				[
 					'expected' => TEST_BAD,
 					'object' => 'proxy',
@@ -646,8 +645,8 @@ class testEncryption extends CWebTest {
 					'message_parameter' => '/1/tls_psk'
 				]
 			],
-			// #17 Same autoregistration identity and same PSK.
-			[
+			// Same autoregistration identity and same PSK.
+			'Proxy: autoregistration identity and PSK' => [
 				[
 					'object' => 'proxy',
 					'url' => 'zabbix.php?action=proxy.list',
@@ -662,8 +661,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #18 Different autoregistration identity and same PSK.
-			[
+			// Different autoregistration identity and same PSK.
+			'Proxy: new identity, autoregistration PSK' => [
 				[
 					'object' => 'proxy',
 					'url' => 'zabbix.php?action=proxy.list',
@@ -678,8 +677,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #19 Unique proxy identity and  PSK.
-			[
+			// Unique proxy identity and PSK.
+			'Proxy: new identity, new PSK' => [
 				[
 					'object' => 'proxy',
 					'url' => 'zabbix.php?action=proxy.list',
@@ -698,6 +697,8 @@ class testEncryption extends CWebTest {
 	}
 
 	/**
+	 * Test function for creating encryption on Hosts or Proxies.
+	 *
 	 * @dataProvider getHostProxyData
 	 *
 	 * @onBeforeOnce prepareAutoregistrationData
@@ -707,6 +708,8 @@ class testEncryption extends CWebTest {
 	}
 
 	/**
+	 * Test function for changing encryption on all objects - Hosts, Proxies, Autoregistariong config.
+	 *
 	 * @dataProvider getHostProxyData
 	 * @dataProvider getAutoregistrationData
 	 *
@@ -716,6 +719,13 @@ class testEncryption extends CWebTest {
 		$this->checkEncryption($data, true);
 	}
 
+	/**
+	 * Function for testing encryption fields in Autoregistration, Hosts and Proxies.
+	 *
+	 * @param array   $data      data provider
+	 * @param boolean $update    true if encryption is being updated, false - if creating new
+	 * @param boolean $same      true if encryption is changed on the same object, false if on other object
+	 */
 	public function checkEncryption($data, $update = false, $same = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash($data['db_query']);
@@ -805,8 +815,8 @@ class testEncryption extends CWebTest {
 
 	public static function getMassUpdateData() {
 		return [
-			// #0 Update two hosts without encryption to existing identity but wrong PSK.
-			[
+			// Update two hosts without encryption to existing identity but wrong PSK.
+			'No encrypton: host identity, new PSK' => [
 				[
 					'expected' => TEST_BAD,
 					'hosts' => [
@@ -820,8 +830,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #1 Update two hosts with encryption to existing identity but wrong PSK.
-			[
+			// Update two hosts with encryption to existing identity but wrong PSK.
+			'With encryption: host identity, new PSK' => [
 				[
 					'expected' => TEST_BAD,
 					'hosts' => [
@@ -835,8 +845,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #2 Update two hosts (one with encryption, one - no encryption) to existing identity but wrong PSK.
-			[
+			// Update two hosts (one with encryption, one - no encryption) to existing identity but wrong PSK.
+			'Mixed encryption: host identity, wrong PSK' => [
 				[
 					'expected' => TEST_BAD,
 					'hosts' => [
@@ -850,8 +860,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #3 Update two hosts (one with encryption, one - no encryption) to same identity and same PSK.
-			[
+			// Update two hosts (one with encryption, one - no encryption) to same identity and same PSK.
+			'Mixed encryption: host identity, host PSK' => [
 				[
 					'hosts' => [
 						'1 Host for mass update',
@@ -864,8 +874,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #4 Update two hosts (one with encryption, one - no encryption) to same identity and new PSK.
-			[
+			// Update two hosts (one with encryption, one - no encryption) to same identity and new PSK.
+			'Mixed encryption: host identity, new PSK' => [
 				[
 					'hosts' => [
 						'5 Host for mass update',
@@ -878,8 +888,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #5 Update hosts with different encryption to same identity and new PSK.
-			[
+			// Update three hosts with encryption to same identity and new PSK.
+			'With encryption: host identity, new PSK' => [
 				[
 					'hosts' => [
 						'1 Host for mass update',
@@ -893,8 +903,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #6 Update two hosts with encryption to "No encryption".
-			[
+			// Update two hosts with encryption to "No encryption".
+			'With encryption: no encryption' => [
 				[
 					'hosts' => [
 						'1 Host for mass update',
@@ -906,8 +916,8 @@ class testEncryption extends CWebTest {
 					]
 				]
 			],
-			// #7 Update two hosts without encryption to new existing host identity and PSK.
-			[
+			// Update two hosts without encryption to new existing host identity and PSK.
+			'No encryption: host identity and PSK' => [
 				[
 					'hosts' => [
 						'1 Host for mass update',
@@ -924,6 +934,8 @@ class testEncryption extends CWebTest {
 	}
 
 	/**
+	 * Test for changing PSK encryption in hosts mass update.
+	 *
 	 * @dataProvider getMassUpdateData
 	 */
 	public function testEncryption_MassUpdate($data) {
