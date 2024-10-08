@@ -29,6 +29,7 @@
 #include "zbxjson.h"
 #include "zbxproxybuffer.h"
 #include "zbxcacheconfig.h"
+#include "zbxdb.h"
 #include "zbxdbhigh.h"
 
 #define ZBX_DATASENDER_AVAILABILITY		0x0001
