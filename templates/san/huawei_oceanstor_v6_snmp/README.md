@@ -3,7 +3,7 @@
 
 ## Overview
 
-The template to monitor SAN Huawei OceanStor V6 by Zabbix SNMP agent.
+This template is developed to monitor SAN Huawei OceanStor V6 via the Zabbix SNMP agent.
 
 ## Requirements
 
@@ -20,7 +20,7 @@ This template has been tested on:
 
 ## Setup
 
-1\. Create a host for Huawei OceanStor V6 with controller management IP as SNMP interface.
+1\. Create a host for Huawei OceanStor V6 with the controller management IP as the SNMP interface.
 
 2\. Link the template to the host.
 
@@ -30,15 +30,15 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$CPU.UTIL.CRIT}|<p>The critical threshold of the CPU utilization expressed in %.</p>|`90`|
+|{$CPU.UTIL.CRIT}|<p>The critical threshold of CPU utilization expressed in %.</p>|`90`|
 |{$HUAWEI.OCEANSTOR_V6.MEM.MAX.WARN}|<p>Maximum percentage of memory used.</p>|`90`|
 |{$HUAWEI.OCEANSTOR_V6.MEM.MAX.TIME}|<p>The time during which memory usage may exceed the threshold.</p>|`5m`|
-|{$HUAWEI.OCEANSTOR_V6.TEMP.MAX.WARN}|<p>Maximum temperature of enclosure.</p>|`35`|
-|{$HUAWEI.OCEANSTOR_V6.TEMP.MAX.TIME}|<p>The time during which temperature of enclosure may exceed the threshold.</p>|`3m`|
-|{$HUAWEI.OCEANSTOR_V6.DISK.TEMP.MAX.WARN}|<p>Maximum temperature of disk. Can be used with {#MODEL} as context.</p>|`45`|
-|{$HUAWEI.OCEANSTOR_V6.DISK.TEMP.MAX.TIME}|<p>The time during which temperature of disk may exceed the threshold.</p>|`5m`|
-|{$HUAWEI.OCEANSTOR_V6.LUN.IO.TIME.MAX.WARN}|<p>Maximum average I/O response time of LUN in seconds.</p>|`0.0001`|
-|{$HUAWEI.OCEANSTOR_V6.LUN.IO.TIME.MAX.TIME}|<p>The time during which average I/O response time of LUN may exceed the threshold.</p>|`5m`|
+|{$HUAWEI.OCEANSTOR_V6.TEMP.MAX.WARN}|<p>Maximum enclosure temperature.</p>|`35`|
+|{$HUAWEI.OCEANSTOR_V6.TEMP.MAX.TIME}|<p>The time during which the enclosure temperature may exceed the threshold.</p>|`3m`|
+|{$HUAWEI.OCEANSTOR_V6.DISK.TEMP.MAX.WARN}|<p>Maximum disk temperature. Can be used with `{#MODEL}` as context.</p>|`45`|
+|{$HUAWEI.OCEANSTOR_V6.DISK.TEMP.MAX.TIME}|<p>The time during which the disk temperature may exceed the threshold.</p>|`5m`|
+|{$HUAWEI.OCEANSTOR_V6.LUN.IO.TIME.MAX.WARN}|<p>Maximum average I/O response time of a LUN in seconds.</p>|`0.0001`|
+|{$HUAWEI.OCEANSTOR_V6.LUN.IO.TIME.MAX.TIME}|<p>The time during which the average I/O response time of a LUN may exceed the threshold.</p>|`5m`|
 |{$SNMP.TIMEOUT}||`5m`|
 |{$ICMP_LOSS_WARN}||`20`|
 |{$ICMP_RESPONSE_TIME_WARN}||`0.15`|
@@ -47,7 +47,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Huawei OceanStor V6: Status|<p>System running status.</p>|SNMP agent|huawei.oceanstor.v6.status<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Huawei OceanStor V6: Status|<p>System status.</p>|SNMP agent|huawei.oceanstor.v6.status<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Huawei OceanStor V6: Version|<p>The device version.</p>|SNMP agent|huawei.oceanstor.v6.version<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Huawei OceanStor V6: Capacity total|<p>Total capacity of a device.</p>|SNMP agent|huawei.oceanstor.v6.capacity.total<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Huawei OceanStor V6: Capacity used|<p>Used capacity of a device.</p>|SNMP agent|huawei.oceanstor.v6.capacity.used<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li></ul>|
@@ -86,8 +86,8 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Huawei OceanStor V6: Controller [{#ID}]: CPU utilization|<p>CPU usage of a controller {#ID}.</p>|SNMP agent|huawei.oceanstor.v6.controller.cpu["{#ID}"]|
-|Huawei OceanStor V6: Controller [{#ID}]: Memory utilization|<p>Memory usage of a controller {#ID}.</p>|SNMP agent|huawei.oceanstor.v6.controller.memory["{#ID}"]|
+|Huawei OceanStor V6: Controller [{#ID}]: CPU utilization|<p>CPU utilization of the controller.</p>|SNMP agent|huawei.oceanstor.v6.controller.cpu["{#ID}"]|
+|Huawei OceanStor V6: Controller [{#ID}]: Memory utilization|<p>Memory utilization of the controller.</p>|SNMP agent|huawei.oceanstor.v6.controller.memory["{#ID}"]|
 |Huawei OceanStor V6: Controller [{#ID}]: Health status|<p>Controller health status.</p>|SNMP agent|huawei.oceanstor.v6.controller.health_status["{#ID}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Huawei OceanStor V6: Controller [{#ID}]: Running status|<p>Controller running status.</p>|SNMP agent|huawei.oceanstor.v6.controller.running_status["{#ID}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Huawei OceanStor V6: Controller [{#ID}]: Role|<p>Controller role.</p>|SNMP agent|huawei.oceanstor.v6.controller.role["{#ID}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
@@ -128,27 +128,27 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Fan discovery|<p>Discovery of FANs.</p>|SNMP agent|huawei.oceanstor.v6.fan.discovery|
+|Fan discovery|<p>Discovery of fans.</p>|SNMP agent|huawei.oceanstor.v6.fan.discovery|
 
 ### Item prototypes for Fan discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Huawei OceanStor V6: FAN [{#ID}] on [{#LOCATION}]: Health status|<p>Health status of a fan.</p>|SNMP agent|huawei.oceanstor.v6.fan.health_status["{#ID}:{#LOCATION}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Huawei OceanStor V6: FAN [{#ID}] on [{#LOCATION}]: Running status|<p>Operating status of a fan.</p>|SNMP agent|huawei.oceanstor.v6.fan.running_status["{#ID}:{#LOCATION}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Huawei OceanStor V6: Fan [{#ID}] on [{#LOCATION}]: Health status|<p>Health status of a fan.</p>|SNMP agent|huawei.oceanstor.v6.fan.health_status["{#ID}:{#LOCATION}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Huawei OceanStor V6: Fan [{#ID}] on [{#LOCATION}]: Running status|<p>Operating status of a fan.</p>|SNMP agent|huawei.oceanstor.v6.fan.running_status["{#ID}:{#LOCATION}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for Fan discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Huawei OceanStor V6: FAN [{#ID}] on [{#LOCATION}]: Health status is not Normal||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.fan.health_status["{#ID}:{#LOCATION}"])<>1`|High||
-|Huawei OceanStor V6: FAN [{#ID}] on [{#LOCATION}]: Running status is not Running||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.fan.running_status["{#ID}:{#LOCATION}"])<>2`|Average||
+|Huawei OceanStor V6: Fan [{#ID}] on [{#LOCATION}]: Health status is not Normal||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.fan.health_status["{#ID}:{#LOCATION}"])<>1`|High||
+|Huawei OceanStor V6: Fan [{#ID}] on [{#LOCATION}]: Running status is not Running||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.fan.running_status["{#ID}:{#LOCATION}"])<>2`|Average||
 
 ### LLD rule BBU discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|BBU discovery|<p>Discovery of BBU.</p>|SNMP agent|huawei.oceanstor.v6.bbu.discovery|
+|BBU discovery|<p>Discovery of BBUs.</p>|SNMP agent|huawei.oceanstor.v6.bbu.discovery|
 
 ### Item prototypes for BBU discovery
 
@@ -190,13 +190,13 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Node performance discovery|<p>Discovery of nodes performance counters.</p>|SNMP agent|huawei.oceanstor.v6.node.discovery|
+|Node performance discovery|<p>Discovery of node performance counters.</p>|SNMP agent|huawei.oceanstor.v6.node.discovery|
 
 ### Item prototypes for Node performance discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Huawei OceanStor V6: Node [{#NODE}]: CPU utilization|<p>CPU usage of the node {#NODE}.</p>|SNMP agent|huawei.oceanstor.v6.node.cpu["{#NODE}"]|
+|Huawei OceanStor V6: Node [{#NODE}]: CPU utilization|<p>CPU utilization of the node.</p>|SNMP agent|huawei.oceanstor.v6.node.cpu["{#NODE}"]|
 |Huawei OceanStor V6: Node [{#NODE}]: Total I/O per second|<p>Total IOPS of the node.</p>|SNMP agent|huawei.oceanstor.v6.node.iops.total["{#NODE}"]|
 |Huawei OceanStor V6: Node [{#NODE}]: Read operations per second|<p>Read IOPS of the node.</p>|SNMP agent|huawei.oceanstor.v6.node.iops.read["{#NODE}"]|
 |Huawei OceanStor V6: Node [{#NODE}]: Write operations per second|<p>Write IOPS of the node.</p>|SNMP agent|huawei.oceanstor.v6.node.iops.write["{#NODE}"]|
