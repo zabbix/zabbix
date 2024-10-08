@@ -21,7 +21,7 @@
 	span {
 		position: relative;
 		display: block;
-		padding: 12px 14px 12px 45px;
+		padding: 12px 34px 12px 44px;
 		font-size: 12px;
 		white-space: nowrap;
 		border-left: 3px solid transparent;
@@ -97,11 +97,11 @@
 		& > a {
 			&::after {
 				@extend %icons-font;
-				position: relative;
-				float: right;
-				top: 4px;
+				position: absolute;
+				top: 17px;
+				right: 13px;
 				font-size: $icon-medium-size * .5;
-				content: $zi-chevron-down;
+				content: $zi-chevron-down-thin;
 				transform: rotate(0deg);
 
 				@if $ui-transitions {
@@ -155,7 +155,7 @@
 		}
 
 		a {
-			padding: 8px 20px;
+			padding: 8px 34px 8px 20px;
 			background: $menu-user-submenu-bg-color;
 			color: $menu-user-submenu-color;
 
@@ -230,6 +230,7 @@
 			& > a {
 				&::after {
 					transform: rotate(90deg);
+					top: 11px;
 				}
 			}
 

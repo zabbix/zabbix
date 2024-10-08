@@ -2625,9 +2625,9 @@ button {
       border-left-color: #ffffff;
       color: #ffffff; }
 .menu-main .has-submenu > a::after {
-  position: relative;
-  float: right;
-  top: 4px;
+  position: absolute;
+  top: 17px;
+  right: 13px;
   font-size: 8px;
   content: "";
   transform: rotate(0deg);
@@ -2647,7 +2647,7 @@ button {
 .menu-main a {
   position: relative;
   display: block;
-  padding: 12px 14px 12px 44px;
+  padding: 12px 34px 12px 44px;
   font-size: 14px;
   line-height: inherit;
   white-space: nowrap;
@@ -2682,7 +2682,7 @@ button {
     font-size: 16px;
     color: inherit; }
   .menu-main .submenu a {
-    padding: 8px 20px;
+    padding: 8px 34px 8px 20px;
     font-size: 12px;
     background: #0e354d;
     color: #ebeef0; }
@@ -2722,7 +2722,8 @@ button {
     .menu-main .submenu .submenu::before, .menu-main .submenu .submenu::after {
       display: none; }
   .menu-main .submenu .has-submenu > a::after {
-    transform: rotate(90deg); }
+    transform: rotate(90deg);
+    top: 11px; }
   .menu-main .submenu .has-submenu:not(.is-expanded) a::after {
     transform: rotate(-90deg); }
   .menu-main .submenu .has-submenu:not(.is-expanded) .submenu {
@@ -2741,7 +2742,7 @@ button {
   .menu-user span {
     position: relative;
     display: block;
-    padding: 12px 14px 12px 45px;
+    padding: 12px 34px 12px 44px;
     font-size: 12px;
     white-space: nowrap;
     border-left: 3px solid transparent;
@@ -2773,11 +2774,11 @@ button {
   .menu-user > li:not(.is-expanded) .submenu {
     max-height: 0 !important; }
   .menu-user .has-submenu > a::after {
-    position: relative;
-    float: right;
-    top: 4px;
+    position: absolute;
+    top: 17px;
+    right: 13px;
     font-size: 8px;
-    content: "";
+    content: "";
     transform: rotate(0deg);
     transition: transform 0.3s; }
   .menu-user .has-submenu.is-expanded > a::after {
@@ -2804,7 +2805,7 @@ button {
       margin-right: 8px;
       color: inherit; }
     .menu-user .submenu a {
-      padding: 8px 20px;
+      padding: 8px 34px 8px 20px;
       background: #0e354d;
       color: #ebeef0; }
       .menu-user .submenu a:hover, .menu-user .submenu a:focus {
@@ -2843,7 +2844,8 @@ button {
       .menu-user .submenu .submenu::before, .menu-user .submenu .submenu::after {
         display: none; }
     .menu-user .submenu .has-submenu > a::after {
-      transform: rotate(90deg); }
+      transform: rotate(90deg);
+      top: 11px; }
     .menu-user .submenu .has-submenu:not(.is-expanded) a::after {
       transform: rotate(-90deg); }
     .menu-user .submenu .has-submenu:not(.is-expanded) .submenu {
