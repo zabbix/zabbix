@@ -272,6 +272,7 @@ void	zbx_dbconn_extract_version_info(zbx_dbconn_t *db, struct zbx_db_version_inf
 			version_info->min_version, version_info->max_version, version_info->min_supported_version);
 
 #else
+	ZBX_UNUSED(db);
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 	version_info->flag = DB_VERSION_SUPPORTED;
 	version_info->friendly_current_version = NULL;
