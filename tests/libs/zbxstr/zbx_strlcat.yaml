@@ -9,11 +9,11 @@ out:
 ---
 test case: "2. Numeric string"
 in:
-  src: "1E02 1E+02"
-  dst: ""
-  size: 6
+  src: " 1E02 1E+02"
+  dst: "1E02"
+  size: 16
 out:
-  result: "1E02 "
+  result: "1E02 1E02 1E+02"
 ---
 test case: "3. Empty string"
 in:

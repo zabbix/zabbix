@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include <sys/procfs.h>
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
@@ -28,8 +29,8 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
+	dest = (char *)realloc(dest, MAX_STRING_LEN);
 	zbx_strlcat(dest, src, size);
-	zbx_replace_invalid_utf8(dest);
 	zbx_mock_assert_str_eq("return value", exp_result, dest);
 	zbx_free(dest);
 }
