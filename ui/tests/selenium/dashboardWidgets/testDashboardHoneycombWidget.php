@@ -2392,7 +2392,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			// #0 Built-in macro with non-argument functions.
+			// #2 Built-in macro with non-argument functions.
 			[
 				[
 					'fields' => [
@@ -2414,7 +2414,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			// #1 User macro with non-argument functions.
+			// #3 User macro with non-argument functions.
 			[
 				[
 					'fields' => [
@@ -2440,23 +2440,27 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			// #4 No arguments or odd argument number in regrepl() function.
+			// #4 Wrong, missing or odd argument number in regrepl(), tr(), regsub(), irregsub() functions.
 			[
 				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
-						'id:primary_label' => '{'.self::USER_MACRO.'.regrepl()}, {'.self::MACRO_CHAR.'.regrepl([a])}',
+						'id:primary_label' => '{'.self::USER_MACRO.'.regrepl()}, {'.self::MACRO_CHAR.'.regrepl([a])}, '.
+							'{'.self::USER_MACRO.'.tr()}, {'.self::USER_MACRO.'.tr(z-a,Z-A)}, {'.self::USER_MACRO.'.tr(1,2,3)}'.
+							', {'.self::USER_MACRO.'.regsub()}, {'.self::USER_MACRO.'.irregsub()}',
 						'id:secondary_label_type' => 'Text',
-						'id:secondary_label' => '{'.self::MACRO_CHAR.'.regrepl(  )}, {{ITEM.NAME}.regrepl(1,2,3)}'
+						'id:secondary_label' => '{'.self::USER_MACRO.'.regrepl()}, {'.self::MACRO_CHAR.'.regrepl([a])}, '.
+							'{'.self::USER_MACRO.'.tr()}, {'.self::USER_MACRO.'.tr(z-a,Z-A)}, {'.self::USER_MACRO.'.tr(1,2,3)}'.
+							', {'.self::USER_MACRO.'.regsub()}, {'.self::USER_MACRO.'.irregsub()}',
 					],
 					'result' => [
-						'primary' => '*UNKNOWN*, *UNKNOWN*',
-						'secondary' => '*UNKNOWN*, *UNKNOWN*'
+						'primary' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*',
+						'secondary' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*'
 					]
 				]
 			],
-			// #6 Check that regrepl() works with digits, multiple byte characters and is case-sensitive.
+			// #5 Check that regrepl() works with digits, multiple byte characters and is case-sensitive.
 			[
 				[
 					'fields' => [
@@ -2472,7 +2476,57 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			// #7 Check tr() with .
+			// #6 Check that regrepl() with too many processed data is not breaking the widget.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{'.self::USER_MACRO.''.
+							'.regrepl(1{0}, test, 1{0}, test, 1{0},test, 1{0}, test, 1{0}, test, 1{0}, test)}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{'.self::USER_MACRO.''.
+							'.regrepl(1{0}, test, 1{0}, test, 1{0},test, 1{0}, test, 1{0}, test, 1{0}, test)}',
+					],
+					'result' => [
+						'primary' => '*UNKNOWN*',
+						'secondary' => '*UNKNOWN*'
+					]
+				]
+			],
+			// #7 Check that tr(), uppercase(), lowercase() are not working with non-ascii.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{'.self::MACRO_CHAR.'.tr(0-9, Ī)}, {'.self::MACRO_CHAR.'.lowercase()}, '.
+							'{'.self::MACRO_CHAR.'.uppercase()}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{'.self::MACRO_CHAR.'.regrepl(🌴, 🌝, [а-я], Q, \d, 🌞)}'
+					],
+					'result' => [
+						'primary' => 'Тест ??? ŽzŠsšĒĀīī 🌴🌴🌴, Тест 123 ŽzŠsšĒĀīī 🌴🌴🌴, Тест 123 ŽZŠSšĒĀīī 🌴🌴🌴',
+						'secondary' => 'Тест ??? ŽzŠsšĒĀīī 🌴🌴🌴, Тест 123 ŽzŠsšĒĀīī 🌴🌴🌴, Тест 123 ŽZŠSšĒĀīī 🌴🌴🌴'
+					]
+				]
+			],
+			// #8 Check example of tr() function with escaping, range and characters.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{'.self::MACRO_URL_ENCODE.'.tr("\/","\"")}, {'.self::MACRO_CHAR.'.tr(0-9abcA-L,*)}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{'.self::MACRO_URL_ENCODE.'.tr("\/","\"")}, {'.self::MACRO_CHAR.'.tr(0-9abcA-L,*)}'
+					],
+					'result' => [
+						'primary' => 'h:""test.com"macro?functions=urlencode&urld=a, Тест *** ŽzŠsšĒĀīī 🌴🌴🌴',
+						'secondary' => 'h:""test.com"macro?functions=urlencode&urld=a, Тест *** ŽzŠsšĒĀīī 🌴🌴🌴'
+					]
+				]
+			],
 		];
 	}
 
