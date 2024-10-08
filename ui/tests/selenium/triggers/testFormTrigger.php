@@ -1374,7 +1374,6 @@ class testFormTrigger extends CLegacyWebTest {
 		COverlayDialogElement::ensureNotPresent();
 
 		// Get the saved trigger's ID from UI.
-		$link = CTestArrayHelper::get($data, 'form_data.Name', CTestArrayHelper::get($data, 'link_name'));
 		$link = (array_key_exists('form_data', $data)) ? $data['form_data']['Name'] : $data['link_name'];
 		$triggerid = $this->page->query('link', $link)->one()->getAttribute('data-triggerid');
 
