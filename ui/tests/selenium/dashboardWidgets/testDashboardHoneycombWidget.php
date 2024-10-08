@@ -58,6 +58,14 @@ class testDashboardHoneycombWidget extends testWidgets {
 	 */
 	protected static $disposable_dashboard_id;
 
+	const DASHBOARD_FOR_MACRO_FUNCTIONS = 'Dashboard for testing macro functions';
+	const WIDGET_FOR_MACRO_FUNCTIONS = 'Widget for testing macro functions';
+	const USER_MACRO = '{$USER.MACRO}';
+	const USER_MACRO_VALUE = 'Macro function test 12345';
+	const USER_SECRET_MACRO = '{$SECRET.MACRO}';
+	const MACRO_CHAR = '{$MACRO.CHAR}';
+	const MACRO_CHAR_VALUE = 'Тест 123 ŽzŠsšĒĀīī 🌴🌴🌴';
+
 	public static function prepareHoneycombWidgetData() {
 		CDataHelper::call('hostgroup.create', [
 			[
@@ -694,6 +702,31 @@ class testDashboardHoneycombWidget extends testWidgets {
 						]
 					]
 				]
+			],
+			[
+				'name' => self::DASHBOARD_FOR_MACRO_FUNCTIONS,
+				'auto_start' => 0,
+				'pages' => [
+					[
+						'widgets' => [
+							[
+								'type' => 'honeycomb',
+								'name' => self::WIDGET_FOR_MACRO_FUNCTIONS,
+								'x' => 0,
+								'y' => 0,
+								'width' => 12,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'items.4',
+										'value' => 'Display item 5'
+									]
+								]
+							]
+						]
+					]
+				]
 			]
 		]);
 		self::$dashboardid = CDataHelper::getIds('name');
@@ -707,6 +740,19 @@ class testDashboardHoneycombWidget extends testWidgets {
 				'macro' => '{$SECRET_TEXT}',
 				'type' => 1,
 				'value' => 'secret_macro'
+			],
+			[
+				'macro' => self::USER_MACRO,
+				'value' => self::USER_MACRO_VALUE
+			],
+			[
+				'macro' => self::USER_SECRET_MACRO,
+				'type' => 1,
+				'value' => self::USER_MACRO_VALUE
+			],
+			[
+				'macro' => self::MACRO_CHAR,
+				'value' => self::MACRO_CHAR_VALUE
 			]
 		]);
 	}
@@ -2272,6 +2318,171 @@ class testDashboardHoneycombWidget extends testWidgets {
 		$filtered = $dashboard->getWidget('UpdateHoneycomb')->getContent()->query('class', 'svg-honeycomb-content')
 				->all()->asText();
 		$this->assertEquals($data['filtered_items'], $filtered);
+	}
+
+	public static function getMacroFunctions() {
+		return [
+			// #0 Built-in macro with btoa() function.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{{ITEM.NAME}.btoa()}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{{ITEM.NAME}.btoa()}'
+					],
+					'result' => [
+						'primary' => base64_encode('Display item 5'),
+						'secondary' => base64_encode('Display item 5')
+					]
+				]
+			],
+			// #1 User macro with btoa() function.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{'.self::USER_MACRO.'.btoa()}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{'.self::USER_MACRO.'.btoa()}'
+					],
+					'result' => [
+						'primary' => base64_encode(self::USER_MACRO_VALUE),
+						'secondary' => base64_encode(self::USER_MACRO_VALUE)
+					]
+				]
+			],
+			// #2 Secret macro with btoa() function.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{'.self::USER_SECRET_MACRO.'.btoa()}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{'.self::USER_SECRET_MACRO.'.btoa()}'
+					],
+					'result' => [
+						'primary' => 'KioqKioq',
+						'secondary' => 'KioqKioq'
+					]
+				]
+			],
+			// #3 Incorrectly used btoa() function.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{'.self::USER_MACRO.'.btoa(,\/)}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{'.self::USER_SECRET_MACRO.'.btoa("test")}'
+					],
+					'result' => [
+						'primary' => '*UNKNOWN*',
+						'secondary' => '*UNKNOWN*'
+					]
+				]
+			],
+			// #4 No arguments in regrepl() function.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{'.self::USER_MACRO.'.regrepl()}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{'.self::MACRO_CHAR.'.regrepl(  )}'
+					],
+					'result' => [
+						'primary' => '*UNKNOWN*',
+						'secondary' => '*UNKNOWN*'
+					]
+				]
+			],
+			// #5 Odd amount of arguments in regrepl() function.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{{ITEM.NAME}.regrepl(1,2,3)}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{'.self::MACRO_CHAR.'.regrepl([a])}'
+					],
+					'result' => [
+						'primary' => '*UNKNOWN*',
+						'secondary' => '*UNKNOWN*'
+					]
+				]
+			],
+			// #6 Macro function regrepl() with secret macro.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{'.self::USER_SECRET_MACRO.'.regrepl([a], b)}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{'.self::USER_SECRET_MACRO.'.regrepl("test", b)}'
+					],
+					'result' => [
+						'primary' => '******',
+						'secondary' => '******'
+					]
+				]
+			],
+			// #7 Check that regrepl() is case sensitive.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{'.self::USER_MACRO.'.regrepl([a-z], "")}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{'.self::USER_MACRO.'.regrepl([A-Z], 1)}'
+					],
+					'result' => [
+						'primary' => 'M 12345',
+						'secondary' => '1acro function test 12345'
+					]
+				]
+			],
+			// #8 Check regrepl() with digits and multiple byte characters.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{'.self::USER_MACRO.'.regrepl([[:digit:]], /)}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{'.self::MACRO_CHAR.'.regrepl(🌴, 🌝, [а-я], Q, \d, 🌞)}'
+					],
+					'result' => [
+						'primary' => 'Macro function test /////',
+						'secondary' => 'ТQQQ 🌞🌞🌞 ŽzŠsšĒĀīī 🌝🌝🌝'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getMacroFunctions
+	 */
+	public function testDashboardHoneycombWidget_CheckMacroFunctions($data) {
+		$this->setWidgetConfiguration(self::$dashboardid[self::DASHBOARD_FOR_MACRO_FUNCTIONS], self::WIDGET_FOR_MACRO_FUNCTIONS, $data['fields']);
+		CDashboardElement::find()->one()->save()->waitUntilReady();
+
+		// Check the resolution of macrofunction.
+		$this->assertEquals($data['result']['primary'],
+				$this->query('xpath://div[@class="svg-honeycomb-label svg-honeycomb-label-primary"]')->one()->getText()
+		);
+		$this->assertEquals($data['result']['secondary'],
+				$this->query('xpath://div[@class="svg-honeycomb-label svg-honeycomb-label-secondary"]')->one()->getText()
+		);
 	}
 
 	/**
