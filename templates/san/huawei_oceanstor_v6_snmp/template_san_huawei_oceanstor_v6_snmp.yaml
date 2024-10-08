@@ -8,7 +8,7 @@ zabbix_export:
       template: 'Huawei OceanStor V6 by SNMP'
       name: 'Huawei OceanStor V6 by SNMP'
       description: |
-        The template to monitor SAN Huawei OceanStor V6 by Zabbix SNMP agent.
+        This template is developed to monitor SAN Huawei OceanStor V6 via the Zabbix SNMP agent.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/418855-discussion-thread-for-official-zabbix-template-huawei-oceanstor
         
@@ -26,7 +26,7 @@ zabbix_export:
           key: huawei.oceanstor.v6.bbu.snmp.walk
           history: '0'
           value_type: TEXT
-          description: 'Discovering device backup battery units.'
+          description: 'Discovery of device backup battery units.'
           tags:
             - tag: component
               value: raw
@@ -68,7 +68,7 @@ zabbix_export:
           key: huawei.oceanstor.v6.controller.snmp.walk
           history: '0'
           value_type: TEXT
-          description: 'Discovering device controllers.'
+          description: 'Discovery of device controllers.'
           tags:
             - tag: component
               value: raw
@@ -79,7 +79,7 @@ zabbix_export:
           key: huawei.oceanstor.v6.disk.snmp.walk
           history: '0'
           value_type: TEXT
-          description: 'Discovering device disks.'
+          description: 'Discovery of device disks.'
           tags:
             - tag: component
               value: raw
@@ -90,18 +90,18 @@ zabbix_export:
           key: huawei.oceanstor.v6.enclosure.snmp.walk
           history: '0'
           value_type: TEXT
-          description: 'Discovering device enclosures.'
+          description: 'Discovery of device enclosures.'
           tags:
             - tag: component
               value: raw
         - uuid: fe922a88992f49f9a6bf4ed080c880d7
-          name: 'FAN SNMP walk'
+          name: 'Fan SNMP walk'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.4.1.34774.4.1.23.5.4.1.1,1.3.6.1.4.1.34774.4.1.23.5.4.1.2,1.3.6.1.4.1.34774.4.1.23.5.4.1.3,1.3.6.1.4.1.34774.4.1.23.5.4.1.4]'
           key: huawei.oceanstor.v6.fan.snmp.walk
           history: '0'
           value_type: TEXT
-          description: 'Discovering device fans.'
+          description: 'Discovery of device fans.'
           tags:
             - tag: component
               value: raw
@@ -112,7 +112,7 @@ zabbix_export:
           key: huawei.oceanstor.v6.lun.snmp.walk
           history: '0'
           value_type: TEXT
-          description: 'Discovering device logical unit numbers.'
+          description: 'Discovery of device logical unit numbers.'
           tags:
             - tag: component
               value: raw
@@ -123,7 +123,7 @@ zabbix_export:
           key: huawei.oceanstor.v6.node.snmp.walk
           history: '0'
           value_type: TEXT
-          description: 'Discovering device nodes.'
+          description: 'Discovery of device nodes.'
           tags:
             - tag: component
               value: raw
@@ -134,7 +134,7 @@ zabbix_export:
           key: huawei.oceanstor.v6.pool.snmp.walk
           history: '0'
           value_type: TEXT
-          description: 'Discovering device storage pools.'
+          description: 'Discovery of device storage pools.'
           tags:
             - tag: component
               value: raw
@@ -143,7 +143,7 @@ zabbix_export:
           type: SNMP_AGENT
           snmp_oid: 'get[1.3.6.1.4.1.34774.4.1.1.3.0]'
           key: huawei.oceanstor.v6.status
-          description: 'System running status.'
+          description: 'System status.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -439,7 +439,7 @@ zabbix_export:
           name: 'BBU discovery'
           type: DEPENDENT
           key: huawei.oceanstor.v6.bbu.discovery
-          description: 'Discovery of BBU.'
+          description: 'Discovery of BBUs.'
           item_prototypes:
             - uuid: 1e9048a8d6884ad6a69af5a3d82e55b2
               name: 'BBU [{#ID}] on [{#LOCATION}]: Health status'
@@ -537,7 +537,7 @@ zabbix_export:
               key: 'huawei.oceanstor.v6.controller.cpu["{#ID}"]'
               value_type: FLOAT
               units: '%'
-              description: 'CPU usage of a controller {#ID}.'
+              description: 'CPU utilization of the controller.'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -598,7 +598,7 @@ zabbix_export:
               key: 'huawei.oceanstor.v6.controller.memory["{#ID}"]'
               value_type: FLOAT
               units: '%'
-              description: 'Memory usage of a controller {#ID}.'
+              description: 'Memory utilization of the controller.'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -940,10 +940,10 @@ zabbix_export:
           name: 'Fan discovery'
           type: DEPENDENT
           key: huawei.oceanstor.v6.fan.discovery
-          description: 'Discovery of FANs.'
+          description: 'Discovery of fans.'
           item_prototypes:
             - uuid: 4a08efa163e5448ab8d01e69535979a1
-              name: 'FAN [{#ID}] on [{#LOCATION}]: Health status'
+              name: 'Fan [{#ID}] on [{#LOCATION}]: Health status'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.fan.health_status["{#ID}:{#LOCATION}"]'
               description: 'Health status of a fan.'
@@ -969,14 +969,14 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 61b916bc59964edaab00fb2f7fba7bdb
                   expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.fan.health_status["{#ID}:{#LOCATION}"])<>1'
-                  name: 'FAN [{#ID}] on [{#LOCATION}]: Health status is not Normal'
+                  name: 'Fan [{#ID}] on [{#LOCATION}]: Health status is not Normal'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   tags:
                     - tag: scope
                       value: availability
             - uuid: 22c3254048bc4973a62069fe9ff35dab
-              name: 'FAN [{#ID}] on [{#LOCATION}]: Running status'
+              name: 'Fan [{#ID}] on [{#LOCATION}]: Running status'
               type: DEPENDENT
               key: 'huawei.oceanstor.v6.fan.running_status["{#ID}:{#LOCATION}"]'
               description: 'Operating status of a fan.'
@@ -1002,7 +1002,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 6fbecb53cd334f65a8fba8d1ab0d9218
                   expression: 'last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.fan.running_status["{#ID}:{#LOCATION}"])<>2'
-                  name: 'FAN [{#ID}] on [{#LOCATION}]: Running status is not Running'
+                  name: 'Fan [{#ID}] on [{#LOCATION}]: Running status is not Running'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   tags:
@@ -1340,7 +1340,7 @@ zabbix_export:
           name: 'Node performance discovery'
           type: DEPENDENT
           key: huawei.oceanstor.v6.node.discovery
-          description: 'Discovery of nodes performance counters.'
+          description: 'Discovery of node performance counters.'
           item_prototypes:
             - uuid: f95b67c8d5d34f9da3ed1491c353b33b
               name: 'Node [{#NODE}]: Read traffic per second'
@@ -1411,7 +1411,7 @@ zabbix_export:
               key: 'huawei.oceanstor.v6.node.cpu["{#NODE}"]'
               value_type: FLOAT
               units: '%'
-              description: 'CPU usage of the node {#NODE}.'
+              description: 'CPU utilization of the node.'
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
@@ -1688,19 +1688,19 @@ zabbix_export:
       macros:
         - macro: '{$CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of the CPU utilization expressed in %.'
+          description: 'The critical threshold of CPU utilization expressed in %.'
         - macro: '{$HUAWEI.OCEANSTOR_V6.DISK.TEMP.MAX.TIME}'
           value: 5m
-          description: 'The time during which temperature of disk may exceed the threshold.'
+          description: 'The time during which the disk temperature may exceed the threshold.'
         - macro: '{$HUAWEI.OCEANSTOR_V6.DISK.TEMP.MAX.WARN}'
           value: '45'
-          description: 'Maximum temperature of disk. Can be used with {#MODEL} as context.'
+          description: 'Maximum disk temperature. Can be used with `{#MODEL}` as context.'
         - macro: '{$HUAWEI.OCEANSTOR_V6.LUN.IO.TIME.MAX.TIME}'
           value: 5m
-          description: 'The time during which average I/O response time of LUN may exceed the threshold.'
+          description: 'The time during which the average I/O response time of a LUN may exceed the threshold.'
         - macro: '{$HUAWEI.OCEANSTOR_V6.LUN.IO.TIME.MAX.WARN}'
           value: '0.0001'
-          description: 'Maximum average I/O response time of LUN in seconds.'
+          description: 'Maximum average I/O response time of a LUN in seconds.'
         - macro: '{$HUAWEI.OCEANSTOR_V6.MEM.MAX.TIME}'
           value: 5m
           description: 'The time during which memory usage may exceed the threshold.'
@@ -1709,10 +1709,10 @@ zabbix_export:
           description: 'Maximum percentage of memory used.'
         - macro: '{$HUAWEI.OCEANSTOR_V6.TEMP.MAX.TIME}'
           value: 3m
-          description: 'The time during which temperature of enclosure may exceed the threshold.'
+          description: 'The time during which the enclosure temperature may exceed the threshold.'
         - macro: '{$HUAWEI.OCEANSTOR_V6.TEMP.MAX.WARN}'
           value: '35'
-          description: 'Maximum temperature of enclosure.'
+          description: 'Maximum enclosure temperature.'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
           description: 'Warning threshold of ICMP packet loss in %.'
