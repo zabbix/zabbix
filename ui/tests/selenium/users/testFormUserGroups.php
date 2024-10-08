@@ -126,6 +126,7 @@ class testFormUserGroups extends CLegacyWebTest {
 		}
 
 		$this->zbxTestClickXpath("//button[@id='cancel']/../button[@id='add']");
+		$this->page->waitUntilReady();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:

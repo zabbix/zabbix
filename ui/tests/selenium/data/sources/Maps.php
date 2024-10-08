@@ -112,7 +112,7 @@ class Maps {
 						'x' => 101,
 						'y' => 301,
 						'elements' => [['triggerid' => $map_links_triggerid]],
-						'urls' => [['name' => 'www.wikipedia.org', 'url' => 'http://www.wikipedia.org']]
+						'urls' => [['name' => 'blog.zabbix.com', 'url' => 'https://blog.zabbix.com/']]
 					],
 					// Host group (Cloud symbol big).
 					[

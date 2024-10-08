@@ -1339,13 +1339,21 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 
 static int	check_allowed_path(const char *allowed, const char *path, char **error)
 {
-	char	*absolute_path = NULL, *absolute_allowed = NULL;
+	char	*absolute_path = NULL, *absolute_allowed = NULL, *directory_name;
 	int	absolute_path_len, absolute_allowed_len, ret = FAIL;
 
-	if (NULL == (absolute_path = realpath(path, NULL)))
+	directory_name = zbx_strdup(NULL, path);
+
+#if defined(HAVE_LIBGEN_H)
+	absolute_path = realpath(dirname(directory_name), NULL);
+#else
+	absolute_path = realpath(directory_name, NULL);
+#endif
+
+	if (NULL == absolute_path)
 	{
 		*error = zbx_dsprintf(*error, "cannot resolve path %s", zbx_strerror(errno));
-		return ret;
+		goto out;
 	}
 
 	if (NULL == (absolute_allowed = realpath(allowed, NULL)))
@@ -1374,6 +1382,7 @@ static int	check_allowed_path(const char *allowed, const char *path, char **erro
 out:
 	zbx_free(absolute_path);
 	zbx_free(absolute_allowed);
+	zbx_free(directory_name);
 
 	return ret;
 }

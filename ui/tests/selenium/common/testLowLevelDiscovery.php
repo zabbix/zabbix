@@ -146,7 +146,7 @@ class testLowLevelDiscovery extends CWebTest {
 			'id:lld_macro_paths_0_path' => ['placeholder' => '$.path.to.node', 'maxlength' => 255],
 
 			// Filters tab.
-			'Filters' => ['value' => [['macro' => 'matches']]],
+			'Filters' => ['value' => [['macro' => '']]],
 			'id:conditions_0_macro' => ['placeholder' => '{#MACRO}', 'maxlength' => 64],
 			'name:conditions[0][operator]' => ['options' => ['matches', 'does not match', 'exists', 'does not exist'],
 				'value' => 'matches'
