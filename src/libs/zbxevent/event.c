@@ -177,6 +177,7 @@ void	zbx_event_get_json_actions(const zbx_db_acknowledge *ack, const char *tz, c
 				ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_NEWSEVERITY, cfg.severity_name[ack->new_severity],
 				ZBX_JSON_TYPE_STRING);
+		zbx_config_clean(&cfg);
 	}
 
 	zbx_json_adduint64(&json, ZBX_PROTO_TAG_UPDATE_MESSAGE, ack->action & ZBX_PROBLEM_UPDATE_MESSAGE ? 1 : 0);
@@ -187,9 +188,9 @@ void	zbx_event_get_json_actions(const zbx_db_acknowledge *ack, const char *tz, c
 	}
 
 	zbx_json_adduint64(&json, ZBX_PROTO_TAG_ACKNOWLEDGE, ack->action & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE ? 1 : 0);
-	zbx_json_adduint64(&json, ZBX_PROTO_TAG_UNACKNOWLEDGE, 1);
-	zbx_json_adduint64(&json, ZBX_PROTO_TAG_UPDATE_SUPPPRESS, ack->action & ZBX_PROBLEM_UPDATE_SUPPRESS ? 1 : 0);
-	zbx_json_adduint64(&json, ZBX_PROTO_TAG_UPDATE_UNSUPPPRESS, 1);
+	zbx_json_adduint64(&json, ZBX_PROTO_TAG_UNACKNOWLEDGE, ack->action & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE ? 1 : 0);
+	zbx_json_adduint64(&json, ZBX_PROTO_TAG_SUPPRESS, ack->action & ZBX_PROBLEM_UPDATE_SUPPRESS ? 1 : 0);
+	zbx_json_adduint64(&json, ZBX_PROTO_TAG_UNSUPPRESS, ack->action & ZBX_PROBLEM_UPDATE_UNSUPPRESS ? 1 : 0);
 
 	if (ack->action & ZBX_PROBLEM_UPDATE_SUPPRESS)
 	{
@@ -208,8 +209,11 @@ void	zbx_event_get_json_actions(const zbx_db_acknowledge *ack, const char *tz, c
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_SUPPRESS_UNTIL, suppress_until_buf, ZBX_JSON_TYPE_STRING);
 		zbx_free(suppress_until_buf);
 	}
-
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_MTIME, zbx_time2str(ack->clock, tz), ZBX_JSON_TYPE_STRING);
+	zbx_json_adduint64(&json, ZBX_PROTO_TAG_RANK_TO_CAUSE, ack->action & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE ? 1 : 0);
+	zbx_json_adduint64(&json, ZBX_PROTO_TAG_RANK_TO_SYMPTOM,
+			ack->action & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM ? 1 : 0);
+	zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOSE, ack->action & ZBX_PROBLEM_UPDATE_CLOSE ? 1 : 0);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_TIME, zbx_time2str(ack->clock, tz), ZBX_JSON_TYPE_STRING);
 	zbx_json_adduint64(&json, ZBX_PROTO_TAG_TIMESTAMP, (zbx_uint64_t)ack->clock);
 
 	zbx_json_close(&json);
@@ -490,10 +494,10 @@ int	zbx_problem_get_actions(const zbx_db_acknowledge *ack, int actions, const ch
 	{
 		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index]);
 		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "ranked as cause");
-	}
+			}
 
 	zbx_free(*out);
 	*out = buf;
 
 	return SUCCEED;
-}
+	}
