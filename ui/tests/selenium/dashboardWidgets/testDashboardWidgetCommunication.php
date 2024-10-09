@@ -14,12 +14,11 @@
 **/
 
 
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CWidgetBehavior.php';
 require_once dirname(__FILE__).'/../common/testWidgets.php';
 
 /**
+ * @backup profiles
+ *
  * @onBefore prepareData
  */
 class testDashboardWidgetCommunication extends testWidgets {
@@ -43,15 +42,15 @@ class testDashboardWidgetCommunication extends testWidgets {
 		'Items page' => 'Honeycomb item broadcaster'
 	];
 
-	const FIRST_HOST_NAME = '1st wc host';
-	const SECOND_HOST_NAME = '2nd wc host';
-	const THIRD_HOST_NAME = '3rd wc host';
-	const FIRST_HOSTGROUP_NAME = '1st wc hostgroup';
-	const SECOND_HOSTGROUP_NAME = '2nd wc hostgroup';
-	const THIRD_HOSTGROUP_NAME = '3rd wc hostgroup';
-	const FIRST_HOST_TRIGGER = 'wc trigger on host 1';
-	const SECOND_HOST_TRIGGER = 'wc trigger on host 2';
-	const THIRD_HOST_TRIGGER = 'wc trigger on host 3';
+	const FIRST_HOST_NAME = '1st host for widgets';
+	const SECOND_HOST_NAME = '2nd host for widgets';
+	const THIRD_HOST_NAME = '3rd host for widgets';
+	const FIRST_HOSTGROUP_NAME = '1st hostgroup for widgets';
+	const SECOND_HOSTGROUP_NAME = '2nd hostgroup for widgets';
+	const THIRD_HOSTGROUP_NAME = '3rd hostgroup for widgets';
+	const FIRST_HOST_TRIGGER = 'trigger on host 1';
+	const SECOND_HOST_TRIGGER = 'trigger on host 2';
+	const THIRD_HOST_TRIGGER = 'trigger on host 3';
 
 	const BROADCASTER_REFERENCES = [
 		'Map hostgroup broadcaster' => 'NRDLG._hostgroupids',
@@ -304,7 +303,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 		$host_groupids = CDataHelper::getIds('name');
 
 		// Create hosts.
-		$host_responce = CDataHelper::createHosts([
+		$host_response = CDataHelper::createHosts([
 			[
 				'host' => self::FIRST_HOST_NAME,
 				'interfaces' => [
@@ -427,8 +426,8 @@ class testDashboardWidgetCommunication extends testWidgets {
 			]
 		]);
 
-		$hostids = $host_responce['hostids'];
-		self::$itemids = $host_responce['itemids'];
+		$hostids = $host_response['hostids'];
+		self::$itemids = $host_response['itemids'];
 		$item_data_timestamp = time();
 
 		// Send values 3, 4 and 5 to the created items.
@@ -457,9 +456,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 		$triggerids = CDataHelper::getIds('description');
 
 		// Set created triggers to problem status
-		foreach (array_keys($triggerids) as $trigger_name) {
-			CDBHelper::setTriggerProblem($trigger_name, TRIGGER_VALUE_TRUE, ['clock' => $item_data_timestamp]);
-		}
+		CDBHelper::setTriggerProblem(array_keys($triggerids), TRIGGER_VALUE_TRUE, ['clock' => $item_data_timestamp]);
 
 		// Create host web scenarios.
 		CDataHelper::call('httptest.create', [
@@ -606,7 +603,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 		]);
 		$mapid = CDataHelper::getIds('name')['Map for widget communication test'];
 
-		$dashboard_responce = CDataHelper::call('dashboard.create', [
+		$dashboard_response = CDataHelper::call('dashboard.create', [
 			[
 				'name' => 'Existing widget communication test dashboard',
 				'private' => PUBLIC_SHARING,
@@ -2434,10 +2431,10 @@ class testDashboardWidgetCommunication extends testWidgets {
 			]
 		]);
 
-		self::$dashboardid = $dashboard_responce['dashboardids'][0];
+		self::$dashboardid = $dashboard_response['dashboardids'][0];
 	}
 
-	public function getWidgetData() {
+	public static function getWidgetData() {
 		return [
 			'Broadcasting hostgroups from map - initial selection' => [
 				[
@@ -2511,7 +2508,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'Trapper item' => '4'
 						],
 						'Geomap listener' => [
-							'1' => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
 								'Host' => self::SECOND_HOST_NAME,
 								'W' => '1'
 							]
@@ -3433,7 +3430,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'value' => self::THIRD_HOST_NAME.': Trapper item'
 						],
 						'Pie chart listener' => [
-							'name' => self::THIRD_HOST_NAME.': Trapper item: ',
+							'name' => self::THIRD_HOST_NAME.': Trapper item',
 							'value' => 5
 						]
 					]
@@ -3461,7 +3458,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'value' => self::FIRST_HOST_NAME.': Trapper item'
 						],
 						'Pie chart listener' => [
-							'name' => self::FIRST_HOST_NAME.': Trapper item: ',
+							'name' => self::FIRST_HOST_NAME.': Trapper item',
 							'value' => 3
 						]
 					]
@@ -3489,7 +3486,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'value' => self::SECOND_HOST_NAME.': Trapper item'
 						],
 						'Pie chart listener' => [
-							'name' => self::SECOND_HOST_NAME.': Trapper item: ',
+							'name' => self::SECOND_HOST_NAME.': Trapper item',
 							'value' => 4
 						]
 					]
@@ -3517,7 +3514,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'value' => self::THIRD_HOST_NAME.': Trapper item'
 						],
 						'Pie chart listener' => [
-							'name' => self::THIRD_HOST_NAME.': Trapper item: ',
+							'name' => self::THIRD_HOST_NAME.': Trapper item',
 							'value' => 5
 						]
 					]
@@ -3545,7 +3542,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'value' => self::FIRST_HOST_NAME.': Trapper item'
 						],
 						'Pie chart listener' => [
-							'name' => self::FIRST_HOST_NAME.': Trapper item: ',
+							'name' => self::FIRST_HOST_NAME.': Trapper item',
 							'value' => 3
 						]
 					]
@@ -3573,7 +3570,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 							'value' => self::SECOND_HOST_NAME.': Trapper item'
 						],
 						'Pie chart listener' => [
-							'name' => self::SECOND_HOST_NAME.': Trapper item: ',
+							'name' => self::SECOND_HOST_NAME.': Trapper item',
 							'value' => 4
 						]
 					]
@@ -3950,11 +3947,12 @@ class testDashboardWidgetCommunication extends testWidgets {
 	 * Close popup or dialog that is opened when clicking on element in broadcaster widget.
 	 */
 	protected function closeOpenedPopup() {
-		if (COverlayDialogElement::find()->one(false)->isValid()) {
-			COverlayDialogElement::find()->one()->close();
+		if ($this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one(false)->isValid()) {
+			$this->query('class:btn-overlay-close')->all()->last()->click();
 		}
 
 		if (CPopupMenuElement::find()->one(false)->isValid()) {
+
 			CPopupMenuElement::find()->one()->close();
 		}
 	}
@@ -4019,39 +4017,25 @@ class testDashboardWidgetCommunication extends testWidgets {
 				case 'problemsbysv':
 				case 'tophosts':
 				case 'web':
-					if ($values === []) {
-						$this->assertEquals('No data found', $listener->query('class:no-data-message')->one()->getText());
-
-						break;
+					if (!CTestArrayHelper::isMultidimensional($values)) {
+						$values = [$values];
 					}
 
-					$widget_table = $listener->asTable();
+					$table_selector = ($listener_name === 'new')
+						? 'xpath://div[contains(@class, "new-widget")]//table'
+						: 'xpath://h4[text()='.CXPathHelper::escapeQuotes($listener_name).']/../..//table';
 
-					if (CTestArrayHelper::isNested($values)) {
-						$this->assertTableData($values, 'xpath://h4[text()='.CXPathHelper::escapeQuotes($listener_name).
-								']/../..//table'
-						);
-					}
-					else {
-						$this->assertEquals(1, $widget_table->getRows()->count());
-						$widget_table->getRow(0)->assertValues($values);
-					}
-
+					$this->assertTableData($values, $table_selector);
 					break;
 
 				case 'geomap':
 					foreach ($values as $icon_index => $popup_values) {
 						$listener->query('xpath:.//img[contains(@class,"leaflet-marker-icon")]['.$icon_index.']')
 								->one()->click();
-
-						$popup = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one();
-						$popup_table = $popup->asTable();
-						$this->assertEquals(1, $popup_table->getRows()->count());
-
-						$popup_table->getRow(0)->assertValues($popup_values);
-						$popup->query('class:btn-overlay-close')->one()->click();
+						$this->assertTableData([$popup_values], 'xpath://div[@ class="overlay-dialogue wordbreak"]');
+						$this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->query('class:btn-overlay-close')
+								->one()->click();
 					}
-
 					break;
 
 				case 'honeycomb':
@@ -4062,7 +4046,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 								->one();
 						$this->assertEquals($value, $cell_content->query('class:svg-honeycomb-label-secondary')->one()->getText());
 					}
-
 					break;
 
 				case 'hostavail':
@@ -4071,10 +4054,10 @@ class testDashboardWidgetCommunication extends testWidgets {
 					// If interface type not defined in expected results, get interface count for each interface type from DB.
 					if ($values === []) {
 						$interface_types = ['Agent (active)', 'Agent (passive)', 'JMX', 'IPMI'];
+						$rows = $widget_table->index('');
 
 						foreach ($interface_types as $type) {
 							$values_by_type = $this->getExpectedInterfaceCountFromDB([], $type);
-							$rows = $widget_table->index('');
 							$this->assertEquals($rows[$type], $values_by_type);
 						}
 					}
@@ -4084,49 +4067,43 @@ class testDashboardWidgetCommunication extends testWidgets {
 							$row->assertValues($interface_states);
 						}
 					}
-
 					break;
 
 				case 'trigover':
 					$widget_table = $listener->asTable();
 
-					$this->assertEquals(count($values['triggers']), $widget_table->getRows()->count());
-
-					foreach ($values['triggers'] as $i => $trigger_name) {
-						$row = $widget_table->getRow($i);
-						$this->assertEquals($trigger_name, $row->getColumn('Triggers')->getText());
-					}
-					$this->assertEquals($values['headers'], $widget_table->getHeadersText());
-
+					$this->assertTableDataColumn($values['triggers'], 'Triggers', 'xpath://h4[text()='.
+							CXPathHelper::escapeQuotes($listener_name).']/../..//table'
+					);
+					$this->assertEquals($values['headers'], $listener->asTable()->getHeadersText());
 					break;
 
 				case 'gauge':
 				case 'item':
 				case 'svggraph':
 					$this->assertEquals($values['value'], $listener->query('class', $values['class'])->one()->getText());
-
 					break;
 
 				case 'graph':
-					// Get graph URL parameters by getting url from src attribute and removing first 10 symbols (charts.php?).
-					$url_params = substr($listener->query('tag:img')->one()->getAttribute('src'), 10);
+					// Get graph URL parameters.
+					$url_params = parse_url($listener->query('tag:img')->one()->getAttribute('src'), PHP_URL_QUERY);
 
 					// Parse obtained URL parameters and assert itemid of the item displayed on the graph.
 					parse_str($url_params, $params_array);
 					$this->assertEquals(self::$itemids[$values['hostname'].':trap.widget.communication'],
 							$params_array['itemids'][0]
 					);
-
 					break;
 
 				case 'piechart':
 					$listener->query('class:svg-pie-chart-arc')->one()->click();
 
-					foreach (['name', 'value'] as $parameter) {
-						$this->assertEquals($values[$parameter], $this->query('class', 'svg-pie-chart-hintbox-'.$parameter)
-								->one()->getText()
-						);
-					}
+					// Check the content in hintbox and the legend of the chart.
+					$this->assertEquals($values['name'].": \n".$values['value'], $this->query('class', 'svg-pie-chart-hintbox')
+							->one()->getText()
+					);
+					$this->assertEquals($values['name'], $listener->query('class:svg-pie-chart-legend-item')->one()->getText());
+					break;
 			}
 		}
 	}
@@ -4147,7 +4124,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 				$element = $widget->query('xpath:.//*[@class="map-elements"]//*[text()='
 						.CXPathHelper::escapeQuotes($element_identifier).']/../../preceding::*[1]'
 				);
-
 				break;
 
 			case 'problemhosts':
@@ -4155,38 +4131,31 @@ class testDashboardWidgetCommunication extends testWidgets {
 			case 'web':
 			case 'tophosts':
 				$element = $widget->query('xpath:.//a[text()='.CXPathHelper::escapeQuotes($element_identifier).']/../..');
-
 				break;
 
 			case 'geomap':
 				$element = $widget->query('xpath:.//img[contains(@class,"leaflet-marker-icon")]['.$element_identifier.']');
-
 				break;
 
 			case 'honeycomb':
 				$element = $widget->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($element_identifier).']');
-
 				break;
 
 			case 'itemhistory':
 				$element = $widget->query('xpath:.//td[text()='.CXPathHelper::escapeQuotes($element_identifier.
 						': Trapper item').']'
 				);
-
 				break;
 
 			case 'hostnavigator':
 				$element = $widget->query('xpath:.//span[@title='.CXPathHelper::escapeQuotes($element_identifier).']');
-
 				break;
 
 			case 'itemnavigator':
 				$element = $widget->query('xpath:.//div[@data-id='.
 						self::$itemids[$element_identifier.':trap.widget.communication'].']'
 				);
-
 				break;
-
 		}
 
 		return $element->waitUntilClickable()->one();

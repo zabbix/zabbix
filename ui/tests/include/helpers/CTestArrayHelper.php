@@ -103,13 +103,13 @@ class CTestArrayHelper {
 	}
 
 	/**
-	 * Check if array is nested.
+	 * Check if array is multidimensional.
 	 *
-	 * @param	array	$array	nested or not nested array under attention
+	 * @param array $array	nested or not nested array under attention
 	 *
-	 * @return	boolean
+	 * @return boolean
 	 */
-	public static function isNested($array) {
+	public static function isMultidimensional($array) {
 		return (count($array) !== count($array, COUNT_RECURSIVE));
 	}
 }
