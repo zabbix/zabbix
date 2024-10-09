@@ -83,6 +83,7 @@ class testFormConnectors extends CWebTest {
 				'Character' => true,
 				'Log' => true,
 				'Text' => true,
+				'Binary' => false,
 				'HTTP authentication' => 'None',
 				'Max records per message' => 'Unlimited',
 				'Concurrent sessions' => '1',
@@ -377,7 +378,8 @@ class testFormConnectors extends CWebTest {
 						'Numeric (float)' => false,
 						'Character' => false,
 						'Log' => false,
-						'Text' => false
+						'Text' => false,
+						'Binary' => false
 					],
 					'error' => [
 						'Field "item_value_types" is mandatory.'
@@ -813,7 +815,8 @@ class testFormConnectors extends CWebTest {
 						'Numeric (float)' => false,
 						'Character' => false,
 						'Log' => true,
-						'Text' => false
+						'Text' => false,
+						'Binary' => false
 					]
 				]
 			],
@@ -827,7 +830,8 @@ class testFormConnectors extends CWebTest {
 						'Numeric (float)' => false,
 						'Character' => false,
 						'Log' => true,
-						'Text' => false
+						'Text' => false,
+						'Binary' => false
 					]
 				]
 			],
@@ -841,7 +845,8 @@ class testFormConnectors extends CWebTest {
 						'Numeric (float)' => true,
 						'Character' => true,
 						'Log' => true,
-						'Text' => true
+						'Text' => true,
+						'Binary' => true
 					]
 				]
 			],
