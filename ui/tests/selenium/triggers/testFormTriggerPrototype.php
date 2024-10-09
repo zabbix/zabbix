@@ -26,7 +26,7 @@ use Facebook\WebDriver\WebDriverKeys;
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *
- * @onBefore prepareTextItemPrototypeData
+ * @onBefore prepareTriggerPrototypeData
  *
  * @backup triggers
  */
@@ -52,23 +52,14 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 	const DISCOVERY_RULEID = 133800;
 	const ITEM_KEY = 'item-prototype-reuse';
 
-	public function prepareTextItemPrototypeData() {
-		CDataHelper::call('itemprototype.create', [
-			'name' => 'Text item prototype {#KEY}',
-			'key_' => 'text_prototype[{#KEY}]',
-			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_TEXT,
-			'hostid' => self::HOSTID,
-			'ruleid' => self::DISCOVERY_RULEID
-		]);
-
-		// Data for the long item name trigger prototype. Create a host with a long name.
+	public function prepareTriggerPrototypeData() {
+		// Host with a long name for long trigger expression tests.
 		$long_key_hostid = CDataHelper::call('host.create', [
 			'host' => STRING_128,
 			'groups' => [['groupid' => 6]]
 		])['hostids'][0];
 
-		// Create an item with a long key.
+		// Item with a long key  for long trigger expression tests.
 		CDataHelper::call('item.create', [
 			[
 				'name' => 'test',
@@ -79,33 +70,43 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 			]
 		]);
 
-		// Create an LLD rule.
+		// LLD rule for long trigger expression tests.
 		self::$long_key_ruleid = CDataHelper::call('discoveryrule.create', [
 			'name' => 'LLD for trigger prototypes',
 			'key_' => 'lld_key',
 			'hostid' => $long_key_hostid,
-			'type' => 3, // Simple check, doesn't need a reference to an interface
+			'type' => ITEM_TYPE_SIMPLE,
 			'delay' => '1m'
 		])['itemids'][0];
 
-		// Create an item prototype with a long key.
+		// Item prototypes used by various tests.
 		CDataHelper::call('itemprototype.create', [
-			'name' => 'test2',
-			'key_' => LONG_KEY,
-			'hostid' => $long_key_hostid,
-			'ruleid' => self::$long_key_ruleid,
-			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_FLOAT
+			[
+				'name' => 'Text item prototype {#KEY}',
+				'key_' => 'text_prototype[{#KEY}]',
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'hostid' => self::HOSTID,
+				'ruleid' => self::DISCOVERY_RULEID
+			],
+			[
+				'name' => 'test2',
+				'key_' => LONG_KEY,
+				'hostid' => $long_key_hostid,
+				'ruleid' => self::$long_key_ruleid,
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_FLOAT
+			]
 		]);
 
-		// Create trigger prototypes for update tests.
+		// Trigger prototypes for long trigger expression tests.
 		CDataHelper::call('triggerprototype.create', [
 			[
-				'description' => 'Trigger prototype for simple update',
+				'description' => 'Trigger prototype with long expression for simple update',
 				'expression' => 'last(/'.STRING_128.'/'.LONG_KEY.')=0'
 			],
 			[
-				'description' => 'Trigger prototype for update',
+				'description' => 'Trigger prototype with long expression for update',
 				'expression' => 'last(/'.STRING_128.'/'.LONG_KEY.')>0'
 			]
 		]);
@@ -1147,7 +1148,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		}
 	}
 
-	public function getCreateWithLongItemKeyData () {
+	public function getLongExpressionData() {
 		return [
 			// Create trigger prototype.
 			[
@@ -1163,7 +1164,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 			[
 				[
 					'update' => true,
-					'link_name' => 'Trigger prototype for simple update',
+					'link_name' => 'Trigger prototype with long expression for simple update',
 					'expected_db_expression' => '/^\{\d+\}=0$/'
 				]
 			],
@@ -1171,7 +1172,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 			[
 				[
 					'update' => true,
-					'link_name' => 'Trigger prototype for simple update',
+					'link_name' => 'Trigger prototype with long expression for update',
 					'form_data' => [
 						'Name' => 'Updated trigger',
 						'Expression' => 'last(/'.STRING_128.'/'.STRING_2048.')>0 and last(/'.STRING_128.'/'.LONG_KEY.')>0'
@@ -1184,25 +1185,20 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 
 	/**
 	 * Test the special case where the host's name and item's key are very long.
-	 * The trigger expression is saved in a different format, so it should work regardless of length.
-	 * See ZBX-25182 for more information.
+	 * The trigger expression is saved using expression IDs instead of saving the whole text of the expression,
+	 * so no issues due to length of host name or item key should be present regardless of their length.
 	 *
-	 * @dataProvider getCreateWithLongItemKeyData
-	 *
-	 * @return void
-	 * @throws Exception
+	 * @dataProvider getLongExpressionData
 	 */
-	public function testFormTriggerPrototype_CreateWithLongItemKey($data) {
+	public function testFormTriggerPrototype_LongExpression($data) {
 		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=host&parent_discoveryid='.self::$long_key_ruleid);
 		$this->page->waitUntilReady();
 
 		// Open the correct form.
-		if (CTestArrayHelper::get($data, 'update', false)) {
-			$this->page->query('link', $data['link_name'])->one()->click();
-		}
-		else {
-			$this->page->query('button:Create trigger prototype')->one()->click();
-		}
+		$open_form_button = (CTestArrayHelper::get($data, 'update'))
+			? 'link:'.$data['link_name']
+			: 'button:Create trigger prototype';
+		$this->page->query($open_form_button)->one()->click();
 
 		// Fill form data and save.
 		$dialog = COverlayDialogElement::find()->one();
@@ -1212,7 +1208,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		COverlayDialogElement::ensureNotPresent();
 
 		// Get the saved trigger's ID from UI.
-		$link = CTestArrayHelper::get($data, 'form_data.Name', CTestArrayHelper::get($data, 'link_name'));
+		$link = (array_key_exists('form_data', $data)) ? $data['form_data']['Name'] : $data['link_name'];
 		$triggerid = $this->page->query('link', $link)->one()->getAttribute('data-triggerid');
 
 		// Get the newly saved trigger's expression, as it is saved in the DB.

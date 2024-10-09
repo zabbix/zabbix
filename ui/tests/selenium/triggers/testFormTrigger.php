@@ -99,11 +99,11 @@ class testFormTrigger extends CLegacyWebTest {
 				'priority' => 0
 			],
 			[
-				'description' => 'Trigger with long key for simple update',
+				'description' => 'Trigger with long expression for simple update',
 				'expression' => 'last(/'.STRING_128.'/'.STRING_2048.')=0'
 			],
 			[
-				'description' => 'Trigger with long key for update',
+				'description' => 'Trigger with long expression for update',
 				'expression' => 'last(/'.STRING_128.'/'.STRING_2048.')>0'
 			]
 		]);
@@ -1314,7 +1314,7 @@ class testFormTrigger extends CLegacyWebTest {
 		}
 	}
 
-	public function getTriggerWithLongExpressionData() {
+	public function getLongExpressionData() {
 		return [
 			// Create trigger.
 			[
@@ -1330,7 +1330,7 @@ class testFormTrigger extends CLegacyWebTest {
 			[
 				[
 					'update' => true,
-					'link_name' => 'Trigger with long key for simple update',
+					'link_name' => 'Trigger with long expression for simple update',
 					'expected_db_expression' => '/^\{\d+\}=0$/'
 				]
 			],
@@ -1338,7 +1338,7 @@ class testFormTrigger extends CLegacyWebTest {
 			[
 				[
 					'update' => true,
-					'link_name' => 'Trigger with long key for update',
+					'link_name' => 'Trigger with long expression for update',
 					'form_data' => [
 						'Name' => 'Updated trigger',
 						'Expression' => 'last(/'.STRING_128.'/'.STRING_2048.')>0 and last(/'.STRING_128.'/'.STRING_2048.')>0'
@@ -1354,9 +1354,9 @@ class testFormTrigger extends CLegacyWebTest {
 	 * The trigger expression is saved using expression IDs instead of saving the whole text of the expression,
 	 * so no issues due to length of host name or item key should be present regardless of their length.
 	 *
-	 * @dataProvider getTriggerWithLongExpressionData
+	 * @dataProvider getLongExpressionData
 	 */
-	public function testFormTrigger_TriggerWithLongExpressionData($data) {
+	public function testFormTrigger_LongExpression($data) {
 		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&context=host&filter_hostids[0]='.
 				self::$long_key_hostid
 		);
