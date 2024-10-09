@@ -482,7 +482,7 @@ static int	substitute_func_macro(char **data, zbx_token_t *token, const struct z
 	}
 
 	ret = zbx_substitute_function_lld_param(*data + par_l + offset + 1, par_r - (par_l + 1), 0, &exp, &exp_alloc,
-			&exp_offset, jp_row, lld_macro_paths, error, max_error_len);
+			&exp_offset, jp_row, lld_macro_paths, ZBX_BACKSLASH_ESC_OFF, error, max_error_len);
 
 	if (SUCCEED == ret)
 	{
@@ -607,6 +607,7 @@ int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
  *             lld_macro_paths - [IN]                                           *
  *             error           - [OUT] error message                            *
  *             max_error_len   - [IN] size of error buffer                      *
+ *
  *                                                                              *
  * Return value: SUCCEED - lld macros were resolved successfully                *
  *               FAIL - otherwise                                               *
@@ -614,7 +615,8 @@ int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
  ********************************************************************************/
 int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char key_in_param,
 		char **exp, size_t *exp_alloc, size_t *exp_offset, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char *error, size_t max_error_len)
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, int esc_flags, char *error,
+		size_t max_error_len)
 {
 	int		ret = SUCCEED;
 	size_t		sep_pos;
@@ -672,7 +674,7 @@ int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char k
 		else
 			zbx_substitute_lld_macros(&param, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 
-		if (SUCCEED != zbx_function_param_quote(&param, quoted, ZBX_BACKSLASH_ESC_ON))
+		if (SUCCEED != zbx_function_param_quote(&param, quoted, esc_flags))
 		{
 			zbx_snprintf(error, max_error_len, "Cannot quote parameter \"%s\"", param);
 			ret = FAIL;

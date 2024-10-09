@@ -68,7 +68,7 @@ zbx_regmatch_t;
 #define ZBX_REGEXP_GROUPS_MAX	10	/* Max number of supported capture groups in regular expressions. */
 					/* Group \0 contains the matching part of string, groups \1 ...\9 */
 					/* contain captured groups (substrings).                          */
-#define ZBX_REGEX_REPL_TIMEOUT	3	/* Regex matches processing timeout in seconds */
+
 
 ZBX_PTR_VECTOR_IMPL(expression, zbx_expression_t *)
 
@@ -1041,6 +1041,7 @@ int	zbx_mregexp_sub_precompiled(const char *string, const zbx_regexp_t *regexp, 
 int	zbx_regexp_repl(const char *string, const char *pattern, const char *output_template, char **out)
 {
 #ifdef HAVE_PCRE2_H
+#define ZBX_REGEX_REPL_TIMEOUT	3	/* Regex matches processing timeout in seconds */
 	zbx_regexp_t		*regexp = NULL;
 	int			mi, shift = 0, ret = FAIL, len = strlen(string);
 	char			*out_str, *error = NULL;
@@ -1157,6 +1158,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+#undef ZBX_REGEX_REPL_TIMEOUT
 #else
 	ZBX_UNUSED(string);
 	ZBX_UNUSED(pattern);

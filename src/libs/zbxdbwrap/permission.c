@@ -15,7 +15,6 @@
 #include "zbxdbwrap.h"
 
 #include "zbxtypes.h"
-#include "zbxdbhigh.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
 

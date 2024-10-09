@@ -16,7 +16,6 @@
 #include "dbupgrade_macros.h"
 
 #include "zbxeval.h"
-#include "zbxdbhigh.h"
 #include "zbxregexp.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
@@ -26,6 +25,7 @@
 #include "zbxnum.h"
 #include "zbxparam.h"
 #include "zbxdb.h"
+#include "zbxdbhigh.h"
 #include "zbxdbschema.h"
 #include "zbxstr.h"
 #include "zbxtime.h"

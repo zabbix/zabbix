@@ -24,7 +24,6 @@
 #include "zbxtime.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
-#include "zbxdbhigh.h"
 #include "zbxthreads.h"
 
 #define AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC	(SEC_PER_MIN * 10)

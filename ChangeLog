@@ -1,6 +1,8 @@
 Changes for 7.2.0alpha1
 
 New features:
+..F....... [ZBXNEXT-8397] updated operational data hint-box to display full value (rgontarski)
+...G...... [ZBXNEXT-9281] added configurable item timeout support (dgoloscapov)
 ........S. [ZBXNEXT-9246] added monitoring of HA manager process utilization (mprihodko)
 .........T [ZBXNEXT-8139] added 'Hypervisor maintenance mode' item to the VMware Guest template (akotsegubov)
 ..F....... [ZBXNEXT-9375] added/removed and modified table titles related to the action column and fixed broken layouts in multiple tables (rgontarski)
@@ -47,6 +49,20 @@ A.F.I..PS. [ZBXNEXT-9176] removed support of Oracle DB (agriscenko, sboidenko)
 .......PS. [ZBXNEXT-8990] extended VMware event log with username (asestakovs)
 
 Bug fixes:
+A......... [ZBX-23007] added chunking when collecting related objects for item and item prototype (dfofanovs)
+..F....... [ZBX-24938] added new line handler for columns with text item data type and display set to "As is" in Item history widget (dfofanovs)
+..F....... [ZBX-24931] fixed vertical text layout for Korean, Japanese and Chinese languages (dfofanovs)
+.........T [ZBX-25314] added check for *UNKNOWN* values in the existing webhooks (aiantsen)
+..F....... [ZBX-24949] fixed uniqueness check of grouping attributes in Host navigator and Item navigator widgets (apoga)
+..F....... [ZBX-25040] fixed incorrect DB query in item value widget when the referred widget is unavailable (averza)
+A......... [ZBX-24975] fixed "username", "name" and "surname" cannot be retrieved by "selectAcknowledges" parameter of event.get API (agriscenko)
+..F....... [ZBX-24826] fixed external link icon overlapping text in System information widget (agriscenko)
+..F....... [ZBX-23171] fixed escaping of slash character in context-based macro patterns (esekace)
+..F....... [ZBX-25095] fixed action log filtering (esekace)
+........S. [ZBX-25141] fixed {FUNCTION.VALUE} and {FUNCTION.RECOVERY.VALUE} macro expansion in notifications, commands, event names and manual event action scripts (dgoloscapov)
+.........T [ZBX-24805] added filter for discovery rule for family of APC templates (akotsegubov)
+...G...... [ZBX-24684] moved Zabbix agent 2 plugin shutdown message to debug log level (esneiders)
+.........T [ZBX-23520] added timeout and fixed keys for raw items for family of MSSQL templates (akotsegubov)
 ..F....... [ZBX-25072] fixed splitting of a trigger expression in the expression builder (Sasha)
 .........T [ZBX-22918] added database name macro for connection to all agent keys in PostgreSQL by Zabbix agent 2 (drasikhov)
 .........T [ZBX-25199] updated filesystem space metrics JavaScript preprocessing in Linux by SNMP template with manual value type conversion (drasikhov)
@@ -286,9 +302,24 @@ A......... [ZBX-24299] fixed possibility to alter readonly error fields with Hos
 Changes for 7.0.5rc1
 
 New features:
+...G...... [ZBXNEXT-9281] added configurable item timeout support (dgoloscapov)
 ........S. [ZBXNEXT-9246] added monitoring of HA manager process utilization (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-24938] added new line handler for columns with text item data type and display set to "As is" in Item history widget (dfofanovs)
+A......... [ZBX-23007] added chunking when collecting related objects for item and item prototype (dfofanovs)
+..F....... [ZBX-24931] fixed vertical text layout for Korean, Japanese and Chinese languages (dfofanovs)
+.........T [ZBX-25314] added check for *UNKNOWN* values in the existing webhooks (abiba)
+..F....... [ZBX-24949] fixed uniqueness check of grouping attributes in Host navigator and Item navigator widgets (apoga)
+..F....... [ZBX-25040] fixed incorrect DB query in item value widget when the referred widget is unavailable (averza)
+A......... [ZBX-24975] fixed "username", "name" and "surname" cannot be retrieved by "selectAcknowledges" parameter of event.get API (agriscenko)
+..F....... [ZBX-24826] fixed external link icon overlapping text in System information widget (agriscenko)
+..F....... [ZBX-23171] fixed escaping of slash character in context-based macro patterns (esekace)
+..F....... [ZBX-25095] fixed action log filtering (esekace)
+........S. [ZBX-25141] fixed {FUNCTION.VALUE} and {FUNCTION.RECOVERY.VALUE} macro expansion in notifications, commands, event names and manual event action scripts (dgoloscapov)
+...G...... [ZBX-24684] moved Zabbix agent 2 plugin shutdown message to debug log level (esneiders)
+.........T [ZBX-24805] added filter for discovery rule for family of APC templates (akotsegubov)
+.........T [ZBX-23520] added timeout and fixed keys for raw items for family of MSSQL templates (akotsegubov)
 ..F....... [ZBX-25072] fixed splitting of a trigger expression in the expression builder (Sasha)
 .........T [ZBX-22918] added database name macro for connection to all agent keys in PostgreSQL by Zabbix agent 2 (drasikhov)
 .........T [ZBX-25199] updated filesystem space metrics JavaScript preprocessing in Linux by SNMP template with manual value type conversion (drasikhov)
@@ -1379,6 +1410,7 @@ Changes for 6.4.20rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-23171] fixed escaping of slash character in context-based macro patterns (esekace)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.19
@@ -3318,6 +3350,12 @@ New features:
 ........S. [ZBXNEXT-9246] added monitoring of HA manager process utilization (mprihodko)
 
 Bug fixes:
+A......... [ZBX-23007] added chunking when collecting related objects for item and item prototype (dfofanovs)
+..F....... [ZBX-23171] fixed escaping of slash character in context-based macro patterns (esekace)
+........S. [ZBX-25141] fixed {FUNCTION.VALUE} and {FUNCTION.RECOVERY.VALUE} macro expansion in notifications, commands, event names and manual event action scripts (dgoloscapov)
+.........T [ZBX-24805] added filter for discovery rule for family of APC templates (akotsegubov)
+.........T [ZBX-23520] added timeout and fixed keys for raw items for family of MSSQL templates (akotsegubov)
+...G...... [ZBX-24684] moved Zabbix agent 2 plugin shutdown message to debug log level (esneiders)
 .........T [ZBX-22918] added database name macro for connection to all agent keys in PostgreSQL by Zabbix agent 2 (drasikhov)
 .........T [ZBX-24979] removed uncompatible proxy last seen threshold macro from Zabbix health templates (drasikhov)
 ..F....... [ZBX-24366] fixed host group filters on availability report to show correct items (jfreibergs, vmaksimovs)
@@ -6581,6 +6619,7 @@ Changes for 5.0.45rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-23171] fixed escaping of slash character in context-based macro patterns (esekace)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.44

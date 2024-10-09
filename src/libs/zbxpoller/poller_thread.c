@@ -15,6 +15,7 @@
 #include "poller.h"
 #include "zbxpoller.h"
 
+#include "zbxdb.h"
 #include "checks_external.h"
 #include "checks_internal.h"
 #include "checks_script.h"
@@ -682,8 +683,10 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 			errcodes[i] = CONFIG_ERROR;
 		}
 #else
-		/* SNMP checks use their own timeouts */
-		get_values_snmp(items, results, errcodes, num, poller_type, config_comms->config_source_ip, progname);
+		/* legacy SNMP checks use config timeout
+		 * walk[ and get[ use item timeout */
+		get_values_snmp(items, results, errcodes, num, poller_type, config_comms->config_source_ip,
+				config_comms->config_timeout, progname);
 #endif
 	}
 	else if (ITEM_TYPE_JMX == items[0].type)

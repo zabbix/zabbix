@@ -26,6 +26,17 @@
 
 #include "zbxcfg.h"
 
+void	zbx_addrs_failover(zbx_vector_addr_ptr_t *addrs)
+{
+	if (1 < addrs->values_num)
+	{
+		zbx_addr_t	*addr = addrs->values[0];
+
+		zbx_vector_addr_ptr_remove(addrs, 0);
+		zbx_vector_addr_ptr_append(addrs, addr);
+	}
+}
+
 static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_vector_addr_ptr_t *addrs,
 		int timeout, int connect_timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
 		int loglevel)
@@ -49,8 +60,7 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 				((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
 				zbx_socket_strerror());
 
-		zbx_vector_addr_ptr_remove(addrs, 0);
-		zbx_vector_addr_ptr_append(addrs, addr);
+		zbx_addrs_failover(addrs);
 	}
 
 	return ret;
@@ -614,6 +624,9 @@ retry:
 success:
 	ret = SUCCEED;
 cleanup:
+	if (SUCCEED != ret)
+		zbx_addrs_failover(addrs);
+
 	zbx_tcp_close(&sock);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));

@@ -26,7 +26,6 @@
 #include "zbx_rtc_constants.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
-#include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 #include "zbxcacheconfig.h"
 
