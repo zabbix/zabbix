@@ -59,7 +59,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 			'groups' => [['groupid' => 6]]
 		])['hostids'][0];
 
-		// Item with a long key  for long trigger expression tests.
+		// Item with a long key for long trigger expression tests.
 		CDataHelper::call('item.create', [
 			[
 				'name' => 'test',
@@ -1184,7 +1184,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 	}
 
 	/**
-	 * Test the special case where the host's name and item's key are very long.
+	 * Test a special case where the host's name and item's key are very long.
 	 * The trigger expression is saved using expression IDs instead of saving the whole text of the expression,
 	 * so no issues due to length of host name or item key should be present regardless of their length.
 	 *

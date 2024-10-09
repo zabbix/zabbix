@@ -45,8 +45,8 @@ class testFormTrigger extends CLegacyWebTest {
 		$this->assertArrayHasKey('groupids', $hostgroups);
 		$groupid = $hostgroups['groupids'][0];
 
-		// Create host for items and triggers.
-		$hosts = CDataHelper::call('host.create',[
+		// Create hosts for various tests.
+		$hosts = CDataHelper::call('host.create', [
 			[
 				'host' => self::HOST,
 				'groups' => [['groupid' => $groupid]]
@@ -80,7 +80,7 @@ class testFormTrigger extends CLegacyWebTest {
 			];
 		}
 
-		// Additional item with a long key.
+		// An additional item with a long key.
 		$items_data[] = [
 			'name' => 'test',
 			'key_' => STRING_2048,
@@ -91,7 +91,7 @@ class testFormTrigger extends CLegacyWebTest {
 
 		CDataHelper::call('item.create', $items_data);
 
-		// Create trigger based on item.
+		// Create triggers for various tests.
 		CDataHelper::call('trigger.create', [
 			[
 				'description' => 'testFormTrigger1',
@@ -1350,7 +1350,7 @@ class testFormTrigger extends CLegacyWebTest {
 	}
 
 	/**
-	 * Test the special case where the host's name and item's key are very long.
+	 * Test a special case where the host's name and item's key are very long.
 	 * The trigger expression is saved using expression IDs instead of saving the whole text of the expression,
 	 * so no issues due to length of host name or item key should be present regardless of their length.
 	 *
@@ -1363,7 +1363,9 @@ class testFormTrigger extends CLegacyWebTest {
 		$this->page->waitUntilReady();
 
 		// Open the correct form.
-		$open_form_button = (CTestArrayHelper::get($data, 'update')) ? 'link:'.$data['link_name'] : 'button:Create trigger';
+		$open_form_button = (CTestArrayHelper::get($data, 'update'))
+			? 'link:'.$data['link_name']
+			: 'button:Create trigger';
 		$this->page->query($open_form_button)->one()->click();
 
 		// Fill form data and save.
