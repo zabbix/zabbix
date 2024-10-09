@@ -128,6 +128,8 @@ class CMaintenance extends CApiService {
 		}
 
 		if ($options['groupids'] !== null) {
+			zbx_value2array($options['groupids']);
+
 			$sqlParts['where'][] = '('.
 				'EXISTS ('.
 					'SELECT NULL'.
@@ -146,6 +148,8 @@ class CMaintenance extends CApiService {
 		}
 
 		if ($options['hostids'] !== null) {
+			zbx_value2array($options['hostids']);
+
 			$sqlParts['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
 				' FROM maintenances_hosts mh'.

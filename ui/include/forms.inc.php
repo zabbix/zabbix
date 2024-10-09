@@ -630,7 +630,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 									new CColHeader(_('Field name')),
 									new CColHeader(_('OID prefix')),
 									new CColHeader(_('Format')),
-									(new CColHeader(_('Action')))->addClass(ZBX_STYLE_NOWRAP)
+									(new CColHeader(''))->addClass(ZBX_STYLE_NOWRAP)
 								]))->addClass(ZBX_STYLE_GREY)
 							)
 							->addItem($mapping_rows)

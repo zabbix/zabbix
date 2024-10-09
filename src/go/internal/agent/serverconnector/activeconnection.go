@@ -47,6 +47,7 @@ func (c *activeConnection) Write(data []byte, timeout time.Duration) (bool, []er
 
 	err := json.Unmarshal(b, &response)
 	if err != nil {
+		c.address.Next()
 		return upload, []error{err}
 	}
 
@@ -55,6 +56,8 @@ func (c *activeConnection) Write(data []byte, timeout time.Duration) (bool, []er
 	}
 
 	if response.Response != "success" {
+		c.address.Next()
+
 		if len(response.Info) != 0 {
 			return upload, []error{fmt.Errorf("%s", response.Info)}
 		}

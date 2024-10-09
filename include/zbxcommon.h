@@ -297,13 +297,11 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_DBCONFIGWORKER		44
 #define ZBX_PROCESS_TYPE_PG_MANAGER		45
 #define ZBX_PROCESS_TYPE_BROWSERPOLLER		46
-#define ZBX_PROCESS_TYPE_COUNT			47	/* number of process types */
+#define ZBX_PROCESS_TYPE_HA_MANAGER		47
+#define ZBX_PROCESS_TYPE_COUNT			48	/* number of process types */
 
 /* special processes that are not present worker list */
-#define ZBX_PROCESS_TYPE_EXT_FIRST		126
-#define ZBX_PROCESS_TYPE_HA_MANAGER		126
-#define ZBX_PROCESS_TYPE_MAIN			127
-#define ZBX_PROCESS_TYPE_EXT_LAST		127
+#define ZBX_PROCESS_TYPE_MAIN			126
 
 #define ZBX_PROCESS_TYPE_UNKNOWN		255
 
@@ -409,14 +407,20 @@ do														\
 }														\
 while (0)
 
-#define THIS_SHOULD_NEVER_HAPPEN_MSG(fmt, ...)									\
+#ifdef HAVE___VA_ARGS__
+#	define THIS_SHOULD_NEVER_HAPPEN_MSG(...)								\
 														\
-do														\
-{														\
-	THIS_SHOULD_NEVER_HAPPEN;										\
-	zbx_error(fmt, ##__VA_ARGS__);										\
-}														\
-while(0)
+	do													\
+	{													\
+		THIS_SHOULD_NEVER_HAPPEN;									\
+		zbx_error(__VA_ARGS__);									\
+	}													\
+	while(0)
+#else
+#	define THIS_SHOULD_NEVER_HAPPEN_MSG									\
+			THIS_SHOULD_NEVER_HAPPEN;								\
+			zbx_error
+#endif
 
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
@@ -539,11 +543,30 @@ zbx_proxy_suppress_t;
 /* string functions that could not be moved into libzbxstr.a because they */
 /* are used by libzbxcommon.a */
 
-/* used by log which will be part of common*/
+/* used by log which will be part of common */
 #if defined(__GNUC__) || defined(__clang__)
 #	define __zbx_attr_format_printf(idx1, idx2) __attribute__((__format__(__printf__, (idx1), (idx2))))
+#	if defined(HAVE_TESTS)
+#		define	__zbx_attr_weak		__attribute__((weak))
+#		define	__zbx_static
+#	endif
 #else
 #	define __zbx_attr_format_printf(idx1, idx2)
+#endif
+
+/* function override support for mock tests */
+
+#if (defined(__GNUC__) || defined(__clang__)) && defined(HAVE_TESTS)
+#	define	__zbx_attr_weak		__attribute__((weak))
+#	define	__zbx_static
+#endif
+
+#if !defined(__zbx_attr_weak)
+#	define __zbx_attr_weak
+#endif
+
+#if !defined(__zbx_static)
+#	define	__zbx_static	static
 #endif
 
 /* used by cuid and also by log */

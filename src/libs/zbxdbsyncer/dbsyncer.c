@@ -22,7 +22,7 @@
 #include "zbxprof.h"
 #include "zbxtimekeeper.h"
 #include "zbxcacheconfig.h"
-#include "zbxdbhigh.h"
+#include "zbxdb.h"
 #include "zbxstr.h"
 #include "zbxthreads.h"
 #include "zbxrtc.h"

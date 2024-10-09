@@ -385,6 +385,8 @@ static int	save_events(void)
 	zbx_uint64_t		eventid;
 	zbx_db_event		*event;
 
+	/* new events without ids could be created during correlation - reserve ids for them */
+
 	for (i = 0; i < events.values_num; i++)
 	{
 		event = events.values[i];
@@ -393,10 +395,11 @@ static int	save_events(void)
 			num++;
 	}
 
+	if (0 != num)
+		eventid = zbx_db_get_maxid_num("events", num);
+
 	zbx_db_insert_prepare(&db_insert, "events", "eventid", "source", "object", "objectid", "clock", "ns", "value",
 			"name", "severity", (char *)NULL);
-
-	eventid = zbx_db_get_maxid_num("events", num);
 
 	num = 0;
 

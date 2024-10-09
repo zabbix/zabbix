@@ -27,7 +27,7 @@
 #include "zbxcachevalue.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
-#include "zbxdbhigh.h"
+#include "zbxdb.h"
 #include "zbxipcservice.h"
 
 /******************************************************************************

@@ -298,7 +298,7 @@ class testFormUser extends CWebTest {
 		$media_tab = $form->query('id:mediaTab')->one();
 		$media_table = $media_tab->asTable();
 
-		$this->assertEquals(['Type', 'Send to', 'When active', 'Use if severity', 'Status', 'Action'],
+		$this->assertEquals(['Type', 'Send to', 'When active', 'Use if severity', 'Status', 'Actions'],
 				$media_table->getHeadersText()
 		);
 
