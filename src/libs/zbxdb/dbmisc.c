@@ -115,9 +115,9 @@ static zbx_uint64_t	dbconn_get_cached_nextid(zbx_dbconn_t *db, size_t index, zbx
 
 		if (NULL == (table = zbx_db_get_table(table_name)))
 		{
-			lastid = 0;
-			nextid = 0;
-			goto out;
+			zbx_mutex_unlock(idcache_mutex);
+			THIS_SHOULD_NEVER_HAPPEN_MSG("unknown table: %s", table_name);
+			exit(EXIT_FAILURE);
 		}
 
 		result = zbx_dbconn_select(db, "select max(%s) from %s where %s between " ZBX_FS_UI64 " and "

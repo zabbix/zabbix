@@ -194,8 +194,8 @@ void	zbx_dbconn_extract_version_info(zbx_dbconn_t *db, struct zbx_db_version_inf
 		ZBX_MARIADB_SFORK = ON;
 	}
 
-	if (ON == ZBX_MARIADB_SFORK && 6 == sscanf(info, "%d.%d.%d-%d.%d.%d-MariaDB", &client_major_version,
-			&client_minor_version, &client_release_version, &server_major_version,
+	if (ON == ZBX_MARIADB_SFORK && NULL != info && 6 == sscanf(info, "%d.%d.%d-%d.%d.%d-MariaDB",
+			&client_major_version, &client_minor_version, &client_release_version, &server_major_version,
 			&server_minor_version, &server_release_version))
 	{
 		ZBX_DB_SVERSION = (zbx_uint32_t)(server_major_version * 10000 + server_minor_version * 100 +

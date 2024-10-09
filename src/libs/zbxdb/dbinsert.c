@@ -369,7 +369,12 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 	{
 		zbx_uint64_t	id;
 
-		id = zbx_dbconn_get_maxid_num(db_insert->db, db_insert->table->table, db_insert->rows.values_num);
+		if (0 == (id = zbx_dbconn_get_maxid_num(db_insert->db, db_insert->table->table,
+				db_insert->rows.values_num)))
+		{
+			/* returning 0 nextid means failed transaction */
+			goto out;
+		}
 
 		for (i = 0; i < db_insert->rows.values_num; i++)
 		{
