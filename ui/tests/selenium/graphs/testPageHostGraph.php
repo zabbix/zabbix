@@ -742,8 +742,8 @@ class testPageHostGraph extends CLegacyWebTest {
 
 		if (array_key_exists('graph', $data)) {
 			foreach ($data['graph'] as $graph) {
-				$this->zbxTestAssertElementPresentXpath(
-						'//a[contains(@href,"graphs.php?form=update")][text()="'.$graph.'"]'
+				$this->assertTrue($this->query('xpath://a[contains(@href,"graphs.php?form=update")][text()="'.$graph.'"]')
+						->one()->isVisible()
 				);
 			}
 		}

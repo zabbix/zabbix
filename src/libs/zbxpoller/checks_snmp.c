@@ -3607,16 +3607,6 @@ static int	zbx_snmp_process_standard(struct snmp_session *ss, const zbx_dc_item_
 	return ret;
 }
 
-int	zbx_get_value_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type,
-		const char *config_source_ip, const char *progname)
-{
-	int	errcode = SUCCEED;
-
-	get_values_snmp(item, result, &errcode, 1, poller_type, config_source_ip, progname);
-
-	return errcode;
-}
-
 /*******************************************************************************************
  *                                                                                         *
  * Comment: Actually this could be called by discoverer, without poller being initialized, *
@@ -3725,7 +3715,8 @@ static void	process_snmp_result(void *data)
 }
 
 void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes, int num,
-		unsigned char poller_type, const char *config_source_ip, const char *progname)
+		unsigned char poller_type, const char *config_source_ip, const int config_timeout,
+		const char *progname)
 {
 	zbx_snmp_sess_t		ssp;
 	char			error[MAX_STRING_LEN];
@@ -3818,7 +3809,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
 			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
 			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, error, sizeof(error),
-			item->timeout, config_source_ip)))
+			config_timeout, config_source_ip)))
 		{
 			err = NETWORK_ERROR;
 			goto exit;
@@ -3842,7 +3833,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
 			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
 			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, error, sizeof(error),
-			item->timeout, config_source_ip)))
+			config_timeout, config_source_ip)))
 		{
 			err = NETWORK_ERROR;
 			goto exit;
@@ -3866,7 +3857,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
 			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
 			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, error, sizeof(error),
-			item->timeout, config_source_ip)))
+			config_timeout, config_source_ip)))
 		{
 			err = NETWORK_ERROR;
 			goto exit;

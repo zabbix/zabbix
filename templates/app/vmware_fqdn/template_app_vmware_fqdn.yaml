@@ -1072,6 +1072,9 @@ zabbix_export:
               priority: AVERAGE
               description: 'Snapshot consolidation needed.'
               manual_close: 'YES'
+              dependencies:
+                - name: 'Hypervisor is in the maintenance mode'
+                  expression: 'last(/VMware Guest/vmware.vm.hv.maintenance[{$VMWARE.URL},{$VMWARE.VM.UUID}])=1 and {$VMWARE.HYPERVISOR.MAINTENANCE}=1'
               tags:
                 - tag: scope
                   value: availability
@@ -1197,6 +1200,35 @@ zabbix_export:
           tags:
             - tag: component
               value: system
+        - uuid: b794d9df3e764df8b04239d5779269cd
+          name: 'Hypervisor maintenance mode'
+          type: SIMPLE
+          key: 'vmware.vm.hv.maintenance[{$VMWARE.URL},{$VMWARE.VM.UUID}]'
+          username: '{$VMWARE.USERNAME}'
+          password: '{$VMWARE.PASSWORD}'
+          description: |
+            Hypervisor maintenance mode. One of the following:
+            - Normal mode;
+            - Maintenance mode.
+          valuemap:
+            name: 'VMware Hypervisor maintenance mode'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          tags:
+            - tag: component
+              value: system
+          triggers:
+            - uuid: 05c2982de3f94647808a523a91af554c
+              expression: 'last(/VMware Guest/vmware.vm.hv.maintenance[{$VMWARE.URL},{$VMWARE.VM.UUID}])=1 and {$VMWARE.HYPERVISOR.MAINTENANCE}=1'
+              name: 'Hypervisor is in the maintenance mode'
+              event_name: 'Hypervisor is in the maintenance mode'
+              priority: INFO
+              description: 'Hypervisor is in the maintenance mode. All other problem on the host will be suppressed.'
+              tags:
+                - tag: scope
+                  value: notice
         - uuid: fedec469a1d040ae971e0013102e1e7c
           name: 'Hypervisor name'
           type: SIMPLE
@@ -1445,6 +1477,9 @@ zabbix_export:
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'VMware virtual machine is not running.'
+              dependencies:
+                - name: 'Hypervisor is in the maintenance mode'
+                  expression: 'last(/VMware Guest/vmware.vm.hv.maintenance[{$VMWARE.URL},{$VMWARE.VM.UUID}])=1 and {$VMWARE.HYPERVISOR.MAINTENANCE}=1'
               tags:
                 - tag: scope
                   value: notice
@@ -1517,6 +1552,8 @@ zabbix_export:
               priority: WARNING
               description: 'VMware Tools is not running on the VM.'
               dependencies:
+                - name: 'Hypervisor is in the maintenance mode'
+                  expression: 'last(/VMware Guest/vmware.vm.hv.maintenance[{$VMWARE.URL},{$VMWARE.VM.UUID}])=1 and {$VMWARE.HYPERVISOR.MAINTENANCE}=1'
                 - name: 'VM is not running'
                   expression: 'last(/VMware Guest/vmware.vm.state[{$VMWARE.URL},{$VMWARE.VM.UUID}]) <> 2'
               tags:
@@ -1780,6 +1817,9 @@ zabbix_export:
                   priority: AVERAGE
                   description: 'The disk free space on [{#FSNAME}] has been less than `{$VMWARE.VM.FS.PFREE.MIN.CRIT:"{#FSNAME}"}`% for 5m.'
                   manual_close: 'YES'
+                  dependencies:
+                    - name: 'Hypervisor is in the maintenance mode'
+                      expression: 'last(/VMware Guest/vmware.vm.hv.maintenance[{$VMWARE.URL},{$VMWARE.VM.UUID}])=1 and {$VMWARE.HYPERVISOR.MAINTENANCE}=1'
                   tags:
                     - tag: scope
                       value: capacity
@@ -1792,6 +1832,8 @@ zabbix_export:
                   description: 'The disk free space on [{#FSNAME}] has been less than `{$VMWARE.VM.FS.PFREE.MIN.WARN:"{#FSNAME}"}`% for 5m.'
                   manual_close: 'YES'
                   dependencies:
+                    - name: 'Hypervisor is in the maintenance mode'
+                      expression: 'last(/VMware Guest/vmware.vm.hv.maintenance[{$VMWARE.URL},{$VMWARE.VM.UUID}])=1 and {$VMWARE.HYPERVISOR.MAINTENANCE}=1'
                     - name: '[{#FSNAME}]: Disk space is critically low'
                       expression: 'max(/VMware Guest/vmware.vm.vfs.fs.size[{$VMWARE.URL},{$VMWARE.VM.UUID},{#FSNAME},pfree],5m)<{$VMWARE.VM.FS.PFREE.MIN.CRIT:"{#FSNAME}"} and {$VMWARE.VM.FS.TRIGGER.USED:"{#FSNAME}"}=1'
                   tags:
@@ -1836,6 +1878,9 @@ zabbix_export:
         - tag: target
           value: vmware-guest
       macros:
+        - macro: '{$VMWARE.HYPERVISOR.MAINTENANCE}'
+          value: '1'
+          description: 'If the hypervisor is in maintenance mode, all other problems on the VM will be suppressed automatically. Set to "1"/"0" to enable or disable this feature.'
         - macro: '{$VMWARE.PASSWORD}'
           type: SECRET_TEXT
           description: 'VMware service `{$USERNAME}` user password.'
@@ -3446,6 +3491,13 @@ zabbix_export:
               newvalue: 'False'
             - value: '2'
               newvalue: Unknown
+        - uuid: 815e082c2a804884bb25da4aaee18934
+          name: 'VMware Hypervisor maintenance mode'
+          mappings:
+            - value: '0'
+              newvalue: 'Normal mode'
+            - value: '1'
+              newvalue: 'Maintenance mode'
         - uuid: 64586743ecc74b5a8b7b849cd4521f48
           name: 'VMware Tools status'
           mappings:
@@ -5512,6 +5564,9 @@ zabbix_export:
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
+      dependencies:
+        - name: 'Hypervisor is in the maintenance mode'
+          expression: 'last(/VMware Guest/vmware.vm.hv.maintenance[{$VMWARE.URL},{$VMWARE.VM.UUID}])=1 and {$VMWARE.HYPERVISOR.MAINTENANCE}=1'
       tags:
         - tag: scope
           value: notice

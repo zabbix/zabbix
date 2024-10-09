@@ -298,7 +298,8 @@ class testFormMapProperties extends CLegacyWebTest {
 			$user_id = $this->zbxTestGetAttributeValue("//div[@id='userid']//li[@data-id]", 'data-id');
 		}
 
-		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
+		$this->query('xpath://div[contains(@class, tfoot-buttons)]/button[@id="add"]')->waitUntilClickable()->one()->click();
+		$this->assertMessage($data['expected']);
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
@@ -363,7 +364,6 @@ class testFormMapProperties extends CLegacyWebTest {
 		return [
 			[['name' => 'Local network']],
 			[['name' => 'Map for form testing']],
-			[['name' => 'Map for widget copies']],
 			[['name' => 'Map with icon mapping']],
 			[['name' => 'Map with links']],
 			[['name' => 'Public map with image']],

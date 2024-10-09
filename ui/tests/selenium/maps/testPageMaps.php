@@ -19,6 +19,8 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
+ * @dataSource Maps, CopyWidgetsDashboards
+ *
  * @backup sysmaps
  *
  * @onBefore prepareMapsData

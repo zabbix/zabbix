@@ -42,7 +42,7 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("Cannot get expected results from test case data: %s", zbx_mock_error_string(error));
 
 	zbx_vector_uint64_create(&actual_results);
-	zbx_db_select_uint64(sql, &actual_results);
+	zbx_dbconn_select_uint64(NULL, sql, &actual_results);
 
 	for (i = 0; ZBX_MOCK_SUCCESS == (error = zbx_mock_vector_element(expected_results, &expected_result)); i++)
 	{

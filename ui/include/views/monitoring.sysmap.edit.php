@@ -280,7 +280,7 @@ $map_tab->addRow(_('Show suppressed problems'),
 // Create url table.
 $url_table = (new CTable())
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Name'), _('URL'), _('Element'), _('Action')]);
+	->setHeader([_('Name'), _('URL'), _('Element'), '']);
 if (empty($data['sysmap']['urls'])) {
 	$data['sysmap']['urls'][] = ['name' => '', 'url' => '', 'elementtype' => 0];
 }

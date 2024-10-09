@@ -157,8 +157,8 @@ tests/libs/zbxcacheconfig/um_cache_sync
 tests/libs/zbxcachevalue/zbx_vc_add_values
 tests/libs/zbxcachevalue/zbx_vc_get_value
 tests/libs/zbxcachevalue/zbx_vc_get_values
+tests/libs/zbxdb/zbx_dbconn_select_uint64
 tests/libs/zbxdbhigh/DBadd_condition_alloc
-tests/libs/zbxdbhigh/zbx_db_select_uint64
 tests/libs/zbxdbhigh/zbx_add_tags
 tests/libs/zbxdbhigh/zbx_del_tags
 tests/libs/zbxdbhigh/zbx_merge_tags
@@ -189,7 +189,7 @@ tests/libs/zbxexpr/zbx_substitute_macros1
 tests/libs/zbxexpr/zbx_substitute_macros_um
 tests/libs/zbxexpression/zbx_evaluate
 tests/libs/zbxexpression/zbx_evaluate_unknown
-tests/libs/zbxexpression/evaluate_function
+tests/libs/zbxexpression/zbx_evaluate_function
 tests/libs/zbxexpression/zbx_get_percentage_of_deviations_in_stl_remainder
 tests/libs/zbxexpression/zbx_STL
 tests/libs/zbxexpression/zbx_calculate_macro_function
@@ -248,6 +248,7 @@ tests/libs/zbxsysinfo/linux/system_cpu_switches
 tests/libs/zbxsysinfo/linux/system_hw_chassis
 tests/libs/zbxsysinfo/linux/system_sw_packages_get
 tests/libs/zbxsysinfo/linux/system_sw_software
+tests/libs/zbxsysinfo/linux/system_process
 tests/libs/zbxsysinfo/linux/vfs_fs_discovery
 tests/libs/zbxsysinfo/zbx_parse_item_key
 tests/libs/zbxsysinfo/process
