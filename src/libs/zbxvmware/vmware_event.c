@@ -1229,7 +1229,11 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 	{
 		shmem_free_sz = vmware_shmem_get_vmware_mem()->free_size -
 				vmware_shmem_get_vmware_mem()->total_size * 5 / 100;
+		service->eventlog.req_sz = 0;
 	}
+	else
+		evt_pause = 1;
+
 	zbx_vmware_unlock();
 
 	if (NULL == (easyhandle = curl_easy_init()))
@@ -1250,7 +1254,7 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 		goto clean;
 	}
 
-	if (0 == service->eventlog.req_sz && 0 == evt_pause)
+	if (0 == evt_pause)
 	{
 		/* skip collection of event data if we don't know where	*/
 		/* we stopped last time or item can't accept values 	*/
@@ -1343,10 +1347,6 @@ out:
 						vmware_shmem_get_vmware_mem()->total_size);
 			}
 		}
-	}
-	else if (0 < service->eventlog.req_sz && service->eventlog.req_sz <= vmware_shmem_get_vmware_mem()->free_size)
-	{
-		service->eventlog.req_sz = 0;
 	}
 
 	if (0 == evt_pause)
