@@ -373,7 +373,7 @@ int	zbx_db_insert_execute(zbx_db_insert_t *db_insert)
 				db_insert->rows.values_num)))
 		{
 			/* returning 0 nextid means failed transaction */
-			goto out;
+			return FAIL;
 		}
 
 		for (i = 0; i < db_insert->rows.values_num; i++)
