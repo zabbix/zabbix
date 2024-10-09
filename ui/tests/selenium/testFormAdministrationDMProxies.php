@@ -255,6 +255,8 @@ class testFormAdministrationDMProxies extends CLegacyWebTest  {
 		}
 
 		$this->zbxTestClickButton('proxy.create');
+		$this->assertMessage($expected);
+
 		switch ($expected) {
 			case PROXY_GOOD:
 				$this->zbxTestTextNotPresent('Cannot add proxy');
@@ -325,7 +327,7 @@ class testFormAdministrationDMProxies extends CLegacyWebTest  {
 
 		$this->zbxTestInputTypeOverwrite('host', $newname);
 		$this->zbxTestClickButton('proxy.update');
-		$this->zbxTestTextPresent('Proxy updated');
+		$this->assertMessage(TEST_GOOD, 'Proxy updated');
 		$this->zbxTestCheckTitle('Configuration of proxies');
 		$this->zbxTestCheckHeader('Proxies');
 		$this->zbxTestTextPresent($newname);

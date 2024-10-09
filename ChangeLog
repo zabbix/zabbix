@@ -1,8 +1,24 @@
 Changes for 6.0.35rc1
 
 New features:
+........S. [ZBXNEXT-9246] added monitoring of HA manager process utilization (mprihodko)
 
 Bug fixes:
+A......... [ZBX-23007] added chunking when collecting related objects for item and item prototype (dfofanovs)
+..F....... [ZBX-23171] fixed escaping of slash character in context-based macro patterns (esekace)
+........S. [ZBX-25141] fixed {FUNCTION.VALUE} and {FUNCTION.RECOVERY.VALUE} macro expansion in notifications, commands, event names and manual event action scripts (dgoloscapov)
+.........T [ZBX-24805] added filter for discovery rule for family of APC templates (akotsegubov)
+.........T [ZBX-23520] added timeout and fixed keys for raw items for family of MSSQL templates (akotsegubov)
+...G...... [ZBX-24684] moved Zabbix agent 2 plugin shutdown message to debug log level (esneiders)
+.........T [ZBX-22918] added database name macro for connection to all agent keys in PostgreSQL by Zabbix agent 2 (drasikhov)
+.........T [ZBX-24979] removed uncompatible proxy last seen threshold macro from Zabbix health templates (drasikhov)
+..F....... [ZBX-24366] fixed host group filters on availability report to show correct items (jfreibergs, vmaksimovs)
+..F....... [ZBX-25072] fixed splitting of a trigger expression in the expression builder (Sasha)
+.........T [ZBX-25255] fixed macro in PostgreSQL by Zabbix agent 2 template (abrosimovs)
+........S. [ZBX-25098] fixed regsub with backshash and At sign output pattern (sboidenko)
+A......... [ZBX-24922] prevented attempt to update trigger or graph prototypes while importing discovery rules without "update existing" option specified (jfreibergs)
+..F....... [ZBX-25156] fixed runtime error in trigger expression constructor if non-existent function was used in the expression field (Ivo)
+.........T [ZBX-25280] fixed trigger expression in Kubernetes cluster state by HTTP (egordymov)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.34
@@ -3257,6 +3273,7 @@ Changes for 5.0.45rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-23171] fixed escaping of slash character in context-based macro patterns (esekace)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.44
