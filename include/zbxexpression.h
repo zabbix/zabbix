@@ -166,7 +166,8 @@ int	zbx_substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, zbx_dc
 		int macro_type, char *error, size_t maxerrlen);
 int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char key_in_param,
 		char **exp, size_t *exp_alloc, size_t *exp_offset, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char *error, size_t max_error_len);
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, int esc_flags, char *error,
+		size_t max_error_len);
 int	zbx_substitute_macros_xml(char **data, const zbx_dc_item_t *item, const struct zbx_json_parse *jp_row,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char *error, int maxerrlen);
 int	zbx_substitute_macros_xml_unmasked(char **data, const zbx_dc_item_t *item, const struct zbx_json_parse *jp_row,
