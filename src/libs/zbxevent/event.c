@@ -180,21 +180,9 @@ void	zbx_event_get_json_actions(const zbx_db_acknowledge *ack, char **replace_to
 
 	if (ack->action & ZBX_PROBLEM_UPDATE_SEVERITY)
 	{
-		zbx_config_t	cfg;
-		const char	*from = "unknown", *to = "unknown";
-
 		zbx_json_addobject(&json, ZBX_PROTO_TAG_SEVERITY);
-		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SEVERITY_NAME);
-
-		if (TRIGGER_SEVERITY_COUNT > ack->old_severity && 0 <= ack->old_severity)
-			from = cfg.severity_name[ack->old_severity];
-
-		if (TRIGGER_SEVERITY_COUNT > ack->new_severity && 0 <= ack->new_severity)
-			to = cfg.severity_name[ack->new_severity];
-
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_OLD, from, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_NEW, to, ZBX_JSON_TYPE_STRING);
-		zbx_config_clean(&cfg);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_OLD, ack->old_severity);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_NEW, ack->new_severity);
 		zbx_json_close(&json);
 	}
 
