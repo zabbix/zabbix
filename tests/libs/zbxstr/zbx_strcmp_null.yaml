@@ -97,7 +97,7 @@ in:
 out:
   val: greater
 ---
-test case: "15. 4 and 2 bytes"
+test case: "15. 3-bytes special characters"
 in:
   string1: "❤"
   string2: "田"

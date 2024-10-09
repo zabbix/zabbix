@@ -30,4 +30,12 @@ in:
   dst: "1234"
 out:
   result: '1234567'
+---
+test case: "5. Numeric string with truncation"
+in:
+  src: '567'
+  size: 6
+  dst: "1234"
+out:
+  result: '12345'
 ...

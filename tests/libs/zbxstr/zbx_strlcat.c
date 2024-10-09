@@ -12,7 +12,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include <sys/procfs.h>
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockutil.h"
