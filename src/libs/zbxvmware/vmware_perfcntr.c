@@ -1445,6 +1445,9 @@ out:
 		/* clean old performance data and copy the new data into shared memory */
 		vmware_entities_shared_clean_stats(&service->entities);
 		vmware_service_copy_perf_data(service, &perfdata);
+
+		if (0 == (service->state & ZBX_VMWARE_STATE_SHMEM_READY))
+			service->state |= ZBX_VMWARE_STATE_SHMEM_READY;
 	}
 
 	zbx_vmware_unlock();
