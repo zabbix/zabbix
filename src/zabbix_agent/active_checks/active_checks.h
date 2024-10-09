@@ -42,7 +42,6 @@ typedef struct
 	int			config_eventlog_max_lines_per_second;
 	int			config_max_lines_per_second;
 	int			config_refresh_active_checks;
-	char			**config_user_parameters;
 }
 zbx_thread_activechk_args;
 

@@ -383,7 +383,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 				if (NULL != (row3 = zbx_db_fetch(result3)))
 				{
-					if (SUCCEED == zbx_db_is_null_basic(row3[0]) || '\0' == *row3[0])
+					if (SUCCEED == zbx_db_is_null(row3[0]) || '\0' == *row3[0])
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve service value for"
 								" host name on \"%s\"", row[2]);
@@ -438,7 +438,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 				if (NULL != (row3 = zbx_db_fetch(result3)))
 				{
-					if (SUCCEED == zbx_db_is_null_basic(row3[0]) || '\0' == *row3[0])
+					if (SUCCEED == zbx_db_is_null(row3[0]) || '\0' == *row3[0])
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve service value for"
 								" host visible name on \"%s\"", row[2]);

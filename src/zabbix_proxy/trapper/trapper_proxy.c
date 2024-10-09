@@ -20,6 +20,7 @@
 #include "zbxcommshigh.h"
 #include "zbxtasks.h"
 #include "zbxmutexs.h"
+#include "zbxdb.h"
 #include "zbxdbwrap.h"
 #include "zbxproxybuffer.h"
 #include "zbxcompress.h"

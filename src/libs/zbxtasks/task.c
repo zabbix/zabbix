@@ -14,7 +14,6 @@
 
 #include "zbxtasks.h"
 
-#include "zbxdbhigh.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"

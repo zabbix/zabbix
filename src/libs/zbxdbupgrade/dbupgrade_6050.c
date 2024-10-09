@@ -19,7 +19,6 @@
 #include "zbxexpr.h"
 #include "zbxeval.h"
 #include "zbxalgo.h"
-#include "zbxdbhigh.h"
 #include "zbxtypes.h"
 #include "zbxregexp.h"
 #include "zbx_host_constants.h"
@@ -27,6 +26,7 @@
 #include "zbxhash.h"
 #include "zbxcrypto.h"
 #include "zbxdb.h"
+#include "zbxdbhigh.h"
 #include "zbxnum.h"
 
 /*
