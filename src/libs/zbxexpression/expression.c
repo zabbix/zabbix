@@ -777,7 +777,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_ACTIONJSON))
 				{
 					if (0 != (macro_type & ZBX_MACRO_TYPE_MESSAGE_UPDATE) && NULL != ack)
-						zbx_event_get_json_actions(ack, tz, &replace_to);
+						zbx_event_get_json_actions(ack, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
