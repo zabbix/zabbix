@@ -955,12 +955,6 @@ class CApiService {
 				continue;
 			}
 
-			if ($value === []) {
-				$filter[] = '1=0';
-
-				continue;
-			}
-
 			$values = [];
 
 			if ($tableSchema['fields'][$field]['type'] & DB::FIELD_TYPE_INT) {
