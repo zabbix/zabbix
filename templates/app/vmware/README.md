@@ -5,7 +5,9 @@
 
 This template is designed for the effortless deployment of both VMware vCenter and ESX hypervisor monitoring and doesn't require any external scripts.
 
-The "VMware Hypervisor" and "VMware Guest" templates are used in discovery and normally should not be manually linked to a host.
+The "VMware Guest" template is used in discovery and normally should not be manually linked to a host.
+The "VMware Hypervisor" can be used in discovery as well as manually linked to a host.
+
 For additional information please check https://www.zabbix.com/documentation/7.2/manual/vm_monitoring
 
 ## Requirements
@@ -271,6 +273,49 @@ Additional resources:
 
 # VMware Hypervisor
 
+## Overview
+
+This template is designed for the effortless deployment of VMware ESX hypervisor monitoring and doesn't require any external scripts.
+
+This template can be used in discovery as well as manually linked to a host.
+
+For additional information please check https://www.zabbix.com/documentation/7.2/manual/vm_monitoring
+
+To use this template as manually linked to a host, attach it to the host and set manually the value of `{$VMWARE.HV.UUID}` macro. 
+
+## Requirements
+
+Zabbix version: 7.2 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- VMware 6.0, 6.7, 7.0, 8.0
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+To use this template as manually linked to a host:
+  1. Compile Zabbix server with the required options (`--with-libxml2` and `--with-libcurl`)
+  2. Set the `StartVMwareCollectors` option in Zabbix server configuration file to "1" or more
+  3. Create a new host
+  4. Set the host macros (on the host or template level) required for VMware authentication:
+  ```text
+  {$VMWARE.URL}
+  {$VMWARE.USERNAME}
+  {$VMWARE.PASSWORD}
+  ```
+  5. To get the hypervisor UUID, enable access to the hypervisor via SSH and log in via SSH using a valid login and password.
+  6. Run the following command and specify the UUID in the macro `{$VMWARE.HV.UUID}`
+  ```text
+  vim-cmd hostsvc/hostsummary | grep uuid
+  ```
+  7. Add the agent interface on the host with the address (IP or DNS) of the VMware hypervisor
+  8. Link the template to host created earlier
+
 ### Macros used
 
 |Name|Description|Default|
@@ -283,6 +328,7 @@ Additional resources:
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of hardware sensor names to be ignored in discovery.</p>|`CHANGE_IF_NEEDED`|
 |{$VMWARE.HV.DATASTORE.SPACE.CRIT}|<p>The critical threshold of the datastore free space.</p>|`10`|
 |{$VMWARE.HV.DATASTORE.SPACE.WARN}|<p>The warning threshold of the datastore free space.</p>|`20`|
+|{$VMWARE.HV.UUID}|<p>UUID of hypervisor.</p>||
 
 ### Items
 
