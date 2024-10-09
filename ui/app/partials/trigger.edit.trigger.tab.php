@@ -75,7 +75,6 @@ $expression_row = [
 		->addClass(ZBX_STYLE_MONOSPACE_FONT)
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setReadonly($readonly)
-		->setMaxlength(DB::getFieldLength('triggers', 'expression'))
 		->disableSpellcheck()
 		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -165,7 +164,6 @@ $recovery_expression_row = [
 		->addClass(ZBX_STYLE_MONOSPACE_FONT)
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setReadonly($readonly)
-		->setMaxlength(DB::getFieldLength('triggers', 'recovery_expression'))
 		->disableSpellcheck()
 		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),

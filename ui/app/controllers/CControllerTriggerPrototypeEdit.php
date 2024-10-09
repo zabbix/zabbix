@@ -46,7 +46,7 @@ class CControllerTriggerPrototypeEdit extends CController {
 			'manual_close' =>			'db triggers.manual_close|in '.implode(',',[ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED, ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED]),
 			'opdata' =>					'db triggers.opdata',
 			'priority' =>				'db triggers.priority|in 0,1,2,3,4,5',
-			'recovery_expression' =>	'db triggers.recovery_expression',
+			'recovery_expression' =>	'string',
 			'recovery_mode' =>			'db triggers.recovery_mode|in '.implode(',', [ZBX_RECOVERY_MODE_EXPRESSION, ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, ZBX_RECOVERY_MODE_NONE]),
 			'status' =>					'db triggers.status|in '.implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]),
 			'tags' =>					'array',
