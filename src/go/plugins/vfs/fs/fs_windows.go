@@ -20,10 +20,12 @@
 package vfsfs
 
 import (
+	"fmt"
 	"syscall"
 
 	"golang.org/x/sys/windows"
 	"zabbix.com/pkg/plugin"
+	"zabbix.com/pkg/zbxerr"
 )
 
 func getMountPaths() (paths []string, err error) {
@@ -41,6 +43,8 @@ func getMountPaths() (paths []string, err error) {
 		for {
 			if err = windows.GetVolumePathNamesForVolumeName(&volume[0], &buffer[0], uint32(len(buffer)), &size); err != nil {
 				if err.(syscall.Errno) != syscall.ERROR_MORE_DATA {
+					err = zbxerr.New(fmt.Sprintf("Cannot obtain a list of filesystems. Volume: %s Error",
+						windows.UTF16ToString(volume))).Wrap(err)
 					return
 				}
 				buffer = make([]uint16, size)
