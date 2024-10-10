@@ -54,7 +54,7 @@ out:
 test case: "5. Replacing with an Empty Block"
 in:
   data: "HelloWorld"
-  data_alloc: 11
+  data_alloc: 10
   data_len: 10
   offset: 5
   sz_to: 5
@@ -67,7 +67,7 @@ out:
 test case: "6. Empty string"
 in:
   data: ""
-  data_alloc: 0
+  data_alloc: 1
   data_len: 0
   offset: 0
   sz_to: 0
@@ -93,7 +93,7 @@ out:
 test case: "8. Long string"
 in:
   data: "The quick brown fox jumps over the lazy dog. The fox was very quick."
-  data_alloc: 68
+  data_alloc: 69
   data_len: 68
   offset: 49
   sz_to: 3
