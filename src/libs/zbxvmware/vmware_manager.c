@@ -127,9 +127,6 @@ static int	vmware_job_exec(zbx_vmware_job_t *job, const char *config_source_ip, 
 	if (ZBX_VMWARE_UPDATE_CONF != job->type && 0 == (job->service->state & ZBX_VMWARE_STATE_READY))
 		goto out;
 
-	if (ZBX_VMWARE_UPDATE_EVENTLOG == job->type && 0 == (job->service->state & ZBX_VMWARE_STATE_SHMEM_READY))
-		goto out;
-
 	switch (job->type)
 	{
 		case ZBX_VMWARE_UPDATE_CONF:

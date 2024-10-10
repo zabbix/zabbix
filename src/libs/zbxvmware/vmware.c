@@ -108,6 +108,27 @@ ZBX_PTR_VECTOR_IMPL(vmware_resourcepool_ptr, zbx_vmware_resourcepool_t *)
 
 static zbx_uint64_t	evt_req_chunk_size;
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: getting information about the filling of shared memory            *
+ *                                                                            *
+ * Comment: we ignore services with any error, such as                        *
+ *          incorrect url, login or password                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	vmware_shared_is_ready(void)
+{
+	int	i;
+
+	for (i = 0; i < vmware->services.values_num; i++)
+	{
+		if (0 == (vmware->services.values[i]->state & (ZBX_VMWARE_STATE_SHMEM_READY | ZBX_VMWARE_STATE_FAILED)))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 /* the vmware resource pool chunk */
 typedef struct
 {

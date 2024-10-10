@@ -1234,7 +1234,27 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 	else
 		evt_pause = 1;
 
+	if (FAIL == vmware_shared_is_ready())
+		evt_pause = 1;
+
 	zbx_vmware_unlock();
+
+	if (0 != evt_pause)
+	{
+		if (0 != service->eventlog.req_sz)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Postponed VMware events requires up to " ZBX_FS_UI64
+					" bytes of free VMwareCache memory. Available " ZBX_FS_UI64 " bytes."
+					" Reading events skipped", service->eventlog.req_sz, shmem_free_sz);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Previous events have not been read. Reading new events skipped");
+		}
+
+		ret = SUCCEED;
+		goto out;
+	}
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
@@ -1254,42 +1274,29 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 		goto clean;
 	}
 
-	if (0 == evt_pause)
+	/* skip collection of event data if we don't know where	*/
+	/* we stopped last time or item can't accept values 	*/
+	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED != evt_last_key && 0 == evt_skip_old && 0 != shmem_free_sz &&
+			SUCCEED != vmware_service_get_event_data(service, easyhandle, evt_last_key, evt_last_ts,
+			shmem_free_sz, evt_severity, &evt_skip_old, &evt_data->events, &events_sz,
+			&evt_data->error))
 	{
-		/* skip collection of event data if we don't know where	*/
-		/* we stopped last time or item can't accept values 	*/
-		if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED != evt_last_key && 0 == evt_skip_old && 0 != shmem_free_sz &&
-				SUCCEED != vmware_service_get_event_data(service, easyhandle, evt_last_key, evt_last_ts,
-				shmem_free_sz, evt_severity, &evt_skip_old, &evt_data->events, &events_sz,
-				&evt_data->error))
-		{
-			goto clean;
-		}
-
-		if (0 != evt_skip_old)
-		{
-			char	*error = NULL;
-
-			/* May not be present */
-			if (SUCCEED != vmware_service_get_last_event_data(service, easyhandle, &evt_data->events,
-					&events_sz, &error))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Unable retrieve lastevent value: %s.", error);
-				zbx_free(error);
-			}
-			else
-				evt_skip_old = 0;
-		}
+		goto clean;
 	}
-	else if (0 != service->eventlog.req_sz)
+
+	if (0 != evt_skip_old)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Postponed VMware events requires up to " ZBX_FS_UI64
-				" bytes of free VMwareCache memory. Available " ZBX_FS_UI64 " bytes."
-				" Reading events skipped", service->eventlog.req_sz, shmem_free_sz);
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Previous events have not been read. Reading new events skipped");
+		char	*error = NULL;
+
+		/* May not be present */
+		if (SUCCEED != vmware_service_get_last_event_data(service, easyhandle, &evt_data->events,
+				&events_sz, &error))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Unable retrieve lastevent value: %s.", error);
+			zbx_free(error);
+		}
+		else
+			evt_skip_old = 0;
 	}
 
 	if (SUCCEED != vmware_service_logout(service, easyhandle, &evt_data->error))

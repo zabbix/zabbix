@@ -1239,6 +1239,52 @@ static void	vmware_perf_counters_availability_check(zbx_vmware_service_t *servic
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: calculate required shared memory size of the perfCounter values   *
+ *                                                                            *
+ * Parameters: perfdata - [IN] performance counter values                     *
+ *                                                                            *
+ * Return value: size of shared memory in bytes                               *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_uint64_t	vmware_perf_data_shmem_size(zbx_vector_vmware_perf_data_ptr_t *perfdata)
+{
+	zbx_vmware_perf_data_t	*data;
+	zbx_uint64_t		req_sz = 0;
+
+	for (int i = 0; i < perfdata->values_num; i++)
+	{
+		data = (zbx_vmware_perf_data_t *)perfdata->values[i];
+
+		if (NULL != data->error)
+		{
+			if (FAIL == vmware_shared_strsearch(data->error))
+			{
+				req_sz += zbx_shmem_required_chunk_size(strlen(data->error) +
+						REFCOUNT_FIELD_SIZE + 1 + ZBX_HASHSET_ENTRY_OFFSET);
+			}
+
+			continue;
+		}
+
+		for (int j = 0; j < data->values.values_num; j++)
+		{
+			zbx_vmware_perf_value_t	*value = data->values.values[j];
+
+			req_sz += zbx_shmem_required_chunk_size(sizeof(zbx_str_uint64_pair_t));
+
+			if (SUCCEED == vmware_shared_strsearch(value->instance))
+				continue;
+
+			req_sz += zbx_shmem_required_chunk_size(strlen(value->instance) +
+					REFCOUNT_FIELD_SIZE + 1 + ZBX_HASHSET_ENTRY_OFFSET);
+		}
+	}
+
+	return req_sz;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: updates vmware statistics data                                    *
  *                                                                            *
  * Parameters: service               - [IN] vmware service                    *
@@ -1263,6 +1309,7 @@ int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *co
 	zbx_vector_vmware_perf_data_ptr_t	perfdata;
 	zbx_vector_perf_available_ptr_t		perf_available;
 	static ZBX_HTTPPAGE			page;	/* 173K */
+	zbx_uint64_t				perf_data_sz = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, service->username, service->url);
 
@@ -1440,7 +1487,7 @@ out:
 
 		zbx_free(error);
 	}
-	else
+	else if (vmware_shmem_get_vmware_mem()->free_size > (perf_data_sz = vmware_perf_data_shmem_size(&perfdata)))
 	{
 		/* clean old performance data and copy the new data into shared memory */
 		vmware_entities_shared_clean_stats(&service->entities);
@@ -1448,6 +1495,21 @@ out:
 
 		if (0 == (service->state & ZBX_VMWARE_STATE_SHMEM_READY))
 			service->state |= ZBX_VMWARE_STATE_SHMEM_READY;
+	}
+	else if ((0 == (service->state & ZBX_VMWARE_STATE_SHMEM_READY)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Not enough VMware shared memory. Performance counters require up to "
+				ZBX_FS_UI64 " bytes of free VMwareCache memory. Available " ZBX_FS_UI64 " bytes."
+				" Increase value of VMwareCacheSize", perf_data_sz,
+				vmware_shmem_get_vmware_mem()->free_size);
+		exit(EXIT_SUCCESS);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Postponed VMware performance counters require up to " ZBX_FS_UI64
+				" bytes of free VMwareCache memory. Available " ZBX_FS_UI64 " bytes."
+				" Reading performance counters skipped", perf_data_sz,
+				vmware_shmem_get_vmware_mem()->free_size);
 	}
 
 	zbx_vmware_unlock();
