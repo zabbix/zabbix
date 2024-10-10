@@ -887,6 +887,7 @@ static zbx_uint64_t	vmware_tags_shmem_size(zbx_vector_vmware_entity_tags_ptr_t *
 			continue;
 
 		req_sz += tags_chunk_sz;
+		req_sz += vmware_shared_str_sz(entity->uuid);
 
 		if (NULL != entity->error)
 		{
