@@ -295,12 +295,21 @@ window.tophosts_column_edit_form = new class {
 			'decimal_places': display_value_as == display_as_numeric,
 			'show_thumbnail': display_value_as == display_as_binary,
 			'aggregate_function': data_item_value,
-			'history': display_value_as == display_as_numeric
+			'history': display_value_as == display_as_numeric,
+			'thresholds': data_item_value && display_value_as == display_as_numeric,
+			'highlights': data_item_value && display_value_as == display_as_text
 		}
 
 		for (const input_name in inputs) {
-			for (const input of this.#form.querySelectorAll(`[name=${input_name}`)) {
-				input.disabled = !inputs[input_name];
+			if (input_name === 'thresholds' || input_name === 'highlights') {
+				for (const input of this.#form.querySelectorAll(`[name^=${input_name}]`)) {
+					input.disabled = !inputs[input_name];
+				}
+			}
+			else {
+				for (const input of this.#form.querySelectorAll(`[name=${input_name}]`)) {
+					input.disabled = !inputs[input_name];
+				}
 			}
 		}
 
