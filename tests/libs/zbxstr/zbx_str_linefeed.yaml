@@ -1,0 +1,81 @@
+---
+test case: "1. Delimiter (|)"
+in:
+  src: "HelloWorldHelloWorldHelloWorld"
+  delim: "|"
+  maxline: 5
+out:
+  string: "Hello|World|Hello|World|Hello|World"
+---
+test case: "2. Wrapping a Short String (No Wrapping Needed)"
+in:
+  src: "Short"
+  delim: "|"
+  maxline: 10
+out:
+  string: "Short"
+---
+test case: "3. Empty String"
+in:
+  src: ""
+  delim: "|"
+  maxline: 10
+out:
+  string: ""
+---
+test case: "4. Delimiter (%)"
+in:
+  src: "HelloWorldHelloWorldHelloWorld"
+  delim: "%"
+  maxline: 5
+out:
+  string: "Hello%World%Hello%World%Hello%World"
+---
+test case: "5. Delimiter (' ')"
+in:
+  src: "HelloWorldHelloWorldHelloWorld"
+  delim: ' '
+  maxline: 5
+out:
+  string: "Hello World Hello World Hello World"
+---
+test case: "6. Emoji"
+in:
+  src: "❤❤❤❤❤❤❤❤❤❤"
+  delim: ' '
+  maxline: 2
+out:
+  string: "? ?? ?? ? ?? ?? ? ?? ?? ? ?? ?? ? ?? ??" # in this test case function returns broken characters string, ? - replaced broken character
+---
+test case: "7. Newlines"
+in:
+  src: "\n\n\n"
+  delim: '.'
+  maxline: 1
+out:
+  string: "\n.\n.\n"
+---
+test case: "8. Backslashes"
+in:
+  src: '\\\\\\'
+  delim: '.'
+  maxline: 1
+out:
+  string: '\.\.\.\.\.\'
+---
+test case: "9. Quotation marks"
+in:
+  src: '"""'
+  delim: '#'
+  maxline: 1
+out:
+  string: '"#"#"'
+---
+test case: "8. Delimiter Newline"
+in:
+  src: "1234567890"
+  delim: "\n"
+  maxline: 5
+out:
+  string: "12345\n67890"
+...

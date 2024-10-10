@@ -1,0 +1,55 @@
+---
+test case: "Copy simple ASCII string"
+in:
+  src: "Hello, World!"
+  dst: "-----, -----!"
+  size: 20 # testing with wrong-on-purpose value
+out:
+  result: 13
+  string: "Hello, World!"
+---
+test case: "Copy UTF-8 string"
+in:
+  src: "Привет"
+  dst: "----------------"
+  size: 17
+out:
+  result: 12
+  string: "Привет"
+---
+test case: "Copy UTF-8 string with truncation"
+in:
+  src: "Привет"
+  dst: "--------"
+  size: 9
+out:
+  result: 8
+  string: "Прив"
+---
+test case: "Copy empty string"
+in:
+  src: ""
+  dst: ""
+  size: 1
+out:
+  result: 0
+  string: ""
+---
+test case: "Copy Emoji"
+in:
+  src: "❤❤❤❤❤❤❤❤"
+  dst: "------------------------------------------"
+  size: 43
+out:
+  result: 24
+  string: "❤❤❤❤❤❤❤❤"
+---
+test case: "Copy Newlines"
+in:
+  src: "\n\n\n\n\n"
+  dst: "------"
+  size: 7
+out:
+  result: 5
+  string: "\n\n\n\n\n"
+...

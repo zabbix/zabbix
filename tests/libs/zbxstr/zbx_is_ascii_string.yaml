@@ -1,0 +1,44 @@
+---
+test case: "1. All printable ASCII characters"
+in:
+  string: |
+   !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}
+out:
+  return: SUCCEED
+---
+test case: "2.  ы"
+in:
+  string: "ы"
+out:
+  return: FAIL
+---
+test case: "3. abcыsss"
+in:
+  string: "abcыsss"
+out:
+  return: FAIL
+---
+test case: "4. 诶"
+in:
+  string: "诶"
+out:
+  return: FAIL
+---
+test case: "5. empty string"
+in:
+  string: ""
+out:
+  return: SUCCEED
+---
+test case: "6. newline"
+in:
+  string: "\n"
+out:
+  return: SUCCEED
+---
+test case: "7. Apostrophe"
+in:
+  string: "'"
+out:
+  return: SUCCEED
+...

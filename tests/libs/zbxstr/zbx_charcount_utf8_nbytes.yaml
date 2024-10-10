@@ -1,0 +1,43 @@
+---
+test case: "1. Hello"
+in:
+  text: "Hello"
+  size: 5
+out:
+  result: 5
+---
+test case: "2. €uro"
+in:
+  text: "€uro"
+  size: 4
+out:
+  result: 2
+---
+test case: "3. 𐍈A"
+in:
+  text: "𐍈A"
+  size: 4
+out:
+  result: 1
+---
+test case: "4. empty string"
+in:
+  text: ""
+  size: 0
+out:
+  result: 0
+---
+test case: "5. Newline"
+in:
+  text: "\n"
+  size: 1
+out:
+  result: 1
+---
+test case: "6. Newlines and spaces"
+in:
+  text: "\n  $"
+  size: 5
+out:
+  result: 4
+...

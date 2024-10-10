@@ -1,0 +1,57 @@
+---
+test case: "/path/to/file.txt - /"
+in:
+  src: "/path/to/file.txt"
+  delimiter: '/' # delimiter must be single-byte character
+out:
+  result_left: "/path/to"
+  result_right: "file.txt"
+---
+test case: "1111!1111!11- !"
+in:
+  src: "1111!1111!11"
+  delimiter: '!' # delimiter must be single-byte character
+out:
+  result_left: "1111!1111"
+  result_right: "11"
+---
+test case: "00000/////0000 - /"
+in:
+  src: "00000/////0000"
+  delimiter: '/' # delimiter must be single-byte character
+out:
+  result_left: "00000////"
+  result_right: "0000"
+---
+test case: "00000///// - /"
+in:
+  src: "00000/////"
+  delimiter: '/' # delimiter must be single-byte character
+out:
+  result_left: "00000////"
+  result_right: ""
+---
+test case: "!11111"
+in:
+  src: "!11111"
+  delimiter: '!' # delimiter must be single-byte character
+out:
+  result_left: ""
+  result_right: "11111"
+---
+test case: "Special characters"
+in:
+  src: "!@#$%^&*()`~"
+  delimiter: '&' # delimiter must be single-byte character
+out:
+  result_left: "!@#$%^"
+  result_right: "*()`~"
+---
+test case: "Newlines"
+in:
+  src: "Newlines\nNewlines\nNewlines"
+  delimiter: "\n" # delimiter must be single-byte character
+out:
+  result_left: "Newlines\nNewlines"
+  result_right: "Newlines"
+...

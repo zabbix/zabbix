@@ -1,0 +1,50 @@
+---
+test case: "1. Default string"
+in:
+  haystack: "Hello, World!"
+  needle: "world"
+out:
+  string: "World!"
+---
+test case: "2. Empty string"
+in:
+  haystack: ""
+  needle: ""
+out:
+  string: ""
+---
+test case: "3. Numeric string"
+in:
+  haystack: "-2147483648/-1"
+  needle: "4"
+out:
+  string: "47483648/-1"
+---
+test case: "5. Special characters string"
+in:
+  haystack: ",./;'[]-="
+  needle: "[]"
+out:
+  string: "[]-="
+---
+test case: "6. Backslash"
+in:
+  haystack: 'adad\adad'
+  needle: '\'
+out:
+  string: '\adad'
+---
+test case: "7. Quotation mark"
+in:
+  haystack: 'Quotation mark"Quotation mark'
+  needle: '"'
+out:
+  string: '"Quotation mark'
+---
+test case: "8. Newline"
+in:
+  haystack: "NewlineNewline\nNewline"
+  needle: "\n"
+out:
+  string: "\nNewline"
+...
