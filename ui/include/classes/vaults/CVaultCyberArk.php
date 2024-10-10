@@ -28,16 +28,16 @@ class CVaultCyberArk extends CVault {
 	private string $api_endpoint;
 	private string $db_prefix;
 	private string $db_path;
-	private ?string $cert_file;
-	private ?string $key_file;
+	private string $cert_file;
+	private string $key_file;
 
-	public function __construct(string $api_endpoint, string $db_prefix, string $db_path, ?string $cert_file,
-			?string $key_file) {
+	public function __construct(string $api_endpoint, string $db_prefix, string $db_path, string $cert_file,
+			string $key_file) {
 		$this->api_endpoint = $api_endpoint;
 		$this->db_prefix = $db_prefix !== '' ? $db_prefix : self::DB_PREFIX_DEFAULT;
 		$this->db_path = $db_path;
-		$this->cert_file = trim($cert_file ?? '');
-		$this->key_file = trim($key_file ?? '');
+		$this->cert_file = trim($cert_file);
+		$this->key_file = trim($key_file);
 	}
 
 	public function validateParameters(): bool {

@@ -113,7 +113,7 @@ out:
   expression: '={?{last(/{HOST.KEY}/key[A]}}='
   return: SUCCEED
 ---
-test case: Expand '={?{last(/{HOST.KEY}/key[{{#A}.fmtnum(1)}]}}=' with {#A}=ABC
+test case: Expand '={?{last(/{HOST.KEY}/key[{{#A}.fmtnum(1)}]}}=' with {#A}=123.456
 in:
   flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
   lld: '{"a":"123.456"}'
@@ -122,5 +122,38 @@ in:
   expression: '={?{last(/{HOST.KEY}/key[{{#A}.fmtnum(1)}]}}='
 out:
   expression: '={?{last(/{HOST.KEY}/key[123.5]}}='
+  return: SUCCEED
+---
+test case: Expand '{{ITEM.VALUE}.regsub({#A}, \1, "\1")}' with {#A}=(.*) and no macro function support
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"a":"(.*)"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '{{ITEM.VALUE}.regsub({#A}, \1, "\1")}'
+out:
+  expression: '{{ITEM.VALUE}.regsub((.*), \1, "\1")}'
+  return: SUCCEED
+---
+test case: Expand '{{ITEM.VALUE}.regsub({#A}, \1, "\1")}' with {#A}=(.*)
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO, ZBX_MACRO_FUNC]
+  lld: '{"a":"(.*)"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '{{ITEM.VALUE}.regsub({#A}, \1, "\1")}'
+out:
+  expression: '{{ITEM.VALUE}.regsub("(.*)", \1, "\1")}'
+  return: SUCCEED
+---
+test case: Expand '{{$MACRO}.regsub({#A}, \1, "\1")}' with {#A}=(.*)
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO, ZBX_MACRO_FUNC]
+  lld: '{"a":"(.*)"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '{{$MACRO}.regsub({#A}, \1, "\1")}'
+out:
+  expression: '{{$MACRO}.regsub("(.*)", \1, "\1")}'
   return: SUCCEED
 ...

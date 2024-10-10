@@ -75,8 +75,6 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results);
 void	zbx_free_agent_result_ptr(AGENT_RESULT *result);
 
-int	zbx_get_value_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type,
-		const char *config_source_ip, const char *progname);
 void	zbx_init_library_mt_snmp(const char *progname);
 
 void	zbx_shutdown_library_mt_snmp(const char *progname);
