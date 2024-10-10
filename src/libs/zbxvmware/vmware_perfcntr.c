@@ -1486,7 +1486,7 @@ out:
 		if (0 == (service->state & ZBX_VMWARE_STATE_SHMEM_READY))
 			service->state |= ZBX_VMWARE_STATE_SHMEM_READY;
 	}
-	else if ((0 == (service->state & ZBX_VMWARE_STATE_SHMEM_READY)))
+	else if (0 == (service->state & ZBX_VMWARE_STATE_SHMEM_READY))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Not enough VMware shared memory. Performance counters require up to "
 				ZBX_FS_UI64 " bytes of free VMwareCache memory. Available " ZBX_FS_UI64 " bytes."
