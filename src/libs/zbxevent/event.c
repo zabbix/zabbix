@@ -190,16 +190,16 @@ void	zbx_event_get_json_actions(const zbx_db_acknowledge *ack, char **replace_to
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_CLOSE, ZBX_PROTO_VALUE_TRUE, ZBX_JSON_TYPE_TRUE);
 
 	if (ack->action & ZBX_PROBLEM_UPDATE_SUPPRESS)
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_SUPPRESS, ack->suppress_until);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_SUPPRESS_UNTIL, ack->suppress_until);
 
 	if (ack->action & ZBX_PROBLEM_UPDATE_UNSUPPRESS)
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_UNSUPPRESS, ZBX_PROTO_VALUE_TRUE, ZBX_JSON_TYPE_TRUE);
 
 	if (ack->action & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE)
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_RANK_TO_CAUSE, ZBX_PROTO_VALUE_TRUE, ZBX_JSON_TYPE_TRUE);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_CAUSE, ZBX_PROTO_VALUE_TRUE, ZBX_JSON_TYPE_TRUE);
 
 	if (ack->action & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM)
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_RANK_TO_SYMPTOM, ZBX_PROTO_VALUE_TRUE, ZBX_JSON_TYPE_TRUE);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_SYMPTOM, ZBX_PROTO_VALUE_TRUE, ZBX_JSON_TYPE_TRUE);
 
 	zbx_json_adduint64(&json, ZBX_PROTO_TAG_TIMESTAMP, (zbx_uint64_t)ack->clock);
 
