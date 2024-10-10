@@ -4032,7 +4032,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 					foreach ($values as $icon_index => $popup_values) {
 						$listener->query('xpath:.//img[contains(@class,"leaflet-marker-icon")]['.$icon_index.']')
 								->one()->click();
-						$this->assertTableData([$popup_values], 'xpath://div[@ class="overlay-dialogue wordbreak"]');
+						$this->assertTableData([$popup_values], 'xpath://div[@class="overlay-dialogue wordbreak"]');
 						$this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->query('class:btn-overlay-close')
 								->one()->click();
 					}

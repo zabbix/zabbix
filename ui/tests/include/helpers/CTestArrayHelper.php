@@ -105,7 +105,7 @@ class CTestArrayHelper {
 	/**
 	 * Check if array is multidimensional.
 	 *
-	 * @param array $array	nested or not nested array under attention
+	 * @param array $array	multidimensional or not multidimensional array under attention
 	 *
 	 * @return boolean
 	 */
