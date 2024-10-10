@@ -1,0 +1,41 @@
+---
+test case: "1. Replaced invalid  UTF-8 characters"
+in:
+  buffer_length: 4
+  buffer: &buffer
+    - '\xfe\xfe\xfe\x00'
+out:
+  buffer_length: 4
+  buffer: &buffer
+    - '\x3f\x3f\x3f\x00'
+---
+test case: "2. null terminated"
+in:
+  buffer_length: 1
+  buffer: &buffer
+    - '\x00'
+out:
+  buffer_length: 1
+  buffer: &buffer
+    - '\x00'
+---
+test case: "3. Hello world! - with invalid"
+in:
+  buffer_length: 13
+  buffer: &buffer
+    - '\x48\x65\x6c\x6c\x6f\x20\x77\x6f\x72\x6c\x64\xfe\x00'
+out:
+  buffer_length: 13
+  buffer: &buffer
+    - '\x48\x65\x6c\x6c\x6f\x20\x77\x6f\x72\x6c\x64\x3f\x00'
+---
+test case: "4. test without invalid"
+in:
+  buffer_length: 5
+  buffer: &buffer
+    - '\x74\x65\x73\x74\x00'
+out:
+  buffer_length: 5
+  buffer: &buffer
+    - '\x74\x65\x73\x74\x00'
+...

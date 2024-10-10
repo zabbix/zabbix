@@ -14,11 +14,12 @@
 **/
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../common/testWidgets.php';
 
 /**
- * @backup widget, profiles
+ * @backup profiles
  */
-class testDashboardHostAvailabilityWidget extends CWebTest {
+class testDashboardHostAvailabilityWidget extends testWidgets {
 
 	/*
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
@@ -726,7 +727,7 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 				$interface_type = $data['fields']['Interface type'];
 			}
 
-			$db_values = $this->getExpectedInterfaceCountFromDB($data, $interface_type);
+			$db_values = $this->getExpectedInterfaceCountFromDB($data['fields'], $interface_type);
 			// Verify that values from the widget match values from DB.
 			$this->assertEquals($db_values, $results);
 		}
@@ -775,7 +776,7 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 		else {
 			// Take reference values from DB taking into account widget layout parameter.
 			foreach ($row_headers as $header) {
-				$db_values = $this->getExpectedInterfaceCountFromDB($data, $header);
+				$db_values = $this->getExpectedInterfaceCountFromDB($data['fields'], $header);
 				$this->assertEquals($rows[$header], $db_values);
 			}
 		}
@@ -788,110 +789,5 @@ class testDashboardHostAvailabilityWidget extends CWebTest {
 			? '15 minutes'
 			: (CTestArrayHelper::get($data['fields'], 'Refresh interval', '15 minutes'));
 		$this->assertEquals($refresh, $widget->getRefreshInterval());
-	}
-
-	/*
-	 * Get the number of interfaces by their type or status, depending on the layout of the HA widget.
-	 * For horizontal layout interface type is passed to the function, but for vertical layout - interface status.
-	 */
-	private function getExpectedInterfaceCountFromDB($data, $header) {
-		$db_interfaces = [
-			'type' => [
-				'Agent (active)' => 5,
-				'Agent (passive)' => 1,
-				'SNMP' => 2,
-				'IPMI' => 3,
-				'JMX' => 4
-			],
-			'interface' => [
-				'Agent (active)' => 'available',
-				'Agent (passive)' => 'available',
-				'SNMP' => 'available',
-				'IPMI' => 'available',
-				'JMX' => 'available'
-			],
-			'status' => [
-				'Unknown' => 0,
-				'Available' => 1,
-				'Not available' => 2
-			]
-		];
-		// Select unique hostids for certain type of interfaces
-		$interfaces_sql = 'SELECT DISTINCT(hostid) FROM interface WHERE type IN (';
-		// Select hostids for host entries that are not templates or proxies and that are not host prototypes.
-		$hosts_sql = 'SELECT hostid FROM hosts WHERE status IN (0,1) AND flags!=2';
-		// Construct sql for horizontal widget layout.
-		if (CTestArrayHelper::get($data, 'fields.Layout', 'Horizontal') === 'Horizontal') {
-			$total_sql = $interfaces_sql.$db_interfaces['type'][$header].') AND hostid IN ('.$hosts_sql;
-			// Filter out hosts in maintenance if the flag 'Include hosts in maintenance' is not set.
-			if (CTestArrayHelper::get($data['fields'], 'Include hosts in maintenance', false) === false) {
-				$total_sql = $total_sql.' AND maintenance_status=0';
-			}
-
-			if ($header === 'Agent (active)') {
-				$db_values = [
-					'Available' => '0',
-					'Not available' => '0',
-					'Mixed' => '-',
-					'Unknown' => '0',
-					'Total' => '0'
-				];
-			}
-			else {
-				// Add interface status flag. Possible values: 0 - unknown, 1 - available, 2 - not available.
-				$db_values = [
-					'Available' => CDBHelper::getCount($total_sql.' AND '.$db_interfaces['interface'][$header].'=1)'),
-					'Not available' => CDBHelper::getCount($total_sql.' AND '.$db_interfaces['interface'][$header].'=2)'),
-					'Mixed' => '0',
-					'Unknown' => CDBHelper::getCount($total_sql.' AND '.$db_interfaces['interface'][$header].'=0)'),
-					'Total' => CDBHelper::getCount($total_sql.')')
-				];
-			}
-		}
-		// Construct sql for vertical widget layout.
-		else {
-			// Filter out hosts in maintenance if the flag 'Include hosts in maintenance' is not set.
-			if (CTestArrayHelper::get($data['fields'], 'Include hosts in maintenance', false) === false) {
-				$hosts_sql = $hosts_sql.' AND maintenance_status=0';
-			}
-			// The SQL for Total interface number doesn't use interface status and needs to be constructed separately.
-			if ($header === 'Total'){
-				$db_values = [
-					'Total Hosts' => CDBHelper::getCount($interfaces_sql.'1,2,3,4) AND hostid IN ('.$hosts_sql.')'),
-					'Agent (passive)' => CDBHelper::getCount($interfaces_sql.'1) AND hostid IN ('.$hosts_sql.')'),
-					'SNMP' => CDBHelper::getCount($interfaces_sql.'2) AND hostid IN ('.$hosts_sql.')'),
-					'IPMI' => CDBHelper::getCount($interfaces_sql.'3) AND hostid IN ('.$hosts_sql.')'),
-					'JMX' => CDBHelper::getCount($interfaces_sql.'4) AND hostid IN ('.$hosts_sql.')')
-				];
-			}
-			else {
-				// Add interface status flag based on interface type.
-				if ($header === 'Mixed') {
-					$db_values = [
-						'Total Hosts' => '0',
-						'Agent (passive)' => '0',
-						'SNMP' => '0',
-						'IPMI' => '0',
-						'JMX' => '0'
-					];
-				}
-				else {
-					$db_values = [
-						'Total Hosts' => CDBHelper::getCount($interfaces_sql.'1,2,3,4) AND available='.
-							$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')'),
-						'Agent (passive)' => CDBHelper::getCount($interfaces_sql.'1) AND available='.
-							$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')'),
-						'SNMP' => CDBHelper::getCount($interfaces_sql.'2) AND available='.
-							$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')'),
-						'IPMI' => CDBHelper::getCount($interfaces_sql.'3) AND available='.
-							$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')'),
-						'JMX' => CDBHelper::getCount($interfaces_sql.'4) AND available='.
-							$db_interfaces['status'][$header].' AND hostid IN ('.$hosts_sql.')')
-					];
-				}
-			}
-		}
-
-		return $db_values;
 	}
 }

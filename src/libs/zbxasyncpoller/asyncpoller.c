@@ -60,18 +60,18 @@ static void	async_task_remove(zbx_async_task_t *task)
 	zbx_free(task);
 }
 
-static const char	*task_state_to_str(zbx_async_task_state_t task_state)
+const char	*zbx_task_state_to_str(zbx_async_task_state_t task_state)
 {
 	switch (task_state)
 	{
 		case ZBX_ASYNC_TASK_WRITE:
-			return "ZBX_ASYNC_TASK_WRITE";
+			return "write";
 		case ZBX_ASYNC_TASK_READ:
-			return "ZBX_ASYNC_TASK_READ";
+			return "read";
 		case ZBX_ASYNC_TASK_STOP:
-			return "ZBX_ASYNC_TASK_STOP";
+			return "stop";
 		case ZBX_ASYNC_TASK_RESOLVE_REVERSE:
-			return "ZBX_ASYNC_TASK_RESOLVE_REVERSE";
+			return "resolve reverse";
 		default:
 			return "unknown";
 	}
@@ -85,7 +85,7 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	ret = task->process_cb(what, task->data, &fd, task->address, task->error);
+	ret = task->process_cb(what, task->data, &fd, task->address, task->error, task->timeout_event);
 
 	switch (ret)
 	{
@@ -150,7 +150,7 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, task_state_to_str(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_task_state_to_str(ret));
 }
 
 static void	async_reverse_dns_event(int err, char type, int count, int ttl, void *addresses, void *arg)
@@ -287,6 +287,7 @@ zbx_async_task_state_t	zbx_async_poller_get_task_state_for_event(short event)
 
 	return ZBX_ASYNC_TASK_STOP;
 }
+
 const char	*zbx_resolv_conf_errstr(const int error)
 {
 	switch (error)
@@ -306,6 +307,24 @@ const char	*zbx_resolv_conf_errstr(const int error)
 		default:
 			return "unknown";
 	}
+}
+
+const char	*zbx_get_event_string(short event)
+{
+
+	if (EV_TIMEOUT & event)
+		return "timeout";
+
+	if (EV_READ & event)
+		return "read";
+
+	if (EV_WRITE & event)
+		return "write";
+
+	if (0 == event)
+		return "init";
+
+	return "unknown";
 }
 
 #endif

@@ -13,7 +13,6 @@
 **/
 
 #include "dbupgrade.h"
-#include "zbxdbhigh.h"
 #include "zbxdb.h"
 
 /*
@@ -173,6 +172,14 @@ static int	DBpatch_7010013(void)
 
 static int	DBpatch_7010014(void)
 {
+	if (FAIL == zbx_db_index_exists("auditlog", "auditlog_5"))
+		return DBcreate_index("auditlog", "auditlog_5", "ip", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7010015(void)
+{
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
@@ -211,5 +218,6 @@ DBPATCH_ADD(7010011, 0, 1)
 DBPATCH_ADD(7010012, 0, 1)
 DBPATCH_ADD(7010013, 0, 1)
 DBPATCH_ADD(7010014, 0, 1)
+DBPATCH_ADD(7010015, 0, 1)
 
 DBPATCH_END()

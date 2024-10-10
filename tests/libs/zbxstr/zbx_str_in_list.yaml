@@ -1,0 +1,73 @@
+---
+test case: "1. a,b,ccc,ddd - succeed"
+in:
+  list: "a,b,ccc,ddd"
+  value: "ccc"
+  delimiter: ','
+out:
+  return: SUCCEED
+---
+test case: "2. a,b,cc,ddd - fail"
+in:
+  list: "a,b,cc,ddd"
+  value: "ccc"
+  delimiter: ','
+out:
+  return: FAIL
+---
+test case: "3. aa.aaa.aaaa.aaaaa - succeed"
+in:
+  list: "aa.aaa.aaaa.aaaaa"
+  value: "aaaa"
+  delimiter: '.'
+out:
+  return: SUCCEED
+---
+test case: "4. NULL"
+in:
+  list: ""
+  value: ""
+  delimiter: ''
+out:
+  return: SUCCEED
+---
+test case: "5. empty list"
+in:
+  list: ""
+  value: "bb"
+  delimiter: '.'
+out:
+  return: FAIL
+---
+test case: "6. empty charlist"
+in:
+  list: "a.bb.ccc"
+  value: ""
+  delimiter: '.'
+out:
+  return: FAIL
+---
+test case: "7. Special characters"
+in:
+  list: "Ω.≈.ç√∫˜µ≤≥÷"
+  value: "≈"
+  delimiter: '.'
+out:
+  return: SUCCEED
+---
+test case: "8. 2-bytes characters"
+in:
+  list: "社會科學/院/語學研究所"
+  value: "院"
+  delimiter: '/'
+out:
+  return: SUCCEED
+---
+test case: "9. Newlines"
+in:
+  list: "\n\n.\n\n.\n\n\n"
+  value: "\n\n"
+  delimiter: '.'
+out:
+  return: SUCCEED
+...

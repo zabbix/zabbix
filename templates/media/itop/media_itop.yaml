@@ -213,7 +213,7 @@ zabbix_export:
             }
             // Create issue for trigger-based events.
             else if (params.event_value === '1' && params.event_update_status === '0'
-                    && Itop.params.id === '{EVENT.TAGS.__zbx_itop_id}') {
+                    && (Itop.params.id === '{EVENT.TAGS.__zbx_itop_id}' || Itop.params.id === '*UNKNOWN*')) {
                 Itop.setCreatePayload();
         
                 var response = Itop.request(json_data);
@@ -226,7 +226,7 @@ zabbix_export:
             }
             // Update created issue for trigger-based event.
             else {
-                if (Itop.params.id === '{EVENT.TAGS.__zbx_itop_id}') {
+                if (Itop.params.id === '{EVENT.TAGS.__zbx_itop_id}' || Itop.params.id === '*UNKNOWN*') {
                     throw 'Incorrect iTop ticket ID given: ' + Itop.params.id;
                 }
                 Itop.setUpdatePayload();

@@ -1,0 +1,73 @@
+---
+test case: 1. Common string
+in:
+  src: "abcd"
+  charlist: 'b'
+  len: 10
+out:
+  return: SUCCEED
+  result: "a\\bcd"
+---
+test case: 2. Numeric string
+in:
+  src: "-9223372036854775808/-1"
+  charlist: '2'
+  len: 30
+out:
+  return: SUCCEED
+  result: "-9\\2\\2337\\2036854775808/-1"
+---
+test case: 3. Special characters string
+in:
+  src: "!@#$%^&*()`~"
+  charlist: '$'
+  len: 20
+out:
+  return: SUCCEED
+  result: "!@#\\$%^&*()`~"
+---
+test case: 4. Empty string
+in:
+  src: ""
+  charlist: ''
+  len: 20
+out:
+  return: SUCCEED
+  result: ""
+---
+test case: 5. Common string with newline
+in:
+  src: "abc\nd"
+  charlist: 'b'
+  len: 10
+out:
+  return: SUCCEED
+  result: "a\\bc\nd"
+---
+test case: 6. Common string with escapings
+in:
+  src: abc\d
+  charlist: 'b'
+  len: 10
+out:
+  return: SUCCEED
+  result: a\bc\d
+---
+test case: 7. Common string with quotation marks
+in:
+  src: a"b"cd
+  charlist: 'b'
+  len: 10
+out:
+  return: SUCCEED
+  result: a"\b"cd
+---
+test case: 8. Charlist is backslash
+in:
+  src: src\lib
+  charlist: '\'
+  len: 10
+out:
+  return: SUCCEED
+  result: src\\lib
+...

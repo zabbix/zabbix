@@ -100,7 +100,7 @@ $custom_intervals = (new CTable())
 		new CColHeader(_('Type')),
 		new CColHeader(_('Interval')),
 		new CColHeader(_('Period')),
-		(new CColHeader(_('Action')))->setWidth(50)
+		''
 	])
 	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
@@ -246,7 +246,11 @@ $operations_popup_form_list
 			->setChecked(array_key_exists('optag', $options))
 			->setReadonly($options['templated']),
 		renderTagTable($field_values['optag'], $options['templated'], ['field_name' => 'optag', 'add_post_js' => false])
-			->setHeader([_('Name'), _('Value'), _('Action')])
+			->setHeader([
+				(new CColHeader(_('Name')))->setWidth('50%'),
+				(new CColHeader(_('Value')))->setWidth('50%'),
+				''
+			])
 			->setId('optag-field')
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addClass('tags-table'),

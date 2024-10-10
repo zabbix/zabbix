@@ -17,7 +17,6 @@
 #include "audit/zbxaudit_trigger.h"
 #include "zbxnum.h"
 #include "zbxdb.h"
-#include "zbxdbhigh.h"
 #include "zbxstr.h"
 
 typedef struct

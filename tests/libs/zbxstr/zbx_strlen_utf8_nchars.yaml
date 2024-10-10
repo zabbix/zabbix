@@ -1,0 +1,50 @@
+---
+test case: "Hello"
+in:
+  text: "Hello"
+  size: 3
+out:
+  result: 3
+---
+test case: "€uro"
+in:
+  text: "€uro"
+  size: 2
+out:
+  result: 4
+---
+test case: "𐍈A"
+in:
+  text: "𐍈A"
+  size: 1
+out:
+  result: 4
+---
+test case: "Empty"
+in:
+  text: ""
+  size: 0
+out:
+  result: 0
+---
+test case: "Newlines"
+in:
+  text: "\n\n\n"
+  size: 3
+out:
+  result: 3
+---
+test case: "Three-Byte Characters"
+in:
+  text: "田中さんにあげて下さい"
+  size: 3
+out:
+  result: 9
+---
+test case: "Emoji"
+in:
+  text: "❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤"
+  size: 3
+out:
+  result: 9
+...

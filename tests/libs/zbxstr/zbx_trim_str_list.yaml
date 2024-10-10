@@ -1,0 +1,36 @@
+---
+test case: " apple , banana , cherry , date "
+in:
+  string: " apple , banana , cherry , date "
+  del: ','
+out:
+  string: "apple,banana,cherry,date"
+---
+test case: " apple . banana . cherry . date "
+in:
+  string: " apple . banana . cherry . date "
+  del: '.'
+out:
+  string: "apple.banana.cherry.date"
+---
+test case: "One letter"
+in:
+  string: "  a  "
+  del: 'a'
+out:
+  string: "a"
+---
+test case: "Two-Byte Characters"
+in:
+  string: "田 . 中 . さ . ん"
+  del: '.'
+out:
+  string: "田.中.さ.ん"
+---
+test case: "Newlines and Tabs"
+in:
+  string: "\n \t \n \t \n \t \n"
+  del: "\t"
+out:
+  string: "\n\t\n\t\n\t\n"
+...

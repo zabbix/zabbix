@@ -58,6 +58,7 @@
 #include "zbxpgservice.h"
 #include "zbxinterface.h"
 #include "zbxhistory.h"
+#include "zbx_expression_constants.h"
 
 ZBX_PTR_VECTOR_IMPL(inventory_value_ptr, zbx_inventory_value_t *)
 ZBX_PTR_VECTOR_IMPL(hc_item_ptr, zbx_hc_item_t *)
@@ -9297,6 +9298,7 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	else
 		config->session_token = NULL;
 
+	config->itservices_num = 0;
 	config->proxy_hostname = (NULL != hostname ? dc_strdup(hostname) : NULL);
 	config->proxy_failover_delay_raw = NULL;
 	config->proxy_failover_delay = ZBX_PG_DEFAULT_FAILOVER_DELAY;
@@ -9869,14 +9871,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 
 			if (NULL != snmp)
 			{
-				if ('\0' != *src_item->timeout &&
-						0 != strncmp(src_item->itemtype.snmpitem->snmp_oid, "walk[",
-						ZBX_CONST_STRLEN("walk[")))
-				{
-					zbx_strscpy(dst_item->timeout_orig,
-							dc_get_global_item_type_timeout(src_item->type));
-				}
-
 				zbx_strscpy(dst_item->snmp_community_orig, snmp->community);
 				zbx_strscpy(dst_item->snmp_oid_orig, src_item->itemtype.snmpitem->snmp_oid);
 				zbx_strscpy(dst_item->snmpv3_securityname_orig, snmp->securityname);
@@ -11482,6 +11476,62 @@ int	zbx_dc_config_get_interface(zbx_dc_interface_t *interface, zbx_uint64_t host
 
 unlock:
 	UNLOCK_CACHE;
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve a particular value associated with the interface.        *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char **replace_to, int request)
+{
+	int			res;
+	zbx_dc_interface_t	interface;
+
+	if (SUCCEED != (res = zbx_dc_config_get_interface(&interface, hostid, itemid)))
+	{
+		*replace_to = zbx_strdup(*replace_to, STR_UNKNOWN_VARIABLE);
+		return SUCCEED;
+	}
+
+	switch (request)
+	{
+		case ZBX_REQUEST_HOST_IP:
+			if ('\0' != *interface.ip_orig && FAIL == zbx_is_ip(interface.ip_orig))
+				return FAIL;
+
+			*replace_to = zbx_strdup(*replace_to, interface.ip_orig);
+			break;
+		case ZBX_REQUEST_HOST_DNS:
+			if ('\0' != *interface.dns_orig && FAIL == zbx_is_ip(interface.dns_orig) &&
+					FAIL == zbx_validate_hostname(interface.dns_orig))
+			{
+				return FAIL;
+			}
+
+			*replace_to = zbx_strdup(*replace_to, interface.dns_orig);
+			break;
+		case ZBX_REQUEST_HOST_CONN:
+			if (FAIL == zbx_is_ip(interface.addr) &&
+					FAIL == zbx_validate_hostname(interface.addr))
+			{
+				return FAIL;
+			}
+
+			*replace_to = zbx_strdup(*replace_to, interface.addr);
+			break;
+		case ZBX_REQUEST_HOST_PORT:
+			*replace_to = zbx_strdup(*replace_to, interface.port_orig);
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			res = FAIL;
+	}
 
 	return res;
 }
@@ -17373,4 +17423,32 @@ zbx_dc_um_shared_handle_t	*zbx_dc_um_shared_handle_copy(zbx_dc_um_shared_handle_
 	handle->refcount++;
 
 	return handle;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update number of IT services in configuration cache               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_set_itservices_num(int num)
+{
+	WRLOCK_CACHE;
+	config->itservices_num = num;
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get number of IT services in configuration cache                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_get_itservices_num(void)
+{
+	int	num;
+
+	RDLOCK_CACHE;
+	num = config->itservices_num;
+	UNLOCK_CACHE;
+
+	return num;
 }
