@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-09-23 21:00+0000\n"
+"PO-Revision-Date: 2024-09-29 14:18+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -12386,7 +12386,7 @@ msgstr "Gráfico de la última semana"
 #: include/views/inventory.host.view.php:145
 #: include/views/inventory.host.view.php:151 jsLoader.php:375
 msgid "Latest data"
-msgstr "Últimos datos"
+msgstr "Datos más recientes"
 
 #: app/partials/administration.system.info.php:101
 msgid "Latest release"

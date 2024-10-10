@@ -650,6 +650,8 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 			zabbix_log(LOG_LEVEL_WARNING, "incorrect answer from \"%s:%hu\": [%s]",
 					sendval_args->addrs->values[0]->ip, sendval_args->addrs->values[0]->port,
 					data);
+
+			zbx_addrs_failover(sendval_args->addrs);
 		}
 
 		zbx_free(data);

@@ -31,7 +31,7 @@
 #include "zbxipmi.h"
 #include "zbxpoller.h"
 #include "zbxcacheconfig.h"
-#include "zbxdbhigh.h"
+#include "zbxdb.h"
 #include "zbxthreads.h"
 #include "zbxtimekeeper.h"
 
