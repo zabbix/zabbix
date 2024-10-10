@@ -95,6 +95,30 @@ class testFormPreprocessingClone extends CWebTest {
 			'params' => "1\n2",
 			'error_handler' => 0,
 			'error_handler_params' => ''
+		],
+		[
+			'type' => '27',
+			'params' => '',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '28',
+			'params' => "OID\n1",
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '29',
+			'params' => "test\nOID\n1",
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '30',
+			'params' => '1',
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		]
 	];
 

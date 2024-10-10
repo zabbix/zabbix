@@ -53,6 +53,12 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 			'error_handler_params' => ''
 		],
 		[
+			'type' => '14',
+			'params' => 'regular expression pattern for matching',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
 			'type' => '15',
 			'params' => 'regular expression pattern for not matching',
 			'error_handler' => 0,
@@ -97,6 +103,30 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 		[
 			'type' => '23',
 			'params' => 'metric',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '27',
+			'params' => '',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '28',
+			'params' => "OID\n1",
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '29',
+			'params' => "test\nOID\n1",
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '30',
+			'params' => '1',
 			'error_handler' => 0,
 			'error_handler_params' => ''
 		]
