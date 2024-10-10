@@ -1257,12 +1257,7 @@ static zbx_uint64_t	vmware_perf_data_shmem_size(zbx_vector_vmware_perf_data_ptr_
 
 		if (NULL != data->error)
 		{
-			if (FAIL == vmware_shared_strsearch(data->error))
-			{
-				req_sz += zbx_shmem_required_chunk_size(strlen(data->error) +
-						REFCOUNT_FIELD_SIZE + 1 + ZBX_HASHSET_ENTRY_OFFSET);
-			}
-
+			req_sz += vmware_shared_str_sz(data->error);
 			continue;
 		}
 
@@ -1271,12 +1266,7 @@ static zbx_uint64_t	vmware_perf_data_shmem_size(zbx_vector_vmware_perf_data_ptr_
 			zbx_vmware_perf_value_t	*value = data->values.values[j];
 
 			req_sz += zbx_shmem_required_chunk_size(sizeof(zbx_str_uint64_pair_t));
-
-			if (SUCCEED == vmware_shared_strsearch(value->instance))
-				continue;
-
-			req_sz += zbx_shmem_required_chunk_size(strlen(value->instance) +
-					REFCOUNT_FIELD_SIZE + 1 + ZBX_HASHSET_ENTRY_OFFSET);
+			req_sz += vmware_shared_str_sz(value->instance);
 		}
 	}
 

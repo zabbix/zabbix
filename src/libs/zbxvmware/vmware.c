@@ -146,6 +146,14 @@ ZBX_PTR_VECTOR_IMPL(vmware_rpool_chunk_ptr, zbx_vmware_rpool_chunk_t *)
 
 /* string pool support */
 
+int	vmware_shared_str_sz(const char *str)
+{
+	if (SUCCEED == vmware_shared_strsearch(str))
+		return 0;
+
+	return zbx_shmem_required_chunk_size(strlen(str) + REFCOUNT_FIELD_SIZE + 1 + ZBX_HASHSET_ENTRY_OFFSET);
+}
+
 int	vmware_shared_strsearch(const char *str)
 {
 	return NULL == zbx_hashset_search(&vmware->strpool, str - REFCOUNT_FIELD_SIZE) ? FAIL : SUCCEED;
@@ -3152,8 +3160,6 @@ void	zbx_vmware_shared_tags_error_set(const char *error, zbx_vmware_data_tags_t 
  ******************************************************************************/
 void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_ptr_t *src, zbx_vmware_data_tags_t *dst)
 {
-	zbx_vmware_lock();
-
 	zbx_vector_vmware_entity_tags_ptr_clear_ext(&dst->entity_tags, vmware_shared_entity_tags_free);
 	vmware_shared_strfree(dst->error);
 	dst->error = NULL;
@@ -3178,6 +3184,8 @@ void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_ptr_t *s
 		else
 			to_entity->error = NULL;
 
+		zbx_vector_vmware_tag_ptr_reserve(&to_entity->tags, from_entity->tags.values_num);
+
 		for (int j = 0; j < from_entity->tags.values_num; j++)
 		{
 			zbx_vmware_tag_t	*to_tag, *from_tag = from_entity->tags.values[j];
@@ -3192,8 +3200,6 @@ void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_ptr_t *s
 
 		zbx_vector_vmware_entity_tags_ptr_append(&dst->entity_tags, to_entity);
 	}
-
-	zbx_vmware_unlock();
 }
 
 zbx_uint64_t	zbx_vmware_get_evt_req_chunk_sz(void)

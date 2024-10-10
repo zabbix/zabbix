@@ -212,6 +212,7 @@ void	zbx_vmware_key_value_free(zbx_vmware_key_value_t value);
 #define REFCOUNT_FIELD_SIZE	sizeof(zbx_uint32_t)
 
 int	vmware_shared_is_ready(void);
+int	vmware_shared_str_sz(const char *str);
 int	vmware_shared_strsearch(const char *str);
 char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_uint64_t *len);
 char	*vmware_shared_strdup(const char *str);
