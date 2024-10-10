@@ -3184,7 +3184,7 @@ void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_ptr_t *s
 		else
 			to_entity->error = NULL;
 
-		zbx_vector_vmware_tag_ptr_reserve(&to_entity->tags, from_entity->tags.values_num);
+		zbx_vector_vmware_tag_ptr_reserve(&to_entity->tags, (size_t)from_entity->tags.values_num);
 
 		for (int j = 0; j < from_entity->tags.values_num; j++)
 		{
