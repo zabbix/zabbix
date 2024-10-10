@@ -130,6 +130,11 @@ static int	DBpatch_7000012(void)
 
 static int	DBpatch_7000013(void)
 {
+	return DBcreate_index("auditlog", "auditlog_5", "ip", 0);
+}
+
+static int	DBpatch_7000014(void)
+{
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
@@ -167,5 +172,6 @@ DBPATCH_ADD(7000010, 0, 0)
 DBPATCH_ADD(7000011, 0, 0)
 DBPATCH_ADD(7000012, 0, 0)
 DBPATCH_ADD(7000013, 0, 0)
+DBPATCH_ADD(7000014, 0, 0)
 
 DBPATCH_END()

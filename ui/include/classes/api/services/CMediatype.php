@@ -37,6 +37,8 @@ class CMediatype extends CApiService {
 		'description', 'provider', 'parameters'
 	];
 
+	public const LIMITED_OUTPUT_FIELDS = ['mediatypeid', 'type', 'name', 'status', 'description', 'maxattempts'];
+
 	/**
 	 * @param array $options
 	 *
@@ -95,12 +97,18 @@ class CMediatype extends CApiService {
 		}
 
 		// permission check
-		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
-		}
-		elseif (!$options['editable'] && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
-		}
-		elseif ($options['editable'] || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if ((self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN && $options['editable'])
+				|| self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
 			return [];
+		}
+
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			if ($options['output'] === API_OUTPUT_EXTEND) {
+				$options['output'] = self::LIMITED_OUTPUT_FIELDS;
+			}
+			elseif (is_array($options['output'])) {
+				$options['output'] = array_intersect($options['output'], self::LIMITED_OUTPUT_FIELDS);
+			}
 		}
 
 		// mediatypeids
@@ -113,6 +121,16 @@ class CMediatype extends CApiService {
 		if (!is_null($options['mediaids'])) {
 			zbx_value2array($options['mediaids']);
 
+			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+				$_options = [
+					'output' => ['mediaid'],
+					'filter' => ['userid' => self::$userData['userid']]
+				];
+				$accessible_mediaids = DBfetchColumn(DBselect(DB::makeSql('media', $_options)), 'mediaid');
+
+				$options['mediaids'] = array_intersect($options['mediaids'], $accessible_mediaids);
+			}
+
 			$sqlParts['from']['media'] = 'media m';
 			$sqlParts['where'][] = dbConditionInt('m.mediaid', $options['mediaids']);
 			$sqlParts['where']['mmt'] = 'm.mediatypeid=mt.mediatypeid';
@@ -122,6 +140,10 @@ class CMediatype extends CApiService {
 		if (!is_null($options['userids'])) {
 			zbx_value2array($options['userids']);
 
+			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+				$options['userids'] = array_intersect($options['userids'], [self::$userData['userid']]);
+			}
+
 			$sqlParts['from']['media'] = 'media m';
 			$sqlParts['where'][] = dbConditionInt('m.userid', $options['userids']);
 			$sqlParts['where']['mmt'] = 'm.mediatypeid=mt.mediatypeid';
@@ -129,11 +151,31 @@ class CMediatype extends CApiService {
 
 		// filter
 		if (is_array($options['filter'])) {
+			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+				if ($options['searchByAny'] !== null && $options['searchByAny'] !== false) {
+					$options['filter'] =
+						array_intersect_key($options['filter'], array_flip(self::LIMITED_OUTPUT_FIELDS));
+				}
+				elseif (array_diff_key($options['filter'], array_flip(self::LIMITED_OUTPUT_FIELDS))) {
+					return [];
+				}
+			}
+
 			$this->dbFilter('media_type mt', $options, $sqlParts);
 		}
 
 		// search
 		if (is_array($options['search'])) {
+			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+				if ($options['searchByAny']) {
+					$options['search'] =
+						array_intersect_key($options['search'], array_flip(self::LIMITED_OUTPUT_FIELDS));
+				}
+				elseif (array_diff_key($options['search'], array_flip(self::LIMITED_OUTPUT_FIELDS))) {
+					return [];
+				}
+			}
+
 			zbx_db_search('media_type mt', $options, $sqlParts);
 		}
 
@@ -906,7 +948,8 @@ class CMediatype extends CApiService {
 		self::addRelatedActions($options, $result);
 
 		// adding message templates
-		if ($options['selectMessageTemplates'] !== null && $options['selectMessageTemplates'] != API_OUTPUT_COUNT) {
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN && $options['selectMessageTemplates'] !== null
+				&& $options['selectMessageTemplates'] != API_OUTPUT_COUNT) {
 			$message_templates = [];
 
 			$relation_map = $this->createRelationMap($result, 'mediatypeid', 'mediatype_messageid',
@@ -932,9 +975,23 @@ class CMediatype extends CApiService {
 
 		// adding users
 		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
+			$user_condition = self::$userData['type'] != USER_TYPE_SUPER_ADMIN
+				? ['userid' => self::$userData['userid']]
+				: [];
+			$_options = [
+				'output' => ['mediatypeid', 'userid'],
+				'filter' => ['mediatypeid' => array_keys($result)] + $user_condition
+			];
+			$medias = DBselect(DB::makeSql('media', $_options));
+
+			$relation_map = new CRelationMap();
+
+			while ($media = DBfetch($medias)) {
+				$relation_map->addRelation($media['mediatypeid'], $media['userid']);
+			}
+
 			$users = [];
-			$relationMap = $this->createRelationMap($result, 'mediatypeid', 'userid', 'media');
-			$related_ids = $relationMap->getRelatedIds();
+			$related_ids = $relation_map->getRelatedIds();
 
 			if ($related_ids) {
 				$users = API::User()->get([
@@ -944,7 +1001,7 @@ class CMediatype extends CApiService {
 				]);
 			}
 
-			$result = $relationMap->mapMany($result, $users, 'users');
+			$result = $relation_map->mapMany($result, $users, 'users');
 		}
 
 		if ($this->outputIsRequested('parameters', $options['output'])) {
@@ -1046,7 +1103,7 @@ class CMediatype extends CApiService {
 			'SELECT DISTINCT om.mediatypeid,o.actionid'.
 			' FROM opmessage om,operations o'.
 			' WHERE om.operationid=o.operationid'.
-			' AND ('.dbConditionId('om.mediatypeid', array_keys($result)).' OR om.mediatypeid IS NULL)'
+				' AND ('.dbConditionId('om.mediatypeid', array_keys($result)).' OR om.mediatypeid IS NULL)'
 		);
 
 		$action_mediatypeids = [];
@@ -1054,30 +1111,28 @@ class CMediatype extends CApiService {
 		while ($row = DBfetch($db_action_mediatypes)) {
 			if ($row['mediatypeid'] == 0) {
 				foreach ($result as $mediatype) {
-					$action_mediatypeids[$row['actionid']][$mediatype['mediatypeid']] = $mediatype['mediatypeid'];
+					$action_mediatypeids[$row['actionid']][$mediatype['mediatypeid']] = true;
 				}
 			}
 			else {
-				$action_mediatypeids[$row['actionid']][$row['mediatypeid']] = $row['mediatypeid'];
+				$action_mediatypeids[$row['actionid']][$row['mediatypeid']] = true;
 			}
 		}
 
-		$action_options = [
+		$actions = API::Action()->get([
 			'output' => $options['selectActions'],
-			'actionids' => array_keys($action_mediatypeids)
-		];
-
-		$db_actions = DBselect(DB::makeSql('actions', $action_options));
+			'actionids' => array_keys($action_mediatypeids),
+			'sortfield' => 'name',
+			'preservekeys' => true
+		]);
 
 		foreach ($result as $mediatype) {
 			$result[$mediatype['mediatypeid']]['actions'] = [];
 		}
 
-		while ($action = DBfetch($db_actions)) {
-			foreach ($action_mediatypeids[$action['actionid']] as $mediatypeid) {
+		foreach ($actions as $actionid => $action) {
+			foreach ($action_mediatypeids[$actionid] as $mediatypeid => $foo) {
 				$result[$mediatypeid]['actions'][] = $action;
-
-				CArrayHelper::sort($result[$mediatypeid]['actions'], ['name']);
 			}
 		}
 	}
