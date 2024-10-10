@@ -87,7 +87,8 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-multiline-tmpl">
-	<?= (new CMultilineInput('preprocessing[#{rowNum}][params][0]', '', ['add_post_js' => false])) ?>
+	<?= (new CMultilineInput('preprocessing[#{rowNum}][params][0]', '', ['add_post_js' => false, 'use_tab' => false]))
+	?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-custom-width-chkbox-tmpl">
@@ -149,7 +150,7 @@
 							new CColHeader(_('Field name')),
 							new CColHeader(_('OID prefix')),
 							new CColHeader(_('Format')),
-							(new CColHeader(_('Action')))->addClass(ZBX_STYLE_NOWRAP)
+							(new CColHeader(''))->addClass(ZBX_STYLE_NOWRAP)
 						]))->addClass(ZBX_STYLE_GREY)
 					)
 					->addItem(

@@ -746,7 +746,7 @@ class testFormAction extends CLegacyWebTest {
 				$this->assertEquals('1h', $form->getField('Default operation step duration')->getValue());
 				$this->zbxTestAssertVisibleId('esc_period');
 				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'maxlength', 255);
-				$this->assertEquals($operations_field->getHeadersText(), ['Steps', 'Details', 'Start in', 'Duration', 'Action']);
+				$this->assertEquals($operations_field->getHeadersText(), ['Steps', 'Details', 'Start in', 'Duration', 'Actions']);
 
 				$checkboxes = [
 					'Pause operations for suppressed problems' => 'id:pause_suppressed',
@@ -762,9 +762,9 @@ class testFormAction extends CLegacyWebTest {
 				}
 
 				$recovery_field = $form->getField('Recovery operations')->asTable();
-				$this->assertEquals($recovery_field->getHeadersText(), ['Details', 'Action']);
+				$this->assertEquals($recovery_field->getHeadersText(), ['Details', 'Actions']);
 				$update_field = $form->getField('Update operations')->asTable();
-				$this->assertEquals($update_field->getHeadersText(), ['Details', 'Action']);
+				$this->assertEquals($update_field->getHeadersText(), ['Details', 'Actions']);
 				break;
 
 			case EVENT_SOURCE_DISCOVERY:
@@ -780,9 +780,9 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestAssertVisibleId('esc_period');
 				$this->zbxTestAssertAttribute('//input[@id=\'esc_period\']', 'maxlength', 255);
 
-				$this->assertEquals($operations_field->getHeadersText(), ['Steps', 'Details', 'Start in', 'Duration', 'Action']);
+				$this->assertEquals($operations_field->getHeadersText(), ['Steps', 'Details', 'Start in', 'Duration', 'Actions']);
 				$recovery_field = $form->getField('Recovery operations')->asTable();
-				$this->assertEquals($recovery_field->getHeadersText(), ['Details', 'Action']);
+				$this->assertEquals($recovery_field->getHeadersText(), ['Details', 'Actions']);
 				$this->zbxTestTextNotPresent(['Pause operations for suppressed problems', 'Notify about canceled escalations',
 					'Update operations']
 				);
@@ -975,7 +975,7 @@ class testFormAction extends CLegacyWebTest {
 		}
 
 		if ($eventsource == EVENT_SOURCE_TRIGGERS && $new_operation_operationtype != null) {
-			$this->zbxTestTextPresent(['Conditions', 'Label', 'Name', 'Action']);
+			$this->zbxTestTextPresent(['Conditions', 'Label', 'Name', 'Actions']);
 
 			if ($add_opcondition == null) {
 				$this->zbxTestAssertVisibleXpath('//button[@class="js-add"]');

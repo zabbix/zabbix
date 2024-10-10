@@ -49,12 +49,14 @@ $table = (new CTableInfo())
 foreach ($data['dashboards'] as $dashboardid => $dashboard) {
 	$table->addRow([
 		new CCheckBox('dashboardids['.$dashboardid.']', $dashboardid),
-		new CLink($dashboard['name'],
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'template.dashboard.edit')
-				->setArgument('dashboardid', $dashboardid)
-				->getUrl()
-		)
+		(new CCol(
+			new CLink($dashboard['name'],
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'template.dashboard.edit')
+					->setArgument('dashboardid', $dashboardid)
+					->getUrl()
+			)
+		))->addClass(ZBX_STYLE_WORDBREAK)
 	]);
 }
 

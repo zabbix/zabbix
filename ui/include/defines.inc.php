@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'7.2.0alpha1');
 define('ZABBIX_API_VERSION',	'7.2.0');
 define('ZABBIX_EXPORT_VERSION',	'7.2');
 
-define('ZABBIX_DB_VERSION',		7010003);
+define('ZABBIX_DB_VERSION',		7010014);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -1728,6 +1728,8 @@ define('ZBX_ACTION_RENAME',		4);
 define('ZBX_ACTIONS_POPUP_MAX_WIDTH',			800);
 
 define('ZBX_HINTBOX_CONTENT_LIMIT',				8192);
+
+define('ZBX_OPDATA_HINTBOX_COLUMN_MAX_WIDTH', 	500);
 
 // Dashboard widget types supported in templates (used only in import converters).
 define('WIDGET_CLOCK',				'clock');

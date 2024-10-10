@@ -123,7 +123,7 @@ $sla_tab = (new CFormGrid())
 					->setId('service-tags')
 					->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 					->setHeader(
-						(new CRowHeader([_('Name'), _('Operation'), _('Value'), _('Action')]))
+						(new CRowHeader([_('Name'), _('Operation'), _('Value'), '']))
 							->addClass(ZBX_STYLE_GREY)
 					)
 					->setFooter(
@@ -175,7 +175,7 @@ $sla_tab = (new CFormGrid())
 $excluded_downtimes = (new CTable())
 	->setId('excluded-downtimes')
 	->setHeader(
-		(new CRowHeader([_('Start time'), _('Duration'), _('Name'), _('Action')]))->addClass(ZBX_STYLE_GREY)
+		(new CRowHeader([_('Start time'), _('Duration'), _('Name'), _('Actions')]))->addClass(ZBX_STYLE_GREY)
 	);
 
 $excluded_downtimes->addItem(

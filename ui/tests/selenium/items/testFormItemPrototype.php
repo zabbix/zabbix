@@ -839,7 +839,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 		if (in_array($type, ['Script', 'Browser'])) {
 			// Check parameters table layout.
 			$parameters_table = $form->getField('Parameters')->asTable();
-			$this->assertSame(['Name', 'Value', 'Action'], $parameters_table->getHeadersText());
+			$this->assertSame(['Name', 'Value', ''], $parameters_table->getHeadersText());
 
 			$this->assertEquals(['Remove', 'Add'], $parameters_table->query('tag:button')->all()
 					->filter(CElementFilter::CLICKABLE)->asText()
@@ -941,7 +941,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					->one()->isDisplayed());
 		}
 		else {
-			$this->zbxTestTextPresent(['Custom intervals', 'Interval',  'Period', 'Action']);
+			$this->zbxTestTextPresent(['Custom intervals', 'Interval',  'Period', '']);
 			$this->assertTrue($form->getField('Custom intervals')->isDisplayed());
 
 			$this->zbxTestTextPresent(['Flexible', 'Scheduling', 'Update interval']);

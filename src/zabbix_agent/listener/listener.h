@@ -26,7 +26,6 @@ typedef struct
 	const char		*config_file;
 	int			config_timeout;
 	const char		*config_hosts_allowed;
-	char			**config_user_parameters;
 }
 zbx_thread_listener_args;
 

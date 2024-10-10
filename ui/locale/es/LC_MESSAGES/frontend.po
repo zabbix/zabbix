@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-08-02 18:22+0000\n"
+"PO-Revision-Date: 2024-09-29 14:18+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -3377,6 +3377,16 @@ msgstr "No se puede heredar la regla LLD con la clave \"%1$s\" de la plantilla \
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
 msgstr "No se puede heredar la regla LLD con la clave \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", porque ya existe una métrica con la misma clave."
+
+#: include/classes/api/services/CItemGeneral.php:684
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr "No se pueden heredar las reglas LLD con la clave \"%1$s\" de las plantillas \"%2$s\" y \"%3$s\", porque la clave debe ser única en el equipo \"%4$s\"."
+
+#: include/classes/api/services/CItemGeneral.php:685
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr "No se pueden heredar las reglas LLD con la clave \"%1$s\" de las plantillas \"%2$s\" y \"%3$s\", porque la clave debe ser única en la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
@@ -12376,7 +12386,7 @@ msgstr "Gráfico de la última semana"
 #: include/views/inventory.host.view.php:145
 #: include/views/inventory.host.view.php:151 jsLoader.php:375
 msgid "Latest data"
-msgstr "Últimos datos"
+msgstr "Datos más recientes"
 
 #: app/partials/administration.system.info.php:101
 msgid "Latest release"
@@ -20350,6 +20360,13 @@ msgstr "Tema"
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "Estos parámetros se pasarán al script como argumentos de línea de comandos en el orden especificado."
 
+#: app/controllers/CControllerDiscoveryEdit.php:175
+#, c-format
+msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
+msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
+msgstr[0] "Esta verificación no se puede eliminar, ya que se utiliza como condición en la acción de descubrimiento de %1$s."
+msgstr[1] "Estas verificaciones no se pueden eliminar, ya que se utilizan como condición en la acción de descubrimiento de %1$s."
+
 #: include/func.inc.php:2566
 msgid "This day last week"
 msgstr "Este día, la semana pasada"
@@ -21966,7 +21983,7 @@ msgstr "El usuario no puede agregarse a un grupo desactivado o a un grupo con ac
 #: include/classes/api/services/CUserGroup.php:673
 #: include/classes/api/services/CUser.php:843
 msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
-msgstr ""
+msgstr "El usuario no puede agregarse a un grupo deshabilitado o a un grupo con acceso a la GUI deshabilitado."
 
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
@@ -22106,7 +22123,7 @@ msgstr "El usuario no puede eliminarse a sí mismo."
 
 #: include/classes/api/services/CUser.php:1837
 msgid "User is not allowed to delete oneself."
-msgstr ""
+msgstr "El usuario no puede eliminarse a sí mismo."
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222
@@ -22428,6 +22445,10 @@ msgstr "Lista de almacenes de datos del hipervisor de VMware, \"url\": URL del s
 msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr "Sensor acumulativo del estado de salud del hipervisor de VMware, \"url\": URL del servicio de VMware, \"uuid\": identificador único global del hipervisor de VMware. Devuelve 0 - gris; 1 - verde; 2 - amarillo; 3 - rojo"
 
+#: include/classes/data/CItemData.php:2237
+msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr "Estado de mantenimiento del hipervisor de VMware, \"url\": URL del servicio de VMware, \"uuid\": identificador único global del hipervisor de VMware. Devuelve 0: no está en mantenimiento; 1: está en mantenimiento"
+
 #: include/classes/data/CItemData.php:2051
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr "Modelo de hipervisor de VMware, \"url\": URL del servicio de VMware, \"uuid\": identificador único global del hipervisor de VMware"
@@ -22563,6 +22584,10 @@ msgstr "Uso de memoria de invitado de la máquina virtual VMware, \"url\": URL d
 #: include/classes/data/CItemData.php:2387
 msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "Uso de memoria del equipo de la máquina virtual VMware, \"url\": URL del servicio VMware, \"uuid\": identificador único global de la máquina virtual VMware"
+
+#: include/classes/data/CItemData.php:2482
+msgid "VMware virtual machine hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr "Estado de mantenimiento del hipervisor de la máquina virtual VMware, \"url\": URL del servicio VMware, \"uuid\": identificador único global de la máquina virtual VMware. Devuelve 0: no está en mantenimiento; 1: está en mantenimiento"
 
 #: include/classes/data/CItemData.php:2331
 msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"

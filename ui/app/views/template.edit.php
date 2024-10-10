@@ -50,7 +50,7 @@ $templates_field_items = [];
 
 if ($data['linked_templates']) {
 	$linked_templates= (new CTable())
-		->setHeader([_('Name'), _('Action')])
+		->setHeader([_('Name'), _('Actions')])
 		->setId('linked-templates')
 		->addClass(ZBX_STYLE_TABLE_FORMS)
 		->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');

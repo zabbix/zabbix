@@ -125,6 +125,11 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_hi
 
 		item->trends = (0 != item->trends_sec);
 	}
+	else
+	{
+		/* it is possible to configure non-numeric items types with trends */
+		item->trends = 0;
+	}
 
 	if (NULL != item->history_period)
 	{

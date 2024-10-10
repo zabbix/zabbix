@@ -185,6 +185,8 @@ int	check_vcenter_vm_guest_memory_size_swapped(AGENT_REQUEST *request, const cha
 		AGENT_RESULT *result);
 int	check_vcenter_vm_guest_uptime(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
+int	check_vcenter_vm_hv_maintenance(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
 int	check_vcenter_vm_hv_name(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_vm_memory_size_consumed(AGENT_REQUEST *request, const char *username, const char *password,
