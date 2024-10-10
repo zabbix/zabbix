@@ -13265,8 +13265,12 @@ msgstr "메뉴 항목 이름은 이벤트 컨텍스트 메뉴에서 트리거 UR
 msgid "Menu path"
 msgstr "메뉴 경로"
 
-#: widgets/piechart/includes/WidgetForm.php:138
+#: widgets/piechart/includes/WidgetForm.php:149
 msgid "Merge sectors smaller than"
+msgstr ""
+
+#: widgets/piechart/includes/WidgetForm.php:138
+msgid "Merge sectors smaller than "
 msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:178

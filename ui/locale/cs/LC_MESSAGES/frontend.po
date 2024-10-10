@@ -13533,8 +13533,12 @@ msgstr "Název položky menu se používá jako popisek pro URL triggeru v konte
 msgid "Menu path"
 msgstr "Cesta v menu"
 
-#: widgets/piechart/includes/WidgetForm.php:138
+#: widgets/piechart/includes/WidgetForm.php:149
 msgid "Merge sectors smaller than"
+msgstr ""
+
+#: widgets/piechart/includes/WidgetForm.php:138
+msgid "Merge sectors smaller than "
 msgstr "Sloučit sektory menší než"
 
 #: app/partials/scheduledreport.formgrid.html.php:178

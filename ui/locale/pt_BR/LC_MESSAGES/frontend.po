@@ -13389,9 +13389,13 @@ msgstr "O nome da entrada de menu é usado como rótulo para o URL do trigger no
 msgid "Menu path"
 msgstr "Caminho do menu"
 
-#: widgets/piechart/includes/WidgetForm.php:138
+#: widgets/piechart/includes/WidgetForm.php:149
 msgid "Merge sectors smaller than"
-msgstr "Mesclar setores menores que"
+msgstr ""
+
+#: widgets/piechart/includes/WidgetForm.php:138
+msgid "Merge sectors smaller than "
+msgstr "Mesclar setores menores que "
 
 #: app/partials/scheduledreport.formgrid.html.php:178
 #: app/views/mediatype.message.edit.php:96

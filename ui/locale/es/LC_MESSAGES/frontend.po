@@ -13385,8 +13385,12 @@ msgstr "El nombre del menú de entrada se utiliza como etiqueta para la URL del 
 msgid "Menu path"
 msgstr "Ruta del menú"
 
-#: widgets/piechart/includes/WidgetForm.php:138
+#: widgets/piechart/includes/WidgetForm.php:149
 msgid "Merge sectors smaller than"
+msgstr ""
+
+#: widgets/piechart/includes/WidgetForm.php:138
+msgid "Merge sectors smaller than "
 msgstr "Fusionar sectores más pequeños que"
 
 #: app/partials/scheduledreport.formgrid.html.php:178

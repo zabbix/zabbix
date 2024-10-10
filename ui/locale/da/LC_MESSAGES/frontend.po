@@ -13398,8 +13398,12 @@ msgstr "Menuindgangsnavnet bruges som en etiket for trigger-URL'en i begivenhede
 msgid "Menu path"
 msgstr "Menusti"
 
-#: widgets/piechart/includes/WidgetForm.php:138
+#: widgets/piechart/includes/WidgetForm.php:149
 msgid "Merge sectors smaller than"
+msgstr ""
+
+#: widgets/piechart/includes/WidgetForm.php:138
+msgid "Merge sectors smaller than "
 msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:178

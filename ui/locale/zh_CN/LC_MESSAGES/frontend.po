@@ -13240,8 +13240,12 @@ msgstr "菜单条目名称在事件内容菜单中用作触发器 URL 的标签�
 msgid "Menu path"
 msgstr "菜单路径"
 
-#: widgets/piechart/includes/WidgetForm.php:138
+#: widgets/piechart/includes/WidgetForm.php:149
 msgid "Merge sectors smaller than"
+msgstr ""
+
+#: widgets/piechart/includes/WidgetForm.php:138
+msgid "Merge sectors smaller than "
 msgstr "合并小于的扇区"
 
 #: app/partials/scheduledreport.formgrid.html.php:178
