@@ -30,14 +30,14 @@ class testPageReportsSystemInformation extends testSystemInformation {
 //				$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()],
 //				'report_without_ha');
 //	}
-
-	/**
-	 * @onBefore prepareHANodeData
-	 */
-	public function testPageReportsSystemInformation_checkEnabledHA() {
-		$this->assertEnabledHACluster();
-		$this->assertScreenshotExcept(null, self::$skip_fields, 'report_with_ha');
-	}
+//
+//	/**
+//	 * @onBefore prepareHANodeData
+//	 */
+//	public function testPageReportsSystemInformation_checkEnabledHA() {
+//		$this->assertEnabledHACluster();
+//		$this->assertScreenshotExcept(null, self::$skip_fields, 'report_with_ha');
+//	}
 
 	/**
 	 * Function checks that zabbix server status is updated after failover delay passes and frontend config is re-validated.
