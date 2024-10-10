@@ -926,7 +926,7 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *co
 	int					version, found_tags = 0, ret = FAIL;
 	char					*error = NULL;
 	unsigned char				is_new_api;
-	zbx_uint64_t				tags_sz;
+	zbx_uint64_t				tags_sz = 0;
 	zbx_vector_vmware_entity_tags_ptr_t	entity_tags;
 	zbx_vector_vmware_tag_ptr_t		tags;
 	zbx_vector_vmware_key_value_t		categories;
@@ -1007,7 +1007,8 @@ out:
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, error);
 	}
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s tags:%d", __func__, zbx_result_string(ret), found_tags);
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s tags:%d tags size:" ZBX_FS_UI64, __func__,
+				zbx_result_string(ret), found_tags, tags_sz);
 
 	zbx_str_free(error);
 

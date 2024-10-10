@@ -1513,8 +1513,9 @@ out:
 	zbx_vector_vmware_perf_entity_ptr_destroy(&hist_entities);
 	zbx_vector_vmware_perf_entity_ptr_destroy(&entities);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s \tprocessed " ZBX_FS_SIZE_T " bytes of data", __func__,
-			zbx_result_string(ret), (zbx_fs_size_t)page.alloc);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s \tprocessed " ZBX_FS_SIZE_T " bytes of data."
+			" Performance counters require up to " ZBX_FS_UI64  " bytes of data.", __func__,
+			zbx_result_string(ret), (zbx_fs_size_t)page.alloc, perf_data_sz);
 
 	return ret;
 #undef INIT_PERF_XML_SIZE
