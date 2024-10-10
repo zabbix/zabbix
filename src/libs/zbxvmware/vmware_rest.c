@@ -905,8 +905,6 @@ static zbx_uint64_t	vmware_tags_shmem_size(zbx_vector_vmware_entity_tags_ptr_t *
 			req_sz += vmware_shared_str_sz(tag->name);
 			req_sz += vmware_shared_str_sz(tag->description);
 			req_sz += vmware_shared_str_sz(tag->category);
-			req_sz += vmware_shared_str_sz(tag->name);
-			req_sz += vmware_shared_str_sz(tag->name);
 		}
 	}
 

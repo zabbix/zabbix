@@ -1230,11 +1230,11 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 		shmem_free_sz = vmware_shmem_get_vmware_mem()->free_size -
 				vmware_shmem_get_vmware_mem()->total_size * 5 / 100;
 		service->eventlog.req_sz = 0;
+
+		if (FAIL == vmware_shared_is_ready())
+			evt_pause = 1;
 	}
 	else
-		evt_pause = 1;
-
-	if (FAIL == vmware_shared_is_ready())
 		evt_pause = 1;
 
 	zbx_vmware_unlock();
