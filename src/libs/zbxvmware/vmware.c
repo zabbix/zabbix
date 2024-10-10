@@ -146,7 +146,7 @@ ZBX_PTR_VECTOR_IMPL(vmware_rpool_chunk_ptr, zbx_vmware_rpool_chunk_t *)
 
 /* string pool support */
 
-int	vmware_shared_str_sz(const char *str)
+zbx_uint64_t	vmware_shared_str_sz(const char *str)
 {
 	if (SUCCEED == vmware_shared_strsearch(str))
 		return 0;
