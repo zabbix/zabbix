@@ -50,6 +50,7 @@ void	zbx_function_param_parse_ext(const char *expr, zbx_uint32_t allowed_macros,
 void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
 void	zbx_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
 void	zbx_lld_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
+void	zbx_lld_function_macro_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
 int	zbx_function_param_parse_count(const char *expr);
 
 typedef enum
