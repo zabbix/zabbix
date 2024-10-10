@@ -42,9 +42,9 @@ class CWidgetFieldColumnsList extends CWidgetField {
 	public const DISPLAY_INDICATORS = 3;
 
 	// Where to select data for aggregation function.
-	public const HISTORY_DATA_AUTO = 1;
-	public const HISTORY_DATA_HISTORY = 2;
-	public const HISTORY_DATA_TRENDS = 3;
+	public const HISTORY_DATA_AUTO = 0;
+	public const HISTORY_DATA_HISTORY = 1;
+	public const HISTORY_DATA_TRENDS = 2;
 
 	public const DEFAULT_DECIMAL_PLACES = 2;
 
