@@ -1,0 +1,1 @@
+....I..... [ZBX-24955] fixed cuid_timestamp PostgreSQL function for database dump and restore (askolmeisters)
