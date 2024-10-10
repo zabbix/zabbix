@@ -13409,7 +13409,7 @@ msgid "Menu path"
 msgstr "נתיב בתפריט"
 
 #: widgets/piechart/includes/WidgetForm.php:138
-msgid "Merge sectors smaller than "
+msgid "Merge sectors smaller than"
 msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:178

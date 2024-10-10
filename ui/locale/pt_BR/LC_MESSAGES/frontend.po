@@ -13390,8 +13390,8 @@ msgid "Menu path"
 msgstr "Caminho do menu"
 
 #: widgets/piechart/includes/WidgetForm.php:138
-msgid "Merge sectors smaller than "
-msgstr "Mesclar setores menores que "
+msgid "Merge sectors smaller than"
+msgstr "Mesclar setores menores que"
 
 #: app/partials/scheduledreport.formgrid.html.php:178
 #: app/views/mediatype.message.edit.php:96

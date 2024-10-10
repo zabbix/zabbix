@@ -13241,7 +13241,7 @@ msgid "Menu path"
 msgstr "菜单路径"
 
 #: widgets/piechart/includes/WidgetForm.php:138
-msgid "Merge sectors smaller than "
+msgid "Merge sectors smaller than"
 msgstr "合并小于的扇区"
 
 #: app/partials/scheduledreport.formgrid.html.php:178

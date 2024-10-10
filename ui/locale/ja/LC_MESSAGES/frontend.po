@@ -13238,7 +13238,7 @@ msgid "Menu path"
 msgstr "メニューパス"
 
 #: widgets/piechart/includes/WidgetForm.php:138
-msgid "Merge sectors smaller than "
+msgid "Merge sectors smaller than"
 msgstr "これより小さいセクターの場合はマージする"
 
 #: app/partials/scheduledreport.formgrid.html.php:178

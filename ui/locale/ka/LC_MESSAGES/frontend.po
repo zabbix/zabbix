@@ -13226,8 +13226,8 @@ msgid "Menu path"
 msgstr "მენიუს ბილიკი"
 
 #: widgets/piechart/includes/WidgetForm.php:138
-msgid "Merge sectors smaller than "
-msgstr "იმ სექტორების შერწყმა, რომლებიც მცირეა, ვიდრე "
+msgid "Merge sectors smaller than"
+msgstr "იმ სექტორების შერწყმა, რომლებიც მცირეა, ვიდრე"
 
 #: app/partials/scheduledreport.formgrid.html.php:178
 #: app/views/mediatype.message.edit.php:96

@@ -13534,7 +13534,7 @@ msgid "Menu path"
 msgstr "Путь в меню"
 
 #: widgets/piechart/includes/WidgetForm.php:138
-msgid "Merge sectors smaller than "
+msgid "Merge sectors smaller than"
 msgstr "Объединение секторов меньших чем"
 
 #: app/partials/scheduledreport.formgrid.html.php:178
