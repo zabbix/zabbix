@@ -13533,6 +13533,10 @@ msgstr "Nazwa elementu menu jest używana jako etykieta adresu URL wyzwalacza w 
 msgid "Menu path"
 msgstr "Ścieżka menu"
 
+#: widgets/piechart/includes/WidgetForm.php:149
+msgid "Merge sectors smaller than"
+msgstr ""
+
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
 msgstr "Połącz sektory mniejsze niż"

@@ -18,17 +18,21 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../../../include/items.inc.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
+define('LONG_KEY', substr(STRING_6000, 0, 2038).'[{#MACRO}]');
+
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *
- * @onBefore prepareTextItemPrototypeData
+ * @onBefore prepareTriggerPrototypeData
  *
  * @backup triggers
  */
 class testFormTriggerPrototype extends CLegacyWebTest {
+	protected static $long_key_prototype_string;
+	protected static $long_key_ruleid;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -48,14 +52,63 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 	const DISCOVERY_RULEID = 133800;
 	const ITEM_KEY = 'item-prototype-reuse';
 
-	public function prepareTextItemPrototypeData() {
+	public function prepareTriggerPrototypeData() {
+		// Host with a long name for long trigger expression tests.
+		$long_key_hostid = CDataHelper::call('host.create', [
+			'host' => STRING_128,
+			'groups' => [['groupid' => 6]]
+		])['hostids'][0];
+
+		// Item with a long key for long trigger expression tests.
+		CDataHelper::call('item.create', [
+			[
+				'name' => 'test',
+				'key_' => STRING_2048,
+				'hostid' => $long_key_hostid,
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_FLOAT
+			]
+		]);
+
+		// LLD rule for long trigger expression tests.
+		self::$long_key_ruleid = CDataHelper::call('discoveryrule.create', [
+			'name' => 'LLD for trigger prototypes',
+			'key_' => 'lld_key',
+			'hostid' => $long_key_hostid,
+			'type' => ITEM_TYPE_SIMPLE,
+			'delay' => '1m'
+		])['itemids'][0];
+
+		// Item prototypes used by various tests.
 		CDataHelper::call('itemprototype.create', [
-			'name' => 'Text item prototype {#KEY}',
-			'key_' => 'text_prototype[{#KEY}]',
-			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_TEXT,
-			'hostid' => self::HOSTID,
-			'ruleid' => self::DISCOVERY_RULEID
+			[
+				'name' => 'Text item prototype {#KEY}',
+				'key_' => 'text_prototype[{#KEY}]',
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'hostid' => self::HOSTID,
+				'ruleid' => self::DISCOVERY_RULEID
+			],
+			[
+				'name' => 'test2',
+				'key_' => LONG_KEY,
+				'hostid' => $long_key_hostid,
+				'ruleid' => self::$long_key_ruleid,
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_FLOAT
+			]
+		]);
+
+		// Trigger prototypes for long trigger expression tests.
+		CDataHelper::call('triggerprototype.create', [
+			[
+				'description' => 'Trigger prototype with long expression for simple update',
+				'expression' => 'last(/'.STRING_128.'/'.LONG_KEY.')=0'
+			],
+			[
+				'description' => 'Trigger prototype with long expression for update',
+				'expression' => 'last(/'.STRING_128.'/'.LONG_KEY.')>0'
+			]
 		]);
 	}
 
@@ -1093,6 +1146,75 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger prototype deleted');
 			$this->assertEquals(0, CDBHelper::getCount("SELECT triggerid FROM triggers where description = '".$description."'"));
 		}
+	}
+
+	public function getLongExpressionData() {
+		return [
+			// Create trigger prototype.
+			[
+				[
+					'form_data' => [
+						'Name' => 'Created trigger prototype',
+						'Expression' => 'last(/'.STRING_128.'/'.STRING_2048.')=0 and last(/'.STRING_128.'/'.LONG_KEY.')=0'
+					],
+					'expected_db_expression' => '/^\{\d+\}=0 and \{\d+\}=0$/'
+				]
+			],
+			// Simple update.
+			[
+				[
+					'update' => true,
+					'link_name' => 'Trigger prototype with long expression for simple update',
+					'expected_db_expression' => '/^\{\d+\}=0$/'
+				]
+			],
+			// Update.
+			[
+				[
+					'update' => true,
+					'link_name' => 'Trigger prototype with long expression for update',
+					'form_data' => [
+						'Name' => 'Updated trigger',
+						'Expression' => 'last(/'.STRING_128.'/'.STRING_2048.')>0 and last(/'.STRING_128.'/'.LONG_KEY.')>0'
+					],
+					'expected_db_expression' => '/^\{\d+\}>0 and \{\d+\}>0$/'
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test a special case where the host's name and item's key are very long.
+	 * The trigger expression is saved using expression IDs instead of saving the whole text of the expression,
+	 * so no issues due to length of host name or item key should be present regardless of their length.
+	 *
+	 * @dataProvider getLongExpressionData
+	 */
+	public function testFormTriggerPrototype_LongExpression($data) {
+		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=host&parent_discoveryid='.self::$long_key_ruleid);
+		$this->page->waitUntilReady();
+
+		// Open the correct form.
+		$open_form_button = (CTestArrayHelper::get($data, 'update'))
+			? 'link:'.$data['link_name']
+			: 'button:Create trigger prototype';
+		$this->page->query($open_form_button)->one()->click();
+
+		// Fill form data and save.
+		$dialog = COverlayDialogElement::find()->one();
+		$dialog->asForm()->fill(CTestArrayHelper::get($data, 'form_data', []));
+		$button = CTestArrayHelper::get($data, 'update', false) ? 'Update' : 'Add';
+		$dialog->getFooter()->query('button', $button)->one()->click();
+		COverlayDialogElement::ensureNotPresent();
+
+		// Get the saved trigger's ID from UI.
+		$link = (array_key_exists('form_data', $data)) ? $data['form_data']['Name'] : $data['link_name'];
+		$triggerid = $this->page->query('link', $link)->one()->getAttribute('data-triggerid');
+
+		// Get the newly saved trigger's expression, as it is saved in the DB.
+		$db_expression = CDBHelper::getValue('SELECT expression FROM triggers WHERE triggerid = '.$triggerid);
+		// Assert by regex that the expression is saved in DB similar to this: "{100253}=0 and {100253}=0".
+		$this->assertEquals(1, preg_match($data['expected_db_expression'], $db_expression));
 	}
 
 	/**
