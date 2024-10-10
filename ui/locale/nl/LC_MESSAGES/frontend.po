@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-10-02 22:12+0000\n"
+"PO-Revision-Date: 2024-10-08 22:16+0000\n"
 "Last-Translator: Peter Beersmans <peterbeersmans1966@gmail.com>\n"
 "Language-Team: NL\n"
 "Language: nl\n"
@@ -20,7 +20,7 @@ msgstr ""
 #: app/controllers/CControllerSlaReportList.php:182
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
-msgstr "De datum \"%1$s\" moet kleiner zijn dan de datum \"%2$s\"."
+msgstr "\"%1$s\" datum moet kleiner zijn dan \"%2$s\" datum."
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -145,8 +145,8 @@ msgstr "%1$s resterende tekens"
 #, c-format
 msgid "%1$s event"
 msgid_plural "%1$s events"
-msgstr[0] "%1$s evenement"
-msgstr[1] "%1$s evenementen"
+msgstr[0] "%1$s gebeurtenis"
+msgstr[1] "%1$s gebeurtenissen"
 
 #: app/views/popup.usergroupmapping.edit.php:87
 #, c-format
@@ -209,7 +209,7 @@ msgstr "%1$s of %2$s - staat toe dat de pagina alleen wordt weergegeven in een f
 #: app/views/administration.miscconfig.edit.php:130
 #, c-format
 msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
-msgstr "%1$s of %2$s - voorkomt dat de pagina in een frame wordt weergegeven, ongeacht de site die dit probeert"
+msgstr "%1$s of %2$s - voorkomt dat de pagina in een frame wordt weergegeven, ongeacht van de site die dit probeert"
 
 #: jsLoader.php:341
 #, c-format
@@ -577,11 +577,11 @@ msgstr "Bevestigd"
 
 #: app/views/administration.trigdisplay.edit.php:53
 msgid "Acknowledged PROBLEM events"
-msgstr "Bevestigde probleem gebeurtenissen"
+msgstr "Bevestigde PROBLEEM gebeurtenissen"
 
 #: app/views/administration.trigdisplay.edit.php:77
 msgid "Acknowledged RESOLVED events"
-msgstr "Bevestigde opgeloste gebeurtenissen"
+msgstr "Bevestigde OPGELOSTE gebeurtenissen"
 
 #: app/partials/monitoring.problem.filter.php:142
 #: widgets/problems/views/widget.edit.php:105
@@ -4024,18 +4024,17 @@ msgstr ""
 #: app/controllers/CControllerHostGroupUpdate.php:43
 #: app/controllers/CControllerHostGroupUpdate.php:105
 msgid "Cannot update host group"
-msgstr ""
+msgstr "Kan hostgroep niet bijwerken"
 
 #: host_prototypes.php:266 host_prototypes.php:280 host_prototypes.php:301
-#, fuzzy
 msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] "Kan host-prototype niet bijwerken"
-msgstr[1] "Kan host-prototype niet bijwerken"
+msgstr[1] "Kan host-prototypes niet bijwerken"
 
 #: app/controllers/CControllerIconMapUpdate.php:73
 msgid "Cannot update icon map"
-msgstr "kan icoon map niet bijwerken"
+msgstr "Kan icoon map niet bijwerken"
 
 #: app/controllers/CControllerImageUpdate.php:43
 #: app/controllers/CControllerImageUpdate.php:109
@@ -4049,28 +4048,26 @@ msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "Kan interface niet bijwerken voor ontdekte host \"%1$s\"."
 
 #: app/controllers/CControllerPopupMassupdateItem.php:279 items.php:670
-#, fuzzy
 msgid "Cannot update item"
 msgid_plural "Cannot update items"
 msgstr[0] "Kan item niet bijwerken"
-msgstr[1] "Kan item niet bijwerken"
+msgstr[1] "Kan items niet bijwerken"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:278
 #: disc_prototypes.php:457 disc_prototypes.php:484 disc_prototypes.php:523
-#, fuzzy
 msgid "Cannot update item prototype"
 msgid_plural "Cannot update item prototypes"
 msgstr[0] "Kan item-prototype niet bijwerken"
-msgstr[1] "Kan item-prototype niet bijwerken"
+msgstr[1] "Kan item-prototypes niet bijwerken"
 
 #: app/controllers/CControllerMacrosUpdate.php:132
 msgid "Cannot update macros"
-msgstr "Kan macros niet bijwerken"
+msgstr "Kan macro's niet bijwerken"
 
 #: app/controllers/CControllerMaintenanceUpdate.php:73
 #: app/controllers/CControllerMaintenanceUpdate.php:152
 msgid "Cannot update maintenance period"
-msgstr ""
+msgstr "Kan onderhoudsperiode niet bijwerken"
 
 #: app/controllers/CControllerMediatypeUpdate.php:78
 msgid "Cannot update media type"
@@ -4078,7 +4075,7 @@ msgstr "Kan mediatype niet bijwerken"
 
 #: app/controllers/CControllerModuleUpdate.php:102
 msgid "Cannot update module"
-msgstr ""
+msgstr "Kan module niet bijwerken"
 
 #: sysmaps.php:189
 msgid "Cannot update network map"
@@ -4092,17 +4089,17 @@ msgstr "Kan proxy niet bijwerken"
 #: include/classes/api/services/CProxy.php:648
 #, c-format
 msgid "Cannot update proxy for discovered host \"%1$s\"."
-msgstr "Kan proxy niet bijwerken voor ontdekte host \"%1$s\"."
+msgstr "Kan proxy voor ontdekte host \"%1$s\" niet bijwerken."
 
 #: app/controllers/CControllerProxyGroupUpdate.php:43
 #: app/controllers/CControllerProxyGroupUpdate.php:82
 msgid "Cannot update proxy group"
-msgstr ""
+msgstr "Kan proxygroep niet bijwerken"
 
 #: include/classes/api/services/CRole.php:768
 #, c-format
 msgid "Cannot update readonly user role \"%1$s\"."
-msgstr ""
+msgstr "Kan alleen-lezen gebruikersrol \"%1$s\" niet bijwerken."
 
 #: app/controllers/CControllerRegExUpdate.php:44
 #: app/controllers/CControllerRegExUpdate.php:89
@@ -4112,7 +4109,7 @@ msgstr "Kan reguliere expressie niet bijwerken"
 #: app/controllers/CControllerScheduledReportUpdate.php:63
 #: app/controllers/CControllerScheduledReportUpdate.php:156
 msgid "Cannot update scheduled report"
-msgstr ""
+msgstr "Kan gepland rapport niet bijwerken"
 
 #: app/controllers/CControllerScriptUpdate.php:65
 #: app/controllers/CControllerScriptUpdate.php:166
@@ -4124,12 +4121,12 @@ msgstr "Kan script niet bijwerken"
 #: include/classes/api/services/CScript.php:443
 #, c-format
 msgid "Cannot update script scope. Script \"%1$s\" is used in action \"%2$s\"."
-msgstr ""
+msgstr "Kan script scope niet bijwerken. Script \"%1$s\" wordt in actie \"%2$s\" gebruikt."
 
 #: app/controllers/CControllerServiceUpdate.php:78
 #: app/controllers/CControllerServiceUpdate.php:172
 msgid "Cannot update service"
-msgstr ""
+msgstr "Kan service niet bijwerken"
 
 #: include/classes/api/services/CService.php:2340
 #: include/classes/api/services/CService.php:2402
@@ -4137,61 +4134,58 @@ msgstr ""
 #: include/classes/api/services/CService.php:2460
 #, c-format
 msgid "Cannot update service \"%1$s\": %2$s."
-msgstr ""
+msgstr "Kan service \"%1$s\" niet bijwerken: %2$s."
 
 #: app/controllers/CControllerPopupMassupdateService.php:161
 msgid "Cannot update services"
-msgstr ""
+msgstr "Kan services niet bijwerken"
 
 #: include/classes/api/services/CHttpTest.php:598
 #: include/classes/api/services/CHttpTest.php:892
 #, c-format
 msgid "Cannot update step for a templated web scenario \"%1$s\": %2$s."
-msgstr ""
+msgstr "Kan stap voor een gesjabloneerd web scenario \"%1$s\" niet bijwerken: %2$s."
 
 #: app/controllers/CControllerTemplateMassupdate.php:353
 #: app/controllers/CControllerTemplateUpdate.php:49
 #: app/controllers/CControllerTemplateUpdate.php:196
-#, fuzzy
 msgid "Cannot update template"
 msgid_plural "Cannot update templates"
-msgstr[0] "Kan template niet bijwerken"
-msgstr[1] "Kan template niet bijwerken"
+msgstr[0] "Kan sjabloon niet bijwerken"
+msgstr[1] "Kan sjablonen niet bijwerken"
 
 #: app/controllers/CControllerTemplateGroupUpdate.php:41
 #: app/controllers/CControllerTemplateGroupUpdate.php:94
 msgid "Cannot update template group"
-msgstr ""
+msgstr "Kan sjabloongroep niet bijwerken"
 
 #: app/controllers/CControllerTriggerMassupdate.php:212
 #: app/controllers/CControllerTriggerUpdate.php:58
 #: app/controllers/CControllerTriggerUpdate.php:155
-#, fuzzy
 msgid "Cannot update trigger"
 msgid_plural "Cannot update triggers"
 msgstr[0] "Kan trigger niet bijwerken"
-msgstr[1] "Kan trigger niet bijwerken"
+msgstr[1] "Kan triggers niet bijwerken"
 
 #: include/classes/api/services/CTriggerGeneral.php:2305
 #, c-format
 msgid "Cannot update trigger \"%1$s\": %2$s."
-msgstr ""
+msgstr "Kan trigger \"%1$s\" niet bijwerken: %2$s."
 
 #: app/controllers/CControllerTriggerMassupdate.php:211
 #: app/controllers/CControllerTriggerPrototypeDisable.php:86
 #: app/controllers/CControllerTriggerPrototypeEnable.php:86
 #: app/controllers/CControllerTriggerPrototypeUpdate.php:60
 #: app/controllers/CControllerTriggerPrototypeUpdate.php:164
-#, fuzzy
 msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
 msgstr[0] "Kan trigger-prototype niet bijwerken"
-msgstr[1] "Kan trigger-prototype niet bijwerken"
+msgstr[1] "Kan trigger-prototypes niet bijwerken"
 
 #: include/classes/api/services/CTriggerGeneral.php:2140
 #, c-format
 msgid "Cannot update trigger prototype \"%1$s\": %2$s."
-msgstr ""
+msgstr "Kan trigger-prototype \"%1$s\" niet bijwerken: %2$s."
 
 #: app/controllers/CControllerUserProfileUpdate.php:69
 #: app/controllers/CControllerUserProfileUpdate.php:127
@@ -4205,21 +4199,21 @@ msgstr "Kan gebruiker niet bijwerken"
 #: app/controllers/CControllerUsergroupUpdate.php:155
 msgid "Cannot update user group"
 msgid_plural "Cannot update user groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan gebruikersgroep niet bijwerken"
+msgstr[1] "Kan gebruikersgroepen niet bijwerken"
 
 #: app/controllers/CControllerUserroleUpdate.php:117
 #: app/controllers/CControllerUserroleUpdate.php:187
 msgid "Cannot update user role"
-msgstr ""
+msgstr "Kan gebruikersrol niet bijwerken"
 
 #: httpconf.php:195
 msgid "Cannot update web scenario"
-msgstr "Kan web scenario niet bijwerken"
+msgstr "Kan webscenario niet bijwerken"
 
 #: app/controllers/CControllerWebScenarioStepCheck.php:57
 msgid "Cannot update web scenario step"
-msgstr ""
+msgstr "Kan webscenariostap niet bijwerken"
 
 #: app/views/administration.regex.edit.php:55
 msgid "Case sensitive"
@@ -4580,12 +4574,12 @@ msgstr "Sluit expressie bouwer"
 #: app/views/correlation.edit.php:254
 #: include/classes/helpers/CCorrelationHelper.php:71
 msgid "Close new event"
-msgstr ""
+msgstr "Sluit nieuwe gebeurtenis"
 
 #: app/views/correlation.edit.php:247
 #: include/classes/helpers/CCorrelationHelper.php:70
 msgid "Close old events"
-msgstr ""
+msgstr "Sluit oude gebeurtenissen"
 
 #: app/views/popup.acknowledge.edit.php:141
 msgid "Close problem"
@@ -5060,7 +5054,7 @@ msgstr[1] "Connectors ingeschakeld"
 
 #: app/controllers/CControllerConnectorUpdate.php:149
 msgid "Connector updated"
-msgstr ""
+msgstr "Connector bijgewerkt"
 
 #: app/controllers/CControllerConnectorList.php:104
 #: app/views/connector.list.php:133 include/classes/helpers/CMenuHelper.php:362
@@ -5171,7 +5165,7 @@ msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:136
 msgid "Converts a symptom event back to cause event"
-msgstr ""
+msgstr "Een symptoomgebeurtenis terug naar een oorzaakgebeurtenis aanpassen"
 
 #: include/views/js/monitoring.sysmaps.js.php:297
 #: include/views/js/monitoring.sysmaps.js.php:433
@@ -5761,7 +5755,7 @@ msgstr ""
 #: app/controllers/CControllerDashboardUpdate.php:217
 #: app/controllers/CControllerTemplateDashboardUpdate.php:189
 msgid "Dashboard updated"
-msgstr ""
+msgstr "Dashboard bijgewerkt"
 
 #: include/classes/api/services/CReport.php:319
 #, c-format
@@ -7155,7 +7149,7 @@ msgstr[1] "Ontdekkingsregels ingeschakeld"
 
 #: app/controllers/CControllerDiscoveryUpdate.php:88 host_discovery.php:545
 msgid "Discovery rule updated"
-msgstr "Ontdekkingsregel aangepast"
+msgstr "Ontdekkingsregel bijgewerkt"
 
 #: app/controllers/CControllerPopupGeneric.php:390
 #: app/controllers/CControllerPopupImportCompare.php:176
@@ -7991,15 +7985,15 @@ msgstr "Gebeurteniscreatie"
 
 #: app/views/js/popup.operation.edit.js.php:513 include/actions.inc.php:368
 msgid "Event is acknowledged"
-msgstr ""
+msgstr "Gebeurtenis is bevestigd"
 
 #: app/views/js/popup.operation.edit.js.php:516 include/actions.inc.php:368
 msgid "Event is not acknowledged"
-msgstr ""
+msgstr "Gebeurtenis is niet bevestigd"
 
 #: tr_events.php:182
 msgid "Event list [previous 20]"
-msgstr "Evenementenlijst [vorige 20]"
+msgstr "Gebeurtenislijst [vorige 20]"
 
 #: include/classes/data/CItemData.php:962
 msgid "Event log monitoring. Returns count of entries"
@@ -8011,7 +8005,7 @@ msgstr ""
 
 #: app/partials/trigger.edit.trigger.tab.php:56 include/actions.inc.php:46
 msgid "Event name"
-msgstr ""
+msgstr "Gebeurtenisnaam"
 
 #: app/views/popup.condition.edit.php:672
 msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
@@ -8019,21 +8013,21 @@ msgstr ""
 
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
-msgstr ""
+msgstr "Gebeurtenis tag paar"
 
 #: app/views/popup.condition.edit.php:701 include/actions.inc.php:65
 msgid "Event type"
-msgstr "Soort evenement"
+msgstr "Gebeurtenistype"
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:273
 msgid "Event updated"
 msgid_plural "Events updated"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Gebeurtenis bijgewerkt"
+msgstr[1] "Gebeurtenissen bijgewerkt"
 
 #: app/views/connector.edit.php:58 app/views/connector.list.php:100
 msgid "Events"
-msgstr ""
+msgstr "Gebeurtenissen"
 
 #: app/views/administration.housekeeping.edit.php:42
 msgid "Events and alerts"
@@ -9577,7 +9571,7 @@ msgstr "Hostgroep typeplaatje"
 
 #: app/controllers/CControllerHostGroupUpdate.php:97
 msgid "Host group updated"
-msgstr ""
+msgstr "Hostgroep bijgewerkt"
 
 #: include/classes/api/services/CDashboardGeneral.php:566
 #: include/classes/api/services/CScript.php:901
@@ -9725,11 +9719,10 @@ msgid "Host prototype macros"
 msgstr ""
 
 #: host_prototypes.php:266 host_prototypes.php:280 host_prototypes.php:300
-#, fuzzy
 msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
-msgstr[0] "Host prototype bijgewerkt"
-msgstr[1] "Host prototype bijgewerkt"
+msgstr[0] "Hostprototype bijgewerkt"
+msgstr[1] "Hostprototypes bijgewerkt"
 
 #: include/classes/api/services/CHostPrototype.php:1137
 #, c-format
@@ -9804,11 +9797,10 @@ msgstr "Host update is mislukt."
 
 #: app/controllers/CControllerHostUpdate.php:150
 #: app/controllers/CControllerPopupMassupdateHost.php:510
-#, fuzzy
 msgid "Host updated"
 msgid_plural "Hosts updated"
 msgstr[0] "Host bijgewerkt"
-msgstr[1] "Host bijgewerkt"
+msgstr[1] "Hosts bijgewerkt"
 
 #: include/classes/api/services/CDashboardGeneral.php:583
 #, c-format
@@ -10051,7 +10043,7 @@ msgstr "Icoon map verwijderd"
 
 #: app/controllers/CControllerIconMapUpdate.php:60
 msgid "Icon map updated"
-msgstr "Icoon map bijgewerkt"
+msgstr "Icoonmap bijgewerkt"
 
 #: app/controllers/CControllerAuditLogList.php:237
 #: app/views/administration.iconmap.edit.php:29
@@ -11931,11 +11923,10 @@ msgstr[1] "Item-prototype verwijderd"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:286
 #: disc_prototypes.php:457 disc_prototypes.php:483 disc_prototypes.php:522
-#, fuzzy
 msgid "Item prototype updated"
 msgid_plural "Item prototypes updated"
 msgstr[0] "Item-prototype bijgewerkt"
-msgstr[1] "Item-prototype bijgewerkt"
+msgstr[1] "Item-prototypes bijgewerkt"
 
 #: include/classes/api/services/CDashboardGeneral.php:480
 #: include/classes/api/services/CDashboardGeneral.php:488
@@ -11975,11 +11966,10 @@ msgid "Item type does not use interface"
 msgstr ""
 
 #: app/controllers/CControllerPopupMassupdateItem.php:287 items.php:670
-#, fuzzy
 msgid "Item updated"
 msgid_plural "Items updated"
 msgstr[0] "Item bijgewerkt"
-msgstr[1] "Item bijgewerkt"
+msgstr[1] "Items bijgewerkt"
 
 #: widgets/item/Widget.php:53 widgets/tophosts/views/column.edit.php:64
 msgid "Item value"
@@ -12817,7 +12807,7 @@ msgstr "Macros"
 
 #: app/controllers/CControllerMacrosUpdate.php:129
 msgid "Macros updated"
-msgstr "Macros zijn bijgewerkt"
+msgstr "Macro's zijn bijgewerkt"
 
 #: app/views/administration.user.list.php:38
 #: app/views/monitoring.dashboard.view.php:77
@@ -12862,7 +12852,7 @@ msgstr "Onderhouds duur"
 
 #: app/controllers/CControllerMaintenanceUpdate.php:144
 msgid "Maintenance period updated"
-msgstr ""
+msgstr "Onderhoudsperiode bijgewerkt"
 
 #: app/views/maintenance.list.php:146
 msgid "Maintenance periods"
@@ -12913,7 +12903,7 @@ msgstr "Handmatig"
 #: app/views/administration.script.list.php:69
 #: app/views/administration.script.list.php:163
 msgid "Manual event action"
-msgstr ""
+msgstr "Handmatige gebeurtenisactie"
 
 #: app/views/administration.script.edit.php:83
 #: app/views/administration.script.list.php:68
@@ -12989,7 +12979,7 @@ msgstr ""
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
-msgstr ""
+msgstr "Kaart is bijgewerkt! Naar kaartenlijst terugkeren?"
 
 #: include/views/monitoring.sysmap.edit.php:213
 msgid "Map label type"
@@ -13108,7 +13098,7 @@ msgstr "Elementen in bulk bijwerken"
 
 #: include/views/js/monitoring.sysmaps.js.php:503
 msgid "Mass update shapes"
-msgstr ""
+msgstr "Vormen in bulk bijwerken"
 
 #: app/views/popup.massupdate.item.php:476 disc_prototypes.php:51
 #: host_discovery.php:54
@@ -13319,7 +13309,7 @@ msgstr ""
 
 #: app/controllers/CControllerMediatypeUpdate.php:191
 msgid "Media type updated"
-msgstr "Media type bijgewerkt"
+msgstr "Mediatype bijgewerkt"
 
 #: include/classes/api/services/CDashboardGeneral.php:690
 #: include/classes/api/services/CUser.php:879
@@ -13641,7 +13631,7 @@ msgstr[1] "Modules ingeschakeld"
 
 #: app/controllers/CControllerModuleUpdate.php:94
 msgid "Module updated"
-msgstr ""
+msgstr "Module bijgewerkt"
 
 #: include/classes/api/services/CRole.php:707
 #, c-format
@@ -13655,7 +13645,7 @@ msgstr ""
 
 #: app/controllers/CControllerModuleScan.php:129
 msgid "Modules updated"
-msgstr ""
+msgstr "Modules bijgewerkt"
 
 #: include/func.inc.php:213
 msgid "Mon"
@@ -14123,17 +14113,17 @@ msgstr "Nieuwe gebeurteniscorrelatie"
 #: include/classes/helpers/CCorrelationHelper.php:54
 #: include/classes/helpers/CCorrelationHelper.php:129
 msgid "New event host group"
-msgstr ""
+msgstr "Nieuwe gebeurtenis hostgroep"
 
 #: app/views/js/correlation.edit.js.php:249
 #: include/classes/helpers/CCorrelationHelper.php:53
 #: include/classes/helpers/CCorrelationHelper.php:123
 msgid "New event tag name"
-msgstr ""
+msgstr "Nieuwe gebeurtenis tagnaam"
 
 #: include/classes/helpers/CCorrelationHelper.php:57
 msgid "New event tag value"
-msgstr ""
+msgstr "Nieuwe gebeurtenis tagwaarde"
 
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:100
 msgid "New excluded downtime"
@@ -14231,7 +14221,7 @@ msgstr ""
 #: app/partials/administration.system.info.php:58
 #: app/partials/administration.system.info.php:63
 msgid "New update available"
-msgstr ""
+msgstr "Nieuwe update beschikbaar"
 
 #: app/views/popup.usergroupmapping.edit.php:112
 msgid "New user group mapping"
@@ -15117,11 +15107,11 @@ msgstr "OK"
 
 #: app/partials/trigger.edit.trigger.tab.php:245
 msgid "OK event closes"
-msgstr ""
+msgstr "OK gebeurtenis sluit"
 
 #: app/partials/trigger.edit.trigger.tab.php:158
 msgid "OK event generation"
-msgstr ""
+msgstr "OK gebeurtenis aanmaken"
 
 #: include/hosts.inc.php:299
 msgid "OOB IP address"
@@ -15195,11 +15185,11 @@ msgstr ""
 #: include/classes/helpers/CCorrelationHelper.php:52
 #: include/classes/helpers/CCorrelationHelper.php:117
 msgid "Old event tag name"
-msgstr ""
+msgstr "Oude gebeurtenis tagnaam"
 
 #: include/classes/helpers/CCorrelationHelper.php:56
 msgid "Old event tag value"
-msgstr ""
+msgstr "Oude gebeurtenis tagwaarde"
 
 #: app/views/correlation.condition.edit.php:128
 msgid "Old tag name"
@@ -15244,13 +15234,13 @@ msgstr ""
 #: include/classes/api/services/CUser.php:889
 #, c-format
 msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "Alleen Super admin- of Admin-gebruikers kunnen de parameter \"%1$s\" bijwerken."
 
 #: include/classes/api/services/CUser.php:812
 #: include/classes/api/services/CUser.php:853
 #, c-format
 msgid "Only Super admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "Alleen Super admin-gebruikers kunnen de parameter \"%1$s\" bijwerken."
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -15784,7 +15774,7 @@ msgstr ""
 
 #: app/partials/trigger.edit.trigger.tab.php:237
 msgid "PROBLEM event generation mode"
-msgstr ""
+msgstr "PROBLEEM gebeurtenis generatiemodus"
 
 #: app/controllers/CControllerProxyCreate.php:108
 #: app/controllers/CControllerProxyUpdate.php:101
@@ -16169,7 +16159,7 @@ msgstr "Selecteer twee elementen"
 
 #: jsLoader.php:194
 msgid "Please update configuration"
-msgstr ""
+msgstr "Gelieve de configuratie bij te werken"
 
 #: app/partials/administration.system.info.php:47
 msgid "Please upgrade to latest major release."
@@ -16507,7 +16497,7 @@ msgstr ""
 #: app/views/popup.mediatype.message.php:54
 #: include/classes/helpers/CMediatypeHelper.php:190
 msgid "Problem update"
-msgstr ""
+msgstr "Probleem bijgewerkt"
 
 #: app/controllers/CControllerProblemView.php:153
 #: app/partials/monitoring.host.view.html.php:41
@@ -16705,7 +16695,7 @@ msgstr[1] ""
 
 #: app/controllers/CControllerProxyGroupUpdate.php:74
 msgid "Proxy group updated"
-msgstr ""
+msgstr "Proxygroep bijgewerkt"
 
 #: app/controllers/CControllerPopupGeneric.php:227
 #: app/views/administration.proxygroup.list.php:163
@@ -16729,7 +16719,7 @@ msgstr ""
 
 #: app/controllers/CControllerProxyUpdate.php:197
 msgid "Proxy updated"
-msgstr ""
+msgstr "Proxy bijgewerkt"
 
 #: app/views/administration.proxy.list.php:114
 #, c-format
@@ -17064,7 +17054,7 @@ msgstr ""
 
 #: app/controllers/CControllerRegExUpdate.php:80
 msgid "Regular expression updated"
-msgstr ""
+msgstr "Reguliere expressie bijgewerkt"
 
 #: app/views/administration.regex.edit.php:29
 #: app/views/administration.regex.list.php:31
@@ -17830,7 +17820,7 @@ msgstr ""
 
 #: app/controllers/CControllerSlaUpdate.php:130
 msgid "SLA updated"
-msgstr ""
+msgstr "SLA bijgewerkt"
 
 #: include/classes/api/services/CDashboardGeneral.php:636
 #, c-format
@@ -18181,7 +18171,7 @@ msgstr ""
 
 #: app/controllers/CControllerScheduledReportUpdate.php:147
 msgid "Scheduled report updated"
-msgstr ""
+msgstr "Gepland rapport bijgewerkt"
 
 #: app/controllers/CControllerScheduledReportEdit.php:309
 #: app/controllers/CControllerScheduledReportList.php:148
@@ -18279,7 +18269,7 @@ msgstr ""
 
 #: app/controllers/CControllerScriptUpdate.php:158
 msgid "Script updated"
-msgstr ""
+msgstr "Script bijgewerkt"
 
 #: app/controllers/CControllerPopupScriptExec.php:74
 #: app/views/administration.script.list.php:35
@@ -18619,7 +18609,7 @@ msgstr ""
 #: app/views/popup.mediatype.message.php:63
 #: include/classes/helpers/CMediatypeHelper.php:255
 msgid "Service update"
-msgstr ""
+msgstr "Service update"
 
 #: app/controllers/CControllerServiceUpdate.php:164
 msgid "Service updated"
@@ -18655,7 +18645,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupMassupdateService.php:152
 msgid "Services updated"
-msgstr ""
+msgstr "Services bijgewerkt"
 
 #: include/classes/api/services/CUser.php:1696
 msgid "Session ID or token is expected."
@@ -19989,7 +19979,7 @@ msgstr[1] ""
 
 #: app/controllers/CControllerTemplateGroupUpdate.php:86
 msgid "Template group updated"
-msgstr ""
+msgstr "Sjabloongroep bijgewerkt"
 
 #: include/classes/api/services/CUserGroup.php:494
 #, c-format
@@ -20035,8 +20025,8 @@ msgstr ""
 #: app/controllers/CControllerTemplateUpdate.php:188
 msgid "Template updated"
 msgid_plural "Templates updated"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Sjabloon bijgewerkt"
+msgstr[1] "Sjablonen bijgewerkt"
 
 #: app/partials/hostmacros.inherited.list.html.php:55
 msgid "Template value"
@@ -20332,7 +20322,7 @@ msgstr ""
 
 #: app/views/popup.token.view.php:62
 msgid "The token has expired. Please update the expiry date to use the token."
-msgstr ""
+msgstr "Het token is verlopen. Gelieve de vervaldatum bij te werken om het token te gebruiken."
 
 #: include/html.inc.php:751
 #, c-format
@@ -20345,7 +20335,7 @@ msgstr ""
 
 #: include/views/configuration.host.discovery.edit.php:712
 msgid "The value should be greater than LLD rule update interval."
-msgstr ""
+msgstr "De waarde moet groter zijn dan de update-interval van de LLD-regel."
 
 #: include/classes/api/services/CUser.php:3482
 msgid "The verification code was incorrect, please try again."
@@ -21053,8 +21043,8 @@ msgstr[1] ""
 #: app/controllers/CControllerTriggerPrototypeUpdate.php:156
 msgid "Trigger prototype updated"
 msgid_plural "Trigger prototypes updated"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Trigger-prototype bijgewerkt"
+msgstr[1] "Trigger-prototypes bijgewerkt"
 
 #: app/controllers/CControllerPopupGeneric.php:255
 #: app/controllers/CControllerPopupImportCompare.php:181
@@ -21085,11 +21075,10 @@ msgstr ""
 
 #: app/controllers/CControllerTriggerMassupdate.php:220
 #: app/controllers/CControllerTriggerUpdate.php:147
-#, fuzzy
 msgid "Trigger updated"
 msgid_plural "Triggers updated"
-msgstr[0] "trigger bijgewerkt"
-msgstr[1] "trigger bijgewerkt"
+msgstr[0] "Trigger bijgewerkt"
+msgstr[1] "Triggers bijgewerkt"
 
 #: app/controllers/CControllerPopupGeneric.php:227
 #: app/controllers/CControllerPopupGeneric.php:241
@@ -21381,11 +21370,11 @@ msgstr ""
 
 #: app/views/administration.trigdisplay.edit.php:41
 msgid "Unacknowledged PROBLEM events"
-msgstr "Niet bevestigde PROBLEM gebeurtenissen"
+msgstr "Niet bevestigde PROBLEEM gebeurtenissen"
 
 #: app/views/administration.trigdisplay.edit.php:65
 msgid "Unacknowledged RESOLVED events"
-msgstr ""
+msgstr "Niet bevestigde OPGELOSTE gebeurtenissen"
 
 #: include/views/monitoring.sysmap.edit.php:272
 #: widgets/problemhosts/includes/WidgetForm.php:85
@@ -21786,7 +21775,7 @@ msgstr "Bijwerken"
 
 #: widgets/tophosts/views/column.edit.php:300
 msgid "Update column"
-msgstr ""
+msgstr "Kolom bijwerken"
 
 #: app/partials/massupdate.macros.tab.php:87
 #: app/partials/massupdate.valuemaps.tab.php:34 app/views/popup.import.php:142
@@ -21806,26 +21795,26 @@ msgstr "Bestaande bijwerken"
 #: include/views/configuration.item.prototype.edit.php:735 items.php:56
 #: items.php:265
 msgid "Update interval"
-msgstr "Bijwerk interval"
+msgstr "Interval bijwerken"
 
 #: app/views/popup.action.edit.php:221
 msgid "Update operations"
-msgstr ""
+msgstr "Bewerkingen bijwerken"
 
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:214
 #: app/controllers/CControllerPopup.php:45 jsLoader.php:346
 msgid "Update problem"
-msgstr ""
+msgstr "Probleem met bijwerken"
 
 #: app/controllers/CControllerAuditLogList.php:387
 #: app/controllers/CControllerPopupImportCompare.php:166
 msgid "Updated"
-msgstr ""
+msgstr "Bijgewerkt"
 
 #: include/classes/api/services/CHost.php:1304
 #, c-format
 msgid "Updated status of host \"%1$s\"."
-msgstr ""
+msgstr "Status van host \"%1$s\" bijgewerkt."
 
 #: include/events.inc.php:288
 msgid "Updating"
@@ -22090,8 +22079,8 @@ msgstr ""
 #: app/controllers/CControllerUsergroupUpdate.php:135
 msgid "User group updated"
 msgid_plural "User groups updated"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Gebruikersgroep bijgewerkt"
+msgstr[1] "Gebruikersgroepen bijgewerkt"
 
 #: include/classes/api/services/CDashboard.php:473
 #: include/classes/api/services/CReport.php:465
@@ -22197,7 +22186,7 @@ msgstr[1] ""
 
 #: app/controllers/CControllerUserroleUpdate.php:179
 msgid "User role updated"
-msgstr ""
+msgstr "Gebruikersrol bijgewerkt"
 
 #: include/classes/api/services/CUser.php:797
 #, c-format
@@ -22835,14 +22824,14 @@ msgstr ""
 #: app/views/js/correlation.edit.js.php:268
 #: include/classes/helpers/CCorrelationHelper.php:153
 msgid "Value of new event tag"
-msgstr ""
+msgstr "Waarde van nieuwe gebeurtenistag"
 
 #: app/views/js/correlation.edit.js.php:234
 #: app/views/js/correlation.edit.js.php:260
 #: include/classes/helpers/CCorrelationHelper.php:138
 #: include/classes/helpers/CCorrelationHelper.php:146
 msgid "Value of old event tag"
-msgstr ""
+msgstr "Waarde van oude gebeurtenistag"
 
 #: app/views/popup.action.edit.php:115 include/actions.inc.php:357
 msgid "Value of tag"
@@ -23128,7 +23117,7 @@ msgstr[1] "Webscenario's ingeschakeld"
 
 #: httpconf.php:194
 msgid "Web scenario updated"
-msgstr ""
+msgstr "Webscenario bijgewerkt"
 
 #: app/controllers/CControllerPopupImportCompare.php:178
 #: app/views/popup.import.php:43 include/html.inc.php:456
@@ -24313,7 +24302,7 @@ msgstr "kan \"Scroll\" API-aanvraag niet uitvoeren, gegevens kunnen worden afgek
 #: include/classes/validators/CApiInputValidator.php:3536
 #, c-format
 msgid "cannot update readonly parameter \"%1$s\" of discovered object"
-msgstr ""
+msgstr "kan de alleen-lezen parameter \"%1$s\" van ontdekte object niet bijwerken"
 
 #: include/classes/validators/CApiInputValidator.php:3530
 #, c-format
@@ -24327,7 +24316,7 @@ msgstr "kan de alleen-lezen parameter \"%1$s\" van overgeërfde object niet bijw
 #: include/classes/api/services/CUser.php:1066
 #, c-format
 msgid "cannot update readonly parameter \"%1$s\" of provisioned user"
-msgstr ""
+msgstr "kan de alleen-lezen parameter \"%1$s\" van voorziene gebruiker niet bijwerken"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:491
 msgid "cbrt() - Cube root"
@@ -24879,7 +24868,7 @@ msgstr ""
 #: include/classes/validators/CHistFunctionValidator.php:69
 #, c-format
 msgid "invalid seventh parameter in function \"%1$s\""
-msgstr ""
+msgstr "ongeldige zevende parameter in functie \"%1$s\""
 
 #: include/classes/validators/CHistFunctionValidator.php:68
 #, c-format
@@ -25019,7 +25008,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:765
 msgid "logeventid() - Event ID of last log entry matching regular expression V for period T (1 - match, 0 - no match)"
-msgstr ""
+msgstr "logeventid() - Gebeurtenis-ID van laatste logboekinvoer die overeenkomt met reguliere expressie V voor periode T (1 - overeenkomst, 0 - geen overeenkomst)"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:772
 msgid "logseverity() - Log severity of the last log entry for period T"
@@ -26018,7 +26007,7 @@ msgstr ""
 #: include/classes/validators/CApiInputValidator.php:3726
 #, c-format
 msgid "update interval \"%1$s\" is longer than period \"%2$s\""
-msgstr ""
+msgstr "update-interval \"%1$s\" is langer dan periode \"%2$s\""
 
 #: include/classes/validators/CApiInputValidator.php:596
 msgid "uppercase identifier expected"
@@ -26233,7 +26222,7 @@ msgstr ""
 #: app/views/js/correlation.edit.js.php:235
 #: include/classes/helpers/CCorrelationHelper.php:141
 msgid "value of new event tag"
-msgstr ""
+msgstr "waarde van nieuwe gebeurtenistag"
 
 #: include/classes/api/services/CScript.php:527
 msgid "values must be unique"
