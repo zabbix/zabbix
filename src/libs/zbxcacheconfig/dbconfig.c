@@ -2764,7 +2764,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		/* first resolve macros for ip and dns fields in main agent interface  */
 		/* because other interfaces might reference main interfaces ip and dns */
-		/* with {HOST.IP} and {HOST.DNS} macros                                */
+		/* with {HOST.IP}, {HOST.DNS} and {HOST.PORT} macros                   */
 		if (1 == interface->main && INTERFACE_TYPE_AGENT == interface->type)
 		{
 			dc_if_update_substitute_host_macros(update, host, 0);
