@@ -2598,34 +2598,39 @@ static void	dc_if_update_free(zbx_dc_if_update_t *update)
  ******************************************************************************/
 static void	dc_if_update_substitute_host_macros(zbx_dc_if_update_t *update, const ZBX_DC_HOST *host, int flags)
 {
-	char	*addr;
+	char	*ptr;
 
-	if (NULL != (addr = dc_expand_host_macros_dyn(update->ip, host, flags)))
+	if (NULL != (ptr = dc_expand_host_macros_dyn(update->ip, host, flags)))
 	{
-		if (SUCCEED == zbx_is_ip(addr))
+		if (SUCCEED == zbx_is_ip(ptr))
 		{
 			zbx_free(update->ip);
-			update->ip = addr;
+			update->ip = ptr;
 		}
 		else
-			zbx_free(addr);
+			zbx_free(ptr);
 	}
 
-	if (NULL != (addr = dc_expand_host_macros_dyn(update->dns, host, flags)))
+	if (NULL != (ptr = dc_expand_host_macros_dyn(update->dns, host, flags)))
 	{
-		if (SUCCEED == zbx_is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
+		if (SUCCEED == zbx_is_ip(ptr) || SUCCEED == zbx_validate_hostname(ptr))
 		{
 			zbx_free(update->dns);
-			update->dns = addr;
+			update->dns = ptr;
 		}
 		else
-			zbx_free(addr);
+			zbx_free(ptr);
 	}
 
-	if (NULL != (addr = dc_expand_host_macros_dyn(update->port, host, flags)))
+	if (NULL != (ptr = dc_expand_host_macros_dyn(update->port, host, flags)))
 	{
-		zbx_free(update->port);
-		update->port = addr;
+		if (SUCCEED == zbx_is_ushort(ptr, NULL))
+		{
+			zbx_free(update->port);
+			update->port = ptr;
+		}
+		else
+			zbx_free(ptr);
 	}
 }
 

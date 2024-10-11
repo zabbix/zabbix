@@ -481,10 +481,10 @@ int	zbx_problem_get_actions(const zbx_db_acknowledge *ack, int actions, const ch
 	{
 		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index]);
 		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "ranked as cause");
-			}
+	}
 
 	zbx_free(*out);
 	*out = buf;
 
 	return SUCCEED;
-	}
+}

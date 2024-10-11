@@ -1690,7 +1690,16 @@ static char	**dbsync_interface_preproc_row(zbx_dbsync_t *sync, char **row)
 	}
 
 	if (NULL != strstr(row[7], "{$"))
-		row[7] = dc_expand_user_and_func_macros_dyn(row[7], &hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+	{
+		char	*ptr;
+
+		ptr = dc_expand_user_and_func_macros_dyn(row[7], &hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+
+		if (SUCCEED == zbx_is_ushort(ptr, NULL))
+			row[7] = ptr;
+		else
+			zbx_free(ptr);
+	}
 
 	return sync->row;
 }
