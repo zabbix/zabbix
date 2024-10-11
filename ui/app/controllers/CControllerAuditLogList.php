@@ -84,7 +84,7 @@ class CControllerAuditLogList extends CController {
 		$non_existent_userids = [0];
 
 		$filter = [
-			'action' => $data['auditlog_actions']
+			'action' => $data['auditlog_actions'] ?: null
 		];
 
 		if ($data['resourcetype'] != -1) {
