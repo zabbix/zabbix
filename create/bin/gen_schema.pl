@@ -613,9 +613,6 @@ sub timescaledb()
 		timescaledb_get_version("ZBX_TIMESCALE_MIN_VERSION_STR");
 
 	print<<EOF
-DROP FUNCTION IF EXISTS base36_decode(character varying);
-
-DROP FUNCTION IF EXISTS cuid_timestamp(cuid varchar(25));
 CREATE OR REPLACE FUNCTION cuid_timestamp(cuid varchar(25)) RETURNS integer AS \$\$
 DECLARE
 	base36 varchar; 
@@ -643,6 +640,7 @@ BEGIN
 	RETURN CAST(ret/1000 AS integer);
 END;
 \$\$ LANGUAGE 'plpgsql' IMMUTABLE;
+DROP FUNCTION IF EXISTS base36_decode(character varying);
 
 DO \$\$
 DECLARE
