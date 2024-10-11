@@ -13237,6 +13237,10 @@ msgstr "メニューエントリ名は、イベントコンテキストメニュ
 msgid "Menu path"
 msgstr "メニューパス"
 
+#: widgets/piechart/includes/WidgetForm.php:149
+msgid "Merge sectors smaller than"
+msgstr ""
+
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
 msgstr "これより小さいセクターの場合はマージする"

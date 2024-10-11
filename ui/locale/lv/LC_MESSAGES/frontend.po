@@ -13546,6 +13546,10 @@ msgstr ""
 msgid "Menu path"
 msgstr "Izvēlnes ceļš"
 
+#: widgets/piechart/includes/WidgetForm.php:149
+msgid "Merge sectors smaller than"
+msgstr ""
+
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
 msgstr ""
