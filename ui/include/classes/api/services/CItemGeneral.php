@@ -48,6 +48,13 @@ abstract class CItemGeneral extends CApiService {
 	protected $fieldRules;
 
 	/**
+	 * Maximum number of items per iteration.
+	 *
+	 * @var int
+	 */
+	protected const CHUNK_SIZE = 1000;
+
+	/**
 	 * @abstract
 	 *
 	 * @param array $options

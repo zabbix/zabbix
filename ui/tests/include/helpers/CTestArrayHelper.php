@@ -86,4 +86,36 @@ class CTestArrayHelper {
 			return 0;
 		});
 	}
+
+	/**
+	 * Recursive function for trimming all values in multi-level array.
+	 *
+	 * @param array    $array    array to be trimmed
+	 *
+	 * @return array
+	 */
+	public static function trim(&$array) {
+		foreach ($array as &$value) {
+			if (!is_array($value)) {
+				$value = trim($value);
+			}
+			else {
+				self::trim($value);
+			}
+		}
+		unset($value);
+
+		return $array;
+	}
+
+	/**
+	 * Check if array is multidimensional.
+	 *
+	 * @param array $array	multidimensional or not multidimensional array under attention
+	 *
+	 * @return boolean
+	 */
+	public static function isMultidimensional($array) {
+		return (count($array) !== count($array, COUNT_RECURSIVE));
+	}
 }
