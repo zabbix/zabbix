@@ -1686,6 +1686,17 @@ static char	**dbsync_interface_preproc_row(zbx_dbsync_t *sync, char **row)
 			zbx_free(addr);
 	}
 
+	if (NULL != strstr(row[7], "{$"))
+	{
+		char	*addr;
+
+		addr = dc_expand_user_and_func_macros_dyn(row[7], &hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+
+		if (SUCCEED == zbx_is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
+			row[7] = addr;
+		else
+			zbx_free(addr);
+	}
 	return sync->row;
 }
 
