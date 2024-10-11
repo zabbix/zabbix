@@ -1,1 +1,0 @@
-A......... [ZBX-25159] resolved issue where API maintenance.get returns HTTP 500 when using a single hostids ID (wczerneha)

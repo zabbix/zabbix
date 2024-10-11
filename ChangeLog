@@ -1,6 +1,9 @@
 Changes for 7.2.0alpha1
 
 New features:
+.......PS. [ZBXNEXT-6726] added auto renew Hashicorp vault periodic service tokens (sboidenko)
+........S. [ZBXNEXT-9397] replaced forced proxy timeout sync between Zabbix server and proxy by sync on demand (mprihodko)
+.........T [ZBXNEXT-9457] added Huawei OceanStor V6 by SNMP template (abrosimovs)
 ..F....... [ZBXNEXT-8397] updated operational data hint-box to display full value (rgontarski)
 ...G...... [ZBXNEXT-9281] added configurable item timeout support (dgoloscapov)
 ........S. [ZBXNEXT-9246] added monitoring of HA manager process utilization (mprihodko)
@@ -49,6 +52,23 @@ A.F.I..PS. [ZBXNEXT-9176] removed support of Oracle DB (agriscenko, sboidenko)
 .......PS. [ZBXNEXT-8990] extended VMware event log with username (asestakovs)
 
 Bug fixes:
+A......... [ZBX-24500] fixed an issue that allowed defining multiple PSK keys for the same PSK identity used in hosts, proxies, and autoregistration (gcalenko)
+...G...... [ZBX-24960] fixed specified item test by Zabbix Agent 2 on Windows for "system.uptime" and other performance counters based items (asestakovs)
+........S. [ZBX-25298] fixed LLD rule lifetime parameters to be updated during template linking by autoregistration and network discovery (asestakovs)
+....I..... [ZBX-24955] fixed cuid_timestamp PostgreSQL function for database dump and restore (askolmeisters)
+........S. [ZBX-25265] fixed macro function parameter escaping in LLD (wiper)
+........S. [ZBX-25157] fixed misleading error message while testing a scheduled report (mprihodko)
+A.F....... [ZBX-23227] fixed using an empty array or string as a value for filtering parameters in get methods returns all records (agriscenko, jfreibergs)
+...G...... [ZBX-24273] fixed potential Zabbix agent crash for vfs.fs.get item (MVekslers)
+A.F.....S. [ZBX-25090] fixed missing binary data type when streaming data to external systems (asestakovs)
+...G...PS. [ZBX-25296] removed overzealous preprocessor test for LIBRESSL_VERSION_NUMBER (jxl)
+..F....... [ZBX-25182] removed length restriction for trigger expression and recovery expression fields (esekace)
+..F....... [ZBX-25033] fixed errors in Problem view and widget in case "Problems" option is set and all symptoms are resolved (Ivo)
+A......... [ZBX-25223] resolved issue where the selectAction parameter with "extend" in mediatype.get request returns only actionid (wczerneha)
+...G...PS. [ZBX-25029] initiate HA failover in the case of invalid server response (wiper)
+A......... [ZBX-25159] resolved issue where API maintenance.get returns HTTP 500 when using a single hostids ID (wczerneha)
+...G...... [ZBX-25309] fixed Zabbix agent crash on 3 user parameters reload (arimdjonoks)
+........S. [ZBX-25293] fixed not-null constraint violation during low level discovery when overrides are used (vso)
 A......... [ZBX-23007] added chunking when collecting related objects for item and item prototype (dfofanovs)
 ..F....... [ZBX-24938] added new line handler for columns with text item data type and display set to "As is" in Item history widget (dfofanovs)
 ..F....... [ZBX-24931] fixed vertical text layout for Korean, Japanese and Chinese languages (dfofanovs)
@@ -302,10 +322,30 @@ A......... [ZBX-24299] fixed possibility to alter readonly error fields with Hos
 Changes for 7.0.5rc1
 
 New features:
+.......PS. [ZBXNEXT-6726] added auto renew Hashicorp vault periodic service tokens (sboidenko)
+........S. [ZBXNEXT-9397] replaced forced proxy timeout sync between Zabbix server and proxy by sync on demand (mprihodko)
+.........T [ZBXNEXT-9457] added Huawei OceanStor V6 by SNMP template (abrosimovs)
 ...G...... [ZBXNEXT-9281] added configurable item timeout support (dgoloscapov)
 ........S. [ZBXNEXT-9246] added monitoring of HA manager process utilization (mprihodko)
 
 Bug fixes:
+A......... [ZBX-24500] fixed an issue that allowed defining multiple PSK keys for the same PSK identity used in hosts, proxies, and autoregistration (gcalenko)
+...G...... [ZBX-24960] fixed specified item test by Zabbix Agent 2 on Windows for "system.uptime" and other performance counters based items (asestakovs)
+........S. [ZBX-25298] fixed LLD rule lifetime parameters to be updated during template linking by autoregistration and network discovery (asestakovs)
+....I..... [ZBX-24955] fixed cuid_timestamp PostgreSQL function for database dump and restore (askolmeisters)
+........S. [ZBX-25265] fixed macro function parameter escaping in LLD (wiper)
+........S. [ZBX-25157] fixed misleading error message while testing a scheduled report (mprihodko)
+...G...... [ZBX-24273] fixed potential Zabbix agent crash for vfs.fs.get item (MVekslers)
+A.F.....S. [ZBX-25090] fixed missing binary data type when streaming data to external systems (asestakovs)
+...G...PS. [ZBX-25296] removed overzealous preprocessor test for LIBRESSL_VERSION_NUMBER (jxl)
+..F....... [ZBX-24249] fixed labels overflowing in widget configuration forms (apoga)
+..F....... [ZBX-25182] removed length restriction for trigger expression and recovery expression fields (esekace)
+..F....... [ZBX-25033] fixed errors in Problem view and widget in case "Problems" option is set and all symptoms are resolved (Ivo)
+A......... [ZBX-25223] resolved issue where the selectAction parameter with "extend" in mediatype.get request returns only actionid (wczerneha)
+...G...PS. [ZBX-25029] initiate HA failover in the case of invalid server response (wiper)
+A......... [ZBX-25159] resolved issue where API maintenance.get returns HTTP 500 when using a single hostids ID (wczerneha)
+...G...... [ZBX-25309] fixed Zabbix agent crash on 3 user parameters reload (arimdjonoks)
+........S. [ZBX-25293] fixed not-null constraint violation during low level discovery when overrides are used (vso)
 ..F....... [ZBX-24938] added new line handler for columns with text item data type and display set to "As is" in Item history widget (dfofanovs)
 A......... [ZBX-23007] added chunking when collecting related objects for item and item prototype (dfofanovs)
 ..F....... [ZBX-24931] fixed vertical text layout for Korean, Japanese and Chinese languages (dfofanovs)
@@ -1410,6 +1450,7 @@ Changes for 6.4.20rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-24273] fixed potential Zabbix agent crash for vfs.fs.get item (MVekslers)
 ..F....... [ZBX-23171] fixed escaping of slash character in context-based macro patterns (esekace)
 
 --------------------------------------------------------------------------------
@@ -3347,9 +3388,16 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.35rc1
 
 New features:
+.........T [ZBXNEXT-9457] added Huawei OceanStor V6 by SNMP template (abrosimovs)
 ........S. [ZBXNEXT-9246] added monitoring of HA manager process utilization (mprihodko)
 
 Bug fixes:
+A......... [ZBX-24500] fixed an issue that allowed defining multiple PSK keys for the same PSK identity used in hosts, proxies, and autoregistration (gcalenko)
+...G...... [ZBX-24960] fixed specified item test by Zabbix Agent 2 on Windows for "system.uptime" and other performance counters based items (asestakovs)
+.......PS. [ZBX-25311] reverted passing errors to dependent items (askolmeisters)
+...G...... [ZBX-24273] fixed potential Zabbix agent crash for vfs.fs.get item (MVekslers)
+...G...PS. [ZBX-25029] initiate HA failover in the case of invalid server response (wiper)
+A......... [ZBX-23410] fixed assigning of interfaces for copied LLD rules and item prototypes (jfreibergs)
 A......... [ZBX-23007] added chunking when collecting related objects for item and item prototype (dfofanovs)
 ..F....... [ZBX-23171] fixed escaping of slash character in context-based macro patterns (esekace)
 ........S. [ZBX-25141] fixed {FUNCTION.VALUE} and {FUNCTION.RECOVERY.VALUE} macro expansion in notifications, commands, event names and manual event action scripts (dgoloscapov)
@@ -6619,6 +6667,7 @@ Changes for 5.0.45rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-24273] fixed potential Zabbix agent crash for vfs.fs.get item (MVekslers)
 ..F....... [ZBX-23171] fixed escaping of slash character in context-based macro patterns (esekace)
 
 --------------------------------------------------------------------------------
