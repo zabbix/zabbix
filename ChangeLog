@@ -1,9 +1,16 @@
 Changes for 6.0.35rc1
 
 New features:
+.........T [ZBXNEXT-9457] added Huawei OceanStor V6 by SNMP template (abrosimovs)
 ........S. [ZBXNEXT-9246] added monitoring of HA manager process utilization (mprihodko)
 
 Bug fixes:
+A......... [ZBX-24500] fixed an issue that allowed defining multiple PSK keys for the same PSK identity used in hosts, proxies, and autoregistration (gcalenko)
+...G...... [ZBX-24960] fixed specified item test by Zabbix Agent 2 on Windows for "system.uptime" and other performance counters based items (asestakovs)
+.......PS. [ZBX-25311] reverted passing errors to dependent items (askolmeisters)
+...G...... [ZBX-24273] fixed potential Zabbix agent crash for vfs.fs.get item (MVekslers)
+...G...PS. [ZBX-25029] initiate HA failover in the case of invalid server response (wiper)
+A......... [ZBX-23410] fixed assigning of interfaces for copied LLD rules and item prototypes (jfreibergs)
 A......... [ZBX-23007] added chunking when collecting related objects for item and item prototype (dfofanovs)
 ..F....... [ZBX-23171] fixed escaping of slash character in context-based macro patterns (esekace)
 ........S. [ZBX-25141] fixed {FUNCTION.VALUE} and {FUNCTION.RECOVERY.VALUE} macro expansion in notifications, commands, event names and manual event action scripts (dgoloscapov)
@@ -3273,6 +3280,7 @@ Changes for 5.0.45rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-24273] fixed potential Zabbix agent crash for vfs.fs.get item (MVekslers)
 ..F....... [ZBX-23171] fixed escaping of slash character in context-based macro patterns (esekace)
 
 --------------------------------------------------------------------------------
