@@ -1617,7 +1617,7 @@ int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const cha
 	{
 		if (vmware_shmem_get_vmware_mem()->free_size < vmware_perf_entity_shmem_size(type, id, instance))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() Addition of performance counter has been postponed."
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() Adding of performance counter has been postponed."
 					" type:%s id:%s counterid:" ZBX_FS_UI64 " instance:%s",
 					__func__, type, id, counterid, instance);
 			return SUCCEED;
