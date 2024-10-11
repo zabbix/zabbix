@@ -1941,6 +1941,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			zbx_set_exiting_with_fail();
 			break;
 		}
+
+		zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
+				config_ssl_cert_location, config_ssl_key_location);
 	}
 out:
 	zbx_log_exit_signal();
