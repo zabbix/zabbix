@@ -560,15 +560,19 @@ sub timescaledb()
 
 	print<<EOF
 DROP FUNCTION IF EXISTS base36_decode(character varying);
-CREATE OR REPLACE FUNCTION base36_decode(IN base36 varchar)
-RETURNS bigint AS \$\$
+
+DROP FUNCTION IF EXISTS cuid_timestamp(cuid varchar(25));
+CREATE OR REPLACE FUNCTION cuid_timestamp(cuid varchar(25)) RETURNS integer AS \$\$
 DECLARE
+	base36 varchar; 
 	a char[];
 	ret bigint;
 	i int;
 	val int;
 	chars varchar;
 BEGIN
+	base36 := substring(cuid FROM 2 FOR 8);
+
 	chars := '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 	FOR i IN REVERSE char_length(base36)..1 LOOP
@@ -582,14 +586,7 @@ BEGIN
 		i := i + 1;
 	END LOOP;
 
-	RETURN ret;
-END;
-\$\$ LANGUAGE 'plpgsql' IMMUTABLE;
-
-DROP FUNCTION IF EXISTS cuid_timestamp(cuid varchar(25));
-CREATE OR REPLACE FUNCTION cuid_timestamp(cuid varchar(25)) RETURNS integer AS \$\$
-BEGIN
-	RETURN CAST(base36_decode(substring(cuid FROM 2 FOR 8))/1000 AS integer);
+	RETURN CAST(ret/1000 AS integer);
 END;
 \$\$ LANGUAGE 'plpgsql' IMMUTABLE;
 
