@@ -28,6 +28,8 @@ use Facebook\WebDriver\WebDriverKeys;
 class testFormTrigger extends CLegacyWebTest {
 	const HOST = 'Host for Triggers test';
 
+	protected static $long_key_hostid;
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -43,14 +45,21 @@ class testFormTrigger extends CLegacyWebTest {
 		$this->assertArrayHasKey('groupids', $hostgroups);
 		$groupid = $hostgroups['groupids'][0];
 
-		// Create host for items and triggers.
+		// Create hosts for various tests.
 		$hosts = CDataHelper::call('host.create', [
-			'host' => self::HOST,
-			'groups' => [['groupid' => $groupid]]
+			[
+				'host' => self::HOST,
+				'groups' => [['groupid' => $groupid]]
+			],
+			[
+				'host' => STRING_128,
+				'groups' => [['groupid' => $groupid]]
+			]
 		]);
 
 		$this->assertArrayHasKey('hostids', $hosts);
 		$hostid = $hosts['hostids'][0];
+		self::$long_key_hostid = $hosts['hostids'][1];
 
 		// Create items.
 		$items_data = [];
@@ -71,16 +80,33 @@ class testFormTrigger extends CLegacyWebTest {
 			];
 		}
 
+		// An additional item with a long key.
+		$items_data[] = [
+			'name' => 'test',
+			'key_' => STRING_2048,
+			'hostid' => self::$long_key_hostid,
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_FLOAT
+		];
+
 		CDataHelper::call('item.create', $items_data);
 
-		// Create trigger based on item.
-		CDataHelper::call('trigger.create',
+		// Create triggers for various tests.
+		CDataHelper::call('trigger.create', [
 			[
 				'description' => 'testFormTrigger1',
 				'expression' => 'last(/'.self::HOST.'/Float,#1)=0',
 				'priority' => 0
+			],
+			[
+				'description' => 'Trigger with long expression for simple update',
+				'expression' => 'last(/'.STRING_128.'/'.STRING_2048.')=0'
+			],
+			[
+				'description' => 'Trigger with long expression for update',
+				'expression' => 'last(/'.STRING_128.'/'.STRING_2048.')>0'
 			]
-		);
+		]);
 	}
 
 	// Returns layout data
@@ -1286,6 +1312,77 @@ class testFormTrigger extends CLegacyWebTest {
 				COverlayDialogElement::find()->one()->close();
 			}
 		}
+	}
+
+	public function getLongExpressionData() {
+		return [
+			// Create trigger.
+			[
+				[
+					'form_data' => [
+						'Name' => 'Created trigger',
+						'Expression' => 'last(/'.STRING_128.'/'.STRING_2048.')=0 and last(/'.STRING_128.'/'.STRING_2048.')=0'
+					],
+					'expected_db_expression' => '/^\{\d+\}=0 and \{\d+\}=0$/'
+				]
+			],
+			// Simple update.
+			[
+				[
+					'update' => true,
+					'link_name' => 'Trigger with long expression for simple update',
+					'expected_db_expression' => '/^\{\d+\}=0$/'
+				]
+			],
+			// Update.
+			[
+				[
+					'update' => true,
+					'link_name' => 'Trigger with long expression for update',
+					'form_data' => [
+						'Name' => 'Updated trigger',
+						'Expression' => 'last(/'.STRING_128.'/'.STRING_2048.')>0 and last(/'.STRING_128.'/'.STRING_2048.')>0'
+					],
+					'expected_db_expression' => '/^\{\d+\}>0 and \{\d+\}>0$/'
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test a special case where the host's name and item's key are very long.
+	 * The trigger expression is saved using expression IDs instead of saving the whole text of the expression,
+	 * so no issues due to length of host name or item key should be present regardless of their length.
+	 *
+	 * @dataProvider getLongExpressionData
+	 */
+	public function testFormTrigger_LongExpression($data) {
+		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&context=host&filter_hostids[0]='.
+				self::$long_key_hostid
+		);
+		$this->page->waitUntilReady();
+
+		// Open the correct form.
+		$open_form_button = (CTestArrayHelper::get($data, 'update'))
+			? 'link:'.$data['link_name']
+			: 'button:Create trigger';
+		$this->page->query($open_form_button)->one()->click();
+
+		// Fill form data and save.
+		$dialog = COverlayDialogElement::find()->one();
+		$dialog->asForm()->fill(CTestArrayHelper::get($data, 'form_data', []));
+		$button = CTestArrayHelper::get($data, 'update') ? 'Update' : 'Add';
+		$dialog->getFooter()->query('button', $button)->one()->click();
+		COverlayDialogElement::ensureNotPresent();
+
+		// Get the saved trigger's ID from UI.
+		$link = (array_key_exists('form_data', $data)) ? $data['form_data']['Name'] : $data['link_name'];
+		$triggerid = $this->page->query('link', $link)->one()->getAttribute('data-triggerid');
+
+		// Get the newly saved trigger's expression, as it is saved in the DB.
+		$db_expression = CDBHelper::getValue('SELECT expression FROM triggers WHERE triggerid = '.$triggerid);
+		// Assert by regex that the expression is saved in DB similar to this: "{100253}=0 and {100253}=0".
+		$this->assertEquals(1, preg_match($data['expected_db_expression'], $db_expression));
 	}
 
 	/**

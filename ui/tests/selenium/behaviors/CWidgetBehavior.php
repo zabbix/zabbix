@@ -44,4 +44,17 @@ class CWidgetBehavior extends CBehavior {
 
 		return $form;
 	}
+
+	/**
+	 * Return widget type.
+	 *
+	 * @param CWidgetElement	$widget		widget for which type is obtained
+	 *
+	 * @return string
+	 */
+	public function getWidgetType($widget) {
+		$class_attribute = $widget->query('class:dashboard-grid-widget-contents')->one()->getAttribute('class');
+
+		return str_replace('dashboard-widget-', '', explode(' ', $class_attribute)[1]);
+	}
 }

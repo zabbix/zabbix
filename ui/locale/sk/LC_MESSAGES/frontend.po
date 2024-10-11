@@ -13534,6 +13534,10 @@ msgstr "Názov položky ponuky sa používa ako označenie pre URL spúšťača 
 msgid "Menu path"
 msgstr "Cesta menu"
 
+#: widgets/piechart/includes/WidgetForm.php:149
+msgid "Merge sectors smaller than"
+msgstr ""
+
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
 msgstr "Zlúčiť sektory menšie ako"

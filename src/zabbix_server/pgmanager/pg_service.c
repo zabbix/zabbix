@@ -157,10 +157,12 @@ static void	pg_get_proxy_sync_data(zbx_pg_service_t *pgs, zbx_ipc_client_t *clie
 
 	/* if proxy is not cached or registered to proxy group return 'no sync' mode */
 	/* with 0 hostmap_revision, forcing full sync next time                      */
+	/* If hostmap revision is 0 it indicates that hostmap is not defined for the */
+	/* proxy group. Return 'no sync' to prevent unneeded sync of proxy list and  */
+	/* empty host map each sync period.                                          */
 	if (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&pgs->cache->proxies, &proxyid)) &&
-			NULL != proxy->group)
+			NULL != proxy->group && 0 != (hostmap_revision = proxy->group->hostmap_revision))
 	{
-		hostmap_revision = proxy->group->hostmap_revision;
 		failover_delay = proxy->group->failover_delay;
 
 		if (0 == proxy_hostmap_revision || proxy_hostmap_revision > hostmap_revision ||

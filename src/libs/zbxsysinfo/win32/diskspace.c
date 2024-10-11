@@ -292,8 +292,11 @@ static int	get_mount_paths(zbx_vector_ptr_t *mount_paths, char **error)
 		{
 			if (ERROR_MORE_DATA != (last_error = GetLastError()))
 			{
-				*error = zbx_dsprintf(*error, "Cannot obtain a list of filesystems: %s",
-						zbx_strerror_from_system(last_error));
+				char	*volume = zbx_unicode_to_utf8(volume_name);
+
+				*error = zbx_dsprintf(*error, "Cannot obtain a list of filesystems. Volume: %s Error: %s",
+						volume, zbx_strerror_from_system(last_error));
+				zbx_free(volume);
 				goto out;
 			}
 
@@ -383,6 +386,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE
 	zbx_vector_ptr_t	mount_paths;
 
 	zbx_vector_ptr_create(&mount_paths);
+	zbx_vector_ptr_create(&mntpoints);
 	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	if (FAIL == get_mount_paths(&mount_paths, &error))
@@ -394,7 +398,6 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE
 	/* 'timeout_event' argument is here to make the vfs_fs_size() prototype as required by */
 	/* zbx_execute_threaded_metric() on MS Windows */
 	ZBX_UNUSED(timeout_event);
-	zbx_vector_ptr_create(&mntpoints);
 
 	for (int i = 0; i < mount_paths.values_num; i++)
 	{
@@ -449,10 +452,9 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE
 out:
 	zbx_vector_ptr_clear_ext(&mount_paths, (zbx_clean_func_t)zbx_ptr_free);
 	zbx_vector_ptr_destroy(&mount_paths);
-
-	zbx_json_free(&j);
 	zbx_vector_ptr_clear_ext(&mntpoints, (zbx_clean_func_t)zbx_wmpoints_free);
 	zbx_vector_ptr_destroy(&mntpoints);
+	zbx_json_free(&j);
 
 	return ret;
 }
