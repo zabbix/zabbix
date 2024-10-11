@@ -3,12 +3,12 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of both VMware vCenter and ESX hypervisor monitoring and doesn't require any external scripts.
+This template set is designed for the effortless deployment of VMware vCenter and ESX hypervisor monitoring and doesn't require any external scripts.
 
-The "VMware Guest" template is used in discovery and normally should not be manually linked to a host.
-The "VMware Hypervisor" can be used in discovery as well as manually linked to a host.
+- The template "VMware Guest" is used in discovery and normally should not be manually linked to a host.
+- The template "VMware Hypervisor" can be used in discovery as well as manually linked to a host.
 
-For additional information please check https://www.zabbix.com/documentation/7.2/manual/vm_monitoring
+For additional information, please see [Zabbix documentation on VM monitoring](https://www.zabbix.com/documentation/7.2/manual/vm_monitoring).
 
 ## Requirements
 
@@ -26,7 +26,7 @@ This template has been tested on:
 ## Setup
 
 1. Compile Zabbix server with the required options (`--with-libxml2` and `--with-libcurl`)
-2. Set the `StartVMwareCollectors` option in Zabbix server configuration file to "1" or more
+2. Set the `StartVMwareCollectors` option in the Zabbix server configuration file to "1" or more
 3. Create a new host
 4. If you want to use a separate user for monitoring, make sure that the user is a member of the `SystemConfiguration.ReadOnly` and `vStatsGroup` groups
 Set the host macros (on the host or template level) required for VMware authentication:
@@ -35,7 +35,7 @@ Set the host macros (on the host or template level) required for VMware authenti
 {$VMWARE.USERNAME}
 {$VMWARE.PASSWORD}
 ```
-5. Link the template to host created earlier
+5. Link the template to the host created earlier
 
 Note: To enable discovery of hardware sensors of VMware hypervisors, set the macro `{$VMWARE.HV.SENSOR.DISCOVERY}` to the value `true` on the discovered host level.
 
@@ -279,9 +279,9 @@ This template is designed for the effortless deployment of VMware ESX hypervisor
 
 This template can be used in discovery as well as manually linked to a host.
 
-For additional information please check https://www.zabbix.com/documentation/7.2/manual/vm_monitoring
+For additional information, please see [Zabbix documentation on VM monitoring](https://www.zabbix.com/documentation/7.2/manual/vm_monitoring).
 
-To use this template as manually linked to a host, attach it to the host and set manually the value of `{$VMWARE.HV.UUID}` macro. 
+To use this template as manually linked to a host, attach it to the host and manually set the value of the `{$VMWARE.HV.UUID}` macro.
 
 ## Requirements
 
@@ -300,7 +300,7 @@ This template has been tested on:
 
 To use this template as manually linked to a host:
   1. Compile Zabbix server with the required options (`--with-libxml2` and `--with-libcurl`)
-  2. Set the `StartVMwareCollectors` option in Zabbix server configuration file to "1" or more
+  2. Set the `StartVMwareCollectors` option in the Zabbix server configuration file to "1" or more
   3. Create a new host
   4. Set the host macros (on the host or template level) required for VMware authentication:
   ```text
@@ -309,12 +309,12 @@ To use this template as manually linked to a host:
   {$VMWARE.PASSWORD}
   ```
   5. To get the hypervisor UUID, enable access to the hypervisor via SSH and log in via SSH using a valid login and password.
-  6. Run the following command and specify the UUID in the macro `{$VMWARE.HV.UUID}`
+  6. Run the following command and specify the UUID in the macro `{$VMWARE.HV.UUID}`:
   ```text
   vim-cmd hostsvc/hostsummary | grep uuid
   ```
   7. Add the agent interface on the host with the address (IP or DNS) of the VMware hypervisor
-  8. Link the template to host created earlier
+  8. Link the template to the host created earlier
 
 ### Macros used
 
