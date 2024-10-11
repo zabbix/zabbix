@@ -156,4 +156,26 @@ in:
 out:
   expression: '{{$MACRO}.regsub("(.*)", \1, "\1")}'
   return: SUCCEED
+---
+test case: Expand '{{$MACRO}.regsub({#A}, \\1, "\\1")}' with {#A}=(.*)
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO, ZBX_MACRO_FUNC]
+  lld: '{"a":"(.*)"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '{{$MACRO}.regsub({#A}, \\1, "\\1")}'
+out:
+  expression: '{{$MACRO}.regsub("(.*)", \\1, "\\1")}'
+  return: SUCCEED
+---
+test case: Expand '{?concat(/host/key[{#A}],"\\{#A}")}' with {#A}=\
+in:
+  flags: [ZBX_MACRO_ANY, ZBX_TOKEN_EXPRESSION_MACRO]
+  lld: '{"a":"\\"}'
+  macros:
+    - {macro: '{#A}', path: $.a}
+  expression: '{?concat(last(/host/key[{#A}]),"\\{#A}",{#A})}'
+out:
+  expression: '{?concat(last(/host/key[\]),"\\\\","\\")}'
+  return: SUCCEED
 ...
