@@ -1235,7 +1235,10 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 			evt_pause = 1;
 	}
 	else
+	{
 		evt_pause = 1;
+		service->eventlog.oom = 1;
+	}
 
 	zbx_vmware_unlock();
 
@@ -1246,6 +1249,10 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 			zabbix_log(LOG_LEVEL_WARNING, "Postponed VMware events requires up to " ZBX_FS_UI64
 					" bytes of free VMwareCache memory. Available " ZBX_FS_UI64 " bytes."
 					" Reading events skipped", service->eventlog.req_sz, shmem_free_sz);
+		}
+		else if (0 != service->eventlog.oom)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "There is no 5% free memory. Reading new events skipped");
 		}
 		else
 		{
