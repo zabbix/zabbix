@@ -272,7 +272,8 @@ class CTabFilter extends CDiv {
 		foreach ($this->contents as $index => $content) {
 			if (is_a($content, CTag::class)) {
 				$show_index = $this->options['expanded_timeselector'] ? 'timeselector' : $selected;
-				$content->addClass($index == $show_index ? null : ZBX_STYLE_DISPLAY_NONE);
+				// Strict comparison is necessary as there are both integer and string indexes.
+				$content->addClass($index === $show_index ? null : ZBX_STYLE_DISPLAY_NONE);
 			}
 		}
 

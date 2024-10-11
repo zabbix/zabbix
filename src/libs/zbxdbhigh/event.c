@@ -74,6 +74,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 		event->name = zbx_strdup(NULL, row[8]);
 		event->severity = atoi(row[9]);
 		event->suppressed = ZBX_PROBLEM_SUPPRESSED_FALSE;
+		event->maintenanceids = NULL;
 
 		event->trigger.triggerid = 0;
 
@@ -231,6 +232,12 @@ void	zbx_db_free_event(DB_EVENT *event)
 	if (0 != event->trigger.triggerid)
 		zbx_db_trigger_clean(&event->trigger);
 
+	if (NULL != event->maintenanceids)
+	{
+		zbx_vector_uint64_destroy(event->maintenanceids);
+		zbx_free(event->maintenanceids);
+	}
+
 	zbx_free(event->name);
 	zbx_free(event);
 }
@@ -276,3 +283,21 @@ void	zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vecto
 
 	zbx_free(filter);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add suppressing maintenanceid to event                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_event_add_maintenanceid(DB_EVENT *event, zbx_uint64_t maintenanceid)
+{
+	if (NULL == event->maintenanceids)
+	{
+		event->maintenanceids = (zbx_vector_uint64_t *)zbx_malloc(NULL, sizeof(zbx_vector_uint64_t));
+		zbx_vector_uint64_create(event->maintenanceids);
+
+		event->suppressed = ZBX_PROBLEM_SUPPRESSED_TRUE;
+	}
+	zbx_vector_uint64_append(event->maintenanceids, maintenanceid);
+}
+
