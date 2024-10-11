@@ -377,12 +377,6 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 			case ITEM_TYPE_SNMP:
 			case ITEM_TYPE_JMX:
 				ZBX_STRDUP(port, items[i].interface.port_orig);
-				if (ZBX_MACRO_EXPAND_YES == expand_macros)
-				{
-					zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid,
-							NULL, NULL, NULL, NULL, NULL, NULL, NULL, &port,
-							ZBX_MACRO_TYPE_COMMON, NULL, 0);
-				}
 
 				if (FAIL == zbx_is_ushort(port, &items[i].interface.port))
 				{

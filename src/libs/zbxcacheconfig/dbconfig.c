@@ -2301,6 +2301,7 @@ static char	*dc_expand_host_macros_dyn(const char *text, const ZBX_DC_HOST *dc_h
 #define IF_MACRO_HOST_IP	IF_MACRO_HOST "IP}"
 #define IF_MACRO_HOST_DNS	IF_MACRO_HOST "DNS}"
 #define IF_MACRO_HOST_CONN	IF_MACRO_HOST "CONN}"
+#define IF_MACRO_HOST_PORT	IF_MACRO_HOST "PORT}"
 /* deprecated macros */
 #define IF_MACRO_HOSTNAME	"{HOSTNAME}"
 #define IF_MACRO_IPADDRESS	"{IPADDRESS}"
@@ -2310,6 +2311,7 @@ static char	*dc_expand_host_macros_dyn(const char *text, const ZBX_DC_HOST *dc_h
 #define IF_MACRO_HOST_IP_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_IP)
 #define IF_MACRO_HOST_DNS_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_DNS)
 #define IF_MACRO_HOST_CONN_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_CONN)
+#define IF_MACRO_HOST_PORT_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_PORT)
 #define IF_MACRO_HOSTNAME_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOSTNAME)
 #define IF_MACRO_IPADDRESS_LEN	ZBX_CONST_STRLEN(IF_MACRO_IPADDRESS)
 
@@ -2369,6 +2371,15 @@ static char	*dc_expand_host_macros_dyn(const char *text, const ZBX_DC_HOST *dc_h
 					value = interface.addr;
 				}
 			}
+			else if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_PORT,
+					IF_MACRO_HOST_PORT_LEN))
+			{
+				if (SUCCEED == zbx_dc_config_get_interface_by_type(&interface, dc_host->hostid,
+						INTERFACE_TYPE_AGENT))
+				{
+					value = interface.port_orig;
+				}
+			}
 		}
 
 		if (NULL != value)
@@ -2393,6 +2404,7 @@ static char	*dc_expand_host_macros_dyn(const char *text, const ZBX_DC_HOST *dc_h
 
 #undef IF_MACRO_HOSTNAME_LEN
 #undef IF_MACRO_HOST_CONN_LEN
+#undef IF_MACRO_HOST_PORT_LEN
 #undef IF_MACRO_HOST_DNS_LEN
 #undef IF_MACRO_HOST_IP_LEN
 #undef IF_MACRO_HOST_NAME_LEN
@@ -2400,6 +2412,7 @@ static char	*dc_expand_host_macros_dyn(const char *text, const ZBX_DC_HOST *dc_h
 #undef IF_MACRO_IPADDRESS
 #undef IF_MACRO_HOSTNAME
 #undef IF_MACRO_HOST_CONN
+#undef IF_MACRO_HOST_PORT
 #undef IF_MACRO_HOST_DNS
 #undef IF_MACRO_HOST_IP
 #undef IF_MACRO_HOST_NAME
@@ -2561,6 +2574,7 @@ typedef struct
 	ZBX_DC_HOST		*host;
 	char			*ip;
 	char			*dns;
+	char			*port;
 	int			modified;
 	int			found;
 }
@@ -2573,6 +2587,7 @@ static void	dc_if_update_free(zbx_dc_if_update_t *update)
 {
 	zbx_free(update->ip);
 	zbx_free(update->dns);
+	zbx_free(update->port);
 	zbx_free(update);
 }
 
@@ -2605,6 +2620,12 @@ static void	dc_if_update_substitute_host_macros(zbx_dc_if_update_t *update, cons
 		}
 		else
 			zbx_free(addr);
+	}
+
+	if (NULL != (addr = dc_expand_host_macros_dyn(update->port, host, flags)))
+	{
+		zbx_free(update->port);
+		update->port = addr;
 	}
 }
 
@@ -2705,8 +2726,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		update->ip = zbx_strdup(NULL, row[5]);
 		update->dns = zbx_strdup(NULL, row[6]);
-		if (SUCCEED == dc_strpool_replace(found, &interface->port, row[7]))
-			update->modified = 1;
+		update->port = zbx_strdup(NULL, row[7]);
 
 		if (0 == found)
 		{
@@ -2754,6 +2774,9 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 			if (SUCCEED == dc_strpool_replace(found, &interface->dns, update->dns))
 				update->modified = 1;
+
+			if (SUCCEED == dc_strpool_replace(found, &interface->port, update->port))
+				update->modified = 1;
 		}
 		update->found = found;
 		zbx_vector_dc_if_update_ptr_append(&updates, update);
@@ -2795,6 +2818,9 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 				update->modified = 1;
 
 			if (SUCCEED == dc_strpool_replace(update->found, &update->interface->dns, update->dns))
+				update->modified = 1;
+
+			if (SUCCEED == dc_strpool_replace(update->found, &update->interface->port, update->port))
 				update->modified = 1;
 		}
 
