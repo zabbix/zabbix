@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-08-26 18:27+0000\n"
+"PO-Revision-Date: 2024-10-10 19:11+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -2073,6 +2073,14 @@ msgstr "Type de bordure"
 msgid "Border width"
 msgstr "Largeur de bordure"
 
+#: include/classes/api/services/CHost.php:1445
+msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1452
+msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
+msgstr ""
+
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
 msgstr "Les deux mots de passe doivent être égaux."
@@ -3381,12 +3389,12 @@ msgstr "Impossible d'hériter de la règle LLD avec la clé \"%1$s\" du modèle 
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'hériter des règles LLD avec la clé \"%1$s\" des modèles \"%2$s\" et \"%3$s\", car la clé doit être unique sur l'hôte \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:685
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'hériter des règles LLD avec la clé \"%1$s\" des modèles \"%2$s\" et \"%3$s\", car la clé doit être unique sur le modèle \"%4$s\"."
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
@@ -20246,6 +20254,10 @@ msgstr "Le prototype d'hôte cloné contient des macros définies par l'utilisat
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "Le modèle cloné contient des macros définies par l'utilisateur avec le type \"Texte secret\". La valeur et le type de ces macros ont été réinitialisés."
 
+#: include/classes/api/services/CHost.php:1433
+msgid "The field \"monitored_by\" must be specified when changing proxy or proxy group for host monitoring."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
 msgstr "Les paramètres suivants sont pris en charge :"
@@ -20364,8 +20376,8 @@ msgstr "Ces paramètres seront transmis au script en tant qu'arguments de ligne 
 #, c-format
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
 msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Cette vérification ne peut pas être supprimée, car elle est utilisée comme condition dans les actions de découverte %1$s."
+msgstr[1] "Cette vérification ne peut pas être supprimée, car elle est utilisée comme condition dans les actions de découverte %1$s."
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -22447,7 +22459,7 @@ msgstr "Capteur cumulatif de l'état de santé de l'hyperviseur VMware, \"url\" 
 
 #: include/classes/data/CItemData.php:2237
 msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
-msgstr ""
+msgstr "État de maintenance de l'hyperviseur VMware, \"url\" - URL du service VMware, \"uuid\" - Identifiant unique global de l'hyperviseur VMware. Retourne 0 - pas en maintenance ; 1 - en maintenance"
 
 #: include/classes/data/CItemData.php:2051
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
@@ -22587,7 +22599,7 @@ msgstr "Utilisation de la mémoire de l'hôte de la machine virtuelle VMware, \"
 
 #: include/classes/data/CItemData.php:2482
 msgid "VMware virtual machine hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
-msgstr ""
+msgstr "État de maintenance de la machine virtuelle VMware, \"url\" - URL du service VMware, \"uuid\" - Identifiant unique global de la machine virtuelle VMware. Retourne 0 - pas en maintenance ; 1 - en maintenance"
 
 #: include/classes/data/CItemData.php:2331
 msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
@@ -23980,6 +23992,16 @@ msgstr "une lettre Latine majuscule et minuscule"
 #: app/views/administration.geomaps.edit.php:47
 msgid "and"
 msgstr "et"
+
+#: include/classes/api/helpers/CApiPskHelper.php:27
+#: include/classes/api/helpers/CApiPskHelper.php:57
+#: include/classes/api/helpers/CApiPskHelper.php:73
+#: include/classes/api/helpers/CApiPskHelper.php:106
+#: include/classes/api/helpers/CApiPskHelper.php:139
+#: include/classes/api/helpers/CApiPskHelper.php:160
+#: include/classes/api/helpers/CApiPskHelper.php:176
+msgid "another tls_psk value is already associated with given tls_psk_identity"
+msgstr ""
 
 #: include/forms.inc.php:1450 include/views/js/item.preprocessing.js.php:237
 msgid "any error"

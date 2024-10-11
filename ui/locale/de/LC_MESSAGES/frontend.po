@@ -2076,6 +2076,14 @@ msgstr "Rahmentyp"
 msgid "Border width"
 msgstr "Rahmenbreite"
 
+#: include/classes/api/services/CHost.php:1445
+msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1452
+msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
+msgstr ""
+
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
 msgstr "Beide Passwörter müssen gleich sein."
@@ -20303,6 +20311,10 @@ msgstr "Der geklonte Host-Prototyp enthält benutzerdefinierte Makros vom Typ \"
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "Die geklonte Vorlage enthält benutzerdefinierte Makros mit dem Typ \"Geheimtext\". Der Wert und der Typ dieser Makros wurden zurückgesetzt."
 
+#: include/classes/api/services/CHost.php:1433
+msgid "The field \"monitored_by\" must be specified when changing proxy or proxy group for host monitoring."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
 msgstr "Die folgenden Platzhalter werden unterstützt:"
@@ -24036,6 +24048,16 @@ msgstr "ein lateinischer Groß- und ein Kleinbuchstabe"
 #: app/views/administration.geomaps.edit.php:47
 msgid "and"
 msgstr "und"
+
+#: include/classes/api/helpers/CApiPskHelper.php:27
+#: include/classes/api/helpers/CApiPskHelper.php:57
+#: include/classes/api/helpers/CApiPskHelper.php:73
+#: include/classes/api/helpers/CApiPskHelper.php:106
+#: include/classes/api/helpers/CApiPskHelper.php:139
+#: include/classes/api/helpers/CApiPskHelper.php:160
+#: include/classes/api/helpers/CApiPskHelper.php:176
+msgid "another tls_psk value is already associated with given tls_psk_identity"
+msgstr ""
 
 #: include/forms.inc.php:1450 include/views/js/item.preprocessing.js.php:237
 msgid "any error"
