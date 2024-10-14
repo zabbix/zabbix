@@ -157,8 +157,7 @@ void	zbx_event_get_json_tags(const zbx_db_event *event, char **replace_to)
  * Purpose: format event actions in JSON format                               *
  *                                                                            *
  * Parameters: ack        - [IN] problem update data                          *
- *             tz         - [IN] time zone                                    *
- *             replace_to - [OUT] replacement string                          *
+ *             replace_to - [OUT]                                             *
  *                                                                            *
  ******************************************************************************/
 void	zbx_event_get_json_actions(const zbx_db_acknowledge *ack, char **replace_to)
@@ -181,8 +180,8 @@ void	zbx_event_get_json_actions(const zbx_db_acknowledge *ack, char **replace_to
 	if (ack->action & ZBX_PROBLEM_UPDATE_SEVERITY)
 	{
 		zbx_json_addobject(&json, ZBX_PROTO_TAG_SEVERITY);
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_OLD, ack->old_severity);
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_NEW, ack->new_severity);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_OLD, (zbx_uint64_t)ack->old_severity);
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_NEW, (zbx_uint64_t)ack->new_severity);
 		zbx_json_close(&json);
 	}
 
