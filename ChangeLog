@@ -3405,7 +3405,7 @@ A......... [ZBX-23007] added chunking when collecting related objects for item a
 .........T [ZBX-23520] added timeout and fixed keys for raw items for family of MSSQL templates (akotsegubov)
 ...G...... [ZBX-24684] moved Zabbix agent 2 plugin shutdown message to debug log level (esneiders)
 .........T [ZBX-22918] added database name macro for connection to all agent keys in PostgreSQL by Zabbix agent 2 (drasikhov)
-.........T [ZBX-24979] removed uncompatible proxy last seen threshold macro from Zabbix health templates (drasikhov)
+.........T [ZBX-24979] removed incompatible "proxy last seen" threshold macro from Zabbix health templates (drasikhov)
 ..F....... [ZBX-24366] fixed host group filters on availability report to show correct items (jfreibergs, vmaksimovs)
 ..F....... [ZBX-25072] fixed splitting of a trigger expression in the expression builder (Sasha)
 .........T [ZBX-25255] fixed macro in PostgreSQL by Zabbix agent 2 template (abrosimovs)
