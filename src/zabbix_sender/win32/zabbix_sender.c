@@ -51,6 +51,7 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 	static ZBX_THREAD_LOCAL zbx_vector_ptr_t	zbx_addrs;
 	static ZBX_THREAD_LOCAL char			*last_address;
 	static unsigned short				last_port;
+	int						retries;
 
 	if (NULL == address)
 	{
@@ -103,6 +104,8 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 	}
 	zbx_json_close(&json);
 
+	retries = zbx_addrs.values_num;
+retry:
 	if (SUCCEED == (ret = connect_to_server(&sock, source, &zbx_addrs, GET_SENDER_TIMEOUT, 30,
 		ZBX_TCP_SEC_UNENCRYPTED, 0, 0)))
 	{
@@ -116,6 +119,12 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 		}
 
 		zbx_tcp_close(&sock);
+
+		if (SUCCEED != ret && 0 < --retries)
+		{
+			zbx_addrs_failover(&zbx_addrs);
+			goto retry;
+		}
 	}
 
 	if (FAIL == ret && NULL != result)

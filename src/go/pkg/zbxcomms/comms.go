@@ -313,6 +313,15 @@ func (c *Listener) Close() (err error) {
 	return c.listener.Close()
 }
 
+// Failover rotates addresses on HA failover.
+func Failover(addresses *[]string) {
+	if len(*addresses) > 1 {
+		tmp := (*addresses)[0]
+		*addresses = (*addresses)[1:]
+		*addresses = append(*addresses, tmp)
+	}
+}
+
 func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, connect_timeout time.Duration,
 	data []byte, args ...interface{}) ([]byte, []error) {
 	log.Tracef("connecting to %s [timeout:%s, connection timeout:%s]", *addresses, timeout, connect_timeout)
@@ -341,9 +350,7 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 		errs = append(errs, fmt.Errorf("cannot connect to [%s]: %s", (*addresses)[0], err))
 		log.Tracef("%s", errs[len(errs)-1])
 
-		tmp := (*addresses)[0]
-		*addresses = (*addresses)[1:]
-		*addresses = append(*addresses, tmp)
+		Failover(addresses)
 	}
 
 	if err != nil {
@@ -359,6 +366,7 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 		errs = append(errs, fmt.Errorf("cannot send to [%s]: %s", (*addresses)[0], err))
 		log.Tracef("%s", errs[len(errs)-1])
 
+		Failover(addresses)
 		return nil, errs
 	}
 
@@ -369,6 +377,7 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 		errs = append(errs, fmt.Errorf("cannot receive data from [%s]: %s", (*addresses)[0], err))
 		log.Tracef("%s", errs[len(errs)-1])
 
+		Failover(addresses)
 		return nil, errs
 	}
 	log.Tracef("received [%s] from [%s]", string(b), (*addresses)[0])
@@ -377,6 +386,7 @@ func Exchange(addresses *[]string, localAddr *net.Addr, timeout time.Duration, c
 		errs = append(errs, fmt.Errorf("connection closed"))
 		log.Tracef("%s", errs[len(errs)-1])
 
+		Failover(addresses)
 		return nil, errs
 	}
 
