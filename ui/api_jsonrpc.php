@@ -57,25 +57,20 @@ try {
 	$jsonRpc = new CJsonRpc($apiClient, $data);
 	echo $jsonRpc->execute($http_request);
 }
-catch (Exception $e) {
-	// decode input json request to get request's id
-	$jsonData = json_decode($data, true);
-	$user_type = CUser::$userData === null ? USER_TYPE_ZABBIX_USER : CUser::$userData['type'];
-	$message = ($e instanceof DBException && $user_type != USER_TYPE_SUPER_ADMIN)
-		? _('System error occurred. Please contact Zabbix administrator.')
-		: $e->getMessage();
+catch (Throwable $e) {
+	$json_data = json_decode($data, true);
 
-	$response = [
-		'jsonrpc' => '2.0',
-		'error' => [
-			'code' => 1,
-			'message' => $message,
-			'data' => ''
-		],
-		'id' => (isset($jsonData['id']) ? $jsonData['id'] : null)
-	];
-
-	echo json_encode($response);
+	if (array_key_exists('id', $json_data)) {
+		echo json_encode([
+			'jsonrpc' => '2.0',
+			'error' => [
+				'code' => -32603,
+				'message' => _('Internal error.'),
+				'data' => _('Internal JSON-RPC error.')
+			],
+			'id' => $json_data['id']
+		]);
+	}
 }
 
 session_write_close();
