@@ -224,6 +224,8 @@
 #define ZBX_PROTO_TAG_CLOSE			"close"
 #define ZBX_PROTO_TAG_CAUSE			"cause"
 #define ZBX_PROTO_TAG_SYMPTOM			"symptom"
+#define ZBX_PROTO_TAG_AUTH			"auth"
+#define ZBX_PROTO_TAG_LEASE_DURATION		"lease_duration"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"

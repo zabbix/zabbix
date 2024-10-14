@@ -547,8 +547,8 @@ ZBX_PTR_VECTOR_IMPL(events_tags, zbx_event_tags_t*)
 
 static int	zbx_event_tags_compare_func(const void *d1, const void *d2)
 {
-	const zbx_event_tags_t	*event_tags_1 = *(const zbx_event_tags_t **)d1;
-	const zbx_event_tags_t	*event_tags_2 = *(const zbx_event_tags_t **)d2;
+	const zbx_event_tags_t	*event_tags_1 = *(const zbx_event_tags_t * const *)d1;
+	const zbx_event_tags_t	*event_tags_2 = *(const zbx_event_tags_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(event_tags_1->eventid, event_tags_2->eventid);
 

@@ -1,0 +1,141 @@
+---
+test case: "1. aaaa & bbbb "
+in:
+  string1: "aaaa"
+  string2: "bbbb"
+out:
+  val: less
+---
+test case: "2. aaaa & aaaa "
+in:
+  string1: "aaaa"
+  string2: "aaaa"
+out:
+  val: equal
+---
+test case: "3. 123 & 123 "
+in:
+  string1: "123"
+  string2: "123"
+out:
+  val: equal
+---
+test case: "4. !@# & !@# "
+in:
+  string1: "!@#"
+  string2: "!@#"
+out:
+  val: equal
+---
+test case: "5. Newline & Newline "
+in:
+  string1: "\n"
+  string2: "\n"
+out:
+  val: equal
+---
+test case: "6. Apostrophe "
+in:
+  string1: "'"
+  string2: "'"
+out:
+  val: equal
+---
+test case: "7. Backslash"
+in:
+  string1: '\'
+  string2: '\'
+out:
+  val: equal
+---
+test case: "8. NULL & NULL"
+in:
+  string1: NULL
+  string2: NULL
+out:
+  val: equal
+---
+test case: "9. NULL & abc"
+in:
+  string1: "NULL"
+  string2: "abc"
+out:
+  val: less
+---
+test case: "10. abc & NULL"
+in:
+  string1: "abc"
+  string2: "NULL"
+out:
+  val: greater
+---
+test case: "11. empty & NULL"
+in:
+  string1: ""
+  string2: "NULL"
+out:
+  val: greater
+---
+test case: "12. NULL & empty"
+in:
+  string1: "NULL"
+  string2: ""
+out:
+  val: less
+---
+test case: "13. Strings are different on a second newline less"
+in:
+  string1: "aaa\nbbb"
+  string2: "aaa\nccc"
+out:
+  val: less
+---
+test case: "14. Strings are different on a second newline greater"
+in:
+  string1: "aaa\nccc"
+  string2: "aaa\nbbb"
+out:
+  val: greater
+---
+test case: "15. 3-bytes special characters"
+in:
+  string1: "❤"
+  string2: "田"
+out:
+  val: less
+---
+test case: "16. Empty and backslash"
+in:
+  string1: ""
+  string2: '\'
+out:
+  val: less
+---
+test case: "17. Newline and empty"
+in:
+  string1: "\n"
+  string2: ""
+out:
+  val: greater
+---
+test case: "18. Newline and 2 newlines"
+in:
+  string1: "\n"
+  string2: "\n\n"
+out:
+  val: less
+---
+test case: "19. Newline and NULL"
+in:
+  string1: "\n"
+  string2: "NULL"
+out:
+  val: greater
+---
+test case: "20. Single quote with empty"
+in:
+  string1: "'"
+  string2: ""
+out:
+  val: greater
+...

@@ -3,6 +3,11 @@
 noinst_LIBRARIES = libzbxdb.a
 
 libzbxdb_a_SOURCES = \
-	db.c
+	dbconn.c \
+	dbconn.h \
+	dbmisc.c \
+	dbinsert.c \
+	dbversion.c \
+	dbconn_compat.c
 
 libzbxdb_a_CFLAGS = $(DB_CFLAGS)

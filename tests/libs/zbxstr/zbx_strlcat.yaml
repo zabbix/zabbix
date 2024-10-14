@@ -1,0 +1,41 @@
+---
+test case: "1. Simple string"
+in:
+  src: " World!"
+  dst: "Hello"
+  size: 13
+out:
+  result: "Hello World!"
+---
+test case: "2. Numeric string"
+in:
+  src: " 1E02 1E+02"
+  dst: "1E02"
+  size: 16
+out:
+  result: "1E02 1E02 1E+02"
+---
+test case: "3. Empty string"
+in:
+  src: ''
+  size: 1
+  dst: ""
+out:
+  result: ''
+---
+test case: "4. Numeric string"
+in:
+  src: '567'
+  size: 8
+  dst: "1234"
+out:
+  result: '1234567'
+---
+test case: "5. Numeric string with truncation"
+in:
+  src: '567'
+  size: 6
+  dst: "1234"
+out:
+  result: '12345'
+...

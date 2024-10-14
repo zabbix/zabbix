@@ -480,7 +480,7 @@ static int	__parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int level
 			zbx_rtrim(parameter, ZBX_CFG_RTRIM_CHARS);
 			zbx_ltrim(value, ZBX_CFG_LTRIM_CHARS);
 
-			zabbix_log(LOG_LEVEL_DEBUG, "cfg: para: [%s] val [%s]", parameter, value);
+			zabbix_log(LOG_LEVEL_DEBUG, "cfg: param: [%s] val [%s]", parameter, value);
 
 			if (0 == strcmp(parameter, "Include"))
 			{

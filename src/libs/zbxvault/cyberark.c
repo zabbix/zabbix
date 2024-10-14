@@ -54,9 +54,9 @@ int	zbx_cyberark_kvs_get(const char *vault_url, const char *prefix, const char *
 
 	url = zbx_dsprintf(NULL, "%s%s%s", vault_url, prefix, path);
 
-	if (SUCCEED != zbx_http_get(url, "Content-Type: application/json", timeout, ssl_cert_file, ssl_key_file,
+	if (SUCCEED != zbx_http_req(url, "Content-Type: application/json", timeout, ssl_cert_file, ssl_key_file,
 			config_source_ip, config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
-			&out, &response_code, error))
+			&out, NULL, &response_code, error))
 	{
 		goto fail;
 	}

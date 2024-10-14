@@ -13,20 +13,19 @@
 **/
 
 #include "zbxcacheconfig.h"
+#include "zbxcommon.h"
 #include "dbsync.h"
 #include "user_macro.h"
-
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 #include "zbxcrypto.h"
 #include "zbxeval.h"
 #include "zbxnum.h"
-#include "zbxdbhigh.h"
+#include "zbxdb.h"
 #include "zbxexpr.h"
 #include "zbxstr.h"
 #include "zbxinterface.h"
 #include "zbxip.h"
-#include <stddef.h>
 
 /* global correlation constants */
 #define ZBX_CORRELATION_ENABLED				0

@@ -673,6 +673,11 @@ func prepareMetricPrintManager(verbose bool) (*scheduler.Manager, error) {
 		return nil, zbxerr.New("failed to initialize user parameters").Wrap(err)
 	}
 
+	err = loadOSDependentItems()
+	if err != nil {
+		return nil, zbxerr.New("cannot load os dependent items").Wrap(err)
+	}
+
 	m, err := scheduler.NewManager(&agent.Options)
 	if err != nil {
 		return nil, zbxerr.New("failed to create scheduling manager").Wrap(err)
