@@ -592,11 +592,8 @@ class testFormGraph extends CLegacyWebTest {
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Hosts')->clear()->fill('Simple form test host');
 		$filter->submit();
-		$this->zbxTestTextPresent([
-			$data['name'],
-			'Graphs'
-		]);
-
+		$this->assertTrue($this->query('link', $data['name'])->one()->isVisible());
+		$this->page->assertHeader('Graphs');
 		$this->assertEquals($oldHashGraphs, CDBHelper::getHash($sqlGraphs));
 	}
 

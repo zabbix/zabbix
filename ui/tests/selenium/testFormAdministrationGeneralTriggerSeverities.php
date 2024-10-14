@@ -22,6 +22,15 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 class testFormAdministrationGeneralTriggerSeverities extends CLegacyWebTest {
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
+	}
+
 	public static function allValues() {
 		return CDBHelper::getDataProvider('SELECT severity_name_0,severity_color_0,severity_name_1,severity_color_1,'.
 				'severity_name_2,severity_color_2,severity_name_3,severity_color_3,severity_name_4,'.
@@ -112,7 +121,7 @@ class testFormAdministrationGeneralTriggerSeverities extends CLegacyWebTest {
 		$this->zbxTestClickXpath('//div[@title="#A5A5A5"]');
 
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent('Configuration updated');
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$sql = 'SELECT severity_name_0 FROM config WHERE severity_name_0='.zbx_dbstr('Not classified2');
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Incorrect severity name in the DB field "severity_name_0"');
@@ -167,8 +176,8 @@ class testFormAdministrationGeneralTriggerSeverities extends CLegacyWebTest {
 		$this->zbxTestClick('resetDefaults');
 		$this->zbxTestClickXpath("//div[contains(@class, 'overlay-dialogue modal')]//button[text()='Reset defaults']");
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent('Configuration updated');
-		$this->zbxTestTextPresent('Trigger severities');
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+		$this->page->assertHeader('Trigger severities');
 
 		// checking that values were reset in the DB
 		$sql = 'SELECT severity_name_0 FROM config WHERE severity_name_0='.zbx_dbstr('Not classified');

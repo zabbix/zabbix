@@ -133,14 +133,18 @@ class testPageApplications extends CLegacyWebTest {
 			$filter->getField('Hosts')->clear();
 			$filter->submit();
 
-			$group_app= [];
-			$sql_all_applications = "SELECT a.name FROM hosts_groups hg LEFT JOIN applications a ON hg.hostid=a.hostid"
-					. " WHERE hg.groupid=(SELECT groupid FROM hstgrp WHERE name='".$data['filter']['Host groups']."')";
+			$group_apps = [];
+			$id = CDBHelper::getValue('SELECT groupid FROM hstgrp WHERE name='.zbx_dbstr($data['filter']['Host groups']));
+			$sql_all_applications = 'SELECT name from applications WHERE hostid IN'.
+					' (SELECT hostid from hosts_groups WHERE groupid='.zbx_dbstr($id).')';
 			$result = DBselect($sql_all_applications);
 			while ($row = DBfetch($result)) {
-				$group_app[] = $row['name'];
+				$group_apps[] = $row['name'];
 			}
-			$this->zbxTestTextPresent($group_app);
+
+			foreach ($group_apps as $group_app) {
+				$this->assertTrue($this->query('link', $group_app)->one()->isVisible());
+			}
 		}
 	}
 

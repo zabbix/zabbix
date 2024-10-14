@@ -25,6 +25,17 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
  */
 class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			'class' => CMessageBehavior::class
+		];
+	}
+
 	public static function allValues() {
 		return CDBHelper::getDataProvider('SELECT refresh_unsupported, snmptrap_logging FROM config ORDER BY configid');
 	}
@@ -109,7 +120,7 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 		$this->zbxTestDropdownSelect('alert_usrgrpid', 'Zabbix administrators');
 		$this->zbxTestCheckboxSelect('snmptrap_logging');  // 1 - yes, 0 - no
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent('Configuration updated');
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$sql = "SELECT refresh_unsupported FROM config WHERE refresh_unsupported='700'";
 		$this->assertEquals(1, CDBHelper::getCount($sql));
@@ -125,7 +136,7 @@ class testFormAdministrationGeneralOtherParams extends CLegacyWebTest {
 		$this->zbxTestDropdownSelect('alert_usrgrpid', 'Enabled debug mode');
 		$this->zbxTestCheckboxSelect('snmptrap_logging', false);
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent('Configuration updated');
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$sql = "SELECT refresh_unsupported FROM config WHERE refresh_unsupported='86400'";
 		$this->assertEquals(1, CDBHelper::getCount($sql));

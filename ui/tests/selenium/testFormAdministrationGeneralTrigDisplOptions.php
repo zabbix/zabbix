@@ -22,6 +22,15 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
+	}
+
 	public static function allValues() {
 		return CDBHelper::getDataProvider(
 			'SELECT custom_color,problem_unack_color,problem_unack_style,problem_ack_color,problem_ack_style,'.
@@ -65,10 +74,15 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 		$this->zbxTestAssertElementValue('ok_period', $allValues['ok_period']);
 		$this->zbxTestAssertElementValue('blink_period', $allValues['blink_period']);
 
-		$this->zbxTestAssertElementPresentXpath("//input[@id='problem_unack_color'][@disabled]");
-		$this->zbxTestAssertElementPresentXpath("//input[@id='problem_ack_color'][@disabled]");
-		$this->zbxTestAssertElementPresentXpath("//input[@id='ok_unack_color'][@disabled]");
-		$this->zbxTestAssertElementPresentXpath("//input[@id='ok_ack_color'][@disabled]");
+		$color_elements = [
+			'xpath://input[@id="problem_unack_color"][@disabled]',
+			'xpath://input[@id="problem_ack_color"][@disabled]',
+			'xpath://input[@id="ok_unack_color"][@disabled]',
+			'xpath://input[@id="ok_ack_color"][@disabled]'
+		];
+		foreach ($color_elements as $color_element) {
+			$this->assertTrue($this->query($color_element)->one()->isVisible());
+		}
 	}
 
 	public function testFormAdministrationGeneralTrigDisplOptions_UpdateTrigDisplOptions() {
@@ -95,7 +109,8 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 		$this->zbxTestInputType('blink_period', '5m');
 
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Configuration updated', 'Trigger displaying options']);
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+		$this->page->assertHeader('Trigger displaying options');
 
 		// checking values in the DB
 		$this->assertEquals(1, CDBHelper::getCount('SELECT custom_color FROM config WHERE custom_color=1'));
@@ -302,7 +317,8 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 		$this->zbxTestClick('resetDefaults');
 		$this->zbxTestClickXpath("//div[contains(@class, 'overlay-dialogue modal')]//button[text()='Reset defaults']");
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(['Configuration updated', 'Trigger displaying options']);
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+		$this->page->assertHeader('Trigger displaying options');
 
 		// checking values in the DB
 		$this->assertEquals(1, CDBHelper::getCount('SELECT custom_color FROM config WHERE custom_color=0'));

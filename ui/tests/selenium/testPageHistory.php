@@ -58,7 +58,9 @@ class testPageHistory extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('testPageHistory_CheckLayout: '.$item['name']);
 
 		$this->zbxTestClickWait('plaintext');
-		$this->zbxTestTextPresent('testPageHistory_CheckLayout: '.$item['name']);
+		$this->assertTrue($this->query('xpath://span[text()='.
+				CXPathHelper::escapeQuotes('testPageHistory_CheckLayout: '.$item['name']).']')->one()->isVisible()
+		);
 
 		$this->zbxTestOpen('history.php?action=showvalues&itemids[]='.$item['itemid']);
 		$this->zbxTestCheckTitle('History [refreshed every 30 sec.]');

@@ -52,7 +52,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Host groups')->select('Templates/Operating systems');
 		$filter->submit();
-		$this->zbxTestTextPresent($this->templateName);
+		$this->assertTrue($this->query('link', $this->templateName)->one()->isVisible());
 
 		$table = $this->query('class:list-table')->asTable()->one();
 		$headers = ['', 'Name', 'Hosts', 'Applications', 'Items', 'Triggers', 'Graphs',

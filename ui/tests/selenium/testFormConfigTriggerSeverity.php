@@ -24,6 +24,16 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
  * @backup config
  */
 class testFormConfigTriggerSeverity extends CLegacyWebTest {
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
+	}
+
 	// Data provider
 	public static function providerTriggerSeverity() {
 		// array of data, saveResult, db fields value
@@ -164,7 +174,7 @@ class testFormConfigTriggerSeverity extends CLegacyWebTest {
 		$this->zbxTestClickWait('update');
 
 		if ($resultSave) {
-			$this->zbxTestTextPresent('Configuration updated');
+			$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 			$dbres = DBfetch(DBselect($sql));
 			foreach ($dbres as $field => $value) {

@@ -412,6 +412,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-body']//a[text()='$name']");
 			// Apply filter
 			$this->zbxTestClickButtonText('Apply');
+			$this->assertTrue($this->query('link', $name)->one()->isVisible());
 			$this->zbxTestTextPresent($name);
 			$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 1 of 1 found');
 			//Reset filter

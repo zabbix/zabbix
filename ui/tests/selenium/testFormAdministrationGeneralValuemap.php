@@ -21,7 +21,16 @@
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 class testFormAdministrationGeneralValuemap extends CLegacyWebTest {
-		private $valuemapWithMultipleMappings = '1valuemapWithMultipleMappings1';
+	private $valuemapWithMultipleMappings = '1valuemapWithMultipleMappings1';
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
+	}
 
 	public function testFormAdministrationGeneralValuemap_Layout() {
 
@@ -83,7 +92,7 @@ class testFormAdministrationGeneralValuemap extends CLegacyWebTest {
 		$this->zbxTestInputType('mappings_0_newvalue', $newvalue);
 
 		$this->zbxTestClickWait('add');
-		$this->zbxTestTextPresent('Value map added');
+		$this->assertMessage(TEST_GOOD, 'Value map added');
 		$this->zbxTestCheckHeader('Value mapping');
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestTextPresent('Value map');
@@ -130,7 +139,7 @@ class testFormAdministrationGeneralValuemap extends CLegacyWebTest {
 		$this->zbxTestInputType('mappings_2_newvalue', $newvalue3);
 
 		$this->zbxTestClickWait('add');
-		$this->zbxTestTextPresent('Value map added');
+		$this->assertMessage(TEST_GOOD, 'Value map added');
 		$this->zbxTestCheckHeader('Value mapping');
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestTextPresent('Value map');
@@ -166,7 +175,7 @@ class testFormAdministrationGeneralValuemap extends CLegacyWebTest {
 		$this->zbxTestInputType('mappings_0_value', 6);
 		$this->zbxTestInputType('mappings_0_newvalue', 'six');
 		$this->zbxTestClickWait('add');
-		$this->zbxTestTextPresent(['Cannot add value map', 'Value map "'.$this->valuemapWithMultipleMappings.'" already exists.']);
+		$this->assertMessage(TEST_BAD, 'Cannot add value map', 'Value map "'.$this->valuemapWithMultipleMappings.'" already exists.');
 	}
 
 	/**
