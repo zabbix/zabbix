@@ -76,7 +76,8 @@ if (array_key_exists('hosts', $data['filter'])) {
 	$multiselect_options['popup']['parameters']['dstfrm'] = $header_form->getId();
 
 	$host_ms = (new CMultiSelect($multiselect_options))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
-	if ($multiselect_options['disabled']) {
+
+	if ($multiselect_options['readonly']) {
 		$host_ms->setTitle(_('You cannot switch hosts for current selection.'));
 	}
 	$controls[] = (new CFormList())->addRow(new CLabel(_('Host'), 'popup_host_ms'), [$empty_btn, $host_ms]);
@@ -426,7 +427,7 @@ switch ($data['popup_type']) {
 		else {
 			foreach ($data['table_records'] as &$item) {
 				$host = reset($item['hosts']);
-				$item_pattern = array_key_exists('pattern', $item) ? $item['pattern'] : $item['itemid'];
+				$item_pattern = $options['patternselect'] ? $item['name'] : $item['itemid'];
 
 				$table->addRow([
 					$data['multiselect']
@@ -462,6 +463,10 @@ switch ($data['popup_type']) {
 				];
 			}
 			unset($item);
+
+			if ($options['patternselect']) {
+				$data['table_records'] = array_column($data['table_records'], null, 'name');
+			}
 		}
 		break;
 

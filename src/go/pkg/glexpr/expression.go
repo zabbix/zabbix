@@ -24,7 +24,7 @@ import (
 	"sort"
 	"unsafe"
 
-	"zabbix.com/pkg/zbxlib"
+	"golang.zabbix.com/agent2/pkg/zbxlib"
 )
 
 const (

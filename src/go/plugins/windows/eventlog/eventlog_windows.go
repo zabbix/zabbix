@@ -25,13 +25,13 @@ import (
 	"time"
 	"unsafe"
 
-	"git.zabbix.com/ap/plugin-support/conf"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
-	"zabbix.com/internal/agent"
-	"zabbix.com/pkg/glexpr"
-	"zabbix.com/pkg/itemutil"
-	"zabbix.com/pkg/zbxlib"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/pkg/glexpr"
+	"golang.zabbix.com/agent2/pkg/itemutil"
+	"golang.zabbix.com/agent2/pkg/zbxlib"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 var impl Plugin

@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -150,7 +150,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 				: 'hostprototype.massdisable'
 			)
 			->setArgument('context', $data['context'])
-			->setArgumentSID()
+			->setArgument('backurl', $url)
 			->getUrl()
 	))
 		->addSID()
@@ -165,6 +165,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 				->setArgument('action', 'hostprototype.updatediscover')
 				->setArgument('discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
 				->setArgument('context', $data['context'])
+				->setArgument('backurl', $url)
 				->getUrl()
 		))
 			->addSID()

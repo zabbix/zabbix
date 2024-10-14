@@ -23,8 +23,8 @@ import (
 	"strings"
 	"unsafe"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"golang.org/x/sys/windows"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 func (o *options) setDefaultIP() error {

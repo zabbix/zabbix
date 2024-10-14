@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-01-22T16:12:31Z'
+  date: '2024-02-08T15:05:24Z'
   groups:
     - uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
@@ -241,7 +241,7 @@ zabbix_export:
           timeout: '{$HPE.SYNERGY.DATA.TIMEOUT}'
           parameters:
             - name: base_url
-              value: '{$HPE.SYNERGY.API.SCHEME}://{HOST.CONN}'
+              value: '{$HPE.SYNERGY.API.SCHEME}://{HOST.CONN}:{$HPE.SYNERGY.API.PORT}'
             - name: password
               value: '{$HPE.SYNERGY.API.PASSWORD}'
             - name: username

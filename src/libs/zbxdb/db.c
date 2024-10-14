@@ -109,11 +109,11 @@ static ub4	OCI_DBserver_status(void);
 #define ZBX_PG_DEADLOCK		"40P01"
 
 static PGconn			*conn = NULL;
-static unsigned int		ZBX_PG_BYTEAOID = 0;
 int			ZBX_TSDB_VERSION = -1;
 static zbx_uint32_t		ZBX_PG_SVERSION = ZBX_DBVERSION_UNDEFINED;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
 static int 			ZBX_TIMESCALE_COMPRESSION_AVAILABLE = OFF;
+static int			ZBX_PG_READ_ONLY_RECOVERABLE = 0;
 #elif defined(HAVE_SQLITE3)
 static sqlite3			*conn = NULL;
 static zbx_mutex_t		sqlite_access = ZBX_MUTEX_NULL;
@@ -392,8 +392,11 @@ static int	is_recoverable_postgresql_error(const PGconn *pg_conn, const PGresult
 	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_DEADLOCK))
 		return SUCCEED;
 
-	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
+	if (1 == ZBX_PG_READ_ONLY_RECOVERABLE &&
+			0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
+	{
 		return SUCCEED;
+	}
 
 	return FAIL;
 }
@@ -419,7 +422,8 @@ void	zbx_db_init_autoincrement_options(void)
  *                                                                            *
  ******************************************************************************/
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port,
-			char *tls_connect, char *cert, char *key, char *ca, char *cipher, char *cipher_13)
+			char *tls_connect, char *cert, char *key, char *ca, char *cipher, char *cipher_13,
+			int read_only_recoverable)
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
 #if defined(HAVE_MYSQL)
@@ -457,6 +461,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 #if defined(HAVE_MYSQL)
 	ZBX_UNUSED(dbschema);
+	ZBX_UNUSED(read_only_recoverable);
 
 	if (NULL == (conn = mysql_init(NULL)))
 	{
@@ -640,6 +645,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	ZBX_UNUSED(ca);
 	ZBX_UNUSED(cipher);
 	ZBX_UNUSED(cipher_13);
+	ZBX_UNUSED(read_only_recoverable);
 
 	memset(&oracle, 0, sizeof(oracle));
 
@@ -834,18 +840,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (ZBX_DB_FAIL == ret || ZBX_DB_DOWN == ret)
 		goto out;
 
-	result = zbx_db_select("select oid from pg_type where typname='bytea'");
-
-	if ((DB_RESULT)ZBX_DB_DOWN == result || NULL == result)
-	{
-		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
-		goto out;
-	}
-
-	if (NULL != (row = zbx_db_fetch(result)))
-		ZBX_PG_BYTEAOID = atoi(row[0]);
-	DBfree_result(result);
-
 	/* disable "nonstandard use of \' in a string literal" warning */
 	if (0 < (ret = zbx_db_execute("set escape_string_warning to off")))
 		ret = ZBX_DB_OK;
@@ -878,6 +872,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		if (0 < (ret = zbx_db_execute("set bytea_output=escape")))
 			ret = ZBX_DB_OK;
 	}
+
+	ZBX_PG_READ_ONLY_RECOVERABLE = read_only_recoverable;
 out:
 #elif defined(HAVE_SQLITE3)
 	ZBX_UNUSED(host);
@@ -891,6 +887,7 @@ out:
 	ZBX_UNUSED(ca);
 	ZBX_UNUSED(cipher);
 	ZBX_UNUSED(cipher_13);
+	ZBX_UNUSED(read_only_recoverable);
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
 	if (SQLITE_OK != sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL))
 #else
@@ -1966,55 +1963,17 @@ DB_RESULT	zbx_db_select_n(const char *query, int n)
 #endif
 }
 
-#ifdef HAVE_POSTGRESQL
-/******************************************************************************
- *                                                                            *
- * Purpose: converts the null terminated string into binary buffer            *
- *                                                                            *
- * Transformations:                                                           *
- *      \ooo == a byte whose value = ooo (ooo is an octal number)             *
- *      \\   == \                                                             *
- *                                                                            *
- * Parameters:                                                                *
- *      io - [IN/OUT] null terminated string / binary data                    *
- *                                                                            *
- * Return value: length of the binary buffer                                  *
- *                                                                            *
- ******************************************************************************/
-static size_t	zbx_db_bytea_unescape(u_char *io)
+int	zbx_db_get_row_num(DB_RESULT result)
 {
-	const u_char	*i = io;
-	u_char		*o = io;
-
-	while ('\0' != *i)
-	{
-		switch (*i)
-		{
-			case '\\':
-				i++;
-				if ('\\' == *i)
-				{
-					*o++ = *i++;
-				}
-				else
-				{
-					if (0 != isdigit(i[0]) && 0 != isdigit(i[1]) && 0 != isdigit(i[2]))
-					{
-						*o = (*i++ - 0x30) << 6;
-						*o += (*i++ - 0x30) << 3;
-						*o++ += *i++ - 0x30;
-					}
-				}
-				break;
-
-			default:
-				*o++ = *i++;
-		}
-	}
-
-	return o - io;
-}
+#if defined(HAVE_POSTGRESQL)
+	return result->row_num;
+#elif defined(HAVE_MYSQL)
+	return (int)mysql_num_rows(result->result);
+#else
+	ZBX_UNUSED(result);
+	return 0;
 #endif
+}
 
 DB_ROW	zbx_db_fetch(DB_RESULT result)
 {
@@ -2121,35 +2080,27 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	return result->values;
 #elif defined(HAVE_POSTGRESQL)
-	/* free old data */
-	if (NULL != result->values)
-		zbx_free(result->values);
-
 	/* EOF */
 	if (result->cursor == result->row_num)
 		return NULL;
 
 	/* init result */
-	result->fld_num = PQnfields(result->pg_result);
+	if (0 == result->cursor)
+		result->fld_num = PQnfields(result->pg_result);
 
 	if (result->fld_num > 0)
 	{
 		int	i;
 
-		result->values = zbx_malloc(result->values, sizeof(char *) * result->fld_num);
+		if (NULL == result->values)
+			result->values = zbx_malloc(result->values, sizeof(char *) * result->fld_num);
 
 		for (i = 0; i < result->fld_num; i++)
 		{
-			if (PQgetisnull(result->pg_result, result->cursor, i))
-			{
-				result->values[i] = NULL;
-			}
-			else
-			{
-				result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
-				if (PQftype(result->pg_result, i) == ZBX_PG_BYTEAOID)	/* binary data type BYTEAOID */
-					zbx_db_bytea_unescape((u_char *)result->values[i]);
-			}
+			result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
+
+			if ('\0' == *result->values[i] && PQgetisnull(result->pg_result, result->cursor, i))
+					result->values[i] = NULL;
 		}
 	}
 

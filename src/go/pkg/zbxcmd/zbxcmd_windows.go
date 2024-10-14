@@ -30,9 +30,8 @@ import (
 	"time"
 	"unsafe"
 
-	"git.zabbix.com/ap/plugin-support/log"
-
 	"golang.org/x/sys/windows"
+	"golang.zabbix.com/sdk/log"
 )
 
 type process struct {
@@ -133,7 +132,7 @@ func ExecuteBackground(s string) (err error) {
 	}
 	cmd := exec.Command(cmd_path)
 	cmd.SysProcAttr = &windows.SysProcAttr{
-		CmdLine: fmt.Sprintf(`/C %s`, s),
+		CmdLine: fmt.Sprintf(`/C "%s"`, s),
 	}
 
 	if err = cmd.Start(); err != nil {

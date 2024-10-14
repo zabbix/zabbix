@@ -22,9 +22,9 @@ package vfsfs
 import (
 	"syscall"
 
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"golang.org/x/sys/windows"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 func init() {
@@ -35,7 +35,7 @@ func init() {
 		"vfs.fs.size", "Disk space in bytes or in percentage from total.",
 	)
 	if err != nil {
-		panic(zbxerr.New("failed to register metrics").Wrap(err))
+		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 }
 
@@ -54,6 +54,7 @@ func getMountPaths() (paths []string, err error) {
 		for {
 			if err = windows.GetVolumePathNamesForVolumeName(&volume[0], &buffer[0], uint32(len(buffer)), &size); err != nil {
 				if err.(syscall.Errno) != syscall.ERROR_MORE_DATA {
+					err = errs.Wrapf(err, "Cannot obtain a list of filesystems. Volume: %s Error", windows.UTF16ToString(volume))
 					return
 				}
 				buffer = make([]uint16, size)

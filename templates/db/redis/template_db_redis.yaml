@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-01-22T15:28:17Z'
+  date: '2024-02-12T14:37:25Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -1551,7 +1551,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.Keyspace["{#DB}"]'
+                    - '$[''{#DB}'']'
                   error_handler: DISCARD_VALUE
               master_item:
                 key: redis.keyspace.info_raw

@@ -863,8 +863,6 @@ int	DBcheck_version(void)
 			required = patches[i].version;
 	}
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
 	if (SUCCEED != DBtable_exists(dbversion_table_name))
 	{
 #ifndef HAVE_SQLITE3
@@ -1017,8 +1015,6 @@ int	DBcheck_version(void)
 #endif	/* not HAVE_SQLITE3 */
 
 out:
-	DBclose();
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -1034,8 +1030,6 @@ int	DBcheck_double_type(void)
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 #if defined(HAVE_MYSQL)
 	sql = DBdyn_escape_string(CONFIG_DBNAME);
@@ -1068,14 +1062,13 @@ int	DBcheck_double_type(void)
 
 	DBfree_result(result);
 out:
-	DBclose();
 	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
 }
-
+#ifndef HAVE_SQLITE3
 int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
 		const char *original_column_name, const char *indexed_column_name, const char *function,
 		const char *idname)
@@ -1119,6 +1112,14 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
 			table_name, indexed_column_name, function, table_name, indexed_column_name, function,
 			original_column_name, idname, idname, table_name, indexed_column_name, table_name,
 			table_name, indexed_column_name, function);
+#else
+	ZBX_UNUSED(sql_alloc);
+	ZBX_UNUSED(sql_offset);
+	ZBX_UNUSED(table_name);
+	ZBX_UNUSED(original_column_name);
+	ZBX_UNUSED(indexed_column_name);
+	ZBX_UNUSED(function);
+	ZBX_UNUSED(idname);
 #endif
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		ret = SUCCEED;
@@ -1178,6 +1179,9 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
 			table_name, indexed_column_name, function, table_name, indexed_column_name, function,
 			original_column_name, idname, idname, table_name, indexed_column_name,
 			original_column_name, table_name, table_name, indexed_column_name, function);
+#else
+	ZBX_UNUSED(sql_alloc);
+	ZBX_UNUSED(sql_offset);
 #endif
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		ret = SUCCEED;
@@ -1186,3 +1190,4 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
 
 	return ret;
 }
+#endif

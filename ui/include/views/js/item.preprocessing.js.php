@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 ?>
 
@@ -96,11 +97,11 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-custom-width-chkbox-tmpl">
-	<?= (new CTextBox('preprocessing[#{rowNum}][params][0]', ''))
+	<?= (new CTextBox('preprocessing[#{rowNum}][params][0]', '#{value_0}'))
 			->setAttribute('placeholder', '#{placeholder_0}')
 			->setWidth('#{width_0}')
 			->setAttribute('maxlength', 1).
-		(new CTextBox('preprocessing[#{rowNum}][params][1]', ''))
+		(new CTextBox('preprocessing[#{rowNum}][params][1]', '#{value_1}'))
 			->setAttribute('placeholder', '#{placeholder_1}')
 			->setWidth('#{width_1}')
 			->setAttribute('maxlength', 1).
@@ -233,8 +234,10 @@
 						rowNum: index,
 						width_0: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>,
 						width_1: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>,
-						placeholder_0: ',',
-						placeholder_1: '"',
+						placeholder_0: <?= json_encode(_('delimiter')) ?>,
+						value_0: ',',
+						placeholder_1: <?= json_encode(_('qualifier')) ?>,
+						value_1: '"',
 						chkbox_label: <?= json_encode(_('With header row')) ?>,
 						chkbox_value: <?= ZBX_PREPROC_CSV_HEADER ?>,
 						chkbox_default: true
@@ -410,23 +413,26 @@
 					case '<?= ZBX_PREPROC_STR_REPLACE ?>':
 						$on_fail
 							.prop('checked', false)
-							.prop('disabled', true)
-							.trigger('change');
+							.prop('disabled', true);
 						$row.find('[name*="[test]"]').prop('disabled', false);
 						break;
 
 					case '<?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>':
 						$on_fail
 							.prop('checked', true)
-							.prop('disabled', true)
-							.trigger('change');
+							.prop('readonly', true);
 						break;
 
 					default:
-						$on_fail.prop('disabled', false);
+						$on_fail
+							.prop('checked', false)
+							.prop('disabled', false)
+							.prop('readonly', false);
 						$row.find('[name*="[test]"]').prop('disabled', false);
 						break;
 				}
+
+				$on_fail.trigger('change');
 
 				updateTypeOptionsAvailability();
 			})

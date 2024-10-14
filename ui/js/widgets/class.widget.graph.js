@@ -114,6 +114,12 @@ class CWidgetGraph extends CWidget {
 		return super._promiseUpdate();
 	}
 
+	_promiseReady() {
+		return new Promise((resolve) => {
+			$(this._target).on('load.image', () => resolve(super._promiseReady()));
+		});
+	}
+
 	_processUpdateResponse(response) {
 		super._processUpdateResponse(response);
 

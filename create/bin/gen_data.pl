@@ -156,6 +156,7 @@ sub process_row
 			}
 
 			$_ =~ s/&pipe;/|/g;
+			$_ =~ s/&tab;/\t/g;
 
 			if ($output{'database'} eq 'mysql')
 			{

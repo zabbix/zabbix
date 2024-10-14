@@ -101,6 +101,7 @@ char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
+int	CONFIG_DBREAD_ONLY_RECOVERABLE	= 0;
 char	*CONFIG_VAULTTOKEN		= NULL;
 char	*CONFIG_VAULTURL		= NULL;
 char	*CONFIG_VAULTDBPATH		= NULL;
@@ -213,9 +214,10 @@ char	**CONFIG_PERF_COUNTERS		= NULL;
 char	**CONFIG_PERF_COUNTERS_EN	= NULL;
 #endif
 
-void	zbx_on_exit(int ret)
+void	zbx_on_exit(int ret, void *on_exit_args)
 {
 	ZBX_UNUSED(ret);
+	ZBX_UNUSED(on_exit_args);
 }
 
 /* test itself */

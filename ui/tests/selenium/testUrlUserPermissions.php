@@ -631,6 +631,11 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			}
 			if ($user && !array_key_exists('no_permissions_to_object', $data)) {
 				$this->zbxTestOpen($data['url']);
+
+				if ($alias === 'guest') {
+					$this->guestLogin();
+				}
+
 				$this->zbxTestCheckTitle($data['title']);
 				if ($data['url'] === 'zabbix.php?action=userprofile.edit') {
 					$this->zbxTestCheckHeader($data['header'].$alias);
@@ -641,17 +646,27 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			}
 			elseif ($user && array_key_exists('no_permissions_to_object', $data) ) {
 				$this->zbxTestOpen($data['url']);
+
+				if ($alias === 'guest') {
+					$this->guestLogin();
+				}
+
 				$this->zbxTestCheckTitle($data['title']);
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'No permissions to referred object or it does not exist!');
 			}
 			else {
 				$this->zbxTestOpen($data['url']);
+
+				if ($alias === 'guest') {
+					$this->guestLogin();
+				}
+
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Access denied');
 				$this->zbxTestAssertElementText("//ul/li[1]", 'You are logged in as "'.$alias.'". You have no permissions to access this page.');
 				$this->zbxTestAssertElementText("//ul/li[2]", 'If you think this message is wrong, please consult your administrators about getting the necessary permissions.');
 			}
 
-			$this->webDriver->manage()->deleteAllCookies();
+			$this->page->logout();
 		}
 	}
 
@@ -677,5 +692,15 @@ class testUrlUserPermissions extends CLegacyWebTest {
 
 	public static function addGuestToDisabledGroup() {
 		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (1552, 9, 2)');
+	}
+
+	/**
+	 * Login as guest user.
+	 */
+	protected function guestLogin() {
+		$this->query('button:Login')->one()->click();
+		$this->page->waitUntilReady();
+		$this->query('link:sign in as guest')->one()->click();
+		$this->page->waitUntilReady();
 	}
 }

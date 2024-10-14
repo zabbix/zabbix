@@ -1735,8 +1735,14 @@ static int	jsonpath_extract_value(zbx_jsonobj_t *obj, zbx_jsonpath_t *path, zbx_
 		char	*str = NULL;
 		size_t	str_alloc = 0, str_offset = 0;
 
-		jsonpath_str_copy_value(&str, &str_alloc, &str_offset, ctx.objects.values[0].value);
-		zbx_variant_set_str(value, str);
+		if (ZBX_JSON_TYPE_NULL != ctx.objects.values[0].value->type)
+		{
+			jsonpath_str_copy_value(&str, &str_alloc, &str_offset, ctx.objects.values[0].value);
+			zbx_variant_set_str(value, str);
+		}
+		else
+			zbx_variant_set_none(value);
+
 		ret = SUCCEED;
 	}
 
@@ -1931,7 +1937,7 @@ static int	jsonpath_regexp_match(const char *text, const char *pattern, double *
  * Purpose: add matched object to the index                                   *
  *                                                                            *
  * Parameters: index   - [IN] the parent object index                         *
- *             name    - [IN] the name of objec to add to index               *
+ *             name    - [IN] the name of object to add to index              *
  *             obj     - [IN] the object to add to index                      *
  *             value   - [IN] the object matched by index path                *
  *                                                                            *

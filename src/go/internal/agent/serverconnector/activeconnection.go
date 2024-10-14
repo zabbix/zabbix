@@ -26,8 +26,8 @@ import (
 	"net"
 	"time"
 
-	"zabbix.com/pkg/tls"
-	"zabbix.com/pkg/zbxcomms"
+	"golang.zabbix.com/agent2/pkg/tls"
+	"golang.zabbix.com/agent2/pkg/zbxcomms"
 )
 
 type activeConnection struct {
@@ -49,10 +49,13 @@ func (c *activeConnection) Write(data []byte, timeout time.Duration) []error {
 
 	err := json.Unmarshal(b, &response)
 	if err != nil {
+		zbxcomms.Failover(&c.addresses)
 		return []error{err}
 	}
 
 	if response.Response != "success" {
+		zbxcomms.Failover(&c.addresses)
+
 		if len(response.Info) != 0 {
 			return []error{fmt.Errorf("%s", response.Info)}
 		}

@@ -196,11 +196,11 @@ static int	ha_status = ZBX_NODE_STATUS_UNKNOWN;
 static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
 zbx_cuid_t	ha_sessionid;
 
-
 unsigned char			program_type	= ZBX_PROGRAM_TYPE_SERVER;
 ZBX_THREAD_LOCAL unsigned char	process_type	= ZBX_PROCESS_TYPE_UNKNOWN;
 ZBX_THREAD_LOCAL int		process_num	= 0;
 ZBX_THREAD_LOCAL int		server_num	= 0;
+static sigset_t			orig_mask;
 
 int	CONFIG_ALERTER_FORKS		= 3;
 int	CONFIG_DISCOVERER_FORKS		= 1;
@@ -236,6 +236,7 @@ int	CONFIG_REPORTWRITER_FORKS	= 0;
 int	CONFIG_SERVICEMAN_FORKS		= 1;
 int	CONFIG_TRIGGERHOUSEKEEPER_FORKS = 1;
 int	CONFIG_ODBCPOLLER_FORKS		= 1;
+int	CONFIG_HAMANAGER_FORKS		= 1;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -280,6 +281,7 @@ char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
+int	CONFIG_DBREAD_ONLY_RECOVERABLE	= 0;
 char	*CONFIG_VAULTTOKEN		= NULL;
 char	*CONFIG_VAULTURL		= NULL;
 char	*CONFIG_VAULTDBPATH		= NULL;
@@ -375,6 +377,13 @@ extern int	ZBX_TSDB_VERSION;
 #endif
 
 struct zbx_db_version_info_t	db_version_info;
+
+typedef struct
+{
+	zbx_rtc_t	*rtc;
+	zbx_socket_t	*listen_sock;
+}
+zbx_on_exit_args_t;
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -573,6 +582,9 @@ static void	zbx_set_defaults(void)
 
 	if (NULL == CONFIG_DBHOST)
 		CONFIG_DBHOST = zbx_strdup(CONFIG_DBHOST, "localhost");
+
+	if (NULL != CONFIG_HA_NODE_NAME && '\0' != *CONFIG_HA_NODE_NAME)
+		CONFIG_DBREAD_ONLY_RECOVERABLE = 1;
 
 	if (NULL == CONFIG_SNMPTRAP_FILE)
 		CONFIG_SNMPTRAP_FILE = zbx_strdup(CONFIG_SNMPTRAP_FILE, "/tmp/zabbix_traps.tmp");
@@ -1145,8 +1157,6 @@ static void	zbx_check_db(void)
 		result = FAIL;
 	}
 
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
 	if (SUCCEED == DBfield_exists("config", "dbversion_status"))
 	{
 		zbx_json_initarray(&db_version_json, ZBX_JSON_STAT_BUF_LEN);
@@ -1182,8 +1192,6 @@ static void	zbx_check_db(void)
 		zbx_json_free(&db_version_json);
 	}
 
-	DBclose();
-
 	if (SUCCEED != result)
 	{
 		zbx_db_version_info_clear();
@@ -1196,7 +1204,8 @@ static void	zbx_check_db(void)
  * Purpose: initialize shared resources and start processes                   *
  *                                                                            *
  ******************************************************************************/
-static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failover, zbx_rtc_t *rtc)
+static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failover, zbx_rtc_t *rtc,
+		zbx_on_exit_args_t *exit_args)
 {
 	int	i, ret = SUCCEED;
 	char	*error = NULL;
@@ -1211,13 +1220,6 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	if (SUCCEED != init_configuration_cache(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize configuration cache: %s", error);
-		zbx_free(error);
-		return FAIL;
-	}
-
-	if (SUCCEED != init_selfmon_collector(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
 		zbx_free(error);
 		return FAIL;
 	}
@@ -1245,11 +1247,16 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	if (0 != CONFIG_TRAPPER_FORKS)
 	{
+		exit_args->listen_sock = listen_sock;
+		zbx_block_signals(&orig_mask);
+
 		if (FAIL == zbx_tcp_listen(listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
 			return FAIL;
 		}
+
+		zbx_unblock_signals(&orig_mask);
 	}
 
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_POLLER_FORKS
@@ -1528,7 +1535,6 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_tfc_destroy();
 	zbx_vc_destroy();
 	zbx_vmware_destroy();
-	free_selfmon_collector();
 	free_configuration_cache();
 	free_database_cache(ZBX_SYNC_NONE);
 
@@ -1589,19 +1595,22 @@ static void	server_restart_ha(zbx_rtc_t *rtc)
 
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
-	char		*error = NULL;
-	int		i, db_type, ret, ha_status_old;
+	char			*error = NULL;
+	int			i, db_type, ret, ha_status_old;
 
-	zbx_socket_t	listen_sock;
-	time_t		standby_warning_time;
-	zbx_rtc_t	rtc;
-	zbx_timespec_t	rtc_timeout = {1, 0};
+	zbx_socket_t		listen_sock = {0};
+	time_t			standby_warning_time;
+	zbx_rtc_t		rtc;
+	zbx_timespec_t		rtc_timeout = {1, 0};
+	zbx_on_exit_args_t	exit_args = {.rtc = NULL, .listen_sock = NULL};
 
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
 		printf("Starting Zabbix Server. Zabbix %s (revision %s).\nPress Ctrl+C to exit.\n\n",
 				ZABBIX_VERSION, ZABBIX_REVISION);
 	}
+
+	zbx_block_signals(&orig_mask);
 
 	if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
 	{
@@ -1714,6 +1723,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	exit_args.rtc = &rtc;
+	zbx_set_on_exit_args(&exit_args);
+
 	if (SUCCEED != zbx_vault_init_token_from_env(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault token: %s", error);
@@ -1721,31 +1733,34 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	zbx_unblock_signals(&orig_mask);
+
 	if (SUCCEED != zbx_vault_init_db_credentials(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	if (ZBX_DB_UNKNOWN == (db_type = zbx_db_get_database_type()))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": database is not a Zabbix database",
 				CONFIG_DBNAME);
-		exit(EXIT_FAILURE);
+		goto out;
 	}
 	else if (ZBX_DB_SERVER != db_type)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot use database \"%s\": its \"users\" table is empty (is this the"
 				" Zabbix proxy database?)", CONFIG_DBNAME);
-		exit(EXIT_FAILURE);
+		goto out;
 	}
 
 	if (SUCCEED != init_database_cache(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
-		return FAIL;
+		goto out;
 	}
 
 	DBcheck_character_set();
@@ -1759,7 +1774,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 	if (SUCCEED != zbx_db_check_instanceid())
-		exit(EXIT_FAILURE);
+		goto out;
+	DBclose();
 
 	if (FAIL == zbx_export_init(&error))
 	{
@@ -1771,6 +1787,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (SUCCEED != zbx_history_init(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize history storage: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	if (SUCCEED != init_selfmon_collector(&error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
@@ -1802,7 +1825,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
-		if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc))
+		if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc, &exit_args))
 		{
 			sig_exiting = ZBX_EXIT_FAILURE;
 			ha_status = ZBX_NODE_STATUS_ERROR;
@@ -1821,13 +1844,17 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		{
 			zabbix_log(LOG_LEVEL_INFORMATION, "\"%s\" node started in \"%s\" mode", CONFIG_HA_NODE_NAME,
 					zbx_ha_status_str(ha_status));
-
 		}
 	}
 
 	ha_status_old = ha_status;
 
-	if (ZBX_NODE_STATUS_STANDBY == ha_status)
+	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
+	{
+		/* reset ha dispatcher heartbeat timings */
+		zbx_ha_dispatch_message(NULL, ZBX_HA_RTC_STATE_RESET, NULL, NULL, NULL);
+	}
+	else if (ZBX_NODE_STATUS_STANDBY == ha_status)
 		standby_warning_time = time(NULL);
 
 	while (ZBX_IS_RUNNING())
@@ -1835,12 +1862,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		time_t			now;
 		zbx_ipc_client_t	*client;
 		zbx_ipc_message_t	*message;
+		int			rtc_state;
 
-		(void)zbx_ipc_service_recv(&rtc.service, &rtc_timeout, &client, &message);
+		rtc_state = zbx_ipc_service_recv(&rtc.service, &rtc_timeout, &client, &message);
 
 		if (NULL == message || ZBX_IPC_SERVICE_HA_RTC_FIRST <= message->code)
 		{
-			if (SUCCEED != zbx_ha_dispatch_message(message, &ha_status, &ha_failover_delay, &error))
+			if (SUCCEED != zbx_ha_dispatch_message(message, rtc_state, &ha_status, &ha_failover_delay,
+					&error))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "HA manager error: %s", error);
 				sig_exiting = ZBX_EXIT_FAILURE;
@@ -1888,7 +1917,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			switch (ha_status)
 			{
 				case ZBX_NODE_STATUS_ACTIVE:
-					if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc))
+					if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc,
+							&exit_args))
 					{
 						sig_exiting = ZBX_EXIT_FAILURE;
 						ha_status = ZBX_NODE_STATUS_ERROR;
@@ -1900,6 +1930,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 						server_teardown(&rtc, &listen_sock);
 						ha_status_old = ha_status;
 					}
+					else
+					{
+						/* reset ha dispatcher heartbeat timings */
+						zbx_ha_dispatch_message(NULL, ZBX_HA_RTC_STATE_RESET, NULL, NULL, NULL);
+					}
+
 					break;
 				case ZBX_NODE_STATUS_STANDBY:
 					server_teardown(&rtc, &listen_sock);
@@ -1949,12 +1985,15 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 	}
 
-	zbx_on_exit(ZBX_EXIT_STATUS());
+	zbx_on_exit(ZBX_EXIT_STATUS(), &exit_args);
 
 	return SUCCEED;
+out:
+	DBclose();
+	exit(EXIT_FAILURE);
 }
 
-void	zbx_on_exit(int ret)
+void	zbx_on_exit(int ret, void *on_exit_args)
 {
 	char	*error = NULL;
 
@@ -1994,9 +2033,9 @@ void	zbx_on_exit(int ret)
 
 		/* free vmware support */
 		zbx_vmware_destroy();
-
-		free_selfmon_collector();
 	}
+
+	free_selfmon_collector();
 
 	zbx_uninitialize_events();
 
@@ -2005,6 +2044,17 @@ void	zbx_on_exit(int ret)
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION, ZABBIX_REVISION);
 
+	if (NULL != on_exit_args)
+	{
+		zbx_on_exit_args_t	*args = (zbx_on_exit_args_t *)on_exit_args;
+
+		if (NULL != args->listen_sock)
+			zbx_tcp_unlisten(args->listen_sock);
+
+		if (NULL != args->rtc)
+			zbx_ipc_service_close(&args->rtc->service);
+	}
+
 	zabbix_close_log();
 
 	zbx_locks_destroy();
@@ -2012,6 +2062,5 @@ void	zbx_on_exit(int ret)
 #if defined(PS_OVERWRITE_ARGV)
 	setproctitle_free_env();
 #endif
-
 	exit(EXIT_SUCCESS);
 }

@@ -384,7 +384,7 @@ class ZBase {
 
 		if (defined('ZBX_DENY_GUI_ACCESS')) {
 			if (!isset($ZBX_GUI_ACCESS_IP_RANGE) || !in_array(CWebUser::getIp(), $ZBX_GUI_ACCESS_IP_RANGE)) {
-				throw new Exception($_REQUEST['warning_msg']);
+				throw new Exception($ZBX_GUI_ACCESS_MESSAGE ?? 'Zabbix is under maintenance.');
 			}
 		}
 	}
@@ -487,6 +487,10 @@ class ZBase {
 
 		// Set the authentication token for the API.
 		API::getWrapper()->auth = CWebUser::$data['sessionid'];
+
+		if (CWebUser::isAutologinEnabled()) {
+			$session->lifetime = time() + SEC_PER_MONTH;
+		}
 
 		// Enable debug mode in the API.
 		API::getWrapper()->debug = CWebUser::getDebugMode();

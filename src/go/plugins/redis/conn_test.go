@@ -24,8 +24,8 @@ import (
 	"testing"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/uri"
 	"github.com/mediocregopher/radix/v3"
+	"golang.zabbix.com/sdk/uri"
 )
 
 func TestConnManager_closeUnused(t *testing.T) {

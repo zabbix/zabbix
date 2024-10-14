@@ -216,6 +216,7 @@ DB_EVENT	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t
 	event->flags = ZBX_FLAGS_DB_EVENT_CREATE;
 	event->severity = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 	event->suppressed = ZBX_PROBLEM_SUPPRESSED_FALSE;
+	event->maintenanceids = NULL;
 
 	if (EVENT_SOURCE_TRIGGERS == source)
 	{
@@ -695,8 +696,7 @@ static int	correlation_match_event_hostgroup(const DB_EVENT *event, zbx_uint64_t
 static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *condition, const DB_EVENT *event,
 		int old_value)
 {
-	int		i, ret;
-	zbx_tag_t	*tag;
+	int	ret;
 
 	/* return SUCCEED for conditions using old events */
 	switch (condition->type)
@@ -709,9 +709,9 @@ static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *c
 	switch (condition->type)
 	{
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG:
-			for (i = 0; i < event->tags.values_num; i++)
+			for (int i = 0; i < event->tags.values_num; i++)
 			{
-				tag = (zbx_tag_t *)event->tags.values[i];
+				const zbx_tag_t	*tag = event->tags.values[i];
 
 				if (0 == strcmp(tag->tag, condition->data.tag.tag))
 					return "1";
@@ -719,11 +719,10 @@ static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *c
 			break;
 
 		case ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE:
-			for (i = 0; i < event->tags.values_num; i++)
+			for (int i = 0; i < event->tags.values_num; i++)
 			{
-				zbx_corr_condition_tag_value_t	*cond = &condition->data.tag_value;
-
-				tag = (zbx_tag_t *)event->tags.values[i];
+				const zbx_corr_condition_tag_value_t	*cond = &condition->data.tag_value;
+				const zbx_tag_t				*tag = event->tags.values[i];
 
 				if (0 == strcmp(tag->tag, cond->tag) &&
 					SUCCEED == zbx_strmatch_condition(tag->value, cond->value, cond->op))
@@ -742,9 +741,9 @@ static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *c
 			return (SUCCEED == ret ? "1" : "0");
 
 		case ZBX_CORR_CONDITION_EVENT_TAG_PAIR:
-			for (i = 0; i < event->tags.values_num; i++)
+			for (int i = 0; i < event->tags.values_num; i++)
 			{
-				tag = (zbx_tag_t *)event->tags.values[i];
+				const zbx_tag_t	*tag = event->tags.values[i];
 
 				if (0 == strcmp(tag->tag, condition->data.tag_pair.newtag))
 					return (SUCCEED == old_value) ? ZBX_UNKNOWN_STR "0" : "0";
@@ -1695,6 +1694,12 @@ static void	zbx_clean_event(DB_EVENT *event)
 		zbx_vector_ptr_destroy(&event->tags);
 	}
 
+	if (NULL != event->maintenanceids)
+	{
+		zbx_vector_uint64_destroy(event->maintenanceids);
+		zbx_free(event->maintenanceids);
+	}
+
 	zbx_free(event);
 }
 
@@ -1756,8 +1761,9 @@ void	zbx_export_events(void)
 
 	for (i = 0; i < events.values_num; i++)
 	{
-		DC_HOST		*host;
-		DB_EVENT	*event;
+		DC_HOST			*host;
+		DB_EVENT		*event;
+		zbx_vector_str_t	groups;
 
 		event = (DB_EVENT *)events.values[i];
 
@@ -1807,8 +1813,18 @@ void	zbx_export_events(void)
 
 		zbx_json_addarray(&json, ZBX_PROTO_TAG_GROUPS);
 
+		zbx_vector_str_create(&groups);
 		while (NULL != (row = DBfetch(result)))
-			zbx_json_addstring(&json, NULL, row[0], ZBX_JSON_TYPE_STRING);
+			zbx_vector_str_append(&groups, zbx_strdup(NULL, row[0]));
+
+		zbx_vector_str_sort(&groups, ZBX_DEFAULT_STR_COMPARE_FUNC);
+
+		for (j = 0; j < groups.values_num; j++)
+			zbx_json_addstring(&json, NULL, groups.values[j], ZBX_JSON_TYPE_STRING);
+
+		zbx_vector_str_clear_ext(&groups, zbx_str_free);
+		zbx_vector_str_destroy(&groups);
+
 		DBfree_result(result);
 
 		zbx_json_close(&json);
@@ -1876,9 +1892,9 @@ void	zbx_events_update_itservices(void)
 		values_num = recovery->r_event->tags.values_num;
 		recovery->r_event->tags.values_num = 0;
 
-		zbx_service_serialize(&data, &data_alloc, &data_offset, recovery->eventid, recovery->r_event->clock,
+		zbx_service_serialize_event(&data, &data_alloc, &data_offset, recovery->eventid, recovery->r_event->clock,
 				recovery->r_event->ns, recovery->r_event->value, recovery->r_event->severity,
-				&recovery->r_event->tags, 0);
+				&recovery->r_event->tags, NULL);
 
 		recovery->r_event->tags.values_num = values_num;
 	}
@@ -1893,14 +1909,15 @@ void	zbx_events_update_itservices(void)
 		if (TRIGGER_VALUE_PROBLEM != event->value)
 			continue;
 
-		zbx_service_serialize(&data, &data_alloc, &data_offset, event->eventid, event->clock, event->ns,
-				event->value, event->severity, &event->tags, event->suppressed);
+		zbx_service_serialize_event(&data, &data_alloc, &data_offset, event->eventid, event->clock, event->ns,
+				event->value, event->severity, &event->tags, event->maintenanceids);
 	}
 
 	if (NULL == data)
 		return;
 
-	zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_PROBLEMS, data, (zbx_uint32_t)data_offset);
+	if (0 != zbx_dc_get_itservices_num())
+		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_PROBLEMS, data, (zbx_uint32_t)data_offset);
 	zbx_free(data);
 }
 
@@ -1952,6 +1969,8 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 
 			for (j = 0; j < event_queries.values_num; j++)
 			{
+				DB_EVENT        *event = (DB_EVENT *)event_refs->values[j];
+
 				query = (zbx_event_suppress_query_t *)event_queries.values[j];
 
 				for (i = 0; i < query->maintenances.values_num; i++)
@@ -1969,7 +1988,7 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 							query->maintenances.values[i].first,
 							(int)query->maintenances.values[i].second);
 
-					((DB_EVENT *)event_refs->values[j])->suppressed = ZBX_PROBLEM_SUPPRESSED_TRUE;
+					zbx_db_event_add_maintenanceid(event, query->maintenances.values[i].first);
 				}
 			}
 

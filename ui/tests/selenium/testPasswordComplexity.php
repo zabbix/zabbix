@@ -122,7 +122,7 @@ class testPasswordComplexity extends CWebTest {
 		foreach ($hintboxes as $hintbox) {
 			// Summon the hint-box.
 			$form->query('xpath://label[text()='.zbx_dbstr($hintbox['field']).']//a')->one()->click();
-			$hint = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
+			$hint = $form->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent();
 
 			// Assert text.
 			$this->assertEquals($hintbox['text'], $hint->one()->getText());
@@ -982,7 +982,7 @@ class testPasswordComplexity extends CWebTest {
 	}
 
 	/**
-	 * Check user changes his own password accordingly to complexity rules.
+	 * Check if user changes their own password according to complexity rules.
 	 *
 	 * @dataProvider getCommonPasswordData
 	 * @dataProvider getUserPasswordData
@@ -994,7 +994,7 @@ class testPasswordComplexity extends CWebTest {
 	}
 
 	/**
-	 * Check Admin changes his own password accordingly to complexity rules.
+	 * Check if Admin changes their own password according to complexity rules.
 	 *
 	 * @dataProvider getCommonPasswordData
 	 * @dataProvider getAdminPasswordData
@@ -1030,7 +1030,7 @@ class testPasswordComplexity extends CWebTest {
 	 * @param string    $admin_password    password used for Admin user login
 	 * @param int       $userid            id of the user whose password is changed
 	 * @param boolean   $update            false if create, true if update
-	 * @param $own      $own               true if user changes his password himself
+	 * @param $own      $own               true if user changes their password themselves
 	 */
 	private function checkPasswordComplexity($data, $admin_password, $userid = null, $update = false, $own = false,
 			$user_password = null) {
@@ -1083,7 +1083,7 @@ class testPasswordComplexity extends CWebTest {
 		if (array_key_exists('hint', $data)) {
 			// Summon hint-box and assert text accordingly to password complexity settings, then close hint-box.
 			$user_form->query('xpath://label[text()="Password"]//a')->one()->click();
-			$hint = $user_form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
+			$hint = $user_form->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent();
 			$this->assertEquals($data['hint'], $hint->one()->getText());
 			$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
 			$hint->waitUntilNotPresent();

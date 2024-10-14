@@ -730,7 +730,9 @@ class CConfigurationImport {
 					$item['interfaceid'] = $interfaceid;
 				}
 
-				if (array_key_exists('valuemap', $item) && $item['valuemap']) {
+				$item['valuemapid'] = 0;
+
+				if ($item['valuemap']) {
 					$valuemapid = $this->referencer->findValuemapidByName($hostid, $item['valuemap']['name']);
 
 					if ($valuemapid === null) {
@@ -743,8 +745,8 @@ class CConfigurationImport {
 					}
 
 					$item['valuemapid'] = $valuemapid;
-					unset($item['valuemap']);
 				}
+				unset($item['valuemap']);
 
 				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 					if (!array_key_exists('key', $item[$master_item_key])) {
@@ -1171,6 +1173,8 @@ class CConfigurationImport {
 						}
 					}
 
+					$item_prototype['valuemapid'] = 0;
+
 					if ($item_prototype['valuemap']) {
 						$valuemapid = $this->referencer->findValuemapidByName($hostid,
 							$item_prototype['valuemap']['name']
@@ -1187,8 +1191,8 @@ class CConfigurationImport {
 						}
 
 						$item_prototype['valuemapid'] = $valuemapid;
-						unset($item_prototype['valuemap']);
 					}
+					unset($item_prototype['valuemap']);
 
 					if ($item_prototype['type'] == ITEM_TYPE_DEPENDENT) {
 						if (!array_key_exists('key', $item_prototype[$master_item_key])) {
@@ -1396,8 +1400,8 @@ class CConfigurationImport {
 
 			foreach ($discovery_rules as $discovery_rule) {
 				// If rule was not processed we should not create/update any of its prototypes.
-				if (array_key_exists($hostid, $processed_discovery_rules)
-						&& !array_key_exists($discovery_rule['key_'], $processed_discovery_rules[$hostid])) {
+				if (!array_key_exists($hostid, $processed_discovery_rules)
+						|| !array_key_exists($discovery_rule['key_'], $processed_discovery_rules[$hostid])) {
 					continue;
 				}
 
@@ -1788,9 +1792,23 @@ class CConfigurationImport {
 		$triggers_to_process_dependencies = [];
 
 		foreach ($this->getFormattedTriggers() as $trigger) {
-			$triggerid = null;
+			$hostids = $this->extractHostids($trigger);
 
-			$is_template_trigger = $this->isTemplateTrigger($trigger);
+			if (!$hostids) {
+				continue;
+			}
+
+			$triggerid = null;
+			$is_template_trigger = false;
+
+			foreach ($hostids as $hostid) {
+				if ($this->importedObjectContainer->isTemplateProcessed($hostid)) {
+					$is_template_trigger = true;
+				}
+				elseif (!$this->importedObjectContainer->isHostProcessed($hostid)) {
+					continue 2;
+				}
+			}
 
 			if ($is_template_trigger && array_key_exists('uuid', $trigger)) {
 				$triggerid = $this->referencer->findTriggeridByUuid($trigger['uuid']);
@@ -1841,35 +1859,35 @@ class CConfigurationImport {
 		$this->processTriggerDependencies($triggers_to_process_dependencies);
 	}
 
-	private function isTemplateTrigger(array $trigger): bool {
+	private function extractHostids(array $trigger): array {
 		$expression_parser = new CExpressionParser(['usermacros' => true]);
 
 		if ($expression_parser->parse($trigger['expression']) != CParser::PARSE_SUCCESS) {
-			return false;
+			return [];
 		}
 
-		foreach ($expression_parser->getResult()->getHosts() as $host) {
-			$host = $this->referencer->findTemplateidByHost($host);
+		$hosts = $expression_parser->getResult()->getHosts();
 
-			if ($host !== null) {
-				return true;
+		if ($trigger['recovery_expression'] !== '') {
+			if ($expression_parser->parse($trigger['recovery_expression']) != CParser::PARSE_SUCCESS) {
+				return [];
 			}
+
+			$hosts = array_merge($hosts, $expression_parser->getResult()->getHosts());
 		}
 
-		if ($trigger['recovery_expression'] === ''
-				|| $expression_parser->parse($trigger['recovery_expression']) != CParser::PARSE_SUCCESS) {
-			return false;
-		}
+		$hostids = [];
+		foreach (array_unique($hosts) as $host) {
+			$hostid = $this->referencer->findTemplateidOrHostidByHost($host);
 
-		foreach ($expression_parser->getResult()->getHosts() as $host) {
-			$host = $this->referencer->findTemplateidByHost($host);
-
-			if ($host !== null) {
-				return true;
+			if ($hostid === null) {
+				return [];
 			}
+
+			$hostids[] = $hostid;
 		}
 
-		return false;
+		return $hostids;
 	}
 
 	/**
@@ -2387,9 +2405,9 @@ class CConfigurationImport {
 		// Unlike triggers that belong to multiple hosts, trigger prototypes do not, so we just delete them.
 		if ($trigger_prototypes_to_delete) {
 			API::TriggerPrototype()->delete(array_keys($trigger_prototypes_to_delete));
-
-			$this->referencer->refreshTriggers();
 		}
+
+		$this->referencer->refreshTriggers();
 
 		$db_graph_prototypes = API::GraphPrototype()->get([
 			'output' => [],
@@ -2404,9 +2422,9 @@ class CConfigurationImport {
 		// Unlike graphs that belong to multiple hosts, graph prototypes do not, so we just delete them.
 		if ($graph_prototypes_to_delete) {
 			API::GraphPrototype()->delete(array_keys($graph_prototypes_to_delete));
-
-			$this->referencer->refreshGraphs();
 		}
+
+		$this->referencer->refreshGraphs();
 
 		$db_item_prototypes = API::ItemPrototype()->get([
 			'output' => [],
@@ -2420,9 +2438,9 @@ class CConfigurationImport {
 
 		if ($item_prototypes_to_delete) {
 			API::ItemPrototype()->delete(array_keys($item_prototypes_to_delete));
-
-			$this->referencer->refreshItems();
 		}
+
+		$this->referencer->refreshItems();
 	}
 
 	/**

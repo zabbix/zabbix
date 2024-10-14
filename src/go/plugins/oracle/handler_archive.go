@@ -23,7 +23,7 @@ import (
 	"context"
 	"fmt"
 
-	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 func archiveHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {

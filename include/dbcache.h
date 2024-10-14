@@ -222,6 +222,7 @@ typedef struct
 	unsigned char		history;
 	unsigned char		trends;
 	unsigned char		flags;
+	unsigned char		has_trigger;
 }
 zbx_history_sync_item_t;
 
@@ -927,6 +928,7 @@ void	zbx_dc_get_hostids_by_group_name(const char *name, zbx_vector_uint64_t *hos
 #define ZBX_DC_FLAG_UNDEF	0x08	/* unsupported or undefined (delta calculation failed) value */
 #define ZBX_DC_FLAG_NOHISTORY	0x10	/* values should not be kept in history */
 #define ZBX_DC_FLAG_NOTRENDS	0x20	/* values should not be kept in trends */
+#define ZBX_DC_FLAG_HASTRIGGER	0x40	/* value is used in trigger expression */
 
 typedef struct zbx_hc_data
 {
@@ -993,6 +995,7 @@ zbx_trigger_dep_t;
 void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_vector_ptr_t *deps);
 
 void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, zbx_uint64_t *proxy_hostids);
+void	zbx_trend_add_new_items(const zbx_vector_uint64_t *itemids);
 
 /* data session support */
 
@@ -1125,4 +1128,8 @@ void	zbx_db_trigger_explain_expression(const DB_TRIGGER *trigger, char **express
 void	zbx_db_trigger_get_function_value(const DB_TRIGGER *trigger, int index, char **value,
 		int (*eval_func_cb)(zbx_variant_t *, DC_EVALUATE_ITEM *, const char *, const char *, const zbx_timespec_t *,
 		char **), int recovery);
+
+void	zbx_dc_set_itservices_num(int num);
+int	zbx_dc_get_itservices_num(void);
+
 #endif

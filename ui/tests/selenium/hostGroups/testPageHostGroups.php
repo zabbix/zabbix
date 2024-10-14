@@ -257,7 +257,7 @@ class testPageHostGroups extends CWebTest {
 		// Check hintbox of discovered host group in info column.
 		$hintbox_row = $table->findRow('Name', self::LLD.': '.self::DISCOVERED_GROUP);
 		$hintbox_row->query('xpath://a[@class="icon-info status-yellow"]')->one()->click();
-		$hintbox = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilVisible();
+		$hintbox = $form->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilVisible();
 		$this->assertEquals('The host group is not discovered anymore and will be deleted the next time discovery'.
 				' rule is processed.', $hintbox->one()->getText()
 		);
@@ -434,9 +434,7 @@ class testPageHostGroups extends CWebTest {
 			[
 				[
 					'Name' => ' enabled ',
-					'expected' => ['Group with enabled host testPageHostGroups', self::GROUP_ENABLED,
-						'ZBX6648 Enabled Triggers'
-					]
+					'expected' => ['Group with enabled host testPageHostGroups', self::GROUP_ENABLED]
 				]
 			],
 			[
@@ -449,9 +447,7 @@ class testPageHostGroups extends CWebTest {
 			[
 				[
 					'Name' => '   enabled   ',
-					'expected' => ['Group with enabled host testPageHostGroups', self::GROUP_ENABLED,
-						'ZBX6648 Enabled Triggers'
-					]
+					'expected' => ['Group with enabled host testPageHostGroups', self::GROUP_ENABLED]
 				]
 			],
 			[

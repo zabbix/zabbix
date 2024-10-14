@@ -29,6 +29,7 @@
 int	__wrap_DBis_null(const char *field);
 DB_ROW	__wrap_DBfetch(DB_RESULT result);
 DB_RESULT	__wrap_DBselect(const char *fmt, ...);
+void	__wrap_zbx_recalc_time_period(int *tm_start, int table_group);
 zbx_trend_state_t	__wrap_zbx_trends_get_avg(const char *table, zbx_uint64_t itemid, int start, int end,
 		double *value);
 

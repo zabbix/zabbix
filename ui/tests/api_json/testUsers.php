@@ -268,6 +268,113 @@ class testUsers extends CAPITest {
 		self::$data['tokens']['valid_for_user_with_disabled_usergroup'] = $tokens[3]['token'];
 	}
 
+	public static function getUserData(): array {
+		return [
+			'Test user.get: "selectRole" (null)' => [
+				'request' => [
+					'output' => [],
+					'selectRole' => null,
+					'userids' => ['1']
+				],
+				'expected_result' => [[
+					'userid' => '1'
+				]],
+				'expected_error' => null
+			],
+			'Test user.get: "selectRole" (empty string)' => [
+				'request' => [
+					'output' => [],
+					'selectRole' => '',
+					'userids' => ['1']
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/output": value must be "extend".'
+			],
+			'Test user.get: "selectRole" (invalid parameter "abc")' => [
+				'request' => [
+					'output' => [],
+					'selectRole' => 'abc',
+					'userids' => ['1']
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/output": value must be "extend".'
+			],
+			'Test user.get: "selectRole" (unsupported parameter "count")' => [
+				'request' => [
+					'output' => [],
+					'selectRole' => 'count',
+					'userids' => ['1']
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/output": value must be "extend".'
+			],
+			'Test user.get: "selectRole" with extended output' => [
+				'request' => [
+					'output' => [],
+					'selectRole' => 'extend',
+					'userids' => ['1']
+				],
+				'expected_result' => [[
+					'userid' => '1',
+					'role' => [
+						'roleid' => '3',
+						'name' => 'Super admin role',
+						'type' => '3', // USER_TYPE_SUPER_ADMIN
+						'readonly' => '1'
+					]
+				]],
+				'expected_error' => null
+			],
+			'Test user.get: "selectRole" (empty array)' => [
+				'request' => [
+					'output' => [],
+					'selectRole' => [],
+					'userids' => ['1']
+				],
+				'expected_result' => [[
+					'userid' => '1',
+					'role' => []
+				]],
+				'expected_error' => null
+			],
+			'Test user.get: "selectRole" (invalid array parameter "abc")' => [
+				'request' => [
+					'output' => [],
+					'selectRole' => ['abc'],
+					'userids' => ['1']
+				],
+				'expected_result' => [],
+				'expected_error' => 'Invalid parameter "/output/1": value must be one of "roleid", "name", "type", "readonly".'
+			],
+
+			'Test user.get: "selectRole" with "roleid"' => [
+				'request' => [
+					'output' => [],
+					'selectRole' => ['roleid'],
+					'userids' => ['1']
+				],
+				'expected_result' => [[
+					'userid' => '1',
+					'role' => [
+						'roleid' => '3'
+					]
+				]],
+				'expected_error' => null
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getUserData
+	 */
+	public function testUsers_Get(array $request, array $expected_result, ?string $expected_error): void {
+		$result = $this->call('user.get', $request, $expected_error);
+
+		if ($expected_error === null) {
+			$this->assertSame($expected_result, $result['result']);
+		}
+	}
+
 	public static function user_create() {
 		return [
 			// Check user password.
@@ -767,7 +874,7 @@ class testUsers extends CAPITest {
 				]],
 				'expected_error' => 'Invalid parameter "/1/usrgrps/2": value (usrgrpid)=(7) already exists.'
 			],
-			// Check user group, admin can't add himself to a disabled group or a group with disabled GUI access.
+			// Check user group, admin can't add oneself to a disabled group or a group with disabled GUI access.
 			[
 				'user' => [[
 					'userid' => '1',
@@ -776,7 +883,7 @@ class testUsers extends CAPITest {
 						['usrgrpid' => '12']
 					]
 				]],
-				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+				'expected_error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 			],
 			[
 				'user' => [[
@@ -786,7 +893,7 @@ class testUsers extends CAPITest {
 						['usrgrpid' => '9']
 					]
 				]],
-				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+				'expected_error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 			],
 			// Check user properties, super-admin user type.
 			[
@@ -1872,10 +1979,10 @@ class testUsers extends CAPITest {
 				'user' => ['9', '9'],
 				'expected_error' => 'Invalid parameter "/2": value (9) already exists.'
 			],
-			// Try delete himself.
+			// Try delete oneself.
 			[
 				'user' => ['1'],
-				'expected_error' => 'User is not allowed to delete himself.'
+				'expected_error' => 'User is not allowed to delete oneself.'
 			],
 			// Try delete internal user.
 			[

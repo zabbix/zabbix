@@ -575,13 +575,11 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_SERVICEMAN		35
 #define ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER	36
 #define ZBX_PROCESS_TYPE_ODBCPOLLER		37
-#define ZBX_PROCESS_TYPE_COUNT			38	/* number of process types */
+#define ZBX_PROCESS_TYPE_HA_MANAGER		38
+#define ZBX_PROCESS_TYPE_COUNT			39	/* number of process types */
 
 /* special processes that are not present worker list */
-#define ZBX_PROCESS_TYPE_EXT_FIRST		126
-#define ZBX_PROCESS_TYPE_HA_MANAGER		126
-#define ZBX_PROCESS_TYPE_MAIN			127
-#define ZBX_PROCESS_TYPE_EXT_LAST		127
+#define ZBX_PROCESS_TYPE_MAIN			126
 
 #define ZBX_PROCESS_TYPE_UNKNOWN		255
 
@@ -1203,6 +1201,8 @@ void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 #define ZBX_JAN_2038		2145916800
 #define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
 
+#define ZBX_MALLOC_TRIM (128 * ZBX_KIBIBYTE)
+
 #define ZBX_MAX_RECV_DATA_SIZE		(1 * ZBX_GIBIBYTE)
 #if defined(_WINDOWS)
 #define ZBX_MAX_RECV_LARGE_DATA_SIZE	(1 * ZBX_GIBIBYTE)
@@ -1223,6 +1223,8 @@ int		zbx_is_leap_year(int year);
 void		zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz);
 long		zbx_get_timezone_offset(time_t t, struct tm *tm);
 struct tm	*zbx_localtime(const time_t *time, const char *tz);
+const struct tm	*zbx_localtime_now(const time_t *time);
+time_t		zbx_mktime(struct tm *time, const char *tz);
 int		zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t);
 int		zbx_day_in_month(int year, int mon);
 zbx_uint64_t	zbx_get_duration_ms(const zbx_timespec_t *ts);
@@ -1274,7 +1276,7 @@ int	is_ip(const char *ip);
 
 int	zbx_validate_hostname(const char *hostname);
 
-void	zbx_on_exit(int ret); /* calls exit() at the end! */
+void	zbx_on_exit(int ret, void *on_exit_args); /* calls exit() at the end! */
 void	zbx_backtrace(void);
 
 int	int_in_list(char *list, int value);
@@ -1768,11 +1770,11 @@ typedef enum
 }
 zbx_time_unit_t;
 
-void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base);
-void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base);
+void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base, const char *tz);
+void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base, const char *tz);
 
-void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base);
-void	zbx_tm_round_down(struct tm *tm, zbx_time_unit_t base);
+void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base, const char *tz);
+void	zbx_tm_round_down(struct tm *tm, zbx_time_unit_t base, const char *tz);
 
 const char	*zbx_timespec_str(const zbx_timespec_t *ts);
 

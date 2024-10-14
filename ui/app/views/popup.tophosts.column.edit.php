@@ -87,7 +87,7 @@ $item_select = (new CPatternSelect([
 	'popup' => [
 		'parameters' => [
 			'srctbl' => 'items',
-			'srcfld1' => 'itemid',
+			'srcfld1' => 'name',
 			'real_hosts' => 1,
 			'webitems' => 1,
 			'dstfrm' => $form->getName(),
@@ -100,7 +100,7 @@ $item_select = (new CPatternSelect([
 $scripts[] = $item_select->getPostJS();
 
 $form_grid->addItem([
-	(new CLabel(_('Item'), 'item_ms'))->setAsteriskMark(),
+	(new CLabel(_('Item name'), 'item_ms'))->setAsteriskMark(),
 	new CFormField($item_select)
 ]);
 

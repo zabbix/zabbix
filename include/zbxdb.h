@@ -86,7 +86,8 @@ void	zbx_db_deinit(void);
 void	zbx_db_init_autoincrement_options(void);
 
 int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *dbschema, char *dbsocket, int port,
-			char *tls_connect, char *cert, char *key, char *ca, char *cipher, char *cipher_13);
+			char *tls_connect, char *cert, char *key, char *ca, char *cipher, char *cipher_13,
+			int read_only_recoverable);
 void	zbx_db_close(void);
 
 int	zbx_db_begin(void);
@@ -137,6 +138,7 @@ int		zbx_db_vexecute(const char *fmt, va_list args);
 DB_RESULT	zbx_db_vselect(const char *fmt, va_list args);
 DB_RESULT	zbx_db_select_n(const char *query, int n);
 
+int		zbx_db_get_row_num(DB_RESULT result);
 DB_ROW		zbx_db_fetch(DB_RESULT result);
 void		DBfree_result(DB_RESULT result);
 int		zbx_db_is_null(const char *field);

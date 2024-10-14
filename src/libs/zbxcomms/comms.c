@@ -1177,8 +1177,9 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 
 	if (0 == s->num_socks)
 	{
-		zbx_set_socket_strerror("zbx_tcp_listen() fatal error: unable to serve on any address [[%s]:%hu]",
-				NULL != listen_ip ? listen_ip : "-", listen_port);
+		zbx_set_socket_strerror("zbx_tcp_listen(): "
+				"failed to create listening socket for [[%s]:%hu]: %s",
+				NULL != listen_ip ? listen_ip : "-", listen_port, zbx_strerror(errno));
 		goto out;
 	}
 
@@ -1342,8 +1343,9 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 
 	if (0 == s->num_socks)
 	{
-		zbx_set_socket_strerror("zbx_tcp_listen() fatal error: unable to serve on any address [[%s]:%hu]",
-				NULL != listen_ip ? listen_ip : "-", listen_port);
+		zbx_set_socket_strerror("zbx_tcp_listen(): "
+				"failed to create listening socket for [[%s]:%hu]: %s",
+				NULL != listen_ip ? listen_ip : "-", listen_port, zbx_strerror(errno));
 		goto out;
 	}
 
@@ -1368,6 +1370,8 @@ void	zbx_tcp_unlisten(zbx_socket_t *s)
 
 	for (i = 0; i < s->num_socks; i++)
 		zbx_socket_close(s->sockets[i]);
+
+	zbx_socket_clean(s);
 }
 
 /******************************************************************************
@@ -1844,6 +1848,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
 
 			if (max_len < expected_len)
 			{
+				zbx_set_socket_strerror("message size exceeds the maximum size");
 				zabbix_log(LOG_LEVEL_WARNING, "Message size " ZBX_FS_UI64 " from %s exceeds the "
 						"maximum size " ZBX_FS_UI64 " bytes. Message ignored.", expected_len,
 						s->peer, max_len);
@@ -1854,6 +1859,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
 			/* compressed protocol stores uncompressed packet size in the reserved data */
 			if (max_len < reserved)
 			{
+				zbx_set_socket_strerror("uncompressed message size exceeds the maximum size");
 				zabbix_log(LOG_LEVEL_WARNING, "Uncompressed message size " ZBX_FS_UI64 " from %s"
 						" exceeds the maximum size " ZBX_FS_UI64 " bytes. Message ignored.",
 						reserved, s->peer, max_len);
@@ -1927,6 +1933,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
 		}
 		else
 		{
+			zbx_set_socket_strerror("message length does not match expected length");
 			if (buf_stat_bytes + buf_dyn_bytes < expected_len)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "Message from %s is shorter than expected " ZBX_FS_UI64
@@ -1943,23 +1950,27 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
 	}
 	else if (ZBX_TCP_EXPECT_LENGTH == expect)
 	{
+		zbx_set_socket_strerror("message is missing data length");
 		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is missing data length. Message ignored.", s->peer);
 		nbytes = ZBX_PROTO_ERROR;
 	}
 	else if (ZBX_TCP_EXPECT_VERSION == expect)
 	{
+		zbx_set_socket_strerror("message is missing protocol version");
 		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is missing protocol version. Message ignored.",
 				s->peer);
 		nbytes = ZBX_PROTO_ERROR;
 	}
 	else if (ZBX_TCP_EXPECT_VERSION_VALIDATE == expect)
 	{
+		zbx_set_socket_strerror("message is using unsupported protocol version");
 		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is using unsupported protocol version \"%d\"."
 				" Message ignored.", s->peer, protocol_version);
 		nbytes = ZBX_PROTO_ERROR;
 	}
 	else if (0 != buf_stat_bytes)
 	{
+		zbx_set_socket_strerror("message is missing header");
 		zabbix_log(LOG_LEVEL_WARNING, "Message from %s is missing header. Message ignored.", s->peer);
 		nbytes = ZBX_PROTO_ERROR;
 	}

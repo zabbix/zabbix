@@ -10,7 +10,7 @@
 **
 ** This program is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
-** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
@@ -32,6 +32,15 @@ class testInheritanceGraph extends CLegacyWebTest {
 
 	private $hostid = 15001;		// 'Template inheritance test host'
 	private $host = 'Template inheritance test host';
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
 
 	// return list of graphs from a template
 	public static function update() {
@@ -112,7 +121,8 @@ class testInheritanceGraph extends CLegacyWebTest {
 			$this->zbxTestTextPresent($this->template.': '.$item['itemName']);
 		}
 
-		$this->zbxTestDoubleClickBeforeMessage('add', 'action_buttons');
+		$this->query('xpath://div[contains(@class, tfoot-buttons)]/button[@id="add"]')->waitUntilClickable()->one()->click();
+		$this->assertMessage($data['expected']);
 
 		switch ($data['expected']) {
 			case TEST_GOOD:

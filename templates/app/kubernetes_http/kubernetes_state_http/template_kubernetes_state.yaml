@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-01-22T16:20:36Z'
+  date: '2024-09-24T07:23:12Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -407,35 +407,50 @@ zabbix_export:
             
             	},
             
-            	parseFilters: function (filter) {
-            		var pairs = {};
+            	parseFilters: function (csv) {
+            		if (!csv)
+            			return [];
             
-            		filter.split(/\s*,\s*/).forEach(function (kv) {
-            			if (/!?([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/)?([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]\s*:\s*.+/.test(kv)) {
-            				var pair = kv.split(/\s*:\s*/);
-            				pairs[pair[0]] = pair[1];
+            		var filters = [];
+            		const filterCapture = /([!\w\-\.\/]+)\s*:\s*(.*)/;
+            		const onComma = /\s*,\s*/;
+            
+            		csv.split(onComma).forEach(function (kv) {
+            			var match = kv.match(filterCapture);
+            			if (!match) {
+            				Zabbix.log(3, 'Cannot parse filter from: "' + kv + '"');
+            				return;
             			}
+            
+            			filters.push({ key: match[1], expression: match[2] });
             		});
-            		return pairs;
+            
+            		return filters;
             	},
             
             	filter: function (name, data, filters) {
-            		var filtered = true;
-            		if (typeof data === 'object') {
-            			Object.keys(filters).some(function (filter) {
-            				var exclude = filter.match(/^!(.+)/);
-            				if (filter in data || (exclude && exclude[1] in data)) {
-            					if ((exclude && new RegExp(filters[filter]).test(data[exclude[1]]))
-            						|| (!exclude && !(new RegExp(filters[filter]).test(data[filter])))) {
-            						Zabbix.log(4, '[ Kubernetes ] Discarded "' + name + '" by filter "' + filter + ': ' + filters[filter] + '"');
-            
-            						filtered = false;
-            						return true;
-            					}
-            				};
-            			});
+            		if (typeof data !== 'object') {
+            			return true;
             		}
-            		return filtered;
+            
+            		return filters.every(function (filter) {
+            			const filter_key = filter.key.startsWith('!') ? filter.key.substring(1) : filter.key;
+            
+            			if (!(filter_key in data)) {
+            				return true;
+            			}
+            
+            			const isExcludingFilter = filter.key.startsWith('!');
+            			const isMatchForFilter = new RegExp(filter.expression).test(data[filter_key]);
+            
+            			if ((isExcludingFilter && isMatchForFilter) ||
+            				(!isExcludingFilter && !isMatchForFilter)) {
+            				Zabbix.log(4, '[ Kubernetes ] Discarded "' + name + '" by filter "' + filter.key + ': ' + filter.expression + '"');
+            				return false;
+            			}
+            
+            			return true;
+            		});
             	},
             
             	getField: function (data, path) {
@@ -834,7 +849,9 @@ zabbix_export:
                   value: healthy
               trigger_prototypes:
                 - uuid: 58828a692aa2418ba98c6d66a23f1506
-                  expression: 'count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],#3,,"True")<2 and length(last(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}]))>0'
+                  expression: 'count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],#2,"ne","True")=2 and length(last(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}]))>0'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],#3,"eq","True")=3'
                   name: 'Kubernetes: Component [{#NAME}] is unhealthy'
                   priority: WARNING
                   tags:
@@ -1807,7 +1824,9 @@ zabbix_export:
                   value: '{#NAME}'
               trigger_prototypes:
                 - uuid: 9fcb23d29ac3481a8613515cc2cccfcf
-                  expression: 'count(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}]))>0'
+                  expression: 'count(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}],#2,"ne","ok")=2 and length(last(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}]))>0'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'count(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}],#3,"eq","ok")=3'
                   name: 'Kubernetes: Livez [{#NAME}] is unhealthy'
                   priority: WARNING
                   tags:
@@ -3128,7 +3147,9 @@ zabbix_export:
                   value: '{#NAME}'
               trigger_prototypes:
                 - uuid: 1a88c2cf94d3444c9e5320776b323ce6
-                  expression: 'count(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}]))>0'
+                  expression: 'count(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}],#2,"ne","ok")=2 and length(last(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}]))>0'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'count(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}],#3,"eq","ok")=3'
                   name: 'Kubernetes: Readyz [{#NAME}] is unhealthy'
                   priority: WARNING
                   tags:

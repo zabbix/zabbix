@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('administration.user.edit.common.js.php');
@@ -106,7 +107,8 @@ if ($data['change_password']) {
 
 	$password1 = (new CPassBox('password1', $data['password1']))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setAriaRequired();
+		->setAriaRequired()
+		->setAttribute('autocomplete', 'off');
 
 	if ($data['action'] !== 'user.edit') {
 		$password1->setAttribute('autofocus', 'autofocus');
@@ -166,6 +168,7 @@ if ($data['change_password']) {
 			(new CPassBox('password2', $data['password2']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
+				->setAttribute('autocomplete', 'off')
 		)
 		->addRow('', _('Password is not mandatory for non internal authentication type.'));
 }
@@ -265,13 +268,14 @@ if ($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== Z
 			->setId('autologout_visible')
 			->setChecked($data['autologout'] !== '0'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CTextBox('autologout', $autologout))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+		(new CTextBox('autologout', $autologout, false, DB::getFieldLength('users', 'autologout')))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	]);
 }
 
 $user_form_list
 	->addRow((new CLabel(_('Refresh'), 'refresh'))->setAsteriskMark(),
-		(new CTextBox('refresh', $data['refresh']))
+		(new CTextBox('refresh', $data['refresh'], false, DB::getFieldLength('users', 'refresh')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 	)
@@ -316,11 +320,18 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 			'dstfrm' => $user_form->getName(),
 			'media' => $index,
 			'mediatypeid' => $media['mediatypeid'],
-			($media['mediatype'] == MEDIA_TYPE_EMAIL) ? 'sendto_emails' : 'sendto' => $media['sendto'],
 			'period' => $media['period'],
 			'severity' => $media['severity'],
 			'active' => $media['active']
 		];
+
+		if ($media['mediatype'] === MEDIA_TYPE_EMAIL) {
+			$parameters['sendto_emails'] = $media['sendto'];
+		}
+		else {
+			$parameters['sendto'] = $media['sendto'];
+		}
+
 		$media_severity = [];
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
@@ -336,7 +347,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				);
 		}
 
-		if ($media['mediatype'] == MEDIA_TYPE_EMAIL) {
+		if (is_array($media['sendto'])) {
 			$media['sendto'] = implode(', ', $media['sendto']);
 		}
 
@@ -346,7 +357,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 
 		$media_table_info->addRow(
 			(new CRow([
-				$media['name'],
+				$media['name'] ?? (new CSpan(_('Unknown')))->addClass(ZBX_STYLE_DISABLED),
 				$media['sendto'],
 				(new CDiv($media['period']))
 					->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
@@ -400,7 +411,7 @@ if ($data['action'] === 'user.edit') {
 		'object_name' => 'roles',
 		'data' => $data['role'],
 		'multiple' => false,
-		'disabled' => $data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0,
+		'readonly' => $data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0,
 		'popup' => [
 			'parameters' => [
 				'srctbl' => 'roles',

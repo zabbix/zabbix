@@ -51,11 +51,11 @@ static int	check_procstate(struct pst_status pst, int zbx_proc_stat)
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define ZBX_BURST	((size_t)10)
-
-	char			*procname, *proccomm, *param;
+	char			*procname, *proccomm, *param, *rxp_error = NULL;
 	struct passwd		*usrinfo;
 	int			proccount = 0, invalid_user = 0, zbx_proc_stat, count, idx = 0;
 	struct pst_status	pst[ZBX_BURST];
+	zbx_regexp_t		*proccomm_rxp = NULL;
 
 	if (4 < request->nparam)
 	{
@@ -103,8 +103,22 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	proccomm = get_rparam(request, 3);
-	if (NULL != proccomm && '\0' == *proccomm)
-		proccomm = NULL;
+
+	if (NULL != proccomm)
+	{
+		if ('\0' == *proccomm)
+		{
+			proccomm = NULL;
+		}
+		else if (SUCCEED != zbx_regexp_compile(proccomm, &proccomm_rxp, &rxp_error))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in fourth parameter: "
+					"%s", rxp_error));
+
+			zbx_free(rxp_error);
+			return SYSINFO_RET_FAIL;
+		}
+	}
 
 	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
 		goto out;
@@ -134,7 +148,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				if (-1 == pstat(PSTAT_GETCOMMANDLINE, un, sizeof(cmdline), 1, pst[i].pst_pid))
 					continue;
 
-				if (NULL == zbx_regexp_match(cmdline, proccomm, NULL))
+				if (0 != zbx_regexp_match_precompiled(cmdline, proccomm_rxp))
 					continue;
 			}
 
@@ -151,10 +165,17 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (-1 == count)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain process information."));
+
+		if (NULL != proccomm_rxp)
+			zbx_regexp_free(proccomm_rxp);
+
 		return SYSINFO_RET_FAIL;
 	}
 out:
 	SET_UI64_RESULT(result, proccount);
+
+	if (NULL != proccomm_rxp)
+		zbx_regexp_free(proccomm_rxp);
 
 	return SYSINFO_RET_OK;
 }

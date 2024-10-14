@@ -138,9 +138,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 		// Create events and problems.
 		self::$time = time();
-		foreach (CDataHelper::getIds('description') as $name => $id) {
-			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE, ['clock' => self::$time]);
-		}
+		CDBHelper::setTriggerProblem(array_keys(CDataHelper::getIds('description')), TRIGGER_VALUE_TRUE, ['clock' => self::$time]);
 
 		// Manual close is true for the problem: Trigger for widget 1 char.
 		DBexecute('UPDATE triggers SET value=1, manual_close=1 WHERE description='.
@@ -676,9 +674,9 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						if ($icon['selector'] !== 'green link-alt') {
 							// Click on icon and open hint.
 							$button->click();
-							$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()
-									->waitUntilVisible()->one();
-							$hint_table = $hint->query('class:list-table')->asTable()->one();
+							$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
+									->waitUntilReady()->one();
+							$hint_table = $hint->query('class:list-table')->asTable()->waitUntilVisible()->one();
 
 							// Check rows in hint's table.
 							foreach ($hint_table->getRows() as $i => $row) {
@@ -731,7 +729,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			foreach ($data['check_tag_ellipsis'] as $problem => $ellipsis_text) {
 				$table->findRow('Problem • Severity', $problem)->getColumn('Tags')->query('class:icon-wizard-action')
 						->waitUntilClickable()->one()->click();
-				$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilVisible()->one();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilVisible()->one();
 				$this->assertEquals($ellipsis_text, $hint->getText());
 				$hint->close();
 			}
@@ -741,7 +739,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		if (CTestArrayHelper::get($data, 'check_suppressed_icon')) {
 			$table->findRow('Problem • Severity', $data['check_suppressed_icon']['problem'])->getColumn('Info')
 					->query('class:icon-invisible')->waitUntilClickable()->one()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilVisible()->one();
+			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilVisible()->one();
 			$this->assertEquals($data['check_suppressed_icon']['text'], $hint->getText());
 			$hint->close();
 		}

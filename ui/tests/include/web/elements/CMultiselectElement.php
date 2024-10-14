@@ -82,9 +82,16 @@ class CMultiselectElement extends CElement {
 	 * @return $this
 	 */
 	public function clear() {
+		$id = $this->getID();
 		$query = $this->query('xpath:.//span[@class="subfilter-disable-btn"]');
-		$query->all()->click();
+		$elements = $query->all();
+		$elements->click();
 		$query->waitUntilNotPresent();
+
+		// TODO: reload should be removed after fix DEV-1535
+		if ($elements->count() > 0 && $this->parents('class:overlay-dialogue-controls')->exists() && $id === $this->getID()) {
+			$this->waitUntilReloaded();
+		}
 
 		return $this;
 	}
@@ -214,10 +221,11 @@ class CMultiselectElement extends CElement {
 		/* TODO: extend the function for composite elements with two buttons,
 		 * Example of such multiselect: [ Input field ] ( Select item ) ( Select prototype )
 		 */
+		$index = COverlayDialogElement::find()->count();
 		$this->getControls()->first()->click();
 
-		return COverlayDialogElement::find()->waitUntilPresent()
-				->all()->last()->waitUntilReady()->setDataContext($context, $this->mode);
+		return COverlayDialogElement::find($index)->waitUntilPresent()->one()
+				->waitUntilReady()->setDataContext($context, $this->mode);
 	}
 
 	/**
@@ -355,12 +363,20 @@ class CMultiselectElement extends CElement {
 	 */
 	public function isEnabled($enabled = true) {
 		$input = $this->query('xpath:.//input[not(@type="hidden")]|textarea')->one(false);
-		if (!$input->isEnabled($enabled)) {
-			return false;
+		if ($this->query('class:search-disabled')->one(false)->isValid()) {
+			if (($input->isValid() && $input->getAttribute('disabled') === null) !== $enabled) {
+				return false;
+			}
+		}
+		else {
+			if (!$input->isEnabled($enabled)) {
+				return false;
+			}
 		}
 
 		$multiselect = $this->query('class:multiselect')->one(false);
-		if ($multiselect->isValid() && ($multiselect->getAttribute('aria-disabled') === 'true') === $enabled) {
+		if ($multiselect->isValid() && ($multiselect->getAttribute('aria-disabled') === 'true'
+				|| $multiselect->getAttribute('aria-readonly') === 'true') === $enabled) {
 			return false;
 		}
 

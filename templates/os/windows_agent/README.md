@@ -44,14 +44,13 @@ Install Zabbix agent on Windows OS according to Zabbix documentation.
 |{$VFS.FS.FSDRIVETYPE.NOT_MATCHES}|<p>This macro is used in filesystems discovery. Can be overridden on the host or linked template level.</p>|`^\s$`|
 |{$VFS.FS.PUSED.MAX.CRIT}|<p>The critical threshold of the filesystem utilization in percent.</p>|`90`|
 |{$VFS.FS.PUSED.MAX.WARN}|<p>The warning threshold of the filesystem utilization in percent.</p>|`80`|
-|{$VFS.FS.FREE.MIN.CRIT}|<p>The critical threshold of the filesystem utilization.</p>|`5G`|
-|{$VFS.FS.FREE.MIN.WARN}|<p>The warning threshold of the filesystem utilization.</p>|`10G`|
 |{$VFS.DEV.DEVNAME.MATCHES}|<p>This macro is used in physical disks discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$VFS.DEV.DEVNAME.NOT_MATCHES}|<p>This macro is used in physical disks discovery. Can be overridden on the host or linked template level.</p>|`_Total`|
 |{$VFS.DEV.UTIL.MAX.WARN}|<p>The warning threshold of disk time utilization in percent.</p>|`95`|
 |{$VFS.DEV.READ.AWAIT.WARN}|<p>Disk read average response time (in s) before the trigger would fire.</p>|`0.02`|
 |{$VFS.DEV.WRITE.AWAIT.WARN}|<p>Disk write average response time (in s) before the trigger would fire.</p>|`0.02`|
-|{$SYSTEM.FUZZYTIME.MAX}|<p>The threshold for difference of system time in seconds.</p>|`60`|
+|{$SYSTEM.FUZZYTIME.MAX}|<p>The upper threshold for difference of system time.</p>|`60s`|
+|{$SYSTEM.FUZZYTIME.MIN}|<p>The lower threshold for difference of system time. Used in recovery expression to avoid trigger flapping.</p>|`10s`|
 |{$IFCONTROL}||`1`|
 |{$NET.IF.IFNAME.MATCHES}|<p>This macro is used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$NET.IF.IFNAME.NOT_MATCHES}|<p>This macro is used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`Macro too long. Please see the template.`|
@@ -138,8 +137,8 @@ Install Zabbix agent on Windows OS according to Zabbix documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#FSLABEL}({#FSNAME}): Disk space is critically low|<p>Two conditions should match:<br>1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}`.<br>2. The second condition should be one of the following:<br>- the disk free space is less than `{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}`;<br>- the disk will be full in less than 24 hours.</p>|`last(/Windows by Zabbix agent/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and ((last(/Windows by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Windows by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Windows by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)`|Average|**Manual close**: Yes|
-|{#FSLABEL}({#FSNAME}): Disk space is low|<p>Two conditions should match:<br>1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}`.<br>2. The second condition should be one of the following:<br>- the disk free space is less than `{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}`;<br>- the disk will be full in less than 24 hours.</p>|`last(/Windows by Zabbix agent/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and ((last(/Windows by Zabbix agent/vfs.fs.size[{#FSNAME},total])-last(/Windows by Zabbix agent/vfs.fs.size[{#FSNAME},used]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Windows by Zabbix agent/vfs.fs.size[{#FSNAME},pused],1h,100)<1d)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>{#FSLABEL}({#FSNAME}): Disk space is critically low</li></ul>|
+|{#FSLABEL}({#FSNAME}): Disk space is critically low|<p>The volume's space usage exceeds the `{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}` limit.</p>|`last(/Windows by Zabbix agent/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}`|Average|**Manual close**: Yes|
+|{#FSLABEL}({#FSNAME}): Disk space is low|<p>The volume's space usage exceeds the `{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}` limit.</p>|`last(/Windows by Zabbix agent/vfs.fs.size[{#FSNAME},pused])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>{#FSLABEL}({#FSNAME}): Disk space is critically low</li></ul>|
 
 ### LLD rule Physical disks discovery
 

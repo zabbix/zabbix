@@ -25,7 +25,7 @@ import (
 	"net"
 	"syscall"
 
-	"zabbix.com/pkg/tls"
+	"golang.zabbix.com/agent2/pkg/tls"
 )
 
 func Listen(address string, args ...interface{}) (c *Listener, err error) {

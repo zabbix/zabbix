@@ -23,7 +23,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 const (

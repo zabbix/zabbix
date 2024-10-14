@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 
@@ -51,6 +51,7 @@ $this->addJsFile('class.widget.problems.js');
 $this->addJsFile('class.widget.problemsbysv.js');
 $this->addJsFile('class.widget.svggraph.js');
 $this->addJsFile('class.widget.trigerover.js');
+$this->addJsFile('class.widget.url.js');
 $this->addJsFile('class.csvggraph.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
@@ -58,7 +59,7 @@ $this->addJsFile('class.sortable.js');
 
 $this->includeJsFile('monitoring.dashboard.print.js.php');
 
-$this->addCssFile('assets/styles/vendors/Leaflet/Leaflet/leaflet.css');
+$this->addCssFile('assets/styles/vendors/Leaflet/leaflet.css');
 
 $this->enableLayoutModes();
 $this->setLayoutMode(ZBX_LAYOUT_KIOSKMODE);

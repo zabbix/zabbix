@@ -173,11 +173,11 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 		const char *output, const char *error)
 {
 	int		ret = SUCCEED;
-	char		auditid_cuid[CUID_LEN], execute_on_s[MAX_ID_LEN + 1], hostid_s[MAX_ID_LEN + 1],
-			eventid_s[MAX_ID_LEN + 1], proxy_hostid_s[MAX_ID_LEN + 1];
-	char		*details_esc;
+	char		auditid_cuid[CUID_LEN], hostid_s[MAX_ID_LEN + 1], eventid_s[MAX_ID_LEN + 1],
+			proxy_hostid_s[MAX_ID_LEN + 1];
 	struct zbx_json	details_json;
 	zbx_config_t	cfg;
+	zbx_db_insert_t	db_insert;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
@@ -190,9 +190,14 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 
 	zbx_json_init(&details_json, ZBX_JSON_STAT_BUF_LEN);
 
-	zbx_snprintf(execute_on_s, sizeof(execute_on_s), "%hhu", script_execute_on);
+	if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script_type)
+	{
+		char	execute_on_s[MAX_ID_LEN + 1];
 
-	append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.execute_on", execute_on_s);
+		zbx_snprintf(execute_on_s, sizeof(execute_on_s), "%hhu", script_execute_on);
+
+		append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.execute_on", execute_on_s);
+	}
 
 	if (0 != eventid)
 	{
@@ -218,19 +223,15 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 	if (NULL != error)
 		append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.error", error);
 
-	details_esc = DBdyn_escape_string(details_json.buffer);
+	zbx_db_insert_prepare(&db_insert, "auditlog", "auditid", "userid", "username", "clock", "action", "ip",
+			"resourceid", "resourcename", "resourcetype", "recordsetid", "details", NULL);
 
-	if (ZBX_DB_OK > DBexecute("insert into auditlog (auditid,userid,username,clock,action,ip,resourceid,"
-			"resourcename,resourcetype,recordsetid,details) values ('%s'," ZBX_FS_UI64 ",'%s',%d,'%d','%s',"
-			ZBX_FS_UI64 ",'%s',%d,'%s','%s')", auditid_cuid, userid, username, (int)time(NULL),
-			AUDIT_ACTION_EXECUTE, clientip, hostid, hostname, AUDIT_RESOURCE_SCRIPT, auditid_cuid,
-			details_esc))
-	{
-		ret = FAIL;
-	}
+	zbx_db_insert_add_values(&db_insert, auditid_cuid, userid, username, (int)time(NULL), AUDIT_ACTION_EXECUTE,
+			clientip, hostid, hostname, AUDIT_RESOURCE_SCRIPT, auditid_cuid, details_json.buffer);
 
-	zbx_free(details_esc);
+	ret = zbx_db_insert_execute(&db_insert);
 
+	zbx_db_insert_clean(&db_insert);
 	zbx_json_free(&details_json);
 out:
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s():%s", __func__, zbx_result_string(ret));
@@ -340,7 +341,7 @@ int	zbx_audit_flush_once(void)
 
 	while (NULL != (audit_entry = (zbx_audit_entry_t **)zbx_hashset_iter_next(&iter)))
 	{
-		char	id[ZBX_MAX_UINT64_LEN + 1], *pvalue, *name_esc, *details_esc;
+		char		id[ZBX_MAX_UINT64_LEN + 1], *pvalue, *name_esc, *details_esc;
 		const char	*pfield;
 
 		if (AUDIT_ACTION_DELETE != (*audit_entry)->audit_action &&

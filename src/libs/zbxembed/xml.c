@@ -8,7 +8,7 @@
 ** (at your option) any later version.
 **
 ** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the envied warranty of
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
@@ -63,7 +63,7 @@ static duk_ret_t	es_xml_query(duk_context *ctx)
 		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, err);
 		goto out;
 	}
-	duk_push_string(ctx, value.data.str);
+	es_push_result_string(ctx, value.data.str, strlen(value.data.str));
 out:
 	zbx_variant_clear(&value);
 	zbx_free(err);
@@ -95,7 +95,7 @@ static duk_ret_t	es_xml_from_json(duk_context *ctx)
 		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, error);
 		goto out;
 	}
-	duk_push_string(ctx, str);
+	es_push_result_string(ctx, str, strlen(str));
 out:
 	zbx_free(str);
 	zbx_free(error);
@@ -127,7 +127,7 @@ static duk_ret_t	es_xml_to_json(duk_context *ctx)
 		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, error);
 		goto out;
 	}
-	duk_push_string(ctx, str);
+	es_push_result_string(ctx, str, strlen(str));
 out:
 	zbx_free(str);
 	zbx_free(error);

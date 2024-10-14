@@ -27,10 +27,22 @@ class CEncryptedCookieSession extends CCookieSession {
 	/**
 	 * @inheritDoc
 	 *
+	 * @param string $id
+	 *
+	 * @return string
+	 */
+	#[\ReturnTypeWillChange]
+	public function read($id) {
+		return $this->checkSign($this->parseData()) ? parent::read($id) : '';
+	}
+
+	/**
+	 * @inheritDoc
+	 *
 	 * @return string|null
 	 */
 	public function extractSessionId(): ?string {
-		if (CSettingsHelper::getGlobal(CSettingsHelper::SESSION_KEY) === '') {
+		if (CSettingsHelper::getPrivate(CSettingsHelper::SESSION_KEY) === '') {
 			CEncryptHelper::updateKey(CEncryptHelper::generateKey());
 		}
 

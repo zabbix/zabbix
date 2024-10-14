@@ -707,7 +707,7 @@ class CControllerPopupGeneric extends CController {
 				'object_name' => $src_name,
 				'data' => array_values($hosts),
 				'selectedLimit' => 1,
-				'disabled' => $this->hasInput('only_hostid'),
+				'readonly' => $this->hasInput('only_hostid'),
 				'popup' => [
 					'parameters' => [
 						'srctbl' => $src_name,
@@ -902,13 +902,6 @@ class CControllerPopupGeneric extends CController {
 						'id' => $row['name']
 					];
 					unset($records[$hostid]);
-				}
-				break;
-
-			case 'items':
-				foreach ($records as $itemid => $row) {
-					$records[$row['name']] = ['pattern' => $row['name']] + $row;
-					unset($records[$itemid]);
 				}
 				break;
 

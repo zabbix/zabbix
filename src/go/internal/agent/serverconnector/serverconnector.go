@@ -29,16 +29,16 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"git.zabbix.com/ap/plugin-support/log"
-	"git.zabbix.com/ap/plugin-support/plugin"
-	"zabbix.com/internal/agent"
-	"zabbix.com/internal/agent/resultcache"
-	"zabbix.com/internal/agent/scheduler"
-	"zabbix.com/internal/monitor"
-	"zabbix.com/pkg/glexpr"
-	"zabbix.com/pkg/tls"
-	"zabbix.com/pkg/version"
-	"zabbix.com/pkg/zbxcomms"
+	"golang.zabbix.com/agent2/internal/agent"
+	"golang.zabbix.com/agent2/internal/agent/resultcache"
+	"golang.zabbix.com/agent2/internal/agent/scheduler"
+	"golang.zabbix.com/agent2/internal/monitor"
+	"golang.zabbix.com/agent2/pkg/glexpr"
+	"golang.zabbix.com/agent2/pkg/tls"
+	"golang.zabbix.com/agent2/pkg/version"
+	"golang.zabbix.com/agent2/pkg/zbxcomms"
+	"golang.zabbix.com/sdk/log"
+	"golang.zabbix.com/sdk/plugin"
 )
 
 const hostMetadataLen = 255
@@ -187,6 +187,7 @@ func (c *Connector) refreshActiveChecks() {
 				c.hostname)
 			c.lastErrors = errs
 		}
+
 		return
 	}
 
@@ -196,6 +197,13 @@ func (c *Connector) refreshActiveChecks() {
 	}
 
 	var response activeChecksResponse
+	parseSuccess := false
+
+	defer func() {
+		if !parseSuccess {
+			zbxcomms.Failover(&c.addresses)
+		}
+	}()
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
@@ -296,6 +304,8 @@ func (c *Connector) refreshActiveChecks() {
 			return
 		}
 	}
+
+	parseSuccess = true
 
 	c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), c.firstActiveChecksRefreshed,
 		response.Expressions, response.Data)

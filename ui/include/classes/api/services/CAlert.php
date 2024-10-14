@@ -15,7 +15,7 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 
@@ -474,7 +474,18 @@ class CAlert extends CApiService {
 
 		// adding media types
 		if ($options['selectMediatypes'] !== null && $options['selectMediatypes'] !== API_OUTPUT_COUNT) {
+			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+				if ($options['selectMediatypes'] === API_OUTPUT_EXTEND) {
+					$options['selectMediatypes'] = CMediatype::LIMITED_OUTPUT_FIELDS;
+				}
+				elseif (is_array($options['selectMediatypes'])) {
+					$options['selectMediatypes'] =
+						array_intersect($options['selectMediatypes'], CMediatype::LIMITED_OUTPUT_FIELDS);
+				}
+			}
+
 			$relationMap = $this->createRelationMap($result, 'alertid', 'mediatypeid');
+
 			$mediatypes = API::getApiService()->select('media_type', [
 				'output' => $options['selectMediatypes'],
 				'filter' => ['mediatypeid' => $relationMap->getRelatedIds()],

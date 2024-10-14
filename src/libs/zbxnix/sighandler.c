@@ -29,6 +29,7 @@
 int			sig_parent_pid = -1;
 volatile sig_atomic_t	sig_exiting;
 static volatile sig_atomic_t	sig_exit_on_terminate = 1;
+static void 			*zbx_on_exit_args = NULL;
 
 static void	log_fatal_signal(int sig, siginfo_t *siginfo, void *context)
 {
@@ -129,7 +130,7 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			zbx_tls_free_on_signal();
 #endif
 			if (0 != sig_exit_on_terminate)
-				zbx_on_exit(SUCCEED);
+				zbx_on_exit(SUCCEED, zbx_on_exit_args);
 		}
 	}
 }
@@ -283,4 +284,9 @@ void	zbx_unblock_signals(const sigset_t *orig_mask)
 {
 	if (0 > sigprocmask(SIG_SETMASK, orig_mask, NULL))
 		zabbix_log(LOG_LEVEL_WARNING,"cannot restore sigprocmask");
+}
+
+void	zbx_set_on_exit_args(void *args)
+{
+	zbx_on_exit_args = args;
 }

@@ -775,6 +775,7 @@ class testPageReportsTriggerTop extends CWebTest {
 	 */
 	public function testPageReportsTriggerTop_Filter($data) {
 		$this->page->login()->open(self::LINK)->waitUntilReady();
+		$table = $this->getTable();
 
 		$filter = CFilterElement::find()->one();
 		if ($filter->getSelectedTabName() !== 'Filter' && !array_key_exists('date', $data)) {
@@ -810,6 +811,7 @@ class testPageReportsTriggerTop extends CWebTest {
 		}
 
 		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 
 		if (array_key_exists('background_colors', $data)) {
 			foreach ($data['background_colors'] as $trigger => $color) {

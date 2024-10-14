@@ -21,11 +21,23 @@
 
 #include "preproc.h"
 #include "../preprocessor/preproc_history.h"
+#include "../preprocessor/item_preproc.h"
 #include "trapper_auth.h"
 
 #define ZBX_STATE_NOT_SUPPORTED	1
 
 extern int	CONFIG_DOUBLE_PRECISION;
+
+static void	json_add_string_with_limit(struct zbx_json *j, const char *tag, const char *value, zbx_json_type_t type)
+{
+	size_t	original_size = zbx_json_addstring_limit(j, tag, value, type, ZBX_JSON_TEST_DATA_MAX_SIZE);
+
+	if (ZBX_JSON_TEST_DATA_MAX_SIZE < original_size)
+	{
+		zbx_json_addstring(j, ZBX_PROTO_TAG_TRUNCATED, "true", ZBX_JSON_TYPE_TRUE);
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_ORIGINAL_SIZE, original_size);
+	}
+}
 
 /******************************************************************************
  *                                                                            *
@@ -38,10 +50,10 @@ extern int	CONFIG_DOUBLE_PRECISION;
  *             values_num   - [OUT] the number of values                      *
  *             value_type   - [OUT] the value type                            *
  *             steps        - [OUT] the preprocessing steps                   *
- *             single     - [OUT] is preproc step single                      *
+ *             single       - [OUT] is preproc step single                    *
  *             state        - [OUT] the item state                            *
- *             bypass_first - [OUT] the flag to bypass first step             *
- *             error      - [OUT] the error message                           *
+ *             not_supp     - [OUT] not supported preprocessor operation      *
+ *             error        - [OUT] the error message                         *
  *                                                                            *
  * Return value: SUCCEED - the request was parsed successfully                *
  *               FAIL    - otherwise                                          *
@@ -49,7 +61,7 @@ extern int	CONFIG_DOUBLE_PRECISION;
  ******************************************************************************/
 static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **values, zbx_timespec_t *ts,
 		int *values_num, unsigned char *value_type, zbx_vector_ptr_t *steps, int *single, int *state,
-		int *bypass_first, char **error)
+		zbx_preproc_op_t **not_supp, char **error)
 {
 	char			buffer[MAX_STRING_LEN], *step_params = NULL, *error_handler_params = NULL;
 	const char		*ptr;
@@ -143,8 +155,6 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **va
 		goto out;
 	}
 
-	*bypass_first = 0;
-
 	for (ptr = NULL; NULL != (ptr = zbx_json_next(&jp_steps, ptr));)
 	{
 		zbx_preproc_op_t	*step;
@@ -185,21 +195,16 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **va
 			goto out;
 		}
 
-		if (ZBX_PREPROC_VALIDATE_NOT_SUPPORTED != step_type || ZBX_STATE_NOT_SUPPORTED == *state)
-		{
-			step = (zbx_preproc_op_t *)zbx_malloc(NULL, sizeof(zbx_preproc_op_t));
-			step->type = step_type;
-			step->params = step_params;
-			step->error_handler = error_handler;
-			step->error_handler_params = error_handler_params;
+		step = (zbx_preproc_op_t *)zbx_malloc(NULL, sizeof(zbx_preproc_op_t));
+		step->type = step_type;
+		step->params = step_params;
+		step->error_handler = error_handler;
+		step->error_handler_params = error_handler_params;
+
+		if (ZBX_PREPROC_VALIDATE_NOT_SUPPORTED != step_type)
 			zbx_vector_ptr_append(steps, step);
-		}
 		else
-		{
-			zbx_free(step_params);
-			zbx_free(error_handler_params);
-			*bypass_first = 1;
-		}
+			*not_supp = step;
 
 		step_params = NULL;
 		error_handler_params = NULL;
@@ -242,27 +247,24 @@ out:
 static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *json, char **error)
 {
 	char			*values[2] = {NULL, NULL}, *preproc_error = NULL;
-	int			i, single, state, bypass_first, ret = FAIL, values_num = 0;
-	unsigned char		value_type, first_step_type;
+	int			i, single, state, ret = FAIL, values_num = 0;
+	unsigned char		value_type;
 	zbx_vector_ptr_t	steps, results, history;
 	zbx_timespec_t		ts[2];
 	zbx_preproc_result_t	*result;
+	zbx_preproc_op_t	*not_supported_step = NULL;
 
 	zbx_vector_ptr_create(&steps);
 	zbx_vector_ptr_create(&results);
 	zbx_vector_ptr_create(&history);
 
 	if (FAIL == trapper_parse_preproc_test(jp, values, ts, &values_num, &value_type, &steps, &single, &state,
-			&bypass_first, error))
+			&not_supported_step, error))
 	{
 		goto out;
 	}
 
-	first_step_type = 0;
-	if (0 != steps.values_num)
-		first_step_type  = ((zbx_preproc_op_t *)steps.values[0])->type;
-
-	if (ZBX_PREPROC_VALIDATE_NOT_SUPPORTED != first_step_type && ZBX_STATE_NOT_SUPPORTED == state)
+	if (NULL == not_supported_step && ZBX_STATE_NOT_SUPPORTED == state)
 	{
 		preproc_error = zbx_strdup(NULL, "This item is not supported. Please, add a preprocessing step"
 				" \"Check for not supported value\" to process it.");
@@ -276,7 +278,7 @@ static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_
 	{
 		zbx_vector_ptr_clear_ext(&results, (zbx_clean_func_t)zbx_preproc_result_free);
 
-		if (0 == steps.values_num)
+		if (0 == steps.values_num && NULL == not_supported_step)
 		{
 			zbx_variant_t	value;
 
@@ -287,10 +289,52 @@ static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_
 			zbx_variant_copy(&result->value, &value);
 			zbx_vector_ptr_append(&results, result);
 		}
-		else if (FAIL == zbx_preprocessor_test(value_type, values[i], &ts[i], &steps, &results, &history,
-				&preproc_error, error))
+		else
 		{
-			goto out;
+			if (NULL != not_supported_step)
+			{
+				/* validate not supported is not handled by preprocessing */
+				/* since it does not process item state */
+				zbx_variant_t	value;
+
+				result = (zbx_preproc_result_t *)zbx_malloc(NULL, sizeof(zbx_preproc_result_t));
+				result->error = NULL;
+				result->action = ZBX_PREPROC_FAIL_DEFAULT;
+
+				zbx_vector_ptr_append(&results, result);
+
+				zbx_variant_set_str(&value, zbx_strdup(NULL, values[i]));
+
+				if (ZBX_STATE_NOT_SUPPORTED == state)
+				{
+					result->action = not_supported_step->error_handler;
+
+					zbx_item_preproc_handle_error(&value, not_supported_step, &preproc_error);
+
+					if (NULL != preproc_error)
+					{
+						zbx_variant_clear(&value);
+						result->error = zbx_strdup(NULL, preproc_error);
+					}
+				}
+
+				zbx_variant_copy(&result->value, &value);
+				zbx_variant_clear(&value);
+
+				if (NULL != preproc_error || ZBX_PREPROC_FAIL_DISCARD_VALUE == result->action)
+				{
+					break;
+				}
+
+				zbx_free(values[i]);
+				values[i] = zbx_strdup(NULL, result->value.data.str);
+			}
+
+			if (FAIL == zbx_preprocessor_test(value_type, values[i], &ts[i], &steps, &results, &history,
+				&preproc_error, error))
+			{
+				goto out;
+			}
 		}
 
 		if (NULL != preproc_error)
@@ -315,14 +359,7 @@ static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_
 
 	zbx_json_addarray(json, ZBX_PROTO_TAG_STEPS);
 
-	if (1 == bypass_first)
-	{
-		zbx_json_addobject(json, NULL);
-		zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, ZBX_PROTO_TAG_VALUE, ZBX_JSON_TYPE_STRING);
-		zbx_json_close(json);
-	}
-
-	if (0 != steps.values_num)
+	if (0 != steps.values_num || NULL != not_supported_step)
 	{
 		for (i = 0; i < results.values_num; i++)
 		{
@@ -347,8 +384,8 @@ static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_
 
 			if (ZBX_VARIANT_NONE != result->value.type)
 			{
-				zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, zbx_variant_value_desc(&result->value),
-						ZBX_JSON_TYPE_STRING);
+				json_add_string_with_limit(json, ZBX_PROTO_TAG_RESULT,
+						zbx_variant_value_desc(&result->value), ZBX_JSON_TYPE_STRING);
 			}
 			else if (NULL == result->error || ZBX_PREPROC_FAIL_DISCARD_VALUE == result->action)
 				zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, NULL, ZBX_JSON_TYPE_NULL);
@@ -365,7 +402,7 @@ err:
 
 		if (ZBX_VARIANT_NONE != result->value.type)
 		{
-			zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, zbx_variant_value_desc(&result->value),
+			json_add_string_with_limit(json, ZBX_PROTO_TAG_RESULT, zbx_variant_value_desc(&result->value),
 					ZBX_JSON_TYPE_STRING);
 		}
 		else
@@ -380,6 +417,9 @@ out:
 		zbx_free(values[i]);
 
 	zbx_free(preproc_error);
+
+	if (NULL != not_supported_step)
+		zbx_preproc_op_free(not_supported_step);
 
 	zbx_vector_ptr_clear_ext(&history, (zbx_clean_func_t)zbx_preproc_op_history_free);
 	zbx_vector_ptr_destroy(&history);
