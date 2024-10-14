@@ -24,10 +24,10 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
  * @onAfter clearAutoregistrationData
  */
 class testEncryption extends CWebTest {
-	const UPDATE_SAME_HOST = 'Same host with PSK Encryption';
-	const UPDATE_SAME_PROXY = 'Same proxy with PSK Encryption';
-	const HOST_NAME = 'Host with PSK Encryption';
-	const PROXY_NAME = 'Proxy with PSK Encryption';
+	const UPDATE_SAME_HOST = 'A Same host with PSK Encryption';
+	const UPDATE_SAME_PROXY = 'A Same proxy with PSK Encryption';
+	const HOST_NAME = 'A Host with PSK Encryption';
+	const PROXY_NAME = 'A Proxy with PSK Encryption';
 
 	/**
 	 * Attach MessageBehavior to the test.
