@@ -126,18 +126,6 @@ class CMultiSelect extends CTag {
 
 			if (array_key_exists('parameters', $options['popup'])) {
 				$params['popup']['parameters'] = $options['popup']['parameters'];
-
-				$excludeids = array_key_exists('excludeids', $options['popup']['parameters'])
-					? $options['popup']['parameters']['excludeids']
-					: [];
-
-				$excludeids = array_merge($excludeids, array_key_exists('disableids', $options['popup']['parameters'])
-					? $options['popup']['parameters']['disableids']
-					: []);
-
-				if ($excludeids) {
-					$params['excludeids'] = $excludeids;
-				}
 			}
 		}
 
