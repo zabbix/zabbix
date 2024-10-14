@@ -87,6 +87,7 @@ require_once dirname(__FILE__).'/dashboardWidgets/testDashboardTopHostsWidget.ph
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardTopTriggersWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardTriggerOverviewWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardURLWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardWidgetCommunication.php';
 
 // Event correlation.
 require_once dirname(__FILE__).'/eventCorrelation/testFormEventCorrelation.php';
@@ -329,6 +330,7 @@ require_once dirname(__FILE__).'/webScenarios/testInheritanceWeb.php';
 require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWebDetails.php';
 
 require_once dirname(__FILE__).'/testDocumentationLinks.php';
+require_once dirname(__FILE__).'/testEncryption.php';
 require_once dirname(__FILE__).'/testExecuteNow.php';
 require_once dirname(__FILE__).'/testExpandExpressionMacros.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
@@ -425,6 +427,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardTopTriggersWidget');
 		$suite->addTestSuite('testDashboardTriggerOverviewWidget');
 		$suite->addTestSuite('testDashboardURLWidget');
+		$suite->addTestSuite('testDashboardWidgetCommunication');
 
 		// Event correlation.
 		$suite->addTestSuite('testFormEventCorrelation');
@@ -667,6 +670,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMonitoringWebDetails');
 
 		$suite->addTestSuite('testDocumentationLinks');
+		$suite->addTestSuite('testEncryption');
 		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testExpandExpressionMacros');
 		$suite->addTestSuite('testFormLogin');

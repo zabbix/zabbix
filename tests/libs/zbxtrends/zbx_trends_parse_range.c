@@ -23,26 +23,12 @@
 #include "zbxdbhigh.h"
 
 int	__wrap_zbx_db_is_null(const char *field);
-zbx_db_row_t	__wrap_zbx_db_fetch(zbx_db_result_t result);
-zbx_db_result_t	__wrap_zbx_db_select(const char *fmt, ...);
 void	__wrap_zbx_recalc_time_period(time_t *tm_start, int table_group);
 
 int	__wrap_zbx_db_is_null(const char *field)
 {
 	ZBX_UNUSED(field);
 	return SUCCEED;
-}
-
-zbx_db_row_t	__wrap_zbx_db_fetch(zbx_db_result_t result)
-{
-	ZBX_UNUSED(result);
-	return NULL;
-}
-
-zbx_db_result_t	__wrap_zbx_db_select(const char *fmt, ...)
-{
-	ZBX_UNUSED(fmt);
-	return NULL;
 }
 
 void	__wrap_zbx_recalc_time_period(time_t *tm_start, int table_group)

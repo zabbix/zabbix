@@ -17,7 +17,6 @@
 
 #include "zbxalgo.h"
 #include "zbxdb.h"
-#include "zbxdbhigh.h"
 #include "zbxstr.h"
 #include "zbxipcservice.h"
 #include "zbxjson.h"

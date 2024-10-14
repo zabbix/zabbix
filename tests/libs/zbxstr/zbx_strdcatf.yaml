@@ -1,0 +1,25 @@
+---
+test case: "1. One argument"
+in:
+  arg_str: "Test"
+  arg_int: "15"  # not used in this test.
+  arg_number: "1"
+out:
+  val: "This is string - Test"
+---
+test case: "2. Two different arguments"
+in:
+  arg_str: "House"
+  arg_int: "15"
+  arg_number: "2"
+out:
+  val: "This is a House, there are 15 rooms"
+---
+test case: "3. Three different arguments"
+in:
+  arg_str: "cat"
+  arg_int: "7"
+  arg_number: "3"
+out:
+  val: "I have a cat. It is 7 years old. This is a big cat"
+...

@@ -212,7 +212,9 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestInputTypeOverwrite('filter_name', 'Zabbix administrators');
 		$this->zbxTestClickXpathWait("//label[@for='filter_user_status_1']");
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
+		$this->assertTrue($this->query('xpath://div[@class="table-stats"][text()="Displaying 1 of 1 found"]')
+				->one()->isVisible()
+		);
 	}
 
 	public function testPageUserGroups_FilterReset() {

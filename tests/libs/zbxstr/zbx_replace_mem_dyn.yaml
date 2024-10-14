@@ -1,0 +1,105 @@
+---
+test case: "1. Replacing with a Block of the Same Size"
+in:
+  data: "HelloWorld"
+  data_alloc: 11
+  data_len: 10
+  offset: 5
+  sz_to: 5
+  from: "Earth"
+  sz_from: 5
+out:
+  exp_result: "0"
+  data: "HelloEarth"
+---
+test case: "2. Replacing with a Larger Block (No Reallocation Needed)"
+in:
+  data: "HelloWorld"
+  data_alloc: 11
+  data_len: 11
+  offset: 5
+  sz_to: 5
+  from: "Everyone"
+  sz_from: 8
+out:
+  exp_result: "3"
+  data: "HelloEveryone"
+---
+test case: "3. Replacing with a Larger Block (Reallocation Needed)"
+in:
+  data: "HelloWorld"
+  data_alloc: 11
+  data_len: 11
+  offset: 5
+  sz_to: 5
+  from: "BeautifulPeople"
+  sz_from: 15
+out:
+  exp_result: "10"
+  data: "HelloBeautifulPeople"
+---
+test case: "4. Replacing with a Smaller Block"
+in:
+  data: "HelloWorld"
+  data_alloc: 11
+  data_len: 10
+  offset: 5
+  sz_to: 5
+  from: "You"
+  sz_from: 3
+out:
+  exp_result: "-2"
+  data: "HelloYould"
+---
+test case: "5. Replacing with an Empty Block"
+in:
+  data: "HelloWorld"
+  data_alloc: 10
+  data_len: 10
+  offset: 5
+  sz_to: 5
+  from: ""
+  sz_from: 0
+out:
+  exp_result: "-5"
+  data: "HelloWorld"
+---
+test case: "6. Empty string"
+in:
+  data: ""
+  data_alloc: 1
+  data_len: 0
+  offset: 0
+  sz_to: 0
+  from: ""
+  sz_from: 0
+out:
+  exp_result: "0"
+  data: ""
+---
+test case: "7. Newline"
+in:
+  data: "\n\n"
+  data_alloc: 3
+  data_len: 2
+  offset: 1
+  sz_to: 1
+  from: "b"
+  sz_from: 2
+out:
+  exp_result: "1"
+  data: "\nb"
+---
+test case: "8. Long string"
+in:
+  data: "The quick brown fox jumps over the lazy dog. The fox was very quick."
+  data_alloc: 69
+  data_len: 68
+  offset: 49
+  sz_to: 3
+  from: "cat"
+  sz_from: 3
+out:
+  exp_result: "0"
+  data: "The quick brown fox jumps over the lazy dog. The cat was very quick."
+...

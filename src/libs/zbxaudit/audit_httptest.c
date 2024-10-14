@@ -17,7 +17,6 @@
 #include "audit.h"
 
 #include "zbxalgo.h"
-#include "zbxdbhigh.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
 #include "zbxhttp.h"

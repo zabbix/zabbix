@@ -9871,14 +9871,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 
 			if (NULL != snmp)
 			{
-				if ('\0' != *src_item->timeout &&
-						0 != strncmp(src_item->itemtype.snmpitem->snmp_oid, "walk[",
-						ZBX_CONST_STRLEN("walk[")))
-				{
-					zbx_strscpy(dst_item->timeout_orig,
-							dc_get_global_item_type_timeout(src_item->type));
-				}
-
 				zbx_strscpy(dst_item->snmp_community_orig, snmp->community);
 				zbx_strscpy(dst_item->snmp_oid_orig, src_item->itemtype.snmpitem->snmp_oid);
 				zbx_strscpy(dst_item->snmpv3_securityname_orig, snmp->securityname);

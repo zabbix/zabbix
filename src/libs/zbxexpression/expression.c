@@ -20,6 +20,7 @@
 #	include "zbxxml.h"
 #endif
 
+#include "zbxdb.h"
 #include "zbxvariant.h"
 #include "zbxeval.h"
 #include "zbxdbwrap.h"

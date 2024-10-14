@@ -16,7 +16,7 @@
 #include "zbxcommon.h"
 #include "version.h"
 #include "zbxcacheconfig.h"
-#include "zbxdbhigh.h"
+#include "zbxdb.h"
 #include "zbxpgservice.h"
 #include "zbxtime.h"
 #include "zbxversion.h"
