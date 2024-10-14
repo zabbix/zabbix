@@ -380,7 +380,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 			'command' => 'echo -n "{EVENT.TIMESTAMP}"',
 			'execute_on' => ZBX_SCRIPT_EXECUTE_ON_SERVER,
 			'scope' => ZBX_SCRIPT_SCOPE_EVENT,
-			'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+			'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
 		]);
 		$this->assertArrayHasKey('scriptids', $response['result']);
 		self::$test_simplemacro = $response['result']['scriptids'][0];
