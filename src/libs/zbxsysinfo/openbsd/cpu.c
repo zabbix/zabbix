@@ -100,6 +100,8 @@ int	system_cpu_util(AGENT_REQUEST *request, AGENT_RESULT *result)
 		state = ZBX_CPU_STATE_IDLE;
 	else if (0 == strcmp(tmp, "interrupt"))
 		state = ZBX_CPU_STATE_INTERRUPT;
+	else if (0 == strcmp(tmp, "spin"))
+		state = ZBX_CPU_STATE_SPIN;
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
