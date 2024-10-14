@@ -25,6 +25,7 @@ This template has been tested on:
 1. Register the app with your Microsoft Entra ID.
 2. Configure Microsoft Graph application permissions on the app ID:
     - `Reports.Read.All` - required for app usage and activity metrics
+    - `ServiceHealth.Read.All` - required for service discovery and service status metrics
 3. Request administrator consent.
 4. Configure the macros: `{$MS365.APP.ID}`, `{$MS365.PASSWORD}`, `{$MS365.TENANT.ID}`.
 
