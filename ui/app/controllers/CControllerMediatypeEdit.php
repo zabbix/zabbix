@@ -95,7 +95,7 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_username' => '',
 			'passwd' => '',
 			'status' => MEDIA_TYPE_STATUS_ACTIVE,
-			'change_passwd' => true,
+			'change_passwd' => false,
 			'maxsessions' => $db_defaults['maxsessions'],
 			'maxattempts' => $db_defaults['maxattempts'],
 			'attempt_interval' => $db_defaults['attempt_interval'],
@@ -123,12 +123,12 @@ class CControllerMediatypeEdit extends CController {
 
 		if ($this->hasInput('mediatypeid')) {
 			$data = array_merge($data, $this->mediatype);
-		}
 
-		if ($this->hasInput('mediatypeid')) {
 			switch ($data['type']) {
 				case MEDIA_TYPE_EMAIL:
 					$data['smtp_username'] = $this->mediatype['username'];
+					$data['change_passwd'] = $data['passwd'] !== ''
+						|| $this->mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL;
 					break;
 
 				case MEDIA_TYPE_EXEC:
@@ -153,8 +153,6 @@ class CControllerMediatypeEdit extends CController {
 					break;
 			}
 		}
-
-		$data['change_passwd'] = $data['passwd'] !== '';
 
 		if ($message_templates) {
 			CArrayHelper::sort($message_templates, ['recovery']);
