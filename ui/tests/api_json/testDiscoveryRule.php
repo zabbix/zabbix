@@ -107,6 +107,16 @@ class testDiscoveryRule extends CAPITest {
 					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
 					ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
 				]).'.'
+			],
+			'Test LLD rule needs interface on host' => [
+				'discoveryrule' => [
+					'name' => 'API LLD rule with missing interface',
+					'key_' => 'lld_iface',
+					'hostid' => '50032',
+					'type' => ITEM_TYPE_ZABBIX,
+					'delay' => '30s'
+				],
+				'expected_error' => 'No interface found.'
 			]
 		];
 
@@ -2696,13 +2706,6 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
-			'Test copying LLD rule to a template' => [
-				'params' => [
-					'discoveryids' => ['110006'],
-					'hostids' => ['50010']
-				],
-				'expected_error' => 'Cannot find host interface on "API Template" for item key "apilldrule1".'
-			],
 			'Test duplicate hosts in request' => [
 				'params' => [
 					'discoveryids' => ['110006'],
@@ -2745,6 +2748,20 @@ class testDiscoveryRule extends CAPITest {
 				'params' => [
 					'discoveryids' => ['110006'],
 					'hostids' => ['50012', '50013']
+				],
+				'expected_error' => null
+			],
+			'Test copying LLD rule to a template' => [
+				'params' => [
+					'discoveryids' => ['110007'],
+					'hostids' => ['50010']
+				],
+				'expected_error' => null
+			],
+			'Test multiple LLD rules copy to template' => [
+				'params' => [
+					'discoveryids' => ['110008', '110009'],
+					'hostids' => ['50012']
 				],
 				'expected_error' => null
 			],

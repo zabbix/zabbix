@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2024-06-15 12:45+0000\n"
+"PO-Revision-Date: 2024-09-29 14:19+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -1731,6 +1731,14 @@ msgstr "Tipo de borde"
 #: include/views/js/monitoring.sysmaps.js.php:575
 msgid "Border width"
 msgstr "Ancho del borde"
+
+#: include/classes/api/services/CHost.php:1314
+msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1321
+msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
+msgstr ""
 
 #: app/controllers/CControllerUserUpdateGeneral.php:106
 msgid "Both passwords must be equal."
@@ -10753,7 +10761,7 @@ msgstr "Gráfico de la última semana"
 #: include/views/inventory.host.view.php:145
 #: include/views/inventory.host.view.php:151 jsLoader.php:380
 msgid "Latest data"
-msgstr "Últimos datos"
+msgstr "Datos más recientes"
 
 #: jsLoader.php:381
 msgid "Latest values"
@@ -20685,6 +20693,14 @@ msgstr "una letra latina mayúscula y minúscula"
 #: app/views/administration.geomaps.edit.php:47
 msgid "and"
 msgstr "y"
+
+#: include/classes/api/helpers/CApiPskHelper.php:32
+#: include/classes/api/helpers/CApiPskHelper.php:62
+#: include/classes/api/helpers/CApiPskHelper.php:78
+#: include/classes/api/helpers/CApiPskHelper.php:111
+#: include/classes/api/helpers/CApiPskHelper.php:127
+msgid "another tls_psk value is already associated with given tls_psk_identity"
+msgstr ""
 
 #: include/views/monitoring.history.php:186
 msgid "as Blue"

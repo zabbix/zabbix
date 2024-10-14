@@ -3038,12 +3038,12 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					else
 						replace_to = zbx_strdup(replace_to, "");
 				}
-				else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_VALUE))
+				else if (0 == strcmp(m, MVAR_FUNCTION_VALUE))
 				{
 					zbx_db_trigger_get_function_value(&c_event->trigger, N_functionid,
 							&replace_to, evaluate_function2, 0);
 				}
-				else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_RECOVERY_VALUE))
+				else if (0 == strcmp(m, MVAR_FUNCTION_RECOVERY_VALUE))
 				{
 					zbx_db_trigger_get_function_value(&c_event->trigger, N_functionid,
 							&replace_to, evaluate_function2, 1);
@@ -3310,12 +3310,12 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					else
 						replace_to = zbx_strdup(replace_to, "");
 				}
-				else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_VALUE))
+				else if (0 == strcmp(m, MVAR_FUNCTION_VALUE))
 				{
 					zbx_db_trigger_get_function_value(&c_event->trigger, N_functionid,
 							&replace_to, evaluate_function2, 0);
 				}
-				else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_RECOVERY_VALUE))
+				else if (0 == strcmp(m, MVAR_FUNCTION_RECOVERY_VALUE))
 				{
 					zbx_db_trigger_get_function_value(&c_event->trigger, N_functionid,
 							&replace_to, evaluate_function2, 1);
@@ -4147,7 +4147,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 						zbx_db_trigger_explain_expression(&event->trigger, &replace_to,
 								evaluate_function2, 0);
 					}
-					else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_VALUE))
+					else if (0 == strcmp(m, MVAR_FUNCTION_VALUE))
 					{
 						zbx_db_trigger_get_function_value(&event->trigger, N_functionid,
 								&replace_to, evaluate_function2, 0);
