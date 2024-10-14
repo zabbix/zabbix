@@ -338,7 +338,20 @@ class CAudit {
 			'paths' => ['usermacro.value'],
 			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
 		],
-		self::RESOURCE_MEDIA_TYPE => ['paths' => ['mediatype.passwd']],
+		self::RESOURCE_MEDIA_TYPE => [
+			'paths' => ['mediatype.passwd'],
+			'conditions' => [
+				[
+					'provider' => [CMediatypeHelper::EMAIL_PROVIDER_SMTP, CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY,
+						CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY
+					],
+					'smtp_authentication' => SMTP_AUTHENTICATION_NORMAL
+				],
+				[
+					'provider' => [CMediatypeHelper::EMAIL_PROVIDER_GMAIL, CMediatypeHelper::EMAIL_PROVIDER_OFFICE365]
+				]
+			]
+		],
 		self::RESOURCE_MFA => ['paths' => ['mfa.client_secret']],
 		self::RESOURCE_PROXY => ['paths' => ['proxy.tls_psk_identity', 'proxy.tls_psk']],
 		self::RESOURCE_SCRIPT => ['paths' => ['script.password']],
