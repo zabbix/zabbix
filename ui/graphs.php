@@ -714,7 +714,6 @@ else {
 	$options = [
 		'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height'],
 		'selectDiscoveryRule' => ['itemid', 'name'],
-		'selectGraphDiscovery'	=> ['status', 'ts_delete'],
 		'selectHosts' => ($data['hostid'] == 0) ? ['name'] : null,
 		'graphids' => zbx_objectValues($data['graphs'], 'graphid'),
 		'preservekeys' => true
@@ -725,7 +724,7 @@ else {
 		$data['graphs'] = API::GraphPrototype()->get($options);
 	}
 	else {
-		$data['graphs'] = API::Graph()->get($options + ['selectGraphDiscovery' => ['ts_delete']]);
+		$data['graphs'] = API::Graph()->get($options + ['selectGraphDiscovery' => ['status', 'ts_delete']]);
 	}
 
 	foreach ($data['graphs'] as $gnum => $graph) {

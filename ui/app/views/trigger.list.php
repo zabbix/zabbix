@@ -296,8 +296,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			$info_icons[] = makeErrorIcon((new CDiv($trigger['error']))->addClass(ZBX_STYLE_WORDBREAK));
 		}
 
-		if (array_key_exists('status', $trigger['triggerDiscovery'])
-				&& $trigger['triggerDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
+		if ($trigger['triggerDiscovery'] && $trigger['triggerDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
 			$info_icons[] = getLldLostEntityIndicator(time(), $trigger['triggerDiscovery']['ts_delete'],
 				$trigger['triggerDiscovery']['ts_disable'], $disable_source,
 				$trigger['status'] == TRIGGER_STATUS_DISABLED, _('trigger')
