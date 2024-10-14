@@ -1801,12 +1801,21 @@ zabbix_export:
             	params: {},
             	metadata: 'http://169.254.169.254/latest/',
             
+            	isObjectEmpty: function (obj) {
+            		for (var prop in obj) {
+            			if (obj.hasOwnProperty(prop)) {
+            				return false;
+            			}
+            		}
+            		return true;
+            	},
+
             	getField: function (data, path) {
             		var steps = path.split('.');
             		for (var i = 0; i < steps.length; i++) {
             			var step = steps[i];
-            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-            				throw 'Required field was not found: ' + path;
+            			if (typeof data !== 'object' || AWS.isObjectEmpty(data) || typeof data[step] === 'undefined') {
+            				return null;
             			}
             
             			data = data[step];
