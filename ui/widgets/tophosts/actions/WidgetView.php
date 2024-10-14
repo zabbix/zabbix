@@ -268,7 +268,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			else {
 				$numeric_only = self::isNumericOnlyColumn($column);
 
-				if (!$calc_extremes || ($column['min'] !== '' && $column['max'] !== '')) {
+				if (!$calc_extremes || ((array_key_exists('min', $column) && $column['min'] !== '')
+						&& (array_key_exists('max', $column) && $column['max'] !== ''))) {
 					$column_items = self::getItems($column['item'], $numeric_only, $groupids, $master_hostids);
 				}
 				else {
@@ -280,7 +281,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$column_item_values = self::getItemValues($column_items, $column);
 			}
 
-			if ($calc_extremes && ($column['min'] !== '' || $column['max'] !== '')) {
+			if ($calc_extremes && (array_key_exists('min', $column) || array_key_exists('max', $column))) {
 				if ($column['min'] !== '') {
 					$number_parser_binary->parse($column['min']);
 					$column['min_binary'] = $number_parser_binary->calcValue();
@@ -311,12 +312,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			if ($column_index == $master_column_index) {
 				if ($calc_extremes) {
-					if ($column['min'] === '') {
+					if (!array_key_exists('min', $column) || $column['min'] === '') {
 						$column['min'] = $master_entities_min;
 						$column['min_binary'] = $column['min'];
 					}
 
-					if ($column['max'] === '') {
+					if (!array_key_exists('max', $column) || $column['max'] === '') {
 						$column['max'] = $master_entities_max;
 						$column['max_binary'] = $column['max'];
 					}
@@ -324,12 +325,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 			else {
 				if ($calc_extremes && $column_item_values) {
-					if ($column['min'] === '') {
+					if (!array_key_exists('min', $column)) {
 						$column['min'] = min($column_item_values);
 						$column['min_binary'] = $column['min'];
 					}
 
-					if ($column['max'] === '') {
+					if (!array_key_exists('max', $column)) {
 						$column['max'] = max($column_item_values);
 						$column['max_binary'] = $column['max'];
 					}
