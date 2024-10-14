@@ -298,10 +298,10 @@ char	*zbx_http_parse_header(char **headers)
 	return NULL;
 }
 
-int	zbx_http_get(const char *url, const char *header, long timeout, const char *ssl_cert_file,
+int	zbx_http_req(const char *url, const char *header, long timeout, const char *ssl_cert_file,
 		const char *ssl_key_file, const char *config_source_ip, const char *config_ssl_ca_location,
 		const char *config_ssl_cert_location, const char *config_ssl_key_location, char **out,
-		long *response_code, char **error)
+		const char *post_data, long *response_code, char **error)
 {
 	CURL			*easyhandle;
 	CURLcode		err;
@@ -318,6 +318,16 @@ int	zbx_http_get(const char *url, const char *header, long timeout, const char *
 	{
 		*error = zbx_strdup(NULL, "Cannot initialize cURL library");
 		goto clean;
+	}
+
+	if (NULL != post_data)
+	{
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, post_data)))
+		{
+			*error = zbx_dsprintf(*error, "Cannot specify data to POST: %s",
+					curl_easy_strerror(err));
+			return FAIL;
+		}
 	}
 
 	if (SUCCEED != zbx_http_prepare_callbacks(easyhandle, &response_header, &body, zbx_curl_ignore_cb,

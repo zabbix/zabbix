@@ -19,8 +19,7 @@
 void	load_aliases(char **lines);
 int	load_user_parameters(char **lines, char **err);
 int	load_key_access_rule(const char *value, const zbx_cfg_line_t *cfg);
-void	reload_user_parameters(unsigned char process_type, int process_num, const char *config_file,
-		char **config_user_parameters);
+void	reload_user_parameters(unsigned char process_type, int process_num, const char *config_file);
 #ifdef _WINDOWS
 void	load_perf_counters(const char **def_lines, const char **eng_lines);
 #endif

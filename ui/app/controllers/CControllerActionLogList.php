@@ -133,7 +133,9 @@ class CControllerActionLogList extends CController {
 				'output' => ['alertid', 'actionid', 'userid', 'clock', 'sendto', 'subject', 'message', 'status',
 					'retries', 'error', 'alerttype'
 				],
-				'filter' => ['status' => $data['actionlog_statuses']],
+				'filter' => [
+					'status' => $data['actionlog_statuses'] ?: null
+				],
 				'selectMediatypes' => ['mediatypeid', 'name', 'maxattempts'],
 				'userids' => $userids ?: null,
 				'actionids' => $actionids ?: null,
@@ -203,12 +205,18 @@ class CControllerActionLogList extends CController {
 	}
 
 	private function updateProfiles(): void {
+		$filter_statuses = $this->getInput('filter_statuses', []);
+
+		if (in_array(ALERT_STATUS_NOT_SENT, $filter_statuses)) {
+			$filter_statuses[] = ALERT_STATUS_NEW;
+		}
+
 		CProfile::updateArray('web.actionlog.filter.userids', $this->getInput('filter_userids', []), PROFILE_TYPE_ID);
 		CProfile::updateArray('web.actionlog.filter.actionids', $this->getInput('filter_actionids', []),
 			PROFILE_TYPE_ID);
 		CProfile::updateArray('web.actionlog.filter.mediatypeids', $this->getInput('filter_mediatypeids', []),
 			PROFILE_TYPE_ID);
-		CProfile::updateArray('web.actionlog.filter.statuses', $this->getInput('filter_statuses', []), PROFILE_TYPE_ID);
+		CProfile::updateArray('web.actionlog.filter.statuses', $filter_statuses, PROFILE_TYPE_ID);
 		CProfile::update('web.actionlog.filter.messages', $this->getInput('filter_messages', ''), PROFILE_TYPE_STR);
 	}
 

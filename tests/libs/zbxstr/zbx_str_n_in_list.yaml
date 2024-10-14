@@ -1,0 +1,91 @@
+---
+test case: "1. a,b,ccc,ddd - succeed"
+in:
+  list: "a,b,ccc,ddd"
+  value: "ccc"
+  len: 3
+  delimiter: ','
+out:
+  return: SUCCEED
+---
+test case: "2. a,b,ccc,ddd - fail"
+in:
+  list: "a,b,cc,ddd"
+  value: "ccc"
+  len: 3
+  delimiter: ','
+out:
+  return: FAIL
+---
+test case: "3. aa.aaa.aaaa.aaaaa - succeed"
+in:
+  list: "aa.aaa.aaaa.aaaaa"
+  value: "aaaa"
+  len: 4
+  delimiter: '.'
+out:
+  return: SUCCEED
+---
+test case: "4. a,b,ccc,ddd - value limited to few initial characters"
+in:
+  list: "a,b,ccc,ddd"
+  value: "ccc"
+  len: 2
+  delimiter: ','
+out:
+  return: FAIL
+---
+test case: "5. %%%!%%%%%!%%%%%!%%% - succeed"
+in:
+  list: "%%%!%%%%%!%%%%%!%%%"
+  value: "%%%%%"
+  len: 5
+  delimiter: '!'
+out:
+  return: SUCCEED
+---
+test case: "6. aa.bbb.bbbb.bbbbb - value limited to few initial characters"
+in:
+  list: "aa.bbb.bbbb.bbbbb"
+  value: "aaaa"
+  len: 2
+  delimiter: '.'
+out:
+  return: SUCCEED
+---
+test case: "7. 3-bytes characters"
+in:
+  list: "社.社社.社社社.社社社社社社"
+  value: "社"
+  len: 3
+  delimiter: '.'
+out:
+  return: SUCCEED
+---
+test case: "8. Unicode characters"
+in:
+  list: "Å.Í.Î.Ï.˝Ó.ÔÒÚÆ☃"
+  value: "Î"
+  len: 2
+  delimiter: '.'
+out:
+  return: SUCCEED
+---
+test case: "9. Space as delimiter"
+in:
+  list: "a aa aaa aa aaa"
+  value: "a"
+  len: 1
+  delimiter: ' '
+out:
+  return: SUCCEED
+---
+test case: "10. Single quote as delimiter"
+in:
+  list: "a'aa'aaa'aa'aaa"
+  value: "aa"
+  len: 2
+  delimiter: "'"
+out:
+  return: SUCCEED
+...

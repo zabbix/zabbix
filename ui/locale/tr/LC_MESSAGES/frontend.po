@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-08-31 18:01+0000\n"
-"Last-Translator: Mehmet Oğuzhan ÖZKURT <oguzhan@oguzhanozkurt.com>\n"
+"PO-Revision-Date: 2024-09-18 07:37+0000\n"
+"Last-Translator: Suleyman Karatas <suleymankaratas1@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -2075,6 +2075,14 @@ msgstr "Sınır türü"
 msgid "Border width"
 msgstr "Sınır genişliği"
 
+#: include/classes/api/services/CHost.php:1445
+msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1452
+msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
+msgstr ""
+
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
 msgstr ""
@@ -2405,7 +2413,7 @@ msgstr "Kullanıcı eklenemiyor"
 #: app/controllers/CControllerUsergroupCreate.php:50
 #: app/controllers/CControllerUsergroupCreate.php:150
 msgid "Cannot add user group"
-msgstr ""
+msgstr "Kullanıcı grubu eklenemiyor"
 
 #: httpconf.php:199
 msgid "Cannot add web scenario"
@@ -2413,7 +2421,7 @@ msgstr "Web senaryosu eklenemiyor"
 
 #: jsLoader.php:135
 msgid "Cannot add widget: no widgets available."
-msgstr ""
+msgstr "Widget eklenemiyor: kullanılabilir widget yok."
 
 #: jsLoader.php:134
 msgid "Cannot add widget: not enough free space on the dashboard."
@@ -20265,6 +20273,10 @@ msgstr ""
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr ""
 
+#: include/classes/api/services/CHost.php:1433
+msgid "The field \"monitored_by\" must be specified when changing proxy or proxy group for host monitoring."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
 msgstr ""
@@ -23999,6 +24011,16 @@ msgstr ""
 
 #: app/views/administration.geomaps.edit.php:47
 msgid "and"
+msgstr ""
+
+#: include/classes/api/helpers/CApiPskHelper.php:27
+#: include/classes/api/helpers/CApiPskHelper.php:57
+#: include/classes/api/helpers/CApiPskHelper.php:73
+#: include/classes/api/helpers/CApiPskHelper.php:106
+#: include/classes/api/helpers/CApiPskHelper.php:139
+#: include/classes/api/helpers/CApiPskHelper.php:160
+#: include/classes/api/helpers/CApiPskHelper.php:176
+msgid "another tls_psk value is already associated with given tls_psk_identity"
 msgstr ""
 
 #: include/forms.inc.php:1450 include/views/js/item.preprocessing.js.php:237

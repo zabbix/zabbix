@@ -22,7 +22,6 @@
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
-#include "zbxdbhigh.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxstr.h"

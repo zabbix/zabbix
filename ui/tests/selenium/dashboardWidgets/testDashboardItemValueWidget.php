@@ -213,7 +213,7 @@ class testDashboardItemValueWidget extends testWidgets {
 
 				// Check Thresholds table.
 				$thresholds_container = $form->getFieldContainer('Thresholds');
-				$this->assertEquals(['', 'Threshold', 'Action'], $thresholds_container->asTable()->getHeadersText());
+				$this->assertEquals(['', 'Threshold', ''], $thresholds_container->asTable()->getHeadersText());
 				$thresholds_icon = $form->getLabel('Thresholds')->query('xpath:.//button[@data-hintbox]')->one();
 				$this->assertTrue($thresholds_icon->isVisible());
 				$thresholds_container->query('button:Add')->one()->waitUntilClickable()->click();
