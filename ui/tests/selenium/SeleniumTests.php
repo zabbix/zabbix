@@ -87,6 +87,7 @@ require_once dirname(__FILE__).'/dashboardWidgets/testDashboardTopHostsWidget.ph
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardTopTriggersWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardTriggerOverviewWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardURLWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardWidgetCommunication.php';
 
 // Event correlation.
 require_once dirname(__FILE__).'/eventCorrelation/testFormEventCorrelation.php';
@@ -178,7 +179,7 @@ require_once dirname(__FILE__).'/maps/testFormMap.php';
 require_once dirname(__FILE__).'/maps/testFormSysmap.php';
 require_once dirname(__FILE__).'/maps/testPageMaps.php';
 
-// Maintenance
+// Maintenance.
 require_once dirname(__FILE__).'/maintenance/testFormMaintenance.php';
 require_once dirname(__FILE__).'/maintenance/testPageMaintenance.php';
 
@@ -213,6 +214,7 @@ require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingLowLevelDisc
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingTest.php';
 
 // Problems.
+require_once dirname(__FILE__).'/problems/testCauseAndSymptomEvents.php';
 require_once dirname(__FILE__).'/problems/testFormUpdateProblem.php';
 require_once dirname(__FILE__).'/problems/testPageProblems.php';
 
@@ -328,6 +330,7 @@ require_once dirname(__FILE__).'/webScenarios/testInheritanceWeb.php';
 require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWebDetails.php';
 
 require_once dirname(__FILE__).'/testDocumentationLinks.php';
+require_once dirname(__FILE__).'/testEncryption.php';
 require_once dirname(__FILE__).'/testExecuteNow.php';
 require_once dirname(__FILE__).'/testExpandExpressionMacros.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
@@ -424,6 +427,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardTopTriggersWidget');
 		$suite->addTestSuite('testDashboardTriggerOverviewWidget');
 		$suite->addTestSuite('testDashboardURLWidget');
+		$suite->addTestSuite('testDashboardWidgetCommunication');
 
 		// Event correlation.
 		$suite->addTestSuite('testFormEventCorrelation');
@@ -550,6 +554,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormPreprocessingTest');
 
 		// Problems.
+		$suite->addTestSuite('testCauseAndSymptomEvents');
 		$suite->addTestSuite('testPageProblems');
 		$suite->addTestSuite('testFormUpdateProblem');
 
@@ -665,6 +670,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMonitoringWebDetails');
 
 		$suite->addTestSuite('testDocumentationLinks');
+		$suite->addTestSuite('testEncryption');
 		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testExpandExpressionMacros');
 		$suite->addTestSuite('testFormLogin');

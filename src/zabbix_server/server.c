@@ -276,7 +276,8 @@ int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	1, /* ZBX_PROCESS_TYPE_INTERNAL_POLLER */
 	1, /* ZBX_PROCESS_TYPE_DBCONFIGWORKER */
 	1, /* ZBX_PROCESS_TYPE_PG_MANAGER */
-	1 /* ZBX_PROCESS_TYPE_BROWSERPOLLER */
+	1, /* ZBX_PROCESS_TYPE_BROWSERPOLLER */
+	1, /* ZBX_PROCESS_TYPE_HA_MANAGER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -1215,9 +1216,9 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 
 		/* free vmware support */
 		zbx_vmware_destroy();
-
-		zbx_free_selfmon_collector();
 	}
+
+	zbx_free_selfmon_collector();
 
 	zbx_uninitialize_events();
 
@@ -1636,13 +1637,6 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	zbx_vps_monitor_init(config_vps_limit, config_vps_overcommit_limit);
 
-	if (SUCCEED != zbx_init_selfmon_collector(get_config_forks, &error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
-		zbx_free(error);
-		return FAIL;
-	}
-
 	if (0 != config_forks[ZBX_PROCESS_TYPE_VMWARE] && SUCCEED != zbx_vmware_init(&config_vmware_cache_size, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize VMware cache: %s", error);
@@ -1693,11 +1687,12 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	for (zbx_threads_num = 0, i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
 	{
-		/* skip threaded components */
+		/* skip HA manager that is started separately and threaded components */
 		switch (i)
 		{
 			case ZBX_PROCESS_TYPE_PREPROCESSOR:
 			case ZBX_PROCESS_TYPE_DISCOVERER:
+			case ZBX_PROCESS_TYPE_HA_MANAGER:
 				continue;
 		}
 
@@ -2036,7 +2031,6 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_tfc_destroy();
 	zbx_vc_destroy();
 	zbx_vmware_destroy();
-	zbx_free_selfmon_collector();
 	zbx_free_configuration_cache();
 	zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs, config_history_storage_pipelines);
 	zbx_deinit_remote_commands_cache();
@@ -2333,6 +2327,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	if (SUCCEED != zbx_init_selfmon_collector(get_config_forks, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	zbx_unset_exit_on_terminate();
 
 	ha_config->ha_node_name =	CONFIG_HA_NODE_NAME;
@@ -2525,6 +2526,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			zbx_set_exiting_with_fail();
 			break;
 		}
+
+		zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
+				config_ssl_cert_location, config_ssl_key_location);
 	}
 
 	zbx_log_exit_signal();

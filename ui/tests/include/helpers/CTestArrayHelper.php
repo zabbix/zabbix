@@ -101,4 +101,15 @@ class CTestArrayHelper {
 
 		return $array;
 	}
+
+	/**
+	 * Check if array is multidimensional.
+	 *
+	 * @param array $array	multidimensional or not multidimensional array under attention
+	 *
+	 * @return boolean
+	 */
+	public static function isMultidimensional($array) {
+		return (count($array) !== count($array, COUNT_RECURSIVE));
+	}
 }

@@ -238,7 +238,7 @@ else {
 		);
 	}
 
-	if ($data['action'] == HISTORY_BATCH_GRAPH) {
+	if (($data['action'] == HISTORY_BATCH_GRAPH || $data['action'] == HISTORY_GRAPH) && count($data['itemids']) > 1) {
 		$filter_form
 			->hideFilterButtons()
 			->addVar('action', $data['action'])

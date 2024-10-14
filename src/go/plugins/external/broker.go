@@ -62,10 +62,11 @@ type request struct {
 // requestWithResponse describes a request that expects a response from the plugin.
 // out, err chan are closed when response or error is received.
 type requestWithResponse struct {
-	id  uint32
-	in  any
-	out chan []byte
-	err chan error
+	id      uint32
+	in      any
+	out     chan []byte
+	err     chan error
+	timeout time.Duration
 }
 
 func newBroker(
@@ -155,7 +156,7 @@ func (b *pluginBroker) writer() {
 				b.requestsMutex.Unlock()
 
 				go func(id uint32) {
-					time.Sleep(b.timeout)
+					time.Sleep(r.timeout)
 
 					b.requestsMutex.Lock()
 					defer b.requestsMutex.Unlock()
@@ -168,7 +169,7 @@ func (b *pluginBroker) writer() {
 					req.err <- errs.Wrapf(
 						ErrBrokerTimeout,
 						"timeout %s reached while waiting for response from plugin",
-						b.timeout.String(),
+						r.timeout.String(),
 					)
 					close(req.out)
 					close(req.err)
@@ -228,7 +229,7 @@ func (b *pluginBroker) close() {
 
 // DoWithResponse sends a request to the plugin and blocks until a response is received.
 // Data must be a pointer.
-func (b *pluginBroker) DoWithResponse(data any) ([]byte, error) {
+func (b *pluginBroker) DoWithResponse(data any, timeout time.Duration) ([]byte, error) {
 	id := b.requestID.Add(1)
 
 	data, err := setID(data, id)
@@ -237,10 +238,11 @@ func (b *pluginBroker) DoWithResponse(data any) ([]byte, error) {
 	}
 
 	r := &requestWithResponse{
-		id:  id,
-		in:  data,
-		out: make(chan []byte),
-		err: make(chan error),
+		id:      id,
+		in:      data,
+		out:     make(chan []byte),
+		err:     make(chan error),
+		timeout: timeout,
 	}
 
 	b.tx <- r
@@ -281,8 +283,8 @@ func (b *pluginBroker) Do(data any) error {
 
 // DoWithResponseAs same as pluginBroker.DoWithResponse but unmarshals the
 // response into T.
-func DoWithResponseAs[T any](broker *pluginBroker, data any) (*T, error) {
-	dataBytes, err := broker.DoWithResponse(data)
+func DoWithResponseAs[T any](broker *pluginBroker, data any, timeout time.Duration) (*T, error) {
+	dataBytes, err := broker.DoWithResponse(data, timeout)
 	if err != nil {
 		return nil, err
 	}

@@ -294,7 +294,7 @@ zabbix_export:
             }
             // Create incident for trigger-based events.
             else if (params.event_value === '1' && params.event_update_status === '0'
-                    && samanage.incident_id === '{EVENT.TAGS.__zbx_solarwinds_inc_id}') {
+                    && (samanage.incident_id === '{EVENT.TAGS.__zbx_solarwinds_inc_id}' || samanage.incident_id === '*UNKNOWN*')) {
                 var key = SolarWinds.createIncident(params.alert_subject, params.alert_message, fields);
         
         
@@ -304,7 +304,7 @@ zabbix_export:
             }
             // Update created incident for trigger-based event.
             else {
-                if (samanage.incident_id === '{EVENT.TAGS.__zbx_solarwinds_inc_id}' || samanage.incident_id === '') {
+                if (samanage.incident_id === '{EVENT.TAGS.__zbx_solarwinds_inc_id}' || samanage.incident_id === '' || samanage.incident_id === '*UNKNOWN*') {
                     throw 'Incorrect incident key given: ' + samanage.incident_id;
                 }
                 if (!params.alert_message) {
