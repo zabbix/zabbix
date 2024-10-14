@@ -324,7 +324,7 @@ int	zbx_http_req(const char *url, const char *header, long timeout, const char *
 		{
 			*error = zbx_dsprintf(*error, "Cannot specify data to POST: %s",
 					curl_easy_strerror(err));
-			return FAIL;
+			goto clean;
 		}
 	}
 
