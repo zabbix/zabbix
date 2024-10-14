@@ -240,7 +240,10 @@ class CAudit {
 			'paths' => ['usermacro.value'],
 			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
 		],
-		self::RESOURCE_MEDIA_TYPE => ['paths' => ['mediatype.passwd']],
+		self::RESOURCE_MEDIA_TYPE => [
+			'paths' => ['mediatype.passwd'],
+			'conditions' => ['smtp_authentication' => SMTP_AUTHENTICATION_NORMAL]
+		],
 		self::RESOURCE_PROXY => ['paths' => ['proxy.tls_psk_identity', 'proxy.tls_psk']],
 		self::RESOURCE_SCRIPT => ['paths' => ['script.password']],
 		self::RESOURCE_TEMPLATE => [
