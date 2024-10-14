@@ -131,7 +131,7 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_username' => '',
 			'passwd' => '',
 			'status' => MEDIA_TYPE_STATUS_ACTIVE,
-			'change_passwd' => true,
+			'change_passwd' => false,
 			'maxsessions' => $db_defaults['maxsessions'],
 			'maxattempts' => $db_defaults['maxattempts'],
 			'attempt_interval' => $db_defaults['attempt_interval'],
@@ -208,7 +208,8 @@ class CControllerMediatypeEdit extends CController {
 					break;
 			}
 
-			$data['change_passwd'] = $this->hasInput('passwd');
+			$data['change_passwd'] = $this->hasInput('passwd')
+				|| $this->mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL;
 		}
 
 		// overwrite with input variables
