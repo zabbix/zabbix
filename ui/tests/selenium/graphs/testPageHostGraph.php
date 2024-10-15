@@ -69,6 +69,7 @@ class testPageHostGraph extends CLegacyWebTest {
 		// Check host breadcrumbs text and url.
 		$filter->getField('Hosts')->fill($host_name);
 		$filter->submit();
+		$this->page->waitUntilReady();
 		$breadcrumbs = [
 			self::HOST_LIST_PAGE => 'All hosts',
 			(new CUrl('zabbix.php'))
@@ -710,6 +711,7 @@ class testPageHostGraph extends CLegacyWebTest {
 		$group_field = ($context === 'template') ? 'Template groups' : 'Host groups';
 		$this->openPageHostGraphs($data['host'], $context);
 
+		$table = $this->query('class:list-table')->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		if (array_key_exists('group', $data)) {
 			if ($data['group'] === 'all') {
@@ -735,6 +737,7 @@ class testPageHostGraph extends CLegacyWebTest {
 			}
 		}
 		$filter->submit();
+		$table->waitUntilReloaded();
 
 		if ($data['host'] === 'all') {
 			$this->assertTrue($this->query('xpath://button[@id="form"][@disabled][text()="Create graph (select host first)"]')

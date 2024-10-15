@@ -626,7 +626,6 @@ class testFormAdministrationProxies extends CWebTest {
 		if (CTestArrayHelper::get($data, 'check_alert')) {
 			// Check alert when trying to refresh page.
 			$this->page->refresh();
-			$this->assertTrue($this->page->isAlertPresent());
 			$this->page->acceptAlert();
 
 			// Check that after accepting alert user remained on Proxies page.

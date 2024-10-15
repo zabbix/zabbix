@@ -163,13 +163,13 @@ class testPageReportsNotifications extends CLegacyWebTest {
 	public function testPageReportsNotifications_CheckFilters($data) {
 		$this->zbxTestLogin('report4.php');
 		$this->page->waitUntilReady();
-		// without sleep test fail because the "zabbix-sidebar-logo" element receive the click
-		sleep(1);
+		$table = $this->query('class:list-table')->one();
+		$table->waitUntilVisible();
 
 		// Select period
 		if (array_key_exists('period', $data)) {
 			$this->query('name:period')->asDropdown()->one()->select($data['period']);
-			sleep(3);
+			$table->waitUntilReloaded();
 			if ($data['period'] === 'Yearly') {
 				$this->zbxTestAssertElementNotPresentId('year');
 			}
@@ -178,11 +178,13 @@ class testPageReportsNotifications extends CLegacyWebTest {
 		// Select year
 		if (array_key_exists('year', $data)) {
 			$this->query('name:year')->asDropdown()->one()->select($data['year']);
+			$table->waitUntilReloaded();
 		}
 
 		// Select media
 		if (array_key_exists('media_type', $data)) {
 			$this->query('name:media_type')->asDropdown()->one()->select($data['media_type']);
+			$table->waitUntilReloaded();
 			$this->zbxTestAssertElementNotPresentId('year');
 			// Check media links not displayed
 			$media_types = [];
