@@ -1,0 +1,1 @@
+...G...PS. [ZBX-25301] removed redundant large message size check on 32-bit platforms and Windows Zabbix agent when sending tcp message (arimdjonoks)
