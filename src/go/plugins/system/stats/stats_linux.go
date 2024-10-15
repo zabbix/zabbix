@@ -151,6 +151,10 @@ func (p *Plugin) addCpu(index int) {
 	}
 }
 
+func (p *Plugin) getCounterAverage(cpu *cpuUnit, counter cpuCounter, period historyIndex) (result interface{}) {
+	return cpu.counterAverage(counter, period, 1)
+}
+
 func numCPUConf() int {
 	log.Tracef("Calling C function \"sysconf()\"")
 	return int(C.sysconf(C._SC_NPROCESSORS_CONF))

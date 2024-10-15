@@ -560,3 +560,9 @@ func (c *perfCounter) getHistory(interval int) (value interface{}, err error) {
 
 	return nil, nil
 }
+
+func (p *Plugin) getCounterAverage(cpu *cpuUnit, counter cpuCounter, period historyIndex) (result interface{}) {
+	p.historyCpuMutex.Lock()
+	defer p.historyCpuMutex.Unlock()
+	return cpu.counterAverage(counter, period, 1)
+}

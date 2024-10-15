@@ -169,10 +169,7 @@ func (p *Plugin) getCpuUtil(params []string) (result interface{}, err error) {
 		return nil, errors.New("CPU is offline.")
 	}
 
-	p.historyCpuMutex.Lock()
-	defer p.historyCpuMutex.Unlock()
-
-	return cpu.counterAverage(counter, period, 1), nil
+	return p.getCounterAverage(cpu, counter, period), nil
 }
 
 func (p *Plugin) newCpus(num int) (cpus []*cpuUnit) {
