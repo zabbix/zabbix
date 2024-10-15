@@ -450,7 +450,7 @@
 				});
 			}
 
-			if (ms.options.custom_select || ms.options.popup !== undefined) {
+			if (ms.options.custom_select || ms.options.popup?.parameters !== undefined) {
 				ms.select_button = $('<button>', {
 					type: 'button',
 					'class': 'btn-grey',
@@ -461,7 +461,7 @@
 					ms.select_button.prop('disabled', true);
 				}
 
-				if (ms.options.popup !== undefined) {
+				if (ms.options.popup?.parameters !== undefined) {
 					ms.select_button.on('click', function(event) {
 						var parameters = ms.options.popup.parameters;
 
