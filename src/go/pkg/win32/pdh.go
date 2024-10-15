@@ -81,10 +81,6 @@ type Instance struct {
 func PdhOpenQuery(dataSource *string, userData uintptr) (query PDH_HQUERY, err error) {
 	pdhMu.RLock()
 	defer pdhMu.RUnlock()
-	return pdhOpenQueryHelper(dataSource, userData)
-}
-
-func pdhOpenQueryHelper(dataSource *string, userData uintptr) (query PDH_HQUERY, err error) {
 	var source uintptr
 	if dataSource != nil {
 		wcharSource := windows.StringToUTF16(*dataSource)
@@ -101,10 +97,6 @@ func pdhOpenQueryHelper(dataSource *string, userData uintptr) (query PDH_HQUERY,
 func PdhCloseQuery(query PDH_HQUERY) (err error) {
 	pdhMu.RLock()
 	defer pdhMu.RUnlock()
-	return pdhCloseQueryHelper(query)
-}
-
-func pdhCloseQueryHelper(query PDH_HQUERY) (err error) {
 	ret, _, _ := syscall.Syscall(pdhCloseQuery, 1, uintptr(query), 0, 0)
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
 		return newPdhError(ret)
@@ -115,10 +107,6 @@ func pdhCloseQueryHelper(query PDH_HQUERY) (err error) {
 func PdhAddCounter(query PDH_HQUERY, path string, userData uintptr) (counter PDH_HCOUNTER, err error) {
 	pdhMu.RLock()
 	defer pdhMu.RUnlock()
-	return pdhAddCounterHelper(query, path, userData)
-}
-
-func pdhAddCounterHelper(query PDH_HQUERY, path string, userData uintptr) (counter PDH_HCOUNTER, err error) {
 	wcharPath, _ := syscall.UTF16PtrFromString(path)
 	ret, _, _ := syscall.Syscall6(pdhAddCounter, 4, uintptr(query), uintptr(unsafe.Pointer(wcharPath)), userData,
 		uintptr(unsafe.Pointer(&counter)), 0, 0)
@@ -132,10 +120,6 @@ func pdhAddCounterHelper(query PDH_HQUERY, path string, userData uintptr) (count
 func PdhAddEnglishCounter(query PDH_HQUERY, path string, userData uintptr) (counter PDH_HCOUNTER, err error) {
 	pdhMu.RLock()
 	defer pdhMu.RUnlock()
-	return pdhAddEnglishCounterHelper(query, path, userData)
-}
-
-func pdhAddEnglishCounterHelper(query PDH_HQUERY, path string, userData uintptr) (counter PDH_HCOUNTER, err error) {
 	wcharPath, _ := syscall.UTF16PtrFromString(path)
 	ret, _, _ := syscall.Syscall6(pdhAddEnglishCounter, 4, uintptr(query), uintptr(unsafe.Pointer(wcharPath)), userData,
 		uintptr(unsafe.Pointer(&counter)), 0, 0)
@@ -149,10 +133,6 @@ func pdhAddEnglishCounterHelper(query PDH_HQUERY, path string, userData uintptr)
 func PdhCollectQueryData(query PDH_HQUERY) (err error) {
 	pdhMu.RLock()
 	defer pdhMu.RUnlock()
-	return pdhCollectQueryDataHelper(query)
-}
-
-func pdhCollectQueryDataHelper(query PDH_HQUERY) (err error) {
 	ret, _, _ := syscall.Syscall(pdhCollectQueryData, 1, uintptr(query), 0, 0)
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
 		return newPdhError(ret)
@@ -163,10 +143,7 @@ func pdhCollectQueryDataHelper(query PDH_HQUERY) (err error) {
 func PdhGetFormattedCounterValueDouble(counter PDH_HCOUNTER, tryCount int) (*float64, error) {
 	pdhMu.RLock()
 	defer pdhMu.RUnlock()
-	return pdhGetFormattedCounterValueDoubleHelper(counter, tryCount)
-}
 
-func pdhGetFormattedCounterValueDoubleHelper(counter PDH_HCOUNTER, tryCount int) (*float64, error) {
 	tryCount--
 
 	value, err := getCounterValueDouble(counter)
@@ -181,7 +158,7 @@ func pdhGetFormattedCounterValueDoubleHelper(counter PDH_HCOUNTER, tryCount int)
 
 		time.Sleep(time.Second)
 
-		return pdhGetFormattedCounterValueDoubleHelper(counter, tryCount)
+		return PdhGetFormattedCounterValueDouble(counter, tryCount)
 	}
 
 	return value, nil
@@ -216,10 +193,6 @@ func pdhGetFormattedCounterValueInt64Helper(counter PDH_HCOUNTER, retry bool) (v
 func PdhRemoveCounter(counter PDH_HCOUNTER) (err error) {
 	pdhMu.RLock()
 	defer pdhMu.RUnlock()
-	return pdhRemoveCounterHelper(counter)
-}
-
-func pdhRemoveCounterHelper(counter PDH_HCOUNTER) (err error) {
 	ret, _, _ := syscall.Syscall(pdhRemoveCounter, 1, uintptr(counter), 0, 0)
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
 		return newPdhError(ret)
@@ -230,10 +203,6 @@ func pdhRemoveCounterHelper(counter PDH_HCOUNTER) (err error) {
 func PdhParseCounterPath(path string) (elements *PDH_COUNTER_PATH_ELEMENTS, err error) {
 	pdhMu.RLock()
 	defer pdhMu.RUnlock()
-	return pdhParseCounterPathHelper(path)
-}
-
-func pdhParseCounterPathHelper(path string) (elements *PDH_COUNTER_PATH_ELEMENTS, err error) {
 	wPath := windows.StringToUTF16(path)
 	ptrPath := uintptr(unsafe.Pointer(&wPath[0]))
 	var size uint32
@@ -254,10 +223,6 @@ func pdhParseCounterPathHelper(path string) (elements *PDH_COUNTER_PATH_ELEMENTS
 func PdhMakeCounterPath(elements *PDH_COUNTER_PATH_ELEMENTS) (path string, err error) {
 	pdhMu.RLock()
 	defer pdhMu.RUnlock()
-	return pdhMakeCounterPathHelper(elements)
-}
-
-func pdhMakeCounterPathHelper(elements *PDH_COUNTER_PATH_ELEMENTS) (path string, err error) {
 	size := uint32(PDH_MAX_COUNTER_NAME)
 	buf := make([]uint16, size)
 	ret, _, _ := syscall.Syscall6(pdhMakeCounterPath, 4, uintptr(unsafe.Pointer(elements)),
@@ -271,10 +236,6 @@ func pdhMakeCounterPathHelper(elements *PDH_COUNTER_PATH_ELEMENTS) (path string,
 func PdhLookupPerfNameByIndex(index int) (path string, err error) {
 	pdhMu.RLock()
 	defer pdhMu.RUnlock()
-	return pdhLookupPerfNameByIndexHelper(index)
-}
-
-func pdhLookupPerfNameByIndexHelper(index int) (path string, err error) {
 	size := uint32(PDH_MAX_COUNTER_NAME)
 	buf := make([]uint16, size)
 	ret, _, _ := syscall.Syscall6(pdhLookupPerfNameByIndex, 4, 0, uintptr(index), uintptr(unsafe.Pointer(&buf[0])),
@@ -302,10 +263,6 @@ func PdhLookupPerfIndexByName(name string) (idx int, err error) {
 func PdhEnumObjectItems(objectName string) (instances []Instance, err error) {
 	pdhMu.Lock()
 	defer pdhMu.Unlock()
-	return pdhEnumObjectItemsHelper(objectName)
-}
-
-func pdhEnumObjectItemsHelper(objectName string) (instances []Instance, err error) {
 	var counterListSize, instanceListSize uint32
 	nameUTF16, err := syscall.UTF16FromString(objectName)
 	if err != nil {
@@ -373,10 +330,6 @@ func pdhEnumObjectItemsHelper(objectName string) (instances []Instance, err erro
 func PdhEnumObject() (objects []string, err error) {
 	pdhMu.Lock()
 	defer pdhMu.Unlock()
-	return pdhEnumObjectHelper()
-}
-
-func pdhEnumObjectHelper() (objects []string, err error) {
 	var objectListSize uint32
 	ret, _, _ := syscall.Syscall6(pdhEnumObjects, 6, 0, 0, 0, uintptr(unsafe.Pointer(&objectListSize)),
 		uintptr(PERF_DETAIL_WIZARD), bool2uintptr(true))
