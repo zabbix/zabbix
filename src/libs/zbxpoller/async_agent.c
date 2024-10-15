@@ -233,10 +233,13 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 			return ZBX_ASYNC_TASK_READ;
 		case ZABBIX_AGENT_STEP_RECV_CLOSE:
 			event_new = 0;
-			if (FAIL == (zbx_tcp_read(&agent_context->s, buf, sizeof(buf), &event_new)) &&
-					ZBX_ASYNC_TASK_STOP != (state = zbx_async_poller_get_task_state_for_event(event_new)))
+			if (FAIL == (zbx_tcp_read(&agent_context->s, buf, sizeof(buf), &event_new)))
 			{
-				return state;
+				if (ZBX_ASYNC_TASK_STOP != (state = zbx_async_poller_get_task_state_for_event(event_new)))
+					return state;
+
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot receive close notify: %s", zbx_socket_strerror());
+				
 			}
 		case ZABBIX_AGENT_STEP_RECV:
 			if (ZABBIX_AGENT_STEP_RECV == agent_context->step)

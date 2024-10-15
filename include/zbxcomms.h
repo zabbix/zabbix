@@ -174,6 +174,7 @@ typedef struct
 	size_t	identity_len;
 #endif
 #endif
+	unsigned char	close_notify_received;
 } zbx_tls_context_t;
 #endif
 

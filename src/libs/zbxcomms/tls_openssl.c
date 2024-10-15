@@ -1599,6 +1599,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 	{
 		s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
 		s->tls_ctx->ctx = NULL;
+		s->tls_ctx->close_notify_received = 0;
 		initialized = 0;
 	}
 	else
@@ -1843,6 +1844,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 
 	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
 	s->tls_ctx->ctx = NULL;
+	s->tls_ctx->close_notify_received = 0;
 
 #if defined(HAVE_OPENSSL_WITH_PSK)
 	incoming_connection_has_psk = 0;	/* assume certificate-based connection by default */
@@ -2190,7 +2192,10 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char
 	}
 
 	if (0 == n)
+	{
+		s->tls_ctx->close_notify_received = 1;
 		return n;
+	}
 
 	if (0 > n)
 	{
