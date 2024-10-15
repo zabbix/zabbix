@@ -239,7 +239,6 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 					return state;
 
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot receive close notify: %s", zbx_socket_strerror());
-				
 			}
 		case ZABBIX_AGENT_STEP_RECV:
 			if (ZABBIX_AGENT_STEP_RECV == agent_context->step)
