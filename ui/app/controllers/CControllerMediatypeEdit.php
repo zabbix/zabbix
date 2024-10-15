@@ -89,7 +89,7 @@ class CControllerMediatypeEdit extends CController {
 		if ($this->hasInput('mediatypeid')) {
 			$mediatypes = API::Mediatype()->get([
 				'output' => ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email',
-					'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_security', 'smtp_verify_peer',
+					'exec_path', 'gsm_modem', 'username', 'status', 'smtp_security', 'smtp_verify_peer',
 					'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions', 'maxattempts',
 					'attempt_interval', 'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu',
 					'event_menu_url', 'event_menu_name', 'parameters', 'description'
@@ -131,7 +131,7 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_username' => '',
 			'passwd' => '',
 			'status' => MEDIA_TYPE_STATUS_ACTIVE,
-			'change_passwd' => false,
+			'change_passwd' => true,
 			'maxsessions' => $db_defaults['maxsessions'],
 			'maxattempts' => $db_defaults['maxattempts'],
 			'attempt_interval' => $db_defaults['attempt_interval'],
@@ -181,7 +181,6 @@ class CControllerMediatypeEdit extends CController {
 			array_pop($data['exec_params']);
 
 			$data['gsm_modem'] = $this->mediatype['gsm_modem'];
-			$data['passwd'] = $this->mediatype['passwd'];
 			$data['status'] = $this->mediatype['status'];
 			$data['maxsessions'] = $this->mediatype['maxsessions'];
 			$data['maxattempts'] = $this->mediatype['maxattempts'];
@@ -207,9 +206,6 @@ class CControllerMediatypeEdit extends CController {
 					CArrayHelper::sort($data['parameters'], ['name']);
 					break;
 			}
-
-			$data['change_passwd'] = $this->hasInput('passwd')
-				|| $this->mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL;
 		}
 
 		// overwrite with input variables
@@ -220,6 +216,10 @@ class CControllerMediatypeEdit extends CController {
 			'event_menu_name', 'description'
 		]);
 		$data['exec_params'] = array_values($data['exec_params']);
+
+		if ($this->hasInput('mediatypeid')) {
+			$data['change_passwd'] = $this->mediatype['smtp_authentication'] != SMTP_AUTHENTICATION_NORMAL;
+		}
 
 		if ($this->hasInput('form_refresh')) {
 			$data['parameters'] = [];
