@@ -249,4 +249,13 @@ in:
 out:
   result: "bWFjcm8= function"
   return: SUCCEED
+---
+test case: "Macro function 2"
+in:
+  expression: "{{MACRO}.btoa()} function"
+  resolve:
+    return: SUCCEED
+out:
+  result: "{{MACRO}.btoa()} function"
+  return: SUCCEED
 ...
