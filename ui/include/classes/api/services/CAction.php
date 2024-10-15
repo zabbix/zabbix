@@ -2697,6 +2697,13 @@ class CAction extends CApiService {
 						&& $action['status'] == ACTION_STATUS_ENABLED
 						&& $action['status'] != $db_actions[$action['actionid']]['status']) {
 					$action['filter'] = $db_actions[$action['actionid']]['filter'];
+
+					if ($action['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						$formulaids = CConditionHelper::getFormulaIds($action['filter']['formula']);
+						$action['filter']['formula'] = CConditionHelper::replaceNumericIds($action['filter']['formula'],
+							$formulaids
+						);
+					}
 				}
 				else {
 					continue;
