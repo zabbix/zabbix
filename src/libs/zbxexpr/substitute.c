@@ -211,7 +211,7 @@ static int	substitute_macros_args(zbx_token_search_t search, char **data, char *
 			zbx_free(replace_to);
 		}
 
-		if (ZBX_TOKEN_FUNC_MACRO == p.token.type)
+		if (ZBX_TOKEN_FUNC_MACRO == p.token.type || ZBX_TOKEN_USER_FUNC_MACRO == p.token.type)
 			zbx_free(m_ptr);
 
 		p.pos++;
