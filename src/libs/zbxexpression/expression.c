@@ -499,21 +499,6 @@ out:
 	return ret;
 }
 
-static int	is_strict_macro(const char *macro)
-{
-	const char	*strict_macros[] = {MVAR_HOST_IP, MVAR_IPADDRESS, MVAR_HOST_DNS,
-			MVAR_HOST_CONN, MVAR_HOST_TARGET_DNS, MVAR_HOST_TARGET_CONN,
-			MVAR_HOST_TARGET_IP};
-
-	for (int i = 0; i < (int)ARRSIZE(strict_macros); i++)
-	{
-		if (0 == strcmp(strict_macros[i], macro))
-			return SUCCEED;
-	}
-
-	return FAIL;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: substitute simple macros in data string with real values.         *
@@ -2528,7 +2513,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve macro '%.*s'",
 					(int)(token.loc.r - token.loc.l + 1), *data + token.loc.l);
 
-			if (ZBX_TOKEN_MACRO == token.type && SUCCEED == is_strict_macro(m))
+			if (ZBX_TOKEN_MACRO == token.type && SUCCEED == zbx_is_strict_macro(m))
 			{
 				if (NULL != error)
 				{
