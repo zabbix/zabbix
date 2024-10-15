@@ -249,10 +249,8 @@ static void	preprocessing_ar_to_variant(AGENT_RESULT *ar, zbx_variant_t *value)
 		zbx_variant_set_str(value, ar->str);
 	else if (ISSET_TEXT(ar))
 		zbx_variant_set_str(value, ar->text);
-	else if (ISSET_MSG(ar))
-		zbx_variant_set_error(value, ar->msg);
 	else
-		zbx_variant_set_none(value);
+		THIS_SHOULD_NEVER_HAPPEN;
 }
 
 /******************************************************************************
@@ -1041,44 +1039,47 @@ static void	preprocessor_enqueue_dependent(zbx_preprocessing_manager_t *manager,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid: " ZBX_FS_UI64, __func__, itemid);
 
-	item_local.itemid = itemid;
-	if (NULL != (item = (zbx_preproc_item_t *)zbx_hashset_search(&manager->item_config, &item_local)) &&
-			0 != item->dep_itemids_num)
+	if (ISSET_VALUE(ar))
 	{
-		zbx_preprocessing_dep_request_t	*dep_request;
-		zbx_variant_t			value = {0};
-		zbx_list_item_t			*enqueued_at;
+		item_local.itemid = itemid;
+		if (NULL != (item = (zbx_preproc_item_t *)zbx_hashset_search(&manager->item_config, &item_local)) &&
+				0 != item->dep_itemids_num)
+		{
+			zbx_preprocessing_dep_request_t	*dep_request;
+			zbx_variant_t			value = {0};
+			zbx_list_item_t			*enqueued_at;
 
-		dep_request = zbx_calloc(NULL, 1, sizeof(zbx_preprocessing_dep_request_t));
-		dep_request->base.kind = ZBX_PREPROC_DEPS;
-		dep_request->base.state = REQUEST_STATE_QUEUED;
-		dep_request->base.pending = NULL;
-		zbx_vector_preprocessing_request_base_create(&dep_request->base.flush_queue);
-		dep_request->hostid = hostid;
+			dep_request = zbx_calloc(NULL, 1, sizeof(zbx_preprocessing_dep_request_t));
+			dep_request->base.kind = ZBX_PREPROC_DEPS;
+			dep_request->base.state = REQUEST_STATE_QUEUED;
+			dep_request->base.pending = NULL;
+			zbx_vector_preprocessing_request_base_create(&dep_request->base.flush_queue);
+			dep_request->hostid = hostid;
 
-		dep_request->ts = NULL != ts ? *ts : (zbx_timespec_t){0, 0};
+			dep_request->ts = NULL != ts ? *ts : (zbx_timespec_t){0, 0};
 
-		/* the data is copied without allocation - the variant value must not be cleared afterwards */
-		preprocessing_ar_to_variant(ar, &value);
-		zbx_variant_copy(&dep_request->value, &value);
+			/* the data is copied without allocation - the variant value must not be cleared afterwards */
+			preprocessing_ar_to_variant(ar, &value);
+			zbx_variant_copy(&dep_request->value, &value);
 
-		dep_request->value_type = value_type;
-		dep_request->master_itemid = itemid;
+			dep_request->value_type = value_type;
+			dep_request->master_itemid = itemid;
 
-		zbx_vector_ipcmsg_create(&dep_request->messages);
+			zbx_vector_ipcmsg_create(&dep_request->messages);
 
-		dep_request->results = NULL;
-		dep_request->results_alloc = 0;
-		dep_request->results_offset = 0;
+			dep_request->results = NULL;
+			dep_request->results_alloc = 0;
+			dep_request->results_offset = 0;
 
-		zbx_list_append(&manager->queue, dep_request, &enqueued_at);
+			zbx_list_append(&manager->queue, dep_request, &enqueued_at);
 
-		preproc_link_nodes(manager, itemid, ZBX_PREPROC_DEPS, enqueued_at);
+			preproc_link_nodes(manager, itemid, ZBX_PREPROC_DEPS, enqueued_at);
 
-		preprocessor_assign_tasks(manager);
-		preprocessing_flush_queue(manager);
+			preprocessor_assign_tasks(manager);
+			preprocessing_flush_queue(manager);
 
-		manager->preproc_num++;
+			manager->preproc_num++;
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

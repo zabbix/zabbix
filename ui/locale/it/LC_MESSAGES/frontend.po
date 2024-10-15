@@ -1732,6 +1732,14 @@ msgstr "Tipo di bordo"
 msgid "Border width"
 msgstr "Spessore bordo"
 
+#: include/classes/api/services/CHost.php:1314
+msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1321
+msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
+msgstr ""
+
 #: app/controllers/CControllerUserUpdateGeneral.php:106
 msgid "Both passwords must be equal."
 msgstr "Entrambe le password devono essere uguali."
@@ -20672,6 +20680,14 @@ msgstr ""
 
 #: app/views/administration.geomaps.edit.php:47
 msgid "and"
+msgstr ""
+
+#: include/classes/api/helpers/CApiPskHelper.php:32
+#: include/classes/api/helpers/CApiPskHelper.php:62
+#: include/classes/api/helpers/CApiPskHelper.php:78
+#: include/classes/api/helpers/CApiPskHelper.php:111
+#: include/classes/api/helpers/CApiPskHelper.php:127
+msgid "another tls_psk value is already associated with given tls_psk_identity"
 msgstr ""
 
 #: include/views/monitoring.history.php:186

@@ -2165,9 +2165,15 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// if this is a plain host, map discovery interfaces
-		if ($srcHost['status'] != HOST_STATUS_TEMPLATE) {
+		if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
 			// find a matching interface
 			$interface = self::findInterfaceForItem($dstDiscovery['type'], $dstHost['interfaces']);
+
+			if ($interface === false && itemTypeInterface($dstDiscovery['type']) == INTERFACE_TYPE_OPT
+					&& $dstDiscovery['interfaceid'] != 0) {
+				$interface = CItem::findInterfaceByPriority($dstHost['interfaces']);
+			}
+
 			if ($interface) {
 				$dstDiscovery['interfaceid'] = $interface['interfaceid'];
 			}
@@ -2372,6 +2378,12 @@ class CDiscoveryRule extends CItemGeneral {
 				if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
 					// find a matching interface
 					$interface = self::findInterfaceForItem($item_prototype['type'], $dstHost['interfaces']);
+
+					if ($interface === false && itemTypeInterface($item_prototype['type']) == INTERFACE_TYPE_OPT
+							&& $item_prototype['interfaceid'] != 0) {
+						$interface = CItem::findInterfaceByPriority($dstHost['interfaces']);
+					}
+
 					if ($interface) {
 						$item_prototype['interfaceid'] = $interface['interfaceid'];
 					}
