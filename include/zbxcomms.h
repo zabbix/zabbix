@@ -447,6 +447,7 @@ typedef struct
 }
 zbx_tls_conn_attr_t;
 
+int		zbx_tls_used(const zbx_socket_t *s);
 int		zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
 int		zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr);
 int		zbx_tls_get_attr(const zbx_socket_t *sock, zbx_tls_conn_attr_t *attr, char **error);

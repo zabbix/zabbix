@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxcommon.h"
 #include "zbxcommshigh.h"
 
 #include "zbxcommon.h"
@@ -597,6 +598,12 @@ retry:
 
 	if (SUCCEED == comms_check_redirect(sock.buffer, addrs, &retry))
 	{
+		if (SUCCEED == zbx_tls_used(&sock))
+		{
+			if (SUCCEED != zbx_tcp_recv(&sock))
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot receive close notify");
+		}
+
 		if (0 == retries && ZBX_REDIRECT_RETRY == retry)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() redirect response found, retrying to: [%s]:%hu", __func__,
@@ -620,6 +627,12 @@ retry:
 
 	if (NULL != out)
 		*out = zbx_socket_detach_buffer(&sock);
+
+	if (SUCCEED == zbx_tls_used(&sock))
+	{
+		if (SUCCEED != zbx_tcp_recv(&sock))
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot receive close notify");
+	}
 success:
 	ret = SUCCEED;
 cleanup:

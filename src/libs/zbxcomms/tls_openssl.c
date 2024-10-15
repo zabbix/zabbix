@@ -2189,7 +2189,10 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char
 		}
 	}
 
-	if (0 >= n)
+	if (0 == n)
+		return n;
+
+	if (0 > n)
 	{
 		size_t	error_alloc = 0, error_offset = 0;
 
@@ -2225,7 +2228,8 @@ void	zbx_tls_close(zbx_socket_t *s)
 
 		/* After TLS shutdown the TCP connection will be closed. So, there is no need to do a bidirectional */
 		/* TLS shutdown - unidirectional shutdown is ok. */
-		if (0 == SSL_in_init(s->tls_ctx->ctx))
+		if (0 == SSL_in_init(s->tls_ctx->ctx) &&
+				0 == (SSL_get_shutdown(s->tls_ctx->ctx) & SSL_RECEIVED_SHUTDOWN))
 		{
 			while (0 > (res = SSL_shutdown(s->tls_ctx->ctx)))
 			{
@@ -2312,6 +2316,13 @@ int	zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 	}
 
 	X509_free(peer_cert);
+
+	return SUCCEED;
+}
+int	zbx_tls_used(const zbx_socket_t *s)
+{
+	if (NULL == s->tls_ctx)
+		return FAIL;
 
 	return SUCCEED;
 }
