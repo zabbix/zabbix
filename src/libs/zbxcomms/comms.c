@@ -826,7 +826,7 @@ int	zbx_tcp_send_context_init(const char *data, size_t len, size_t reserved, uns
 				" size " ZBX_FS_UI64 " bytes.", (zbx_uint64_t)len, ZBX_MAX_RECV_LARGE_DATA_SIZE);
 		return FAIL;
 	}
-#endif
+
 	if (ZBX_MAX_RECV_LARGE_DATA_SIZE < reserved)
 	{
 		zbx_set_socket_strerror("cannot send data: uncompressed message size " ZBX_FS_UI64
@@ -834,7 +834,7 @@ int	zbx_tcp_send_context_init(const char *data, size_t len, size_t reserved, uns
 				ZBX_MAX_RECV_LARGE_DATA_SIZE);
 		return FAIL;
 	}
-
+#endif
 	if (0 != (flags & ZBX_TCP_COMPRESS))
 	{
 		/* compress if not compressed yet */
