@@ -131,8 +131,8 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestInputTypeOverwrite('trends', '55d');
 		$this->zbxTestInputType('description', 'description');
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
-
-		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
+		$this->query('xpath://div[contains(@class, tfoot-buttons)]/button[@id="add"]')->waitUntilClickable()->one()->click();
+		$this->assertMessage($result);
 
 		switch ($result) {
 			case TEST_GOOD:
@@ -160,8 +160,8 @@ class testTemplateInheritance extends CLegacyWebTest {
 				// check that the inherited item matches the original
 				$this->zbxTestOpen('hosts.php');
 				$this->zbxTestCheckHeader('Hosts');
-				$this->zbxTestClickLinkTextWait($this->hostName);
-				$this->zbxTestClickLinkTextWait('Items');
+				$this->query('link', $this->hostName)->one()->waitUntilClickable()->click();
+				$this->query('link', 'Items')->one()->waitUntilClickable()->click();
 				$this->zbxTestCheckHeader('Items');
 				$this->zbxTestAssertElementText("//a[text()='".$itemName."']/parent::td", "$template: $itemName");
 				$this->zbxTestClickLinkTextWait($itemName);

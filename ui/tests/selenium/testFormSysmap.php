@@ -30,6 +30,15 @@ class testFormSysmap extends CLegacyWebTest {
 	public $mapName = 'Test map 1';
 	public $edit_map_name = 'Local network';
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
 	public function testFormSysmap_Layout() {
 		$this->zbxTestLogin('sysmaps.php?form=Create+map');
 		$this->zbxTestCheckTitle('Configuration of network maps');
@@ -287,7 +296,8 @@ class testFormSysmap extends CLegacyWebTest {
 			$user_id = $this->zbxTestGetAttributeValue("//div[@id='userid']//li[@data-id]", 'data-id');
 		}
 
-		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
+		$this->query('xpath://div[contains(@class, tfoot-buttons)]/button[@id="add"]')->waitUntilClickable()->one()->click();
+		$this->assertMessage($data['expected']);
 
 		switch ($data['expected']) {
 			case TEST_GOOD:

@@ -31,6 +31,15 @@ use Facebook\WebDriver\WebDriverBy;
  */
 class testFormAction extends CLegacyWebTest {
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
+	}
+
 	private $event_sources = [
 		EVENT_SOURCE_TRIGGERS => 'Trigger actions',
 		EVENT_SOURCE_DISCOVERY => 'Discovery actions',
@@ -1796,8 +1805,8 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Cancel"]');
 		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('add'));
 
-		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action added');
+		$this->query('xpath://div[contains(@class, tfoot-buttons)]/button[@id="add"]')->waitUntilClickable()->one()->click();
+		$this->assertMessage(TEST_GOOD, 'Action added');
 
 		$sql = "SELECT actionid FROM actions WHERE name='action test'";
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Action has not been created in the DB.');
