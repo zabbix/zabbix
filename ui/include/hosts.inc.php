@@ -1025,7 +1025,7 @@ function mergeInheritedMacros(array $host_macros, array $inherited_macros): arra
 						$inh_context = $user_macro_parser->getContext();
 						$inh_regex = $user_macro_parser->getRegex();
 
-						if ($hst_macro === $inh_macro && ($hst_context === $inh_context || $hst_regex === $inh_regex)) {
+						if ($hst_macro === $inh_macro && $hst_context === $inh_context && $hst_regex === $inh_regex) {
 							$match_found = true;
 
 							$host_macro = array_merge($inherited_macros[$inherited_macro], $host_macro);
