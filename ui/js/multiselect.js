@@ -1277,18 +1277,10 @@
 	function getSkipSearchIds($obj) {
 		const ms = $obj.data('multiSelect');
 
-		let skip_ids = Object.keys(ms.values.selected);
-
-		if (ms.options.popup !== undefined) {
-			if (ms.options.popup.parameters.excludeids !== undefined) {
-				skip_ids = [...skip_ids, ...ms.options.popup.parameters.excludeids];
-			}
-
-			if (ms.options.popup.parameters.disableids !== undefined) {
-				skip_ids = [...skip_ids, ...ms.options.popup.parameters.disableids];
-			}
-		}
-
-		return [...new Set(skip_ids)];
+		return [...new Set([
+			...Object.keys(ms.values.selected),
+			...(ms.options.popup?.parameters?.excludeids || []),
+			...(ms.options.popup?.parameters?.disableids || [])
+		])];
 	}
 })(jQuery);
