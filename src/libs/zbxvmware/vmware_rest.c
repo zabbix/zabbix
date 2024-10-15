@@ -944,10 +944,10 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *co
 	zbx_vmware_lock();
 	version = service->major_version * 100 + service->minor_version * 10 + service->update_version;
 
-	if (650 > version)
+	if (650 > version || ZBX_VMWARE_TYPE_VCENTER != service->type)
 	{
 		zbx_vmware_unlock();
-		error = zbx_strdup(error, "Tags are supported since vmware version 6.5.");
+		error = zbx_strdup(error, "Tags are supported since VMware virtual center version 6.5.");
 		goto out;
 	}
 
