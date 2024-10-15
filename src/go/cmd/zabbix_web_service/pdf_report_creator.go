@@ -36,7 +36,12 @@ import (
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-const netErrCertAuthorityInvalid = "net::ERR_CERT_AUTHORITY_INVALID"
+const (
+	netErrCertAuthorityInvalid = "net::ERR_CERT_AUTHORITY_INVALID"
+	ctxErrDeadlineExceeded     = "context deadline exceeded"
+)
+
+const dashboardLoadingTimeout = 45 * time.Second
 
 type requestBody struct {
 	URL        string            `json:"url"`
@@ -259,7 +264,7 @@ func runCDP(
 				return
 			}
 
-			listenerErr = handleErr(failEvent.ErrorText)
+			listenerErr = handleNetEvtErr(failEvent.ErrorText)
 
 			cancel()
 		},
@@ -280,7 +285,11 @@ func runCDP(
 				WithPaperHeight(pixels2inches(req.size.height)).
 				Do(timeoutContext)
 
-			return err
+			if err != nil {
+				return handlePDFErr(err)
+			}
+
+			return nil
 		}),
 	})
 
@@ -310,7 +319,7 @@ func prepareDashboard(url string) chromedp.ActionFunc {
 	return func(ctx context.Context) error {
 		_, _, _, err := page.Navigate(url).Do(ctx)
 		if err != nil {
-			return err
+			return errs.Wrapf(err, "failed to navigate to dashboard, url: '%s'", url)
 		}
 
 		return waitForDashboardReady(ctx, url)
@@ -325,7 +334,7 @@ func waitForDashboardReady(ctx context.Context, url string) error {
 		chromedp.Poll(
 			"document.querySelector('.wrapper.is-ready') !== null",
 			&isReady,
-			chromedp.WithPollingTimeout(time.Second*45),
+			chromedp.WithPollingTimeout(dashboardLoadingTimeout),
 		),
 	)
 	if err != nil {
@@ -358,8 +367,8 @@ func parseUrl(u string) (*url.URL, error) {
 	return parsed, nil
 }
 
-// handleErr returns a user friendly error message for network.EventLoadingFailed errors.
-func handleErr(errStr string) error {
+// handleNetEvtErr returns a user friendly error message for network.EventLoadingFailed errors.
+func handleNetEvtErr(errStr string) error {
 	switch errStr {
 	case netErrCertAuthorityInvalid:
 		return errs.Errorf(
@@ -376,5 +385,19 @@ func handleErr(errStr string) error {
 			"network.EventLoadingFailed event with ErrorText = '%s' was received while loading dashboard.",
 			errStr,
 		)
+	}
+}
+
+// handlePDFErr returns a user friendly error message for errors while formatting a dashboard as PDF.
+func handlePDFErr(err error) error {
+	switch err.Error() {
+	case ctxErrDeadlineExceeded:
+		return errs.Errorf(
+			"timeout (%ds) happened while formatting dashboard as PDF, it is configurable in Zabbix web "+
+				"service config file",
+			options.Timeout,
+		)
+	default:
+		return errs.Wrap(err, "failed to format dashboard as PDF")
 	}
 }
