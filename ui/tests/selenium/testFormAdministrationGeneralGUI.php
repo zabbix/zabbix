@@ -149,8 +149,7 @@ class testFormAdministrationGeneralGUI extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('GUI');
 		$this->zbxTestInputTypeOverwrite('search_limit', '0');
 		$this->zbxTestClickWait('update');
-
-		$this->zbxTestTextPresent(['GUI', 'Limit for search and filter results']);
+		$this->page->assertHeader('GUI');
 		$this->assertMessage(TEST_BAD, 'Cannot update configuration', 'Incorrect value "0" for "search_limit" field.');
 		$this->zbxTestTextNotPresent('Configuration updated');
 

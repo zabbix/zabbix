@@ -32,6 +32,15 @@ class testInheritanceGraph extends CLegacyWebTest {
 	private $hostid = 15001;		// 'Template inheritance test host'
 	private $host = 'Template inheritance test host';
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
 	// return list of graphs from a template
 	public static function update() {
 		return CDBHelper::getDataProvider(
@@ -111,7 +120,10 @@ class testInheritanceGraph extends CLegacyWebTest {
 			$this->zbxTestTextPresent($this->template.': '.$item['itemName']);
 		}
 
-		$this->zbxTestDoubleClickBeforeMessage('add', 'action_buttons');
+		$this->query('xpath://div[contains(@class, tfoot-buttons)]/button[@id="add"]')->waitUntilClickable()
+				->one()->click();
+		$this->assertMessage($data['expected']);
+
 
 		switch ($data['expected']) {
 			case TEST_GOOD:

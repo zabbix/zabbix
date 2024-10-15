@@ -182,7 +182,7 @@ class testFormConfigTriggerSeverity extends CLegacyWebTest {
 			}
 		}
 		else {
-			$this->zbxTestTextPresent('Cannot update configuration');
+			$this->assertMessage(TEST_BAD, 'Cannot update configuration');
 			$this->assertEquals($hash, CDBHelper::getHash($sql), "DB fields changed after unsuccessful save.");
 		}
 
