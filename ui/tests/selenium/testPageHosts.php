@@ -248,8 +248,8 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Name')->fill($this->HostName);
 		$filter->submit();
-		$this->assertTrue($this->query('link', $this->HostName)->exists());
-		$this->assertFalse($this->query('xpath://div[@class="table-sats"][text()="Displaying 0 of 0 found"]')->isVisible());
+		$this->assertTrue($this->query('link', $this->HostName)->one()->isVisible());
+		$this->assertFalse($this->query('xpath://div[@class="table-sats"][text()="Displaying 0 of 0 found"]')->exists());
 	}
 
 	public function testPageHosts_FilterByTemplates() {
