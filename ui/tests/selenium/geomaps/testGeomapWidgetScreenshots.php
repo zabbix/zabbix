@@ -290,7 +290,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		$form->submit();
 
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
-		$this->page->waitUntilReady();
+		CDashboardElement::find()->waitUntilReady();
 
 		// Some zoom widgets are excluded for 'Stamen Terrain', because images on screenshots are not stable.
 		$widgets = [
