@@ -203,7 +203,7 @@ $mediatype_form_grid
 	]);
 
 // Create password field.
-if ($data['change_passwd']) {
+if (!$data['change_passwd']) {
 	// Disabling 'passwd' field prevents stored passwords autofill by browser.
 	$passwd_field = [
 		(new CButton('chPass_btn', _('Change password'))),
