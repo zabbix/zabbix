@@ -283,7 +283,7 @@
 				const $obj = $(this);
 				const ms = $obj.data('multiSelect');
 
-				if (ms !== undefined) {
+				if (ms?.options.popup.parameters !== undefined) {
 					ms.options.popup.parameters.disableids = entries;
 				}
 			});
@@ -450,7 +450,7 @@
 				});
 			}
 
-			if (ms.options.custom_select || ms.options.popup?.parameters !== undefined) {
+			if (ms.options.custom_select || ms.options.popup.parameters !== undefined) {
 				ms.select_button = $('<button>', {
 					type: 'button',
 					'class': 'btn-grey',
@@ -461,7 +461,7 @@
 					ms.select_button.prop('disabled', true);
 				}
 
-				if (ms.options.popup?.parameters !== undefined) {
+				if (ms.options.popup.parameters !== undefined) {
 					ms.select_button.on('click', function(event) {
 						var parameters = ms.options.popup.parameters;
 
@@ -588,9 +588,9 @@
 									cache: false,
 									data: jQuery.extend({
 										search: search,
-										limit: ms.options.limit != 0
+										limit: ms.options.limit !== 0
 											? ms.options.limit + getSkipSearchIds($obj).length + 1
-											: null
+											: undefined
 									}, preselect_values)
 								})
 									.then(function(response) {
@@ -1279,8 +1279,8 @@
 
 		return [...new Set([
 			...Object.keys(ms.values.selected),
-			...(ms.options.popup?.parameters?.excludeids || []),
-			...(ms.options.popup?.parameters?.disableids || [])
+			...(ms.options.popup.parameters?.excludeids || []),
+			...(ms.options.popup.parameters?.disableids || [])
 		])];
 	}
 })(jQuery);
