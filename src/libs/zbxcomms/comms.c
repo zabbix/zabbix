@@ -819,7 +819,7 @@ int	zbx_tcp_send_context_init(const char *data, size_t len, size_t reserved, uns
 	if (0 == (flags & ZBX_TCP_PROTOCOL))
 		return SUCCEED;
 
-#if (8 == SIZEOF_SIZE_T)
+#if !defined(_WINDOWS) && (8 == SIZEOF_SIZE_T)
 	if (ZBX_MAX_RECV_LARGE_DATA_SIZE < len)
 	{
 		zbx_set_socket_strerror("cannot send data: message size " ZBX_FS_UI64 " exceeds the maximum"
@@ -1979,11 +1979,11 @@ void	zbx_tcp_recv_context_init(zbx_socket_t *s, zbx_tcp_recv_context_t *tcp_recv
 	tcp_recv_context->expected_len = 16 * ZBX_MEBIBYTE;
 	tcp_recv_context->reserved = 0;
 	tcp_recv_context->expect = ZBX_TCP_EXPECT_HEADER;
-#if defined(_WINDOWS)
-	tcp_recv_context->max_len = ZBX_MAX_RECV_DATA_SIZE;
-#else
+#if !defined(_WINDOWS) && (8 == SIZEOF_SIZE_T)
 	tcp_recv_context->max_len = 0 != (flags & ZBX_TCP_LARGE) ? ZBX_MAX_RECV_LARGE_DATA_SIZE :
 			ZBX_MAX_RECV_DATA_SIZE;
+#else
+	tcp_recv_context->max_len = ZBX_MAX_RECV_DATA_SIZE;
 #endif
 	zbx_socket_free(s);
 	tcp_recv_context->allocated = 0;
