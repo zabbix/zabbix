@@ -69,23 +69,6 @@ func (h historyIndex) sub(value historyIndex, interval int) historyIndex {
 	return h
 }
 
-func (h historyIndex) sub2(value, interval int) historyIndex {
-	h -= historyIndex(value)
-	for int(h) < 0 {
-		h += historyIndex(interval)
-	}
-
-	return h
-}
-
-func (h historyIndex) sub3(value historyIndex) historyIndex {
-	h -= value
-	for h < 0 {
-		h += maxHistory
-	}
-	return h
-}
-
 type cpuUnit struct {
 	index      int
 	head, tail historyIndex

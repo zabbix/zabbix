@@ -355,9 +355,11 @@ func (p *Plugin) export_perf(key string, params []string, ctx plugin.ContextProv
 }
 
 func (p *Plugin) collectCounterData() error {
+	p.historyPerfMutex.Lock()
 	if len(p.counters) == 0 && len(p.addCounters) == 0 {
 		return nil
 	}
+	p.historyPerfMutex.Unlock()
 
 	var err error
 	if p.query == 0 {
