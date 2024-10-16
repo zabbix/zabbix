@@ -23,8 +23,8 @@ class CSvgGraph extends CSvg {
 	public const SVG_GRAPH_DEFAULT_LINE_WIDTH = 1;
 
 	public const SVG_GRAPH_X_AXIS_LABEL_MARGIN = 5;
-	public const SVG_GRAPH_Y_AXIS_LEFT_LABEL_MARGIN = 5;
-	public const SVG_GRAPH_Y_AXIS_RIGHT_LABEL_MARGIN = 12;
+	public const SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER = 10;
+	public const SVG_GRAPH_Y_AXIS_LABEL_MARGIN_INNER = 5;
 
 	private $canvas_x;
 	private $canvas_y;
@@ -822,8 +822,11 @@ class CSvgGraph extends CSvg {
 			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT, $this->left_y_empty);
 
 			if ($values) {
-				$offset_left = max($this->offset_left, max(array_map('strlen', $values)) * $approx_width);
-				$this->offset_left = (int) min($offset_left, $this->max_yaxis_width);
+				$this->offset_left = min($this->max_yaxis_width,
+					max($this->offset_left,
+						self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER + max(array_map('strlen', $values)) * $approx_width
+					)
+				);
 			}
 		}
 
@@ -831,9 +834,11 @@ class CSvgGraph extends CSvg {
 			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT, $this->right_y_empty);
 
 			if ($values) {
-				$offset_right = max($this->offset_right, max(array_map('strlen', $values)) * $approx_width);
-				$offset_right += self::SVG_GRAPH_Y_AXIS_RIGHT_LABEL_MARGIN;
-				$this->offset_right = (int) min($offset_right, $this->max_yaxis_width);
+				$this->offset_right = min($this->max_yaxis_width,
+					max($this->offset_right,
+						self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER + max(array_map('strlen', $values)) * $approx_width
+					)
+				);
 			}
 		}
 
@@ -1192,7 +1197,7 @@ class CSvgGraph extends CSvg {
 		if ($this->show_right_y_axis) {
 			$grid_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT, $this->right_y_empty);
 
-			// Do not draw label at the bottom of right Y axis to avoid label averlapping with horizontal axis arrow.
+			// Do not draw label at the bottom of right Y axis to avoid label overlapping with horizontal axis arrow.
 			if (array_key_exists(0, $grid_values)) {
 				unset($grid_values[0]);
 			}
