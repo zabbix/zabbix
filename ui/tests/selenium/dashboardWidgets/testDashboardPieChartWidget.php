@@ -995,10 +995,11 @@ class testDashboardPieChartWidget extends testWidgets {
 
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_id);
 
+		// TODO: temporarily commented out due webdriver issue #351858989, alert is not displayed while leaving page during test execution
 		// Check that alert is present in case of saving the widget without saving the dashboard.
-		if ($data['save_widget'] == true && $data['save_dashboard'] == false) {
-			$this->page->acceptAlert();
-		}
+//		if ($data['save_widget'] == true && $data['save_dashboard'] == false) {
+//			$this->page->acceptAlert();
+//		}
 
 		$this->page->waitUntilReady();
 		$dashboard->selectPage(self::PAGE_2);
