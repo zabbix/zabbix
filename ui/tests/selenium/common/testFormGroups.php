@@ -155,10 +155,11 @@ class testFormGroups extends CWebTest {
 			$this->assertTrue($form->getField('Group name')->isAttributePresent('readonly'));
 			$this->assertEquals(self::LLD, $form->getField('Discovered by')->query('tag:a')->one()->getText());
 			$form->query('link', self::LLD)->one()->click();
-			if (!$this->standalone) {
-				$this->page->acceptAlert();
-				$this->page->waitUntilReady();
-			}
+			// TODO: temporarily commented out due webdriver issue #351858989, alert is not displayed while leaving page during test execution
+//			if (!$this->standalone) {
+//				$this->page->acceptAlert();
+//				$this->page->waitUntilReady();
+//			}
 			$this->page->assertHeader('Host prototypes');
 			$this->query('id:host')->one()->checkValue(self::HOST_PROTOTYPE);
 
