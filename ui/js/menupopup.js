@@ -1283,9 +1283,7 @@ jQuery(function($) {
 					my: 'left top',
 					at: 'left bottom',
 					using: (pos, data) => {
-						let wrapper_rect = document.querySelector('.wrapper').getBoundingClientRect();
-
-						let max_left = data.horizontal === 'left'
+						const max_left = data.horizontal === 'left'
 							? wrapper_rect.right
 							: wrapper_rect.right - data.element.width;
 
@@ -1493,7 +1491,7 @@ jQuery(function($) {
 	};
 
 	/**
-	 * Calculate submenu position based on <li> parent element
+	 * Calculate submenu position based on <li> parent element.
 	 *
 	 * @param {object}  $submenu
 	 * @param {DOMRect} li_pos
@@ -1501,12 +1499,12 @@ jQuery(function($) {
 	 * @return object
 	 */
 	function calculateSubmenuPosition($submenu, li_pos) {
-		const wrapper_rect = $('.wrapper')[0].getBoundingClientRect();
+		const wrapper_rect = document.querySelector('.wrapper').getBoundingClientRect();
 		const max_relative_top = wrapper_rect.bottom - $submenu.outerHeight() - WRAPPER_MARGIN_BOTTOM;
 		const max_relative_left = wrapper_rect.right - $submenu.outerWidth();
 
-		// Will use parent directions, if the parent is not menu-popup-top
-		// If the directions are not defined, will use default direction: x - right, y - bottom
+		// Will use parent directions, if the parent is not menu-popup-top.
+		// If the directions are not defined, will use default direction: x - right, y - bottom.
 		let submenu_direction_x = 1;
 		let submenu_direction_y = 1;
 
@@ -1527,26 +1525,28 @@ jQuery(function($) {
 				: li_pos.left - ($submenu.outerWidth() + SUBMENU_PADDING_LEFT),
 			'direction_x': submenu_direction_x,
 			'direction_y': submenu_direction_y
-		}
+		};
 
 		if (submenu_data.left < wrapper_rect.left || submenu_data.left > max_relative_left) {
-			// Reverse the direction on X asis
+			// Reverse the direction on X axis.
 			submenu_data.direction_x *= -1;
 
 			submenu_data.left = submenu_data.direction_x === 1
 				? li_pos.right + SUBMENU_PADDING_RIGHT
 				: li_pos.left - ($submenu.outerWidth() + SUBMENU_PADDING_LEFT);
 
+			submenu_data.left = Math.max(0, Math.min(submenu_data.left, max_relative_left));
+
 			if (!is_first_child
 					&& Math.abs($submenu_parents[1].getBoundingClientRect().top - submenu_data.top) < DELTA_Y) {
 				const pos_top = submenu_data.top + (submenu_data.direction_y * DELTA_Y);
 
 				if (max_relative_top < pos_top || WRAPPER_MARGIN_TOP > pos_top) {
-					// Reverse the direction on Y asis
+					// Reverse the direction on Y axis.
 					submenu_data.direction_y *= -1;
 				}
 
-				submenu_data.top += submenu_direction_y * DELTA_Y;
+				submenu_data.top += submenu_data.direction_y * DELTA_Y;
 			}
 		}
 
@@ -1578,7 +1578,7 @@ jQuery(function($) {
 	};
 
 	function handleWindowResize() {
-		$('.menu-popup-top').menuPopup('close', null, false)
+		$('.menu-popup-top').menuPopup('close', null, false);
 	}
 
 	function menuPopupDocumentCloseHandler(event) {

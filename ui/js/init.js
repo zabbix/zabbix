@@ -260,9 +260,9 @@ jQuery(function($) {
 					my: 'left top',
 					at: 'left bottom',
 					using: (pos, data) => {
-						let wrapper_rect = document.querySelector('.wrapper').getBoundingClientRect();
+						const wrapper_rect = document.querySelector('.wrapper').getBoundingClientRect();
 
-						let max_left = data.horizontal === 'left'
+						const max_left = data.horizontal === 'left'
 							? wrapper_rect.right
 							: wrapper_rect.right - data.element.width;
 
