@@ -186,15 +186,12 @@ window.trigger_edit_popup = new class {
 	}
 
 	#initTriggersTab() {
-		$('#tabs').one('tabscreate tabsactivate', (event, ui) => {
+		$('#tabs').on('tabsactivate', (event, ui) => {
 			const panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
-			if (panel.attr('id') === 'triggersTab') {
-				$('#triggersTab')
-					.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
-					.textareaFlexible();
-			}
+			panel.find('[name="event_name"]').textareaFlexible();
 		});
+		requestAnimationFrame(() => $('#event_name').textareaFlexible());
 	}
 
 	#addDepTrigger(button) {
