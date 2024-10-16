@@ -298,6 +298,7 @@ tests/libs/zbxtime/zbx_tm_sub
 tests/libs/zbxtrends/zbx_baseline_get_data
 tests/libs/zbxtrends/zbx_trends_parse_range
 tests/libs/zbxvariant/zbx_variant_compare
+tests/libs/zbxvariant/zbx_variant_to_value_type
 tests/libs/zbxxml/zbx_json_to_xml
 tests/libs/zbxxml/zbx_xml_to_json
 tests/zabbix_server/lld/zbx_lld_hgsets_test
