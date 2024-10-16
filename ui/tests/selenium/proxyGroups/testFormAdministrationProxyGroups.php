@@ -397,10 +397,10 @@ class testFormAdministrationProxyGroups extends CWebTest {
 		 */
 		if ($update && $expected === TEST_GOOD) {
 			$data['fields']['Name'] = ($trim)
-				? '   Update:' . substr($data['fields']['Name'], 2)
+				? '   Update:' . substr(trim($data['fields']['Name']), 2)
 				: (($data['fields']['Name'] === STRING_255)
-					? 'Update: ' . substr($data['fields']['Name'], 8)
-					: 'Update: '.$data['fields']['Name']);
+					? 'Update: ' . substr(trim($data['fields']['Name']), 8)
+					: 'Update: '.trim($data['fields']['Name']));
 		}
 
 		$form->fill($data['fields']);

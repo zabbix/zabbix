@@ -1132,7 +1132,7 @@ class testFormConnectors extends CWebTest {
 
 		// Add a prefix to the name of the Connector in case of update scenario to avoid duplicate names.
 		if ($update && $data['expected'] === TEST_GOOD) {
-			$data['fields']['Name'] = 'Update: '.$data['fields']['Name'];
+			$data['fields']['Name'] = 'Update: '.trim($data['fields']['Name']);
 		}
 
 		if (array_key_exists('tags', $data)) {
