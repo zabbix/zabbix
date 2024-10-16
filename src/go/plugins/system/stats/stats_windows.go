@@ -217,17 +217,17 @@ func (p *Plugin) Start() {
 	p.stop = make(chan bool)
 
 	go func() {
-		var lastCheck time.Time
 		var err error
+
+		t := time.NewTimer(1 * time.Second)
+		defer t.Stop()
 
 		for {
 			select {
 			case <-p.stop:
 				return
-			default:
-				time.Sleep(lastCheck.Add(1 * time.Second).Sub(time.Now()))
-
-				err = p.collectCounterData()
+			case <-t.C:
+				err = p.collectPerfCounterData()
 				if err != nil {
 					p.Warningf("failed to get performance counters data: '%s'", err)
 				}
@@ -236,8 +236,6 @@ func (p *Plugin) Start() {
 				if err != nil {
 					p.Warningf("failed to get CPU performance data: '%s'", err)
 				}
-
-				lastCheck = time.Now()
 			}
 		}
 	}()
@@ -354,7 +352,7 @@ func (p *Plugin) export_perf(key string, params []string, ctx plugin.ContextProv
 	return counter.getHistory(int(interval))
 }
 
-func (p *Plugin) collectCounterData() error {
+func (p *Plugin) collectPerfCounterData() error {
 	p.historyPerfMutex.Lock()
 	if len(p.counters) == 0 && len(p.addCounters) == 0 {
 		return nil
