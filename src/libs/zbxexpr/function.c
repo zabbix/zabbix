@@ -474,6 +474,7 @@ void	zbx_trigger_function_param_parse(const char *expr, size_t *param_pos, size_
  * Purpose: parse trigger prototype function parameter                        *
  *                                                                            *
  * Parameters: expr      - [IN] pre-validated function parameter list         *
+ *             esc_flags - [IN] character escaping flags                      *
  *             param_pos - [OUT] the parameter position, excluding leading    *
  *                               whitespace                                   *
  *             length    - [OUT] the parameter length including trailing      *
@@ -482,10 +483,11 @@ void	zbx_trigger_function_param_parse(const char *expr, size_t *param_pos, size_
  *                               (',' or '\0' or ')') position                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_lld_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos)
+void	zbx_lld_function_param_parse(const char *expr, int esc_flags, size_t *param_pos, size_t *length,
+		size_t *sep_pos)
 {
 	zbx_function_param_parse_ext(expr, ZBX_TOKEN_USER_MACRO | ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO,
-			ZBX_BACKSLASH_ESC_ON, param_pos, length, sep_pos);
+			esc_flags, param_pos, length, sep_pos);
 }
 
 int	zbx_function_param_parse_count(const char *expr)
@@ -515,7 +517,7 @@ int	zbx_function_param_parse_count(const char *expr)
  *               caller.                                                      *
  *                                                                            *
  ******************************************************************************/
-static char	*function_param_unquote_dyn(const char *param, size_t len, int *quoted, int esc_bs)
+char	*zbx_function_param_unquote_dyn_ext(const char *param, size_t len, int *quoted, int esc_bs)
 {
 	char	*out;
 
@@ -560,7 +562,7 @@ static char	*function_param_unquote_dyn(const char *param, size_t len, int *quot
  ******************************************************************************/
 char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted)
 {
-	return function_param_unquote_dyn(param, len, quoted, ZBX_BACKSLASH_ESC_ON);
+	return zbx_function_param_unquote_dyn_ext(param, len, quoted, ZBX_BACKSLASH_ESC_ON);
 }
 
 /******************************************************************************
@@ -578,7 +580,7 @@ char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted)
  ******************************************************************************/
 char	*zbx_function_param_unquote_dyn_compat(const char *param, size_t len, int *quoted)
 {
-	return function_param_unquote_dyn(param, len, quoted, ZBX_BACKSLASH_ESC_OFF);
+	return zbx_function_param_unquote_dyn_ext(param, len, quoted, ZBX_BACKSLASH_ESC_OFF);
 }
 
 /******************************************************************************
