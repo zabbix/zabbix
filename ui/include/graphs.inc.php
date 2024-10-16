@@ -644,16 +644,16 @@ function find_period_end($periods, $time, $max_time) {
 }
 
 /**
-* Yield suitable graph scale intervals.
-*
-* @param float  $min    Minimum extreme of the scale.
-* @param float  $max    Maximum extreme of the scale.
-* @param string $units  Scale units.
-* @param int    $power  Scale power (ignored for time units).
-* @param int    $rows   Number of scale rows.
-*
-* @return iterable
-*/
+ * Yield suitable graph scale intervals.
+ *
+ * @param float  $min    Minimum extreme of the scale.
+ * @param float  $max    Maximum extreme of the scale.
+ * @param string $units  Scale units.
+ * @param int    $power  Scale power (ignored for time units).
+ * @param int    $rows   Number of scale rows.
+ *
+ * @return Generator
+ */
 function yieldGraphScaleInterval(float $min, float $max, string $units, int $power, int $rows): Generator {
 	if ($units === 's') {
 		return yield from yieldGraphScaleIntervalForSUnits($min, $max, $power, $rows);
@@ -692,15 +692,15 @@ function yieldGraphScaleInterval(float $min, float $max, string $units, int $pow
 }
 
 /**
-* Yield suitable graph scale intervals for time units.
-*
-* @param float $min    Minimum extreme of the scale.
-* @param float $max    Maximum extreme of the scale.
-* @param int   $power  Scale power (ignored for time units).
-* @param int   $rows   Number of scale rows.
-*
-* @return iterable
-*/
+ * Yield suitable graph scale intervals for time units.
+ *
+ * @param float $min    Minimum extreme of the scale.
+ * @param float $max    Maximum extreme of the scale.
+ * @param int   $power  Scale power (ignored for time units).
+ * @param int   $rows   Number of scale rows.
+ *
+ * @return Generator
+ */
 function yieldGraphScaleIntervalForSUnits(float $min, float $max, int $power, int $rows): Generator {
 	static $power_multipliers = [
 		0 => [1, 2, 5, 10, 15, 20, 30],
@@ -750,19 +750,19 @@ function yieldGraphScaleIntervalForSUnits(float $min, float $max, int $power, in
 }
 
 /**
-* Calculate graph scale extremes.
-*
-* @param float  $data_min   Minimum extreme of the graph.
-* @param float  $data_max   Maximum extreme of the graph.
-* @param string $units      Scale units.
-* @param bool   $calc_power Should scale power be calculated?
-* @param bool   $calc_min   Should scale minimum be calculated?
-* @param bool   $calc_max   Should scale maximum be calculated?
-* @param int    $rows_min   Minimum number of scale rows.
-* @param int    $rows_max   Maximum number of scale rows.
-*
-* @return array|null
-*/
+ * Calculate graph scale extremes.
+ *
+ * @param float  $data_min    Minimum extreme of the graph.
+ * @param float  $data_max    Maximum extreme of the graph.
+ * @param string $units       Scale units.
+ * @param bool   $calc_power  Should scale power be calculated?
+ * @param bool   $calc_min    Should scale minimum be calculated?
+ * @param bool   $calc_max    Should scale maximum be calculated?
+ * @param int    $rows_min    Minimum number of scale rows.
+ * @param int    $rows_max    Maximum number of scale rows.
+ *
+ * @return array|null
+ */
 function calculateGraphScaleExtremes(float $data_min, float $data_max, string $units, bool $calc_power, bool $calc_min,
 		bool $calc_max, int $rows_min, int $rows_max): ?array {
 	$scale_min = truncateFloat($data_min);
@@ -876,19 +876,19 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, string $u
 }
 
 /**
-* Calculate graph scale intermediate values.
-*
-* @param float  $min             Minimum extreme of the scale.
-* @param float  $max             Maximum extreme of the scale.
-* @param bool   $min_calculated  Is minimum extreme of the scale calculated?
-* @param bool   $max_calculated  Is maximum extreme of the scale calculated?
-* @param float  $interval        Scale interval.
-* @param string $units           Scale units.
-* @param int    $power           Scale power.
-* @param int    $precision_max   Maximum precision to use for the scale.
-*
-* @return array
-*/
+ * Calculate graph scale intermediate values.
+ *
+ * @param float  $min             Minimum extreme of the scale.
+ * @param float  $max             Maximum extreme of the scale.
+ * @param bool   $min_calculated  Is minimum extreme of the scale calculated?
+ * @param bool   $max_calculated  Is maximum extreme of the scale calculated?
+ * @param float  $interval        Scale interval.
+ * @param string $units           Scale units.
+ * @param int    $power           Scale power.
+ * @param int    $precision_max   Maximum precision to use for the scale.
+ *
+ * @return array
+ */
 function calculateGraphScaleValues(float $min, float $max, bool $min_calculated, bool $max_calculated, float $interval,
 		string $units, int $power, int $precision_max): array {
 	$rows = [];

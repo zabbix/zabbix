@@ -1230,6 +1230,8 @@ function getUnitsSPowerData(): array {
  * @param bool             $ignore_milliseconds  Do not use milliseconds.
  * @param int              $decimals             Max number of first non-zero decimals to display.
  * @param bool             $decimals_exact       Display exactly this number of decimals instead of first non-zeros.
+ *
+ * @return string
  */
 function convertUnitsSWithDecimals($value, bool $ignore_milliseconds, int $decimals, bool $decimals_exact): string {
 	$value = (float) $value;
