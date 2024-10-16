@@ -79,13 +79,13 @@ type Instance struct {
 }
 
 func PdhOpenQuery(dataSource *string, userData uintptr) (query PDH_HQUERY, err error) {
-	pdhMu.RLock()
-	defer pdhMu.RUnlock()
 	var source uintptr
 	if dataSource != nil {
 		wcharSource := windows.StringToUTF16(*dataSource)
 		source = uintptr(unsafe.Pointer(&wcharSource[0]))
 	}
+	pdhMu.RLock()
+	defer pdhMu.RUnlock()
 	ret, _, _ := syscall.Syscall(pdhOpenQuery, 3, source, userData, uintptr(unsafe.Pointer(&query)))
 
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
@@ -105,9 +105,9 @@ func PdhCloseQuery(query PDH_HQUERY) (err error) {
 }
 
 func PdhAddCounter(query PDH_HQUERY, path string, userData uintptr) (counter PDH_HCOUNTER, err error) {
+	wcharPath, _ := syscall.UTF16PtrFromString(path)
 	pdhMu.RLock()
 	defer pdhMu.RUnlock()
-	wcharPath, _ := syscall.UTF16PtrFromString(path)
 	ret, _, _ := syscall.Syscall6(pdhAddCounter, 4, uintptr(query), uintptr(unsafe.Pointer(wcharPath)), userData,
 		uintptr(unsafe.Pointer(&counter)), 0, 0)
 
@@ -118,9 +118,9 @@ func PdhAddCounter(query PDH_HQUERY, path string, userData uintptr) (counter PDH
 }
 
 func PdhAddEnglishCounter(query PDH_HQUERY, path string, userData uintptr) (counter PDH_HCOUNTER, err error) {
+	wcharPath, _ := syscall.UTF16PtrFromString(path)
 	pdhMu.RLock()
 	defer pdhMu.RUnlock()
-	wcharPath, _ := syscall.UTF16PtrFromString(path)
 	ret, _, _ := syscall.Syscall6(pdhAddEnglishCounter, 4, uintptr(query), uintptr(unsafe.Pointer(wcharPath)), userData,
 		uintptr(unsafe.Pointer(&counter)), 0, 0)
 
@@ -141,9 +141,6 @@ func PdhCollectQueryData(query PDH_HQUERY) (err error) {
 }
 
 func PdhGetFormattedCounterValueDouble(counter PDH_HCOUNTER, tryCount int) (*float64, error) {
-	pdhMu.RLock()
-	defer pdhMu.RUnlock()
-
 	tryCount--
 
 	value, err := getCounterValueDouble(counter)
@@ -165,15 +162,15 @@ func PdhGetFormattedCounterValueDouble(counter PDH_HCOUNTER, tryCount int) (*flo
 }
 
 func PdhGetFormattedCounterValueInt64(counter PDH_HCOUNTER) (value *int64, err error) {
-	pdhMu.RLock()
-	defer pdhMu.RUnlock()
 	return pdhGetFormattedCounterValueInt64Helper(counter, true)
 }
 
 func pdhGetFormattedCounterValueInt64Helper(counter PDH_HCOUNTER, retry bool) (value *int64, err error) {
 	var pdhValue PDH_FMT_COUNTERVALUE_LARGE
+	pdhMu.RLock()
 	ret, _, _ := syscall.Syscall6(pdhGetFormattedCounterValue, 4, uintptr(counter), uintptr(PDH_FMT_LARGE), 0,
 		uintptr(unsafe.Pointer(&pdhValue)), 0, 0)
+	pdhMu.RUnlock()
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
 		if ret == PDH_CALC_NEGATIVE_DENOMINATOR {
 			if retry {
@@ -201,11 +198,11 @@ func PdhRemoveCounter(counter PDH_HCOUNTER) (err error) {
 }
 
 func PdhParseCounterPath(path string) (elements *PDH_COUNTER_PATH_ELEMENTS, err error) {
-	pdhMu.RLock()
-	defer pdhMu.RUnlock()
 	wPath := windows.StringToUTF16(path)
 	ptrPath := uintptr(unsafe.Pointer(&wPath[0]))
 	var size uint32
+	pdhMu.RLock()
+	defer pdhMu.RUnlock()
 	ret, _, _ := syscall.Syscall6(pdhParseCounterPath, 4, ptrPath, 0, uintptr(unsafe.Pointer(&size)), 0, 0, 0)
 	if ret != PDH_MORE_DATA && syscall.Errno(ret) != windows.ERROR_SUCCESS {
 		return nil, newPdhError(ret)
@@ -252,6 +249,8 @@ func PdhLookupPerfIndexByName(name string) (idx int, err error) {
 		return 0, err
 	}
 
+	pdhMu.RLock()
+	defer pdhMu.RUnlock()
 	ret, _, _ := syscall.Syscall(pdhLookupPerfIndexByName, 3, 0, uintptr(unsafe.Pointer(nameUTF16)), uintptr(unsafe.Pointer(&idx)))
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
 		return 0, newPdhError(ret)
@@ -364,6 +363,9 @@ func PdhEnumObject() (objects []string, err error) {
 
 func getCounterValueDouble(counter PDH_HCOUNTER) (*float64, error) {
 	var pdhValue PDH_FMT_COUNTERVALUE_DOUBLE
+
+	pdhMu.RLock()
+	defer pdhMu.RUnlock()
 
 	ret, _, _ := syscall.SyscallN(
 		pdhGetFormattedCounterValue,
