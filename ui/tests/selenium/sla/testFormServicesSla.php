@@ -1007,7 +1007,7 @@ class testFormServicesSla extends CWebTest {
 
 		// Add a prefix to the name of the SLA in case of update scenario to avoid duplicate names.
 		if ($update && CTesTArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
-			$data['fields']['Name'] = 'Update: '.$data['fields']['Name'];
+			$data['fields']['Name'] = 'Update: '.trim($data['fields']['Name']);
 		}
 
 		$form->fill($data['fields']);

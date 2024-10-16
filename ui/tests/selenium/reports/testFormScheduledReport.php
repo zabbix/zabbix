@@ -713,7 +713,7 @@ class testFormScheduledReport extends CWebTest {
 		foreach ($common_data as $report) {
 			// Add prefix to the report name in the common data so that the names do not match with create data on page.
 			if (array_key_exists('Name', $report[0]['fields']) && $report[0]['fields']['Name'] !== 'Report for delete') {
-				$report[0]['fields']['Name'] = 'From dashboard - '.$report[0]['fields']['Name'];
+				$report[0]['fields']['Name'] = 'From dashboard - '.trim($report[0]['fields']['Name']);
 			}
 			// Reports in dashboard do not have an error message header.
 			if ($report[0]['expected'] === TEST_BAD) {
