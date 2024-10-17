@@ -239,7 +239,6 @@ SUBDIRS = \
 	zbxcompress \
 	zbxcfg \
 	zbxcrypto \
-	zbxcurl \
 	zbxdbschema \
 	zbxdiscovery \
 	zbxescalations \
@@ -252,7 +251,6 @@ SUBDIRS = \
 	zbxhttppoller \
 	zbxinterface \
 	zbxip \
-	zbxipcservice \
 	zbxjson \
 	zbxlog \
 	zbxmodules \
@@ -260,7 +258,6 @@ SUBDIRS = \
 	zbxprof \
 	zbxnix \
 	zbxnum \
-	zbxodbc \
 	zbxparam \
 	zbxpinger \
 	zbxregexp \
