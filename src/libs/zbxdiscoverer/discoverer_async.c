@@ -36,9 +36,10 @@
 #	include "zbxasynchttppoller.h"
 #endif
 
+
 #ifdef HAVE_NETSNMP
-#	include "zbxpoller.h"
 #endif
+#include "zbxpoller.h"
 
 #ifndef EVDNS_BASE_INITIALIZE_NAMESERVERS
 #	define EVDNS_BASE_INITIALIZE_NAMESERVERS	1
