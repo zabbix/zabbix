@@ -14,8 +14,9 @@
 
 #include "async_telnet.h"
 
-#include "../../libs/zbxpoller/async_poller.h"
+//#include "../../libs/zbxpoller/async_poller.h"
 
+#include "zbxpoller.h"
 #include "zbxtimekeeper.h"
 #include "zbxcomms.h"
 #include "zbxself.h"

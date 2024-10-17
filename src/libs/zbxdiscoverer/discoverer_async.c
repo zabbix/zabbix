@@ -14,13 +14,13 @@
 
 #include "discoverer_job.h"
 #include "discoverer_async.h"
-#include "../../libs/zbxpoller/async_agent.h"
+//#include "../../libs/zbxpoller/async_agent.h"
 #include "async_tcpsvc.h"
 #include "async_telnet.h"
 
-#ifdef HAVE_NETSNMP
-#	include "../../libs/zbxpoller/checks_snmp.h"
-#endif
+//#ifdef HAVE_NETSNMP
+//#	include "../../libs/zbxpoller/checks_snmp.h"
+//#endif
 
 #include "zbxsysinfo.h"
 #include "zbx_discoverer_constants.h"
