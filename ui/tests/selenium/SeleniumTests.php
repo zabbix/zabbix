@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/testGeneric.php';
+require_once dirname(__FILE__).'/testEncryption.php';
 require_once dirname(__FILE__).'/testPageDashboardWidgets.php';
 require_once dirname(__FILE__).'/testPageLatestData.php';
 require_once dirname(__FILE__).'/problems/testFormUpdateProblem.php';
@@ -241,6 +242,7 @@ class SeleniumTests {
 		$suite = new TestSuite('selenium');
 
 		$suite->addTestSuite('testGeneric');
+		$suite->addTestSuite('testEncryption');
 		$suite->addTestSuite('testPageActions');
 		$suite->addTestSuite('testPageAdministrationDMProxies');
 		$suite->addTestSuite('testFormAdministrationGeneralAutoregistration');

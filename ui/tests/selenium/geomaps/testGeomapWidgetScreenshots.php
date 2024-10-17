@@ -290,7 +290,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		$form->submit();
 
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
-		$this->page->waitUntilReady();
+		CDashboardElement::find()->waitUntilReady();
 
 		// Some zoom widgets are excluded for 'Stamen Terrain', because images on screenshots are not stable.
 		$widgets = [
@@ -328,6 +328,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		});
 
 		foreach ($widgets as $widget) {
+			CDashboardElement::find()->one()->getWidget($widget)->waitUntilReady();
 			$id = $widget.' '.$data['Tile provider'];
 			$element = $this->query("xpath://div[@class=\"dashboard-grid-widget\"]//h4[text()=".
 					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one();
