@@ -20,7 +20,7 @@
 #ifdef HAVE_NETSNMP
 
 #include "zbxcacheconfig.h"
-#include "zbxasyncpoller.h"
+//#include "zbxasyncpoller.h"
 
 #define ZBX_SNMP_STR_HEX	1
 #define ZBX_SNMP_STR_STRING	2

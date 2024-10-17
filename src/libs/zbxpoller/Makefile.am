@@ -35,13 +35,11 @@ libzbxpoller_a_SOURCES = \
 	checks_simple_vmware.c \
 	checks_simple_vmware.h \
 	async_poller.c \
-	async_poller.h \
 	async_manager.c \
 	async_manager.h \
 	async_httpagent.c \
 	async_httpagent.h \
 	async_agent.c \
-	async_agent.h \
 	async_worker.c \
 	async_worker.h \
 	async_queue.c \

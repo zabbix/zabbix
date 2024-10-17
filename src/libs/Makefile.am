@@ -272,7 +272,6 @@ SUBDIRS = \
 	zbxtime \
 	zbxvariant \
 	zbxversion \
-	zbxvmware \
 	zbxxml \
 	zbxagentget \
 	$(PROXY_SUBDIRS) \

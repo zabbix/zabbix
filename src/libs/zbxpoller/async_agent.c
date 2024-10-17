@@ -12,9 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "async_agent.h"
-
-#include "async_poller.h"
+#include "zbxpoller.h"
 
 #include "zbxtimekeeper.h"
 #include "zbxcacheconfig.h"
