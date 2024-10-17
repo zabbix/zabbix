@@ -179,7 +179,7 @@ zbx_substitute_simple_macros_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
 zbx_substitute_simple_macros_LDADD += @SERVER_LIBS@
 
 zbx_substitute_simple_macros_LDFLAGS = @SERVER_LDFLAGS@ \
-			-Wl,--wrap=expr_db_get_trigger_value \
+			-Wl,--wrap=zbx_db_get_trigger_value \
 			-Wl,--wrap=zbx_dc_open_user_macros \
 			-Wl,--wrap=zbx_dc_close_user_macros \
 			-Wl,--wrap=zbx_db_trigger_get_all_hostids \

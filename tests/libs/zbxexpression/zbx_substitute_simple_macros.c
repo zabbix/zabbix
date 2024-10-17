@@ -20,7 +20,7 @@
 
 zbx_vector_uint64_t	test_hostids;
 
-int	__wrap_expr_db_get_trigger_value(const zbx_db_trigger *trigger, char **replace_to, int N_functionid,
+int	__wrap_zbx_db_get_trigger_value(const zbx_db_trigger *trigger, char **replace_to, int N_functionid,
 		int request);
 
 zbx_dc_um_handle_t	*__wrap_zbx_dc_open_user_macros(void);
@@ -31,7 +31,7 @@ int	__wrap_zbx_db_trigger_get_all_hostids(const zbx_db_trigger *trigger, const z
 void	__wrap_zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macro,
 		const zbx_uint64_t *hostids, int hostids_num, char **value);
 
-int	__wrap_expr_db_get_trigger_value(const zbx_db_trigger *trigger, char **replace_to, int N_functionid,
+int	__wrap_zbx_db_get_trigger_value(const zbx_db_trigger *trigger, char **replace_to, int N_functionid,
 		int request)
 {
 	ZBX_UNUSED(trigger);

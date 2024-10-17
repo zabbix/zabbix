@@ -10499,19 +10499,34 @@ int	zbx_dc_get_host_value(zbx_uint64_t itemid, char **replace_to, int request)
 
 	switch (request)
 	{
-		case ZBX_REQUEST_HOST_ID:
+		case ZBX_DC_REQUEST_HOST_ID:
 			*replace_to = zbx_dsprintf(*replace_to, ZBX_FS_UI64, host.hostid);
 			break;
-		case ZBX_REQUEST_HOST_HOST:
+		case ZBX_DC_REQUEST_HOST_HOST:
 			*replace_to = zbx_strdup(*replace_to, host.host);
 			break;
-		case ZBX_REQUEST_HOST_NAME:
+		case ZBX_DC_REQUEST_HOST_NAME:
 			*replace_to = zbx_strdup(*replace_to, host.name);
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			ret = FAIL;
 	}
+
+	return ret;
+}
+
+int	zbx_dc_get_host_host(zbx_uint64_t itemid, char **replace_to)
+{
+	int		ret;
+	zbx_dc_host_t	host;
+
+	zbx_dc_config_get_hosts_by_itemids(&host, &itemid, &ret, 1);
+
+	if (FAIL == ret)
+		return FAIL;
+
+	*replace_to = zbx_strdup(*replace_to, host.host);
 
 	return ret;
 }
@@ -11436,13 +11451,13 @@ int	zbx_dc_get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char **
 
 	switch (request)
 	{
-		case ZBX_REQUEST_HOST_IP:
+		case ZBX_DC_REQUEST_HOST_IP:
 			if ('\0' != *interface.ip_orig && FAIL == zbx_is_ip(interface.ip_orig))
 				return FAIL;
 
 			*replace_to = zbx_strdup(*replace_to, interface.ip_orig);
 			break;
-		case ZBX_REQUEST_HOST_DNS:
+		case ZBX_DC_REQUEST_HOST_DNS:
 			if ('\0' != *interface.dns_orig && FAIL == zbx_is_ip(interface.dns_orig) &&
 					FAIL == zbx_validate_hostname(interface.dns_orig))
 			{
@@ -11451,7 +11466,7 @@ int	zbx_dc_get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char **
 
 			*replace_to = zbx_strdup(*replace_to, interface.dns_orig);
 			break;
-		case ZBX_REQUEST_HOST_CONN:
+		case ZBX_DC_REQUEST_HOST_CONN:
 			if (FAIL == zbx_is_ip(interface.addr) &&
 					FAIL == zbx_validate_hostname(interface.addr))
 			{
@@ -11460,7 +11475,7 @@ int	zbx_dc_get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char **
 
 			*replace_to = zbx_strdup(*replace_to, interface.addr);
 			break;
-		case ZBX_REQUEST_HOST_PORT:
+		case ZBX_DC_REQUEST_HOST_PORT:
 			*replace_to = zbx_strdup(*replace_to, interface.port_orig);
 			break;
 		default:
@@ -11469,6 +11484,11 @@ int	zbx_dc_get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char **
 	}
 
 	return res;
+}
+
+int	zbx_dc_get_interface_value_itemid(zbx_uint64_t itemid, char **replace_to, int request)
+{
+	return zbx_dc_get_interface_value(0, itemid, replace_to, request);
 }
 
 /******************************************************************************
@@ -16490,6 +16510,30 @@ int	zbx_dc_expand_user_and_func_macros(const zbx_dc_um_handle_t *um_handle, char
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s() '%s'", __func__, *text);
+
+	return ret;
+}
+
+int	zbx_dc_expand_user_and_func_macros_itemid(zbx_uint64_t itemid, char **replace_to)
+{
+	zbx_dc_item_t	dc_item;
+	int		ret = FAIL, errcode;
+
+	zbx_dc_config_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
+
+	if (SUCCEED == errcode)
+	{
+		zbx_dc_um_handle_t	*um_handle;
+
+		um_handle = zbx_dc_open_user_macros();
+
+		(void)zbx_dc_expand_user_and_func_macros(um_handle, replace_to, &dc_item.host.hostid, 1, NULL);
+
+		zbx_dc_close_user_macros(um_handle);
+		ret = SUCCEED;
+	}
+
+	zbx_dc_config_clean_items(&dc_item, &errcode, 1);
 
 	return ret;
 }
