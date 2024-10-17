@@ -24,8 +24,7 @@
 #include "zbxtime.h"
 #include "zbxvariant.h"
 #include "zbx_expression_constants.h"
-#include "zbxexpression.h"
-#include "zbxparam.h"
+#include "zbxdb.h"
 
 /* temporary cache of trigger related data */
 typedef struct

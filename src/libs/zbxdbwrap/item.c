@@ -14,12 +14,12 @@
 
 #include "zbxdbwrap.h"
 
-#include "zbx_expression_constants.h"
 #include "zbxhistory.h"
 #include "zbxcachevalue.h"
 #include "zbxexpression.h"
-#include "zbx_item_constants.h"
-#include "zbxcachevalue.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxtime.h"
 
 /******************************************************************************
  *                                                                            *

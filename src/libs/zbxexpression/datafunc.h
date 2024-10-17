@@ -18,7 +18,6 @@
 #include "evalfunc.h"
 
 #include "zbxdbhigh.h"
-#include "zbxtime.h"
 
 const char	*alert_type_string(unsigned char type);
 const char	*alert_status_string(unsigned char type, unsigned char status);

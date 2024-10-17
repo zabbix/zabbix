@@ -18,15 +18,13 @@
 
 #include "zbxdb.h"
 #include "zbxcacheconfig.h"
-#include "zbxcachevalue.h"
 #include "zbx_expression_constants.h"
 #include "zbxevent.h"
 #include "zbxdbwrap.h"
-#include "zbxvariant.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxalgo.h"
-#include "zbxhistory.h"
+#include "zbxtime.h"
 
 /******************************************************************************
  *                                                                            *
@@ -272,7 +270,6 @@ static void	zbx_substitute_macros_in_item_key(zbx_dc_item_t *dc_item, char **rep
 	zbx_free(*replace_to);
 	*replace_to = key;
 }
-
 
 int	expr_db_get_trigger_error(const zbx_db_trigger *trigger, char **replace_to)
 {
@@ -562,4 +559,3 @@ int	expr_db_get_event_symptoms(const zbx_db_event *event, char **replace_to)
 
 	return ret;
 }
-
