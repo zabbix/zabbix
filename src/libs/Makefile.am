@@ -232,8 +232,6 @@ endif
 SUBDIRS = \
 	zbxalgo \
 	zbxalerter \
-	zbxasyncpoller \
-	zbxasynchttppoller \
 	zbxbincommon \
 	zbxcommon \
 	zbxcomms \
