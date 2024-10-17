@@ -239,6 +239,7 @@ SUBDIRS = \
 	zbxcompress \
 	zbxcfg \
 	zbxcrypto \
+	zbxcurl \
 	zbxdbschema \
 	zbxdiscovery \
 	zbxescalations \
