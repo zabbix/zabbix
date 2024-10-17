@@ -266,13 +266,11 @@ SUBDIRS = \
 	zbxparam \
 	zbxpinger \
 	zbxregexp \
-	zbxscripts \
 	zbxsysinfo \
 	zbxstr \
 	zbxthreads \
 	zbxtime \
 	zbxvariant \
-	zbxtrapper \
 	zbxversion \
 	zbxvmware \
 	zbxxml \
