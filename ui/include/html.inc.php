@@ -824,7 +824,7 @@ function makeLogo(int $type): CTag {
 	$brand_logo = CBrandHelper::getLogo($type);
 
 	if ($brand_logo !== null) {
-		return (new CImg($brand_logo));
+		return (new CImg($brand_logo))->addClass($zabbix_logo_classes[$type]);
 	}
 
 	return (new CDiv())->addClass($zabbix_logo_classes[$type]);
