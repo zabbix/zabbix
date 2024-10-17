@@ -133,6 +133,8 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 
 void	zbx_set_snmp_bulkwalk_options(const char *progname);
 
+#endif
+
 void	zbx_async_check_agent_clean(zbx_agent_context *agent_context);
 
 int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_task_clear_cb_t clear_cb,
@@ -172,7 +174,6 @@ typedef struct
 }
 zbx_poller_config_t;
 
-#endif
 
 
 #endif /* ZABBIX_ZBX_POLLER_H*/
