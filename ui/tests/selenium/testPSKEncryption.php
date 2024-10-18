@@ -133,7 +133,7 @@ class testPSKEncryption extends CWebTest {
 	public function prepareAutoregistrationData() {
 		CDataHelper::call('autoregistration.update',
 			[
-				'tls_accept' => 3, // Allow both unencrypted  and TLS with PSK connections.
+				'tls_accept' => 3, // Allow both unencrypted and TLS with PSK connections.
 				'tls_psk_identity' => 'autoregistration_identity',
 				'tls_psk' => 'c1be5e2fc488b0934f8f44be69fac48da9037087ea05d7fac05a702e3370370f'
 			]
@@ -143,7 +143,7 @@ class testPSKEncryption extends CWebTest {
 	public static function clearAutoregistrationData() {
 		CDataHelper::call('autoregistration.update',
 			[
-				'tls_accept' => 1 // Allow only unencrypted  connections.
+				'tls_accept' => 1 // Allow only unencrypted connections.
 			]
 		);
 	}
