@@ -244,6 +244,7 @@ SUBDIRS = \
 	zbxfile \
 	zbxgetopt \
 	zbxhash \
+	zbxhttp \
 	zbxinterface \
 	zbxip \
 	zbxjson \
