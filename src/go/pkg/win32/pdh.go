@@ -131,8 +131,8 @@ func PdhAddEnglishCounter(query PDH_HQUERY, path string, userData uintptr) (coun
 }
 
 func PdhCollectQueryData(query PDH_HQUERY) (err error) {
-	pdhMu.RLock()
-	defer pdhMu.RUnlock()
+	pdhMu.Lock()
+	defer pdhMu.Unlock()
 	ret, _, _ := syscall.Syscall(pdhCollectQueryData, 1, uintptr(query), 0, 0)
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
 		return newPdhError(ret)

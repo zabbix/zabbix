@@ -178,11 +178,14 @@ func (p *Plugin) Start() {
 				t.Stop()
 				return
 			case <-t.C:
+				p.Debugf("starting to collect CPU performance data")
 				err := p.collectCpuData()
 				lastCheck = time.Now()
 
 				if err != nil {
 					p.Warningf("failed to get CPU performance data: '%s'", err)
+				} else {
+					p.Debugf("collected CPU performance data")
 				}
 			}
 		}
