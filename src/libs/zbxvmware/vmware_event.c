@@ -1200,7 +1200,7 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 	unsigned char			evt_pause = 0, evt_skip_old, evt_severity;
 	zbx_uint64_t			evt_last_key, events_sz = 0, shmem_free_sz = 0;
 	time_t				evt_last_ts;
-	char				msg[MAX_STRING_LEN / 8];
+	char				msg[VMWARE_SHORT_STR_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, service->username, service->url);
 
@@ -1222,22 +1222,34 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 	{
 		evt_pause = 1;
 	}
-	else if (NULL != service->eventlog.data)
-		vmware_eventlog_msg_shared_free(&service->eventlog.data->events);
-
-	if (vmware_shmem_get_vmware_mem()->free_size > vmware_shmem_get_vmware_mem()->total_size * 5 / 100)
-	{
-		shmem_free_sz = vmware_shmem_get_vmware_mem()->free_size -
-				vmware_shmem_get_vmware_mem()->total_size * 5 / 100;
-		service->eventlog.req_sz = 0;
-
-		if (FAIL == vmware_shared_is_ready())
-			evt_pause = 1;
-	}
 	else
 	{
-		evt_pause = 1;
-		service->eventlog.oom = 1;
+		if (NULL != service->eventlog.data)
+			vmware_eventlog_msg_shared_free(&service->eventlog.data->events);
+
+		if (vmware_shmem_get_vmware_mem()->free_size > vmware_shmem_get_vmware_mem()->total_size * 5 / 100)
+		{
+			shmem_free_sz = vmware_shmem_get_vmware_mem()->free_size -
+					vmware_shmem_get_vmware_mem()->total_size * 5 / 100;
+
+			/* we read events small 1MB (13.5k events) chunks because: */
+			/* - easy for poller */
+			/* - getting data in UI faster */
+			/* - more predictable memory split across multiple VC */
+			/* - memory fragmentation: no need for one monotonic huge chunk of memory */
+			if (shmem_free_sz > ZBX_MEBIBYTE)
+				shmem_free_sz = ZBX_MEBIBYTE;
+
+			service->eventlog.req_sz = 0;
+
+			if (FAIL == vmware_shared_is_ready())
+				evt_pause = 1;
+		}
+		else
+		{
+			evt_pause = 1;
+			service->eventlog.oom = 1;
+		}
 	}
 
 	zbx_vmware_unlock();

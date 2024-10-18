@@ -26,7 +26,7 @@ zbx_vmware_t			*zbx_vmware_get_vmware(void);
 
 #define ZBX_XPATH_PROP_OBJECT(type)	ZBX_XPATH_PROP_OBJECT_ID(type, "") "/"
 
-#define		VMWARE_SHORT_STR_LEN	MAX_STRING_LEN / 8
+#define		VMWARE_SHORT_STR_LEN	MAX_STRING_LEN / 8 + 1
 
 #define ZBX_POST_VSPHERE_HEADER									\
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"					\
@@ -182,8 +182,8 @@ void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zbx_vecto
 	"/*/*/*/*/*[local-name()='objects']/*[local-name()='obj'][@type='" type "']"
 
 #define ZBX_XNN(NN)			"*[local-name()='" NN "']"
-#define ZBX_XPATH_NN(NN)			ZBX_XNN(NN)
-#define ZBX_XPATH_LN(LN)			"/" ZBX_XPATH_NN(LN)
+#define ZBX_XPATH_NN(NN)		ZBX_XNN(NN)
+#define ZBX_XPATH_LN(LN)		"/" ZBX_XPATH_NN(LN)
 #define ZBX_XPATH_LN1(LN1)		"/" ZBX_XPATH_LN(LN1)
 #define ZBX_XPATH_LN2(LN1, LN2)		"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2)
 #define ZBX_XPATH_LN3(LN1, LN2, LN3)	"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2) ZBX_XPATH_LN(LN3)

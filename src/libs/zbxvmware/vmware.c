@@ -2555,7 +2555,7 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 	zbx_vmware_alarms_data_t	alarms_data;
 	int				ret = FAIL;
 	ZBX_HTTPPAGE			page;	/* 347K/87K */
-	char				msg[MAX_STRING_LEN / 8];
+	char				msg[VMWARE_SHORT_STR_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, service->username, service->url);
 
