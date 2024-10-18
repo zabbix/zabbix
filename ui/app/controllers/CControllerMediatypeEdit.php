@@ -95,7 +95,7 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_username' => '',
 			'passwd' => '',
 			'status' => MEDIA_TYPE_STATUS_ACTIVE,
-			'change_passwd' => true,
+			'display_password_input' => true,
 			'maxsessions' => $db_defaults['maxsessions'],
 			'maxattempts' => $db_defaults['maxattempts'],
 			'attempt_interval' => $db_defaults['attempt_interval'],
@@ -127,7 +127,8 @@ class CControllerMediatypeEdit extends CController {
 			switch ($data['type']) {
 				case MEDIA_TYPE_EMAIL:
 					$data['smtp_username'] = $this->mediatype['username'];
-					$data['change_passwd'] = $this->mediatype['smtp_authentication'] != SMTP_AUTHENTICATION_NORMAL;
+					$data['display_password_input'] =
+						$this->mediatype['smtp_authentication'] != SMTP_AUTHENTICATION_NORMAL;
 					break;
 
 				case MEDIA_TYPE_EXEC:
