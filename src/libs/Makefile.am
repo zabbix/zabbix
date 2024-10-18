@@ -231,7 +231,6 @@ endif
 
 SUBDIRS = \
 	zbxalgo \
-	zbxalerter \
 	zbxbincommon \
 	zbxcommon \
 	zbxcomms \
@@ -240,16 +239,11 @@ SUBDIRS = \
 	zbxcfg \
 	zbxcrypto \
 	zbxcurl \
-	zbxdbschema \
-	zbxdiscovery \
-	zbxescalations \
 	zbxexec \
 	zbxexpr \
 	zbxfile \
 	zbxgetopt \
 	zbxhash \
-	zbxhttp \
-	zbxhttppoller \
 	zbxinterface \
 	zbxip \
 	zbxjson \
@@ -260,7 +254,6 @@ SUBDIRS = \
 	zbxnix \
 	zbxnum \
 	zbxparam \
-	zbxpinger \
 	zbxregexp \
 	zbxsysinfo \
 	zbxstr \
