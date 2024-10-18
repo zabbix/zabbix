@@ -4594,11 +4594,10 @@ z-select[readonly] .focusable,
 .menu-popup {
   position: fixed;
   overflow-y: auto;
-  z-index: 1001;
+  z-index: 10001;
   padding: 5px 15px 5px 25px;
   min-width: 166px;
   max-width: 250px;
-  max-height: calc(100vh - 90px);
   background-color: #ffffff;
   border: 1px solid #ccd5d9;
   border-bottom-color: #c9d3d7;
@@ -4619,7 +4618,7 @@ z-select[readonly] .focusable,
     text-decoration: none;
     border: 0;
     outline: 0;
-    padding: 0 20px 0 25px;
+    padding: 0 25px 0 25px;
     margin: 0 -15px 0 -25px;
     position: relative;
     transition: background-color .2s ease-out; }

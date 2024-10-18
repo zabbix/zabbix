@@ -1180,13 +1180,16 @@ function getMenuPopupScriptData(scripts, trigger_element, hostid, eventid) {
 }
 
 jQuery(function($) {
+	const SUBMENU_BORDER = 1;
+
+	const SUBMENU_MARGIN_RIGHT = 15;
 	const SUBMENU_PADDING_LEFT = 25;
 	const SUBMENU_PADDING_RIGHT = 15;
-	const SUBMENU_PADDING_Y = 5;
-	const SUBMENU_BORDER = 1;
-	const WRAPPER_MARGIN_TOP = 46;
-	const WRAPPER_MARGIN_BOTTOM = 36;
+
 	const DELTA_Y = 15;
+	const SUBMENU_MARGIN_TOP = 10;
+	const SUBMENU_MARGIN_BOTTOM = 15;
+	const SUBMENU_PADDING_Y = 5;
 
 	const SUBMENU_DELAY = 600;
 
@@ -1270,6 +1273,7 @@ jQuery(function($) {
 
 			const wrapper = $('.wrapper');
 			const wrapper_rect = wrapper[0].getBoundingClientRect();
+			const margin_top = getMenuMarginTop();
 
 			options = $.extend({
 				position: {
@@ -1287,7 +1291,7 @@ jQuery(function($) {
 							? wrapper_rect.right
 							: wrapper_rect.right - data.element.width;
 
-						pos.top = Math.max(0, pos.top);
+						pos.top = Math.max(margin_top, pos.top);
 						pos.left = Math.max(wrapper_rect.left, Math.min(max_left, pos.left));
 
 						data.element.element[0].style.top = `${pos.top}px`;
@@ -1332,9 +1336,14 @@ jQuery(function($) {
 
 			const menu_rect = $menu_popup[0].getBoundingClientRect();
 
-			$menu_popup.css('top', Math.max(WRAPPER_MARGIN_TOP,
-				Math.min(menu_rect.top, wrapper_rect.bottom - menu_rect.height - WRAPPER_MARGIN_BOTTOM)
-			));
+			const menu_top = Math.max(margin_top,
+				Math.min(menu_rect.top, wrapper_rect.bottom - menu_rect.height - SUBMENU_MARGIN_BOTTOM)
+			);
+
+			$menu_popup.css({
+				'top': menu_top,
+				'bottom': Math.max(SUBMENU_MARGIN_BOTTOM, wrapper_rect.bottom - menu_rect.bottom)
+			});
 
 			// Hide all action menu sub-levels, including the topmost, for fade effect to work.
 			$menu_popup.add('.menu-popup', $menu_popup).hide();
@@ -1355,7 +1364,9 @@ jQuery(function($) {
 
 			$menu_popup.focus();
 
-			$menu_popup.on('scroll', () => {
+			$menu_popup.on('scroll', (e) => {
+				e.stopPropagation();
+
 				$menu_popup.actionMenuItemCollapse();
 			});
 
@@ -1437,6 +1448,7 @@ jQuery(function($) {
 						$submenu
 							.css({
 								'top': submenu_data.top,
+								'bottom': submenu_data.bottom,
 								'left': submenu_data.left,
 								'display': 'block'
 							})
@@ -1500,8 +1512,9 @@ jQuery(function($) {
 	 */
 	function calculateSubmenuPosition($submenu, li_pos) {
 		const wrapper_rect = document.querySelector('.wrapper').getBoundingClientRect();
-		const max_relative_top = wrapper_rect.bottom - $submenu.outerHeight() - WRAPPER_MARGIN_BOTTOM;
-		const max_relative_left = wrapper_rect.right - $submenu.outerWidth();
+		const max_relative_top = wrapper_rect.bottom - $submenu.outerHeight() - SUBMENU_MARGIN_BOTTOM;
+		const max_relative_left = wrapper_rect.right - $submenu.outerWidth() - SUBMENU_MARGIN_RIGHT;
+		const margin_top = getMenuMarginTop();
 
 		// Will use parent directions, if the parent is not menu-popup-top.
 		// If the directions are not defined, will use default direction: x - right, y - bottom.
@@ -1535,13 +1548,15 @@ jQuery(function($) {
 				? li_pos.right + SUBMENU_PADDING_RIGHT
 				: li_pos.left - ($submenu.outerWidth() + SUBMENU_PADDING_LEFT);
 
-			submenu_data.left = Math.max(0, Math.min(submenu_data.left, max_relative_left));
+			submenu_data.left = submenu_data.direction_x === 1
+				? Math.min(max_relative_left, submenu_data.left)
+				: Math.max(submenu_data.left, wrapper_rect.left);
 
 			if (!is_first_child
 					&& Math.abs($submenu_parents[1].getBoundingClientRect().top - submenu_data.top) < DELTA_Y) {
 				const pos_top = submenu_data.top + (submenu_data.direction_y * DELTA_Y);
 
-				if (max_relative_top < pos_top || WRAPPER_MARGIN_TOP > pos_top) {
+				if (max_relative_top < pos_top || margin_top > pos_top) {
 					// Reverse the direction on Y axis.
 					submenu_data.direction_y *= -1;
 				}
@@ -1550,9 +1565,18 @@ jQuery(function($) {
 			}
 		}
 
-		submenu_data.top = Math.max(WRAPPER_MARGIN_TOP, Math.min(submenu_data.top, max_relative_top));
+		submenu_data.top = Math.max(margin_top, Math.min(submenu_data.top, max_relative_top));
+		submenu_data.bottom = Math.max(SUBMENU_MARGIN_BOTTOM,
+			wrapper_rect.bottom - (submenu_data.top + $submenu.outerHeight())
+		);
 
 		return submenu_data;
+	}
+
+	function getMenuMarginTop() {
+		const header_rect = document.querySelector('.wrapper > header').getBoundingClientRect();
+
+		return Math.max(SUBMENU_MARGIN_TOP, header_rect.bottom - Math.max(header_rect.top, 0));
 	}
 
 	/**
@@ -1564,12 +1588,22 @@ jQuery(function($) {
 		$('.highlighted', parent_menu).removeClass('highlighted');
 		$('[aria-expanded]', parent_menu).attr({'aria-expanded': 'false'});
 		$('.menu-popup', parent_menu)
-			.css({'display': 'none'})
+			.css({
+				'top': '',
+				'bottom': '',
+				'left': '',
+				'display': 'none'
+			})
 			.removeData('pos');
 
 		// Close actual menu level.
 		parent_menu.not('.menu-popup-top')
-			.css({'display': 'none'})
+			.css({
+				'top': '',
+				'bottom': '',
+				'left': '',
+				'display': 'none'
+			})
 			.removeData('pos');
 
 		parent_menu.prev('[role="menuitem"]').attr({'aria-expanded': 'false'});
@@ -1769,8 +1803,7 @@ jQuery(function($) {
 		if (options.items !== undefined && options.items.length > 0) {
 			link.attr({
 				'aria-haspopup': 'true',
-				'aria-expanded': 'false',
-				'aria-hidden': 'true'
+				'aria-expanded': 'false'
 			});
 			link.on('click', function(e) {
 				e.stopPropagation();
