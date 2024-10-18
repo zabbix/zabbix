@@ -19,7 +19,6 @@
 **/
 
 require_once dirname(__FILE__).'/testGeneric.php';
-require_once dirname(__FILE__).'/testEncryption.php';
 require_once dirname(__FILE__).'/testPageDashboardWidgets.php';
 require_once dirname(__FILE__).'/testPageLatestData.php';
 require_once dirname(__FILE__).'/problems/testFormUpdateProblem.php';
@@ -68,6 +67,7 @@ require_once dirname(__FILE__).'/testPageMonitoringHosts.php';
 require_once dirname(__FILE__).'/networkDiscovery/testPageNetworkDiscovery.php';
 require_once dirname(__FILE__).'/lld/testPageLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testPasswordComplexity.php';
+require_once dirname(__FILE__).'/testPSKEncryption.php';
 /*
 require_once dirname(__FILE__).'/testPageQueueDetails.php';
 require_once dirname(__FILE__).'/testPageQueueOverview.php';
@@ -242,7 +242,6 @@ class SeleniumTests {
 		$suite = new TestSuite('selenium');
 
 		$suite->addTestSuite('testGeneric');
-		$suite->addTestSuite('testEncryption');
 		$suite->addTestSuite('testPageActions');
 		$suite->addTestSuite('testPageAdministrationDMProxies');
 		$suite->addTestSuite('testFormAdministrationGeneralAutoregistration');
@@ -314,6 +313,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageUsers');
 		$suite->addTestSuite('testPageMonitoringWeb');
 		$suite->addTestSuite('testPasswordComplexity');
+		$suite->addTestSuite('testPSKEncryption');
 		$suite->addTestSuite('testExpandExpressionMacros');
 		$suite->addTestSuite('testFormAction');
 		$suite->addTestSuite('testFormAdministrationAuthenticationSaml');
