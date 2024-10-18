@@ -82,8 +82,6 @@ void	zbx_shutdown_library_mt_snmp(const char *progname);
 
 void	zbx_clear_cache_snmp(unsigned char process_type, int process_num);
 
-////////
-
 typedef enum
 {
 	ZABBIX_AGENT_STEP_CONNECT_INIT = 0,
@@ -93,6 +91,22 @@ typedef enum
 	ZABBIX_AGENT_STEP_RECV
 }
 zbx_zabbix_agent_step_t;
+
+#ifdef HAVE_NETSNMP
+typedef struct zbx_snmp_context	zbx_snmp_context_t;
+
+void	*zbx_async_check_snmp_get_arg(zbx_snmp_context_t *snmp_context);
+
+zbx_dc_item_context_t	*zbx_async_check_snmp_get_item_context(zbx_snmp_context_t *snmp_context);
+
+char	*zbx_async_check_snmp_get_reverse_dns(zbx_snmp_context_t *snmp_context);
+void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context);
+int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_task_clear_cb_t clear_cb,
+		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
+		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries);
+
+void	zbx_set_snmp_bulkwalk_options(const char *progname);
+#endif
 
 typedef struct
 {
@@ -115,25 +129,6 @@ typedef struct
 	struct zbx_json			j;
 }
 zbx_agent_context;
-
-#ifdef HAVE_NETSNMP
-
-typedef struct zbx_snmp_context	zbx_snmp_context_t;
-
-void	*zbx_async_check_snmp_get_arg(zbx_snmp_context_t *snmp_context);
-
-zbx_dc_item_context_t	*zbx_async_check_snmp_get_item_context(zbx_snmp_context_t *snmp_context);
-char	*zbx_async_check_snmp_get_reverse_dns(zbx_snmp_context_t *snmp_context);
-
-void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context);
-
-int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_task_clear_cb_t clear_cb,
-		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
-		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries);
-
-void	zbx_set_snmp_bulkwalk_options(const char *progname);
-
-#endif
 
 void	zbx_async_check_agent_clean(zbx_agent_context *agent_context);
 
@@ -173,7 +168,5 @@ typedef struct
 #endif
 }
 zbx_poller_config_t;
-
-
 
 #endif /* ZABBIX_ZBX_POLLER_H*/

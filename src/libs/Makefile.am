@@ -93,7 +93,9 @@ DIST_SUBDIRS = \
 
 if SERVER
 SERVER_SUBDIRS = \
+	zbxalerter \
 	zbxasynchttppoller \
+	zbxasyncpoller \
 	zbxaudit \
 	zbxautoreg \
 	zbxavailability \
@@ -124,6 +126,7 @@ SERVER_SUBDIRS = \
 	zbxicmpping \
 	zbxinterface \
 	zbxip \
+	zbxipcservice \
 	zbxkvs \
 	zbxmedia \
 	zbxnum \
@@ -163,6 +166,7 @@ endif
 else
 if PROXY
 PROXY_SUBDIRS = \
+	zbxasyncpoller \
 	zbxaudit \
 	zbxautoreg \
 	zbxavailability \
@@ -192,6 +196,7 @@ PROXY_SUBDIRS = \
 	zbxicmpping \
 	zbxinterface \
 	zbxip \
+	zbxipcservice \
 	zbxkvs \
 	zbxnum \
 	zbxodbc \
