@@ -167,6 +167,7 @@ else
 if PROXY
 PROXY_SUBDIRS = \
 	zbxasyncpoller \
+	zbxasynchttppoller \
 	zbxaudit \
 	zbxautoreg \
 	zbxavailability \
