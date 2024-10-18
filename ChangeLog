@@ -1,8 +1,10 @@
 Changes for 7.2.0alpha2
 
 New features:
+.......PS. [ZBXNEXT-9238] increased PostgreSQL maximum supported version to 17 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-24582] truncated error message when testing item and there is value type mismatch (rtrizna)
 
 --------------------------------------------------------------------------------
 Changes for 7.2.0alpha1
@@ -1154,6 +1156,7 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.20rc1
 
 New features:
+.......PS. [ZBXNEXT-9238] increased PostgreSQL maximum supported version to 17 (mprihodko)
 
 Bug fixes:
 ...G...... [ZBX-24273] fixed potential Zabbix agent crash for vfs.fs.get item (MVekslers)
