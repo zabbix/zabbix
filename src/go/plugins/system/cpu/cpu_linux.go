@@ -63,7 +63,7 @@ func (*Plugin) Period() int {
 	return 1
 }
 
-func (*Plugin) getCpuLoad(_ []string) (result any, err error) {
+func (*Plugin) getCPULoad(_ []string) (any, error) {
 	return nil, plugin.UnsupportedMetricError
 }
 
@@ -150,7 +150,7 @@ func (p *Plugin) addCpu(index int) {
 	}
 }
 
-func (*Plugin) getCounterAverage(cpu *cpuUnit, counter cpuCounter, period historyIndex) (result any) {
+func (*Plugin) getCounterAverage(cpu *cpuUnit, counter cpuCounter, period historyIndex) any {
 	return cpu.counterAverage(counter, period, 1)
 }
 

@@ -98,7 +98,7 @@ func numCPU() (numCpu int) {
 	return
 }
 
-func (p *Plugin) getCpuLoad(params []string) (result any, err error) {
+func (p *Plugin) getCPULoad(params []string) (result any, err error) {
 	split := 1
 
 	period := historyIndex(defaultIndex)
@@ -207,7 +207,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "system.cpu.discovery":
 		return p.getCpuDiscovery(params)
 	case "system.cpu.load":
-		return p.getCpuLoad(params)
+		return p.getCPULoad(params)
 	case "system.cpu.num":
 		if len(params) > 0 && params[0] == "max" {
 			return nil, errors.New("Invalid first parameter.")
@@ -220,7 +220,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 }
 
-func (p *Plugin) getCounterAverage(cpu *cpuUnit, counter cpuCounter, period historyIndex) (result any) {
+func (p *Plugin) getCounterAverage(cpu *cpuUnit, counter cpuCounter, period historyIndex) any {
 	p.historyCpuMutex.Lock()
 	defer p.historyCpuMutex.Unlock()
 	return cpu.counterAverage(counter, period, 1)
