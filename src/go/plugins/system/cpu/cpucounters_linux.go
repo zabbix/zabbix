@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package stats
+package cpu
 
 const (
 	counterUnknown cpuCounter = iota - 1
@@ -81,8 +81,8 @@ func (c *cpuUnit) counterAverage(counter cpuCounter, period historyIndex, _ int)
 	if totalnum-1 < period {
 		period = totalnum - 1
 	}
-	tail = &c.history[c.tail.dec(maxHistory)]
-	head = &c.history[c.tail.sub(period+1, maxHistory)]
+	tail = &c.history[c.tail.dec()]
+	head = &c.history[c.tail.sub(period+1)]
 
 	var value, total uint64
 	for i := 0; i < len(tail.counters); i++ {

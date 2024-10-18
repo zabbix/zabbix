@@ -1,3 +1,6 @@
+//go:build windows
+// +build windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
@@ -17,30 +20,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package stats
+package perfmon
 
 import (
 	"errors"
 	"fmt"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
-	"unsafe"
 
 	"golang.zabbix.com/agent2/pkg/pdh"
 	"golang.zabbix.com/agent2/pkg/win32"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
-)
-
-const (
-	modeParam = 2
-	cpuParam  = 1
-	noParam   = 0
-
-	defaultIndex = 60
 )
 
 const (
@@ -83,10 +76,7 @@ type perfCounter struct {
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	cpus             []*cpuUnit
-	collector        *pdhCollector
 	historyPerfMutex sync.Mutex
-	historyCpuMutex  sync.Mutex
 	counters         map[perfCounterIndex]*perfCounter
 	countersErr      map[perfCounterIndex]*perfCounterErrorInfo
 	addCounters      []perfCounterAddInfo
@@ -95,15 +85,11 @@ type Plugin struct {
 	stop             chan bool
 }
 
-func init() {
-	impl.collector = newPdhCollector(&impl)
+type historyIndex int
 
+func init() {
 	err := plugin.RegisterMetrics(
-		&impl, pluginName,
-		"system.cpu.discovery", "List of detected CPUs/CPU cores, used for low-level discovery.",
-		"system.cpu.load", "CPU load.",
-		"system.cpu.num", "Number of CPUs.",
-		"system.cpu.util", "CPU utilization percentage.",
+		&impl, "WindowsPerfMon",
 		"perf_counter", "Value of any Windows performance counter.",
 		"perf_counter_en", "Value of any Windows performance counter in English.",
 	)
@@ -112,129 +98,25 @@ func init() {
 	}
 }
 
-func numCPUOnline() int {
-	return numCPU()
-}
-
-func numCPUConf() int {
-	// unsupported on Windows
-	return 0
-}
-
-func numCPU() (numCpu int) {
-	size, err := win32.GetLogicalProcessorInformationEx(win32.RelationProcessorCore, nil)
-	if err != nil {
-		return
-	}
-
-	b := make([]byte, size)
-	size, err = win32.GetLogicalProcessorInformationEx(win32.RelationProcessorCore, b)
-	if err != nil {
-		return
-	}
-
-	var sinfo *win32.SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX
-	for i := uint32(0); i < size; i += sinfo.Size {
-		sinfo = (*win32.SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX)(unsafe.Pointer(&b[i]))
-		pinfo := (*win32.PROCESSOR_RELATIONSHIP)(unsafe.Pointer(&sinfo.Data[0]))
-		groups := (*win32.RGGROUP_AFFINITY)(unsafe.Pointer(&pinfo.GroupMask[0]))[:pinfo.GroupCount:pinfo.GroupCount]
-		for _, group := range groups {
-			for mask := group.Mask; mask != 0; mask >>= 1 {
-				numCpu += int(mask & 1)
-			}
-		}
-	}
-	return
-}
-
-func (p *Plugin) getCpuLoad(params []string) (result interface{}, err error) {
-	split := 1
-
-	period := historyIndex(defaultIndex)
-	switch len(params) {
-	case modeParam: // mode parameter
-		if period = periodByMode(params[1]); period < 0 {
-			return nil, errors.New("Invalid first parameter.")
-		}
-
-		fallthrough
-	case cpuParam: // all, cpu number or per cpu
-		switch params[0] {
-		case "", "all":
-		case "percpu":
-			split = numCPUOnline()
-		default:
-			return nil, errors.New("Invalid second parameter.")
-		}
-	case noParam:
-	default:
-		return nil, zbxerr.ErrorTooManyParameters
-	}
-
-	p.historyCpuMutex.Lock()
-	defer p.historyCpuMutex.Unlock()
-
-	return p.cpus[0].counterAverage(counterLoad, period, split), nil
-}
-
-func (p *Plugin) collectCpuData() (err error) {
-	ok, err := p.collector.collect()
-	if err != nil || !ok {
-		return
-	}
-
-	for i, cpu := range p.cpus {
-		slot := &cpu.history[cpu.tail]
-		cpu.status = cpuStatusOnline
-		if i == 0 {
-			// gather cpu load into 'total' slot
-			slot.load += p.collector.cpuLoad()
-		}
-		slot.util += p.collector.cpuUtil(i)
-
-		p.historyCpuMutex.Lock()
-		if cpu.tail = cpu.tail.inc(maxHistory); cpu.tail == cpu.head {
-			cpu.head = cpu.head.inc(maxHistory)
-		}
-		// write the current value into next slot so next time the new value
-		// can be added to it resulting in incrementing counter
-		nextSlot := &cpu.history[cpu.tail]
-		*nextSlot = *slot
-		p.historyCpuMutex.Unlock()
-	}
-	return
-}
-
 func (p *Plugin) Start() {
-	numCpus := numCPU()
-	numGroups := getNumaNodeCount()
-	if numCpus == 0 || numGroups == 0 {
-		p.Warningf("cannot calculate the number of CPUs per group, only total values will be available")
-	}
-	p.cpus = p.newCpus(numCpus)
-	p.collector.open(numCpus, numGroups)
-
 	p.stop = make(chan bool)
 
 	go func() {
-		var err error
-
-		t := time.NewTimer(1 * time.Second)
-		defer t.Stop()
+		lastCheck := time.Now().Add(-1 * time.Second)
+		var t *time.Timer
 
 		for {
+			t = time.NewTimer(lastCheck.Add(1 * time.Second).Sub(time.Now()))
 			select {
 			case <-p.stop:
+				t.Stop()
 				return
 			case <-t.C:
-				err = p.collectPerfCounterData()
+				err := p.collectPerfCounterData()
+				lastCheck = time.Now()
+
 				if err != nil {
 					p.Warningf("failed to get performance counters data: '%s'", err)
-				}
-
-				err = p.collectCpuData()
-				if err != nil {
-					p.Warningf("failed to get CPU performance data: '%s'", err)
 				}
 			}
 		}
@@ -242,46 +124,11 @@ func (p *Plugin) Start() {
 }
 
 func (p *Plugin) Stop() {
-	p.collector.close()
-	p.cpus = nil
-
 	p.stop <- true
 }
 
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if strings.HasPrefix(key, "system.") {
-		result, err = p.export_cpu(key, params, ctx)
-	} else {
-		result, err = p.export_perf(key, params, ctx)
-	}
-
-	return
-}
-
-func (p *Plugin) export_cpu(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if p.cpus == nil || p.cpus[0].head == p.cpus[0].tail {
-		// no data gathered yet
-		return
-	}
-	switch key {
-	case "system.cpu.discovery":
-		return p.getCpuDiscovery(params)
-	case "system.cpu.load":
-		return p.getCpuLoad(params)
-	case "system.cpu.num":
-		if len(params) > 0 && params[0] == "max" {
-			return nil, errors.New("Invalid first parameter.")
-		}
-		return p.getCpuNum(params)
-	case "system.cpu.util":
-		return p.getCpuUtil(params)
-	default:
-		return nil, plugin.UnsupportedMetricError
-	}
-}
-
 // Export -
-func (p *Plugin) export_perf(key string, params []string, ctx plugin.ContextProvider) (any, error) {
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (any, error) {
 	var lang int
 	switch key {
 	case "perf_counter":
@@ -355,6 +202,7 @@ func (p *Plugin) export_perf(key string, params []string, ctx plugin.ContextProv
 func (p *Plugin) collectPerfCounterData() error {
 	p.historyPerfMutex.Lock()
 	if len(p.counters) == 0 && len(p.addCounters) == 0 {
+		p.historyPerfMutex.Unlock()
 		return nil
 	}
 	p.historyPerfMutex.Unlock()
@@ -544,7 +392,7 @@ func (c *perfCounter) getHistory(interval int) (value interface{}, err error) {
 	if totalnum < interval {
 		interval = totalnum
 	}
-	start := c.tail.sub(historyIndex(interval), c.interval)
+	start := c.tail.sub(interval, c.interval)
 	var total, num float64
 	for index := start; index != c.tail; index = index.inc(c.interval) {
 		if pvalue := c.history[index]; pvalue != nil {
@@ -559,8 +407,29 @@ func (c *perfCounter) getHistory(interval int) (value interface{}, err error) {
 	return nil, nil
 }
 
-func (p *Plugin) getCounterAverage(cpu *cpuUnit, counter cpuCounter, period historyIndex) (result interface{}) {
-	p.historyCpuMutex.Lock()
-	defer p.historyCpuMutex.Unlock()
-	return cpu.counterAverage(counter, period, 1)
+func (h historyIndex) inc(interval int) historyIndex {
+	h++
+	if int(h) == interval {
+		h = 0
+	}
+
+	return h
+}
+
+func (h historyIndex) dec(interval int) historyIndex {
+	h--
+	if int(h) < 0 {
+		h = historyIndex(interval - 1)
+	}
+
+	return h
+}
+
+func (h historyIndex) sub(value, interval int) historyIndex {
+	h -= historyIndex(value)
+	for int(h) < 0 {
+		h += historyIndex(interval)
+	}
+
+	return h
 }
