@@ -98,7 +98,7 @@ func numCPU() (numCpu int) {
 	return
 }
 
-func (p *Plugin) getCpuLoad(params []string) (result interface{}, err error) {
+func (p *Plugin) getCpuLoad(params []string) (result any, err error) {
 	split := 1
 
 	period := historyIndex(defaultIndex)
@@ -168,9 +168,8 @@ func (p *Plugin) Start() {
 	p.stop = make(chan bool)
 
 	go func() {
-		lastCheck := time.Now().Add(-1 * time.Second)
 		var t *time.Timer
-
+		lastCheck := time.Now().Add(-1 * time.Second)
 		for {
 			t = time.NewTimer(lastCheck.Add(1 * time.Second).Sub(time.Now()))
 			select {
@@ -221,7 +220,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 }
 
-func (p *Plugin) getCounterAverage(cpu *cpuUnit, counter cpuCounter, period historyIndex) (result interface{}) {
+func (p *Plugin) getCounterAverage(cpu *cpuUnit, counter cpuCounter, period historyIndex) (result any) {
 	p.historyCpuMutex.Lock()
 	defer p.historyCpuMutex.Unlock()
 	return cpu.counterAverage(counter, period, 1)

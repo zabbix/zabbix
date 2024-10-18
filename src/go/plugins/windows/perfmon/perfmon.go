@@ -102,9 +102,8 @@ func (p *Plugin) Start() {
 	p.stop = make(chan bool)
 
 	go func() {
-		lastCheck := time.Now().Add(-1 * time.Second)
 		var t *time.Timer
-
+		lastCheck := time.Now().Add(-1 * time.Second)
 		for {
 			t = time.NewTimer(lastCheck.Add(1 * time.Second).Sub(time.Now()))
 			select {
