@@ -45,7 +45,8 @@ class CEventNameValidatorTest extends TestCase {
 			['Nested expression macro not supported {?100+{?20+1}}', false, 'incorrect expression starting from "{?20+1}}"'],
 			['Empty expression macro {?}', false, 'incorrect expression starting from "}"'],
 			['Function value macro {FUNCTION.VALUE} {FUNCTION.VALUE1} {?{FUNCTION.VALUE}+{FUNCTION.VALUE9}}', true, null],
-			['Function value macro {FUNCTION.RECOVERY.VALUE} {FUNCTION.RECOVERY.VALUE1} {?{FUNCTION.RECOVERY.VALUE}+{FUNCTION.RECOVERY.VALUE9}}', true, null]
+			['Function value macro {FUNCTION.RECOVERY.VALUE} {FUNCTION.RECOVERY.VALUE1} {?{FUNCTION.RECOVERY.VALUE}+{FUNCTION.RECOVERY.VALUE9}}', true, null],
+			['Function value macro {{?{FUNCTION.VALUE}}.regsub("{?", "a")}', true, null]
 		];
 	}
 
