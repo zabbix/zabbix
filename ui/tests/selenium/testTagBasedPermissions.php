@@ -400,6 +400,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 
 		// Check problem displaying on Problem page
 		$this->zbxTestOpen('zabbix.php?action=problem.view');
+		$this->page->waitUntilReady();
 		$this->zbxTestTextPresent($data['trigger_names']);
 		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying '.$countTriggers.' of '.$countTriggers.' found');
 

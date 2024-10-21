@@ -348,6 +348,7 @@ class testPageProblems extends CLegacyWebTest {
 	public function testPageProblems_TagPriority($data) {
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestClickButtonText('Reset');
+		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
 		$this->zbxTestInputType('filter_name', 'trigger with tag priority');
 
 		if (array_key_exists('show_tags', $data)) {
@@ -363,6 +364,8 @@ class testPageProblems extends CLegacyWebTest {
 		}
 
 		$this->zbxTestClickButtonText('Apply');
+		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 
 		// Check tag priority sorting.
 		if (array_key_exists('sorting', $data)) {
