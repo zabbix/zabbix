@@ -695,10 +695,10 @@ static void	zbx_set_sender_signal_handlers(void)
 static	ZBX_THREAD_ENTRY(send_value, args)
 {
 	ZBX_THREAD_SENDVAL_ARGS	*sendval_args = (ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args;
-	int			ret = FAIL;
+	int			ret = FAIL, retries = sendval_args->addrs->values_num;
 	zbx_socket_t		sock;
 #if !defined(_WINDOWS)
-	int			i, retries = sendval_args->addrs->values_num;
+	int			i;
 	zbx_addr_t		*last_addr;
 
 	last_addr = (zbx_addr_t *)sendval_args->addrs->values[0];
