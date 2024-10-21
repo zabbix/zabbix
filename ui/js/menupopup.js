@@ -1180,16 +1180,17 @@ function getMenuPopupScriptData(scripts, trigger_element, hostid, eventid) {
 }
 
 jQuery(function($) {
-	const SUBMENU_BORDER = 1;
+	const MENU_BORDER = 1;
 
-	const SUBMENU_MARGIN_RIGHT = 15;
-	const SUBMENU_PADDING_LEFT = 25;
-	const SUBMENU_PADDING_RIGHT = 15;
+	const MENU_PADDING_LEFT = 25;
+	const MENU_PADDING_RIGHT = 15;
+	const MENU_PADDING_Y = 5;
 
 	const DELTA_Y = 15;
-	const SUBMENU_MARGIN_TOP = 10;
-	const SUBMENU_MARGIN_BOTTOM = 15;
-	const SUBMENU_PADDING_Y = 5;
+
+	const WRAPPER_PADDING_BOTTOM = 15;
+	const WRAPPER_PADDING_TOP = 10;
+	const WRAPPER_PADDING_RIGHT = 15;
 
 	const SUBMENU_DELAY = 600;
 
@@ -1288,8 +1289,8 @@ jQuery(function($) {
 					at: 'left bottom',
 					using: (pos, data) => {
 						const max_left = data.horizontal === 'left'
-							? wrapper_rect.right
-							: wrapper_rect.right - data.element.width;
+							? wrapper_rect.right - WRAPPER_PADDING_RIGHT
+							: wrapper_rect.right - WRAPPER_PADDING_RIGHT - data.element.width;
 
 						pos.top = Math.max(margin_top, pos.top);
 						pos.left = Math.max(wrapper_rect.left, Math.min(max_left, pos.left));
@@ -1336,13 +1337,11 @@ jQuery(function($) {
 
 			const menu_rect = $menu_popup[0].getBoundingClientRect();
 
-			const menu_top = Math.max(margin_top,
-				Math.min(menu_rect.top, wrapper_rect.bottom - menu_rect.height - SUBMENU_MARGIN_BOTTOM)
-			);
-
 			$menu_popup.css({
-				'top': menu_top,
-				'bottom': Math.max(SUBMENU_MARGIN_BOTTOM, wrapper_rect.bottom - menu_rect.bottom)
+				'top': Math.max(margin_top,
+					Math.min(menu_rect.top, wrapper_rect.bottom - menu_rect.height - WRAPPER_PADDING_BOTTOM)
+				),
+				'bottom': Math.max(WRAPPER_PADDING_BOTTOM, wrapper_rect.bottom - menu_rect.bottom)
 			});
 
 			// Hide all action menu sub-levels, including the topmost, for fade effect to work.
@@ -1512,8 +1511,8 @@ jQuery(function($) {
 	 */
 	function calculateSubmenuPosition($submenu, li_pos) {
 		const wrapper_rect = document.querySelector('.wrapper').getBoundingClientRect();
-		const max_relative_top = wrapper_rect.bottom - $submenu.outerHeight() - SUBMENU_MARGIN_BOTTOM;
-		const max_relative_left = wrapper_rect.right - $submenu.outerWidth() - SUBMENU_MARGIN_RIGHT;
+		const max_relative_top = wrapper_rect.bottom - $submenu.outerHeight() - WRAPPER_PADDING_BOTTOM;
+		const max_relative_left = wrapper_rect.right - $submenu.outerWidth() - WRAPPER_PADDING_RIGHT;
 		const margin_top = getMenuMarginTop();
 
 		// Will use parent directions, if the parent is not menu-popup-top.
@@ -1532,10 +1531,10 @@ jQuery(function($) {
 		}
 
 		const submenu_data = {
-			'top': li_pos.top - (SUBMENU_PADDING_Y + SUBMENU_BORDER),
+			'top': li_pos.top - (MENU_PADDING_Y + MENU_BORDER),
 			'left': submenu_direction_x === 1
-				? li_pos.right + SUBMENU_PADDING_RIGHT
-				: li_pos.left - ($submenu.outerWidth() + SUBMENU_PADDING_LEFT),
+				? li_pos.right + MENU_PADDING_RIGHT
+				: li_pos.left - ($submenu.outerWidth() + MENU_PADDING_LEFT),
 			'direction_x': submenu_direction_x,
 			'direction_y': submenu_direction_y
 		};
@@ -1545,8 +1544,8 @@ jQuery(function($) {
 			submenu_data.direction_x *= -1;
 
 			submenu_data.left = submenu_data.direction_x === 1
-				? li_pos.right + SUBMENU_PADDING_RIGHT
-				: li_pos.left - ($submenu.outerWidth() + SUBMENU_PADDING_LEFT);
+				? li_pos.right + MENU_PADDING_RIGHT
+				: li_pos.left - ($submenu.outerWidth() + MENU_PADDING_LEFT);
 
 			submenu_data.left = submenu_data.direction_x === 1
 				? Math.min(max_relative_left, submenu_data.left)
@@ -1566,7 +1565,7 @@ jQuery(function($) {
 		}
 
 		submenu_data.top = Math.max(margin_top, Math.min(submenu_data.top, max_relative_top));
-		submenu_data.bottom = Math.max(SUBMENU_MARGIN_BOTTOM,
+		submenu_data.bottom = Math.max(WRAPPER_PADDING_BOTTOM,
 			wrapper_rect.bottom - (submenu_data.top + $submenu.outerHeight())
 		);
 
@@ -1576,7 +1575,7 @@ jQuery(function($) {
 	function getMenuMarginTop() {
 		const header_rect = document.querySelector('.wrapper > header').getBoundingClientRect();
 
-		return Math.max(SUBMENU_MARGIN_TOP, header_rect.bottom - Math.max(header_rect.top, 0));
+		return Math.max(WRAPPER_PADDING_TOP, header_rect.bottom - Math.max(header_rect.top, 0));
 	}
 
 	/**
