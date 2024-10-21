@@ -15,6 +15,7 @@
 package oracle
 
 import (
+	"fmt"
 	"os"
 
 	"golang.zabbix.com/sdk/conf"
@@ -54,7 +55,9 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	}
 
 	if p.options.CustomQueriesEnabled && p.options.CustomQueriesPath == "" {
-		p.options.CustomQueriesPath = os.Getenv("ProgramFiles")
+		p.options.CustomQueriesPath = fmt.Sprintf(
+			"%s\\Zabbix Agent 2\\Custom Queries\\Oracle", os.Getenv("programfiles"),
+		)
 	}
 
 	if p.options.ConnectTimeout == 0 {
