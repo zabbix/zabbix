@@ -839,7 +839,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					}
 				}
 				else {
-					$this->zbxTestAssertElementPresentXpath("//button[@name='test_expression']");
+					$this->assertTrue($this->query('xpath://button[@name="test_expression"]')->waitUntilVisible()->exists());
 
 					$this->zbxTestAssertVisibleXpath("//li[@id='expression_row']//button[contains(@onclick, 'and_expression') and text()='And']");
 					$this->zbxTestAssertVisibleXpath("//li[@id='expression_row']//button[contains(@onclick, 'or_expression') and text()='Or']");
