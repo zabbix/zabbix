@@ -22,6 +22,7 @@
 #include "zbxalgo.h"
 #include "zbxcurl.h"
 #include "vmware_shmem.h"
+#include "zbxshmem.h"
 
 typedef struct
 {
@@ -895,8 +896,8 @@ static zbx_uint64_t	vmware_tags_shmem_size(zbx_vector_vmware_entity_tags_ptr_t *
 			continue;
 		}
 
-		req_sz += tag_chunk_sz * entity->tags.values_num +
-				zbx_shmem_required_chunk_size(entity->tags.values_alloc * sizeof(zbx_vmware_tag_t*));
+		req_sz += tag_chunk_sz * (zbx_uint64_t)entity->tags.values_num + zbx_shmem_required_chunk_size(
+				(zbx_uint64_t)entity->tags.values_alloc * sizeof(zbx_vmware_tag_t*));
 
 		for (int j = 0; j < entity->tags.values_num; j++)
 		{

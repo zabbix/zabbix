@@ -21,6 +21,7 @@
 #include "zbxvmware.h"
 #include "vmware_shmem.h"
 #include "vmware_internal.h"
+#include "zbxshmem.h"
 
 #include "zbxnum.h"
 #include "zbxstr.h"
