@@ -70,6 +70,8 @@ class CExpressionParserTest extends TestCase {
 			['{TRIGGER.VALUE}', null, CParser::PARSE_SUCCESS],
 			['{$USERMACRO}', null, CParser::PARSE_SUCCESS, ['usermacros' => true]],
 			['{$USERMACRO}', ['error' => 'incorrect expression starting from "{$USERMACRO}"', 'match' => ''], CParser::PARSE_FAIL],
+			['{FUNCTION.VALUE} + {FUNCTION.VALUE9} + {FUNCTION.RECOVERY.VALUE} + {FUNCTION.RECOVERY.VALUE9}', null, CParser::PARSE_SUCCESS, ['macros_n' => ['{FUNCTION.VALUE}', '{FUNCTION.RECOVERY.VALUE}']]],
+			['{FUNCTION.VALUE1}', ['error' => 'incorrect expression starting from "{FUNCTION.VALUE1}"', 'match' => ''], CParser::PARSE_FAIL],
 
 			['{TRIGGER.VALUE}=1', null, CParser::PARSE_SUCCESS],
 			['{$USERMACRO}=1', null, CParser::PARSE_SUCCESS, ['usermacros' => true]],

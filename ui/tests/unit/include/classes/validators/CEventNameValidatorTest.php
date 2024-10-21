@@ -43,7 +43,9 @@ class CEventNameValidatorTest extends TestCase {
 			['{?Expression macro without closing bracket', false, 'incorrect expression starting from "Expression macro without closing bracket"'],
 			['Expression macro without closing bracket at the end of event name {?', false, 'incorrect expression starting from ""'],
 			['Nested expression macro not supported {?100+{?20+1}}', false, 'incorrect expression starting from "{?20+1}}"'],
-			['Empty expression macro {?}', false, 'incorrect expression starting from "}"']
+			['Empty expression macro {?}', false, 'incorrect expression starting from "}"'],
+			['Function value macro {FUNCTION.VALUE} {FUNCTION.VALUE1} {?{FUNCTION.VALUE}+{FUNCTION.VALUE9}}', true, null],
+			['Function value macro {FUNCTION.RECOVERY.VALUE} {FUNCTION.RECOVERY.VALUE1} {?{FUNCTION.RECOVERY.VALUE}+{FUNCTION.RECOVERY.VALUE9}}', true, null]
 		];
 	}
 

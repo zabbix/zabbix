@@ -32,7 +32,8 @@ class CEventNameValidator extends CValidator {
 			'usermacros' => true,
 			'lldmacros' => true,
 			'host_macro_n' => true,
-			'empty_host' => true
+			'empty_host' => true,
+			'macros_n' => ['{FUNCTION.VALUE}', '{FUNCTION.RECOVERY.VALUE}']
 		]);
 		$expr_func_macro = new CExpressionMacroFunctionParser([
 			'usermacros' => true,
