@@ -204,11 +204,11 @@ static int	function_recovery_value_resolv(zbx_macro_resolv_data_t *p, va_list ar
 	ZBX_UNUSED(error);
 	ZBX_UNUSED(maxerrlen);
 
-	if (p->indexed && 0 == strcmp(p->macro, MVAR_FUNCTION_VALUE))
+	if (0 == strcmp(p->macro, MVAR_FUNCTION_VALUE))
 	{
 		zbx_db_trigger_get_function_value(&event->trigger, p->index, replace_to, zbx_evaluate_function, 0);
 	}
-	else if (p->indexed && 0 == strcmp(p->macro, MVAR_FUNCTION_RECOVERY_VALUE))
+	else if (0 == strcmp(p->macro, MVAR_FUNCTION_RECOVERY_VALUE))
 	{
 		zbx_db_trigger_get_function_value(&event->trigger, p->index, replace_to, zbx_evaluate_function, 1);
 	}
