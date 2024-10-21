@@ -100,10 +100,10 @@ foreach ($data['drules'] as $drule) {
 
 	$discoveryTable->addRow([
 		new CCheckBox('druleids['.$drule['druleid'].']', $drule['druleid']),
-		new CLink($drule['name'], (new CUrl('zabbix.php'))
+		(new CCol(new CLink($drule['name'], (new CUrl('zabbix.php'))
 			->setArgument('action', 'discovery.edit')
 			->setArgument('druleid', $drule['druleid'])
-		),
+		)))->addClass(ZBX_STYLE_WORDBREAK),
 		$drule['iprange'],
 		$drule['proxy'],
 		$drule['delay'],

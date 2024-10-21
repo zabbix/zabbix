@@ -83,7 +83,9 @@ $proxy_form_list = (new CFormList('proxyFormList'))
 		(new CTextBox('proxy_address', $data['proxy_address'], false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_('Description'),
-		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('description', $data['description']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('hosts', 'description'))
 	);
 
 // append tabs to form

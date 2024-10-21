@@ -6,7 +6,7 @@ BUILD_TIME=`date +%H:%M:%S`
 BUILD_DATE=`date +"%b %_d %Y"`
 GOOS=`go env GOOS`
 GOARCH=`go env GOARCH`
-PKG=golang2.zabbix.com/gent2/pkg/version
+PKG=golang.zabbix.com/agent2/pkg/version
 NEW_FROM_REV=""
 
 GOLDFLAGS = -X '${PKG}.compileDate=${BUILD_DATE}'

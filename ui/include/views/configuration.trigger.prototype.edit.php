@@ -252,7 +252,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 							->setChecked($i == 0)
 							->onClick('check_target(this, '.TRIGGER_EXPRESSION.');')
 						: null,
-					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDWRAP),
+					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDBREAK),
 					!$data['limited']
 						? (new CCol(
 							(new CSimpleButton(_('Remove')))
@@ -459,7 +459,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 							->setChecked($i == 0)
 							->onClick('check_target(this, '.TRIGGER_RECOVERY_EXPRESSION.');')
 						: null,
-					$e['list'],
+					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDBREAK),
 					!$data['limited']
 						? (new CCol(
 							(new CSimpleButton(_('Remove')))

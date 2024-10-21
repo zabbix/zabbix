@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-04-12T16:23:52Z'
+  date: '2024-07-10T17:29:39Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -1663,7 +1663,7 @@ zabbix_export:
                 ROUND(total_mb / DECODE(TYPE, 'NORMAL', 2, 'HIGH', 3, 'EXTERN', 1)*1024*1024) AS size_byte,
                 ROUND(usable_file_mb*1024*1024 ) AS free_size_byte,
                 ROUND(100-(usable_file_mb /(total_mb / DECODE(TYPE, 'NORMAL', 2, 'HIGH', 3, 'EXTERN', 1)))* 100, 2) AS used_percent
-                FROM v$asm_diskgroup
+                FROM v$asm_diskgroup_stat
                 WHERE name = '{#DGNAME}';
               username: '{$ORACLE.USER}'
               password: '{$ORACLE.PASSWORD}'

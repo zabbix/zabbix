@@ -2166,6 +2166,7 @@ class testDataDisplayInGraphs extends CWebTest {
 
 		// Set time selector to display the time period, required for the corresponding data type.
 		$this->setTimeSelector(self::TIMESTAMPS[$data['type']]);
+		$this->page->waitUntilReady();
 
 		// Switch to filter tab and fill in the name pattern to return only graphs with certain type.
 		CFilterElement::find()->one()->selectTab('Filter');
@@ -2177,7 +2178,10 @@ class testDataDisplayInGraphs extends CWebTest {
 			: 'monitoring_hosts_'.$data['type'].'_';
 
 		// Check screenshots of graphs for each option in 'Show' field.
-		foreach (['All graphs', 'Host graphs', 'Simple graphs'] as $show) {
+		$show_data = $data['type'] === 'trends'
+			? ['All graphs' => 8, 'Host graphs' => 6, 'Simple graphs' => 2]
+			: ['All graphs' => 6, 'Host graphs' => 4, 'Simple graphs' => 2];
+		foreach ($show_data as $show => $count) {
 			// Pie widget displays data in non-fixed time period, so only host graph screenshot will not differ each time.
 			if ($data['type'] === 'pie' && $show !== 'Host graphs') {
 				continue;
@@ -2200,7 +2204,7 @@ class testDataDisplayInGraphs extends CWebTest {
 
 			// Wait for all graphs to load and check the screenshots of all graphs of the desired type.
 			$charts_table = $this->query('id:charts')->waitUntilVisible()->one();
-			foreach ($charts_table->query('class:center')->all() as $graph) {
+			foreach ($charts_table->query('class:center')->waitUntilCount($count)->all() as $graph) {
 				$graph->waitUntilClassesNotPresent('is-loading');
 			}
 

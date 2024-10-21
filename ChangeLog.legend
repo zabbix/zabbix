@@ -21,5 +21,5 @@ Server and proxy would be .......PS.
 Commit messages that do not actually change anything (for example, creation and
  deletion of branches) have all components unset - ..........
 
-See https://zabbix.org/wiki/Docs/specs/development_guidelines#Components
+See https://www.zabbix.com/documentation/guidelines/en/devel#components
  for more information

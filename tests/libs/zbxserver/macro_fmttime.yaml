@@ -9,7 +9,7 @@ out:
   value: '2020-01-01 03:00:00'
   return: SUCCEED
 ---
-test case: Simple substraction (-1h)
+test case: Simple subtraction (-1h)
 in:
   time: 2020-01-01 02:00:00.000000000
   fmt: '%Y-%m-%d %H:%M:%S'
@@ -29,7 +29,7 @@ out:
   value: '2020-01-02 02:00:00'
   return: SUCCEED
 ---
-test case: Simple substraction (-1d)
+test case: Simple subtraction (-1d)
 in:
   time: 2020-01-01 02:00:00.000000000
   fmt: '%Y-%m-%d %H:%M:%S'
@@ -49,7 +49,7 @@ out:
   value: '2020-01-08 02:00:00'
   return: SUCCEED
 ---
-test case: Simple substraction (-1w)
+test case: Simple subtraction (-1w)
 in:
   time: 2020-01-01 02:00:00.000000000
   fmt: '%Y-%m-%d %H:%M:%S'
@@ -69,7 +69,7 @@ out:
   value: '2020-02-01 02:00:00'
   return: SUCCEED
 ---
-test case: Simple substraction (-1M)
+test case: Simple subtraction (-1M)
 in:
   time: 2020-01-01 02:00:00.000000000
   fmt: '%Y-%m-%d %H:%M:%S'
@@ -89,7 +89,7 @@ out:
   value: '2021-01-01 02:00:00'
   return: SUCCEED
 ---
-test case: Simple substraction (-1y)
+test case: Simple subtraction (-1y)
 in:
   time: 2020-01-01 02:00:00.000000000
   fmt: '%Y-%m-%d %H:%M:%S'
@@ -99,7 +99,7 @@ out:
   value: '2019-01-01 02:00:00'
   return: SUCCEED
 ---
-test case: Different macros formulas with substraction (-1d-1h)
+test case: Different macros formulas with subtraction (-1d-1h)
 in:
   time: 2020-01-01 02:00:00.000000000
   fmt: '%Y-%m-%d %H:%M:%S'
@@ -109,7 +109,7 @@ out:
   value: '2019-12-31 01:00:00'
   return: SUCCEED
 ---
-test case: Different macros formulas with substraction (-1w-1h)
+test case: Different macros formulas with subtraction (-1w-1h)
 in:
   time: 2020-01-01 02:00:00.000000000
   fmt: '%Y-%m-%d %H:%M:%S'
@@ -119,7 +119,7 @@ out:
   value: '2019-12-25 01:00:00'
   return: SUCCEED
 ---
-test case: Different macros formulas with substraction (-1w-1d)
+test case: Different macros formulas with subtraction (-1w-1d)
 in:
   time: 2020-01-01 02:00:00.000000000
   fmt: '%Y-%m-%d %H:%M:%S'
@@ -129,7 +129,7 @@ out:
   value: '2019-12-24 02:00:00'
   return: SUCCEED
 ---
-test case: Different macros formulas with substraction (-1M-1h)
+test case: Different macros formulas with subtraction (-1M-1h)
 in:
   time: 2020-01-01 02:00:00.000000000
   fmt: '%Y-%m-%d %H:%M:%S'
@@ -139,7 +139,7 @@ out:
   value: '2019-12-01 01:00:00'
   return: SUCCEED
 ---
-test case: Different macros formulas with substraction (-1M-1d)
+test case: Different macros formulas with subtraction (-1M-1d)
 in:
   time: 2020-01-01 02:00:00.000000000
   fmt: '%Y-%m-%d %H:%M:%S'
@@ -149,7 +149,7 @@ out:
   value: '2019-11-30 02:00:00'
   return: SUCCEED
 ---
-test case: Different macros formulas with substraction (-1M-1w)
+test case: Different macros formulas with subtraction (-1M-1w)
 in:
   time: 2020-01-01 02:00:00.000000000
   fmt: '%Y-%m-%d %H:%M:%S'
@@ -159,7 +159,7 @@ out:
   value: '2019-11-24 02:00:00'
   return: SUCCEED
 ---
-test case: Different macros formulas with substraction (-1y-1h)
+test case: Different macros formulas with subtraction (-1y-1h)
 in:
   time: 2020-01-01 02:00:00.000000000
   fmt: '%Y-%m-%d %H:%M:%S'
@@ -169,7 +169,7 @@ out:
   value: '2019-01-01 01:00:00'
   return: SUCCEED
 ---
-test case: Different macros formulas with substraction (-1y-1d)
+test case: Different macros formulas with subtraction (-1y-1d)
 in:
   time: 2020-01-01 02:00:00.000000000
   fmt: '%Y-%m-%d %H:%M:%S'
@@ -179,7 +179,7 @@ out:
   value: '2018-12-31 02:00:00'
   return: SUCCEED
 ---
-test case: Different macros formulas with substraction (-1y-1w)
+test case: Different macros formulas with subtraction (-1y-1w)
 in:
   time: 2020-01-01 02:00:00.000000000
   fmt: '%Y-%m-%d %H:%M:%S'
@@ -189,7 +189,7 @@ out:
   value: '2018-12-25 02:00:00'
   return: SUCCEED
 ---
-test case: Different macros formulas with substraction (-1y-1M)
+test case: Different macros formulas with subtraction (-1y-1M)
 in:
   time: 2020-01-01 02:00:00.000000000
   fmt: '%Y-%m-%d %H:%M:%S'
@@ -199,7 +199,7 @@ out:
   value: '2018-12-01 02:00:00'
   return: SUCCEED
 ---
-test case: Different macros formulas with substraction (-1h-1h)
+test case: Different macros formulas with subtraction (-1h-1h)
 in:
   time: 2020-01-01 02:00:00.000000000
   fmt: '%Y-%m-%d %H:%M:%S'

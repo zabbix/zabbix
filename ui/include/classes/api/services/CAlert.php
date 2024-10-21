@@ -474,7 +474,18 @@ class CAlert extends CApiService {
 
 		// adding media types
 		if ($options['selectMediatypes'] !== null && $options['selectMediatypes'] !== API_OUTPUT_COUNT) {
+			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+				if ($options['selectMediatypes'] === API_OUTPUT_EXTEND) {
+					$options['selectMediatypes'] = CMediatype::LIMITED_OUTPUT_FIELDS;
+				}
+				elseif (is_array($options['selectMediatypes'])) {
+					$options['selectMediatypes'] =
+						array_intersect($options['selectMediatypes'], CMediatype::LIMITED_OUTPUT_FIELDS);
+				}
+			}
+
 			$relationMap = $this->createRelationMap($result, 'alertid', 'mediatypeid');
+
 			$mediatypes = API::getApiService()->select('media_type', [
 				'output' => $options['selectMediatypes'],
 				'filter' => ['mediatypeid' => $relationMap->getRelatedIds()],

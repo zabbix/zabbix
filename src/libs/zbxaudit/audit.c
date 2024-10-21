@@ -173,8 +173,8 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 		const char *output, const char *error)
 {
 	int		ret = SUCCEED;
-	char		auditid_cuid[CUID_LEN], execute_on_s[MAX_ID_LEN + 1], hostid_s[MAX_ID_LEN + 1],
-			eventid_s[MAX_ID_LEN + 1], proxy_hostid_s[MAX_ID_LEN + 1];
+	char		auditid_cuid[CUID_LEN], hostid_s[MAX_ID_LEN + 1], eventid_s[MAX_ID_LEN + 1],
+			proxy_hostid_s[MAX_ID_LEN + 1];
 	struct zbx_json	details_json;
 	zbx_config_t	cfg;
 	zbx_db_insert_t	db_insert;
@@ -190,9 +190,14 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 
 	zbx_json_init(&details_json, ZBX_JSON_STAT_BUF_LEN);
 
-	zbx_snprintf(execute_on_s, sizeof(execute_on_s), "%hhu", script_execute_on);
+	if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script_type)
+	{
+		char	execute_on_s[MAX_ID_LEN + 1];
 
-	append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.execute_on", execute_on_s);
+		zbx_snprintf(execute_on_s, sizeof(execute_on_s), "%hhu", script_execute_on);
+
+		append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.execute_on", execute_on_s);
+	}
 
 	if (0 != eventid)
 	{

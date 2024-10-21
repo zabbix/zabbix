@@ -69,7 +69,7 @@ func getDiskGRoupQuery(name string) string {
 			) RETURNING CLOB 
 		)
 	 FROM 
-		 V$ASM_DISKGROUP
+		 V$ASM_DISKGROUP_STAT
 	 %s
 `, whereStr)
 }

@@ -133,7 +133,7 @@ foreach ($data['auditlogs'] as $auditlog) {
 				->setArgument('filter_set', 1)
 		),
 		(new CDiv([
-			new CDiv(zbx_nl2br($auditlog['short_details'])),
+			(new CDiv(zbx_nl2br($auditlog['short_details'])))->addClass(ZBX_STYLE_WORDWRAP),
 			($auditlog['details_button'] == 1)
 				? (new CDiv(
 					(new CLinkAction(_('Details')))->setAttribute('data-details', json_encode($auditlog['details']))

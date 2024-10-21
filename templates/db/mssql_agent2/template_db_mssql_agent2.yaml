@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-04-05T11:13:26Z'
+  date: '2024-09-16T15:49:59Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -96,6 +96,7 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'The item gets availability group states - name, primary and secondary health, synchronization health.'
+          timeout: 30s
           tags:
             - tag: component
               value: raw
@@ -443,6 +444,7 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Getting databases - database name and recovery model.'
+          timeout: 30s
           tags:
             - tag: component
               value: raw
@@ -667,6 +669,7 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'The item gets the SQL agent job status.'
+          timeout: 30s
           tags:
             - tag: component
               value: raw
@@ -700,6 +703,7 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'The item gets information about backup processes.'
+          timeout: 30s
           tags:
             - tag: component
               value: raw
@@ -782,6 +786,7 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Getting the states of the local availability database.'
+          timeout: 30s
           tags:
             - tag: component
               value: raw
@@ -1084,6 +1089,7 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Getting DB mirroring.'
+          timeout: 30s
           tags:
             - tag: component
               value: raw
@@ -1094,6 +1100,7 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Getting the non-local availability database.'
+          timeout: 30s
           tags:
             - tag: component
               value: raw
@@ -1345,6 +1352,7 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'The item gets server global status information.'
+          timeout: 30s
           tags:
             - tag: component
               value: raw
@@ -1374,6 +1382,7 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Getting quorum - cluster name, type, and state.'
+          timeout: 10s
           tags:
             - tag: component
               value: raw
@@ -1384,6 +1393,7 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Getting quorum members - member name, type, state, and number of quorum votes.'
+          timeout: 10s
           tags:
             - tag: component
               value: raw
@@ -1416,6 +1426,7 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           description: 'Getting the database replica.'
+          timeout: 30s
           tags:
             - tag: component
               value: raw

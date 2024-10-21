@@ -215,6 +215,20 @@ trait WaitableTrait {
 	}
 
 	/**
+	 * Wait until element count is present.
+	 *
+	 * @param integer      $count      element count to wait for
+	 * @param integer      $timeout    timeout in seconds
+	 *
+	 * @return $this
+	 */
+	public function waitUntilCount($count, $timeout = null) {
+		CElementQuery::waitUntil($this, CElementFilter::COUNT, [$count], $timeout);
+
+		return $this;
+	}
+
+	/**
 	 * Get logically reversed condition. Acts as "not" statement.
 	 *
 	 * @param callable $condition    condition to be reversed

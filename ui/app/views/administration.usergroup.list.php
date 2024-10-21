@@ -199,7 +199,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 				: _('Users'),
 			CViewHelper::showNum($usergroup['user_cnt'])
 		],
-		$users,
+		(new CCol($users))->addClass(ZBX_STYLE_WORDBREAK),
 		$gui_access,
 		$debug_mode,
 		$user_status

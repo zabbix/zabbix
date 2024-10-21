@@ -1057,12 +1057,12 @@ class CScreenProblem extends CScreenBase {
 
 					if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 						$description[] = [_('Problem'), ': ', (new CDiv($trigger['expression_html']))
-							->addClass(ZBX_STYLE_WORDWRAP), BR()];
+							->addClass(ZBX_STYLE_WORDBREAK), BR()];
 						$description[] = [_('Recovery'), ': ', (new CDiv($trigger['recovery_expression_html']))
-							->addClass(ZBX_STYLE_WORDWRAP)];
+							->addClass(ZBX_STYLE_WORDBREAK)];
 					}
 					else {
-						$description[] = (new CDiv($trigger['expression_html']))->addClass(ZBX_STYLE_WORDWRAP);
+						$description[] = (new CDiv($trigger['expression_html']))->addClass(ZBX_STYLE_WORDBREAK);
 					}
 				}
 

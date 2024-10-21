@@ -46,7 +46,9 @@ $table->setHeader([
 ]);
 
 foreach ($data['hosts'] as $hostid => $host) {
-	$host_name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostid));
+	$host_name = (new CLinkAction($host['name']))
+		->setMenuPopup(CMenuPopupHelper::getHost($hostid))
+		->addClass(ZBX_STYLE_WORDWRAP);
 
 	$interface = null;
 	if ($host['interfaces']) {

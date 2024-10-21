@@ -477,6 +477,49 @@ const struct tm	*zbx_localtime_now(const time_t *time)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: convert local time to UTC                                         *
+ *                                                                            *
+ * Parameters: time - [IN] input time                                         *
+ *             tz   - [IN] time zone                                          *
+ *                                                                            *
+ * Return value: Universal Coordinate Time                                    *
+ *                                                                            *
+ ******************************************************************************/
+time_t	zbx_mktime(struct tm *time, const char *tz)
+{
+#if defined(HAVE_GETENV) && defined(HAVE_PUTENV) && defined(HAVE_UNSETENV) && defined(HAVE_TZSET) && \
+		!defined(_WINDOWS) && !defined(__MINGW32__)
+	char		*old_tz;
+	time_t		ret;
+
+	if (NULL == tz || 0 == strcmp(tz, "system"))
+		return mktime(time);
+
+	if (NULL != (old_tz = getenv("TZ")))
+		old_tz = zbx_strdup(NULL, old_tz);
+
+	setenv("TZ", tz, 1);
+	tzset();
+	ret = (time_t)mktime(time);
+
+	if (NULL != old_tz)
+	{
+		setenv("TZ", old_tz, 1);
+		zbx_free(old_tz);
+	}
+	else
+		unsetenv("TZ");
+
+	tzset();
+
+	return ret;
+#else
+	return (time_t)mktime(time);
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get UTC time from broken down time elements                       *
  *                                                                            *
  * Parameters:                                                                *
@@ -3726,27 +3769,27 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 	{
 		/* handle midnight startup times */
 		if (0 == tm->tm_sec && 0 == tm->tm_min && 0 == tm->tm_hour)
-			zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY);
+			zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY, tz);
 
 		switch (cycle)
 		{
 			case ZBX_REPORT_CYCLE_YEARLY:
-				zbx_tm_round_up(tm, ZBX_TIME_UNIT_YEAR);
+				zbx_tm_round_up(tm, ZBX_TIME_UNIT_YEAR, tz);
 				break;
 			case ZBX_REPORT_CYCLE_MONTHLY:
-				zbx_tm_round_up(tm, ZBX_TIME_UNIT_MONTH);
+				zbx_tm_round_up(tm, ZBX_TIME_UNIT_MONTH, tz);
 				break;
 			case ZBX_REPORT_CYCLE_WEEKLY:
 				if (0 == weekdays)
 					return -1;
-				zbx_tm_round_up(tm, ZBX_TIME_UNIT_DAY);
+				zbx_tm_round_up(tm, ZBX_TIME_UNIT_DAY, tz);
 
 				while (0 == (weekdays & (1 << (tm->tm_wday + 6) % 7)))
-					zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY);
+					zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY, tz);
 
 				break;
 			case ZBX_REPORT_CYCLE_DAILY:
-				zbx_tm_round_up(tm, ZBX_TIME_UNIT_DAY);
+				zbx_tm_round_up(tm, ZBX_TIME_UNIT_DAY, tz);
 				break;
 		}
 
@@ -3754,7 +3797,7 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 		tm->tm_min = tm_min;
 		tm->tm_hour = tm_hour;
 
-		nextcheck = (int)mktime(tm);
+		nextcheck = (int)zbx_mktime(tm, tz);
 	}
 	while (-1 != nextcheck && nextcheck <= now);
 

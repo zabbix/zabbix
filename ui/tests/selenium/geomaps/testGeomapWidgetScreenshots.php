@@ -228,9 +228,9 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		self::$zoom_dashboardid = $dashboards['dashboardids'][0];
 
 		// Create events and problems.
-		foreach (['Trigger Riga', 'Trigger Tallin', 'Trigger Vilnius', 'Trigger Oslo', 'Trigger Bergen'] as $name) {
-			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE);
-		}
+		CDBHelper::setTriggerProblem(['Trigger Riga', 'Trigger Tallin', 'Trigger Vilnius', 'Trigger Oslo', 'Trigger Bergen'],
+				TRIGGER_VALUE_TRUE
+		);
 	}
 
 	public static function getZoomWidgetData() {
@@ -290,11 +290,12 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		$form->submit();
 
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
-		$this->page->waitUntilReady();
+		CDashboardElement::find()->waitUntilReady();
 
 		// Some zoom widgets are excluded for 'Stamen Terrain', because images on screenshots are not stable.
 		$widgets = [
-			'Geomap for screenshots, 5',
+			// TODO: temporarily commented out due to mouse pointer on first widget in Jenkins
+//			'Geomap for screenshots, 5',
 			'Geomap for screenshots, 10',
 			'Geomap for screenshots, 30',
 			'Geomap for screenshots, no zoom',
@@ -328,11 +329,17 @@ class testGeomapWidgetScreenshots extends CWebTest {
 		});
 
 		foreach ($widgets as $widget) {
+			CDashboardElement::find()->one()->getWidget($widget)->waitUntilReady();
 			$id = $widget.' '.$data['Tile provider'];
 			$element = $this->query("xpath://div[@class=\"dashboard-grid-widget\"]//h4[text()=".
 					CXPathHelper::escapeQuotes($widget)."]/../..")->waitUntilVisible()->one();
 
 			$count = count($this->errors);
+			/*
+			 * Zoom in and zoom out icons in the geomap widget are not centred on refrence screenshots due to script
+			 * execution in the assertScreenshotExcept() method for text and image rendering. This is expected beahavior
+			 * and can only be reproduced by running a test.
+			 */
 			$this->assertScreenshot($element, $id);
 
 			if ($count !== count($this->errors)) {
