@@ -2242,10 +2242,10 @@ class CExpressionParserTest extends TestCase {
 	public static function dataProviderTokens() {
 		return [
 			[
-				'((-12 + {$MACRO} + {{$MACRO}.regsub("^([a-z]+)", \1)})) = 1K or not {{#M}.regsub("^([0-9]+)", \1)} and {TRIGGER.VALUE} and "\\"str\\"" = func(/host/key, #25:now/M, "eq", "str") or math() or min( last(/host/key), {$MACRO}, {{$MACRO}.regsub("^([0-9]+)", \1)}, 123, "abc" , min(min(/host/key, 1d:now/d), 125) + 10 ) or {{TRIGGER.VALUE}.regsub("^(\d+)$", \1)}',
+				'((-12 + {$MACRO} + {{$MACRO}.regsub("^([a-z]+)", \1)})) = 1K or not {{#M}.regsub("^([0-9]+)", \1)} and {TRIGGER.VALUE} and "\\"str\\"" = func(/host/key, #25:now/M, "eq", "str") or math() or min( last(/host/key), {$MACRO}, {{$MACRO}.regsub("^([0-9]+)", \1)}, 123, "abc" , min(min(/host/key, 1d:now/d), 125) + 10 ) or {{TRIGGER.VALUE}.regsub("^(\d+)$", \1)} or {{FUNCTION.VALUE}.regsub("^(\d+)$", \1)} or {{FUNCTION.RECOVERY.VALUE5}.regsub("^(\d+)$", \1)}',
 				[
-					'match' => '((-12 + {$MACRO} + {{$MACRO}.regsub("^([a-z]+)", \1)})) = 1K or not {{#M}.regsub("^([0-9]+)", \1)} and {TRIGGER.VALUE} and "\\"str\\"" = func(/host/key, #25:now/M, "eq", "str") or math() or min( last(/host/key), {$MACRO}, {{$MACRO}.regsub("^([0-9]+)", \1)}, 123, "abc" , min(min(/host/key, 1d:now/d), 125) + 10 ) or {{TRIGGER.VALUE}.regsub("^(\d+)$", \1)}',
-					'length' => 353,
+					'match' => '((-12 + {$MACRO} + {{$MACRO}.regsub("^([a-z]+)", \1)})) = 1K or not {{#M}.regsub("^([0-9]+)", \1)} and {TRIGGER.VALUE} and "\\"str\\"" = func(/host/key, #25:now/M, "eq", "str") or math() or min( last(/host/key), {$MACRO}, {{$MACRO}.regsub("^([0-9]+)", \1)}, 123, "abc" , min(min(/host/key, 1d:now/d), 125) + 10 ) or {{TRIGGER.VALUE}.regsub("^(\d+)$", \1)} or {{FUNCTION.VALUE}.regsub("^(\d+)$", \1)} or {{FUNCTION.RECOVERY.VALUE5}.regsub("^(\d+)$", \1)}',
+					'length' => 451,
 					'tokens' => [
 						[
 							'type' => CExpressionParserResult::TOKEN_TYPE_OPEN_BRACE,
@@ -2666,10 +2666,34 @@ class CExpressionParserTest extends TestCase {
 							'pos' => 314,
 							'match' => '{{TRIGGER.VALUE}.regsub("^(\d+)$", \1)}',
 							'length' => 39
+						],
+						[
+							'type' => CExpressionParserResult::TOKEN_TYPE_OPERATOR,
+							'pos' => 354,
+							'match' => 'or',
+							'length' => 2
+						],
+						[
+							'type' => CExpressionParserResult::TOKEN_TYPE_MACRO,
+							'pos' => 357,
+							'match' => '{{FUNCTION.VALUE}.regsub("^(\d+)$", \1)}',
+							'length' => 40
+						],
+						[
+							'type' => CExpressionParserResult::TOKEN_TYPE_OPERATOR,
+							'pos' => 398,
+							'match' => 'or',
+							'length' => 2
+						],
+						[
+							'type' => CExpressionParserResult::TOKEN_TYPE_MACRO,
+							'pos' => 401,
+							'match' => '{{FUNCTION.RECOVERY.VALUE5}.regsub("^(\d+)$", \1)}',
+							'length' => 50
 						]
 					]
 				],
-				['usermacros' => true, 'lldmacros' => true]
+				['usermacros' => true, 'lldmacros' => true, 'macros_n' => ['{FUNCTION.VALUE}', '{FUNCTION.RECOVERY.VALUE}']]
 			],
 			[
 				'{52735} > 0 or min({52736}, {52737}, 5M + {$MACRO})',
