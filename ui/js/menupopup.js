@@ -1457,7 +1457,7 @@ jQuery(function($) {
 					}
 				}
 				else {
-					// Collapses the submenus deeper than +2 level of targeted submenu
+					// Collapses the submenus deeper than +2 level of targeted submenu.
 					const $submenu_link = $('ul:visible > li > a', item[0]);
 
 					if ($submenu_link.hasClass('highlighted')) {
