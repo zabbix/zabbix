@@ -64,8 +64,6 @@ class CItemPrototype extends CItemGeneral {
 	 * Get ItemPrototype data.
 	 */
 	public function get($options = []) {
-		$result = [];
-
 		$sqlParts = [
 			'select'	=> ['items' => 'i.itemid'],
 			'from'		=> ['items' => 'items i'],
@@ -266,35 +264,49 @@ class CItemPrototype extends CItemGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
-		while ($item = DBfetch($res)) {
-			if ($options['countOutput']) {
-				if ($options['groupCount'])
-					$result[] = $item;
-				else
-					$result = $item['rowscount'];
-			}
-			else {
-				$result[$item['itemid']] = $item;
-			}
-		}
+		$resource = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
 		if ($options['countOutput']) {
-			return $result;
+			if ($options['groupCount']) {
+				$result = [];
+
+				while ($item = DBfetch($resource)) {
+					$result[] = $item;
+				}
+
+				return $result;
+			}
+
+			return DBfetch($resource)['rowscount'];
 		}
 
-		if ($result) {
-			self::prepareItemsForApi($result, false);
+		$items = [];
+		$items_chunk = [];
 
-			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['hostid', 'valuemapid'], $options['output']);
-		}
+		do {
+			while ($item = DBfetch($resource)) {
+				$items_chunk[$item['itemid']] = $item;
+
+				if (count($items_chunk) == CItemGeneral::CHUNK_SIZE) {
+					break;
+				}
+			}
+
+			if (!$items_chunk) {
+				break;
+			}
+
+			$this->prepareChunkObjects($items_chunk, $options);
+
+			$items += $items_chunk;
+			$items_chunk = [];
+		} while ($item !== false);
 
 		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
+			$items = array_values($items);
 		}
 
-		return $result;
+		return $items;
 	}
 
 	/**
@@ -314,6 +326,14 @@ class CItemPrototype extends CItemGeneral {
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
+	}
+
+	private function prepareChunkObjects(array &$items, array $options): void {
+		$items = $this->addRelatedObjects($options, $items);
+		$items = $this->unsetExtraFields($items, ['hostid', 'valuemapid'], $options['output']);
+		$items = $this->unsetExtraFields($items, ['name_upper']);
+
+		self::prepareItemsForApi($items, false);
 	}
 
 	/**

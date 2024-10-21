@@ -22,7 +22,7 @@
 $operations_table = (new CTable())
 	->setId('upd-table')
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Details'), _('Action')]);
+	->setHeader([_('Details'), _('Actions')]);
 
 $i = 0;
 foreach ($data['action']['update_operations'] as $operationid => $operation) {

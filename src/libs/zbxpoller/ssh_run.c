@@ -23,7 +23,8 @@
 
 #if !defined(HAVE_SSH_OPTIONS_KEY_EXCHANGE) && !defined(HAVE_SSH_OPTIONS_HOSTKEYS) && \
 		!defined(HAVE_SSH_OPTIONS_CIPHERS_C_S) && !defined(HAVE_SSH_OPTIONS_CIPHERS_S_C) && \
-		!defined(HAVE_SSH_OPTIONS_HMAC_C_S) && !defined(HAVE_SSH_OPTIONS_HMAC_S_C)
+		!defined(HAVE_SSH_OPTIONS_HMAC_C_S) && !defined(HAVE_SSH_OPTIONS_HMAC_S_C) && \
+		!defined(HAVE_SSH_OPTIONS_PUBLICKEY_ACCEPTED_TYPES)
 #define HAVE_NO_SSH_OPTIONS	1
 #endif
 
@@ -123,6 +124,17 @@ static int	ssh_parse_options(ssh_session session, const char *options, char **er
 
 			if (SUCCEED != (ret = ssh_set_options(session, SSH_OPTIONS_HMAC_S_C, KEY_MACS_STR, eq_str,
 					err_msg)))
+			{
+				break;
+			}
+			continue;
+		}
+#endif
+#if defined(HAVE_SSH_OPTIONS_PUBLICKEY_ACCEPTED_TYPES)
+		if (0 == strncmp(line, KEY_PUBKEY_STR, ZBX_CONST_STRLEN(KEY_PUBKEY_STR)))
+		{
+			if (SUCCEED != (ret = ssh_set_options(session, SSH_OPTIONS_PUBLICKEY_ACCEPTED_TYPES,
+					KEY_PUBKEY_STR, eq_str, err_msg)))
 			{
 				break;
 			}

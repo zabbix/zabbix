@@ -801,9 +801,9 @@ class testItemTest extends CWebTest {
 						'context' => 'id:interface_details_contextname',
 						'security' => 'id:interface_details_securityname',
 						'security_level' => 'id:interface_details_securitylevel',
-						'authentication_protocol' => 'name:interfaces[details][authprotocol]',
+						'authentication_protocol' => 'name:interface[details][authprotocol]',
 						'authentication_passphrase' => 'id:interface_details_authpassphrase',
-						'privacy_protocol' => 'name:interfaces[details][privprotocol]',
+						'privacy_protocol' => 'name:interface[details][privprotocol]',
 						'privacy_passphrase' => 'id:interface_details_privpassphrase'
 					];
 				}

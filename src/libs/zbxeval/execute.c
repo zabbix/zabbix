@@ -2339,7 +2339,7 @@ static int	eval_execute_function_histogram_quantile(const zbx_eval_context_t *ct
 				}
 				else
 				{
-					*error = zbx_dsprintf(*error, "invalid string values of backet"
+					*error = zbx_dsprintf(*error, "invalid string values of bucket"
 							" for function at \"%s\"", err_fn);
 					return FAIL;
 				}

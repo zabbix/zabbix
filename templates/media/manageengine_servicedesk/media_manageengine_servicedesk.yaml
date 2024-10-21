@@ -357,7 +357,8 @@ zabbix_export:
         
             if (params.event_update_status === '1' && (typeof params.sd_request_id === 'undefined'
                     || params.sd_request_id.trim() === ''
-                    || params.sd_request_id === '{EVENT.TAGS.__zbx_sd_request_id}')) {
+                    || params.sd_request_id === '{EVENT.TAGS.__zbx_sd_request_id}'
+                    || params.sd_request_id === '*UNKNOWN*')) {
                 throw 'Parameter "sd_request_id" can\'t be empty for update operation.';
             }
         

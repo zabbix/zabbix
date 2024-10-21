@@ -1812,7 +1812,8 @@ static int	substitute_formula_macros(char **data, const struct zbx_json_parse *j
  *                                                                             *
  *******************************************************************************/
 static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_prototype,
-		const zbx_lld_row_t *lld_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error)
+		const zbx_lld_row_t *lld_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, int lastcheck,
+		char **error)
 {
 	zbx_lld_item_full_t		*item;
 	const struct zbx_json_parse	*jp_row = (struct zbx_json_parse *)&lld_row->jp_row;
@@ -1827,7 +1828,7 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 
 	item->itemid = 0;
 	item->parent_itemid = item_prototype->itemid;
-	item->lastcheck = 0;
+	item->lastcheck = lastcheck;
 	item->discovery_status = ZBX_LLD_DISCOVERY_STATUS_NORMAL;
 	item->ts_delete = 0;
 	item->ts_disable = 0;
@@ -2413,7 +2414,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
  ******************************************************************************/
 static void	lld_items_make(const zbx_vector_lld_item_prototype_ptr_t *item_prototypes,
 		zbx_vector_lld_row_ptr_t *lld_rows, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths,
-		zbx_vector_lld_item_full_ptr_t *items, zbx_hashset_t *items_index, char **error)
+		zbx_vector_lld_item_full_ptr_t *items, zbx_hashset_t *items_index, int lastcheck, char **error)
 {
 	int				index;
 	zbx_lld_item_prototype_t	*item_prototype;
@@ -2492,7 +2493,8 @@ static void	lld_items_make(const zbx_vector_lld_item_prototype_ptr_t *item_proto
 			if (NULL == (item_index = (zbx_lld_item_index_t *)zbx_hashset_search(items_index,
 					&item_index_local)))
 			{
-				item = lld_item_make(item_prototype, item_index_local.lld_row, lld_macro_paths, error);
+				item = lld_item_make(item_prototype, item_index_local.lld_row, lld_macro_paths,
+						lastcheck, error);
 
 				/* add the created item to items vector and update index */
 				zbx_vector_lld_item_full_ptr_append(items, item);
@@ -2923,7 +2925,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 				item_prototype->allow_traps);
 
 		zbx_db_insert_add_values(db_insert_idiscovery, (*itemdiscoveryid)++, *itemid,
-				item->parent_itemid, item_prototype->key);
+				item->parent_itemid, item_prototype->key, item->lastcheck);
 
 		zbx_db_insert_add_values(db_insert_irtdata, *itemid);
 		zbx_db_insert_add_values(db_insert_irtname, *itemid, item->name, item->name);
@@ -3518,7 +3520,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 				"ssl_key_password", "verify_peer", "verify_host", "allow_traps", (char *)NULL);
 
 		zbx_db_insert_prepare(&db_insert_idiscovery, "item_discovery", "itemdiscoveryid", "itemid",
-				"parent_itemid", "key_", (char *)NULL);
+				"parent_itemid", "key_", "lastcheck", (char *)NULL);
 
 		zbx_db_insert_prepare(&db_insert_irtdata, "item_rtdata", "itemid", (char *)NULL);
 		zbx_db_insert_prepare(&db_insert_irtname, "item_rtname", "itemid", "name_resolved",
@@ -4161,24 +4163,6 @@ out:
 	return ret;
 }
 
-static	void	get_item_info(const void *object, zbx_uint64_t *id, int *discovery_flag, int *lastcheck,
-		unsigned char *discovery_status, int *ts_delete, int *ts_disable, unsigned char *object_status,
-		unsigned char *disable_source, char **name)
-{
-	const zbx_lld_item_full_t	*item = (const zbx_lld_item_full_t *)object;
-
-	*id = item->itemid;
-	*discovery_flag = item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED;
-	*lastcheck = item->lastcheck;
-	*discovery_status = item->discovery_status;
-	*ts_delete = item->ts_delete;
-	*ts_disable = item->ts_disable;
-	*object_status = ITEM_STATUS_ACTIVE == item->status ?
-			ZBX_LLD_OBJECT_STATUS_ENABLED : ZBX_LLD_OBJECT_STATUS_DISABLED;
-	*disable_source = item->disable_source;
-	*name = item->name;
-}
-
 static	int	get_item_status_value(int status)
 {
 	if (ZBX_LLD_OBJECT_STATUS_ENABLED == status)
@@ -4468,6 +4452,56 @@ static void	lld_link_dependent_items(zbx_vector_lld_item_full_ptr_t *items, zbx_
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: process lost item resources                                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_process_lost_items(zbx_vector_lld_item_full_ptr_t *items, const zbx_lld_lifetime_t *lifetime,
+		const zbx_lld_lifetime_t *enabled_lifetime, int now)
+{
+	zbx_hashset_t	discoveries;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_hashset_create(&discoveries, (size_t)items->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	for (int i = 0; i < items->values_num; i++)
+	{
+		zbx_lld_item_full_t	*item = items->values[i];
+		zbx_lld_discovery_t	*discovery;
+		unsigned char		object_status;
+
+		object_status = (ITEM_STATUS_DISABLED == item->status ? ZBX_LLD_OBJECT_STATUS_DISABLED :
+				ZBX_LLD_OBJECT_STATUS_ENABLED);
+		discovery = lld_add_discovery(&discoveries, item->itemid, item->name);
+
+		if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+		{
+			lld_process_discovered_object(discovery, item->discovery_status, item->ts_delete,
+					item->lastcheck, now);
+			lld_enable_discovered_object(discovery, object_status, item->disable_source, item->ts_disable);
+			continue;
+		}
+
+		/* process lost items */
+
+		lld_process_lost_object(discovery, object_status, item->lastcheck, now, lifetime,
+				item->discovery_status, item->disable_source, item->ts_delete);
+
+		lld_disable_lost_object(discovery, object_status, item->lastcheck, now, enabled_lifetime,
+				item->ts_disable);
+	}
+
+	lld_flush_discoveries(&discoveries, "itemid", "items", "item_discovery", now, get_item_status_value,
+			zbx_db_delete_items, zbx_audit_item_create_entry, zbx_audit_item_update_json_update_status);
+
+	zbx_hashset_destroy(&discoveries);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: adds or updates discovered items                                  *
  *                                                                            *
  * Return value: SUCCEED - if items were successfully added/updated or        *
@@ -4500,7 +4534,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	zbx_db_begin();
 	lld_items_get(&item_prototypes, &items);
 	zbx_db_commit();
-	lld_items_make(&item_prototypes, lld_rows, lld_macro_paths, &items, &items_index, error);
+	lld_items_make(&item_prototypes, lld_rows, lld_macro_paths, &items, &items_index, lastcheck, error);
 	lld_items_preproc_make(&item_prototypes, lld_macro_paths, &items);
 	lld_items_param_make(&item_prototypes, lld_macro_paths, &items, error);
 	lld_items_tags_make(&item_prototypes, lld_macro_paths, &items, error);
@@ -4533,9 +4567,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 
 	lld_item_links_populate(&item_prototypes, lld_rows, &items_index);
 
-	lld_process_lost_objects("item_discovery", "items", "itemid", (zbx_vector_ptr_t *)&items, lifetime,
-			enabled_lifetime, lastcheck, zbx_db_delete_items, get_item_info, get_item_status_value,
-			zbx_audit_item_create_entry, zbx_audit_item_update_json_update_status);
+	lld_process_lost_items(&items, lifetime, enabled_lifetime, lastcheck);
 clean:
 	zbx_hashset_destroy(&items_index);
 

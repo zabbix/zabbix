@@ -1,0 +1,73 @@
+---
+test case: "1. Replacement with Same Length: Hello, World! -> Hello, Earth!"
+in:
+  data: "Hello, World!"
+  value: "Earth"
+  l: 7
+  r: 11
+out:
+  return: "Hello, Earth!"
+---
+test case: "2. Replacement with a Longer String: Hello, World! -> Hello, Universe!"
+in:
+  data: "Hello, World!"
+  value: "Universe"
+  l: 7
+  r: 11
+out:
+  return: "Hello, Universe!"
+---
+test case: "3. Replacement with a Shorter String: Hello, Universe! -> Hello, World!"
+in:
+  data: "Hello, Universe!"
+  value: "World"
+  l: 7
+  r: 14
+out:
+  return: "Hello, World!"
+---
+test case: "4. Replacement with an Empty String: Hello, World! -> Hello, !"
+in:
+  data: "Hello, World!"
+  value: ""
+  l: 7
+  r: 11
+out:
+  return: "Hello, !"
+---
+test case: "5. Replacement with a String Larger than the Original Data: Hi! -> Greetings, everyone!"
+in:
+  data: "Hi!"
+  value: "Greetings, everyone!"
+  l: 0
+  r: 2
+out:
+  return: "Greetings, everyone!"
+---
+test case: "6. Special characters replace"
+in:
+  data: "@@@@@"
+  value: "!"
+  l: 0
+  r: 2
+out:
+  return: "!@@"
+---
+test case: "8. Newlines replace"
+in:
+  data: "\n\n\n\n\n\n"
+  value: "N"
+  l: 3
+  r: 4
+out:
+  return: "\n\n\nN\n"
+---
+test case: "9. Backslash and quotation mark replace"
+in:
+  data: '\\"\\\"\'
+  value: "N"
+  l: 3
+  r: 4
+out:
+  return: '\\"N\"\'
+...

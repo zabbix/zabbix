@@ -63,9 +63,9 @@
 			this.interface_types = interface_types;
 			this.discovered_item = discovered_item === undefined ? false : discovered_item;
 			this.type = document.getElementById('type');
-			this.timeout = document.getElementById('timeout');
 			this.custom_timeout = document.getElementById('custom_timeout');
-			this.custom_timeout_value = this.timeout.value;
+			this.inherited_timeout = document.getElementById('inherited_timeout');
+			this.timeout = document.getElementById('timeout');
 			this.inherited_timeouts = inherited_timeouts;
 
 			if (typeof value_type_by_keys !== 'undefined' && typeof keys_by_item_type !== 'undefined') {
@@ -132,18 +132,11 @@
 			);
 		}
 
-		if (type in item_form.inherited_timeouts) {
-			item_form.timeout.disabled = false;
+		item_form.inherited_timeout.value = item_form.inherited_timeouts[type] || '';
 
-			if (item_form.custom_timeout.querySelector(':checked').value == <?= ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED ?>) {
-				item_form.timeout.value = item_form.inherited_timeouts[type];
-			}
+		if (item_form.custom_timeout.querySelector(':checked').value == <?= ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED ?>) {
+			item_form.timeout.value = item_form.inherited_timeout.value;
 		}
-		else {
-			item_form.timeout.disabled = true;
-		}
-
-		item_form.custom_timeout_value = item_form.timeout.value;
 
 		$('label[for=interfaceid]').toggleClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', !interface_optional);
 		$('input[name=interfaceid]').prop('aria-required', !interface_optional);
@@ -228,16 +221,19 @@
 			.trigger('change');
 
 		item_form.custom_timeout.addEventListener('change', () => {
-			if (item_form.custom_timeout.querySelector(':checked').value == <?= ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED ?>) {
-				item_form.custom_timeout_value = item_form.timeout.value;
-				item_form.timeout.value = item_form.inherited_timeouts[item_form.type.value] || '';
-				item_form.timeout.readOnly = true;
+			if (item_form.custom_timeout.querySelector(':checked').value == <?= ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED ?>) {
+				item_form.timeout.disabled = false;
+				item_form.timeout.style.display = '';
+				item_form.inherited_timeout.style.display = 'none';
 			}
 			else {
-				item_form.timeout.value = item_form.custom_timeout_value;
-				item_form.timeout.readOnly = false;
+				item_form.timeout.disabled = true;
+				item_form.timeout.style.display = 'none';
+				item_form.inherited_timeout.style.display = '';
 			}
 		});
+
+		item_form.custom_timeout.dispatchEvent(new Event('change'));
 
 		$('#test_item').on('click', function() {
 			var step_nums = [];

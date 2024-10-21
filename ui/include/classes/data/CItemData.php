@@ -317,6 +317,7 @@ final class CItemData {
 			'vmware.vm.discovery[url]',
 			'vmware.vm.guest.memory.size.swapped[url,uuid]',
 			'vmware.vm.guest.osuptime[url,uuid]',
+			'vmware.vm.hv.maintenance[url,uuid]',
 			'vmware.vm.hv.name[url,uuid]',
 			'vmware.vm.memory.size.ballooned[url,uuid]',
 			'vmware.vm.memory.size.compressed[url,uuid]',
@@ -2233,7 +2234,7 @@ final class CItemData {
 				]
 			],
 			'vmware.hv.maintenance[url,uuid]' => [
-				'description' => _('VVMware hypervisor maintenance status, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance'),
+				'description' => _('VMware hypervisor maintenance status, "url" - VMware service URL, "uuid" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'documentation_link' => [
 					ITEM_TYPE_SIMPLE => 'vm_monitoring/vmware_keys#vmware.hv.maintenance'
@@ -2475,6 +2476,13 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'documentation_link' => [
 					ITEM_TYPE_SIMPLE => 'vm_monitoring/vmware_keys#vmware.vm.guest.osuptime'
+				]
+			],
+			'vmware.vm.hv.maintenance[url,uuid]' => [
+				'description' => _('VMware virtual machine hypervisor maintenance status, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'documentation_link' => [
+					ITEM_TYPE_SIMPLE => 'vm_monitoring/vmware_keys#vmware.vm.hv.maintenance'
 				]
 			],
 			'vmware.vm.hv.name[url,uuid]' => [

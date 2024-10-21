@@ -373,7 +373,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 			case 'Script':
 				$script_params = $form->getField('Script parameters')->asTable();
-				$this->assertEquals(['Value','Action'], $script_params->getHeadersText());
+				$this->assertEquals(['Value',''], $script_params->getHeadersText());
 				$this->assertEquals('Add', $script_params->query('xpath:./tfoot//button')->one()->getText());
 
 				// Click on the add button and check the added row for script parameter.
@@ -398,7 +398,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				];
 
 				$params_table = $this->query('id:parameters_table')->asMultifieldTable()->one();
-				$this->assertEquals(['Name', 'Value', 'Action'], $params_table->getHeadersText());
+				$this->assertEquals(['Name', 'Value', ''], $params_table->getHeadersText());
 				$params_table->checkValue($webhook_params);
 
 				// Check that Remove button for each parameter and Add button are present and clickable in Parameters table.

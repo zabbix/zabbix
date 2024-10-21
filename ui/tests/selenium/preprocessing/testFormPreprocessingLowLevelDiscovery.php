@@ -53,6 +53,12 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 			'error_handler_params' => ''
 		],
 		[
+			'type' => '14',
+			'params' => 'regular expression pattern for matching',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
 			'type' => '15',
 			'params' => 'regular expression pattern for not matching',
 			'error_handler' => 0,
@@ -99,157 +105,175 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 			'params' => 'metric',
 			'error_handler' => 0,
 			'error_handler_params' => ''
+		],
+		[
+			'type' => '27',
+			'params' => '',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '28',
+			'params' => "OID\n1",
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '29',
+			'params' => "test\nOID\n1",
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '30',
+			'params' => '1',
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		]
 	];
 
 	/*
-	 * Preprocessing data for LLD successful creation.
+	 * GOOD create scenario data for LLD ONLY.
 	 */
-	public static function getLLDPreprocessingCreateData() {
-		return [
-			// #0 Structured data. CSV to JSON.
+	public function getLLDPreprocessingCreateData() {
+		return array_merge($this->getCommonPreprocessingCreateData(), [
+			// All steps at once.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'CSV to JSON empty parameters',
-						'Key' => 'csv-to-json-empty-parameters'
+						'Name' => 'All steps at once',
+						'Key' => 'all-steps-at-once[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'CSV to JSON']
-					]
-				]
-			],
-			// #1
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Name' => 'CSV to JSON with default parameters',
-						'Key' => 'csv-to-json-with-default-parameters'
-					],
-					'preprocessing' => [
-						['type' => 'CSV to JSON', 'parameter_1' => ',', 'parameter_2' => '"', 'parameter_3' => true]
-					]
-				]
-			],
-			// #2
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Name' => 'CSV to JSON custom parameters',
-						'Key' => 'csv-to-json-custom-parameters'
-					],
-					'preprocessing' => [
-						['type' => 'CSV to JSON', 'parameter_1' => ' ', 'parameter_2' => "'", 'parameter_3' => false]
-					]
-				]
-			],
-			// #3
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Name' => 'Add spaces preprocessing',
-						'Key' => 'item.spaces.preprocessing'
-					],
-					'preprocessing' => [
-						['type' => 'Replace', 'parameter_1' => '   test text  ', 'parameter_2' => '   replacement 1  '],
-						['type' => 'Regular expression', 'parameter_1' => '       expression       ', 'parameter_2' => '   \1     '],
-						['type' => 'JSONPath', 'parameter_1' => '    $.data.test      '],
-						['type' => 'JavaScript', 'parameter_1' => "  Test line 1\n   Test line   2\n   Test line 3   "],
-						['type' => 'Does not match regular expression', 'parameter_1' => '    Pattern     '],
-						['type' => 'Check for error in JSON', 'parameter_1' => '    $.new.path    ']
-					]
-				]
-			],
-			// #4
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Name' => 'LLD all preprocessing steps',
-						'Key' => 'lld-all-preprocessing-steps'
-					],
-					'preprocessing' => [
-						['type' => 'Replace', 'parameter_1' => 'test', 'parameter_2' => 'replacement'],
-						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => '\1'],
+						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
+						['type' => 'Replace', 'parameter_1' => 'text', 'parameter_2' => 'REPLACEMENT'],
+						['type' => 'XML XPath', 'parameter_1' => 'def'],
+						['type' => 'JSONPath', 'parameter_1' => 'def'],
 						['type' => 'CSV to JSON','parameter_1' => ' ', 'parameter_2' => '\\', 'parameter_3' => true],
-						['type' => 'JSONPath', 'parameter_1' => '$.data.test'],
+						['type' => 'XML to JSON'],
+						['type' => 'SNMP walk value', 'parameter_1' => '1.2.3', 'parameter_2' => 'UTF-8 from Hex-STRING'],
+						['type' => 'SNMP walk to JSON', 'parameter_table_1_1' => 'abc', 'parameter_table_1_2' => '123'],
+						['type' => 'SNMP get value', 'parameter_1' => 'MAC from Hex-STRING'],
 						['type' => 'JavaScript', 'parameter_1' => 'Test JavaScript'],
-						['type' => 'Does not match regular expression', 'parameter_1' => 'Pattern'],
-						['type' => 'Check for error in JSON', 'parameter_1' => '$.new.path'],
-						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '30'],
-						['type' => 'XML to JSON']
+						['type' => 'Matches regular expression', 'parameter_1' => 'test'],
+						['type' => 'Does not match regular expression', 'parameter_1' => 'test'],
+						['type' => 'Check for error in JSON', 'parameter_1' => 'test'],
+						['type' => 'Check for error in XML', 'parameter_1' => 'abc'],
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '5']
 					],
 					'screenshot' => true
 				]
 			],
-			// #5
+			// Unicode symbols.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'LLD double preprocessing steps',
-						'Key' => 'lld-double-preprocessing-steps'
+						'Name' => 'Unicode symbols',
+						'Key' => 'unicode-symbols[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'Replace', 'parameter_1' => '123', 'parameter_2' => '345'],
-						['type' => 'Replace', 'parameter_1' => '123', 'parameter_2' => '345'],
-						['type' => 'Regular expression', 'parameter_1' => 'expression1', 'parameter_2' => '\1'],
-						['type' => 'Regular expression', 'parameter_1' => 'expression2', 'parameter_2' => '\2'],
-						['type' => 'CSV to JSON', 'parameter_1' => '.', 'parameter_2' => "'" ,'parameter_3' => false],
-						['type' => 'CSV to JSON', 'parameter_1' => '.', 'parameter_2' => "'" ,'parameter_3' => false],
-						['type' => 'JSONPath', 'parameter_1' => '$.data.test1'],
-						['type' => 'JSONPath', 'parameter_1' => '$.data.test2'],
-						['type' => 'XML to JSON'],
-						['type' => 'XML to JSON'],
-						['type' => 'Does not match regular expression', 'parameter_1' => 'Pattern1'],
-						['type' => 'Does not match regular expression', 'parameter_1' => 'Pattern2'],
-						['type' => 'JavaScript', 'parameter_1' => 'Test JavaScript'],
-						['type' => 'JavaScript', 'parameter_1' => 'Test JavaScript'],
-						['type' => 'Check for error in JSON', 'parameter_1' => '$.new.path1'],
-						['type' => 'Check for error in JSON', 'parameter_1' => '$.new.path2']
+						['type' => 'Regular expression', 'parameter_1' => '01_<!@"\'&nbsp;🙂🙃', 'parameter_2' => '02_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Replace', 'parameter_1' => '03_<!@"\'&nbsp;🙂🙃', 'parameter_2' => '04_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'XML XPath', 'parameter_1' => '08_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'JSONPath', 'parameter_1' => '09_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'CSV to JSON','parameter_1' => '<', 'parameter_2' => '<'],
+						['type' => 'SNMP walk value', 'parameter_1' => '10_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'SNMP walk to JSON', 'parameter_table_1_1' => '11_<!@"\'&nbsp;🙂🙃', 'parameter_table_1_2' => '12_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'JavaScript', 'parameter_1' => '13_5d!@#$%^&*()-='],
+						['type' => 'Matches regular expression', 'parameter_1' => '14_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Does not match regular expression', 'parameter_1' => '15_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Check for error in JSON', 'parameter_1' => '16_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Check for error in XML', 'parameter_1' => '17_<!@"\'&nbsp;🙂🙃']
 					]
 				]
 			],
-			// #6
+			// Duplicate steps.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'LLD symbols preprocessing steps',
-						'Key' => 'lld-symbols-preprocessing-steps'
+						'Name' => 'Duplicate steps',
+						'Key' => 'duplicate-steps[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'Regular expression', 'parameter_1' => '1a!@#$%^&*()-=', 'parameter_2' => '2b!@#$%^&*()-='],
-						['type' => 'JSONPath', 'parameter_1' => '3c!@#$%^&*()-='],
-						['type' => 'Does not match regular expression', 'parameter_1' => '4d!@#$%^&*()-='],
-						['type' => 'JavaScript', 'parameter_1' => '5d!@#$%^&*()-='],
-						['type' => 'Check for error in JSON', 'parameter_1' => '5e!@#$%^&*()-=']
+						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
+						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
+						['type' => 'Replace', 'parameter_1' => 'text', 'parameter_2' => 'REPLACEMENT'],
+						['type' => 'Replace', 'parameter_1' => 'text', 'parameter_2' => 'REPLACEMENT'],
+						['type' => 'XML XPath', 'parameter_1' => 'def'],
+						['type' => 'XML XPath', 'parameter_1' => 'def'],
+						['type' => 'JSONPath', 'parameter_1' => 'def'],
+						['type' => 'JSONPath', 'parameter_1' => 'def'],
+						['type' => 'CSV to JSON','parameter_1' => ' ', 'parameter_2' => '\\', 'parameter_3' => true],
+						['type' => 'CSV to JSON','parameter_1' => ' ', 'parameter_2' => '\\', 'parameter_3' => true],
+						['type' => 'XML to JSON'],
+						['type' => 'XML to JSON'],
+						['type' => 'SNMP walk value', 'parameter_1' => '1.2.3', 'parameter_2' => 'UTF-8 from Hex-STRING'],
+						['type' => 'SNMP walk value', 'parameter_1' => '1.2.3', 'parameter_2' => 'UTF-8 from Hex-STRING'],
+						['type' => 'SNMP walk to JSON', 'parameter_table_1_1' => 'abc', 'parameter_table_1_2' => '123'],
+						['type' => 'SNMP walk to JSON', 'parameter_table_1_1' => 'abc', 'parameter_table_1_2' => '123'],
+						['type' => 'SNMP get value', 'parameter_1' => 'MAC from Hex-STRING'],
+						['type' => 'SNMP get value', 'parameter_1' => 'MAC from Hex-STRING'],
+						['type' => 'JavaScript', 'parameter_1' => 'Test JavaScript'],
+						['type' => 'JavaScript', 'parameter_1' => 'Test JavaScript'],
+						['type' => 'Matches regular expression', 'parameter_1' => 'test'],
+						['type' => 'Matches regular expression', 'parameter_1' => 'test'],
+						['type' => 'Does not match regular expression', 'parameter_1' => 'test'],
+						['type' => 'Does not match regular expression', 'parameter_1' => 'test'],
+						['type' => 'Check for error in JSON', 'parameter_1' => 'test'],
+						['type' => 'Check for error in JSON', 'parameter_1' => 'test'],
+						['type' => 'Check for error in XML', 'parameter_1' => 'abc'],
+						['type' => 'Check for error in XML', 'parameter_1' => 'abc']
 					]
 				]
 			],
-			// #7
+			// User macros.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'LLD user macros preprocessing steps',
-						'Key' => 'lld-macros-preprocessing-steps'
+						'Name' => 'Item with preprocessing rule with user macro',
+						'Key' => 'item-user-macro[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'Regular expression', 'parameter_1' => '{$PATTERN}', 'parameter_2' => '{$OUTPUT}'],
-						['type' => 'JSONPath', 'parameter_1' => '{$PATH}'],
-						['type' => 'Does not match regular expression', 'parameter_1' => '{$PATTERN2}'],
+						['type' => 'Replace', 'parameter_1' => '{$TEST1}', 'parameter_2' => '{$MACRO2}'],
+						['type' => 'Regular expression', 'parameter_1' => '{$DELIM}(.*)', 'parameter_2' => '\1'],
+						['type' => 'XML XPath', 'parameter_1' => 'number(/values/Item/value[../key=\'{$DELIM}\'])'],
+						['type' => 'JSONPath', 'parameter_1' => '$.data[\'{$KEY}\']'],
+						['type' => 'Matches regular expression', 'parameter_1' => '{$EXPRESSION}(.*)'],
+						['type' => 'Does not match regular expression', 'parameter_1' => '{$REGEXP}(.+)'],
 						['type' => 'JavaScript', 'parameter_1' => '{$JAVASCRIPT}'],
-						['type' => 'Check for error in JSON', 'parameter_1' => '{$PATH2}'],
-						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '{$HEARTBEAT}']
+						['type' => 'Check for error in JSON', 'parameter_1' => '{$USERMACRO}'],
+						['type' => 'Check for error in XML', 'parameter_1' => '/tmp/{$PATH}'],
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '{$SECONDS}'],
+						['type' => 'Prometheus to JSON', 'parameter_1' => '{$PATTERN}']
+					]
+				]
+			],
+			// Whitespace.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with spaces in preprocessing',
+						'Key' => 'item-spaces-preprocessing[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Replace', 'parameter_1' => '   test text  ', 'parameter_2' => '   replacement 1  '],
+						['type' => 'Regular expression', 'parameter_1' => '  pattern    ', 'parameter_2' => '   \1   '],
+						['type' => 'XML XPath', 'parameter_1' => '   number(/values/Item)    '],
+						['type' => 'JSONPath', 'parameter_1' => '    $.data.key    '],
+						['type' => 'Matches regular expression', 'parameter_1' => '  expression    '],
+						['type' => 'Does not match regular expression', 'parameter_1' => '   not_expression   '],
+						['type' => 'JavaScript', 'parameter_1' => "   Test line 1  \n   Test line 2 \n   Test line  3   \n   \n "],
+						['type' => 'Check for error in JSON', 'parameter_1' => '   $.error     '],
+						['type' => 'Check for error in XML', 'parameter_1' => '   /tmp/path/   ']
 					]
 				]
 			]
-		];
+		]);
 	}
 
 	public function getLLDPrometheusData() {

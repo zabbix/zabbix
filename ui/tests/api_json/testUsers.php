@@ -125,11 +125,13 @@ class testUsers extends CAPITest {
 		$usergroup_data = [
 			[
 				'name' => 'API test users status enabled',
-				'users_status' => GROUP_STATUS_ENABLED
+				'users_status' => GROUP_STATUS_ENABLED,
+				'gui_access' => GROUP_GUI_ACCESS_INTERNAL
 			],
 			[
 				'name' => 'API test users status disabled',
-				'users_status' => GROUP_STATUS_DISABLED
+				'users_status' => GROUP_STATUS_DISABLED,
+				'gui_access' => GROUP_GUI_ACCESS_INTERNAL
 			]
 		];
 
@@ -923,6 +925,15 @@ class testUsers extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/usrgrps/2": value (usrgrpid)=(7) already exists.'
 			],
+			'Can create user without user groups' => [
+				'user' => [[
+					'username' => 'Can create user without user groups',
+					'roleid' => 1,
+					'passwd' => 'zabbix123456',
+					'usrgrps' => []
+				]],
+				'expected_error' => null
+			],
 			// Roleid is as a string.
 			[
 				'user' => [
@@ -936,6 +947,15 @@ class testUsers extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/roleid": a number is expected.'
+			],
+			'Can create user without role' => [
+				'user' => [[
+					'username' => 'Can create user without role',
+					'passwd' => 'zabbix123456',
+					'usrgrps' => [['usrgrpid' => 7]],
+					'roleid' => 0
+				]],
+				'expected_error' => null
 			],
 			// Check successfully creation of user.
 			[
@@ -1015,6 +1035,8 @@ class testUsers extends CAPITest {
 		$result = $this->call('user.create', $user, $expected_error);
 
 		if ($expected_error === null) {
+			$this->assertArrayHasKey('userids', $result['result']);
+
 			foreach ($result['result']['userids'] as $key => $id) {
 				$dbResultUser = DBSelect('select * from users where userid='.zbx_dbstr($id));
 				$dbRowUser = DBFetch($dbResultUser);
@@ -1029,9 +1051,12 @@ class testUsers extends CAPITest {
 				$this->assertEquals($dbRowUser['theme'], 'default');
 				$this->assertEquals($dbRowUser['url'], '');
 
-				$this->assertEquals(1, CDBHelper::getCount('select * from users_groups where userid='.zbx_dbstr($id).
-						' and usrgrpid='.zbx_dbstr($user[$key]['usrgrps'][0]['usrgrpid']))
-				);
+				if (array_key_exists('usrgrps', $user[$key]) && $user[$key]['usrgrps']) {
+					$this->assertEquals(1, CDBHelper::getCount(
+						'select * from users_groups where userid='.zbx_dbstr($id).
+							' and usrgrpid='.zbx_dbstr($user[$key]['usrgrps'][0]['usrgrpid']))
+					);
+				}
 
 				if (array_key_exists('medias', $user[$key])) {
 					$dbResultMedia = DBSelect('select * from media where userid='.$id);
@@ -1137,7 +1162,7 @@ class testUsers extends CAPITest {
 				]],
 				'expected_error' => 'Not allowed to set password for user "guest".'
 			],
-			// Check super admin type user password change for himself/herself.
+			// Check super admin type user password change for oneself.
 			[
 				'user' => [[
 					'userid' => '1',
@@ -1259,7 +1284,15 @@ class testUsers extends CAPITest {
 				]],
 				'expected_error' => 'Invalid parameter "/1/usrgrps/2": value (usrgrpid)=(7) already exists.'
 			],
-			// Check user group, admin can't add himself to a disabled group or a group with disabled GUI access.
+			'Groups can be removed when updating user' => [
+				'user' => [[
+					'userid' => '9',
+					'username' => 'User without user groups',
+					'usrgrps' => []
+				]],
+				'expected_error' => null
+			],
+			// Check user group, admin can't add oneself to a disabled group or a group with disabled GUI access.
 			[
 				'user' => [[
 					'userid' => '1',
@@ -1268,7 +1301,7 @@ class testUsers extends CAPITest {
 						['usrgrpid' => '12']
 					]
 				]],
-				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+				'expected_error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 			],
 			[
 				'user' => [[
@@ -1278,7 +1311,7 @@ class testUsers extends CAPITest {
 						['usrgrpid' => '9']
 					]
 				]],
-				'expected_error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+				'expected_error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 			],
 			// Check user properties, super-admin user type.
 			[
@@ -1378,6 +1411,15 @@ class testUsers extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "userdirectoryid".'
+			],
+			'Role roleid can be removed when updating user' => [
+				'user' => [[
+					'userid' => '9',
+					'username' => 'Role roleid can be removed when updating user',
+					'medias' => [['mediatypeid' => '1', 'sendto' => 'api@zabbix.com']],
+					'roleid' => 0
+				]],
+				'expected_error' => null
 			]
 		];
 	}
@@ -1399,6 +1441,8 @@ class testUsers extends CAPITest {
 		$result = $this->call('user.update', $users, $expected_error);
 
 		if ($expected_error === null) {
+			$this->assertArrayHasKey('userids', $result['result']);
+
 			foreach ($result['result']['userids'] as $key => $id) {
 				$dbResultUser = DBSelect('select * from users where userid='.zbx_dbstr($id));
 				$dbRowUser = DBFetch($dbResultUser);
@@ -1417,7 +1461,7 @@ class testUsers extends CAPITest {
 					$this->assertEquals(1, password_verify('GreatNewP', $dbRowUser['passwd']));
 				}
 
-				if (array_key_exists('usrgrps', $users[$key])) {
+				if (array_key_exists('usrgrps', $users[$key]) && $users[$key]['usrgrps']) {
 					$this->assertEquals(1, CDBHelper::getCount(
 						'select * from users_groups where userid='.zbx_dbstr($id).
 							' and usrgrpid='.zbx_dbstr($users[$key]['usrgrps'][0]['usrgrpid']))
@@ -2452,10 +2496,10 @@ class testUsers extends CAPITest {
 				'user' => ['9', '9'],
 				'expected_error' => 'Invalid parameter "/2": value (9) already exists.'
 			],
-			// Try delete himself.
+			// Try delete oneself.
 			[
 				'user' => ['1'],
-				'expected_error' => 'User is not allowed to delete himself.'
+				'expected_error' => 'User is not allowed to delete oneself.'
 			],
 			// Try delete internal user.
 			[

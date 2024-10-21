@@ -322,14 +322,6 @@
 		}
 	}
 
-	.tag {
-		cursor: pointer;
-
-		&:not(:last-of-type) {
-			margin-right: 3px;
-		}
-	}
-
 	&.compact-view {
 		.tag {
 			max-width: 40px;
@@ -345,6 +337,18 @@
 			@media screen and (min-width: 1600px) {
 				max-width: 133px;
 			}
+		}
+	}
+}
+
+.list-table,
+.hintbox-wrap {
+	.tag {
+		margin-right: 0;
+		cursor: pointer;
+
+		&:not(:first-child) {
+			margin-left: 3px;
 		}
 	}
 }

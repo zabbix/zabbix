@@ -50,13 +50,13 @@ $form
 				new CWidgetFieldColorView($data['fields']['bg_color'])
 			)
 			->addFieldsGroup(
-				getDateFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-date')
+				getDateFieldsGroupView($data['fields'])->addRowClass('fields-group-date')
 			)
 			->addFieldsGroup(
-				getTimeFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-time')
+				getTimeFieldsGroupView($data['fields'])->addRowClass('fields-group-time')
 			)
 			->addFieldsGroup(
-				getTimeZoneFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-tzone')
+				getTimeZoneFieldsGroupView($data['fields'])->addRowClass('fields-group-tzone')
 			)
 			->addClass('js-fieldset-adv-conf')
 	)
@@ -64,14 +64,8 @@ $form
 	->addJavaScript('widget_clock_form.init();')
 	->show();
 
-function getDateFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
-	$date_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['date_size']));
-
+function getDateFieldsGroupView(array $fields): CWidgetFieldsGroupView {
 	return (new CWidgetFieldsGroupView(_('Date')))
-		->addItem([
-			$date_size_field->getLabel(),
-			(new CFormField([$date_size_field->getView(), '%']))->addClass('field-size')
-		])
 		->addField(
 			new CWidgetFieldCheckBoxView($fields['date_bold'])
 		)
@@ -80,14 +74,8 @@ function getDateFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFi
 		);
 }
 
-function getTimeFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
-	$time_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['time_size']));
-
+function getTimeFieldsGroupView(array $fields): CWidgetFieldsGroupView {
 	return (new CWidgetFieldsGroupView(_('Time')))
-		->addItem([
-			$time_size_field->getLabel(),
-			(new CFormField([$time_size_field->getView(), '%']))->addClass('field-size')
-		])
 		->addField(
 			new CWidgetFieldCheckBoxView($fields['time_bold'])
 		)
@@ -102,14 +90,8 @@ function getTimeFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFi
 		);
 }
 
-function getTimeZoneFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
-	$tzone_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['tzone_size']));
-
+function getTimeZoneFieldsGroupView(array $fields): CWidgetFieldsGroupView {
 	return (new CWidgetFieldsGroupView(_('Time zone')))
-		->addItem([
-			$tzone_size_field->getLabel(),
-			(new CFormField([$tzone_size_field->getView(), '%']))->addClass('field-size')
-		])
 		->addField(
 			new CWidgetFieldCheckBoxView($fields['tzone_bold'])
 		)

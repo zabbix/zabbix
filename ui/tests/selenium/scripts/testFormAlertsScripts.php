@@ -1645,7 +1645,7 @@ class testFormAlertsScripts extends CWebTest {
 		$form->checkValue($default_values);
 
 		// Check table headers.
-		$this->assertEquals(['Name', 'Value', 'Action'], $form->query('id:parameters-table')->asTable()->one()->getHeadersText());
+		$this->assertEquals(['Name', 'Value', ''], $form->query('id:parameters-table')->asTable()->one()->getHeadersText());
 
 		// Check fields' lengths.
 		$field_maxlength = [

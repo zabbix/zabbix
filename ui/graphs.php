@@ -671,6 +671,16 @@ else {
 		? API::GraphPrototype()->get($options)
 		: API::Graph()->get($options);
 
+	if ($data['context'] === 'host') {
+		$editable_hosts = API::Host()->get([
+			'output' => ['hostids'],
+			'graphids' => array_column($data['graphs'], 'graphid'),
+			'editable' => true
+		]);
+
+		$data['editable_hosts'] = array_column($editable_hosts, 'hostid');
+	}
+
 	if ($sort_field === 'graphtype') {
 		foreach ($data['graphs'] as $gnum => $graph) {
 			$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
@@ -706,7 +716,6 @@ else {
 		'selectDiscoveryRule' => ['itemid', 'name'],
 		'selectGraphDiscovery'	=> ['status', 'ts_delete'],
 		'selectHosts' => ($data['hostid'] == 0) ? ['name'] : null,
-		'selectTemplates' => ($data['hostid'] == 0) ? ['name'] : null,
 		'graphids' => zbx_objectValues($data['graphs'], 'graphid'),
 		'preservekeys' => true
 	];
@@ -754,6 +763,13 @@ else {
 	}
 
 	order_result($data['graphs'], $sort_field, $sort_order);
+
+	if ($data['hostid'] == 0) {
+		foreach ($data['graphs'] as &$graph) {
+			CArrayHelper::sort($graph['hosts'], ['name']);
+		}
+		unset($graph);
+	}
 
 	$data['parent_templates'] = getGraphParentTemplates($data['graphs'], ($data['parent_discoveryid'] === null)
 		? ZBX_FLAG_DISCOVERY_NORMAL

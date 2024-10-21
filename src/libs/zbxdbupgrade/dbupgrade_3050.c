@@ -15,7 +15,6 @@
 #include "dbupgrade.h"
 #include "dbupgrade_common.h"
 
-#include "zbxdbhigh.h"
 #include "zbxtasks.h"
 #include "zbxregexp.h"
 #include "zbxexpr.h"

@@ -2872,7 +2872,6 @@ zbx_vmware_cust_query_t	*zbx_vmware_service_add_cust_query(zbx_vmware_service_t 
 		const char *id, const char *key, zbx_vmware_custom_query_type_t query_type, const char *mode,
 		zbx_vector_custquery_param_t *query_params)
 {
-	int			ret = FAIL;
 	zbx_vmware_cust_query_t	cq, *pcq;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() soap_type:%s id:%s query_type:%u key:%s", __func__, soap_type, id,
@@ -2886,7 +2885,7 @@ zbx_vmware_cust_query_t	*zbx_vmware_service_add_cust_query(zbx_vmware_service_t 
 	cq.value = NULL;
 	cq.error = NULL;
 	cq.state = (ZBX_VMWARE_CQ_NEW | ZBX_VMWARE_CQ_SEPARATE);
-	cq.last_pooled = 0;
+	cq.last_pooled = time(NULL);
 
 	if (VMWARE_DVSWITCH_FETCH_DV_PORTS == query_type)
 	{
@@ -2910,7 +2909,7 @@ zbx_vmware_cust_query_t	*zbx_vmware_service_add_cust_query(zbx_vmware_service_t 
 	pcq = (zbx_vmware_cust_query_t *)zbx_hashset_insert(&service->cust_queries, &cq,
 			sizeof(zbx_vmware_cust_query_t));
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return pcq;
 }

@@ -24,6 +24,7 @@
 #define KEY_HOSTKEY_STR		"HostkeyAlgorithms"
 #define KEY_CIPHERS_STR		"Ciphers"
 #define KEY_MACS_STR		"MACs"
+#define KEY_PUBKEY_STR		"PubkeyAcceptedKeyTypes"
 
 int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options, int timeout,
 		const char *config_source_ip, const char *config_ssh_key_location);

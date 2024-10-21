@@ -355,7 +355,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	zbx_vector_uint64_t	eventids;
 	zbx_vector_db_event_t	events;
 	zbx_vector_ptr_pair_t	webhook_params;
-	char			*user_timezone = NULL, *webhook_params_json = NULL, error[MAX_STRING_LEN];
+	char			*tz = NULL, *webhook_params_json = NULL, error[MAX_STRING_LEN];
 	zbx_db_event		*problem_event = NULL, *recovery_event = NULL;
 	zbx_dc_um_handle_t	*um_handle = NULL;
 
@@ -495,7 +495,16 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		goto fail;
 	}
 
-	user_timezone = zbx_db_get_user_timezone(user->userid);
+	tz = zbx_db_get_user_timezone(user->userid);
+
+	if (NULL == tz || 0 == strcmp(tz, ZBX_TIMEZONE_DEFAULT_VALUE))
+	{
+		zbx_config_t	cfg;
+
+		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DEFAULT_TIMEZONE);
+		tz = zbx_strdup(tz, cfg.default_timezone);
+		zbx_config_clean(&cfg);
+	}
 
 	if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 	{
@@ -568,15 +577,15 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	if (ZBX_SCRIPT_TYPE_WEBHOOK != script.type)
 	{
 		if (SUCCEED != zbx_substitute_simple_macros_unmasked(NULL, problem_event, recovery_event, &user->userid,
-				NULL, &host, NULL, NULL, NULL, NULL, NULL, user_timezone, &script.command, macro_type,
-				error, sizeof(error)))
+				NULL, &host, NULL, NULL, NULL, NULL, NULL, tz, &script.command, macro_type, error,
+				sizeof(error)))
 		{
 			goto fail;
 		}
 
 		if (SUCCEED != zbx_substitute_simple_macros(NULL, problem_event, recovery_event, &user->userid, NULL,
-				&host, NULL, NULL, NULL, NULL, NULL, user_timezone, &script.command_orig, macro_type,
-				error, sizeof(error)))
+				&host, NULL, NULL, NULL, NULL, NULL, tz, &script.command_orig, macro_type, error,
+				sizeof(error)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			goto fail;
@@ -587,7 +596,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		for (int i = 0; i < webhook_params.values_num; i++)
 		{
 			if (SUCCEED != zbx_substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
-					&user->userid, NULL, &host, NULL, NULL, NULL, NULL, NULL, user_timezone,
+					&user->userid, NULL, &host, NULL, NULL, NULL, NULL, NULL, tz,
 					(char **)&webhook_params.values[i].second, macro_type, error,
 					sizeof(error)))
 			{
@@ -638,7 +647,7 @@ fail:
 
 	zbx_script_clean(&script);
 	zbx_free(webhook_params_json);
-	zbx_free(user_timezone);
+	zbx_free(tz);
 
 	for (int i = 0; i < webhook_params.values_num; i++)
 	{

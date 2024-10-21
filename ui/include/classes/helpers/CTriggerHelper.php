@@ -168,28 +168,32 @@ class CTriggerHelper extends CTriggerGeneralHelper {
 
 						if (array_key_exists($src_trigger['triggerid'], $src_master_dep_triggers)) {
 							$dst_master_triggerids[$src_trigger['triggerid']][$dst_hostid] = $dst_triggerid;
+						}
+					}
+				}
 
-							foreach ($src_master_dep_triggers[$src_trigger['triggerid']] as $src_dep_triggerid => $f) {
-								unset($src_master_dep_triggers[$src_trigger['triggerid']][$src_dep_triggerid]);
+				foreach ($src_triggers as $src_trigger) {
+					if (array_key_exists($src_trigger['triggerid'], $src_master_dep_triggers)) {
+						foreach ($src_master_dep_triggers[$src_trigger['triggerid']] as $src_dep_triggerid => $f) {
+							unset($src_master_dep_triggers[$src_trigger['triggerid']][$src_dep_triggerid]);
 
-								if (!$src_master_dep_triggers[$src_trigger['triggerid']]) {
-									unset($src_master_dep_triggers[$src_trigger['triggerid']]);
-								}
-
-								foreach ($src_dep_triggers[$src_dep_triggerid]['dependencies'] as $master_trigger) {
-									if (bccomp($master_trigger['triggerid'], $src_trigger['triggerid']) == 0) {
-										continue;
-									}
-
-									if (array_key_exists($master_trigger['triggerid'], $src_master_dep_triggers)
-											&& array_key_exists($src_dep_triggerid, $src_master_dep_triggers[$master_trigger['triggerid']])) {
-										continue 3;
-									}
-								}
-
-								$_src_triggers[] = $src_dep_triggers[$src_dep_triggerid];
-								unset($src_dep_triggers[$src_dep_triggerid]);
+							if (!$src_master_dep_triggers[$src_trigger['triggerid']]) {
+								unset($src_master_dep_triggers[$src_trigger['triggerid']]);
 							}
+
+							foreach ($src_dep_triggers[$src_dep_triggerid]['dependencies'] as $master_trigger) {
+								if (bccomp($master_trigger['triggerid'], $src_trigger['triggerid']) == 0) {
+									continue;
+								}
+
+								if (array_key_exists($master_trigger['triggerid'], $src_master_dep_triggers)
+										&& array_key_exists($src_dep_triggerid, $src_master_dep_triggers[$master_trigger['triggerid']])) {
+									continue 2;
+								}
+							}
+
+							$_src_triggers[] = $src_dep_triggers[$src_dep_triggerid];
+							unset($src_dep_triggers[$src_dep_triggerid]);
 						}
 					}
 				}

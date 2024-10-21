@@ -1028,17 +1028,21 @@ class CUserDirectory extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$ldap_userdirectories_delete = array_column($db_userdirectories, 'idp_type', 'userdirectoryid');
-		$ldap_userdirectories_delete = array_keys($ldap_userdirectories_delete, IDP_TYPE_LDAP);
+		$userdirectoryid_idptype = array_column($db_userdirectories, 'idp_type', 'userdirectoryid');
+		$auth = API::Authentication()->get([
+			'output' => ['ldap_userdirectoryid', 'authentication_type', 'ldap_auth_enabled', 'saml_auth_enabled']
+		]);
+
+		if ($auth['saml_auth_enabled'] == ZBX_AUTH_SAML_ENABLED && in_array(IDP_TYPE_SAML, $userdirectoryid_idptype)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete default user directory.'));
+		}
+
+		$ldap_userdirectories_delete = array_keys($userdirectoryid_idptype, IDP_TYPE_LDAP);
 		$ldap_userdirectories_left = API::UserDirectory()->get([
 			'countOutput' => true,
 			'filter' => ['idp_type' => IDP_TYPE_LDAP]
 		]);
 		$ldap_userdirectories_left -= count($ldap_userdirectories_delete);
-
-		$auth = API::Authentication()->get([
-			'output' => ['ldap_userdirectoryid', 'authentication_type', 'ldap_auth_enabled']
-		]);
 
 		// Default LDAP server cannot be removed if there are remaining LDAP servers.
 		if (in_array($auth['ldap_userdirectoryid'], $userdirectoryids)

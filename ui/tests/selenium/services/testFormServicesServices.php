@@ -101,7 +101,7 @@ class testFormServicesServices extends CWebTest {
 
 		// Check Problem tags table headers.
 		$problem_tags_table = $form->query('id', 'problem_tags')->asMultifieldTable()->one();
-		$this->assertSame(['Name', 'Operation', 'Value', 'Action'], $problem_tags_table->getHeadersText());
+		$this->assertSame(['Name', 'Operation', 'Value', ''], $problem_tags_table->getHeadersText());
 
 		// Check Problem tags table fields.
 		$problem_tags_table->checkValue([['tag' => '', 'operator' => 'Equals', 'value' => '']]);
@@ -115,7 +115,7 @@ class testFormServicesServices extends CWebTest {
 
 		// Check Status rules table headers.
 		$status_rules_table = $form->query('id', 'status_rules')->asMultifieldTable()->one();
-		$this->assertSame(['Name', 'Action'], $status_rules_table->getHeadersText());
+		$this->assertSame(['Name', 'Actions'], $status_rules_table->getHeadersText());
 
 		// Check Service tab fields' maxlengths.
 		$service_tab_limits = [

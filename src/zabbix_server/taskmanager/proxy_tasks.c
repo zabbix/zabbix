@@ -15,7 +15,6 @@
 #include "taskmanager_server.h"
 
 #include "zbxdb.h"
-#include "zbxdbhigh.h"
 #include "zbxnum.h"
 #include "zbxtasks.h"
 #include "zbxversion.h"

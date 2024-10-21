@@ -116,7 +116,7 @@ class testFormGraphs extends CWebTest {
 						'id:itemsTable' =>  ['visible' => true]
 					],
 					'items' => [
-						'item_columns' => ['', '', 'Name', 'Function', 'Draw style', 'Y axis side', 'Colour', 'Action'],
+						'item_columns' => ['', '', 'Name', 'Function', 'Draw style', 'Y axis side', 'Colour', ''],
 						'dropdowns' => [
 							'calc_fnc' => ['all', 'min', 'avg', 'max'],
 							'drawtype' => ['Line', 'Filled region', 'Bold line', 'Dot', 'Dashed line', 'Gradient line'],
@@ -151,7 +151,7 @@ class testFormGraphs extends CWebTest {
 						'id:itemsTable' =>  ['visible' => true]
 					],
 					'items' => [
-						'item_columns' => ['', '', 'Name', 'Function', 'Y axis side', 'Colour', 'Action'],
+						'item_columns' => ['', '', 'Name', 'Function', 'Y axis side', 'Colour', ''],
 						'dropdowns' => [
 							'calc_fnc' => ['min', 'avg', 'max'],
 							'yaxisside' => ['Left', 'Right']
@@ -186,7 +186,7 @@ class testFormGraphs extends CWebTest {
 						'id:itemsTable' =>  ['visible' => true]
 					],
 					'items' => [
-						'item_columns' => ['', '', 'Name', 'Type', 'Function', 'Colour', 'Action'],
+						'item_columns' => ['', '', 'Name', 'Type', 'Function', 'Colour', ''],
 						'dropdowns' => [
 							'type' => ['Simple', 'Graph sum'],
 							'calc_fnc' => ['min', 'avg', 'max', 'last']
@@ -221,7 +221,7 @@ class testFormGraphs extends CWebTest {
 						'id:itemsTable' =>  ['visible' => true]
 					],
 					'items' => [
-						'item_columns' => ['', '', 'Name', 'Type', 'Function', 'Colour', 'Action'],
+						'item_columns' => ['', '', 'Name', 'Type', 'Function', 'Colour', ''],
 						'dropdowns' => [
 							'type' => ['Simple', 'Graph sum'],
 							'calc_fnc' => ['min', 'avg', 'max', 'last']

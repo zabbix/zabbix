@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-07-26 16:25+0000\n"
-"Last-Translator: Daniil Mitrofanov <daniil.mitrofanov@softswiss.com>\n"
+"PO-Revision-Date: 2024-10-16 06:20+0000\n"
+"Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -1687,7 +1687,7 @@ msgstr "Должна поддерживаться по крайней мере �
 
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
-msgstr "Должна поддерживаться по крайней мере одна база данных из MySQL, PostgreSQL или Oracle."
+msgstr "Должна поддерживаться по крайней мере одна база данных: MySQL, PostgreSQL или Oracle."
 
 #: app/views/correlation.edit.php:264
 msgid "At least one operation must be selected."
@@ -2097,6 +2097,14 @@ msgstr "Тип рамки"
 #: include/views/js/monitoring.sysmaps.js.php:597
 msgid "Border width"
 msgstr "Ширина рамки"
+
+#: include/classes/api/services/CHost.php:1445
+msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1452
+msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
+msgstr ""
 
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
@@ -3467,6 +3475,16 @@ msgstr "Не удалось унаследовать LDD правило с кл�
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
 msgstr "Не удалось унаследовать LDD правило с ключом \"%1$s\" шаблона \"%2$s\" к шаблону \"%3$s\", так как элемент данных с таким же ключом уже существует."
+
+#: include/classes/api/services/CItemGeneral.php:684
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:685
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr ""
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
@@ -12681,6 +12699,10 @@ msgstr "Список Zabbix прокси с именем, режимом, шиф
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name, state (unknown/offline/online). Returns JSON."
 msgstr "Список Zabbix прокси с именем, режимом, шифрованием, сжатием, версией, временем последней видимости, количеством узлов сети, количеством элементов данных, требуемым количеством значений в секунду (vps), совместимостью (текущий/устаревший/неподдерживаемый), временем ожидания, именем группы прокси, состоянием (неизвестно/офлайн/онлайн). Возвращает JSON."
 
+#: include/classes/data/CItemData.php:2935
+msgid "List of Zabbix proxy groups configuration data and real-time data. Configuration data includes proxy group name, failover delay, and minimum number of online proxies required for the group to be online. Real-time data includes number of online proxies, percentage of online proxies, and state of proxy group (unknown, offline, recovering, online, degrading). This item does not return groupless proxies. Returns JSON."
+msgstr "Список данных конфигурации и данных в реальном времени для групп прокси Zabbix. Данные конфигурации включают название группы прокси, задержку переключения на резервный узел и минимальное количество онлайн-прокси, необходимое для того, чтобы группа считалась онлайн. Данные в реальном времени включают количество онлайн-прокси, процент онлайн-прокси и состояние группы прокси (неизвестно, офлайн, восстанавливается, онлайн, деградирует). Этот элемент не возвращает прокси без группы. Возвращает JSON."
+
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Список блочных устройств и их типы. Возвращает JSON"
@@ -15385,13 +15407,13 @@ msgstr "Онлайн прокси"
 #: include/classes/api/services/CUser.php:889
 #, c-format
 msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "Только пользователи с правами Супер-администратора или Администратора могут обновлять параметр \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:812
 #: include/classes/api/services/CUser.php:853
 #, c-format
 msgid "Only Super admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "Только пользователи с правами Супер-администратора могут обновлять параметр \"%1$s\"."
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -16908,7 +16930,7 @@ msgstr "Файл публичного ключа"
 
 #: app/controllers/CControllerAuditLogList.php:210
 msgid "Push"
-msgstr "Нажать"
+msgstr "Push"
 
 #: include/classes/helpers/CSlaHelper.php:64
 msgid "Quarter"
@@ -20401,6 +20423,10 @@ msgstr "Склонированный прототип узлов сети сод
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "Склонированный шаблон содержит пользовательские макросы с типом \"Скрытый текст\". Значения и тип этих макросов сброшены."
 
+#: include/classes/api/services/CHost.php:1433
+msgid "The field \"monitored_by\" must be specified when changing proxy or proxy group for host monitoring."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
 msgstr "Поддерживаются следующие символы-заполнители:"
@@ -20516,6 +20542,14 @@ msgstr "Тема"
 #: app/views/mediatype.edit.php:189 app/views/mediatype.test.edit.php:48
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "Эти параметры будут переданы в скрипт аргументами командной строки в указанном порядке."
+
+#: app/controllers/CControllerDiscoveryEdit.php:175
+#, c-format
+msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
+msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -22138,6 +22172,11 @@ msgstr "Строка user agent"
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Пользователь не может добавить себя в отключенную группу или в группу с отключенным доступом к Веб-интерфейсу."
 
+#: include/classes/api/services/CUserGroup.php:673
+#: include/classes/api/services/CUser.php:843
+msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
+msgstr ""
+
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
 msgid "User cannot change own role."
@@ -22276,6 +22315,10 @@ msgstr "Ввод данных пользователем успешно прот
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
 msgstr "Пользователю не разрешается удалять самого себя."
+
+#: include/classes/api/services/CUser.php:1837
+msgid "User is not allowed to delete oneself."
+msgstr "Пользователю запрещено удалять самого себя."
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222
@@ -22599,6 +22642,10 @@ msgstr "Список хранилищ гипервизора VMware, \"url\" - U
 msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr "Состояние обобщенного датчика работоспособности гипервизора VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор гипервизора VMware. Возвращает 0 - серый; 1 - зелёный; 2 - жёлтый; 3 - красный"
 
+#: include/classes/data/CItemData.php:2237
+msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2051
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr "Модель VMware гипервизора, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор гипервизора VMware"
@@ -22734,6 +22781,10 @@ msgstr "Размер используемой гостевой памяти ви
 #: include/classes/data/CItemData.php:2387
 msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "Размер используемой памяти хоста виртуальной машиной VMware, \"url\" - URL службы VMware, \"uuid\" - глобальный уникальный идентификатор виртуальной машины VMware"
+
+#: include/classes/data/CItemData.php:2482
+msgid "VMware virtual machine hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr ""
 
 #: include/classes/data/CItemData.php:2331
 msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
@@ -24129,6 +24180,16 @@ msgstr "латинскую букву в нижнем и верхнем реги
 #: app/views/administration.geomaps.edit.php:47
 msgid "and"
 msgstr "и"
+
+#: include/classes/api/helpers/CApiPskHelper.php:27
+#: include/classes/api/helpers/CApiPskHelper.php:57
+#: include/classes/api/helpers/CApiPskHelper.php:73
+#: include/classes/api/helpers/CApiPskHelper.php:106
+#: include/classes/api/helpers/CApiPskHelper.php:139
+#: include/classes/api/helpers/CApiPskHelper.php:160
+#: include/classes/api/helpers/CApiPskHelper.php:176
+msgid "another tls_psk value is already associated with given tls_psk_identity"
+msgstr ""
 
 #: include/forms.inc.php:1450 include/views/js/item.preprocessing.js.php:237
 msgid "any error"

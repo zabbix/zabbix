@@ -64,7 +64,7 @@ class testFormUserGroups extends CLegacyWebTest {
 					'user' => 'Admin',
 					'enabled' => false,
 					'error_msg' => 'Cannot add user group',
-					'error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+					'error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 				]
 			],
 			[
@@ -75,7 +75,7 @@ class testFormUserGroups extends CLegacyWebTest {
 					'user' => 'Admin',
 					'frontend_access' => 'Disabled',
 					'error_msg' => 'Cannot add user group',
-					'error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+					'error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 				]
 			],
 			[
@@ -126,6 +126,7 @@ class testFormUserGroups extends CLegacyWebTest {
 		}
 
 		$this->zbxTestClickXpath("//button[@id='cancel']/../button[@id='add']");
+		$this->page->waitUntilReady();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
@@ -176,7 +177,7 @@ class testFormUserGroups extends CLegacyWebTest {
 					'user' => 'Admin',
 					'enabled' => false,
 					'error_msg' => 'Cannot update user group',
-					'error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+					'error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 				]
 			],
 			[
@@ -187,7 +188,7 @@ class testFormUserGroups extends CLegacyWebTest {
 					'user' => 'Admin',
 					'frontend_access' => 'Disabled',
 					'error_msg' => 'Cannot update user group',
-					'error' => 'User cannot add himself to a disabled group or a group with disabled GUI access.'
+					'error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 				]
 			],
 			[
@@ -261,9 +262,8 @@ class testFormUserGroups extends CLegacyWebTest {
 		return [
 			[
 				[
-					'expected' => TEST_BAD,
-					'name' => 'Disabled',
-					'error' => 'User "disabled-user" cannot be without user group.'
+					'expected' => TEST_GOOD,
+					'name' => 'Disabled'
 				]
 			],
 			[

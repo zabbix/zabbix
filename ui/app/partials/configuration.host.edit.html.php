@@ -105,7 +105,7 @@ $templates_field_items = [];
 
 if ($data['host']['parentTemplates']) {
 	$linked_templates = (new CTable())
-		->setHeader([_('Name'), _('Action')])
+		->setHeader([_('Name'), _('Actions')])
 		->setId('linked-templates')
 		->addClass(ZBX_STYLE_TABLE_FORMS)
 		->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
@@ -423,7 +423,7 @@ foreach ($data['inventory_fields'] as $inventory_no => $inventory_field) {
 		$data['host']['inventory'][$field_name] = '';
 	}
 
-	if ($inventory_field['type'] == DB::FIELD_TYPE_TEXT) {
+	if ($inventory_field['type'] & DB::FIELD_TYPE_TEXT) {
 		$input_field = (new CTextArea('host_inventory['.$field_name.']', $data['host']['inventory'][$field_name]))
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH);
 	}

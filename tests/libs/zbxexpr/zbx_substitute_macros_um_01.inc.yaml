@@ -1,0 +1,23 @@
+---
+hosts:
+  - hostid: 0
+    macros:
+      - macroid: 1
+        macro: "{$TEXT_VALUE}"
+        value: "text value"
+        type: ZBX_MACRO_VALUE_TEXT
+      - macroid: 2
+        macro: "{$SECRET_VALUE}"
+        value: "secret value"
+        type: ZBX_MACRO_VALUE_SECRET
+      - macroid: 3
+        macro: "{$VAULT_VALUE}"
+        value: "a/b:k1"
+        type: ZBX_MACRO_VALUE_VAULT
+    templates: []
+vault:
+  - path: a/b
+    values:
+      - key: k1
+        value: "vault value"
+...

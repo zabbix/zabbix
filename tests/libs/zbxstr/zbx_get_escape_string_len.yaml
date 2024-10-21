@@ -1,0 +1,64 @@
+---
+test case: "1. Hello"
+in:
+  src: "Hello"
+  charlist: "!"
+out:
+  return: 5
+---
+test case: "2. 123 !!!"
+in:
+  src: "123 !!!"
+  charlist: "!"
+out:
+  return: 10
+---
+test case: "3. Whitespace"
+in:
+  src: " "
+  charlist: "!"
+out:
+  return: 1
+---
+test case: "4. abbcccdddd"
+in:
+  src: "abbcccdddd"
+  charlist: "abc"
+out:
+  return: 16
+---
+test case: "5. Empty string"
+in:
+  src: ""
+  charlist: "!!!"
+out:
+  return: 0
+---
+test case: "6. Empty charlist"
+in:
+  src: "test"
+  charlist: ""
+out:
+  return: 4
+---
+test case: "7. Special Characters"
+in:
+  src: ",./;'[]-="
+  charlist: ";"
+out:
+  return: 10
+---
+test case: "8. Newlines"
+in:
+  src: "Newlines \n\n"
+  charlist: "\n"
+out:
+  return: 13
+---
+test case: "9. Apostrophe"
+in:
+  src: "'Apostrophe'"
+  charlist: "'"
+out:
+  return: 14
+...

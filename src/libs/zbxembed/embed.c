@@ -23,6 +23,9 @@
 
 #include "zbxjson.h"
 #include "zbxstr.h"
+#include "webdriver.h"
+#include "browser_element.h"
+#include "browser_alert.h"
 
 #define ZBX_ES_MEMORY_LIMIT	(1024 * 1024 * 512)
 #define ZBX_ES_STACK_LIMIT	1000
@@ -35,7 +38,7 @@
 
 typedef struct
 {
-	void			*heapptr;	/* js object heap ptr */
+	const void		*heapptr;	/* js object heap ptr */
 	void			*data;
 	zbx_es_obj_type_t	type;
 }
@@ -251,6 +254,19 @@ fail:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: push result string on duktape value stack                         *
+ *                                                                            *
+ * Comments: The string might be modified by this function.                   *
+ *                                                                            *
+ ******************************************************************************/
+void	es_push_result_string(duk_context *ctx, char *str, size_t size)
+{
+	zbx_replace_invalid_utf8(str);
+	duk_push_lstring(ctx, str, size);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: timeout checking callback                                         *
  *                                                                            *
  ******************************************************************************/
@@ -346,6 +362,25 @@ int	zbx_es_init_env(zbx_es_t *es, const char *config_source_ip, char **error)
 	duk_def_prop(es->env->ctx, -3, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
 			DUK_DEFPROP_HAVE_CONFIGURABLE);
 
+	/* JSON parse/stringify is used internally, store them into stash to prevent them */
+	/* from being freed when assigning null to them in scripts                        */
+	duk_get_global_string(es->env->ctx, "JSON");			/* [stash,JSON] */
+	duk_push_string(es->env->ctx, "\xff""\xff""duk_json_parse");	/* [stash,JSON,"_parse"] */
+	duk_get_prop_string(es->env->ctx, -2, "parse");			/* [stash,JSON,"_parse",JSON.parse] */
+	es->env->json_parse = duk_get_heapptr(es->env->ctx, -1);
+
+	duk_def_prop(es->env->ctx, -4, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
+			DUK_DEFPROP_HAVE_CONFIGURABLE);	/* [stash,JSON] */
+
+	duk_push_string(es->env->ctx, "\xff""\xff""duk_json_stringify");	/* [stash,JSON,"_stringify"] */
+	duk_get_prop_string(es->env->ctx, -2, "stringify");	/* [stash,JSON,"_stringify",JSON.stringify] */
+	es->env->json_stringify = duk_get_heapptr(es->env->ctx, -1);
+
+	duk_def_prop(es->env->ctx, -4, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
+			DUK_DEFPROP_HAVE_CONFIGURABLE);	/* [stash,JSON] */
+
+	duk_pop(es->env->ctx);
+
 	/* initialize HttpRequest prototype */
 	if (FAIL == zbx_es_init_httprequest(es, error))
 		goto out;
@@ -370,6 +405,36 @@ out:
 			ZBX_NULL2EMPTY_STR(*error));
 
 	return ret;
+}
+
+static void	es_objmap_destroy(zbx_hashset_t *objmap)
+{
+#ifdef HAVE_LIBCURL
+	zbx_hashset_iter_t	iter;
+	zbx_es_obj_data_t	*obj;
+
+	zbx_hashset_iter_reset(objmap, &iter);
+	while (NULL != (obj = (zbx_es_obj_data_t *)zbx_hashset_iter_next(&iter)))
+	{
+		switch (obj->type)
+		{
+			case ES_OBJ_HTTPREQUEST:
+				es_httprequest_free(obj->data);
+				break;
+			case ES_OBJ_BROWSER:
+				webdriver_release((zbx_webdriver_t *)obj->data);
+				break;
+			case ES_OBJ_ELEMENT:
+				wd_element_free((zbx_wd_element_t *)obj->data);
+				break;
+			case ES_OBJ_ALERT:
+				wd_alert_free((zbx_wd_alert_t *)obj->data);
+				break;
+		}
+	}
+#endif
+
+	zbx_hashset_destroy(objmap);
 }
 
 /******************************************************************************
@@ -397,9 +462,11 @@ int	zbx_es_destroy_env(zbx_es_t *es, char **error)
 	}
 
 	duk_destroy_heap(es->env->ctx);
+	es_objmap_destroy(&es->env->objmap);
+
 	zbx_es_debug_disable(es);
+
 	zbx_free(es->env->browser_endpoint);
-	zbx_hashset_destroy(&es->env->objmap);
 	zbx_free(es->env->error);
 	zbx_free(es->env);
 
@@ -878,15 +945,16 @@ int	es_is_chained_constructor_call(duk_context *ctx)
  *                                                                            *
  * Purpose: attach data pointer to current object                             *
  *                                                                            *
- * Comments: The object must be on the top of the stack (-1)                  *
- *           This function must be used only from object constructor          *
+ * Comments: This function must be used only from object constructor          *
  *                                                                            *
  ******************************************************************************/
-void	es_obj_attach_data(zbx_es_env_t *env, void *data, zbx_es_obj_type_t type)
+void	es_obj_attach_data(zbx_es_env_t *env, void *objptr, void *data, zbx_es_obj_type_t type)
 {
 	zbx_es_obj_data_t	obj_local;
 
-	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
+	duk_push_this(env->ctx);
+	obj_local.heapptr = objptr;
+	duk_pop(env->ctx);
 
 	obj_local.data = data;
 	obj_local.type = type;
@@ -897,19 +965,18 @@ void	es_obj_attach_data(zbx_es_env_t *env, void *data, zbx_es_obj_type_t type)
  *                                                                            *
  * Purpose: get data pointer attached to current object                       *
  *                                                                            *
- * Parameters: env  - [IN]                                                    *
- *             type - [IN] object type                                        *
+ * Parameters: env    - [IN]                                                  *
+ *             objptr - [IN] js object heap pointer                           *
+ *             type   - [IN] object type                                      *
  *                                                                            *
  * Comments: This function must be used only from object methods.             *
  *                                                                            *
  ******************************************************************************/
-void	*es_obj_get_data(zbx_es_env_t *env, zbx_es_obj_type_t type)
+void	*es_obj_get_data(zbx_es_env_t *env, const void *objptr, zbx_es_obj_type_t type)
 {
 	zbx_es_obj_data_t	obj_local, *obj;
 
-	duk_push_this(env->ctx);
-	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
-	duk_pop(env->ctx);
+	obj_local.heapptr = objptr;
 
 	if (NULL != (obj = zbx_hashset_search(&env->objmap, &obj_local)) && obj->type == type)
 		return obj->data;
@@ -921,8 +988,8 @@ void	*es_obj_get_data(zbx_es_env_t *env, zbx_es_obj_type_t type)
  *                                                                            *
  * Purpose: detach data pointer from current object                           *
  *                                                                            *
- * Parameters: env  - [IN]                                                    *
- *             type - [IN] object type                                        *
+ * Parameters: env    - [IN]                                                  *
+ *             objptr - [IN] object js heap pointer                           *
  *                                                                            *
  * Return value: detached data pointer                                        *
  *                                                                            *
@@ -932,18 +999,23 @@ void	*es_obj_get_data(zbx_es_env_t *env, zbx_es_obj_type_t type)
  *           This function must be used only from object destructor.          *
  *                                                                            *
  ******************************************************************************/
-void	*es_obj_detach_data(zbx_es_env_t *env, zbx_es_obj_type_t type)
+void	*es_obj_detach_data(zbx_es_env_t *env, void *objptr, zbx_es_obj_type_t type)
 {
-	zbx_es_obj_data_t	obj_local, *obj;
-	void			*data;
+	if (NULL != objptr)
+	{
+		zbx_es_obj_data_t	obj_local, *obj;
+		void			*data;
 
-	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
+		obj_local.heapptr = objptr;
 
-	if (NULL == (obj = zbx_hashset_search(&env->objmap, &obj_local)) || obj->type != type)
+		if (NULL == (obj = zbx_hashset_search(&env->objmap, &obj_local)) || obj->type != type)
+			return NULL;
+
+		data = obj->data;
+		zbx_hashset_remove_direct(&env->objmap, obj);
+
+		return data;
+	}
+	else
 		return NULL;
-
-	data = obj->data;
-	zbx_hashset_remove_direct(&env->objmap, obj);
-
-	return data;
 }

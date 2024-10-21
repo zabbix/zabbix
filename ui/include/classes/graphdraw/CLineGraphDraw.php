@@ -1312,33 +1312,30 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 
 		foreach ($this->percentile as $side => $percentile) {
-			if ($percentile['percent'] > 0 && $percentile['value']) {
-				$minY = $this->m_minY[$side];
-				$maxY = $this->m_maxY[$side];
+			if ($percentile['percent'] > 0 && $percentile['value'] != 0) {
+				$min_y = $this->m_minY[$side];
+				$max_y = $this->m_maxY[$side];
 
-				$color = ($side == GRAPH_YAXIS_SIDE_LEFT)
-					? $this->graphtheme['leftpercentilecolor']
-					: $this->graphtheme['rightpercentilecolor'];
+				if ($percentile['value'] >= $min_y && $percentile['value'] <= $max_y) {
+					$color = ($side == GRAPH_YAXIS_SIDE_LEFT)
+						? $this->graphtheme['leftpercentilecolor']
+						: $this->graphtheme['rightpercentilecolor'];
 
-				if ($maxY - $minY == INF) {
-					$y = $this->sizeY + $this->shiftY - CMathHelper::safeMul([$this->sizeY,
-						$percentile['value'] / 10 - $minY / 10, 1 / ($maxY / 10 - $minY / 10)]
+					if ($max_y - $min_y == INF) {
+						$y = $this->sizeY + $this->shiftY - CMathHelper::safeMul([$this->sizeY,
+							$percentile['value'] / 10 - $min_y / 10, 1 / ($max_y / 10 - $min_y / 10)]
+						);
+					}
+					else {
+						$y = $this->sizeY + $this->shiftY - CMathHelper::safeMul([$this->sizeY,
+							$percentile['value'] - $min_y, 1 / ($max_y - $min_y)]
+						);
+					}
+
+					zbx_imageline($this->im, $this->shiftXleft, $y, $this->sizeX + $this->shiftXleft, $y,
+						$this->getColor($color)
 					);
 				}
-				else {
-					$y = $this->sizeY + $this->shiftY - CMathHelper::safeMul([$this->sizeY,
-						$percentile['value'] - $minY, 1 / ($maxY - $minY)]
-					);
-				}
-
-				zbx_imageline(
-					$this->im,
-					$this->shiftXleft,
-					$y,
-					$this->sizeX + $this->shiftXleft,
-					$y,
-					$this->getColor($color)
-				);
 			}
 		}
 	}

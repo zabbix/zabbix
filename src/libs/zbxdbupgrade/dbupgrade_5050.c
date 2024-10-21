@@ -15,7 +15,6 @@
 #include "dbupgrade.h"
 #include "dbupgrade_macros.h"
 
-#include "zbxdbhigh.h"
 #include "zbxcrypto.h"
 #include "zbxnum.h"
 #include "zbxalgo.h"

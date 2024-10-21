@@ -1059,7 +1059,7 @@ int	item_preproc_get_error_from_regex(const zbx_variant_t *value, const char *pa
 
 	*output++ = '\0';
 
-	if (FAIL == zbx_mregexp_sub(value_str.data.str, pattern, output, error))
+	if (FAIL == zbx_mregexp_sub(value_str.data.str, pattern, output, ZBX_REGEXP_GROUP_CHECK_DISABLE, error))
 	{
 		*error = zbx_dsprintf(*error, "invalid regular expression \"%s\"", pattern);
 		ret = FAIL;

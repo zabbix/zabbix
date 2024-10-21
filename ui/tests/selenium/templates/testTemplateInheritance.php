@@ -39,6 +39,15 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 */
 	protected $hostName = 'Template inheritance test host';
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
 	public function testTemplateInheritance_linkHost(){
 		$sql = "select hostid from hosts where host='Linux by Zabbix agent';";
 		$this->assertEquals(1, CDBHelper::getCount($sql));
@@ -175,7 +184,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		$table = $form->query('id:linked-templates')->asTable()->one()->waitUntilVisible();
 		$table->findRow('Name', $template)
-				->getColumn('Action')->query('button:Unlink and clear')->one()->click();
+				->getColumn('Actions')->query('button:Unlink and clear')->one()->click();
 		$this->assertFalse($table->findRow('Name', $template)->isValid());
 		$form->submit();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
@@ -255,7 +264,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestLaunchOverlayDialog('Items');
 		$this->zbxTestClickLinkText('testInheritanceItem1');
 		$this->zbxTestClickWait('add');
-		$this->zbxTestTextPresent('Graph added');
+		$this->assertMessage(TEST_GOOD,'Graph added');
 
 		// check that the inherited graph matches the original
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
@@ -491,7 +500,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestTextPresent($this->templateName.': testInheritanceItem1');
 
 		$this->zbxTestClickWait('add');
-		$this->zbxTestTextPresent('Graph prototype added');
+		$this->assertMessage(TEST_GOOD,'Graph prototype added');
 		$this->zbxTestTextPresent('Test LLD graph');
 
 		// check that the inherited graph matches the original

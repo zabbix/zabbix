@@ -126,6 +126,7 @@ class testLowLevelDiscovery extends CWebTest {
 			'id:delay_flex_0_delay' => ['placeholder' => '50s', 'maxlength' => 255],
 			'id:delay_flex_0_period' => ['placeholder' => '1-7,00:00-24:00', 'maxlength' => 255],
 			'id:timeout' => ['value' => '3s', 'maxlength' => 255],
+			'id:inherited_timeout' => ['value' => '3s', 'maxlength' => 255],
 			'id:custom_timeout' => ['labels' => ['Global', 'Override'], 'value' => 'Global'],
 			'Delete lost resources' => ['value' => '7d', 'maxlength' => 255],
 			'Disable lost resources' => ['value' => '1h', 'maxlength' => 255],
@@ -133,7 +134,7 @@ class testLowLevelDiscovery extends CWebTest {
 			'id:enabled_lifetime_type' => ['labels' => ['Never', 'Immediately', 'After'], 'value' => 'Immediately'],
 			'Enable trapping' => ['value' => false],
 			'id:trapper_hosts' => ['maxlength' => 255],
-			'Description' => ['value' => ''],
+			'Description' => ['value' => '', 'maxlength' => 65535],
 			'Enabled' => ['value' => true],
 
 			// Preprocessing tab.
@@ -145,7 +146,7 @@ class testLowLevelDiscovery extends CWebTest {
 			'id:lld_macro_paths_0_path' => ['placeholder' => '$.path.to.node', 'maxlength' => 255],
 
 			// Filters tab.
-			'Filters' => ['value' => [['macro' => '', 'operator' => 'matches']]],
+			'Filters' => ['value' => [['macro' => '']]],
 			'id:conditions_0_macro' => ['placeholder' => '{#MACRO}', 'maxlength' => 64],
 			'name:conditions[0][operator]' => ['options' => ['matches', 'does not match', 'exists', 'does not exist'],
 				'value' => 'matches'
@@ -214,7 +215,7 @@ class testLowLevelDiscovery extends CWebTest {
 							->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
 					);
 					$filter_table = $filters_container->query('id:conditions')->asTable()->one();
-					$this->assertEquals(['Label', 'Macro', '', 'Regular expression', 'Action'],
+					$this->assertEquals(['Label', 'Macro', '', 'Regular expression', ''],
 							$filter_table->getHeadersText()
 					);
 					$this->assertFalse($filters_container->query('id:evaltype')->exists());
@@ -522,11 +523,19 @@ class testLowLevelDiscovery extends CWebTest {
 
 				// Timeout fields' dependency.
 				$timeout_array = [
-					'Global' => ['enabled' => false, 'visible' => true],
-					'Override' => ['enabled' => true, 'visible' => true]
+					'Global' => [
+						'id:inherited_timeout' => ['enabled' => false, 'visible' => true],
+						'id:timeout' => ['enabled' => false, 'visible' => false]
+					],
+					'Override' => [
+						'id:inherited_timeout' => ['enabled' => false, 'visible' => false],
+						'id:timeout' => ['enabled' => true, 'visible' => true]
+					]
 				];
-				foreach ($timeout_array as $timeout => $status) {
-					$this->checkFieldsDependency($form, ['id:custom_timeout' => $timeout], ['id:timeout' => $status]);
+				foreach ($timeout_array as $timeout => $statuses) {
+					foreach ($statuses as $id => $status) {
+						$this->checkFieldsDependency($form, ['id:custom_timeout' => $timeout], [$id => $status]);
+					}
 				}
 
 				// Check Timeouts link.

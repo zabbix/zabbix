@@ -20,7 +20,7 @@ zabbix_export:
         
         3. Install the PostgreSQL ODBC driver.
         
-        4. Set up the connection string with the `{$PG.CONNSTRING}` macro. The minimum required parameters are:
+        4. Set up the connection string with the `{$PG.CONNSTRING.ODBC}` macro. The minimum required parameters are:
         - `Driver=` - set the name of the driver which will be used for monitoring (from the `odbcinst.ini` file) or specify the path to the driver file (for example `/usr/lib64/psqlodbcw.so`);
         - `Servername=` - set the host name or IP address of the PostgreSQL instance;
         - `Port=` - adjust the port number if needed.
@@ -46,7 +46,7 @@ zabbix_export:
         - uuid: 9440208c49134347809eff39109c644f
           name: 'Get archive'
           type: ODBC
-          key: 'db.odbc.select[pgsql.archive,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          key: 'db.odbc.select[pgsql.archive,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           history: '0'
           value_type: TEXT
           params: |
@@ -77,7 +77,7 @@ zabbix_export:
         - uuid: dd79edeb2d65420fb58d587e411c440f
           name: 'Count of autovacuum workers'
           type: ODBC
-          key: 'db.odbc.select[pgsql.autovacuum.count,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          key: 'db.odbc.select[pgsql.autovacuum.count,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           value_type: FLOAT
           params: |
             SELECT count(*)
@@ -94,7 +94,7 @@ zabbix_export:
         - uuid: ec6e574448804ed5bb71fa6dafa3b3f8
           name: 'Get bgwriter'
           type: ODBC
-          key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           history: '0'
           value_type: TEXT
           params: |
@@ -121,7 +121,7 @@ zabbix_export:
         - uuid: 1d267b6aed064d03b4f464b27c1e897e
           name: 'Get connections sum'
           type: ODBC
-          key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           history: '0'
           value_type: TEXT
           params: |
@@ -150,7 +150,7 @@ zabbix_export:
         - uuid: 0f93764d56574a288467ad16dce11a17
           name: 'Get dbstat'
           type: ODBC
-          key: 'db.odbc.select[pgsql.dbstat,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          key: 'db.odbc.select[pgsql.dbstat,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           history: '0'
           value_type: TEXT
           params: |
@@ -184,7 +184,7 @@ zabbix_export:
         - uuid: 6ea1a17fad8b4ef3aba8b49a0922a77d
           name: 'Get dbstat sum'
           type: ODBC
-          key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           history: '0'
           value_type: TEXT
           params: |
@@ -217,7 +217,7 @@ zabbix_export:
         - uuid: efa015e294684fdeb711a0fde1256cf9
           name: 'Get locks'
           type: ODBC
-          key: 'db.odbc.select[pgsql.locks,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          key: 'db.odbc.select[pgsql.locks,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           history: '0'
           value_type: TEXT
           params: |
@@ -278,7 +278,7 @@ zabbix_export:
         - uuid: 266a9b5c1e604d97ac5a74ccdb598c97
           name: 'Age of oldest xid'
           type: ODBC
-          key: 'db.odbc.select[pgsql.oldest.xid,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          key: 'db.odbc.select[pgsql.oldest.xid,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           value_type: FLOAT
           params: |
             SELECT greatest(max(age(backend_xmin)), max(age(backend_xid)))
@@ -291,7 +291,7 @@ zabbix_export:
               value: transactions
           triggers:
             - uuid: 4d32971898d441fb94d5f029649dddfa
-              expression: 'last(/PostgreSQL by ODBC/db.odbc.select[pgsql.oldest.xid,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]) > 18000000'
+              expression: 'last(/PostgreSQL by ODBC/db.odbc.select[pgsql.oldest.xid,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]) > 18000000'
               name: 'Oldest xid is too big'
               priority: AVERAGE
               tags:
@@ -300,7 +300,7 @@ zabbix_export:
         - uuid: 3c16a3c2db7641c2b6958649d7b4809e
           name: Ping
           type: ODBC
-          key: 'db.odbc.select[pgsql.ping,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          key: 'db.odbc.select[pgsql.ping,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           params: 'SELECT 1'
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
@@ -323,7 +323,7 @@ zabbix_export:
               value: health
           triggers:
             - uuid: 758e569b51954fcf82c7cb3fa391c882
-              expression: 'last(/PostgreSQL by ODBC/db.odbc.select[pgsql.ping,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"])=0'
+              expression: 'last(/PostgreSQL by ODBC/db.odbc.select[pgsql.ping,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"])=0'
               name: 'Service is down'
               priority: HIGH
               description: 'Last test of a connection was unsuccessful.'
@@ -333,7 +333,7 @@ zabbix_export:
         - uuid: ee6b3f64e07d4acd875dbd83dccd51d0
           name: 'Get queries'
           type: ODBC
-          key: 'db.odbc.select[pgsql.queries,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          key: 'db.odbc.select[pgsql.queries,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           history: '0'
           value_type: TEXT
           params: |
@@ -377,7 +377,7 @@ zabbix_export:
         - uuid: d156db3cb35049a88179060583961156
           name: 'Replication: Standby count'
           type: ODBC
-          key: 'db.odbc.select[pgsql.replication.count,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          key: 'db.odbc.select[pgsql.replication.count,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           params: 'SELECT count(*) FROM pg_stat_replication'
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
@@ -388,7 +388,7 @@ zabbix_export:
         - uuid: 669d87ebf9324d6eaa26c3cb44efc850
           name: 'Replication: Lag in bytes'
           type: ODBC
-          key: 'db.odbc.select[pgsql.replication.lag.b,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          key: 'db.odbc.select[pgsql.replication.lag.b,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           units: B
           params: |
             SELECT
@@ -405,7 +405,7 @@ zabbix_export:
         - uuid: bb87b83d35784d3ea5be2263fa3722b0
           name: 'Replication: Lag in seconds'
           type: ODBC
-          key: 'db.odbc.select[pgsql.replication.lag.sec,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          key: 'db.odbc.select[pgsql.replication.lag.sec,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           units: s
           params: |
             SELECT
@@ -422,7 +422,7 @@ zabbix_export:
         - uuid: 3f2b5c02a6be40d4837205f68aaacabb
           name: 'Get replication'
           type: ODBC
-          key: 'db.odbc.select[pgsql.replication.process,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          key: 'db.odbc.select[pgsql.replication.process,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           history: '0'
           value_type: TEXT
           params: |
@@ -448,7 +448,7 @@ zabbix_export:
         - uuid: f8205cdd902a4a688b5bcb7f65d8e41d
           name: 'Replication: Recovery role'
           type: ODBC
-          key: 'db.odbc.select[pgsql.replication.recovery_role,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          key: 'db.odbc.select[pgsql.replication.recovery_role,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           params: 'SELECT pg_is_in_recovery()::int'
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
@@ -461,7 +461,7 @@ zabbix_export:
         - uuid: 6cc8c748f6174d3dba9aa9b39570b006
           name: 'Replication: Status'
           type: ODBC
-          key: 'db.odbc.select[pgsql.replication.status,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          key: 'db.odbc.select[pgsql.replication.status,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           params: |
             SELECT
               CASE
@@ -479,7 +479,7 @@ zabbix_export:
         - uuid: 817c494132044fff88ea4c9fcaacb60a
           name: Uptime
           type: ODBC
-          key: 'db.odbc.select[pgsql.uptime,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          key: 'db.odbc.select[pgsql.uptime,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           value_type: FLOAT
           units: s
           params: 'SELECT date_part(''epoch'', now() - pg_postmaster_start_time())'
@@ -491,7 +491,7 @@ zabbix_export:
               value: application
           triggers:
             - uuid: 22077f0b0ee54becb43ef9ab808c3e43
-              expression: 'last(/PostgreSQL by ODBC/db.odbc.select[pgsql.uptime,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]) < 10m'
+              expression: 'last(/PostgreSQL by ODBC/db.odbc.select[pgsql.uptime,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]) < 10m'
               name: 'Service has been restarted'
               event_name: 'Service has been restarted (uptime < 10m)'
               priority: AVERAGE
@@ -502,7 +502,7 @@ zabbix_export:
         - uuid: 4bfb0c1697f043d9acf640b84cc8d945
           name: Version
           type: ODBC
-          key: 'db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          key: 'db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           delay: 15m
           value_type: CHAR
           params: 'SELECT version()'
@@ -518,7 +518,7 @@ zabbix_export:
               value: application
           triggers:
             - uuid: fd409b64f83943edaf43845a12bf8ace
-              expression: 'last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"],#1)<>last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"],#2) and length(last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]))>0'
+              expression: 'last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"],#1)<>last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"],#2) and length(last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]))>0'
               name: 'Version has changed'
               event_name: 'Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO
@@ -528,7 +528,7 @@ zabbix_export:
         - uuid: 8af13c6154744e9596a0f96dfbf09d8b
           name: 'Get WAL'
           type: ODBC
-          key: 'db.odbc.select[pgsql.wal.stat,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          key: 'db.odbc.select[pgsql.wal.stat,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           delay: 5m
           history: '0'
           value_type: TEXT
@@ -564,7 +564,7 @@ zabbix_export:
               parameters:
                 - $.archived_count
           master_item:
-            key: 'db.odbc.select[pgsql.archive,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.archive,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: archive
@@ -579,7 +579,7 @@ zabbix_export:
               parameters:
                 - $.count_files
           master_item:
-            key: 'db.odbc.select[pgsql.archive,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.archive,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: archive
@@ -594,7 +594,7 @@ zabbix_export:
               parameters:
                 - $.failed_count
           master_item:
-            key: 'db.odbc.select[pgsql.archive,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.archive,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: archive
@@ -609,7 +609,7 @@ zabbix_export:
               parameters:
                 - $.size_files
           master_item:
-            key: 'db.odbc.select[pgsql.archive,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.archive,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: archive
@@ -625,7 +625,7 @@ zabbix_export:
                 - $.buffers_alloc
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: bgwriter
@@ -641,7 +641,7 @@ zabbix_export:
                 - $.buffers_backend
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: bgwriter
@@ -657,7 +657,7 @@ zabbix_export:
                 - $.buffers_backend_fsync
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: bgwriter
@@ -673,7 +673,7 @@ zabbix_export:
                 - $.buffers_checkpoint
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: bgwriter
@@ -689,7 +689,7 @@ zabbix_export:
                 - $.buffers_clean
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: bgwriter
@@ -705,7 +705,7 @@ zabbix_export:
                 - $.checkpoints_req
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: bgwriter
@@ -721,7 +721,7 @@ zabbix_export:
                 - $.checkpoints_timed
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: bgwriter
@@ -741,7 +741,7 @@ zabbix_export:
                 - '0.001'
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: bgwriter
@@ -761,7 +761,7 @@ zabbix_export:
                 - '0.001'
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: bgwriter
@@ -777,7 +777,7 @@ zabbix_export:
                 - $.maxwritten_clean
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: bgwriter
@@ -802,7 +802,7 @@ zabbix_export:
               parameters:
                 - $.active
           master_item:
-            key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: connections
@@ -816,7 +816,7 @@ zabbix_export:
               parameters:
                 - $.disabled
           master_item:
-            key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: connections
@@ -830,7 +830,7 @@ zabbix_export:
               parameters:
                 - $.fastpath_function_call
           master_item:
-            key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: connections
@@ -844,7 +844,7 @@ zabbix_export:
               parameters:
                 - $.idle
           master_item:
-            key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: connections
@@ -858,7 +858,7 @@ zabbix_export:
               parameters:
                 - $.idle_in_transaction
           master_item:
-            key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: connections
@@ -872,7 +872,7 @@ zabbix_export:
               parameters:
                 - $.idle_in_transaction_aborted
           master_item:
-            key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: connections
@@ -888,7 +888,7 @@ zabbix_export:
               parameters:
                 - $.prepared
           master_item:
-            key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: connections
@@ -902,7 +902,7 @@ zabbix_export:
               parameters:
                 - $.total
           master_item:
-            key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: connections
@@ -917,7 +917,7 @@ zabbix_export:
               parameters:
                 - $.total_pct
           master_item:
-            key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: connections
@@ -943,7 +943,7 @@ zabbix_export:
               parameters:
                 - $.waiting
           master_item:
-            key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: connections
@@ -959,7 +959,7 @@ zabbix_export:
                 - $.blks_hit
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: cache
@@ -975,7 +975,7 @@ zabbix_export:
                 - $.blks_read
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: storage
@@ -994,7 +994,7 @@ zabbix_export:
               parameters:
                 - '0.001'
           master_item:
-            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: storage
@@ -1013,7 +1013,7 @@ zabbix_export:
               parameters:
                 - '0.001'
           master_item:
-            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: storage
@@ -1029,7 +1029,7 @@ zabbix_export:
                 - $.conflicts
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: queries
@@ -1045,7 +1045,7 @@ zabbix_export:
                 - $.deadlocks
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: deadlocks
@@ -1059,7 +1059,7 @@ zabbix_export:
               parameters:
                 - $.numbackends
           master_item:
-            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: backends
@@ -1076,7 +1076,7 @@ zabbix_export:
                 - $.temp_bytes
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: storage
@@ -1092,7 +1092,7 @@ zabbix_export:
                 - $.temp_files
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: storage
@@ -1108,7 +1108,7 @@ zabbix_export:
                 - $.tup_deleted
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: queries
@@ -1124,7 +1124,7 @@ zabbix_export:
                 - $.tup_fetched
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: queries
@@ -1140,7 +1140,7 @@ zabbix_export:
                 - $.tup_inserted
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: queries
@@ -1156,7 +1156,7 @@ zabbix_export:
                 - $.tup_returned
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: queries
@@ -1172,7 +1172,7 @@ zabbix_export:
                 - $.tup_updated
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: queries
@@ -1188,7 +1188,7 @@ zabbix_export:
                 - $.xact_commit
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: transactions
@@ -1204,7 +1204,7 @@ zabbix_export:
                 - $.xact_rollback
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: transactions
@@ -1218,7 +1218,7 @@ zabbix_export:
               parameters:
                 - $.count
           master_item:
-            key: 'db.odbc.select[pgsql.wal.stat,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.wal.stat,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: wal
@@ -1234,7 +1234,7 @@ zabbix_export:
                 - $.receive
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.wal.stat,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.wal.stat,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: wal
@@ -1250,7 +1250,7 @@ zabbix_export:
                 - $.write
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'db.odbc.select[pgsql.wal.stat,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+            key: 'db.odbc.select[pgsql.wal.stat,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: wal
@@ -1258,7 +1258,7 @@ zabbix_export:
         - uuid: 1c51decca55847a8adba4260f53e0acf
           name: 'Database discovery'
           type: ODBC
-          key: 'db.odbc.select[pgsql.db.discovery,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          key: 'db.odbc.select[pgsql.db.discovery,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           delay: 1h
           params: |
             WITH T AS (
@@ -1288,7 +1288,7 @@ zabbix_export:
             - uuid: 98b74e578a3e48f3990bc16eb0217a17
               name: 'DB [{#DBNAME}]: Database age'
               type: ODBC
-              key: 'db.odbc.select[pgsql.db.age,,"Database={#DBNAME};{$PG.CONNSTRING}"]'
+              key: 'db.odbc.select[pgsql.db.age,,"Database={#DBNAME};{$PG.CONNSTRING.ODBC}"]'
               delay: 10m
               params: |
                 SELECT age(datfrozenxid)
@@ -1305,7 +1305,7 @@ zabbix_export:
             - uuid: cb7067b756bc4b3eb5be2ee2361df6f8
               name: 'DB [{#DBNAME}]: Bloating tables'
               type: ODBC
-              key: 'db.odbc.select[pgsql.db.bloating_tables,,"Database={#DBNAME};{$PG.CONNSTRING}"]'
+              key: 'db.odbc.select[pgsql.db.bloating_tables,,"Database={#DBNAME};{$PG.CONNSTRING.ODBC}"]'
               params: |
                 SELECT count(*)
                 FROM pg_catalog.pg_stat_all_tables
@@ -1322,7 +1322,7 @@ zabbix_export:
             - uuid: f6bc4dd7f66a4a399a16230b6a7a8f2d
               name: 'DB [{#DBNAME}]: Database size'
               type: ODBC
-              key: 'db.odbc.select[pgsql.db.size,,"Database={#DBNAME};{$PG.CONNSTRING}"]'
+              key: 'db.odbc.select[pgsql.db.size,,"Database={#DBNAME};{$PG.CONNSTRING.ODBC}"]'
               delay: 5m
               units: B
               params: 'SELECT pg_database_size(current_database())'
@@ -1485,7 +1485,7 @@ zabbix_export:
                     - '$[''{#DBNAME}'']'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'db.odbc.select[pgsql.dbstat,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+                key: 'db.odbc.select[pgsql.dbstat,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: raw
@@ -1729,7 +1729,7 @@ zabbix_export:
                     - '$[''{#DBNAME}'']'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'db.odbc.select[pgsql.locks,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+                key: 'db.odbc.select[pgsql.locks,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: raw
@@ -1845,7 +1845,7 @@ zabbix_export:
                     - '$[''{#DBNAME}'']'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'db.odbc.select[pgsql.queries,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+                key: 'db.odbc.select[pgsql.queries,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: raw
@@ -2067,7 +2067,7 @@ zabbix_export:
                   color: 199C0D
                   item:
                     host: 'PostgreSQL by ODBC'
-                    key: 'db.odbc.select[pgsql.db.bloating_tables,,"Database={#DBNAME};{$PG.CONNSTRING}"]'
+                    key: 'db.odbc.select[pgsql.db.bloating_tables,,"Database={#DBNAME};{$PG.CONNSTRING.ODBC}"]'
             - uuid: f9162816d4f740dd8e4863c726b64105
               name: 'DB [{#DBNAME}]: pg_stat_database metrics'
               graph_items:
@@ -2181,7 +2181,7 @@ zabbix_export:
                   color: 199C0D
                   item:
                     host: 'PostgreSQL by ODBC'
-                    key: 'db.odbc.select[pgsql.db.size,,"Database={#DBNAME};{$PG.CONNSTRING}"]'
+                    key: 'db.odbc.select[pgsql.db.size,,"Database={#DBNAME};{$PG.CONNSTRING.ODBC}"]'
             - uuid: 88a09d63e9214cf1bf8ee82ae485f442
               name: 'DB [{#DBNAME}]: Slow queries'
               ymin_type_1: FIXED
@@ -2203,7 +2203,7 @@ zabbix_export:
         - uuid: 46a6f3cdfff244a28cb712c4186afc7f
           name: 'Replication discovery'
           type: ODBC
-          key: 'db.odbc.select[pgsql.replication.process.discovery,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+          key: 'db.odbc.select[pgsql.replication.process.discovery,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           delay: 15m
           params: |
             SELECT json_build_object('data',COALESCE(json_agg(json_build_object('{#APPLICATION_NAME}',application_name)), '[]'))		
@@ -2230,7 +2230,7 @@ zabbix_export:
                     - '$[''{#APPLICATION_NAME}'']'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'db.odbc.select[pgsql.replication.process,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]'
+                key: 'db.odbc.select[pgsql.replication.process,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: application
                   value: '{#APPLICATION_NAME}'
@@ -2321,7 +2321,7 @@ zabbix_export:
         - macro: '{$PG.CONFLICTS.MAX.WARN}'
           value: '0'
           description: 'Maximum number of recovery conflicts for trigger expression.'
-        - macro: '{$PG.CONNSTRING}'
+        - macro: '{$PG.CONNSTRING.ODBC}'
           value: Servername=localhost;Port=5432;Driver=/usr/lib64/psqlodbcw.so
           description: 'Connection string for the PostgreSQL instance.'
         - macro: '{$PG.CONN_TOTAL_PCT.MAX.WARN}'

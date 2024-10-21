@@ -29,11 +29,33 @@ class C70ImportConverter extends CConverter {
 	public function convert(array $data): array {
 		$data['zabbix_export']['version'] = '7.2';
 
+		if (array_key_exists('templates', $data['zabbix_export'])) {
+			$data['zabbix_export']['templates'] = self::convertTemplates($data['zabbix_export']['templates']);
+		}
+
 		if (array_key_exists('hosts', $data['zabbix_export'])) {
 			$data['zabbix_export']['hosts'] = self::convertHosts($data['zabbix_export']['hosts']);
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Convert templates.
+	 *
+	 * @param array $templates
+	 *
+	 * @return array
+	 */
+	private static function convertTemplates(array $templates): array {
+		foreach ($templates as &$template) {
+			if (array_key_exists('dashboards', $template)) {
+				$template['dashboards'] = self::convertDashboards($template['dashboards']);
+			}
+		}
+		unset($template);
+
+		return $templates;
 	}
 
 	/**
@@ -92,5 +114,47 @@ class C70ImportConverter extends CConverter {
 		unset($host_prototype);
 
 		return $host_prototypes;
+	}
+
+	/**
+	 * Convert dashboards.
+	 *
+	 * @param array $dashboards
+	 *
+	 * @return array
+	 */
+	private static function convertDashboards(array $dashboards): array {
+		foreach ($dashboards as &$dashboard) {
+			if (!array_key_exists('pages', $dashboard)) {
+				continue;
+			}
+
+			foreach ($dashboard['pages'] as &$dashboard_page) {
+				if (!array_key_exists('widgets', $dashboard_page)) {
+					continue;
+				}
+
+				foreach ($dashboard_page['widgets'] as &$widget) {
+					if ($widget['type'] === 'clock') {
+						if (!array_key_exists('fields', $widget)) {
+							continue;
+						}
+
+						$fields_to_remove = ['time_size', 'date_size', 'tzone_size'];
+
+						$widget['fields'] = array_values(array_filter($widget['fields'],
+							static function (array $field) use ($fields_to_remove): bool {
+								return !in_array($field['name'], $fields_to_remove, true);
+							}
+						));
+					}
+				}
+				unset($widget);
+			}
+			unset($dashboard_page);
+		}
+		unset($dashboard);
+
+		return $dashboards;
 	}
 }

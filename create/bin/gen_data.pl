@@ -12,11 +12,10 @@
 # You should have received a copy of the GNU Affero General Public License along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
 
-
 use strict;
 use File::Basename;
 
-my (%output, $insert_into, $fields);
+my (%output, $insert_into, $fields, @values_list);
 
 my %mysql = (
 	"database"	=>	"mysql",
@@ -32,13 +31,6 @@ my %postgresql = (
 	"exec_cmd"	=>	";\n"
 );
 
-my %sqlite3 = (
-	"database"	=>	"sqlite3",
-	"before"	=>	"BEGIN TRANSACTION;\n",
-	"after"		=>	"COMMIT;\n",
-	"exec_cmd"	=>	";\n"
-);
-
 sub process_table
 {
 	my $line = $_[0];
@@ -46,6 +38,7 @@ sub process_table
 	$line = "`$line`" if ($output{'database'} eq 'mysql');
 
 	$insert_into = "INSERT INTO $line";
+	@values_list = ();  # Reset the values list when processing a new table
 }
 
 sub process_fields
@@ -159,12 +152,22 @@ sub process_row
 
 	$values = "$values)";
 
-	print "$insert_into $fields values $values$output{'exec_cmd'}";
+	# Add the current row's values to the list
+	push @values_list, $values;
+}
+
+sub flush_bulk_insert
+{
+	if (@values_list) {
+		my $bulk_insert = "$insert_into $fields VALUES ".join(",\n", @values_list).$output{'exec_cmd'};
+		print $bulk_insert;
+		@values_list = ();  # Clear the values list after printing
+	}
 }
 
 sub usage
 {
-	print "Usage: $0 [mysql|postgresql|sqlite3]\n";
+	print "Usage: $0 [mysql|postgresql]\n";
 	print "The script generates Zabbix SQL data files for different database engines.\n";
 	exit;
 }
@@ -190,7 +193,6 @@ sub main
 
 	if ($ARGV[0] eq 'mysql')		{ %output = %mysql; }
 	elsif ($ARGV[0] eq 'postgresql')	{ %output = %postgresql; }
-	elsif ($ARGV[0] eq 'sqlite3')		{ %output = %sqlite3; }
 	else					{ usage(); }
 
 	print $output{"before"};
@@ -208,10 +210,12 @@ sub main
 			$type =~ s/\s+$//; # remove trailing spaces
 
 			if ($type eq 'FIELDS')		{ process_fields($line); }
-			elsif ($type eq 'TABLE')	{ process_table($line); }
+			elsif ($type eq 'TABLE')	{ flush_bulk_insert(); process_table($line); }
 			elsif ($type eq 'ROW')		{ process_row($line); }
 		}
 	}
+
+	flush_bulk_insert();  # Ensure the last batch of rows is printed
 
 	print "DELETE FROM changelog$output{'exec_cmd'}";
 

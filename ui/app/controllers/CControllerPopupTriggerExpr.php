@@ -1486,7 +1486,9 @@ class CControllerPopupTriggerExpr extends CController {
 			'item_required' => !in_array($function, array_merge(getStandaloneFunctions(), getFunctionsConstants())),
 			'functions' => $this->functions,
 			'function' => $function,
-			'function_type' => reset($this->functions[$function]['types']),
+			'function_type' => array_key_exists($function, $this->functions)
+				? reset($this->functions[$function]['types'])
+				: null,
 			'operator' => $operator,
 			'item_key' => $item_key,
 			'itemValueType' => $item_value_type,

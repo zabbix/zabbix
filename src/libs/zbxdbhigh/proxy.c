@@ -111,7 +111,7 @@ char	*zbx_get_proxy_protocol_version_str(const struct zbx_json_parse *jp)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: converts protocol version fom textual to numeric representation   *
+ * Purpose: converts protocol version from textual to numeric representation  *
  *          for version comparison. The function truncates release candidate  *
  *          part of the version.                                              *
  *                                                                            *

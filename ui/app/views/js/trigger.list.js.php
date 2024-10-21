@@ -25,11 +25,12 @@
 
 <script>
 	const view = new class {
-		init({checkbox_hash, checkbox_object, context, token}) {
+		init({checkbox_hash, checkbox_object, context, token, form_name}) {
 			this.checkbox_hash = checkbox_hash;
 			this.checkbox_object = checkbox_object;
 			this.context = context;
 			this.token = token;
+			this.form = document.forms[form_name];
 
 			this.#initFilter();
 			this.#initActions();
@@ -68,39 +69,46 @@
 		}
 
 		#initActions() {
-			document.addEventListener('click', (e) => {
-				if (e.target.id === 'js-create') {
-					this.#edit({'hostid': e.target.dataset.hostid, 'context': this.context})
-				}
-				else if (e.target.classList.contains('js-trigger-edit')) {
+			this.form.addEventListener('click', (e) => {
+				const target = e.target;
+
+				if (target.classList.contains('js-trigger-edit')) {
 					this.#edit({
-						'triggerid': e.target.dataset.triggerid,
-						'hostid': e.target.dataset.hostid,
+						'triggerid': target.dataset.triggerid,
+						'hostid': target.dataset.hostid,
 						'context': this.context
 					})
 				}
-				else if (e.target.id === 'js-copy') {
-					this.#copy();
+				else if (target.classList.contains('js-enable-trigger')) {
+					this.#enable(target, [target.dataset.triggerid]);
 				}
-				else if (e.target.id === 'js-massenable-trigger') {
-					this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
+				else if (target.classList.contains('js-disable-trigger')) {
+					this.#disable(target, [target.dataset.triggerid]);
 				}
-				else if (e.target.classList.contains('js-enable-trigger')) {
-					this.#enable(e.target, [e.target.dataset.triggerid]);
+				else if (target.classList.contains('js-edit-host')) {
+					this.editHost(e, target.dataset.hostid);
 				}
-				else if (e.target.id === 'js-massdisable-trigger') {
-					this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
+				else if (target.classList.contains('js-edit-template')) {
+					this.editTemplate(e, target.dataset.hostid);
 				}
-				else if (e.target.classList.contains('js-disable-trigger')) {
-					this.#disable(e.target, [e.target.dataset.triggerid]);
-				}
-				else if (e.target.id === 'js-massdelete-trigger') {
-					this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
-				}
-				else if (e.target.id === 'js-massupdate-trigger') {
-					this.#massupdate(e.target);
-				}
-			})
+			});
+
+			document.getElementById('js-create')?.addEventListener('click', (e) => {
+				this.#edit({'hostid': e.target.dataset.hostid, 'context': this.context});
+			});
+			document.getElementById('js-copy').addEventListener('click', () => this.#copy());
+			document.getElementById('js-massenable-trigger').addEventListener('click', (e) => {
+				this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
+			});
+			document.getElementById('js-massdisable-trigger').addEventListener('click', (e) => {
+				this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
+			});
+			document.getElementById('js-massupdate-trigger').addEventListener('click', (e) => {
+				this.#massupdate(e.target);
+			});
+			document.getElementById('js-massdelete-trigger').addEventListener('click', (e) => {
+				this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
+			});
 		}
 
 		#edit(parameters = {}) {

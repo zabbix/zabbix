@@ -79,7 +79,7 @@ static int	baseline_get_common_data(zbx_uint64_t itemid, const char *table, time
 		}
 
 		tm = tm_now;
-		zbx_tm_sub(&tm, i + 1, season_unit);
+		zbx_tm_sub(&tm, i + 1, season_unit, NULL);
 
 		if (-1 == (now = mktime(&tm)))
 		{
@@ -155,7 +155,7 @@ static int	baseline_get_isoyear_data(zbx_uint64_t itemid, const char *table, tim
 			}
 		}
 
-		zbx_tm_sub(&tm_end, 1, ZBX_TIME_UNIT_ISOYEAR);
+		zbx_tm_sub(&tm_end, 1, ZBX_TIME_UNIT_ISOYEAR, NULL);
 
 		if (-1 == (end = (int)mktime(&tm_end)))
 		{
@@ -165,8 +165,8 @@ static int	baseline_get_isoyear_data(zbx_uint64_t itemid, const char *table, tim
 
 		tm_start = tm_end;
 		/* add an hour to get real end timestamp rather than last trend hour */
-		zbx_tm_add(&tm_start, 1, ZBX_TIME_UNIT_HOUR);
-		zbx_tm_sub(&tm_start, period_num, period_unit);
+		zbx_tm_add(&tm_start, 1, ZBX_TIME_UNIT_HOUR, NULL);
+		zbx_tm_sub(&tm_start, period_num, period_unit, NULL);
 
 		if (-1 == (start = (int)mktime(&tm_start)))
 		{

@@ -27,9 +27,9 @@ window.drule_edit_popup = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
 		this.druleid = druleid;
+		this.dchecks = dchecks;
 		this.drule = drule;
 		this.dcheckid = getUniqueId();
-
 		this.available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
 
 		document.getElementById('discovery_by').addEventListener('change', () => this.#updateForm());
@@ -91,9 +91,11 @@ window.drule_edit_popup = new class {
 
 	#updateCheck(row, input) {
 		delete input.dchecks;
+		input.warning = row.querySelector('.btn-icon')?.getAttribute('data-hintbox-contents');
 
 		this.#addCheck(input, row, true);
 		row.remove();
+		this.#updateCheckWarningIcon(input);
 		this.#addInputFields(input);
 	}
 
@@ -215,10 +217,26 @@ window.drule_edit_popup = new class {
 				.querySelector('#dcheckList tbody')
 				.insertAdjacentHTML('beforeend', template.evaluate(input));
 
+			this.#updateCheckWarningIcon(input);
 			this.#addInputFields(input);
 		}
 
 		this.#updateRadioButtonRows(input, update, row);
+	}
+
+	#updateCheckWarningIcon(input) {
+		const row = document.getElementById(`dcheckRow_${input.dcheckid}`);
+		const warning_icon = row.querySelector('.btn-icon');
+
+		if (input.dcheckid.includes('new')) {
+			warning_icon.remove();
+		}
+
+		this.dchecks.forEach(dcheck => {
+			if (dcheck.dcheckid === input.dcheckid) {
+				dcheck.warning === '' ? warning_icon.remove() : row.querySelector('.js-remove').disabled = true;
+			}
+		});
 	}
 
 	#addInputFields(input) {
@@ -333,6 +351,12 @@ window.drule_edit_popup = new class {
 
 	clone({title, buttons}) {
 		this.druleid = null;
+
+		// Remove all warning icons and enable all Remove buttons in Checks table.
+		const table = document.getElementById('dcheckList');
+
+		table.querySelectorAll('.js-remove').forEach(element => element.disabled = false);
+		table.querySelectorAll('.btn-icon').forEach(element => element.remove());
 
 		this.overlay.setProperties({title, buttons});
 		this.overlay.unsetLoading();

@@ -212,6 +212,7 @@ func (c *Connector) refreshActiveChecks() {
 				c.hostname)
 			c.lastActiveCheckErrors = errs
 		}
+
 		return
 	}
 
@@ -221,6 +222,14 @@ func (c *Connector) refreshActiveChecks() {
 	}
 
 	var response activeChecksResponse
+
+	parseSuccess := false
+
+	defer func() {
+		if !parseSuccess {
+			c.address.Next()
+		}
+	}()
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
@@ -256,6 +265,8 @@ func (c *Connector) refreshActiveChecks() {
 		if c.configRevision == 0 {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: data array is missing", c.clientID,
 				c.address.Get())
+		} else {
+			parseSuccess = true
 		}
 		return
 	}
@@ -341,6 +352,7 @@ func (c *Connector) refreshActiveChecks() {
 	c.taskManager.UpdateTasks(c.clientID, c.resultCache.(resultcache.Writer), c.firstActiveChecksRefreshed,
 		response.Expressions, response.Data, now)
 
+	parseSuccess = true
 	c.firstActiveChecksRefreshed = true
 }
 
@@ -387,30 +399,32 @@ func (c *Connector) sendHeartbeatMsg() {
 }
 
 func (c *Connector) run() {
-	var lastRefresh time.Time
-	var lastFlush time.Time
-	var lastHeartbeat time.Time
+	var lastRefresh, lastFlush, lastHeartbeat int64
 
 	defer log.PanicHook()
 	log.Debugf("[%d] starting server connector for %s", c.clientID, c.address)
 
+	time.Sleep(time.Duration(1e9 - time.Now().Nanosecond()))
 	ticker := time.NewTicker(time.Second)
 run:
 	for {
 		select {
 		case <-ticker.C:
-			now := time.Now()
-			if now.Sub(lastFlush) >= time.Second*time.Duration(c.options.BufferSend) {
+			now := time.Now().Unix()
+
+			if (now - lastFlush) >= int64(c.options.BufferSend) {
 				c.resultCache.Upload(nil)
 				lastFlush = now
 			}
-			if now.Sub(lastRefresh) > time.Second*time.Duration(c.options.RefreshActiveChecks) {
+			if (now - lastRefresh) >= int64(c.options.RefreshActiveChecks) {
 				c.refreshActiveChecks()
-				lastRefresh = time.Now()
+				lastRefresh = time.Now().Unix()
 			}
-			if now.Sub(lastHeartbeat) > time.Second*time.Duration(c.options.HeartbeatFrequency) {
-				c.sendHeartbeatMsg()
-				lastHeartbeat = time.Now()
+			if c.options.HeartbeatFrequency > 0 {
+				if (now - lastHeartbeat) >= int64(c.options.HeartbeatFrequency) {
+					c.sendHeartbeatMsg()
+					lastHeartbeat = time.Now().Unix()
+				}
 			}
 		case u := <-c.input:
 			if u == nil {

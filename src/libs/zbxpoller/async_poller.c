@@ -48,6 +48,10 @@
 
 #include <event2/dns.h>
 
+#ifndef EVDNS_BASE_INITIALIZE_NAMESERVERS
+#	define EVDNS_BASE_INITIALIZE_NAMESERVERS	1
+#endif
+
 static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_t *poller_config)
 {
 	zbx_timespec_t		timespec;
@@ -294,7 +298,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 				errcodes[i] = zbx_async_check_snmp(&items[i], &results[i], process_snmp_result,
 						poller_config, poller_config, poller_config->base,
 						poller_config->dnsbase, poller_config->config_source_ip,
-						ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO);
+						ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO, ZBX_SNMP_DEFAULT_NUMBER_OF_RETRIES);
 	#else
 				errcodes[i] = NOTSUPPORTED;
 				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for SNMP checks was not compiled"
@@ -634,18 +638,16 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 		{
 			last_snmp_engineid_hk_time = time(NULL);
 			zbx_housekeep_snmp_engineid_cache();
+			poller_config.clear_cache = 1;
 		}
 #undef SNMP_ENGINEID_HK_INTERVAL
 #endif
+		if (ZBX_POLLER_TYPE_HTTPAGENT != poller_type)
+			zbx_async_dns_update_host_addresses(poller_config.dnsbase);
 	}
 
 	if (ZBX_POLLER_TYPE_HTTPAGENT != poller_type)
 	{
-#ifdef HAVE_NETSNMP
-		if (ZBX_POLLER_TYPE_SNMP == poller_type)
-			zbx_destroy_snmp_engineid_cache();
-#endif
-
 		async_poller_dns_destroy(&poller_config);
 	}
 
@@ -661,6 +663,11 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 	}
 
 	async_poller_destroy(&poller_config);
+
+#ifdef HAVE_NETSNMP
+	if (ZBX_POLLER_TYPE_SNMP == poller_type)
+		zbx_destroy_snmp_engineid_cache();
+#endif
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 

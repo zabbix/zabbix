@@ -54,18 +54,20 @@ foreach($data['regexs'] as $regexid => $regex) {
 		$expressions[] = (new CTable())->addRow([
 			new CCol($numb++),
 			new CCol([' ', RARR(), ' ']),
-			new CCol($expression['expression']),
+			(new CCol($expression['expression']))->addClass(ZBX_STYLE_WORDWRAP),
 			new CCol(' ['.CRegexHelper::expression_type2str($expression['expression_type']).']')
 		]);
 	}
 
 	$table->addRow([
 		new CCheckBox('regexids['.$regexid.']', $regexid),
-		new CLink($regex['name'],
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'regex.edit')
-				->setArgument('regexid', $regexid)
-		),
+		(new CCol(
+			new CLink($regex['name'],
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'regex.edit')
+					->setArgument('regexid', $regexid)
+			),
+		))->addClass(ZBX_STYLE_WORDBREAK),
 		$expressions
 	]);
 }

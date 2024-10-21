@@ -80,7 +80,6 @@ dbschema_timescaledb:
 
 dbschema_sqlite3:
 	cd database/sqlite3 && \
-	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
 	$(MAKE) $(AM_MAKEFLAGS) schema.sql
 
 dbschema_c:
@@ -150,14 +149,13 @@ modules_clean:
 ## cmocka test support
 if TESTS
 WRAP_DB_FUNCS = \
+	-Wl,--wrap=zbx_db_select \
 	-Wl,--wrap=zbx_db_vselect \
-	-Wl,--wrap=zbx_db_select_n_basic \
-	-Wl,--wrap=zbx_db_fetch_basic \
-	-Wl,--wrap=__zbx_db_execute \
+	-Wl,--wrap=zbx_db_select_n \
+	-Wl,--wrap=zbx_db_execute \
 	-Wl,--wrap=zbx_db_begin \
 	-Wl,--wrap=zbx_db_commit \
-	-Wl,--wrap=zbx_db_execute_multiple_query \
-	-Wl,--wrap=zbx_db_free_result
+	-Wl,--wrap=zbx_db_execute_multiple_query
 
 WRAP_IO_FUNCS = \
 	-Wl,--wrap=fopen \

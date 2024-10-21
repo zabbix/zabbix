@@ -593,6 +593,46 @@ class testHistoryPush extends CIntegrationTest {
 		$this->assertArrayHasKey('error', $response['result']['data'][1]);
 	}
 
+	public function testHistoryPush_sequentialDuplicatedTimestamps() {
+		if (CAPIHelper::getSessionId() === null) {
+			$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
+		}
+
+		$response1 = CAPIHelper::call('history.push', [
+			[
+				'itemid' => self::$itemids['trapper_uint'],
+				'value' => 10001
+			],
+			[
+				'itemid' => self::$itemids['trapper_uint'],
+				'value' => 10002
+			]
+		]);
+
+		$response2 = CAPIHelper::call('history.push', [
+			[
+				'itemid' => self::$itemids['trapper_uint'],
+				'value' => 10003
+			],
+			[
+				'itemid' => self::$itemids['trapper_uint'],
+				'value' => 10004
+			]
+		]);
+
+		$this->checkResult($response1);
+		$this->checkResult($response2);
+
+		$response = $this->call('history.get', [
+			'output' => ['itemid', 'value', 'clock', 'ns'],
+			'itemids' => self::$itemids['trapper_uint'],
+			'sortfield' => ['clock', 'ns'],
+			'limit' => 1,
+			'sortorder' => 'DESC'
+		]);
+		$this->assertEquals(1, count($response['result']));
+	}
+
 	public function testHistoryPush_malformedRequest() {
 		// CAPITest::call() has assertions for 'result' key in a response, these will throw an exception
 		$this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);

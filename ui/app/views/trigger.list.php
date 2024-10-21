@@ -320,7 +320,12 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			if (!empty($hosts)) {
 				$hosts[] = ', ';
 			}
-			$hosts[] = $host['name'];
+
+			$hosts[] = in_array($host['hostid'], $data['editable_hosts'])
+				? (new CLink($host['name']))
+					->setAttribute('data-hostid', $host['hostid'])
+					->addClass('js-edit-'.$data['context'])
+				: $host['name'];
 		}
 
 		$hosts = (new CCol($hosts))->addClass(ZBX_STYLE_WORDBREAK);
@@ -409,7 +414,8 @@ $html_page
 		'checkbox_hash' => $data['checkbox_hash'],
 		'checkbox_object' => 'g_triggerid',
 		'context' => $data['context'],
-		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('trigger')]
+		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('trigger')],
+		'form_name' => $triggers_form->getName()
 	]).');
 '))
 	->setOnDocumentReady()

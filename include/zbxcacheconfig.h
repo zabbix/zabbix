@@ -787,6 +787,12 @@ void	zbx_dc_config_get_triggers_by_triggerids(zbx_dc_trigger_t *triggers, const 
 		int *errcode, size_t num);
 void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num);
 int	zbx_dc_get_host_by_hostid(zbx_dc_host_t *host, zbx_uint64_t hostid);
+
+#define ZBX_REQUEST_HOST_ID			101
+#define ZBX_REQUEST_HOST_HOST			102
+#define ZBX_REQUEST_HOST_NAME			103
+
+int	zbx_dc_get_host_value(zbx_uint64_t itemid, char **replace_to, int request);
 void	zbx_dc_config_get_hosts_by_itemids(zbx_dc_host_t *hosts, const zbx_uint64_t *itemids, int *errcodes, size_t num);
 void	zbx_dc_config_get_hosts_by_hostids(zbx_dc_host_t *hosts, const zbx_uint64_t *hostids, int *errcodes, int num);
 void	zbx_dc_config_get_items_by_keys(zbx_dc_item_t *items, zbx_host_key_t *keys, int *errcodes, size_t num);
@@ -864,6 +870,14 @@ void	zbx_dc_config_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max
 int	zbx_dc_config_get_suggested_snmp_vars(zbx_uint64_t interfaceid, int *bulk);
 int	zbx_dc_config_get_interface_by_type(zbx_dc_interface_t *interface, zbx_uint64_t hostid, unsigned char type);
 int	zbx_dc_config_get_interface(zbx_dc_interface_t *interface, zbx_uint64_t hostid, zbx_uint64_t itemid);
+
+#define ZBX_REQUEST_HOST_IP			1
+#define ZBX_REQUEST_HOST_DNS			2
+#define ZBX_REQUEST_HOST_CONN			3
+#define ZBX_REQUEST_HOST_PORT			4
+
+int	zbx_dc_get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char **replace_to, int request);
+
 int	zbx_dc_config_get_poller_nextcheck(unsigned char poller_type);
 int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout, int processing,
 		int config_max_concurrent_checks, zbx_dc_item_t **items);
@@ -904,6 +918,10 @@ void	zbx_dc_config_items_apply_changes(const zbx_vector_item_diff_ptr_t *item_di
 
 void	zbx_dc_config_update_inventory_values(const zbx_vector_inventory_value_ptr_t *inventory_values);
 int	zbx_dc_get_host_inventory_value_by_itemid(zbx_uint64_t itemid, char **replace_to, int value_idx);
+int	zbx_dc_get_host_inventory_by_itemid(const char *macro, zbx_uint64_t itemid, char **replace_to);
+int	zbx_dc_get_host_inventory(const char *macro, const zbx_db_trigger *trigger, char **replace_to,
+		int N_functionid);
+int	zbx_dc_get_host_inventory_by_hostid(const char *macro, zbx_uint64_t hostid, char **replace_to);
 int	zbx_dc_get_host_inventory_value_by_hostid(zbx_uint64_t hostid, char **replace_to, int value_idx);
 
 #define ZBX_CONFSTATS_BUFFER_TOTAL	1
@@ -1505,5 +1523,8 @@ void	zbx_dc_set_proxy_failover_delay(const char *failover_delay);
 void	zbx_dc_set_proxy_lastonline(int lastonline);
 zbx_uint64_t	zbx_dc_get_proxy_group_revision(zbx_uint64_t proxy_groupid);
 zbx_uint64_t	zbx_dc_get_proxy_groupid(zbx_uint64_t proxyid);
+
+void	zbx_dc_set_itservices_num(int num);
+int	zbx_dc_get_itservices_num(void);
 
 #endif

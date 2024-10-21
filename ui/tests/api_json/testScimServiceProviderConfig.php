@@ -244,6 +244,7 @@ class testScimServiceProviderConfig extends CAPIScimTest {
 	 */
 	public static function clearData(): void {
 		// Delete userdirectories.
+		CDataHelper::call('authentication.update', ['saml_auth_enabled' => ZBX_AUTH_SAML_DISABLED]);
 		CDataHelper::call('userdirectory.delete', array_values(self::$data['userdirectoryid']));
 
 		// Delete token.

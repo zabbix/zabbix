@@ -36,6 +36,12 @@ void	__wrap_zbx_rtc_subscribe(unsigned char proc_type, int proc_num, zbx_uint32_
 		int config_timeout, void *rtc);
 void	__wrap_zbx_rtc_notify_finished_sync(int config_timeout, zbx_uint32_t code, const char *process_name,
 		void *rtc);
+void	__wrap_zbx_dc_set_itservices_num(int num);
+
+void	__wrap_zbx_dc_set_itservices_num(int num)
+{
+	ZBX_UNUSED(num);
+}
 
 /* stubs to satisfy hard link dependenceies */
 

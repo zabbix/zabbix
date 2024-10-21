@@ -1,0 +1,49 @@
+---
+test case: "Hello, World! -> W"
+in:
+  string: "Hello, World!"
+  left: 7
+  right: 7
+out:
+  return: "W"
+---
+test case: "Hello, World! -> Hello"
+in:
+  string: "Hello, World!"
+  left: 0
+  right: 4
+out:
+  return: "Hello"
+---
+test case: "Hello, World! -> World"
+in:
+  string: "Hello, World!"
+  left: 7
+  right: 11
+out:
+  return: "World"
+---
+test case: "!@#$%^&*() -> @#$%^&"
+in:
+  string: "!@#$%^&*()"
+  left: 1
+  right: 6
+out:
+  return: "@#$%^&"
+---
+test case: "Newlines"
+in:
+  string: "Newlines\nNewlines\nNewlines\nNewlines"
+  left: 9
+  right: 17
+out:
+  return: "Newlines\n"
+---
+test case: "Quotation marks"
+in:
+  string: 'sasa"""sasa'
+  left: 4
+  right: 6
+out:
+  return: '"""'
+...

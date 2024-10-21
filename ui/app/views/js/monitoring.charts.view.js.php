@@ -22,6 +22,8 @@
 		_data: null,
 		_resize_observer: null,
 		_container: null,
+		_filter_tags: new Map(),
+		_filter_tagnames: new Set(),
 
 		init({filter_form_name, data, timeline}) {
 			this._filter_form = document.querySelector(`[name="${filter_form_name}"]`);
@@ -43,14 +45,20 @@
 		},
 
 		initSubfilter() {
+			for (const element of this._filter_form.querySelectorAll('.js-subfilter-unset')) {
+				this.setSubfilter(element.dataset.tag, element.dataset.value || null);
+			}
+
 			this._filter_form.addEventListener('click', (e) => {
 				const link = e.target;
 
 				if (link.classList.contains('js-subfilter-set')) {
 					this.setSubfilter(link.getAttribute('data-tag'), link.getAttribute('data-value'));
+					this.submitSubfilter();
 				}
 				else if (link.classList.contains('js-subfilter-unset')) {
 					this.unsetSubfilter(link.getAttribute('data-tag'), link.getAttribute('data-value'));
+					this.submitSubfilter();
 				}
 			});
 		},
@@ -89,24 +97,20 @@
 
 		setSubfilter(tag, value) {
 			if (value !== null) {
-				this.filterAddVar(`subfilter_tags[${tag}][]`, value);
+				this._filter_tags.set(tag, value);
 			}
 			else {
-				this.filterAddVar(`subfilter_tagnames[]`, tag);
+				this._filter_tagnames.add(tag);
 			}
-
-			this.submitSubfilter();
 		},
 
 		unsetSubfilter(tag, value) {
 			if (value !== null) {
-				document.querySelector(`[name^="subfilter_tags[${tag}]["][value="${value}"]`).remove();
+				this._filter_tags.delete(tag);
 			}
 			else {
-				document.querySelector(`[name^="subfilter_tagnames["][value="${tag}"]`).remove();
+				this._filter_tagnames.delete(tag);
 			}
-
-			this.submitSubfilter();
 		},
 
 		filterAddVar(name, value) {
@@ -121,6 +125,18 @@
 
 		submitSubfilter() {
 			this.filterAddVar('subfilter_set', '1');
+
+			for (const element of this._filter_form.querySelectorAll('[name^="subfilter_tag"]')) {
+				element.remove();
+			}
+
+			this._filter_tags.forEach((value, tag) => {
+				this.filterAddVar(`subfilter_tags[${encodeURIComponent(tag)}][]`, value);
+			});
+			this._filter_tagnames.forEach(tag => {
+				this.filterAddVar(`subfilter_tagnames[]`, tag);
+			});
+
 			this._filter_form.submit();
 		}
 	};

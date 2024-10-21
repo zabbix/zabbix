@@ -208,7 +208,6 @@ class CControllerNotificationsGet extends CController {
 				'output' => [],
 				'selectHosts' => ['hostid', 'name'],
 				'triggerids' => array_keys($problems_by_triggerid),
-				'lastChangeSince' => $this->time_from,
 				'preservekeys' => true
 			]);
 
@@ -302,7 +301,8 @@ class CControllerNotificationsGet extends CController {
 					TRIGGER_SEVERITY_NOT_CLASSIFIED => $this->settings['sounds.'.TRIGGER_SEVERITY_NOT_CLASSIFIED],
 					TRIGGER_SEVERITY_WARNING => $this->settings['sounds.'.TRIGGER_SEVERITY_WARNING]
 				]
-			]
+			],
+			CSRF_TOKEN_NAME => CCsrfTokenHelper::get('notifications')
 		]);
 	}
 }

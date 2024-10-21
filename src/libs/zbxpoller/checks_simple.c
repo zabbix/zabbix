@@ -115,6 +115,7 @@ static zbx_vmcheck_t	vmchecks[] =
 	{"vm.datacenter.name", VMCHECK_FUNC(check_vcenter_vm_datacenter_name)},
 	{"vm.discovery", VMCHECK_FUNC(check_vcenter_vm_discovery)},
 	{"vm.guest.osuptime", VMCHECK_FUNC(check_vcenter_vm_guest_uptime)},
+	{"vm.hv.maintenance", VMCHECK_FUNC(check_vcenter_vm_hv_maintenance)},
 	{"vm.hv.name", VMCHECK_FUNC(check_vcenter_vm_hv_name)},
 	{"vm.memory.size", VMCHECK_FUNC(check_vcenter_vm_memory_size)},
 	{"vm.memory.size.ballooned", VMCHECK_FUNC(check_vcenter_vm_memory_size_ballooned)},

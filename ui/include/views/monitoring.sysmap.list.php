@@ -107,11 +107,13 @@ foreach ($data['maps'] as $map) {
 
 	$sysmapTable->addRow([
 		$checkbox,
-		(new CLink($map['name'],
+		(new CCol(
+			(new CLink($map['name'],
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'map.view')
 				->setArgument('sysmapid', $map['sysmapid'])
-		)),
+			))
+		))->addClass(ZBX_STYLE_WORDWRAP),
 		$map['width'],
 		$map['height'],
 		new CHorList([$properties_link, $edit_link])

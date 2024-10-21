@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-07-15 08:55+0000\n"
+"PO-Revision-Date: 2024-09-20 03:45+0000\n"
 "Last-Translator: NoYoWiFi <1284524409@qq.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -1860,7 +1860,7 @@ msgstr "可用性报表"
 #: app/controllers/CControllerAvailabilityReportTrigger.php:70
 #: app/views/reports.availabilityreport.trigger.php:23
 msgid "Availability report graph"
-msgstr ""
+msgstr "可用性报告图表"
 
 #: include/classes/html/CHostAvailability.php:80
 #: widgets/hostavail/views/widget.view.php:32
@@ -2050,6 +2050,14 @@ msgstr "边框类型"
 #: include/views/js/monitoring.sysmaps.js.php:597
 msgid "Border width"
 msgstr "边框宽度"
+
+#: include/classes/api/services/CHost.php:1445
+msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1452
+msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
+msgstr ""
 
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
@@ -3290,6 +3298,16 @@ msgstr "无法将模板“%2$s”的密钥“%1$s”的 LLD 规则继承到模�
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
 msgstr "无法将模板“%2$s”的密钥“%1$s”的 LLD 规则继承到模板“%3$s”，已存在相同密钥的监控项。"
+
+#: include/classes/api/services/CItemGeneral.php:684
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr "无法使用“%2$s”和“%3$s”模板的键“%1$s”继承 LLD 规则，键在主机“%4$s”上必须是唯一的。"
+
+#: include/classes/api/services/CItemGeneral.php:685
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr "无法使用“%2$s”和“%3$s”模板的键“%1$s”继承 LLD 规则，键在模板“%4$s”上必须是唯一的。"
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
@@ -12398,6 +12416,10 @@ msgstr "Zabbix proxies列表，包括名称、模式、加密、压缩、版本�
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name, state (unknown/offline/online). Returns JSON."
 msgstr "Zabbix proxies列表，包括名称、模式、加密、压缩、版本、最后出现时间、主机数、监控项数、每秒所需值（vps）、兼容性（当前/过时/不支持）、超时、代理组名称、状态（未知/离线/在线）。返回JSON。"
 
+#: include/classes/data/CItemData.php:2935
+msgid "List of Zabbix proxy groups configuration data and real-time data. Configuration data includes proxy group name, failover delay, and minimum number of online proxies required for the group to be online. Real-time data includes number of online proxies, percentage of online proxies, and state of proxy group (unknown, offline, recovering, online, degrading). This item does not return groupless proxies. Returns JSON."
+msgstr "Zabbix proxy 组的配置数据和实时数据列表。配置数据包括 proxy 组名称、故障转移延迟以及组在线所需的最少在线 proxy 数量。实时数据包括在线 proxy 数量、在线 proxy 百分比以及 proxy 组的状态（未知、离线、恢复中、在线、降级）。此监控项不返回无组的 proxy 。返回 JSON 。"
+
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
 msgstr "块设备列表及其类型。返回 JSON"
@@ -15080,13 +15102,13 @@ msgstr "在线proxies"
 #: include/classes/api/services/CUser.php:889
 #, c-format
 msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "只有超级管理员或管理员用户才能更新 \"%1$s\" 参数。"
 
 #: include/classes/api/services/CUser.php:812
 #: include/classes/api/services/CUser.php:853
 #, c-format
 msgid "Only Super admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "只有超级管理员用户才能更新 \"%1$s\" 参数。"
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -20066,6 +20088,10 @@ msgstr "克隆的主机原型包含用户定义的“秘密文本”类型的宏
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "克隆的模板包含类型为“秘密文本”的用户定义宏。这些宏的值和类型已重置。"
 
+#: include/classes/api/services/CHost.php:1433
+msgid "The field \"monitored_by\" must be specified when changing proxy or proxy group for host monitoring."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
 msgstr "支持以下占位符："
@@ -20177,6 +20203,12 @@ msgstr "主题"
 #: app/views/mediatype.edit.php:189 app/views/mediatype.test.edit.php:48
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "这些参数将按指定顺序作为命令行参数传递给脚本。"
+
+#: app/controllers/CControllerDiscoveryEdit.php:175
+#, c-format
+msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
+msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
+msgstr[0] ""
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -21783,6 +21815,11 @@ msgstr "用户代理字符串"
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "用户不能将自己加进一个取消的群组或已关闭图形接口访问权的群组."
 
+#: include/classes/api/services/CUserGroup.php:673
+#: include/classes/api/services/CUser.php:843
+msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
+msgstr "用户无法将自己添加到已禁用的组或图形用户界面访问已禁用的组中。"
+
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
 msgid "User cannot change own role."
@@ -21915,6 +21952,10 @@ msgstr "已成功测试用户输入。"
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
 msgstr "用户是不允许删除自己"
+
+#: include/classes/api/services/CUser.php:1837
+msgid "User is not allowed to delete oneself."
+msgstr "用户不允许删除自己。"
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222
@@ -22234,6 +22275,10 @@ msgstr "VMware 虚拟机管理程序数据存储列表，“url”- VMware 服�
 msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr "VMware 虚拟机管理程序健康状态汇总传感器，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符。返回 0 - 灰色； 1 - 绿色； 2-黄色； 3 - 红色"
 
+#: include/classes/data/CItemData.php:2237
+msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr "VMware 虚拟机管理程序维护状态，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符。返回值 0 - 不在维护中； 1 - 维护中"
+
 #: include/classes/data/CItemData.php:2051
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr "VMware 虚拟机管理程序模型，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
@@ -22369,6 +22414,10 @@ msgstr "VMware 虚拟机访客内存使用情况，“url”- VMware 服务 URL�
 #: include/classes/data/CItemData.php:2387
 msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "VMware虚拟机主机内存使用情况，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符"
+
+#: include/classes/data/CItemData.php:2482
+msgid "VMware virtual machine hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr "VMware虚拟机管理程序维护状态，“url” - VMware服务网址，“uuid” - VMware虚拟机全局唯一标识符。返回值 0 - 不在维护中；1 - 在维护中。"
 
 #: include/classes/data/CItemData.php:2331
 msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
@@ -23758,6 +23807,16 @@ msgstr "一个大写和一个小写拉丁字母"
 #: app/views/administration.geomaps.edit.php:47
 msgid "and"
 msgstr "和"
+
+#: include/classes/api/helpers/CApiPskHelper.php:27
+#: include/classes/api/helpers/CApiPskHelper.php:57
+#: include/classes/api/helpers/CApiPskHelper.php:73
+#: include/classes/api/helpers/CApiPskHelper.php:106
+#: include/classes/api/helpers/CApiPskHelper.php:139
+#: include/classes/api/helpers/CApiPskHelper.php:160
+#: include/classes/api/helpers/CApiPskHelper.php:176
+msgid "another tls_psk value is already associated with given tls_psk_identity"
+msgstr ""
 
 #: include/forms.inc.php:1450 include/views/js/item.preprocessing.js.php:237
 msgid "any error"

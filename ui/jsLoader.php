@@ -404,6 +404,7 @@ $translate_strings = [
 		'Scripts' => _('Scripts'),
 		'Sharing' => _('Sharing'),
 		'Submap' => _('Submap'),
+		'Template' => _('Template'),
 		'Trigger' => _('Trigger'),
 		'Triggers' => _('Triggers'),
 		'Trigger status "OK"' => _('Trigger status "OK"'),

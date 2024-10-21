@@ -27,6 +27,9 @@ Link this template to the local Zabbix server host.
 |Name|Description|Default|
 |----|-----------|-------|
 |{$PROXY.LAST_SEEN.MAX}|<p>The maximum number of seconds that Zabbix proxy has not been seen.</p>|`600`|
+|{$PROXY.GROUP.AVAIL.PERCENT.MIN}|<p>Minimum threshold for proxy group availability percentage trigger.</p>|`75`|
+|{$PROXY.GROUP.DISCOVERY.NAME.MATCHES}|<p>Filter to include discovered proxy groups by their name.</p>|`.*`|
+|{$PROXY.GROUP.DISCOVERY.NAME.NOT_MATCHES}|<p>Filter to exclude discovered proxy groups by their name.</p>|`CHANGE_IF_NEEDED`|
 |{$ZABBIX.SERVER.UTIL.MAX}|<p>Default maximum threshold for percentage utilization triggers (use macro context for specification).</p>|`75`|
 |{$ZABBIX.SERVER.UTIL.MIN}|<p>Default minimum threshold for percentage utilization triggers (use macro context for specification).</p>|`65`|
 |{$ZABBIX.SERVER.UTIL.MAX:"value cache"}|<p>Maximum threshold for value cache utilization trigger.</p>|`95`|
@@ -37,6 +40,7 @@ Link this template to the local Zabbix server host.
 |----|-----------|----|-----------------------|
 |Zabbix stats cluster|<p>The master item of Zabbix cluster statistics.</p>|Zabbix internal|zabbix[cluster,discovery,nodes]|
 |Zabbix proxies stats|<p>The master item of Zabbix proxies' statistics.</p>|Zabbix internal|zabbix[proxy,discovery]|
+|Zabbix proxy groups stats|<p>The master item of Zabbix proxy groups' statistics.</p>|Zabbix internal|zabbix[proxy group,discovery]|
 |Queue over 10 minutes|<p>The number of monitored items in the queue, which are delayed at least by 10 minutes.</p>|Zabbix internal|zabbix[queue,10m]|
 |Queue|<p>The number of monitored items in the queue, which are delayed at least by 6 seconds.</p>|Zabbix internal|zabbix[queue]|
 |Utilization of alert manager internal processes, in %|<p>The average percentage of the time during which the alert manager processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,alert manager,avg,busy]|
@@ -195,6 +199,35 @@ Link this template to the local Zabbix server host.
 |Proxy [{#PROXY.NAME}]: Zabbix proxy never seen|<p>Zabbix proxy is not updating the configuration data.</p>|`last(/Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)=-1`|Warning||
 |Proxy [{#PROXY.NAME}]: Zabbix proxy is outdated|<p>Zabbix proxy version is older than server version, but is partially supported. Only data collection and remote execution is available.</p>|`last(/Zabbix server health/zabbix.proxy.compatibility[{#PROXY.NAME}],#1)=2`|Warning||
 |Proxy [{#PROXY.NAME}]: Zabbix proxy is not supported|<p>Zabbix proxy version is older than server previous LTS release version or server major version is older than proxy major version.</p>|`last(/Zabbix server health/zabbix.proxy.compatibility[{#PROXY.NAME}],#1)=3`|High||
+
+### LLD rule Zabbix proxy groups discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Zabbix proxy groups discovery|<p>LLD rule with item and trigger prototypes for the proxy groups discovery.</p>|Dependent item|zabbix.proxy.groups.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Item prototypes for Zabbix proxy groups discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Proxy group [{#PROXY.GROUP.NAME}]: Stats|<p>The statistics for the discovered proxy group.</p>|Dependent item|zabbix.proxy.group.stats[{#PROXY.GROUP.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.rtdata["{#PROXY.GROUP.NAME}"]`</p></li></ul>|
+|Proxy group [{#PROXY.GROUP.NAME}]: State|<p>State of the Zabbix proxy group.</p><p></p><p>Possible values:</p><p>0 - unknown;</p><p>1 - offline;</p><p>2 - recovering;</p><p>3 - online;</p><p>4 - degrading.</p>|Dependent item|zabbix.proxy.group.state[{#PROXY.GROUP.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Proxy group [{#PROXY.GROUP.NAME}]: Available proxies|<p>Count of available proxies in the Zabbix proxy group.</p>|Dependent item|zabbix.proxy.group.avail.proxies[{#PROXY.GROUP.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.available`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Proxy group [{#PROXY.GROUP.NAME}]: Available proxies, in %|<p>Percentage of available proxies in the Zabbix proxy group.</p>|Dependent item|zabbix.proxy.group.avail.proxies.percent[{#PROXY.GROUP.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pavailable`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Proxy group [{#PROXY.GROUP.NAME}]: Settings|<p>The settings for the discovered proxy group.</p>|Dependent item|zabbix.proxy.group.settings[{#PROXY.GROUP.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data[?(@.name=="{#PROXY.GROUP.NAME}")].first()`</p></li></ul>|
+|Proxy group [{#PROXY.GROUP.NAME}]: Failover period|<p>Failover period in the Zabbix proxy group.</p>|Dependent item|zabbix.proxy.group.failover[{#PROXY.GROUP.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.failover_delay`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Proxy group [{#PROXY.GROUP.NAME}]: Minimum number of proxies|<p>Minimum number of proxies online in the Zabbix proxy group.</p>|Dependent item|zabbix.proxy.group.online.min[{#PROXY.GROUP.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.min_online`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+
+### Trigger prototypes for Zabbix proxy groups discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Proxy group [{#PROXY.GROUP.NAME}]: Status "offline"|<p>The state of the Zabbix proxy group is "offline".</p>|`last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}],#1)=1`|High||
+|Proxy group [{#PROXY.GROUP.NAME}]: Status "degrading"|<p>The state of the Zabbix proxy group is "degrading".</p>|`last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}],#1)=4`|Average|**Depends on**:<br><ul><li>Proxy group [{#PROXY.GROUP.NAME}]: Status "offline"</li></ul>|
+|Proxy group [{#PROXY.GROUP.NAME}]: Status changed|<p>The state of the Zabbix proxy group has changed. Acknowledge to close the problem manually.</p>|`last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}],#1)<>last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}],#2) and length(last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}]))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Proxy group [{#PROXY.GROUP.NAME}]: Status "degrading"</li></ul>|
+|Proxy group [{#PROXY.GROUP.NAME}]: Availability too low|<p>The availability of proxies in a proxy group is below {$PROXY.GROUP.AVAIL.PERCENT.MIN}% for at least 3 minutes.</p>|`max(/Zabbix server health/zabbix.proxy.group.avail.proxies.percent[{#PROXY.GROUP.NAME}],3m)<{$PROXY.GROUP.AVAIL.PERCENT.MIN}`|Warning||
+|Proxy group [{#PROXY.GROUP.NAME}]: Failover invalid value|<p>Proxy group failover has an invalid value.</p>|`last(/Zabbix server health/zabbix.proxy.group.failover[{#PROXY.GROUP.NAME}],#1)=-1`|Warning||
+|Proxy group [{#PROXY.GROUP.NAME}]: Minimum number of proxies invalid value|<p>Proxy group minimum number of proxies has an invalid value.</p>|`last(/Zabbix server health/zabbix.proxy.group.online.min[{#PROXY.GROUP.NAME}],#1)=-1`|Warning||
 
 ### LLD rule High availability cluster node discovery
 

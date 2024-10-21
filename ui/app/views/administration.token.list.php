@@ -161,14 +161,14 @@ foreach ($data['tokens'] as $token) {
 	$token_table->addRow([
 		new CCheckBox('tokenids['.$token['tokenid'].']', $token['tokenid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
-		$token['user'],
+		(new CCol($token['user']))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CSpan(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $token['expires_at'])))->addClass(
 			$token['is_expired'] ? ZBX_STYLE_RED : ZBX_STYLE_GREEN
 		),
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $token['created_at']),
 		($token['creator'] === null)
 			? italic(_('Unknown'))
-			: $token['creator'],
+			: (new CCol($token['creator']))->addClass(ZBX_STYLE_WORDBREAK),
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $token['lastaccess']),
 		($token['status'] == ZBX_AUTH_TOKEN_ENABLED)
 			? (new CLink(_('Enabled'), (new CUrl('zabbix.php'))

@@ -106,8 +106,115 @@ class C70ImportConverterTest extends CImportConverterTest {
 		];
 	}
 
+	public function importConverterDataProviderClockWidget(): array {
+		return [
+			[
+				[
+					'templates' => [
+						[
+							'name' => 'template',
+							'dashboards' => [
+								[
+									'pages' => [
+										[
+											'widgets' => [
+												[
+													'type' => 'clock',
+													'fields' => [
+														[
+															'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
+															'name' => 'clock_type',
+															'value' => '1'
+														],
+														[
+															'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
+															'name' => 'date_size',
+															'value' => '45'
+														],
+														[
+															'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
+															'name' => 'show.0',
+															'value' => '1'
+														],
+														[
+															'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
+															'name' => 'show.1',
+															'value' => '2'
+														],
+														[
+															'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
+															'name' => 'show.2',
+															'value' => '3'
+														],
+														[
+															'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
+															'name' => 'time_size',
+															'value' => '25'
+														],
+														[
+															'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
+															'name' => 'tzone_size',
+															'value' => '30'
+														]
+													]
+												]
+											]
+										]
+									]
+								]
+							]
+						]
+					]
+				],
+				[
+					'templates' => [
+						[
+							'name' => 'template',
+							'dashboards' => [
+								[
+									'pages' => [
+										[
+											'widgets' => [
+												[
+													'type' => 'clock',
+													'fields' => [
+														[
+															'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
+															'name' => 'clock_type',
+															'value' => '1'
+														],
+														[
+															'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
+															'name' => 'show.0',
+															'value' => '1'
+														],
+														[
+															'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
+															'name' => 'show.1',
+															'value' => '2'
+														],
+														[
+															'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
+															'name' => 'show.2',
+															'value' => '3'
+														]
+													]
+												]
+											]
+										]
+									]
+								]
+							]
+						]
+					]
+				]
+			]
+		];
+	}
+
 	/**
 	 * @dataProvider providerInventoryMode
+	 * @dataProvider importConverterDataProviderClockWidget
 	 *
 	 * @param array $source
 	 * @param array $expected

@@ -69,7 +69,8 @@ func (cp *common) osSkip(path string, d fs.DirEntry) bool {
 	}
 
 	iData := inodeData{
-		iStat.Dev, iStat.Ino,
+		Dev: uint64(iStat.Dev),
+		Ino: uint64(iStat.Ino),
 	}
 
 	_, ok = cp.files[iData]

@@ -149,7 +149,7 @@ $parameters_exec_table = (new CTable())
 	->setId('exec_params_table')
 	->setHeader([
 		(new CColHeader(_('Value')))->setWidth('100%'),
-		_('Action')
+		''
 	])
 	->addStyle('width: 100%;')
 	->addItem(
@@ -224,7 +224,7 @@ $parameters_table = (new CTable())
 	->setHeader([
 		(new CColHeader(_('Name')))->setWidth('50%'),
 		(new CColHeader(_('Value')))->setWidth('50%'),
-		_('Action')
+		''
 	])
 	->addStyle('width: 100%;')
 	->addItem(

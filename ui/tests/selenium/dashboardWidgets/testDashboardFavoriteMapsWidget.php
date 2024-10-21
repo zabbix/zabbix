@@ -23,12 +23,13 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
  */
 class testDashboardFavoriteMapsWidget extends CWebTest {
 
+	const MAP_NAME = 'Test map for favourite widget';
+
 	protected static $dashboardid;
-	public $map_test = 'Test map 1';
-	public $mapid = 3;
+	protected static $mapid;
 
 	public static function prepareDashboardData() {
-		$response = CDataHelper::call('dashboard.create', [
+		$dashboards = CDataHelper::call('dashboard.create', [
 			[
 				'name' => 'Dashboard with favorite maps widget',
 				'private' => 1,
@@ -47,13 +48,36 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 				]
 			]
 		]);
-		self::$dashboardid = $response['dashboardids'][0];
+		self::$dashboardid = $dashboards['dashboardids'][0];
+
+		$hosts = CDataHelper::call('host.create', [
+			[
+				'host' => 'Map host',
+				'groups' => ['groupid' => 4] // Zabbix servers.
+			]
+		]);
+
+		$maps = CDataHelper::call('map.create', [
+			[
+				'name' => self::MAP_NAME,
+				'width' => 500,
+				'height' => 500,
+				'selements' => [
+					[
+						'elements' => [['hostid' => $hosts['hostids'][0]]],
+						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
+						'iconid_off' => 186
+					]
+				]
+			]
+		]);
+		self::$mapid = $maps['sysmapids'][0];
 	}
 
 	public function testDashboardFavoriteMapsWidget_AddFavoriteMap() {
 		$this->page->login()->open('sysmaps.php')->waitUntilReady();
 		$this->page->assertHeader('Maps');
-		$this->query('link', $this->map_test)->waitUntilClickable()->one()->click();
+		$this->query('link', self::MAP_NAME)->waitUntilClickable()->one()->click();
 
 		$this->page->waitUntilReady();
 		$button = $this->query('xpath://button[@id="addrm_fav"]')->waitUntilVisible()->one();
@@ -63,11 +87,11 @@ class testDashboardFavoriteMapsWidget extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$widget = CDashboardElement::find()->one()->getWidget('Favorite maps')->waitUntilReady()->getContent();
-		$this->assertEquals('zabbix.php?action=map.view&sysmapid='.$this->mapid,
-				$widget->query('link', $this->map_test)->one()->getAttribute('href')
+		$this->assertEquals('zabbix.php?action=map.view&sysmapid='.self::$mapid,
+				$widget->query('link', self::MAP_NAME)->one()->getAttribute('href')
 		);
 		$this->assertEquals(1, CDBHelper::getCount('SELECT profileid FROM profiles WHERE idx='.
-				zbx_dbstr('web.favorite.sysmapids').' AND value_id='.zbx_dbstr($this->mapid))
+				zbx_dbstr('web.favorite.sysmapids').' AND value_id='.zbx_dbstr(self::$mapid))
 		);
 	}
 

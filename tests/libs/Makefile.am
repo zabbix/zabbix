@@ -10,6 +10,7 @@ SUBDIRS = \
 	zbxcfg \
 	zbxcachevalue \
 	zbxcacheconfig \
+	zbxdb \
 	zbxdbhigh \
 	zbxhistory \
 	zbxicmpping \
@@ -30,4 +31,5 @@ SUBDIRS = \
 	zbxtime \
 	zbxeval \
 	zbxfile \
+	zbxodbc \
 	zbxhttp

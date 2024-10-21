@@ -40,7 +40,7 @@ $rename_container = (new CTable())
 	->setHeader([
 		_('From'),
 		_('To'),
-		_('Action')
+		''
 	])
 	->setFooter(new CCol(
 		(new CButtonLink(_('Add')))->addClass('element-table-add')

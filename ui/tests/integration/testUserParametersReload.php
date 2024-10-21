@@ -28,6 +28,7 @@ class testUserParametersReload extends CIntegrationTest {
 
 	const ITEM_NAME_01		= 'usrprm01';
 	const ITEM_NAME_02		= 'usrprm02';
+	const ITEM_NAME_03		= 'usrprm03';
 
 	private static $hostids = [];
 	private static $itemids = [];
@@ -43,11 +44,19 @@ class testUserParametersReload extends CIntegrationTest {
 			'component' => self::COMPONENT_AGENT
 		],
 		[
+			'key' => self::ITEM_NAME_03,
+			'component' => self::COMPONENT_AGENT
+		],
+		[
 			'key' => self::ITEM_NAME_01,
 			'component' => self::COMPONENT_AGENT2
 		],
 		[
 			'key' => self::ITEM_NAME_02,
+			'component' => self::COMPONENT_AGENT2
+		],
+		[
+			'key' => self::ITEM_NAME_03,
 			'component' => self::COMPONENT_AGENT2
 		]
 	];
@@ -190,7 +199,8 @@ class testUserParametersReload extends CIntegrationTest {
 		];
 
 		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-			if (file_put_contents(PHPUNIT_CONFIG_DIR.'/'.$component.'_usrprm.conf', 'UserParameter='.self::ITEM_NAME_02.',echo multipleParams.02') === false) {
+			if (file_put_contents(PHPUNIT_CONFIG_DIR.'/'.$component.'_usrprm.conf',
+					'UserParameter='.self::ITEM_NAME_02.',echo multipleParams.02') === false) {
 				throw new Exception('Failed to create include configuration file');
 			}
 		}
@@ -203,7 +213,7 @@ class testUserParametersReload extends CIntegrationTest {
 			$this->assertTrue(@unlink(PHPUNIT_CONFIG_DIR.'/'.$component.'_usrprm.conf'));
 		}
 
-		// Test no user parameters
+		// Test user parameters with multiple comas
 
 		$this->executeUserParamReload();
 
@@ -211,6 +221,43 @@ class testUserParametersReload extends CIntegrationTest {
 			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NOTSUPPORTED);
 			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NOTSUPPORTED);
 		}
+
+		$config = [
+			self::COMPONENT_AGENT => [
+				'UserParameter' => self::ITEM_NAME_01.',echo A, echo B, echo C'
+			],
+			self::COMPONENT_AGENT2 => [
+				'UserParameter' => self::ITEM_NAME_01.',echo A, echo B, echo C'
+			]
+		];
+
+		$this->executeUserParamReload($config);
+
+		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
+			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NORMAL, 'A, echo B, echo C');
+			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NOTSUPPORTED);
+		}
+
+		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
+			if (file_put_contents(PHPUNIT_CONFIG_DIR.'/'.$component.'_usrprm.conf',
+					'UserParameter='.self::ITEM_NAME_02.',echo multipleParams.02') === false) {
+				throw new Exception('Failed to create include configuration file');
+			}
+
+			if (file_put_contents(PHPUNIT_CONFIG_DIR.'/'.$component.'_usrprm.conf',
+					'UserParameter='.self::ITEM_NAME_03.',echo multipleParams.03', FILE_APPEND | LOCK_EX) === false) {
+				throw new Exception('Failed to create include configuration file');
+			}
+		}
+
+		$this->executeUserParamReload($config);
+
+		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
+			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NORMAL, 'A, echo B, echo C');
+			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NOTSUPPORTED);
+			$this->checkItemState($component.':'.self::ITEM_NAME_03, ITEM_STATE_NOTSUPPORTED);
+		}
+
 	}
 
 	/**

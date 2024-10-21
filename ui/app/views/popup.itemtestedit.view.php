@@ -205,7 +205,7 @@ if ($data['is_item_testable']) {
 			(new CLabel(_('Authentication protocol'), 'label-authprotocol'))
 				->addClass('js-popup-row-snmpv3-authprotocol'),
 			(new CFormField(
-				(new CSelect('interfaces[details][authprotocol]'))
+				(new CSelect('interface[details][authprotocol]'))
 					->setValue((int) $data['inputs']['host']['interface']['details']['authprotocol'])
 					->setFocusableElementId('label-authprotocol')
 					->addOptions(CSelect::createOptionsFromArray(getSnmpV3AuthProtocols()))
@@ -226,7 +226,7 @@ if ($data['is_item_testable']) {
 
 			(new CLabel(_('Privacy protocol'), 'label-privprotocol'))->addClass('js-popup-row-snmpv3-privprotocol'),
 			(new CFormField(
-				(new CSelect('interfaces[details][privprotocol]'))
+				(new CSelect('interface[details][privprotocol]'))
 					->setValue((int) $data['inputs']['host']['interface']['details']['privprotocol'])
 					->setFocusableElementId('label-privprotocol')
 					->addOptions(CSelect::createOptionsFromArray(getSnmpV3PrivProtocols()))
@@ -300,7 +300,8 @@ $form_grid->addItem([
 	new CFormField(
 		(new CMultilineInput('value', '', [
 			'disabled' => false,
-			'readonly' => false
+			'readonly' => false,
+			'use_tab' => false
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	),
 
@@ -317,7 +318,7 @@ $form_grid->addItem([
 			(new CCheckBox('not_supported'))->setLabel(_('Not supported'))->setChecked((bool) $data['not_supported']),
 			(new CDiv([
 				(new CLabel(_('Error'), 'runtime_error_match'))->setFor('runtime_error'),
-				(new CMultilineInput('runtime_error', '', ['readonly' => false]))
+				(new CMultilineInput('runtime_error', '', ['readonly' => false, 'use_tab' => false]))
 			]))
 		]))
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
@@ -327,7 +328,8 @@ $form_grid->addItem([
 	new CLabel(_('Previous value'), 'prev_item_value'),
 	new CFormField(
 		(new CMultilineInput('prev_value', '', [
-			'disabled' => !$data['show_prev']
+			'disabled' => !$data['show_prev'],
+			'use_tab' => false
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	),
 

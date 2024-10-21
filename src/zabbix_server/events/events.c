@@ -33,6 +33,7 @@
 #include "zbxconnector.h"
 #include "zbxtagfilter.h"
 #include "zbxescalations.h"
+#include "zbx_expression_constants.h"
 
 /* event recovery data */
 typedef struct
@@ -140,24 +141,97 @@ static void	process_trigger_tag(zbx_db_event* event, const zbx_tag_t *tag)
 	validate_and_add_tag(event, t);
 }
 
-static void	substitute_item_tag_macro(const zbx_db_event* event, const zbx_dc_item_t *dc_item, char **str)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: resolves macros in item tags                                      *
+ *                                                                            *
+ * Parameters: p            - [IN] macro resolver data structure              *
+ *             args         - [IN] list of variadic parameters                *
+ *                                 Expected content:                          *
+ *                                  - const char *tz: name of timezone        *
+ *                                      (can be NULL)                         *
+ *             replace_with - [OUT] pointer to value to replace macro with    *
+ *             data         - [IN/OUT] pointer to original input raw string   *
+ *                                  (for macro in macro resolving)            *
+ *             error        - [OUT] pointer to pre-allocated error message    *
+ *                                  buffer (can be NULL)                      *
+ *             maxerrlen    - [IN] size of error message buffer (can be 0 if  *
+ *                                 'error' is NULL)                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	macro_item_tag_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
+		char *error, size_t maxerrlen)
 {
-	zbx_substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, dc_item, NULL,
-			NULL, NULL, NULL, NULL, str, ZBX_MACRO_TYPE_ITEM_TAG, NULL, 0);
+	/* Passed arguments */
+	const zbx_dc_um_handle_t	*um_handle = va_arg(args, zbx_dc_um_handle_t *);
+	const zbx_db_event		*event = va_arg(args, const zbx_db_event *);
+	const zbx_uint64_t		hostid = va_arg(args, zbx_uint64_t);
+	const zbx_uint64_t		itemid = va_arg(args, zbx_uint64_t);
+
+	ZBX_UNUSED(data);
+	ZBX_UNUSED(error);
+	ZBX_UNUSED(maxerrlen);
+
+	if (0 == p->indexed)
+	{
+		if (EVENT_SOURCE_TRIGGERS == event->source && 0 == strcmp(p->macro, MVAR_TRIGGER_ID))
+		{
+			*replace_with = zbx_dsprintf(*replace_with, ZBX_FS_UI64, event->objectid);
+		}
+		else if (EVENT_SOURCE_TRIGGERS == event->source || EVENT_SOURCE_INTERNAL == event->source)
+		{
+			if (ZBX_TOKEN_USER_MACRO == p->token.type || (ZBX_TOKEN_USER_FUNC_MACRO == p->token.type &&
+					0 == strncmp(p->macro, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
+			{
+				zbx_dc_get_user_macro(um_handle, p->macro, &hostid, 1, replace_with);
+			}
+			else if (0 == strncmp(p->macro, MVAR_INVENTORY, ZBX_CONST_STRLEN(MVAR_INVENTORY)))
+			{
+				zbx_dc_get_host_inventory_by_hostid(p->macro, hostid, replace_with);
+			}
+			else if (0 == strcmp(p->macro, MVAR_HOST_ID))
+			{
+				zbx_dc_get_host_value(itemid, replace_with, ZBX_REQUEST_HOST_ID);
+			}
+			else if (0 == strcmp(p->macro, MVAR_HOST_HOST))
+			{
+				zbx_dc_get_host_value(itemid, replace_with, ZBX_REQUEST_HOST_HOST);
+			}
+			else if (0 == strcmp(p->macro, MVAR_HOST_NAME))
+			{
+				zbx_dc_get_host_value(itemid, replace_with, ZBX_REQUEST_HOST_NAME);
+			}
+			else if (0 == strcmp(p->macro, MVAR_HOST_IP))
+			{
+				zbx_dc_get_interface_value(hostid, itemid, replace_with, ZBX_REQUEST_HOST_IP);
+			}
+			else if (0 == strcmp(p->macro, MVAR_HOST_DNS))
+			{
+				zbx_dc_get_interface_value(hostid, itemid, replace_with, ZBX_REQUEST_HOST_DNS);
+			}
+			else if (0 == strcmp(p->macro, MVAR_HOST_CONN))
+			{
+				zbx_dc_get_interface_value(hostid, itemid, replace_with, ZBX_REQUEST_HOST_CONN);
+			}
+			else if (0 == strcmp(p->macro, MVAR_HOST_PORT))
+			{
+				zbx_dc_get_interface_value(hostid, itemid, replace_with, ZBX_REQUEST_HOST_PORT);
+			}
+		}
+	}
+
+	return SUCCEED;
 }
 
-static void	process_item_tag(zbx_db_event* event, const zbx_item_tag_t *item_tag)
+static void	process_item_tag(zbx_db_event* event, const zbx_item_tag_t *item_tag, zbx_dc_um_handle_t *um_handle)
 {
-	zbx_tag_t	*t;
-	zbx_dc_item_t	dc_item; /* used to pass data into zbx_substitute_simple_macros() function */
+	zbx_tag_t	*t = duplicate_tag(&item_tag->tag);
 
-	t = duplicate_tag(&item_tag->tag);
+	zbx_substitute_macros(&t->tag, NULL, 0, &macro_item_tag_resolv, um_handle, event, item_tag->hostid,
+			item_tag->itemid);
+	zbx_substitute_macros(&t->value, NULL, 0, &macro_item_tag_resolv, um_handle, event, item_tag->hostid,
+			item_tag->itemid);
 
-	dc_item.host.hostid = item_tag->hostid;
-	dc_item.itemid = item_tag->itemid;
-
-	substitute_item_tag_macro(event, &dc_item, &t->tag);
-	substitute_item_tag_macro(event, &dc_item, &t->value);
 	validate_and_add_tag(event, t);
 }
 
@@ -223,6 +297,7 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 	event->flags = ZBX_FLAGS_DB_EVENT_CREATE;
 	event->severity = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 	event->suppressed = ZBX_PROBLEM_SUPPRESSED_FALSE;
+	event->maintenanceids = NULL;
 
 	if (EVENT_SOURCE_TRIGGERS == source)
 	{
@@ -270,7 +345,7 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 
 		for (int i = 0; i < item_tags.values_num; i++)
 		{
-			process_item_tag(event, item_tags.values[i]);
+			process_item_tag(event, item_tags.values[i], um_handle);
 			zbx_free_item_tag(item_tags.values[i]);
 		}
 
@@ -309,7 +384,7 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 
 		for (int i = 0; i < item_tags.values_num; i++)
 		{
-			process_item_tag(event, item_tags.values[i]);
+			process_item_tag(event, item_tags.values[i], um_handle);
 			zbx_free_item_tag(item_tags.values[i]);
 		}
 
@@ -384,6 +459,8 @@ static int	save_events(void)
 	zbx_uint64_t		eventid;
 	zbx_db_event		*event;
 
+	/* new events without ids could be created during correlation - reserve ids for them */
+
 	for (i = 0; i < events.values_num; i++)
 	{
 		event = events.values[i];
@@ -392,10 +469,11 @@ static int	save_events(void)
 			num++;
 	}
 
+	if (0 != num)
+		eventid = zbx_db_get_maxid_num("events", num);
+
 	zbx_db_insert_prepare(&db_insert, "events", "eventid", "source", "object", "objectid", "clock", "ns", "value",
 			"name", "severity", (char *)NULL);
-
-	eventid = zbx_db_get_maxid_num("events", num);
 
 	num = 0;
 
@@ -1728,6 +1806,12 @@ static void	zbx_clean_event(zbx_db_event *event)
 		zbx_vector_tags_ptr_destroy(&event->tags);
 	}
 
+	if (NULL != event->maintenanceids)
+	{
+		zbx_vector_uint64_destroy(event->maintenanceids);
+		zbx_free(event->maintenanceids);
+	}
+
 	zbx_free(event);
 }
 
@@ -2000,9 +2084,9 @@ void	zbx_events_update_itservices(void)
 		values_num = recovery->r_event->tags.values_num;
 		recovery->r_event->tags.values_num = 0;
 
-		zbx_service_serialize(&data, &data_alloc, &data_offset, recovery->eventid, recovery->r_event->clock,
+		zbx_service_serialize_event(&data, &data_alloc, &data_offset, recovery->eventid, recovery->r_event->clock,
 				recovery->r_event->ns, recovery->r_event->value, recovery->r_event->severity,
-				&recovery->r_event->tags, 0);
+				&recovery->r_event->tags, NULL);
 
 		recovery->r_event->tags.values_num = values_num;
 	}
@@ -2017,14 +2101,15 @@ void	zbx_events_update_itservices(void)
 		if (TRIGGER_VALUE_PROBLEM != event->value)
 			continue;
 
-		zbx_service_serialize(&data, &data_alloc, &data_offset, event->eventid, event->clock, event->ns,
-				event->value, event->severity, &event->tags, event->suppressed);
+		zbx_service_serialize_event(&data, &data_alloc, &data_offset, event->eventid, event->clock, event->ns,
+				event->value, event->severity, &event->tags, event->maintenanceids);
 	}
 
 	if (NULL == data)
 		return;
 
-	zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_PROBLEMS, data, (zbx_uint32_t)data_offset);
+	if (0 != zbx_dc_get_itservices_num())
+		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_PROBLEMS, data, (zbx_uint32_t)data_offset);
 	zbx_free(data);
 }
 
@@ -2076,6 +2161,8 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 
 			for (int j = 0; j < event_queries.values_num; j++)
 			{
+				zbx_db_event	*event = (zbx_db_event *)event_refs->values[j];
+
 				query = event_queries.values[j];
 
 				for (int i = 0; i < query->maintenances.values_num; i++)
@@ -2093,8 +2180,7 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 							query->maintenances.values[i].first,
 							(int)query->maintenances.values[i].second);
 
-					((zbx_db_event *)event_refs->values[j])->suppressed =
-							ZBX_PROBLEM_SUPPRESSED_TRUE;
+					zbx_db_event_add_maintenanceid(event, query->maintenances.values[i].first);
 				}
 			}
 

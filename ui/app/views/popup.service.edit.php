@@ -59,7 +59,7 @@ $service_tab = (new CFormGrid())
 					->setId('problem_tags')
 					->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 					->setHeader(
-						(new CRowHeader([_('Name'), _('Operation'), _('Value'), _('Action')]))
+						(new CRowHeader([_('Name'), _('Operation'), _('Value'), '']))
 							->addClass(ZBX_STYLE_GREY)
 					)
 					->setFooter(
@@ -147,7 +147,7 @@ $service_tab = (new CFormGrid())
 $additional_rules = (new CTable())
 	->setId('status_rules')
 	->setHeader(
-		(new CRowHeader([_('Name'), _('Action')]))->addClass(ZBX_STYLE_GREY)
+		(new CRowHeader([_('Name'), _('Actions')]))->addClass(ZBX_STYLE_GREY)
 	);
 
 $additional_rules->addItem(
@@ -222,7 +222,7 @@ $tags_tab = (new CFormGrid())
 				->addItem([
 					renderTagTable($data['form']['tags'])
 						->addClass('tags-table')
-						->setHeader((new CRowHeader([_('Name'), _('Value'), _('Action')]))->addClass(ZBX_STYLE_GREY)),
+						->setHeader((new CRowHeader([_('Name'), _('Value'), '']))->addClass(ZBX_STYLE_GREY)),
 					(new CTemplateTag('tag-row-tmpl'))->addItem(
 						renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => ''], ['add_post_js' => false])
 					)

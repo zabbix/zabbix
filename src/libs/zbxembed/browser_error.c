@@ -120,7 +120,13 @@ int	browser_push_error(duk_context *ctx, zbx_webdriver_t *wd, const char *format
 
 	if (NULL != wd)
 	{
-		duk_push_heapptr(ctx, wd->browser);
+		zbx_es_env_t	*env;
+
+		if (NULL != (env = zbx_es_get_env(ctx)) && NULL != es_obj_get_data(env, wd->browser, ES_OBJ_BROWSER))
+			duk_push_heapptr(ctx, wd->browser);
+		else
+			duk_push_null(ctx);
+
 		zbx_free(wd->last_error_message);
 		wd->last_error_message = message;
 	}

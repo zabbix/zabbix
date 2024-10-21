@@ -195,7 +195,7 @@ AS_HELP_STRING([--with-libpcre@<:@=DIR@:>@], [use libpcre from given base instal
 			LIBPCRE_LIBS=" $LIBPCRE_LIBS -lpthread"
 		elif test "x$enable_static_libs" = "xyes"; then
 			if test "x$static_linking_support" == "xno"; then
-				AC_MSG_WARN([compiler has no direct suppor for static linkage])
+				AC_MSG_WARN([compiler has no direct support for static linkage])
 
 				if test -n "$libpcre_lib_dir"; then
 					if test -f "$libpcre_lib_dir/libpcre.a"; then

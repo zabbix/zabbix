@@ -250,6 +250,11 @@ class CControllerTriggerList extends CController {
 				'nopermissions' => true
 			]);
 
+			foreach ($triggers as &$trigger) {
+				CArrayHelper::sort($trigger['hosts'], ['name']);
+			}
+			unset($trigger);
+
 			$items = API::Item()->get([
 				'output' => ['itemid'],
 				'selectTriggers' => ['triggerid'],
@@ -331,6 +336,15 @@ class CControllerTriggerList extends CController {
 			}
 			unset($dependencyTrigger);
 		}
+
+		$options = [
+			'output' => [],
+			'triggerids' => array_keys($triggers),
+			'editable' => true,
+			'preservekeys' => true
+		];
+		$editable_hosts = $data['context'] === 'host' ? API::Host()->get($options) : API::Template()->get($options);
+		$data['editable_hosts'] = array_keys($editable_hosts);
 
 		CProfile::update($prefix.'trigger.list.sort', $sort, PROFILE_TYPE_STR);
 		CProfile::update($prefix.'trigger.list.sortorder', $sort_order, PROFILE_TYPE_STR);

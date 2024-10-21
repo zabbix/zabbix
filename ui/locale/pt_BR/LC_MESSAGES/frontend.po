@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-07-24 12:28+0000\n"
-"Last-Translator: Francys Nivea <francysnivea@hotmail.com>\n"
+"PO-Revision-Date: 2024-10-03 04:06+0000\n"
+"Last-Translator: Felipe L. Ewald <felipe.idj@hotmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -2074,6 +2074,14 @@ msgstr "Tipo da borda"
 msgid "Border width"
 msgstr "Largura da borda"
 
+#: include/classes/api/services/CHost.php:1445
+msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1452
+msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
+msgstr ""
+
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
 msgstr "Ambas as senhas devem ser iguais."
@@ -2939,7 +2947,7 @@ msgstr[1] "Não é possível excluir funções de usuário"
 msgid "Cannot delete web scenario"
 msgid_plural "Cannot delete web scenarios"
 msgstr[0] "Não é possível excluir o cenário web"
-msgstr[1] "Não é possível excluir cenários web"
+msgstr[1] "Não é possível excluir os cenários web"
 
 #: app/controllers/CControllerTokenDisable.php:66
 msgid "Cannot disable API token"
@@ -3378,6 +3386,16 @@ msgstr "Não é possível herdar a regra LLD com a chave \"%1$s\" do modelo \"%2
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item with the same key already exists."
 msgstr "Não é possível herdar a regra LLD com a chave \"%1$s\" do modelo \"%2$s\" para o modelo \"%3$s\", porque já existe um item com a mesma chave."
+
+#: include/classes/api/services/CItemGeneral.php:684
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
+msgstr "Não é possível herdar regras de LLD com a chave \"%1$s\" dos modelos \"%2$s\" e \"%3$s\", porque a chave deve ser exclusiva no host \"%4$s\"."
+
+#: include/classes/api/services/CItemGeneral.php:685
+#, c-format
+msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
+msgstr "Não é possível herdar regras de LLD com a chave \"%1$s\" dos modelos \"%2$s\" e \"%3$s\", porque a chave deve ser exclusiva no modelo \"%4$s\"."
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
@@ -12542,6 +12560,10 @@ msgstr "Lista de proxies Zabbix com nome, modo, criptografia, compressão, vers�
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name, state (unknown/offline/online). Returns JSON."
 msgstr "Lista de proxies Zabbix com nome, modo, criptografia, compactação, versão, último visto, contagem de hosts, contagem de itens, valores necessários por segundo (vps), compatibilidade (atual/desatualizado/sem suporte), tempos limite, nome do grupo de proxy, estado (desconhecido/desligado/ligado). Retorna JSON."
 
+#: include/classes/data/CItemData.php:2935
+msgid "List of Zabbix proxy groups configuration data and real-time data. Configuration data includes proxy group name, failover delay, and minimum number of online proxies required for the group to be online. Real-time data includes number of online proxies, percentage of online proxies, and state of proxy group (unknown, offline, recovering, online, degrading). This item does not return groupless proxies. Returns JSON."
+msgstr "Lista de dados de configuração de grupos de proxies Zabbix e dados em tempo real. Os dados de configuração incluem nome do grupo de proxies, período de failover e número mínimo de proxies online necessários para que o grupo fique online. Os dados em tempo real incluem número de proxies online, percentagem de proxies online e estado do grupo de proxies (desconhecido, offline, recuperando, online, degradando). Este item não retorna proxies sem grupo. Retorna JSON."
+
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Lista de dispositivos de bloco e seu tipo. Retorna JSON"
@@ -14027,8 +14049,8 @@ msgstr "Mapa de rede adicionado"
 #: sysmaps.php:265
 msgid "Network map deleted"
 msgid_plural "Network maps deleted"
-msgstr[0] "Mapa de rede excluído"
-msgstr[1] "Mapas de rede excluídos"
+msgstr[0] "Mapa de rede removido"
+msgstr[1] "Mapas de rede removidos"
 
 #: sysmaps.php:188
 msgid "Network map updated"
@@ -15235,13 +15257,13 @@ msgstr "Proxies online"
 #: include/classes/api/services/CUser.php:889
 #, c-format
 msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "Somente usuários Super administradores ou Administradores podem atualizar o parâmetro \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:812
 #: include/classes/api/services/CUser.php:853
 #, c-format
 msgid "Only Super admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "Somente usuários Super administradores podem atualizar o parâmetro \"%1$s\"."
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -20236,6 +20258,10 @@ msgstr "O protótipo de host clonado contém macros definidas pelo usuário com 
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "O modelo clonado contém macros definidas pelo usuário com o tipo \"Texto secreto\". O valor e o tipo dessas macros foram redefinidos."
 
+#: include/classes/api/services/CHost.php:1433
+msgid "The field \"monitored_by\" must be specified when changing proxy or proxy group for host monitoring."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
 msgstr "Os seguintes espaços reservados são compatíveis:"
@@ -20349,6 +20375,13 @@ msgstr "Tema"
 #: app/views/mediatype.edit.php:189 app/views/mediatype.test.edit.php:48
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "Esses parâmetros serão passados para o script como argumentos de linha de comando na ordem especificada."
+
+#: app/controllers/CControllerDiscoveryEdit.php:175
+#, c-format
+msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
+msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
+msgstr[0] "Esta verificação não pode ser removida, pois é usada como uma condição na ação de descoberta %1$s."
+msgstr[1] "Essa verificação não pode ser removida, pois é usada como uma condição em ações de descoberta %1$s."
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -20848,7 +20881,7 @@ msgstr "URL do Trigger Script"
 #: app/views/action.list.php:32 include/classes/helpers/CMenuHelper.php:231
 #: include/classes/helpers/CRoleHelper.php:470
 msgid "Trigger actions"
-msgstr "Desabilitar ações?"
+msgstr "Ações de trigger"
 
 #: app/controllers/CControllerTriggerCreate.php:123
 msgid "Trigger added"
@@ -20871,8 +20904,8 @@ msgstr "Período de retenção dados de triggers"
 #: app/controllers/CControllerTriggerDelete.php:62
 msgid "Trigger deleted"
 msgid_plural "Triggers deleted"
-msgstr[0] "Gatilho excluído"
-msgstr[1] "Gatilhos excluídos"
+msgstr[0] "Trigger excluído"
+msgstr[1] "Triggers excluídos"
 
 #: tr_events.php:169
 msgid "Trigger details"
@@ -21026,8 +21059,8 @@ msgstr "Protótipo de trigger adicionado"
 #: app/controllers/CControllerTriggerPrototypeDelete.php:62
 msgid "Trigger prototype deleted"
 msgid_plural "Trigger prototypes deleted"
-msgstr[0] "Protótipo de gatilho excluído"
-msgstr[1] "Protótipos de gatilhos excluídos"
+msgstr[0] "Protótipo de trigger excluído"
+msgstr[1] "Protótipos de trigger excluídos"
 
 #: app/controllers/CControllerTriggerMassupdate.php:219
 #: app/controllers/CControllerTriggerPrototypeDisable.php:76
@@ -21069,8 +21102,8 @@ msgstr "Tags de gatilho"
 #: app/controllers/CControllerTriggerUpdate.php:147
 msgid "Trigger updated"
 msgid_plural "Triggers updated"
-msgstr[0] "Gatilho atualizado"
-msgstr[1] "Gatilhos atualizados"
+msgstr[0] "Trigger atualizada"
+msgstr[1] "Triggers atualizados"
 
 #: app/controllers/CControllerPopupGeneric.php:227
 #: app/controllers/CControllerPopupGeneric.php:241
@@ -21844,7 +21877,7 @@ msgstr "Use %{ref} no filtro de grupo para fazer referência ao valor desse atri
 
 #: app/views/administration.miscconfig.edit.php:123
 msgid "Use X-Frame-Options HTTP header"
-msgstr "Utilize o cabeçalho HTTP X-Frame-Options"
+msgstr "Usar o cabeçalho HTTP X-Frame-Options"
 
 #: app/partials/configuration.host.interface.row.php:222
 msgid "Use combined requests"
@@ -21962,6 +21995,11 @@ msgstr "Mensagem do agente de usuário"
 #: include/classes/api/services/CUser.php:993
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Um usuário não pode se adicionar em um grupo desativado ou em um grupo com acesso à interface web desativado."
+
+#: include/classes/api/services/CUserGroup.php:673
+#: include/classes/api/services/CUser.php:843
+msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
+msgstr "Usuário não pode se adicionar a um grupo desabilitado ou a um grupo com acesso de interface desabilitado."
 
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
@@ -22098,6 +22136,10 @@ msgstr "A entrada do usuário foi testada com sucesso."
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
 msgstr "Um usuário não pode excluir a si mesmo."
+
+#: include/classes/api/services/CUser.php:1837
+msgid "User is not allowed to delete oneself."
+msgstr "Usuário não pode excluir a si mesmo."
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222
@@ -22419,6 +22461,10 @@ msgstr "Lista de datastores do hipervisor da VMware, \"url\" - URL do serviço d
 msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr "Sensor de rollup de estado de integridade do hypervisor VMware, \"url\" - URL do serviço VMware, \"uuid\" - identificador exclusivo global do hypervisor VMware. Retorna 0 - cinza; 1 - verde; 2 - amarelo; 3 - vermelho"
 
+#: include/classes/data/CItemData.php:2237
+msgid "VMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr "Status de manutenção do hipervisor VVMware, \"url\" - URL do serviço VMware, \"uuid\" - identificador exclusivo global do hipervisor VMware. Retorna 0 - não está em manutenção; 1 - em manutenção"
+
 #: include/classes/data/CItemData.php:2051
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
 msgstr "Modelo do hipervisor da VMware, \"url\" - URL do serviço da VMware, \"uuid\" - identificador exclusivo global do hipervisor da VMware"
@@ -22554,6 +22600,10 @@ msgstr "Uso de memória de convidado da máquina virtual VMware, \"url\" - URL d
 #: include/classes/data/CItemData.php:2387
 msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "Uso de memória do host da máquina virtual VMware, \"url\" - URL do serviço VMware, \"uuid\" - identificador exclusivo global da máquina virtual VMware"
+
+#: include/classes/data/CItemData.php:2482
+msgid "VMware virtual machine hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr "Status de manutenção do hipervisor da máquina virtual VMware, \"url\" - URL do serviço VMware, \"uuid\" - identificador exclusivo global da máquina virtual VMware. Retorna 0 - não está em manutenção; 1 - em manutenção"
 
 #: include/classes/data/CItemData.php:2331
 msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
@@ -23083,8 +23133,8 @@ msgstr "Cenário web adicionado"
 #: httpconf.php:178 httpconf.php:417
 msgid "Web scenario deleted"
 msgid_plural "Web scenarios deleted"
-msgstr[0] "Cenário web excluído"
-msgstr[1] "Cenários web excluídos"
+msgstr[0] "Cenário web removido"
+msgstr[1] "Cenários web removidos"
 
 #: httpconf.php:386
 msgid "Web scenario disabled"
@@ -23946,6 +23996,16 @@ msgstr "uma letra latina maiúscula e uma letra latina minúscula"
 #: app/views/administration.geomaps.edit.php:47
 msgid "and"
 msgstr "e"
+
+#: include/classes/api/helpers/CApiPskHelper.php:27
+#: include/classes/api/helpers/CApiPskHelper.php:57
+#: include/classes/api/helpers/CApiPskHelper.php:73
+#: include/classes/api/helpers/CApiPskHelper.php:106
+#: include/classes/api/helpers/CApiPskHelper.php:139
+#: include/classes/api/helpers/CApiPskHelper.php:160
+#: include/classes/api/helpers/CApiPskHelper.php:176
+msgid "another tls_psk value is already associated with given tls_psk_identity"
+msgstr ""
 
 #: include/forms.inc.php:1450 include/views/js/item.preprocessing.js.php:237
 msgid "any error"

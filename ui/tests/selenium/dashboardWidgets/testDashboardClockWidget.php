@@ -282,12 +282,12 @@ class testDashboardClockWidget extends testWidgets {
 				$form->fill(['id:show_1' => true, 'id:show_3' => true]);
 
 				$advanced_configuration = [
-					'Date' => ['id:date_size' => 20, 'id:date_bold' => false, 'id:date_color' => null],
-					'Time' => ['id:time_size' => 30, 'id:time_bold' => false, 'id:time_color' => null,
+					'Date' => ['id:date_bold' => false, 'id:date_color' => null],
+					'Time' => ['id:time_bold' => false, 'id:time_color' => null,
 							'id:time_sec' => true, 'id:time_format' => '24-hour'
 					],
 					// This is Time zone field found by xpath, because we have one more field with Time zone label.
-					'xpath:.//div[@class="fields-group fields-group-tzone"]' => ['id:tzone_size' => 20,
+					'xpath:.//div[@class="fields-group fields-group-tzone"]' => [
 							'id:tzone_bold' => false, 'id:tzone_color' => null,
 							'id:tzone_timezone' => 'Local default: '.CDateTimeHelper::getTimeZoneFormat('Europe/Riga'),
 							'id:tzone_format' => 'Short'
@@ -302,7 +302,7 @@ class testDashboardClockWidget extends testWidgets {
 					// Check that with Host time 'Time zone' and 'Format' fields disappear.
 					if ($type === 'Host time') {
 						$advanced_configuration['xpath:.//div[@class="fields-group fields-group-tzone"]'] =
-								['id:tzone_size' => 20,'id:tzone_bold' => false, 'id:tzone_color' => null];
+								['id:tzone_bold' => false, 'id:tzone_color' => null];
 
 						foreach (['id:tzone_timezone', 'id:tzone_format'] as $id) {
 							$this->assertFalse($form->getField($id)->isVisible());
@@ -323,10 +323,7 @@ class testDashboardClockWidget extends testWidgets {
 				}
 
 				// Check form fields' maximal lengths.
-				foreach (['Name' =>  255, 'id:date_size' => 3, 'id:time_size' => 3, 'id:tzone_size' => 3]
-						as $field => $length) {
-					$this->assertEquals($length, $form->getField($field)->getAttribute('maxlength'));
-				}
+				$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
 
 				// Now remove the Time checkbox from Show field and check that only its Advanced config disappeared.
 				$form->fill(['id:show_2' => false]);
@@ -574,7 +571,7 @@ class testDashboardClockWidget extends testWidgets {
 					]
 				]
 			],
-			// #15.
+			// #17.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -591,7 +588,7 @@ class testDashboardClockWidget extends testWidgets {
 					]
 				]
 			],
-			// #16.
+			// #18.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -609,7 +606,7 @@ class testDashboardClockWidget extends testWidgets {
 					]
 				]
 			],
-			// #17.
+			// #19.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -625,13 +622,12 @@ class testDashboardClockWidget extends testWidgets {
 						'id:show_3' => false,
 						'Advanced configuration' => true,
 						'Background colour' => 'FFEB3B',
-						'id:date_size' => '50',
 						'id:date_bold' => true,
 						'xpath://button[@id="lbl_date_color"]/..' => 'F57F17'
 					]
 				]
 			],
-			// #18.
+			// #20.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -647,10 +643,8 @@ class testDashboardClockWidget extends testWidgets {
 						'id:show_3' => false,
 						'Advanced configuration' => true,
 						'Background colour' => '7B1FA2',
-						'id:date_size' => '15',
 						'id:date_bold' => true,
 						'xpath://button[@id="lbl_date_color"]/..' => '002B4D',
-						'id:time_size' => '30',
 						'id:time_bold' => false,
 						'xpath://button[@id="lbl_time_color"]/..' => '00897B',
 						'id:time_sec' => true,
@@ -658,7 +652,7 @@ class testDashboardClockWidget extends testWidgets {
 					]
 				]
 			],
-			// #19.
+			// #21.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -674,10 +668,8 @@ class testDashboardClockWidget extends testWidgets {
 						'id:show_3' => false,
 						'Advanced configuration' => true,
 						'Background colour' => '43A047',
-						'id:date_size' => '55',
 						'id:date_bold' => true,
 						'xpath://button[@id="lbl_date_color"]/..' => '64B5F6',
-						'id:time_size' => '25',
 						'id:time_bold' => true,
 						'xpath://button[@id="lbl_time_color"]/..' => '180D49',
 						'id:time_sec' => false,
@@ -685,7 +677,7 @@ class testDashboardClockWidget extends testWidgets {
 					]
 				]
 			],
-			// #20.
+			// #22.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -701,15 +693,12 @@ class testDashboardClockWidget extends testWidgets {
 						'id:show_3' => true,
 						'Advanced configuration' => true,
 						'Background colour' => 'C62828',
-						'id:date_size' => '40',
 						'id:date_bold' => true,
 						'xpath://button[@id="lbl_date_color"]/..' => 'FDD835',
-						'id:time_size' => '15',
 						'id:time_bold' => true,
 						'xpath://button[@id="lbl_time_color"]/..' => '1B5E20',
 						'id:time_sec' => false,
 						'id:time_format' => '12-hour',
-						'id:tzone_size' => '20',
 						'id:tzone_bold' => false,
 						'xpath://button[@id="lbl_tzone_color"]/..' => '06081F',
 						'xpath://button[@id="label-tzone_timezone"]/..'
@@ -718,7 +707,7 @@ class testDashboardClockWidget extends testWidgets {
 					]
 				]
 			],
-			// #21.
+			// #23.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -734,15 +723,12 @@ class testDashboardClockWidget extends testWidgets {
 						'id:show_3' => true,
 						'Advanced configuration' => true,
 						'Background colour' => '001819',
-						'id:date_size' => '33',
 						'id:date_bold' => true,
 						'xpath://button[@id="lbl_date_color"]/..' => '607D8B',
-						'id:time_size' => '12',
 						'id:time_bold' => true,
 						'xpath://button[@id="lbl_time_color"]/..' => '1565C0',
 						'id:time_sec' => false,
 						'id:time_format' => '12-hour',
-						'id:tzone_size' => '35',
 						'id:tzone_bold' => true,
 						'xpath://button[@id="lbl_tzone_color"]/..' => 'CDDC39',
 						'xpath://button[@id="label-tzone_timezone"]/..'
@@ -751,162 +737,14 @@ class testDashboardClockWidget extends testWidgets {
 					]
 				]
 			],
-			// #22 Empty Size fields.
-			[
-				[
-					'expected' => TEST_BAD,
-					'second_page' => true,
-					'fields' => [
-						'Clock type' => 'Digital',
-						'id:show_1' => true,
-						'id:show_2' => true,
-						'id:show_3' => true,
-						'Advanced configuration' => true,
-						'id:date_size' => '',
-						'id:time_size' => '',
-						'id:tzone_size' => ''
-					],
-					'Error message' => [
-						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.'
-					]
-				]
-			],
-			// #23 Characters in Size fields.
-			[
-				[
-					'expected' => TEST_BAD,
-					'second_page' => true,
-					'fields' => [
-						'Clock type' => 'Digital',
-						'id:show_1' => true,
-						'id:show_2' => true,
-						'id:show_3' => true,
-						'Advanced configuration' => true,
-						'id:date_size' => 'tes',
-						'id:time_size' => 'tfi',
-						'id:tzone_size' => 'eld'
-					],
-					'Error message' => [
-						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.'
-					]
-				]
-			],
-			// #24 Zeros in Size fields.
-			[
-				[
-					'expected' => TEST_BAD,
-					'second_page' => true,
-					'fields' => [
-						'Clock type' => 'Digital',
-						'id:show_1' => true,
-						'id:show_2' => true,
-						'id:show_3' => true,
-						'Advanced configuration' => true,
-						'id:date_size' => 0,
-						'id:time_size' => 0,
-						'id:tzone_size' => 0
-					],
-					'Error message' => [
-						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.'
-					]
-				]
-			],
-			// #25 Negatives in Size fields.
-			[
-				[
-					'expected' => TEST_BAD,
-					'second_page' => true,
-					'fields' => [
-						'Clock type' => 'Digital',
-						'id:show_1' => true,
-						'id:show_2' => true,
-						'id:show_3' => true,
-						'Advanced configuration' => true,
-						'id:date_size' => -1,
-						'id:time_size' => -12,
-						'id:tzone_size' => -99
-					],
-					'Error message' => [
-						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.'
-					]
-				]
-			],
-			// #26 Floats in Size fields.
-			[
-				[
-					'expected' => TEST_BAD,
-					'second_page' => true,
-					'fields' => [
-						'Clock type' => 'Digital',
-						'id:show_1' => true,
-						'id:show_2' => true,
-						'id:show_3' => true,
-						'Advanced configuration' => true,
-						'id:date_size' => 0.5,
-						'id:time_size' => 1.3,
-						'id:tzone_size' => 9.9
-					],
-					'Error message' => [
-						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.'
-					]
-				]
-			],
-			// #27.
+			// #24.
 			[
 				[
 					'expected' => TEST_BAD,
 					'second_page' => true,
 					'fields' => [
 						'Show header' => true,
-						'Name' => 'DigitalClock12',
-						'Refresh interval' => '30 seconds',
-						'Time type' => CFormElement::RELOADABLE_FILL('Local time'),
-						'Clock type' => 'Digital',
-						'id:show_1' => true,
-						'id:show_2' => true,
-						'id:show_3' => true,
-						'Advanced configuration' => true,
-						'Background colour' => '001819',
-						'id:date_size' => '333',
-						'id:date_bold' => true,
-						'xpath://button[@id="lbl_date_color"]/..' => '607D8B',
-						'id:time_size' => '123',
-						'id:time_bold' => true,
-						'xpath://button[@id="lbl_time_color"]/..' => '1565C0',
-						'id:time_sec' => false,
-						'id:time_format' => '12-hour',
-						'id:tzone_size' => '353',
-						'id:tzone_bold' => true,
-						'xpath://button[@id="lbl_tzone_color"]/..' => 'CDDC39',
-						'xpath://button[@id="label-tzone_timezone"]/..'
-								=> CDateTimeHelper::getTimeZoneFormat('Africa/Bangui'),
-						'id:time_format' => '12-hour'
-					],
-					'Error message' => [
-						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.'
-					]
-				]
-			],
-			// #28.
-			[
-				[
-					'expected' => TEST_BAD,
-					'second_page' => true,
-					'fields' => [
-						'Show header' => true,
-						'Name' => 'DigitalClock13',
+						'Name' => 'DigitalClock11',
 						'Refresh interval' => '30 seconds',
 						'Time type' => CFormElement::RELOADABLE_FILL('Host time'),
 						'Clock type' => 'Digital',
@@ -915,15 +753,12 @@ class testDashboardClockWidget extends testWidgets {
 						'id:show_3' => true,
 						'Advanced configuration' => true,
 						'Background colour' => '001819',
-						'id:date_size' => '33',
 						'id:date_bold' => true,
 						'xpath://button[@id="lbl_date_color"]/..' => '607D8B',
-						'id:time_size' => '23',
 						'id:time_bold' => true,
 						'xpath://button[@id="lbl_time_color"]/..' => '1565C0',
 						'id:time_sec' => false,
 						'id:time_format' => '12-hour',
-						'id:tzone_size' => '33',
 						'id:tzone_bold' => true,
 						'xpath://button[@id="lbl_tzone_color"]/..' => 'CDDC39'
 					],
@@ -931,7 +766,7 @@ class testDashboardClockWidget extends testWidgets {
 						'Invalid parameter "Item": cannot be empty.'
 					]
 				],
-				// #29.
+				// #25.
 				[
 					[
 						'expected' => TEST_BAD,

@@ -19,7 +19,7 @@ require_once dirname(__FILE__).'/../common/testMultiselectDialogs.php';
 /**
  * Test for checking empty multiselects' overlays.
  *
- * @onBefore prepareEmptyData
+ * @onBefore clearData, prepareEmptyData
  *
  * @backup profiles
  */
@@ -44,6 +44,59 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 	 */
 	public function getBehaviors() {
 		return [CTableBehavior::class];
+	}
+
+	/**
+	 * Function for finding and deleting data created before with previous tests.
+	 */
+	public function clearData() {
+		$delete_data = [
+			// Delete Services.
+			[
+				'api' => 'service.delete',
+				'sql' => 'SELECT * FROM services',
+				'column' => 'serviceid'
+			],
+			// Delete Proxies and Proxy groups, connected Hosts, Actions and Discovery rules.
+			[
+				'api' => 'drule.delete',
+				'sql' => 'SELECT * FROM drules',
+				'column' => 'druleid'
+			],
+			[
+				'api' => 'host.delete',
+				'sql' => 'SELECT * FROM hosts WHERE monitored_by=1 OR monitored_by=2',
+				'column' => 'hostid'
+			],
+			[
+				'api' => 'action.delete',
+				'sql' => 'SELECT * FROM actions',
+				'column' => 'actionid'
+			],
+			[
+				'api' => 'proxy.delete',
+				'sql' => 'SELECT * FROM proxy',
+				'column' => 'proxyid'
+			],
+			[
+				'api' => 'proxygroup.delete',
+				'sql' => 'SELECT * FROM proxy_group',
+				'column' => 'proxy_groupid'
+			],
+			// Delete SLA.
+			[
+				'api' => 'sla.delete',
+				'sql' => 'SELECT * FROM sla',
+				'column' => 'slaid'
+			]
+		];
+
+		foreach ($delete_data as $data) {
+			$ids = CDBHelper::getColumn($data['sql'], $data['column']);
+			if ($ids !== []) {
+				CDataHelper::call($data['api'], array_values($ids));
+			}
+		}
 	}
 
 	public function prepareEmptyData() {

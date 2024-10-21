@@ -32,7 +32,7 @@ $form_grid = new CFormGrid();
 $new_tag_filter_table = (new CTable())
 	->setId('new-tag-filter-table')
 	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_FILTER_STANDARD_WIDTH.'px;')
-	->setHeader([_('Tag'), _('Value'), _('Action')])
+	->setHeader([_('Tag'), _('Value'), ''])
 	->addRow((new CRow())->addClass('js-tag-filter-row-placeholder'))
 	->addItem(
 		(new CTag('tfoot', true))

@@ -45,15 +45,17 @@ zbx_event_severity_t;
 
 void	zbx_event_severity_free(zbx_event_severity_t *event_severity);
 
-void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset, zbx_uint64_t eventid,
-		int clock, int ns, int value, int severity, const zbx_vector_tags_ptr_t *tags, int suppressed);
-void	zbx_service_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_vector_events_ptr_t *events);
+void	zbx_service_serialize_event(unsigned char **data, size_t *data_alloc, size_t *data_offset, zbx_uint64_t eventid,
+		int clock, int ns, int value, int severity, const zbx_vector_tags_ptr_t *tags,
+		zbx_vector_uint64_t *maintenanceids);
+void	zbx_service_deserialize_event(const unsigned char *data, zbx_uint32_t size, zbx_vector_events_ptr_t *events);
 void	zbx_service_serialize_problem_tags(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		zbx_uint64_t eventid, const zbx_vector_tags_ptr_t *tags);
 void	zbx_service_deserialize_problem_tags(const unsigned char *data, zbx_uint32_t size,
 		zbx_vector_events_ptr_t *events);
 void	zbx_service_serialize_id(unsigned char **data, size_t *data_alloc, size_t *data_offset, zbx_uint64_t id);
 void	zbx_service_deserialize_ids(const unsigned char *data, zbx_uint32_t size, zbx_vector_uint64_t *ids);
+void	zbx_service_deserialize_id_pairs(const unsigned char *data, zbx_vector_uint64_pair_t *id_pairs);
 void	zbx_service_serialize_rootcause(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		zbx_uint64_t serviceid, const zbx_vector_uint64_t *eventids);
 void	zbx_service_deserialize_rootcause(const unsigned char *data, zbx_uint32_t size,

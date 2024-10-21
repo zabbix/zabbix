@@ -20,8 +20,7 @@
 #include "zbxexpr.h"
 #include "module.h"
 #include "zbxvariant.h"
-
-#include <stdlib.h>
+#include "zbxstr.h"
 
 const char	*zbx_mock_get_parameter_string(const char *path)
 {
@@ -121,8 +120,43 @@ void	zbx_mock_str_to_token_type(const char *str, int *out)
 		*out = ZBX_TOKEN_LLD_FUNC_MACRO;
 	else if (0 == strcmp(str, "ZBX_TOKEN_EXPRESSION_MACRO"))
 		*out = ZBX_TOKEN_EXPRESSION_MACRO;
+	else if (0 == strcmp(str, "ZBX_TOKEN_VAR_MACRO"))
+		*out = ZBX_TOKEN_VAR_MACRO;
+	else if (0 == strcmp(str, "ZBX_TOKEN_VAR_FUNC_MACRO"))
+		*out = ZBX_TOKEN_VAR_FUNC_MACRO;
 	else
 		fail_msg("Unknown token type \"%s\"", str);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: converts token type from text format                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_mock_str_to_token_search(const char *str, int *out)
+{
+	*out = ZBX_TOKEN_SEARCH_BASIC;
+
+	if (SUCCEED == zbx_str_in_list(str, "ZBX_TOKEN_SEARCH_BASIC", ','))
+		*out |= ZBX_TOKEN_SEARCH_BASIC;
+
+	if (SUCCEED == zbx_str_in_list(str, "ZBX_TOKEN_SEARCH_REFERENCES", ','))
+		*out |= ZBX_TOKEN_SEARCH_REFERENCES;
+
+	if (SUCCEED == zbx_str_in_list(str, "ZBX_TOKEN_SEARCH_EXPRESSION_MACRO", ','))
+		*out |= ZBX_TOKEN_SEARCH_EXPRESSION_MACRO;
+
+	if (SUCCEED == zbx_str_in_list(str, "ZBX_TOKEN_SEARCH_FUNCTIONID", ','))
+		*out |= ZBX_TOKEN_SEARCH_FUNCTIONID;
+
+	if (SUCCEED == zbx_str_in_list(str, "ZBX_TOKEN_SEARCH_SIMPLE_MACRO", ','))
+		*out |= ZBX_TOKEN_SEARCH_SIMPLE_MACRO;
+
+	if (SUCCEED == zbx_str_in_list(str, "ZBX_TOKEN_SEARCH_VAR_MACRO", ','))
+		*out |= ZBX_TOKEN_SEARCH_VAR_MACRO;
+
+	if (SUCCEED == zbx_str_in_list(str, "ZBX_TOKEN_SEARCH_BASIC", ','))
+		*out |= ZBX_TOKEN_SEARCH_BASIC;
 }
 
 /******************************************************************************
@@ -323,7 +357,6 @@ int	zbx_mock_get_object_member_int(zbx_mock_handle_t object, const char *name)
 
 	return member;
 }
-
 
 /******************************************************************************
  *                                                                            *

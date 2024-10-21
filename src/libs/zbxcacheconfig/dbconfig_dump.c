@@ -822,35 +822,6 @@ static void	DCdump_item_discovery(void)
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
 
-static void	DCdump_prototype_items(void)
-{
-	ZBX_DC_PROTOTYPE_ITEM	*proto_item;
-	zbx_hashset_iter_t	iter;
-	int			i;
-	zbx_vector_ptr_t	index;
-
-	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
-
-	zbx_vector_ptr_create(&index);
-	zbx_hashset_iter_reset(&(get_dc_config())->template_items, &iter);
-
-	while (NULL != (proto_item = (ZBX_DC_PROTOTYPE_ITEM *)zbx_hashset_iter_next(&iter)))
-		zbx_vector_ptr_append(&index, proto_item);
-
-	zbx_vector_ptr_sort(&index, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-	for (i = 0; i < index.values_num; i++)
-	{
-		proto_item = (ZBX_DC_PROTOTYPE_ITEM *)index.values[i];
-		zabbix_log(LOG_LEVEL_TRACE, "itemid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " templateid:" ZBX_FS_UI64,
-				proto_item->itemid, proto_item->hostid, proto_item->templateid);
-	}
-
-	zbx_vector_ptr_destroy(&index);
-
-	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
-}
-
 static void	DCdump_functions(void)
 {
 	ZBX_DC_FUNCTION		*function;
@@ -1680,7 +1651,6 @@ void	DCdump_configuration(void)
 	DCdump_item_discovery();
 	DCdump_interface_snmpitems();
 	DCdump_template_items();
-	DCdump_prototype_items();
 	DCdump_triggers();
 	DCdump_trigdeps();
 	DCdump_functions();

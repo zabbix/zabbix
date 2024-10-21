@@ -22,13 +22,15 @@
 #include "zbxip.h"
 #include "zbx_discoverer_constants.h"
 
-static int	http_task_process(short event, void *data, int *fd, const char *addr, char *dnserr)
+static int	http_task_process(short event, void *data, int *fd, const char *addr, char *dnserr,
+		struct event *timeout_event)
 {
 	int					 task_ret = ZBX_ASYNC_TASK_STOP;
 	zbx_discovery_async_http_context_t	*http_context = (zbx_discovery_async_http_context_t *)data;
 
 	ZBX_UNUSED(fd);
 	ZBX_UNUSED(dnserr);
+	ZBX_UNUSED(timeout_event);
 
 	if (ZBX_ASYNC_HTTP_STEP_RDNS == http_context->step)
 	{
@@ -107,8 +109,8 @@ int	zbx_discovery_async_check_http(CURLM *curl_mhandle, const char *config_sourc
 			CURLE_OK != (err = curl_easy_setopt(http_ctx->easyhandle, opt = CURLOPT_NOBODY, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(http_ctx->easyhandle, opt = CURLOPT_SSL_VERIFYPEER, 0L)) ||
 			CURLE_OK != (err = curl_easy_setopt(http_ctx->easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)) ||
-			CURLE_OK != (err = curl_easy_setopt(http_ctx->easyhandle, opt = CURLOPT_INTERFACE,
-			config_source_ip)) ||
+			(NULL != config_source_ip && CURLE_OK != (err = curl_easy_setopt(http_ctx->easyhandle,
+					opt = CURLOPT_INTERFACE, config_source_ip))) ||
 			CURLE_OK != (err = curl_easy_setopt(http_ctx->easyhandle, opt = CURLOPT_TIMEOUT,
 			(long)timeout)) ||
 			CURLE_OK != (err = curl_easy_setopt(http_ctx->easyhandle, opt = CURLOPT_ACCEPT_ENCODING,

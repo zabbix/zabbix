@@ -56,7 +56,7 @@ $table = (new CTable())
 	->setAttribute('style', 'width: 100%;')
 	->setId('iconMapTable')
 	->addClass(ZBX_STYLE_LIST_NUMBERED)
-	->setHeader(['', '', _('Inventory field'), _('Expression'), _('Icon'), '', _('Action')]);
+	->setHeader(['', '', _('Inventory field'), _('Expression'), _('Icon'), '', '']);
 
 $i = 0;
 foreach ($data['iconmap']['mappings'] as $mapping) {

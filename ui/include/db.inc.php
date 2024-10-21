@@ -407,7 +407,8 @@ function zbx_db_search($table, $options, &$sql_parts) {
 
 	$search = [];
 	foreach ($options['search'] as $field => $patterns) {
-		if (!isset($tableSchema['fields'][$field]) || $patterns === null) {
+		if ($patterns === null || !array_key_exists($field, $tableSchema['fields'])
+				|| ($tableSchema['fields'][$field]['type'] & DB::SUPPORTED_SEARCH_TYPES) == 0) {
 			continue;
 		}
 
@@ -416,12 +417,6 @@ function zbx_db_search($table, $options, &$sql_parts) {
 		});
 
 		if (!$patterns) {
-			continue;
-		}
-
-		if ($tableSchema['fields'][$field]['type'] !== DB::FIELD_TYPE_CHAR
-				&& $tableSchema['fields'][$field]['type'] !== DB::FIELD_TYPE_TEXT
-				&& $tableSchema['fields'][$field]['type'] !== DB::FIELD_TYPE_CUID) {
 			continue;
 		}
 

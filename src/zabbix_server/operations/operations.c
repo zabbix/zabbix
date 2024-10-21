@@ -383,7 +383,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 				if (NULL != (row3 = zbx_db_fetch(result3)))
 				{
-					if (SUCCEED == zbx_db_is_null_basic(row3[0]) || '\0' == *row3[0])
+					if (SUCCEED == zbx_db_is_null(row3[0]) || '\0' == *row3[0])
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve service value for"
 								" host name on \"%s\"", row[2]);
@@ -438,7 +438,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 				if (NULL != (row3 = zbx_db_fetch(result3)))
 				{
-					if (SUCCEED == zbx_db_is_null_basic(row3[0]) || '\0' == *row3[0])
+					if (SUCCEED == zbx_db_is_null(row3[0]) || '\0' == *row3[0])
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve service value for"
 								" host visible name on \"%s\"", row[2]);
@@ -987,7 +987,7 @@ void	op_host_del(const zbx_db_event *event)
 	zbx_vector_uint64_t	hostids;
 	zbx_vector_str_t	hostnames;
 	zbx_uint64_t		hostid;
-	char			*hostname = NULL;
+	char			*hostname = NULL, *hostname_esc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1003,8 +1003,8 @@ void	op_host_del(const zbx_db_event *event)
 	zbx_vector_str_append(&hostnames, zbx_strdup(NULL, hostname));
 
 	zbx_db_delete_hosts_with_prototypes(&hostids, &hostnames, zbx_map_db_event_to_audit_context(event));
-
-	zbx_db_execute("delete from autoreg_host where host='%s'", hostname);
+	hostname_esc = zbx_db_dyn_escape_string(hostname);
+	zbx_db_execute("delete from autoreg_host where host='%s'", hostname_esc);
 
 	zbx_vector_str_clear_ext(&hostnames, zbx_str_free);
 	zbx_vector_str_destroy(&hostnames);
@@ -1013,6 +1013,7 @@ void	op_host_del(const zbx_db_event *event)
 	zbx_audit_host_del(zbx_map_db_event_to_audit_context(event), hostid, hostname);
 out:
 	zbx_free(hostname);
+	zbx_free(hostname_esc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 

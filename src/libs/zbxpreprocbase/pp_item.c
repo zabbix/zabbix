@@ -38,6 +38,7 @@ zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(zbx_uint64_t hostid, unsigned 
 	preproc->refcount = 1;
 	preproc->steps_num = 0;
 	preproc->steps = NULL;
+	preproc->pp_revision = 0;
 	preproc->dep_itemids_num = 0;
 	preproc->dep_itemids = NULL;
 

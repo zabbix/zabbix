@@ -176,7 +176,7 @@ $ldap_tab = (new CFormGrid())
 							new CColHeader(_('Host')),
 							(new CColHeader(_('User groups')))->addClass(ZBX_STYLE_NOWRAP),
 							_('Default'),
-							''
+							_('Action')
 						]))->addClass(ZBX_STYLE_GREY)
 					)
 					->addItem(
@@ -470,7 +470,10 @@ $saml_tab = (new CFormGrid())
 					->addClass($saml_auth_enabled ? null : ZBX_STYLE_DISABLED)
 					->setHeader(
 						(new CRowHeader([
-							_('Name '), _('Media type'), _('Attribute'), ''
+							_('Name'),
+							_('Media type'),
+							_('Attribute'),
+							(new CColHeader(_('Action')))->setWidth('12%')
 						]))->addClass(ZBX_STYLE_GREY)
 					)
 					->addItem(

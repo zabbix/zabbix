@@ -134,6 +134,7 @@ AS_HELP_STRING([--with-ssh@<:@=DIR@:>@],[use SSH package @<:@default=no@:>@, DIR
       ENUM_CHECK([SSH_OPTIONS_CIPHERS_S_C],[libssh/libssh.h])
       ENUM_CHECK([SSH_OPTIONS_HMAC_C_S],[libssh/libssh.h])
       ENUM_CHECK([SSH_OPTIONS_HMAC_S_C],[libssh/libssh.h])
+      ENUM_CHECK([SSH_OPTIONS_PUBLICKEY_ACCEPTED_TYPES],[libssh/libssh.h])
     else
       AC_MSG_RESULT(no)
       SSH_CFLAGS=""

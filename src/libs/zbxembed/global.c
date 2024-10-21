@@ -88,7 +88,7 @@ static duk_ret_t	es_btoa(duk_context *ctx)
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot obtain parameter");
 
 	zbx_base64_encode_dyn(str, &b64str, (int)len);
-	duk_push_string(ctx, b64str);
+	es_push_result_string(ctx, b64str, strlen(b64str));
 	zbx_free(str);
 	zbx_free(b64str);
 
@@ -178,7 +178,7 @@ static duk_ret_t	es_md5(duk_context *ctx)
 
 	es_bin_to_hex(hash, ZBX_MD5_DIGEST_SIZE, md5sum);
 
-	duk_push_string(ctx, md5sum);
+	es_push_result_string(ctx, md5sum, ZBX_MD5_DIGEST_SIZE * 2);
 	zbx_free(md5sum);
 	zbx_free(str);
 
@@ -208,7 +208,7 @@ static duk_ret_t	es_sha256(duk_context *ctx)
 	zbx_sha256_hash_len(str, len, hash_res);
 	es_bin_to_hex((const unsigned char *)hash_res, ZBX_SHA256_DIGEST_SIZE, hash_res_stringhexes);
 
-	duk_push_string(ctx, hash_res_stringhexes);
+	es_push_result_string(ctx, hash_res_stringhexes, ZBX_SHA256_DIGEST_SIZE * 2);
 
 	zbx_free(str);
 
@@ -259,7 +259,7 @@ static duk_ret_t	es_hmac(duk_context *ctx)
 	if (SUCCEED != ret)
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot calculate HMAC");
 
-	duk_push_string(ctx, out);
+	es_push_result_string(ctx, out, strlen(out));
 	zbx_free(out);
 
 	return 1;

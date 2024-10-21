@@ -480,7 +480,7 @@ class testFormUserMedia extends CWebTest {
 			$this->assertEquals($row->getColumn('Status')->getText(), 'Disabled');
 
 			// Remove one of the media.
-			$row->getColumn('Action')->query('button:Remove')->one()->click();
+			$row->getColumn('Actions')->query('button:Remove')->one()->click();
 			$this->assertFalse($table->findRow('Send to', 'test@zabbix.com')->isValid());
 
 			$this->query('button', $action)->one()->click();

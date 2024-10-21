@@ -96,5 +96,9 @@ func (s *SmartCtl) Execute(args ...string) ([]byte, error) {
 		)
 	}
 
+	s.logr.Debugf(
+		"executed smartctl command: %s %s Got output: %q", cmd, strings.Join(cmdArgs, " "), out,
+	)
+
 	return out, nil
 }

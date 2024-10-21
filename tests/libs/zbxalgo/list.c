@@ -68,7 +68,7 @@ static void	test_list_range_values(int iterations, zbx_vector_ptr_t *values)
 
 		if (SUCCEED == zbx_list_pop(&list, ptr))
 		{
-			fail_msg("succeeded to pop empy list");
+			fail_msg("succeeded to pop empty list");
 		}
 		zbx_mock_assert_ptr_eq("value", NULL, ptr);
 	}

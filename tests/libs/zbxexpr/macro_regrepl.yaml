@@ -1,0 +1,290 @@
+---
+test case: simple replacement short value with longer value 
+in:
+  data: 't t t '
+  params: '"t","long"'
+
+out:
+  value: 'long long long '
+  return: SUCCEED
+---
+test case: simple replacement long value with shorter value 
+in:
+  data: 'longvalue longvalue123 -longvalue'
+  params: '"longvalue","short"'
+
+out:
+  value: 'short short123 -short'
+  return: SUCCEED
+---
+test case: one parameter
+in:
+  data: 'ABCabc123'
+  params: '"1"'
+
+out:
+  value: ''
+  return: FAIL
+---
+test case: two parameters
+in:
+  data: 'ABC123 ABC'
+  params: '"([A-Z]+)([0-9]+)","---"'
+
+out:
+  value: '--- ABC'
+  return: SUCCEED
+---
+test case: three parameters
+in:
+  data: 'ABCabc123'
+  params: '"1","2","3"'
+
+out:
+  value: ''
+  return: FAIL
+---
+test case: four parameters
+in:
+  data: 'ABC123 ABC'
+  params: '"([A-Z]+)([0-9]+)","---","([A-Z]+)","!!!"'
+
+out:
+  value: '--- !!!'
+  return: SUCCEED
+---
+test case: five parameters
+in:
+  data: 'ABCabc123'
+  params: '"1","2","3","4","5"'
+
+out:
+  value: ''
+  return: FAIL
+---
+test case: six parameters 
+in:
+  data: 'ABC123 ABC 123'
+  params: '"([A-Z]+)([0-9]+)","321","([A-Z]+)","!!!","([0-9]+)","+++"'
+
+out:
+  value: '+++ !!! +++'
+  return: SUCCEED
+---
+test case: seven parameters
+in:
+  data: 'ABCabc123'
+  params: '"1","2","3","4","5","6","7"'
+
+out:
+  value: ''
+  return: FAIL
+---
+test case: eight parameters 
+in:
+  data: 'ABC123 ABC 123'
+  params: '"([A-Z]+)([0-9]+)","321","([A-Z]+)","!!!","([0-9]+)","+++","!!!","stop"'
+
+out:
+  value: '+++ stop +++'
+  return: SUCCEED
+
+---
+test case: nine parameters
+in:
+  data: 'ABCabc123'
+  params: '"1","2","3","4","5","6","7","8","9"'
+
+out:
+  value: ''
+  return: FAIL
+
+---
+test case: ten parameters 
+in:
+  data: 'ABC123 ABC 123'
+  params: '"([A-Z]+)([0-9]+)","321","([A-Z]+)","!!!","([0-9]+)","+++","!!!","stop","stop","end"'
+
+out:
+  value: '+++ end +++'
+  return: SUCCEED
+---
+test case: replacement with 1st group
+in:
+  data: 'ABC123 ABC 123'
+  params: '"([A-Z]+)([0-9]+)","\1"'
+
+out:
+  value: 'ABC ABC 123'
+  return: SUCCEED
+---
+test case: replacement with 2d group
+in:
+  data: 'ABC123 ABC 123'
+  params: '"([A-Z]+)([0-9]+)","\2"'
+
+out:
+  value: '123 ABC 123'
+  return: SUCCEED
+
+---
+test case: replace first accurance
+in:
+  data: '123Log line test657'
+  params: '^[0-9]+,Problem'
+
+out:
+  value: 'ProblemLog line test657'
+  return: SUCCEED
+---
+test case: replace first accurance as group
+in:
+  data: '123 Log line test657'
+  params: '"^([0-9]+)",Problem'
+
+out:
+  value: 'Problem Log line test657'
+  return: SUCCEED
+---
+test case: replace first accurance with pattern including group
+in:
+  data: '123 Log line'
+  params: '"^([0-9]+)",Problem ID: \1'
+
+out:
+  value: 'Problem ID: 123 Log line'
+  return: SUCCEED
+---
+test case: replace all string
+in:
+  data: 'Log line'
+  params: '".*","Problem ID: \1"'
+
+out:
+  value: 'Problem ID: '
+  return: SUCCEED
+---
+test case: replace 2 matches using 2 groups
+in:
+  data: 'MySQL crashed errno 123 ORACLE not supported 0'
+  params: '"(\w+).*?([0-9]+)","Problem ID: \1_\2"'
+
+out:
+  value: 'Problem ID: MySQL_123 Problem ID: ORACLE_0'
+  return: SUCCEED
+---
+test case: invalid regular expression
+in:
+  data: 'Log line'
+  params: '"([1-9]+","Problem ID: \1"'
+
+out:
+  value: ''
+  return: FAIL
+---
+test case: only first group
+in:
+  data: 'customername_1'
+  params: '"(.*)_([0-9]+)","\1"'
+
+out:
+  value: 'customername'
+  return: SUCCEED
+
+---
+test case: replace with empty value
+in:
+  data: 't t t t'
+  params: 't,""'
+
+out:
+  value: '   '
+  return: SUCCEED
+
+---
+test case: empty regular expression ""
+in:
+  data: 'customername_1'
+  params: '"",""'
+
+out:
+  value: 'customername_1'
+  return: SUCCEED
+
+---
+test case: empty data
+in:
+  data: ''
+  params: '"[0-9]+","1"'
+
+out:
+  value: ''
+  return: SUCCEED
+
+---
+test case: replace with escaped backslash
+in:
+  data: 'customername_1'
+  params: '"(.*)_([0-9]+)",\\'
+
+out:
+  value: '\'
+  return: SUCCEED
+
+---
+test case: empty regular expression
+in:
+  data: 'customername_1'
+  params: ',a'
+
+out:
+  value: 'customername_1'
+  return: SUCCEED
+---
+test case: empty regular expression and empty data
+in:
+  data: ''
+  params: ',a'
+
+out:
+  value: ''
+  return: SUCCEED
+---
+test case: replace empty data
+in:
+  data: ''
+  params: '.*,@'
+
+out:
+  value: '@'
+  return: SUCCEED
+
+---
+test case: insertion test
+in:
+  data: '0tttttt1234aaaaa5'
+  params: '"(?=[0123456789])",A'
+
+out:
+  value: 'A0ttttttA1A2A3A4aaaaaA5'
+  return: SUCCEED
+---
+test case: replace end of string
+in:
+  data: '12345'
+  params: '$,@'
+
+out:
+  value: '12345@'
+  return: SUCCEED
+---
+test case: output overflow
+in:
+  data: 't t t '
+  params: '.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0,.*,\0\0\0'
+
+out:
+  value: ''
+  return: FAIL
+
+...

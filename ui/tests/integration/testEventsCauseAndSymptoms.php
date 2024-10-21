@@ -54,6 +54,15 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 				'{EVENT.CAUSE.VALUE}' => self::EVENT_START
 			]);
 		}
+		else {
+			$replacements = array_merge($replacements, [
+				'{EVENT.CAUSE.NAME}' => '*UNKNOWN*',
+				'{EVENT.CAUSE.ID}' => '*UNKNOWN*',
+				'{EVENT.CAUSE.SOURCE}' => '*UNKNOWN*',
+				'{EVENT.CAUSE.OBJECT}' => '*UNKNOWN*',
+				'{EVENT.CAUSE.VALUE}' => '*UNKNOWN*'
+			]);
+		}
 
 		$from = [];
 		$to = [];

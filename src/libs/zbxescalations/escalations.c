@@ -31,14 +31,13 @@ void	zbx_init_escalations(int escalators_num, zbx_rtc_notify_generic_cb_t rtc_no
 
 void	zbx_start_escalations(zbx_ipc_async_socket_t *rtc, zbx_vector_escalation_new_ptr_t *escalations)
 {
-	zbx_vector_uint64_pair_t	*trigger_escalations;
-	zbx_uint64_pair_t		pair;
+	zbx_vector_uint64_t	*escalator_escalationids;
 
-	trigger_escalations = (zbx_vector_uint64_pair_t *)zbx_malloc(NULL, (size_t)escalators_number *
-			sizeof(zbx_vector_uint64_pair_t));
+	escalator_escalationids = (zbx_vector_uint64_t *)zbx_malloc(NULL, (size_t)escalators_number *
+			sizeof(zbx_vector_uint64_t));
 
 	for (int i = 0; i < escalators_number; i++)
-		zbx_vector_uint64_pair_create(&trigger_escalations[i]);
+		zbx_vector_uint64_create(&escalator_escalationids[i]);
 
 	for (int i = 0; i < escalations->values_num; i++)
 	{
@@ -46,32 +45,26 @@ void	zbx_start_escalations(zbx_ipc_async_socket_t *rtc, zbx_vector_escalation_ne
 
 		if (EVENT_OBJECT_TRIGGER == escalation->event->object)
 		{
-			zbx_uint64_t	triggerid = escalation->event->objectid;
-			int		escalator_process_num;
+			int	escalator_process_num;
 
-			pair.first = escalation->escalationid;
-			pair.second = triggerid;
-			escalator_process_num = (int)(triggerid % (uint64_t)escalators_number + 1);
-			zbx_vector_uint64_pair_append_ptr(&trigger_escalations[escalator_process_num - 1], &pair);
+			escalator_process_num = (int)(escalation->event->objectid % (uint64_t)escalators_number + 1);
+			zbx_vector_uint64_append(&escalator_escalationids[escalator_process_num - 1],
+					escalation->escalationid);
 		}
 	}
 
 	for (int i = 0; i < escalators_number; i++)
 	{
-		if (0 != trigger_escalations[i].values_num)
+		if (0 != escalator_escalationids[i].values_num)
 		{
-			int		escalations_per_process = trigger_escalations[i].values_num;
-			zbx_uint32_t	notify_size = (zbx_uint32_t)(sizeof(zbx_uint32_t) +
-					2 * (size_t)escalations_per_process * sizeof(zbx_uint64_t));
+			int		escalations_per_process = escalator_escalationids[i].values_num;
+			zbx_uint32_t	notify_size = (zbx_uint32_t)(sizeof(int) +
+					(size_t)escalations_per_process * sizeof(zbx_uint64_t));
 			unsigned char	*notify_data = zbx_malloc(NULL, notify_size), *ptr = notify_data;
 
 			ptr += zbx_serialize_value(ptr, escalations_per_process);
 			for (int j = 0; j < escalations_per_process; j++)
-			{
-				pair = trigger_escalations[i].values[j];
-				ptr += zbx_serialize_value(ptr, pair.first);
-				ptr += zbx_serialize_value(ptr, pair.second);
-			}
+				ptr += zbx_serialize_value(ptr, escalator_escalationids[i].values[j]);
 
 			rtc_notify_generic_cb(rtc, ZBX_PROCESS_TYPE_ESCALATOR, i + 1, ZBX_RTC_ESCALATOR_NOTIFY,
 					(char *)notify_data, notify_size);
@@ -80,9 +73,9 @@ void	zbx_start_escalations(zbx_ipc_async_socket_t *rtc, zbx_vector_escalation_ne
 	}
 
 	for (int i = 0; i < escalators_number; i++)
-		zbx_vector_uint64_pair_destroy(&trigger_escalations[i]);
+		zbx_vector_uint64_destroy(&escalator_escalationids[i]);
 
-	zbx_free(trigger_escalations);
+	zbx_free(escalator_escalationids);
 }
 
 void	zbx_escalation_new_ptr_free(zbx_escalation_new_t *escalation)

@@ -197,7 +197,7 @@ class testFormServicesSla extends CWebTest {
 		$this->assertSame(['Equals', 'Contains'], $form->getField('name:service_tags[0][operator]')->getOptions()->asText());
 
 		$tags_table_elements = [
-			'headers' => ['Name', 'Operation', 'Value', 'Action'],
+			'headers' => ['Name', 'Operation', 'Value', ''],
 			'buttons' => ['Add', 'Remove'],
 			'count' => 2
 		];
@@ -209,7 +209,7 @@ class testFormServicesSla extends CWebTest {
 		$downtimes_table = $form->query('id:excluded-downtimes')->asMultifieldTable()->waitUntilVisible()->one();
 
 		$downtimes_table_elements = [
-			'headers' => ['Start time', 'Duration', 'Name', 'Action'],
+			'headers' => ['Start time', 'Duration', 'Name', 'Actions'],
 			'buttons' => ['Add', 'Edit', 'Remove'],
 			'count' => 1
 		];
@@ -288,7 +288,7 @@ class testFormServicesSla extends CWebTest {
 				'Start time' => date('Y-m-d', strtotime(date('Y-m-d')."+1 days")).' 00:00',
 				'Duration' => '1h',
 				'Name' => '!@#$%^&*()_+123Zabbix',
-				'Action' => 'Edit Remove'
+				'Actions' => 'Edit Remove'
 			]
 		];
 		$this->assertTableData($table_data, 'id:excluded-downtimes');

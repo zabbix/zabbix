@@ -15,7 +15,7 @@
 #include "zbxhttppoller.h"
 
 #include "zbxtimekeeper.h"
-#include "zbxdbhigh.h"
+#include "zbxdb.h"
 #include "zbxlog.h"
 #include "zbxnix.h"
 #include "zbxself.h"

@@ -93,7 +93,11 @@ else {
 			(new CDiv())
 				->addClass(ZBX_STYLE_CELL)
 				->addClass('lazyload-image')
-				->addItem([$img, BR(), new CLink($image['name'], $edit_url->getUrl())])
+				->addItem([
+					$img,
+					BR(),
+					(new CLink($image['name'], $edit_url->getUrl()))->addClass(ZBX_STYLE_WORDBREAK)
+				])
 		);
 
 		if ((++$count % 5) == 0) {

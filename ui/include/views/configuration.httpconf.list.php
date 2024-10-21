@@ -184,9 +184,15 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 		}
 	}
 
+	$host = $this->data['hostid'] == 0
+		? (new CLink($httpTest['hostname']))
+			->setAttribute('data-hostid', $httpTest['hostid'])
+			->addClass('js-edit-'.$data['context'])
+		: null;
+
 	$httpTable->addRow([
 		new CCheckBox('group_httptestid['.$httpTest['httptestid'].']', $httpTest['httptestid']),
-		($this->data['hostid'] > 0) ? null : $httpTest['hostname'],
+		$host,
 		$name,
 		$httpTest['stepscnt'],
 		$httpTest['delay'],
@@ -258,7 +264,8 @@ $html_page
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'checkbox_hash' => $data['hostid']
+		'checkbox_hash' => $data['hostid'],
+		'form_name' => $httpForm->getName()
 	]).');
 '))
 	->setOnDocumentReady()

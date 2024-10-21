@@ -20,8 +20,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: resolves macros in trigger expression                             *
- *         (ZBX_MACRO_TYPE_TRIGGER_EXPRESSION) context                        *
+ * Purpose: resolves macros in trigger expression context                     *
  *                                                                            *
  * Parameters: p          - [IN] macro resolver data structure                *
  *             args       - [IN] list of variadic parameters                  *

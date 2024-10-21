@@ -1,0 +1,390 @@
+[
+    {
+        "value": "*myitem*_\"value\"",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([^a-z])", "\\\\\\1"]
+        },
+        "result": "\\*myitem\\*\\_\\\"value\\\""
+    },
+    {
+        "value": "*myitem*_\"value\"",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["myitem", "test"]
+        },
+        "result": "*test*_\"value\""
+    },
+    {
+        "value": "*myitem*_\"value\"",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["myitem", "test", "e", "es"]
+        },
+        "result": "*tesst*_\"values\""
+    },
+    {
+        "value": "*myitem*_\"value\"",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["myitem", "test", "e", "es", "tesst", "www123"]
+        },
+        "result": "*www123*_\"values\""
+    },
+    {
+        "value": "ABC123 ABC 123",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([A-Z]+)([0-9]+)", "321", "([A-Z]+)", "!!!", "([0-9]+)", "+++"]
+        },
+        "result": "+++ !!! +++"
+    },
+    {
+        "value": "ABC123 ABC 123",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([A-Z]+)([0-9]+)", "321", "([A-Z]+)", "!!!", "([0-9]+)", "+++", "!!!", "stop", "stop",
+                "end"
+            ]
+        },
+        "result": "+++ end +++"
+    },
+    {
+        "value": "abc_def_ghi",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["_", "-"]
+        },
+        "result": "abc-def-ghi"
+    },
+    {
+        "value": "abc_def_ghi",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["_", ""]
+        },
+        "result": "abcdefghi"
+    },
+    {
+        "value": "abc_def_ghi",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["_", "\\\\_"]
+        },
+        "result": "abc\\_def\\_ghi"
+    },
+    {
+        "value": "abc_def_ghi123",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["[^a-z]", "-"]
+        },
+        "result": "abc-def-ghi---"
+    },
+    {
+        "value": "test_value",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["/a{2,1}/", "123"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "test_value",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["myitem"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "test_value",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["myitem", "test", "abc"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "123Log line test657",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["^[0-9]+", "Problem"]
+        },
+        "result": "ProblemLog line test657"
+    },
+    {
+        "value": "123 Log line",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["^([0-9]+)", "Problem ID: \\1"]
+        },
+        "result": "Problem ID: 123 Log line"
+    },
+    {
+        "value": "Log line",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["Log line", "Problem ID:"]
+        },
+        "result": "Problem ID:"
+    },
+    {
+        "value": "Log line",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": [".*", "Problem ID:\\1"]
+        },
+        "result": "Problem ID:Problem ID:"
+    },
+    {
+        "value": "MySQL crashed err no 123 ORACLE not supported 0",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["(\\w+).*?([0-9]+)", "Problem ID: \\1_\\2"]
+        },
+        "result": "Problem ID: MySQL_123 Problem ID: ORACLE_0"
+    },
+    {
+        "value": "Log line",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([1-9]+", "Problem ID: \\1"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "customername_1",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["(.*)_([0-9]+)", "\\1"]
+        },
+        "result": "customername"
+    },
+    {
+        "value": "customername_1",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["(.*)_([0-9]+)", ""]
+        },
+        "result": ""
+    },
+    {
+        "value": "customername_1",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["''", "''"]
+        },
+        "result": "customername_1"
+    },
+    {
+        "value": "customername_1",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["(.*)_([0-9]+)", "\\\\"]
+        },
+        "result": "\\"
+    },
+    {
+        "value": "oldParam=value",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["OLDPARAM", "newParam"]
+        },
+        "result": "oldParam=value"
+    },
+    {
+        "value": "oldparam=value",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["oldparam","newParam\\/"]
+        },
+        "result": "newParam\\/=value"
+    },
+    {
+        "value": "oldparam=value",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["oldparam","newParam/"]
+        },
+        "result": "newParam/=value"
+    },
+    {
+        "value": "test_value",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["com/", "newParam"]
+        },
+        "result": "test_value"
+    },
+    {
+        "value": "test_value",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["","test"]
+        },
+        "result": "test_value"
+    },
+    {
+        "value": "testing_value",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["[aebcd]", "test"]
+        },
+        "result": "tteststing_vtestlutest"
+    },
+    {
+        "value": "regrepl testing",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["\\w+$", "test"]
+        },
+        "result": "regrepl test"
+    },
+    {
+        "value": "test/macro/functions",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["[/]", "\\/"]
+        },
+        "result": "test\\/macro\\/functions"
+    },
+    {
+        "value": "test/macro/functions",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["/", "\\/"]
+        },
+        "result": "test\\/macro\\/functions"
+    },
+    {
+        "value": "test/macro/functions",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["[\\/]", "test"]
+        },
+        "result": "testtestmacrotestfunctions"
+    },
+    {
+        "value": "value_ППП_aaa_123",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["П", "A"]
+        },
+        "result": "value_AAA_aaa_123"
+    },
+    {
+        "value": "абвгшд",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["[абвгдшДЙя]", "test"]
+        },
+        "result": "testtesttesttesttesttest"
+    },
+    {
+        "value": "абвгшд",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["[абвгдшДЙя]", "б"]
+        },
+        "result": "бббббб"
+    },
+    {
+        "value": "abcdef",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["2{0}", "test", "2{0}", "test" ,"2{0}", "test" ,"2{0}", "test" ,"2{0}", "test" ,"2{0}",
+                "test" ,"2{0}", "test" ,"2{0}", "test" ,"2{0}", "test"
+            ]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "abcdef",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["2{0}", "test", "2{0}", "test" ,"2{0}", "test" ,"2{0}", "test"]
+        },
+        "result": "testttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestatestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestbtestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestctestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestdtestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestftestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststesttteststestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttestttestttesteteststestttestttestttesteteststestttestetestttesteteststesttteststestttesteteststestttestttestttesteteststestttest"
+    },
+    {
+        "value": "abcdefghijk",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([a])([b])([c])([d])([e])([f])([g])([h])([i])([j])([k])", "X\\10"]
+        },
+        "result": "Xa0"
+    },
+    {
+        "value": "abcdefghijk",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([a])([b])([c])([d])([e])([f])([g])([h])([i])([j])([k])", "X\\30"]
+        },
+        "result": "Xc0"
+    },
+    {
+        "value": "abcdefghijk",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([a])([b])([c])([d])([e])([f])([g])([h])([i])([j])([k])", "X\\0"]
+        },
+        "result": "Xabcdefghijk"
+    },
+    {
+        "value": "pārbaude",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["ā", "\\"]
+        },
+        "result": "p\\rbaude"
+    },
+    {
+        "value": "тестовые данные",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["\\A\\w+", "test ", "\\Z", "test"]
+        },
+        "result": "тестовые данныеtest"
+    },
+    {
+        "value": "parbaude",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["\\w+\\z", "test"]
+        },
+        "result": "test"
+    },
+    {
+        "value": "pārbaude",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["\\w+\\z", "test"]
+        },
+        "result": "pātest"
+    },
+    {
+        "value": "pārbaude",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["^\\w+", "test"]
+        },
+        "result": "testārbaude"
+    },
+    {
+        "value": "pārbaude",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["\\w+\\z", "test", "^\\w+", "test"]
+        },
+        "result": "testātest"
+    },
+    {
+        "value": "test123 pārbaude 123",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["\\w+$", "test"]
+        },
+        "result": "test123 pārbaude test"
+    }
+]

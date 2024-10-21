@@ -265,7 +265,7 @@ class testItemRate extends CIntegrationTest {
 		[
 			'api_request' => false,
 			'expected_result' => false,
-			'expected_error' => 'Cannot evaluate expression: invalid string values of backet for function at "histogram_quantile(0.8,0.1,last(//rate[0.1]),"Inf2",last(//rate[Inf2]))"',
+			'expected_error' => 'Cannot evaluate expression: invalid string values of bucket for function at "histogram_quantile(0.8,0.1,last(//rate[0.1]),"Inf2",last(//rate[Inf2]))"',
 			'item' => [
 				'name' => 'histogram_quantile-fail-Inf2',
 				'params' => 'histogram_quantile(0.8,0.1,last(/'.'/rate[0.1]),"Inf2",last(/'.'/rate[Inf2]))',

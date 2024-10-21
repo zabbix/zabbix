@@ -29,7 +29,7 @@ func TestMain(m *testing.M) {
 	fixtures = make(map[command][]byte)
 
 	for _, cmd := range []command{
-		cmdDf, cmdPgDump, cmdOSDCrushRuleDump, cmdOSDCrushTree, cmdOSDDump, cmdHealth, cmdStatus,
+		cmdDf, cmdPgDump, cmdOSDCrushRuleDump, cmdOSDCrushTree, cmdOSDDump, cmdHealth,
 	} {
 		var err error
 		fixtures[cmd], err = os.ReadFile(

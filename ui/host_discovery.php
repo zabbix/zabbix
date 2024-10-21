@@ -133,10 +133,12 @@ $fields = [
 									null
 								],
 	'timeout' =>				[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO,	null,
-									'(isset({add}) || isset({update})) && isset({type})'.
-									' && '.IN([ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE,
-										ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
-										ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
+									'(isset({add}) || isset({update})) && isset({custom_timeout})'.
+									' && {custom_timeout} == '.ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED.
+									' && isset({type}) && '.IN([ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE,
+										ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
+										ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP,
+										ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
 									], 'type'),
 									_('Timeout')
 								],
@@ -776,10 +778,12 @@ if (hasRequest('form')) {
 		? CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
 		: CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 
+	$data['inherited_timeout'] = array_key_exists($data['type'], $data['inherited_timeouts']['timeouts'])
+		? $data['inherited_timeouts']['timeouts'][$data['type']]
+		: $default_timeout;
+
 	if (!$data['custom_timeout']) {
-		$data['timeout'] = array_key_exists($data['type'], $data['inherited_timeouts']['timeouts'])
-			? $data['inherited_timeouts']['timeouts'][$data['type']]
-			: $default_timeout;
+		$data['timeout'] = $data['inherited_timeout'];
 	}
 
 	if (!hasRequest('form_refresh')) {

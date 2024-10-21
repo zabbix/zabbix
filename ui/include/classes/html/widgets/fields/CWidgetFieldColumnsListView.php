@@ -29,7 +29,7 @@ class CWidgetFieldColumnsListView extends CWidgetFieldView {
 			'',
 			(new CColHeader(_('Name')))->addStyle('width: 39%'),
 			(new CColHeader(_('Data')))->addStyle('width: 59%'),
-			_('Action')
+			_('Actions')
 		];
 
 		$row_actions = [

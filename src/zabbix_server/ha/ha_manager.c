@@ -18,7 +18,6 @@
 #include "../audit/audit_server.h"
 
 #include "zbx_ha_constants.h"
-#include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 #include "zbxthreads.h"
@@ -35,6 +34,8 @@
 #include "zbxdb.h"
 #include "zbxalgo.h"
 #include "zbxlog.h"
+#include "zbxself.h"
+#include "zbxtimekeeper.h"
 
 #define ZBX_HA_POLL_PERIOD	5
 
@@ -82,6 +83,8 @@ typedef struct
 
 	const char	*name;
 	char		*error;
+
+	zbx_dbconn_t	*dbconn;
 }
 zbx_ha_info_t;
 
@@ -278,15 +281,15 @@ static void	ha_set_error(zbx_ha_info_t *info, const char *fmt, ...)
 static int	ha_db_begin(zbx_ha_info_t *info)
 {
 	if (ZBX_DB_DOWN == info->db_status)
-		info->db_status = zbx_db_connect(ZBX_DB_CONNECT_ONCE);
+		info->db_status = zbx_dbconn_open(info->dbconn);
 
 	if (ZBX_DB_OK <= info->db_status)
-		info->db_status = zbx_db_begin_basic();
+		info->db_status = zbx_dbconn_begin(info->dbconn);
 
 	if (ZBX_DB_FAIL == info->db_status)
 		ha_set_error(info, "database error");
 	else if (ZBX_DB_DOWN == info->db_status)
-		zbx_db_close();
+		zbx_dbconn_close(info->dbconn);
 
 	return info->db_status;
 }
@@ -300,16 +303,16 @@ static int	ha_db_begin(zbx_ha_info_t *info)
  ******************************************************************************/
 static int	ha_db_rollback(zbx_ha_info_t *info)
 {
-	if (ZBX_DB_OK > (info->db_status = zbx_db_rollback_basic()))
+	if (ZBX_DB_OK > (info->db_status = zbx_dbconn_rollback(info->dbconn)))
 	{
 		if (ZBX_DB_DOWN == info->db_status)
-			zbx_db_close();
+			zbx_dbconn_close(info->dbconn);
 	}
 
 	if (ZBX_DB_FAIL == info->db_status)
 		ha_set_error(info, "database error");
 	else if (ZBX_DB_DOWN == info->db_status)
-		zbx_db_close();
+		zbx_dbconn_close(info->dbconn);
 
 	return info->db_status;
 }
@@ -324,16 +327,16 @@ static int	ha_db_rollback(zbx_ha_info_t *info)
 static int	ha_db_commit(zbx_ha_info_t *info)
 {
 	if (ZBX_DB_OK <= info->db_status)
-		info->db_status = zbx_db_commit_basic();
+		info->db_status = zbx_dbconn_commit(info->dbconn);
 
 	if (ZBX_DB_OK > info->db_status)
 	{
-		zbx_db_rollback_basic();
+		zbx_dbconn_rollback(info->dbconn);
 
 		if (ZBX_DB_FAIL == info->db_status)
 			ha_set_error(info, "database error");
 		else
-			zbx_db_close();
+			zbx_dbconn_close(info->dbconn);
 	}
 
 	return info->db_status;
@@ -354,7 +357,7 @@ static zbx_db_result_t	ha_db_select(zbx_ha_info_t *info, const char *sql, ...)
 		return NULL;
 
 	va_start(args, sql);
-	result = zbx_db_vselect(sql, args);
+	result = zbx_dbconn_vselect(info->dbconn, sql, args);
 	va_end(args);
 
 	if (NULL == result)
@@ -384,7 +387,7 @@ static int	ha_db_execute(zbx_ha_info_t *info, const char *sql, ...)
 		return FAIL;
 
 	va_start(args, sql);
-	info->db_status = zbx_db_vexecute(sql, args);
+	info->db_status = zbx_dbconn_vexecute(info->dbconn, sql, args);
 	va_end(args);
 
 	return ZBX_DB_OK <= info->db_status ? SUCCEED : FAIL;
@@ -679,7 +682,7 @@ static void	ha_flush_audit(zbx_ha_info_t *info)
 		return;
 	}
 
-	info->db_status = zbx_audit_flush_once(ZBX_AUDIT_HA_CONTEXT);
+	info->db_status = zbx_audit_flush_dbconn(info->dbconn, ZBX_AUDIT_HA_CONTEXT);
 }
 
 /******************************************************************************
@@ -1665,6 +1668,7 @@ out:
  ******************************************************************************/
 int	zbx_ha_start(zbx_rtc_t *rtc, zbx_ha_config_t *ha_config, char **error)
 {
+#define ZBX_HA_PROCESS_NUM	1
 	int			ret = FAIL, status;
 	zbx_uint32_t		code = 0;
 	zbx_thread_args_t	args;
@@ -1676,6 +1680,8 @@ int	zbx_ha_start(zbx_rtc_t *rtc, zbx_ha_config_t *ha_config, char **error)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	args.args = (void *)ha_config;
+	args.info.process_type = ZBX_PROCESS_TYPE_HA_MANAGER;
+	args.info.process_num = ZBX_HA_PROCESS_NUM;
 	zbx_thread_start(ha_manager_thread, &args, &ha_pid);
 
 	if (ZBX_THREAD_ERROR == ha_pid)
@@ -1735,6 +1741,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+#undef ZBX_HA_PROCESS_NUM
 }
 
 /******************************************************************************
@@ -1832,6 +1839,7 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 	zbx_ha_info_t		info;
 	zbx_timespec_t		timeout;
 	zbx_ha_config_t		ha_config;
+	const zbx_thread_info_t	*thread_info = &((zbx_thread_args_t *)args)->info;
 
 	zbx_setproctitle("ha manager");
 
@@ -1871,6 +1879,9 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 	info.auditlog_enabled = 0;
 	info.auditlog_mode = 0;
 
+	info.dbconn = zbx_dbconn_create();
+	zbx_dbconn_set_connect_options(info.dbconn, ZBX_DB_CONNECT_ONCE);
+
 	tick = zbx_time();
 
 	if (ZBX_NODE_STATUS_UNKNOWN == info.ha_status)
@@ -1889,6 +1900,8 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 		nextcheck *= 3;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "HA manager started in %s mode", zbx_ha_status_str(info.ha_status));
+
+	zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_BUSY);
 
 	while (SUCCEED != pause && ZBX_NODE_STATUS_ERROR != info.ha_status)
 	{
@@ -1930,7 +1943,9 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 		timeout.sec = (int)(tick - now);
 		timeout.ns = (int)((tick - now) * 1000000000) % 1000000000;
 
+		zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_IDLE);
 		(void)zbx_ipc_service_recv(&service, &timeout, &client, &message);
+		zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_BUSY);
 
 		if (NULL != message)
 		{
@@ -1986,7 +2001,9 @@ pause:
 
 	while (SUCCEED != stop)
 	{
+		zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_IDLE);
 		(void)zbx_ipc_service_recv(&service, &timeout, &client, &message);
+		zbx_update_selfmon_counter(thread_info, ZBX_PROCESS_STATE_BUSY);
 
 		if (ZBX_NODE_STATUS_STANDBY == info.ha_status || ZBX_NODE_STATUS_ACTIVE == info.ha_status)
 			ha_db_update_lastaccess(&info);
@@ -2018,7 +2035,7 @@ pause:
 
 	ha_db_update_exit_status(&info);
 
-	zbx_db_close();
+	zbx_dbconn_free(info.dbconn);
 
 	zbx_ipc_async_socket_close(&rtc_socket);
 	zbx_ipc_service_close(&service);

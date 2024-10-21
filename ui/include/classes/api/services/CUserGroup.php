@@ -280,7 +280,7 @@ class CUserGroup extends CApiService {
 
 		$this->checkDuplicates(array_column($usrgrps, 'name'));
 		$this->checkUsers($usrgrps);
-		$this->checkHimself($usrgrps, __FUNCTION__);
+		$this->checkOneself($usrgrps, __FUNCTION__);
 		$this->checkTemplateGroups($usrgrps);
 		$this->checkHostGroups($usrgrps);
 		$this->checkTagFilters($usrgrps);
@@ -415,8 +415,7 @@ class CUserGroup extends CApiService {
 			$this->checkDuplicates($names);
 		}
 		$this->checkUsers($usrgrps, $db_usrgrps);
-		$this->checkHimself($usrgrps, __FUNCTION__, $db_usrgrps);
-		$this->checkUsersWithoutGroups($usrgrps);
+		$this->checkOneself($usrgrps, __FUNCTION__, $db_usrgrps);
 		$this->checkTemplateGroups($usrgrps);
 		$this->checkHostGroups($usrgrps);
 		$this->checkTagFilters($usrgrps);
@@ -608,7 +607,7 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Auxiliary function for checkHimself().
+	 * Auxiliary function for checkOneself().
 	 * Returns true if user group has GROUP_GUI_ACCESS_DISABLED or GROUP_STATUS_DISABLED states.
 	 *
 	 * @param array  $usrgrp
@@ -629,7 +628,7 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Additional check to exclude an opportunity to deactivate himself.
+	 * Additional check to exclude an opportunity to deactivate oneself.
 	 *
 	 * @param array  $usrgrps
 	 * @param string $method
@@ -637,7 +636,7 @@ class CUserGroup extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkHimself(array $usrgrps, $method, array $db_usrgrps = null) {
+	private function checkOneself(array $usrgrps, $method, array $db_usrgrps = null) {
 		if ($method === 'validateUpdate') {
 			$groups_users = [];
 
@@ -671,86 +670,10 @@ class CUserGroup extends CApiService {
 				foreach ($usrgrp['users'] as $user) {
 					if (bccomp(self::$userData['userid'], $user['userid']) == 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('User cannot add himself to a disabled group or a group with disabled GUI access.')
+							_('User cannot add oneself to a disabled group or a group with disabled GUI access.')
 						);
 					}
 				}
-			}
-		}
-	}
-
-	/**
-	 * Check to exclude an opportunity to leave user without user groups.
-	 *
-	 * @param array  $usrgrps
-	 * @param array  $usrgrps[]['usrgrpid']
-	 * @param array  $usrgrps[]['users']              (optional)
-	 * @param string $usrgrps[]['users'][]['userid']
-	 *
-	 * @throws APIException
-	 */
-	private function checkUsersWithoutGroups(array $usrgrps) {
-		$users_groups = [];
-
-		foreach ($usrgrps as $usrgrp) {
-			if (array_key_exists('users', $usrgrp)) {
-				$users_groups[$usrgrp['usrgrpid']] = [];
-
-				foreach ($usrgrp['users'] as $user) {
-					$users_groups[$usrgrp['usrgrpid']][$user['userid']] = true;
-				}
-			}
-		}
-
-		if (!$users_groups) {
-			return;
-		}
-
-		$db_users_groups = DB::select('users_groups', [
-			'output' => ['usrgrpid', 'userid'],
-			'filter' => ['usrgrpid' => array_keys($users_groups)]
-		]);
-
-		$ins_userids = [];
-		$del_userids = [];
-
-		foreach ($db_users_groups as $db_user_group) {
-			if (array_key_exists($db_user_group['userid'], $users_groups[$db_user_group['usrgrpid']])) {
-				unset($users_groups[$db_user_group['usrgrpid']][$db_user_group['userid']]);
-			}
-			else {
-				if (!array_key_exists($db_user_group['userid'], $del_userids)) {
-					$del_userids[$db_user_group['userid']] = 0;
-				}
-				$del_userids[$db_user_group['userid']]++;
-			}
-		}
-
-		foreach ($users_groups as $usrgrpid => $userids) {
-			foreach (array_keys($userids) as $userid) {
-				$ins_userids[$userid] = true;
-			}
-		}
-
-		$del_userids = array_diff_key($del_userids, $ins_userids);
-
-		if (!$del_userids) {
-			return;
-		}
-
-		$db_users = DBselect(
-			'SELECT u.userid,u.username,count(ug.usrgrpid) as usrgrp_num'.
-			' FROM users u,users_groups ug'.
-			' WHERE u.userid=ug.userid'.
-				' AND '.dbConditionInt('u.userid', array_keys($del_userids)).
-			' GROUP BY u.userid,u.username'
-		);
-
-		while ($db_user = DBfetch($db_users)) {
-			if ($db_user['usrgrp_num'] == $del_userids[$db_user['userid']]) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('User "%1$s" cannot be without user group.', $db_user['username'])
-				);
 			}
 		}
 	}
@@ -1372,7 +1295,6 @@ class CUserGroup extends CApiService {
 		}
 
 		self::checkProvisionedUsersExist($db_usrgrps);
-		$this->checkUsersWithoutGroups($usrgrps);
 	}
 
 	private static function checkProvisionedUsersExist(array $db_user_groups): void {

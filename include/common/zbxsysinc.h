@@ -329,10 +329,6 @@
 #	include <sys/shm.h>
 #endif
 
-#ifdef HAVE_SYS_FILE_H
-#	include <sys/file.h>
-#endif
-
 #ifdef HAVE_MATH_H
 #	include <math.h>
 #endif
@@ -423,6 +419,10 @@
 
 #ifdef HAVE_MALLOC_H
 #	include"malloc.h"
+#endif
+
+#ifdef HAVE_LIBGEN_H
+#	include <libgen.h>
 #endif
 
 #endif

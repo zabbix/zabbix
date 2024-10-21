@@ -73,7 +73,11 @@ class BinaryValueGet extends CController {
 			]);
 
 			if ($history_value) {
-				$result['value'] = $history_value[0]['value'];
+				$result['value'] = $history_value[0]['value'] !== ''
+					? $history_value[0]['value']
+					: italic(_('Empty value.'))
+						->addClass(ZBX_STYLE_GREY)
+						->toString();
 			}
 		}
 

@@ -88,7 +88,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 
 		// Clicks button named "Unlink" next to a template by name.
 		$this->assertTrue($dialog->query('link', $template)->exists());
-		$dialog->query('id:linked-templates')->asTable()->one()->findRow('Name', $template)->getColumn('Action')
+		$dialog->query('id:linked-templates')->asTable()->one()->findRow('Name', $template)->getColumn('Actions')
 				->query('button:Unlink')->one()->click();
 		$this->assertFalse($dialog->query('link', $template)->exists());
 
@@ -148,7 +148,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 
 		// Clicks button named "Unlink and clear" next to a template by name.
 		$this->assertTrue($dialog->query('link', $template)->exists());
-		$dialog->query('id:linked-templates')->asTable()->one()->findRow('Name', $template)->getColumn('Action')
+		$dialog->query('id:linked-templates')->asTable()->one()->findRow('Name', $template)->getColumn('Actions')
 				->query('button:Unlink and clear')->one()->click();
 		$this->assertFalse($dialog->query('link', $template)->exists());
 

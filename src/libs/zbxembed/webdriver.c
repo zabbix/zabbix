@@ -20,8 +20,10 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxcurl.h"
+#include "zbxnum.h"
 
 #define WEBDRIVER_INVALID_SESSIONID_ERROR	"invalid session id"
+#define WEBDRIVER_ELEMENT_ID			"element-6066-11e4-a52e-4f735466cecf"
 
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
@@ -274,6 +276,13 @@ static int	webdriver_session_query(zbx_webdriver_t *wd, const char *method, cons
 		goto out;
 	}
 
+	if (0 == wd->data_offset)
+	{
+		*error = zbx_dsprintf(NULL, "cannot perform request %s session/%s: received empty response",
+				method, ZBX_NULL2EMPTY_STR(command));
+		goto out;
+	}
+
 	zabbix_log(LOG_LEVEL_TRACE, "webdriver response: %s", wd->data);
 
 	if (NULL == jp)
@@ -347,7 +356,7 @@ zbx_webdriver_t	*webdriver_create(const char *endpoint, const char *sourceip, ch
 			SUCCEED != CURL_SETOPT(wd->handle, CURLOPT_SSL_VERIFYHOST, 0L, error) ||
 			SUCCEED != CURL_SETOPT(wd->handle, CURLOPT_HEADERFUNCTION, curl_header_cb, error) ||
 			SUCCEED != CURL_SETOPT(wd->handle, CURLOPT_HEADERDATA, wd, error) ||
-			SUCCEED != CURL_SETOPT(wd->handle, CURLOPT_INTERFACE, sourceip, error))
+			(NULL != sourceip && SUCCEED != CURL_SETOPT(wd->handle, CURLOPT_INTERFACE, sourceip, error)))
 	{
 		goto out;
 	}
@@ -572,7 +581,8 @@ int	webdriver_find_element(zbx_webdriver_t *wd, const char *strategy, const char
 	if (SUCCEED != webdriver_session_query(wd, "POST", "element", json.buffer, &jp, error))
 	{
 		/* throw exception in the case of connection errors */
-		if (404 != wd->error->http_code || 0 == strcmp(wd->error->error, WEBDRIVER_INVALID_SESSIONID_ERROR))
+		if (NULL == wd->error || 404 != wd->error->http_code ||
+				0 == strcmp(wd->error->error, WEBDRIVER_INVALID_SESSIONID_ERROR))
 			goto out;
 
 		/* otherwise log the error and return NULL element */
@@ -1169,8 +1179,11 @@ int	webdriver_get_alert(zbx_webdriver_t *wd, char **text, char **error)
 	if (SUCCEED != webdriver_session_query(wd, "GET", "alert/text", NULL, &jp, error))
 	{
 		/* throw exception in the case of connection errors */
-		if (404 != wd->error->http_code || 0 == strcmp(wd->error->error, WEBDRIVER_INVALID_SESSIONID_ERROR))
+		if (NULL == wd->error || 404 != wd->error->http_code ||
+				0 == strcmp(wd->error->error, WEBDRIVER_INVALID_SESSIONID_ERROR))
+		{
 			goto out;
+		}
 
 		/* otherwise log the error and return NULL alert */
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot get alert text: %s", error);
@@ -1200,6 +1213,52 @@ int	webdriver_accept_alert(zbx_webdriver_t *wd, char **error)
 int	webdriver_dismiss_alert(zbx_webdriver_t *wd, char **error)
 {
 	return webdriver_session_query(wd, "POST", "alert/dismiss", "{}", NULL, error);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: swtich to frame                                                   *
+ *                                                                            *
+ * Parameters: wd    - [IN] webdriver object                                  *
+ *             frame - [OUT] target frame                                     *
+ *             error - [OUT] error message                                    *
+ *                                                                            *
+ * Return value: SUCCEED - operation was performed successfully               *
+ *               FAIL   - otherwise                                           *
+ *                                                                            *
+ * Comments: The switching depends on frame contents:                         *
+ *             NULL - switch to top level browsing context                    *
+ *             number - switch to the frame by index                          *
+ *             otherwise - switch to the frame by element                     *
+ *                                                                            *
+ ******************************************************************************/
+int	webdriver_switch_frame(zbx_webdriver_t *wd, const char *frame, char **error)
+{
+	struct zbx_json	json;
+	int		ret;
+	zbx_uint64_t	id;
+
+	zbx_json_init(&json, 128);
+
+	if (NULL == frame)
+	{
+		zbx_json_addraw(&json, "id", "null");
+	}
+	else if (SUCCEED == zbx_is_uint64(frame, &id))
+	{
+		zbx_json_adduint64(&json, "id", id);
+	}
+	else
+	{
+		zbx_json_addobject(&json, "id");
+		zbx_json_addstring(&json, WEBDRIVER_ELEMENT_ID, frame, ZBX_JSON_TYPE_STRING);
+	}
+
+	ret = webdriver_session_query(wd, "POST", "frame", json.buffer, NULL, error);
+
+	zbx_json_free(&json);
+
+	return ret;
 }
 
 #endif

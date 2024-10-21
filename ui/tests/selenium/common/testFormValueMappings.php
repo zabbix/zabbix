@@ -90,7 +90,7 @@ class testFormValueMappings extends CWebTest {
 
 		// Check mappings table layout.
 		$mappings_table = $mapping_form->query('id:mappings-table')->asTable()->one();
-		$this->assertEquals(['', 'Type', 'Value', '', 'Mapped to', 'Action', ''], $mappings_table->getHeadersText());
+		$this->assertEquals(['', 'Type', 'Value', '', 'Mapped to', ''], $mappings_table->getHeadersText());
 		$row = $mappings_table->getRow(0);
 		foreach (['Value', 'Mapped to'] as $mapping_column) {
 			$mapping_field = $row->getColumn($mapping_column)->query('xpath:.//input')->one();

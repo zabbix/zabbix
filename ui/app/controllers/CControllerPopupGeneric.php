@@ -1815,7 +1815,7 @@ class CControllerPopupGeneric extends CController {
 				break;
 
 			case 'media_types':
-				$options += ['output' => ['name']];
+				$options += ['output' => ['mediatypeid', 'name']];
 
 				$records = API::MediaType()->get($options);
 				CArrayHelper::sort($records, ['name']);

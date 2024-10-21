@@ -214,15 +214,17 @@ foreach ($data['triggers'] as $trigger) {
 	);
 
 	$table->addRow([
-		$trigger['host_name'],
+		(new CCol($trigger['host_name']))->addClass(ZBX_STYLE_WORDBREAK),
 		$data['can_monitor_problems']
-			? new CLink($trigger['description'],
+			? (new CCol(
+			new CLink($trigger['description'],
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'problem.view')
 					->setArgument('filter_set', '1')
 					->setArgument('triggerids', [$trigger['triggerid']])
 			)
-			: $trigger['description'],
+		))->addClass(ZBX_STYLE_WORDBREAK)
+			: (new CCol($trigger['description']))->addClass(ZBX_STYLE_WORDBREAK),
 		$availability['true'] < 0.00005
 			? ''
 			: (new CSpan(sprintf('%.4f%%', $availability['true'])))->addClass(ZBX_STYLE_RED),

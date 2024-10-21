@@ -196,7 +196,7 @@ AS_HELP_STRING([--with-libpcre2@<:@=DIR@:>@], [use libpcre2 from given base inst
 			LIBPCRE2_LIBS=" $LIBPCRE2_LIBS -lpthread"
 		elif test "x$enable_static_libs" = "xyes"; then
 			if test "x$static_linking_support" == "xno"; then
-				AC_MSG_WARN([compiler has no direct suppor for static linkage])
+				AC_MSG_WARN([compiler has no direct support for static linkage])
 
 				if test -n "$libpcre2_lib_dir"; then
 					if test -f "$libpcre2_lib_dir/libpcre2-8.a"; then

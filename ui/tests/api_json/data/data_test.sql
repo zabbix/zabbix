@@ -73,7 +73,6 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (55002, 50020, 52
 
 -- user group
 INSERT INTO usrgrp (usrgrpid, name) VALUES (14, 'API user group for update with user and rights');
-INSERT INTO usrgrp (usrgrpid, name) VALUES (15, 'API user group with one user');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (16, 'API user group delete');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (17, 'API user group delete1');
 INSERT INTO usrgrp (usrgrpid, name) VALUES (18, 'API user group delete2');
@@ -84,12 +83,10 @@ INSERT INTO usrgrp (usrgrpid, name) VALUES (22, 'API user group in configuration
 INSERT INTO usrgrp (usrgrpid, name) VALUES (23, 'API user group for update');
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (4, 'zabbix-admin', '$2a$10$PmEcvov/w84R3sShOV4rX.xJd81bwgaK4o0SfoiSxop2ol7PPGsOi', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (5, 'zabbix-user', '$2a$10$w8oiYEgP3Fy4XuPIE5VCiO2j5snJEopKfTCYa3DC7bNL83ldKlPRS', 0, 0, 'en_US', '30s', 1, 'default', 0, 0, 50);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (6, 'user-in-one-group', '$2a$10$mTYvfZskz3369zQaYLogHuSUMQ11YSEOZtua2NFSL3/.T6kQ/bNaG', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (7, 'user-in-two-groups', '$2a$10$GiBCQXAPeTCPR9rEQ/YodOmE7mqvXjYwbEkZLGP7iWU/fzKcB9yF6', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (8, 'api-user', '$2a$10$NyZQvuelvUVqpCDYb7cOy.pEewNe9U0MK0ZIdjJeupYbgHU6G7Iea', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (7, 8, 4);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (8, 14, 4);
-INSERT INTO users_groups (id, usrgrpid, userid) VALUES (9, 15, 6);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (10, 16, 7);
 INSERT INTO users_groups (id, usrgrpid, userid) VALUES (11, 17, 7);
 INSERT INTO rights (rightid, groupid, permission, id) VALUES (2, 14, 3, 50012);
@@ -728,21 +725,21 @@ INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50004, 
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50005, 99014, 99025);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50006, 99015, 99026);
 INSERT INTO hosts_templates (hosttemplateid, hostid, templateid) VALUES (50007, 99024, 99027);
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1000, 99013, 'OS', 'Windows');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1001, 99014, 'Browser', 'Firefox');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1002, 99015, 'OS', 'Linux');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1003, 99016, 'Browser', 'Chrome');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1004, 99018, 'Other', '');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1005, 99019, 'OS', 'Android');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1006, 99020, 'Browser', 'IE');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1007, 99021, 'OS', '');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1008, 99022, 'OS', 'Mac');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1009, 99023, 'Browser', '');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1010, 99024, 'OS', 'Win7');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1011, 99025, 'Browser', 'FF');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1012, 99026, 'OS', 'Ubuntu Bionic Beaver');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1013, 99025, 'Webbrowser', 'Mozilla');
-INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (1014, 99027, 'office', 'Riga');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (3000, 99013, 'OS', 'Windows');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (3001, 99014, 'Browser', 'Firefox');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (3002, 99015, 'OS', 'Linux');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (3003, 99016, 'Browser', 'Chrome');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (3004, 99018, 'Other', '');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (3005, 99019, 'OS', 'Android');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (3006, 99020, 'Browser', 'IE');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (3007, 99021, 'OS', '');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (3008, 99022, 'OS', 'Mac');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (3009, 99023, 'Browser', '');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (3010, 99024, 'OS', 'Win7');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (3011, 99025, 'Browser', 'FF');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (3012, 99026, 'OS', 'Ubuntu Bionic Beaver');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (3013, 99025, 'Webbrowser', 'Mozilla');
+INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (3014, 99027, 'office', 'Riga');
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params,query_fields, description, posts, headers) VALUES (58736, 99013, NULL, 2, 3, 'Item', 'item', 0, 90, 0, '','', '', '', '');
 INSERT INTO triggers (triggerid, description, expression, comments, value) VALUES (50172, 'trigger1', '{50232}=1', '', '1');
 INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (50232, 50172, 58736, 'last', '$');

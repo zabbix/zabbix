@@ -288,70 +288,78 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 						[
 							'Message type' => 'Problem',
 							'Subject' => 'Problem: {EVENT.NAME}',
-							'Message' => '<b>Problem started</b> at {EVENT.TIME} on {EVENT.DATE}<br><b>Problem name:</b> '.
-									'{EVENT.NAME}<br><b>Host:</b> {HOST.NAME}<br><b>Severity:</b> {EVENT.SEVERITY}<br>'.
-									'<b>Operational data:</b> {EVENT.OPDATA}<br><b>Original problem ID:</b> '.
-									'{EVENT.ID}<br>{TRIGGER.URL}'
-
+							'Message' => '<b>Problem started</b> at {{EVENT.TIME}.htmlencode()} on '.
+									'{{EVENT.DATE}.htmlencode()}<br><b>Problem name:</b> {{EVENT.NAME}.htmlencode()}'.
+									'<br><b>Host:</b> {{HOST.NAME}.htmlencode()}<br><b>Severity:</b> '.
+									'{{EVENT.SEVERITY}.htmlencode()}<br><b>Operational data:</b> {{EVENT.OPDATA}.htmlencode()}'.
+									'<br><b>Original problem ID:</b> {{EVENT.ID}.htmlencode()}<br>{{TRIGGER.URL}.htmlencode()}'
 						],
 						[
 							'Message type' => 'Problem recovery',
 							'Subject' => 'Resolved in {EVENT.DURATION}: {EVENT.NAME}',
-							'Message' => '<b>Problem has been resolved</b> at {EVENT.RECOVERY.TIME} on '.
-									'{EVENT.RECOVERY.DATE}<br><b>Problem name:</b> {EVENT.NAME}<br><b>Problem '.
-									'duration:</b> {EVENT.DURATION}<br><b>Host:</b> {HOST.NAME}<br><b>Severity:</b> '.
-									'{EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}<br>{TRIGGER.URL}'
-
-
+							'Message' => '<b>Problem has been resolved</b> at {{EVENT.RECOVERY.TIME}.htmlencode()} on '.
+									'{{EVENT.RECOVERY.DATE}.htmlencode()}<br><b>Problem name:</b> '.
+									'{{EVENT.NAME}.htmlencode()}<br><b>Problem duration:</b> {{EVENT.DURATION}.htmlencode()}'.
+									'<br><b>Host:</b> {{HOST.NAME}.htmlencode()}<br><b>Severity:</b> {{EVENT.SEVERITY}'.
+									'.htmlencode()}<br><b>Original problem ID:</b> {{EVENT.ID}.htmlencode()}'.
+									'<br>{{TRIGGER.URL}.htmlencode()}'
 						],
 						[
 							'Message type' => 'Problem update',
 							'Subject' => 'Updated problem in {EVENT.AGE}: {EVENT.NAME}',
-							'Message' => '<b>{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem</b> at {EVENT.UPDATE.DATE} '.
-									'{EVENT.UPDATE.TIME}.<br>{EVENT.UPDATE.MESSAGE}<br><br><b>Current problem status:'.
-									'</b> {EVENT.STATUS}<br><b>Age:</b> {EVENT.AGE}<br><b>Acknowledged:</b> {EVENT.ACK.STATUS}.'
+							'Message' => '<b>{{USER.FULLNAME}.htmlencode()} {{EVENT.UPDATE.ACTION}.htmlencode()} '.
+									'problem</b> at {{EVENT.UPDATE.DATE}.htmlencode()} {{EVENT.UPDATE.TIME}.htmlencode()}.'.
+									'<br>{{EVENT.UPDATE.MESSAGE}.htmlencode()}<br><br><b>Current problem status:'.
+									'</b> {{EVENT.STATUS}.htmlencode()}<br><b>Age:</b> {{EVENT.AGE}.htmlencode()}'.
+									'<br><b>Acknowledged:</b> {{EVENT.ACK.STATUS}.htmlencode()}.'
 						],
 						[
 							'Message type' => 'Service',
 							'Subject' => 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}',
-							'Message' => '<b>Service problem started</b> at {EVENT.TIME} on {EVENT.DATE}'.
-									'<br><b>Service problem name:</b> {EVENT.NAME}<br><b>Service:</b> '.
-									'{SERVICE.NAME}<br><b>Severity:</b> {EVENT.SEVERITY}<br><b>Original '.
-									'problem ID:</b> {EVENT.ID}<br><b>Service description:</b> {SERVICE.DESCRIPTION}<br>'.
-									'<br>{SERVICE.ROOTCAUSE}'
+							'Message' => '<b>Service problem started</b> at {{EVENT.TIME}.htmlencode()} on '.
+									'{{EVENT.DATE}.htmlencode()}<br><b>Service problem name:</b> {{EVENT.NAME}'.
+									'.htmlencode()}<br><b>Service:</b> {{SERVICE.NAME}.htmlencode()}<br><b>Severity:'.
+									'</b> {{EVENT.SEVERITY}.htmlencode()}<br><b>Original problem ID:</b> '.
+									'{{EVENT.ID}.htmlencode()}<br><b>Service description:</b> '.
+									'{{SERVICE.DESCRIPTION}.htmlencode()}<br><br>{{SERVICE.ROOTCAUSE}.htmlencode()}'
 						],
 						[
 							'Message type' => 'Service recovery',
 							'Subject' => 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}',
-							'Message' => '<b>Service "{SERVICE.NAME}" has been resolved</b> at {EVENT.RECOVERY.TIME} on '.
-									'{EVENT.RECOVERY.DATE}<br><b>Problem name:</b> {EVENT.NAME}<br>'.
-									'<b>Problem duration:</b> {EVENT.DURATION}<br>'.
-									'<b>Severity:</b> {EVENT.SEVERITY}<br><b>Original problem ID:</b> {EVENT.ID}<br>'.
-									'<b>Service description:</b> {SERVICE.DESCRIPTION}'
+							'Message' => '<b>Service "{{SERVICE.NAME}.htmlencode()}" has been resolved</b> at '.
+									'{{EVENT.RECOVERY.TIME}.htmlencode()} on {{EVENT.RECOVERY.DATE}.htmlencode()}<br>'.
+									'<b>Problem name:</b> {{EVENT.NAME}.htmlencode()}<br><b>Problem duration:</b> '.
+									'{{EVENT.DURATION}.htmlencode()}<br><b>Severity:</b> {{EVENT.SEVERITY}.htmlencode()}'.
+									'<br><b>Original problem ID:</b> {{EVENT.ID}.htmlencode()}<br>'.
+									'<b>Service description:</b> {{SERVICE.DESCRIPTION}.htmlencode()}'
 						],
 						[
 							'Message type' => 'Service update',
 							'Subject' => 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}',
-							'Message' => '<b>Changed "{SERVICE.NAME}" service status</b> to {EVENT.UPDATE.SEVERITY} at '.
-									'{EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.<br><b>Current problem age</b> is {EVENT.AGE}.'.
-									'<br><b>Service description:</b> {SERVICE.DESCRIPTION}<br><br>{SERVICE.ROOTCAUSE}'
+							'Message' => '<b>Changed "{{SERVICE.NAME}.htmlencode()}" service status</b> to '.
+									'{{EVENT.UPDATE.SEVERITY}.htmlencode()} at {{EVENT.UPDATE.DATE}.htmlencode()} '.
+									'{{EVENT.UPDATE.TIME}.htmlencode()}.<br><b>Current problem age</b> is '.
+									'{{EVENT.AGE}.htmlencode()}.<br><b>Service description:</b> '.
+									'{{SERVICE.DESCRIPTION}.htmlencode()}<br><br>{{SERVICE.ROOTCAUSE}.htmlencode()}'
 						],
 						[
 							'Message type' => 'Discovery',
 							'Subject' => 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}',
-							'Message' => '<b>Discovery rule:</b> {DISCOVERY.RULE.NAME}<br><br><b>Device IP:</b> '.
-									'{DISCOVERY.DEVICE.IPADDRESS}<br><b>Device DNS:</b> {DISCOVERY.DEVICE.DNS}<br>'.
-									'<b>Device status:</b> {DISCOVERY.DEVICE.STATUS}<br><b>Device uptime:</b> '.
-									'{DISCOVERY.DEVICE.UPTIME}<br><br><b>Device service name:</b> {DISCOVERY.SERVICE.NAME}'.
-									'<br><b>Device service port:</b> {DISCOVERY.SERVICE.PORT}<br><b>Device service '.
-									'status:</b> {DISCOVERY.SERVICE.STATUS}<br><b>Device service uptime:</b> '.
-									'{DISCOVERY.SERVICE.UPTIME}'
+							'Message' => '<b>Discovery rule:</b> {{DISCOVERY.RULE.NAME}.htmlencode()}<br><br><b>'.
+									'Device IP:</b> {{DISCOVERY.DEVICE.IPADDRESS}.htmlencode()}<br><b>Device DNS:</b> '.
+									'{{DISCOVERY.DEVICE.DNS}.htmlencode()}<br><b>Device status:</b> '.
+									'{{DISCOVERY.DEVICE.STATUS}.htmlencode()}<br><b>Device uptime:</b> '.
+									'{{DISCOVERY.DEVICE.UPTIME}.htmlencode()}<br><br><b>Device service name:</b> '.
+									'{{DISCOVERY.SERVICE.NAME}.htmlencode()}<br><b>Device service port:</b> '.
+									'{{DISCOVERY.SERVICE.PORT}.htmlencode()}<br><b>Device service '.'status:</b> '.
+									'{{DISCOVERY.SERVICE.STATUS}.htmlencode()}<br><b>Device service uptime:</b> '.
+									'{{DISCOVERY.SERVICE.UPTIME}.htmlencode()}'
 						],
 						[
 							'Message type' => 'Autoregistration',
 							'Subject' => 'Autoregistration: {HOST.HOST}',
-							'Message' => '<b>Host name:</b> {HOST.HOST}<br><b>Host IP:</b> {HOST.IP}<br><b>Agent port:'.
-									'</b> {HOST.PORT}'
+							'Message' => '<b>Host name:</b> {{HOST.HOST}.htmlencode()}<br><b>Host IP:</b> '.
+									'{{HOST.IP}.htmlencode()}<br><b>Agent port:</b> {{HOST.PORT}.htmlencode()}'
 						],
 						[
 							'Message type' => 'Internal problem',
@@ -808,20 +816,22 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 							'Message type' => 'Discovery',
 							'action' => 'Skip',
 							'Subject' => 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}',
-							'Message' => '<b>Discovery rule:</b> {DISCOVERY.RULE.NAME}<br><br><b>Device IP:</b> '.
-									'{DISCOVERY.DEVICE.IPADDRESS}<br><b>Device DNS:</b> {DISCOVERY.DEVICE.DNS}<br>'.
-									'<b>Device status:</b> {DISCOVERY.DEVICE.STATUS}<br><b>Device uptime:</b> '.
-									'{DISCOVERY.DEVICE.UPTIME}<br><br><b>Device service name:</b> {DISCOVERY.SERVICE.NAME}'.
-									'<br><b>Device service port:</b> {DISCOVERY.SERVICE.PORT}<br><b>Device service '.
-									'status:</b> {DISCOVERY.SERVICE.STATUS}<br><b>Device service uptime:</b> '.
-									'{DISCOVERY.SERVICE.UPTIME}'
+							'Message' => '<b>Discovery rule:</b> {{DISCOVERY.RULE.NAME}.htmlencode()}<br><br><b>'.
+									'Device IP:</b> {{DISCOVERY.DEVICE.IPADDRESS}.htmlencode()}<br><b>Device DNS:</b> '.
+									'{{DISCOVERY.DEVICE.DNS}.htmlencode()}<br><b>Device status:</b> '.
+									'{{DISCOVERY.DEVICE.STATUS}.htmlencode()}<br><b>Device uptime:</b> '.
+									'{{DISCOVERY.DEVICE.UPTIME}.htmlencode()}<br><br><b>Device service name:</b> '.
+									'{{DISCOVERY.SERVICE.NAME}.htmlencode()}<br><b>Device service port:</b> '.
+									'{{DISCOVERY.SERVICE.PORT}.htmlencode()}<br><b>Device service '.'status:</b> '.
+									'{{DISCOVERY.SERVICE.STATUS}.htmlencode()}<br><b>Device service uptime:</b> '.
+									'{{DISCOVERY.SERVICE.UPTIME}.htmlencode()}'
 						],
 						[
 							'Message type' => 'Autoregistration',
 							'action' => 'Skip',
 							'Subject' => 'Autoregistration: {HOST.HOST}',
-							'Message' => '<b>Host name:</b> {HOST.HOST}<br><b>Host IP:</b> {HOST.IP}<br><b>Agent port:'.
-									'</b> {HOST.PORT}'
+							'Message' => '<b>Host name:</b> {{HOST.HOST}.htmlencode()}<br><b>Host IP:</b> '.
+									'{{HOST.IP}.htmlencode()}<br><b>Agent port:</b> {{HOST.PORT}.htmlencode()}'
 						]
 					],
 					'rows' => 4

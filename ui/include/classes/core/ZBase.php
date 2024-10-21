@@ -396,7 +396,7 @@ class ZBase {
 
 		if (defined('ZBX_DENY_GUI_ACCESS')) {
 			if (!isset($ZBX_GUI_ACCESS_IP_RANGE) || !in_array(CWebUser::getIp(), $ZBX_GUI_ACCESS_IP_RANGE)) {
-				throw new Exception($_REQUEST['warning_msg']);
+				throw new Exception($ZBX_GUI_ACCESS_MESSAGE ?? 'Zabbix is under maintenance.');
 			}
 		}
 	}
@@ -430,10 +430,6 @@ class ZBase {
 	 * Vault provider initialisation if it exists in configuration file.
 	 */
 	protected function initVault(): void {
-		if (!array_key_exists('VAULT', $this->config['DB'])) {
-			return;
-		}
-
 		switch ($this->config['DB']['VAULT']) {
 			case CVaultCyberArk::NAME:
 				$this->vault = new CVaultCyberArk($this->config['DB']['VAULT_URL'], $this->config['DB']['VAULT_PREFIX'],
