@@ -1168,7 +1168,7 @@ class testFormConnectors extends CWebTest {
 
 			if ($update) {
 				$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM connector WHERE name='.zbx_dbstr(self::$update_connector)));
-				self::$update_connector = $data['fields']['Name'];
+				self::$update_connector = $name;
 			}
 
 			$this->query('link', $name)->waitUntilClickable()->one()->click();
