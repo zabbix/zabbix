@@ -1132,6 +1132,31 @@ zabbix_export:
           username: '{$USERNAME}'
           password: '{$PASSWORD}'
           item_prototypes:
+            - uuid: 9866032fbf964dcbb59fb19a9911ba57
+              name: '{#ETHPORTNAME}: Enabled'
+              type: DEPENDENT
+              key: 'netapp.port.eth.enabled[{#NODENAME},{#ETHPORTNAME}]'
+              delay: '0'
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: 'The admin state of the port. Possible values: true, false.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.records[?(@.name==''{#ETHPORTNAME}'')].enabled.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              master_item:
+                key: netapp.ports.eth.get
+              tags:
+                - tag: component
+                  value: interfaces
+                - tag: interfaces
+                  value: '{#ETHPORTNAME}'
+                - tag: node
+                  value: '{#NODENAME}'
             - uuid: dda2086a96f844c7b5a8002549fe6bf5
               name: '{#ETHPORTNAME}: State'
               type: DEPENDENT
@@ -1156,9 +1181,7 @@ zabbix_export:
                   value: '{#NODENAME}'
               trigger_prototypes:
                 - uuid: 0fa3a54b559349d58b616720ee33cdf5
-                  expression: '(last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}])="down")'
-                  recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: '(last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}])="up")'
+                  expression: 'last(/NetApp by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}])="down" and last(/NetApp by HTTP/netapp.port.eth.enabled[{#NODENAME},{#ETHPORTNAME}])="true"'
                   name: '{#ETHPORTNAME}: Ethernet port of the Node "{#NODENAME}" is down'
                   priority: AVERAGE
                   description: 'Something is wrong with the ethernet port.'
