@@ -166,18 +166,18 @@ void	zbx_event_get_json_actions(const zbx_db_acknowledge *ack, char **replace_to
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	if (ack->action & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE)
+	if (0 != (ack->action & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE))
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_ACKNOWLEDGE, ZBX_PROTO_VALUE_TRUE, ZBX_JSON_TYPE_TRUE);
 
-	if (ack->action & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE)
+	if (0 != (ack->action & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE))
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_UNACKNOWLEDGE, ZBX_PROTO_VALUE_TRUE, ZBX_JSON_TYPE_TRUE);
 
-	if (ack->action & ZBX_PROBLEM_UPDATE_MESSAGE)
+	if (0 != (ack->action & ZBX_PROBLEM_UPDATE_MESSAGE))
 	{
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_MESSAGE, ack->message, ZBX_JSON_TYPE_STRING);
 	}
 
-	if (ack->action & ZBX_PROBLEM_UPDATE_SEVERITY)
+	if (0 != (ack->action & ZBX_PROBLEM_UPDATE_SEVERITY))
 	{
 		zbx_json_addobject(&json, ZBX_PROTO_TAG_SEVERITY);
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_OLD, (zbx_uint64_t)ack->old_severity);
@@ -185,19 +185,19 @@ void	zbx_event_get_json_actions(const zbx_db_acknowledge *ack, char **replace_to
 		zbx_json_close(&json);
 	}
 
-	if (ack->action & ZBX_PROBLEM_UPDATE_CLOSE)
+	if (0 != (ack->action & ZBX_PROBLEM_UPDATE_CLOSE))
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_CLOSE, ZBX_PROTO_VALUE_TRUE, ZBX_JSON_TYPE_TRUE);
 
-	if (ack->action & ZBX_PROBLEM_UPDATE_SUPPRESS)
+	if (0 != (ack->action & ZBX_PROBLEM_UPDATE_SUPPRESS))
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_SUPPRESS_UNTIL, ack->suppress_until);
 
-	if (ack->action & ZBX_PROBLEM_UPDATE_UNSUPPRESS)
+	if (0 != (ack->action & ZBX_PROBLEM_UPDATE_UNSUPPRESS))
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_UNSUPPRESS, ZBX_PROTO_VALUE_TRUE, ZBX_JSON_TYPE_TRUE);
 
-	if (ack->action & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE)
+	if (0 != (ack->action & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE))
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_CAUSE, ZBX_PROTO_VALUE_TRUE, ZBX_JSON_TYPE_TRUE);
 
-	if (ack->action & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM)
+	if (0 != (ack->action & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM))
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_SYMPTOM, ZBX_PROTO_VALUE_TRUE, ZBX_JSON_TYPE_TRUE);
 
 	zbx_json_adduint64(&json, ZBX_PROTO_TAG_TIMESTAMP, (zbx_uint64_t)ack->clock);
