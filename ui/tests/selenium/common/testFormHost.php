@@ -691,7 +691,7 @@ class testFormHost extends CWebTest {
 						'Monitored by' => 'Proxy group'
 					],
 					'error_title' => 'Cannot add host',
-					'error' => 'Invalid parameter "/1/proxy_groupid": cannot be empty.'
+					'error' => 'Invalid parameter "/1/proxy_groupid": object does not exist, or you have no permissions to it'
 				]
 			],
 			// #22 Host without interface.
@@ -1331,7 +1331,7 @@ class testFormHost extends CWebTest {
 						'Monitored by' => 'Proxy group'
 					],
 					'error_title' => 'Cannot update host',
-					'error' => 'Invalid parameter "/1/proxy_groupid": cannot be empty.'
+					'error' => 'Invalid parameter "/1/proxy_groupid": object does not exist, or you have no permissions to it'
 				]
 			]
 		];
