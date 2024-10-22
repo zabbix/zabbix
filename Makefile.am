@@ -63,19 +63,19 @@ dbschema_mysql:
 	cd database/mysql && \
 	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
 	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) history_pk_prepare.sql
+	$(MAKE) $(AM_MAKEFLAGS) -C option-patches
 
 dbschema_oracle:
 	cd database/oracle && \
 	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
 	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) history_pk_prepare.sql
+	$(MAKE) $(AM_MAKEFLAGS) -C option-patches
 
 dbschema_postgresql:
 	cd database/postgresql && \
 	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
 	$(MAKE) $(AM_MAKEFLAGS) schema.sql && \
-	$(MAKE) $(AM_MAKEFLAGS) history_pk_prepare.sql
+	$(MAKE) $(AM_MAKEFLAGS) -C option-patches
 
 dbschema_sqlite3:
 	cd database/sqlite3 && \

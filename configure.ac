@@ -1928,8 +1928,11 @@ AC_CONFIG_FILES([
 	Makefile
 	database/Makefile
 	database/mysql/Makefile
+	database/mysql/option-patches/Makefile
 	database/oracle/Makefile
+	database/oracle/option-patches/Makefile
 	database/postgresql/Makefile
+	database/postgresql/option-patches/Makefile
 	database/sqlite3/Makefile
 	misc/Makefile
 	src/Makefile
