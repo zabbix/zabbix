@@ -819,14 +819,14 @@ class CSvgGraph extends CSvg {
 			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT, $this->left_y_empty);
 
 			if ($values) {
-				$max_approx_width = 0;
+				$approx_width = 0;
 
 				foreach ($values as $value) {
-					$max_approx_width = max($max_approx_width, imageTextSize(11, 0, $value)['width']);
+					$approx_width = max($approx_width, imageTextSize(11, 0, $value)['width']);
 				}
 
 				$this->offset_left = min($this->max_yaxis_width,
-					max($this->offset_left, self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER + $max_approx_width)
+					max($this->offset_left, self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER + $approx_width)
 				);
 			}
 		}
@@ -839,14 +839,14 @@ class CSvgGraph extends CSvg {
 					unset($values[0]);
 				}
 
-				$max_approx_width = 0;
+				$approx_width = 0;
 
 				foreach ($values as $value) {
-					$max_approx_width = max($max_approx_width, imageTextSize(11, 0, $value)['width']);
+					$approx_width = max($approx_width, imageTextSize(11, 0, $value)['width']);
 				}
 
 				$this->offset_right = min($this->max_yaxis_width,
-					max($this->offset_right, self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER + $max_approx_width)
+					max($this->offset_right, self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER + $approx_width)
 				);
 			}
 		}
