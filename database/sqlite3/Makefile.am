@@ -14,6 +14,6 @@ all: $(GENSQLFILES)
 data.sql: $(top_srcdir)/create/src/data.tmpl $(top_srcdir)/create/src/templates.tmpl $(top_srcdir)/create/src/dashboards.tmpl
 	$(top_srcdir)/create/bin/gen_data.pl sqlite3 > $@
 
-schema.sql: $(top_srcdir)/create/src/schema.tmpl
+schema.sql: $(top_srcdir)/create/src/schema.tmpl $(top_srcdir)/create/bin/gen_schema.pl
 	$(top_srcdir)/create/bin/gen_schema.pl sqlite3 > $@
 endif
