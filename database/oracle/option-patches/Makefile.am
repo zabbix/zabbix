@@ -13,4 +13,6 @@ all: $(GENPATCHES)
 
 history_pk_prepare.sql: $(top_srcdir)/create/bin/gen_history_pk.pl
 	$(top_srcdir)/create/bin/gen_history_pk.pl oracle > $@
+
+.PHONY: all
 endif
