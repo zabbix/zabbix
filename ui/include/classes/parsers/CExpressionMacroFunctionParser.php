@@ -38,6 +38,7 @@ class CExpressionMacroFunctionParser extends CParser {
 	 *   'host_macro' => false    Allow {HOST.HOST} macro as host name part in the query.
 	 *   'host_macro_n' => false  Allow {HOST.HOST} and {HOST.HOST<1-9>} macros as host name part in the query.
 	 *   'empty_host' => false    Allow empty hostname in the query string.
+	 *   'macros_n' => []         Array of strings having supported reference macros.
 	 *
 	 * @var array
 	 */
@@ -46,7 +47,8 @@ class CExpressionMacroFunctionParser extends CParser {
 		'lldmacros' => false,
 		'host_macro' => false,
 		'host_macro_n' => false,
-		'empty_host' => false
+		'empty_host' => false,
+		'macros_n' => []
 	];
 
 	/**
@@ -62,7 +64,8 @@ class CExpressionMacroFunctionParser extends CParser {
 			'lldmacros' => $this->options['lldmacros'],
 			'host_macro' => $this->options['host_macro'],
 			'host_macro_n' => $this->options['host_macro_n'],
-			'empty_host' => $this->options['empty_host']
+			'empty_host' => $this->options['empty_host'],
+			'macros_n' => $this->options['macros_n']
 		]);
 		$this->function_parser = new C10FunctionParser();
 	}
