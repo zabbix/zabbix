@@ -557,17 +557,17 @@ class CExpressionParser extends CParser {
 					CExpressionParserResult::TOKEN_TYPE_MACRO)) {
 				return true;
 			}
+		}
 
-			if ($options['macros_n']) {
-				$_options = [
-					'macros' => $options['macros_n'],
-					'ref_type' => CMacroParser::REFERENCE_NUMERIC
-				];
+		if ($options['macros_n']) {
+			$_options = [
+				'macros' => $options['macros_n'],
+				'ref_type' => CMacroParser::REFERENCE_NUMERIC
+			];
 
-				if (self::parseUsing(new CMacroParser($_options), $source, $pos, $tokens,
-						CExpressionParserResult::TOKEN_TYPE_MACRO)) {
-					return true;
-				}
+			if (self::parseUsing(new CMacroParser($_options), $source, $pos, $tokens,
+					CExpressionParserResult::TOKEN_TYPE_MACRO)) {
+				return true;
 			}
 		}
 
