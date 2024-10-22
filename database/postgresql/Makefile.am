@@ -1,4 +1,6 @@
 SUBDIRS = option-patches
+# extensions
+SUBDIRS += timescaledb
 
 EXTRA_DIST = images.sql
 
