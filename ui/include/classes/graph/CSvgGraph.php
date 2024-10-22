@@ -815,17 +815,18 @@ class CSvgGraph extends CSvg {
 		] = $result;
 
 		// Define canvas dimensions and offsets, except canvas height and bottom offset.
-
-		$approx_width = 10;
-
 		if ($this->show_left_y_axis) {
 			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT, $this->left_y_empty);
 
 			if ($values) {
+				$max_approx_width = 0;
+
+				foreach ($values as $value) {
+					$max_approx_width = max($max_approx_width, imageTextSize(11, 0, $value)['width']);
+				}
+
 				$this->offset_left = min($this->max_yaxis_width,
-					max($this->offset_left,
-						self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER + max(array_map('strlen', $values)) * $approx_width
-					)
+					max($this->offset_left, self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER + $max_approx_width)
 				);
 			}
 		}
@@ -834,10 +835,18 @@ class CSvgGraph extends CSvg {
 			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT, $this->right_y_empty);
 
 			if ($values) {
+				if (array_key_exists(0, $values)) {
+					unset($values[0]);
+				}
+
+				$max_approx_width = 0;
+
+				foreach ($values as $value) {
+					$max_approx_width = max($max_approx_width, imageTextSize(11, 0, $value)['width']);
+				}
+
 				$this->offset_right = min($this->max_yaxis_width,
-					max($this->offset_right,
-						self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER + max(array_map('strlen', $values)) * $approx_width
-					)
+					max($this->offset_right, self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER + $max_approx_width)
 				);
 			}
 		}
