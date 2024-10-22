@@ -569,6 +569,11 @@ class CExpressionParser extends CParser {
 					CExpressionParserResult::TOKEN_TYPE_MACRO)) {
 				return true;
 			}
+
+			if (self::parseUsing(new CMacroFunctionParser($_options), $source, $pos, $tokens,
+					CExpressionParserResult::TOKEN_TYPE_MACRO)) {
+				return true;
+			}
 		}
 
 		if ($options['collapsed_expression']) {
