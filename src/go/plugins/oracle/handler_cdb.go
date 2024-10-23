@@ -17,6 +17,7 @@ package oracle
 import (
 	"context"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -27,12 +28,12 @@ func cdbHandler(ctx context.Context, conn OraClient, params map[string]string, _
 
 	row, err := conn.QueryRow(ctx, query, args...)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	err = row.Scan(&CDBInfo)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	if CDBInfo == "" {

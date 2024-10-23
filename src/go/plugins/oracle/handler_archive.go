@@ -17,6 +17,7 @@ package oracle
 import (
 	"context"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -27,12 +28,12 @@ func archiveHandler(ctx context.Context, conn OraClient, params map[string]strin
 
 	row, err := conn.QueryRow(ctx, query, args...)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	err = row.Scan(&archiveLogs)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	if archiveLogs == "" {

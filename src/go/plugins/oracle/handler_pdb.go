@@ -17,6 +17,7 @@ package oracle
 import (
 	"context"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -27,12 +28,13 @@ func pdbHandler(ctx context.Context, conn OraClient, params map[string]string, _
 
 	row, err := conn.QueryRow(ctx, query, args...)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
+
 	}
 
 	err = row.Scan(&PDBInfo)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	if PDBInfo == "" {

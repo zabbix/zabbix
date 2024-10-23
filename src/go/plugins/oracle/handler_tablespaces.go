@@ -16,9 +16,9 @@ package oracle
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -36,17 +36,17 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params map[string]s
 
 	query, args, err := getTablespacesQuery(params)
 	if err != nil {
-		return nil, err
+		return nil, errs.Wrap(err, "failed to retrieve tabespace query")
 	}
 
 	row, err := conn.QueryRow(ctx, query, args...)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	err = row.Scan(&tablespaces)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	// Add leading zeros for floats: ".03" -> "0.03".
@@ -73,7 +73,7 @@ func getTablespacesQuery(params map[string]string) (string, []any, error) {
 	var err error
 	ts, t, err = prepValues(ts, t)
 	if err != nil {
-		return "", nil, zbxerr.ErrorInvalidParams.Wrap(err)
+		return "", nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams)
 	}
 
 	switch t {
@@ -90,7 +90,7 @@ func getTablespacesQuery(params map[string]string) (string, []any, error) {
 
 		return getTempQueryPart(), []any{ts}, nil
 	default:
-		return "", nil, zbxerr.ErrorInvalidParams.Wrap(fmt.Errorf("incorrect table-space type %s", t))
+		return "", nil, errs.Wrapf(zbxerr.ErrorInvalidParams, "incorrect table-space type %s", t)
 	}
 }
 
@@ -108,7 +108,7 @@ func prepValues(ts, t string) (outTableSpace string, outType string, err error) 
 			return defaultTEMPTS, t, nil
 		}
 
-		return "", "", fmt.Errorf("incorrect type %s", t)
+		return "", "", errs.Errorf("incorrect type %s", t)
 	}
 
 	return ts, perm, nil

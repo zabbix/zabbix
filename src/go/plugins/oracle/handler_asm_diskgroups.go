@@ -16,8 +16,8 @@ package oracle
 
 import (
 	"context"
-	"fmt"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -29,12 +29,12 @@ func asmDiskGroupsHandler(ctx context.Context, conn OraClient, params map[string
 
 	row, err := conn.QueryRow(ctx, query, args...)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	err = row.Scan(&diskGroups)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	if diskGroups == "" {
@@ -67,6 +67,5 @@ func getDiskGRoupQuery(name string) (string, []any) {
 		return query + " WHERE NAME = :1", []any{name}
 	}
 
-	fmt.Println("returned unnamed")
 	return query, nil
 }
