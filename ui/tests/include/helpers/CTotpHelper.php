@@ -27,14 +27,15 @@ class CTotpHelper {
 	/**
 	 * Generate a Time-based One-Time Password (TOTP) based on the provided secret.
 	 *
-	 * @param string $secret       Base32-encoded secret used to generate the TOTP.
-	 * @param int    $digits       Number of digits for the TOTP (6 or 8).
-	 * @param string $hash_func    Hash function to use (e.g., 'sha1', 'sha256').
+	 * @param string $secret              Base32-encoded secret used to generate the TOTP.
+	 * @param int    $digits              Number of digits for the TOTP (6 or 8).
+	 * @param string $hash_func           Hash function to use (e.g., 'sha1', 'sha256').
+	 * @param int    $time_step_offset    This is added to the time step. 1 means 30 seconds in the future.
 	 *
 	 * @return string                      The TOTP of specified digit length.
 	 * @throws InvalidArgumentException    If the number of digits is not 6 or 8, or if an unsupported hash provided.
 	 */
-	public static function generateTotp($secret, $digits = 6, $hash_func = SHA_1) {
+	public static function generateTotp($secret, $digits = 6, $hash_func = SHA_1, $time_step_offset = 0) {
 		// Validate the number of digits.
 		if (!in_array($digits, [6, 8])) {
 			throw new InvalidArgumentException('TOTP length must be either 6 or 8.');
@@ -46,7 +47,7 @@ class CTotpHelper {
 		}
 
 		// Calculate the current time step. The TOTP changes every 30 seconds.
-		$time_step = floor(time() / 30);
+		$time_step = floor(time() / 30) + $time_step_offset;
 		// Convert time step to a 64-bit binary timestamp.
 		$time_step_binary = pack('J', $time_step);
 
