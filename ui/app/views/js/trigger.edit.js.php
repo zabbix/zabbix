@@ -47,6 +47,8 @@ window.trigger_edit_popup = new class {
 			this.addPopupValues(data.values);
 		}
 
+		this.form.style.display = '';
+
 		this.#initActions();
 		this.#initTriggersTab();
 		this.#changeRecoveryMode();
@@ -56,7 +58,6 @@ window.trigger_edit_popup = new class {
 			this.#loadDependencyTable(this.dependencies);
 		}
 
-		this.form.style.display = '';
 		this.overlay.recoverFocus();
 	}
 
@@ -191,7 +192,7 @@ window.trigger_edit_popup = new class {
 				ui.newPanel.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 			}
 		});
-		setTimeout(() => $('#triggersTab .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible(), 0);
+		$('#triggersTab .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 	}
 
 	#addDepTrigger(button) {
