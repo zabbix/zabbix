@@ -61,19 +61,19 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Get cluster|<p>Get the available clusters.</p>|Script|nutanix.cluster.get|
-|Get cluster check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|nutanix.cluster.get.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ` `</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get cluster check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|nutanix.cluster.get.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Get host|<p>Get the available hosts.</p>|Script|nutanix.host.get|
-|Get host check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|nutanix.host.get.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ` `</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get host check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|nutanix.host.get.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Get storage container|<p>Get the available storage containers.</p>|Script|nutanix.storage.container.get|
-|Get storage container check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|nutanix.storage.container.get.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ` `</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get storage container check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|nutanix.storage.container.get.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Nutanix: Failed to get cluster data from API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Prism Element by HTTP/nutanix.cluster.get.check))>0`|High||
-|Nutanix: Failed to get host data from API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Prism Element by HTTP/nutanix.host.get.check))>0`|High||
-|Nutanix: Failed to get storage container data from API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Prism Element by HTTP/nutanix.storage.container.get.check))>0`|High||
+|Failed to get cluster data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Prism Element by HTTP/nutanix.cluster.get.check))>0`|High||
+|Failed to get host data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Prism Element by HTTP/nutanix.host.get.check))>0`|High||
+|Failed to get storage container data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Prism Element by HTTP/nutanix.storage.container.get.check))>0`|High||
 
 ### LLD rule Cluster discovery
 
@@ -169,9 +169,9 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Get metric|<p>Get data about basic metrics.</p>|Script|nutanix.cluster.metric.get|
-|Get metric check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|nutanix.cluster.metric.get.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ` `</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get metric check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|nutanix.cluster.metric.get.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Get alert|<p>Get data about alerts.</p>|Script|nutanix.cluster.alert.get|
-|Get alert check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|nutanix.cluster.alert.get.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ` `</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get alert check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|nutanix.cluster.alert.get.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Content Cache: Hit rate, %|<p>Content cache hits over all lookups.</p>|Dependent item|nutanix.cluster.content.cache.hit.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.stats.content_cache_hit_ppm`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.0001`</p></li></ul>|
 |Content Cache: Logical memory usage, bytes|<p>Logical memory used to cache data without deduplication in bytes.</p>|Dependent item|nutanix.cluster.content.cache.logical.memory.usage.bytes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.stats.content_cache_logical_memory_usage_bytes`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Content Cache: Logical saved memory usage, bytes|<p>Memory saved due to content cache deduplication in bytes.</p>|Dependent item|nutanix.cluster.content.cache.saved.memory.usage.bytes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.stats.content_cache_saved_memory_usage_bytes`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
@@ -271,9 +271,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Nutanix Cluster: Failed to get metric data from API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.metric.get.check))>0`|High||
-|Nutanix Cluster: Failed to get alert data from API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.alert.get.check))>0`|High||
-|Nutanix Cluster: Redundancy factor mismatched|<p>Current redundancy factor does not match the desired redundancy factor.</p>|`last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.redundancy.factor.current)<>last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.redundancy.factor.desired)`|High||
+|Failed to get metric data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.metric.get.check))>0`|High||
+|Failed to get alert data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.alert.get.check))>0`|High||
+|Redundancy factor mismatched|<p>Current redundancy factor does not match the desired redundancy factor.</p>|`last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.redundancy.factor.current)<>last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.redundancy.factor.desired)`|High||
 
 ### LLD rule Alert discovery
 
@@ -360,11 +360,11 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Get metric|<p>Get data about basic metrics.</p>|Script|nutanix.host.metric.get|
-|Get metric check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|nutanix.host.metric.get.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ` `</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get metric check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|nutanix.host.metric.get.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Get disk|<p>Get data about installed disks.</p>|Script|nutanix.host.disk.get|
-|Get disk check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|nutanix.host.disk.get.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ` `</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get disk check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|nutanix.host.disk.get.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Get alert|<p>Get data about alerts.</p>|Script|nutanix.host.alert.get|
-|Get alert check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|nutanix.host.alert.get.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ` `</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get alert check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|nutanix.host.alert.get.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Content Cache: Hit rate, %|<p>Content cache hits over all lookups.</p>|Dependent item|nutanix.host.content.cache.hit.percent<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.stats.content_cache_hit_ppm`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.0001`</p></li></ul>|
 |Content Cache: Logical memory usage, bytes|<p>Logical memory used to cache data without deduplication in bytes.</p>|Dependent item|nutanix.host.content.cache.logical.memory.usage.bytes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.stats.content_cache_logical_memory_usage_bytes`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Content Cache: Logical saved memory usage, bytes|<p>Memory saved due to content cache deduplication in bytes.</p>|Dependent item|nutanix.host.content.cache.saved.memory.usage.bytes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.stats.content_cache_saved_memory_usage_bytes`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
@@ -476,10 +476,10 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Nutanix Host: Failed to get metric data from API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Host Prism Element by HTTP/nutanix.host.metric.get.check))>0`|High||
-|Nutanix Host: Failed to get disk data from API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Host Prism Element by HTTP/nutanix.host.disk.get.check))>0`|High||
-|Nutanix Host: Failed to get alert data from API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Host Prism Element by HTTP/nutanix.host.alert.get.check))>0`|High||
-|Nutanix Host: Host is in degraded status|<p>Host is in a degraded status. The host may soon become unavailable.</p>|`last(/Nutanix Host Prism Element by HTTP/nutanix.host.general.degraded)=1`|High||
+|Failed to get metric data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Host Prism Element by HTTP/nutanix.host.metric.get.check))>0`|High||
+|Failed to get disk data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Host Prism Element by HTTP/nutanix.host.disk.get.check))>0`|High||
+|Failed to get alert data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Host Prism Element by HTTP/nutanix.host.alert.get.check))>0`|High||
+|Host is in degraded status|<p>Host is in a degraded status. The host may soon become unavailable.</p>|`last(/Nutanix Host Prism Element by HTTP/nutanix.host.general.degraded)=1`|High||
 
 ### LLD rule Disk discovery
 
