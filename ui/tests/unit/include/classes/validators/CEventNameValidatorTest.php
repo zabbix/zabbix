@@ -46,7 +46,7 @@ class CEventNameValidatorTest extends TestCase {
 			['Empty expression macro {?}', false, 'incorrect expression starting from "}"'],
 			['Function value macro {FUNCTION.VALUE} {FUNCTION.VALUE1} {?{FUNCTION.VALUE}+{FUNCTION.VALUE9}}', true, null],
 			['Function value macro {FUNCTION.RECOVERY.VALUE} {FUNCTION.RECOVERY.VALUE1} {?{FUNCTION.RECOVERY.VALUE}+{FUNCTION.RECOVERY.VALUE9}}', true, null],
-			['Function value macro {{?{FUNCTION.VALUE}}.regsub("{?", "a")}', true, null]
+			['Function value macro {{?{FUNCTION.VALUE}}.regsub("{?", "a")}{{?{FUNCTION.VALUE}}.regsub("{?", "a")}', true, null]
 		];
 	}
 
