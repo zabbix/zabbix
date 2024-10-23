@@ -2429,15 +2429,15 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'result' => [
 						[
 							'Name' => 'Host name',
-							'Value' => 'lon...'
+							'Value' => 'lon…'
 						],
 						[
 							'Name' => 'Host name',
-							'Value' => '<sp...'
+							'Value' => '<sp…'
 						],
 						[
 							'Name' => 'Host name',
-							'Value' => '<b>...'
+							'Value' => '<b>…'
 						],
 						[
 							'Name' => 'Master item',

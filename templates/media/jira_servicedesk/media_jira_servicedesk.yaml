@@ -308,7 +308,7 @@ zabbix_export:
             }
             // Create request for trigger-based events.
             else if (params.event_value === '1' && params.event_update_status === '0'
-                && jira.request_key === '{EVENT.TAGS.__zbx_jira_requestkey}') {
+                && (jira.request_key === '{EVENT.TAGS.__zbx_jira_requestkey}' || jira.request_key === '*UNKNOWN*')) {
                 var key = Jira.createRequest(params.alert_subject, params.alert_message, fields);
         
                 result.tags.__zbx_jira_requestkey = key;
@@ -317,7 +317,7 @@ zabbix_export:
             }
             // Comment created request for trigger-based event.
             else {
-                if (jira.request_key === '{EVENT.TAGS.__zbx_jira_requestkey}' || jira.request_key.trim() === '') {
+                if (jira.request_key === '{EVENT.TAGS.__zbx_jira_requestkey}' || jira.request_key.trim() === '' || jira.request_key === '*UNKNOWN*') {
                     throw 'Incorrect Request key given: ' + jira.request_key;
                 }
                 comment.body = params.alert_message;

@@ -45,7 +45,6 @@ zbx_trends_parse_range_LDADD = \
 zbx_trends_parse_range_LDADD += @SERVER_LIBS@
 
 zbx_trends_parse_range_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) \
-	-Wl,--wrap=zbx_db_fetch \
 	-Wl,--wrap=zbx_db_select \
 	-Wl,--wrap=zbx_db_is_null \
 	-Wl,--wrap=DBfetch \
@@ -68,7 +67,6 @@ zbx_baseline_get_data_LDADD = \
 zbx_baseline_get_data_LDADD += @SERVER_LIBS@
 
 zbx_baseline_get_data_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) \
-	-Wl,--wrap=zbx_db_fetch \
 	-Wl,--wrap=zbx_db_select \
 	-Wl,--wrap=zbx_db_is_null \
 	-Wl,--wrap=zbx_trends_get_avg \

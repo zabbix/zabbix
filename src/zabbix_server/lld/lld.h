@@ -21,6 +21,14 @@
 #include "zbxcacheconfig.h"
 #include "zbxregexp.h"
 
+typedef struct zbx_lld_item_full_s zbx_lld_item_full_t;
+typedef struct zbx_lld_dependency_s zbx_lld_dependency_t;
+typedef struct zbx_lld_trigger_s zbx_lld_trigger_t;
+
+ZBX_PTR_VECTOR_DECL(lld_item_full_ptr, zbx_lld_item_full_t*)
+ZBX_PTR_VECTOR_DECL(lld_dependency_ptr, zbx_lld_dependency_t*)
+ZBX_PTR_VECTOR_DECL(lld_trigger_ptr, zbx_lld_trigger_t*)
+
 typedef struct
 {
 	zbx_uint64_t	itemid;
@@ -204,10 +212,6 @@ ZBX_PTR_VECTOR_DECL(lld_item_prototype_ptr, zbx_lld_item_prototype_t*)
 
 int	lld_item_prototype_compare_func(const void *d1, const void *d2);
 
-typedef struct zbx_lld_item_full_s zbx_lld_item_full_t;
-
-ZBX_VECTOR_STRUCT_DECL(lld_item_full_ptr, zbx_lld_item_full_t*)
-
 struct zbx_lld_item_full_s
 {
 	zbx_uint64_t				itemid;
@@ -339,8 +343,6 @@ struct zbx_lld_item_full_s
 	unsigned char				verify_host_orig;
 	unsigned char				allow_traps_orig;
 };
-
-ZBX_PTR_VECTOR_FUNC_DECL(lld_item_full_ptr, zbx_lld_item_full_t*)
 
 int	lld_item_full_compare_func(const void *d1, const void *d2);
 

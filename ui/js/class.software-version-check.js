@@ -105,7 +105,7 @@ class CSoftwareVersionCheck {
 					console.log('Could not update data', {error: response.error});
 				}
 
-				this.#startUpdating(response.delay);
+				this.#startUpdating(response.delay || CSoftwareVersionCheck.DELAY_ON_ERROR);
 			})
 			.catch(exception => {
 				console.log('Could not update data', exception);

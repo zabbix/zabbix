@@ -15,6 +15,22 @@
 #include "zbxexpr.h"
 
 #include "zbxnum.h"
+#include "zbx_expression_constants.h"
+
+int	zbx_is_strict_macro(const char *macro)
+{
+	const char	*strict_macros[] = {MVAR_HOST_IP, MVAR_IPADDRESS, MVAR_HOST_DNS,
+			MVAR_HOST_CONN, MVAR_HOST_TARGET_DNS, MVAR_HOST_TARGET_CONN,
+			MVAR_HOST_TARGET_IP};
+
+	for (int i = 0; i < (int)ARRSIZE(strict_macros); i++)
+	{
+		if (0 == strcmp(strict_macros[i], macro))
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
 
 /******************************************************************************
  *                                                                            *

@@ -16,6 +16,7 @@
 #define ZABBIX_ZBXAUDIT_H
 
 #include "zbxjson.h"
+#include "zbxdb.h"
 
 /* audit logging mode */
 #define ZBX_AUDITLOG_DISABLED	0
@@ -92,7 +93,7 @@ void	zbx_audit_init(int auditlog_enabled_set, int auditlog_mode_set, int audit_c
 void	zbx_audit_prepare(int audit_context_mode);
 void	zbx_audit_clean(int audit_context_mode);
 void	zbx_audit_flush(int audit_context_mode);
-int	zbx_audit_flush_once(int audit_context_mode);
+int	zbx_audit_flush_dbconn(zbx_dbconn_t *db, int audit_context_mode);
 
 void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const int id_table, const char *audit_op,
 		const char *key, uint64_t value, const char *table, const char *field);

@@ -1087,7 +1087,7 @@ class CMediatype extends CApiService {
 			'SELECT DISTINCT om.mediatypeid,o.actionid'.
 			' FROM opmessage om,operations o'.
 			' WHERE om.operationid=o.operationid'.
-			' AND ('.dbConditionId('om.mediatypeid', array_keys($result)).' OR om.mediatypeid IS NULL)'
+				' AND ('.dbConditionId('om.mediatypeid', array_keys($result)).' OR om.mediatypeid IS NULL)'
 		);
 
 		$action_mediatypeids = [];
@@ -1095,30 +1095,28 @@ class CMediatype extends CApiService {
 		while ($row = DBfetch($db_action_mediatypes)) {
 			if ($row['mediatypeid'] == 0) {
 				foreach ($result as $mediatype) {
-					$action_mediatypeids[$row['actionid']][$mediatype['mediatypeid']] = $mediatype['mediatypeid'];
+					$action_mediatypeids[$row['actionid']][$mediatype['mediatypeid']] = true;
 				}
 			}
 			else {
-				$action_mediatypeids[$row['actionid']][$row['mediatypeid']] = $row['mediatypeid'];
+				$action_mediatypeids[$row['actionid']][$row['mediatypeid']] = true;
 			}
 		}
 
-		$action_options = [
+		$actions = API::Action()->get([
 			'output' => $options['selectActions'],
-			'actionids' => array_keys($action_mediatypeids)
-		];
-
-		$db_actions = DBselect(DB::makeSql('actions', $action_options));
+			'actionids' => array_keys($action_mediatypeids),
+			'sortfield' => 'name',
+			'preservekeys' => true
+		]);
 
 		foreach ($result as $mediatype) {
 			$result[$mediatype['mediatypeid']]['actions'] = [];
 		}
 
-		while ($action = DBfetch($db_actions)) {
-			foreach ($action_mediatypeids[$action['actionid']] as $mediatypeid) {
+		foreach ($actions as $actionid => $action) {
+			foreach ($action_mediatypeids[$actionid] as $mediatypeid => $foo) {
 				$result[$mediatypeid]['actions'][] = $action;
-
-				CArrayHelper::sort($result[$mediatypeid]['actions'], ['name']);
 			}
 		}
 	}

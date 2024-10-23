@@ -53,7 +53,7 @@ static int	zbx_config_eventlog_max_lines_per_second = 20;
 static char	*config_load_module_path = NULL;
 static char	**config_aliases = NULL;
 static char	**config_load_module = NULL;
-static char	**zbx_config_user_parameters = NULL;
+static char	**config_user_parameters = NULL;
 static char	*config_user_parameter_dir = NULL;
 #if defined(_WINDOWS)
 static char	**config_perf_counters = NULL;
@@ -852,7 +852,6 @@ static int	add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vect
 				zbx_config_eventlog_max_lines_per_second;
 		config_active_args[forks].config_max_lines_per_second = zbx_config_max_lines_per_second;
 		config_active_args[forks].config_refresh_active_checks = zbx_config_refresh_active_checks;
-		config_active_args[forks].config_user_parameters = zbx_config_user_parameters;
 	}
 
 	return SUCCEED;
@@ -994,7 +993,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			1},
 		{"Alias",			&config_aliases,			ZBX_CFG_TYPE_MULTISTRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
-		{"UserParameter",		&zbx_config_user_parameters,		ZBX_CFG_TYPE_MULTISTRING,
+		{"UserParameter",		&config_user_parameters,		ZBX_CFG_TYPE_MULTISTRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"UserParameterDir",		&config_user_parameter_dir,		ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
@@ -1062,7 +1061,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 
 	/* initialize multistrings */
 	zbx_strarr_init(&config_aliases);
-	zbx_strarr_init(&zbx_config_user_parameters);
+	zbx_strarr_init(&config_user_parameters);
 #ifndef _WINDOWS
 	zbx_strarr_init(&config_load_module);
 #endif
@@ -1119,7 +1118,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 static void	zbx_free_config(void)
 {
 	zbx_strarr_free(&config_aliases);
-	zbx_strarr_free(&zbx_config_user_parameters);
+	zbx_strarr_free(&config_user_parameters);
 #ifndef _WINDOWS
 	zbx_strarr_free(&config_load_module);
 #endif
@@ -1352,7 +1351,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 #endif
 
-	if (FAIL == load_user_parameters(zbx_config_user_parameters, &error))
+	if (FAIL == load_user_parameters(config_user_parameters, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot load user parameters: %s", error);
 		zbx_free(error);
@@ -1431,7 +1430,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_thread_info_t		*thread_info;
 		zbx_thread_listener_args	listener_args = {&listen_sock, zbx_config_tls, get_zbx_program_type,
 								config_file, zbx_config_timeout,
-								zbx_config_hosts_allowed, zbx_config_user_parameters};
+								zbx_config_hosts_allowed};
 
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
 		thread_info = &thread_args->info;
@@ -1663,7 +1662,7 @@ int	main(int argc, char **argv)
 			load_aliases(config_aliases);
 			zbx_set_user_parameter_dir(config_user_parameter_dir);
 
-			if (FAIL == load_user_parameters(zbx_config_user_parameters, &error))
+			if (FAIL == load_user_parameters(config_user_parameters, &error))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot load user parameters: %s", error);
 				zbx_free(error);
@@ -1701,7 +1700,7 @@ int	main(int argc, char **argv)
 #endif
 			zbx_set_user_parameter_dir(config_user_parameter_dir);
 
-			if (FAIL == load_user_parameters(zbx_config_user_parameters, &error))
+			if (FAIL == load_user_parameters(config_user_parameters, &error))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot load user parameters: %s", error);
 				zbx_free(error);

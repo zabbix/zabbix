@@ -51,4 +51,6 @@ int	zbx_comms_exchange_with_redirect(const char *source_ip, zbx_vector_addr_ptr_
 		int connect_timeout, int retry_interval, int loglevel, const zbx_config_tls_t *config_tls,
 		const char *data, char *(*connect_callback)(void *), void *cb_data, char **out, char **error);
 
+void	zbx_addrs_failover(zbx_vector_addr_ptr_t *addrs);
+
 #endif // ZABBIX_COMMSHIGH_H

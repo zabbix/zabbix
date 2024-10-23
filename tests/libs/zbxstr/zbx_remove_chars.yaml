@@ -1,0 +1,50 @@
+---
+test case: "1. abc c"
+in:
+  string: "abc"
+  list: "c"
+out:
+  return: "ab"
+---
+test case: "2. $123$ $"
+in:
+  string: "$123$"
+  list: "$"
+out:
+  return: "123"
+---
+test case: "3. empty string"
+in:
+  string: ""
+  list: ""
+out:
+  return: ""
+---
+test case: "4. Unicode Symbols"
+in:
+  string: "Ω≈ç√∫˜µ≤≥÷"
+  list: "Ω"
+out:
+  return: "≈ç√∫˜µ≤≥÷"
+---
+test case: "5. Newlines"
+in:
+  string: "\nNewlines\n"
+  list: "\n"
+out:
+  return: "Newlines"
+---
+test case: "6. Backslashes"
+in:
+  string: \\\\\Something\\\\\\
+  list: \
+out:
+  return: "Something"
+---
+test case: "7. Quotation mark"
+in:
+  string: '"""t"""'
+  list: '"'
+out:
+  return: "t"
+...

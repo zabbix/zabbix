@@ -1,0 +1,61 @@
+---
+test case: "1. 10.0100 -> 10.01"
+in:
+  string: "10.0100"
+out:
+  string: "10.01"
+---
+test case: "2. 10. -> 10"
+in:
+  string: "10."
+out:
+  string: "10"
+---
+test case: "3. 1.000e10 -> 1.000e10"
+in:
+  string: "1.000e10"
+out:
+  string: "1.000e10"
+---
+test case: "4. 1000 -> 1000"
+in:
+  string: "1000"
+out:
+  string: "1000"
+---
+test case: "5. 0 -> 0"
+in:
+  string: "0"
+out:
+  string: "0"
+---
+test case: "6. -0 -> -0"
+in:
+  string: "-0"
+out:
+  string: "-0"
+---
+test case: "7. +0 -> +0"
+in:
+  string: "+0"
+out:
+  string: "+0"
+---
+test case: "8. empty -> empty"
+in:
+  string: ""
+out:
+  string: ""
+---
+test case: 9. \\100.100 -> \\100.1
+in:
+  string: \\100.100
+out:
+  string: \\100.1
+---
+test case: '10. \n-100.200'
+in:
+  string: "\n-100.200"
+out:
+  string: "\n-100.2"
+...

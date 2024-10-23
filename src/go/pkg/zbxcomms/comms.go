@@ -361,7 +361,7 @@ func Exchange(addrpool AddressSet, localAddr *net.Addr, timeout time.Duration, c
 		errs = append(errs, fmt.Errorf("cannot connect to [%s]: %s", addrpool.Get(), err))
 		log.Tracef("%s", errs[len(errs)-1])
 
-		addrpool.next()
+		addrpool.Next()
 	}
 
 	if err != nil {
@@ -377,6 +377,7 @@ func Exchange(addrpool AddressSet, localAddr *net.Addr, timeout time.Duration, c
 		errs = append(errs, fmt.Errorf("cannot send to [%s]: %s", addrpool.Get(), err))
 		log.Tracef("%s", errs[len(errs)-1])
 
+		addrpool.Next()
 		return nil, errs, nil
 	}
 
@@ -386,8 +387,6 @@ func Exchange(addrpool AddressSet, localAddr *net.Addr, timeout time.Duration, c
 	if err != nil {
 		errs = append(errs, fmt.Errorf("cannot receive data from [%s]: %s", addrpool.Get(), err))
 		log.Tracef("%s", errs[len(errs)-1])
-
-		return nil, errs, errs[len(errs)-1]
 	}
 	log.Tracef("received [%s] from [%s]", string(b), addrpool.Get())
 
@@ -395,6 +394,7 @@ func Exchange(addrpool AddressSet, localAddr *net.Addr, timeout time.Duration, c
 		errs = append(errs, fmt.Errorf("connection closed"))
 		log.Tracef("%s", errs[len(errs)-1])
 
+		addrpool.Next()
 		return nil, errs, errs[len(errs)-1]
 	}
 

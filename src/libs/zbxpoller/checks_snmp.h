@@ -34,7 +34,8 @@
 typedef struct zbx_snmp_context	zbx_snmp_context_t;
 
 void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes, int num,
-		unsigned char poller_type, const char *config_source_ip, const char *progname);
+		unsigned char poller_type, const char *config_source_ip, const int config_timeout,
+		const char *progname);
 
 int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_task_clear_cb_t clear_cb,
 		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
