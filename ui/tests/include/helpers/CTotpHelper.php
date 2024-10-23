@@ -14,44 +14,61 @@
 **/
 
 
+define('SHA_1', 'sha1');
+define('SHA_256', 'sha256');
+define('SHA_512', 'sha512');
+
 /**
  * Class for generating MFA TOTP tokens.
  */
 class CTotpHelper {
-	const VALID_BASE32_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+	private const VALID_BASE32_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 
 	/**
 	 * Generate a Time-based One-Time Password (TOTP) based on the provided secret.
 	 *
-	 * @param string $secret    Base32-encoded secret used to generate the TOTP.
+	 * @param string $secret       Base32-encoded secret used to generate the TOTP.
+	 * @param int    $digits       Number of digits for the TOTP (6 or 8).
+	 * @param string $hash_func    Hash function to use (e.g., 'sha1', 'sha256').
 	 *
-	 * @return string    The 6-digit TOTP.
+	 * @return string                      The TOTP of specified digit length.
+	 * @throws InvalidArgumentException    If the number of digits is not 6 or 8, or if an unsupported hash provided.
 	 */
-	public static function generateTotp($secret) {
-		// Calculate the current time step. The TOTP changes every 30 seconds
+	public static function generateTotp($secret, $digits = 6, $hash_func = SHA_1) {
+		// Validate the number of digits.
+		if (!in_array($digits, [6, 8])) {
+			throw new InvalidArgumentException('TOTP length must be either 6 or 8.');
+		}
+
+		// Validate the provided hash function.
+		if (!in_array($hash_func, [SHA_1, SHA_256, SHA_512])) {
+			throw new InvalidArgumentException('TOTP hash function not supported.');
+		}
+
+		// Calculate the current time step. The TOTP changes every 30 seconds.
 		$time_step = floor(time() / 30);
-		// Convert time step to a 64 bit binary timestamp.
+		// Convert time step to a 64-bit binary timestamp.
 		$time_step_binary = pack('J', $time_step);
 
 		// Convert the secret key from Base32 to binary.
 		$secret_binary = self::base32Decode($secret);
 
 		// Generate the hash that the TOTP is extracted from.
-		$hash_binary = hash_hmac('sha1', $time_step_binary, $secret_binary, true);
+		$hash_binary = hash_hmac($hash_func, $time_step_binary, $secret_binary, true);
 
 		// Determine the offset for TOTP extraction.
-		$offset = ord($hash_binary[19]) & 0xf;
+		$offset = ord($hash_binary[strlen($hash_binary) - 1]) & 0xf;
 
-		// Extract the TOTP from the hash
+		// Extract the TOTP from the binary hash.
 		$totp = (((
 				(ord($hash_binary[$offset + 0]) & 0x7f) << 24 |
 				(ord($hash_binary[$offset + 1]) & 0xff) << 16 |
 				(ord($hash_binary[$offset + 2]) & 0xff) << 8 |
 				(ord($hash_binary[$offset + 3]) & 0xff)
-			) % 1000000)); // Limit to 6 digits
+			) % pow(10, $digits))); // limit to the specified digit count
 
 		// Zero pad and return.
-		return str_pad($totp, 6, '0', STR_PAD_LEFT);
+		return str_pad($totp, $digits, '0', STR_PAD_LEFT);
 	}
 
 	/**
@@ -59,8 +76,8 @@ class CTotpHelper {
 	 *
 	 * @param string $base32_secret    Base32 secret string to be decoded.
 	 *
-	 * @return string    Decoded secret binary data.
-	 * @throws InvalidArgumentException   If the input contains invalid Base32 characters.
+	 * @return string                      Decoded secret binary data.
+	 * @throws InvalidArgumentException    If the input contains invalid Base32 characters.
 	 */
 	private static function base32Decode($base32_secret) {
 		$base32_secret = strtoupper($base32_secret);
