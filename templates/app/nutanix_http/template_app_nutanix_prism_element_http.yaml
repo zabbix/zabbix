@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-10-10T14:30:37Z'
+  date: '2024-10-14T16:16:36Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -189,7 +189,6 @@ zabbix_export:
               parameters:
                 - $.error
               error_handler: CUSTOM_VALUE
-              error_handler_params: ' '
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
@@ -201,7 +200,7 @@ zabbix_export:
           triggers:
             - uuid: 741e1271a7454b9ab0214ae39b04f9cb
               expression: 'length(last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.alert.get.check))>0'
-              name: 'Nutanix Cluster: Failed to get alert data from API'
+              name: 'Nutanix Cluster: Failed to get alert data from the API'
               priority: HIGH
               description: 'Failed to get data from the API. Check the latest values for details.'
               tags:
@@ -1703,7 +1702,6 @@ zabbix_export:
               parameters:
                 - $.error
               error_handler: CUSTOM_VALUE
-              error_handler_params: ' '
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
@@ -1715,7 +1713,7 @@ zabbix_export:
           triggers:
             - uuid: 5ac8ddec162b4668b1df1493216792d6
               expression: 'length(last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.metric.get.check))>0'
-              name: 'Nutanix Cluster: Failed to get metric data from API'
+              name: 'Nutanix Cluster: Failed to get metric data from the API'
               priority: HIGH
               description: 'Failed to get data from the API. Check the latest values for details.'
               tags:
@@ -3886,7 +3884,6 @@ zabbix_export:
               parameters:
                 - $.error
               error_handler: CUSTOM_VALUE
-              error_handler_params: ' '
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
@@ -3898,7 +3895,7 @@ zabbix_export:
           triggers:
             - uuid: 6dbb467d463e47dca35970591ef1446f
               expression: 'length(last(/Nutanix Host Prism Element by HTTP/nutanix.host.alert.get.check))>0'
-              name: 'Nutanix Host: Failed to get alert data from API'
+              name: 'Nutanix Host: Failed to get alert data from the API'
               priority: HIGH
               description: 'Failed to get data from the API. Check the latest values for details.'
               tags:
@@ -4346,7 +4343,6 @@ zabbix_export:
               parameters:
                 - $.error
               error_handler: CUSTOM_VALUE
-              error_handler_params: ' '
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
@@ -4358,7 +4354,7 @@ zabbix_export:
           triggers:
             - uuid: a105b91b5d48438b93abc257b238e2c9
               expression: 'length(last(/Nutanix Host Prism Element by HTTP/nutanix.host.disk.get.check))>0'
-              name: 'Nutanix Host: Failed to get disk data from API'
+              name: 'Nutanix Host: Failed to get disk data from the API'
               priority: HIGH
               description: 'Failed to get data from the API. Check the latest values for details.'
               tags:
@@ -5911,7 +5907,6 @@ zabbix_export:
               parameters:
                 - $.error
               error_handler: CUSTOM_VALUE
-              error_handler_params: ' '
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
@@ -5923,7 +5918,7 @@ zabbix_export:
           triggers:
             - uuid: f23095d512e845ae846a2b774b97de51
               expression: 'length(last(/Nutanix Host Prism Element by HTTP/nutanix.host.metric.get.check))>0'
-              name: 'Nutanix Host: Failed to get metric data from API'
+              name: 'Nutanix Host: Failed to get metric data from the API'
               priority: HIGH
               description: 'Failed to get data from the API. Check the latest values for details.'
               tags:
@@ -8842,7 +8837,6 @@ zabbix_export:
               parameters:
                 - $.error
               error_handler: CUSTOM_VALUE
-              error_handler_params: ' '
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
@@ -8854,7 +8848,7 @@ zabbix_export:
           triggers:
             - uuid: baf3ae722bd44a09a628f9c81c541259
               expression: 'length(last(/Nutanix Prism Element by HTTP/nutanix.cluster.get.check))>0'
-              name: 'Nutanix: Failed to get cluster data from API'
+              name: 'Nutanix: Failed to get cluster data from the API'
               priority: HIGH
               description: 'Failed to get data from the API. Check the latest values for details.'
               tags:
@@ -9024,7 +9018,6 @@ zabbix_export:
               parameters:
                 - $.error
               error_handler: CUSTOM_VALUE
-              error_handler_params: ' '
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
@@ -9036,7 +9029,7 @@ zabbix_export:
           triggers:
             - uuid: 56e915c86d4640c3b073cb8309bf1d6e
               expression: 'length(last(/Nutanix Prism Element by HTTP/nutanix.host.get.check))>0'
-              name: 'Nutanix: Failed to get host data from API'
+              name: 'Nutanix: Failed to get host data from the API'
               priority: HIGH
               description: 'Failed to get data from the API. Check the latest values for details.'
               tags:
@@ -9211,7 +9204,6 @@ zabbix_export:
               parameters:
                 - $.error
               error_handler: CUSTOM_VALUE
-              error_handler_params: ' '
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
@@ -9223,7 +9215,7 @@ zabbix_export:
           triggers:
             - uuid: f46c6213084c4afe88065beb6cdcef33
               expression: 'length(last(/Nutanix Prism Element by HTTP/nutanix.storage.container.get.check))>0'
-              name: 'Nutanix: Failed to get storage container data from API'
+              name: 'Nutanix: Failed to get storage container data from the API'
               priority: HIGH
               description: 'Failed to get data from the API. Check the latest values for details.'
               tags:
