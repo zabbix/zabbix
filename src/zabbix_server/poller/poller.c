@@ -866,8 +866,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 					{
 						items[i].state = ITEM_STATE_NOTSUPPORTED;
 						zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid,
-								items[i].value_type, items[i].flags, &results[i],
-								&ts_tmp, items[i].state, add_result->msg);
+						items[i].value_type, items[i].flags, NULL, &ts_tmp, items[i].state,
+								add_result->msg);
 					}
 					else
 					{
@@ -890,7 +890,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
-					items[i].flags, &results[i], &timespec, items[i].state, results[i].msg);
+					items[i].flags, NULL, &timespec, items[i].state, results[i].msg);
 		}
 
 		DCpoller_requeue_items(&items[i].itemid, &timespec.sec, &errcodes[i], 1, poller_type,

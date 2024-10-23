@@ -395,18 +395,6 @@ else {
 	}
 	// Report by host.
 	else {
-		// Sanitize $data['filter']['groups'] and prepare "Host groups" filter field.
-		$data['filter']['groups'] = $data['filter']['groups']
-			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-				'output' => ['groupid', 'name'],
-				'groupids' => $data['filter']['groups'],
-				'monitored_hosts' => true,
-				'preservekeys' => true
-			]), ['groupid' => 'id'])
-			: [];
-
-		CArrayHelper::sort($data['filter']['groups'], ['name']);
-
 		// Sanitize $data['filter']['hostids'] and prepare "Hosts" filter field.
 		$data['filter']['hostids'] = $data['filter']['hostids']
 			? CArrayHelper::renameObjectsKeys(API::Host()->get([
@@ -420,14 +408,16 @@ else {
 
 		CArrayHelper::sort($data['filter']['hostids'], ['name']);
 
-		// Select monitored host triggers, derived from templates and belonging to the requested groups.
-		$groups = enrichParentGroups($data['filter']['groups']);
+		$groupids = getSubGroups($data['filter']['groups'], $data['filter']['groups'],
+			['monitored_hosts' => true]
+		);
+		CArrayHelper::sort($data['filter']['groups'], ['name']);
 
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'description', 'expression', 'value'],
 			'selectHosts' => ['name'],
-			'groupids' => $groups ? array_keys($groups) : null,
+			'groupids' => $groupids ? $groupids : null,
 			'hostids' => $data['filter']['hostids'] ? array_keys($data['filter']['hostids']) : null,
 			'expandDescription' => true,
 			'monitored' => true,

@@ -26,6 +26,7 @@
 #include "threads.h"
 #include "mutexs.h"
 #include "comms.h"
+#include "zbxself.h"
 #include "../../libs/zbxalgo/vectorimpl.h"
 #include "../../libs/zbxaudit/audit.h"
 #include "../../libs/zbxaudit/audit_ha.h"
@@ -34,6 +35,9 @@
 #define ZBX_HA_POLL_PERIOD	5
 
 #define ZBX_HA_NODE_LOCK	1
+
+extern ZBX_THREAD_LOCAL unsigned char	process_type;
+extern ZBX_THREAD_LOCAL int		process_num;
 
 static pid_t			ha_pid = ZBX_THREAD_ERROR;
 
@@ -1634,6 +1638,7 @@ out:
  ******************************************************************************/
 int	zbx_ha_start(zbx_rtc_t *rtc, int ha_status, char **error)
 {
+#define ZBX_HA_PROCESS_NUM	1
 	int			ret = FAIL, status;
 	zbx_uint32_t		code = 0;
 	zbx_thread_args_t	args;
@@ -1645,6 +1650,8 @@ int	zbx_ha_start(zbx_rtc_t *rtc, int ha_status, char **error)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	args.args = (void *)(uintptr_t)ha_status;
+	args.process_type = ZBX_PROCESS_TYPE_HA_MANAGER;
+	args.process_num = ZBX_HA_PROCESS_NUM;
 	zbx_thread_start(ha_manager_thread, &args, &ha_pid);
 
 	if (ZBX_THREAD_ERROR == ha_pid)
@@ -1702,6 +1709,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+#undef ZBX_HA_PROCESS_NUM
 }
 
 /******************************************************************************
@@ -1809,6 +1817,9 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 	zbx_ha_info_t		info;
 	zbx_timespec_t		timeout;
 
+	process_type = ((zbx_thread_args_t *)args)->process_type;
+	process_num = ((zbx_thread_args_t *)args)->process_num;
+
 	zbx_setproctitle("ha manager");
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "starting HA manager");
@@ -1863,6 +1874,8 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "HA manager started in %s mode", zbx_ha_status_str(info.ha_status));
 
+	update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
+
 	while (SUCCEED != pause && ZBX_NODE_STATUS_ERROR != info.ha_status)
 	{
 		if (tick <= (now = zbx_time()))
@@ -1903,7 +1916,9 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 		timeout.sec = (int)(tick - now);
 		timeout.ns = (int)((tick - now) * 1000000000) % 1000000000;
 
+		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 		(void)zbx_ipc_service_recv(&service, &timeout, &client, &message);
+		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 		if (NULL != message)
 		{
@@ -1975,7 +1990,9 @@ pause:
 
 	while (SUCCEED != stop)
 	{
+		update_selfmon_counter(ZBX_PROCESS_STATE_IDLE);
 		(void)zbx_ipc_service_recv(&service, &timeout, &client, &message);
+		update_selfmon_counter(ZBX_PROCESS_STATE_BUSY);
 
 		if (ZBX_NODE_STATUS_STANDBY == info.ha_status || ZBX_NODE_STATUS_ACTIVE == info.ha_status)
 			ha_db_update_lastaccess(&info);
