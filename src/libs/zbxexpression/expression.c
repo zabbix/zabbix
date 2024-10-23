@@ -2013,8 +2013,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				}
 				else if (0 == strcmp(m, MVAR_SERVICE_ID))
 				{
-					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64,
-							(unsigned long)service->serviceid);
+					replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, service->serviceid);
 				}
 				else if (0 == strcmp(m, MVAR_SERVICE_DESCRIPTION))
 				{

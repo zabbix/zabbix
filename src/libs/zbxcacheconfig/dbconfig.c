@@ -2574,7 +2574,6 @@ typedef struct
 	ZBX_DC_HOST		*host;
 	char			*ip;
 	char			*dns;
-	char			*port;
 	int			modified;
 	int			found;
 }
@@ -2587,7 +2586,6 @@ static void	dc_if_update_free(zbx_dc_if_update_t *update)
 {
 	zbx_free(update->ip);
 	zbx_free(update->dns);
-	zbx_free(update->port);
 	zbx_free(update);
 }
 
@@ -2598,39 +2596,28 @@ static void	dc_if_update_free(zbx_dc_if_update_t *update)
  ******************************************************************************/
 static void	dc_if_update_substitute_host_macros(zbx_dc_if_update_t *update, const ZBX_DC_HOST *host, int flags)
 {
-	char	*ptr;
+	char	*addr;
 
-	if (NULL != (ptr = dc_expand_host_macros_dyn(update->ip, host, flags)))
+	if (NULL != (addr = dc_expand_host_macros_dyn(update->ip, host, flags)))
 	{
-		if (SUCCEED == zbx_is_ip(ptr))
+		if (SUCCEED == zbx_is_ip(addr))
 		{
 			zbx_free(update->ip);
-			update->ip = ptr;
+			update->ip = addr;
 		}
 		else
-			zbx_free(ptr);
+			zbx_free(addr);
 	}
 
-	if (NULL != (ptr = dc_expand_host_macros_dyn(update->dns, host, flags)))
+	if (NULL != (addr = dc_expand_host_macros_dyn(update->dns, host, flags)))
 	{
-		if (SUCCEED == zbx_is_ip(ptr) || SUCCEED == zbx_validate_hostname(ptr))
+		if (SUCCEED == zbx_is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
 		{
 			zbx_free(update->dns);
-			update->dns = ptr;
+			update->dns = addr;
 		}
 		else
-			zbx_free(ptr);
-	}
-
-	if (NULL != (ptr = dc_expand_host_macros_dyn(update->port, host, flags)))
-	{
-		if (SUCCEED == zbx_is_ushort(ptr, NULL))
-		{
-			zbx_free(update->port);
-			update->port = ptr;
-		}
-		else
-			zbx_free(ptr);
+			zbx_free(addr);
 	}
 }
 
@@ -2731,7 +2718,9 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		update->ip = zbx_strdup(NULL, row[5]);
 		update->dns = zbx_strdup(NULL, row[6]);
-		update->port = zbx_strdup(NULL, row[7]);
+
+		if (SUCCEED == dc_strpool_replace(found, &interface->port, row[7]))
+			update->modified = 1;
 
 		if (0 == found)
 		{
@@ -2769,7 +2758,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		/* first resolve macros for ip and dns fields in main agent interface  */
 		/* because other interfaces might reference main interfaces ip and dns */
-		/* with {HOST.IP}, {HOST.DNS} and {HOST.PORT} macros                   */
+		/* with {HOST.IP} and {HOST.DNS} macros                                */
 		if (1 == interface->main && INTERFACE_TYPE_AGENT == interface->type)
 		{
 			dc_if_update_substitute_host_macros(update, host, 0);
@@ -2778,9 +2767,6 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 				update->modified = 1;
 
 			if (SUCCEED == dc_strpool_replace(found, &interface->dns, update->dns))
-				update->modified = 1;
-
-			if (SUCCEED == dc_strpool_replace(found, &interface->port, update->port))
 				update->modified = 1;
 		}
 		update->found = found;
@@ -2825,8 +2811,6 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			if (SUCCEED == dc_strpool_replace(update->found, &update->interface->dns, update->dns))
 				update->modified = 1;
 
-			if (SUCCEED == dc_strpool_replace(update->found, &update->interface->port, update->port))
-				update->modified = 1;
 		}
 
 		if (0 != update->modified)
@@ -7319,7 +7303,6 @@ static void	DCsync_connectors(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
-
 
 /******************************************************************************
  *                                                                            *
