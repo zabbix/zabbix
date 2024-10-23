@@ -47,16 +47,23 @@ class CEventNameValidator extends CValidator {
 		]);
 
 		while (isset($value[$p])) {
-			if ($value[$p] === '{' && (substr($value, $p, 2) === '{?' || substr($value, $p, 3) === '{{?')) {
-				$parser = substr($value, $p, 2) === '{?' ? $expr_macro : $expr_func_macro;
+			if (substr($value, $p, 3) === '{{?') {
+				if ($expr_func_macro->parse($value, $p) !== CParser::PARSE_FAIL) {
+					$p += $expr_func_macro->getLength();
 
-				if ($parser->parse($value, $p) === CParser::PARSE_FAIL) {
-					$this->setError($parser->getError());
+					continue;
+				}
+				$p++;
+			}
+
+			if (substr($value, $p, 2) === '{?') {
+				if ($expr_macro->parse($value, $p) === CParser::PARSE_FAIL) {
+					$this->setError($expr_macro->getError());
 
 					return false;
 				}
 
-				$p += $parser->getLength();
+				$p += $expr_macro->getLength();
 
 				continue;
 			}
