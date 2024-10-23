@@ -16,11 +16,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-
 use strict;
 use File::Basename;
 
-my (%output, $insert_into, $fields);
+my (%output, $insert_into, $fields, @values_list);
 
 my %mysql = (
 	"database"	=>	"mysql",
@@ -43,15 +42,8 @@ my %postgresql = (
 	"exec_cmd"	=>	";\n"
 );
 
-my %sqlite3 = (
-	"database"	=>	"sqlite3",
-	"before"	=>	"BEGIN TRANSACTION;\n",
-	"after"		=>	"COMMIT;\n",
-	"exec_cmd"	=>	";\n"
-);
-
 # Maximum line length that SQL*Plus can read from .sql file is 2499 characters.
-# Splitting long entries in 'media_type' table have to happen before SQL*Plus limit has been reached and end-of-lien
+# Splitting long entries in 'media_type' table have to happen before SQL*Plus limit has been reached and end-of-line
 # character has to stay intact in one line.
 my $oracle_field_limit = 2048;
 
@@ -62,6 +54,7 @@ sub process_table
 	$line = "`$line`" if ($output{'database'} eq 'mysql');
 
 	$insert_into = "INSERT INTO $line";
+	@values_list = ();  # Reset the values list when processing a new table
 }
 
 sub process_fields
@@ -236,19 +229,24 @@ sub process_row
 
 	$values = "$values)";
 
-	if ($output{'database'} eq 'oracle')
-	{
-		print "$insert_into $fields\nvalues $values$output{'exec_cmd'}";
-	}
-	else
-	{
-		print "$insert_into $fields values $values$output{'exec_cmd'}";
+	# Add the current row's values to the list
+	push @values_list, $values;
+}
+
+sub flush_bulk_insert
+{
+	if (@values_list) {
+		my $bulk_insert = $output{'database'} eq 'mysql' || $output{'database'} eq 'postgresql'
+			? "$insert_into $fields VALUES ".join(",\n", @values_list).$output{'exec_cmd'}
+			: "$insert_into $fields\nvalues ".join("\n/\n\n$insert_into $fields\nvalues ", @values_list).$output{'exec_cmd'};
+		print $bulk_insert;
+		@values_list = ();  # Clear the values list after printing
 	}
 }
 
 sub usage
 {
-	print "Usage: $0 [mysql|oracle|postgresql|sqlite3]\n";
+	print "Usage: $0 [mysql|oracle|postgresql]\n";
 	print "The script generates Zabbix SQL data files for different database engines.\n";
 	exit;
 }
@@ -275,7 +273,6 @@ sub main
 	if ($ARGV[0] eq 'mysql')		{ %output = %mysql; }
 	elsif ($ARGV[0] eq 'oracle')		{ %output = %oracle; }
 	elsif ($ARGV[0] eq 'postgresql')	{ %output = %postgresql; }
-	elsif ($ARGV[0] eq 'sqlite3')		{ %output = %sqlite3; }
 	else					{ usage(); }
 
 	print $output{"before"};
@@ -293,10 +290,12 @@ sub main
 			$type =~ s/\s+$//; # remove trailing spaces
 
 			if ($type eq 'FIELDS')		{ process_fields($line); }
-			elsif ($type eq 'TABLE')	{ process_table($line); }
+			elsif ($type eq 'TABLE')	{ flush_bulk_insert(); process_table($line); }
 			elsif ($type eq 'ROW')		{ process_row($line); }
 		}
 	}
+
+	flush_bulk_insert();  # Ensure the last batch of rows is printed
 
 	print $output{"after"};
 }
