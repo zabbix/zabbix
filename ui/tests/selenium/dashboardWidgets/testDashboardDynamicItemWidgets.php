@@ -39,7 +39,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 			'Dynamic widgets H3I1' => 31
 		];
 		foreach ($items_data as $name => $value) {
-			CDataHelper::addItemData(self::$itemids [$name], $value);
+			CDataHelper::addItemData(self::$itemids[$name], $value);
 		}
 	}
 
@@ -94,18 +94,6 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 								'Dynamic widgets H1I1' => '11',
 								'Dynamic widgets H1I2' => '12'
 							]
-						]
-					],
-					'item_data' => [
-						[
-							'name' => 'Dynamic widgets H1I2',
-							'value' => '12',
-							'time' => 'now'
-						],
-						[
-							'name' => 'Dynamic widgets H1I1',
-							'value' => '11',
-							'time' => 'now'
 						]
 					]
 				]
@@ -164,18 +152,6 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 								'Dynamic widgets H1I2' => '12'
 							]
 						]
-					],
-					'item_data' => [
-						[
-							'name' => 'Dynamic widgets H1I2',
-							'value' => '12',
-							'time' => 'now'
-						],
-						[
-							'name' =>  'Dynamic widgets H1I1',
-							'value' => '11',
-							'time' => 'now'
-						]
 					]
 				]
 			],
@@ -226,18 +202,6 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 							'type' => 'Item history',
 							'header' => 'Dynamic widgets H1I1 & Dynamic widgets H1I2 - with host override',
 							'expected' => ['Dynamic widgets H1I1' => '21']
-						]
-					],
-					'item_data' => [
-						[
-							'name' => 'Dynamic widgets H1I2',
-							'value' => '12',
-							'time' => 'now'
-						],
-						[
-							'name' => 'Dynamic widgets H2I1',
-							'value' => '21',
-							'time' => 'now'
 						]
 					]
 				]
@@ -290,18 +254,6 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 							'header' => 'Dynamic widgets H1I1 & Dynamic widgets H1I2 - with host override',
 							'expected' => ['Dynamic widgets H1I1' => '31']
 						]
-					],
-					'item_data' => [
-						[
-							'name' => 'Dynamic widgets H1I2',
-							'value' => '12',
-							'time' => 'now'
-						],
-						[
-							'name' => 'Dynamic widgets H3I1',
-							'value' => '31',
-							'time' => 'now'
-						]
 					]
 				]
 			],
@@ -352,13 +304,6 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 							'type' => 'Item history',
 							'header' => 'Dynamic widgets H1I1 & Dynamic widgets H1I2 - with host override',
 							'empty' => true
-						]
-					],
-					'item_data' => [
-						[
-							'name' => 'Dynamic widgets H1I2',
-							'value' => '12',
-							'time' => 'now'
 						]
 					]
 				]
@@ -435,9 +380,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 			}
 
 			// Check widget content when the host match dynamic option criteria.
-			if ($expected['type'] !== 'Item history') {
-				$this->assertFalse($widget_content->query('class:no-data-message')->one(false)->isValid());
-			}
+			$this->assertFalse($widget_content->query('class:no-data-message')->one(false)->isValid());
 
 			switch ($expected['type']) {
 				case 'Item history':
@@ -447,7 +390,6 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 						$row = $data[$item];
 						$this->assertEquals($value, $row['Value']);
 					}
-
 					break;
 
 				case 'URL':
