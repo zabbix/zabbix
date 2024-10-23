@@ -169,13 +169,20 @@
 					timeout,
 					url: form_data['url'],
 					verify_host: form_data['verify_host'] || 0,
-					verify_peer: form_data['verify_peer'] || 0
+					verify_peer: form_data['verify_peer'] || 0,
+					allow_traps: form_data['allow_traps'] || <?= HTTPCHECK_ALLOW_TRAPS_OFF ?>
 				};
 
 				if (properties.authtype != <?= ZBX_HTTP_AUTH_NONE ?>) {
 					properties = jQuery.extend(properties, {
 						http_username: form_data['http_username'],
 						http_password: form_data['http_password']
+					});
+				}
+
+				if (properties.allow_traps == <?= HTTPCHECK_ALLOW_TRAPS_ON ?>) {
+					properties = jQuery.extend(properties, {
+						trapper_hosts: form_data['trapper_hosts']
 					});
 				}
 				break;

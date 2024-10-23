@@ -181,8 +181,14 @@ abstract class CControllerPopupItemTest extends CController {
 		],
 		'parameters' => [
 			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}'],
+			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
+			'support_user_macros' => true,
+			'support_lld_macros' => true
+		],
+		'trapper_hosts' => [
+			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
+			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
 		],
@@ -441,7 +447,7 @@ abstract class CControllerPopupItemTest extends CController {
 				$data_item += CArrayHelper::getByKeys($input, ['key', 'http_authtype', 'follow_redirects', 'headers',
 					'http_proxy', 'output_format', 'posts', 'post_type', 'query_fields', 'request_method',
 					'retrieve_mode', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'status_codes', 'timeout',
-					'url', 'verify_host', 'verify_peer'
+					'url', 'verify_host', 'verify_peer', 'allow_traps'
 				]) + [
 					'http_authtype' => ZBX_HTTP_AUTH_NONE,
 					'follow_redirects' => HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF,
@@ -455,6 +461,10 @@ abstract class CControllerPopupItemTest extends CController {
 
 				if ($data_item['http_authtype'] != ZBX_HTTP_AUTH_NONE) {
 					$data_item += CArrayHelper::getByKeys($input, ['http_username', 'http_password']);
+				}
+
+				if ($data_item['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_ON) {
+					$data_item += CArrayHelper::getByKeys($input, ['trapper_hosts']);
 				}
 				break;
 

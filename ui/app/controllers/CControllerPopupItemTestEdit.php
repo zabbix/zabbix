@@ -26,6 +26,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 	protected function checkInput() {
 		$fields = [
 			'authtype'				=> 'in '.implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
+			'allow_traps'			=> 'in '.implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON]),
 			'data'					=> 'array',
 			'delay'					=> 'string',
 			'get_value'				=> 'in 0,1',
@@ -69,6 +70,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'status_codes'			=> 'string',
 			'test_type'				=> 'required|in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD]),
 			'timeout'				=> 'string',
+			'trapper_hosts'			=> 'string',
 			'username'				=> 'string',
 			'url'					=> 'string',
 			'value_type'			=> 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY]),
