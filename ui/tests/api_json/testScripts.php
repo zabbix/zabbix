@@ -4609,7 +4609,8 @@ class testScripts extends CAPITest {
 				'request' => [
 					'output' => ['name', 'url'],
 					'search' => ['url' => 'http://zabbix'],
-					'sortfield' => 'name'
+					'sortfield' => 'name',
+					'sortorder' => ZBX_SORT_UP
 				],
 				'expected_results' => [
 					[
