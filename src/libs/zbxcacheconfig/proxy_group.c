@@ -71,6 +71,8 @@ void	dc_sync_proxy_group(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	zbx_dcsync_sync_start(sync, dbconfig_used_size());
+
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
 		/* removed rows will be always added at the end */
@@ -106,6 +108,8 @@ void	dc_sync_proxy_group(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	if (0 != sync->add_num + sync->update_num + sync->remove_num)
 		get_dc_config()->revision.proxy_group = revision;
+
+	zbx_dcsync_sync_end(sync, dbconfig_used_size());
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -356,6 +360,8 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	zbx_vector_dc_host_ptr_create(&hosts);
 
+	zbx_dcsync_sync_start(sync, dbconfig_used_size());
+
 	/* Encryption data in host_proxy table is stored and synced only on proxy. */
 	/* The identify conflicts have been already checked by server, so they can */
 	/* be skipped by using separate psk_owner registry.                        */
@@ -476,6 +482,8 @@ void	dc_sync_host_proxy(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	zbx_hashset_destroy(&psk_owners);
 	zbx_vector_dc_host_ptr_destroy(&hosts);
+
+	zbx_dcsync_sync_end(sync, dbconfig_used_size());
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
