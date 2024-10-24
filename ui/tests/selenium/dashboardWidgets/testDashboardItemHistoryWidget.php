@@ -1971,8 +1971,6 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			$data['check_time'] = $period['From'].' – '.$period['To'];
 		}
 
-		$values = $form->getValues();
-
 		// Fill Columns field.
 		if (array_key_exists('Columns', $data)) {
 			foreach ($data['Columns'] as $column) {
@@ -2003,6 +2001,8 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		}
 
 		if (!array_key_exists('column_error', $data)) {
+			$form->fill($data['fields']);
+			$values = $form->getValues();
 			$form->submit();
 		}
 
