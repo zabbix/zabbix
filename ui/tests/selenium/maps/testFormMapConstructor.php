@@ -119,7 +119,7 @@ class testFormMapConstructor extends CLegacyWebTest {
 						'x' => 451,
 						'y' => 501,
 						'elements' => [['triggerid' => $triggers['triggerids'][1]]]
-					],
+					]
 				]
 			]
 		]);
@@ -330,7 +330,7 @@ class testFormMapConstructor extends CLegacyWebTest {
 					'*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*',
 					'id' => 6
 				]
-			],
+			]
 		];
 	}
 
