@@ -1,0 +1,57 @@
+---
+test case: "ASCII Character - H"
+in:
+  buffer_length: 1
+  buffer: &buffer
+    - '\x48'
+out:
+  return: 1
+---
+test case: "2-Byte UTF-8 Character - ©"
+in:
+  buffer_length: 2
+  buffer: &buffer
+    - '\xc2\xa9'
+out:
+  return: 2
+---
+test case: "3-Byte UTF-8 Character - €"
+in:
+  buffer_length: 3
+  buffer: &buffer
+    - '\xe2\x82\xac'
+out:
+  return: 3
+---
+test case: "4-Byte UTF-8 Character - 𐍈"
+in:
+  buffer_length: 4
+  buffer: &buffer
+    - '\xf0\x90\x8d\x88'
+out:
+  return: 4
+---
+test case: "Not valid"
+in:
+  buffer_length: 2
+  buffer: &buffer
+    - '\xff\xbf'
+out:
+  return: 0
+---
+test case: "Empty buffer"
+in:
+  buffer_length: 0
+  buffer: &buffer
+    -
+out:
+  return: 1  # a quirk of zbx_utf8_char_len() for empty buffer
+---
+test case: "Newline"
+in:
+  buffer_length: 1
+  buffer: &buffer
+    - '\x0a'
+out:
+  return: 1
+...

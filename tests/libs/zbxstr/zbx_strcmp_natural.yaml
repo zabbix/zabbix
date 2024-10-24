@@ -1,0 +1,141 @@
+---
+test case: "1. empty strings "
+in:
+  string1: ""
+  string2: ""
+out:
+  val: equal
+---
+test case: "2. apple apple "
+in:
+  string1: "apple"
+  string2: "apple"
+out:
+  val: equal
+---
+test case: "3. appl apple "
+in:
+  string1: "appl"
+  string2: "apple"
+out:
+  val: less
+---
+test case: "4. 1 2 "
+in:
+  string1: "1"
+  string2: "2"
+out:
+  val: less
+---
+test case: "4. 2 1 "
+in:
+  string1: "2"
+  string2: "1"
+out:
+  val: greater
+---
+test case: "5. Ω ≈ "
+in:
+  string1: "Ω"
+  string2: "≈"
+out:
+  val: less
+---
+test case: "6. string.234 string.432 "
+in:
+  string1: "string.234"
+  string2: "string.432"
+out:
+  val: less
+---
+test case: "7. 製 和"
+in:
+  string1: "製"
+  string2: "和"
+out:
+  val: greater
+---
+test case: "8. Первый Второй"
+in:
+  string1: "Первый"
+  string2: "Второй"
+out:
+  val: greater
+---
+test case: "8. ❤ 😅"
+in:
+  string1: "❤"
+  string2: "😅"
+out:
+  val: less
+---
+test case: "9. Strings are different on a second newline less"
+in:
+  string1: "aaa\nbbb"
+  string2: "aaa\nccc"
+out:
+  val: less
+---
+test case: "10. Strings are different on a second newline greater"
+in:
+  string1: "aaa\nccc"
+  string2: "aaa\nbbb"
+out:
+  val: greater
+---
+test case: "11. 4 and 2 bytes"
+in:
+  string1: "❤"
+  string2: "田"
+out:
+  val: less
+---
+test case: "12. Empty and backslash"
+in:
+  string1: ""
+  string2: '\'
+out:
+  val: less
+---
+test case: "13. Newline and empty"
+in:
+  string1: "\n"
+  string2: ""
+out:
+  val: greater
+---
+test case: "14. Newline and 2 newlines"
+in:
+  string1: "\n"
+  string2: "\n\n"
+out:
+  val: less
+---
+test case: "15. Single quote with empty"
+in:
+  string1: "'"
+  string2: ""
+out:
+  val: greater
+---
+test case: "16. Apostrophe "
+in:
+  string1: "'"
+  string2: "'"
+out:
+  val: equal
+---
+test case: "17. Newline & Newline "
+in:
+  string1: "\n"
+  string2: "\n"
+out:
+  val: equal
+---
+test case: "18. Backslash"
+in:
+  string1: '\'
+  string2: '\'
+out:
+  val: equal
+...

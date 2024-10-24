@@ -23,7 +23,6 @@
 #include "zbxtime.h"
 #include "zbxcacheconfig.h"
 #include "zbxalgo.h"
-#include "zbxdbhigh.h"
 #include "zbxdb.h"
 #include "zbxstr.h"
 

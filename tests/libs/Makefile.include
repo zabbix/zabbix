@@ -94,11 +94,16 @@ EVAL_DEPS = \
 
 DB_DEPS = \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxshmem/libzbxshmem.a \
+	$(top_srcdir)/src/libs/zbxdbschema/libzbxdbschema.a \
+	$(CFG_DEPS) \
 	$(JSON_DEPS) \
+	$(MUTEX_DEPS) \
+	$(CRYPTO_DEPS) \
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a 
 
 # WARNING - cyclyc dependency with DBHIGH
 TAGFILTER_DEPS = \
@@ -110,7 +115,6 @@ TAGFILTER_DEPS = \
 DBHIGH_DEPS = \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(DB_DEPS) \
-	$(top_srcdir)/src/libs/zbxdbschema/libzbxdbschema.a \
 	$(TAGFILTER_DEPS) \
 	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(CRYPTO_DEPS) \

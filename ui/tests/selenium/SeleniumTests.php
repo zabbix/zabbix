@@ -87,6 +87,7 @@ require_once dirname(__FILE__).'/dashboardWidgets/testDashboardTopHostsWidget.ph
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardTopTriggersWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardTriggerOverviewWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardURLWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardWidgetCommunication.php';
 
 // Event correlation.
 require_once dirname(__FILE__).'/eventCorrelation/testFormEventCorrelation.php';
@@ -178,7 +179,7 @@ require_once dirname(__FILE__).'/maps/testFormMapConstructor.php';
 require_once dirname(__FILE__).'/maps/testFormMapProperties.php';
 require_once dirname(__FILE__).'/maps/testPageMaps.php';
 
-// Maintenance
+// Maintenance.
 require_once dirname(__FILE__).'/maintenance/testFormMaintenance.php';
 require_once dirname(__FILE__).'/maintenance/testPageMaintenance.php';
 
@@ -213,6 +214,7 @@ require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingLowLevelDisc
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingTest.php';
 
 // Problems.
+require_once dirname(__FILE__).'/problems/testCauseAndSymptomEvents.php';
 require_once dirname(__FILE__).'/problems/testFormUpdateProblem.php';
 require_once dirname(__FILE__).'/problems/testPageProblems.php';
 
@@ -340,6 +342,7 @@ require_once dirname(__FILE__).'/testPageInventory.php';
 require_once dirname(__FILE__).'/testPageSearch.php';
 require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
 require_once dirname(__FILE__).'/testPagesWithoutData.php';
+require_once dirname(__FILE__).'/testPSKEncryption.php';
 require_once dirname(__FILE__).'/testSidebarMenu.php';
 require_once dirname(__FILE__).'/testTimezone.php';
 require_once dirname(__FILE__).'/testUrlParameters.php';
@@ -424,6 +427,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardTopTriggersWidget');
 		$suite->addTestSuite('testDashboardTriggerOverviewWidget');
 		$suite->addTestSuite('testDashboardURLWidget');
+		$suite->addTestSuite('testDashboardWidgetCommunication');
 
 		// Event correlation.
 		$suite->addTestSuite('testFormEventCorrelation');
@@ -550,6 +554,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormPreprocessingTest');
 
 		// Problems.
+		$suite->addTestSuite('testCauseAndSymptomEvents');
 		$suite->addTestSuite('testPageProblems');
 		$suite->addTestSuite('testFormUpdateProblem');
 
@@ -677,6 +682,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testPagesWithoutData');
+		$suite->addTestSuite('testPSKEncryption');
 		$suite->addTestSuite('testSidebarMenu');
 		$suite->addTestSuite('testTimezone');
 		$suite->addTestSuite('testUrlParameters');

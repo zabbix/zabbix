@@ -18,7 +18,6 @@
 #include "zbxdbschema.h"
 #include "zbxtime.h"
 #include "zbxdb.h"
-#include "zbxdbhigh.h"
 #include "zbxstr.h"
 #include "zbx_ha_constants.h"
 

@@ -483,6 +483,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Trapper LLD for filter',
 						'Trīspadsmitais LLD',
 						'Zabbix server health: Zabbix proxies stats: Zabbix proxy discovery',
+						'Zabbix server health: Zabbix proxy groups stats: Zabbix proxy groups discovery',
 						'Četrpadsmitais LLD'
 					]
 				]

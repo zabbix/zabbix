@@ -1,0 +1,65 @@
+---
+test case: "user@example.com - @"
+in:
+  src: "user@example.com"
+  delimiter: '@' # delimiter must be single-byte character
+out:
+  result_left: "user"
+  result_right: "example.com"
+---
+test case: "usr/test/smth - /"
+in:
+  src: "usr/test/smth"
+  delimiter: '/' # delimiter must be single-byte character
+out:
+  result_left: "usr"
+  result_right: "test/smth"
+---
+test case: "00000/////0000 - /"
+in:
+  src: "00000/////0000"
+  delimiter: '/' # delimiter must be single-byte character
+out:
+  result_left: "00000"
+  result_right: "////0000"
+---
+test case: "/usr/bin - /"
+in:
+  src: "/usr/bin"
+  delimiter: '/' # delimiter must be single-byte character
+out:
+  result_left: ""
+  result_right: "usr/bin"
+---
+test case: "usr|bin/ - /"
+in:
+  src: "usr|bin/"
+  delimiter: '/' # delimiter must be single-byte character
+out:
+  result_left: "usr|bin"
+  result_right: ""
+---
+test case: "Special characters"
+in:
+  src: "!@#$%^&*()`~"
+  delimiter: '&' # delimiter must be single-byte character
+out:
+  result_left: "!@#$%^"
+  result_right: "*()`~"
+---
+test case: "Newlines"
+in:
+  src: "Newlines\nNewlines\nNewlines"
+  delimiter: "\n" # delimiter must be single-byte character
+out:
+  result_left: "Newlines"
+  result_right: "Newlines\nNewlines"
+---
+test case: "Emoji and Quotation marks"
+in:
+  src: ❤"❤❤❤❤"❤❤
+  delimiter: '"' # delimiter must be single-byte character
+out:
+  result_left: "❤"
+  result_right: ❤❤❤❤"❤❤
+...

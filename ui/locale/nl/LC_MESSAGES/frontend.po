@@ -5,8 +5,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-08-26 09:02+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2024-10-11 20:12+0000\n"
+"Last-Translator: Peter Beersmans <peterbeersmans1966@gmail.com>\n"
 "Language-Team: NL\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -2074,6 +2074,14 @@ msgstr "Rand type"
 msgid "Border width"
 msgstr "Rand wijdte"
 
+#: include/classes/api/services/CHost.php:1445
+msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1452
+msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
+msgstr ""
+
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
 msgstr "Beide wachtwoorden moeten gelijk zijn."
@@ -2863,8 +2871,8 @@ msgstr "Kan dienst \"%1$s\": %2$s niet verwijderen."
 #: app/controllers/CControllerTemplateDelete.php:143
 msgid "Cannot delete template"
 msgid_plural "Cannot delete templates"
-msgstr[0] "Kan template niet verwijderen"
-msgstr[1] "Kan sjabloonen niet verwijderen"
+msgstr[0] "Kan sjabloon niet verwijderen"
+msgstr[1] "Kan sjablonen niet verwijderen"
 
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
@@ -2938,8 +2946,8 @@ msgstr[1] "Kan gebruikersrollen niet verwijderen"
 #: httpconf.php:178 httpconf.php:418
 msgid "Cannot delete web scenario"
 msgid_plural "Cannot delete web scenarios"
-msgstr[0] "Kan web scenario niet verwijderen"
-msgstr[1] "Kan web scenarios niet verwijderen"
+msgstr[0] "Kan webscenario niet verwijderen"
+msgstr[1] "Kan webscenario's niet verwijderen"
 
 #: app/controllers/CControllerTokenDisable.php:66
 msgid "Cannot disable API token"
@@ -20256,6 +20264,10 @@ msgstr ""
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr ""
 
+#: include/classes/api/services/CHost.php:1433
+msgid "The field \"monitored_by\" must be specified when changing proxy or proxy group for host monitoring."
+msgstr ""
+
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
 msgstr ""
@@ -23988,6 +24000,16 @@ msgstr ""
 
 #: app/views/administration.geomaps.edit.php:47
 msgid "and"
+msgstr ""
+
+#: include/classes/api/helpers/CApiPskHelper.php:27
+#: include/classes/api/helpers/CApiPskHelper.php:57
+#: include/classes/api/helpers/CApiPskHelper.php:73
+#: include/classes/api/helpers/CApiPskHelper.php:106
+#: include/classes/api/helpers/CApiPskHelper.php:139
+#: include/classes/api/helpers/CApiPskHelper.php:160
+#: include/classes/api/helpers/CApiPskHelper.php:176
+msgid "another tls_psk value is already associated with given tls_psk_identity"
 msgstr ""
 
 #: include/forms.inc.php:1450 include/views/js/item.preprocessing.js.php:237

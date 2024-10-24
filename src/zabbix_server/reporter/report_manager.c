@@ -130,6 +130,7 @@ typedef struct
 	zbx_uint64_t		batchid;
 	char			*url;
 	char			*report_name;
+	unsigned char		is_test_report;
 	zbx_vector_uint64_t	userids;
 	zbx_vector_ptr_pair_t	params;
 	zbx_rm_session_t	*session;
@@ -1436,7 +1437,25 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 
 	if (0 == dsts.values_num)
 	{
-		*error = zbx_dsprintf(NULL, "No media configured for the report recipients");
+		char	*username = NULL;
+
+		if (1 != job->is_test_report)
+		{
+			*error = zbx_dsprintf(NULL, "No media configured for the report recipients");
+			goto out;
+		}
+
+		sql = zbx_dsprintf(sql, "select username from users where userid=" ZBX_FS_UI64, job->userids.values[0]);
+
+		result = zbx_db_select("%s", sql);
+
+		/* username of the user who tests a scheduled report should always be present */
+		if (NULL != (row = zbx_db_fetch(result)))
+			username = row[0];
+
+		*error = zbx_dsprintf(NULL, "No media configured for the report recipient '%s'",
+				ZBX_NULL2STR(username));
+		zbx_db_free_result(result);
 		goto out;
 	}
 
@@ -2072,6 +2091,7 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 	if (NULL != (job = rm_create_job(manager, name, dashboardid, access_userid, report_time, period, &userid, 1,
 			&params, error)))
 	{
+		job->is_test_report = 1;
 		zbx_ipc_client_addref(client);
 		job->client = client;
 		(void)zbx_list_append(&manager->job_queue, job, NULL);

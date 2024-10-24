@@ -192,7 +192,7 @@ class CConnector extends CApiService {
 			'data_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_EVENTS]), 'default' => DB::getDefault('connector', 'data_type')],
 			'url' =>				['type' => API_URL, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('connector', 'url')],
 			'item_value_type' => 	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'data_type', 'in' => ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES], 'type' => API_INT32, 'in' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT.':'.(ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT | ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR | ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG | ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64 | ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT)],
+										['if' => ['field' => 'data_type', 'in' => ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES], 'type' => API_INT32, 'in' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT.':'.(ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT | ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR | ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG | ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64 | ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT | ZBX_CONNECTOR_ITEM_VALUE_TYPE_BIN)],
 										['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('connector', 'item_value_type')]
 			]],
 			'authtype' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ZBX_HTTP_AUTH_BEARER]), 'default' => DB::getDefault('connector', 'authtype')],
@@ -365,7 +365,7 @@ class CConnector extends CApiService {
 			'data_type' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES, ZBX_CONNECTOR_DATA_TYPE_EVENTS])],
 			'url' =>				['type' => API_URL, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('connector', 'url')],
 			'item_value_type' => 	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'data_type', 'in' => ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES], 'type' => API_INT32, 'in' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT.':'.(ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT | ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR | ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG | ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64 | ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT)],
+										['if' => ['field' => 'data_type', 'in' => ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES], 'type' => API_INT32, 'in' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT.':'.(ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT | ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR | ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG | ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64 | ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT | ZBX_CONNECTOR_ITEM_VALUE_TYPE_BIN)],
 										['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('connector', 'item_value_type')]
 			]],
 			'authtype' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ZBX_HTTP_AUTH_BEARER])],

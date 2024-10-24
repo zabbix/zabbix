@@ -14,7 +14,6 @@
 
 #include "dbupgrade.h"
 
-#include "zbxdbhigh.h"
 #include "zbxalgo.h"
 #include "zbxnum.h"
 #include "zbxdb.h"

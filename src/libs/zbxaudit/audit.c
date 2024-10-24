@@ -20,7 +20,6 @@
 #include "zbxcacheconfig.h"
 #include "zbxnum.h"
 #include "zbxdb.h"
-#include "zbxdbhigh.h"
 #include "zbxdbschema.h"
 #include "zbxstr.h"
 #include "zbx_scripts_constants.h"
@@ -358,7 +357,7 @@ void	zbx_audit_flush(int audit_context_mode)
 	zbx_audit_clean(audit_context_mode);
 }
 
-int	zbx_audit_flush_once(int audit_context_mode)
+int	zbx_audit_flush_dbconn(zbx_dbconn_t *db, int audit_context_mode)
 {
 	char			recsetid_cuid[CUID_LEN];
 	int			ret = ZBX_DB_OK;
@@ -394,7 +393,7 @@ int	zbx_audit_flush_once(int audit_context_mode)
 		name_esc = zbx_db_dyn_escape_string((*audit_entry)->name);
 		details_esc = zbx_db_dyn_escape_string((*audit_entry)->details_json.buffer);
 
-		ret = zbx_db_execute_once("insert into auditlog (auditid,userid,username,"
+		ret = zbx_dbconn_execute(db, "insert into auditlog (auditid,userid,username,"
 				"clock,action,ip,%s,resourcename,resourcetype,recordsetid,details) values"
 				" ('%s'," AUDIT_USERID_SQL ",'%s','%d','%d','%s','%s','%s',%d,'%s','%s')",
 				pfield, (*audit_entry)->audit_cuid, AUDIT_USERNAME, (int)time(NULL),

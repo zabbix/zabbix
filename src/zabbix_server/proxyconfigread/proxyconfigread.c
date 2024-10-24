@@ -1262,14 +1262,15 @@ static int	proxyconfig_get_tables(zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_conf
 		if(0 != macro_hostids.values_num)
 			flags |= ZBX_PROXYCONFIG_SYNC_HMACROS;
 
+		/* config sync is required because of possible proxy timeout changes overriding global timeouts */
 		if (proxy_config_revision < proxy->revision)
-			flags |= ZBX_PROXYCONFIG_SYNC_DRULES;
+			flags |= ZBX_PROXYCONFIG_SYNC_DRULES | ZBX_PROXYCONFIG_SYNC_CONFIG;
 
 		if (proxy_config_revision < dc_revision->expression)
 			flags |= ZBX_PROXYCONFIG_SYNC_EXPRESSIONS;
 
-		/* force config table sync because of possible proxy timeout changes overriding global timeouts */
-		flags |= ZBX_PROXYCONFIG_SYNC_CONFIG;
+		if (proxy_config_revision < dc_revision->config_table)
+			flags |= ZBX_PROXYCONFIG_SYNC_CONFIG;
 
 		if (0 != httptestids.values_num)
 			flags |= ZBX_PROXYCONFIG_SYNC_HTTPTESTS;

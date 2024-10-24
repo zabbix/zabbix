@@ -31,14 +31,36 @@ import (
 	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/cdproto/page"
 	"github.com/chromedp/chromedp"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/zbxerr"
 )
+
+const netErrCertAuthorityInvalid = "net::ERR_CERT_AUTHORITY_INVALID"
 
 type requestBody struct {
 	URL        string            `json:"url"`
 	Header     map[string]string `json:"headers"`
 	Parameters map[string]string `json:"parameters"`
+}
+
+// Report size in pixels.
+type reportSize struct {
+	width  int64
+	height int64
+}
+
+// PDF report generation request parameters.
+type reportReqParams struct {
+	cookieParams []*network.CookieParam
+	size         reportSize
+	url          string
+}
+
+// Report generation request parameters.
+type chromedpResp struct {
+	data []byte
+	err  error
 }
 
 func newRequestBody() *requestBody {
@@ -58,7 +80,13 @@ func logAndWriteError(w http.ResponseWriter, errMsg string, code int) {
 	w.Header().Set("Content-Type", "application/problem+json")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.WriteHeader(code)
-	json.NewEncoder(w).Encode(map[string]string{"detail": errMsg})
+	encoder := json.NewEncoder(w)
+	encoder.SetEscapeHTML(false)
+
+	err := encoder.Encode(map[string]string{"detail": errMsg})
+	if err != nil {
+		log.Errf("Error '%s' happened while encoding error message: '%s'", err.Error(), errMsg)
+	}
 }
 
 func (h *handler) report(w http.ResponseWriter, r *http.Request) {
@@ -109,7 +137,7 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 		opts = append(opts, chromedp.Flag("ignore-certificate-errors", "1"))
 	}
 
-	allocCtx, cancel := chromedp.NewExecAllocator(context.Background(), opts...)
+	allocCtx, cancel := chromedp.NewExecAllocator(r.Context(), opts...)
 	defer cancel()
 
 	ctx, cancel := chromedp.NewContext(allocCtx)
@@ -175,37 +203,103 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 		cookieParams = append(cookieParams, &cookieParam)
 	}
 
-	var buf []byte
+	cdpReqParams := reportReqParams{
+		cookieParams: cookieParams,
+		size: reportSize{
+			height: height,
+			width:  width,
+		},
+		url: u.String(),
+	}
 
-	if err = chromedp.Run(ctx, chromedp.Tasks{
-		network.SetCookies(cookieParams),
-		emulation.SetDeviceMetricsOverride(width, height, 1, false),
-		prepareDashboard(u.String()),
-		chromedp.ActionFunc(func(ctx context.Context) error {
-			timeoutContext, cancel := context.WithTimeout(ctx, time.Duration(options.Timeout)*time.Second)
-			defer cancel()
-			var err error
-			buf, _, err = page.PrintToPDF().
-				WithPrintBackground(true).
-				WithPreferCSSPageSize(true).
-				WithPaperWidth(pixels2inches(width)).
-				WithPaperHeight(pixels2inches(height)).
-				Do(timeoutContext)
+	respChan := make(chan chromedpResp)
+	defer close(respChan)
 
-			return err
-		}),
-	}); err != nil {
-		logAndWriteError(w, zbxerr.ErrorCannotFetchData.Wrap(err).Error(), http.StatusInternalServerError)
+	go runCDP(ctx, cancel, cdpReqParams, respChan)
+
+	// should never deadlock as chromedp.Run has it's own timeout and we should always get a response
+	resp := <-respChan
+
+	if resp.err != nil {
+		logAndWriteError(
+			w,
+			errs.WrapConst(resp.err, zbxerr.ErrorCannotFetchData).Error(),
+			http.StatusInternalServerError,
+		)
 
 		return
 	}
 
-	log.Infof("writing response for report request from %s", r.RemoteAddr)
+	log.Infof("writing response to report request from %s", r.RemoteAddr)
 
 	w.Header().Set("Content-type", "application/pdf")
-	w.Write(buf)
 
-	return
+	_, err = w.Write(resp.data)
+	if err != nil {
+		log.Errf("failed to write response to report request from %s: %s", r.RemoteAddr, err.Error())
+	}
+}
+
+func runCDP(
+	ctx context.Context,
+	cancel context.CancelFunc,
+	req reportReqParams,
+	resp chan<- chromedpResp,
+) {
+	var (
+		out         []byte
+		listenerErr error
+	)
+
+	chromedp.ListenTarget(
+		ctx,
+		func(ev any) {
+			failEvent, ok := ev.(*network.EventLoadingFailed)
+			if !ok {
+				return
+			}
+
+			listenerErr = handleErr(failEvent.ErrorText)
+
+			cancel()
+		},
+	)
+
+	err := chromedp.Run(ctx, chromedp.Tasks{
+		network.SetCookies(req.cookieParams),
+		emulation.SetDeviceMetricsOverride(req.size.width, req.size.height, 1, false),
+		prepareDashboard(req.url),
+		chromedp.ActionFunc(func(ctx context.Context) error {
+			timeoutContext, cancel := context.WithTimeout(ctx, time.Duration(options.Timeout)*time.Second)
+			defer cancel()
+			var err error
+			out, _, err = page.PrintToPDF().
+				WithPrintBackground(true).
+				WithPreferCSSPageSize(true).
+				WithPaperWidth(pixels2inches(req.size.width)).
+				WithPaperHeight(pixels2inches(req.size.height)).
+				Do(timeoutContext)
+
+			return err
+		}),
+	})
+
+	if listenerErr != nil {
+		// error is logged since in case of listenerErr chromedp error might be nil or some other error,
+		// and it is good for debugging.
+		log.Tracef("chromedp.Run exited, with err: %v", err)
+		resp <- chromedpResp{err: listenerErr}
+
+		return
+	}
+
+	if err != nil {
+		resp <- chromedpResp{err: err}
+
+		return
+	}
+
+	resp <- chromedpResp{data: out}
 }
 
 func pixels2inches(value int64) float64 {
@@ -224,20 +318,24 @@ func prepareDashboard(url string) chromedp.ActionFunc {
 }
 
 func waitForDashboardReady(ctx context.Context, url string) error {
-	const wrapperIsReady = ".wrapper.is-ready"
-	const timeout = time.Minute
-
-	expression := fmt.Sprintf("document.querySelector('%s') !== null", wrapperIsReady)
 	var isReady bool
 
-	err := chromedp.Run(ctx, chromedp.Poll(expression, &isReady, chromedp.WithPollingTimeout(timeout)))
+	err := chromedp.Run(
+		ctx,
+		chromedp.Poll(
+			"document.querySelector('.wrapper.is-ready') !== null",
+			&isReady,
+			chromedp.WithPollingTimeout(time.Second*45),
+		),
+	)
+	if err != nil {
+		return errs.Wrapf(err, "dashboard failed to get ready, url: '%s'", url)
+	}
 
-	if errors.Is(err, chromedp.ErrPollingTimeout) {
-		log.Warningf("timeout occurred while dashboard was getting ready, url: '%s'", url)
-	} else if err != nil {
-		log.Warningf("error while dashboard was getting ready: %s, url: '%s'", err.Error(), url)
-	} else if !isReady {
-		log.Warningf("should never happen, dashboard failed to get ready with no error, url: '%s'", url)
+	if !isReady {
+		/* Should never happen: */
+		/* it is expected that either dashboard gets ready or chromedp.ErrPollingTimeout happens. */
+		return errs.Errorf("dashboard failed to get ready with no error, url: '%s'", url)
 	}
 
 	return nil
@@ -258,4 +356,25 @@ func parseUrl(u string) (*url.URL, error) {
 	}
 
 	return parsed, nil
+}
+
+// handleErr returns a user friendly error message for network.EventLoadingFailed errors.
+func handleErr(errStr string) error {
+	switch errStr {
+	case netErrCertAuthorityInvalid:
+		return errs.Errorf(
+			"Invalid certificate authority detected while loading dashboard. Fix TLS configuration or " +
+				"configure Zabbix web service to ignore TLS certificate errors when accessing " +
+				"frontend URL.",
+		)
+	case "":
+		return errs.New(
+			"network.EventLoadingFailed event with empty ErrorText was received while loading dashboard.",
+		)
+	default:
+		return errs.Errorf(
+			"network.EventLoadingFailed event with ErrorText = '%s' was received while loading dashboard.",
+			errStr,
+		)
+	}
 }

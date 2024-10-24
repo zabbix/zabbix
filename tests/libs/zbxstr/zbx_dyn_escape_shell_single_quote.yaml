@@ -1,0 +1,43 @@
+---
+test case: "1. Regular string"
+in:
+  arg: "It's a nice day!"
+out:
+  string: It'\''s a nice day!
+---
+test case: "2. Empty string"
+in:
+  arg: ""
+out:
+  string: ""
+---
+test case: "3. No quotes here"
+in:
+  arg: "No quotes here"
+out:
+  string: "No quotes here"
+---
+test case: "4. 2-bytes characters"
+in:
+  arg: "社會科學院語'學研究所"
+out:
+  string: 社會科學院語'\''學研究所
+---
+test case: "5. Unicode symbols"
+in:
+  arg: "Ω≈ç√∫˜'µ≤≥÷"
+out:
+  string: Ω≈ç√∫˜'\''µ≤≥÷
+---
+test case: "6. Backslashes"
+in:
+  arg: \\'\\\'\\\
+out:
+  string: \\'\''\\\'\''\\\
+---
+test case: "7. Quote on second line"
+in:
+  arg: "Hello\nit's me"
+out:
+  string: "Hello\nit'\\''s me"
+...

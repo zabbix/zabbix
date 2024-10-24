@@ -25,6 +25,7 @@
 #include "zbxdbwrap.h"
 #include "zbxnix.h"
 #include "zbxself.h"
+#include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxlog.h"
 #include "zbxcompress.h"

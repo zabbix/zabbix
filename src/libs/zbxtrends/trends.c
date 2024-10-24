@@ -16,7 +16,6 @@
 #include "zbxtrends.h"
 
 #include "zbxtime.h"
-#include "zbxdbhigh.h"
 #include "zbxdb.h"
 #include "zbxcacheconfig.h"
 #include "zbxvariant.h"

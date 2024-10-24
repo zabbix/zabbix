@@ -15,7 +15,6 @@
 #include "lld.h"
 
 #include "../server_constants.h"
-#include "zbxdbhigh.h"
 #include "audit/zbxaudit.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
@@ -173,6 +172,9 @@ void	lld_process_lost_object(zbx_lld_discovery_t *discovery, unsigned char objec
 {
 	int	ts;
 
+	if (0 == discovery->id)
+		return;
+
 	ts = lld_get_lifetime_ts(lastcheck, lifetime);
 
 	if (ts != ts_delete)
@@ -211,6 +213,9 @@ void	lld_disable_lost_object(zbx_lld_discovery_t *discovery, unsigned char objec
 		const zbx_lld_lifetime_t *lifetime, int ts_disable)
 {
 	int	ts;
+
+	if (0 == discovery->id)
+		return;
 
 	ts = lld_get_lifetime_ts(lastcheck, lifetime);
 

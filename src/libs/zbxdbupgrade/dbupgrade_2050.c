@@ -14,7 +14,6 @@
 
 #include "dbupgrade.h"
 
-#include "zbxdbhigh.h"
 #include "zbxsysinfo.h"
 #include "zbxparam.h"
 #include "zbxdb.h"

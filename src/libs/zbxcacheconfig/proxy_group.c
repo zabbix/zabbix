@@ -20,7 +20,7 @@
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxcommon.h"
-#include "zbxdbhigh.h"
+#include "zbxdb.h"
 #include "zbxnum.h"
 #include "zbxpgservice.h"
 #include "zbxtime.h"

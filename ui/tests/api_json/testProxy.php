@@ -130,7 +130,9 @@ class testProxy extends CAPITest {
 				'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
 				'address' => '127.0.0.1',
 				'port' => '10050',
-				'tls_connect' => HOST_ENCRYPTION_PSK
+				'tls_connect' => HOST_ENCRYPTION_PSK,
+				'tls_psk_identity' => 'proxyidentity',
+				'tls_psk' => '486a9e7b43740b3619e42636cb1c24bf'
 			],
 			'passive_cert' => [
 				'name' => 'API test proxy - passive with certificate-based connections to proxy',
@@ -1323,7 +1325,7 @@ class testProxy extends CAPITest {
 					'local_address' => 'localhost',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 				],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'Invalid parameter "/1/proxy_groupid": object does not exist, or you have no permissions to it.'
 			],
 
 			// Check "local_address".
@@ -1790,6 +1792,14 @@ class testProxy extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value must be empty.'
 			],
+			'Test proxy.create: invalid "tls_psk_identity" required for active proxy' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'tls_accept' => HOST_ENCRYPTION_PSK
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "tls_psk_identity" is missing.'
+			],
 			'Test proxy.create: invalid "tls_psk_identity" (empty string) for active proxy' => [
 				'proxy' => [
 					'name' => 'API create proxy',
@@ -1798,6 +1808,16 @@ class testProxy extends CAPITest {
 					'tls_psk_identity' => ''
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": cannot be empty.'
+			],
+			'Test proxy.create: invalid "tls_psk_identity" required for passive proxy' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
+					'address' => '127.0.0.1',
+					'port' => '10050',
+					'tls_connect' => HOST_ENCRYPTION_PSK
+				],
+				'expected_error' => 'Invalid parameter "/1": the parameter "tls_psk_identity" is missing.'
 			],
 			'Test proxy.create: invalid "tls_psk_identity" (empty string) for passive proxy' => [
 				'proxy' => [
@@ -1894,6 +1914,7 @@ class testProxy extends CAPITest {
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 					'tls_accept' => HOST_ENCRYPTION_PSK,
+					'tls_psk_identity' => 'test',
 					'tls_psk' => 'abc'
 				],
 				'expected_error' =>
@@ -1906,6 +1927,7 @@ class testProxy extends CAPITest {
 					'address' => '127.0.0.1',
 					'port' => '10050',
 					'tls_connect' => HOST_ENCRYPTION_PSK,
+					'tls_psk_identity' => 'test',
 					'tls_psk' => 'abc'
 				],
 				'expected_error' =>
@@ -1916,6 +1938,7 @@ class testProxy extends CAPITest {
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 					'tls_accept' => HOST_ENCRYPTION_PSK,
+					'tls_psk_identity' => 'test',
 					'tls_psk' => str_repeat('a', 33)
 				],
 				'expected_error' =>
@@ -1928,10 +1951,86 @@ class testProxy extends CAPITest {
 					'address' => '127.0.0.1',
 					'port' => '10050',
 					'tls_connect' => HOST_ENCRYPTION_PSK,
+					'tls_psk_identity' => 'test',
 					'tls_psk' => str_repeat('a', 33)
 				],
 				'expected_error' =>
 					'Invalid parameter "/1/tls_psk": an even number of hexadecimal characters is expected.'
+			],
+			'Test proxy.create: invalid "tls_psk" multiple values not allowed for same "tls_psk_identity" PROXY_OPERATING_MODE_ACTIVE' => [
+				'proxy' => [
+					[
+						'name' => 'tls_psk1.example.com',
+						'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+						'tls_accept' => HOST_ENCRYPTION_PSK,
+						'tls_psk_identity' => 'public',
+						'tls_psk' => '5fce1b3e34b520afeffb37ce08c7cd66'
+					],
+					[
+						'name' => 'tls_psk2.example.com',
+						'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+						'tls_accept' => HOST_ENCRYPTION_PSK,
+						'tls_psk_identity' => 'public',
+						'tls_psk' => 'fb48829a6f9ebbb70294a75ca0916772'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2/tls_psk": another tls_psk value is already associated with given tls_psk_identity.'
+			],
+			'Test proxy.create: invalid "tls_psk" multiple values not allowed for same "tls_psk_identity" PROXY_OPERATING_MODE_PASSIVE' => [
+				'proxy' => [
+					[
+						'name' => 'tls_psk3.example.com',
+						'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
+						'address' => '127.0.0.1',
+						'port' => '10050',
+						'tls_connect' => HOST_ENCRYPTION_PSK,
+						'tls_psk_identity' => 'public',
+						'tls_psk' => '5fce1b3e34b520afeffb37ce08c7cd66'
+					],
+					[
+						'name' => 'tls_psk4.example.com',
+						'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
+						'address' => '127.0.0.1',
+						'port' => '10050',
+						'tls_connect' => HOST_ENCRYPTION_PSK,
+						'tls_psk_identity' => 'public',
+						'tls_psk' => 'fb48829a6f9ebbb70294a75ca0916772'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2/tls_psk": another tls_psk value is already associated with given tls_psk_identity.'
+			],
+			'Test proxy.create: invalid "tls_psk" multiple values not allowed for same "tls_psk_identity" PROXY_OPERATING_MODE_*' => [
+				'proxy' => [
+					[
+						'name' => 'tls_psk5.example.com',
+						'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+						'tls_accept' => HOST_ENCRYPTION_PSK,
+						'tls_psk_identity' => 'public',
+						'tls_psk' => '5fce1b3e34b520afeffb37ce08c7cd66'
+					],
+					[
+						'name' => 'tls_psk6.example.com',
+						'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
+						'address' => '127.0.0.1',
+						'port' => '10050',
+						'tls_connect' => HOST_ENCRYPTION_PSK,
+						'tls_psk_identity' => 'public',
+						'tls_psk' => 'fb48829a6f9ebbb70294a75ca0916772'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/2/tls_psk": another tls_psk value is already associated with given tls_psk_identity.'
+			],
+			'Test proxy.create: invalid "tls_psk" multiple values not allowed for same "tls_psk_identity"' => [
+				'proxy' => [
+					[
+						'name' => 'tls_psk7.example.com',
+						'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+						'tls_accept' => HOST_ENCRYPTION_PSK,
+						'tls_psk_identity' => 'proxyidentity',
+						'tls_psk' => '9b8eafedfaae00cece62e85d5f4792c7'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/tls_psk": another tls_psk value is already associated with given tls_psk_identity.'
 			],
 
 			// Check "tls_issuer".
@@ -1957,6 +2056,8 @@ class testProxy extends CAPITest {
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 					'tls_accept' => HOST_ENCRYPTION_PSK,
+					'tls_psk_identity' => 'proxyidentity',
+					'tls_psk' => '486a9e7b43740b3619e42636cb1c24bf',
 					'tls_issuer' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_issuer": value must be empty.'
@@ -1979,6 +2080,8 @@ class testProxy extends CAPITest {
 					'address' => '127.0.0.1',
 					'port' => '10050',
 					'tls_connect' => HOST_ENCRYPTION_PSK,
+					'tls_psk_identity' => 'proxyidentity',
+					'tls_psk' => '486a9e7b43740b3619e42636cb1c24bf',
 					'tls_issuer' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_issuer": value must be empty.'
@@ -2019,6 +2122,8 @@ class testProxy extends CAPITest {
 					'name' => 'API create proxy',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 					'tls_accept' => HOST_ENCRYPTION_PSK,
+					'tls_psk_identity' => 'proxyidentity',
+					'tls_psk' => '486a9e7b43740b3619e42636cb1c24bf',
 					'tls_subject' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_subject": value must be empty.'
@@ -2041,6 +2146,8 @@ class testProxy extends CAPITest {
 					'address' => '127.0.0.1',
 					'port' => '10050',
 					'tls_connect' => HOST_ENCRYPTION_PSK,
+					'tls_psk_identity' => 'proxyidentity',
+					'tls_psk' => '486a9e7b43740b3619e42636cb1c24bf',
 					'tls_subject' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_subject": value must be empty.'
@@ -3368,7 +3475,7 @@ class testProxy extends CAPITest {
 						['hostid' => self::INVALID_NUMBER]
 					]
 				],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'Invalid parameter "/1/hosts/1/hostid": object does not exist, or you have no permissions to it.'
 			],
 			'Test proxy.create: invalid "hostid" (duplicate) for "hosts"' => [
 				'proxy' => [
@@ -3711,7 +3818,7 @@ class testProxy extends CAPITest {
 					'proxy_groupid' => self::INVALID_NUMBER,
 					'local_address' => 'localhost'
 				],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'Invalid parameter "/1/proxy_groupid": object does not exist, or you have no permissions to it.'
 			],
 
 			// Check "local_address".
@@ -4064,14 +4171,34 @@ class testProxy extends CAPITest {
 			'Test proxy.update: invalid "custom_timeouts" (proxy version is outdated)' => [
 				'proxy' => [
 					'proxyid' => 'version_outdated',
-					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '4s',
+					'timeout_simple_check' => '4s',
+					'timeout_snmp_agent' => '4s',
+					'timeout_external_check' => '4s',
+					'timeout_db_monitor' => '4s',
+					'timeout_http_agent' => '4s',
+					'timeout_ssh_agent' => '4s',
+					'timeout_telnet_agent' => '4s',
+					'timeout_script' => '4s',
+					'timeout_browser' => '61s'
 				],
 				'expected_error' => 'Invalid parameter "/1/custom_timeouts": timeouts are disabled because the proxy and server versions do not match.'
 			],
 			'Test proxy.update: invalid "custom_timeouts" (proxy version is unsupported)' => [
 				'proxy' => [
 					'proxyid' => 'version_unsupported',
-					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '4s',
+					'timeout_simple_check' => '4s',
+					'timeout_snmp_agent' => '4s',
+					'timeout_external_check' => '4s',
+					'timeout_db_monitor' => '4s',
+					'timeout_http_agent' => '4s',
+					'timeout_ssh_agent' => '4s',
+					'timeout_telnet_agent' => '4s',
+					'timeout_script' => '4s',
+					'timeout_browser' => '61s'
 				],
 				'expected_error' => 'Invalid parameter "/1/custom_timeouts": timeouts are disabled because the proxy and server versions do not match.'
 			],
@@ -5113,7 +5240,7 @@ class testProxy extends CAPITest {
 						['hostid' => self::INVALID_NUMBER]
 					]
 				],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'Invalid parameter "/1/hosts/1/hostid": object does not exist, or you have no permissions to it.'
 			],
 			'Test proxy.update: invalid "hostid" (duplicate) for "hosts"' => [
 				'proxy' => [
