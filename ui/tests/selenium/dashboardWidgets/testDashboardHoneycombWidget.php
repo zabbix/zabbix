@@ -2452,7 +2452,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:secondary_label_type' => 'Text',
 						'id:secondary_label' => '{'.self::USER_MACRO.'.regrepl()}, {'.self::MACRO_CHAR.'.regrepl([a])}, '.
 							'{'.self::USER_MACRO.'.tr()}, {'.self::USER_MACRO.'.tr(z-a,Z-A)}, {'.self::USER_MACRO.'.tr(1,2,3)}'.
-							', {'.self::USER_MACRO.'.regsub()}, {'.self::USER_MACRO.'.irregsub()}',
+							', {'.self::USER_MACRO.'.regsub()}, {'.self::USER_MACRO.'.irregsub()}'
 					],
 					'result' => [
 						'primary' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*',
@@ -2486,7 +2486,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 							'.regrepl(1{0}, test, 1{0}, test, 1{0},test, 1{0}, test, 1{0}, test, 1{0}, test)}',
 						'id:secondary_label_type' => 'Text',
 						'id:secondary_label' => '{'.self::USER_MACRO.''.
-							'.regrepl(1{0}, test, 1{0}, test, 1{0},test, 1{0}, test, 1{0}, test, 1{0}, test)}',
+							'.regrepl(1{0}, test, 1{0}, test, 1{0},test, 1{0}, test, 1{0}, test, 1{0}, test)}'
 					],
 					'result' => [
 						'primary' => '*UNKNOWN*',
@@ -2526,7 +2526,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'secondary' => 'h:""test.com"macro?functions=urlencode&urld=a, Тест *** ŽzŠsšĒĀīī 🌴🌴🌴'
 					]
 				]
-			],
+			]
 		];
 	}
 
