@@ -16,6 +16,7 @@ SERVER_tests = \
 	zbx_trim_float \
 	zbx_trim_integer \
 	zbx_variant_compare \
+	zbx_variant_to_value_type \
 	zbx_user_macro_parse \
 	zbx_str_extract \
 	convert_to_utf8 \
