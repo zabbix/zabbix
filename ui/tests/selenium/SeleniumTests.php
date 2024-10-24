@@ -186,6 +186,9 @@ require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeMessa
 require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeWebhook.php';
 require_once dirname(__FILE__).'/mediaTypes/testPageAdministrationMediaTypes.php';
 
+// MFA.
+require_once dirname(__FILE__).'/mfa/testFormTotpEnroll.php';
+
 // Multiselects.
 require_once dirname(__FILE__).'/multiselects/testMultiselects.php';
 require_once dirname(__FILE__).'/multiselects/testMultiselectsErrorsHostsTemplates.php';
@@ -522,6 +525,9 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationMediaTypes');
 		$suite->addTestSuite('testFormAdministrationMediaTypeWebhook');
 		$suite->addTestSuite('testPageAdministrationMediaTypes');
+
+		// MFA.
+		$suite->addTestSuite('testFormTotpEnroll');
 
 		// Multiselects.
 		$suite->addTestSuite('testMultiselects');
