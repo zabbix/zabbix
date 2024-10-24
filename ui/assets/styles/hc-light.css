@@ -7233,12 +7233,15 @@ button:focus {
   color: #ffffff; }
 .radio-list-control li input[type="radio"]:checked + label {
   background-color: #333333 !important; }
-.radio-list-control li input[type="radio"]:focus + label {
+.radio-list-control li input[type="radio"]:not([readonly]):focus + label {
   background-color: #6f6f6f !important;
   box-shadow: 0 0 0 2px #111111 !important;
   color: #ffffff; }
 .radio-list-control li input[type="radio"]:checked[disabled] + label {
   background-color: #d3d3d3 !important; }
+.radio-list-control li input[type="radio"][readonly]:checked + label {
+  background-color: #b2b4bb !important;
+  -webkit-text-fill-color: #292929; }
 
 a:link {
   border-bottom: 1px solid rgba(0, 0, 0, 0.5); }
