@@ -38,7 +38,6 @@ OBJS = \
 	..\..\..\src\libs\zbxstr\str.o \
 	..\..\..\src\libs\zbxcommon\common_str.o \
 	..\..\..\src\libs\zbxcommon\common_log.o \
-	..\..\..\src\libs\zbxparam\param.o \
 	..\..\..\src\libs\zbxtime\time.o \
 	..\..\..\src\libs\zbxexpr\expr.o \
 	..\..\..\src\libs\zbxexpr\function.o \
