@@ -1445,7 +1445,7 @@ class testDashboardGaugeWidget extends testWidgets {
 					'result' => '*UNKNOWN*'
 				]
 			],
-			// #7 Check that regrepl() with too many processed data is not breaking the widget.
+			// #7 Check that tr(), uppercase(), lowercase() are not working with non-ascii.
 			[
 				[
 					'fields' => [

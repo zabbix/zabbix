@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../common/testWidgets.php';
  *
  * @backup dashboard
  *
- * @dataSource WebScenarios, AllItemValueTypes, ItemValueWidget, GlobalMacros
+ * @dataSource WebScenarios, AllItemValueTypes, ItemValueWidget
  *
  * @onBefore prepareData
  */
@@ -53,11 +53,19 @@ class testDashboardItemValueWidget extends testWidgets {
 	const DASHBOARD_MACRO_FUNCTIONS = 'Dashboard for macro function check';
 	const DATA_WIDGET = 'Widget for aggregation function data check';
 	const MACRO_FUNCTION_WIDGET = 'Widget for macro function check';
-	const GLOBAL_MACRO = '{$GLOBAL_MACRO_TEST}';
-	const GLOBAL_MACRO_VALUE = 'Macro for testing Macro functions 12345';
-	const GLOBAL_MACRO_UPPERCASE ='{$CASE_SENSITIVE_CHECK}';
-	const GLOBAL_MACRO_UPPERCASE_VALUE = 'TEST MACRO FUNCTION';
-	const GLOBAL_MACRO_SECRET ='{$SECRET_MACRO}';
+	const USER_MACRO = '{$USER.MACRO}';
+	const USER_MACRO_VALUE = 'Macro function Test 12345';
+	const USER_SECRET_MACRO = '{$SECRET.MACRO}';
+	const MACRO_CHAR = '{$MACRO.CHAR}';
+	const MACRO_HTML_ENCODE = '{$MACRO.HTML.ENCODE}';
+	const MACRO_HTML_ENCODE_VALUE = '<a href="test.url">"test&"</a>';
+	const MACRO_HTML_DECODE = '{$MACRO.HTML.DECODE}';
+	const MACRO_HTML_DECODE_VALUE = '&lt;a href=&quot;test.url&quot;&gt;&quot;test&amp;&quot;&lt;/a&gt;';
+	const MACRO_CHAR_VALUE = '000 ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰';
+	const MACRO_URL_ENCODE = '{$MACRO.URL.ENCODE}';
+	const MACRO_URL_ENCODE_VALUE = 'h://test.com/macro?functions=urlencode&urld=a🎸';
+	const MACRO_URL_DECODE = '{$MACRO.URL.DECODE}';
+	const MACRO_URL_DECODE_VALUE = 'h%3A%2F%2Ftest.com%2Fmacro%3Ffunctions%3Durlencode%26urld%3Da%F0%9F%8E%B8';
 
 	/**
 	 * Get threshold table element with mapping set.
@@ -4246,76 +4254,118 @@ class testDashboardItemValueWidget extends testWidgets {
 				[
 					'fields' => [
 						'Advanced configuration' => true,
-						'id:description' => '{{ITEM.NAME}.btoa()}',
+						'id:description' => '{{ITEM.NAME}.btoa(\)}, {'.self::USER_MACRO.'.htmldecode(test)}, '.
+							'{'.self::USER_MACRO.'.htmlencode(test)}, {{ITEM.NAME}.lowercase([test])}, '.
+							'{{ITEM.NAME}.uppercase([test])}, {{ITEM.NAME}.urldecode([test])}, '.
+							'{'.self::USER_SECRET_MACRO.'.urlencode(\/)}',
 						'id:desc_size' => 5
 					],
-					'result' => base64_encode('CPU user time')
+					'result' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*'
 				]
 			],
-			// #1 Host macro with btoa() function.
+			// #1 Check that secret macro value is not exposed by macro functions on the dashboard.
 			[
 				[
 					'fields' => [
 						'Advanced configuration' => true,
-						'id:description' => '{'.self::GLOBAL_MACRO.'.btoa()}',
+						'id:description' => '{'.self::USER_SECRET_MACRO.'.btoa()}, {'.self::USER_SECRET_MACRO.'.htmldecode()}, '.
+							'{'.self::USER_SECRET_MACRO.'.htmlencode()}, {'.self::USER_SECRET_MACRO.'.lowercase()}, '.
+							'{'.self::USER_SECRET_MACRO.'.uppercase()}, {'.self::USER_SECRET_MACRO.'.regrepl(a, b)}, '.
+							'{'.self::USER_SECRET_MACRO.'.tr(a-z, b)}, {'.self::USER_SECRET_MACRO.'.urldecode()}, '.
+							'{'.self::USER_SECRET_MACRO.'.urlencode()}',
 						'id:desc_size' => 5
 					],
-					'result' => base64_encode(self::GLOBAL_MACRO_VALUE)
+					'result' => 'KioqKioq, ******, ******, ******, ******, ******, ******, ******, %2A%2A%2A%2A%2A%2A'
 				]
 			],
-			// #2 Secret macro with btoa() function.
+			// #2 Built-in macro with non-argument functions.
 			[
 				[
 					'fields' => [
 						'Advanced configuration' => true,
-						'id:description' => '{'.self::GLOBAL_MACRO_SECRET.'.btoa()}',
+						'id:description' => '{{ITEM.NAME}.btoa()}, {{ITEM.NAME}.htmldecode()}, {{ITEM.NAME}.htmlencode()}, '.
+							'{{ITEM.NAME}.lowercase()}, {{ITEM.NAME}.uppercase()}, {{ITEM.NAME}.urlencode()}, '.
+							'{{ITEM.NAME}.urldecode()}',
 						'id:desc_size' => 5
 					],
-					'result' => 'KioqKioq'
+					'result' => 'Q1BVIHVzZXIgdGltZQ==, CPU user time, CPU user time, cpu user time, CPU USER TIME, '.
+						'CPU%20user%20time, CPU user time'
 				]
 			],
-			// #3 Incorrectly used btoa() function.
+			// #3 User macro with non-argument functions.
 			[
 				[
 					'fields' => [
 						'Advanced configuration' => true,
-						'id:description' => '{{ITEM.NAME}.btoa(\/\)}',
+						'id:description' => '{'.self::USER_MACRO.'.btoa()}, {'.self::MACRO_HTML_ENCODE.'.htmlencode()}, '.
+							'{'.self::MACRO_HTML_DECODE.'.htmldecode()}, {'.self::MACRO_URL_ENCODE.'.urlencode()}, '.
+							'{'.self::MACRO_URL_DECODE.'.urldecode()}, {'.self::USER_MACRO.'.uppercase()}, '.
+							'{'.self::USER_MACRO.'.lowercase()}',
+						'id:desc_size' => 5
+					],
+					'result' => base64_encode(self::USER_MACRO_VALUE).', '.self::MACRO_HTML_DECODE_VALUE.', '.
+							self::MACRO_HTML_ENCODE_VALUE.', '.self::MACRO_URL_DECODE_VALUE.', '.self::MACRO_URL_ENCODE_VALUE.
+							', MACRO FUNCTION TEST 12345, macro function test 12345'
+				]
+			],
+			// #4 Wrong, missing or odd argument number in regrepl(), tr(), regsub(), irregsub() functions.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_MACRO.'.regrepl()}, {'.self::MACRO_CHAR.'.regrepl(,[a]~,\\\1)}, '.
+							'{'.self::USER_MACRO.'.tr()}, {'.self::USER_MACRO.'.tr(z-a,Z-A)}, {'.self::USER_MACRO.'.tr(1,2,3)}'.
+							', {'.self::USER_MACRO.'.regsub()}, {'.self::USER_MACRO.'.irregsub()}',
+						'id:desc_size' => 5
+					],
+					'result' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*'
+				]
+			],
+			// #5 Check that regrepl() works with digits, multiple byte characters and is case-sensitive.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_MACRO.'.regrepl("[^a-z]", /, [A-Z], \)}, '.
+							'{'.self::MACRO_CHAR.'.regrepl(🌴, 🌝, [а-я], Q, \d, 🌞, ₰, *)}',
+						'id:desc_size' => 5
+					],
+					'result' => '/acro/function//est//////, 🌞🌞🌞 ЙQQQQЖŽzŠsšĒĀīī🌝 ***'
+				]
+			],
+			// #6 Check that regrepl() with too many processed data is not breaking the widget.
+			[
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_MACRO.''.
+							'.regrepl(1{0}, test, 1{0}, test, 1{0},test, 1{0}, test, 1{0}, test, 1{0}, test)}',
 						'id:desc_size' => 5
 					],
 					'result' => '*UNKNOWN*'
 				]
 			],
-			// #4 No arguments in regrepl() function.
+			// #7 Check that tr(), uppercase(), lowercase() are not working with non-ascii.
 			[
 				[
 					'fields' => [
 						'Advanced configuration' => true,
-						'id:description' => '{{ITEM.NAME}.regrepl()}',
+						'id:description' => '{'.self::MACRO_CHAR.'.tr(0-9, Ī)}, {'.self::MACRO_CHAR.'.lowercase()}, '.
+							'{'.self::MACRO_CHAR.'.uppercase()}',
 						'id:desc_size' => 5
 					],
-					'result' => '*UNKNOWN*'
+					'result' => '??? ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰, 000 ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰, 000 ЙщфхжЖŽZŠSšĒĀīī🌴 ₰₰₰'
 				]
 			],
-			// #5 Odd amount of arguments in regrepl() function.
+			// #8 Check example of tr() function with escaping, range and characters.
 			[
 				[
 					'fields' => [
 						'Advanced configuration' => true,
-						'id:description' => '{{ITEM.NAME}.regrepl(test, 1, test)}',
+						'id:description' => '{'.self::MACRO_URL_ENCODE.'.tr("\/","\"")}, {'.self::MACRO_CHAR.'.tr(0-9A-Cabc,*)}',
 						'id:desc_size' => 5
 					],
-					'result' => '*UNKNOWN*'
-				]
-			],
-			// #6 Regrepl with secret macro.
-			[
-				[
-					'fields' => [
-						'Advanced configuration' => true,
-						'id:description' => '{'.self::GLOBAL_MACRO_SECRET.'.regrepl([abcde], test)}',
-						'id:desc_size' => 5
-					],
-					'result' => '******'
+					'result' => 'h:""test.com"macro?functions=urlencode&urld=a🎸, *** ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰'
 				]
 			]
 		];

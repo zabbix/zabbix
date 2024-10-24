@@ -86,19 +86,6 @@ class GlobalMacros {
 			[
 				'macro' => '{$Z_GLOBAL_MACRO_2_RESOLVE}',
 				'value' => 'Value 2 B resolved'
-			],
-			[
-				'macro' => '{$GLOBAL_MACRO_TEST}',
-				'value' => 'Macro for testing Macro functions 12345'
-			],
-			[
-				'macro' => '{$CASE_SENSITIVE_CHECK}',
-				'value' => 'TEST MACRO FUNCTION'
-			],
-			[
-				'macro' => '{$SECRET_MACRO}',
-				'value' => 'Secret macro',
-				'type' => ZBX_MACRO_TYPE_SECRET
 			]
 		]);
 	}
