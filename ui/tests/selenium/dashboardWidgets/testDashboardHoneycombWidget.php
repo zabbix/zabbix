@@ -61,7 +61,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 	const DASHBOARD_FOR_MACRO_FUNCTIONS = 'Dashboard for testing macro functions';
 	const WIDGET_FOR_MACRO_FUNCTIONS = 'Widget for testing macro functions';
 	const USER_MACRO = '{$USER.MACRO}';
-	const USER_MACRO_VALUE = 'Test';
+	const USER_MACRO_VALUE = 'Test5';
 	const USER_SECRET_MACRO = '{$SECRET.MACRO}';
 	const MACRO_CHAR = '{$MACRO.CHAR}';
 	const MACRO_HTML_ENCODE = '{$MACRO.HTML.ENCODE}';
@@ -2433,10 +2433,10 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => [
 						'primary' => base64_encode(self::USER_MACRO_VALUE).', '.self::MACRO_HTML_DECODE_VALUE.', '.
 							self::MACRO_HTML_ENCODE_VALUE.', '.self::MACRO_URL_DECODE_VALUE.', '.self::MACRO_URL_ENCODE_VALUE.
-							', TEST, test',
+							', TEST5, test5',
 						'secondary' => base64_encode(self::USER_MACRO_VALUE).', '.self::MACRO_HTML_DECODE_VALUE.', '.
 							self::MACRO_HTML_ENCODE_VALUE.', '.self::MACRO_URL_DECODE_VALUE.', '.self::MACRO_URL_ENCODE_VALUE.
-							', TEST, test'
+							', TEST5, test5'
 					]
 				]
 			],
@@ -2471,7 +2471,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:secondary_label' => '{'.self::MACRO_CHAR.'.regrepl(🌴, 🌝, [а-я], Q, \d, 🌞)}'
 					],
 					'result' => [
-						'primary' => '\acro function test /////',
+						'primary' => '\est/',
 						'secondary' => 'ТQQQ 🌞🌞🌞 ŽzŠsšĒĀīī 🌝🌝🌝'
 					]
 				]
@@ -2507,7 +2507,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					],
 					'result' => [
 						'primary' => 'Тест ??? ŽzŠsšĒĀīī 🌴🌴🌴, Тест 123 ŽzŠsšĒĀīī 🌴🌴🌴, Тест 123 ŽZŠSšĒĀīī 🌴🌴🌴',
-						'secondary' => 'Тест ??? ŽzŠsšĒĀīī 🌴🌴🌴, Тест 123 ŽzŠsšĒĀīī 🌴🌴🌴, Тест 123 ŽZŠSšĒĀīī 🌴🌴🌴'
+						'secondary' => 'ТQQQ 🌞🌞🌞 ŽzŠsšĒĀīī 🌝🌝🌝'
 					]
 				]
 			],
