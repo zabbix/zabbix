@@ -19,10 +19,10 @@ define('SHA_256', 'sha256');
 define('SHA_512', 'sha512');
 
 /**
- * Class for generating MFA TOTP tokens.
+ * Class for generating MFA TOTP tokens. This simulates a phone's authenticator app.
  */
-class CTotpHelper {
-	private const VALID_BASE32_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+class CMfaTotpHelper {
+	const VALID_BASE32_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 
 	/**
 	 * Generate a Time-based One-Time Password (TOTP) based on the provided secret.
@@ -38,12 +38,12 @@ class CTotpHelper {
 	public static function generateTotp($secret, $digits = 6, $hash_func = SHA_1, $time_step_offset = 0) {
 		// Validate the number of digits.
 		if (!in_array($digits, [6, 8])) {
-			throw new InvalidArgumentException('TOTP length must be either 6 or 8.');
+			throw new InvalidArgumentException('TOTP length must be either 6 or 8, unsupported value: '.$digits);
 		}
 
 		// Validate the provided hash function.
 		if (!in_array($hash_func, [SHA_1, SHA_256, SHA_512])) {
-			throw new InvalidArgumentException('TOTP hash function not supported.');
+			throw new InvalidArgumentException('Unsupported TOTP hash: '.$hash_func);
 		}
 
 		// Calculate the current time step. The TOTP changes every 30 seconds.
@@ -89,7 +89,7 @@ class CTotpHelper {
 		foreach (str_split($base32_secret) as $char) {
 			$index = strpos(self::VALID_BASE32_CHARS, $char);
 			if ($index === false) {
-				throw new InvalidArgumentException('TOTP secret contains an invalid Base32 character: '.$char);
+				throw new InvalidArgumentException('Invalid Base32 character in TOTP secret: '.$char);
 			}
 
 			// Each character in Base32 represents 5 bits.
