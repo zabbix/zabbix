@@ -7765,7 +7765,7 @@ a.btn-icon:link, a.btn-icon:hover, a.btn-icon:focus, a.btn-icon:visited,
   color: #000000 !important; }
 .radio-list-control li [type="radio"]:checked + label {
   background-color: #dddddd !important; }
-.radio-list-control li [type="radio"]:focus + label {
+.radio-list-control li [type="radio"]:not([readonly]):focus + label {
   background-color: #c7c7c7 !important;
   box-shadow: 0 0 0 2px #ffffff !important;
   color: #000000 !important; }
