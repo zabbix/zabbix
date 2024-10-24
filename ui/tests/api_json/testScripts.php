@@ -4609,13 +4609,20 @@ class testScripts extends CAPITest {
 				'request' => [
 					'output' => ['name', 'url'],
 					'search' => ['url' => 'http://zabbix'],
-					'sortfield' => 'name',
-					'sortorder' => ZBX_SORT_UP
+					'sortfield' => 'scriptid'
 				],
 				'expected_results' => [
 					[
 						'name' => 'API test script.get URL',
 						'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}'
+					],
+					[
+						'name' => 'API test script.getScriptsByHosts - URL',
+						'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}'
+					],
+					[
+						'name' => 'API test script.getScriptsByHosts - URL with manual input',
+						'url' => 'http://zabbix/ui/zabbix.php?action={MANUALINPUT}'
 					],
 					[
 						'name' => 'API test script.getScriptsByEvents - URL',
@@ -4627,14 +4634,6 @@ class testScripts extends CAPITest {
 					],
 					[
 						'name' => 'API test script.getScriptsByEvents - URL with manual input',
-						'url' => 'http://zabbix/ui/zabbix.php?action={MANUALINPUT}'
-					],
-					[
-						'name' => 'API test script.getScriptsByHosts - URL',
-						'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}'
-					],
-					[
-						'name' => 'API test script.getScriptsByHosts - URL with manual input',
 						'url' => 'http://zabbix/ui/zabbix.php?action={MANUALINPUT}'
 					]
 				],
