@@ -72,9 +72,9 @@ static void	mock_step_validate(zbx_mock_step_t *step)
 
 	um_mock_cache_init_from_config(&mock_cache, step->cache);
 
-	zbx_dbsync_init(&gmacros, ZBX_DBSYNC_UPDATE);
-	zbx_dbsync_init(&hmacros, ZBX_DBSYNC_UPDATE);
-	zbx_dbsync_init(&htmpls, ZBX_DBSYNC_UPDATE);
+	zbx_dbsync_init(&gmacros, NULL, ZBX_DBSYNC_UPDATE);
+	zbx_dbsync_init(&hmacros, NULL, ZBX_DBSYNC_UPDATE);
+	zbx_dbsync_init(&htmpls, NULL, ZBX_DBSYNC_UPDATE);
 
 	printf("MOCK:\n");
 	um_mock_cache_dump(&step->mock_cache);
@@ -131,9 +131,9 @@ void	zbx_mock_test_entry(void **state)
 
 		printf("=== STEP %d ===\n", i + 1);
 
-		zbx_dbsync_init(&gmacros, ZBX_DBSYNC_UPDATE);
-		zbx_dbsync_init(&hmacros, ZBX_DBSYNC_UPDATE);
-		zbx_dbsync_init(&htmpls, ZBX_DBSYNC_UPDATE);
+		zbx_dbsync_init(&gmacros, NULL, ZBX_DBSYNC_UPDATE);
+		zbx_dbsync_init(&hmacros, NULL, ZBX_DBSYNC_UPDATE);
+		zbx_dbsync_init(&htmpls, NULL, ZBX_DBSYNC_UPDATE);
 
 		um_mock_cache_diff(mock_cache, &steps.values[i]->mock_cache, &gmacros, &hmacros, &htmpls);
 		umc = steps.values[i]->cache = um_cache_sync(umc, 0, &gmacros, &hmacros, &htmpls, &config_vault,
