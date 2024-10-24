@@ -780,6 +780,7 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 
 		$all_macros[$minified_macro] = true;
 		$global_macros[$minified_macro] = [
+			'macro' => $db_global_macro['macro'],
 			'value' => getMacroConfigValue($db_global_macro),
 			'description' => $db_global_macro['description'],
 			'type' => $db_global_macro['type']
@@ -807,8 +808,7 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 				'templateid' => $hostid,
 				'name' => $db_template['name'],
 				'templateids' => array_column($db_template['parentTemplates'], 'templateid'),
-				'macros' => [],
-				'_macros' => []
+				'macros' => []
 			];
 
 			foreach ($db_template['macros'] as $db_macro) {
@@ -817,6 +817,7 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 
 				$all_macros[$minified_macro] = true;
 				$hosts[$hostid]['macros'][$minified_macro] = [
+					'macro' => $db_macro['macro'],
 					'value' => getMacroConfigValue($db_macro),
 					'description' => $db_macro['description'],
 					'type' => $db_macro['type']
@@ -850,6 +851,7 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 
 			$all_macros[$minified_macro] = true;
 			$parent_host_macros[$minified_macro] = [
+				'macro' => $db_macro['macro'],
 				'value' => getMacroConfigValue($db_macro),
 				'description' => $db_macro['description'],
 				'type' => $db_macro['type']
@@ -859,17 +861,10 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 
 	// resolving
 	foreach (array_keys($all_macros) as $macro) {
-		$inherited_macro = ['macro' => $macro];
-
-		if (array_key_exists($macro, $parent_host_macros)) {
-			$inherited_macro['parent_host'] = [
-				'value' => $parent_host_macros[$macro]['value'],
-				'description' => $parent_host_macros[$macro]['description'],
-				'type' => $parent_host_macros[$macro]['type']
-			];
-		}
+		$inherited_macro = [];
 
 		if (array_key_exists($macro, $global_macros)) {
+			$inherited_macro['macro'] = $global_macros[$macro]['macro'];
 			$inherited_macro['global'] = [
 				'value' => $global_macros[$macro]['value'],
 				'description' => $global_macros[$macro]['description'],
@@ -884,6 +879,7 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 
 			foreach ($templateids as $templateid) {
 				if (array_key_exists($templateid, $hosts) && array_key_exists($macro, $hosts[$templateid]['macros'])) {
+					$inherited_macro['macro'] = $hosts[$templateid]['macros'][$macro]['macro'];
 					$inherited_macro['template'] = [
 						'value' => $hosts[$templateid]['macros'][$macro]['value'],
 						'description' => $hosts[$templateid]['macros'][$macro]['description'],
@@ -914,6 +910,15 @@ function getInheritedMacros(array $hostids, ?int $parent_hostid = null): array {
 
 			$templateids = $parent_templateids;
 		} while ($templateids);
+
+		if (array_key_exists($macro, $parent_host_macros)) {
+			$inherited_macro['macro'] = $parent_host_macros[$macro]['macro'];
+			$inherited_macro['parent_host'] = [
+				'value' => $parent_host_macros[$macro]['value'],
+				'description' => $parent_host_macros[$macro]['description'],
+				'type' => $parent_host_macros[$macro]['type']
+			];
+		}
 
 		$inherited_macros[$macro] = $inherited_macro;
 	}
