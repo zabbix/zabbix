@@ -242,7 +242,10 @@ void	*dbconfig_shmem_malloc_func(void *old, size_t size)
 
 zbx_uint64_t	dbconfig_used_size(void)
 {
-	return config_mem->used_size;
+	if (NULL != config_mem)
+		return config_mem->used_size;
+	else
+		return 0;
 }
 
 static void	dc_maintenance_precache_nested_groups(void);
