@@ -772,8 +772,12 @@ static void	dbsync_init(zbx_dbsync_t *sync, unsigned char mode)
 void	zbx_dbsync_init(zbx_dbsync_t *sync, const char *name, unsigned char mode)
 {
 	dbsync_init(sync, mode);
-	sync->from = name;
-	zbx_vector_dbsync_append(&dbsync_env.dbsyncs, sync);
+
+	if (NULL != name)
+	{
+		sync->from = name;
+		zbx_vector_dbsync_append(&dbsync_env.dbsyncs, sync);
+	}
 
 	sync->type = ZBX_DBSYNC_TYPE_DIFF;
 }
