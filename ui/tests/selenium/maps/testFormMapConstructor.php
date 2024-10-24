@@ -195,11 +195,11 @@ class testFormMapConstructor extends CLegacyWebTest {
 			'query'	=> 'class:map-timestamp',
 			'color'	=> '#ffffff'
 		];
-//		$this->assertScreenshotExcept($element, $exclude, 'view_'.$map['name']);
+		$this->assertScreenshotExcept($element, $exclude, 'view_'.$map['name']);
 
 		$this->query('button:Edit map')->one()->click();
 		$this->page->waitUntilReady();
-//		$this->assertScreenshot($this->query('id:map-area')->waitUntilPresent()->one(), 'edit_'.$map['name']);
+		$this->assertScreenshot($this->query('id:map-area')->waitUntilPresent()->one(), 'edit_'.$map['name']);
 		$this->query('button:Update')->one()->click();
 
 		$this->page->waitUntilAlertIsPresent();
@@ -369,6 +369,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 
 		// Take a screenshot to test draggable object position for triggers of trigger type map element.
 		$this->page->removeFocus();
-//		$this->assertScreenshot($this->query('id:triggerContainer')->waitUntilVisible()->one(), 'Map element');
+		$this->assertScreenshot($this->query('id:triggerContainer')->waitUntilVisible()->one(), 'Map element');
 	}
 }
