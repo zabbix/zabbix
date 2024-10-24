@@ -378,6 +378,9 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 
 	poller_config->config_source_ip = poller_args_in->config_comms->config_source_ip;
 	poller_config->config_timeout = poller_args_in->config_comms->config_timeout;
+	poller_config->config_ssl_ca_location = poller_args_in->config_comms->config_ssl_ca_location;
+	poller_config->config_ssl_cert_location = poller_args_in->config_comms->config_ssl_cert_location;
+	poller_config->config_ssl_key_location = poller_args_in->config_comms->config_ssl_key_location;
 	poller_config->poller_type = poller_args_in->poller_type;
 	poller_config->config_unavailable_delay = poller_args_in->config_unavailable_delay;
 	poller_config->config_unreachable_delay = poller_args_in->config_unreachable_delay;

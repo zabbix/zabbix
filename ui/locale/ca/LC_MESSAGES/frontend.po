@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-09-18 11:44+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2024-10-11 20:04+0000\n"
+"Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
@@ -2071,6 +2071,14 @@ msgstr "Tipus de vora"
 #: include/views/js/monitoring.sysmaps.js.php:597
 msgid "Border width"
 msgstr "Amplada de la vora"
+
+#: include/classes/api/services/CHost.php:1445
+msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
+msgstr "Tant els camps \"tls_connect\" com \"tls_accept\" s'han d'especificar quan es canvia la configuració del xifrat de la connexió."
+
+#: include/classes/api/services/CHost.php:1452
+msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
+msgstr "Tant els camps \"tls_psk_identity\" com \"tls_psk\" s'han d'especificar quan es canvia el PSK per al xifrat de la connexió."
 
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
@@ -20245,6 +20253,10 @@ msgstr "El prototip d'equip clonat conté macros definides per l'usuari amb el t
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "La plantilla clonada conté macros definides per l'usuari amb el tipus \"Text secret\". El valor i el tipus d'aquestes macros es van restablir."
 
+#: include/classes/api/services/CHost.php:1433
+msgid "The field \"monitored_by\" must be specified when changing proxy or proxy group for host monitoring."
+msgstr "El camp \"monitored_by\" s'ha d'especificar quan es canvia el proxy o el grup de proxys per al monitoratge de l'equip."
+
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
 msgstr "S'admeten els següents marcadors de posició:"
@@ -23979,6 +23991,16 @@ msgstr "una lletra majúscula i una de minúscula de l'alfabet romà"
 #: app/views/administration.geomaps.edit.php:47
 msgid "and"
 msgstr "i"
+
+#: include/classes/api/helpers/CApiPskHelper.php:27
+#: include/classes/api/helpers/CApiPskHelper.php:57
+#: include/classes/api/helpers/CApiPskHelper.php:73
+#: include/classes/api/helpers/CApiPskHelper.php:106
+#: include/classes/api/helpers/CApiPskHelper.php:139
+#: include/classes/api/helpers/CApiPskHelper.php:160
+#: include/classes/api/helpers/CApiPskHelper.php:176
+msgid "another tls_psk value is already associated with given tls_psk_identity"
+msgstr "un altre valor tls_psk ja és associat amb tls_psk_identity donat"
 
 #: include/forms.inc.php:1450 include/views/js/item.preprocessing.js.php:237
 msgid "any error"

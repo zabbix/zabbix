@@ -605,9 +605,9 @@ int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
  *             exp_offset      - [IN/OUT] current position in output buffer     *
  *             jp_row          - [IN] discovery data                            *
  *             lld_macro_paths - [IN]                                           *
+ *             esc_flags       - [IN] character escaping flags                  *
  *             error           - [OUT] error message                            *
  *             max_error_len   - [IN] size of error buffer                      *
- *
  *                                                                              *
  * Return value: SUCCEED - lld macros were resolved successfully                *
  *               FAIL - otherwise                                               *
@@ -636,7 +636,7 @@ int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char k
 		size_t	param_pos, param_len, rel_len = len - (p - e);
 		int	quoted;
 
-		zbx_lld_trigger_function_param_parse(p, &param_pos, &param_len, &sep_pos);
+		zbx_lld_function_param_parse(p, esc_flags, &param_pos, &param_len, &sep_pos);
 
 		/* copy what was before the parameter */
 		zbx_strncpy_alloc(exp, exp_alloc, exp_offset, p, param_pos);
@@ -644,7 +644,7 @@ int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char k
 		/* prepare the parameter (macro substitutions and quoting) */
 
 		zbx_free(param);
-		param = zbx_function_param_unquote_dyn(p + param_pos, param_len, &quoted);
+		param = zbx_function_param_unquote_dyn_ext(p + param_pos, param_len, &quoted, esc_flags);
 
 		if (1 == key_in_param && p == e)
 		{

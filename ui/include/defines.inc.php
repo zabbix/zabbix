@@ -13,7 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-define('ZABBIX_VERSION',		'7.2.0alpha1');
+define('ZABBIX_VERSION',		'7.2.0alpha2');
 define('ZABBIX_API_VERSION',	'7.2.0');
 define('ZABBIX_EXPORT_VERSION',	'7.2');
 
@@ -622,6 +622,7 @@ define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR',		0x02);
 define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG',		0x04);
 define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64',	0x08);
 define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT',	0x10);
+define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_BIN',		0x20);
 
 define('ITEM_DATA_TYPE_DECIMAL',		0);
 define('ITEM_DATA_TYPE_OCTAL',			1);
