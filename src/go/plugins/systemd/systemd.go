@@ -66,6 +66,7 @@ type unitJson struct {
 	JobType       string `json:"{#UNIT.JOBTYPE}"`
 	JobPath       string `json:"{#UNIT.JOBPATH}"`
 	UnitFileState string `json:"{#UNIT.UNITFILESTATE}"`
+	ServiceType   string `json:"{#UNIT.SERVICETYPE}"`
 }
 
 type state struct {
@@ -249,9 +250,23 @@ func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error
 			continue
 		}
 
+		ServiceType, err := p.info([]string{u.Name, "Type", "Service"}, conn)
+		if err != nil {
+			p.Debugf("Failed to retrieve unit service type for %s, err:", u.Name, err.Error())
+			continue
+		}
+
+		var servicetype string
+		switch reflect.TypeOf(ServiceType).Kind() {
+		case reflect.String:
+			servicetype = ServiceType.(string)
+		default:
+			p.Debugf("Unit service type is not string for %s", u.Name)
+			continue
+		}
 		array = append(array, unitJson{
 			u.Name, u.Description, u.LoadState, u.ActiveState,
-			u.SubState, u.Followed, u.Path, u.JobID, u.JobType, u.JobPath, state,
+			u.SubState, u.Followed, u.Path, u.JobID, u.JobType, u.JobPath, state, servicetype,
 		})
 	}
 
@@ -266,15 +281,21 @@ func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error
 
 		unitPath := "/org/freedesktop/systemd1/unit/" + getName(basePath)
 
-		var details map[string]interface{}
-		obj = conn.Object("org.freedesktop.systemd1", dbus.ObjectPath(unitPath))
-		err = obj.Call("org.freedesktop.DBus.Properties.GetAll", 0, "org.freedesktop.systemd1.Unit").Store(&details)
+		ServiceType, err := p.info([]string{f.Name, "Type", "Service"}, conn)
 		if err != nil {
-			p.Debugf("Cannot get unit properties for disabled unit %s, err:", basePath, err.Error())
+			p.Debugf("Failed to retrieve unit service type for %s, err:", f.Name, err.Error())
 			continue
 		}
 
-		array = append(array, unitJson{basePath, "", "", "inactive", "", "", unitPath, 0, "", "", f.EnablementState})
+		var servicetype string
+		switch reflect.TypeOf(ServiceType).Kind() {
+		case reflect.String:
+			servicetype = ServiceType.(string)
+		default:
+			p.Debugf("Unit service type is not string for %s", f.Name)
+			continue
+		}
+		array = append(array, unitJson{basePath, "", "", "inactive", "", "", unitPath, 0, "", "", f.EnablementState, servicetype})
 	}
 
 	jsonArray, err := json.Marshal(array)
