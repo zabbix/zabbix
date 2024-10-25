@@ -824,18 +824,20 @@ class CHostGroup extends CApiService {
 	 */
 	private static function checkMaintenances(array $groupids): void {
 		$maintenance = DBfetch(DBselect(
-			'SELECT m.maintenanceid,m.name'.
-			' FROM maintenances m'.
-			' WHERE NOT EXISTS ('.
-				'SELECT NULL'.
-				' FROM maintenances_groups mg'.
-				' WHERE m.maintenanceid=mg.maintenanceid'.
-					' AND '.dbConditionId('mg.groupid', $groupids, true).
-			')'.
+			'SELECT mg.maintenanceid,m.name'.
+			' FROM maintenances_groups mg'.
+			' JOIN maintenances m ON mg.maintenanceid=m.maintenanceid'.
+			' WHERE '.dbConditionId('mg.groupid', $groupids).
+				' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM maintenances_groups mg1'.
+					' WHERE mg.maintenanceid=mg1.maintenanceid'.
+						' AND '.dbConditionId('mg1.groupid', $groupids, true).
+				')'.
 				' AND NOT EXISTS ('.
 					'SELECT NULL'.
 					' FROM maintenances_hosts mh'.
-					' WHERE m.maintenanceid=mh.maintenanceid'.
+					' WHERE mg.maintenanceid=mh.maintenanceid'.
 				')'
 		, 1));
 

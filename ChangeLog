@@ -1,3 +1,15 @@
+Changes for 7.0.6rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.0.5
+
+7.0.5rc1 was released as 7.0.5 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.0.5rc1
 
 New features:
@@ -1127,6 +1139,7 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.20rc1
 
 New features:
+.......PS. [ZBXNEXT-9238] increased PostgreSQL maximum supported version to 17 (mprihodko)
 
 Bug fixes:
 ...G...... [ZBX-24273] fixed potential Zabbix agent crash for vfs.fs.get item (MVekslers)
@@ -3062,6 +3075,18 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.36rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.35
+
+6.0.35rc1 was released as 6.0.35 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.35rc1
