@@ -657,11 +657,11 @@ int	pb_history_check_age(zbx_pb_t *pb)
 	zbx_pb_history_t	*row;
 	int			now;
 
-	now = (int)time(NULL);
+	now = time(NULL);
 
 	while (SUCCEED == zbx_list_peek(&pb->history, (void **)&row))
 	{
-		if (now - row->ts.sec <= pb->offline_buffer)
+		if (now - row->write_clock <= (time_t)pb->offline_buffer)
 			break;
 
 		zbx_list_pop(&pb->history, NULL);
@@ -671,7 +671,7 @@ int	pb_history_check_age(zbx_pb_t *pb)
 	if (0 == pb->max_age)
 		return SUCCEED;
 
-	if (SUCCEED != zbx_list_peek(&pb->history, (void **)&row) || time(NULL) - row->ts.sec < pb->max_age)
+	if (SUCCEED != zbx_list_peek(&pb->history, (void **)&row) || time(NULL) - row->write_clock < pb->max_age)
 		return SUCCEED;
 
 	return FAIL;
