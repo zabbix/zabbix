@@ -1,3 +1,50 @@
+Changes for 6.0.36rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.35
+
+6.0.35rc1 was released as 6.0.35 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.35rc1
+
+New features:
+.........T [ZBXNEXT-9457] added Huawei OceanStor V6 by SNMP template (abrosimovs)
+........S. [ZBXNEXT-9246] added monitoring of HA manager process utilization (mprihodko)
+
+Bug fixes:
+A......... [ZBX-24500] fixed an issue that allowed defining multiple PSK keys for the same PSK identity used in hosts, proxies, and autoregistration (gcalenko)
+...G...... [ZBX-24960] fixed specified item test by Zabbix agent 2 on Windows for "system.uptime" and other performance counter-based items (asestakovs)
+.......PS. [ZBX-25311] reverted passing errors to dependent items (askolmeisters)
+...G...... [ZBX-24273] fixed potential Zabbix agent crash for vfs.fs.get item (MVekslers)
+...G...PS. [ZBX-25029] fixed initiating HA failover in the case of invalid server response (wiper)
+A......... [ZBX-23410] fixed assigning of interfaces for copied LLD rules and item prototypes (jfreibergs)
+A......... [ZBX-23007] added chunking when collecting related objects for item and item prototype (dfofanovs)
+..F....... [ZBX-23171] fixed escaping of slash character in context-based macro patterns (esekace)
+........S. [ZBX-25141] fixed {FUNCTION.VALUE} and {FUNCTION.RECOVERY.VALUE} macro expansion in notifications, commands, event names and manual event action scripts (dgoloscapov)
+.........T [ZBX-24805] added filter for discovery rule for family of APC templates (akotsegubov)
+.........T [ZBX-23520] added timeout and fixed keys for raw items for family of MSSQL templates (akotsegubov)
+...G...... [ZBX-24684] moved Zabbix agent 2 plugin shutdown message to debug log level (esneiders)
+.........T [ZBX-22918] added database name macro for connection to all agent keys in PostgreSQL by Zabbix agent 2 (drasikhov)
+.........T [ZBX-24979] removed incompatible "proxy last seen" threshold macro from Zabbix health templates (drasikhov)
+..F....... [ZBX-24366] fixed host group filters on availability report to show correct items (jfreibergs, vmaksimovs)
+..F....... [ZBX-25072] fixed splitting of a trigger expression in the expression builder (Sasha)
+.........T [ZBX-25255] fixed macro in PostgreSQL by Zabbix agent 2 template (abrosimovs)
+........S. [ZBX-25098] fixed regsub output pattern issue with backslash and "at" sign in macro functions (sboidenko)
+A......... [ZBX-24922] prevented attempt to update trigger or graph prototypes while importing discovery rules without "update existing" option specified (jfreibergs)
+..F....... [ZBX-25156] fixed runtime error in trigger expression constructor if non-existent function was used in the expression field (Ivo)
+.........T [ZBX-25280] fixed trigger expression in Kubernetes cluster state by HTTP (egordymov)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.34
+
+6.0.34rc2 was released as 6.0.34 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.34rc2
 
 Bug fixes:
@@ -3245,6 +3292,8 @@ Changes for 5.0.45rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-24273] fixed potential Zabbix agent crash for vfs.fs.get item (MVekslers)
+..F....... [ZBX-23171] fixed escaping of slash character in context-based macro patterns (esekace)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.44

@@ -187,6 +187,7 @@ func (c *Connector) refreshActiveChecks() {
 				c.hostname)
 			c.lastErrors = errs
 		}
+
 		return
 	}
 
@@ -196,6 +197,13 @@ func (c *Connector) refreshActiveChecks() {
 	}
 
 	var response activeChecksResponse
+	parseSuccess := false
+
+	defer func() {
+		if !parseSuccess {
+			zbxcomms.Failover(&c.addresses)
+		}
+	}()
 
 	err = json.Unmarshal(data, &response)
 	if err != nil {
@@ -296,6 +304,8 @@ func (c *Connector) refreshActiveChecks() {
 			return
 		}
 	}
+
+	parseSuccess = true
 
 	c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), c.firstActiveChecksRefreshed,
 		response.Expressions, response.Data)

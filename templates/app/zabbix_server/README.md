@@ -26,7 +26,6 @@ Link this template to the local Zabbix server host.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$PROXY.LAST_SEEN.MAX}|<p>The maximum number of seconds that Zabbix proxy has not been seen.</p>|`600`|
 |{$ZABBIX.SERVER.UTIL.MAX}|<p>Default maximum threshold for percentage utilization triggers (use macro context for specification).</p>|`75`|
 |{$ZABBIX.SERVER.UTIL.MIN}|<p>Default minimum threshold for percentage utilization triggers (use macro context for specification).</p>|`65`|
 |{$ZABBIX.SERVER.UTIL.MAX:"value cache"}|<p>Maximum threshold for value cache utilization trigger.</p>|`95`|

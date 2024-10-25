@@ -695,7 +695,7 @@ static void	zbx_set_sender_signal_handlers(void)
 static	ZBX_THREAD_ENTRY(send_value, args)
 {
 	ZBX_THREAD_SENDVAL_ARGS	*sendval_args = (ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args;
-	int			ret = FAIL;
+	int			ret = FAIL, retries = sendval_args->addrs->values_num;
 	zbx_socket_t		sock;
 #if !defined(_WINDOWS)
 	int			i;
@@ -713,6 +713,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 		zbx_tls_take_vars(&sendval_args->tls_vars);
 	}
 #endif
+retry:
 	if (SUCCEED == connect_to_server(&sock, CONFIG_SOURCE_IP, sendval_args->addrs,
 			CONFIG_SENDER_TIMEOUT, CONFIG_TIMEOUT, configured_tls_connect_mode, 0, LOG_LEVEL_DEBUG))
 	{
@@ -726,9 +727,9 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 			zbx_json_adduint64(&sendval_args->json, ZBX_PROTO_TAG_NS, ts.ns);
 		}
 
-		if (SUCCEED == zbx_tcp_send(&sock, sendval_args->json.buffer))
+		if (SUCCEED == (ret = zbx_tcp_send(&sock, sendval_args->json.buffer)))
 		{
-			if (SUCCEED == zbx_tcp_recv(&sock))
+			if (SUCCEED == (ret = zbx_tcp_recv(&sock)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "answer [%s]", sock.buffer);
 
@@ -759,6 +760,12 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 		}
 
 		zbx_tcp_close(&sock);
+
+		if (SUCCEED != ret && 0 < --retries)
+		{
+			zbx_addrs_failover(sendval_args->addrs);
+			goto retry;
+		}
 	}
 #if !defined(_WINDOWS)
 	for (i = sendval_args->addrs->values_num - 1; i >= 0; i--)

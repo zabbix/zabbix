@@ -34,6 +34,17 @@ extern char	*CONFIG_TLS_SERVER_CERT_SUBJECT;
 extern char	*CONFIG_TLS_PSK_IDENTITY;
 #endif
 
+void	zbx_addrs_failover(zbx_vector_ptr_t *addrs)
+{
+	if (1 < addrs->values_num)
+	{
+		zbx_addr_t	*addr = (zbx_addr_t *)addrs->values[0];
+
+		zbx_vector_ptr_remove(addrs, 0);
+		zbx_vector_ptr_append(addrs, addr);
+	}
+}
+
 static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_vector_ptr_t *addrs,
 		int timeout, int connect_timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
 		int loglevel)
@@ -57,8 +68,7 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 				((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
 				zbx_socket_strerror());
 
-		zbx_vector_ptr_remove(addrs, 0);
-		zbx_vector_ptr_append(addrs, addr);
+		zbx_addrs_failover(addrs);
 	}
 
 	return ret;

@@ -197,6 +197,9 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state)
 
 		if (SUCCEED != upload_state)
 		{
+			/* initiate failover on upload failure */
+			zbx_addrs_failover(&zbx_addrs);
+
 			*more = ZBX_PROXY_DATA_DONE;
 			if (ZBX_PROXY_UPLOAD_DISABLED != *hist_upload_state)
 			{

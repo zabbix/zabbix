@@ -124,6 +124,7 @@ extern int	CONFIG_AVAILMAN_FORKS;
 extern int	CONFIG_SERVICEMAN_FORKS;
 extern int	CONFIG_TRIGGERHOUSEKEEPER_FORKS;
 extern int	CONFIG_ODBCPOLLER_FORKS;
+extern int	CONFIG_HAMANAGER_FORKS;
 
 extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern ZBX_THREAD_LOCAL int		process_num;
@@ -213,6 +214,8 @@ int	get_process_type_forks(unsigned char proc_type)
 			return CONFIG_TRIGGERHOUSEKEEPER_FORKS;
 		case ZBX_PROCESS_TYPE_ODBCPOLLER:
 			return CONFIG_ODBCPOLLER_FORKS;
+		case ZBX_PROCESS_TYPE_HA_MANAGER:
+			return CONFIG_HAMANAGER_FORKS;
 	}
 
 	return get_component_process_type_forks(proc_type);
