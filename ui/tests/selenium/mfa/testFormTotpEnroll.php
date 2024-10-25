@@ -22,6 +22,7 @@
 class testFormTotpEnroll extends CWebTest {
 
 	private const USER_NAME = 'totp-user';
+	private const USER_PASS = 'zabbixzabbix';
 	private const TOTP_METHOD_NAME = 'TOTP';
 
 	private static $user_id;
@@ -38,20 +39,19 @@ class testFormTotpEnroll extends CWebTest {
 		// Enable TOTP and set it as the default MFA method.
 		CDataHelper::call('authentication.update', [
 			'mfa_status' => MFA_ENABLED,
-			'mfaid' => $result['mfaids'][0] // this sets it as the default
+			'mfaid' => $result['mfaids'][0] // set as default
 		]);
 
 		// Create a user group for testing MFA.
 		$result = CDataHelper::call('usergroup.create', [
 			'name' => 'TOTP group',
-			'mfa_status' => MFA_ENABLED,
-			//'mfaid'=> $result['mfaids'][0]
+			'mfa_status' => MFA_ENABLED
 		]);
 
 		// Create a user for testing MFA.
 		self::$user_id = CDataHelper::call('user.create', [
 			'username' => self::USER_NAME,
-			'passwd' => 'zabbixzabbix',
+			'passwd' => self::USER_PASS,
 			'roleid'=> 1, // User role
 			'usrgrps' => [['usrgrpid' => $result['usrgrpids'][0]]]
 		])['userids'][0];
@@ -61,21 +61,21 @@ class testFormTotpEnroll extends CWebTest {
 	 * Assert elements and layout in the enroll form (the form with QR code).
 	 */
 	public function testFormTotpEnroll_Layout() {
-		$this->page->userLogin(self::USER_NAME, 'zabbixzabbix');
+		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
 
-		// Assert Zabbix logo visible.
-		$this->assertTrue($this->page->query('class:zabbix-logo')->one()->isVisible());
+		// The container contains most elements.
+		$container = $this->page->query('class:signin-container')->one();
 
-		// The form contains most other elements.
-		$form = $this->page->query('class:signin-container')->asForm()->one();
+		// Assert Zabbix logo.
+		$this->assertTrue($container->query('class:zabbix-logo')->one()->isVisible());
 		// Assert title.
-		$this->assertTrue($form->query('xpath:./div[text()="Scan this QR code"]')->one()->isVisible());
+		$this->assertTrue($container->query('xpath:.//div[text()="Scan this QR code"]')->one()->isVisible());
 		// Assert subtitle.
 		$subtitle = 'Please scan and get your verification code displayed in your authenticator app.';
-		$this->assertTrue($form->query('xpath:./div[text()='.CXPathHelper::escapeQuotes($subtitle).']')->one()->isVisible());
+		$this->assertTrue($container->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($subtitle).']')->one()->isVisible());
 
 		// Assert the QR code.
-		$qr_code = $form->query('class:qr-code')->one();
+		$qr_code = $container->query('class:qr-code')->one();
 		// Assert the URL in the title attribute.
 		$regex = $this->buildExpectedQrCodeUrlRegex(self::TOTP_METHOD_NAME, self::USER_NAME, SHA_1, 6);
 		$this->assertEquals(1, preg_match($regex, $qr_code->getAttribute('title'), $matches), 'Failed to assert the QR code url.');
@@ -88,15 +88,43 @@ class testFormTotpEnroll extends CWebTest {
 
 		// Assert the description text.
 		$description = 'Unable to scan? You can use '.strtoupper(SHA_1).' secret key to manually configure your authenticator app:';
-		$this->assertTrue($form->query('xpath:./div[text()='.CXPathHelper::escapeQuotes($description).']')->one()->isVisible());
+		$this->assertTrue($container->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($description).']')->one()->isVisible());
 		// Assert the secret is visible.
-		$this->assertTrue($form->query('xpath:./div[text()='.CXPathHelper::escapeQuotes($secret).']')->one()->isVisible());
+		$this->assertTrue($container->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($secret).']')->one()->isVisible());
 
-		// Assert the 'Verification code' field.
-		//$this->assertTrue($form->getField('Verification code')->isVisible());
+		// Assert 'Verification code' label.
+		$label = $container->query('xpath:.//label[@for="verification_code"]')->one();
+		$this->assertTrue($label->isVisible());
+		$this->assertEquals('Verification code', $label->getText());
+		// Assert 'Verification code' field.
+		$code_field = $container->query('id:verification_code')->one();
+		$this->assertTrue($code_field->isVisible() && $code_field->isEnabled());
+		$this->assertEquals('255', $code_field->getAttribute('maxlength'));
 
+		// Assert 'Sign in' button.
+		$button = $container->query('id:enter')->one();
+		$this->assertEquals('Sign in', $button->getText());
+		$this->assertEquals('submit', $button->getAttribute('type'));
+		$this->assertTrue($button->isClickable());
 
+		// Since index_mfa.php is a unique form, also check the generic elements.
+		$links = $this->page->query('class:signin-links')->one();
 
+		$help_link = $links->query('xpath:./a[text()="Help"]')->one();
+		$this->assertTrue($help_link->isClickable());
+		$this->assertEquals(1,
+			preg_match('/^https:\/\/www.zabbix.com\/documentation\/\d.\d\/$/', $help_link->getAttribute('href'))
+		);
+		$this->assertEquals('_blank', $help_link->getAttribute('target')); // opens link in a new tab
+
+		$support_link = $links->query('xpath:./a[text()="Support"]')->one();
+		$this->assertTrue($support_link->isClickable());
+		$this->assertEquals('https://www.zabbix.com/support', $support_link->getAttribute('href'));
+		$this->assertEquals('_blank', $support_link->getAttribute('target')); // opens link in a new tab
+
+		$copyright = $this->page->query('xpath://footer[@role="contentinfo"]')->one();
+		$this->assertTrue($copyright->isVisible());
+		$this->assertEquals(1, preg_match('/^© 2001–20\d\d, Zabbix SIA$/', $copyright->getText()));
 	}
 
 	/**
