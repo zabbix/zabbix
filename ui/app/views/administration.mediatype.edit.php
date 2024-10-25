@@ -132,7 +132,7 @@ $mediatype_formlist->addRow((new CLabel(_('GSM modem'), 'gsm_modem'))->setAsteri
 );
 
 // Create password field.
-if ($data['passwd'] !== '' && !$data['change_passwd']) {
+if (!$data['display_password_input']) {
 	// Disabling 'passwd' field prevents stored passwords autofill by browser.
 	$passwd_field = [
 		(new CButton('chPass_btn', _('Change password'))),
