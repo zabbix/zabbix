@@ -204,7 +204,7 @@ function DBselect(string $query, ?int $limit = null, int $offset = 0) {
 
 		case ZBX_DB_POSTGRESQL:
 			if (!$result = pg_query($DB['DB'], $query)) {
-				error('Error in query ['.$query.'] ['.pg_last_error($DB['DB']).']', true);
+				trigger_error('Error in query ['.$query.'] ['.pg_last_error($DB['DB']).']', E_USER_WARNING);
 			}
 
 			break;
