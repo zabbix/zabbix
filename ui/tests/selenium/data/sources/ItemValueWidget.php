@@ -134,37 +134,6 @@ class ItemValueWidget {
 				'valuemapid' => $valuemapids['Value mapping for item value widget']
 			]
 		]);
-		CDataHelper::call('usermacro.createglobal', [
-			[
-				'macro' => '{$USER.MACRO}',
-				'value' => 'Macro function Test 12345'
-			],
-			[
-				'macro' => '{$SECRET.MACRO}',
-				'type' => 1,
-				'value' => 'secret'
-			],
-			[
-				'macro' => '{$MACRO.CHAR}',
-				'value' => '000 ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰'
-			],
-			[
-				'macro' => '{$MACRO.HTML.ENCODE}',
-				'value' => '<a href="test.url">"test&"</a>'
-			],
-			[
-				'macro' => '{$MACRO.HTML.DECODE}',
-				'value' => '&lt;a href=&quot;test.url&quot;&gt;&quot;test&amp;&quot;&lt;/a&gt;'
-			],
-			[
-				'macro' => '{$MACRO.URL.ENCODE}',
-				'value' => 'h://test.com/macro?functions=urlencode&urld=a🎸'
-			],
-			[
-				'macro' => '{$MACRO.URL.DECODE}',
-				'value' => 'h%3A%2F%2Ftest.com%2Fmacro%3Ffunctions%3Durlencode%26urld%3Da%F0%9F%8E%B8'
-			]
-		]);
 
 		CDataHelper::call('dashboard.create', [
 			[
