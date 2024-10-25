@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../common/testWidgets.php';
 /**
  * Test for checking Item Value Widget.
  *
- * @backup dashboard
+ * @backup dashboard, globalmacro
  *
  * @dataSource WebScenarios, AllItemValueTypes, ItemValueWidget
  *

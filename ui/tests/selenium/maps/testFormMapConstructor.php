@@ -19,7 +19,7 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 /**
  * @dataSource Maps
  *
- * @backup sysmaps
+ * @backup sysmaps, globalmacro
  *
  * @onBefore prepareMapForMacrofunctions
  */
