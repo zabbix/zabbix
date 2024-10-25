@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxcommon.h"
 #include "zbxcomms.h"
 
 #include "comms.h"
@@ -2156,14 +2157,12 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, short *event
 
 ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char **error)
 {
-	ssize_t		n = 0;
+	ssize_t	n = 0, err;
 
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 
 	while (1)
 	{
-		ssize_t	err;
-
 		if (0 <= (n = (ssize_t)SSL_read(s->tls_ctx->ctx, buf, (int)len)))
 			break;
 
@@ -2193,6 +2192,12 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char
 
 	if (0 == n)
 	{
+		if (SSL_ERROR_ZERO_RETURN != (err = (size_t)SSL_get_error(s->tls_ctx->ctx, (int)n)))
+		{
+			*error = zbx_dsprintf(*error, "connection was not closed gracefully:%ld", err);
+			return ZBX_PROTO_ERROR;
+		}
+
 		s->tls_ctx->close_notify_received = 1;
 		return n;
 	}
