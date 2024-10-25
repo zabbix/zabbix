@@ -23,23 +23,33 @@ class testFormTotpEnroll extends CWebTest {
 
 	private const USER_NAME = 'totp-user';
 	private const USER_PASS = 'zabbixzabbix';
-	private const TOTP_METHOD_NAME = 'TOTP';
 
-	private static $user_id;
+	private const DEFAULT_METHOD_NAME = 'TOTP';
+	private const DEFAULT_ALGO = SHA_1;
+	private const DEFAULT_TOTP_CODE_LENGTH = TOTP_CODE_LENGTH_6;
+
+	protected static $mfa_id;
+	protected static $user_id;
+
+	protected static $algo_map = [
+		SHA_1 => TOTP_HASH_SHA1,
+		SHA_256 => TOTP_HASH_SHA256,
+		SHA_512 => TOTP_HASH_SHA512
+	];
 
 	public function prepareData() {
 		// Create a TOTP MFA method.
-		$result = CDataHelper::call('mfa.create', [
+		self::$mfa_id = CDataHelper::call('mfa.create', [
 			'type' => MFA_TYPE_TOTP,
-			'name' => self::TOTP_METHOD_NAME,
-			'hash_function' => TOTP_HASH_SHA1,
-			'code_length' => TOTP_CODE_LENGTH_6
-		]);
+			'name' => self::DEFAULT_METHOD_NAME,
+			'hash_function' => self::$algo_map[self::DEFAULT_ALGO],
+			'code_length' => self::DEFAULT_TOTP_CODE_LENGTH
+		])['mfaids'][0];
 
 		// Enable TOTP and set it as the default MFA method.
 		CDataHelper::call('authentication.update', [
 			'mfa_status' => MFA_ENABLED,
-			'mfaid' => $result['mfaids'][0] // set as default
+			'mfaid' => self::$mfa_id // set as default
 		]);
 
 		// Create a user group for testing MFA.
@@ -77,7 +87,9 @@ class testFormTotpEnroll extends CWebTest {
 		// Assert the QR code.
 		$qr_code = $container->query('class:qr-code')->one();
 		// Assert the URL in the title attribute.
-		$regex = $this->buildExpectedQrCodeUrlRegex(self::TOTP_METHOD_NAME, self::USER_NAME, SHA_1, 6);
+		$regex = $this->buildExpectedQrCodeUrlRegex(
+			self::DEFAULT_METHOD_NAME, self::USER_NAME, self::DEFAULT_ALGO, self::DEFAULT_TOTP_CODE_LENGTH
+		);
 		$this->assertEquals(1, preg_match($regex, $qr_code->getAttribute('title'), $matches), 'Failed to assert the QR code url.');
 		// Save the secret string for later.
 		$secret = $matches[1];
@@ -87,8 +99,7 @@ class testFormTotpEnroll extends CWebTest {
 		$this->assertEquals("Scan me!", $qr_img->getAttribute('alt'));
 
 		// Assert the description text.
-		$description = 'Unable to scan? You can use '.strtoupper(SHA_1).' secret key to manually configure your authenticator app:';
-		$this->assertTrue($container->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($description).']')->one()->isVisible());
+		$this->validateDescription(SHA_1);
 		// Assert the secret is visible.
 		$this->assertTrue($container->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($secret).']')->one()->isVisible());
 
@@ -127,13 +138,56 @@ class testFormTotpEnroll extends CWebTest {
 		$this->assertEquals(1, preg_match('/^© 2001–20\d\d, Zabbix SIA$/', $copyright->getText()));
 	}
 
+
+	public function getEnrollData() {
+		return [
+			[
+				[
+					// Default MFA settings.
+				]
+			],
+			[
+				[
+					// SHA-256 algorithm.
+					'mfa_data' => [
+						'hash_function' => SHA_256,
+					]
+				]
+			],
+		];
+	}
+
+	public function prepareEnrollData() {
+		$providedData = $this->getProvidedData();
+		$data = reset($providedData);
+
+		// Set the needed MFA configuration via API.
+		CDataHelper::call('mfa.update', [
+			'mfaid' => self::$mfa_id,
+			'name' => CTestArrayHelper::get($data, 'mfa_data.name', self::DEFAULT_METHOD_NAME),
+			'hash_function' => self::$algo_map[CTestArrayHelper::get($data, 'mfa_data.hash_function', self::DEFAULT_ALGO)],
+			'code_length' => CTestArrayHelper::get($data, 'mfa_data.code_length', self::DEFAULT_TOTP_CODE_LENGTH)
+		]);
+	}
+
 	/**
-	 * Builds the QR code's URL as a regex string. Regex because the secret string is not known.
+	 * Test different enrollment scenarios.
 	 *
-	 * @param string $method_name    The expected TOTP method name
-	 * @param string $user_name      User that is trying to enroll
-	 * @param string $algorithm      The expected Cryptographic algorithm, used for creating tokens
-	 * @param int    $digits         The expected TOTP code length, number of digits
+	 * @dataProvider  getEnrollData
+	 * @onBefore      prepareEnrollData
+	 */
+	public function testFormTotpEnroll_Enroll($data) {
+		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
+
+	}
+
+	/**
+	 * Builds the QR code's URL as a regex string. Regex, because the secret string is not known.
+	 *
+	 * @param string $method_name    the expected TOTP method name
+	 * @param string $user_name      user that is trying to enroll
+	 * @param string $algorithm      the expected Cryptographic algorithm, used for creating tokens
+	 * @param int    $digits         the expected TOTP code length, number of digits
 	 *
 	 * @return string    Regex that matches the expected QR code's URL.
 	 */
@@ -143,5 +197,22 @@ class testFormTotpEnroll extends CWebTest {
 		$regex = '/^otpauth:\/\/totp\/'.$method_name.':'.$user_name.'\?secret=(['.CMfaTotpHelper::VALID_BASE32_CHARS.
 				']{32})&issuer='.$method_name.'&algorithm='.strtoupper($algorithm).'&digits='.$digits.'&period=30$/';
 		return $regex;
+	}
+
+	/**
+	 * Validatest the description text under the QR code.
+	 *
+	 * @param string $algorithm    the cryptographic algorithm that should be displayed
+	 */
+	protected function validateDescription($algorithm) {
+		$description = 'Unable to scan? You can use '.strtoupper($algorithm).
+				' secret key to manually configure your authenticator app:';
+		$this->assertTrue($this->page->query('xpath:.//div[text()='.
+				CXPathHelper::escapeQuotes($description).']')->one()->isVisible()
+		);
+	}
+
+	protected function readSecret() {
+
 	}
 }
