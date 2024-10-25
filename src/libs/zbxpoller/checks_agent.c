@@ -140,6 +140,8 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 		{
 			retry = 1;
 		}
+
+		zbx_tcp_read_close_notify(&s, NULL);
 	}
 	else
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));

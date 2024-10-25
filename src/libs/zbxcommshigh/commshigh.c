@@ -597,11 +597,7 @@ retry:
 
 	if (SUCCEED == comms_check_redirect(sock.buffer, addrs, &retry))
 	{
-		if (SUCCEED == zbx_tls_used(&sock))
-		{
-			if (SUCCEED != zbx_tcp_recv(&sock))
-				zabbix_log(LOG_LEVEL_DEBUG, "cannot receive close notify");
-		}
+		zbx_tcp_read_close_notify(&sock, NULL);
 
 		if (0 == retries && ZBX_REDIRECT_RETRY == retry)
 		{
@@ -627,11 +623,7 @@ retry:
 	if (NULL != out)
 		*out = zbx_socket_detach_buffer(&sock);
 
-	if (SUCCEED == zbx_tls_used(&sock))
-	{
-		if (SUCCEED != zbx_tcp_recv(&sock))
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot receive close notify");
-	}
+	zbx_tcp_read_close_notify(&sock, NULL);
 success:
 	ret = SUCCEED;
 cleanup:

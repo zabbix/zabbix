@@ -623,6 +623,10 @@ static int tls_ready(tls_t *tls)
 static int tls_close(tls_t *tls)
 {
 	int	ret;
+
+	if (0 != (SSL_get_shutdown(tls->ssl) & SSL_RECEIVED_SHUTDOWN))
+		return 1;
+
 	if (0 > (ret = SSL_shutdown(tls->ssl)) && SSL_ERROR_WANT_READ == SSL_get_error(tls->ssl, ret))
 		return 0;
 	return ret;

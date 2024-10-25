@@ -54,7 +54,6 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)agent_context->arg_action;
 	int			errnum = 0;
 	socklen_t		optlen = sizeof(int);
-	char			buf[ZBX_STAT_BUF_LEN];
 
 	ZBX_UNUSED(fd);
 	ZBX_UNUSED(timeout_event);
@@ -232,14 +231,14 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 
 			return ZBX_ASYNC_TASK_READ;
 		case ZABBIX_AGENT_STEP_RECV_CLOSE:
-			event_new = 0;
-			if (FAIL == (zbx_tcp_read(&agent_context->s, buf, sizeof(buf), &event_new)))
+			if (SUCCEED != zbx_tcp_read_close_notify(&agent_context->s, &event_new))
 			{
 				if (ZBX_ASYNC_TASK_STOP != (state = zbx_async_poller_get_task_state_for_event(event_new)))
 					return state;
 
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot receive close notify: %s", zbx_socket_strerror());
 			}
+			ZBX_FALLTHROUGH;
 		case ZABBIX_AGENT_STEP_RECV:
 			if (ZABBIX_AGENT_STEP_RECV == agent_context->step)
 			{

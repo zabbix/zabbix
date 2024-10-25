@@ -1934,6 +1934,25 @@ ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len, short *events)
 	return tcp_read(s, buf, len, events);
 }
 
+int	zbx_tcp_read_close_notify(zbx_socket_t *s, short *events)
+{
+	char	buf[1];
+
+	if (SUCCEED != zbx_tls_used(s))
+		return SUCCEED;
+
+	if (NULL != events)
+		*events = 0;
+
+	if (0 != (zbx_tcp_read(s, buf, sizeof(buf), events)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot receive close notify");
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: sets deadline for socket operations                               *
