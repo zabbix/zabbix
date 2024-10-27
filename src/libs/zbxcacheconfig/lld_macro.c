@@ -104,19 +104,19 @@ void	zbx_lld_macro_path_free(zbx_lld_macro_path_t *lld_macro_path)
  * Purpose: get value of LLD macro using json path if available or by         *
  *          searching for such key in key value pairs of array entry          *
  *                                                                            *
- * Parameters: jp_row          - [IN] the lld data row                        *
+ * Parameters: lld_obj         - [IN] the lld data row                        *
  *             lld_macro_paths - [IN] use json path to extract from jp_row    *
  *             macro           - [IN] LLD macro                               *
  *             value           - [OUT] value extracted from jp_row            *
  *                                                                            *
  ******************************************************************************/
-int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row,
+int	zbx_lld_macro_value_by_name(const zbx_jsonobj_t *lld_obj,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, const char *macro, char **value)
 {
 	zbx_lld_macro_path_t	lld_macro_path_local, *lld_macro_path;
 	int			index;
-	size_t			value_alloc = 0;
-	zbx_json_type_t		type;
+	size_t			value_alloc = 0, value_offset = 0;
+	const zbx_jsonobj_t	*val;
 
 	lld_macro_path_local.lld_macro = (char *)macro;
 
@@ -125,15 +125,23 @@ int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row,
 	{
 		lld_macro_path = lld_macro_paths->values[index];
 
-		if (SUCCEED == zbx_jsonpath_query(jp_row, lld_macro_path->path, value) && NULL != *value)
+		if (SUCCEED == zbx_jsonobj_query(lld_obj, lld_macro_path->path, value) && NULL != *value)
 			return SUCCEED;
 
 		return FAIL;
 	}
 
-	if (FAIL != (zbx_json_value_by_name_dyn(jp_row, macro, value, &value_alloc, &type)) &&
-			ZBX_JSON_TYPE_NULL != type)
-		return SUCCEED;
+	if (NULL == (val = zbx_jsonobj_get_value(lld_obj, macro)))
+		return FAIL;
+
+	switch (val->type)
+	{
+		case ZBX_JSON_TYPE_NUMBER:
+		case ZBX_JSON_TYPE_STRING:
+			return zbx_jsonobj_to_string(value, &value_alloc, &value_offset, val);
+		default:
+			return FAIL;
+	}
 
 	return FAIL;
 }

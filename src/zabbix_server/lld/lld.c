@@ -212,7 +212,7 @@ static int	lld_filter_load(zbx_lld_filter_t *filter, zbx_uint64_t lld_ruleid, co
  *                                                                            *
  * Purpose: checks if LLD data passes filter evaluation                       *
  *                                                                            *
- * Parameters: jp_row          - [IN] LLD data row                            *
+ * Parameters: lld_obj         - [IN] LLD data row                            *
  *             lld_macro_paths - [IN] use JSON path to extract from jp_row    *
  *             condition       - [IN] LLD filter condition                    *
  *             result          - [OUT] result of evaluation                   *
@@ -222,14 +222,14 @@ static int	lld_filter_load(zbx_lld_filter_t *filter, zbx_uint64_t lld_ruleid, co
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	filter_condition_match(const struct zbx_json_parse *jp_row,
+static int	filter_condition_match(const zbx_jsonobj_t *lld_obj,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, const lld_condition_t *condition, int *result,
 		char **err_msg)
 {
 	char	*value = NULL;
 	int	ret = SUCCEED;
 
-	if (SUCCEED == zbx_lld_macro_value_by_name(jp_row, lld_macro_paths, condition->macro, &value))
+	if (SUCCEED == zbx_lld_macro_value_by_name(lld_obj, lld_macro_paths, condition->macro, &value))
 	{
 		if (ZBX_CONDITION_OPERATOR_NOT_EXIST == condition->op)
 		{
@@ -285,7 +285,7 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row,
  * Purpose: checks if LLD data passes filter evaluation by and/or/andor rules           *
  *                                                                                      *
  * Parameters: filter          - [IN] LLD filter                                        *
- *             jp_row          - [IN] LLD data row                                      *
+ *             lld_obj         - [IN] LLD data row                                      *
  *             lld_macro_paths - [IN] use JSON path to extract from jp_row              *
  *             info            - [OUT] warning description                              *
  *                                                                                      *
@@ -293,7 +293,7 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row,
  *               FAIL    - otherwise                                                    *
  *                                                                                      *
  ****************************************************************************************/
-static int	filter_evaluate_and_or_andor(const zbx_lld_filter_t *filter, const struct zbx_json_parse *jp_row,
+static int	filter_evaluate_and_or_andor(const zbx_lld_filter_t *filter, const zbx_jsonobj_t *lld_obj,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **info)
 {
 	int			ret = SUCCEED, error_num = 0, res;
@@ -344,7 +344,7 @@ static int	filter_evaluate_and_or_andor(const zbx_lld_filter_t *filter, const st
 				goto out;
 		}
 
-		if (SUCCEED == (ret = filter_condition_match(jp_row, lld_macro_paths, condition, &res, &errmsg)))
+		if (SUCCEED == (ret = filter_condition_match(lld_obj, lld_macro_paths, condition, &res, &errmsg)))
 		{
 			zbx_snprintf_alloc(&expression, &expression_alloc, &expression_offset, "%d", res);
 		}
@@ -384,7 +384,7 @@ out:
  * Purpose: checks if LLD data passes filter evaluation by custom expression  *
  *                                                                            *
  * Parameters: filter          - [IN] LLD filter                              *
- *             jp_row          - [IN] LLD data row                            *
+ *             lld_obj         - [IN] LLD data row                            *
  *             lld_macro_paths - [IN] use JSON path to extract from jp_row    *
  *             err_msg         - [OUT]                                        *
  *                                                                            *
@@ -396,7 +396,7 @@ out:
  *           2) call zbx_evaluate() to calculate final result                 *
  *                                                                            *
  ******************************************************************************/
-static int	filter_evaluate_expression(const zbx_lld_filter_t *filter, const struct zbx_json_parse *jp_row,
+static int	filter_evaluate_expression(const zbx_lld_filter_t *filter, const zbx_jsonobj_t *lld_obj,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **err_msg)
 {
 	int			ret, res, error_num = 0;
@@ -419,7 +419,7 @@ static int	filter_evaluate_expression(const zbx_lld_filter_t *filter, const stru
 	{
 		const lld_condition_t	*condition = filter->conditions.values[i];
 
-		if (SUCCEED == filter_condition_match(jp_row, lld_macro_paths, condition, &res, &errmsg))
+		if (SUCCEED == filter_condition_match(lld_obj, lld_macro_paths, condition, &res, &errmsg))
 		{
 			zbx_snprintf(value, sizeof(value), "%d", res);
 		}
@@ -470,7 +470,7 @@ static int	filter_evaluate_expression(const zbx_lld_filter_t *filter, const stru
  * Purpose: checks if LLD data passes filter evaluation                       *
  *                                                                            *
  * Parameters: filter          - [IN] LLD filter                              *
- *             jp_row          - [IN] LLD data row                            *
+ *             lld_obj         - [IN] LLD data row                            *
  *             lld_macro_paths - [IN] use JSON path to extract from jp_row    *
  *             info            - [OUT] warning description                    *
  *                                                                            *
@@ -478,7 +478,7 @@ static int	filter_evaluate_expression(const zbx_lld_filter_t *filter, const stru
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	filter_evaluate(const zbx_lld_filter_t *filter, const struct zbx_json_parse *jp_row,
+static int	filter_evaluate(const zbx_lld_filter_t *filter, const zbx_jsonobj_t *lld_obj,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **info)
 {
 	if (0 == filter->conditions.values_num)
@@ -489,9 +489,9 @@ static int	filter_evaluate(const zbx_lld_filter_t *filter, const struct zbx_json
 		case ZBX_CONDITION_EVAL_TYPE_AND_OR:
 		case ZBX_CONDITION_EVAL_TYPE_AND:
 		case ZBX_CONDITION_EVAL_TYPE_OR:
-			return filter_evaluate_and_or_andor(filter, jp_row, lld_macro_paths, info);
+			return filter_evaluate_and_or_andor(filter, lld_obj, lld_macro_paths, info);
 		case ZBX_CONDITION_EVAL_TYPE_EXPRESSION:
-			return filter_evaluate_expression(filter, jp_row, lld_macro_paths, info);
+			return filter_evaluate_expression(filter, lld_obj, lld_macro_paths, info);
 	}
 
 	return FAIL;
@@ -991,57 +991,55 @@ int	lld_validate_item_override_no_discover(const zbx_vector_lld_override_ptr_t *
 	return ZBX_PROTOTYPE_NO_DISCOVER == override_default ? FAIL : SUCCEED;
 }
 
-static int	lld_rows_get(const char *value, zbx_lld_filter_t *filter, zbx_vector_lld_row_ptr_t *lld_rows,
+static int	lld_rows_get(zbx_jsonobj_t *lld_obj, zbx_lld_filter_t *filter, zbx_vector_lld_row_ptr_t *lld_rows,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, const zbx_vector_lld_override_ptr_t *overrides,
 		char **info, char **error)
 {
-	struct zbx_json_parse	jp, jp_array, jp_row;
-	const char		*p;
 	zbx_lld_row_t		*lld_row;
 	int			ret = FAIL;
+	const zbx_jsonobj_t	*lld_array;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != zbx_json_open(value, &jp))
+	if (ZBX_JSON_TYPE_ARRAY == lld_obj->type)
 	{
-		*error = zbx_dsprintf(*error, "Invalid discovery rule value: %s", zbx_json_strerror());
-		goto out;
+		lld_array = lld_obj;
+	}
+	else
+	{
+		if (NULL == (lld_array = zbx_jsonobj_get_value(lld_obj, ZBX_PROTO_TAG_DATA)) ||
+				ZBX_JSON_TYPE_ARRAY != lld_array->type)
+		{
+			*error = zbx_dsprintf(*error, "Cannot find the \"%s\" array in the received JSON object.",
+					ZBX_PROTO_TAG_DATA);
+			goto out;
+		}
 	}
 
-	if ('[' == *jp.start)
+	for (int i = 0; i < lld_array->data.array.values_num; i++)
 	{
-		jp_array = jp;
-	}
-	else if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_array))	/* deprecated */
-	{
-		*error = zbx_dsprintf(*error, "Cannot find the \"%s\" array in the received JSON object.",
-				ZBX_PROTO_TAG_DATA);
-		goto out;
-	}
+		const zbx_jsonobj_t	*obj = lld_array->data.array.values[i];
 
-	p = NULL;
-	while (NULL != (p = zbx_json_next(&jp_array, p)))
-	{
-		if (FAIL == zbx_json_brackets_open(p, &jp_row))
+		if (ZBX_JSON_TYPE_OBJECT != obj->type)
 			continue;
 
-		if (SUCCEED != filter_evaluate(filter, &jp_row, lld_macro_paths, info))
+		if (SUCCEED != filter_evaluate(filter, obj, lld_macro_paths, info))
 			continue;
 
 		lld_row = (zbx_lld_row_t *)zbx_malloc(NULL, sizeof(zbx_lld_row_t));
 		zbx_vector_lld_row_ptr_append(lld_rows, lld_row);
 
-		lld_row->jp_row = jp_row;
+		lld_row->data = obj;
 		zbx_vector_lld_item_link_ptr_create(&lld_row->item_links);
 		zbx_vector_lld_override_ptr_create(&lld_row->overrides);
 
 #define OVERRIDE_STOP_TRUE	1
 
-		for (int i = 0; i < overrides->values_num; i++)
+		for (int j = 0; j < overrides->values_num; j++)
 		{
-			zbx_lld_override_t	*override = overrides->values[i];
+			zbx_lld_override_t	*override = overrides->values[j];
 
-			if (SUCCEED != filter_evaluate(&override->filter, &jp_row, lld_macro_paths, info))
+			if (SUCCEED != filter_evaluate(&override->filter, obj, lld_macro_paths, info))
 				continue;
 
 			zbx_vector_lld_override_ptr_append(&lld_row->overrides, override);
@@ -1057,13 +1055,23 @@ static int	lld_rows_get(const char *value, zbx_lld_filter_t *filter, zbx_vector_
 out:
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 	{
+		char	*str = NULL;
+		size_t	str_alloc = 0;
+
 		for (int i = 0; i < lld_rows->values_num; i++)
 		{
+			size_t	str_offset = 0;
+
 			lld_row = lld_rows->values[i];
 
-			zabbix_log(LOG_LEVEL_TRACE, "lld_row '%.*s' overrides:",
-					(int)(lld_row->jp_row.end - lld_row->jp_row.start + 1),
-					lld_row->jp_row.start);
+			if (SUCCEED != zbx_jsonobj_to_string(&str, &str_alloc, &str_offset, lld_row->data))
+			{
+				THIS_SHOULD_NEVER_HAPPEN_MSG("cannot convert json object to string");
+				continue;
+			}
+
+
+			zabbix_log(LOG_LEVEL_TRACE, "lld_row '%s' overrides:", str);
 
 			for (int j = 0; j < lld_row->overrides.values_num; j++)
 			{
@@ -1071,6 +1079,8 @@ out:
 						*(const zbx_uint64_t *)lld_row->overrides.values[j]);
 			}
 		}
+
+		zbx_free(str);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
@@ -1141,6 +1151,7 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	zbx_dc_um_handle_t		*um_handle;
 	zbx_vector_lld_override_ptr_t	overrides;
 	zbx_vector_lld_row_ptr_t	lld_rows;
+	zbx_jsonobj_t			lld_obj = {0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __func__, lld_ruleid);
 
@@ -1203,7 +1214,13 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	if (SUCCEED != (ret = lld_overrides_load(&overrides, lld_ruleid, &item, error)))
 		goto out;
 
-	if (SUCCEED != lld_rows_get(value, &filter, &lld_rows, &lld_macro_paths, &overrides, &info, error))
+	if (SUCCEED != zbx_jsonobj_open(value, &lld_obj))
+	{
+		*error = zbx_dsprintf(*error, "Invalid discovery rule value: %s", zbx_json_strerror());
+		goto out;
+	}
+
+	if (SUCCEED != lld_rows_get(&lld_obj, &filter, &lld_rows, &lld_macro_paths, &overrides, &info, error))
 	{
 		ret = FAIL;
 		goto out;

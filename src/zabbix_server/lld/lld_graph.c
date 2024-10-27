@@ -711,7 +711,7 @@ static void	lld_graph_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_v
 		int lastcheck, const zbx_lld_row_t *lld_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths)
 {
 	zbx_lld_graph_t			*graph = NULL;
-	const struct zbx_json_parse	*jp_row = &lld_row->jp_row;
+	const zbx_jsonobj_t		*lld_obj = lld_row->data;
 	zbx_uint64_t			ymin_itemid, ymax_itemid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -730,7 +730,7 @@ static void	lld_graph_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_v
 	{
 		char	*buffer = zbx_strdup(NULL, name_proto);
 
-		zbx_substitute_lld_macros(&buffer, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
+		zbx_substitute_lld_macros(&buffer, lld_obj, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 
 		if (0 != strcmp(graph->name, buffer))
@@ -773,7 +773,7 @@ static void	lld_graph_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_v
 
 		graph->name = zbx_strdup(NULL, name_proto);
 		graph->name_orig = NULL;
-		zbx_substitute_lld_macros(&graph->name, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
+		zbx_substitute_lld_macros(&graph->name, lld_obj, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 		zbx_lrtrim(graph->name, ZBX_WHITESPACE);
 
 		lld_override_graph(&lld_row->overrides, graph->name, &discover_proto);

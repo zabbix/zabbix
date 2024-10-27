@@ -349,7 +349,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 		if (ZBX_MACRO_EXPAND_YES == expand_macros)
 		{
 			ZBX_STRDUP(items[i].key, items[i].key_orig);
-			if (SUCCEED != zbx_substitute_key_macros_unmasked(&items[i].key, NULL, &items[i], NULL, NULL,
+			if (SUCCEED != zbx_substitute_key_macros_unmasked(&items[i].key, NULL, &items[i],
 					ZBX_MACRO_TYPE_ITEM_KEY, error, sizeof(error)))
 			{
 				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));

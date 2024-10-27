@@ -113,7 +113,7 @@ ZBX_PTR_VECTOR_DECL(lld_override_ptr, zbx_lld_override_t*)
 
 typedef struct
 {
-	struct zbx_json_parse		jp_row;
+	const zbx_jsonobj_t		*data;
 	zbx_vector_lld_item_link_ptr_t	item_links;	/* the list of item prototypes */
 	zbx_vector_lld_override_ptr_t	overrides;
 }
