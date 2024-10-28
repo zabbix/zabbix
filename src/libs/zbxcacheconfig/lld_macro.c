@@ -117,6 +117,7 @@ int	zbx_lld_macro_value_by_name(const zbx_jsonobj_t *lld_obj,
 	int			index;
 	size_t			value_alloc = 0, value_offset = 0;
 	const zbx_jsonobj_t	*val;
+	char			buf[ZBX_MAX_DOUBLE_LEN + 1];
 
 	lld_macro_path_local.lld_macro = (char *)macro;
 
@@ -137,8 +138,12 @@ int	zbx_lld_macro_value_by_name(const zbx_jsonobj_t *lld_obj,
 	switch (val->type)
 	{
 		case ZBX_JSON_TYPE_NUMBER:
+			zbx_print_double(buf, sizeof(buf), val->data.number);
+			*value = zbx_strdup(NULL, buf);
+			return SUCCEED;
 		case ZBX_JSON_TYPE_STRING:
-			return zbx_jsonobj_to_string(value, &value_alloc, &value_offset, val);
+			*value = zbx_strdup(NULL, val->data.string);
+			return SUCCEED;
 		default:
 			return FAIL;
 	}

@@ -1264,6 +1264,7 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	if (NULL != info)
 		*error = zbx_strdcat(*error, info);
 out:
+	zbx_jsonobj_clear(&lld_obj);
 	zbx_audit_flush(ZBX_AUDIT_LLD_CONTEXT);
 	zbx_dc_config_clean_items(&item, &errcode, 1);
 	zbx_free(info);
