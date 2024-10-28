@@ -334,45 +334,12 @@ class testFormScheduledReport extends CWebTest {
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Name' => 'start time -1 hour'
-					],
-					'Start time' => '-1:10',
-					'New start time' => '01:10',
-					'Dashboard' => 'Global view'
-				]
-			],
-			[
-				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'start time 60 minutes'
 					],
 					'Start time' => '00:60',
 					'message_details' => 'Incorrect value for field "minutes": value must be no greater than "59".'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Name' => 'start time -1 minute'
-					],
-					'Start time' => '00:-1',
-					'New start time' => '00:01',
-					'Dashboard' => 'Global view'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Name' => 'start time 1:1 minutes'
-					],
-					'Start time' => '1:1',
-					'New start time' => '01:01',
-					'Dashboard' => 'Global view'
 				]
 			],
 			// Date fields validation.
@@ -661,6 +628,39 @@ class testFormScheduledReport extends CWebTest {
 							]
 						]
 					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'start time -1 hour'
+					],
+					'Start time' => '-1:10',
+					'new_start_time' => '01:10',
+					'Dashboard' => 'Global view'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'start time -1 minute'
+					],
+					'Start time' => '00:-1',
+					'new_start_time' => '00:01',
+					'Dashboard' => 'Global view'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'start time 1:1 minutes'
+					],
+					'Start time' => '1:1',
+					'new_start_time' => '01:01',
+					'Dashboard' => 'Global view'
 				]
 			]
 		];
@@ -1012,6 +1012,39 @@ class testFormScheduledReport extends CWebTest {
 						]
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'start time -1 hour'
+					],
+					'Start time' => '-1:10',
+					'new_start_time' => '01:10',
+					'Dashboard' => 'Global view'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'start time -1 minute'
+					],
+					'Start time' => '00:-1',
+					'new_start_time' => '00:01',
+					'Dashboard' => 'Global view'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'start time 1:1 minutes'
+					],
+					'Start time' => '1:1',
+					'new_start_time' => '01:01',
+					'Dashboard' => 'Global view'
+				]
 			]
 		]);
 	}
@@ -1347,13 +1380,12 @@ class testFormScheduledReport extends CWebTest {
 
 		$form = $this->query('id:scheduledreport-form')->waitUntilVisible()->asForm()->one();
 
+		// Make Name field unique in update scenario.
 		if ($action === 'update' && array_key_exists('Name', $data['fields']) && !CTestArrayHelper::get($data, 'unique')) {
-			if ($data['fields']['Name'] !== ''){
+			if ($data['fields']['Name'] !== '') {
 				$data['fields']['Name'] = $data['fields']['Name'].microtime();
 			}
 		}
-
-		$form->fill($data['fields']);
 
 		if (CTestArrayHelper::get($data, 'Start time', false)) {
 			// Split the time on hours and minutes.
@@ -1368,10 +1400,13 @@ class testFormScheduledReport extends CWebTest {
 				$container->query('id:minutes')->one()->fill($time[1]);
 			}
 
-			if (CTestArrayHelper::get($data, 'New start time')) {
-				$time = explode(':', $data['New start time']);
+			// Start time automatically is changed to valid if -1 or 1 is entered.
+			if (CTestArrayHelper::get($data, 'new_start_time')) {
+				$time = explode(':', $data['new_start_time']);
 			}
 		}
+
+		$form->fill($data['fields']);
 		$this->fillSubscriptions($data);
 
 		if (CTestArrayHelper::get($data, 'subscription_error', false) === false) {
