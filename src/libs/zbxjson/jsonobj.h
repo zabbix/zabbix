@@ -23,7 +23,7 @@ typedef struct
 {
 	char			*name;
 	const zbx_jsonobj_t	*value;
-	zbx_jsonobj_t		object;		/* can optionally hold the object value refers to */
+	zbx_jsonobj_t		*internal;	/* can optionally hold the object value refers to */
 }
 zbx_jsonobj_ref_t;
 

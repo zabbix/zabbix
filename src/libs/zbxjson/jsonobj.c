@@ -308,9 +308,13 @@ void	jsonobj_clear_ref_vector(zbx_vector_jsonobj_ref_t *refs)
 		zbx_jsonobj_ref_t	*ref = &refs->values[i];
 
 		zbx_free(ref->name);
-		if (ref->value == &ref->object)
-			zbx_jsonobj_clear(&ref->object);
+		if (NULL != ref->internal)
+		{
+			zbx_jsonobj_clear(ref->internal);
+			zbx_free(ref->internal);
+		}
 	}
+
 	zbx_vector_jsonobj_ref_clear(refs);
 }
 

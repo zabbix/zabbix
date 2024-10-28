@@ -111,6 +111,7 @@ static void	zbx_vector_jsonobj_ref_add_object(zbx_vector_jsonobj_ref_t *refs, co
 	zbx_jsonobj_ref_t	ref;
 
 	ref.name = zbx_strdup(NULL, name);
+	ref.internal = NULL;
 	ref.value = value;
 	zbx_vector_jsonobj_ref_append(refs, ref);
 }
@@ -133,9 +134,10 @@ static void	zbx_vector_jsonobj_ref_add_string(zbx_vector_jsonobj_ref_t *refs, co
 	zbx_jsonobj_ref_t	ref;
 
 	ref.name = zbx_strdup(NULL, name);
-	jsonobj_init(&ref.object, ZBX_JSON_TYPE_STRING);
-	jsonobj_set_string(&ref.object, zbx_strdup(NULL, str));
-	ref.value = &ref.object;
+	ref.internal = (zbx_jsonobj_t *)zbx_malloc(NULL, sizeof(zbx_jsonobj_t));
+	jsonobj_init(ref.internal, ZBX_JSON_TYPE_UNKNOWN);
+	jsonobj_set_string(ref.internal, zbx_strdup(NULL, str));
+	ref.value = ref.internal;
 
 	zbx_vector_jsonobj_ref_append(refs, ref);
 }
@@ -153,7 +155,7 @@ static void	zbx_vector_jsonobj_ref_add_string(zbx_vector_jsonobj_ref_t *refs, co
  ******************************************************************************/
 static void	zbx_vector_jsonobj_ref_add(zbx_vector_jsonobj_ref_t *refs, zbx_jsonobj_ref_t *ref)
 {
-	if (ref->value == &ref->object)
+	if (ref->value != ref->internal)
 		zbx_vector_jsonobj_ref_add_object(refs, ref->name, ref->value);
 	else
 		zbx_vector_jsonobj_ref_add_string(refs, ref->name, ref->value->data.string);
@@ -176,7 +178,7 @@ static void	zbx_vector_jsonobj_ref_copy(zbx_vector_jsonobj_ref_t *dst, const zbx
 
 	for (i = 0; i < src->values_num; i++)
 	{
-		if (src->values[i].value == &src->values[i].object)
+		if (src->values[i].value != src->values[i].internal)
 			zbx_vector_jsonobj_ref_add_object(dst, src->values[i].name, src->values[i].value);
 		else
 			zbx_vector_jsonobj_ref_add_string(dst, src->values[i].name, src->values[i].value->data.string);
@@ -2972,8 +2974,11 @@ static void	jsonobj_index_el_clear(void *v)
 	{
 		zbx_free(el->objects.values[i].name);
 
-		if (el->objects.values[i].value == &el->objects.values[i].object)
-			zbx_jsonobj_clear(&el->objects.values[i].object);
+		if (NULL == el->objects.values[i].internal)
+		{
+			zbx_jsonobj_clear(el->objects.values[i].internal);
+			zbx_free(el->objects.values[i].internal);
+		}
 	}
 
 	zbx_vector_jsonobj_ref_destroy(&el->objects);
