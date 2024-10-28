@@ -172,6 +172,7 @@ class CAlert extends CApiService {
 				' WHERE ug.userid=a.userid'.
 					' AND '.dbConditionInt('ug.usrgrpid', getUserGroupsByUserId(self::$userData['userid'])).
 			'))';
+			$sqlParts['where'][] = 'a.userid='.self::$userData['userid'];
 		}
 
 		// groupids
