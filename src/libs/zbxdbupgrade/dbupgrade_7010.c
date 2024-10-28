@@ -183,18 +183,14 @@ static int	DBpatch_7010015(void)
 	return DBdrop_index("proxy_history", "proxy_history_1");
 }
 
-static int	DBpatch_7010017(void)
+static int	DBpatch_7010016(void)
 {
-	if (FAIL != zbx_db_index_exists("proxy_history", "proxy_history_2"))
-		return DBdrop_index("proxy_history", "proxy_history_2");
+	if (FAIL == zbx_db_index_exists("proxy_history", "proxy_history_2"))
+		return DBcreate_index("proxy_history", "proxy_history_2", "write_clock", 0);
 
 	return SUCCEED;
 }
 
-static int	DBpatch_7010017(void)
-{
-	return DBcreate_index("proxy_history", "proxy_history_1", "write_clock", 0);
-}
 #endif
 
 DBPATCH_START(7010)
@@ -218,6 +214,5 @@ DBPATCH_ADD(7010013, 0, 1)
 DBPATCH_ADD(7010014, 0, 1)
 DBPATCH_ADD(7010015, 0, 1)
 DBPATCH_ADD(7010016, 0, 1)
-DBPATCH_ADD(7010017, 0, 1)
 
 DBPATCH_END()
