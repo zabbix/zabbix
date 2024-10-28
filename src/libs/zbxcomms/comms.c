@@ -1939,15 +1939,12 @@ int	zbx_tcp_read_close_notify(zbx_socket_t *s, short *events)
 	char	buf[1024];
 
 	if (SUCCEED != zbx_tls_used(s))
-		return SUCCEED;
+		return 0;
 
 	if (NULL != events)
 		*events = 0;
 
-	if (0 != (zbx_tcp_read(s, buf, sizeof(buf), events)))
-		return FAIL;
-
-	return SUCCEED;
+	return zbx_tcp_read(s, buf, sizeof(buf), events);
 }
 
 /******************************************************************************

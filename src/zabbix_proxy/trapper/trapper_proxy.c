@@ -17,6 +17,7 @@
 #include "../taskmanager/taskmanager_proxy.h"
 #include "../proxyconfigwrite/proxyconfigwrite.h"
 
+#include "zbxcomms.h"
 #include "zbxcommshigh.h"
 #include "zbxtasks.h"
 #include "zbxmutexs.h"
@@ -83,6 +84,8 @@ static int	send_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_
 
 	if (SUCCEED != zbx_recv_response(sock, config_timeout, error))
 		return FAIL;
+
+	zbx_tcp_read_close_notify(sock, NULL);
 
 	return SUCCEED;
 }

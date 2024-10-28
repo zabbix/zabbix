@@ -115,6 +115,7 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 		}
 		else if (FAIL != (received_len = zbx_tcp_recv_ext(&s, 0, 0)))
 		{
+			zbx_tcp_read_close_notify(&s, NULL);
 			ret = SUCCEED;
 		}
 		else if (SUCCEED != zbx_socket_check_deadline(&s))
@@ -140,8 +141,6 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 		{
 			retry = 1;
 		}
-
-		zbx_tcp_read_close_notify(&s, NULL);
 	}
 	else
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));

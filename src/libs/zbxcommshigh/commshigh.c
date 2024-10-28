@@ -167,6 +167,8 @@ int	zbx_get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_si
 		goto exit;
 	}
 
+	zbx_tcp_read_close_notify(sock, NULL);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "Received [%s] from server", sock->buffer);
 
 	ret = SUCCEED;
@@ -200,6 +202,8 @@ int	zbx_put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size
 
 	if (SUCCEED != zbx_recv_response(sock, 0, error))
 		goto out;
+
+	zbx_tcp_read_close_notify(sock, NULL);
 
 	ret = SUCCEED;
 out:
@@ -592,13 +596,13 @@ retry:
 
 		goto cleanup;
 	}
+	else
+		zbx_tcp_read_close_notify(&sock, NULL);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() received: %s", __func__, sock.buffer);
 
 	if (SUCCEED == comms_check_redirect(sock.buffer, addrs, &retry))
 	{
-		zbx_tcp_read_close_notify(&sock, NULL);
-
 		if (0 == retries && ZBX_REDIRECT_RETRY == retry)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() redirect response found, retrying to: [%s]:%hu", __func__,
@@ -622,8 +626,6 @@ retry:
 
 	if (NULL != out)
 		*out = zbx_socket_detach_buffer(&sock);
-
-	zbx_tcp_read_close_notify(&sock, NULL);
 success:
 	ret = SUCCEED;
 cleanup:
