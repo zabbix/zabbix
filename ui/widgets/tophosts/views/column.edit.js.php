@@ -36,19 +36,14 @@ window.tophosts_column_edit_form = new class {
 	#form;
 
 	/**
-	 * @type {string}
+	 * @type {HTMLTableElement}
 	 */
 	#thresholds_table;
 
 	/**
-	 * @type {string}
+	 * @type {HTMLTableElement}
 	 */
 	#highlights_table;
-
-	/**
-	 * @type {number|null}
-	 */
-	#item_value_type;
 
 	init({form_id, thresholds, highlights, colors, groupids, hostids}) {
 		this.#overlay = overlays_stack.getById('tophosts-column-edit-overlay');
@@ -71,10 +66,10 @@ window.tophosts_column_edit_form = new class {
 				this.#overlay.setLoading();
 
 				this.#promiseGetItemType(ms_item_data[0].name, groupids, hostids)
-					.then((type) => {
+					.then(type => {
 						if (this.#form.isConnected) {
-							this.#item_value_type = type;
-							this.#updateForm(true);
+							this.#updateFieldDisplayValueAsByType(type);
+							this.#updateForm();
 						}
 					})
 					.finally(() => {
@@ -82,7 +77,6 @@ window.tophosts_column_edit_form = new class {
 					});
 			}
 			else {
-				this.#item_value_type = null;
 				this.#updateForm();
 			}
 		});
@@ -166,15 +160,14 @@ window.tophosts_column_edit_form = new class {
 		new CFormFieldsetCollapsible(document.getElementById('advanced-configuration'));
 
 		// Field trimming.
-		for (const name of ['name', 'min', 'max']) {
-			this.#form.querySelector(`[name=${name}`)
-				.addEventListener('change', (e) => e.target.value = e.target.value.trim(), {capture: true});
-		}
+		this.#form.querySelectorAll('[name="name"], [name="min"], [name="max"]').forEach(element => {
+			element.addEventListener('change', (e) => e.target.value = e.target.value.trim(), {capture: true});
+		});
 
 		// Initialize form elements accessibility.
 		this.#updateForm();
 
-		this.#form.removeAttribute('style');
+		this.#form.style.display = '';
 		this.#overlay.recoverFocus();
 
 		this.#form.addEventListener('submit', () => this.submit());
@@ -213,111 +206,168 @@ window.tophosts_column_edit_form = new class {
 			});
 	}
 
+	#updateFieldDisplayValueAsByType(type) {
+		let display_value_as;
+
+		switch (type) {
+			case <?= ITEM_VALUE_TYPE_FLOAT ?>:
+			case <?= ITEM_VALUE_TYPE_UINT64 ?>:
+				display_value_as = <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>;
+				break;
+			case <?= ITEM_VALUE_TYPE_STR ?>:
+			case <?= ITEM_VALUE_TYPE_LOG ?>:
+			case <?= ITEM_VALUE_TYPE_TEXT ?>:
+				display_value_as = <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_TEXT ?>;
+				break;
+			case <?= ITEM_VALUE_TYPE_BINARY ?>:
+				display_value_as = <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY ?>;
+				break;
+		}
+
+		for (const input of document.querySelectorAll('[name="display_value_as"]')) {
+			input.checked = input.value == display_value_as;
+		}
+	}
+
 	/**
 	 * Updates widget column configuration form field visibility, enable/disable state and available options.
-	 *
-	 * @param {boolean} item_change  Whether form update was triggered by changing the selected item.
 	 */
-	#updateForm(item_change = false) {
-		const data_type = document.querySelector('[name=data]').value;
-		const data_item_value = data_type == <?= CWidgetFieldColumnsList::DATA_ITEM_VALUE ?>;
-		const data_text = data_type == <?= CWidgetFieldColumnsList::DATA_TEXT ?>;
-		const is_item_type_numeric = [<?= ITEM_VALUE_TYPE_FLOAT ?>, <?= ITEM_VALUE_TYPE_UINT64 ?>]
-			.includes(this.#item_value_type);
-		const is_item_type_text = [<?= ITEM_VALUE_TYPE_STR ?>, <?= ITEM_VALUE_TYPE_LOG ?>, <?= ITEM_VALUE_TYPE_TEXT ?>]
-			.includes(this.#item_value_type);
-		const is_item_type_binary = this.#item_value_type == <?= ITEM_VALUE_TYPE_BINARY ?>;
-		const display_as_numeric = <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>;
-		const display_as_text = <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_TEXT ?>;
-		const display_as_binary = <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY ?>;
+	#updateForm() {
+		const data_type = document.querySelector('[name="data"]').value;
 
-		if (item_change) {
-			document.querySelectorAll('[name=display_value_as]').forEach(element => {
-				element.checked = (element.value == display_as_text && is_item_type_text)
-					|| (element.value == display_as_binary && is_item_type_binary)
-					|| (element.value == display_as_numeric && (is_item_type_numeric
-						|| (!is_item_type_text && !is_item_type_binary)));
-			});
+		const data_type_item_value = data_type == <?= CWidgetFieldColumnsList::DATA_ITEM_VALUE ?>;
+		const data_type_text = data_type == <?= CWidgetFieldColumnsList::DATA_TEXT ?>;
+
+		const display_item_value_as = document.querySelector('[name="display_value_as"]:checked').value;
+
+		const display_item_value_as_numeric = data_type_item_value
+			&& display_item_value_as == <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>;
+		const display_item_value_as_text = data_type_item_value
+			&& display_item_value_as == <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_TEXT ?>;
+		const display_item_as_binary = data_type_item_value
+			&& display_item_value_as == <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY ?>;
+
+		// Item name.
+		for (const element of this.#form.querySelectorAll('.js-item-row')) {
+			element.style.display = data_type_item_value ? '' : 'none';
 		}
 
-		const display_value_as = document.querySelector('[name=display_value_as]:checked').value;
-		const display_numeric_as_is = document.querySelector('[name=display]:checked')
-			.value == <?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>;
-		const show_min_max = data_item_value && display_value_as == display_as_numeric && !display_numeric_as_is;
-		const show_numeric_value_fields = data_item_value && display_value_as == display_as_numeric;
+		$('#item').multiSelect(data_type_item_value ? 'enable' : 'disable');
 
-		// Update aggregate function options based on item value display type.
-		const aggregation_function_select = document.querySelector('z-select[name=aggregate_function]');
+		// Text.
+		for (const element of this.#form.querySelectorAll('.js-text-row')) {
+			element.style.display = data_type_text ? '' : 'none';
 
-		[<?= AGGREGATE_MIN ?>, <?= AGGREGATE_MAX ?>, <?= AGGREGATE_AVG ?>, <?= AGGREGATE_SUM ?>].forEach(option => {
-			aggregation_function_select.getOptionByValue(option).disabled = display_value_as != display_as_numeric;
-			aggregation_function_select.getOptionByValue(option).hidden = display_value_as != display_as_numeric;
-
-			if (aggregation_function_select.value == option && display_value_as != display_as_numeric) {
-				aggregation_function_select.value = <?= AGGREGATE_NONE ?>;
-			}
-		});
-
-		// Toggle row visibility.
-		const rows = {
-			'js-text-row': data_text,
-			'js-item-row': data_item_value,
-			'js-display-as-row': data_item_value,
-			'js-display-row': show_numeric_value_fields,
-			'js-highlights-row': data_item_value && display_value_as == display_as_text,
-			'js-min-max-row': show_min_max,
-			'js-thresholds-row': show_numeric_value_fields,
-			'js-decimals-row': show_numeric_value_fields,
-			'js-history-row': show_numeric_value_fields,
-			'js-display-as-image-row': data_item_value && display_value_as == display_as_binary,
-			'js-advanced-configuration-fieldset': data_item_value
-		}
-
-		for (const class_name in rows) {
-			const row = this.#form.getElementsByClassName(class_name);
-
-			for (const element of row) {
-				element.style.display = rows[class_name] ? '' : 'none';
+			for (const input of element.querySelectorAll('input')) {
+				input.disabled = !data_type_text;
 			}
 		}
 
-		// Toggle disable/enable of input fields.
-		$('#item', this.#form).multiSelect(data_item_value ? 'enable' : 'disable');
-		$(this.#thresholds_table).toggleClass('disabled', display_value_as != display_as_numeric);
-		$(this.#highlights_table).toggleClass('disabled', display_value_as != display_as_text);
+		// Display item value as.
+		for (const element of this.#form.querySelectorAll('.js-display-value-as-row')) {
+			element.style.display = data_type_item_value ? '' : 'none';
 
-		const inputs = {
-			'text': data_text,
-			'display_value_as': data_item_value,
-			'display': display_value_as == display_as_numeric,
-			'min': show_min_max,
-			'max': show_min_max,
-			'decimal_places': display_value_as == display_as_numeric,
-			'show_thumbnail': display_value_as == display_as_binary,
-			'aggregate_function': data_item_value,
-			'history': display_value_as == display_as_numeric,
-			'thresholds': data_item_value && display_value_as == display_as_numeric,
-			'highlights': data_item_value && display_value_as == display_as_text
+			for (const input of element.querySelectorAll('input')) {
+				input.disabled = !data_type_item_value;
+			}
 		}
 
-		for (const input_name in inputs) {
-			if (input_name === 'thresholds' || input_name === 'highlights') {
-				for (const input of this.#form.querySelectorAll(`[name^=${input_name}]`)) {
-					input.disabled = !inputs[input_name];
+		// Display.
+		for (const element of this.#form.querySelectorAll('.js-display-row')) {
+			element.style.display = display_item_value_as_numeric ? '' : 'none';
+
+			for (const input of element.querySelectorAll('input')) {
+				input.disabled = !display_item_value_as_numeric;
+			}
+		}
+
+		// Min/Max.
+		const show_min_max = display_item_value_as_numeric
+			&& document.querySelector('[name="display"]:checked').value != <?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>;
+
+		for (const element of this.#form.querySelectorAll('.js-min-max-row')) {
+			element.style.display = show_min_max ? '' : 'none';
+
+			for (const input of element.querySelectorAll('input')) {
+				input.disabled = !show_min_max;
+			}
+		}
+
+		// Thresholds.
+		for (const element of this.#form.querySelectorAll('.js-thresholds-row')) {
+			element.style.display = display_item_value_as_numeric ? '' : 'none';
+
+			for (const input of element.querySelectorAll('input')) {
+				input.disabled = !display_item_value_as_numeric;
+			}
+		}
+
+		// Decimal places.
+		for (const element of this.#form.querySelectorAll('.js-decimals-row')) {
+			element.style.display = display_item_value_as_numeric ? '' : 'none';
+
+			for (const input of element.querySelectorAll('input')) {
+				input.disabled = !display_item_value_as_numeric;
+			}
+		}
+
+		// Highlights.
+		for (const element of this.#form.querySelectorAll('.js-highlights-row')) {
+			element.style.display = display_item_value_as_text ? '' : 'none';
+
+			for (const input of element.querySelectorAll('input')) {
+				input.disabled = !display_item_value_as_text;
+			}
+		}
+
+		// Show thumbnail.
+		for (const element of this.#form.querySelectorAll('.js-show-thumbnail-row')) {
+			element.style.display = display_item_as_binary ? '' : 'none';
+
+			for (const input of element.querySelectorAll('input')) {
+				input.disabled = !display_item_as_binary;
+			}
+		}
+
+		// Advanced configuration.
+		document.getElementById('advanced-configuration').style.display = data_type_item_value ? '' : 'none';
+
+
+		// Aggregation function.
+		const aggregation_function_select = document.getElementById('aggregate_function');
+
+		aggregation_function_select.disabled = !data_type_item_value;
+
+		if (data_type_item_value) {
+			const numeric_aggregation_function = [<?= AGGREGATE_MIN ?>, <?= AGGREGATE_MAX ?>, <?= AGGREGATE_AVG ?>,
+				<?= AGGREGATE_SUM ?>
+			];
+
+			for (const option of aggregation_function_select.getOptions()) {
+				if (numeric_aggregation_function.includes(parseInt(option.value))) {
+					option.hidden = display_item_value_as_text || display_item_as_binary;
+
+					if (option.value == aggregation_function_select.value) {
+						aggregation_function_select.value = <?= AGGREGATE_NONE ?>;
+					}
 				}
 			}
-			else {
-				for (const input of this.#form.querySelectorAll(`[name=${input_name}]`)) {
-					input.disabled = !inputs[input_name];
-				}
-			}
 		}
 
-		const aggregate_function = parseInt(document.getElementById('aggregate_function').value);
+		// Time period.
+		const use_aggregation = aggregation_function_select.value != <?= AGGREGATE_NONE ?>;
 
-		// Toggle time period selector visibility and enable/disable state.
-		this.#form.fields.time_period.disabled = !data_item_value || aggregate_function == <?= AGGREGATE_NONE ?>;
-		this.#form.fields.time_period.hidden = !data_item_value || aggregate_function == <?= AGGREGATE_NONE ?>;
+		this.#form.fields.time_period.disabled = !data_type_item_value || !use_aggregation;
+		this.#form.fields.time_period.hidden = !data_type_item_value || !use_aggregation;
+
+		// History data.
+		for (const element of this.#form.querySelectorAll('.js-history-row')) {
+			element.style.display = display_item_value_as_numeric ? '' : 'none';
+
+			for (const input of element.querySelectorAll('input')) {
+				input.disabled = !display_item_value_as_numeric;
+			}
+		}
 	}
 
 	submit() {

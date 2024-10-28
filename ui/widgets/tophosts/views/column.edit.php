@@ -66,19 +66,7 @@ $form_grid->addItem([
 	)
 ]);
 
-// Static text.
-$form_grid->addItem([
-	(new CLabel(_('Text'), 'text'))
-		->setAsteriskMark()
-		->addClass('js-text-row'),
-	(new CFormField(
-		(new CTextBox('text', $data['text']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', _('Text, supports {INVENTORY.*}, {HOST.*} macros'))
-	))->addClass('js-text-row')
-]);
-
-// Item.
+// Item name.
 $parameters = [
 	'srctbl' => 'items',
 	'srcfld1' => 'name',
@@ -125,6 +113,18 @@ $form_grid->addItem([
 	(new CFormField($item_select))->addClass('js-item-row')
 ]);
 
+// Text.
+$form_grid->addItem([
+	(new CLabel(_('Text'), 'text'))
+		->setAsteriskMark()
+		->addClass('js-text-row'),
+	(new CFormField(
+		(new CTextBox('text', $data['text']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('placeholder', _('Text, supports {INVENTORY.*}, {HOST.*} macros'))
+	))->addClass('js-text-row')
+]);
+
 // Base color.
 $form_grid->addItem([
 	new CLabel(_('Base color'), 'lbl_base_color'),
@@ -133,14 +133,14 @@ $form_grid->addItem([
 
 // Display item value as.
 $form_grid->addItem([
-	(new CLabel(_('Display item value as'), 'display_value_as'))->addClass('js-display-as-row'),
+	(new CLabel(_('Display item value as'), 'display_value_as'))->addClass('js-display-value-as-row'),
 	(new CFormField(
 		(new CRadioButtonList('display_value_as', (int) $data['display_value_as']))
 			->addValue(_('Numeric'), CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC)
 			->addValue(_('Text'), CWidgetFieldColumnsList::DISPLAY_VALUE_AS_TEXT)
 			->addValue(_('Binary'), CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY)
 			->setModern()
-	))->addClass('js-display-as-row')
+	))->addClass('js-display-value-as-row')
 ]);
 
 // Display.
@@ -155,7 +155,7 @@ $form_grid->addItem([
 	))->addClass('js-display-row')
 ]);
 
-// Min value.
+// Min.
 $form_grid->addItem([
 	(new CLabel(_('Min'), 'min'))->addClass('js-min-max-row'),
 	(new CFormField(
@@ -165,7 +165,7 @@ $form_grid->addItem([
 	))->addClass('js-min-max-row')
 ]);
 
-// Max value.
+// Max.
 $form_grid->addItem([
 	(new CLabel(_('Max'), 'max'))->addClass('js-min-max-row'),
 	(new CFormField(
@@ -175,14 +175,14 @@ $form_grid->addItem([
 	))->addClass('js-min-max-row')
 ]);
 
-// Thresholds table.
+// Thresholds.
 $threshold_header_row = [
 	'',
 	_('Threshold'),
 	(new CColHeader(''))->setWidth('100%')
 ];
 
-$thresholds = (new CDiv(
+$thresholds = (new CDiv([
 	(new CTable())
 		->setId('thresholds_table')
 		->addClass(ZBX_STYLE_TABLE_FORMS)
@@ -191,12 +191,7 @@ $thresholds = (new CDiv(
 			(new CCol(
 				(new CButtonLink(_('Add')))->addClass('element-table-add')
 			))->setColSpan(count($threshold_header_row))
-		))
-))
-	->addClass('table-forms-separator')
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
-
-$thresholds->addItem(
+		)),
 	(new CTemplateTag('thresholds-row-tmpl'))
 		->addItem((new CRow([
 			(new CColor('thresholds[#{rowNum}][color]', '#{color}'))->appendColorPickerJs(false),
@@ -207,7 +202,9 @@ $thresholds->addItem(
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
 		]))->addClass('form_row'))
-);
+]))
+	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
 $form_grid->addItem([
 	(new CLabel(_('Thresholds'), 'thresholds_table'))->addClass('js-thresholds-row'),
@@ -222,14 +219,14 @@ $form_grid->addItem([
 	))->addClass('js-decimals-row')
 ]);
 
-// Highlights table.
+// Highlights.
 $highlight_header_row = [
 	'',
 	(new CColHeader(_('Regular expression')))->setWidth('100%'),
 	_('Action')
 ];
 
-$highlights = (new CDiv(
+$highlights = (new CDiv([
 	(new CTable())
 		->setId('highlights_table')
 		->addClass(ZBX_STYLE_TABLE_FORMS)
@@ -238,12 +235,7 @@ $highlights = (new CDiv(
 			(new CCol(
 				(new CButtonLink(_('Add')))->addClass('element-table-add')
 			))->setColSpan(count($highlight_header_row))
-		))
-))
-	->addClass('table-forms-separator')
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
-
-$highlights->addItem(
+		)),
 	(new CTemplateTag('highlights-row-tmpl'))
 		->addItem((new CRow([
 			(new CColor('highlights[#{rowNum}][color]', '#{color}'))->appendColorPickerJs(false),
@@ -254,19 +246,21 @@ $highlights->addItem(
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
 		]))->addClass('form_row'))
-);
+]))
+	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
 $form_grid->addItem([
 	(new CLabel(_('Highlights'), 'highlights_table'))->addClass('js-highlights-row'),
 	(new CFormField($highlights))->addClass('js-highlights-row')
 ]);
 
-// Display as image.
+// Show thumbnail.
 $form_grid->addItem([
-	(new CLabel(_('Show thumbnail'), 'show_thumbnail'))->addClass('js-display-as-image-row'),
+	(new CLabel(_('Show thumbnail'), 'show_thumbnail'))->addClass('js-show-thumbnail-row'),
 	(new CFormField(
 		(new CCheckBox('show_thumbnail'))->setChecked($data['show_thumbnail'])
-	))->addClass('js-display-as-image-row')
+	))->addClass('js-show-thumbnail-row')
 ]);
 
 $time_period_field_view = (new CWidgetFieldTimePeriodView($data['time_period_field']))
@@ -278,9 +272,6 @@ $time_period_field_view = (new CWidgetFieldTimePeriodView($data['time_period_fie
 // Advanced configuration.
 $advanced_configuration_fieldset = (new CFormFieldsetCollapsible(_('Advanced configuration')))
 	->setId('advanced-configuration')
-	->addClass('js-advanced-configuration-fieldset');
-
-$advanced_configuration_fieldset
 	->addItem([
 		new CLabel(_('Aggregation function'), 'column_aggregate_function'),
 		new CFormField(
