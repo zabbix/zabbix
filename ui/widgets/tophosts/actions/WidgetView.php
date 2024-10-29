@@ -281,8 +281,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$column_item_values = self::getItemValues($column_items, $column);
 			}
 
-			if ($calc_extremes && (array_key_exists('min', $column) || array_key_exists('max', $column))) {
-				if ($column['min'] !== '') {
+			if ($calc_extremes) {
+				if (array_key_exists('min', $column) && $column['min'] !== '') {
 					$number_parser_binary->parse($column['min']);
 					$column['min_binary'] = $number_parser_binary->calcValue();
 
@@ -290,7 +290,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$column['min'] = $number_parser->calcValue();
 				}
 
-				if ($column['max'] !== '') {
+				if (array_key_exists('max', $column) && $column['max'] !== '') {
 					$number_parser_binary->parse($column['max']);
 					$column['max_binary'] = $number_parser_binary->calcValue();
 
