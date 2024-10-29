@@ -366,7 +366,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 
 				switch ($expected['type']) {
 					case 'Item history':
-						$message = 'No data.';
+						$message = 'No data found';
 						break;
 					case 'URL':
 						$message = 'No host selected.';
