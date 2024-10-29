@@ -345,10 +345,12 @@ window.tophosts_column_edit_form = new class {
 
 			for (const option of aggregation_function_select.getOptions()) {
 				if (numeric_aggregation_function.includes(parseInt(option.value))) {
-					option.hidden = display_item_value_as_text || display_item_as_binary;
-
-					if (option.value == aggregation_function_select.value) {
+					if (display_item_value_as_text || display_item_as_binary) {
+						option.hidden = true;
 						aggregation_function_select.value = <?= AGGREGATE_NONE ?>;
+					}
+					else {
+						option.hidden = false;
 					}
 				}
 			}
