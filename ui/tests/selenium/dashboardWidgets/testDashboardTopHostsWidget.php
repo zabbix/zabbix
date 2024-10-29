@@ -274,7 +274,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$this->checkFieldsAttributes($fields, $form);
 
 		// Check Columns table.
-		$this->assertEquals(['', 'Name', 'Data', 'Action'], $form->getFieldContainer('Columns')->asTable()->getHeadersText());
+		$this->assertEquals(['', 'Name', 'Data', 'Actions'], $form->getFieldContainer('Columns')->asTable()->getHeadersText());
 
 		// Check clickable buttons.
 		$dialog_buttons = [
@@ -2343,9 +2343,9 @@ class testDashboardTopHostsWidget extends testWidgets {
 				$table->getRow($row_number - 1)->getColumnData('Data', $table_name);
 
 				$form->query('xpath:(.//button[@name="edit"])['.$row_number.']')->one()->click();
-				$column_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->all()->last();
-				$form_header = $this->query('xpath://div[@class="overlay-dialogue modal modal-popup"]//h4')->one()->getText();
-				$this->assertEquals('Update column', $form_header);
+
+				$column_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+				$this->assertEquals('Update column', $column_dialog->getTitle());
 
 				// Check Thresholds values.
 				if (array_key_exists('Thresholds', $values)) {
@@ -2358,7 +2358,9 @@ class testDashboardTopHostsWidget extends testWidgets {
 					unset($values['Thresholds']);
 				}
 
-				$column_form->checkValue($values);
+				// Advanced configuration in saved form is always false.
+				$values['Advanced configuration'] = false;
+				$column_dialog->asForm()->checkValue($values);
 				$this->query('xpath:(//button[text()="Cancel"])[2]')->one()->click();
 
 				// Check next row in a column table.
@@ -2384,25 +2386,26 @@ class testDashboardTopHostsWidget extends testWidgets {
 		}
 
 		$form = $this->query('id:widget-dialogue-form')->one()->asForm();
-		foreach ($data['column_fields'] as $values) {
+		foreach ($data['column_fields'] as $column) {
 			// Open the Column configuration add or column update dialog depending on the action type.
 			$selector = ($action === 'create') ? 'id:add' : 'xpath:(.//button[@name="edit"])['.$column_count.']';
 			$form->query($selector)->waitUntilClickable()->one()->click();
 			$column_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->all()->last();
-			$column_form->fill($values);
 
 			// Fill Thresholds values.
-			if (array_key_exists('Thresholds', $data)) {
-				$this->getTreshholdTable()->fill($data['Thresholds']);
-				unset($data['Thresholds']);
+			if (array_key_exists('Thresholds', $column)) {
+				$this->getTreshholdTable()->fill($column['Thresholds']);
+				unset($column['Thresholds']);
 			}
 
 			// Fill Highlights values.
-			if (array_key_exists('Highlights', $data)) {
-				$this->getHighlightsTable()->fill($data['Highlights']);
-				unset($data['Highlights']);
+			if (array_key_exists('Highlights', $column)) {
+				$column_form->fill(['Display item value as' => 'Text']);
+				$this->getHighlightsTable()->fill($column['Highlights']);
+				unset($column['Highlights']);
 			}
 
+			$column_form->fill($column);
 			$column_form->submit();
 
 			// Updating top host several columns, change it count number.
@@ -3293,12 +3296,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Threshold and numeric item but without data',
-							'Item name' => 'Item with type of information - numeric (unsigned)'
+							'Item name' => 'Item with type of information - numeric (unsigned)',
+							'Thresholds' => [
+								['color' => 'AABBCC', 'threshold' => '1'],
+								['color' => 'CCBBAA', 'threshold' => '2']
+							]
 						]
-					],
-					'Thresholds' => [
-						['color' => 'AABBCC', 'threshold' => '1'],
-						['color' => 'CCBBAA', 'threshold' => '2']
 					],
 					'expected_color' => '000000',
 					'opacity' => 'transparent'
@@ -3310,12 +3313,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Two thresholds and numeric item without data',
-							'Item name' => 'Item with type of information - numeric (float)'
+							'Item name' => 'Item with type of information - numeric (float)',
+							'Thresholds' => [
+								['color' => 'AABBCC', 'threshold' => '0'],
+								['color' => 'CCDDAA', 'threshold' => '1.01']
+							]
 						]
-					],
-					'Thresholds' => [
-						['color' => 'AABBCC', 'threshold' => '0'],
-						['color' => 'CCDDAA', 'threshold' => '1.01']
 					],
 					'expected_color' => '000000',
 					'opacity' => 'transparent'
@@ -3330,11 +3333,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Item name' => 'Item with type of information - Log',
 							'Display item value as' => 'Numeric',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'min'
+							'Aggregation function' => 'min',
+							'Thresholds' => [
+								['color' => '7E57C2', 'threshold' => '0']
+							]
 						]
-					],
-					'Thresholds' => [
-						['color' => '7E57C2', 'threshold' => '0']
 					],
 					'expected_color' => '000000',
 					'opacity' => 'transparent'
@@ -3349,11 +3352,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Item name' => 'Item with type of information - Character',
 							'Display item value as' => 'Numeric',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'max'
+							'Aggregation function' => 'max',
+							'Thresholds' => [
+								['color' => '7E57C2', 'threshold' => '1']
+							]
 						]
-					],
-					'Thresholds' => [
-						['color' => '7E57C2', 'threshold' => '1']
 					],
 					'expected_color' => '000000',
 					'opacity' => 'transparent'
@@ -3368,11 +3371,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Item name' => 'Item with type of information - Text',
 							'Display item value as' => 'Numeric',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'avg'
+							'Aggregation function' => 'avg',
+							'Thresholds' => [
+								['color' => '7E57C2', 'threshold' => '-1']
+							]
 						]
-					],
-					'Thresholds' => [
-						['color' => '7E57C2', 'threshold' => '-1']
 					],
 					'expected_color' => '000000',
 					'opacity' => 'transparent'
@@ -3387,11 +3390,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Item name' => 'Item with type of information - Log',
 							'Display item value as' => 'Numeric',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'sum'
+							'Aggregation function' => 'sum',
+							'Thresholds' => [
+								['color' => '7E57C2', 'threshold' => '0']
+							]
 						]
-					],
-					'Thresholds' => [
-						['color' => '7E57C2', 'threshold' => '0']
 					],
 					'expected_color' => '000000',
 					'opacity' => 'transparent'
@@ -3405,11 +3408,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Non-numeric (Character) item without data and with aggregation function first',
 							'Item name' => 'Item with type of information - Character',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'first'
+							'Aggregation function' => 'first',
+							'Highlights' => [
+								['color' => '7E57C2', 'regexp' => '-1']
+							]
 						]
-					],
-					'Highlights' => [
-						['color' => '7E57C2', 'regexp' => '-1']
 					],
 					'expected_color' => '000000',
 					'opacity' => 'transparent'
@@ -3423,11 +3426,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Non-numeric (Text) item without data and with aggregation function last',
 							'Item name' => 'Item with type of information - Text',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'last'
+							'Aggregation function' => 'last',
+							'Highlights' => [
+								['color' => '7E57C2', 'regexp' => '0.00']
+							]
 						]
-					],
-					'Highlights' => [
-						['color' => '7E57C2', 'regexp' => '0.00']
 					],
 					'expected_color' => '000000',
 					'opacity' => 'transparent'
@@ -3439,11 +3442,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Non-numeric (log) item without data and with aggregation function not used',
-							'Item name' => 'Item with type of information - Log'
+							'Item name' => 'Item with type of information - Log',
+							'Highlights' => [
+								['color' => '7E57C2', 'regexp' => '0']
+							]
 						]
-					],
-					'Highlights' => [
-						['color' => '7E57C2', 'regexp' => '0']
 					],
 					'expected_color' => '000000',
 					'opacity' => 'transparent'
@@ -3457,11 +3460,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Non-numeric (Log) item without data but with aggregation function count',
 							'Item name' => 'Item with type of information - Character',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'count'
+							'Aggregation function' => 'count',
+							'Highlights' => [
+								['color' => '7E57C2', 'regexp' => '1']
+							]
 						]
-					],
-					'Highlights' => [
-						['color' => '7E57C2', 'regexp' => '1']
 					],
 					'expected_color' => '000000',
 					'opacity' => 'transparent'
@@ -3475,11 +3478,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Non-numeric (Character) item without data but with aggregation function count',
 							'Item name' => 'Item with type of information - Character',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'count'
+							'Aggregation function' => 'count',
+							'Highlights' => [
+								['color' => '7E57C2', 'regexp' => '1']
+							]
 						]
-					],
-					'Highlights' => [
-						['color' => '7E57C2', 'regexp' => '1']
 					],
 					'expected_color' => '000000',
 					'opacity' => 'transparent'
@@ -3493,11 +3496,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Non-numeric (Text) item without data but with aggregation function count',
 							'Item name' => 'Item with type of information - Text',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'count'
+							'Aggregation function' => 'count',
+							'Highlights' => [
+								['color' => '7E57C2', 'regexp' => '1']
+							]
 						]
-					],
-					'Highlights' => [
-						['color' => '7E57C2', 'regexp' => '1']
 					],
 					'expected_color' => '000000',
 					'opacity' => 'transparent'
@@ -3511,11 +3514,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Non-numeric (log) item without data but with aggregation function count and threshold that match 0',
 							'Item name' => 'Item with type of information - Log',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'count'
+							'Aggregation function' => 'count',
+							'Highlights' => [
+								['color' => '7E57C2', 'regexp' => '0']
+							]
 						]
-					],
-					'Highlights' => [
-						['color' => '7E57C2', 'regexp' => '0']
 					]
 				]
 			],
@@ -3527,11 +3530,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Non-numeric (Character) item without data but with aggregation function count and threshold that match 0',
 							'Item name' => 'Item with type of information - Character',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'count'
+							'Aggregation function' => 'count',
+							'Highlights' => [
+								['color' => '7E57C2', 'regexp' => '0']
+							]
 						]
-					],
-					'Highlights' => [
-						['color' => '7E57C2', 'regexp' => '0']
 					]
 				]
 			],
@@ -3543,11 +3546,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Non-numeric (Text) item without data but with aggregation function count and threshold that match 0',
 							'Item name' => 'Item with type of information - Text',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'count'
+							'Aggregation function' => 'count',
+							'Highlights' => [
+								['color' => '7E57C2', 'regexp' => '0']
+							]
 						]
-					],
-					'Highlights' => [
-						['color' => '7E57C2', 'regexp' => '0']
 					]
 				]
 			],
@@ -3558,12 +3561,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Thresholds and numeric (unsigned) item',
-							'Item name' => 'Item with type of information - numeric (unsigned)'
+							'Item name' => 'Item with type of information - numeric (unsigned)',
+							'Thresholds' => [
+								['color' => 'AABBCC', 'threshold' => '1'],
+								['color' => 'CCDDAA', 'threshold' => '2']
+							]
 						]
-					],
-					'Thresholds' => [
-						['color' => 'AABBCC', 'threshold' => '1'],
-						['color' => 'CCDDAA', 'threshold' => '2']
 					],
 					'value' => '1'
 				]
@@ -3575,12 +3578,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Thresholds and numeric (float) item',
-							'Item name' => 'Item with type of information - numeric (float)'
+							'Item name' => 'Item with type of information - numeric (float)',
+							'Thresholds' => [
+								['color' => 'AABBCC', 'threshold' => '1.01'],
+								['color' => 'CCDDAA', 'threshold' => '2.01']
+							]
 						]
-					],
-					'Thresholds' => [
-						['color' => 'AABBCC', 'threshold' => '1.01'],
-						['color' => 'CCDDAA', 'threshold' => '2.01']
 					],
 					'value' => '1.02'
 				]
@@ -3594,12 +3597,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Numeric (unsigned) item with thresholds and aggregation function count',
 							'Item name' => 'Item with type of information - numeric (unsigned)',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'count'
+							'Aggregation function' => 'count',
+							'Thresholds' => [
+								['color' => 'AABBCC', 'threshold' => '1'],
+								['color' => 'CCDDAA', 'threshold' => '2']
+							]
 						]
-					],
-					'Thresholds' => [
-						['color' => 'AABBCC', 'threshold' => '1'],
-						['color' => 'CCDDAA', 'threshold' => '2']
 					],
 					'value' => '1'
 				]
@@ -3613,12 +3616,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Numeric (float) item with thresholds and aggregation function count',
 							'Item name' => 'Item with type of information - numeric (float)',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'count'
+							'Aggregation function' => 'count',
+							'Thresholds' => [
+								['color' => 'AABBCC', 'threshold' => '0.99'],
+								['color' => 'CCDDAA', 'threshold' => '1.99']
+							]
 						]
-					],
-					'Thresholds' => [
-						['color' => 'AABBCC', 'threshold' => '0.99'],
-						['color' => 'CCDDAA', 'threshold' => '1.99']
 					],
 					'value' => '1.02'
 				]
@@ -3631,12 +3634,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Thresholds and non-nmeric (Text) item',
 							'Item name' => 'Item with type of information - Text',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'count'
+							'Aggregation function' => 'count',
+							'Highlights' => [
+								['color' => 'DDAAFF', 'regexp' => '1'],
+								['color' => 'FFDDAA', 'regexp' => '2']
+							]
 						]
-					],
-					'Highlights' => [
-						['color' => 'DDAAFF', 'regexp' => '1'],
-						['color' => 'FFDDAA', 'regexp' => '2']
 					],
 					'value' => 'test'
 				]
@@ -3649,12 +3652,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Thresholds and non-nmeric (Log) item',
 							'Item name' => 'Item with type of information - Log',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'count'
+							'Aggregation function' => 'count',
+							'Highlights' => [
+								['color' => 'DDAAFF', 'regexp' => '1'],
+								['color' => 'FFDDAA', 'regexp' => '2']
+							]
 						]
-					],
-					'Highlights' => [
-						['color' => 'DDAAFF', 'regexp' => '1'],
-						['color' => 'FFDDAA', 'regexp' => '2']
 					],
 					'value' => 'test'
 				]
@@ -3668,11 +3671,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Item name' => 'Item with type of information - Character',
 							'Advanced configuration' => true,
 							'Aggregation function' => 'count',
+							'Highlights' => [
+								['color' => 'DDAAFF', 'regexp' => '1'],
+								['color' => 'FFDDAA', 'regexp' => '2']
+							]
 						]
-					],
-					'Highlights' => [
-						['color' => 'DDAAFF', 'regexp' => '1'],
-						['color' => 'FFDDAA', 'regexp' => '2']
 					],
 					'value' => 'test'
 				]
@@ -3686,12 +3689,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Numeric (unsigned) item with threshold and aggregation function min',
 							'Item name' => 'Item with type of information - numeric (unsigned)',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'min'
+							'Aggregation function' => 'min',
+							'Thresholds' => [
+								['color' => 'AABBCC', 'threshold' => '1'],
+								['color' => 'CCDDAA', 'threshold' => '2']
+							]
 						]
-					],
-					'Thresholds' => [
-						['color' => 'AABBCC', 'threshold' => '1'],
-						['color' => 'CCDDAA', 'threshold' => '2']
 					],
 					'expected_color' => 'AABBCC',
 					'value' => '1'
@@ -3706,12 +3709,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Numeric (float) item with threshold and aggregation function max',
 							'Item name' => 'Item with type of information - numeric (float)',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'max'
+							'Aggregation function' => 'max',
+							'Thresholds' => [
+								['color' => '7CB342', 'threshold' => '0.00'],
+								['color' => 'FFF9C4', 'threshold' => '1.01']
+							]
 						]
-					],
-					'Thresholds' => [
-						['color' => '7CB342', 'threshold' => '0.00'],
-						['color' => 'FFF9C4', 'threshold' => '1.01']
 					],
 					'expected_color' => 'FFF9C4',
 					'value' => '1.01'
@@ -3726,12 +3729,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Numeric (unsigned) item with threshold and aggregation function avg',
 							'Item name' => 'Item with type of information - numeric (unsigned)',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'avg'
+							'Aggregation function' => 'avg',
+							'Thresholds' => [
+								['color' => '7CB342', 'threshold' => '1'],
+								['color' => 'FFF9C4', 'threshold' => '2']
+							]
 						]
-					],
-					'Thresholds' => [
-						['color' => '7CB342', 'threshold' => '1'],
-						['color' => 'FFF9C4', 'threshold' => '2']
 					],
 					'expected_color' => '7CB342',
 					'value' => '1'
@@ -3747,11 +3750,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Item name' => 'Item with type of information - numeric (float)',
 							'Advanced configuration' => true,
 							'Aggregation function' => 'sum',
+							'Thresholds' => [
+								['color' => 'D32F2F', 'threshold' => '1.11'],
+								['color' => '8BC34A', 'threshold' => '2.22']
+							]
 						]
-					],
-					'Thresholds' => [
-						['color' => 'D32F2F', 'threshold' => '1.11'],
-						['color' => '8BC34A', 'threshold' => '2.22']
 					],
 					'expected_color' => '8BC34A',
 					'value' => '2.22'
@@ -3766,12 +3769,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Numeric (unsigned) item with threshold and aggregation function first',
 							'Item name' => 'Item with type of information - numeric (unsigned)',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'first'
+							'Aggregation function' => 'first',
+							'Thresholds' => [
+								['color' => 'D32F2F', 'threshold' => '0'],
+								['color' => '8BC34A', 'threshold' => '1']
+							]
 						]
-					],
-					'Thresholds' => [
-						['color' => 'D32F2F', 'threshold' => '0'],
-						['color' => '8BC34A', 'threshold' => '1']
 					],
 					'expected_color' => 'D32F2F',
 					'value' => '0'
@@ -3786,12 +3789,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Numeric (float) item with threshold and aggregation function last',
 							'Item name' => 'Item with type of information - numeric (float)',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'last'
+							'Aggregation function' => 'last',
+							'Thresholds' => [
+								['color' => 'D32F2F', 'threshold' => '-1.00'],
+								['color' => '8BC34A', 'threshold' => '0.00']
+							]
 						]
-					],
-					'Thresholds' => [
-						['color' => 'D32F2F', 'threshold' => '-1.00'],
-						['color' => '8BC34A', 'threshold' => '0.00']
 					],
 					'expected_color' => '8BC34A',
 					'value' => '0'
@@ -3806,10 +3809,10 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Item name' => 'Item with type of information - Log',
 							'Advanced configuration' => true,
 							'Aggregation function' => 'last', //'min' is not available for text elements, changed to 'last'
+							'Highlights' => [
+								['color' => 'DDAAFF', 'regexp' => '0']
+							]
 						]
-					],
-					'Highlights' => [
-						['color' => 'DDAAFF', 'regexp' => '0']
 					],
 					'value' => 'test',
 					'expected_color' => '000000',
@@ -3825,11 +3828,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Item name' => 'Item with type of information - Character',
 							'Advanced configuration' => true,
 							'Aggregation function' => 'first',//'max' is not available for text elements, changed to 'first'
+							'Highlights' => [
+								['color' => 'D32F2F', 'regexp' => '-1'],
+								['color' => '8BC34A', 'regexp' => '0']
+							]
 						]
-					],
-					'Highlights' => [
-						['color' => 'D32F2F', 'regexp' => '-1'],
-						['color' => '8BC34A', 'regexp' => '0']
 					],
 					'value' => 'test',
 					'expected_color' => '000000',
@@ -3845,11 +3848,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Item name' => 'Item with type of information - Text',
 							'Advanced configuration' => true,
 							'Aggregation function' => 'last',//'avg' is not available for text elements, changed to 'last'
+							'Highlights' => [
+								['color' => 'D1C4E9', 'regexp' => '1'],
+								['color' => '80CBC4', 'regexp' => '2']
+							]
 						]
-					],
-					'Highlights' => [
-						['color' => 'D1C4E9', 'regexp' => '1'],
-						['color' => '80CBC4', 'regexp' => '2']
 					],
 					'value' => 'test',
 					'expected_color' => '000000',
@@ -3865,11 +3868,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Item name' => 'Item with type of information - Log',
 							'Advanced configuration' => true,
 							'Aggregation function' => 'first', //'sum' is not available for text elements, changed to 'first'
+							'Highlights' => [
+								['color' => 'D1C4E9', 'regexp' => '1'],
+								['color' => '80CBC4', 'regexp' => '2']
+							]
 						]
-					],
-					'Highlights' => [
-						['color' => 'D1C4E9', 'regexp' => '1'],
-						['color' => '80CBC4', 'regexp' => '2']
 					],
 					'value' => 'test',
 					'expected_color' => '000000',
@@ -3884,11 +3887,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Thresholds and non-nmeric (Character) item with aggregation function first',
 							'Item name' => 'Item with type of information - Character',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'first'
+							'Aggregation function' => 'first',
+							'Highlights' => [
+								['color' => 'D1C4E9', 'regexp' => '0']
+							]
 						]
-					],
-					'Highlights' => [
-						['color' => 'D1C4E9', 'regexp' => '0']
 					],
 					'value' => 'test',
 					'expected_color' => '000000',
@@ -3903,11 +3906,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Thresholds and non-nmeric (Text) item with aggregation function last',
 							'Item name' => 'Item with type of information - Text',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'last'
+							'Aggregation function' => 'last',
+							'Highlights' => [
+								['color' => 'D1C4E9', 'regexp' => '0']
+							]
 						]
-					],
-					'Highlights' => [
-						['color' => 'D1C4E9', 'regexp' => '0']
 					],
 					'value' => 'test',
 					'expected_color' => '000000',
@@ -3920,11 +3923,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'column_fields' => [
 						[
 							'Name' => 'Thresholds and non-nmeric (Log) item with aggregation function not used',
-							'Item name' => 'Item with type of information - Log'
+							'Item name' => 'Item with type of information - Log',
+							'Highlights' => [
+								['color' => 'D1C4E9', 'regexp' => '0']
+							]
 						]
-					],
-					'Highlights' => [
-						['color' => 'D1C4E9', 'regexp' => '0']
 					],
 					'value' => 'test',
 					'expected_color' => '000000',
@@ -3943,13 +3946,14 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$time = strtotime('now');
 		$this->createTopHostsWidget($data, self::$other_dashboardids[self::DASHBOARD_THRESHOLD]);
 		$dashboard = CDashboardElement::find()->one();
-		$colors = CTestArrayHelper::get($data, 'Thresholds') ? $data['Thresholds'] : $data['Highlights'];
 
-		foreach ($data['column_fields'] as $fields) {
+		foreach ($data['column_fields'] as $column) {
+			$colors = CTestArrayHelper::get($column, 'Thresholds') ? $column['Thresholds'] : $column['Highlights'];
+
 			foreach ($colors as $color_bar) {
 				// Insert item data.
 				if (array_key_exists('value', $data)) {
-					CDataHelper::addItemData(self::$aggregation_itemids[$fields['Item name']], $data['value'], $time);
+					CDataHelper::addItemData(self::$aggregation_itemids[$column['Item name']], $data['value'], $time);
 
 					if (array_key_exists('numeric', $data)) {
 						$data['value']++;
