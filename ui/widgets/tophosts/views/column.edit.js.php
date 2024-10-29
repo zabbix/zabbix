@@ -332,7 +332,6 @@ window.tophosts_column_edit_form = new class {
 		// Advanced configuration.
 		document.getElementById('advanced-configuration').style.display = data_type_item_value ? '' : 'none';
 
-
 		// Aggregation function.
 		const aggregation_function_select = document.getElementById('aggregate_function');
 
