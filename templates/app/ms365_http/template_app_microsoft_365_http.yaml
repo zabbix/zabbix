@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-09-03T10:03:34Z'
+  date: '2024-10-14T07:33:28Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -17,6 +17,7 @@ zabbix_export:
           1. Register the app with Microsoft Entra ID.
           2. Configure Microsoft Graph application permissions on the app ID:
             `Reports.Read.All` - required for app usage and activity metrics
+            `ServiceHealth.Read.All` - required for service discovery and service status metrics
           3. Request administrator consent.
           4. Configure the macros: `{$MS365.APP.ID}`, `{$MS365.PASSWORD}`, `{$MS365.TENANT.ID}`.
         
