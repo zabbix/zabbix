@@ -2373,7 +2373,9 @@ button {
       .list-table .checkbox-radio + label span {
         margin: 0; }
   .list-table .wordbreak {
-    white-space: normal; }
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis; }
   .list-table.compact-view td {
     padding-top: 2px;
     padding-bottom: 2px;
