@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-10-10 19:11+0000\n"
+"PO-Revision-Date: 2024-10-11 19:56+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -2075,11 +2075,11 @@ msgstr "Largeur de bordure"
 
 #: include/classes/api/services/CHost.php:1445
 msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
-msgstr ""
+msgstr "Les champs « tls_connect » et « tls_accept » doivent être spécifiés lors de la modification des paramètres de cryptage de connexion."
 
 #: include/classes/api/services/CHost.php:1452
 msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
-msgstr ""
+msgstr "Les champs « tls_psk_identity » et « tls_psk » doivent être spécifiés lors du changement du PSK pour le cryptage de la connexion."
 
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
@@ -20256,7 +20256,7 @@ msgstr "Le modèle cloné contient des macros définies par l'utilisateur avec l
 
 #: include/classes/api/services/CHost.php:1433
 msgid "The field \"monitored_by\" must be specified when changing proxy or proxy group for host monitoring."
-msgstr ""
+msgstr "Le champ « monitored_by » doit être spécifié lors du changement de proxy ou de groupe de proxy pour la surveillance de l'hôte."
 
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
@@ -24001,7 +24001,7 @@ msgstr "et"
 #: include/classes/api/helpers/CApiPskHelper.php:160
 #: include/classes/api/helpers/CApiPskHelper.php:176
 msgid "another tls_psk value is already associated with given tls_psk_identity"
-msgstr ""
+msgstr "une autre valeur tls_psk est déjà associée à l'identité tls_psk donnée"
 
 #: include/forms.inc.php:1450 include/views/js/item.preprocessing.js.php:237
 msgid "any error"

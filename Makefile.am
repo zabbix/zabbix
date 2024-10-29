@@ -80,7 +80,6 @@ dbschema_timescaledb:
 
 dbschema_sqlite3:
 	cd database/sqlite3 && \
-	$(MAKE) $(AM_MAKEFLAGS) data.sql && \
 	$(MAKE) $(AM_MAKEFLAGS) schema.sql
 
 dbschema_c:

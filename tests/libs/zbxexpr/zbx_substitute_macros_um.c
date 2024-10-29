@@ -99,9 +99,9 @@ static void	load_um_cache(zbx_um_mock_cache_t *mock_cache, zbx_mock_handle_t hco
 	um_mock_cache_init(mock_cache, hconfig);
 	um_mock_cache_dump(mock_cache);
 
-	zbx_dbsync_init(&gmacros, ZBX_DBSYNC_UPDATE);
-	zbx_dbsync_init(&hmacros, ZBX_DBSYNC_UPDATE);
-	zbx_dbsync_init(&htmpls, ZBX_DBSYNC_UPDATE);
+	zbx_dbsync_init(&gmacros, NULL, ZBX_DBSYNC_UPDATE);
+	zbx_dbsync_init(&hmacros, NULL, ZBX_DBSYNC_UPDATE);
+	zbx_dbsync_init(&htmpls, NULL, ZBX_DBSYNC_UPDATE);
 
 	um_mock_cache_diff(&mock_cache0, mock_cache, &gmacros, &hmacros, &htmpls);
 	config->um_cache = um_cache_create();

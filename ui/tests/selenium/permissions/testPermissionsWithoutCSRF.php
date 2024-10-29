@@ -192,7 +192,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM graphs',
-					'link' => 'graphs.php?form=update&graphid=700026&filter_hostids%5B0%5D=99202&context=host',
+					'link' => 'graphs.php?form=update&graphid=700008&filter_hostids%5B0%5D=50001&context=host',
 					'incorrect_request' => true
 				]
 			],
@@ -208,7 +208,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM host_discovery',
-					'link' => 'host_discovery.php?form=update&itemid=99107&context=host',
+					'link' => 'host_discovery.php?form=update&itemid=400430&context=host',
 					'incorrect_request' => true
 				]
 			],
@@ -216,7 +216,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM host_discovery',
-					'link' => 'host_discovery.php?form=create&hostid=99202&context=host',
+					'link' => 'host_discovery.php?form=create&hostid=50001&context=host',
 					'incorrect_request' => true
 				]
 			],
@@ -706,9 +706,9 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'token' => true,
-					'token_url' => 'host_discovery.php?form=update&hostid=99202&itemid=99107&context=host',
+					'token_url' => 'host_discovery.php?form=update&hostid=50001&itemid=400430&context=host',
 					'db' => 'SELECT * FROM items',
-					'link' => 'host_discovery.php?form=update&hostid=99202&itemid=99107&context=host&name=test'.
+					'link' => 'host_discovery.php?form=update&hostid=50001&itemid=400430&context=host&name=test'.
 						'&description=&key=trap%5B4%5D&type=2&value_type=3&inventory_link=0&trapper_hosts=&units=UNIT'.
 						'&lifetime=1&formula=test&evaltype=1&update=Update&_csrf_token=',
 					'error' => self::INCORRECT_REQUEST

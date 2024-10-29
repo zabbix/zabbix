@@ -101,9 +101,15 @@ struct zbx_dbsync
 	zbx_vector_ptr_t		columns;
 
 	/* statistics */
+	const char	*from;
 	zbx_uint64_t	add_num;
 	zbx_uint64_t	update_num;
 	zbx_uint64_t	remove_num;
+	double		start;
+	double		sql_time;
+	double		sync_time;
+	zbx_uint64_t	used;
+	zbx_int64_t	sync_size;
 };
 
 void	zbx_dbsync_env_init(zbx_dc_config_t *cache);
@@ -113,8 +119,8 @@ void	zbx_dbsync_env_clear(void);
 int	zbx_dbsync_env_changelog_num(void);
 int	zbx_dbsync_env_changelog_dbsyncs_new_records(void);
 
-void	zbx_dbsync_init(zbx_dbsync_t *sync, unsigned char mode);
-void	zbx_dbsync_init_changelog(zbx_dbsync_t *sync, unsigned char mode);
+void	zbx_dbsync_init(zbx_dbsync_t *sync, const char *name, unsigned char mode);
+void	zbx_dbsync_init_changelog(zbx_dbsync_t *sync, const char *name, unsigned char mode);
 void	zbx_dbsync_clear(zbx_dbsync_t *sync);
 int	zbx_dbsync_get_row_num(const zbx_dbsync_t *sync);
 int	zbx_dbsync_next(zbx_dbsync_t *sync, zbx_uint64_t *rowid, char ***row, unsigned char *tag);
@@ -170,5 +176,10 @@ int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync);
 
 int	zbx_dbsync_prepare_proxy_group(zbx_dbsync_t *sync);
 int	zbx_dbsync_prepare_host_proxy(zbx_dbsync_t *sync);
+void	zbx_dcsync_sql_start(zbx_dbsync_t *sync);
+void	zbx_dcsync_sql_end(zbx_dbsync_t *sync);
+void	zbx_dcsync_sync_start(zbx_dbsync_t *sync, zbx_uint64_t used_size);
+void	zbx_dcsync_sync_end(zbx_dbsync_t *sync, zbx_uint64_t used_size);
+void	zbx_dcsync_stats_dump(const char *function_name);
 
 #endif /* BUILD_SRC_LIBS_ZBXDBCACHE_DBSYNC_H_ */

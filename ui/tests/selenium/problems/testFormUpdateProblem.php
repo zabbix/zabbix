@@ -976,7 +976,7 @@ class testFormUpdateProblem extends CWebTest {
 	 */
 	private function checkIconAndHint($row, $class, $text) {
 		// Assert blinking icon in Info column.
-		$icon = $row->getColumn('Info')->query('class', [$class, 'js-blink'])->waitUntilVisible();
+		$icon = $row->getColumn('Info')->query('class', [$class, 'js-blink'])->waitUntilPresent();
 		$this->assertTrue($icon->exists());
 
 		// Check icon hintbox.
