@@ -274,7 +274,7 @@ class testFormScheduledReport extends CWebTest {
 						'Name' => 'Report for delete'
 					],
 					'error_message_part' => 'add',
-					'unique' => true,
+					'unique' => false,
 					'message_details' => 'Report "Report for delete" already exists.'
 				]
 			],
@@ -1381,10 +1381,9 @@ class testFormScheduledReport extends CWebTest {
 		$form = $this->query('id:scheduledreport-form')->waitUntilVisible()->asForm()->one();
 
 		// Make Name field unique in update scenario.
-		if ($action === 'update' && array_key_exists('Name', $data['fields']) && !CTestArrayHelper::get($data, 'unique')) {
-			if ($data['fields']['Name'] !== '') {
-				$data['fields']['Name'] = $data['fields']['Name'].microtime();
-			}
+		if ($action === 'update' && CTestArrayHelper::get($data['fields'], 'Name', '') !== ''
+				&& CTestArrayHelper::get($data, 'unique', true)) {
+			$data['fields']['Name'] = $data['fields']['Name'].microtime();
 		}
 
 		if (CTestArrayHelper::get($data, 'Start time', false)) {
