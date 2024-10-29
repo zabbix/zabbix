@@ -2119,14 +2119,6 @@ int	zbx_tls_validate_attr(const zbx_tls_conn_attr_t *attr, const char *tls_issue
 	return SUCCEED;
 }
 
-int	zbx_tls_used(const zbx_socket_t *s)
-{
-	if (NULL == s->tls_ctx)
-		return FAIL;
-
-	return SUCCEED;
-}
-
 #if defined(_WINDOWS)
 /******************************************************************************
  *                                                                            *

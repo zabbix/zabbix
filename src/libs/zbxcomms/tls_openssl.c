@@ -2333,14 +2333,6 @@ int	zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 	return SUCCEED;
 }
 
-int	zbx_tls_used(const zbx_socket_t *s)
-{
-	if (NULL == s->tls_ctx)
-		return FAIL;
-
-	return SUCCEED;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: get PSK attributes from the context of established connection     *

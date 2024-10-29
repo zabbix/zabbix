@@ -307,7 +307,7 @@ ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len, short *event
 ssize_t		zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags);
 ssize_t		zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout);
 const char	*zbx_tcp_recv_line(zbx_socket_t *s);
-int		zbx_tcp_read_close_notify(zbx_socket_t *s, short *events);
+int		zbx_tcp_read_close_notify(zbx_socket_t *s, int timeout, short *events);
 
 void	zbx_tcp_recv_context_init(zbx_socket_t *s, zbx_tcp_recv_context_t *tcp_recv_context, unsigned char flags);
 ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, unsigned char flags, short *events);

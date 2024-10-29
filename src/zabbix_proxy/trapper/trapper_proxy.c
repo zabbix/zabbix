@@ -85,12 +85,6 @@ static int	send_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_
 	if (SUCCEED != zbx_recv_response(sock, config_timeout, error))
 		return FAIL;
 
-	if (ZBX_PROTO_ERROR == zbx_tcp_read_close_notify(sock, NULL))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot gracefully close connection to server: %s",
-				zbx_socket_strerror());
-	}
-
 	return SUCCEED;
 }
 

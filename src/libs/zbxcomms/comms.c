@@ -1934,17 +1934,26 @@ ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len, short *events)
 	return tcp_read(s, buf, len, events);
 }
 
-int	zbx_tcp_read_close_notify(zbx_socket_t *s, short *events)
+int	zbx_tcp_read_close_notify(zbx_socket_t *s, int timeout, short *events)
 {
+	int	ret;
 	char	buf[ZBX_STAT_BUF_LEN];
 
 	if (SUCCEED != zbx_tls_used(s))
 		return 0;
 
+	if (0 != timeout)
+		zbx_socket_set_deadline(s, timeout);
+
 	if (NULL != events)
 		*events = 0;
 
-	return zbx_tcp_read(s, buf, sizeof(buf), events);
+	ret = zbx_tcp_read(s, buf, sizeof(buf), events);
+
+	if (0 != timeout)
+		zbx_socket_set_deadline(s, 0);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -2905,4 +2914,13 @@ void	zbx_udp_close(zbx_socket_t *s)
 {
 	zbx_socket_free(s);
 	zbx_socket_close(s->socket);
+}
+
+int	zbx_tls_used(const zbx_socket_t *s)
+{
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (NULL != s->tls_ctx)
+		return SUCCEED;
+#endif
+	return FAIL;
 }

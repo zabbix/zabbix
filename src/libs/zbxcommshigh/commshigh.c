@@ -167,7 +167,7 @@ int	zbx_get_data_from_server(zbx_socket_t *sock, char **buffer, size_t buffer_si
 		goto exit;
 	}
 
-	if (ZBX_PROTO_ERROR == zbx_tcp_read_close_notify(sock, NULL))
+	if (ZBX_PROTO_ERROR == zbx_tcp_read_close_notify(sock, 0, NULL))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot gracefully close connection: %s",
 				zbx_socket_strerror());
@@ -206,12 +206,6 @@ int	zbx_put_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size
 
 	if (SUCCEED != zbx_recv_response(sock, 0, error))
 		goto out;
-
-	if (ZBX_PROTO_ERROR == zbx_tcp_read_close_notify(sock, NULL))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot gracefully close connection: %s",
-				zbx_socket_strerror());
-	}
 
 	ret = SUCCEED;
 out:
@@ -334,6 +328,12 @@ int	zbx_recv_response(zbx_socket_t *sock, int timeout, char **error)
 		/* side is just too busy processing our data if there is no response */
 		*error = zbx_strdup(*error, zbx_socket_strerror());
 		goto out;
+	}
+
+	if (ZBX_PROTO_ERROR == zbx_tcp_read_close_notify(sock, timeout, NULL))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot gracefully close connection to proxy: %s",
+				zbx_socket_strerror());
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() '%s'", __func__, sock->buffer);
@@ -606,7 +606,7 @@ retry:
 	}
 	else
 	{
-		if (ZBX_PROTO_ERROR == zbx_tcp_read_close_notify(&sock, NULL))
+		if (ZBX_PROTO_ERROR == zbx_tcp_read_close_notify(&sock, 0, NULL))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot gracefully close connection: %s",
 					zbx_socket_strerror());
