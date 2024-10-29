@@ -1600,7 +1600,6 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 	{
 		s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
 		s->tls_ctx->ctx = NULL;
-		s->tls_ctx->close_notify_received = 0;
 		initialized = 0;
 	}
 	else
@@ -1845,7 +1844,6 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 
 	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
 	s->tls_ctx->ctx = NULL;
-	s->tls_ctx->close_notify_received = 0;
 
 #if defined(HAVE_OPENSSL_WITH_PSK)
 	incoming_connection_has_psk = 0;	/* assume certificate-based connection by default */
@@ -2194,11 +2192,17 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char
 	{
 		if (SSL_ERROR_ZERO_RETURN != (err = (size_t)SSL_get_error(s->tls_ctx->ctx, (int)n)))
 		{
-			*error = zbx_dsprintf(*error, "connection was not closed gracefully:%ld", err);
+			size_t	error_alloc = 0, error_offset = 0;
+
+			if (SUCCEED == zbx_tls_get_error(s->tls_ctx->ctx, n, "SSL_read", &error_alloc,
+					&error_offset, error))
+			{
+				*error = zbx_strdup(*error, "SSL_read() unexpected result code");
+			}
+
 			return ZBX_PROTO_ERROR;
 		}
 
-		s->tls_ctx->close_notify_received = 1;
 		return n;
 	}
 

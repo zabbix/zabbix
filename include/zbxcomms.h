@@ -166,6 +166,7 @@ typedef struct
 	gnutls_psk_client_credentials_t	psk_client_creds;
 	gnutls_psk_server_credentials_t	psk_server_creds;
 	unsigned char	psk_buf[HOST_TLS_PSK_LEN / 2];
+	unsigned char	close_notify_received;
 #elif defined(HAVE_OPENSSL)
 	SSL				*ctx;
 #if defined(HAVE_OPENSSL_WITH_PSK)
@@ -174,7 +175,6 @@ typedef struct
 	size_t	identity_len;
 #endif
 #endif
-	unsigned char	close_notify_received;
 } zbx_tls_context_t;
 #endif
 

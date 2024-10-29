@@ -17,6 +17,7 @@
 #include "async_poller.h"
 
 #include "zbxcacheconfig.h"
+#include "zbxcommon.h"
 #include "zbxcomms.h"
 #include "zbxip.h"
 #include "zbxself.h"
@@ -49,7 +50,7 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 		struct event *timeout_event)
 {
 	zbx_agent_context	*agent_context = (zbx_agent_context *)data;
-	short			event_new;
+	short			event_new = 0;
 	zbx_async_task_state_t	state = ZBX_ASYNC_TASK_STOP;
 	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)agent_context->arg_action;
 	int			errnum = 0;

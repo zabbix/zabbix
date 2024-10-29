@@ -2829,10 +2829,10 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		if (0 != update->modified)
 		{
-			if (INTERFACE_TYPE_AGENT == interface->type &&
-					interface->version < ZBX_COMPONENT_VERSION(7, 0, 0))
+			if (INTERFACE_TYPE_AGENT == update->interface->type &&
+					update->interface->version < ZBX_COMPONENT_VERSION(7, 0, 0))
 			{
-				interface->version = ZBX_COMPONENT_VERSION(7, 0, 0);
+				update->interface->version = ZBX_COMPONENT_VERSION(7, 0, 0);
 			}
 
 			dc_host_update_revision(update->host, revision);
