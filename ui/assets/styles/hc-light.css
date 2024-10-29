@@ -3063,7 +3063,9 @@ form.is-loading {
     text-align: right;
     white-space: nowrap; }
   .list-table .wordbreak {
-    white-space: normal; }
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis; }
   .list-table.sticky-header thead {
     position: sticky;
     top: 0;

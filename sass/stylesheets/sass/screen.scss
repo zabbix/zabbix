@@ -730,6 +730,8 @@ form {
 
 	.wordbreak {
 		white-space: normal;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	&.sticky-header {
