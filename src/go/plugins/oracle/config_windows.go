@@ -17,54 +17,12 @@ package oracle
 import (
 	"fmt"
 	"os"
-
-	"golang.zabbix.com/sdk/conf"
-	"golang.zabbix.com/sdk/plugin"
 )
 
-type PluginOptions struct {
-	// ConnectTimeout is the maximum time in seconds for waiting when a connection has to be established.
-	// Default value equals to the global timeout.
-	ConnectTimeout int `conf:"optional,range=1:30"`
-
-	// CallTimeout is the maximum time in seconds for waiting when a request has to be done.
-	// Default value equals to the global agent timeout.
-	CallTimeout int `conf:"optional,range=1:30"`
-
-	// KeepAlive is a time to wait before unused connections will be closed.
-	KeepAlive int `conf:"optional,range=60:900,default=300"`
-
-	// Sessions stores pre-defined named sets of connections settings.
-	Sessions map[string]Session `conf:"optional"`
-
-	// CustomQueriesPath is a full pathname of a directory containing *.sql files with custom queries.
-	CustomQueriesPath string `conf:"optional"`
-
-	// CustomQueriesEnabled enables custom query key.
-	CustomQueriesEnabled bool `conf:"optional,default=false"`
-
-	// Default stores default connection parameter values from configuration file
-	Default Session `conf:"optional"`
-}
-
-// Configure implements the Configurator interface.
-// Initializes configuration structures.
-func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-	if err := conf.Unmarshal(options, &p.options); err != nil {
-		p.Errf("cannot unmarshal configuration options: %s", err)
-	}
-
-	if p.options.CustomQueriesEnabled && p.options.CustomQueriesPath == "" {
-		p.options.CustomQueriesPath = fmt.Sprintf(
-			"%s\\Zabbix Agent 2\\Custom Queries\\Oracle", os.Getenv("programfiles"),
+func (pc *PluginOptions) setCustomQueriesPathDefault() {
+	if pc.CustomQueriesEnabled && pc.CustomQueriesPath == "" {
+		pc.CustomQueriesPath = fmt.Sprintf(
+			"%s\\Zabbix Agent 2\\Custom Queries\\Oracle", os.Getenv("ProgramFiles"),
 		)
-	}
-
-	if p.options.ConnectTimeout == 0 {
-		p.options.ConnectTimeout = global.Timeout
-	}
-
-	if p.options.CallTimeout == 0 {
-		p.options.CallTimeout = global.Timeout
 	}
 }

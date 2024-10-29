@@ -46,7 +46,7 @@ var impl Plugin
 // Export implements the Exporter interface.
 func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (any, error) {
 	if key == keyCustomQuery && !p.options.CustomQueriesEnabled {
-		return nil, errs.Errorf("key %s is disabled", keyCustomQuery)
+		return nil, errs.Errorf("key %q is disabled", keyCustomQuery)
 	}
 
 	params, extraParams, hc, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
