@@ -177,592 +177,139 @@ abstract class testFormPreprocessing extends CWebTest {
 			'params' => "1\n2",
 			'error_handler' => 0,
 			'error_handler_params' => ''
+		],
+		[
+			'type' => '26',
+			'params' => "1\ntest",
+			'error_handler' => 1,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '27',
+			'params' => '',
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '28',
+			'params' => "OID\n1",
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '29',
+			'params' => "test\nOID\n1",
+			'error_handler' => 0,
+			'error_handler_params' => ''
+		],
+		[
+			'type' => '30',
+			'params' => '1',
+			'error_handler' => 0,
+			'error_handler_params' => ''
 		]
 	];
 
-	/*
-	 * Preprocessing validation data for Item and Item prototype.
+	/**
+	 * Sets rows per page to 200 so that all items are always shown on screen.
 	 */
-	public function getItemPreprocessingValidationData() {
-		return array_merge($this->getCommonPreprocessingValidationData(), [
-			// Text. Trim.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Right trim',
-						'Key' => 'empty-right-trim[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Right trim']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Left trim',
-						'Key' => 'empty-left-trim[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Left trim']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Trim',
-						'Key' => 'empty-trim[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Trim']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
-				]
-			],
-			// Arithmetic. Custom multiplier.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Empty multiplier',
-						'Key' => 'empty-multiplier[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Custom multiplier']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'String multiplier',
-						'Key' => 'string-multiplier[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Custom multiplier', 'parameter_1' => 'abc']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Multiplier comma',
-						'Key' => 'comma-multiplier[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Custom multiplier', 'parameter_1' => '0,0']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Multiplier symbols',
-						'Key' => 'symbols-multiplier[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Custom multiplier', 'parameter_1' => '1a!@#$%^&*()-=']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
-				]
-			],
-			// Change. Simple change, Change per second
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Two delta',
-						'Key' => 'two-delta[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Simple change'],
-						['type' => 'Simple change']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
-							'the combinations of (type)=((9, 10)).'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Two delta per second',
-						'Key' => 'two-delta-per-second[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Change per second'],
-						['type' => 'Change per second']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
-							'the combinations of (type)=((9, 10)).'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Two different delta',
-						'Key' => 'two-different-delta[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Simple change'],
-						['type' => 'Change per second']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
-							'the combinations of (type)=((9, 10)).'
-				]
-			],
-			// Validation. In range.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'In range empty',
-						'Key' => 'in-range-empty[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'In range']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'In range letters string',
-						'Key' => 'in-range-letters-string[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'In range', 'parameter_1' => 'abc', 'parameter_2' => 'def']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'In range symbols',
-						'Key' => 'in-range-symbols[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'In range', 'parameter_1' => '1a!@#$%^&*()-=', 'parameter_2' => '2b!@#$%^&*()-=']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'In range comma',
-						'Key' => 'in-range-comma[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'In range', 'parameter_1' => '1,5', 'parameter_2' => '-3,5']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'In range wrong interval',
-						'Key' => 'in-range-wrong-interval[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'In range', 'parameter_1' => '8', 'parameter_2' => '-8']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be less than or equal '.
-							'to the value of parameter "/1/preprocessing/1/params/1".'
-				]
-			],
-			// Validation. Matches regular expression.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Matches regular expression empty',
-						'Key' => 'matches-regular-expression-empty[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Matches regular expression']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
-				]
-			],
-			// Validation. Check for error in XML.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Item error XML empty',
-						'Key' => 'item-error-xml-empty[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Check for error in XML']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
-				]
-			],
-			// Validation. Check for error using regular expression.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Item error REGEXP both params empty',
-						'Key' => 'item-error-regexp-both-empty[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Check for error using regular expression']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Item error REGEXP first parameter empty',
-						'Key' => 'item-error-regexp-first-empty[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Check for error using regular expression', 'parameter_2' => 'test']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Item error REGEXP second parameter empty',
-						'Key' => 'item-error-regexp-second-empty[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Check for error using regular expression', 'parameter_1' => 'test']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be empty.'
-				]
-			],
-			// Throttling. Discard unchanged.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Item two discard unchanged',
-						'Key' => 'item-two-discard-unchanged[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Discard unchanged'],
-						['type' => 'Discard unchanged']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
-							'the combinations of (type)=((19, 20)).'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Item two different throttlings',
-						'Key' => 'item-two-different-throttlings[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Discard unchanged'],
-						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
-							'the combinations of (type)=((19, 20)).'
-				]
-			]
+	protected function setRowsPerPage() {
+		DB::update('users', [
+			'values' => ['rows_per_page' => 200],
+			'where' => ['userid' => 1] // Admin (super admin role)
 		]);
 	}
 
 	/*
-	 * Preprocessing validation data for item, item prototype and LLD.
+	 * GOOD scenario data common for all - items, item prototypes and LLD.
+	 *
+	 * Comments are formatted like this:
+	 * {Preprocessing step category} - {Preprocessing step name}.
+	 * The category is shown in UI.
 	 */
-	public static function getCommonPreprocessingValidationData() {
+	public static function getCommonPreprocessingCreateData() {
 		return [
-			// #0 Text. Regular expression.
+			// Text - Regular expression.
 			[
 				[
-					'expected' => TEST_BAD,
+					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Empty regular expression',
-						'Key' => 'Empty-both-parameters[{#KEY}]'
+						'Name' => 'Regular expression simple',
+						'Key' => 'regular-expression-simple[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'Regular expression']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+						['type' => 'Regular expression', 'parameter_1' => 'test', 'parameter_2' => 'TEST' ]
+					]
 				]
 			],
-			// #1
 			[
 				[
-					'expected' => TEST_BAD,
+					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Empty pattern of regular expression',
-						'Key' => 'empty-first-parameter[{#KEY}]'
+						'Name' => 'Regular expression complex',
+						'Key' => 'regular-expression-complex[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'Regular expression', 'parameter_2' => 'test output']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+						[
+							'type' => 'Regular expression',
+							'parameter_1' => '^(\d{4}-\d{1,2}-[0123]{1}\d) test ([💚💙])',
+							'parameter_2' => 'date \1 emoji \2'
+						]
+					]
 				]
 			],
-			// #2
+			// Text - Replace.
 			[
 				[
-					'expected' => TEST_BAD,
+					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Empty output of regular expression',
-						'Key' => 'empty-second-parameter[{#KEY}]'
+						'Name' => 'Replace',
+						'Key' => 'replace[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'Regular expression', 'parameter_1' => 'expression']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be empty.'
+						['type' => 'Replace', 'parameter_1' => 'old string ', 'parameter_2' => 'NEW👍string ']
+					]
 				]
 			],
-			// #3 Structured data. XML XPath.
 			[
 				[
-					'expected' => TEST_BAD,
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Replace - empty replacement',
+						'Key' => 'replace-empty-replacement[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Replace', 'parameter_1' => 'replacement']
+					]
+				]
+			],
+			// Structured data - XML XPath.
+			[
+				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => 'XML XPath',
-						'Key' => 'empty-xpath[{#KEY}]'
+						'Key' => 'xml-xpath[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'XML XPath']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+						['type' => 'XML XPath', 'parameter_1' => '//div[contains(@class, "test")]']
+					]
 				]
 			],
-			// #4 Structured data. JSONPath.
+			// Structured data - JSONPath.
 			[
 				[
-					'expected' => TEST_BAD,
+					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'JSONPath empty',
-						'Key' => 'empty-jsonpath[{#KEY}]'
+						'Name' => 'JSONPath',
+						'Key' => 'jsonpath[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'JSONPath']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+						['type' => 'JSONPath', 'parameter_1' => '$.test[:1].type']
+					]
 				]
 			],
-			// #5 Custom scripts. JavaScript.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Empty JavaScript',
-						'Key' => 'item-empty-javascript[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'JavaScript']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
-				]
-			],
-			// #6 Validation. Does not match regular expression
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Does not match regular expression empty',
-						'Key' => 'does-not-match-regular-expression-empty[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Does not match regular expression']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
-				]
-			],
-			// #7 Validation. Check for error in JSON.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Error JSON empty',
-						'Key' => 'error-json-empty[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Check for error in JSON']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
-				]
-			],
-			// #8 Throttling. Discard unchanged with heartbeat
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Two equal discard unchanged with heartbeat',
-						'Key' => 'two-equal-discard-unchanged-with-heartbeat[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1'],
-						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist '.
-							'within the combinations of (type)=((19, 20)).'
-				]
-			],
-			// #9
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Two different discard unchanged with heartbeat',
-						'Key' => 'two-different-discard-unchanged-with-heartbeat[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1'],
-						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '2']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist '.
-							'within the combinations of (type)=((19, 20)).'
-				]
-			],
-			// #10
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Discard unchanged with heartbeat empty',
-						'Key' => 'discard-unchanged-with-heartbeat-empty[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Discard unchanged with heartbeat']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
-				]
-			],
-			// #11
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Discard unchanged with heartbeat symbols',
-						'Key' => 'discard-unchanged-with-heartbeat-symbols[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '3g!@#$%^&*()-=']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a time unit is expected.'
-				]
-			],
-			// #12
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Discardunchanged with heartbeat letters string',
-						'Key' => 'discard-unchanged-with-heartbeat-letters-string[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => 'abc']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a time unit is expected.'
-				]
-			],
-			// #13
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Discard unchanged with heartbeat comma',
-						'Key' => 'discard-unchanged-with-heartbeat-comma[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1,5']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a time unit is expected.'
-				]
-			],
-			// #14
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Discard unchanged with heartbeat dot',
-						'Key' => 'discard-unchanged-with-heartbeat-dot[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1.5']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a time unit is expected.'
-				]
-			],
-			// #15
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Discard unchanged with heartbeat negative',
-						'Key' => 'discard-unchanged-with-heartbeat-negative[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '-3']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": value must be one of 1-788400000.'
-				]
-			],
-			// #16
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Discard unchanged with heartbeat zero',
-						'Key' => 'discard-unchanged-with-heartbeat-zero[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '0']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": value must be one of 1-788400000.'
-				]
-			],
-			// #17
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Discard unchanged with heartbeat maximum',
-						'Key' => 'unchanged-with-heartbeat-max[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '788400001']
-					],
-					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": value must be one of 1-788400000.'
-				]
-			]
-		];
-	}
-
-	/*
-	 * Preprocessing data for item and item prototype successful creation.
-	 */
-	public static function getItemPreprocessingCreateData() {
-		return [
-			// Structured data. CSV to JSON.
+			// Structured data - CSV to JSON.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -799,7 +346,410 @@ abstract class testFormPreprocessing extends CWebTest {
 					]
 				]
 			],
-			// In range.
+			// Structured data - XML to JSON.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'XML to JSON',
+						'Key' => 'xml-to-json[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'XML to JSON']
+					]
+				]
+			],
+			// SNMP - SNMP walk value.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'SNMP walk value - Unchanged',
+						'Key' => 'snmp-walk-value-unchanged[{#KEY}]'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'SNMP walk value',
+							'parameter_1' => '1.3.6.1.2.1.1.1',
+							'parameter_2' => 'Unchanged'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'SNMP walk value - UTF-8 from Hex-STRING',
+						'Key' => 'snmp-walk-value-utf8-hex[{#KEY}]'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'SNMP walk value',
+							'parameter_1' => 'SNMPv2-MIB::sysName.0',
+							'parameter_2' => 'UTF-8 from Hex-STRING'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'SNMP walk value - MAC from Hex-STRING',
+						'Key' => 'snmp-walk-value-mac-hex[{#KEY}]'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'SNMP walk value',
+							'parameter_1' => 'iso.org.dod.internet.mgmt.mib-2.system.sysDescr',
+							'parameter_2' => 'MAC from Hex-STRING'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'SNMP walk value - Integer from BITS',
+						'Key' => 'snmp-walk-value-int-bits[{#KEY}]'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'SNMP walk value',
+							'parameter_1' => '1.2.3.4.5.6.7.8.9',
+							'parameter_2' => 'Integer from BITS'
+						]
+					]
+				]
+			],
+			// SNMP - SNMP walk to JSON.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'SNMP walk to JSON - Unchanged',
+						'Key' => 'snmp-walk-to-json-unchanged[{#KEY}]'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'SNMP walk to JSON',
+							'parameter_table_1_1' => 'test',
+							'parameter_table_1_2' => '1.3.6.1.2.1.1.1',
+							'parameter_table_1_3' => 'Unchanged'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'SNMP walk to JSON - UTF-8 from Hex-STRING',
+						'Key' => 'snmp-walk-to-json-uft8-hex[{#KEY}]'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'SNMP walk to JSON',
+							'parameter_table_1_1' => 'fieldName',
+							'parameter_table_1_2' => 'SNMPv2-MIB::sysName.0',
+							'parameter_table_1_3' => 'UTF-8 from Hex-STRING'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'SNMP walk to JSON - MAC from Hex-STRING',
+						'Key' => 'snmp-walk-to-json-mac-hex[{#KEY}]'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'SNMP walk to JSON',
+							'parameter_table_1_1' => '1234',
+							'parameter_table_1_2' => 'iso.org.dod.internet.mgmt.mib-2.system.sysDescr',
+							'parameter_table_1_3' => 'MAC from Hex-STRING'
+						]
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'SNMP walk to JSON - Integer from BITS',
+						'Key' => 'snmp-walk-to-json-int-bits[{#KEY}]'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'SNMP walk to JSON',
+							'parameter_table_1_1' => 'test.test',
+							'parameter_table_1_2' => '1.2.3.4.5.6.7.8.9',
+							'parameter_table_1_3' => 'Integer from BITS'
+						]
+					]
+				]
+			],
+			// SNMP - SNMP get value.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'SNMP get value - UTF-8 from Hex-STRING',
+						'Key' => 'snmp-get-value-utf8-hex[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'SNMP get value', 'parameter_1' => 'UTF-8 from Hex-STRING']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'SNMP get value - MAC from Hex-STRING',
+						'Key' => 'snmp-get-value-mac-hex[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'SNMP get value', 'parameter_1' => 'MAC from Hex-STRING']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'SNMP get value - Integer from BITS',
+						'Key' => 'snmp-get-value-int-bits[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'SNMP get value',	'parameter_1' => 'Integer from BITS']
+					]
+				]
+			],
+			// Custom scripts - JavaScript.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'JavaScript',
+						'Key' => 'javascript[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'JavaScript', 'parameter_1' => 'alert("hi!");']
+					]
+				]
+			],
+			// Validation - Matches regular expression.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Matches regular expression',
+						'Key' => 'matches-regular-expression[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Matches regular expression', 'parameter_1' => '^test[123].*\d{4}-\d{1,2}-[0123]{1}\d$']
+					]
+				]
+			],
+			// Validation - Does not match regular expression.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Does not match regular expression',
+						'Key' => 'does-not-match-regular-expression[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Does not match regular expression', 'parameter_1' => '^test[123].*\d{4}-\d{1,2}-[0123]{1}\d$']
+					]
+				]
+			],
+			// Validation - Check for error in JSON.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for error in JSON',
+						'Key' => 'check-for-error-in-json[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for error in JSON', 'parameter_1' => '$.path.to.node']
+					]
+				]
+			],
+			// Validation - Check for error in XML.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for error in XML',
+						'Key' => 'check-for-error-in-xml[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for error in XML', 'parameter_1' => '//div[contains(@class, "test")]']
+					]
+				]
+			],
+			// Throttling - Discard unchanged with heartbeat.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Discard unchanged with heartbeat',
+						'Key' => 'discard-unchanged-with-heartbeat[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '2']
+					]
+				]
+			]
+		];
+	}
+
+	/*
+	 * GOOD scenario data for items and item prototypes ONLY (not LLD).
+	 *
+	 * Comments are formatted like this:
+	 * {Preprocessing step category} - {Preprocessing step name}.
+	 * The category is shown in UI.
+	 */
+	public function getItemPreprocessingCreateData() {
+		return array_merge($this->getCommonPreprocessingCreateData(), [
+			// Text - Trim.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Trim',
+						'Key' => 'trim[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Trim', 'parameter_1' => ' \t\\\\']
+					]
+				]
+			],
+			// Text - Right trim.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Right trim',
+						'Key' => 'right-trim[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Right trim', 'parameter_1' => '\n']
+					]
+				]
+			],
+			// Text - Left trim.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Left trim',
+						'Key' => 'left-trim[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Left trim', 'parameter_1' => ' ']
+					]
+				]
+			],
+			// Arithmetic - Custom multiplier.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Custom multiplier',
+						'Key' => 'custom-multiplier[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Custom multiplier', 'parameter_1' => '1.23']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Custom multiplier - scientific notation',
+						'Key' => 'custom-multiplier-scientific[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Custom multiplier', 'parameter_1' => '1.5617497E+20']
+					]
+				]
+			],
+			// Change - Simple change.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Simple change',
+						'Key' => 'simple-change[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Simple change']
+					]
+				]
+			],
+			// Change - Change per second.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Change per second',
+						'Key' => 'change-per-second[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Change per second']
+					]
+				]
+			],
+			// Numeral systems - Boolean to decimal.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Boolean to decimal',
+						'Key' => 'boolean-to-decimal[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Boolean to decimal']
+					]
+				]
+			],
+			// Numeral systems - Octal to decimal.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Octal to decimal',
+						'Key' => 'octal-to-decimal[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Octal to decimal']
+					]
+				]
+			],
+			// Numeral systems - Hexadecimal to decimal.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Hexadecimal to decimal',
+						'Key' => 'hexadecimal-to-decimal[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Hexadecimal to decimal']
+					]
+				]
+			],
+			// Validation - In range.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -809,19 +759,6 @@ abstract class testFormPreprocessing extends CWebTest {
 					],
 					'preprocessing' => [
 						['type' => 'In range', 'parameter_1' => '-3.5', 'parameter_2' => '-1.5']
-					]
-				]
-			],
-			// Validation
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Name' => 'Not supported step',
-						'Key' => 'check-for-not-supported[{#KEY}]'
-					],
-					'preprocessing' => [
-						['type' => 'Check for not supported value']
 					]
 				]
 			],
@@ -837,12 +774,213 @@ abstract class testFormPreprocessing extends CWebTest {
 					]
 				]
 			],
+			// Validation - Check for error using regular expression.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Add all preprocessing',
-						'Key' => 'item.all.preprocessing[{#KEY}]'
+						'Name' => 'Check for error using regular expression',
+						'Key' => 'check-for-error-using-regular-expression[{#KEY}]'
+					],
+					'preprocessing' => [
+						[
+							'type' => 'Check for error using regular expression',
+							'parameter_1' => '^test[123].*(\d{4}-\d{1,2}-[0123]{1})\d$',
+							'parameter_2' => 'output \1'
+						]
+					]
+				]
+			],
+			// Validation - Check for not supported value.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for not supported value - any error',
+						'Key' => 'check-for-not-supported-value-any-error[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value', 'parameter_1' => 'any error']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for not supported value - error matches',
+						'Key' => 'check-for-not-supported-value-error-matches[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value', 'parameter_1' => 'error matches', 'parameter_2' => '^test.*$']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for not supported value - error does not match',
+						'Key' => 'check-for-not-supported-value-error-does-not-match[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value', 'parameter_1' => 'error does not match', 'parameter_2' => '^test.*$']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for not supported value - error matches + any error',
+						'Key' => 'check-for-not-supported-value-1[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value', 'parameter_1' => 'error matches', 'parameter_2' => '^test.*$'],
+						['type' => 'Check for not supported value', 'parameter_1' => 'any error']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for not supported value - error matches + error matches',
+						'Key' => 'check-for-not-supported-value-2[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value', 'parameter_1' => 'error matches', 'parameter_2' => '^test.*$'],
+						['type' => 'Check for not supported value', 'parameter_1' => 'error matches', 'parameter_2' => 'different']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for not supported value - error matches + error matches (equal parameters)',
+						'Key' => 'check-for-not-supported-value-3[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value', 'parameter_1' => 'error matches', 'parameter_2' => 'equal'],
+						['type' => 'Check for not supported value', 'parameter_1' => 'error matches', 'parameter_2' => 'equal']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for not supported value - error does not match + any error',
+						'Key' => 'check-for-not-supported-value-4[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value', 'parameter_1' => 'error does not match', 'parameter_2' => '^test.*$'],
+						['type' => 'Check for not supported value', 'parameter_1' => 'any error']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for not supported value - error does not match + error does not match',
+						'Key' => 'check-for-not-supported-value-5[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value', 'parameter_1' => 'error does not match', 'parameter_2' => '^test.*$'],
+						['type' => 'Check for not supported value', 'parameter_1' => 'error does not match', 'parameter_2' => 'different']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for not supported value - error does not match + error does not match (equal parameters)',
+						'Key' => 'check-for-not-supported-value-6[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value', 'parameter_1' => 'error does not match', 'parameter_2' => 'equal'],
+						['type' => 'Check for not supported value', 'parameter_1' => 'error does not match', 'parameter_2' => 'equal']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Check for not supported value - all types',
+						'Key' => 'check-for-not-supported-value-all-types[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value', 'parameter_1' => 'error does not match', 'parameter_2' => 'aa'],
+						['type' => 'Check for not supported value', 'parameter_1' => 'error matches', 'parameter_2' => '^test.*$'],
+						['type' => 'Check for not supported value', 'parameter_1' => 'any error']
+					]
+				]
+			],
+			// Throttling - Discard unchanged.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Discard unchanged',
+						'Key' => 'discard-unchanged[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Discard unchanged']
+					]
+				]
+			],
+			// All steps at once.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'All steps at once',
+						'Key' => 'all-steps-at-once[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value'],
+						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
+						['type' => 'Replace', 'parameter_1' => 'text', 'parameter_2' => 'REPLACEMENT'],
+						['type' => 'Trim', 'parameter_1' => '1a2b3c'],
+						['type' => 'Right trim', 'parameter_1' => 'abc'],
+						['type' => 'Left trim', 'parameter_1' => 'def'],
+						['type' => 'XML XPath', 'parameter_1' => 'def'],
+						['type' => 'JSONPath', 'parameter_1' => 'def'],
+						['type' => 'CSV to JSON','parameter_1' => ' ', 'parameter_2' => '\\', 'parameter_3' => true],
+						['type' => 'XML to JSON'],
+						['type' => 'SNMP walk value', 'parameter_1' => '1.2.3', 'parameter_2' => 'UTF-8 from Hex-STRING'],
+						['type' => 'SNMP walk to JSON', 'parameter_table_1_1' => 'abc', 'parameter_table_1_2' => '123'],
+						['type' => 'SNMP get value', 'parameter_1' => 'MAC from Hex-STRING'],
+						['type' => 'Custom multiplier', 'parameter_1' => '123'],
+						['type' => 'Simple change'],
+						['type' => 'Boolean to decimal'],
+						['type' => 'Octal to decimal'],
+						['type' => 'Hexadecimal to decimal'],
+						['type' => 'JavaScript', 'parameter_1' => 'Test JavaScript'],
+						['type' => 'In range', 'parameter_1' => '-5', 'parameter_2' => '9.5'],
+						['type' => 'Matches regular expression', 'parameter_1' => 'test'],
+						['type' => 'Does not match regular expression', 'parameter_1' => 'test'],
+						['type' => 'Check for error in JSON', 'parameter_1' => 'test'],
+						['type' => 'Check for error in XML', 'parameter_1' => 'abc'],
+						['type' => 'Check for error using regular expression', 'parameter_1' => 'test', 'parameter_2' => 'abc'],
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '5'],
+						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label',
+								'parameter_3' => 'label_name'
+						]
+					]
+				]
+			],
+			// Many steps for screenshot.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Many steps for screenshot',
+						'Key' => 'many-steps-for-screenshot[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Check for not supported value'],
@@ -862,88 +1000,99 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'In range', 'parameter_1' => '-5', 'parameter_2' => '9.5'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '5'],
 						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label',
-								'parameter_3' => 'label_name']
+								'parameter_3' => 'label_name'
+						]
 					],
 					'screenshot' => true
 				]
 			],
+			// Unicode symbols.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Add symbols preprocessing',
-						'Key' => 'item.symbols.preprocessing[{#KEY}]'
+						'Name' => 'Unicode symbols',
+						'Key' => 'unicode-symbols[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'Replace', 'parameter_1' => '1a!@#$%^&*()-=', 'parameter_2' => '1a!@#$%^&*()-='],
-						['type' => 'Right trim', 'parameter_1' => '1a!@#$%^&*()-='],
-						['type' => 'Left trim', 'parameter_1' => '2b!@#$%^&*()-='],
-						['type' => 'Trim', 'parameter_1' => '3c!@#$%^&*()-='],
-						['type' => 'XML XPath', 'parameter_1' => '3c!@#$%^&*()-='],
-						['type' => 'JSONPath', 'parameter_1' => '3c!@#$%^&*()-='],
-						['type' => 'Custom multiplier', 'parameter_1' => '4.0E+14'],
-						['type' => 'Regular expression', 'parameter_1' => '5d!@#$%^&*()-=', 'parameter_2' => '6e!@#$%^&*()-='],
-						['type' => 'JavaScript', 'parameter_1' => '5d!@#$%^&*()-='],
-						['type' => 'Matches regular expression', 'parameter_1' => '7f!@#$%^&*()-='],
-						['type' => 'Does not match regular expression', 'parameter_1' => '8g!@#$%^&*()-='],
-						['type' => 'Check for error in JSON', 'parameter_1' => '9h!@#$%^&*()-='],
-						['type' => 'Check for error in XML', 'parameter_1' => '0i!@#$%^&*()-='],
-						['type' => 'Check for error using regular expression', 'parameter_1' => '1j!@#$%^&*()-=', 'parameter_2' => '2k!@#$%^&*()-=']
+						['type' => 'Regular expression', 'parameter_1' => '01_<!@"\'&nbsp;🙂🙃', 'parameter_2' => '02_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Replace', 'parameter_1' => '03_<!@"\'&nbsp;🙂🙃', 'parameter_2' => '04_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Trim', 'parameter_1' => '05_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Right trim', 'parameter_1' => '06_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Left trim', 'parameter_1' => '07_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'XML XPath', 'parameter_1' => '08_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'JSONPath', 'parameter_1' => '09_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'CSV to JSON','parameter_1' => '<', 'parameter_2' => '<'],
+						['type' => 'SNMP walk value', 'parameter_1' => '10_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'SNMP walk to JSON', 'parameter_table_1_1' => '11_<!@"\'&nbsp;🙂🙃', 'parameter_table_1_2' => '12_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'JavaScript', 'parameter_1' => '13_5d!@#$%^&*()-='],
+						['type' => 'Matches regular expression', 'parameter_1' => '14_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Does not match regular expression', 'parameter_1' => '15_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Check for error in JSON', 'parameter_1' => '16_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Check for error in XML', 'parameter_1' => '17_<!@"\'&nbsp;🙂🙃'],
+						['type' => 'Check for error using regular expression', 'parameter_1' => '18_<!@"\'&nbsp;🙂🙃', 'parameter_2' => '19_<!@"\'&nbsp;🙂🙃']
 					]
 				]
 			],
+			// Duplicate steps.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Add the same preprocessing',
-						'Key' => 'item.theSamePpreprocessing[{#KEY}]'
+						'Name' => 'Duplicate steps',
+						'Key' => 'duplicate-steps[{#KEY}]'
 					],
 					'preprocessing' => [
-						['type' => 'Replace', 'parameter_1' => 'текст', 'parameter_2' => 'замена'],
-						['type' => 'Replace', 'parameter_1' => 'текст', 'parameter_2' => 'замена'],
-						['type' => 'Change per second'],
+						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
+						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
+						['type' => 'Replace', 'parameter_1' => 'text', 'parameter_2' => 'REPLACEMENT'],
+						['type' => 'Replace', 'parameter_1' => 'text', 'parameter_2' => 'REPLACEMENT'],
+						['type' => 'Trim', 'parameter_1' => '1a2b3c'],
+						['type' => 'Trim', 'parameter_1' => '1a2b3c'],
 						['type' => 'Right trim', 'parameter_1' => 'abc'],
 						['type' => 'Right trim', 'parameter_1' => 'abc'],
 						['type' => 'Left trim', 'parameter_1' => 'def'],
 						['type' => 'Left trim', 'parameter_1' => 'def'],
-						['type' => 'Trim', 'parameter_1' => '1a2b3c'],
-						['type' => 'Trim', 'parameter_1' => '1a2b3c'],
-						['type' => 'CSV to JSON', 'parameter_1' => '.', 'parameter_2' => "'" ,'parameter_3' => false],
-						['type' => 'CSV to JSON', 'parameter_1' => '.', 'parameter_2' => "'" ,'parameter_3' => false],
+						['type' => 'XML XPath', 'parameter_1' => 'def'],
+						['type' => 'XML XPath', 'parameter_1' => 'def'],
+						['type' => 'JSONPath', 'parameter_1' => 'def'],
+						['type' => 'JSONPath', 'parameter_1' => 'def'],
+						['type' => 'CSV to JSON','parameter_1' => ' ', 'parameter_2' => '\\', 'parameter_3' => true],
+						['type' => 'CSV to JSON','parameter_1' => ' ', 'parameter_2' => '\\', 'parameter_3' => true],
 						['type' => 'XML to JSON'],
 						['type' => 'XML to JSON'],
-						['type' => 'XML XPath', 'parameter_1' => '1a2b3c'],
-						['type' => 'XML XPath', 'parameter_1' => '1a2b3c'],
-						['type' => 'JSONPath', 'parameter_1' => '1a2b3c'],
-						['type' => 'JSONPath', 'parameter_1' => '1a2b3c'],
+						['type' => 'SNMP walk value', 'parameter_1' => '1.2.3', 'parameter_2' => 'UTF-8 from Hex-STRING'],
+						['type' => 'SNMP walk value', 'parameter_1' => '1.2.3', 'parameter_2' => 'UTF-8 from Hex-STRING'],
+						['type' => 'SNMP walk to JSON', 'parameter_table_1_1' => 'abc', 'parameter_table_1_2' => '123'],
+						['type' => 'SNMP walk to JSON', 'parameter_table_1_1' => 'abc', 'parameter_table_1_2' => '123'],
+						['type' => 'SNMP get value', 'parameter_1' => 'MAC from Hex-STRING'],
+						['type' => 'SNMP get value', 'parameter_1' => 'MAC from Hex-STRING'],
 						['type' => 'Custom multiplier', 'parameter_1' => '123'],
 						['type' => 'Custom multiplier', 'parameter_1' => '123'],
-						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
-						['type' => 'Regular expression', 'parameter_1' => 'expression', 'parameter_2' => 'test output'],
 						['type' => 'Boolean to decimal'],
 						['type' => 'Boolean to decimal'],
 						['type' => 'Octal to decimal'],
 						['type' => 'Octal to decimal'],
 						['type' => 'Hexadecimal to decimal'],
 						['type' => 'Hexadecimal to decimal'],
-						['type' => 'In range', 'parameter_1' => '-5.5', 'parameter_2' => '10'],
-						['type' => 'In range', 'parameter_1' => '-5.5', 'parameter_2' => '10'],
 						['type' => 'JavaScript', 'parameter_1' => 'Test JavaScript'],
 						['type' => 'JavaScript', 'parameter_1' => 'Test JavaScript'],
-						['type' => 'Matches regular expression', 'parameter_1' => 'test_expression'],
-						['type' => 'Matches regular expression', 'parameter_1' => 'test_expression'],
-						['type' => 'Does not match regular expression', 'parameter_1' => 'not_expression'],
-						['type' => 'Does not match regular expression', 'parameter_1' => 'not_expression'],
-						['type' => 'Check for error in JSON', 'parameter_1' => '/path'],
-						['type' => 'Check for error in JSON', 'parameter_1' => '/path'],
-						['type' => 'Check for error in XML', 'parameter_1' => '/path/xml'],
-						['type' => 'Check for error in XML', 'parameter_1' => '/path/xml'],
-						['type' => 'Check for error using regular expression', 'parameter_1' => 'regexp', 'parameter_2' => '\1'],
-						['type' => 'Check for error using regular expression', 'parameter_1' => 'regexp', 'parameter_2' => '\1']
+						['type' => 'In range', 'parameter_1' => '-5', 'parameter_2' => '9.5'],
+						['type' => 'In range', 'parameter_1' => '-5', 'parameter_2' => '9.5'],
+						['type' => 'Matches regular expression', 'parameter_1' => 'test'],
+						['type' => 'Matches regular expression', 'parameter_1' => 'test'],
+						['type' => 'Does not match regular expression', 'parameter_1' => 'test'],
+						['type' => 'Does not match regular expression', 'parameter_1' => 'test'],
+						['type' => 'Check for error in JSON', 'parameter_1' => 'test'],
+						['type' => 'Check for error in JSON', 'parameter_1' => 'test'],
+						['type' => 'Check for error in XML', 'parameter_1' => 'abc'],
+						['type' => 'Check for error in XML', 'parameter_1' => 'abc'],
+						['type' => 'Check for error using regular expression', 'parameter_1' => 'test', 'parameter_2' => 'abc'],
+						['type' => 'Check for error using regular expression', 'parameter_1' => 'test', 'parameter_2' => 'abc']
 					]
 				]
 			],
+			// User macros.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -972,6 +1121,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					]
 				]
 			],
+			// Whitespace.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -996,7 +1146,668 @@ abstract class testFormPreprocessing extends CWebTest {
 					]
 				]
 			]
+		]);
+	}
+
+	/*
+	 * BAD scenario data, common for all - items, item prototypes and LLD.
+	 *
+	 * Comments are formatted like this:
+	 * {Preprocessing step category} - {Preprocessing step name}.
+	 * The category is shown in UI.
+	 */
+	public static function getCommonPreprocessingValidationData() {
+		return [
+			// Text - Regular expression.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Regular expression - missing both parameters',
+						'Key' => 'regex-empty[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Regular expression']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Regular expression - missing pattern',
+						'Key' => 'regex-missing-pattern[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Regular expression', 'parameter_2' => 'output']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Regular expression - missing output',
+						'Key' => 'regex-missing-output[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Regular expression', 'parameter_1' => 'expression']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be empty.'
+				]
+			],
+			// Text - Replace.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Replace - missing search string',
+						'Key' => 'replace-missing-search-string[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Replace', 'parameter_2' => 'replacement']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			// Structured data - XML XPath.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'XML XPath missing',
+						'Key' => 'xpath-missing[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'XML XPath']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			// Structured data - JSONPath.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'JSONPath missing',
+						'Key' => 'jsonpath-missing[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'JSONPath']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			// SNMP - SNMP walk value.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'SNMP walk value - missing OID',
+						'Key' => 'snmp-walk-value-missing-oid[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'SNMP walk value']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			// SNMP - SNMP walk to JSON.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'SNMP walk to JSON - missing all fields',
+						'Key' => 'snmp-walk-to-json-missing-all[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'SNMP walk to JSON']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'SNMP walk to JSON - missing Field name',
+						'Key' => 'snmp-walk-to-json-missing-name[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'SNMP walk to JSON', 'parameter_table_1_2' => '1.3.6.1.2.1.1.1']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'SNMP walk to JSON - missing OID',
+						'Key' => 'snmp-walk-to-json-missing-oid[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'SNMP walk to JSON', 'parameter_table_1_1' => 'test']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be empty.'
+				]
+			],
+			// Custom scripts - JavaScript.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'JavaScript missing',
+						'Key' => 'javascript-missing[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'JavaScript']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			// Validation - Does not match regular expression.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Does not match regular expression - missing parameter',
+						'Key' => 'does-not-match-regular-expression-missing[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Does not match regular expression']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			// Validation - Check for error in JSON.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Check for error in JSON - missing parameter',
+						'Key' => 'check-for-error-in-json-missing[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for error in JSON']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			// Throttling - Discard unchanged with heartbeat.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Discard unchanged with heartbeat - conflict with different values',
+						'Key' => 'discard-unchanged-with-heartbeat-conflict-different[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1'],
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '2']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist '.
+						'within the combinations of (type)=((19, 20)).'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Discard unchanged with heartbeat - missing seconds',
+						'Key' => 'discard-unchanged-with-heartbeat-missing-seconds[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Discard unchanged with heartbeat']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Discard unchanged with heartbeat - string',
+						'Key' => 'discard-unchanged-with-heartbeat-string[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => 'abc']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a time unit is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Discard unchanged with heartbeat - string with symbols',
+						'Key' => 'discard-unchanged-with-heartbeat-string-symbols[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '3g!@#$%^&*()-=✨']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a time unit is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Discard unchanged with heartbeat - decimal seconds',
+						'Key' => 'discard-unchanged-with-heartbeat-decimal[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1.5']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a time unit is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Discard unchanged with heartbeat - comma as decimal point',
+						'Key' => 'discard-unchanged-with-heartbeat-comma[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1,5']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a time unit is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Discard unchanged with heartbeat - negative value',
+						'Key' => 'discard-unchanged-with-heartbeat-negative[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '-3']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": value must be one of 1-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Discard unchanged with heartbeat - value zero',
+						'Key' => 'discard-unchanged-with-heartbeat-zero[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '0']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": value must be one of 1-788400000.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Discard unchanged with heartbeat - value over maximum',
+						'Key' => 'discard-unchanged-with-heartbeat-max[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '788400001']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": value must be one of 1-788400000.'
+				]
+			]
 		];
+	}
+
+	/*
+	 * BAD scenario data for items and item prototypes ONLY (not LLD).
+	 *
+	 * Comments are formatted like this:
+	 * {Preprocessing step category} - {Preprocessing step name}.
+	 * The category is shown in UI.
+	 */
+	public function getItemPreprocessingValidationData() {
+		return array_merge($this->getCommonPreprocessingValidationData(), [
+			// Text - Trim.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Trim - missing list of characters',
+						'Key' => 'trim-empty[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Trim']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			// Text - Right trim.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Right trim - missing list of characters',
+						'Key' => 'right-trim-empty[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Right trim']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			// Text - Left trim.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Left trim - missing list of characters',
+						'Key' => 'left-trim-empty[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Left trim']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			// Arithmetic - Custom multiplier.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Custom multiplier - missing multiplier',
+						'Key' => 'custom-multiplier-missing-multiplier[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Custom multiplier']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Custom multiplier - string multiplier',
+						'Key' => 'custom-multiplier-string-multiplier[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Custom multiplier', 'parameter_1' => 'abc']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Custom multiplier - comma as decimal point',
+						'Key' => 'custom-multiplier-comma[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Custom multiplier', 'parameter_1' => '0,0']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Custom multiplier - invalid scientific notation',
+						'Key' => 'symbols-multiplier[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Custom multiplier', 'parameter_1' => '3.2e+12<$@✨']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
+				]
+			],
+			// Change - Simple change.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Simple change - duplicate',
+						'Key' => 'simple-change-duplicate[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Simple change'],
+						['type' => 'Simple change']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
+							'the combinations of (type)=((9, 10)).'
+				]
+			],
+			// Change - Change per second.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Change per second - duplicate',
+						'Key' => 'change-per-second-duplicate[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Change per second'],
+						['type' => 'Change per second']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
+							'the combinations of (type)=((9, 10)).'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Change per second - conflict with simple change',
+						'Key' => 'change-per-second-conflict[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Simple change'],
+						['type' => 'Change per second']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
+							'the combinations of (type)=((9, 10)).'
+				]
+			],
+			// Validation - In range.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'In range - missing all',
+						'Key' => 'in-range-missing-all[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'In range']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'In range - strings',
+						'Key' => 'in-range-strings[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'In range', 'parameter_1' => 'abc', 'parameter_2' => 'def']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'In range - symbols',
+						'Key' => 'in-range-symbols[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'In range', 'parameter_1' => '1a!@#$%^&*()-=✨', 'parameter_2' => '2b!@#$%^&*()-=✨']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'In range - comma for decimal point',
+						'Key' => 'in-range-comma[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'In range', 'parameter_1' => '1,5', 'parameter_2' => '-3,5']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": a floating point value is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'In range - invalid interval',
+						'Key' => 'in-range-invalid-interval[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'In range', 'parameter_1' => '8', 'parameter_2' => '-8']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be less than or equal '.
+							'to the value of parameter "/1/preprocessing/1/params/1".'
+				]
+			],
+			// Validation - Matches regular expression.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Matches regular expression - missing parameter',
+						'Key' => 'matches-regular-expression-missing[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Matches regular expression']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			// Validation - Check for error in XML.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Check for error in XML - missing parameter',
+						'Key' => 'check-for-error-in-xml-missing[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for error in XML']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			// Validation - Check for error using regular expression.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Check for error using regular expression - missing all',
+						'Key' => 'check-for-error-using-regex-missing[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for error using regular expression']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Check for error using regular expression - missing pattern',
+						'Key' => 'check-for-error-using-regex-missing-pattern[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for error using regular expression', 'parameter_2' => 'test']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/1": cannot be empty.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Check for error using regular expression - missing output',
+						'Key' => 'check-for-error-using-regex-missing-output[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for error using regular expression', 'parameter_1' => 'test']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be empty.'
+				]
+			],
+			// Validation - Check for not supported value.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Check for not supported value - duplicate',
+						'Key' => 'check-for-not-supported-duplicate[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Check for not supported value'],
+						['type' => 'Check for not supported value']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/2": value (type, params)=(26, -1) already exists.'
+				]
+			],
+			// Throttling - Discard unchanged.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Discard unchanged - duplicate',
+						'Key' => 'discard-unchanged-duplicate[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Discard unchanged'],
+						['type' => 'Discard unchanged']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
+							'the combinations of (type)=((19, 20)).'
+				]
+			],
+			// Throttling - Discard unchanged with heartbeat.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Discard unchanged with heartbeat - duplicate',
+						'Key' => 'discard-unchanged-with-heartbeat-duplicate[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1'],
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
+							'the combinations of (type)=((19, 20)).'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Discard unchanged with heartbeat - conflict',
+						'Key' => 'discard-unchanged-with-heartbeat-conflict[{#KEY}]'
+					],
+					'preprocessing' => [
+						['type' => 'Discard unchanged'],
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1']
+					],
+					'error' => 'Invalid parameter "/1/preprocessing/2": only one object can exist within '.
+							'the combinations of (type)=((19, 20)).'
+				]
+			]
+		]);
 	}
 
 	/*
@@ -2252,28 +3063,6 @@ abstract class testFormPreprocessing extends CWebTest {
 		}
 	}
 
-	/**
-	 * Check that adding two 'Check for not supported value'
-	 * preprocessing steps is impossible.
-	 */
-	public function checkRepeatedNotSupported() {
-		// TODO: rewrite this check accordingly to DEV-2667 (1).
-//		$this->page->login()->open($this->link);
-//		$this->query('button:'.$this->button)->waitUntilPresent()->one()->click();
-//
-//		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-//		$form->fill(['Key' => 'test.key']);
-//		$form->selectTab('Preprocessing');
-//
-//		$this->addPreprocessingSteps([['type' => 'Check for not supported value']]);
-//		$this->query('id:param_add')->one()->click();
-//
-//		$this->assertTrue($this->query('xpath://z-select[@id="preprocessing_0_type"]'.
-//				'//li[text()="Check for not supported value"]')->one()->isEnabled());
-//		$this->assertFalse($this->query('xpath://z-select[@id="preprocessing_1_type"]'.
-//				'//li[text()="Check for not supported value"]')->one()->isEnabled());
-	}
-
 	/*
 	 * Preprocessing steps with Custom on fail checks for item, item prototype and LLD.
 	 */
@@ -2516,7 +3305,7 @@ abstract class testFormPreprocessing extends CWebTest {
 
 	public static function getCustomOnFailValidationData() {
 		$cases = [
-			// #0 'Set value to' validation.
+			// Custom on fail - Set value to.
 			[
 				'expected' => TEST_GOOD,
 				'fields' => [
@@ -2528,7 +3317,6 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error_handler_params' => ''
 				]
 			],
-			// #1
 			[
 				'expected' => TEST_GOOD,
 				'fields' => [
@@ -2540,7 +3328,6 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error_handler_params' => '500'
 				]
 			],
-			// #2
 			[
 				'expected' => TEST_GOOD,
 				'fields' => [
@@ -2552,7 +3339,6 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error_handler_params' => 'String'
 				]
 			],
-			// #3
 			[
 				'expected' => TEST_GOOD,
 				'fields' => [
@@ -2564,7 +3350,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error_handler_params' => '!@#$%^&*()_+<>,.\/'
 				]
 			],
-			// #4 'Set error to' validation.
+			// Custom on fail - Set error to.
 			[
 				'expected' => TEST_BAD,
 				'fields' => [
@@ -2577,7 +3363,6 @@ abstract class testFormPreprocessing extends CWebTest {
 				],
 				'error' => 'Invalid parameter "/1/preprocessing/1/error_handler_params": cannot be empty.'
 			],
-			// #5
 			[
 				'expected' => TEST_GOOD,
 				'fields' => [
@@ -2589,7 +3374,6 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error_handler_params' => 'Test error'
 				]
 			],
-			// #6
 			[
 				'expected' => TEST_GOOD,
 				'fields' => [
@@ -2601,7 +3385,6 @@ abstract class testFormPreprocessing extends CWebTest {
 					'error_handler_params' => '999'
 				]
 			],
-			// #7
 			[
 				'expected' => TEST_GOOD,
 				'fields' => [
@@ -2849,8 +3632,8 @@ abstract class testFormPreprocessing extends CWebTest {
 			'Key' => 'cloned-preprocessing'.time().'[{#KEY}]'
 		];
 
-		// Open original item on host and get its' preprocessing steps.
-		$this->page->login()->open($link);
+		// Open original item on host and get its preprocessing steps.
+		$this->page->login()->open($link)->waitUntilReady();
 
 		if ($item === 'Discovery rule') {
 			$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
@@ -2860,7 +3643,7 @@ abstract class testFormPreprocessing extends CWebTest {
 				? CDBHelper::getValue('SELECT name FROM items WHERE itemid='.($templated ? self::INHERITED_ITEMID : self::CLONE_ITEMID))
 				: CDBHelper::getValue('SELECT name FROM items WHERE itemid='.($templated ? self::INHERITED_ITEM_PROTOTYPE : self::CLONE_ITEM_PROTOTYPEID));
 
-			$this->query('link', $item_name)->one()->click();
+			$this->query('link', $item_name)->one()->waitUntilClickable()->click();
 			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 			$form = $dialog->asForm();
 		}

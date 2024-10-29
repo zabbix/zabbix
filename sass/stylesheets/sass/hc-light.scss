@@ -408,7 +408,7 @@ a.btn-icon,
 				background-color: $ui-bg-selected-color !important;
 			}
 
-			&:focus + label {
+			&:not([readonly]):focus + label {
 				background-color: lighten($btn-bg-color, 10%) !important;
 				box-shadow: 0 0 0 2px $btn-focus-outline-color !important;
 				color: $white;
@@ -416,6 +416,11 @@ a.btn-icon,
 
 			&:checked[disabled] + label {
 				background-color: #d3d3d3 !important;
+			}
+
+			&[readonly]:checked + label {
+				background-color: #b2b4bb !important;
+				-webkit-text-fill-color: #292929;
 			}
 		}
 	}
