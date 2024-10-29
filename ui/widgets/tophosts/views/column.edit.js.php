@@ -337,21 +337,18 @@ window.tophosts_column_edit_form = new class {
 
 		aggregation_function_select.disabled = !data_type_item_value;
 
-		if (data_type_item_value) {
-			const numeric_aggregation_function = [<?= AGGREGATE_MIN ?>, <?= AGGREGATE_MAX ?>, <?= AGGREGATE_AVG ?>,
-				<?= AGGREGATE_SUM ?>
-			];
+		for (const value of [<?= AGGREGATE_MIN ?>, <?= AGGREGATE_MAX ?>, <?= AGGREGATE_AVG ?>, <?= AGGREGATE_SUM ?>]) {
+			const option = aggregation_function_select.getOptionByValue(value);
 
-			for (const option of aggregation_function_select.getOptions()) {
-				if (numeric_aggregation_function.includes(parseInt(option.value))) {
-					if (display_item_value_as_text || display_item_as_binary) {
-						option.hidden = true;
-						aggregation_function_select.value = <?= AGGREGATE_NONE ?>;
-					}
-					else {
-						option.hidden = false;
-					}
+			if (display_item_value_as_text || display_item_as_binary) {
+				option.hidden = true;
+
+				if (aggregation_function_select.value == value) {
+					aggregation_function_select.value = <?= AGGREGATE_NONE ?>;
 				}
+			}
+			else {
+				option.hidden = false;
 			}
 		}
 
