@@ -155,11 +155,11 @@ $form_list
 		(new CDiv([
 			(new CNumericBox('hour', $data['hour'], 2, false, false, false))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-				->setPad(2),
+				->padWithZeroes(2),
 			' : ',
 			(new CNumericBox('minute', $data['minute'], 2, false, false, false))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-				->setPad(2)
+				->padWithZeroes(2)
 		]))->addClass(ZBX_STYLE_FORM_FIELDS_INLINE),
 		'row_timeperiod_period_at_hours_minutes'
 	)

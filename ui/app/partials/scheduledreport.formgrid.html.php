@@ -110,11 +110,11 @@ $form_grid
 			(new CDiv([
 				(new CNumericBox('hours', $data['hours'], 2, !$data['allowed_edit'], false, false))
 					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-					->setPad(2),
+					->padWithZeroes(2),
 				' : ',
 				(new CNumericBox('minutes', $data['minutes'], 2, !$data['allowed_edit'], false, false))
 					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-					->setPad(2)
+					->padWithZeroes(2)
 			]))->addClass(ZBX_STYLE_FORM_FIELDS_INLINE)
 		)
 	]);

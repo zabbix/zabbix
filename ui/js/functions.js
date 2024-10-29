@@ -111,37 +111,21 @@ jQuery.escapeHtml = function(html) {
  *                                           with "0".
  * @param {bool}             allow_negative  If true, negative numbers are allowed; otherwise, negative numbers
  *                                           are converted to positive.
+ * @param {number}           min_length      Pad number with zeroes to maintain min length.
  */
-function normalizeNumericBox(input, allow_empty, allow_negative) {
+function normalizeNumericBox(input, {allow_empty, allow_negative, min_length}) {
 	let num = parseInt(input.value, 10);
 
 	if (isNaN(num)) {
-		num = allow_empty ? '' : 0;
+		input.value = allow_empty ? '' : '0'.repeat(min_length);
 	}
-	else if (num < 0 && !allow_negative) {
-		num = Math.abs(num);
+	else {
+		if (num < 0 && !allow_negative) {
+			num = -num;
+		}
+
+		input.value = num < 0 ? num : num.toString().padStart(min_length, '0');
 	}
-
-	input.value = num !== '' ? addPads(num, input) : '';
-}
-
-/**
- * Adds leading zeroes for the given number.
- *
- * @param {number|string}    num    The number to process and add leading zeroes.
- * @param {HTMLInputElement} input  The HTML input element containing the numeric value. Checks for "data-pads-length"
- *                                  attribute.
- *
- * @return {string}  To add leading zeroes, returned number has to be in string format.
- */
-function addPads(num, input) {
-	num = num.toString();
-
-	if (num >= 0 && input.hasAttribute('data-pads-length')) {
-		num = num.padStart(input.dataset.padsLength, '0')
-	}
-
-	return num;
 }
 
 /**
