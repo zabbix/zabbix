@@ -1936,7 +1936,7 @@ ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len, short *events)
 
 int	zbx_tcp_read_close_notify(zbx_socket_t *s, short *events)
 {
-	char	buf[1024];
+	char	buf[ZBX_STAT_BUF_LEN];
 
 	if (SUCCEED != zbx_tls_used(s))
 		return 0;
