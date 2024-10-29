@@ -236,7 +236,7 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 				if (ZBX_ASYNC_TASK_STOP != (state = zbx_async_poller_get_task_state_for_event(event_new)))
 					return state;
 
-				zabbix_log(LOG_LEVEL_DEBUG, "cannot receive close notify: %s", zbx_socket_strerror());
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot gracefully close connection: %s", zbx_socket_strerror());
 			}
 			ZBX_FALLTHROUGH;
 		case ZABBIX_AGENT_STEP_RECV:

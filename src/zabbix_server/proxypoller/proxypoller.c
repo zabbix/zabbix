@@ -326,7 +326,6 @@ static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vaul
 		}
 		else
 		{
-			zbx_tcp_read_close_notify(&s, NULL);
 			if (SUCCEED != zbx_json_open(s.buffer, &jp))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "invalid configuration data response received from proxy"
@@ -341,6 +340,12 @@ static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vaul
 				proxy->version_int = zbx_get_proxy_protocol_version_int(version_str);
 				proxy->lastaccess = time(NULL);
 				zbx_free(version_str);
+			}
+
+			if (ZBX_PROTO_ERROR == zbx_tcp_read_close_notify(&s, NULL))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot gracefully close connection to proxy: %s",
+						zbx_socket_strerror());
 			}
 		}
 	}
