@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/../../include/CAPITest.php';
  * @backup media_type, auditlog, config, profiles
  *
  * @onBefore deleteAuditlog
+ *
+ * @dataSource DynamicItemWidgets
  */
 class testPageReportsAudit extends CWebTest {
 
@@ -218,11 +220,10 @@ class testPageReportsAudit extends CWebTest {
 	 * Clear history and trends in item and check audit page.
 	 */
 	public function testPageReportsAudit_HistoryClear() {
-		CDataHelper::call('history.clear', [99106]);
-
 		// Check that audit info displayed correctly on frontend.
-		$clear_audit = 'Description: Dynamic widgets H3I1';
-		$this->checkAuditValues('Item', 99106, ['History clear' => $clear_audit]);
+		self::$id = CDataHelper::get('DynamicItemWidgets.itemids.Dynamic widgets H3I1');
+		CDataHelper::call('history.clear', [self::$id]);
+		$this->checkAuditValues('Item', self::$id, ['History clear' => 'Description: Dynamic widgets H3I1']);
 	}
 
 	/**
@@ -294,7 +295,7 @@ class testPageReportsAudit extends CWebTest {
 	 */
 	public static function getCheckFilterData() {
 		return [
-			// #0
+			// #0.
 			[
 				[
 					'fields' => [
@@ -304,7 +305,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 1
 				]
 			],
-			// #1
+			// #1.
 			[
 				[
 					'fields' => [
@@ -313,7 +314,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 4
 				]
 			],
-			// #2
+			// #2.
 			[
 				[
 					'fields' => [
@@ -323,7 +324,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 4
 				]
 			],
-			// #3
+			// #3.
 			[
 				[
 					'fields' => [
@@ -332,7 +333,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 12
 				]
 			],
-			// #4
+			// #4.
 			[
 				[
 					'fields' => [
@@ -342,7 +343,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 1
 				]
 			],
-			// #5
+			// #5.
 			[
 				[
 					'fields' => [
@@ -358,7 +359,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 5
 				]
 			],
-			// #6
+			// #6.
 			[
 				[
 					'fields' => [
@@ -374,7 +375,7 @@ class testPageReportsAudit extends CWebTest {
 					]
 				]
 			],
-			// #7
+			// #7.
 			[
 				[
 					'fields' => [
@@ -383,28 +384,28 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 13
 				]
 			],
-			// #8
+			// #8.
 			[
 				[
 					'fields' => [
-						'Resource ID' => 99106
+						'Resource ID' => 'replace'
 					],
 					'result_count' => 1
 				]
 			],
-			// #9
+			// #9.
 			[
 				[
 					'fields' => [
 						'Users' => 'Admin',
 						'Resource' => 'Item',
-						'Resource ID' => 99106,
+						'Resource ID' => 'replace',
 						'Actions' => 'History clear'
 					],
 					'result_count' => 1
 				]
 			],
-			// #10
+			// #10.
 			[
 				[
 					'fields' => [
@@ -413,7 +414,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// #11
+			// #11.
 			[
 				[
 					'fields' => [
@@ -423,7 +424,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// #12
+			// #12.
 			[
 				[
 					'fields' => [
@@ -432,7 +433,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// #13
+			// #13.
 			[
 				[
 					'fields' => [
@@ -441,7 +442,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// #14
+			// #14.
 			[
 				[
 					'fields' => [
@@ -450,7 +451,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// #15
+			// #15.
 			[
 				[
 					'fields' => [
@@ -459,7 +460,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// #16 IPv4 address
+			// #16 IPv4 address.
 			[
 				[
 					'fields' => [
@@ -468,7 +469,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 1
 				]
 			],
-			// #17 Another correct IP
+			// #17 Another correct IP.
 			[
 				[
 					'fields' => [
@@ -477,7 +478,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 4
 				]
 			],
-			// #18 Part of correct IP
+			// #18 Part of correct IP.
 			[
 				[
 					'fields' => [
@@ -486,7 +487,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// #19 IP is not in the list
+			// #19 IP is not in the list.
 			[
 				[
 					'fields' => [
@@ -495,7 +496,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// #20 IPv6 address
+			// #20 IPv6 address.
 			[
 				[
 					'fields' => [
@@ -504,7 +505,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 2
 				]
 			],
-			// #21 Domain address
+			// #21 Domain address.
 			[
 				[
 					'fields' => [
@@ -512,26 +513,25 @@ class testPageReportsAudit extends CWebTest {
 					],
 					'result_count' => 6
 				]
+			],
+			// #22.
+			[
+				[
+					'fields' => [
+						'Resource ID' => 'aaaaaaaa'
+					],
+					'no_data' => true
+				]
+			],
+			// #23.
+			[
+				[
+					'fields' => [
+						'Recordset ID' => 'aaaaaaaa'
+					],
+					'no_data' => true
+				]
 			]
-			// TODO: uncomment after ZBX-21097 fix
-			// #16
-//			[
-//				[
-//					'fields' => [
-//						'Resource ID' => 'aaaaaaaa'
-//					],
-//					'no_data' => true
-//				]
-//			],
-			// #17
-//			[
-//				[
-//					'fields' => [
-//						'Recordset ID' => 'aaaaaaaa'
-//					],
-//					'no_data' => true
-//				]
-//			]
 		];
 	}
 
@@ -560,6 +560,10 @@ class testPageReportsAudit extends CWebTest {
 	 * @depends testPageReportsAudit_DisabledEnabled
 	 */
 	public function testPageReportsAudit_CheckFilter($data) {
+		if (CTestArrayHelper::get($data['fields'], 'Resource ID') === 'replace') {
+			$data['fields']['Resource ID'] = CDataHelper::get('DynamicItemWidgets.itemids.Dynamic widgets H3I1');
+		}
+
 		$this->page->login()->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->one();

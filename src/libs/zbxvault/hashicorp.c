@@ -20,6 +20,7 @@
 #include "zbxtime.h"
 #include "zbxhttp.h"
 #include "zbxstr.h"
+#include "zbxnum.h"
 
 int	zbx_hashicorp_kvs_get(const char *vault_url, const char *prefix, const char *token, const char *ssl_cert_file,
 		const char *ssl_key_file, const char *config_source_ip, const char *config_ssl_ca_location,

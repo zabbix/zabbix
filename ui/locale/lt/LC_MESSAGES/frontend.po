@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-03-26 20:27+0000\n"
-"Last-Translator: Irmantas <translate@irmantas.tech>\n"
+"PO-Revision-Date: 2024-10-15 16:27+0000\n"
+"Last-Translator: Jovitas Sakalauskas <jovitas.sakalauskas@gmail.com>\n"
 "Language-Team: none\n"
 "Language: lt\n"
 "MIME-Version: 1.0\n"
@@ -392,7 +392,7 @@ msgstr "10 sekundžių"
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:116
 #: widgets/clock/includes/WidgetForm.php:116
 msgid "12-hour"
-msgstr ""
+msgstr "12 valandų"
 
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:115
 #: widgets/clock/includes/WidgetForm.php:115
@@ -474,7 +474,7 @@ msgstr ""
 #: app/controllers/CControllerPopupGeneric.php:422
 #: app/views/administration.userrole.edit.php:310
 msgid "API methods"
-msgstr ""
+msgstr "API metodai"
 
 #: app/controllers/CControllerAuditLogList.php:222
 msgid "API token"
@@ -539,7 +539,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:370
 msgid "Abscissa"
-msgstr ""
+msgstr "Abscisė"
 
 #: include/classes/core/ZBase.php:757 include/func.inc.php:1683
 msgid "Access denied"
@@ -552,7 +552,7 @@ msgstr "Prieiga uždrausta!"
 #: app/views/administration.user.edit.php:673
 #: app/views/administration.userrole.edit.php:296
 msgid "Access to API"
-msgstr ""
+msgstr "Prieiga prie API"
 
 #: app/views/administration.user.edit.php:525
 #: app/views/administration.userrole.edit.php:88
@@ -562,17 +562,17 @@ msgstr ""
 #: app/views/administration.user.edit.php:702
 #: app/views/administration.userrole.edit.php:345
 msgid "Access to actions"
-msgstr ""
+msgstr "Prieiga prie veiksmų"
 
 #: app/views/administration.user.edit.php:643
 #: app/views/administration.userrole.edit.php:244
 msgid "Access to modules"
-msgstr ""
+msgstr "Prieiga prie modulių"
 
 #: app/views/administration.user.edit.php:547
 #: app/views/administration.userrole.edit.php:156
 msgid "Access to services"
-msgstr ""
+msgstr "Prieiga prie paslaugų"
 
 # There is no acronym for this word in LT language we're writing all word "Pripažinimas"
 #: include/actions.inc.php:165 include/classes/screens/CScreenProblem.php:1181
@@ -585,7 +585,7 @@ msgstr "Pripažinimas"
 
 #: include/classes/helpers/CRoleHelper.php:545
 msgid "Acknowledge problems"
-msgstr ""
+msgstr "Pripažinti problemas"
 
 #: app/partials/monitoring.problem.filter.php:147
 #: app/views/popup.condition.edit.php:784 include/actions.inc.php:1533
@@ -605,7 +605,7 @@ msgstr ""
 #: app/partials/monitoring.problem.filter.php:142
 #: widgets/problems/views/widget.edit.php:105
 msgid "Acknowledgement status"
-msgstr ""
+msgstr "Pripažinimo būsena"
 
 #: app/controllers/CControllerAuditLogList.php:221
 #: app/partials/action.operations.php:32 app/partials/action.operations.php:35
@@ -681,7 +681,7 @@ msgstr "Veiksmas"
 #: widgets/actionlog/views/widget.view.php:38
 msgctxt "compact table header"
 msgid "Action"
-msgstr ""
+msgstr "Veiksmas"
 
 #: include/classes/api/services/CAction.php:2824
 #, c-format
