@@ -677,9 +677,8 @@ function convertUnits(array $options): string {
  *     'units' =>               (string)    Units to base the conversion on. Default: ''.
  *     'convert' =>             (int)       Default: ITEM_CONVERT_WITH_UNITS. Set to ITEM_CONVERT_NO_UNITS to
  *                                          force-convert a value with empty units.
- *     'power' =>               (int)       Convert to the specified power of "unit_base" (0 => '', 1 => K, 2 => M, ..).
+ *     'power' =>               (int)       Convert to the specified power of units. (0 => '', 1 => K, 2 => M, ...).
  *                                          By default, the power will be calculated automatically.
- *     'unit_base' =>           (string)    1000 or 1024. By default, will only use 1024 for "B" and "Bps" units.
  *     'ignore_milliseconds' => (bool)      Ignore milliseconds in time conversion ("s" units).
  *     'precision' =>           (int)       Max number of significant digits to take into account.
  *                                          Default: ZBX_FLOAT_DIG.
@@ -702,7 +701,6 @@ function convertUnitsRaw(array $options): array {
 		'units' => '',
 		'convert' => ITEM_CONVERT_WITH_UNITS,
 		'power' => null,
-		'unit_base' => null,
 		'ignore_milliseconds' => false,
 		'precision' => ZBX_FLOAT_DIG,
 		'decimals' => null,
@@ -742,11 +740,11 @@ function convertUnitsRaw(array $options): array {
 	if ($units === 's') {
 		if ($options['decimals'] !== null && $options['decimals'] != 0) {
 			return [
-				'value' => convertUnitSWithDecimals($value, $options['ignore_milliseconds'], $options['decimals'],
+				'value' => convertUnitsSWithDecimals($value, $options['ignore_milliseconds'], $options['decimals'],
 					$options['decimals_exact']
 				),
 				'units' => '',
-				'is_mapped' => false
+				'is_numeric' => false
 			];
 		}
 
@@ -783,11 +781,7 @@ function convertUnitsRaw(array $options): array {
 		];
 	}
 
-	$unit_base = $options['unit_base'];
-
-	if ($unit_base != 1000 && $unit_base != ZBX_KIBIBYTE) {
-		$unit_base = isBinaryUnits($units) ? ZBX_KIBIBYTE : 1000;
-	}
+	$unit_base = isBinaryUnits($units) ? ZBX_KIBIBYTE : 1000;
 
 	if ($options['power'] === null) {
 		$result = null;
