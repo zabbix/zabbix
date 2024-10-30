@@ -736,8 +736,11 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 						zbx_problem_get_actions(ack, ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
 								ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE |
 								ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_MESSAGE |
-								ZBX_PROBLEM_UPDATE_SEVERITY | ZBX_PROBLEM_UPDATE_SUPPRESS
-								| ZBX_PROBLEM_UPDATE_UNSUPPRESS, tz, &replace_to);
+								ZBX_PROBLEM_UPDATE_SEVERITY |
+								ZBX_PROBLEM_UPDATE_SUPPRESS |
+								ZBX_PROBLEM_UPDATE_UNSUPPRESS |
+								ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE |
+								ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM, tz, &replace_to);
 					}
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_UPDATE_STATUS))
