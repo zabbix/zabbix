@@ -93,7 +93,7 @@ class TopHostsWidget {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'columns.0.decimal_places',
-										'value' =>  4
+										'value' => 4
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,

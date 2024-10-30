@@ -305,7 +305,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$this->assertEquals($hidden_labels, array_values($column_form->getLabels()->filter(CElementFilter::NOT_VISIBLE)->asText()));
 
 		$expanded_labels = ['Aggregation function', 'History data'];
-		$column_form->highlight()->fill(['Advanced configuration' => true]);
+		$column_form->fill(['Advanced configuration' => true]);
 		$this->assertEquals(array_merge($visible_labels, $expanded_labels),
 				array_values($column_form->getLabels()->filter(CElementFilter::VISIBLE)->asText())
 		);
