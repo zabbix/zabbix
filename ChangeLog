@@ -1,9 +1,23 @@
 Changes for 7.2.0alpha2
 
 New features:
+.........T [ZBXNEXT-9557] added Website certificate by Zabbix agent 2 active template (abakaldin)
+.........T [ZBXNEXT-9549] added active agent templates for LAMP stack monitoring (abakaldin)
+.........T [ZBXNEXT-9382] added Nutanix template (akotsegubov)
+.........T [ZBXNEXT-9058] updated VMware Hypervisor template for ability to work as a standalone template (akotsegubov)
+........S. [ZBXNEXT-9532] updated max supported TimescaleDB version to 2.17 (mprihodko)
 .......PS. [ZBXNEXT-9238] increased PostgreSQL maximum supported version to 17 (mprihodko)
 
 Bug fixes:
+A.F....... [ZBX-21503] prevented creation of audit logs for Media type objects on updates without actual changes (jfreibergs)
+..F....... [ZBX-24633] fixed code error when viewing graph and trigger lists with discovered objects set to expire (jfreibergs)
+..F....... [ZBX-25139] prevented sending of empty query_fields, headers or parameters for item testing (jfreibergs)
+A......... [ZBX-24846] fixed checking for orphaned maintenances when deleting a host or hostgroup (wczerneha)
+..F....... [ZBX-23676] fixed incorrect displaying of rebranded sidebar logotypes (averza)
+..F....... [ZBX-25091] fixed colors of selected readonly radio buttons (rgontarski)
+.........T [ZBX-25392] fixed description in Microsoft 365 reports by HTTP template (abrosimovs)
+.......PS. [ZBX-24698] fixed loading of SSL certificate and key in poller process for HTTP agent checks (Andris)
+..F....... [ZBX-25393] fixed unwanted page scrolling when editing text in multiline text fields (averza)
 ........S. [ZBX-24582] truncated error message when testing item and there is value type mismatch (rtrizna)
 
 --------------------------------------------------------------------------------
@@ -30,8 +44,25 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.6rc1
 
 New features:
+.........T [ZBXNEXT-9557] added Website certificate by Zabbix agent 2 active template (abakaldin)
+.........T [ZBXNEXT-9549] added active agent templates for LAMP stack monitoring (abakaldin)
+.........T [ZBXNEXT-9382] added Nutanix template (akotsegubov)
+........S. [ZBXNEXT-9532] updated max supported TimescaleDB version to 2.17 (mprihodko)
+.......PS. [ZBXNEXT-9238] increased PostgreSQL maximum supported version to 17 (mprihodko)
+.........T [ZBXNEXT-9058] updated VMware Hypervisor template for ability to work as a standalone template (akotsegubov)
 
 Bug fixes:
+A.F....... [ZBX-24528] prevented SQL errors being displayed to non-authorized users (gcalenko, jfreibergs)
+A.F....... [ZBX-21503] prevented creation of audit logs for Media type objects on updates without actual changes (jfreibergs)
+..F....... [ZBX-24633] fixed code error when viewing graph and trigger lists with discovered objects set to expire (jfreibergs)
+..F....... [ZBX-25139] prevented sending of empty query_fields, headers or parameters for item testing (jfreibergs)
+A......... [ZBX-24846] fixed checking for orphaned maintenances when deleting a host or hostgroup (wczerneha)
+..F....... [ZBX-23676] fixed incorrect displaying of rebranded sidebar logotypes (averza)
+..F....... [ZBX-25091] fixed colors of selected readonly radio buttons (rgontarski)
+.........T [ZBX-25392] fixed description in Microsoft 365 reports by HTTP template (abrosimovs)
+.......PS. [ZBX-24698] fixed loading of SSL certificate and key in poller process for HTTP agent checks (Andris)
+........S. [ZBX-24582] truncated error message when testing item and there is value type mismatch (rtrizna)
+..F....... [ZBX-25393] fixed unwanted page scrolling when editing text in multiline text fields (averza)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.5
@@ -1168,6 +1199,7 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.20rc1
 
 New features:
+........S. [ZBXNEXT-9532] updated max supported TimescaleDB version to 2.17 (mprihodko)
 .......PS. [ZBXNEXT-9238] increased PostgreSQL maximum supported version to 17 (mprihodko)
 
 Bug fixes:
@@ -3109,8 +3141,20 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.36rc1
 
 New features:
+.........T [ZBXNEXT-9382] added Nutanix template (akotsegubov)
+.........T [ZBXNEXT-9058] updated VMware Hypervisor template for ability to work as a standalone template (akotsegubov)
+........S. [ZBXNEXT-9532] updated max supported TimescaleDB version to 2.17 (mprihodko)
+.......PS. [ZBXNEXT-9238] increased PostgreSQL maximum supported version to 17 (mprihodko)
 
 Bug fixes:
+A.F....... [ZBX-24528] prevented SQL errors being displayed to non-authorized users (gcalenko, jfreibergs)
+A.F....... [ZBX-21503] prevented creation of audit logs for Media type objects on updates without actual changes (jfreibergs)
+..F....... [ZBX-24633] fixed code error when viewing graph and trigger lists with discovered objects set to expire (jfreibergs)
+A......... [ZBX-24846] fixed checking for orphaned maintenances when deleting a host or hostgroup (wczerneha)
+..F....... [ZBX-25091] fixed colors of selected readonly radio buttons (rgontarski)
+.........T [ZBX-25392] fixed description in Microsoft 365 reports by HTTP template (abrosimovs)
+..F....... [ZBX-20848] fixed multiselect not suggesting just removed record (apoga, averza)
+..F....... [ZBX-25393] fixed unwanted page scrolling when editing text in multiline text fields (averza)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.35

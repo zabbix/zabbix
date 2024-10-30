@@ -903,11 +903,11 @@ class testProxyConfSync extends CIntegrationTest
 		$log = file_get_contents(self::getLogPath(self::COMPONENT_PROXY));
 		$data = explode("\n", $log);
 
-		$sync_lines = preg_grep('/dcsync_log_stats.*\([0-9]+\/[0-9]+\/[0-9]+\)\.$/', $data);
+		$sync_lines = preg_grep('/zbx_dc_sync_configuration.*\([0-9]+\/[0-9]+\/[0-9]+\)\.$/', $data);
 
 		$sync_lines1 = preg_replace(
 			[
-				"/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+ dcsync_log_stats\(\) /",
+				"/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+ zbx_dc_sync_configuration\(\) /",
 				"/\s+/",
 				"/-?[0-9]+bytes/",
 				"/:sql:[0-9]+\.[0-9]+sync:[0-9]+\.[0-9]+sec/",
