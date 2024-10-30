@@ -1180,7 +1180,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	char					*error = NULL;
 	zbx_ipc_client_t			*client;
 	zbx_ipc_message_t			*message;
-	double					time_stat, time_idle = 0, time_flush, time_vps_update;
+	double					time_stat, time_idle = 0, time_flush, time_vps_update, time_trim;
 	zbx_timespec_t				timeout = {PP_MANAGER_DELAY_SEC, PP_MANAGER_DELAY_NS};
 	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
 	int					server_num = ((zbx_thread_args_t *)args)->info.server_num,
@@ -1232,6 +1232,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	time_stat = zbx_time();
 	time_flush = time_stat;
 	time_vps_update = time_stat;
+	time_trim = time_stat;
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
@@ -1341,6 +1342,15 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 		{
 			zbx_vps_monitor_add_collected(0);
 			time_vps_update = sec;
+		}
+
+		/* release memory in case of peak periods */
+		if (SEC_PER_DAY <= sec - time_trim)
+		{
+#ifdef	HAVE_MALLOC_TRIM
+			malloc_trim(128 * ZBX_MEBIBYTE);
+#endif
+			time_trim = sec;
 		}
 	}
 out:
