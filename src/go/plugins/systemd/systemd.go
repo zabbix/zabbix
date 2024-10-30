@@ -66,7 +66,7 @@ type unitJson struct {
 	JobType       string `json:"{#UNIT.JOBTYPE}"`
 	JobPath       string `json:"{#UNIT.JOBPATH}"`
 	UnitFileState string `json:"{#UNIT.UNITFILESTATE}"`
-	ServiceType   string `json:"{#UNIT.SERVICETYPE}"`
+	ServiceType   string `json:"{#UNIT.SERVICETYPE}"` //nolint:tagliatelle
 }
 
 type state struct {
@@ -197,6 +197,20 @@ func (p *Plugin) get(params []string, conn *dbus.Conn) (interface{}, error) {
 	return string(val), nil
 }
 
+func (p *Plugin) getServiceType(name string, conn *dbus.Conn) (string, error) {
+	serviceType, err := p.info([]string{name, "Type", "Service"}, conn)
+	if err != nil {
+		return "", errs.Wrapf(err, "failed to retrieve unit info service type for %s", name)
+	}
+
+	typeString, ok := serviceType.(string)
+	if !ok {
+		return "", errs.Wrapf(err, "unit service type is not string for %s", name)
+	}
+
+	return typeString, nil
+}
+
 func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error) {
 	var ext string
 
@@ -250,23 +264,15 @@ func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error
 			continue
 		}
 
-		ServiceType, err := p.info([]string{u.Name, "Type", "Service"}, conn)
+		serviceType, err := p.getServiceType(u.Name, conn)
 		if err != nil {
-			p.Debugf("Failed to retrieve unit service type for %s, err:", u.Name, err.Error())
-			continue
-		}
+			p.Debugf("Unit service type not available %s", err.Error())
 
-		var servicetype string
-		switch reflect.TypeOf(ServiceType).Kind() {
-		case reflect.String:
-			servicetype = ServiceType.(string)
-		default:
-			p.Debugf("Unit service type is not string for %s", u.Name)
 			continue
 		}
 		array = append(array, unitJson{
 			u.Name, u.Description, u.LoadState, u.ActiveState,
-			u.SubState, u.Followed, u.Path, u.JobID, u.JobType, u.JobPath, state, servicetype,
+			u.SubState, u.Followed, u.Path, u.JobID, u.JobType, u.JobPath, state, serviceType,
 		})
 	}
 
@@ -281,21 +287,15 @@ func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error
 
 		unitPath := "/org/freedesktop/systemd1/unit/" + getName(basePath)
 
-		ServiceType, err := p.info([]string{f.Name, "Type", "Service"}, conn)
-		if err != nil {
-			p.Debugf("Failed to retrieve unit service type for %s, err:", f.Name, err.Error())
+		serviceType, errst := p.getServiceType(f.Name, conn)
+		if errst != nil {
+			p.Debugf("Unit service type not available %s", errst.Error())
+
 			continue
 		}
 
-		var servicetype string
-		switch reflect.TypeOf(ServiceType).Kind() {
-		case reflect.String:
-			servicetype = ServiceType.(string)
-		default:
-			p.Debugf("Unit service type is not string for %s", f.Name)
-			continue
-		}
-		array = append(array, unitJson{basePath, "", "", "inactive", "", "", unitPath, 0, "", "", f.EnablementState, servicetype})
+		array = append(array, unitJson{basePath, "", "", "inactive", "", "", unitPath, 0, "", "",
+			f.EnablementState, serviceType})
 	}
 
 	jsonArray, err := json.Marshal(array)
