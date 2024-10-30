@@ -475,6 +475,9 @@ class testPageMonitoringLatestData extends CWebTest {
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$table = $this->getTable()->waitUntilPresent();
 
+		// Expand filter if it is collapsed.
+		CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_RIGHT)->expand();
+
 		// Reset filter in case if some filtering remained before ongoing test case.
 		$this->query('button:Reset')->one()->click();
 		$table->waitUntilReloaded();
