@@ -36,7 +36,10 @@ import (
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-const netErrCertAuthorityInvalid = "net::ERR_CERT_AUTHORITY_INVALID"
+const (
+	netErrCertAuthorityInvalid = "net::ERR_CERT_AUTHORITY_INVALID"
+	ctxErrDeadlineExceeded     = "context deadline exceeded"
+)
 
 type requestBody struct {
 	URL        string            `json:"url"`
@@ -279,8 +282,21 @@ func runCDP(
 				WithPaperWidth(pixels2inches(req.size.width)).
 				WithPaperHeight(pixels2inches(req.size.height)).
 				Do(timeoutContext)
+			if err != nil {
+				if errors.Is(err, context.DeadlineExceeded) {
+					return errs.Wrapf(
+						err,
+						"timeout (%ds) reached while formatting dashboard as PDF, "+
+							"it is configurable in Zabbix web service config file "+
+							"('Timeout' option)",
+						options.Timeout,
+					)
+				}
 
-			return err
+				return errs.Wrap(err, "failed to format dashboard as PDF")
+			}
+
+			return nil
 		}),
 	})
 
@@ -310,7 +326,7 @@ func prepareDashboard(url string) chromedp.ActionFunc {
 	return func(ctx context.Context) error {
 		_, _, _, err := page.Navigate(url).Do(ctx)
 		if err != nil {
-			return err
+			return errs.Wrapf(err, "failed to navigate to dashboard, url: %q", url)
 		}
 
 		return waitForDashboardReady(ctx, url)
