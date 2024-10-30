@@ -23,8 +23,8 @@ class CSvgGraph extends CSvg {
 	public const SVG_GRAPH_DEFAULT_LINE_WIDTH = 1;
 
 	public const SVG_GRAPH_X_AXIS_LABEL_MARGIN = 5;
-	public const SVG_GRAPH_Y_AXIS_LEFT_LABEL_MARGIN = 5;
-	public const SVG_GRAPH_Y_AXIS_RIGHT_LABEL_MARGIN = 12;
+	public const SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER = 10;
+	public const SVG_GRAPH_Y_AXIS_LABEL_MARGIN_INNER = 5;
 
 	private $canvas_x;
 	private $canvas_y;
@@ -98,7 +98,6 @@ class CSvgGraph extends CSvg {
 	private $left_y_max_calculated;
 	private $left_y_interval;
 	private $left_y_units;
-	private $left_y_is_binary;
 	private $left_y_power;
 	private $left_y_empty = true;
 	private $left_y_zero;
@@ -110,7 +109,6 @@ class CSvgGraph extends CSvg {
 	private $right_y_max_calculated;
 	private $right_y_interval;
 	private $right_y_units;
-	private $right_y_is_binary;
 	private $right_y_power;
 	private $right_y_empty = true;
 	private $right_y_zero;
@@ -773,12 +771,10 @@ class CSvgGraph extends CSvg {
 			$this->left_y_max = $this->max_value_left ?: 1;
 		}
 
-		$this->left_y_is_binary = isBinaryUnits($this->left_y_units);
-
 		$calc_power = $this->left_y_units === '' || $this->left_y_units[0] !== '!';
 
-		$result = calculateGraphScaleExtremes($this->left_y_min, $this->left_y_max, $this->left_y_is_binary,
-			$calc_power, $this->left_y_min_calculated, $this->left_y_max_calculated, $rows_min, $rows_max
+		$result = calculateGraphScaleExtremes($this->left_y_min, $this->left_y_max, $this->left_y_units, $calc_power,
+			$this->left_y_min_calculated, $this->left_y_max_calculated, $rows_min, $rows_max
 		);
 
 		[
@@ -805,12 +801,10 @@ class CSvgGraph extends CSvg {
 			$this->right_y_max = $this->max_value_right ?: 1;
 		}
 
-		$this->right_y_is_binary = isBinaryUnits($this->right_y_units);
-
 		$calc_power = $this->right_y_units === '' || $this->right_y_units[0] !== '!';
 
-		$result = calculateGraphScaleExtremes($this->right_y_min, $this->right_y_max, $this->right_y_is_binary,
-			$calc_power, $this->right_y_min_calculated, $this->right_y_max_calculated, $rows_min, $rows_max
+		$result = calculateGraphScaleExtremes($this->right_y_min, $this->right_y_max, $this->right_y_units, $calc_power,
+			$this->right_y_min_calculated, $this->right_y_max_calculated, $rows_min, $rows_max
 		);
 
 		[
@@ -821,15 +815,19 @@ class CSvgGraph extends CSvg {
 		] = $result;
 
 		// Define canvas dimensions and offsets, except canvas height and bottom offset.
-
-		$approx_width = 10;
-
 		if ($this->show_left_y_axis) {
 			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_LEFT, $this->left_y_empty);
 
 			if ($values) {
-				$offset_left = max($this->offset_left, max(array_map('strlen', $values)) * $approx_width);
-				$this->offset_left = (int) min($offset_left, $this->max_yaxis_width);
+				$approx_width = 0;
+
+				foreach ($values as $value) {
+					$approx_width = max($approx_width, imageTextSize(11, 0, $value)['width']);
+				}
+
+				$this->offset_left = min($this->max_yaxis_width,
+					max($this->offset_left, self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER + $approx_width)
+				);
 			}
 		}
 
@@ -837,9 +835,19 @@ class CSvgGraph extends CSvg {
 			$values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT, $this->right_y_empty);
 
 			if ($values) {
-				$offset_right = max($this->offset_right, max(array_map('strlen', $values)) * $approx_width);
-				$offset_right += self::SVG_GRAPH_Y_AXIS_RIGHT_LABEL_MARGIN;
-				$this->offset_right = (int) min($offset_right, $this->max_yaxis_width);
+				if (array_key_exists(0, $values)) {
+					unset($values[0]);
+				}
+
+				$approx_width = 0;
+
+				foreach ($values as $value) {
+					$approx_width = max($approx_width, imageTextSize(11, 0, $value)['width']);
+				}
+
+				$this->offset_right = min($this->max_yaxis_width,
+					max($this->offset_right, self::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_OUTER + $approx_width)
+				);
 			}
 		}
 
@@ -1198,7 +1206,7 @@ class CSvgGraph extends CSvg {
 		if ($this->show_right_y_axis) {
 			$grid_values = $this->getValuesGridWithPosition(GRAPH_YAXIS_SIDE_RIGHT, $this->right_y_empty);
 
-			// Do not draw label at the bottom of right Y axis to avoid label averlapping with horizontal axis arrow.
+			// Do not draw label at the bottom of right Y axis to avoid label overlapping with horizontal axis arrow.
 			if (array_key_exists(0, $grid_values)) {
 				unset($grid_values[0]);
 			}
@@ -1619,7 +1627,6 @@ class CSvgGraph extends CSvg {
 		$max_calculated = true;
 		$interval = 1;
 		$units = '';
-		$is_binary = false;
 		$power = 0;
 
 		if (!$empty_set) {
@@ -1630,7 +1637,6 @@ class CSvgGraph extends CSvg {
 				$max_calculated = $this->left_y_max_calculated;
 				$interval = $this->left_y_interval;
 				$units = $this->left_y_units;
-				$is_binary = $this->left_y_is_binary;
 				$power = $this->left_y_power;
 			}
 			elseif ($side === GRAPH_YAXIS_SIDE_RIGHT) {
@@ -1640,13 +1646,12 @@ class CSvgGraph extends CSvg {
 				$max_calculated = $this->right_y_max_calculated;
 				$interval = $this->right_y_interval;
 				$units = $this->right_y_units;
-				$is_binary = $this->right_y_is_binary;
 				$power = $this->right_y_power;
 			}
 		}
 
 		$relative_values = calculateGraphScaleValues($min, $max, $min_calculated, $max_calculated, $interval, $units,
-			$is_binary, $power, 14
+			$power, 14
 		);
 
 		$absolute_values = [];

@@ -1618,18 +1618,20 @@ class CHost extends CHostGeneral {
 	 */
 	private static function checkMaintenances(array $hostids): void {
 		$maintenance = DBfetch(DBselect(
-			'SELECT m.maintenanceid,m.name'.
-			' FROM maintenances m'.
-			' WHERE NOT EXISTS ('.
-				'SELECT NULL'.
-				' FROM maintenances_hosts mh'.
-				' WHERE m.maintenanceid=mh.maintenanceid'.
-					' AND '.dbConditionId('mh.hostid', $hostids, true).
-			')'.
+			'SELECT DISTINCT mh.maintenanceid,m.name'.
+			' FROM maintenances_hosts mh'.
+			' JOIN maintenances m ON mh.maintenanceid=m.maintenanceid'.
+			' WHERE '.dbConditionId('mh.hostid', $hostids).
+				' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM maintenances_hosts mh1'.
+					' WHERE mh.maintenanceid=mh1.maintenanceid'.
+						' AND '.dbConditionId('mh1.hostid', $hostids, true).
+				')'.
 				' AND NOT EXISTS ('.
 					'SELECT NULL'.
 					' FROM maintenances_groups mg'.
-					' WHERE m.maintenanceid=mg.maintenanceid'.
+					' WHERE mh.maintenanceid=mg.maintenanceid'.
 				')'
 		, 1));
 
