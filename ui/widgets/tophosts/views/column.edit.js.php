@@ -210,10 +210,6 @@ window.tophosts_column_edit_form = new class {
 		let display_value_as;
 
 		switch (type) {
-			case <?= ITEM_VALUE_TYPE_FLOAT ?>:
-			case <?= ITEM_VALUE_TYPE_UINT64 ?>:
-				display_value_as = <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>;
-				break;
 			case <?= ITEM_VALUE_TYPE_STR ?>:
 			case <?= ITEM_VALUE_TYPE_LOG ?>:
 			case <?= ITEM_VALUE_TYPE_TEXT ?>:
@@ -221,6 +217,9 @@ window.tophosts_column_edit_form = new class {
 				break;
 			case <?= ITEM_VALUE_TYPE_BINARY ?>:
 				display_value_as = <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY ?>;
+				break;
+			default:
+				display_value_as = <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>;
 				break;
 		}
 
