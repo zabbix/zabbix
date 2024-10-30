@@ -222,8 +222,8 @@ $form_grid->addItem([
 // Highlights.
 $highlight_header_row = [
 	'',
-	(new CColHeader(_('Regular expression')))->setWidth('100%'),
-	_('Action')
+	_('Regular expression'),
+	(new CColHeader(''))->setWidth('100%')
 ];
 
 $highlights = (new CDiv([
