@@ -232,7 +232,7 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 
 			return ZBX_ASYNC_TASK_READ;
 		case ZABBIX_AGENT_STEP_RECV_CLOSE:
-			if (SUCCEED != zbx_tcp_read_close_notify(&agent_context->s, 0, &event_new))
+			if (ZBX_PROTO_ERROR == zbx_tcp_read_close_notify(&agent_context->s, 0, &event_new))
 			{
 				if (ZBX_ASYNC_TASK_STOP != (state = zbx_async_poller_get_task_state_for_event(event_new)))
 					return state;
