@@ -2921,6 +2921,8 @@ int	zbx_tls_used(const zbx_socket_t *s)
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (NULL != s->tls_ctx)
 		return SUCCEED;
+#else
+	ZBX_UNUSED(s);
 #endif
 	return FAIL;
 }
