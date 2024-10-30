@@ -54,13 +54,11 @@ class CNumericBox extends CInput {
 	}
 
 	public function toString($destroy = true) {
-		if ($this->min_length > 0) {
-			$this->onChange('normalizeNumericBox(this, '.json_encode([
-					'allow_empty' => $this->allow_empty,
-					'allow_negative' => $this->allow_negative,
-					'min_length' => $this->min_length
-				]).');');
-		}
+		$this->onChange('normalizeNumericBox(this, '.json_encode([
+			'allow_empty' => $this->allow_empty,
+			'allow_negative' => $this->allow_negative,
+			'min_length' => $this->min_length
+		]).');');
 
 		return parent::toString($destroy);
 	}
