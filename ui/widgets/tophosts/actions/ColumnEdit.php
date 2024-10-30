@@ -116,7 +116,7 @@ class ColumnEdit extends CController {
 				]
 			] + $input;
 
-			$data['time_period_field'] = (new CWidgetFieldTimePeriod('time_period', 'Time period'))
+			$data['time_period_field'] = (new CWidgetFieldTimePeriod('time_period', _('Time period')))
 				->setDefaultPeriod(['from' => 'now-1h', 'to' => 'now'])
 				->setInType(CWidgetsData::DATA_TYPE_TIME_PERIOD)
 				->acceptDashboard()
