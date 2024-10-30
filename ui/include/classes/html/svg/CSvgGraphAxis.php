@@ -175,8 +175,8 @@ class CSvgGraphAxis extends CSvgGroup {
 		else {
 			$axis = 'y';
 			$x = ($this->type == GRAPH_YAXIS_SIDE_RIGHT)
-				? CSvgGraph::SVG_GRAPH_Y_AXIS_RIGHT_LABEL_MARGIN
-				: $this->width - CSvgGraph::SVG_GRAPH_Y_AXIS_LEFT_LABEL_MARGIN;
+				? CSvgGraph::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_INNER
+				: $this->width - CSvgGraph::SVG_GRAPH_Y_AXIS_LABEL_MARGIN_INNER;
 		}
 
 		foreach ($this->labels as $pos => $label) {

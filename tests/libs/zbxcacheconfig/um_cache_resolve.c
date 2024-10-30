@@ -59,9 +59,9 @@ void	zbx_mock_test_entry(void **state)
 	um_mock_cache_init(&mock_cache0, -1);
 	um_mock_cache_init(&mock_cache, zbx_mock_get_parameter_handle("in.config"));
 
-	zbx_dbsync_init(&gmacros, ZBX_DBSYNC_UPDATE);
-	zbx_dbsync_init(&hmacros, ZBX_DBSYNC_UPDATE);
-	zbx_dbsync_init(&htmpls, ZBX_DBSYNC_UPDATE);
+	zbx_dbsync_init(&gmacros, NULL, ZBX_DBSYNC_UPDATE);
+	zbx_dbsync_init(&hmacros, NULL, ZBX_DBSYNC_UPDATE);
+	zbx_dbsync_init(&htmpls, NULL, ZBX_DBSYNC_UPDATE);
 
 	um_mock_cache_diff(&mock_cache0, &mock_cache, &gmacros, &hmacros, &htmpls);
 	cache = um_cache_create();

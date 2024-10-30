@@ -39,8 +39,10 @@
 		var old_value = $textarea.val(),
 			new_value = old_value
 				.replace(/\r?\n+$/g, '')
-				.replace(/\r?\n/g, ' '),
-			scroll_pos = $(window).scrollTop();
+				.replace(/\r?\n/g, ' ');
+
+		const scrollable = getScrollableParent($textarea[0]);
+		const scrollable_pos = scrollable !== null ? scrollable.scrollTop : 0;
 
 		if (old_value !== new_value) {
 			var pos = $textarea[0].selectionStart;
@@ -57,7 +59,21 @@
 		// Fire event.
 		$textarea.trigger('resize');
 
-		$(window).scrollTop(scroll_pos);
+		if (scrollable !== null) {
+			scrollable.scrollTop = scrollable_pos;
+		}
+	}
+
+	function getScrollableParent(element) {
+		while (element !== null) {
+			if (['auto', 'scroll'].includes(getComputedStyle(element).overflowY)) {
+				return element;
+			}
+
+			element = element.parentElement;
+		}
+
+		return null;
 	}
 
 	var methods = {

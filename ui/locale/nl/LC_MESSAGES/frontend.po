@@ -5,8 +5,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-08-26 09:02+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2024-10-11 20:12+0000\n"
+"Last-Translator: Peter Beersmans <peterbeersmans1966@gmail.com>\n"
 "Language-Team: NL\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -2871,8 +2871,8 @@ msgstr "Kan dienst \"%1$s\": %2$s niet verwijderen."
 #: app/controllers/CControllerTemplateDelete.php:143
 msgid "Cannot delete template"
 msgid_plural "Cannot delete templates"
-msgstr[0] "Kan template niet verwijderen"
-msgstr[1] "Kan sjabloonen niet verwijderen"
+msgstr[0] "Kan sjabloon niet verwijderen"
+msgstr[1] "Kan sjablonen niet verwijderen"
 
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
@@ -2946,8 +2946,8 @@ msgstr[1] "Kan gebruikersrollen niet verwijderen"
 #: httpconf.php:178 httpconf.php:418
 msgid "Cannot delete web scenario"
 msgid_plural "Cannot delete web scenarios"
-msgstr[0] "Kan web scenario niet verwijderen"
-msgstr[1] "Kan web scenarios niet verwijderen"
+msgstr[0] "Kan webscenario niet verwijderen"
+msgstr[1] "Kan webscenario's niet verwijderen"
 
 #: app/controllers/CControllerTokenDisable.php:66
 msgid "Cannot disable API token"

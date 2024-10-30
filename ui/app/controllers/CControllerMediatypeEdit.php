@@ -53,7 +53,7 @@ class CControllerMediatypeEdit extends CController {
 		if ($this->hasInput('mediatypeid')) {
 			$mediatypes = API::Mediatype()->get([
 				'output' => ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email',
-					'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_security', 'smtp_verify_peer',
+					'exec_path', 'gsm_modem', 'username', 'status', 'smtp_security', 'smtp_verify_peer',
 					'smtp_verify_host', 'smtp_authentication', 'maxsessions', 'maxattempts', 'attempt_interval',
 					'message_format', 'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
 					'event_menu_name', 'parameters', 'description', 'provider'
@@ -95,7 +95,7 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_username' => '',
 			'passwd' => '',
 			'status' => MEDIA_TYPE_STATUS_ACTIVE,
-			'change_passwd' => true,
+			'display_password_input' => true,
 			'maxsessions' => $db_defaults['maxsessions'],
 			'maxattempts' => $db_defaults['maxattempts'],
 			'attempt_interval' => $db_defaults['attempt_interval'],
@@ -123,12 +123,12 @@ class CControllerMediatypeEdit extends CController {
 
 		if ($this->hasInput('mediatypeid')) {
 			$data = array_merge($data, $this->mediatype);
-		}
 
-		if ($this->hasInput('mediatypeid')) {
 			switch ($data['type']) {
 				case MEDIA_TYPE_EMAIL:
 					$data['smtp_username'] = $this->mediatype['username'];
+					$data['display_password_input'] =
+						$this->mediatype['smtp_authentication'] != SMTP_AUTHENTICATION_NORMAL;
 					break;
 
 				case MEDIA_TYPE_EXEC:
@@ -153,8 +153,6 @@ class CControllerMediatypeEdit extends CController {
 					break;
 			}
 		}
-
-		$data['change_passwd'] = $data['passwd'] !== '';
 
 		if ($message_templates) {
 			CArrayHelper::sort($message_templates, ['recovery']);

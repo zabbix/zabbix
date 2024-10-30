@@ -167,25 +167,13 @@ static int	substitute_macros_args(zbx_token_search_t search, char **data, char *
 
 			if (SUCCEED < ret) continue; /* resolver did everything */
 
-			if (ZBX_TOKEN_FUNC_MACRO == p.token.type && NULL != replace_to)
+			if ((ZBX_TOKEN_FUNC_MACRO == p.token.type || ZBX_TOKEN_USER_FUNC_MACRO == p.token.type) &&
+					NULL != replace_to)
 			{
 				if (SUCCEED != (ret = zbx_calculate_macro_function(*data, &p.token.data.func_macro,
 						&replace_to)))
 				{
 					zbx_free(replace_to);
-				}
-			}
-
-			if (NULL != replace_to)
-			{
-				if (1 == p.resolved && NULL != strstr(replace_to, "{$"))
-				{
-					/* Macros should be already expanded. An unexpanded user macro means either   */
-					/* unknown macro or macro value validation failure.                           */
-					zbx_snprintf(error, maxerrlen, "Invalid macro '%.*s' value",
-							(int)(p.token.loc.r - p.token.loc.l + 1),
-							*data + p.token.loc.l);
-					res = FAIL;
 				}
 			}
 		}
@@ -194,6 +182,20 @@ static int	substitute_macros_args(zbx_token_search_t search, char **data, char *
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve macro '%.*s'",
 					(int)(p.token.loc.r - p.token.loc.l + 1), *data + p.token.loc.l);
+
+			if (ZBX_TOKEN_MACRO == p.token.type && SUCCEED == zbx_is_strict_macro(p.macro))
+			{
+				if (NULL != error)
+				{
+					/* return error if strict macro resolving failed */
+					zbx_snprintf(error, maxerrlen, "Invalid macro '%.*s' value",
+							(int)(p.token.loc.r - p.token.loc.l + 1),
+							*data + p.token.loc.l);
+
+					res = FAIL;
+				}
+			}
+
 			replace_to = zbx_strdup(replace_to, STR_UNKNOWN_VARIABLE);
 		}
 
@@ -209,7 +211,7 @@ static int	substitute_macros_args(zbx_token_search_t search, char **data, char *
 			zbx_free(replace_to);
 		}
 
-		if (ZBX_TOKEN_FUNC_MACRO == p.token.type)
+		if (ZBX_TOKEN_FUNC_MACRO == p.token.type || ZBX_TOKEN_USER_FUNC_MACRO == p.token.type)
 			zbx_free(m_ptr);
 
 		p.pos++;

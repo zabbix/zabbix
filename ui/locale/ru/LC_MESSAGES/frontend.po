@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-09-18 12:09+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2024-10-16 06:20+0000\n"
+"Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -16930,7 +16930,7 @@ msgstr "Файл публичного ключа"
 
 #: app/controllers/CControllerAuditLogList.php:210
 msgid "Push"
-msgstr "Нажать"
+msgstr "Push"
 
 #: include/classes/helpers/CSlaHelper.php:64
 msgid "Quarter"

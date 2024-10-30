@@ -294,7 +294,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 				foreach ($inputs['item'][$field] as $num => $row) {
 					if ($row['name'] === '') {
-						unset($inputs[$field][$num]);
+						unset($inputs['item'][$field][$num]);
 					}
 				}
 

@@ -18,7 +18,8 @@ require_once dirname(__FILE__).'/../common/testFormPreprocessing.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
- * @backup items
+ * @backup items,users
+ * @onBefore setRowsPerPage
  */
 class testFormPreprocessingItem extends testFormPreprocessing {
 
@@ -92,13 +93,6 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 		$this->checkCreate($data);
 	}
 
-	/**
-	 * Check that adding two 'Check for not supported value'
-	 * preprocessing steps is impossible.
-	 */
-	public function testFormItemPreprocessing_RepeatedNotSupported() {
-		$this->checkRepeatedNotSupported();
-	}
 	/**
 	 * @dataProvider getItemPreprocessingTrailingSpacesData
 	 */
