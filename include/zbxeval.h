@@ -227,8 +227,8 @@ int	zbx_eval_execute_ext(zbx_eval_context_t *ctx, const zbx_timespec_t *ts, zbx_
 		zbx_eval_function_cb_t history_func_cb, void *data, zbx_variant_t *value, char **error);
 void	zbx_eval_get_functionids(zbx_eval_context_t *ctx, zbx_vector_uint64_t *functionids);
 void	zbx_eval_get_functionids_ordered(zbx_eval_context_t *ctx, zbx_vector_uint64_t *functionids);
-int	zbx_eval_substitute_macros(const zbx_eval_context_t *ctx, char **error,
-		zbx_eval_subst_macros_func_t resolver, ...);
+int	zbx_eval_substitute_macros(const zbx_eval_context_t *ctx, char **error, zbx_eval_subst_macros_func_t resolver,
+		...);
 int	zbx_eval_query_subtitute_user_macros(const char *itemquery, size_t len, char **out, char **error,
 		zbx_eval_subst_macros_func_t resolver, ...);
 

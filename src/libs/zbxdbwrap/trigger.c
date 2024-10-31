@@ -155,7 +155,7 @@ int	zbx_db_trigger_recovery_user_and_func_macro_eval_resolv(zbx_token_type_t tok
 	const uint64_t			*hostids = va_arg(args, const uint64_t *);
 	const int			hostids_num = va_arg(args, const int);
 
-	int	ret= SUCCEED;
+	int	ret = SUCCEED;
 
 	switch (token_type)
 	{
