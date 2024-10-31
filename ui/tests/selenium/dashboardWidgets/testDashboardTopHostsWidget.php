@@ -349,14 +349,14 @@ class testDashboardTopHostsWidget extends testWidgets {
 			$this->checkFieldsAttributes($column_default_fields, $column_form);
 		}
 
-		// Check hintboxes.
+		// Check hidden fields dependency.
 		$column_form->fill([
 			'Data' => CFormElement::RELOADABLE_FILL('Item value'),
 			'Advanced configuration' => true
 		]);
 
 		// Adding those fields new info icons appear.
-		$warning_visibility = [
+		$fields_visibility = [
 			'Aggregation function' => ['not used' => false, 'min' => true, 'max' => true, 'avg' => true, 'count' => false,
 					'sum' => true, 'first' => false, 'last' => false
 			],
@@ -364,42 +364,18 @@ class testDashboardTopHostsWidget extends testWidgets {
 			'History data' => ['Auto' => false, 'History' => false, 'Trends' => true]
 		];
 
-		// Check warning and hintbox message, as well as Aggregation function, Min/Max and Thresholds fields visibility.
-		foreach ($warning_visibility as $warning_label => $options) {
-//			if ($warning_label === 'History data' || $warning_label === 'Display') {
-//				$hint_text = ($warning_label === 'History data')
-//					? 'This setting applies only to numeric data. Non-numeric data will always be taken from history.'
-//					: 'With this setting only numeric data will be displayed.';
-//			}
-//			else {
-//				$hint_text = 'With this setting only numeric items will be displayed.';
-//			}
-//
-//			$warning_button = $column_form->getLabel($warning_label)->query('xpath:.//button[@data-hintbox]')->one();
-//
+		// Check Aggregation function and  Min/Max fields visibility.
+		foreach ($fields_visibility as $field => $options) {
 			foreach ($options as $option => $visible) {
-				$column_form->fill([$warning_label => $option]);
-//				$this->assertTrue($warning_button->isVisible($visible));
+				$column_form->fill([$field => $option]);
 
-//				if ($visible) {
-//					$warning_button->click();
-//
-//					// Check hintbox text.
-//					$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible();
-//					$this->assertEquals($hint_text, $hint_dialog->getText());
-//
-//					// Close the hintbox.
-//					$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
-//					$hint_dialog->waitUntilNotPresent();
-//				}
-
-				if ($warning_label === 'Aggregation function' && $option !== 'not used') {
+				if ($field === 'Aggregation function' && $option !== 'not used') {
 					$this->assertTrue($column_form->getLabel('Time period')->isDisplayed());
 				}
 
-				if ($warning_label === 'Display') {
-					foreach (['Min', 'Max'] as $field) {
-						$this->assertTrue($column_form->getField($field)->isVisible($visible));
+				if ($field === 'Display') {
+					foreach (['Min', 'Max'] as $bar_range) {
+						$this->assertTrue($column_form->getField($bar_range)->isVisible($visible));
 					}
 				}
 			}
@@ -432,16 +408,15 @@ class testDashboardTopHostsWidget extends testWidgets {
 						'input_selector' => 'id:highlights_0_pattern',
 						'color' => 'E65660'
 					];
+
 				$color_container = $column_form->getFieldContainer(($color_table['label']));
 				$this->assertEquals(['', $color_table['header'], ''], $color_container->asTable()->getHeadersText());
-//				$thresholds_icon = $column_form->getLabel('Thresholds')->query('xpath:.//button[@data-hintbox]')->one();
-//				$this->assertTrue($thresholds_icon->isVisible());
 				$color_container->query('button:Add')->one()->waitUntilClickable()->click();
 
 				$this->checkFieldsAttributes([
-					$color_table['color_selector'] => [$color_table['color']],
-					$color_table['input_selector'] => ['value' => '', 'maxlength' => 255]
-				], $column_form
+						$color_table['color_selector'] => [$color_table['color']],
+						$color_table['input_selector'] => ['value' => '', 'maxlength' => 255]
+					], $column_form
 				);
 
 				$this->assertEquals(2, $color_container->query('button', ['Add', 'Remove'])->all()
@@ -449,14 +424,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 				);
 			}
 		}
-
-
-
-//		$thresholds_icon->click();
-//		$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible();
-//		$this->assertEquals('This setting applies only to numeric data.', $hint_dialog->getText());
-//		$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
-//		$hint_dialog->waitUntilNotPresent();
 
 		$column_dialog->close();
 		$dialog->close();
