@@ -18,7 +18,7 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 
-#define	ZBX_DEPENDENT_ITEM_MAX_COUNT	2000000
+#define	ZBX_DEPENDENT_ITEM_MAX_COUNT	30000
 #define	ZBX_DEPENDENT_ITEM_MAX_LEVELS	3
 
 typedef struct zbx_lld_item_node zbx_lld_item_node_t;
