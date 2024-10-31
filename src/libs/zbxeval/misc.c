@@ -535,6 +535,8 @@ int	zbx_eval_query_subtitute_user_macros(const char *itemquery, size_t len, char
 	char			*errmsg = NULL, *filter = NULL;
 	va_list			args;
 
+	va_start(args, resolver);
+
 	if (len != zbx_eval_parse_query(itemquery, len, &query))
 	{
 		if (NULL != error)
@@ -562,8 +564,6 @@ int	zbx_eval_query_subtitute_user_macros(const char *itemquery, size_t len, char
 		zbx_free(errmsg);
 		goto out;
 	}
-
-	va_start(args, resolver);
 
 	for (i = 0; i < ctx.stack.values_num; i++)
 	{
@@ -670,9 +670,6 @@ int	zbx_eval_substitute_macros(const zbx_eval_context_t *ctx, char **error,
 		switch (token->type)
 		{
 			case ZBX_EVAL_TOKEN_VAR_MACRO:
-				value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
-				ret = resolver(token->type, &value, error, pargs);
-				break;
 			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
 				value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
 				ret = resolver(token->type, &value, error, pargs);

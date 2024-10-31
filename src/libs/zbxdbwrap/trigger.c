@@ -243,7 +243,7 @@ int	zbx_db_trigger_supplement_eval_resolv(zbx_token_type_t token_type, char **va
 	const int			hostids_num = va_arg(args, const int);
 	const zbx_db_event		*event = va_arg(args, const zbx_db_event *);
 
-	int	ret = SUCCEED;
+	int				ret = SUCCEED;
 
 	switch (token_type)
 	{
