@@ -21,9 +21,9 @@
 
 class CNumericBox extends CInput {
 
-	private bool $allow_empty;
-	private bool $allow_negative;
-	private int $min_length = 0;
+	private $allow_empty;
+	private $allow_negative;
+	private $min_length = 0;
 
 	public function __construct($name = 'number', $value = '0', $maxlength = 20, $readonly = false,
 			$allow_empty = false, $allow_negative = true) {
