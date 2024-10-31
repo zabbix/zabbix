@@ -135,10 +135,7 @@ static int	DBpatch_7000013(void)
 
 static int	DBpatch_7000014(void)
 {
-	if (FAIL == zbx_db_index_exists("proxy_history", "proxy_history_2"))
-		return DBcreate_index("proxy_history", "proxy_history_2", "write_clock", 0);
-
-	return SUCCEED;
+	return DBcreate_index("proxy_history", "proxy_history_2", "write_clock", 0);
 }
 
 #endif
