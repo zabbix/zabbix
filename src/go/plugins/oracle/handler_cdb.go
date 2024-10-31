@@ -16,22 +16,24 @@ package oracle
 
 import (
 	"context"
-	"fmt"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
 func cdbHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
 	var CDBInfo string
 
-	row, err := conn.QueryRow(ctx, getCDBQuery(params["Database"]))
+	query, args := getCDBQuery(params["Database"])
+
+	row, err := conn.QueryRow(ctx, query, args...)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	err = row.Scan(&CDBInfo)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	if CDBInfo == "" {
@@ -41,13 +43,8 @@ func cdbHandler(ctx context.Context, conn OraClient, params map[string]string, _
 	return CDBInfo, nil
 }
 
-func getCDBQuery(name string) string {
-	var whereStr string
-	if name != "" {
-		whereStr = fmt.Sprintf(`WHERE NAME = '%s'`, name)
-	}
-
-	return fmt.Sprintf(`
+func getCDBQuery(name string) (string, []any) {
+	const query = `
 	SELECT
 		JSON_ARRAYAGG(
 			JSON_OBJECT(NAME VALUE
@@ -83,7 +80,11 @@ func getCDBQuery(name string) string {
 			)
 		)		
 		FROM
-			V$DATABASE
-		%s
-`, whereStr)
+			V$DATABASE`
+
+	if name != "" {
+		return query + " WHERE NAME = :1", []any{name}
+	}
+
+	return query, nil
 }
