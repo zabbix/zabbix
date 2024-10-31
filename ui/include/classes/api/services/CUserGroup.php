@@ -280,7 +280,7 @@ class CUserGroup extends CApiService {
 
 		$this->checkDuplicates(array_column($usrgrps, 'name'));
 		$this->checkUsers($usrgrps);
-		$this->checkHimself($usrgrps, __FUNCTION__);
+		$this->checkOneself($usrgrps, __FUNCTION__);
 		$this->checkTemplateGroups($usrgrps);
 		$this->checkHostGroups($usrgrps);
 		$this->checkTagFilters($usrgrps);
@@ -415,7 +415,7 @@ class CUserGroup extends CApiService {
 			$this->checkDuplicates($names);
 		}
 		$this->checkUsers($usrgrps, $db_usrgrps);
-		$this->checkHimself($usrgrps, __FUNCTION__, $db_usrgrps);
+		$this->checkOneself($usrgrps, __FUNCTION__, $db_usrgrps);
 		$this->checkTemplateGroups($usrgrps);
 		$this->checkHostGroups($usrgrps);
 		$this->checkTagFilters($usrgrps);
@@ -607,7 +607,7 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Auxiliary function for checkHimself().
+	 * Auxiliary function for checkOneself().
 	 * Returns true if user group has GROUP_GUI_ACCESS_DISABLED or GROUP_STATUS_DISABLED states.
 	 *
 	 * @param array  $usrgrp
@@ -628,7 +628,7 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Additional check to exclude an opportunity to deactivate himself.
+	 * Additional check to exclude an opportunity to deactivate oneself.
 	 *
 	 * @param array  $usrgrps
 	 * @param string $method
@@ -636,7 +636,7 @@ class CUserGroup extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkHimself(array $usrgrps, $method, array $db_usrgrps = null) {
+	private function checkOneself(array $usrgrps, $method, array $db_usrgrps = null) {
 		if ($method === 'validateUpdate') {
 			$groups_users = [];
 
@@ -670,7 +670,7 @@ class CUserGroup extends CApiService {
 				foreach ($usrgrp['users'] as $user) {
 					if (bccomp(self::$userData['userid'], $user['userid']) == 0) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('User cannot add himself to a disabled group or a group with disabled GUI access.')
+							_('User cannot add oneself to a disabled group or a group with disabled GUI access.')
 						);
 					}
 				}

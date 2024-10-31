@@ -1,0 +1,98 @@
+[
+    {
+        "value": "hello world",
+        "macrofunc": {
+            "function": "btoa",
+            "parameters": []
+        },
+        "result": "aGVsbG8gd29ybGQ="
+    },
+    {
+        "value": "M",
+        "macrofunc": {
+            "function": "btoa",
+            "parameters": []
+        },
+        "result": "TQ=="
+    },
+    {
+        "value": "test_test",
+        "macrofunc": {
+            "function": "btoa",
+            "parameters": []
+        },
+        "result": "dGVzdF90ZXN0"
+    },
+    {
+        "value": "12345",
+        "macrofunc": {
+            "function": "btoa",
+            "parameters": []
+        },
+        "result": "MTIzNDU="
+    },
+    {
+        "value": "special_characters_!@#",
+        "macrofunc": {
+            "function": "btoa",
+            "parameters": []
+        },
+        "result": "c3BlY2lhbF9jaGFyYWN0ZXJzXyFAIw=="
+    },
+    {
+        "value": "special_characters_字😊",
+        "macrofunc": {
+            "function": "btoa",
+            "parameters": []
+        },
+        "result": "c3BlY2lhbF9jaGFyYWN0ZXJzX+Wtl/CfmIo="
+    },
+    {
+        "value": "12345",
+        "macrofunc": {
+            "function": "btoa",
+            "parameters": ["extraParam"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "",
+        "macrofunc": {
+            "function": "btoa",
+            "parameters": []
+        },
+        "result": ""
+    },
+    {
+        "value": "   ",
+        "macrofunc": {
+            "function": "btoa",
+            "parameters": []
+        },
+        "result": "ICAg"
+    },
+    {
+        "value": "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1112223334445556667778889990003333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333",
+        "macrofunc": {
+            "function": "btoa",
+            "parameters": []
+        },
+        "result": "YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXpBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWjExMTIyMjMzMzQ0NDU1NTY2Njc3Nzg4ODk5OTAwMDMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzMzM="
+    },
+    {
+        "value": "1234567890!@#$%^&*()_+-={}[]:\";'<>?,./|\\`~",
+        "macrofunc": {
+            "function": "btoa",
+            "parameters": []
+        },
+        "result": "MTIzNDU2Nzg5MCFAIyQlXiYqKClfKy09e31bXToiOyc8Pj8sLi98XGB+"
+    },
+    {
+        "value": "12345",
+        "macrofunc": {
+            "function": "btoa",
+            "parameters": [" "]
+        },
+        "result": "*UNKNOWN*"
+    }
+]

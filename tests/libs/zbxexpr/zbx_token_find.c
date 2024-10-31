@@ -174,18 +174,31 @@ static void	compare_token_expression_macro_values(const char *expression, zbx_to
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char		*expression;
-	int			expected_ret, expected_token_type;
+	const char		*expression, *flags;
+	int			expected_ret, expected_token_type, token_search;
 	zbx_token_t		token;
+	zbx_mock_handle_t	handle;
+	zbx_mock_error_t	err;
 
 	ZBX_UNUSED(state);
 
 	expression = zbx_mock_get_parameter_string("in.expression");
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("in.token_search", &handle))
+	{
+		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string(handle, &flags)))
+		{
+			fail_msg("Cannot read parameter at \"in.token_search\": %s", zbx_mock_error_string(err));
+		}
+
+		zbx_mock_str_to_token_search(flags, &token_search);
+	}
+	else
+		token_search = ZBX_TOKEN_SEARCH_EXPRESSION_MACRO | ZBX_TOKEN_SEARCH_SIMPLE_MACRO;
+
 	zbx_mock_assert_result_eq("zbx_token_find() return code", expected_ret,
-			zbx_token_find(expression, 0, &token, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO |
-			ZBX_TOKEN_SEARCH_SIMPLE_MACRO));
+			zbx_token_find(expression, 0, &token, token_search));
 
 	if (SUCCEED == expected_ret)
 	{
@@ -217,6 +230,12 @@ void	zbx_mock_test_entry(void **state)
 				break;
 			case ZBX_TOKEN_EXPRESSION_MACRO:
 				compare_token_expression_macro_values(expression, &token);
+				break;
+			case ZBX_TOKEN_VAR_MACRO:
+				compare_token_macro_values(expression, &token);
+				break;
+			case ZBX_TOKEN_VAR_FUNC_MACRO:
+				compare_token_func_macro_values(expression, &token);
 				break;
 		}
 	}

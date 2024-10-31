@@ -16,7 +16,7 @@ $DB['ENCRYPTION']		= false;
 $DB['KEY_FILE']			= '';
 $DB['CERT_FILE']		= '';
 $DB['CA_FILE']			= '';
-$DB['VERIFY_HOST']		= false;
+$DB['VERIFY_HOST']		= true;
 $DB['CIPHER_LIST']		= '';
 
 // Vault configuration. Used if database credentials are stored in Vault secrets manager.

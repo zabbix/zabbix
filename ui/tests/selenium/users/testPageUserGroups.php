@@ -92,7 +92,7 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		if ($cannotDisable) {
-			$this->zbxTestTextPresent('User cannot add himself to a disabled group or a group with disabled GUI access.');
+			$this->zbxTestTextPresent('User cannot add oneself to a disabled group or a group with disabled GUI access.');
 		}
 		else {
 			$this->zbxTestTextPresent('User group updated');
@@ -212,7 +212,9 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestInputTypeOverwrite('filter_name', 'Zabbix administrators');
 		$this->zbxTestClickXpathWait("//label[@for='filter_user_status_1']");
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
+		$this->assertTrue($this->query('xpath://div[@class="table-stats"][text()="Displaying 1 of 1 found"]')
+				->one()->isVisible()
+		);
 	}
 
 	public function testPageUserGroups_FilterReset() {

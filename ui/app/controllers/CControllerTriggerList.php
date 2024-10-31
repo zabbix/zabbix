@@ -250,37 +250,10 @@ class CControllerTriggerList extends CController {
 				'nopermissions' => true
 			]);
 
-			$items = API::Item()->get([
-				'output' => ['itemid'],
-				'selectTriggers' => ['triggerid'],
-				'selectItemDiscovery' => ['ts_delete'],
-				'triggerids' => array_keys($triggers),
-				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
-			]);
-
-			foreach ($items as $item) {
-				$ts_delete = $item['itemDiscovery']['ts_delete'];
-
-				if ($ts_delete == 0) {
-					continue;
-				}
-
-				foreach (array_column($item['triggers'], 'triggerid') as $triggerid) {
-					if (!array_key_exists($triggerid, $triggers)) {
-						continue;
-					}
-
-					if (!array_key_exists('ts_delete', $triggers[$triggerid]['triggerDiscovery'])) {
-						$triggers[$triggerid]['triggerDiscovery']['ts_delete'] = $ts_delete;
-					}
-					else {
-						$trigger_ts_delete = $triggers[$triggerid]['triggerDiscovery']['ts_delete'];
-						$triggers[$triggerid]['triggerDiscovery']['ts_delete'] = ($trigger_ts_delete > 0)
-							? min($ts_delete, $trigger_ts_delete)
-							: $ts_delete;
-					}
-				}
+			foreach ($triggers as &$trigger) {
+				CArrayHelper::sort($trigger['hosts'], ['name']);
 			}
+			unset($trigger);
 
 			// We must maintain sort order that is applied on prefetched_triggers array.
 			foreach ($triggers as $triggerid => $trigger) {
@@ -331,6 +304,15 @@ class CControllerTriggerList extends CController {
 			}
 			unset($dependencyTrigger);
 		}
+
+		$options = [
+			'output' => [],
+			'triggerids' => array_keys($triggers),
+			'editable' => true,
+			'preservekeys' => true
+		];
+		$editable_hosts = $data['context'] === 'host' ? API::Host()->get($options) : API::Template()->get($options);
+		$data['editable_hosts'] = array_keys($editable_hosts);
 
 		CProfile::update($prefix.'trigger.list.sort', $sort, PROFILE_TYPE_STR);
 		CProfile::update($prefix.'trigger.list.sortorder', $sort_order, PROFILE_TYPE_STR);

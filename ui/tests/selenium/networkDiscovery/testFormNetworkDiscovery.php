@@ -62,7 +62,7 @@ class testFormNetworkDiscovery extends CWebTest {
 	public function testFormNetworkDiscovery_Layout() {
 		$this->page->login()->open('zabbix.php?action=discovery.list');
 		$this->query('button:Create discovery rule')->waitUntilClickable()->one()->click();
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->assertEquals('New discovery rule', $dialog->getTitle());
 		$form = $dialog->asForm();
 
@@ -1118,7 +1118,7 @@ class testFormNetworkDiscovery extends CWebTest {
 			$this->query('button:Create discovery rule')->waitUntilClickable()->one()->click();
 		}
 
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$form = $dialog->asForm();
 
 		if ($update && CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
@@ -1542,7 +1542,7 @@ class testFormNetworkDiscovery extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=discovery.list');
 		$this->query('link', self::CHECKS_RULE)->waitUntilClickable()->one()->click();
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$form = $dialog->asForm();
 		$this->changeDiscoveryChecks($data['Checks'], $form);
 
@@ -1694,7 +1694,7 @@ class testFormNetworkDiscovery extends CWebTest {
 	public function testFormNetworkDiscovery_Clone($data) {
 		$this->page->login()->open('zabbix.php?action=discovery.list');
 		$this->query('link', self::CLONE_RULE)->waitUntilClickable()->one()->click();
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$dialog->query('button:Clone')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 		$form = $dialog->asForm();
@@ -1781,7 +1781,7 @@ class testFormNetworkDiscovery extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=discovery.list');
 		$this->query('link', $data['discovery'])->waitUntilClickable()->one()->click();
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$dialog->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->assertEquals('Delete discovery rule?', $this->page->getAlertText());
 		$this->page->acceptAlert();
@@ -1807,7 +1807,7 @@ class testFormNetworkDiscovery extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=discovery.list');
 		$this->query('button:Create discovery rule')->waitUntilClickable()->one()->click();
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$form = $dialog->asForm();
 		$form->fill(['Name' => $discovery_name]);
 
@@ -1912,7 +1912,7 @@ class testFormNetworkDiscovery extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=discovery.list');
 		$selector = ($data['action'] === 'Add') ? 'button:Create discovery rule' : ('link:'.self::CANCEL_RULE);
 		$this->query($selector)->waitUntilClickable()->one()->click();
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$form = $dialog->asForm();
 
 		if ($data['action'] === 'Delete') {
@@ -2040,5 +2040,25 @@ class testFormNetworkDiscovery extends CWebTest {
 			// Check selected radio label.
 			$this->assertEquals(array_keys(array_filter($values)), [$field->getValue()]);
 		}
+	}
+
+	/**
+	 * Checks for the presence of a tooltip icon and disabled button for the discovery check if it is used in Action.
+	 */
+	public function testFormNetworkDiscovery_LayoutForUsedInAction() {
+		$this->page->login()->open('zabbix.php?action=discovery.list');
+		$this->query('link:Discovery rule for deleting, check used in Action')->waitUntilClickable()->one()->click();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+
+		// Check if button is disabled
+		$this->assertFalse($dialog->query('button:Remove')->waitUntilVisible()->one()->isEnabled());
+
+		// Compare hint text
+		$dialog->query('class:zi-i-warning')->one()->click();
+		$this->assertEquals('This check cannot be removed, as it is used as a condition in 1 discovery action.',
+				$this->query('class:hintbox-wrap')->WaitUntilVisible()->one()->getText()
+		);
+
+		$dialog->close();
 	}
 }

@@ -306,7 +306,7 @@ static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
 }
 
 static void *tls_new_context(const char *ca_file, const char *crl_file, const char *cert_file, const char *key_file,
-		char **error)
+		const char *cipher, const char *cipher13, char **error)
 {
 #define TLS_CIPHER_CERT_ECDHE		"EECDH+aRSA+AES128:"
 #define TLS_CIPHER_CERT			"RSA+aRSA+AES128"
@@ -389,9 +389,23 @@ static void *tls_new_context(const char *ca_file, const char *crl_file, const ch
 	}
 
 #if OPENSSL_VERSION_NUMBER >= 0x1010100fL	// OpenSSL 1.1.1
-	if (1 != SSL_CTX_set_ciphersuites(ctx, TLS_1_3_CIPHERSUITES))
+	const char	*cipher_suites = TLS_1_3_CIPHERSUITES;
+	if (NULL != cipher13)
+		cipher_suites = cipher13;
+
+	if (1 != SSL_CTX_set_ciphersuites(ctx, cipher_suites))
 		goto out;
+#else
+	if (NULL != cipher13)
+	{
+		*error = strdup("cannot set list of TLS 1.3"
+					" certificate ciphersuites: compiled with OpenSSL version older than 1.1.1,"
+					" consider not using parameters \"TLSCipherCert13\"");
+		goto out;
+	}
 #endif
+	if (NULL != cipher)
+		ciphers = cipher;
 
 	if (1 != SSL_CTX_set_cipher_list(ctx, ciphers))
 		goto out;
@@ -400,24 +414,28 @@ static void *tls_new_context(const char *ca_file, const char *crl_file, const ch
 out:
 	if (-1 == ret)
 	{
-		int	sz;
-		BIO	*err;
-
-		err = BIO_new(BIO_s_mem());
-		BIO_set_nbio(err, 1);
-		ERR_print_errors(err);
-
-		sz = (int)BIO_ctrl_pending(err);
-		if (sz != 0)
+		if (NULL == *error)
 		{
-			*error = malloc((size_t)sz + 1);
-			BIO_read(err, *error, sz);
-			(*error)[sz] = '\0';
-		}
-		else
-			*error = strdup("unknown openssl error");
+			int	sz;
+			BIO	*err;
 
-		BIO_vfree(err);
+			err = BIO_new(BIO_s_mem());
+			BIO_set_nbio(err, 1);
+			ERR_print_errors(err);
+
+			sz = (int)BIO_ctrl_pending(err);
+			if (sz != 0)
+			{
+				*error = malloc((size_t)sz + 1);
+				BIO_read(err, *error, sz);
+				(*error)[sz] = '\0';
+			}
+			else
+				*error = strdup("unknown openssl error");
+
+			BIO_vfree(err);
+		}
+
 		if (NULL != ctx)
 		{
 			SSL_CTX_free(ctx);
@@ -795,12 +813,14 @@ static int tls_init(void)
 }
 
 static void *tls_new_context(const char *ca_file, const char *crl_file, const char *cert_file, const char *key_file,
-		 char **error)
+		const char *cipher, const char *cipher13, char **error)
 {
 	TLS_UNUSED(ca_file);
 	TLS_UNUSED(crl_file);
 	TLS_UNUSED(cert_file);
 	TLS_UNUSED(key_file);
+	TLS_UNUSED(cipher);
+	TLS_UNUSED(cipher13);
 	*error = strdup("built without OpenSSL");
 	return NULL;
 }
@@ -1082,13 +1102,17 @@ func (c *tlsConn) verifyIssuerSubject(cfg *Config) (err error) {
 		var cSubject, cIssuer *C.char
 		if cfg.ServerCertIssuer != "" {
 			cIssuer = C.CString(cfg.ServerCertIssuer)
-			log.Tracef("Calling C function \"free(cIssuer)\"")
-			defer C.free(unsafe.Pointer(cIssuer))
+			defer func() {
+				log.Tracef("Calling C function \"free(cIssuer)\"")
+				C.free(unsafe.Pointer(cIssuer))
+			}()
 		}
 		if cfg.ServerCertSubject != "" {
 			cSubject = C.CString(cfg.ServerCertSubject)
-			log.Tracef("Calling C function \"free(cSubject)\"")
-			defer C.free(unsafe.Pointer(cSubject))
+			defer func() {
+				log.Tracef("Calling C function \"free(cSubject)\"")
+				C.free(unsafe.Pointer(cSubject))
+			}()
 		}
 		log.Tracef("Calling C function \"tls_validate_issuer_and_subject()\"")
 		if 0 != C.tls_validate_issuer_and_subject((*C.tls_t)(c.tls), cIssuer, cSubject) {
@@ -1201,8 +1225,10 @@ func NewClient(nc net.Conn, cfg *Config, timeout time.Duration, shiftDeadline bo
 		hostname := url.Host()
 		if nil == net.ParseIP(hostname) {
 			cHostname = C.CString(hostname)
-			log.Tracef("Calling C function \"free()\"")
-			defer C.free(unsafe.Pointer(cHostname))
+			defer func() {
+				log.Tracef("Calling C function \"free()\"")
+				C.free(unsafe.Pointer(cHostname))
+			}()
 		}
 	}
 
@@ -1377,6 +1403,10 @@ type Config struct {
 	KeyFile           string
 	ServerCertIssuer  string
 	ServerCertSubject string
+	CipherAll         string
+	CipherAll13       string
+	CipherPSK         string
+	CipherPSK13       string
 }
 
 func CopyrightMessage() (message string) {
@@ -1405,27 +1435,67 @@ func Init(config *Config) (err error) {
 		C.tls_free_context(C.SSL_CTX_LP(defaultContext))
 	}
 
-	var cErr, cCaFile, cCrlFile, cCertFile, cKeyFile, cNULL *C.char
+	var cErr, cCaFile, cCrlFile, cCertFile, cKeyFile, cCipherCert, cCipherCert13, cCipherPSK, cCipherPSK13, cNULL *C.char
 	if (config.Accept|config.Connect)&ConnCert != 0 {
 		cCaFile = C.CString(config.CAFile)
 		cCertFile = C.CString(config.CertFile)
 		cKeyFile = C.CString(config.KeyFile)
-		log.Tracef("Calling C function \"free()\"")
-		defer C.free(unsafe.Pointer(cCaFile))
-		log.Tracef("Calling C function \"free()\"")
-		defer C.free(unsafe.Pointer(cCertFile))
-		log.Tracef("Calling C function \"free()\"")
-		defer C.free(unsafe.Pointer(cKeyFile))
+
+		defer func() {
+			log.Tracef("Calling C function \"free()\"")
+			C.free(unsafe.Pointer(cCaFile))
+			log.Tracef("Calling C function \"free()\"")
+			C.free(unsafe.Pointer(cCertFile))
+			log.Tracef("Calling C function \"free()\"")
+			C.free(unsafe.Pointer(cKeyFile))
+		}()
 
 		if config.CRLFile != "" {
 			cCrlFile = C.CString(config.CRLFile)
-			log.Tracef("Calling C function \"free()\"")
-			defer C.free(unsafe.Pointer(cCrlFile))
+			defer func() {
+				log.Tracef("Calling C function \"free()\"")
+				C.free(unsafe.Pointer(cCrlFile))
+			}()
+		}
+
+		if config.CipherAll != "" {
+			cCipherCert = C.CString(config.CipherAll)
+			defer func() {
+				log.Tracef("Calling C function \"free()\"")
+				C.free(unsafe.Pointer(cCipherCert))
+			}()
+		}
+
+		if config.CipherAll13 != "" {
+			cCipherCert13 = C.CString(config.CipherAll13)
+			defer func() {
+				log.Tracef("Calling C function \"free()\"")
+				C.free(unsafe.Pointer(cCipherCert13))
+			}()
+		}
+	}
+
+	if (config.Accept|config.Connect)&ConnPSK != 0 {
+		if config.CipherPSK != "" {
+			cCipherPSK = C.CString(config.CipherPSK)
+			defer func() {
+				log.Tracef("Calling C function \"free()\"")
+				C.free(unsafe.Pointer(cCipherPSK))
+			}()
+		}
+		if config.CipherPSK13 != "" {
+			cCipherPSK13 = C.CString(config.CipherPSK13)
+			defer func() {
+				log.Tracef("Calling C function \"free()\"")
+				C.free(unsafe.Pointer(cCipherPSK13))
+			}()
 		}
 	}
 
 	log.Tracef("Calling C function \"tls_new_context()\"")
-	if defaultContext = unsafe.Pointer(C.tls_new_context(cCaFile, cCrlFile, cCertFile, cKeyFile, &cErr)); defaultContext == nil {
+	defaultContext = unsafe.Pointer(C.tls_new_context(cCaFile, cCrlFile, cCertFile, cKeyFile, cCipherCert,
+		cCipherCert13, &cErr))
+	if defaultContext == nil {
 		err = fmt.Errorf("cannot initialize default TLS context: %s", C.GoString(cErr))
 		log.Tracef("Calling C function \"free()\"")
 		C.free(unsafe.Pointer(cErr))
@@ -1433,7 +1503,8 @@ func Init(config *Config) (err error) {
 	}
 
 	log.Tracef("Calling C function \"tls_new_context()\"")
-	if pskContext = unsafe.Pointer(C.tls_new_context(cNULL, cNULL, cNULL, cNULL, &cErr)); pskContext == nil {
+	pskContext = unsafe.Pointer(C.tls_new_context(cNULL, cNULL, cNULL, cNULL, cCipherPSK, cCipherPSK13, &cErr))
+	if pskContext == nil {
 		err = fmt.Errorf("cannot initialize PSK TLS context: %s", C.GoString(cErr))
 		log.Tracef("Calling C function \"free()\"")
 		C.free(unsafe.Pointer(cErr))

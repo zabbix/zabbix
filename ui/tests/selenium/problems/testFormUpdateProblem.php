@@ -175,7 +175,8 @@ class testFormUpdateProblem extends CWebTest {
 						'Suppress' => 'Manual problem suppression. Date-time input accepts relative and absolute time format.',
 						'Unsuppress' => 'Deactivates manual suppression.',
 						'Acknowledge' => 'Confirms the problem is noticed (acknowledging user will be recorded). '.
-								'Status change triggers action update operation.'
+								'Status change triggers action update operation.',
+						'Convert to cause' => 'Converts a symptom event back to cause event'
 					],
 					'history' => [],
 					'Acknowledge' => true,
@@ -213,7 +214,8 @@ class testFormUpdateProblem extends CWebTest {
 					'hintboxes' => [
 						'Suppress' => 'Manual problem suppression. Date-time input accepts relative and absolute time format.',
 						'Unsuppress' => 'Deactivates manual suppression.',
-						'Unacknowledge' => 'Undo problem acknowledgement.'
+						'Unacknowledge' => 'Undo problem acknowledgement.',
+						'Convert to cause' => 'Converts a symptom event back to cause event'
 					]
 				]
 			],
@@ -238,7 +240,8 @@ class testFormUpdateProblem extends CWebTest {
 						'Suppress' => 'Manual problem suppression. Date-time input accepts relative and absolute time format.',
 						'Unsuppress' => 'Deactivates manual suppression.',
 						'Acknowledge' => 'Confirms the problem is noticed (acknowledging user will be recorded). '.
-								'Status change triggers action update operation.'
+								'Status change triggers action update operation.',
+						'Convert to cause' => 'Converts a symptom event back to cause event'
 					]
 				]
 			],
@@ -255,7 +258,8 @@ class testFormUpdateProblem extends CWebTest {
 						'Unsuppress' => 'Deactivates manual suppression.',
 						'Acknowledge' => 'Confirms the problem is noticed (acknowledging user will be recorded). '.
 								'Status change triggers action update operation.',
-						'Unacknowledge' => 'Undo problem acknowledgement.'
+						'Unacknowledge' => 'Undo problem acknowledgement.',
+						'Convert to cause' => 'Converts a symptom event back to cause event'
 					],
 					'close_enabled' => true,
 					'unsuppress_enabled' => true,
@@ -342,6 +346,7 @@ class testFormUpdateProblem extends CWebTest {
 			'id:suppress_time_option' => ['value' => 'Until', 'enabled' => false],
 			'id:suppress_until_problem' => ['maxlength' => 255, 'value' => 'now+1d', 'enabled' => false, 'placeholder' => 'now+1d'],
 			'id:unsuppress_problem' => ['value' => false, 'enabled' => CTestArrayHelper::get($data, 'unsuppress_enabled', false)],
+			'id:change_rank' => ['value' => false, 'enabled' => false],
 			'Close problem' => ['value' => false, 'enabled' => CTestArrayHelper::get($data, 'close_enabled', false)]
 		];
 

@@ -43,6 +43,7 @@
 #include "zbxrtc.h"
 #include "zbxjson.h"
 #include "zbxhttp.h"
+#include "zbxexpr.h"
 #include "zbxlog.h"
 #include "zbxavailability.h"
 #include "zbx_availability_constants.h"
@@ -205,7 +206,7 @@ static int	parse_query_fields(const zbx_dc_item_t *item, char **query_fields, un
 			zbx_substitute_simple_macros(NULL, NULL, NULL,NULL, NULL, &item->host, item, NULL, NULL, NULL,
 					NULL, NULL, &data, ZBX_MACRO_TYPE_HTTP_RAW, NULL, 0);
 		}
-		zbx_http_url_encode(data, &data);
+		zbx_url_encode(data, &data);
 		zbx_strcpy_alloc(&str, &alloc_len, &offset, data);
 		zbx_chrcpy_alloc(&str, &alloc_len, &offset, '=');
 
@@ -216,7 +217,7 @@ static int	parse_query_fields(const zbx_dc_item_t *item, char **query_fields, un
 					NULL, NULL, NULL, NULL, &data, ZBX_MACRO_TYPE_HTTP_RAW, NULL, 0);
 		}
 
-		zbx_http_url_encode(data, &data);
+		zbx_url_encode(data, &data);
 		zbx_strcpy_alloc(&str, &alloc_len, &offset, data);
 
 		free(data);
@@ -569,8 +570,10 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 			errcodes[i] = CONFIG_ERROR;
 		}
 #else
-		/* SNMP checks use their own timeouts */
-		get_values_snmp(items, results, errcodes, num, poller_type, config_comms->config_source_ip, progname);
+		/* legacy SNMP checks use config timeout
+		 * walk[ and get[ use item timeout */
+		get_values_snmp(items, results, errcodes, num, poller_type, config_comms->config_source_ip,
+				config_comms->config_timeout, progname);
 #endif
 	}
 	else if (ITEM_TYPE_JMX == items[0].type)
@@ -839,6 +842,9 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
+#ifdef HAVE_NETSNMP
+	time_t			last_snmp_engineid_hk_time = 0;
+#endif
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -941,6 +947,16 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				break;
 		}
+#ifdef HAVE_NETSNMP
+#define	SNMP_ENGINEID_HK_INTERVAL	86400
+		if ((ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type) &&
+				time(NULL) >= SNMP_ENGINEID_HK_INTERVAL + last_snmp_engineid_hk_time)
+		{
+			last_snmp_engineid_hk_time = time(NULL);
+			zbx_clear_cache_snmp(process_type, process_num);
+		}
+#undef SNMP_ENGINEID_HK_INTERVAL
+#endif
 	}
 
 	scriptitem_es_engine_destroy();

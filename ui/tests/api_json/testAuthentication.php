@@ -23,11 +23,13 @@ class testAuthentication extends CAPITest {
 
 	public const TEST_DATA_TO_RESOLVE = [
 		'disabled_usrgrpid' => 'Disabled user group for API tests',
+		'ldap_userdirectoryid' => 'Used in LDAP settings',
 		'mfaid' => 'Default MFA method'
 	];
 
 	public static $data = [
 		'disabled_usrgrpid' => null,
+		'ldap_userdirectoryid' => null,
 		'mfaid' => null
 	];
 
@@ -136,13 +138,6 @@ class testAuthentication extends CAPITest {
 				'expected_error' => 'Invalid parameter "/passwd_check_rules": value must be one of 0-'.
 					(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE).'.'
 			],
-			'Test authentication set to LDAP but having LDAP disabled at the same time' => [
-				'authentication' => [
-					'authentication_type' => ZBX_AUTH_LDAP,
-					'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED
-				],
-				'expected_error' => 'Incorrect value for field "/authentication_type": LDAP must be enabled.'
-			],
 
 			// Invalid HTTP auth tests.
 			'Test invalid HTTP auth' => [
@@ -165,34 +160,6 @@ class testAuthentication extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/http_case_sensitive": value must be one of '.
 					implode(', ', [ZBX_AUTH_CASE_INSENSITIVE, ZBX_AUTH_CASE_SENSITIVE]).'.'
-			],
-
-			// Invalid LDAP auth tests.
-			'Test invalid LDAP auth' => [
-				'authentication' => [
-					'ldap_auth_enabled' => 999
-				],
-				'expected_error' => 'Invalid parameter "/ldap_auth_enabled": value must be one of '.
-					implode(', ', [ZBX_AUTH_LDAP_DISABLED, ZBX_AUTH_LDAP_ENABLED]).'.'
-			],
-			'Test invalid userdirectoryid' => [
-				'authentication' => [
-					'ldap_userdirectoryid' => 'userdirectory_invalidid_1'
-				],
-				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": a number is expected.'
-			],
-			'Cannot set default authentication ldap when ldap is disabled' => [
-				'authentication' => [
-					'authentication_type' => ZBX_AUTH_LDAP,
-					'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED
-				],
-				'expected_error' => 'Incorrect value for field "/authentication_type": LDAP must be enabled.'
-			],
-			'Test invalid LDAP enabled without LDAP servers' => [
-				'authentication' => [
-					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED
-				],
-				'expected_error' => 'At least one LDAP server must exist.'
 			],
 
 			// Invalid SAML auth tests.
@@ -292,27 +259,6 @@ class testAuthentication extends CAPITest {
 				'expected_error' => null
 			],
 
-			// Valid LDAP auth tests.
-			'Test valid LDAP JIT status' => [
-				'authentication' => [
-					'ldap_jit_status' => JIT_PROVISIONING_ENABLED,
-					'disabled_usrgrpid' => self::TEST_DATA_TO_RESOLVE['disabled_usrgrpid']
-				],
-				'expected_error' => null
-			],
-			'Test valid LDAP JIT interval' => [
-				'authentication' => [
-					'jit_provision_interval' => '3h'
-				],
-				'expected_error' => null
-			],
-			'Test valid case sensitive for LDAP auth' => [
-				'authentication' => [
-					'ldap_case_sensitive' => ZBX_AUTH_CASE_SENSITIVE
-				],
-				'expected_error' => null
-			],
-
 			// Valid SAML auth tests.
 			'Test valid SAML auth' => [
 				'authentication' => [
@@ -341,14 +287,6 @@ class testAuthentication extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Test setting up the deprovisioned user group without unchecking disabled LDAP JIT status' => [
-				'authentication' => [
-					'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
-					'ldap_jit_status' => JIT_PROVISIONING_ENABLED,
-					'disabled_usrgrpid' => 0
-				],
-				'expected_error' => null
-			],
 
 			//Valid MFA settings tests
 			'Test valid MFA settings' => [
@@ -361,9 +299,243 @@ class testAuthentication extends CAPITest {
 		];
 	}
 
+	public static function authentication_update_ldap(): array {
+		return [
+			'Test invalid LDAP auth' => [
+				'authentication' => [
+					'ldap_auth_enabled' => 999
+				],
+				'expected_error' => 'Invalid parameter "/ldap_auth_enabled": value must be one of '.
+					implode(', ', [ZBX_AUTH_LDAP_DISABLED, ZBX_AUTH_LDAP_ENABLED]).'.'
+			],
+			'Reject userdirectoryid as null' => [
+				'authentication' => [
+					'ldap_userdirectoryid' => null
+				],
+				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": a number is expected.'
+			],
+			'Test invalid userdirectoryid' => [
+				'authentication' => [
+					'ldap_userdirectoryid' => 'userdirectory_invalidid_1'
+				],
+				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": a number is expected.'
+			],
+			'Reject negative userdirectoryid' => [
+				'authentication' => [
+					'ldap_userdirectoryid' => -1
+				],
+				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": a number is expected.'
+			],
+			'Reject non-exist userdirectoryid' => [
+				'authentication' => [
+					'ldap_userdirectoryid' => 99999
+				],
+				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": object does not exist.'
+			],
+			'Reject invalid ldap_jit_status' => [
+				'authentication' => [
+					'ldap_jit_status' => 99999
+				],
+				'expected_error' => 'Invalid parameter "/ldap_jit_status": value must be one of '.
+					implode(', ', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED]).'.'
+			],
+			'Reset state to disabled LDAP' => [
+				'authentication' => [
+					'authentication_type' => ZBX_AUTH_INTERNAL,
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
+					'ldap_jit_status' => JIT_PROVISIONING_DISABLED,
+					'disabled_usrgrpid' => '0',
+					'ldap_userdirectoryid' => '0'
+				],
+				'expected_error' => null
+			],
+			'Cannot set default authentication ldap when ldap is disabled' => [
+				'authentication' => [
+					'authentication_type' => ZBX_AUTH_LDAP,
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED
+				],
+				'expected_error' => 'Invalid parameter "/ldap_auth_enabled": value must be '.ZBX_AUTH_LDAP_ENABLED.'.'
+			],
+			'Test invalid LDAP enabled without LDAP servers' => [
+				'authentication' => [
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED
+				],
+				'expected_error' => 'Default LDAP server must be specified.'
+			],
+			'Disable LDAP with deprovision group and userdirectoryid' => [
+				'authentication' => [
+					'authentication_type' => ZBX_AUTH_INTERNAL,
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
+					'disabled_usrgrpid' => self::TEST_DATA_TO_RESOLVE['disabled_usrgrpid'],
+					'ldap_userdirectoryid' => self::TEST_DATA_TO_RESOLVE['ldap_userdirectoryid']
+				],
+				'expected_error' => null
+			],
+			'Enable LDAP auth and set it as default auth type' => [
+				'authentication' => [
+					'authentication_type' => ZBX_AUTH_LDAP,
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED,
+					'ldap_userdirectoryid' => self::TEST_DATA_TO_RESOLVE['ldap_userdirectoryid']
+				],
+				'expected_error' => null
+			],
+			'Reject disabling LDAP while authentication_type is LDAP' => [
+				'authentication' => [
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED
+				],
+				'expected_error' => 'Invalid parameter "/ldap_auth_enabled": value must be '.ZBX_AUTH_LDAP_ENABLED.'.'
+			],
+			'Reject set userdirectoryid to 0 while LDAP enabled' => [
+				'authentication' => [
+					'ldap_userdirectoryid' => '0'
+				],
+				'expected_error' => 'Default LDAP server must be specified.'
+			],
+			'Change authentication_type and disable LDAP' => [
+				'authentication' => [
+					'authentication_type' => ZBX_AUTH_INTERNAL,
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED
+				],
+				'expected_error' => null
+			],
+			'Reject set userdirectoryid to non-exist while LDAP is disabled' => [
+				'authentication' => [
+					'ldap_userdirectoryid' => 99999
+				],
+				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": object does not exist.'
+			],
+			'Accept set userdirectoryid to 0 while LDAP is disabled' => [
+				'authentication' => [
+					'ldap_userdirectoryid' => '0'
+				],
+				'expected_error' => null
+			],
+			'Reject enabling LDAP while userdirectoryid=0' => [
+				'authentication' => [
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED
+				],
+				'expected_error' => 'Default LDAP server must be specified.'
+			],
+			'Reject enabling LDAP with set userdirectoryid=0' => [
+				'authentication' => [
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED,
+					'ldap_userdirectoryid' => '0'
+				],
+				'expected_error' => 'Default LDAP server must be specified.'
+			],
+			'Enable LDAP with non-existing userdirectoryid' => [
+				'authentication' => [
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED,
+					'ldap_userdirectoryid' => 99999
+				],
+				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": object does not exist.'
+			],
+			'Disable LDAP and set non-exist userdirectoryid' => [
+				'authentication' => [
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
+					'ldap_userdirectoryid' => 99999
+				],
+				'expected_error' => 'Invalid parameter "/ldap_userdirectoryid": object does not exist.'
+			],
+			'Disable LDAP with existing userdirectoryid' => [
+				'authentication' => [
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
+					'ldap_userdirectoryid' => self::TEST_DATA_TO_RESOLVE['ldap_userdirectoryid']
+				],
+				'expected_error' => null
+			],
+			'Enable LDAP with existing userdirectoryid' => [
+				'authentication' => [
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED,
+					'ldap_userdirectoryid' => self::TEST_DATA_TO_RESOLVE['ldap_userdirectoryid']
+				],
+				'expected_error' => null
+			],
+			'Enable LDAP having previously set existing userdirectoryid' => [
+				'authentication' => [
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED
+				],
+				'expected_error' => null
+			],
+			'Disable LDAP having previously set existing userdirectoryid' => [
+				'authentication' => [
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED
+				],
+				'expected_error' => null
+			],
+			'Test valid LDAP JIT status' => [
+				'authentication' => [
+					'ldap_jit_status' => JIT_PROVISIONING_ENABLED,
+					'disabled_usrgrpid' => self::TEST_DATA_TO_RESOLVE['disabled_usrgrpid']
+				],
+				'expected_error' => null
+			],
+			'Reset deprovisioning group' => [
+				'authentication' => [
+					'disabled_usrgrpid' => '0'
+				],
+				'expected_error' => null
+			],
+			'Enable LDAP having JIT enabled but no deprovisioning group' => [
+				'authentication' => [
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED
+				],
+				'expected_error' => 'Deprovisioned users group cannot be empty.'
+			],
+			'Enable LDAP having JIT enabled with non-exist deprovisioning group' => [
+				'authentication' => [
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED,
+					'disabled_usrgrpid' => 99999
+				],
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			'Enable LDAP having JIT enabled with valid deprovisioning group' => [
+				'authentication' => [
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED,
+					'disabled_usrgrpid' => self::TEST_DATA_TO_RESOLVE['disabled_usrgrpid']
+				],
+				'expected_error' => null
+			],
+			'Test setting up the deprovisioned user group without unchecking disabled LDAP JIT status' => [
+				'authentication' => [
+					'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
+					'ldap_jit_status' => JIT_PROVISIONING_ENABLED,
+					'disabled_usrgrpid' => 0
+				],
+				'expected_error' => null
+			],
+			'Invalid LDAP JIT interval' => [
+				'authentication' => [
+					'jit_provision_interval' => 'minutes'
+				],
+				'expected_error' => 'Invalid parameter "/jit_provision_interval": a time unit is expected.'
+			],
+			'Valid LDAP JIT interval' => [
+				'authentication' => [
+					'jit_provision_interval' => '3h'
+				],
+				'expected_error' => null
+			],
+			'Invalid case sensitive for LDAP auth' => [
+				'authentication' => [
+					'ldap_case_sensitive' => 9999
+				],
+				'expected_error' => 'Invalid parameter "/ldap_case_sensitive": value must be one of '.
+					implode(', ', [ZBX_AUTH_CASE_INSENSITIVE, ZBX_AUTH_CASE_SENSITIVE]).'.'
+			],
+			'Valid case sensitive for LDAP auth' => [
+				'authentication' => [
+					'ldap_case_sensitive' => ZBX_AUTH_CASE_SENSITIVE
+				],
+				'expected_error' => null
+			]
+		];
+	}
+
 	/**
 	 * @dataProvider authentication_update_data_invalid
 	 * @dataProvider authentication_update_data_valid
+	 * @dataProvider authentication_update_ldap
 	 */
 	public function testAuthentication_Update($authentication, $expected_error) {
 		$authentication = self::resolveInstanceData($authentication);
@@ -442,6 +614,27 @@ class testAuthentication extends CAPITest {
 						}
 
 						$test_data['mfaid'] = self::$data['mfaid'];
+
+						break;
+
+					case 'ldap_userdirectoryid':
+						if (!self::$data['ldap_userdirectoryid']) {
+							$response = CDataHelper::call('userdirectory.create', [
+								'idp_type' => '1',
+								'name' => 'LDAP API server #1',
+								'host' => 'ldap =>//local.ldap',
+								'port' => '389',
+								'base_dn' => 'ou=Users,dc=example,dc=org',
+								'bind_dn' => 'cn=ldap_search,dc=example,dc=org',
+								'bind_password' => 'ldapsecretpassword',
+								'search_attribute' => 'uid',
+								'start_tls' => '1'
+							]);
+
+							self::$data['ldap_userdirectoryid'] = $response['userdirectoryids'][0];
+						}
+
+						$test_data['ldap_userdirectoryid'] = self::$data['ldap_userdirectoryid'];
 
 						break;
 				}

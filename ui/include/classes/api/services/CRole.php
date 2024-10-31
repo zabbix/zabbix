@@ -420,7 +420,7 @@ class CRole extends CApiService {
 				continue;
 			}
 
-			$name = $db_roles !== null ? $db_roles[$role['roleid']]['name'] : $role['name'];
+			$name = array_key_exists('name', $role) ? $role['name'] : $db_roles[$role['roleid']]['name'];
 			$type = array_key_exists('type', $role) ? $role['type'] : $db_roles[$role['roleid']]['type'];
 
 			$db_rules = $db_roles !== null ? $db_roles[$role['roleid']]['rules'] : null;
@@ -428,7 +428,7 @@ class CRole extends CApiService {
 			self::checkUiRules($name, (int) $type, $role['rules'], $db_rules);
 			$this->checkServicesRules($name, (int) $type, $role['rules'], $db_rules);
 			$this->checkModulesRules($name, $role['rules']);
-			$this->checkApiRules($name, $role['rules']);
+			self::checkApiRules($name, (int) $type, $role['rules']);
 			$this->checkActionsRules($name, (int) $type, $role['rules']);
 		}
 	}
@@ -712,11 +712,12 @@ class CRole extends CApiService {
 
 	/**
 	 * @param string $name
+	 * @param int    $type
 	 * @param array  $rules
 	 *
 	 * @throws APIException
 	 */
-	private function checkApiRules(string $name, array $rules): void {
+	private static function checkApiRules(string $name, int $type, array $rules): void {
 		if (!array_key_exists('api', $rules)) {
 			return;
 		}
@@ -726,8 +727,8 @@ class CRole extends CApiService {
 				continue;
 			}
 
-			if (!in_array($rule, CRoleHelper::getApiMethodMasks(USER_TYPE_SUPER_ADMIN), true)
-					&& !in_array($rule, CRoleHelper::getApiMethods(USER_TYPE_SUPER_ADMIN), true)) {
+			if (!in_array($rule, CRoleHelper::getApiMethodMasks($type), true)
+					&& !in_array($rule, CRoleHelper::getApiMethods($type), true)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Invalid API method "%2$s" for user role "%1$s".', $name, $rule)
 				);
@@ -858,22 +859,17 @@ class CRole extends CApiService {
 		$rules = [];
 
 		foreach ($roles as $roleid => $role) {
-			if (!array_key_exists('rules', $role)) {
-				continue;
-			}
-
 			$type = array_key_exists('type', $role) ? $role['type'] : $db_roles[$role['roleid']]['type'];
-
 			$old_rules = $db_roles !== null ? $db_roles[$roleid]['rules'] : $default_rules;
-			$new_rules = $role['rules'] + $old_rules;
+			$new_rules = array_key_exists('rules', $role) ? $role['rules'] + $old_rules : $old_rules;
 
 			$rules[$roleid] = array_merge(
-				$this->compileUiRules((int) $type, $old_rules, $new_rules),
-				$this->compileServicesReadRules($new_rules),
-				$this->compileServicesWriteRules($new_rules),
-				$this->compileModulesRules($old_rules, $new_rules),
-				$this->compileApiRules($new_rules),
-				$this->compileActionsRules((int) $type, $old_rules, $new_rules)
+				self::compileUiRules((int) $type, $old_rules, $new_rules),
+				self::compileServicesReadRules($new_rules),
+				self::compileServicesWriteRules($new_rules),
+				self::compileModulesRules($old_rules, $new_rules),
+				self::compileApiRules((int) $type, $new_rules),
+				self::compileActionsRules((int) $type, $old_rules, $new_rules)
 			);
 		}
 
@@ -944,7 +940,7 @@ class CRole extends CApiService {
 	 *
 	 * @return array
 	 */
-	private function compileUiRules(int $type, array $old_rules, array $new_rules): array {
+	private static function compileUiRules(int $type, array $old_rules, array $new_rules): array {
 		$old_ui_rules = array_column($old_rules['ui'], null, 'name');
 		$new_ui_rules = array_column($new_rules['ui'], null, 'name');
 
@@ -970,7 +966,6 @@ class CRole extends CApiService {
 					'value' => $ui_rule_status
 				];
 			}
-
 		}
 
 		$compiled_rules[] = [
@@ -987,7 +982,7 @@ class CRole extends CApiService {
 	 *
 	 * @return array
 	 */
-	private function compileServicesReadRules(array $new_rules): array {
+	private static function compileServicesReadRules(array $new_rules): array {
 		$compiled_rules[] = [
 			'name' => 'services.read',
 			'type' => self::RULE_TYPE_INT32,
@@ -1028,7 +1023,7 @@ class CRole extends CApiService {
 	 *
 	 * @return array
 	 */
-	private function compileServicesWriteRules(array $new_rules): array {
+	private static function compileServicesWriteRules(array $new_rules): array {
 		$compiled_rules[] = [
 			'name' => 'services.write',
 			'type' => self::RULE_TYPE_INT32,
@@ -1072,7 +1067,7 @@ class CRole extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function compileModulesRules(array $old_rules, array $new_rules): array {
+	private static function compileModulesRules(array $old_rules, array $new_rules): array {
 		$old_modules_rules = array_column($old_rules['modules'], null, 'moduleid');
 		$new_modules_rules = array_column($new_rules['modules'], null, 'moduleid');
 
@@ -1112,11 +1107,12 @@ class CRole extends CApiService {
 	}
 
 	/**
+	 * @param int   $type
 	 * @param array $new_rules
 	 *
 	 * @return array
 	 */
-	private function compileApiRules(array $new_rules): array {
+	private static function compileApiRules(int $type, array $new_rules): array {
 		$compiled_rules = [];
 
 		$compiled_rules[] = [
@@ -1133,6 +1129,13 @@ class CRole extends CApiService {
 			];
 
 			foreach ($new_rules['api'] as $index => $api_method) {
+				// Skip specific API methods that do not belong to new user in case of user type change.
+				if ($api_method !== ZBX_ROLE_RULE_API_WILDCARD && $api_method !== ZBX_ROLE_RULE_API_WILDCARD_ALIAS
+						&& !in_array($api_method, CRoleHelper::getApiMethodMasks($type), true)
+						&& !in_array($api_method, CRoleHelper::getApiMethods($type), true)) {
+					continue;
+				}
+
 				$compiled_rules[] = [
 					'name' => 'api.method.'.$index,
 					'type' => self::RULE_TYPE_STR,
@@ -1151,7 +1154,7 @@ class CRole extends CApiService {
 	 *
 	 * @return array
 	 */
-	private function compileActionsRules(int $type, array $old_rules, array $new_rules): array {
+	private static function compileActionsRules(int $type, array $old_rules, array $new_rules): array {
 		$old_actions_rules = array_column($old_rules['actions'], null, 'name');
 		$new_actions_rules = array_column($new_rules['actions'], null, 'name');
 
@@ -1177,7 +1180,6 @@ class CRole extends CApiService {
 					'value' => $action_rule_status
 				];
 			}
-
 		}
 
 		$compiled_rules[] = [

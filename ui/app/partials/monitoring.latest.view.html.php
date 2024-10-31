@@ -330,8 +330,14 @@ foreach ($data['items'] as $itemid => $item) {
 }
 
 $button_list = [
-	GRAPH_TYPE_STACKED => ['name' => _('Display stacked graph'), 'attributes' => ['data-required' => 'graph']],
-	GRAPH_TYPE_NORMAL => ['name' => _('Display graph'), 'attributes' => ['data-required' => 'graph']],
+	GRAPH_TYPE_STACKED => [
+		'name' => _('Display stacked graph'),
+		'attributes' => ['data-required' => 'graph', 'data-required-count' => 2]
+	],
+	GRAPH_TYPE_NORMAL => [
+		'name' => _('Display graph'),
+		'attributes' => ['data-required' => 'graph']
+	],
 	'item.execute' => [
 		'content' => (new CSimpleButton(_('Execute now')))
 			->addClass(ZBX_STYLE_BTN_ALT)

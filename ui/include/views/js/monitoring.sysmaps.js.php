@@ -141,6 +141,7 @@ function createFontSelect(string $name): CSelect {
 							->setId('elementLabel')
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setRows(2)
+							->setMaxlength(DB::getFieldLength('sysmaps_elements', 'label'))
 							->disableSpellcheck()
 					)
 					->addRow(new CLabel(_('Label location'), 'label-label-location'),
@@ -364,7 +365,8 @@ function createFontSelect(string $name): CSelect {
 							(new CTextArea('text'))
 								->addStyle('margin-bottom: 4px;')
 								->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-								->setRows(3),
+								->setRows(3)
+								->setMaxlength(DB::getFieldLength('sysmap_shape', 'text')),
 							BR(),
 							_('Font'),
 							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -526,7 +528,8 @@ function createFontSelect(string $name): CSelect {
 							->setLabel(_('Text')),
 						(new CTextArea('mass_text'))
 								->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-								->setRows(2),
+								->setRows(2)
+								->setMaxlength(DB::getFieldLength('sysmap_shape', 'text')),
 						null, 'shape_figure_row'
 					)
 					->addRow((new CCheckBox('chkbox_font'))
@@ -663,6 +666,7 @@ function createFontSelect(string $name): CSelect {
 							->setId('massLabel')
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setRows(2)
+							->setMaxlength(DB::getFieldLength('sysmaps_elements', 'label'))
 							->disableSpellcheck()
 					)
 					->addRow(
@@ -781,6 +785,7 @@ function createFontSelect(string $name): CSelect {
 							->setId('linklabel')
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setRows(2)
+							->setMaxlength(DB::getFieldLength('sysmaps_links', 'label'))
 							->disableSpellcheck()
 					)
 					->addRow(new CLabel(_('Connect to'), 'label-selementid2'), (new CSelect('selementid2'))

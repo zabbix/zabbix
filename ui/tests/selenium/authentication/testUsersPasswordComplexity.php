@@ -913,7 +913,7 @@ class testUsersPasswordComplexity extends CWebTest {
 	}
 
 	/**
-	 * Check user changes his own password accordingly to complexity rules.
+	 * Check if user changes their own password according to complexity rules.
 	 *
 	 * @dataProvider getCommonPasswordData
 	 * @dataProvider getUserPasswordData
@@ -925,7 +925,7 @@ class testUsersPasswordComplexity extends CWebTest {
 	}
 
 	/**
-	 * Check Admin changes his own password accordingly to complexity rules.
+	 * Check if Admin changes their own password according to complexity rules.
 	 *
 	 * @dataProvider getCommonPasswordData
 	 * @dataProvider getAdminPasswordData
@@ -961,7 +961,7 @@ class testUsersPasswordComplexity extends CWebTest {
 	 * @param string    $admin_password    password used for Admin user login
 	 * @param int       $userid            id of the user whose password is changed
 	 * @param boolean   $update            false if create, true if update
-	 * @param $own      $own               true if user changes his password himself
+	 * @param $own      $own               true if user changes their password themselves
 	 */
 	private function checkPasswordComplexity($data, $admin_password, $userid = null, $update = false, $own = false,
 			$user_password = null) {
@@ -1050,7 +1050,7 @@ class testUsersPasswordComplexity extends CWebTest {
 		}
 		else {
 			if ($own || $userid === 1) {
-				// If user updates his own password he is being logged out, so check Login screen.
+				// If user updates their own password they will be logged out, so check login screen.
 				$this->page->assertTitle('Zabbix');
 				$this->assertTrue($this->query('button:Sign in')->one()->isClickable());
 			}

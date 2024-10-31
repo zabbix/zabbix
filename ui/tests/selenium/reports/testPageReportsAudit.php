@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/../../include/CAPITest.php';
  * @backup media_type, auditlog, config, profiles
  *
  * @onBefore deleteAuditlog
+ *
+ * @dataSource DynamicItemWidgets
  */
 class testPageReportsAudit extends CWebTest {
 
@@ -73,7 +75,7 @@ class testPageReportsAudit extends CWebTest {
 		}
 
 		// Check form labels.
-		$this->assertEquals(['Users', 'Actions', 'Resource', 'Resource ID', 'Recordset ID'], $form->getLabels()->asText());
+		$this->assertEquals(['Users', 'Actions', 'Resource', 'Resource ID', 'Recordset ID', 'IP'], $form->getLabels()->asText());
 
 		// Check that resource values set as All by default.
 		$this->assertTrue($form->checkValue(['Resource' => 'All']));
@@ -218,11 +220,10 @@ class testPageReportsAudit extends CWebTest {
 	 * Clear history and trends in item and check audit page.
 	 */
 	public function testPageReportsAudit_HistoryClear() {
-		CDataHelper::call('history.clear', [99106]);
-
 		// Check that audit info displayed correctly on frontend.
-		$clear_audit = 'Description: Dynamic widgets H3I1';
-		$this->checkAuditValues('Item', 99106, ['History clear' => $clear_audit]);
+		self::$id = CDataHelper::get('DynamicItemWidgets.itemids.Dynamic widgets H3I1');
+		CDataHelper::call('history.clear', [self::$id]);
+		$this->checkAuditValues('Item', self::$id, ['History clear' => 'Description: Dynamic widgets H3I1']);
 	}
 
 	/**
@@ -294,7 +295,7 @@ class testPageReportsAudit extends CWebTest {
 	 */
 	public static function getCheckFilterData() {
 		return [
-			// #0
+			// #0.
 			[
 				[
 					'fields' => [
@@ -304,7 +305,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 1
 				]
 			],
-			// #1
+			// #1.
 			[
 				[
 					'fields' => [
@@ -313,7 +314,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 4
 				]
 			],
-			// #2
+			// #2.
 			[
 				[
 					'fields' => [
@@ -323,7 +324,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 4
 				]
 			],
-			// #3
+			// #3.
 			[
 				[
 					'fields' => [
@@ -332,7 +333,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 12
 				]
 			],
-			// #4
+			// #4.
 			[
 				[
 					'fields' => [
@@ -342,7 +343,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 1
 				]
 			],
-			// #5
+			// #5.
 			[
 				[
 					'fields' => [
@@ -358,7 +359,7 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 5
 				]
 			],
-			// #6
+			// #6.
 			[
 				[
 					'fields' => [
@@ -374,7 +375,7 @@ class testPageReportsAudit extends CWebTest {
 					]
 				]
 			],
-			// #7
+			// #7.
 			[
 				[
 					'fields' => [
@@ -383,28 +384,28 @@ class testPageReportsAudit extends CWebTest {
 					'result_count' => 13
 				]
 			],
-			// #8
+			// #8.
 			[
 				[
 					'fields' => [
-						'Resource ID' => 99106
+						'Resource ID' => 'replace'
 					],
 					'result_count' => 1
 				]
 			],
-			// #9
+			// #9.
 			[
 				[
 					'fields' => [
 						'Users' => 'Admin',
 						'Resource' => 'Item',
-						'Resource ID' => 99106,
+						'Resource ID' => 'replace',
 						'Actions' => 'History clear'
 					],
 					'result_count' => 1
 				]
 			],
-			// #10
+			// #10.
 			[
 				[
 					'fields' => [
@@ -413,7 +414,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// #11
+			// #11.
 			[
 				[
 					'fields' => [
@@ -423,7 +424,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// #12
+			// #12.
 			[
 				[
 					'fields' => [
@@ -432,7 +433,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// #13
+			// #13.
 			[
 				[
 					'fields' => [
@@ -441,7 +442,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// #14
+			// #14.
 			[
 				[
 					'fields' => [
@@ -450,7 +451,7 @@ class testPageReportsAudit extends CWebTest {
 					'no_data' => true
 				]
 			],
-			// #15
+			// #15.
 			[
 				[
 					'fields' => [
@@ -458,27 +459,89 @@ class testPageReportsAudit extends CWebTest {
 					],
 					'no_data' => true
 				]
+			],
+			// #16 IPv4 address.
+			[
+				[
+					'fields' => [
+						'IP' => '111.222.33.44'
+					],
+					'result_count' => 1
+				]
+			],
+			// #17 Another correct IP.
+			[
+				[
+					'fields' => [
+						'IP' => '111.222.33.4'
+					],
+					'result_count' => 4
+				]
+			],
+			// #18 Part of correct IP.
+			[
+				[
+					'fields' => [
+						'IP' => '111.222'
+					],
+					'no_data' => true
+				]
+			],
+			// #19 IP is not in the list.
+			[
+				[
+					'fields' => [
+						'IP' => '66.66.66.66'
+					],
+					'no_data' => true
+				]
+			],
+			// #20 IPv6 address.
+			[
+				[
+					'fields' => [
+						'IP' => 'fe80::fd4a:c2bd:74e:99ab'
+					],
+					'result_count' => 2
+				]
+			],
+			// #21 Domain address.
+			[
+				[
+					'fields' => [
+						'IP' => 'domain'
+					],
+					'result_count' => 6
+				]
+			],
+			// #22.
+			[
+				[
+					'fields' => [
+						'Resource ID' => 'aaaaaaaa'
+					],
+					'no_data' => true
+				]
+			],
+			// #23.
+			[
+				[
+					'fields' => [
+						'Recordset ID' => 'aaaaaaaa'
+					],
+					'no_data' => true
+				]
 			]
-			// TODO: uncomment after ZBX-21097 fix
-			// #16
-//			[
-//				[
-//					'fields' => [
-//						'Resource ID' => 'aaaaaaaa'
-//					],
-//					'no_data' => true
-//				]
-//			],
-			// #17
-//			[
-//				[
-//					'fields' => [
-//						'Recordset ID' => 'aaaaaaaa'
-//					],
-//					'no_data' => true
-//				]
-//			]
 		];
+	}
+
+	/**
+	 * Set IP addresses in database rows.
+	 */
+	protected function setIpAddressValues() {
+		foreach (['3' => '111.222.33.4', '15' => '111.222.33.44', '0' => 'domain', '40' => 'fe80::fd4a:c2bd:74e:99ab'] as $type => $ip) {
+			DBexecute("UPDATE auditlog SET ip=".zbx_dbstr($ip)." WHERE resourcetype=".zbx_dbstr($type));
+		}
 	}
 
 	/**
@@ -487,7 +550,7 @@ class testPageReportsAudit extends CWebTest {
 	 *
 	 * @dataProvider getCheckFilterData
 	 *
-	 * @onBeforeOnce prepareLoginData
+	 * @onBeforeOnce prepareLoginData, setIpAddressValues
 	 *
 	 * @depends testPageReportsAudit_Add
 	 * @depends testPageReportsAudit_Update
@@ -497,6 +560,10 @@ class testPageReportsAudit extends CWebTest {
 	 * @depends testPageReportsAudit_DisabledEnabled
 	 */
 	public function testPageReportsAudit_CheckFilter($data) {
+		if (CTestArrayHelper::get($data['fields'], 'Resource ID') === 'replace') {
+			$data['fields']['Resource ID'] = CDataHelper::get('DynamicItemWidgets.itemids.Dynamic widgets H3I1');
+		}
+
 		$this->page->login()->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -545,24 +612,57 @@ class testPageReportsAudit extends CWebTest {
 		}
 	}
 
+	public static function getClickableTablePlaces() {
+		return [
+			// #0
+			[
+				[
+					'table_column' => 'IP',
+					'sql' => 'SELECT NULL FROM auditlog WHERE ip=',
+					'label' => 'IP'
+				]
+			],
+			// #1
+			[
+				[
+					'table_column' => 'ID',
+					'sql' => 'SELECT NULL FROM auditlog WHERE resourceid=',
+					'label' => 'Resource ID'
+				]
+			],
+			// #2
+			[
+				[
+					'table_column' => 'Recordset ID',
+					'sql' => 'SELECT NULL FROM auditlog WHERE recordsetid=',
+					'label' => 'Recordset ID'
+				]
+			]
+		];
+	}
+
 	/**
-	 * Check that audit log can be filtered by recordsetid.
+	 * Check that audit log can be filtered by IP, ID and Recordset ID column values.
+	 *
+	 * @dataProvider getClickableTablePlaces
+	 *
+	 * @depends testPageReportsAudit_CheckFilter
 	 */
-	public function testPageReportsAudit_CheckRecordsetFilter() {
+	public function testPageReportsAudit_CheckClickableTable($data) {
 		$this->page->login()->open('zabbix.php?action=auditlog.list&filter_rst=1')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
 		$form->query('button:Reset')->one()->click();
 
-		// Click on Recordset ID in first row.
-		$table->getRow(0)->getColumn('Recordset ID')->query('xpath:.//a')->one()->click();
-		$recordsetid = $table->getRow(0)->getColumn('Recordset ID')->getText();
+		// Click on the link in the first row of the table.
+		$table->getRow(0)->getColumn($data['table_column'])->query('xpath:.//a')->one()->click();
+		$column = $table->getRow(0)->getColumn($data['table_column'])->getText();
 
-		// Check that correct Recordset ID displayed in filter form.
-		$this->assertTrue($form->checkValue(['Recordset ID' => $recordsetid]));
+		// Check that correct column value displayed in filter form.
+		$this->assertTrue($form->checkValue([$data['label'] => $column]));
 
 		// Compare result cout on page and in DB.
-		$recordsetid_count = CDBHelper::getCount('SELECT NULL FROM auditlog WHERE recordsetid='.zbx_dbstr($recordsetid));
+		$recordsetid_count = CDBHelper::getCount($data['sql'].zbx_dbstr($column));
 		$this->assertEquals($recordsetid_count, $table->getRows()->count());
 	}
 

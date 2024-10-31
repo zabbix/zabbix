@@ -769,7 +769,10 @@ $item_tab
 	])
 	->addItem([
 		new CLabel(_('Description'), 'description'),
-		new CFormField((new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+		new CFormField((new CTextArea('description', $data['description']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxLength(DB::getFieldLength('hosts', 'description'))
+		)
 	])
 	->addItem([
 		new CLabel(_('Enabled'), 'status'),

@@ -129,7 +129,7 @@ void	pg_cache_init(zbx_pg_cache_t *cache, zbx_uint64_t map_revision)
 
 	if (0 != (err = pthread_mutex_init(&cache->lock, NULL)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot initialize proxy group manager cache mutext: %s", zbx_strerror(err));
+		zabbix_log(LOG_LEVEL_ERR, "cannot initialize proxy group manager cache mutex: %s", zbx_strerror(err));
 		exit(EXIT_FAILURE);
 	}
 
@@ -1031,7 +1031,8 @@ void	pg_cache_update_proxies(zbx_pg_cache_t *cache, int flags)
 		if (proxy->revision == cache->proxy_revision)
 			continue;
 
-		pg_cache_group_remove_proxy(cache, proxy, PG_REMOVE_DELETED_PROXY);
+		if (NULL != proxy->group)
+			pg_cache_group_remove_proxy(cache, proxy, PG_REMOVE_DELETED_PROXY);
 		pg_proxy_clear(proxy);
 		zbx_hashset_iter_remove(&iter);
 	}

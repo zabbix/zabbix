@@ -1,0 +1,82 @@
+[
+    {
+        "value": "%",
+        "macrofunc": {
+            "function": "urlencode",
+            "parameters": []
+        },
+        "result": "%25"
+    },
+    {
+        "value": "",
+        "macrofunc": {
+            "function": "urlencode",
+            "parameters": []
+        },
+        "result": ""
+    },
+    {
+        "value": "encode_this:&<>",
+        "macrofunc": {
+            "function": "urlencode",
+            "parameters": []
+        },
+        "result": "encode_this%3A%26%3C%3E"
+    },
+    {
+        "value": "special_characters:?=&#%",
+        "macrofunc": {
+            "function": "urlencode",
+            "parameters": []
+        },
+        "result": "special_characters%3A%3F%3D%26%23%25"
+    },
+    {
+        "value": "test",
+        "macrofunc": {
+            "function": "urlencode",
+            "parameters": ["123"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": "test",
+        "macrofunc": {
+            "function": "urlencode",
+            "parameters": ["123", "456", "789"]
+        },
+        "result": "*UNKNOWN*"
+    },
+    {
+        "value": " ",
+        "macrofunc": {
+            "function": "urlencode",
+            "parameters": []
+        },
+        "result": "%20"
+    },
+    {
+        "value": "~",
+        "macrofunc": {
+            "function": "urlencode",
+            "parameters": []
+        },
+        "result": "~"
+    },
+    {
+        "value": "\"\t%\t-\t.\t<\t>\t\\\t^\t_\t`\t{\t|\t}\t~ !\t#\t$\t&\t(\t)\t*\t+\t,\t/\t:\t;\t=\t?\t\"\t%\t-\t.\t<\t>\t\\\t^\t_\t`\t{\t|\t}\t~ !\t#\t$\t&\t(\t)\t*\t+\t,\t/\t:\t;\t=\t?\t\"\t%\t-\t.\t<\t>\t\\\t^\t_\t`\t{\t|\t}\t~ !\t#\t$\t&\t(\t)\t*\t+\t,\t/\t:\t;\t=\t?\t\"\t%\t-\t.\t<\t>\t\\\t^\t_\t`\t{\t|\t}\t~ !\t#\t$\t&\t(\t)\t*\t+\t,\t/\t:\t;\t=\t?\t",
+        "macrofunc": {
+            "function": "urlencode",
+            "parameters": []
+        },
+        "result": "%22%09%25%09-%09.%09%3C%09%3E%09%5C%09%5E%09_%09%60%09%7B%09%7C%09%7D%09~%20%21%09%23%09%24%09%26%09%28%09%29%09%2A%09%2B%09%2C%09%2F%09%3A%09%3B%09%3D%09%3F%09%22%09%25%09-%09.%09%3C%09%3E%09%5C%09%5E%09_%09%60%09%7B%09%7C%09%7D%09~%20%21%09%23%09%24%09%26%09%28%09%29%09%2A%09%2B%09%2C%09%2F%09%3A%09%3B%09%3D%09%3F%09%22%09%25%09-%09.%09%3C%09%3E%09%5C%09%5E%09_%09%60%09%7B%09%7C%09%7D%09~%20%21%09%23%09%24%09%26%09%28%09%29%09%2A%09%2B%09%2C%09%2F%09%3A%09%3B%09%3D%09%3F%09%22%09%25%09-%09.%09%3C%09%3E%09%5C%09%5E%09_%09%60%09%7B%09%7C%09%7D%09~%20%21%09%23%09%24%09%26%09%28%09%29%09%2A%09%2B%09%2C%09%2F%09%3A%09%3B%09%3D%09%3F%09"
+    },
+    {
+        "value": "12345",
+        "macrofunc": {
+            "function": "urlencode",
+            "parameters": [" "]
+        },
+        "result": "*UNKNOWN*"
+    }
+]

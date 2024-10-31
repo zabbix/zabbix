@@ -247,7 +247,7 @@ function DBselect($query, $limit = null, $offset = 0) {
 
 		case ZBX_DB_POSTGRESQL:
 			if (!$result = pg_query($DB['DB'], $query)) {
-				error('Error in query ['.$query.'] ['.pg_last_error($DB['DB']).']', true);
+				trigger_error('Error in query ['.$query.'] ['.pg_last_error($DB['DB']).']', E_USER_WARNING);
 			}
 
 			break;
@@ -257,14 +257,14 @@ function DBselect($query, $limit = null, $offset = 0) {
 
 			if ($result === false) {
 				$e = oci_error();
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', true);
+				trigger_error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', E_USER_WARNING);
 
 				break;
 			}
 
 			if (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
 				$e = oci_error($result);
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', true);
+				trigger_error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', E_USER_WARNING);
 			}
 
 			break;
@@ -555,7 +555,8 @@ function zbx_db_search($table, $options, &$sql_parts) {
 
 	$search = [];
 	foreach ($options['search'] as $field => $patterns) {
-		if (!isset($tableSchema['fields'][$field]) || $patterns === null) {
+		if ($patterns === null || !array_key_exists($field, $tableSchema['fields'])
+				|| ($tableSchema['fields'][$field]['type'] & DB::SUPPORTED_SEARCH_TYPES) == 0) {
 			continue;
 		}
 
@@ -564,13 +565,6 @@ function zbx_db_search($table, $options, &$sql_parts) {
 		});
 
 		if (!$patterns) {
-			continue;
-		}
-
-		if ($tableSchema['fields'][$field]['type'] !== DB::FIELD_TYPE_CHAR
-				&& $tableSchema['fields'][$field]['type'] !== DB::FIELD_TYPE_NCLOB
-				&& $tableSchema['fields'][$field]['type'] !== DB::FIELD_TYPE_TEXT
-				&& $tableSchema['fields'][$field]['type'] !== DB::FIELD_TYPE_CUID) {
 			continue;
 		}
 
@@ -583,7 +577,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 				? $start.$pattern.'%'
 				: str_replace('*', '%', $pattern);
 
-			if ($DB['TYPE'] == ZBX_DB_ORACLE && $tableSchema['fields'][$field]['type'] === DB::FIELD_TYPE_NCLOB
+			if ($DB['TYPE'] == ZBX_DB_ORACLE && $tableSchema['fields'][$field]['type'] & DB::FIELD_TYPE_NCLOB
 					&& strlen($pattern) > ORACLE_MAX_STRING_SIZE) {
 				$chunks = zbx_dbstr(DB::chunkMultibyteStr($pattern, ORACLE_MAX_STRING_SIZE));
 				$pattern = 'TO_NCLOB('.implode(') || TO_NCLOB(', $chunks).')';

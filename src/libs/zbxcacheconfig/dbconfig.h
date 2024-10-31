@@ -102,12 +102,14 @@ ZBX_DC_FUNCTION;
 typedef struct
 {
 	zbx_vector_uint64_pair_t	dep_itemids;
+	zbx_uint64_t			revision;
 }
 ZBX_DC_MASTERITEM;
 
 typedef struct
 {
 	zbx_vector_ptr_t	preproc_ops;
+	zbx_uint64_t		revision;
 }
 ZBX_DC_PREPROCITEM;
 
@@ -317,14 +319,6 @@ typedef struct
 	zbx_uint64_t		templateid;
 }
 ZBX_DC_TEMPLATE_ITEM;
-
-typedef struct
-{
-	zbx_uint64_t		itemid;
-	zbx_uint64_t		hostid;
-	zbx_uint64_t		templateid;
-}
-ZBX_DC_PROTOTYPE_ITEM;
 
 typedef struct
 {
@@ -972,6 +966,7 @@ typedef struct
 	unsigned int		auto_registration_actions;	/* number of enabled auto resistration actions */
 
 	zbx_dc_revision_t	revision;
+	int		        itservices_num;
 
 	/* maintenance processing management */
 	unsigned char		maintenance_update;		/* flag to trigger maintenance update by timers  */
@@ -984,8 +979,7 @@ typedef struct
 	zbx_hashset_t		items;
 	zbx_hashset_t		items_hk;		/* hostid, key */
 	zbx_hashset_t		item_discovery;
-	zbx_hashset_t		template_items;		/* template items selected from items table */
-	zbx_hashset_t		prototype_items;	/* item prototypes selected from items table */
+	zbx_hashset_t		template_items;		/* template and prototype items from items table */
 	zbx_hashset_t		functions;
 	zbx_hashset_t		triggers;
 	zbx_hashset_t		trigdeps;
@@ -1032,7 +1026,6 @@ typedef struct
 	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
 							/* by PSK identity */
 #endif
-	zbx_hashset_t		data_sessions;
 	zbx_hashset_t		drules;
 	zbx_hashset_t		dchecks;
 	zbx_hashset_t		httptests;
@@ -1160,8 +1153,9 @@ ZBX_DC_PSK	*dc_psk_sync(char *tls_psk_identity, char *tls_psk, const char *name,
 		zbx_hashset_t *psk_owners, ZBX_DC_PSK *tls_dc_psk);
 #endif
 
-void	dbconfig_shmem_free_func(void *ptr);
-void	*dbconfig_shmem_realloc_func(void *old, size_t size);
-void	*dbconfig_shmem_malloc_func(void *old, size_t size);
+void		dbconfig_shmem_free_func(void *ptr);
+void		*dbconfig_shmem_realloc_func(void *old, size_t size);
+void		*dbconfig_shmem_malloc_func(void *old, size_t size);
+zbx_uint64_t	dbconfig_used_size(void);
 
 #endif

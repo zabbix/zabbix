@@ -671,6 +671,16 @@ else {
 		? API::GraphPrototype()->get($options)
 		: API::Graph()->get($options);
 
+	if ($data['context'] === 'host') {
+		$editable_hosts = API::Host()->get([
+			'output' => ['hostids'],
+			'graphids' => array_column($data['graphs'], 'graphid'),
+			'editable' => true
+		]);
+
+		$data['editable_hosts'] = array_column($editable_hosts, 'hostid');
+	}
+
 	if ($sort_field === 'graphtype') {
 		foreach ($data['graphs'] as $gnum => $graph) {
 			$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
@@ -704,9 +714,7 @@ else {
 	$options = [
 		'output' => ['graphid', 'name', 'templateid', 'graphtype', 'width', 'height'],
 		'selectDiscoveryRule' => ['itemid', 'name'],
-		'selectGraphDiscovery'	=> ['status', 'ts_delete'],
 		'selectHosts' => ($data['hostid'] == 0) ? ['name'] : null,
-		'selectTemplates' => ($data['hostid'] == 0) ? ['name'] : null,
 		'graphids' => zbx_objectValues($data['graphs'], 'graphid'),
 		'preservekeys' => true
 	];
@@ -716,44 +724,21 @@ else {
 		$data['graphs'] = API::GraphPrototype()->get($options);
 	}
 	else {
-		$data['graphs'] = API::Graph()->get($options + ['selectGraphDiscovery' => ['ts_delete']]);
+		$data['graphs'] = API::Graph()->get($options + ['selectGraphDiscovery' => ['status', 'ts_delete']]);
 	}
 
 	foreach ($data['graphs'] as $gnum => $graph) {
 		$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
 	}
 
-	if (!hasRequest('parent_discoveryid')) {
-		$items = API::Item()->get([
-			'output' => ['itemid'],
-			'selectGraphs' => ['graphid'],
-			'selectItemDiscovery' => ['ts_delete'],
-			'graphids' => array_keys($data['graphs']),
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
-		]);
-
-		foreach ($items as $item) {
-			$ts_delete = $item['itemDiscovery']['ts_delete'];
-
-			if ($ts_delete == 0) {
-				continue;
-			}
-
-			foreach (array_column($item['graphs'], 'graphid') as $graphid) {
-				if (!array_key_exists('ts_delete', $data['graphs'][$graphid]['graphDiscovery'])) {
-					$data['graphs'][$graphid]['graphDiscovery']['ts_delete'] = $ts_delete;
-				}
-				else {
-					$graph_ts_delete = $data['graphs'][$graphid]['graphDiscovery']['ts_delete'];
-					$data['graphs'][$graphid]['graphDiscovery']['ts_delete'] = ($graph_ts_delete > 0)
-						? min($ts_delete, $graph_ts_delete)
-						: $ts_delete;
-				}
-			}
-		}
-	}
-
 	order_result($data['graphs'], $sort_field, $sort_order);
+
+	if ($data['hostid'] == 0) {
+		foreach ($data['graphs'] as &$graph) {
+			CArrayHelper::sort($graph['hosts'], ['name']);
+		}
+		unset($graph);
+	}
 
 	$data['parent_templates'] = getGraphParentTemplates($data['graphs'], ($data['parent_discoveryid'] === null)
 		? ZBX_FLAG_DISCOVERY_NORMAL

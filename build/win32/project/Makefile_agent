@@ -58,6 +58,7 @@ OBJS = \
 	..\..\..\src\libs\zbxexpr\interval.o \
 	..\..\..\src\libs\zbxexpr\macro.o \
 	..\..\..\src\libs\zbxexpr\token.o \
+	..\..\..\src\libs\zbxexpr\urlencode.o \
 	..\..\..\src\libs\zbxcommon\components_strings_representations.o \
 	..\..\..\src\libs\zbxcommon\libc_wrappers.o \
 	..\..\..\src\libs\zbxcommshigh\commshigh.o \
@@ -82,7 +83,6 @@ OBJS = \
 	..\..\..\src\libs\zbxhttp\http.o \
 	..\..\..\src\libs\zbxcurl\curl.o \
 	..\..\..\src\libs\zbxhttp\punycode.o \
-	..\..\..\src\libs\zbxhttp\urlencode.o \
 	..\..\..\src\libs\zbxhttp\charset.o \
 	..\..\..\src\libs\zbxsysinfo\agent\agent.o \
 	..\..\..\src\libs\zbxsysinfo\agent\modbus.o \

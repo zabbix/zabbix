@@ -627,6 +627,8 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 	zbx_vector_um_host_t	hosts;
 	zbx_hashset_t		*user_macros;
 
+	zbx_dcsync_sync_start(sync, dbconfig_used_size());
+
 	user_macros = (2 == offset ? &(get_dc_config())->hmacros : &(get_dc_config())->gmacros);
 
 	zbx_vector_um_host_create(&hosts);
@@ -786,6 +788,8 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 	}
 
 	zbx_vector_um_host_destroy(&hosts);
+
+	zbx_dcsync_sync_end(sync, dbconfig_used_size());
 }
 
 /*********************************************************************************

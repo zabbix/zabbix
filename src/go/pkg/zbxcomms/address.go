@@ -16,29 +16,32 @@ package zbxcomms
 
 type singleAddress string
 
-// NewAddress creates single address implementing AddressSet interface
+// NewAddress creates single address implementing AddressSet interface.
 func NewAddress(addr string) AddressSet {
 	return singleAddress(addr)
 }
 
+// Get returns current address as string <address>:<port>.
 func (a singleAddress) Get() string {
 	return string(a)
 }
 
+// String returns list of all addresses.
 func (a singleAddress) String() string {
 	return string(a)
 }
 
-func (a singleAddress) next() {
+// Next cycles the address set by selecting next address.
+func (singleAddress) Next() {
 }
 
-func (a singleAddress) reset() {
+func (singleAddress) reset() {
 }
 
-func (a singleAddress) addRedirect(addr string, revision uint64) bool {
+func (singleAddress) addRedirect(_ string, _ uint64) bool {
 	return false
 }
 
-func (a singleAddress) count() int {
+func (singleAddress) count() int {
 	return 1
 }

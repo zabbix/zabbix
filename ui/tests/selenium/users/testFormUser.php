@@ -1674,7 +1674,7 @@ class testFormUser extends CWebTest {
 	}
 
 	/**
-	 * Check that user can't delete himself.
+	 * Check that user can't delete oneself.
 	 */
 	public function testFormUser_SelfDeletion() {
 		$this->page->login()->open('zabbix.php?action=user.edit&userid=1');

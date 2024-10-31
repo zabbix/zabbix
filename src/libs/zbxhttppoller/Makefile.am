@@ -10,4 +10,5 @@ libzbxhttppoller_a_SOURCES = \
 	httptest.h
 
 libzbxhttppoller_a_CFLAGS = \
+	$(LIBXML2_CFLAGS) \
 	$(TLS_CFLAGS)

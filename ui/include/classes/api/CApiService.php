@@ -572,8 +572,7 @@ class CApiService {
 		$nclob_fields = [];
 
 		foreach ($schema['fields'] as $field_name => $field) {
-			if ($field['type'] == DB::FIELD_TYPE_NCLOB
-					&& $this->outputIsRequested($field_name, $options['output'])) {
+			if ($field['type'] & DB::FIELD_TYPE_NCLOB && $this->outputIsRequested($field_name, $options['output'])) {
 				$nclob_fields[] = $field_name;
 			}
 		}
@@ -605,7 +604,7 @@ class CApiService {
 		$nclob_fields = [];
 
 		foreach ($schema['fields'] as $field_name => $field) {
-			if ($field['type'] == DB::FIELD_TYPE_NCLOB && $this->outputIsRequested($field_name, $options['output'])) {
+			if ($field['type'] & DB::FIELD_TYPE_NCLOB && $this->outputIsRequested($field_name, $options['output'])) {
 				$nclob_fields[] = $field_name;
 			}
 		}
@@ -1026,84 +1025,75 @@ class CApiService {
 		foreach ($options['filter'] as $field => $value) {
 			// skip missing fields and text fields (not supported by Oracle)
 			// skip empty values
-			if (!isset($tableSchema['fields'][$field]) || $tableSchema['fields'][$field]['type'] == DB::FIELD_TYPE_TEXT
-					|| $tableSchema['fields'][$field]['type'] == DB::FIELD_TYPE_NCLOB
+			if (!array_key_exists($field, $tableSchema['fields'])
+					|| ($tableSchema['fields'][$field]['type'] & DB::SUPPORTED_FILTER_TYPES) == 0
 					|| zbx_empty($value)) {
 				continue;
 			}
 
 			$values = [];
 
-			switch ($tableSchema['fields'][$field]['type']) {
-				case DB::FIELD_TYPE_INT:
-					foreach ((array) $value as $val) {
-						if (!is_int($val) && (!is_string($val) || !preg_match('/^'.ZBX_PREG_INT.'$/', $val))) {
-							continue;
-						}
-
-						if ($val < ZBX_MIN_INT32 || $val > ZBX_MAX_INT32) {
-							continue;
-						}
-
-						$values[] = $val;
+			if ($tableSchema['fields'][$field]['type'] & DB::FIELD_TYPE_INT) {
+				foreach ((array) $value as $val) {
+					if (!is_int($val) && (!is_string($val) || !preg_match('/^'.ZBX_PREG_INT.'$/', $val))) {
+						continue;
 					}
-					break;
 
-				case DB::FIELD_TYPE_ID:
-					foreach ((array) $value as $val) {
-						if (!is_int($val) && (!is_string($val) || !ctype_digit($val))) {
-							continue;
-						}
-
-						if ($val < 0 || bccomp((string) $val, ZBX_DB_MAX_ID) > 0) {
-							continue;
-						}
-
-						$values[] = $val;
+					if ($val < ZBX_MIN_INT32 || $val > ZBX_MAX_INT32) {
+						continue;
 					}
-					break;
 
-				case DB::FIELD_TYPE_UINT:
-					foreach ((array) $value as $val) {
-						if (!is_int($val) && (!is_string($val) || !ctype_digit($val))) {
-							continue;
-						}
-
-						if (bccomp((string) $val, ZBX_MIN_INT64) < 0 || bccomp((string) $val, ZBX_MAX_INT64) > 0) {
-							continue;
-						}
-
-						$values[] = $val;
+					$values[] = $val;
+				}
+			}
+			elseif ($tableSchema['fields'][$field]['type'] & DB::FIELD_TYPE_ID) {
+				foreach ((array) $value as $val) {
+					if (!is_int($val) && (!is_string($val) || !ctype_digit($val))) {
+						continue;
 					}
-					break;
 
-				case DB::FIELD_TYPE_FLOAT:
-					foreach ((array) $value as $val) {
-						if (!is_numeric($val)) {
-							continue;
-						}
-
-						$values[] = $val;
+					if ($val < 0 || bccomp((string) $val, ZBX_DB_MAX_ID) > 0) {
+						continue;
 					}
-					break;
 
-				default:
-					$values = (array) $value;
+					$values[] = $val;
+				}
+			}
+			elseif ($tableSchema['fields'][$field]['type'] & DB::FIELD_TYPE_UINT) {
+				foreach ((array) $value as $val) {
+					if (!is_int($val) && (!is_string($val) || !ctype_digit($val))) {
+						continue;
+					}
+
+					if (bccomp((string) $val, ZBX_MIN_INT64) < 0 || bccomp((string) $val, ZBX_MAX_INT64) > 0) {
+						continue;
+					}
+
+					$values[] = $val;
+				}
+			}
+			elseif ($tableSchema['fields'][$field]['type'] & DB::FIELD_TYPE_FLOAT) {
+				foreach ((array) $value as $val) {
+					if (!is_numeric($val)) {
+						continue;
+					}
+
+					$values[] = $val;
+				}
+			}
+			else {
+				$values = (array) $value;
 			}
 
 			$fieldName = $this->fieldId($field, $tableShort);
-			switch ($tableSchema['fields'][$field]['type']) {
-				case DB::FIELD_TYPE_ID:
-					$filter[$field] = dbConditionId($fieldName, $values);
-					break;
-
-				case DB::FIELD_TYPE_INT:
-				case DB::FIELD_TYPE_UINT:
-					$filter[$field] = dbConditionInt($fieldName, $values);
-					break;
-
-				default:
-					$filter[$field] = dbConditionString($fieldName, $values);
+			if ($tableSchema['fields'][$field]['type'] & DB::FIELD_TYPE_ID) {
+				$filter[$field] = dbConditionId($fieldName, $values);
+			}
+			elseif ($tableSchema['fields'][$field]['type'] & (DB::FIELD_TYPE_INT | DB::FIELD_TYPE_UINT)) {
+				$filter[$field] = dbConditionInt($fieldName, $values);
+			}
+			else {
+				$filter[$field] = dbConditionString($fieldName, $values);
 			}
 		}
 

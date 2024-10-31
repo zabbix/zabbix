@@ -16,10 +16,6 @@
 
 class CControllerNotificationsRead extends CController {
 
-	protected function init(): void {
-		$this->disableCsrfValidation();
-	}
-
 	protected function checkInput(): bool {
 		$fields = [
 			'ids' => 'array_db events.eventid|required'

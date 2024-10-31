@@ -85,7 +85,7 @@ func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 
 		err := accessor.RegisterMetrics(config)
 		if err != nil {
-			return "", errs.Wrap(err, "failed to register metrics")
+			return "", errs.Wrapf(err, "failed to register metrics of plugin %q", name)
 		}
 	}
 

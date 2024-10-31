@@ -594,7 +594,7 @@ class testRole extends CAPITest {
 					]
 				],
 				'expected_error' =>
-					'UI element "services.actions" is not available for user role "first-role-for-update".'
+					'UI element "services.actions" is not available for user role "Unknown ui element".'
 			]
 		];
 	}

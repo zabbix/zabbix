@@ -15,7 +15,6 @@
 #ifndef ZABBIX_PROXYBUFFER_H
 #define ZABBIX_PROXYBUFFER_H
 
-#include "proxybuffer.h"
 #include "zbxalgo.h"
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
@@ -170,5 +169,8 @@ zbx_uint64_t	pb_get_next_handleid(zbx_pb_t *pb);
 zbx_uint64_t	pb_register_handle(zbx_pb_t *pb, zbx_vector_uint64_t *handleids);
 void	pb_deregister_handle(zbx_vector_uint64_t *handleids, zbx_uint64_t handleid);
 void	pb_wait_handles(const zbx_vector_uint64_t *handleids);
+
+void	pb_add_json_field(struct zbx_json *j, zbx_history_table_t *history_table, const char *fld_name, void *value,
+		int type);
 
 #endif

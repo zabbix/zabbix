@@ -45,7 +45,7 @@ ZBX_VECTOR_DECL(eventdata, zbx_eventdata_t)
 
 void	zbx_eventdata_free(zbx_eventdata_t *eventdata);
 int	zbx_eventdata_compare(const zbx_eventdata_t *d1, const zbx_eventdata_t *d2);
-void	zbx_eventdata_to_str(const zbx_vector_eventdata_t *eventdata, char **replace_to);
+int	zbx_eventdata_to_str(const zbx_vector_eventdata_t *eventdata, char **replace_to);
 
 void	zbx_event_get_macro_value(const char *macro, const zbx_db_event *event, char **replace_to,
 			const zbx_uint64_t *recipient_userid, const zbx_db_event *r_event, const char *tz);

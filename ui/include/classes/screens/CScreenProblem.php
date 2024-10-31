@@ -859,7 +859,9 @@ class CScreenProblem extends CScreenBase {
 
 					$symptom_events = $this->data['filter']['show'] == TRIGGERS_OPTION_ALL
 						? API::Event()->get($options)
-						: API::Problem()->get($options + ['recent' => true]);
+						: API::Problem()->get($options + [
+							'recent' => $this->data['filter']['show'] == TRIGGERS_OPTION_RECENT_PROBLEM
+						]);
 
 					if ($symptom_events) {
 						$enabled_triggers = API::Trigger()->get([

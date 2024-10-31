@@ -24,7 +24,6 @@ class CLineGraphDraw extends CGraphDraw {
 	private $drawExLegend;
 	private $drawItemsLegend;
 	private $intervals;
-	private $is_binary;
 	private $itemsHost;
 	private $outer;
 	private $oxy;
@@ -85,7 +84,6 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$this->intervals = [];
 		$this->power = [];
-		$this->is_binary = [];
 
 		$this->drawItemsLegend = false; // draw items legend
 		$this->drawExLegend = false; // draw percentile and triggers legend
@@ -1202,7 +1200,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$scale_values = calculateGraphScaleValues($this->m_minY[$side], $this->m_maxY[$side],
 				$this->ymin_type == GRAPH_YAXIS_TYPE_CALCULATED, $this->ymax_type == GRAPH_YAXIS_TYPE_CALCULATED,
-				$this->intervals[$side], $units, $this->is_binary[$side], $this->power[$side], 10
+				$this->intervals[$side], $units, $this->power[$side], 10
 			);
 
 			$line_color = $this->getColor($this->graphtheme['gridcolor'], 0);
@@ -1312,33 +1310,30 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 
 		foreach ($this->percentile as $side => $percentile) {
-			if ($percentile['percent'] > 0 && $percentile['value']) {
-				$minY = $this->m_minY[$side];
-				$maxY = $this->m_maxY[$side];
+			if ($percentile['percent'] > 0 && $percentile['value'] != 0) {
+				$min_y = $this->m_minY[$side];
+				$max_y = $this->m_maxY[$side];
 
-				$color = ($side == GRAPH_YAXIS_SIDE_LEFT)
-					? $this->graphtheme['leftpercentilecolor']
-					: $this->graphtheme['rightpercentilecolor'];
+				if ($percentile['value'] >= $min_y && $percentile['value'] <= $max_y) {
+					$color = ($side == GRAPH_YAXIS_SIDE_LEFT)
+						? $this->graphtheme['leftpercentilecolor']
+						: $this->graphtheme['rightpercentilecolor'];
 
-				if ($maxY - $minY == INF) {
-					$y = $this->sizeY + $this->shiftY - CMathHelper::safeMul([$this->sizeY,
-						$percentile['value'] / 10 - $minY / 10, 1 / ($maxY / 10 - $minY / 10)]
+					if ($max_y - $min_y == INF) {
+						$y = $this->sizeY + $this->shiftY - CMathHelper::safeMul([$this->sizeY,
+							$percentile['value'] / 10 - $min_y / 10, 1 / ($max_y / 10 - $min_y / 10)]
+						);
+					}
+					else {
+						$y = $this->sizeY + $this->shiftY - CMathHelper::safeMul([$this->sizeY,
+							$percentile['value'] - $min_y, 1 / ($max_y - $min_y)]
+						);
+					}
+
+					zbx_imageline($this->im, $this->shiftXleft, $y, $this->sizeX + $this->shiftXleft, $y,
+						$this->getColor($color)
 					);
 				}
-				else {
-					$y = $this->sizeY + $this->shiftY - CMathHelper::safeMul([$this->sizeY,
-						$percentile['value'] - $minY, 1 / ($maxY - $minY)]
-					);
-				}
-
-				zbx_imageline(
-					$this->im,
-					$this->shiftXleft,
-					$y,
-					$this->sizeX + $this->shiftXleft,
-					$y,
-					$this->getColor($color)
-				);
 			}
 		}
 	}
@@ -1906,17 +1901,18 @@ class CLineGraphDraw extends CGraphDraw {
 				$min = min(0, $min);
 			}
 
-			$is_binary = false;
-			$calc_power = false;
+			$units = '';
 
 			foreach ($this->items as $item) {
 				if ($item['yaxisside'] == $side) {
-					$is_binary = $is_binary || in_array($item['units'], ['B', 'Bps']);
-					$calc_power = $calc_power || $item['units'] === '' || $item['units'][0] !== '!';
+					$units = $item['units'];
+					break;
 				}
 			}
 
-			$result = calculateGraphScaleExtremes($min, $max, $is_binary, $calc_power, $calc_min, $calc_max, $rows_min,
+			$calc_power = $units === '' || $units[0] !== '!';
+
+			$result = calculateGraphScaleExtremes($min, $max, $units, $calc_power, $calc_min, $calc_max, $rows_min,
 				$rows_max
 			);
 
@@ -1931,8 +1927,6 @@ class CLineGraphDraw extends CGraphDraw {
 				'interval' => $this->intervals[$side],
 				'power' => $this->power[$side]
 			] = $result;
-
-			$this->is_binary[$side] = $is_binary;
 
 			if ($calc_min && $calc_max) {
 				$rows_min = $rows_max = $result['rows'];

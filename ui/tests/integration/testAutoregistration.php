@@ -20,7 +20,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  *
  * @required-components server, agent
  * @configurationDataProvider agentConfigurationProvider
- * @backup hosts,actions,operations,optag,host_tag
+ * @backup ids,hosts,items,actions,operations,optag,host_tag
  * @backup auditlog,changelog,config,ha_node
  */
 class testAutoregistration extends CIntegrationTest {
@@ -28,8 +28,31 @@ class testAutoregistration extends CIntegrationTest {
 	const HOST_METADATA2 = "autoreg 2";
 	const AUTOREG_ACTION_NAME1 = 'Test autoregistration action 1';
 	const AUTOREG_ACTION_NAME2 = 'Test autoregistration action 2';
+	const ITEM_KEY = "item_key";
+	const LLD_KEY = "lld_key";
 
 	public static $HOST_METADATA = self::HOST_METADATA1;
+
+	public static $items = [
+			[
+				'name' => self::ITEM_KEY,
+				'key_' => self::ITEM_KEY,
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_UINT64
+			]
+		];
+
+	public static $lldrules = [
+			[
+				'name' => self::LLD_KEY,
+				'key_' => self::LLD_KEY,
+				'type' => ITEM_TYPE_TRAPPER,
+				'lifetime_type' => 0,
+				'lifetime' => '1d',
+				'enabled_lifetime_type' => 0,
+				'enabled_lifetime' => '3h'
+			]
+		];
 
 	private function waitForAutoreg($expectedTags) {
 		$max_attempts = 5;
@@ -69,6 +92,7 @@ class testAutoregistration extends CIntegrationTest {
 			}
 		}
 
+		return $autoregHost['hostid'];
 	}
 
 	/**
@@ -102,6 +126,52 @@ class testAutoregistration extends CIntegrationTest {
 		$response = $this->call('host.get', []);
 		$this->assertArrayHasKey('result', $response, 'Failed to clear existing hosts during test setup');
 		$this->assertCount(0, $response['result'], 'Failed to clear existing hosts during test setup');
+
+		$response = $this->call('templategroup.get', [
+			'filter' => [
+				'name' => 'Templates'
+			]
+		]);
+		$this->assertCount(1, $response['result']);
+		$templategroupid = $response['result'][0]['groupid'];
+
+		$response = $this->call('template.create', [
+				'host' => 'test_template',
+				'groups' => [
+					'groupid' => $templategroupid
+				]
+		]);
+		$this->assertCount(1, $response['result']['templateids']);
+		$templateid = $response['result']['templateids'][0];
+
+		$items = [];
+		foreach (self::$items as $item) {
+			$items[] = [
+				'name' => $item['name'],
+				'key_' => $item['key_'],
+				'type' => $item['type'],
+				'value_type' => $item['value_type'],
+				'hostid' => $templateid
+			];
+		}
+		$response = $this->call('item.create', $items);
+		$this->assertCount(count($items), $response['result']['itemids']);
+
+		$lldrules = [];
+		foreach (self::$lldrules as $lldrule) {
+			$lldrules[] = [
+				'name' => $lldrule['name'],
+				'key_' => $lldrule['key_'],
+				'type' => $lldrule['type'],
+				'lifetime_type' => $lldrule['lifetime_type'],
+				'lifetime' => $lldrule['lifetime'],
+				'enabled_lifetime_type' => $lldrule['enabled_lifetime_type'],
+				'enabled_lifetime' => $lldrule['enabled_lifetime'],
+				'hostid' => $templateid
+			];
+		}
+		$response = $this->call('discoveryrule.create', $lldrules);
+		$this->assertCount(count($lldrules), $response['result']['itemids']);
 
 		$response = $this->call('action.create', [
 		[
@@ -149,6 +219,14 @@ class testAutoregistration extends CIntegrationTest {
 						[
 							'tag' => 'tag2',
 							'value' => 'value 2'
+						]
+					]
+				],
+				[
+					'operationtype' => OPERATION_TYPE_TEMPLATE_ADD,
+					'optemplate' => [
+						[
+							'templateid' => $templateid
 						]
 					]
 				]
@@ -217,10 +295,45 @@ class testAutoregistration extends CIntegrationTest {
 	 */
 	public function testAutoregistration_autoregHost1FirstTime()
 	{
-		$this->waitForAutoreg([
+		$hostid = $this->waitForAutoreg([
 			['tag' => 'a1', 'value' => 'autoreg 1'],
 			['tag' => 'tag1', 'value' => 'value 1']
 		]);
+
+		$response = $this->call('item.get', [
+			'hostids' => [ $hostid ],
+			'output' => [
+				'name',
+				'key_',
+				'type',
+				'value_type'
+			]
+		]);
+		$this->assertCount(count(self::$items), $response['result']);
+
+		for ($i = 0; $i < count($response['result']); $i++) {
+			unset($response['result'][$i]['itemid']);
+			$this->assertContains($response['result'][$i], self::$items);
+		}
+
+		$response = $this->call('discoveryrule.get', [
+			'hostids' => [ $hostid ],
+			'output' => [
+				'name',
+				'key_',
+				'type',
+				'lifetime_type',
+				'lifetime',
+				'enabled_lifetime_type',
+				'enabled_lifetime'
+			]
+		]);
+		$this->assertCount(count(self::$lldrules), $response['result']);
+
+		for ($i = 0; $i < count($response['result']); $i++) {
+			unset($response['result'][$i]['itemid']);
+			$this->assertContains($response['result'][$i], self::$lldrules);
+		}
 
 		self::$HOST_METADATA = self::HOST_METADATA2;
 	}

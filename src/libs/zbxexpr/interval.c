@@ -1705,27 +1705,27 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 	{
 		/* handle midnight startup times */
 		if (0 == tm->tm_sec && 0 == tm->tm_min && 0 == tm->tm_hour)
-			zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY);
+			zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY, tz);
 
 		switch (cycle)
 		{
 			case ZBX_REPORT_CYCLE_YEARLY:
-				zbx_tm_round_up(tm, ZBX_TIME_UNIT_YEAR);
+				zbx_tm_round_up(tm, ZBX_TIME_UNIT_YEAR, tz);
 				break;
 			case ZBX_REPORT_CYCLE_MONTHLY:
-				zbx_tm_round_up(tm, ZBX_TIME_UNIT_MONTH);
+				zbx_tm_round_up(tm, ZBX_TIME_UNIT_MONTH, tz);
 				break;
 			case ZBX_REPORT_CYCLE_WEEKLY:
 				if (0 == weekdays)
 					return -1;
-				zbx_tm_round_up(tm, ZBX_TIME_UNIT_DAY);
+				zbx_tm_round_up(tm, ZBX_TIME_UNIT_DAY, tz);
 
 				while (0 == (weekdays & (1 << (tm->tm_wday + 6) % 7)))
-					zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY);
+					zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY, tz);
 
 				break;
 			case ZBX_REPORT_CYCLE_DAILY:
-				zbx_tm_round_up(tm, ZBX_TIME_UNIT_DAY);
+				zbx_tm_round_up(tm, ZBX_TIME_UNIT_DAY, tz);
 				break;
 		}
 

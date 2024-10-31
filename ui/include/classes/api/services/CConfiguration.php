@@ -424,7 +424,7 @@ class CConfiguration extends CApiService {
 
 		$unlink_templates_data = [];
 
-		if ($params['rules']['templateLinkage']['deleteMissing']) {
+		if (array_key_exists('templates', $import) && $params['rules']['templateLinkage']['deleteMissing']) {
 			$import_tmp_parent_tmp_names = [];
 
 			foreach ($import['templates'] as $template) {

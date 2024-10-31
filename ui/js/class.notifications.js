@@ -410,11 +410,15 @@ ZBX_Notifications.prototype.handleTabFocusIn = function() {
 };
 
 /**
- * @param {MouseEvent} e
+ * Close the notification box.
  */
-ZBX_Notifications.prototype.handleCloseClicked = function(e) {
+ZBX_Notifications.prototype.handleCloseClicked = function() {
+	const data = {ids: this.getEventIds()};
+
+	data[CSRF_TOKEN_NAME] = this._csrf_token;
+
 	this
-		.fetch('notifications.read', {ids: this.getEventIds()})
+		.fetch('notifications.read', data)
 		.then((resp) => {
 			if ('error' in resp) {
 				throw {error: resp.error};
@@ -451,9 +455,12 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function() {
 	}
 
 	const latest_event = Math.max(...this.collection.getRawList().map(event => parseInt(event.eventid, 10)));
+	const data = {eventid: latest_event};
+
+	data[CSRF_TOKEN_NAME] = this._csrf_token;
 
 	this
-		.fetch('notifications.snooze', {eventid: latest_event})
+		.fetch('notifications.snooze', data)
 		.then((response) => {
 			if ('error' in response) {
 				throw {error: response.error};
@@ -489,11 +496,15 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function() {
 };
 
 /**
- * @param {MouseEvent} e
+ * Mute messages in the notification box.
  */
-ZBX_Notifications.prototype.handleMuteClicked = function(e) {
+ZBX_Notifications.prototype.handleMuteClicked = function() {
+	const data = {muted: this.alarm.muted ? 0 : 1};
+
+	data[CSRF_TOKEN_NAME] = this._csrf_token;
+
 	this
-		.fetch('notifications.mute', {muted: this.alarm.muted ? 0 : 1})
+		.fetch('notifications.mute', data)
 		.then((resp) => {
 			if ('error' in resp) {
 				throw {error: resp.error};
@@ -543,6 +554,7 @@ ZBX_Notifications.prototype.handleMainLoopResp = function(resp) {
 
 	this.consumeUserSettings(resp.settings);
 	this.consumeList(resp.notifications);
+	this._csrf_token = resp[CSRF_TOKEN_NAME];
 	this.render();
 
 	this.pushUpdates();

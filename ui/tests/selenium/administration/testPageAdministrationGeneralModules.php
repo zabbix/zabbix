@@ -21,7 +21,6 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 /**
  * @backup module, widget
  */
-
 class testPageAdministrationGeneralModules extends CWebTest {
 
 	/**
@@ -106,7 +105,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'y' => 0,
 								'width' => 36,
 								'height' => 4,
-								'view_mode' => 0,
 								'fields' => [
 									[
 										'type' => 1,
@@ -131,7 +129,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'y' => 0,
 								'width' => 36,
 								'height' => 4,
-								'view_mode' => 0,
 								'fields' => [
 									[
 										'type' => 1,
@@ -142,7 +139,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 							],
 							[
 								'type' => 'favgraphs',
-								'view_mode' => 0,
 								'x' => 18,
 								'y' => 4,
 								'width' => 18,
@@ -155,7 +151,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 						'widgets' => [
 							[
 								'type' => 'clock345',
-								'view_mode' => 0,
 								'x' => 0,
 								'y' => 0,
 								'width' => 18,
@@ -163,7 +158,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 							],
 							[
 								'type' => 'favgraphs',
-								'view_mode' => 0,
 								'x' => 18,
 								'y' => 0,
 								'width' => 18,
@@ -177,7 +171,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 							[
 
 								'type' => 'favgraphs',
-								'view_mode' => 0,
 								'x' => 0,
 								'y' => 0,
 								'width' => 18,
@@ -185,7 +178,161 @@ class testPageAdministrationGeneralModules extends CWebTest {
 							],
 							[
 								'type' => 'systeminfo',
-								'view_mode' => 0,
+								'x' => 18,
+								'y' => 0,
+								'width' => 18,
+								'height' => 4
+							]
+						]
+					],
+					[
+						'name' => 'Widget communication page',
+						'widgets' => [
+							[
+								'type' => 'problemhosts',
+								'name' => 'Problem hosts hostgroup broadcaster',
+								'x' => 0,
+								'y' => 0,
+								'width' => 20,
+								'height' => 6,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'IDDQD'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'honeycomb',
+								'name' => 'Honeycomb host and item broadcaster',
+								'x' => 0,
+								'y' => 6,
+								'width' => 20,
+								'height' => 6,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'items.0',
+										'value' => 'Available memory'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'ICARE'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'geomap',
+								'name' => 'Geomap listener',
+								'x' => 22,
+								'y' => 0,
+								'width' => 20,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'groupids._reference',
+										'value' => 'IDDQD._hostgroupids'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'default_view',
+										'value' => '56.9,24.1,5'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'PINTA'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'problems',
+								'name' => 'Problems listener',
+								'x' => 22,
+								'y' => 4,
+								'width' => 20,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'hostids._reference',
+										'value' => 'ICARE._hostids'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'NODAY'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'gauge',
+								'name' => 'Gauge listener',
+								'x' => 22,
+								'y' => 8,
+								'width' => 20,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'itemid._reference',
+										'value' => 'ICARE._itemid'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'min',
+										'value' => '0'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'max',
+										'value' => '10'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 0
+									]
+								]
+							]
+						]
+					],
+					[
+						'name' => 'System info page',
+						'widgets' => [
+							[
+
+								'type' => 'favgraphs',
+								'x' => 0,
+								'y' => 0,
+								'width' => 18,
+								'height' => 4
+							],
+							[
+								'type' => 'systeminfo',
 								'x' => 18,
 								'y' => 0,
 								'width' => 18,
@@ -198,7 +345,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 						'widgets' => [
 							[
 								'type' => 'favgraphs',
-								'view_mode' => 0,
 								'x' => 0,
 								'y' => 0,
 								'width' => 18,
@@ -206,7 +352,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 							],
 							[
 								'type' => 'emptyWidget',
-								'view_mode' => 0,
 								'x' => 18,
 								'y' => 0,
 								'width' => 18,
@@ -262,7 +407,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 							],
 							[
 								'type' => 'clock345',
-								'view_mode' => 0,
 								'x' => 18,
 								'y' => 0,
 								'width' => 18,
@@ -926,8 +1070,26 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				[
 					'module_name' => 'Map navigation tree',
 					'widget_name' => 'Awesome map tree',
-					'dependent_widget' => 'Map',
+					'dependent_widgets' => ['Map'],
 					'page' => 'Map page'
+				]
+			],
+			// Disabling widget module from which another widget listens for hostgroup.
+			[
+				[
+					'module_name' => 'Problem hosts',
+					'widget_name' => 'Problem hosts hostgroup broadcaster',
+					'dependent_widgets' => ['Geomap listener'],
+					'page' => 'Widget communication page'
+				]
+			],
+			// Disabling widget module from which other widgets listen for host and item.
+			[
+				[
+					'module_name' => 'Honeycomb',
+					'widget_name' => 'Honeycomb host and item broadcaster',
+					'dependent_widgets' => ['Problems listener', 'Gauge listener'],
+					'page' => 'Widget communication page'
 				]
 			],
 			// Custom widget with minimal contents.
@@ -1201,10 +1363,12 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			}
 
 			// Check that dependent widget is there and that it's content is not hidden.
-			if (array_key_exists('dependent_widget', $module)) {
-				$dependent_widget = $dashboard->getWidget($module['dependent_widget']);
-				$this->assertTrue($dependent_widget->isValid());
-				$this->assertNotEquals(self::INACCESSIBLE_TEXT, $dependent_widget->getContent()->getText());
+			if (array_key_exists('dependent_widgets', $module)) {
+				foreach ($module['dependent_widgets'] as $widget_name) {
+					$dependent_widget = $dashboard->getWidget($widget_name);
+					$this->assertTrue($dependent_widget->isValid());
+					$this->assertNotEquals(self::INACCESSIBLE_TEXT, $dependent_widget->getContent()->getText());
+				}
 			}
 		}
 		else {
@@ -1219,12 +1383,14 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			$this->assertFalse($dashboard->getWidget($module['widget_name'], false)->isValid());
 
 			// Check that the dependent widget is still there, but its contents is not displayed.
-			if (array_key_exists('dependent_widget', $module)) {
-				$dependent_widget = $dashboard->getWidget($module['dependent_widget']);
-				$this->assertTrue($dependent_widget->isValid());
-				$this->assertEquals("Referred widget is unavailable\nPlease update configuration",
-						$dependent_widget->getContent()->getText()
-				);
+			if (array_key_exists('dependent_widgets', $module)) {
+				foreach ($module['dependent_widgets'] as $widget_name) {
+					$dependent_widget = $dashboard->getWidget($widget_name);
+					$this->assertTrue($dependent_widget->isValid());
+					$this->assertEquals("Referred widget is unavailable\nPlease update configuration",
+							$dependent_widget->getContent()->getText()
+					);
+				}
 			}
 
 			/**

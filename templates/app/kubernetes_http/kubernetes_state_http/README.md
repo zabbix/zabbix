@@ -3,7 +3,7 @@
 
 ## Overview
 
-The template to monitor Kubernetes state. 
+The template to monitor Kubernetes state.
 It works without external scripts and uses the script item to make HTTP requests to the Kubernetes API.
 
 Template `Kubernetes cluster state by HTTP` - collects metrics by HTTP agent from kube-state-metrics endpoint and Kubernetes API.
@@ -446,7 +446,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Component [{#NAME}] is unhealthy||`count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],#3,,"True")<2 and length(last(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}]))>0`|Warning||
+|Component [{#NAME}] is unhealthy||`count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],#2,"ne","True")=2 and length(last(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}]))>0`|Warning||
 
 ### LLD rule Readyz discovery
 
@@ -464,7 +464,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Readyz [{#NAME}] is unhealthy||`count(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}]))>0`|Warning||
+|Readyz [{#NAME}] is unhealthy||`count(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}],#2,"ne","ok")=2 and length(last(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}]))>0`|Warning||
 
 ### LLD rule Livez discovery
 
@@ -482,7 +482,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Livez [{#NAME}] is unhealthy||`count(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}],#3,,"ok")<2 and length(last(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}]))>0`|Warning||
+|Livez [{#NAME}] is unhealthy||`count(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}],#2,"ne","ok")=2 and length(last(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}]))>0`|Warning||
 
 ### LLD rule OpenShift BuildConfig discovery
 

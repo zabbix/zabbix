@@ -710,6 +710,7 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 								']);'
 							)
 							->addClass(ZBX_STYLE_BTN_TAG)
+							->addClass(ZBX_STYLE_TAG)
 							->setHint(getTagString($tag), '', false);
 					}
 					else {
@@ -746,6 +747,7 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 								']);'
 							)
 							->addClass(ZBX_STYLE_BTN_TAG)
+							->addClass(ZBX_STYLE_TAG)
 							->setHint(getTagString($tag), '', false);
 					}
 					else {

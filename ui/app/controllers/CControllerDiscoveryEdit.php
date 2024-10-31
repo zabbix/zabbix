@@ -113,10 +113,12 @@ class CControllerDiscoveryEdit extends CController {
 		];
 
 		CArrayHelper::sort($this->drule['dchecks'], ['name']);
-		$this->drule['dchecks'] = array_values($this->drule['dchecks']);
+
+		$this->drule['dchecks'] = $this->addCheckWarningMessages();
 
 		$concurrency_max_type = ($this->drule['concurrency_max'] == ZBX_DISCOVERY_CHECKS_UNLIMITED
-			|| $this->drule['concurrency_max'] == ZBX_DISCOVERY_CHECKS_ONE)
+			|| $this->drule['concurrency_max'] == ZBX_DISCOVERY_CHECKS_ONE
+		)
 			? $this->drule['concurrency_max']
 			: ZBX_DISCOVERY_CHECKS_CUSTOM;
 
@@ -142,6 +144,45 @@ class CControllerDiscoveryEdit extends CController {
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of discovery rules'));
 		$this->setResponse($response);
+	}
+
+	private function addCheckWarningMessages(): array {
+		$dcheckids = array_column($this->drule['dchecks'], 'dcheckid');
+
+		$actions =  API::Action()->get([
+			'output' => [],
+			'filter' => ['eventsource' => EVENT_SOURCE_DISCOVERY],
+			'selectConditions' => ['conditiontype', 'value'],
+			'selectFilter' => ['conditions']
+		]);
+
+		$checkid_usage_count = array_fill_keys($dcheckids, 0);
+
+		foreach ($actions as $action) {
+			foreach ($action['filter']['conditions'] as $condition) {
+				if ($condition['conditiontype'] == ZBX_CONDITION_TYPE_DCHECK
+						&& array_key_exists($condition['value'], $checkid_usage_count)) {
+					$checkid_usage_count[$condition['value']]++;
+				}
+			}
+		}
+
+		foreach ($checkid_usage_count as $dcheck_id => $usage_count) {
+			foreach($this->drule['dchecks'] as &$dcheck) {
+				if (bccomp($dcheck['dcheckid'], $dcheck_id) == 0) {
+					$dcheck['warning'] = $usage_count > 0
+						? _n(
+							'This check cannot be removed, as it is used as a condition in %1$s discovery action.',
+							'This check cannot be removed, as it is used as a condition in %1$s discovery actions.',
+							$usage_count,
+						)
+						: '';
+				}
+			}
+			unset($dcheck);
+		}
+
+		return $this->drule['dchecks'];
 	}
 
 	/**

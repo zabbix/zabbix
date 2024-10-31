@@ -242,12 +242,9 @@ class CElasticsearchHelper {
 	public static function addFilter($schema, $query, $options) {
 		foreach ($options['filter'] as $field => $value) {
 			// Skip missing fields, textual fields (different mapping is needed for exact matching) and empty values.
-			if ($value === null || !array_key_exists($field, $schema['fields'])) {
-				continue;
-			}
-
-			$field_type = $schema['fields'][$field]['type'];
-			if (in_array($field_type, [DB::FIELD_TYPE_TEXT, DB::FIELD_TYPE_NCLOB, DB::FIELD_TYPE_CHAR])) {
+			if ($value === null || !array_key_exists($field, $schema['fields'])
+					|| $schema['fields'][$field]['type']
+						& (DB::FIELD_TYPE_CHAR | DB::FIELD_TYPE_TEXT | DB::FIELD_TYPE_NCLOB)) {
 				continue;
 			}
 
@@ -292,12 +289,9 @@ class CElasticsearchHelper {
 
 		foreach ($options['search'] as $field => $value) {
 			// Skip missing fields, non textual fields and empty values.
-			if ($value === null || !array_key_exists($field, $schema['fields'])) {
-				continue;
-			}
-
-			$field_type = $schema['fields'][$field]['type'];
-			if (!in_array($field_type, [DB::FIELD_TYPE_TEXT, DB::FIELD_TYPE_NCLOB, DB::FIELD_TYPE_CHAR])) {
+			if ($value === null || !array_key_exists($field, $schema['fields'])
+					|| ($schema['fields'][$field]['type']
+						& (DB::FIELD_TYPE_TEXT | DB::FIELD_TYPE_NCLOB | DB::FIELD_TYPE_CHAR)) == 0) {
 				continue;
 			}
 

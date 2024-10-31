@@ -24,6 +24,7 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxvariant.h"
+#include "zbx_expression_constants.h"
 
 /* temporary cache of trigger related data */
 typedef struct
@@ -639,7 +640,7 @@ static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value, zbx_t
 	}
 
 	if (NULL == *value)
-		*value = zbx_strdup(NULL, "*UNKNOWN*");
+		*value = zbx_strdup(NULL, STR_UNKNOWN_VARIABLE);
 }
 
 static void	db_trigger_explain_expression(const zbx_eval_context_t *ctx, char **expression,
@@ -725,7 +726,7 @@ static void	db_trigger_get_function_value(const zbx_eval_context_t *ctx, int ind
 	zbx_eval_clear(&local_ctx);
 
 	if (NULL == *value_ret)
-		*value_ret = zbx_strdup(NULL, "*UNKNOWN*");
+		*value_ret = zbx_strdup(NULL, STR_UNKNOWN_VARIABLE);
 }
 
 void	zbx_db_trigger_explain_expression(const zbx_db_trigger *trigger, char **expression,
@@ -739,7 +740,7 @@ void	zbx_db_trigger_explain_expression(const zbx_db_trigger *trigger, char **exp
 
 	if (NULL == (cache = db_trigger_get_cache(trigger, state)))
 	{
-		*expression = zbx_strdup(NULL, "*UNKNOWN*");
+		*expression = zbx_strdup(NULL, STR_UNKNOWN_VARIABLE);
 		return;
 	}
 
@@ -759,7 +760,7 @@ void	zbx_db_trigger_get_function_value(const zbx_db_trigger *trigger, int index,
 
 	if (NULL == (cache = db_trigger_get_cache(trigger, state)))
 	{
-		*value = zbx_strdup(NULL, "*UNKNOWN*");
+		*value = zbx_strdup(NULL, STR_UNKNOWN_VARIABLE);
 		return;
 	}
 

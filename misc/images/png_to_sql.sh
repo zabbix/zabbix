@@ -10,14 +10,13 @@ imagefile="images.sql"
 
 imagefile_mysql="$sqlbasedir/mysql/$imagefile"
 imagefile_pgsql="$sqlbasedir/postgresql/$imagefile"
-imagefile_sqlite3="$sqlbasedir/sqlite3/$imagefile"
 imagefile_oracle="$sqlbasedir/oracle/$imagefile"
 
 oracle_string_max=2048
 oracle_line_max=15
 oracle_base64tmp=tmp_b64
 
-for imagefile in "$imagefile_mysql" "$imagefile_pgsql" "$imagefile_sqlite3" "$imagefile_oracle"; do
+for imagefile in "$imagefile_mysql" "$imagefile_pgsql" "$imagefile_oracle"; do
 	[[ -s "$imagefile" ]] && {
 		echo "Non-empty $imagefile already exists, stopping"
 		exit 1
@@ -51,11 +50,8 @@ for imagefile in $pngdir/*.png; do
 		rm -f $oracle_imagefile
 	done
 	echo -e "\tINSERT INTO images VALUES ($imagesdone,1,'$imagename',base64_decode(l_clob));"  >> "$imagefile_oracle"
-	# ----- SQLite
-	echo "INSERT INTO images (imageid,imagetype,name,image) VALUES ($imagesdone,1,'$imagename','$image_data');" >> "$imagefile_sqlite3"
 
 	echo -ne "\b\b\b\b$[$imagesdone*100/$imagecount]% "
-	
 done
 cat images_oracle_end.txt >> "$imagefile_oracle"
 echo

@@ -25,78 +25,60 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
 class testInitialConfSync extends CIntegrationTest
 {
 	private $expected_initial = [
-		[
 			'config' =>
 			[
 				'insert' => '1',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
-			'autoreg' =>
+			],
+			'config_autoreg_tls' =>
 			[
 				'insert' => '1',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
-			'autoreghost' =>
+			],
+			'autoreg_host' =>
 			[
 				'insert' => '0',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
+			],
 			'hosts' =>
 			[
 				'insert' => '15',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
-			'host_invent' =>
+			],
+			'host_inventory' =>
 			[
 				'insert' => '3',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
-			'templates' =>
+			],
+			'hosts_templates' =>
 			[
 				'insert' => '4',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
-			'globmacros' =>
+			],
+			'globalmacro' =>
 			[
 				'insert' => '3',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
-			'hostmacros' =>
+			],
+			'hostmacro' =>
 			[
 				'insert' => '5',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
-			'interfaces' =>
+			],
+			'interface' =>
 			[
 				'insert' => '15',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
+			],
 
 		/* Where the number 95 came from ?
 		Need to go through the confsync_hosts.xml and confsync_tmpl.xml,
@@ -123,1017 +105,765 @@ class testInitialConfSync extends CIntegrationTest
 		8) HostWithComprehensiveTemplate -> 36 items (inherits 'Comprehensive Template')
 		3 + 9 + 1 + 28 + 3 + 8 + 7 + 36 = 95 */
 
-		[
 			'items' =>
 			[
-				'insert' => '95',
+				'insert' => '152',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
-			'template_items' =>
-			[
-				'insert' => '54',
-				'update' => '0',
-				'delete' => '0'
-			]
-		],
-		[
-			'prototype_items' =>
-			[
-				'insert' => '5',
-				'update' => '0',
-				'delete' => '0'
-			]
-		],
-		[
+			],
 			'item_discovery' =>
 			[
 				'insert' => '5',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
+			],
 			'triggers' =>
 			[
 				'insert' => '28',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
-			'trigdeps' =>
+			],
+			'trigger_depends' =>
 			[
 				'insert' => '7',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
-			'trigtags' =>
+			],
+			'trigger_tag' =>
 			[
 				'insert' => '22',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
-			'hosttags' =>
+			],
+			'host_tag' =>
 			[
 				'insert' => '3',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
-			'itemtags' =>
+			],
+			'item_tag' =>
 			[
 				'insert' => '3',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
+			],
 			'functions' =>
 			[
 				'insert' => '28',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
-			'expressions' =>
+			],
+			'regexps' =>
 			[
 				'insert' => '1',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
+			],
 			'actions' =>
 			[
 				'insert' => '1',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
+			],
 			'operations' =>
 			[
 				'insert' => '0',
 				'update' => '1',
 				'delete' => '0'
-			]
-		],
-		[
+			],
 			'conditions' =>
 			[
 				'insert' => '1',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
-			'corr' =>
+			],
+			'correlation' =>
 			[
 				'insert' => '1',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
-			'corr_cond' =>
+			],
+			'corr_condition' =>
 			[
 				'insert' => '1',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
-			'corr_op' =>
+			],
+			'corr_operation' =>
 			[
 				'insert' => '1',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
-			'hgroups' =>
+			],
+			'hstgrp' =>
 			[
 				'insert' => '3',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
-			'itempproc' =>
+			],
+			'item_preproc' =>
 			[
 				'insert' => '44',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
-			'itemscriptparam' =>
+			],
+			'item_parameter' =>
 			[
 				'insert' => '2',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
-			'maintenance' =>
+			],
+			'maintenances' =>
 			[
 				'insert' => '1',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
+			],
 			'drules' =>
 			[
 				'insert' => '1',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
-			'httptests' =>
+			],
+			'httptest' =>
 			[
 				'insert' => '5',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
+			],
 			'connector' =>
 			[
 				'insert' => '0',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
+			],
 			'connector_tag' =>
 			[
 				'insert' => '0',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
+			],
 			'proxy' =>
 			[
 				'insert' => '2',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
+			],
 			'proxy_group' =>
 			[
 				'insert' => '1',
 				'update' => '0',
 				'delete' => '0'
-			]
-		],
-		[
+			],
 			'host_proxy' =>
 			[
 				'insert' => '0',
 				'update' => '0',
 				'delete' => '0'
-			]
-		]
+			],
 	];
 
 	private $expected_update =
 	[
+		"config" =>
 		[
-			"config" =>
-			[
-				"insert" =>
-				"1",
-				"update" =>
-				"0",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"1",
+			"update" =>
+			"0",
+			"delete" =>
+			"0"
 		],
+		"config_autoreg_tls" =>
 		[
-			"autoreg" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"1",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"1",
+			"delete" =>
+			"0"
 		],
+		'autoreg_host' =>
 		[
-			'autoreghost' =>
-			[
-				'insert' => '0',
-				'update' => '0',
-				'delete' => '0'
-			]
+			'insert' => '0',
+			'update' => '0',
+			'delete' => '0'
 		],
+		"hosts" =>
 		[
-			"hosts" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"14",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"14",
+			"delete" =>
+			"0"
 		],
+		"host_inventory" =>
 		[
-			"host_invent" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"1",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"1",
+			"delete" =>
+			"0"
 		],
+		"hosts_templates" =>
 		[
-			"templates" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"0"
 		],
+		"globalmacro" =>
 		[
-			"globmacros" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"3",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"3",
+			"delete" =>
+			"0"
 		],
+		"hostmacro" =>
 		[
-			"hostmacros" =>
-			[
-				"insert" =>
-				"2",
-				"update" =>
-				"2",
-				"delete" =>
-				"2"
-			]
+			"insert" =>
+			"2",
+			"update" =>
+			"2",
+			"delete" =>
+			"2"
 		],
+		"interface" =>
 		[
-			"interfaces" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"9",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"9",
+			"delete" =>
+			"0"
 		],
+		"items" =>
 		[
-			"items" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"84",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"139",
+			"delete" =>
+			"0"
 		],
+		"item_discovery" =>
 		[
-			"template_items" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"0"
 		],
+		"triggers" =>
 		[
-			"prototype_items" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"5",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"9",
+			"update" =>
+			"10",
+			"delete" =>
+			"9"
 		],
+		"trigger_depends" =>
 		[
-			"item_discovery" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"4",
+			"update" =>
+			"0",
+			"delete" =>
+			"4"
 		],
+		"trigger_tag" =>
 		[
-			"triggers" =>
-			[
-				"insert" =>
-				"9",
-				"update" =>
-				"10",
-				"delete" =>
-				"9"
-			]
+			"insert" =>
+			"12",
+			"update" =>
+			"0",
+			"delete" =>
+			"12"
 		],
+		"host_tag" =>
 		[
-			"trigdeps" =>
-			[
-				"insert" =>
-				"4",
-				"update" =>
-				"0",
-				"delete" =>
-				"4"
-			]
+			"insert" =>
+			"2",
+			"update" =>
+			"0",
+			"delete" =>
+			"2"
 		],
+		"item_tag" =>
 		[
-			"trigtags" =>
-			[
-				"insert" =>
-				"12",
-				"update" =>
-				"0",
-				"delete" =>
-				"12"
-			]
+			"insert" =>
+			"1",
+			"update" =>
+			"0",
+			"delete" =>
+			"1"
 		],
+		"functions" =>
 		[
-			"hosttags" =>
-			[
-				"insert" =>
-				"2",
-				"update" =>
-				"0",
-				"delete" =>
-				"2"
-			]
+			"insert" =>
+			"15",
+			"update" =>
+			"0",
+			"delete" =>
+			"15"
 		],
+		"regexps" =>
 		[
-			"itemtags" =>
-			[
-				"insert" =>
-				"1",
-				"update" =>
-				"0",
-				"delete" =>
-				"1"
-			]
+			"insert" =>
+			"1",
+			"update" =>
+			"0",
+			"delete" =>
+			"1"
 		],
+		"actions" =>
 		[
-			"functions" =>
-			[
-				"insert" =>
-				"15",
-				"update" =>
-				"0",
-				"delete" =>
-				"15"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"1",
+			"delete" =>
+			"0"
 		],
+		"operations" =>
 		[
-			"expressions" =>
-			[
-				"insert" =>
-				"1",
-				"update" =>
-				"0",
-				"delete" =>
-				"1"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"0"
 		],
+		"conditions" =>
 		[
-			"actions" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"1",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"1",
+			"delete" =>
+			"0"
 		],
+		"correlation" =>
 		[
-			"operations" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"1",
+			"delete" =>
+			"0"
 		],
+		"corr_condition" =>
 		[
-			"conditions" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"1",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"1",
+			"update" =>
+			"0",
+			"delete" =>
+			"1"
 		],
+		"corr_operation" =>
 		[
-			"corr" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"1",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"1",
+			"update" =>
+			"0",
+			"delete" =>
+			"1"
 		],
+		"hstgrp" =>
 		[
-			"corr_cond" =>
-			[
-				"insert" =>
-				"1",
-				"update" =>
-				"0",
-				"delete" =>
-				"1"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"0"
 		],
+		"item_preproc" =>
 		[
-			"corr_op" =>
-			[
-				"insert" =>
-				"1",
-				"update" =>
-				"0",
-				"delete" =>
-				"1"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"12",
+			"delete" =>
+			"0"
 		],
+		"item_parameter" =>
 		[
-			"hgroups" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"1",
+			"delete" =>
+			"0"
 		],
+		"maintenances" =>
 		[
-			"itempproc" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"12",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"1",
+			"delete" =>
+			"0"
 		],
+		"drules" =>
 		[
-			"itemscriptparam" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"1",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"0"
 		],
+		"httptest" =>
 		[
-			"maintenance" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"1",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"5",
+			"delete" =>
+			"0"
 		],
+		'connector' =>
 		[
-			"drules" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"0"
-			]
+			'insert' =>
+			'0',
+			'update' =>
+			'0',
+			'delete' =>
+			'0'
 		],
+		'connector_tag' =>
 		[
-			"httptests" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"5",
-				"delete" =>
-				"0"
-			]
+			'insert' =>
+			'0',
+			'update' =>
+			'0',
+			'delete' =>
+			'0'
 		],
+		'proxy' =>
 		[
-			'connector' =>
-			[
-				'insert' =>
-				'0',
-				'update' =>
-				'0',
-				'delete' =>
-				'0'
-			]
+			'insert' =>
+			'0',
+			'update' =>
+			'2',
+			'delete' =>
+			'0'
 		],
+		'proxy_group' =>
 		[
-			'connector_tag' =>
-			[
-				'insert' =>
-				'0',
-				'update' =>
-				'0',
-				'delete' =>
-				'0'
-			]
-			],
-		[
-			'proxy' =>
-			[
-				'insert' =>
-				'0',
-				'update' =>
-				'2',
-				'delete' =>
-				'0'
-			]
+			'insert' => '0',
+			'update' => '1',
+			'delete' => '0'
 		],
+		'host_proxy' =>
 		[
-			'proxy_group' =>
-			[
-				'insert' => '0',
-				'update' => '1',
-				'delete' => '0'
-			]
-		],
-		[
-			'host_proxy' =>
-			[
-				'insert' => '0',
-				'update' => '0',
-				'delete' => '0'
-			]
+			'insert' => '0',
+			'update' => '0',
+			'delete' => '0'
 		]
 	];
 
 	private $expected_delete = [
+		"config" =>
 		[
-			"config" =>
-			[
-				"insert" =>
-				"1",
-				"update" =>
-				"0",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"1",
+			"update" =>
+			"0",
+			"delete" =>
+			"0"
 		],
+		"config_autoreg_tls" =>
 		[
-			"autoreg" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"0"
 		],
+		'autoreg_host' =>
 		[
-			'autoreghost' =>
-			[
-				'insert' => '0',
-				'update' => '0',
-				'delete' => '0'
-			]
+			'insert' => '0',
+			'update' => '0',
+			'delete' => '0'
 		],
+		"hosts" =>
 		[
-			"hosts" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"19"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"19"
 		],
+		"host_inventory" =>
 		[
-			"host_invent" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"3"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"3"
 		],
+		"hosts_templates" =>
 		[
-			"templates" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"4"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"4"
 		],
+		"globalmacro" =>
 		[
-			"globmacros" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"0"
 		],
+		"hostmacro" =>
 		[
-			"hostmacros" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"5"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"5"
 		],
+		"interface" =>
 		[
-			"interfaces" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"15"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"15"
 		],
+		"items" =>
 		[
-			"items" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"152"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"152"
 		],
+		"item_discovery" =>
 		[
-			"template_items" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"54"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"5"
 		],
+		"triggers" =>
 		[
-			"prototype_items" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"152"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"28"
 		],
+		"trigger_depends" =>
 		[
-			"item_discovery" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"5"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"7"
 		],
+		"trigger_tag" =>
 		[
-			"triggers" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"28"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"22"
 		],
+		"host_tag" =>
 		[
-			"trigdeps" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"7"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"3"
 		],
+		"item_tag" =>
 		[
-			"trigtags" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"22"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"3"
 		],
+		"functions" =>
 		[
-			"hosttags" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"3"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"28"
 		],
+		"regexps" =>
 		[
-			"itemtags" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"3"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"1"
 		],
+		"actions" =>
 		[
-			"functions" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"28"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"1"
 		],
+		"operations" =>
 		[
-			"expressions" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"1"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"0"
 		],
+		"conditions" =>
 		[
-			"actions" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"1"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"1"
 		],
+		"correlation" =>
 		[
-			"operations" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"0"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"1"
 		],
+		"corr_condition" =>
 		[
-			"conditions" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"1"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"1"
 		],
+		"corr_operation" =>
 		[
-			"corr" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"1"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"1"
 		],
+		"hstgrp" =>
 		[
-			"corr_cond" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"1"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"2"
 		],
+		"item_preproc" =>
 		[
-			"corr_op" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"1"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"44"
 		],
+		"item_parameter" =>
 		[
-			"hgroups" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"2"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"2"
 		],
+		"maintenances" =>
 		[
-			"itempproc" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"44"
-			]
+			"insert" =>
+			"0",
+			"update" =>
+			"0",
+			"delete" =>
+			"1"
 		],
+		'drules' =>
 		[
-			"itemscriptparam" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"2"
-			]
+			'insert' => '0',
+			'update' => '0',
+			'delete' => '0'
 		],
+		'httptest' =>
 		[
-			"maintenance" =>
-			[
-				"insert" =>
-				"0",
-				"update" =>
-				"0",
-				"delete" =>
-				"1"
-			]
+			'insert' => '0',
+			'update' => '0',
+			'delete' => '5'
 		],
+		'connector' =>
 		[
-			'drules' =>
-			[
-				'insert' => '0',
-				'update' => '0',
-				'delete' => '0'
-			]
+			'insert' => '0',
+			'update' => '0',
+			'delete' => '0'
 		],
+		'connector_tag' =>
 		[
-			'httptests' =>
-			[
-				'insert' => '0',
-				'update' => '0',
-				'delete' => '5'
-			]
+			'insert' => '0',
+			'update' => '0',
+			'delete' => '0'
 		],
+		'proxy' =>
 		[
-			'connector' =>
-			[
-				'insert' => '0',
-				'update' => '0',
-				'delete' => '0'
-			]
+			'insert' => '0',
+			'update' => '0',
+			'delete' => '2'
 		],
+		'proxy_group' =>
 		[
-			'connector_tag' =>
-			[
-				'insert' => '0',
-				'update' => '0',
-				'delete' => '0'
-			]
+			'insert' => '0',
+			'update' => '0',
+			'delete' => '1'
 		],
+		'host_proxy' =>
 		[
-			'proxy' =>
-			[
-				'insert' => '0',
-				'update' => '0',
-				'delete' => '2'
-			]
-		],
-		[
-			'proxy_group' =>
-			[
-				'insert' => '0',
-				'update' => '0',
-				'delete' => '1'
-			]
-		],
-		[
-			'host_proxy' =>
-			[
-				'insert' => '0',
-				'update' => '0',
-				'delete' => '0'
-			]
+			'insert' => '0',
+			'update' => '0',
+			'delete' => '0'
 		]
 	];
 
@@ -1174,6 +904,33 @@ class testInitialConfSync extends CIntegrationTest
 		];
 	}
 
+	private function assertSyncResults($got, $expected_objects)
+	{
+		$diff_keys = array_diff_key($expected_objects, $got);
+
+		$this->assertEmpty($diff_keys,
+			'following objects are missing from sync log:\n'.var_export(array_keys($diff_keys)));
+
+		$diff_objects = [];
+
+		foreach ($expected_objects as $obj_name => $obj_val)
+		{
+			$expected_values = $expected_objects[$obj_name];
+
+			$diff = array_diff_assoc($obj_val, $expected_values);
+			if (count($diff) > 0) {
+				$failed_obj = [
+					'expected' => $expected_values,
+					'synced' => $obj_val
+				];
+
+				$diff_objects[$obj_name] = $failed_obj;
+			}
+		}
+
+		$this->assertEmpty($diff_objects, 'different objects were found:\n'.var_export($diff_objects, true));
+	}
+
 	private function parseSyncResults()
 	{
 		$log = file_get_contents(self::getLogPath(self::COMPONENT_SERVER));
@@ -1185,6 +942,7 @@ class testInitialConfSync extends CIntegrationTest
 			[
 				"/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+ zbx_dc_sync_configuration\(\) /",
 				"/\s+/",
+				"/-?[0-9]+bytes/",
 				"/:sql:[0-9]+\.[0-9]+sync:[0-9]+\.[0-9]+sec/",
 				"/:sql:[0-9]+\.[0-9]+sec/"
 			],
@@ -1216,15 +974,11 @@ class testInitialConfSync extends CIntegrationTest
 				continue;
 			}
 
-			$pair = [
-				$subject => [
-					'insert' => $operations[0],
-					'update' => $operations[1],
-					'delete' => $operations[2]
-				]
+			$results[$subject] = [
+				'insert' => $operations[0],
+				'update' => $operations[1],
+				'delete' => $operations[2]
 			];
-
-			array_push($results, $pair);
 		}
 
 		return $results;
@@ -1625,7 +1379,7 @@ class testInitialConfSync extends CIntegrationTest
 	private function createGlobalMacros()
 	{
 		$response = $this->call('usermacro.createglobal', [
-			'macro' => '{$GLOBDELAY}',
+			'macro' => '{$GLOBALMACRO}',
 			'value' => '1'
 		]);
 		$this->assertArrayHasKey('result', $response);
@@ -1940,7 +1694,7 @@ class testInitialConfSync extends CIntegrationTest
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 
 		$got = $this->parseSyncResults();
-		$this->assertEquals($this->expected_initial, $got);
+		$this->assertSyncResults($got, $this->expected_initial);
 
 		$this->purgeExisting('correlation', 'correlationids');
 		$this->purgeExisting('maintenance', 'maintenanceids');
@@ -2035,7 +1789,7 @@ class testInitialConfSync extends CIntegrationTest
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 
 		$got = $this->parseSyncResults();
-		$this->assertEquals($this->expected_update, $got);
+		$this->assertSyncResults($got, $this->expected_update);
 
 		return true;
 	}
@@ -2058,7 +1812,7 @@ class testInitialConfSync extends CIntegrationTest
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 
 		$got = $this->parseSyncResults();
-		$this->assertEquals($this->expected_delete, $got);
+		$this->assertSyncResults($got, $this->expected_delete);
 
 		self::stopComponent(self::COMPONENT_SERVER);
 		self::clearLog(self::COMPONENT_SERVER);

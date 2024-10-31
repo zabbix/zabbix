@@ -311,9 +311,13 @@ foreach ($data['discoveries'] as $discovery) {
 		$checkbox->setAttribute('data-actions', 'execute');
 	}
 
+	$host = (new CLink($discovery['hosts'][0]['name']))
+		->setAttribute('data-hostid', $discovery['hosts'][0]['hostid'])
+		->addClass('js-edit-'.$data['context']);
+
 	$discoveryTable->addRow([
 		$checkbox,
-		$discovery['hosts'][0]['name'],
+		$host,
 		$description,
 		[
 			new CLink(_('Item prototypes'),
@@ -410,8 +414,8 @@ $html_page
 		'context' => $data['context'],
 		'checkbox_hash' => $data['checkbox_hash'],
 		'checkbox_object' => 'g_hostdruleid',
-		'form_name' => $discoveryForm->getName(),
-		'token' => [CSRF_TOKEN_NAME, CCsrfTokenHelper::get('item')]
+		'token' => [CSRF_TOKEN_NAME, CCsrfTokenHelper::get('item')],
+		'form_name' => $discoveryForm->getName()
 	]).');
 '))
 	->setOnDocumentReady()

@@ -80,8 +80,9 @@ SERVICE_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_clean_events \
 	-Wl,--wrap=zbx_interface_availability_is_set \
 	-Wl,--wrap=zbx_rtc_subscribe \
-	-Wl,--wrap=zbx_rtc_notify_finished_sync
-
+	-Wl,--wrap=zbx_rtc_notify_finished_sync \
+	-Wl,--wrap=zbx_dc_set_itservices_num
+	
 # service_get_rootcause_eventids
 
 service_get_rootcause_eventids_SOURCES = \

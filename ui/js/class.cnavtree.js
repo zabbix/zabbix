@@ -123,6 +123,11 @@ if (typeof addPopupValues === 'undefined') {
 				clearTimeout(this.changing_parent);
 			}
 
+			this.dragDirection = {
+				vertical: this._getDragVerticalDirection(),
+				horizontal: this._getDragHorizontalDirection()
+			};
+
 			// re-arrange
 			for (let i = this.items.length - 1; i >= 0; i--) {
 

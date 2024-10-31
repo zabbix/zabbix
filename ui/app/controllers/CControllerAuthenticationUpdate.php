@@ -89,8 +89,7 @@ class CControllerAuthenticationUpdate extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$ret = $this->validateDefaultAuth() && $this->validateLdap() && $this->validateSamlAuth()
-				&& $this->validateMfa();
+			$ret = $this->validateLdap() && $this->validateSamlAuth() && $this->validateMfa();
 		}
 
 		if (!$ret) {
@@ -105,38 +104,13 @@ class CControllerAuthenticationUpdate extends CController {
 	}
 
 	/**
-	 * Validate default authentication. Do not allow user to change default authentication to LDAP if LDAP is not
-	 * configured.
-	 *
-	 * @return bool
-	 */
-	private function validateDefaultAuth() {
-		$data = [
-			'ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED,
-			'authentication_type' => ZBX_AUTH_INTERNAL
-		];
-		$this->getInputs($data, array_keys($data));
-
-		$is_valid = ($data['authentication_type'] != ZBX_AUTH_LDAP
-				|| $data['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED);
-
-		if (!$is_valid) {
-			error(_s('Incorrect value for field "%1$s": %2$s.', 'authentication_type', _('LDAP is not configured')));
-		}
-
-		return $is_valid;
-	}
-
-	/**
 	 * Validate LDAP settings.
 	 *
 	 * @return bool
 	 */
 	private function validateLdap(): bool {
-		$ldap_enabled = $this->getInput('ldap_auth_enabled', ZBX_AUTH_LDAP_DISABLED) == ZBX_AUTH_LDAP_ENABLED;
-		$ldap_servers = $this->getInput('ldap_servers', []);
-
-		if ($ldap_enabled) {
+		if ($this->getInput('ldap_auth_enabled', DB::getDefault('config', 'ldap_auth_enabled')) ==
+				ZBX_AUTH_LDAP_ENABLED) {
 			$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
 
 			if ($ldap_status['result'] != CFrontendSetup::CHECK_OK) {
@@ -144,35 +118,48 @@ class CControllerAuthenticationUpdate extends CController {
 
 				return false;
 			}
-		}
 
-		if ($ldap_servers
-				&& (!$this->hasInput('ldap_default_row_index')
-					|| !array_key_exists($this->getInput('ldap_default_row_index'), $ldap_servers))) {
-			error(_('Default LDAP server must be specified.'));
+			$ldap_servers = $this->getInput('ldap_servers', []);
+
+			if (!$ldap_servers) {
+				error(_('At least one LDAP server must exist.'));
+
+				return false;
+			}
+
+			if (!$this->hasInput('ldap_default_row_index')
+					|| !array_key_exists($this->getInput('ldap_default_row_index'), $ldap_servers)) {
+				error(_('Default LDAP server must be specified.'));
+
+				return false;
+			}
+
+			foreach ($ldap_servers as $ldap_server) {
+				if (!array_key_exists('provision_status', $ldap_server)
+						|| $ldap_server['provision_status'] != JIT_PROVISIONING_ENABLED) {
+					continue;
+				}
+
+				if (!array_key_exists('provision_groups', $ldap_server)
+						|| !$this->validateProvisionGroups($ldap_server['provision_groups'])) {
+					error(_('Invalid LDAP JIT provisioning user group mapping configuration.'));
+
+					return false;
+				}
+
+				if (array_key_exists('provision_media', $ldap_server)
+						&& !$this->validateProvisionMedia($ldap_server['provision_media'])) {
+					error(_('Invalid LDAP JIT provisioning media type mapping configuration.'));
+
+					return false;
+				}
+			}
+		}
+		elseif ($this->getInput('authentication_type', DB::getDefault('config', 'authentication_type')) ==
+				ZBX_AUTH_LDAP) {
+			error(_s('Incorrect value for field "%1$s": %2$s.', 'authentication_type', _('LDAP is not configured')));
 
 			return false;
-		}
-
-		foreach ($ldap_servers as $ldap_server) {
-			if (!array_key_exists('provision_status', $ldap_server)
-					|| $ldap_server['provision_status'] != JIT_PROVISIONING_ENABLED) {
-				continue;
-			}
-
-			if (!array_key_exists('provision_groups', $ldap_server)
-					|| !$this->validateProvisionGroups($ldap_server['provision_groups'])) {
-				error(_('Invalid LDAP JIT provisioning user group mapping configuration.'));
-
-				return false;
-			}
-
-			if (array_key_exists('provision_media', $ldap_server)
-					&& !$this->validateProvisionMedia($ldap_server['provision_media'])) {
-				error(_('Invalid LDAP JIT provisioning media type mapping configuration.'));
-
-				return false;
-			}
 		}
 
 		return true;
@@ -289,13 +276,9 @@ class CControllerAuthenticationUpdate extends CController {
 
 				if ($ldap_servers) {
 					$ldap_userdirectoryids = $this->processLdapServers($ldap_servers);
-					$ldap_default_row_index = $this->getInput('ldap_default_row_index', 0);
+					$ldap_default_row_index = $this->getInput('ldap_default_row_index');
 
 					if (!$ldap_userdirectoryids) {
-						$result = false;
-					}
-					elseif (!array_key_exists($ldap_default_row_index, $ldap_userdirectoryids)) {
-						CMessageHelper::setErrorTitle(_('Failed to select default LDAP server.'));
 						$result = false;
 					}
 					else {

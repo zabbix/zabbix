@@ -90,6 +90,9 @@ $html_page = (new CHtmlPage())
 				->addRow(_('Recordset ID'), (new CTextBox('filter_recordsetid', $data['recordsetid']))
 					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				)
+				->addRow(_('IP'), (new CTextBox('filter_ip', $data['ip']))
+					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				)
 		])
 	);
 
@@ -112,7 +115,12 @@ foreach ($data['auditlogs'] as $auditlog) {
 		in_array($auditlog['userid'], $data['non_existent_userids'])
 			? new CTag('em', true, $auditlog['username'])
 			: $data['users'][$auditlog['userid']],
-		$auditlog['ip'],
+		new CLink($auditlog['ip'],
+			(new CUrl('zabbix.php'))
+				->setArgument('action', $data['action'])
+				->setArgument('filter_ip', $auditlog['ip'])
+				->setArgument('filter_set', 1)
+		),
 		array_key_exists($auditlog['resourcetype'], $data['resources'])
 			? $data['resources'][$auditlog['resourcetype']]
 			: _('Unknown resource'),

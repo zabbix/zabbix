@@ -30,6 +30,7 @@ class CControllerAuditLogList extends CController {
 			'filter_userids' =>			'array_db users.userid',
 			'filter_resourceid' =>		'string',
 			'filter_recordsetid' =>		'string',
+			'filter_ip' =>				'string',
 			'from' =>					'range_time',
 			'to' =>						'range_time'
 		];
@@ -71,6 +72,7 @@ class CControllerAuditLogList extends CController {
 			'auditlog_actions' => CProfile::getArray('web.auditlog.filter.actions', []),
 			'resourceid' => CProfile::get('web.auditlog.filter.resourceid', ''),
 			'recordsetid' => CProfile::get('web.auditlog.filter.recordsetid', ''),
+			'ip' => CProfile::get('web.auditlog.filter.ip', ''),
 			'action' => $this->getAction(),
 			'actions' => self::getActionsList(),
 			'resources' => self::getResourcesList(),
@@ -89,12 +91,10 @@ class CControllerAuditLogList extends CController {
 			$filter['resourcetype'] = $data['resourcetype'];
 		}
 
-		if ($data['resourceid'] !== '') {
-			$filter['resourceid'] = $data['resourceid'];
-		}
-
-		if ($data['recordsetid'] !== '') {
-			$filter['recordsetid'] = $data['recordsetid'];
+		foreach (['resourceid', 'recordsetid', 'ip'] as $field) {
+			if ($data[$field] !== '') {
+				$filter[$field] = $data[$field];
+			}
 		}
 
 		$params = [
@@ -261,6 +261,7 @@ class CControllerAuditLogList extends CController {
 		CProfile::update('web.auditlog.filter.recordsetid', $this->getInput('filter_recordsetid', ''),
 			PROFILE_TYPE_STR
 		);
+		CProfile::update('web.auditlog.filter.ip', $this->getInput('filter_ip', ''), PROFILE_TYPE_STR);
 	}
 
 	private function deleteProfiles(): void {
@@ -269,6 +270,7 @@ class CControllerAuditLogList extends CController {
 		CProfile::delete('web.auditlog.filter.resourcetype');
 		CProfile::delete('web.auditlog.filter.resourceid');
 		CProfile::delete('web.auditlog.filter.recordsetid');
+		CProfile::delete('web.auditlog.filter.ip');
 	}
 
 	private function sanitizeUsersForMultiselect(array $users): array {

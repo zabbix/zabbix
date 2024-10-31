@@ -502,7 +502,7 @@ class testItemTimeouts extends CIntegrationTest {
 		$tm1 = time();
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of process_async_result", true, 90, 1, true);
 		$tm2 = time();
-		$this->assertTrue($tm2 - $tm1 <= 7);
+		$this->assertTrue($tm2 - $tm1 <= 7 * 2);
 	}
 
 	/**

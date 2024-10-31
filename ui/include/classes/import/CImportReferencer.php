@@ -1317,7 +1317,6 @@ class CImportReferencer {
 		$this->db_hosts = API::Host()->get([
 			'output' => ['host'],
 			'filter' => ['host' => array_keys($this->hosts)],
-			'templated_hosts' => true,
 			'preservekeys' => true
 		]);
 
