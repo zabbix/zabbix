@@ -10516,6 +10516,16 @@ int	zbx_dc_get_host_value(zbx_uint64_t itemid, char **replace_to, int request)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets host hostname from itemid                                    *
+ *                                                                            *
+ * Parameters: itemid     - [IN]                                              *
+ *             replace_to - [OUT] buffer where to put hostname                *
+ *                                                                            *
+ * Return value: FAIL when item is not found                                  *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_dc_get_host_host(zbx_uint64_t itemid, char **replace_to)
 {
 	int		ret;

@@ -110,7 +110,7 @@ int	zbx_db_item_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_ti
  ******************************************************************************/
 int	zbx_db_item_lastvalue(const zbx_db_trigger *trigger, char **lastvalue, int N_functionid, int raw)
 {
-	int		ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
