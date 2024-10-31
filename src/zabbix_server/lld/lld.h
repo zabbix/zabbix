@@ -196,6 +196,8 @@ typedef struct
 	zbx_vector_lld_item_preproc_ptr_t	preproc_ops;
 	zbx_vector_item_param_ptr_t		item_params;
 	zbx_vector_db_tag_ptr_t			item_tags;
+	zbx_hashset_t				item_index;
+	zbx_vector_str_t			keys;		/* keys used to create items from this prototype */
 }
 zbx_lld_item_prototype_t;
 

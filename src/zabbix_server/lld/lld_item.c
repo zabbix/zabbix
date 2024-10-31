@@ -111,6 +111,22 @@ static int	lld_item_preproc_sort_by_step(const void *d1, const void *d2)
 	return 0;
 }
 
+/* items index hashset support functions */
+static zbx_hash_t	lld_item_ref_key_hash_func(const void *data)
+{
+	const zbx_lld_item_ref_t	*ref = (const zbx_lld_item_ref_t *)data;
+
+	return ZBX_DEFAULT_STRING_HASH_FUNC(ref->item->key);
+}
+
+static int	lld_item_ref_key_compare_func(const void *d1, const void *d2)
+{
+	const zbx_lld_item_ref_t	*ref1 = (const zbx_lld_item_ref_t *)d1;
+	const zbx_lld_item_ref_t	*ref2 = (const zbx_lld_item_ref_t *)d2;
+
+	return strcmp(ref1->item->key, ref2->item->key);
+}
+
 static void	lld_item_preproc_free(zbx_lld_item_preproc_t *op)
 {
 	zbx_free(op->params);
@@ -163,6 +179,9 @@ static void	lld_item_prototype_free(zbx_lld_item_prototype_t *item_prototype)
 
 	zbx_vector_db_tag_ptr_clear_ext(&item_prototype->item_tags, zbx_db_tag_free);
 	zbx_vector_db_tag_ptr_destroy(&item_prototype->item_tags);
+
+	zbx_hashset_destroy(&item_prototype->item_index);
+	zbx_vector_str_destroy(&item_prototype->keys);
 
 	zbx_free(item_prototype);
 }
@@ -2015,7 +2034,6 @@ static void	lld_items_make(const zbx_vector_lld_item_prototype_ptr_t *item_proto
 	zbx_lld_item_full_t		*item;
 	zbx_lld_row_t			*lld_row;
 	zbx_lld_item_index_t		*item_index, item_index_local;
-	char				*buffer = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2028,10 +2046,10 @@ static void	lld_items_make(const zbx_vector_lld_item_prototype_ptr_t *item_proto
 			zbx_vector_lld_row_ptr_append(&item_prototype->lld_rows, lld_rows->values[j]);
 	}
 
-	/* Iterate in reverse order because usually the items are created in the same order as     */
-	/* incoming lld rows. Iterating in reverse optimizes lld_row removal from item prototypes. */
-	for (int i = items->values_num - 1; i >= 0; i--)
+	for (int i = 0; i < items->values_num; i++)
 	{
+		zbx_lld_item_ref_t	ref_local;
+
 		item = items->values[i];
 
 		zbx_lld_item_prototype_t	cmp = {.itemid = item->parent_itemid};
@@ -2045,34 +2063,65 @@ static void	lld_items_make(const zbx_vector_lld_item_prototype_ptr_t *item_proto
 
 		item_prototype = item_prototypes->values[index];
 
+		if (0 == item_prototype->item_index.num_slots)
+			zbx_hashset_reserve(&item_prototype->item_index, items->values_num);
+
+		ref_local.item = item;
+
+		zbx_hashset_insert(&item_prototype->item_index, &ref_local, sizeof(ref_local));
+
+		if (FAIL == zbx_vector_str_search(&item_prototype->keys, item->key_proto, ZBX_DEFAULT_STR_COMPARE_FUNC))
+			zbx_vector_str_append(&item_prototype->keys, item->key_proto);
+	}
+
+	/* match previously discovered items with prototypes and lld rows */
+	for (int i = 0; i < item_prototypes->values_num; i++)
+	{
+		zbx_lld_item_full_t	item_stub = {0};
+		zbx_lld_item_ref_t	*ref, ref_local = {.item = &item_stub};
+
+		item_prototype = item_prototypes->values[i];
+
 		for (int j = item_prototype->lld_rows.values_num - 1; j >= 0; j--)
 		{
 			lld_row = item_prototype->lld_rows.values[j];
 
-			buffer = zbx_strdup(buffer, item->key_proto);
-
-			if (SUCCEED != zbx_substitute_key_macros(&buffer, NULL, NULL, &lld_row->jp_row, lld_macro_paths,
-					ZBX_MACRO_TYPE_ITEM_KEY, NULL, 0))
+			for (int k = 0; k < item_prototype->keys.values_num; k++)
 			{
-				continue;
-			}
+				item_stub.key = zbx_strdup(item_stub.key, item_prototype->keys.values[k]);
 
-			if (0 == strcmp(item->key, buffer) &&
-					SUCCEED == lld_validate_item_override_no_discover(&lld_row->overrides,
-					item->name, item_prototype->discover))
-			{
-				item_index_local.parent_itemid = item->parent_itemid;
+				if (SUCCEED != zbx_substitute_key_macros(&item_stub.key, NULL, NULL, &lld_row->jp_row,
+						lld_macro_paths, ZBX_MACRO_TYPE_ITEM_KEY, NULL, 0))
+				{
+					continue;
+				}
+
+				if (NULL == (ref = (zbx_lld_item_ref_t *)zbx_hashset_search(&item_prototype->item_index,
+						&ref_local)))
+				{
+					continue;
+				}
+
+				if (SUCCEED != lld_validate_item_override_no_discover(&lld_row->overrides,
+						ref->item->name, item_prototype->discover))
+				{
+					continue;
+				}
+
+				item_index_local.parent_itemid = ref->item->parent_itemid;
 				item_index_local.lld_row = lld_row;
-				item_index_local.item = item;
+				item_index_local.item = ref->item;
 				zbx_hashset_insert(items_index, &item_index_local, sizeof(item_index_local));
 
 				zbx_vector_lld_row_ptr_remove_noorder(&item_prototype->lld_rows, j);
+				zbx_hashset_remove_direct(&item_prototype->item_index, ref);
+
 				break;
 			}
 		}
-	}
 
-	zbx_free(buffer);
+		zbx_free(item_stub.key);
+	}
 
 	/* update/create discovered items */
 	for (int i = 0; i < item_prototypes->values_num; i++)
@@ -3933,6 +3982,11 @@ static void	lld_item_prototypes_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_item
 		zbx_vector_lld_item_preproc_ptr_create(&item_prototype->preproc_ops);
 		zbx_vector_item_param_ptr_create(&item_prototype->item_params);
 		zbx_vector_db_tag_ptr_create(&item_prototype->item_tags);
+
+		zbx_hashset_create(&item_prototype->item_index, 0, lld_item_ref_key_hash_func,
+				lld_item_ref_key_compare_func);
+
+		zbx_vector_str_create(&item_prototype->keys);
 
 		zbx_vector_lld_item_prototype_ptr_append(item_prototypes, item_prototype);
 	}
