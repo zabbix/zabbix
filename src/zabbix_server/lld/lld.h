@@ -436,4 +436,24 @@ void	lld_flush_discoveries(zbx_hashset_t *discoveries, const char *id_field, con
 		const char *discovery_table, int now, get_object_status_val cb_status, delete_ids_f cb_delete_objects,
 		object_audit_entry_create_f cb_audit_create, object_audit_entry_update_status_f cb_audit_update_status);
 
+/* item index by prototype (parent) id and lld row */
+typedef struct
+{
+	zbx_uint64_t		parent_itemid;
+	zbx_lld_row_t		*lld_row;
+	zbx_lld_item_full_t	*item;
+}
+zbx_lld_item_index_t;
+
+/* reference to an item either by its id (existing items) or structure (new items) */
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	zbx_lld_item_full_t	*item;
+}
+zbx_lld_item_ref_t;
+
+void	lld_update_dependent_items_and_validate(zbx_vector_lld_item_full_ptr_t *items,
+		zbx_vector_lld_item_prototype_ptr_t *item_prototypes, zbx_hashset_t *items_index, char **error);
+
 #endif
