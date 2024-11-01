@@ -11496,6 +11496,20 @@ int	zbx_dc_get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char **
 	return res;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve a particular value associated with the interface.        *
+ *                                                                            *
+ * Parameters: itemid     - [IN]                                              *
+ *             replace_to - [OUT] place to put value                          *
+ *             request    - [IN] type of value to get                         *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ * Comments: This function is used as callback in zbx_db_with_trigger_itemid  *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_dc_get_interface_value_itemid(zbx_uint64_t itemid, char **replace_to, int request)
 {
 	return zbx_dc_get_interface_value(0, itemid, replace_to, request);
@@ -16524,6 +16538,14 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: expand user and func macros in specified text value from itemid   *
+ *                                                                            *
+ * Parameters: itemid     - [IN]                                              *
+ *             replace_to - [IN/OUT] text value with macros to expand         *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_dc_expand_user_and_func_macros_itemid(zbx_uint64_t itemid, char **replace_to)
 {
 	zbx_dc_item_t	dc_item;
