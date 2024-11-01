@@ -197,18 +197,18 @@ func (p *Plugin) get(params []string, conn *dbus.Conn) (interface{}, error) {
 	return string(val), nil
 }
 
-func (p *Plugin) getServiceType(name string, conn *dbus.Conn) (string, error) {
+func (p *Plugin) getServiceType(name string, conn *dbus.Conn) string {
 	serviceType, err := p.info([]string{name, "Type", "Service"}, conn)
 	if err != nil {
-		return "", errs.Wrapf(err, "failed to retrieve unit info service type for %s", name)
+		return ""
 	}
 
 	typeString, ok := serviceType.(string)
 	if !ok {
-		return "", errs.Wrapf(err, "unit service type is not string for %s", name)
+		return ""
 	}
 
-	return typeString, nil
+	return typeString
 }
 
 func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error) {
@@ -264,12 +264,7 @@ func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error
 			continue
 		}
 
-		serviceType, err := p.getServiceType(u.Name, conn)
-		if err != nil {
-			p.Debugf("Unit service type not available %s", err.Error())
-
-			continue
-		}
+		serviceType := p.getServiceType(u.Name, conn)
 		array = append(array, unitJson{
 			u.Name, u.Description, u.LoadState, u.ActiveState,
 			u.SubState, u.Followed, u.Path, u.JobID, u.JobType, u.JobPath, state, serviceType,
@@ -287,12 +282,7 @@ func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error
 
 		unitPath := "/org/freedesktop/systemd1/unit/" + getName(basePath)
 
-		serviceType, errst := p.getServiceType(f.Name, conn)
-		if errst != nil {
-			p.Debugf("Unit service type not available %s", errst.Error())
-
-			continue
-		}
+		serviceType := p.getServiceType(f.Name, conn)
 
 		array = append(array, unitJson{basePath, "", "", "inactive", "", "", unitPath, 0, "", "",
 			f.EnablementState, serviceType})
