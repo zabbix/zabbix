@@ -408,8 +408,7 @@ int	vmware_service_get_hv_ds_dc_dvs_list(const zbx_vmware_service_t *service, CU
 
 	while (NULL != iter->token)
 	{
-		zbx_xml_free_doc(doc);
-		doc = NULL;
+		zbx_xml_doc_free(doc);
 
 		if (SUCCEED != zbx_property_collection_next(__func__, iter, &doc, error))
 			goto out;
@@ -431,7 +430,7 @@ int	vmware_service_get_hv_ds_dc_dvs_list(const zbx_vmware_service_t *service, CU
 	ret = SUCCEED;
 out:
 	zbx_property_collection_free(iter);
-	zbx_xml_free_doc(doc);
+	zbx_xml_doc_free(doc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s found hv:%d ds:%d dc:%d", __func__, zbx_result_string(ret),
 			hvs->values_num, dss->values_num, datacenters->values_num);
 

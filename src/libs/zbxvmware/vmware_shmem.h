@@ -64,6 +64,9 @@ void	vmware_shmem_service_free(zbx_vmware_service_t *service);
 void	vmware_shmem_evtseverity_copy(zbx_hashset_t *dst, const zbx_vector_vmware_key_value_t *src);
 void	zbx_shmem_vmware_key_value_free(zbx_vmware_key_value_t *value);
 
+int		vmware_strpool_compare_func(const void *d1, const void *d2);
+zbx_hash_t	vmware_strpool_hash_func(const void *data);
+
 zbx_vmware_event_t			*vmware_shmem_event_dup(const zbx_vmware_event_t *src);
 zbx_vmware_diskextent_t			*vmware_shmem_diskextent_dup(const zbx_vmware_diskextent_t *src);
 zbx_vmware_resourcepool_t		*vmware_shmem_resourcepool_dup(const zbx_vmware_resourcepool_t *src);
@@ -83,6 +86,6 @@ zbx_vmware_entity_tags_t		*vmware_shmem_entity_tags_malloc(void);
 zbx_vmware_tag_t			*vmware_shmem_tag_malloc(void);
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 int					vmware_shmem_init(zbx_uint64_t *config_vmware_cache_size, zbx_vmware_t **vmware,
-							zbx_hashset_t *evt_msg_strpool, char **error);
+							char **error);
 
 #endif	/* ZABBIX_VMWARE_SHMEM_H */
