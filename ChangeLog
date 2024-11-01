@@ -7,6 +7,10 @@ New features:
 .......PS. [ZBXNEXT-9238] increased PostgreSQL maximum supported version to 17 (mprihodko)
 
 Bug fixes:
+.........T [ZBX-20767] removed unnecessary discard with heartbeat preprocessing in discovery rules in Linux and Nextcloud templates (drasikhov)
+A......... [ZBX-23949] fixed processing of `host` parameter for trigger prototypes (jfreibergs)
+A......... [ZBX-25034] fixed export of host prototype discovery and template override is using visible name (wczerneha)
+.......PS. [ZBX-25416] fixed unsupported value passing to preprocessor (askolmeisters)
 A.F....... [ZBX-24528] prevented SQL errors being displayed to non-authorized users (gcalenko, jfreibergs)
 A.F....... [ZBX-21503] prevented creation of audit logs for Media type objects on updates without actual changes (jfreibergs)
 ..F....... [ZBX-24633] fixed code error when viewing graph and trigger lists with discovered objects set to expire (jfreibergs)
