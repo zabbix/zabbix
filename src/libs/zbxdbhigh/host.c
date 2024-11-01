@@ -5862,7 +5862,7 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
 	}
 	DBfree_result(result);
 
-	/* check if groups is used in the groups prototypes */
+	/* check if groups are used in the groups prototypes */
 
 	if (0 != groupids->values_num)
 	{
@@ -5894,6 +5894,36 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
 
 			zabbix_log(LOG_LEVEL_WARNING, "host group \"%s\" cannot be deleted,"
 					" because it is used by a host prototype", row[1]);
+		}
+		DBfree_result(result);
+	}
+
+	/* check if groups are used in the event correlation conditions */
+
+	if (0 != groupids->values_num)
+	{
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select distinct(g.groupid),g.name"
+				" from hstgrp g,corr_condition_group c"
+				" where g.groupid=c.groupid and");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.groupid",
+				groupids->values, groupids->values_num);
+
+		result = DBselect("%s", sql);
+
+		while (NULL != (row = DBfetch(result)))
+		{
+			ZBX_STR2UINT64(groupid, row[0]);
+
+			if (FAIL != (index = zbx_vector_uint64_bsearch(groupids, groupid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			{
+				zbx_vector_uint64_remove(groupids, index);
+			}
+
+			zabbix_log(LOG_LEVEL_WARNING, "host group \"%s\" cannot be deleted,"
+					" because it is used by an event correlation condition", row[1]);
 		}
 		DBfree_result(result);
 	}
