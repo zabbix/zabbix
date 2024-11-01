@@ -79,7 +79,10 @@ class CWidgetFieldColumnsListView extends CWidgetFieldView {
 				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 				(new CDiv($column['name']))->addClass('text'),
 				(new CDiv($label))->addClass('text'),
-				(new CList(array_merge($row_actions, [$column_data])))->addClass(ZBX_STYLE_HOR_LIST)
+				[
+					(new CList($row_actions))->addClass(ZBX_STYLE_HOR_LIST),
+					$column_data
+				]
 			]);
 		}
 

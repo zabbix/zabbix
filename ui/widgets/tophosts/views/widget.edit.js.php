@@ -38,13 +38,6 @@ window.widget_tophosts_form = new class {
 	 */
 	#list_columns;
 
-	/**
-	 * Column index.
-	 *
-	 * @type {number}
-	 */
-	#column_index;
-
 	init({templateid}) {
 		this.#form = document.getElementById('widget-dialogue-form');
 		this.#list_columns = document.getElementById('list_columns');
@@ -62,11 +55,12 @@ window.widget_tophosts_form = new class {
 		const target = e.target;
 		const form_fields = getFormFields(this.#form);
 
+		let column_index;
 		let column_popup;
 
 		switch (target.getAttribute('name')) {
 			case 'add':
-				this.#column_index = this.#list_columns.querySelectorAll('tr').length;
+				column_index = this.#list_columns.querySelectorAll('tr').length;
 
 				column_popup = PopUp(
 					'widget.tophosts.column.edit',
@@ -81,17 +75,17 @@ window.widget_tophosts_form = new class {
 					}
 				).$dialogue[0];
 
-				column_popup.addEventListener('dialogue.submit', (e) => this.#updateColumns(e));
+				column_popup.addEventListener('dialogue.submit', (e) => this.#updateColumns(column_index, e.detail));
 				column_popup.addEventListener('dialogue.close', this.#removeColorpicker);
 				break;
 
 			case 'edit':
-				this.#column_index = target.closest('tr').querySelector('[name="sortorder[columns][]"]').value;
+				column_index = target.closest('tr').querySelector('[name="sortorder[columns][]"]').value;
 
 				column_popup = PopUp(
 					'widget.tophosts.column.edit',
 					{
-						...form_fields.columns[this.#column_index],
+						...form_fields.columns[column_index],
 						edit: 1,
 						templateid: this.#templateid,
 						groupids: form_fields.groupids,
@@ -102,7 +96,7 @@ window.widget_tophosts_form = new class {
 					}
 					).$dialogue[0];
 
-				column_popup.addEventListener('dialogue.submit', (e) => this.#updateColumns(e));
+				column_popup.addEventListener('dialogue.submit', (e) => this.#updateColumns(column_index, e.detail));
 				column_popup.addEventListener('dialogue.close', this.#removeColorpicker);
 				break;
 
@@ -113,47 +107,40 @@ window.widget_tophosts_form = new class {
 		}
 	}
 
-	#updateColumns(e) {
-		const data = e.detail;
+	#updateColumns(column_index, data) {
+		this.#list_columns.querySelectorAll(`[name^="columns[${column_index}]["]`).forEach(node => node.remove());
 
-		if (!data.edit) {
-			this.#addVar('sortorder[columns][]', this.#column_index);
+		if (data.edit) {
+			delete data.edit;
+		}
+		else {
+			this.#addVar(`sortorder[columns][]`, column_index);
 		}
 
 		for (const [data_key, data_value] of Object.entries(data)) {
 			switch (data_key) {
-				case 'edit':
-					this.#list_columns.querySelectorAll(`[name^="columns[${this.#column_index}]["]`)
-						.forEach((node) => node.remove());
-
-					break;
-
 				case 'thresholds':
-					for (const [key, value] of Object.entries(data.thresholds)) {
-						this.#addVar(`columns[${this.#column_index}][thresholds][${key}][color]`, value.color);
-						this.#addVar(`columns[${this.#column_index}][thresholds][${key}][threshold]`, value.threshold);
+					for (const [key, value] of Object.entries(data_value)) {
+						this.#addVar(`columns[${column_index}][thresholds][${key}][color]`, value.color);
+						this.#addVar(`columns[${column_index}][thresholds][${key}][threshold]`, value.threshold);
 					}
-
 					break;
 
 				case 'highlights':
-					for (const [key, value] of Object.entries(data.highlights)) {
-						this.#addVar(`columns[${this.#column_index}][highlights][${key}][color]`, value.color);
-						this.#addVar(`columns[${this.#column_index}][highlights][${key}][pattern]`, value.pattern);
+					for (const [key, value] of Object.entries(data_value)) {
+						this.#addVar(`columns[${column_index}][highlights][${key}][color]`, value.color);
+						this.#addVar(`columns[${column_index}][highlights][${key}][pattern]`, value.pattern);
 					}
-
 					break;
 
 				case 'time_period':
-					for (const [key, value] of Object.entries(data.time_period)) {
-						this.#addVar(`columns[${this.#column_index}][time_period][${key}]`, value);
+					for (const [key, value] of Object.entries(data_value)) {
+						this.#addVar(`columns[${column_index}][time_period][${key}]`, value);
 					}
-
 					break;
 
 				default:
-					this.#addVar(`columns[${this.#column_index}][${data_key}]`, data_value);
-
+					this.#addVar(`columns[${column_index}][${data_key}]`, data_value);
 					break;
 			}
 		}

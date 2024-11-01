@@ -261,6 +261,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$calc_extremes = $column['display'] == CWidgetFieldColumnsList::DISPLAY_BAR
 				|| $column['display'] == CWidgetFieldColumnsList::DISPLAY_INDICATORS;
 
+			$column += ['min' => '', 'min_binary' => '', 'max' => '', 'max_binary' => ''];
+
 			if ($column_index == $master_column_index) {
 				$column_items = $master_entities;
 				$column_item_values = $master_entity_values;
@@ -268,8 +270,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			else {
 				$numeric_only = self::isNumericOnlyColumn($column);
 
-				if (!$calc_extremes || ((array_key_exists('min', $column) && $column['min'] !== '')
-						&& (array_key_exists('max', $column) && $column['max'] !== ''))) {
+				if (!$calc_extremes || ($column['min'] !== '' && $column['max'] !== '')) {
 					$column_items = self::getItems($column['item'], $numeric_only, $groupids, $master_hostids);
 				}
 				else {
@@ -282,7 +283,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 
 			if ($calc_extremes) {
-				if (array_key_exists('min', $column) && $column['min'] !== '') {
+				if ($column['min'] !== '') {
 					$number_parser_binary->parse($column['min']);
 					$column['min_binary'] = $number_parser_binary->calcValue();
 
@@ -290,12 +291,35 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$column['min'] = $number_parser->calcValue();
 				}
 
-				if (array_key_exists('max', $column) && $column['max'] !== '') {
+				if ($column['max'] !== '') {
 					$number_parser_binary->parse($column['max']);
 					$column['max_binary'] = $number_parser_binary->calcValue();
 
 					$number_parser->parse($column['max']);
 					$column['max'] = $number_parser->calcValue();
+				}
+
+				if ($column_index == $master_column_index) {
+					if ($column['min'] === '') {
+						$column['min'] = $master_entities_min;
+						$column['min_binary'] = $column['min'];
+					}
+
+					if ($column['max'] === '') {
+						$column['max'] = $master_entities_max;
+						$column['max_binary'] = $column['max'];
+					}
+				}
+				elseif ($column_item_values) {
+					if ($column['min'] === '') {
+						$column['min'] = min($column_item_values);
+						$column['min_binary'] = $column['min'];
+					}
+
+					if ($column['max'] === '') {
+						$column['max'] = max($column_item_values);
+						$column['max_binary'] = $column['max'];
+					}
 				}
 			}
 
@@ -308,33 +332,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$threshold['threshold'] = $number_parser->calcValue();
 				}
 				unset($threshold);
-			}
-
-			if ($column_index == $master_column_index) {
-				if ($calc_extremes) {
-					if (!array_key_exists('min', $column) || $column['min'] === '') {
-						$column['min'] = $master_entities_min;
-						$column['min_binary'] = $column['min'];
-					}
-
-					if (!array_key_exists('max', $column) || $column['max'] === '') {
-						$column['max'] = $master_entities_max;
-						$column['max_binary'] = $column['max'];
-					}
-				}
-			}
-			else {
-				if ($calc_extremes && $column_item_values) {
-					if (!array_key_exists('min', $column)) {
-						$column['min'] = min($column_item_values);
-						$column['min_binary'] = $column['min'];
-					}
-
-					if (!array_key_exists('max', $column)) {
-						$column['max'] = max($column_item_values);
-						$column['max_binary'] = $column['max'];
-					}
-				}
 			}
 
 			$item_values[$column_index] = [];
