@@ -229,7 +229,7 @@ void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *ch
 		if (SUCCEED == (res = zbx_iprange_parse(&ipr, start)))
 			zbx_iprange_first(&ipr, ip_first);
 
-		if (SUCCEED != res || 0 == memcmp(ip_first, z, sizeof(zbx_range_t) *
+		if (SUCCEED != res || 0 == memcmp(ip_first, z, sizeof(int) *
 				(ZBX_IPRANGE_V4 == ipr.type ? ZBX_IPRANGE_GROUPS_V4 : ZBX_IPRANGE_GROUPS_V6)))
 		{
 			char	err[MAX_STRING_LEN];
