@@ -1635,6 +1635,9 @@ static int	dbsync_compare_interface(const ZBX_DC_INTERFACE *interface, const zbx
 	if (FAIL == dbsync_compare_str(dbrow[6], interface->dns))
 		return FAIL;
 
+	if (NULL != strstr(dbrow[7], "{$"))
+		return FAIL;
+
 	if (FAIL == dbsync_compare_str(dbrow[7], interface->port))
 		return FAIL;
 
@@ -1733,6 +1736,18 @@ static char	**dbsync_interface_preproc_row(zbx_dbsync_t *sync, char **row)
 			row[6] = addr;
 		else
 			zbx_free(addr);
+	}
+
+	if (NULL != strstr(row[7], "{$"))
+	{
+		char	*ptr;
+
+		ptr = dc_expand_user_and_func_macros_dyn(row[7], &hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+
+		if (SUCCEED == zbx_is_ushort(ptr, NULL))
+			row[7] = ptr;
+		else
+			zbx_free(ptr);
 	}
 
 	return sync->row;

@@ -616,8 +616,8 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 			continue;
 		}
 
-		/* do not notify about rank changes */
-		if (0 != (atoi(row[5]) & (ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE | ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM)))
+		/* do not notify only rank changes */
+		if (0 == (atoi(row[5]) & ~(ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE | ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM)))
 			continue;
 
 		ack_task = (zbx_ack_task_t *)zbx_malloc(NULL, sizeof(zbx_ack_task_t));

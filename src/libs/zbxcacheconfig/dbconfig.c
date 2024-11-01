@@ -2735,6 +2735,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		update->ip = zbx_strdup(NULL, row[5]);
 		update->dns = zbx_strdup(NULL, row[6]);
+
 		if (SUCCEED == dc_strpool_replace(found, &interface->port, row[7]))
 			update->modified = 1;
 
@@ -7424,7 +7425,6 @@ static void	DCsync_connectors(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
-
 
 /******************************************************************************
  *                                                                            *

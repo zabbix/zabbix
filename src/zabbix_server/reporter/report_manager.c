@@ -1720,6 +1720,10 @@ static int	macro_report_resolv(zbx_macro_resolv_data_t *p, va_list args, char **
 	{
 		*replace_with = zbx_strdup(*replace_with, zbx_time2str(time(NULL), tz));
 	}
+	else if (0 == strcmp(p->macro, MVAR_TIMESTAMP))
+	{
+		*replace_with = zbx_dsprintf(*replace_with, "%ld", (long)time(NULL));
+	}
 
 	return SUCCEED;
 }

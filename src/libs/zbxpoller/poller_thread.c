@@ -347,7 +347,7 @@ static int	macro_jmx_endpoint_resolv(zbx_macro_resolv_data_t *p, va_list args, c
 void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
 		unsigned char expand_macros)
 {
-	char			*port = NULL, error[ZBX_ITEM_ERROR_LEN_MAX], *timeout = NULL;
+	char			error[ZBX_ITEM_ERROR_LEN_MAX], *timeout = NULL;
 	zbx_dc_um_handle_t	*um_handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d", __func__, num);
@@ -377,15 +377,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 			case ITEM_TYPE_ZABBIX:
 			case ITEM_TYPE_SNMP:
 			case ITEM_TYPE_JMX:
-				ZBX_STRDUP(port, items[i].interface.port_orig);
-				if (ZBX_MACRO_EXPAND_YES == expand_macros)
-				{
-					zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid,
-							NULL, NULL, NULL, NULL, NULL, NULL, NULL, &port,
-							ZBX_MACRO_TYPE_COMMON, NULL, 0);
-				}
-
-				if (FAIL == zbx_is_ushort(port, &items[i].interface.port))
+				if (FAIL == zbx_is_ushort(items[i].interface.port_orig, &items[i].interface.port))
 				{
 					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "Invalid port number [%s]",
 								items[i].interface.port_orig));
@@ -649,8 +641,6 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 		}
 		zbx_free(timeout);
 	}
-
-	zbx_free(port);
 
 	if (ZBX_MACRO_EXPAND_YES == expand_macros)
 		zbx_dc_close_user_macros(um_handle);

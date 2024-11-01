@@ -531,6 +531,9 @@ int	expr_db_get_history_log_value(zbx_uint64_t itemid, char **replace_to, int re
 		case ZBX_REQUEST_ITEM_LOG_AGE:
 			*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - value.value.log->timestamp));
 			goto success;
+		case ZBX_REQUEST_ITEM_LOG_TIMESTAMP:
+			*replace_to = zbx_dsprintf(*replace_to, "%d", value.value.log->timestamp);
+			goto success;
 	}
 
 	/* the following attributes are set only for windows eventlog items */
@@ -956,6 +959,10 @@ int	expr_get_history_log_value(const char *m, const zbx_db_trigger *trigger, cha
 	else if (0 == strcmp(m, MVAR_ITEM_LOG_TIME))
 	{
 		request = ZBX_REQUEST_ITEM_LOG_TIME;
+	}
+	else if (0 == strcmp(m, MVAR_ITEM_LOG_TIMESTAMP))
+	{
+		request = ZBX_REQUEST_ITEM_LOG_TIMESTAMP;
 	}
 	else
 		goto out;
