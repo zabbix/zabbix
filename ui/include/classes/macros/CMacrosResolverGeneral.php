@@ -1003,10 +1003,6 @@ class CMacrosResolverGeneral {
 							$value = date('H:i:s', $history[$itemid][0]['timestamp']);
 							break;
 
-						case 'ITEM.LOG.TIMESTAMP':
-							$value = $history[$itemid][0]['timestamp'];
-							break;
-
 						case 'ITEM.LOG.AGE':
 							$value = zbx_date2age($history[$itemid][0]['timestamp']);
 							break;
@@ -1260,31 +1256,21 @@ class CMacrosResolverGeneral {
 					case 'ITEM.LOG.DATE':
 						$value = date('Y.m.d', $history[$function['itemid']][0]['timestamp']);
 						break;
-
 					case 'ITEM.LOG.TIME':
 						$value = date('H:i:s', $history[$function['itemid']][0]['timestamp']);
 						break;
-
-					case 'ITEM.LOG.TIMESTAMP':
-						$value = $history[$function['itemid']][0]['timestamp'];
-						break;
-
 					case 'ITEM.LOG.AGE':
 						$value = zbx_date2age($history[$function['itemid']][0]['timestamp']);
 						break;
-
 					case 'ITEM.LOG.SOURCE':
 						$value = $history[$function['itemid']][0]['source'];
 						break;
-
 					case 'ITEM.LOG.SEVERITY':
 						$value = get_item_logtype_description($history[$function['itemid']][0]['severity']);
 						break;
-
 					case 'ITEM.LOG.NSEVERITY':
 						$value = $history[$function['itemid']][0]['severity'];
 						break;
-
 					case 'ITEM.LOG.EVENTID':
 						$value = $history[$function['itemid']][0]['logeventid'];
 						break;
@@ -1816,7 +1802,7 @@ class CMacrosResolverGeneral {
 		}
 
 		$db_interfaces = array_column(API::HostInterface()->get([
-			'output' => ['hostid', 'useip', 'ip', 'dns', 'port'],
+			'output' => ['hostid', 'useip', 'ip', 'dns'],
 			'hostids' => array_keys($macros),
 			'filter' => [
 				'type' => INTERFACE_TYPE_AGENT,
@@ -1827,9 +1813,7 @@ class CMacrosResolverGeneral {
 		$data = [];
 
 		foreach ($db_interfaces as $hostid => $db_interface) {
-			$data[$hostid] = ['ip' => $db_interface['ip'], 'dns' => $db_interface['dns'],
-				'port' => $db_interface['port']
-			];
+			$data[$hostid] = ['ip' => $db_interface['ip'], 'dns' => $db_interface['dns']];
 		}
 
 		$data = CMacrosResolver::resolve([
@@ -1840,16 +1824,13 @@ class CMacrosResolverGeneral {
 		foreach ($db_interfaces as $hostid => &$db_interface) {
 			$db_interface['ip'] = $data[$hostid]['ip'];
 			$db_interface['dns'] = $data[$hostid]['dns'];
-			$db_interface['port'] = $data[$hostid]['port'];
 			$db_interface['conn'] = ($db_interface['useip'] == INTERFACE_USE_IP)
 				? $db_interface['ip']
 				: $db_interface['dns'];
 		}
 		unset($db_interface);
 
-		$interface_macros = ['IPADDRESS' => 'ip', 'HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn',
-			'HOST.PORT' => 'port'
-		];
+		$interface_macros = ['IPADDRESS' => 'ip', 'HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn'];
 
 		foreach ($db_interfaces as $hostid => $db_interface) {
 			foreach ($macros[$hostid] as $macro => $tokens) {
@@ -2227,7 +2208,7 @@ class CMacrosResolverGeneral {
 		}
 
 		$db_interfaces = API::HostInterface()->get([
-			'output' => ['hostid', 'type', 'useip', 'ip', 'dns', 'port'],
+			'output' => ['hostid', 'type', 'useip', 'ip', 'dns'],
 			'hostids' => array_keys($hostids),
 			'filter' => ['main' => INTERFACE_PRIMARY]
 		]);
@@ -2251,9 +2232,7 @@ class CMacrosResolverGeneral {
 		}
 		unset($host_interface);
 
-		$interface_macros = ['IPADDRESS' => 'ip', 'HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn',
-			'HOST.PORT' => 'port'
-		];
+		$interface_macros = ['IPADDRESS' => 'ip', 'HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn'];
 
 		foreach ($macros as $triggerid => $macro_data) {
 			if (!array_key_exists($triggerid, $trigger_hosts_by_f_num)) {

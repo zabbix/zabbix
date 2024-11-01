@@ -53,7 +53,6 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 	protected function checkInput() {
 		$fields = [
 			'authtype'				=> 'in '.implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
-			'allow_traps'			=> 'in '.implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON]),
 			'get_value'				=> 'in 0,1',
 			'eol'					=> 'in '.implode(',', [ZBX_EOL_LF, ZBX_EOL_CRLF]),
 			'headers'				=> 'array',
@@ -99,7 +98,6 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'test_type'				=> 'required|in '.implode(',', [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD]),
 			'time_change'			=> 'int32',
 			'timeout'				=> 'string',
-			'trapper_hosts'			=> 'string',
 			'username'				=> 'string',
 			'url'					=> 'string',
 			'value'					=> 'string',
