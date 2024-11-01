@@ -402,10 +402,13 @@ static int	pb_history_get_mem(zbx_pb_t *pb, struct zbx_json *j, zbx_uint64_t *la
 
 		while (1)
 		{
-			while (SUCCEED == zbx_list_iterator_next(&li) && ZBX_MAX_HRECORDS > rows.values_num)
+			while (SUCCEED == zbx_list_iterator_next(&li))
 			{
 				(void)zbx_list_iterator_peek(&li, (void **)&row);
 				zbx_vector_pb_history_ptr_append(&rows, row);
+
+				if (ZBX_MAX_HRECORDS <= rows.values_num)
+					break;
 			}
 
 			records_num = pb_history_export(j, records_num, &rows, lastid);
