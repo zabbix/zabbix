@@ -102,7 +102,7 @@ The user must be included in the Administrators group.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Nextcloud: User discovery|<p>User discovery.</p>|HTTP agent|nextcloud.user.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ocs.data.users`</p><p>⛔️Custom on fail: Set value to: `[]`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Nextcloud: User discovery|<p>User discovery.</p>|HTTP agent|nextcloud.user.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ocs.data.users`</p><p>⛔️Custom on fail: Set value to: `[]`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for Nextcloud: User discovery
 
