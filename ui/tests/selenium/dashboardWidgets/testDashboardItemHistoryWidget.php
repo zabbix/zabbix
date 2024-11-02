@@ -349,7 +349,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				'placeholder' => 'default'
 			],
 			'Show lines' => [
-				'maxlength' => 4
+				'maxlength' => '4'
 			],
 			'id:override_hostid_ms' => [
 				'placeholder' => 'type here to search'

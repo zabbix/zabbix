@@ -1554,7 +1554,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						'Host limit' => '0'
 					],
 					'main_error' => [
-						'Invalid parameter "Host limit": value must be one of 1-100.'
+						'Invalid parameter "Host limit": value must be one of 1-1000.'
 					]
 				]
 			],
