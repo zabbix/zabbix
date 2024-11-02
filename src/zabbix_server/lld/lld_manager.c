@@ -334,7 +334,7 @@ static void	lld_process_next_request(zbx_lld_manager_t *manager, zbx_lld_worker_
 	data = worker->rule->head;
 	buf_len = zbx_lld_serialize_item_value(&buf, data->itemid, 0, data->value, &data->ts, data->meta,
 			data->lastlogsize, data->mtime, data->error);
-	zbx_ipc_client_send(worker->client, ZBX_IPC_LLD_TASK, buf, buf_len);
+	zbx_ipc_client_send(worker->client, ZBX_IPC_LLD_PREPARE_VALUE, buf, buf_len);
 	zbx_free(buf);
 }
 
@@ -400,6 +400,53 @@ static void	lld_process_result(zbx_lld_manager_t *manager, zbx_ipc_client_t *cli
 	else
 		zbx_queue_ptr_push(&manager->free_workers, worker);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: processes LLD worker 'next' response                              *
+ *                                                                            *
+ * Parameters: manager - [IN]                                                 *
+ *             client  - [IN] worker's IPC client connection                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_process_next(zbx_lld_manager_t *manager, zbx_ipc_client_t *client)
+{
+	zbx_lld_worker_t	*worker;
+	zbx_lld_rule_t		*rule;
+	zbx_lld_data_t		*data;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	worker = lld_get_worker_by_client(manager, client);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "discovery rule:" ZBX_FS_UI64 " duplicate check in progress",
+			worker->rule->head->itemid);
+
+	rule = worker->rule;
+
+	if (NULL == rule->head->next)
+	{
+		zbx_ipc_client_send(client, ZBX_IPC_LLD_PROCESS, NULL, 0);
+		goto out;
+	}
+
+	data = rule->head;
+	rule->head = rule->head->next;
+	rule->head->prev = NULL;
+	rule->values_num--;
+
+	lld_data_free(data);
+
+	unsigned char	*buf;
+	zbx_uint32_t	buf_len;
+
+	data = rule->head;
+	buf_len = zbx_lld_serialize_value(&buf, data->value);
+	zbx_ipc_client_send(client, ZBX_IPC_LLD_CHECK_VALUE, buf, buf_len);
+	zbx_free(buf);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -586,6 +633,9 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 					lld_process_result(&manager, client);
 					processed_num++;
 					manager.queued_num--;
+					break;
+				case ZBX_IPC_LLD_NEXT:
+					lld_process_next(&manager, client);
 					break;
 				case ZBX_IPC_LLD_QUEUE:
 					zbx_ipc_client_send(client, message->code, (unsigned char *)&manager.queued_num,

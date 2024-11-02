@@ -175,13 +175,11 @@ static int	lld_filter_condition_add(zbx_vector_lld_condition_ptr_t *conditions, 
  * Purpose: loads LLD filter data                                             *
  *                                                                            *
  * Parameters: filter     - [IN] LLD filter                                   *
- *             lld_ruleid - [IN]                                              *
  *             item       - [IN] LLD item                                     *
  *             error      - [OUT] error message                               *
  *                                                                            *
  ******************************************************************************/
-static int	lld_filter_load(zbx_lld_filter_t *filter, zbx_uint64_t lld_ruleid, const zbx_dc_item_t *item,
-		char **error)
+static int	lld_filter_load(zbx_lld_filter_t *filter, const zbx_dc_item_t *item, char **error)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -193,7 +191,7 @@ static int	lld_filter_load(zbx_lld_filter_t *filter, zbx_uint64_t lld_ruleid, co
 			"select item_conditionid,macro,value,operator"
 			" from item_condition"
 			" where itemid=" ZBX_FS_UI64,
-			lld_ruleid);
+			item->itemid);
 
 	while (NULL != (row = zbx_db_fetch(result)) && SUCCEED == (ret = lld_filter_condition_add(&filter->conditions,
 			row[0], row[1], row[2], row[3], item, error)))
@@ -639,8 +637,7 @@ static void	lld_dump_overrides(const zbx_vector_lld_override_ptr_t *overrides)
 	}
 }
 
-static int	lld_overrides_load(zbx_vector_lld_override_ptr_t *overrides, zbx_uint64_t lld_ruleid,
-		const zbx_dc_item_t *item, char **error)
+static int	lld_overrides_load(zbx_vector_lld_override_ptr_t *overrides, const zbx_dc_item_t *item, char **error)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -660,7 +657,7 @@ static int	lld_overrides_load(zbx_vector_lld_override_ptr_t *overrides, zbx_uint
 			" from lld_override"
 			" where itemid=" ZBX_FS_UI64
 			" order by lld_overrideid",
-			lld_ruleid);
+			item->itemid);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1074,14 +1071,14 @@ static void	lld_row_free(zbx_lld_row_t *lld_row)
  *                                                                            *
  * Purpose: adds or updates items, triggers and graphs for discovery item     *
  *                                                                            *
- * Parameters: lld_ruleid - [IN] discovery rule id from database              *
- *             value      - [IN] received value from agent                    *
- *             error      - [OUT] Error or informational message. Will be set *
- *                               to empty string on successful discovery      *
+ * Parameters: item        - [IN] discovery rule                              *
+ *             lld_entries - [IN] discovery entries (rows)                    *
+ *             error       - [OUT] Error or informational message. Will be    *
+ *                               set to empty string on successful discovery  *
  *                               without additional information.              *
  *                                                                            *
  ******************************************************************************/
-int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char **error)
+int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_hashset_t *lld_entries, char **error)
 {
 #define LIFETIME_DURATION_GET(lt, lt_str)									\
 	do													\
@@ -1110,47 +1107,31 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	zbx_db_row_t			row;
 	zbx_uint64_t			hostid;
 	char				*discovery_key = NULL, *info = NULL;
-	int				errcode, ret = SUCCEED;
-	zbx_vector_lld_macro_path_ptr_t	lld_macro_paths;
+	int				ret = SUCCEED;
 	zbx_lld_filter_t		filter;
 	zbx_lld_lifetime_t		lifetime, enabled_lifetime;
 	time_t				now;
-	zbx_dc_item_t			item;
 	zbx_config_t			cfg;
 	zbx_dc_um_handle_t		*um_handle;
 	zbx_vector_lld_override_ptr_t	overrides;
 	zbx_vector_lld_row_ptr_t	lld_rows;
-	zbx_jsonobj_t			lld_obj = {0};
-	zbx_hashset_t			lld_entries;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __func__, lld_ruleid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __func__, item->itemid);
 
 	um_handle = zbx_dc_open_user_macros();
 
 	zbx_vector_lld_row_ptr_create(&lld_rows);
-	zbx_vector_lld_macro_path_ptr_create(&lld_macro_paths);
 	zbx_vector_lld_override_ptr_create(&overrides);
-
-	zbx_hashset_create_ext(&lld_entries, 0, lld_entry_hash, lld_entry_compare, (zbx_clean_func_t)lld_entry_clear,
-			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	lld_filter_init(&filter);
 
-	zbx_dc_config_get_items_by_itemids(&item, &lld_ruleid, &errcode, 1);
-
-	if (SUCCEED != errcode)
-	{
-		*error = zbx_dsprintf(*error, "Invalid discovery rule ID [" ZBX_FS_UI64 "].", lld_ruleid);
-		ret = FAIL;
-		goto out;
-	}
 
 	result = zbx_db_select(
 			"select hostid,key_,evaltype,formula,lifetime_type,lifetime,enabled_lifetime_type,"
 				"enabled_lifetime"
 			" from items"
 			" where itemid=" ZBX_FS_UI64,
-			lld_ruleid);
+			item->itemid);
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1168,38 +1149,21 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 
 	if (NULL == row)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery rule ID [" ZBX_FS_UI64 "]", lld_ruleid);
+		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery rule ID [" ZBX_FS_UI64 "]", item->itemid);
 		goto out;
 	}
 
-	if (SUCCEED != lld_filter_load(&filter, lld_ruleid, &item, error))
+	if (SUCCEED != lld_filter_load(&filter, item, error))
 	{
 		ret = FAIL;
 		goto out;
 	}
 
-	if (SUCCEED != zbx_lld_macro_paths_get(lld_ruleid, &lld_macro_paths, error))
-	{
-		ret = FAIL;
-		goto out;
-	}
 
-	if (SUCCEED != (ret = lld_overrides_load(&overrides, lld_ruleid, &item, error)))
+	if (SUCCEED != (ret = lld_overrides_load(&overrides, item, error)))
 		goto out;
 
-	if (SUCCEED != zbx_jsonobj_open(value, &lld_obj))
-	{
-		*error = zbx_dsprintf(*error, "Invalid discovery rule value: %s", zbx_json_strerror());
-		goto out;
-	}
-
-	ret = lld_extract_entries(&lld_entries, &lld_obj, &lld_macro_paths, error);
-	zbx_jsonobj_clear(&lld_obj);
-
-	if (SUCCEED != ret)
-		goto out;
-
-	if (SUCCEED != lld_rows_get(&lld_entries, &filter, &lld_rows, &overrides, &info))
+	if (SUCCEED != lld_rows_get(lld_entries, &filter, &lld_rows, &overrides, &info))
 	{
 		ret = FAIL;
 		goto out;
@@ -1212,7 +1176,7 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED | ZBX_CONFIG_FLAGS_AUDITLOG_MODE);
 	zbx_audit_init(cfg.auditlog_enabled, cfg.auditlog_mode, ZBX_AUDIT_LLD_CONTEXT);
 
-	if (SUCCEED != lld_update_items(hostid, lld_ruleid, &lld_rows, error, &lifetime, &enabled_lifetime, now))
+	if (SUCCEED != lld_update_items(hostid, item->itemid, &lld_rows, error, &lifetime, &enabled_lifetime, now))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add items because parent host was removed while"
 				" processing lld rule");
@@ -1221,29 +1185,27 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 
 	lld_item_links_sort(&lld_rows);
 
-	if (SUCCEED != lld_update_triggers(hostid, lld_ruleid, &lld_rows, error, &lifetime, &enabled_lifetime, now))
+	if (SUCCEED != lld_update_triggers(hostid, item->itemid, &lld_rows, error, &lifetime, &enabled_lifetime, now))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add triggers because parent host was removed while"
 				" processing lld rule");
 		goto out;
 	}
 
-	if (SUCCEED != lld_update_graphs(hostid, lld_ruleid, &lld_rows, error, &lifetime, now))
+	if (SUCCEED != lld_update_graphs(hostid, item->itemid, &lld_rows, error, &lifetime, now))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add graphs because parent host was removed while"
 				" processing lld rule");
 		goto out;
 	}
 
-	lld_update_hosts(lld_ruleid, &lld_rows, error, &lifetime, &enabled_lifetime, now);
+	lld_update_hosts(item->itemid, &lld_rows, error, &lifetime, &enabled_lifetime, now);
 
 	/* add informative warning to the error message about lack of data for macros used in filter */
 	if (NULL != info)
 		*error = zbx_strdcat(*error, info);
 out:
-	zbx_hashset_destroy(&lld_entries);
 	zbx_audit_flush(ZBX_AUDIT_LLD_CONTEXT);
-	zbx_dc_config_clean_items(&item, &errcode, 1);
 	zbx_free(info);
 	zbx_free(discovery_key);
 
@@ -1253,8 +1215,6 @@ out:
 	zbx_vector_lld_override_ptr_destroy(&overrides);
 	zbx_vector_lld_row_ptr_clear_ext(&lld_rows, lld_row_free);
 	zbx_vector_lld_row_ptr_destroy(&lld_rows);
-	zbx_vector_lld_macro_path_ptr_clear_ext(&lld_macro_paths, zbx_lld_macro_path_free);
-	zbx_vector_lld_macro_path_ptr_destroy(&lld_macro_paths);
 
 	zbx_dc_close_user_macros(um_handle);
 

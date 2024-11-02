@@ -417,7 +417,7 @@ typedef void	(*object_audit_entry_update_status_f)(int audit_context_mode, zbx_u
 		int status_old, int status_new);
 typedef int	(get_object_status_val)(int status);
 
-int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char **error);
+int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_hashset_t *lld_entries, char **error);
 
 /* discovered resource tracking (*_discovery tables) */
 typedef struct
