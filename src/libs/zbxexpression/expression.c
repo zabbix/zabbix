@@ -2897,8 +2897,8 @@ static int	substitute_macros_xml_impl(char **data, const zbx_dc_item_t *item,
 #ifndef HAVE_LIBXML2
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(item);
-	ZBX_UNUSED(jp_row);
-	ZBX_UNUSED(lld_macro_paths);
+	ZBX_UNUSED(macro_resolver_cb);
+	ZBX_UNUSED(resolver_data);
 	zbx_snprintf(error, maxerrlen, "Support for XML was not compiled in");
 	return FAIL;
 #else

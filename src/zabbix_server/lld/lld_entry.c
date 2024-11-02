@@ -17,7 +17,7 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 
-ZBX_VECTOR_IMPL(lld_macro, zbx_lld_macro_t);
+ZBX_VECTOR_IMPL(lld_macro, zbx_lld_macro_t)
 
 static void	lld_macro_clear(zbx_lld_macro_t *macro)
 {

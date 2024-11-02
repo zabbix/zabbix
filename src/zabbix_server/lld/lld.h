@@ -94,7 +94,7 @@ typedef struct
 }
 zbx_lld_macro_t;
 
-ZBX_VECTOR_DECL(lld_macro, zbx_lld_macro_t);
+ZBX_VECTOR_DECL(lld_macro, zbx_lld_macro_t)
 
 /* LLD macros extracted from LLD row */
 typedef struct
