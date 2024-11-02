@@ -1,6 +1,7 @@
 if SERVER
 SERVER_tests = zbx_lld_hgsets_test \
-		lld_entry_create
+		lld_entry_create \
+		lld_compare_entries
 
 noinst_PROGRAMS = $(SERVER_tests)
 
@@ -145,6 +146,22 @@ lld_entry_create_LDADD += @SERVER_LIBS@
 lld_entry_create_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 lld_entry_create_CFLAGS = \
+	-I@top_srcdir@/tests @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
+
+lld_compare_entries_SOURCES = \
+	lld_compare_entries.c \
+	../../zbxmockexit.c \
+	../../zbxmockdb.c \
+	../../zbxmockdata.c \
+	../../zbxmocklog.c \
+	../../zbxmockfile.c \
+	../../zbxmockdir.c
+
+lld_compare_entries_LDADD = $(LLD_LIBS)
+lld_compare_entries_LDADD += @SERVER_LIBS@
+lld_compare_entries_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
+lld_compare_entries_CFLAGS = \
 	-I@top_srcdir@/tests @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
 	
 endif

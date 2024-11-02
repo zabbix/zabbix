@@ -458,4 +458,18 @@ typedef struct
 }
 zbx_lld_item_ref_t;
 
+typedef struct zbx_lld_entry zbx_lld_entry_t;
+
+void	lld_entry_clear(zbx_lld_entry_t *entry);
+
+zbx_hash_t	lld_entry_hash(const void *data);
+int        lld_entry_compare(const void *d1, const void *d2);
+
+int	lld_extract_entries(zbx_hashset_t *entries, const zbx_jsonobj_t *lld_obj,
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error);
+
+void	lld_free_entries(zbx_hashset_t *entries);
+
+int	lld_compare_entries(const zbx_hashset_t *entries1, const zbx_hashset_t *entries2);
+
 #endif

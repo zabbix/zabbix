@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "../../../src/zabbix_server/lld/lld_entry.c"
 #include "zbxmocktest.h"
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
@@ -21,7 +22,6 @@
 
 #include "zbxcacheconfig.h"
 
-#include "../../../src/zabbix_server/lld/lld_index.c"
 
 static void	load_macro_paths(zbx_vector_lld_macro_path_ptr_t *macro_paths)
 {

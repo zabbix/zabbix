@@ -28,13 +28,13 @@ zbx_lld_macro_t;
 ZBX_VECTOR_DECL(lld_macro, zbx_lld_macro_t);
 ZBX_VECTOR_IMPL(lld_macro, zbx_lld_macro_t);
 
-void	lld_macro_clear(zbx_lld_macro_t *macro)
+static void	lld_macro_clear(zbx_lld_macro_t *macro)
 {
 	zbx_free(macro->macro);
 	zbx_free(macro->value);
 }
 
-int	lld_macro_compare(const void *d1, const void *d2)
+static int	lld_macro_compare(const void *d1, const void *d2)
 {
 	const zbx_lld_macro_t	*m1 = (const zbx_lld_macro_t *)d1;
 	const zbx_lld_macro_t	*m2 = (const zbx_lld_macro_t *)d2;
@@ -42,11 +42,10 @@ int	lld_macro_compare(const void *d1, const void *d2)
 	return strcmp(m1->macro, m2->macro);
 }
 
-typedef struct
+struct zbx_lld_entry
 {
 	zbx_vector_lld_macro_t	macros;
-}
-zbx_lld_entry_t;
+};
 
 /******************************************************************************
  *                                                                            *
@@ -93,7 +92,7 @@ int        lld_entry_compare(const void *d1, const void *d2)
  * Purpose: create lld entry (row)                                            *
  *                                                                            *
  ******************************************************************************/
-void	lld_entry_create(zbx_lld_entry_t *entry, const zbx_jsonobj_t *obj,
+static void	lld_entry_create(zbx_lld_entry_t *entry, const zbx_jsonobj_t *obj,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths)
 {
 	size_t	size;
@@ -115,10 +114,10 @@ void	lld_entry_create(zbx_lld_entry_t *entry, const zbx_jsonobj_t *obj,
 		if (SUCCEED != zbx_jsonobj_query(obj, macro_path->path, &value))
 			continue;
 
-                lld_macro.macro = zbx_strdup(NULL, macro_path->lld_macro);
-                lld_macro.value = value;
+		lld_macro.macro = zbx_strdup(NULL, macro_path->lld_macro);
+		lld_macro.value = value;
 
-                zbx_vector_lld_macro_append(&entry->macros, lld_macro);
+		zbx_vector_lld_macro_append(&entry->macros, lld_macro);
 	}
 
 	if (ZBX_JSON_TYPE_OBJECT == obj->type)
@@ -136,15 +135,15 @@ void	lld_entry_create(zbx_lld_entry_t *entry, const zbx_jsonobj_t *obj,
 
 			switch (el->value.type)
 			{
-				case ZBX_JSON_TYPE_NUMBER:
-					zbx_print_double(buf, sizeof(buf), el->value.data.number);
-					lld_macro.value = zbx_strdup(NULL, buf);
-					break;
-				case ZBX_JSON_TYPE_STRING:
-					lld_macro.value = zbx_strdup(NULL, el->value.data.string);
-					break;
-				default:
-					continue;
+			case ZBX_JSON_TYPE_NUMBER:
+				zbx_print_double(buf, sizeof(buf), el->value.data.number);
+				lld_macro.value = zbx_strdup(NULL, buf);
+				break;
+			case ZBX_JSON_TYPE_STRING:
+				lld_macro.value = zbx_strdup(NULL, el->value.data.string);
+				break;
+			default:
+				continue;
 			}
 
 			lld_macro.macro = zbx_strdup(NULL, el->name);
@@ -170,21 +169,6 @@ void	lld_entry_clear(zbx_lld_entry_t *entry)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add macro to lld entry                                            *
- *                                                                            *
- ******************************************************************************/
-void	lld_entry_add_macro(zbx_lld_entry_t *entry, const char *macro, const char *value)
-{
-	zbx_lld_macro_t	lld_macro;
-
-	lld_macro.macro = zbx_strdup(NULL, macro);
-	lld_macro.value = zbx_strdup(NULL, value);
-
-	zbx_vector_lld_macro_append(&entry->macros, lld_macro);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: lld_entry_get_macro                                              *
  *                                                                            *
  * Purpose: retrieve macro value from lld entry                               *
@@ -206,12 +190,41 @@ const char        *lld_entry_get_macro(const zbx_lld_entry_t *entry, const char 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: prepare lld entry for further processing                          *
+ * Purpose: extract lld entries from lld json                                 *
  *                                                                            *
  ******************************************************************************/
-void	lld_entry_prepare(zbx_lld_entry_t *entry)
+int	lld_extract_entries(zbx_hashset_t *entries, const zbx_jsonobj_t *lld_obj,
+		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error)
 {
-	zbx_vector_lld_macro_sort(&entry->macros, lld_macro_compare);
+	const zbx_jsonobj_t	*lld_array;
+
+	if (ZBX_JSON_TYPE_ARRAY == lld_obj->type)
+	{
+		lld_array = lld_obj;
+	}
+	else
+	{
+		if (NULL == (lld_array = zbx_jsonobj_get_value(lld_obj, ZBX_PROTO_TAG_DATA)) ||
+				ZBX_JSON_TYPE_ARRAY != lld_array->type)
+		{
+			*error = zbx_dsprintf(*error, "Cannot find the \"%s\" array in the received JSON object.",
+					ZBX_PROTO_TAG_DATA);
+			return FAIL;
+		}
+	}
+
+	for (int i = 0; i < lld_array->data.array.values_num; i++)
+	{
+		zbx_lld_entry_t	entry_local;
+
+		if (ZBX_JSON_TYPE_OBJECT != lld_array->data.array.values[i]->type)
+			continue;
+
+		lld_entry_create(&entry_local, lld_array->data.array.values[i], lld_macro_paths);
+		zbx_hashset_insert(entries, &entry_local, sizeof(entry_local));
+	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************
