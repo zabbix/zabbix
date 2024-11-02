@@ -17,15 +17,6 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 
-typedef struct
-{
-	char	*macro;
-	char	*value;
-
-}
-zbx_lld_macro_t;
-
-ZBX_VECTOR_DECL(lld_macro, zbx_lld_macro_t);
 ZBX_VECTOR_IMPL(lld_macro, zbx_lld_macro_t);
 
 static void	lld_macro_clear(zbx_lld_macro_t *macro)
@@ -41,11 +32,6 @@ static int	lld_macro_compare(const void *d1, const void *d2)
 
 	return strcmp(m1->macro, m2->macro);
 }
-
-struct zbx_lld_entry
-{
-	zbx_vector_lld_macro_t	macros;
-};
 
 /******************************************************************************
  *                                                                            *
@@ -111,7 +97,7 @@ static void	lld_entry_create(zbx_lld_entry_t *entry, const zbx_jsonobj_t *obj,
 		const zbx_lld_macro_path_t	*macro_path = lld_macro_paths->values[i];
 		char				*value = NULL;
 
-		if (SUCCEED != zbx_jsonobj_query(obj, macro_path->path, &value))
+		if (SUCCEED != zbx_jsonobj_query(obj, macro_path->path, &value) || NULL == value)
 			continue;
 
 		lld_macro.macro = zbx_strdup(NULL, macro_path->lld_macro);
@@ -248,4 +234,21 @@ int	lld_compare_entries(const zbx_hashset_t *entries1, const zbx_hashset_t *entr
 	}
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: print entry contents as comma delimited macro:value string        *
+ *                                                                            *
+ ******************************************************************************/
+void	lld_entry_snprintf_alloc(const zbx_lld_entry_t *entry, char **str, size_t *str_alloc, size_t *str_offset)
+{
+	for (int i = 0; i < entry->macros.values_num; i++)
+	{
+		if (0 != i)
+			zbx_strcpy_alloc(str, str_alloc, str_offset, ", ");
+
+		zbx_snprintf_alloc(str, str_alloc, str_offset, "%s:%s", entry->macros.values[i].macro,
+				entry->macros.values[i].value);
+	}
 }

@@ -2665,8 +2665,8 @@ typedef struct
 {
 	zbx_uint64_t				*hostid;
 	zbx_dc_item_t				*dc_item;
-	const zbx_jsonobj_t			*lld_obj;
-	const zbx_vector_lld_macro_path_ptr_t	*lld_macro_paths;
+	zbx_macro_resolver_f			resolver_cb;
+	const void				*resolver_data;
 	int					macro_type;
 }
 replace_key_param_data_t;
@@ -2682,8 +2682,8 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 	replace_key_param_data_t		*replace_key_param_data = (replace_key_param_data_t *)cb_data;
 	zbx_uint64_t				*hostid = replace_key_param_data->hostid;
 	zbx_dc_item_t				*dc_item = replace_key_param_data->dc_item;
-	const zbx_jsonobj_t			*lld_obj = replace_key_param_data->lld_obj;
-	const zbx_vector_lld_macro_path_ptr_t	*lld_macros = replace_key_param_data->lld_macro_paths;
+	zbx_macro_resolver_f			resolver_cb = replace_key_param_data->resolver_cb;
+	const void				*resolver_data = replace_key_param_data->resolver_data;
 	int					macro_type = replace_key_param_data->macro_type, ret = SUCCEED;
 
 	ZBX_UNUSED(num);
@@ -2699,11 +2699,11 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 	if (0 != level)
 		zbx_unquote_key_param(*param);
 
-	if (NULL == lld_obj)
+	if (NULL == resolver_cb)
 		substitute_simple_macros_impl(NULL, NULL, NULL, NULL, hostid, NULL, dc_item, NULL, NULL, NULL, NULL,
 				NULL, NULL, param, macro_type, NULL, 0);
 	else
-		zbx_substitute_lld_macros(param, lld_obj, lld_macros, ZBX_MACRO_ANY, NULL, 0);
+		resolver_cb(param, resolver_data);
 
 	if (0 != level)
 	{
@@ -2748,8 +2748,8 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
  *                                                                            *
  ******************************************************************************/
 int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
-		const zbx_jsonobj_t *lld_obj, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths,
-		int macro_type, char *error, size_t maxerrlen)
+		zbx_macro_resolver_f macro_resolver_cb, const void *resolver_data, int macro_type, char *error,
+		size_t maxerrlen)
 {
 	replace_key_param_data_t	replace_key_param_data;
 	int				key_type, ret;
@@ -2758,8 +2758,8 @@ int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, zbx_dc_item_t 
 
 	replace_key_param_data.hostid = hostid;
 	replace_key_param_data.dc_item = dc_item;
-	replace_key_param_data.lld_obj = lld_obj;
-	replace_key_param_data.lld_macro_paths = lld_macro_paths;
+	replace_key_param_data.resolver_cb = macro_resolver_cb;
+	replace_key_param_data.resolver_data = resolver_data;
 	replace_key_param_data.macro_type = macro_type;
 
 	switch (macro_type)
@@ -2789,8 +2789,8 @@ int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, zbx_dc_item_t 
  * Comments: auxiliary function for substitute_macros_xml().                  *
  *                                                                            *
  ******************************************************************************/
-static void	substitute_macros_in_xml_elements(const zbx_dc_item_t *item, const zbx_jsonobj_t *lld_obj,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, xmlNode *node)
+static void	substitute_macros_in_xml_elements(const zbx_dc_item_t *item, zbx_macro_resolver_f macro_resolver_cb,
+		const void *resolver_data, xmlNode *node)
 {
 	xmlChar	*value;
 	xmlAttr	*attr;
@@ -2806,17 +2806,14 @@ static void	substitute_macros_in_xml_elements(const zbx_dc_item_t *item, const z
 
 				value_tmp = zbx_strdup(NULL, (const char *)value);
 
-				if (NULL != item)
+				if (NULL == macro_resolver_cb)
 				{
 					substitute_simple_macros_impl(NULL, NULL, NULL, NULL, NULL, &item->host, item,
 							NULL, NULL, NULL, NULL, NULL, NULL, &value_tmp,
 							ZBX_MACRO_TYPE_HTTP_XML, NULL, 0);
 				}
 				else
-				{
-					zbx_substitute_lld_macros(&value_tmp, lld_obj, lld_macro_paths, ZBX_MACRO_ANY,
-							NULL, 0);
-				}
+					macro_resolver_cb(&value_tmp, resolver_data);
 
 				xmlNodeSetContent(node, NULL);
 				xmlNodeAddContent(node, (xmlChar *)value_tmp);
@@ -2830,17 +2827,14 @@ static void	substitute_macros_in_xml_elements(const zbx_dc_item_t *item, const z
 
 				value_tmp = zbx_strdup(NULL, (const char *)value);
 
-				if (NULL != item)
+				if (NULL == macro_resolver_cb)
 				{
 					substitute_simple_macros_impl(NULL, NULL, NULL, NULL, NULL, &item->host, item,
 							NULL, NULL, NULL, NULL, NULL, NULL, &value_tmp,
 							ZBX_MACRO_TYPE_HTTP_RAW, NULL, 0);
 				}
 				else
-				{
-					zbx_substitute_lld_macros(&value_tmp, lld_obj, lld_macro_paths, ZBX_MACRO_ANY,
-							NULL, 0);
-				}
+					macro_resolver_cb(&value_tmp, resolver_data);
 
 				xmlNodeSetContent(node, NULL);
 				xmlNodeAddContent(node, (xmlChar *)value_tmp);
@@ -2856,17 +2850,14 @@ static void	substitute_macros_in_xml_elements(const zbx_dc_item_t *item, const z
 
 					value_tmp = zbx_strdup(NULL, (const char *)value);
 
-					if (NULL != item)
+					if (NULL == macro_resolver_cb)
 					{
 						substitute_simple_macros_impl(NULL, NULL, NULL, NULL, NULL, &item->host,
 								item, NULL, NULL, NULL, NULL, NULL, NULL, &value_tmp,
 								ZBX_MACRO_TYPE_HTTP_XML, NULL, 0);
 					}
 					else
-					{
-						zbx_substitute_lld_macros(&value_tmp, lld_obj, lld_macro_paths,
-								ZBX_MACRO_ANY, NULL, 0);
-					}
+						macro_resolver_cb(&value_tmp, resolver_data);
 
 					xmlSetProp(node, attr->name, (xmlChar *)value_tmp);
 
@@ -2878,7 +2869,7 @@ static void	substitute_macros_in_xml_elements(const zbx_dc_item_t *item, const z
 				break;
 		}
 
-		substitute_macros_in_xml_elements(item, lld_obj, lld_macro_paths, node->children);
+		substitute_macros_in_xml_elements(item, macro_resolver_cb, resolver_data, node->children);
 	}
 }
 #endif
@@ -2888,19 +2879,20 @@ static void	substitute_macros_in_xml_elements(const zbx_dc_item_t *item, const z
  * Purpose: Substitutes simple or LLD macros in XML text nodes, attributes of *
  *          a node or in CDATA section, validates XML.                        *
  *                                                                            *
- * Parameters: data            - [IN/OUT] pointer to buffer that contains xml *
- *             item            - [IN] item for simple macro substitution      *
- *             lld_obj         - [IN] discovery data for lld macro            *
- *                                    substitution                            *
- *             lld_macro_paths - [IN] lld macro paths                         *
- *             error           - [OUT] reason for xml parsing failure         *
- *             maxerrlen       - [IN] size of error buffer                    *
+ * Parameters: data              - [IN/OUT] pointer to buffer that contains   *
+ *                                          xml                               *
+ *             item              - [IN] item for simple macro substitution    *
+ *             macro_resolver_cb - [IN] macro resolver function, optional     *
+ *             resolver_data    - [IN] user-defined data for macro resolver, *
+ *                                      optional                              *
+ *             error             - [OUT] reason for xml parsing failure       *
+ *             maxerrlen         - [IN] size of error buffer                  *
  *                                                                            *
  * Return value: SUCCEED or FAIL if XML validation has failed.                *
  *                                                                            *
  ******************************************************************************/
-static int	substitute_macros_xml_impl(char **data, const zbx_dc_item_t *item, const zbx_jsonobj_t *lld_obj,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char *error, int maxerrlen)
+static int	substitute_macros_xml_impl(char **data, const zbx_dc_item_t *item,
+		zbx_macro_resolver_f macro_resolver_cb, const void *resolver_data, char *error, int maxerrlen)
 {
 #ifndef HAVE_LIBXML2
 	ZBX_UNUSED(data);
@@ -2926,7 +2918,7 @@ static int	substitute_macros_xml_impl(char **data, const zbx_dc_item_t *item, co
 			goto clean;
 	}
 
-	substitute_macros_in_xml_elements(item, lld_obj, lld_macro_paths, root_element);
+	substitute_macros_in_xml_elements(item, macro_resolver_cb, resolver_data, root_element);
 	xmlDocDumpMemory(doc, &mem, &size);
 
 	if (FAIL == zbx_check_xml_memory((char *)mem, maxerrlen, &error))
@@ -2998,10 +2990,10 @@ int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const zb
  * Purpose: substitute_macros_xml with masked secret macros.                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_substitute_macros_xml(char **data, const zbx_dc_item_t *item, const zbx_jsonobj_t *lld_obj,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char *error, int maxerrlen)
+int	zbx_substitute_macros_xml(char **data, const zbx_dc_item_t *item, zbx_macro_resolver_f macro_resolver_cb,
+		const void *resolver_data, char *error, int maxerrlen)
 {
-	return substitute_macros_xml_impl(data, item, lld_obj, lld_macro_paths, error, maxerrlen);
+	return substitute_macros_xml_impl(data, item, macro_resolver_cb, resolver_data, error, maxerrlen);
 }
 
 /******************************************************************************
@@ -3009,15 +3001,15 @@ int	zbx_substitute_macros_xml(char **data, const zbx_dc_item_t *item, const zbx_
  * Purpose: substitute_macros_xml with unmasked secret macros.                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_substitute_macros_xml_unmasked(char **data, const zbx_dc_item_t *item, const zbx_jsonobj_t *lld_obj,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char *error, int maxerrlen)
+int	zbx_substitute_macros_xml_unmasked(char **data, const zbx_dc_item_t *item,
+		zbx_macro_resolver_f macro_resolver_cb, const void *resolver_data, char *error, int maxerrlen)
 {
 	int			ret;
 	zbx_dc_um_handle_t	*um_handle;
 
 	um_handle = zbx_dc_open_user_macros_secure();
 
-	ret = substitute_macros_xml_impl(data, item, lld_obj, lld_macro_paths, error, maxerrlen);
+	ret = substitute_macros_xml_impl(data, item, macro_resolver_cb, resolver_data, error, maxerrlen);
 
 	zbx_dc_close_user_macros(um_handle);
 
@@ -3030,10 +3022,11 @@ int	zbx_substitute_macros_xml_unmasked(char **data, const zbx_dc_item_t *item, c
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_key_macros(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
-		const zbx_jsonobj_t *lld_obj, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths,
-		int macro_type, char *error, size_t maxerrlen)
+		zbx_macro_resolver_f macro_resolver_cb, const void *resolver_data, int macro_type, char *error,
+		size_t maxerrlen)
 {
-	return substitute_key_macros_impl(data, hostid, dc_item, lld_obj, lld_macro_paths, macro_type, error, maxerrlen);
+	return substitute_key_macros_impl(data, hostid, dc_item, macro_resolver_cb, resolver_data, macro_type, error,
+			maxerrlen);
 }
 
 /******************************************************************************

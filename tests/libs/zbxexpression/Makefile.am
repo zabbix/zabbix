@@ -7,7 +7,6 @@ SERVER_tests = \
 	zbx_evaluate_function \
 	zbx_STL \
 	zbx_get_percentage_of_deviations_in_stl_remainder \
-	zbx_substitute_lld_macros \
 	zbx_calculate_macro_function \
 	zbx_substitute_simple_macros \
 	evaluate_value_by_map
@@ -133,19 +132,6 @@ zbx_evaluate_unknown_LDADD += @SERVER_LIBS@
 zbx_evaluate_unknown_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_evaluate_unknown_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS)
-
-
-zbx_substitute_lld_macros_SOURCES = \
-	zbx_substitute_lld_macros.c
-
-zbx_substitute_lld_macros_LDADD = \
-	$(EVALUATE_LIB_FILES) $(TLS_LIBS)
-
-zbx_substitute_lld_macros_LDADD += @SERVER_LIBS@
-
-zbx_substitute_lld_macros_LDFLAGS =  @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
-
-zbx_substitute_lld_macros_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS)
 
 
 zbx_calculate_macro_function_SOURCES = \
