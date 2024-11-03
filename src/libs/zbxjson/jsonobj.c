@@ -181,6 +181,8 @@ void	zbx_jsonobj_clear(zbx_jsonobj_t *obj)
 		default:
 			break;
 	}
+
+	obj->type = ZBX_JSON_TYPE_UNKNOWN;
 }
 
 /******************************************************************************
@@ -260,19 +262,20 @@ int	zbx_jsonobj_to_string(char **str, size_t *str_alloc, size_t *str_offset, con
  ******************************************************************************/
 int	zbx_jsonobj_open(const char *data, zbx_jsonobj_t *obj)
 {
-	int	ret = FAIL;
-	char	*error = NULL;
+	zbx_uint64_t	offset;
+	int		ret = FAIL;
+	char		*error = NULL;
 
 	SKIP_WHITESPACE(data);
 
 	switch (*data)
 	{
 		case '{':
-			if (0 == json_parse_object(data, obj, 0, &error))
+			if (0 == (offset = json_parse_object(data, obj, 0, &error)))
 				goto out;
 			break;
 		case '[':
-			if (0 == json_parse_array(data, obj, 0, &error))
+			if (0 == (offset = json_parse_array(data, obj, 0, &error)))
 				goto out;
 			break;
 		default:
@@ -282,7 +285,13 @@ int	zbx_jsonobj_open(const char *data, zbx_jsonobj_t *obj)
 			goto out;
 	}
 
-	ret = SUCCEED;
+	data += offset;
+	SKIP_WHITESPACE(data);
+
+	if ('\0' != *data)
+		(void)json_error("invalid data trailing JSON object", data, &error);
+	else
+		ret = SUCCEED;
 out:
 	if (FAIL == ret)
 	{

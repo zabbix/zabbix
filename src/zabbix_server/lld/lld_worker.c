@@ -105,7 +105,7 @@ static void	lld_flush_value(zbx_lld_value_t *lld_value, unsigned char state, con
 
 	if (ITEM_STATE_UNKNOWN != state && state != lld_value->item.state)
 	{
-		diff.state = ITEM_STATE_NOTSUPPORTED;
+		diff.state = state;
 		diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE;
 
 		if (ITEM_STATE_NORMAL == state)
@@ -132,6 +132,13 @@ static void	lld_flush_value(zbx_lld_value_t *lld_value, unsigned char state, con
 		zbx_db_commit();
 
 		zbx_clean_events();
+	}
+
+	/* with successful LLD processing LLD error will be set to empty string */
+	if (NULL != error && 0 != strcmp(error, ZBX_NULL2EMPTY_STR(lld_value->item.error)))
+	{
+		diff.error = error;
+		diff.flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
 	}
 
 	if (0 != lld_value->meta)
