@@ -89,6 +89,7 @@ LLD_LIBS = \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/alias/libalias.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
@@ -137,6 +138,7 @@ zbx_lld_hgsets_test_CFLAGS = \
 	
 lld_entry_create_SOURCES = \
 	lld_entry_create.c \
+	../../../src/zabbix_server/lld/lld_macro.c \
 	../../zbxmockexit.c \
 	../../zbxmockdb.c \
 	../../zbxmockdata.c \
@@ -153,6 +155,7 @@ lld_entry_create_CFLAGS = \
 
 lld_compare_entries_SOURCES = \
 	lld_compare_entries.c \
+	../../../src/zabbix_server/lld/lld_macro.c \
 	../../zbxmockexit.c \
 	../../zbxmockdb.c \
 	../../zbxmockdata.c \

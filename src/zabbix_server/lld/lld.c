@@ -225,7 +225,7 @@ static int	filter_condition_match(const zbx_lld_entry_t *lld_obj, const lld_cond
 	char	*value = NULL;
 	int	ret = SUCCEED;
 
-	if (SUCCEED == zbx_lld_macro_value_by_name(lld_obj, condition->macro, &value))
+	if (SUCCEED == lld_macro_value_by_name(lld_obj, condition->macro, &value))
 	{
 		if (ZBX_CONDITION_OPERATOR_NOT_EXIST == condition->op)
 		{

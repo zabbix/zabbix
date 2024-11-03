@@ -30,6 +30,19 @@
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 
+typedef struct
+{
+	zbx_dc_item_t			item;
+	int				errcode;
+	zbx_timespec_t			ts;
+	unsigned char			meta;
+	zbx_uint64_t			lastlogsize;
+	int				mtime;
+	zbx_hashset_t			entries;
+	zbx_vector_lld_macro_path_ptr_t	macro_paths;
+}
+zbx_lld_value_t;
+
 /******************************************************************************
  *                                                                            *
  * Purpose: registers LLD worker with LLD manager                             *
@@ -46,19 +59,12 @@ static void	lld_register_worker(zbx_ipc_socket_t *socket)
 	zbx_ipc_socket_write(socket, ZBX_IPC_LLD_REGISTER, (unsigned char *)&ppid, sizeof(ppid));
 }
 
-typedef struct
-{
-	zbx_dc_item_t			item;
-	int				errcode;
-	zbx_timespec_t			ts;
-	unsigned char			meta;
-	zbx_uint64_t			lastlogsize;
-	int				mtime;
-	zbx_hashset_t			entries;
-	zbx_vector_lld_macro_path_ptr_t	macro_paths;
-}
-zbx_lld_value_t;
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize LLD value                                              *
+ *                                                                            *
+ ******************************************************************************/
 void	lld_value_init(zbx_lld_value_t *lld_value)
 {
 	zbx_hashset_create_ext(&lld_value->entries, 0, lld_entry_hash, lld_entry_compare,
@@ -70,6 +76,11 @@ void	lld_value_init(zbx_lld_value_t *lld_value)
 	zbx_vector_lld_macro_path_ptr_create(&lld_value->macro_paths);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: clear LLD value                                                   *
+ *                                                                            *
+ ******************************************************************************/
 void	lld_value_clear(zbx_lld_value_t *lld_value)
 {
 	zbx_hashset_destroy(&lld_value->entries);
@@ -81,6 +92,11 @@ void	lld_value_clear(zbx_lld_value_t *lld_value)
 	memset(lld_value, 0, sizeof(zbx_lld_value_t));
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: flush processed, meta or error LLD value                          *
+ *                                                                            *
+ ******************************************************************************/
 static void	lld_flush_value(zbx_lld_value_t *lld_value, unsigned char state, const char *error)
 {
 	zbx_item_diff_t	diff;
@@ -153,6 +169,11 @@ static void	lld_flush_value(zbx_lld_value_t *lld_value, unsigned char state, con
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare LLD value                                                 *
+ *                                                                            *
+ ******************************************************************************/
 static int	lld_prepare_value(const zbx_ipc_message_t *message, zbx_lld_value_t *lld_value)
 {
 	zbx_uint64_t	itemid, hostid;
@@ -211,6 +232,11 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: compare cached LLD value with the new value                       *
+ *                                                                            *
+ ******************************************************************************/
 static int	lld_compare_value(const zbx_ipc_message_t *message, zbx_lld_value_t *lld_value)
 {
 	char		*value = NULL, *error = NULL;
@@ -227,10 +253,10 @@ static int	lld_compare_value(const zbx_ipc_message_t *message, zbx_lld_value_t *
 	if (FAIL == zbx_jsonobj_open(value, &json))
 		goto out;
 
-	if (FAIL == lld_extract_entries(&entries, &json, &lld_value->macro_paths, &error))
-		goto out;
+	if (SUCCEED == (ret = lld_extract_entries(&entries, &json, &lld_value->macro_paths, &error)))
+		ret = lld_compare_entries(&lld_value->entries, &entries);
 
-	ret = lld_compare_entries(&lld_value->entries, &entries);
+	zbx_jsonobj_clear(&json);
 out:
 	zbx_free(value);
 	zbx_free(error);
@@ -240,6 +266,11 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process LLD value                                                 *
+ *                                                                            *
+ ******************************************************************************/
 static void	lld_process_value(zbx_lld_value_t *lld_value)
 {
 	char		*error = NULL;
