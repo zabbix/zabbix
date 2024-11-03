@@ -167,7 +167,7 @@ const char        *lld_entry_get_macro(const zbx_lld_entry_t *entry, const char 
 	int			i;
 	zbx_lld_macro_t 	lld_macro = {.macro = (char *)macro};
 
-	if (FAIL == (i = zbx_vector_lld_macro_search(&entry->macros, lld_macro, lld_macro_compare)))
+	if (FAIL == (i = zbx_vector_lld_macro_bsearch(&entry->macros, lld_macro, lld_macro_compare)))
 		return NULL;
 
 	return entry->macros.values[i].value;

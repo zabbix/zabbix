@@ -371,7 +371,6 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 	if (0 != lld_value.item.itemid)
 		lld_value_clear(&lld_value);
 
-
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
 	while (1)
