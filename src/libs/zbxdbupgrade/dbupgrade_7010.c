@@ -184,9 +184,18 @@ static int	DBpatch_7010015(void)
 		return SUCCEED;
 
 	if (ZBX_DB_OK > zbx_db_execute(
-			"update widget_field as wf join widget as w on (w.widgetid=wf.widgetid)"
-			" set wf.value_int=case when wf.value_int=1 then 0 when wf.value_int=2 then 1 when wf.value_int=3 then 2 end"
-			" where w.type='tophosts' and wf.name like 'columns.%%.history'"))
+			"update widget_field"
+			" set value_int="
+				"case when value_int=1 then 0"
+				" when value_int=2 then 1"
+				" when value_int=3 then 2 end"
+			" where name like 'columns.%%.history'"
+				" and exists ("
+					"select null"
+					" from widget w"
+					" where widget_field.widgetid=w.widgetid"
+						" and w.type='tophosts'"
+				")"))
 	{
 		return FAIL;
 	}
