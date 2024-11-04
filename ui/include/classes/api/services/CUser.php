@@ -164,7 +164,6 @@ class CUser extends CApiService {
 			}
 		}
 
-		$output_fields = array_flip(self::OUTPUT_FIELDS);
 		$limited_output_fields = array_flip(self::LIMITED_OUTPUT_FIELDS);
 
 		// filter
@@ -308,7 +307,7 @@ class CUser extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-//			$result = $this->unsetExtraFields($result, ['roleid'], $options['output']);
+			$result = $this->unsetExtraFields($result, ['roleid'], $options['output']);
 		}
 
 		// removing keys
