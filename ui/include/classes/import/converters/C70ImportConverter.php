@@ -148,6 +148,34 @@ class C70ImportConverter extends CConverter {
 							}
 						));
 					}
+
+					if ($widget['type'] === 'tophosts') {
+						if (!array_key_exists('fields', $widget)) {
+							continue;
+						}
+
+						foreach ($widget['fields'] as &$field) {
+							if (preg_match('/^columns\.\d+\.history$/', $field['name'])) {
+								$field['value'] = [
+									'1' => '0',		// HISTORY_DATA_AUTO
+									'2' => '1',		// HISTORY_DATA_HISTORY
+									'3' => '2'		// HISTORY_DATA_TRENDS
+								][$field['value']];
+							}
+						}
+						unset($field);
+
+						// Clear default values.
+						$widget['fields'] = array_filter($widget['fields'], static function($field) {
+							return !(
+								(preg_match('/^columns\.\d+\.base_color$/', $field['name']) && $field['value'] === '')
+								|| (preg_match('/^columns\.\d+\.display$/', $field['name']) && $field['value'] === '1')
+								|| (preg_match('/^columns\.\d+\.decimal_places$/', $field['name']) && $field['value'] === '2')
+								|| (preg_match('/^columns\.\d+\.aggregate_function/', $field['name']) && $field['value'] === '0')
+								|| (preg_match('/^columns\.\d+\.history$/', $field['name']) && $field['value'] === '0')
+							);
+						});
+					}
 				}
 				unset($widget);
 			}
