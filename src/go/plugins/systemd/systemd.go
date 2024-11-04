@@ -200,11 +200,13 @@ func (p *Plugin) get(params []string, conn *dbus.Conn) (interface{}, error) {
 func (p *Plugin) getServiceType(name string, conn *dbus.Conn) string {
 	serviceType, err := p.info([]string{name, "Type", "Service"}, conn)
 	if err != nil {
+		p.Debugf("failed to retrieve service type for %s, err:", name, err.Error())
 		return ""
 	}
 
 	typeString, ok := serviceType.(string)
 	if !ok {
+		p.Debugf("unit service type is not string for %s", name)
 		return ""
 	}
 
