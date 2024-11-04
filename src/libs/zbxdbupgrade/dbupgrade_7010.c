@@ -210,11 +210,11 @@ static int	DBpatch_7010016(void)
 
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from widget_field"
-			" where (name like 'columns.%%.base_color' and value_str='')"
+			" where ((name like 'columns.%%.base_color' and value_str='')"
 				" or (name like 'columns.%%.display' and value_int=1)"
 				" or (name like 'columns.%%.decimal_places' and value_int=2)"
 				" or (name like 'columns.%%.aggregate_function' and value_int=0)"
-				" or (name like 'columns.%%.history' and value_int=0)"
+				" or (name like 'columns.%%.history' and value_int=0))"
 			" and exists ("
 				"select null"
 				" from widget w"
