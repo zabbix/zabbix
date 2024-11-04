@@ -133,6 +133,11 @@ static int	DBpatch_7000013(void)
 	return DBcreate_index("auditlog", "auditlog_5", "ip", 0);
 }
 
+static int	DBpatch_7000014(void)
+{
+	return DBcreate_index("proxy_history", "proxy_history_2", "write_clock", 0);
+}
+
 #endif
 
 DBPATCH_START(7000)
@@ -153,5 +158,6 @@ DBPATCH_ADD(7000010, 0, 0)
 DBPATCH_ADD(7000011, 0, 0)
 DBPATCH_ADD(7000012, 0, 0)
 DBPATCH_ADD(7000013, 0, 0)
+DBPATCH_ADD(7000014, 0, 0)
 
 DBPATCH_END()
