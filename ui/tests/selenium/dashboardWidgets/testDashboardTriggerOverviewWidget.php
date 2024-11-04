@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 /**
  * @backup widget, profiles, triggers, problem, config
  *
+ * @dataSource DynamicItemWidgets
+ *
  * @onBefore prepareData
  */
 class testDashboardTriggerOverviewWidget extends CWebTest {
