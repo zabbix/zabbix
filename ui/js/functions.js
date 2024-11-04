@@ -117,7 +117,7 @@ function normalizeNumericBox(input, {allow_empty, allow_negative, min_length}) {
 	let num = parseInt(input.value, 10);
 
 	if (isNaN(num)) {
-		input.value = allow_empty ? '' : '0'.repeat(Math.max(min_length, 1));
+		input.value = (input.value === '' && allow_empty) ? '' : '0'.repeat(Math.max(min_length, 1));
 	}
 	else {
 		if (num < 0 && !allow_negative) {
