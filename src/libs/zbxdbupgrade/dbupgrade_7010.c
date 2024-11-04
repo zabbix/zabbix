@@ -178,6 +178,40 @@ static int	DBpatch_7010014(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7010015(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field as wf join widget as w on (w.widgetid=wf.widgetid)"
+			" set wf.value_int=case when wf.value_int=1 then 0 when wf.value_int=2 then 1 when wf.value_int=3 then 2 end"
+			" where w.type='tophosts' and wf.name like 'columns.%.history'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7010016(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete wf from widget_field as wf join widget as w on (w.widgetid=wf.widgetid)"
+			" where w.type='tophosts' and ("
+			" (wf.name like 'columns.%.base_color' and wf.value_str='')"
+			" or (wf.name like 'columns.%.display' and wf.value_int=1)"
+			" or (wf.name like 'columns.%.decimal_places' and wf.value_int=2)"
+			" or (wf.name like 'columns.%.aggregate_function' and wf.value_int=0)"
+			" or (wf.name like 'columns.%.history' and wf.value_int=0))"))
+	{
+		return FAIL;
+	}
+}
+
 #endif
 
 DBPATCH_START(7010)
@@ -199,5 +233,7 @@ DBPATCH_ADD(7010011, 0, 1)
 DBPATCH_ADD(7010012, 0, 1)
 DBPATCH_ADD(7010013, 0, 1)
 DBPATCH_ADD(7010014, 0, 1)
+DBPATCH_ADD(7010015, 0, 1)
+DBPATCH_ADD(7010016, 0, 1)
 
 DBPATCH_END()
