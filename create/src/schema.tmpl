@@ -1144,7 +1144,7 @@ FIELD		|lastlogsize	|t_bigint	|'0'	|NOT NULL	|0
 FIELD		|mtime		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|write_clock	|t_time		|'0'	|NOT NULL	|0
-INDEX		|1		|clock
+INDEX		|2		|write_clock
 
 TABLE|proxy_dhistory|id|0
 FIELD		|id		|t_id		|	|NOT NULL	|0
@@ -2329,4 +2329,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|7010014	|7010014
+ROW		|1		|7010016	|7010016
