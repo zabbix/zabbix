@@ -2642,7 +2642,6 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
 
-	ZBX_DC_INTERFACE	*interface;
 	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
 	ZBX_DC_HOST		*host;
 
@@ -2661,6 +2660,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
 		zbx_dc_if_update_t	*update;
+		ZBX_DC_INTERFACE	*interface;
 
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
@@ -2831,10 +2831,10 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		if (0 != update->modified)
 		{
-			if (INTERFACE_TYPE_AGENT == interface->type &&
-					interface->version < ZBX_COMPONENT_VERSION(7, 0, 0))
+			if (INTERFACE_TYPE_AGENT == update->interface->type &&
+					update->interface->version < ZBX_COMPONENT_VERSION(7, 0, 0))
 			{
-				interface->version = ZBX_COMPONENT_VERSION(7, 0, 0);
+				update->interface->version = ZBX_COMPONENT_VERSION(7, 0, 0);
 			}
 
 			dc_host_update_revision(update->host, revision);
@@ -2854,6 +2854,8 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
+		ZBX_DC_INTERFACE	*interface;
+
 		if (NULL == (interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &rowid)))
 			continue;
 
