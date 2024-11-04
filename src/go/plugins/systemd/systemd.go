@@ -200,7 +200,7 @@ func (p *Plugin) get(params []string, conn *dbus.Conn) (interface{}, error) {
 func (p *Plugin) getServiceType(name string, conn *dbus.Conn) string {
 	serviceType, err := p.info([]string{name, "Type", "Service"}, conn)
 	if err != nil {
-		p.Debugf("failed to retrieve service type for %s, err:", name, err.Error())
+		p.Debugf("failed to retrieve service type for %s, err:%s", name, err.Error())
 		return ""
 	}
 
@@ -253,7 +253,7 @@ func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error
 
 		UnitFileState, err := p.info([]string{u.Name, "UnitFileState"}, conn)
 		if err != nil {
-			p.Debugf("Failed to retrieve unit file state for %s, err:", u.Name, err.Error())
+			p.Debugf("Failed to retrieve unit file state for %s, err:%s", u.Name, err.Error())
 			continue
 		}
 
