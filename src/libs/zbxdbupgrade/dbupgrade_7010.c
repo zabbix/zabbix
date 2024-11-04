@@ -215,12 +215,12 @@ static int	DBpatch_7010016(void)
 				" or (name like 'columns.%%.decimal_places' and value_int=2)"
 				" or (name like 'columns.%%.aggregate_function' and value_int=0)"
 				" or (name like 'columns.%%.history' and value_int=0))"
-			" and exists ("
-				"select null"
-				" from widget w"
-				" where widget_field.widgetid=w.widgetid"
-					" and w.type='tophosts'"
-			")"))
+				" and exists ("
+					"select null"
+					" from widget w"
+					" where widget_field.widgetid=w.widgetid"
+						" and w.type='tophosts'"
+				")"))
 	{
 		return FAIL;
 	}
