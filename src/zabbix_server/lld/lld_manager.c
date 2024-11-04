@@ -426,7 +426,7 @@ static void	lld_process_next(zbx_lld_manager_t *manager, zbx_ipc_client_t *clien
 
 	rule = worker->rule;
 
-	if (NULL == rule->head->next)
+	if (NULL == rule->head->next || NULL == rule->head->next->value)
 	{
 		zbx_ipc_client_send(client, ZBX_IPC_LLD_PROCESS, NULL, 0);
 		goto out;
