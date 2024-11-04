@@ -268,7 +268,8 @@ static void	lld_queue_request(zbx_lld_manager_t *manager, const zbx_ipc_message_
 
 	if (NULL == (rule = zbx_hashset_search(&manager->rule_index, &hostid)))
 	{
-		zbx_lld_rule_t	rule_local = {.hostid = hostid, .values_num = 0, .tail = data, .head = data};
+		zbx_lld_rule_t	rule_local = {.hostid = hostid, .values_num = 0, .tail = data, .head = data,
+				.dup = NULL};
 
 		data->prev = NULL;
 
@@ -379,6 +380,7 @@ static void	lld_process_result(zbx_lld_manager_t *manager, zbx_ipc_client_t *cli
 	rule = worker->rule;
 	worker->rule = NULL;
 
+	rule->dup = NULL;
 	data = rule->head;
 	rule->head = rule->head->next;
 
@@ -405,6 +407,28 @@ static void	lld_process_result(zbx_lld_manager_t *manager, zbx_ipc_client_t *cli
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: get next value from the same rule if it's not empty               *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_lld_data_t	*lld_data_get_next_value(zbx_lld_data_t *from, zbx_uint64_t itemid)
+{
+	zbx_lld_data_t	*data;
+
+	for (data = from; NULL != data; data = data->next)
+	{
+		if (data->itemid == itemid)
+		{
+			if (NULL != data->value)
+				return data;
+			break;
+		}
+	}
+
+	return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: processes LLD worker 'next' response                              *
  *                                                                            *
  * Parameters: manager - [IN]                                                 *
@@ -415,35 +439,47 @@ static void	lld_process_next(zbx_lld_manager_t *manager, zbx_ipc_client_t *clien
 {
 	zbx_lld_worker_t	*worker;
 	zbx_lld_rule_t		*rule;
-	zbx_lld_data_t		*data;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	worker = lld_get_worker_by_client(manager, client);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "discovery rule:" ZBX_FS_UI64 " duplicate check in progress",
-			worker->rule->head->itemid);
-
 	rule = worker->rule;
 
-	if (NULL == rule->head->next || NULL == rule->head->next->value)
+	zabbix_log(LOG_LEVEL_DEBUG, "discovery rule:" ZBX_FS_UI64 " duplicate check in progress, values:%d",
+			rule->head->itemid, rule->values_num);
+
+	if (NULL != rule->dup)
+	{
+		/* worker asking for another value after duplicate check  */
+		/* means that the checked value was duplicate - discard it */
+
+		zbx_lld_data_t	*dup = rule->dup;
+
+		if (NULL != dup->prev)
+			dup->prev->next = dup->next;
+		else
+			rule->head = dup->next;
+
+		if (NULL != dup->next)
+			dup->next->prev = dup->prev;
+		else
+			rule->tail = dup->prev;
+
+		lld_data_free(dup);
+		rule->values_num--;
+		rule->dup = NULL;
+	}
+
+	if (NULL == (rule->dup = lld_data_get_next_value(rule->head->next, rule->head->itemid)))
 	{
 		zbx_ipc_client_send(client, ZBX_IPC_LLD_PROCESS, NULL, 0);
 		goto out;
 	}
 
-	data = rule->head;
-	rule->head = rule->head->next;
-	rule->head->prev = NULL;
-	rule->values_num--;
-
-	lld_data_free(data);
-
 	unsigned char	*buf;
 	zbx_uint32_t	buf_len;
 
-	data = rule->head;
-	buf_len = zbx_lld_serialize_value(&buf, data->value);
+	buf_len = zbx_lld_serialize_value(&buf, rule->dup->value);
 	zbx_ipc_client_send(client, ZBX_IPC_LLD_CHECK_VALUE, buf, buf_len);
 	zbx_free(buf);
 out:
