@@ -53,6 +53,8 @@ The `Service's TCP port state` item uses the `{HOST.CONN}` and `{$MSSQL.PORT}` m
 
 Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKUP_LOG.USED}`, and `{$MSSQL.BACKUP_DIFF.USED}` to disable backup age triggers for a certain database. If set to a value other than "1", the trigger expression for the backup age will not fire.
 
+Note: Since version 6.0.36, you can also connect to the MSSQL by instance name. To do this, set the connection string in the `{$MSSQL.URI}` macro as `<protocol://host/instance_name>`.
+
 ### Macros used
 
 |Name|Description|Default|
