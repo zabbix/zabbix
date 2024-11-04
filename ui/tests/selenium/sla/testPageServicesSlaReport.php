@@ -1393,6 +1393,9 @@ class testPageServicesSlaReport extends testSlaReport {
 		$this->page->login()->open('zabbix.php?action=slareport.list');
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 
+		// Expand filter if it is collapsed.
+		CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_RIGHT)->expand();
+
 		// Usage of Select mode is required as in Type mode a service that contains the name of required service is chosen.
 		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
 		$filter_form->query('button:Reset')->one()->click();

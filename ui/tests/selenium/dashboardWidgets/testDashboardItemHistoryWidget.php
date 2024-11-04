@@ -349,7 +349,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				'placeholder' => 'default'
 			],
 			'Show lines' => [
-				'maxlength' => '3'
+				'maxlength' => '4'
 			],
 			'id:override_hostid_ms' => [
 				'placeholder' => 'type here to search'
@@ -593,7 +593,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 							]
 						]
 					],
-					'error' => ['Invalid parameter "Show lines": value must be one of 1-100.']
+					'error' => ['Invalid parameter "Show lines": value must be one of 1-1000.']
 				]
 			],
 			// #2.
@@ -614,7 +614,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 							]
 						]
 					],
-					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+					'error' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
 				]
 			],
 			// #3.
@@ -622,7 +622,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Show lines' => '101'
+						'Show lines' => '1001'
 					],
 					'Columns' => [
 						[
@@ -635,7 +635,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 							]
 						]
 					],
-					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+					'error' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
 				]
 			],
 			// #4.
@@ -656,7 +656,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 							]
 						]
 					],
-					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+					'error' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
 				]
 			],
 			// #5.
@@ -668,7 +668,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					],
 					'error' => [
 						'Invalid parameter "Columns": cannot be empty.',
-						'Invalid parameter "Show lines": value must be one of 1-100.'
+						'Invalid parameter "Show lines": value must be one of 1-1000.'
 					]
 				]
 			],

@@ -973,7 +973,7 @@ define('SCREEN_REFRESH_RESPONSIVENESS',	10);
 // default, minimum and maximum number of lines for dashboard widgets
 define('ZBX_DEFAULT_WIDGET_LINES', 25);
 define('ZBX_MIN_WIDGET_LINES', 1);
-define('ZBX_MAX_WIDGET_LINES', 100);
+define('ZBX_MAX_WIDGET_LINES', 1000);
 
 // dashboards
 define('DASHBOARD_MAX_PAGES',		50);
