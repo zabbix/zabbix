@@ -819,7 +819,6 @@ int	zbx_tcp_send_context_init(const char *data, size_t len, size_t reserved, uns
 	if (0 == (flags & ZBX_TCP_PROTOCOL))
 		return SUCCEED;
 
-#if !defined(_WINDOWS) && (8 == SIZEOF_SIZE_T)
 	if (ZBX_MAX_RECV_LARGE_DATA_SIZE < len)
 	{
 		zbx_set_socket_strerror("cannot send data: message size " ZBX_FS_UI64 " exceeds the maximum"
@@ -834,7 +833,7 @@ int	zbx_tcp_send_context_init(const char *data, size_t len, size_t reserved, uns
 				ZBX_MAX_RECV_LARGE_DATA_SIZE);
 		return FAIL;
 	}
-#endif
+
 	if (0 != (flags & ZBX_TCP_COMPRESS))
 	{
 		/* compress if not compressed yet */
