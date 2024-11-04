@@ -64,7 +64,10 @@ window.trigger_edit_popup = new class {
 	#initActions() {
 		['input', 'keydown', 'paste'].forEach((event_type) => {
 			this.name.addEventListener(event_type,
-				(e) => this.form.querySelector('#event_name').placeholder = e.target.value
+				(e) => {
+					this.form.querySelector('#event_name').placeholder = e.target.value;
+					this.form.querySelector('#event_name').dispatchEvent(new Event('input'));
+				}
 			);
 			this.name.dispatchEvent(new Event('input'));
 		});
