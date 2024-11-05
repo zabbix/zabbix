@@ -348,7 +348,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 				'placeholder' => 'value'
 			],
 			'Trigger limit' => [
-				'maxlength' => 3
+				'maxlength' => 4
 			]
 		];
 		foreach ($inputs as $field => $attributes) {
@@ -394,7 +394,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					'fields' => [
 						'Trigger limit' => ''
 					],
-					'error' => 'Invalid parameter "Trigger limit": value must be one of 1-100.'
+					'error' => 'Invalid parameter "Trigger limit": value must be one of 1-1000.'
 				]
 			],
 			[
@@ -403,7 +403,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					'fields' => [
 						'Trigger limit' => ' '
 					],
-					'error' => 'Invalid parameter "Trigger limit": value must be one of 1-100.'
+					'error' => 'Invalid parameter "Trigger limit": value must be one of 1-1000.'
 				]
 			],
 			[
@@ -412,16 +412,16 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					'fields' => [
 						'Trigger limit' => '0'
 					],
-					'error' => 'Invalid parameter "Trigger limit": value must be one of 1-100.'
+					'error' => 'Invalid parameter "Trigger limit": value must be one of 1-1000.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Trigger limit' => '101'
+						'Trigger limit' => '1001'
 					],
-					'error' => 'Invalid parameter "Trigger limit": value must be one of 1-100.'
+					'error' => 'Invalid parameter "Trigger limit": value must be one of 1-1000.'
 				]
 			],
 			[
@@ -430,7 +430,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					'fields' => [
 						'Trigger limit' => 'x'
 					],
-					'error' => 'Invalid parameter "Trigger limit": value must be one of 1-100.'
+					'error' => 'Invalid parameter "Trigger limit": value must be one of 1-1000.'
 				]
 			],
 			[

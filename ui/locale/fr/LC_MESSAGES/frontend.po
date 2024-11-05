@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-28 19:22+0000\n"
+"PO-Revision-Date: 2024-10-11 19:57+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -957,7 +957,7 @@ msgstr "Ajouter un nouveau widget"
 
 #: widgets/navtree/Widget.php:34
 msgid "Add child element"
-msgstr ""
+msgstr "Ajouter un élément enfant"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
@@ -996,7 +996,7 @@ msgstr "Ajouter un déclencheur à l'hôte"
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
-msgstr ""
+msgstr "Ajouter un élément"
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1904,7 +1904,7 @@ msgstr "Évitez les mots de passe faciles à deviner"
 
 #: jsLoader.php:172
 msgid "Awaiting data"
-msgstr ""
+msgstr "En attente de données"
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -2063,6 +2063,14 @@ msgstr "Type de bordure"
 #: include/views/js/monitoring.sysmaps.js.php:597
 msgid "Border width"
 msgstr "Largeur de bordure"
+
+#: include/classes/api/services/CHost.php:1445
+msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
+msgstr "Les champs « tls_connect » et « tls_accept » doivent être spécifiés lors de la modification des paramètres de cryptage de connexion."
+
+#: include/classes/api/services/CHost.php:1452
+msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
+msgstr "Les champs « tls_psk_identity » et « tls_psk » doivent être spécifiés lors du changement du PSK pour le cryptage de la connexion."
 
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
@@ -3372,12 +3380,12 @@ msgstr "Impossible d'hériter de la règle LLD avec la clé \"%1$s\" du modèle 
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'hériter des règles LLD avec la clé \"%1$s\" des modèles \"%2$s\" et \"%3$s\", car la clé doit être unique sur l'hôte \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:685
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "Impossible d'hériter des règles LLD avec la clé \"%1$s\" des modèles \"%2$s\" et \"%3$s\", car la clé doit être unique sur le modèle \"%4$s\"."
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
@@ -5441,7 +5449,7 @@ msgstr "Créer un nouveau"
 
 #: jsLoader.php:372
 msgid "Create new report"
-msgstr ""
+msgstr "Créer un nouveau rapport"
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -9569,7 +9577,7 @@ msgstr "Éléments du groupe d'hôtes"
 
 #: jsLoader.php:292
 msgid "Host group is not selected."
-msgstr ""
+msgstr "Le groupe d'hôtes n'est pas sélectionné."
 
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
@@ -9652,7 +9660,7 @@ msgstr "Aperçu d'inventaire d'hôtes"
 
 #: jsLoader.php:289
 msgid "Host is not selected."
-msgstr ""
+msgstr "L'hôte n'est pas sélectionné."
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -12541,7 +12549,7 @@ msgstr "Liste des proxys Zabbix avec nom, mode, cryptage, compression, version, 
 
 #: include/classes/data/CItemData.php:2935
 msgid "List of Zabbix proxy groups configuration data and real-time data. Configuration data includes proxy group name, failover delay, and minimum number of online proxies required for the group to be online. Real-time data includes number of online proxies, percentage of online proxies, and state of proxy group (unknown, offline, recovering, online, degrading). This item does not return groupless proxies. Returns JSON."
-msgstr ""
+msgstr "Liste des données de configuration et données temps réel des groupes proxy Zabbix. Les données de configuration incluent le nom du groupe de proxys, le délai de basculement et le nombre minimum de proxys en ligne requis pour que le groupe soit en ligne. Les données temps réel incluent le nombre de proxys en ligne, le pourcentage de proxys en ligne et l'état du groupe de proxys (inconnu, hors ligne, en récupération, en ligne, dégradé). Cet élément ne renvoie pas de proxys sans groupe. Retourne un JSON."
 
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
@@ -12978,7 +12986,7 @@ msgstr "Type d'étiquette de l'élément de carte"
 
 #: jsLoader.php:290
 msgid "Map is not selected."
-msgstr ""
+msgstr "La carte n'est pas sélectionnée."
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -13384,6 +13392,10 @@ msgstr "Le nom de l'entrée du menu est utilisé comme étiquette pour l'URL du 
 #: app/views/administration.script.edit.php:90
 msgid "Menu path"
 msgstr "Chemin du menu"
+
+#: widgets/piechart/includes/WidgetForm.php:149
+msgid "Merge sectors smaller than"
+msgstr "Fusionner les secteurs plus petits que"
 
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
@@ -15236,13 +15248,13 @@ msgstr "Proxys en ligne"
 #: include/classes/api/services/CUser.php:889
 #, c-format
 msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "Seuls les utilisateurs super-administrateurs ou administrateurs peuvent mettre à jour le paramètre \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:812
 #: include/classes/api/services/CUser.php:853
 #, c-format
 msgid "Only Super admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "Seuls les utilisateurs super-administrateurs peuvent mettre à jour le paramètre \"%1$s\"."
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -19537,7 +19549,7 @@ msgstr "Fonctions de chaîne de caractères"
 
 #: widgets/piechart/includes/WidgetForm.php:137
 msgid "Stroke width"
-msgstr ""
+msgstr "Largeur du trait"
 
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
@@ -20237,6 +20249,10 @@ msgstr "Le prototype d'hôte cloné contient des macros définies par l'utilisat
 msgid "The cloned template contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "Le modèle cloné contient des macros définies par l'utilisateur avec le type \"Texte secret\". La valeur et le type de ces macros ont été réinitialisés."
 
+#: include/classes/api/services/CHost.php:1433
+msgid "The field \"monitored_by\" must be specified when changing proxy or proxy group for host monitoring."
+msgstr "Le champ « monitored_by » doit être spécifié lors du changement de proxy ou de groupe de proxy pour la surveillance de l'hôte."
+
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
 msgstr "Les paramètres suivants sont pris en charge :"
@@ -20355,8 +20371,8 @@ msgstr "Ces paramètres seront transmis au script en tant qu'arguments de ligne 
 #, c-format
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
 msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Cette vérification ne peut pas être supprimée, car elle est utilisée comme condition dans l'action de découverte %1$s."
+msgstr[1] "Cette vérification ne peut pas être supprimée, car elle est utilisée comme condition dans les actions de découverte %1$s."
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -20920,7 +20936,7 @@ msgstr "Le déclencheur du modèle \"%1$s\" a une dépendance au déclencheur du
 
 #: jsLoader.php:291
 msgid "Trigger is not selected."
-msgstr ""
+msgstr "Le déclencheur n’est pas sélectionné."
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -21974,7 +21990,7 @@ msgstr "Un utilisateur ne peut pas s'ajouter à un groupe désactivé ou à un g
 #: include/classes/api/services/CUserGroup.php:673
 #: include/classes/api/services/CUser.php:843
 msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
-msgstr ""
+msgstr "L'utilisateur ne peut pas s'ajouter à un groupe désactivé ou à un groupe avec un accès GUI désactivé."
 
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
@@ -22114,7 +22130,7 @@ msgstr "Un utilisateur n'est pas autorisé à s'effacer lui-même."
 
 #: include/classes/api/services/CUser.php:1837
 msgid "User is not allowed to delete oneself."
-msgstr ""
+msgstr "L'utilisateur n'est pas autorisé à se supprimer."
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222
@@ -22985,7 +23001,7 @@ msgstr "Afficher comme"
 
 #: jsLoader.php:417
 msgid "View related reports"
-msgstr ""
+msgstr "Afficher les rapports associés"
 
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -23198,7 +23214,7 @@ msgstr "Le widget est trop petit pour le nombre de colonnes et de lignes spécif
 
 #: jsLoader.php:205
 msgid "Widgets"
-msgstr ""
+msgstr "Widgets"
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
 #: include/views/configuration.graph.list.php:170
@@ -23574,7 +23590,7 @@ msgstr "Vous devez vous identifier pour accéder à cette page."
 
 #: jsLoader.php:287
 msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
-msgstr ""
+msgstr "Vous devez avoir au moins une image téléchargée pour créer un élément de carte. Les images peuvent être téléchargées dans la section Administration->Général->Images."
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -23963,6 +23979,16 @@ msgstr "une lettre Latine majuscule et minuscule"
 #: app/views/administration.geomaps.edit.php:47
 msgid "and"
 msgstr "et"
+
+#: include/classes/api/helpers/CApiPskHelper.php:27
+#: include/classes/api/helpers/CApiPskHelper.php:57
+#: include/classes/api/helpers/CApiPskHelper.php:73
+#: include/classes/api/helpers/CApiPskHelper.php:106
+#: include/classes/api/helpers/CApiPskHelper.php:139
+#: include/classes/api/helpers/CApiPskHelper.php:160
+#: include/classes/api/helpers/CApiPskHelper.php:176
+msgid "another tls_psk value is already associated with given tls_psk_identity"
+msgstr "une autre valeur tls_psk est déjà associée à l'identité tls_psk donnée"
 
 #: include/forms.inc.php:1450 include/views/js/item.preprocessing.js.php:237
 msgid "any error"
@@ -25586,7 +25612,7 @@ msgstr "right() - Retourne le nombre de caractères le plus à droite"
 
 #: widgets/navtree/Widget.php:41
 msgid "root"
-msgstr ""
+msgstr "racine"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"

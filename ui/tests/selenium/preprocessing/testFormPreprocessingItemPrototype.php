@@ -20,7 +20,8 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *
- * @backup items
+ * @backup items,users
+ * @onBefore setRowsPerPage
  */
 class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 

@@ -644,63 +644,127 @@ function find_period_end($periods, $time, $max_time) {
 }
 
 /**
-* Yield suitable graph scale intervals.
-*
-* @param float $min        Minimum extreme of the scale.
-* @param float $max        Maximum extreme of the scale.
-* @param bool  $is_binary  Is the scale binary (use 1024 base for units)?
-* @param int   $power      Scale power.
-* @param int   $rows       Number of scale rows.
-*
-* @return iterable
-*/
-function yieldGraphScaleInterval(float $min, float $max, bool $is_binary, int $power, int $rows): iterable {
-	$unit_base = $is_binary ? ZBX_KIBIBYTE : 1000;
+ * Yield suitable graph scale intervals.
+ *
+ * @param float  $min    Minimum extreme of the scale.
+ * @param float  $max    Maximum extreme of the scale.
+ * @param string $units  Scale units.
+ * @param int    $power  Scale power (ignored for time units).
+ * @param int    $rows   Number of scale rows.
+ *
+ * @return Generator
+ */
+function yieldGraphScaleInterval(float $min, float $max, string $units, int $power, int $rows): Generator {
+	if ($units === 's') {
+		return yield from yieldGraphScaleIntervalForSUnits($min, $max, $power, $rows);
+	}
 
-	$divisor = pow($unit_base, $power);
+	$is_binary = isBinaryUnits($units);
+
+	$base = getUnitsBase($units, $power);
 
 	// Expression optimized to avoid overflow.
-	$interval = truncateFloat($max / $divisor / $rows - $min / $divisor / $rows);
+	$interval = truncateFloat($max / $rows - $min / $rows);
 
 	while (true) {
-		if ($is_binary && $interval >= 1) {
-			$result = pow(2, ceil(log($interval, 2)));
-		}
-		else {
-			$exponent = floor(log10($interval));
+		if ($is_binary && $interval >= $base) {
+			$exponent = ceil(log($interval / $base, 2));
 
-			foreach ([2, 5, 10] as $multiply) {
-				$candidate = truncateFloat(pow(10, $exponent) * $multiply);
-				if ($candidate >= $interval) {
-					$result = $candidate;
+			while (true) {
+				yield truncateFloat($base * pow(2, $exponent));
 
-					break;
-				}
+				$exponent++;
 			}
 		}
 
-		yield $result * pow($unit_base, $power);
+		$exponent = floor(log10($interval / $base));
 
-		$interval = $result * 1.5;
+		foreach ([1, 2, 5] as $multiplier) {
+			$candidate = truncateFloat($base * pow(10, $exponent) * $multiplier);
+
+			if ($candidate >= $interval) {
+				yield $candidate;
+			}
+		}
+
+		$interval = truncateFloat($base * pow(10, $exponent + 1));
 	}
 }
 
 /**
-* Calculate graph scale extremes.
-*
-* @param float $data_min   Minimum extreme of the graph.
-* @param float $data_max   Maximum extreme of the graph.
-* @param bool  $is_binary  Is the scale binary (use 1024 base for units)?
-* @param bool  $calc_power Should scale power be calculated?
-* @param bool  $calc_min   Should scale minimum be calculated?
-* @param bool  $calc_max   Should scale maximum be calculated?
-* @param int   $rows_min   Minimum number of scale rows.
-* @param int   $rows_max   Maximum number of scale rows.
-*
-* @return array|null
-*/
-function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_binary, bool $calc_power,
-		bool $calc_min, bool $calc_max, int $rows_min, int $rows_max): ?array {
+ * Yield suitable graph scale intervals for time units.
+ *
+ * @param float $min    Minimum extreme of the scale.
+ * @param float $max    Maximum extreme of the scale.
+ * @param int   $power  Scale power (ignored for time units).
+ * @param int   $rows   Number of scale rows.
+ *
+ * @return Generator
+ */
+function yieldGraphScaleIntervalForSUnits(float $min, float $max, int $power, int $rows): Generator {
+	static $power_multipliers = [
+		0 => [1, 2, 5, 10, 15, 20, 30],
+		1 => [1, 2, 5, 10, 15, 20, 30],
+		2 => [1, 2, 3, 4, 6, 12],
+		3 => [1, 2, 5, 10, 15],
+		4 => [1, 2, 3, 4, 6]
+	];
+
+	// Expression optimized to avoid overflow.
+	$interval = truncateFloat($max / $rows - $min / $rows);
+
+	while (true) {
+		$use_power = $power == 5 ? 5 : getUnitsPower('s', $interval);
+		$base = getUnitsBase('s', $use_power);
+
+		if (array_key_exists($use_power, $power_multipliers)) {
+			foreach ($power_multipliers[$use_power] as $multiplier) {
+				$candidate = truncateFloat($base * $multiplier);
+
+				if ($candidate >= $interval) {
+					yield $candidate;
+				}
+			}
+
+			$interval = getUnitsBase('s', $use_power + 1);
+
+			continue;
+		}
+
+		$exponent = floor(log10($interval / $base));
+
+		if ($exponent < 0 && $use_power == 5) {
+			$exponent = 0;
+		}
+
+		foreach ([1, 2, 5] as $multiplier) {
+			$candidate = truncateFloat($base * pow(10, $exponent) * $multiplier);
+
+			if ($candidate >= $interval) {
+				yield $candidate;
+			}
+		}
+
+		$interval = truncateFloat($base * pow(10, $exponent + 1));
+	}
+}
+
+/**
+ * Calculate graph scale extremes.
+ *
+ * @param float  $data_min    Minimum extreme of the graph.
+ * @param float  $data_max    Maximum extreme of the graph.
+ * @param string $units       Scale units.
+ * @param bool   $calc_power  Should scale power be calculated?
+ * @param bool   $calc_min    Should scale minimum be calculated?
+ * @param bool   $calc_max    Should scale maximum be calculated?
+ * @param int    $rows_min    Minimum number of scale rows.
+ * @param int    $rows_max    Maximum number of scale rows.
+ *
+ * @return array|null
+ */
+function calculateGraphScaleExtremes(float $data_min, float $data_max, string $units, bool $calc_power, bool $calc_min,
+		bool $calc_max, int $rows_min, int $rows_max): ?array {
 	$scale_min = truncateFloat($data_min);
 	$scale_max = truncateFloat($data_max);
 
@@ -729,9 +793,7 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 		}
 	}
 
-	$power = $calc_power
-		? (int) min(8, max(0, floor(log(max(abs($scale_min), abs($scale_max)), $is_binary ? ZBX_KIBIBYTE : 1000))))
-		: 0;
+	$power = $calc_power ? getUnitsPower($units, max(abs($scale_min), abs($scale_max))) : 0;
 
 	$best_result_value = null;
 	$best_result = [
@@ -747,7 +809,7 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 		$clearance_min = min(0.5, $rows * 0.05);
 		$clearance_max = min(1, $rows * 0.1);
 
-		foreach (yieldGraphScaleInterval($scale_min, $scale_max, $is_binary, $power, $rows) as $interval) {
+		foreach (yieldGraphScaleInterval($scale_min, $scale_max, $units, $power, $rows) as $interval) {
 			if ($interval == INF) {
 				break;
 			}
@@ -814,45 +876,21 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 }
 
 /**
-* Calculate graph scale intermediate values.
-*
-* @param float  $min             Minimum extreme of the scale.
-* @param float  $max             Maximum extreme of the scale.
-* @param bool   $min_calculated  Is minimum extreme of the scale calculated?
-* @param bool   $max_calculated  Is maximum extreme of the scale calculated?
-* @param float  $interval        Scale interval.
-* @param string $units           Scale units.
-* @param bool   $is_binary       Is the scale binary (use 1024 base for units)?
-* @param int    $power           Scale power.
-* @param int    $precision_max   Maximum precision to use for the scale.
-*
-* @return array
-*/
+ * Calculate graph scale intermediate values.
+ *
+ * @param float  $min             Minimum extreme of the scale.
+ * @param float  $max             Maximum extreme of the scale.
+ * @param bool   $min_calculated  Is minimum extreme of the scale calculated?
+ * @param bool   $max_calculated  Is maximum extreme of the scale calculated?
+ * @param float  $interval        Scale interval.
+ * @param string $units           Scale units.
+ * @param int    $power           Scale power.
+ * @param int    $precision_max   Maximum precision to use for the scale.
+ *
+ * @return array
+ */
 function calculateGraphScaleValues(float $min, float $max, bool $min_calculated, bool $max_calculated, float $interval,
-		string $units, bool $is_binary, int $power, int $precision_max): array {
-	$unit_base = $is_binary ? ZBX_KIBIBYTE : 1000;
-
-	$units_length = ($units !== '' && $units !== '!')
-		? ($power > 0 ? 1 : 0) + mb_strlen($units) + ($units[0] !== '!' ? 1 : 0)
-		: ($power > 0 ? 1 : 0);
-
-	$precision = max(3, $units_length == 0 ? $precision_max : ($precision_max - $units_length - ($min < 0 ? 1 : 0)));
-
-	$decimals = min(ZBX_UNITS_ROUNDOFF_SUFFIXED, $precision - 1);
-	$decimals_exact = false;
-
-	$power_interval = $interval / pow($unit_base, $power);
-
-	if ($power_interval < 1) {
-		$decimals = getNumDecimals($power_interval);
-		$decimals_exact = true;
-
-		if ($decimals > $precision - 1) {
-			$decimals = $precision - 1;
-			$decimals_exact = false;
-		}
-	}
-
+		string $units, int $power, int $precision_max): array {
 	$rows = [];
 
 	$clearance = 0.5;
@@ -866,25 +904,52 @@ function calculateGraphScaleValues(float $min, float $max, bool $min_calculated,
 		$rows[] = $value;
 	}
 
-	$ignore_milliseconds = ($min <= -1 || $max >= 1);
-
 	$options = [
+		'value' => 0,
 		'units' => $units,
-		'unit_base' => $unit_base,
 		'convert' => ITEM_CONVERT_NO_UNITS,
 		'power' => $power,
-		'ignore_milliseconds' => $ignore_milliseconds
+		'ignore_milliseconds' => $min <= -1 || $max >= 1
 	];
-	$options_fixed = $options + [
-		'precision' => $precision,
-		'decimals' => $precision - 1,
-		'decimals_exact' => false
-	];
-	$options_calculated = $options + [
-		'precision' => $precision,
-		'decimals' => $decimals,
-		'decimals_exact' => $decimals_exact
-	];
+	$options_fixed = $options;
+	$options_calculated = $options;
+
+	$pre_conversion = convertUnitsRaw($options);
+
+	if ($pre_conversion['is_numeric'] || ($units === 's' && $power == -1)) {
+		$precision = max(3,
+			$pre_conversion['units'] !== ''
+				? $precision_max - 1 - mb_strlen($pre_conversion['units'])
+				: $precision_max
+		);
+
+		$decimals = min(ZBX_UNITS_ROUNDOFF_SUFFIXED, $precision - 1);
+		$decimals_exact = false;
+
+		$power_interval = $interval / getUnitsBase($units, $power);
+
+		if ($power_interval < 1) {
+			$decimals = getNumDecimals($power_interval);
+			$decimals_exact = true;
+
+			if ($decimals > $precision - 1) {
+				$decimals = $precision - 1;
+				$decimals_exact = false;
+			}
+		}
+
+		$options_fixed += [
+			'precision' => $precision,
+			'decimals' => $precision - 1,
+			'decimals_exact' => false
+		];
+
+		$options_calculated += [
+			'precision' => $precision,
+			'decimals' => $decimals,
+			'decimals_exact' => $decimals_exact
+		];
+	}
 
 	$scale_values = [];
 

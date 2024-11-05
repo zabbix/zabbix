@@ -84,6 +84,15 @@ void	zbx_audit_item_update_json_add_data(int audit_context_mode, zbx_uint64_t it
 	{
 		zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
 				"discoveryrule.lifetime", item->lifetime, AUDIT_TABLE_NAME, "lifetime");
+		zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
+				"discoveryrule.lifetime_type", item->lifetime_type, AUDIT_TABLE_NAME,
+				"lifetime_type");
+		zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
+				"discoveryrule.enabled_lifetime", item->enabled_lifetime, AUDIT_TABLE_NAME,
+				"enabled_lifetime");
+		zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
+				"discoveryrule.enabled_lifetime_type", item->enabled_lifetime_type,
+				AUDIT_TABLE_NAME, "enabled_lifetime_type");
 	}
 
 	if (1 == zbx_audit_item_resource_is_only_item_and_item_prototype(resource_type))

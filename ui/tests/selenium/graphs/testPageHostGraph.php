@@ -69,6 +69,7 @@ class testPageHostGraph extends CLegacyWebTest {
 		// Check host breadcrumbs text and url.
 		$filter->getField('Hosts')->fill($host_name);
 		$filter->submit();
+		$this->page->waitUntilReady();
 		$breadcrumbs = [
 			self::HOST_LIST_PAGE => 'All hosts',
 			(new CUrl('zabbix.php'))
@@ -85,7 +86,9 @@ class testPageHostGraph extends CLegacyWebTest {
 		$count_graphs = CDBHelper::getCount($sql);
 
 		foreach ($breadcrumbs as $url => $text) {
-			$this->zbxTestAssertElementPresentXpath('//a[@href="'.$url.'"][text()="'.$text.'"]');
+			$this->assertTrue($this->query('xpath://a[@href="'.$url.'"][text()="'.$text.'"]')
+					->one()->isVisible()
+			);
 
 			// Check item and graph count.
 			if ($text === 'Items' || $text === 'Graphs') {
@@ -708,6 +711,7 @@ class testPageHostGraph extends CLegacyWebTest {
 		$group_field = ($context === 'template') ? 'Template groups' : 'Host groups';
 		$this->openPageHostGraphs($data['host'], $context);
 
+		$table = $this->query('class:list-table')->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		if (array_key_exists('group', $data)) {
 			if ($data['group'] === 'all') {
@@ -733,17 +737,18 @@ class testPageHostGraph extends CLegacyWebTest {
 			}
 		}
 		$filter->submit();
+		$table->waitUntilReloaded();
 
 		if ($data['host'] === 'all') {
-			$this->zbxTestAssertElementPresentXpath(
-					'//button[@id="form"][@disabled][text()="Create graph (select host first)"]'
+			$this->assertTrue($this->query('xpath://button[@id="form"][@disabled][text()="Create graph (select host first)"]')
+					->one()->isVisible()
 			);
 		}
 
 		if (array_key_exists('graph', $data)) {
 			foreach ($data['graph'] as $graph) {
-				$this->zbxTestAssertElementPresentXpath(
-						'//a[contains(@href,"graphs.php?form=update")][text()="'.$graph.'"]'
+				$this->assertTrue($this->query('xpath://a[contains(@href,"graphs.php?form=update")][text()="'.$graph.'"]')
+					->one()->isVisible()
 				);
 			}
 		}

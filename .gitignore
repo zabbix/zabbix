@@ -178,6 +178,8 @@ tests/libs/zbxeval/zbx_eval_serialize
 tests/libs/zbxexpr/calculate_item_nextcheck
 tests/libs/zbxexpr/calculate_item_nextcheck_unreachable
 tests/libs/zbxexpr/is_double_suffix
+tests/libs/zbxexpr/macro_func
+tests/libs/zbxexpr/macro_tr
 tests/libs/zbxexpr/parse_key
 tests/libs/zbxexpr/zbx_function_find
 tests/libs/zbxexpr/zbx_function_get_param_dyn
@@ -187,7 +189,9 @@ tests/libs/zbxexpr/zbx_interval_preproc
 tests/libs/zbxexpr/zbx_token_find
 tests/libs/zbxexpr/zbx_user_macro_parse
 tests/libs/zbxexpr/zbx_validate_interval
+tests/libs/zbxexpression/evaluate
 tests/libs/zbxexpression/evaluate_function
+tests/libs/zbxexpression/evaluate_unknown
 tests/libs/zbxexpression/evaluate_percentage_deviations_in_remainder
 tests/libs/zbxexpression/evaluate_stl
 tests/libs/zbxexpression/get_trigger_expression_constant
@@ -245,6 +249,7 @@ tests/libs/zbxsysinfo/linux/system_boottime
 tests/libs/zbxsysinfo/linux/system_cpu_intr
 tests/libs/zbxsysinfo/linux/system_cpu_switches
 tests/libs/zbxsysinfo/linux/system_hw_chassis
+tests/libs/zbxsysinfo/linux/system_process
 tests/libs/zbxsysinfo/linux/system_sw_packages_get
 tests/libs/zbxsysinfo/linux/system_sw_software
 tests/libs/zbxsysinfo/linux/vfs_fs_discovery
@@ -263,6 +268,7 @@ tests/libs/zbxtime/zbx_tm_sub
 tests/libs/zbxtrends/zbx_baseline_get_data
 tests/libs/zbxtrends/zbx_trends_parse_range
 tests/libs/zbxvariant/zbx_variant_compare
+tests/libs/zbxvariant/zbx_variant_to_value_type
 tests/libs/zbxxml/zbx_json_to_xml
 tests/libs/zbxxml/zbx_xml_to_json
 tests/zabbix_server/lld/zbx_lld_hgsets_test

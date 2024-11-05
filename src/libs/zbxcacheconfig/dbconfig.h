@@ -1026,7 +1026,6 @@ typedef struct
 	zbx_hashset_t		psks;			/* for keeping PSK-identity and PSK pairs and for searching */
 							/* by PSK identity */
 #endif
-	zbx_hashset_t		data_sessions;
 	zbx_hashset_t		drules;
 	zbx_hashset_t		dchecks;
 	zbx_hashset_t		httptests;
@@ -1154,8 +1153,9 @@ ZBX_DC_PSK	*dc_psk_sync(char *tls_psk_identity, char *tls_psk, const char *name,
 		zbx_hashset_t *psk_owners, ZBX_DC_PSK *tls_dc_psk);
 #endif
 
-void	dbconfig_shmem_free_func(void *ptr);
-void	*dbconfig_shmem_realloc_func(void *old, size_t size);
-void	*dbconfig_shmem_malloc_func(void *old, size_t size);
+void		dbconfig_shmem_free_func(void *ptr);
+void		*dbconfig_shmem_realloc_func(void *old, size_t size);
+void		*dbconfig_shmem_malloc_func(void *old, size_t size);
+zbx_uint64_t	dbconfig_used_size(void);
 
 #endif

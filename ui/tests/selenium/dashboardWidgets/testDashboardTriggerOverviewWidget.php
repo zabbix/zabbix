@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 /**
  * @backup widget, profiles, triggers, problem, config
  *
+ * @dataSource DynamicItemWidgets
+ *
  * @onBefore prepareData
  */
 class testDashboardTriggerOverviewWidget extends CWebTest {
@@ -144,7 +146,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		DBexecute('UPDATE problem SET r_clock='.zbx_dbstr($timestamp).' WHERE objectid='.zbx_dbstr($triggerids[0]));
 
 		// Change the resolved triggers blinking period as the default value is too small for this test.
-		CDataHelper::call('settings.update', ['blink_period' => '5m']);
+		CDataHelper::call('settings.update', ['blink_period' => '10m', 'ok_period' => '10m']);
 
 		// Enable the trigger that other triggers depend on.
 		CDataHelper::call('trigger.update', [['triggerid' => $triggerids[1], 'status' => 0]]);

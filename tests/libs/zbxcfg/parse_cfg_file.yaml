@@ -111,4 +111,34 @@ files:
   10.conf: |
     Include=11.conf
   11.conf: |
+---
+test case: user parameters, 3 comas
+in:
+  configuration file: user_param.conf
+  validation: strict
+  parameters:
+    - name: UserParameter
+      type: string list
+      mandatory: no
+      expect: [ping, echo 1, echo2,]
+files:
+  user_param.conf: |
+    # whitespace should not matter
+    UserParameter=ping,echo 1,echo2,
+---
+test case: user parameters, 3 user parameters
+in:
+  configuration file: user_param.conf
+  validation: strict
+  parameters:
+    - name: UserParameter
+      type: multi string
+      mandatory: no
+      expect: ["ping1,echo1", "ping2,echo2", "ping3,echo3"]
+files:
+  user_param.conf: |
+    # whitespace should not matter
+    UserParameter=ping1,echo1
+    UserParameter=ping2,echo2
+    UserParameter=ping3,echo3
 ...

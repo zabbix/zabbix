@@ -23,7 +23,7 @@ type AddressSet interface {
 	String() string
 
 	// next cycles the address set by selecting next address
-	next()
+	Next()
 	// reset cyckles addresses if the current is redirected
 	reset()
 	// count returns number of addresses in set

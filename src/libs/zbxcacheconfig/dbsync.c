@@ -107,6 +107,7 @@ typedef struct
 	zbx_dbsync_journal_t		journals[ZBX_DBSYNC_OBJ_COUNT];
 
 	zbx_vector_dbsync_t		changelog_dbsyncs;
+	zbx_vector_dbsync_t		dbsyncs;
 }
 zbx_dbsync_env_t;
 
@@ -520,6 +521,7 @@ int	zbx_dbsync_env_prepare(unsigned char mode)
 	}
 
 	zbx_vector_dbsync_create(&dbsync_env.changelog_dbsyncs);
+	zbx_vector_dbsync_create(&dbsync_env.dbsyncs);
 
 	return changelog_num;
 }
@@ -584,6 +586,7 @@ void	zbx_dbsync_env_clear(void)
 {
 	size_t	i;
 
+	zbx_vector_dbsync_destroy(&dbsync_env.dbsyncs);
 	zbx_vector_dbsync_destroy(&dbsync_env.changelog_dbsyncs);
 
 	dbsync_prune_changelog();
@@ -744,6 +747,9 @@ static void	dbsync_init(zbx_dbsync_t *sync, unsigned char mode)
 	sync->add_num = 0;
 	sync->update_num = 0;
 	sync->remove_num = 0;
+	sync->sql_time = 0;
+	sync->sync_time = 0;
+	sync->sync_size = 0;
 
 	sync->row = NULL;
 	sync->preproc_row_func = NULL;
@@ -763,9 +769,16 @@ static void	dbsync_init(zbx_dbsync_t *sync, unsigned char mode)
  * Purpose: initializes changeset                                             *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dbsync_init(zbx_dbsync_t *sync, unsigned char mode)
+void	zbx_dbsync_init(zbx_dbsync_t *sync, const char *name, unsigned char mode)
 {
 	dbsync_init(sync, mode);
+
+	if (NULL != name)
+	{
+		sync->from = name;
+		zbx_vector_dbsync_append(&dbsync_env.dbsyncs, sync);
+	}
+
 	sync->type = ZBX_DBSYNC_TYPE_DIFF;
 }
 
@@ -774,9 +787,10 @@ void	zbx_dbsync_init(zbx_dbsync_t *sync, unsigned char mode)
  * Purpose: initializes changeset for tables using changelog                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dbsync_init_changelog(zbx_dbsync_t *sync, unsigned char mode)
+void	zbx_dbsync_init_changelog(zbx_dbsync_t *sync, const char *name, unsigned char mode)
 {
 	dbsync_init(sync, mode);
+	sync->from = name;
 	sync->type = ZBX_DBSYNC_TYPE_CHANGELOG;
 
 	zbx_vector_dbsync_append(&dbsync_env.changelog_dbsyncs, sync);
@@ -929,6 +943,8 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 {
 	zbx_db_result_t	result;
 
+	zbx_dcsync_sql_start(sync);
+
 #define SELECTED_CONFIG_FIELD_COUNT	44	/* number of columns in the following zbx_db_select() */
 
 	if (NULL == (result = zbx_db_select("select discovery_groupid,snmptrap_logging,"
@@ -955,6 +971,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		sync->dbresult = result;
+		zbx_dcsync_sql_end(sync);
 		return SUCCEED;
 	}
 
@@ -963,6 +980,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 	/* global configuration will be always synchronized directly with database */
 	THIS_SHOULD_NEVER_HAPPEN;
 
+	zbx_dcsync_sql_end(sync);
 	return FAIL;
 #undef SELECTED_CONFIG_FIELD_COUNT
 }
@@ -991,6 +1009,7 @@ int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync)
 	zbx_db_row_t	dbrow;
 	int		num_records = 0;
 
+	zbx_dcsync_sql_start(sync);
 #define CONFIG_AUTOREG_TLS_FIELD_COUNT	2	/* number of columns in the following zbx_db_select() */
 
 	if (NULL == (result = zbx_db_select("select tls_psk_identity,tls_psk"
@@ -1006,6 +1025,7 @@ int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync)
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		sync->dbresult = result;
+		zbx_dcsync_sql_end(sync);
 		return SUCCEED;
 	}
 
@@ -1034,6 +1054,8 @@ int	zbx_dbsync_compare_autoreg_psk(zbx_dbsync_t *sync)
 
 	zbx_db_free_result(result);
 
+	zbx_dcsync_sql_end(sync);
+
 	return SUCCEED;
 #undef CONFIG_AUTOREG_TLS_FIELD_COUNT
 }
@@ -1054,6 +1076,8 @@ int	zbx_dbsync_compare_autoreg_host(zbx_dbsync_t *sync)
 	if (ZBX_DBSYNC_INIT != sync->mode)
 		return SUCCEED;
 
+	zbx_dcsync_sql_start(sync);
+
 	if (NULL == (sync->dbresult = zbx_db_select(
 			"select host,listen_ip,listen_dns,host_metadata,flags,listen_port"
 			" from autoreg_host"
@@ -1061,6 +1085,8 @@ int	zbx_dbsync_compare_autoreg_host(zbx_dbsync_t *sync)
 	{
 		return FAIL;
 	}
+
+	zbx_dcsync_sql_end(sync);
 
 	return SUCCEED;
 }
@@ -1081,6 +1107,8 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
+
+	zbx_dcsync_sql_start(sync);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hostid,proxyid,host,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,"
@@ -1104,6 +1132,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST)]);
 out:
 	zbx_free(sql);
+	zbx_dcsync_sql_end(sync);
 
 	return ret;
 }
@@ -1155,6 +1184,8 @@ int	zbx_dbsync_compare_host_inventory(zbx_dbsync_t *sync)
 	ZBX_DC_HOST_INVENTORY	*hi;
 	const char		*sql;
 
+	zbx_dcsync_sql_start(sync);
+
 	sql = "select hostid,inventory_mode,type,type_full,name,alias,os,os_full,os_short,serialno_a,"
 			"serialno_b,tag,asset_tag,macaddress_a,macaddress_b,hardware,hardware_full,software,"
 			"software_full,software_app_a,software_app_b,software_app_c,software_app_d,"
@@ -1169,13 +1200,17 @@ int	zbx_dbsync_compare_host_inventory(zbx_dbsync_t *sync)
 			" from host_inventory";
 
 	if (NULL == (result = zbx_db_select("%s", sql)))
+	{
+		zbx_dcsync_sql_end(sync);
 		return FAIL;
+	}
 
 	dbsync_prepare(sync, 72, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		sync->dbresult = result;
+		zbx_dcsync_sql_end(sync);
 		return SUCCEED;
 	}
 
@@ -1199,7 +1234,6 @@ int	zbx_dbsync_compare_host_inventory(zbx_dbsync_t *sync)
 
 		if (ZBX_DBSYNC_ROW_NONE != tag)
 			dbsync_add_row(sync, rowid, tag, dbrow);
-
 	}
 
 	zbx_hashset_iter_reset(&dbsync_env.cache->host_inventories, &iter);
@@ -1211,6 +1245,8 @@ int	zbx_dbsync_compare_host_inventory(zbx_dbsync_t *sync)
 
 	zbx_hashset_destroy(&ids);
 	zbx_db_free_result(result);
+
+	zbx_dcsync_sql_end(sync);
 
 	return SUCCEED;
 }
@@ -1237,6 +1273,8 @@ int	zbx_dbsync_compare_host_templates(zbx_dbsync_t *sync)
 	char			hostid_s[MAX_ID_LEN + 1], templateid_s[MAX_ID_LEN + 1];
 	char			*del_row[2] = {hostid_s, templateid_s};
 
+	zbx_dcsync_sql_start(sync);
+
 	if (NULL == (result = zbx_db_select(
 			"select hostid,templateid"
 			" from hosts_templates"
@@ -1250,6 +1288,7 @@ int	zbx_dbsync_compare_host_templates(zbx_dbsync_t *sync)
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		sync->dbresult = result;
+		zbx_dcsync_sql_end(sync);
 		return SUCCEED;
 	}
 
@@ -1291,6 +1330,7 @@ int	zbx_dbsync_compare_host_templates(zbx_dbsync_t *sync)
 
 	zbx_db_free_result(result);
 	zbx_hashset_destroy(&htmpls);
+	zbx_dcsync_sql_end(sync);
 
 	return SUCCEED;
 }
@@ -1375,6 +1415,8 @@ int	zbx_dbsync_compare_global_macros(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid, *prowid = &rowid;
 	zbx_um_macro_t		**pmacro;
 
+	zbx_dcsync_sql_start(sync);
+
 	if (NULL == (result = zbx_db_select(
 			"select globalmacroid,macro,value,type"
 			" from globalmacro")))
@@ -1387,6 +1429,7 @@ int	zbx_dbsync_compare_global_macros(zbx_dbsync_t *sync)
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		sync->dbresult = result;
+		zbx_dcsync_sql_end(sync);
 		return SUCCEED;
 	}
 
@@ -1418,6 +1461,8 @@ int	zbx_dbsync_compare_global_macros(zbx_dbsync_t *sync)
 
 	zbx_hashset_destroy(&ids);
 	zbx_db_free_result(result);
+
+	zbx_dcsync_sql_end(sync);
 
 	return SUCCEED;
 }
@@ -1505,6 +1550,8 @@ int	zbx_dbsync_compare_host_macros(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid, *prowid = &rowid;
 	zbx_um_macro_t		**pmacro;
 
+	zbx_dcsync_sql_start(sync);
+
 	if (NULL == (result = zbx_db_select("select hostmacroid,hostid,macro,value,type from hostmacro")))
 		return FAIL;
 
@@ -1513,6 +1560,7 @@ int	zbx_dbsync_compare_host_macros(zbx_dbsync_t *sync)
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		sync->dbresult = result;
+		zbx_dcsync_sql_end(sync);
 		return SUCCEED;
 	}
 
@@ -1544,6 +1592,8 @@ int	zbx_dbsync_compare_host_macros(zbx_dbsync_t *sync)
 
 	zbx_hashset_destroy(&ids);
 	zbx_db_free_result(result);
+
+	zbx_dcsync_sql_end(sync);
 
 	return SUCCEED;
 }
@@ -1712,6 +1762,8 @@ int	zbx_dbsync_compare_interfaces(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid;
 	ZBX_DC_INTERFACE	*interface;
 
+	zbx_dcsync_sql_start(sync);
+
 	if (NULL == (result = zbx_db_select(
 			"select i.interfaceid,i.hostid,i.type,i.main,i.useip,i.ip,i.dns,i.port,"
 			"i.available,i.disable_until,i.error,i.errors_from,"
@@ -1727,6 +1779,7 @@ int	zbx_dbsync_compare_interfaces(zbx_dbsync_t *sync)
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
+		zbx_dcsync_sql_end(sync);
 		sync->dbresult = result;
 		return SUCCEED;
 	}
@@ -1762,6 +1815,8 @@ int	zbx_dbsync_compare_interfaces(zbx_dbsync_t *sync)
 
 	zbx_hashset_destroy(&ids);
 	zbx_db_free_result(result);
+
+	zbx_dcsync_sql_end(sync);
 
 	return SUCCEED;
 }
@@ -1826,6 +1881,8 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
 
+	zbx_dcsync_sql_start(sync);
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select i.itemid,i.hostid,i.status,i.type,i.value_type,i.key_,i.snmp_oid,i.ipmi_sensor,i.delay,"
 				"i.trapper_hosts,i.logtimefmt,i.params,ir.state,i.authtype,i.username,i.password,"
@@ -1851,6 +1908,7 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM)]);
 out:
 	zbx_free(sql);
+	zbx_dcsync_sql_end(sync);
 
 	return ret;
 }
@@ -1879,6 +1937,8 @@ int	zbx_dbsync_compare_item_discovery(zbx_dbsync_t *sync)
 	ZBX_DC_ITEM_DISCOVERY	*item_discovery;
 	char			**row;
 
+	zbx_dcsync_sql_start(sync);
+
 	if (NULL == (result = zbx_db_select("select itemid,parent_itemid from item_discovery")))
 		return FAIL;
 
@@ -1886,6 +1946,7 @@ int	zbx_dbsync_compare_item_discovery(zbx_dbsync_t *sync)
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
+		zbx_dcsync_sql_end(sync);
 		sync->dbresult = result;
 		return SUCCEED;
 	}
@@ -1923,6 +1984,7 @@ int	zbx_dbsync_compare_item_discovery(zbx_dbsync_t *sync)
 
 	zbx_hashset_destroy(&ids);
 	zbx_db_free_result(result);
+	zbx_dcsync_sql_end(sync);
 
 	return SUCCEED;
 }
@@ -2020,6 +2082,8 @@ int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
 
+	zbx_dcsync_sql_start(sync);
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select triggerid,description,expression,error,priority,type,value,state,lastchange,status,"
 			"recovery_mode,recovery_expression,correlation_mode,correlation_tag,opdata,event_name,null,"
@@ -2039,6 +2103,7 @@ int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_TRIGGER)]);
 out:
 	zbx_free(sql);
+	zbx_dcsync_sql_end(sync);
 
 	return ret;
 }
@@ -2065,6 +2130,8 @@ int	zbx_dbsync_compare_trigger_dependency(zbx_dbsync_t *sync)
 	char			*del_row[2] = {down_s, up_s};
 	int			i;
 
+	zbx_dcsync_sql_start(sync);
+
 	if (NULL == (result = zbx_db_select("select triggerid_down,triggerid_up from trigger_depends")))
 		return FAIL;
 
@@ -2073,6 +2140,7 @@ int	zbx_dbsync_compare_trigger_dependency(zbx_dbsync_t *sync)
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		sync->dbresult = result;
+		zbx_dcsync_sql_end(sync);
 		return SUCCEED;
 	}
 
@@ -2115,6 +2183,8 @@ int	zbx_dbsync_compare_trigger_dependency(zbx_dbsync_t *sync)
 
 	zbx_db_free_result(result);
 	zbx_hashset_destroy(&deps);
+
+	zbx_dcsync_sql_end(sync);
 
 	return SUCCEED;
 }
@@ -2165,6 +2235,8 @@ int	zbx_dbsync_compare_functions(zbx_dbsync_t *sync)
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
 
+	zbx_dcsync_sql_start(sync);
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select functionid,itemid,name,parameter,triggerid from functions");
 
@@ -2181,6 +2253,7 @@ int	zbx_dbsync_compare_functions(zbx_dbsync_t *sync)
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_FUNCTION)]);
 out:
 	zbx_free(sql);
+	zbx_dcsync_sql_end(sync);
 
 	return ret;
 }
@@ -2236,6 +2309,8 @@ int	zbx_dbsync_compare_expressions(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid;
 	ZBX_DC_EXPRESSION	*expression;
 
+	zbx_dcsync_sql_start(sync);
+
 	if (NULL == (result = zbx_db_select(
 			"select r.name,e.expressionid,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive"
 			" from regexps r,expressions e"
@@ -2249,6 +2324,7 @@ int	zbx_dbsync_compare_expressions(zbx_dbsync_t *sync)
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		sync->dbresult = result;
+		zbx_dcsync_sql_end(sync);
 		return SUCCEED;
 	}
 
@@ -2283,6 +2359,8 @@ int	zbx_dbsync_compare_expressions(zbx_dbsync_t *sync)
 
 	zbx_hashset_destroy(&ids);
 	zbx_db_free_result(result);
+
+	zbx_dcsync_sql_end(sync);
 
 	return SUCCEED;
 }
@@ -2332,6 +2410,8 @@ int	zbx_dbsync_compare_actions(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid;
 	zbx_dc_action_t		*action;
 
+	zbx_dcsync_sql_start(sync);
+
 	if (NULL == (result = zbx_db_select(
 			"select actionid,eventsource,evaltype,formula"
 			" from actions"
@@ -2347,6 +2427,7 @@ int	zbx_dbsync_compare_actions(zbx_dbsync_t *sync)
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		sync->dbresult = result;
+		zbx_dcsync_sql_end(sync);
 		return SUCCEED;
 	}
 
@@ -2378,6 +2459,8 @@ int	zbx_dbsync_compare_actions(zbx_dbsync_t *sync)
 
 	zbx_hashset_destroy(&ids);
 	zbx_db_free_result(result);
+
+	zbx_dcsync_sql_end(sync);
 
 	return SUCCEED;
 }
@@ -2429,6 +2512,8 @@ int	zbx_dbsync_compare_action_ops(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid, actionid = 0;
 	unsigned char		opflags = ZBX_ACTION_OPCLASS_NONE;
 
+	zbx_dcsync_sql_start(sync);
+
 	if (NULL == (result = zbx_db_select(
 			"select a.actionid,o.recovery"
 			" from actions a"
@@ -2475,6 +2560,7 @@ int	zbx_dbsync_compare_action_ops(zbx_dbsync_t *sync)
 	dbsync_compare_action_op(sync, actionid, opflags);
 
 	zbx_db_free_result(result);
+	zbx_dcsync_sql_end(sync);
 
 	return SUCCEED;
 }
@@ -2519,12 +2605,14 @@ static int	dbsync_compare_action_condition(const zbx_dc_action_condition_t *cond
  ******************************************************************************/
 int	zbx_dbsync_compare_action_conditions(zbx_dbsync_t *sync)
 {
-	zbx_db_row_t				dbrow;
+	zbx_db_row_t			dbrow;
 	zbx_db_result_t			result;
 	zbx_hashset_t			ids;
 	zbx_hashset_iter_t		iter;
 	zbx_uint64_t			rowid;
 	zbx_dc_action_condition_t	*condition;
+
+	zbx_dcsync_sql_start(sync);
 
 	if (NULL == (result = zbx_db_select(
 			"select c.conditionid,c.actionid,c.conditiontype,c.operator,c.value,c.value2"
@@ -2541,6 +2629,7 @@ int	zbx_dbsync_compare_action_conditions(zbx_dbsync_t *sync)
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		sync->dbresult = result;
+		zbx_dcsync_sql_end(sync);
 		return SUCCEED;
 	}
 
@@ -2576,6 +2665,8 @@ int	zbx_dbsync_compare_action_conditions(zbx_dbsync_t *sync)
 	zbx_hashset_destroy(&ids);
 	zbx_db_free_result(result);
 
+	zbx_dcsync_sql_end(sync);
+
 	return SUCCEED;
 }
 
@@ -2595,6 +2686,8 @@ int	zbx_dbsync_compare_trigger_tags(zbx_dbsync_t *sync)
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
 
+	zbx_dcsync_sql_start(sync);
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select triggertagid,triggerid,tag,value from trigger_tag");
 
 	dbsync_prepare(sync, 4, NULL);
@@ -2610,6 +2703,7 @@ int	zbx_dbsync_compare_trigger_tags(zbx_dbsync_t *sync)
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_TRIGGER_TAG)]);
 out:
 	zbx_free(sql);
+	zbx_dcsync_sql_end(sync);
 
 	return ret;
 }
@@ -2630,6 +2724,8 @@ int	zbx_dbsync_compare_item_tags(zbx_dbsync_t *sync)
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
 
+	zbx_dcsync_sql_start(sync);
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select itemtagid,itemid,tag,value from item_tag");
 
 	dbsync_prepare(sync, 4, NULL);
@@ -2645,6 +2741,7 @@ int	zbx_dbsync_compare_item_tags(zbx_dbsync_t *sync)
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM_TAG)]);
 out:
 	zbx_free(sql);
+	zbx_dcsync_sql_end(sync);
 
 	return ret;
 }
@@ -2665,6 +2762,8 @@ int	zbx_dbsync_compare_host_tags(zbx_dbsync_t *sync)
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
 
+	zbx_dcsync_sql_start(sync);
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select hosttagid,hostid,tag,value from host_tag");
 
 	dbsync_prepare(sync, 4, NULL);
@@ -2680,6 +2779,7 @@ int	zbx_dbsync_compare_host_tags(zbx_dbsync_t *sync)
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST_TAG)]);
 out:
 	zbx_free(sql);
+	zbx_dcsync_sql_end(sync);
 
 	return ret;
 }
@@ -2728,6 +2828,8 @@ int	zbx_dbsync_compare_correlations(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid;
 	zbx_dc_correlation_t	*correlation;
 
+	zbx_dcsync_sql_start(sync);
+
 	if (NULL == (result = zbx_db_select(
 			"select correlationid,name,evaltype,formula"
 			" from correlation"
@@ -2742,6 +2844,7 @@ int	zbx_dbsync_compare_correlations(zbx_dbsync_t *sync)
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		sync->dbresult = result;
+		zbx_dcsync_sql_end(sync);
 		return SUCCEED;
 	}
 
@@ -2776,6 +2879,7 @@ int	zbx_dbsync_compare_correlations(zbx_dbsync_t *sync)
 
 	zbx_hashset_destroy(&ids);
 	zbx_db_free_result(result);
+	zbx_dcsync_sql_end(sync);
 
 	return SUCCEED;
 }
@@ -2854,6 +2958,8 @@ int	zbx_dbsync_compare_corr_conditions(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid;
 	zbx_dc_corr_condition_t	*corr_condition;
 
+	zbx_dcsync_sql_start(sync);
+
 	if (NULL == (result = zbx_db_select(
 			"select cc.corr_conditionid,cc.correlationid,cc.type,cct.tag,cctv.tag,cctv.value,cctv.operator,"
 				" ccg.groupid,ccg.operator,cctp.oldtag,cctp.newtag"
@@ -2878,6 +2984,7 @@ int	zbx_dbsync_compare_corr_conditions(zbx_dbsync_t *sync)
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		sync->dbresult = result;
+		zbx_dcsync_sql_end(sync);
 		return SUCCEED;
 	}
 
@@ -2912,6 +3019,7 @@ int	zbx_dbsync_compare_corr_conditions(zbx_dbsync_t *sync)
 
 	zbx_hashset_destroy(&ids);
 	zbx_db_free_result(result);
+	zbx_dcsync_sql_end(sync);
 
 	return SUCCEED;
 }
@@ -2959,6 +3067,8 @@ int	zbx_dbsync_compare_corr_operations(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid;
 	zbx_dc_corr_operation_t	*corr_operation;
 
+	zbx_dcsync_sql_start(sync);
+
 	if (NULL == (result = zbx_db_select(
 			"select co.corr_operationid,co.correlationid,co.type"
 			" from correlation c,corr_operation co"
@@ -2974,6 +3084,7 @@ int	zbx_dbsync_compare_corr_operations(zbx_dbsync_t *sync)
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		sync->dbresult = result;
+		zbx_dcsync_sql_end(sync);
 		return SUCCEED;
 	}
 
@@ -3008,6 +3119,7 @@ int	zbx_dbsync_compare_corr_operations(zbx_dbsync_t *sync)
 
 	zbx_hashset_destroy(&ids);
 	zbx_db_free_result(result);
+	zbx_dcsync_sql_end(sync);
 
 	return SUCCEED;
 }
@@ -3050,6 +3162,8 @@ int	zbx_dbsync_compare_host_groups(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid;
 	zbx_dc_hostgroup_t	*group;
 
+	zbx_dcsync_sql_start(sync);
+
 	if (NULL == (result = zbx_db_select("select groupid,name from hstgrp where type=%d", HOSTGROUP_TYPE_HOST)))
 		return FAIL;
 
@@ -3058,6 +3172,7 @@ int	zbx_dbsync_compare_host_groups(zbx_dbsync_t *sync)
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		sync->dbresult = result;
+		zbx_dcsync_sql_end(sync);
 		return SUCCEED;
 	}
 
@@ -3090,6 +3205,8 @@ int	zbx_dbsync_compare_host_groups(zbx_dbsync_t *sync)
 	zbx_hashset_destroy(&ids);
 	zbx_db_free_result(result);
 
+	zbx_dcsync_sql_end(sync);
+
 	return SUCCEED;
 }
 
@@ -3109,6 +3226,8 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
 
+	zbx_dcsync_sql_start(sync);
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select item_preprocid,itemid,type,params,step,error_handler,error_handler_params"
 			" from item_preproc");
@@ -3126,6 +3245,7 @@ int	zbx_dbsync_compare_item_preprocs(zbx_dbsync_t *sync)
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM_PREPROC)]);
 out:
 	zbx_free(sql);
+	zbx_dcsync_sql_end(sync);
 
 	return ret;
 }
@@ -3204,6 +3324,8 @@ int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync)
 	zbx_dc_item_param_t	*items_params;
 	char			**row;
 
+	zbx_dcsync_sql_start(sync);
+
 	if (NULL == (result = zbx_db_select(
 			"select p.item_parameterid,p.itemid,p.name,p.value,i.hostid"
 			" from item_parameter p,items i,hosts h"
@@ -3223,6 +3345,7 @@ int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync)
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		sync->dbresult = result;
+		zbx_dcsync_sql_end(sync);
 		return SUCCEED;
 	}
 
@@ -3262,6 +3385,7 @@ int	zbx_dbsync_compare_item_script_param(zbx_dbsync_t *sync)
 
 	zbx_hashset_destroy(&ids);
 	zbx_db_free_result(result);
+	zbx_dcsync_sql_end(sync);
 
 	return SUCCEED;
 }
@@ -3285,6 +3409,8 @@ int	zbx_dbsync_compare_maintenances(zbx_dbsync_t *sync)
 	zbx_uint64_t		rowid;
 	zbx_dc_maintenance_t	*maintenance;
 
+	zbx_dcsync_sql_start(sync);
+
 	if (NULL == (result = zbx_db_select("select maintenanceid,maintenance_type,active_since,active_till,tags_evaltype"
 						" from maintenances")))
 	{
@@ -3296,6 +3422,7 @@ int	zbx_dbsync_compare_maintenances(zbx_dbsync_t *sync)
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		sync->dbresult = result;
+		zbx_dcsync_sql_end(sync);
 		return SUCCEED;
 	}
 
@@ -3329,6 +3456,8 @@ int	zbx_dbsync_compare_maintenances(zbx_dbsync_t *sync)
 
 	zbx_hashset_destroy(&ids);
 	zbx_db_free_result(result);
+
+	zbx_dcsync_sql_end(sync);
 
 	return SUCCEED;
 }
@@ -3378,6 +3507,8 @@ int	zbx_dbsync_compare_maintenance_tags(zbx_dbsync_t *sync)
 	zbx_uint64_t			rowid;
 	zbx_dc_maintenance_tag_t	*maintenance_tag;
 
+	zbx_dcsync_sql_start(sync);
+
 	if (NULL == (result = zbx_db_select("select maintenancetagid,maintenanceid,operator,tag,value"
 						" from maintenance_tag")))
 	{
@@ -3389,6 +3520,7 @@ int	zbx_dbsync_compare_maintenance_tags(zbx_dbsync_t *sync)
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		sync->dbresult = result;
+		zbx_dcsync_sql_end(sync);
 		return SUCCEED;
 	}
 
@@ -3423,6 +3555,8 @@ int	zbx_dbsync_compare_maintenance_tags(zbx_dbsync_t *sync)
 
 	zbx_hashset_destroy(&ids);
 	zbx_db_free_result(result);
+
+	zbx_dcsync_sql_end(sync);
 
 	return SUCCEED;
 }
@@ -3487,6 +3621,8 @@ int	zbx_dbsync_compare_maintenance_periods(zbx_dbsync_t *sync)
 	zbx_uint64_t			rowid;
 	zbx_dc_maintenance_period_t	*period;
 
+	zbx_dcsync_sql_start(sync);
+
 	if (NULL == (result = zbx_db_select("select t.timeperiodid,t.timeperiod_type,t.every,t.month,t.dayofweek,t.day,"
 						"t.start_time,t.period,t.start_date,m.maintenanceid"
 					" from maintenances_windows m,timeperiods t"
@@ -3500,6 +3636,7 @@ int	zbx_dbsync_compare_maintenance_periods(zbx_dbsync_t *sync)
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		sync->dbresult = result;
+		zbx_dcsync_sql_end(sync);
 		return SUCCEED;
 	}
 
@@ -3535,6 +3672,8 @@ int	zbx_dbsync_compare_maintenance_periods(zbx_dbsync_t *sync)
 	zbx_hashset_destroy(&ids);
 	zbx_db_free_result(result);
 
+	zbx_dcsync_sql_end(sync);
+
 	return SUCCEED;
 }
 
@@ -3560,6 +3699,8 @@ int	zbx_dbsync_compare_maintenance_groups(zbx_dbsync_t *sync)
 	char			maintenanceid_s[MAX_ID_LEN + 1], groupid_s[MAX_ID_LEN + 1];
 	char			*del_row[2] = {maintenanceid_s, groupid_s};
 
+	zbx_dcsync_sql_start(sync);
+
 	if (NULL == (result = zbx_db_select("select maintenanceid,groupid from maintenances_groups order by maintenanceid")))
 		return FAIL;
 
@@ -3568,6 +3709,7 @@ int	zbx_dbsync_compare_maintenance_groups(zbx_dbsync_t *sync)
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		sync->dbresult = result;
+		zbx_dcsync_sql_end(sync);
 		return SUCCEED;
 	}
 
@@ -3610,6 +3752,8 @@ int	zbx_dbsync_compare_maintenance_groups(zbx_dbsync_t *sync)
 	zbx_db_free_result(result);
 	zbx_hashset_destroy(&mgroups);
 
+	zbx_dcsync_sql_end(sync);
+
 	return SUCCEED;
 }
 
@@ -3635,14 +3779,19 @@ int	zbx_dbsync_compare_maintenance_hosts(zbx_dbsync_t *sync)
 	char			maintenanceid_s[MAX_ID_LEN + 1], hostid_s[MAX_ID_LEN + 1];
 	char			*del_row[2] = {maintenanceid_s, hostid_s};
 
+	zbx_dcsync_sql_start(sync);
+
 	if (NULL == (result = zbx_db_select("select maintenanceid,hostid from maintenances_hosts order by maintenanceid")))
+	{
 		return FAIL;
+	}
 
 	dbsync_prepare(sync, 2, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		sync->dbresult = result;
+		zbx_dcsync_sql_end(sync);
 		return SUCCEED;
 	}
 
@@ -3685,6 +3834,8 @@ int	zbx_dbsync_compare_maintenance_hosts(zbx_dbsync_t *sync)
 	zbx_db_free_result(result);
 	zbx_hashset_destroy(&mhosts);
 
+	zbx_dcsync_sql_end(sync);
+
 	return SUCCEED;
 }
 
@@ -3710,6 +3861,8 @@ int	zbx_dbsync_compare_host_group_hosts(zbx_dbsync_t *sync)
 	char			groupid_s[MAX_ID_LEN + 1], hostid_s[MAX_ID_LEN + 1];
 	char			*del_row[2] = {groupid_s, hostid_s};
 
+	zbx_dcsync_sql_start(sync);
+
 	if (NULL == (result = zbx_db_select(
 			"select hg.groupid,hg.hostid"
 			" from hosts_groups hg,hosts h"
@@ -3727,6 +3880,7 @@ int	zbx_dbsync_compare_host_group_hosts(zbx_dbsync_t *sync)
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		sync->dbresult = result;
+		zbx_dcsync_sql_end(sync);
 		return SUCCEED;
 	}
 
@@ -3770,6 +3924,8 @@ int	zbx_dbsync_compare_host_group_hosts(zbx_dbsync_t *sync)
 	zbx_db_free_result(result);
 	zbx_hashset_destroy(&groups);
 
+	zbx_dcsync_sql_end(sync);
+
 	return SUCCEED;
 }
 
@@ -3789,6 +3945,8 @@ int	zbx_dbsync_prepare_drules(zbx_dbsync_t *sync)
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
 
+	zbx_dcsync_sql_start(sync);
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select druleid,proxyid,delay,name,iprange,status,concurrency_max from drules");
 
@@ -3806,6 +3964,8 @@ int	zbx_dbsync_prepare_drules(zbx_dbsync_t *sync)
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_DRULE)]);
 out:
 	zbx_free(sql);
+
+	zbx_dcsync_sql_end(sync);
 
 	return ret;
 }
@@ -3826,6 +3986,8 @@ int	zbx_dbsync_prepare_dchecks(zbx_dbsync_t *sync)
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
 
+	zbx_dcsync_sql_start(sync);
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select dcheckid,druleid,type,key_,snmp_community,ports,snmpv3_securityname,"
 				"snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,uniq,"
@@ -3845,6 +4007,7 @@ int	zbx_dbsync_prepare_dchecks(zbx_dbsync_t *sync)
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_DCHECK)]);
 out:
 	zbx_free(sql);
+	zbx_dcsync_sql_end(sync);
 
 	return ret;
 }
@@ -3865,6 +4028,8 @@ int	zbx_dbsync_prepare_httptests(zbx_dbsync_t *sync)
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
 
+	zbx_dcsync_sql_start(sync);
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select httptestid,hostid,delay,status from httptest");
 
 	dbsync_prepare(sync, 4, NULL);
@@ -3880,6 +4045,7 @@ int	zbx_dbsync_prepare_httptests(zbx_dbsync_t *sync)
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HTTPTEST)]);
 out:
 	zbx_free(sql);
+	zbx_dcsync_sql_end(sync);
 
 	return ret;
 }
@@ -3900,6 +4066,8 @@ int	zbx_dbsync_prepare_httptest_fields(zbx_dbsync_t *sync)
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
 
+	zbx_dcsync_sql_start(sync);
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select httptest_fieldid,httptestid from httptest_field");
 
 	dbsync_prepare(sync, 2, NULL);
@@ -3915,6 +4083,7 @@ int	zbx_dbsync_prepare_httptest_fields(zbx_dbsync_t *sync)
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HTTPTEST_FIELD)]);
 out:
 	zbx_free(sql);
+	zbx_dcsync_sql_end(sync);
 
 	return ret;
 }
@@ -3935,6 +4104,8 @@ int	zbx_dbsync_prepare_httpsteps(zbx_dbsync_t *sync)
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
 
+	zbx_dcsync_sql_start(sync);
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select httpstepid,httptestid from httpstep");
 	dbsync_prepare(sync, 2, NULL);
 
@@ -3949,6 +4120,7 @@ int	zbx_dbsync_prepare_httpsteps(zbx_dbsync_t *sync)
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HTTPSTEP)]);
 out:
 	zbx_free(sql);
+	zbx_dcsync_sql_end(sync);
 
 	return ret;
 }
@@ -3969,6 +4141,8 @@ int	zbx_dbsync_prepare_httpstep_fields(zbx_dbsync_t *sync)
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
 
+	zbx_dcsync_sql_start(sync);
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select httpstep_fieldid,httpstepid from httpstep_field");
 	dbsync_prepare(sync, 2, NULL);
 
@@ -3983,6 +4157,7 @@ int	zbx_dbsync_prepare_httpstep_fields(zbx_dbsync_t *sync)
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HTTPSTEP_FIELD)]);
 out:
 	zbx_free(sql);
+	zbx_dcsync_sql_end(sync);
 
 	return ret;
 }
@@ -4004,6 +4179,8 @@ int	zbx_dbsync_compare_connectors(zbx_dbsync_t *sync)
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
 
+	zbx_dcsync_sql_start(sync);
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select connectorid,protocol,data_type,url,max_records,"
 			"max_senders,timeout,max_attempts,token,http_proxy,authtype,username,password,verify_peer,"
 			"verify_host,ssl_cert_file,ssl_key_file,ssl_key_password,status,"
@@ -4023,6 +4200,7 @@ int	zbx_dbsync_compare_connectors(zbx_dbsync_t *sync)
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_CONNECTOR)]);
 out:
 	zbx_free(sql);
+	zbx_dcsync_sql_end(sync);
 
 	return ret;
 }
@@ -4033,6 +4211,8 @@ int	zbx_dbsync_compare_connector_tags(zbx_dbsync_t *sync)
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
+
+	zbx_dcsync_sql_start(sync);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select connector_tagid,connectorid,operator,tag,value"
 			" from connector_tag");
@@ -4050,6 +4230,7 @@ int	zbx_dbsync_compare_connector_tags(zbx_dbsync_t *sync)
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_CONNECTOR_TAG)]);
 out:
 	zbx_free(sql);
+	zbx_dcsync_sql_end(sync);
 
 	return ret;
 }
@@ -4059,6 +4240,8 @@ int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync)
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
+
+	zbx_dcsync_sql_start(sync);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select p.proxyid,p.name,p.operating_mode,p.tls_connect,p.tls_accept,p.tls_issuer,p.tls_subject,"
@@ -4084,6 +4267,7 @@ int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync)
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_PROXY)]);
 out:
 	zbx_free(sql);
+	zbx_dcsync_sql_end(sync);
 
 	return ret;
 }
@@ -4104,6 +4288,8 @@ int	zbx_dbsync_prepare_proxy_group(zbx_dbsync_t *sync)
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
 
+	zbx_dcsync_sql_start(sync);
+
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select proxy_groupid,failover_delay,min_online,name from proxy_group");
 
@@ -4120,6 +4306,7 @@ int	zbx_dbsync_prepare_proxy_group(zbx_dbsync_t *sync)
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_PROXY_GROUP)]);
 out:
 	zbx_free(sql);
+	zbx_dcsync_sql_end(sync);
 
 	return ret;
 }
@@ -4139,6 +4326,8 @@ int	zbx_dbsync_prepare_host_proxy(zbx_dbsync_t *sync)
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
+
+	zbx_dcsync_sql_start(sync);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hp.hostproxyid,hp.hostid,hp.host,hp.proxyid,hp.revision,h.host,hp.tls_accept,"
@@ -4160,6 +4349,67 @@ int	zbx_dbsync_prepare_host_proxy(zbx_dbsync_t *sync)
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST_PROXY)]);
 out:
 	zbx_free(sql);
+	zbx_dcsync_sql_end(sync);
 
 	return ret;
+}
+
+
+void	zbx_dcsync_sql_start(zbx_dbsync_t *sync)
+{
+	sync->start = zbx_time();
+}
+
+void	zbx_dcsync_sql_end(zbx_dbsync_t *sync)
+{
+	sync->sql_time = zbx_time() - sync->start;
+}
+
+void	zbx_dcsync_sync_start(zbx_dbsync_t *sync, zbx_uint64_t used_size)
+{
+	sync->start = zbx_time();
+	sync->used = used_size;
+}
+
+void	zbx_dcsync_sync_end(zbx_dbsync_t *sync, zbx_uint64_t used_size)
+{
+	sync->sync_time += zbx_time() - sync->start;
+	sync->sync_size += used_size - sync->used;
+}
+
+static void	dcsync_log_stats(const char *function_name, const zbx_dbsync_t *sync)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() %16s: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes ("
+			ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").", function_name, sync->from, sync->sql_time,
+			sync->sync_time, sync->sync_size, sync->add_num, sync->update_num, sync->remove_num);
+}
+
+void	zbx_dcsync_stats_dump(const char *function_name)
+{
+	double		sync_time_total = 0, sql_time_total = 0;
+	zbx_int64_t	total_used = 0;
+
+	for (int i = 0; i < dbsync_env.changelog_dbsyncs.values_num; i++)
+	{
+		const zbx_dbsync_t *sync = dbsync_env.changelog_dbsyncs.values[i];
+
+		dcsync_log_stats(function_name, sync);
+		sql_time_total += sync->sql_time;
+		sync_time_total += sync->sync_time;
+		total_used += sync->sync_size;
+	}
+
+	for (int i = 0; i < dbsync_env.dbsyncs.values_num; i++)
+	{
+		const zbx_dbsync_t *sync = dbsync_env.dbsyncs.values[i];
+
+		dcsync_log_stats(function_name, sync);
+		sql_time_total += sync->sql_time;
+		sync_time_total += sync->sync_time;
+		total_used += sync->sync_size;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sql  : " ZBX_FS_DBL " sec.", function_name, sql_time_total);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() total sync : " ZBX_FS_DBL " sec.", function_name, sync_time_total);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() total memory difference: " ZBX_FS_I64 " bytes.", function_name, total_used);
 }

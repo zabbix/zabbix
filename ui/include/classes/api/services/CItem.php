@@ -88,8 +88,6 @@ class CItem extends CItemGeneral {
 	 * @return array|int item data as array or false if error
 	 */
 	public function get($options = []) {
-		$result = [];
-
 		$sqlParts = [
 			'select'	=> ['items' => 'i.itemid'],
 			'from'		=> ['items' => 'items i'],
@@ -409,47 +407,50 @@ class CItem extends CItemGeneral {
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
-		while ($item = DBfetch($res)) {
-			// Items share table with item prototypes. Therefore remove item unrelated fields.
-			unset($item['discover']);
-
-			if (!$options['countOutput']) {
-				$result[$item['itemid']] = $item;
-				continue;
-			}
-
-			if ($options['groupCount']) {
-				$result[] = $item;
-			}
-			else {
-				$result = $item['rowscount'];
-			}
-		}
+		$resource = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
 
 		if ($options['countOutput']) {
-			return $result;
-		}
+			if ($options['groupCount']) {
+				$result = [];
 
-		if ($result) {
-			if (self::dbDistinct($sqlParts)) {
-				$result = $this->addNclobFieldValues($options, $result);
+				while ($item = DBfetch($resource)) {
+					$result[] = $item;
+				}
+
+				return $result;
 			}
 
-			self::prepareItemsForApi($result, false);
-
-			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['hostid', 'interfaceid', 'value_type', 'valuemapid'],
-				$options['output']
-			);
+			return DBfetch($resource)['rowscount'];
 		}
+
+		$items = [];
+		$items_chunk = [];
+
+		do {
+			while ($item = DBfetch($resource)) {
+				$items_chunk[$item['itemid']] = $item;
+
+				if (count($items_chunk) == CItemGeneral::CHUNK_SIZE) {
+					break;
+				}
+			}
+
+			if (!$items_chunk) {
+				break;
+			}
+
+			$this->prepareChunkObjects($items_chunk, $options, $sqlParts);
+
+			$items += $items_chunk;
+			$items_chunk = [];
+		} while ($item !== false);
 
 		// removing keys (hash -> array)
 		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
+			$items = array_values($items);
 		}
 
-		return $result;
+		return $items;
 	}
 
 	/**
@@ -469,6 +470,26 @@ class CItem extends CItemGeneral {
 		if (!CApiInputValidator::validate($api_input_rules, $options_filter, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
+	}
+
+	private function prepareChunkObjects(array &$items, array $options, array $sqlParts): void {
+		if (self::dbDistinct($sqlParts)) {
+			$items = $this->addNclobFieldValues($options, $items);
+		}
+
+		$items = $this->addRelatedObjects($options, $items);
+		$items = $this->unsetExtraFields($items, ['hostid', 'interfaceid', 'value_type', 'valuemapid'],
+			$options['output']
+		);
+		$items = $this->unsetExtraFields($items, ['name_upper']);
+
+		self::prepareItemsForApi($items, false);
+
+		foreach ($items as &$item) {
+			// Items share table with item prototypes. Therefore remove item unrelated fields.
+			unset($item['discover']);
+		}
+		unset($item);
 	}
 
 	/**

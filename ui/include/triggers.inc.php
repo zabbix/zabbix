@@ -872,53 +872,50 @@ function getExpressionTree(CExpressionParser $expression_parser, int $start, int
 		$lParentheses = -1;
 		$rParentheses = -1;
 		$expressions = [];
+
 		$openSymbolNum = $start;
+		while (strpos(CExpressionParser::WHITESPACES, $expression[$openSymbolNum]) !== false) {
+			$openSymbolNum++;
+		}
 
-		for ($i = $start, $level = 0; $i <= $end; $i++) {
-			switch ($expression[$i]) {
-				case ' ':
-				case "\r":
-				case "\n":
-				case "\t":
-					if ($openSymbolNum == $i) {
-						$openSymbolNum++;
-					}
-					break;
-
-				case '(':
-					if ($level == 0) {
-						$lParentheses = $i;
-					}
-					$level++;
-					break;
-
-				case ')':
-					$level--;
-					if ($level == 0) {
-						$rParentheses = $i;
-					}
-					break;
-
-				default:
-					/*
-					 * Once reached the end of a complete expression, parse the expression on the left side of the
-					 * operator.
-					 */
-					if ($level == 0 && array_key_exists($i, $tokens)
-							&& $tokens[$i]['type'] == CExpressionParserResult::TOKEN_TYPE_OPERATOR
-							&& $tokens[$i]['match'] === $operator) {
-						// Find the last symbol of the expression before the operator.
-						$closeSymbolNum = $i - 1;
-
-						// Trim blank symbols after the expression.
-						while (strpos(CExpressionParser::WHITESPACES, $expression[$closeSymbolNum]) !== false) {
-							$closeSymbolNum--;
+		for ($i = $openSymbolNum, $level = 0; $i <= $end; $i++) {
+			if (array_key_exists($i, $tokens)) {
+				switch ($tokens[$i]['type']) {
+					case CExpressionParserResult::TOKEN_TYPE_OPEN_BRACE:
+						if ($level == 0) {
+							$lParentheses = $i;
 						}
+						$level++;
+						break;
 
-						$expressions[] = getExpressionTree($expression_parser, $openSymbolNum, $closeSymbolNum);
-						$openSymbolNum = $i + $tokens[$i]['length'];
-						$operatorFound = true;
-					}
+					case CExpressionParserResult::TOKEN_TYPE_CLOSE_BRACE:
+						$level--;
+						if ($level == 0) {
+							$rParentheses = $i;
+						}
+						break;
+
+					case CExpressionParserResult::TOKEN_TYPE_OPERATOR:
+						/*
+						 * Once reached the end of a complete expression, parse the expression on the left side of the
+						 * operator.
+						 */
+						if ($level == 0 && $tokens[$i]['match'] === $operator) {
+							// Find the last symbol of the expression before the operator.
+							$closeSymbolNum = $i - 1;
+
+							// Trim blank symbols after the expression.
+							while (strpos(CExpressionParser::WHITESPACES, $expression[$closeSymbolNum]) !== false) {
+								$closeSymbolNum--;
+							}
+
+							$expressions[] = getExpressionTree($expression_parser, $openSymbolNum, $closeSymbolNum);
+							$openSymbolNum = $i + $tokens[$i]['length'];
+							$operatorFound = true;
+						}
+						break;
+				}
+				$i += $tokens[$i]['length'] - 1;
 			}
 		}
 

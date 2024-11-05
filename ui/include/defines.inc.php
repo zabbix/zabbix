@@ -13,8 +13,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-define('ZABBIX_VERSION',		'7.0.4rc1');
-define('ZABBIX_API_VERSION',	'7.0.4');
+define('ZABBIX_VERSION',		'7.0.6rc1');
+define('ZABBIX_API_VERSION',	'7.0.6');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
 define('ZABBIX_DB_VERSION',		7000000);
@@ -628,6 +628,7 @@ define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR',		0x02);
 define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG',		0x04);
 define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64',	0x08);
 define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT',	0x10);
+define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_BIN',		0x20);
 
 define('ITEM_DATA_TYPE_DECIMAL',		0);
 define('ITEM_DATA_TYPE_OCTAL',			1);
@@ -972,7 +973,7 @@ define('SCREEN_REFRESH_RESPONSIVENESS',	10);
 // default, minimum and maximum number of lines for dashboard widgets
 define('ZBX_DEFAULT_WIDGET_LINES', 25);
 define('ZBX_MIN_WIDGET_LINES', 1);
-define('ZBX_MAX_WIDGET_LINES', 100);
+define('ZBX_MAX_WIDGET_LINES', 1000);
 
 // dashboards
 define('DASHBOARD_MAX_PAGES',		50);

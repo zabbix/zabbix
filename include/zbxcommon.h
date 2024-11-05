@@ -297,13 +297,11 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_DBCONFIGWORKER		44
 #define ZBX_PROCESS_TYPE_PG_MANAGER		45
 #define ZBX_PROCESS_TYPE_BROWSERPOLLER		46
-#define ZBX_PROCESS_TYPE_COUNT			47	/* number of process types */
+#define ZBX_PROCESS_TYPE_HA_MANAGER		47
+#define ZBX_PROCESS_TYPE_COUNT			48	/* number of process types */
 
 /* special processes that are not present worker list */
-#define ZBX_PROCESS_TYPE_EXT_FIRST		126
-#define ZBX_PROCESS_TYPE_HA_MANAGER		126
-#define ZBX_PROCESS_TYPE_MAIN			127
-#define ZBX_PROCESS_TYPE_EXT_LAST		127
+#define ZBX_PROCESS_TYPE_MAIN			126
 
 #define ZBX_PROCESS_TYPE_UNKNOWN		255
 
@@ -527,10 +525,10 @@ zbx_proxy_suppress_t;
 #define ZBX_JAN_1970_IN_SEC	2208988800.0	/* 1970 - 1900 in seconds */
 
 #define ZBX_MAX_RECV_DATA_SIZE		(1 * ZBX_GIBIBYTE)
-#if defined(_WINDOWS)
-#define ZBX_MAX_RECV_LARGE_DATA_SIZE	(1 * ZBX_GIBIBYTE)
-#else
+#if (4 < SIZEOF_SIZE_T)
 #define ZBX_MAX_RECV_LARGE_DATA_SIZE	(__UINT64_C(16) * ZBX_GIBIBYTE)
+#else
+#define ZBX_MAX_RECV_LARGE_DATA_SIZE	(1 * ZBX_GIBIBYTE)
 #endif
 
 /* max length of base64 data */

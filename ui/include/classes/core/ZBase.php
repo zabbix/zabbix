@@ -430,10 +430,6 @@ class ZBase {
 	 * Vault provider initialisation if it exists in configuration file.
 	 */
 	protected function initVault(): void {
-		if (!array_key_exists('VAULT', $this->config['DB'])) {
-			return;
-		}
-
 		switch ($this->config['DB']['VAULT']) {
 			case CVaultCyberArk::NAME:
 				$this->vault = new CVaultCyberArk($this->config['DB']['VAULT_URL'], $this->config['DB']['VAULT_PREFIX'],
@@ -494,7 +490,7 @@ class ZBase {
 		if (!DBconnect($error)) {
 			CDataCacheHelper::clearValues(['db_user', 'db_password']);
 
-			throw new DBException($error);
+			throw new DBException($error, DB::DBEXECUTE_ERROR);
 		}
 	}
 

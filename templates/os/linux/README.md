@@ -161,7 +161,7 @@ Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.za
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Block devices discovery||Zabbix agent|vfs.dev.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Block devices discovery||Zabbix agent|vfs.dev.discovery|
 
 ### Item prototypes for Block devices discovery
 

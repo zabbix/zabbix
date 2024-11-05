@@ -24,7 +24,7 @@ type addressPool struct {
 	mu   sync.Mutex
 }
 
-// NewAddressPool creates address pool implementing AddressSet interface
+// NewAddressPool creates address pool implementing AddressSet interface.
 func NewAddressPool(addrs []string) AddressSet {
 	a := &addressPool{
 		pool: make([]address, 0, len(addrs)),
@@ -37,6 +37,7 @@ func NewAddressPool(addrs []string) AddressSet {
 	return a
 }
 
+// String returns list of all addresses.
 func (a *addressPool) String() string {
 	a.mu.Lock()
 	defer a.mu.Unlock()
@@ -53,6 +54,7 @@ func (a *addressPool) String() string {
 	return s[:len(s)-1]
 }
 
+// Get returns current address as string <address>:<port>.
 func (a *addressPool) Get() string {
 	a.mu.Lock()
 	defer a.mu.Unlock()
@@ -69,7 +71,8 @@ func (a *addressPool) nextAddress() {
 	a.pool = append(a.pool[:0], a.pool[1:]...)
 }
 
-func (a *addressPool) next() {
+// Next cycles the address set by selecting next address.
+func (a *addressPool) Next() {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
