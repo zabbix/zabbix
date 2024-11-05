@@ -59,17 +59,11 @@ class CWidgetMap extends CWidget {
 
 		if (this.isFieldsReferredDataUpdated('sysmapid')) {
 			this.#previous_maps = [];
-		}
-
-		if (this.#map_svg !== null || this.isFieldsReferredDataUpdated('sysmapid')) {
-			if (this.#sysmapid != fields_data.sysmapid) {
-				this.#sysmapid = fields_data.sysmapid;
-			}
-
+			this.#sysmapid = fields_data.sysmapid;
 			this.#map_svg = null;
 		}
 
-		if (this.#map_svg === null || this.#sysmapid !== fields_data.sysmapid) {
+		if (this.#map_svg === null || this.#sysmapid != fields_data.sysmapid) {
 			return super.promiseUpdate();
 		}
 
