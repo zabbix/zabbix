@@ -76,7 +76,7 @@ int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, ch
 		err_val = zbx_truncate_value(value_desc, ERROR_VALUE_MAX_CHAR, short_value, sizeof(short_value));
 		err_val_tostring = zbx_str_printable_dyn(err_val);
 		*errmsg = zbx_dsprintf(NULL, "Value of type \"%s\" is not suitable for value"
-				" type \"%s\". Value ""\"%s%s\"", zbx_variant_type_desc(value),
+				" type \"%s\". Value \"%s%s\"", zbx_variant_type_desc(value),
 				zbx_item_value_type_string(value_type), err_val_tostring,
 				(strlen(value_desc) > strlen(err_val)) ? "(truncated)" : "");
 		zbx_free(err_val_tostring);
