@@ -1135,7 +1135,8 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 				$triggerId = $row['triggerid'];
 			}
 			$this->zbxTestOpen(self::HOST_LIST_PAGE);
-			$this->zbxTestAcceptAlert();
+			// TODO: temporarily commented out due webdriver issue, alert is not displayed while leaving page during test execution
+//			$this->zbxTestAcceptAlert();
 			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$this->filterEntriesAndOpenDiscovery(self::HOST, $form);
 			$this->zbxTestClickLinkTextWait(self::DISCOVERY_RULE);

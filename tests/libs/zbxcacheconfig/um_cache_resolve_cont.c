@@ -166,9 +166,9 @@ static void	mock_read_steps(zbx_vector_mock_step_t *steps, zbx_mock_handle_t hst
 
 		step = (zbx_mock_step_t *)zbx_malloc(NULL, sizeof(zbx_mock_step_t));
 
-		zbx_dbsync_init(&gmacros, ZBX_DBSYNC_UPDATE);
-		zbx_dbsync_init(&hmacros, ZBX_DBSYNC_UPDATE);
-		zbx_dbsync_init(&htmpls, ZBX_DBSYNC_UPDATE);
+		zbx_dbsync_init(&gmacros, NULL, ZBX_DBSYNC_UPDATE);
+		zbx_dbsync_init(&hmacros, NULL, ZBX_DBSYNC_UPDATE);
+		zbx_dbsync_init(&htmpls, NULL, ZBX_DBSYNC_UPDATE);
 
 		hconfig = zbx_mock_get_object_member_handle(hstep, "config");
 		um_mock_cache_init(&step->mock_cache, hconfig);

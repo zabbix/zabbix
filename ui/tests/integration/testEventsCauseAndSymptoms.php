@@ -28,6 +28,7 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 	private static $event_ids = [];
 	private static $cause_events_test_scriptid;
 	private static $symptom_events_test_scriptid;
+	private static $test_simplemacro;
 
 	const HOST_NAME = 'host cause and symptoms';
 	const TRAPPER_ITEM_NAME_PREFIX = 'Trapper item ';
@@ -372,6 +373,18 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('scriptids', $response['result']);
 		self::$symptom_events_test_scriptid = $response['result']['scriptids'][0];
+
+		// create a script for testing simple build in macro
+		$response = $this->call('script.create', [
+			'name' => 'simple macro',
+			'command' => 'echo -n "{EVENT.TIMESTAMP}"',
+			'execute_on' => ZBX_SCRIPT_EXECUTE_ON_SERVER,
+			'scope' => ZBX_SCRIPT_SCOPE_EVENT,
+			'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT
+		]);
+		$this->assertArrayHasKey('scriptids', $response['result']);
+		self::$test_simplemacro = $response['result']['scriptids'][0];
+
 	}
 
 	/**
@@ -629,4 +642,31 @@ class testEventsCauseAndSymptoms extends CIntegrationTest {
 		$this->checkSymptomsUntilSuccessOrTimeout($expected);
 		$this->checkEventCauseMacros($expected);
 	}
+
+	/**
+	 * Rank symptom events as causes to check {EVENT.TIMESTAMP} macro.
+	 *
+	 * @configurationDataProvider serverConfigurationProvider
+	 * @depends testEventsCauseAndSymptoms_rankAsCause1
+	 *
+	 */
+	public function testEventsSimpleMacro() {
+		// request event/problem ranking
+		$response = $this->call('event.acknowledge', [
+			'eventids' => $this->eventNumToId([1]),
+			'action' => ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
+		]);
+
+		$response = $this->callUntilDataIsPresent('script.execute', [
+			'scriptid' => self::$test_simplemacro,
+			'eventid' =>  1
+		], 10, 1);
+
+		$this->assertArrayHasKey('result', $response);
+		$this->assertArrayHasKey('value', $response['result']);
+
+		$expanded_macro = $response['result']['value'];
+		$this->assertTrue(abs(intval($expanded_macro) - microtime(true)) < 100);
+	}
+
 }

@@ -1213,25 +1213,25 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 	if (NULL == (service = get_vmware_service(url, item->username, item->password, result, &ret)))
 		goto unlock;
 
-	if (0 == (service->jobs_type & ZBX_VMWARE_UPDATE_EVENTLOG))
-	{
-		service->jobs_type |= ZBX_VMWARE_REQ_UPDATE_EVENTLOG;
-		ret = SYSINFO_RET_OK;
-		goto unlock;
-	}
-
 	lastaccess = time(NULL);
 
-	if (0 != service->eventlog.lastaccess)
+	if (0 != service->eventlog.lastaccess &&
+			service->eventlog.interval != lastaccess - service->eventlog.lastaccess)
+	{
+		service->jobs_flag |= ZBX_VMWARE_REQ_UPDATE_EVENTLOG;
 		service->eventlog.interval = lastaccess - service->eventlog.lastaccess;
+	}
 
 	service->eventlog.lastaccess = lastaccess;
+
+	if (0 == (service->jobs_flag & ZBX_VMWARE_UPDATE_EVENTLOG))
+		service->jobs_flag |= ZBX_VMWARE_REQ_UPDATE_EVENTLOG;
 
 	if (severity != service->eventlog.severity)
 		service->eventlog.severity = severity;
 
 	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED == service->eventlog.last_key ||
-			(0 != skip_old && 0 != service->eventlog.last_key ))
+			(0 != skip_old && service->eventlog.owner_itemid != item->itemid))
 	{
 		/* this may happen if recreate item vmware.eventlog for same service URL */
 		service->eventlog.last_key = request->lastlogsize;
@@ -1262,7 +1262,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 	else if (0 < service->eventlog.data->events.values_num)
 	{
 		/* Some times request->lastlogsize value gets stuck due to concurrent update of history cache */
-		/* thereby we can rely to value of the request->lastlogsize and have to return events based on */
+		/* thereby we can't rely to value of the request->lastlogsize and have to return events based on */
 		/* internal state of the service->eventlog */
 		vmware_get_events(&service->eventlog.data->events, &service->eventlog, item, add_results);
 		service->eventlog.last_key = service->eventlog.data->events.values[0]->key;

@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'7.2.0alpha2');
 define('ZABBIX_API_VERSION',	'7.2.0');
 define('ZABBIX_EXPORT_VERSION',	'7.2');
 
-define('ZABBIX_DB_VERSION',		7010014);
+define('ZABBIX_DB_VERSION',		7010016);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -967,7 +967,7 @@ define('SCREEN_REFRESH_RESPONSIVENESS',	10);
 // default, minimum and maximum number of lines for dashboard widgets
 define('ZBX_DEFAULT_WIDGET_LINES', 25);
 define('ZBX_MIN_WIDGET_LINES', 1);
-define('ZBX_MAX_WIDGET_LINES', 100);
+define('ZBX_MAX_WIDGET_LINES', 1000);
 
 // dashboards
 define('DASHBOARD_MAX_PAGES',		50);

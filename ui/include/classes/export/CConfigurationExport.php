@@ -964,7 +964,7 @@ class CConfigurationExport {
 
 		if ($templateids) {
 			$templates = API::Template()->get([
-				'output' => ['name'],
+				'output' => ['host'],
 				'templateids' => array_keys($templateids),
 				'preservekeys' => true
 			]);
@@ -975,7 +975,7 @@ class CConfigurationExport {
 							if (array_key_exists('optemplate', $operation)) {
 								$operation['templates'] = [];
 								foreach ($operation['optemplate'] as $template) {
-									$operation['templates'][] = ['name' => $templates[$template['templateid']]['name']];
+									$operation['templates'][] = ['name' => $templates[$template['templateid']]['host']];
 								}
 								unset($operation['optemplate']);
 							}

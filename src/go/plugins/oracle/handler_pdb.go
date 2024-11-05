@@ -16,21 +16,25 @@ package oracle
 
 import (
 	"context"
-	"fmt"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
 func pdbHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
 	var PDBInfo string
-	row, err := conn.QueryRow(ctx, getPDBQuery(params["Database"]))
+
+	query, args := getPDBQuery(params["Database"])
+
+	row, err := conn.QueryRow(ctx, query, args...)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
+
 	}
 
 	err = row.Scan(&PDBInfo)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	if PDBInfo == "" {
@@ -40,13 +44,8 @@ func pdbHandler(ctx context.Context, conn OraClient, params map[string]string, _
 	return PDBInfo, nil
 }
 
-func getPDBQuery(name string) string {
-	var whereStr string
-	if name != "" {
-		whereStr = fmt.Sprintf(`WHERE NAME = '%s'`, name)
-	}
-
-	return fmt.Sprintf(`
+func getPDBQuery(name string) (string, []any) {
+	const query = `
 	SELECT
 		JSON_ARRAYAGG(
 			JSON_OBJECT(
@@ -69,7 +68,11 @@ func getPDBQuery(name string) string {
 			)
 		)
 		FROM
-			V$PDBS
-		%s
-`, whereStr)
+			V$PDBS`
+
+	if name != "" {
+		return query + " WHERE NAME = :1", []any{name}
+	}
+
+	return query, nil
 }

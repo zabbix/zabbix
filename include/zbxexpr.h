@@ -22,6 +22,7 @@ int	zbx_is_key_char(unsigned char c);
 int	zbx_is_function_char(unsigned char c);
 int	zbx_is_macro_char(unsigned char c);
 int	zbx_is_discovery_macro(const char *name);
+int	zbx_is_strict_macro(const char *macro);
 int	zbx_parse_key(const char **exp);
 int	zbx_parse_host_key(char *exp, char **host, char **key);
 void	zbx_make_hostname(char *host);

@@ -66,6 +66,7 @@ type unitJson struct {
 	JobType       string `json:"{#UNIT.JOBTYPE}"`
 	JobPath       string `json:"{#UNIT.JOBPATH}"`
 	UnitFileState string `json:"{#UNIT.UNITFILESTATE}"`
+	ServiceType   string `json:"{#UNIT.SERVICETYPE}"` //nolint:tagliatelle
 }
 
 type state struct {
@@ -196,6 +197,22 @@ func (p *Plugin) get(params []string, conn *dbus.Conn) (interface{}, error) {
 	return string(val), nil
 }
 
+func (p *Plugin) getServiceType(name string, conn *dbus.Conn) string {
+	serviceType, err := p.info([]string{name, "Type", "Service"}, conn)
+	if err != nil {
+		p.Debugf("failed to retrieve service type for %s, err:%s", name, err.Error())
+		return ""
+	}
+
+	typeString, ok := serviceType.(string)
+	if !ok {
+		p.Debugf("unit service type is not string for %s", name)
+		return ""
+	}
+
+	return typeString
+}
+
 func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error) {
 	var ext string
 
@@ -236,7 +253,7 @@ func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error
 
 		UnitFileState, err := p.info([]string{u.Name, "UnitFileState"}, conn)
 		if err != nil {
-			p.Debugf("Failed to retrieve unit file state for %s, err:", u.Name, err.Error())
+			p.Debugf("Failed to retrieve unit file state for %s, err:%s", u.Name, err.Error())
 			continue
 		}
 
@@ -249,9 +266,10 @@ func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error
 			continue
 		}
 
+		serviceType := p.getServiceType(u.Name, conn)
 		array = append(array, unitJson{
 			u.Name, u.Description, u.LoadState, u.ActiveState,
-			u.SubState, u.Followed, u.Path, u.JobID, u.JobType, u.JobPath, state,
+			u.SubState, u.Followed, u.Path, u.JobID, u.JobType, u.JobPath, state, serviceType,
 		})
 	}
 
@@ -266,15 +284,10 @@ func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error
 
 		unitPath := "/org/freedesktop/systemd1/unit/" + getName(basePath)
 
-		var details map[string]interface{}
-		obj = conn.Object("org.freedesktop.systemd1", dbus.ObjectPath(unitPath))
-		err = obj.Call("org.freedesktop.DBus.Properties.GetAll", 0, "org.freedesktop.systemd1.Unit").Store(&details)
-		if err != nil {
-			p.Debugf("Cannot get unit properties for disabled unit %s, err:", basePath, err.Error())
-			continue
-		}
+		serviceType := p.getServiceType(f.Name, conn)
 
-		array = append(array, unitJson{basePath, "", "", "inactive", "", "", unitPath, 0, "", "", f.EnablementState})
+		array = append(array, unitJson{basePath, "", "", "inactive", "", "", unitPath, 0, "", "",
+			f.EnablementState, serviceType})
 	}
 
 	jsonArray, err := json.Marshal(array)

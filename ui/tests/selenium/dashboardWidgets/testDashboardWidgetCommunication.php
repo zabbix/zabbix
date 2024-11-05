@@ -4008,6 +4008,11 @@ class testDashboardWidgetCommunication extends testWidgets {
 				$listener = $dashboard->getWidget($listener_name);
 			}
 
+			// It takes time for listener to load data. Listener has "is-loading" class while this process is active.
+			if ($listener->hasClass('is-loading')) {
+				$listener->waitUntilClassesNotPresent('is-loading');
+			}
+
 			$listener_type = $this->getWidgetType($listener);
 
 			switch ($listener_type) {

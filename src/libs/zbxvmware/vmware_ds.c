@@ -347,7 +347,7 @@ zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_service
 		datastore = NULL;
 	}
 out:
-	zbx_xml_free_doc(doc);
+	zbx_xml_doc_free(doc);
 	zbx_vector_cq_value_ptr_destroy(&cqvs);
 
 	if (NULL != error)
@@ -577,8 +577,7 @@ int	vmware_hv_ds_access_update(zbx_vmware_service_t *service, CURL *easyhandle, 
 
 	while (NULL != iter->token)
 	{
-		zbx_xml_free_doc(doc);
-		doc = NULL;
+		zbx_xml_doc_free(doc);
 
 		if (SUCCEED != zbx_property_collection_next(__func__, iter, &doc, error))
 			goto out;
@@ -589,7 +588,7 @@ int	vmware_hv_ds_access_update(zbx_vmware_service_t *service, CURL *easyhandle, 
 	ret = SUCCEED;
 out:
 	zbx_property_collection_free(iter);
-	zbx_xml_free_doc(doc);
+	zbx_xml_doc_free(doc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s for %d / %d", __func__, zbx_result_string(ret), updated,
 			hv_dss->values_num);
 
@@ -693,7 +692,7 @@ int	vmware_service_get_maxquerymetrics(CURL *easyhandle, zbx_vmware_service_t *s
 
 	zbx_free(val);
 out:
-	zbx_xml_free_doc(doc);
+	zbx_xml_doc_free(doc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
