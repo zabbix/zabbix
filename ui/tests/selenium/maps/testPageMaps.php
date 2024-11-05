@@ -284,7 +284,7 @@ class testPageMaps extends CWebTest {
 
 	public function getFilterData() {
 		return [
-			// #0 View results with empty Name.
+			// #0. View results with empty Name.
 			[
 				[
 					'filter' => [
@@ -310,9 +310,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// TODO: Uncomment the test cases after issue in ZBX-24652 is fixed. Update the numbering of all test cases.
-			/*
-			// # View results with multiple spaces for Name.
+			// #1. View results with multiple spaces for Name.
 			[
 				[
 					'filter' => [
@@ -320,7 +318,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// # View results with single space in the name.
+			// #2. View results with single space in the name.
 			[
 				[
 					'filter' => [
@@ -345,7 +343,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// # View results if request has trailing spaces.
+			// #3. View results if request has trailing spaces.
 			[
 				[
 					'filter' => [
@@ -353,7 +351,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// # View results if request has leading spaces.
+			// #4. View results if request has leading spaces.
 			[
 				[
 					'filter' => [
@@ -361,8 +359,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			*/
-			// #1 View results with request that has spaces separating the words.
+			// #5. View results with request that has spaces separating the words.
 			[
 				[
 					'filter' => [
@@ -373,7 +370,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #2 View results with partial name match.
+			// #6. View results with partial name match.
 			[
 				[
 					'filter' => [
@@ -384,7 +381,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #3 View results with partial name match with space.
+			// #7. View results with partial name match with space.
 			[
 				[
 					'filter' => [
@@ -400,7 +397,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #4 View results with partial match, trailing and leading spaces.
+			// #8. View results with partial match, trailing and leading spaces.
 			[
 				[
 					'filter' => [
@@ -412,7 +409,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #5 View results with upper case.
+			// #9. View results with upper case.
 			[
 				[
 					'filter' => [
@@ -426,7 +423,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #6 View results with lower case.
+			// #10. View results with lower case.
 			[
 				[
 					'filter' => [
@@ -440,7 +437,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #7 View results with non-existing request.
+			// #11. View results with non-existing request.
 			[
 				[
 					'filter' => [
@@ -448,7 +445,7 @@ class testPageMaps extends CWebTest {
 					]
 				]
 			],
-			// #8 View results if request contains special symbols.
+			// #12. View results if request contains special symbols.
 			[
 				[
 					'filter' => [

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-01-22T15:13:28Z'
+  date: '2024-10-31T12:21:29Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -1284,9 +1284,6 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - 'return JSON.stringify(JSON.parse(value).map(function(user) {return {user_name: user}}));'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
       tags:
         - tag: class
           value: application

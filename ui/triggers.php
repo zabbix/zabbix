@@ -90,7 +90,7 @@ $fields = [
 	'filter_inherited' =>						[T_ZBX_INT, O_OPT, null, IN([-1, 0, 1]), null],
 	'filter_discovered' =>						[T_ZBX_INT, O_OPT, null, IN([-1, 0, 1]), null],
 	'filter_dependent' =>						[T_ZBX_INT, O_OPT, null, IN([-1, 0, 1]), null],
-	'filter_name' =>							[T_ZBX_STR, O_OPT, null, null, null],
+	'filter_name' =>							[T_ZBX_STR, O_OPT, P_NO_TRIM,	 null,	 null],
 	'filter_state' =>							[T_ZBX_INT, O_OPT, null,
 													IN([-1, TRIGGER_STATE_NORMAL, TRIGGER_STATE_UNKNOWN]), null
 												],
