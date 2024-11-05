@@ -60,7 +60,7 @@ $fields = [
 	// filter
 	'filter_set' =>							[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_rst' =>							[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'filter_name' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_name' =>						[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	null],
 	'filter_status' =>						[T_ZBX_INT, O_OPT, null,	IN([-1, MAINTENANCE_STATUS_ACTIVE, MAINTENANCE_STATUS_APPROACH, MAINTENANCE_STATUS_EXPIRED]), null],
 	'filter_groups' =>						[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	// sort and sortorder
