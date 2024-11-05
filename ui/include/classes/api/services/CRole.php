@@ -1251,15 +1251,22 @@ class CRole extends CApiService {
 				$output = array_unique(array_merge(['userid', 'roleid'], $options['selectUsers']));
 			}
 
-			$user_condition = self::$userData['type'] != USER_TYPE_SUPER_ADMIN
-				? ['userid' => self::$userData['userid']]
-				: [];
-
-			$users = API::User()->get([
-				'output' => $output,
-				'filter' => ['roleid' => $roleids] + $user_condition,
-				'preservekeys' => true
-			]);
+			if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+				$users = API::User()->get([
+					'output' => $output,
+					'filter' => ['roleid' => $roleids],
+					'preservekeys' => true
+				]);
+			}
+			else {
+				$users = array_key_exists(self::$userData['roleid'], $result)
+					? API::User()->get([
+						'output' => $output,
+						'userids' => self::$userData['userid'],
+						'preservekeys' => true
+					])
+					: [];
+			}
 
 			$relation_map = $this->createRelationMap($users, 'roleid', 'userid');
 			$users = $this->unsetExtraFields($users, ['userid', 'roleid'], $options['selectUsers']);
