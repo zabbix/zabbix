@@ -152,7 +152,6 @@ class CUser extends CApiService {
 			}
 		}
 
-		$output_fields = array_flip(self::OUTPUT_FIELDS);
 		$limited_output_fields = array_flip(self::LIMITED_OUTPUT_FIELDS);
 
 		// filter
