@@ -16,6 +16,7 @@
 #define ZABBIX_ZBX_POLLER_H
 
 #include "zbxcacheconfig.h"
+#include "zbxasyncpoller.h"
 #include "module.h"
 
 ZBX_PTR_VECTOR_DECL(agent_result_ptr, AGENT_RESULT*)
@@ -80,5 +81,92 @@ void	zbx_init_library_mt_snmp(const char *progname);
 void	zbx_shutdown_library_mt_snmp(const char *progname);
 
 void	zbx_clear_cache_snmp(unsigned char process_type, int process_num);
+
+typedef enum
+{
+	ZABBIX_AGENT_STEP_CONNECT_INIT = 0,
+	ZABBIX_AGENT_STEP_CONNECT_WAIT,
+	ZABBIX_AGENT_STEP_TLS_WAIT,
+	ZABBIX_AGENT_STEP_SEND,
+	ZABBIX_AGENT_STEP_RECV
+}
+zbx_zabbix_agent_step_t;
+
+#ifdef HAVE_NETSNMP
+typedef struct zbx_snmp_context	zbx_snmp_context_t;
+
+void	*zbx_async_check_snmp_get_arg(zbx_snmp_context_t *snmp_context);
+
+zbx_dc_item_context_t	*zbx_async_check_snmp_get_item_context(zbx_snmp_context_t *snmp_context);
+
+char	*zbx_async_check_snmp_get_reverse_dns(zbx_snmp_context_t *snmp_context);
+void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context);
+int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_task_clear_cb_t clear_cb,
+		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
+		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries);
+
+void	zbx_set_snmp_bulkwalk_options(const char *progname);
+#endif
+
+typedef struct
+{
+	zbx_dc_item_context_t		item;
+	void				*arg;
+	void				*arg_action;
+	zbx_socket_t			s;
+	zbx_tcp_recv_context_t		tcp_recv_context;
+	zbx_tcp_send_context_t		tcp_send_context;
+	zbx_zabbix_agent_step_t		step;
+	char				*server_name;
+	char				*tls_arg1;
+	char				*tls_arg2;
+	unsigned char			tls_connect;
+	const char			*config_source_ip;
+	int				config_timeout;
+	zbx_async_resolve_reverse_dns_t	resolve_reverse_dns;
+	zbx_async_rdns_step_t		rdns_step;
+	char				*reverse_dns;
+	struct zbx_json			j;
+}
+zbx_agent_context;
+
+void	zbx_async_check_agent_clean(zbx_agent_context *agent_context);
+
+int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_task_clear_cb_t clear_cb,
+		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
+		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns);
+
+typedef struct zbx_async_manager	zbx_async_manager_t;
+
+typedef struct
+{
+	zbx_async_manager_t	*manager;
+	const zbx_thread_info_t	*info;
+	int			state;
+	int			clear_cache;
+	int			process_num;
+	unsigned char		poller_type;
+	int			processed;
+	int			queued;
+	int			processing;
+	int			config_unavailable_delay;
+	int			config_unreachable_delay;
+	int			config_unreachable_period;
+	int			config_max_concurrent_checks_per_poller;
+	int			config_timeout;
+	const char		*config_source_ip;
+	const char		*config_ssl_ca_location;
+	const char		*config_ssl_cert_location;
+	const char		*config_ssl_key_location;
+	struct event		*async_wake_timer;
+	struct event		*async_timer;
+	struct event_base	*base;
+	struct evdns_base	*dnsbase;
+	zbx_hashset_t		interfaces;
+#ifdef HAVE_LIBCURL
+	CURLM			*curl_handle;
+#endif
+}
+zbx_poller_config_t;
 
 #endif /* ZABBIX_ZBX_POLLER_H*/
