@@ -1,0 +1,1 @@
+...G...PS. [ZBX-25301] removed redundant message size check on 32-bit platforms when sending TCP message (arimdjonoks)
