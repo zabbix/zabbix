@@ -37,7 +37,7 @@ void	zbx_mock_test_entry(void **state)
 
 	mock_read_variant("in.value", &value);
 	value_type = zbx_mock_str_to_value_type(zbx_mock_get_parameter_string("in.value_type"));
-	ret = zbx_variant_to_value_type(&value, value_type, 1, &error);
+	ret = zbx_variant_to_value_type(&value, value_type, ZBX_DB_DBL_PRECISION_ENABLED, &error);
 
 	zbx_mock_assert_str_eq("zbx_variant_to_value_type() return", zbx_mock_get_parameter_string("out.return"),
 			error);
