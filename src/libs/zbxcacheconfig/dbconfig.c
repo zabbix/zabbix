@@ -59,6 +59,8 @@
 #include "zbxpgservice.h"
 #include "zbxinterface.h"
 
+#define	ZBX_VECTOR_ARRAY_RESERVE	3
+
 ZBX_PTR_VECTOR_IMPL(inventory_value_ptr, zbx_inventory_value_t *)
 ZBX_PTR_VECTOR_IMPL(hc_item_ptr, zbx_hc_item_t *)
 ZBX_PTR_VECTOR_IMPL(dc_corr_condition_ptr, zbx_dc_corr_condition_t *)
@@ -5698,7 +5700,10 @@ static void	DCsync_trigger_tags(zbx_dbsync_t *sync)
 		{
 			trigger_tag->triggerid = triggerid;
 			if (ZBX_FLAG_DISCOVERY_PROTOTYPE != trigger->flags)
+			{
+				zbx_vector_ptr_reserve(&trigger->tags, ZBX_VECTOR_ARRAY_RESERVE);
 				zbx_vector_ptr_append(&trigger->tags, trigger_tag);
+			}
 		}
 	}
 
@@ -5797,7 +5802,9 @@ static void	DCsync_item_tags(zbx_dbsync_t *sync)
 		if (0 == found)
 		{
 			item_tag->itemid = itemid;
+			zbx_vector_ptr_reserve(&item->tags, ZBX_VECTOR_ARRAY_RESERVE);
 			zbx_vector_ptr_append(&item->tags, item_tag);
+
 		}
 	}
 
@@ -6060,6 +6067,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		if (0 == found)
 		{
 			op->itemid = itemid;
+			zbx_vector_ptr_reserve(&preprocitem->preproc_ops, ZBX_VECTOR_ARRAY_RESERVE);
 			zbx_vector_ptr_append(&preprocitem->preproc_ops, op);
 		}
 	}
