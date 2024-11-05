@@ -41,7 +41,7 @@ const char	*tls_crypto_init_msg;
 #elif !defined(HAVE_OPENSSL_WITH_PSK)
 #	error package golang.zabbix.com/agent2/pkg/tls cannot be compiled with OpenSSL which has excluded PSK support.
 #elif defined(_WINDOWS) && OPENSSL_VERSION_NUMBER < 0x1010100fL	// On MS Windows OpenSSL 1.1.1 is required
-#	error on Microsoft Windows the package golang.zabbix.com/aagent2/pkg/tls requires OpenSSL 1.1.1 or newer.
+#	error on Microsoft Windows the package golang.zabbix.com/agent2/pkg/tls requires OpenSSL 1.1.1 or newer.
 #elif OPENSSL_VERSION_NUMBER < 0x1000100fL
 	// OpenSSL before 1.0.1
 #	error package golang.zabbix.com/agent2/pkg/tls cannot be compiled with this OpenSSL version.\
@@ -389,18 +389,14 @@ static void *tls_new_context(const char *ca_file, const char *crl_file, const ch
 	}
 
 #if OPENSSL_VERSION_NUMBER >= 0x1010100fL	// OpenSSL 1.1.1
-	const char	*cipher_suites = TLS_1_3_CIPHERSUITES;
-	if (NULL != cipher13)
-		cipher_suites = cipher13;
-
-	if (1 != SSL_CTX_set_ciphersuites(ctx, cipher_suites))
+	if (1 != SSL_CTX_set_ciphersuites(ctx, (NULL != cipher13) ? cipher13 : TLS_1_3_CIPHERSUITES))
 		goto out;
 #else
 	if (NULL != cipher13)
 	{
 		*error = strdup("cannot set list of TLS 1.3"
-					" certificate ciphersuites: compiled with OpenSSL version older than 1.1.1,"
-					" consider not using parameters \"TLSCipherCert13\"");
+				" certificate ciphersuites: compiled with OpenSSL version older than 1.1.1,"
+				" consider not using parameters \"TLSCipherCert13\"");
 		goto out;
 	}
 #endif
@@ -1435,7 +1431,9 @@ func Init(config *Config) (err error) {
 		C.tls_free_context(C.SSL_CTX_LP(defaultContext))
 	}
 
-	var cErr, cCaFile, cCrlFile, cCertFile, cKeyFile, cCipherCert, cCipherCert13, cCipherPSK, cCipherPSK13, cNULL *C.char
+	var cErr, cCaFile, cCrlFile, cCertFile, cKeyFile, cCipherCert, cCipherCert13, cCipherPSK, cCipherPSK13,
+		cNULL *C.char
+
 	if (config.Accept|config.Connect)&ConnCert != 0 {
 		cCaFile = C.CString(config.CAFile)
 		cCertFile = C.CString(config.CertFile)
@@ -1493,8 +1491,8 @@ func Init(config *Config) (err error) {
 	}
 
 	log.Tracef("Calling C function \"tls_new_context()\"")
-	defaultContext = unsafe.Pointer(C.tls_new_context(cCaFile, cCrlFile, cCertFile, cKeyFile, cCipherCert,
-		cCipherCert13, &cErr))
+	defaultContext = C.tls_new_context(cCaFile, cCrlFile, cCertFile, cKeyFile, cCipherCert, cCipherCert13, &cErr)
+
 	if defaultContext == nil {
 		err = fmt.Errorf("cannot initialize default TLS context: %s", C.GoString(cErr))
 		log.Tracef("Calling C function \"free()\"")
@@ -1503,7 +1501,8 @@ func Init(config *Config) (err error) {
 	}
 
 	log.Tracef("Calling C function \"tls_new_context()\"")
-	pskContext = unsafe.Pointer(C.tls_new_context(cNULL, cNULL, cNULL, cNULL, cCipherPSK, cCipherPSK13, &cErr))
+	pskContext = C.tls_new_context(cNULL, cNULL, cNULL, cNULL, cCipherPSK, cCipherPSK13, &cErr)
+
 	if pskContext == nil {
 		err = fmt.Errorf("cannot initialize PSK TLS context: %s", C.GoString(cErr))
 		log.Tracef("Calling C function \"free()\"")
