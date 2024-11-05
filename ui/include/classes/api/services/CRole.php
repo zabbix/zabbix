@@ -1257,7 +1257,7 @@ class CRole extends CApiService {
 
 			$users = API::User()->get([
 				'output' => $output,
-				'filter' => ['roleid' => array_keys($result)] + $user_condition,
+				'filter' => ['roleid' => $roleids] + $user_condition,
 				'preservekeys' => true
 			]);
 

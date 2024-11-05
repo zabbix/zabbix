@@ -39,7 +39,7 @@ class CUser extends CApiService {
 	protected $tableAlias = 'u';
 	protected $sortColumns = ['userid', 'username', 'alias']; // Field "alias" is deprecated in favor for "username".
 
-	public const OUTPUT_FIELDS = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang',
+	public const OUTPUT_FIELDS = ['userid', 'username', 'alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang',
 		'refresh', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid'
 	];
 
