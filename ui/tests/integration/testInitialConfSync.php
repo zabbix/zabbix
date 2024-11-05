@@ -260,7 +260,7 @@ class testInitialConfSync extends CIntegrationTest
 				'insert' => '0',
 				'update' => '0',
 				'delete' => '0'
-			],
+			]
 	];
 
 	private $expected_update =

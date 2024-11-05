@@ -269,7 +269,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			],
 			'id:tags_0_value' => ['value' => '', 'placeholder' => 'value', 'maxlength' => 255],
 			'Order' => ['value' => 'Top N', 'labels' => ['Top N', 'Bottom N']],
-			'Host limit' => ['value' => 10, 'maxlength' => 3]
+			'Host limit' => ['value' => 10, 'maxlength' => 4]
 		];
 		$this->checkFieldsAttributes($fields, $form);
 
@@ -857,7 +857,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'main_error' => [
-						'Invalid parameter "Host limit": value must be one of 1-100.'
+						'Invalid parameter "Host limit": value must be one of 1-1000.'
 					]
 				]
 			],
@@ -867,7 +867,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'expected' => TEST_BAD,
 					'main_fields' => [
 						'Name' => 'Host limit error without item column',
-						'Host limit' => '333'
+						'Host limit' => '3333'
 					],
 					'column_fields' => [
 						[
@@ -876,7 +876,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'main_error' => [
-						'Invalid parameter "Host limit": value must be one of 1-100.'
+						'Invalid parameter "Host limit": value must be one of 1-1000.'
 					]
 				]
 			],
@@ -1615,7 +1615,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						'Host limit' => '0'
 					],
 					'main_error' => [
-						'Invalid parameter "Host limit": value must be one of 1-100.'
+						'Invalid parameter "Host limit": value must be one of 1-1000.'
 					]
 				]
 			],

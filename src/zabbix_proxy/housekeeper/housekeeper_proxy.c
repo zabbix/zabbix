@@ -32,7 +32,8 @@
  * Purpose: remove outdated information from historical table                 *
  *                                                                            *
  * Parameters: table                 - [IN]                                   *
- *             fieldname             - [IN]                                   *
+ *             lastid_field          - [IN] lastid field name in ids table    *
+ *             clock_field           - [IN] record creation timestamp field   *
  *             now                   - [IN] current timestamp                 *
  *             config_offline_buffer - [IN] hours to keep data when offline   *
  *             config_local_buffer   - [IN] hours to keep data                *
@@ -40,8 +41,8 @@
  * Return value: number of rows records                                       *
  *                                                                            *
  ******************************************************************************/
-static int	delete_history(const char *table, const char *fieldname, int now, int config_offline_buffer,
-		int config_local_buffer)
+static int	delete_history(const char *table, const char *lastid_field, const char *clock_field, int now,
+		int config_offline_buffer, int config_local_buffer)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -58,7 +59,7 @@ static int	delete_history(const char *table, const char *fieldname, int now, int
 			" from ids"
 			" where table_name='%s'"
 				" and field_name='%s'",
-			table, fieldname);
+			table, lastid_field);
 
 	if (NULL == (row = zbx_db_fetch(result)))
 		goto rollback;
@@ -76,17 +77,16 @@ static int	delete_history(const char *table, const char *fieldname, int now, int
 	zbx_db_free_result(result);
 
 	if (0 != config_local_buffer)
-		condition = zbx_dsprintf(NULL, " and clock<%d", now - config_local_buffer * SEC_PER_HOUR);
+		condition = zbx_dsprintf(NULL, " and %s<%d", clock_field, now - config_local_buffer * SEC_PER_HOUR);
 
 	records = zbx_db_execute(
 			"delete from %s"
 			" where id<" ZBX_FS_UI64
-				" and (clock<%d"
+				" and (%s<%d"
 					" or (id<=" ZBX_FS_UI64 "%s))",
 			table, maxid,
-			now - config_offline_buffer * SEC_PER_HOUR,
-			lastid,
-			ZBX_NULL2EMPTY_STR(condition));
+			clock_field, now - config_offline_buffer * SEC_PER_HOUR,
+			lastid, ZBX_NULL2EMPTY_STR(condition));
 	zbx_free(condition);
 
 	zbx_db_commit();
@@ -118,9 +118,11 @@ static int	housekeeping_history(int now, int config_offline_buffer, int config_l
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	records += delete_history("proxy_history", "history_lastid", now, config_offline_buffer, config_local_buffer);
-	records += delete_history("proxy_dhistory", "dhistory_lastid", now, config_offline_buffer, config_local_buffer);
-	records += delete_history("proxy_autoreg_host", "autoreg_host_lastid", now, config_offline_buffer,
+	records += delete_history("proxy_history", "history_lastid", "write_clock", now, config_offline_buffer,
+			config_local_buffer);
+	records += delete_history("proxy_dhistory", "dhistory_lastid", "clock", now, config_offline_buffer,
+			config_local_buffer);
+	records += delete_history("proxy_autoreg_host", "autoreg_host_lastid", "clock", now, config_offline_buffer,
 			config_local_buffer);
 
 	return records;

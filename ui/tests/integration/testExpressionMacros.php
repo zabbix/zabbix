@@ -38,6 +38,7 @@ class testExpressionMacros extends CIntegrationTest {
 	const MESSAGE_PREFIX_RECOVERY = 'recovery message with expression macro: ';
 	const SUBJECT_PREFIX_RECOVERY = 'recovery subject with expression macro: ';
 	const EVENT_PREFIX = 'event name with expression macro: ';
+	const TIMESTAMP_PREFIX = '/macro/timestamp:';
 	const VALUE_TO_FIRE_TRIGGER = 3;
 	const VALUE_TO_RECOVER_TRIGGER = 2;
 
@@ -154,7 +155,8 @@ class testExpressionMacros extends CIntegrationTest {
 								'/macro/macro:{?last(/{HOST.HOST}/{ITEM.KEY})}'.
 								'/macroN/macro:{?last(/{HOST.HOST1}/{ITEM.KEY})}'.
 								'/macro/macroN:{?last(/{HOST.HOST}/{ITEM.KEY2})}'.
-								'/empty/macroN:{?last(//{ITEM.KEY2})}'
+								'/empty/macroN:{?last(//{ITEM.KEY2})}'.
+								self::TIMESTAMP_PREFIX.'{TIMESTAMP}'
 					],
 					'opmessage_grp' => [
 						['usrgrpid' => 7]
@@ -257,6 +259,11 @@ class testExpressionMacros extends CIntegrationTest {
 	 * Test expression macro with {HOST.HOST} and {ITEM.KEY} macros
 	 */
 	public function testExpressionMacros_checkMacros() {
+		$string = self::$alert_response['result'][1]['message'];
+		$position = strpos($string, self::TIMESTAMP_PREFIX);
+		$macroses = substr($string, 0, $position);
+		$timestamp = intval(substr($string, $position + strlen(self::TIMESTAMP_PREFIX)));
+
 		$this->assertEquals(self::MESSAGE_PREFIX.self::VALUE_TO_FIRE_TRIGGER.
 				'/host/macro:'.self::VALUE_TO_FIRE_TRIGGER.
 				'/empty/macro:'.self::VALUE_TO_FIRE_TRIGGER.
@@ -264,7 +271,9 @@ class testExpressionMacros extends CIntegrationTest {
 				'/macroN/macro:'.self::VALUE_TO_FIRE_TRIGGER.
 				'/macro/macroN:'.self::VALUE_TO_RECOVER_TRIGGER.
 				'/empty/macroN:'.self::VALUE_TO_RECOVER_TRIGGER,
-				self::$alert_response['result'][1]['message']);
+				$macroses);
+
+		$this->assertTrue(abs($timestamp - microtime(true)) < 100);
 	}
 
 	/**

@@ -1129,12 +1129,12 @@ static int	vmware_job_compare_nextcheck(const void *d1, const void *d2)
 
 #define REFCOUNT_FIELD_SIZE	sizeof(zbx_uint32_t)
 
-static int	vmware_strpool_compare_func(const void *d1, const void *d2)
+int	vmware_strpool_compare_func(const void *d1, const void *d2)
 {
 	return strcmp((const char *)d1 + REFCOUNT_FIELD_SIZE, (const char *)d2 + REFCOUNT_FIELD_SIZE);
 }
 
-static zbx_hash_t	vmware_strpool_hash_func(const void *data)
+zbx_hash_t	vmware_strpool_hash_func(const void *data)
 {
 	return ZBX_DEFAULT_STRING_HASH_FUNC((const char *)data + REFCOUNT_FIELD_SIZE);
 }
@@ -1211,8 +1211,7 @@ void	zbx_shmem_vmware_key_value_free(zbx_vmware_key_value_t *value)
  * Comments: This function must be called before worker threads are forked.   *
  *                                                                            *
  ******************************************************************************/
-int	vmware_shmem_init(zbx_uint64_t *config_vmware_cache_size, zbx_vmware_t **vmware, zbx_hashset_t *evt_msg_strpool,
-		char **error)
+int	vmware_shmem_init(zbx_uint64_t *config_vmware_cache_size, zbx_vmware_t **vmware, char **error)
 {
 	int		ret = FAIL;
 	zbx_uint64_t	size_reserved;
@@ -1237,13 +1236,10 @@ int	vmware_shmem_init(zbx_uint64_t *config_vmware_cache_size, zbx_vmware_t **vmw
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 	(*vmware)->strpool_sz = 0;
 
-	zbx_hashset_create(evt_msg_strpool, 100, vmware_strpool_hash_func, vmware_strpool_compare_func);
 	zbx_hashset_create_ext(&(*vmware)->strpool, 100, vmware_strpool_hash_func, vmware_strpool_compare_func, NULL,
 		__vm_shmem_malloc_func, __vm_shmem_realloc_func, __vm_shmem_free_func);
 	zbx_binary_heap_create_ext(&(*vmware)->jobs_queue, vmware_job_compare_nextcheck, ZBX_BINARY_HEAP_OPTION_EMPTY,
 			__vm_shmem_malloc_func, __vm_shmem_realloc_func, __vm_shmem_free_func);
-#else
-	ZBX_UNUSED(evt_msg_strpool);
 #endif
 	ret = SUCCEED;
 out:

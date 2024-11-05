@@ -16,22 +16,24 @@ package oracle
 
 import (
 	"context"
-	"fmt"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
 func archiveHandler(ctx context.Context, conn OraClient, params map[string]string, _ ...string) (interface{}, error) {
 	var archiveLogs string
 
-	row, err := conn.QueryRow(ctx, getArchiveQuery(params["Destination"]))
+	query, args := getArchiveQuery(params["Destination"])
+
+	row, err := conn.QueryRow(ctx, query, args...)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	err = row.Scan(&archiveLogs)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	if archiveLogs == "" {
@@ -41,13 +43,8 @@ func archiveHandler(ctx context.Context, conn OraClient, params map[string]strin
 	return archiveLogs, nil
 }
 
-func getArchiveQuery(name string) string {
-	var whereStr string
-	if name != "" {
-		whereStr = fmt.Sprintf(`AND DEST_NAME = '%s'`, name)
-	}
-
-	return fmt.Sprintf(`
+func getArchiveQuery(destName string) (string, []any) {
+	const query = `
 	SELECT
 		JSON_ARRAYAGG(
 			JSON_OBJECT(d.DEST_NAME VALUE
@@ -63,7 +60,11 @@ func getArchiveQuery(name string) string {
 		V$DATABASE db
 	WHERE 
 		d.STATUS != 'INACTIVE' 
-		AND db.LOG_MODE = 'ARCHIVELOG'
-		%s
-`, whereStr)
+		AND db.LOG_MODE = 'ARCHIVELOG'`
+
+	if destName != "" {
+		return query + " AND d.DEST_NAME = :1", []any{destName}
+	}
+
+	return query, nil
 }

@@ -45,6 +45,7 @@
 #define ZBX_REQUEST_ITEM_LOG_SEVERITY		205
 #define ZBX_REQUEST_ITEM_LOG_NSEVERITY		206
 #define ZBX_REQUEST_ITEM_LOG_EVENTID		207
+#define ZBX_REQUEST_ITEM_LOG_TIMESTAMP		208
 
 const char	*item_logtype_string(unsigned char logtype);
 const char	*alert_type_string(unsigned char type);

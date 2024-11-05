@@ -449,7 +449,7 @@ static int	vmware_hv_get_parent_data(const zbx_vmware_service_t *service, CURL *
 
 	ret = SUCCEED;
 out:
-	zbx_xml_free_doc(doc);
+	zbx_xml_doc_free(doc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -821,8 +821,7 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 
 	while (NULL != iter->token)
 	{
-		zbx_xml_free_doc(doc);
-		doc = NULL;
+		zbx_xml_doc_free(doc);
 
 		if (SUCCEED != (ret = zbx_property_collection_next(__func__, iter, &doc, error)))
 			goto out;
@@ -854,8 +853,7 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 
 	while (NULL != iter->token)
 	{
-		zbx_xml_free_doc(doc_dinfo);
-		doc_dinfo = NULL;
+		zbx_xml_doc_free(doc_dinfo);
 
 		if (SUCCEED != (ret = zbx_property_collection_next(__func__, iter, &doc_dinfo, error)))
 			goto out;
@@ -864,8 +862,8 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 	}
 out:
 	zbx_free(tmp);
-	zbx_xml_free_doc(doc);
-	zbx_xml_free_doc(doc_dinfo);
+	zbx_xml_doc_free(doc);
+	zbx_xml_doc_free(doc_dinfo);
 	zbx_vector_str_destroy(&scsi_luns);
 	zbx_property_collection_free(iter);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s for %d(vsan:%d) / %d", __func__, zbx_result_string(ret), updated,
@@ -1416,8 +1414,8 @@ int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandle, cons
 
 	ret = SUCCEED;
 out:
-	zbx_xml_free_doc(multipath_data);
-	zbx_xml_free_doc(details);
+	zbx_xml_doc_free(multipath_data);
+	zbx_xml_doc_free(details);
 
 	zbx_vector_str_clear_ext(&vms, zbx_str_free);
 	zbx_vector_str_destroy(&vms);
