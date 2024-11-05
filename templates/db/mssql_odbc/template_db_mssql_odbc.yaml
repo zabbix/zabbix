@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-11-04T09:03:49Z'
+  date: '2024-11-05T13:33:02Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -34,7 +34,7 @@ zabbix_export:
         
           Note! Credentials in the odbc.ini do not work for MSSQL.
         
-        The "Service's TCP port state" item uses the {HOST.CONN} and {$MSSQL.PORT} macros to check the availability of the MSSQL instance.
+        The "Service's TCP port state" item uses the {HOST.CONN} and {$MSSQL.PORT} macros to check the availability of the MSSQL instance. But keep in mind that if dynamic ports are used on the MSSQL server side, this check will not work correctly.
         
         If your instance uses a non-default TCP port, set the port in your section of odbc.ini in the line Server = IP or FQDN name, port.
         

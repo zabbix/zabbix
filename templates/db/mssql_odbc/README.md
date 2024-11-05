@@ -50,7 +50,7 @@ See Microsoft documentation for instructions: https://docs.microsoft.com/en-us/s
 
 **Note! Credentials in the `odbc.ini` do not work for MSSQL.**
 
-The `Service's TCP port state` item uses the `{HOST.CONN}` and `{$MSSQL.PORT}` macros to check the availability of the MSSQL instance.
+The `Service's TCP port state` item uses the `{HOST.CONN}` and `{$MSSQL.PORT}` macros to check the availability of the MSSQL instance. But keep in mind that if dynamic ports are used on the MSSQL server side, this check will not work correctly.
 
 If your instance uses a non-default TCP port, set the port in your section of `odbc.ini` in the line Server = IP or FQDN name, port.
 
