@@ -446,14 +446,12 @@ class testPageHostGroups extends CWebTest {
 			// Space trimming.
 			[
 				[
-					'Name' => '   enabled   ',
-					'expected' => ['Group with enabled host testPageHostGroups', self::GROUP_ENABLED]
+					'Name' => '   enabled   '
 				]
 			],
 			[
 				[
-					'Name' => '   ',
-					'all' => true
+					'Name' => '   '
 				]
 			],
 			// Not case sensitive.
