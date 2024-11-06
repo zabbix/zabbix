@@ -35,28 +35,23 @@ window.tophosts_column_edit_form = new class {
 	 */
 	#form;
 
-	/**
-	 * @type {HTMLTableElement}
-	 */
-	#thresholds_table;
-
-	/**
-	 * @type {HTMLTableElement}
-	 */
-	#highlights_table;
-
 	init({form_id, thresholds, highlights, colors, groupids, hostids}) {
 		this.#overlay = overlays_stack.getById('tophosts-column-edit-overlay');
 		this.#dialogue = this.#overlay.$dialogue[0];
 		this.#form = document.getElementById(form_id);
 
-		this.#thresholds_table = document.getElementById('thresholds_table');
-		this.#highlights_table = document.getElementById('highlights_table');
+		const inputs = this.#form.querySelectorAll('[name="data"], [name="aggregate_function"], [name="display"], '
+			+ '[name="history"], [name="display_value_as"]');
 
-		this.#form.querySelectorAll('[name="data"], [name="aggregate_function"], [name="display"], [name="history"]')
-			.forEach(element => {
-				element.addEventListener('change', () => this.#updateForm());
-			});
+		for (const input of inputs) {
+			input.addEventListener('change', () => this.#updateForm());
+		}
+
+		this.#form.addEventListener('change', ({target}) => {
+			if (target.matches('[type="text"]')) {
+				target.value = target.value.trim();
+			}
+		});
 
 		// Initialize item multiselect.
 		$('#item').on('change', () => {
@@ -83,17 +78,15 @@ window.tophosts_column_edit_form = new class {
 
 		colorPalette.setThemeColors(colors);
 
-		// Initialize Display item value as and Display event listener
-		document.getElementById('display_value_as').addEventListener('change', () => this.#updateForm());
-		document.getElementById('display').addEventListener('change', () => this.#updateForm());
+		const thresholds_table = document.getElementById('thresholds_table');
 
 		// Initialize thresholds table.
-		$(this.#thresholds_table)
+		$(thresholds_table)
 			.dynamicRows({
 				rows: thresholds,
 				template: '#thresholds-row-tmpl',
 				allow_empty: true,
-				dataCallback: (row_data) => {
+				dataCallback: row_data => {
 					if (!('color' in row_data)) {
 						const colors = this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input');
 						const used_colors = [];
@@ -108,43 +101,8 @@ window.tophosts_column_edit_form = new class {
 					}
 				}
 			})
-			.on('afteradd.dynamicRows', e => {
-				const $colorpicker = $('tr.form_row:last input[name$="[color]"]', e.target);
-
-				$colorpicker.colorpicker({appendTo: $colorpicker.closest('.input-color-picker')});
-
-				this.#updateForm();
-			})
-			.on('afterremove.dynamicRows', () => this.#updateForm())
-			.on('change', (e) => e.target.value = e.target.value.trim());
-
-		for (const colorpicker of this.#thresholds_table.querySelectorAll('tr.form_row input[name$="[color]"]')) {
-			$(colorpicker).colorpicker({appendTo: $(colorpicker).closest('.input-color-picker')});
-		}
-
-		// Initialize highlights table.
-		$(this.#highlights_table)
-			.dynamicRows({
-				rows: highlights,
-				template: '#highlights-row-tmpl',
-				allow_empty: true,
-				dataCallback: (row_data) => {
-					if (!('color' in row_data)) {
-						const colors = this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input');
-						const used_colors = [];
-
-						for (const color of colors) {
-							if (color.value !== '') {
-								used_colors.push(color.value);
-							}
-						}
-
-						row_data.color = colorPalette.getNextColor(used_colors);
-					}
-				}
-			})
-			.on('afteradd.dynamicRows', e => {
-				const $colorpicker = $('tr.form_row:last input[name$="[color]"]', e.target);
+			.on('afteradd.dynamicRows', ({target}) => {
+				const $colorpicker = $('tr.form_row:last input[name$="[color]"]', target);
 
 				$colorpicker.colorpicker({appendTo: $colorpicker.closest('.input-color-picker')});
 
@@ -152,19 +110,54 @@ window.tophosts_column_edit_form = new class {
 			})
 			.on('afterremove.dynamicRows', () => this.#updateForm());
 
-		for (const colorpicker of this.#highlights_table.querySelectorAll('tr.form_row input[name$="[color]"]')) {
+		for (const colorpicker of thresholds_table.querySelectorAll('tr.form_row input[name$="[color]"]')) {
 			$(colorpicker).colorpicker({appendTo: $(colorpicker).closest('.input-color-picker')});
+		}
+
+		const highlights_table = document.getElementById('highlights_table');
+
+		// Initialize highlights table.
+		$(highlights_table)
+			.dynamicRows({
+				rows: highlights,
+				template: '#highlights-row-tmpl',
+				allow_empty: true,
+				dataCallback: row_data => {
+					if (!('color' in row_data)) {
+						const colors = this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input');
+						const used_colors = [];
+
+						for (const color of colors) {
+							if (color.value !== '') {
+								used_colors.push(color.value);
+							}
+						}
+
+						row_data.color = colorPalette.getNextColor(used_colors);
+					}
+				}
+			})
+			.on('afteradd.dynamicRows', ({target}) => {
+				const $colorpicker = $('tr.form_row:last input[name$="[color]"]', target);
+
+				$colorpicker.colorpicker({appendTo: $colorpicker.closest('.input-color-picker')});
+
+				this.#updateForm();
+			})
+			.on('afterremove.dynamicRows', () => this.#updateForm());
+
+		for (const colorpicker of highlights_table.querySelectorAll('tr.form_row input[name$="[color]"]')) {
+			$(colorpicker).colorpicker({appendTo: $(colorpicker).closest('.input-color-picker')});
+		}
+
+		for (const input of this.#form.querySelectorAll('[type="text"]')) {
+			input.value = input.value.trim();
 		}
 
 		// Initialize Advanced configuration collapsible.
 		new CFormFieldsetCollapsible(document.getElementById('advanced-configuration'));
 
-		// Field trimming.
-		this.#form.querySelectorAll('[name="name"], [name="min"], [name="max"]').forEach(element => {
-			element.addEventListener('change', (e) => e.target.value = e.target.value.trim(), {capture: true});
-		});
-
-		// Initialize form elements accessibility.
+		// Initialize form elements.
 		this.#updateForm();
 
 		this.#form.style.display = '';
@@ -392,7 +385,7 @@ window.tophosts_column_edit_form = new class {
 
 				this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 			})
-			.catch((exception) => {
+			.catch(exception => {
 				for (const element of this.#form.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
