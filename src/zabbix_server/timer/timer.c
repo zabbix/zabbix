@@ -552,17 +552,18 @@ static int	db_update_event_suppress_data(int *suppressed_num)
 		zbx_db_insert_autoincrement(&db_insert, "event_suppressid");
 		zbx_db_insert_execute(&db_insert);
 cleanup:
-		txn_rc = DBcommit();
-
-		if (0 != del_event_maintenances.values_num || 0 != suppressed.values_num)
+		if (ZBX_DB_OK == (txn_rc = DBcommit()))
 		{
-			if (0 != zbx_dc_get_itservices_num())
+			if (0 != del_event_maintenances.values_num || 0 != suppressed.values_num)
 			{
-				if (0 != del_event_maintenances.values_num)
-					service_send_suppression_data(&del_event_maintenances, 0);
+				if (0 != zbx_dc_get_itservices_num())
+				{
+					if (0 != del_event_maintenances.values_num)
+						service_send_suppression_data(&del_event_maintenances, 0);
 
-				if (0 != suppressed.values_num)
-					service_send_suppression_data(&suppressed, 1);
+					if (0 != suppressed.values_num)
+						service_send_suppression_data(&suppressed, 1);
+				}
 			}
 		}
 
