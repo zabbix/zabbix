@@ -113,6 +113,7 @@ zbx_lld_hgsets_test_SOURCES = \
 	../../../src/zabbix_server/lld/lld_graph.c \
 	../../../src/zabbix_server/lld/lld_audit.c \
 	../../../src/zabbix_server/lld/lld_item.c \
+	../../../src/zabbix_server/lld/lld_item_dep.c \
 	../../../src/zabbix_server/lld/lld_trigger.c \
 	../../../src/zabbix_server/lld/lld.c \
 	zbx_lld_hgsets_test.c \
