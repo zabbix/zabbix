@@ -33,6 +33,9 @@ const (
 
 	tcpProtocol = "tcp"
 	udpProtocol = "udp"
+
+	inAddrSuffix   = ".in-addr.arpa"
+	inAddrV6Suffix = ".ip6.arpa"
 )
 
 const (
@@ -512,7 +515,9 @@ func runQuery(resolver, domain, net string, record uint16, timeout time.Duration
 	}
 
 	var err error
-	if record == dns.TypePTR {
+	if record == dns.TypePTR &&
+		!strings.HasSuffix(domain, inAddrSuffix) &&
+		!strings.HasSuffix(domain, inAddrV6Suffix) {
 		domain, err = dns.ReverseAddr(domain)
 		if err != nil {
 			return nil, err
