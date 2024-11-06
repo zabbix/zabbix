@@ -201,7 +201,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			]],
 			'item'					=> ['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],
-												'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
+												'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
 											['else' => true,
 												'type' => API_STRING_UTF8]
 			]],
