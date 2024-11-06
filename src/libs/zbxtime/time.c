@@ -322,6 +322,51 @@ struct tm	*zbx_localtime(const time_t *time, const char *tz)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: get broken-down representation of the time in specified time zone *
+ *                                                                            *
+ * Parameters: time - [IN] input time                                         *
+ *             tz   - [IN] time zone                                          *
+ *                                                                            *
+ * Return value: broken-down representation of the time in specified time zone*
+ *                                                                            *
+ ******************************************************************************/
+void zbx_localtime_r(const time_t *time, struct tm *timeinfo, const char *tz)
+{
+#if defined(HAVE_GETENV) && defined(HAVE_UNSETENV) && defined(HAVE_TZSET) && \
+		!defined(_WINDOWS) && !defined(__MINGW32__)
+	char		*old_tz;
+	struct tm	*tm;
+
+	if (NULL == tz || 0 == strcmp(tz, "system"))
+		return localtime_r(time, timeinfo);
+
+	if (NULL != (old_tz = getenv("TZ")))
+		old_tz = zbx_strdup(NULL, old_tz);
+
+	setenv("TZ", tz, 1);
+
+	tzset();
+	localtime_r(time, timeinfo);
+
+	if (NULL != old_tz)
+	{
+		setenv("TZ", old_tz, 1);
+		zbx_free(old_tz);
+	}
+	else
+		unsetenv("TZ");
+
+	tzset();
+
+	return;
+#else
+	ZBX_UNUSED(tz);
+	localtime_r(time, timeinfo);
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get broken-down representation of the time and cache result       *
  *                                                                            *
  * Parameters: time - [IN] input time                                         *
@@ -558,14 +603,14 @@ static void	tm_add_seconds(struct tm *tm, int seconds, const char *tz)
 	}
 
 	time_new += seconds;
-	localtime_r(&time_new, &tm_new);
+	zbx_localtime_r(&time_new, &tm_new, tz);
 
 	if (tm->tm_isdst != tm_new.tm_isdst && -1 != tm->tm_isdst && -1 != tm_new.tm_isdst)
 	{
 		if (0 == tm_new.tm_isdst)
-			tm_add(&tm_new, 1, ZBX_TIME_UNIT_HOUR);
+			zbx_tm_add(&tm_new, 1, ZBX_TIME_UNIT_HOUR, tz);
 		else
-			tm_sub(&tm_new, 1, ZBX_TIME_UNIT_HOUR);
+			zbx_tm_sub(&tm_new, 1, ZBX_TIME_UNIT_HOUR, tz);
 	}
 
 	*tm = tm_new;
@@ -1199,7 +1244,7 @@ int	zbx_iso8601_utc(const char *str, time_t *time)
 	long int	offset;
 	struct tm	tm;
 
-	if ( 0 == isdigit(*str) || ZBX_CONST_STRLEN("1234-12-12T12:12:12") > strlen(str) ||
+	if (0 == isdigit(*str) || ZBX_CONST_STRLEN("1234-12-12T12:12:12") > strlen(str) ||
 			('T' != str[10] && ' ' != str[10]) ||
 			'-' != str[4] || '-' != str[7] || ':' != str[13] || ':' != str[16])
 	{
@@ -1233,7 +1278,7 @@ int	zbx_iso8601_utc(const char *str, time_t *time)
 	{
 		int	t;
 
-		if(FAIL == zbx_utc_time(tm.tm_year, tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, &t))
+		if (FAIL == zbx_utc_time(tm.tm_year, tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, &t))
 			return FAIL;
 
 		*time = t - offset;
