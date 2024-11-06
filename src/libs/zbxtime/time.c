@@ -330,15 +330,17 @@ struct tm	*zbx_localtime(const time_t *time, const char *tz)
  * Return value: broken-down representation of the time in specified time zone*
  *                                                                            *
  ******************************************************************************/
-void zbx_localtime_r(const time_t *time, struct tm *timeinfo, const char *tz)
+static void zbx_localtime_r(const time_t *time, struct tm *timeinfo, const char *tz)
 {
 #if defined(HAVE_GETENV) && defined(HAVE_UNSETENV) && defined(HAVE_TZSET) && \
 		!defined(_WINDOWS) && !defined(__MINGW32__)
 	char		*old_tz;
-	struct tm	*tm;
 
 	if (NULL == tz || 0 == strcmp(tz, "system"))
-		return localtime_r(time, timeinfo);
+	{
+		localtime_r(time, timeinfo);
+		return;
+	}
 
 	if (NULL != (old_tz = getenv("TZ")))
 		old_tz = zbx_strdup(NULL, old_tz);
