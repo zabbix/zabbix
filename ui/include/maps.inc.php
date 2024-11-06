@@ -797,6 +797,18 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 			}
 		}
 
+		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
+			$selement_hosts = [];
+
+			foreach ($sysmaps_data as $sysmap_elements) {
+				foreach ($sysmap_elements['selements'] as $sysmap_element) {
+					$selement_hosts = array_merge($selement_hosts, array_keys($sysmap_element['hosts']));
+				}
+			}
+
+			$selement['hosts'] = array_unique($selement_hosts);
+		}
+
 		foreach ($selement['hosts'] as $hostid) {
 			$host = $hosts[$hostid];
 
