@@ -101,6 +101,7 @@ static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offse
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_SERIAL_STR);
 			break;
 		default:
+			zbx_this_should_never_happen_backtrace();
 			assert(0);
 	}
 }
@@ -124,6 +125,7 @@ static void	DBfield_type_suffix_string(char **sql, size_t *sql_alloc, size_t *sq
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " %s", ZBX_TYPE_SERIAL_SUFFIX_STR);
 			break;
 		default:
+			zbx_this_should_never_happen_backtrace();
 			assert(0);
 	}
 }
