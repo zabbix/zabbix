@@ -951,7 +951,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1": the parameter "item" is missing.'
+						'Invalid parameter "/1/item": cannot be empty.'
 					]
 				]
 			],
@@ -1834,7 +1834,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					],
 					'column_error' => [
-						'Invalid parameter "/1": the parameter "item" is missing.'
+						'Invalid parameter "/1/item": cannot be empty.'
 					]
 				]
 			],
