@@ -619,8 +619,13 @@ static int tls_ready(tls_t *tls)
 static int tls_close(tls_t *tls)
 {
 	int	ret;
+
+	if (0 != (SSL_get_shutdown(tls->ssl) & SSL_RECEIVED_SHUTDOWN))
+		return 0;
+
 	if (0 > (ret = SSL_shutdown(tls->ssl)) && SSL_ERROR_WANT_READ == SSL_get_error(tls->ssl, ret))
 		return 0;
+
 	return ret;
 }
 
@@ -1081,6 +1086,7 @@ func (c *tlsConn) SetWriteDeadline(t time.Time) error {
 func (c *tlsConn) Close() (err error) {
 	log.Tracef("Calling C function \"tls_close()\"")
 	cr := C.tls_close((*C.tls_t)(c.tls))
+	c.flushTLS()
 	c.conn.Close()
 
 	log.Tracef("Calling C function \"tls_free()\"")
