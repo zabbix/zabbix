@@ -991,9 +991,6 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 
 	do
 	{
-		if (0 == parsed_count && 0 != node_count)
-			break;
-
 		zbx_xml_doc_free(doc);
 
 		if ((ZBX_MAXQUERYMETRICS_UNLIMITED / 2) >= soap_count)
