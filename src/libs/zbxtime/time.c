@@ -623,7 +623,6 @@ static void	tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
  * Parameter: tm         - [IN/OUT] the time structure                        *
  *            multiplier - [IN] the unit multiplier                           *
  *            base       - [IN] the time unit to add                          *
- *            tz         - [IN] time zone                                     *
  *                                                                            *
  ******************************************************************************/
 void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
@@ -731,7 +730,6 @@ static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
  * Parameter: tm         - [IN/OUT] the time structure                        *
  *            multiplier - [IN] the unit multiplier                           *
  *            base       - [IN] the time unit to add                          *
- *            tz         - [IN] time zone                                     *
  *                                                                            *
  ******************************************************************************/
 void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
@@ -772,7 +770,6 @@ void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
  *                                                                            *
  * Parameter: tm         - [IN/OUT] the time structure                        *
  *            base       - [IN] the time unit                                 *
- *            tz         - [IN] time zone                                     *
  *                                                                            *
  ******************************************************************************/
 void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base)
@@ -838,7 +835,6 @@ void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base)
  *                                                                            *
  * Parameter: tm         - [IN/OUT] the time structure                        *
  *            base       - [IN] the time unit                                 *
- *            tz         - [IN] time zone                                     *
  *                                                                            *
  ******************************************************************************/
 void	zbx_tm_round_down(struct tm *tm, zbx_time_unit_t base)
