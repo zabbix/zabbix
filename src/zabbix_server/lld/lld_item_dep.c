@@ -385,8 +385,8 @@ static void	lld_item_node_update_parent(zbx_vector_lld_item_full_ptr_t *items,
 			{
 				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
 
-				*error = zbx_strdcatf(*error, "Cannot %s item: too many dependency levels.\n",
-						(0 != item->itemid ? "update" : "create"));
+				*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": too many dependency levels.\n",
+						(0 != item->itemid ? "update" : "create"), item->key);
 				continue;
 			}
 
@@ -396,8 +396,8 @@ static void	lld_item_node_update_parent(zbx_vector_lld_item_full_ptr_t *items,
 			if (ZBX_DEPENDENT_ITEM_MAX_COUNT < total)
 			{
 				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
-				*error = zbx_strdcatf(*error, "Cannot %s item: too many dependent items.\n",
-						(0 != item->itemid ? "update" : "create"));
+				*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": too many dependent items.\n",
+						(0 != item->itemid ? "update" : "create"), item->key);
 				continue;
 			}
 		}

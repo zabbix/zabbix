@@ -38,9 +38,6 @@
 #include "zbxtime.h"
 #include "../server_constants.h"
 
-#define	ZBX_DEPENDENT_ITEM_MAX_COUNT	29999
-#define	ZBX_DEPENDENT_ITEM_MAX_LEVELS	3
-
 ZBX_PTR_VECTOR_IMPL(lld_item_full_ptr, zbx_lld_item_full_t*)
 
 ZBX_PTR_VECTOR_IMPL(lld_item_preproc_ptr, zbx_lld_item_preproc_t*)
