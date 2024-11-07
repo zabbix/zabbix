@@ -48,7 +48,7 @@ void	zbx_mock_test_entry(void **state)
 	time_tmp = ts_in.sec;
 	tm = *localtime(&time_tmp);
 
-	zbx_tm_round_up(&tm, base, NULL);
+	zbx_tm_round_up(&tm, base);
 
 	if (0 > tm.tm_hour || 23 < tm.tm_hour)
 		fail_msg("invalid tm_hour:%d", tm.tm_hour);

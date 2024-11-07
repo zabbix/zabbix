@@ -67,16 +67,11 @@ void	zbx_mock_test_entry(void **state)
 	int			start_time, step = 1;
 	zbx_mock_handle_t	htimes, htime;
 	zbx_mock_error_t	err;
-	char			buf[MAX_STRING_LEN];
-	const char		*report_tz;
+	char			buf[MAX_STRING_LEN], *old_tz;
 
 	ZBX_UNUSED(state);
 
-	report_tz = zbx_mock_get_parameter_string("in.timezone");
-	if (0 != setenv("TZ", report_tz, 1))
-		fail_msg("Cannot set 'TZ' environment variable: %s", zbx_strerror(errno));
-
-	tzset();
+	old_tz = zbx_set_time_zone(zbx_mock_get_parameter_string("in.timezone"));
 
 	cycle = mock_get_cycle("in.cycle");
 	weekdays = mock_get_weekdays("in.weekdays");
@@ -100,12 +95,18 @@ void	zbx_mock_test_entry(void **state)
 		if (ZBX_MOCK_SUCCESS != (err = zbx_strtime_to_timespec(value, &ts)))
 			fail_msg("[%d] cannot parse nextcheck timestamp: %s", step, zbx_mock_error_string(err));
 
-		if (FAIL == (nextcheck = zbx_get_report_nextcheck(now, cycle, weekdays, start_time, report_tz)))
+		if (FAIL == (nextcheck = zbx_get_report_nextcheck(now, cycle, weekdays, start_time)))
 			fail_msg("[%d] cannot calculate report nextcheck", step);
 
 		zbx_snprintf(buf, sizeof(buf), "[%d] invalid report nextchek value", step++);
 		zbx_mock_assert_time_eq(buf, ts.sec, nextcheck);
 
 		now = nextcheck;
+	}
+
+	if (NULL != old_tz)
+	{
+		zbx_set_time_zone(old_tz);
+		zbx_free(old_tz);
 	}
 }
