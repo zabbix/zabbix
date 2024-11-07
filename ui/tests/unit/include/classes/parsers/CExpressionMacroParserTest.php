@@ -134,6 +134,16 @@ class CExpressionMacroParserTest extends TestCase {
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '{?nodata(/Zabbix server/system.cpu.load, "\\ ")}',
 				'length' => 47
+			]],
+			['text {? min({FUNCTION.VALUE}, {FUNCTION.VALUE9}) / {FUNCTION.RECOVERY.VALUE1} } text', ['macros_n' => ['{FUNCTION.VALUE}', '{FUNCTION.RECOVERY.VALUE}']], 5, [
+				'rc' => CParser::PARSE_SUCCESS_CONT,
+				'match' => '{? min({FUNCTION.VALUE}, {FUNCTION.VALUE9}) / {FUNCTION.RECOVERY.VALUE1} }',
+				'length' => 74
+			]],
+			['text {? min({FUNCTION.VALUE}, {FUNCTION.VALUE9}) / {FUNCTION.RECOVERY.VALUE1} } text', ['macros_n' => ['{FUNCTION.VALUE}']], 5, [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'length' => 0
 			]]
 		];
 	}

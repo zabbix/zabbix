@@ -81,8 +81,7 @@ class CMediatype extends CApiService {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// permission check
-		if ((self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN && $options['editable'])
-				|| self::$userData['type'] == USER_TYPE_ZABBIX_USER) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && $options['editable']) {
 			return [];
 		}
 

@@ -771,7 +771,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							'field' => 'Show lines',
 							'value' => 25,
 							'attributes' => [
-								'maxlength' => 3
+								'maxlength' => 4
 							],
 							'mandatory' => true
 						]
@@ -1712,7 +1712,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							'field' => 'Show lines',
 							'value' => 25,
 							'attributes' => [
-								'maxlength' => 3
+								'maxlength' => 4
 							],
 							'mandatory' => true
 						]
@@ -1871,7 +1871,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							'field' => 'Show lines',
 							'value' => 25,
 							'attributes' => [
-								'maxlength' => 3
+								'maxlength' => 4
 							],
 							'mandatory' => true
 						]
@@ -2053,7 +2053,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						[
 							'field' => 'Trigger limit',
 							'attributes' => [
-								'maxlength' => 3
+								'maxlength' => 4
 							],
 							'value' => 10,
 							'mandatory' => true
@@ -2616,7 +2616,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Name' => 'Action log with 0 show lines',
 						'Show lines' => 0
 					],
-					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
 				]
 			],
 			// #1 Action log widget with too big value in Show lines field.
@@ -2626,9 +2626,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Action log'),
 						'Name' => 'Action log with 101 show lines',
-						'Show lines' => 101
+						'Show lines' => 1001
 					],
-					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
 				]
 			],
 			// #2 Action log with default values.
@@ -3602,7 +3602,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					],
 					'error_message' => [
 						'Invalid parameter "Columns": cannot be empty.',
-						'Invalid parameter "Show lines": value must be one of 1-100.'
+						'Invalid parameter "Show lines": value must be one of 1-1000.'
 					]
 				]
 			],
@@ -3613,7 +3613,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
 						'Name' => 'Item history widget with too much lines',
-						'Show lines' => 999
+						'Show lines' => 9999
 					],
 					'Column' => [
 						'Name' => 'Column1',
@@ -3622,7 +3622,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							'context' => ['values' => self::TEMPLATE]
 						]
 					],
-					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
 				]
 			],
 			// #56 Item history widget with negative Show lines parameter.
@@ -3641,7 +3641,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							'context' => ['values' => self::TEMPLATE]
 						]
 					],
-					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
 				]
 			],
 			// #57 Item history widget with Values location = Bottom, Show timestamp =true and Column header = Off.
@@ -3722,7 +3722,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Name' => 'Problems widget with empty Show lines',
 						'Show lines' => ''
 					],
-					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
 				]
 			],
 			// #62 Problems widget with too high value of Show lines parameter.
@@ -3732,9 +3732,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Problems'),
 						'Name' => 'Problems widget with too much lines',
-						'Show lines' => 101
+						'Show lines' => 1001
 					],
-					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
 				]
 			],
 			// #63 Problems widget with negative Show lines parameter.
@@ -3746,7 +3746,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Name' => 'Problems widget with negative Show lines',
 						'Show lines' => -1
 					],
-					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
 				]
 			],
 			// #64 Problems widget with default parameters.
@@ -4034,7 +4034,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Trigger limit' => ''
 					],
 					'page' => '2nd page',
-					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-100.'
+					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-1000.'
 				]
 			],
 			// #83 Top triggers widget with non-numeric Trigger limit.
@@ -4047,10 +4047,10 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Trigger limit' => 'abc'
 					],
 					'swap_expected' => [
-						'Trigger limit' => 0
+						'Trigger limit' => '0'
 					],
 					'page' => '2nd page',
-					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-100.'
+					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-1000.'
 				]
 			],
 			// #84 Top triggers widget with zero Trigger limit.
@@ -4063,7 +4063,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Trigger limit' => 0
 					],
 					'page' => '2nd page',
-					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-100.'
+					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-1000.'
 				]
 			],
 			// #85 Top triggers widget with out of range Trigger limit.
@@ -4073,10 +4073,10 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Top triggers'),
 						'Name' => 'Top triggers widget with out of range Trigger limit',
-						'Trigger limit' => 101
+						'Trigger limit' => 1001
 					],
 					'page' => '2nd page',
-					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-100.'
+					'error_message' => 'Invalid parameter "Trigger limit": value must be one of 1-1000.'
 				]
 			],
 			// #86 Top triggers widget with default parameters.

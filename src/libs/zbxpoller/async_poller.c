@@ -12,11 +12,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "async_poller.h"
 #include "zbxpoller.h"
 
 #include "async_manager.h"
-#include "async_agent.h"
 
 #ifdef HAVE_LIBCURL
 #	include "async_httpagent.h"

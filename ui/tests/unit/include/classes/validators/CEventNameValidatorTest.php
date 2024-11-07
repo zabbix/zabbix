@@ -35,7 +35,7 @@ class CEventNameValidatorTest extends TestCase {
 			['', true, null],
 			['Macro except expression macro are ignored {ANY_MACRO_HERE}', true, null],
 			['Incorrect macro except expression macro are ignored {ANY_MACRO_HERE_ {}', true, null],
-			['Simple expression macro {?100+1} test', true, null],
+			['Simple expression macro {?100+1} {{?100+1}} test', true, null],
 			['Expression macro with modificator {{?100+1-(2)}.anyfunc(2)}', true, null],
 			['Macro as host name {?func(/{HOST.HOST}/item)}', true, null],
 			['Expression macro with incorrect syntax {?123++321}', false, 'incorrect expression starting from "+321}"'],
@@ -43,7 +43,10 @@ class CEventNameValidatorTest extends TestCase {
 			['{?Expression macro without closing bracket', false, 'incorrect expression starting from "Expression macro without closing bracket"'],
 			['Expression macro without closing bracket at the end of event name {?', false, 'incorrect expression starting from ""'],
 			['Nested expression macro not supported {?100+{?20+1}}', false, 'incorrect expression starting from "{?20+1}}"'],
-			['Empty expression macro {?}', false, 'incorrect expression starting from "}"']
+			['Empty expression macro {?}', false, 'incorrect expression starting from "}"'],
+			['Function value macro {FUNCTION.VALUE} {FUNCTION.VALUE1} {?{FUNCTION.VALUE}+{FUNCTION.VALUE9}}', true, null],
+			['Function value macro {FUNCTION.RECOVERY.VALUE} {FUNCTION.RECOVERY.VALUE1} {?{FUNCTION.RECOVERY.VALUE}+{FUNCTION.RECOVERY.VALUE9}}', true, null],
+			['Function value macro {{?{FUNCTION.VALUE}}.regsub("{?", "a")}{{?{FUNCTION.VALUE}}.regsub("{?", "a")}', true, null]
 		];
 	}
 

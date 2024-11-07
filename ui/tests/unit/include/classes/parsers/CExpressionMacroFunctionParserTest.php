@@ -65,10 +65,10 @@ class CExpressionMacroFunctionParserTest extends TestCase {
 				'match' => '{{? last(/{HOST.HOST}/key, #25) }.func()}',
 				'length' => 41
 			]],
-			['text {{? last(/host/key, #25) + max(sum(/host/key, 1d:now/d), sum(/host/key, 1d:now/d-1d)) }.func()} text', 5, [
+			['text {{? last(/host/key, #25) + max(sum(/host/key, 1d:now/d), sum(/host/key, 1d:now/d-1d)) - {FUNCTION.VALUE} }.func()} text', 5, [
 				'rc' => CParser::PARSE_SUCCESS_CONT,
-				'match' => '{{? last(/host/key, #25) + max(sum(/host/key, 1d:now/d), sum(/host/key, 1d:now/d-1d)) }.func()}',
-				'length' => 95
+				'match' => '{{? last(/host/key, #25) + max(sum(/host/key, 1d:now/d), sum(/host/key, 1d:now/d-1d)) - {FUNCTION.VALUE} }.func()}',
+				'length' => 114
 			]],
 			['text {? 1 + 1   text', 5, [
 				'rc' => CParser::PARSE_FAIL,
@@ -90,7 +90,8 @@ class CExpressionMacroFunctionParserTest extends TestCase {
 			'usermacros' => true,
 			'lldmacros' => true,
 			'host_macro_n' => true,
-			'empty_host' => true
+			'empty_host' => true,
+			'macros_n' => ['{FUNCTION.VALUE}']
 		]);
 
 		$this->assertSame($result, [

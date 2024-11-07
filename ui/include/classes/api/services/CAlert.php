@@ -41,6 +41,10 @@ class CAlert extends CApiService {
 	 * @return array|string
 	 */
 	public function get(array $options = []) {
+		$mediatype_output_fields = self::$userData['type'] == USER_TYPE_SUPER_ADMIN
+			? CMediatype::OUTPUT_FIELDS
+			: CMediatype::LIMITED_OUTPUT_FIELDS;
+
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'alertids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
@@ -60,10 +64,7 @@ class CAlert extends CApiService {
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			'groupCount' =>				['type' => API_FLAG, 'default' => false],
 			'selectHosts' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CHost::OUTPUT_FIELDS), 'default' => null],
-			'selectMediatypes' =>		['type' => API_MULTIPLE, 'rules' => [
-											['if' => static fn(): bool => self::$userData['type'] == USER_TYPE_SUPER_ADMIN, 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CMediatype::OUTPUT_FIELDS), 'default' => null],
-											['else' => true, 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CMediatype::LIMITED_OUTPUT_FIELDS), 'default' => null]
-			]],
+			'selectMediatypes' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $mediatype_output_fields), 'default' => null],
 			'selectUsers' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CUser::OUTPUT_FIELDS), 'default' => null],
 			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['alertid', 'actionid', 'eventid', 'userid', 'mediatypeid', 'status', 'acknowledgeid']],
 			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['sendto', 'subject', 'message', 'error']],
@@ -426,13 +427,9 @@ class CAlert extends CApiService {
 			return;
 		}
 
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && $options['selectMediatypes'] === API_OUTPUT_EXTEND) {
-			$options['selectMediatypes'] = CMediatype::LIMITED_OUTPUT_FIELDS;
-		}
-
 		$relation_map = $this->createRelationMap($result, 'alertid', 'mediatypeid');
 
-		$mediatypes = API::getApiService()->select('media_type', [
+		$mediatypes = API::MediaType()->get([
 			'output' => $options['selectMediatypes'],
 			'filter' => ['mediatypeid' => $relation_map->getRelatedIds()],
 			'preservekeys' => true

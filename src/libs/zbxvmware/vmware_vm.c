@@ -1124,7 +1124,7 @@ zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, CURL *e
 			error);
 out:
 	zbx_vector_cq_value_ptr_destroy(&cqvs);
-	zbx_xml_free_doc(details);
+	zbx_xml_doc_free(details);
 
 	if (SUCCEED != ret)
 	{

@@ -60,6 +60,8 @@
 #include "zbxhistory.h"
 #include "zbx_expression_constants.h"
 
+#define	ZBX_VECTOR_ARRAY_RESERVE	3
+
 ZBX_PTR_VECTOR_IMPL(inventory_value_ptr, zbx_inventory_value_t *)
 ZBX_PTR_VECTOR_IMPL(hc_item_ptr, zbx_hc_item_t *)
 ZBX_PTR_VECTOR_IMPL(dc_corr_condition_ptr, zbx_dc_corr_condition_t *)
@@ -2642,7 +2644,6 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
 
-	ZBX_DC_INTERFACE	*interface;
 	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
 	ZBX_DC_HOST		*host;
 
@@ -2661,6 +2662,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
 		zbx_dc_if_update_t	*update;
+		ZBX_DC_INTERFACE	*interface;
 
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
@@ -2735,6 +2737,7 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		update->ip = zbx_strdup(NULL, row[5]);
 		update->dns = zbx_strdup(NULL, row[6]);
+
 		if (SUCCEED == dc_strpool_replace(found, &interface->port, row[7]))
 			update->modified = 1;
 
@@ -2830,10 +2833,10 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		if (0 != update->modified)
 		{
-			if (INTERFACE_TYPE_AGENT == interface->type &&
-					interface->version < ZBX_COMPONENT_VERSION(7, 0, 0))
+			if (INTERFACE_TYPE_AGENT == update->interface->type &&
+					update->interface->version < ZBX_COMPONENT_VERSION(7, 0, 0))
 			{
-				interface->version = ZBX_COMPONENT_VERSION(7, 0, 0);
+				update->interface->version = ZBX_COMPONENT_VERSION(7, 0, 0);
 			}
 
 			dc_host_update_revision(update->host, revision);
@@ -2853,6 +2856,8 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
+		ZBX_DC_INTERFACE	*interface;
+
 		if (NULL == (interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &rowid)))
 			continue;
 
@@ -5749,7 +5754,10 @@ static void	DCsync_trigger_tags(zbx_dbsync_t *sync)
 		{
 			trigger_tag->triggerid = triggerid;
 			if (ZBX_FLAG_DISCOVERY_PROTOTYPE != trigger->flags)
+			{
+				zbx_vector_ptr_reserve(&trigger->tags, ZBX_VECTOR_ARRAY_RESERVE);
 				zbx_vector_ptr_append(&trigger->tags, trigger_tag);
+			}
 		}
 	}
 
@@ -5848,7 +5856,9 @@ static void	DCsync_item_tags(zbx_dbsync_t *sync)
 		if (0 == found)
 		{
 			item_tag->itemid = itemid;
+			zbx_vector_ptr_reserve(&item->tags, ZBX_VECTOR_ARRAY_RESERVE);
 			zbx_vector_ptr_append(&item->tags, item_tag);
+
 		}
 	}
 
@@ -6111,6 +6121,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		if (0 == found)
 		{
 			op->itemid = itemid;
+			zbx_vector_ptr_reserve(&preprocitem->preproc_ops, ZBX_VECTOR_ARRAY_RESERVE);
 			zbx_vector_ptr_append(&preprocitem->preproc_ops, op);
 		}
 	}
@@ -7424,7 +7435,6 @@ static void	DCsync_connectors(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
-
 
 /******************************************************************************
  *                                                                            *

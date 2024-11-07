@@ -19,7 +19,6 @@
 #define SNMP_NO_DEBUGGING
 
 #include "zbxasyncpoller.h"
-#include "async_poller.h"
 #include "zbxpoller.h"
 
 #include "zbxtimekeeper.h"

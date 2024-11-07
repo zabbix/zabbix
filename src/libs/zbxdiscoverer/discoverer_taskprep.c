@@ -221,13 +221,18 @@ void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *ch
 	for (start = drule->iprange; '\0' != *start;)
 	{
 		zbx_iprange_t	ipr;
+		int		res, ip_first[ZBX_IPRANGE_GROUPS_V6], z[ZBX_IPRANGE_GROUPS_V6] = {0};
 
 		if (NULL != (comma = strchr(start, ',')))
 			*comma = '\0';
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() range:'%s'", __func__, start);
 
-		if (SUCCEED != zbx_iprange_parse(&ipr, start))
+		if (SUCCEED == (res = zbx_iprange_parse(&ipr, start)))
+			zbx_iprange_first(&ipr, ip_first);
+
+		if (SUCCEED != res || 0 == memcmp(ip_first, z, sizeof(int) *
+				(ZBX_IPRANGE_V4 == ipr.type ? ZBX_IPRANGE_GROUPS_V4 : ZBX_IPRANGE_GROUPS_V6)))
 		{
 			char	err[MAX_STRING_LEN];
 

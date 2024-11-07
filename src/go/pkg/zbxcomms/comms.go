@@ -390,12 +390,20 @@ func Exchange(addrpool AddressSet, localAddr *net.Addr, timeout time.Duration, c
 	}
 	log.Tracef("received [%s] from [%s]", string(b), addrpool.Get())
 
-	if len(b) == 0 && false == no_response {
-		errs = append(errs, fmt.Errorf("connection closed"))
-		log.Tracef("%s", errs[len(errs)-1])
+	if len(b) == 0 {
+		if !no_response {
+			errs = append(errs, fmt.Errorf("connection closed"))
+			log.Tracef("%s", errs[len(errs)-1])
 
-		addrpool.Next()
-		return nil, errs, errs[len(errs)-1]
+			addrpool.Next()
+			return nil, errs, errs[len(errs)-1]
+		}
+	} else {
+		if nil != tlsconfig {
+			byte_slice := make([]byte, 1024)
+			c.conn.Read(byte_slice)
+		}
+
 	}
 
 	return b, nil, nil

@@ -1,6 +1,9 @@
 Changes for 7.2.0alpha2
 
 New features:
+.......PS. [ZBXNEXT-9405] added pagination for collecting VMware events based on free shared memory (MVekslers)
+........S. [ZBXNEXT-9448] implemented new {EVENT.UPDATE.ACTIONJSON}, {XXX.TIMESTAMP}, {SERVICE.ID} and improved {HOST.PORT} built-in macros (sboidenko)
+...G...... [ZBXNEXT-8914] reworked Oracle plugin queries to use variable binding (dgoloscapov, esneiders)
 .........T [ZBXNEXT-9557] added Website certificate by Zabbix agent 2 active template (abakaldin)
 .........T [ZBXNEXT-9549] added active agent templates for LAMP stack monitoring (abakaldin)
 .........T [ZBXNEXT-9382] added Nutanix template (akotsegubov)
@@ -9,6 +12,15 @@ New features:
 .......PS. [ZBXNEXT-9238] increased PostgreSQL maximum supported version to 17 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-25465] fixed action notification with convert to cause action mixed with other actions (sboidenko)
+.........T [ZBX-20767] removed unnecessary discard with heartbeat preprocessing in discovery rules in Linux and Nextcloud templates (drasikhov)
+A......... [ZBX-23949] fixed processing of `host` parameter for trigger prototypes (jfreibergs)
+........S. [ZBX-25320] improved error message for errors while formatting dashboard as PDF (mprihodko)
+..F....... [ZBX-25273] fixed incorrect vertical scale for s-units in graphs (averza, dfofanovs)
+A.F....... [ZBX-24528] prevented SQL errors being displayed to non-authorized users (gcalenko, jfreibergs)
+........S. [ZBX-25324]  fixed FreeTDS ODBC login with special characters in the password field (sboidenko)
+A......... [ZBX-25034] fixed export of host prototype discovery and template override is using visible name (wczerneha)
+..F....... [ZBX-20848] fixed multiselect not suggesting just removed record (apoga, averza)
 A.F....... [ZBX-21503] prevented creation of audit logs for Media type objects on updates without actual changes (jfreibergs)
 ..F....... [ZBX-24633] fixed code error when viewing graph and trigger lists with discovered objects set to expire (jfreibergs)
 ..F....... [ZBX-25139] prevented sending of empty query_fields, headers or parameters for item testing (jfreibergs)
@@ -44,6 +56,7 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.6rc1
 
 New features:
+.......PS. [ZBXNEXT-9405] added pagination for collecting VMware events based on free shared memory (MVekslers)
 .........T [ZBXNEXT-9557] added Website certificate by Zabbix agent 2 active template (abakaldin)
 .........T [ZBXNEXT-9549] added active agent templates for LAMP stack monitoring (abakaldin)
 .........T [ZBXNEXT-9382] added Nutanix template (akotsegubov)
@@ -52,6 +65,14 @@ New features:
 .........T [ZBXNEXT-9058] updated VMware Hypervisor template for ability to work as a standalone template (akotsegubov)
 
 Bug fixes:
+........S. [ZBX-25465] fixed action notification with convert to cause action mixed with other actions (sboidenko)
+.........T [ZBX-20767] removed unnecessary discard with heartbeat preprocessing in discovery rules in Linux and Nextcloud templates (drasikhov)
+A......... [ZBX-23949] fixed processing of `host` parameter for trigger prototypes (jfreibergs)
+..F....... [ZBX-25273] fixed incorrect vertical scale for s-units in graphs (averza, dfofanovs)
+........S. [ZBX-25320] improved error message for errors while formatting dashboard as PDF (mprihodko)
+........S. [ZBX-25324]  fixed FreeTDS ODBC login with special characters in the password field (sboidenko)
+A......... [ZBX-25034] fixed export of host prototype discovery and template override is using visible name (wczerneha)
+..F....... [ZBX-20848] fixed multiselect not suggesting just removed record (apoga, averza)
 A.F....... [ZBX-24528] prevented SQL errors being displayed to non-authorized users (gcalenko, jfreibergs)
 A.F....... [ZBX-21503] prevented creation of audit logs for Media type objects on updates without actual changes (jfreibergs)
 ..F....... [ZBX-24633] fixed code error when viewing graph and trigger lists with discovered objects set to expire (jfreibergs)
@@ -3147,6 +3168,10 @@ New features:
 .......PS. [ZBXNEXT-9238] increased PostgreSQL maximum supported version to 17 (mprihodko)
 
 Bug fixes:
+.........T [ZBX-20767] removed unnecessary discard with heartbeat preprocessing in discovery rules in Linux and Nextcloud templates (drasikhov)
+A......... [ZBX-23949] fixed processing of `host` parameter for trigger prototypes (jfreibergs)
+A......... [ZBX-25034] fixed export of host prototype discovery and template override is using visible name (wczerneha)
+.......PS. [ZBX-25416] fixed unsupported value passing to preprocessor (askolmeisters)
 A.F....... [ZBX-24528] prevented SQL errors being displayed to non-authorized users (gcalenko, jfreibergs)
 A.F....... [ZBX-21503] prevented creation of audit logs for Media type objects on updates without actual changes (jfreibergs)
 ..F....... [ZBX-24633] fixed code error when viewing graph and trigger lists with discovered objects set to expire (jfreibergs)
