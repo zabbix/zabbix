@@ -54,6 +54,7 @@ void	zbx_event_get_tag(const char *text, const zbx_db_event *event, char **repla
 
 void	zbx_event_get_str_tags(const zbx_db_event *event, char **replace_to);
 void	zbx_event_get_json_tags(const zbx_db_event *event, char **replace_to);
+void	zbx_event_get_json_actions(const zbx_db_acknowledge *ack, char **replace_to);
 
 int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *error, size_t max_error_len);
 

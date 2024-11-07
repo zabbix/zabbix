@@ -509,7 +509,7 @@ int	zbx_iprange_uniq_next(const zbx_iprange_t *ipranges, const int num, char *ip
  ******************************************************************************/
 int	zbx_iprange_uniq_iter(const zbx_iprange_t *ipranges, const int num, int *idx, int *ipaddress)
 {
-	int	i, z[ZBX_IPRANGE_GROUPS_V6] = {0, 0, 0, 0, 0, 0, 0, 0};
+	int	i, z[ZBX_IPRANGE_GROUPS_V6] = {0};
 
 	if (0 == num)
 		return FAIL;

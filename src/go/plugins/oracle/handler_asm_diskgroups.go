@@ -16,8 +16,8 @@ package oracle
 
 import (
 	"context"
-	"fmt"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -25,14 +25,16 @@ func asmDiskGroupsHandler(ctx context.Context, conn OraClient, params map[string
 	_ ...string) (interface{}, error) {
 	var diskGroups string
 
-	row, err := conn.QueryRow(ctx, getDiskGRoupQuery(params["Diskgroup"]))
+	query, args := getDiskGRoupQuery(params["Diskgroup"])
+
+	row, err := conn.QueryRow(ctx, query, args...)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	err = row.Scan(&diskGroups)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	if diskGroups == "" {
@@ -42,13 +44,8 @@ func asmDiskGroupsHandler(ctx context.Context, conn OraClient, params map[string
 	return diskGroups, nil
 }
 
-func getDiskGRoupQuery(name string) string {
-	var whereStr string
-	if name != "" {
-		whereStr = fmt.Sprintf(`WHERE NAME = '%s'`, name)
-	}
-
-	return fmt.Sprintf(`
+func getDiskGRoupQuery(name string) (string, []any) {
+	const query = `
 	SELECT
 		JSON_ARRAYAGG(
 			JSON_OBJECT(NAME VALUE
@@ -64,7 +61,11 @@ func getDiskGRoupQuery(name string) string {
 			) RETURNING CLOB 
 		)
 	 FROM 
-		 V$ASM_DISKGROUP_STAT
-	 %s
-`, whereStr)
+		 V$ASM_DISKGROUP_STAT`
+
+	if name != "" {
+		return query + " WHERE NAME = :1", []any{name}
+	}
+
+	return query, nil
 }

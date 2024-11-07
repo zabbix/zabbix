@@ -733,7 +733,7 @@ class testPermissions extends CIntegrationTest {
 					$this->assertCount(count($expected_hostgroups), $hostgroups, $err_msg);
 
 					foreach ($expected_hostgroups as $hostgroup)
-						$this->assertContains($hostgroup, $expected_hostgroups, $err_msg);
+						$this->assertContains($hostgroup, $hostgroups, $err_msg);
 				}
 
 				break;

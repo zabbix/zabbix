@@ -12,33 +12,30 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "discoverer_job.h"
 #include "discoverer_async.h"
-#include "../../libs/zbxpoller/async_agent.h"
+
+#include "discoverer_job.h"
 #include "async_tcpsvc.h"
 #include "async_telnet.h"
 
-#ifdef HAVE_NETSNMP
-#	include "../../libs/zbxpoller/checks_snmp.h"
+#ifdef HAVE_LIBCURL
+#	include "async_http.h"
 #endif
 
 #include "zbxsysinfo.h"
 #include "zbx_discoverer_constants.h"
 #include "zbxasyncpoller.h"
+#include "zbxpoller.h"
+
+#ifdef HAVE_LIBCURL
+#	include "zbxasynchttppoller.h"
+#endif
+
 #include "zbxcacheconfig.h"
 #include "zbxcomms.h"
 #include "zbxdbhigh.h"
 #include "zbxip.h"
 #include "zbxstr.h"
-
-#ifdef HAVE_LIBCURL
-#	include "async_http.h"
-#	include "zbxasynchttppoller.h"
-#endif
-
-#ifdef HAVE_NETSNMP
-#	include "zbxpoller.h"
-#endif
 
 #ifndef EVDNS_BASE_INITIALIZE_NAMESERVERS
 #	define EVDNS_BASE_INITIALIZE_NAMESERVERS	1

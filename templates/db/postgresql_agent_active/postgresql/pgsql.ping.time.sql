@@ -1,0 +1,2 @@
+\timing
+SELECT 1;

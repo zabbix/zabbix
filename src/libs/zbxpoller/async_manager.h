@@ -20,7 +20,6 @@
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 
-typedef struct zbx_async_manager	zbx_async_manager_t;
 typedef void (*zbx_async_notify_cb_t)(void *data);
 
 typedef struct

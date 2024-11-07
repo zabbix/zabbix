@@ -24,9 +24,6 @@
 /* for various value getters grouped by their scope:                */
 
 /* expr_db_get_item_value() */
-#define ZBX_REQUEST_HOST_ID			101
-#define ZBX_REQUEST_HOST_HOST			102
-#define ZBX_REQUEST_HOST_NAME			103
 #define ZBX_REQUEST_HOST_DESCRIPTION		104
 #define ZBX_REQUEST_ITEM_ID			105
 #define ZBX_REQUEST_ITEM_NAME			106
@@ -48,6 +45,7 @@
 #define ZBX_REQUEST_ITEM_LOG_SEVERITY		205
 #define ZBX_REQUEST_ITEM_LOG_NSEVERITY		206
 #define ZBX_REQUEST_ITEM_LOG_EVENTID		207
+#define ZBX_REQUEST_ITEM_LOG_TIMESTAMP		208
 
 const char	*item_logtype_string(unsigned char logtype);
 const char	*alert_type_string(unsigned char type);
@@ -78,11 +76,5 @@ int	expr_get_history_log_value(const char *m, const zbx_db_trigger *trigger, cha
 		int clock, int ns, const char *tz);
 int	expr_db_get_event_symptoms(const zbx_db_event *event, char **replace_to);
 void	expr_db_get_rootcause(const zbx_db_service *service, char **replace_to);
-
-int	expr_dc_get_host_value(zbx_uint64_t itemid, char **replace_to, int request);
-int	expr_dc_get_host_inventory(const char *macro, const zbx_db_trigger *trigger, char **replace_to,
-		int N_functionid);
-int	expr_dc_get_host_inventory_by_itemid(const char *macro, zbx_uint64_t itemid, char **replace_to);
-int	expr_dc_get_host_inventory_by_hostid(const char *macro, zbx_uint64_t hostid, char **replace_to);
 
 #endif

@@ -27,7 +27,12 @@ typedef	int (*zbx_vault_kvs_get_cb_t)(const char *vault_url, const char *prefix,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, const char *path, long timeout, zbx_kvs_t *kvs, char **error);
 
+typedef	void (*zbx_vault_kvs_renew_cb_t)(const char *vault_url, const char *token, const char *ssl_cert_file,
+		const char *ssl_key_file, const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location, long timeout);
+
 static zbx_vault_kvs_get_cb_t	zbx_vault_kvs_get_cb;
+static zbx_vault_kvs_renew_cb_t	zbx_vault_kvs_renew_cb;
 static const char		*zbx_vault_dbuser_key, *zbx_vault_dbpassword_key;
 
 int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
@@ -50,6 +55,7 @@ int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
 		}
 
 		zbx_vault_kvs_get_cb = zbx_hashicorp_kvs_get;
+		zbx_vault_kvs_renew_cb = zbx_hashicorp_renew_token;
 		zbx_vault_dbuser_key = ZBX_HASHICORP_DBUSER_KEY;
 		zbx_vault_dbpassword_key = ZBX_HASHICORP_DBPASSWORD_KEY;
 	}
@@ -81,6 +87,18 @@ int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
 #undef ZBX_CYBERARK_NAME
 #undef ZBX_CYBERARK_DBUSER_KEY
 #undef ZBX_CYBERARK_DBPASSWORD_KEY
+}
+
+void	zbx_vault_renew_token(const zbx_config_vault_t *config_vault,
+		const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location)
+{
+	if (NULL == zbx_vault_kvs_renew_cb)
+		return;
+
+	zbx_vault_kvs_renew_cb(config_vault->url, config_vault->token, config_vault->tls_cert_file,
+			config_vault->tls_key_file, config_source_ip, config_ssl_ca_location,
+			config_ssl_cert_location, config_ssl_key_location, ZBX_VAULT_TIMEOUT);
 }
 
 int	zbx_vault_kvs_get(const char *path, zbx_kvs_t *kvs, const zbx_config_vault_t *config_vault,

@@ -52,6 +52,7 @@ Please provide the necessary access levels for both the User and the Token:
 |{$PVE.VM.CPU.PUSE.MAX.WARN}|<p>Maximum used CPU in percentage.</p>|`90`|
 |{$PVE.LXC.MEMORY.PUSE.MAX.WARN}|<p>Maximum used memory in percentage.</p>|`90`|
 |{$PVE.LXC.CPU.PUSE.MAX.WARN}|<p>Maximum used CPU in percentage.</p>|`90`|
+|{$PVE.LXC.DISK.PUSE.MAX.WARN}|<p>Maximum used disk in percentage.</p>|`90`|
 |{$PVE.STORAGE.PUSE.MAX.WARN}|<p>Maximum used storage space in percentage.</p>|`90`|
 
 ### Items
@@ -197,6 +198,8 @@ Please provide the necessary access levels for both the User and the Token:
 |LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Status|<p>Status of LXC container.</p>|Dependent item|proxmox.lxc.vmstatus[{#LXC.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.status`</p></li></ul>|
 |LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Disk write, rate|<p>Disk write.</p>|Dependent item|proxmox.lxc.diskwrite[{#LXC.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.diskwrite`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Disk read, rate|<p>Disk read.</p>|Dependent item|proxmox.lxc.diskread[{#LXC.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.diskread`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Disk space total|<p>Total disk space.</p>|Dependent item|proxmox.lxc.maxdisk[{#LXC.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.maxdisk`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Disk space usage|<p>Disk space usage.</p>|Dependent item|proxmox.lxc.disk[{#LXC.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.disk`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Memory usage|<p>Used memory in bytes.</p>|Dependent item|proxmox.lxc.mem[{#LXC.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.mem`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Memory total|<p>The total memory expressed in bytes.</p>|Dependent item|proxmox.lxc.maxmem[{#LXC.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.maxmem`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Incoming data, rate|<p>Incoming data rate.</p>|Dependent item|proxmox.lxc.netin[{#LXC.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.netin`</p></li><li>Change per second</li><li><p>Custom multiplier: `8`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
@@ -209,6 +212,7 @@ Please provide the necessary access levels for both the User and the Token:
 |----|-----------|----------|--------|--------------------------------|
 |LXC [{#NODE.NAME}/{#LXC.NAME}]: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Proxmox VE by HTTP/proxmox.lxc.uptime[{#LXC.ID}])<10m`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Not running</li></ul>|
 |LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: Not running|<p>LXC state is not "running".</p>|`last(/Proxmox VE by HTTP/proxmox.lxc.vmstatus[{#LXC.ID}])<>"running"`|Average||
+|LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})]: high disk space usage|<p>Disk space usage.</p>|`min(/Proxmox VE by HTTP/proxmox.lxc.disk[{#LXC.ID}],5m) / last(/Proxmox VE by HTTP/proxmox.lxc.maxdisk[{#LXC.ID}]) * 100 > {$PVE.LXC.DISK.PUSE.MAX.WARN:"{#LXC.ID}"}`|Warning||
 |LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})] high memory usage|<p>Memory usage.</p>|`min(/Proxmox VE by HTTP/proxmox.lxc.mem[{#LXC.ID}],5m) / last(/Proxmox VE by HTTP/proxmox.lxc.maxmem[{#LXC.ID}]) * 100 >{$PVE.LXC.MEMORY.PUSE.MAX.WARN:"{#LXC.ID}"}`|Warning||
 |LXC [{#NODE.NAME}/{#LXC.NAME} ({#LXC.ID})] high CPU usage|<p>CPU usage.</p>|`min(/Proxmox VE by HTTP/proxmox.lxc.cpu[{#LXC.ID}],5m) > {$PVE.LXC.CPU.PUSE.MAX.WARN:"{#LXC.ID}"}`|Warning||
 

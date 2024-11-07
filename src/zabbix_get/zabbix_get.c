@@ -301,6 +301,8 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 		{
 			if (FAIL == (received_len = zbx_tcp_recv_ext(&s, 0, 0)))
 				ret = FAIL;
+			else
+				(void)zbx_tcp_read_close_notify(&s, 0, NULL);
 		}
 
 		if (SUCCEED == ret)

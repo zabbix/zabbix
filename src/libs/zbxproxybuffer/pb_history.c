@@ -402,10 +402,13 @@ static int	pb_history_get_mem(zbx_pb_t *pb, struct zbx_json *j, zbx_uint64_t *la
 
 		while (1)
 		{
-			while (SUCCEED == zbx_list_iterator_next(&li) && ZBX_MAX_HRECORDS > rows.values_num)
+			while (SUCCEED == zbx_list_iterator_next(&li))
 			{
 				(void)zbx_list_iterator_peek(&li, (void **)&row);
 				zbx_vector_pb_history_ptr_append(&rows, row);
+
+				if (ZBX_MAX_HRECORDS <= rows.values_num)
+					break;
 			}
 
 			records_num = pb_history_export(j, records_num, &rows, lastid);
@@ -657,11 +660,11 @@ int	pb_history_check_age(zbx_pb_t *pb)
 	zbx_pb_history_t	*row;
 	int			now;
 
-	now = (int)time(NULL);
+	now = time(NULL);
 
 	while (SUCCEED == zbx_list_peek(&pb->history, (void **)&row))
 	{
-		if (now - row->ts.sec <= pb->offline_buffer)
+		if (now - row->write_clock <= (time_t)pb->offline_buffer)
 			break;
 
 		zbx_list_pop(&pb->history, NULL);
@@ -671,7 +674,7 @@ int	pb_history_check_age(zbx_pb_t *pb)
 	if (0 == pb->max_age)
 		return SUCCEED;
 
-	if (SUCCEED != zbx_list_peek(&pb->history, (void **)&row) || time(NULL) - row->ts.sec < pb->max_age)
+	if (SUCCEED != zbx_list_peek(&pb->history, (void **)&row) || time(NULL) - row->write_clock < pb->max_age)
 		return SUCCEED;
 
 	return FAIL;

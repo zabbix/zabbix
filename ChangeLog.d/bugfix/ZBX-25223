@@ -1,1 +1,0 @@
-A......... [ZBX-25223] resolved issue where the selectAction parameter with "extend" in mediatype.get request returns only actionid (wczerneha)
