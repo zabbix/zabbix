@@ -1153,8 +1153,9 @@ ZBX_DC_PSK	*dc_psk_sync(char *tls_psk_identity, char *tls_psk, const char *name,
 		zbx_hashset_t *psk_owners, ZBX_DC_PSK *tls_dc_psk);
 #endif
 
-void	dbconfig_shmem_free_func(void *ptr);
-void	*dbconfig_shmem_realloc_func(void *old, size_t size);
-void	*dbconfig_shmem_malloc_func(void *old, size_t size);
+void		dbconfig_shmem_free_func(void *ptr);
+void		*dbconfig_shmem_realloc_func(void *old, size_t size);
+void		*dbconfig_shmem_malloc_func(void *old, size_t size);
+zbx_uint64_t	dbconfig_used_size(void);
 
 #endif

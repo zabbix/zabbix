@@ -26,7 +26,7 @@ zbx_vmware_t			*zbx_vmware_get_vmware(void);
 
 #define ZBX_XPATH_PROP_OBJECT(type)	ZBX_XPATH_PROP_OBJECT_ID(type, "") "/"
 
-#define		VMWARE_SHORT_STR_LEN	MAX_STRING_LEN / 8
+#define		VMWARE_SHORT_STR_LEN	MAX_STRING_LEN / 8 + 1
 
 #define ZBX_POST_VSPHERE_HEADER									\
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"					\
@@ -65,11 +65,19 @@ void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_ptr_t *s
 int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, xmlDoc **xdoc,
 		char **token , char **error);
 
+void		vmware_eventlog_msg_shared_free(zbx_vector_vmware_event_ptr_t *events);
 void		vmware_eventlog_data_shared_free(zbx_vmware_eventlog_data_t *data_eventlog);
 zbx_uint64_t	zbx_vmware_get_evt_req_chunk_sz(void);
 
-#define zbx_xml_free_doc(xdoc)		if (NULL != xdoc)		\
-						xmlFreeDoc(xdoc)
+#define zbx_xml_doc_free(xdoc)		do					\
+					{					\
+						if (NULL != xdoc)		\
+						{				\
+							xmlFreeDoc(xdoc);	\
+							xdoc = NULL;		\
+						}				\
+					}					\
+					while(0)
 
 #define ZBX_VPXD_STATS_MAXQUERYMETRICS				64
 #define ZBX_MAXQUERYMETRICS_UNLIMITED				1000
@@ -173,12 +181,9 @@ void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zbx_vecto
 #define ZBX_XPATH_OBJS_BY_TYPE(type)									\
 	"/*/*/*/*/*[local-name()='objects']/*[local-name()='obj'][@type='" type "']"
 
-char	*evt_msg_strpool_strdup(const char *str, zbx_uint64_t *len);
-void	evt_msg_strpool_strfree(char *str);
-
 #define ZBX_XNN(NN)			"*[local-name()='" NN "']"
-#define ZBX_XPATH_NN(NN)			ZBX_XNN(NN)
-#define ZBX_XPATH_LN(LN)			"/" ZBX_XPATH_NN(LN)
+#define ZBX_XPATH_NN(NN)		ZBX_XNN(NN)
+#define ZBX_XPATH_LN(LN)		"/" ZBX_XPATH_NN(LN)
 #define ZBX_XPATH_LN1(LN1)		"/" ZBX_XPATH_LN(LN1)
 #define ZBX_XPATH_LN2(LN1, LN2)		"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2)
 #define ZBX_XPATH_LN3(LN1, LN2, LN3)	"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2) ZBX_XPATH_LN(LN3)
@@ -206,6 +211,8 @@ void	zbx_vmware_key_value_free(zbx_vmware_key_value_t value);
 
 #define REFCOUNT_FIELD_SIZE	sizeof(zbx_uint32_t)
 
+int	vmware_shared_is_ready(void);
+zbx_uint64_t	vmware_shared_str_sz(const char *str);
 int	vmware_shared_strsearch(const char *str);
 char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_uint64_t *len);
 char	*vmware_shared_strdup(const char *str);

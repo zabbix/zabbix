@@ -163,7 +163,7 @@ class testDashboardProblemsWidget extends CWebTest {
 			'id:acknowledged_by_me' => ['value' => false, 'enabled' => false],
 			'Sort entries by' => ['value' => 'Time (descending)', 'enabled' => true],
 			'Show timeline' => ['value' => true, 'enabled' => true],
-			'Show lines' => ['value' => 25, 'enabled' => true, 'maxlength' => 3]
+			'Show lines' => ['value' => 25, 'enabled' => true, 'maxlength' => 4]
 		];
 
 		foreach ($fields as $field => $attributes) {
@@ -266,7 +266,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					'fields' => [
 						'Show lines' => ''
 					],
-					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+					'error' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
 				]
 			],
 			// #1 Widget with zero in 'Show lines' field.
@@ -276,7 +276,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					'fields' => [
 						'Show lines' => 0
 					],
-					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+					'error' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
 				]
 			],
 			// #2 Widget with 999 in 'Show lines' field.
@@ -284,9 +284,9 @@ class testDashboardProblemsWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Show lines' => 999
+						'Show lines' => 9999
 					],
-					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+					'error' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
 				]
 			],
 			// #3 Widget with text in 'Show lines' field.
@@ -296,7 +296,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					'fields' => [
 						'Show lines' => 'test'
 					],
-					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+					'error' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
 				]
 			],
 			// #4 Widget with negative number in 'Show lines' field.
@@ -306,7 +306,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					'fields' => [
 						'Show lines' => '-1'
 					],
-					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+					'error' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
 				]
 			],
 			// #5 Widget with tags.

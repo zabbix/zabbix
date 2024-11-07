@@ -86,4 +86,100 @@ class testTriggerPrototypes extends CAPITest {
 	public function testTriggerPrototype_Create($params, $expected_error) {
 		$this->call('triggerprototype.create', $params, $expected_error);
 	}
+
+	public static function triggerprototype_get_data() {
+		$host = 'with_lld_discovery';
+		$triggerids = ['30001', '30003'];
+
+		return [
+			'Basic filter by ID' => [
+				'params' => [
+					'output' => ['triggerid'],
+					'triggerids' => $triggerids
+				],
+				'expect' => [
+					'error' => null,
+					'triggerids' => $triggerids
+				]
+			],
+			'Host parameter matched' => [
+				'params' => [
+					'output' => ['triggerid'],
+					'triggerids' => $triggerids,
+					'host' => $host
+				],
+				'expect' => [
+					'error' => null,
+					'triggerids' => $triggerids
+				]
+			],
+			'Host parameter not matched' => [
+				'params' => [
+					'output' => ['triggerid'],
+					'triggerids' => $triggerids,
+					'host' => 'Not '.$host
+				],
+				'expect' => [
+					'error' => null,
+					'triggerids' => []
+				]
+			],
+			'Filter host parameter matched' => [
+				'params' => [
+					'output' => ['triggerid'],
+					'triggerids' => $triggerids,
+					'filter' => [
+						'host' => $host
+					]
+				],
+				'expect' => [
+					'error' => null,
+					'triggerids' => $triggerids
+				]
+			],
+			'One of filter host parameters matched' => [
+				'params' => [
+					'output' => ['triggerid'],
+					'triggerids' => $triggerids,
+					'filter' => [
+						'host' => ['Not '.$host, $host]
+					]
+				],
+				'expect' => [
+					'error' => null,
+					'triggerids' => $triggerids
+				]
+			],
+			'Filter host parameter not matched' => [
+				'params' => [
+					'output' => ['triggerid'],
+					'triggerids' => $triggerids,
+					'filter' => [
+						'host' => 'Not '.$host
+					]
+				],
+				'expect' => [
+					'error' => null,
+					'triggerids' => []
+				]
+			]
+		];
+	}
+
+	/**
+	* @dataProvider triggerprototype_get_data
+	*/
+	public function testTriggerPrototype_Get($params, $expect) {
+		$response = $this->call('triggerprototype.get', $params, $expect['error']);
+
+		if ($expect['error'] !== null) {
+			return;
+		}
+
+		$triggerids = array_column($response['result'], 'triggerid');
+		sort($triggerids);
+		sort($expect['triggerids']);
+
+		$this->assertSame($expect['triggerids'], $triggerids);
+	}
 }

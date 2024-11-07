@@ -74,10 +74,10 @@ int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *
 		const char *token, char **error);
 char	*zbx_http_parse_header(char **headers);
 
-int	zbx_http_get(const char *url, const char *header, long timeout, const char *ssl_cert_file,
+int	zbx_http_req(const char *url, const char *header, long timeout, const char *ssl_cert_file,
 		const char *ssl_key_file, const char *config_source_ip, const char *config_ssl_ca_location,
 		const char *config_ssl_cert_location, const char *config_ssl_key_location, char **out,
-		long *response_code, char **error);
+		const char *post_data, long *response_code, char **error);
 
 #define HTTP_REQUEST_GET	0
 #define HTTP_REQUEST_POST	1

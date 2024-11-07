@@ -135,6 +135,11 @@ static int	DBpatch_7000013(void)
 
 static int	DBpatch_7000014(void)
 {
+	return DBcreate_index("proxy_history", "proxy_history_2", "write_clock", 0);
+}
+
+static int	DBpatch_7000015(void)
+{
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
@@ -173,5 +178,6 @@ DBPATCH_ADD(7000011, 0, 0)
 DBPATCH_ADD(7000012, 0, 0)
 DBPATCH_ADD(7000013, 0, 0)
 DBPATCH_ADD(7000014, 0, 0)
+DBPATCH_ADD(7000015, 0, 0)
 
 DBPATCH_END()
