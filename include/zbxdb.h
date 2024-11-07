@@ -275,4 +275,6 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 #	define ZBX_DB_CHAR_LENGTH(str)	"length(" #str ")"
 #endif
 
+#define ZBX_DB_LARGE_QUERY_BATCH_SIZE	1000
+
 #endif
