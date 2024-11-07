@@ -17,6 +17,7 @@
 #include "../taskmanager/taskmanager_proxy.h"
 #include "../proxyconfigwrite/proxyconfigwrite.h"
 
+#include "zbxcomms.h"
 #include "zbxcommshigh.h"
 #include "zbxtasks.h"
 #include "zbxmutexs.h"

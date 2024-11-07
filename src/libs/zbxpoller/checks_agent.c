@@ -115,6 +115,11 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 		}
 		else if (FAIL != (received_len = zbx_tcp_recv_ext(&s, 0, 0)))
 		{
+			if (ZBX_PROTO_ERROR == zbx_tcp_read_close_notify(&s, 0, NULL))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot gracefully close connection: %s",
+						zbx_socket_strerror());
+			}
 			ret = SUCCEED;
 		}
 		else if (SUCCEED != zbx_socket_check_deadline(&s))
