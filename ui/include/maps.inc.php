@@ -711,14 +711,7 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 			unset($trigger);
 
 			// Assign selected hosts back to the sysmap elements they origin from.
-			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
-				$hostid = $selement['elements'][0]['hostid'];
-				$selement['hosts'][$hostid] = $hostid;
-			}
-			elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
-				$groupid = $selement['elements'][0]['groupid'];
-				$selement['hosts'] = $hosts_by_groupids[$groupid];
-			}
+			$selement['hosts'] = getElementHosts($selement, $sysmaps_data, $hosts_by_groupids);
 		}
 		unset($selement);
 	}
@@ -795,18 +788,6 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 					}
 				}
 			}
-		}
-
-		if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
-			$selement_hosts = [];
-
-			foreach ($sysmaps_data as $sysmap_elements) {
-				foreach ($sysmap_elements['selements'] as $sysmap_element) {
-					$selement_hosts = array_merge($selement_hosts, array_keys($sysmap_element['hosts']));
-				}
-			}
-
-			$selement['hosts'] = array_unique($selement_hosts);
 		}
 
 		foreach ($selement['hosts'] as $hostid) {
@@ -940,6 +921,27 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 	}
 
 	return $info;
+}
+
+function getElementHosts($selement, &$sysmaps_data, $hosts_by_groupids, &$host_ids = []) {
+	if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
+		$host_ids[] = $selement['elements'][0]['hostid'];
+	}
+	elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
+		$groupid = $selement['elements'][0]['groupid'];
+		$host_ids = array_merge($host_ids, $hosts_by_groupids[$groupid]);
+	}
+	elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
+		$sysmapid = $selement['elements'][0]['sysmapid'];
+
+		if (array_key_exists($sysmapid, $sysmaps_data)) {
+			foreach ($sysmaps_data[$sysmapid]['selements'] as $nested_element) {
+				getElementHosts($nested_element, $sysmaps_data, $hosts_by_groupids, $host_ids);
+			}
+		}
+	}
+
+	return array_unique($host_ids);
 }
 
 function countSelementProblems(array $selement, array &$sysmaps_data): array {
