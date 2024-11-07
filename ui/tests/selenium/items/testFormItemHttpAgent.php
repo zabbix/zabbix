@@ -20,6 +20,8 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 use Facebook\WebDriver\WebDriverBy;
 
 /**
+ * @onBefore prepareHTTPItemData
+ *
  * @backup items
  */
 class testFormItemHttpAgent extends CLegacyWebTest {
@@ -31,10 +33,61 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		return [CMessageBehavior::class];
 	}
 
-	/**
-	 * Host id used in test.
-	 */
-	const HOSTID = 50010;
+	protected static $hostid;
+
+	public function prepareHTTPItemData() {
+		$result = CDataHelper::createHosts([
+			[
+				'host' => 'Host with HTTP items',
+				'groups' => ['groupid' => 4], // Zabbix servers.
+				'items' => [
+					[
+						'name' => 'Http agent item form',
+						'key_' => 'http-item-form',
+						'type' => ITEM_TYPE_HTTPAGENT,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT,
+						'url' => 'zabbix.com',
+						'query_fields' => [['name' => 'user', 'value' => 'admin']],
+						'headers' => [['name' => 'Content-Type', 'value' => 'text/plain']],
+						'delay' => 30,
+						'description' => '{$_} {$NONEXISTING}'
+					],
+					[
+						'name' => 'Http agent item for delete',
+						'key_' => 'http-item-delete',
+						'type' => ITEM_TYPE_HTTPAGENT,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT,
+						'url' => 'zabbix.com',
+						'delay' => 30
+					],
+					[
+						'name' => 'Http agent item for update',
+						'key_' => 'http-item-update',
+						'type' => ITEM_TYPE_HTTPAGENT,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT,
+						'url' => 'zabbix.com',
+						'query_fields' => [['name' => 'user', 'value' => 'admin']],
+						'headers' => [['name' => 'Content-Type', 'value' => 'text/plain']],
+						'delay' => 30,
+						'description' => '{$LOCALIP} {$A}'
+					]
+				]
+			]
+		]);
+
+		self::$hostid = $result['hostids']['Host with HTTP items'];
+
+		CDataHelper::call('valuemap.create', [
+			[
+				'name' => 'Service state',
+				'hostid' => self::$hostid,
+				'mappings' => [
+					['value' => '0', 'newvalue' => 'Down'],
+					['value' => '1', 'newvalue' => 'Up']
+				]
+			]
+		]);
+	}
 
 	/*
 	 * Check form fields after create or update item.
@@ -264,7 +317,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	 * @dataProvider getUrlParseData
 	 */
 	public function testFormItemHttpAgent_UrlParse($data) {
-		$this->page->login()->open('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->page->login()->open('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::$hostid);
 		$this->query('button:Create item')->one()->click();
 		$form = COverlayDialogElement::find()->one()->waitUntilready()->asForm();
 		$form->getField('Type')->asDropdown()->select('HTTP agent');
@@ -290,7 +343,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	 * Test form validation.
 	 */
 	private function executeValidation($data, $action) {
-		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::$hostid);
 
 		switch ($action) {
 			case 'create':
@@ -917,7 +970,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	 * @dataProvider getCreataData
 	 */
 	public function testFormItemHttpAgent_Create($data) {
-		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::$hostid);
 		$this->query('button:Create item')->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilready();
 		$form = $dialog->asForm();
@@ -1139,7 +1192,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			$data['fields']['Name'] = $update_item;
 		}
 
-		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::$hostid);
 		$this->zbxTestClickLinkTextWait($update_item);
 		$dialog = COverlayDialogElement::find()->one()->waitUntilready();
 		$form = $dialog->asForm();
@@ -1184,11 +1237,11 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	public function testFormItemHttpAgent_SimpleUpdate() {
 		$sql_hash = 'SELECT * FROM items ORDER BY itemid';
 		$old_hash = CDBHelper::getHash($sql_hash);
-		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::$hostid);
 
 		$sql = 'SELECT name'.
 				' FROM items'.
-				' WHERE type='.ITEM_TYPE_HTTPAGENT.' AND hostid='.self::HOSTID.
+				' WHERE type='.ITEM_TYPE_HTTPAGENT.' AND hostid='.self::$hostid.
 				' ORDER BY itemid'.
 				' LIMIT 3';
 
@@ -1216,7 +1269,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		$sql_hash = 'SELECT * FROM items WHERE name='.zbx_dbstr($clone_item);
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::$hostid);
 		$this->zbxTestClickLinkTextWait($clone_item);
 		$dialog = COverlayDialogElement::find()->one()->waitUntilready();
 		$dialog->getFooter()->query('button:Clone')->one()->click();
@@ -1264,7 +1317,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	public function testFormItemHttpAgent_Delete() {
 		$name = 'Http agent item for delete';
 
-		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::$hostid);
 		$this->zbxTestClickLinkTextWait($name);
 		COverlayDialogElement::find()->one()->waitUntilReady()->getFooter()->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();
@@ -1290,7 +1343,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 		$sql_hash = 'SELECT * FROM items WHERE type='.ITEM_TYPE_HTTPAGENT.' ORDER BY itemid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::$hostid);
 		$this->query('button:Create item')->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilready();
 		$form = $dialog->asForm();
@@ -1311,10 +1364,10 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	private function executeCancelAction($action) {
 		$sql_hash = 'SELECT * FROM items ORDER BY itemid';
 		$old_hash = CDBHelper::getHash($sql_hash);
-		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::HOSTID);
+		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.self::$hostid);
 
 		foreach (CDBHelper::getRandom('SELECT name FROM items WHERE type='.ITEM_TYPE_HTTPAGENT.
-				' AND hostid='.self::HOSTID , 1) as $item) {
+				' AND hostid='.self::$hostid , 1) as $item) {
 			$name = $item['name'];
 			$this->zbxTestClickLinkText($name);
 			$dialog = COverlayDialogElement::find()->one()->waitUntilready();

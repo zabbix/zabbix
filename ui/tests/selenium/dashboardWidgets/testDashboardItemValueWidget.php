@@ -1088,7 +1088,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Override host' => 'Dashboard'
 					],
 					'item' => [
-						'Host for different items types' => 'Http agent item form'
+						'ЗАББИКС Сервер' => 'Available memory'
 					]
 				]
 			],
