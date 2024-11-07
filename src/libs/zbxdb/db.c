@@ -1033,6 +1033,7 @@ int	zbx_db_begin_basic(void)
 	if (txn_level > 0)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: nested transaction detected. Please report it to Zabbix Team.");
+		zbx_this_should_never_happen_backtrace();
 		assert(0);
 	}
 #if defined(HAVE_MYSQL)
@@ -1073,6 +1074,7 @@ int	zbx_db_commit_basic(void)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: commit without transaction."
 				" Please report it to Zabbix Team.");
+		zbx_this_should_never_happen_backtrace();
 		assert(0);
 	}
 
@@ -1119,6 +1121,7 @@ int	zbx_db_rollback_basic(void)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: rollback without transaction."
 				" Please report it to Zabbix Team.");
+		zbx_this_should_never_happen_backtrace();
 		assert(0);
 	}
 
