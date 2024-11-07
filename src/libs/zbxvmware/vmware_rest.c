@@ -22,7 +22,6 @@
 #include "zbxstr.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
-#include "zbxcurl.h"
 #include "vmware_shmem.h"
 #include "zbxshmem.h"
 
