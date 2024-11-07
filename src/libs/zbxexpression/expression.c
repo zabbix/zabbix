@@ -170,6 +170,7 @@ static int	get_expression_macro_result(const zbx_db_event *event, char *data, zb
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_strncpy_alloc(&expression, &exp_alloc, &exp_offset, data + loc->l, loc->r - loc->l + 1);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() expression: '%s'", __func__, expression);
 
 	um_handle = zbx_dc_open_user_macros();
@@ -183,8 +184,8 @@ static int	get_expression_macro_result(const zbx_db_event *event, char *data, zb
 		goto out;
 	}
 
-	if (SUCCEED != zbx_eval_expand_user_macros(&ctx, hostids->values, hostids->values_num,
-			(zbx_macro_expand_func_t)zbx_dc_expand_user_and_func_macros, um_handle, NULL))
+	if (SUCCEED != zbx_eval_substitute_macros(&ctx, NULL, &zbx_db_trigger_supplement_eval_resolv, um_handle,
+			hostids->values, hostids->values_num, event))
 	{
 		goto out;
 	}
@@ -2153,6 +2154,11 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 					{
 						zbx_db_trigger_get_function_value(&event->trigger, N_functionid,
 								&replace_to, zbx_evaluate_function, 0);
+					}
+					else if (0 == strcmp(m, MVAR_FUNCTION_RECOVERY_VALUE))
+					{
+						zbx_db_trigger_get_function_value(&event->trigger, N_functionid,
+								&replace_to, zbx_evaluate_function, 1);
 					}
 				}
 			}
