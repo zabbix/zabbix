@@ -656,7 +656,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Min' => '50',
 							'Max' => '100',
 							'Advanced configuration' => true,
-							'History data' => 'Trends',
+							'History data' => 'Trends'
 						]
 					]
 				]
