@@ -14,14 +14,16 @@
 **/
 
 
-namespace Zabbix\Widgets\Fields;
+namespace Widgets\TopHosts\Includes;
 
 use CWidgetsData;
+
 use Zabbix\Widgets\CWidgetField;
+use Zabbix\Widgets\Fields\CWidgetFieldTimePeriod;
 
 class CWidgetFieldColumnsList extends CWidgetField {
 
-	public const DEFAULT_VIEW = \CWidgetFieldColumnsListView::class;
+	public const DEFAULT_VIEW = CWidgetFieldColumnsListView::class;
 	public const DEFAULT_VALUE = [];
 
 	// Source of value to display in column.
@@ -29,23 +31,22 @@ class CWidgetFieldColumnsList extends CWidgetField {
 	public const DATA_HOST_NAME = 2;
 	public const DATA_TEXT = 3;
 
-	// Column value display type.
+	// Item value column display as type.
+	public const DISPLAY_VALUE_AS_NUMERIC = 0;
+	public const DISPLAY_VALUE_AS_TEXT = 1;
+	public const DISPLAY_VALUE_AS_BINARY = 2;
+
+	// Numeric item value display type.
 	public const DISPLAY_AS_IS = 1;
 	public const DISPLAY_BAR = 2;
 	public const DISPLAY_INDICATORS = 3;
 
 	// Where to select data for aggregation function.
-	public const HISTORY_DATA_AUTO = 1;
-	public const HISTORY_DATA_HISTORY = 2;
-	public const HISTORY_DATA_TRENDS = 3;
+	public const HISTORY_DATA_AUTO = 0;
+	public const HISTORY_DATA_HISTORY = 1;
+	public const HISTORY_DATA_TRENDS = 2;
 
 	public const DEFAULT_DECIMAL_PLACES = 2;
-
-	// Predefined colors for thresholds. Each next threshold takes next sequential value from palette.
-	public const THRESHOLDS_DEFAULT_COLOR_PALETTE = [
-		'FF465C', 'FFD54F', '0EC9AC', '524BBC', 'ED1248', 'D1E754', '2AB5FF', '385CC7', 'EC1594', 'BAE37D',
-		'6AC8FF', 'EE2B29', '3CA20D', '6F4BBC', '00A1FF', 'F3601B', '1CAE59', '45CFDB', '894BBC', '6D6D6D'
-	];
 
 	private array $time_period_fields = [];
 
@@ -115,41 +116,71 @@ class CWidgetFieldColumnsList extends CWidgetField {
 		$fields = [
 			'name' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'data' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'text' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'item' => ZBX_WIDGET_FIELD_TYPE_STR,
-			'aggregate_function' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'base_color' => ZBX_WIDGET_FIELD_TYPE_STR,
+			'display_value_as' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'display' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'min' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'max' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'decimal_places' => ZBX_WIDGET_FIELD_TYPE_INT32,
-			'display' => ZBX_WIDGET_FIELD_TYPE_INT32,
-			'history' => ZBX_WIDGET_FIELD_TYPE_INT32,
-			'base_color' => ZBX_WIDGET_FIELD_TYPE_STR,
-			'text' => ZBX_WIDGET_FIELD_TYPE_STR
+			'show_thumbnail' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'aggregate_function' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'history' => ZBX_WIDGET_FIELD_TYPE_INT32
+		];
+
+		$column_defaults = [
+			'base_color' => '',
+			'display_value_as' => CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC,
+			'display' => CWidgetFieldColumnsList::DISPLAY_AS_IS,
+			'min' => '',
+			'max' => '',
+			'decimal_places' => CWidgetFieldColumnsList::DEFAULT_DECIMAL_PLACES,
+			'show_thumbnail' => 0,
+			'aggregate_function' => AGGREGATE_NONE,
+			'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO
 		];
 
 		foreach ($this->getValue() as $column_index => $value) {
 			foreach (array_intersect_key($fields, $value) as $field => $field_type) {
-				$widget_fields[] = [
-					'type' => $field_type,
-					'name' => $this->name.'.'.$column_index.'.'.$field,
-					'value' => $value[$field]
-				];
+				if (!array_key_exists($field, $column_defaults) || $column_defaults[$field] !== $value[$field]) {
+					$widget_fields[] = [
+						'type' => $field_type,
+						'name' => $this->name.'.'.$column_index.'.'.$field,
+						'value' => $value[$field]
+					];
+				}
 			}
 
-			if (!array_key_exists('thresholds', $value) || !$value['thresholds']) {
-				continue;
+			if (array_key_exists('thresholds', $value)) {
+				foreach ($value['thresholds'] as $threshold_index => $threshold) {
+					$widget_fields[] = [
+						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+						'name' => $this->name.'thresholds.'.$column_index.'.color.'.$threshold_index,
+						'value' => $threshold['color']
+					];
+					$widget_fields[] = [
+						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+						'name' => $this->name.'thresholds.'.$column_index.'.threshold.'.$threshold_index,
+						'value' => $threshold['threshold']
+					];
+				}
 			}
 
-			foreach ($value['thresholds'] as $threshold_index => $threshold) {
-				$widget_fields[] = [
-					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => $this->name.'thresholds.'.$column_index.'.color.'.$threshold_index,
-					'value' => $threshold['color']
-				];
-				$widget_fields[] = [
-					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => $this->name.'thresholds.'.$column_index.'.threshold.'.$threshold_index,
-					'value' => $threshold['threshold']
-				];
+			if (array_key_exists('highlights', $value)) {
+				foreach ($value['highlights'] as $highlight_index => $highlight) {
+					$widget_fields[] = [
+						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+						'name' => $this->name.'.'.$column_index.'.highlights.'.$highlight_index.'.color',
+						'value' => $highlight['color']
+					];
+
+					$widget_fields[] = [
+						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+						'name' => $this->name.'.'.$column_index.'.highlights.'.$highlight_index.'.pattern',
+						'value' => $highlight['pattern']
+					];
+				}
 			}
 		}
 
@@ -162,39 +193,50 @@ class CWidgetFieldColumnsList extends CWidgetField {
 		$validation_rules = ['type' => API_OBJECTS, 'fields' => [
 			'name'					=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
 			'data'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::DATA_ITEM_VALUE, self::DATA_HOST_NAME, self::DATA_TEXT])],
+			'text'					=> ['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'data', 'in' => self::DATA_TEXT],
+											'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
+										['else' => true,
+											'type' => API_STRING_UTF8]
+			]],
 			'item'					=> ['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],
-												'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
+												'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
 											['else' => true,
 												'type' => API_STRING_UTF8]
 			]],
-			'aggregate_function'	=> ['type' => API_INT32, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST]), 'default' => AGGREGATE_NONE],
-			'time_period'			=> ['type' => API_ANY],
+			'base_color'			=> ['type' => API_COLOR, 'default' => ''],
+			'display_value_as'		=> ['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],
+											'type' => API_INT32, 'default' => self::DISPLAY_VALUE_AS_NUMERIC, 'in' => implode(',', [self::DISPLAY_VALUE_AS_NUMERIC, self::DISPLAY_VALUE_AS_TEXT, self::DISPLAY_VALUE_AS_BINARY])],
+										['else' => true,
+											'type' => API_INT32]
+			]],
 			'display'				=> ['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],
 												'type' => API_INT32, 'default' => self::DISPLAY_AS_IS, 'in' => implode(',', [self::DISPLAY_AS_IS, self::DISPLAY_BAR, self::DISPLAY_INDICATORS])],
 											['else' => true,
 												'type' => API_INT32]
 			]],
-			'history'				=> ['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],
-												'type' => API_INT32, 'default' => self::HISTORY_DATA_AUTO, 'in' => implode(',', [self::HISTORY_DATA_AUTO, self::HISTORY_DATA_HISTORY, self::HISTORY_DATA_TRENDS])],
-											['else' => true,
-												'type' => API_INT32]
-			]],
-			'base_color'			=> ['type' => API_COLOR],
 			'min'					=> ['type' => API_NUMERIC],
 			'max'					=> ['type' => API_NUMERIC],
 			'decimal_places'		=> ['type' => API_INT32, 'in' => '0:10', 'default' => self::DEFAULT_DECIMAL_PLACES],
 			'thresholds'			=> ['type' =>  API_OBJECTS, 'uniq' => [['threshold']], 'fields' => [
-				'color'					=> ['type' => API_COLOR],
-				'threshold'				=> ['type' => API_NUMERIC]
+				'color'					=> ['type' => API_COLOR, 'flags' => API_REQUIRED],
+				'threshold'				=> ['type' => API_NUMERIC, 'flags' => API_REQUIRED]
 			]],
-			'text'					=> ['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'data', 'in' => self::DATA_TEXT],
-												'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
-											['else' => true,
-												'type' => API_STRING_UTF8]
+			'highlights'			=> ['type' =>  API_OBJECTS, 'uniq' => [['pattern']], 'fields' => [
+				'color'					=> ['type' => API_COLOR, 'flags' => API_REQUIRED],
+				'pattern'				=> ['type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255]
+			]],
+			'show_thumbnail'		=> ['type' => API_INT32, 'default' => 0, 'in' => '0,1'],
+			'aggregate_function'	=> ['type' => API_INT32, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST]), 'default' => AGGREGATE_NONE],
+			'time_period'			=> ['type' => API_ANY],
+			'history'				=> ['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],
+											'type' => API_INT32, 'default' => self::HISTORY_DATA_AUTO, 'in' => implode(',', [self::HISTORY_DATA_AUTO, self::HISTORY_DATA_HISTORY, self::HISTORY_DATA_TRENDS])],
+										['else' => true,
+											'type' => API_INT32]
 			]]
 		]];
 

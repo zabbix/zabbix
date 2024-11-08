@@ -21,7 +21,7 @@
  * @var array $data
  */
 
-use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
+use Widgets\Honeycomb\Widget;
 
 $form = new CWidgetFormView($data);
 
@@ -111,8 +111,8 @@ $form
 	)
 	->includeJsFile('widget.edit.js.php')
 	->addJavaScript('widget_honeycomb_form.init('.json_encode([
-			'thresholds_colors' => CWidgetFieldColumnsList::THRESHOLDS_DEFAULT_COLOR_PALETTE
-		], JSON_THROW_ON_ERROR).');')
+		'thresholds_colors' => Widget::DEFAULT_COLOR_PALETTE
+	], JSON_THROW_ON_ERROR).');')
 	->show();
 
 function getLabelFieldsGroupView(CWidgetFormView $form, string $group_label, array $fields): CWidgetFieldsGroupView {

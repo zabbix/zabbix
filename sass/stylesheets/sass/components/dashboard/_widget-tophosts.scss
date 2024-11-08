@@ -17,14 +17,36 @@ form.dashboard-widget-tophosts {
 
 div.dashboard-widget-tophosts {
 	$bar-gauge-height: 20px;
+	$thumbnail-height: 56px;
 
 	.list-table {
-		th.center {
-			text-align: center;
+		&.show-thumbnail {
+			tbody td {
+				height: $thumbnail-height;
+				vertical-align: middle;
+			}
 		}
 
 		tr[data-hostid] {
 			cursor: pointer;
+		}
+	}
+
+	.btn-thumbnail {
+		overflow: hidden;
+
+		&:not(.btn-link) {
+			width: 100px;
+			height: 56px;
+			background: transparent var(--thumbnail) no-repeat center;
+			background-size: cover;
+			border-color: transparent;
+			text-indent: -9999px;
+
+			&:not(.is-loading) {
+				border: 1px solid $ui-border-color;
+				border-radius: 3px;
+			}
 		}
 	}
 
@@ -40,5 +62,35 @@ div.dashboard-widget-tophosts {
 	z-bar-gauge {
 		min-width: 64px;
 		height: $bar-gauge-height;
+	}
+}
+
+.dashboard-widget-tophosts-hintbox-image {
+	.dashboard-widget-tophosts-hintbox {
+		overflow: hidden;
+	}
+
+	&.is-loading {
+		min-width: 100px;
+		min-height: 56px;
+
+		&::before {
+			content: ' ';
+		}
+
+		img {
+			opacity: 0;
+		}
+	}
+
+	img {
+		display: block;
+		max-width: 50vw;
+		max-height: 50vh;
+		opacity: 1;
+
+		@if $ui-transitions {
+			transition: opacity $ui-transition-duration ease-out;
+		}
 	}
 }

@@ -935,7 +935,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 		// Check added threshold colors.
 		$table->query('button:Add')->one()->click();
 		$colorpicker = $table->query('xpath:.//input[@id="thresholds_0_color"]/..')->asColorPicker()->one();
-		$this->assertEquals('FF465C', $colorpicker->getValue());
+		$this->assertEquals('E65660', $colorpicker->getValue());
 		$this->assertTrue($colorpicker->isClickable());
 
 		// Check added threshold input field.

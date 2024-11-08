@@ -14,13 +14,16 @@
 **/
 
 
-namespace Widgets\ItemHistory\Actions;
+namespace Widgets\TopHosts\Actions;
 
 use API,
 	CController,
 	CControllerResponseData;
 
-class BinaryValueGet extends CController {
+class ValueCheck extends CController {
+
+	private const VALUE_TYPE_IMAGE = 'image';
+	private const VALUE_TYPE_RAW = 'raw';
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
@@ -32,9 +35,10 @@ class BinaryValueGet extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'itemid' =>		'int32|required',
-			'clock' =>		'int32|required',
-			'ns' =>			'int32|required'
+			'itemid' =>			'int32|required',
+			'clock' =>			'int32|required',
+			'ns' =>				'int32|required',
+			'show_thumbnail' =>	'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -73,11 +77,22 @@ class BinaryValueGet extends CController {
 			]);
 
 			if ($history_value) {
-				$result['value'] = $history_value[0]['value'] !== ''
-					? $history_value[0]['value']
-					: italic(_('Empty value.'))
-						->addClass(ZBX_STYLE_GREY)
-						->toString();
+				$image = @imagecreatefromstring(base64_decode($history_value[0]['value']));
+
+				if ($image) {
+					$result['type'] = self::VALUE_TYPE_IMAGE;
+
+					if ($this->getInput('show_thumbnail', 0) == 1) {
+						ob_start();
+
+						imagepng(imageThumb($image, 0, 112));
+
+						$result['thumbnail'] = base64_encode(ob_get_clean());
+					}
+				}
+				else {
+					$result['type'] = self::VALUE_TYPE_RAW;
+				}
 			}
 		}
 

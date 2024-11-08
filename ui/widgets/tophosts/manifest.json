@@ -28,13 +28,25 @@
 		]
 	},
 	"actions": {
-		"widget.tophosts.view": {
-			"class": "WidgetView"
+		"widget.tophosts.binary_value.get": {
+			"class": "BinaryValueGet",
+			"layout": "layout.json"
 		},
 		"widget.tophosts.column.edit": {
 			"class": "ColumnEdit",
 			"view": "column.edit",
 			"layout": "layout.json"
+		},
+		"widget.tophosts.image_value.get": {
+			"class": "ImageValueGet",
+			"layout": "layout.image"
+		},
+		"widget.tophosts.value.check": {
+			"class": "ValueCheck",
+			"layout": "layout.json"
+		},
+		"widget.tophosts.view": {
+			"class": "WidgetView"
 		}
 	},
 	"assets": {

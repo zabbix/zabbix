@@ -30,7 +30,7 @@ class ValueCheck extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return true;
+		return $this->getUserType() >= USER_TYPE_ZABBIX_USER;
 	}
 
 	protected function checkInput(): bool {

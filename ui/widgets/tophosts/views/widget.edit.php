@@ -21,6 +21,8 @@
  * @var array $data
  */
 
+use Widgets\TopHosts\Includes\CWidgetFieldColumnsListView;
+
 $form = new CWidgetFormView($data);
 
 $groupids = array_key_exists('groupids', $data['fields'])
