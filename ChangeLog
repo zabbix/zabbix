@@ -1,6 +1,12 @@
 Changes for 7.2.0alpha2
 
 New features:
+A.F....PS. [ZBXNEXT-9229] added support for {FUNCTION.VALUE<1-9>} and {FUNCTION.RECOVERY.VALUE<1-9>} macros to expression macros (askolmeisters, gcalenko, Sasha)
+..F.I..... [ZBXNEXT-9199] implemented new column configuration options in Top hosts widget and support for binary item display (ashubin, ddauksa)
+A......... [ZBXNEXT-9404] enabled to use the mediatype.get method for users with the User role with a limited field scope (wczerneha)
+...G...... [ZBXNEXT-8571] added support for LLD MACRO {#UNIT.SERVICETYPE} in systemd.unit.discovery for Zabbix agent 2 (sboidenko)
+.........T [ZBXNEXT-9249] added new items and trigger for disk space usage in LXC containers for Proxmox VE by HTTP template (akotsegubov)
+..F....... [ZBXNEXT-9563] increased the maximum number of lines for widgets that display data in rows (wczerneha)
 .......PS. [ZBXNEXT-9405] added pagination for collecting VMware events based on free shared memory (MVekslers)
 ........S. [ZBXNEXT-9448] implemented new {EVENT.UPDATE.ACTIONJSON}, {XXX.TIMESTAMP}, {SERVICE.ID} and improved {HOST.PORT} built-in macros (sboidenko)
 ...G...... [ZBXNEXT-8914] reworked Oracle plugin queries to use variable binding (dgoloscapov, esneiders)
@@ -12,6 +18,18 @@ New features:
 .......PS. [ZBXNEXT-9238] increased PostgreSQL maximum supported version to 17 (mprihodko)
 
 Bug fixes:
+....I....T [ZBX-24994] removed UUIDs for host elements in the default data (abakaldin, asestakovs)
+........S. [ZBX-25397] fixed events not being suppressed during maintenance if deadlock has occurred (vso)
+...G...PS. [ZBX-24614] fixed unidirectional SSL shutdown being performed by both sides resulting in RST packets during communication between Zabbix components (vso)
+.........T [ZBX-25096] fixed performance counter query in MSSQL by ODBC template; updated documentation in MSSQL by Zabbix agent 2 template (akotsegubov)
+A......... [ZBX-24410] prevented occasional mismatch of preprocessing step order in inherited items when linking template to host (vmaksimovs)
+.......PS. [ZBX-25455] fixed reserving too much memory for preprocessing and tags in configuration cache (vso)
+...G...... [ZBX-24954] removed references to GnuTLS from configuration file (wiper)
+...G...PS. [ZBX-25301] removed redundant message size check on 32-bit platforms when sending TCP message (arimdjonoks)
+..F....... [ZBX-25208] fixed merging of user macros in the "Inherited and host/template/host prototype macros" mode; fixed resolving of user macros with unquoted conteхt started with "regex:" (Sasha)
+..F....... [ZBX-24972] fixed the inability to open links from host type map element in a new tab (esekace)
+.......PS. [ZBX-25305] fixed timeout not being applied for Zabbix agent passive checks (vso)
+.......P.. [ZBX-25024] changed Zabbix proxy to use history write time rather than value timestamp when discarding old values (wiper)
 ........S. [ZBX-25465] fixed action notification with convert to cause action mixed with other actions (sboidenko)
 .........T [ZBX-20767] removed unnecessary discard with heartbeat preprocessing in discovery rules in Linux and Nextcloud templates (drasikhov)
 A......... [ZBX-23949] fixed processing of `host` parameter for trigger prototypes (jfreibergs)
@@ -56,6 +74,9 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.6rc1
 
 New features:
+A......... [ZBXNEXT-9404] enabled to use the mediatype.get method for users with the User role with a limited field scope (wczerneha)
+.........T [ZBXNEXT-9249] added new items and trigger for disk space usage in LXC containers for Proxmox VE by HTTP template (akotsegubov)
+..F....... [ZBXNEXT-9563] increased the maximum number of lines for widgets that display data in rows (wczerneha)
 .......PS. [ZBXNEXT-9405] added pagination for collecting VMware events based on free shared memory (MVekslers)
 .........T [ZBXNEXT-9557] added Website certificate by Zabbix agent 2 active template (abakaldin)
 .........T [ZBXNEXT-9549] added active agent templates for LAMP stack monitoring (abakaldin)
@@ -65,6 +86,19 @@ New features:
 .........T [ZBXNEXT-9058] updated VMware Hypervisor template for ability to work as a standalone template (akotsegubov)
 
 Bug fixes:
+....I....T [ZBX-24994] removed UUIDs for host elements in the default data (abakaldin, asestakovs)
+........S. [ZBX-25397] fixed events not being suppressed during maintenance if deadlock has occurred (vso)
+...G...PS. [ZBX-24614] fixed unidirectional SSL shutdown being performed by both sides resulting in RST packets during communication between Zabbix components (vso)
+........S. [ZBX-25162] optimized dependent item validation in LLD (wiper)
+.........T [ZBX-25096] fixed performance counter query in MSSQL by ODBC template; updated documentation in MSSQL by Zabbix agent 2 template (akotsegubov)
+A......... [ZBX-24410] prevented occasional mismatch of preprocessing step order in inherited items when linking template to host (vmaksimovs)
+.......PS. [ZBX-25455] fixed reserving too much memory for preprocessing and tags in configuration cache (vso)
+...G...... [ZBX-24954] removed references to GnuTLS from configuration file (wiper)
+...G...PS. [ZBX-25301] removed redundant message size check on 32-bit platforms when sending TCP message (arimdjonoks)
+..F....... [ZBX-25208] fixed merging of user macros in the "Inherited and host/template/host prototype macros" mode; fixed resolving of user macros with unquoted conteхt started with "regex:" (Sasha)
+..F....... [ZBX-24972] fixed the inability to open links from host type map element in a new tab (esekace)
+.......PS. [ZBX-25305] fixed timeout not being applied for Zabbix agent passive checks (vso)
+.......P.. [ZBX-25024] changed Zabbix proxy to use history write time rather than value timestamp when discarding old values (wiper)
 ........S. [ZBX-25465] fixed action notification with convert to cause action mixed with other actions (sboidenko)
 .........T [ZBX-20767] removed unnecessary discard with heartbeat preprocessing in discovery rules in Linux and Nextcloud templates (drasikhov)
 A......... [ZBX-23949] fixed processing of `host` parameter for trigger prototypes (jfreibergs)
@@ -1224,6 +1258,7 @@ New features:
 .......PS. [ZBXNEXT-9238] increased PostgreSQL maximum supported version to 17 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-25324]  fixed FreeTDS ODBC login with special characters in the password field (sboidenko)
 ...G...... [ZBX-24273] fixed potential Zabbix agent crash for vfs.fs.get item (MVekslers)
 ..F....... [ZBX-23171] fixed escaping of slash character in context-based macro patterns (esekace)
 
@@ -3162,12 +3197,20 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.36rc1
 
 New features:
+.........T [ZBXNEXT-9249] added new items and trigger for disk space usage in LXC containers for Proxmox VE by HTTP template (akotsegubov)
 .........T [ZBXNEXT-9382] added Nutanix template (akotsegubov)
 .........T [ZBXNEXT-9058] updated VMware Hypervisor template for ability to work as a standalone template (akotsegubov)
 ........S. [ZBXNEXT-9532] updated max supported TimescaleDB version to 2.17 (mprihodko)
 .......PS. [ZBXNEXT-9238] increased PostgreSQL maximum supported version to 17 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-25397] fixed events not being suppressed during maintenance if deadlock has occurred (vso)
+........S. [ZBX-25324]  fixed FreeTDS ODBC login with special characters in the password field (sboidenko)
+........S. [ZBX-24582] truncated error message when testing item and there is value type mismatch (rtrizna)
+.........T [ZBX-25096] fixed performance counter query in MSSQL by ODBC template; updated documentation in MSSQL by Zabbix agent 2 template (akotsegubov)
+...G...PS. [ZBX-25301] removed redundant message size check on 32-bit platforms when sending TCP message (arimdjonoks)
+..F....... [ZBX-25208] fixed merging of user macros in the "Inherited and host/template/host prototype macros" mode; fixed resolving of user macros with unquoted conteхt started with "regex:" (Sasha)
+..F....... [ZBX-24652] fixed name filtering for Maps, Maintenance, Actions, Host groups and Templates (wczerneha)
 .........T [ZBX-20767] removed unnecessary discard with heartbeat preprocessing in discovery rules in Linux and Nextcloud templates (drasikhov)
 A......... [ZBX-23949] fixed processing of `host` parameter for trigger prototypes (jfreibergs)
 A......... [ZBX-25034] fixed export of host prototype discovery and template override is using visible name (wczerneha)
