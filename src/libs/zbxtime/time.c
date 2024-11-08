@@ -502,11 +502,10 @@ int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_ti
  *             out_tz - [OUT] previouse time zone                             *
  *                                                                            *
  ******************************************************************************/
-void zbx_set_time_zone(const char *tz, char **old_tz)
+void	zbx_set_time_zone(const char *tz, char **old_tz)
 {
 #if defined(HAVE_GETENV) && defined(HAVE_UNSETENV) && defined(HAVE_TZSET) && \
 		!defined(_WINDOWS) && !defined(__MINGW32__)
-
 
 	if (NULL != old_tz && NULL != (*old_tz = getenv("TZ")))
 		*old_tz = zbx_strdup(NULL, *old_tz);
