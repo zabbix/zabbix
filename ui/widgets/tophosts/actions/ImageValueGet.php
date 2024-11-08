@@ -14,13 +14,13 @@
 **/
 
 
-namespace Widgets\ItemHistory\Actions;
+namespace Widgets\TopHosts\Actions;
 
 use API,
 	CController,
 	CControllerResponseData;
 
-class BinaryValueGet extends CController {
+class ImageValueGet extends CController {
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
@@ -32,24 +32,12 @@ class BinaryValueGet extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'itemid' =>		'int32|required',
-			'clock' =>		'int32|required',
-			'ns' =>			'int32|required'
+			'itemid' =>	'int32|required',
+			'clock' =>	'int32|required',
+			'ns' =>		'int32|required'
 		];
 
-		$ret = $this->validateInput($fields);
-
-		if (!$ret) {
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				], JSON_THROW_ON_ERROR)]))->disableView()
-			);
-		}
-
-		return $ret;
+		return $this->validateInput($fields);
 	}
 
 	protected function doAction(): void {
@@ -73,16 +61,12 @@ class BinaryValueGet extends CController {
 			]);
 
 			if ($history_value) {
-				$result['value'] = $history_value[0]['value'] !== ''
-					? $history_value[0]['value']
-					: italic(_('Empty value.'))
-						->addClass(ZBX_STYLE_GREY)
-						->toString();
+				$result['image'] = @imagecreatefromstring(base64_decode($history_value[0]['value']));
 			}
 		}
 
 		$this->setResponse(
-			(new CControllerResponseData(['main_block' => json_encode($result, JSON_THROW_ON_ERROR)]))->disableView()
+			(new CControllerResponseData($result))->disableView()
 		);
 	}
 }

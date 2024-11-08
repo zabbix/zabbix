@@ -28,32 +28,33 @@ use API,
 	Manager;
 
 use Widgets\TopHosts\Widget;
-use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
+use Widgets\TopHosts\Includes\CWidgetFieldColumnsList;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
 	protected function doAction(): void {
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
+			'error' => null,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
 
-		// Editing template dashboard?
-		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
-			$data['error'] = _('No data.');
+		if (!$this->fields_values['override_hostid'] && $this->isTemplateDashboard()) {
+			$data['configuration'] = $this->fields_values['columns'];
+			$data['show_thumbnail'] = false;
+			$data['rows'] = [];
 		}
 		else {
 			$data += $this->getData();
-			$data['error'] = null;
 		}
 
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
 	private function getData(): array {
-		$configuration = $this->fields_values['columns'];
+		$columns = $this->fields_values['columns'];
 
 		$groupids = !$this->isTemplateDashboard() && $this->fields_values['groupids']
 			? getSubGroups($this->fields_values['groupids'])
@@ -98,18 +99,21 @@ class WidgetView extends CControllerDashboardWidgetView {
 		);
 
 		$has_text_column = false;
+		$show_thumbnail = false;
 		$item_names = [];
 		$items = [];
 
-		foreach ($configuration as $column_index => $column) {
-			switch ($column['data']) {
-				case CWidgetFieldColumnsList::DATA_TEXT:
-					$has_text_column = true;
-					break 2;
+		foreach ($columns as $column_index => $column) {
+			if ($column['data'] == CWidgetFieldColumnsList::DATA_TEXT) {
+				$has_text_column = true;
+			}
+			elseif ($column['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE) {
+				$item_names[$column_index] = $column['item'];
 
-				case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
-					$item_names[$column_index] = $column['item'];
-					break;
+				if ($column['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
+						&& $column['show_thumbnail'] == 1) {
+					$show_thumbnail = true;
+				}
 			}
 		}
 
@@ -117,7 +121,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$hosts_with_items = [];
 
 			foreach ($item_names as $column_index => $item_name) {
-				$numeric_only = self::isNumericOnlyColumn($configuration[$column_index]);
+				$numeric_only = self::isNumericOnlyColumn($columns[$column_index]);
 				$items[$column_index] = self::getItems($item_name, $numeric_only, $groupids, $hostids);
 
 				foreach ($items[$column_index] as $item) {
@@ -131,13 +135,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if (!$hostids) {
 			return [
-				'configuration' => $configuration,
+				'configuration' => $columns,
+				'show_thumbnail' => $show_thumbnail,
 				'rows' => []
 			];
 		}
 
 		$master_column_index = $this->fields_values['column'];
-		$master_column = $configuration[$master_column_index];
+		$master_column = $columns[$master_column_index];
 		$master_entities = $hosts;
 		$master_entity_values = [];
 
@@ -185,7 +190,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$master_entities_min = end($master_entity_values);
 				$master_entities_max = reset($master_entity_values);
 			}
-			else {
+			elseif ($master_column['data'] != CWidgetFieldColumnsList::DATA_ITEM_VALUE
+					|| $master_column['display_value_as'] != CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
 				natcasesort($master_entity_values);
 			}
 		}
@@ -196,7 +202,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$master_entities_min = reset($master_entity_values);
 				$master_entities_max = end($master_entity_values);
 			}
-			else {
+			elseif ($master_column['data'] != CWidgetFieldColumnsList::DATA_ITEM_VALUE
+					|| $master_column['display_value_as'] != CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
 				natcasesort($master_entity_values);
 				$master_entity_values = array_reverse($master_entity_values, true);
 			}
@@ -241,7 +248,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$item_values = [];
 		$text_columns = [];
 
-		foreach ($configuration as $column_index => &$column) {
+		foreach ($columns as $column_index => &$column) {
 			if ($column['data'] == CWidgetFieldColumnsList::DATA_TEXT) {
 				$text_columns[$column_index] = $column['text'];
 				continue;
@@ -253,6 +260,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			$calc_extremes = $column['display'] == CWidgetFieldColumnsList::DISPLAY_BAR
 				|| $column['display'] == CWidgetFieldColumnsList::DISPLAY_INDICATORS;
+
+			$column += ['min' => '', 'min_binary' => '', 'max' => '', 'max_binary' => ''];
 
 			if ($column_index == $master_column_index) {
 				$column_items = $master_entities;
@@ -273,7 +282,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$column_item_values = self::getItemValues($column_items, $column);
 			}
 
-			if ($calc_extremes && ($column['min'] !== '' || $column['max'] !== '')) {
+			if ($calc_extremes) {
 				if ($column['min'] !== '') {
 					$number_parser_binary->parse($column['min']);
 					$column['min_binary'] = $number_parser_binary->calcValue();
@@ -289,6 +298,29 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$number_parser->parse($column['max']);
 					$column['max'] = $number_parser->calcValue();
 				}
+
+				if ($column_index == $master_column_index) {
+					if ($column['min'] === '') {
+						$column['min'] = $master_entities_min;
+						$column['min_binary'] = $column['min'];
+					}
+
+					if ($column['max'] === '') {
+						$column['max'] = $master_entities_max;
+						$column['max_binary'] = $column['max'];
+					}
+				}
+				elseif ($column_item_values) {
+					if ($column['min'] === '') {
+						$column['min'] = min($column_item_values);
+						$column['min_binary'] = $column['min'];
+					}
+
+					if ($column['max'] === '') {
+						$column['max'] = max($column_item_values);
+						$column['max_binary'] = $column['max'];
+					}
+				}
 			}
 
 			if (array_key_exists('thresholds', $column)) {
@@ -300,33 +332,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$threshold['threshold'] = $number_parser->calcValue();
 				}
 				unset($threshold);
-			}
-
-			if ($column_index == $master_column_index) {
-				if ($calc_extremes) {
-					if ($column['min'] === '') {
-						$column['min'] = $master_entities_min;
-						$column['min_binary'] = $column['min'];
-					}
-
-					if ($column['max'] === '') {
-						$column['max'] = $master_entities_max;
-						$column['max_binary'] = $column['max'];
-					}
-				}
-			}
-			else {
-				if ($calc_extremes && $column_item_values) {
-					if ($column['min'] === '') {
-						$column['min'] = min($column_item_values);
-						$column['min_binary'] = $column['min'];
-					}
-
-					if ($column['max'] === '') {
-						$column['max'] = max($column_item_values);
-						$column['max_binary'] = $column['max'];
-					}
-				}
 			}
 
 			$item_values[$column_index] = [];
@@ -350,7 +355,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		foreach ($master_hostids as $hostid) {
 			$row = [];
 
-			foreach ($configuration as $column_index => $column) {
+			foreach ($columns as $column_index => $column) {
 				switch ($column['data']) {
 					case CWidgetFieldColumnsList::DATA_HOST_NAME:
 						$data = [
@@ -392,7 +397,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		return [
-			'configuration' => $configuration,
+			'configuration' => $columns,
+			'show_thumbnail' => $show_thumbnail,
 			'rows' => $rows
 		];
 	}
@@ -457,35 +463,121 @@ class WidgetView extends CControllerDashboardWidgetView {
 			? $column['time_period']['from_ts']
 			: time() - $history_period_s;
 
-		$items = self::addDataSource($items, $time_from, $column);
+		$items_by_value_type = self::addDataSource($items, $time_from, $column);
 
 		$result = [];
 
 		if ($column['aggregate_function'] != AGGREGATE_NONE) {
-			$values = Manager::History()->getAggregatedValues($items, $column['aggregate_function'], $time_from,
-				$column['time_period']['to_ts']
-			);
+			foreach ($items_by_value_type as $value_type => $items) {
+				if ($value_type == ITEM_VALUE_TYPE_BINARY) {
+					$output = $column['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
+						? ['itemid', 'clock', 'ns']
+						: ['itemid', 'value'];
 
-			$result += array_column($values, 'value', 'itemid');
+					foreach (array_keys($items) as $itemid) {
+						switch ($column['aggregate_function']) {
+							case AGGREGATE_LAST:
+							case AGGREGATE_FIRST:
+								$db_values = API::History()->get([
+									'output' => $output,
+									'history' => ITEM_VALUE_TYPE_BINARY,
+									'itemids' => $itemid,
+									'time_from' => $column['time_period']['from_ts'],
+									'time_till' => $column['time_period']['to_ts'],
+									'sortfield' => ['clock', 'ns'],
+									'sortorder' => $column['aggregate_function'] == AGGREGATE_LAST
+										? ZBX_SORT_DOWN
+										: ZBX_SORT_UP,
+									'limit' => 1
+								]);
+
+								if ($db_values) {
+									$result[$db_values[0]['itemid']] =
+										$column['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
+											? [
+												'clock' => $db_values[0]['clock'],
+												'ns' => $db_values[0]['ns']
+											]
+											: $db_values[0]['value'];
+								}
+
+								break;
+
+							case AGGREGATE_COUNT:
+								$db_values = API::History()->get([
+									'output' => ['itemid'],
+									'history' => ITEM_VALUE_TYPE_BINARY,
+									'itemids' => $itemid,
+									'time_from' => $column['time_period']['from_ts'],
+									'time_till' => $column['time_period']['to_ts']
+								]);
+
+								if ($db_values) {
+									$result[$db_values[0]['itemid']] = count($db_values);
+								}
+
+								break;
+						}
+					}
+				}
+				else {
+					$values = Manager::History()->getAggregatedValues($items, $column['aggregate_function'], $time_from,
+						$column['time_period']['to_ts']
+					);
+
+					$result += array_column($values, 'value', 'itemid');
+				}
+			}
 		}
 		else {
 			$items_by_source = ['history' => [], 'trends' => []];
 
-			foreach (self::addDataSource($items, $time_from, $column) as $itemid => $item) {
-				$items_by_source[$item['source']][$itemid] = $item;
-			}
+			foreach ($items_by_value_type as $value_type => $items) {
+				if ($value_type == ITEM_VALUE_TYPE_BINARY) {
+					$output = $column['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
+						? ['itemid', 'clock', 'ns']
+						: ['itemid', 'value'];
 
-			if ($items_by_source['history']) {
-				$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period_s);
-				$result += array_column(array_column($values, 0), 'value', 'itemid');
-			}
+					foreach (array_keys($items) as $itemid) {
+						$db_values = API::History()->get([
+							'output' => $output,
+							'history' => ITEM_VALUE_TYPE_BINARY,
+							'itemids' => $itemid,
+							'sortfield' => ['clock', 'ns'],
+							'sortorder' => ZBX_SORT_DOWN,
+							'limit' => 1
+						]);
 
-			if ($items_by_source['trends']) {
-				$values = Manager::History()->getAggregatedValues($items_by_source['trends'], AGGREGATE_LAST,
-					$time_from
-				);
+						if ($db_values) {
+							$result[$db_values[0]['itemid']] =
+								$column['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
+									? [
+										'clock' => $db_values[0]['clock'],
+										'ns' => $db_values[0]['ns']
+									]
+									: $db_values[0]['value'];
+						}
+					}
+				}
+				else {
+					foreach ($items as $itemid => $item) {
+						$items_by_source[$item['source']][$itemid] = $item;
+					}
 
-				$result += array_column($values, 'value', 'itemid');
+					if ($items_by_source['history']) {
+						$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period_s);
+
+						$result += array_column(array_column($values, 0), 'value', 'itemid');
+					}
+
+					if ($items_by_source['trends']) {
+						$values = Manager::History()->getAggregatedValues($items_by_source['trends'], AGGREGATE_LAST,
+							$time_from
+						);
+
+						$result += array_column($values, 'value', 'itemid');
+					}
+				}
 			}
 		}
 
@@ -493,6 +585,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private static function addDataSource(array $items, int $time, array $column): array {
+		$items_by_history_type = [];
+
 		if ($column['history'] == CWidgetFieldColumnsList::HISTORY_DATA_AUTO) {
 			$items = CItemHelper::addDataSource($items, $time);
 		}
@@ -509,9 +603,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 			if (!in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
 				$item['source'] = 'history';
 			}
+
+			$items_by_history_type[$item['value_type']][$item['itemid']] = $item;
 		}
 		unset($item);
 
-		return $items;
+		return $items_by_history_type;
 	}
 }

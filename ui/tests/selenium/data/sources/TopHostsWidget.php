@@ -87,28 +87,13 @@ class TopHostsWidget {
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'columns.0.aggregate_function',
-										'value' => 0
-									],
-									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'columns.0.decimal_places',
-										'value' =>  4
-									],
-									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'columns.0.display',
-										'value' => 1
+										'value' => 4
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'columns.0.history',
 										'value' => 1
-									],
-									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-										'name' => 'columns.0.base_color',
-										'value' => ''
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -132,28 +117,8 @@ class TopHostsWidget {
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'columns.1.aggregate_function',
-										'value' => 0
-									],
-									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'columns.1.decimal_places',
-										'value' =>  2
-									],
-									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'columns.1.display',
-										'value' => 1
-									],
-									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'columns.1.history',
 										'value' => 1
-									],
-									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-										'name' => 'columns.1.base_color',
-										'value' => ''
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,

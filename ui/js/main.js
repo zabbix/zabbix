@@ -751,17 +751,20 @@ var hintBox = {
 function ApiCall(method, params, id = 1) {
 	return fetch(new Curl('api_jsonrpc.php').getUrl(), {
 		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json'
-		},
+		headers: {'Content-Type': 'application/json'},
 		credentials: 'same-origin',
-		body: JSON.stringify({
-			jsonrpc: '2.0',
-			method,
-			params,
-			id
-		}),
-	}).then((response) => response.json());
+		body: JSON.stringify({jsonrpc: '2.0', method, params, id}),
+	})
+		.then(response => response.json())
+		.then(response => {
+			if ('error' in response) {
+				throw new Error(response.error.message, {
+					cause: { code: response.error.code, data: response.error.data }
+				});
+			}
+
+			return response;
+		});
 }
 
 /**

@@ -30,6 +30,8 @@ class testPageMonitoringLatestData extends CWebTest {
 	const FILTER_HOSTNAME = 'Host for items tags filtering';
 	const MAINTENANCE_HOSTNAME = 'Host in maintenance';
 
+	protected static $hostids;
+
 	/**
 	 * Attach TableBehavior to the test.
 	 *
@@ -69,6 +71,31 @@ class testPageMonitoringLatestData extends CWebTest {
 			];
 		}
 
+		$item_descriptions = [
+			'',
+			'Non-clickable description',
+			'https://zabbix.com',
+			'The following url should be clickable: https://zabbix.com',
+			'http://zabbix.com https://www.zabbix.com/career https://www.zabbix.com/contact',
+			'These urls should be clickable: https://zabbix.com https://www.zabbix.com/career',
+			'{$_} {$NONEXISTING}',
+			'{$LOCALIP} {$A}',
+			'{$A} and IP number {$LOCALIP}',
+			'{{$A}}',
+			'{$A}'
+		];
+
+		$items_descriptions_data = [];
+		foreach ($item_descriptions as $i => $description) {
+			$items_descriptions_data[] = [
+				'name' => 'Trapper_'.$i,
+				'key_' => 'trapper_'.$i,
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'description' => $description
+			];
+		}
+
 		// Create hosts with items and tags.
 		$result = CDataHelper::createHosts([
 			[
@@ -87,10 +114,16 @@ class testPageMonitoringLatestData extends CWebTest {
 						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
 				]
+			],
+			[
+				'host' => 'Host with item descriptions',
+				'groups' => ['groupid' => 4], // Zabbix servers.
+				'items' => $items_descriptions_data
 			]
 		]);
 
-		$maintenace_hostid = $result['hostids'][self::MAINTENANCE_HOSTNAME];
+		self::$hostids = $result['hostids'];
+		$maintenace_hostid = self::$hostids[self::MAINTENANCE_HOSTNAME];
 
 		$data_item_id = $result['itemids'][self::FILTER_HOSTNAME.':trapper0'];
 
@@ -731,87 +764,76 @@ class testPageMonitoringLatestData extends CWebTest {
 			// Item without description.
 			[
 				[
-					'hostid' => '15003',
-					'Item name' => 'item_testPageHistory_CheckLayout_Log'
+					'Item name' => 'Trapper_0'
 				]
 			],
 			// Item with plain text in the description.
 			[
 				[
-					'hostid' => '15003',
-					'Item name' => 'item_testPageHistory_CheckLayout_Log_2',
+					'Item name' => 'Trapper_1',
 					'description' => 'Non-clickable description'
 				]
 			],
 			// Item with only 1 url in description.
 			[
 				[
-					'hostid' => '15003',
-					'Item name' => 'item_testPageHistory_CheckLayout_Eventlog',
+					'Item name' => 'Trapper_2',
 					'description' => 'https://zabbix.com'
 				]
 			],
 			// Item with text and url in description.
 			[
 				[
-					'hostid' => '15003',
-					'Item name' => 'item_testPageHistory_CheckLayout_Eventlog_2',
+					'Item name' => 'Trapper_3',
 					'description' => 'The following url should be clickable: https://zabbix.com'
 				]
 			],
 			// Item with multiple urls in description.
 			[
 				[
-					'hostid' => '15003',
-					'Item name' => 'item_testPageHistory_CheckLayout_Character',
+					'Item name' => 'Trapper_4',
 					'description' => 'http://zabbix.com https://www.zabbix.com/career https://www.zabbix.com/contact'
 				]
 			],
 			// Item with text and 2 urls in description.
 			[
 				[
-					'hostid' => '15003',
-					'Item name' => 'item_testPageHistory_CheckLayout_Text',
+					'Item name' => 'Trapper_5',
 					'description' => 'These urls should be clickable: https://zabbix.com https://www.zabbix.com/career'
 				]
 			],
 			// Item with underscore in macros name and one non existing macros  in description .
 			[
 				[
-					'hostid' => '50010',
-					'Item name' => 'Http agent item form',
+					'Item name' => 'Trapper_6',
 					'description' => 'Underscore {$NONEXISTING}'
 				]
 			],
 			// Item with 2 macros in description.
 			[
 				[
-					'hostid' => '50010',
-					'Item name' => 'Http agent item for update',
+					'Item name' => 'Trapper_7',
 					'description' => '127.0.0.1 Some text'
 				]
 			],
 			// Item with 2 macros and text in description.
 			[
 				[
-					'hostid' => '50010',
-					'Item name' => 'Http agent item for delete',
+					'Item name' => 'Trapper_8',
 					'description' => 'Some text and IP number 127.0.0.1'
 				]
 			],
 			// Item with macros inside curly brackets.
 			[
 				[
-					'hostid' => '50007',
-					'Item name' => 'Item-layout-test-002',
+					'Item name' => 'Trapper_9',
 					'description' => '{Some text}'
 				]
 			],
 			// Item with macros in description.
 			[
 				[
-					'hostid' => '99027',
-					'Item name' => 'Item to check graph',
+					'Item name' => 'Trapper_10',
 					'description' => 'Some text'
 				]
 			]
@@ -822,9 +844,9 @@ class testPageMonitoringLatestData extends CWebTest {
 	 * @dataProvider getItemDescription
 	 */
 	public function testPageMonitoringLatestData_checkItemDescription($data) {
-		// Open Latest data for host 'testPageHistory_CheckLayout'
-		$this->page->login()->open('zabbix.php?&action=latest.view&show_details=0&hostids%5B%5D='.$data['hostid'])
-				->waitUntilReady();
+		// Open Latest data for host 'Host with item descriptions'
+		$this->page->login()->open('zabbix.php?&action=latest.view&show_details=0&hostids%5B%5D='.
+				self::$hostids['Host with item descriptions'])->waitUntilReady();
 
 		// Find rows from the data provider and click on the description icon if such should persist.
 		$row = $this->getTable()->findRow('Name', $data['Item name'], true);

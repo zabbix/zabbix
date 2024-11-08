@@ -1,4 +1,4 @@
-<?php declare(strict_types = 0);
+<?php declare(strict_types=0);
 /*
 ** Copyright (C) 2001-2024 Zabbix SIA
 **
@@ -14,7 +14,17 @@
 **/
 
 
-use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
+namespace Widgets\TopHosts\Includes;
+
+use CButton,
+	CCol,
+	CColHeader,
+	CDiv,
+	CList,
+	CTable,
+	CTag,
+	CVar,
+	CWidgetFieldView;
 
 class CWidgetFieldColumnsListView extends CWidgetFieldView {
 
@@ -55,7 +65,7 @@ class CWidgetFieldColumnsListView extends CWidgetFieldView {
 			if ($column['data'] == CWidgetFieldColumnsList::DATA_HOST_NAME) {
 				$label = new CTag('em', true, _('Host name'));
 			}
-			else if ($column['data'] == CWidgetFieldColumnsList::DATA_TEXT) {
+			elseif ($column['data'] == CWidgetFieldColumnsList::DATA_TEXT) {
 				$label = new CTag('em', true, $column['text']);
 			}
 			elseif (array_key_exists('item', $column)) {
@@ -69,7 +79,10 @@ class CWidgetFieldColumnsListView extends CWidgetFieldView {
 				(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 				(new CDiv($column['name']))->addClass('text'),
 				(new CDiv($label))->addClass('text'),
-				(new CList(array_merge($row_actions, [$column_data])))->addClass(ZBX_STYLE_HOR_LIST)
+				[
+					(new CList($row_actions))->addClass(ZBX_STYLE_HOR_LIST),
+					$column_data
+				]
 			]);
 		}
 

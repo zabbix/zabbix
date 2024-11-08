@@ -17,47 +17,87 @@
 
 window.widget_tophosts_form = new class {
 
+	/**
+	 * Widget form.
+	 *
+	 * @type {HTMLFormElement}
+	 */
+	#form;
+
+	/**
+	 * Template id.
+	 *
+	 * @type {string}
+	 */
+	#templateid;
+
+	/**
+	 * Column list container.
+	 *
+	 * @type {HTMLElement}
+	 */
+	#list_columns;
+
 	init({templateid}) {
-		this._form = document.getElementById('widget-dialogue-form');
-		this._templateid = templateid;
+		this.#form = document.getElementById('widget-dialogue-form');
+		this.#list_columns = document.getElementById('list_columns');
+		this.#templateid = templateid;
 
-		this._list_columns = document.getElementById('list_columns');
-
-		new CSortable(this._list_columns.querySelector('tbody'), {
+		new CSortable(this.#list_columns.querySelector('tbody'), {
 			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			freeze_end: 1
 		});
 
-		this._list_columns.addEventListener('click', (e) => this.processColumnsAction(e));
+		this.#list_columns.addEventListener('click', (e) => this.#processColumnsAction(e));
 	}
 
-	processColumnsAction(e) {
+	#processColumnsAction(e) {
 		const target = e.target;
+		const form_fields = getFormFields(this.#form);
 
+		let column_index;
 		let column_popup;
 
 		switch (target.getAttribute('name')) {
 			case 'add':
-				this._column_index = this._list_columns.querySelectorAll('tr').length;
+				column_index = this.#list_columns.querySelectorAll('tr').length;
 
 				column_popup = PopUp(
 					'widget.tophosts.column.edit',
-					{templateid: this._templateid},
-					{dialogue_class: 'modal-popup-generic'}
+					{
+						templateid: this.#templateid,
+						groupids: form_fields.groupids,
+						hostids: form_fields.hostids
+					},
+					{
+						dialogueid: 'tophosts-column-edit-overlay',
+						dialogue_class: 'modal-popup-generic'
+					}
 				).$dialogue[0];
-				column_popup.addEventListener('dialogue.submit', (e) => this.updateColumns(e));
-				column_popup.addEventListener('dialogue.close', this.removeColorpicker);
+
+				column_popup.addEventListener('dialogue.submit', (e) => this.#updateColumns(column_index, e.detail));
+				column_popup.addEventListener('dialogue.close', this.#removeColorpicker);
 				break;
 
 			case 'edit':
-				const form_fields = getFormFields(this._form);
+				column_index = target.closest('tr').querySelector('[name="sortorder[columns][]"]').value;
 
-				this._column_index = target.closest('tr').querySelector('[name="sortorder[columns][]"]').value;
+				column_popup = PopUp(
+					'widget.tophosts.column.edit',
+					{
+						...form_fields.columns[column_index],
+						edit: 1,
+						templateid: this.#templateid,
+						groupids: form_fields.groupids,
+						hostids: form_fields.hostids
+					}, {
+						dialogueid: 'tophosts-column-edit-overlay',
+						dialogue_class: 'modal-popup-generic'
+					}
+					).$dialogue[0];
 
-				column_popup = PopUp('widget.tophosts.column.edit',
-					{...form_fields.columns[this._column_index], edit: 1, templateid: this._templateid}).$dialogue[0];
-				column_popup.addEventListener('dialogue.submit', (e) => this.updateColumns(e));
-				column_popup.addEventListener('dialogue.close', this.removeColorpicker);
+				column_popup.addEventListener('dialogue.submit', (e) => this.#updateColumns(column_index, e.detail));
+				column_popup.addEventListener('dialogue.close', this.#removeColorpicker);
 				break;
 
 			case 'remove':
@@ -67,58 +107,57 @@ window.widget_tophosts_form = new class {
 		}
 	}
 
-	updateColumns(e) {
-		const data = e.detail;
-		const input = document.createElement('input');
-
-		input.setAttribute('type', 'hidden');
+	#updateColumns(column_index, data) {
+		this.#list_columns.querySelectorAll(`[name^="columns[${column_index}]["]`).forEach(node => node.remove());
 
 		if (data.edit) {
-			this._list_columns.querySelectorAll(`[name^="columns[${this._column_index}][`)
-				.forEach((node) => node.remove());
-
 			delete data.edit;
 		}
 		else {
-			input.setAttribute('name', `sortorder[columns][]`);
-			input.setAttribute('value', this._column_index);
-			this._form.appendChild(input.cloneNode());
+			this.#addVar(`sortorder[columns][]`, column_index);
 		}
 
-		if (data.thresholds) {
-			for (const [key, value] of Object.entries(data.thresholds)) {
-				input.setAttribute('name', `columns[${this._column_index}][thresholds][${key}][color]`);
-				input.setAttribute('value', value.color);
-				this._form.appendChild(input.cloneNode());
-				input.setAttribute('name', `columns[${this._column_index}][thresholds][${key}][threshold]`);
-				input.setAttribute('value', value.threshold);
-				this._form.appendChild(input.cloneNode());
+		for (const [data_key, data_value] of Object.entries(data)) {
+			switch (data_key) {
+				case 'thresholds':
+					for (const [key, value] of Object.entries(data_value)) {
+						this.#addVar(`columns[${column_index}][thresholds][${key}][color]`, value.color);
+						this.#addVar(`columns[${column_index}][thresholds][${key}][threshold]`, value.threshold);
+					}
+					break;
+
+				case 'highlights':
+					for (const [key, value] of Object.entries(data_value)) {
+						this.#addVar(`columns[${column_index}][highlights][${key}][color]`, value.color);
+						this.#addVar(`columns[${column_index}][highlights][${key}][pattern]`, value.pattern);
+					}
+					break;
+
+				case 'time_period':
+					for (const [key, value] of Object.entries(data_value)) {
+						this.#addVar(`columns[${column_index}][time_period][${key}]`, value);
+					}
+					break;
+
+				default:
+					this.#addVar(`columns[${column_index}][${data_key}]`, data_value);
+					break;
 			}
-
-			delete data.thresholds;
-		}
-
-		if (data.time_period) {
-			for (const [key, value] of Object.entries(data.time_period)) {
-				input.setAttribute('name', `columns[${this._column_index}][time_period][${key}]`);
-				input.setAttribute('value', value);
-				this._form.appendChild(input.cloneNode());
-			}
-
-			delete data.time_period;
-		}
-
-		for (const [key, value] of Object.entries(data)) {
-			input.setAttribute('name', `columns[${this._column_index}][${key}]`);
-			input.setAttribute('value', value);
-			this._form.appendChild(input.cloneNode());
 		}
 
 		ZABBIX.Dashboard.reloadWidgetProperties();
 	}
 
+	#addVar(name, value) {
+		const input = document.createElement('input');
+		input.setAttribute('type', 'hidden');
+		input.setAttribute('name', name);
+		input.setAttribute('value', value);
+		this.#form.appendChild(input);
+	}
+
 	// Need to remove function after sub-popups auto close.
-	removeColorpicker() {
+	#removeColorpicker() {
 		$('#color_picker').hide();
 	}
 };

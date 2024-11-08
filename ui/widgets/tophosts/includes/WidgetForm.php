@@ -16,6 +16,8 @@
 
 namespace Widgets\TopHosts\Includes;
 
+use Widgets\TopHosts\Widget;
+
 use Zabbix\Widgets\{
 	CWidgetField,
 	CWidgetForm
@@ -23,7 +25,6 @@ use Zabbix\Widgets\{
 
 use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
-	CWidgetFieldColumnsList,
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectGroup,
 	CWidgetFieldMultiSelectHost,
@@ -32,8 +33,6 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldSelect,
 	CWidgetFieldTags
 };
-
-use Widgets\TopHosts\Widget;
 
 /**
  * Top hosts data widget form.

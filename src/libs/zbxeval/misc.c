@@ -512,27 +512,30 @@ static int	eval_has_usermacro(const char *str, size_t len)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: expands user macros in item query                                 *
+ * Purpose: substitutes macros in item query using resolver callback          *
  *                                                                            *
  * Parameters: itemquery    - [IN]                                            *
  *             len          - [IN] item query length                          *
- *             hostids      - [IN] linked hostids                             *
- *             hostids_num  - [IN] number of linked hostids                   *
- *             um_expand_cb - [IN] resolver callback                          *
- *             um_data      - [IN] resolver callback data                     *
  *             out          - [OUT] item query with expanded macros           *
  *             error        - [OUT] Error message, optional. If specified,    *
  *                                  the function will return failure at the   *
  *                                  first failed macro expansion.             *
+ *             resolver     - [IN] resolver callback                          *
+ *                                                                            *
+ * Return value: SUCCEED - query is successfully parsed and substituted       *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	eval_query_expand_user_macros(const char *itemquery, size_t len, const zbx_uint64_t *hostids,
-		int hostids_num, zbx_macro_expand_func_t um_expand_cb, void *um_data, char **out, char **error)
+int	zbx_eval_query_subtitute_user_macros(const char *itemquery, size_t len, char **out, char **error,
+		zbx_eval_subst_macros_func_t resolver, ...)
 {
 	zbx_eval_context_t	ctx;
 	zbx_item_query_t	query;
 	int			i, ret = FAIL;
 	char			*errmsg = NULL, *filter = NULL;
+	va_list			args;
+
+	va_start(args, resolver);
 
 	if (len != zbx_eval_parse_query(itemquery, len, &query))
 	{
@@ -566,12 +569,16 @@ static int	eval_query_expand_user_macros(const char *itemquery, size_t len, cons
 	{
 		zbx_eval_token_t	*token = &ctx.stack.values[i];
 		char			*value = NULL;
+		va_list			pargs;
 
 		switch (token->type)
 		{
 			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
 				value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
-				ret = um_expand_cb(um_data, &value, hostids, hostids_num, error);
+
+				va_copy(pargs, args);
+				ret = resolver(token->type, &value, error, pargs);
+				va_end(pargs);
 				break;
 			case ZBX_EVAL_TOKEN_VAR_STR:
 				if (SUCCEED != eval_has_usermacro(ctx.expression + token->loc.l,
@@ -580,7 +587,10 @@ static int	eval_query_expand_user_macros(const char *itemquery, size_t len, cons
 					continue;
 				}
 				value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
-				ret = um_expand_cb(um_data, &value, hostids, hostids_num, error);
+
+				va_copy(pargs, args);
+				ret = resolver(token->type, &value, error, pargs);
+				va_end(pargs);
 				break;
 			default:
 				continue;
@@ -603,6 +613,7 @@ static int	eval_query_expand_user_macros(const char *itemquery, size_t len, cons
 	*out = zbx_dsprintf(NULL, "/%s/%s?[%s]", ZBX_NULL2EMPTY_STR(query.host), query.key, filter);
 	ret = SUCCEED;
 out:
+	va_end(args);
 	zbx_free(filter);
 	zbx_eval_clear_query(&query);
 
@@ -611,44 +622,64 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: expands user macros in parsed expression                          *
+ * Purpose: substitutes macros in parsed expression using resolver callback   *
  *                                                                            *
- * Parameters: ctx          - [IN] evaluation context                         *
- *             hostids      - [IN] linked hostids                             *
- *             hostids_num  - [IN] number of linked hostids                   *
- *             um_expand_cb - [IN] resolver callback                          *
- *             data         - [IN] resolver callback data                     *
- *             error        - [OUT] Error message, optional. If specified     *
- *                                  the function will return failure at the   *
- *                                  first failed macro expansion.             *
+ * Parameters: ctx      - [IN] evaluation context                             *
+ *             error    - [OUT] Error message, optional. If specified the     *
+ *                              function will return failure at the first     *
+ *                              failed macro expansion.                       *
+ *             resolver - [IN] pointer to resolver function:                  *
+ *             ...      - [IN/OUT] additional variadic arguments passed to    *
+ *                                 resolver function                          *
  *                                                                            *
- * Return value: SUCCEED - macros were expanded successfully                  *
+ * Return value: SUCCEED - macros were substituted successfully               *
  *               FAIL    - error parameter was given and at least one of      *
- *                         macros was not expanded                            *
+ *                         macros was not substituted                         *
+ *                                                                            *
+ * Macro resolver parameters:                                                 *
+ *             token_type - [IN] evaluation token type                        *
+ *             value      - [IN/OUT] replaceable value                        *
+ *             error      - [OUT] pointer to error message                    *
+ *             args       - [IN] list of variadic arguments passed from       *
+ *                               caller                                       *
+ *                                                                            *
+ * Macro resolver return value:                                               *
+ *               SUCCEED - supported macros were replaced                     *
+ *               FAIL    - supported macro substitution failed                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, const zbx_uint64_t *hostids, int hostids_num,
-		zbx_macro_expand_func_t um_expand_cb, void *data, char **error)
+int	zbx_eval_substitute_macros(const zbx_eval_context_t *ctx, char **error,
+		zbx_eval_subst_macros_func_t resolver, ...)
 {
-	int	i;
+	va_list	args;
 
-	for (i = 0; i < ctx->stack.values_num; i++)
+	va_start(args, resolver);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	for (int i = 0; i < ctx->stack.values_num; i++)
 	{
 		zbx_eval_token_t	*token = &ctx->stack.values[i];
 		char			*value = NULL;
 		int			ret;
 
+		va_list	pargs;
+
+		va_copy(pargs, args); /* copy current argument position */
+
 		switch (token->type)
 		{
+			case ZBX_EVAL_TOKEN_VAR_MACRO:
 			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
 				value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
-				ret = um_expand_cb(data, &value, hostids, hostids_num, error);
+				ret = resolver(token->type, &value, error, pargs);
 				break;
 			case ZBX_EVAL_TOKEN_VAR_STR:
 				if (SUCCEED != eval_has_usermacro(ctx->expression + token->loc.l,
 						token->loc.r - token->loc.l + 1))
 				{
-					continue;
+					ret = SUCCEED_PARTIAL;
+					break;
 				}
 
 				if (ZBX_VARIANT_NONE != token->value.type)
@@ -678,36 +709,44 @@ int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, const zbx_uint64_
 				else
 					value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
 
-				ret = um_expand_cb(data, &value, hostids, hostids_num, error);
+				ret = resolver(token->type, &value, error, pargs);
 				break;
 			case ZBX_EVAL_TOKEN_VAR_NUM:
 			case ZBX_EVAL_TOKEN_ARG_PERIOD:
 				if (SUCCEED != eval_has_usermacro(ctx->expression + token->loc.l,
 						token->loc.r - token->loc.l + 1))
 				{
-					continue;
+					ret = SUCCEED_PARTIAL;
+					break;
 				}
 				value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
-				ret = um_expand_cb(data, &value, hostids, hostids_num, error);
+				ret = resolver(token->type, &value, error, pargs);
 				break;
 			case ZBX_EVAL_TOKEN_ARG_QUERY:
 				if (SUCCEED != eval_has_usermacro(ctx->expression + token->loc.l,
 						token->loc.r - token->loc.l + 1))
 				{
-					continue;
+					ret = SUCCEED_PARTIAL;
+					break;
 				}
-				ret = eval_query_expand_user_macros(ctx->expression + token->loc.l,
-						token->loc.r - token->loc.l + 1, hostids, hostids_num,
-						um_expand_cb, data, &value, error);
+				value = zbx_substr(ctx->expression, token->loc.l, token->loc.r);
+				ret = resolver(token->type, &value, error, pargs);
 				break;
 			default:
-				continue;
+				ret = SUCCEED_PARTIAL;
+				break;
 		}
 
-		if (FAIL == ret)
+		/* it is required to call this, otherwise it's undefined behaviour */
+		va_end(pargs);
+
+		switch (ret)
 		{
-			zbx_free(value);
-			return FAIL;
+			case FAIL:
+				zbx_free(value);
+				return FAIL;
+			case SUCCEED_PARTIAL:
+				continue;
 		}
 
 		if (NULL != value)
@@ -716,6 +755,10 @@ int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, const zbx_uint64_
 			zbx_variant_set_str(&token->value, value);
 		}
 	}
+
+	va_end(args);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return SUCCEED;
 }

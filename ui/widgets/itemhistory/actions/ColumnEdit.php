@@ -23,6 +23,7 @@ use API,
 	CParser;
 
 use Widgets\ItemHistory\Includes\CWidgetFieldColumnsList;
+use Widgets\ItemHistory\Widget;
 
 class ColumnEdit extends CController {
 
@@ -89,11 +90,11 @@ class ColumnEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return true;
+		return $this->getUserType() >= USER_TYPE_ZABBIX_USER;
 	}
 
 	protected function doAction(): void {
-		$input = $this->getInputAll();
+		$input = $this->getInputAll() + self::getColumnDefaults();
 		unset($input['update']);
 
 		$item_ms = [];
@@ -133,7 +134,7 @@ class ColumnEdit extends CController {
 		if (!$this->hasInput('update')) {
 			$data = [
 				'action' => $this->getAction(),
-				'colors' => CWidgetFieldColumnsList::DEFAULT_COLOR_PALETTE,
+				'colors' => Widget::DEFAULT_COLOR_PALETTE,
 				'ms_item' => $item_ms,
 				'item_value_type' => $item_value_type,
 				'templateid' => $this->hasInput('templateid') ? $this->getInput('templateid') : null,
@@ -141,18 +142,15 @@ class ColumnEdit extends CController {
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				]
-			] + $input + self::getColumnDefaults();
+			] + $input;
 
 			$this->setResponse(new CControllerResponseData($data));
-
-			return;
 		}
+		else {
+			$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 
-		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
+			$thresholds = [];
 
-		$thresholds = [];
-
-		if (array_key_exists('thresholds', $input)) {
 			foreach ($input['thresholds'] as $threshold) {
 				$order_threshold = trim($threshold['threshold']);
 
@@ -161,28 +159,26 @@ class ColumnEdit extends CController {
 				}
 			}
 
-			unset($input['thresholds']);
-		}
-
-		if ($thresholds) {
-			uasort($thresholds,
-				static function (array $threshold_1, array $threshold_2): int {
-					return $threshold_1['order_threshold'] <=> $threshold_2['order_threshold'];
-				}
-			);
-
 			$input['thresholds'] = [];
 
-			foreach ($thresholds as $threshold) {
-				unset($threshold['order_threshold']);
+			if ($thresholds) {
+				uasort($thresholds,
+					static function (array $threshold_1, array $threshold_2): int {
+						return $threshold_1['order_threshold'] <=> $threshold_2['order_threshold'];
+					}
+				);
 
-				$input['thresholds'][] = $threshold;
+				foreach ($thresholds as $threshold) {
+					unset($threshold['order_threshold']);
+
+					$input['thresholds'][] = $threshold;
+				}
 			}
-		}
 
-		$this->setResponse(
-			(new CControllerResponseData(['main_block' => json_encode($input, JSON_THROW_ON_ERROR)]))->disableView()
-		);
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode($input, JSON_THROW_ON_ERROR)]))->disableView()
+			);
+		}
 	}
 
 	/**

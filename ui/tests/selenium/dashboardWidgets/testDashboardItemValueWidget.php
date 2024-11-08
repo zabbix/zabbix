@@ -317,7 +317,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'maxlength' => 255
 					],
 					'xpath:.//input[@id="thresholds_0_color"]/..' => [
-						'color' => 'FF465C'
+						'color' => 'E65660'
 					],
 					'id:time_period_from' => [
 						'maxlength' => 255,
@@ -1088,7 +1088,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Override host' => 'Dashboard'
 					],
 					'item' => [
-						'Host for different items types' => 'Http agent item form'
+						'ЗАББИКС Сервер' => 'Available memory'
 					]
 				]
 			],

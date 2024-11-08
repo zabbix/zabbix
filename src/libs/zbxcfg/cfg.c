@@ -552,6 +552,7 @@ static int	__parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int level
 						}
 						break;
 					default:
+						zbx_this_should_never_happen_backtrace();
 						assert(0);
 				}
 			}
@@ -582,6 +583,7 @@ static int	__parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int level
 					goto missing_mandatory;
 				break;
 			default:
+				zbx_this_should_never_happen_backtrace();
 				assert(0);
 		}
 	}

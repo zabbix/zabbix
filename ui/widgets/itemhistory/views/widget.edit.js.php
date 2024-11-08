@@ -112,55 +112,51 @@ window.widget_itemhistory_form = new class {
 
 	#updateColumns(e) {
 		const data = e.detail;
-		const input = document.createElement('input');
 
-		input.setAttribute('type', 'hidden');
-
-		if (data.edit) {
-			this.#list_columns.querySelectorAll(`[name^="columns[${this.#column_index}]["]`)
-				.forEach((node) => node.remove());
-
-			delete data.edit;
-		}
-		else {
-			input.setAttribute('name', `sort_order[columns][]`);
-			input.setAttribute('value', this.#column_index);
-			this.#form.appendChild(input.cloneNode());
+		if (!data.edit) {
+			this.#addVar('sort_order[columns][]', this.#column_index);
 		}
 
-		if (data.thresholds) {
-			for (const [key, value] of Object.entries(data.thresholds)) {
-				input.setAttribute('name', `columns[${this.#column_index}][thresholds][${key}][color]`);
-				input.setAttribute('value', value.color);
-				this.#form.appendChild(input.cloneNode());
-				input.setAttribute('name', `columns[${this.#column_index}][thresholds][${key}][threshold]`);
-				input.setAttribute('value', value.threshold);
-				this.#form.appendChild(input.cloneNode());
+		for (const [data_key, data_value] of Object.entries(data)) {
+			switch (data_key) {
+				case 'edit':
+					this.#list_columns.querySelectorAll(`[name^="columns[${this.#column_index}]["]`)
+						.forEach((node) => node.remove());
+
+					break;
+
+				case 'thresholds':
+					for (const [key, value] of Object.entries(data.thresholds)) {
+						this.#addVar(`columns[${this.#column_index}][thresholds][${key}][color]`, value.color);
+						this.#addVar(`columns[${this.#column_index}][thresholds][${key}][threshold]`, value.threshold);
+					}
+
+					break;
+
+				case 'highlights':
+					for (const [key, value] of Object.entries(data.highlights)) {
+						this.#addVar(`columns[${this.#column_index}][highlights][${key}][color]`, value.color);
+						this.#addVar(`columns[${this.#column_index}][highlights][${key}][pattern]`, value.pattern);
+					}
+
+					break;
+
+				default:
+					this.#addVar(`columns[${this.#column_index}][${data_key}]`, data_value);
+
+					break;
 			}
-
-			delete data.thresholds;
-		}
-
-		if (data.highlights) {
-			for (const [key, value] of Object.entries(data.highlights)) {
-				input.setAttribute('name', `columns[${this.#column_index}][highlights][${key}][color]`);
-				input.setAttribute('value', value.color);
-				this.#form.appendChild(input.cloneNode());
-				input.setAttribute('name', `columns[${this.#column_index}][highlights][${key}][pattern]`);
-				input.setAttribute('value', value.pattern);
-				this.#form.appendChild(input.cloneNode());
-			}
-
-			delete data.highlights;
-		}
-
-		for (const [key, value] of Object.entries(data)) {
-			input.setAttribute('name', `columns[${this.#column_index}][${key}]`);
-			input.setAttribute('value', value);
-			this.#form.appendChild(input.cloneNode());
 		}
 
 		ZABBIX.Dashboard.reloadWidgetProperties();
+	}
+
+	#addVar(name, value) {
+		const input = document.createElement('input');
+		input.setAttribute('type', 'hidden');
+		input.setAttribute('name', name);
+		input.setAttribute('value', value);
+		this.#form.appendChild(input);
 	}
 
 	// Need to remove function after sub-popups auto close.

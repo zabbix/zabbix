@@ -335,6 +335,7 @@ int	uint64_array_add(zbx_uint64_t **values, int *alloc, int *num, zbx_uint64_t v
 		if (0 == alloc_step)
 		{
 			zbx_error("Unable to reallocate buffer");
+			zbx_this_should_never_happen_backtrace();
 			assert(0);
 		}
 

@@ -196,6 +196,56 @@ static int	DBpatch_7010017(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field"
+			" set value_int="
+				"case when value_int=1 then 0"
+				" when value_int=2 then 1"
+				" when value_int=3 then 2 end"
+			" where name like 'columns.%%.history'"
+				" and exists ("
+					"select null"
+					" from widget w"
+					" where widget_field.widgetid=w.widgetid"
+						" and w.type='tophosts'"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7010018(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from widget_field"
+			" where ((name like 'columns.%%.base_color' and value_str='')"
+				" or (name like 'columns.%%.display' and value_int=1)"
+				" or (name like 'columns.%%.decimal_places' and value_int=2)"
+				" or (name like 'columns.%%.aggregate_function' and value_int=0)"
+				" or (name like 'columns.%%.history' and value_int=0))"
+				" and exists ("
+					"select null"
+					" from widget w"
+					" where widget_field.widgetid=w.widgetid"
+						" and w.type='tophosts'"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7010019(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	/* 0 - HOST_STATUS_MONITORED */
 	/* 1 - HOST_STATUS_NOT_MONITORED */
 	if (ZBX_DB_OK > zbx_db_execute(
@@ -234,5 +284,7 @@ DBPATCH_ADD(7010014, 0, 1)
 DBPATCH_ADD(7010015, 0, 1)
 DBPATCH_ADD(7010016, 0, 1)
 DBPATCH_ADD(7010017, 0, 1)
+DBPATCH_ADD(7010018, 0, 1)
+DBPATCH_ADD(7010019, 0, 1)
 
 DBPATCH_END()

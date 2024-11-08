@@ -14,7 +14,7 @@
 **/
 
 
-namespace Widgets\ItemHistory\Actions;
+namespace Widgets\TopHosts\Actions;
 
 use API,
 	CController,

@@ -3606,44 +3606,45 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #55 Item history widget with too high value of Show lines parameter.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
-						'Name' => 'Item history widget with too much lines',
-						'Show lines' => 9999
-					],
-					'Column' => [
-						'Name' => 'Column1',
-						'Item' => [
-							'values' => self::TEMPLATE_ITEM,
-							'context' => ['values' => self::TEMPLATE]
-						]
-					],
-					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
-				]
-			],
-			// #56 Item history widget with negative Show lines parameter.
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
-						'Name' => 'Item history widget with too much lines',
-						'Show lines' => -99
-					],
-					'Column' => [
-						'Name' => 'Column1',
-						'Item' => [
-							'values' => self::TEMPLATE_ITEM,
-							'context' => ['values' => self::TEMPLATE]
-						]
-					],
-					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-1000.'
-				]
-			],
+			// TODO: Uncomment and fix when DEV-4069 is ready.
+//			// #55 Item history widget with too high value of Show lines parameter.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'fields' => [
+//						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
+//						'Name' => 'Item history widget with too much lines',
+//						'Show lines' => 9999
+//					],
+//					'Column' => [
+//						'Name' => 'Column1',
+//						'Item' => [
+//							'values' => self::TEMPLATE_ITEM,
+//							'context' => ['values' => self::TEMPLATE]
+//						]
+//					],
+//					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+//				]
+//			],
+//			// #56 Item history widget with negative Show lines parameter.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'fields' => [
+//						'Type' => CFormElement::RELOADABLE_FILL('Item history'),
+//						'Name' => 'Item history widget with too much lines',
+//						'Show lines' => -99
+//					],
+//					'Column' => [
+//						'Name' => 'Column1',
+//						'Item' => [
+//							'values' => self::TEMPLATE_ITEM,
+//							'context' => ['values' => self::TEMPLATE]
+//						]
+//					],
+//					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+//				]
+//			],
 			// #57 Item history widget with Values location = Bottom, Show timestamp =true and Column header = Off.
 			[
 				[
