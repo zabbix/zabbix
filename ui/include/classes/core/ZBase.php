@@ -465,7 +465,7 @@ class ZBase {
 				$db_credentials = $this->vault->getCredentials();
 
 				if ($db_credentials === null) {
-					throw new DBException(_('Unable to load database credentials from Vault.'));
+					throw new DBException(_('Unable to load database credentials from Vault.'), DB::INIT_ERROR);
 				}
 
 				['user' => $db_user, 'password' => $db_password] = $db_credentials;
@@ -490,7 +490,7 @@ class ZBase {
 		if (!DBconnect($error)) {
 			CDataCacheHelper::clearValues(['db_user', 'db_password']);
 
-			throw new DBException($error, DB::DBEXECUTE_ERROR);
+			throw new DBException($error, DB::INIT_ERROR);
 		}
 	}
 
