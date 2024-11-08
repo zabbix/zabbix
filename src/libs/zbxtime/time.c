@@ -498,19 +498,18 @@ int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_ti
  *                                                                            *
  * Purpose: set time zone                                                     *
  *                                                                            *
- * Parameters: tz   - [IN] time zone                                          *
- *                                                                            *
- * Return value: previouse time zone or NULL                                  *
+ * Parameters: tz     - [IN] time zone                                        *
+ *             out_tz - [OUT] previouse time zone                             *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_set_time_zone(const char *tz)
+void zbx_set_time_zone(const char *tz, char **old_tz)
 {
 #if defined(HAVE_GETENV) && defined(HAVE_UNSETENV) && defined(HAVE_TZSET) && \
 		!defined(_WINDOWS) && !defined(__MINGW32__)
-	char		*old_tz;
 
-	if (NULL != (old_tz = getenv("TZ")))
-		old_tz = zbx_strdup(NULL, old_tz);
+
+	if (NULL != old_tz && NULL != (*old_tz = getenv("TZ")))
+		*old_tz = zbx_strdup(NULL, *old_tz);
 
 	if (NULL == tz || 0 == strcmp(tz, "system"))
 	{
@@ -522,9 +521,11 @@ char	*zbx_set_time_zone(const char *tz)
 	}
 	tzset();
 
-	return old_tz;
+	return;
 #else
-	return NULL;
+	if(NULL != old_tz)
+		*old_tz = NULL;
+	return;
 #endif
 }
 

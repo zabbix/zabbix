@@ -71,7 +71,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	old_tz = zbx_set_time_zone(zbx_mock_get_parameter_string("in.timezone"));
+	zbx_set_time_zone(zbx_mock_get_parameter_string("in.timezone"), &old_tz);
 
 	cycle = mock_get_cycle("in.cycle");
 	weekdays = mock_get_weekdays("in.weekdays");
@@ -104,9 +104,6 @@ void	zbx_mock_test_entry(void **state)
 		now = nextcheck;
 	}
 
-	if (NULL != old_tz)
-	{
-		zbx_set_time_zone(old_tz);
-		zbx_free(old_tz);
-	}
+	zbx_set_time_zone(old_tz, NULL);
+	zbx_free(old_tz);
 }
