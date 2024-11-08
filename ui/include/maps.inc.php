@@ -923,21 +923,23 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 	return $info;
 }
 
-function getElementHosts($selement, $sysmaps_data, $hosts_by_groupids, $host_ids = []) {
+function getElementHosts($selement, $sysmaps_data, $hosts_by_groupids) {
+	$host_ids = [];
+
 	if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
 		$hostid = $selement['elements'][0]['hostid'];
 		$host_ids[$hostid] = $hostid;
 	}
 	elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
 		$groupid = $selement['elements'][0]['groupid'];
-		$host_ids += $hosts_by_groupids[$groupid];
+		$host_ids = $hosts_by_groupids[$groupid];
 	}
 	elseif ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_MAP) {
 		$sysmapid = $selement['elements'][0]['sysmapid'];
 
 		if (array_key_exists($sysmapid, $sysmaps_data)) {
 			foreach ($sysmaps_data[$sysmapid]['selements'] as $nested_element) {
-				$host_ids = getElementHosts($nested_element, $sysmaps_data, $hosts_by_groupids, $host_ids);
+				$host_ids += getElementHosts($nested_element, $sysmaps_data, $hosts_by_groupids);
 			}
 		}
 	}
