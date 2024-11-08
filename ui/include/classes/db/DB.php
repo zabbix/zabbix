@@ -21,6 +21,7 @@ class DB {
 	const DBEXECUTE_ERROR = 1;
 	const RESERVEIDS_ERROR = 2;
 	const SCHEMA_ERROR = 3;
+	const INIT_ERROR = 4;
 
 	const FIELD_TYPE_INT = 0x01;
 	const FIELD_TYPE_CHAR = 0x02;

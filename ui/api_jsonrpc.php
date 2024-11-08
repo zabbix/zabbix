@@ -62,7 +62,7 @@ catch (Throwable $e) {
 
 	if (array_key_exists('id', $json_data)) {
 		$user_type = CUser::$userData === null ? USER_TYPE_ZABBIX_USER : CUser::$userData['type'];
-		$data = ($e instanceof DBException && $user_type != USER_TYPE_SUPER_ADMIN)
+		$data = ($e instanceof DBException && $user_type != USER_TYPE_SUPER_ADMIN && $e->getCode() != DB::INIT_ERROR)
 			? _('System error occurred. Please contact Zabbix administrator.')
 			: $e->getMessage();
 
