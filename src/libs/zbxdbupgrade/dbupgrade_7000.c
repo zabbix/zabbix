@@ -138,6 +138,25 @@ static int	DBpatch_7000014(void)
 	return DBcreate_index("proxy_history", "proxy_history_2", "write_clock", 0);
 }
 
+static int	DBpatch_7000015(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* 0 - HOST_STATUS_MONITORED */
+	/* 1 - HOST_STATUS_NOT_MONITORED */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update items"
+				" set uuid=''"
+				" where hostid in (select hostid from hosts where status in (0,1))"
+					" and uuid" ZBX_SQL_STRCMP, ZBX_SQL_STRVAL_NE("")))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7000)
@@ -159,5 +178,6 @@ DBPATCH_ADD(7000011, 0, 0)
 DBPATCH_ADD(7000012, 0, 0)
 DBPATCH_ADD(7000013, 0, 0)
 DBPATCH_ADD(7000014, 0, 0)
+DBPATCH_ADD(7000015, 0, 0)
 
 DBPATCH_END()
