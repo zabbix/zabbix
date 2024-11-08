@@ -138,7 +138,7 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 #endif
 		ZBX_STR2UCHAR(host->monitored_by, row[8 + ZBX_IPMI_FIELDS_NUM]);
 
-		if(HOST_MONITORED_BY_PROXY_GROUP != host->monitored_by)
+		if (HOST_MONITORED_BY_PROXY_GROUP != host->monitored_by)
 			ZBX_DBROW2UINT64(host->proxyid, row[1]);
 		else
 			ZBX_DBROW2UINT64(host->proxyid, row[9 + ZBX_IPMI_FIELDS_NUM]);
