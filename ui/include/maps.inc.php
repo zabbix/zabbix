@@ -923,7 +923,7 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 	return $info;
 }
 
-function getElementHosts($selement, &$sysmaps_data, $hosts_by_groupids, $host_ids = []) {
+function getElementHosts($selement, $sysmaps_data, $hosts_by_groupids, $host_ids = []) {
 	if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
 		$hostid = $selement['elements'][0]['hostid'];
 		$host_ids[$hostid] = $hostid;
