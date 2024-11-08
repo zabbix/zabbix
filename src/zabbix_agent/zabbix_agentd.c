@@ -1164,6 +1164,7 @@ static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 			break;
 		default:
 			/* there can not be other choice */
+			zbx_this_should_never_happen_backtrace();
 			assert(0);
 	}
 

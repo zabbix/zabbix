@@ -662,6 +662,7 @@ void	zbx_db_flush_trends(ZBX_DC_TREND *trends, int *trends_num, zbx_vector_uint6
 			table_name = "trends_uint";
 			break;
 		default:
+			zbx_this_should_never_happen_backtrace();
 			assert(0);
 	}
 

@@ -1245,6 +1245,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 		s->tls_ctx->ctx = NULL;
 		s->tls_ctx->psk_client_creds = NULL;
 		s->tls_ctx->psk_server_creds = NULL;
+		s->tls_ctx->close_notify_received = 0;
 
 		if (GNUTLS_E_SUCCESS != (res = gnutls_init(&s->tls_ctx->ctx, GNUTLS_CLIENT | GNUTLS_NO_EXTENSIONS)))
 				/* GNUTLS_NO_EXTENSIONS is used because we do not currently support extensions (e.g. */
@@ -1527,6 +1528,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 	s->tls_ctx->ctx = NULL;
 	s->tls_ctx->psk_client_creds = NULL;
 	s->tls_ctx->psk_server_creds = NULL;
+	s->tls_ctx->close_notify_received = 0;
 
 	if (GNUTLS_E_SUCCESS != (res = gnutls_init(&s->tls_ctx->ctx, GNUTLS_SERVER)))
 	{
@@ -1874,8 +1876,8 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char
 
 	if (0 == n)
 	{
-		*error = zbx_dsprintf(*error, "connection closed");
-		return ZBX_PROTO_ERROR;
+		s->tls_ctx->close_notify_received = 1;
+		return n;
 	}
 
 	if (0 > n)
@@ -1907,7 +1909,8 @@ void	zbx_tls_close(zbx_socket_t *s)
 	if (NULL != s->tls_ctx->ctx)
 	{
 		/* shutdown TLS connection */
-		while (GNUTLS_E_SUCCESS != (res = gnutls_bye(s->tls_ctx->ctx, GNUTLS_SHUT_WR)))
+		while (0 == s->tls_ctx->close_notify_received &&
+				GNUTLS_E_SUCCESS != (res = gnutls_bye(s->tls_ctx->ctx, GNUTLS_SHUT_WR)))
 		{
 			if (SUCCEED != tls_is_nonblocking_error(res))
 			{

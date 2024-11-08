@@ -131,6 +131,8 @@ static void	*ALIGNPTR(void *ptr)
 		return ALIGN4(ptr);
 	if (8 == ZBX_PTR_SIZE)
 		return ALIGN8(ptr);
+
+	zbx_this_should_never_happen_backtrace();
 	assert(0);
 }
 

@@ -1330,6 +1330,7 @@ AC_DEFINE_UNQUOTED([ARCH], "${ARCH}", [Define to OS name for code managing])
 AC_SUBST(ARCH)
 
 AC_CHECK_SIZEOF([void *])
+AC_CHECK_SIZEOF([size_t])
 
 dnl *****************************************************************
 dnl *                                                               *

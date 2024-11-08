@@ -935,6 +935,7 @@ static int	dbconn_begin(zbx_dbconn_t *db)
 	if (db->txn_level > 0)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: nested transaction detected. Please report it to Zabbix Team.");
+		zbx_this_should_never_happen_backtrace();
 		assert(0);
 	}
 
@@ -974,6 +975,7 @@ static int	dbconn_commit(zbx_dbconn_t *db)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: commit without transaction."
 				" Please report it to Zabbix Team.");
+		zbx_this_should_never_happen_backtrace();
 		assert(0);
 	}
 
@@ -1012,6 +1014,7 @@ static int	dbconn_rollback(zbx_dbconn_t *db)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: rollback without transaction."
 				" Please report it to Zabbix Team.");
+		zbx_this_should_never_happen_backtrace();
 		assert(0);
 	}
 

@@ -2154,14 +2154,12 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, short *event
 
 ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char **error)
 {
-	ssize_t		n = 0;
+	ssize_t	n = 0, err;
 
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 
 	while (1)
 	{
-		ssize_t	err;
-
 		if (0 <= (n = (ssize_t)SSL_read(s->tls_ctx->ctx, buf, (int)len)))
 			break;
 
@@ -2189,7 +2187,25 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char
 		}
 	}
 
-	if (0 >= n)
+	if (0 == n)
+	{
+		if (SSL_ERROR_ZERO_RETURN != (err = (size_t)SSL_get_error(s->tls_ctx->ctx, (int)n)))
+		{
+			size_t	error_alloc = 0, error_offset = 0;
+
+			if (SUCCEED == zbx_tls_get_error(s->tls_ctx->ctx, n, "SSL_read", &error_alloc,
+					&error_offset, error))
+			{
+				*error = zbx_strdup(*error, "SSL_read() unexpected result code");
+			}
+
+			return ZBX_PROTO_ERROR;
+		}
+
+		return n;
+	}
+
+	if (0 > n)
 	{
 		size_t	error_alloc = 0, error_offset = 0;
 
@@ -2225,7 +2241,8 @@ void	zbx_tls_close(zbx_socket_t *s)
 
 		/* After TLS shutdown the TCP connection will be closed. So, there is no need to do a bidirectional */
 		/* TLS shutdown - unidirectional shutdown is ok. */
-		if (0 == SSL_in_init(s->tls_ctx->ctx))
+		if (0 == SSL_in_init(s->tls_ctx->ctx) &&
+				0 == (SSL_get_shutdown(s->tls_ctx->ctx) & SSL_RECEIVED_SHUTDOWN))
 		{
 			while (0 > (res = SSL_shutdown(s->tls_ctx->ctx)))
 			{

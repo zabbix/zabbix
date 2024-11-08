@@ -197,7 +197,10 @@ void	get_values_java(unsigned char request, const zbx_dc_item_t *items, AGENT_RE
 		}
 	}
 	else
+	{
+		zbx_this_should_never_happen_backtrace();
 		assert(0);
+	}
 
 	zbx_json_addarray(&json, ZBX_PROTO_TAG_KEYS);
 

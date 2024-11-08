@@ -70,6 +70,9 @@ class CExpressionParserTest extends TestCase {
 			['{TRIGGER.VALUE}', null, CParser::PARSE_SUCCESS],
 			['{$USERMACRO}', null, CParser::PARSE_SUCCESS, ['usermacros' => true]],
 			['{$USERMACRO}', ['error' => 'incorrect expression starting from "{$USERMACRO}"', 'match' => ''], CParser::PARSE_FAIL],
+			['{FUNCTION.VALUE} + {FUNCTION.VALUE9} + {FUNCTION.RECOVERY.VALUE} + {FUNCTION.RECOVERY.VALUE9}', null, CParser::PARSE_SUCCESS, ['macros_n' => ['{FUNCTION.VALUE}', '{FUNCTION.RECOVERY.VALUE}']]],
+			['{FUNCTION.VALUE} + {FUNCTION.VALUE9} + {FUNCTION.RECOVERY.VALUE} + {FUNCTION.RECOVERY.VALUE9}', null, CParser::PARSE_SUCCESS, ['macros_n' => ['{FUNCTION.VALUE}', '{FUNCTION.RECOVERY.VALUE}'], 'calculated' => true]],
+			['{FUNCTION.VALUE1}', ['error' => 'incorrect expression starting from "{FUNCTION.VALUE1}"', 'match' => ''], CParser::PARSE_FAIL],
 
 			['{TRIGGER.VALUE}=1', null, CParser::PARSE_SUCCESS],
 			['{$USERMACRO}=1', null, CParser::PARSE_SUCCESS, ['usermacros' => true]],
@@ -2239,10 +2242,10 @@ class CExpressionParserTest extends TestCase {
 	public static function dataProviderTokens() {
 		return [
 			[
-				'((-12 + {$MACRO} + {{$MACRO}.regsub("^([a-z]+)", \1)})) = 1K or not {{#M}.regsub("^([0-9]+)", \1)} and {TRIGGER.VALUE} and "\\"str\\"" = func(/host/key, #25:now/M, "eq", "str") or math() or min( last(/host/key), {$MACRO}, {{$MACRO}.regsub("^([0-9]+)", \1)}, 123, "abc" , min(min(/host/key, 1d:now/d), 125) + 10 ) or {{TRIGGER.VALUE}.regsub("^(\d+)$", \1)}',
+				'((-12 + {$MACRO} + {{$MACRO}.regsub("^([a-z]+)", \1)})) = 1K or not {{#M}.regsub("^([0-9]+)", \1)} and {TRIGGER.VALUE} and "\\"str\\"" = func(/host/key, #25:now/M, "eq", "str") or math() or min( last(/host/key), {$MACRO}, {{$MACRO}.regsub("^([0-9]+)", \1)}, 123, "abc" , min(min(/host/key, 1d:now/d), 125) + 10 ) or {{TRIGGER.VALUE}.regsub("^(\d+)$", \1)} or {{FUNCTION.VALUE}.regsub("^(\d+)$", \1)} or {{FUNCTION.RECOVERY.VALUE5}.regsub("^(\d+)$", \1)}',
 				[
-					'match' => '((-12 + {$MACRO} + {{$MACRO}.regsub("^([a-z]+)", \1)})) = 1K or not {{#M}.regsub("^([0-9]+)", \1)} and {TRIGGER.VALUE} and "\\"str\\"" = func(/host/key, #25:now/M, "eq", "str") or math() or min( last(/host/key), {$MACRO}, {{$MACRO}.regsub("^([0-9]+)", \1)}, 123, "abc" , min(min(/host/key, 1d:now/d), 125) + 10 ) or {{TRIGGER.VALUE}.regsub("^(\d+)$", \1)}',
-					'length' => 353,
+					'match' => '((-12 + {$MACRO} + {{$MACRO}.regsub("^([a-z]+)", \1)})) = 1K or not {{#M}.regsub("^([0-9]+)", \1)} and {TRIGGER.VALUE} and "\\"str\\"" = func(/host/key, #25:now/M, "eq", "str") or math() or min( last(/host/key), {$MACRO}, {{$MACRO}.regsub("^([0-9]+)", \1)}, 123, "abc" , min(min(/host/key, 1d:now/d), 125) + 10 ) or {{TRIGGER.VALUE}.regsub("^(\d+)$", \1)} or {{FUNCTION.VALUE}.regsub("^(\d+)$", \1)} or {{FUNCTION.RECOVERY.VALUE5}.regsub("^(\d+)$", \1)}',
+					'length' => 451,
 					'tokens' => [
 						[
 							'type' => CExpressionParserResult::TOKEN_TYPE_OPEN_BRACE,
@@ -2663,10 +2666,34 @@ class CExpressionParserTest extends TestCase {
 							'pos' => 314,
 							'match' => '{{TRIGGER.VALUE}.regsub("^(\d+)$", \1)}',
 							'length' => 39
+						],
+						[
+							'type' => CExpressionParserResult::TOKEN_TYPE_OPERATOR,
+							'pos' => 354,
+							'match' => 'or',
+							'length' => 2
+						],
+						[
+							'type' => CExpressionParserResult::TOKEN_TYPE_MACRO,
+							'pos' => 357,
+							'match' => '{{FUNCTION.VALUE}.regsub("^(\d+)$", \1)}',
+							'length' => 40
+						],
+						[
+							'type' => CExpressionParserResult::TOKEN_TYPE_OPERATOR,
+							'pos' => 398,
+							'match' => 'or',
+							'length' => 2
+						],
+						[
+							'type' => CExpressionParserResult::TOKEN_TYPE_MACRO,
+							'pos' => 401,
+							'match' => '{{FUNCTION.RECOVERY.VALUE5}.regsub("^(\d+)$", \1)}',
+							'length' => 50
 						]
 					]
 				],
-				['usermacros' => true, 'lldmacros' => true]
+				['usermacros' => true, 'lldmacros' => true, 'macros_n' => ['{FUNCTION.VALUE}', '{FUNCTION.RECOVERY.VALUE}']]
 			],
 			[
 				'{52735} > 0 or min({52736}, {52737}, 5M + {$MACRO})',

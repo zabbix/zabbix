@@ -2599,7 +2599,8 @@ abstract class CItemGeneral extends CApiService {
 			'output' => [
 				'item_preprocid', 'itemid', 'step', 'type', 'params', 'error_handler', 'error_handler_params'
 			],
-			'filter' => ['itemid' => $itemids]
+			'filter' => ['itemid' => $itemids],
+			'sortfield' => ['itemid', 'step']
 		];
 		$db_item_preprocs = DBselect(DB::makeSql('item_preproc', $options));
 

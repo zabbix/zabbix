@@ -44,6 +44,7 @@ class CExpressionMacroParser extends CParser {
 	 *   'host_macro_n' => false       Allow {HOST.HOST} and {HOST.HOST<1-9>} macros as host name part in the query.
 	 *   'empty_host' => false         Allow empty hostname in the query string.
 	 *   'escape_backslashes' => true  Disable backslash escaping in history function parameters prior to v7.0.
+	 *   'macros_n' => []              Array of strings having supported reference macros.
 	 *
 	 * @var array
 	 */
@@ -53,7 +54,8 @@ class CExpressionMacroParser extends CParser {
 		'host_macro' => false,
 		'host_macro_n' => false,
 		'empty_host' => false,
-		'escape_backslashes' => true
+		'escape_backslashes' => true,
+		'macros_n' => []
 	];
 
 	/**
@@ -70,7 +72,8 @@ class CExpressionMacroParser extends CParser {
 			'host_macro' => $this->options['host_macro'],
 			'host_macro_n' => $this->options['host_macro_n'],
 			'empty_host' => $this->options['empty_host'],
-			'escape_backslashes' => $this->options['escape_backslashes']
+			'escape_backslashes' => $this->options['escape_backslashes'],
+			'macros_n' => $this->options['macros_n']
 		]);
 	}
 
