@@ -419,10 +419,11 @@ static void	db_get_query_events(zbx_vector_event_suppress_query_ptr_t *event_que
  *             get_forks_cb   - [IN]                                          *
  *                                                                            *
  ******************************************************************************/
-static void	db_update_event_suppress_data(int *suppressed_num, int process_num, zbx_get_config_forks_f get_forks_cb)
+static int	db_update_event_suppress_data(int *suppressed_num, int process_num, zbx_get_config_forks_f get_forks_cb)
 {
 	zbx_vector_event_suppress_query_ptr_t	event_queries;
 	zbx_vector_event_suppress_data_ptr_t	event_data;
+	int					txn_rc = ZBX_DB_OK;
 
 	*suppressed_num = 0;
 
@@ -571,17 +572,18 @@ static void	db_update_event_suppress_data(int *suppressed_num, int process_num, 
 		zbx_db_insert_autoincrement(&db_insert, "event_suppressid");
 		zbx_db_insert_execute(&db_insert);
 cleanup:
-		zbx_db_commit();
-
-		if (0 != del_event_maintenances.values_num || 0 != suppressed.values_num)
+		if (ZBX_DB_OK == (txn_rc = zbx_db_commit()))
 		{
-			if (0 != zbx_dc_get_itservices_num())
+			if (0 != del_event_maintenances.values_num || 0 != suppressed.values_num)
 			{
-				if (0 != del_event_maintenances.values_num)
-					service_send_suppression_data(&del_event_maintenances, 0);
+				if (0 != zbx_dc_get_itservices_num())
+				{
+					if (0 != del_event_maintenances.values_num)
+						service_send_suppression_data(&del_event_maintenances, 0);
 
-				if (0 != suppressed.values_num)
-					service_send_suppression_data(&suppressed, 1);
+					if (0 != suppressed.values_num)
+						service_send_suppression_data(&suppressed, 1);
+				}
 			}
 		}
 
@@ -599,6 +601,8 @@ cleanup:
 
 	zbx_vector_event_suppress_query_ptr_clear_ext(&event_queries, zbx_event_suppress_query_free);
 	zbx_vector_event_suppress_query_ptr_destroy(&event_queries);
+
+	return txn_rc;
 }
 
 /******************************************************************************
@@ -714,8 +718,10 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 				if (SUCCEED == update)
 				{
 					zbx_dc_maintenance_set_update_flags();
-					db_update_event_suppress_data(&events_num, process_num,
-							args_in->get_process_forks_cb_arg);
+					while (ZBX_DB_DOWN == db_update_event_suppress_data(&events_num, process_num,
+							args_in->get_process_forks_cb_arg))
+						;
+
 					zbx_dc_maintenance_reset_update_flag(process_num);
 				}
 				else
@@ -735,7 +741,9 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 			zbx_setproctitle("%s #%d [%s, processing maintenances]", get_process_type_string(process_type),
 					process_num, info);
 
-			db_update_event_suppress_data(&events_num, process_num, args_in->get_process_forks_cb_arg);
+			while (ZBX_DB_DOWN == db_update_event_suppress_data(&events_num, process_num,
+					args_in->get_process_forks_cb_arg))
+				;
 
 			info_offset = 0;
 			zbx_snprintf_alloc(&info, &info_alloc, &info_offset, "suppressed %d events in " ZBX_FS_DBL
