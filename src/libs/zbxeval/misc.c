@@ -530,7 +530,7 @@ int	zbx_eval_query_subtitute_user_macros(const char *itemquery, size_t len, char
 		zbx_eval_subst_macros_func_t resolver, ...)
 {
 	zbx_eval_context_t	ctx;
-	zbx_item_query_t	query;
+	zbx_item_query_t	query = {0};
 	int			i, ret = FAIL;
 	char			*errmsg = NULL, *filter = NULL;
 	va_list			args;
@@ -539,6 +539,8 @@ int	zbx_eval_query_subtitute_user_macros(const char *itemquery, size_t len, char
 
 	if (len != zbx_eval_parse_query(itemquery, len, &query))
 	{
+		va_end(args);
+
 		if (NULL != error)
 		{
 			*error = zbx_strdup(NULL, "cannot parse item query");
@@ -744,6 +746,7 @@ int	zbx_eval_substitute_macros(const zbx_eval_context_t *ctx, char **error,
 		{
 			case FAIL:
 				zbx_free(value);
+				va_end(args);
 				return FAIL;
 			case SUCCEED_PARTIAL:
 				continue;
