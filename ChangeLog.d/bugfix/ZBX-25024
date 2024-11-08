@@ -1,1 +1,0 @@
-.......P.. [ZBX-25024] changed Zabbix proxy to use history write time rather than value timestamp when discarding old values (wiper)

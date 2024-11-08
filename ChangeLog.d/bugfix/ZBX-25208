@@ -1,1 +1,0 @@
-..F....... [ZBX-25208] fixed merging of user macros in the "Inherited and host/template/host prototype macros" mode; fixed resolving of user macros with unquoted conteхt started with "regex:" (Sasha)

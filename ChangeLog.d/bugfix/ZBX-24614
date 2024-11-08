@@ -1,1 +1,0 @@
-...G...PS. [ZBX-24614] fixed unidirectional SSL shutdown being performed by both sides resulting in RST packets during communication between Zabbix components (vso)
