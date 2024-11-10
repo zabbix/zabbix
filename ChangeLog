@@ -14,8 +14,8 @@ A......... [ZBXNEXT-9404] enabled to use the mediatype.get method for users with
 .........T [ZBXNEXT-9549] added active agent templates for LAMP stack monitoring (abakaldin)
 .........T [ZBXNEXT-9382] added Nutanix template (akotsegubov)
 .........T [ZBXNEXT-9058] updated VMware Hypervisor template for ability to work as a standalone template (akotsegubov)
-........S. [ZBXNEXT-9532] updated max supported TimescaleDB version to 2.17 (mprihodko)
-.......PS. [ZBXNEXT-9238] increased PostgreSQL maximum supported version to 17 (mprihodko)
+........S. [ZBXNEXT-9532] updated maximum supported TimescaleDB version to 2.17 (mprihodko)
+.......PS. [ZBXNEXT-9238] updated maximum supported PostgreSQL version to 17 (mprihodko)
 
 Bug fixes:
 ....I....T [ZBX-24994] removed UUIDs for host elements in the default data (abakaldin, asestakovs)
@@ -36,7 +36,7 @@ A......... [ZBX-23949] fixed processing of `host` parameter for trigger prototyp
 ........S. [ZBX-25320] improved error message for errors while formatting dashboard as PDF (mprihodko)
 ..F....... [ZBX-25273] fixed incorrect vertical scale for s-units in graphs (averza, dfofanovs)
 A.F....... [ZBX-24528] prevented SQL errors being displayed to non-authorized users (gcalenko, jfreibergs)
-........S. [ZBX-25324]  fixed FreeTDS ODBC login with special characters in the password field (sboidenko)
+........S. [ZBX-25324] fixed FreeTDS ODBC login with special characters in the password field (sboidenko)
 A......... [ZBX-25034] fixed export of host prototype discovery and template override is using visible name (wczerneha)
 ..F....... [ZBX-20848] fixed multiselect not suggesting just removed record (apoga, averza)
 A.F....... [ZBX-21503] prevented creation of audit logs for Media type objects on updates without actual changes (jfreibergs)
@@ -81,8 +81,8 @@ A......... [ZBXNEXT-9404] enabled to use the mediatype.get method for users with
 .........T [ZBXNEXT-9557] added Website certificate by Zabbix agent 2 active template (abakaldin)
 .........T [ZBXNEXT-9549] added active agent templates for LAMP stack monitoring (abakaldin)
 .........T [ZBXNEXT-9382] added Nutanix template (akotsegubov)
-........S. [ZBXNEXT-9532] updated max supported TimescaleDB version to 2.17 (mprihodko)
-.......PS. [ZBXNEXT-9238] increased PostgreSQL maximum supported version to 17 (mprihodko)
+........S. [ZBXNEXT-9532] updated maximum supported TimescaleDB version to 2.17 (mprihodko)
+.......PS. [ZBXNEXT-9238] updated maximum supported PostgreSQL version to 17 (mprihodko)
 .........T [ZBXNEXT-9058] updated VMware Hypervisor template for ability to work as a standalone template (akotsegubov)
 
 Bug fixes:
@@ -104,7 +104,7 @@ A......... [ZBX-24410] prevented occasional mismatch of preprocessing step order
 A......... [ZBX-23949] fixed processing of `host` parameter for trigger prototypes (jfreibergs)
 ..F....... [ZBX-25273] fixed incorrect vertical scale for s-units in graphs (averza, dfofanovs)
 ........S. [ZBX-25320] improved error message for errors while formatting dashboard as PDF (mprihodko)
-........S. [ZBX-25324]  fixed FreeTDS ODBC login with special characters in the password field (sboidenko)
+........S. [ZBX-25324] fixed FreeTDS ODBC login with special characters in the password field (sboidenko)
 A......... [ZBX-25034] fixed export of host prototype discovery and template override is using visible name (wczerneha)
 ..F....... [ZBX-20848] fixed multiselect not suggesting just removed record (apoga, averza)
 A.F....... [ZBX-24528] prevented SQL errors being displayed to non-authorized users (gcalenko, jfreibergs)
@@ -1254,11 +1254,11 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.20rc1
 
 New features:
-........S. [ZBXNEXT-9532] updated max supported TimescaleDB version to 2.17 (mprihodko)
-.......PS. [ZBXNEXT-9238] increased PostgreSQL maximum supported version to 17 (mprihodko)
+........S. [ZBXNEXT-9532] updated maximum supported TimescaleDB version to 2.17 (mprihodko)
+.......PS. [ZBXNEXT-9238] updated maximum supported PostgreSQL version to 17 (mprihodko)
 
 Bug fixes:
-........S. [ZBX-25324]  fixed FreeTDS ODBC login with special characters in the password field (sboidenko)
+........S. [ZBX-25324] fixed FreeTDS ODBC login with special characters in the password field (sboidenko)
 ...G...... [ZBX-24273] fixed potential Zabbix agent crash for vfs.fs.get item (MVekslers)
 ..F....... [ZBX-23171] fixed escaping of slash character in context-based macro patterns (esekace)
 
@@ -3200,12 +3200,12 @@ New features:
 .........T [ZBXNEXT-9249] added new items and trigger for disk space usage in LXC containers for Proxmox VE by HTTP template (akotsegubov)
 .........T [ZBXNEXT-9382] added Nutanix template (akotsegubov)
 .........T [ZBXNEXT-9058] updated VMware Hypervisor template for ability to work as a standalone template (akotsegubov)
-........S. [ZBXNEXT-9532] updated max supported TimescaleDB version to 2.17 (mprihodko)
-.......PS. [ZBXNEXT-9238] increased PostgreSQL maximum supported version to 17 (mprihodko)
+........S. [ZBXNEXT-9532] updated maximum supported TimescaleDB version to 2.17 (mprihodko)
+.......PS. [ZBXNEXT-9238] updated maximum supported PostgreSQL version to 17 (mprihodko)
 
 Bug fixes:
 ........S. [ZBX-25397] fixed events not being suppressed during maintenance if deadlock has occurred (vso)
-........S. [ZBX-25324]  fixed FreeTDS ODBC login with special characters in the password field (sboidenko)
+........S. [ZBX-25324] fixed FreeTDS ODBC login with special characters in the password field (sboidenko)
 ........S. [ZBX-24582] truncated error message when testing item and there is value type mismatch (rtrizna)
 .........T [ZBX-25096] fixed performance counter query in MSSQL by ODBC template; updated documentation in MSSQL by Zabbix agent 2 template (akotsegubov)
 ...G...PS. [ZBX-25301] removed redundant message size check on 32-bit platforms when sending TCP message (arimdjonoks)
