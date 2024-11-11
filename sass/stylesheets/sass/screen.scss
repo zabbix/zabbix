@@ -843,6 +843,10 @@ form {
 	display: inline-block;
 	padding: 5px;
 	position: relative;
+
+	.wordbreak {
+		white-space: normal;
+	}
 }
 
 .border-left {
@@ -1045,6 +1049,12 @@ select {
 		color: $font-color !important;
 		pointer-events: none;
 		@extend %form-disabled;
+	}
+}
+
+div {
+	.overlay-dialogue.wordbreak {
+		white-space: normal;
 	}
 }
 
@@ -1777,6 +1787,10 @@ select {
 	border: 1px solid $overlay-border-color;
 	border-bottom-color: darken($overlay-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
+
+	.wordbreak {
+		white-space: normal;
+	}
 
 	.overlay-dialogue-header {
 		margin: -8px -10px 6px -10px;

@@ -113,7 +113,7 @@ foreach ($data['maps'] as $map) {
 				->setArgument('action', 'map.view')
 				->setArgument('sysmapid', $map['sysmapid'])
 			))
-		))->addClass(ZBX_STYLE_WORDWRAP),
+		))->addClass(ZBX_STYLE_WORDBREAK),
 		$map['width'],
 		$map['height'],
 		new CHorList([$properties_link, $edit_link])

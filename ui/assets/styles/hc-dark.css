@@ -2106,15 +2106,12 @@ button {
 .dashboard-grid-iterator-contents.is-loading::before {
   margin: calc(.25rem + 1px); }
 
-.dashboard-list .dashboard-list-item {
-  display: flex;
-  justify-content: space-between; }
-  .dashboard-list .dashboard-list-item .status-green {
-    background-color: #e0e0e0;
-    border-color: #e0e0e0; }
-  .dashboard-list .dashboard-list-item .status-yellow {
-    background-color: #e0e0e0;
-    border-color: #e0e0e0; }
+.dashboard-list .status-green {
+  background-color: #e0e0e0;
+  border-color: #e0e0e0; }
+.dashboard-list .status-yellow {
+  background-color: #e0e0e0;
+  border-color: #e0e0e0; }
 
 .overlay-dialogue.modal-popup.modal-widget-configuration {
   max-width: 1120px;
@@ -2375,6 +2372,10 @@ button {
       vertical-align: top; }
       .list-table .checkbox-radio + label span {
         margin: 0; }
+  .list-table .wordbreak {
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis; }
   .list-table.compact-view td {
     padding-top: 2px;
     padding-bottom: 2px;
@@ -2459,13 +2460,10 @@ button {
     .list-table.compact-view .tag {
       max-width: 133px; } }
 
-.list-table .tag,
 .hintbox-wrap .tag {
-  margin-right: 0;
   cursor: pointer; }
-  .list-table .tag:not(:first-child),
-  .hintbox-wrap .tag:not(:first-child) {
-    margin-left: 3px; }
+  .hintbox-wrap .tag:last-child {
+    margin-right: 0; }
 
 .list-table .timeline-date,
 .list-table .timeline-axis,
@@ -5608,6 +5606,8 @@ form.is-loading {
   display: inline-block;
   padding: 5px;
   position: relative; }
+  .table-forms-separator .wordbreak {
+    white-space: normal; }
 
 .border-left {
   border-left: 1px solid #333333; }
@@ -5691,6 +5691,9 @@ select {
   select[readonly] {
     color: #ffffff !important;
     pointer-events: none; }
+
+div .overlay-dialogue.wordbreak {
+  white-space: normal; }
 
 .form-fields-inline label {
   margin: 0 8px 0 3px; }
@@ -6156,6 +6159,8 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   border: 1px solid #666666;
   border-bottom-color: #636363;
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); }
+  .overlay-dialogue .wordbreak {
+    white-space: normal; }
   .overlay-dialogue .overlay-dialogue-header {
     margin: -8px -10px 6px -10px;
     padding: 8px 10px;
