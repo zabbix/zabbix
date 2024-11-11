@@ -47,12 +47,13 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password");
 #endif
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,h.monitored_by");
+			",h.tls_issuer,h.tls_subject,h.tls_psk_identity,h.tls_psk,h.monitored_by,hp.proxyid");
 	switch (event->source)
 	{
 		case EVENT_SOURCE_TRIGGERS:
 			zbx_snprintf(sql + offset, sizeof(sql) - offset,
 					" from functions f,items i,hosts h"
+					" left join host_proxy hp on h.hostid=hp.hostid"
 					" where f.itemid=i.itemid"
 						" and i.hostid=h.hostid"
 						" and h.status=%d"
@@ -63,6 +64,7 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 		case EVENT_SOURCE_DISCOVERY:
 			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
 					" from hosts h,interface i,dservices ds"
+					" left join host_proxy hp on h.hostid=hp.hostid"
 					" where h.hostid=i.hostid"
 						" and i.ip=ds.ip"
 						" and i.useip=1"
@@ -84,6 +86,7 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 		case EVENT_SOURCE_AUTOREGISTRATION:
 			zbx_snprintf(sql + offset, sizeof(sql) - offset,
 					" from autoreg_host a,hosts h"
+					" left join host_proxy hp on h.hostid=hp.hostid"
 					" where " ZBX_SQL_NULLCMP("a.proxyid", "h.proxyid")
 						" and a.host=h.host"
 						" and h.status=%d"
@@ -118,7 +121,6 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 		}
 
 		ZBX_STR2UINT64(host->hostid, row[0]);
-		ZBX_DBROW2UINT64(host->proxyid, row[1]);
 		zbx_strscpy(host->host, row[2]);
 		ZBX_STR2UCHAR(host->tls_connect, row[3]);
 
@@ -135,6 +137,12 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 		zbx_strscpy(host->tls_psk, row[7 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 		ZBX_STR2UCHAR(host->monitored_by, row[8 + ZBX_IPMI_FIELDS_NUM]);
+
+		if (HOST_MONITORED_BY_PROXY_GROUP != host->monitored_by)
+			ZBX_DBROW2UINT64(host->proxyid, row[1]);
+		else
+			ZBX_DBROW2UINT64(host->proxyid, row[9 + ZBX_IPMI_FIELDS_NUM]);
+
 	}
 	zbx_db_free_result(result);
 
