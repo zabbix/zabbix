@@ -583,7 +583,8 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
 
-		if (ZBX_PROCESS_STATE_BUSY == poller_config.state)
+		if (ZBX_PROCESS_STATE_BUSY == poller_config.state &&
+				poller_config.processing < poller_config.config_max_concurrent_checks_per_poller)
 		{
 			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 			poller_config.state = ZBX_PROCESS_STATE_IDLE;
@@ -607,9 +608,9 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 		{
 			zbx_update_env(get_process_type_string(process_type), zbx_time());
 
-			zbx_setproctitle("%s #%d [got %d values, queued %d in 5 sec%s]",
+			zbx_setproctitle("%s #%d [got %d values, queued %d in 5 sec, awaiting %d%s]",
 				get_process_type_string(process_type), process_num, poller_config.processed,
-				poller_config.queued, zbx_vps_monitor_status());
+				poller_config.queued, poller_config.processing, zbx_vps_monitor_status());
 
 			poller_config.processed = 0;
 			poller_config.queued = 0;
