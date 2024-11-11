@@ -8,6 +8,7 @@ New features:
 .......PS. [ZBXNEXT-9238] updated maximum supported PostgreSQL version to 17 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-25463] fixed report manager endless loop (sboidenko)
 ........S. [ZBX-25477] fixed crash when calculated item contains large value (vso)
 ..F....... [ZBX-21618] fixed layout in multiple list pages when long names are used (esekace)
 ..F....... [ZBX-25444] fixed missing maintenance data in maps for map type elements (esekace)
