@@ -317,8 +317,8 @@ foreach ($data['discoveries'] as $discovery) {
 
 	$discoveryTable->addRow([
 		$checkbox,
-		$host,
-		$description,
+		(new CCol($host))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
 		[
 			new CLink(_('Item prototypes'),
 				(new CUrl('zabbix.php'))

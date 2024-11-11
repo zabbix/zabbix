@@ -192,6 +192,12 @@
 		}
 	}
 
+	.wordbreak {
+		white-space: normal;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
 	&.compact-view {
 		td {
 			padding-top: 2px;
@@ -341,14 +347,12 @@
 	}
 }
 
-.list-table,
 .hintbox-wrap {
 	.tag {
-		margin-right: 0;
 		cursor: pointer;
 
-		&:not(:first-child) {
-			margin-left: 3px;
+		&:last-child {
+			margin-right: 0;
 		}
 	}
 }

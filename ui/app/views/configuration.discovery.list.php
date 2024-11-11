@@ -104,11 +104,13 @@ foreach ($data['drules'] as $drule) {
 
 	$discoveryTable->addRow([
 		new CCheckBox('druleids['.$drule['druleid'].']', $drule['druleid']),
-		(new CLink($drule['name']))
-			->addClass('js-discovery-edit')
-			->setAttribute('data-druleid', $drule['druleid']),
+		(new CCol(
+			(new CLink($drule['name']))
+				->addClass('js-discovery-edit')
+				->setAttribute('data-druleid', $drule['druleid'])
+		))->addClass(ZBX_STYLE_WORDBREAK),
 		$drule['iprange'],
-		$drule['proxy'],
+		(new CCol($drule['proxy']))->addClass(ZBX_STYLE_WORDBREAK),
 		$drule['delay'],
 		!empty($drule['checks']) ? implode(', ', $drule['checks']) : '',
 		$status,

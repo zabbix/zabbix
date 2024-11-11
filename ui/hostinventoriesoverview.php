@@ -115,7 +115,7 @@ if ($filter['groupby'] !== '') {
 	$allowed_ui_inventory = CWebUser::checkAccess(CRoleHelper::UI_INVENTORY_HOSTS);
 	foreach ($report as $rep) {
 		$table->addRow([
-			zbx_str2links($rep['inventory_field']),
+			(new CCol(zbx_str2links($rep['inventory_field'])))->addClass(ZBX_STYLE_WORDBREAK),
 			$allowed_ui_inventory
 				? new CLink($rep['host_count'],
 					(new CUrl('hostinventories.php'))

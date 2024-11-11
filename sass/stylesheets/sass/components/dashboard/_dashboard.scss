@@ -1019,20 +1019,14 @@
 
 // Dashboard list table.
 .dashboard-list {
-	.dashboard-list-item {
-		display: flex;
-		justify-content: space-between;
-		height: 18px;
+	.status-green {
+		background-color: $dashboard-my-bg-color;
+		border-color: $dashboard-my-bg-color;
+	}
 
-		.status-green {
-			background-color: $dashboard-my-bg-color;
-			border-color: $dashboard-my-bg-color;
-		}
-
-		.status-yellow {
-			background-color: $dashboard-shared-bg-color;
-			border-color: $dashboard-shared-bg-color;
-		}
+	.status-yellow {
+		background-color: $dashboard-shared-bg-color;
+		border-color: $dashboard-shared-bg-color;
 	}
 }
 

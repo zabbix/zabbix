@@ -82,7 +82,8 @@ $table = (new CTableInfo())
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'],
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'dashboard.list')
-				->getUrl())
+				->getUrl()
+		)->setColSpan(2)
 	])
 	->setPageNavigation($data['paging']);
 
@@ -103,14 +104,14 @@ foreach ($data['dashboards'] as $dashboard) {
 		(new CCheckBox('dashboardids['.$dashboard['dashboardid'].']', $dashboard['dashboardid']))
 			->setEnabled($dashboard['editable']),
 		(new CDiv([
-			new CLink($dashboard['name'],
+			(new CLink($dashboard['name'],
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'dashboard.view')
 					->setArgument('dashboardid', $dashboard['dashboardid'])
 					->getUrl()
-			),
-			$tags ? new CDiv($tags) : null
-		]))->addClass(ZBX_STYLE_DASHBOARD_LIST_ITEM)
+			))->addClass(ZBX_STYLE_WORDBREAK),
+		])),
+		(new CCol($tags))->addClass(ZBX_STYLE_LIST_TABLE_ACTIONS)
 	]);
 }
 

@@ -1080,6 +1080,11 @@ class testFormServicesSla extends CWebTest {
 			$db_data = CDBHelper::getColumn('SELECT * FROM sla', 'name');
 			$this->assertTrue(in_array($data['fields']['Name'], $db_data));
 
+			// Remove extra spaces in the middle of the name; spaces in links on page are trimmed.
+			$name = CTestArrayHelper::get($data, 'trim', false)
+				? preg_replace('/\s+/', ' ', $data['fields']['Name'])
+				: $data['fields']['Name'];
+
 			if ($update) {
 				// Check that old name is not present anymore and write new name to global variable for future cases.
 				if (array_key_exists('downtime_action', $data)) {
@@ -1088,11 +1093,11 @@ class testFormServicesSla extends CWebTest {
 				}
 				else {
 					$this->assertFalse(in_array(self::$update_sla, $db_data));
-					self::$update_sla = $data['fields']['Name'];
+					self::$update_sla = $name;
 				}
 			}
 
-			$this->query('link', $data['fields']['Name'])->waitUntilClickable()->one()->click();
+			$this->query('link', $name)->waitUntilClickable()->one()->click();
 			$form->invalidate();
 			$form->checkValue($data['fields']);
 
