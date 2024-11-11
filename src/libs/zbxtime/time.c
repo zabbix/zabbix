@@ -496,49 +496,6 @@ int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_ti
 
 /******************************************************************************
  *                                                                            *
- * Purpose: convert local time to UTC                                         *
- *                                                                            *
- * Parameters: time - [IN] input time                                         *
- *             tz   - [IN] time zone                                          *
- *                                                                            *
- * Return value: Universal Coordinate Time                                    *
- *                                                                            *
- ******************************************************************************/
-time_t	zbx_mktime(struct tm *time, const char *tz)
-{
-#if defined(HAVE_GETENV) && defined(HAVE_UNSETENV) && defined(HAVE_TZSET) && \
-		!defined(_WINDOWS) && !defined(__MINGW32__)
-	char		*old_tz;
-	time_t		ret;
-
-	if (NULL == tz || 0 == strcmp(tz, "system"))
-		return mktime(time);
-
-	if (NULL != (old_tz = getenv("TZ")))
-		old_tz = zbx_strdup(NULL, old_tz);
-
-	setenv("TZ", tz, 1);
-	tzset();
-	ret = (time_t)mktime(time);
-
-	if (NULL != old_tz)
-	{
-		setenv("TZ", old_tz, 1);
-		zbx_free(old_tz);
-	}
-	else
-		unsetenv("TZ");
-
-	tzset();
-
-	return ret;
-#else
-	return (time_t)mktime(time);
-#endif
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: add seconds to the time and adjust result by dst                  *
  *                                                                            *
  * Parameter: tm      - [IN/OUT] the time structure                           *
@@ -546,12 +503,12 @@ time_t	zbx_mktime(struct tm *time, const char *tz)
  *            tz      - [IN] time zone                                        *
  *                                                                            *
  ******************************************************************************/
-static void	tm_add_seconds(struct tm *tm, int seconds, const char *tz)
+static void	tm_add_seconds(struct tm *tm, int seconds)
 {
 	time_t		time_new;
 	struct tm	tm_new = *tm;
 
-	if (-1 == (time_new = zbx_mktime(&tm_new, tz)))
+	if (-1 == (time_new = mktime(&tm_new)))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
 		return;
@@ -632,10 +589,9 @@ static void	tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
  * Parameter: tm         - [IN/OUT] the time structure                        *
  *            multiplier - [IN] the unit multiplier                           *
  *            base       - [IN] the time unit to add                          *
- *            tz         - [IN] time zone                                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base, const char *tz)
+void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base)
 {
 	if (ZBX_TIME_UNIT_MONTH == base || ZBX_TIME_UNIT_YEAR == base)
 	{
@@ -648,7 +604,7 @@ void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base, const char 
 			tm->tm_mday = days_max;
 	}
 
-	tm_add_seconds(tm, multiplier * time_unit_seconds[base], tz);
+	tm_add_seconds(tm, multiplier * time_unit_seconds[base]);
 
 	return;
 }
@@ -740,10 +696,9 @@ static void	tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
  * Parameter: tm         - [IN/OUT] the time structure                        *
  *            multiplier - [IN] the unit multiplier                           *
  *            base       - [IN] the time unit to add                          *
- *            tz         - [IN] time zone                                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base, const char *tz)
+void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base)
 {
 	if (ZBX_TIME_UNIT_ISOYEAR == base)
 	{
@@ -752,7 +707,7 @@ void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base, const char 
 		week_num = zbx_get_week_number(tm);
 
 		/* use zbx_tm_sub instead of tm_sub to force weekday recalculation */
-		zbx_tm_sub(tm, week_num, ZBX_TIME_UNIT_WEEK, tz);
+		zbx_tm_sub(tm, week_num, ZBX_TIME_UNIT_WEEK);
 
 		total_weeks = zbx_get_week_number(tm);
 		if (week_num > total_weeks)
@@ -770,7 +725,7 @@ void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base, const char 
 			tm->tm_mday = days_max;
 	}
 
-	tm_add_seconds(tm, -multiplier * time_unit_seconds[base], tz);
+	tm_add_seconds(tm, -multiplier * time_unit_seconds[base]);
 
 	return;
 }
@@ -781,15 +736,14 @@ void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base, const char 
  *                                                                            *
  * Parameter: tm         - [IN/OUT] the time structure                        *
  *            base       - [IN] the time unit                                 *
- *            tz         - [IN] time zone                                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base, const char *tz)
+void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base)
 {
 	if (0 != tm->tm_sec)
 	{
 		tm->tm_sec = 0;
-		zbx_tm_add(tm, 1, ZBX_TIME_UNIT_MINUTE, tz);
+		zbx_tm_add(tm, 1, ZBX_TIME_UNIT_MINUTE);
 	}
 
 	if (ZBX_TIME_UNIT_MINUTE == base)
@@ -798,7 +752,7 @@ void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base, const char *tz)
 	if (0 != tm->tm_min)
 	{
 		tm->tm_min = 0;
-		zbx_tm_add(tm, 1, ZBX_TIME_UNIT_HOUR, tz);
+		zbx_tm_add(tm, 1, ZBX_TIME_UNIT_HOUR);
 	}
 
 	if (ZBX_TIME_UNIT_HOUR == base)
@@ -807,7 +761,7 @@ void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base, const char *tz)
 	if (0 != tm->tm_hour)
 	{
 		tm->tm_hour = 0;
-		zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY, tz);
+		zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY);
 	}
 
 	if (ZBX_TIME_UNIT_DAY == base)
@@ -817,7 +771,7 @@ void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base, const char *tz)
 	{
 		if (1 != tm->tm_wday)
 		{
-			zbx_tm_add(tm, (0 == tm->tm_wday ? 1 : 8 - tm->tm_wday), ZBX_TIME_UNIT_DAY, tz);
+			zbx_tm_add(tm, (0 == tm->tm_wday ? 1 : 8 - tm->tm_wday), ZBX_TIME_UNIT_DAY);
 			tm->tm_wday = 1;
 		}
 		return;
@@ -826,7 +780,7 @@ void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base, const char *tz)
 	if (1 != tm->tm_mday)
 	{
 		tm->tm_mday = 1;
-		zbx_tm_add(tm, 1, ZBX_TIME_UNIT_MONTH, tz);
+		zbx_tm_add(tm, 1, ZBX_TIME_UNIT_MONTH);
 	}
 
 	if (ZBX_TIME_UNIT_MONTH == base)
@@ -835,7 +789,7 @@ void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base, const char *tz)
 	if (0 != tm->tm_mon)
 	{
 		tm->tm_mon = 0;
-		zbx_tm_add(tm, 1, ZBX_TIME_UNIT_YEAR, tz);
+		zbx_tm_add(tm, 1, ZBX_TIME_UNIT_YEAR);
 	}
 
 	return;
@@ -847,17 +801,16 @@ void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base, const char *tz)
  *                                                                            *
  * Parameter: tm         - [IN/OUT] the time structure                        *
  *            base       - [IN] the time unit                                 *
- *            tz         - [IN] time zone                                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tm_round_down(struct tm *tm, zbx_time_unit_t base, const char *tz)
+void	zbx_tm_round_down(struct tm *tm, zbx_time_unit_t base)
 {
 	switch (base)
 	{
 		case ZBX_TIME_UNIT_WEEK:
 			if (1 != tm->tm_wday)
 			{
-				zbx_tm_sub(tm, (0 == tm->tm_wday ? 6 : tm->tm_wday - 1), ZBX_TIME_UNIT_DAY, tz);
+				zbx_tm_sub(tm, (0 == tm->tm_wday ? 6 : tm->tm_wday - 1), ZBX_TIME_UNIT_DAY);
 				tm->tm_wday = 1;
 			}
 
@@ -866,8 +819,8 @@ void	zbx_tm_round_down(struct tm *tm, zbx_time_unit_t base, const char *tz)
 			tm->tm_sec = 0;
 			break;
 		case ZBX_TIME_UNIT_ISOYEAR:
-			zbx_tm_round_down(tm, ZBX_TIME_UNIT_WEEK, tz);
-			zbx_tm_sub(tm, zbx_get_week_number(tm) - 1, ZBX_TIME_UNIT_WEEK, tz);
+			zbx_tm_round_down(tm, ZBX_TIME_UNIT_WEEK);
+			zbx_tm_sub(tm, zbx_get_week_number(tm) - 1, ZBX_TIME_UNIT_WEEK);
 			break;
 		case ZBX_TIME_UNIT_YEAR:
 			tm->tm_mon = 0;
@@ -888,7 +841,7 @@ void	zbx_tm_round_down(struct tm *tm, zbx_time_unit_t base, const char *tz)
 			break;
 	}
 
-	tm_add_seconds(tm, 0, tz);
+	tm_add_seconds(tm, 0);
 
 	return;
 }
@@ -1199,7 +1152,7 @@ int	zbx_iso8601_utc(const char *str, time_t *time)
 	long int	offset;
 	struct tm	tm;
 
-	if ( 0 == isdigit(*str) || ZBX_CONST_STRLEN("1234-12-12T12:12:12") > strlen(str) ||
+	if (0 == isdigit(*str) || ZBX_CONST_STRLEN("1234-12-12T12:12:12") > strlen(str) ||
 			('T' != str[10] && ' ' != str[10]) ||
 			'-' != str[4] || '-' != str[7] || ':' != str[13] || ':' != str[16])
 	{
@@ -1233,7 +1186,7 @@ int	zbx_iso8601_utc(const char *str, time_t *time)
 	{
 		int	t;
 
-		if(FAIL == zbx_utc_time(tm.tm_year, tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, &t))
+		if (FAIL == zbx_utc_time(tm.tm_year, tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec, &t))
 			return FAIL;
 
 		*time = t - offset;

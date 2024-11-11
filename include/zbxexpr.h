@@ -237,8 +237,7 @@ int	zbx_calculate_item_nextcheck_unreachable(int simple_interval, const zbx_cust
 		time_t disable_until);
 
 int	zbx_check_time_period(const char *period, time_t time, const char *tz, int *res);
-int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekdays, int start_time,
-		const char *tz);
+int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekdays, int start_time);
 /* interval END */
 
 /* condition operators */

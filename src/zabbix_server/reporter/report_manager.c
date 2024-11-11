@@ -533,10 +533,10 @@ static int	rm_get_report_range(int report_time, unsigned char period, struct tm 
 		return FAIL;
 
 	*to = *tm;
-	zbx_tm_round_down(to, period2unit[period], NULL);
+	zbx_tm_round_down(to, period2unit[period]);
 
 	*from = *to;
-	zbx_tm_sub(from, 1, period2unit[period], NULL);
+	zbx_tm_sub(from, 1, period2unit[period]);
 
 	return SUCCEED;
 }
@@ -724,11 +724,12 @@ static int	rm_report_calc_nextcheck(const zbx_rm_report_t *report, int now, char
 	else
 	{
 		if (-1 == (nextcheck = zbx_get_report_nextcheck(now, report->cycle, report->weekdays,
-				report->start_time, report->timezone)))
+				report->start_time)))
 		{
 			*error = zbx_dsprintf(NULL, "Cannot calculate report start time: %s",
 					zbx_strerror(errno));
 		}
+
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() nextcheck:%s %s, error:%s", __func__, zbx_date2str(nextcheck, NULL),
