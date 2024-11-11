@@ -59,7 +59,6 @@ void		zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz);
 long		zbx_get_timezone_offset(time_t t, struct tm *tm);
 struct tm	*zbx_localtime(const time_t *time, const char *tz);
 const struct tm	*zbx_localtime_now(const time_t *time);
-void		zbx_set_time_zone(const char *tz, char **out_tz);
 int		zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t);
 int		zbx_day_in_month(int year, int mon);
 zbx_uint64_t	zbx_get_duration_ms(const zbx_timespec_t *ts);

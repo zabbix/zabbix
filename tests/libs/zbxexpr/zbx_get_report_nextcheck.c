@@ -67,11 +67,9 @@ void	zbx_mock_test_entry(void **state)
 	int			start_time, step = 1;
 	zbx_mock_handle_t	htimes, htime;
 	zbx_mock_error_t	err;
-	char			buf[MAX_STRING_LEN], *old_tz;
+	char			buf[MAX_STRING_LEN];
 
 	ZBX_UNUSED(state);
-
-	zbx_set_time_zone(NULL, &old_tz);
 
 	cycle = mock_get_cycle("in.cycle");
 	weekdays = mock_get_weekdays("in.weekdays");
@@ -103,7 +101,4 @@ void	zbx_mock_test_entry(void **state)
 
 		now = nextcheck;
 	}
-
-	zbx_set_time_zone(old_tz, NULL);
-	zbx_free(old_tz);
 }

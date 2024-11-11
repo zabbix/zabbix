@@ -723,10 +723,6 @@ static int	rm_report_calc_nextcheck(const zbx_rm_report_t *report, int now, char
 	}
 	else
 	{
-		char *old_tz;
-
-		zbx_set_time_zone(NULL, &old_tz);
-
 		if (-1 == (nextcheck = zbx_get_report_nextcheck(now, report->cycle, report->weekdays,
 				report->start_time)))
 		{
@@ -734,8 +730,6 @@ static int	rm_report_calc_nextcheck(const zbx_rm_report_t *report, int now, char
 					zbx_strerror(errno));
 		}
 
-		zbx_set_time_zone(old_tz, NULL);
-		zbx_free(old_tz);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() nextcheck:%s %s, error:%s", __func__, zbx_date2str(nextcheck, NULL),
