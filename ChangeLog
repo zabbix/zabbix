@@ -13,6 +13,9 @@ A......... [ZBXNEXT-9404] enabled to use the mediatype.get method for users with
 .........T [ZBXNEXT-9058] updated VMware Hypervisor template for ability to work as a standalone template (akotsegubov)
 
 Bug fixes:
+........S. [ZBX-25477] fixed crash when calculated item contains large value (vso)
+..F....... [ZBX-21618] fixed layout for multiple lists when long names are used (esekace)
+..F....... [ZBX-25444] fixed missing maintenance data in maps for map type elements (esekace)
 ....I....T [ZBX-24994] removed UUIDs for host elements in the default data (abakaldin, asestakovs)
 ........S. [ZBX-25397] fixed events not being suppressed during maintenance if deadlock has occurred (vso)
 ...G...PS. [ZBX-24614] fixed unidirectional SSL shutdown being performed by both sides resulting in RST packets during communication between Zabbix components (vso)
@@ -1185,6 +1188,7 @@ New features:
 .......PS. [ZBXNEXT-9238] updated maximum supported PostgreSQL version to 17 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-25477] fixed crash when calculated item contains large value (vso)
 ........S. [ZBX-25324] fixed FreeTDS ODBC login with special characters in the password field (sboidenko)
 ...G...... [ZBX-24273] fixed potential Zabbix agent crash for vfs.fs.get item (MVekslers)
 ..F....... [ZBX-23171] fixed escaping of slash character in context-based macro patterns (esekace)
@@ -3131,6 +3135,9 @@ New features:
 .......PS. [ZBXNEXT-9238] updated maximum supported PostgreSQL version to 17 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-25477] fixed crash when calculated item contains large value (vso)
+..F....... [ZBX-21618] fixed layout in multiple list pages when long names are used (esekace)
+..F....... [ZBX-25444] fixed missing maintenance data in maps for map type elements (esekace)
 ........S. [ZBX-25397] fixed events not being suppressed during maintenance if deadlock has occurred (vso)
 ........S. [ZBX-25324] fixed FreeTDS ODBC login with special characters in the password field (sboidenko)
 ........S. [ZBX-24582] truncated error message when testing item and there is value type mismatch (rtrizna)
