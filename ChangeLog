@@ -3316,8 +3316,6 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 --------------------------------------------------------------------------------
 Changes for 5.0.45rc1
 
-New features:
-
 Bug fixes:
 ...G...... [ZBX-24273] fixed potential Zabbix agent crash for vfs.fs.get item (MVekslers)
 ..F....... [ZBX-23171] fixed escaping of slash character in context-based macro patterns (esekace)
