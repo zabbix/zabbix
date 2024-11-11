@@ -110,7 +110,7 @@ foreach ($data['dashboards'] as $dashboard) {
 					->setArgument('action', 'dashboard.view')
 					->setArgument('dashboardid', $dashboard['dashboardid'])
 					->getUrl()
-			))->addClass(ZBX_STYLE_WORDBREAK),
+			))->addClass(ZBX_STYLE_WORDBREAK)
 		])),
 		(new CCol($tags))->addClass(ZBX_STYLE_LIST_TABLE_ACTIONS)
 	]);
