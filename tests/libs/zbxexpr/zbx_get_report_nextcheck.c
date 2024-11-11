@@ -71,7 +71,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	zbx_set_time_zone(zbx_mock_get_parameter_string("in.timezone"), &old_tz);
+	zbx_set_time_zone(NULL, &old_tz);
 
 	cycle = mock_get_cycle("in.cycle");
 	weekdays = mock_get_weekdays("in.weekdays");

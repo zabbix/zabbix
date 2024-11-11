@@ -725,7 +725,7 @@ static int	rm_report_calc_nextcheck(const zbx_rm_report_t *report, int now, char
 	{
 		char *old_tz;
 
-		zbx_set_time_zone(report->timezone, &old_tz);
+		zbx_set_time_zone(NULL, &old_tz);
 
 		if (-1 == (nextcheck = zbx_get_report_nextcheck(now, report->cycle, report->weekdays,
 				report->start_time)))
