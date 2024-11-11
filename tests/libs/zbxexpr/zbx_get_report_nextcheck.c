@@ -68,11 +68,18 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_handle_t	htimes, htime;
 	zbx_mock_error_t	err;
 	char			buf[MAX_STRING_LEN];
+	const char		*report_tz;
 
 	ZBX_UNUSED(state);
 
 	cycle = mock_get_cycle("in.cycle");
 	weekdays = mock_get_weekdays("in.weekdays");
+
+	report_tz = zbx_mock_get_parameter_string("in.timezone");
+	if (0 != setenv("TZ", report_tz, 1))
+		fail_msg("Cannot set 'TZ' environment variable: %s", zbx_strerror(errno));
+
+	tzset();
 
 	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_parameter_string("in.now"), &ts))
 		fail_msg("Invalid time format for 'now' parameter");
