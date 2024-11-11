@@ -64,6 +64,7 @@ Install Zabbix agent on OpenBSD according to Zabbix documentation.
 |CPU nice time|<p>Time the CPU has spent running users' processes that have been niced.</p>|Zabbix agent|system.cpu.util[,nice]|
 |CPU system time|<p>Time the CPU has spent running the kernel and its processes.</p>|Zabbix agent|system.cpu.util[,system]|
 |CPU user time|<p>Time the CPU has spent running users' processes that are not niced.</p>|Zabbix agent|system.cpu.util[,user]|
+|CPU spin time|<p>Time the CPU has spent spinning on a lock.</p>|Zabbix agent|system.cpu.util[,spin]|
 |Host name|<p>The host name of the system.</p>|Zabbix agent|system.hostname<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Host local time|<p>The local system time of the host.</p>|Zabbix agent|system.localtime|
 |Free swap space|<p>The free space of the swap volume/file expressed in bytes.</p>|Zabbix agent|system.swap.size[,free]|

@@ -52,7 +52,8 @@ void	*get_result_value_by_type(AGENT_RESULT *result, int require_type);
 #define ZBX_CPU_STATE_STEAL	7
 #define ZBX_CPU_STATE_GCPU	8
 #define ZBX_CPU_STATE_GNICE	9
-#define ZBX_CPU_STATE_COUNT	10
+#define ZBX_CPU_STATE_SPIN	10
+#define ZBX_CPU_STATE_COUNT	11
 
 #define ZBX_DSTAT_TYPE_SECT	0
 #define ZBX_DSTAT_TYPE_OPER	1
