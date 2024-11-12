@@ -1155,6 +1155,25 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: reset discovery flags for all dependent item tree                 *
+ *                                                                            *
+ *****************************************************************************/
+static void	lld_item_update_dep_discovery(zbx_lld_item_full_t *item, zbx_uint64_t reset_flags)
+{
+	if (0 == reset_flags && 0 != (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+		return;
+
+	for (int i = 0; i < item->dependent_items.values_num; i++)
+	{
+		zbx_lld_item_full_t	*dep = item->dependent_items.values[i];
+
+		dep->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+		lld_item_update_dep_discovery(item->dependent_items.values[i], ZBX_FLAG_LLD_ITEM_DISCOVERED);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Parameters: hostid            - [IN]                                       *
  *             items             - [IN]                                       *
  *             error             - [OUT] error message                        *
@@ -1381,6 +1400,10 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 
 	zbx_vector_str_destroy(&keys);
 	zbx_vector_uint64_destroy(&itemids);
+
+	/* update discovered flags for dependent items */
+	for (int i = 0; i < items->values_num; i++)
+		lld_item_update_dep_discovery(items->values[i], 0);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -4111,8 +4134,7 @@ static void	lld_link_dependent_items(zbx_vector_lld_item_full_ptr_t *items, zbx_
 	{
 		zbx_lld_item_full_t	*item = items->values[i];
 
-		/* only discovered dependent items should be linked */
-		if (0 == (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED) || 0 == item->master_itemid)
+		if (0 == item->master_itemid)
 			continue;
 
 		item_index_local.parent_itemid = item->master_itemid;
