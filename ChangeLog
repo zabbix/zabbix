@@ -1,4 +1,4 @@
-Changes for 7.2.0alpha2
+Changes for 7.2.0beta1
 
 New features:
 ...G.....T [ZBXNEXT-9471] added support for CP_SPIN cpu state on OpenBSD (akotsegubov, jxl)
