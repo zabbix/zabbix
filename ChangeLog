@@ -95,6 +95,7 @@ A......... [ZBXNEXT-9404] enabled usage of the mediatype.get method for users wi
 .........T [ZBXNEXT-9058] updated VMware Hypervisor template for ability to work as a standalone template (akotsegubov)
 
 Bug fixes:
+........S. [ZBX-24894] optimized database queries in lld lost resource handling (vso, wiper)
 ........S. [ZBX-25322] fixed action command sending to proxies assigned to proxy group (wiper)
 ........S. [ZBX-25463] fixed an endless loop in the report manager (sboidenko)
 .......PS. [ZBX-25479] improved asynchronous pollers to count as busy when maximum capacity has been reached (vso)
