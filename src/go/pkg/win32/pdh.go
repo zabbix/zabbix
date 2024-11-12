@@ -71,6 +71,8 @@ var (
 	pdhEnumObjectItems          = hPdh.mustGetProcAddress("PdhEnumObjectItemsW")
 	pdhEnumObjects              = hPdh.mustGetProcAddress("PdhEnumObjectsW")
 
+	// mutex to prevent concurrent calls of Windows API PDH functions when one of the following is already being executed
+	// pdhEnumObjectItems(), pdhEnumObjects() and pdhCollectQueryData()
 	pdhMu sync.RWMutex
 )
 

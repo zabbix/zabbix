@@ -42,10 +42,10 @@ const (
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	cpus            []*cpuUnit
-	collector       *pdhCollector
-	historyCpuMutex sync.Mutex
-	stop            chan bool
+	cpus      []*cpuUnit
+	collector *pdhCollector
+	cpusMu    sync.Mutex
+	stop      chan struct{}
 }
 
 func init() {
@@ -122,8 +122,8 @@ func (p *Plugin) getCPULoad(params []string) (result any, err error) {
 		return nil, zbxerr.ErrorTooManyParameters
 	}
 
-	p.historyCpuMutex.Lock()
-	defer p.historyCpuMutex.Unlock()
+	p.cpusMu.Lock()
+	defer p.cpusMu.Unlock()
 
 	return p.cpus[0].counterAverage(counterLoad, period, split), nil
 }
@@ -143,7 +143,7 @@ func (p *Plugin) collectCpuData() (err error) {
 		}
 		slot.util += p.collector.cpuUtil(i)
 
-		p.historyCpuMutex.Lock()
+		p.cpusMu.Lock()
 		if cpu.tail = cpu.tail.inc(); cpu.tail == cpu.head {
 			cpu.head = cpu.head.inc()
 		}
@@ -151,7 +151,7 @@ func (p *Plugin) collectCpuData() (err error) {
 		// can be added to it resulting in incrementing counter
 		nextSlot := &cpu.history[cpu.tail]
 		*nextSlot = *slot
-		p.historyCpuMutex.Unlock()
+		p.cpusMu.Unlock()
 	}
 	return
 }
@@ -165,21 +165,18 @@ func (p *Plugin) Start() {
 	p.cpus = p.newCpus(numCpus)
 	p.collector.open(numCpus, numGroups)
 
-	p.stop = make(chan bool)
+	p.stop = make(chan struct{})
 
 	go func() {
-		var t *time.Timer
-		lastCheck := time.Now().Add(-1 * time.Second)
+		t := time.NewTicker(1 * time.Second)
+		defer t.Stop()
 		for {
-			t = time.NewTimer(lastCheck.Add(1 * time.Second).Sub(time.Now()))
 			select {
 			case <-p.stop:
-				t.Stop()
 				return
 			case <-t.C:
 				p.Debugf("starting to collect CPU performance data")
 				err := p.collectCpuData()
-				lastCheck = time.Now()
 
 				if err != nil {
 					p.Warningf("failed to get CPU performance data: '%s'", err)
@@ -195,7 +192,7 @@ func (p *Plugin) Stop() {
 	p.collector.close()
 	p.cpus = nil
 
-	p.stop <- true
+	p.stop <- struct{}{}
 }
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
@@ -221,7 +218,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 }
 
 func (p *Plugin) getCounterAverage(cpu *cpuUnit, counter cpuCounter, period historyIndex) any {
-	p.historyCpuMutex.Lock()
-	defer p.historyCpuMutex.Unlock()
+	p.cpusMu.Lock()
+	defer p.cpusMu.Unlock()
 	return cpu.counterAverage(counter, period, 1)
 }
