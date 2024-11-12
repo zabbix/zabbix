@@ -7329,6 +7329,10 @@ msgstr "Отображать триггеры в состоянии ОК в те
 msgid "Display graph"
 msgstr "Показать график"
 
+#: widgets/tophosts/views/column.edit.php:136
+msgid "Display item value as"
+msgstr ""
+
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
 msgstr "Локальное время"
@@ -15231,6 +15235,10 @@ msgstr "Количество inode в процентах. Возвращает �
 #: include/items.inc.php:1593
 msgid "Numeral systems"
 msgstr "Системы счисления"
+
+#: widgets/tophosts/views/column.edit.php:139
+msgid "Numeric"
+msgstr ""
 
 #: app/partials/configuration.filter.items.php:143
 #: app/views/popup.massupdate.item.php:148 include/items.inc.php:125

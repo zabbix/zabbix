@@ -7330,6 +7330,10 @@ msgstr "Zobrazovať spúšťače v stave OK po dobu"
 msgid "Display graph"
 msgstr "Zobraziť graf"
 
+#: widgets/tophosts/views/column.edit.php:136
+msgid "Display item value as"
+msgstr ""
+
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
 msgstr "Zobraz miestny čas"
@@ -15232,6 +15236,10 @@ msgstr "Počet alebo percento voľných inodov. Vráti celé číslo pre počet 
 #: include/items.inc.php:1593
 msgid "Numeral systems"
 msgstr "Číselné sústavy"
+
+#: widgets/tophosts/views/column.edit.php:139
+msgid "Numeric"
+msgstr ""
 
 #: app/partials/configuration.filter.items.php:143
 #: app/views/popup.massupdate.item.php:148 include/items.inc.php:125

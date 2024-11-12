@@ -7103,6 +7103,10 @@ msgstr "正常イベントの表示期間"
 msgid "Display graph"
 msgstr "グラフ表示"
 
+#: widgets/tophosts/views/column.edit.php:136
+msgid "Display item value as"
+msgstr ""
+
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
 msgstr "ローカル時間を表示"
@@ -14923,6 +14927,10 @@ msgstr "iノードの数値またはパーセンテージ。数値であれば�
 #: include/items.inc.php:1593
 msgid "Numeral systems"
 msgstr "数値変換"
+
+#: widgets/tophosts/views/column.edit.php:139
+msgid "Numeric"
+msgstr ""
 
 #: app/partials/configuration.filter.items.php:143
 #: app/views/popup.massupdate.item.php:148 include/items.inc.php:125

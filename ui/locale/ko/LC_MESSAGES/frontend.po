@@ -7104,6 +7104,10 @@ msgstr "복구트리거 표시기간"
 msgid "Display graph"
 msgstr "그래프 표시"
 
+#: widgets/tophosts/views/column.edit.php:136
+msgid "Display item value as"
+msgstr ""
+
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
 msgstr "현지 시간 표시"
@@ -14924,6 +14928,10 @@ msgstr "inode의 수 혹은 퍼센트. 수치라면 integer를 리턴하고 퍼�
 #: include/items.inc.php:1593
 msgid "Numeral systems"
 msgstr "수치변환"
+
+#: widgets/tophosts/views/column.edit.php:139
+msgid "Numeric"
+msgstr ""
 
 #: app/partials/configuration.filter.items.php:143
 #: app/views/popup.massupdate.item.php:148 include/items.inc.php:125

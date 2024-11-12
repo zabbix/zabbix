@@ -7227,6 +7227,10 @@ msgstr "Vis OK utløsere for"
 msgid "Display graph"
 msgstr "Vis grafen"
 
+#: widgets/tophosts/views/column.edit.php:136
+msgid "Display item value as"
+msgstr ""
+
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
 msgstr ""
@@ -15099,6 +15103,10 @@ msgstr "Antall eller prosent av inoder. Returnerer heltall for nummer; flyte for
 #: include/items.inc.php:1593
 msgid "Numeral systems"
 msgstr "Numerale systemer"
+
+#: widgets/tophosts/views/column.edit.php:139
+msgid "Numeric"
+msgstr ""
 
 #: app/partials/configuration.filter.items.php:143
 #: app/views/popup.massupdate.item.php:148 include/items.inc.php:125

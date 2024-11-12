@@ -7319,6 +7319,10 @@ msgstr ""
 msgid "Display graph"
 msgstr ""
 
+#: widgets/tophosts/views/column.edit.php:136
+msgid "Display item value as"
+msgstr ""
+
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
 msgstr ""
@@ -15220,6 +15224,10 @@ msgstr ""
 #: include/items.inc.php:1585 include/items.inc.php:1589
 #: include/items.inc.php:1593
 msgid "Numeral systems"
+msgstr ""
+
+#: widgets/tophosts/views/column.edit.php:139
+msgid "Numeric"
 msgstr ""
 
 #: app/partials/configuration.filter.items.php:143

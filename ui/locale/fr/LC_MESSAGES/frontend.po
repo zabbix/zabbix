@@ -7216,6 +7216,10 @@ msgstr "Afficher les déclencheurs OK pendant"
 msgid "Display graph"
 msgstr "Afficher le graphique"
 
+#: widgets/tophosts/views/column.edit.php:136
+msgid "Display item value as"
+msgstr ""
+
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
 msgstr "Afficher l'heure locale"
@@ -15077,6 +15081,10 @@ msgstr "Nombre ou pourcentage des i-nœuds. Retourne un entier pour le nombre, u
 #: include/items.inc.php:1593
 msgid "Numeral systems"
 msgstr "Systèmes numériques"
+
+#: widgets/tophosts/views/column.edit.php:139
+msgid "Numeric"
+msgstr ""
 
 #: app/partials/configuration.filter.items.php:143
 #: app/views/popup.massupdate.item.php:148 include/items.inc.php:125

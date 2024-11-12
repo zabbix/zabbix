@@ -7095,6 +7095,10 @@ msgstr "Các trigger hiển thị OK khi"
 msgid "Display graph"
 msgstr "Hiển thị đồ thị"
 
+#: widgets/tophosts/views/column.edit.php:136
+msgid "Display item value as"
+msgstr ""
+
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
 msgstr ""
@@ -14924,6 +14928,10 @@ msgstr "Số lượng hoặc tỷ lệ phần trăm của các nút. Trả về 
 #: include/items.inc.php:1593
 msgid "Numeral systems"
 msgstr "Hệ thống số"
+
+#: widgets/tophosts/views/column.edit.php:139
+msgid "Numeric"
+msgstr ""
 
 #: app/partials/configuration.filter.items.php:143
 #: app/views/popup.massupdate.item.php:148 include/items.inc.php:125
