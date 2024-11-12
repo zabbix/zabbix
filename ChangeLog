@@ -139,6 +139,7 @@ New features:
 .........T [ZBXNEXT-9341] added AssumeRole authentication to AWS templates (egordymov)
 
 Bug fixes:
+........S. [ZBX-24894] optimized database queries in lld lost resource handling (vso, wiper)
 ........S. [ZBX-25238] fixed crash when deleting proxy group and proxy at same moment (vso)
 .......PS. [ZBX-25176] added retry to asynchronous SNMP pollers to avoid failure if one of packets is lost (vso)
 ..F....... [ZBX-25239] fixed translation strings (averza)
