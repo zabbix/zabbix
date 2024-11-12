@@ -73,6 +73,7 @@ A.F.I..... [ZBXNEXT-9297] improved Clock widget (type - digital) elements sizing
 A.F.I..PS. [ZBXNEXT-9176] removed support of Oracle DB (agriscenko, sboidenko)
 
 Bug fixes:
+........S. [ZBX-24894] optimized database queries in lld lost resource handling (vso, wiper)
 A.F....... [ZBX-23227] fixed issue where using an empty array or string value for parameter filtering in get methods returned all records. (agriscenko, jfreibergs)
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
