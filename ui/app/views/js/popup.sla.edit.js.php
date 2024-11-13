@@ -186,7 +186,6 @@ window.sla_edit_popup = {
 		this.overlay.setProperties({title, buttons});
 		this.overlay.containFocus()
 		this.overlay.recoverFocus()
-
 	},
 
 	delete() {
