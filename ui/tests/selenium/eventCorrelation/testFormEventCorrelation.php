@@ -14,992 +14,1448 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-
-use Facebook\WebDriver\WebDriverBy;
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup correlation
  *
- * @onBefore prepareEventData
+ * @onBefore prepareData
  */
-class testFormEventCorrelation extends CLegacyWebTest {
+class testFormEventCorrelation extends CWebTest {
+
+	const HASH_SQL = 'SELECT * FROM correlation c INNER JOIN corr_condition cc ON c.correlationid = cc.correlationid'.
+			' LEFT JOIN corr_operation co ON c.correlationid = co.correlationid'.
+			' LEFT JOIN corr_condition_group ccg ON cc.corr_conditionid = ccg.corr_conditionid'.
+			' LEFT JOIN corr_condition_tag cct ON cc.corr_conditionid = cct.corr_conditionid'.
+			' LEFT JOIN corr_condition_tagpair cctp ON cc.corr_conditionid = cctp.corr_conditionid'.
+			' LEFT JOIN corr_condition_tagvalue cctv ON cc.corr_conditionid = cctv.corr_conditionid'.
+			' ORDER BY cc.corr_conditionid';
+
+	protected static $update_correlation_id;
+	protected static $update_correlation_initial = [
+		'name' => 'Event correlation for update',
+		'description' => 'Test description update',
+		'filter' => [
+			'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+			'conditions' => [['type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG, 'tag' => '0 update tag']]
+		],
+		'operations' => [['type' => ZBX_CORR_OPERATION_CLOSE_OLD]],
+		'status' => ZBX_CORRELATION_ENABLED
+	];
 
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehaviour to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
 
-	public function prepareEventData() {
+	public function prepareData() {
 		CDataHelper::call('correlation.create', [
 			[
-				'name' => 'Event correlation for cancel',
-				'description' => 'Test description cancel',
-				'status' => ZBX_CORRELATION_DISABLED,
+				'name' => 'Event correlation for layout check',
+				'description' => 'Test description layout',
 				'filter' => [
-					'evaltype' => 1,
+					'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+					'formula' => 'A or B',
 					'conditions' => [
-						[
-							'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
-							'tag' => 'cancel tag'
-						]
+						['type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG, 'tag' => 'tag', 'formulaid' => 'A'],
+						['type' => ZBX_CORR_CONDITION_NEW_EVENT_TAG, 'tag' => 'tag', 'formulaid' => 'B']
 					]
 				],
-				'operations' => [
-					[
-						'type' => ZBX_CORR_OPERATION_CLOSE_OLD
-					]
-				]
-			],
-			[
-				'name' => 'Event correlation for clone',
-				'description' => 'Test description clone',
-				'filter' => [
-					'evaltype' => 0,
-					'conditions' => [
-						[
-							'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
-							'tag' => 'clone tag'
-						]
-					]
-				],
-				'operations' => [
-					[
-						'type' => ZBX_CORR_OPERATION_CLOSE_OLD
-					]
-				]
+				'operations' => [['type' => ZBX_CORR_OPERATION_CLOSE_OLD]]
 			],
 			[
 				'name' => 'Event correlation for delete',
 				'description' => 'Test description delete',
 				'filter' => [
-					'evaltype' => 0,
-					'conditions' => [
-						[
-							'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
-							'tag' => 'delete tag'
-						]
-					]
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+					'conditions' => [['type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG, 'tag' => 'delete tag']]
 				],
-				'operations' => [
-					[
-						'type' => ZBX_CORR_OPERATION_CLOSE_OLD
-					]
-				]
+				'operations' => [['type' => ZBX_CORR_OPERATION_CLOSE_OLD]]
 			],
 			[
-				'name' => 'Event correlation for update',
-				'description' => 'Test description update',
+				'name' => 'Event correlation for cancel',
+				'description' => 'Test description cancel',
 				'filter' => [
-					'evaltype' => 0,
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+					'conditions' => [
+						['type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG, 'tag' => 'cancel tag'],
+						['type' => ZBX_CORR_CONDITION_NEW_EVENT_TAG, 'tag' => 'cancel tag']
+					]
+				],
+				'operations' => [['type' => ZBX_CORR_OPERATION_CLOSE_OLD]],
+				'status' => ZBX_CORRELATION_DISABLED
+			],
+			[
+				'name' => 'Event correlation for clone',
+				'description' => 'Test description clone',
+				'filter' => [
+					'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+					'formula' => 'A or B',
 					'conditions' => [
 						[
 							'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
-							'tag' => 'update tag'
+							'tag' => 'clone tag',
+							'formulaid' => 'A'
+						],
+						[
+							'type' => ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE,
+							'tag' => 'another tag',
+							'operator' => CONDITION_OPERATOR_NOT_LIKE,
+							'value' => 'test',
+							'formulaid' => 'B'
 						]
 					]
 				],
-				'operations' => [
-					[
-						'type' => ZBX_CORR_OPERATION_CLOSE_OLD
-					]
-				]
+				'operations' => [['type' => ZBX_CORR_OPERATION_CLOSE_OLD]],
+				'status' => ZBX_CORRELATION_DISABLED
 			]
 		]);
-	}
 
-	public static function create() {
-		return [
-			[
-				[
-					'fields' => [
-						'Name' => 'Test create with all fields',
-						'Description' => 'Event correlation with description',
-						'Enabled' => false,
-						'Close new event' => true
-
-					],
-					'tag_fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('New event tag name'),
-						'Tag' => 'Test tag'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Test create with minimum fields',
-						'Close old events' => true
-					],
-					'tag_fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Old event tag name'),
-						'Tag' => 'Test tag'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Test create with both operations selected',
-						'Close old events' => true,
-						'Close new event' => true
-					],
-					'tag_fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Old event tag name'),
-						'Tag' => 'Test tag'
-					]
-				]
-			]
-		];
+		// Create the correlation that will be reset each time for the update scenarios.
+		self::$update_correlation_id = CDataHelper::call(
+				'correlation.create', self::$update_correlation_initial
+		)['correlationids'][0];
 	}
 
 	/**
-	 * Test creation of a event correlation with all possible fields and with default values.
-	 *
-	 * @dataProvider create
+	 * Test the layout and basic functionality of the form.
 	 */
-	public function testFormEventCorrelation_Create($data) {
-		$this->zbxTestLogin('zabbix.php?action=correlation.list');
-		$this->zbxTestCheckHeader('Event correlation');
-		$this->zbxTestCheckTitle('Event correlation rules');
+	public function testFormEventCorrelation_Layout() {
+		$this->page->login()->open('zabbix.php?action=correlation.list')->waitUntilReady();
 
+		// Open 'New event correlation' modal.
 		$this->query('button:Create event correlation')->one()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$form = $dialog->asForm();
-
 		$this->assertEquals('New event correlation', $dialog->getTitle());
-		$form->fill($data['fields']);
+		$form = $dialog->asForm();
 
-		$form->getField('Conditions')->query('button:Add')->one()->click();
-		$condition_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-		$condition_form = $condition_dialog->query('id:correlation-condition-form')->asForm()->one();
-		$this->assertEquals('New condition', $condition_dialog->getTitle());
+		// Check modal header buttons.
+		foreach (['Help', 'Close'] as $button_title) {
+			$this->assertTrue($dialog->query('xpath:.//*[@title="'.$button_title.'"]')->one()->isClickable());
+		}
 
-		$condition_form->fill($data['tag_fields']);
+		// Check form labels.
+		$this->assertEqualsCanonicalizing(['Name', 'Conditions', 'Description', 'Operations', 'Enabled'],
+				$form->getLabels(CElementFilter::VISIBLE)->asText()
+		);
 
-		$condition_form->submit();
-		$condition_dialog->waitUntilNotVisible();
+		// Check form inputs to be enabled.
+		foreach (['name', 'description'] as $id) {
+			$this->assertTrue($form->query('id', $id)->one()->isEnabled());
+		}
 
-		$form->submit();
-		$dialog->ensureNotPresent();
+		// Check mandatory fields.
+		$this->assertEquals(['Name', 'Conditions'], $form->getRequiredLabels());
 
-		$this->assertMessage(TEST_GOOD, 'Event correlation created');
-		$this->zbxTestTextPresent($data['fields']['Name']);
-
-		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['fields']['Name']);
-		$this->assertEquals(1, CDBHelper::getCount($sql));
-	}
-
-	public static function validation() {
-		return [
-			[
-				[
-					'error_header' => 'Cannot create event correlation',
-					'error_messages' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Field "conditions" is mandatory.'
-					]
-				]
-			],
-			[
-				[
-					'name' => 'Without conditions',
-					'error_header' => 'Cannot create event correlation',
-					'error_messages' => [
-						'Field "conditions" is mandatory.'
-					]
-				]
-			],
-			[
-				[
-					'name' => 'Without operation',
-					'tag' => 'tag name',
-					'error_header' => 'Cannot create event correlation',
-					'error_messages' => [
-						'Invalid parameter "/1/operations": cannot be empty.'
-					]
-				]
-			]
+		// Check input attributes.
+		$field_attributes = [
+			'Name' => ['type' => 'text', 'maxlength' => 255, 'value' => '', 'autofocus' => 'true'],
+			'id:evaltype' => ['value' => 0],
+			'id:formula' => ['type' => 'text', 'value' => '', 'maxlength' => 255, 'placeholder' => 'A or (B and C) ...',
+					'disabled' => 'true'],
+			'Description' => ['maxlength' => 65535, 'value' => '', 'rows' => 7]
 		];
-	}
 
-	/**
-	 * Test form validations.
-	 *
-	 * @dataProvider validation
-	 */
-	public function testFormEventCorrelation_CreateValidation($data) {
-		$this->zbxTestLogin('zabbix.php?action=correlation.list');
-		$this->query('button:Create event correlation')->one()->click();
-		$this->zbxTestCheckHeader('Event correlation');
-		$this->zbxTestCheckTitle('Event correlation rules');
+		foreach ($field_attributes as $field => $attributes) {
+			$field_element = $form->getField($field);
 
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$form = $dialog->asForm();
-
-		if (array_key_exists('name', $data)) {
-			$form->getField('Name')->fill($data['name']);
-		}
-
-		if (array_key_exists('tag', $data)) {
-			$form->getField('Conditions')->query('button:Add')->one()->click();
-			$condition_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-			$condition_form = $condition_dialog->query('id:correlation-condition-form')->asForm()->one();
-
-			$condition_form->getField('Tag')->fill($data['tag']);
-			$condition_form->submit();
-			$condition_dialog->waitUntilNotVisible();
-		}
-
-		$form->submit();
-
-		$this->assertMessage(TEST_BAD, $data['error_header'], $data['error_messages']);
-		$dialog->close();
-
-		if (array_key_exists('name', $data) && $data['name'] === 'Event correlation for update') {
-			$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
-			$this->assertEquals(1, CDBHelper::getCount($sql));
-		}
-
-		if (array_key_exists('name', $data) && $data['name'] != 'Event correlation for update') {
-			$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
-			$this->assertEquals(0, CDBHelper::getCount($sql));
-		}
-	}
-
-	public function testFormEventCorrelation_LongNameValidation() {
-		$name = 'Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_'
-				. 'Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_'
-				. 'Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name';
-		$db_name = 'Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_'
-				. 'Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_Name_'
-				. 'Test_With_Long_Name_Test_With_Long_Name_Test_With_Long_';
-
-		$this->zbxTestLogin('zabbix.php?action=correlation.list');
-		$this->query('button:Create event correlation')->one()->click();
-		$this->zbxTestCheckHeader('Event correlation');
-		$this->zbxTestCheckTitle('Event correlation rules');
-
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$form = $dialog->asForm();
-		$form->getField('Name')->fill($name);
-
-		$form->getField('Conditions')->query('button:Add')->one()->click();
-		$condition_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-		$condition_form = $condition_dialog->query('id:correlation-condition-form')->asForm()->one();
-		$condition_form->getField('Tag')->fill('Test tag');
-		$condition_form->submit();
-		$condition_dialog->waitUntilNotVisible();
-
-		$form->getField('Close old events')->fill(true);
-		$form->submit();
-		$this->assertMessage(TEST_GOOD, 'Event correlation created');
-
-		// Name longer than 255 symbols is truncated on frontend, check the shortened name in DB
-		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($db_name);
-		$this->assertEquals(1, CDBHelper::getCount($sql));
-	}
-
-	public static function tags() {
-		return [
-			[
-				[
-					'name' => 'Test create with New event host group equals',
-					'tag_fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('New event host group'),
-						'Operator' => 'equals',
-						'Host groups' => 'Zabbix servers'
-					]
-
-				]
-			],
-			[
-				[
-					'name' => 'Test create with New event host group does not equal',
-					'tag_fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('New event host group'),
-						'Operator' => 'does not equal',
-						'Host groups' => 'Zabbix servers'
-					]
-				]
-			],
-			[
-				[
-					'name' => 'Test create with Event tag pair',
-					'tag_fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Event tag pair'),
-						'Old tag name' => 'Old tag',
-						'New tag name' => 'New tag'
-					]
-				]
-			],
-			[
-				[
-					'name' => 'Test create with Old event tag value equals tag',
-					'tag_fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Old event tag value'),
-						'Tag' => 'TagTag',
-						'Operator' => 'equals',
-						'Value' => 'TagValue'
-					]
-				]
-			],
-			[
-				[
-					'name' => 'Test create with Old event tag value equals Empty',
-					'tag_fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Old event tag value'),
-						'Tag' => 'TagTag',
-						'Operator' => 'equals',
-						'Value' => ''
-					]
-				]
-			],
-			[
-				[
-					'name' => 'Test create with Old event tag value does not equal tag',
-					'tag_fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Old event tag value'),
-						'Tag' => 'TagTag',
-						'Operator' => 'does not equal',
-						'Value' => 'TagValue'
-					]
-				]
-			],
-			[
-				[
-					'name' => 'Test create with Old event tag value contains tag',
-					'tag_fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Old event tag value'),
-						'Tag' => 'TagTag',
-						'Operator' => 'contains',
-						'Value' => 'TagValue'
-					]
-				]
-			],
-			[
-				[
-					'name' => 'Test create with Old event tag value does not contain tag',
-					'tag_fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Old event tag value'),
-						'Tag' => 'TagTag',
-						'Operator' => 'does not contain',
-						'Value' => 'TagValue'
-					]
-				]
-			],
-			[
-				[
-					'name' => 'Test create with New event tag value equals tag',
-					'tag_fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('New event tag value'),
-						'Tag' => 'TagTag',
-						'Operator' => 'equals',
-						'Value' => 'TagValue'
-					]
-				]
-			],
-			[
-				[
-					'name' => 'Test create with New event tag value equals Empty',
-					'tag_fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('New event tag value'),
-						'Tag' => 'TagTag',
-						'Operator' => 'equals',
-						'Value' => ''
-					]
-				]
-			],
-			[
-				[
-					'name' => 'Test create with New event tag value does not equal tag',
-					'tag_fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('New event tag value'),
-						'Tag' => 'TagTag',
-						'Operator' => 'does not equal',
-						'Value' => 'TagValue'
-					]
-				]
-			],
-			[
-				[
-					'name' => 'Test create with New event tag value contains tag',
-					'tag_fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('New event tag value'),
-						'Tag' => 'TagTag',
-						'Operator' => 'contains',
-						'Value' => 'TagValue'
-					]
-				]
-			],
-			[
-				[
-					'name' => 'Test create with New event tag value does not contain tag',
-					'tag_fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('New event tag value'),
-						'Tag' => 'TagTag',
-						'Operator' => 'does not contain',
-						'Value' => 'TagValue'
-					]
-				]
-			]
-		];
-	}
-
-	/**
-	 * Test creation with different conditions.
-	 *
-	 * @dataProvider tags
-	 */
-	public function testFormEventCorrelation_TestTags($data) {
-		$this->zbxTestLogin('zabbix.php?action=correlation.list');
-		$this->query('button:Create event correlation')->one()->click();
-		$this->zbxTestCheckHeader('Event correlation');
-		$this->zbxTestCheckTitle('Event correlation rules');
-
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$form = $dialog->asForm();
-		$form->getField('Name')->fill($data['name']);
-
-		$form->getField('Conditions')->query('button:Add')->one()->click();
-		$condition_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-		$condition_form = $condition_dialog->query('id:correlation-condition-form')->asForm()->one();
-
-		$condition_form->fill($data['tag_fields']);
-		$condition_form->submit();
-		$condition_dialog->waitUntilNotVisible();
-
-		$form->getField('Close old events')->fill(true);
-		$form->submit();
-		$this->assertMessage(TEST_GOOD, 'Event correlation created');
-
-		$this->zbxTestTextPresent($data['name']);
-		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
-		$this->assertEquals(1, CDBHelper::getCount($sql));
-	}
-
-	public static function tagsValidation() {
-		return [
-			[
-				[
-					'name' => 'Test empty New event tag',
-					'tag_fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('New event tag name')
-					],
-					'error_message' => 'Incorrect value for field "tag": cannot be empty.'
-				]
-			],
-			[
-				[
-					'name' => 'Test empty New event host group',
-					'tag_fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('New event host group')
-					],
-					'error_message' => 'Incorrect value for field "groupid": cannot be empty.'
-				]
-			],
-			[
-				[
-					'name' => 'Test empty Old tag in Event tag pair',
-					'tag_fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Event tag pair'),
-						'New tag name' => 'New tag'
-					],
-					'error_message' => 'Incorrect value for field "oldtag": cannot be empty.'
-				]
-			],
-			[
-				[
-					'name' => 'Test empty New tag in Event tag pair',
-					'tag_fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Event tag pair'),
-						'Old tag name' => 'Old tag'
-					],
-					'error_message' => 'Incorrect value for field "newtag": cannot be empty.'
-				]
-			],
-			[
-				[
-					'name' => 'Test empty tag in Old event tag value',
-					'tag_fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Old event tag value')
-					],
-					'error_message' => 'Incorrect value for field "tag": cannot be empty.'
-				]
-			],
-			[
-				[
-					'name' => 'Test empty tag in New event tag value',
-					'tag_fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('New event tag value')
-					],
-					'error_message' => 'Incorrect value for field "tag": cannot be empty.'
-				]
-			]
-		];
-	}
-
-	/**
-	 * Test condition value validations.
-	 *
-	 * @dataProvider tagsValidation
-	 */
-	public function testFormEventCorrelation_CheckEmptyTagsValue($data) {
-		$this->zbxTestLogin('zabbix.php?action=correlation.list');
-		$this->query('button:Create event correlation')->one()->click();
-		$this->zbxTestCheckHeader('Event correlation');
-		$this->zbxTestCheckTitle('Event correlation rules');
-
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$form = $dialog->asForm();
-		$form->getField('Name')->fill($data['name']);
-
-		$form->getField('Conditions')->query('button:Add')->one()->click();
-		$condition_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-		$condition_form = $condition_dialog->query('id:correlation-condition-form')->asForm()->one();
-
-		$condition_form->fill($data['tag_fields']);
-
-		$condition_form->submit();
-		$this->assertMessage(TEST_BAD, null, $data['error_message']);
-		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
-		$this->assertEquals(0, CDBHelper::getCount($sql));
-
-		$condition_dialog->close();
-		$dialog->close();
-	}
-
-	public static function calculation() {
-		return [
-			[
-				[
-					'name' => 'Test create with calculation And/Or',
-					'tags' => [
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('Old event tag name'),
-							'Tag' => 'Test tag1'
-						],
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('New event tag name'),
-							'Tag' => 'Test tag2'
-						]
-					]
-				]
-			],
-			[
-				[
-					'name' => 'Test create with calculation And',
-					'tags' => [
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('Old event tag name'),
-							'Tag' => 'Test tag1'
-						],
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('New event tag name'),
-							'Tag' => 'Test tag2'
-						]
-					],
-					'calculation' => 'And'
-				]
-			],
-			[
-				[
-					'name' => 'Test create with calculation OR',
-					'tags' => [
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('Old event tag name'),
-							'Tag' => 'Test tag1'
-						],
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('New event tag name'),
-							'Tag' => 'Test tag2'
-						]
-					],
-					'calculation' => 'Or'
-				]
-			],
-			[
-				[
-					'name' => 'Test create with calculation Custom',
-					'tags' => [
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('Old event tag name'),
-							'Tag' => 'Test tag1'
-						],
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('New event tag name'),
-							'Tag' => 'Test tag2'
-						],
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('New event tag name'),
-							'Tag' => 'Test tag3'
-						]
-					],
-					'calculation' => 'Custom expression',
-					'formula' => 'A or (B and not C)'
-				]
-			]
-		];
-	}
-
-	/**
-	 * Test all types of calculation.
-	 *
-	 * @dataProvider calculation
-	 */
-	public function testFormEventCorrelation_CreateCalculation($data) {
-		$this->zbxTestLogin('zabbix.php?action=correlation.list');
-		$this->query('button:Create event correlation')->one()->click();
-		$this->zbxTestCheckHeader('Event correlation');
-		$this->zbxTestCheckTitle('Event correlation rules');
-
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$form = $dialog->asForm();
-		$form->getField('Name')->fill($data['name']);
-
-		foreach ($data['tags'] as $tag) {
-			$form->getField('Conditions')->query('button:Add')->one()->click();
-			$condition_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-			$condition_form = $condition_dialog->query('id:correlation-condition-form')->asForm()->one();
-
-			$condition_form->fill($tag);
-
-			$condition_form->submit();
-			$condition_dialog->waitUntilNotVisible();
-		}
-
-		if (array_key_exists('calculation', $data)) {
-			$form->getField('id:evaltype')->fill($data['calculation']);
-			if ($data['calculation'] === 'Custom expression') {
-				$form->query('id:formula')->waitUntilPresent()->one()->fill($data['formula']);
+			foreach ($attributes as $attribute => $expected_value) {
+				$this->assertEquals($expected_value, $field_element->getAttribute($attribute));
 			}
 		}
 
-		$form->getField('Close old events')->fill(true);
-		$form->submit();
-		$this->assertMessage(TEST_GOOD, 'Event correlation created');
+		// Check that Type of calculation field is hidden.
+		foreach (['evaltype', 'formula'] as $id) {
+			$this->assertFalse($form->getField('id:'.$id)->isVisible());
+		}
 
-		$this->zbxTestTextPresent($data['name']);
-		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
-		$this->assertEquals(1, CDBHelper::getCount($sql));
+		// Check Conditions table.
+		$conditions_table = $dialog->query('id:condition_table')->asTable()->one();
+		$this->assertEquals(['Label', 'Name', 'Action'], $conditions_table->getHeaders()->asText());
+		$this->assertTrue($conditions_table->query('button:Add')->one()->isClickable());
+
+		// Check Operations checkbox list.
+		$operations_checkbox_list = $form->getField('Operations');
+		$this->assertEqualsCanonicalizing(['Close old events', 'Close new event'],
+				$operations_checkbox_list->getLabels(CElementFilter::VISIBLE)->asText()
+		);
+		$this->assertEquals([], $operations_checkbox_list->getValue());
+		$this->assertTrue($operations_checkbox_list->isEnabled());
+
+		// Check that "one operation must be selected" text exists.
+		$this->assertTrue($dialog->query('xpath:.//label[text()="At least one operation must be selected."]')->one()
+				->hasClass('form-label-asterisk')
+		);
+
+		// Assert Enabled checkbox.
+		$enabled_checkbox = $form->getField('Enabled');
+		$this->assertTrue($enabled_checkbox->isEnabled());
+		$this->assertEquals(true, $enabled_checkbox->getValue());
+
+		// Check modal footer buttons.
+		$this->assertEquals(['Add', 'Cancel'], $dialog->getFooter()->query('button')->all()
+				->filter(CElementFilter::CLICKABLE)->asText()
+		);
+
+		// Open 'New condition' modal.
+		$form->getField('Conditions')->query('button:Add')->one()->click();
+		$condition_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+		$this->assertEquals('New condition', $condition_dialog->getTitle());
+		$condition_form = $condition_dialog->query('id:correlation-condition-form')->asForm()->one();
+
+		// Check available operator types for each condition type.
+		$condition_types = [
+			'Old event tag name' => [
+				'Operator' => ['value' => 'equals'],
+				'Tag' => ['value' => '', 'maxlength' => 255, 'required' => true]
+			],
+			'New event tag name' => [
+				'Operator' => ['value' => 'equals'],
+				'Tag' => ['value' => '', 'maxlength' => 255, 'required' => true]
+			],
+			'New event host group' => [
+				'Operator' => ['value' => 'equals', 'labels' => ['equals', 'does not equal']],
+				'Host groups' => ['value' => '', 'required' => true]
+			],
+			'Event tag pair' => [
+				'Old tag name' => ['value' => '', 'maxlength' => 255, 'required' => true],
+				'Operator' => ['value' => 'equals'],
+				'New tag name' => ['value' => '', 'maxlength' => 255, 'required' => true]
+			],
+			'Old event tag value' => [
+				'Tag' => ['value' => '', 'maxlength' => 255, 'required' => true],
+				'Operator' => ['value' => 'equals', 'labels' => ['equals', 'does not equal', 'contains', 'does not contain']],
+				'Value' => ['value' => '', 'maxlength' => 255]
+			],
+			'New event tag value' => [
+				'Tag' => ['value' => '', 'maxlength' => 255, 'required' => true],
+				'Operator' => ['value' => 'equals', 'labels' => ['equals', 'does not equal', 'contains', 'does not contain']],
+				'Value' => ['value' => '', 'maxlength' => 255]
+			]
+		];
+
+		foreach ($condition_types as $condition_type => $fields) {
+			$condition_form->fill(['Type' => CFormElement::RELOADABLE_FILL($condition_type)]);
+
+			foreach ($fields as $field_label => $properties) {
+				$field = $condition_form->getField($field_label);
+				$this->assertEquals($properties['value'], $field->getValue());
+				$this->assertEquals(CTestArrayHelper::get($properties, 'required', false), $condition_form->isRequired($field_label));
+				$this->assertEquals(CTestArrayHelper::get($properties, 'maxlength'), $field->getAttribute('maxlength'));
+
+				if (array_key_exists('labels', $properties)) {
+					$this->assertEqualsCanonicalizing($properties['labels'], $field->getLabels(CElementFilter::VISIBLE)->asText());
+				}
+			}
+		}
+
+		// Check modal footer buttons.
+		$this->assertEquals(['Add', 'Cancel'], $condition_dialog->getFooter()->query('button')->all()
+				->filter(CElementFilter::CLICKABLE)->asText()
+		);
+
+		// Close both modals.
+		COverlayDialogElement::closeAll();
+
+		// Check Type of calculation and Formula fields are enabled.
+		$this->query('link:Event correlation for layout check')->one()->click();
+		$form->invalidate();
+
+		foreach (['evaltype', 'formula'] as $id) {
+			$field = $form->getField('id:'.$id);
+			$this->assertTrue($field->isVisible() && $field->isEnabled());
+		}
+
+		// Check that formula field becomes hidden when changing Type of calculation.
+		$form->fill(['id:evaltype' => 'And']);
+		$this->assertFalse($form->getField('id:formula')->isVisible());
+
+		// Check that the condition Type dropdown saves the value
+		$form->getField('Conditions')->query('button:Add')->one()->click();
+		COverlayDialogElement::find()->waitUntilReady()->all()->last()->asForm()->checkValue(['Type' => 'New event tag value']);
+		COverlayDialogElement::closeAll();
 	}
 
-	public static function formulaValidation() {
+	public function getEventCorrelationData() {
 		return [
 			// #0
 			[
 				[
-					'name' => 'Test create with empty expression',
-					'tags' => [
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('Old event tag name'),
-							'Tag' => 'Test tag1'
-						],
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('New event tag name'),
-							'Tag' => 'Test tag2'
-						]
+					'fields' => [
+						'Name' => 'All fields',
+						'Description' => 'Event correlation with description',
+						'Enabled' => false,
+						'Operations' => ['Close old events', 'Close new event']
 					],
-					'formula' => '',
-					'error_message' => 'Invalid parameter "/1/filter/formula": cannot be empty.'
+					'update_name' => true,
+					'unique_name' => true,
+					'remove_condition' => true,
+					'conditions' => [
+						[
+							'Type' => 'New event tag name',
+							'Tag' => 'Test tag'
+						]
+					]
 				]
 			],
 			// #1
 			[
 				[
-					'name' => 'Test create with missing argument',
-					'tags' => [
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('Old event tag name'),
-							'Tag' => 'Test tag1'
-						],
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('New event tag name'),
-							'Tag' => 'Test tag2'
-						],
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('Old event tag value'),
-							'Tag' => 'Test tag3',
-							'Operator' => 'contains',
-							'Value' => 'Value'
-						]
+					'fields' => [
+						'Name' => 'Minimum fields'
 					],
-					'formula' => 'A or B',
-					'error_message' => 'Invalid parameter "/1/filter/conditions": incorrect number of conditions.'
+					'conditions' => [
+						[
+							'Type' => 'Old event tag name',
+							'Tag' => 'Test tag'
+						]
+					]
 				]
 			],
 			// #2
 			[
 				[
-					'name' => 'Test create with extra argument',
-					'tags' => [
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('Old event tag name'),
-							'Tag' => 'Test tag1'
-						],
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('New event tag name'),
-							'Tag' => 'Test tag2'
-						],
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('Old event tag value'),
-							'Tag' => 'Test tag3',
-							'Operator' => 'contains',
-							'Value' => 'Value'
-						]
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => ''
 					],
-					'formula' => '(A or B) and (C or D)',
-					'error_message' => 'Invalid parameter "/1/filter/conditions": incorrect number of conditions.'
+					'update_name' => true,
+					'remove_condition' => true,
+					'errors' => [
+						'Incorrect value for field "name": cannot be empty.',
+						'Field "conditions" is mandatory.'
+					]
 				]
 			],
-			// #3
+			// #3 - Name already used.
 			[
 				[
-					'name' => 'Test create with wrong formula',
-					'tags' => [
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Event correlation for clone'
+					],
+					'update_name' => true,
+					'conditions' => [
 						[
-							'Type' => CFormElement::RELOADABLE_FILL('Old event tag name'),
-							'Tag' => 'Test tag1'
-						],
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('New event tag name'),
-							'Tag' => 'Test tag2'
-						],
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('Old event tag value'),
-							'Tag' => 'Test tag3',
-							'Operator' => 'contains',
-							'Value' => 'Value'
+							'Type' => 'Old event tag name',
+							'Tag' => 'Test tag'
 						]
 					],
-					'formula' => 'Wrong formula',
-					'error_message' => 'Invalid parameter "/1/filter/formula": incorrect syntax near "Wrong formula".'
+					'errors' => [
+						'Event correlation "Event correlation for clone" already exists.'
+					]
 				]
 			],
 			// #4
 			[
 				[
-					'name' => 'Check case sensitive of operator in formula',
-					'tags' => [
+					'fields' => [
+						'Name' => 'Unicode 🙂🙃 &nbsp; <script>alert("hi!");</script>',
+						'Description' => '🙂🙃 &nbsp; <script>alert("hi!");</script>'
+					],
+					'conditions' => [
 						[
-							'Type' => CFormElement::RELOADABLE_FILL('Old event tag name'),
-							'Tag' => 'Test tag1'
+							'Type' => 'Old event tag name',
+							'Tag' => '🙂🙃 &nbsp; <script>alert("hi!");</script>'
 						],
 						[
-							'Type' => CFormElement::RELOADABLE_FILL('New event tag name'),
-							'Tag' => 'Test tag2'
+							'Type' => 'New event tag value',
+							'Operator' => 'does not contain',
+							'Tag' => '🙂🙃 &nbsp; <script>alert("hi!");</script>',
+							'Value' => '🙂🙃 &nbsp; <script>alert("hi!");</script>'
 						]
-					],
-					'formula' => 'A and Not B',
-					'error_message' => 'Invalid parameter "/1/filter/formula": incorrect syntax near "Not B".'
+					]
 				]
 			],
 			// #5
 			[
 				[
-					'name' => 'Check case sensitive of first operator in formula',
-					'tags' => [
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('Old event tag name'),
-							'Tag' => 'Test tag1'
-						],
-						[
-							'Type' => CFormElement::RELOADABLE_FILL('New event tag name'),
-							'Tag' => 'Test tag2'
-						]
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Without conditions'
 					],
-					'formula' => 'NOT A and not B',
-					'error_message' => 'Invalid parameter "/1/filter/formula": incorrect syntax near " A and not B".'
+					'remove_condition' => true,
+					'errors' => [
+						'Field "conditions" is mandatory.'
+					]
 				]
 			],
 			// #6
 			[
 				[
-					'name' => 'Test create with only NOT in formula',
-					'tags' => [
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Without operation',
+						'Operations' => []
+					],
+					'conditions' => [
 						[
-							'Type' => CFormElement::RELOADABLE_FILL('Old event tag name'),
+							'Type' => 'Old event tag name',
+							'Tag' => 'Test tag'
+						]
+					],
+					'errors' => [
+						'Invalid parameter "/1/operations": cannot be empty.'
+					]
+				]
+			],
+			// #7
+			[
+				[
+					'fields' => [
+						'Name' => STRING_255
+					],
+					'conditions' => [
+						[
+							'Type' => 'New event tag value',
+							'Operator' => 'does not contain',
+							'Tag' => STRING_255,
+							'Value' => STRING_255
+						]
+					]
+				]
+			],
+			// #8
+			[
+				[
+					'fields' => [
+						'Name' => 'New event host group operators'
+					],
+					'conditions' => [
+						[
+							'Type' => 'New event host group',
+							'Host groups' => 'Zabbix servers'
+						],
+						[
+							'Type' => 'New event host group',
+							'Operator' => 'does not equal',
+							'Host groups' => 'Databases'
+						]
+					]
+				]
+			],
+			// #9
+			[
+				[
+					'fields' => [
+						'Name' => 'Event tag pair operators'
+					],
+					'conditions' => [
+						[
+							'Type' => 'Event tag pair',
+							'Old tag name' => 'Old tag',
+							'New tag name' => 'New tag'
+						]
+					]
+				]
+			],
+			// #10
+			[
+				[
+					'fields' => [
+						'Name' => 'Old event tag value operators'
+					],
+					'conditions' => [
+						[
+							'Type' => 'Old event tag value',
+							'Tag' => 'Tag1',
+							'Value' => 'TagValue'
+						],
+						[
+							'Type' => 'Old event tag value',
+							'Tag' => 'Tag2',
+							'Value' => ''
+						],
+						[
+							'Type' => 'Old event tag value',
+							'Tag' => 'Tag3',
+							'Operator' => 'does not equal',
+							'Value' => 'TagValue'
+						],
+						[
+							'Type' => 'Old event tag value',
+							'Tag' => 'Tag4',
+							'Operator' => 'contains',
+							'Value' => 'TagValue'
+						],
+						[
+							'Type' => 'Old event tag value',
+							'Tag' => 'Tag5',
+							'Operator' => 'does not contain',
+							'Value' => 'TagValue'
+						]
+					]
+				]
+			],
+			// #11
+			[
+				[
+					'fields' => [
+						'Name' => 'New event tag value operators'
+					],
+					'conditions' => [
+						[
+							'Type' => 'New event tag value',
+							'Tag' => 'Tag1',
+							'Value' => 'TagValue'
+						],
+						[
+							'Type' => 'New event tag value',
+							'Tag' => 'Tag2',
+							'Value' => ''
+						],
+						[
+							'Type' => 'New event tag value',
+							'Tag' => 'Tag3',
+							'Operator' => 'does not equal',
+							'Value' => 'TagValue'
+						],
+						[
+							'Type' => 'New event tag value',
+							'Tag' => 'Tag4',
+							'Operator' => 'contains',
+							'Value' => 'TagValue'
+						],
+						[
+							'Type' => 'New event tag value',
+							'Tag' => 'Tag5',
+							'Operator' => 'does not contain',
+							'Value' => 'TagValue'
+						]
+					]
+				]
+			],
+			// #12
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty New event tag'
+					],
+					'conditions' => [
+						[
+							'Type' => 'New event tag name'
+						]
+					],
+					'condition_error' => 'Incorrect value for field "tag": cannot be empty.'
+				]
+			],
+			// #13
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty New event host group'
+					],
+					'conditions' => [
+						[
+							'Type' => 'New event host group'
+						]
+					],
+					'condition_error' => 'Incorrect value for field "groupid": cannot be empty.'
+				]
+			],
+			// #14
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty Old tag in Event tag pair'
+					],
+					'conditions' => [
+						[
+							'Type' => 'Event tag pair',
+							'New tag name' => 'New tag'
+						]
+					],
+					'condition_error' => 'Incorrect value for field "oldtag": cannot be empty.'
+				]
+			],
+			// #15
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty New tag in Event tag pair'
+					],
+					'conditions' => [
+						[
+							'Type' => 'Event tag pair',
+							'Old tag name' => 'Old tag'
+						]
+					],
+					'condition_error' => 'Incorrect value for field "newtag": cannot be empty.'
+				]
+			],
+			// #16
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty tag in Old event tag value'
+					],
+					'conditions' => [
+						[
+							'Type' => 'Old event tag value'
+						]
+					],
+					'condition_error' => 'Incorrect value for field "tag": cannot be empty.'
+				]
+			],
+			// #17
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty tag value (operator contains) in Old event tag value'
+					],
+					'conditions' => [
+						[
+							'Type' => 'Old event tag value',
+							'Tag' => 'TagTag',
+							'Operator' => 'contains'
+						]
+					],
+					'condition_error' => 'Incorrect value for field "value": cannot be empty.'
+				]
+			],
+			// #18
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty tag value (operator does not contain) in Old event tag value'
+					],
+					'conditions' => [
+						[
+							'Type' => 'Old event tag value',
+							'Tag' => 'TagTag',
+							'Operator' => 'does not contain'
+						]
+					],
+					'condition_error' => 'Incorrect value for field "value": cannot be empty.'
+				]
+			],
+			// #19
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty tag in New event tag value'
+					],
+					'conditions' => [
+						[
+							'Type' => 'New event tag value'
+						]
+					],
+					'condition_error' => 'Incorrect value for field "tag": cannot be empty.'
+				]
+			],
+			// #20
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty tag value (operator contains) in New event tag value'
+					],
+					'conditions' => [
+						[
+							'Type' => 'New event tag value',
+							'Tag' => 'TagTag',
+							'Operator' => 'contains'
+						]
+					],
+					'condition_error' => 'Incorrect value for field "value": cannot be empty.'
+				]
+			],
+			// #21
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty tag value (operator does not contain) in New event tag value'
+					],
+					'conditions' => [
+						[
+							'Type' => 'New event tag value',
+							'Tag' => 'TagTag',
+							'Operator' => 'does not contain'
+						]
+					],
+					'condition_error' => 'Incorrect value for field "value": cannot be empty.'
+				]
+			],
+			// #22
+			[
+				[
+					'fields' => [
+						'Name' => 'Calculation AND/OR'
+					],
+					'conditions' => [
+						[
+							'Type' => 'Old event tag name',
 							'Tag' => 'Test tag1'
 						],
 						[
-							'Type' => CFormElement::RELOADABLE_FILL('New event tag name'),
+							'Type' => 'New event tag name',
 							'Tag' => 'Test tag2'
 						]
 					],
+					'expected_expression' => 'A and B',
+					'expected_expression_update' => '(A or B) and C'
+				]
+			],
+			// #23
+			[
+				[
+					'fields' => [
+						'Name' => 'Calculation AND/OR - mixed types'
+					],
+					'conditions' => [
+						[
+							'Type' => 'Old event tag name',
+							'Tag' => 'Test tag1',
+							'custom_order' => 1
+						],
+						[
+							'Type' => 'New event tag name',
+							'Tag' => 'Test tag2',
+							'custom_order' => 3
+						],
+						[
+							'Type' => 'New event tag name',
+							'Tag' => 'Test tag3',
+							'custom_order' => 4
+						],
+						[
+							'Type' => 'Old event tag name',
+							'Tag' => 'Test tag4',
+							'custom_order' => 2
+						]
+					],
+					'custom_conditions_order' => true,
+					'expected_expression' => '(A or D) and (B or C)',
+					'expected_expression_update' => '(A or B or E) and (C or D)'
+				]
+			],
+			// #24
+			[
+				[
+					'fields' => [
+						'Name' => 'Calculation AND'
+					],
+					'conditions' => [
+						[
+							'Type' => 'Old event tag name',
+							'Tag' => 'Test tag1'
+						],
+						[
+							'Type' => 'New event tag name',
+							'Tag' => 'Test tag2'
+						]
+					],
+					'calculation' => 'And',
+					'expected_expression' => 'A and B',
+					'expected_expression_update' => '(A and B) and C'
+				]
+			],
+			// #25
+			[
+				[
+					'fields' => [
+						'Name' => 'Calculation OR'
+					],
+					'conditions' => [
+						[
+							'Type' => 'Old event tag name',
+							'Tag' => 'Test tag1'
+						],
+						[
+							'Type' => 'New event tag name',
+							'Tag' => 'Test tag2'
+						]
+					],
+					'calculation' => 'Or',
+					'expected_expression' => 'A or B',
+					'expected_expression_update' => '(A or B) or C'
+				]
+			],
+			// #26
+			[
+				[
+					'fields' => [
+						'Name' => 'Calculation Custom'
+					],
+					'remove_condition' => true,
+					'conditions' => [
+						[
+							'Type' => 'Old event tag name',
+							'Tag' => 'Test tag1',
+							'custom_order' => 2
+						],
+						[
+							'Type' => 'New event tag name',
+							'Tag' => 'Test tag2',
+							'custom_order' => 3
+						],
+						[
+							'Type' => 'New event tag name',
+							'Tag' => 'Test tag3',
+							'custom_order' => 1
+						]
+					],
+					'custom_conditions_order' => true,
+					'calculation' => 'Custom expression',
+					'formula' => 'C or (A and not B)'
+				]
+			],
+			// #27
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty expression'
+					],
+					'conditions' => [
+						[
+							'Type' => 'Old event tag name',
+							'Tag' => 'Test tag1'
+						],
+						[
+							'Type' => 'New event tag name',
+							'Tag' => 'Test tag2'
+						]
+					],
+					'calculation' => 'Custom expression',
+					'formula' => '',
+					'errors' => [
+						'Invalid parameter "/1/filter/formula": cannot be empty.'
+					]
+				]
+			],
+			// #28
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Missing argument'
+					],
+					'remove_condition' => true,
+					'conditions' => [
+						[
+							'Type' => 'Old event tag name',
+							'Tag' => 'Test tag1'
+						],
+						[
+							'Type' => 'New event tag name',
+							'Tag' => 'Test tag2'
+						],
+						[
+							'Type' => 'Old event tag value',
+							'Tag' => 'Test tag3',
+							'Operator' => 'contains',
+							'Value' => 'Value'
+						]
+					],
+					'calculation' => 'Custom expression',
+					'formula' => 'A or B',
+					'errors' => [
+						'Invalid parameter "/1/filter/conditions": incorrect number of conditions.'
+					]
+				]
+			],
+			// #29
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Extra argument'
+					],
+					'remove_condition' => true,
+					'conditions' => [
+						[
+							'Type' => 'Old event tag name',
+							'Tag' => 'Test tag1'
+						],
+						[
+							'Type' => 'New event tag name',
+							'Tag' => 'Test tag2'
+						],
+						[
+							'Type' => 'Old event tag value',
+							'Tag' => 'Test tag3',
+							'Operator' => 'contains',
+							'Value' => 'Value'
+						]
+					],
+					'calculation' => 'Custom expression',
+					'formula' => '(A or B) and (C or D)',
+					'errors' => [
+						'Invalid parameter "/1/filter/conditions": incorrect number of conditions.'
+					]
+				]
+			],
+			// #30
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Invalid formula'
+					],
+					'conditions' => [
+						[
+							'Type' => 'Old event tag name',
+							'Tag' => 'Test tag1'
+						],
+						[
+							'Type' => 'New event tag name',
+							'Tag' => 'Test tag2'
+						],
+						[
+							'Type' => 'Old event tag value',
+							'Tag' => 'Test tag3',
+							'Operator' => 'contains',
+							'Value' => 'Value'
+						]
+					],
+					'calculation' => 'Custom expression',
+					'formula' => 'Invalid formula',
+					'errors' => [
+						'Invalid parameter "/1/filter/formula": incorrect syntax near "Invalid formula".'
+					]
+				]
+			],
+			// #31
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Case sensitivity in formula'
+					],
+					'conditions' => [
+						[
+							'Type' => 'Old event tag name',
+							'Tag' => 'Test tag1'
+						],
+						[
+							'Type' => 'New event tag name',
+							'Tag' => 'Test tag2'
+						]
+					],
+					'calculation' => 'Custom expression',
+					'formula' => 'A and Not B',
+					'errors' => [
+						'Invalid parameter "/1/filter/formula": incorrect syntax near "Not B".'
+					]
+				]
+			],
+			// #32
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Case sensitivity of first operator in formula'
+					],
+					'conditions' => [
+						[
+							'Type' => 'Old event tag name',
+							'Tag' => 'Test tag1'
+						],
+						[
+							'Type' => 'New event tag name',
+							'Tag' => 'Test tag2'
+						]
+					],
+					'calculation' => 'Custom expression',
+					'formula' => 'NOT A and not B',
+					'errors' => [
+						'Invalid parameter "/1/filter/formula": incorrect syntax near " A and not B".'
+					]
+				]
+			],
+			// #33
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Only NOT in formula'
+					],
+					'conditions' => [
+						[
+							'Type' => 'Old event tag name',
+							'Tag' => 'Test tag1'
+						],
+						[
+							'Type' => 'New event tag name',
+							'Tag' => 'Test tag2'
+						]
+					],
+					'calculation' => 'Custom expression',
 					'formula' => 'not A not B',
-					'error_message' => 'Invalid parameter "/1/filter/formula": incorrect syntax near " not B".'
+					'errors' => [
+						'Invalid parameter "/1/filter/formula": incorrect syntax near " not B".'
+					]
 				]
 			]
 		];
 	}
 
 	/**
-	 * Test custom expression field validation.
+	 * Test creation of an Event Correlation.
 	 *
-	 * @dataProvider formulaValidation
+	 * @dataProvider getEventCorrelationData
 	 */
-	public function testFormEventCorrelation_FormulaValidation($data) {
-		$this->zbxTestLogin('zabbix.php?action=correlation.list');
-		$this->query('button:Create event correlation')->one()->click();
-		$this->zbxTestCheckHeader('Event correlation');
-		$this->zbxTestCheckTitle('Event correlation rules');
-
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$form = $dialog->asForm();
-		$form->getField('Name')->fill($data['name']);
-
-		foreach ($data['tags'] as $tag) {
-			$form->getField('Conditions')->query('button:Add')->one()->click();
-			$condition_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-			$condition_form = $condition_dialog->query('id:correlation-condition-form')->asForm()->one();
-			$condition_form->fill($tag);
-
-			$condition_form->submit();
-			$condition_dialog->waitUntilNotVisible();
-		}
-
-		$form->getField('id:evaltype')->fill('Custom expression');
-		$form->query('id:formula')->waitUntilPresent()->one()->fill($data['formula']);
-
-		$form->getField('Close old events')->fill(true);
-		$form->submit();
-
-		$this->assertMessage(TEST_BAD, 'Cannot create event correlation', $data['error_message']);
-		$sql = 'SELECT NULL FROM correlation WHERE name='.zbx_dbstr($data['name']);
-		$this->assertEquals(0, CDBHelper::getCount($sql));
-
-		$dialog->close();
+	public function testFormEventCorrelation_Create($data) {
+		$this->checkCreateUpdate($data);
 	}
 
+	/**
+	 * Test opening an Event Correlation for edit and immediately saving.
+	 *
+	 * @onBefore resetUpdateCorrelation
+	 */
+	public function testFormEventCorrelation_SimpleUpdate() {
+		$this->checkCreateUpdate([], true);
+	}
+
+	/**
+	 * Test updating an Event Correlation.
+	 *
+	 * @onBefore     resetUpdateCorrelation
+	 * @dataProvider getEventCorrelationData
+	 */
+	public function testFormEventCorrelation_Update($data) {
+		$this->checkCreateUpdate($data, true);
+	}
+
+	/**
+	 * Test cloning of an Event Correlation.
+	 */
 	public function testFormEventCorrelation_Clone() {
-		$this->zbxTestLogin('zabbix.php?action=correlation.list');
-		$this->zbxTestClickLinkTextWait('Event correlation for clone');
-		$this->zbxTestCheckHeader('Event correlation');
-		$this->zbxTestCheckTitle('Event correlation rules');
+		$this->page->login()->open('zabbix.php?action=correlation.list')->waitUntilReady();
+		$this->query('link:Event correlation for clone')->one()->click();
 
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$dialog->query('button:Clone')->one()->click();
 
 		$form = $dialog->asForm();
 		$form->fill(['Name' => 'Cloned correlation']);
+		$values_before = $form->getValues();
 		$form->submit();
+		$dialog->ensureNotPresent();
 
 		$this->assertMessage(TEST_GOOD, 'Event correlation created');
-		$this->zbxTestTextPresent('Cloned correlation');
 
-		$sql = "SELECT NULL FROM correlation WHERE name='Cloned correlation' AND description='Test description clone'";
-		$this->assertEquals(1, CDBHelper::getCount($sql));
+		// Assert both correlations exist in table.
+		$conditions = [
+			['Type' => 'Old event tag name', 'Tag' => 'clone tag'],
+			['Type' => 'New event tag value', 'Tag' => 'another tag', 'Operator' => 'does not contain', 'Value' => 'test']
+		];
 
-		$sql = "SELECT NULL FROM correlation WHERE name='Event correlation for clone' AND description='Test description clone'";
-		$this->assertEquals(1, CDBHelper::getCount($sql));
-
-		$sql = "SELECT NULL FROM corr_condition_tag WHERE tag='clone tag'";
-		$this->assertEquals(2, CDBHelper::getCount($sql));
+		// Assert data in edit form.
+		$this->query('link:Cloned correlation')->one()->click();
+		$dialog->invalidate();
+		$dialog->waitUntilReady();
+		$form = $dialog->asForm();
+		unset($values_before['Type of calculation']); // hidden field
+		$form->checkValue($values_before);
+		$this->assertConditionsTable($conditions, $dialog);
+		$dialog->close();
 	}
 
 	/**
-	 * Test update without any modification of event correlation data.
+	 * Test deletion of an Event Correlation.
 	 */
-	public function testFormEventCorrelation_UpdateNone() {
-		$sql_hash = 'SELECT * FROM correlation ORDER BY correlationid';
-		$old_hash = CDBHelper::getHash($sql_hash);
-
-		$this->zbxTestLogin('zabbix.php?action=correlation.list');
-		$this->zbxTestClickLinkTextWait('Event correlation for update');
-		$this->zbxTestCheckHeader('Event correlation');
-		$this->zbxTestCheckTitle('Event correlation rules');
-
-		$this->query('button:Update')->waitUntilClickable()->one()->click();
-
-		$this->assertMessage(TEST_GOOD, 'Event correlation updated');
-		$this->zbxTestTextPresent('Event correlation for update');
-
-		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
-	}
-
-	public function testFormEventCorrelation_UpdateAllFields() {
-		$fields = [
-			'Name' => 'New event correlation for update',
-			'Description' => 'New test description update',
-			'Close old events' => false,
-			'Close new event' => true,
-			'Enabled' => false
-		];
-		$tag = [
-			'Type' => CFormElement::RELOADABLE_FILL('New event tag name'),
-			'Tag' => 'New update tag'
-		];
-
-		$this->zbxTestLogin('zabbix.php?action=correlation.list');
-		$this->zbxTestClickLinkTextWait('Event correlation for update');
-		$this->zbxTestCheckHeader('Event correlation');
-		$this->zbxTestCheckTitle('Event correlation rules');
-
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$form = $dialog->asForm();
-		$form->fill($fields);
-
-		$conditions_field = $form->getField('Conditions');
-		$conditions_field->query('button:Remove')->one()->click();
-		$conditions_field->query('button:Add')->one()->click();
-		$condition_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-		$condition_form = $condition_dialog->query('id:correlation-condition-form')->asForm()->one();
-
-		$condition_form->fill($tag);
-		$condition_form->submit();
-		$condition_dialog->waitUntilNotVisible();
-
-		$form->submit();
-		$this->assertMessage(TEST_GOOD, 'Event correlation updated');
-		$this->zbxTestTextPresent('New event correlation for update');
-
-		$sql = "SELECT NULL FROM correlation WHERE name='New event correlation for update' AND description='New test description update'";
-		$this->assertEquals(1, CDBHelper::getCount($sql));
-
-		$sql = "SELECT NULL FROM correlation WHERE name='Event correlation for update'";
-		$this->assertEquals(0, CDBHelper::getCount($sql));
-
-		$sql = "SELECT NULL FROM corr_condition_tag WHERE tag='New update tag'";
-		$this->assertEquals(1, CDBHelper::getCount($sql));
-
-		$sql = "SELECT NULL FROM corr_condition_tag WHERE tag='update tag'";
-		$this->assertEquals(0, CDBHelper::getCount($sql));
-	}
-
 	public function testFormEventCorrelation_Delete() {
-		$this->zbxTestLogin('zabbix.php?action=correlation.list');
-		$this->zbxTestClickLinkTextWait('Event correlation for delete');
-		$this->zbxTestCheckHeader('Event correlation');
-		$this->zbxTestCheckTitle('Event correlation rules');
+		$this->page->login()->open('zabbix.php?action=correlation.list')->waitUntilReady();
+		$table = $this->query('class:list-table')->asTable()->one();
+		$row_count_before = $table->getRows()->count();
 
+		$name = 'Event correlation for delete';
+		$table->query('link', $name)->one()->click();
 		COverlayDialogElement::find()->waitUntilReady()->one()->query('button:Delete')->waitUntilClickable()->one()->click();
+		$this->assertEquals('Delete event correlation?', $this->page->getAlertText());
 		$this->page->acceptAlert();
 
 		$this->assertMessage(TEST_GOOD, 'Event correlation deleted');
-		$this->zbxTestTextNotVisible('Event correlation for delete');
-
-		$sql = "SELECT NULL FROM correlation WHERE name='Event correlation for delete'";
-		$this->assertEquals(0, CDBHelper::getCount($sql));
+		$this->assertTableStats($row_count_before - 1);
+		$this->assertFalse($this->query('link', $name)->exists());
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM correlation WHERE name='.CDBHelper::escape($name)));
 	}
 
-	public function testFormEventCorrelation_Cancel() {
-		$sql_hash = 'SELECT * FROM correlation ORDER BY correlationid';
-		$old_hash = CDBHelper::getHash($sql_hash);
+	/**
+	 * Test opening an Event Correlation create form but then cancelling.
+	 */
+	public function testFormEventCorrelation_CancelCreate() {
+		$this->checkCancelAction('create');
+	}
 
-		$this->zbxTestLogin('zabbix.php?action=correlation.list');
-		$this->zbxTestClickLinkTextWait('Event correlation for cancel');
-		$this->zbxTestCheckHeader('Event correlation');
-		$this->zbxTestCheckTitle('Event correlation rules');
+	/**
+	 * Test opening an Event Correlation update form but then cancelling.
+	 */
+	public function testFormEventCorrelation_CancelUpdate() {
+		$this->checkCancelAction('update');
+	}
 
-		COverlayDialogElement::find()->waitUntilReady()->one()->query('button:Cancel')->waitUntilClickable()->one()->click();
+	/**
+	 * Test trying to add a Condition, but then cancelling.
+	 */
+	public function testFormEventCorrelation_CancelAddCondition() {
+		$this->checkCancelAction('add_condition');
+	}
 
-		$this->zbxTestTextPresent('Event correlation for cancel');
+	/**
+	 * Test opening an Event Correlation clone form but then cancelling.
+	 */
+	public function testFormEventCorrelation_CancelClone() {
+		$this->checkCancelAction('clone');
+	}
 
-		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
+	/**
+	 * Test trying to delete an Event Correlation but then cancelling.
+	 */
+	public function testFormEventCorrelation_CancelDelete() {
+		$this->checkCancelAction('delete');
+	}
+
+	/**
+	 * Performs a creation or an update of an Event correlation.
+	 *
+	 * @param array $data      data from data provider
+	 * @param bool  $update    if an update should be performed
+	 */
+	protected function checkCreateUpdate($data, $update = false) {
+		// Setup for DB data check later.
+		$hash_before = CDBHelper::getHash(self::HASH_SQL);
+		$count_sql = 'SELECT NULL FROM correlation';
+		$count_before = CDBHelper::getCount($count_sql);
+
+		// Set the default expected operations.
+		$data['fields']['Operations'] = CTestArrayHelper::get($data, 'fields.Operations', ['Close old events']);
+
+		// Special cases when updating.
+		if ($update) {
+			// When it is needed to avoid Name conflicts.
+			if (CTestArrayHelper::get($data, 'unique_name')) {
+				$data['fields']['Name'] = $data['fields']['Name'].' update';
+			}
+
+			// Clear the Name field when updating (unless required).
+			if (!CTestArrayHelper::get($data, 'update_name', false)) {
+				unset($data['fields']['Name']);
+			}
+		}
+
+		// Login and open Correlation list.
+		$this->page->login()->open('zabbix.php?action=correlation.list')->waitUntilReady();
+
+		// Open the correct Correlation form.
+		$locator = $update ? 'link:'.self::$update_correlation_initial['name'] : 'button:Create event correlation';
+		$this->query($locator)->one()->click();
+
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->asForm();
+
+		// Fill the form.
+		$form->fill(CTestArrayHelper::get($data, 'fields', []));
+
+		// Remove the default condition when needed.
+		if ($update && CTestArrayHelper::get($data, 'remove_condition')) {
+			$dialog->query('button:Remove')->one()->click();
+		}
+
+		// Fill Condition data.
+		$add_button = $form->getField('Conditions')->query('button:Add')->one();
+
+		foreach (CTestArrayHelper::get($data, 'conditions', []) as $condition) {
+			$add_button->click();
+			$condition_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+			$condition_form = $condition_dialog->query('id:correlation-condition-form')->asForm()->one();
+			$this->fillConditionForm($condition_form, $condition);
+			$condition_form->submit();
+
+			// Only expect Condition modal to close if error not expected.
+			if (!array_key_exists('condition_error', $data)) {
+				$condition_dialog->waitUntilNotVisible();
+			}
+		}
+
+		// Fill the 'Type of calculation' field and check the shown expression.
+		if (array_key_exists('calculation', $data)) {
+			$form->getField('id:evaltype')->fill($data['calculation']);
+
+			if ($data['calculation'] === 'Custom expression') {
+				$form->query('id:formula')->waitUntilPresent()->one()->fill($data['formula']);
+			}
+		}
+
+		if (array_key_exists('expected_expression'.($update ? '_update' : ''), $data)) {
+			$expression_text = $form->query('id:expression')->one()->getText();
+			$this->assertEquals($data['expected_expression'.($update ? '_update' : '')], $expression_text);
+		}
+
+		// Submit 'New event correlation' form only if error in the 'New condition' modal not expected.
+		if (!array_key_exists('condition_error', $data)) {
+			$form->submit();
+		}
+
+		// Assert result.
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) !== TEST_BAD) {
+			// When no error expected.
+
+			$dialog->ensureNotPresent();
+			$this->assertMessage(TEST_GOOD, 'Event correlation '.($update ? 'updated' : 'created'));
+
+			if ($update) {
+				// Validate the old Name when updating.
+				if (!CTestArrayHelper::get($data, 'update_name', false)) {
+					$data['fields']['Name'] = self::$update_correlation_initial['name'];
+				}
+
+				// Check the default condition when updating.
+				if (!CTestArrayHelper::get($data, 'remove_condition')) {
+					$data['conditions'] = array_merge([['Type' => 'Old event tag name', 'Tag' => '0 update tag']],
+							CTestArrayHelper::get($data, 'conditions', [])
+					);
+				}
+
+				// Set the default expected 'Description' when updating.
+				$data['fields']['Description'] = CTestArrayHelper::get($data['fields'], 'Description',
+						'Test description update'
+				);
+			}
+
+			// Assert data in DB.
+			$this->assertEquals($count_before + ($update ? 0 : 1), CDBHelper::getCount($count_sql));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM correlation WHERE name='.
+					zbx_dbstr($data['fields']['Name'])
+			));
+
+			// Simple update scenario - check that data in DB has not changed.
+			if ($update && $data === []) {
+				$this->assertEquals($hash_before, CDBHelper::getHash(self::HASH_SQL));
+			}
+
+			// Open the dialog again to assert data.
+			$this->query('link', $data['fields']['Name'])->one()->waitUntilClickable()->click();
+			$dialog->waitUntilReady();
+			$form = $dialog->asForm();
+
+			// Set the expected 'Enabled' value.
+			$data['fields']['Enabled'] = CTestArrayHelper::get($data['fields'], 'Enabled', true);
+
+			// Check values in the form.
+			$form->checkValue($data['fields']);
+
+			// Assert Conditions table data.
+			$this->assertConditionsTable($data['conditions'], $dialog, CTestArrayHelper::get($data, 'custom_conditions_order'));
+
+			$dialog->close();
+		}
+		else if (array_key_exists('condition_error', $data)) {
+			// When expecting an error in the 'New condition' modal.
+
+			$this->assertMessage(TEST_BAD, null, $data['condition_error']);
+			$this->assertEquals($hash_before, CDBHelper::getHash(self::HASH_SQL));
+
+			// Close both dialogs.
+			COverlayDialogElement::closeAll();
+		}
+		else {
+			// When expecting an error in the 'New event correlation' modal.
+
+			$this->assertMessage(TEST_BAD, 'Cannot '.($update ? 'update' : 'create').' event correlation', $data['errors']);
+			$dialog->close();
+			$this->assertEquals($hash_before, CDBHelper::getHash(self::HASH_SQL));
+		}
+	}
+
+	/**
+	 * Resets the update correlation to the starting state.
+	 */
+	public function resetUpdateCorrelation() {
+		// Data is the inital state + the id of the Correlation that is going to be reset.
+		$data = self::$update_correlation_initial;
+		$data['correlationid'] = self::$update_correlation_id;
+		CDataHelper::call('correlation.update', [$data]);
+	}
+
+	/**
+	 * Check the cancellation scenario for different possible actions.
+	 *
+	 * @param string $action    name of the action cancelled
+	 */
+	protected function checkCancelAction($action) {
+		$old_hash = CDBHelper::getHash(self::HASH_SQL);
+
+		$this->page->login()->open('zabbix.php?action=correlation.list')->waitUntilReady();
+		$button_selector = ($action === 'create')
+			? 'button:Create event correlation'
+			: 'link:Event correlation for cancel';
+		$this->query($button_selector)->one()->click();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+
+		// Press the Clone button in the clone scenario.
+		if ($action === 'clone') {
+			$dialog->query('button:Clone')->one()->click();
+		}
+
+		// Change values in the form.
+		$dialog->asForm()->fill(
+			[
+				'Name' => 'Test cancellation',
+				'Description' => 'Test cancellation description',
+				'Close old events' => false,
+				'Close new event' => true,
+				'Enabled' => true
+			]
+		);
+
+		// Perform action specific steps.
+		switch ($action) {
+			case 'update':
+			case 'clone':
+				// Remove a Condition.
+				$dialog->query('button:Remove')->one()->click();
+				break;
+
+			case 'delete':
+				// Cancel deletion.
+				$dialog->query('button:Delete')->one()->click();
+				$this->page->dismissAlert();
+				break;
+
+			case 'add_condition':
+				// Cancel adding a condition.
+				$dialog->asForm()->getField('Conditions')->query('button:Add')->one()->click();
+				$condition_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+				$condition_form = $condition_dialog->query('id:correlation-condition-form')->asForm()->one();
+				$this->fillConditionForm($condition_form, ['Type' => 'New event tag name', 'Tag' => 'Cancelled tag']);
+				$condition_dialog->query('button:Cancel')->one()->click();
+				$condition_dialog->waitUntilNotVisible();
+				break;
+		}
+
+		$dialog->close(true);
+
+		// Assert that an Event Correlation is not added in the UI.
+		$this->assertFalse($this->query('link:Test cancellation')->exists());
+
+		// Assert that nothing has changed in the DB.
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::HASH_SQL));
+	}
+
+	/**
+	 * Asserts the Conditions table data in the create/edit form.
+	 *
+	 * @param array                 $conditions      condition data from data provider
+	 * @param COverlayDialogElement $dialog          dialog element that contains the table	 *
+	 * @param bool                  $custom_order    if true then displayed conditions will be sorted
+	 */
+	protected function assertConditionsTable($conditions, $dialog, $custom_order = false) {
+		// Assert the Label column.
+		$count = $dialog->query('id:condition_table')->asTable()->one()->getRows()->count();
+		$this->assertTableDataColumn(array_slice(range('A', 'Z'), 0, $count), 'Label', 'id:condition_table');
+
+		// Assert the Name column.
+		$expected_conditions = $this->getExpectedConditionsArray($conditions, $custom_order);
+		$this->assertTableDataColumn($expected_conditions, 'Name', 'id:condition_table');
+	}
+
+	/**
+	 * Calculates the expected values of Conditions as displayed in the UI.
+	 *
+	 * @param array $conditions      conditions for this entry
+	 * @param bool  $custom_order    if true then displayed conditions will be sorted
+	 *
+	 * @return array
+	 */
+	protected function getExpectedConditionsArray($conditions, $custom_order = false) {
+		$result = [];
+
+		/*
+		 * Explanation on condition sorting order.
+		 *
+		 * The display order of conditions after saving can change and the logic is a bit complicated.
+		 * For this reason by default the display order is assumed to be the same as input order.
+		 * In other cases a custom order must be set in the data provider.
+		 *
+		 * The logic itself goes like this:
+		 * If 'Type of calculation' is 'And/Or' then conditions are first sorted by type and then alphabetically by value.
+		 * If 'Type of calculation' is 'And' then the conditions are ordered alphabetically by value.
+		 * If 'Type of calculation' is 'Or' then the conditions are ordered alphabetically by value.
+		 * If 'Type of calculation' is 'Custom expression' then order is recalculated from the expression.
+		 * Example - formula 'A or C or B' will reorder the C condition to be the second condition (after saving).
+		 *
+		 * Note: when displaying conditions, their Labels (A, B, C...) are always alphabetical.
+		 * This means they can change when saving.
+		 */
+
+		// Sort by custom order if applicable.
+		if ($custom_order) {
+			// Add the custom_order parameter if missing (update scenario).
+			foreach ($conditions as &$condition) {
+				if (!array_key_exists('custom_order', $condition)) {
+					$condition['custom_order'] = 0;
+				}
+			}
+			unset($condition);
+
+			// The sorting itself.
+			usort($conditions, function ($a, $b) {
+				return $a['custom_order'] <=> $b['custom_order'];
+			});
+		}
+
+		// Add each condition string to the result array.
+		foreach ($conditions as $condition) {
+			switch ($condition['Type']) {
+				case 'Event tag pair':
+					$text = 'Value of old event tag '.$condition['Old tag name'].' equals value of new event tag '.
+							$condition['New tag name'];
+					break;
+
+				case 'Old event tag value':
+					$text = 'Value of old event tag '.$condition['Tag'].' '.
+							CTestArrayHelper::get($condition, 'Operator', 'equals').' '.$condition['Value'];
+					break;
+
+				case 'New event tag value':
+					$text = 'Value of new event tag '.$condition['Tag'].' '.
+							CTestArrayHelper::get($condition, 'Operator', 'equals').' '.$condition['Value'];
+					break;
+
+				default:
+					$text = $condition['Type'].' '.
+							(array_key_exists('Operator', $condition) ? $condition['Operator'] : 'equals').' '.
+							CTestArrayHelper::get($condition, 'Tag', CTestArrayHelper::get($condition, 'Host groups'));
+			}
+
+			$result[] = trim($text);
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Fills the Correlation condition form and waits for reload when filling the type dropdown.
+	 *
+	 * @param CFormElement $form      form element that will be filled
+	 * @param array        $values    the values to fill in the form
+	 */
+	protected function fillConditionForm($form, $values) {
+		$values['Type'] = CFormElement::RELOADABLE_FILL($values['Type']);
+		$values['Operator'] = CTestArrayHelper::get($values, 'Operator', 'equals');
+		unset($values['custom_order']);
+		$form->fill($values);
 	}
 }
