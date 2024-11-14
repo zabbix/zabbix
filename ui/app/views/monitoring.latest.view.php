@@ -47,42 +47,39 @@ $widget = (new CWidget())
 			->setAttribute('aria-label', _('Content controls'))
 	);
 
-if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
-	$filter = (new CTabFilter())
-		->setId('monitoring_latest_filter')
-		->setOptions($data['tabfilter_options'])
-		->addSubfilter(new CPartial('monitoring.latest.subfilter',
-			array_intersect_key($data, array_flip(['subfilters', 'subfilters_expanded'])))
-		)
-		->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
+$filter = (new CTabFilter())
+	->setId('monitoring_latest_filter')
+	->setOptions($data['tabfilter_options'])
+	->addSubfilter(new CPartial('monitoring.latest.subfilter',
+		array_intersect_key($data, array_flip(['subfilters', 'subfilters_expanded'])))
+	)
+	->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
 
-	foreach ($data['filter_tabs'] as $tab) {
-		$tab['tab_view'] = $data['filter_view'];
-		$filter->addTemplatedTab($tab['filter_name'], $tab);
-	}
-
-	// Set javascript options for tab filter initialization in monitoring.latest.view.js.php file.
-	$data['filter_options'] = $filter->options;
-	$widget->addItem($filter);
-}
-else {
-	$data['filter_options'] = null;
+foreach ($data['filter_tabs'] as $tab) {
+	$tab['tab_view'] = $data['filter_view'];
+	$filter->addTemplatedTab($tab['filter_name'], $tab);
 }
 
-$widget->addItem(new CPartial('monitoring.latest.view.html', array_intersect_key($data,
-	array_flip(['filter', 'sort_field', 'sort_order', 'view_curl', 'paging', 'hosts', 'items', 'history', 'config',
-		'tags', 'maintenances'
-	])
-)));
-
-$widget->show();
+// Set javascript options for tab filter initialization in monitoring.latest.view.js.php file.
+$data['filter_options'] = $filter->options;
+$widget
+	->addItem($filter)
+	->addItem(
+		new CPartial('monitoring.latest.view.html', array_intersect_key($data,
+			array_flip(['filter', 'sort_field', 'sort_order', 'view_curl', 'paging', 'hosts', 'items', 'history',
+				'config', 'tags', 'maintenances'
+			])
+		))
+	)
+	->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
 		'filter_options' => $data['filter_options'],
 		'refresh_url' => $data['refresh_url'],
 		'refresh_data' => $data['refresh_data'],
-		'refresh_interval' => $data['refresh_interval']
+		'refresh_interval' => $data['refresh_interval'],
+		'layout_mode' => $web_layout_mode
 	]).');
 '))
 	->setOnDocumentReady()

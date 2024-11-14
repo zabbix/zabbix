@@ -795,27 +795,30 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const DC_ITEM *item, AGENT_RE
 		goto unlock;
 
 	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED == service->eventlog.last_key ||
-			(0 != skip_old && 0 != service->eventlog.last_key ))
+			(0 != skip_old && service->eventlog.owner_itemid != item->itemid))
 	{
 		/* this may happen if recreate item vmware.eventlog for the same service URL */
 		service->eventlog.last_key = request->lastlogsize;
 		service->eventlog.last_ts = 0;
 		service->eventlog.skip_old = skip_old;
+		service->eventlog.owner_itemid = item->itemid;
+	}
+	else if (item->itemid != service->eventlog.owner_itemid)
+	{
+		/* to protect against data fragmentation among multiple vmware event items */
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Duplicate VMware eventlog item is not supported"));
+		goto unlock;
 	}
 	else if (0 != service->eventlog.oom)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Not enough shared memory to store VMware events."));
 		goto unlock;
 	}
-	else if (request->lastlogsize < service->eventlog.last_key && 0 != request->lastlogsize)
-	{
-		/* this may happen if there are multiple vmware.eventlog items for the same service URL or item has  */
-		/* been polled, but values got stuck in history cache and item's lastlogsize hasn't been updated yet */
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too old events requested."));
-		goto unlock;
-	}
 	else if (0 < service->data->events.values_num)
 	{
+		/* Sometimes request->lastlogsize has incorrect value due to concurrent update of history cache, */
+		/* therefore, we can not rely on the value of request->lastlogsize. We have to return events based */
+		/* on internal state of the service->eventlog. */
 		vmware_get_events(&service->data->events, &service->eventlog, item, add_results);
 		service->eventlog.last_key = ((const zbx_vmware_event_t *)service->data->events.values[0])->key;
 		service->eventlog.last_ts = ((const zbx_vmware_event_t *)service->data->events.values[0])->timestamp;

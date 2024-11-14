@@ -205,7 +205,7 @@ Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.za
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Block devices discovery||Zabbix agent|vfs.dev.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Block devices discovery||Zabbix agent|vfs.dev.discovery|
 
 ### Item prototypes for Block devices discovery
 
@@ -316,7 +316,8 @@ Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.za
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$SYSTEM.FUZZYTIME.MAX}||`60`|
+|{$SYSTEM.FUZZYTIME.MAX}|<p>The upper threshold for difference of system time.</p>|`60s`|
+|{$SYSTEM.FUZZYTIME.MIN}|<p>The lower threshold for difference of system time. Used in recovery expression to avoid trigger flapping.</p>|`10s`|
 |{$KERNEL.MAXPROC.MIN}||`1024`|
 |{$KERNEL.MAXFILES.MIN}||`256`|
 

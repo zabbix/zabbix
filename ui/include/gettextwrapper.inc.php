@@ -237,6 +237,9 @@ function setupLocale(string $language, ?string &$error = ''): bool {
 	// Force PHP to always use a point instead of a comma for decimal numbers.
 	setlocale(LC_NUMERIC, $numeric_locales);
 
+	// Reset the LC_CTYPE category so that case-conversion and preg functions work correctly with the Turkish locale.
+	setlocale(LC_CTYPE, $numeric_locales);
+
 	if (function_exists('bindtextdomain')) {
 		bindtextdomain('frontend', 'locale');
 		bind_textdomain_codeset('frontend', 'UTF-8');

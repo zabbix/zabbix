@@ -949,7 +949,7 @@ class testFormTabIndicators extends CWebTest {
 				else {
 					foreach ($tab['entries'] as $field_value) {
 						$form->query('id:valuemap_add')->one()->click();
-						$valuemap_form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+						$valuemap_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 						$valuemap_form->query('xpath:.//input[@type="text"]')->all()->fill($field_value);
 						$valuemap_form->submit();
 						COverlayDialogElement::ensureNotPresent();

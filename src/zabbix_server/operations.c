@@ -691,7 +691,7 @@ void	op_host_del(const DB_EVENT *event)
 	zbx_vector_uint64_t	hostids;
 	zbx_vector_str_t	hostnames;
 	zbx_uint64_t		hostid;
-	char			*hostname = NULL;
+	char			*hostname = NULL, *hostname_esc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -708,7 +708,8 @@ void	op_host_del(const DB_EVENT *event)
 
 	DBdelete_hosts_with_prototypes(&hostids, &hostnames);
 
-	DBexecute("delete from autoreg_host where host='%s'", hostname);
+	hostname_esc = DBdyn_escape_string(hostname);
+	DBexecute("delete from autoreg_host where host='%s'", hostname_esc);
 
 	zbx_vector_str_clear_ext(&hostnames, zbx_str_free);
 	zbx_vector_str_destroy(&hostnames);
@@ -717,6 +718,7 @@ void	op_host_del(const DB_EVENT *event)
 	zbx_audit_host_del(hostid, hostname);
 out:
 	zbx_free(hostname);
+	zbx_free(hostname_esc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 

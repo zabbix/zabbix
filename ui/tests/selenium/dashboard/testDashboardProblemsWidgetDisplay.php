@@ -138,9 +138,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 		// Create events and problems.
 		self::$time = time();
-		foreach (CDataHelper::getIds('description') as $name => $id) {
-			CDBHelper::setTriggerProblem($name, TRIGGER_VALUE_TRUE, ['clock' => self::$time]);
-		}
+		CDBHelper::setTriggerProblem(array_keys(CDataHelper::getIds('description')), TRIGGER_VALUE_TRUE, ['clock' => self::$time]);
 
 		// Manual close is true for the problem: Trigger for widget 1 char.
 		DBexecute('UPDATE triggers SET value=1, manual_close=1 WHERE description='.
@@ -548,7 +546,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						],
 						[
 							'Problem • Severity' => 'Trigger for widget 2 unsigned',
-							'Operational data' => "Item value: \n0"
+							'Operational data' => "Item value:\n0"
 						],
 						[
 							'Problem • Severity' => 'Trigger for widget 2 log',
@@ -560,7 +558,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						],
 						[
 							'Problem • Severity' => 'Trigger for widget 1 float',
-							'Operational data' => "Item value: \n0"
+							'Operational data' => "Item value:\n0"
 						]
 					],
 					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
@@ -580,7 +578,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					'result' => [
 						['Problem • Severity' => 'Trigger for widget 2 log'],
 						['Problem • Severity' => 'Trigger for widget 1 char'],
-						['Problem • Severity' => "Trigger for widget 1 float (Item value: \n0)"]
+						['Problem • Severity' => "Trigger for widget 1 float (Item value:\n0)"]
 					]
 				]
 			],

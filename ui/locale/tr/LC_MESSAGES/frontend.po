@@ -1734,6 +1734,14 @@ msgstr "Sınır türü"
 msgid "Border width"
 msgstr "Sınır genişliği"
 
+#: include/classes/api/services/CHost.php:1314
+msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1321
+msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
+msgstr ""
+
 #: app/controllers/CControllerUserUpdateGeneral.php:106
 msgid "Both passwords must be equal."
 msgstr ""
@@ -4467,6 +4475,10 @@ msgstr "Medya türü oluştur"
 msgid "Create new"
 msgstr "Yeni oluştur"
 
+#: jsLoader.php:363
+msgid "Create new report"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:37
 msgid "Create proxy"
 msgstr "Vekil sunucu oluştur"
@@ -6871,6 +6883,10 @@ msgstr ""
 msgid "Failed to update dashboard properties."
 msgstr ""
 
+#: app/views/js/popup.dashboard.share.edit.js.php:86
+msgid "Failed to update dashboard sharing."
+msgstr ""
+
 #: jsLoader.php:142
 msgid "Failed to update widget properties."
 msgstr ""
@@ -7992,6 +8008,10 @@ msgstr ""
 msgid "Host group elements"
 msgstr "Ana makine grubu öğeleri"
 
+#: jsLoader.php:287
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:165
 msgid "Host group label type"
 msgstr "Ana makine grubu etiket türü"
@@ -8065,6 +8085,10 @@ msgstr "Ana makine envanteri"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "Ana makine envanteri genel bakış"
+
+#: jsLoader.php:284
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:180
 msgid "Host label type"
@@ -11255,6 +11279,10 @@ msgstr ""
 msgid "Map element label type"
 msgstr ""
 
+#: jsLoader.php:285
+msgid "Map is not selected."
+msgstr ""
+
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
 msgstr ""
@@ -13192,6 +13220,18 @@ msgstr "Bir"
 #: app/views/popup.maintenance.period.php:75 include/maintenances.inc.php:25
 msgid "One time only"
 msgstr "Yalnızca bir kere"
+
+#: include/classes/api/services/CUser.php:800
+#: include/classes/api/services/CUser.php:807
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:725
+#: include/classes/api/services/CUser.php:766
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
+msgstr ""
 
 #: include/classes/api/services/CDRule.php:488
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -18110,6 +18150,10 @@ msgstr "Tetikleyici \"bilinmeyen\" durumunda"
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "\"%1$s\" şablonundaki tetikleyici, \"%2$s\" şablonundaki tetikleyiciye bağımlı."
 
+#: jsLoader.php:286
+msgid "Trigger is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:195
 msgid "Trigger label type"
 msgstr "Tetikleyici etiket türü"
@@ -18994,6 +19038,11 @@ msgstr "Kullanıcı aracısı stringi"
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Kullanıcı kendini devre dışı bir gruba veya grafik arayüzü erişimi devre dışı olan bir gruba ekleyemez."
 
+#: include/classes/api/services/CUserGroup.php:534
+#: include/classes/api/services/CUser.php:756
+msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
+msgstr ""
+
 #: app/views/administration.user.edit.php:421
 #: include/classes/api/services/CUser.php:951
 msgid "User cannot change own role."
@@ -19093,6 +19142,10 @@ msgstr "Kullanıcı grupları"
 #: include/classes/api/services/CUser.php:1225
 msgid "User is not allowed to delete himself."
 msgstr "Kullanıcının kendisini silmesine izin verilmez."
+
+#: include/classes/api/services/CUser.php:1291
+msgid "User is not allowed to delete oneself."
+msgstr ""
 
 #: include/classes/widgets/views/widget.item.form.view.php:62
 msgid "User macros"
@@ -19757,6 +19810,10 @@ msgstr ""
 msgid "View as"
 msgstr ""
 
+#: jsLoader.php:397
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1234
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Bayt cinsinden veya toplam yüzdesi olarak sanal alan boyutu. Bayt için tam sayı; yüzde için float döndürür"
@@ -20296,6 +20353,10 @@ msgstr "Bu sayfaya erişmek için izniniz yok."
 msgid "You must login to view this page."
 msgstr "Bu sayfayı görmek için oturup açmak zorundasınız."
 
+#: jsLoader.php:282
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
+
 #: include/classes/db/DB.php:135
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
 msgstr "Veritabanınız düzgün çalışmıyor. Lütfen birkaç dakika bekleyin ve bu işlemi tekrarlamayı deneyin. Sorun devam ederse, lütfen sistem yöneticisine başvurun. Soruna, veritabanı yönetim sisteminiz tarafından gerçekleştirilen uzun süren bir işlem veya satır düzeyi kilidi neden olabilir."
@@ -20627,6 +20688,14 @@ msgstr ""
 
 #: app/views/administration.geomaps.edit.php:47
 msgid "and"
+msgstr ""
+
+#: include/classes/api/helpers/CApiPskHelper.php:32
+#: include/classes/api/helpers/CApiPskHelper.php:62
+#: include/classes/api/helpers/CApiPskHelper.php:78
+#: include/classes/api/helpers/CApiPskHelper.php:111
+#: include/classes/api/helpers/CApiPskHelper.php:127
+msgid "another tls_psk value is already associated with given tls_psk_identity"
 msgstr ""
 
 #: include/views/monitoring.history.php:186
@@ -22011,6 +22080,10 @@ msgstr "sağ"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:924
 msgid "right() - Returns the rightmost count characters"
+msgstr ""
+
+#: jsLoader.php:199
+msgid "root"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:937

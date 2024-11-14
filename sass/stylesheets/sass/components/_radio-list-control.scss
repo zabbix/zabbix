@@ -86,14 +86,24 @@
 			z-index: 2;
 		}
 
-		&:checked[disabled] + label {
-			background-color: lighten($ui-bg-selected-color, 33%) !important;
-			transition: none;
+		&[readonly],
+		&[disabled] {
+			+ label {
+				transition: none;
+				cursor: default;
+				box-shadow: none;
+				@extend %form-disabled;
+			}
+
+			&:checked + label {
+				background-color: lighten($ui-bg-selected-color, 33%);
+			}
 		}
 
-		&[disabled] + label {
-			transition: none;
-			@extend %form-disabled;
+		&[readonly]:checked + label {
+			box-shadow: none;
+			color: $font-color;
+			-webkit-text-fill-color: $font-color;
 		}
 	}
 

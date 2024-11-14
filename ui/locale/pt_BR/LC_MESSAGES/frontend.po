@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2024-06-05 16:44+0000\n"
+"PO-Revision-Date: 2024-10-29 21:55+0000\n"
 "Last-Translator: Marco <marcodefreitas@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -202,12 +202,12 @@ msgstr[1] "%1$s de %2$s elementos em estado de incidente"
 #: app/views/administration.miscconfig.edit.php:119
 #, c-format
 msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
-msgstr ""
+msgstr "%1$s ou %2$s - permite que a página seja exibida apenas em um frame com a mesma origem da página"
 
 #: app/views/administration.miscconfig.edit.php:122
 #, c-format
 msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
-msgstr ""
+msgstr "%1$s ou %2$s - previne que a página seja exibida em um frame, independente do site que tente fazê-lo"
 
 #: jsLoader.php:353
 #, c-format
@@ -1732,6 +1732,14 @@ msgstr "Tipo da borda"
 #: include/views/js/monitoring.sysmaps.js.php:575
 msgid "Border width"
 msgstr "Largura da borda"
+
+#: include/classes/api/services/CHost.php:1314
+msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1321
+msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
+msgstr ""
 
 #: app/controllers/CControllerUserUpdateGeneral.php:106
 msgid "Both passwords must be equal."
@@ -4472,6 +4480,10 @@ msgstr "Criar tipo de mídia"
 msgid "Create new"
 msgstr "Criar novo"
 
+#: jsLoader.php:363
+msgid "Create new report"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:37
 msgid "Create proxy"
 msgstr "Criar proxy"
@@ -6567,7 +6579,7 @@ msgstr "Nome do Evento"
 
 #: app/views/popup.condition.common.php:642
 msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
-msgstr ""
+msgstr "O nome do evento corresponde ao nome do Trigger (com macros expandidas) a menos que um nome de evento personalizado seja especificado nas configurações do Trigger."
 
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
@@ -6876,6 +6888,10 @@ msgstr "Falha ao atualizar as propriedades da página do painel."
 #: jsLoader.php:141
 msgid "Failed to update dashboard properties."
 msgstr "Falha ao atualizar as propriedades do painel."
+
+#: app/views/js/popup.dashboard.share.edit.js.php:86
+msgid "Failed to update dashboard sharing."
+msgstr ""
 
 #: jsLoader.php:142
 msgid "Failed to update widget properties."
@@ -7998,6 +8014,10 @@ msgstr "O grupo de hosts \"%1$s\" é interno e não pode ser excluído."
 msgid "Host group elements"
 msgstr "Elementos do grupo de hosts"
 
+#: jsLoader.php:287
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:165
 msgid "Host group label type"
 msgstr "Tipo de rótulo do grupo de hosts"
@@ -8071,6 +8091,10 @@ msgstr "Inventário do host"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "Visão geral do inventário de host"
+
+#: jsLoader.php:284
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:180
 msgid "Host label type"
@@ -11264,6 +11288,10 @@ msgstr "Localização do rótulo do elemento no mapa"
 msgid "Map element label type"
 msgstr "Tipo de rótulo no elemento do mapa"
 
+#: jsLoader.php:285
+msgid "Map is not selected."
+msgstr ""
+
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
 msgstr "O mapa foi atualizado! Voltar à lista de mapas?"
@@ -12873,7 +12901,7 @@ msgstr "Não suportado"
 #: app/views/administration.miscconfig.edit.php:130
 #, c-format
 msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
-msgstr ""
+msgstr "Observe que %1$s ou %2$s serão considerados como hostnames, se utilizados sem aspas simples."
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -13203,6 +13231,18 @@ msgstr "Um"
 #: app/views/popup.maintenance.period.php:75 include/maintenances.inc.php:25
 msgid "One time only"
 msgstr "Apenas uma vez"
+
+#: include/classes/api/services/CUser.php:800
+#: include/classes/api/services/CUser.php:807
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:725
+#: include/classes/api/services/CUser.php:766
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
+msgstr ""
 
 #: include/classes/api/services/CDRule.php:488
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -18119,6 +18159,10 @@ msgstr "A trigger está no estado \"desconhecido\""
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "Existe trigger no template \"%1$s\" que possui dependência com trigger no template \"%2$s\"."
 
+#: jsLoader.php:286
+msgid "Trigger is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:195
 msgid "Trigger label type"
 msgstr "Tipo de rótulo de trigger"
@@ -19003,6 +19047,11 @@ msgstr "Mensagem do agente de usuário"
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Um usuário não pode se adicionar em um grupo desativado ou em um grupo com acesso à interface web desativado."
 
+#: include/classes/api/services/CUserGroup.php:534
+#: include/classes/api/services/CUser.php:756
+msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
+msgstr ""
+
 #: app/views/administration.user.edit.php:421
 #: include/classes/api/services/CUser.php:951
 msgid "User cannot change own role."
@@ -19102,6 +19151,10 @@ msgstr "Grupos de usuários"
 #: include/classes/api/services/CUser.php:1225
 msgid "User is not allowed to delete himself."
 msgstr "Um usuário não pode excluir a si mesmo."
+
+#: include/classes/api/services/CUser.php:1291
+msgid "User is not allowed to delete oneself."
+msgstr ""
 
 #: include/classes/widgets/views/widget.item.form.view.php:62
 msgid "User macros"
@@ -19766,6 +19819,10 @@ msgstr "Visualizar"
 msgid "View as"
 msgstr "Ver como"
 
+#: jsLoader.php:397
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1234
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Espaço virtual em bytes ou percentual do total. Retorna inteiro para bytes; Ponto flutuante para percentual"
@@ -20305,6 +20362,10 @@ msgstr "Você não possui permissão para acessar esta página."
 msgid "You must login to view this page."
 msgstr "Você deve logar para ver esta página."
 
+#: jsLoader.php:282
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
+
 #: include/classes/db/DB.php:135
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
 msgstr "Seu banco de dados não está funcionando corretamente. Aguarde alguns minutos e tente novamente esta ação. Se o problema persistir, por favor contacte um administrador do sistema. O problema pode ser causado por uma transação demorada em execução ou por bloqueio em nível de linha realizado por seu sistema gerenciador de banco de dados."
@@ -20495,7 +20556,7 @@ msgstr "um caractere especial"
 #: app/views/administration.miscconfig.edit.php:125
 #, c-format
 msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
-msgstr ""
+msgstr "lista de hostnames separados por espaço; adicionar %1$s à lista permite que a página seja exibida em um frame desta mesma página"
 
 #: include/classes/validators/CApiInputValidator.php:2650
 msgid "a string, number or null value is expected"
@@ -20641,6 +20702,14 @@ msgstr "uma letra latina maiúscula e uma letra latina minúscula"
 msgid "and"
 msgstr "e"
 
+#: include/classes/api/helpers/CApiPskHelper.php:32
+#: include/classes/api/helpers/CApiPskHelper.php:62
+#: include/classes/api/helpers/CApiPskHelper.php:78
+#: include/classes/api/helpers/CApiPskHelper.php:111
+#: include/classes/api/helpers/CApiPskHelper.php:127
+msgid "another tls_psk value is already associated with given tls_psk_identity"
+msgstr ""
+
 #: include/views/monitoring.history.php:186
 msgid "as Blue"
 msgstr "em Azul"
@@ -20715,7 +20784,7 @@ msgstr "avg() - Valor médio de um período T"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1053
 msgid "baselinedev() - Returns the number of deviations between data periods in seasons and the last data period"
-msgstr "baselinedev() - Retorna o número de desvios entre os períodos de dados nas estações e o último período de dados"
+msgstr "baselinedev() - Retorna o número de desvios entre os períodos de dados nas temporadas e o último período de dados"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1060
 msgid "baselinewma() - Calculates baseline by averaging data periods in seasons"
@@ -21588,7 +21657,7 @@ msgstr "macro(s)"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:770
 msgid "mad() - Median absolute deviation"
-msgstr "mad() - Desvio absoluto mediano"
+msgstr "mad() - Desvio absoluto mediano da mediana"
 
 #: include/classes/validators/CHistFunctionValidator.php:93
 #, c-format
@@ -22026,6 +22095,10 @@ msgstr "direita"
 msgid "right() - Returns the rightmost count characters"
 msgstr "right() - Retorna a contagem de caracteres mais à direita"
 
+#: jsLoader.php:199
+msgid "root"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:937
 msgid "round() - Rounds a value to decimal places"
 msgstr "round() - Arredonda um valor para casas decimais"
@@ -22148,7 +22221,7 @@ msgstr "stddevpop() - Desvio padrão da população"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1005
 msgid "stddevsamp() - Sample standard deviation"
-msgstr "stddevsamp() - Desvio padrão da amostra"
+msgstr "stddevsamp() - Desvio padrão amostral"
 
 #: app/views/popup.tophosts.column.edit.php:137 include/graphs.inc.php:84
 msgid "sum"
@@ -22278,7 +22351,7 @@ msgstr "time() - Horário atual"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1039
 msgid "timeleft() - Time to reach threshold estimated based on period T"
-msgstr "timeleft() - Tempo para alcançar o limite estimado com base no período T"
+msgstr "timeleft() - Tempo para alcançar o limiar estimado com base no período T"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1046
 msgid "trendavg() - Average value of a period T with exact period shift"

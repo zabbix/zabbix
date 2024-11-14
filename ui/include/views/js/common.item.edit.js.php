@@ -111,7 +111,11 @@
 
 	jQuery(document).ready(function($) {
 		$('#delayFlexTable').on('click', 'input[type="radio"]', function() {
-			var rowNum = $(this).attr('id').split('_')[2];
+			if ($(this).prop('readonly')) {
+				return;
+			}
+
+			const rowNum = $(this).attr('id').split('_')[2];
 
 			if ($(this).val() == <?= ITEM_DELAY_FLEXIBLE; ?>) {
 				$('#delay_flex_' + rowNum + '_schedule').hide();
@@ -224,10 +228,11 @@
 				$(':radio', '#retrieve_mode')
 					.filter('[value=<?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>]').click()
 					.end()
-					.prop('disabled', true);
+					.prop('readonly', true);
 			}
 			else {
-				$(':radio', '#retrieve_mode').prop('disabled', false);
+				$(':radio', '#retrieve_mode')
+					.prop('readonly', false);
 			}
 		});
 	});

@@ -128,13 +128,22 @@
 				var $obj = $(this),
 					ms = $obj.data('multiSelect');
 
-				if (ms.options.disabled === true) {
-					$obj.removeAttr('aria-disabled');
-					$('.multiselect-list', $obj).removeClass('disabled');
+				if (ms.options.disabled === true || ms.options.readonly === true) {
+					if (ms.options.disabled === true) {
+						$obj.removeAttr('aria-disabled');
+						$('.multiselect-list', $obj).removeClass('disabled');
+
+						ms.options.disabled = false;
+					}
+					else {
+						$obj.removeAttr('aria-readonly');
+						$('.multiselect-list', $obj).removeAttr('aria-readonly');
+
+						ms.options.readonly = false;
+					}
+
 					$('.multiselect-button > button', $obj.parent()).prop('disabled', false);
 					$obj.append(makeMultiSelectInput($obj));
-
-					ms.options.disabled = false;
 
 					cleanSearch($obj);
 				}
@@ -272,19 +281,11 @@
 		setDisabledEntries: function (entries) {
 			this.each(function() {
 				const $obj = $(this);
-				const ms_parameters = $obj.data('multiSelect');
+				const ms = $obj.data('multiSelect');
 
-				if (typeof ms_parameters === 'undefined') {
-					return;
+				if (ms?.options.popup.parameters !== undefined) {
+					ms.options.popup.parameters.disableids = entries;
 				}
-
-				const link = new Curl(ms_parameters.options.url, false);
-				link.setArgument('disabledids', entries);
-
-				ms_parameters.options.url = link.getUrl();
-				ms_parameters.options.popup.parameters.disableids = entries;
-
-				$obj.data('multiSelect', ms_parameters);
 			});
 		}
 	};
@@ -303,9 +304,9 @@
 	 * @param bool   options['data'][inaccessible]	(optional)
 	 * @param bool   options['data'][disabled]		(optional)
 	 * @param string options['placeholder']			set custom placeholder (optional)
-	 * @param array  options['excludeids']			the list of excluded ids (optional)
 	 * @param string options['defaultValue']		default value for input element (optional)
-	 * @param bool   options['disabled']			turn on/off readonly state (optional)
+	 * @param bool   options['disabled']			turn on/off disabled state (optional)
+	 * @param bool   options['readonly']		    turn on/off readonly state (optional)
 	 * @param bool   options['addNew']				allow user to create new names (optional)
 	 * @param int    options['selectedLimit']		how many items can be selected (optional)
 	 * @param int    options['limit']				how many available items can be received from backend (optional)
@@ -342,10 +343,10 @@
 			},
 			placeholder: t('type here to search'),
 			data: [],
-			excludeids: [],
 			addNew: false,
 			defaultValue: null,
 			disabled: false,
+			readonly: false,
 			selectedLimit: 0,
 			limit: 20,
 			popup: {},
@@ -410,9 +411,15 @@
 
 			$obj.append($selected_div.append($selected_ul));
 
-			if (ms.options.disabled) {
-				$obj.attr('aria-disabled', true);
-				$selected_ul.addClass('disabled');
+			if (ms.options.disabled || ms.options.readonly) {
+				if (ms.options.disabled) {
+					$obj.attr('aria-disabled', true);
+					$selected_ul.addClass('disabled');
+				}
+				else {
+					$obj.attr('aria-readonly', true);
+					$selected_ul.attr('aria-readonly', true);
+				}
 			}
 			else {
 				$obj.append(makeMultiSelectInput($obj));
@@ -420,7 +427,7 @@
 
 			$obj
 				.on('mousedown', function(event) {
-					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1) {
+					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1 && !ms.options.readonly) {
 						$obj.addClass('active');
 						$('.selected li.selected', $obj).removeClass('selected');
 
@@ -450,7 +457,7 @@
 					text: ms.options.labels['Select']
 				});
 
-				if (ms.options.disabled) {
+				if (ms.options.disabled || ms.options.readonly) {
 					ms.select_button.prop('disabled', true);
 				}
 
@@ -581,7 +588,9 @@
 									cache: false,
 									data: jQuery.extend({
 										search: search,
-										limit: getLimit($obj),
+										limit: ms.options.limit !== 0
+											? ms.options.limit + getSkipSearchIds($obj).length + 1
+											: undefined
 									}, preselect_values)
 								})
 									.then(function(response) {
@@ -821,7 +830,7 @@
 						.append($('<span>')
 							.addClass('subfilter-disable-btn')
 							.on('click', function() {
-								if (!ms.options.disabled && !item_disabled) {
+								if (!ms.options.disabled && !item_disabled && !ms.options.readonly) {
 									removeSelected($obj, item.id);
 									if (isSearchFieldVisible($obj)) {
 										$('input[type="text"]', $obj)[0].focus({preventScroll:true});
@@ -833,7 +842,7 @@
 						)
 				)
 				.on('click', function() {
-					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1) {
+					if (isSearchFieldVisible($obj) && ms.options.selectedLimit != 1 && !ms.options.readonly) {
 						$('.selected li.selected', $obj).removeClass('selected');
 						$(this).addClass('selected');
 
@@ -979,13 +988,13 @@
 			}
 		}
 
+		const skip_search_ids = getSkipSearchIds($obj);
+
 		var available_more = false;
 
 		$.each(data, function(i, item) {
 			if (ms.options.limit == 0 || objectSize(ms.values.available) < ms.options.limit) {
-				if (typeof ms.values.available[item.id] === 'undefined'
-						&& typeof ms.values.selected[item.id] === 'undefined'
-						&& ms.options.excludeids.indexOf(item.id) === -1) {
+				if (!skip_search_ids.includes(item.id)) {
 					ms.values.available[item.id] = item;
 				}
 			}
@@ -1265,11 +1274,13 @@
 		return !$obj.hasClass('search-disabled');
 	}
 
-	function getLimit($obj) {
-		var ms = $obj.data('multiSelect');
+	function getSkipSearchIds($obj) {
+		const ms = $obj.data('multiSelect');
 
-		return (ms.options.limit != 0)
-			? ms.options.limit + objectSize(ms.values.selected) + ms.options.excludeids.length + 1
-			: null;
+		return [...new Set([
+			...Object.keys(ms.values.selected),
+			...(ms.options.popup.parameters?.excludeids || []),
+			...(ms.options.popup.parameters?.disableids || [])
+		])];
 	}
 })(jQuery);

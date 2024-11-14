@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
@@ -112,7 +113,7 @@ $triggersFormList
 
 if ($discovered_trigger) {
 	$triggersFormList->addVar('priority', (int) $data['priority']);
-	$severity = new CSeverity('priority_names', (int) $data['priority'], false);
+	$severity = (new CSeverity('priority_names', (int) $data['priority']))->setReadonly($readonly);
 }
 else {
 	$severity = new CSeverity('priority', (int) $data['priority']);
@@ -255,6 +256,12 @@ if ($data['expression_constructor'] == IM_TREE) {
 				foreach ($e['list'] as &$obj) {
 					if ($obj instanceof CLinkAction && $obj->getAttribute('class') == ZBX_STYLE_LINK_ACTION) {
 						$obj = new CSpan($obj->items);
+
+						// Decode HTML entities in trigger expressions.
+						foreach ($obj->items as &$obj_item) {
+							$obj_item = htmlspecialchars_decode($obj_item, ENT_NOQUOTES);
+						}
+						unset($obj_item);
 					}
 				}
 				unset($obj);
@@ -268,7 +275,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 							->onClick('check_target(this, '.TRIGGER_EXPRESSION.');')
 							->removeId()
 						: null,
-					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDWRAP),
+					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDBREAK),
 					!$readonly
 						? (new CCol(
 							(new CSimpleButton(_('Remove')))
@@ -333,7 +340,7 @@ $triggersFormList->addRow(_('OK event generation'),
 		->addValue(_('Recovery expression'), ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION)
 		->addValue(_('None'), ZBX_RECOVERY_MODE_NONE)
 		->setModern(true)
-		->setEnabled(!$readonly)
+		->setReadonly($readonly)
 );
 
 $popup_options = [
@@ -459,6 +466,12 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 				foreach ($e['list'] as &$obj) {
 					if ($obj instanceof CLinkAction && $obj->getAttribute('class') == ZBX_STYLE_LINK_ACTION) {
 						$obj = new CSpan($obj->items);
+
+						// Decode HTML entities in trigger expressions.
+						foreach ($obj->items as &$obj_item) {
+							$obj_item = htmlspecialchars_decode($obj_item, ENT_NOQUOTES);
+						}
+						unset($obj_item);
 					}
 				}
 				unset($obj);
@@ -472,7 +485,7 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 							->onClick('check_target(this, '.TRIGGER_RECOVERY_EXPRESSION.');')
 							->removeId()
 						: null,
-					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDWRAP),
+					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDBREAK),
 					!$readonly
 						? (new CCol(
 							(new CSimpleButton(_('Remove')))
@@ -538,14 +551,14 @@ $triggersFormList
 			->addValue(_('Single'), TRIGGER_MULT_EVENT_DISABLED)
 			->addValue(_('Multiple'), TRIGGER_MULT_EVENT_ENABLED)
 			->setModern(true)
-			->setEnabled(!$readonly)
+			->setReadonly($readonly)
 	)
 	->addRow(_('OK event closes'),
 		(new CRadioButtonList('correlation_mode', (int) $data['correlation_mode']))
 			->addValue(_('All problems'), ZBX_TRIGGER_CORRELATION_NONE)
 			->addValue(_('All problems if tag values match'), ZBX_TRIGGER_CORRELATION_TAG)
 			->setModern(true)
-			->setEnabled(!$readonly),
+			->setReadonly($readonly),
 		'correlation_mode_row'
 	)
 	->addRow(
@@ -558,7 +571,7 @@ $triggersFormList
 	->addRow(_('Allow manual close'),
 		(new CCheckBox('manual_close'))
 			->setChecked($data['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
-			->setEnabled(!$readonly)
+			->setReadonly($readonly)
 	);
 
 // Append status to form list.

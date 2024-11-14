@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once dirname(__FILE__).'/js/configuration.item.prototype.list.js.php';
@@ -125,6 +126,7 @@ foreach ($data['items'] as $item) {
 				: 'itemprototype.massdisable'
 			)
 			->setArgument('context', $data['context'])
+			->setArgument('backurl', $url)
 			->getUrl()
 	))
 		->addClass(ZBX_STYLE_LINK_ACTION)
@@ -148,10 +150,7 @@ foreach ($data['items'] as $item) {
 	$item_menu = CMenuPopupHelper::getItemPrototypeConfiguration([
 		'itemid' => $item['itemid'],
 		'context' => $data['context'],
-		'backurl' => (new CUrl('disc_prototypes.php'))
-			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-			->setArgument('context', $data['context'])
-			->getUrl()
+		'backurl' => $url
 	]);
 
 	$wizard = (new CButton(null))
@@ -168,6 +167,7 @@ foreach ($data['items'] as $item) {
 					: 'itemprototype.massdiscover.disable'
 				)
 				->setArgument('context', $data['context'])
+				->setArgument('backurl', $url)
 				->getUrl()
 		))
 			->addSID()
@@ -177,7 +177,7 @@ foreach ($data['items'] as $item) {
 	$itemTable->addRow([
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$wizard,
-		$description,
+		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$item['delay'],
 		$item['history'],

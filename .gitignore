@@ -165,6 +165,7 @@ tests/libs/zbxcommon/zbx_truncate_value
 tests/libs/zbxcommon/zbx_user_macro_parse
 tests/libs/zbxcommon/zbx_validate_interval
 tests/libs/zbxcommon/zbx_variant_compare
+tests/libs/zbxcommon/zbx_variant_to_value_type
 tests/libs/zbxcommon/zbx_xml_to_json
 tests/libs/zbxcommon/zbx_buf_readln
 tests/libs/zbxcomms/zbx_tcp_check_allowed_peers

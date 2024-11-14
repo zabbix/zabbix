@@ -299,7 +299,7 @@ $item_tab
 			->addValue(_('Raw data'), ZBX_POSTTYPE_RAW)
 			->addValue(_('JSON data'), ZBX_POSTTYPE_JSON)
 			->addValue(_('XML data'), ZBX_POSTTYPE_XML)
-			->setEnabled(!$data['limited'])
+			->setReadonly($data['limited'])
 			->setModern(true)
 		))->setId('js-item-post-type-field')
 	])
@@ -390,7 +390,7 @@ $item_tab
 	->addItem([
 		(new CLabel(_('Follow redirects'), 'follow_redirects'))->setId('js-item-follow-redirects-label'),
 		(new CFormField((new CCheckBox('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_ON))
-			->setEnabled(!$data['limited'])
+			->setReadonly($data['limited'])
 			->setChecked($data['follow_redirects'] == HTTPTEST_STEP_FOLLOW_REDIRECTS_ON)
 		))->setId('js-item-follow-redirects-field')
 	])
@@ -401,7 +401,7 @@ $item_tab
 			->addValue(_('Body'), HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
 			->addValue(_('Headers'), HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
 			->addValue(_('Body and headers'), HTTPTEST_STEP_RETRIEVE_MODE_BOTH)
-			->setEnabled(!($data['limited'] || $data['request_method'] == HTTPCHECK_REQUEST_HEAD))
+			->setReadonly($data['limited'] || $data['request_method'] == HTTPCHECK_REQUEST_HEAD)
 			->setModern(true)
 		))->setId('js-item-retrieve-mode-field')
 	])
@@ -452,7 +452,7 @@ $item_tab
 	->addItem([
 		(new CLabel(_('SSL verify peer'), 'verify_peer'))->setId('js-item-verify-peer-label'),
 		(new CFormField((new CCheckBox('verify_peer', HTTPTEST_VERIFY_PEER_ON))
-			->setEnabled(!$data['limited'])
+			->setReadonly($data['limited'])
 			->setChecked($data['verify_peer'] == HTTPTEST_VERIFY_PEER_ON)
 		))->setId('js-item-verify-peer-field')
 	])
@@ -461,7 +461,7 @@ $item_tab
 		(new CLabel(_('SSL verify host'), 'verify_host'))->setId('js-item-verify-host-label'),
 		(new CFormField(
 			(new CCheckBox('verify_host', HTTPTEST_VERIFY_HOST_ON))
-				->setEnabled(!$data['limited'])
+				->setReadonly($data['limited'])
 				->setChecked($data['verify_host'] == HTTPTEST_VERIFY_HOST_ON)
 		))->setId('js-item-verify-host-field')
 	])
@@ -503,7 +503,7 @@ $item_tab
 				'name' => 'master_itemid',
 				'object_name' => 'items',
 				'multiple' => false,
-				'disabled' => $data['limited'],
+				'readonly' => $data['limited'],
 				'data' => ($data['master_itemid'] > 0)
 					? [
 						[
@@ -730,7 +730,10 @@ $item_tab
 	])
 	->addItem([
 		new CLabel(_('Description'), 'description'),
-		new CFormField((new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+		new CFormField((new CTextArea('description', $data['description']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxLength(DB::getFieldLength('hosts', 'description'))
+		)
 	])
 	->addItem([
 		new CLabel(_('Enabled'), 'status'),

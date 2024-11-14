@@ -640,6 +640,57 @@ static int	DBpatch_6000044(void)
 #undef TOKEN_LEN
 #undef LAST_FOREACH
 }
+
+static int	DBpatch_6000045(void)
+{
+	return DBcreate_index("auditlog", "auditlog_4", "recordsetid", 0);
+}
+
+static int	DBpatch_6000046(void)
+{
+	return DBcreate_index("items", "items_10", "uuid", 0);
+}
+
+static int	DBpatch_6000047(void)
+{
+	return DBcreate_index("hosts", "hosts_9", "uuid", 0);
+}
+
+static int	DBpatch_6000048(void)
+{
+	return DBcreate_index("hstgrp", "hstgrp_2", "uuid", 0);
+}
+
+static int	DBpatch_6000049(void)
+{
+	return DBcreate_index("httptest", "httptest_5", "uuid", 0);
+}
+
+static int	DBpatch_6000050(void)
+{
+	return DBcreate_index("valuemap", "valuemap_2", "uuid", 0);
+}
+
+static int	DBpatch_6000051(void)
+{
+	return DBcreate_index("triggers", "triggers_4", "uuid", 0);
+}
+
+static int	DBpatch_6000052(void)
+{
+	return DBcreate_index("graphs", "graphs_5", "uuid", 0);
+}
+
+static int	DBpatch_6000053(void)
+{
+	return DBcreate_index("services", "services_1", "uuid", 0);
+}
+
+static int	DBpatch_6000054(void)
+{
+	return DBcreate_index("dashboard", "dashboard_3", "uuid", 0);
+}
+
 #endif
 
 DBPATCH_START(6000)
@@ -691,5 +742,15 @@ DBPATCH_ADD(6000041, 0, 0)
 DBPATCH_ADD(6000042, 0, 0)
 DBPATCH_ADD(6000043, 0, 0)
 DBPATCH_ADD(6000044, 0, 0)
+DBPATCH_ADD(6000045, 0, 0)
+DBPATCH_ADD(6000046, 0, 0)
+DBPATCH_ADD(6000047, 0, 0)
+DBPATCH_ADD(6000048, 0, 0)
+DBPATCH_ADD(6000049, 0, 0)
+DBPATCH_ADD(6000050, 0, 0)
+DBPATCH_ADD(6000051, 0, 0)
+DBPATCH_ADD(6000052, 0, 0)
+DBPATCH_ADD(6000053, 0, 0)
+DBPATCH_ADD(6000054, 0, 0)
 
 DBPATCH_END()

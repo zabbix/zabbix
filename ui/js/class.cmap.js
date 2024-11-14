@@ -3179,13 +3179,13 @@ ZABBIX.apps.map = (function($) {
 				// validate element id
 				if ($.isEmptyObject(data.elements) && data.elementtype !== '4') {
 					switch (data.elementtype) {
-						case '0': alert('Host is not selected.');
+						case '0': alert(t('Host is not selected.'));
 							return false;
-						case '1': alert('Map is not selected.');
+						case '1': alert(t('Map is not selected.'));
 							return false;
-						case '2': alert('Trigger is not selected.');
+						case '2': alert(t('Trigger is not selected.'));
 							return false;
-						case '3': alert('Host group is not selected.');
+						case '3': alert(t('Host group is not selected.'));
 							return false;
 					}
 				}

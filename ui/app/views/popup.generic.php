@@ -76,7 +76,8 @@ if (array_key_exists('hosts', $data['filter'])) {
 	$multiselect_options['popup']['parameters']['dstfrm'] = $header_form->getId();
 
 	$host_ms = (new CMultiSelect($multiselect_options))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH);
-	if ($multiselect_options['disabled']) {
+
+	if ($multiselect_options['readonly']) {
 		$host_ms->setTitle(_('You cannot switch hosts for current selection.'));
 	}
 	$controls[] = (new CFormList())->addRow(new CLabel(_('Host'), 'popup_host_ms'), [$empty_btn, $host_ms]);

@@ -1120,46 +1120,11 @@ class CMacrosResolverGeneral {
 
 			foreach ($keys as $key => $tokens) {
 				foreach ($tokens as $token => $data) {
-					switch ($data['macro']) {
-						case 'ITEM.VALUE':
-						case 'ITEM.LASTVALUE':
-							if (array_key_exists('function', $data)) {
-								if ($data['function'] !== 'regsub' && $data['function'] !== 'iregsub') {
-									continue 2;
-								}
-
-								if (count($data['parameters']) != 2) {
-									continue 2;
-								}
-
-								$ci = ($data['function'] === 'iregsub') ? 'i' : '';
-
-								set_error_handler(function ($errno, $errstr) {});
-								$rc = preg_match('/'.$data['parameters'][0].'/'.$ci, $history[$itemid][0]['value'],
-									$matches
-								);
-								restore_error_handler();
-
-								if ($rc === false) {
-									continue 2;
-								}
-
-								$macro_value = $data['parameters'][1];
-								$matched_macros = self::getMacroPositions($macro_value, ['replacements' => true]);
-
-								foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-									$macro_value = substr_replace($macro_value,
-										array_key_exists($macro[1], $matches) ? $matches[$macro[1]] : '',
-										$pos, strlen($macro)
-									);
-								}
-							}
-							else {
-								$macro_value = formatHistoryValue($history[$itemid][0]['value'], $db_items[$itemid]);
-							}
-
-							$macro_values[$key][$token] = $macro_value;
-							break;
+					if ($data['macro'] === 'ITEM.VALUE' || $data['macro'] === 'ITEM.LASTVALUE') {
+						$macro_values[$key][$token] = array_key_exists('macrofunc', $data)
+							? self::calcMacrofunc($history[$itemid][0]['value'], $data['macrofunc'])
+							: formatHistoryValue($history[$itemid][0]['value'], $db_items[$itemid]);
+						continue;
 					}
 
 					if ($db_items[$itemid]['value_type'] != ITEM_VALUE_TYPE_LOG) {
@@ -1184,8 +1149,8 @@ class CMacrosResolverGeneral {
 							break;
 
 						case 'ITEM.LOG.SEVERITY':
-							$macro_values[$key][$token]
-								= CSeverityHelper::getName((int) $history[$itemid][0]['severity']);
+							$macro_values[$key][$token] =
+								get_item_logtype_description($history[$itemid][0]['severity']);
 							break;
 
 						case 'ITEM.LOG.NSEVERITY':
@@ -1478,7 +1443,7 @@ class CMacrosResolverGeneral {
 						$value = $history[$function['itemid']][0]['source'];
 						break;
 					case 'ITEM.LOG.SEVERITY':
-						$value = CSeverityHelper::getName((int) $history[$function['itemid']][0]['severity']);
+						$value = get_item_logtype_description($history[$function['itemid']][0]['severity']);
 						break;
 					case 'ITEM.LOG.NSEVERITY':
 						$value = $history[$function['itemid']][0]['severity'];
@@ -2561,6 +2526,7 @@ class CMacrosResolverGeneral {
 			}
 		}
 
+		$user_macro_parser_with_regex = new CUserMacroParser(['allow_regex' => true]);
 		$user_macro_parser = new CUserMacroParser();
 
 		/*
@@ -2590,14 +2556,14 @@ class CMacrosResolverGeneral {
 				]);
 
 				foreach ($db_host_macros as $db_host_macro) {
-					if ($user_macro_parser->parse($db_host_macro['macro']) != CParser::PARSE_SUCCESS) {
+					if ($user_macro_parser_with_regex->parse($db_host_macro['macro']) != CParser::PARSE_SUCCESS) {
 						continue;
 					}
 
 					$hostid = $db_host_macro['hostid'];
-					$macro = $user_macro_parser->getMacro();
-					$context = $user_macro_parser->getContext();
-					$regex = $user_macro_parser->getRegex();
+					$macro = $user_macro_parser_with_regex->getMacro();
+					$context = $user_macro_parser_with_regex->getContext();
+					$regex = $user_macro_parser_with_regex->getRegex();
 					$value = self::getMacroValue($db_host_macro);
 
 					if (!array_key_exists($hostid, $host_macros)) {
@@ -2695,10 +2661,10 @@ class CMacrosResolverGeneral {
 			$global_macros = [];
 
 			foreach ($db_global_macros as $db_global_macro) {
-				if ($user_macro_parser->parse($db_global_macro['macro']) == CParser::PARSE_SUCCESS) {
-					$macro = $user_macro_parser->getMacro();
-					$context = $user_macro_parser->getContext();
-					$regex = $user_macro_parser->getRegex();
+				if ($user_macro_parser_with_regex->parse($db_global_macro['macro']) == CParser::PARSE_SUCCESS) {
+					$macro = $user_macro_parser_with_regex->getMacro();
+					$context = $user_macro_parser_with_regex->getContext();
+					$regex = $user_macro_parser_with_regex->getRegex();
 					$value = self::getMacroValue($db_global_macro);
 
 					if (!array_key_exists($macro, $global_macros)) {
@@ -2732,7 +2698,7 @@ class CMacrosResolverGeneral {
 							}
 							elseif ($context !== null && count($global_macros[$macro]['regex'])) {
 								foreach ($global_macros[$macro]['regex'] as $regex => $val) {
-									if (preg_match('/'.strtr(trim($regex, '/'), ['/' => '\\/']).'/', $context) === 1) {
+									if (preg_match('/'.self::handleSlashEscaping($regex).'/', $context) === 1) {
 										$value['value'] = $val;
 										break;
 									}
@@ -2809,7 +2775,7 @@ class CMacrosResolverGeneral {
 				// Searching context coincidence, if regex array not empty.
 				elseif ($context !== null && count($host_macros[$hostid][$macro]['regex'])) {
 					foreach ($host_macros[$hostid][$macro]['regex'] as $regex => $val) {
-						if (preg_match('/'.strtr(trim($regex, '/'), ['/' => '\\/']).'/', $context) === 1) {
+						if (preg_match('/'.self::handleSlashEscaping($regex).'/', $context) === 1) {
 							return [
 								'value' => $val,
 								'value_default' => $value_default
@@ -2853,6 +2819,34 @@ class CMacrosResolverGeneral {
 		}
 
 		return ['value' => null, 'value_default' => $value_default];
+	}
+
+	/**
+	 * Escape slashes in the regular expression based on preceding backslashes.
+	 *
+	 * @param string $regex
+	 *
+	 * @return string
+	 */
+	private static function handleSlashEscaping(string $regex): string {
+		$formatted_regex = '';
+		$backslash_count = 0;
+
+		for ($p = 0; isset($regex[$p]); $p++) {
+			if ($regex[$p] === '\\') {
+				$backslash_count++;
+			}
+			else {
+				if ($regex[$p] === '/' && $backslash_count % 2 == 0) {
+					$formatted_regex .= '\\';
+				}
+				$backslash_count = 0;
+			}
+
+			$formatted_regex .= $regex[$p];
+		}
+
+		return $formatted_regex;
 	}
 
 	/**

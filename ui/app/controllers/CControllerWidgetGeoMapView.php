@@ -75,7 +75,7 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 
 			$data['config'] = $this->geomap_config + $this->getMapCenter() + [
 				'filter' => $this->getUserProfileFilter(),
-				'colors' => self::getSeveritySettings()
+				'severities' => self::getSeveritySettings()
 			];
 		}
 
@@ -83,7 +83,7 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 	}
 
 	/**
-	 * Create an array of problem severity colors.
+	 * Get severity-related settings.
 	 *
 	 * @static
 	 *
@@ -91,11 +91,21 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 	 */
 	protected static function getSeveritySettings(): array {
 		$severity_config = [
-			-1 => self::NO_PROBLEMS_MARKER_COLOR
+			-1 => [
+				'name' => _('No problems'),
+				'color' => self::NO_PROBLEMS_MARKER_COLOR,
+				'style' => ''
+			]
 		];
 
-		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$severity_config[$severity] = '#'.CSeverityHelper::getColor($severity);
+		$severities = CSeverityHelper::getSeverities();
+
+		foreach ($severities as $severity) {
+			$severity_config[$severity['value']] = [
+				'name' => $severity['label'],
+				'color' => '#'.CSeverityHelper::getColor($severity['value']),
+				'style' => $severity['style']
+			];
 		}
 
 		return $severity_config;

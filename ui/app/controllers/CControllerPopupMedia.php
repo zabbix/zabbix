@@ -82,25 +82,30 @@ class CControllerPopupMedia extends CController {
 				'mediatypeids' => $page_options['mediatypeid']
 			]);
 
-			$type = $db_mediatypes ? $db_mediatypes[0]['type'] : 0;
+			if (!$db_mediatypes) {
+				error(_s('Media type with ID "%1$s" is not available.', $page_options['mediatypeid']));
+			}
+			else {
+				$type = $db_mediatypes[0]['type'];
 
-			if ($type == MEDIA_TYPE_EMAIL) {
-				$email_validator = new CEmailValidator();
+				if ($type == MEDIA_TYPE_EMAIL) {
+					$email_validator = new CEmailValidator();
 
-				$page_options['sendto_emails'] = array_values(array_filter($page_options['sendto_emails']));
-				if (!$page_options['sendto_emails']) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto_emails', _('cannot be empty')));
-				}
+					$page_options['sendto_emails'] = array_values(array_filter($page_options['sendto_emails']));
+					if (!$page_options['sendto_emails']) {
+						error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto_emails', _('cannot be empty')));
+					}
 
-				foreach ($page_options['sendto_emails'] as $email) {
-					if (!$email_validator->validate($email)) {
-						error($email_validator->getError());
-						break;
+					foreach ($page_options['sendto_emails'] as $email) {
+						if (!$email_validator->validate($email)) {
+							error($email_validator->getError());
+							break;
+						}
 					}
 				}
-			}
-			elseif ($page_options['sendto'] === '') {
-				error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto', _('cannot be empty')));
+				elseif ($page_options['sendto'] === '') {
+					error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto', _('cannot be empty')));
+				}
 			}
 
 			if (($messages = getMessages()) !== null) {

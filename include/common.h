@@ -575,13 +575,11 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_SERVICEMAN		35
 #define ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER	36
 #define ZBX_PROCESS_TYPE_ODBCPOLLER		37
-#define ZBX_PROCESS_TYPE_COUNT			38	/* number of process types */
+#define ZBX_PROCESS_TYPE_HA_MANAGER		38
+#define ZBX_PROCESS_TYPE_COUNT			39	/* number of process types */
 
 /* special processes that are not present worker list */
-#define ZBX_PROCESS_TYPE_EXT_FIRST		126
-#define ZBX_PROCESS_TYPE_HA_MANAGER		126
-#define ZBX_PROCESS_TYPE_MAIN			127
-#define ZBX_PROCESS_TYPE_EXT_LAST		127
+#define ZBX_PROCESS_TYPE_MAIN			126
 
 #define ZBX_PROCESS_TYPE_UNKNOWN		255
 
@@ -1206,10 +1204,10 @@ void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 #define ZBX_MALLOC_TRIM (128 * ZBX_KIBIBYTE)
 
 #define ZBX_MAX_RECV_DATA_SIZE		(1 * ZBX_GIBIBYTE)
-#if defined(_WINDOWS)
-#define ZBX_MAX_RECV_LARGE_DATA_SIZE	(1 * ZBX_GIBIBYTE)
-#else
+#if (4 < SIZEOF_SIZE_T)
 #define ZBX_MAX_RECV_LARGE_DATA_SIZE	(__UINT64_C(16) * ZBX_GIBIBYTE)
+#else
+#define ZBX_MAX_RECV_LARGE_DATA_SIZE	(1 * ZBX_GIBIBYTE)
 #endif
 
 /* max length of base64 data */
@@ -1818,8 +1816,7 @@ void	zbx_new_cuid(char *cuid);
 #define ZBX_REPORT_CYCLE_MONTHLY	2
 #define ZBX_REPORT_CYCLE_YEARLY		3
 
-int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekdays, int start_time,
-		const char *tz);
+int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekdays, int start_time);
 
 /* */
 char	*zbx_substr(const char *src, size_t left, size_t right);

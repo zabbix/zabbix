@@ -82,7 +82,8 @@ class CHostInterfaceElement extends CMultifieldTableElement {
 				break;
 		}
 
-		$this->query('button:Add')->one()->click();
+		// scrollIntoView() was only added in 6.0 branch due to unstable behaviour in Jenkins.
+		$this->query('button:Add')->one()->scrollIntoView()->click();
 		CPopupMenuElement::find()->waitUntilVisible()->one()->fill($values['type']);
 		// Wait until new table row appears.
 		$this->query('xpath:'.CXPathHelper::fromSelector($this->selectors['row']).'['.($rows + 1).']')->waitUntilPresent();

@@ -430,16 +430,21 @@ elseif (getRequest('action') && str_in_array(getRequest('action'), ['triggerprot
 		$result = true;
 	}
 
-	if ($result) {
-		uncheckTableRows(getRequest('parent_discoveryid'));
-	}
-
 	$updated = count($update);
 
-	$messageSuccess = _n('Trigger prototype updated', 'Trigger prototypes updated', $updated);
-	$messageFailed = _n('Cannot update trigger prototype', 'Cannot update trigger prototypes', $updated);
+	if ($result) {
+		uncheckTableRows(getRequest('parent_discoveryid'));
 
-	show_messages($result, $messageSuccess, $messageFailed);
+		CMessageHelper::setSuccessTitle(_n('Trigger prototype updated', 'Trigger prototypes updated', $updated));
+	}
+	else {
+		CMessageHelper::setErrorTitle(_n('Cannot update trigger prototype', 'Cannot update trigger prototypes', $updated));
+	}
+
+	if (hasRequest('backurl')) {
+		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response->redirect();
+	}
 }
 elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massdelete' && hasRequest('g_triggerid')) {
 	$result = API::TriggerPrototype()->delete(getRequest('g_triggerid'));
@@ -478,16 +483,23 @@ elseif (getRequest('action') && hasRequest('g_triggerid')
 		$result = true;
 	}
 
-	if ($result) {
-		uncheckTableRows(getRequest('parent_discoveryid'));
-	}
-
 	$updated = count($update);
 
-	$messageSuccess = _n('Trigger prototype updated', 'Trigger prototypes updated', $updated);
-	$messageFailed = _n('Cannot update trigger prototype', 'Cannot update trigger prototypes', $updated);
+	if ($result) {
+		uncheckTableRows(getRequest('parent_discoveryid'));
 
-	show_messages($result, $messageSuccess, $messageFailed);
+		CMessageHelper::setSuccessTitle(_n('Trigger prototype updated', 'Trigger prototypes updated', $updated));
+	}
+	else {
+		CMessageHelper::setErrorTitle(
+			_n('Cannot update trigger prototype', 'Cannot update trigger prototypes', $updated)
+		);
+	}
+
+	if (hasRequest('backurl')) {
+		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response->redirect();
+	}
 }
 
 /*

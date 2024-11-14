@@ -46,7 +46,9 @@ $table->setHeader([
 ]);
 
 foreach ($data['hosts'] as $hostid => $host) {
-	$host_name = (new CLinkAction($host['name']))->setMenuPopup(CMenuPopupHelper::getHost($hostid));
+	$host_name = (new CLinkAction($host['name']))
+		->setMenuPopup(CMenuPopupHelper::getHost($hostid))
+		->addClass(ZBX_STYLE_WORDWRAP);
 
 	$interface = null;
 	if ($host['interfaces']) {
@@ -87,7 +89,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 	}
 
 	if ($total_problem_count == 0) {
-		$problems_link->addItem('Problems');
+		$problems_link->addItem(_('Problems'));
 	}
 	else {
 		$problems_link->addClass(ZBX_STYLE_PROBLEM_ICON_LINK);
@@ -111,7 +113,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 
 	$table->addRow([
 		[$host_name, $maintenance_icon],
-		(new CCol(getHostInterface($interface)))->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol(getHostInterface($interface)))->addClass(ZBX_STYLE_WORDBREAK),
 		getHostAvailabilityTable($host['interfaces']),
 		$host['tags'],
 		($host['status'] == HOST_STATUS_MONITORED)

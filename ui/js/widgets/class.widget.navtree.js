@@ -912,30 +912,57 @@ class CWidgetNavTree extends CWidget {
 											}
 
 											const add_child_level = (sysmapid, itemid, depth) => {
-												if (resp.hierarchy[sysmapid] !== undefined
-														&& depth <= this._max_depth) {
-													const root = this._target
-														.querySelector(`.tree-item[data-id="${itemid}"]>ul.tree-list`);
+												const root = this._target
+													.querySelector(`.tree-item[data-id="${itemid}"]>ul.tree-list`);
 
+												if (root === null) {
+													return;
+												}
+
+												const tree_item = root.closest('.tree-item');
+
+												if (tree_item.classList.contains('is-parent')) {
+													tree_item.classList.remove('closed');
+													tree_item.classList.add('opened');
+												}
+
+												if (resp.hierarchy[sysmapid] !== undefined && itemid !== undefined
+														&& depth <= this._max_depth) {
 													$.each(resp.hierarchy[sysmapid], (i, submapid) => {
 														if (resp.submaps[submapid] === undefined) {
 															return;
 														}
 
-														const submap_item = resp.submaps[submapid];
-														const submap_itemid = this._getNextId();
+														const same_consecutive_submap = resp.hierarchy[sysmapid].filter(
+															(id, index) => id === submapid && index < i
+														).length;
 
-														root.append(this._makeTreeItem({
-															id: submap_itemid,
-															name: submap_item['name'],
-															sysmapid: submap_item['sysmapid'],
-															parent: itemid
-														}));
+														const added_submap = root.querySelectorAll(
+															`:scope>.tree-item[data-sysmapid="${submapid}"]`
+														)[same_consecutive_submap];
+
+														let submap_itemid;
+
+														if (added_submap !== undefined) {
+															submap_itemid = added_submap.dataset.id;
+														}
+														else {
+															submap_itemid = this._getNextId();
+
+															const submap_item = resp.submaps[submapid];
+
+															root.append(this._makeTreeItem({
+																id: submap_itemid,
+																name: submap_item['name'],
+																sysmapid: submap_item['sysmapid'],
+																parent: itemid
+															}));
+														}
+
 														add_child_level(submapid, submap_itemid, depth + 1);
 													});
 
-													root.closest('.tree-item').classList.remove('closed');
-													root.closest('.tree-item').classList.add('opened', 'is-parent');
+													tree_item.classList.add('is-parent');
 												}
 											};
 

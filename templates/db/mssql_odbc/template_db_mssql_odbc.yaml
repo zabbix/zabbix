@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-26T10:54:19Z'
+  date: '2024-11-06T10:45:09Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -34,7 +34,7 @@ zabbix_export:
         
           Note! Credentials in the odbc.ini do not work for MSSQL.
         
-        The "Service's TCP port state" item uses the {HOST.CONN} and {$MSSQL.PORT} macros to check the availability of the MSSQL instance.
+        The "Service's TCP port state" item uses the {HOST.CONN} and {$MSSQL.PORT} macros to check the availability of the MSSQL instance. Keep in mind that if dynamic ports are used on the MSSQL server side, this check will not work correctly.
         
         If your instance uses a non-default TCP port, set the port in your section of odbc.ini in the line Server = IP or FQDN name, port.
         
@@ -66,13 +66,14 @@ zabbix_export:
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
           description: 'The item gets availability group states - name, primary and secondary health, synchronization health.'
+          timeout: 30s
           tags:
             - tag: component
               value: raw
         - uuid: 9c902b33ed254e1892e44218a67876d3
           name: 'MSSQL: Get database'
           type: ODBC
-          key: 'db.odbc.get[get_database,{$MSSQL.DSN}]'
+          key: 'db.odbc.get[get_database,"{$MSSQL.DSN}"]'
           delay: 1h
           history: '0'
           trends: '0'
@@ -83,13 +84,14 @@ zabbix_export:
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
           description: 'Getting databases - database name and recovery model.'
+          timeout: 30s
           tags:
             - tag: component
               value: raw
         - uuid: 9948ac27a2f84ba5a74ee0860d934f4e
           name: 'MSSQL: Get DB mirroring'
           type: ODBC
-          key: 'db.odbc.get[get_db_mirroring","{$MSSQL.DSN}"]'
+          key: 'db.odbc.get[get_db_mirroring,"{$MSSQL.DSN}"]'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -108,6 +110,7 @@ zabbix_export:
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
           description: 'Getting DB mirroring.'
+          timeout: 30s
           tags:
             - tag: component
               value: raw
@@ -152,6 +155,7 @@ zabbix_export:
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
           description: 'The item gets the SQL agent job status.'
+          timeout: 30s
           tags:
             - tag: component
               value: raw
@@ -195,6 +199,7 @@ zabbix_export:
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
           description: 'The item gets information about backup processes.'
+          timeout: 30s
           tags:
             - tag: component
               value: raw
@@ -224,6 +229,7 @@ zabbix_export:
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
           description: 'Getting the states of the local availability database.'
+          timeout: 30s
           tags:
             - tag: component
               value: raw
@@ -252,13 +258,14 @@ zabbix_export:
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
           description: 'Getting the non-local availability database.'
+          timeout: 30s
           tags:
             - tag: component
               value: raw
         - uuid: 3fcb3b84bdee42428bedc39fcc582c9e
           name: 'MSSQL: Get quorum'
           type: ODBC
-          key: 'db.odbc.get[get_quorum,{$MSSQL.DSN}]'
+          key: 'db.odbc.get[get_quorum,"{$MSSQL.DSN}"]'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -268,13 +275,14 @@ zabbix_export:
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
           description: 'Getting quorum - cluster name, type, and state.'
+          timeout: 10s
           tags:
             - tag: component
               value: raw
         - uuid: 69a31cdfbf9b4099bf89adb26e8b9f06
           name: 'MSSQL: Get quorum member'
           type: ODBC
-          key: 'db.odbc.get[get_quorum_member,{$MSSQL.DSN}]'
+          key: 'db.odbc.get[get_quorum_member,"{$MSSQL.DSN}"]'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -284,13 +292,14 @@ zabbix_export:
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
           description: 'Getting quorum members - member name, type, state, and number of quorum votes.'
+          timeout: 10s
           tags:
             - tag: component
               value: raw
         - uuid: 7a82483c605d4e8eb67c2576069cf8a9
           name: 'MSSQL: Get replica'
           type: ODBC
-          key: 'db.odbc.get[get_replica","{$MSSQL.DSN}"]'
+          key: 'db.odbc.get[get_replica,"{$MSSQL.DSN}"]'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -312,6 +321,7 @@ zabbix_export:
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
           description: 'Getting the database replica.'
+          timeout: 30s
           tags:
             - tag: component
               value: raw
@@ -324,21 +334,23 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           params: |
+            DECLARE @SQLNAME NVARCHAR(22)
+            SET @SQLNAME = CASE WHEN @@SERVICENAME = 'MSSQLSERVER' THEN 'SQLServer' ELSE 'MSSQL$' + @@SERVICENAME END
             SELECT object_name,
               counter_name,
               instance_name,
               cntr_value
             FROM sys.dm_os_performance_counters
-            UNION SELECT 'MSSQL$' + @@servicename AS object_name,
+            UNION SELECT @SQLNAME AS object_name,
               'Version' AS counter_name,
               @@version AS instance_name,
               0 AS cntr_value
-            UNION SELECT 'MSSQL$' + @@servicename AS object_name,
+            UNION SELECT @SQLNAME AS object_name,
               'Uptime' AS counter_name,
               '' AS instance_name,
               DATEDIFF(second, sqlserver_start_time, GETDATE()) AS cntr_value
             FROM sys.dm_os_sys_info
-            UNION SELECT 'MSSQL$' + @@servicename + ':Databases' AS object_name,
+            UNION SELECT @SQLNAME + ':Databases' AS object_name,
               'State' AS counter_name,
               name AS instance_name,
               state AS cntr_value
@@ -353,11 +365,11 @@ zabbix_export:
                 OBJECT_NAME
               FROM sys.dm_os_performance_counters
               WHERE counter_name = 'Buffer cache hit ratio base'
-                AND OBJECT_NAME = 'MSSQL$' + @@servicename + ':Buffer Manager'
+                AND OBJECT_NAME = @SQLNAME + ':Buffer Manager'
             ) b
               ON a.OBJECT_NAME = b.OBJECT_NAME
             WHERE a.counter_name = 'Buffer cache hit ratio'
-              AND a.OBJECT_NAME = 'MSSQL$' + @@servicename + ':Buffer Manager'
+              AND a.OBJECT_NAME = @SQLNAME + ':Buffer Manager'
             UNION SELECT a.object_name,
               'WorktablesFromCacheRatio' AS counter_name,
               '' AS instance_name,
@@ -368,11 +380,11 @@ zabbix_export:
                 OBJECT_NAME
               FROM sys.dm_os_performance_counters
               WHERE counter_name = 'Worktables From Cache Base'
-                AND OBJECT_NAME = 'MSSQL$' + @@servicename + ':Access Methods'
+                AND OBJECT_NAME = @SQLNAME + ':Access Methods'
             ) b
               ON a.OBJECT_NAME = b.OBJECT_NAME
             WHERE a.counter_name = 'Worktables From Cache Ratio'
-              AND a.OBJECT_NAME = 'MSSQL$' + @@servicename + ':Access Methods'
+              AND a.OBJECT_NAME = @SQLNAME + ':Access Methods'
             UNION SELECT a.object_name,
               'CacheHitRatio' AS counter_name,
               '_Total' AS instance_name,
@@ -383,16 +395,17 @@ zabbix_export:
                 OBJECT_NAME
               FROM sys.dm_os_performance_counters
               WHERE counter_name = 'Cache Hit Ratio base'
-                AND OBJECT_NAME = 'MSSQL$' + @@servicename + ':Plan Cache'
+                AND OBJECT_NAME = @SQLNAME + ':Plan Cache'
                 AND instance_name = '_Total'
             ) b
               ON a.OBJECT_NAME = b.OBJECT_NAME
             WHERE a.counter_name = 'Cache Hit Ratio'
-              AND a.OBJECT_NAME = 'MSSQL$' + @@servicename + ':Plan Cache'
+              AND a.OBJECT_NAME = @SQLNAME + ':Plan Cache'
               AND instance_name = '_Total'
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
           description: 'The item gets server global status information.'
+          timeout: 30s
           tags:
             - tag: component
               value: raw
@@ -3016,7 +3029,7 @@ zabbix_export:
                     host: 'MSSQL by ODBC'
                     key: 'mssql.db.data_files_size["{#DBNAME}"]'
           master_item:
-            key: 'db.odbc.get[get_database,{$MSSQL.DSN}]'
+            key: 'db.odbc.get[get_database,"{$MSSQL.DSN}"]'
           lld_macro_paths:
             - lld_macro: '{#DBNAME}'
               path: $.dbname
@@ -3432,7 +3445,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get[get_db_mirroring","{$MSSQL.DSN}"]'
+                key: 'db.odbc.get[get_db_mirroring,"{$MSSQL.DSN}"]'
               tags:
                 - tag: component
                   value: mssql-mirroring
@@ -3456,7 +3469,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get[get_db_mirroring","{$MSSQL.DSN}"]'
+                key: 'db.odbc.get[get_db_mirroring,"{$MSSQL.DSN}"]'
               tags:
                 - tag: component
                   value: mssql-mirroring
@@ -3483,7 +3496,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get[get_db_mirroring","{$MSSQL.DSN}"]'
+                key: 'db.odbc.get[get_db_mirroring,"{$MSSQL.DSN}"]'
               tags:
                 - tag: component
                   value: mssql-mirroring
@@ -3514,7 +3527,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get[get_db_mirroring","{$MSSQL.DSN}"]'
+                key: 'db.odbc.get[get_db_mirroring,"{$MSSQL.DSN}"]'
               tags:
                 - tag: component
                   value: mssql-mirroring
@@ -3572,7 +3585,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get[get_db_mirroring","{$MSSQL.DSN}"]'
+                key: 'db.odbc.get[get_db_mirroring,"{$MSSQL.DSN}"]'
               tags:
                 - tag: component
                   value: mssql-mirroring
@@ -3603,7 +3616,7 @@ zabbix_export:
                     host: 'MSSQL by ODBC'
                     key: 'mssql.mirroring.witness_state["{#DBNAME}"]'
           master_item:
-            key: 'db.odbc.get[get_db_mirroring","{$MSSQL.DSN}"]'
+            key: 'db.odbc.get[get_db_mirroring,"{$MSSQL.DSN}"]'
           lld_macro_paths:
             - lld_macro: '{#DBNAME}'
               path: $.dbname
@@ -3739,7 +3752,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get[get_quorum,{$MSSQL.DSN}]'
+                key: 'db.odbc.get[get_quorum,"{$MSSQL.DSN}"]'
               tags:
                 - tag: cluster-name
                   value: '{#CLUSTER_NAME}'
@@ -3769,14 +3782,14 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: 'db.odbc.get[get_quorum,{$MSSQL.DSN}]'
+                key: 'db.odbc.get[get_quorum,"{$MSSQL.DSN}"]'
               tags:
                 - tag: cluster-name
                   value: '{#CLUSTER_NAME}'
                 - tag: component
                   value: quorum
           master_item:
-            key: 'db.odbc.get[get_quorum,{$MSSQL.DSN}]'
+            key: 'db.odbc.get[get_quorum,"{$MSSQL.DSN}"]'
           lld_macro_paths:
             - lld_macro: '{#CLUSTER_NAME}'
               path: $.cluster_name
@@ -3811,7 +3824,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get[get_quorum_member,{$MSSQL.DSN}]'
+                key: 'db.odbc.get[get_quorum_member,"{$MSSQL.DSN}"]'
               tags:
                 - tag: component
                   value: 'quorum members'
@@ -3839,7 +3852,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: 'db.odbc.get[get_quorum_member,{$MSSQL.DSN}]'
+                key: 'db.odbc.get[get_quorum_member,"{$MSSQL.DSN}"]'
               tags:
                 - tag: component
                   value: 'quorum members'
@@ -3860,14 +3873,14 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: 'db.odbc.get[get_quorum_member,{$MSSQL.DSN}]'
+                key: 'db.odbc.get[get_quorum_member,"{$MSSQL.DSN}"]'
               tags:
                 - tag: component
                   value: 'quorum members'
                 - tag: quorum-members-name
                   value: '{#MEMBER_NAME}'
           master_item:
-            key: 'db.odbc.get[get_quorum_member,{$MSSQL.DSN}]'
+            key: 'db.odbc.get[get_quorum_member,"{$MSSQL.DSN}"]'
           lld_macro_paths:
             - lld_macro: '{#MEMBER_NAME}'
               path: $.member_name
@@ -3904,7 +3917,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get[get_replica","{$MSSQL.DSN}"]'
+                key: 'db.odbc.get[get_replica,"{$MSSQL.DSN}"]'
               tags:
                 - tag: availability-group
                   value: '{#GROUP_NAME}'
@@ -3932,7 +3945,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get[get_replica","{$MSSQL.DSN}"]'
+                key: 'db.odbc.get[get_replica,"{$MSSQL.DSN}"]'
               tags:
                 - tag: availability-group
                   value: '{#GROUP_NAME}'
@@ -3960,7 +3973,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get[get_replica","{$MSSQL.DSN}"]'
+                key: 'db.odbc.get[get_replica,"{$MSSQL.DSN}"]'
               tags:
                 - tag: availability-group
                   value: '{#GROUP_NAME}'
@@ -3993,7 +4006,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get[get_replica","{$MSSQL.DSN}"]'
+                key: 'db.odbc.get[get_replica,"{$MSSQL.DSN}"]'
               tags:
                 - tag: availability-group
                   value: '{#GROUP_NAME}'
@@ -4058,7 +4071,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get[get_replica","{$MSSQL.DSN}"]'
+                key: 'db.odbc.get[get_replica,"{$MSSQL.DSN}"]'
               tags:
                 - tag: availability-group
                   value: '{#GROUP_NAME}'
@@ -4100,7 +4113,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get[get_replica","{$MSSQL.DSN}"]'
+                key: 'db.odbc.get[get_replica,"{$MSSQL.DSN}"]'
               tags:
                 - tag: availability-group
                   value: '{#GROUP_NAME}'
@@ -4129,7 +4142,7 @@ zabbix_export:
                   parameters:
                     - 1h
               master_item:
-                key: 'db.odbc.get[get_replica","{$MSSQL.DSN}"]'
+                key: 'db.odbc.get[get_replica,"{$MSSQL.DSN}"]'
               tags:
                 - tag: availability-group
                   value: '{#GROUP_NAME}'
@@ -4179,7 +4192,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
           master_item:
-            key: 'db.odbc.get[get_replica","{$MSSQL.DSN}"]'
+            key: 'db.odbc.get[get_replica,"{$MSSQL.DSN}"]'
           lld_macro_paths:
             - lld_macro: '{#GROUP_NAME}'
               path: $.group_name

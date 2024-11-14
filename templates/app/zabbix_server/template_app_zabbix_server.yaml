@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T20:47:06Z'
+  date: '2024-09-17T05:29:32Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -18,7 +18,7 @@ zabbix_export:
         - name: Templates/Applications
       items:
         - uuid: f9d60d6dcbe14cd4aaec08aec6ca1856
-          name: 'Zabbix server: Zabbix stats cluster'
+          name: 'Zabbix server: Cluster stats'
           type: INTERNAL
           key: 'zabbix[cluster,discovery,nodes]'
           history: '0'
@@ -59,11 +59,11 @@ zabbix_export:
               value: internal-process
           triggers:
             - uuid: 20963ffd33864196ab909b60d7acdc0a
-              expression: 'avg(/Zabbix server health/zabbix[process,alerter,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,alerter,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"alerter"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,alerter,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,alerter,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"alerter"}'
               name: 'Zabbix server: Utilization of alerter processes is high'
-              event_name: 'Zabbix server: Utilization of alerter processes over 75%'
+              event_name: 'Zabbix server: Utilization of alerter processes over {$ZABBIX.SERVER.UTIL.MAX:"alerter"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -81,11 +81,11 @@ zabbix_export:
               value: internal-process
           triggers:
             - uuid: c7f8ac54e4d3409788b8a456046ee461
-              expression: 'avg(/Zabbix server health/zabbix[process,alert manager,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,alert manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"alert manager"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,alert manager,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,alert manager,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"alert manager"}'
               name: 'Zabbix server: Utilization of alert manager processes is high'
-              event_name: 'Zabbix server: Utilization of alert manager processes over 75%'
+              event_name: 'Zabbix server: Utilization of alert manager processes over {$ZABBIX.SERVER.UTIL.MAX:"alert manager"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -103,11 +103,11 @@ zabbix_export:
               value: internal-process
           triggers:
             - uuid: e2a487335f2748a6b26d867290c9cfe4
-              expression: 'avg(/Zabbix server health/zabbix[process,alert syncer,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,alert syncer,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"alert syncer"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,alert syncer,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,alert syncer,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"alert syncer"}'
               name: 'Zabbix server: Utilization of alert syncer processes is high'
-              event_name: 'Zabbix server: Utilization of alert syncer processes over 75%'
+              event_name: 'Zabbix server: Utilization of alert syncer processes over {$ZABBIX.SERVER.UTIL.MAX:"alert syncer"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -125,11 +125,11 @@ zabbix_export:
               value: internal-process
           triggers:
             - uuid: 048c947b3b0a440b80ad6ebfc1a43f10
-              expression: 'avg(/Zabbix server health/zabbix[process,availability manager,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,availability manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"availability manager"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,availability manager,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,availability manager,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"availability manager"}'
               name: 'Zabbix server: Utilization of availability manager processes is high'
-              event_name: 'Zabbix server: Utilization of availability manager processes over 75%'
+              event_name: 'Zabbix server: Utilization of availability manager processes over {$ZABBIX.SERVER.UTIL.MAX:"availability manager"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -147,17 +147,17 @@ zabbix_export:
               value: internal-process
           triggers:
             - uuid: 63d681dba0b94487886a1d9b3360d1d1
-              expression: 'avg(/Zabbix server health/zabbix[process,configuration syncer,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,configuration syncer,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"configuration syncer"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,configuration syncer,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,configuration syncer,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"configuration syncer"}'
               name: 'Zabbix server: Utilization of configuration syncer processes is high'
-              event_name: 'Zabbix server: Utilization of configuration syncer processes over 75%'
+              event_name: 'Zabbix server: Utilization of configuration syncer processes over {$ZABBIX.SERVER.UTIL.MAX:"configuration syncer"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: performance
         - uuid: db7fee2552d5487fa608cf12f69aef41
-          name: 'Zabbix server: Utilization of discoverer data collector processes, in %'
+          name: 'Zabbix server: Utilization of discoverer internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,discoverer,avg,busy]'
           history: 7d
@@ -166,14 +166,14 @@ zabbix_export:
           description: 'The average percentage of the time during which the discoverer processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: internal-process
           triggers:
             - uuid: 5c470ddbda674fe0a789447dd120c36d
-              expression: 'avg(/Zabbix server health/zabbix[process,discoverer,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,discoverer,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"discoverer"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,discoverer,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,discoverer,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"discoverer"}'
               name: 'Zabbix server: Utilization of discoverer processes is high'
-              event_name: 'Zabbix server: Utilization of discoverer processes over 75%'
+              event_name: 'Zabbix server: Utilization of discoverer processes over {$ZABBIX.SERVER.UTIL.MAX:"discoverer"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -191,17 +191,17 @@ zabbix_export:
               value: internal-process
           triggers:
             - uuid: 9895b4318f50487d9c7f25abd48bb1a1
-              expression: 'avg(/Zabbix server health/zabbix[process,escalator,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,escalator,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"escalator"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,escalator,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,escalator,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"escalator"}'
               name: 'Zabbix server: Utilization of escalator processes is high'
-              event_name: 'Zabbix server: Utilization of escalator processes over 75%'
+              event_name: 'Zabbix server: Utilization of escalator processes over {$ZABBIX.SERVER.UTIL.MAX:"escalator"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: performance
         - uuid: 8de74bea977141469cf2d594bc907968
-          name: 'Zabbix server: Utilization of history poller data collector processes, in %'
+          name: 'Zabbix server: Utilization of history poller internal processes, in %'
           type: INTERNAL
           key: 'zabbix[process,history poller,avg,busy]'
           history: 7d
@@ -210,14 +210,14 @@ zabbix_export:
           description: 'The average percentage of the time during which the history poller processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: internal-process
           triggers:
             - uuid: 9a76cde4aaea4e8eb48f725e9653037b
-              expression: 'avg(/Zabbix server health/zabbix[process,history poller,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,history poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"history poller"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,history poller,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,history poller,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"history poller"}'
               name: 'Zabbix server: Utilization of history poller processes is high'
-              event_name: 'Zabbix server: Utilization of history poller processes over 75%'
+              event_name: 'Zabbix server: Utilization of history poller processes over {$ZABBIX.SERVER.UTIL.MAX:"history poller"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -235,11 +235,11 @@ zabbix_export:
               value: internal-process
           triggers:
             - uuid: a99ffd43a05e40f7abee83aa8c6c3ce5
-              expression: 'avg(/Zabbix server health/zabbix[process,history syncer,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,history syncer,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"history syncer"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,history syncer,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,history syncer,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"history syncer"}'
               name: 'Zabbix server: Utilization of history syncer processes is high'
-              event_name: 'Zabbix server: Utilization of history syncer processes over 75%'
+              event_name: 'Zabbix server: Utilization of history syncer processes over {$ZABBIX.SERVER.UTIL.MAX:"history syncer"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -257,11 +257,11 @@ zabbix_export:
               value: internal-process
           triggers:
             - uuid: faa349f84dc043658fe51294ad87f766
-              expression: 'avg(/Zabbix server health/zabbix[process,housekeeper,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,housekeeper,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"housekeeper"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,housekeeper,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,housekeeper,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"housekeeper"}'
               name: 'Zabbix server: Utilization of housekeeper processes is high'
-              event_name: 'Zabbix server: Utilization of housekeeper processes over 75%'
+              event_name: 'Zabbix server: Utilization of housekeeper processes over {$ZABBIX.SERVER.UTIL.MAX:"housekeeper"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -276,14 +276,14 @@ zabbix_export:
           description: 'The average percentage of the time during which the http poller processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: gathering-process
           triggers:
             - uuid: c296c1ecdba44bd5b826ab4a86bbc300
-              expression: 'avg(/Zabbix server health/zabbix[process,http poller,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,http poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"http poller"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,http poller,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,http poller,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"http poller"}'
               name: 'Zabbix server: Utilization of http poller processes is high'
-              event_name: 'Zabbix server: Utilization of http poller processes over 75%'
+              event_name: 'Zabbix server: Utilization of http poller processes over {$ZABBIX.SERVER.UTIL.MAX:"http poller"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -298,14 +298,14 @@ zabbix_export:
           description: 'The average percentage of the time during which the icmp pinger processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: gathering-process
           triggers:
             - uuid: d5c6ea5711594a9587ab8d7094f1f481
-              expression: 'avg(/Zabbix server health/zabbix[process,icmp pinger,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,icmp pinger,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"icmp pinger"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,icmp pinger,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,icmp pinger,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"icmp pinger"}'
               name: 'Zabbix server: Utilization of icmp pinger processes is high'
-              event_name: 'Zabbix server: Utilization of icmp pinger processes over 75%'
+              event_name: 'Zabbix server: Utilization of icmp pinger processes over {$ZABBIX.SERVER.UTIL.MAX:"icmp pinger"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -323,11 +323,11 @@ zabbix_export:
               value: internal-process
           triggers:
             - uuid: 9ce0c874e5924b308827e8be5a9bf0eb
-              expression: 'avg(/Zabbix server health/zabbix[process,ipmi manager,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,ipmi manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"ipmi manager"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,ipmi manager,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,ipmi manager,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"ipmi manager"}'
               name: 'Zabbix server: Utilization of ipmi manager processes is high'
-              event_name: 'Zabbix server: Utilization of ipmi manager processes over 75%'
+              event_name: 'Zabbix server: Utilization of ipmi manager processes over {$ZABBIX.SERVER.UTIL.MAX:"ipmi manager"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -342,14 +342,14 @@ zabbix_export:
           description: 'The average percentage of the time during which the ipmi poller processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: gathering-process
           triggers:
             - uuid: 5a4f841292fd4bb5bec2e28340c9e4c2
-              expression: 'avg(/Zabbix server health/zabbix[process,ipmi poller,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,ipmi poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"ipmi poller"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,ipmi poller,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,ipmi poller,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"ipmi poller"}'
               name: 'Zabbix server: Utilization of ipmi poller processes is high'
-              event_name: 'Zabbix server: Utilization of ipmi poller processes over 75%'
+              event_name: 'Zabbix server: Utilization of ipmi poller processes over {$ZABBIX.SERVER.UTIL.MAX:"ipmi poller"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -364,14 +364,14 @@ zabbix_export:
           description: 'The average percentage of the time during which the java poller processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: gathering-process
           triggers:
             - uuid: d7705ba9c3f74554ac21c59c9a0dcc11
-              expression: 'avg(/Zabbix server health/zabbix[process,java poller,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,java poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"java poller"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,java poller,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,java poller,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"java poller"}'
               name: 'Zabbix server: Utilization of java poller processes is high'
-              event_name: 'Zabbix server: Utilization of java poller processes over 75%'
+              event_name: 'Zabbix server: Utilization of java poller processes over {$ZABBIX.SERVER.UTIL.MAX:"java poller"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -383,17 +383,17 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The average percentage of the time during which the lld manager processes have been busy for the last minute.'
+          description: 'The average percentage of the time during which the LLD manager processes have been busy for the last minute.'
           tags:
             - tag: component
               value: internal-process
           triggers:
             - uuid: 39109dabd9454844996864834292c0c4
-              expression: 'avg(/Zabbix server health/zabbix[process,lld manager,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,lld manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"LLD manager"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,lld manager,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of lld manager processes is high'
-              event_name: 'Zabbix server: Utilization of lld manager processes over 75%'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,lld manager,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"LLD manager"}'
+              name: 'Zabbix server: Utilization of LLD manager processes is high'
+              event_name: 'Zabbix server: Utilization of LLD manager processes over {$ZABBIX.SERVER.UTIL.MAX:"LLD manager"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -405,17 +405,17 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The average percentage of the time during which the lld worker processes have been busy for the last minute.'
+          description: 'The average percentage of the time during which the LLD worker processes have been busy for the last minute.'
           tags:
             - tag: component
               value: internal-process
           triggers:
             - uuid: 8eca01d6e0e64f5795d3a5b5e4aa593d
-              expression: 'avg(/Zabbix server health/zabbix[process,lld worker,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,lld worker,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"LLD worker"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,lld worker,avg,busy],10m)<65'
-              name: 'Zabbix server: Utilization of lld worker processes is high'
-              event_name: 'Zabbix server: Utilization of lld worker processes over 75%'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,lld worker,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"LLD worker"}'
+              name: 'Zabbix server: Utilization of LLD worker processes is high'
+              event_name: 'Zabbix server: Utilization of LLD worker processes over {$ZABBIX.SERVER.UTIL.MAX:"LLD worker"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -430,14 +430,14 @@ zabbix_export:
           description: 'The average percentage of the time during which the ODBC poller processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: gathering-process
           triggers:
             - uuid: f536b921e9444c6eb0ac805ab9302af9
-              expression: 'avg(/Zabbix server health/zabbix[process,odbc poller,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,odbc poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"ODBC poller"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,odbc poller,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,odbc poller,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"ODBC poller"}'
               name: 'Zabbix server: Utilization of ODBC poller processes is high'
-              event_name: 'Zabbix server: Utilization of ODBC poller processes over 75%'
+              event_name: 'Zabbix server: Utilization of ODBC poller processes over {$ZABBIX.SERVER.UTIL.MAX:"ODBC poller"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -452,14 +452,14 @@ zabbix_export:
           description: 'The average percentage of the time during which the poller processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: gathering-process
           triggers:
             - uuid: bb50da4052134ef1a478bface291b50a
-              expression: 'avg(/Zabbix server health/zabbix[process,poller,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"poller"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,poller,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,poller,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"poller"}'
               name: 'Zabbix server: Utilization of poller processes is high'
-              event_name: 'Zabbix server: Utilization of poller processes over 75%'
+              event_name: 'Zabbix server: Utilization of poller processes over {$ZABBIX.SERVER.UTIL.MAX:"poller"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -477,11 +477,11 @@ zabbix_export:
               value: internal-process
           triggers:
             - uuid: 6e7a117afa7e41e2a783f8afc42434fa
-              expression: 'avg(/Zabbix server health/zabbix[process,preprocessing manager,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,preprocessing manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"preprocessing manager"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,preprocessing manager,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,preprocessing manager,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"preprocessing manager"}'
               name: 'Zabbix server: Utilization of preprocessing manager processes is high'
-              event_name: 'Zabbix server: Utilization of preprocessing manager processes over 75%'
+              event_name: 'Zabbix server: Utilization of preprocessing manager processes over {$ZABBIX.SERVER.UTIL.MAX:"preprocessing manager"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -499,11 +499,11 @@ zabbix_export:
               value: internal-process
           triggers:
             - uuid: e2cbdcc8b4844943a67d1f51587e599c
-              expression: 'avg(/Zabbix server health/zabbix[process,preprocessing worker,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,preprocessing worker,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"preprocessing worker"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,preprocessing worker,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,preprocessing worker,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"preprocessing worker"}'
               name: 'Zabbix server: Utilization of preprocessing worker processes is high'
-              event_name: 'Zabbix server: Utilization of preprocessing worker processes over 75%'
+              event_name: 'Zabbix server: Utilization of preprocessing worker processes over {$ZABBIX.SERVER.UTIL.MAX:"preprocessing worker"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -518,14 +518,14 @@ zabbix_export:
           description: 'The average percentage of the time during which the proxy poller processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: gathering-process
           triggers:
             - uuid: 6a884c1fbf254637bb74b68571ee2ffa
-              expression: 'avg(/Zabbix server health/zabbix[process,proxy poller,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,proxy poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"proxy poller"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,proxy poller,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,proxy poller,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"proxy poller"}'
               name: 'Zabbix server: Utilization of proxy poller processes is high'
-              event_name: 'Zabbix server: Utilization of proxy poller processes over 75%'
+              event_name: 'Zabbix server: Utilization of proxy poller processes over {$ZABBIX.SERVER.UTIL.MAX:"proxy poller"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -543,11 +543,11 @@ zabbix_export:
               value: internal-process
           triggers:
             - uuid: 82f774b4a47247f49db1ab0480a69eae
-              expression: 'avg(/Zabbix server health/zabbix[process,report manager,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,report manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"report manager"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,report manager,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,report manager,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"report manager"}'
               name: 'Zabbix server: Utilization of report manager processes is high'
-              event_name: 'Zabbix server: Utilization of report manager processes over 75%'
+              event_name: 'Zabbix server: Utilization of report manager processes over {$ZABBIX.SERVER.UTIL.MAX:"report manager"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -565,11 +565,11 @@ zabbix_export:
               value: internal-process
           triggers:
             - uuid: 03158d902b854b3495aa76042f361bea
-              expression: 'avg(/Zabbix server health/zabbix[process,report writer,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,report writer,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"report writer"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,report writer,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,report writer,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"report writer"}'
               name: 'Zabbix server: Utilization of report writer processes is high'
-              event_name: 'Zabbix server: Utilization of report writer processes over 75%'
+              event_name: 'Zabbix server: Utilization of report writer processes over {$ZABBIX.SERVER.UTIL.MAX:"report writer"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -587,11 +587,11 @@ zabbix_export:
               value: internal-process
           triggers:
             - uuid: bf730ed3313f45248f483289c704f5e9
-              expression: 'avg(/Zabbix server health/zabbix[process,self-monitoring,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,self-monitoring,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"self-monitoring"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,self-monitoring,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,self-monitoring,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"self-monitoring"}'
               name: 'Zabbix server: Utilization of self-monitoring processes is high'
-              event_name: 'Zabbix server: Utilization of self-monitoring processes over 75%'
+              event_name: 'Zabbix server: Utilization of self-monitoring processes over {$ZABBIX.SERVER.UTIL.MAX:"self-monitoring"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -609,11 +609,11 @@ zabbix_export:
               value: internal-process
           triggers:
             - uuid: c4cdbce205e843d6b882503961a15376
-              expression: 'avg(/Zabbix server health/zabbix[process,service manager,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,service manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"service manager"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,service manager,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,service manager,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"service manager"}'
               name: 'Zabbix server: Utilization of service manager processes is high'
-              event_name: 'Zabbix server: Utilization of service manager processes over 75%'
+              event_name: 'Zabbix server: Utilization of service manager processes over {$ZABBIX.SERVER.UTIL.MAX:"service manager"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -628,14 +628,14 @@ zabbix_export:
           description: 'The average percentage of the time during which the snmp trapper processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: gathering-process
           triggers:
             - uuid: 821611786e5e49bf941cbca370d6ed6b
-              expression: 'avg(/Zabbix server health/zabbix[process,snmp trapper,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,snmp trapper,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"snmp trapper"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,snmp trapper,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,snmp trapper,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"snmp trapper"}'
               name: 'Zabbix server: Utilization of snmp trapper processes is high'
-              event_name: 'Zabbix server: Utilization of snmp trapper processes over 75%'
+              event_name: 'Zabbix server: Utilization of snmp trapper processes over {$ZABBIX.SERVER.UTIL.MAX:"snmp trapper"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -653,11 +653,11 @@ zabbix_export:
               value: internal-process
           triggers:
             - uuid: 37c1c6ec07474a8a95b06c3c28e4bf96
-              expression: 'avg(/Zabbix server health/zabbix[process,task manager,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,task manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"task manager"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,task manager,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,task manager,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"task manager"}'
               name: 'Zabbix server: Utilization of task manager processes is high'
-              event_name: 'Zabbix server: Utilization of task manager processes over 75%'
+              event_name: 'Zabbix server: Utilization of task manager processes over {$ZABBIX.SERVER.UTIL.MAX:"task manager"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -675,11 +675,11 @@ zabbix_export:
               value: internal-process
           triggers:
             - uuid: 0c7715df608f4736a7077ff2f6098adc
-              expression: 'avg(/Zabbix server health/zabbix[process,timer,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,timer,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"timer"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,timer,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,timer,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"timer"}'
               name: 'Zabbix server: Utilization of timer processes is high'
-              event_name: 'Zabbix server: Utilization of timer processes over 75%'
+              event_name: 'Zabbix server: Utilization of timer processes over {$ZABBIX.SERVER.UTIL.MAX:"timer"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -694,14 +694,14 @@ zabbix_export:
           description: 'The average percentage of the time during which the trapper processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: gathering-process
           triggers:
             - uuid: 197c04bbf5204ce7ac80630f2948b6b0
-              expression: 'avg(/Zabbix server health/zabbix[process,trapper,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,trapper,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"trapper"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,trapper,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,trapper,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"trapper"}'
               name: 'Zabbix server: Utilization of trapper processes is high'
-              event_name: 'Zabbix server: Utilization of trapper processes over 75%'
+              event_name: 'Zabbix server: Utilization of trapper processes over {$ZABBIX.SERVER.UTIL.MAX:"trapper"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -719,11 +719,11 @@ zabbix_export:
               value: internal-process
           triggers:
             - uuid: 5ffa02f393d34c49bcb9eed2b2b89704
-              expression: 'avg(/Zabbix server health/zabbix[process,trigger housekeeper,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,trigger housekeeper,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"trigger housekeeper"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,trigger housekeeper,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,trigger housekeeper,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"trigger housekeeper"}'
               name: 'Zabbix server: Utilization of trigger housekeeper processes is high'
-              event_name: 'Zabbix server: Utilization of trigger housekeeper processes over 75%'
+              event_name: 'Zabbix server: Utilization of trigger housekeeper processes over {$ZABBIX.SERVER.UTIL.MAX:"trigger housekeeper"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -738,20 +738,20 @@ zabbix_export:
           description: 'The average percentage of the time during which the unreachable poller processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: gathering-process
           triggers:
             - uuid: b0168864ef6849f185deb6ef22a056fa
-              expression: 'avg(/Zabbix server health/zabbix[process,unreachable poller,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,unreachable poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"unreachable poller"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,unreachable poller,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,unreachable poller,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"unreachable poller"}'
               name: 'Zabbix server: Utilization of unreachable poller processes is high'
-              event_name: 'Zabbix server: Utilization of unreachable poller processes over 75%'
+              event_name: 'Zabbix server: Utilization of unreachable poller processes over {$ZABBIX.SERVER.UTIL.MAX:"unreachable poller"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: performance
         - uuid: bad00e43cd064a0fb3a4b65b71bea926
-          name: 'Zabbix server: Utilization of vmware data collector processes, in %'
+          name: 'Zabbix server: Utilization of vmware collector data collector processes, in %'
           type: INTERNAL
           key: 'zabbix[process,vmware collector,avg,busy]'
           history: 7d
@@ -760,14 +760,14 @@ zabbix_export:
           description: 'The average percentage of the time during which the vmware collector processes have been busy for the last minute.'
           tags:
             - tag: component
-              value: data-collector
+              value: gathering-process
           triggers:
             - uuid: 7e0881bb1b384deba18439ae098a7fbd
-              expression: 'avg(/Zabbix server health/zabbix[process,vmware collector,avg,busy],10m)>75'
+              expression: 'avg(/Zabbix server health/zabbix[process,vmware collector,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"vmware collector"}'
               recovery_mode: RECOVERY_EXPRESSION
-              recovery_expression: 'avg(/Zabbix server health/zabbix[process,vmware collector,avg,busy],10m)<65'
+              recovery_expression: 'avg(/Zabbix server health/zabbix[process,vmware collector,avg,busy],10m)<{$ZABBIX.SERVER.UTIL.MIN:"vmware collector"}'
               name: 'Zabbix server: Utilization of vmware collector processes is high'
-              event_name: 'Zabbix server: Utilization of vmware collector processes over 75%'
+              event_name: 'Zabbix server: Utilization of vmware collector processes over {$ZABBIX.SERVER.UTIL.MAX:"vmware collector"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -786,7 +786,6 @@ zabbix_export:
               expression: 'min(/Zabbix server health/zabbix[queue,10m],10m)>100'
               name: 'Zabbix server: More than 100 items having missing data for more than 10 minutes'
               priority: WARNING
-              description: 'The `zabbix[stats,{$IP},{$PORT},queue,10m]` item collects data about the number of items that have been missing the data for more than 10 minutes.'
               tags:
                 - tag: scope
                   value: performance
@@ -812,8 +811,8 @@ zabbix_export:
               value: system
           triggers:
             - uuid: 088a0e0ac64442a29de4d86f11c87438
-              expression: 'max(/Zabbix server health/zabbix[rcache,buffer,pused],10m)>75'
-              name: 'Zabbix server: More than 75% used in the configuration cache'
+              expression: 'max(/Zabbix server health/zabbix[rcache,buffer,pused],10m)>{$ZABBIX.SERVER.UTIL.MAX:"configuration cache"}'
+              name: 'Zabbix server: More than {$ZABBIX.SERVER.UTIL.MAX:"configuration cache"}% used in the configuration cache'
               priority: AVERAGE
               description: 'Consider increasing `CacheSize` in the `zabbix_server.conf` configuration file.'
               tags:
@@ -858,8 +857,8 @@ zabbix_export:
               value: system
           triggers:
             - uuid: cdca16919f6648ebbe6119e7c23a98c7
-              expression: 'max(/Zabbix server health/zabbix[vcache,buffer,pused],10m)>95'
-              name: 'Zabbix server: More than 95% used in the value cache'
+              expression: 'max(/Zabbix server health/zabbix[vcache,buffer,pused],10m)>{$ZABBIX.SERVER.UTIL.MAX:"value cache"}'
+              name: 'Zabbix server: More than {$ZABBIX.SERVER.UTIL.MAX:"value cache"}% used in the value cache'
               priority: AVERAGE
               description: 'Consider increasing `ValueCacheSize` in the `zabbix_server.conf` configuration file.'
               tags:
@@ -873,7 +872,7 @@ zabbix_export:
           key: 'zabbix[vcache,cache,hits]'
           history: 7d
           value_type: FLOAT
-          units: vps
+          units: '!vps'
           description: 'The effectiveness statistics of Zabbix value cache. The number of cache hits (history values taken from the cache).'
           preprocessing:
             - type: CHANGE_PER_SECOND
@@ -888,7 +887,7 @@ zabbix_export:
           key: 'zabbix[vcache,cache,misses]'
           history: 7d
           value_type: FLOAT
-          units: vps
+          units: '!vps'
           description: 'The effectiveness statistics of Zabbix value cache. The number of cache misses (history values taken from the database).'
           preprocessing:
             - type: CHANGE_PER_SECOND
@@ -902,6 +901,7 @@ zabbix_export:
           type: INTERNAL
           key: 'zabbix[vcache,cache,mode]'
           history: 7d
+          units: '!vps'
           description: 'The operating mode of the value cache.'
           valuemap:
             name: 'Value cache operating mode'
@@ -958,8 +958,8 @@ zabbix_export:
               value: system
           triggers:
             - uuid: 2df2ed6520c44ee880f35912f869583e
-              expression: 'max(/Zabbix server health/zabbix[vmware,buffer,pused],10m)>75'
-              name: 'Zabbix server: More than 75% used in the vmware cache'
+              expression: 'max(/Zabbix server health/zabbix[vmware,buffer,pused],10m)>{$ZABBIX.SERVER.UTIL.MAX:"vmware cache"}'
+              name: 'Zabbix server: More than {$ZABBIX.SERVER.UTIL.MAX:"vmware cache"}% used in the vmware cache'
               priority: AVERAGE
               description: 'Consider increasing `VMwareCacheSize` in the `zabbix_server.conf` configuration file.'
               tags:
@@ -982,8 +982,8 @@ zabbix_export:
               value: system
           triggers:
             - uuid: 5d63483588964e49b1f870dfb770bf04
-              expression: 'max(/Zabbix server health/zabbix[wcache,history,pused],10m)>75'
-              name: 'Zabbix server: More than 75% used in the history cache'
+              expression: 'max(/Zabbix server health/zabbix[wcache,history,pused],10m)>{$ZABBIX.SERVER.UTIL.MAX:"history cache"}'
+              name: 'Zabbix server: More than {$ZABBIX.SERVER.UTIL.MAX:"history cache"}% used in the history cache'
               priority: AVERAGE
               description: 'Consider increasing `HistoryCacheSize` in the `zabbix_server.conf` configuration file.'
               tags:
@@ -1006,8 +1006,8 @@ zabbix_export:
               value: system
           triggers:
             - uuid: 24245fbc55b743319162dd1edb37c5a0
-              expression: 'max(/Zabbix server health/zabbix[wcache,index,pused],10m)>75'
-              name: 'Zabbix server: More than 75% used in the history index cache'
+              expression: 'max(/Zabbix server health/zabbix[wcache,index,pused],10m)>{$ZABBIX.SERVER.UTIL.MAX:"index cache"}'
+              name: 'Zabbix server: More than {$ZABBIX.SERVER.UTIL.MAX:"index cache"}% used in the history index cache'
               priority: AVERAGE
               description: 'Consider increasing `HistoryIndexCacheSize` in the `zabbix_server.conf` configuration file.'
               tags:
@@ -1030,8 +1030,8 @@ zabbix_export:
               value: system
           triggers:
             - uuid: 34426156de6b4690918117a23ccc1138
-              expression: 'max(/Zabbix server health/zabbix[wcache,trend,pused],10m)>75'
-              name: 'Zabbix server: More than 75% used in the trends cache'
+              expression: 'max(/Zabbix server health/zabbix[wcache,trend,pused],10m)>{$ZABBIX.SERVER.UTIL.MAX:"trend cache"}'
+              name: 'Zabbix server: More than {$ZABBIX.SERVER.UTIL.MAX:"trend cache"}% used in the trends cache'
               priority: AVERAGE
               description: 'Consider increasing `TrendCacheSize` in the `zabbix_server.conf` configuration file.'
               tags:
@@ -1045,14 +1045,17 @@ zabbix_export:
           key: 'zabbix[wcache,values,float]'
           history: 7d
           value_type: FLOAT
+          units: '!vps'
           description: |
             The statistics and availability of Zabbix write cache.
-            The number of processed float values.
+            The number of processed numeric (float) values.
           preprocessing:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
           tags:
+            - tag: component
+              value: nvps
             - tag: component
               value: system
         - uuid: dae76dc6c4ce4707be7cf9534efc0233
@@ -1061,6 +1064,7 @@ zabbix_export:
           key: 'zabbix[wcache,values,log]'
           history: 7d
           value_type: FLOAT
+          units: '!vps'
           description: |
             The statistics and availability of Zabbix write cache.
             The number of processed log values.
@@ -1070,6 +1074,8 @@ zabbix_export:
                 - ''
           tags:
             - tag: component
+              value: nvps
+            - tag: component
               value: system
         - uuid: c99a99cf7e1e44918736ab860694d3a4
           name: 'Zabbix server: Number of processed not supported values per second'
@@ -1077,6 +1083,7 @@ zabbix_export:
           key: 'zabbix[wcache,values,not supported]'
           history: 7d
           value_type: FLOAT
+          units: '!vps'
           description: |
             The statistics and availability of Zabbix write cache.
             The number of times the item processing resulted in an item becoming unsupported or keeping that state.
@@ -1086,6 +1093,8 @@ zabbix_export:
                 - ''
           tags:
             - tag: component
+              value: nvps
+            - tag: component
               value: system
         - uuid: b58fdd85cd6a48489d0b983ee8ebe97b
           name: 'Zabbix server: Number of processed character values per second'
@@ -1093,14 +1102,17 @@ zabbix_export:
           key: 'zabbix[wcache,values,str]'
           history: 7d
           value_type: FLOAT
+          units: '!vps'
           description: |
             The statistics and availability of Zabbix write cache.
-            The number of processed character/string values.
+            The number of processed character values.
           preprocessing:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
           tags:
+            - tag: component
+              value: nvps
             - tag: component
               value: system
         - uuid: 5397d6d4dedc44c29ff25b8fd5611003
@@ -1109,6 +1121,7 @@ zabbix_export:
           key: 'zabbix[wcache,values,text]'
           history: 7d
           value_type: FLOAT
+          units: '!vps'
           description: |
             The statistics and availability of Zabbix write cache.
             The number of processed text values.
@@ -1118,6 +1131,8 @@ zabbix_export:
                 - ''
           tags:
             - tag: component
+              value: nvps
+            - tag: component
               value: system
         - uuid: 47132a8565c943c0abbd4918d6af9339
           name: 'Zabbix server: Number of processed numeric (unsigned) values per second'
@@ -1125,6 +1140,7 @@ zabbix_export:
           key: 'zabbix[wcache,values,uint]'
           history: 7d
           value_type: FLOAT
+          units: '!vps'
           description: |
             The statistics and availability of Zabbix write cache.
             The number of processed numeric (unsigned) values.
@@ -1134,6 +1150,8 @@ zabbix_export:
                 - ''
           tags:
             - tag: component
+              value: nvps
+            - tag: component
               value: system
         - uuid: db364af6bcb24881850f3979933fccb0
           name: 'Zabbix server: Number of processed values per second'
@@ -1141,6 +1159,7 @@ zabbix_export:
           key: 'zabbix[wcache,values]'
           history: 7d
           value_type: FLOAT
+          units: '!vps'
           description: |
             The statistics and availability of Zabbix write cache.
             The total number of values processed by Zabbix server or Zabbix proxy, except unsupported items.
@@ -1149,6 +1168,8 @@ zabbix_export:
               parameters:
                 - ''
           tags:
+            - tag: component
+              value: nvps
             - tag: component
               value: system
       discovery_rules:
@@ -1162,7 +1183,7 @@ zabbix_export:
             - uuid: c5cb7ffbd314494cb1801ae804e9c76e
               name: 'Cluster node [{#NODE.NAME}]: Address'
               type: DEPENDENT
-              key: 'zabbix.nodes.address[{#NODE.ID}]'
+              key: 'zabbix.node.address[{#NODE.ID}]'
               delay: '0'
               history: 7d
               trends: '0'
@@ -1176,7 +1197,7 @@ zabbix_export:
                   parameters:
                     - 12h
               master_item:
-                key: 'zabbix.nodes.stats[{#NODE.ID}]'
+                key: 'zabbix.node.stats[{#NODE.ID}]'
               tags:
                 - tag: component
                   value: cluster
@@ -1187,7 +1208,7 @@ zabbix_export:
             - uuid: f444de7cdd7a4f3bb7f4b1f2e86e16d7
               name: 'Cluster node [{#NODE.NAME}]: Last access age'
               type: DEPENDENT
-              key: 'zabbix.nodes.lastaccess.age[{#NODE.ID}]'
+              key: 'zabbix.node.lastaccess.age[{#NODE.ID}]'
               delay: '0'
               history: 7d
               units: uptime
@@ -1197,7 +1218,7 @@ zabbix_export:
                   parameters:
                     - $.lastaccess_age
               master_item:
-                key: 'zabbix.nodes.stats[{#NODE.ID}]'
+                key: 'zabbix.node.stats[{#NODE.ID}]'
               tags:
                 - tag: component
                   value: cluster
@@ -1208,7 +1229,7 @@ zabbix_export:
             - uuid: 2e33f747803b45d7a9b94c171bf36f61
               name: 'Cluster node [{#NODE.NAME}]: Last access time'
               type: DEPENDENT
-              key: 'zabbix.nodes.lastaccess.time[{#NODE.ID}]'
+              key: 'zabbix.node.lastaccess.time[{#NODE.ID}]'
               delay: '0'
               history: 7d
               units: unixtime
@@ -1218,7 +1239,7 @@ zabbix_export:
                   parameters:
                     - $.lastaccess
               master_item:
-                key: 'zabbix.nodes.stats[{#NODE.ID}]'
+                key: 'zabbix.node.stats[{#NODE.ID}]'
               tags:
                 - tag: component
                   value: cluster
@@ -1229,7 +1250,7 @@ zabbix_export:
             - uuid: 4cf654a5bbb74ad69847b4ff15d0b623
               name: 'Cluster node [{#NODE.NAME}]: Stats'
               type: DEPENDENT
-              key: 'zabbix.nodes.stats[{#NODE.ID}]'
+              key: 'zabbix.node.stats[{#NODE.ID}]'
               delay: '0'
               history: '0'
               trends: '0'
@@ -1253,7 +1274,7 @@ zabbix_export:
             - uuid: 1e4de6a913764a22862c0265d329b592
               name: 'Cluster node [{#NODE.NAME}]: Status'
               type: DEPENDENT
-              key: 'zabbix.nodes.status[{#NODE.ID}]'
+              key: 'zabbix.node.status[{#NODE.ID}]'
               delay: '0'
               history: 7d
               description: 'The status of a node.'
@@ -1267,7 +1288,7 @@ zabbix_export:
                   parameters:
                     - 12h
               master_item:
-                key: 'zabbix.nodes.stats[{#NODE.ID}]'
+                key: 'zabbix.node.stats[{#NODE.ID}]'
               tags:
                 - tag: component
                   value: cluster
@@ -1277,7 +1298,7 @@ zabbix_export:
                   value: '{#NODE.NAME}'
               trigger_prototypes:
                 - uuid: 8d48978fb5724d19a950aa6eb8a3dd75
-                  expression: 'last(/Zabbix server health/zabbix.nodes.status[{#NODE.ID}],#1)<>last(/Zabbix server health/zabbix.nodes.status[{#NODE.ID}],#2)'
+                  expression: 'last(/Zabbix server health/zabbix.node.status[{#NODE.ID}],#1)<>last(/Zabbix server health/zabbix.node.status[{#NODE.ID}],#2)'
                   name: 'Cluster node [{#NODE.NAME}]: Status changed'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
@@ -1293,6 +1314,23 @@ zabbix_export:
               path: $.id
             - lld_macro: '{#NODE.NAME}'
               path: $.name
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var hacluster = JSON.parse(value);
+                  
+                  result = hacluster.map(function (hanode) {
+                      return {
+                          'id': hanode.id,
+                          'name': hanode.name
+                      };
+                  });
+                  
+                  return JSON.stringify(result);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: software
@@ -1300,33 +1338,70 @@ zabbix_export:
           value: server
         - tag: target
           value: zabbix
+      macros:
+        - macro: '{$ZABBIX.SERVER.UTIL.MAX}'
+          value: '75'
+          description: 'Default maximum threshold for percentage utilization triggers (use macro context for specification).'
+        - macro: '{$ZABBIX.SERVER.UTIL.MAX:"value cache"}'
+          value: '95'
+          description: 'Maximum threshold for value cache utilization trigger.'
+        - macro: '{$ZABBIX.SERVER.UTIL.MIN}'
+          value: '65'
+          description: 'Default minimum threshold for percentage utilization triggers (use macro context for specification).'
       dashboards:
         - uuid: 6815a90fb9b745fd8f1b1f47697893d6
           name: 'Zabbix server health'
+          auto_start: 'NO'
           pages:
-            - widgets:
+            - name: Performance
+              widgets:
                 - type: GRAPH_CLASSIC
-                  width: '12'
+                  name: 'Cache usage, in %'
+                  width: '24'
+                  height: '7'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Zabbix server health'
+                        name: 'Zabbix server: Cache usage, in %'
+                - type: GRAPH_CLASSIC
+                  name: 'Server performance'
+                  'y': '7'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: GRAPH
                       name: graphid
                       value:
                         host: 'Zabbix server health'
-                        name: 'Zabbix server: Zabbix server performance'
+                        name: 'Zabbix server: Server performance'
                 - type: GRAPH_CLASSIC
-                  'y': '5'
-                  width: '12'
+                  name: 'Values processed'
+                  'y': '12'
+                  width: '24'
+                  height: '6'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Zabbix server health'
+                        name: 'Zabbix server: Values processed'
+                - type: GRAPH_CLASSIC
+                  name: 'Internal queues'
+                  'y': '18'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: GRAPH
                       name: graphid
                       value:
                         host: 'Zabbix server health'
-                        name: 'Zabbix server: Zabbix internal process busy %'
+                        name: 'Zabbix server: Internal queues'
                 - type: GRAPH_CLASSIC
-                  'y': '10'
-                  width: '12'
+                  name: 'Value cache effectiveness'
+                  'y': '23'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: GRAPH
@@ -1335,81 +1410,127 @@ zabbix_export:
                         host: 'Zabbix server health'
                         name: 'Zabbix server: Value cache effectiveness'
                 - type: GRAPH_CLASSIC
-                  x: '12'
-                  width: '12'
+                  name: 'Trend cache effectiveness, in %'
+                  'y': '28'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: GRAPH
                       name: graphid
                       value:
                         host: 'Zabbix server health'
-                        name: 'Zabbix server: Zabbix data gathering process busy %'
+                        name: 'Zabbix server: Trend cache effectiveness, in %'
+            - name: Processes
+              widgets:
                 - type: GRAPH_CLASSIC
-                  x: '12'
-                  'y': '5'
-                  width: '12'
-                  height: '5'
+                  name: 'Utilization: Internal processes: Core'
+                  width: '24'
+                  height: '7'
                   fields:
                     - type: GRAPH
                       name: graphid
                       value:
                         host: 'Zabbix server health'
-                        name: 'Zabbix server: Zabbix cache usage, % free'
+                        name: 'Zabbix server: Utilization: Internal processes: Core'
                 - type: GRAPH_CLASSIC
-                  x: '12'
-                  'y': '10'
-                  width: '12'
+                  name: 'Utilization: Internal processes: Housekeeping'
+                  'y': '7'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: GRAPH
                       name: graphid
                       value:
                         host: 'Zabbix server health'
-                        name: 'Zabbix server: Zabbix internal queues'
-        - uuid: 32994a87287449eab12bed911880ef13
-          name: 'Zabbix server processes'
-          pages:
-            - widgets:
+                        name: 'Zabbix server: Utilization: Internal processes: Housekeeping'
                 - type: GRAPH_CLASSIC
-                  width: '12'
-                  height: '5'
+                  name: 'Utilization: Gathering processes'
+                  'y': '12'
+                  width: '24'
+                  height: '7'
                   fields:
                     - type: GRAPH
                       name: graphid
                       value:
                         host: 'Zabbix server health'
-                        name: 'Zabbix server: Data handling processes'
+                        name: 'Zabbix server: Utilization: Gathering processes'
                 - type: GRAPH_CLASSIC
-                  'y': '5'
-                  width: '12'
+                  name: 'Utilization: Gathering processes: Web'
+                  'y': '19'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: GRAPH
                       name: graphid
                       value:
                         host: 'Zabbix server health'
-                        name: 'Zabbix server: Internal processes'
+                        name: 'Zabbix server: Utilization: Gathering processes: Web'
                 - type: GRAPH_CLASSIC
-                  x: '12'
-                  width: '12'
+                  name: 'Utilization: Gathering processes: Trappers'
+                  'y': '24'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: GRAPH
                       name: graphid
                       value:
                         host: 'Zabbix server health'
-                        name: 'Zabbix server: Reporting processes'
+                        name: 'Zabbix server: Utilization: Gathering processes: Trappers'
                 - type: GRAPH_CLASSIC
-                  x: '12'
-                  'y': '5'
-                  width: '12'
+                  name: 'Utilization: Availability processes'
+                  'y': '29'
+                  width: '24'
+                  height: '6'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Zabbix server health'
+                        name: 'Zabbix server: Utilization: Availability processes'
+                - type: GRAPH_CLASSIC
+                  name: 'Utilization: Calculation processes'
+                  'y': '35'
+                  width: '24'
+                  height: '6'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Zabbix server health'
+                        name: 'Zabbix server: Utilization: Calculation processes'
+                - type: GRAPH_CLASSIC
+                  name: 'Utilization: Discovery processes'
+                  'y': '41'
+                  width: '24'
+                  height: '6'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Zabbix server health'
+                        name: 'Zabbix server: Utilization: Discovery processes'
+                - type: GRAPH_CLASSIC
+                  name: 'Utilization: Reporting processes'
+                  'y': '47'
+                  width: '24'
+                  height: '6'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Zabbix server health'
+                        name: 'Zabbix server: Utilization: Reporting processes'
+                - type: GRAPH_CLASSIC
+                  name: 'Utilization: Proxy management and data exchange'
+                  'y': '53'
+                  width: '24'
                   height: '5'
                   fields:
                     - type: GRAPH
                       name: graphid
                       value:
                         host: 'Zabbix server health'
-                        name: 'Zabbix server: Data gathering processes'
+                        name: 'Zabbix server: Utilization: Proxy management and data exchange'
       valuemaps:
         - uuid: cee1681b12ff49b6b7d442a851e870b4
           name: 'Cluster node status'
@@ -1422,6 +1543,13 @@ zabbix_export:
               newvalue: Unavailable
             - value: '3'
               newvalue: Active
+        - uuid: 0d2da53a4e404248b9d156b5a7342002
+          name: 'Service state'
+          mappings:
+            - value: '0'
+              newvalue: 'Off'
+            - value: '1'
+              newvalue: 'On'
         - uuid: 97bbea700550483bbd8405b4dd9d8005
           name: 'Value cache operating mode'
           mappings:
@@ -1430,429 +1558,386 @@ zabbix_export:
             - value: '1'
               newvalue: 'Low memory'
   graphs:
-    - uuid: a6eb4d7df7ec4388bc37f7d27cc26a9f
-      name: 'Zabbix server: Data gathering processes'
+    - uuid: 4c219cd994d5425fa3107805ad76cbcb
+      name: 'Zabbix server: Cache usage, in %'
       ymin_type_1: FIXED
       ymax_type_1: FIXED
       graph_items:
-        - color: '990099'
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,trapper,avg,busy]'
-        - sortorder: '1'
-          color: '990000'
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,poller,avg,busy]'
-        - sortorder: '2'
-          color: 0000EE
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,ipmi poller,avg,busy]'
-        - sortorder: '3'
-          color: FF33FF
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,ipmi manager,avg,busy]'
-        - sortorder: '4'
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,icmp pinger,avg,busy]'
-        - sortorder: '5'
-          color: '003300'
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,http poller,avg,busy]'
-        - sortorder: '6'
-          color: 33FFFF
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,unreachable poller,avg,busy]'
-        - sortorder: '7'
-          color: DD0000
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,java poller,avg,busy]'
-        - sortorder: '8'
-          color: '000099'
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,snmp trapper,avg,busy]'
-        - sortorder: '9'
-          color: 00FF00
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,vmware collector,avg,busy]'
-        - sortorder: '10'
-          color: 5A2B57
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,history poller,avg,busy]'
-        - sortorder: '11'
-          color: 9FA8DA
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,odbc poller,avg,busy]'
-    - uuid: ee66abf6d914407c8133b00acad77f17
-      name: 'Zabbix server: Data handling processes'
-      ymin_type_1: FIXED
-      ymax_type_1: FIXED
-      graph_items:
-        - color: 00EE00
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,history syncer,avg,busy]'
-        - sortorder: '1'
-          color: 0000EE
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,preprocessing manager,avg,busy]'
-        - sortorder: '2'
-          color: FFAA00
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,preprocessing worker,avg,busy]'
-        - sortorder: '3'
-          color: 00EEEE
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,lld worker,avg,busy]'
-        - sortorder: '4'
-          color: '990099'
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,lld manager,avg,busy]'
-    - uuid: df8944bf1e2f4149b5fbfe945548d1d8
-      name: 'Zabbix server: Internal processes'
-      ymin_type_1: FIXED
-      ymax_type_1: FIXED
-      graph_items:
-        - color: 00EE00
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,timer,avg,busy]'
-        - sortorder: '1'
-          color: FFAA00
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,housekeeper,avg,busy]'
-        - sortorder: '2'
-          color: '990099'
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,configuration syncer,avg,busy]'
-        - sortorder: '3'
-          color: FF66FF
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,self-monitoring,avg,busy]'
-        - sortorder: '4'
-          color: '009999'
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,task manager,avg,busy]'
-        - sortorder: '5'
-          color: 2B5429
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,availability manager,avg,busy]'
-        - sortorder: '6'
-          color: 8048B4
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,discoverer,avg,busy]'
-        - sortorder: '7'
-          color: FD5434
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,proxy poller,avg,busy]'
-    - uuid: 821dc2e1b416449ca0d356a0a34f58ac
-      name: 'Zabbix server: Reporting processes'
-      ymin_type_1: FIXED
-      ymax_type_1: FIXED
-      graph_items:
-        - color: 00EE00
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,escalator,avg,busy]'
-        - sortorder: '1'
-          color: 0000EE
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,alerter,avg,busy]'
-        - sortorder: '2'
-          color: FFAA00
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,alert manager,avg,busy]'
-        - sortorder: '3'
-          color: 00EEEE
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,alert syncer,avg,busy]'
-        - sortorder: '4'
-          color: '990099'
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,report manager,avg,busy]'
-        - sortorder: '5'
-          color: EE0000
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,report writer,avg,busy]'
-    - uuid: 739c5a4a46e949c69c46073c39ce3ef8
-      name: 'Zabbix server: Trend function cache effectiveness'
-      graph_items:
-        - color: C80000
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[tcache,cache,pmisses]'
-        - sortorder: '1'
-          color: 00C800
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[tcache,cache,pitems]'
-    - uuid: d2841f4fbb33411d9ab1b1b48e7e959f
-      name: 'Zabbix server: Value cache effectiveness'
-      type: STACKED
-      graph_items:
-        - color: C80000
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[vcache,cache,misses]'
-        - sortorder: '1'
-          color: 00C800
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[vcache,cache,hits]'
-    - uuid: 0432df37a8f34cf7978531642037c1a1
-      name: 'Zabbix server: Zabbix cache usage, % free'
-      ymin_type_1: FIXED
-      ymax_type_1: FIXED
-      graph_items:
-        - color: '009900'
+        - drawtype: GRADIENT_LINE
+          color: 1f78b4
           item:
             host: 'Zabbix server health'
             key: 'zabbix[wcache,trend,pused]'
         - sortorder: '1'
-          color: DD0000
+          drawtype: GRADIENT_LINE
+          color: 33a02c
           item:
             host: 'Zabbix server health'
             key: 'zabbix[rcache,buffer,pused]'
         - sortorder: '2'
-          color: 00DDDD
+          drawtype: GRADIENT_LINE
+          color: e31a1c
           item:
             host: 'Zabbix server health'
             key: 'zabbix[wcache,index,pused]'
         - sortorder: '3'
-          color: 3333FF
+          drawtype: GRADIENT_LINE
+          color: ff7f00
           item:
             host: 'Zabbix server health'
             key: 'zabbix[wcache,history,pused]'
         - sortorder: '4'
-          color: '999900'
+          drawtype: GRADIENT_LINE
+          color: 6a3d9a
           item:
             host: 'Zabbix server health'
             key: 'zabbix[vcache,buffer,pused]'
         - sortorder: '5'
-          color: 00FF00
+          drawtype: GRADIENT_LINE
+          color: b15928
           item:
             host: 'Zabbix server health'
             key: 'zabbix[vmware,buffer,pused]'
-    - uuid: 99fbcd47f72148f486f3b5e7d49596b8
-      name: 'Zabbix server: Zabbix data gathering process busy %'
+    - uuid: 0c4fb28d41ab42dcb49f6805208cbe8f
+      name: 'Zabbix server: Internal queues'
       ymin_type_1: FIXED
-      ymax_type_1: FIXED
       graph_items:
-        - color: '990099'
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,trapper,avg,busy]'
-        - sortorder: '1'
-          color: '990000'
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,poller,avg,busy]'
-        - sortorder: '2'
-          color: 0000EE
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,ipmi poller,avg,busy]'
-        - sortorder: '3'
-          color: FF33FF
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,discoverer,avg,busy]'
-        - sortorder: '4'
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,icmp pinger,avg,busy]'
-        - sortorder: '5'
-          color: '003300'
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,http poller,avg,busy]'
-        - sortorder: '6'
-          color: CCCC00
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,proxy poller,avg,busy]'
-        - sortorder: '7'
-          color: 33FFFF
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,unreachable poller,avg,busy]'
-        - sortorder: '8'
-          color: DD0000
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,java poller,avg,busy]'
-        - sortorder: '9'
-          color: '000099'
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,snmp trapper,avg,busy]'
-        - sortorder: '10'
-          color: 00FF00
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,vmware collector,avg,busy]'
-        - sortorder: '11'
-          color: 5A2B57
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,history poller,avg,busy]'
-        - sortorder: '12'
-          color: 9FA8DA
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,odbc poller,avg,busy]'
-    - uuid: 630f638ad0054d3380f941e72805ea1d
-      name: 'Zabbix server: Zabbix internal process busy %'
-      ymin_type_1: FIXED
-      ymax_type_1: FIXED
-      graph_items:
-        - color: 00EE00
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,timer,avg,busy]'
-        - sortorder: '1'
-          color: 0000EE
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,escalator,avg,busy]'
-        - sortorder: '2'
-          color: FFAA00
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,housekeeper,avg,busy]'
-        - sortorder: '3'
-          color: 00EEEE
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,alerter,avg,busy]'
-        - sortorder: '4'
-          color: '990099'
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,configuration syncer,avg,busy]'
-        - sortorder: '5'
-          color: EE0000
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,history syncer,avg,busy]'
-        - sortorder: '6'
-          color: FF66FF
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,self-monitoring,avg,busy]'
-        - sortorder: '7'
-          color: '009999'
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,task manager,avg,busy]'
-        - sortorder: '8'
-          color: BBBB00
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,ipmi manager,avg,busy]'
-        - sortorder: '9'
-          color: AA0000
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,alert manager,avg,busy]'
-        - sortorder: '10'
-          color: '990000'
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,preprocessing manager,avg,busy]'
-        - sortorder: '11'
-          color: '008800'
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,preprocessing worker,avg,busy]'
-        - sortorder: '12'
-          color: 80B0E0
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,lld manager,avg,busy]'
-        - sortorder: '13'
-          color: 4080B0
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,lld worker,avg,busy]'
-        - sortorder: '14'
-          color: 8000FF
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,alert syncer,avg,busy]'
-        - sortorder: '15'
-          color: 2B5429
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,availability manager,avg,busy]'
-        - sortorder: '16'
-          color: 8048B4
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,report manager,avg,busy]'
-        - sortorder: '17'
-          color: FD5434
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,report writer,avg,busy]'
-        - sortorder: '18'
-          color: 790E1F
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,service manager,avg,busy]'
-        - sortorder: '19'
-          color: 87AC4D
-          item:
-            host: 'Zabbix server health'
-            key: 'zabbix[process,trigger housekeeper,avg,busy]'
-    - uuid: b053dc416ee3422b94e46fb415ea87e6
-      name: 'Zabbix server: Zabbix internal queues'
-      graph_items:
-        - color: '008800'
+        - drawtype: GRADIENT_LINE
+          color: ffff99
           item:
             host: 'Zabbix server health'
             key: 'zabbix[preprocessing_queue]'
         - sortorder: '1'
-          color: EE0000
+          drawtype: GRADIENT_LINE
+          color: 1f78b4
           item:
             host: 'Zabbix server health'
             key: 'zabbix[lld_queue]'
-    - uuid: 3d256a358da74f469700eea05173343a
-      name: 'Zabbix server: Zabbix server performance'
+    - uuid: 1c24194e0dd9447f9138ee1d951d373c
+      name: 'Zabbix server: Server performance'
+      ymin_type_1: FIXED
       graph_items:
         - drawtype: GRADIENT_LINE
-          color: 00C800
+          color: 33a02c
           item:
             host: 'Zabbix server health'
             key: 'zabbix[wcache,values]'
         - sortorder: '1'
-          color: F63100
+          drawtype: GRADIENT_LINE
+          color: e31a1c
           item:
             host: 'Zabbix server health'
             key: 'zabbix[queue]'
+    - uuid: 29fb1b2c295d426bae1c8eaa9b8a9bd1
+      name: 'Zabbix server: Trend cache effectiveness, in %'
+      ymin_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: ffff99
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[tcache,cache,pitems]'
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: e31a1c
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[tcache,cache,pmisses]'
+    - uuid: c9dc57ade96747e2bf7118262818ec51
+      name: 'Zabbix server: Utilization: Availability processes'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: 6a3d9a
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,unreachable poller,avg,busy]'
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: b15928
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,availability manager,avg,busy]'
+        - sortorder: '2'
+          drawtype: GRADIENT_LINE
+          color: 1f78b4
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,icmp pinger,avg,busy]'
+    - uuid: d90d2e972e764764afe0ba1ad1b708b5
+      name: 'Zabbix server: Utilization: Calculation processes'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: 17becf
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,history poller,avg,busy]'
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: bcbd22
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,preprocessing worker,avg,busy]'
+        - sortorder: '2'
+          drawtype: GRADIENT_LINE
+          color: d62728
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,preprocessing manager,avg,busy]'
+    - uuid: 26cc95bed3bf4bbe81a070a5a7ce4807
+      name: 'Zabbix server: Utilization: Discovery processes'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: ffff99
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,lld manager,avg,busy]'
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 6a3d9a
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,lld worker,avg,busy]'
+        - sortorder: '2'
+          drawtype: GRADIENT_LINE
+          color: 1f78b4
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,discoverer,avg,busy]'
+    - uuid: b39c411a2aa8434cb02f87f419151173
+      name: 'Zabbix server: Utilization: Gathering processes'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: 1f78b4
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,poller,avg,busy]'
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 6a3d9a
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,ipmi poller,avg,busy]'
+        - sortorder: '2'
+          drawtype: GRADIENT_LINE
+          color: b15928
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,ipmi manager,avg,busy]'
+        - sortorder: '3'
+          drawtype: GRADIENT_LINE
+          color: a6cee3
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,java poller,avg,busy]'
+        - sortorder: '4'
+          drawtype: GRADIENT_LINE
+          color: fb9a99
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,vmware collector,avg,busy]'
+        - sortorder: '5'
+          drawtype: GRADIENT_LINE
+          color: fdbf6f
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,odbc poller,avg,busy]'
+    - uuid: f26f9158c1544da88df815146d90f761
+      name: 'Zabbix server: Utilization: Gathering processes: Trappers'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: cab2d6
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,trapper,avg,busy]'
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: ffff99
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,snmp trapper,avg,busy]'
+    - uuid: d0726c9304274691a0105f0a28137693
+      name: 'Zabbix server: Utilization: Gathering processes: Web'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: 1f78b4
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,http poller,avg,busy]'
+    - uuid: 9ce127eb3e51445da4d9595963e34d27
+      name: 'Zabbix server: Utilization: Internal processes: Core'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: 1f78b4
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,configuration syncer,avg,busy]'
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: e31a1c
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,history syncer,avg,busy]'
+        - sortorder: '2'
+          drawtype: GRADIENT_LINE
+          color: ff7f00
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,self-monitoring,avg,busy]'
+        - sortorder: '3'
+          drawtype: GRADIENT_LINE
+          color: 6a3d9a
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,service manager,avg,busy]'
+        - sortorder: '4'
+          drawtype: GRADIENT_LINE
+          color: b15928
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,task manager,avg,busy]'
+        - sortorder: '5'
+          drawtype: GRADIENT_LINE
+          color: a6cee3
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,timer,avg,busy]'
+    - uuid: 67ab3e3f628c4a5f9e2a463f965a8a8e
+      name: 'Zabbix server: Utilization: Internal processes: Housekeeping'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: fdbf6f
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,housekeeper,avg,busy]'
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: cab2d6
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,trigger housekeeper,avg,busy]'
+    - uuid: 4329a3881d574596b7e344e596447a5b
+      name: 'Zabbix server: Utilization: Proxy management and data exchange'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: cab2d6
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,trapper,avg,busy]'
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: '000080'
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,proxy poller,avg,busy]'
+    - uuid: 54e992a142b943db995dc5ff495000ed
+      name: 'Zabbix server: Utilization: Reporting processes'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: 17becf
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,alert manager,avg,busy]'
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: bcbd22
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,alert syncer,avg,busy]'
+        - sortorder: '2'
+          drawtype: GRADIENT_LINE
+          color: d62728
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,alerter,avg,busy]'
+        - sortorder: '3'
+          drawtype: GRADIENT_LINE
+          color: 17becf
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,escalator,avg,busy]'
+        - sortorder: '4'
+          drawtype: GRADIENT_LINE
+          color: e377c2
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,report manager,avg,busy]'
+        - sortorder: '5'
+          drawtype: GRADIENT_LINE
+          color: ffdf00
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[process,report writer,avg,busy]'
+    - uuid: df02c5090f7c4d13905b0c9e92567bcd
+      name: 'Zabbix server: Value cache effectiveness'
+      ymin_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: 33a02c
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[vcache,cache,hits]'
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: e31a1c
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[vcache,cache,misses]'
+    - uuid: a28be0b61010498b8edd7947b481267c
+      name: 'Zabbix server: Values processed'
+      ymin_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: 1f78b4
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[wcache,values,uint]'
+        - sortorder: '1'
+          drawtype: GRADIENT_LINE
+          color: 33a02c
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[wcache,values,float]'
+        - sortorder: '2'
+          drawtype: GRADIENT_LINE
+          color: e31a1c
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[wcache,values,not supported]'
+        - sortorder: '3'
+          drawtype: GRADIENT_LINE
+          color: ff7f00
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[wcache,values,str]'
+        - sortorder: '4'
+          drawtype: GRADIENT_LINE
+          color: 6a3d9a
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[wcache,values,log]'
+        - sortorder: '5'
+          drawtype: GRADIENT_LINE
+          color: b15928
+          item:
+            host: 'Zabbix server health'
+            key: 'zabbix[wcache,values,text]'

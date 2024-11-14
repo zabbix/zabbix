@@ -196,6 +196,7 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 					: 'httptest.massdisable'
 				)
 				->setArgument('context', $data['context'])
+				->setArgument('backurl', $url)
 				->getUrl()
 		))
 			->addClass(ZBX_STYLE_LINK_ACTION)

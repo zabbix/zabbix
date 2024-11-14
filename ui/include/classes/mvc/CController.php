@@ -36,7 +36,7 @@ abstract class CController {
 	private $post_content_type = self::POST_CONTENT_TYPE_FORM;
 
 	/**
-	 * Action name, so that controller knows what action he is executing.
+	 * Action name, so that controller knows which action is being executed.
 	 *
 	 * @var string
 	 */

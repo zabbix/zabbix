@@ -109,7 +109,6 @@ var chkbxRange = {
 	 * @param e
 	 */
 	handleClick: function(e) {
-		e = e || window.event;
 		var checkbox = e.target;
 
 		PageRefresh.restart();
@@ -342,8 +341,6 @@ var chkbxRange = {
 	},
 
 	submitFooterButton: function(e) {
-		e = e || window.event;
-
 		var footerButton = jQuery(e.target),
 			form = footerButton.closest('form'),
 			confirmText = footerButton.attr('confirm');

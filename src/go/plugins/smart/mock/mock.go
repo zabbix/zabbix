@@ -1,10 +1,31 @@
+/*
+** Zabbix
+** Copyright (C) 2001-2024 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
 package mock
 
 import (
 	"fmt"
 	"sync"
+	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"golang.zabbix.com/sdk/errs"
 )
 
 // MockController allows prepare and validate SmartController.Execute calls.
@@ -13,6 +34,7 @@ type MockController struct {
 	mu           sync.Mutex
 	count        int
 	expectations []*expectation
+	t            *testing.T
 }
 
 type expectation struct {
@@ -21,18 +43,29 @@ type expectation struct {
 	err  error
 }
 
+// NewMockController creates a new MockController.
+func NewMockController(t *testing.T) *MockController {
+	t.Helper()
+
+	return &MockController{t: t}
+}
+
 // Execute mock call to the SmartController.Execute method.
 func (c *MockController) Execute(args ...string) ([]byte, error) {
 	c.mu.Lock()
-
-	defer func() {
-		c.count++
-		c.mu.Unlock()
-	}()
+	defer c.mu.Unlock()
 
 	if c.count >= len(c.expectations) {
-		panic("unexpected call to Execute")
+		if c.t != nil {
+			c.t.Fatalf("Unexpected call to Execute with args: %v", args)
+
+			return nil, nil
+		}
+
+		panic(fmt.Sprintf("unexpected call to Execute with args: %v", args))
 	}
+
+	defer func() { c.count++ }()
 
 	e := c.expectations[c.count]
 
@@ -42,7 +75,13 @@ func (c *MockController) Execute(args ...string) ([]byte, error) {
 
 	if e.args != nil {
 		if diff := cmp.Diff(e.args, args); diff != "" {
-			panic(fmt.Errorf("Execute args mismatch (-want +got):\n%s", diff))
+			if c.t != nil {
+				c.t.Fatalf("Execute args mismatch (-want +got):\n%s", diff)
+
+				return nil, nil
+			}
+
+			panic("Execute args mismatch (-want +got):\n" + diff)
 		}
 	}
 
@@ -50,7 +89,7 @@ func (c *MockController) Execute(args ...string) ([]byte, error) {
 }
 
 // ExpectExecute adds a new expectation for the SmartController.Execute method.
-func (c *MockController) ExpectExecute() *expectation {
+func (c *MockController) ExpectExecute() *expectation { //nolint:revive
 	e := &expectation{}
 	c.expectations = append(c.expectations, e)
 
@@ -60,7 +99,7 @@ func (c *MockController) ExpectExecute() *expectation {
 // ExpectationsWhereMet checks if all expectations defined (expected) where met.
 func (c *MockController) ExpectationsWhereMet() error {
 	if c.count != len(c.expectations) {
-		return fmt.Errorf(
+		return errs.Errorf(
 			"not all expectations were met, expected %d, got %d",
 			len(c.expectations), c.count,
 		)

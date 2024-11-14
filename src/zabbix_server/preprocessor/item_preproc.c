@@ -173,13 +173,26 @@ static int	item_preproc_multiplier_variant(unsigned char value_type, zbx_variant
  *                                                                            *
  * Purpose: executes during notsupported item preprocessing                   *
  *                                                                            *
- * Return value: FAIL - for further error handling                            *
+ * Return value: SUCCEED - has value and no error                             *
+ *               FAIL - for further error handling                            *
  *                                                                            *
  ******************************************************************************/
-static int	item_preproc_validate_notsupport(char **errmsg)
+static int	item_preproc_validate_notsupport(zbx_variant_t *value, char **errmsg)
 {
-	*errmsg = zbx_dsprintf(*errmsg, "item is not supported");
-	return FAIL;
+	int	ret = SUCCEED;
+
+	if (ZBX_VARIANT_ERR == value->type)
+	{
+		*errmsg = zbx_strdup(NULL, value->data.str);
+		ret = FAIL;
+	}
+	else if (ZBX_VARIANT_NONE == value->type)
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "item is not supported");
+		ret = FAIL;
+	}
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1338,7 +1351,7 @@ static int	item_preproc_get_error_from_regex(const zbx_variant_t *value, const c
 
 	*output++ = '\0';
 
-	if (FAIL == zbx_mregexp_sub(value_str.data.str, pattern, output, error))
+	if (FAIL == zbx_mregexp_sub(value_str.data.str, pattern, output, ZBX_REGEXP_GROUP_CHECK_DISABLE, error))
 	{
 		*error = zbx_dsprintf(*error, "invalid regular expression \"%s\"", pattern);
 		ret = FAIL;
@@ -1546,10 +1559,10 @@ static int	item_preproc_prometheus_pattern(zbx_preproc_cache_t *cache, zbx_varia
 		if (NULL == (prom_cache = (zbx_prometheus_t *)zbx_preproc_cache_get(cache,
 				ZBX_PREPROC_PROMETHEUS_PATTERN)))
 		{
-			prom_cache = (zbx_prometheus_t *)zbx_malloc(NULL, sizeof(zbx_prometheus_t));
-
 			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 				return FAIL;
+
+			prom_cache = (zbx_prometheus_t *)zbx_malloc(NULL, sizeof(zbx_prometheus_t));
 
 			if (SUCCEED != zbx_prometheus_init(prom_cache, value->data.str, &err))
 			{
@@ -2121,7 +2134,7 @@ int	zbx_item_preproc(zbx_preproc_cache_t *cache, unsigned char value_type, zbx_v
 			ret = item_preproc_str_replace(value, op->params, error);
 			break;
 		case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
-			ret = item_preproc_validate_notsupport(error);
+			ret = item_preproc_validate_notsupport(value, error);
 			break;
 		case ZBX_PREPROC_XML_TO_JSON:
 			ret = item_preproc_xml_to_json(value, error);

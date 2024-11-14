@@ -237,6 +237,7 @@ class CUser extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
+			$result = $this->unsetExtraFields($result, ['roleid'], $options['output']);
 		}
 
 		// removing keys
@@ -245,6 +246,16 @@ class CUser extends CApiService {
 		}
 
 		return $result;
+	}
+
+	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts): array {
+		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
+
+		if (!$options['countOutput'] && $options['selectRole'] !== null) {
+			$sql_parts = $this->addQuerySelect($this->fieldId('roleid'), $sql_parts);
+		}
+
+		return $sql_parts;
 	}
 
 	/**
@@ -367,7 +378,7 @@ class CUser extends CApiService {
 
 			/*
 			 * If user is created without a password (e.g. for GROUP_GUI_ACCESS_LDAP), store an empty string
-			 * as his password in database.
+			 * as their password in database.
 			 */
 			$user['passwd'] = array_key_exists('passwd', $user)
 				? password_hash($user['passwd'], PASSWORD_BCRYPT, ['cost' => ZBX_BCRYPT_COST])
@@ -607,6 +618,8 @@ class CUser extends CApiService {
 
 		self::addAffectedObjects($users, $db_users);
 
+		self::checkOwnParameters($users, $db_users);
+
 		if ($usernames) {
 			$this->checkDuplicates($usernames);
 		}
@@ -617,7 +630,6 @@ class CUser extends CApiService {
 		$this->checkUserGroups($users, $db_users);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
-		$this->checkHimself($users);
 	}
 
 	/**
@@ -662,6 +674,96 @@ class CUser extends CApiService {
 			while ($db_media = DBfetch($db_medias)) {
 				$db_users[$db_media['userid']]['medias'][$db_media['mediaid']] =
 					array_diff_key($db_media, array_flip(['userid']));
+			}
+		}
+	}
+
+	/**
+	 * Check whether current user is allowed to change specific own parameters.
+	 *
+	 * @param array $users
+	 * @param array $db_users
+	 *
+	 * @throws APIException
+	 */
+	private static function checkOwnParameters(array $users, array $db_users): void {
+		$user = self::getOwnUser($users);
+
+		if ($user === null) {
+			return;
+		}
+
+		$db_user = $db_users[$user['userid']];
+
+		self::checkOwnUsername($user, $db_user);
+		self::checkOwnRole($user, $db_user);
+		self::checkOwnUserGroups($user, $db_user);
+	}
+
+	private static function getOwnUser(array $users): ?array {
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+			foreach ($users as $user) {
+				if (bccomp($user['userid'], self::$userData['userid']) == 0) {
+					return $user;
+				}
+			}
+
+			return null;
+		}
+
+		return reset($users);
+	}
+
+	private static function checkOwnUsername(array $user, array $db_user): void {
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+			return;
+		}
+
+		if (array_key_exists('username', $user) && $user['username'] !== $db_user['username']) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Only Super admin users can update "%1$s" parameter.', 'username')
+			);
+		}
+	}
+
+	private static function checkOwnRole(array $user, array $db_user): void {
+		if (array_key_exists('roleid', $user) && bccomp($user['roleid'], $db_user['roleid']) != 0) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('User cannot change own role.'));
+		}
+	}
+
+	private static function checkOwnUserGroups(array $user, array $db_user): void {
+		if (!array_key_exists('usrgrps', $user)) {
+			return;
+		}
+
+		$usrgrpids = array_column($user['usrgrps'], 'usrgrpid');
+
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+			$disabled_user_group = DBfetch(DBselect(
+				'SELECT NULL'.
+				' FROM usrgrp'.
+				' WHERE '.dbConditionId('usrgrpid', $usrgrpids).
+					' AND ('.
+						'gui_access='.GROUP_GUI_ACCESS_DISABLED.
+						' OR users_status='.GROUP_STATUS_DISABLED.
+					')',
+				1
+			));
+
+			if ($disabled_user_group) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_('User cannot add oneself to a disabled group or a group with disabled GUI access.')
+				);
+			}
+		}
+		else {
+			$db_usrgrpids = array_column($db_user['usrgrps'], 'usrgrpid');
+
+			if (array_diff($usrgrpids, $db_usrgrpids) || array_diff($db_usrgrpids, $usrgrpids)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Only Super admin users can update "%1$s" parameter.', 'usrgrps')
+				);
 			}
 		}
 	}
@@ -937,42 +1039,6 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Additional check to exclude an opportunity to deactivate himself.
-	 *
-	 * @param array  $users
-	 * @param array  $users[]['usrgrps']  (optional)
-	 *
-	 * @throws APIException
-	 */
-	private function checkHimself(array $users) {
-		foreach ($users as $user) {
-			if (bccomp($user['userid'], self::$userData['userid']) == 0) {
-				if (array_key_exists('roleid', $user) && $user['roleid'] != self::$userData['roleid']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('User cannot change own role.'));
-				}
-
-				if (array_key_exists('usrgrps', $user)) {
-					$db_usrgrps = DB::select('usrgrp', [
-						'output' => ['gui_access', 'users_status'],
-						'usrgrpids' => zbx_objectValues($user['usrgrps'], 'usrgrpid')
-					]);
-
-					foreach ($db_usrgrps as $db_usrgrp) {
-						if ($db_usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED
-								|| $db_usrgrp['users_status'] == GROUP_STATUS_DISABLED) {
-							self::exception(ZBX_API_ERROR_PARAMETERS,
-								_('User cannot add himself to a disabled group or a group with disabled GUI access.')
-							);
-						}
-					}
-				}
-
-				break;
-			}
-		}
-	}
-
-	/**
 	 * Additional check to exclude an opportunity to enable auto-login and auto-logout options together..
 	 *
 	 * @param array  $user
@@ -1222,7 +1288,7 @@ class CUser extends CApiService {
 			$db_user = $db_users[$userid];
 
 			if (bccomp($userid, self::$userData['userid']) == 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('User is not allowed to delete himself.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('User is not allowed to delete oneself.'));
 			}
 
 			if ($db_user['username'] == ZBX_GUEST_USER) {
@@ -1968,32 +2034,27 @@ class CUser extends CApiService {
 			$result = $relationMap->mapMany($result, $mediaTypes, 'mediatypes');
 		}
 
-		// adding user role
-		if ($options['selectRole'] !== null && $options['selectRole'] !== API_OUTPUT_COUNT) {
-			if ($options['selectRole'] === API_OUTPUT_EXTEND) {
-				$options['selectRole'] = ['roleid', 'name', 'type', 'readonly'];
-			}
-
-			$db_roles = DBselect(
-				'SELECT u.userid'.($options['selectRole'] ? ',r.'.implode(',r.', $options['selectRole']) : '').
-				' FROM users u,role r'.
-				' WHERE u.roleid=r.roleid'.
-				' AND '.dbConditionInt('u.userid', $userIds)
-			);
-
-			foreach ($result as $userid => $user) {
-				$result[$userid]['role'] = [];
-			}
-
-			while ($db_role = DBfetch($db_roles)) {
-				$userid = $db_role['userid'];
-				unset($db_role['userid']);
-
-				$result[$userid]['role'] = $db_role;
-			}
-		}
+		$this->addRelatedRole($options, $result);
 
 		return $result;
+	}
+
+	private function addRelatedRole(array $options, array &$result): void {
+		if ($options['selectRole'] === null) {
+			return;
+		}
+
+		$relation_map = $this->createRelationMap($result, 'userid', 'roleid');
+
+		$db_roles = API::Role()->get([
+			'output' => $options['selectRole'] === API_OUTPUT_EXTEND
+				? CRole::OUTPUT_FIELDS
+				: $options['selectRole'],
+			'roleids' => $relation_map->getRelatedIds(),
+			'preservekeys' => true
+		]);
+
+		$result = $relation_map->mapOne($result, $db_roles, 'role');
 	}
 
 	/**

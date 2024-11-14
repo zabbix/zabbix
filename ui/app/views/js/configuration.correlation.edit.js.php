@@ -75,7 +75,7 @@
 		jQuery('#clone').click(function() {
 			jQuery('#correlationid, #delete, #clone').remove();
 			jQuery('#update')
-				.text(t('Add'))
+				.text(<?= json_encode(_('Add')) ?>)
 				.val('correlation.create')
 				.attr({id: 'add'});
 

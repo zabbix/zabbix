@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-05-07T08:13:23Z'
+  date: '2024-10-31T12:21:39Z'
   groups:
     - uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -364,8 +364,10 @@ zabbix_export:
           triggers:
             - uuid: fb77b6ac381c4b5289584bd91e7da7d5
               expression: 'fuzzytime(/Linux by Zabbix agent/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'fuzzytime(/Linux by Zabbix agent/system.localtime,{$SYSTEM.FUZZYTIME.MIN})=1'
               name: 'Linux: System time is out of sync'
-              event_name: 'Linux: System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
+              event_name: 'Linux: System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX})'
               priority: WARNING
               description: 'The host''s system time is different from Zabbix server time.'
               manual_close: 'YES'
@@ -1209,10 +1211,6 @@ zabbix_export:
                   item:
                     host: 'Linux by Zabbix agent'
                     key: 'vfs.dev.util[{#DEVNAME}]'
-          preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
         - uuid: 7d090603037e4defb34ef74021d3adcd
           name: 'Mounted filesystem discovery'
           key: vfs.fs.discovery
@@ -1419,7 +1417,11 @@ zabbix_export:
         - macro: '{$SWAP.PFREE.MIN.WARN}'
           value: '50'
         - macro: '{$SYSTEM.FUZZYTIME.MAX}'
-          value: '60'
+          value: 60s
+          description: 'The upper threshold for difference of system time.'
+        - macro: '{$SYSTEM.FUZZYTIME.MIN}'
+          value: 10s
+          description: 'The lower threshold for difference of system time. Used in recovery expression to avoid trigger flapping.'
         - macro: '{$VFS.DEV.DEVNAME.MATCHES}'
           value: .+
           description: 'This macro is used for a discovery of block devices. It can be overridden on host level or its linked template level.'

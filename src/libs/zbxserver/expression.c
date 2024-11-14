@@ -2676,7 +2676,13 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 	if (0 != (macro_type & (MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY | MACRO_TYPE_MESSAGE_UPDATE |
 			MACRO_TYPE_EVENT_NAME)))
 	{
-		token_search |= ZBX_TOKEN_SEARCH_EXPRESSION_MACRO;
+
+		const DB_EVENT	*c_event;
+
+		c_event = ((NULL != r_event) ? r_event : event);
+
+		if (NULL != c_event && EVENT_SOURCE_TRIGGERS == c_event->source)
+			token_search |= ZBX_TOKEN_SEARCH_EXPRESSION_MACRO;
 	}
 
 	if (SUCCEED != zbx_token_find(*data, pos, &token, token_search))
@@ -3032,12 +3038,12 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					else
 						replace_to = zbx_strdup(replace_to, "");
 				}
-				else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_VALUE))
+				else if (0 == strcmp(m, MVAR_FUNCTION_VALUE))
 				{
 					zbx_db_trigger_get_function_value(&c_event->trigger, N_functionid,
 							&replace_to, evaluate_function2, 0);
 				}
-				else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_RECOVERY_VALUE))
+				else if (0 == strcmp(m, MVAR_FUNCTION_RECOVERY_VALUE))
 				{
 					zbx_db_trigger_get_function_value(&c_event->trigger, N_functionid,
 							&replace_to, evaluate_function2, 1);
@@ -3304,12 +3310,12 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					else
 						replace_to = zbx_strdup(replace_to, "");
 				}
-				else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_VALUE))
+				else if (0 == strcmp(m, MVAR_FUNCTION_VALUE))
 				{
 					zbx_db_trigger_get_function_value(&c_event->trigger, N_functionid,
 							&replace_to, evaluate_function2, 0);
 				}
-				else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_RECOVERY_VALUE))
+				else if (0 == strcmp(m, MVAR_FUNCTION_RECOVERY_VALUE))
 				{
 					zbx_db_trigger_get_function_value(&c_event->trigger, N_functionid,
 							&replace_to, evaluate_function2, 1);
@@ -4141,7 +4147,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 						zbx_db_trigger_explain_expression(&event->trigger, &replace_to,
 								evaluate_function2, 0);
 					}
-					else if (1 == indexed_macro && 0 == strcmp(m, MVAR_FUNCTION_VALUE))
+					else if (0 == strcmp(m, MVAR_FUNCTION_VALUE))
 					{
 						zbx_db_trigger_get_function_value(&event->trigger, N_functionid,
 								&replace_to, evaluate_function2, 0);

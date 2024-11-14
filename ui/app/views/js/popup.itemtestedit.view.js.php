@@ -319,7 +319,7 @@ function itemCompleteTest(overlay) {
 					$result_row.append(jQuery('<div>')
 						.append(
 							jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'})
-								.text('<?= _('Result with value map applied') ?>'),
+								.text(<?= json_encode(_('Result with value map applied')) ?>),
 							$mapped_value
 						)
 					);
@@ -501,7 +501,7 @@ jQuery(document).ready(function($) {
 					$('#interface_port').prop('disabled', false);
 				<?php endif ?>
 
-				$submit_btn.html('<?= _('Get value and test') ?>');
+				$submit_btn.html(<?= json_encode(_('Get value and test')) ?>);
 				$rows.show();
 
 				<?php if ($data['show_snmp_form']): ?>
@@ -569,7 +569,7 @@ jQuery(document).ready(function($) {
 					$('#interface_port').prop('disabled', false);
 				<?php endif ?>
 
-				$submit_btn.html('<?= _('Test') ?>');
+				$submit_btn.html(<?= json_encode(_('Test')) ?>);
 				$rows.hide();
 			}
 		}).trigger('change');

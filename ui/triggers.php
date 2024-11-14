@@ -90,7 +90,7 @@ $fields = [
 	'filter_inherited' =>						[T_ZBX_INT, O_OPT, null, IN([-1, 0, 1]), null],
 	'filter_discovered' =>						[T_ZBX_INT, O_OPT, null, IN([-1, 0, 1]), null],
 	'filter_dependent' =>						[T_ZBX_INT, O_OPT, null, IN([-1, 0, 1]), null],
-	'filter_name' =>							[T_ZBX_STR, O_OPT, null, null, null],
+	'filter_name' =>							[T_ZBX_STR, O_OPT, P_NO_TRIM,	 null,	 null],
 	'filter_state' =>							[T_ZBX_INT, O_OPT, null,
 													IN([-1, TRIGGER_STATE_NORMAL, TRIGGER_STATE_UNKNOWN]), null
 												],
@@ -462,8 +462,7 @@ elseif (isset($_REQUEST['add_dependency']) && isset($_REQUEST['new_dependency'])
 	}
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['trigger.massenable', 'trigger.massdisable']) && hasRequest('g_triggerid')) {
-	$enable = (getRequest('action') === 'trigger.massenable');
-	$status = $enable ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
+	$status = getRequest('action') === 'trigger.massenable' ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
 	$update = [];
 
 	// Get requested triggers with permission check.
@@ -488,19 +487,29 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['trigger.mas
 	}
 
 	$updated = count($update);
-	$messageSuccess = $enable
-		? _n('Trigger enabled', 'Triggers enabled', $updated)
-		: _n('Trigger disabled', 'Triggers disabled', $updated);
-	$messageFailed = $enable
-		? _n('Cannot enable trigger', 'Cannot enable triggers', $updated)
-		: _n('Cannot disable trigger', 'Cannot disable triggers', $updated);
 
 	if ($result) {
 		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
 		unset($_REQUEST['g_triggerid']);
+
+		$message = $status == TRIGGER_STATUS_ENABLED
+			? _n('Trigger enabled', 'Triggers enabled', $updated)
+			: _n('Trigger disabled', 'Triggers disabled', $updated);
+
+		CMessageHelper::setSuccessTitle($message);
+	}
+	else {
+		$message = $status == TRIGGER_STATUS_ENABLED
+			? _n('Cannot enable trigger', 'Cannot enable triggers', $updated)
+			: _n('Cannot disable trigger', 'Cannot disable triggers', $updated);
+
+		CMessageHelper::setErrorTitle($message);
 	}
 
-	show_messages($result, $messageSuccess, $messageFailed);
+	if (hasRequest('backurl')) {
+		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response->redirect();
+	}
 }
 elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' && hasRequest('copy')
 		&& hasRequest('g_triggerid')) {
@@ -818,38 +827,6 @@ else {
 			'preservekeys' => true,
 			'nopermissions' => true
 		]);
-
-		$items = API::Item()->get([
-			'output' => ['itemid'],
-			'selectTriggers' => ['triggerid'],
-			'selectItemDiscovery' => ['ts_delete'],
-			'triggerids' => array_keys($triggers),
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
-		]);
-
-		foreach ($items as $item) {
-			$ts_delete = $item['itemDiscovery']['ts_delete'];
-
-			if ($ts_delete == 0) {
-				continue;
-			}
-
-			foreach (array_column($item['triggers'], 'triggerid') as $triggerid) {
-				if (!array_key_exists($triggerid, $triggers)) {
-					continue;
-				}
-
-				if (!array_key_exists('ts_delete', $triggers[$triggerid]['triggerDiscovery'])) {
-					$triggers[$triggerid]['triggerDiscovery']['ts_delete'] = $ts_delete;
-				}
-				else {
-					$trigger_ts_delete = $triggers[$triggerid]['triggerDiscovery']['ts_delete'];
-					$triggers[$triggerid]['triggerDiscovery']['ts_delete'] = ($trigger_ts_delete > 0)
-						? min($ts_delete, $trigger_ts_delete)
-						: $ts_delete;
-				}
-			}
-		}
 
 		// We must maintain sort order that is applied on prefetched_triggers array.
 		foreach ($triggers as $triggerid => $trigger) {

@@ -59,7 +59,7 @@ $this->addJsFile('class.sortable.js');
 
 $this->includeJsFile('monitoring.dashboard.print.js.php');
 
-$this->addCssFile('assets/styles/vendors/Leaflet/Leaflet/leaflet.css');
+$this->addCssFile('assets/styles/vendors/Leaflet/leaflet.css');
 
 $this->enableLayoutModes();
 $this->setLayoutMode(ZBX_LAYOUT_KIOSKMODE);

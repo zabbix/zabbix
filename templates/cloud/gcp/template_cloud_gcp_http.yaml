@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-01-22T15:22:48Z'
+  date: '2024-06-18T13:37:18Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -329,6 +329,60 @@ zabbix_export:
           tags:
             - tag: component
               value: raw
+        - uuid: 80687b35246b45ffa1be9d171f686e94
+          name: 'GCP Cloud SQL MSSQL: Instances count'
+          type: DEPENDENT
+          key: gcp.cloudsql.instances.mssql_count
+          delay: '0'
+          history: 7d
+          trends: 90d
+          description: 'GCP Cloud SQL MSSQL instances count.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[?(@.db_type =~ ''SQLSERVER'')].length()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gcp.cloudsql.instances.get
+          tags:
+            - tag: component
+              value: environment
+        - uuid: 8ec94dff7a3b47998242d97a18cf0821
+          name: 'GCP Cloud SQL MySQL: Instances count'
+          type: DEPENDENT
+          key: gcp.cloudsql.instances.mysql_count
+          delay: '0'
+          history: 7d
+          trends: 90d
+          description: 'GCP Cloud SQL MySQL instances count.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[?(@.db_type =~ ''MYSQL'')].length()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gcp.cloudsql.instances.get
+          tags:
+            - tag: component
+              value: environment
+        - uuid: de284dd30b2d4ecb9f7d0cf3ca80a094
+          name: 'GCP Cloud SQL PostgreSQL: Instances count'
+          type: DEPENDENT
+          key: gcp.cloudsql.instances.pgsql_count
+          delay: '0'
+          history: 7d
+          trends: 90d
+          description: 'GCP Cloud SQL PostgreSQL instances count.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$[?(@.db_type =~ ''POSTGRES'')].length()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gcp.cloudsql.instances.get
+          tags:
+            - tag: component
+              value: environment
         - uuid: b926ba1901c5413396c1c071e6e76072
           name: 'GCP Cloud SQL: Instances total'
           type: DEPENDENT
@@ -474,7 +528,7 @@ zabbix_export:
                   				state: getField(inst, 'status'),
                   				project_id: '{$GCP.PROJECT.ID}',
                   				ip: getField(inst, 'networkInterfaces.0.networkIP'),
-                  				integrity: getField(inst, 'shieldedInstanceConfig.enableIntegrityMonitoring')
+                  				integrity: getFieldBool(inst, 'shieldedInstanceConfig.enableIntegrityMonitoring') ? inst.shieldedInstanceConfig.enableIntegrityMonitoring : false
                   			};
                   
                   			obj.ext_ip = getFieldBool(inst, 'networkInterfaces.0.accessConfigs.0.natIP') ? inst.networkInterfaces[0].accessConfigs[0].natIP : '0.0.0.0';
@@ -490,60 +544,6 @@ zabbix_export:
           tags:
             - tag: component
               value: raw
-        - uuid: 80687b35246b45ffa1be9d171f686e94
-          name: 'GCP Cloud SQL MSSQL: Instances count'
-          type: DEPENDENT
-          key: gcp.gce.instances.mssql_count
-          delay: '0'
-          history: 7d
-          trends: 90d
-          description: 'GCP Cloud SQL MSSQL instances count.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$[?(@.db_type =~ ''SQLSERVER'')].length()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: gcp.cloudsql.instances.get
-          tags:
-            - tag: component
-              value: environment
-        - uuid: 8ec94dff7a3b47998242d97a18cf0821
-          name: 'GCP Cloud SQL MySQL: Instances count'
-          type: DEPENDENT
-          key: gcp.gce.instances.mysql_count
-          delay: '0'
-          history: 7d
-          trends: 90d
-          description: 'GCP Cloud SQL MySQL instances count.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$[?(@.db_type =~ ''MYSQL'')].length()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: gcp.cloudsql.instances.get
-          tags:
-            - tag: component
-              value: environment
-        - uuid: de284dd30b2d4ecb9f7d0cf3ca80a094
-          name: 'GCP Cloud SQL PostgreSQL: Instances count'
-          type: DEPENDENT
-          key: gcp.gce.instances.pgsql_count
-          delay: '0'
-          history: 7d
-          trends: 90d
-          description: 'GCP Cloud SQL PostgreSQL instances count.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$[?(@.db_type =~ ''POSTGRES'')].length()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: gcp.cloudsql.instances.get
-          tags:
-            - tag: component
-              value: environment
         - uuid: a936207f9d914955b2e2140e953f22f2
           name: 'GCP Compute Engine: Regular instances count'
           type: DEPENDENT
@@ -1523,7 +1523,7 @@ zabbix_export:
                       name: itemid
                       value:
                         host: 'GCP by HTTP'
-                        key: gcp.gce.instances.mysql_count
+                        key: gcp.cloudsql.instances.mysql_count
                     - type: INTEGER
                       name: show
                       value: '2'
@@ -1570,7 +1570,7 @@ zabbix_export:
                       name: itemid
                       value:
                         host: 'GCP by HTTP'
-                        key: gcp.gce.instances.pgsql_count
+                        key: gcp.cloudsql.instances.pgsql_count
                     - type: INTEGER
                       name: show
                       value: '2'
@@ -1634,7 +1634,7 @@ zabbix_export:
                       name: itemid
                       value:
                         host: 'GCP by HTTP'
-                        key: gcp.gce.instances.mssql_count
+                        key: gcp.cloudsql.instances.mssql_count
                     - type: INTEGER
                       name: show
                       value: '2'

@@ -80,6 +80,20 @@ interface IWaitable {
 	public function getNotClickableCondition();
 
 	/**
+	 * Condition describing state when object is enabled.
+	 *
+	 * @return callable
+	 */
+	public function getEnabledCondition();
+
+	/**
+	 * Condition describing state when object is not enabled.
+	 *
+	 * @return callable
+	 */
+	public function getNotEnabledCondition();
+
+	/**
 	 * Condition describing state when text is present within the object.
 	 *
 	 * @param string $text    text to be present

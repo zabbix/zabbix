@@ -1732,6 +1732,14 @@ msgstr "Type de bordure"
 msgid "Border width"
 msgstr "Largeur de bordure"
 
+#: include/classes/api/services/CHost.php:1314
+msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1321
+msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
+msgstr ""
+
 #: app/controllers/CControllerUserUpdateGeneral.php:106
 msgid "Both passwords must be equal."
 msgstr "Les deux mots de passe doivent être égaux."
@@ -4471,6 +4479,10 @@ msgstr "Créer un type de média"
 msgid "Create new"
 msgstr "Créer un nouveau"
 
+#: jsLoader.php:363
+msgid "Create new report"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:37
 msgid "Create proxy"
 msgstr "Créer un proxy"
@@ -6874,6 +6886,10 @@ msgstr "Échec de la mise à jour des propriétés de la page du tableau de bord
 msgid "Failed to update dashboard properties."
 msgstr "Échec de la mise à jour des propriétés du tableau de bord."
 
+#: app/views/js/popup.dashboard.share.edit.js.php:86
+msgid "Failed to update dashboard sharing."
+msgstr ""
+
 #: jsLoader.php:142
 msgid "Failed to update widget properties."
 msgstr "Échec de la mise à jour des propriétés du widget."
@@ -7995,6 +8011,10 @@ msgstr "Le groupe d'hôtes \"%1$s\" est interne et ne peut pas être supprimé."
 msgid "Host group elements"
 msgstr "Éléments du groupe d'hôtes"
 
+#: jsLoader.php:287
+msgid "Host group is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:165
 msgid "Host group label type"
 msgstr "Type d'étiquette du groupe d'hôtes"
@@ -8068,6 +8088,10 @@ msgstr "Inventaire d'hôtes"
 #: hostinventoriesoverview.php:26 hostinventoriesoverview.php:146
 msgid "Host inventory overview"
 msgstr "Aperçu d'inventaire d'hôtes"
+
+#: jsLoader.php:284
+msgid "Host is not selected."
+msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:180
 msgid "Host label type"
@@ -11258,6 +11282,10 @@ msgstr "Emplacement de l'étiquette de l'élément de carte"
 msgid "Map element label type"
 msgstr "Type d'étiquette de l'élément de carte"
 
+#: jsLoader.php:285
+msgid "Map is not selected."
+msgstr ""
+
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
 msgstr "La carte est mise à jour ! Revenir à la liste des cartes ?"
@@ -13195,6 +13223,18 @@ msgstr "Un"
 #: app/views/popup.maintenance.period.php:75 include/maintenances.inc.php:25
 msgid "One time only"
 msgstr "Une fois uniquement"
+
+#: include/classes/api/services/CUser.php:800
+#: include/classes/api/services/CUser.php:807
+#, c-format
+msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:725
+#: include/classes/api/services/CUser.php:766
+#, c-format
+msgid "Only Super admin users can update \"%1$s\" parameter."
+msgstr ""
 
 #: include/classes/api/services/CDRule.php:488
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -18111,6 +18151,10 @@ msgstr "Déclencheur dans l'état \"inconnu\""
 msgid "Trigger in template \"%1$s\" has dependency with trigger in template \"%2$s\"."
 msgstr "Le déclencheur du modèle \"%1$s\" a une dépendance au déclencheur du modèle \"%2$s\"."
 
+#: jsLoader.php:286
+msgid "Trigger is not selected."
+msgstr ""
+
 #: include/views/monitoring.sysmap.edit.php:195
 msgid "Trigger label type"
 msgstr "Type d'étiquette de déclencheur"
@@ -18995,6 +19039,11 @@ msgstr "Chaîne de caractères du \"user agent\""
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "Un utilisateur ne peut pas s'ajouter à un groupe désactivé ou à un groupe sans accès GUI."
 
+#: include/classes/api/services/CUserGroup.php:534
+#: include/classes/api/services/CUser.php:756
+msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
+msgstr ""
+
 #: app/views/administration.user.edit.php:421
 #: include/classes/api/services/CUser.php:951
 msgid "User cannot change own role."
@@ -19094,6 +19143,10 @@ msgstr "Groupes d'utilisateurs"
 #: include/classes/api/services/CUser.php:1225
 msgid "User is not allowed to delete himself."
 msgstr "Un utilisateur n'est pas autorisé à s'effacer lui-même."
+
+#: include/classes/api/services/CUser.php:1291
+msgid "User is not allowed to delete oneself."
+msgstr ""
 
 #: include/classes/widgets/views/widget.item.form.view.php:62
 msgid "User macros"
@@ -19758,6 +19811,10 @@ msgstr "Vue"
 msgid "View as"
 msgstr "Afficher comme"
 
+#: jsLoader.php:397
+msgid "View related reports"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1234
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "Taille de l'espace virtuel en octets ou en pourcentage du toutal. Retourne un entier pour les octets; un flottant pour les pourcentages"
@@ -20297,6 +20354,10 @@ msgstr "Vous n'avez pas la permission d'accéder à cette page."
 msgid "You must login to view this page."
 msgstr "Vous devez vous identifier pour accéder à cette page."
 
+#: jsLoader.php:282
+msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
+msgstr ""
+
 #: include/classes/db/DB.php:135
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
 msgstr "Votre base de données ne fonctionne pas correctement. Veuillez patienter quelques minutes et essayez de répéter cette action. Si le problème persiste, contactez l'administrateur système. Le problème peut être causé par une transaction de longue durée ou un verrouillage de niveau de ligne effectué par votre système de gestion de base de données."
@@ -20632,6 +20693,14 @@ msgstr "une lettre Latine majuscule et minuscule"
 #: app/views/administration.geomaps.edit.php:47
 msgid "and"
 msgstr "et"
+
+#: include/classes/api/helpers/CApiPskHelper.php:32
+#: include/classes/api/helpers/CApiPskHelper.php:62
+#: include/classes/api/helpers/CApiPskHelper.php:78
+#: include/classes/api/helpers/CApiPskHelper.php:111
+#: include/classes/api/helpers/CApiPskHelper.php:127
+msgid "another tls_psk value is already associated with given tls_psk_identity"
+msgstr ""
 
 #: include/views/monitoring.history.php:186
 msgid "as Blue"
@@ -22016,6 +22085,10 @@ msgstr "droite"
 #: app/controllers/CControllerPopupTriggerExpr.php:924
 msgid "right() - Returns the rightmost count characters"
 msgstr "right() - Retourne le nombre de caractères le plus à droite"
+
+#: jsLoader.php:199
+msgid "root"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:937
 msgid "round() - Rounds a value to decimal places"

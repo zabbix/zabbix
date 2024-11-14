@@ -285,11 +285,11 @@ class testPageMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #2 Name with 2 empty spaces.
+			// #2 Name with empty spaces.
 			[
 				[
 					'filter' => [
-						'Name' => '  '
+						'Name' => ' '
 					],
 					'expected' => [
 						self::ACTIVE_MAINTENANCE,

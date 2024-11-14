@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $form = (new CForm())
@@ -40,7 +41,7 @@ if (!$data['dashboard']['template']) {
 		'name' => 'userid',
 		'object_name' => 'users',
 		'data' => [$data['dashboard']['owner']],
-		'disabled' => in_array(CWebUser::getType(), [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN]),
+		'readonly' => in_array(CWebUser::getType(), [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN]),
 		'multiple' => false,
 		'popup' => [
 			'parameters' => [

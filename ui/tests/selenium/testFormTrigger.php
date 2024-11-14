@@ -362,7 +362,7 @@ class testFormTrigger extends CLegacyWebTest {
 			if (isset($data['templatedHost'])) {
 				$this->zbxTestAssertElementPresentXpath("//button[@id='delete'][@disabled]");
 				$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
-				$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
+				$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@readonly]");
 			}
 		}
 		else {

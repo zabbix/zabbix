@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-05-07T08:23:11Z'
+  date: '2024-06-12T11:59:11Z'
   groups:
     - uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
@@ -438,17 +438,6 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-          triggers:
-            - uuid: ed8075fd5332427ca0f9b56d55f4912b
-              expression: 'fuzzytime(/Windows generic by Zabbix agent active/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0'
-              name: 'Windows: System time is out of sync'
-              event_name: 'Windows: System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
-              priority: WARNING
-              description: 'The host''s system time is different from Zabbix server time.'
-              manual_close: 'YES'
-              tags:
-                - tag: scope
-                  value: notice
         - uuid: 0522b89bdee248c5aad6ff77d9a68311
           name: 'Windows: Operating system architecture'
           type: ZABBIX_ACTIVE
@@ -504,10 +493,6 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: notice
-      macros:
-        - macro: '{$SYSTEM.FUZZYTIME.MAX}'
-          value: '60'
-          description: 'The threshold for difference of system time in seconds.'
       dashboards:
         - uuid: 4d18a4649222441082da33aca011bbab
           name: Processes

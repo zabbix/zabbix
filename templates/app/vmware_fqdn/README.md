@@ -3,10 +3,12 @@
 
 ## Overview
 
-This template is designed for the effortless deployment of both VMware vCenter and ESX hypervisor monitoring and doesn't require any external scripts.
+This template set is designed for the effortless deployment of VMware vCenter and ESX hypervisor monitoring and doesn't require any external scripts.
 
-The "VMware Hypervisor" and "VMware Guest" templates are used by discovery and normally should not be manually linked to a host.
-For additional information please check https://www.zabbix.com/documentation/6.0/manual/vm_monitoring
+- The template "VMware Guest" is used in discovery and normally should not be manually linked to a host.
+- The template "VMware Hypervisor" can be used in discovery as well as manually linked to a host.
+
+For additional information, please see [Zabbix documentation on VM monitoring](https://www.zabbix.com/documentation/6.0/manual/vm_monitoring).
 
 ## Requirements
 
@@ -24,7 +26,7 @@ This template has been tested on:
 ## Setup
 
 1. Compile Zabbix server with the required options (`--with-libxml2` and `--with-libcurl`)
-2. Set the `StartVMwareCollectors` option in Zabbix server configuration file to "1" or more
+2. Set the `StartVMwareCollectors` option in the Zabbix server configuration file to "1" or more
 3. Create a new host
 4. Set the host macros (on the host or template level) required for VMware authentication:
 ```text
@@ -32,7 +34,7 @@ This template has been tested on:
 {$VMWARE.USERNAME}
 {$VMWARE.PASSWORD}
 ```
-5. Link the template to host created earlier
+5. Link the template to the host created earlier
 
 Note: To enable discovery of hardware sensors of VMware Hypervisors, set the macro `{$VMWARE.HV.SENSOR.DISCOVERY}` to the value `true` on the host level.
 
@@ -46,8 +48,8 @@ Note: To enable discovery of hardware sensors of VMware Hypervisors, set the mac
 |{$VMWARE.HV.SENSOR.DISCOVERY}|<p>Set "true"/"false" to enable or disable monitoring of hardware sensors.</p>|`false`|
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of hardware sensor names to allow in discovery.</p>|`.*`|
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of hardware sensor names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
-|{$VMWARE.DATASTORE.SPACE.CRIT}|<p>The critical threshold of the datastore space utilization.</p>|`90`|
-|{$VMWARE.DATASTORE.SPACE.WARN}|<p>The warning threshold of the datastore space utilization.</p>|`80`|
+|{$VMWARE.DATASTORE.SPACE.CRIT}|<p>The critical threshold of the datastore free space.</p>|`10`|
+|{$VMWARE.DATASTORE.SPACE.WARN}|<p>The warning threshold of the datastore free space.</p>|`20`|
 
 ### Items
 
@@ -87,7 +89,7 @@ Note: To enable discovery of hardware sensors of VMware Hypervisors, set the mac
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |VMware: Average read latency of the datastore {#DATASTORE}|<p>Amount of time for a read operation from the datastore (milliseconds).</p>|Simple check|vmware.datastore.read[{$VMWARE.URL},{#DATASTORE},latency]|
-|VMware: Free space on datastore {#DATASTORE} (percentage)|<p>VMware datastore space in percentage from total.</p>|Simple check|vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree]|
+|VMware: Free space on datastore {#DATASTORE} (percentage)|<p>VMware datastore free space in percentage from total.</p>|Simple check|vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree]|
 |VMware: Total size of datastore {#DATASTORE}|<p>VMware datastore space in bytes.</p>|Simple check|vmware.datastore.size[{$VMWARE.URL},{#DATASTORE}]|
 |VMware: Average write latency of the datastore {#DATASTORE}|<p>Amount of time for a write operation to the datastore (milliseconds).</p>|Simple check|vmware.datastore.write[{$VMWARE.URL},{#DATASTORE},latency]|
 
@@ -95,8 +97,8 @@ Note: To enable discovery of hardware sensors of VMware Hypervisors, set the mac
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|VMware: {#DATASTORE}: Disk space is critically low|<p>Datastore space exceeded critical threshold.</p>|`last(/VMware FQDN/vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree])>{$VMWARE.DATASTORE.SPACE.CRIT}`|High||
-|VMware: {#DATASTORE}: Disk space is low|<p>Datastore space exceeded warning threshold.</p>|`last(/VMware FQDN/vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree])>{$VMWARE.DATASTORE.SPACE.WARN}`|Warning|**Depends on**:<br><ul><li>VMware: {#DATASTORE}: Disk space is critically low</li></ul>|
+|VMware: {#DATASTORE}: Free space is critically low|<p>Datastore free space has fallen below critical threshold.</p>|`last(/VMware FQDN/vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree])<{$VMWARE.DATASTORE.SPACE.CRIT}`|High||
+|VMware: {#DATASTORE}: Free space is low|<p>Datastore free space has fallen below warning threshold.</p>|`last(/VMware FQDN/vmware.datastore.size[{$VMWARE.URL},{#DATASTORE},pfree])<{$VMWARE.DATASTORE.SPACE.WARN}`|Warning|**Depends on**:<br><ul><li>VMware: {#DATASTORE}: Free space is critically low</li></ul>|
 
 ### LLD rule Discover VMware hypervisors
 
@@ -210,6 +212,49 @@ Note: To enable discovery of hardware sensors of VMware Hypervisors, set the mac
 
 # VMware Hypervisor
 
+## Overview
+
+This template is designed for the effortless deployment of VMware ESX hypervisor monitoring and doesn't require any external scripts.
+
+This template can be used in discovery as well as manually linked to a host.
+
+For additional information, please see [Zabbix documentation on VM monitoring](https://www.zabbix.com/documentation/6.0/manual/vm_monitoring).
+
+To use this template as manually linked to a host, attach it to the host and manually set the value of the `{$VMWARE.HV.UUID}` macro.
+
+## Requirements
+
+Zabbix version: 6.0 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- VMware 6.0, 6.7, 7.0, 8.0
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+To use this template as manually linked to a host:
+  1. Compile Zabbix server with the required options (`--with-libxml2` and `--with-libcurl`)
+  2. Set the `StartVMwareCollectors` option in the Zabbix server configuration file to "1" or more
+  3. Create a new host
+  4. Set the host macros (on the host or template level) required for VMware authentication:
+  ```text
+  {$VMWARE.URL}
+  {$VMWARE.USERNAME}
+  {$VMWARE.PASSWORD}
+  ```
+  5. To get the hypervisor UUID, enable access to the hypervisor via SSH and log in via SSH using a valid login and password.
+  6. Run the following command and specify the UUID in the macro `{$VMWARE.HV.UUID}`:
+  ```text
+  vim-cmd hostsvc/hostsummary | grep uuid
+  ```
+  7. Add the agent interface on the host with the address (IP or DNS) of the VMware hypervisor
+  8. Link the template to the host created earlier
+
 ### Macros used
 
 |Name|Description|Default|
@@ -220,8 +265,9 @@ Note: To enable discovery of hardware sensors of VMware Hypervisors, set the mac
 |{$VMWARE.HV.SENSOR.DISCOVERY}|<p>Set "true"/"false" to enable or disable monitoring of hardware sensors.</p>|`false`|
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.MATCHES}|<p>Sets the regex string of hardware sensor names to allow in discovery.</p>|`.*`|
 |{$VMWARE.HV.SENSOR.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the regex string of hardware sensor names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
-|{$VMWARE.HV.DATASTORE.SPACE.CRIT}|<p>The critical threshold of the datastore space utilization.</p>|`90`|
-|{$VMWARE.HV.DATASTORE.SPACE.WARN}|<p>The warning threshold of the datastore space utilization.</p>|`80`|
+|{$VMWARE.HV.DATASTORE.SPACE.CRIT}|<p>The critical threshold of the datastore free space.</p>|`10`|
+|{$VMWARE.HV.DATASTORE.SPACE.WARN}|<p>The warning threshold of the datastore free space.</p>|`20`|
+|{$VMWARE.HV.UUID}|<p>UUID of hypervisor.</p>||
 
 ### Items
 
@@ -274,7 +320,7 @@ Note: To enable discovery of hardware sensors of VMware Hypervisors, set the mac
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |VMware: Average read latency of the datastore {#DATASTORE}|<p>Average amount of time for a read operation from the datastore (milliseconds).</p>|Simple check|vmware.hv.datastore.read[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},latency]|
-|VMware: Free space on datastore {#DATASTORE} (percentage)|<p>VMware datastore space in percentage from total.</p>|Simple check|vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree]|
+|VMware: Free space on datastore {#DATASTORE} (percentage)|<p>VMware datastore free space in percentage from total.</p>|Simple check|vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree]|
 |VMware: Total size of datastore {#DATASTORE}|<p>VMware datastore space in bytes.</p>|Simple check|vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}]|
 |VMware: Average write latency of the datastore {#DATASTORE}|<p>Average amount of time for a write operation to the datastore (milliseconds).</p>|Simple check|vmware.hv.datastore.write[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},latency]|
 |VMware: Multipath count for datastore {#DATASTORE}|<p>Number of available datastore paths.</p>|Simple check|vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}]|
@@ -283,8 +329,8 @@ Note: To enable discovery of hardware sensors of VMware Hypervisors, set the mac
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|VMware: {#DATASTORE}: Disk space is critically low|<p>Datastore space exceeded critical threshold.</p>|`last(/VMware Hypervisor/vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree])>{$VMWARE.HV.DATASTORE.SPACE.CRIT}`|High||
-|VMware: {#DATASTORE}: Disk space is low|<p>Datastore space exceeded warning threshold.</p>|`last(/VMware Hypervisor/vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree])>{$VMWARE.HV.DATASTORE.SPACE.WARN}`|Warning|**Depends on**:<br><ul><li>VMware: {#DATASTORE}: Disk space is critically low</li></ul>|
+|VMware: {#DATASTORE}: Free space is critically low|<p>Datastore free space has fallen below critical threshold.</p>|`last(/VMware Hypervisor/vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree])<{$VMWARE.HV.DATASTORE.SPACE.CRIT}`|High||
+|VMware: {#DATASTORE}: Free space is low|<p>Datastore free space has fallen below warning threshold.</p>|`last(/VMware Hypervisor/vmware.hv.datastore.size[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE},pfree])<{$VMWARE.HV.DATASTORE.SPACE.WARN}`|Warning|**Depends on**:<br><ul><li>VMware: {#DATASTORE}: Free space is critically low</li></ul>|
 |VMware: The multipath count has been changed|<p>The number of available datastore paths less than registered ({#MULTIPATH.COUNT}).</p>|`last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#1)<>last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}],#2) and last(/VMware Hypervisor/vmware.hv.datastore.multipath[{$VMWARE.URL},{$VMWARE.HV.UUID},{#DATASTORE}])<{#MULTIPATH.COUNT}`|Average|**Manual close**: Yes|
 
 ### LLD rule Healthcheck discovery

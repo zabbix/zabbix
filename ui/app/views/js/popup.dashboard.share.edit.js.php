@@ -83,7 +83,9 @@ window.dashboard_share_edit_popup = {
 
 				const message_box = (typeof error === 'object' && 'html_string' in error)
 					? new DOMParser().parseFromString(error.html_string, 'text/html').body.firstElementChild
-					: makeMessageBox('bad', [], t('Failed to update dashboard sharing.'), true, false)[0];
+					: makeMessageBox('bad', [], <?= json_encode(_('Failed to update dashboard sharing.')) ?>, true,
+						false
+					)[0];
 
 				form.parentNode.insertBefore(message_box, form);
 			});

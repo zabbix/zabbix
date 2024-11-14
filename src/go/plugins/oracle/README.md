@@ -27,13 +27,11 @@ CREATE USER zabbix_mon IDENTIFIED BY <PASSWORD>;
 -- Grant access to the zabbix_mon user.
 GRANT CONNECT, CREATE SESSION TO zabbix_mon;
 GRANT SELECT_CATALOG_ROLE to zabbix_mon;
-GRANT SELECT ON DBA_TABLESPACE_USAGE_METRICS TO zabbix_mon;
-GRANT SELECT ON DBA_TABLESPACES TO zabbix_mon;
 GRANT SELECT ON DBA_USERS TO zabbix_mon;
-GRANT SELECT ON SYS.DBA_DATA_FILES TO zabbix_mon;
 GRANT SELECT ON V_$ACTIVE_SESSION_HISTORY TO zabbix_mon;
 GRANT SELECT ON V_$ARCHIVE_DEST TO zabbix_mon;
 GRANT SELECT ON V_$ASM_DISKGROUP TO zabbix_mon;
+GRANT SELECT ON V_$ASM_DISKGROUP_STAT TO zabbix_mon;
 GRANT SELECT ON V_$DATABASE TO zabbix_mon;
 GRANT SELECT ON V_$DATAFILE TO zabbix_mon;
 GRANT SELECT ON V_$INSTANCE TO zabbix_mon;
@@ -42,12 +40,76 @@ GRANT SELECT ON V_$OSSTAT TO zabbix_mon;
 GRANT SELECT ON V_$PGASTAT TO zabbix_mon;
 GRANT SELECT ON V_$PROCESS TO zabbix_mon;
 GRANT SELECT ON V_$RECOVERY_FILE_DEST TO zabbix_mon;
-GRANT SELECT ON V_$RESTORE_POINT TO zabbix_mon;
 GRANT SELECT ON V_$SESSION TO zabbix_mon;
 GRANT SELECT ON V_$SGASTAT TO zabbix_mon;
 GRANT SELECT ON V_$SYSMETRIC TO zabbix_mon;
 GRANT SELECT ON V_$SYSTEM_PARAMETER TO zabbix_mon;
 ```
+
+**Important! These privileges grant the monitoring user `SELECT_CATALOG_ROLE`, which, in turn, gives access to thousands of tables in the database.**
+This role is required to access the `V$RESTORE_POINT` dynamic performance view.
+However, there are ways to go around this, if the `SELECT_CATALOG_ROLE` assigned to a monitoring user raises any security issues.
+One way to do this is using **pipelined table functions**:
+
+  1. Log into your database as the `SYS` user or make sure that your administration user has the required privileges to execute the steps below;
+  
+  2. Create types for the table function:
+    
+      ```sql
+      CREATE OR REPLACE TYPE zbx_mon_restore_point_row AS OBJECT (
+        SCN                           NUMBER,
+        DATABASE_INCARNATION#         NUMBER,
+        GUARANTEE_FLASHBACK_DATABASE  VARCHAR2(3),
+        STORAGE_SIZE                  NUMBER,
+        TIME                          TIMESTAMP(9),
+        RESTORE_POINT_TIME            TIMESTAMP(9),
+        PRESERVED                     VARCHAR2(3),
+        NAME                          VARCHAR2(128),
+        PDB_RESTORE_POINT             VARCHAR2(3),
+        CLEAN_PDB_RESTORE_POINT       VARCHAR2(3),
+        PDB_INCARNATION#              NUMBER,
+        REPLICATED                    VARCHAR2(3),
+        CON_ID                        NUMBER
+      );
+      CREATE OR REPLACE TYPE zbx_mon_restore_point_tab IS TABLE OF zbx_mon_restore_point_row;
+      ```
+  
+  3. Create the pipelined table function:
+  
+      ```sql
+      CREATE OR REPLACE FUNCTION zbx_mon_restore_point RETURN zbx_mon_restore_point_tab PIPELINED AS
+      BEGIN
+        FOR i IN (SELECT * FROM V$RESTORE_POINT) LOOP
+          PIPE ROW (zbx_mon_restore_point_row(i.SCN, i.DATABASE_INCARNATION#, i.GUARANTEE_FLASHBACK_DATABASE, i.STORAGE_SIZE, i.TIME, i.RESTORE_POINT_TIME, i.PRESERVED, i.NAME, i.PDB_RESTORE_POINT, i.CLEAN_PDB_RESTORE_POINT, i.PDB_INCARNATION#, i.REPLICATED, i.CON_ID));
+        END LOOP;
+        RETURN;
+      END;
+      ```
+  
+  4. Grant the Zabbix monitoring user the Execute privilege on the created pipelined table function and replace the monitoring user `V$RESTORE_POINT` view with the `SYS` user function (in this example, the `SYS` user is used to create DB types and function):
+
+      ```sql
+      GRANT EXECUTE ON zbx_mon_restore_point TO zabbix_mon;
+      CREATE OR REPLACE VIEW zabbix_mon.V$RESTORE_POINT AS SELECT * FROM TABLE(SYS.zbx_mon_restore_point);
+      ```
+
+5. Finally, revoke the `SELECT_CATALOG_ROLE` and grant additional permissions that were previously covered by the `SELECT_CATALOG_ROLE`.
+
+    ```sql
+    REVOKE SELECT_CATALOG_ROLE FROM zabbix_mon;
+    GRANT SELECT ON v_$pdbs TO zabbix_mon;
+    GRANT SELECT ON gv_$sort_segment TO zabbix_mon;
+    GRANT SELECT ON v_$parameter TO zabbix_mon;
+    GRANT SELECT ON DBA_TABLESPACES TO zabbix_mon;
+    GRANT SELECT ON DBA_DATA_FILES TO zabbix_mon;
+    GRANT SELECT ON DBA_FREE_SPACE TO zabbix_mon;
+    GRANT SELECT ON DBA_TEMP_FILES TO zabbix_mon;
+    ```
+
+  > Note that in these examples, the monitoring user is named `zabbix_mon` and the system user - `SYS`. Change these example usernames to ones that are appropriate for your environment.
+  
+  If this workaround does not work for you, there are more options available, such as __materialized views__, but look out for data refresh as `V$RESTORE_POINT` is a dynamic performance view.
+
 3. Make sure a TNS Listener and an Oracle instance are available for the connection.  
 
 ## Configuration

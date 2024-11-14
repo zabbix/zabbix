@@ -174,10 +174,6 @@ function removeListener(element, eventname, expression, bubbling) {
 }
 
 function cancelEvent(e) {
-	if (!e) {
-		e = window.event;
-	}
-
 	e.stopPropagation();
 	e.preventDefault();
 
@@ -758,11 +754,11 @@ function redirect(uri, method, needle, invert_needle, add_sid, allow_empty) {
 			if ((is_needle && !invert_needle) || (!is_needle && invert_needle)) {
 				if (Array.isArray(args[key])) {
 					for (var i = 0, l = args[key].length; i < l; i++) {
-						action += '&' + key + '[]=' + args[key][i];
+						action += '&' + key + '[]=' + encodeURIComponent(args[key][i]);
 					}
 				}
 				else {
-					action += '&' + key + '=' + args[key];
+					action += '&' + key + '=' + encodeURIComponent(args[key]);
 				}
 
 				continue;
@@ -991,7 +987,7 @@ Function.prototype.bindAsEventListener = function (context) {
 	var method = this, args = Array.prototype.slice.call(arguments, 1);
 
 	return function(event) {
-		return method.apply(context, [event || window.event].concat(args));
+		return method.apply(context, [event].concat(args));
 	};
 };
 

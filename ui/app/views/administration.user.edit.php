@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('administration.user.edit.common.js.php');
@@ -319,11 +320,18 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 			'dstfrm' => $user_form->getName(),
 			'media' => $index,
 			'mediatypeid' => $media['mediatypeid'],
-			($media['mediatype'] == MEDIA_TYPE_EMAIL) ? 'sendto_emails' : 'sendto' => $media['sendto'],
 			'period' => $media['period'],
 			'severity' => $media['severity'],
 			'active' => $media['active']
 		];
+
+		if ($media['mediatype'] === MEDIA_TYPE_EMAIL) {
+			$parameters['sendto_emails'] = $media['sendto'];
+		}
+		else {
+			$parameters['sendto'] = $media['sendto'];
+		}
+
 		$media_severity = [];
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
@@ -339,7 +347,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				);
 		}
 
-		if ($media['mediatype'] == MEDIA_TYPE_EMAIL) {
+		if (is_array($media['sendto'])) {
 			$media['sendto'] = implode(', ', $media['sendto']);
 		}
 
@@ -349,7 +357,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 
 		$media_table_info->addRow(
 			(new CRow([
-				$media['name'],
+				$media['name'] ?? (new CSpan(_('Unknown')))->addClass(ZBX_STYLE_DISABLED),
 				$media['sendto'],
 				(new CDiv($media['period']))
 					->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
@@ -403,7 +411,7 @@ if ($data['action'] === 'user.edit') {
 		'object_name' => 'roles',
 		'data' => $data['role'],
 		'multiple' => false,
-		'disabled' => $data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0,
+		'readonly' => $data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0,
 		'popup' => [
 			'parameters' => [
 				'srctbl' => 'roles',

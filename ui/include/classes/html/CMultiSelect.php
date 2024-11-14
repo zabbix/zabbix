@@ -67,6 +67,10 @@ class CMultiSelect extends CTag {
 			$this->setAttribute('aria-disabled', 'true');
 		}
 
+		if (array_key_exists('readonly', $options) && $options['readonly']) {
+			$this->setAttribute('aria-readonly', 'true');
+		}
+
 		// Autocomplete url.
 		$url = (new CUrl('jsrpc.php'))
 			->setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON)
@@ -99,7 +103,8 @@ class CMultiSelect extends CTag {
 			$params['data'] = zbx_cleanHashes($options['data']);
 		}
 
-		foreach (['defaultValue', 'disabled', 'selectedLimit', 'addNew', 'styles', 'placeholder'] as $option) {
+		foreach (['defaultValue', 'disabled', 'selectedLimit', 'addNew', 'styles', 'placeholder', 'readonly']
+				as $option) {
 			if (array_key_exists($option, $options)) {
 				$params[$option] = $options[$option];
 			}
@@ -121,18 +126,6 @@ class CMultiSelect extends CTag {
 
 			if (array_key_exists('parameters', $options['popup'])) {
 				$params['popup']['parameters'] = $options['popup']['parameters'];
-
-				$excludeids = array_key_exists('excludeids', $options['popup']['parameters'])
-					? $options['popup']['parameters']['excludeids']
-					: [];
-
-				$excludeids = array_merge($excludeids, array_key_exists('disableids', $options['popup']['parameters'])
-					? $options['popup']['parameters']['disableids']
-					: []);
-
-				if ($excludeids) {
-					$params['excludeids'] = $excludeids;
-				}
 			}
 		}
 
@@ -161,7 +154,7 @@ class CMultiSelect extends CTag {
 	 */
 	protected function mapOptions(array $options) {
 		$valid_fields = ['name', 'object_name', 'multiselect_id', 'multiple', 'disabled', 'default_value', 'data',
-			'add_new', 'add_post_js', 'styles', 'popup', 'custom_select', 'placeholder', 'autosuggest'
+			'add_new', 'add_post_js', 'styles', 'popup', 'custom_select', 'placeholder', 'autosuggest', 'readonly'
 		];
 
 		foreach ($options as $field => $value) {
@@ -181,7 +174,8 @@ class CMultiSelect extends CTag {
 			'add_new' => 'addNew',
 			'add_post_js' => 'add_post_js',
 			'styles' => 'styles',
-			'placeholder' => 'placeholder'
+			'placeholder' => 'placeholder',
+			'readonly' => 'readonly'
 		];
 
 		foreach ($mappings as $new_field => $old_field) {

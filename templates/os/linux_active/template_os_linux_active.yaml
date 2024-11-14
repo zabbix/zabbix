@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-05-07T08:13:48Z'
+  date: '2024-10-31T12:21:41Z'
   groups:
     - uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -398,19 +398,6 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-          triggers:
-            - uuid: 10f29c3898cf41a0a2551349cd052413
-              expression: 'fuzzytime(/Linux by Zabbix agent active/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0'
-              name: 'Linux: System time is out of sync'
-              event_name: 'Linux: System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
-              priority: WARNING
-              description: 'The host''s system time is different from Zabbix server time.'
-              manual_close: 'YES'
-              tags:
-                - tag: scope
-                  value: availability
-                - tag: scope
-                  value: performance
         - uuid: 627cbcb2432a4aeda6e90363d9b0c1db
           name: 'Linux: Operating system architecture'
           type: ZABBIX_ACTIVE
@@ -1249,10 +1236,6 @@ zabbix_export:
                   item:
                     host: 'Linux by Zabbix agent active'
                     key: 'vfs.dev.util[{#DEVNAME}]'
-          preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
         - uuid: 5c9b5dbed44c4af0957ff9316f8fb761
           name: 'Mounted filesystem discovery'
           type: ZABBIX_ACTIVE
@@ -1463,8 +1446,6 @@ zabbix_export:
           description: 'It filters out `loopbacks`, `nulls`, `docker veth` links and `docker0 bridge` by default.'
         - macro: '{$SWAP.PFREE.MIN.WARN}'
           value: '50'
-        - macro: '{$SYSTEM.FUZZYTIME.MAX}'
-          value: '60'
         - macro: '{$VFS.DEV.DEVNAME.MATCHES}'
           value: .+
           description: 'This macro is used for a discovery of block devices. It can be overridden on host level or its linked template level.'

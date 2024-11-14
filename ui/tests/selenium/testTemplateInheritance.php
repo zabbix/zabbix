@@ -43,6 +43,15 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 */
 	protected $hostName = 'Template inheritance test host';
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
 	public function testTemplateInheritance_linkHost(){
 		$sql = "select hostid from hosts where host='Zabbix agent';";
 		$this->assertEquals(1, CDBHelper::getCount($sql));
@@ -120,7 +129,8 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestInputType('description', 'description');
 		$this->assertTrue($this->zbxTestCheckboxSelected('status'));
 
-		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
+		$this->query('xpath://div[contains(@class, tfoot-buttons)]/button[@id="add"]')->waitUntilClickable()->one()->click();
+		$this->assertMessage($result);
 
 		switch ($result) {
 			case TEST_GOOD:
@@ -221,7 +231,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestAssertElementValue('description', 'Test LLD trigger1');
 		$this->zbxTestAssertElementValue('expression', 'last(/Template inheritance test host/key-item-inheritance-test,#1)=0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
-		$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
+		$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@readonly]");
 		$this->zbxTestAssertElementText('//*[@name="comments"]', 'comments');
 		$this->zbxTestAssertElementValue('url', 'zabbix.php');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_2'));
@@ -260,7 +270,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestLaunchOverlayDialog('Items');
 		$this->zbxTestClickLinkText('testInheritanceItem1');
 		$this->zbxTestClickWait('add');
-		$this->zbxTestTextPresent('Graph added');
+		$this->assertMessage(TEST_GOOD,'Graph added');
 
 		// check that the inherited graph matches the original
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
@@ -438,7 +448,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->assertEquals($getName, 'Test LLD trigger');
 		$this->zbxTestAssertElementValue('expression', 'last(/Template inheritance test host/item-discovery-prototype,#1)=0');
 		$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
-		$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
+		$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@readonly]");
 		$this->zbxTestAssertElementText('//*[@name="comments"]', 'comments');
 		$this->zbxTestAssertElementValue('url', 'zabbix.php');
 		$this->assertTrue($this->zbxTestCheckboxSelected('priority_2'));
@@ -493,7 +503,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestTextPresent($this->templateName.': testInheritanceItem1');
 
 		$this->zbxTestClickWait('add');
-		$this->zbxTestTextPresent('Graph prototype added');
+		$this->assertMessage(TEST_GOOD,'Graph prototype added');
 		$this->zbxTestTextPresent('Test LLD graph');
 
 		// check that the inherited graph matches the original

@@ -260,7 +260,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$SYSTEM.FUZZYTIME.MAX}|<p>The threshold for difference of system time in seconds.</p>|`60`|
+|{$SYSTEM.FUZZYTIME.MAX}|<p>The upper threshold for difference of system time.</p>|`60s`|
+|{$SYSTEM.FUZZYTIME.MIN}|<p>The lower threshold for difference of system time. Used in recovery expression to avoid trigger flapping.</p>|`10s`|
 
 ### Items
 

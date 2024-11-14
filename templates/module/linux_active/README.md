@@ -205,7 +205,7 @@ Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.za
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Block devices discovery||Zabbix agent (active)|vfs.dev.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Block devices discovery||Zabbix agent (active)|vfs.dev.discovery|
 
 ### Item prototypes for Block devices discovery
 
@@ -316,7 +316,6 @@ Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.za
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$SYSTEM.FUZZYTIME.MAX}||`60`|
 |{$KERNEL.MAXPROC.MIN}||`1024`|
 |{$KERNEL.MAXFILES.MIN}||`256`|
 
@@ -344,7 +343,6 @@ Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.za
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Linux: {HOST.NAME} has been restarted|<p>The host uptime is less than 10 minutes.</p>|`last(/Linux generic by Zabbix agent active/system.uptime)<10m`|Warning|**Manual close**: Yes|
-|Linux: System time is out of sync|<p>The host's system time is different from Zabbix server time.</p>|`fuzzytime(/Linux generic by Zabbix agent active/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0`|Warning|**Manual close**: Yes|
 |Linux: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`change(/Linux generic by Zabbix agent active/system.hostname) and length(last(/Linux generic by Zabbix agent active/system.hostname))>0`|Info|**Manual close**: Yes|
 |Linux: Configured max number of open filedescriptors is too low||`last(/Linux generic by Zabbix agent active/kernel.maxfiles)<{$KERNEL.MAXFILES.MIN}`|Info||
 |Linux: Configured max number of processes is too low||`last(/Linux generic by Zabbix agent active/kernel.maxproc)<{$KERNEL.MAXPROC.MIN}`|Info|**Depends on**:<br><ul><li>Linux: Getting closer to process limit</li></ul>|

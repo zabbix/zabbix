@@ -1068,7 +1068,7 @@ class CHistoryManager {
 			$period = $time_to - $time_from;
 
 			// Required for 'group by' support of Oracle.
-			$calc_field = 'round('.$width.'*('.zbx_dbcast_2bigint('clock').'-'.$time_from.')/'.$period.',0)';
+			$calc_field = 'round('.$width.'.0*(clock-'.$time_from.')/'.$period.',0)';
 
 			$sql_select_extra = ','.$calc_field.' AS i';
 			$group_by .= ','.$calc_field;

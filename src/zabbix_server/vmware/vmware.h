@@ -234,6 +234,7 @@ typedef struct
 	unsigned char	oom;		/* no enough memory to store new events */
 	zbx_uint64_t	req_sz;		/* memory size required to store events */
 	time_t		last_ts;	/* timestamp when vmware.eventlog[] item was polled last time */
+	zbx_uint64_t	owner_itemid;	/* single item that will receive all events */
 }
 zbx_vmware_eventlog_state_t;
 

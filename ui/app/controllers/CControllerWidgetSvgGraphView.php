@@ -73,10 +73,16 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 
 	protected function doAction() {
 		$fields = $this->getForm()->getFieldsData();
+
 		$edit_mode = $this->getInput('edit_mode', 0);
 		$width = (int) $this->getInput('content_width', self::GRAPH_WIDTH_MIN);
 		$height = (int) $this->getInput('content_height', self::GRAPH_HEIGHT_MIN);
 		$preview = (bool) $this->getInput('preview', 0); // Configuration preview.
+
+		// Hide left/right Y axis if it is not used by any dataset.
+		$ds_y_axes = array_column($fields['ds'], 'axisy', 'axisy');
+		$lefty = array_key_exists(GRAPH_YAXIS_SIDE_LEFT, $ds_y_axes) ? $fields['lefty'] : 0;
+		$righty = array_key_exists(GRAPH_YAXIS_SIDE_RIGHT, $ds_y_axes) ? $fields['righty'] : 0;
 
 		$parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 		$lefty_min = $parser->parse($fields['lefty_min']) == CParser::PARSE_SUCCESS ? $parser->calcValue() : '';
@@ -93,7 +99,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 				'time_to' => null
 			],
 			'left_y_axis' => [
-				'show' => $fields['lefty'],
+				'show' => $lefty,
 				'min' => $lefty_min,
 				'max' => $lefty_max,
 				'units' => ($fields['lefty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC)
@@ -101,7 +107,7 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 					: null
 			],
 			'right_y_axis' => [
-				'show' => $fields['righty'],
+				'show' => $righty,
 				'min' => $righty_min,
 				'max' => $righty_max,
 				'units' => ($fields['righty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC)

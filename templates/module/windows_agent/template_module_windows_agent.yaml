@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-05-07T08:22:43Z'
+  date: '2024-06-12T12:07:34Z'
   groups:
     - uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
@@ -425,8 +425,10 @@ zabbix_export:
           triggers:
             - uuid: 3144a1b15227479e9ea4ce858faea74b
               expression: 'fuzzytime(/Windows generic by Zabbix agent/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'fuzzytime(/Windows generic by Zabbix agent/system.localtime,{$SYSTEM.FUZZYTIME.MIN})=1'
               name: 'Windows: System time is out of sync'
-              event_name: 'Windows: System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
+              event_name: 'Windows: System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX})'
               priority: WARNING
               description: 'The host''s system time is different from Zabbix server time.'
               manual_close: 'YES'
@@ -487,8 +489,11 @@ zabbix_export:
                   value: notice
       macros:
         - macro: '{$SYSTEM.FUZZYTIME.MAX}'
-          value: '60'
-          description: 'The threshold for difference of system time in seconds.'
+          value: 60s
+          description: 'The upper threshold for difference of system time.'
+        - macro: '{$SYSTEM.FUZZYTIME.MIN}'
+          value: 10s
+          description: 'The lower threshold for difference of system time. Used in recovery expression to avoid trigger flapping.'
       dashboards:
         - uuid: fe672969b8cc48728d6c879def44ef81
           name: Processes

@@ -132,7 +132,7 @@ $mediatype_formlist->addRow((new CLabel(_('GSM modem'), 'gsm_modem'))->setAsteri
 );
 
 // Create password field.
-if ($data['passwd'] !== '' && !$data['change_passwd']) {
+if (!$data['display_password_input']) {
 	// Disabling 'passwd' field prevents stored passwords autofill by browser.
 	$passwd_field = [
 		(new CButton('chPass_btn', _('Change password'))),
@@ -263,7 +263,9 @@ $mediatype_formlist
 		'row_webhook_event_menu_url'
 	)
 	->addRow(_('Description'),
-		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('description', $data['description']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('media_type', 'description'))
 	)
 	->addRow(_('Enabled'),
 		(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked($data['status'] == MEDIA_TYPE_STATUS_ACTIVE)

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-05-07T08:12:59Z'
+  date: '2024-10-31T12:21:34Z'
   groups:
     - uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
@@ -273,10 +273,6 @@ zabbix_export:
                   item:
                     host: 'Linux block devices by Zabbix agent active'
                     key: 'vfs.dev.util[{#DEVNAME}]'
-          preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
       macros:
         - macro: '{$VFS.DEV.DEVNAME.MATCHES}'
           value: .+
@@ -950,19 +946,6 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-          triggers:
-            - uuid: 350ceb73bee84b21b1f5c559e6697879
-              expression: 'fuzzytime(/Linux generic by Zabbix agent active/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0'
-              name: 'Linux: System time is out of sync'
-              event_name: 'Linux: System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
-              priority: WARNING
-              description: 'The host''s system time is different from Zabbix server time.'
-              manual_close: 'YES'
-              tags:
-                - tag: scope
-                  value: availability
-                - tag: scope
-                  value: performance
         - uuid: 6f37348c05fa409e9189af3731296095
           name: 'Linux: Operating system architecture'
           type: ZABBIX_ACTIVE
@@ -1105,8 +1088,6 @@ zabbix_export:
           value: '256'
         - macro: '{$KERNEL.MAXPROC.MIN}'
           value: '1024'
-        - macro: '{$SYSTEM.FUZZYTIME.MAX}'
-          value: '60'
       dashboards:
         - uuid: 0d616895bc1a4c768c8b7b37039b0df7
           name: Processes

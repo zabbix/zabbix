@@ -728,6 +728,12 @@ form {
 		white-space: nowrap;
 	}
 
+	.wordbreak {
+		white-space: normal;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
 	&.sticky-header {
 		thead {
 			position: sticky;
@@ -1172,6 +1178,10 @@ form {
 		@extend %form-disabled;
 	}
 
+	&[aria-readonly] {
+		@extend %form-readonly;
+	}
+
 	input[type="text"] {
 		border: 0;
 		background: none;
@@ -1244,6 +1254,14 @@ form {
 			background-color: $multiselect-item-disabled-bg-color;
 			color: $multiselect-item-disabled-color;
 			-webkit-text-fill-color: $multiselect-item-disabled-color;
+		}
+	}
+
+	[aria-readonly] {
+		.subfilter-enabled,
+		.subfilter-disable-btn {
+			cursor: default;
+			background-color: $multiselect-item-disabled-bg-color;
 		}
 	}
 
@@ -1524,6 +1542,10 @@ form {
 	display: inline-block;
 	padding: 5px;
 	position: relative;
+
+	.wordbreak {
+		white-space: normal;
+	}
 }
 
 .border-left {
@@ -1816,6 +1838,12 @@ select {
 				border-color: $form-border-color !important;
 			}
 		}
+
+		&:checked[readonly] + label span {
+			&::after {
+				border-color: $font-color !important;
+			}
+		}
 	}
 
 	&[type="radio"] {
@@ -1840,6 +1868,12 @@ select {
 		&:checked[disabled] + label span {
 			&::after {
 				background-color: $form-border-color !important;
+			}
+		}
+
+		&:checked[readonly] + label span {
+			&::after {
+				background-color: $font-color !important;
 			}
 		}
 	}
@@ -3111,6 +3145,12 @@ $form-icon-btn: (
 	}
 }
 
+div {
+	.overlay-dialogue.wordbreak {
+		white-space: normal;
+	}
+}
+
 .overlay-dialogue {
 	display: table;
 	position: absolute;
@@ -3120,6 +3160,10 @@ $form-icon-btn: (
 	border: 1px solid $overlay-border-color;
 	border-bottom-color: darken($overlay-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
+
+	.wordbreak {
+		white-space: normal;
+	}
 
 	&.modal {
 		position: fixed;
@@ -3449,7 +3493,7 @@ $form-icon-btn: (
 	min-height: 24px;
 	overflow: hidden;
 	resize: none;
-	word-break: break-all;
+	word-break: break-word;
 	height: 24px;
 	line-height: 14px;
 	white-space: break-spaces;
@@ -6352,7 +6396,7 @@ $range-input-width: 31px;
 	.table-col-function { width: 85px; }
 	.table-col-draw-style { width: 85px; }
 	.table-col-y-axis-side { width: 85px; }
-	.table-col-colour { width: 55px; }
+	.table-col-color { width: 55px; }
 	.table-col-action { width: 55px; }
 }
 

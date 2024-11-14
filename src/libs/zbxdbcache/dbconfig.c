@@ -7327,6 +7327,8 @@ int	init_configuration_cache(char **error)
 	else
 		config->session_token = NULL;
 
+	config->itservices_num = 0;
+
 #undef CREATE_HASHSET
 #undef CREATE_HASHSET_EXT
 out:
@@ -11326,13 +11328,31 @@ static void	dc_status_update_apply_diff(zbx_dc_status_diff_t *diff)
 	config->status->last_update = time(NULL);
 }
 
+static const ZBX_DC_ITEM	*get_active_master_item_rec(const ZBX_DC_ITEM *dc_item)
+{
+	const ZBX_DC_ITEM	*dc_item_local;
+
+	if (ITEM_TYPE_DEPENDENT != dc_item->type)
+		return dc_item;
+
+	if (NULL == (dc_item_local = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
+			&dc_item->itemtype.depitem->master_itemid)) || ITEM_STATUS_ACTIVE != dc_item_local->status)
+	{
+		return NULL;
+	}
+
+	return get_active_master_item_rec(dc_item_local);
+}
+
 static void	get_item_statistics(zbx_dc_status_diff_t *diff)
 {
-	zbx_hashset_iter_t	iter;
-	ZBX_DC_HOST		*dc_host;
+	int				delay_last = 0;
+	zbx_uint64_t			master_itemid = 0;
+	zbx_hashset_iter_t		iter;
+	ZBX_DC_HOST			*dc_host;
 	zbx_dc_status_diff_host_t	*host_diff;
 	zbx_dc_status_diff_proxy_t	*proxy_diff;
-	const ZBX_DC_ITEM	*dc_item;
+	const ZBX_DC_ITEM		*dc_item;
 
 	zbx_hashset_iter_reset(&config->items, &iter);
 
@@ -11360,17 +11380,32 @@ static void	get_item_statistics(zbx_dc_status_diff_t *diff)
 			case ITEM_STATUS_ACTIVE:
 				if (HOST_STATUS_MONITORED == dc_host->status)
 				{
-					if (SUCCEED == diff->reset)
-					{
-						int	delay;
+					int			delay = 0;
+					const ZBX_DC_ITEM	*dc_item_local;
 
-						if (SUCCEED == zbx_interval_preproc(dc_item->delay, &delay, NULL, NULL) &&
-								0 != delay)
+					if (SUCCEED == diff->reset &&
+							NULL != (dc_item_local = get_active_master_item_rec(dc_item)))
+					{
+						if (0 == master_itemid || master_itemid != dc_item_local->itemid)
+						{
+							(void)zbx_interval_preproc(dc_item_local->delay, &delay,
+									NULL, NULL);
+						}
+						else
+							delay = delay_last;
+
+						if (0 != delay)
 						{
 							diff->required_performance += 1.0 / delay;
 
 							if (NULL != proxy_diff)
 								proxy_diff->required_performance += 1.0 / delay;
+
+							if (master_itemid != dc_item_local->itemid)
+							{
+								delay_last = delay;
+								master_itemid = dc_item_local->itemid;
+							}
 						}
 					}
 
@@ -13905,6 +13940,25 @@ int	zbx_dc_maintenance_has_tags(void)
 
 	return ret;
 }
+
+void	zbx_dc_set_itservices_num(int num)
+{
+	WRLOCK_CACHE;
+	config->itservices_num = num;
+	UNLOCK_CACHE;
+}
+
+int	zbx_dc_get_itservices_num(void)
+{
+	int	num;
+
+	RDLOCK_CACHE;
+	num = config->itservices_num;
+	UNLOCK_CACHE;
+
+	return num;
+}
+
 
 #ifdef HAVE_TESTS
 #	include "../../../tests/libs/zbxdbcache/dc_item_poller_type_update_test.c"

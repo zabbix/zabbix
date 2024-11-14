@@ -971,7 +971,7 @@
 
 		this.overlay = overlayDialogue({
 			class: 'modal-popup modal-popup-medium',
-			title: t('Operation details')
+			title: <?= json_encode(_('Operation details')) ?>
 		});
 
 		const props = {
@@ -1070,13 +1070,13 @@
 		}
 
 		const buttons = [{
-			title: this.operation_num === null ? t('Add') : t('Update'),
+			title: this.operation_num === null ? <?= json_encode(_('Add')) ?> : <?= json_encode(_('Update')) ?>,
 			class: '',
 			keepOpen: true,
 			isSubmit: true,
 			action: () => this.onsubmit()
 		}, {
-			title: t('Cancel'),
+			title: <?= json_encode(_('Cancel')) ?>,
 			class: 'btn-alt',
 			cancel: true,
 			action: () => this.trigger_element.focus()

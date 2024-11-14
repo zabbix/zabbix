@@ -253,7 +253,7 @@ $tags_tab = (new CFormGrid())
 						->addClass('tags-table')
 						->setHeader((new CRowHeader([_('Name'), _('Value'), _('Action')]))->addClass(ZBX_STYLE_GREY)),
 					(new CScriptTemplate('tag-row-tmpl'))
-						->addItem(renderTagTableRow('#{rowNum}', '', '', ['add_post_js' => false]))
+						->addItem(renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => ''], ['add_post_js' => false]))
 				])
 		)
 	]);

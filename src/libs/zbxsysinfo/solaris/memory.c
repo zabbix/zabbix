@@ -207,7 +207,7 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 
 		CHECKED_SYSCONF_SYSCALL(_SC_PAGESIZE);
 
-		total *= res_SC_PHYS_PAGES;
+		total *= res_SC_PAGESIZE;
 		SET_DBL_RESULT(result, (total - freemem) / (double)total * 100);
 	}
 	else if (NULL != error)

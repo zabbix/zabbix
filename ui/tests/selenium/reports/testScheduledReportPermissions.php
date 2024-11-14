@@ -613,8 +613,7 @@ class testScheduledReportPermissions extends CWebTest {
 		$this->page->query('button:Create report')->waitUntilClickable()->one()->click();
 		$form = $this->query('id:scheduledreport-form')->waitUntilVisible()->asForm()->one();
 		$form->checkValue(['Owner' => $data['alias']]);
-		// TODO: check why not working $form->getField('Owner')->isEnabled($state)
-		$this->assertTrue($form->getField('Owner')->query('xpath://div[@class="selected"]/ul')->one()->isEnabled($state));
+		$this->assertTrue($form->getField('Owner')->isEnabled($state));
 
 		// Check create form on dashboard.
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid=1')->waitUntilReady();
@@ -623,7 +622,7 @@ class testScheduledReportPermissions extends CWebTest {
 		$overlay = COverlayDialogElement::find()->waitUntilReady()->one();
 		$form = $overlay->query('id:scheduledreport-form')->waitUntilVisible()->asForm()->one();
 		$form->checkValue(['Owner' => $data['alias']]);
-		$this->assertTrue($form->getField('Owner')->query('xpath://div[@class="selected"]/ul')->one()->isEnabled($state));
+		$this->assertTrue($form->getField('Owner')->isEnabled($state));
 	}
 
 	public static function getDeleteData() {

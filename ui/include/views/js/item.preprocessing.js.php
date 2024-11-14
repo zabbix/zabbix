@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 ?>
 
@@ -412,23 +413,26 @@
 					case '<?= ZBX_PREPROC_STR_REPLACE ?>':
 						$on_fail
 							.prop('checked', false)
-							.prop('disabled', true)
-							.trigger('change');
+							.prop('disabled', true);
 						$row.find('[name*="[test]"]').prop('disabled', false);
 						break;
 
 					case '<?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>':
 						$on_fail
 							.prop('checked', true)
-							.prop('disabled', true)
-							.trigger('change');
+							.prop('readonly', true);
 						break;
 
 					default:
-						$on_fail.prop('disabled', false);
+						$on_fail
+							.prop('checked', false)
+							.prop('disabled', false)
+							.prop('readonly', false);
 						$row.find('[name*="[test]"]').prop('disabled', false);
 						break;
 				}
+
+				$on_fail.trigger('change');
 
 				updateTypeOptionsAvailability();
 			})

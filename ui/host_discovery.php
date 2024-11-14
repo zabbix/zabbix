@@ -214,7 +214,7 @@ $fields = [
 	'filter_rst' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_groupids' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	'filter_hostids' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
-	'filter_name' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_name' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,		null,	null],
 	'filter_key' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_type' =>			[T_ZBX_INT, O_OPT, null,
 									IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
@@ -765,20 +765,29 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['discoveryru
 
 	$result = (bool) API::DiscoveryRule()->update($lld_rules);
 
-	if ($result) {
-		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
-	}
-
 	$updated = count($itemids);
 
-	$messageSuccess = ($status == ITEM_STATUS_ACTIVE)
-		? _n('Discovery rule enabled', 'Discovery rules enabled', $updated)
-		: _n('Discovery rule disabled', 'Discovery rules disabled', $updated);
-	$messageFailed = ($status == ITEM_STATUS_ACTIVE)
-		? _n('Cannot enable discovery rule', 'Cannot enable discovery rules', $updated)
-		: _n('Cannot disable discovery rule', 'Cannot disable discovery rules', $updated);
+	if ($result) {
+		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
 
-	show_messages($result, $messageSuccess, $messageFailed);
+		$message = $status == ITEM_STATUS_ACTIVE
+			? _n('Discovery rule enabled', 'Discovery rules enabled', $updated)
+			: _n('Discovery rule disabled', 'Discovery rules disabled', $updated);
+
+		CMessageHelper::setSuccessTitle($message);
+	}
+	else {
+		$message = $status == ITEM_STATUS_ACTIVE
+			? _n('Cannot enable discovery rule', 'Cannot enable discovery rules', $updated)
+			: _n('Cannot disable discovery rule', 'Cannot disable discovery rules', $updated);
+
+		CMessageHelper::setErrorTitle($message);
+	}
+
+	if (hasRequest('backurl')) {
+		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response->redirect();
+	}
 }
 elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.massdelete' && hasRequest('g_hostdruleid')) {
 	$result = API::DiscoveryRule()->delete(getRequest('g_hostdruleid'));

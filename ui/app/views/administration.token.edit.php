@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->addJsFile('class.calendar.js');
@@ -52,7 +53,7 @@ $token_from_list = (new CFormList())
 	)
 	->addRow((new CLabel(_('User'), 'userid_ms'))->setAsteriskMark(), [
 		(new CMultiSelect([
-			'disabled' => ($data['tokenid'] != 0),
+			'readonly' => ($data['tokenid'] != 0),
 			'multiple' => false,
 			'name' => 'userid',
 			'object_name' => 'users',

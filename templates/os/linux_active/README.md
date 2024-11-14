@@ -49,7 +49,6 @@ Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.za
 |{$NET.IF.IFNAME.MATCHES}||`^.*$`|
 |{$NET.IF.IFNAME.NOT_MATCHES}|<p>It filters out `loopbacks`, `nulls`, `docker veth` links and `docker0 bridge` by default.</p>|`Macro too long. Please see the template.`|
 |{$IF.UTIL.MAX}|<p>This macro is used as a threshold in the interface utilization trigger.</p>|`90`|
-|{$SYSTEM.FUZZYTIME.MAX}||`60`|
 |{$KERNEL.MAXPROC.MIN}||`1024`|
 |{$KERNEL.MAXFILES.MIN}||`256`|
 
@@ -110,7 +109,6 @@ Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.za
 |Linux: Lack of available memory||`max(/Linux by Zabbix agent active/vm.memory.size[available],5m)<{$MEMORY.AVAILABLE.MIN} and last(/Linux by Zabbix agent active/vm.memory.size[total])>0`|Average||
 |Linux: High swap space usage|<p>If there is no swap configured, this trigger is ignored.</p>|`max(/Linux by Zabbix agent active/system.swap.size[,pfree],5m)<{$SWAP.PFREE.MIN.WARN} and last(/Linux by Zabbix agent active/system.swap.size[,total])>0`|Warning|**Depends on**:<br><ul><li>Linux: Lack of available memory</li><li>Linux: High memory utilization</li></ul>|
 |Linux: {HOST.NAME} has been restarted|<p>The host uptime is less than 10 minutes.</p>|`last(/Linux by Zabbix agent active/system.uptime)<10m`|Warning|**Manual close**: Yes|
-|Linux: System time is out of sync|<p>The host's system time is different from Zabbix server time.</p>|`fuzzytime(/Linux by Zabbix agent active/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0`|Warning|**Manual close**: Yes|
 |Linux: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`change(/Linux by Zabbix agent active/system.hostname) and length(last(/Linux by Zabbix agent active/system.hostname))>0`|Info|**Manual close**: Yes|
 |Linux: Configured max number of open filedescriptors is too low||`last(/Linux by Zabbix agent active/kernel.maxfiles)<{$KERNEL.MAXFILES.MIN}`|Info||
 |Linux: Configured max number of processes is too low||`last(/Linux by Zabbix agent active/kernel.maxproc)<{$KERNEL.MAXPROC.MIN}`|Info|**Depends on**:<br><ul><li>Linux: Getting closer to process limit</li></ul>|
@@ -146,7 +144,7 @@ Install Zabbix agent on Linux OS following Zabbix [documentation](https://www.za
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Block devices discovery||Zabbix agent (active)|vfs.dev.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Block devices discovery||Zabbix agent (active)|vfs.dev.discovery|
 
 ### Item prototypes for Block devices discovery
 

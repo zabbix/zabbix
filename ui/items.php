@@ -238,12 +238,13 @@ $fields = [
 	'form_refresh' =>				[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	'tags' =>						[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,		null],
 	'show_inherited_tags' =>		[T_ZBX_INT, O_OPT, null,	IN([0,1]),	null],
+	'backurl' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	// filter
 	'filter_set' =>					[T_ZBX_STR, O_OPT, null,			null,	null],
 	'filter_rst' =>					[T_ZBX_STR, O_OPT, null,			null,	null],
 	'filter_groupids' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	'filter_hostids' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
-	'filter_name' =>				[T_ZBX_STR, O_OPT, null,			null,	null],
+	'filter_name' =>				[T_ZBX_STR, O_OPT, P_NO_TRIM,		null,	null],
 	'filter_type' =>				[T_ZBX_INT, O_OPT, null,
 										IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
 											ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
@@ -340,6 +341,11 @@ else {
 			access_deny();
 		}
 	}
+}
+
+// Validate backurl.
+if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
+	access_deny();
 }
 
 // Set sub-groups of selected groups.
@@ -918,20 +924,29 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massen
 
 	$result = (bool) API::Item()->update($items);
 
-	if ($result) {
-		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
-	}
-
 	$updated = count($itemids);
 
-	$messageSuccess = ($status == ITEM_STATUS_ACTIVE)
-		? _n('Item enabled', 'Items enabled', $updated)
-		: _n('Item disabled', 'Items disabled', $updated);
-	$messageFailed = ($status == ITEM_STATUS_ACTIVE)
-		? _n('Cannot enable item', 'Cannot enable items', $updated)
-		: _n('Cannot disable item', 'Cannot disable items', $updated);
+	if ($result) {
+		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
 
-	show_messages($result, $messageSuccess, $messageFailed);
+		$message = $status == ITEM_STATUS_ACTIVE
+			? _n('Item enabled', 'Items enabled', $updated)
+			: _n('Item disabled', 'Items disabled', $updated);
+
+		CMessageHelper::setSuccessTitle($message);
+	}
+	else {
+		$message = $status == ITEM_STATUS_ACTIVE
+			? _n('Cannot enable item', 'Cannot enable items', $updated)
+			: _n('Cannot disable item', 'Cannot disable items', $updated);
+
+		CMessageHelper::setErrorTitle($message);
+	}
+
+	if (hasRequest('backurl')) {
+		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response->redirect();
+	}
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && hasRequest('copy')
 		&& hasRequest('group_itemid')) {
@@ -1402,8 +1417,8 @@ else {
 					|| uint_in_array($item['value_type'], $_REQUEST['subfilter_value_types']),
 				'subfilter_status' => empty($_REQUEST['subfilter_status'])
 					|| uint_in_array($item['status'], $_REQUEST['subfilter_status']),
-				'subfilter_state' => empty($_REQUEST['subfilter_state'])
-					|| uint_in_array($item['state'], $_REQUEST['subfilter_state']),
+				'subfilter_state' => empty(getRequest('subfilter_state'))
+					|| (uint_in_array($item['state'], getRequest('subfilter_state')) && $item['status'] == ITEM_STATUS_ACTIVE),
 				'subfilter_inherited' =>  !getRequest('subfilter_inherited')
 					|| ($item['templateid'] == 0 && uint_in_array(0, getRequest('subfilter_inherited'))
 					|| ($item['templateid'] > 0 && uint_in_array(1, getRequest('subfilter_inherited')))),

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-05-07T08:12:33Z'
+  date: '2024-10-31T12:21:31Z'
   groups:
     - uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
@@ -271,10 +271,6 @@ zabbix_export:
                   item:
                     host: 'Linux block devices by Zabbix agent'
                     key: 'vfs.dev.util[{#DEVNAME}]'
-          preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
       macros:
         - macro: '{$VFS.DEV.DEVNAME.MATCHES}'
           value: .+
@@ -923,8 +919,10 @@ zabbix_export:
           triggers:
             - uuid: cffb7209ce2a45bd868ac41c0680be56
               expression: 'fuzzytime(/Linux generic by Zabbix agent/system.localtime,{$SYSTEM.FUZZYTIME.MAX})=0'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'fuzzytime(/Linux generic by Zabbix agent/system.localtime,{$SYSTEM.FUZZYTIME.MIN})=1'
               name: 'Linux: System time is out of sync'
-              event_name: 'Linux: System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX}s)'
+              event_name: 'Linux: System time is out of sync (diff with Zabbix server > {$SYSTEM.FUZZYTIME.MAX})'
               priority: WARNING
               description: 'The host''s system time is different from Zabbix server time.'
               manual_close: 'YES'
@@ -1069,7 +1067,11 @@ zabbix_export:
         - macro: '{$KERNEL.MAXPROC.MIN}'
           value: '1024'
         - macro: '{$SYSTEM.FUZZYTIME.MAX}'
-          value: '60'
+          value: 60s
+          description: 'The upper threshold for difference of system time.'
+        - macro: '{$SYSTEM.FUZZYTIME.MIN}'
+          value: 10s
+          description: 'The lower threshold for difference of system time. Used in recovery expression to avoid trigger flapping.'
       dashboards:
         - uuid: a1f6a4775d2c4488a4e90d9b0ad143b0
           name: Processes

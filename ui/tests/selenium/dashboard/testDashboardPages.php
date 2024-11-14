@@ -308,7 +308,7 @@ class testDashboardPages extends CWebTest {
 		}
 
 		// Check page popup-menu options in created dashboard.
-		$this->getPageMenu('First_page_name');
+		$page_menu = $this->getPageMenu('First_page_name');
 		$page_menu->hasTitles('ACTIONS');
 		$this->assertEquals(['Copy', 'Properties'], $page_menu->getItems()->asText());
 
@@ -688,9 +688,10 @@ class testDashboardPages extends CWebTest {
 		if ($value !== 'selected-tab') {
 			CDashboardElement::find()->one()->selectPage($page_name, $index);
 		}
-		$this->query('xpath:('.$selector.']/following-sibling::button)['.$index.']')->waitUntilClickable()->one()->click();
+		$action_button = $this->query('xpath:('.$selector.']/following-sibling::button)['.$index.']');
+		$action_button->waitUntilClickable()->one()->click();
 
-		return CPopupMenuElement::find()->waitUntilVisible()->one();
+		return $action_button->asPopupButton()->one()->getMenu();
 	}
 
 	/**

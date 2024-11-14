@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once dirname(__FILE__).'/js/configuration.trigger.prototype.list.js.php';
@@ -138,12 +139,12 @@ foreach ($data['triggers'] as $trigger) {
 			->setArgument('g_triggerid[]', $triggerid)
 			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 			->setArgument('context', $data['context'])
+			->setArgument('backurl', $url)
 			->getUrl()
 	))
 		->addClass(ZBX_STYLE_LINK_ACTION)
 		->addClass(triggerIndicatorStyle($trigger['status']))
 		->addSID();
-
 
 	$nodiscover = ($trigger['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
 	$discover = (new CLink($nodiscover ? _('No') : _('Yes'),
@@ -155,7 +156,7 @@ foreach ($data['triggers'] as $trigger) {
 					: 'triggerprototype.discover.disable'
 				)
 				->setArgument('context', $data['context'])
-				->setArgumentSID()
+				->setArgument('backurl', $url)
 				->getUrl()
 		))
 			->addSID()
@@ -178,9 +179,9 @@ foreach ($data['triggers'] as $trigger) {
 	$triggersTable->addRow([
 		$checkBox,
 		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
-		$description,
-		$trigger['opdata'],
-		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($trigger['opdata']))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CDiv($expression))->addClass(ZBX_STYLE_WORDBREAK),
 		$status,
 		$discover,
 		$data['tags'][$triggerid]

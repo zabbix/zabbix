@@ -107,13 +107,14 @@ class CControllerMediatypeList extends CController {
 			foreach ($data['mediatypes'] as &$mediaType) {
 				$mediaType['typeid'] = $mediaType['type'];
 				$mediaType['type'] = media_type2str($mediaType['type']);
+				$mediaType['action_count_total'] = 0;
 				$mediaType['listOfActions'] = [];
 
 				foreach ($actions as $action) {
 					foreach ($action['operations'] as $operation) {
 						if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
 								&& $operation['opmessage']['mediatypeid'] == $mediaType['mediatypeid']) {
-
+							$mediaType['action_count_total']++;
 							$mediaType['listOfActions'][$action['actionid']] = [
 								'actionid' => $action['actionid'],
 								'name' => $action['name'],
@@ -123,7 +124,13 @@ class CControllerMediatypeList extends CController {
 					}
 				}
 
-				order_result($mediaType['listOfActions'], 'name');
+				if ($mediaType['listOfActions']) {
+					CArrayHelper::sort($mediaType['listOfActions'], ['name']);
+
+					$mediaType['listOfActions'] = array_slice($mediaType['listOfActions'], 0,
+						CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
+					);
+				}
 			}
 			unset($mediaType);
 

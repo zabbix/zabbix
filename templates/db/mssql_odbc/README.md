@@ -50,7 +50,7 @@ See Microsoft documentation for instructions: https://docs.microsoft.com/en-us/s
 
 **Note! Credentials in the `odbc.ini` do not work for MSSQL.**
 
-The `Service's TCP port state` item uses the `{HOST.CONN}` and `{$MSSQL.PORT}` macros to check the availability of the MSSQL instance.
+The `Service's TCP port state` item uses the `{HOST.CONN}` and `{$MSSQL.PORT}` macros to check the availability of the MSSQL instance. Keep in mind that if dynamic ports are used on the MSSQL server side, this check will not work correctly.
 
 If your instance uses a non-default TCP port, set the port in your section of `odbc.ini` in the line Server = IP or FQDN name, port.
 
@@ -109,12 +109,12 @@ Note: You can use the context macros `{$MSSQL.BACKUP_FULL.USED}`, `{$MSSQL.BACKU
 |MSSQL: Get performance counters|<p>The item gets server global status information.</p>|Database monitor|db.odbc.get[get_status_variables,"{$MSSQL.DSN}"]|
 |MSSQL: Get availability groups|<p>The item gets availability group states - name, primary and secondary health, synchronization health.</p>|Database monitor|db.odbc.get[get_availability_group,"{$MSSQL.DSN}"]|
 |MSSQL: Get local DB|<p>Getting the states of the local availability database.</p>|Database monitor|db.odbc.get[get_local_db,"{$MSSQL.DSN}"]|
-|MSSQL: Get DB mirroring|<p>Getting DB mirroring.</p>|Database monitor|db.odbc.get[get_db_mirroring","{$MSSQL.DSN}"]|
+|MSSQL: Get DB mirroring|<p>Getting DB mirroring.</p>|Database monitor|db.odbc.get[get_db_mirroring,"{$MSSQL.DSN}"]|
 |MSSQL: Get non-local DB|<p>Getting the non-local availability database.</p>|Database monitor|db.odbc.get[get_non_local_db,"{$MSSQL.DSN}"]|
-|MSSQL: Get replica|<p>Getting the database replica.</p>|Database monitor|db.odbc.get[get_replica","{$MSSQL.DSN}"]|
-|MSSQL: Get quorum|<p>Getting quorum - cluster name, type, and state.</p>|Database monitor|db.odbc.get[get_quorum,{$MSSQL.DSN}]|
-|MSSQL: Get quorum member|<p>Getting quorum members - member name, type, state, and number of quorum votes.</p>|Database monitor|db.odbc.get[get_quorum_member,{$MSSQL.DSN}]|
-|MSSQL: Get database|<p>Getting databases - database name and recovery model.</p>|Database monitor|db.odbc.get[get_database,{$MSSQL.DSN}]|
+|MSSQL: Get replica|<p>Getting the database replica.</p>|Database monitor|db.odbc.get[get_replica,"{$MSSQL.DSN}"]|
+|MSSQL: Get quorum|<p>Getting quorum - cluster name, type, and state.</p>|Database monitor|db.odbc.get[get_quorum,"{$MSSQL.DSN}"]|
+|MSSQL: Get quorum member|<p>Getting quorum members - member name, type, state, and number of quorum votes.</p>|Database monitor|db.odbc.get[get_quorum_member,"{$MSSQL.DSN}"]|
+|MSSQL: Get database|<p>Getting databases - database name and recovery model.</p>|Database monitor|db.odbc.get[get_database,"{$MSSQL.DSN}"]|
 |MSSQL: Version|<p>MSSQL Server version.</p>|Dependent item|mssql.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.counter_name=='Version')].instance_name.first()`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |MSSQL: Uptime|<p>MSSQL Server uptime in the format "N days, hh:mm:ss".</p>|Dependent item|mssql.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.counter_name=='Uptime')].cntr_value.first()`</p></li></ul>|
 |MSSQL: Get Access Methods counters|<p>The item gets server information about access methods.</p>|Dependent item|mssql.access_methods.raw<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.object_name=~'.*Access Methods')]`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|

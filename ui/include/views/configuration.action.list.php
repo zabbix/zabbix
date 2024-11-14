@@ -148,12 +148,14 @@ if ($this->data['actions']) {
 
 		$actionTable->addRow([
 			new CCheckBox('g_actionid['.$action['actionid'].']', $action['actionid']),
-			(new CLink($action['name'], $current_url
-				->setArgument('form', 'update')
-				->setArgument('actionid', $action['actionid'])
-			)),
-			$conditions,
-			$operations,
+			(new CCol(
+				(new CLink($action['name'], $current_url
+					->setArgument('form', 'update')
+					->setArgument('actionid', $action['actionid'])
+				))
+			))->addClass(ZBX_STYLE_WORDBREAK),
+			(new CCol($conditions))->addClass(ZBX_STYLE_WORDBREAK),
+			(new CCol($operations))->addClass(ZBX_STYLE_WORDBREAK),
 			$status
 		]);
 	}
