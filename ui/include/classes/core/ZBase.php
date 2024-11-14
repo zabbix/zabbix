@@ -420,7 +420,7 @@ class ZBase {
 		if (!DBconnect($error)) {
 			CDataCacheHelper::clearValues(['db_username', 'db_password']);
 
-			throw new DBException($error, DB::DBEXECUTE_ERROR);
+			throw new DBException($error, DB::INIT_ERROR);
 		}
 	}
 

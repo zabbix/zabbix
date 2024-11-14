@@ -1204,10 +1204,10 @@ void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 #define ZBX_MALLOC_TRIM (128 * ZBX_KIBIBYTE)
 
 #define ZBX_MAX_RECV_DATA_SIZE		(1 * ZBX_GIBIBYTE)
-#if defined(_WINDOWS)
-#define ZBX_MAX_RECV_LARGE_DATA_SIZE	(1 * ZBX_GIBIBYTE)
-#else
+#if (4 < SIZEOF_SIZE_T)
 #define ZBX_MAX_RECV_LARGE_DATA_SIZE	(__UINT64_C(16) * ZBX_GIBIBYTE)
+#else
+#define ZBX_MAX_RECV_LARGE_DATA_SIZE	(1 * ZBX_GIBIBYTE)
 #endif
 
 /* max length of base64 data */
@@ -1224,7 +1224,6 @@ void		zbx_get_time(struct tm *tm, long *milliseconds, zbx_timezone_t *tz);
 long		zbx_get_timezone_offset(time_t t, struct tm *tm);
 struct tm	*zbx_localtime(const time_t *time, const char *tz);
 const struct tm	*zbx_localtime_now(const time_t *time);
-time_t		zbx_mktime(struct tm *time, const char *tz);
 int		zbx_utc_time(int year, int mon, int mday, int hour, int min, int sec, int *t);
 int		zbx_day_in_month(int year, int mon);
 zbx_uint64_t	zbx_get_duration_ms(const zbx_timespec_t *ts);
@@ -1770,11 +1769,11 @@ typedef enum
 }
 zbx_time_unit_t;
 
-void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base, const char *tz);
-void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base, const char *tz);
+void	zbx_tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base);
+void	zbx_tm_sub(struct tm *tm, int multiplier, zbx_time_unit_t base);
 
-void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base, const char *tz);
-void	zbx_tm_round_down(struct tm *tm, zbx_time_unit_t base, const char *tz);
+void	zbx_tm_round_up(struct tm *tm, zbx_time_unit_t base);
+void	zbx_tm_round_down(struct tm *tm, zbx_time_unit_t base);
 
 const char	*zbx_timespec_str(const zbx_timespec_t *ts);
 
@@ -1817,8 +1816,7 @@ void	zbx_new_cuid(char *cuid);
 #define ZBX_REPORT_CYCLE_MONTHLY	2
 #define ZBX_REPORT_CYCLE_YEARLY		3
 
-int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekdays, int start_time,
-		const char *tz);
+int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekdays, int start_time);
 
 /* */
 char	*zbx_substr(const char *src, size_t left, size_t right);
