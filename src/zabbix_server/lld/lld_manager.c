@@ -396,6 +396,7 @@ static void	lld_process_result(zbx_lld_manager_t *manager, zbx_ipc_client_t *cli
 	}
 
 	lld_data_free(data);
+	manager->queued_num--;
 
 	if (SUCCEED != zbx_binary_heap_empty(&manager->rule_queue))
 		lld_process_next_request(manager, worker);
@@ -465,9 +466,11 @@ static void	lld_process_next(zbx_lld_manager_t *manager, zbx_ipc_client_t *clien
 		else
 			rule->tail = dup->prev;
 
-		lld_data_free(dup);
 		rule->values_num--;
 		rule->dup = NULL;
+
+		lld_data_free(dup);
+		manager->queued_num--;
 	}
 
 	if (NULL == (rule->dup = lld_data_get_next_value(rule->head->next, rule->head->itemid)))
@@ -668,7 +671,6 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 				case ZBX_IPC_LLD_DONE:
 					lld_process_result(&manager, client);
 					processed_num++;
-					manager.queued_num--;
 					break;
 				case ZBX_IPC_LLD_NEXT:
 					lld_process_next(&manager, client);
