@@ -154,6 +154,7 @@ function getTimePeriodTab(CWidgetFormView $form, array $fields): CFormGrid {
 
 function getAxesTab(CWidgetFormView $form, array $fields): CDiv {
 	$lefty = $form->registerField(new CWidgetFieldCheckBoxView($fields['lefty']));
+	$lefty_scale = $form->registerField(new CWidgetFieldSelectView($fields['lefty_scale']));
 	$lefty_min = $form->registerField(
 		(new CWidgetFieldNumericBoxView($fields['lefty_min']))->setPlaceholder(_('calculated'))
 	);
@@ -167,6 +168,7 @@ function getAxesTab(CWidgetFormView $form, array $fields): CDiv {
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	);
 	$righty = $form->registerField(new CWidgetFieldCheckBoxView($fields['righty']));
+	$righty_scale = $form->registerField(new CWidgetFieldSelectView($fields['righty_scale']));
 	$righty_min = $form->registerField(
 		(new CWidgetFieldNumericBoxView($fields['righty_min']))->setPlaceholder(_('calculated'))
 	);
@@ -191,6 +193,10 @@ function getAxesTab(CWidgetFormView $form, array $fields): CDiv {
 					new CFormField($lefty->getView())
 				])
 				->addItem([
+					$lefty_scale->getLabel(),
+					new CFormField($lefty_scale->getView())
+				])
+				->addItem([
 					$lefty_min->getLabel(),
 					new CFormField($lefty_min->getView())
 				])
@@ -211,6 +217,10 @@ function getAxesTab(CWidgetFormView $form, array $fields): CDiv {
 				->addItem([
 					$righty->getLabel(),
 					new CFormField($righty->getView())
+				])
+				->addItem([
+					$righty_scale->getLabel(),
+					new CFormField($righty_scale->getView())
 				])
 				->addItem([
 					$righty_min->getLabel(),

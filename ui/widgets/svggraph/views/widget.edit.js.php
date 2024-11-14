@@ -890,7 +890,7 @@ window.widget_svggraph_form = new class {
 			lefty_checkbox.checked = true;
 		}
 
-		for (const element of document.querySelectorAll('#lefty_min, #lefty_max, #lefty_units')) {
+		for (const element of document.querySelectorAll('#lefty_scale, #lefty_min, #lefty_max, #lefty_units')) {
 			element.disabled = !lefty_on;
 		}
 
@@ -906,7 +906,7 @@ window.widget_svggraph_form = new class {
 			righty_checkbox.checked = true;
 		}
 
-		for (const element of document.querySelectorAll('#righty_min, #righty_max, #righty_units')) {
+		for (const element of document.querySelectorAll('#righty_scale, #righty_min, #righty_max, #righty_units')) {
 			element.disabled = !righty_on;
 		}
 

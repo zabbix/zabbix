@@ -26,8 +26,6 @@ use Widgets\SvgGraph\Includes\{
 	WidgetForm
 };
 
-use Widgets\SvgGraph\Widget;
-
 class WidgetView extends CControllerDashboardWidgetView {
 
 	private const GRAPH_WIDTH_MIN = 1;
@@ -107,12 +105,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 			],
 			'axes' => [
 				'show_left_y_axis' => $lefty == SVG_GRAPH_AXIS_ON,
+				'left_y_scale' => $this->fields_values['lefty_scale'],
 				'left_y_min' => $lefty_min,
 				'left_y_max' => $lefty_max,
 				'left_y_units' => $this->fields_values['lefty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC
 					? $this->fields_values['lefty_static_units']
 					: null,
 				'show_right_y_axis' => $righty == SVG_GRAPH_AXIS_ON,
+				'right_y_scale' => $this->fields_values['righty_scale'],
 				'right_y_min' => $righty_min,
 				'right_y_max' => $righty_max,
 				'right_y_units' => $this->fields_values['righty_units'] == SVG_GRAPH_AXIS_UNITS_STATIC
