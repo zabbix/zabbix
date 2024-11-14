@@ -1494,6 +1494,7 @@ class testPageProblems extends CWebTest {
 		}
 
 		$form->submit();
+		$table->waitUntilReloaded();
 
 		if (array_key_exists('time_selector', $data)) {
 			$this->query('xpath://a[contains(@class, "zi-clock")]')->waitUntilClickable()->one()->click();
