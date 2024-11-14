@@ -121,15 +121,15 @@ static void	lld_entry_create(zbx_lld_entry_t *entry, const zbx_jsonobj_t *obj,
 
 			switch (el->value.type)
 			{
-			case ZBX_JSON_TYPE_NUMBER:
-				zbx_print_double(buf, sizeof(buf), el->value.data.number);
-				lld_macro.value = zbx_strdup(NULL, buf);
-				break;
-			case ZBX_JSON_TYPE_STRING:
-				lld_macro.value = zbx_strdup(NULL, el->value.data.string);
-				break;
-			default:
-				continue;
+				case ZBX_JSON_TYPE_NUMBER:
+					zbx_print_double(buf, sizeof(buf), el->value.data.number);
+					lld_macro.value = zbx_strdup(NULL, buf);
+					break;
+				case ZBX_JSON_TYPE_STRING:
+					lld_macro.value = zbx_strdup(NULL, el->value.data.string);
+					break;
+				default:
+					continue;
 			}
 
 			lld_macro.macro = zbx_strdup(NULL, el->name);
