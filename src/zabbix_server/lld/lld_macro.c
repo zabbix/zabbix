@@ -21,9 +21,9 @@
 #include "zbxregexp.h"
 #include "zbxstr.h"
 #include "zbxjson.h"
-#include "zbxcacheconfig.h"
 #include "zbxexpression.h"
-
+#include "zbxalgo.h"
+#include "zbxdb.h"
 
 ZBX_PTR_VECTOR_IMPL(lld_macro_path_ptr, zbx_lld_macro_path_t *)
 

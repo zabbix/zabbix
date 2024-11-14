@@ -16,6 +16,9 @@
 
 #include "zbxalgo.h"
 #include "zbxjson.h"
+#include "zbxexpr.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
 
 ZBX_VECTOR_IMPL(lld_macro, zbx_lld_macro_t)
 

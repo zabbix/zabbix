@@ -18,6 +18,7 @@
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
 #include "zbxjson.h"
+#include "zbxexpression.h"
 
 int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
 		zbx_macro_resolver_f macro_resolver_cb, const void *resolver_data, int macro_type, char *error,
