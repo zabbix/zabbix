@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-16T10:23:18Z'
+  date: '2024-11-14T20:52:50Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -247,7 +247,7 @@ zabbix_export:
                 formulaid: B
           host_prototypes:
             - uuid: 59cd2e995b814d7e9f8411dbc7420c76
-              host: '{#NAME}'
+              host: 'meraki-organization-{#ID}'
               name: '[{#REGION}] {#NAME}'
               group_links:
                 - group:
