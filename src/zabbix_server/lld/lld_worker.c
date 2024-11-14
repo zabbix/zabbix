@@ -66,7 +66,7 @@ static void	lld_register_worker(zbx_ipc_socket_t *socket)
  * Purpose: initialize LLD value                                              *
  *                                                                            *
  ******************************************************************************/
-void	lld_value_init(zbx_lld_value_t *lld_value)
+static void	lld_value_init(zbx_lld_value_t *lld_value)
 {
 	zbx_hashset_create_ext(&lld_value->entries, 0, lld_entry_hash, lld_entry_compare,
 			(zbx_clean_func_t)lld_entry_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
@@ -84,7 +84,7 @@ void	lld_value_init(zbx_lld_value_t *lld_value)
  * Purpose: clear LLD value                                                   *
  *                                                                            *
  ******************************************************************************/
-void	lld_value_clear(zbx_lld_value_t *lld_value)
+static void	lld_value_clear(zbx_lld_value_t *lld_value)
 {
 	zbx_vector_lld_entry_ptr_destroy(&lld_value->entries_sorted);
 	zbx_hashset_destroy(&lld_value->entries);
