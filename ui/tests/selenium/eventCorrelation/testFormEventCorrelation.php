@@ -23,8 +23,6 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @backup correlation
  *
@@ -33,6 +31,7 @@ use Facebook\WebDriver\WebDriverBy;
 class testFormEventCorrelation extends CWebTest {
 
 	const HASH_SQL = 'SELECT * FROM correlation c INNER JOIN corr_condition cc ON c.correlationid = cc.correlationid'.
+			' LEFT JOIN corr_operation co ON c.correlationid = co.correlationid'.
 			' LEFT JOIN corr_condition_group ccg ON cc.corr_conditionid = ccg.corr_conditionid'.
 			' LEFT JOIN corr_condition_tag cct ON cc.corr_conditionid = cct.corr_conditionid'.
 			' LEFT JOIN corr_condition_tagpair cctp ON cc.corr_conditionid = cctp.corr_conditionid'.
@@ -104,10 +103,25 @@ class testFormEventCorrelation extends CWebTest {
 				'name' => 'Event correlation for clone',
 				'description' => 'Test description clone',
 				'filter' => [
-					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
-					'conditions' => [['type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG, 'tag' => 'clone tag']]
+					'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+					'formula' => 'A or B',
+					'conditions' => [
+						[
+							'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
+							'tag' => 'clone tag',
+							'formulaid' => 'A'
+						],
+						[
+							'type' => ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE,
+							'tag' => 'another tag',
+							'operator' => CONDITION_OPERATOR_NOT_LIKE,
+							'value' => 'test',
+							'formulaid' => 'B'
+						]
+					]
 				],
-				'operations' => [['type' => ZBX_CORR_OPERATION_CLOSE_OLD]]
+				'operations' => [['type' => ZBX_CORR_OPERATION_CLOSE_OLD]],
+				'status' => ZBX_CORRELATION_DISABLED
 			]
 		]);
 
@@ -129,8 +143,8 @@ class testFormEventCorrelation extends CWebTest {
 		$form = $this->query('id:correlation.edit')->one()->asForm();
 
 		// Check form labels.
-		$this->assertEquals(['Name', 'Type of calculation', 'Conditions', 'Description', 'Operations', '', 'Enabled'],
-				$form->getLabels()->asText()
+		$this->assertEqualsCanonicalizing(['Name', 'Conditions', 'Description', 'Operations', 'Enabled', ''],
+				$form->getLabels(CElementFilter::VISIBLE)->asText()
 		);
 
 		// Check form inputs to be enabled.
@@ -169,8 +183,10 @@ class testFormEventCorrelation extends CWebTest {
 		$this->assertTrue($conditions_table->query('button:Add')->one()->isClickable());
 
 		// Check Operations checkbox list.
-		$operations_checkbox_list = $form->getField('Operations')->asCheckboxList();
-		$this->assertEquals(['Close old events', 'Close new events'], $operations_checkbox_list->getLabels()->asText());
+		$operations_checkbox_list = $form->getField('Operations');
+		$this->assertEqualsCanonicalizing(['Close old events', 'Close new events'],
+				$operations_checkbox_list->getLabels(CElementFilter::VISIBLE)->asText()
+		);
 		$this->assertEquals([], $operations_checkbox_list->getValue());
 		$this->assertTrue($operations_checkbox_list->isEnabled());
 
@@ -236,7 +252,7 @@ class testFormEventCorrelation extends CWebTest {
 				$this->assertEquals(CTestArrayHelper::get($properties, 'maxlength'), $field->getAttribute('maxlength'));
 
 				if (array_key_exists('labels', $properties)) {
-					$this->assertEquals($properties['labels'], $field->getLabels()->asText());
+					$this->assertEqualsCanonicalizing($properties['labels'], $field->getLabels(CElementFilter::VISIBLE)->asText());
 				}
 			}
 		}
@@ -1127,19 +1143,22 @@ class testFormEventCorrelation extends CWebTest {
 		$this->query('button:Clone')->one()->click();
 
 		$form = $this->query('id:correlation.edit')->one()->asForm();
-		$values_before = $form->getValues();
 		$form->fill(['Name' => 'Cloned correlation']);
+		$values_before = $form->getValues();
 		$form->submit();
 		$this->page->waitUntilReady();
 
 		$this->assertMessage(TEST_GOOD, 'Correlation added');
 
 		// Assert both correlations exist in table.
-		$conditions = [['Type' => 'Old event tag name', 'Tag' => 'clone tag']];
+		$conditions = [
+			['Type' => 'Old event tag name', 'Tag' => 'clone tag'],
+			['Type' => 'New event tag value', 'Tag' => 'another tag', 'Operator' => 'does not contain', 'Value' => 'test']
+		];
 
 		foreach (['Cloned correlation', 'Event correlation for clone'] as $name) {
 			$this->assertTableCorrelationRow([
-				'fields' => ['Name' => $name, 'Description' => 'Test description clone'],
+				'fields' => ['Name' => $name, 'Description' => 'Test description clone', 'Enabled' => false],
 				'conditions' => $conditions
 			]);
 		}
@@ -1148,22 +1167,12 @@ class testFormEventCorrelation extends CWebTest {
 		$this->query('link:Cloned correlation')->one()->click();
 		$this->page->waitUntilReady();
 		$form->invalidate();
-		$values_before['Name'] = 'Cloned correlation';
 		unset($values_before['Type of calculation']); // hidden field
-		unset($values_before['']); // 6.4 and below uses an empty field for "Close new event" checkbox
+		unset($values_before['']); // 6.0 uses an empty field for "Close new event" checkbox
 		$form->checkValue($values_before);
 		$this->assertConditionsTable($conditions, $form);
 
-		// Assert 'Operations' checkboxes.
-		foreach (['Close old events' => true, 'Close new events' => false] as $operation => $expected_state) {
-			// Find checkbox by label.
-			$checkbox = $form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($operation).
-					']/parent::*//input[@type="checkbox"]'
-			)->asCheckbox()->one();
-			$this->assertEquals($expected_state, $checkbox->isChecked());
-		}
-
-		$this->assertEquals(true, $form->getField('Enabled')->getValue());
+		$this->assertEquals(false, $form->getField('Enabled')->getValue());
 	}
 
 	/**
@@ -1392,7 +1401,7 @@ class testFormEventCorrelation extends CWebTest {
 				$this->assertMessage(TEST_BAD, 'Cannot update correlation', $data['errors']);
 			}
 			else {
-				// On 6.4 and below it sometimes shows 'update' instead of 'add' in the error message.
+				// On 6.0 it sometimes shows 'update' instead of 'add' in the error message.
 				$message = CMessageElement::find()->waitUntilVisible()->one();
 				$this->assertContains($message->getTitle(), ['Cannot add correlation', 'Cannot update correlation']);
 
@@ -1515,7 +1524,7 @@ class testFormEventCorrelation extends CWebTest {
 		// Get the actually displayed conditions and compare to the expected.
 		$displayed_conditions = preg_split("/\r\n|\n|\r/", $row->getColumn('Conditions')->getText());
 
-		// Ignore the order of conditions. The logic is not predetermined on 6.4 and lower.
+		// Ignore the order of conditions. The logic is not predetermined on 6.0.
 		$expected_conditions = sort($expected_conditions);
 		$displayed_conditions = sort($displayed_conditions);
 		$this->assertEquals($expected_conditions, $displayed_conditions);
@@ -1537,7 +1546,7 @@ class testFormEventCorrelation extends CWebTest {
 			// Assert the 'Label' column - chr(65) = 'A', 66 = 'B', 67 = 'C', etc.
 			$this->assertEquals(chr(65 + $i), $rows->get($i)->getColumn('Label')->getText());
 
-			// Ignore the order of conditions. The logic is not predetermined on 6.4 and lower.
+			// Ignore the order of conditions. The logic is not predetermined on 6.0.
 			$condition = $rows->get($i)->getColumn('Name')->getText();
 			$this->assertTrue(in_array($condition, $expected_conditions));
 			unset($expected_conditions[array_search($condition, $expected_conditions)]);
