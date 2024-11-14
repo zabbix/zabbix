@@ -49,10 +49,10 @@ void	zbx_mock_test_entry(void **state)
 	zbx_hashset_create_ext(&entries2, 0, lld_entry_hash, lld_entry_compare, (zbx_clean_func_t)lld_entry_clear,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
-	if (SUCCEED != lld_extract_entries(&entries1, &obj1, &macro_paths, &error))
+	if (SUCCEED != lld_extract_entries(&entries1, NULL, &obj1, &macro_paths, &error))
 		fail_msg("lld_extract_entries(entries1): %s", error);
 
-	if (SUCCEED != lld_extract_entries(&entries2, &obj2, &macro_paths, &error))
+	if (SUCCEED != lld_extract_entries(&entries2, NULL, &obj2, &macro_paths, &error))
 		fail_msg("lld_extract_entries(entries2): %s", error);
 
 	returned_ret = lld_compare_entries(&entries1, &entries2);

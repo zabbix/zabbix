@@ -138,7 +138,14 @@ zbx_lld_hgsets_test_CFLAGS = \
 	
 lld_entry_create_SOURCES = \
 	lld_entry_create.c \
+	../../../src/zabbix_server/lld/lld_common.c \
+	../../../src/zabbix_server/lld/lld_graph.c \
+	../../../src/zabbix_server/lld/lld_audit.c \
+	../../../src/zabbix_server/lld/lld_item.c \
+	../../../src/zabbix_server/lld/lld_trigger.c \
 	../../../src/zabbix_server/lld/lld_macro.c \
+	../../../src/zabbix_server/lld/lld_host.c \
+	../../../src/zabbix_server/lld/lld.c \
 	../../zbxmockexit.c \
 	../../zbxmockdb.c \
 	../../zbxmockdata.c \
@@ -155,7 +162,14 @@ lld_entry_create_CFLAGS = \
 
 lld_compare_entries_SOURCES = \
 	lld_compare_entries.c \
+	../../../src/zabbix_server/lld/lld_common.c \
+	../../../src/zabbix_server/lld/lld_graph.c \
+	../../../src/zabbix_server/lld/lld_audit.c \
+	../../../src/zabbix_server/lld/lld_item.c \
+	../../../src/zabbix_server/lld/lld_trigger.c \
 	../../../src/zabbix_server/lld/lld_macro.c \
+	../../../src/zabbix_server/lld/lld_host.c \
+	../../../src/zabbix_server/lld/lld.c \
 	../../zbxmockexit.c \
 	../../zbxmockdb.c \
 	../../zbxmockdata.c \
