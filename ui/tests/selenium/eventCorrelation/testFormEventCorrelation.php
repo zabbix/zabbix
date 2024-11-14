@@ -291,8 +291,7 @@ class testFormEventCorrelation extends CWebTest {
 						'Name' => 'All fields',
 						'Description' => 'Event correlation with description',
 						'Enabled' => false,
-						'Close old events' => true,
-						'Close new events' => true
+						'Operations' => ['Close old events', 'Close new event']
 					],
 					'update_name' => true,
 					'unique_name' => true,
@@ -386,8 +385,7 @@ class testFormEventCorrelation extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Without operation',
-						'Close old events' => false,
-						'Close new events' => false
+						'Operations' => []
 					],
 					'conditions' => [
 						[
@@ -1158,7 +1156,12 @@ class testFormEventCorrelation extends CWebTest {
 
 		foreach (['Cloned correlation', 'Event correlation for clone'] as $name) {
 			$this->assertTableCorrelationRow([
-				'fields' => ['Name' => $name, 'Description' => 'Test description clone', 'Enabled' => false],
+				'fields' => [
+					'Name' => $name,
+					'Description' => 'Test description clone',
+					'Enabled' => false,
+					'Operations' => ['Close old events']
+				],
 				'conditions' => $conditions
 			]);
 		}
@@ -1187,6 +1190,7 @@ class testFormEventCorrelation extends CWebTest {
 		$table->query('link', $name)->one()->click();
 		$this->page->waitUntilReady();
 		$this->query('button:Delete')->waitUntilClickable()->one()->click();
+		$this->assertEquals('Delete current correlation?', $this->page->getAlertText());
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 
@@ -1243,43 +1247,33 @@ class testFormEventCorrelation extends CWebTest {
 		$count_sql = 'SELECT NULL FROM correlation';
 		$count_before = CDBHelper::getCount($count_sql);
 
-		// Open and fill Correlation data.
+		// Set the default expected operations.
+		$data['fields']['Operations'] = CTestArrayHelper::get($data, 'fields.Operations', ['Close old events']);
+
+		// Special cases when updating.
+		if ($update) {
+			// When it is needed to avoid Name conflicts.
+			if (CTestArrayHelper::get($data, 'unique_name')) {
+				$data['fields']['Name'] = $data['fields']['Name'] . ' update';
+			}
+
+			// Clear the Name field when updating (unless required).
+			if (!CTestArrayHelper::get($data, 'update_name', false)) {
+				unset($data['fields']['Name']);
+			}
+		}
+
+		// Login and open Correlation list.
 		$this->page->login()->open('zabbix.php?action=correlation.list')->waitUntilReady();
 
-		if ($update) {
-			$this->query('link', self::$update_correlation_initial['name'])->one()->click();
-		}
-		else {
-			$this->query('button:Create correlation')->one()->click();
-		}
+		// Open the correct Correlation form.
+		$locator = $update ? 'link:'.self::$update_correlation_initial['name'] : 'button:Create correlation';
+		$this->query($locator)->one()->click();
 
 		$this->page->waitUntilReady();
 		$form = $this->query('id:correlation.edit')->one()->asForm();
 
-		// Set the default values and fill the form.
-		if (array_key_exists('fields', $data)) {
-			// Set the default expected operations.
-			if (!array_key_exists('Close old events', $data['fields'])
-					&& !array_key_exists('Close new events', $data['fields'])) {
-				$data['fields']['Close old events'] = true;
-				$data['fields']['Close new events'] = false;
-			}
-
-			// Special cases when updating.
-			if ($update) {
-				// When it is needed to avoid Name conflicts.
-				if ($update && CTestArrayHelper::get($data, 'unique_name')) {
-					$data['fields']['Name'] = $data['fields']['Name'].' update';
-				}
-
-				// Clear the Name field when updating (unless required).
-				if (!CTestArrayHelper::get($data, 'update_name', false)) {
-					unset($data['fields']['Name']);
-				}
-			}
-
-			$form->fill($data['fields']);
-		}
+		$form->fill(CTestArrayHelper::get($data, 'fields', []));
 
 		// Remove the default condition when needed.
 		if ($update && CTestArrayHelper::get($data, 'remove_condition')) {
@@ -1308,13 +1302,13 @@ class testFormEventCorrelation extends CWebTest {
 				$form->getField('id:evaltype')->fill($data['calculation']);
 
 				if ($data['calculation'] === 'Custom expression') {
-					$form->query('id:formula')->waitUntilPresent()->one()->fill($data['formula']);
+					$form->query('id:formula')->waitUntilVisible()->one()->fill($data['formula']);
 				}
 			}
 
 			// Only check the expression if 'Type of calculation' not set to 'Custom expression'.
 			if (CTestArrayHelper::get($data, 'calculation') !== 'Custom expression') {
-				$expression_text = $form->query('id:condition_label')->waitUntilPresent()->one()->getText();
+				$expression_text = $form->query('id:condition_label')->one()->getText();
 
 				if (array_key_exists('expected_expression'.($update ? '_update' : ''), $data)) {
 					$this->assertEquals($data['expected_expression'.($update ? '_update' : '')], $expression_text);
@@ -1356,7 +1350,9 @@ class testFormEventCorrelation extends CWebTest {
 
 			// Assert data in DB.
 			$this->assertEquals($count_before + ($update ? 0 : 1), CDBHelper::getCount($count_sql));
-			$this->assertTrue(in_array($data['fields']['Name'], CDBHelper::getColumn('SELECT name FROM correlation', 'name')));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM correlation WHERE name='.
+					zbx_dbstr($data['fields']['Name'])
+			));
 
 			// Simple update scenario - check that data in DB has not changed.
 			if ($update &&  $data === []) {
@@ -1488,7 +1484,7 @@ class testFormEventCorrelation extends CWebTest {
 		// Assert that the original Event Correlation was not updated in the UI.
 		if (in_array($action, ['update', 'clone', 'delete'])) {
 			$this->assertTableCorrelationRow([
-				'fields' => ['Name' => 'Event correlation for cancel', 'Enabled' => false],
+				'fields' => ['Name' => 'Event correlation for cancel', 'Enabled' => false, 'Operations' => ['Close old events']],
 				'conditions' => [
 					['Type' => 'Old event tag name', 'Tag' => 'cancel tag'],
 					['Type' => 'New event tag name', 'Tag' => 'cancel tag']
@@ -1509,7 +1505,7 @@ class testFormEventCorrelation extends CWebTest {
 		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $data['fields']['Name']);
 
 		$expected_row_data = [
-			'Operations' => $this->getExpectedOperationsText($data['fields']),
+			'Operations' => implode("\n", $data['fields']['Operations']),
 			'Status' => CTestArrayHelper::get($data['fields'], 'Enabled', true) ? 'Enabled' : 'Disabled'
 		];
 
@@ -1607,35 +1603,6 @@ class testFormEventCorrelation extends CWebTest {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Calculates the expected value of Operations column as displayed in the UI.
-	 *
-	 * @param array $fields    entry fields
-	 *
-	 * @return string
-	 */
-
-	protected function getExpectedOperationsText($fields) {
-		$fields = ($fields === null) ? [] : $fields;
-
-		// 'Close old events' is used as the default.
-		if (!array_key_exists('Close old events', $fields) && !array_key_exists('Close new events', $fields)) {
-			$fields['Close old events'] = true;
-		}
-
-		$result = '';
-
-		foreach (['Close old events', 'Close new events'] as $operation) {
-			if (CTestArrayHelper::get($fields, $operation)) {
-				// On 6.0 the "Close new events" field shows as "Close new event" in the table instead.
-				$result .= ($operation === 'Close new events' ? "\nClose new event" : "\nClose old events");
-			}
-		}
-
-		// Trim the leading newline character.
-		return trim($result);
 	}
 
 	/**
