@@ -291,7 +291,7 @@ class testFormEventCorrelation extends CWebTest {
 						'Name' => 'All fields',
 						'Description' => 'Event correlation with description',
 						'Enabled' => false,
-						'Operations' => ['Close old events', 'Close new event']
+						'Operations' => ['Close old events', 'Close new events']
 					],
 					'update_name' => true,
 					'unique_name' => true,
@@ -434,7 +434,7 @@ class testFormEventCorrelation extends CWebTest {
 						[
 							'Type' => 'New event host group',
 							'Operator' => 'does not equal',
-							'Host groups' => 'Databases'
+							'Host groups' => 'Templates/Databases'
 						]
 					]
 				]
