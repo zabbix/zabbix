@@ -260,6 +260,20 @@ static int	DBpatch_7010019(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7010020(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'hostcard','widgets/hostcard',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7010)
@@ -286,5 +300,6 @@ DBPATCH_ADD(7010016, 0, 1)
 DBPATCH_ADD(7010017, 0, 1)
 DBPATCH_ADD(7010018, 0, 1)
 DBPATCH_ADD(7010019, 0, 1)
+DBPATCH_ADD(7010020, 0, 1)
 
 DBPATCH_END()

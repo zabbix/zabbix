@@ -1,0 +1,228 @@
+// Widget view.
+
+div.dashboard-widget-hostcard {
+	.host-card {
+		min-width: 300px;
+
+		.sections-header {
+			display: grid;
+			grid-template-columns: 1fr max-content;
+			align-items: center;
+			height: 53px;
+			padding: 0 10px;
+			border-bottom: 1px solid $table-border-color;
+
+			.host-name {
+				display: flex;
+				gap: 4px;
+				min-width: 0;
+				line-height: 18px;
+
+				.link-action {
+					@extend %overflow-ellipsis;
+					height: 17px;
+				}
+
+				.btn-icon {
+					align-self: center;
+					min-width: 16px;
+					height: 16px;
+				}
+			}
+
+			.problem-icon-link {
+				margin-left: 5px;
+			}
+		}
+
+		.sections {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+			grid-auto-rows: minmax(54px, auto);
+			margin-left: -1px;
+			overflow: hidden;
+
+			.section {
+				display: grid;
+				position: relative;
+				grid-template-columns: auto 1fr;
+				grid-row: span var(--span, 1);
+				column-gap: 10px;
+				align-items: center;
+				padding: 0 10px;
+				margin-right: -1px;
+				border-right: 1px solid $table-border-color;
+				border-bottom: 1px solid $table-border-color;
+				border-left: 1px solid $table-border-color;
+				line-height: 18px;
+
+				.section-name {
+					@extend %overflow-ellipsis;
+				}
+
+				.section-body {
+					text-align: right;
+				}
+
+				&.section-host-groups {
+
+					.host-groups {
+						max-height: 36px;
+						overflow: hidden;
+
+						.host-group {
+							display: inline-block;
+
+							&:not(:first-of-type) {
+								margin-left: 4px;
+							}
+
+							.host-group-name,
+							.delimiter {
+								display: inline-block;
+								vertical-align: top;
+							}
+						}
+
+						.link-alt {
+							margin-left: 5px;
+						}
+
+						&.has-ellipsis {
+
+							.host-group-name {
+								@extend %overflow-ellipsis;
+								max-width: 75px;
+							}
+						}
+					}
+				}
+
+				&.section-description {
+					grid-template-columns: 1fr;
+					--line-clamp: 2;
+				}
+
+				&.section-monitoring {
+					container-type: inline-size;
+
+					.monitoring {
+						display: grid;
+						grid-template-columns: repeat(2, auto);
+						gap: 5px;
+						align-items: center;
+
+						.monitoring-item {
+							display: flex;
+							gap: 5px;
+							justify-content: right;
+							min-width: 0;
+							height: 16px;
+							line-height: 16px;
+
+							.monitoring-item-name {
+								@extend %overflow-ellipsis;
+							}
+						}
+					}
+
+					@container (width > 400px) {
+						.monitoring {
+							grid-template-columns: repeat(4, auto);
+						}
+					}
+				}
+
+				&.section-monitored-by {
+
+					.section-body {
+						@extend %overflow-ellipsis;
+
+						.icon {
+							margin-right: 5px;
+						}
+					}
+				}
+
+				&.section-templates {
+
+					.templates {
+						max-height: 36px;
+						overflow: hidden;
+
+						.template {
+							display: inline-block;
+
+							&:not(:first-of-type) {
+								margin-left: 4px;
+							}
+
+							.template-name,
+							.delimiter {
+								display: inline-block;
+								vertical-align: top;
+							}
+						}
+
+						.link-alt {
+							margin-left: 5px;
+						}
+
+						&.has-ellipsis {
+
+							.template-name {
+								@extend %overflow-ellipsis;
+								max-width: 75px;
+							}
+						}
+					}
+				}
+
+				&.section-inventory {
+					container-type: inline-size;
+					grid-template-columns: 1fr;
+					align-items: start;
+
+					.section-name {
+						padding-top: 18px;
+					}
+
+					.section-body {
+						display: grid;
+						grid-template-columns: 1fr 2fr;
+						gap: 10px;
+
+						.inventory-field-name {
+							text-align: left;
+						}
+
+						.inventory-field-name,
+						.inventory-field-value {
+							@extend %overflow-ellipsis;
+						}
+					}
+
+					@container (width > 450px) {
+						.section-body {
+							grid-template-columns: auto 1fr;
+						}
+					}
+				}
+
+				&.section-tags {
+					grid-template-columns: 1fr;
+
+					.tags {
+						max-height: 38px;
+						overflow: hidden;
+
+						.btn-icon {
+							height: 14px;
+							margin-top: 2px;
+						}
+					}
+				}
+			}
+		}
+	}
+}

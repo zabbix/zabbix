@@ -95,9 +95,10 @@ class CControllerDashboardWidgetEdit extends CController {
 		natcasesort($known_types);
 		natcasesort($deprecated_types);
 
+		$values = $this->getInput('fields', $this->widget->getInitialFieldsValues());
 		$templateid = $this->hasInput('templateid') ? $this->getInput('templateid') : null;
 
-		$form = $this->widget->getForm($this->getInput('fields', []), $templateid);
+		$form = $this->widget->getForm($values, $templateid);
 		$form->validate();
 
 		$captions = $this->getValuesCaptions($form->fieldsToApi());

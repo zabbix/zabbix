@@ -522,6 +522,18 @@ class CControllerPopupGeneric extends CController {
 				'table_columns' => [
 					_('Media type')
 				]
+			],
+			'host_inventory' => [
+				'title' => _('Inventory'),
+				'min_user_type' => USER_TYPE_ZABBIX_USER,
+				'allowed_src_fields' => 'id,name',
+				'form' => [
+					'name' => 'inventory_form',
+					'id' => 'inventory_form'
+				],
+				'table_columns' => [
+					_('Name')
+				]
 			]
 		];
 	}
@@ -1819,6 +1831,17 @@ class CControllerPopupGeneric extends CController {
 
 				$records = API::MediaType()->get($options);
 				CArrayHelper::sort($records, ['name']);
+				break;
+
+			case 'host_inventory':
+				$records = [];
+
+				foreach (getHostInventories(true) as $inventory_field) {
+					$records[$inventory_field['nr']] = [
+						'id' => $inventory_field['nr'],
+						'name' => $inventory_field['title']
+					];
+				}
 				break;
 		}
 

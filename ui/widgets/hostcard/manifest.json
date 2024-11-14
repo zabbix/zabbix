@@ -1,0 +1,32 @@
+{
+	"manifest_version": 2.0,
+	"id": "hostcard",
+	"type": "widget",
+	"name": "Host card",
+	"namespace": "HostCard",
+	"version": "1.0",
+	"author": "Zabbix",
+	"description": "Displays the most relevant host information.",
+	"url": "web_interface/frontend_sections/dashboards/widgets/host_card",
+	"widget": {
+		"size": {
+			"width": 14,
+			"height": 4
+		},
+		"js_class": "CWidgetHostCard",
+		"in": {
+			"hostid": {
+				"type": "_hostid",
+				"required": true
+			}
+		}
+	},
+	"actions": {
+		"widget.hostcard.view": {
+			"class": "WidgetView"
+		}
+	},
+	"assets": {
+		"js": ["class.widget.js", "class.widget-field.host-sections.js"]
+	}
+}

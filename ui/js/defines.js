@@ -41,6 +41,8 @@ const ZBX_STYLE_DRAG_ICON = 'drag-icon';
 const ZBX_STYLE_PROBLEM_ICON_LINK = 'problem-icon-link';
 const ZBX_STYLE_PROBLEM_ICON_LIST_ITEM = 'problem-icon-list-item';
 
+const ZBX_STYLE_LINK_ALT = 'link-alt';
+
 const ZBX_STYLE_LIST_TABLE = 'list-table';
 
 const ZBX_STYLE_ROW_SELECTED = 'row-selected';

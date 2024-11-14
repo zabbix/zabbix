@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'7.2.0rc1');
 define('ZABBIX_API_VERSION',	'7.2.0');
 define('ZABBIX_EXPORT_VERSION',	'7.2');
 
-define('ZABBIX_DB_VERSION',		7010019);
+define('ZABBIX_DB_VERSION',		7010020);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -2364,6 +2364,8 @@ define('ZBX_ICON_PENCIL', 'zi-pencil');
 define('ZBX_ICON_PLAY', 'zi-play');
 define('ZBX_ICON_PLUS', 'zi-plus');
 define('ZBX_ICON_PLUS_SMALL', 'zi-plus-small');
+define('ZBX_ICON_PROXY', 'zi-proxy');
+define('ZBX_ICON_PROXY_GROUP', 'zi-proxy-group');
 define('ZBX_ICON_REFERENCE', 'zi-reference');
 define('ZBX_ICON_REMOVE', 'zi-remove');
 define('ZBX_ICON_REMOVE_SMALL', 'zi-remove-small');
@@ -2371,6 +2373,7 @@ define('ZBX_ICON_REMOVE_SMALLER', 'zi-remove-smaller');
 define('ZBX_ICON_REPORTS', 'zi-reports');
 define('ZBX_ICON_SEARCH', 'zi-search');
 define('ZBX_ICON_SEARCH_LARGE', 'zi-search-large');
+define('ZBX_ICON_SERVER', 'zi-server');
 define('ZBX_ICON_SERVICES', 'zi-services');
 define('ZBX_ICON_SIGN_OUT', 'zi-sign-out');
 define('ZBX_ICON_SPEAKER', 'zi-speaker');

@@ -181,6 +181,15 @@ class CWidget extends CModule {
 		return $this->manifest['widget']['out'];
 	}
 
+	/**
+	 * Get initial configuration for new widget editor. This will override form defaults for specified fields.
+	 *
+	 * @return array
+	 */
+	public function getInitialFieldsValues(): array {
+		return [];
+	}
+
 	public function getDefaultRefreshRate(): int {
 		return array_key_exists($this->manifest['widget']['refresh_rate'], self::getRefreshRates())
 			? (int) $this->manifest['widget']['refresh_rate']

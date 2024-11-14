@@ -60,6 +60,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				'an item prototype.',
 		'Honeycomb' => 'Displays item values as a honeycomb.',
 		'Host availability' => 'Displays the host count by status (available/unavailable/unknown).',
+		'Host card' => 'Displays the most relevant host information.',
 		'Host navigator' => 'Displays host hierarchy with ability to control other widgets based on selected host.',
 		'Item history' => 'Displays the latest data for the selected items with an option to add progress bar visualizations, '.
 				'customize report columns, and display images for binary data types.',

@@ -755,6 +755,18 @@ switch ($data['method']) {
 					$result = CArrayHelper::renameObjectsKeys($sysmaps, ['sysmapid' => 'id']);
 				}
 				break;
+
+			case 'host_inventory':
+				$inventory_fields = array_column(getHostInventories(true), 'title', 'nr');
+
+				if (array_key_exists('search', $data)) {
+					$inventory_fields = preg_grep('/'.preg_quote($data['search']).'/i', $inventory_fields);
+				}
+
+				foreach (array_slice($inventory_fields, 0, $limit, true) as $nr => $title) {
+					$result[] = ['id' => (string) $nr, 'name' => $title];
+				}
+				break;
 		}
 		break;
 

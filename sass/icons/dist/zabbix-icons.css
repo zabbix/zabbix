@@ -1,9 +1,9 @@
 @font-face {
   font-family: "zabbix-icons";
-  src: url("zabbix-icons.woff2?t=1715610469019") format("woff2"),
-  url("zabbix-icons.woff?t=1715610469019") format("woff"),
-  url('zabbix-icons.ttf?t=1715610469019') format('truetype'),
-  url('zabbix-icons.svg?t=1715610469019#zabbix-icons') format('svg');
+  src: url("zabbix-icons.woff2?t=1728543869077") format("woff2"),
+  url("zabbix-icons.woff?t=1728543869077") format("woff"),
+  url('zabbix-icons.ttf?t=1728543869077') format('truetype'),
+  url('zabbix-icons.svg?t=1728543869077#zabbix-icons') format('svg');
 }
 
 [class^="zi-"]::before, [class*=" zi-"]::before {
@@ -96,39 +96,42 @@
 .zi-picture:before { content: "\ea51"; }
 .zi-play:before { content: "\ea52"; }
 .zi-plus:before { content: "\ea53"; }
-.zi-reference:before { content: "\ea54"; }
-.zi-reload:before { content: "\ea55"; }
-.zi-remove:before { content: "\ea56"; }
-.zi-reports:before { content: "\ea57"; }
-.zi-search-large:before { content: "\ea58"; }
-.zi-search:before { content: "\ea59"; }
-.zi-services:before { content: "\ea5a"; }
-.zi-sign-out:before { content: "\ea5b"; }
-.zi-slash:before { content: "\ea5c"; }
-.zi-speaker-off:before { content: "\ea5d"; }
-.zi-speaker:before { content: "\ea5e"; }
-.zi-star-filled:before { content: "\ea5f"; }
-.zi-star:before { content: "\ea60"; }
-.zi-stop-sign:before { content: "\ea61"; }
-.zi-support:before { content: "\ea62"; }
-.zi-text:before { content: "\ea63"; }
-.zi-time-period:before { content: "\ea64"; }
-.zi-trash:before { content: "\ea65"; }
-.zi-tree-top-bottom:before { content: "\ea66"; }
-.zi-tree-top-right-bottom:before { content: "\ea67"; }
-.zi-tree-top-right:before { content: "\ea68"; }
-.zi-triangle-flipped-warning:before { content: "\ea69"; }
-.zi-triangle-warning:before { content: "\ea6a"; }
-.zi-uncheck:before { content: "\ea6b"; }
-.zi-user-filled:before { content: "\ea6c"; }
-.zi-user-settings:before { content: "\ea6d"; }
-.zi-user:before { content: "\ea6e"; }
-.zi-users-filled:before { content: "\ea6f"; }
-.zi-users:before { content: "\ea70"; }
-.zi-widget-add:before { content: "\ea71"; }
-.zi-widget-awaiting-data-large:before { content: "\ea72"; }
-.zi-widget-empty-references-large:before { content: "\ea73"; }
-.zi-widget-resize:before { content: "\ea74"; }
-.zi-wrench-alt:before { content: "\ea75"; }
-.zi-wrench:before { content: "\ea76"; }
+.zi-proxy-group:before { content: "\ea54"; }
+.zi-proxy:before { content: "\ea55"; }
+.zi-reference:before { content: "\ea56"; }
+.zi-reload:before { content: "\ea57"; }
+.zi-remove:before { content: "\ea58"; }
+.zi-reports:before { content: "\ea59"; }
+.zi-search-large:before { content: "\ea5a"; }
+.zi-search:before { content: "\ea5b"; }
+.zi-server:before { content: "\ea5c"; }
+.zi-services:before { content: "\ea5d"; }
+.zi-sign-out:before { content: "\ea5e"; }
+.zi-slash:before { content: "\ea5f"; }
+.zi-speaker-off:before { content: "\ea60"; }
+.zi-speaker:before { content: "\ea61"; }
+.zi-star-filled:before { content: "\ea62"; }
+.zi-star:before { content: "\ea63"; }
+.zi-stop-sign:before { content: "\ea64"; }
+.zi-support:before { content: "\ea65"; }
+.zi-text:before { content: "\ea66"; }
+.zi-time-period:before { content: "\ea67"; }
+.zi-trash:before { content: "\ea68"; }
+.zi-tree-top-bottom:before { content: "\ea69"; }
+.zi-tree-top-right-bottom:before { content: "\ea6a"; }
+.zi-tree-top-right:before { content: "\ea6b"; }
+.zi-triangle-flipped-warning:before { content: "\ea6c"; }
+.zi-triangle-warning:before { content: "\ea6d"; }
+.zi-uncheck:before { content: "\ea6e"; }
+.zi-user-filled:before { content: "\ea6f"; }
+.zi-user-settings:before { content: "\ea70"; }
+.zi-user:before { content: "\ea71"; }
+.zi-users-filled:before { content: "\ea72"; }
+.zi-users:before { content: "\ea73"; }
+.zi-widget-add:before { content: "\ea74"; }
+.zi-widget-awaiting-data-large:before { content: "\ea75"; }
+.zi-widget-empty-references-large:before { content: "\ea76"; }
+.zi-widget-resize:before { content: "\ea77"; }
+.zi-wrench-alt:before { content: "\ea78"; }
+.zi-wrench:before { content: "\ea79"; }
 
