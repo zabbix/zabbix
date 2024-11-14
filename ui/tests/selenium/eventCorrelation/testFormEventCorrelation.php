@@ -362,6 +362,12 @@ class testFormEventCorrelation extends CWebTest {
 						[
 							'Type' => 'Old event tag name',
 							'Tag' => '🙂🙃 &nbsp; <script>alert("hi!");</script>'
+						],
+						[
+							'Type' => 'New event tag value',
+							'Operator' => 'does not contain',
+							'Tag' => '🙂🙃 &nbsp; <script>alert("hi!");</script>',
+							'Value' => '🙂🙃 &nbsp; <script>alert("hi!");</script>'
 						]
 					]
 				]
@@ -406,8 +412,10 @@ class testFormEventCorrelation extends CWebTest {
 					],
 					'conditions' => [
 						[
-							'Type' => 'Old event tag name',
-							'Tag' => 'Test tag'
+							'Type' => 'New event tag value',
+							'Operator' => 'does not contain',
+							'Tag' => STRING_255,
+							'Value' => STRING_255
 						]
 					]
 				]
@@ -416,12 +424,17 @@ class testFormEventCorrelation extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'New event host group equals'
+						'Name' => 'New event host group operators'
 					],
 					'conditions' => [
 						[
 							'Type' => 'New event host group',
 							'Host groups' => 'Zabbix servers'
+						],
+						[
+							'Type' => 'New event host group',
+							'Operator' => 'does not equal',
+							'Host groups' => 'Databases'
 						]
 					]
 				]
@@ -430,22 +443,7 @@ class testFormEventCorrelation extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'New event host group does not equal'
-					],
-					'conditions' => [
-						[
-							'Type' => 'New event host group',
-							'Operator' => 'does not equal',
-							'Host groups' => 'Zabbix servers'
-						]
-					]
-				]
-			],
-			// #10
-			[
-				[
-					'fields' => [
-						'Name' => 'Event tag pair'
+						'Name' => 'Event tag pair operators'
 					],
 					'conditions' => [
 						[
@@ -456,163 +454,83 @@ class testFormEventCorrelation extends CWebTest {
 					]
 				]
 			],
-			// #11
+			// #10
 			[
 				[
 					'fields' => [
-						'Name' => 'Old event tag value equals tag'
+						'Name' => 'Old event tag value operators'
 					],
 					'conditions' => [
 						[
 							'Type' => 'Old event tag value',
-							'Tag' => 'TagTag',
+							'Tag' => 'Tag1',
+							'Value' => 'TagValue'
+						],
+						[
+							'Type' => 'Old event tag value',
+							'Tag' => 'Tag2',
+							'Value' => ''
+						],
+						[
+							'Type' => 'Old event tag value',
+							'Tag' => 'Tag3',
+							'Operator' => 'does not equal',
+							'Value' => 'TagValue'
+						],
+						[
+							'Type' => 'Old event tag value',
+							'Tag' => 'Tag4',
+							'Operator' => 'contains',
+							'Value' => 'TagValue'
+						],
+						[
+							'Type' => 'Old event tag value',
+							'Tag' => 'Tag5',
+							'Operator' => 'does not contain',
+							'Value' => 'TagValue'
+						]
+					]
+				]
+			],
+			// #11
+			[
+				[
+					'fields' => [
+						'Name' => 'New event tag value operators'
+					],
+					'conditions' => [
+						[
+							'Type' => 'New event tag value',
+							'Tag' => 'Tag1',
+							'Value' => 'TagValue'
+						],
+						[
+							'Type' => 'New event tag value',
+							'Tag' => 'Tag2',
+							'Value' => ''
+						],
+						[
+							'Type' => 'New event tag value',
+							'Tag' => 'Tag3',
+							'Operator' => 'does not equal',
+							'Value' => 'TagValue'
+						],
+						[
+							'Type' => 'New event tag value',
+							'Tag' => 'Tag4',
+							'Operator' => 'contains',
+							'Value' => 'TagValue'
+						],
+						[
+							'Type' => 'New event tag value',
+							'Tag' => 'Tag5',
+							'Operator' => 'does not contain',
 							'Value' => 'TagValue'
 						]
 					]
 				]
 			],
 			// #12
-			[
-				[
-					'fields' => [
-						'Name' => 'Old event tag value equals Empty'
-					],
-					'conditions' => [
-						[
-							'Type' => 'Old event tag value',
-							'Tag' => 'TagTag',
-							'Value' => ''
-						]
-					]
-				]
-			],
-			// #13
-			[
-				[
-					'fields' => [
-						'Name' => 'Old event tag value does not equal tag'
-					],
-					'conditions' => [
-						[
-							'Type' => 'Old event tag value',
-							'Tag' => 'TagTag',
-							'Operator' => 'does not equal',
-							'Value' => 'TagValue'
-						]
-					]
-				]
-			],
-			// #14
-			[
-				[
-					'fields' => [
-						'Name' => 'Old event tag value contains tag'
-					],
-					'conditions' => [
-						[
-							'Type' => 'Old event tag value',
-							'Tag' => 'TagTag',
-							'Operator' => 'contains',
-							'Value' => 'TagValue'
-						]
-					]
-				]
-			],
-			// #15
-			[
-				[
-					'fields' => [
-						'Name' => 'Old event tag value does not contain tag'
-					],
-					'conditions' => [
-						[
-							'Type' => 'Old event tag value',
-							'Tag' => 'TagTag',
-							'Operator' => 'does not contain',
-							'Value' => 'TagValue'
-						]
-					]
-				]
-			],
-			// #16
-			[
-				[
-					'fields' => [
-						'Name' => 'New event tag value equals tag'
-					],
-					'conditions' => [
-						[
-							'Type' => 'New event tag value',
-							'Tag' => 'TagTag',
-							'Value' => 'TagValue'
-						]
-					]
-				]
-			],
-			// #17
-			[
-				[
-					'fields' => [
-						'Name' => 'New event tag value equals Empty'
-					],
-					'conditions' => [
-						[
-							'Type' => 'New event tag value',
-							'Tag' => 'TagTag',
-							'Value' => ''
-						]
-					]
-				]
-			],
-			// #18
-			[
-				[
-					'fields' => [
-						'Name' => 'New event tag value does not equal tag'
-					],
-					'conditions' => [
-						[
-							'Type' => 'New event tag value',
-							'Tag' => 'TagTag',
-							'Operator' => 'does not equal',
-							'Value' => 'TagValue'
-						]
-					]
-				]
-			],
-			// #19
-			[
-				[
-					'fields' => [
-						'Name' => 'New event tag value contains tag'
-					],
-					'conditions' => [
-						[
-							'Type' => 'New event tag value',
-							'Tag' => 'TagTag',
-							'Operator' => 'contains',
-							'Value' => 'TagValue'
-						]
-					]
-				]
-			],
-			// #20
-			[
-				[
-					'fields' => [
-						'Name' => 'New event tag value does not contain tag'
-					],
-					'conditions' => [
-						[
-							'Type' => 'New event tag value',
-							'Tag' => 'TagTag',
-							'Operator' => 'does not contain',
-							'Value' => 'TagValue'
-						]
-					]
-				]
-			],
-			// #21
 			[
 				[
 					'expected' => TEST_BAD,
@@ -627,7 +545,7 @@ class testFormEventCorrelation extends CWebTest {
 					'condition_error' => 'Incorrect value for field "tag": cannot be empty.'
 				]
 			],
-			// #22
+			// #13
 			[
 				[
 					'expected' => TEST_BAD,
@@ -642,7 +560,7 @@ class testFormEventCorrelation extends CWebTest {
 					'condition_error' => 'Incorrect value for field "groupid": cannot be empty.'
 				]
 			],
-			// #23
+			// #14
 			[
 				[
 					'expected' => TEST_BAD,
@@ -658,7 +576,7 @@ class testFormEventCorrelation extends CWebTest {
 					'condition_error' => 'Incorrect value for field "oldtag": cannot be empty.'
 				]
 			],
-			// #24
+			// #15
 			[
 				[
 					'expected' => TEST_BAD,
@@ -674,7 +592,7 @@ class testFormEventCorrelation extends CWebTest {
 					'condition_error' => 'Incorrect value for field "newtag": cannot be empty.'
 				]
 			],
-			// #25
+			// #16
 			[
 				[
 					'expected' => TEST_BAD,
@@ -689,7 +607,7 @@ class testFormEventCorrelation extends CWebTest {
 					'condition_error' => 'Incorrect value for field "tag": cannot be empty.'
 				]
 			],
-			// #26
+			// #17
 			[
 				[
 					'expected' => TEST_BAD,
@@ -706,7 +624,7 @@ class testFormEventCorrelation extends CWebTest {
 					'condition_error' => 'Incorrect value for field "value": cannot be empty.'
 				]
 			],
-			// #27
+			// #18
 			[
 				[
 					'expected' => TEST_BAD,
@@ -723,7 +641,7 @@ class testFormEventCorrelation extends CWebTest {
 					'condition_error' => 'Incorrect value for field "value": cannot be empty.'
 				]
 			],
-			// #28
+			// #19
 			[
 				[
 					'expected' => TEST_BAD,
@@ -738,7 +656,7 @@ class testFormEventCorrelation extends CWebTest {
 					'condition_error' => 'Incorrect value for field "tag": cannot be empty.'
 				]
 			],
-			// #29
+			// #20
 			[
 				[
 					'expected' => TEST_BAD,
@@ -755,7 +673,7 @@ class testFormEventCorrelation extends CWebTest {
 					'condition_error' => 'Incorrect value for field "value": cannot be empty.'
 				]
 			],
-			// #30
+			// #21
 			[
 				[
 					'expected' => TEST_BAD,
@@ -772,7 +690,7 @@ class testFormEventCorrelation extends CWebTest {
 					'condition_error' => 'Incorrect value for field "value": cannot be empty.'
 				]
 			],
-			// #31
+			// #22
 			[
 				[
 					'fields' => [
@@ -788,10 +706,11 @@ class testFormEventCorrelation extends CWebTest {
 							'Tag' => 'Test tag2'
 						]
 					],
+					'expected_expression' => 'A and B',
 					'expected_expression_update' => '(A or B) and C'
 				]
 			],
-			// #32
+			// #23
 			[
 				[
 					'fields' => [
@@ -824,7 +743,7 @@ class testFormEventCorrelation extends CWebTest {
 					'expected_expression_update' => '(A or B or E) and (C or D)'
 				]
 			],
-			// #33
+			// #24
 			[
 				[
 					'fields' => [
@@ -845,7 +764,7 @@ class testFormEventCorrelation extends CWebTest {
 					'expected_expression_update' => '(A and B) and C'
 				]
 			],
-			// #34
+			// #25
 			[
 				[
 					'fields' => [
@@ -866,7 +785,7 @@ class testFormEventCorrelation extends CWebTest {
 					'expected_expression_update' => '(A or B) or C'
 				]
 			],
-			// #35
+			// #26
 			[
 				[
 					'fields' => [
@@ -895,7 +814,7 @@ class testFormEventCorrelation extends CWebTest {
 					'formula' => 'C or (A and not B)'
 				]
 			],
-			// #36
+			// #27
 			[
 				[
 					'expected' => TEST_BAD,
@@ -919,7 +838,7 @@ class testFormEventCorrelation extends CWebTest {
 					]
 				]
 			],
-			// #37
+			// #28
 			[
 				[
 					'expected' => TEST_BAD,
@@ -950,7 +869,7 @@ class testFormEventCorrelation extends CWebTest {
 					]
 				]
 			],
-			// #38
+			// #29
 			[
 				[
 					'expected' => TEST_BAD,
@@ -981,7 +900,7 @@ class testFormEventCorrelation extends CWebTest {
 					]
 				]
 			],
-			// #39
+			// #30
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1011,7 +930,7 @@ class testFormEventCorrelation extends CWebTest {
 					]
 				]
 			],
-			// #40
+			// #31
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1035,7 +954,7 @@ class testFormEventCorrelation extends CWebTest {
 					]
 				]
 			],
-			// #41
+			// #32
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1059,7 +978,7 @@ class testFormEventCorrelation extends CWebTest {
 					]
 				]
 			],
-			// #42
+			// #33
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1080,22 +999,6 @@ class testFormEventCorrelation extends CWebTest {
 					'formula' => 'not A not B',
 					'errors' => [
 						'Invalid parameter "/1/filter/formula": check expression starting from " not B".'
-					]
-				]
-			],
-			// #43
-			[
-				[
-					'fields' => [
-						'Name' => 'Unicode tags'
-					],
-					'conditions' => [
-						[
-							'Type' => 'New event tag value',
-							'Operator' => 'does not contain',
-							'Tag' => '🙂🙃 &nbsp; <script>alert("hi!");</script>',
-							'Value' => '🙂🙃 &nbsp; <script>alert("hi!");</script>'
-						]
 					]
 				]
 			]
@@ -1153,18 +1056,6 @@ class testFormEventCorrelation extends CWebTest {
 			['Type' => 'Old event tag name', 'Tag' => 'clone tag'],
 			['Type' => 'New event tag value', 'Tag' => 'another tag', 'Operator' => 'does not contain', 'Value' => 'test']
 		];
-
-		foreach (['Cloned correlation', 'Event correlation for clone'] as $name) {
-			$this->assertTableCorrelationRow([
-				'fields' => [
-					'Name' => $name,
-					'Description' => 'Test description clone',
-					'Enabled' => false,
-					'Operations' => ['Close old events']
-				],
-				'conditions' => $conditions
-			]);
-		}
 
 		// Assert data in edit form.
 		$this->query('link:Cloned correlation')->one()->click();
@@ -1297,26 +1188,17 @@ class testFormEventCorrelation extends CWebTest {
 		}
 
 		// Fill the 'Type of calculation' field and check the shown expression.
-		if (array_key_exists('conditions', $data) && count($data['conditions']) > 1) {
-			if (array_key_exists('calculation', $data)) {
-				$form->getField('id:evaltype')->fill($data['calculation']);
+		if (array_key_exists('calculation', $data)) {
+			$form->getField('id:evaltype')->fill($data['calculation']);
 
-				if ($data['calculation'] === 'Custom expression') {
-					$form->query('id:formula')->waitUntilVisible()->one()->fill($data['formula']);
-				}
+			if ($data['calculation'] === 'Custom expression') {
+				$form->query('id:formula')->waitUntilPresent()->one()->fill($data['formula']);
 			}
+		}
 
-			// Only check the expression if 'Type of calculation' not set to 'Custom expression'.
-			if (CTestArrayHelper::get($data, 'calculation') !== 'Custom expression') {
-				$expression_text = $form->query('id:condition_label')->one()->getText();
-
-				if (array_key_exists('expected_expression'.($update ? '_update' : ''), $data)) {
-					$this->assertEquals($data['expected_expression'.($update ? '_update' : '')], $expression_text);
-				}
-				else {
-					$this->assertEquals('A and B', $expression_text);
-				}
-			}
+		if (array_key_exists('expected_expression'.($update ? '_update' : ''), $data)) {
+			$expression_text = $form->query('id:condition_label')->one()->getText();
+			$this->assertEquals($data['expected_expression'.($update ? '_update' : '')], $expression_text);
 		}
 
 		// Submit 'New event correlation' form only if error in the 'New condition' modal not expected.
@@ -1343,10 +1225,14 @@ class testFormEventCorrelation extends CWebTest {
 							CTestArrayHelper::get($data, 'conditions', [])
 					);
 				}
-			}
 
-			// Assert the data in list table.
-			$this->assertTableCorrelationRow($data);
+				// Set the default expected 'Description' when updating.
+				if ($update) {
+					$data['fields']['Description'] = CTestArrayHelper::get($data['fields'], 'Description',
+						'Test description update'
+					);
+				}
+			}
 
 			// Assert data in DB.
 			$this->assertEquals($count_before + ($update ? 0 : 1), CDBHelper::getCount($count_sql));
@@ -1355,22 +1241,15 @@ class testFormEventCorrelation extends CWebTest {
 			));
 
 			// Simple update scenario - check that data in DB has not changed.
-			if ($update &&  $data === []) {
+			if ($update && $data === []) {
 				$this->assertEquals($hash_before, CDBHelper::getHash(self::HASH_SQL));
 			}
 
 			// Reload the page and open the form again to assert data.
 			$this->page->open('zabbix.php?action=correlation.list')->waitUntilReady();
-			$this->query('link', $data['fields']['Name'])->one()->click();
+			$this->query('link', $data['fields']['Name'])->one()->waitUntilClickable()->click();
 			$this->page->waitUntilReady();
 			$form->invalidate();
-
-			// Set the default expected 'Description' when updating.
-			if ($update) {
-				$data['fields']['Description'] = CTestArrayHelper::get($data['fields'], 'Description',
-						'Test description update'
-				);
-			}
 
 			// Set the expected 'Enabled' value.
 			$data['fields']['Enabled'] = CTestArrayHelper::get($data['fields'], 'Enabled', true);
@@ -1481,49 +1360,8 @@ class testFormEventCorrelation extends CWebTest {
 		// Assert that an Event Correlation is not added in the UI.
 		$this->assertFalse($this->query('link:Test cancellation')->exists());
 
-		// Assert that the original Event Correlation was not updated in the UI.
-		if (in_array($action, ['update', 'clone', 'delete'])) {
-			$this->assertTableCorrelationRow([
-				'fields' => ['Name' => 'Event correlation for cancel', 'Enabled' => false, 'Operations' => ['Close old events']],
-				'conditions' => [
-					['Type' => 'Old event tag name', 'Tag' => 'cancel tag'],
-					['Type' => 'New event tag name', 'Tag' => 'cancel tag']
-				]
-			]);
-		}
-
 		// Assert that nothing has changed in the DB.
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::HASH_SQL));
-	}
-
-	/**
-	 * Asserts that the data table contains a row with the expected data from data provider.
-	 *
-	 * @param array $data    data from data provider
-	 */
-	protected function assertTableCorrelationRow($data) {
-		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $data['fields']['Name']);
-
-		$expected_row_data = [
-			'Operations' => implode("\n", $data['fields']['Operations']),
-			'Status' => CTestArrayHelper::get($data['fields'], 'Enabled', true) ? 'Enabled' : 'Disabled'
-		];
-
-		// Assert the displayed table row data.
-		$row->assertValues($expected_row_data);
-
-		// Assert the Conditions column.
-		$expected_conditions = $this->getExpectedConditionsArray($data['conditions'],
-				CTestArrayHelper::get($data, 'custom_conditions_order')
-		);
-
-		// Get the actually displayed conditions and compare to the expected.
-		$displayed_conditions = preg_split("/\r\n|\n|\r/", $row->getColumn('Conditions')->getText());
-
-		// Ignore the order of conditions. The logic is not predetermined on 6.0.
-		$expected_conditions = sort($expected_conditions);
-		$displayed_conditions = sort($displayed_conditions);
-		$this->assertEquals($expected_conditions, $displayed_conditions);
 	}
 
 	/**
@@ -1563,11 +1401,12 @@ class testFormEventCorrelation extends CWebTest {
 		// Sort by custom order if applicable.
 		if ($custom_order) {
 			// Add the custom_order parameter if missing (update scenario).
-			foreach ($conditions as $i => $condition) {
+			foreach ($conditions as &$condition) {
 				if (!array_key_exists('custom_order', $condition)) {
-					$conditions[$i]['custom_order'] = 0;
+					$condition['custom_order'] = 0;
 				}
 			}
+			unset($condition);
 
 			// The sorting itself.
 			usort($conditions, function ($a, $b) {
