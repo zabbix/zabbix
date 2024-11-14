@@ -33,6 +33,7 @@ ZBX_PTR_VECTOR_IMPL(lld_override_ptr, zbx_lld_override_t*)
 ZBX_PTR_VECTOR_IMPL(lld_row_ptr, zbx_lld_row_t*)
 ZBX_PTR_VECTOR_IMPL(lld_item_ptr, zbx_lld_item_t*)
 ZBX_PTR_VECTOR_IMPL(lld_item_prototype_ptr, zbx_lld_item_prototype_t*)
+ZBX_PTR_VECTOR_IMPL(lld_entry_ptr, zbx_lld_entry_t *)
 
 int	lld_item_compare_func(const void *d1, const void *d2)
 {
@@ -981,19 +982,18 @@ int	lld_validate_item_override_no_discover(const zbx_vector_lld_override_ptr_t *
 	return ZBX_PROTOTYPE_NO_DISCOVER == override_default ? FAIL : SUCCEED;
 }
 
-static int	lld_rows_get(zbx_hashset_t *lld_entries, zbx_lld_filter_t *filter, zbx_vector_lld_row_ptr_t *lld_rows,
-		const zbx_vector_lld_override_ptr_t *overrides, char **info)
+static int	lld_rows_get(zbx_vector_lld_entry_ptr_t *lld_entries, zbx_lld_filter_t *filter,
+		zbx_vector_lld_row_ptr_t *lld_rows, const zbx_vector_lld_override_ptr_t *overrides, char **info)
 {
-	zbx_lld_row_t		*lld_row;
-	int			ret = FAIL;
-	zbx_hashset_iter_t	iter;
-	zbx_lld_entry_t		*lld_entry;
+	zbx_lld_row_t	*lld_row;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_hashset_iter_reset(lld_entries, &iter);
-	while (NULL != (lld_entry = (zbx_lld_entry_t *)zbx_hashset_iter_next(&iter)))
+	for (int i = 0; i < lld_entries->values_num; i++)
 	{
+		zbx_lld_entry_t	*lld_entry = (zbx_lld_entry_t *)lld_entries->values[i];
+
 		if (SUCCEED != filter_evaluate(filter, lld_entry, info))
 			continue;
 
@@ -1078,7 +1078,7 @@ static void	lld_row_free(zbx_lld_row_t *lld_row)
  *                               without additional information.              *
  *                                                                            *
  ******************************************************************************/
-int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_hashset_t *lld_entries, char **error)
+int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *lld_entries, char **error)
 {
 #define LIFETIME_DURATION_GET(lt, lt_str)									\
 	do													\

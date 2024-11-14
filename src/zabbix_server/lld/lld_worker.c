@@ -39,6 +39,7 @@ typedef struct
 	zbx_uint64_t			lastlogsize;
 	int				mtime;
 	zbx_hashset_t			entries;
+	zbx_vector_lld_entry_ptr_t	entries_sorted;
 	zbx_vector_lld_macro_path_ptr_t	macro_paths;
 }
 zbx_lld_value_t;
@@ -71,9 +72,11 @@ void	lld_value_init(zbx_lld_value_t *lld_value)
 			(zbx_clean_func_t)lld_entry_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
 			ZBX_DEFAULT_MEM_FREE_FUNC);
 
+	zbx_vector_lld_entry_ptr_create(&lld_value->entries_sorted);
 	lld_value->errcode = FAIL;
 
 	zbx_vector_lld_macro_path_ptr_create(&lld_value->macro_paths);
+
 }
 
 /******************************************************************************
@@ -83,6 +86,7 @@ void	lld_value_init(zbx_lld_value_t *lld_value)
  ******************************************************************************/
 void	lld_value_clear(zbx_lld_value_t *lld_value)
 {
+	zbx_vector_lld_entry_ptr_destroy(&lld_value->entries_sorted);
 	zbx_hashset_destroy(&lld_value->entries);
 	zbx_dc_config_clean_items(&lld_value->item, &lld_value->errcode, 1);
 
@@ -206,7 +210,10 @@ static int	lld_prepare_value(const zbx_ipc_message_t *message, zbx_lld_value_t *
 		else
 		{
 			if (SUCCEED == zbx_lld_macro_paths_get(itemid, &lld_value->macro_paths, &error))
-				lld_extract_entries(&lld_value->entries, &json, &lld_value->macro_paths, &error);
+			{
+				lld_extract_entries(&lld_value->entries, &lld_value->entries_sorted, &json,
+						&lld_value->macro_paths, &error);
+			}
 
 			zbx_jsonobj_clear(&json);
 		}
@@ -260,7 +267,7 @@ static int	lld_compare_value(const zbx_ipc_message_t *message, zbx_lld_value_t *
 	if (FAIL == zbx_jsonobj_open(value, &json))
 		goto out;
 
-	if (SUCCEED == (ret = lld_extract_entries(&entries, &json, &lld_value->macro_paths, &error)))
+	if (SUCCEED == (ret = lld_extract_entries(&entries, NULL, &json, &lld_value->macro_paths, &error)))
 		ret = lld_compare_entries(&lld_value->entries, &entries);
 
 	zbx_jsonobj_clear(&json);
@@ -283,7 +290,7 @@ static void	lld_process_value(zbx_lld_value_t *lld_value)
 	char		*error = NULL;
 	unsigned char	state;
 
-	if (SUCCEED == lld_process_discovery_rule(&lld_value->item, &lld_value->entries, &error))
+	if (SUCCEED == lld_process_discovery_rule(&lld_value->item, &lld_value->entries_sorted, &error))
 		state = ITEM_STATE_NORMAL;
 	else
 		state = ITEM_STATE_NOTSUPPORTED;

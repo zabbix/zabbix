@@ -117,6 +117,8 @@ typedef struct
 }
 zbx_lld_entry_t;
 
+ZBX_PTR_VECTOR_DECL(lld_entry_ptr, zbx_lld_entry_t *)
+
 void	lld_entry_clear(zbx_lld_entry_t *entry);
 
 zbx_hash_t	lld_entry_hash(const void *data);
@@ -124,8 +126,8 @@ int        lld_entry_compare(const void *d1, const void *d2);
 void	lld_entry_snprintf_alloc(const zbx_lld_entry_t *entry, char **str, size_t *str_alloc, size_t *str_offset);
 const char        *lld_entry_get_macro(const zbx_lld_entry_t *entry, const char *macro);
 
-int	lld_extract_entries(zbx_hashset_t *entries, const zbx_jsonobj_t *lld_obj,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error);
+int	lld_extract_entries(zbx_hashset_t *entries, zbx_vector_lld_entry_ptr_t *entries_sorted,
+		const zbx_jsonobj_t *lld_obj, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error);
 void	lld_free_entries(zbx_hashset_t *entries);
 int	lld_compare_entries(const zbx_hashset_t *entries1, const zbx_hashset_t *entries2);
 
@@ -433,7 +435,7 @@ typedef void	(*object_audit_entry_update_status_f)(int audit_context_mode, zbx_u
 		int status_old, int status_new);
 typedef int	(get_object_status_val)(int status);
 
-int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_hashset_t *lld_entries, char **error);
+int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *lld_entries, char **error);
 
 /* discovered resource tracking (*_discovery tables) */
 typedef struct

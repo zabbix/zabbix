@@ -178,9 +178,19 @@ const char        *lld_entry_get_macro(const zbx_lld_entry_t *entry, const char 
  *                                                                            *
  * Purpose: extract lld entries from lld json                                 *
  *                                                                            *
+ * Parameters: entries         - [OUT] hashset for storing extracted entries  *
+ *             entries_sorted  - [OUT] vector of sorted entry pointers        *
+ *                                     (optional)                             *
+ *             lld_obj         - [IN] JSON object with LLD data               *
+ *             lld_macro_paths - [IN] vector of LLD macro paths               *
+ *             error           - [OUT] error message                          *
+ *                                                                            *
+ * Return value: SUCCEED - entries extracted successfully                     *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
  ******************************************************************************/
-int	lld_extract_entries(zbx_hashset_t *entries, const zbx_jsonobj_t *lld_obj,
-		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error)
+int	lld_extract_entries(zbx_hashset_t *entries, zbx_vector_lld_entry_ptr_t *entries_sorted,
+		const zbx_jsonobj_t *lld_obj, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error)
 {
 	const zbx_jsonobj_t	*lld_array;
 
@@ -201,13 +211,21 @@ int	lld_extract_entries(zbx_hashset_t *entries, const zbx_jsonobj_t *lld_obj,
 
 	for (int i = 0; i < lld_array->data.array.values_num; i++)
 	{
-		zbx_lld_entry_t	entry_local;
+		zbx_lld_entry_t	entry_local, *entry;
+		int		num_data;
 
 		if (ZBX_JSON_TYPE_OBJECT != lld_array->data.array.values[i]->type)
 			continue;
 
+		num_data = entries->num_data;
 		lld_entry_create(&entry_local, lld_array->data.array.values[i], lld_macro_paths);
-		zbx_hashset_insert(entries, &entry_local, sizeof(entry_local));
+		entry = (zbx_lld_entry_t *)zbx_hashset_insert(entries, &entry_local, sizeof(entry_local));
+
+		if (NULL != entries_sorted)
+			zbx_vector_lld_entry_ptr_append(entries_sorted, entry);
+
+		if (num_data == entries->num_data)
+			lld_entry_clear(&entry_local);
 	}
 
 	return SUCCEED;
