@@ -2974,7 +2974,7 @@ static void	jsonobj_index_el_clear(void *v)
 	{
 		zbx_free(el->objects.values[i].name);
 
-		if (NULL == el->objects.values[i].internal)
+		if (NULL != el->objects.values[i].internal)
 		{
 			zbx_jsonobj_clear(el->objects.values[i].internal);
 			zbx_free(el->objects.values[i].internal);
@@ -3018,6 +3018,7 @@ static void	jsonobj_index_add_element(zbx_hashset_t *index, const char *name, co
 
 	ref.name = zbx_strdup(NULL, name);
 	ref.value = obj;
+	ref.internal = NULL;
 	zbx_vector_jsonobj_ref_append(&el->objects, ref);
 }
 
