@@ -783,7 +783,7 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		if ($this->hasInput('monitored_hosts')) {
-			$group_options['monitored_hosts'] = 1;
+			$group_options['with_monitored_hosts'] = 1;
 			$host_options['monitored_hosts'] = 1;
 		}
 		elseif ($this->hasInput('real_hosts')) {

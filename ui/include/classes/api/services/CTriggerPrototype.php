@@ -79,7 +79,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 			// output
 			'expandExpression'				=> null,
 			'output'						=> API_OUTPUT_EXTEND,
-			'selectGroups'					=> null,
 			'selectHostGroups'				=> null,
 			'selectTemplateGroups'			=> null,
 			'selectHosts'					=> null,
@@ -97,8 +96,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 			'limitSelects'					=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
-
-		$this->checkDeprecatedParam($options, 'selectGroups');
 
 		// editable + permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -521,7 +518,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 	}
 
 	/**
-	 * Retrieves and adds additional requested data (options 'selectHosts', 'selectGroups', etc.) to result set.
+	 * Retrieves and adds additional requested data (options 'selectHosts', etc.) to result set.
 	 *
 	 * @param array		$options
 	 * @param array		$result

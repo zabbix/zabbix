@@ -63,7 +63,6 @@ class CHost extends CHostGeneral {
 	 * @param bool          $options['tags']                               Select hosts by given tags.
 	 * @param bool          $options['severities']                         Select hosts that have only problems with given severities.
 	 * @param bool          $options['inheritedTags']                      Select hosts that have given tags also in their linked templates.
-	 * @param string|array  $options['selectGroups']                       Deprecated! Return a "groups" property with host groups data that the host belongs to.
 	 * @param string|array  $options['selectHostGroups']                   Return a "hostgroups" property with host groups data that the host belongs to.
 	 * @param string|array  $options['selectParentTemplates']              Return a "parentTemplates" property with templates that the host is linked to.
 	 * @param string|array  $options['selectItems']                        Return an "items" property with host items.
@@ -144,7 +143,6 @@ class CHost extends CHostGeneral {
 			'searchWildcardsEnabled'			=> false,
 			// output
 			'output'							=> API_OUTPUT_EXTEND,
-			'selectGroups'						=> null,
 			'selectHostGroups'					=> null,
 			'selectParentTemplates'				=> null,
 			'selectItems'						=> null,
@@ -172,8 +170,6 @@ class CHost extends CHostGeneral {
 		$options = zbx_array_merge($defOptions, $options);
 
 		$this->validateGet($options);
-
-		$this->checkDeprecatedParam($options, 'selectGroups');
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -1815,9 +1811,7 @@ class CHost extends CHostGeneral {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		// adding groups
-		$this->addRelatedGroups($options, $result, 'selectGroups');
-		$this->addRelatedGroups($options, $result, 'selectHostGroups');
+		$this->addRelatedHostGroups($options, $result);
 
 		$hostids = array_keys($result);
 
@@ -2011,29 +2005,19 @@ class CHost extends CHostGeneral {
 		return $result;
 	}
 
-	/**
-	 * Adds related host groups requested by "select*" options to the resulting object set.
-	 *
-	 * @param array  $options  [IN] Original input options.
-	 * @param array  $result   [IN/OUT] Result output.
-	 * @param string $option   [IN] Possible values:
-	 *                                - "selectGroups" (deprecated);
-	 *                                - "selectHostGroups" (or any other value).
-	 */
-	private function addRelatedGroups(array $options, array &$result, string $option): void {
-		if ($options[$option] === null || $options[$option] === API_OUTPUT_COUNT) {
+	private function addRelatedHostGroups(array $options, array &$result): void {
+		if ($options['selectHostGroups'] === null || $options['selectHostGroups'] === API_OUTPUT_COUNT) {
 			return;
 		}
 
-		$relationMap = $this->createRelationMap($result, 'hostid', 'groupid', 'hosts_groups');
+		$relation_map = $this->createRelationMap($result, 'hostid', 'groupid', 'hosts_groups');
 		$groups = API::HostGroup()->get([
-			'output' => $options[$option],
-			'groupids' => $relationMap->getRelatedIds(),
+			'output' => $options['selectHostGroups'],
+			'groupids' => $relation_map->getRelatedIds(),
 			'preservekeys' => true
 		]);
 
-		$output_tag = $option === 'selectGroups' ? 'groups' : 'hostgroups';
-		$result = $relationMap->mapMany($result, $groups, $output_tag);
+		$result = $relation_map->mapMany($result, $groups, 'hostgroups');
 	}
 
 	/**

@@ -542,9 +542,20 @@ class ZBase {
 	 */
 	protected function authenticateUser(): void {
 		$session = new CEncryptedCookieSession();
+		$sessionid = $session->extractSessionId() ?: '';
 
-		if (!CWebUser::checkAuthentication($session->extractSessionId() ?: '')) {
+		API::getWrapper()->auth = [
+			'type' => CJsonRpc::AUTH_TYPE_COOKIE,
+			'auth' => $sessionid
+		];
+
+		if (!CWebUser::checkAuthentication($sessionid)) {
 			CWebUser::setDefault();
+
+			API::getWrapper()->auth = [
+				'type' => CJsonRpc::AUTH_TYPE_COOKIE,
+				'auth' => CWebUser::$data['sessionid']
+			];
 		}
 
 		$this->initLocales(CWebUser::$data['lang']);
@@ -554,12 +565,6 @@ class ZBase {
 		}
 
 		CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
-
-		// Set the authentication token for the API.
-		API::getWrapper()->auth = [
-			'type' => CJsonRpc::AUTH_TYPE_COOKIE,
-			'auth' => CWebUser::$data['sessionid']
-		];
 
 		if (CWebUser::isAutologinEnabled()) {
 			$session->lifetime = time() + SEC_PER_MONTH;

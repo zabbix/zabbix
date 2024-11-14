@@ -15,6 +15,7 @@
 
 
 require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once dirname(__FILE__).'/../include/helpers/CTestDataHelper.php';
 
 /**
  * @onBefore prepareTestData

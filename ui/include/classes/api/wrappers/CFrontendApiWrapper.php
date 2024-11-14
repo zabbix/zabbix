@@ -77,34 +77,4 @@ class CFrontendApiWrapper extends CApiWrapper {
 			return false;
 		}
 	}
-
-	/**
-	 * Call the client method. Pass the "auth" parameter only to the methods that require it.
-	 *
-	 * @param string $method		API method
-	 * @param array  $params		API parameters
-	 *
-	 * @return CApiClientResponse
-	 */
-	protected function callClientMethod($method, $params) {
-		$auth = ($this->requiresAuthentication($this->api, $method))
-			? $this->auth
-			: ['type' => CJsonRpc::AUTH_TYPE_PARAM, 'auth' => null];
-
-		return $this->client->callMethod($this->api, $method, $params, $auth);
-	}
-
-	/**
-	 * Returns true if calling the given method requires an authentication token.
-	 *
-	 * @param $api
-	 * @param $method
-	 *
-	 * @return bool
-	 */
-	protected function requiresAuthentication($api, $method) {
-		return !(($api === 'user' && $method === 'login')
-			|| ($api === 'user' && $method === 'checkAuthentication')
-			|| ($api === 'apiinfo' && $method === 'version'));
-	}
 }

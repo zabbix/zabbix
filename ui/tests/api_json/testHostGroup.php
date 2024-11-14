@@ -499,22 +499,23 @@ class testHostGroup extends CAPITest {
 				'params' => [
 					'output' => ['groupid'],
 					'groupids' => ['50005', '50006'],
-					'monitored_hosts' => true,
 					'with_monitored_hosts' => true
 				],
-				'expected_result' => false,
-				'expected_error' =>
-					'Deprecated parameter "/monitored_hosts" cannot be used with "/with_monitored_hosts".'
+				'expected_result' => [
+					['groupid' => '50005']
+				],
+				'expected_error' => null
 			],
 			[
 				'params' => [
 					'output' => ['groupid'],
 					'groupids' => ['50005', '50006'],
-					'real_hosts' => true,
 					'with_hosts' => true
 				],
-				'expected_result' => false,
-				'expected_error' => 'Deprecated parameter "/real_hosts" cannot be used with "/with_hosts".'
+				'expected_result' => [
+					['groupid' => '50005']
+				],
+				'expected_error' => null
 			],
 			[
 				'params' => [
@@ -522,7 +523,7 @@ class testHostGroup extends CAPITest {
 					'groupids' => ['50005', '50006'],
 					'templated_hosts' => true
 				],
-				'expected_result' => false,
+				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/": unexpected parameter "templated_hosts".'
 			],
 			[
@@ -531,7 +532,7 @@ class testHostGroup extends CAPITest {
 					'groupids' => ['50005', '50006'],
 					'with_hosts_and_templates' => true
 				],
-				'expected_result' => false,
+				'expected_result' => [],
 				'expected_error' => 'Invalid parameter "/": unexpected parameter "with_hosts_and_templates".'
 			]
 		];
@@ -543,12 +544,18 @@ class testHostGroup extends CAPITest {
 	public function testHostGroup_Get($params, $expected_result, $expected_error) {
 		$result = $this->call('hostgroup.get', $params, $expected_error);
 
-		if ($expected_error === null) {
-			foreach ($result['result'] as $hostgroup) {
-				foreach ($expected_result as $field => $expected_value){
-					$this->assertArrayHasKey($field, $hostgroup, 'Field should be present.');
-					$this->assertEquals($hostgroup[$field], $expected_value, 'Returned value should match.');
-				}
+		if ($expected_error !== null) {
+			return;
+		}
+
+		$this->assertCount(count($expected_result), $result['result']);
+
+		foreach ($result['result'] as $hostgroup) {
+			$expected_hostgroup = array_shift($expected_result);
+
+			foreach ($expected_hostgroup as $field => $expected_value){
+				$this->assertArrayHasKey($field, $hostgroup, 'Field '.$field.' should be present.');
+				$this->assertEquals($hostgroup[$field], $expected_value, 'Returned value should match.');
 			}
 		}
 	}

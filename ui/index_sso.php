@@ -316,7 +316,7 @@ try {
 
 		CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
 		API::getWrapper()->auth = [
-			'type' => CJsonRpc::AUTH_TYPE_FRONTEND,
+			'type' => CJsonRpc::AUTH_TYPE_COOKIE,
 			'auth' => CWebUser::$data['sessionid']
 		];
 

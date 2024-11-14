@@ -26,7 +26,7 @@ abstract class CApiClient {
 	 * @param string $method
 	 * @param array  $params
 	 * @param array  $auth
-	 * @param int    $auth['type']  CJsonRpc::AUTH_TYPE_PARAM, CJsonRpc::AUTH_TYPE_HEADER, CJsonRpc::AUTH_TYPE_COOKIE
+	 * @param int    $auth['type']  CJsonRpc::AUTH_TYPE_HEADER, CJsonRpc::AUTH_TYPE_COOKIE
 	 * @param string $auth['auth']
 	 *
 	 * @return CApiClientResponse

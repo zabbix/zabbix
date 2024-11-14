@@ -76,7 +76,6 @@ class CGraph extends CGraphGeneral {
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
-			'selectGroups'				=> null,
 			'selectHostGroups'			=> null,
 			'selectTemplateGroups'		=> null,
 			'selectTemplates'			=> null,
@@ -93,8 +92,6 @@ class CGraph extends CGraphGeneral {
 			'limit'						=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
-
-		$this->checkDeprecatedParam($options, 'selectGroups');
 
 		// permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {

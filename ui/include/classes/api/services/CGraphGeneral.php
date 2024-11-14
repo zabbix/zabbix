@@ -358,10 +358,8 @@ abstract class CGraphGeneral extends CApiService {
 			$result = $relationMap->mapMany($result, $gitems, 'gitems');
 		}
 
-		// adding HostGroups
-		$this->addRelatedGroups($options, $result, 'selectGroups');
-		$this->addRelatedGroups($options, $result, 'selectHostGroups');
-		$this->addRelatedGroups($options, $result, 'selectTemplateGroups');
+		$this->addRelatedHostGroups($options, $result);
+		$this->addRelatedTemplateGroups($options, $result);
 
 		// adding Hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] !== API_OUTPUT_COUNT) {
@@ -425,63 +423,70 @@ abstract class CGraphGeneral extends CApiService {
 		return $result;
 	}
 
-	/**
-	 * Adds related host groups and template groups requested by "select*" options to the resulting object set.
-	 *
-	 * @param array  $options  [IN] Original input options.
-	 * @param array  $result   [IN/OUT] Result output.
-	 * @param string $option   [IN] Possible values:
-	 *                                - "selectGroups" (deprecated);
-	 *                                - "selectHostGroups";
-	 *                                - "selectTemplateGroups".
-	 */
-	private function addRelatedGroups(array $options, array &$result, string $option): void {
-		if ($options[$option] === null || $options[$option] === API_OUTPUT_COUNT) {
+	private function addRelatedHostGroups(array $options, array &$result): void {
+		if ($options['selectHostGroups'] === null || $options['selectHostGroups'] === API_OUTPUT_COUNT) {
 			return;
 		}
 
-		$relationMap = new CRelationMap();
-
-		// discovered items
-		$dbRules = DBselect(
+		$resource = DBselect(
 			'SELECT gi.graphid,hg.groupid'.
-			' FROM graphs_items gi,items i,hosts_groups hg'.
-			' WHERE '.dbConditionInt('gi.graphid', array_keys($result)).
-				' AND gi.itemid=i.itemid'.
-				' AND i.hostid=hg.hostid'
+			' FROM graphs_items gi'.
+			' JOIN items i ON gi.itemid=i.itemid'.
+			' JOIN hosts_groups hg ON i.hostid=hg.hostid'.
+			' JOIN hstgrp hgg ON hg.groupid=hgg.groupid'.
+				' AND '.dbConditionInt('hgg.type', [HOST_GROUP_TYPE_HOST_GROUP]).
+			' WHERE '.dbConditionId('gi.graphid', array_keys($result))
 		);
-		while ($relation = DBfetch($dbRules)) {
-			$relationMap->addRelation($relation['graphid'], $relation['groupid']);
+		$relation_map = new CRelationMap();
+
+		while ($relation = DBfetch($resource)) {
+			$relation_map->addRelation($relation['graphid'], $relation['groupid']);
 		}
 
-		switch ($option) {
-			case 'selectGroups':
-				$output_tag = 'groups';
-				$entities = [API::HostGroup(), API::TemplateGroup()];
-				break;
-
-			case 'selectHostGroups':
-				$entities = [API::HostGroup()];
-				$output_tag = 'hostgroups';
-				break;
-
-			case 'selectTemplateGroups':
-				$entities = [API::TemplateGroup()];
-				$output_tag = 'templategroups';
-				break;
-		}
-
-		$groups = [];
-		foreach ($entities as $entity) {
-			$groups += $entity->get([
-				'output' => $options[$option],
-				'groupids' => $relationMap->getRelatedIds(),
+		$related_ids = $relation_map->getRelatedIds();
+		$groups = $related_ids
+			? API::HostGroup()->get([
+				'output' => $options['selectHostGroups'],
+				'groupids' => $related_ids,
 				'nopermissions' => true,
 				'preservekeys' => true
-			]);
+			])
+			: [];
+
+		$result = $relation_map->mapMany($result, $groups, 'hostgroups');
+	}
+
+	private function addRelatedTemplateGroups(array $options, array &$result): void {
+		if ($options['selectTemplateGroups'] === null || $options['selectTemplateGroups'] === API_OUTPUT_COUNT) {
+			return;
 		}
 
-		$result = $relationMap->mapMany($result, $groups, $output_tag);
+		$resource = DBselect(
+			'SELECT gi.graphid,hg.groupid'.
+			' FROM graphs_items gi'.
+			' JOIN items i ON gi.itemid=i.itemid'.
+			' JOIN hosts_groups hg ON i.hostid=hg.hostid'.
+			' JOIN hstgrp hgg ON hg.groupid=hgg.groupid'.
+				' AND '.dbConditionInt('hgg.type', [HOST_GROUP_TYPE_TEMPLATE_GROUP]).
+			' WHERE '.dbConditionId('gi.graphid', array_keys($result))
+		);
+		$relation_map = new CRelationMap();
+
+		while ($relation = DBfetch($resource)) {
+			$relation_map->addRelation($relation['graphid'], $relation['groupid']);
+		}
+
+		$related_ids = $relation_map->getRelatedIds();
+		$groups = $related_ids
+			? API::TemplateGroup()->get([
+				'output' => $options['selectTemplateGroups'],
+				'groupids' => $related_ids,
+				'nopermissions' => true,
+				'preservekeys' => true
+			])
+			: [];
+
+		$result = $relation_map->mapMany($result, $groups, 'templategroups');
 	}
 
 	/**

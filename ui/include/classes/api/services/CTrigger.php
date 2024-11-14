@@ -106,7 +106,6 @@ class CTrigger extends CTriggerGeneral {
 			'expandComment'					=> null,
 			'expandExpression'				=> null,
 			'output'						=> API_OUTPUT_EXTEND,
-			'selectGroups'					=> null,
 			'selectHostGroups'				=> null,
 			'selectTemplateGroups'			=> null,
 			'selectHosts'					=> null,
@@ -126,8 +125,6 @@ class CTrigger extends CTriggerGeneral {
 			'limitSelects'					=> null
 		];
 		$options = zbx_array_merge($defOptions, $options);
-
-		$this->checkDeprecatedParam($options, 'selectGroups');
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
