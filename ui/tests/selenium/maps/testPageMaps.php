@@ -231,7 +231,7 @@ class testPageMaps extends CWebTest {
 			$filter->expand($state);
 
 			// Refresh the page to make sure the filter state is still saved.
-			$this->page->refresh();
+			$this->page->refresh()->waitUntilReady();
 			$this->assertTrue($filter->isExpanded($state));
 		}
 
@@ -547,7 +547,7 @@ class testPageMaps extends CWebTest {
 		// Count of the maps that will be selected before delete action.
 		$sysmap_count = ($sysmaps === []) ? CDBHelper::getCount(self::SYSMAPS_SQL) : count($sysmaps);
 
-		$this->page->login()->open('sysmaps.php');
+		$this->page->login()->open('sysmaps.php?filter_rst=1');
 		$this->selectTableRows($sysmaps);
 		$this->query('button:Delete')->one()->waitUntilClickable()->click();
 		$this->assertEquals('Delete selected map'.(($sysmap_count > 1) ? 's?' : '?'), $this->page->getAlertText());

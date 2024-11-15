@@ -2899,6 +2899,7 @@ class testLowLevelDiscovery extends CWebTest {
 			$operation_dialog_form->waitUntilNotVisible();
 			$override_dialog_form->submit();
 			$operation_dialog_form->waitUntilNotVisible();
+			COverlayDialogElement::ensureNotPresent();
 		}
 
 		$this->query('button:Cancel')->waitUntilClickable()->one()->click();

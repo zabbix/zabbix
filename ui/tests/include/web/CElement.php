@@ -325,7 +325,7 @@ class CElement extends CBaseElement implements IWaitable {
 	 * @return $this
 	 */
 	public function fill($text) {
-		if (!is_array($text) && preg_match('/[\x{10000}-\x{10FFFF}]/u', $text) === 1) {
+		if (is_string($text) && preg_match('/[\x{10000}-\x{10FFFF}]/u', $text) === 1) {
 			CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($text).';', [$this]);
 		}
 		else {
