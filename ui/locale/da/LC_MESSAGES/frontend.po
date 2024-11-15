@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.4\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-04 09:46+0000\n"
+"PO-Revision-Date: 2024-11-15 13:29+0000\n"
 "Last-Translator: Ryan Skov <rsk@capmon.dk>\n"
 "Language-Team: none\n"
 "Language: da\n"
@@ -955,7 +955,7 @@ msgstr "Tilføj en ny widget"
 
 #: widgets/navtree/Widget.php:34
 msgid "Add child element"
-msgstr ""
+msgstr "Tilføj underordnet element"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
@@ -994,7 +994,7 @@ msgstr "Tilføj værts alarm"
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
-msgstr ""
+msgstr "Tilføj datapunkt"
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1483,11 +1483,11 @@ msgstr "Enhver tegnstreng inkluderet"
 
 #: app/views/js/popup.import.js.php:109
 msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "Alle eksisterende værtsenheder, der ikke er til stede i importfilen, vil blive slettet. Klik på OK for at fortsætte."
 
 #: app/views/js/popup.import.js.php:106
 msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "Alle eksisterende skabelonenheder, der ikke findes i importfilen, slettes. Klik på OK for at fortsætte."
 
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
@@ -1902,7 +1902,7 @@ msgstr "Undgå kodeord der er nemme at gætte"
 
 #: jsLoader.php:172
 msgid "Awaiting data"
-msgstr ""
+msgstr "Afventer data"
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -2064,11 +2064,11 @@ msgstr "Kant bredde"
 
 #: include/classes/api/services/CHost.php:1445
 msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
-msgstr ""
+msgstr "Både \"tls_connect\" og \"tls_accept\" felter skal angives ved ændring af indstillinger for forbindelseskryptering."
 
 #: include/classes/api/services/CHost.php:1452
 msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
-msgstr ""
+msgstr "Både \"tls_psk_identity\" og \"tls_psk\" felter skal angives ved ændring af PSK for forbindelseskryptering."
 
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
@@ -2100,7 +2100,7 @@ msgstr "Bring forrest"
 #: app/views/administration.timeouts.edit.php:130
 #: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
 msgid "Browser"
-msgstr ""
+msgstr "Browser"
 
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
@@ -2644,11 +2644,10 @@ msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Kan ikke slette Zabbix intern bruger \"%1$s\", prøv at deaktivere den bruger."
 
 #: app/controllers/CControllerActionDelete.php:87
-#, fuzzy
 msgid "Cannot delete action"
 msgid_plural "Cannot delete actions"
 msgstr[0] "Kan ikke slette handling"
-msgstr[1] "Kan ikke slette handling"
+msgstr[1] "Kan ikke slette handlinger"
 
 #: include/classes/api/services/CRole.php:368
 #, c-format
@@ -2691,25 +2690,22 @@ msgstr[0] "Kan ikke slette begivenhedskorrelation"
 msgstr[1] ""
 
 #: graphs.php:281 graphs.php:338
-#, fuzzy
 msgid "Cannot delete graph"
 msgid_plural "Cannot delete graphs"
 msgstr[0] "Kan ikke slette graf"
-msgstr[1] "Kan ikke slette graf"
+msgstr[1] "Kan ikke slette grafer"
 
 #: graphs.php:273 graphs.php:317
-#, fuzzy
 msgid "Cannot delete graph prototype"
 msgid_plural "Cannot delete graph prototypes"
 msgstr[0] "Kan ikke slette graf prototype"
-msgstr[1] "Kan ikke slette graf prototype"
+msgstr[1] "Kan ikke slette graf prototyper"
 
 #: app/controllers/CControllerHostMassDelete.php:76
-#, fuzzy
 msgid "Cannot delete host"
 msgid_plural "Cannot delete hosts"
 msgstr[0] "Kan ikke slette vært"
-msgstr[1] "Kan ikke slette vært"
+msgstr[1] "Kan ikke slette værter"
 
 #: include/classes/api/services/CHost.php:1461
 #, c-format
@@ -2764,18 +2760,16 @@ msgid "Cannot delete inventory."
 msgstr "Kan ikke slette indholdsfortegnelse."
 
 #: items.php:524 items.php:736
-#, fuzzy
 msgid "Cannot delete item"
 msgid_plural "Cannot delete items"
-msgstr[0] "Kan ikke slette element"
-msgstr[1] "Kan ikke slette element"
+msgstr[0] "Kan ikke slette datapunkt"
+msgstr[1] "Kan ikke slette datapunkter"
 
 #: disc_prototypes.php:302 disc_prototypes.php:500
-#, fuzzy
 msgid "Cannot delete item prototype"
 msgid_plural "Cannot delete item prototypes"
-msgstr[0] "Kan ikke slette element prototype"
-msgstr[1] "Kan ikke slette element prototype"
+msgstr[0] "Kan ikke slette datapunkt prototype"
+msgstr[1] "Kan ikke slette datapunkt prototype"
 
 #: app/controllers/CControllerMaintenanceDelete.php:71
 msgid "Cannot delete maintenance period"
@@ -2797,11 +2791,10 @@ msgstr[0] "Kan ikke slette modul: %1$s."
 msgstr[1] "Kan ikke slette moduler: %1$s."
 
 #: sysmaps.php:266
-#, fuzzy
 msgid "Cannot delete network map"
 msgid_plural "Cannot delete network maps"
-msgstr[0] "Kan ikke slette netværk kort"
-msgstr[1] "Kan ikke slette netværk kort"
+msgstr[0] "Kan ikke slette kort over netværk"
+msgstr[1] "Kan ikke slette kort over netværk"
 
 #: app/controllers/CControllerProxyDelete.php:39
 msgid "Cannot delete proxies"
@@ -2864,11 +2857,10 @@ msgid "Cannot delete service \"%1$s\": %2$s."
 msgstr "Kan ikke slette service \"%1$s\": %2$s."
 
 #: app/controllers/CControllerTemplateDelete.php:143
-#, fuzzy
 msgid "Cannot delete template"
 msgid_plural "Cannot delete templates"
 msgstr[0] "Kan ikke slette skabelon"
-msgstr[1] "Kan ikke slette skabelon"
+msgstr[1] "Kan ikke slette skabeloner"
 
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
@@ -2900,18 +2892,16 @@ msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Kan ikke slette skabelons webscenarie \"%1$s\"."
 
 #: app/controllers/CControllerTriggerDelete.php:70
-#, fuzzy
 msgid "Cannot delete trigger"
 msgid_plural "Cannot delete triggers"
 msgstr[0] "Kan ikke slette udløser"
-msgstr[1] "Kan ikke slette udløser"
+msgstr[1] "Kan ikke slette udløserne"
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
-#, fuzzy
 msgid "Cannot delete trigger prototype"
 msgid_plural "Cannot delete trigger prototypes"
 msgstr[0] "Kan ikke slette udløser prototype"
-msgstr[1] "Kan ikke slette udløser prototype"
+msgstr[1] "Kan ikke slette udløser prototyperne"
 
 #: app/controllers/CControllerUserDelete.php:59
 msgid "Cannot delete user"
