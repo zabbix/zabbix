@@ -1510,10 +1510,10 @@ class testPageProblems extends CWebTest {
 			}
 
 			$this->query('button:Apply')->one()->click();
+			$this->page->waitUntilReady();
+			$table->waitUntilReloaded();
 		}
 
-		$this->page->waitUntilReady();
-		$table->waitUntilReloaded();
 		$this->assertTableData($data['result']);
 
 		// Check "Compact view" and "Highlight whole row" filter checkboxes.
