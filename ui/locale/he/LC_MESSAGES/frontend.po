@@ -9506,6 +9506,10 @@ msgstr "זמינות מארח"
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "למארח לא יכול להיות יותר ממנשק בררת מחדל יחיד מאותו הסוג."
 
+#: widgets/hostcard/Widget.php:32
+msgid "Host card"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:91 hostinventoriesoverview.php:85
 #: widgets/tophosts/includes/WidgetForm.php:159
 msgid "Host count"
@@ -11806,6 +11810,12 @@ msgstr "המאגר מבוטל עבור המארח „%1$s”."
 msgid "Inventory field"
 msgstr "שדה מאגר"
 
+#: include/classes/html/widgets/fields/CWidgetFieldMultiSelectHostInventoryView.php:30
+#: include/classes/widgets/fields/CWidgetFieldMultiSelectHostInventory.php:48
+#: widgets/hostcard/includes/WidgetForm.php:50
+msgid "Inventory fields"
+msgstr ""
+
 #: app/views/popup.massupdate.host.php:175
 #: app/views/popup.operation.edit.php:402
 msgid "Inventory mode"
@@ -12494,6 +12504,11 @@ msgstr "סוג קו"
 msgid "Line width"
 msgstr "עובי קו"
 
+#: widgets/svggraph/includes/WidgetForm.php:301
+#: widgets/svggraph/includes/WidgetForm.php:333
+msgid "Linear"
+msgstr ""
+
 #: app/views/popup.massupdate.host.php:42 app/views/template.massupdate.php:45
 #: include/views/monitoring.sysmap.constructor.php:43
 msgid "Link"
@@ -12702,6 +12717,11 @@ msgstr "תבנית הזמן ליומן"
 #: app/views/administration.miscconfig.edit.php:82
 msgid "Log unmatched SNMP traps"
 msgstr "תיעוד מלכודות SNMP שאינן תואמות"
+
+#: widgets/svggraph/includes/WidgetForm.php:302
+#: widgets/svggraph/includes/WidgetForm.php:334
+msgid "Logarithmic"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:201
 #: app/views/administration.user.list.php:135
@@ -19241,6 +19261,13 @@ msgstr ""
 msgid "Spanish (es_ES)"
 msgstr "ספרדית (es_ES)"
 
+#: widgets/item/includes/WidgetForm.php:191
+#: widgets/item/includes/WidgetForm.php:321
+#: widgets/tophosts/views/column.edit.php:155
+#: widgets/tophosts/views/column.edit.php:162
+msgid "Sparkline"
+msgstr ""
+
 #: include/classes/helpers/CRoleHelper.php:199
 msgid "Specified role was not found."
 msgstr "התפקיד שצוין לא נמצא."
@@ -24907,6 +24934,10 @@ msgstr "שם קבוצת המארחים שגויה"
 msgid "invalid host name"
 msgstr "שם המארח שגוי"
 
+#: include/classes/widgets/fields/CWidgetFieldMultiSelectHostInventory.php:48
+msgid "invalid inventory field"
+msgstr ""
+
 #: include/classes/validators/CHistFunctionValidator.php:82
 #: include/classes/validators/CMathFunctionValidator.php:86
 #, c-format
@@ -25229,6 +25260,11 @@ msgstr "monodec()‎ - בדיקת הקטנת ערך פריט באופן רציף
 #: app/controllers/CControllerPopupTriggerExpr.php:858
 msgid "monoinc() - Check for continuous item value increase (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
 msgstr "monoinc()‎ - בדיקת גדילת ערך פריט באופן רציף (1 - הנתון הוא מונוטוני, 0 - אחרת), מצב (strict - דורש מונוטוניות קשיחה)"
+
+#: widgets/hostcard/views/widget.view.php:157
+#: widgets/hostcard/views/widget.view.php:338
+msgid "more"
+msgstr ""
 
 #: include/func.inc.php:571
 msgctxt "millisecond short"

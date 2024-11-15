@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-10-11 20:04+0000\n"
+"PO-Revision-Date: 2024-11-12 12:47+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -7217,7 +7217,7 @@ msgstr "Mostra el gràfic"
 
 #: widgets/tophosts/views/column.edit.php:136
 msgid "Display item value as"
-msgstr ""
+msgstr "Mostra el valor de l'element com a"
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
@@ -9500,6 +9500,10 @@ msgstr "Disponibilitat de l'equip"
 #: include/classes/api/services/CHostInterface.php:1022
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "L'equip no pot pas tindre més d'una interfície predeterminada del mateix tipus."
+
+#: widgets/hostcard/Widget.php:32
+msgid "Host card"
+msgstr ""
 
 #: app/views/administration.proxy.list.php:91 hostinventoriesoverview.php:85
 #: widgets/tophosts/includes/WidgetForm.php:159
@@ -11800,6 +11804,12 @@ msgstr "Inventari desactivat per a l'equip \"%1$s\"."
 msgid "Inventory field"
 msgstr "Camp d'inventari"
 
+#: include/classes/html/widgets/fields/CWidgetFieldMultiSelectHostInventoryView.php:30
+#: include/classes/widgets/fields/CWidgetFieldMultiSelectHostInventory.php:48
+#: widgets/hostcard/includes/WidgetForm.php:50
+msgid "Inventory fields"
+msgstr ""
+
 #: app/views/popup.massupdate.host.php:175
 #: app/views/popup.operation.edit.php:402
 msgid "Inventory mode"
@@ -12485,6 +12495,11 @@ msgstr "Tipus de línia"
 msgid "Line width"
 msgstr "Amplada de línia"
 
+#: widgets/svggraph/includes/WidgetForm.php:301
+#: widgets/svggraph/includes/WidgetForm.php:333
+msgid "Linear"
+msgstr ""
+
 #: app/views/popup.massupdate.host.php:42 app/views/template.massupdate.php:45
 #: include/views/monitoring.sysmap.constructor.php:43
 msgid "Link"
@@ -12693,6 +12708,11 @@ msgstr "Format d'hora de registre"
 #: app/views/administration.miscconfig.edit.php:82
 msgid "Log unmatched SNMP traps"
 msgstr "Registra captures SNMP no coincidents"
+
+#: widgets/svggraph/includes/WidgetForm.php:302
+#: widgets/svggraph/includes/WidgetForm.php:334
+msgid "Logarithmic"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:201
 #: app/views/administration.user.list.php:135
@@ -15083,7 +15103,7 @@ msgstr "Sistemes numèrics"
 
 #: widgets/tophosts/views/column.edit.php:139
 msgid "Numeric"
-msgstr ""
+msgstr "Numèric"
 
 #: app/partials/configuration.filter.items.php:143
 #: app/views/popup.massupdate.item.php:148 include/items.inc.php:125
@@ -19231,6 +19251,13 @@ msgstr "Espai entre sectors"
 #: include/locales.inc.php:62
 msgid "Spanish (es_ES)"
 msgstr "Espanyol (es_ES)"
+
+#: widgets/item/includes/WidgetForm.php:191
+#: widgets/item/includes/WidgetForm.php:321
+#: widgets/tophosts/views/column.edit.php:155
+#: widgets/tophosts/views/column.edit.php:162
+msgid "Sparkline"
+msgstr ""
 
 #: include/classes/helpers/CRoleHelper.php:199
 msgid "Specified role was not found."
@@ -24892,6 +24919,10 @@ msgstr "nom del grup d'equips no vàlid"
 msgid "invalid host name"
 msgstr "nom d'equip no vàlid"
 
+#: include/classes/widgets/fields/CWidgetFieldMultiSelectHostInventory.php:48
+msgid "invalid inventory field"
+msgstr ""
+
 #: include/classes/validators/CHistFunctionValidator.php:82
 #: include/classes/validators/CMathFunctionValidator.php:86
 #, c-format
@@ -25214,6 +25245,11 @@ msgstr "monodec() - Comprova la disminució contínua del valor de l'element (1 
 #: app/controllers/CControllerPopupTriggerExpr.php:858
 msgid "monoinc() - Check for continuous item value increase (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
 msgstr "monoinc() - Comproveu l'augment continu del valor de l'element (1 - les dades són monòtones, 0 - en cas contrari), Mode (strict - requereix una monotonia estricta)"
+
+#: widgets/hostcard/views/widget.view.php:157
+#: widgets/hostcard/views/widget.view.php:338
+msgid "more"
+msgstr ""
 
 #: include/func.inc.php:571
 msgctxt "millisecond short"

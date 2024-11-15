@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.4\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-05-04 09:46+0000\n"
+"PO-Revision-Date: 2024-11-15 13:35+0000\n"
 "Last-Translator: Ryan Skov <rsk@capmon.dk>\n"
 "Language-Team: none\n"
 "Language: da\n"
@@ -955,7 +955,7 @@ msgstr "Tilføj en ny widget"
 
 #: widgets/navtree/Widget.php:34
 msgid "Add child element"
-msgstr ""
+msgstr "Tilføj underordnet element"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
@@ -994,7 +994,7 @@ msgstr "Tilføj værts alarm"
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
-msgstr ""
+msgstr "Tilføj datapunkt"
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1483,11 +1483,11 @@ msgstr "Enhver tegnstreng inkluderet"
 
 #: app/views/js/popup.import.js.php:109
 msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "Alle eksisterende værtsenheder, der ikke er til stede i importfilen, vil blive slettet. Klik på OK for at fortsætte."
 
 #: app/views/js/popup.import.js.php:106
 msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "Alle eksisterende skabelonenheder, der ikke findes i importfilen, slettes. Klik på OK for at fortsætte."
 
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
@@ -1656,7 +1656,7 @@ msgstr "Mindst en værts-gruppe eller vært skal være valgt."
 
 #: include/classes/setup/CFrontendSetup.php:252
 msgid "At least one of MySQL or PostgreSQL should be supported."
-msgstr ""
+msgstr "Mindst én af MySQL eller PostgreSQL bør understøttes."
 
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
@@ -1880,7 +1880,7 @@ msgstr "Tilgængeligheds rapport"
 #: app/controllers/CControllerAvailabilityReportTrigger.php:70
 #: app/views/reports.availabilityreport.trigger.php:23
 msgid "Availability report graph"
-msgstr ""
+msgstr "Graf for tilgængelighedsrapport"
 
 #: include/classes/html/CHostAvailability.php:80
 #: widgets/hostavail/views/widget.view.php:32
@@ -1911,7 +1911,7 @@ msgstr "Undgå kodeord der er nemme at gætte"
 
 #: jsLoader.php:172
 msgid "Awaiting data"
-msgstr ""
+msgstr "Afventer data"
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -2073,11 +2073,11 @@ msgstr "Kant bredde"
 
 #: include/classes/api/services/CHost.php:1445
 msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
-msgstr ""
+msgstr "Både \"tls_connect\" og \"tls_accept\" felter skal angives ved ændring af indstillinger for forbindelseskryptering."
 
 #: include/classes/api/services/CHost.php:1452
 msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
-msgstr ""
+msgstr "Både \"tls_psk_identity\" og \"tls_psk\" felter skal angives ved ændring af PSK for forbindelseskryptering."
 
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
@@ -2109,7 +2109,7 @@ msgstr "Bring forrest"
 #: app/views/administration.timeouts.edit.php:130
 #: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
 msgid "Browser"
-msgstr ""
+msgstr "Browser"
 
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
@@ -2653,7 +2653,6 @@ msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Kan ikke slette Zabbix intern bruger \"%1$s\", prøv at deaktivere den bruger."
 
 #: app/controllers/CControllerActionDelete.php:87
-#, fuzzy
 msgid "Cannot delete action"
 msgid_plural "Cannot delete actions"
 msgstr[0] "Kan ikke slette handling"
@@ -2697,24 +2696,21 @@ msgstr[1] "Kan ikke slette opdagelsesregler"
 msgid "Cannot delete event correlation"
 msgid_plural "Cannot delete event correlations"
 msgstr[0] "Kan ikke slette begivenhedskorrelation"
-msgstr[1] ""
+msgstr[1] "Kan ikke slette begivenhedskorrelationer"
 
 #: graphs.php:281 graphs.php:338
-#, fuzzy
 msgid "Cannot delete graph"
 msgid_plural "Cannot delete graphs"
 msgstr[0] "Kan ikke slette graf"
 msgstr[1] "Kan ikke slette graf"
 
 #: graphs.php:273 graphs.php:317
-#, fuzzy
 msgid "Cannot delete graph prototype"
 msgid_plural "Cannot delete graph prototypes"
 msgstr[0] "Kan ikke slette graf prototype"
 msgstr[1] "Kan ikke slette graf prototype"
 
 #: app/controllers/CControllerHostMassDelete.php:76
-#, fuzzy
 msgid "Cannot delete host"
 msgid_plural "Cannot delete hosts"
 msgstr[0] "Kan ikke slette vært"
@@ -2773,18 +2769,16 @@ msgid "Cannot delete inventory."
 msgstr "Kan ikke slette indholdsfortegnelse."
 
 #: items.php:524 items.php:736
-#, fuzzy
 msgid "Cannot delete item"
 msgid_plural "Cannot delete items"
-msgstr[0] "Kan ikke slette element"
-msgstr[1] "Kan ikke slette element"
+msgstr[0] "Kan ikke slette datapunkt"
+msgstr[1] "Kan ikke slette datapunkt"
 
 #: disc_prototypes.php:302 disc_prototypes.php:500
-#, fuzzy
 msgid "Cannot delete item prototype"
 msgid_plural "Cannot delete item prototypes"
-msgstr[0] "Kan ikke slette element prototype"
-msgstr[1] "Kan ikke slette element prototype"
+msgstr[0] "Kan ikke slette datapunkt prototype"
+msgstr[1] "Kan ikke slette datapunkt prototype"
 
 #: app/controllers/CControllerMaintenanceDelete.php:71
 msgid "Cannot delete maintenance period"
@@ -2806,11 +2800,10 @@ msgstr[0] "Kan ikke slette modul: %1$s."
 msgstr[1] "Kan ikke slette moduler: %1$s."
 
 #: sysmaps.php:266
-#, fuzzy
 msgid "Cannot delete network map"
 msgid_plural "Cannot delete network maps"
-msgstr[0] "Kan ikke slette netværk kort"
-msgstr[1] "Kan ikke slette netværk kort"
+msgstr[0] "Kan ikke slette kort over netværk"
+msgstr[1] "Kan ikke slette kort over netværk"
 
 #: app/controllers/CControllerProxyDelete.php:39
 msgid "Cannot delete proxies"
@@ -2873,7 +2866,6 @@ msgid "Cannot delete service \"%1$s\": %2$s."
 msgstr "Kan ikke slette service \"%1$s\": %2$s."
 
 #: app/controllers/CControllerTemplateDelete.php:143
-#, fuzzy
 msgid "Cannot delete template"
 msgid_plural "Cannot delete templates"
 msgstr[0] "Kan ikke slette skabelon"
@@ -2909,18 +2901,16 @@ msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Kan ikke slette skabelons webscenarie \"%1$s\"."
 
 #: app/controllers/CControllerTriggerDelete.php:70
-#, fuzzy
 msgid "Cannot delete trigger"
 msgid_plural "Cannot delete triggers"
 msgstr[0] "Kan ikke slette udløser"
-msgstr[1] "Kan ikke slette udløser"
+msgstr[1] "Kan ikke slette udløsere"
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
-#, fuzzy
 msgid "Cannot delete trigger prototype"
 msgid_plural "Cannot delete trigger prototypes"
 msgstr[0] "Kan ikke slette udløser prototype"
-msgstr[1] "Kan ikke slette udløser prototype"
+msgstr[1] "Kan ikke slette udløser prototyper"
 
 #: app/controllers/CControllerUserDelete.php:59
 msgid "Cannot delete user"
@@ -2951,11 +2941,10 @@ msgstr[0] "Kan ikke slette bruger rolle"
 msgstr[1] "Kan ikke slette bruger roller"
 
 #: httpconf.php:178 httpconf.php:418
-#, fuzzy
 msgid "Cannot delete web scenario"
 msgid_plural "Cannot delete web scenarios"
 msgstr[0] "Kan ikke slette web scenarie"
-msgstr[1] "Kan ikke slette web scenarie"
+msgstr[1] "Kan ikke slette web scenarier"
 
 #: app/controllers/CControllerTokenDisable.php:66
 msgid "Cannot disable API token"
@@ -3398,12 +3387,12 @@ msgstr "Kan ikke arve LLD-reglen med nøglen \"%1$s\" af skabelonen \"%2$s\" til
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "Kan ikke arve LLD-regler med nøglen \"%1$s\" til både \"%2$s\" og \"%3$s\" skabeloner, fordi nøglen skal være unik på værten \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:685
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "Kan ikke arve LLD-regler med nøglen \"%1$s\" til både \"%2$s\" og \"%3$s\" skabeloner, fordi nøglen skal være unik på skabelonen \"%4$s\"."
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
@@ -4037,11 +4026,10 @@ msgstr "Kan ikke opdatere grupper for opdagede vært \"%1$s\"."
 #: app/controllers/CControllerHostUpdate.php:36
 #: app/controllers/CControllerHostUpdate.php:160
 #: app/controllers/CControllerPopupMassupdateHost.php:521
-#, fuzzy
 msgid "Cannot update host"
 msgid_plural "Cannot update hosts"
 msgstr[0] "Kan ikke opdatere vært"
-msgstr[1] "Kan ikke opdatere vært"
+msgstr[1] "Kan ikke opdatere værter"
 
 #: include/classes/api/services/CHost.php:982
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
@@ -4074,11 +4062,10 @@ msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "Kan ikke opdatere grænsefladen for den opdagede vært \"%1$s\"."
 
 #: app/controllers/CControllerPopupMassupdateItem.php:279 items.php:670
-#, fuzzy
 msgid "Cannot update item"
 msgid_plural "Cannot update items"
-msgstr[0] "Kan ikke opdatere genstand"
-msgstr[1] "Kan ikke opdatere genstand"
+msgstr[0] "Kan ikke opdatere datapunkt"
+msgstr[1] "Kan ikke opdatere datapunkter"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:278
 #: disc_prototypes.php:457 disc_prototypes.php:484 disc_prototypes.php:523
@@ -4176,11 +4163,10 @@ msgstr "Kan ikke opdatere trin for et skabelons webscenariet \"%1$s\": %2$s."
 #: app/controllers/CControllerTemplateMassupdate.php:353
 #: app/controllers/CControllerTemplateUpdate.php:49
 #: app/controllers/CControllerTemplateUpdate.php:196
-#, fuzzy
 msgid "Cannot update template"
 msgid_plural "Cannot update templates"
 msgstr[0] "Kan ikke opdatere skabelon"
-msgstr[1] "Kan ikke opdatere skabelon"
+msgstr[1] "Kan ikke opdatere skabeloner"
 
 #: app/controllers/CControllerTemplateGroupUpdate.php:41
 #: app/controllers/CControllerTemplateGroupUpdate.php:94
@@ -4190,11 +4176,10 @@ msgstr "Kan ikke opdatere skabelon-gruppe"
 #: app/controllers/CControllerTriggerMassupdate.php:212
 #: app/controllers/CControllerTriggerUpdate.php:58
 #: app/controllers/CControllerTriggerUpdate.php:155
-#, fuzzy
 msgid "Cannot update trigger"
 msgid_plural "Cannot update triggers"
 msgstr[0] "Kan ikke opdatere udløser"
-msgstr[1] "Kan ikke opdatere udløser"
+msgstr[1] "Kan ikke opdatere udløsere"
 
 #: include/classes/api/services/CTriggerGeneral.php:2305
 #, c-format
@@ -5078,19 +5063,19 @@ msgstr "Forbindelse oprettet"
 msgid "Connector deleted"
 msgid_plural "Connectors deleted"
 msgstr[0] "Forbindelse slettet"
-msgstr[1] ""
+msgstr[1] "Forbindelser slettet"
 
 #: app/controllers/CControllerConnectorDisable.php:69
 msgid "Connector disabled"
 msgid_plural "Connectors disabled"
 msgstr[0] "Forbindelse deaktiveret"
-msgstr[1] ""
+msgstr[1] "Forbindelser deaktiveret"
 
 #: app/controllers/CControllerConnectorEnable.php:69
 msgid "Connector enabled"
 msgid_plural "Connectors enabled"
 msgstr[0] "Forbindelse aktiveret"
-msgstr[1] ""
+msgstr[1] "Forbindelser aktiveret"
 
 #: app/controllers/CControllerConnectorUpdate.php:149
 msgid "Connector updated"
@@ -5471,7 +5456,7 @@ msgstr "Opret ny"
 
 #: jsLoader.php:372
 msgid "Create new report"
-msgstr ""
+msgstr "Opret ny rapport"
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -6112,7 +6097,7 @@ msgstr "Standardgodkendelse"
 
 #: app/views/administration.miscconfig.edit.php:58
 msgid "Default host inventory mode"
-msgstr ""
+msgstr "Standard værtsinventar tilstand"
 
 #: app/views/administration.script.edit.php:358
 msgid "Default input string"
@@ -6288,7 +6273,7 @@ msgstr "Vil du slette links mellem valgte elementer?"
 #: include/views/configuration.host.discovery.edit.php:716
 #: include/views/configuration.host.discovery.list.php:151
 msgid "Delete lost resources"
-msgstr ""
+msgstr "Slet tabte ressourcer"
 
 #: app/views/maintenance.edit.php:275
 msgid "Delete maintenance period?"
@@ -6333,11 +6318,11 @@ msgstr "Vil du slette valgte handlinger?"
 
 #: app/views/connector.edit.php:318 app/views/js/connector.list.js.php:118
 msgid "Delete selected connector?"
-msgstr ""
+msgstr "Slet valgte forbindelser?"
 
 #: app/views/js/connector.list.js.php:117
 msgid "Delete selected connectors?"
-msgstr ""
+msgstr "Slet valgte forbindelser?"
 
 #: app/views/configuration.dashboard.list.php:71
 #: app/views/monitoring.dashboard.list.php:125
@@ -6476,11 +6461,11 @@ msgstr "Vil du slette de valgte proxyer?"
 #: app/views/js/administration.proxygroup.list.js.php:88
 #: app/views/popup.proxygroup.edit.php:147
 msgid "Delete selected proxy group?"
-msgstr ""
+msgstr "Vil du slette den valgte proxygruppe?"
 
 #: app/views/js/administration.proxygroup.list.js.php:87
 msgid "Delete selected proxy groups?"
-msgstr ""
+msgstr "Vil du slette valgte proxygrupper?"
 
 #: app/views/js/administration.proxy.list.js.php:144
 #: app/views/popup.proxy.edit.php:367
@@ -6831,7 +6816,7 @@ msgstr "Vil du deaktivere værter overvåget af den valgte proxy?"
 #: include/views/configuration.host.discovery.edit.php:730
 #: include/views/configuration.host.discovery.list.php:166
 msgid "Disable lost resources"
-msgstr ""
+msgstr "Deaktiver tabte ressourcer"
 
 #: app/views/administration.token.list.php:211
 #: app/views/administration.user.token.list.php:164
@@ -6861,11 +6846,11 @@ msgstr "Vil du deaktivere de valgte handlinger?"
 
 #: app/views/js/connector.list.js.php:103
 msgid "Disable selected connector?"
-msgstr ""
+msgstr "Deaktiver valgte forbindelser?"
 
 #: app/views/js/connector.list.js.php:102
 msgid "Disable selected connectors?"
-msgstr ""
+msgstr "Deaktiver valgte forbindelser?"
 
 #: app/views/js/configuration.discovery.list.js.php:97
 #: include/views/configuration.host.discovery.list.php:349
@@ -7000,7 +6985,7 @@ msgstr "Deaktiveret"
 #: app/views/configuration.host.list.php:511 app/views/item.list.php:219
 #: app/views/trigger.list.php:358
 msgid "Disabled automatically by an LLD rule."
-msgstr ""
+msgstr "Deaktiveret automatisk af en LLD-regel."
 
 #: app/views/administration.trigdisplay.edit.php:146
 #: widgets/geomap/Widget.php:44
@@ -7172,18 +7157,18 @@ msgstr "Opdagelsesregel oprettet"
 msgid "Discovery rule deleted"
 msgid_plural "Discovery rules deleted"
 msgstr[0] "Opdagelsesregler slettet"
-msgstr[1] ""
+msgstr[1] "Opdagelsesregl slettet"
 
 #: app/controllers/CControllerDiscoveryDisable.php:68 host_discovery.php:581
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
-msgstr[0] "Opdagelsesregler slettet"
-msgstr[1] ""
+msgstr[0] "Opdagelsesregel deaktiveret"
+msgstr[1] "Opdagelsesregler deaktiveret"
 
 #: app/controllers/CControllerDiscoveryEnable.php:68 host_discovery.php:580
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
-msgstr[0] "Opdagelsesregel deaktiveret"
+msgstr[0] "Opdagelsesregel er aktiveret"
 msgstr[1] ""
 
 #: app/controllers/CControllerDiscoveryUpdate.php:88 host_discovery.php:545
@@ -9515,6 +9500,10 @@ msgstr "Vært tilgængelighed"
 msgid "Host cannot have more than one default interface of the same type."
 msgstr "Værten kan ikke have mere end én standard interface af samme type."
 
+#: widgets/hostcard/Widget.php:32
+msgid "Host card"
+msgstr ""
+
 #: app/views/administration.proxy.list.php:91 hostinventoriesoverview.php:85
 #: widgets/tophosts/includes/WidgetForm.php:159
 msgid "Host count"
@@ -11814,6 +11803,12 @@ msgstr "Inventarkartotek deaktiveret for værten \"%1$s\"."
 msgid "Inventory field"
 msgstr "Inventar felt"
 
+#: include/classes/html/widgets/fields/CWidgetFieldMultiSelectHostInventoryView.php:30
+#: include/classes/widgets/fields/CWidgetFieldMultiSelectHostInventory.php:48
+#: widgets/hostcard/includes/WidgetForm.php:50
+msgid "Inventory fields"
+msgstr ""
+
 #: app/views/popup.massupdate.host.php:175
 #: app/views/popup.operation.edit.php:402
 msgid "Inventory mode"
@@ -12499,6 +12494,11 @@ msgstr "Linjetype"
 msgid "Line width"
 msgstr "Linjebredde"
 
+#: widgets/svggraph/includes/WidgetForm.php:301
+#: widgets/svggraph/includes/WidgetForm.php:333
+msgid "Linear"
+msgstr ""
+
 #: app/views/popup.massupdate.host.php:42 app/views/template.massupdate.php:45
 #: include/views/monitoring.sysmap.constructor.php:43
 msgid "Link"
@@ -12707,6 +12707,11 @@ msgstr "Logtidsformat"
 #: app/views/administration.miscconfig.edit.php:82
 msgid "Log unmatched SNMP traps"
 msgstr "Log umatchede SNMP traps"
+
+#: widgets/svggraph/includes/WidgetForm.php:302
+#: widgets/svggraph/includes/WidgetForm.php:334
+msgid "Logarithmic"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:201
 #: app/views/administration.user.list.php:135
@@ -19246,6 +19251,13 @@ msgstr "Rum mellem sektorer"
 msgid "Spanish (es_ES)"
 msgstr "Spansk (es_ES)"
 
+#: widgets/item/includes/WidgetForm.php:191
+#: widgets/item/includes/WidgetForm.php:321
+#: widgets/tophosts/views/column.edit.php:155
+#: widgets/tophosts/views/column.edit.php:162
+msgid "Sparkline"
+msgstr ""
+
 #: include/classes/helpers/CRoleHelper.php:199
 msgid "Specified role was not found."
 msgstr "Den angivne rolle blev ikke fundet."
@@ -24903,6 +24915,10 @@ msgstr ""
 msgid "invalid host name"
 msgstr ""
 
+#: include/classes/widgets/fields/CWidgetFieldMultiSelectHostInventory.php:48
+msgid "invalid inventory field"
+msgstr ""
+
 #: include/classes/validators/CHistFunctionValidator.php:82
 #: include/classes/validators/CMathFunctionValidator.php:86
 #, c-format
@@ -25224,6 +25240,11 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:858
 msgid "monoinc() - Check for continuous item value increase (1 - data is monotonic, 0 - otherwise), Mode (strict - require strict monotonicity)"
+msgstr ""
+
+#: widgets/hostcard/views/widget.view.php:157
+#: widgets/hostcard/views/widget.view.php:338
+msgid "more"
 msgstr ""
 
 #: include/func.inc.php:571
