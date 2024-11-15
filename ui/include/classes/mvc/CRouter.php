@@ -107,7 +107,6 @@ class CRouter {
 		'export.mediatypes'							=> ['CControllerExport',								'layout.export',		null],
 		'export.sysmaps'							=> ['CControllerExport',								'layout.export',		null],
 		'export.templates'							=> ['CControllerExport',								'layout.export',		null],
-		'export.valuemaps'							=> ['CControllerExport',								'layout.export',		null],
 		'favorite.create'							=> ['CControllerFavoriteCreate',						'layout.javascript',	null],
 		'favorite.delete'							=> ['CControllerFavoriteDelete',						'layout.javascript',	null],
 		'geomaps.edit'								=> ['CControllerGeomapsEdit',							'layout.htmlpage',		'administration.geomaps.edit'],
