@@ -1485,12 +1485,12 @@ void	zbx_tls_free(void)
 	zbx_tls_library_deinit(ZBX_TLS_INIT_PROCESS);
 }
 
-static int	zbx_tls_get_error(const SSL *s, ssize_t res, const char *func, size_t *error_alloc,
-		size_t *error_offset, char **error)
+static int	openssl_get_error(const SSL *s, int res, const char *func, size_t *error_alloc, size_t *error_offset,
+		char **error)
 {
 	int	result_code;
 
-	result_code = SSL_get_error(s, (int)res);
+	result_code = SSL_get_error(s, res);
 
 	switch (result_code)
 	{
@@ -1519,7 +1519,7 @@ static int	zbx_tls_get_error(const SSL *s, ssize_t res, const char *func, size_t
 					/* "man SSL_get_error" describes only res == 0 and res == -1 for */
 					/* SSL_ERROR_SYSCALL case */
 					zbx_snprintf_alloc(error, error_alloc, error_offset, "%s()"
-							" returned undocumented code " ZBX_FS_SSIZE_T, func, res);
+							" returned undocumented code %d", func, res);
 				}
 			}
 			else
@@ -1767,7 +1767,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 			}
 		}
 
-		if (FAIL == zbx_tls_get_error(s->tls_ctx->ctx, res, "SSL_connect", &error_alloc, &error_offset, error))
+		if (FAIL == openssl_get_error(s->tls_ctx->ctx, res, "SSL_connect", &error_alloc, &error_offset, error))
 			goto out;
 	}
 
@@ -2091,20 +2091,21 @@ out1:
 
 ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, short *event, char **error)
 {
-	ssize_t		offset = 0, n;
+	ssize_t		offset = 0;
+	int		n;
 
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 
 	while (1)
 	{
-		if (0 == (n = (ssize_t)SSL_write(s->tls_ctx->ctx, buf + offset, (int)(len - (size_t)offset))))
+		if (0 == (n = SSL_write(s->tls_ctx->ctx, buf + offset, (int)(len - (size_t)offset))))
 			break;
 
 		if (0 > n)
 		{
 			ssize_t	err;
 
-			err = (size_t)SSL_get_error(s->tls_ctx->ctx, (int)n);
+			err = (size_t)SSL_get_error(s->tls_ctx->ctx, n);
 			if (SUCCEED != tls_is_nonblocking_error(err))
 				break;
 
@@ -2140,7 +2141,7 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, short *event
 	{
 		size_t	error_alloc = 0, error_offset = 0;
 
-		if (SUCCEED == zbx_tls_get_error(s->tls_ctx->ctx, n, "SSL_write", &error_alloc,
+		if (SUCCEED == openssl_get_error(s->tls_ctx->ctx, n, "SSL_write", &error_alloc,
 				&error_offset, error))
 		{
 			*error = zbx_strdup(*error, "SSL_write() unexpected result code");
@@ -2154,16 +2155,17 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, short *event
 
 ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char **error)
 {
-	ssize_t	n = 0, err;
+	int	n = 0;
+	ssize_t	err;
 
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
 
 	while (1)
 	{
-		if (0 <= (n = (ssize_t)SSL_read(s->tls_ctx->ctx, buf, (int)len)))
+		if (0 <= (n = SSL_read(s->tls_ctx->ctx, buf, (int)len)))
 			break;
 
-		err = (size_t)SSL_get_error(s->tls_ctx->ctx, (int)n);
+		err = (size_t)SSL_get_error(s->tls_ctx->ctx, n);
 		if (SUCCEED != tls_is_nonblocking_error(err))
 			break;
 
@@ -2189,11 +2191,11 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char
 
 	if (0 == n)
 	{
-		if (SSL_ERROR_ZERO_RETURN != (err = (size_t)SSL_get_error(s->tls_ctx->ctx, (int)n)))
+		if (SSL_ERROR_ZERO_RETURN != SSL_get_error(s->tls_ctx->ctx, (int)n))
 		{
 			size_t	error_alloc = 0, error_offset = 0;
 
-			if (SUCCEED == zbx_tls_get_error(s->tls_ctx->ctx, n, "SSL_read", &error_alloc,
+			if (SUCCEED == openssl_get_error(s->tls_ctx->ctx, n, "SSL_read", &error_alloc,
 					&error_offset, error))
 			{
 				*error = zbx_strdup(*error, "SSL_read() unexpected result code");
@@ -2209,7 +2211,7 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char
 	{
 		size_t	error_alloc = 0, error_offset = 0;
 
-		if (SUCCEED == zbx_tls_get_error(s->tls_ctx->ctx, n, "SSL_read", &error_alloc,
+		if (SUCCEED == openssl_get_error(s->tls_ctx->ctx, n, "SSL_read", &error_alloc,
 				&error_offset, error))
 		{
 			*error = zbx_strdup(*error, "SSL_read() unexpected result code");

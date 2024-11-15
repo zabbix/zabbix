@@ -98,10 +98,22 @@ static int	httpmacro_append_pair(zbx_httptest_t *httptest, const char *pkey, siz
 	zbx_ptr_pair_t	pair = {NULL, NULL};
 	int		index, ret = FAIL, rc;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pkey:'%.*s' pvalue:'%.*s'",
-			__func__, (int)nkey, pkey, (int)nvalue, pvalue);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() pkey:'%.*s' pvalue:'%.*s'", __func__, (int)nkey, pkey, (int)nvalue,
+			pvalue);
 
-	if (0 == nkey && 0 != nvalue)
+	if (0 == nkey && 0 == nvalue)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() missing variable name and value", __func__);
+
+		if (NULL != err_str && NULL == *err_str)
+		{
+			*err_str = zbx_dsprintf(*err_str, "missing variable name and value");
+		}
+
+		goto out;
+	}
+
+	if (0 == nkey)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() missing variable name (only value provided): \"%.*s\"",
 				__func__, (int)nvalue, pvalue);

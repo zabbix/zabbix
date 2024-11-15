@@ -17,7 +17,8 @@ BINARIES_tests = \
 	macro_tr \
 	zbx_function_param_parse_ext \
 	zbx_substitute_macros \
-	zbx_substitute_macros1
+	zbx_substitute_macros1 \
+	zbx_function_param_quote
 
 if HAVE_PCRE2
 BINARIES_tests += macro_regrepl
@@ -368,3 +369,16 @@ zbx_substitute_macros_um_CFLAGS = \
 	$(EXPR_COMPILER_FLAGS)
 
 endif
+
+zbx_function_param_quote_SOURCES = \
+	zbx_function_param_quote.c \
+	$(COMMON_SRC_FILES)
+
+zbx_function_param_quote_LDADD = \
+	$(EXPR_LIBS)
+
+zbx_function_param_quote_LDADD += @SERVER_LIBS@
+
+zbx_function_param_quote_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_function_param_quote_CFLAGS = $(EXPR_COMPILER_FLAGS)
