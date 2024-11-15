@@ -114,25 +114,24 @@ static void	lld_entry_create(zbx_lld_entry_t *entry, const zbx_jsonobj_t *obj,
 		zbx_hashset_const_iter_t	iter;
 		const zbx_jsonobj_el_t		*el;
 		zbx_lld_macro_t			lld_macro;
-		char				buf[ZBX_MAX_DOUBLE_LEN + 1];
 
 		zbx_hashset_const_iter_reset(&obj->data.object, &iter);
 		while (NULL != (el = (zbx_jsonobj_el_t *)zbx_hashset_const_iter_next(&iter)))
 		{
+			size_t	value_alloc = 0, value_offset = 0;
+
 			if (SUCCEED != zbx_is_discovery_macro(el->name))
 				continue;
 
 			switch (el->value.type)
 			{
-				case ZBX_JSON_TYPE_NUMBER:
-					zbx_print_double(buf, sizeof(buf), el->value.data.number);
-					lld_macro.value = zbx_strdup(NULL, buf);
-					break;
 				case ZBX_JSON_TYPE_STRING:
 					lld_macro.value = zbx_strdup(NULL, el->value.data.string);
 					break;
 				default:
-					continue;
+					lld_macro.value = NULL;
+					zbx_jsonobj_to_string(&lld_macro.value, &value_alloc, &value_offset,
+							&el->value);
 			}
 
 			lld_macro.macro = zbx_strdup(NULL, el->name);
