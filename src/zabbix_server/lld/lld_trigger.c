@@ -2047,6 +2047,51 @@ out:
 	return ret;
 }
 
+static void	lld_triggers_validate_descriptions(zbx_vector_str_t *descriptions, zbx_vector_ptr_t *triggers,
+		zbx_vector_uint64_t *triggerids, char **error)
+{
+	int	i, j;
+
+	for (i = 1; i < descriptions->values_num; i++)
+	{
+		int	excluded = 0;
+
+		if (0 == strcmp(descriptions->values[i - 1], descriptions->values[i]))
+		{
+			for (j = triggers->values_num - 1; j >= 0; j--)
+			{
+				zbx_lld_trigger_t	*t = triggers->values[j];
+
+				if (0 == strcmp(descriptions->values[i], t->description))
+				{
+					int	idx;
+
+					if (0 == t->triggerid)
+					{
+						t->flags &= ~ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
+
+						*error = zbx_strdcatf(*error,
+								"Cannot create trigger: "
+								"trigger \"%s\" already exists.\n",
+								t->description);
+					}
+					else if (FAIL != (idx = zbx_vector_uint64_bsearch(triggerids, t->triggerid,
+							ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+					{
+						zbx_vector_uint64_remove(triggerids, idx);
+					}
+				}
+
+				if (SUCCEED != lld_trigger_changed(t))
+					excluded = 1;
+			}
+		}
+
+		if (1 == excluded)
+			zbx_vector_str_remove(descriptions, i);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Parameters: triggers - [IN] sorted list of triggers                        *
@@ -2095,12 +2140,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 			continue;
 
 		if (0 != trigger->triggerid)
-		{
 			zbx_vector_uint64_append(&triggerids, trigger->triggerid);
-
-			if (SUCCEED != lld_trigger_changed(trigger))
-				continue;
-		}
 
 		zbx_vector_str_append(&descriptions, trigger->description);
 	}
@@ -2117,7 +2157,9 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 		zbx_vector_ptr_create(&db_triggers);
 
 		zbx_vector_str_sort(&descriptions, ZBX_DEFAULT_STR_COMPARE_FUNC);
-		zbx_vector_str_uniq(&descriptions, ZBX_DEFAULT_STR_COMPARE_FUNC);
+		zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		lld_triggers_validate_descriptions(&descriptions, triggers, &triggerids, error);
 
 		sql = (char *)zbx_malloc(sql, sql_alloc);
 
