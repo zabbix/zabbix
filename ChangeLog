@@ -1,8 +1,13 @@
 Changes for 7.2.0rc1
 
 New features:
+..F....... [ZBXNEXT-9232] implemented sparkline chart component and added it in Item value widget and Top hosts widget (apoga, gcalenko)
+..F....... [ZBXNEXT-599] implemented logarithmic scale for SVG graph widget (ashubin, averza, dfofanovs)
+..F.I..... [ZBXNEXT-9086] implemented new "Host card" widget (agriscenko)
+A......... [ZBXNEXT-9452] removed deprecated API parameters (jfreibergs, vmaksimovs)
 
 Bug fixes:
+.D........ [ZBX-24600] added exit code description to Zabbix get man page (rtrizna)
 
 --------------------------------------------------------------------------------
 Changes for 7.2.0beta1
