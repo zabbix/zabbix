@@ -3699,14 +3699,13 @@ ZABBIX.apps.map = (function($) {
 					i,
 					ln,
 					linkTriggerPattern = /^linktrigger_(\w+)_(triggerid|linktriggerid|drawtype|color|desc_exp)$/,
-					colorPattern = /^[0-9a-f]{6}$/i,
 					linkTrigger;
 
 				for (i = 0, ln = values.length; i < ln; i++) {
 					linkTrigger = linkTriggerPattern.exec(values[i].name);
 
 					if (linkTrigger !== null) {
-						if (linkTrigger[2] == 'color' && !values[i].value.toString().match(colorPattern)) {
+						if (linkTrigger[2] == 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
 							throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
 						}
 
@@ -3717,7 +3716,7 @@ ZABBIX.apps.map = (function($) {
 						data.linktriggers[linkTrigger[1]][linkTrigger[2]] = values[i].value.toString();
 					}
 					else {
-						if (values[i].name == 'color' && !values[i].value.toString().match(colorPattern)) {
+						if (values[i].name == 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
 							throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
 						}
 

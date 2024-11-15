@@ -929,3 +929,10 @@ function convertHSLToRGB(h, s, l) {
 
 	return [f(0), f(8), f(4)];
 }
+
+/**
+ * Check if given value is valid color hex code.
+ */
+function isColorHex(value) {
+	return /^#([0-9A-F]{6})$/i.test(value);
+}

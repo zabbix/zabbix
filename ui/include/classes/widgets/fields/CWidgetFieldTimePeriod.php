@@ -19,7 +19,6 @@ namespace Zabbix\Widgets\Fields;
 use CAbsoluteTimeParser,
 	CApiInputValidator,
 	CParser,
-	CRangeTimeParser,
 	CRelativeTimeParser,
 	CTimePeriodHelper,
 	DateTimeZone;
@@ -213,6 +212,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	public function toApi(array &$widget_fields = []): void {
 		$value = $this->getValue();
 		$default = $this->getDefault();
+		$group_name = rtrim(str_replace(['][', '['], '.', $this->name), ']');
 
 		switch ($this->getDataSource()) {
 			case self::DATA_SOURCE_DEFAULT:
@@ -224,7 +224,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 					if (array_key_exists(self::FOREIGN_REFERENCE_KEY, $default) || $value[$name] !== $default[$name]) {
 						$widget_fields[] = [
 							'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-							'name' => $this->name.'.'.$name,
+							'name' => $group_name.'.'.$name,
 							'value' => $value[$name]
 						];
 					}
@@ -241,7 +241,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 						|| $value[self::FOREIGN_REFERENCE_KEY] !== $default[self::FOREIGN_REFERENCE_KEY]) {
 					$widget_fields[] = [
 						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-						'name' => $this->name.'.'.self::FOREIGN_REFERENCE_KEY,
+						'name' => $group_name.'.'.self::FOREIGN_REFERENCE_KEY,
 						'value' => $value[self::FOREIGN_REFERENCE_KEY]
 					];
 				}

@@ -57,6 +57,9 @@ $form
 			->addFieldsGroup(
 				getChangeIndicatorFieldsGroupView($data['fields'])->addRowClass('fields-group-change-indicator')
 			)
+			->addItem(
+				(new CWidgetFieldSparklineView($data['fields']['sparkline']))->addRowClass('js-sparkline-row')
+			)
 			->addField(
 				new CWidgetFieldColorView($data['fields']['bg_color'])
 			)

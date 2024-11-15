@@ -20,6 +20,7 @@ use CWidgetsData;
 
 use Zabbix\Widgets\CWidgetField;
 use Zabbix\Widgets\Fields\CWidgetFieldTimePeriod;
+use Zabbix\Widgets\Fields\CWidgetFieldSparkline;
 
 class CWidgetFieldColumnsList extends CWidgetField {
 
@@ -40,6 +41,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 	public const DISPLAY_AS_IS = 1;
 	public const DISPLAY_BAR = 2;
 	public const DISPLAY_INDICATORS = 3;
+	public const DISPLAY_SPARKLINE = 6;
 
 	// Where to select data for aggregation function.
 	public const HISTORY_DATA_AUTO = 0;
@@ -48,7 +50,19 @@ class CWidgetFieldColumnsList extends CWidgetField {
 
 	public const DEFAULT_DECIMAL_PLACES = 2;
 
-	private array $time_period_fields = [];
+	public const SPARKLINE_DEFAULT = [
+		'width'		=> 1,
+		'fill'		=> 3,
+		'color'		=> '42A5F5',
+		'time_period' => [
+			'data_source' => CWidgetFieldTimePeriod::DATA_SOURCE_DEFAULT,
+			'from' => 'now-1h',
+			'to' => 'now'
+		],
+		'history'	=> CWidgetFieldSparkline::DATA_SOURCE_AUTO
+	];
+
+	private array $fields_objects = [];
 
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
@@ -69,41 +83,65 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			return $errors;
 		}
 
-		$this->time_period_fields = [];
+		$this->fields_objects = [];
 
 		$columns_values = $this->getValue();
 
 		foreach ($columns_values as $column_index => &$value) {
-			if ($value['data'] != self::DATA_ITEM_VALUE || $value['aggregate_function'] == AGGREGATE_NONE) {
+			if ($value['data'] != self::DATA_ITEM_VALUE) {
 				continue;
 			}
 
-			$time_period_field = (new CWidgetFieldTimePeriod($this->name.'.'.$column_index.'.time_period',
-				'/'.($column_index + 1)
-			))
-				->setDefault([
-					CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
-						CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_TIME_PERIOD
-					)
-				])
-				->setInType(CWidgetsData::DATA_TYPE_TIME_PERIOD)
-				->acceptDashboard()
-				->acceptWidget()
-				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK);
+			$fields = [];
 
-			if (array_key_exists('time_period', $value)) {
-				$time_period_field->setValue($value['time_period']);
+			if ($value['display'] == self::DISPLAY_SPARKLINE) {
+				$sparkline = (new CWidgetFieldSparkline($this->name.'.'.$column_index.'.sparkline', null,
+					['color' => ['use_default' => false]]
+				))
+					->setInType(CWidgetsData::DATA_TYPE_TIME_PERIOD)
+					->acceptDashboard()
+					->setDefault(CWidgetFieldColumnsList::SPARKLINE_DEFAULT)
+					->acceptWidget();
+
+				if (array_key_exists('sparkline', $value)) {
+					$sparkline->setValue($value['sparkline']);
+				}
+
+				$fields['sparkline'] = $sparkline;
 			}
 
-			$errors = $time_period_field->validate($strict);
+			if ($value['aggregate_function'] != AGGREGATE_NONE) {
+				$time_period_field = (new CWidgetFieldTimePeriod($this->name.'.'.$column_index.'.time_period',
+					'/'.($column_index + 1)
+				))
+					->setDefault([
+						CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
+							CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_TIME_PERIOD
+						)
+					])
+					->setInType(CWidgetsData::DATA_TYPE_TIME_PERIOD)
+					->acceptDashboard()
+					->acceptWidget()
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK);
 
-			if ($errors) {
-				return $errors;
+				if (array_key_exists('time_period', $value)) {
+					$time_period_field->setValue($value['time_period']);
+				}
+
+				$fields['time_period'] = $time_period_field;
 			}
 
-			$value['time_period'] = $time_period_field->getValue();
+			foreach ($fields as $i => $field) {
+				$errors = $field->validate($strict);
 
-			$this->time_period_fields[] = $time_period_field;
+				if ($errors) {
+					return $errors;
+				}
+
+				$value[$i] = $field->getValue();
+
+				$this->fields_objects[] = $field;
+			}
 		}
 		unset($value);
 
@@ -184,8 +222,8 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			}
 		}
 
-		foreach ($this->time_period_fields as $time_period_field) {
-			$time_period_field->toApi($widget_fields);
+		foreach ($this->fields_objects as $field) {
+			$field->toApi($widget_fields);
 		}
 	}
 
@@ -214,10 +252,11 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			]],
 			'display'				=> ['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],
-												'type' => API_INT32, 'default' => self::DISPLAY_AS_IS, 'in' => implode(',', [self::DISPLAY_AS_IS, self::DISPLAY_BAR, self::DISPLAY_INDICATORS])],
+												'type' => API_INT32, 'default' => self::DISPLAY_AS_IS, 'in' => implode(',', [self::DISPLAY_AS_IS, self::DISPLAY_BAR, self::DISPLAY_INDICATORS, self::DISPLAY_SPARKLINE])],
 											['else' => true,
 												'type' => API_INT32]
 			]],
+			'sparkline'				=> ['type' => API_ANY],
 			'min'					=> ['type' => API_NUMERIC],
 			'max'					=> ['type' => API_NUMERIC],
 			'decimal_places'		=> ['type' => API_INT32, 'in' => '0:10', 'default' => self::DEFAULT_DECIMAL_PLACES],

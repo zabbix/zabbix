@@ -25,12 +25,24 @@ use API,
 	CMacrosResolverHelper,
 	CNumberParser,
 	CSettingsHelper,
+	CSvgGraph,
 	Manager;
 
 use Widgets\TopHosts\Widget;
 use Widgets\TopHosts\Includes\CWidgetFieldColumnsList;
 
 class WidgetView extends CControllerDashboardWidgetView {
+
+	/** @property int $sparkline_max_samples  Limit of samples when requesting sparkline graph data for time period. */
+	protected int $sparkline_max_samples;
+
+	protected function init(): void {
+		parent::init();
+
+		$this->addValidationRules([
+			'contents_width'	=> 'int32'
+		]);
+	}
 
 	protected function doAction(): void {
 		$data = [
@@ -102,6 +114,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$show_thumbnail = false;
 		$item_names = [];
 		$items = [];
+		$this->sparkline_max_samples = ceil($this->getInput('contents_width') / count($columns));
 
 		foreach ($columns as $column_index => $column) {
 			if ($column['data'] == CWidgetFieldColumnsList::DATA_TEXT) {
@@ -145,15 +158,22 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$master_column = $columns[$master_column_index];
 		$master_entities = $hosts;
 		$master_entity_values = [];
+		$master_sparkline_values = [];
 
 		switch ($master_column['data']) {
 			case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
+				$numeric_only = self::isNumericOnlyColumn($master_column);
 				$master_entities = array_key_exists($master_column_index, $items)
 					? $items[$master_column_index]
-					: self::getItems($master_column['item'], self::isNumericOnlyColumn($master_column), $groupids,
-						$hostids
-					);
+					: self::getItems($master_column['item'], $numeric_only, $groupids, $hostids);
+
 				$master_entity_values = self::getItemValues($master_entities, $master_column);
+
+				if ($master_column['display'] == CWidgetFieldColumnsList::DISPLAY_SPARKLINE) {
+					$config = $master_column + ['contents_width' => $this->sparkline_max_samples];
+					$master_sparkline_values = self::getItemSparklineValues($master_entities, $config);
+				}
+
 				break;
 
 			case CWidgetFieldColumnsList::DATA_HOST_NAME:
@@ -258,6 +278,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				continue;
 			}
 
+			$sparkline_item_values = [];
 			$calc_extremes = $column['display'] == CWidgetFieldColumnsList::DISPLAY_BAR
 				|| $column['display'] == CWidgetFieldColumnsList::DISPLAY_INDICATORS;
 
@@ -266,6 +287,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			if ($column_index == $master_column_index) {
 				$column_items = $master_entities;
 				$column_item_values = $master_entity_values;
+				$sparkline_item_values = $master_sparkline_values;
 			}
 			else {
 				$numeric_only = self::isNumericOnlyColumn($column);
@@ -280,6 +302,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 
 				$column_item_values = self::getItemValues($column_items, $column);
+
+				if ($column['display'] == CWidgetFieldColumnsList::DISPLAY_SPARKLINE) {
+					$config = $column + ['contents_width' => $this->sparkline_max_samples];
+					$sparkline_item_values = self::getItemSparklineValues($column_items, $config);
+				}
 			}
 
 			if ($calc_extremes) {
@@ -336,13 +363,24 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			$item_values[$column_index] = [];
 
-			foreach ($column_item_values as $itemid => $column_item_value) {
-				if (in_array($column_items[$itemid]['hostid'], $master_hostids)) {
-					$item_values[$column_index][$column_items[$itemid]['hostid']] = [
-						'value' => $column_item_value,
+			foreach ($column_items as $itemid => $item) {
+				$hostid = $column_items[$itemid]['hostid'];
+
+				$column_value = [];
+
+				if (array_key_exists($itemid, $column_item_values)) {
+					$column_value['value'] = $column_item_values[$itemid];
+				}
+
+				if (array_key_exists($itemid, $sparkline_item_values)) {
+					$column_value['sparkline_value'] = $sparkline_item_values[$itemid];
+				}
+
+				if ($column_value && in_array($hostid, $master_hostids)) {
+					$item_values[$column_index][$hostid] = [
 						'item' => $column_items[$itemid],
 						'is_binary_units' => isBinaryUnits($column_items[$itemid]['units'])
-					];
+					] + $column_value;
 				}
 			}
 		}
@@ -379,11 +417,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 					case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
 						$row[] = array_key_exists($hostid, $item_values[$column_index])
-							? [
-								'value' => $item_values[$column_index][$hostid]['value'],
-								'item' => $item_values[$column_index][$hostid]['item'],
-								'is_binary_units' => $item_values[$column_index][$hostid]['is_binary_units']
-							]
+							? $item_values[$column_index][$hostid]
 							: null;
 
 						break;
@@ -450,6 +484,59 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		return $items;
+	}
+
+	/**
+	 * Return sparkline graph item values, applies data function SVG_GRAPH_MISSING_DATA_NONE on points for each item.
+	 *
+	 * @param array $items   Items required to get sparkline data for.
+	 * @param array $column  Column configuration with sparkline configuration data.
+	 *
+	 * @return array itemid as key, sparkline data array of arrays as value, itemid with no data will be not present.
+	 */
+	private static function getItemSparklineValues(array $items, array $column): array {
+		$result = [];
+		$sparkline = $column['sparkline'];
+		$items_by_valuetype = self::addDataSource($items, $sparkline['time_period']['from_ts'],
+			['history' => $sparkline['history']] + $column
+		);
+		$items = array_key_exists(ITEM_VALUE_TYPE_FLOAT, $items_by_valuetype)
+			? $items_by_valuetype[ITEM_VALUE_TYPE_FLOAT]
+			: [];
+
+		if (array_key_exists(ITEM_VALUE_TYPE_UINT64, $items_by_valuetype)) {
+			$items = array_merge($items, $items_by_valuetype[ITEM_VALUE_TYPE_UINT64]);
+		}
+
+		if (!$items) {
+			return $result;
+		}
+
+		$itemids_rows = Manager::History()->getGraphAggregationByWidth($items, $sparkline['time_period']['from_ts'],
+			$sparkline['time_period']['to_ts'], $column['contents_width']
+		);
+
+		foreach ($itemids_rows as $itemid => $rows) {
+			if (!$rows['data']) {
+				continue;
+			}
+
+			$result[$itemid] = [];
+			$points = array_column($rows['data'], 'avg', 'clock');
+			/**
+			 * Postgres may return entries in mixed 'clock' order, getMissingData for calculations
+			 * requires order by 'clock'.
+			 */
+			ksort($points);
+			$points += CSvgGraph::getMissingData($points, SVG_GRAPH_MISSING_DATA_NONE);
+			ksort($points);
+
+			foreach ($points as $ts => $value) {
+				$result[$itemid][] = [$ts, $value];
+			}
+		}
+
+		return $result;
 	}
 
 	private static function getItemValues(array $items, array $column): array {

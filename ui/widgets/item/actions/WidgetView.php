@@ -25,6 +25,7 @@ use API,
 	CMacrosResolverHelper,
 	CNumberParser,
 	CSettingsHelper,
+	CSvgGraph,
 	CUrl,
 	Manager;
 
@@ -36,7 +37,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'has_custom_time_period' => 'in 1'
+			'contents_width'			=> 'int32',
+			'has_custom_time_period'	=> 'in 1'
 		]);
 	}
 
@@ -48,7 +50,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'info' => $this->makeWidgetInfo(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'sparkline' => []
 		];
 
 		if ($item !== null) {
@@ -64,12 +67,74 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'url' => $this->getUrl($item),
 				'bg_color' => $this->getBgColor($item, $data_last, $this->fields_values['aggregate_function'])
 			];
+
+			if (array_key_exists(Widget::SHOW_SPARKLINE, $show) && $item) {
+				$sparkline_item = [
+					'itemid'		=> $item['itemid'],
+					'value_type'	=> $item['value_type'],
+					'history'		=> $item['history'],
+					'trends'		=> $item['trends']
+				];
+				$output['sparkline'] = $this->getSparkline($sparkline_item, [
+					'width'		=> $this->fields_values['sparkline']['width'],
+					'fill'		=> $this->fields_values['sparkline']['fill'],
+					'color'		=> $this->fields_values['sparkline']['color'],
+					'history'	=> $this->fields_values['sparkline']['history'],
+					'from'		=> $this->fields_values['sparkline']['time_period']['from_ts'],
+					'to'		=> $this->fields_values['sparkline']['time_period']['to_ts'],
+					'contents_width'	=> $this->getInput('contents_width', 0)
+				]);
+			}
 		}
 		else {
 			$output['error'] = _('No permissions to referred object or it does not exist!');
 		}
 
 		$this->setResponse(new CControllerResponseData($output));
+	}
+
+	protected function getSparkline(array $sparkline_item, array $options): array {
+		$sparkline = [
+			'width'		=> $options['width'],
+			'fill'		=> $options['fill'],
+			'color'		=> $options['color'],
+			'history'	=> $options['history'],
+			'from'		=> $options['from'],
+			'to'		=> $options['to'],
+			'value'		=> []
+		];
+
+		if (!in_array($sparkline_item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+			return $sparkline;
+		}
+
+		if ($options['history'] == Widget::HISTORY_DATA_AUTO) {
+			[$sparkline_item] = CItemHelper::addDataSource([$sparkline_item], $options['from']);
+		}
+		else {
+			$sparkline_item['source'] = $options['history'] == Widget::HISTORY_DATA_TRENDS ? 'trends' : 'history';
+		}
+
+		$data = Manager::History()->getGraphAggregationByWidth([$sparkline_item], $options['from'], $options['to'],
+			$options['contents_width']
+		);
+
+		if ($data) {
+			$points = array_column(reset($data)['data'], 'avg', 'clock');
+			/**
+			 * Postgres may return entries in mixed 'clock' order, getMissingData for calculations
+			 * requires order by 'clock'.
+			 */
+			ksort($points);
+			$points += CSvgGraph::getMissingData($points, SVG_GRAPH_MISSING_DATA_NONE);
+			ksort($points);
+
+			foreach ($points as $ts => $value) {
+				$sparkline['value'][] = [$ts, $value];
+			}
+		}
+
+		return $sparkline;
 	}
 
 	private function getItem(): ?array {

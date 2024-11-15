@@ -1,0 +1,19 @@
+.widget-field-sparkline {
+	display: grid;
+	grid-template-columns: minmax(100px, max-content) 1fr minmax(95px, max-content) max-content;
+	align-items: center;
+	column-gap: 10px;
+	row-gap: 5px;
+
+	.field-fluid {
+		grid-column: 2 / -1;
+
+		.multiselect-control .multiselect {
+			width: 100%;
+		}
+	}
+
+	.offset-1 {
+		grid-column-start: 1;
+	}
+}

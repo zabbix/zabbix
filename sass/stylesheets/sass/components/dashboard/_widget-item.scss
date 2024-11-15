@@ -71,21 +71,17 @@ div.dashboard-widget-item {
 	.dashboard-grid-widget-body {
 		$line-height: 1.14;
 
-		> div {
+		a {
+			position: relative;
+			display: flex;
+			flex-direction: column;
 			box-sizing: border-box;
 			height: 100%;
 			padding: 10px;
-			overflow-x: hidden;
+			overflow: hidden;
+			color: inherit;
 
 			@extend %webkit-scrollbar;
-		}
-
-		a {
-			box-sizing: border-box;
-			display: flex;
-			flex-direction: column;
-			height: 100%;
-			color: inherit;
 
 			&:focus,
 			&:hover,
@@ -94,6 +90,7 @@ div.dashboard-widget-item {
 			}
 
 			> div {
+				position: relative;
 				display: flex;
 				flex: 1 1 calc(100% / 3);
 			}
@@ -173,6 +170,14 @@ div.dashboard-widget-item {
 
 		.svg-arrow {
 			height: calc(var(--content-height) * var(--widget-item-font) * 0.72 / #{$line-height});
+		}
+
+		z-sparkline {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			height: 50%;
+			width: 100%;
 		}
 
 		.item-value-no-data {

@@ -15,12 +15,14 @@
 
 const CSRF_TOKEN_NAME = '_csrf_token';
 
+const ZBX_COLOR_SCHEME_DARK = 'dark';
+const ZBX_COLOR_SCHEME_LIGHT = 'light';
+
 const ZBX_STYLE_DISPLAY_NONE = 'display-none';
 
 const ZBX_STYLE_NO_DATA = 'no-data';
-
-const ZBX_COLOR_SCHEME_DARK = 'dark';
-const ZBX_COLOR_SCHEME_LIGHT = 'light';
+const ZBX_STYLE_NO_DATA_DESCRIPTION = 'no-data-description';
+const ZBX_STYLE_NO_DATA_MESSAGE = 'no-data-message';
 
 const ZBX_STYLE_BTN = 'btn';
 const ZBX_STYLE_BTN_ALT = 'btn-alt';
@@ -44,11 +46,7 @@ const ZBX_STYLE_PROBLEM_ICON_LIST_ITEM = 'problem-icon-list-item';
 const ZBX_STYLE_LINK_ALT = 'link-alt';
 
 const ZBX_STYLE_LIST_TABLE = 'list-table';
-
 const ZBX_STYLE_ROW_SELECTED = 'row-selected';
-
-const ZBX_STYLE_NO_DATA_DESCRIPTION = 'no-data-description';
-const ZBX_STYLE_NO_DATA_MESSAGE = 'no-data-message';
 
 const ZBX_ICON_BELL = 'zi-bell';
 const ZBX_ICON_BELL_OFF = 'zi-bell-off';

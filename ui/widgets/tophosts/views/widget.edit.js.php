@@ -139,6 +139,19 @@ window.widget_tophosts_form = new class {
 					}
 					break;
 
+				case 'sparkline':
+					for (const [key, value] of Object.entries(data_value)) {
+						if (key === 'time_period') {
+							for (const [k, v] of Object.entries(value)) {
+								this.#addVar(`columns[${column_index}][sparkline][time_period][${k}]`, v);
+							}
+						}
+						else {
+							this.#addVar(`columns[${column_index}][sparkline][${key}]`, value);
+						}
+					}
+					break;
+
 				default:
 					this.#addVar(`columns[${column_index}][${data_key}]`, data_value);
 					break;

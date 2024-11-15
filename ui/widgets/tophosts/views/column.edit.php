@@ -20,6 +20,7 @@
  */
 
 use Widgets\TopHosts\Includes\CWidgetFieldColumnsList;
+use Zabbix\Widgets\Fields\CWidgetFieldSparkline;
 
 $form = (new CForm())
 	->setId('tophosts_column_edit_form')
@@ -151,9 +152,26 @@ $form_grid->addItem([
 			->addValue(_('As is'), CWidgetFieldColumnsList::DISPLAY_AS_IS)
 			->addValue(_('Bar'), CWidgetFieldColumnsList::DISPLAY_BAR)
 			->addValue(_('Indicators'), CWidgetFieldColumnsList::DISPLAY_INDICATORS)
+			->addValue(_('Sparkline'), CWidgetFieldColumnsList::DISPLAY_SPARKLINE)
 			->setModern()
 	))->addClass('js-display-row')
 ]);
+
+// Sparkline.
+$sparkline = (new CWidgetFieldSparklineView(
+	(new CWidgetFieldSparkline('sparkline', _('Sparkline')))
+		->setInType(CWidgetsData::DATA_TYPE_TIME_PERIOD)
+		->acceptDashboard()
+		->acceptWidget()
+		->setValue($data['sparkline'])
+))->setFormName($form->getName());
+
+$form_grid->addItem([
+	$sparkline->getLabel()->addClass('js-sparkline-row'),
+	$sparkline->getView()->addClass('js-sparkline-row')
+]);
+
+$scripts[] = $sparkline->getJavaScript();
 
 // Min.
 $form_grid->addItem([

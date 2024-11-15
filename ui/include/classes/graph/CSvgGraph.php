@@ -344,6 +344,65 @@ class CSvgGraph extends CSvg {
 	}
 
 	/**
+	 * Calculate missing data for given set of $points according given $missingdatafunc.
+	 *
+	 * @param array $points           Array of metric points to modify, where key is metric timestamp.
+	 * @param int   $missingdatafunc  Type of function, allowed value:
+	 *                                SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO, SVG_GRAPH_MISSING_DATA_NONE,
+	 *                                SVG_GRAPH_MISSING_DATA_CONNECTED
+	 *
+	 * @return array  Array of calculated missing data points.
+	 */
+	public static function getMissingData(array $points, int $missingdatafunc): array {
+		// Get average distance between points to detect gaps of missing data.
+		$prev_clock = null;
+		$points_distance = [];
+		foreach ($points as $clock => $point) {
+			if ($prev_clock !== null) {
+				$points_distance[] = $clock - $prev_clock;
+			}
+			$prev_clock = $clock;
+		}
+
+		/**
+		 * $threshold          is a minimal period of time at what we assume that data point is missed;
+		 * $average_distance   is an average distance between existing data points;
+		 * $gap_interval       is a time distance between missing points used to fulfill gaps of missing data.
+		 *                     It's unique for each gap.
+		 */
+		$average_distance = $points_distance ? array_sum($points_distance) / count($points_distance) : 0;
+		$threshold = $points_distance ? $average_distance * 3 : 0;
+
+		// Add missing values.
+		$prev_point = null;
+		$prev_clock = null;
+		$missing_points = [];
+		foreach ($points as $clock => $point) {
+			if ($prev_clock !== null && ($clock - $prev_clock) > $threshold) {
+				$gap_interval = floor(($clock - $prev_clock) / $threshold);
+
+				if ($missingdatafunc == SVG_GRAPH_MISSING_DATA_NONE) {
+					$missing_points[$prev_clock + $gap_interval] = null;
+				}
+				elseif ($missingdatafunc == SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO) {
+					$value = ['min' => 0, 'avg' => 0, 'max' => 0];
+
+					$missing_points[$prev_clock + $gap_interval] = $value;
+					$missing_points[$clock - $gap_interval] = $value;
+				}
+				elseif ($missingdatafunc == SVG_GRAPH_MISSING_DATA_LAST_KNOWN) {
+					$missing_points[$clock - $gap_interval] = $prev_point;
+				}
+			}
+
+			$prev_clock = $clock;
+			$prev_point = $point;
+		}
+
+		return $missing_points;
+	}
+
+	/**
 	 * Modifies metric data and Y value range according specified missing data function.
 	 */
 	private function applyMissingDataFunc(): void {
@@ -363,7 +422,7 @@ class CSvgGraph extends CSvg {
 			}
 
 			$points = &$this->points[$index];
-			$missing_data_points = $this->getMissingData($points, $missing_data_function);
+			$missing_data_points = self::getMissingData($points, $missing_data_function);
 
 			// Sort according new clock times (array keys).
 			$points += $missing_data_points;
@@ -1847,65 +1906,6 @@ class CSvgGraph extends CSvg {
 				->setPosition($this->canvas_x, $this->canvas_y)
 				->setSize($this->canvas_width, $this->canvas_height)
 		);
-	}
-
-	/**
-	 * Calculate missing data for given set of $points according given $missingdatafunc.
-	 *
-	 * @param array $points           Array of metric points to modify, where key is metric timestamp.
-	 * @param int   $missingdatafunc  Type of function, allowed value:
-	 *                                SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO, SVG_GRAPH_MISSING_DATA_NONE,
-	 *                                SVG_GRAPH_MISSING_DATA_CONNECTED
-	 *
-	 * @return array  Array of calculated missing data points.
-	 */
-	private function getMissingData(array $points, int $missingdatafunc): array {
-		// Get average distance between points to detect gaps of missing data.
-		$prev_clock = null;
-		$points_distance = [];
-		foreach ($points as $clock => $point) {
-			if ($prev_clock !== null) {
-				$points_distance[] = $clock - $prev_clock;
-			}
-			$prev_clock = $clock;
-		}
-
-		/**
-		 * $threshold          is a minimal period of time at what we assume that data point is missed;
-		 * $average_distance   is an average distance between existing data points;
-		 * $gap_interval       is a time distance between missing points used to fulfill gaps of missing data.
-		 *                     It's unique for each gap.
-		 */
-		$average_distance = $points_distance ? array_sum($points_distance) / count($points_distance) : 0;
-		$threshold = $points_distance ? $average_distance * 3 : 0;
-
-		// Add missing values.
-		$prev_point = null;
-		$prev_clock = null;
-		$missing_points = [];
-		foreach ($points as $clock => $point) {
-			if ($prev_clock !== null && ($clock - $prev_clock) > $threshold) {
-				$gap_interval = floor(($clock - $prev_clock) / $threshold);
-
-				if ($missingdatafunc == SVG_GRAPH_MISSING_DATA_NONE) {
-					$missing_points[$prev_clock + $gap_interval] = null;
-				}
-				elseif ($missingdatafunc == SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO) {
-					$value = ['min' => 0, 'avg' => 0, 'max' => 0];
-
-					$missing_points[$prev_clock + $gap_interval] = $value;
-					$missing_points[$clock - $gap_interval] = $value;
-				}
-				elseif ($missingdatafunc == SVG_GRAPH_MISSING_DATA_LAST_KNOWN) {
-					$missing_points[$clock - $gap_interval] = $prev_point;
-				}
-			}
-
-			$prev_clock = $clock;
-			$prev_point = $point;
-		}
-
-		return $missing_points;
 	}
 
 	/**

@@ -36,6 +36,7 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldSelect,
 	CWidgetFieldTextArea,
 	CWidgetFieldTextBox,
+	CWidgetFieldSparkline,
 	CWidgetFieldThresholds,
 	CWidgetFieldTimePeriod
 };
@@ -59,6 +60,18 @@ class WidgetForm extends CWidgetForm {
 	public const ITEM_VALUE_DATA_SOURCE_AUTO = 0;
 	public const ITEM_VALUE_DATA_SOURCE_HISTORY = 1;
 	public const ITEM_VALUE_DATA_SOURCE_TRENDS = 2;
+
+	public const SPARKLINE_DEFAULT = [
+		'width'		=> 1,
+		'fill'		=> 3,
+		'color'		=> '42A5F5',
+		'time_period' => [
+			'data_source' => CWidgetFieldTimePeriod::DATA_SOURCE_DEFAULT,
+			'from' => 'now-1h',
+			'to' => 'now'
+		],
+		'history'	=> CWidgetFieldSparkline::DATA_SOURCE_AUTO
+	];
 
 	private bool $is_binary_units = false;
 
@@ -91,13 +104,22 @@ class WidgetForm extends CWidgetForm {
 	}
 
 	public function validate(bool $strict = false): array {
-		$errors = parent::validate($strict);
+		$show = $this->getFieldValue('show');
+		$sparkline_enabled = in_array(Widget::SHOW_SPARKLINE, $show);
+		$errors = [];
+
+		foreach ($this->fields as $name => $field) {
+			if (!$sparkline_enabled && $name === 'sparkline') {
+				$field->setValue(CWidgetFieldSparkline::DEFAULT_VALUE);
+			}
+			else {
+				$errors = array_merge($errors, $field->validate($strict));
+			}
+		}
 
 		if ($errors) {
 			return $errors;
 		}
-
-		$show = $this->getFieldValue('show');
 
 		if (!$show) {
 			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Show'), _('at least one option must be selected'));
@@ -140,6 +162,19 @@ class WidgetForm extends CWidgetForm {
 		return $errors;
 	}
 
+	protected function normalizeValues(array $values): array {
+		$values = parent::normalizeValues($values);
+
+		if (array_key_exists('show', $values) && is_array($values['show'])
+				&& in_array(Widget::SHOW_SPARKLINE, $values['show'])) {
+			$values['sparkline'] = array_key_exists('sparkline', $values)
+				? array_replace(WidgetForm::SPARKLINE_DEFAULT, $values['sparkline'])
+				: WidgetForm::SPARKLINE_DEFAULT;
+		}
+
+		return $values;
+	}
+
 	public function addFields(): self {
 		return $this
 			->addField(
@@ -152,7 +187,8 @@ class WidgetForm extends CWidgetForm {
 					Widget::SHOW_DESCRIPTION => _('Description'),
 					Widget::SHOW_VALUE => _('Value'),
 					Widget::SHOW_TIME => _('Time'),
-					Widget::SHOW_CHANGE_INDICATOR => _('Change indicator')
+					Widget::SHOW_CHANGE_INDICATOR => _('Change indicator'),
+					Widget::SHOW_SPARKLINE => _('Sparkline')
 				]))
 					->setDefault([Widget::SHOW_DESCRIPTION, Widget::SHOW_VALUE, Widget::SHOW_TIME,
 						Widget::SHOW_CHANGE_INDICATOR
@@ -280,6 +316,9 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				new CWidgetFieldColor('updown_color', _('Change indicator'))
+			)
+			->addField(
+				(new CWidgetFieldSparkline('sparkline', _('Sparkline')))->setDefault(self::SPARKLINE_DEFAULT)
 			)
 			->addField(
 				new CWidgetFieldColor('bg_color', _('Background color'))

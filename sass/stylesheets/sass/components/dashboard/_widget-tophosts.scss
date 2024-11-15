@@ -51,8 +51,10 @@ div.dashboard-widget-tophosts {
 	}
 
 	td {
-		line-height: $bar-gauge-height;
 		height: 20px;
+		padding-top: 5px;
+		padding-bottom: 5px;
+		line-height: $bar-gauge-height;
 	}
 
 	.link-action {
@@ -62,6 +64,11 @@ div.dashboard-widget-tophosts {
 	z-bar-gauge {
 		min-width: 64px;
 		height: $bar-gauge-height;
+	}
+
+	z-sparkline {
+		min-width: 64px;
+		height: 20px;
 	}
 }
 

@@ -4183,6 +4183,29 @@ z-select {
   z-select[disabled] .focusable {
     pointer-events: none; }
 
+z-sparkline {
+  position: relative;
+  display: block; }
+  z-sparkline svg {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0; }
+
+.widget-field-sparkline {
+  display: grid;
+  grid-template-columns: minmax(100px, max-content) 1fr minmax(95px, max-content) max-content;
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 5px; }
+  .widget-field-sparkline .field-fluid {
+    grid-column: 2 / -1; }
+    .widget-field-sparkline .field-fluid .multiselect-control .multiselect {
+      width: 100%; }
+  .widget-field-sparkline .offset-1 {
+    grid-column-start: 1; }
+
 form.dashboard-widget-clock .fields-group.fields-group-date, form.dashboard-widget-clock .fields-group.fields-group-time, form.dashboard-widget-clock .fields-group.fields-group-tzone {
   display: grid;
   grid-template-columns: 60px 120px 60px auto;
@@ -4571,20 +4594,19 @@ form.dashboard-widget-item .fields-group.fields-group-change-indicator {
   form.dashboard-widget-item .fields-group.fields-group-change-indicator .input-color-picker {
     display: block; }
 
-div.dashboard-widget-item .dashboard-grid-widget-body > div {
+div.dashboard-widget-item .dashboard-grid-widget-body a {
+  position: relative;
+  display: flex;
+  flex-direction: column;
   box-sizing: border-box;
   height: 100%;
   padding: 10px;
-  overflow-x: hidden; }
-div.dashboard-widget-item .dashboard-grid-widget-body a {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
+  overflow: hidden;
   color: inherit; }
   div.dashboard-widget-item .dashboard-grid-widget-body a:focus, div.dashboard-widget-item .dashboard-grid-widget-body a:hover, div.dashboard-widget-item .dashboard-grid-widget-body a:visited {
     border: none; }
   div.dashboard-widget-item .dashboard-grid-widget-body a > div {
+    position: relative;
     display: flex;
     flex: 1 1 calc(100% / 3); }
 div.dashboard-widget-item .dashboard-grid-widget-body .item-description,
@@ -4633,6 +4655,12 @@ div.dashboard-widget-item .dashboard-grid-widget-body .change-indicator:not(:fir
   margin-left: 5px; }
 div.dashboard-widget-item .dashboard-grid-widget-body .svg-arrow {
   height: calc(var(--content-height) * var(--widget-item-font) * 0.72 / 1.14); }
+div.dashboard-widget-item .dashboard-grid-widget-body z-sparkline {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 50%;
+  width: 100%; }
 div.dashboard-widget-item .dashboard-grid-widget-body .item-value-no-data {
   color: #737373; }
 div.dashboard-widget-item .dashboard-grid-widget-body .left {
@@ -5275,11 +5303,16 @@ div.dashboard-widget-tophosts .btn-thumbnail {
       border: 1px solid #303030;
       border-radius: 3px; }
 div.dashboard-widget-tophosts td {
-  line-height: 20px;
-  height: 20px; }
+  height: 20px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  line-height: 20px; }
 div.dashboard-widget-tophosts .link-action {
   white-space: nowrap; }
 div.dashboard-widget-tophosts z-bar-gauge {
+  min-width: 64px;
+  height: 20px; }
+div.dashboard-widget-tophosts z-sparkline {
   min-width: 64px;
   height: 20px; }
 
@@ -7115,26 +7148,26 @@ span.is-loading {
 
 .dashboard-grid-widget-contents, output .msg-details ul, .multiselect-available, .z-select .focusable,
 z-select .focusable, .z-select .list,
-z-select .list, div.dashboard-widget-item .dashboard-grid-widget-body > div, textarea, select, .setup-right-body, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue .hintbox-wrap,
+z-select .list, div.dashboard-widget-item .dashboard-grid-widget-body a, textarea, select, .setup-right-body, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue .hintbox-wrap,
 .overlay-dialogue .hintbox-wrap-horizontal, .overlay-dialogue .maps-container, .notif-body, .debug-output, .overlay-descr, .import-compare .toc,
 .import-compare .diff {
   scrollbar-width: thin; }
   .dashboard-grid-widget-contents::-webkit-scrollbar, output .msg-details ul::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, .z-select .focusable::-webkit-scrollbar,
   z-select .focusable::-webkit-scrollbar, .z-select .list::-webkit-scrollbar,
-  z-select .list::-webkit-scrollbar, div.dashboard-widget-item .dashboard-grid-widget-body > div::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar,
+  z-select .list::-webkit-scrollbar, div.dashboard-widget-item .dashboard-grid-widget-body a::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar,
   .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .import-compare .toc::-webkit-scrollbar,
   .import-compare .diff::-webkit-scrollbar {
     width: 9px;
     height: 9px; }
   .dashboard-grid-widget-contents::-webkit-scrollbar-track, output .msg-details ul::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, .z-select .focusable::-webkit-scrollbar-track,
   z-select .focusable::-webkit-scrollbar-track, .z-select .list::-webkit-scrollbar-track,
-  z-select .list::-webkit-scrollbar-track, div.dashboard-widget-item .dashboard-grid-widget-body > div::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track,
+  z-select .list::-webkit-scrollbar-track, div.dashboard-widget-item .dashboard-grid-widget-body a::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track,
   .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .import-compare .toc::-webkit-scrollbar-track,
   .import-compare .diff::-webkit-scrollbar-track {
     background-color: #1f1f1f; }
   .dashboard-grid-widget-contents::-webkit-scrollbar-thumb, output .msg-details ul::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, .z-select .focusable::-webkit-scrollbar-thumb,
   z-select .focusable::-webkit-scrollbar-thumb, .z-select .list::-webkit-scrollbar-thumb,
-  z-select .list::-webkit-scrollbar-thumb, div.dashboard-widget-item .dashboard-grid-widget-body > div::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb,
+  z-select .list::-webkit-scrollbar-thumb, div.dashboard-widget-item .dashboard-grid-widget-body a::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb,
   .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .import-compare .toc::-webkit-scrollbar-thumb,
   .import-compare .diff::-webkit-scrollbar-thumb {
     background-color: #383838;

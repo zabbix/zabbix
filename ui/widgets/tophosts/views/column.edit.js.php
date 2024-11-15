@@ -216,7 +216,7 @@ window.tophosts_column_edit_form = new class {
 				break;
 		}
 
-		for (const input of document.querySelectorAll('[name="display_value_as"]')) {
+		for (const input of this.#form.querySelectorAll('[name="display_value_as"]')) {
 			input.checked = input.value == display_value_as;
 		}
 	}
@@ -225,12 +225,17 @@ window.tophosts_column_edit_form = new class {
 	 * Updates widget column configuration form field visibility, enable/disable state and available options.
 	 */
 	#updateForm() {
-		const data_type = document.querySelector('[name="data"]').value;
+		const data_type = this.#form.querySelector('[name="data"]').value;
 
 		const data_type_item_value = data_type == <?= CWidgetFieldColumnsList::DATA_ITEM_VALUE ?>;
 		const data_type_text = data_type == <?= CWidgetFieldColumnsList::DATA_TEXT ?>;
 
-		const display_item_value_as = document.querySelector('[name="display_value_as"]:checked').value;
+		const display = this.#form.querySelector('[name="display"]:checked').value;
+		const display_bar = display == <?= CWidgetFieldColumnsList::DISPLAY_BAR ?>;
+		const display_indicators = display == <?= CWidgetFieldColumnsList::DISPLAY_INDICATORS ?>;
+		const display_sparkline = display == <?= CWidgetFieldColumnsList::DISPLAY_SPARKLINE ?>;
+
+		const display_item_value_as = this.#form.querySelector('[name="display_value_as"]:checked').value;
 
 		const display_item_value_as_numeric = data_type_item_value
 			&& display_item_value_as == <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC ?>;
@@ -273,9 +278,19 @@ window.tophosts_column_edit_form = new class {
 			}
 		}
 
+		// Sparkline.
+		for (const element of this.#form.querySelectorAll('.js-sparkline-row')) {
+			element.style.display = display_item_value_as_numeric && display_sparkline ? '' : 'none';
+
+			for (const input of element.querySelectorAll('input')) {
+				input.disabled = !(display_item_value_as_numeric && display_sparkline);
+			}
+		}
+
+		this.#form.fields['sparkline[time_period]'].disabled = !(display_item_value_as_numeric && display_sparkline);
+
 		// Min/Max.
-		const show_min_max = display_item_value_as_numeric
-			&& document.querySelector('[name="display"]:checked').value != <?= CWidgetFieldColumnsList::DISPLAY_AS_IS ?>;
+		const show_min_max = display_item_value_as_numeric && (display_bar || display_indicators);
 
 		for (const element of this.#form.querySelectorAll('.js-min-max-row')) {
 			element.style.display = show_min_max ? '' : 'none';

@@ -88,6 +88,13 @@ class WidgetForm extends CWidgetForm {
 				switch ($value['data']) {
 					case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
 						$this->field_column_values[$key] = $value['name'] === '' ? $value['item'] : $value['name'];
+
+						if (array_key_exists('display', $value)
+								&& $value['display'] == CWidgetFieldColumnsList::DISPLAY_SPARKLINE) {
+							$values['columns'][$key]['sparkline'] = array_key_exists('sparkline', $value)
+								? array_replace(CWidgetFieldColumnsList::SPARKLINE_DEFAULT, $value['sparkline'])
+								: CWidgetFieldColumnsList::SPARKLINE_DEFAULT;
+						}
 						break;
 
 					case CWidgetFieldColumnsList::DATA_HOST_NAME:

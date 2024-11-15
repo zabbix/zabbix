@@ -1162,12 +1162,9 @@ SVGMapShape.prototype.update = function(options) {
 		];
 
 	mapping.forEach(function(map) {
-		if (typeof options[map.key] !== 'undefined' && /[0-9A-F]{6}/g.test(options[map.key].trim())) {
-			attributes[map.value] = '#' + options[map.key];
-		}
-		else {
-			attributes[map.value] = 'none';
-		}
+		const color = `#${options[map.key].toString().trim()}`;
+
+		attributes[map.value] = isColorHex(color) ? color : 'none';
 	}, this);
 
 	if (typeof options['border_width'] !== 'undefined') {
@@ -1296,10 +1293,12 @@ SVGMapShape.prototype.update = function(options) {
 				break;
 		}
 
+		const font_color = `#${options['font_color'].toString().trim()}`;
+
 		element.add('textarea', {
 			'x': x,
 			'y': y,
-			fill: '#' + (/[0-9A-F]{6}/g.test(options['font_color'].trim()) ? options['font_color'] : '000000'),
+			fill: isColorHex(font_color) ? font_color : '#000000',
 			'font-family': SVGMap.FONTS[parseInt(options.font)],
 			'font-size': parseInt(options['font_size']) + 'px',
 			'anchor': anchor,

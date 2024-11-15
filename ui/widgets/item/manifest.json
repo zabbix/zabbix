@@ -21,6 +21,9 @@
 			},
 			"time_period": {
 				"type": "_timeperiod"
+			},
+			"sparkline": {
+				"type": "_timeperiod"
 			}
 		}
 	},

@@ -298,7 +298,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$visible_labels = ['Name', 'Data', 'Item name', 'Base colour', 'Display item value as', 'Display', 'Thresholds',
 				'Decimal places', 'Advanced configuration'
 		];
-		$hidden_labels = ['Text', 'Min', 'Max','Highlights', 'Show thumbnail', 'Aggregation function', 'Time period', 'Widget', 'From', 'To', 'History data'];
+		$hidden_labels = ['Text', 'Sparkline', 'Min', 'Max', 'Highlights', 'Show thumbnail', 'Aggregation function', 'Time period', 'Widget', 'From', 'To', 'History data'];
 		$this->assertEquals($visible_labels, array_values($column_form->getLabels()->filter(CElementFilter::VISIBLE)->asText()));
 		$this->assertEquals($hidden_labels, array_values($column_form->getLabels()->filter(CElementFilter::NOT_VISIBLE)->asText()));
 		$form->getRequiredLabels(['Name', 'Item name']);
@@ -310,8 +310,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'visible' => false, 'enabled' => false
 			],
 			'Item name' => ['value' => ''],
+			'Display' => ['value' => 'As is', 'labels' => ['As is', 'Bar', 'Indicators', 'Sparkline']],
 			'Display item value as' => ['value' => 'Numeric', 'labels' => ['Numeric', 'Text', 'Binary']],
-			'Display' => ['value' => 'As is', 'labels' => ['As is', 'Bar', 'Indicators']],
 			'Min' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
 			'Max' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
 			'xpath:.//input[@id="base_color"]/..' => ['color' => ''],
@@ -364,7 +364,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			'History data' => ['Auto' => false, 'History' => false, 'Trends' => true]
 		];
 
-		// Check Aggregation function and  Min/Max fields visibility.
+		// Check Aggregation function and Min/Max fields visibility.
 		foreach ($fields_visibility as $field => $options) {
 			foreach ($options as $option => $visible) {
 				$column_form->fill([$field => $option]);
@@ -5740,7 +5740,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'result' => [
 						[
 							'Host name' => 'HostB',
-							'Text: Macro in host' => 'HostB',  // Resolved global macro.
+							'Text: Macro in host' => 'HostB', // Resolved global macro.
 							'{#LLD_MACRO}' => '1.00',
 							'{HOST.HOST}' => '1.00',
 							'{$USERMACRO}' => '',
