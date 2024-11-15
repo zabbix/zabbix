@@ -40,6 +40,7 @@ class testFormAdministrationGeneralValuemap extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Value mapping');
 		$this->zbxTestAssertElementPresentXpath('//button[text()="Create value map"]');
 		$this->zbxTestClickButtonText('Create value map');
+		$this->page->waitUntilReady();
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestAssertElementPresentId('name');
 		$this->zbxTestAssertAttribute("//input[@id='name']", "maxlength", 64);
