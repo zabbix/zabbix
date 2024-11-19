@@ -28,6 +28,10 @@ class IntegerValidator implements InputValidator
 		this.hi = hi;
 	}
 
+	protected final void finalize() throws Throwable
+	{
+	}
+
 	@Override
 	public boolean validate(Object value)
 	{

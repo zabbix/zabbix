@@ -50,6 +50,10 @@ class ZabbixItem
 		this.key = key;
 	}
 
+	protected final void finalize() throws Throwable
+	{
+	}
+
 	String getKey()
 	{
 		return key;
