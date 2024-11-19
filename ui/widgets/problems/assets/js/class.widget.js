@@ -25,9 +25,9 @@ class CWidgetProblems extends CWidget {
 	/**
 	 * ID of selected event.
 	 *
-	 * @type {string}
+	 * @type {string|null}
 	 */
-	#selected_event_id = '';
+	#selected_eventid = null;
 
 	onInitialize() {
 		this._opened_eventids = [];
@@ -69,30 +69,51 @@ class CWidgetProblems extends CWidget {
 
 		this.#table_body = this._contents.querySelector(`.${ZBX_STYLE_LIST_TABLE} tbody`);
 
-		if (this.#table_body !== null) {
-			if (this.#selected_event_id !== '') {
-				const row = this.#table_body.querySelector(`tr[data-eventid="${this.#selected_event_id}"]`);
-
-				if (row !== null) {
-					this.#selectEvent();
-				}
-				else {
-					this.#selected_event_id = '';
-				}
-			}
+		if (this.#table_body === null) {
+			return;
 		}
 
 		this.#activateContentsEvents();
+
+		if (!this.hasEverUpdated() && this.isReferred()) {
+			this.#selected_eventid = this.#getDefaultSelectable();
+
+			if (this.#selected_eventid !== null) {
+				this.#selectEvent();
+				this.#broadcast();
+			}
+		}
+		else if (this.#selected_eventid !== null) {
+			this.#selectEvent();
+		}
+	}
+
+	onReferredUpdate() {
+		if (this.#table_body === null || this.#selected_eventid !== null) {
+			return;
+		}
+
+		this.#selected_eventid = this.#getDefaultSelectable();
+
+		if (this.#selected_eventid !== null) {
+			this.#selectEvent();
+			this.#broadcast();
+		}
+	}
+
+	#getDefaultSelectable() {
+		const row = this.#table_body.querySelector('[data-eventid]');
+
+		return row !== null ? row.dataset.eventid : null;
 	}
 
 	#activateContentsEvents() {
-		for (const button of this._body.querySelectorAll("button[data-action='show_symptoms']")) {
+		for (const button of this._body.querySelectorAll('button[data-action="show_symptoms"]')) {
 			button.addEventListener('click', e => this.#onShowSymptoms(e));
 
 			// Open the symptom block for previously clicked problems when content is reloaded.
 			if (this._opened_eventids.includes(button.dataset.eventid)) {
-				const rows = this._body
-					.querySelectorAll("tr[data-cause-eventid='" + button.dataset.eventid + "']");
+				const rows = this._body.querySelectorAll(`[data-cause-eventid="${button.dataset.eventid}"]`);
 
 				[...rows].forEach(row => row.classList.remove('hidden'));
 
@@ -106,10 +127,10 @@ class CWidgetProblems extends CWidget {
 	}
 
 	#selectEvent() {
-		const rows = this.#table_body.querySelectorAll('tr[data-eventid]');
+		const rows = this.#table_body.querySelectorAll('[data-eventid]');
 
 		for (const row of rows) {
-			row.classList.toggle(ZBX_STYLE_ROW_SELECTED, row.dataset.eventid === this.#selected_event_id);
+			row.classList.toggle(ZBX_STYLE_ROW_SELECTED, row.dataset.eventid === this.#selected_eventid);
 		}
 	}
 
@@ -119,7 +140,7 @@ class CWidgetProblems extends CWidget {
 		// Disable the button to prevent multiple clicks.
 		button.disabled = true;
 
-		const rows = this._body.querySelectorAll("tr[data-cause-eventid='" + button.dataset.eventid + "']");
+		const rows = this._body.querySelectorAll(`[data-cause-eventid="${button.dataset.eventid}"]`);
 
 		if (rows[0].classList.contains('hidden')) {
 			button.classList.remove(ZBX_ICON_CHEVRON_DOWN, ZBX_STYLE_COLLAPSED);
@@ -135,7 +156,7 @@ class CWidgetProblems extends CWidget {
 			button.classList.add(ZBX_ICON_CHEVRON_DOWN, ZBX_STYLE_COLLAPSED);
 			button.title = t('Expand');
 
-			this._opened_eventids = this._opened_eventids.filter((id) => id !== button.dataset.eventid);
+			this._opened_eventids = this._opened_eventids.filter(id => id !== button.dataset.eventid);
 
 			[...rows].forEach(row => row.classList.add('hidden'));
 		}
@@ -144,23 +165,22 @@ class CWidgetProblems extends CWidget {
 		button.disabled = false;
 	}
 
+	#broadcast() {
+		this.broadcast({[CWidgetsData.DATA_TYPE_EVENT_ID]: [this.#selected_eventid]});
+	}
+
 	#onTableBodyClick(e) {
 		if (e.target.closest('a') !== null || e.target.closest('[data-hintbox="1"]') !== null) {
 			return;
 		}
 
-		const row = e.target.closest('tr');
+		const row = e.target.closest('[data-eventid]');
 
 		if (row !== null) {
-			const eventid = row.dataset.eventid;
+			this.#selected_eventid = row.dataset.eventid;
 
-			if (eventid !== undefined) {
-				this.#selected_event_id = eventid;
-
-				this.#selectEvent();
-
-				this.broadcast({[CWidgetsData.DATA_TYPE_EVENT_ID]: [eventid]});
-			}
+			this.#selectEvent();
+			this.#broadcast();
 		}
 	}
 }

@@ -25,7 +25,19 @@ class CWidgetGeoMap extends CWidget {
 	static SEVERITY_HIGH = 4;
 	static SEVERITY_DISASTER = 5;
 
-	#selected_hostid = '';
+	/**
+	 * Geomap's data from response.
+	 *
+	 * @type {Object|null}
+	 */
+	#geomap = null;
+
+	/**
+	 * ID of selected host
+	 *
+	 * @type {string|null}
+	 */
+	#selected_hostid = null;
 
 	onInitialize() {
 		this._map = null;
@@ -63,16 +75,63 @@ class CWidgetGeoMap extends CWidget {
 			super.setContents(response);
 		}
 
-		if (response.geomap !== undefined) {
-			if (response.geomap.config !== undefined) {
-				this._initMap(response.geomap.config);
-			}
+		if (response.geomap === undefined) {
+			this._initial_load = false;
+			return;
+		}
 
-			this._addMarkers(response.geomap.hosts);
+		this.#geomap = response.geomap;
+
+		if (this.#geomap.config !== undefined) {
+			this._initMap(this.#geomap.config);
+		}
+
+		this._addMarkers(this.#geomap.hosts);
+
+		if (!this.hasEverUpdated() && this.isReferred()) {
+			this.#selected_hostid = this.#getDefaultSelectable();
+
+			if (this.#selected_hostid !== null) {
+				this.#updateHintboxes();
+				this.#updateMarkers();
+				this.#broadcast();
+			}
+		}
+		else if (this.#selected_hostid !== null) {
+			this.#updateHintboxes();
 			this.#updateMarkers();
 		}
 
 		this._initial_load = false;
+	}
+
+	#broadcast() {
+		this.broadcast({
+			[CWidgetsData.DATA_TYPE_HOST_ID]: [this.#selected_hostid],
+			[CWidgetsData.DATA_TYPE_HOST_IDS]: [this.#selected_hostid]
+		});
+	}
+
+	#getDefaultSelectable() {
+		return this.#geomap.hosts.length > 0
+			? this.#getClosestHost(this.#geomap.config, this.#geomap.hosts).properties.hostid
+			: null;
+	}
+
+	onReferredUpdate() {
+		if (this.#geomap === null) {
+			return;
+		}
+
+		if (this.#selected_hostid === null) {
+			this.#selected_hostid = this.#getDefaultSelectable();
+
+			if (this.#selected_hostid !== null) {
+				this.#updateHintboxes();
+				this.#updateMarkers();
+				this.#broadcast();
+			}
+		}
 	}
 
 	_addMarkers(hosts) {
@@ -195,9 +254,13 @@ class CWidgetGeoMap extends CWidget {
 		});
 
 		this._markers.on('click keypress', (e) => {
-			const node = e.originalEvent.srcElement;
+			this.#selected_hostid = e.layer.feature.properties.hostid;
 
-			this.#selectHost(e.layer.feature.properties.hostid);
+			this.#updateHintboxes();
+			this.#updateMarkers();
+			this.#broadcast();
+
+			const node = e.originalEvent.srcElement;
 
 			if ('hintBoxItem' in node) {
 				return;
@@ -286,11 +349,32 @@ class CWidgetGeoMap extends CWidget {
 	}
 
 	/**
+	 * Get the closest host to the map center defined in the config.
+	 *
+	 * @param {Object}        config
+	 * @param {Array<Object>} hosts
+	 *
+	 * @returns {Object}
+	 */
+	#getClosestHost(config, hosts) {
+		const center_point = L.latLng(config.center.latitude, config.center.longitude);
+
+		return hosts.reduce((closest, current) => {
+			const current_point = L.latLng(current.geometry.coordinates[1], current.geometry.coordinates[0]);
+			const closest_point = L.latLng(closest.geometry.coordinates[1], closest.geometry.coordinates[0]);
+
+			return current_point.distanceTo(center_point) < closest_point.distanceTo(center_point)
+				? current
+				: closest;
+		});
+	}
+
+	/**
 	 * Update style for selected marker and cluster and broadcast _hostid.
 	 *
 	 * @param {string} hostid
 	 */
-	#selectHost(hostid) {
+	#broadcastSelected(hostid) {
 		this.#selected_hostid = hostid;
 
 		this.broadcast({
@@ -563,7 +647,11 @@ class CWidgetGeoMap extends CWidget {
 				const hostid = row.dataset.hostid;
 
 				if (hostid !== undefined) {
-					this.#selectHost(hostid);
+					this.#selected_hostid = hostid;
+
+					this.#updateHintboxes();
+					this.#updateMarkers();
+					this.#broadcast();
 				}
 			}
 		});

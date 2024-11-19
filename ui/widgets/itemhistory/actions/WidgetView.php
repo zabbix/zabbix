@@ -266,7 +266,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			]);
 
 			foreach ($db_items_values as $db_item_value) {
-				$result[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY][$db_item_value['itemid']][] = $db_item_value;
+				$result[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY][$db_item_value['itemid']][] = $db_item_value
+					+ ['key_' => $items[$db_item_value['itemid']]['key_']];
 			}
 		}
 
@@ -288,7 +289,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'itemid' => $db_item_trend['itemid'],
 					'value' => $db_item_trend['value_avg'],
 					'clock' => $db_item_trend['clock'],
-					'ns' => 0
+					'ns' => 0,
+					'key_' => $items[$db_item_trend['itemid']]['key_']
 				];
 			}
 		}

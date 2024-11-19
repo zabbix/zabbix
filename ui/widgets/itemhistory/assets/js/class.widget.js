@@ -29,6 +29,7 @@ class CWidgetItemHistory extends CWidget {
 
 	#selected_itemid = null;
 	#selected_clock = null;
+	#selected_key_ = null;
 
 	setContents(response) {
 		super.setContents(response);
@@ -40,30 +41,82 @@ class CWidgetItemHistory extends CWidget {
 
 		this.#values_table = this._body.querySelector(`.${ZBX_STYLE_LIST_TABLE}`);
 
-		if (this.#values_table !== null) {
-			this.#loadThumbnails(this.#makeUrls());
+		if (this.#values_table === null) {
+			return;
+		}
 
-			this.#markSelected(this.#selected_itemid, this.#selected_clock);
+		const items_data = new Map();
+		this.#values_table.querySelectorAll('.has-broadcast-data').forEach(element => {
+			const itemid = element.dataset.itemid;
+			const clock = element.dataset.clock;
+			const key_ = element.dataset.key_;
 
-			this.#values_table.addEventListener('click', (e) => {
-				if (e.target.closest('[data-hintbox="1"]') !== null) {
-					return;
+			if (!items_data.has(itemid)) {
+				items_data.set(itemid, { itemid: itemid, clock: clock, key_: key_ });
+			}
+		});
+
+		this.#loadThumbnails(this.#makeUrls());
+
+		this.#values_table.addEventListener('click', e => {
+			const element = e.target.closest('.has-broadcast-data');
+
+			if (element !== null) {
+				this.#selected_clock = element.dataset.clock;
+				this.#selected_itemid = element.dataset.itemid;
+				this.#selected_key_ = element.dataset.key_;
+
+				this.#broadcast();
+				this.#markSelected();
+			}
+		});
+
+		if (!this.hasEverUpdated() && this.isReferred()) {
+			const element = this.#getDefaultSelectable();
+
+			if (element !== null) {
+				this.#selected_clock = element.dataset.clock;
+				this.#selected_itemid = element.dataset.itemid;
+				this.#selected_key_ = element.dataset.key_;
+
+				this.#broadcast();
+				this.#markSelected();
+			}
+		}
+		else if (this.#selected_itemid !== null) {
+			if (!items_data.has(this.#selected_itemid)) {
+				for (let [itemid, item] of items_data) {
+					if (item.key_ === this.#selected_key_) {
+						this.#selected_itemid = itemid;
+						this.#selected_clock = item.clock;
+
+						this.#broadcast();
+						break;
+					}
 				}
+			}
 
-				const element = e.target.closest('.has-broadcast-data');
+			this.#markSelected();
+		}
+	}
 
-				if (element !== null) {
-					this.#selected_itemid = element.dataset.itemid;
-					this.#selected_clock = element.dataset.clock;
+	#getDefaultSelectable() {
+		return this.#values_table.querySelector('.has-broadcast-data');
+	}
 
-					this.#markSelected(this.#selected_itemid, this.#selected_clock);
+	onReferredUpdate() {
+		if (this.#values_table === null || this.#selected_itemid !== null) {
+			return;
+		}
 
-					this.broadcast({
-						[CWidgetsData.DATA_TYPE_ITEM_ID]: [element.dataset.itemid],
-						[CWidgetsData.DATA_TYPE_ITEM_IDS]: [element.dataset.itemid]
-					});
-				}
-			});
+		const element = this.#getDefaultSelectable();
+
+		if (element !== null) {
+			this.#selected_clock = element.dataset.clock;
+			this.#selected_itemid = element.dataset.itemid;
+
+			this.#broadcast();
+			this.#markSelected();
 		}
 	}
 
@@ -78,10 +131,20 @@ class CWidgetItemHistory extends CWidget {
 		}
 	}
 
-	#markSelected(itemid, clock) {
+	#broadcast() {
+		this.broadcast({
+			[CWidgetsData.DATA_TYPE_ITEM_ID]: [this.#selected_itemid],
+			[CWidgetsData.DATA_TYPE_ITEM_IDS]: [this.#selected_itemid]
+		});
+	}
+
+	#markSelected() {
 		this.#values_table.querySelectorAll('.has-broadcast-data').forEach(element => {
 			const data = element.dataset;
-			element.classList.toggle('selected', data?.itemid === itemid && data?.clock === clock);
+
+			element.classList.toggle('selected', data?.itemid === this.#selected_itemid
+				&& data?.clock === this.#selected_clock
+			);
 		});
 	}
 

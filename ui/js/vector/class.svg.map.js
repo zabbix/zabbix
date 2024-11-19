@@ -495,10 +495,6 @@ SVGMap.prototype.update = function (options, incremental) {
 				this.updateOrderedItems('shapes', 'sysmap_shapeid', 'SVGMapShape', options.shapes, incremental);
 				this.updateItems('links', 'SVGMapLink', options.links, incremental);
 				this.updateBackground(options.background);
-
-				if (this.selected_element_id !== '') {
-					this.elements[this.selected_element_id].select();
-				}
 			}
 			catch(exception) {
 				resolve();
@@ -518,7 +514,10 @@ SVGMap.prototype.update = function (options, incremental) {
 				readiness.push(new Promise(resolve => image.addEventListener('load', resolve)));
 			});
 
-			resolve(Promise.all(readiness));
+			resolve(Promise
+				.all(readiness)
+				.then(this.select(this.selected_element_id))
+			);
 		}, this);
 	});
 
@@ -552,6 +551,17 @@ SVGMap.prototype.render = function (container) {
 	this.canvas.render(container);
 	this.container = container;
 };
+
+/**
+ * Map element selection by element ID.
+ *
+ * @param selected_element_id
+ */
+SVGMap.prototype.select = function(selected_element_id) {
+	for (const element_id in this.elements) {
+		this.elements[element_id].toggleSelection(element_id == selected_element_id);
+	}
+}
 
 /*
  * SVGMapElement class. Implements rendering of map elements (selements).
@@ -936,40 +946,29 @@ SVGMapElement.prototype.onMouseOut = function(e) {
  * Element click event.
  */
 SVGMapElement.prototype.onClick = function() {
-	if (this.map.selected_element_id !== '') {
-		const prev_selected_element = this.map.elements[this.map.selected_element_id];
-		prev_selected_element.selection.element.classList.add('display-none');
-		prev_selected_element.selection.element.classList.remove('selected');
-		prev_selected_element.image.element.classList.remove('selected');
-	}
-
-	this.select();
+	this.map.container.dispatchEvent(new CustomEvent(this.map.EVENT_ELEMENT_SELECT, {
+		detail: {
+			selected_element_id: this.options.selementid,
+			hostid: this.options.elementtype == SYSMAP_ELEMENT_TYPE_HOST
+				? this.options.elements[0].hostid
+				: null,
+			hostgroupid: this.options.elementtype == SYSMAP_ELEMENT_TYPE_HOST_GROUP
+				? this.options.elements[0].groupid
+				: null
+		}
+	}));
 };
 
 /**
  * Select element.
  */
-SVGMapElement.prototype.select = function() {
-	this.map.selected_element_id = this.options.selementid;
-
-	this.selection.element.classList.remove('display-none');
-	this.selection.element.classList.add('selected');
-	this.image.element.classList.add('selected');
-
-	const detail = {
-		selected_element_id: this.map.selected_element_id,
-		hostid: null,
-		hostgroupid: null
-	};
-
-	if (this.options.elementtype == SYSMAP_ELEMENT_TYPE_HOST) {
-		detail.hostid = this.options.elements[0].hostid;
+SVGMapElement.prototype.toggleSelection = function(is_selected) {
+	if (this.selection === null) {
+		return;
 	}
-	else if (this.options.elementtype == SYSMAP_ELEMENT_TYPE_HOST_GROUP) {
-		detail.hostgroupid = this.options.elements[0].groupid;
-	}
-
-	this.map.container.dispatchEvent(new CustomEvent(this.map.EVENT_ELEMENT_SELECT, {detail}));
+	this.selection.element.classList.toggle('display-none', !is_selected);
+	this.selection.element.classList.toggle('selected', is_selected);
+	this.image.element.classList.toggle('selected', is_selected);
 };
 
 /**

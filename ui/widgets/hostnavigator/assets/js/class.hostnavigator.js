@@ -68,13 +68,6 @@ class CHostNavigator {
 	#listeners = {};
 
 	/**
-	 * ID of selected host.
-	 *
-	 * @type {string}
-	 */
-	#selected_host_id = '';
-
-	/**
 	 * @param {Object} config  Widget configuration.
 	 */
 	constructor(config) {
@@ -89,11 +82,12 @@ class CHostNavigator {
 	/**
 	 * Set list of hosts.
 	 *
-	 * @param {Array}   hosts              Array of hosts and their info.
-	 * @param {Object}  maintenances       Info about all maintenances between hosts.
-	 * @param {boolean} is_limit_exceeded  Whether host limit is exceeded or not.
+	 * @param {Array}       hosts              Array of hosts and their info.
+	 * @param {Object}      maintenances       Info about all maintenances between hosts.
+	 * @param {boolean}     is_limit_exceeded  Whether host limit is exceeded or not.
+	 * @param {string|null} selected_hostid    ID of selected host
 	 */
-	setValue({hosts, maintenances, is_limit_exceeded}) {
+	setValue({hosts, maintenances, is_limit_exceeded, selected_hostid}) {
 		if (this.#container !== null) {
 			this.#reset();
 		}
@@ -104,7 +98,7 @@ class CHostNavigator {
 		this.#prepareNodesProperties(this.#nodes);
 
 		this.#navigation_tree = new CNavigationTree(this.#nodes, {
-			selected_id: this.#selected_host_id,
+			selected_id: selected_hostid,
 			show_problems: this.#config.show_problems,
 			severities: this.#config.severities
 		});
@@ -117,14 +111,6 @@ class CHostNavigator {
 		}
 
 		this.#activateListeners();
-
-		const first_selected_host = this.#container.querySelector(
-			`.${CNavigationTree.ZBX_STYLE_NODE}[data-id="${this.#selected_host_id}"]`
-		);
-
-		if (this.#selected_host_id !== '' && first_selected_host === null) {
-			this.#selected_host_id = '';
-		}
 	}
 
 	/**
@@ -437,8 +423,6 @@ class CHostNavigator {
 	#registerListeners() {
 		this.#listeners = {
 			hostSelect: e => {
-				this.#selected_host_id = e.detail.id;
-
 				this.#container.dispatchEvent(new CustomEvent(CHostNavigator.EVENT_HOST_SELECT, {
 					detail: {
 						hostid: e.detail.id
@@ -504,5 +488,14 @@ class CHostNavigator {
 		this.#navigation_tree = null;
 		this.#nodes = [];
 		this.#maintenances = {};
+	}
+
+	/**
+	 * Select item of navigation tree.
+	 *
+	 * @param {string} item_id  ID of item to select.
+	 */
+	selectItem(item_id) {
+		this.#navigation_tree.selectItem(item_id);
 	}
 }

@@ -128,7 +128,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$search_field = $this->isTemplateDashboard() ? 'name' : 'name_resolved';
 
 		$options = [
-			'output' => ['itemid', 'hostid', 'name_resolved'],
+			'output' => ['itemid', 'hostid', 'name_resolved', 'key_'],
 			'webitems' => true,
 			'evaltype' => $this->fields_values['item_tags_evaltype'],
 			'tags' => $this->fields_values['item_tags'] ?: null,

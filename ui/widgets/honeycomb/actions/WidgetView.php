@@ -107,7 +107,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$search_field = $this->isTemplateDashboard() ? 'name' : 'name_resolved';
 
 		$options = [
-			'output' => ['itemid', 'hostid', 'units', 'value_type', 'name_resolved'],
+			'output' => ['itemid', 'hostid', 'units', 'value_type', 'name_resolved', 'key_'],
 			'selectHosts' => ['name'],
 			'webitems' => true,
 			'hostids' => $hostids,
@@ -184,7 +184,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'secondary_label' => $secondary_label,
 					'value' => $last_value,
 					'is_numeric' => in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]),
-					'is_binary_units' => isBinaryUnits($item['units'])
+					'is_binary_units' => isBinaryUnits($item['units']),
+					'key_' => $item['key_'],
 				];
 
 				if (count($cells) == $limit) {

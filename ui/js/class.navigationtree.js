@@ -127,7 +127,7 @@ class CNavigationTree {
 			`);
 
 			if (node !== null) {
-				this.#selectItem(node);
+				this.selectItem(node.dataset.id);
 			}
 		}
 	}
@@ -467,7 +467,7 @@ class CNavigationTree {
 				}
 
 				if (node.classList.contains(CNavigationTree.ZBX_STYLE_NODE_IS_ITEM)) {
-					this.#selectItem(node);
+					this.selectItem(node.dataset.id);
 				}
 				else if (e.target.closest(`.${CNavigationTree.ZBX_STYLE_NODE_INFO_ARROW} button`)) {
 					this.#toggleGroup(node);
@@ -486,17 +486,26 @@ class CNavigationTree {
 	/**
 	 * Select item of navigation tree.
 	 *
-	 * @param {HTMLElement} node  Node element of item to select.
+	 * @param {string} item_id  ID of item to select.
 	 */
-	#selectItem(node) {
-		this.#selected_id = node.dataset.id;
+	selectItem(item_id) {
+		this.#selected_id = item_id;
 
 		const item_nodes = this.#container.querySelectorAll(`.${CNavigationTree.ZBX_STYLE_NODE_IS_ITEM}`);
 
 		for (const item_node of item_nodes) {
-			item_node.classList.toggle(CNavigationTree.ZBX_STYLE_NODE_IS_SELECTED,
-				item_node.dataset.id === this.#selected_id
-			);
+			if (item_node.dataset.id === this.#selected_id) {
+				item_node.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_SELECTED);
+
+				const item_group = item_node.closest(`.${CNavigationTree.ZBX_STYLE_NODE_IS_GROUP}`);
+
+				if (item_group !== null) {
+					this.#toggleGroup(item_group, true);
+				}
+			}
+			else {
+				item_node.classList.remove(CNavigationTree.ZBX_STYLE_NODE_IS_SELECTED);
+			}
 		}
 
 		this.#container.dispatchEvent(new CustomEvent(CNavigationTree.EVENT_ITEM_SELECT, {
@@ -509,32 +518,38 @@ class CNavigationTree {
 	/**
 	 * Toggle group of navigation tree.
 	 *
-	 * @param {HTMLElement} node  Node element of group to toggle.
+	 * @param {HTMLElement}  node   Node element of group to toggle.
+	 * @param {boolean|null} force  If included, turns the toggle into a one-way only operation.
 	 */
-	#toggleGroup(node) {
-		const arrow = node.querySelector(`.${CNavigationTree.ZBX_STYLE_NODE_INFO_ARROW} button`);
-		let is_open = false;
+	#toggleGroup(node, force = null) {
+		const toggle_group = (element, is_open) => {
+			element.classList.toggle(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN, is_open);
 
-		if (node.classList.contains(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN)) {
-			node.classList.remove(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
-			arrow.querySelector('span').classList.replace(ZBX_STYLE_ARROW_DOWN, ZBX_STYLE_ARROW_RIGHT);
+			const arrow = element.querySelector(`.${CNavigationTree.ZBX_STYLE_NODE_INFO_ARROW} span`);
+			arrow.classList.toggle(ZBX_STYLE_ARROW_DOWN, is_open);
+			arrow.classList.toggle(ZBX_STYLE_ARROW_RIGHT, !is_open);
 
-			const inner_open_nodes = node.querySelectorAll(`.${CNavigationTree.ZBX_STYLE_NODE_IS_OPEN}`);
-
-			for (const inner_open_node of inner_open_nodes) {
-				inner_open_node.classList.remove(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
-
-				const inner_arrow = inner_open_node
-					.querySelector(`.${CNavigationTree.ZBX_STYLE_NODE_INFO_ARROW} button`);
-
-				inner_arrow.querySelector('span').classList.replace(ZBX_STYLE_ARROW_DOWN, ZBX_STYLE_ARROW_RIGHT);
+			if (!is_open) {
+				for (const inner_open_node of node.querySelectorAll(`.${CNavigationTree.ZBX_STYLE_NODE_IS_OPEN}`)) {
+					toggle_group(inner_open_node, false);
+				}
 			}
 		}
-		else {
-			node.classList.add(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
-			arrow.querySelector('span').classList.replace(ZBX_STYLE_ARROW_RIGHT, ZBX_STYLE_ARROW_DOWN);
 
-			is_open = true;
+		const is_open = force ?? !node.classList.contains(CNavigationTree.ZBX_STYLE_NODE_IS_OPEN);
+
+		toggle_group(node, is_open);
+
+		if (is_open) {
+			let parent = node.parentElement;
+
+			while (parent !== null && !parent.classList.contains(CNavigationTree.ZBX_STYLE_CLASS)) {
+				if (parent.classList.contains(CNavigationTree.ZBX_STYLE_NODE_IS_GROUP)) {
+					toggle_group(parent, true);
+				}
+
+				parent = parent.parentElement;
+			}
 		}
 
 		this.#container.dispatchEvent(new CustomEvent(CNavigationTree.EVENT_GROUP_TOGGLE, {

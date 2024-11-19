@@ -1026,4 +1026,13 @@ class CSVGHoneycomb {
 
 		return {max_rows, max_columns};
 	}
+
+	/**
+	 * Get cells data.
+	 *
+	 * @returns {Array|null}
+	 */
+	getCellsData () {
+		return this.#cells_data;
+	}
 }

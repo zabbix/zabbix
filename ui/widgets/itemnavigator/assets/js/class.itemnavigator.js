@@ -69,13 +69,6 @@ class CItemNavigator {
 	#listeners = {};
 
 	/**
-	 * ID of selected item.
-	 *
-	 * @type {string}
-	 */
-	#selected_item_id = '';
-
-	/**
 	 * @param {Object} config  Widget configuration.
 	 */
 	constructor(config) {
@@ -90,11 +83,12 @@ class CItemNavigator {
 	/**
 	 * Set list of items.
 	 *
-	 * @param {Array}   items              Array of items and their info.
-	 * @param {Array}   hosts              All hosts to which retrieved items belong.
-	 * @param {boolean} is_limit_exceeded  Whether item limit is exceeded or not.
+	 * @param {Array}       items              Array of items and their info.
+	 * @param {Array}       hosts              All hosts to which retrieved items belong.
+	 * @param {boolean}     is_limit_exceeded  Whether item limit is exceeded or not.
+	 * @param {string|null} selected_itemid    ID of selected item.
 	 */
-	setValue({items, hosts, is_limit_exceeded}) {
+	setValue({items, hosts, is_limit_exceeded, selected_itemid}) {
 		if (this.#container !== null) {
 			this.#reset();
 		}
@@ -105,7 +99,7 @@ class CItemNavigator {
 		this.#prepareNodesProperties(this.#nodes);
 
 		this.#navigation_tree = new CNavigationTree(this.#nodes, {
-			selected_id: this.#selected_item_id,
+			selected_id: selected_itemid,
 			show_problems: this.#config.show_problems,
 			severities: this.#config.severities
 		});
@@ -118,14 +112,6 @@ class CItemNavigator {
 		}
 
 		this.#activateListeners();
-
-		const first_selected_item = this.#container.querySelector(
-			`.${CNavigationTree.ZBX_STYLE_NODE}[data-id="${this.#selected_item_id}"]`
-		);
-
-		if (this.#selected_item_id !== '' && first_selected_item === null) {
-			this.#selected_item_id = '';
-		}
 	}
 
 	/**
@@ -405,8 +391,6 @@ class CItemNavigator {
 	#registerListeners() {
 		this.#listeners = {
 			itemSelect: e => {
-				this.#selected_item_id = e.detail.id;
-
 				this.#container.dispatchEvent(new CustomEvent(CItemNavigator.EVENT_ITEM_SELECT, {
 					detail: {
 						itemid: e.detail.id
@@ -471,5 +455,14 @@ class CItemNavigator {
 		this.#container.innerHTML = '';
 		this.#navigation_tree = null;
 		this.#nodes = [];
+	}
+
+	/**
+	 * Select item of navigation tree.
+	 *
+	 * @param {string} item_id  ID of item to select.
+	 */
+	selectItem(item_id) {
+		this.#navigation_tree.selectItem(item_id);
 	}
 }

@@ -134,6 +134,7 @@ class CWidgetNavTree extends CWidget {
 
 		if (new_item_id != 0 && this.#markTreeItemSelected(new_item_id)) {
 			this.#openBranch(this.#navtree_item_selected);
+			this.#updateUserProfile();
 
 			return true;
 		}
@@ -486,20 +487,37 @@ class CWidgetNavTree extends CWidget {
 		else {
 			this.#parseProblems();
 
-			if (this.#navtree_item_selected === null
-				|| !jQuery(`.tree-item[data-id=${this.#navtree_item_selected}]`).is(':visible')) {
-				this.#navtree_item_selected = jQuery('.tree-item:visible', jQuery(this._target))
-					.not('[data-sysmapid="0"]')
-					.first()
-					.data('id');
-			}
+			if (!this.hasEverUpdated() && this.isReferred()) {
+				const item_selected = this.#getDefaultSelectable();
 
-			this.broadcast({
-				[CWidgetsData.DATA_TYPE_MAP_ID]: this.#markTreeItemSelected(this.#navtree_item_selected)
-					? [this.#navtree[this.#navtree_item_selected].sysmapid]
-					: CWidgetsData.getDefault(CWidgetsData.DATA_TYPE_MAP_ID)
-			});
+				if (this.#markTreeItemSelected(item_selected)) {
+					this.#updateUserProfile();
+					this.#broadcast();
+				}
+			}
+			else if (this.#navtree_item_selected !== null) {
+				this.#markTreeItemSelected(this.#navtree_item_selected);
+			}
 		}
+	}
+
+	#getDefaultSelectable() {
+		return jQuery('.tree-item:visible', jQuery(this._target))
+			.not('[data-sysmapid="0"]')
+			.first()
+			.data('id');
+	}
+
+	#broadcast() {
+		this.broadcast({
+			[CWidgetsData.DATA_TYPE_MAP_ID]: [this.#navtree[this.#navtree_item_selected].sysmapid]
+		});
+	}
+
+	#updateUserProfile() {
+		updateUserProfile('web.dashboard.widget.navtree.item.selected',
+			this.#navtree_item_selected, [this.getWidgetId()]
+		);
 	}
 
 	#removeTree() {
@@ -549,7 +567,7 @@ class CWidgetNavTree extends CWidget {
 		const selected_item = document.getElementById(`${this.getUniqueId()}_tree-item-${itemid}`);
 		const item = this.#navtree[itemid];
 
-		if (item === undefined || selected_item === null || item === this.#navtree_item_selected) {
+		if (item === undefined || selected_item === null) {
 			return false;
 		}
 
@@ -565,10 +583,6 @@ class CWidgetNavTree extends CWidget {
 			step_in_path.classList.add('selected');
 			step_in_path = step_in_path.parentNode.closest('.tree-item');
 		}
-
-		updateUserProfile('web.dashboard.widget.navtree.item.selected',
-			this.#navtree_item_selected, [this.getWidgetId()]
-		);
 
 		return true;
 	}
@@ -1026,13 +1040,8 @@ class CWidgetNavTree extends CWidget {
 				if (this.#markTreeItemSelected(itemid)) {
 					this.#openBranch(this.#navtree_item_selected);
 
-					updateUserProfile('web.dashboard.widget.navtree.item.selected', this.#navtree_item_selected,
-						[this.getWidgetId()]
-					);
-
-					this.broadcast({
-						[CWidgetsData.DATA_TYPE_MAP_ID]: [this.#navtree[this.#navtree_item_selected].sysmapid]
-					});
+					this.#updateUserProfile();
+					this.#broadcast();
 				}
 
 				e.preventDefault();
