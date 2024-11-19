@@ -185,7 +185,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'value' => $last_value,
 					'is_numeric' => in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]),
 					'is_binary_units' => isBinaryUnits($item['units']),
-					'key_' => $item['key_'],
+					'key_' => $item['key_']
 				];
 
 				if (count($cells) == $limit) {
