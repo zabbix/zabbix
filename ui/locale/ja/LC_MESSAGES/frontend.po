@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2024-05-17 05:24+0000\n"
+"PO-Revision-Date: 2024-11-18 07:16+0000\n"
 "Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -9196,7 +9196,7 @@ msgstr "\"%1$s\"フィールドのための値が正しくありません。"
 #: include/validate.inc.php:332
 #, c-format
 msgid "Incorrect value for field \"%1$s\": %2$s."
-msgstr "フィールド\"%1$s\": %2$sの値が正しくありません。"
+msgstr "フィールド\"%1$s\"の値が正しくありません: %2$s。"
 
 #: include/classes/api/services/CProxy.php:590
 msgid "Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters."
@@ -16097,7 +16097,7 @@ msgstr "ソースの種類"
 
 #: include/locales.inc.php:75
 msgid "Spanish (es_ES)"
-msgstr "スペイン語(es_ES)"
+msgstr "スペイン語 (es_ES)"
 
 #: include/classes/api/services/CAction.php:1852
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
