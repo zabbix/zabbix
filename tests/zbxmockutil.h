@@ -40,6 +40,4 @@ void	zbx_mock_str_to_token_search(const char *str, int *out);
 int	zbx_mock_str_to_item_type(const char *str);
 int	zbx_mock_str_to_family(const char *str);
 
-int	zbx_mock_get_parameter_int(const char *path);
-
 #endif
