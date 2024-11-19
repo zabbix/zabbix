@@ -29,15 +29,16 @@
 #define ASYNC_WORKER_INIT_NONE		0x00
 #define ASYNC_WORKER_INIT_THREAD	0x01
 
-static zbx_poller_item_t	*dc_config_async_get_poller_items(const zbx_async_queue_t *queue)
+static zbx_poller_item_t	*dc_config_async_get_poller_items(zbx_uint64_t processing_num,
+		unsigned char poller_type, int config_timeout, zbx_uint64_t processing_limit)
 {
 	zbx_poller_item_t	*poller_item;
 
 	poller_item = zbx_malloc(NULL, sizeof(zbx_poller_item_t));
 	poller_item->items = NULL;
 
-	poller_item->num = zbx_dc_config_get_poller_items(queue->poller_type, queue->config_timeout,
-			queue->processing_num, queue->processing_limit, &poller_item->items);
+	poller_item->num = zbx_dc_config_get_poller_items(poller_type, config_timeout,
+			processing_num, processing_limit, &poller_item->items);
 
 	if (0 != poller_item->num)
 	{
@@ -162,6 +163,14 @@ static void	*async_worker_entry(void *args)
 	zbx_vector_int32_create(&errcodes);
 	zbx_vector_int32_create(&lastclocks);
 
+	const unsigned char	poller_type = queue->poller_type;
+	const zbx_uint64_t	processing_limit = queue->processing_limit;
+	zbx_uint64_t		queue_poller_items_values_num, processing_num = queue->processing_num;
+	const int		config_timeout = queue->config_timeout,
+				config_unavailable_delay = queue->config_unavailable_delay,
+				config_unreachable_period = queue->config_unreachable_period,
+				config_unreachable_delay = queue->config_unreachable_delay;
+
 	while (0 == worker->stop)
 	{
 		zbx_poller_item_t	*poller_item = NULL;
@@ -191,15 +200,17 @@ static void	*async_worker_entry(void *args)
 			zbx_vector_int32_clear(&queue->lastclocks);
 			zbx_vector_int32_clear(&queue->errcodes);
 
-			queue->processing_num -= itemids.values_num;
+			processing_num = queue->processing_num -= itemids.values_num;
 		}
+
+		queue_poller_items_values_num = queue->poller_items.values_num;
 
 		async_task_queue_unlock(queue);
 
 		if (0 != interfaces.values_num)
 		{
-			poller_update_interfaces(&interfaces, queue->config_unavailable_delay,
-					queue->config_unreachable_period, queue->config_unreachable_delay);
+			poller_update_interfaces(&interfaces, config_unavailable_delay,
+					config_unreachable_period, config_unreachable_delay);
 			zbx_vector_interface_status_clear_ext(&interfaces, zbx_interface_status_free);
 		}
 
@@ -208,7 +219,7 @@ static void	*async_worker_entry(void *args)
 			int	nextcheck;
 
 			zbx_dc_poller_requeue_items(itemids.values, lastclocks.values, errcodes.values,
-					(size_t)itemids.values_num, queue->poller_type, &nextcheck);
+					(size_t)itemids.values_num, poller_type, &nextcheck);
 
 			if (FAIL == nextcheck || nextcheck > time(NULL))
 				check_queue = 0;
@@ -225,17 +236,18 @@ static void	*async_worker_entry(void *args)
 		/* only check queue if requested to preserve resources */
 		if (1 == check_queue)
 		{
-			poller_item = dc_config_async_get_poller_items(queue);
+			poller_item = dc_config_async_get_poller_items(processing_num, poller_type, config_timeout,
+					processing_limit);
 
 			zabbix_log(LOG_LEVEL_DEBUG, "queue processing_num:" ZBX_FS_UI64 " pending:%d",
-					queue->processing_num, queue->poller_items.values_num);
+					processing_num, queue_poller_items_values_num);
 		}
 
 		async_task_queue_lock(queue);
 
 		if (NULL != poller_item)
 		{
-			queue->processing_num += poller_item->num;
+			processing_num = queue->processing_num += poller_item->num;
 			zbx_vector_poller_item_append(&queue->poller_items, poller_item);
 
 			if (NULL != worker->finished_cb)
