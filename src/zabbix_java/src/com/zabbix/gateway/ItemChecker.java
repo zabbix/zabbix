@@ -67,6 +67,10 @@ abstract class ItemChecker
 		}
 	}
 
+	protected final void finalize() throws Throwable
+	{
+	}
+
 	JSONArray getValues() throws ZabbixException
 	{
 		JSONArray values = new JSONArray();
