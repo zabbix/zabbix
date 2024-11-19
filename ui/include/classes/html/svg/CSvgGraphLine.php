@@ -74,8 +74,16 @@ class CSvgGraphLine extends CSvgPath {
 			if ($this->add_labels) {
 				$line_values = '';
 
-				foreach ($this->path as $point) {
-					$line_values .= ($line_values === '') ? $point[2] : ','.$point[2];
+				// Every point needs a label, in case of a "no value" point that can happen on stacked graphs
+				// no actual value is assigned, but the comma is still added for marking the point as empty and
+				// that that's not a real value point, in case this doesn't happen the order of points becomes messed up
+				// and actual value will assign itself to empty "non-value" points
+
+				foreach ($this->path as $key => $point) {
+					$line_values .= $point[2];
+					if ($key !== array_key_last($this->path)) {
+						$line_values .= ',';
+					}
 				}
 
 				$this->setAttribute('label', $line_values);
