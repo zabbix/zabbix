@@ -1003,6 +1003,10 @@ class CMacrosResolverGeneral {
 							$value = date('H:i:s', $history[$itemid][0]['timestamp']);
 							break;
 
+						case 'ITEM.LOG.TIMESTAMP':
+							$value = $history[$itemid][0]['timestamp'];
+							break;
+
 						case 'ITEM.LOG.AGE':
 							$value = zbx_date2age($history[$itemid][0]['timestamp']);
 							break;
@@ -1256,21 +1260,31 @@ class CMacrosResolverGeneral {
 					case 'ITEM.LOG.DATE':
 						$value = date('Y.m.d', $history[$function['itemid']][0]['timestamp']);
 						break;
+
 					case 'ITEM.LOG.TIME':
 						$value = date('H:i:s', $history[$function['itemid']][0]['timestamp']);
 						break;
+
+					case 'ITEM.LOG.TIMESTAMP':
+						$value = $history[$function['itemid']][0]['timestamp'];
+						break;
+
 					case 'ITEM.LOG.AGE':
 						$value = zbx_date2age($history[$function['itemid']][0]['timestamp']);
 						break;
+
 					case 'ITEM.LOG.SOURCE':
 						$value = $history[$function['itemid']][0]['source'];
 						break;
+
 					case 'ITEM.LOG.SEVERITY':
 						$value = get_item_logtype_description($history[$function['itemid']][0]['severity']);
 						break;
+
 					case 'ITEM.LOG.NSEVERITY':
 						$value = $history[$function['itemid']][0]['severity'];
 						break;
+
 					case 'ITEM.LOG.EVENTID':
 						$value = $history[$function['itemid']][0]['logeventid'];
 						break;
@@ -2208,7 +2222,7 @@ class CMacrosResolverGeneral {
 		}
 
 		$db_interfaces = API::HostInterface()->get([
-			'output' => ['hostid', 'type', 'useip', 'ip', 'dns'],
+			'output' => ['hostid', 'type', 'useip', 'ip', 'dns', 'port'],
 			'hostids' => array_keys($hostids),
 			'filter' => ['main' => INTERFACE_PRIMARY]
 		]);
@@ -2232,7 +2246,9 @@ class CMacrosResolverGeneral {
 		}
 		unset($host_interface);
 
-		$interface_macros = ['IPADDRESS' => 'ip', 'HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn'];
+		$interface_macros = ['IPADDRESS' => 'ip', 'HOST.IP' => 'ip', 'HOST.DNS' => 'dns', 'HOST.CONN' => 'conn',
+			'HOST.PORT' => 'port'
+		];
 
 		foreach ($macros as $triggerid => $macro_data) {
 			if (!array_key_exists($triggerid, $trigger_hosts_by_f_num)) {
