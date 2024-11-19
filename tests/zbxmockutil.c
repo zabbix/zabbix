@@ -436,3 +436,19 @@ int	zbx_mock_str_to_family(const char *str)
 	return AF_UNSPEC;
 }
 
+int	zbx_mock_get_parameter_int(const char *path)
+{
+	zbx_mock_error_t	err;
+	zbx_mock_handle_t	handle;
+	int			parameter;
+
+	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_parameter(path, &handle)) ||
+			ZBX_MOCK_SUCCESS != (err = zbx_mock_int(handle, &parameter)))
+	{
+		fail_msg("Cannot read parameter at \"%s\": %s", path, zbx_mock_error_string(err));
+
+		return 0;
+	}
+
+	return parameter;
+}

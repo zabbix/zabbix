@@ -1,0 +1,85 @@
+---
+test case: "1. Empty string"
+in:
+  string: ""
+out:
+  return: FAIL
+---
+test case: "2. 127.0.0.1"
+in:
+  string: "127.0.0.1"
+out:
+  return: SUCCEED
+---
+test case: "3. Random private ipv4"
+in:
+  string: "203.0.113.76"
+out:
+  return: SUCCEED
+---
+test case: "4. Random private ipv6"
+in:
+  string: "2001:0db8:85a3:0000:0000:8a2e:0370:7334"
+out:
+  return: SUCCEED
+---
+test case: "5. DNS ipv6"
+in:
+  string: "2001:4860:4860::1111"
+out:
+  return: SUCCEED
+---
+test case: "6. Definitely not ip"
+in:
+  string: 'qwertyuiopasdfghjkl!@#$[]::::::::   ....///\\\\\\'
+out:
+  return: FAIL
+---
+test case: "7. ---------------------------------------"
+in:
+  string: "---------------------------------------"
+out:
+  return: FAIL
+---
+test case: "8. ipv4 wildcard-unspecified address"
+in:
+  string: "0.0.0.0"
+out:
+  return: SUCCEED
+---
+test case: '9. ipv6 double "::" usage'
+in:
+  string: "2001::4860::1111"
+out:
+  return: FAIL
+---
+test case: '10. ipv6 null address'
+in:
+  string: "0:0:0:0:0:0:0:0"
+out:
+  return: SUCCEED
+---
+test case: '11. 256.256.256.256'
+in:
+  string: "256.256.256.256"
+out:
+  return: FAIL
+---
+test case: '12. invalid ipv6'
+in:
+  string: "xxff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
+out:
+  return: FAIL
+---
+test case: '13. ipv4 with subnet mask'
+in:
+  string: "255.255.255.1/24"
+out:
+  return: FAIL
+---
+test case: '13. ipv4 with with newline'
+in:
+  string: "255.255\n.255.255"
+out:
+  return: FAIL
+...

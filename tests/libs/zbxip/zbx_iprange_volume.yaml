@@ -1,0 +1,43 @@
+---
+test case: "1. ipv4 CIDR /24"
+in:
+  address: "192.168.1.0/24"
+out:
+  return: 254
+---
+test case: "2. ipv6 CIDR /120"
+in:
+  address: "2001:0db8:85a3::/120"
+out:
+  return: 256
+---
+test case: "3. ipv4 CIDR /8"
+in:
+  address: "192.168.1.0/8"
+out:
+  return: 16777214
+---
+test case: "4. ipv4 CIDR /16"
+in:
+  address: "192.168.1.0/16"
+out:
+  return: 65534
+---
+test case: "5. ipv6 CIDR /126"
+in:
+  address: "2001:0db8:85a3::/126"
+out:
+  return: 4
+---
+test case: "6. ipv4 127.0.0.0-10"
+in:
+  address: "127.0.0.0-10"
+out:
+  return: 11
+---
+test case: "7. ipv6 0000:0000:0000-0002:0000:0000:0000:0000:0000-0002"
+in:
+  address: "0000:0000:0000-0002:0000:0000:0000:0000:0000-0002"
+out:
+  return: 9
+...

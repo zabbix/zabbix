@@ -32,4 +32,5 @@ SUBDIRS = \
 	zbxeval \
 	zbxfile \
 	zbxodbc \
-	zbxhttp
+	zbxhttp \
+	zbxip

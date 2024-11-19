@@ -1,0 +1,85 @@
+---
+test case: "1. ipv4"
+in:
+  address: "192.168.1.0/24"
+out:
+  return: SUCCEED
+---
+test case: "2. Definitely not ip"
+in:
+  address: "jadfjagpldfkgp[dgkpedf]...||\n........//"
+out:
+  return: FAIL
+---
+test case: "3. ipv4 with letter"
+in:
+  address: '192.16d.1.0/24'
+out:
+  return: FAIL
+---
+test case: "4. ipv6"
+in:
+  address: "2001:0db8:85a3::/64"
+out:
+  return: SUCCEED
+---
+test case: "5. ipv6 5 characters"
+in:
+  address: "2001:0db8d:85a3::/64"
+out:
+  return: SUCCEED
+---
+test case: "6. 0.0.0.0-1"
+in:
+  address: "0.0.0.0-1"
+out:
+  return: SUCCEED
+---
+test case: "7. ::/65"
+in:
+  address: "::/65"
+out:
+  return: SUCCEED
+---
+test case: "8. 123 123"
+in:
+  address: "123\n123"
+out:
+  return: FAIL
+---
+test case: "9. ipv6 / - without mask"
+in:
+  address: "2001:0db8:85a3::/"
+out:
+  return: FAIL
+---
+test case: "10. ipv6 / with quote"
+in:
+  address: "2001:0db8:85a'::0001"
+out:
+  return: FAIL
+---
+test case: 11. ipv6 / with quote double quotes
+in:
+  address: 2001:0"db"8:85a::0001
+out:
+  return: FAIL
+---
+test case: 12. 192.168.0.1 with newline
+in:
+  address: "192.168.\n0.1-5"
+out:
+  return: FAIL
+---
+test case: 13. ipv6 subnet mask /641
+in:
+  address: "2001:0db8d:85a3::/641"
+out:
+  return: FAIL
+---
+test case: 14. ipv6 with g letter
+in:
+  address: "2001:2001:2001:2001:2001:2001:2001:200g/64"
+out:
+  return: FAIL
+...

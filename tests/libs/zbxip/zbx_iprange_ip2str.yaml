@@ -1,0 +1,26 @@
+---
+test case: "1. ipv4"
+in:
+  type: 0
+  ip: "192.168.1.1"
+---
+test case: "2. ipv6"
+in:
+  type: 1
+  ip: "2001:db8:85a3:0:0:8a2e:370:7334"
+---
+test case: "3. ipv4"
+in:
+  type: 0
+  ip: "1.1.1.1"
+---
+test case: "4. ipv6"
+in:
+  type: 1
+  ip: "a1:a1:a1:0:0:a1:a1:a1"
+---
+test case: "5. ipv6"
+in:
+  type: 1
+  ip: "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
+...

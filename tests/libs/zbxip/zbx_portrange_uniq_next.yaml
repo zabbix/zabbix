@@ -1,0 +1,34 @@
+---
+test case: "1. Two groups port range"
+in:
+  num: 2
+  range: "1-2"
+  range1: "2-4"
+out:
+  port:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+---
+test case: "2. Two ranges single value min max"
+in:
+  num: 2
+  range: "1"
+  range1: "65534"
+out:
+  port:
+  - '1'
+  - '65534'
+---
+test case: "3. One range above max port(65534)"
+in:
+  num: 1
+  range: "70000-70002"
+  range1: ""
+out:
+  port:
+  - '70000'
+  - '70001'
+  - '70002'
+...

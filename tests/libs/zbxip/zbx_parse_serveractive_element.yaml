@@ -1,0 +1,55 @@
+---
+test case: "1. 192.168.0.1:10051"
+in:
+  str: "192.168.0.1:10051"
+  ipv: 0
+out:
+  return: SUCCEED
+  host: "192.168.0.1"
+  port: 10051
+---
+test case: "2. 192.168.0.1"
+in:
+  str: "192.168.0.1"
+  ipv: 0
+out:
+  return: SUCCEED
+  host: "192.168.0.1"
+  port: 80
+---
+test case: "3. [::1]:10051"
+in:
+  str: "[::1]:10051"
+  ipv: 1
+out:
+  return: SUCCEED
+  host: "::1"
+  port: 10051
+---
+test case: "4. [::1]"
+in:
+  str: "[::1]"
+  ipv: 1
+out:
+  return: SUCCEED
+  host: "::1"
+  port: 80
+---
+test case: "5. 3f4b:12a9:89cd:64ef:9a72:1d3c:ba54:ff23"
+in:
+  str: "3f4b:12a9:89cd:64ef:9a72:1d3c:ba54:ff23"
+  ipv: 1
+out:
+  return: SUCCEED
+  host: "3f4b:12a9:89cd:64ef:9a72:1d3c:ba54:ff23"
+  port: 80
+---
+test case: "4. ::ZZ"
+in:
+  str: "::ZZ"
+  ipv: 1
+out:
+  return: FAIL
+  host: "::ZZ"
+  port: 80
+...

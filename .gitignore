@@ -203,6 +203,16 @@ tests/libs/zbxexpression/evaluate_value_by_map
 tests/libs/zbxfile/zbx_buf_readln
 tests/libs/zbxhistory/zbx_history_get_values
 tests/libs/zbxhttp/zbx_determine_charset
+test/libs/zbxip/zbx_ip_in_list
+test/libs/zbxip/zbx_is_ip
+test/libs/zbxip/zbx_is_supported_ip
+test/libs/zbxip/zbx_iprange_ip2str
+test/libs/zbxip/zbx_iprange_parse
+test/libs/zbxip/zbx_iprange_volume
+test/libs/zbxip/zbx_iprange_uniq_iter
+test/libs/zbxip/zbx_iprange_uniq_next
+test/libs/zbxip/zbx_parse_serveractive_element
+test/libs/zbxip/zbx_portrange_uniq_next
 tests/libs/zbxicmpping/get_interval_option
 tests/libs/zbxicmpping/line_process
 tests/libs/zbxjson/zbx_json_decodevalue

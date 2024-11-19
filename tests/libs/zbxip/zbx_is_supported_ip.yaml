@@ -1,0 +1,57 @@
+---
+test case: "1. Empty string"
+in:
+  string: ""
+  ipv: 0
+out:
+  return: FAIL
+---
+test case: "2. Random private ipv4"
+in:
+  string: "203.0.113.76"
+  ipv: 0
+out:
+  return: SUCCEED
+---
+test case: "3. Random private ipv6"
+in:
+  string: "2001:0db8:85a3:0000:0000:8a2e:0370:7334"
+  ipv: 1
+out:
+  return: SUCCEED
+---
+test case: "4. Definitely not ip"
+in:
+  string: "qwertyuiopasdfghjkl!@#$..''::\"::;;;;  \\n\\t\\r"
+  ipv: 0
+out:
+  return: FAIL
+---
+test case: "5. DNS ipv6"
+in:
+  string: "2001:4860:4860::1234"
+  ipv: 1
+out:
+  return: SUCCEED
+---
+test case: "6. Invalid ipv4"
+in:
+  string: "256.256.256.256"
+  ipv: 0
+out:
+  return: FAIL
+---
+test case: "6. Invalid ipv6"
+in:
+  string: "xxff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"
+  ipv: 1
+out:
+  return: FAIL
+---
+test case: '7. ipv4 with with newline'
+in:
+  string: "255.255.255.255\n"
+  ipv: 0
+out:
+  return: FAIL
+...
