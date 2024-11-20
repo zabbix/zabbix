@@ -1,0 +1,67 @@
+// Widget configuration.
+
+form.dashboard-widget-topitems {
+	.fields-group {
+		&.fields-group-item-ordering,
+		&.fields-group-host-ordering {
+			display: grid;
+			grid-template-columns: minmax(85px, max-content) 429px;
+			align-items: center;
+			column-gap: 10px;
+			row-gap: 5px;
+		}
+	}
+
+	#list_columns {
+		line-height: $body-line-height;
+
+		.text {
+			@extend %overflow-ellipsis;
+			max-width: 400px;
+		}
+	}
+}
+
+// Widget view.
+
+div.dashboard-widget-topitems {
+	$bar-gauge-height: 20px;
+
+	.list-table {
+		th.center {
+			text-align: center;
+		}
+
+		tr[data-hostid] {
+			cursor: pointer;
+		}
+	}
+
+	td {
+		line-height: $bar-gauge-height;
+		height: $bar-gauge-height;
+	}
+
+	td[class] {
+		+ {
+			td.na-bg,
+			td.normal-bg,
+			td.info-bg,
+			td.average-bg,
+			td.warning-bg,
+			td.high-bg,
+			td.disaster-bg {
+				border-left: 0 none;
+			}
+		}
+	}
+
+	.link-action {
+		white-space: nowrap;
+	}
+
+	z-bar-gauge {
+		min-width: 64px;
+		height: $bar-gauge-height;
+	}
+}

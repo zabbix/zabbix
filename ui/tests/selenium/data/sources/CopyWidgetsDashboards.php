@@ -176,8 +176,8 @@ class CopyWidgetsDashboards {
 								]
 							],
 							[
-								'name' => 'Test copy Data overview',
-								'type' => 'dataover',
+								'name' => 'Test copy Top items',
+								'type' => 'topitems',
 								'x' => 54,
 								'y' => 4,
 								'width' => 18,
@@ -187,16 +187,16 @@ class CopyWidgetsDashboards {
 									[
 										'type' => 0,
 										'name' => 'rf_rate',
-										'value' => '0'
+										'value' => 0
 									],
 									[
 										'type' => 0,
-										'name' => 'show_suppressed',
-										'value' => 1
+										'name' => 'problems',
+										'value' => 0
 									],
 									[
 										'type' => 0,
-										'name' => 'style',
+										'name' => 'layout',
 										'value' => 1
 									],
 									[
@@ -213,6 +213,11 @@ class CopyWidgetsDashboards {
 										'type' => 3,
 										'name' => 'hostids',
 										'value' => 50012
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.items.0',
+										'value' => 'Test_item'
 									]
 								]
 							],
@@ -769,7 +774,7 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 0,
-										'name' => 'style',
+										'name' => 'layout ',
 										'value' => 1
 									],
 									[

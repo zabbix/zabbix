@@ -48,7 +48,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	private static $widget_descriptions = [
 		'Action log' => 'Displays records about executed action operations (notifications, remote commands).',
 		'Clock' => 'Displays local, server, or specified host time.',
-		'Data overview' => 'Displays the latest item data and current status of each item for selected hosts.',
 		'Discovery status' => 'Displays the status summary of the active network discovery rules.',
 		'Favorite graphs' => 'Displays shortcuts to the most needed graphs (marked as favorite).',
 		'Favorite maps' => 'Displays shortcuts to the most needed network maps (marked as favorite).',
@@ -79,6 +78,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				'associated components.',
 		'Top hosts' => 'Displays top N hosts that have the highest or the lowest item value (for example, CPU load) '.
 				'with an option to add progress-bar visualizations and customize report columns.',
+		'Top items' => 'Displays the latest item data and current status of each item for selected hosts.',
 		'Top triggers' => 'Displays top N triggers that have the most problems within the period of evaluation,'.
 				' sorted by the number of problems.',
 		'Trigger overview' => 'Displays trigger states for selected hosts.',

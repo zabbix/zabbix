@@ -115,11 +115,11 @@ class testDashboardsWidgetsPage extends CWebTest {
 
 		// Opening edit widget form and change widget type.
 		$change_form = $dashboard->getWidget('System information')->edit();
-		$change_form->fill(['Type' => 'Data overview']);
+		$change_form->fill(['Type' => 'Trigger overview']);
 		$change_form->waitUntilReloaded();
 		$change_form->submit();
 		// Check that widget type inherited from previous widget.
-		$this->checkLastSelectedWidgetType('Data overview', 'dataover');
+		$this->checkLastSelectedWidgetType('Trigger overview', 'trigover');
 
 		$dashboard->cancelEditing();
 	}

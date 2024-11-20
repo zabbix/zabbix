@@ -39,7 +39,6 @@ use Zabbix\Widgets\Fields\{
  */
 class WidgetForm extends CWidgetForm {
 
-	private const DEFAULT_HOSTS_COUNT = 10;
 	private const DEFAULT_ORDER_COLUMN = 0;
 
 	private array $field_column_values = [];
@@ -160,7 +159,7 @@ class WidgetForm extends CWidgetForm {
 				: (new CWidgetFieldIntegerBox('show_lines', _('Host limit'), ZBX_MIN_WIDGET_LINES,
 					ZBX_MAX_WIDGET_LINES
 				))
-					->setDefault(self::DEFAULT_HOSTS_COUNT)
+					->setDefault(10)
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(

@@ -772,12 +772,16 @@ switch ($data['method']) {
 
 	case 'patternselect.get':
 		$search = (array_key_exists('search', $data) && $data['search'] !== '') ? $data['search'] : null;
+		$hostids = array_key_exists('hostids', $data) ? $data['hostids'] : null;
+		$items = array_key_exists('items', $data) ? $data['items'] : null;
+		$groupids = array_key_exists('groupids', $data) ? getSubGroups($data['groupids']) : null;
 		$wildcard_enabled = array_key_exists('wildcard_allowed', $data) && strpos($search, '*') !== false;
 
 		switch ($data['object_name']) {
 			case 'hosts':
 				$options = [
 					'output' => ['name'],
+					'groupids' => $groupids,
 					'search' => ['name' => $search.($wildcard_enabled ? '*' : '')],
 					'searchWildcardsEnabled' => $wildcard_enabled,
 					'preservekeys' => true,
@@ -789,8 +793,6 @@ switch ($data['method']) {
 				break;
 
 			case 'items':
-				$hostids = null;
-
 				if (array_key_exists('host_pattern', $data)) {
 					$host_pattern_multiple = array_key_exists('host_pattern_multiple', $data)
 						&& $data['host_pattern_multiple'] == 1;
@@ -800,6 +802,8 @@ switch ($data['method']) {
 
 					$hosts = API::Host()->get([
 						'output' => [],
+						'hostids' => $hostids,
+						'groupids' => $groupids,
 						'search' => [
 							'name' => $host_pattern_wildcard_enabled ? $host_patterns : null
 						],
@@ -825,10 +829,17 @@ switch ($data['method']) {
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'hostids' => $hostids,
+					'groupids' => $groupids,
 					'webitems' => true,
 					'sortfield' => 'name',
 					'limit' => $limit
 				];
+
+				if ($items) {
+					$options['search'][$name_field] = [...$items, $options['search'][$name_field]];
+					$options['searchWildcardsEnabled'] = true;
+					$options['searchByAny'] = true;
+				}
 
 				$db_result = API::Item()->get($options);
 

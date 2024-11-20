@@ -2566,7 +2566,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/web_monitoring'
 				]
 			],
-			// #232 Start creating Data overview widget.
+			// #232 Start creating Top items widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2580,8 +2580,8 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'id:dashboard-add-widget'
 						]
 					],
-					'widget_type' => 'Data overview',
-					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/data_overview'
+					'widget_type' => 'Top items',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/top_items'
 				]
 			],
 			// #233 Start creating Gauge widget.

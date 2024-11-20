@@ -352,6 +352,34 @@
 			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
 		}
 
+		executeNow(target, data) {
+			const curl = new Curl('zabbix.php');
+
+			curl.setArgument('action', 'item.execute');
+
+			data[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('item')) ?>;
+
+			return fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify(data)
+			})
+				.then(response => response.json())
+				.then(response => {
+					clearMessages();
+					if (response.error) {
+						addMessage(makeMessageBox('bad', response.error.messages, response.error.title))
+					}
+					else {
+						addMessage(makeMessageBox('good', [], response.success.title))
+					}
+				})
+				.catch(() => {
+					clearMessages();
+					addMessage(makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]));
+				});
+		}
+
 		editHost(hostid) {
 			const host_data = {hostid};
 

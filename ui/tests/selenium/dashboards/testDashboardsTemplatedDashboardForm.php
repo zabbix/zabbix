@@ -520,12 +520,19 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 								'height' => 4
 							],
 							[
-								'type' => 'dataover',
-								'name' => 'Data overview widget',
+								'type' => 'topitems',
+								'name' => 'Top items widget',
 								'x' => 36,
 								'y' => 16,
 								'width' => 12,
-								'height' => 4
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.0.items.0',
+										'value' => 'Test item'
+									]
+								]
 							],
 							[
 								'type' => 'honeycomb',
@@ -2085,10 +2092,10 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							'value' => false
 						],
 						[
-							'field' => 'Host location',
+							'field' => 'Layout',
 							'type' => 'radio_button',
-							'possible_values' => ['Left', 'Top'],
-							'value' => 'Left'
+							'possible_values' => ['Horizontal', 'Vertical'],
+							'value' => 'Horizontal'
 						]
 					]
 				]
@@ -2132,33 +2139,85 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			// #23 Data overview widget.
 			[
 				[
-					'type' => CFormElement::RELOADABLE_FILL('Data overview'),
+					'type' => CFormElement::RELOADABLE_FILL('Top items'),
 					'refresh_interval' => 'Default (1 minute)',
 					'fields' => [
 						[
-							'field' => 'Item tags',
-							'type' => 'tags_table',
-							'operators' => ['Exists', 'Equals', 'Contains', 'Does not exist', 'Does not equal', 'Does not contain'],
-							'default_operator' => 'Contains'
-						],
-						[
-							'field' => 'Show suppressed problems',
-							'type' => 'checkbox',
-							'value' => false
-						],
-						[
-							'field' => 'Host location',
+							'field' => 'Layout',
 							'type' => 'radio_button',
-							'possible_values' => ['Left', 'Top'],
-							'value' => 'Left'
+							'possible_values' => ['Horizontal', 'Vertical'],
+							'value' => 'Horizontal'
+						],
+						[
+							'field' => 'Show problems',
+							'type' => 'radio_button',
+							'possible_values' => ['All', 'Unsuppressed', 'None'],
+							'value' => 'Unsuppressed'
+						],
+						[
+							'field' => 'Items',
+							'type' => 'table',
+							'headers' => ['', 'Patterns', 'Actions'],
+							'buttons' => ['Add'],
+							'mandatory' => true
 						]
 					],
-					'hints' => [
+					'hidden' => [
 						[
-							'label' => 'Type',
-							'type' => 'warning',
-							'text' => 'Widget is deprecated.'
+							'field' => 'Host ordering',
+							'type' => 'complex_field',
+							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-host-ordering"]',
+							'contents' => [
+								[
+									'field' => 'Order by',
+									'type' => 'radio_button',
+									'possible_values' => ['Host name', 'Item value'],
+									'value' => 'Host name'
+								],
+								[
+									'field' => 'Order',
+									'type' => 'radio_button',
+									'possible_values' => ['Top N', 'Bottom N'],
+									'value' => 'Top N'
+								],
+								[
+									'field' => 'Limit',
+									'mandatory' => true
+								]
+							]
+						],
+						[
+							'field' => 'Item ordering',
+							'type' => 'complex_field',
+							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-item-ordering"]',
+							'contents' => [
+								[
+									'field' => 'Order by',
+									'type' => 'radio_button',
+									'possible_values' => ['Item value', 'Item name', 'Host'],
+									'value' => 'Item value'
+								],
+								[
+									'field' => 'Order',
+									'type' => 'radio_button',
+									'possible_values' => ['Top N', 'Bottom N'],
+									'value' => 'Top N'
+								],
+								[
+									'field' => 'Limit',
+									'mandatory' => true
+								]
+							]
+						],
+						[
+							'field' => 'Show column header',
+							'type' => 'radio_button',
+							'possible_values' => ['Off', 'Horizontal', 'Vertical'],
+							'value' => 'Vertical'
 						]
+					],
+					'fill_for_hidden' => [
+						'Advanced configuration' => true
 					]
 				]
 			]
@@ -4131,7 +4190,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'id:tags_0_operator' => 'Contains',
 						'id:tags_0_value' => 'tag_value',
 						'Show suppressed problems' => true,
-						'Host location' => 'Top'
+						'Layout' => 'Vertical'
 					],
 					'page' => '2nd page'
 				]
@@ -4200,33 +4259,33 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'page' => '2nd page'
 				]
 			],
-			// #95 Data overview widget with default parameters.
-			[
-				[
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Data overview'),
-						'Name' => 'Data overview widget with default parameters'
-					],
-					'page' => '2nd page'
-				]
-			],
-			// #96 Data overview widget with all possible parameters.
-			[
-				[
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Data overview'),
-						'Name' => 'Data overview widget with all parameters',
-						'Refresh interval' => '10 seconds',
-						'Item tags' => 'Or',
-						'id:tags_0_tag' => 'tag_name',
-						'id:tags_0_operator' => 'Equals',
-						'id:tags_0_value' => 'tag_value',
-						'Show suppressed problems' => true,
-						'Host location' => 'Top'
-					],
-					'page' => '2nd page'
-				]
-			]
+			// #95 Data overview widget with default parameters. TODO: Update to correct Top Items - DEV-4101
+//			[
+//				[
+//					'fields' => [
+//						'Type' => CFormElement::RELOADABLE_FILL('Data overview'),
+//						'Name' => 'Data overview widget with default parameters'
+//					],
+//					'page' => '2nd page'
+//				]
+//			],
+			// #96 Data overview widget with all possible parameters. TODO: Update to correct Top Items - DEV-4101
+//			[
+//				[
+//					'fields' => [
+//						'Type' => CFormElement::RELOADABLE_FILL('Data overview'),
+//						'Name' => 'Data overview widget with all parameters',
+//						'Refresh interval' => '10 seconds',
+//						'Item tags' => 'Or',
+//						'id:tags_0_tag' => 'tag_name',
+//						'id:tags_0_operator' => 'Equals',
+//						'id:tags_0_value' => 'tag_value',
+//						'Show suppressed problems' => true,
+//						'Host location' => 'Top'
+//					],
+//					'page' => '2nd page'
+//				]
+//			]
 		];
 	}
 
@@ -4441,7 +4500,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 				'Graph', 'Graph (classic)', 'Graph prototype', 'Honeycomb', 'Host availability', 'Host card',
 				'Host navigator', 'Item history', 'Item navigator', 'Item value', 'Map', 'Map navigation tree',
 				'Pie chart', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report', 'System information',
-				'Top hosts', 'Top triggers', 'Trigger overview', 'URL', 'Web monitoring', 'Data overview'
+				'Top hosts', 'Top items', 'Top triggers', 'Trigger overview', 'URL', 'Web monitoring'
 			];
 			$this->assertEquals($all_types, $form->getField('Type')->getOptions()->asText());
 		}

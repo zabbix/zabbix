@@ -1,6 +1,6 @@
 @charset "UTF-8";
 .sidebar .server-name, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups.has-ellipsis .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates.has-ellipsis .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
-div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .totals-list.totals-list-horizontal .count,
+div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .totals-list.totals-list-horizontal .count,
 .totals-list.totals-list-horizontal .name {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -5283,6 +5283,38 @@ div.dashboard-widget-tophosts z-sparkline {
   max-width: 50vw;
   max-height: 50vh;
   opacity: 1; }
+
+form.dashboard-widget-topitems .fields-group.fields-group-item-ordering, form.dashboard-widget-topitems .fields-group.fields-group-host-ordering {
+  display: grid;
+  grid-template-columns: minmax(85px, max-content) 429px;
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 5px; }
+form.dashboard-widget-topitems #list_columns {
+  line-height: 1.4em; }
+  form.dashboard-widget-topitems #list_columns .text {
+    max-width: 400px; }
+
+div.dashboard-widget-topitems .list-table th.center {
+  text-align: center; }
+div.dashboard-widget-topitems .list-table tr[data-hostid] {
+  cursor: pointer; }
+div.dashboard-widget-topitems td {
+  line-height: 20px;
+  height: 20px; }
+div.dashboard-widget-topitems td[class] + td.na-bg,
+div.dashboard-widget-topitems td[class] + td.normal-bg,
+div.dashboard-widget-topitems td[class] + td.info-bg,
+div.dashboard-widget-topitems td[class] + td.average-bg,
+div.dashboard-widget-topitems td[class] + td.warning-bg,
+div.dashboard-widget-topitems td[class] + td.high-bg,
+div.dashboard-widget-topitems td[class] + td.disaster-bg {
+  border-left: 0 none; }
+div.dashboard-widget-topitems .link-action {
+  white-space: nowrap; }
+div.dashboard-widget-topitems z-bar-gauge {
+  min-width: 64px;
+  height: 20px; }
 
 div.dashboard-widget-url .widget-url {
   display: block; }

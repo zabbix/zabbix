@@ -14,22 +14,21 @@
 **/
 
 
-/**
- * Data overview widget view.
- *
- * @var CView $this
- * @var array $data
- */
+namespace Widgets\TopItems;
 
-if ($data['error'] !== null) {
-	$table = (new CTableInfo())->setNoDataMessage($data['error']);
-}
-else {
-	$table = $data['style'] == STYLE_TOP
-		? (new CPartial('table.top', $data))->getOutput()
-		: (new CPartial('table.left', $data))->getOutput();
-}
+use Zabbix\Core\CWidget;
 
-(new CWidgetView($data))
-	->addItem($table)
-	->show();
+class Widget extends CWidget {
+
+	public const DEFAULT_FILL = '#97AAB3';
+
+	public const CELL_HOSTID = 0;
+	public const CELL_ITEMID = 1;
+	public const CELL_VALUE = 2;
+	public const CELL_METADATA = 3;
+	public const CELL_SPARKLINE_VALUE = 4;
+
+	public function getDefaultName(): string {
+		return _('Top items');
+	}
+}
