@@ -68,8 +68,12 @@ class ZSparkline extends HTMLElement {
 			const color = this.#container.attr('color');
 			this.#color = isColorHex(color) ? color : ZSparkline.DEFAULT_COLOR;
 
-			this.#line_width = parseInt(this.#container.attr('line-width')) || ZSparkline.DEFAULT_LINE_WIDTH;
-			this.#fill = parseInt(this.#container.attr('fill')) || ZSparkline.DEFAULT_FILL;
+			const line_width = parseInt(this.#container.attr('line-width'));
+			this.#line_width = !isNaN(line_width) ? line_width : ZSparkline.DEFAULT_LINE_WIDTH;
+
+			const fill = parseInt(this.#container.attr('fill'));
+			this.#fill = !isNaN(fill) ? fill : ZSparkline.DEFAULT_FILL;
+
 			this.#points = ZSparkline.#parsePoints(this.#container.attr('value'));
 
 			this.#time_period = {
@@ -186,11 +190,13 @@ class ZSparkline extends HTMLElement {
 				break;
 
 			case 'line-width':
-				this.#line_width = parseInt(new_value) || ZSparkline.DEFAULT_LINE_WIDTH;
+				const line_width = parseInt(new_value);
+				this.#line_width = !isNaN(line_width) ? line_width : ZSparkline.DEFAULT_LINE_WIDTH;
 				break;
 
 			case 'fill':
-				this.#fill = parseInt(new_value) || ZSparkline.DEFAULT_FILL;
+				const fill = parseInt(new_value);
+				this.#fill = !isNaN(fill) ? fill : ZSparkline.DEFAULT_FILL;
 				break;
 
 			case 'value':
