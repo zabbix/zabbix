@@ -5674,6 +5674,8 @@ form.is-loading {
       border-right: 0; }
     .filter-forms .cell button {
       margin: 0; }
+    .filter-forms .cell .btn-icon {
+      margin-left: 5px; }
     .filter-forms .cell table {
       width: auto; }
   .filter-forms button {

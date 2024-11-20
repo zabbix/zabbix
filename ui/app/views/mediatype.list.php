@@ -68,6 +68,29 @@ $html_page = (new CHtmlPage())
 							->addValue(_('Disabled'), MEDIA_TYPE_STATUS_DISABLED)
 							->setModern()
 					)
+				]),
+			(new CFormGrid())
+				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+				->addItem([
+					new CLabel([_('Display actions'), makeHelpIcon([
+						_('Filter actions by the scope of media type usage:'),
+						(new CList([
+							_('All').' - '._('display all actions'),
+							[_('All available'), ' - ', make_decoration(
+								_('display only actions where All available media types are used in action operation'),
+								_('All available')
+							)],
+							_('Specific').' - '.
+								_('display only actions where specific media type is used in action operation')
+						]))->addClass(ZBX_STYLE_LIST_DASHED)
+					])]),
+					new CFormField(
+						(new CRadioButtonList('filter_actions', (int) $data['filter']['actions']))
+							->addValue(_('All'), ZBX_MEDIA_TYPE_ACTIONS_ALL)
+							->addValue(_('All available'), ZBX_MEDIA_TYPE_ACTIONS_AVAILABLE)
+							->addValue(_('Specific'), ZBX_MEDIA_TYPE_ACTIONS_SPECIFIC)
+							->setModern()
+					)
 				])
 		])
 		->addVar('action', 'mediatype.list')
