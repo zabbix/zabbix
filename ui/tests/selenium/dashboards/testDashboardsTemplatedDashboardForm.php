@@ -4258,7 +4258,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					],
 					'page' => '2nd page'
 				]
-			],
+			]
 			// #95 Data overview widget with default parameters. TODO: Update to correct Top Items - DEV-4101
 //			[
 //				[
