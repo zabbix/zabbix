@@ -60,10 +60,10 @@
 					this._disable(e.target, [e.target.dataset.slaid]);
 				}
 				else if (e.target.classList.contains('js-massenable-sla')) {
-					this._enable(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this._enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 				}
 				else if (e.target.classList.contains('js-massdisable-sla')) {
-					this._disable(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this._disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 				}
 				else if (e.target.classList.contains('js-massdelete-sla')) {
 					this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
@@ -94,13 +94,15 @@
 			location.href = location.href;
 		}
 
-		_enable(target, slaids) {
-			const confirmation = slaids.length > 1
-				? <?= json_encode(_('Enable selected SLAs?')) ?>
-				: <?= json_encode(_('Enable selected SLA?')) ?>;
+		_enable(target, slaids, massenable = false) {
+			if (massenable) {
+				const confirmation = slaids.length > 1
+					? <?= json_encode(_('Enable selected SLAs?')) ?>
+					: <?= json_encode(_('Enable selected SLA?')) ?>;
 
-			if (!window.confirm(confirmation)) {
-				return;
+				if (!window.confirm(confirmation)) {
+					return;
+				}
 			}
 
 			const curl = new Curl('zabbix.php');
@@ -109,13 +111,15 @@
 			this._post(target, slaids, curl);
 		}
 
-		_disable(target, slaids) {
-			const confirmation = slaids.length > 1
-				? <?= json_encode(_('Disable selected SLAs?')) ?>
-				: <?= json_encode(_('Disable selected SLA?')) ?>;
+		_disable(target, slaids, massdisable = false) {
+			if (massdisable) {
+				const confirmation = slaids.length > 1
+					? <?= json_encode(_('Disable selected SLAs?')) ?>
+					: <?= json_encode(_('Disable selected SLA?')) ?>;
 
-			if (!window.confirm(confirmation)) {
-				return;
+				if (!window.confirm(confirmation)) {
+					return;
+				}
 			}
 
 			const curl = new Curl('zabbix.php');

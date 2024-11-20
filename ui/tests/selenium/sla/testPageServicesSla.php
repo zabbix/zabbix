@@ -341,6 +341,7 @@ class testPageServicesSla extends CWebTest {
 		foreach (['Disable' => 'disabled', 'Enable' => 'enabled'] as $button => $status) {
 			$row->select();
 			$this->query('button', $button)->one()->waitUntilClickable()->click();
+			$this->page->acceptAlert();
 			$this->checkSlaStatus($row, $status, self::$update_sla);
 		}
 	}
@@ -364,7 +365,6 @@ class testPageServicesSla extends CWebTest {
 			$db_status = '0';
 		}
 
-		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, $message_title);
 		CMessageElement::find()->one()->close();

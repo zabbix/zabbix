@@ -28,16 +28,16 @@
 					this._edit({moduleid: e.target.dataset.moduleid});
 				}
 				else if (e.target.classList.contains('js-enable-module')) {
-					this._enable(e.target, [e.target.dataset.moduleid], false);
+					this._enable(e.target, [e.target.dataset.moduleid]);
 				}
 				else if (e.target.classList.contains('js-massenable-module')) {
-					this._enable(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this._enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 				}
 				else if (e.target.classList.contains('js-disable-module')) {
-					this._disable(e.target, [e.target.dataset.moduleid], false);
+					this._disable(e.target, [e.target.dataset.moduleid]);
 				}
 				else if (e.target.classList.contains('js-massdisable-module')) {
-					this._disable(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this._disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 				}
 			});
 		}
@@ -62,8 +62,8 @@
 			});
 		}
 
-		_enable(target, moduleids, mass_update = true) {
-			if (mass_update) {
+		_enable(target, moduleids, massenable = false) {
+			if (massenable) {
 				const confirmation = moduleids.length > 1
 					? <?= json_encode(_('Enable selected modules?')) ?>
 					: <?= json_encode(_('Enable selected module?')) ?>;
@@ -79,8 +79,8 @@
 			this._post(target, moduleids, curl);
 		}
 
-		_disable(target, moduleids, mass_update = true) {
-			if (mass_update) {
+		_disable(target, moduleids, massdisable = false) {
+			if (massdisable) {
 				const confirmation = moduleids.length > 1
 					? <?= json_encode(_('Disable selected modules?')) ?>
 					: <?= json_encode(_('Disable selected module?')) ?>;

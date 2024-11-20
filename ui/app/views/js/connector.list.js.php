@@ -44,11 +44,11 @@
 			});
 
 			form.querySelector('.js-massenable-connector').addEventListener('click', (e) => {
-				this._enable(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				this._enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 			});
 
 			form.querySelector('.js-massdisable-connector').addEventListener('click', (e) => {
-				this._disable(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				this._disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 			});
 
 			form.querySelector('.js-massdelete-connector').addEventListener('click', (e) => {
@@ -77,13 +77,15 @@
 			});
 		}
 
-		_enable(target, connectorids) {
-			const confirmation = connectorids.length > 1
-				? <?= json_encode(_('Enable selected connectors?')) ?>
-				: <?= json_encode(_('Enable selected connector?')) ?>;
+		_enable(target, connectorids, massenable = false) {
+			if (massenable) {
+				const confirmation = connectorids.length > 1
+					? <?= json_encode(_('Enable selected connectors?')) ?>
+					: <?= json_encode(_('Enable selected connector?')) ?>;
 
-			if (!window.confirm(confirmation)) {
-				return;
+				if (!window.confirm(confirmation)) {
+					return;
+				}
 			}
 
 			const curl = new Curl('zabbix.php');
@@ -92,13 +94,15 @@
 			this._post(target, connectorids, curl);
 		}
 
-		_disable(target, connectorids) {
-			const confirmation = connectorids.length > 1
-				? <?= json_encode(_('Disable selected connectors?')) ?>
-				: <?= json_encode(_('Disable selected connector?')) ?>;
+		_disable(target, connectorids, massdisable = false) {
+			if (massdisable) {
+				const confirmation = connectorids.length > 1
+					? <?= json_encode(_('Disable selected connectors?')) ?>
+					: <?= json_encode(_('Disable selected connector?')) ?>;
 
-			if (!window.confirm(confirmation)) {
-				return;
+				if (!window.confirm(confirmation)) {
+					return;
+				}
 			}
 
 			const curl = new Curl('zabbix.php');

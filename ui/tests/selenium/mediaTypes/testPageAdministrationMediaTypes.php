@@ -314,14 +314,6 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			$new_status = array_values(array_diff($statuses, [$old_status]))[0];
 			// Change media type status.
 			$row->query('link', $old_status)->one()->click();
-
-			// Check alert text and accept alert.
-			$alert_text = ($new_status === 'Enabled')
-				? 'Enable selected media type?'
-				: 'Disable selected media type?';
-			$this->assertEquals($alert_text, $this->page->getAlertText());
-			$this->page->acceptAlert();
-
 			$this->page->waitUntilReady();
 
 			// Check result on fronted.

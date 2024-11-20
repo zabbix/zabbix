@@ -468,20 +468,6 @@ class testPageConnectors extends CWebTest {
 		return [
 			[
 				[
-					'link_button' => true,
-					'action' => 'Disable',
-					'name' => self::$update_connector
-				]
-			],
-			[
-				[
-					'link_button' => true,
-					'action' => 'Enable',
-					'name' =>'Disabled connector'
-				]
-			],
-			[
-				[
 					'action' => 'Enable'
 				]
 			],
@@ -526,18 +512,12 @@ class testPageConnectors extends CWebTest {
 		}
 
 		$this->page->login()->open('zabbix.php?action=connector.list');
-		if (array_key_exists('link_button', $data)) {
-			// Disable or enable Connector via Enabled/Disabled button.
-			$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $data['name'][0]);
-			$row->getColumn('Status')->query('xpath:.//a')->one()->click();
-		}
-		else {
-			// Connectors count that will be selected before Enable/Disable/Delete action.
-			$selected_count = array_key_exists('name', $data) ? count($data['name']) : CDBHelper::getCount(self::$connector_sql);
-			$this->selectTableRows(CTestArrayHelper::get($data, 'name'));
-			$this->assertSelectedCount($selected_count);
-			$this->query('button:'.$data['action'])->one()->waitUntilClickable()->click();
-		}
+
+		// Connectors count that will be selected before Enable/Disable/Delete action.
+		$selected_count = array_key_exists('name', $data) ? count($data['name']) : CDBHelper::getCount(self::$connector_sql);
+		$this->selectTableRows(CTestArrayHelper::get($data, 'name'));
+		$this->assertSelectedCount($selected_count);
+		$this->query('button:'.$data['action'])->one()->waitUntilClickable()->click();
 
 		$message = $data['action'].' selected connector'.(count(CTestArrayHelper::get($data, 'name', [])) === 1 ? '?' : 's?' );
 		$this->assertEquals($message, $this->page->getAlertText());
@@ -632,8 +612,10 @@ class testPageConnectors extends CWebTest {
 		}
 
 		// Check alert and success message.
-		$this->assertEquals($data['action'].' selected connector'.$plural.'?', $this->page->getAlertText());
-		$this->page->acceptAlert();
+		if (!array_key_exists('link_button', $data)) {
+			$this->assertEquals($data['action'].' selected connector'.$plural.'?', $this->page->getAlertText());
+			$this->page->acceptAlert();
+		}
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Connector'.$plural.' '.lcfirst($data['action']).'d');
 		CMessageElement::find()->one()->close();

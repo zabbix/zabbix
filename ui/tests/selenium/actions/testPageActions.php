@@ -205,13 +205,11 @@ class testPageActions extends CLegacyWebTest {
 		switch ($action['status']) {
 			case ACTION_STATUS_ENABLED:
 				$this->zbxTestClickXpath('//a[contains(@data-actionid,"'.$action['actionid'].'") and (text()="Enabled")]');
-				$this->page->acceptAlert();
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action disabled');
 				$newStatus = ACTION_STATUS_DISABLED;
 				break;
 			case ACTION_STATUS_DISABLED:
 				$this->zbxTestClickXpath('//a[contains(@data-actionid,"'.$action['actionid'].'") and (text()="Disabled")]');
-				$this->page->acceptAlert();
 				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action enabled');
 				$newStatus = ACTION_STATUS_ENABLED;
 				break;
