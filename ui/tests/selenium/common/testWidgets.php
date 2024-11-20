@@ -59,7 +59,8 @@ class testWidgets extends CWebTest {
 		switch ($widget) {
 			case 'Top hosts':
 			case 'Item history':
-				$widget_form->getFieldContainer('Columns')->query('button:Add')->one()->waitUntilClickable()->click();
+				$container = ($widget === 'Top hosts') ? 'Columns' : 'Items';
+				$widget_form->getFieldContainer($container)->query('button:Add')->one()->waitUntilClickable()->click();
 				$column_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 				$select_dialog = $column_dialog;
 				break;

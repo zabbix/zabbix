@@ -1709,9 +1709,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							'value' => 'Horizontal'
 						],
 						[
-							'field' => 'Columns',
+							'field' => 'Items',
 							'type' => 'table',
-							'headers' => ['', 'Name', 'Data', 'Actions'],
+							'headers' => ['', 'Name', 'Item', 'Actions'],
 							'buttons' => ['Add'],
 							'mandatory' => true
 						],
@@ -3660,7 +3660,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'Show lines' => ''
 					],
 					'error_message' => [
-						'Invalid parameter "Columns": cannot be empty.',
+						'Invalid parameter "Items": cannot be empty.',
 						'Invalid parameter "Show lines": value must be one of 1-1000.'
 					]
 				]
@@ -4258,7 +4258,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					],
 					'page' => '2nd page'
 				]
-			]
+			],
 			// #95 Data overview widget with default parameters. TODO: Update to correct Top Items - DEV-4101
 //			[
 //				[
@@ -4285,7 +4285,24 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 //					],
 //					'page' => '2nd page'
 //				]
-//			]
+//			],
+			// #97 Top hosts widget with default parameters.
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Top hosts'),
+						'Name' => 'Top hosts widget with required fields'
+					],
+					'Column' => [
+						'Name' => 'Column1',
+						'Item name' => [
+							'values' => self::TEMPLATE_ITEM,
+							'context' => ['values' => self::TEMPLATE]
+						]
+					],
+					'page' => '2nd page'
+				]
+			]
 		];
 	}
 
@@ -4368,15 +4385,18 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 				}
 			}
 
-			$form->getFieldContainer('Columns')->query('button:Add')->one()->waitUntilClickable()->click();
+			$container = CTestArrayHelper::get($data, 'Column.Item', false) ? 'Items' : 'Columns';
+			$form->getFieldContainer($container)->query('button:Add')->one()->waitUntilClickable()->click();
 			$column_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 			$column_overlay->asForm()->fill($data['Column']);
 			$column_overlay->getFooter()->query('button:Add')->waitUntilClickable()->one()->click();
 			$column_overlay->waitUntilNotVisible();
 			$form->waitUntilReloaded();
 
-			// Open Advanced config again because after column filling it becomes collapsed.
-			$form->fill(['Advanced configuration' => true]);
+			// Open Advanced config again because after column filling it becomes collapsed for Item history widget.
+			if ($container === 'Items') {
+				$form->fill(['Advanced configuration' => true]);
+			}
 		}
 
 		// Some field changes, like changing the type of map widget, result in dialog reload, so need to wait until it's done.
@@ -4631,10 +4651,12 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 			// Check saved column and item name.
 			if (array_key_exists('Column', $data)) {
 				$row = $reopened_form->query('id:list_columns')->asTable()->one()->getRow(0);
-				$this->assertEquals(CTestArrayHelper::get($data['Column'], 'Name', $data['Column']['Item']['values']),
+				$this->assertEquals(CTestArrayHelper::get($data['Column'], 'Name', CTestArrayHelper::get($data, 'Column.Item.values')),
 						$row->getColumn('Name')->getText()
 				);
-				$this->assertEquals(self::TEMPLATE_ITEM, $row->getColumn('Data')->getText());
+
+				$column_name = CTestArrayHelper::get($data, 'Column.Item', false) ? 'Item' : 'Data';
+				$this->assertEquals(self::TEMPLATE_ITEM, $row->getColumn($column_name)->getText());
 			}
 
 			$this->closeDialogue();

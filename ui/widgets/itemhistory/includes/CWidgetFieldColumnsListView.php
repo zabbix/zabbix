@@ -45,7 +45,7 @@ class CWidgetFieldColumnsListView extends CWidgetFieldView {
 			->setHeader([
 				'',
 				(new CColHeader(_('Name')))->addStyle('width: 39%'),
-				(new CColHeader(_('Data')))->addStyle('width: 59%'),
+				(new CColHeader(_('Item')))->addStyle('width: 59%'),
 				_('Actions')
 			]);
 
