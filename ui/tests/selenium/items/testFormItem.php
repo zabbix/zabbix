@@ -456,7 +456,7 @@ class testFormItem extends CLegacyWebTest {
 		}
 
 		if ($type == 'SSH agent' && !isset($itemid)) {
-			$this->zbxTestAssertElementValue('key', 'ssh.run[<unique short description>,<ip>,<port>,<encoding>,<ssh options>]');
+			$this->zbxTestAssertElementValue('key', 'ssh.run[<unique short description>,<ip>,<port>,<encoding>,<ssh options>,<subsystem>]');
 		}
 
 		if ($type == 'TELNET agent' && !isset($itemid)) {

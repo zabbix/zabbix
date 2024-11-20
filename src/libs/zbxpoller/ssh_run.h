@@ -27,7 +27,7 @@
 #define KEY_PUBKEY_STR		"PubkeyAcceptedKeyTypes"
 
 int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options, int timeout,
-		const char *config_source_ip, const char *config_ssh_key_location);
+		const char *config_source_ip, const char *config_ssh_key_location, const char *subsystem);
 #endif	/* defined(HAVE_SSH2) || defined(HAVE_SSH)*/
 
 #endif

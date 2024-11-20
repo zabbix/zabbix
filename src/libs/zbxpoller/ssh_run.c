@@ -150,7 +150,7 @@ static int	ssh_parse_options(ssh_session session, const char *options, char **er
 }
 #undef HAVE_NO_SSH_OPTIONS
 
-static int	ssh_socket_wait(ZBX_SOCKET s)
+static int	ssh_socket_wait(ZBX_SOCKET s, int timeout_ms)
 {
 	zbx_pollfd_t	pd;
 	int		ret;
@@ -158,7 +158,7 @@ static int	ssh_socket_wait(ZBX_SOCKET s)
 	pd.fd = s;
 	pd.events = POLLIN;
 
-	if (0 > (ret = zbx_socket_poll(&pd, 1, 100)))
+	if (0 > (ret = zbx_socket_poll(&pd, 1, timeout_ms)))
 	{
 		if (SUCCEED != zbx_socket_had_nonblocking_error())
 			return FAIL;
@@ -187,7 +187,7 @@ static int	ssh_nonblocking_error(ssh_session session, int errcode, int errcode_a
 		return FAIL;
 	}
 
-	if (SUCCEED != ssh_socket_wait((ZBX_SOCKET)ssh_get_fd(session)))
+	if (SUCCEED != ssh_socket_wait((ZBX_SOCKET)ssh_get_fd(session), 100))
 	{
 		*error = zbx_strdup(NULL, "connection error");
 		return FAIL;
@@ -198,7 +198,7 @@ static int	ssh_nonblocking_error(ssh_session session, int errcode, int errcode_a
 
 /* example ssh.run["ls /"] */
 int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options, int timeout,
-		const char *config_source_ip, const char *config_ssh_key_location)
+		const char *config_source_ip, const char *config_ssh_key_location, const char *subsystem)
 {
 	ssh_session	session;
 	ssh_channel	channel;
@@ -473,15 +473,53 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 		}
 	}
 
-	/* request a shell on a channel and execute command */
+	/* request a shell or subsystem on a channel and execute command */
+
 	zbx_dos2unix(item->params);	/* CR+LF (Windows) => LF (Unix) */
 
-	while (SSH_OK != (rc = ssh_channel_request_exec(channel, item->params)))
+	if (NULL == subsystem || '\0' == *subsystem)
 	{
-		if (SUCCEED != ssh_nonblocking_error(session, rc, SSH_AGAIN, &deadline, &err_msg))
+		while (SSH_OK != (rc = ssh_channel_request_exec(channel, item->params)))
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot request a shell: %s", err_msg));
-			zbx_free(err_msg);
+			if (SUCCEED != ssh_nonblocking_error(session, rc, SSH_AGAIN, &deadline, &err_msg))
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot request a shell: %s", err_msg));
+				zbx_free(err_msg);
+
+				goto channel_free;
+			}
+		}
+	}
+	else
+	{
+		int		timeout_ms;
+		zbx_timespec_t	ts;
+
+		while (SSH_OK != (rc = ssh_channel_request_subsystem(channel, subsystem)))
+		{
+			if (SUCCEED != ssh_nonblocking_error(session, rc, SSH_AGAIN, &deadline, &err_msg))
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot request a subsystem: %s", err_msg));
+				zbx_free(err_msg);
+
+				goto channel_free;
+			}
+		}
+
+		zbx_timespec(&ts);
+		timeout_ms = (deadline.ns - ts.ns) / 1000000 + (deadline.sec - ts.sec) * 1000;
+
+		if (0 >= timeout_ms || SUCCEED != ssh_socket_wait((ZBX_SOCKET)ssh_get_fd(session), timeout_ms))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot wait for a subsystem"));
+
+			goto channel_free;
+		}
+
+		if (0 > (rc = ssh_channel_write(channel, item->params, (zbx_uint32_t)strlen(item->params))))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot execute request: %s",
+					ssh_get_error(session)));
 
 			goto channel_free;
 		}

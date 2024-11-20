@@ -47,7 +47,7 @@ int	zbx_ssh_get_value(zbx_dc_item_t *item, const char *config_source_ip, const c
 	}
 #undef SSH_RUN_KEY
 
-	if (5 < get_rparams_num(&request))
+	if (6 < get_rparams_num(&request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		goto out;
@@ -81,7 +81,7 @@ int	zbx_ssh_get_value(zbx_dc_item_t *item, const char *config_source_ip, const c
 	ssh_options = get_rparam(&request, 4);
 
 	ret = ssh_run(item, result, ZBX_NULL2EMPTY_STR(encoding), ZBX_NULL2EMPTY_STR(ssh_options), item->timeout,
-			config_source_ip, config_ssh_key_location);
+			config_source_ip, config_ssh_key_location, get_rparam(&request, 5));
 out:
 	zbx_free_agent_request(&request);
 

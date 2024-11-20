@@ -1315,7 +1315,7 @@ class testLowLevelDiscovery extends CWebTest {
 					'fields' => [
 						'Name' => 'SSH agent LLD',
 						'Type' => 'SSH agent',
-						'Key' => 'ssh.run[<unique short description>,<ip>,<port>,<encoding>,<ssh options>]',
+						'Key' => 'ssh.run[<unique short description>,<ip>,<port>,<encoding>,<ssh options>,<subsystem>]',
 						'User name' => 'test_user',
 						'Executed script' => 'test_script'
 					],
