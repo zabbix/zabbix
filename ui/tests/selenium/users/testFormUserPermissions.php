@@ -478,7 +478,7 @@ class testFormUserPermissions extends CWebTest {
 			'Gauge', 'Geomap', 'Graph', 'Graph (classic)', 'Graph prototype', 'Honeycomb', 'Host availability',
 			'Host card', 'Host navigator', 'Item history', 'Item navigator', 'Item value', 'Map', 'Map navigation tree',
 			'Pie chart', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report', 'System information',
-			'Top hosts', 'Top triggers', 'Top items', 'Trigger overview', 'URL', 'Web monitoring'
+			'Top hosts', 'Top items', 'Top triggers', 'Trigger overview', 'URL', 'Web monitoring'
 		];
 
 		$this->page->login()->open('zabbix.php?action=user.edit&userid='.self::$admin_user)->waitUntilReady();
