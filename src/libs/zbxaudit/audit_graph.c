@@ -305,26 +305,32 @@ void	zbx_audit_graph_update_json_delete_gitems(int audit_context_mode, zbx_uint6
 	zbx_audit_update_json_append_no_value(graphid, AUDIT_GRAPH_ID, AUDIT_DETAILS_ACTION_DELETE, audit_key);
 }
 
-void	zbx_audit_DBselect_delete_for_graph(int audit_context_mode, const char *sql, zbx_vector_uint64_t *ids)
+/********************************************************************************
+ *                                                                              *
+ * Purpose: create audit events for graphs that are to be removed               *
+ *                                                                              *
+ ********************************************************************************/
+void	zbx_audit_graph_delete(int audit_context_mode, zbx_vector_uint64_t *graphids)
 {
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
+	zbx_db_large_query_t	query;
+	zbx_db_row_t		row;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
 
-	result = zbx_db_select("%s", sql);
+	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
-	while (NULL != (row = zbx_db_fetch(result)))
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select graphid,name,flags from graphs where");
+	zbx_db_large_query_prepare_uint(&query, &sql, &sql_alloc, &sql_offset, "graphid", graphids);
+
+	while (NULL != (row = zbx_db_large_query_fetch(&query)))
 	{
-		int		flags;
-		zbx_uint64_t	id;
+		zbx_uint64_t	graphid;
 
-		ZBX_STR2UINT64(id, row[0]);
-		zbx_vector_uint64_append(ids, id);
-		flags = atoi(row[2]);
+		ZBX_STR2UINT64(graphid, row[0]);
 
-		zbx_audit_graph_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_DELETE, id, row[1], flags);
+		zbx_audit_graph_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_DELETE, graphid, row[1],
+				atoi(row[2]));
 	}
-
-	zbx_db_free_result(result);
-
-	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_db_large_query_clear(&query);
+	zbx_free(sql);
 }

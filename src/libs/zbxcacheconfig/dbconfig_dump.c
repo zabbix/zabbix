@@ -149,8 +149,13 @@ static void	DCdump_hosts(void)
 		}
 
 		zabbix_log(LOG_LEVEL_TRACE, "  items:");
-		for (j = 0; j < host->items.values_num; j++)
-			zabbix_log(LOG_LEVEL_TRACE, "    itemid:" ZBX_FS_UI64, host->items.values[j]->itemid);
+
+		zbx_hashset_iter_t	item_iter;
+		ZBX_DC_ITEM_REF		*ref;
+
+		zbx_hashset_iter_reset(&host->items, &item_iter);
+		while (NULL != (ref = (ZBX_DC_ITEM_REF *)zbx_hashset_iter_next(&item_iter)))
+			zabbix_log(LOG_LEVEL_TRACE, "    itemid:" ZBX_FS_UI64, ref->item->itemid);
 	}
 
 	zbx_vector_ptr_destroy(&index);
@@ -550,15 +555,17 @@ static void	DCdump_calcitem(const ZBX_DC_CALCITEM *calcitem)
 	zabbix_log(LOG_LEVEL_TRACE, "  calc:[params:'%s']", calcitem->params);
 }
 
-static void	DCdump_masteritem(const ZBX_DC_MASTERITEM *masteritem)
+static void	DCdump_masteritem(ZBX_DC_MASTERITEM *masteritem)
 {
-	int	i;
+	zbx_hashset_iter_t	iter;
+	zbx_uint64_t		*pitemid;
 
 	zabbix_log(LOG_LEVEL_TRACE, "  dependent:");
-	for (i = 0; i < masteritem->dep_itemids.values_num; i++)
+
+	zbx_hashset_iter_reset(&masteritem->dep_itemids, &iter);
+	while (NULL != (pitemid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zabbix_log(LOG_LEVEL_TRACE, "    itemid:" ZBX_FS_UI64 " flags:" ZBX_FS_UI64,
-				masteritem->dep_itemids.values[i].first, masteritem->dep_itemids.values[i].second);
+		zabbix_log(LOG_LEVEL_TRACE, "    itemid:" ZBX_FS_UI64, *pitemid);
 	}
 }
 

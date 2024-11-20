@@ -2228,14 +2228,13 @@ void	zbx_dbconn_select_uint64(zbx_dbconn_t *db, const char *sql, zbx_vector_uint
 int	zbx_dbconn_prepare_multiple_query(zbx_dbconn_t *db, const char *query, const char *field_name,
 		zbx_vector_uint64_t *ids, char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
-#define ZBX_MAX_IDS	950
 	int	i, ret = SUCCEED;
 
-	for (i = 0; i < ids->values_num; i += ZBX_MAX_IDS)
+	for (i = 0; i < ids->values_num; i += ZBX_DB_LARGE_QUERY_BATCH_SIZE)
 	{
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, query);
 		zbx_db_add_condition_alloc(sql, sql_alloc, sql_offset, field_name, &ids->values[i],
-				MIN(ZBX_MAX_IDS, ids->values_num - i));
+				MIN(ZBX_DB_LARGE_QUERY_BATCH_SIZE, ids->values_num - i));
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 
 		if (SUCCEED != (ret = zbx_dbconn_execute_overflowed_sql(db, sql, sql_alloc, sql_offset)))
@@ -2243,8 +2242,6 @@ int	zbx_dbconn_prepare_multiple_query(zbx_dbconn_t *db, const char *query, const
 	}
 
 	return ret;
-
-#undef ZBX_MAX_IDS
 }
 
 /******************************************************************************
@@ -2271,3 +2268,202 @@ int	zbx_dbconn_execute_multiple_query(zbx_dbconn_t *db, const char *query, const
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: selects next batch of ids from database                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	db_large_query_select(zbx_db_large_query_t *query)
+{
+	int	values_num, size = ZBX_DB_LARGE_QUERY_BATCH_SIZE;
+
+	switch (query->type)
+	{
+		case ZBX_DB_LARGE_QUERY_UI64:
+			values_num = query->ids.ui64->values_num;
+			break;
+		case ZBX_DB_LARGE_QUERY_STR:
+			values_num = query->ids.str->values_num;
+			break;
+	}
+
+	if (query->offset >= values_num)
+		return FAIL;
+
+	if (NULL != query->result)
+	{
+		zbx_db_free_result(query->result);
+		query->result = NULL;
+	}
+
+	if (query->offset + size > values_num)
+		size = values_num - query->offset;
+
+	*query->sql_offset = query->sql_reset;
+
+	switch (query->type)
+	{
+		case ZBX_DB_LARGE_QUERY_UI64:
+			zbx_db_add_condition_alloc(query->sql, query->sql_alloc, query->sql_offset, query->field,
+					query->ids.ui64->values + query->offset, size);
+			break;
+		case ZBX_DB_LARGE_QUERY_STR:
+			zbx_db_add_str_condition_alloc(query->sql, query->sql_alloc, query->sql_offset, query->field,
+					(const char * const *)&query->ids.str->values[query->offset], size);
+			break;
+	}
+
+	if (NULL != query->suffix)
+		zbx_strcpy_alloc(query->sql, query->sql_alloc, query->sql_offset, query->suffix);
+
+	query->offset += size;
+	query->result = dbconn_select(query->db, "%s", *query->sql);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare large SQL query                                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	db_large_query_prepare(zbx_db_large_query_t *query, zbx_dbconn_t *db, char **sql, size_t *sql_alloc,
+		size_t *sql_offset, const char *field)
+{
+	query->db = db;
+	query->field = field;
+	query->sql = sql;
+	query->sql_alloc = sql_alloc;
+	query->sql_offset = sql_offset;
+	query->sql_reset = *sql_offset;
+	query->offset = 0;
+	query->result = NULL;
+	query->suffix = NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare large SQL query with uint based IDs                       *
+ *                                                                            *
+ * Parameters: query      - [IN] large query object                           *
+ *             db         - [IN] database connection object                   *
+ *             sql        - [IN/OUT] first part of the query, can be modified *
+ *                              or reallocated                                *
+ *             sql_alloc  - [IN/OUT] size of allocated sql string             *
+ *             sql_offset - [IN/OUT] length of the sql string                 *
+ *             field      - [IN] ID field name                                *
+ *             ids        - [IN] vector of IDs                                *
+ *                                                                            *
+ * Comments: Large query object 'borrows' the sql buffer with the query part, *
+ *           meaning:                                                         *
+ *             - caller must not free/modify this sql buffer while the        *
+ *               prepared large query object is being used                    *
+ *             - caller must free this sql buffer afterwards - it's not freed *
+ *               when large query object is cleared.                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dbconn_large_query_prepare_uint(zbx_db_large_query_t *query, zbx_dbconn_t *db, char **sql,
+		size_t *sql_alloc, size_t *sql_offset, const char *field, const zbx_vector_uint64_t *ids)
+{
+	query->type = ZBX_DB_LARGE_QUERY_UI64;
+	query->ids.ui64 = ids;
+
+	db_large_query_prepare(query, db, sql, sql_alloc, sql_offset, field);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare large SQL query with string based IDs                     *
+ *                                                                            *
+ * Parameters: query      - [IN] large query object                           *
+ *             db         - [IN] database connection object                   *
+ *             sql        - [IN/OUT] first part of the query, can be modified *
+ *                              or reallocated                                *
+ *             sql_alloc  - [IN/OUT] size of allocated sql string             *
+ *             sql_offset - [IN/OUT] length of the sql string                 *
+ *             field      - [IN] ID field name                                *
+ *             ids        - [IN] vector of IDs                                *
+ *                                                                            *
+ * Comments: Large query object 'borrows' the sql buffer with the query part, *
+ *           meaning:                                                         *
+ *             - caller must not free/modify this sql buffer while the        *
+ *               prepared large query object is being used                    *
+ *             - caller must free this sql buffer afterwards - it's not freed *
+ *               when large query object is cleared.                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dbconn_large_query_prepare_str(zbx_db_large_query_t *query, zbx_dbconn_t *db, char **sql, size_t *sql_alloc,
+		size_t *sql_offset, const char *field, const zbx_vector_str_t *ids)
+{
+	query->type = ZBX_DB_LARGE_QUERY_STR;
+	query->ids.str = ids;
+
+	db_large_query_prepare(query, db, sql, sql_alloc, sql_offset, field);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: fetch next row from large SQL query                               *
+ *                                                                            *
+ * Parameters: query      - [IN] large query object                           *
+ *                                                                            *
+ * Return value: database row or NULL if all rows are fetched                 *
+ *                                                                            *
+ * Comments: When all rows of the current batch are fetched this function     *
+ *           will automatically select next batch and fetch next row until    *
+ *           all batches are fetched.                                         *
+ *                                                                            *
+ ******************************************************************************/
+zbx_db_row_t	zbx_db_large_query_fetch(zbx_db_large_query_t *query)
+{
+	zbx_db_row_t	row;
+	int		values_num;
+
+	if (NULL == query->db)
+		return NULL;
+
+	switch (query->type)
+	{
+		case ZBX_DB_LARGE_QUERY_UI64:
+			values_num = query->ids.ui64->values_num;
+			break;
+		case ZBX_DB_LARGE_QUERY_STR:
+			values_num = query->ids.str->values_num;
+			break;
+	}
+
+	while (NULL == (row = zbx_db_fetch(query->result)) && query->offset < values_num)
+	{
+		if (SUCCEED != db_large_query_select(query))
+			return NULL;
+	}
+
+	return row;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: clear large SQL query                                             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_large_query_clear(zbx_db_large_query_t *query)
+{
+	zbx_db_free_result(query->result);
+	zbx_free(query->suffix);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set sql statement to be appended to each batch                    *
+ *                                                                            *
+ * Parameters: query      - [IN] large query object                           *
+ *             sql        - [IN] sql statement to append                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dbconn_large_query_append_sql(zbx_db_large_query_t *query, const char *sql)
+{
+	query->suffix = zbx_strdup(NULL, sql);
+}
+
+

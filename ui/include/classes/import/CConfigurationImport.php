@@ -2954,7 +2954,7 @@ class CConfigurationImport {
 			$resolve_entity_keys = [];
 			$itemid_to_item_key_by_hosts = [];
 
-			for ($level = 0; $level < ZBX_DEPENDENT_ITEM_MAX_LEVELS; $level++) {
+			while ($db_items) {
 				$missing_master_itemids = [];
 
 				foreach ($db_items as $itemid => $item) {
@@ -3007,12 +3007,6 @@ class CConfigurationImport {
 				else {
 					break;
 				}
-			}
-
-			if ($missing_master_itemids) {
-				throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
-					_('maximum number of dependency levels reached')
-				));
 			}
 
 			foreach ($resolve_entity_keys as $item) {
@@ -3073,12 +3067,6 @@ class CConfigurationImport {
 					else {
 						throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
 							_s('value "%1$s" not found', $master_key)
-						));
-					}
-
-					if ($level > ZBX_DEPENDENT_ITEM_MAX_LEVELS) {
-						throw new Exception(_s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
-							_('maximum number of dependency levels reached')
 						));
 					}
 				}

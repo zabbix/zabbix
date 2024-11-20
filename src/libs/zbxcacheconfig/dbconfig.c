@@ -117,6 +117,23 @@ int	zbx_trigger_dep_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
+/* item reference hashset support */
+static zbx_hash_t	dc_item_ref_hash(const void *data)
+{
+	const ZBX_DC_ITEM_REF	*ref = (const ZBX_DC_ITEM_REF *)data;
+
+	return ZBX_DEFAULT_UINT64_HASH_FUNC(&ref->item->itemid);
+}
+
+static int	dc_item_ref_compare(const void *d1, const void *d2)
+{
+	const ZBX_DC_ITEM_REF	*ref1 = (const ZBX_DC_ITEM_REF *)d1;
+	const ZBX_DC_ITEM_REF	*ref2 = (const ZBX_DC_ITEM_REF *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(ref1->item->itemid, ref2->item->itemid);
+	return 0;
+}
+
 int	sync_in_progress = 0;
 
 #define START_SYNC	do { WRLOCK_CACHE_CONFIG_HISTORY; WRLOCK_CACHE; sync_in_progress = 1; } while(0)
@@ -1937,8 +1954,10 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 
 			zbx_vector_dc_httptest_ptr_create_ext(&host->httptests, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
-			zbx_vector_dc_item_ptr_create_ext(&host->items, __config_shmem_malloc_func,
-					__config_shmem_realloc_func, __config_shmem_free_func);
+
+			zbx_hashset_create_ext(&host->items, 0, dc_item_ref_hash, dc_item_ref_compare, NULL,
+					__config_shmem_malloc_func, __config_shmem_realloc_func,
+					__config_shmem_free_func);
 		}
 		else
 		{
@@ -2099,7 +2118,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 		dc_psk_unlink(host->tls_dc_psk);
 #endif
 		zbx_vector_ptr_destroy(&host->interfaces_v);
-		zbx_vector_dc_item_ptr_destroy(&host->items);
+		zbx_hashset_destroy(&host->items);
 		zbx_hashset_remove_direct(&config->hosts, host);
 
 		zbx_vector_dc_httptest_ptr_destroy(&host->httptests);
@@ -2949,7 +2968,7 @@ static void	dc_interface_snmpitems_remove(ZBX_DC_ITEM *item)
 
 static void	dc_masteritem_free(ZBX_DC_MASTERITEM *masteritem)
 {
-	zbx_vector_uint64_pair_destroy(&masteritem->dep_itemids);
+	zbx_hashset_destroy(&masteritem->dep_itemids);
 	__config_shmem_free_func(masteritem);
 }
 
@@ -2966,8 +2985,6 @@ static void	dc_masteritem_remove_depitem(zbx_uint64_t master_itemid, zbx_uint64_
 {
 	ZBX_DC_MASTERITEM	*masteritem;
 	ZBX_DC_ITEM		*item;
-	int			index;
-	zbx_uint64_pair_t	pair;
 
 	if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &master_itemid)))
 		return;
@@ -2975,16 +2992,9 @@ static void	dc_masteritem_remove_depitem(zbx_uint64_t master_itemid, zbx_uint64_
 	if (NULL == (masteritem = item->master_item))
 		return;
 
-	pair.first = dep_itemid;
-	if (FAIL == (index = zbx_vector_uint64_pair_search(&masteritem->dep_itemids, pair,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-	{
-		return;
-	}
+	zbx_hashset_remove(&masteritem->dep_itemids, &dep_itemid);
 
-	zbx_vector_uint64_pair_remove_noorder(&masteritem->dep_itemids, index);
-
-	if (0 == masteritem->dep_itemids.values_num)
+	if (0 == masteritem->dep_itemids.num_data)
 	{
 		dc_masteritem_free(item->master_item);
 		item->master_item = NULL;
@@ -3641,7 +3651,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 	ZBX_DC_HOST		*host = NULL;
 
-	ZBX_DC_ITEM		*item;
+	ZBX_DC_ITEM		*item = NULL;
 	ZBX_DC_TEMPLATE_ITEM	*template_item;
 	ZBX_DC_ITEM		*depitem;
 	ZBX_DC_INTERFACE_ITEM	*interface_snmpitem;
@@ -3782,6 +3792,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 		if (0 == found)
 		{
+			ZBX_DC_ITEM_REF	ref_local = {.item = item};
+
 			item->triggers = NULL;
 			item->update_triggers = 0;
 			item->nextcheck = 0;
@@ -3801,7 +3813,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 			zbx_vector_ptr_create_ext(&item->tags, __config_shmem_malloc_func, __config_shmem_realloc_func,
 					__config_shmem_free_func);
 
-			zbx_vector_dc_item_ptr_append(&host->items, item);
+			zbx_hashset_insert_ext(&host->items, &ref_local, sizeof(ref_local), 0, sizeof(ref_local), uniq);
 
 			item->preproc_item = NULL;
 			item->master_item = NULL;
@@ -3935,32 +3947,31 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 	for (i = 0; i < dep_items.values_num; i++)
 	{
-		zbx_uint64_pair_t	pair;
-
 		depitem = (ZBX_DC_ITEM *)dep_items.values[i];
 		dc_masteritem_remove_depitem(depitem->itemtype.depitem->last_master_itemid, depitem->itemid, revision);
 
-		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
-				&depitem->itemtype.depitem->master_itemid)))
+		if (NULL == item || item->itemid != depitem->itemtype.depitem->master_itemid)
 		{
-			continue;
+			if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
+					&depitem->itemtype.depitem->master_itemid)))
+			{
+				continue;
+			}
 		}
-
-		pair.first = depitem->itemid;
-		pair.second = depitem->flags;
-
 		if (NULL == item->master_item)
 		{
 			item->master_item = (ZBX_DC_MASTERITEM *)__config_shmem_malloc_func(NULL,
 					sizeof(ZBX_DC_MASTERITEM));
 
-			zbx_vector_uint64_pair_create_ext(&item->master_item->dep_itemids, __config_shmem_malloc_func,
+			zbx_hashset_create_ext(&item->master_item->dep_itemids, 3, ZBX_DEFAULT_UINT64_HASH_FUNC,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
 		}
 
 		item->master_item->revision = revision;
 
-		zbx_vector_uint64_pair_append(&item->master_item->dep_itemids, pair);
+		zbx_hashset_insert_ext(&item->master_item->dep_itemids, &depitem->itemid, sizeof(depitem->itemid), 0,
+				sizeof(depitem->itemid), uniq);
 
 		/* Update master item revision for preprocessing configuration refresh.     */
 		/* No need to update host revision as it was already updated when dependent */
@@ -3990,13 +4001,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 		if (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &item->hostid)))
 		{
-			dc_host_update_revision(host, revision);
+			ZBX_DC_ITEM_REF	ref_local = {.item = item};
 
-			if (FAIL != (i = zbx_vector_dc_item_ptr_search(&host->items, item,
-					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
-			{
-				zbx_vector_dc_item_ptr_remove(&host->items, i);
-			}
+			zbx_hashset_remove(&host->items, &ref_local);
+			dc_host_update_revision(host, revision);
 		}
 
 		if (ITEM_STATUS_ACTIVE == item->status)
@@ -10118,16 +10126,19 @@ void	zbx_dc_config_get_items_by_itemids(zbx_dc_item_t *items, const zbx_uint64_t
 
 int	zbx_dc_config_get_active_items_count_by_hostid(zbx_uint64_t hostid)
 {
-	const ZBX_DC_HOST	*dc_host;
-	int			i, num = 0;
+	ZBX_DC_HOST		*dc_host;
+	int			num = 0;
+	zbx_hashset_iter_t	iter;
+	ZBX_DC_ITEM_REF		*ref;
 
 	RDLOCK_CACHE;
 
 	if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
 	{
-		for (i = 0; i < dc_host->items.values_num; i++)
+		zbx_hashset_iter_reset(&dc_host->items, &iter);
+		while (NULL != (ref = (ZBX_DC_ITEM_REF *)zbx_hashset_iter_next(&iter)))
 		{
-			if (ITEM_TYPE_ZABBIX_ACTIVE == dc_host->items.values[i]->type)
+			if (ITEM_TYPE_ZABBIX_ACTIVE == ref->item->type)
 				num++;
 		}
 	}
@@ -10139,24 +10150,23 @@ int	zbx_dc_config_get_active_items_count_by_hostid(zbx_uint64_t hostid)
 
 void	zbx_dc_config_get_active_items_by_hostid(zbx_dc_item_t *items, zbx_uint64_t hostid, int *errcodes, size_t num)
 {
-	const ZBX_DC_HOST	*dc_host;
-	size_t			i, j = 0;
+	ZBX_DC_HOST		*dc_host;
+	size_t			j = 0;
+	zbx_hashset_iter_t	iter;
+	ZBX_DC_ITEM_REF		*ref;
 
 	RDLOCK_CACHE;
 
 	if (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)) &&
-			0 != dc_host->items.values_num)
+			0 != dc_host->items.num_data)
 	{
-		for (i = 0; i < (size_t)dc_host->items.values_num && j < num; i++)
+		zbx_hashset_iter_reset(&dc_host->items, &iter);
+		while (NULL != (ref = (ZBX_DC_ITEM_REF *)zbx_hashset_iter_next(&iter)))
 		{
-			const ZBX_DC_ITEM	*dc_item;
-
-			dc_item = dc_host->items.values[i];
-
-			if (ITEM_TYPE_ZABBIX_ACTIVE != dc_item->type)
+			if (ITEM_TYPE_ZABBIX_ACTIVE != ref->item->type)
 				continue;
 
-			DCget_item(&items[j], dc_item);
+			DCget_item(&items[j], ref->item);
 			errcodes[j++] = SUCCEED;
 		}
 
@@ -10164,7 +10174,7 @@ void	zbx_dc_config_get_active_items_by_hostid(zbx_dc_item_t *items, zbx_uint64_t
 		{
 			DCget_host(&items[0].host, dc_host);
 
-			for (i = 1; i < j; i++)
+			for (size_t i = 1; i < j; i++)
 				items[i].host = items[0].host;
 		}
 	}
@@ -10207,18 +10217,23 @@ static void	dc_preproc_sync_preprocitem(zbx_pp_item_preproc_t *preproc, const ZB
  * Purpose: sync mater-dependent item links                                   *
  *                                                                            *
  ******************************************************************************/
-static void	dc_preproc_sync_masteritem(zbx_pp_item_preproc_t *preproc, const ZBX_DC_MASTERITEM *masteritem)
+static void	dc_preproc_sync_masteritem(zbx_pp_item_preproc_t *preproc, ZBX_DC_MASTERITEM *masteritem)
 {
-	preproc->dep_itemids = (zbx_uint64_t *)zbx_malloc(NULL,
-			sizeof(zbx_uint64_t) * (size_t)masteritem->dep_itemids.values_num);
+	zbx_hashset_iter_t	iter;
+	zbx_uint64_t		*pitemid;
+	int			i = 0;
 
-	for (int i = 0; i < masteritem->dep_itemids.values_num; i++)
-		preproc->dep_itemids[i] = masteritem->dep_itemids.values[i].first;
+	preproc->dep_itemids = (zbx_uint64_t *)zbx_malloc(NULL,
+			sizeof(zbx_uint64_t) * (size_t)masteritem->dep_itemids.num_data);
+
+	zbx_hashset_iter_reset(&masteritem->dep_itemids, &iter);
+	while (NULL != (pitemid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
+		preproc->dep_itemids[i++] = *pitemid;
 
 	qsort(preproc->dep_itemids, (size_t)preproc->dep_itemids_num, sizeof(zbx_uint64_t),
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	preproc->dep_itemids_num = masteritem->dep_itemids.values_num;
+	preproc->dep_itemids_num = masteritem->dep_itemids.num_data;
 }
 
 static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx_uint64_t revision)
@@ -10267,14 +10282,15 @@ static void	dc_preproc_add_item_rec(ZBX_DC_ITEM *dc_item, zbx_vector_dc_item_ptr
 
 	if (NULL != dc_item->master_item)
 	{
-		int	i;
+		zbx_hashset_iter_t	iter;
+		zbx_uint64_t		*pitemid;
 
-		for (i = 0; i < dc_item->master_item->dep_itemids.values_num; i++)
+		zbx_hashset_iter_reset(&dc_item->master_item->dep_itemids, &iter);
+		while (NULL != (pitemid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
 		{
 			ZBX_DC_ITEM	*dep_item;
 
-			if (NULL == (dep_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
-					&dc_item->master_item->dep_itemids.values[i].first)) ||
+			if (NULL == (dep_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, pitemid)) ||
 					ITEM_STATUS_ACTIVE != dep_item->status)
 			{
 				continue;
@@ -10344,12 +10360,16 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 	zbx_hashset_iter_reset(&config->hosts, &iter);
 	while (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
 	{
+		zbx_hashset_iter_t	item_iter;
+		ZBX_DC_ITEM_REF		*ref;
+
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
-		for (i = 0; i < dc_host->items.values_num; i++)
+		zbx_hashset_iter_reset(&dc_host->items, &item_iter);
+		while (NULL != (ref = (ZBX_DC_ITEM_REF *)zbx_hashset_iter_next(&item_iter)))
 		{
-			ZBX_DC_ITEM	*dc_item = dc_host->items.values[i];
+			ZBX_DC_ITEM	*dc_item = ref->item;
 
 			if (ITEM_STATUS_ACTIVE != dc_item->status || ITEM_TYPE_DEPENDENT == dc_item->type)
 				continue;
@@ -12864,7 +12884,7 @@ int	zbx_dc_get_item_queue(zbx_vector_queue_item_ptr_t *queue, int from, int to)
 {
 	zbx_hashset_iter_t	iter;
 	const ZBX_DC_ITEM	*dc_item;
-	const ZBX_DC_HOST	*dc_host;
+	ZBX_DC_HOST		*dc_host;
 	int			now, nitems = 0, data_expected_from, delay;
 	zbx_queue_item_t	*queue_item;
 
@@ -12874,19 +12894,22 @@ int	zbx_dc_get_item_queue(zbx_vector_queue_item_ptr_t *queue, int from, int to)
 
 	zbx_hashset_iter_reset(&config->hosts, &iter);
 
-	while (NULL != (dc_host = (const ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (dc_host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
 	{
 		const ZBX_DC_INTERFACE	*dc_interface = NULL;
+		zbx_hashset_iter_t	item_iter;
+		ZBX_DC_ITEM_REF		*ref;
 
 		if (HOST_STATUS_MONITORED != dc_host->status)
 			continue;
 
-		for (int i = 0; i < dc_host->items.values_num; i++)
+		zbx_hashset_iter_reset(&dc_host->items, &item_iter);
+		while (NULL != (ref = (ZBX_DC_ITEM_REF *)zbx_hashset_iter_next(&item_iter)))
 		{
-			char			*delay_s;
-			int			ret;
+			char	*delay_s;
+			int	ret;
 
-			dc_item = dc_host->items.values[i];
+			dc_item = ref->item;
 
 			if (ITEM_STATUS_ACTIVE != dc_item->status)
 				continue;
@@ -13053,12 +13076,15 @@ static int	get_active_item_count_rec(const ZBX_DC_ITEM *dc_item)
 
 	if (NULL != dc_item->master_item)
 	{
-		for (int i = 0; i < dc_item->master_item->dep_itemids.values_num; i++)
+		zbx_hashset_iter_t	iter;
+		zbx_uint64_t		*pitemid;
+
+		zbx_hashset_iter_reset(&dc_item->master_item->dep_itemids, &iter);
+		while (NULL != (pitemid = (zbx_uint64_t *)zbx_hashset_iter_next(&iter)))
 		{
 			ZBX_DC_ITEM	*dep_item;
 
-			if (NULL != (dep_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
-					&dc_item->master_item->dep_itemids.values[i].first)) &&
+			if (NULL != (dep_item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, pitemid)) &&
 					ITEM_STATUS_ACTIVE == dep_item->status)
 			{
 				count += get_active_item_count_rec(dep_item);
@@ -13096,13 +13122,15 @@ static void	update_required_performance(const ZBX_DC_ITEM *dc_item, zbx_dc_statu
 static void	get_host_statistics(ZBX_DC_HOST *dc_host, zbx_dc_status_diff_host_t *host_diff,
 		zbx_dc_status_diff_proxy_t *proxy_diff, zbx_dc_status_diff_t *diff)
 {
-	int			i;
 	const ZBX_DC_ITEM	*dc_item;
+	zbx_hashset_iter_t	iter;
+	ZBX_DC_ITEM_REF		*ref;
 
 	/* loop over items to gather per-host and per-proxy statistics */
-	for (i = 0; i < dc_host->items.values_num; i++)
+	zbx_hashset_iter_reset(&dc_host->items, &iter);
+	while (NULL != (ref = (ZBX_DC_ITEM_REF *)zbx_hashset_iter_next(&iter)))
 	{
-		dc_item = dc_host->items.values[i];
+		dc_item = ref->item;
 
 		if (ZBX_FLAG_DISCOVERY_NORMAL != dc_item->flags && ZBX_FLAG_DISCOVERY_CREATED != dc_item->flags)
 			continue;

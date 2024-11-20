@@ -135,6 +135,50 @@ zbx_lld_graph_t;
 ZBX_PTR_VECTOR_DECL(lld_graph_ptr, zbx_lld_graph_t*)
 ZBX_PTR_VECTOR_IMPL(lld_graph_ptr, zbx_lld_graph_t*)
 
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	zbx_lld_graph_t	*graph;
+}
+zbx_lld_item_graph_t;
+
+typedef struct
+{
+	zbx_lld_graph_t	*graph;
+}
+zbx_lld_graph_ref_t;
+
+static zbx_hash_t	lld_graph_ref_name_hash(const void *d)
+{
+	const zbx_lld_graph_ref_t	*ref = (zbx_lld_graph_ref_t *)d;
+
+	return ZBX_DEFAULT_STRING_HASH_FUNC(ref->graph->name);
+}
+
+static int	lld_graph_ref_name_compare(const void *d1, const void *d2)
+{
+	const zbx_lld_graph_ref_t	*ref1 = (zbx_lld_graph_ref_t *)d1;
+	const zbx_lld_graph_ref_t	*ref2 = (zbx_lld_graph_ref_t *)d2;
+
+	return strcmp(ref1->graph->name, ref2->graph->name);
+}
+
+static zbx_hash_t	lld_graph_ref_id_hash(const void *d)
+{
+	const zbx_lld_graph_ref_t	*ref = (zbx_lld_graph_ref_t *)d;
+
+	return ZBX_DEFAULT_UINT64_HASH_FUNC(&ref->graph->graphid);
+}
+
+static int	lld_graph_ref_id_compare(const void *d1, const void *d2)
+{
+	const zbx_lld_graph_ref_t	*ref1 = (zbx_lld_graph_ref_t *)d1;
+	const zbx_lld_graph_ref_t	*ref2 = (zbx_lld_graph_ref_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(ref1->graph->graphid, ref2->graph->graphid);
+	return 0;
+}
+
 static int	lld_graph_compare_func(const void *d1, const void *d2)
 {
 	const zbx_lld_graph_t	*lld_graph_1 = *(const zbx_lld_graph_t **)d1;
@@ -308,21 +352,28 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_lld_gitem_ptr
 {
 	zbx_lld_graph_t		*graph;
 	zbx_vector_uint64_t	graphids;
-	zbx_db_result_t		result;
+	zbx_db_large_query_t	query;
 	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
+	zbx_hashset_t		graph_index;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	zbx_hashset_create(&graph_index, graphs->values_num, lld_graph_ref_id_hash, lld_graph_ref_id_compare);
 	zbx_vector_uint64_create(&graphids);
 	zbx_vector_uint64_append(&graphids, parent_graphid);
 
 	for (int i = 0; i < graphs->values_num; i++)
 	{
+		zbx_lld_graph_ref_t	ref_local;
+
 		graph = graphs->values[i];
 
 		zbx_vector_uint64_append(&graphids, graph->graphid);
+
+		ref_local.graph = graph;
+		zbx_hashset_insert(&graph_index, &ref_local, sizeof(ref_local));
 	}
 
 	zbx_vector_uint64_sort(&graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -333,18 +384,14 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_lld_gitem_ptr
 			"select gitemid,graphid,itemid,drawtype,sortorder,color,yaxisside,calc_fnc,type"
 			" from graphs_items"
 			" where");
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "graphid",
-			graphids.values, graphids.values_num);
 
-	result = zbx_db_select("%s", sql);
+	zbx_db_large_query_prepare_uint(&query, &sql, &sql_alloc, &sql_offset, "graphid", &graphids);
 
-	zbx_free(sql);
-
-	while (NULL != (row = zbx_db_fetch(result)))
+	while (NULL != (row = zbx_db_large_query_fetch(&query)))
 	{
-		int			index;
 		zbx_uint64_t		graphid;
 		zbx_lld_gitem_t		*gitem = (zbx_lld_gitem_t *)zbx_malloc(NULL, sizeof(zbx_lld_gitem_t));
+		zbx_lld_graph_ref_t	*ref;
 
 		ZBX_STR2UINT64(gitem->gitemid, row[0]);
 		ZBX_STR2UINT64(graphid, row[1]);
@@ -366,25 +413,30 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_lld_gitem_ptr
 
 		gitem->flags = ZBX_FLAG_LLD_GITEM_UNSET;
 
-		zbx_lld_graph_t	cmp = {.graphid = graphid};
-
 		if (graphid == parent_graphid)
 		{
 			zbx_vector_lld_gitem_ptr_append(gitems_proto, gitem);
 		}
-		else if (FAIL != (index = zbx_vector_lld_graph_ptr_bsearch(graphs, &cmp, lld_graph_compare_func)))
-		{
-			graph = graphs->values[index];
-
-			zbx_vector_lld_gitem_ptr_append(&graph->gitems, gitem);
-		}
 		else
 		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			lld_gitem_free(gitem);
+			zbx_lld_graph_t		cmp = {.graphid = graphid};
+			zbx_lld_graph_ref_t	ref_local = {.graph = &cmp};
+
+			if (NULL != (ref = (zbx_lld_graph_ref_t *)zbx_hashset_search(&graph_index, &ref_local)))
+			{
+				zbx_vector_lld_gitem_ptr_append(&ref->graph->gitems, gitem);
+			}
+			else
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				lld_gitem_free(gitem);
+			}
 		}
 	}
-	zbx_db_free_result(result);
+
+	zbx_db_large_query_clear(&query);
+
+	zbx_free(sql);
 
 	zbx_vector_lld_gitem_ptr_sort(gitems_proto, lld_gitem_compare_func);
 
@@ -396,6 +448,7 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_lld_gitem_ptr
 	}
 
 	zbx_vector_uint64_destroy(&graphids);
+	zbx_hashset_destroy(&graph_index);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -469,35 +522,7 @@ static void	lld_items_get(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_ui
 
 	zbx_vector_uint64_destroy(&itemids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: Finds already existing graph, using item.                         *
- *                                                                            *
- * Return value: upon successful completion returns pointer to graph          *
- *                                                                            *
- ******************************************************************************/
-static zbx_lld_graph_t	*lld_graph_by_item(const zbx_vector_lld_graph_ptr_t *graphs, zbx_uint64_t itemid)
-{
-	for (int i = 0; i < graphs->values_num; i++)
-	{
-		zbx_lld_graph_t	*graph = graphs->values[i];
-
-		if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED))
-			continue;
-
-		for (int j = 0; j < graph->gitems.values_num; j++)
-		{
-			zbx_lld_gitem_t	*gitem = graph->gitems.values[j];
-
-			if (gitem->itemid == itemid)
-				return graph;
-		}
-	}
-
-	return NULL;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): items:" ZBX_FS_UI64 , __func__, items->values_num);
 }
 
 /******************************************************************************
@@ -508,17 +533,15 @@ static zbx_lld_graph_t	*lld_graph_by_item(const zbx_vector_lld_graph_ptr_t *grap
  * Return value: upon successful completion returns pointer to graph          *
  *                                                                            *
  ******************************************************************************/
-static zbx_lld_graph_t	*lld_graph_get(const zbx_vector_lld_graph_ptr_t *graphs,
-		const zbx_vector_lld_item_link_ptr_t *item_links)
+static zbx_lld_graph_t	*lld_graph_get(zbx_hashset_t *graph_index, const zbx_vector_lld_item_link_ptr_t *item_links)
 {
-	zbx_lld_graph_t	*graph;
-
 	for (int i = 0; i < item_links->values_num; i++)
 	{
 		const zbx_lld_item_link_t	*item_link = item_links->values[i];
+		zbx_lld_item_graph_t		*ig;
 
-		if (NULL != (graph = lld_graph_by_item(graphs, item_link->itemid)))
-			return graph;
+		if (NULL != (ig = (zbx_lld_item_graph_t *)zbx_hashset_search(graph_index, &item_link->itemid)))
+			return ig->graph;
 	}
 
 	return NULL;
@@ -683,9 +706,9 @@ out:
  *                                                                            *
  ******************************************************************************/
 static void	lld_graph_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_vector_lld_graph_ptr_t *graphs,
-		zbx_vector_lld_item_ptr_t *items, const char *name_proto, zbx_uint64_t ymin_itemid_proto,
-		zbx_uint64_t ymax_itemid_proto, unsigned char discover_proto, int lastcheck,
-		const zbx_lld_row_t *lld_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths)
+		zbx_vector_lld_item_ptr_t *items, zbx_hashset_t *graph_index, const char *name_proto,
+		zbx_uint64_t ymin_itemid_proto, zbx_uint64_t ymax_itemid_proto, unsigned char discover_proto,
+		int lastcheck, const zbx_lld_row_t *lld_row, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths)
 {
 	zbx_lld_graph_t			*graph = NULL;
 	const struct zbx_json_parse	*jp_row = &lld_row->jp_row;
@@ -703,7 +726,7 @@ static void	lld_graph_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_v
 	else if (SUCCEED != lld_item_get(ymax_itemid_proto, items, &lld_row->item_links, &ymax_itemid))
 		goto out;
 
-	if (NULL != (graph = lld_graph_get(graphs, &lld_row->item_links)))
+	if (NULL != (graph = lld_graph_get(graph_index, &lld_row->item_links)))
 	{
 		char	*buffer = zbx_strdup(NULL, name_proto);
 
@@ -780,28 +803,48 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	lld_graph_index_update(zbx_hashset_t *graph_index, zbx_lld_graph_t *graph)
+{
+	for (int i = 0; i < graph->gitems.values_num; i++)
+	{
+		if (0 == graph->gitems.values[i]->itemid)
+			continue;
+
+		zbx_lld_item_graph_t	ig_local = {.itemid = graph->gitems.values[i]->itemid, .graph = graph};
+
+		zbx_hashset_insert(graph_index, &ig_local, sizeof(ig_local));
+	}
+}
+
 static void	lld_graphs_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_vector_lld_graph_ptr_t *graphs,
 		zbx_vector_lld_item_ptr_t *items, const char *name_proto, zbx_uint64_t ymin_itemid_proto,
 		zbx_uint64_t ymax_itemid_proto, unsigned char discover_proto, int lastcheck,
 		const zbx_vector_lld_row_ptr_t *lld_rows, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths)
 {
+	zbx_hashset_t	graph_index;
+
+	zbx_hashset_create(&graph_index, graphs->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	for (int i = 0; i < graphs->values_num; i++)
+		lld_graph_index_update(&graph_index, graphs->values[i]);
+
 	for (int i = 0; i < lld_rows->values_num; i++)
 	{
 		zbx_lld_row_t	*lld_row = lld_rows->values[i];
 
-		lld_graph_make(gitems_proto, graphs, items, name_proto, ymin_itemid_proto, ymax_itemid_proto,
-				discover_proto, lastcheck, lld_row, lld_macro_paths);
+		lld_graph_make(gitems_proto, graphs, items, &graph_index, name_proto, ymin_itemid_proto,
+				ymax_itemid_proto, discover_proto, lastcheck, lld_row, lld_macro_paths);
 	}
 
 	zbx_vector_lld_graph_ptr_sort(graphs, lld_graph_compare_func);
+
+	zbx_hashset_destroy(&graph_index);
 }
 
 static void	lld_validate_graph_field(zbx_lld_graph_t *graph, char **field, char **field_orig, zbx_uint64_t flag,
 		size_t field_len, char **error)
 {
-	if (0 == (graph->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED))
-		return;
-
 	/* only new graphs or graphs with changed data will be validated */
 	if (0 != graph->graphid && 0 == (graph->flags & flag))
 		return;
@@ -833,6 +876,88 @@ static void	lld_validate_graph_field(zbx_lld_graph_t *graph, char **field, char 
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check for duplicated keys in database                             *
+ *                                                                            *
+ *****************************************************************************/
+static void	lld_graphs_validate_db_name(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t *graphs,
+		zbx_hashset_t *name_index, char **error)
+{
+	zbx_db_large_query_t	query;
+	zbx_db_row_t		row;
+	zbx_vector_str_t	names;
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
+
+	zbx_vector_str_create(&names);		/* list of item keys */
+
+	for (int i = 0; i < graphs->values_num; i++)
+	{
+		zbx_lld_graph_t		*graph;
+
+		graph = graphs->values[i];
+
+		if (0 == (graph->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED))
+			continue;
+
+		if (0 == graph->graphid || 0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_NAME))
+			zbx_vector_str_append(&names, graph->name);
+	}
+
+	if (0 == names.values_num)
+		goto out;
+
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select g.graphid,g.name"
+			" from graphs g,graphs_items gi,items i"
+			" where g.graphid=gi.graphid"
+				" and gi.itemid=i.itemid"
+				" and i.hostid=" ZBX_FS_UI64
+				" and",
+			hostid);
+
+	zbx_db_large_query_prepare_str(&query, &sql, &sql_alloc, &sql_offset, "g.name", &names);
+
+	while (NULL != (row = zbx_db_large_query_fetch(&query)))
+	{
+		zbx_lld_graph_t		*graph, graph_stub;
+		zbx_lld_graph_ref_t	*ref, ref_local = {.graph = &graph_stub};
+
+		ZBX_STR2UINT64(graph_stub.graphid, row[0]);
+		graph_stub.name = row[1];
+
+		if (NULL == (ref = (zbx_lld_graph_ref_t *)zbx_hashset_search(name_index, &ref_local)) ||
+				ref->graph->graphid == ref_local.graph->graphid ||
+				0 == (ref->graph->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED))
+		{
+			continue;
+		}
+
+		graph = ref->graph;
+
+		*error = zbx_strdcatf(*error, "Cannot %s graph:"
+				" graph with the same name \"%s\" already exists.\n",
+				(0 != graph->graphid ? "update" : "create"), graph->name);
+
+		if (0 != graph->graphid)
+		{
+			lld_field_str_rollback(&graph->name, &graph->name_orig, &graph->flags,
+					ZBX_FLAG_LLD_GRAPH_UPDATE_NAME);
+		}
+		else
+			graph->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+	}
+
+	zbx_db_large_query_clear(&query);
+
+	zbx_free(sql);
+out:
+	zbx_vector_str_destroy(&names);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: validates sorted graph                                            *
  *                                                                            *
  * Parameters: hostid - [IN]                                                  *
@@ -842,14 +967,13 @@ static void	lld_validate_graph_field(zbx_lld_graph_t *graph, char **field, char 
  ******************************************************************************/
 static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t *graphs, char **error)
 {
-	zbx_lld_graph_t		*graph, *graph_b;
-	zbx_vector_uint64_t	graphids;
-	zbx_vector_str_t	names;
+	zbx_lld_graph_t		*graph;
+	zbx_hashset_t		name_index;
+	zbx_lld_graph_ref_t	ref_local, *ref;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_uint64_create(&graphids);
-	zbx_vector_str_create(&names);		/* list of graph names */
+	zbx_hashset_create(&name_index, graphs->values_num, lld_graph_ref_name_hash, lld_graph_ref_name_compare);
 
 	/* checking a validity of the fields */
 
@@ -857,8 +981,18 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t 
 	{
 		graph = graphs->values[i];
 
+		if (0 == (graph->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED))
+			continue;
+
 		lld_validate_graph_field(graph, &graph->name, &graph->name_orig,
 				ZBX_FLAG_LLD_GRAPH_UPDATE_NAME, ZBX_GRAPH_NAME_LEN, error);
+
+		/* index existing graphs without pending name updates */
+		if (0 != graph->graphid && 0 == (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_NAME))
+		{
+			ref_local.graph = graph;
+			(void)zbx_hashset_insert(&name_index, &ref_local, sizeof(ref_local));
+		}
 	}
 
 	/* checking duplicated graph names */
@@ -873,16 +1007,11 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t 
 		if (0 != graph->graphid && 0 == (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_NAME))
 			continue;
 
-		for (int j = 0; j < graphs->values_num; j++)
+		ref_local.graph = graph;
+		ref = (zbx_lld_graph_ref_t *)zbx_hashset_insert(&name_index, &ref_local, sizeof(ref_local));
+
+		if (ref->graph != graph)	/* another graph with the same name was already indexed */
 		{
-			graph_b = graphs->values[j];
-
-			if (0 == (graph_b->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED) || i == j)
-				continue;
-
-			if (0 != strcmp(graph->name, graph_b->name))
-				continue;
-
 			*error = zbx_strdcatf(*error, "Cannot %s graph:"
 						" graph with the same name \"%s\" already exists.\n",
 						(0 != graph->graphid ? "update" : "create"), graph->name);
@@ -894,95 +1023,12 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_lld_graph_ptr_t 
 			}
 			else
 				graph->flags &= ~ZBX_FLAG_LLD_GRAPH_DISCOVERED;
-
-			break;
 		}
 	}
 
-	/* checking duplicated graphs in DB */
+	lld_graphs_validate_db_name(hostid, graphs, &name_index, error);
 
-	for (int i = 0; i < graphs->values_num; i++)
-	{
-		graph = graphs->values[i];
-
-		if (0 == (graph->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED))
-			continue;
-
-		if (0 != graph->graphid)
-		{
-			zbx_vector_uint64_append(&graphids, graph->graphid);
-
-			if (0 == (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_NAME))
-				continue;
-		}
-
-		zbx_vector_str_append(&names, graph->name);
-	}
-
-	if (0 != names.values_num)
-	{
-		zbx_db_result_t	result;
-		zbx_db_row_t	row;
-		char		*sql = NULL;
-		size_t		sql_alloc = 256, sql_offset = 0;
-
-		sql = (char *)zbx_malloc(sql, sql_alloc);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select g.name"
-				" from graphs g,graphs_items gi,items i"
-				" where g.graphid=gi.graphid"
-					" and gi.itemid=i.itemid"
-					" and i.hostid=" ZBX_FS_UI64
-					" and",
-				hostid);
-		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.name",
-				(const char **)names.values, names.values_num);
-
-		if (0 != graphids.values_num)
-		{
-			zbx_vector_uint64_sort(&graphids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and not");
-			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.graphid",
-					graphids.values, graphids.values_num);
-		}
-
-		result = zbx_db_select("%s", sql);
-
-		while (NULL != (row = zbx_db_fetch(result)))
-		{
-			for (int i = 0; i < graphs->values_num; i++)
-			{
-				graph = graphs->values[i];
-
-				if (0 == (graph->flags & ZBX_FLAG_LLD_GRAPH_DISCOVERED))
-					continue;
-
-				if (0 == strcmp(graph->name, row[0]))
-				{
-					*error = zbx_strdcatf(*error, "Cannot %s graph:"
-							" graph with the same name \"%s\" already exists.\n",
-							(0 != graph->graphid ? "update" : "create"), graph->name);
-
-					if (0 != graph->graphid)
-					{
-						lld_field_str_rollback(&graph->name, &graph->name_orig, &graph->flags,
-								ZBX_FLAG_LLD_GRAPH_UPDATE_NAME);
-					}
-					else
-						graph->flags &= ~ZBX_FLAG_LLD_GRAPH_DISCOVERED;
-
-					continue;
-				}
-			}
-		}
-		zbx_db_free_result(result);
-
-		zbx_free(sql);
-	}
-
-	zbx_vector_str_destroy(&names);
-	zbx_vector_uint64_destroy(&graphids);
+	zbx_hashset_destroy(&name_index);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1420,11 +1466,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 	if (0 != del_gitemids.values_num)
 	{
 		zbx_vector_uint64_sort(&del_gitemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from graphs_items where");
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "gitemid",
-				del_gitemids.values, del_gitemids.values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+		zbx_db_execute_multiple_query("delete from graphs_items where", "gitemid", &del_gitemids);
 	}
 
 	if (0 != upd_graphs || 0 != upd_gitems.values_num || 0 != del_gitemids.values_num)
@@ -1460,7 +1502,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process lost graph resources                                    *
+ * Purpose: process lost graph resources                                      *
  *                                                                            *
  ******************************************************************************/
 static void	lld_process_lost_graphs(zbx_vector_lld_graph_ptr_t *graphs, const zbx_lld_lifetime_t *lifetime, int now)
@@ -1565,14 +1607,18 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 		lld_graphs_get(parent_graphid, &graphs, width, height, yaxismin, yaxismax, show_work_period,
 				show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right,
 				ymin_type, ymax_type);
+
 		lld_gitems_get(parent_graphid, &gitems_proto, &graphs);
+
 		lld_items_get(&gitems_proto, ymin_itemid_proto, ymax_itemid_proto, &items);
 
 		/* making graphs */
 
 		lld_graphs_make(&gitems_proto, &graphs, &items, name_proto, ymin_itemid_proto, ymax_itemid_proto,
 				discover_proto, lastcheck, lld_rows, lld_macro_paths);
+
 		lld_graphs_validate(hostid, &graphs, error);
+
 		ret = lld_graphs_save(hostid, parent_graphid, &graphs, width, height, yaxismin, yaxismax,
 				show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left,
 				percent_right, ymin_type, ymax_type);

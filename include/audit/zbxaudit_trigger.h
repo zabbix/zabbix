@@ -53,7 +53,7 @@ PREPARE_AUDIT_TRIGGER_UPDATE_H(description, const char*)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(expression, const char*)
 PREPARE_AUDIT_TRIGGER_UPDATE_H(recovery_expression, const char*)
 
-void	zbx_audit_DBselect_delete_for_trigger(int audit_context_mode, const char *sql, zbx_vector_uint64_t *ids);
+void	zbx_audit_trigger_delete(int audit_context_mode, zbx_vector_uint64_t *triggerids);
 void	zbx_audit_trigger_update_json_add_dependency(int audit_context_mode, int flags, zbx_uint64_t triggerdepid,
 		zbx_uint64_t triggerid, zbx_uint64_t triggerid_up);
 void	zbx_audit_trigger_update_json_remove_dependency(int audit_context_mode, int flags, zbx_uint64_t triggerdepid,

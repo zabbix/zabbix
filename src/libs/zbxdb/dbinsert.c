@@ -28,7 +28,7 @@
  * Parameters: self        - [IN] the bulk insert data                        *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_insert_clean(zbx_db_insert_t *db_insert)
+static void	db_insert_clear_rows(zbx_db_insert_t *db_insert)
 {
 	for (int i = 0; i < db_insert->rows.values_num; i++)
 	{
@@ -53,6 +53,19 @@ void	zbx_db_insert_clean(zbx_db_insert_t *db_insert)
 		zbx_free(row);
 	}
 
+	zbx_vector_db_value_ptr_clear(&db_insert->rows);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: releases resources allocated by bulk insert operations            *
+ *                                                                            *
+ * Parameters: self        - [IN] the bulk insert data                        *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_insert_clean(zbx_db_insert_t *db_insert)
+{
+	db_insert_clear_rows(db_insert);
 	zbx_vector_db_value_ptr_destroy(&db_insert->rows);
 
 	zbx_vector_const_db_field_ptr_destroy(&db_insert->fields);
@@ -93,6 +106,7 @@ void	zbx_dbconn_prepare_insert_dyn(zbx_dbconn_t *db, zbx_db_insert_t *db_insert,
 	db_insert->db = db;
 	db_insert->autoincrement = -1;
 	db_insert->lastid = 0;
+	db_insert->batch_size = 0;
 
 	zbx_vector_const_db_field_ptr_create(&db_insert->fields);
 	zbx_vector_db_value_ptr_create(&db_insert->rows);
@@ -181,6 +195,12 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *db_insert, zbx_db_value_t **v
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
 		exit(EXIT_FAILURE);
+	}
+
+	if (0 != db_insert->batch_size && db_insert->batch_size <= db_insert->rows.values_num)
+	{
+		zbx_db_insert_execute(db_insert);
+		db_insert_clear_rows(db_insert);
 	}
 
 	row = (zbx_db_value_t *)zbx_malloc(NULL, (size_t)db_insert->fields.values_num * sizeof(zbx_db_value_t));
@@ -562,4 +582,20 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *db_insert, const char *field_n
 zbx_uint64_t	zbx_db_insert_get_lastid(zbx_db_insert_t *self)
 {
 	return self->lastid;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set batch size                                                    *
+ *                                                                            *
+ * Parameters: self       - [IN] bulk insert data                             *
+ *             batch_size - [IN] maximum number of rows to cache before       *
+ *                               flushing (inserting) to database.            *
+ *                               0 - no limit                                 *
+ *                                                                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_insert_set_batch_size(zbx_db_insert_t *self, int batch_size)
+{
+	self->batch_size = batch_size;
 }

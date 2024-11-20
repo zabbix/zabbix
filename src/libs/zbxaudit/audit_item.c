@@ -165,76 +165,33 @@ PREPARE_AUDIT_ITEM_UPDATE(key,			const char*,	string)
 #undef ONLY_LLD_RULE
 #undef ZBX_AUDIT_IT_OR_ITP_OR_DR
 
-/******************************************************************************
- *                                                                            *
- * Parameters:                                                                *
- *             audit_context_mode - [IN]                                      *
- *             id                 - [IN] resource id                          *
- *             name               - [IN] resource name                        *
- *             flag               - [IN] resource flag                        *
- *                                                                            *
- ******************************************************************************/
-void	zbx_audit_item_create_entry_for_delete(int audit_context_mode, zbx_uint64_t id, const char *name, int flag)
+/********************************************************************************
+ *                                                                              *
+ * Purpose: create audit events for items that are to be removed                *
+ *                                                                              *
+ ********************************************************************************/
+void	zbx_audit_item_delete(int audit_context_mode, zbx_vector_uint64_t *itemids)
 {
-	int			resource_type;
-	zbx_audit_entry_t	local_audit_item_entry, **found_audit_item_entry;
-	zbx_audit_entry_t	*local_audit_item_entry_x = &local_audit_item_entry;
+	zbx_db_large_query_t	query;
+	zbx_db_row_t		row;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
 
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
-	resource_type = zbx_audit_item_flag_to_resource_type(flag);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select itemid,name,flags from items where");
+	zbx_db_large_query_prepare_uint(&query, &sql, &sql_alloc, &sql_offset, "itemid", itemids);
 
-	local_audit_item_entry.id = id;
-	local_audit_item_entry.cuid = NULL;
-	local_audit_item_entry.id_table = AUDIT_ITEM_ID;
-
-	found_audit_item_entry = (zbx_audit_entry_t**)zbx_hashset_search(zbx_get_audit_hashset(),
-			&(local_audit_item_entry_x));
-	if (NULL == found_audit_item_entry)
+	while (NULL != (row = zbx_db_large_query_fetch(&query)))
 	{
-		zbx_audit_entry_t	*local_audit_item_entry_insert;
+		zbx_uint64_t	itemid;
 
-		local_audit_item_entry_insert = zbx_audit_entry_init(id, AUDIT_ITEM_ID, name, ZBX_AUDIT_ACTION_DELETE,
-				resource_type);
-		zbx_hashset_insert(zbx_get_audit_hashset(), &local_audit_item_entry_insert,
-				sizeof(local_audit_item_entry_insert));
+		ZBX_STR2UINT64(itemid, row[0]);
+
+		zbx_audit_item_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_DELETE, itemid, row[1], atoi(row[2]));
 	}
-}
-
-/********************************************************************************
- *                                                                              *
- * Parameters:                                                                  *
- *             audit_context_mode - [IN]                                        *
- *             sql                - [IN] sql statement                          *
- *             ids                - [OUT] sorted list of selected uint64 values *
- *                                                                              *
- * Return value: SUCCEED - query SUCCEEDED                                      *
- *               FAIL    - otherwise                                            *
- *                                                                              *
- ********************************************************************************/
-int	zbx_audit_DBselect_delete_for_item(int audit_context_mode, const char *sql, zbx_vector_uint64_t *ids)
-{
-	int		ret = FAIL;
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	zbx_uint64_t	id;
-
-	if (NULL == (result = zbx_db_select("%s", sql)))
-		goto out;
-
-	while (NULL != (row = zbx_db_fetch(result)))
-	{
-		ZBX_STR2UINT64(id, row[0]);
-		zbx_vector_uint64_append(ids, id);
-		zbx_audit_item_create_entry_for_delete(audit_context_mode, id, row[1], atoi(row[2]));
-	}
-
-	zbx_db_free_result(result);
-
-	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	ret = SUCCEED;
-out:
-	return ret;
+	zbx_db_large_query_clear(&query);
+	zbx_free(sql);
 }
 
 void	zbx_audit_discovery_rule_update_json_add_filter_conditions(int audit_context_mode, zbx_uint64_t itemid,

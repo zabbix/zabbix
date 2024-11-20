@@ -1,0 +1,1 @@
+A.......S. [ZBXNEXT-9233] added LLD optimizations to perform discovery of 2m items/triggers/graphs within reasonable time limits, removed 30k dependent item limit (vmurzins, wiper)

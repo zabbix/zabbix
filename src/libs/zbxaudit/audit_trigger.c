@@ -220,37 +220,35 @@ PREPARE_AUDIT_TRIGGER_UPDATE(recovery_expression, const char*, string)
 #undef PREPARE_AUDIT_TRIGGER_UPDATE
 #undef TR_OR_TRP
 
+
 /********************************************************************************
  *                                                                              *
- * Parameters:                                                                  *
- *             audit_context_mode - [IN]                                        *
- *             sql                - [IN] sql statement                          *
- *             ids                - [OUT] sorted list of selected uint64 values *
- *                                                                              *
- * Return value: SUCCEED - query SUCCEEDED                                      *
- *               FAIL    - otherwise                                            *
+ * Purpose: create audit events for triggers that are to be removed             *
  *                                                                              *
  ********************************************************************************/
-void	zbx_audit_DBselect_delete_for_trigger(int audit_context_mode, const char *sql, zbx_vector_uint64_t *ids)
+void	zbx_audit_trigger_delete(int audit_context_mode, zbx_vector_uint64_t *triggerids)
 {
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
+	zbx_db_large_query_t	query;
+	zbx_db_row_t		row;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
 
-	result = zbx_db_select("%s", sql);
+	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
-	while (NULL != (row = zbx_db_fetch(result)))
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select triggerid,description,flags from triggers where");
+	zbx_db_large_query_prepare_uint(&query, &sql, &sql_alloc, &sql_offset, "triggerid", triggerids);
+
+	while (NULL != (row = zbx_db_large_query_fetch(&query)))
 	{
-		zbx_uint64_t	id;
+		zbx_uint64_t	triggerid;
 
-		ZBX_STR2UINT64(id, row[0]);
-		zbx_vector_uint64_append(ids, id);
+		ZBX_STR2UINT64(triggerid, row[0]);
 
-		zbx_audit_trigger_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_DELETE, id, row[1], atoi(row[2]));
+		zbx_audit_trigger_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_DELETE, triggerid, row[1],
+				atoi(row[2]));
 	}
-
-	zbx_db_free_result(result);
-
-	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_db_large_query_clear(&query);
+	zbx_free(sql);
 }
 
 void	zbx_audit_trigger_update_json_add_dependency(int audit_context_mode, int flags, zbx_uint64_t triggerdepid,

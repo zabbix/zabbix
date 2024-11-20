@@ -253,22 +253,19 @@ void	lld_disable_lost_object(zbx_lld_discovery_t *discovery, unsigned char objec
 static void	lld_check_objects_in_db(zbx_hashset_t *discoveries, zbx_vector_uint64_t *upd_ids,
 				const char *id_field, const char *object_table)
 {
-	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_lld_discovery_t	*discovery;
+	zbx_db_large_query_t	query;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select %s,status from %s where",
 			id_field, object_table );
 
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, id_field, upd_ids->values, upd_ids->values_num);
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ZBX_FOR_UPDATE);
+	zbx_db_large_query_prepare_uint(&query, &sql, &sql_alloc, &sql_offset, id_field, upd_ids);
+	zbx_db_large_query_append_sql(&query, ZBX_FOR_UPDATE);
 
-	result = zbx_db_select("%s", sql);
-	zbx_free(sql);
-
-	while (NULL != (row = zbx_db_fetch(result)))
+	while (NULL != (row = zbx_db_large_query_fetch(&query)))
 	{
 		zbx_uint64_t	id;
 		unsigned char	value;
@@ -290,7 +287,8 @@ static void	lld_check_objects_in_db(zbx_hashset_t *discoveries, zbx_vector_uint6
 				discovery->flags &= ~ZBX_LLD_DISCOVERY_UPDATE_OBJECT_STATUS;
 		}
 	}
-	zbx_db_free_result(result);
+	zbx_db_large_query_clear(&query);
+	zbx_free(sql);
 
 	/* reset discovery flags for already removed objects */
 	for (int i = 0; i < upd_ids->values_num; i++)
@@ -304,6 +302,133 @@ static void	lld_check_objects_in_db(zbx_hashset_t *discoveries, zbx_vector_uint6
 		if (0 == (discovery->flags & ZBX_LLD_DISCOVERY_UPDATE_OBJECT_EXISTS))
 			discovery->flags = 0;
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: flush object status updates                                       *
+ *                                                                            *
+ * Parameters: sql          - [IN/OUT] SQL query string                       *
+ *             sql_alloc    - [IN/OUT] allocated size of SQL query string     *
+ *             sql_offset   - [IN/OUT] current position in SQL query string   *
+ *             id_field     - [IN] object id field name                       *
+ *             object_table - [IN] object table name                          *
+ *             status       - [IN] new object status                          *
+ *             ids          - [IN] object identifiers to update               *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_flush_object_status(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *id_field,
+		const char *object_table, unsigned char status, zbx_vector_uint64_t *ids)
+{
+	if (0 == ids->values_num)
+		return;
+
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "update %s set status=%d where", object_table, status);
+	zbx_db_add_condition_alloc(sql, sql_alloc, sql_offset, id_field, ids->values, ids->values_num);
+	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
+	zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
+
+	zbx_vector_uint64_clear(ids);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: flush discovery updates to the database                           *
+ *                                                                            *
+ * Parameters: sql             - [IN/OUT] SQL query string                    *
+ *             sql_alloc       - [IN/OUT] allocated size of SQL query string  *
+ *             sql_offset      - [IN/OUT] current position in SQL query string*
+ *             id_field        - [IN] object id field name                    *
+ *             discovery_table - [IN] discovery table name                    *
+ *             discovery       - [IN] updates to flush                        *
+ *             now             - [IN] current timestamp                       *
+ *             ids             - [IN] object identifiers to update            *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_flush_discovery_updates(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *id_field,
+		const char *discovery_table, const zbx_lld_discovery_t *discovery, int now, zbx_vector_uint64_t *ids)
+{
+	if (0 == ids->values_num)
+		return;
+
+	char	delim = ' ';
+
+	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "update %s set", discovery_table);
+
+	if (0 != (discovery->flags & ZBX_LLD_DISCOVERY_UPDATE_LASTCHECK))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%clastcheck=%d", delim, now);
+		delim = ',';
+	}
+
+	if (0 != (discovery->flags & ZBX_LLD_DISCOVERY_UPDATE_DISCOVERY_STATUS))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cstatus=%u", delim,
+				discovery->discovery_status);
+		delim = ',';
+	}
+
+	if (0 != (discovery->flags & ZBX_LLD_DISCOVERY_UPDATE_DISABLE_SOURCE))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cdisable_source=%u", delim,
+				discovery->disable_source);
+		delim = ',';
+	}
+
+	if (0 != (discovery->flags & ZBX_LLD_DISCOVERY_UPDATE_TS_DELETE))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cts_delete=%d", delim,
+				discovery->ts_delete);
+		delim = ',';
+	}
+
+	if (0 != (discovery->flags & ZBX_LLD_DISCOVERY_UPDATE_TS_DISABLE))
+	{
+		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%cts_disable=%d", delim,
+				discovery->ts_disable);
+	}
+
+	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, " where");
+	zbx_db_add_condition_alloc(sql, sql_alloc, sql_offset, id_field, ids->values, ids->values_num);
+	zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
+	zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
+
+	zbx_vector_uint64_clear(ids);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: compare two discovery updates                                     *
+ *                                                                            *
+ * Return value: 0 - updates are the same                                     *
+ *               otherwise - updates are different                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_compare_discovery_updates(const zbx_lld_discovery_t *d1, const zbx_lld_discovery_t *d2)
+{
+	ZBX_RETURN_IF_NOT_EQUAL(d1->flags, d2->flags);
+
+	if (0 != (d1->flags & ZBX_LLD_DISCOVERY_UPDATE_DISCOVERY_STATUS))
+	{
+		ZBX_RETURN_IF_NOT_EQUAL(d1->discovery_status, d2->discovery_status);
+	}
+
+	if (0 != (d1->flags & ZBX_LLD_DISCOVERY_UPDATE_DISABLE_SOURCE))
+	{
+		ZBX_RETURN_IF_NOT_EQUAL(d1->disable_source, d2->disable_source);
+	}
+
+	if (0 != (d1->flags & ZBX_LLD_DISCOVERY_UPDATE_TS_DELETE))
+	{
+		ZBX_RETURN_IF_NOT_EQUAL(d1->ts_delete, d2->ts_delete);
+	}
+
+	if (0 != (d1->flags & ZBX_LLD_DISCOVERY_UPDATE_TS_DISABLE))
+	{
+		ZBX_RETURN_IF_NOT_EQUAL(d1->ts_disable, d2->ts_disable);
+	}
+
+	return 0;
 }
 
 /******************************************************************************
@@ -336,7 +461,7 @@ void	lld_flush_discoveries(zbx_hashset_t *discoveries, const char *id_field, con
 		object_audit_entry_create_f cb_audit_create, object_audit_entry_update_status_f cb_audit_update_status)
 {
 	int				updates_num = 0;
-	zbx_vector_uint64_t		upd_ids, del_ids, upd_ts;
+	zbx_vector_uint64_t		upd_ids, del_ids, ids;
 	zbx_vector_lld_discovery_ptr_t	object_updates, discovery_updates;
 	zbx_hashset_iter_t		iter;
 	zbx_lld_discovery_t		*discovery;
@@ -349,7 +474,7 @@ void	lld_flush_discoveries(zbx_hashset_t *discoveries, const char *id_field, con
 	zbx_vector_lld_discovery_ptr_create(&discovery_updates);
 	zbx_vector_uint64_create(&upd_ids);
 	zbx_vector_uint64_create(&del_ids);
-	zbx_vector_uint64_create(&upd_ts);
+	zbx_vector_uint64_create(&ids);
 
 	zbx_hashset_iter_reset(discoveries, &iter);
 	while (NULL != (discovery = (zbx_lld_discovery_t *)zbx_hashset_iter_next(&iter)))
@@ -376,6 +501,7 @@ void	lld_flush_discoveries(zbx_hashset_t *discoveries, const char *id_field, con
 	}
 
 	/* prepare updates */
+	zbx_vector_lld_discovery_ptr_reserve(&discovery_updates, discoveries->num_data);
 	zbx_hashset_iter_reset(discoveries, &iter);
 	while (NULL != (discovery = (zbx_lld_discovery_t *)zbx_hashset_iter_next(&iter)))
 	{
@@ -392,12 +518,7 @@ void	lld_flush_discoveries(zbx_hashset_t *discoveries, const char *id_field, con
 			zbx_vector_lld_discovery_ptr_append(&object_updates, discovery);
 
 		if (0 != (discovery->flags & ZBX_LLD_DISCOVERY_UPDATE))
-		{
-			if (ZBX_LLD_DISCOVERY_UPDATE_LASTCHECK == (discovery->flags & ZBX_LLD_DISCOVERY_UPDATE))
-				zbx_vector_uint64_append(&upd_ts, discovery->id);
-			else
-				zbx_vector_lld_discovery_ptr_append(&discovery_updates, discovery);
-		}
+			zbx_vector_lld_discovery_ptr_append(&discovery_updates, discovery);
 	}
 
 	if (0 != del_ids.values_num)
@@ -406,91 +527,78 @@ void	lld_flush_discoveries(zbx_hashset_t *discoveries, const char *id_field, con
 		cb_delete_objects(&del_ids, ZBX_AUDIT_LLD_CONTEXT);
 	}
 
-	if (0 == object_updates.values_num && 0 == discovery_updates.values_num && 0 == upd_ts.values_num)
+	if (0 == object_updates.values_num && 0 == discovery_updates.values_num)
 		goto commit;
 
-	zbx_vector_lld_discovery_ptr_sort(&object_updates, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-	for (int i = 0; i < object_updates.values_num; i++)
+	if (0 != object_updates.values_num)
 	{
-		discovery = object_updates.values[i];
+		zbx_vector_lld_discovery_ptr_sort(&object_updates, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set status=%d where %s=" ZBX_FS_UI64 ";\n",
-				object_table, cb_status(discovery->object_status), id_field, discovery->id);
-		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		unsigned char	last_status = object_updates.values[0]->object_status;
 
-		unsigned char	old_status = ZBX_LLD_OBJECT_STATUS_ENABLED == discovery->object_status ?
-						ZBX_LLD_OBJECT_STATUS_DISABLED : ZBX_LLD_OBJECT_STATUS_ENABLED;
+		zbx_vector_uint64_append(&ids, object_updates.values[0]->id);
 
-		cb_audit_create(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_UPDATE, discovery->id,
-				discovery->name, (int)ZBX_FLAG_DISCOVERY_CREATED);
+		for (int i = 1; i < object_updates.values_num; i++)
+		{
+			discovery = object_updates.values[i];
 
-		cb_audit_update_status(ZBX_AUDIT_LLD_CONTEXT, discovery->id, (int)ZBX_FLAG_DISCOVERY_CREATED,
-				cb_status(old_status), cb_status(discovery->object_status));
+			if (last_status != discovery->object_status || ZBX_DB_LARGE_QUERY_BATCH_SIZE <= ids.values_num)
+			{
+				lld_flush_object_status(&sql, &sql_alloc, &sql_offset, id_field, object_table,
+						cb_status(last_status), &ids);
+				last_status = discovery->object_status;
+			}
+
+			zbx_vector_uint64_append(&ids, discovery->id);
+
+			unsigned char	old_status = ZBX_LLD_OBJECT_STATUS_ENABLED == discovery->object_status ?
+							ZBX_LLD_OBJECT_STATUS_DISABLED : ZBX_LLD_OBJECT_STATUS_ENABLED;
+
+			cb_audit_create(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_UPDATE, discovery->id,
+					discovery->name, (int)ZBX_FLAG_DISCOVERY_CREATED);
+
+			cb_audit_update_status(ZBX_AUDIT_LLD_CONTEXT, discovery->id, (int)ZBX_FLAG_DISCOVERY_CREATED,
+					cb_status(old_status), cb_status(discovery->object_status));
+		}
+
+		lld_flush_object_status(&sql, &sql_alloc, &sql_offset, id_field, object_table, cb_status(last_status),
+				&ids);
 	}
 
-	zbx_vector_lld_discovery_ptr_sort(&discovery_updates, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-	for (int i = 0; i < discovery_updates.values_num; i++)
+	if (0 != discovery_updates.values_num)
 	{
-		char	delim = ' ';
+		zbx_vector_lld_discovery_ptr_sort(&discovery_updates, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-		discovery = discovery_updates.values[i];
+		zbx_lld_discovery_t	*last_discovery = discovery_updates.values[0];
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set", discovery_table);
+		zbx_vector_uint64_append(&ids, last_discovery->id);
 
-		if (0 != (discovery->flags & ZBX_LLD_DISCOVERY_UPDATE_LASTCHECK))
+		for (int i = 1; i < discovery_updates.values_num; i++)
 		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%clastcheck=%d", delim, now);
-			delim = ',';
+			discovery = discovery_updates.values[i];
+
+			if (0 != lld_compare_discovery_updates(discovery, last_discovery)
+					|| ZBX_DB_LARGE_QUERY_BATCH_SIZE <= ids.values_num)
+			{
+				lld_flush_discovery_updates(&sql, &sql_alloc, &sql_offset, id_field, discovery_table,
+						last_discovery, now, &ids);
+				last_discovery = discovery;
+			}
+
+			zbx_vector_uint64_append(&ids, discovery->id);
 		}
 
-		if (0 != (discovery->flags & ZBX_LLD_DISCOVERY_UPDATE_DISCOVERY_STATUS))
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cstatus=%u", delim,
-					discovery->discovery_status);
-			delim = ',';
-		}
-
-		if (0 != (discovery->flags & ZBX_LLD_DISCOVERY_UPDATE_DISABLE_SOURCE))
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cdisable_source=%u", delim,
-					discovery->disable_source);
-			delim = ',';
-		}
-
-		if (0 != (discovery->flags & ZBX_LLD_DISCOVERY_UPDATE_TS_DELETE))
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cts_delete=%d", delim,
-					discovery->ts_delete);
-			delim = ',';
-		}
-
-		if (0 != (discovery->flags & ZBX_LLD_DISCOVERY_UPDATE_TS_DISABLE))
-		{
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cts_disable=%d", delim,
-					discovery->ts_disable);
-		}
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where %s=" ZBX_FS_UI64 ";\n",
-				id_field, discovery->id);
-		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		lld_flush_discovery_updates(&sql, &sql_alloc, &sql_offset, id_field, discovery_table, last_discovery,
+				now, &ids);
 	}
 
 	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
-
-	if (0 != upd_ts.values_num)
-	{
-		sql_offset = 0;
-		zbx_vector_uint64_sort(&upd_ts, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update %s set lastcheck=%d where",
-				discovery_table, now);
-		zbx_db_execute_multiple_query(sql, id_field, &upd_ts);
-	}
 
 	zbx_free(sql);
 commit:
 	zbx_db_commit();
 out:
-	zbx_vector_uint64_destroy(&upd_ts);
+	zbx_vector_uint64_destroy(&ids);
 	zbx_vector_uint64_destroy(&del_ids);
 	zbx_vector_uint64_destroy(&upd_ids);
 	zbx_vector_lld_discovery_ptr_destroy(&discovery_updates);

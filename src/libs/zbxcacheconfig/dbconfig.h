@@ -101,8 +101,8 @@ ZBX_DC_FUNCTION;
 
 typedef struct
 {
-	zbx_vector_uint64_pair_t	dep_itemids;
-	zbx_uint64_t			revision;
+	zbx_hashset_t	dep_itemids;
+	zbx_uint64_t	revision;
 }
 ZBX_DC_MASTERITEM;
 
@@ -307,6 +307,12 @@ ZBX_DC_ITEM;
 
 typedef struct
 {
+	ZBX_DC_ITEM	*item;
+}
+ZBX_DC_ITEM_REF;
+
+typedef struct
+{
 	zbx_uint64_t	itemid;
 	zbx_uint64_t	parent_itemid;
 }
@@ -407,7 +413,7 @@ typedef struct
 						/* 'config->interfaces' hashset */
 
 	zbx_vector_dc_httptest_ptr_t	httptests;
-	zbx_vector_dc_item_ptr_t	items;
+	zbx_hashset_t			items;
 }
 ZBX_DC_HOST;
 

@@ -73,6 +73,6 @@ PREPARE_AUDIT_GRAPH_UPDATE(type, int)
 void	zbx_audit_graph_update_json_delete_gitems(int audit_context_mode, zbx_uint64_t graphid, int flags,
 		zbx_uint64_t gitemid);
 
-void	zbx_audit_DBselect_delete_for_graph(int audit_context_mode, const char *sql, zbx_vector_uint64_t *ids);
+void	zbx_audit_graph_delete(int audit_context_mode, zbx_vector_uint64_t *graphids);
 
 #endif	/* ZABBIX_AUDIT_GRAPH_H */

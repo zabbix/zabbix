@@ -1263,6 +1263,9 @@ out:
 
 	zbx_dc_close_user_macros(um_handle);
 
+#ifdef	HAVE_MALLOC_TRIM
+	malloc_trim(128 * ZBX_MEBIBYTE);
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
