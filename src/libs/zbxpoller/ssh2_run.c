@@ -20,6 +20,7 @@
 #include "zbxcomms.h"
 #include "zbxfile.h"
 #include "zbxstr.h"
+#include "zbxtime.h"
 
 #if !defined(HAVE_LIBSSH2_METHOD_KEX) && !defined(HAVE_LIBSSH2_METHOD_HOSTKEY) && \
 		!defined(HAVE_LIBSSH2_METHOD_CRYPT_CS) && !defined(HAVE_LIBSSH2_METHOD_CRYPT_SC) && \
