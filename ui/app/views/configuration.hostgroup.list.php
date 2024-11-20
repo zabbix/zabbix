@@ -93,13 +93,16 @@ foreach ($data['groups'] as $group) {
 		}
 
 		if ($data['allowed_ui_conf_hosts']) {
-			$host_output = (new CLink($host['name'], (new CUrl('zabbix.php'))
-				->setArgument('action', 'host.edit')
+			$host_url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', 'host.edit')
 				->setArgument('hostid', $host['hostid'])
-			))
-			->setAttribute('data-hostid', $host['hostid'])
-			->onClick('view.editHost(event, this.dataset.hostid);')
-			->addClass(ZBX_STYLE_LINK_ALT);
+				->getUrl();
+
+			$host_output = (new CLink($host['name'], $host_url))
+				->setAttribute('data-hostid', $host['hostid'])
+				->setAttribute('data-action', 'host.edit')
+				->addClass(ZBX_STYLE_LINK_ALT);
 		}
 		else {
 			$host_output = new CSpan($host['name']);
@@ -158,13 +161,15 @@ foreach ($data['groups'] as $group) {
 		$name[] = NAME_DELIMITER;
 	}
 
-	$name[] = (new CLink($group['name'],
-		(new CUrl('zabbix.php'))
-			->setArgument('action', 'hostgroup.edit')
-			->setArgument('groupid', $group['groupid'])
-	))
-		->addClass('js-edit-hostgroup')
-		->setAttribute('data-groupid', $group['groupid']);
+	$group_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'popup')
+		->setArgument('popup', 'hostgroup.edit')
+		->setArgument('groupid', $group['groupid'])
+		->getUrl();
+
+	$name[] = (new CLink($group['name'], $group_url))
+		->setAttribute('data-groupid', $group['groupid'])
+		->setAttribute('data-action', 'hostgroup.edit');
 
 	$info_icons = [];
 

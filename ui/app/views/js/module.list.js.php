@@ -24,45 +24,24 @@
 
 		init() {
 			document.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-edit-module')) {
-					this._edit({moduleid: e.target.dataset.moduleid});
-				}
-				else if (e.target.classList.contains('js-enable-module')) {
-					this._enable(e.target, [e.target.dataset.moduleid]);
+				if (e.target.classList.contains('js-enable-module')) {
+					this.#enable(e.target, [e.target.dataset.moduleid]);
 				}
 				else if (e.target.classList.contains('js-massenable-module')) {
-					this._enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
+					this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 				}
 				else if (e.target.classList.contains('js-disable-module')) {
-					this._disable(e.target, [e.target.dataset.moduleid]);
+					this.#disable(e.target, [e.target.dataset.moduleid]);
 				}
 				else if (e.target.classList.contains('js-massdisable-module')) {
-					this._disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
+					this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 				}
 			});
+
+			this.#setSubmitCallback();
 		}
 
-		_edit(parameters = {}) {
-			const overlay = PopUp('module.edit', parameters, {
-				dialogueid: 'module-edit',
-				dialogue_class: 'modal-popup-medium',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				postMessageOk(e.detail.title);
-
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				uncheckTableRows('modules');
-
-				location.href = location.href;
-			});
-		}
-
-		_enable(target, moduleids, massenable = false) {
+		#enable(target, moduleids, massenable = false) {
 			if (massenable) {
 				const confirmation = moduleids.length > 1
 					? <?= json_encode(_('Enable selected modules?')) ?>
@@ -76,10 +55,10 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'module.enable');
 
-			this._post(target, moduleids, curl);
+			this.#post(target, moduleids, curl);
 		}
 
-		_disable(target, moduleids, massdisable = false) {
+		#disable(target, moduleids, massdisable = false) {
 			if (massdisable) {
 				const confirmation = moduleids.length > 1
 					? <?= json_encode(_('Disable selected modules?')) ?>
@@ -93,10 +72,10 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'module.disable');
 
-			this._post(target, moduleids, curl);
+			this.#post(target, moduleids, curl);
 		}
 
-		_post(target, moduleids, curl) {
+		#post(target, moduleids, curl) {
 			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('module')) ?>);
 
 			target.classList.add('is-loading');
@@ -140,5 +119,21 @@
 					target.classList.remove('is-loading');
 				});
 		}
+
+		#setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
+
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
+				}
+
+				uncheckTableRows('modules');
+				location.href = location.href;
+			});
+		}
+
 	};
 </script>

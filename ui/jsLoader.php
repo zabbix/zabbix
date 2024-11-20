@@ -114,6 +114,7 @@ $available_js = [
 	'class.navigationtree.js' => '',
 	'init.js' => '',
 	'class.tab-indicators.js' => '',
+	'class.popupmanager.js' => '',
 	// templates
 	'sysmap.tpl.js' => 'templates/',
 	// page-specific scripts
@@ -510,7 +511,8 @@ if (empty($_GET['files'])) {
 		'hostinterfacemanager.js',
 		'hostmacrosmanager.js',
 		'textareaflexible.js',
-		'init.js'
+		'init.js',
+		'class.popupmanager.js'
 	];
 
 	if (CCookieHelper::has(ZBX_SESSION_NAME)) {

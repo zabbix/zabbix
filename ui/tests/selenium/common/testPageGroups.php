@@ -161,12 +161,9 @@ class testPageGroups extends CWebTest {
 		$row->getColumn(ucfirst($this->object).'s')->query('link', $links['host_template'])->one()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 
-		if ($this->object === 'host') {
-			$this->assertStringContainsString('zabbix.php?action=host.edit&hostid='.$id, $this->page->getCurrentUrl());
-		}
-		else {
-			$this->assertStringContainsString($this->link, $this->page->getCurrentUrl());
-		}
+		$this->assertStringContainsString('zabbix.php?action=popup&popup='.$this->object.'.edit&'.$this->object.
+				'id='.$id, $this->page->getCurrentUrl()
+		);
 
 		$this->assertEquals(ucfirst($this->object), $dialog->getTitle());
 		$dialog->asForm()->checkValue([ucfirst($this->object).' name' => $links['host_template']]);

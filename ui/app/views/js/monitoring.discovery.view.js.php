@@ -22,57 +22,24 @@
 <script>
 	const view = new class {
 
-		#edit(parameters = {}) {
-			const overlay = PopUp('discovery.edit', parameters, {
-				dialogueid: 'discoveryForm',
-				dialogue_class: 'modal-popup-medium',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit',
-				e => this.elementSuccess('title' in e.detail ? {detail: {success: e.detail}} : e),
-				{once: true}
-			);
+		init() {
+			this.#setSubmitCallback();
 		}
 
-		editDRule(data) {
-			this.#edit(data);
-		}
+		#setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
+				const data = e.detail;
 
-		editHost(hostid) {
-			const host_data = {hostid};
+				if ('success' in data) {
+					postMessageOk(data.success.title);
 
-			this.openHostPopup(host_data);
-		}
-
-		openHostPopup(host_data) {
-			const original_url = location.href;
-			const overlay = PopUp('popup.host.edit', host_data, {
-				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
-				history.replaceState({}, '', original_url);
-				this.elementSuccess(e);
-			}, {once: true});
-
-			overlay.$dialogue[0].addEventListener('dialogue.close', e => history.replaceState({}, '', original_url));
-		}
-
-		elementSuccess(e) {
-			const data = e.detail;
-
-			if ('success' in data) {
-				postMessageOk(data.success.title);
-
-				if ('messages' in data.success) {
-					postMessageDetails('success', data.success.messages);
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
 				}
-			}
 
-			location.href = location.href;
+				location.href = location.href;
+			});
 		}
 	}
 </script>

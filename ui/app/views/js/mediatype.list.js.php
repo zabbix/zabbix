@@ -23,7 +23,9 @@
 	const view = new class {
 
 		init() {
-			document.getElementById('js-create').addEventListener('click', () => this.#edit());
+			document.getElementById('js-create').addEventListener('click', () =>
+				window.popupManagerInstance.openPopup('mediatype.edit', {})
+			);
 
 			document.getElementById('js-massenable').addEventListener('click', (e) =>
 				this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
@@ -38,10 +40,7 @@
 			);
 
 			document.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-edit')) {
-					this.#edit({mediatypeid: e.target.dataset.mediatypeid});
-				}
-				else if (e.target.classList.contains('js-test-edit')) {
+				if (e.target.classList.contains('js-test-edit')) {
 					PopUp('mediatype.test.edit', {mediatypeid: e.target.dataset.mediatypeid},
 						{
 							dialogue_class: 'modal-popup-medium',
@@ -49,41 +48,15 @@
 						}
 					);
 				}
-				else if (e.target.classList.contains('js-action-edit')) {
-					this.#actionEdit({actionid: e.target.dataset.actionid, eventsource: e.target.dataset.eventsource});
-				}
 				else if (e.target.classList.contains('js-enable')) {
 					this.#enable(e.target, [e.target.dataset.mediatypeid]);
 				}
 				else if (e.target.classList.contains('js-disable')) {
 					this.#disable(e.target, [e.target.dataset.mediatypeid]);
 				}
-			})
-		}
-
-		/**
-		 * Opens media type edit popup and listens to submit and delete actions from edit form. If gets a successful
-		 * response, reloads the page.
-		 *
-		 * @param {object} parameters  Parameters to pass to the edit form.
-		 */
-		#edit(parameters = {}) {
-			const overlay = PopUp('mediatype.edit', parameters, {
-				dialogueid: 'media-type-form',
-				dialogue_class: 'modal-popup-static',
-				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				uncheckTableRows('mediatype');
-				postMessageOk(e.detail.title);
-
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				location.href = location.href;
-			});
+			this.#setSubmitCallback();
 		}
 
 		/**
@@ -164,30 +137,6 @@
 		}
 
 		/**
-		 * Opens action edit popup and adds event listener for dialogue.submit event.
-		 *
-		 * @param {object} parameters  An object containing the action data.
-		 */
-		#actionEdit(parameters) {
-			const overlay = PopUp('popup.action.edit', parameters, {
-				dialogueid: 'action-edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				uncheckTableRows('mediatype');
-				postMessageOk(e.detail.title);
-
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				location.href = location.href;
-			});
-		}
-
-		/**
 		 * Sends a POST request to the specified URL with the provided data and handles the response.
 		 *
 		 * @param {element} target        The target element that will display a loading state during the request.
@@ -234,6 +183,21 @@
 					addMessage(message_box);
 				})
 				.finally(() => target.classList.remove('is-loading'));
+		}
+
+		#setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
+
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
+				}
+
+				uncheckTableRows('mediatype');
+				location.href = location.href;
+			});
 		}
 	};
 </script>

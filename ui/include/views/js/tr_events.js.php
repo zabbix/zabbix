@@ -20,69 +20,18 @@
 ?>
 
 <script>
-	const view = {
+	const view = new class {
 		init() {
-			$.subscribe("acknowledge.create", function(event, response, overlay) {
+			$.subscribe("acknowledge.create", function(event, response) {
 				postMessageOk(response.success.title);
 				location.href = location.href;
 			});
-		},
 
-		editItem(target, data) {
-			const overlay = PopUp('item.edit', data, {
-				dialogueid: 'item-edit',
-				dialogue_class: 'modal-popup-large',
-				trigger_element: target,
-				prevent_navigation: true
-			});
+			this.#setSubmitCallback();
+		}
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-		},
-
-		editHost(hostid) {
-			const host_data = {hostid};
-
-			this.openHostPopup(host_data);
-		},
-
-		editTrigger(trigger_data) {
-			clearMessages();
-
-			const overlay = PopUp('trigger.edit', trigger_data, {
-				dialogueid: 'trigger-edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-		},
-
-		openHostPopup(host_data) {
-			const original_url = location.href;
-			const overlay = PopUp('popup.host.edit', host_data, {
-				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
-				history.replaceState({}, '', original_url);
-			}, {once: true});
-		},
-
-		openTemplatePopup(template_data) {
-			const overlay =  PopUp('template.edit', template_data, {
-				dialogueid: 'templates-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-		},
-
-		events: {
-			elementSuccess(e) {
+		#setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
 				let new_href = location.href;
 				const data = e.detail;
 
@@ -103,7 +52,7 @@
 				}
 
 				location.href = new_href;
-			}
+			});
 		}
 	};
 </script>

@@ -166,7 +166,8 @@ abstract class CControllerItemPrototype extends CController {
 		if ($this->hasInput('itemid')) {
 			$ret = (bool) API::ItemPrototype()->get([
 				'output' => ['itemid'],
-				'itemids' => [$this->getInput('itemid')]
+				'itemids' => [$this->getInput('itemid')],
+				'editable' => true
 			]);
 		}
 

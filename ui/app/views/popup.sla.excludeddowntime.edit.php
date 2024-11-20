@@ -90,7 +90,8 @@ $output = [
 		]
 	],
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('popup.sla.excludeddowntime.edit.js.php')
+		$this->readJsFile('popup.sla.excludeddowntime.edit.js.php'),
+	'dialogue_class' => 'modal-popup-medium'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

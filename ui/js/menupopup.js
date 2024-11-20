@@ -219,7 +219,8 @@ function getMenuPopupHost(options, trigger_element) {
 		if (options.allowed_ui_conf_hosts) {
 			// host
 			url = new Curl('zabbix.php');
-			url.setArgument('action', 'host.edit');
+			url.setArgument('action', 'popup');
+			url.setArgument('popup', 'host.edit');
 			url.setArgument('hostid', options.hostid);
 
 			configuration.push({
@@ -229,8 +230,10 @@ function getMenuPopupHost(options, trigger_element) {
 				clickCallback: function(e) {
 					e.preventDefault();
 					jQuery(this).closest('.menu-popup').menuPopup('close', null);
-
-					view.editHost(options.hostid);
+				},
+				dataAttributes: {
+					action: 'host.edit',
+					hostid: options.hostid
 				}
 			});
 
@@ -512,18 +515,21 @@ function getMenuPopupMapElementTrigger(options) {
 		const item_urls = [];
 
 		for (const value of options.triggers) {
+			url = new Curl('zabbix.php');
+			url.setArgument('action', 'popup');
+			url.setArgument('popup', 'trigger.edit');
+			url.setArgument('context', 'host');
+			url.setArgument('triggerid', value.triggerid);
+
 			trigger_urls.push({
 				label: value.description,
-				clickCallback: function(e) {
-					e.preventDefault();
-					jQuery(this).closest('.menu-popup-top').menuPopup('close', null);
-
-					view.editTrigger({
-						triggerid: value.triggerid,
-						context: 'host'
-					});
+				url: url.getUrl(),
+				dataAttributes: {
+					action: 'trigger.edit',
+					triggerid: value.triggerid,
+					context: 'host'
 				}
-			});
+			})
 		}
 
 		config_urls.push({
@@ -540,17 +546,23 @@ function getMenuPopupMapElementTrigger(options) {
 					});
 				}
 				else {
+					url = new Curl('zabbix.php');
+					url.setArgument('action', 'popup');
+					url.setArgument('popup', 'item.edit');
+					url.setArgument('context', 'host');
+					url.setArgument('itemid', item.params.itemid);
+
 					item_urls.push({
 						label: item.name,
-						clickCallback: () => {
-							view.editItem(null, {
-								context: 'host',
-								itemid: item.params.itemid
-							});
+						url: url.getUrl(),
+						dataAttributes: {
+							action: 'item.edit',
+							itemid: item.params.itemid,
+							context: 'host'
 						}
 					});
 				}
-			};
+			}
 
 			config_urls.push({
 				label: t('Items'),
@@ -790,14 +802,22 @@ function getMenuPopupTrigger(options, trigger_element) {
 	}
 
 	if ('show_update_problem' in options && options.show_update_problem) {
+		url = new Curl('zabbix.php');
+		url.setArgument('action', 'popup');
+		url.setArgument('popup', 'acknowledge.edit');
+		url.setArgument('eventid', options.eventid);
+
 		sections.push({
 			label: t('Actions'),
 			items: [{
 				label: t('Update problem'),
 				clickCallback: function() {
 					jQuery(this).closest('.menu-popup-top').menuPopup('close', null);
-
-					acknowledgePopUp({eventids: [options.eventid]}, trigger_element);
+				},
+				url: url.getUrl(),
+				dataAttributes: {
+					action: 'acknowledge.edit',
+					eventid: options.eventid
 				}
 			}]
 		});
@@ -808,16 +828,19 @@ function getMenuPopupTrigger(options, trigger_element) {
 		const config_urls = [];
 		const item_urls = [];
 
+		url = new Curl('zabbix.php');
+		url.setArgument('action', 'popup');
+		url.setArgument('popup', 'trigger.edit');
+		url.setArgument('context', 'host');
+		url.setArgument('triggerid', options.triggerid);
+
 		config_urls.push({
 			label: t('Trigger'),
-			clickCallback: function(e) {
-				e.preventDefault();
-				jQuery(this).closest('.menu-popup').menuPopup('close', null);
-
-				view.editTrigger({
-					triggerid: options.triggerid,
-					context: 'host'
-				});
+			url: url.getUrl(),
+			dataAttributes: {
+				action: 'trigger.edit',
+				triggerid: options.triggerid,
+				context: 'host'
 			}
 		});
 
@@ -830,13 +853,19 @@ function getMenuPopupTrigger(options, trigger_element) {
 					});
 				}
 				else {
+					url = new Curl('zabbix.php');
+					url.setArgument('action', 'popup');
+					url.setArgument('popup', 'item.edit');
+					url.setArgument('context', 'host');
+					url.setArgument('itemid', item.params.itemid);
+
 					item_urls.push({
 						label: item.name,
-						clickCallback: () => {
-							view.editItem(null, {
-								context: 'host',
-								itemid: item.params.itemid
-							});
+						url: url.getUrl(),
+						dataAttributes: {
+							action: 'item.edit',
+							itemid: item.params.itemid,
+							context: 'host'
 						}
 					});
 				}
@@ -1072,33 +1101,52 @@ function getMenuPopupItem(options) {
 		};
 
 		if (options.isWriteable) {
+			url = new Curl('zabbix.php');
+			url.setArgument('action', 'popup');
+			url.setArgument('popup', 'item.edit');
+			url.setArgument('context', options.context);
+			url.setArgument('itemid', options.itemid);
+
 			config_urls.push({
 				label: t('Item'),
-				clickCallback: () => {
-					view.editItem(null, {
-						context: options.context,
-						itemid: options.itemid
-					});
+				url: url.getUrl(),
+				class: 'js-item-edit',
+				dataAttributes: {
+					action: 'item.edit',
+					context: options.context,
+					itemid: options.itemid
 				}
 			});
 		}
 
 		if (options.context === 'host') {
-			const action = new URLSearchParams(options.backurl.split('?')[1]).get('action');
+			url = new Curl('zabbix.php');
+			url.setArgument('action', 'popup');
+			url.setArgument('popup', 'host.edit');
+			url.setArgument('hostid', options.hostid);
 
 			config_urls.push({
 				label: t('Host'),
 				disabled: !options.isWriteable,
-				clickCallback: (e) => {
-					action === 'item.list' ? view.editHost(e, options.hostid) : view.editHost(options.hostid);
+				url: url.getUrl(),
+				dataAttributes: {
+					action: 'host.edit',
+					hostid: options.hostid,
 				}
 			});
 		}
 		else {
+			url = new Curl('zabbix.php');
+			url.setArgument('action', 'popup');
+			url.setArgument('popup', 'template.edit');
+			url.setArgument('templateid', options.hostid);
+
 			config_urls.push({
 				label: t('Template'),
-				clickCallback: (e) => {
-					view.editTemplate(e, options.hostid);
+				url: url.getUrl(),
+				dataAttributes: {
+					action: 'template.edit',
+					templateid: options.hostid,
 				}
 			});
 		}
@@ -1107,17 +1155,21 @@ function getMenuPopupItem(options) {
 			const trigger_items = [];
 
 			for (const value of options.triggers) {
+				url = new Curl('zabbix.php');
+				url.setArgument('action', 'popup');
+				url.setArgument('popup', 'trigger.edit');
+				url.setArgument('triggerid', value.triggerid);
+				url.setArgument('hostid', options.hostid);
+				url.setArgument('context', options.context);
+
 				trigger_items.push({
 					label: value.description,
-					clickCallback: function(e) {
-						e.preventDefault();
-						jQuery(this).closest('.menu-popup-top').menuPopup('close', null)
-
-						view.editTrigger({
-							triggerid: value.triggerid,
-							hostid: options.hostid,
-							context: options.context
-						});
+					url: url.getUrl(),
+					dataAttributes: {
+						action: 'trigger.edit',
+						triggerid: value.triggerid,
+						hostid: options.hostid,
+						context: options.context
 					}
 				});
 			}
@@ -1131,10 +1183,9 @@ function getMenuPopupItem(options) {
 			label: t('Create trigger'),
 			disabled: options.binary_value_type,
 			clickCallback: function(e) {
-				e.preventDefault();
 				jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-				view.editTrigger({
+				window.popupManagerInstance.openPopup('trigger.edit', {
 					hostid: options.hostid,
 					name: options.name,
 					expression: 'func(/' + options.host + '/' + options.key + ')',
@@ -1153,7 +1204,7 @@ function getMenuPopupItem(options) {
 			config_urls.push({
 				label: t('Create dependent item'),
 				clickCallback: () => {
-					view.editItem(null, {
+					window.popupManagerInstance.openPopup('item.edit', {
 						context: options.context,
 						hostid: options.hostid,
 						master_itemid: options.itemid,
@@ -1234,16 +1285,21 @@ function getMenuPopupItemPrototype(options) {
 		disabled: true
 	};
 
-	let url;
+	const url = new Curl('zabbix.php');
+	url.setArgument('action', 'popup');
+	url.setArgument('popup', 'item.prototype.edit');
+	url.setArgument('context', options.context);
+	url.setArgument('itemid', options.itemid);
+	url.setArgument('parent_discoveryid', options.parent_discoveryid);
 
 	config_urls.push({
 		label: t('Item prototype'),
-		clickCallback: () => {
-			view.editItemPrototype(null, {
-				context: options.context,
-				itemid: options.itemid,
-				parent_discoveryid: options.parent_discoveryid
-			});
+		url: url.getUrl(),
+		dataAttributes: {
+			action: 'item.prototype.edit',
+			context: options.context,
+			itemid: options.itemid,
+			parent_discoveryid: options.parent_discoveryid
 		}
 	});
 
@@ -1251,17 +1307,20 @@ function getMenuPopupItemPrototype(options) {
 		const trigger_prototypes = [];
 
 		for (const value of options.trigger_prototypes) {
+			url.setArgument('action', 'popup');
+			url.setArgument('popup', 'trigger.prototype.edit');
+			url.setArgument('context', options.context);
+			url.setArgument('triggerid', value.triggerid);
+			url.setArgument('parent_discoveryid', options.parent_discoveryid);
+
 			trigger_prototypes.push({
 				label: value.description,
-				clickCallback: function(e) {
-					e.preventDefault();
-					jQuery(this).closest('.menu-popup-top').menuPopup('close', null)
-
-					view.editTriggerPrototype({
-						triggerid: value.triggerid,
-						parent_discoveryid: options.parent_discoveryid,
-						context: options.context
-					});
+				url: url.getUrl(),
+				dataAttributes: {
+					action: 'trigger.prototype.edit',
+					context: options.context,
+					triggerid: value.triggerid,
+					parent_discoveryid: options.parent_discoveryid
 				}
 			});
 		}
@@ -1279,7 +1338,7 @@ function getMenuPopupItemPrototype(options) {
 			e.preventDefault();
 			jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-			view.editTriggerPrototype({
+			window.popupManagerInstance.openPopup('trigger.prototype.edit', {
 				parent_discoveryid: options.parent_discoveryid,
 				name: options.name,
 				hostid: options.hostid,
@@ -1292,7 +1351,7 @@ function getMenuPopupItemPrototype(options) {
 	config_urls.push({
 		label: t('Create dependent item'),
 		clickCallback: () => {
-			view.editItemPrototype(null, {
+			window.popupManagerInstance.openPopup('item.prototype.edit', {
 				context: options.context,
 				master_itemid: options.itemid,
 				parent_discoveryid: options.parent_discoveryid,
@@ -1658,14 +1717,17 @@ function getMenuPopupDRule(options) {
 	const sections = [];
 	const config_urls = [];
 
+	const url = new Curl('zabbix.php');
+	url.setArgument('action', 'popup');
+	url.setArgument('popup', 'discovery.edit');
+	url.setArgument('druleid', options.druleid);
+
 	config_urls.push({
 		label: t('Discovery rule'),
-		disabled: !options.allowed_ui_conf_drules,
-		clickCallback: function(e) {
-			e.preventDefault();
-			jQuery(this).closest('.menu-popup').menuPopup('close', null);
-
-			view.editDRule({druleid: options.druleid});
+		url: url.getUrl(),
+		dataAttributes: {
+			action: 'discovery.edit',
+			druleid: options.druleid
 		}
 	});
 

@@ -121,6 +121,11 @@ if ($data['hostid']) {
 	$popup_parameters['hostid'] = $data['hostid'];
 }
 
+$backurl = (new CUrl('zabbix.php'))
+	->setArgument('action', 'trigger.list')
+	->setArgument('context', $data['context'])
+	->getUrl();
+
 // Append tabs to form.
 $trigger_form
 	->addItem($triggers_tab)
@@ -131,7 +136,10 @@ $trigger_form
 			'dependencies' => $data['db_dependencies'],
 			'action' => 'trigger.edit',
 			'context' => $data['context'],
-			'db_trigger' => $data['db_trigger']
+			'db_trigger' => $data['db_trigger'],
+			'backurl' => $backurl,
+			'overlayid' => 'trigger.edit',
+			'parent_discoveryid' => null
 		]).');'))->setOnDocumentReady()
 	);
 
@@ -140,7 +148,8 @@ $output = [
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_TRIGGERS_EDIT),
 	'body' => $trigger_form->toString(),
 	'buttons' => $buttons,
-	'script_inline' => getPagePostJs().$this->readJsFile('trigger.edit.js.php')
+	'script_inline' => getPagePostJs().$this->readJsFile('trigger.edit.js.php'),
+	'dialogue_class' => 'modal-popup-large'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

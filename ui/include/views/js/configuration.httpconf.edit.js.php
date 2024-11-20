@@ -49,10 +49,6 @@
 		/** @type {HTMLTableElement} */
 		#steps;
 
-		constructor() {
-			this.#registerEvents();
-		}
-
 		init({is_templated, variables, headers, steps, context}) {
 			this.#form = document.getElementById('webscenario-form');
 			this.#is_templated = is_templated;
@@ -62,15 +58,6 @@
 			this.#steps = document.getElementById('steps');
 
 			this.#initTemplates();
-
-			this.#form.addEventListener('click', e => {
-				const target = e.target;
-
-				if (target.matches('.js-edit-template')) {
-					e.preventDefault();
-					this.#openTemplatePopup(target.dataset);
-				}
-			});
 
 			jQuery('#tabs').on('tabscreate tabsactivate', (e, ui) => {
 				const panel = e.type === 'tabscreate' ? ui.panel : ui.newPanel;
@@ -90,6 +77,7 @@
 			}
 
 			this.#updateForm();
+			this.#setSubmitCallback();
 		}
 
 		#initTemplates() {
@@ -249,46 +237,30 @@
 			}
 		}
 
-		editHost(e, hostid) {
-			e.preventDefault();
-			const host_data = {hostid};
+		#setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
+				let curl = null;
 
-			this.#openHostPopup(host_data);
-		}
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
 
-		#openHostPopup(host_data) {
-			const original_url = location.href;
-			const overlay = PopUp('popup.host.edit', host_data, {
-				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
+
+					if ('action' in e.detail.success && e.detail.success.action === 'delete') {
+						curl = new Curl('httpconf.php');
+						curl.setArgument('context', this.#context);
+					}
+				}
+
+				if (curl === null) {
+					view.refresh();
+				}
+				else {
+					location.href = curl.getUrl();
+				}
 			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit',
-				this.#events.elementSuccess.bind(this, this.#context), {once: true}
-			);
-			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
-				history.replaceState({}, '', original_url);
-			}, {once: true});
-		}
-
-		editTemplate(e, templateid) {
-			e.preventDefault();
-			const template_data = {templateid};
-
-			this.#openTemplatePopup(template_data);
-		}
-
-		#openTemplatePopup(template_data) {
-			const overlay =  PopUp('template.edit', template_data, {
-				dialogueid: 'templates-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit',
-				this.#events.elementSuccess.bind(this, this.#context), {once: true}
-			);
 		}
 
 		refresh() {
@@ -296,35 +268,6 @@
 			const fields = getFormFields(this.#form);
 
 			post(curl.getUrl(), fields);
-		}
-
-		#registerEvents() {
-			this.#events = {
-				elementSuccess(context, e) {
-					const data = e.detail;
-					let curl = null;
-
-					if ('success' in data) {
-						postMessageOk(data.success.title);
-
-						if ('messages' in data.success) {
-							postMessageDetails('success', data.success.messages);
-						}
-
-						if ('action' in data.success && data.success.action === 'delete') {
-							curl = new Curl('httpconf.php');
-							curl.setArgument('context', context);
-						}
-					}
-
-					if (curl === null) {
-						view.refresh();
-					}
-					else {
-						location.href = curl.getUrl();
-					}
-				}
-			};
 		}
 	};
 </script>

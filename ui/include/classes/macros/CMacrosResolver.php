@@ -592,27 +592,40 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 									$link = (new CSpan('/'.$function['host'].'/'.$function['key_']))->addClass($style);
 								}
 								elseif ($function['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+									$item_url = (new CUrl('zabbix.php'))
+										->setArgument('action', 'popup')
+										->setArgument('popup', 'item.prototype.edit')
+										->setArgument('context', $options['context'])
+										->setArgument('itemid', $function['itemid'])
+										->setArgument('parent_discoveryid', $function['parent_itemid'])
+										->getUrl();
+
 									$link = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
-										? (new CLink('/'.$function['host'].'/'.$function['key_']))
+										? (new CLink('/'.$function['host'].'/'.$function['key_'], $item_url))
 											->addClass($style)
 											->addClass(ZBX_STYLE_LINK_ALT)
-											->onClick('view.editItemPrototype(this, '.json_encode([
-												'context' => $options['context'],
-												'itemid' => $function['itemid'],
-												'parent_discoveryid' => $function['parent_itemid']
-											]).')')
+											->setAttribute('data-context', $options['context'])
+											->setAttribute('data-itemid', $function['itemid'])
+											->setAttribute('data-parent_discoveryid', $function['parent_itemid'])
+											->setAttribute('data-action', 'item.prototype.edit')
 										: (new CSpan('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style);
 								}
 								else {
+									$item_url = (new CUrl('zabbix.php'))
+										->setArgument('action', 'popup')
+										->setArgument('popup', 'item.edit')
+										->setArgument('context', $options['context'])
+										->setArgument('itemid', $function['itemid'])
+										->getUrl();
+
 									$link = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
-										? (new CLink('/'.$function['host'].'/'.$function['key_']))
+										? (new CLink('/'.$function['host'].'/'.$function['key_'], $item_url))
 											->addClass($style)
 											->addClass(ZBX_STYLE_LINK_ALT)
-											->onClick('view.editItem(this, '.json_encode([
-												'context' => $options['context'],
-												'itemid' => $function['itemid']
-											]).')')
+											->setAttribute('data-itemid', $function['itemid'])
+											->setAttribute('data-context', $options['context'])
+											->setAttribute('data-action', 'item.edit')
 										: (new CSpan('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style);
 								}

@@ -27,11 +27,12 @@
 	const view = new class {
 
 		init() {
-			this._initTagFilter();
-			this._initActions();
+			this.#initTagFilter();
+			this.#initActions();
+			this.#setSubmitCallback();
 		}
 
-		_initTagFilter() {
+		#initTagFilter() {
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
 				.on('afteradd.dynamicRows', function () {
@@ -45,56 +46,30 @@
 			});
 		}
 
-		_initActions() {
+		#initActions() {
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-create-sla')) {
-					this._edit();
-				}
-				else if (e.target.classList.contains('js-edit-sla')) {
-					this._edit({slaid: e.target.dataset.slaid});
+					window.popupManagerInstance.openPopup('sla.edit', {});
 				}
 				else if (e.target.classList.contains('js-enable-sla')) {
-					this._enable(e.target, [e.target.dataset.slaid]);
+					this.#enable(e.target, [e.target.dataset.slaid]);
 				}
 				else if (e.target.classList.contains('js-disable-sla')) {
-					this._disable(e.target, [e.target.dataset.slaid]);
+					this.#disable(e.target, [e.target.dataset.slaid]);
 				}
 				else if (e.target.classList.contains('js-massenable-sla')) {
-					this._enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
+					this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 				}
 				else if (e.target.classList.contains('js-massdisable-sla')) {
-					this._disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
+					this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 				}
 				else if (e.target.classList.contains('js-massdelete-sla')) {
-					this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 			});
 		}
 
-		_edit(parameters = {}) {
-			const overlay = PopUp('popup.sla.edit', parameters, {
-				dialogueid: 'sla_edit',
-				dialogue_class: 'modal-popup-static',
-				prevent_navigation: true
-			});
-
-			const dialogue = overlay.$dialogue[0];
-
-			dialogue.addEventListener('dialogue.submit', (e) => this._reload(e.detail));
-		}
-
-		_reload(success) {
-			postMessageOk(success.title);
-
-			if ('messages' in success) {
-				postMessageDetails('success', success.messages);
-			}
-
-			uncheckTableRows('sla');
-			location.href = location.href;
-		}
-
-		_enable(target, slaids, massenable = false) {
+		#enable(target, slaids, massenable = false) {
 			if (massenable) {
 				const confirmation = slaids.length > 1
 					? <?= json_encode(_('Enable selected SLAs?')) ?>
@@ -108,10 +83,10 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'sla.enable');
 
-			this._post(target, slaids, curl);
+			this.#post(target, slaids, curl);
 		}
 
-		_disable(target, slaids, massdisable = false) {
+		#disable(target, slaids, massdisable = false) {
 			if (massdisable) {
 				const confirmation = slaids.length > 1
 					? <?= json_encode(_('Disable selected SLAs?')) ?>
@@ -125,10 +100,10 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'sla.disable');
 
-			this._post(target, slaids, curl);
+			this.#post(target, slaids, curl);
 		}
 
-		_delete(target, slaids) {
+		#delete(target, slaids) {
 			const confirmation = slaids.length > 1
 				? <?= json_encode(_('Delete selected SLAs?')) ?>
 				: <?= json_encode(_('Delete selected SLA?')) ?>;
@@ -140,10 +115,10 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'sla.delete');
 
-			this._post(target, slaids, curl);
+			this.#post(target, slaids, curl);
 		}
 
-		_post(target, slaids, curl) {
+		#post(target, slaids, curl) {
 			target.classList.add('is-loading');
 
 			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('sla')) ?>);
@@ -186,6 +161,21 @@
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
+		}
+
+		#setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
+
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
+				}
+
+				uncheckTableRows('sla');
+				location.href = location.href;
+			});
 		}
 	};
 </script>

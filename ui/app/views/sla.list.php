@@ -127,14 +127,20 @@ foreach ($data['slas'] as $slaid => $sla) {
 		$sla_report_tag = null;
 	}
 
+	$sla_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'popup')
+		->setArgument('popup', 'sla.edit')
+		->setArgument('slaid', $slaid)
+		->getUrl();
+
 	$row = [
 		$data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]
 			? new CCheckBox('slaids['.$slaid.']', $slaid)
 			: null,
 		(new CCol($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]
-			? (new CLink($sla['name']))
-				->addClass('js-edit-sla')
+			? (new CLink($sla['name'], $sla_url))
 				->setAttribute('data-slaid', $slaid)
+				->setAttribute('data-action', 'sla.edit')
 			: $sla['name']
 		))->addClass(ZBX_STYLE_WORDBREAK),
 		CSlaHelper::getSloTag((float) $sla['slo']),

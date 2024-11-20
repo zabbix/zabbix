@@ -20,7 +20,9 @@
 ?>
 
 <script>
-	const view = {
+
+	const view = new class {
+
 		init({checkbox_hash, checkbox_object, context, parent_discoveryid, form_name}) {
 			this.checkbox_hash = checkbox_hash;
 			this.checkbox_object = checkbox_object;
@@ -28,15 +30,16 @@
 			this.is_discovery = parent_discoveryid !== null;
 			this.form = document.forms[form_name];
 
-			this._initActions();
-		},
+			this.#initActions();
+			this.#setSubmitCallback();
+		}
 
-		_initActions() {
+		#initActions() {
 			const copy = document.querySelector('.js-copy');
 
 			if (copy !== null) {
 				copy.addEventListener('click', () => {
-					const overlay = this.openCopyPopup();
+					const overlay = this.#openCopyPopup();
 					const dialogue = overlay.$dialogue[0];
 
 					dialogue.addEventListener('dialogue.submit', (e) => {
@@ -55,20 +58,9 @@
 					});
 				});
 			}
+		}
 
-			this.form.addEventListener('click', (e) => {
-				const target = e.target;
-
-				if (target.classList.contains('js-edit-host')) {
-					this.editHost(e, target.dataset.hostid);
-				}
-				else if (target.classList.contains('js-edit-template')) {
-					this.editTemplate(e, target.dataset.hostid);
-				}
-			});
-		},
-
-		openCopyPopup() {
+		#openCopyPopup() {
 			const parameters = {
 				graphids: Object.keys(chkbxRange.getSelectedIds()),
 				source: 'graphs'
@@ -85,72 +77,28 @@
 				dialogueid: 'copy',
 				dialogue_class: 'modal-popup-static'
 			});
-		},
+		}
 
-		editHost(e, hostid) {
-			e.preventDefault();
-			const host_data = {hostid};
-
-			this.openHostPopup(host_data);
-		},
-
-		editTemplate(e, templateid) {
-			e.preventDefault();
-			const template_data = {templateid};
-
-			this.openTemplatePopup(template_data);
-		},
-
-		openHostPopup(host_data) {
-			const original_url = location.href;
-			const overlay = PopUp('popup.host.edit', host_data, {
-				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit',
-				this.events.elementSuccess.bind(this, this.context, this.is_discovery), {once: true}
-			);
-			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
-				history.replaceState({}, '', original_url);
-			}, {once: true});
-		},
-
-		openTemplatePopup(template_data) {
-			const overlay =  PopUp('template.edit', template_data, {
-				dialogueid: 'templates-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit',
-				this.events.elementSuccess.bind(this, this.context, this.is_discovery), {once: true}
-			);
-		},
-
-		events: {
-			elementSuccess(context, discovery, e) {
-				const data = e.detail;
+		#setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
 				let curl = null;
 
-				if ('success' in data) {
-					postMessageOk(data.success.title);
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
 
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
 					}
 
-					if ('action' in data.success && data.success.action === 'delete') {
-						curl = discovery ? new Curl('host_discovery.php') : new Curl('graphs.php');
-						curl.setArgument('context', context);
+					if ('action' in e.detail.success && e.detail.success.action === 'delete') {
+						curl = this.is_discovery ? new Curl('host_discovery.php') : new Curl('graphs.php');
+						curl.setArgument('context', this.context);
 					}
 				}
 
 				uncheckTableRows('graphs_' + this.checkbox_hash, [], false);
-
-				location.href = curl === null? location.href : curl.getUrl();
-			}
+				location.href = curl === null ? location.href : curl.getUrl();
+			});
 		}
 	};
 </script>

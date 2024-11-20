@@ -255,10 +255,19 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		$description[] = NAME_DELIMITER;
 	}
 
-	$description[] = (new CLink($trigger['description']))
-		->addClass('js-trigger-edit')
+	$trigger_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'popup')
+		->setArgument('popup', 'trigger.edit')
+		->setArgument('triggerid', $triggerid)
+		->setArgument('hostid', $data['single_selected_hostid'])
+		->setArgument('context', $data['context'])
+		->getUrl();
+
+	$description[] = (new CLink($trigger['description'], $trigger_url))
+		->setAttribute('data-action', 'trigger.edit')
 		->setAttribute('data-triggerid', $triggerid)
 		->setAttribute('data-hostid', $data['single_selected_hostid'])
+		->setAttribute('data-context', $data['context'])
 		->addClass(ZBX_STYLE_WORDBREAK);
 
 	if ($trigger['dependencies']) {
@@ -271,10 +280,19 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			$dep_trigger_desc =
 				implode(', ', array_column($dep_trigger['hosts'], 'name')).NAME_DELIMITER.$dep_trigger['description'];
 
-			$trigger_deps[] = (new CLink($dep_trigger_desc))
-				->addClass('js-trigger-edit')
+			$dep_trigger_url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', 'trigger.edit')
+				->setArgument('triggerid', $dep_trigger['triggerid'])
+				->setArgument('hostid', $data['single_selected_hostid'])
+				->setArgument('context', $data['context'])
+				->getUrl();
+
+			$trigger_deps[] = (new CLink($dep_trigger_desc, $trigger_url))
+				->setAttribute('data-action', 'trigger.edit')
 				->setAttribute('data-triggerid', $dep_trigger['triggerid'])
 				->setAttribute('data-hostid', $data['single_selected_hostid'])
+				->setAttribute('data-context', $data['context'])
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(triggerIndicatorStyle($dep_trigger['status']));
 
@@ -320,10 +338,16 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 				$hosts[] = ', ';
 			}
 
+			$host_url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', $data['context'] === 'host' ? 'host.edit' : 'template.edit')
+				->setArgument($data['context'] === 'host' ? 'hostid' : 'templateid', $host['hostid'])
+				->getUrl();
+
 			$hosts[] = in_array($host['hostid'], $data['editable_hosts'])
-				? (new CLink($host['name']))
-					->setAttribute('data-hostid', $host['hostid'])
-					->addClass('js-edit-'.$data['context'])
+				? (new CLink($host['name'], $host_url))
+					->setAttribute($data['context'] === 'host' ? 'data-hostid' : 'data-templateid', $host['hostid'])
+					->setAttribute('data-action', $data['context'] === 'host' ? 'host.edit' : 'template.edit')
 				: $host['name'];
 		}
 

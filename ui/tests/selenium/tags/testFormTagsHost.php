@@ -25,7 +25,7 @@ class testFormTagsHost extends testFormTags {
 	public $clone_name = 'Host with tags for cloning';
 	public $remove_name = 'Host for removing tags';
 	public $link = 'zabbix.php?action=host.list';
-	public $saved_link = 'zabbix.php?action=host.edit&hostid=';
+	public $saved_link = 'zabbix.php?action=popup&popup=host.edit&hostid=';
 
 	/**
 	 * Test creating of Host with tags.

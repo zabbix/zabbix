@@ -25,57 +25,11 @@
 			this.context = context;
 			this.checkbox_hash = checkbox_hash;
 
-			document.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-edit-template')) {
-					this.openTemplatePopup({templateid: e.target.dataset.templateid})
-				}
-			});
+			this.setSubmitCallback();
 		},
 
-		editHost(e, hostid) {
-			e.preventDefault();
-			const host_data = {hostid};
-
-			this.openHostPopup(host_data);
-		},
-
-		editTemplate(e, templateid) {
-			e.preventDefault();
-			const template_data = {templateid};
-
-			this.openTemplatePopup(template_data);
-		},
-
-		openHostPopup(host_data) {
-			const original_url = location.href;
-			const overlay = PopUp('popup.host.edit', host_data, {
-				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit',
-				this.events.elementSuccess.bind(this, this.context), {once: true}
-			);
-			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
-				history.replaceState({}, '', original_url);
-			}, {once: true});
-		},
-
-		openTemplatePopup(template_data) {
-			const overlay =  PopUp('template.edit', template_data, {
-				dialogueid: 'templates-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit',
-				this.events.elementSuccess.bind(this, this.context), {once: true}
-			);
-		},
-
-		events: {
-			elementSuccess(context, e) {
+		setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
 				const data = e.detail;
 				let curl = null;
 
@@ -100,7 +54,7 @@
 				else {
 					location.href = location.href;
 				}
-			}
+			});
 		}
 	};
 </script>

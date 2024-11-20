@@ -675,8 +675,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 		}
 
 		// Go to host and change IPMI settings.
-		$this->page->open('zabbix.php?action=host.edit&hostid='.self::HOST_ID);
-		$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
+		$this->page->open('zabbix.php?action=popup&popup=host.edit&hostid='.self::HOST_ID);
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		$form->selectTab('IPMI');
 
 		$new_values = [
@@ -748,7 +748,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 	 */
 	public function testFormHostPrototype_CheckEncryptionFromHost($data) {
 		$this->zbxTestLogin('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.
-				'&context=host&hostid='.self::HOST_PROTOTYPE_ID);
+				'&hostid='.self::HOST_PROTOTYPE_ID.'&context=host');
 		$this->zbxTestWaitForPageToLoad();
 
 		// Check Encryption settings on prototype before changes on host.
@@ -769,8 +769,9 @@ class testFormHostPrototype extends CLegacyWebTest {
 		}
 
 		// Go to host and change Encryption settings.
-		$this->page->open('zabbix.php?action=host.edit&hostid='.self::HOST_ID);
-		$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
+		$this->page->open('zabbix.php?action=popup&popup=host.edit&hostid='.self::HOST_ID);
+
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		$form->selectTab('Encryption');
 		$form->fill(['Connections to host' => $data['connection_to_host']]);
 
@@ -794,8 +795,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->assertMessage(TEST_GOOD, 'Host updated');
 
 		// Go back to prototype and check changes.
-		$this->zbxTestOpen('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.
-				'&context=host&hostid='.self::HOST_PROTOTYPE_ID);
+		$this->zbxTestLogin('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.
+				'&hostid='.self::HOST_PROTOTYPE_ID.'&context=host');
 		$this->zbxTestTabSwitch('Encryption');
 		$this->zbxTestWaitForPageToLoad();
 

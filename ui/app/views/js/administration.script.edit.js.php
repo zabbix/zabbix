@@ -22,11 +22,16 @@
 window.script_edit_popup = new class {
 
 	init({script}) {
-		this.overlay = overlays_stack.getById('script-form');
+		this.overlay = overlays_stack.getById('script.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.script = script;
 		this.scriptid = script.scriptid;
+
+		const backurl = new Curl('zabbix.php');
+
+		backurl.setArgument('action', 'script.list');
+		this.overlay.backurl = backurl.getUrl();
 
 		this.#loadView(script);
 		this.#initActions();
@@ -197,7 +202,7 @@ window.script_edit_popup = new class {
 		this.#post(curl.getUrl(), {scriptids: [this.scriptid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 		});
 	}
 
@@ -222,7 +227,7 @@ window.script_edit_popup = new class {
 		this.#post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 		});
 	}
 

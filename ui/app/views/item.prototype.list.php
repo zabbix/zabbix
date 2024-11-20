@@ -63,19 +63,34 @@ foreach ($data['items'] as $item) {
 		}
 		else {
 			if ($item['master_item']['source'] === 'itemprototypes') {
-				$name[] = (new CLink($item['master_item']['name']))
+				$item_prototype_url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'popup')
+					->setArgument('popup', 'item.prototype.edit')
+					->setArgument('itemid', $item['master_item']['itemid'])
+					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+					->setArgument('context', $data['context'])
+					->getUrl();
+
+				$name[] = (new CLink($item['master_item']['name'], $item_prototype_url))
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->addClass(ZBX_STYLE_TEAL)
-					->addClass('js-update-itemprototype')
+					->setAttribute('data-action', 'item.prototype.edit')
 					->setAttribute('data-itemid', $item['master_item']['itemid'])
 					->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
 					->setAttribute('data-context', $data['context']);
 			}
 			else {
-				$name[] = (new CLink($item['master_item']['name']))
+				$item_url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'popup')
+					->setArgument('popup', 'item.edit')
+					->setArgument('itemid', $item['master_item']['itemid'])
+					->setArgument('context', $data['context'])
+					->getUrl();
+
+				$name[] = (new CLink($item['master_item']['name'], $item_url))
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->addClass(ZBX_STYLE_TEAL)
-					->addClass('js-update-item')
+					->setAttribute('data-action', 'item.edit')
 					->setAttribute('data-itemid', $item['master_item']['itemid'])
 					->setAttribute('data-context', $data['context']);
 			}
@@ -84,8 +99,16 @@ foreach ($data['items'] as $item) {
 		$name[] = NAME_DELIMITER;
 	}
 
-	$name[] = (new CLink($item['name']))
-		->addClass('js-update-itemprototype')
+	$item_prototype_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'popup')
+		->setArgument('popup', 'item.prototype.edit')
+		->setArgument('itemid', $item['itemid'])
+		->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+		->setArgument('context', $data['context'])
+		->getUrl();
+
+	$name[] = (new CLink($item['name'], $item_prototype_url))
+		->setAttribute('data-action', 'item.prototype.edit')
 		->setAttribute('data-itemid', $item['itemid'])
 		->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
 		->setAttribute('data-context', $data['context']);

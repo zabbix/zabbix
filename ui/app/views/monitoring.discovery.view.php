@@ -75,4 +75,8 @@ $discovery_table = CScreenBuilder::getScreen([
 	]
 ])->get();
 
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
+	->show();
+
 $html_page->addItem($discovery_table)->show();

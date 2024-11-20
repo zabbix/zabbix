@@ -187,6 +187,7 @@ class testPageItems extends CLegacyWebTest {
 		// Item create button enabled and breadcrumbs exist.
 		$this->assertTrue($this->query('button:Create item')->one()->isEnabled());
 		$this->assertFalse($this->query('class:breadcrumbs')->all()->isEmpty());
+
 		// Clear hosts in filter fields.
 		if (!array_key_exists('Hosts', $data['filter_options'])) {
 			$form->getField('Hosts')->asMultiselect()->clear();
@@ -195,24 +196,28 @@ class testPageItems extends CLegacyWebTest {
 		$form->fill($data['filter_options']);
 		$form->submit();
 		$this->page->waitUntilReady();
+
 		// Item create button disabled and breadcrumbs not exist.
 		$this->assertFalse($this->query('button:Create item (select host first)')->one()->isEnabled());
 		$this->assertTrue($this->query('class:filter-breadcrumb')->all()->isEmpty());
+
 		// Check results in table.
 		$table = $this->query('name:item_list')->one()->query('class:list-table')->asTable()->one();
 		foreach ($table->getRows() as $i => $row) {
-			$get_host = $row->getColumn('Name')->query('class:js-update-item')->one()->getText();
-			$get_group = $row->getColumn('Host')->getText();
 			foreach ($data['result'][$i] as $group => $host) {
+				$get_host = $row->getColumn('Name')->query('link:'.$host)->one()->getText();
+				$get_group = $row->getColumn('Host')->getText();
 				$this->assertEquals($host, $get_host);
 				$this->assertEquals($group, $get_group);
 			}
 		}
+
 		if (array_key_exists('not_displayed', $data)) {
 			foreach ($data['not_displayed'] as $column => $value) {
 				$this->assertNotContains($value, $table->getCells($column));
 			}
 		}
+
 		$this->assertEquals(count($data['result']), $table->getRows()->count());
 	}
 }

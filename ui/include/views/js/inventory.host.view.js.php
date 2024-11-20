@@ -22,59 +22,29 @@
 <script>
 	const view = new class {
 
-		constructor() {
-			this._registerEvents();
+		init() {
+			this.setSubmitCallback();
 		}
 
-		editHost({hostid}) {
-			this._openHostPopup({hostid});
-		}
+		setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
+				const data = e.detail;
+				let curl = null;
 
-		_openHostPopup(host_data) {
-			const original_url = location.href;
-			const overlay = PopUp('popup.host.edit', host_data, {
-				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
+				if ('success' in data) {
+					postMessageOk(data.success.title);
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess);
-			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
-				history.replaceState({}, '', original_url);
-			});
-		}
-
-		_editTemplate(parameters) {
-			const overlay = PopUp('template.edit', parameters, {
-				dialogueid: 'templates-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-		}
-
-		_registerEvents() {
-			this.events = {
-				elementSuccess(e) {
-					const data = e.detail;
-					let curl = null;
-
-					if ('success' in data) {
-						postMessageOk(data.success.title);
-
-						if ('messages' in data.success) {
-							postMessageDetails('success', data.success.messages);
-						}
-
-						if ('action' in data.success && data.success.action === 'delete') {
-							curl = new Curl('hostinventories.php').getUrl();
-						}
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
 					}
 
-					location.href = curl === null ? location.href : curl;
+					if ('action' in data.success && data.success.action === 'delete') {
+						curl = new Curl('hostinventories.php').getUrl();
+					}
 				}
-			};
+
+				location.href = curl === null ? location.href : curl;
+			});
 		}
 	};
 </script>

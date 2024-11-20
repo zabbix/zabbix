@@ -84,7 +84,8 @@ $output = [
 			'action' => 'module_edit.submit();'
 		]
 	],
-	'script_inline' => getPagePostJs().$this->readJsFile('module.edit.js.php')
+	'script_inline' => getPagePostJs().$this->readJsFile('module.edit.js.php'),
+	'dialogue_class' => 'modal-popup-medium'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

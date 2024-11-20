@@ -115,7 +115,7 @@ foreach ($data['services'] as $serviceid => $service) {
 				->setAttribute('data-serviceid', $serviceid)
 				->setEnabled(!$service['readonly'] && $service['problem_tags'] == 0),
 			(new CButtonIcon(ZBX_ICON_PENCIL, _('Edit')))
-				->addClass('js-edit-service')
+				->addClass('js-edit-service-list')
 				->setAttribute('data-serviceid', $serviceid)
 				->setEnabled(!$service['readonly']),
 			(new CButtonIcon(ZBX_ICON_REMOVE_SMALL, _('Delete')))

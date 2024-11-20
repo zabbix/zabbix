@@ -24,61 +24,16 @@
 
 		init() {
 			this.#initActions();
+			this.#setSubmitCallback();
 		}
 
 		#initActions() {
-			document.getElementById('js-create').addEventListener('click', () => this.#edit());
+			document.getElementById('js-create').addEventListener('click', () => {
+				window.popupManagerInstance.openPopup('script.edit', {});
+			});
 
 			document.getElementById('js-massdelete').addEventListener('click', (e) => {
 				this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
-			});
-
-			document.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-action-edit')) {
-					this.#editAction({actionid: e.target.dataset.actionid, eventsource: e.target.dataset.eventsource});
-				}
-
-				if (e.target.classList.contains('js-edit')) {
-					this.#edit({scriptid: e.target.dataset.scriptid});
-				}
-			})
-		}
-
-		#edit(parameters = {}) {
-			const overlay = PopUp('script.edit', parameters, {
-				dialogueid: 'script-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				uncheckTableRows('script');
-				postMessageOk(e.detail.title);
-
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				location.href = location.href;
-			});
-		}
-
-		#editAction(parameters = {}) {
-			const overlay = PopUp('popup.action.edit', parameters, {
-				dialogueid: 'action-edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				uncheckTableRows('script');
-				postMessageOk(e.detail.title);
-
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				location.href = location.href;
 			});
 		}
 
@@ -140,6 +95,21 @@
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
+		}
+
+		#setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
+
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
+				}
+
+				uncheckTableRows('script');
+				location.href = location.href;
+			});
 		}
 	};
 </script>

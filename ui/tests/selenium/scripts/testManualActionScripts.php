@@ -95,7 +95,7 @@ class testManualActionScripts extends CWebTest {
 						'Name' => 'Host url with {MANUALINPUT} macro, confirmation message and input type - string',
 						'Scope' => 'Manual host action',
 						'Type' => 'URL',
-						'URL' => 'zabbix.php?action=host.edit&hostid={MANUALINPUT}',
+						'URL' => 'zabbix.php?action=popup&popup=host.edit&hostid={MANUALINPUT}',
 						'Advanced configuration' => true,
 						'Enable user input' => true,
 						'Input prompt' => 'Enter host id',
@@ -126,7 +126,7 @@ class testManualActionScripts extends CWebTest {
 						'Name' => 'Event url with {MANUALINPUT} macro, confirmation message and input type - string',
 						'Scope' => 'Manual event action',
 						'Type' => 'URL',
-						'URL' => 'zabbix.php?action=host.edit&hostid={MANUALINPUT}',
+						'URL' => 'zabbix.php?action=popup&popup=host.edit&hostid={MANUALINPUT}',
 						'Advanced configuration' => true,
 						'Enable user input' => true,
 						'Input prompt' => 'Enter host id',
@@ -155,7 +155,7 @@ class testManualActionScripts extends CWebTest {
 						'Name' => 'Event url with without confirmation message',
 						'Scope' => 'Manual event action',
 						'Type' => 'URL',
-						'URL' => 'zabbix.php?action=host.edit&hostid={MANUALINPUT}',
+						'URL' => 'zabbix.php?action=popup&popup=host.edit&hostid={MANUALINPUT}',
 						'Advanced configuration' => true,
 						'Enable user input' => true,
 						'Input prompt' => 'Enter host id',
@@ -183,7 +183,7 @@ class testManualActionScripts extends CWebTest {
 						'Name' => 'Host url with {MANUALINPUT} macro and without confirmation message',
 						'Scope' => 'Manual host action',
 						'Type' => 'URL',
-						'URL' => 'zabbix.php?action=host.edit&hostid={MANUALINPUT}',
+						'URL' => 'zabbix.php?action=popup&popup=host.edit&hostid={MANUALINPUT}',
 						'Advanced configuration' => true,
 						'Enable user input' => true,
 						'Input prompt' => 'Enter host id',
@@ -819,7 +819,7 @@ class testManualActionScripts extends CWebTest {
 						'Name' => 'Host url without confirmation message and with input type - string',
 						'Scope' => 'Manual host action',
 						'Type' => 'URL',
-						'URL' => 'zabbix.php?action=host.edit&hostid={MANUALINPUT}',
+						'URL' => 'zabbix.php?action=popup&popup=host.edit&hostid={MANUALINPUT}',
 						'Open in a new window' => false,
 						'Advanced configuration' => true,
 						'Enable user input' => true,
@@ -848,7 +848,7 @@ class testManualActionScripts extends CWebTest {
 						'Name' => 'Host url without confirmation message and with input type - dropdown',
 						'Scope' => 'Manual host action',
 						'Type' => 'URL',
-						'URL' => 'zabbix.php?action=host.edit&hostid={MANUALINPUT}',
+						'URL' => 'zabbix.php?action=popup&popup=host.edit&hostid={MANUALINPUT}',
 						'Open in a new window' => false,
 						'Advanced configuration' => true,
 						'Enable user input' => true,
@@ -876,7 +876,7 @@ class testManualActionScripts extends CWebTest {
 						'Name' => 'Event url without confirmation message and with input type - string',
 						'Scope' => 'Manual event action',
 						'Type' => 'URL',
-						'URL' => 'zabbix.php?action=host.edit&hostid={MANUALINPUT}',
+						'URL' => 'zabbix.php?action=popup&popup=host.edit&hostid={MANUALINPUT}',
 						'Open in a new window' => false,
 						'Advanced configuration' => true,
 						'Enable user input' => true,
@@ -903,7 +903,7 @@ class testManualActionScripts extends CWebTest {
 						'Name' => 'Event url without confirmation message and with input type - dropdown',
 						'Scope' => 'Manual event action',
 						'Type' => 'URL',
-						'URL' => 'zabbix.php?action=host.edit&hostid={MANUALINPUT}',
+						'URL' => 'zabbix.php?action=popup&popup=host.edit&hostid={MANUALINPUT}',
 						'Open in a new window' => false,
 						'Advanced configuration' => true,
 						'Enable user input' => true,
@@ -929,7 +929,7 @@ class testManualActionScripts extends CWebTest {
 						'Name' => 'Host url with confirmation message and with input type - string',
 						'Scope' => 'Manual host action',
 						'Type' => 'URL',
-						'URL' => 'zabbix.php?action=host.edit&hostid={MANUALINPUT}',
+						'URL' => 'zabbix.php?action=popup&popup=host.edit&hostid={MANUALINPUT}',
 						'Open in a new window' => false,
 						'Advanced configuration' => true,
 						'Enable user input' => true,
@@ -960,7 +960,7 @@ class testManualActionScripts extends CWebTest {
 						'Name' => 'Host url with confirmation message and with input type - dropdown',
 						'Scope' => 'Manual host action',
 						'Type' => 'URL',
-						'URL' => 'zabbix.php?action=host.edit&hostid={MANUALINPUT}',
+						'URL' => 'zabbix.php?action=popup&popup=host.edit&hostid={MANUALINPUT}',
 						'Open in a new window' => false,
 						'Advanced configuration' => true,
 						'Enable user input' => true,
@@ -990,7 +990,7 @@ class testManualActionScripts extends CWebTest {
 						'Name' => 'Event url with confirmation message and with input type - string',
 						'Scope' => 'Manual event action',
 						'Type' => 'URL',
-						'URL' => 'zabbix.php?action=host.edit&hostid={MANUALINPUT}',
+						'URL' => 'zabbix.php?action=popup&popup=host.edit&hostid={MANUALINPUT}',
 						'Open in a new window' => false,
 						'Advanced configuration' => true,
 						'Enable user input' => true,
@@ -1019,7 +1019,7 @@ class testManualActionScripts extends CWebTest {
 						'Name' => 'Event url with confirmation message and with input type - dropdown',
 						'Scope' => 'Manual event action',
 						'Type' => 'URL',
-						'URL' => 'zabbix.php?action=host.edit&hostid={MANUALINPUT}',
+						'URL' => 'zabbix.php?action=popup&popup=host.edit&hostid={MANUALINPUT}',
 						'Open in a new window' => false,
 						'Advanced configuration' => true,
 						'Enable user input' => true,
@@ -2289,9 +2289,9 @@ class testManualActionScripts extends CWebTest {
 				}
 
 				if ($data['fields']['Type'] === 'URL') {
-					COverlayDialogElement::ensureNotPresent();
 					$host_name = (array_key_exists('host', $data)) ? $data['host'] : self::HOST;
-					$this->assertEquals($host_name, $this->query('id:host')->one()->getValue());
+					$this->assertEquals($host_name, $this->query('id:host')->waitUntilVisible()->one()->getValue());
+					COverlayDialogElement::find()->one()->close();
 				}
 				else {
 					$this->query('button:Ok')->waitUntilVisible()->one();

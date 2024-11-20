@@ -147,9 +147,15 @@ $table = (new CTableInfo())
 	->setPageNavigation($data['paging']);
 
 foreach ($data['templates'] as $template) {
-	$name = (new CLink($template['name']))
-		->addClass('js-edit')
-		->setAttribute('data-templateid', $template['templateid']);
+	$template_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'popup')
+		->setArgument('popup', 'template.edit')
+		->setArgument('templateid', $template['templateid'])
+		->getUrl();
+
+	$name = (new CLink($template['name'], $template_url))
+		->setAttribute('data-templateid', $template['templateid'])
+		->setAttribute('data-action', 'template.edit');
 
 	$linked_templates_output = [];
 	$linked_to_output = [];
@@ -169,11 +175,17 @@ foreach ($data['templates'] as $template) {
 		}
 
 		if (array_key_exists($parent_template['templateid'], $data['editable_templates'])) {
-			$linked_templates_output[] = (new CLink($parent_template['name']))
-				->addClass('js-edit')
+			$linked_template_url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', 'template.edit')
+				->setArgument('templateid', $parent_template['templateid'])
+				->getUrl();
+
+			$linked_templates_output[] = (new CLink($parent_template['name'], $linked_template_url))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_GREY)
-				->setAttribute('data-templateid', $parent_template['templateid']);
+				->setAttribute('data-templateid', $parent_template['templateid'])
+				->setAttribute('data-action', 'template.edit');
 		}
 		else {
 			$linked_templates_output[] = (new CSpan($parent_template['name']))
@@ -196,11 +208,17 @@ foreach ($data['templates'] as $template) {
 		}
 
 		if (array_key_exists($child_template['templateid'], $data['editable_templates'])) {
-			$linked_to_output[] = (new CLink($child_template['name']))
-				->addClass('js-edit')
+			$linked_to_url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', 'template.edit')
+				->setArgument('templateid', $child_template['templateid'])
+				->getUrl();
+
+			$linked_to_output[] = (new CLink($child_template['name'], $linked_to_url))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_GREY)
-				->setAttribute('data-templateid', $child_template['templateid']);
+				->setAttribute('data-templateid', $child_template['templateid'])
+				->setAttribute('data-action', 'template.edit');
 		}
 		else {
 			$linked_to_output[] = (new CSpan($child_template['name']))

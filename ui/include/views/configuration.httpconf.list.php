@@ -184,10 +184,16 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 		}
 	}
 
+	$host_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'popup')
+		->setArgument('popup', $data['context'] === 'host' ? 'host.edit' : 'template.edit')
+		->setArgument($data['context'] === 'host' ? 'hostid' : 'templateid', $httpTest['hostid'])
+		->getUrl();
+
 	$host = $this->data['hostid'] == 0
-		? (new CLink($httpTest['hostname']))
-			->setAttribute('data-hostid', $httpTest['hostid'])
-			->addClass('js-edit-'.$data['context'])
+		? (new CLink($httpTest['hostname'], $host_url))
+			->setAttribute($data['context'] === 'host' ? 'data-hostid' : 'data-templateid', $httpTest['hostid'])
+			->setAttribute('data-action', $data['context'] === 'host' ? 'host.edit' : 'template.edit')
 		: null;
 
 	$httpTable->addRow([

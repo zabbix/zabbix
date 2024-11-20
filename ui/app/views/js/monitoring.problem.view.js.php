@@ -145,24 +145,55 @@
 		},
 
 		initAcknowledge() {
-			$.subscribe('acknowledge.create', function(event, response) {
-				// Clear all selected checkboxes in Monitoring->Problems.
+			window.popupManagerInstance.setSubmitCallback((e) => {
+				clearMessages();
+
 				if (chkbxRange.prefix === 'problem') {
 					chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
 					chkbxRange.clearSelectedOnFilterChange();
 				}
 
-				view.refreshNow();
+				const data = e.detail;
 
-				clearMessages();
-				addMessage(makeMessageBox('good', [], response.success.title));
+				if ('success' in data) {
+					let messages = [];
+
+					if ('messages' in data.success) {
+						messages = data.success.messages;
+					}
+
+					addMessage(makeMessageBox('good', messages, data.success.title));
+				}
+
+				uncheckTableRows('problem');
+				view.refreshResults();
+				view.refreshCounters();
 			});
 
-			$(document).on('submit', '#problem_form', function(e) {
+			$(document).on('submit', '#problem_form', (e) => {
 				e.preventDefault();
 
-				acknowledgePopUp({eventids: Object.keys(chkbxRange.getSelectedIds())}, this);
+				// Save current url before opening the popup and modifying the URL.
+				this.current_url = location.href;
+				window.popupManagerInstance.setUrl(this.current_url);
+
+				// Set the URL for popup.
+				this.setPopupLink(Object.keys(chkbxRange.getSelectedIds()));
+
+				window.popupManagerInstance.openPopup('acknowledge.edit',
+					{eventids: Object.keys(chkbxRange.getSelectedIds())}, false
+				);
 			});
+		},
+
+		setPopupLink(eventids) {
+			const url = new Curl('zabbix.php');
+
+			url.setArgument('action', 'popup');
+			url.setArgument('popup', 'acknowledge.edit');
+			url.setArgument('eventids', eventids);
+
+			history.replaceState(null, '', url.getUrl());
 		},
 
 		initExpandables() {
@@ -412,82 +443,6 @@
 						this.refresh_interval > 0 ? this.refresh_interval : 5000
 					);
 				});
-		},
-
-		editHost(hostid) {
-			this.openHostPopup({hostid});
-		},
-
-		editItem(target, data) {
-			clearMessages();
-
-			const overlay = PopUp('item.edit', data, {
-				dialogueid: 'item-edit',
-				dialogue_class: 'modal-popup-large',
-				trigger_element: target,
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-		},
-
-		openHostPopup(host_data) {
-			clearMessages();
-
-			const original_url = location.href;
-			const overlay = PopUp('popup.host.edit', host_data, {
-				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
-				history.replaceState({}, '', original_url);
-			}, {once: true});
-		},
-
-		editTemplate(parameters) {
-			const overlay = PopUp('template.edit', parameters, {
-				dialogueid: 'templates-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-		},
-
-		editTrigger(trigger_data) {
-			clearMessages();
-
-			const overlay = PopUp('trigger.edit', trigger_data, {
-				dialogueid: 'trigger-edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-		},
-
-		events: {
-			elementSuccess(e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					const title = data.success.title;
-					let messages = [];
-
-					if ('messages' in data.success) {
-						messages = data.success.messages;
-					}
-
-					addMessage(makeMessageBox('good', messages, title));
-				}
-
-				uncheckTableRows('problem');
-				view.refreshResults();
-				view.refreshCounters();
-			}
 		}
 	};
 </script>

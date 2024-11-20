@@ -97,7 +97,7 @@ if ($host_prototype['templateid']) {
 			if ($data['allowed_ui_conf_templates']
 					&& array_key_exists($template['templateid'], $host_prototype['writable_templates'])) {
 				$template_link = (new CLink($template['name']))
-					->addClass('js-edit-linked-template')
+					->addClass('js-edit-template')
 					->setAttribute('data-templateid', $template['templateid']);
 			}
 			else {
@@ -123,9 +123,15 @@ else {
 
 			if ($data['allowed_ui_conf_templates']
 					&& array_key_exists($template['templateid'], $host_prototype['writable_templates'])) {
-				$template_link = (new CLink($template['name']))
-					->addClass('js-edit-linked-template')
-					->setAttribute('data-templateid', $template['templateid']);
+				$template_url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'popup')
+					->setArgument('popup', 'template.edit')
+					->setArgument('templateid', $template['templateid'])
+					->getUrl();
+
+				$template_link = (new CLink($template['name'], $template_url))
+					->setAttribute('data-templateid', $template['templateid'])
+					->setAttribute('data-action', 'template.edit');
 			}
 			else {
 				$template_link = new CSpan($template['name']);

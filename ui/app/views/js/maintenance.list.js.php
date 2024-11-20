@@ -25,48 +25,26 @@
 		init() {
 			const $filter_groups = $('#filter_groups_');
 
-			$filter_groups.on('change', () => this._updateMultiselect($filter_groups));
-			this._updateMultiselect($filter_groups);
+			$filter_groups.on('change', () => this.#updateMultiselect($filter_groups));
+			this.#updateMultiselect($filter_groups);
 
-			this._initActions();
+			this.#initActions();
 		}
 
-		_initActions() {
+		#initActions() {
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-create-maintenance')) {
-					this._edit();
-				}
-				else if (e.target.classList.contains('js-edit-maintenance')) {
-					this._edit({maintenanceid: e.target.dataset.maintenanceid});
+					window.popupManagerInstance.openPopup('maintenance.edit', {});
 				}
 				else if (e.target.classList.contains('js-massdelete-maintenance')) {
-					this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
-			})
-		}
-
-		_edit(parameters = {}) {
-			const overlay = PopUp('maintenance.edit', parameters, {
-				dialogueid: 'maintenance-edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
 			});
 
-			const dialogue = overlay.$dialogue[0];
-
-			dialogue.addEventListener('dialogue.submit', (e) => {
-				postMessageOk(e.detail.title);
-
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				uncheckTableRows('maintenance');
-				location.href = location.href;
-			});
+			this.#setSubmitCallback();
 		}
 
-		_delete(target, maintenanceids) {
+		#delete(target, maintenanceids) {
 			const confirmation = maintenanceids.length > 1
 				? <?= json_encode(_('Delete selected maintenance periods?')) ?>
 				: <?= json_encode(_('Delete selected maintenance period?')) ?>;
@@ -78,10 +56,10 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'maintenance.delete');
 
-			this._post(target, maintenanceids, curl.getUrl());
+			this.#post(target, maintenanceids, curl.getUrl());
 		}
 
-		_post(target, maintenanceids, url) {
+		#post(target, maintenanceids, url) {
 			target.classList.add('is-loading');
 
 			const post_data = {
@@ -129,8 +107,23 @@
 				});
 		}
 
-		_updateMultiselect($ms) {
+		#updateMultiselect($ms) {
 			$ms.multiSelect('setDisabledEntries', [...$ms.multiSelect('getData').map((entry) => entry.id)]);
+		}
+
+		#setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
+
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
+				}
+
+				uncheckTableRows('maintenance');
+				location.href = location.href;
+			});
 		}
 	};
 </script>

@@ -22,6 +22,16 @@
 $item = $data['item'];
 $readonly = $item['templated'] || $item['discovered'];
 
+if ($item['discovered']) {
+	$discovered_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'popup')
+		->setArgument('popup', 'item.prototype.edit')
+		->setArgument('context', $item['context'])
+		->setArgument('itemid', $item['itemDiscovery']['parent_itemid'])
+		->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
+		->getUrl();
+}
+
 $formgrid = (new CFormGrid())
 	->addItem($item['parent_items']
 		? [
@@ -33,7 +43,7 @@ $formgrid = (new CFormGrid())
 	->addItem($item['discovered'] ? [
 		new CLabel(_('Discovered by')),
 		(new CFormField(
-			(new CLink($item['discoveryRule']['name']))
+			(new CLink($item['discoveryRule']['name'], $discovered_url))
 				->setAttribute('data-action', 'item.prototype.edit')
 				->setAttribute('data-parent_discoveryid', $item['discoveryRule']['itemid'])
 				->setAttribute('data-itemid', $item['itemDiscovery']['parent_itemid'])
@@ -688,10 +698,16 @@ $custom_timeout_enabled = $item['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_ENA
 
 if ($data['can_edit_source_timeouts'] && (!$readonly || !$custom_timeout_enabled)) {
 	$edit_source_timeouts_link = $data['host']['proxyid']
-		? (new CLink(_('Timeouts')))
+		? (new CLink(_('Timeouts'), (new CUrl('zabbix.php'))
+			->setArgument('action', 'popup')
+			->setArgument('popup', 'proxy.edit')
+			->setArgument('proxyid', $data['host']['proxyid'])
+			->getUrl()
+		))
 			->addClass(ZBX_STYLE_LINK)
 			->addClass('js-edit-proxy')
 			->setAttribute('data-proxyid', $data['host']['proxyid'])
+			->setAttribute('data-action', 'proxy.edit')
 		: (new CLink(_('Timeouts'),
 			(new CUrl('zabbix.php'))->setArgument('action', 'timeouts.edit')
 		))

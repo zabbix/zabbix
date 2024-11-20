@@ -1065,7 +1065,7 @@ class testFormAction extends CLegacyWebTest {
 		$operation_details->getField('Custom message')->set(true);
 		$this->assertEquals(255, $operation_details->getField('id:operation-opmessage-subject')->waitUntilVisible()->getAttribute('maxlength'));
 		$this->assertEquals(65535, $operation_details->getField('id:operation_opmessage_message')->waitUntilVisible()->getAttribute('maxlength'));
-		$this->zbxTestClickXpath("//div[@class='overlay-dialogue modal modal-popup modal-popup-medium']//button[@title='Close']");
+		$this->zbxTestClickXpath("//div[@class='overlay-dialogue modal modal-popup modal-popup-medium undefined']//button[@title='Close']");
 	}
 
 	public static function update() {
@@ -1617,7 +1617,7 @@ class testFormAction extends CLegacyWebTest {
 
 		$this->page->login()->open('zabbix.php?action=action.list&eventsource=4')->waitUntilReady();
 		$this->zbxTestClickXpath('//a[text()="Service action"]');
-		$this->zbxTestClickXpathWait('//div[@data-dialogueid="action-edit"]//button[text()="Clone"]');
+		$this->zbxTestClickXpathWait('//div[@data-dialogueid="action.edit"]//button[text()="Clone"]');
 		$dialog = $this->query('class:overlay-dialogue-body')->asOverlayDialog()->one()->waitUntilReady();
 		$form = $dialog->asForm();
 		$form->getField('id:name')->fill(self::SERVICE_ACTION.' Clone');

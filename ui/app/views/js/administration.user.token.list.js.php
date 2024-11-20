@@ -20,54 +20,33 @@
 ?>
 
 <script>
-	const view = {
+	const view = new class {
 
 		init() {
-			this.initActionButtons();
+			this.#initActionButtons();
+			this.#setSubmitCallback();
 			this.expiresDaysHandler();
-		},
+		}
 
-		initActionButtons() {
+		#initActionButtons() {
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-create-token')) {
-					this.createUserToken();
-				}
-				else if (e.target.classList.contains('js-edit-token')) {
-					this.editUserToken(e.target.dataset.tokenid);
+					window.popupManagerInstance.openPopup('token.edit', {admin_mode: '0'});
 				}
 				else if (e.target.classList.contains('js-massdelete-token')) {
-					this.massDeleteUserToken(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#massDeleteUserToken(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 			});
-		},
+		}
 
 		expiresDaysHandler() {
 			const filter_expires_state = document.getElementById('filter-expires-state');
 			const filter_expires_days = document.getElementById('filter-expires-days');
 
 			filter_expires_days.disabled = !filter_expires_state.checked;
-		},
+		}
 
-		createUserToken() {
-			this.openUserTokenPopup({admin_mode: '0'});
-		},
-
-		editUserToken(tokenid) {
-			const user_token_data = {tokenid, admin_mode: '0'};
-			this.openUserTokenPopup(user_token_data);
-		},
-
-		openUserTokenPopup(user_token_data) {
-			const overlay = PopUp('popup.token.edit', user_token_data, {
-				dialogueid: 'token_edit',
-				dialogue_class: 'modal-popup-generic',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.userTokenSuccess, {once: true});
-		},
-
-		massDeleteUserToken(target, tokenids) {
+		#massDeleteUserToken(target, tokenids) {
 			const confirmation = tokenids.length > 1
 				? <?= json_encode(_('Delete selected tokens?')) ?>
 				: <?= json_encode(_('Delete selected token?')) ?>;
@@ -122,23 +101,21 @@
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
-		},
+		}
 
-		events: {
-			userTokenSuccess(e) {
-				const data = e.detail;
+		#setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
+				if (e.detail && 'success' in e.detail) {
+					postMessageOk(e.detail.success.title);
 
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
 					}
 				}
 
 				uncheckTableRows('user.token');
 				location.href = location.href;
-			}
+			});
 		}
 	};
 </script>

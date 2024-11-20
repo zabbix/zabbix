@@ -39,11 +39,13 @@
 			this.initMacrosTab();
 			this.initInventoryTab();
 			this.initEncryptionTab();
+			this.setSubmitCallback();
+			this.setPopupOpeningCallback();
+		}
 
-			this.form.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-edit-linked-template')) {
-					this.openTemplatePopup({templateid: e.target.dataset.templateid});
-				}
+		setPopupOpeningCallback() {
+			window.popupManagerInstance.setPopupOpeningCallback((action) => {
+				return action !== 'host.edit';
 			});
 		}
 
@@ -261,27 +263,6 @@
 			return templateids;
 		}
 
-		editHost(e, hostid) {
-			return;
-		}
-
-		editTemplate(e, templateid) {
-			e.preventDefault();
-			const template_data = {templateid};
-
-			this.openTemplatePopup(template_data);
-		}
-
-		openTemplatePopup(template_data) {
-			const overlay = PopUp('template.edit', template_data, {
-				dialogueid: 'templates-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.templateSubmit(e));
-		}
-
 		refresh() {
 			const url = new Curl('');
 			const form = document.getElementsByName(this.form_name)[0];
@@ -290,28 +271,30 @@
 			post(url.getUrl(), fields);
 		}
 
-		templateSubmit(e) {
-			let curl = null;
+		setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
+				let curl = null;
 
-			if ('success' in e.detail) {
-				postMessageOk(e.detail.success.title);
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
 
-				if ('messages' in e.detail.success) {
-					postMessageDetails('success', e.detail.success.messages);
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
+
+					if ('action' in e.detail.success && e.detail.success.action === 'delete') {
+						curl = new Curl('host_discovery.php');
+						curl.setArgument('context', 'template');
+					}
 				}
 
-				if ('action' in e.detail.success && e.detail.success.action === 'delete') {
-					curl = new Curl('host_discovery.php');
-					curl.setArgument('context', 'template');
+				if (curl) {
+					location.href = curl.getUrl();
 				}
-			}
-
-			if (curl) {
-				location.href = curl.getUrl();
-			}
-			else {
-				view.refresh();
-			}
+				else {
+					view.refresh();
+				}
+			});
 		}
 	}
 </script>
@@ -352,7 +335,9 @@
 		}
 
 		initInherit() {
-			const host_interface_row_tmpl = document.getElementById('host-interface-row-tmpl').innerHTML;
+			const form = document.getElementById('host-prototype-form');
+			const host_interface_row_tmpl = form.querySelector('#host-interface-row-tmpl').innerHTML;
+
 			const hostInterfaceManagerInherit = new HostInterfaceManager(this._data.inherited_interfaces,
 				host_interface_row_tmpl
 			);
@@ -362,7 +347,9 @@
 		}
 
 		initCustom() {
-			const host_interface_row_tmpl = document.getElementById('host-interface-row-tmpl').innerHTML;
+			const form = document.getElementById('host-prototype-form');
+			const host_interface_row_tmpl = form.querySelector('#host-interface-row-tmpl').innerHTML;
+
 			// This is in global space, as Add functions uses it.
 			window.hostInterfaceManager = new HostInterfaceManager(this._data.custom_interfaces,
 				host_interface_row_tmpl

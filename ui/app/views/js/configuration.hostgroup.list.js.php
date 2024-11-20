@@ -31,16 +31,13 @@
 			this.delete_url = delete_url;
 
 			this.initActionButtons();
+			this.setSubmitCallback();
 		},
 
 		initActionButtons() {
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-create-hostgroup')) {
-					this.edit();
-				}
-				else if (e.target.classList.contains('js-edit-hostgroup')) {
-					e.preventDefault();
-					this.edit({groupid: e.target.dataset.groupid});
+					window.popupManagerInstance.openPopup('hostgroup.edit', {});
 				}
 				else if (e.target.classList.contains('js-massenable-hostgroup')) {
 					this.enable(e.target, Object.keys(chkbxRange.getSelectedIds()));
@@ -52,20 +49,6 @@
 					this.delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 			});
-		},
-
-		edit(parameters = {}) {
-			const original_url = location.href;
-			const overlay = PopUp('popup.hostgroup.edit', parameters, {
-				dialogueid: 'hostgroup_edit',
-				dialogue_class: 'modal-popup-static',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail));
-			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
-				history.replaceState({}, '', original_url);
-			}, {once: true});
 		},
 
 		enable(target, groupids) {
@@ -98,37 +81,6 @@
 			}
 
 			this._post(target, groupids, this.delete_url);
-		},
-
-		editHost(e, hostid) {
-			e.preventDefault();
-			const host_data = {hostid};
-
-			this.openHostPopup(host_data);
-		},
-
-		openHostPopup(host_data) {
-			const original_url = location.href;
-			const overlay = PopUp('popup.host.edit', host_data, {
-				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail.success));
-			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
-				history.replaceState({}, '', original_url);
-			});
-		},
-
-		editTemplate(parameters) {
-			const overlay = PopUp('template.edit', parameters, {
-				dialogueid: 'templates-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail.success));
 		},
 
 		_post(target, groupids, url) {
@@ -174,16 +126,19 @@
 				});
 		},
 
-		_reload(success) {
-			uncheckTableRows('hostgroup');
-			postMessageOk(success.title);
+		setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
 
-			if ('messages' in success) {
-				postMessageDetails('success', success.messages);
-			}
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
+				}
 
-			uncheckTableRows('hostgroup');
-			location.href = location.href;
-		}
+				uncheckTableRows('hostgroup');
+				location.href = location.href;
+			});
+		},
 	};
 </script>

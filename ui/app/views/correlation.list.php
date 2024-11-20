@@ -113,11 +113,18 @@ foreach ($data['correlations'] as $correlation) {
 			->addClass('js-enable')
 			->setAttribute('data-correlationid', (int) $correlation['correlationid']);
 
+	$correlation_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'popup')
+		->setArgument('popup', 'correlation.edit')
+		->setArgument('correlationid', $correlation['correlationid'])
+		->getUrl();
+
 	$table->addRow([
 		new CCheckBox('correlationids['.$correlation['correlationid'].']', $correlation['correlationid']),
-		(new CCol((new CLink($correlation['name']))
-			->addClass('js-edit')
-			->setAttribute('data-correlationid', $correlation['correlationid'])
+		(new CCol(
+			(new CLink($correlation['name'], $correlation_url))
+				->setAttribute('data-correlationid', $correlation['correlationid'])
+				->setAttribute('data-action', 'correlation.edit')
 		))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CCol($conditions))->addClass(ZBX_STYLE_WORDBREAK),
 		$operations,

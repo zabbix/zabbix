@@ -691,11 +691,17 @@ $edit_source_timeouts_link = null;
 
 if ($data['can_edit_source_timeouts']
 		&& (!$data['limited'] || $data['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)) {
+	$proxy_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'popup')
+		->setArgument('popup', 'proxy.edit')
+		->setArgument('proxyid', $data['host']['proxyid'])
+		->getUrl();
+
 	$edit_source_timeouts_link = $data['host']['proxyid']
-		? (new CLink(_('Timeouts')))
+		? (new CLink(_('Timeouts'), $proxy_url))
 			->addClass(ZBX_STYLE_LINK)
+			->setAttribute('data-action', 'proxy.edit')
 			->setAttribute('data-proxyid', $data['host']['proxyid'])
-			->onClick('view.editProxy(event, this.dataset.proxyid);')
 		: (new CLink(_('Timeouts'),
 			(new CUrl('zabbix.php'))->setArgument('action', 'timeouts.edit')
 		))

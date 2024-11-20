@@ -22,7 +22,7 @@
 window.trigger_edit_popup = new class {
 
 	init({triggerid, expression_popup_parameters, recovery_popup_parameters, readonly, dependencies, action,
-			context, db_trigger
+			context, db_trigger, backurl, overlayid, parent_discoveryid
 	}) {
 		this.triggerid = triggerid;
 		this.expression_popup_parameters = expression_popup_parameters;
@@ -32,7 +32,9 @@ window.trigger_edit_popup = new class {
 		this.action = action;
 		this.context = context;
 		this.db_trigger = db_trigger;
-		this.overlay = overlays_stack.getById('trigger-edit');
+		this.overlay = overlays_stack.getById(overlayid);
+		this.overlay.backurl = backurl;
+		this.parent_discoveryid = parent_discoveryid;
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.expression = this.form.querySelector('#expression');
@@ -162,11 +164,9 @@ window.trigger_edit_popup = new class {
 			else if (e.target.classList.contains('js-check-recovery-target')) {
 				check_target(e.target, <?= json_encode(TRIGGER_RECOVERY_EXPRESSION) ?>);
 			}
-			else if (e.target.classList.contains('js-related-trigger-edit')) {
-				this.#openRelatedTrigger(e.target.dataset);
-			}
-			else if (e.target.classList.contains('js-edit-template')) {
-				this.editTemplate(e, e.target.dataset.templateid);
+			else if (e.target.classList.contains('js-edit-template')
+					|| e.target.classList.contains('js-related-trigger-edit')) {
+				this.#setActions(e.target.dataset);
 			}
 		});
 
@@ -183,6 +183,46 @@ window.trigger_edit_popup = new class {
 
 			this.#disableExpressionConstructorButtons(button_ids, e.target);
 		})
+	}
+
+	#setActions(dataset) {
+		const {action, ...params} = dataset;
+
+		window.popupManagerInstance.setAdditionalActions(() => {
+			const url = new Curl('zabbix.php');
+
+			url.setArgument('action', 'popup');
+			url.setArgument('popup', action);
+
+			for (const [key, value] of Object.entries(params)) {
+				url.setArgument(key, value);
+			}
+
+			if (this.#isFormModified()) {
+				if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
+					return false;
+				}
+				else {
+					overlayDialogueDestroy(this.overlay.dialogueid);
+
+					const url = new Curl(location.href);
+
+					url.setArgument('action', 'popup');
+					for (const [key, value] of Object.entries(params)) {
+						url.setArgument(key, value);
+					}
+
+					history.replaceState(null, '', url.getUrl());
+
+					return true;
+				}
+			}
+
+			overlayDialogueDestroy(this.overlay.dialogueid);
+			history.replaceState(null, '', url.getUrl());
+
+			return true;
+		});
 	}
 
 	#initTriggersTab() {
@@ -325,9 +365,11 @@ window.trigger_edit_popup = new class {
 			dependencies.push({
 				name: name,
 				triggerid: dependency.triggerid,
-				prototype: prototype
+				prototype: prototype,
+				trigger_url: this.#constructTriggerUrl(dependency.triggerid, prototype === '1'),
+				action: prototype === '1' ? 'trigger.prototype.edit' : 'trigger.edit'
 			});
-		})
+		});
 
 		return dependencies;
 	}
@@ -597,18 +639,6 @@ window.trigger_edit_popup = new class {
 		}
 	}
 
-	#openRelatedTrigger(data) {
-		if (this.#isFormModified() && !this.confirmNavigation()) {
-			return;
-		}
-
-		const dialogueid = this.dialogue.dataset.dialogueid;
-		const dialogue_class = this.dialogue.getAttribute('class');
-		const action = data.prototype === '1' ? 'trigger.prototype.edit' : 'trigger.edit';
-
-		PopUp(action, data, {dialogueid, dialogue_class});
-	}
-
 	#toggleInheritedTags() {
 		const form_refresh = document.createElement('input');
 
@@ -803,7 +833,7 @@ window.trigger_edit_popup = new class {
 		this.#post(curl.getUrl(), {triggerids: [this.triggerid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 		});
 	}
 
@@ -817,17 +847,26 @@ window.trigger_edit_popup = new class {
 		dependency_table
 			.querySelectorAll('.js-related-trigger-edit')
 			.forEach(row => {
+				const prototype = row.dataset.prototype && row.dataset.prototype === '1';
+
 				dependencies.push({
 					name: row.textContent,
 					triggerid: row.dataset.triggerid,
-					prototype: row.dataset.prototype
+					prototype: row.dataset.prototype,
+					trigger_url: this.#constructTriggerUrl(row.dataset.triggerid, prototype),
+					action: prototype ? 'trigger.prototype.edit' : 'trigger.edit'
 				});
-		})
+			});
 
 		Object.values(data).forEach((new_dependency) => {
 			if (dependencies.some(dependency => dependency.triggerid === new_dependency.triggerid)) {
 				return;
 			}
+
+			const prototype = new_dependency.prototype === '1';
+
+			new_dependency.action = prototype ? 'trigger.prototype.edit' : 'trigger.edit';
+			new_dependency.trigger_url = this.#constructTriggerUrl(new_dependency.triggerid, prototype);
 
 			dependencies.push(new_dependency);
 		})
@@ -837,33 +876,18 @@ window.trigger_edit_popup = new class {
 		this.#addDependencies(dependencies);
 	}
 
-	editTemplate(e, templateid) {
-		if (this.#isFormModified() && !this.confirmNavigation()) {
-			return;
+	#constructTriggerUrl(triggerid, is_prototype) {
+		const url = new Curl('zabbix.php');
+		url.setArgument('action', 'popup');
+		url.setArgument('popup', is_prototype ? 'trigger.prototype.edit' : 'trigger.edit');
+		url.setArgument('triggerid', triggerid);
+		url.setArgument('context', this.context);
+
+		if (is_prototype) {
+			url.setArgument('parent_discoveryid', this.parent_discoveryid);
 		}
 
-		e.preventDefault();
-		overlayDialogueDestroy(this.overlay.dialogueid);
-
-		const template_data = {templateid};
-
-		this.openTemplatePopup(template_data);
-	}
-
-	openTemplatePopup(template_data) {
-		const overlay =  PopUp('template.edit', template_data, {
-			dialogueid: 'templates-form',
-			dialogue_class: 'modal-popup-large',
-			prevent_navigation: true
-		});
-
-		overlay.$dialogue[0].addEventListener('dialogue.submit',
-			this.elementSuccess.bind(this, this.context, this.action !== 'trigger.edit'), {once: true}
-		);
-	}
-
-	confirmNavigation() {
-		return window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
+		return url.getUrl();
 	}
 
 	elementSuccess(context, discovery, e) {
@@ -883,7 +907,7 @@ window.trigger_edit_popup = new class {
 			}
 		}
 
-		if (curl == null) {
+		if (curl === null) {
 			location.href = location.href;
 		}
 		else {

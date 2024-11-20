@@ -160,9 +160,16 @@ else {
 
 		if (array_key_exists('template', $macro)) {
 			if ($macro['template']['rights'] == PERM_READ_WRITE) {
-				$link = (new CLink($macro['template']['name']))
-					->addClass('js-edit-linked-template')
-					->setAttribute('data-templateid', $macro['template']['templateid']);
+				$template_url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'popup')
+					->setArgument('popup', 'template.edit')
+					->setArgument('templateid', $macro['template']['templateid'])
+					->getUrl();
+
+				$link = (new CLink($macro['template']['name'], $template_url))
+					->setAttribute('data-templateid', $macro['template']['templateid'])
+					->setAttribute('data-action', 'template.edit')
+					->addClass('js-edit-template');
 			}
 			else {
 				$link = new CSpan($macro['template']['name']);

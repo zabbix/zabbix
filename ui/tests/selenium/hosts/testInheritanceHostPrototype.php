@@ -179,8 +179,10 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testInheritanceHostPrototype_CreateHostLinkTemplate($data) {
-		$this->zbxTestLogin('zabbix.php?action=host.edit');
-		$form = $this->query('id:host-form')->asForm()->one()->waitUntilVisible();
+		$this->zbxTestLogin('zabbix.php?action=host.list');
+		$this->query('button:Create host')->one()->waitUntilClickable()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $dialog->asForm();
 		$form->fill($data['fields']);
 
 		$form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => ['1' => 'default']])
@@ -190,6 +192,8 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->page->waitUntilReady();
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host added');
+
+		COverlayDialogElement::ensureNotPresent();
 
 		// DB check.
 		$hosts_templates = 'SELECT NULL'.

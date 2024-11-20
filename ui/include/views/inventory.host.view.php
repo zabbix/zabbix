@@ -171,9 +171,16 @@ $overviewFormList->addRow(_('Monitoring'),
 
 // configuration
 if ($data['allowed_ui_conf_hosts'] && $data['rwHost']) {
-	$hostLink = (new CLink(_('Host')))
+	$host_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'popup')
+		->setArgument('popup', 'host.edit')
+		->setArgument('hostid', $data['host']['hostid'])
+		->getUrl();
+
+	$hostLink = (new CLink(_('Host'), $host_url))
 		->setAttribute('data-hostid', $data['host']['hostid'])
-		->onClick('view.editHost({hostid: this.dataset.hostid});');
+		->setAttribute('data-action', 'host.edit');
+
 	$itemsLink = new CLink(_('Items'),
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'item.list')
@@ -257,6 +264,10 @@ $hostInventoriesTab->addTab('detailsTab', _('Details'), $detailsFormList);
 
 // append tabs and form
 $hostInventoriesTab->setFooter(makeFormFooter(null, [new CButtonCancel()]));
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
+	->show();
 
 (new CHtmlPage())
 	->setTitle(_('Host inventory'))

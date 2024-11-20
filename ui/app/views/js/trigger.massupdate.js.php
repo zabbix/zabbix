@@ -45,9 +45,25 @@
 					parent_discoveryid: '<?= $data['parent_discoveryid'] ?>',
 					context: '<?= $data['context'] ?>',
 					name: value.name,
-					prototype: prototype
+					prototype: prototype,
+					trigger_url: this.constructTriggerUrl(value.triggerid, prototype === '1'),
+					action: prototype === '1' ? 'trigger.prototype.edit' : 'trigger.edit'
 				}));
 		}
+	}
+
+	function constructTriggerUrl(triggerid, is_prototype) {
+		const url = new Curl('zabbix.php');
+		url.setArgument('action', 'popup');
+		url.setArgument('popup', is_prototype ? 'trigger.prototype.edit' : 'trigger.edit');
+		url.setArgument('triggerid', triggerid);
+		url.setArgument('context', '<?= $data['context'] ?>');
+
+		if (is_prototype) {
+			url.setArgument('parent_discoveryid', '<?= $data['parent_discoveryid'] ?>');
+		}
+
+		return url.getUrl();
 	}
 
 	function removeDependency(triggerid) {
@@ -65,30 +81,6 @@
 
 			const massupdate_overlay = overlays_stack.end();
 			overlayDialogueDestroy(massupdate_overlay.dialogueid);
-
-			const trigger_data = {
-				triggerid: e.target.dataset.triggerid,
-				parent_discoveryid: e.target.dataset.parent_discoveryid,
-				context: e.target.dataset.context
-			};
-
-			const action = (e.target.dataset.prototype === '0') ? 'trigger.edit' : 'trigger.prototype.edit';
-
-			const overlay = PopUp(action, trigger_data, {
-				dialogueid: 'trigger-edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				postMessageOk(e.detail.success.title);
-
-				if ('messages' in e.detail.success) {
-					postMessageDetails('success', e.detail.success.messages);
-				}
-
-				location.href = location.href;
-			});
 		}
 	})
 </script>

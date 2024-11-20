@@ -920,13 +920,8 @@ class testFormHost extends CWebTest {
 
 		$this->page->login()->open($this->link)->waitUntilReady();
 
-		if ($this->standalone) {
-			$form = $this->query('id:host-form')->asForm()->waitUntilReady()->one();
-		}
-		else {
-			$this->query('button:Create host')->one()->waitUntilClickable()->click();
-			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
-		}
+		$this->query('button:Create host')->one()->waitUntilClickable()->click();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
@@ -1849,7 +1844,7 @@ class testFormHost extends CWebTest {
 	 */
 	public function cloneHost($data) {
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['host']));
-		$form = $this->openForm(($this->standalone ? 'zabbix.php?action=host.edit&hostid='.$hostid : $this->link), $data['host']);
+		$form = $this->openForm(($this->standalone ? 'zabbix.php?action=popup&popup=host.edit&hostid='.$hostid : $this->link), $data['host']);
 
 		// Get values from form.
 		$form->fill($data['fields']);
@@ -1979,7 +1974,7 @@ class testFormHost extends CWebTest {
 			}
 		}
 		else {
-			$form = $this->openForm(($this->standalone ? 'zabbix.php?action=host.edit&hostid='.$hostid : $this->link), $host);
+			$form = $this->openForm(($this->standalone ? 'zabbix.php?action=popup&popup=host.edit&hostid='.$hostid : $this->link), $host);
 		}
 
 		$form_type = ($this->standalone) ? $form : COverlayDialogElement::find()->waitUntilReady()->one();
@@ -2002,7 +1997,7 @@ class testFormHost extends CWebTest {
 		if ($data['action'] === 'Clone') {
 			$form_type->invalidate();
 			$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
-			$expected_url = PHPUNIT_URL.'zabbix.php?action=host.edit&hostid='.$id.'&clone=1';
+			$expected_url = PHPUNIT_URL.'zabbix.php?action=popup&popup=host.edit&hostid='.$id;
 
 			$this->assertEquals($expected_url, $this->page->getCurrentUrl());
 			$this->assertFalse($form_type->query("xpath:.//ul[".CXPathHelper::fromClass('filter-breadcrumb')."]")
@@ -2120,7 +2115,7 @@ class testFormHost extends CWebTest {
 		$table->waitUntilReloaded();
 
 		$host_link = $table->findRow('Name', $host, true)->getColumn('Name')
-				->query($this->monitoring ? 'tag:a' : "xpath:.//a[@onclick]")->waitUntilClickable();
+				->query($this->monitoring ? 'tag:a' : 'xpath:.//a[@data-action="host.edit"]')->waitUntilClickable();
 
 		if ($this->monitoring) {
 			$host_link->asPopupButton()->one()->select('Host');

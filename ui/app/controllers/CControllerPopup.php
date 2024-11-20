@@ -21,29 +21,51 @@ class CControllerPopup extends CController {
 
 	/**
 	 * List of supported popups.
-	 *
-	 * @var array
 	 */
-	protected $supported_popups;
+	protected array $supported_popups;
 
 	/**
 	 * Controller instance of the popup.
-	 *
-	 * @var CController
 	 */
-	protected $popup_controller;
+	protected CController $popup_controller;
+
+	/**
+	 * Current action name.
+	 */
+	private string $action;
 
 	protected function init() {
 		$this->disableCsrfValidation();
 
 		$this->supported_popups = [
-			'acknowledge.edit' => _('Update problem')
+			'acknowledge.edit' => _('Update problem'),
+			'action.edit' => _('Action edit'),
+			'connector.edit' => _('Connector edit'),
+			'correlation.edit' => _('Correlation edit'),
+			'discovery.edit' => _('Discovery rule edit'),
+			'host.edit' => _('Host edit'),
+			'hostgroup.edit' => _('Host group edit'),
+			'item.edit' => _('Item edit'),
+			'item.prototype.edit' => _('Item prototype edit'),
+			'maintenance.edit' => _('Maintenance edit'),
+			'mediatype.edit' => _('Media type edit'),
+			'module.edit' => _('Module edit'),
+			'proxy.edit' => _('Proxy edit'),
+			'proxygroup.edit' => _('Proxy group edit'),
+			'templategroup.edit' => _('Template group edit'),
+			'script.edit' => _('Script edit'),
+			'service.edit' => _('Service edit'),
+			'sla.edit' => _('SLA edit'),
+			'template.edit' => _('Template edit'),
+			'token.edit' => _('Token edit'),
+			'trigger.edit' => _('Trigger edit'),
+			'trigger.prototype.edit' => _('Trigger prototype edit')
 		];
 	}
 
 	protected function checkInput() {
 		$fields = [
-			'popup_action' => 'required|in '.implode(',', array_keys($this->supported_popups))
+			'popup' => 'required|in '.implode(',', array_keys($this->supported_popups))
 		];
 
 		$ret = $this->validateInput($fields);
@@ -51,7 +73,10 @@ class CControllerPopup extends CController {
 		if ($ret) {
 			/** @var CRouter $router */
 			$router = clone APP::Component()->get('router');
-			$router->setAction('popup.'.$this->getInput('popup_action'));
+
+			$this->action = $this->getInput('popup');
+			$router->setAction($this->action);
+
 			$popup_controller_class = $router->getController();
 			$this->popup_controller = new $popup_controller_class;
 
@@ -72,13 +97,13 @@ class CControllerPopup extends CController {
 	protected function doAction() {
 		$data = [
 			'popup' => [
-				'action' => 'popup.'.$this->getInput('popup_action'),
+				'action' => $this->action,
 				'options' => $this->popup_controller->getInputAll()
 			]
 		];
 
 		$response = (new CControllerResponseData($data));
-		$response->setTitle($this->supported_popups[$this->getInput('popup_action')]);
+		$response->setTitle($this->supported_popups[$this->getInput('popup')]);
 
 		$this->setResponse($response);
 	}

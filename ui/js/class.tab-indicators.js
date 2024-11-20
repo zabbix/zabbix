@@ -402,7 +402,7 @@ class HostPrototypeMacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		let macros = [...document.forms['hostPrototypeForm'].querySelectorAll('#tbl_macros .form_row')];
+		let macros = [...document.forms['host-prototype-form'].querySelectorAll('#tbl_macros .form_row')];
 
 		return macros
 			.filter((row) => {

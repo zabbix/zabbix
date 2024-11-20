@@ -20,65 +20,22 @@
 ?>
 
 <script>
-	const view = {
-		delete_url: null,
-
+	const view = new class {
 		init({delete_url}) {
 			this.delete_url = delete_url;
 
+			document.querySelector('.js-create-templategroup').addEventListener('click', () => {
+				window.popupManagerInstance.openPopup('templategroup.edit', {});
+			});
+
 			document.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-create-templategroup')) {
-					this.edit();
-				}
-				else if (e.target.classList.contains('js-edit-templategroup')) {
-					e.preventDefault();
-					this.edit({groupid: e.target.dataset.groupid});
-				}
-				else if (e.target.classList.contains('js-massdelete-templategroup')) {
+				if (e.target.classList.contains('js-massdelete-templategroup')) {
 					this.delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
-				else if (e.target.classList.contains('js-edit-template')) {
-					this.editTemplate({templateid: e.target.dataset.templateid})
-				}
-			});
-		},
-
-		editTemplate(parameters) {
-			const overlay = PopUp('template.edit', parameters, {
-				dialogueid: 'templates-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				uncheckTableRows('templategroup');
-				postMessageOk(e.detail.title);
-
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				location.href = location.href;
-			});
-		},
-
-		edit(parameters = {}) {
-			const original_url = location.href;
-			const overlay = PopUp('popup.templategroup.edit', parameters, {
-				dialogueid: 'templategroup_edit',
-				dialogue_class: 'modal-popup-static',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail));
-			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
-				history.replaceState({}, '', original_url);
-			}, {once: true});
-		},
+			this.#setSubmitCallback();
+		}
 
 		delete(target, groupids) {
 			const confirmation = groupids.length > 1
@@ -89,10 +46,10 @@
 				return;
 			}
 
-			this._post(target, groupids, this.delete_url);
-		},
+			this.#post(target, groupids, this.delete_url);
+		}
 
-		_post(target, groupids, url) {
+		#post(target, groupids, url) {
 			target.classList.add('is-loading');
 
 			return fetch(url, {
@@ -134,17 +91,21 @@
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
-		},
+		}
 
-		_reload(success) {
-			postMessageOk(success.title);
+		#setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
 
-			if ('messages' in success) {
-				postMessageDetails('success', success.messages);
-			}
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
+				}
 
-			uncheckTableRows('templategroup');
-			location.href = location.href;
+				uncheckTableRows('templategroup');
+				location.href = location.href;
+			});
 		}
 	}
 </script>

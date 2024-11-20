@@ -38,6 +38,7 @@
 
 			this.initForm(field_switches);
 			this.initEvents();
+			this.#setSubmitCallback();
 		}
 
 		initForm(field_switches) {
@@ -87,10 +88,7 @@
 				const target = e.target;
 				const itemids = Object.keys(chkbxRange.getSelectedIds());
 
-				if (target.classList.contains('js-update-item')) {
-					this.#edit(target, {itemid: target.dataset.itemid, context: this.context});
-				}
-				else if (target.classList.contains('js-enable-item')) {
+				if (target.classList.contains('js-enable-item')) {
 					this.#enable(null, {itemids: [target.dataset.itemid], context: this.context});
 				}
 				else if (target.classList.contains('js-disable-item')) {
@@ -117,39 +115,11 @@
 				else if (target.classList.contains('js-massdelete-item')) {
 					this.#delete(target, {itemids: itemids, context: this.context});
 				}
-				else if (target.classList.contains('js-edit-host')) {
-					this.editHost(e, target.dataset.hostid);
-				}
-				else if (target.classList.contains('js-edit-template')) {
-					this.editTemplate(e, target.dataset.hostid);
-				}
-			});
-			document.addEventListener('click', e => {
-				const target = e.target;
-
-				if (target.classList.contains('js-create-item')) {
-					this.#edit(target, target.dataset);
-				}
-				else if (target.classList.contains('js-trigger-edit')) {
-					this.editTrigger(target.dataset);
-				}
-			});
-		}
-
-		editItem(target, data) {
-			this.#edit(target, data);
-		}
-
-		editTrigger(trigger_data) {
-			clearMessages();
-
-			const overlay = PopUp('trigger.edit', trigger_data, {
-				dialogueid: 'trigger-edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.elementSuccess.bind(this), {once: true});
+			document.querySelector('.js-create-item')?.addEventListener('click', (e) =>
+				window.popupManagerInstance.openPopup('item.edit', e.target.dataset)
+			);
 		}
 
 		executeNow(target, data) {
@@ -157,57 +127,6 @@
 
 			curl.setArgument('action', 'item.execute');
 			this.#post(curl, data);
-		}
-
-		editHost(e, hostid) {
-			e.preventDefault();
-			const host_data = {hostid};
-
-			this.openHostPopup(host_data);
-		}
-
-		editTemplate(e, templateid) {
-			e.preventDefault();
-			const template_data = {templateid};
-
-			this.openTemplatePopup(template_data);
-		}
-
-		openHostPopup(host_data) {
-			let original_url = location.href;
-			const overlay = PopUp('popup.host.edit', host_data, {
-				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
-				history.replaceState({}, '', original_url);
-				this.elementSuccess(e);
-			}, {once: true});
-
-			overlay.$dialogue[0].addEventListener('dialogue.close', e => history.replaceState({}, '', original_url));
-		}
-
-		openTemplatePopup(template_data) {
-			const overlay =  PopUp('template.edit', template_data, {
-				dialogueid: 'templates-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.elementSuccess.bind(this), {once: true});
-		}
-
-		#edit(target, parameters = {}) {
-			const overlay = PopUp('item.edit', parameters, {
-				dialogueid: 'item-edit',
-				dialogue_class: 'modal-popup-large',
-				trigger_element: target,
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.elementSuccess.bind(this), {once: true});
 		}
 
 		#enable(target, parameters) {
@@ -310,6 +229,12 @@
 
 					addMessage(message_box);
 				});
+		}
+
+		#setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
+				this.elementSuccess(e);
+			});
 		}
 
 		elementSuccess(e) {

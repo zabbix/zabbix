@@ -292,10 +292,16 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 	$list = new CList();
 
 	if ($is_template) {
+		$template_url = (new CUrl('zabbix.php'))
+			->setArgument('action', 'popup')
+			->setArgument('popup', 'template.edit')
+			->setArgument('templateid', $db_host['templateid'])
+			->getUrl();
+
 		$template = new CSpan(
-			(new CLink($db_host['name']))
+			(new CLink($db_host['name'], $template_url))
 				->setAttribute('data-templateid', $db_host['templateid'])
-				->onClick('view.editTemplate(event, this.dataset.templateid);')
+				->setAttribute('data-action', 'template.edit')
 		);
 
 		if ($current_element === '') {
@@ -327,14 +333,16 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 				break;
 		}
 
+		$host_url = (new CUrl('zabbix.php'))
+			->setArgument('action', 'popup')
+			->setArgument('popup', 'host.edit')
+			->setArgument('hostid', $db_host['hostid'])
+			->getUrl();
+
 		$host = new CSpan(
-			(new CLink($db_host['name'],
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'host.edit')
-					->setArgument('hostid', $db_host['hostid'])
-			))
+			(new CLink($db_host['name'], $host_url))
 				->setAttribute('data-hostid', $db_host['hostid'])
-				->onClick('view.editHost(event, this.dataset.hostid);')
+				->setAttribute('data-action', 'host.edit')
 		);
 
 		if ($current_element === '') {

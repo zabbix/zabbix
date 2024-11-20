@@ -44,7 +44,7 @@ window.item_edit_form = new class {
 
 	init({
 		actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly, testable_item_types,
-		type_with_key_select, value_type_keys, source
+		type_with_key_select, value_type_keys, source, backurl
 	}) {
 		this.actions = actions;
 		this.form_data = form_data;
@@ -78,6 +78,7 @@ window.item_edit_form = new class {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
+		this.overlay.backurl = backurl;
 
 		this.initForm(field_switches);
 		this.initEvents();
@@ -233,11 +234,7 @@ window.item_edit_form = new class {
 			}
 
 			if (target.matches('a') && target.closest('.js-parent-items')) {
-				e.preventDefault();
-
-				if (!this.#isFormModified() || this.#isConfirmed()) {
-					this.#openRelatedItem(target.dataset);
-				}
+				this.setActions(e.target.dataset);
 			}
 		});
 		this.form.querySelector('#delay-flex-table').addEventListener('click', e => this.#intervalTypeChangeHandler(e));
@@ -258,19 +255,8 @@ window.item_edit_form = new class {
 		this.form.addEventListener('click', e => {
 			const target = e.target;
 
-			if (target.matches('.js-edit-template')) {
-				e.preventDefault();
-
-				if (!this.#isFormModified() || this.#isConfirmed()) {
-					this.#openTemplatePopup(target.dataset);
-				}
-			}
-			else if (target.matches('.js-edit-proxy')) {
-				e.preventDefault();
-
-				if (!this.#isFormModified() || this.#isConfirmed()) {
-					this.#openProxyPopup(target.dataset);
-				}
+			if (target.matches('.js-edit-template') || target.matches('.js-edit-proxy')) {
+				this.setActions(e.target.dataset);
 			}
 		});
 
@@ -285,6 +271,51 @@ window.item_edit_form = new class {
 		});
 	}
 
+	setActions(dataset) {
+		const {action, ...params} = dataset;
+
+		window.popupManagerInstance.setAdditionalActions(() => {
+			const fields = this.#getFormFields(this.form);
+
+			fields.show_inherited_tags = this.initial_form_fields.show_inherited_tags;
+
+			if (!fields.tags.length) {
+				fields.tags.push({tag: '', value: ''});
+			}
+
+			const url = new Curl('zabbix.php');
+			url.setArgument('action', 'popup');
+			url.setArgument('popup', action);
+
+			for (const [key, value] of Object.entries(params)) {
+				url.setArgument(key, value);
+			}
+
+			if (JSON.stringify(this.initial_form_fields) !== JSON.stringify(fields)) {
+				if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
+					return false;
+				}
+				else {
+					overlayDialogueDestroy(this.overlay.dialogueid);
+
+					const url = new Curl(location.href);
+					for (const [key, value] of Object.entries(params)) {
+						url.setArgument(key, value);
+					}
+
+					history.replaceState(null, '', url.getUrl());
+
+					return true;
+				}
+			}
+
+			overlayDialogueDestroy(this.overlay.dialogueid);
+			history.replaceState(null, '', url.getUrl());
+
+			return true;
+		});
+	}
+
 	initItemPrototypeEvents() {
 		this.form.querySelector('[name="master-item-prototype"]').addEventListener('click', (e) => {
 			this.#openMasterItemPrototypePopup();
@@ -295,11 +326,10 @@ window.item_edit_form = new class {
 
 	clone() {
 		this.overlay.setLoading();
-
-		PopUp(this.actions.form, {clone: 1, ...this.#getFormFields()}, {
-			dialogueid: this.overlay.dialogueid,
-			dialogue_class: 'modal-popup-large'
-		});
+		window.popupManagerInstance.openPopup(
+			this.source === 'itemprototype' ? 'item.prototype.edit' : 'item.edit',
+			{clone: 1, ...this.#getFormFields()}
+		);
 	}
 
 	create() {
@@ -794,30 +824,6 @@ window.item_edit_form = new class {
 		this.#updateTagsList(this.form.querySelector('.tags-table'));
 	}
 
-	#openRelatedItem(parameters) {
-		overlayDialogueDestroy(this.overlay.dialogueid);
-
-		const overlay = PopUp(parameters.action, parameters, {
-			dialogueid: this.overlay.dialogueid,
-			dialogue_class: 'modal-popup-large',
-			prevent_navigation: true
-		});
-
-		this.#proxyDialogueSubmitEvent(overlay);
-	}
-
-	#openProxyPopup(parameters) {
-		overlayDialogueDestroy(this.overlay.dialogueid);
-
-		const overlay = PopUp('popup.proxy.edit', parameters, {
-			dialogueid: 'proxy_edit',
-			dialogue_class: 'modal-popup-static',
-			prevent_navigation: true
-		});
-
-		this.#proxyDialogueSubmitEvent(overlay);
-	}
-
 	#openMasterItemPrototypePopup() {
 		const parameters = {
 			srctbl: 'item_prototypes',
@@ -830,24 +836,6 @@ window.item_edit_form = new class {
 		}
 
 		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
-	}
-
-	#openTemplatePopup(template_data) {
-		overlayDialogueDestroy(this.overlay.dialogueid);
-
-		const overlay =  PopUp('template.edit', template_data, {
-			dialogueid: 'templates-form',
-			dialogue_class: 'modal-popup-large',
-			prevent_navigation: true
-		});
-
-		this.#proxyDialogueSubmitEvent(overlay);
-	}
-
-	#proxyDialogueSubmitEvent(overlay) {
-		overlay.$dialogue[0].addEventListener('dialogue.submit',
-			(e) => this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: e.detail}))
-		);
 	}
 }
 })();

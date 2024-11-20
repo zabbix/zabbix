@@ -325,7 +325,7 @@ function PopUp(action, parameters, {
 			dialogueid,
 			title: '',
 			doc_url: '',
-			content: jQuery('<div>', {'height': '68px', class: 'is-loading'}),
+			content: jQuery('<div>', {'height': '68px', 'width': '105px', class: 'is-loading'}),
 			class: 'modal-popup ' + dialogue_class,
 			buttons: [],
 			element: trigger_element,
@@ -381,6 +381,7 @@ function PopUp(action, parameters, {
 					doc_url: resp.doc_url,
 					content: resp.body,
 					controls: resp.controls,
+					class: 'modal-popup ' + resp.dialogue_class ?? dialogue_class,
 					buttons,
 					debug: resp.debug,
 					script_inline: resp.script_inline,
@@ -443,39 +444,6 @@ function PopUp(action, parameters, {
 }
 
 /**
- * Open "Update problem" dialog and manage URL change.
- *
- * @param {Object} parameters
- * @param {array}  parameters['eventids']  Eventids to update.
- * @param {object} trigger_element        (optional) UI element which was clicked to open overlay dialogue.
- *
- * @returns {Overlay}
- */
-function acknowledgePopUp(parameters, trigger_element) {
-	const overlay = PopUp('popup.acknowledge.edit', parameters,
-		{dialogue_class: 'modal-popup-generic', trigger_element}
-	);
-	const backurl = location.href;
-
-	overlay.trigger_parents = $(trigger_element).parents();
-
-	overlay.xhr.then(function() {
-		const url = new Curl('zabbix.php');
-		url.setArgument('action', 'popup');
-		url.setArgument('popup_action', 'acknowledge.edit');
-		url.setArgument('eventids', parameters.eventids);
-
-		history.replaceState({}, '', url.getUrl());
-	});
-
-	overlay.$dialogue[0].addEventListener('dialogue.close', () => {
-		history.replaceState({}, '', backurl);
-	}, {once: true});
-
-	return overlay;
-}
-
-/**
  * Function to add details about overlay UI elements in global overlays_stack variable.
  *
  * @param {string|Overlay} id       Unique overlay element identifier or Overlay object.
@@ -510,7 +478,7 @@ function closeDialogHandler(event) {
 			switch (dialog.type) {
 				// Close overlay popup.
 				case 'popup':
-					overlayDialogueDestroy(dialog.dialogueid);
+					overlayDialogueDestroy(dialog.dialogueid, true);
 					break;
 
 				// Close overlay hintbox.

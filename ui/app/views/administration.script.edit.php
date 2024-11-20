@@ -466,7 +466,8 @@ $output = [
 	'doc_url' => CDocHelper::getUrl(CDocHelper::ALERTS_SCRIPT_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,
-	'script_inline' => getPagePostJs().$this->readJsFile('administration.script.edit.js.php')
+	'script_inline' => getPagePostJs().$this->readJsFile('administration.script.edit.js.php'),
+	'dialogue_class' => 'modal-popup-large'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

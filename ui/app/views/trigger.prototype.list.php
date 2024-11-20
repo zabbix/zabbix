@@ -84,9 +84,18 @@ foreach ($data['triggers'] as $trigger) {
 		ZBX_FLAG_DISCOVERY_PROTOTYPE, $data['allowed_ui_conf_templates']
 	);
 
-	$description[] = (new CLink($trigger['description']))
-		->addClass('js-trigger-prototype-edit')
-		->setAttribute('data-triggerid', $triggerid);
+	$trigger_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'popup')
+		->setArgument('popup', 'trigger.prototype.edit')
+		->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+		->setArgument('triggerid', $triggerid)
+		->setArgument('context', $data['context']);
+
+	$description[] = (new CLink($trigger['description'], $trigger_url))
+		->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
+		->setAttribute('data-triggerid', $triggerid)
+		->setAttribute('data-context', $data['context'])
+		->setAttribute('data-action', 'trigger.prototype.edit');
 
 	if ($trigger['dependencies']) {
 		$description[] = [BR(), bold(_('Depends on').':')];
@@ -99,17 +108,36 @@ foreach ($data['triggers'] as $trigger) {
 				implode(', ', array_column($dep_trigger['hosts'], 'name')).NAME_DELIMITER.$dep_trigger['description'];
 
 			if ($dep_trigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$trigger_dependencies[] = (new CLink($dep_trigger_description))
+				$dep_trigger_prototype_url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'popup')
+					->setArgument('popup', 'trigger.prototype.edit')
+					->setArgument('triggerid', $dep_trigger['triggerid'])
+					->setArgument('context', $data['context'])
+					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+					->getUrl();
+
+				$trigger_dependencies[] = (new CLink($dep_trigger_description, $dep_trigger_prototype_url))
 					->addClass(triggerIndicatorStyle($dep_trigger['status']))
-					->addClass('js-trigger-prototype-edit')
-					->setAttribute('data-triggerid', $dep_trigger['triggerid']);
-			}
-			elseif ($dep_trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-				$trigger_dependencies[] = (new CLink($dep_trigger_description))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->setAttribute('data-action', 'trigger.prototype.edit')
 					->setAttribute('data-triggerid', $dep_trigger['triggerid'])
 					->setAttribute('data-context', $data['context'])
+					->setAttribute('data-parent_discoveryid', $data['parent_discoveryid']);
+			}
+			elseif ($dep_trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+				$dep_trigger_url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'popup')
+					->setArgument('popup', 'trigger.edit')
+					->setArgument('triggerid', $dep_trigger['triggerid'])
+					->setArgument('context', $data['context'])
+					->getUrl();
+
+				$trigger_dependencies[] = (new CLink($dep_trigger_description, $dep_trigger_url))
 					->addClass(triggerIndicatorStyle($dep_trigger['status']))
-					->addClass('js-trigger-edit');
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->setAttribute('data-action', 'trigger.edit')
+					->setAttribute('data-triggerid', $dep_trigger['triggerid'])
+					->setAttribute('data-context', $data['context']);
 			}
 
 			$trigger_dependencies[] = BR();

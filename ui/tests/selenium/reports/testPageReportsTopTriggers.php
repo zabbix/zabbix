@@ -1285,7 +1285,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					'Inventory' => 'hostinventories.php?hostid=10084'
 				],
 				'CONFIGURATION' => [
-					'Host' => 'zabbix.php?action=host.edit&hostid=10084',
+					'Host' => 'zabbix.php?action=popup&popup=host.edit&hostid=10084',
 					'Items' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B%5D=10084&context=host',
 					'Triggers' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B%5D=10084&context=host',
 					'Graphs' => 'graphs.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',

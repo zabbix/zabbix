@@ -20,54 +20,33 @@
 ?>
 
 <script>
-	const view = {
+	const view = new class {
 
 		init() {
-			this.initActionButtons();
+			this.#initActionButtons();
+			this.#setSubmitCallback();
 			this.expiresDaysHandler();
-		},
+		}
 
-		initActionButtons() {
+		#initActionButtons() {
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-create-token')) {
-					this.createToken();
-				}
-				else if (e.target.classList.contains('js-edit-token')) {
-					this.editToken(e.target.dataset.tokenid);
+					window.popupManagerInstance.openPopup('token.edit', {admin_mode: '1'});
 				}
 				else if (e.target.classList.contains('js-massdelete-token')) {
-					this.massDeleteToken(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#massDeleteToken(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 			});
-		},
+		}
 
 		expiresDaysHandler() {
 			const filter_expires_state = document.getElementById('filter-expires-state');
 			const filter_expires_days = document.getElementById('filter-expires-days');
 
 			filter_expires_days.disabled = !filter_expires_state.checked;
-		},
+		}
 
-		createToken() {
-			this.openTokenPopup({admin_mode: '1'});
-		},
-
-		editToken(tokenid) {
-			const token_data = {tokenid, admin_mode: '1'};
-			this.openTokenPopup(token_data);
-		},
-
-		openTokenPopup(token_data) {
-			const overlay = PopUp('popup.token.edit', token_data, {
-				dialogueid: 'token_edit',
-				dialogue_class: 'modal-popup-generic',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.tokenSuccess, {once: true});
-		},
-
-		massDeleteToken(target, tokenids) {
+		#massDeleteToken(target, tokenids) {
 			const confirmation = tokenids.length > 1
 				? <?= json_encode(_('Delete selected tokens?')) ?>
 				: <?= json_encode(_('Delete selected token?')) ?>;
@@ -122,23 +101,21 @@
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
-		},
+		}
 
-		events: {
-			tokenSuccess(e) {
-				const data = e.detail;
+		#setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
+				if (e.detail && 'success' in e.detail) {
+					postMessageOk(e.detail.success.title);
 
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
 					}
 				}
 
 				uncheckTableRows('token');
 				location.href = location.href;
-			}
+			});
 		}
 	};
 </script>

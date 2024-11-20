@@ -79,7 +79,8 @@ class CControllerTriggerEdit extends CController {
 				'selectDiscoveryRule' => ['itemid', 'name', 'templateid'],
 				'selectTriggerDiscovery' => ['parent_triggerid', 'disable_source'],
 				'selectDependencies' => ['triggerid'],
-				'selectTags' => ['tag', 'value']
+				'selectTags' => ['tag', 'value'],
+				'editable' => true
 			];
 
 			if ($this->hasInput('show_inherited_tags') && $this->getInput('show_inherited_tags')) {

@@ -19,89 +19,42 @@
 	const view = new class {
 
 		init() {
-			this._initActions();
+			this.#initActions();
+			this.#setSubmitCallback();
 		}
 
-		_initActions() {
-			document
-				.querySelector('.js-create-proxy')
-				.addEventListener('click', () => this._edit());
+		#initActions() {
+			document.querySelector('.js-create-proxy').addEventListener('click', () => {
+				window.popupManagerInstance.openPopup('proxy.edit', {});
+			});
 
 			const form = document.getElementById('proxy-list');
 
-			form.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-edit-proxy')) {
-					this._edit({proxyid: e.target.dataset.proxyid});
-				}
-				else if (e.target.classList.contains('js-edit-proxy-group')) {
-					this.#editProxyGroup(e.target.dataset.proxy_groupid);
-				}
-				else if (e.target.classList.contains('js-edit-host')) {
-					this._editHost(e.target.dataset.hostid);
-				}
-			});
-
-			form
-				.querySelector('.js-refresh-proxy-config')
+			form.querySelector('.js-refresh-proxy-config')
 				.addEventListener('click', (e) => {
-					this._refreshConfig(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#refreshConfig(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				});
 
 			form
 				.querySelector('.js-massenable-proxy-host')
 				.addEventListener('click', (e) => {
-					this._enableHosts(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#enableHosts(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				});
 
 			form
 				.querySelector('.js-massdisable-proxy-host')
 				.addEventListener('click', (e) => {
-					this._disableHosts(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#disableHosts(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				});
 
 			form
 				.querySelector('.js-massdelete-proxy')
 				.addEventListener('click', (e) => {
-					this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				});
 		}
 
-		_edit(parameters = {}) {
-			const overlay = PopUp('popup.proxy.edit', parameters, {
-				dialogueid: 'proxy_edit',
-				dialogue_class: 'modal-popup-static',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail.success));
-		}
-
-		#editProxyGroup(proxy_groupid) {
-			const overlay = PopUp('popup.proxygroup.edit', {proxy_groupid}, {
-				dialogueid: 'proxy-group-edit',
-				dialogue_class: 'modal-popup-static',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail.success));
-		}
-
-		_editHost(hostid) {
-			const original_url = location.href;
-
-			const overlay = PopUp('popup.host.edit', {hostid}, {
-				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail.success));
-			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
-				history.replaceState({}, '', original_url);
-			});
-		}
-
-		_refreshConfig(target, proxyids) {
+		#refreshConfig(target, proxyids) {
 			const confirmation = proxyids.length > 1
 				? <?= json_encode(_('Refresh configuration of the selected proxies?')) ?>
 				: <?= json_encode(_('Refresh configuration of the selected proxy?')) ?>;
@@ -113,10 +66,10 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'proxy.config.refresh');
 
-			this._post(target, proxyids, curl);
+			this.#post(target, proxyids, curl);
 		}
 
-		_enableHosts(target, proxyids) {
+		#enableHosts(target, proxyids) {
 			const confirmation = proxyids.length > 1
 				? <?= json_encode(_('Enable hosts monitored by selected proxies?')) ?>
 				: <?= json_encode(_('Enable hosts monitored by selected proxy?')) ?>;
@@ -128,10 +81,10 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'proxy.host.enable');
 
-			this._post(target, proxyids, curl);
+			this.#post(target, proxyids, curl);
 		}
 
-		_disableHosts(target, proxyids) {
+		#disableHosts(target, proxyids) {
 			const confirmation = proxyids.length > 1
 				? <?= json_encode(_('Disable hosts monitored by selected proxies?')) ?>
 				: <?= json_encode(_('Disable hosts monitored by selected proxy?')) ?>;
@@ -143,10 +96,10 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'proxy.host.disable');
 
-			this._post(target, proxyids, curl);
+			this.#post(target, proxyids, curl);
 		}
 
-		_delete(target, proxyids) {
+		#delete(target, proxyids) {
 			const confirmation = proxyids.length > 1
 				? <?= json_encode(_('Delete selected proxies?')) ?>
 				: <?= json_encode(_('Delete selected proxy?')) ?>;
@@ -158,10 +111,10 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'proxy.delete');
 
-			this._post(target, proxyids, curl);
+			this.#post(target, proxyids, curl);
 		}
 
-		_post(target, proxyids, url) {
+		#post(target, proxyids, url) {
 			url.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('proxy')) ?>);
 
 			target.classList.add('is-loading');
@@ -206,15 +159,19 @@
 				});
 		}
 
-		_reload(success) {
-			postMessageOk(success.title);
+		#setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
 
-			if ('messages' in success) {
-				postMessageDetails('success', success.messages);
-			}
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
+				}
 
-			uncheckTableRows('proxy');
-			location.href = location.href;
+				uncheckTableRows('proxy');
+				location.href = location.href;
+			});
 		}
 	};
 </script>

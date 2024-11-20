@@ -493,6 +493,8 @@
 				.on(CSortable.EVENT_SORT, this.recalculateSortOrder);
 
 			!this.graphs.readonly && this.rewriteNameLinks();
+
+			this.setSubmitCallback();
 		},
 
 		loadItem(item) {
@@ -644,48 +646,6 @@
 			!view.graphs.readonly && view.rewriteNameLinks();
 		},
 
-		editHost(e, hostid) {
-			e.preventDefault();
-			const host_data = {hostid};
-
-			this.openHostPopup(host_data);
-		},
-
-		openHostPopup(host_data) {
-			const original_url = location.href;
-			const overlay = PopUp('popup.host.edit', host_data, {
-				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit',
-				this.events.elementSuccess.bind(this, this.context, this.is_discovery), {once: true}
-			);
-			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
-				history.replaceState({}, '', original_url);
-			}, {once: true});
-		},
-
-		editTemplate(e, templateid) {
-			e.preventDefault();
-			const template_data = {templateid};
-
-			this.openTemplatePopup(template_data);
-		},
-
-		openTemplatePopup(template_data) {
-			const overlay =  PopUp('template.edit', template_data, {
-				dialogueid: 'templates-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit',
-				this.events.elementSuccess.bind(this, this.context, this.is_discovery), {once: true}
-			);
-		},
-
 		refresh() {
 			const url = new Curl('');
 			const form = document.getElementsByName(this.form_name)[0];
@@ -694,31 +654,29 @@
 			post(url.getUrl(), fields);
 		},
 
-		events: {
-			elementSuccess(context, discovery, e) {
-				const data = e.detail;
+		setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
 				let curl = null;
 
-				if ('success' in data) {
-					postMessageOk(data.success.title);
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
 
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
 					}
 
-					if ('action' in data.success && data.success.action === 'delete') {
-						curl = discovery ? new Curl('host_discovery.php') : new Curl('graphs.php');
-						curl.setArgument('context', context);
+					if ('action' in e.detail.success && e.detail.success.action === 'delete') {
+						curl = this.is_discovery ? new Curl('host_discovery.php') : new Curl('graphs.php');
+						curl.setArgument('context', this.context);
 					}
 				}
-
-				if (curl === null) {
-					view.refresh();
-				}
-				else {
+				if (curl) {
 					location.href = curl.getUrl();
 				}
-			}
+				else {
+					view.refresh();
+				}
+			});
 		}
 	};
 </script>

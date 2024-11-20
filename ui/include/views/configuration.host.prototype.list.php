@@ -97,11 +97,17 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 
 			if ($data['allowed_ui_conf_templates']
 					&& array_key_exists($template['templateid'], $data['writable_templates'])) {
-				$caption[] = (new CLink($template['name']))
-					->addClass('js-edit-template')
+				$template_url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'popup')
+					->setArgument('popup', 'template.edit')
+					->setArgument('templateid', $template['templateid'])
+					->getUrl();
+
+				$caption[] = (new CLink($template['name'], $template_url))
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->addClass(ZBX_STYLE_GREY)
-					->setAttribute('data-templateid', $template['templateid']);
+					->setAttribute('data-templateid', $template['templateid'])
+					->setAttribute('data-action', 'template.edit');
 			}
 			else {
 				$caption[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
@@ -113,10 +119,16 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 
 				$caption[] = ' (';
 				foreach ($linkedTemplates as $tpl) {
+					$tpl_url = (new CUrl('zabbix.php'))
+						->setArgument('action', 'popup')
+						->setArgument('popup', 'template.edit')
+						->setArgument('templateid', $tpl['templateid'])
+						->getUrl();
+
 					if (array_key_exists($tpl['templateid'], $data['writable_templates'])) {
-						$caption[] = (new CLink($tpl['name']))
-							->addClass('js-edit-template')
-							->setAttribute('data-templateid',  $tpl['templateid'])
+						$caption[] = (new CLink($tpl['name'], $tpl_url))
+							->setAttribute('data-templateid', $tpl['templateid'])
+							->setAttribute('data-action', 'template.edit')
 							->addClass(ZBX_STYLE_LINK_ALT)
 							->addClass(ZBX_STYLE_GREY);
 					}

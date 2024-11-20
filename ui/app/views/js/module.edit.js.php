@@ -18,9 +18,14 @@
 window.module_edit = new class {
 
 	init() {
-		this.overlay = overlays_stack.getById('module-edit');
+		this.overlay = overlays_stack.getById('module.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+
+		const backurl = new Curl('zabbix.php');
+
+		backurl.setArgument('action', 'module.list');
+		this.overlay.backurl = backurl.getUrl();
 	}
 
 	submit() {
@@ -32,7 +37,7 @@ window.module_edit = new class {
 		this._post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 		});
 	}
 

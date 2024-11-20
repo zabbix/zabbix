@@ -301,7 +301,8 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('maintenance.edit.js.php')
+		$this->readJsFile('maintenance.edit.js.php'),
+	'dialogue_class' => 'modal-popup-large'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

@@ -24,7 +24,7 @@
 </script>
 
 <script>
-	const view = {
+	const view = new class {
 		init() {
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
@@ -37,52 +37,22 @@
 			document.querySelectorAll('#filter-tags .form_row').forEach(row => {
 				new CTagFilterItem(row);
 			});
-		},
 
-		editHost(hostid) {
-			const host_data = {hostid};
+			this.#setSubmitCallback();
+		}
 
-			this.openHostPopup(host_data);
-		},
+		#setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
 
-		openHostPopup(host_data) {
-			const original_url = location.href;
-			const overlay = PopUp('popup.host.edit', host_data, {
-				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
-				history.replaceState({}, '', original_url);
-			}, {once: true});
-		},
-
-		editTemplate(parameters) {
-			const overlay = PopUp('template.edit', parameters, {
-				dialogueid: 'templates-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-		},
-
-		events: {
-			elementSuccess(e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
 					}
 				}
 
 				location.href = location.href;
-			}
+			}, {once: true});
 		}
 	}
 </script>

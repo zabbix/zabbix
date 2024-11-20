@@ -24,55 +24,34 @@
 
 		init({eventsource}) {
 			this.eventsource = eventsource;
-			this._initActions();
+			this.#initActions();
+			this.#setSubmitCallback();
 		}
 
-		_initActions() {
+		#initActions() {
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-action-create')) {
-					this._edit({eventsource: this.eventsource});
-				}
-				else if (e.target.classList.contains('js-action-edit')) {
-					this._edit({actionid: e.target.dataset.actionid, eventsource: this.eventsource});
+					window.popupManagerInstance.openPopup('action.edit', {eventsource: this.eventsource});
 				}
 				else if (e.target.classList.contains('js-enable-action')) {
-					this._enable(e.target, [e.target.dataset.actionid]);
+					this.#enable(e.target, [e.target.dataset.actionid]);
 				}
 				else if (e.target.classList.contains('js-massenable-action')) {
-					this._enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
+					this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 				}
 				else if (e.target.classList.contains('js-disable-action')) {
-					this._disable(e.target, [e.target.dataset.actionid]);
+					this.#disable(e.target, [e.target.dataset.actionid]);
 				}
 				else if (e.target.classList.contains('js-massdisable-action')) {
-					this._disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
+					this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 				}
 				else if (e.target.classList.contains('js-massdelete-action')) {
-					this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 			})
 		}
 
-		_edit(parameters = {}) {
-			const overlay = PopUp('popup.action.edit', parameters, {
-				dialogueid: 'action-edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				uncheckTableRows('action_' + this.eventsource);
-				postMessageOk(e.detail.title);
-
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				location.href = location.href;
-			});
-		}
-
-		_enable(target, actionids, massenable = false) {
+		#enable(target, actionids, massenable = false) {
 			if (massenable) {
 				const confirmation = actionids.length > 1
 					? <?= json_encode(_('Enable selected actions?')) ?>
@@ -86,10 +65,10 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'action.enable');
 
-			this._post(target, actionids, curl);
+			this.#post(target, actionids, curl);
 		}
 
-		_disable(target, actionids, massdisable = false) {
+		#disable(target, actionids, massdisable = false) {
 			if (massdisable) {
 				const confirmation = actionids.length > 1
 					? <?= json_encode(_('Disable selected actions?')) ?>
@@ -103,10 +82,10 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'action.disable');
 
-			this._post(target, actionids, curl);
+			this.#post(target, actionids, curl);
 		}
 
-		_delete(target, actionids) {
+		#delete(target, actionids) {
 			const confirmation = actionids.length > 1
 				? <?= json_encode(_('Delete selected actions?')) ?>
 				: <?= json_encode(_('Delete selected action?')) ?>;
@@ -118,10 +97,10 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'action.delete');
 
-			this._post(target, actionids, curl);
+			this.#post(target, actionids, curl);
 		}
 
-		_post(target, actionids, url) {
+		#post(target, actionids, url) {
 			url.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('action')) ?>);
 
 			target.classList.add('is-loading');
@@ -164,6 +143,21 @@
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
+		}
+
+		#setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
+
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
+				}
+
+				uncheckTableRows('action_' + this.eventsource);
+				location.href = location.href;
+			});
 		}
 	};
 </script>

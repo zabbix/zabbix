@@ -24,10 +24,15 @@ window.connector_edit_popup = new class {
 	init({connectorid, tags}) {
 		this.connectorid = connectorid;
 
-		this.overlay = overlays_stack.getById('connector_edit');
+		this.overlay = overlays_stack.getById('connector.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
+
+		const backurl = new Curl('zabbix.php');
+
+		backurl.setArgument('action', 'connector.list');
+		this.overlay.backurl = backurl.getUrl();
 
 		jQuery('#tags').dynamicRows({
 			template: '#tag-row-tmpl',
@@ -97,7 +102,7 @@ window.connector_edit_popup = new class {
 		this._post(curl.getUrl(), {connectorids: [this.connectorid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 		});
 	}
 
@@ -132,7 +137,7 @@ window.connector_edit_popup = new class {
 		this._post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 		});
 	}
 

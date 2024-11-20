@@ -27,7 +27,7 @@ class CControllerItemEdit extends CControllerItem {
 			'clone' => 'in 1'
 		] + static::getValidationFields();
 
-		$ret = $this->validateInput($fields) && $this->validateReferredObjects();
+		$ret = $this->validateInput($fields);
 
 		if ($ret) {
 			if ($this->hasInput('clone') && !$this->hasInput('itemid')) {
@@ -51,6 +51,14 @@ class CControllerItemEdit extends CControllerItem {
 		}
 
 		return $ret;
+	}
+
+	protected function checkPermissions(): bool {
+		if (!CWebUser::isLoggedIn() || !$this->validateReferredObjects()) {
+			return false;
+		}
+
+		return parent::checkPermissions();
 	}
 
 	public function doAction() {

@@ -16,19 +16,23 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->addJsFile('class.calendar.js');
+$this->addJsFile('multilineinput.js');
+$this->addJsFile('class.form.fieldset.collapsible.js');
+$this->includeJsFile('popup.view.js.php');
+$this->addJsFile('items.js');
+$this->addJsFile('class.tagfilteritem.js');
 
-(new CHtmlPage())->show();
+$html_page = (new CHtmlPage())->show();
 
-(new CScriptTag(
-	'PopUp("'.$data['popup']['action'].'", '.json_encode($data['popup']['options']).');'.
-
-	'$.subscribe("acknowledge.create", function(event, response, overlay) {'.
-		'clearMessages();'.
-		'addMessage(makeMessageBox("good", [], response.success.title, true, false));'.
-	'});'
-))
+(new CScriptTag('
+	view.init('.json_encode([
+		'action' => $data['popup']['action'],
+		'options' => $data['popup']['options']
+	]).');
+'))
 	->setOnDocumentReady()
 	->show();

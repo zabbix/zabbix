@@ -110,12 +110,18 @@ foreach ($data['maintenances'] as $maintenanceid => $maintenance) {
 			break;
 	}
 
+	$maintenance_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'popup')
+		->setArgument('popup', 'maintenance.edit')
+		->setArgument('maintenanceid', $maintenanceid)
+		->getUrl();
+
 	$maintenance_list->addRow([
 		$data['allowed_edit'] ? new CCheckBox('maintenanceids['.$maintenanceid.']', $maintenanceid) : null,
 		(new CCol(
-			(new CLink($maintenance['name']))
-				->addClass('js-edit-maintenance')
+			(new CLink($maintenance['name'], $maintenance_url))
 				->setAttribute('data-maintenanceid', $maintenanceid)
+				->setAttribute('data-action', 'maintenance.edit')
 		))->addClass(ZBX_STYLE_WORDBREAK),
 		$maintenance['maintenance_type'] ? _('No data collection') : _('With data collection'),
 		zbx_date2str(DATE_TIME_FORMAT, $maintenance['active_since']),

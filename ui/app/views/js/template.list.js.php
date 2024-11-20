@@ -46,13 +46,12 @@
 				else if (e.target.classList.contains('js-massdelete-clear')) {
 					this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 				}
-				else if (e.target.classList.contains('js-edit')) {
-					this.#edit({templateid: e.target.dataset.templateid})
-				}
 			});
 
 			document.getElementById('js-create').addEventListener('click', (e) => {
-				this.#edit({groupids: JSON.parse(e.target.dataset.groupids)})
+				window.popupManagerInstance.openPopup('template.edit',
+					{groupids: JSON.parse(e.target.dataset.groupids)}
+				);
 			});
 
 			document.getElementById('js-import').addEventListener('click', () => {
@@ -64,6 +63,8 @@
 					dialogue_class: "modal-popup-generic"
 				});
 			});
+
+			this.#setSubmitCallback();
 		}
 
 		#initFilter() {
@@ -85,29 +86,6 @@
 				$(filter).on('change', () => this.#updateMultiselect($(filter)));
 				this.#updateMultiselect($(filter));
 			})
-		}
-
-		#edit(parameters) {
-			const overlay = PopUp('template.edit', parameters, {
-				dialogueid: 'templates-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				uncheckTableRows('templates');
-				postMessageOk(e.detail.title);
-
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				location.href = location.href;
-			});
 		}
 
 		#delete(target, templateids, clear) {
@@ -184,6 +162,21 @@
 
 		#updateMultiselect($ms) {
 			$ms.multiSelect('setDisabledEntries', [...$ms.multiSelect('getData').map((entry) => entry.id)]);
+		}
+
+		#setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
+
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
+				}
+
+				uncheckTableRows('templates');
+				location.href = location.href;
+			});
 		}
 	};
 </script>

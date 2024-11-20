@@ -75,6 +75,13 @@ foreach ($data['items'] as $item) {
 		$data['allowed_ui_conf_templates']
 	);
 
+	$item_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'popup')
+		->setArgument('popup', 'item.edit')
+		->setArgument('context', $data['context'])
+		->setArgument('itemid', $item['itemid'])
+		->getUrl();
+
 	if ($item['discoveryRule']) {
 		$name[] = (new CLink($item['discoveryRule']['name'],
 			(new CUrl('zabbix.php'))
@@ -92,35 +99,44 @@ foreach ($data['items'] as $item) {
 			$name[] = $item['master_item']['name'];
 		}
 		else {
-			$name[] = (new CLink($item['master_item']['name']))
+			$name[] = (new CLink($item['master_item']['name'], $item_url))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_TEAL)
-				->addClass('js-update-item')
 				->setAttribute('data-itemid', $item['master_item']['itemid'])
-				->setAttribute('data-context', $data['context']);
+				->setAttribute('data-context', $data['context'])
+				->setAttribute('data-action', 'item.edit');
 		}
 
 		$name[] = NAME_DELIMITER;
 	}
 
-	$name[] = (new CLink($item['name']))
-		->addClass('js-update-item')
+	$name[] = (new CLink($item['name'], $item_url))
 		->setAttribute('data-itemid', $item['itemid'])
-		->setAttribute('data-context', $data['context']);
+		->setAttribute('data-context', $data['context'])
+		->setAttribute('data-action', 'item.edit');
 
 	// Trigger information
 	$hint_table = (new CTableInfo())->setHeader([_('Severity'), _('Name'), _('Expression'), _('Status')]);
 
 	foreach ($item['triggers'] as $trigger) {
 		$trigger = $data['triggers'][$trigger['triggerid']];
+
+		$trigger_url = (new CUrl('zabbix.php'))
+			->setArgument('action', 'popup')
+			->setArgument('popup', 'trigger.edit')
+			->setArgument('triggerid', $trigger['triggerid'])
+			->setArgument('hostid', key($trigger['hosts']))
+			->setArgument('context', $data['context'])
+			->getUrl();
+
 		$hint_table->addRow([
 			CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 			[
 				makeTriggerTemplatePrefix($trigger['triggerid'], $data['trigger_parent_templates'],
 					ZBX_FLAG_DISCOVERY_NORMAL, $data['allowed_ui_conf_templates']
 				),
-				(new CLink($trigger['description']))
-					->addClass('js-trigger-edit')
+				(new CLink($trigger['description'], $trigger_url))
+					->setAttribute('data-action', 'trigger.edit')
 					->setAttribute('data-hostid', key($trigger['hosts']))
 					->setAttribute('data-triggerid', $trigger['triggerid'])
 					->setAttribute('data-context', $data['context'])
@@ -189,10 +205,16 @@ foreach ($data['items'] as $item) {
 
 	$disabled_by_lld = $disable_source == ZBX_DISABLE_SOURCE_LLD;
 
+	$host_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'popup')
+		->setArgument('popup', $data['context'] === 'host' ? 'host.edit' : 'template.edit')
+		->setArgument($data['context'] === 'host' ? 'hostid' : 'templateid', $item['hosts'][0]['hostid'])
+		->getUrl();
+
 	$host = $data['hostid'] == 0
-		? (new CLink($item['hosts'][0]['name']))
-			->setAttribute('data-hostid', $item['hosts'][0]['hostid'])
-			->addClass('js-edit-'.$data['context'])
+		? (new CLink($item['hosts'][0]['name'], $host_url))
+			->setAttribute($data['context'] === 'host' ? 'data-hostid' : 'data-templateid', $item['hosts'][0]['hostid'])
+			->setAttribute('data-action', $data['context'] === 'host' ? 'host.edit' : 'template.edit')
 		: null;
 
 	$row = [

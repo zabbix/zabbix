@@ -22,7 +22,7 @@
 window.mediatype_edit_popup = new class {
 
 	init({mediatype, message_templates, smtp_server_default, smtp_email_default}) {
-		this.overlay = overlays_stack.getById('media-type-form');
+		this.overlay = overlays_stack.getById('mediatype.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.mediatypeid = mediatype.mediatypeid;
@@ -32,6 +32,11 @@ window.mediatype_edit_popup = new class {
 		this.message_templates = Object.fromEntries(message_templates.map((obj, index) => [index, { ...obj }]));
 		this.smtp_server_default = smtp_server_default;
 		this.smtp_email_default = smtp_email_default;
+
+		const backurl = new Curl('zabbix.php');
+
+		backurl.setArgument('action', 'mediatype.list');
+		this.overlay.backurl = backurl.getUrl();
 
 		this.#loadView(mediatype);
 		this.#initActions();
@@ -115,7 +120,7 @@ window.mediatype_edit_popup = new class {
 		this.#post(curl.getUrl(), {mediatypeids: [this.mediatypeid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 		});
 	}
 
@@ -169,7 +174,7 @@ window.mediatype_edit_popup = new class {
 		this.#post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 		});
 	}
 

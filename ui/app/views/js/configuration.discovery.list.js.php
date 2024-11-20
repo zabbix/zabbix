@@ -23,53 +23,35 @@
 	const view = new class {
 
 		init() {
-			document.getElementById('js-create').addEventListener('click', () => this._edit());
+			document.getElementById('js-create').addEventListener('click', () => {
+				window.popupManagerInstance.openPopup('discovery.edit', {});
+			});
 
 			document.getElementById('js-massenable').addEventListener('click', (e) => {
-				this._enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
+				this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 			});
 
 			document.getElementById('js-massdisable').addEventListener('click', (e) => {
-				this._disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
+				this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 			});
 
 			document.getElementById('js-massdelete').addEventListener('click', (e) => {
-				this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
+				this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 			});
 
 			document.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-discovery-edit')) {
-					this._edit({druleid: e.target.dataset.druleid});
-				}
-				else if (e.target.classList.contains('js-enable-drule')) {
-					this._enable(e.target, [e.target.dataset.druleid]);
+				if (e.target.classList.contains('js-enable-drule')) {
+					this.#enable(e.target, [e.target.dataset.druleid]);
 				}
 				else if (e.target.classList.contains('js-disable-drule')) {
-					this._disable(e.target, [e.target.dataset.druleid]);
+					this.#disable(e.target, [e.target.dataset.druleid]);
 				}
 			});
+
+			this.#setSubmitCallback();
 		}
 
-		_edit(parameters = {}) {
-			const overlay = PopUp('discovery.edit', parameters, {
-				dialogueid: 'discoveryForm',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				uncheckTableRows('discovery');
-				postMessageOk(e.detail.title);
-
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				location.href = location.href;
-			});
-		}
-
-		_enable(target, druleids, massenable = false) {
+		#enable(target, druleids, massenable = false) {
 			if (massenable) {
 				const confirmation = druleids.length > 1
 					? <?= json_encode(_('Enable selected discovery rules?')) ?>
@@ -82,10 +64,10 @@
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'discovery.enable');
-			this._post(target, druleids, curl);
+			this.#post(target, druleids, curl);
 		}
 
-		_disable(target, druleids, massdisable = false) {
+		#disable(target, druleids, massdisable = false) {
 			if (massdisable) {
 				const confirmation = druleids.length > 1
 					? <?= json_encode(_('Disable selected discovery rules?')) ?>
@@ -99,10 +81,10 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'discovery.disable');
 
-			this._post(target, druleids, curl);
+			this.#post(target, druleids, curl);
 		}
 
-		_delete(target, druleids) {
+		#delete(target, druleids) {
 			const confirmation = druleids.length > 1
 				? <?= json_encode(_('Delete selected discovery rules?')) ?>
 				: <?= json_encode(_('Delete selected discovery rule?')) ?>;
@@ -114,10 +96,10 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'discovery.delete');
 
-			this._post(target, druleids, curl);
+			this.#post(target, druleids, curl);
 		}
 
-		_post(target, druleids, url) {
+		#post(target, druleids, url) {
 			url.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('discovery')) ?>);
 
 			target.classList.add('is-loading');
@@ -159,6 +141,21 @@
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
+		}
+
+		#setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
+
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
+				}
+
+				uncheckTableRows('discovery');
+				location.href = location.href;
+			});
 		}
 	};
 </script>

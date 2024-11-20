@@ -33,6 +33,7 @@
 			this.form = document.forms[form_name];
 
 			this.initEvents();
+			this.setSubmitCallback();
 		},
 
 		initEvents() {
@@ -47,20 +48,6 @@
 			});
 
 			this.updateLostResourcesFields();
-
-			this.form.addEventListener('click', (e) => {
-				const target = e.target;
-
-				if (target.classList.contains('js-update-item')) {
-					this.editItem(target, target.dataset);
-				}
-				else if (target.classList.contains('js-edit-host')) {
-					this.editHost(e, target.dataset.hostid);
-				}
-				else if (target.classList.contains('js-edit-template')) {
-					this.editTemplate(e, target.dataset.hostid);
-				}
-			});
 		},
 
 		updateFieldsVisibility() {
@@ -81,64 +68,6 @@
 			document.getElementById('filter_enabled_lifetime').disabled =
 				enabled_lifetime_type != <?= ZBX_LLD_DISABLE_AFTER ?>
 					|| lifetime_type == <?= ZBX_LLD_DELETE_IMMEDIATELY ?>;
-		},
-
-		editItem(target, data) {
-			const overlay = PopUp('item.edit', data, {
-				dialogueid: 'item-edit',
-				dialogue_class: 'modal-popup-large',
-				trigger_element: target
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-		},
-
-		editHost(e, hostid) {
-			e.preventDefault();
-			const host_data = {hostid};
-
-			this.openHostPopup(host_data);
-		},
-
-		editTemplate(e, templateid) {
-			e.preventDefault();
-			const template_data = {templateid};
-
-			this.openTemplatePopup(template_data);
-		},
-
-		openHostPopup(host_data) {
-			const original_url = location.href;
-			const overlay = PopUp('popup.host.edit', host_data, {
-				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
-				history.replaceState({}, '', original_url);
-			}, {once: true});
-		},
-
-		openTemplatePopup(template_data) {
-			const overlay =  PopUp('template.edit', template_data, {
-				dialogueid: 'templates-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-		},
-
-		openTemplatePopup(template_data) {
-			const overlay =  PopUp('template.edit', template_data, {
-				dialogueid: 'templates-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
 		},
 
 		executeNow(button) {
@@ -189,8 +118,8 @@
 				});
 		},
 
-		events: {
-			elementSuccess(e) {
+		setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
 				const data = e.detail;
 
 				if ('success' in data) {
@@ -204,7 +133,7 @@
 				uncheckTableRows('host_discovery_' + view.checkbox_hash, [], false);
 
 				location.href = location.href;
-			}
+			});
 		}
 	};
 </script>

@@ -28,15 +28,24 @@ if ($data['templates']) {
 }
 
 if ($discovered_trigger) {
+	$discovered_trigger_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'popup')
+		->setArgument('popup', 'trigger.prototype.edit')
+		->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
+		->setArgument('triggerid', $data['triggerDiscovery']['parent_triggerid'])
+		->setArgument('context', $data['context'])
+		->setArgument('prototype', '1')
+		->getUrl();
+
 	$trigger_form_grid->addItem([new CLabel(_('Discovered by')), new CFormField(
-		(new CLink($data['discoveryRule']['name']))
+		(new CLink($data['discoveryRule']['name'], $discovered_trigger_url))
+			->setAttribute('data-action', 'trigger.prototype.edit')
 			->setAttribute('data-parent_discoveryid', $data['discoveryRule']['itemid'])
 			->setAttribute('data-triggerid', $data['triggerDiscovery']['parent_triggerid'])
 			->setAttribute('data-context', $data['context'])
 			->setAttribute('data-prototype', '1')
 			->addClass('js-related-trigger-edit')
-	)
-	]);
+	)]);
 }
 
 $trigger_form_grid

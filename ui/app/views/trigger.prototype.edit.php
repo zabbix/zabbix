@@ -114,8 +114,14 @@ $popup_parameters = [
 	'context' => $data['context']
 ];
 
+$backurl = (new CUrl('zabbix.php'))
+	->setArgument('action', 'trigger.prototype.list')
+	->setArgument('context', $data['context']);
+
 if (array_key_exists('parent_discoveryid', $data)) {
 	$popup_parameters['parent_discoveryid'] = $data['parent_discoveryid'];
+
+	$backurl->setArgument('parent_discoveryid', $data['parent_discoveryid']);
 }
 
 if ($data['hostid']) {
@@ -131,7 +137,10 @@ $trigger_form
 			'dependencies' => $data['db_dependencies'],
 			'action' => 'trigger.prototype.edit',
 			'context' => $data['context'],
-			'db_trigger' => $data['db_trigger']
+			'db_trigger' => $data['db_trigger'],
+			'backurl' => $backurl->getUrl(),
+			'overlayid' => 'trigger.prototype.edit',
+			'parent_discoveryid' => array_key_exists('parent_discoveryid', $data) ? $data['parent_discoveryid'] : null
 		]).');'))->setOnDocumentReady()
 	);
 
@@ -140,7 +149,8 @@ $output = [
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_TRIGGER_PROTOTYPE_EDIT),
 	'body' => $trigger_form->toString(),
 	'buttons' => $buttons,
-	'script_inline' => getPagePostJs().$this->readJsFile('trigger.edit.js.php')
+	'script_inline' => getPagePostJs().$this->readJsFile('trigger.edit.js.php'),
+	'dialogue_class' => 'modal-popup-large'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

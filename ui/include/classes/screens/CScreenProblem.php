@@ -1150,7 +1150,7 @@ class CScreenProblem extends CScreenBase {
 			self::addProblemsToTable($table, $data['problems'], $data, false);
 
 			$footer = new CActionButtonList('action', 'eventids', [
-				'popup.acknowledge.edit' => [
+				'acknowledge.edit' => [
 					'name' => _('Mass update'),
 					'disabled' => !($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
 							|| $allowed['close'] || $allowed['suppress_problems'] || $allowed['rank_change']
@@ -1637,14 +1637,20 @@ class CScreenProblem extends CScreenBase {
 				);
 			}
 
+			$problem_update_url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', 'acknowledge.edit')
+				->setArgument('eventids[]', $problem['eventid'])
+				->getUrl();
+
 			// Create acknowledge link.
 			$problem_update_link = ($data['allowed']['add_comments'] || $data['allowed']['change_severity']
 					|| $data['allowed']['acknowledge'] || $can_be_closed || $data['allowed']['suppress_problems']
 					|| $data['allowed']['rank_change'])
-				? (new CLink(_('Update')))
+				? (new CLink(_('Update'), $problem_update_url))
 					->addClass(ZBX_STYLE_LINK_ALT)
-					->setAttribute('data-eventid', $problem['eventid'])
-					->onClick('acknowledgePopUp({eventids: [this.dataset.eventid]}, this);')
+					->setAttribute('data-eventids[]', $problem['eventid'])
+					->setAttribute('data-action', 'acknowledge.edit')
 				: new CSpan(_('Update'));
 
 			$row->addItem([

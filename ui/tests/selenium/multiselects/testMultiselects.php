@@ -35,14 +35,20 @@ class testMultiselects extends CWebTest {
 	}
 
 	public function testMultiselects_SuggestCreateNew() {
-		$this->checkSuggest('zabbix.php?action=host.edit', 'host-form', 'Host groups', 'QQQwww',
+		$this->checkSuggest('zabbix.php?action=host.list', 'host-form', 'Host groups', 'QQQwww',
 				'multiselect-suggest'
 		);
 	}
 
 	public function checkSuggest($link, $query, $name, $string, $class) {
-		$this->page->login()->open($link)->waitUntilReady();
-		$this->page->updateViewport();
+		if ($link == 'zabbix.php?action=host.list') {
+			$this->page->login()->open($link)->waitUntilReady();
+			$this->query('button:Create host')->one()->waitUntilClickable()->click();
+		}
+		else {
+			$this->page->login()->open($link)->waitUntilReady();
+			$this->page->updateViewport();
+		}
 		$field = $this->query('name:'.$query)->asForm()->one()->getField($name);
 		$element = $field->query('tag:input')->one();
 		$element->type($string);
@@ -99,3 +105,4 @@ class testMultiselects extends CWebTest {
 		]);
 	}
 }
+

@@ -1873,9 +1873,20 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bo
 					$prototype = '0';
 				}
 
-				$name = (new CLink($template['name']))
+				$trigger_url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'popup')
+					->setArgument('popup', $prototype === '1' ? 'trigger.prototype.edit' : 'trigger.edit')
+					->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
+					->setArgument('context', 'template')
+					->setArgument($attribute_name === 'data-parent_discoveryid'
+						? 'parent_discoveryid'
+						: 'data-hostid',
+					$attribute_value)
+					->getUrl();
+
+				$name = (new CLink($template['name'], $trigger_url))
 					->addClass('js-related-trigger-edit')
-					->setAttribute('data-prototype', $prototype)
+					->setAttribute('data-action', $prototype === '1' ? 'trigger.prototype.edit' : 'trigger.edit')
 					->setAttribute('data-triggerid', $parent_templates['links'][$triggerid]['triggerid'])
 					->setAttribute('data-context', 'template')
 					->setAttribute($attribute_name, $attribute_value);

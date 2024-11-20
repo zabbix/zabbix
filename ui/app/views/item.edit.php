@@ -189,6 +189,11 @@ $tabs = (new CTabView(['id' => $tabsid]))
 		TAB_INDICATOR_PREPROCESSING
 	);
 
+$backurl = (new CUrl('zabbix.php'))
+	->setArgument('action', 'item.list')
+	->setArgument('context', $item['context'])
+	->getUrl();
+
 $form
 	->addItem($tabs)
 	->addItem((new CScriptTag('item_edit_form.init('.json_encode([
@@ -207,7 +212,8 @@ $form
 			'source' => 'item',
 			'testable_item_types' => $data['testable_item_types'],
 			'type_with_key_select' => $type_with_key_select,
-			'value_type_keys' => $data['value_type_keys']
+			'value_type_keys' => $data['value_type_keys'],
+			'backurl' => $backurl
 		]).');'))->setOnDocumentReady()
 	);
 $output = [
@@ -215,7 +221,8 @@ $output = [
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_ITEM_EDIT),
 	'body' => $form->toString().implode('', $scripts),
 	'buttons' => $buttons,
-	'script_inline' => getPagePostJs().$this->readJsFile('item.edit.js.php')
+	'script_inline' => getPagePostJs().$this->readJsFile('item.edit.js.php'),
+	'dialogue_class' => 'modal-popup-large'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

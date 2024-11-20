@@ -38,6 +38,7 @@
 			});
 
 			timeControl.processObjects();
+			this.#setSubmitCallback();
 		}
 
 		#initTagFilter() {
@@ -54,65 +55,18 @@
 			}
 		}
 
-		editHost(hostid) {
-			const host_data = {hostid};
+		#setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
 
-			this.#openHostPopup(host_data);
-		}
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
+				}
 
-		editItem(target, data) {
-			const overlay = PopUp('item.edit', data, {
-				dialogueid: 'item-edit',
-				dialogue_class: 'modal-popup-large',
-				trigger_element: target,
-				prevent_navigation: true
+				location.href = location.href;
 			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#reload(e.detail.success));
-		}
-
-		#openHostPopup(host_data) {
-			const original_url = location.href;
-			const overlay = PopUp('popup.host.edit', host_data, {
-				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#reload(e.detail.success));
-			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
-				history.replaceState({}, '', original_url);
-			});
-		}
-
-		editTemplate(parameters) {
-			const overlay = PopUp('template.edit', parameters, {
-				dialogueid: 'templates-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#reload(e.detail.success));
-		}
-
-		editTrigger(trigger_data) {
-			const overlay = PopUp('trigger.edit', trigger_data, {
-				dialogueid: 'trigger-edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#reload(e.detail.success));
-		}
-
-		#reload(success) {
-			postMessageOk(success.title);
-
-			if ('messages' in success) {
-				postMessageDetails('success', success.messages);
-			}
-
-			location.href = location.href;
 		}
 	};
 </script>

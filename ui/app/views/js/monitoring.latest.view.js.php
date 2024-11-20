@@ -52,12 +52,20 @@
 			this.initTabFilter(filter_options);
 			this.initExpandableSubfilter();
 			this.initListActions();
-			this.initItemFormEvents(this.getCurrentForm().get(0));
 
 			if (this.refresh_interval != 0 && this.filter_set) {
 				this.running = true;
 				this.scheduleRefresh();
 			}
+
+			document.addEventListener('click', (e) => {
+				if (e.target.closest('.menu-popup-item')) {
+					this._removePopupMessage();
+					this.unscheduleRefresh();
+				}
+			});
+
+			this.setSubmitCallback();
 		},
 
 		initTabFilter(filter_options) {
@@ -117,35 +125,6 @@
 
 			form.querySelector('.js-massexecute-item').addEventListener('click', e => {
 				this.executeNow(e.target, {itemids: Object.keys(chkbxRange.getSelectedIds())});
-			});
-		},
-
-		initItemFormEvents(form) {
-			form.addEventListener('click', e => {
-				const target = e.target;
-
-				if (!target.matches('.js-update-item')) {
-					return;
-				}
-
-				this._removePopupMessage();
-				this.unscheduleRefresh();
-
-				const overlay = PopUp('item.edit', target.dataset, {
-					dialogueid: 'item-edit',
-					dialogue_class: 'modal-popup-large',
-					trigger_element: target
-				});
-
-				overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
-					postMessageOk(e.detail.title);
-
-					if ('messages' in e.detail) {
-						postMessageDetails('success', e.detail.messages);
-					}
-
-					this.refresh();
-				});
 			});
 		},
 
@@ -441,55 +420,6 @@
 				});
 		},
 
-		editItem(target, data) {
-			this._removePopupMessage();
-			this.unscheduleRefresh();
-
-			const overlay = PopUp('item.edit', data, {
-				dialogueid: 'item-edit',
-				dialogue_class: 'modal-popup-large',
-				trigger_element: target,
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-		},
-
-		editHost(hostid) {
-			const host_data = {hostid};
-
-			this.openHostPopup(host_data);
-		},
-
-		openHostPopup(host_data) {
-			this._removePopupMessage();
-
-			const original_url = location.href;
-			const overlay = PopUp('popup.host.edit', host_data, {
-				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			this.unscheduleRefresh();
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
-				history.replaceState({}, '', original_url);
-				this.scheduleRefresh();
-			}, {once: true});
-		},
-
-		editTemplate(parameters) {
-			const overlay = PopUp('template.edit', parameters, {
-				dialogueid: 'templates-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-		},
-
 		setSubfilter(field) {
 			this.filter.setSubfilter(field[0], field[1]);
 		},
@@ -498,20 +428,8 @@
 			this.filter.unsetSubfilter(field[0], field[1]);
 		},
 
-		editTrigger(trigger_data) {
-			this._removePopupMessage();
-
-			const overlay = PopUp('trigger.edit', trigger_data, {
-				dialogueid: 'trigger-edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-		},
-
-		events: {
-			elementSuccess(e) {
+		setSubmitCallback() {
+			window.popupManagerInstance.setSubmitCallback((e) => {
 				const data = e.detail;
 
 				if ('success' in data) {
@@ -527,7 +445,7 @@
 
 				uncheckTableRows('latest');
 				view.refresh();
-			}
+			});
 		}
 	};
 </script>

@@ -113,17 +113,14 @@ require_once dirname(__FILE__).'/graphs/testPageMonitoringHostsGraph.php';
 // Host and template groups.
 require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormHostGroup.php';
 require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormHostGroupSearchPage.php';
-require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormHostGroupStandalone.php';
 require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormTemplateGroup.php';
 require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormTemplateGroupSearchPage.php';
-require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormTemplateGroupStandalone.php';
 require_once dirname(__FILE__).'/hostAndTemplateGroups/testPageHostGroups.php';
 require_once dirname(__FILE__).'/hostAndTemplateGroups/testPageTemplateGroups.php';
 
 // Hosts.
 require_once dirname(__FILE__).'/hosts/testFormHostFromConfiguration.php';
 require_once dirname(__FILE__).'/hosts/testFormHostFromMonitoring.php';
-require_once dirname(__FILE__).'/hosts/testFormHostFromStandalone.php';
 require_once dirname(__FILE__).'/hosts/testFormHostLinkTemplates.php';
 require_once dirname(__FILE__).'/hosts/testFormHostPrototype.php';
 require_once dirname(__FILE__).'/hosts/testInheritanceHostPrototype.php';
@@ -453,17 +450,14 @@ class SeleniumTests {
 		// Groups.
 		$suite->addTestSuite('testFormHostGroup');
 		$suite->addTestSuite('testFormHostGroupSearchPage');
-		$suite->addTestSuite('testFormHostGroupStandalone');
 		$suite->addTestSuite('testFormTemplateGroup');
 		$suite->addTestSuite('testFormTemplateGroupSearchPage');
-		$suite->addTestSuite('testFormTemplateGroupStandalone');
 		$suite->addTestSuite('testPageHostGroups');
 		$suite->addTestSuite('testPageTemplateGroups');
 
 		// Hosts.
 		$suite->addTestSuite('testFormHostFromConfiguration');
 		$suite->addTestSuite('testFormHostFromMonitoring');
-		$suite->addTestSuite('testFormHostFromStandalone');
 		$suite->addTestSuite('testFormHostLinkTemplates');
 		$suite->addTestSuite('testFormHostPrototype');
 		$suite->addTestSuite('testInheritanceHostPrototype');
