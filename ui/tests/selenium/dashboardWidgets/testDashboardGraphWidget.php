@@ -344,9 +344,9 @@ class testDashboardGraphWidget extends testWidgets {
 					'Data set' => [
 						[],
 						[
+							'xpath://button[@id="lbl_ds_1_color"]/..' => '00000 ',
 							'host' => 'Zabbix*',
-							'item' => 'Agent ping',
-							'xpath://button[@id="lbl_ds_1_color"]/..' => '00000 '
+							'item' => 'Agent ping'
 						]
 					],
 					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal colour code (6 symbols) is expected.'
@@ -1444,6 +1444,7 @@ class testDashboardGraphWidget extends testWidgets {
 					],
 					'Data set' => [
 						[
+							'xpath://button[@id="lbl_ds_0_color"]/..' => '009688',
 							'host' => 'One host',
 							'item' => 'One item',
 							'Draw' => 'Staircase',
@@ -1455,19 +1456,18 @@ class testDashboardGraphWidget extends testWidgets {
 							'Aggregation function' => 'last',
 							'Aggregation interval' => '1',
 							'Aggregate' => 'Data set',
-							'xpath://button[@id="lbl_ds_0_color"]/..' => '009688',
 							'Approximation' => 'max',
 							'Data set label' => 'Staircase graph'
 						],
 						[
+							'xpath://button[@id="lbl_ds_1_color"]/..' => '000000',
 							'host' => 'Two host',
 							'item' => 'Two item',
 							'Y-axis' => 'Right',
 							'Draw' => 'Points',
 							'Point size' => '1',
 							'Transparency' => '0',
-							'Time shift' => '-1s',
-							'xpath://button[@id="lbl_ds_1_color"]/..' => '000000'
+							'Time shift' => '-1s'
 						]
 					],
 					'Displaying options' => [
@@ -1736,6 +1736,7 @@ class testDashboardGraphWidget extends testWidgets {
 					],
 					'Data set' => [
 						[
+							'xpath://button[@id="lbl_ds_0_color"]/..' => '009688',
 							'host' => 'One host',
 							'item' => 'One item',
 							'Y-axis' => 'Left',
@@ -1744,10 +1745,10 @@ class testDashboardGraphWidget extends testWidgets {
 							'Transparency' => '10',
 							'Fill' => '10',
 							'Missing data' => 'Connected',
-							'Time shift' => '0',
-							'xpath://button[@id="lbl_ds_0_color"]/..' => '009688'
+							'Time shift' => '0'
 						],
 						[
+							'xpath://button[@id="lbl_ds_1_color"]/..' => '000000',
 							'host' => 'Two host',
 							'item' => 'Two item',
 							'Y-axis' => 'Right',
@@ -1757,8 +1758,7 @@ class testDashboardGraphWidget extends testWidgets {
 							'Time shift' => '-1s',
 							'Aggregation function' => 'avg',
 							'Aggregation interval' => '5h',
-							'Aggregate' => 'Data set',
-							'xpath://button[@id="lbl_ds_1_color"]/..' => '000000'
+							'Aggregate' => 'Data set'
 						]
 					],
 					'Displaying options' => [
@@ -1946,6 +1946,7 @@ class testDashboardGraphWidget extends testWidgets {
 					}
 				}
 
+				COverlayDialogElement::find()->one()->scrollToTop();
 				$form->fill($data_set);
 
 				// Open next dataset, if it exists on frontend.

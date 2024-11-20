@@ -5123,8 +5123,13 @@ form.dashboard-widget-svggraph .table-forms-separator {
 form.dashboard-widget-svggraph .dataset-head,
 form.dashboard-widget-svggraph .dataset-body.list-accordion-item-body {
   display: contents; }
-form.dashboard-widget-svggraph .dataset-head .multiselect {
-  width: 100%; }
+form.dashboard-widget-svggraph .dataset-head .multiselect-control {
+  overflow: hidden;
+  margin: -2px;
+  padding: 2px; }
+  form.dashboard-widget-svggraph .dataset-head .multiselect-control .multiselect {
+    overflow: hidden;
+    flex-grow: 1; }
 form.dashboard-widget-svggraph .dataset-body .form-grid {
   padding-top: 0; }
   form.dashboard-widget-svggraph .dataset-body .form-grid:first-child {
@@ -5207,6 +5212,13 @@ form.dashboard-widget-svggraph .single-item-table .unavailable-widget .reference
   color: #acbbc2; }
 form.dashboard-widget-svggraph .single-item-table .unavailable-widget a {
   color: #acbbc2; }
+form.dashboard-widget-svggraph .override-host-field-view {
+  overflow: hidden;
+  margin: -2px;
+  padding: 2px; }
+  form.dashboard-widget-svggraph .override-host-field-view .multiselect {
+    overflow: hidden;
+    flex-grow: 1; }
 form.dashboard-widget-svggraph .overrides-list {
   position: relative;
   margin: -5px 0 -5px 15px; }

@@ -35,6 +35,7 @@ use CButton,
 	CRadioButtonList,
 	CRangeControl,
 	CRow,
+	CScriptTag,
 	CSelect,
 	CSimpleButton,
 	CSpan,
@@ -44,9 +45,11 @@ use CButton,
 	CTemplateTag,
 	CTextBox,
 	CVar,
+	CWidgetFieldMultiSelectOverrideHostView,
 	CWidgetFieldView;
 
 use Zabbix\Widgets\CWidgetField;
+use Zabbix\Widgets\Fields\CWidgetFieldMultiSelectOverrideHost;
 
 class CWidgetFieldDataSetView extends CWidgetFieldView {
 
@@ -216,12 +219,16 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 				]))->addClass('js-items-multiselect');
 			}
 
-			$dataset_head = array_merge($dataset_head, [
-				(new CColor($field_name.'['.$row_num.'][color]', $value['color']))
-					->appendColorPickerJs(false),
-				$host_pattern_field,
-				$item_pattern_field
-			]);
+			$dataset_head[] = (new CColor($field_name.'['.$row_num.'][color]', $value['color']))
+				->appendColorPickerJs(false);
+
+			if ($host_pattern_field !== null) {
+				$dataset_head[] = $host_pattern_field;
+				$dataset_head[] = new CScriptTag($host_pattern_field->getPostJS());
+			}
+
+			$dataset_head[] = $item_pattern_field;
+			$dataset_head[] = new CScriptTag($item_pattern_field->getPostJS());
 		}
 		else {
 			$item_rows = [];
@@ -275,6 +282,29 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 		$dataset_head[] = (new CDiv(
 			(new CButtonIcon(ZBX_ICON_REMOVE_SMALLER, _('Delete')))->addClass('js-remove')
 		))->addClass('list-item-actions');
+
+		$override_host_html = [];
+
+		if (!$this->field->isTemplateDashboard()) {
+			$override_host_field =
+				(new CWidgetFieldMultiSelectOverrideHost($field_name.'['.$row_num.'][override_hostid]'))
+					->setValue($value['override_hostid']);
+
+			$override_host_field_view = (new CWidgetFieldMultiSelectOverrideHostView($override_host_field))
+				->setFormName($this->form_name)
+				->setWidth(null);
+
+			foreach ($override_host_field_view->getViewCollection() as
+					['label' => $label, 'view' => $view, 'class' => $class]) {
+				$override_host_html[] = $label;
+				$override_host_html[] = (new CFormField($view))
+					->addClass($class)
+					->addClass('override-host-field-view');
+			}
+
+			$override_host_html[] = implode('', $override_host_field_view->getTemplates());
+			$override_host_html[] = (new CScriptTag($override_host_field_view->getJavaScript()))->setOnDocumentReady();
+		}
 
 		return (new CListItem([
 			(new CDiv())
@@ -376,7 +406,8 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
 									->setModern()
 							)
-						]),
+						])
+						->addItem($override_host_html),
 					(new CFormGrid())
 						->addItem([
 							new CLabel(_('Y-axis'), $field_name.'['.$row_num.'][axisy]'),

@@ -177,19 +177,23 @@ class CSvgGraphHelper {
 			}
 
 			if ($templateid === '') {
-				// Find hosts.
-				$hosts = API::Host()->get([
-					'output' => [],
-					'search' => [
-						'name' => self::processPattern($data_set['hosts'])
-					],
-					'searchWildcardsEnabled' => true,
-					'searchByAny' => true,
-					'preservekeys' => true
-				]);
+				if ($data_set['override_hostid']) {
+					$options['hostids'] = $data_set['override_hostid'];
+				}
+				else {
+					$hosts = API::Host()->get([
+						'output' => [],
+						'search' => [
+							'name' => self::processPattern($data_set['hosts'])
+						],
+						'searchWildcardsEnabled' => true,
+						'searchByAny' => true,
+						'preservekeys' => true
+					]);
 
-				if ($hosts) {
-					$options['hostids'] = array_keys($hosts);
+					if ($hosts) {
+						$options['hostids'] = array_keys($hosts);
+					}
 				}
 			}
 			else {
@@ -246,7 +250,18 @@ class CSvgGraphHelper {
 				break;
 			}
 
-			if ($templateid !== '' && $override_hostid !== '') {
+			$dataset_override_hostid = null;
+
+			if ($templateid === '') {
+				if ($data_set['override_hostid']) {
+					$dataset_override_hostid = $data_set['override_hostid'][0];
+				}
+			}
+			elseif ($override_hostid !== '') {
+				$dataset_override_hostid = $override_hostid;
+			}
+
+			if ($dataset_override_hostid !== null) {
 				$tmp_items = API::Item()->get([
 					'output' => ['key_'],
 					'itemids' => $data_set['itemids'],
@@ -265,7 +280,7 @@ class CSvgGraphHelper {
 
 					$items = API::Item()->get([
 						'output' => ['itemid', 'key_'],
-						'hostids' => [$override_hostid],
+						'hostids' => [$dataset_override_hostid],
 						'webitems' => true,
 						'filter' => [
 							'key_' => array_keys($keys_index)
