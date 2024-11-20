@@ -1,0 +1,1 @@
+...G...... [ZBX-25404] fixed issue of trapper item failing when space character is used in the 'Allowed hosts' field (MVekslers)

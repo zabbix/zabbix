@@ -3302,6 +3302,7 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 						sizeof(ZBX_DC_TRAPITEM));
 			}
 
+			zbx_trim_str_list(row[9], ',');
 			dc_strpool_replace(found, &item->itemtype.trapitem->trapper_hosts, row[9]);
 			break;
 		case ITEM_TYPE_SIMPLE:
@@ -3439,6 +3440,7 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 			item->itemtype.httpitem->authtype = (unsigned char)atoi(row[13]);
 			dc_strpool_replace(found, &item->itemtype.httpitem->username, row[14]);
 			dc_strpool_replace(found, &item->itemtype.httpitem->password, row[15]);
+			zbx_trim_str_list(row[9], ',');
 			dc_strpool_replace(found, &item->itemtype.httpitem->trapper_hosts, row[9]);
 			break;
 		case ITEM_TYPE_SNMP:
