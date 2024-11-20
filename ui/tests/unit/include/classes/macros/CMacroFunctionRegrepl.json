@@ -8,6 +8,14 @@
         "result": "\\*myitem\\*\\_\\\"value\\\""
     },
     {
+        "value": "TEST 012345",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([^a-z])", "\\\\\\1"]
+        },
+        "result": "\\T\\E\\S\\T\\ \\0\\1\\2\\3\\4\\5"
+    },
+    {
         "value": "*myitem*_\"value\"",
         "macrofunc": {
             "function": "regrepl",
@@ -122,6 +130,14 @@
         "result": "Problem ID: 123 Log line"
     },
     {
+        "value": "test",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": [".*", "\\0\\0\\0"]
+        },
+        "result": "testtesttest"
+    },
+    {
         "value": "Log line",
         "macrofunc": {
             "function": "regrepl",
@@ -135,7 +151,15 @@
             "function": "regrepl",
             "parameters": [".*", "Problem ID:\\1"]
         },
-        "result": "Problem ID:Problem ID:"
+        "result": "Problem ID:\\1Problem ID:\\1"
+    },
+    {
+        "value": "Log line",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["^.*", "Problem ID:\\1"]
+        },
+        "result": "Problem ID:\\1"
     },
     {
         "value": "MySQL crashed err no 123 ORACLE not supported 0",
