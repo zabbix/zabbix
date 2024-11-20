@@ -1,0 +1,1 @@
+.......PS. [ZBX-25108] added more verbose logging of SNMP async agent failures, fixed error not being cleared in different edge cases (dgoloscapov, vso)
