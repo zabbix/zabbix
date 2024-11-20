@@ -59,7 +59,11 @@ window.widget_topitems_form = new class {
 			freeze_end: 1
 		}).on(CSortable.EVENT_SORT, (e) => {
 			const form_fields = getFormFields(this.#form);
-			const columns_size = Math.max(...Object.keys(form_fields.columns));
+			if (form_fields.columns === undefined) {
+				return;
+			}
+
+			const columns_size = Object.keys(form_fields.columns).length - 1;
 
 			const rows = {};
 			for (let i = 0; i <= columns_size; i++) {
@@ -214,6 +218,7 @@ window.widget_topitems_form = new class {
 
 			case 'remove':
 				target.closest('tr').remove();
+				this.#list_columns.querySelector('tbody').dispatchEvent(new CustomEvent(CSortable.EVENT_SORT));
 				this.#triggerUpdate();
 				break;
 		}

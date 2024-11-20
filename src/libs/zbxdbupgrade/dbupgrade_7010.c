@@ -14,6 +14,7 @@
 
 #include "dbupgrade.h"
 #include "zbxdb.h"
+#include "zbxalgo.h"
 
 /*
  * 7.2 development database patches
@@ -375,7 +376,7 @@ static int	DBpatch_7010026(void)
 
 static int	DBpatch_7010027(void)
 {
-	int			ret = SUCCEED;
+	int			size, ret = SUCCEED;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_vector_uint64_t	widgetids;
@@ -393,7 +394,7 @@ static int	DBpatch_7010027(void)
 		goto out;
 	}
 
-	int size = atoi(row[0]);
+	size = atoi(row[0]);
 
 	/* 10 - DEFAULT_HOSTS_COUNT / DEFAULT_ITEMS_COUNT */
 	if (10 == size)
