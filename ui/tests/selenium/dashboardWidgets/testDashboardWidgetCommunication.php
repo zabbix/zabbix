@@ -762,7 +762,7 @@ class testDashboardWidgetCommunication extends testWidgets {
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'columns.0.item_tags.0.operato',
+										'name' => 'columns.0.item_tags.0.operator',
 										'value' => TAG_OPERATOR_LIKE
 									],
 									[
