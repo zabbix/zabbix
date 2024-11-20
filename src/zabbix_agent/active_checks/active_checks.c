@@ -1930,6 +1930,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	zbx_tls_init_child(activechks_args_in->zbx_config_tls, activechks_args_in->zbx_get_program_type_cb_arg, NULL);
 #endif
 	init_active_metrics(activechks_args_in->config_buffer_size);
+	zbx_cfg_set_process_num(process_num);
 
 #ifndef _WINDOWS
 	zbx_set_sigusr_handler(zbx_active_checks_sigusr_handler);

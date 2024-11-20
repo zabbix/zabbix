@@ -1069,7 +1069,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 	zbx_strarr_init(&config_perf_counters);
 	zbx_strarr_init(&config_perf_counters_en);
 #endif
-	zbx_parse_cfg_file(config_file, cfg, requirement, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
+	zbx_parse_cfg_file(config_file, cfg, requirement, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE, ZBX_CFG_ENVVAR_USE);
 
 	zbx_finalize_key_access_rules_configuration();
 

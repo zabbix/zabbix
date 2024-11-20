@@ -30,11 +30,12 @@
 #include <libgen.h>
 #endif
 
-static const char	*program_type_str = NULL;
-static const char	*main_cfg_file = NULL;
+static const char		*program_type_str = NULL;
+static const char		*main_cfg_file = NULL;
+static ZBX_THREAD_LOCAL int	process_num = 0;
 
 static int	__parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int level, int optional, int strict,
-		int noexit);
+		int noexit, zbx_vector_str_t *env_vars);
 
 ZBX_PTR_VECTOR_IMPL(addr_ptr, zbx_addr_t *)
 
@@ -42,6 +43,11 @@ void	zbx_init_library_cfg(unsigned char program_type, const char *cfg_file)
 {
 	program_type_str = get_program_type_string(program_type);
 	main_cfg_file = cfg_file;
+}
+
+void	zbx_cfg_set_process_num(int num)
+{
+	process_num = num;
 }
 
 /******************************************************************************
@@ -205,12 +211,13 @@ trim:
  *                                                                            *
  * Purpose: parses directory with configuration files                         *
  *                                                                            *
- * Parameters: path    - [IN] full path to directory                          *
- *             pattern - [IN] pattern that files in directory should match    *
- *             cfg     - [OUT] pointer to configuration parameter structure   *
- *             level   - [IN] level of included file                          *
- *             strict  - [IN] treat unknown parameters as error               *
- *             noexit  - [INT] on error return FAIL instead of EXIT_FAILURE   *
+ * Parameters: path     - [IN] full path to directory                         *
+ *             pattern  - [IN] pattern that files in directory should match   *
+ *             cfg      - [OUT] pointer to configuration parameter structure  *
+ *             level    - [IN] level of included file                         *
+ *             strict   - [IN] treat unknown parameters as error              *
+ *             noexit   - [INT] on error return FAIL instead of EXIT_FAILURE  *
+ *             env_vars - [IN/OUT] environment variables to be cleared        *
  *                                                                            *
  * Return value: SUCCEED - parsed successfully                                *
  *               FAIL - error processing directory                            *
@@ -218,7 +225,7 @@ trim:
  ******************************************************************************/
 #ifdef _WINDOWS
 static int	parse_cfg_dir(const char *path, const char *pattern, zbx_cfg_line_t *cfg, int level, int strict,
-		int noexit)
+		int noexit, zbx_vector_str_t *env_vars)
 {
 	WIN32_FIND_DATAW	find_file_data;
 	HANDLE			h_find;
@@ -249,7 +256,7 @@ static int	parse_cfg_dir(const char *path, const char *pattern, zbx_cfg_line_t *
 
 		zbx_free(file_name);
 
-		if (SUCCEED != __parse_cfg_file(file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict, noexit))
+		if (SUCCEED != __parse_cfg_file(file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict, noexit, env_vars))
 			goto close;
 	}
 
@@ -265,7 +272,7 @@ clean:
 }
 #else
 static int	parse_cfg_dir(const char *path, const char *pattern, zbx_cfg_line_t *cfg, int level, int strict,
-		int noexit)
+		int noexit, zbx_vector_str_t *env_vars)
 {
 	DIR		*dir;
 	struct dirent	*d;
@@ -289,7 +296,7 @@ static int	parse_cfg_dir(const char *path, const char *pattern, zbx_cfg_line_t *
 		if (NULL != pattern && SUCCEED != match_glob(d->d_name, pattern))
 			continue;
 
-		if (SUCCEED != __parse_cfg_file(file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict, noexit))
+		if (SUCCEED != __parse_cfg_file(file, cfg, level, ZBX_CFG_FILE_REQUIRED, strict, noexit, env_vars))
 			goto close;
 	}
 
@@ -362,12 +369,14 @@ static char	*expand_include_path(char *raw_path)
  *             level    - [IN] level of included file                         *
  *             strict   - [IN] treat unknown parameters as error              *
  *             noexit   - [IN] on error return FAIL instead of EXIT_FAILURE   *
+ *             env_vars - [IN/OUT] environment variables to be cleared        *
  *                                                                            *
  * Return value: SUCCEED - parsed successfully                                *
  *               FAIL - error processing object                               *
  *                                                                            *
  ******************************************************************************/
-static int	parse_cfg_object(const char *cfg_file, zbx_cfg_line_t *cfg, int level, int strict, int noexit)
+static int	parse_cfg_object(const char *cfg_file, zbx_cfg_line_t *cfg, int level, int strict, int noexit,
+		zbx_vector_str_t *env_vars)
 {
 	int		ret = FAIL;
 	char		*path = NULL, *pattern = NULL;
@@ -388,7 +397,7 @@ static int	parse_cfg_object(const char *cfg_file, zbx_cfg_line_t *cfg, int level
 	{
 		if (NULL == pattern)
 		{
-			ret = __parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict, noexit);
+			ret = __parse_cfg_file(path, cfg, level, ZBX_CFG_FILE_REQUIRED, strict, noexit, env_vars);
 			goto clean;
 		}
 
@@ -396,12 +405,61 @@ static int	parse_cfg_object(const char *cfg_file, zbx_cfg_line_t *cfg, int level
 		goto clean;
 	}
 
-	ret = parse_cfg_dir(path, pattern, cfg, level, strict, noexit);
+	ret = parse_cfg_dir(path, pattern, cfg, level, strict, noexit, env_vars);
 clean:
 	zbx_free(pattern);
 	zbx_free(path);
 
 	return ret;
+}
+
+static char	*envvar_name_get(const char *name)
+{
+	size_t	len = strlen(name) - 1;
+
+	if (3 > len || '$' != *name || '{' != name[1] || '}' != name[len] ||
+			(0 == isalpha(name[2]) && '_' != name[2]))
+	{
+		return NULL;
+	}
+
+	for (unsigned int i = 3; i < len; i++)
+	{
+		if (0 == isalnum(name[i]) && '_' != name[i])
+			return NULL;
+	}
+
+	return zbx_substr(name, 2, len - 1);
+}
+
+#if (defined(HAVE_GETENV) && defined(HAVE_UNSETENV)) || defined(_WINDOWS) || defined(__MINGW32__)
+static void	envvar_unset(const char *name)
+{
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	char	*buf = zbx_dsprintf(NULL, "%s=", name);
+
+	_putenv(buf);
+	zbx_free(buf);
+#else
+	zbx_unsetenv(name);
+#endif
+}
+#endif
+
+static int	is_param_expected(zbx_cfg_line_t *cfg, const char *param)
+{
+	int	i;
+
+	for (i = 0; NULL != cfg[i].parameter; i++)
+	{
+		if (0 == strcmp(cfg[i].parameter, param))
+			break;
+	}
+
+	if (NULL == cfg[i].parameter)
+		return FAIL;
+
+	return SUCCEED;
 }
 
 /********************************************************************************
@@ -414,24 +472,28 @@ clean:
  *             optional - [IN] do not treat missing configuration file as error *
  *             strict   - [IN] treat unknown parameters as error                *
  *             noexit   - [IN] on error return FAIL instead of EXIT_FAILURE     *
+ *             env_vars - [IN/OUT] environment variables to be cleared          *
  *                                                                              *
  * Return value: SUCCEED - parsed successfully                                  *
  *               FAIL - error processing config file                            *
  *                                                                              *
  ********************************************************************************/
 static int	__parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int level, int optional, int strict,
-		int noexit)
+		int noexit, zbx_vector_str_t *env_vars)
 {
 #define ZBX_MAX_INCLUDE_LEVEL	10
 
 #define ZBX_CFG_LTRIM_CHARS	"\t "
 #define ZBX_CFG_RTRIM_CHARS	ZBX_CFG_LTRIM_CHARS "\r\n"
 
+#define ZBX_CFG_LTRIM_CHARS_SKIP(src)	\
+	while ('\0' != *(src) && NULL != strchr(ZBX_CFG_LTRIM_CHARS, *(src))) (src)++
+
 	FILE		*file;
 	int		i, lineno, param_valid;
-	char		line[MAX_STRING_LEN + 3], *parameter, *value;
+	char		line[MAX_STRING_LEN + 3], *parameter, *value, *envvar_name, *envvar_value = NULL;
 	zbx_uint64_t	var;
-	size_t		len;
+	size_t		len, alloc_len = 0, offset;
 #ifdef _WINDOWS
 	wchar_t		*wcfg_file;
 #endif
@@ -478,13 +540,57 @@ static int	__parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int level
 			*value++ = '\0';
 
 			zbx_rtrim(parameter, ZBX_CFG_RTRIM_CHARS);
-			zbx_ltrim(value, ZBX_CFG_LTRIM_CHARS);
+			ZBX_CFG_LTRIM_CHARS_SKIP(value);
+
+			if (NULL != (envvar_name = envvar_name_get(value)))
+			{
+#if (defined(HAVE_GETENV) && defined(HAVE_UNSETENV)) || defined(_WINDOWS) || defined(__MINGW32__)
+				if (NULL == env_vars)
+				{
+					if (1 == process_num && (0 == strcmp(parameter, "Include") ||
+							SUCCEED == is_param_expected(cfg, parameter)))
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "environment variables are not supported"
+								" during user parameters reloading, skipped parameter"
+								" \"%s\" with value \"%s\" at line %d in config file"
+								" \"%s\"", parameter, value, lineno, cfg_file);
+					}
+
+					zbx_free(envvar_name);
+					continue;
+				}
+
+				if (NULL == (value = getenv(envvar_name)))
+				{
+					zbx_free(envvar_name);
+					continue;
+				}
+
+				zbx_vector_str_append(env_vars, envvar_name);
+
+				if (SUCCEED != zbx_is_utf8(value))
+					goto envvar_non_utf8;
+
+				ZBX_CFG_LTRIM_CHARS_SKIP(value);
+
+				offset = 0;
+				zbx_strcpy_alloc(&envvar_value, &alloc_len, &offset, value);
+				value = envvar_value;
+
+				zbx_rtrim(value, ZBX_CFG_RTRIM_CHARS);
+
+				if (0 != strchr(value, '\n'))
+					goto envvar_multi_string;
+#else
+				goto envvar_not_supported;
+#endif
+			}
 
 			zabbix_log(LOG_LEVEL_DEBUG, "cfg: param: [%s] val [%s]", parameter, value);
 
 			if (0 == strcmp(parameter, "Include"))
 			{
-				if (FAIL == parse_cfg_object(value, cfg, level, strict, noexit))
+				if (FAIL == parse_cfg_object(value, cfg, level, strict, noexit, env_vars))
 				{
 					fclose(file);
 					goto error;
@@ -563,6 +669,8 @@ static int	__parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int level
 		fclose(file);
 	}
 
+	zbx_free(envvar_value);
+
 	if (1 != level)	/* skip mandatory parameters check for included files */
 		return SUCCEED;
 
@@ -607,6 +715,23 @@ non_key_value:
 	zbx_error("invalid entry \"%s\" (not following \"parameter=value\" notation) in config file \"%s\", line %d",
 			line, cfg_file, lineno);
 	goto error;
+envvar_non_utf8:
+	fclose(file);
+	zbx_error("non-UTF-8 character in environment variable \"%s\" value \"%s\" at line %d in config file \"%s\"",
+			envvar_name, value, lineno, cfg_file);
+	goto error;
+envvar_multi_string:
+	fclose(file);
+	zbx_error("multi-line string in environment variable \"%s\" value \"%s\" at line %d in config file \"%s\"",
+			envvar_name, value, lineno, cfg_file);
+	goto error;
+#if (!defined(HAVE_GETENV) || !defined(HAVE_UNSETENV)) && (!defined(_WINDOWS) || !defined(__MINGW32__))
+envvar_not_supported:
+	fclose(file);
+	zbx_error("environment variables support is not compiled in, \"%s\" detected at line %d in config file \"%s\"",
+			envvar_name, lineno, cfg_file);
+	goto error;
+#endif
 incorrect_config:
 	fclose(file);
 	zbx_error("wrong value of \"%s\" in config file \"%s\", line %d", cfg[i].parameter, cfg_file, lineno);
@@ -618,19 +743,51 @@ unknown_parameter:
 missing_mandatory:
 	zbx_error("missing mandatory parameter \"%s\" in config file \"%s\"", cfg[i].parameter, cfg_file);
 error:
+	zbx_free(envvar_value);
+
 	if (0 == noexit)
 		exit(EXIT_FAILURE);
 
 	return FAIL;
 #undef ZBX_MAX_INCLUDE_LEVEL
 
+#undef ZBX_CFG_LTRIM_CHARS_SKIP
 #undef ZBX_CFG_LTRIM_CHARS
 #undef ZBX_CFG_RTRIM_CHARS
 }
 
-int	zbx_parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int optional, int strict, int noexit)
+int	zbx_parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int optional, int strict, int noexit, int noenv)
 {
-	return __parse_cfg_file(cfg_file, cfg, 0, optional, strict, noexit);
+	int			ret;
+	zbx_vector_str_t	env_vars;
+
+	if (ZBX_CFG_ENVVAR_IGNORE == noenv)
+		return __parse_cfg_file(cfg_file, cfg, 0, optional, strict, noexit, NULL);
+
+	zbx_vector_str_create(&env_vars);
+	ret = __parse_cfg_file(cfg_file, cfg, 0, optional, strict, noexit, &env_vars);
+
+#if (defined(HAVE_GETENV) && defined(HAVE_UNSETENV)) || defined(_WINDOWS) || defined(__MINGW32__)
+	if (SUCCEED == ret)
+	{
+		zbx_vector_str_t	env_vars_uniq;
+
+		zbx_vector_str_create(&env_vars_uniq);
+		zbx_vector_str_append_array(&env_vars_uniq, env_vars.values, env_vars.values_num);
+		zbx_vector_str_sort(&env_vars_uniq, ZBX_DEFAULT_STR_COMPARE_FUNC);
+		zbx_vector_str_uniq(&env_vars_uniq, ZBX_DEFAULT_STR_COMPARE_FUNC);
+
+		for (int i = 0; i < env_vars_uniq.values_num; i++)
+			envvar_unset(env_vars_uniq.values[i]);
+
+		zbx_vector_str_destroy(&env_vars_uniq);
+	}
+#endif
+
+	zbx_vector_str_clear_ext(&env_vars, zbx_str_free);
+	zbx_vector_str_destroy(&env_vars);
+
+	return ret;
 }
 
 int	zbx_check_cfg_feature_int(const char *parameter, int value, const char *feature)

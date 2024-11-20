@@ -311,3 +311,38 @@ void	zbx_setproctitle_deinit(void)
 	zbx_free(environ_int);
 #endif	/* PS_OVERWRITE_ARGV */
 }
+
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+void	zbx_unsetenv(const char *envname)
+{
+#if defined(PS_OVERWRITE_ARGV)
+	if (NULL != environ_int)
+	{
+		int	i;
+		size_t	len = strlen(envname);
+
+		for (i = 0; NULL != environ[i]; i++)
+		{
+			if (0 == strncmp(envname, environ[i], len) && '=' == environ[i][len])
+			{
+				zbx_free(environ[i]);
+
+				do
+				{
+					environ[i] = environ[i + 1];
+					i++;
+				} while (NULL != environ[i]);
+
+				break;
+			}
+		}
+	}
+	else
+		(void)unsetenv(envname);
+#elif defined(HAVE_UNSETENV)
+	(void)unsetenv(envname);
+#else
+	ZBX_UNUSED(envname);
+#endif
+}
+#endif

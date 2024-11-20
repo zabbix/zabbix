@@ -358,6 +358,7 @@ zbx_substitute_macros_um_LDADD = \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxhttp/libzbxhttp.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
 zbx_substitute_macros_um_LDADD += @SERVER_LIBS@

@@ -37,6 +37,9 @@
 #define	ZBX_CFG_EXIT_FAILURE	0
 #define	ZBX_CFG_NO_EXIT_FAILURE	1
 
+#define	ZBX_CFG_ENVVAR_USE	0
+#define	ZBX_CFG_ENVVAR_IGNORE	1
+
 #define ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX	SEC_PER_HOUR
 #define ZBX_PROXY_LASTACCESS_UPDATE_FREQUENCY	5
 
@@ -68,11 +71,12 @@ typedef struct
 zbx_cfg_custom_parameter_parser_t;
 
 void	zbx_init_library_cfg(unsigned char program_type, const char *cfg_file);
+void	zbx_cfg_set_process_num(int num);
 
 void	zbx_addr_copy(zbx_vector_addr_ptr_t *addr_to, const zbx_vector_addr_ptr_t *addr_from);
 void	zbx_addr_free(zbx_addr_t *addr);
 
-int	zbx_parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int optional, int strict, int noexit);
+int	zbx_parse_cfg_file(const char *cfg_file, zbx_cfg_line_t *cfg, int optional, int strict, int noexit, int noenv);
 
 int	zbx_check_cfg_feature_int(const char *parameter, int value, const char *feature);
 int	zbx_check_cfg_feature_str(const char *parameter, const char *value, const char *feature);

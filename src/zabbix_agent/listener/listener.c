@@ -22,6 +22,7 @@
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
 #include "zbxjson.h"
+#include "zbxcfg.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "zbxwinservice.h"
@@ -248,6 +249,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 #ifndef _WINDOWS
 	zbx_set_sigusr_handler(zbx_listener_sigusr_handler);
 #endif
+	zbx_cfg_set_process_num(process_num);
 
 	while (ZBX_IS_RUNNING())
 	{

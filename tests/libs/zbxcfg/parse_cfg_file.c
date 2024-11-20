@@ -232,7 +232,7 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_init_library_cfg(ZBX_PROGRAM_TYPE_SERVER, cfg_file);
 
-	zbx_parse_cfg_file(cfg_file, cfg, ZBX_CFG_FILE_REQUIRED, strict, ZBX_CFG_EXIT_FAILURE);
+	zbx_parse_cfg_file(cfg_file, cfg, ZBX_CFG_FILE_REQUIRED, strict, ZBX_CFG_EXIT_FAILURE, ZBX_CFG_ENVVAR_USE);
 
 	if (ZBX_MOCK_NO_EXIT_CODE != (error = zbx_mock_exit_code(&exit_code)))
 	{
