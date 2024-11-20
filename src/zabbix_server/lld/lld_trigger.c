@@ -708,15 +708,11 @@ static void	lld_functions_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_pr
 	zbx_lld_trigger_t		*trigger;
 	zbx_hashset_t			trigger_functions;
 	zbx_trigger_functions_t		tfuncs_local;
-	int				triggers_num = 0;
+	size_t				triggers_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (NULL != trigger_prototypes)
-		triggers_num = trigger_prototypes->values_num;
-
-	if (NULL!= triggers)
-		triggers_num += triggers->values_num;
+	triggers_num = (size_t)(trigger_prototypes->values_num + triggers->values_num);
 
 	zbx_hashset_create(&trigger_functions, triggers_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
