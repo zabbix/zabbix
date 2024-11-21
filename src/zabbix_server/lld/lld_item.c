@@ -3778,7 +3778,7 @@ out:
 	return ret;
 }
 
-static	int	get_item_status_value(int status)
+static	unsigned char	get_item_status_value(int status)
 {
 	if (ZBX_LLD_OBJECT_STATUS_ENABLED == status)
 		return ITEM_STATUS_ACTIVE;

@@ -433,7 +433,7 @@ typedef void	(*object_audit_entry_create_f)(int audit_context_mode, int audit_ac
 		const char *name, int flags);
 typedef void	(*object_audit_entry_update_status_f)(int audit_context_mode, zbx_uint64_t objectid, int flags,
 		int status_old, int status_new);
-typedef int	(get_object_status_val)(int status);
+typedef unsigned char	(get_object_status_val)(int status);
 
 int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *lld_entries, char **error);
 

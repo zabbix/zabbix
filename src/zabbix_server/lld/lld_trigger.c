@@ -3769,7 +3769,7 @@ static void	lld_trigger_dependencies_validate(zbx_vector_lld_trigger_ptr_t *trig
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static	int	get_trigger_status_value(int status)
+static	unsigned char	get_trigger_status_value(int status)
 {
 	if (ZBX_LLD_OBJECT_STATUS_ENABLED == status)
 		return TRIGGER_STATUS_ENABLED;

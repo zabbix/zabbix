@@ -359,7 +359,7 @@ static void	lld_gitems_get(zbx_uint64_t parent_graphid, zbx_vector_lld_gitem_ptr
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_hashset_create(&graph_index, graphs->values_num, lld_graph_ref_id_hash, lld_graph_ref_id_compare);
+	zbx_hashset_create(&graph_index, (size_t)graphs->values_num, lld_graph_ref_id_hash, lld_graph_ref_id_compare);
 	zbx_vector_uint64_create(&graphids);
 	zbx_vector_uint64_append(&graphids, parent_graphid);
 
@@ -822,7 +822,7 @@ static void	lld_graphs_make(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_
 {
 	zbx_hashset_t	graph_index;
 
-	zbx_hashset_create(&graph_index, graphs->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&graph_index, (size_t)graphs->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	for (int i = 0; i < graphs->values_num; i++)
