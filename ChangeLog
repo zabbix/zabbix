@@ -1,12 +1,23 @@
 Changes for 7.2.0rc1
 
 New features:
+..F....... [ZBXNEXT-9555] implemented host override possibility in datasets of Graph widgets (averza)
+..F....... [ZBXNEXT-7689] implemented Top items widget (talbergs)
+..F....... [ZBXNEXT-9340] implemented URL links for modal configuration forms (esekace)
+...G...PS. [ZBXNEXT-9533] added support of configuration parameters specified by environment variables (asestakovs, mprihodko)
+A.......S. [ZBXNEXT-9233] added LLD optimizations to perform discovery of 2m items/triggers/graphs within reasonable time limits, removed 30k dependent item limit (vmurzins, wiper)
+..F....... [ZBXNEXT-9459] renamed item history widget labels from "Columns" to "Items" and "Data" to "Item" (Ivo)
+........S. [ZBXNEXT-9588] added subsystem support for SSH item (asestakovs)
+A.F....... [ZBXNEXT-8690] implemented a new filter in media type list view to filter out media types by their usage in actions (Ivo)
+..F....... [ZBXNEXT-9228] implemented automatic selection of the first element of a broadcast-capable widget (averza, wczerneha)
 ..F....... [ZBXNEXT-9232] implemented sparkline chart component and added it in Item value widget and Top hosts widget (apoga, gcalenko)
 ..F....... [ZBXNEXT-599] implemented logarithmic scale for SVG graph widget (ashubin, averza, dfofanovs)
 ..F.I..... [ZBXNEXT-9086] implemented new "Host card" widget (agriscenko)
 A......... [ZBXNEXT-9452] removed deprecated API parameters (jfreibergs, vmaksimovs)
 
 Bug fixes:
+...G...... [ZBX-25404] fixed issue of trapper item failing when space character is used in the 'Allowed hosts' field (MVekslers)
+..F....... [ZBX-7846] removed confirmation when changing the status of a single object in a list (jfreibergs)
 .D........ [ZBX-24600] added exit code description to Zabbix get man page (rtrizna)
 
 --------------------------------------------------------------------------------
