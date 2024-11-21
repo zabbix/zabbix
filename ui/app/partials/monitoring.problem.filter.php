@@ -102,6 +102,7 @@ $left_column = (new CFormList())
 			->setChecked($data['severities'])
 			->setColumns(3)
 			->setVertical(true)
+			->showTitles()
 	);
 
 $filter_age = (new CNumericBox('age', $data['age'], 3, false, false, false))

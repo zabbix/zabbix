@@ -83,6 +83,7 @@ $form
 							->setOptions(CSeverityHelper::getSeverities())
 							->setChecked($data['severities'])
 							->setVertical(true)
+							->showTitles()
 					)
 				],
 				[

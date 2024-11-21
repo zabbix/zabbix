@@ -121,6 +121,7 @@ $left_column = (new CFormList())
 			->setChecked($data['severities'])
 			->setColumns(3)
 			->setVertical(true)
+			->showTitles()
 	);
 
 $right_column = (new CFormList())
