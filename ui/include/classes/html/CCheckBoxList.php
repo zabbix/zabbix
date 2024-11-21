@@ -236,7 +236,7 @@ class CCheckBoxList extends CList {
 
 			if ($this->showTitles) {
 				$checkbox->setTitle($value['label']);
-			};
+			}
 
 			if (array_key_exists('id', $value) || $this->uniqid !== '') {
 				$checkbox->setId(array_key_exists('id', $value)
