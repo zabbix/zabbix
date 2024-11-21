@@ -716,6 +716,10 @@ msgstr[0] "Wyłączono akcję"
 msgstr[1] "Wyłączono akcje"
 msgstr[2] "Wyłączono akcje"
 
+#: app/controllers/CControllerPopup.php:42
+msgid "Action edit"
+msgstr ""
+
 #: app/controllers/CControllerActionEnable.php:84
 msgid "Action enabled"
 msgid_plural "Actions enabled"
@@ -1307,6 +1311,11 @@ msgstr "Dopasuj elementy map"
 #: widgets/problems/includes/WidgetForm.php:131
 msgid "All"
 msgstr "Wszystkie"
+
+#: app/views/mediatype.list.php:79 app/views/mediatype.list.php:81
+#: app/views/mediatype.list.php:90 app/views/popup.operation.edit.php:160
+msgid "All available"
+msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:189
 msgid "All dashboards"
@@ -5178,6 +5187,10 @@ msgstr[0] "Wyłączono konektor"
 msgstr[1] "Wyłączono konektory"
 msgstr[2] "Wyłączono konektory"
 
+#: app/controllers/CControllerPopup.php:43
+msgid "Connector edit"
+msgstr ""
+
 #: app/controllers/CControllerConnectorEnable.php:69
 msgid "Connector enabled"
 msgid_plural "Connectors enabled"
@@ -5339,6 +5352,10 @@ msgstr[2] "Kopiuj %1$s wyzwalaczy"
 #: app/views/popup.token.view.php:51
 msgid "Copy to clipboard"
 msgstr "Kopiuj do schowka"
+
+#: app/controllers/CControllerPopup.php:44
+msgid "Correlation edit"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:52
 #: app/controllers/CControllerPopupTriggerExpr.php:693
@@ -7279,6 +7296,10 @@ msgstr[0] "Wyłączono regułę wykrywania"
 msgstr[1] "Wyłączono reguły wykrywania"
 msgstr[2] "Wyłączono reguły wykrywania"
 
+#: app/controllers/CControllerPopup.php:45
+msgid "Discovery rule edit"
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryEnable.php:68 host_discovery.php:580
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
@@ -7325,6 +7346,10 @@ msgstr "Wyświetl"
 msgid "Display OK triggers for"
 msgstr "Wyświetlanie wyzwalaczy w stanie OK przez"
 
+#: app/views/mediatype.list.php:75
+msgid "Display actions"
+msgstr ""
+
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
 msgstr "Wyświetl wykres"
@@ -7352,6 +7377,10 @@ msgstr "Wyświetl problemy"
 #: app/partials/monitoring.latest.view.html.php:308
 msgid "Display stacked graph"
 msgstr "Wyświetl wykres skumulowany"
+
+#: widgets/topitems/views/column.edit.php:90
+msgid "Display value as"
+msgstr ""
 
 #: app/controllers/CControllerHintboxActionlist.php:99
 #: app/views/administration.queue.details.php:86
@@ -8662,6 +8691,10 @@ msgstr "Obszar wypełniony"
 msgid "Filter"
 msgstr "Filtr"
 
+#: app/views/mediatype.list.php:76
+msgid "Filter actions by the scope of media type usage:"
+msgstr ""
+
 #: app/views/js/popup.tabfilter.edit.js.php:63
 msgid "Filter deleted"
 msgstr "Usunięto filtr"
@@ -9652,6 +9685,10 @@ msgstr[0] "Wyłączono host"
 msgstr[1] "Wyłączono hosty"
 msgstr[2] "Wyłączono hosty"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Host edit"
+msgstr ""
+
 #: app/controllers/CControllerHostGroupEnable.php:76
 #: app/controllers/CControllerPopupMassupdateHost.php:491
 #: app/controllers/CControllerProxyHostEnable.php:85
@@ -9712,6 +9749,10 @@ msgid_plural "Host groups deleted"
 msgstr[0] "Usunięto grupę hostów"
 msgstr[1] "Usunięto grupy hostów"
 msgstr[2] "Usunięto grupy hostów"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Host group edit"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:112
 msgid "Host group elements"
@@ -9844,6 +9885,12 @@ msgstr "Nawigator hosta"
 #: include/hosts.inc.php:284
 msgid "Host networks"
 msgstr "Sieci hosta"
+
+#: widgets/topitems/includes/WidgetForm.php:116
+#: widgets/topitems/includes/WidgetForm.php:128
+#: widgets/topitems/views/widget.edit.php:63
+msgid "Host ordering"
+msgstr ""
 
 #: widgets/hostnavigator/includes/WidgetForm.php:65
 msgid "Host patterns"
@@ -12021,6 +12068,10 @@ msgstr[0] "Wyłączono pozycję"
 msgstr[1] "Wyłączono pozycje"
 msgstr[2] "Wyłączono pozycje"
 
+#: app/controllers/CControllerPopup.php:48
+msgid "Item edit"
+msgstr ""
+
 #: items.php:707
 msgid "Item enabled"
 msgid_plural "Items enabled"
@@ -12057,6 +12108,12 @@ msgstr "Nawigator pozycji"
 msgid "Item not selected"
 msgstr "Nie wybrano pozycji"
 
+#: widgets/topitems/includes/WidgetForm.php:145
+#: widgets/topitems/includes/WidgetForm.php:157
+#: widgets/topitems/views/widget.edit.php:81
+msgid "Item ordering"
+msgstr ""
+
 #: widgets/piechart/views/widget.edit.js.php:203
 #: widgets/svggraph/views/widget.edit.js.php:281
 msgid "Item pattern"
@@ -12089,6 +12146,10 @@ msgid_plural "Item prototypes deleted"
 msgstr[0] "Usunięto prototyp pozycji"
 msgstr[1] "Usunięto prototypy pozycji"
 msgstr[2] "Usunięto prototypy pozycji"
+
+#: app/controllers/CControllerPopup.php:49
+msgid "Item prototype edit"
+msgstr ""
 
 #: app/controllers/CControllerPopupMassupdateItem.php:286
 #: disc_prototypes.php:457 disc_prototypes.php:483 disc_prototypes.php:522
@@ -12613,6 +12674,15 @@ msgstr "Długość"
 msgid "Licensed under"
 msgstr "Uprawniony do"
 
+#: widgets/topitems/includes/WidgetForm.php:125
+#: widgets/topitems/includes/WidgetForm.php:154
+msgid "Limit"
+msgstr ""
+
+#: widgets/topitems/views/widget.edit.php:95
+msgid "Limit applies to each \"Item pattern\" separately"
+msgstr ""
+
 #: app/views/administration.gui.edit.php:93
 msgid "Limit for search and filter results"
 msgstr "Ograniczenie wyszukiwania/filtrowania elementów"
@@ -13017,6 +13087,10 @@ msgstr "Utrzymanie"
 #, c-format
 msgid "Maintenance \"%1$s\" already exists."
 msgstr "Utrzymanie \"%1$s\" już istnieje."
+
+#: app/controllers/CControllerPopup.php:50
+msgid "Maintenance edit"
+msgstr ""
 
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:238
@@ -13446,6 +13520,11 @@ msgstr "Typ mediów"
 msgid "Media type \"%1$s\" already exists."
 msgstr "Typ mediów \"%1$s\" już istnieje."
 
+#: include/classes/api/services/CMediatype.php:878
+#, c-format
+msgid "Media type \"%1$s\" is used by action \"%2$s\"."
+msgstr ""
+
 #: app/controllers/CControllerMediatypeCreate.php:187
 msgid "Media type added"
 msgstr "Dodano typ mediów"
@@ -13467,6 +13546,10 @@ msgstr[2] "Wyłączono typy mediów"
 #: app/views/administration.user.edit.php:359
 msgid "Media type disabled by Administration."
 msgstr "Typ mediów wyłączony przez administrację."
+
+#: app/controllers/CControllerPopup.php:51
+msgid "Media type edit"
+msgstr ""
 
 #: app/controllers/CControllerMediatypeEnable.php:87
 #: app/controllers/CControllerMediatypeEnable.php:94
@@ -13818,6 +13901,10 @@ msgid_plural "Modules disabled"
 msgstr[0] "Wyłączono moduł"
 msgstr[1] "Wyłączono moduły"
 msgstr[2] "Wyłączono moduły"
+
+#: app/controllers/CControllerPopup.php:52
+msgid "Module edit"
+msgstr ""
 
 #: app/controllers/CControllerModuleEnable.php:91
 msgid "Module enabled"
@@ -16202,6 +16289,10 @@ msgstr "Wklej bez zewnętrznych łączy"
 msgid "Pattern"
 msgstr "Wzorzec"
 
+#: widgets/topitems/includes/CWidgetFieldColumnsListView.php:58
+msgid "Patterns"
+msgstr ""
+
 #: app/views/popup.action.edit.php:238
 msgid "Pause operations for suppressed problems"
 msgstr "Zatrzymaj operacje dla wstrzymanych problemów"
@@ -16862,6 +16953,10 @@ msgstr[0] "Usunięto proxy"
 msgstr[1] "Usunięto proxy"
 msgstr[2] "Usunięto proxy"
 
+#: app/controllers/CControllerPopup.php:53
+msgid "Proxy edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:239
 #: app/partials/configuration.host.edit.html.php:266
 #: app/views/configuration.host.list.php:153
@@ -16896,6 +16991,10 @@ msgid_plural "Proxy groups deleted"
 msgstr[0] "Grupa proxy została usunięta"
 msgstr[1] "Grupy proxy zostały usunięte"
 msgstr[2] "Grupy proxy zostały usunięte"
+
+#: app/controllers/CControllerPopup.php:54
+msgid "Proxy group edit"
+msgstr ""
 
 #: app/controllers/CControllerProxyGroupUpdate.php:74
 msgid "Proxy group updated"
@@ -18008,6 +18107,10 @@ msgstr[0] "Wyłączono SLA"
 msgstr[1] "Wyłączono SLA"
 msgstr[2] "Wyłączono SLA"
 
+#: app/controllers/CControllerPopup.php:58
+msgid "SLA edit"
+msgstr ""
+
 #: app/controllers/CControllerSlaEnable.php:73
 msgid "SLA enabled"
 msgid_plural "SLAs enabled"
@@ -18452,6 +18555,10 @@ msgstr[2] "Usunięto skrypt"
 msgid "Script does not have parameters."
 msgstr "Skrypt nie ma parametrów."
 
+#: app/controllers/CControllerPopup.php:56
+msgid "Script edit"
+msgstr ""
+
 #: app/views/administration.timeouts.edit.php:168
 msgid "Script execution"
 msgstr "Wykonanie skryptu"
@@ -18664,6 +18771,10 @@ msgstr "Wyślij do"
 msgid "Send to back"
 msgstr "Wyślij do tyłu"
 
+#: app/views/popup.operation.edit.php:189
+msgid "Send to media type"
+msgstr ""
+
 #: app/views/popup.operation.edit.php:108
 msgid "Send to user groups"
 msgstr "Wyślij do grup użytkowników"
@@ -18781,6 +18892,10 @@ msgid_plural "Services deleted"
 msgstr[0] "Usunięto usługę"
 msgstr[1] "Usunięto usługi"
 msgstr[2] "Usunięto usługi"
+
+#: app/controllers/CControllerPopup.php:57
+msgid "Service edit"
+msgstr ""
 
 #: app/views/administration.userrole.edit.php:166
 #: app/views/administration.userrole.edit.php:207
@@ -19424,6 +19539,10 @@ msgstr "Hiszpański (es_ES)"
 #: widgets/tophosts/views/column.edit.php:155
 #: widgets/tophosts/views/column.edit.php:162
 msgid "Sparkline"
+msgstr ""
+
+#: app/views/mediatype.list.php:83 app/views/mediatype.list.php:91
+msgid "Specific"
 msgstr ""
 
 #: include/classes/helpers/CRoleHelper.php:199
@@ -20174,6 +20293,10 @@ msgstr[0] "Usunięto szablon"
 msgstr[1] "Usunięto szablony"
 msgstr[2] "Usunięto szablony"
 
+#: app/controllers/CControllerPopup.php:59
+msgid "Template edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:259
 #: app/partials/configuration.templategroup.edit.html.php:52
 #: app/views/configuration.templategroup.edit.php:52
@@ -20197,6 +20320,10 @@ msgid_plural "Template groups deleted"
 msgstr[0] "Usunięto grupę szablonów"
 msgstr[1] "Usunięto grupy szablonów"
 msgstr[2] "Usunięto grupy szablonów"
+
+#: app/controllers/CControllerPopup.php:55
+msgid "Template group edit"
+msgstr ""
 
 #: app/controllers/CControllerTemplateGroupUpdate.php:86
 msgid "Template group updated"
@@ -20869,6 +20996,10 @@ msgstr "Dziś"
 msgid "Today so far"
 msgstr "Dzisiaj jak dotąd"
 
+#: app/controllers/CControllerPopup.php:60
+msgid "Token edit"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:40
 #: include/views/js/monitoring.sysmaps.js.php:159
 #: include/views/js/monitoring.sysmaps.js.php:684
@@ -20897,6 +21028,10 @@ msgstr "Pierwsze N"
 #: widgets/tophosts/Widget.php:34
 msgid "Top hosts"
 msgstr "TOP hosty"
+
+#: widgets/topitems/Widget.php:32
+msgid "Top items"
+msgstr ""
 
 #: widgets/toptriggers/Widget.php:29
 msgid "Top triggers"
@@ -21129,6 +21264,10 @@ msgstr[2] "Wyłączono wyzwalacze"
 msgid "Trigger displaying options"
 msgstr "Opcje wyświetlania wyzwalaczy"
 
+#: app/controllers/CControllerPopup.php:61
+msgid "Trigger edit"
+msgstr ""
+
 #: app/controllers/CControllerTriggerEnable.php:67
 msgid "Trigger enabled"
 msgid_plural "Triggers enabled"
@@ -21269,6 +21408,10 @@ msgid_plural "Trigger prototypes deleted"
 msgstr[0] "Usunięto prototyp wyzwalacza"
 msgstr[1] "Usunięto prototypy wyzwalaczy"
 msgstr[2] "Usunięto prototypy wyzwalaczy"
+
+#: app/controllers/CControllerPopup.php:62
+msgid "Trigger prototype edit"
+msgstr ""
 
 #: app/controllers/CControllerTriggerMassupdate.php:219
 #: app/controllers/CControllerTriggerPrototypeDisable.php:76
@@ -24748,6 +24891,18 @@ msgstr "folder nie może być pusty"
 #, c-format
 msgid "discovery rule \"%1$s\" on host \"%2$s\" is not monitored"
 msgstr "reguła wykrywania \"%1$s\" nie jest monitorowana na hoście \"%2$s\""
+
+#: app/views/mediatype.list.php:78
+msgid "display all actions"
+msgstr ""
+
+#: app/views/mediatype.list.php:80
+msgid "display only actions where All available media types are used in action operation"
+msgstr ""
+
+#: app/views/mediatype.list.php:84
+msgid "display only actions where specific media type is used in action operation"
+msgstr ""
 
 #: app/views/popup.lldoperation.php:65 include/actions.inc.php:27
 #: include/classes/helpers/CCorrelationHelper.php:37

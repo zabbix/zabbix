@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-11-12 12:47+0000\n"
+"PO-Revision-Date: 2024-11-16 07:37+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -693,6 +693,10 @@ msgid_plural "Actions disabled"
 msgstr[0] "Acció desactivada"
 msgstr[1] "Accions desactivades"
 
+#: app/controllers/CControllerPopup.php:42
+msgid "Action edit"
+msgstr ""
+
 #: app/controllers/CControllerActionEnable.php:84
 msgid "Action enabled"
 msgid_plural "Actions enabled"
@@ -1283,6 +1287,11 @@ msgstr "Alinear els elements del mapa"
 #: widgets/problems/includes/WidgetForm.php:131
 msgid "All"
 msgstr "Tots"
+
+#: app/views/mediatype.list.php:79 app/views/mediatype.list.php:81
+#: app/views/mediatype.list.php:90 app/views/popup.operation.edit.php:160
+msgid "All available"
+msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:189
 msgid "All dashboards"
@@ -5072,6 +5081,10 @@ msgid_plural "Connectors disabled"
 msgstr[0] "Connector desactivat"
 msgstr[1] "Connectors desactivats"
 
+#: app/controllers/CControllerPopup.php:43
+msgid "Connector edit"
+msgstr ""
+
 #: app/controllers/CControllerConnectorEnable.php:69
 msgid "Connector enabled"
 msgid_plural "Connectors enabled"
@@ -5229,6 +5242,10 @@ msgstr[1] "Copiar els triggers %1$s"
 #: app/views/popup.token.view.php:51
 msgid "Copy to clipboard"
 msgstr "Copiar al portapapers"
+
+#: app/controllers/CControllerPopup.php:44
+msgid "Correlation edit"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:52
 #: app/controllers/CControllerPopupTriggerExpr.php:693
@@ -7166,6 +7183,10 @@ msgid_plural "Discovery rules disabled"
 msgstr[0] "Regla de descobriment desactivada"
 msgstr[1] "Regles de descobriment desactivades"
 
+#: app/controllers/CControllerPopup.php:45
+msgid "Discovery rule edit"
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryEnable.php:68 host_discovery.php:580
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
@@ -7211,6 +7232,10 @@ msgstr "Mostra"
 msgid "Display OK triggers for"
 msgstr "Mostra els triggers en bon estat per"
 
+#: app/views/mediatype.list.php:75
+msgid "Display actions"
+msgstr ""
+
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
 msgstr "Mostra el gràfic"
@@ -7238,6 +7263,10 @@ msgstr "Mostra els problemes"
 #: app/partials/monitoring.latest.view.html.php:308
 msgid "Display stacked graph"
 msgstr "Mostra el gràfic apilat"
+
+#: widgets/topitems/views/column.edit.php:90
+msgid "Display value as"
+msgstr ""
 
 #: app/controllers/CControllerHintboxActionlist.php:99
 #: app/views/administration.queue.details.php:86
@@ -8544,6 +8573,10 @@ msgstr "Regió omplerta"
 msgid "Filter"
 msgstr "Filtre"
 
+#: app/views/mediatype.list.php:76
+msgid "Filter actions by the scope of media type usage:"
+msgstr ""
+
 #: app/views/js/popup.tabfilter.edit.js.php:63
 msgid "Filter deleted"
 msgstr "S'ha esborrat el filtre"
@@ -9503,7 +9536,7 @@ msgstr "L'equip no pot pas tindre més d'una interfície predeterminada del mate
 
 #: widgets/hostcard/Widget.php:32
 msgid "Host card"
-msgstr ""
+msgstr "Tarja d'equip"
 
 #: app/views/administration.proxy.list.php:91 hostinventoriesoverview.php:85
 #: widgets/tophosts/includes/WidgetForm.php:159
@@ -9527,6 +9560,10 @@ msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] "Equip desactivat"
 msgstr[1] "Equips desactivats"
+
+#: app/controllers/CControllerPopup.php:46
+msgid "Host edit"
+msgstr ""
 
 #: app/controllers/CControllerHostGroupEnable.php:76
 #: app/controllers/CControllerPopupMassupdateHost.php:491
@@ -9586,6 +9623,10 @@ msgid "Host group deleted"
 msgid_plural "Host groups deleted"
 msgstr[0] "S'ha esborrat el grup d'equips"
 msgstr[1] "S'han esborrat els grups d'equips"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Host group edit"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:112
 msgid "Host group elements"
@@ -9718,6 +9759,12 @@ msgstr "Navegador d'equips"
 #: include/hosts.inc.php:284
 msgid "Host networks"
 msgstr "Xarxes d'equips"
+
+#: widgets/topitems/includes/WidgetForm.php:116
+#: widgets/topitems/includes/WidgetForm.php:128
+#: widgets/topitems/views/widget.edit.php:63
+msgid "Host ordering"
+msgstr ""
 
 #: widgets/hostnavigator/includes/WidgetForm.php:65
 msgid "Host patterns"
@@ -11808,7 +11855,7 @@ msgstr "Camp d'inventari"
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectHostInventory.php:48
 #: widgets/hostcard/includes/WidgetForm.php:50
 msgid "Inventory fields"
-msgstr ""
+msgstr "Camps d'inventari"
 
 #: app/views/popup.massupdate.host.php:175
 #: app/views/popup.operation.edit.php:402
@@ -11887,6 +11934,10 @@ msgid_plural "Items disabled"
 msgstr[0] "Element desactivat"
 msgstr[1] "Elements desactivats"
 
+#: app/controllers/CControllerPopup.php:48
+msgid "Item edit"
+msgstr ""
+
 #: items.php:707
 msgid "Item enabled"
 msgid_plural "Items enabled"
@@ -11922,6 +11973,12 @@ msgstr "Navegador d'elements"
 msgid "Item not selected"
 msgstr "Element no triat"
 
+#: widgets/topitems/includes/WidgetForm.php:145
+#: widgets/topitems/includes/WidgetForm.php:157
+#: widgets/topitems/views/widget.edit.php:81
+msgid "Item ordering"
+msgstr ""
+
 #: widgets/piechart/views/widget.edit.js.php:203
 #: widgets/svggraph/views/widget.edit.js.php:281
 msgid "Item pattern"
@@ -11953,6 +12010,10 @@ msgid "Item prototype deleted"
 msgid_plural "Item prototypes deleted"
 msgstr[0] "S'ha esborrat el prototip d'element"
 msgstr[1] "S'han esborrat els prototips d'elements"
+
+#: app/controllers/CControllerPopup.php:49
+msgid "Item prototype edit"
+msgstr ""
 
 #: app/controllers/CControllerPopupMassupdateItem.php:286
 #: disc_prototypes.php:457 disc_prototypes.php:483 disc_prototypes.php:522
@@ -12469,6 +12530,15 @@ msgstr "Allargada"
 msgid "Licensed under"
 msgstr "Llicenciat sota"
 
+#: widgets/topitems/includes/WidgetForm.php:125
+#: widgets/topitems/includes/WidgetForm.php:154
+msgid "Limit"
+msgstr ""
+
+#: widgets/topitems/views/widget.edit.php:95
+msgid "Limit applies to each \"Item pattern\" separately"
+msgstr ""
+
 #: app/views/administration.gui.edit.php:93
 msgid "Limit for search and filter results"
 msgstr "Limitar la cerca i filtrar els resultats"
@@ -12498,7 +12568,7 @@ msgstr "Amplada de línia"
 #: widgets/svggraph/includes/WidgetForm.php:301
 #: widgets/svggraph/includes/WidgetForm.php:333
 msgid "Linear"
-msgstr ""
+msgstr "Lineal"
 
 #: app/views/popup.massupdate.host.php:42 app/views/template.massupdate.php:45
 #: include/views/monitoring.sysmap.constructor.php:43
@@ -12712,7 +12782,7 @@ msgstr "Registra captures SNMP no coincidents"
 #: widgets/svggraph/includes/WidgetForm.php:302
 #: widgets/svggraph/includes/WidgetForm.php:334
 msgid "Logarithmic"
-msgstr ""
+msgstr "Logarítmic"
 
 #: app/controllers/CControllerAuditLogList.php:201
 #: app/views/administration.user.list.php:135
@@ -12873,6 +12943,10 @@ msgstr "Manteniment"
 #, c-format
 msgid "Maintenance \"%1$s\" already exists."
 msgstr "El manteniment \"%1$s\" ja existeix."
+
+#: app/controllers/CControllerPopup.php:50
+msgid "Maintenance edit"
+msgstr ""
 
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:238
@@ -13300,6 +13374,11 @@ msgstr "Tipus de suport"
 msgid "Media type \"%1$s\" already exists."
 msgstr "El tipus de suport \"%1$s\" ja existeix."
 
+#: include/classes/api/services/CMediatype.php:878
+#, c-format
+msgid "Media type \"%1$s\" is used by action \"%2$s\"."
+msgstr ""
+
 #: app/controllers/CControllerMediatypeCreate.php:187
 msgid "Media type added"
 msgstr "Afegit el tipus de suport"
@@ -13319,6 +13398,10 @@ msgstr[1] "Desactivats els tipus de suport"
 #: app/views/administration.user.edit.php:359
 msgid "Media type disabled by Administration."
 msgstr "Tipus de suport desactivat per l'Administrador."
+
+#: app/controllers/CControllerPopup.php:51
+msgid "Media type edit"
+msgstr ""
 
 #: app/controllers/CControllerMediatypeEnable.php:87
 #: app/controllers/CControllerMediatypeEnable.php:94
@@ -13665,6 +13748,10 @@ msgid "Module disabled"
 msgid_plural "Modules disabled"
 msgstr[0] "Mòdul desactivat"
 msgstr[1] "Mòduls desactivats"
+
+#: app/controllers/CControllerPopup.php:52
+msgid "Module edit"
+msgstr ""
 
 #: app/controllers/CControllerModuleEnable.php:91
 msgid "Module enabled"
@@ -16046,6 +16133,10 @@ msgstr "Enganxa sense enllaços externs"
 msgid "Pattern"
 msgstr "Patró"
 
+#: widgets/topitems/includes/CWidgetFieldColumnsListView.php:58
+msgid "Patterns"
+msgstr ""
+
 #: app/views/popup.action.edit.php:238
 msgid "Pause operations for suppressed problems"
 msgstr "Pausa les operacions per problemes esborrats"
@@ -16705,6 +16796,10 @@ msgid_plural "Proxies deleted"
 msgstr[0] "S'ha esborrat el servidor intermediari"
 msgstr[1] "S'han esborrat els servidors intermediaris"
 
+#: app/controllers/CControllerPopup.php:53
+msgid "Proxy edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:239
 #: app/partials/configuration.host.edit.html.php:266
 #: app/views/configuration.host.list.php:153
@@ -16738,6 +16833,10 @@ msgid "Proxy group deleted"
 msgid_plural "Proxy groups deleted"
 msgstr[0] "S'ha esborrat el grup de proxys"
 msgstr[1] "S'han esborrat els grups de proxys"
+
+#: app/controllers/CControllerPopup.php:54
+msgid "Proxy group edit"
+msgstr ""
 
 #: app/controllers/CControllerProxyGroupUpdate.php:74
 msgid "Proxy group updated"
@@ -17847,6 +17946,10 @@ msgid_plural "SLAs disabled"
 msgstr[0] "SLA desactivat"
 msgstr[1] "SLAs desactivats"
 
+#: app/controllers/CControllerPopup.php:58
+msgid "SLA edit"
+msgstr ""
+
 #: app/controllers/CControllerSlaEnable.php:73
 msgid "SLA enabled"
 msgid_plural "SLAs enabled"
@@ -18286,6 +18389,10 @@ msgstr[1] "S'han esborrat els scripts"
 msgid "Script does not have parameters."
 msgstr "L'script no té paràmetres."
 
+#: app/controllers/CControllerPopup.php:56
+msgid "Script edit"
+msgstr ""
+
 #: app/views/administration.timeouts.edit.php:168
 msgid "Script execution"
 msgstr "Execució d'script"
@@ -18498,6 +18605,10 @@ msgstr "Enviar a"
 msgid "Send to back"
 msgstr "Enviar enrere"
 
+#: app/views/popup.operation.edit.php:189
+msgid "Send to media type"
+msgstr ""
+
 #: app/views/popup.operation.edit.php:108
 msgid "Send to user groups"
 msgstr "Enviar als grups d'usuaris"
@@ -18614,6 +18725,10 @@ msgid "Service deleted"
 msgid_plural "Services deleted"
 msgstr[0] "Servei esborrat"
 msgstr[1] "Serveis esborrats"
+
+#: app/controllers/CControllerPopup.php:57
+msgid "Service edit"
+msgstr ""
 
 #: app/views/administration.userrole.edit.php:166
 #: app/views/administration.userrole.edit.php:207
@@ -19257,6 +19372,10 @@ msgstr "Espanyol (es_ES)"
 #: widgets/tophosts/views/column.edit.php:155
 #: widgets/tophosts/views/column.edit.php:162
 msgid "Sparkline"
+msgstr "Sparkline"
+
+#: app/views/mediatype.list.php:83 app/views/mediatype.list.php:91
+msgid "Specific"
 msgstr ""
 
 #: include/classes/helpers/CRoleHelper.php:199
@@ -20006,6 +20125,10 @@ msgid_plural "Templates deleted"
 msgstr[0] "S'ha esborrat la plantilla"
 msgstr[1] "S'han esborrat les plantilles"
 
+#: app/controllers/CControllerPopup.php:59
+msgid "Template edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:259
 #: app/partials/configuration.templategroup.edit.html.php:52
 #: app/views/configuration.templategroup.edit.php:52
@@ -20028,6 +20151,10 @@ msgid "Template group deleted"
 msgid_plural "Template groups deleted"
 msgstr[0] "S'ha esborrat el grup de plantilles"
 msgstr[1] "S'han esborrat els grups de plantilles"
+
+#: app/controllers/CControllerPopup.php:55
+msgid "Template group edit"
+msgstr ""
 
 #: app/controllers/CControllerTemplateGroupUpdate.php:86
 msgid "Template group updated"
@@ -20696,6 +20823,10 @@ msgstr "Avui"
 msgid "Today so far"
 msgstr "El que duem de dia"
 
+#: app/controllers/CControllerPopup.php:60
+msgid "Token edit"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:40
 #: include/views/js/monitoring.sysmaps.js.php:159
 #: include/views/js/monitoring.sysmaps.js.php:684
@@ -20724,6 +20855,10 @@ msgstr "Top N"
 #: widgets/tophosts/Widget.php:34
 msgid "Top hosts"
 msgstr "Els equips top"
+
+#: widgets/topitems/Widget.php:32
+msgid "Top items"
+msgstr ""
 
 #: widgets/toptriggers/Widget.php:29
 msgid "Top triggers"
@@ -20953,6 +21088,10 @@ msgstr[1] "Triggers desactivats"
 msgid "Trigger displaying options"
 msgstr "Opcions de visualització dels triggers"
 
+#: app/controllers/CControllerPopup.php:61
+msgid "Trigger edit"
+msgstr ""
+
 #: app/controllers/CControllerTriggerEnable.php:67
 msgid "Trigger enabled"
 msgid_plural "Triggers enabled"
@@ -21091,6 +21230,10 @@ msgid "Trigger prototype deleted"
 msgid_plural "Trigger prototypes deleted"
 msgstr[0] "Prototip de trigger esborrat"
 msgstr[1] "S'han esborrat els prototips de triggers"
+
+#: app/controllers/CControllerPopup.php:62
+msgid "Trigger prototype edit"
+msgstr ""
 
 #: app/controllers/CControllerTriggerMassupdate.php:219
 #: app/controllers/CControllerTriggerPrototypeDisable.php:76
@@ -24560,6 +24703,18 @@ msgstr "el directori no pot pas ésser buit"
 msgid "discovery rule \"%1$s\" on host \"%2$s\" is not monitored"
 msgstr "la regla de descobriment \"%1$s\" a l'equip \"%2$s\" no es supervisa pas"
 
+#: app/views/mediatype.list.php:78
+msgid "display all actions"
+msgstr ""
+
+#: app/views/mediatype.list.php:80
+msgid "display only actions where All available media types are used in action operation"
+msgstr ""
+
+#: app/views/mediatype.list.php:84
+msgid "display only actions where specific media type is used in action operation"
+msgstr ""
+
 #: app/views/popup.lldoperation.php:65 include/actions.inc.php:27
 #: include/classes/helpers/CCorrelationHelper.php:37
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:164
@@ -24921,7 +25076,7 @@ msgstr "nom d'equip no vàlid"
 
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectHostInventory.php:48
 msgid "invalid inventory field"
-msgstr ""
+msgstr "camp d'inventari no vàlid"
 
 #: include/classes/validators/CHistFunctionValidator.php:82
 #: include/classes/validators/CMathFunctionValidator.php:86
@@ -25249,7 +25404,7 @@ msgstr "monoinc() - Comproveu l'augment continu del valor de l'element (1 - les 
 #: widgets/hostcard/views/widget.view.php:157
 #: widgets/hostcard/views/widget.view.php:338
 msgid "more"
-msgstr ""
+msgstr "més"
 
 #: include/func.inc.php:571
 msgctxt "millisecond short"

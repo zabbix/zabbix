@@ -717,6 +717,10 @@ msgstr[0] "Дію дезактивовано"
 msgstr[1] "Дії дезактивовано"
 msgstr[2] "Дії дезактивовано"
 
+#: app/controllers/CControllerPopup.php:42
+msgid "Action edit"
+msgstr ""
+
 #: app/controllers/CControllerActionEnable.php:84
 msgid "Action enabled"
 msgid_plural "Actions enabled"
@@ -1308,6 +1312,11 @@ msgstr "Вирівняти елементи карти"
 #: widgets/problems/includes/WidgetForm.php:131
 msgid "All"
 msgstr "Все"
+
+#: app/views/mediatype.list.php:79 app/views/mediatype.list.php:81
+#: app/views/mediatype.list.php:90 app/views/popup.operation.edit.php:160
+msgid "All available"
+msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:189
 msgid "All dashboards"
@@ -5194,6 +5203,10 @@ msgstr[0] "Роз'єм вимкнено"
 msgstr[1] "Роз'єми вимкнено"
 msgstr[2] "Роз'єми вимкнено"
 
+#: app/controllers/CControllerPopup.php:43
+msgid "Connector edit"
+msgstr ""
+
 #: app/controllers/CControllerConnectorEnable.php:69
 msgid "Connector enabled"
 msgid_plural "Connectors enabled"
@@ -5355,6 +5368,10 @@ msgstr[2] "Копіювати тригери %1$s"
 #: app/views/popup.token.view.php:51
 msgid "Copy to clipboard"
 msgstr "Копіювати в буфер обміну"
+
+#: app/controllers/CControllerPopup.php:44
+msgid "Correlation edit"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:52
 #: app/controllers/CControllerPopupTriggerExpr.php:693
@@ -7295,6 +7312,10 @@ msgstr[0] "Правило виявлення дезактивовано"
 msgstr[1] "Правила виявлення дезактивовано"
 msgstr[2] "Правила виявлення дезактивовано"
 
+#: app/controllers/CControllerPopup.php:45
+msgid "Discovery rule edit"
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryEnable.php:68 host_discovery.php:580
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
@@ -7341,6 +7362,10 @@ msgstr "Відображення"
 msgid "Display OK triggers for"
 msgstr "Відображати тригери ОК протягом"
 
+#: app/views/mediatype.list.php:75
+msgid "Display actions"
+msgstr ""
+
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
 msgstr "Показати графік"
@@ -7368,6 +7393,10 @@ msgstr "Відображення проблем"
 #: app/partials/monitoring.latest.view.html.php:308
 msgid "Display stacked graph"
 msgstr "Показати стекований графік"
+
+#: widgets/topitems/views/column.edit.php:90
+msgid "Display value as"
+msgstr ""
 
 #: app/controllers/CControllerHintboxActionlist.php:99
 #: app/views/administration.queue.details.php:86
@@ -8678,6 +8707,10 @@ msgstr "Заповнений регіон"
 msgid "Filter"
 msgstr "Фільтр"
 
+#: app/views/mediatype.list.php:76
+msgid "Filter actions by the scope of media type usage:"
+msgstr ""
+
 #: app/views/js/popup.tabfilter.edit.js.php:63
 msgid "Filter deleted"
 msgstr "Фільтр видалено"
@@ -9671,6 +9704,10 @@ msgstr[0] "Вузел мережі дезактивовано"
 msgstr[1] "Вузли мережі дезактивовано"
 msgstr[2] "Вузли мережі дезактивовано"
 
+#: app/controllers/CControllerPopup.php:46
+msgid "Host edit"
+msgstr ""
+
 #: app/controllers/CControllerHostGroupEnable.php:76
 #: app/controllers/CControllerPopupMassupdateHost.php:491
 #: app/controllers/CControllerProxyHostEnable.php:85
@@ -9731,6 +9768,10 @@ msgid_plural "Host groups deleted"
 msgstr[0] "Видалено групу вузлів мережі"
 msgstr[1] "Видалено групи вузлів мережі"
 msgstr[2] "Видалено групи вузлів мережі"
+
+#: app/controllers/CControllerPopup.php:47
+msgid "Host group edit"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:112
 msgid "Host group elements"
@@ -9863,6 +9904,12 @@ msgstr ""
 #: include/hosts.inc.php:284
 msgid "Host networks"
 msgstr "Мережі вузла мережі"
+
+#: widgets/topitems/includes/WidgetForm.php:116
+#: widgets/topitems/includes/WidgetForm.php:128
+#: widgets/topitems/views/widget.edit.php:63
+msgid "Host ordering"
+msgstr ""
 
 #: widgets/hostnavigator/includes/WidgetForm.php:65
 msgid "Host patterns"
@@ -12043,6 +12090,10 @@ msgstr[0] "Елемент даних дезактивовано"
 msgstr[1] "Елементи даних дезактивовано"
 msgstr[2] "Елементи даних дезактивовано"
 
+#: app/controllers/CControllerPopup.php:48
+msgid "Item edit"
+msgstr ""
+
 #: items.php:707
 msgid "Item enabled"
 msgid_plural "Items enabled"
@@ -12079,6 +12130,12 @@ msgstr ""
 msgid "Item not selected"
 msgstr "Елемент даних не вибрано"
 
+#: widgets/topitems/includes/WidgetForm.php:145
+#: widgets/topitems/includes/WidgetForm.php:157
+#: widgets/topitems/views/widget.edit.php:81
+msgid "Item ordering"
+msgstr ""
+
 #: widgets/piechart/views/widget.edit.js.php:203
 #: widgets/svggraph/views/widget.edit.js.php:281
 msgid "Item pattern"
@@ -12112,6 +12169,10 @@ msgid_plural "Item prototypes deleted"
 msgstr[0] "Прототип елемента даних видалено"
 msgstr[1] "Прототип елемента даних видалено"
 msgstr[2] "Прототип елемента даних видалено"
+
+#: app/controllers/CControllerPopup.php:49
+msgid "Item prototype edit"
+msgstr ""
 
 #: app/controllers/CControllerPopupMassupdateItem.php:286
 #: disc_prototypes.php:457 disc_prototypes.php:483 disc_prototypes.php:522
@@ -12637,6 +12698,15 @@ msgstr ""
 msgid "Licensed under"
 msgstr ""
 
+#: widgets/topitems/includes/WidgetForm.php:125
+#: widgets/topitems/includes/WidgetForm.php:154
+msgid "Limit"
+msgstr ""
+
+#: widgets/topitems/views/widget.edit.php:95
+msgid "Limit applies to each \"Item pattern\" separately"
+msgstr ""
+
 #: app/views/administration.gui.edit.php:93
 msgid "Limit for search and filter results"
 msgstr "Ліміт елементів в пошуку/фільтрі"
@@ -13041,6 +13111,10 @@ msgstr "Сервіс"
 #, c-format
 msgid "Maintenance \"%1$s\" already exists."
 msgstr "Сервіс \"%1$s\" вже існує."
+
+#: app/controllers/CControllerPopup.php:50
+msgid "Maintenance edit"
+msgstr ""
 
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:238
@@ -13470,6 +13544,11 @@ msgstr ""
 msgid "Media type \"%1$s\" already exists."
 msgstr "Метод повідомлень \"%1$s\" вже існує."
 
+#: include/classes/api/services/CMediatype.php:878
+#, c-format
+msgid "Media type \"%1$s\" is used by action \"%2$s\"."
+msgstr ""
+
 #: app/controllers/CControllerMediatypeCreate.php:187
 msgid "Media type added"
 msgstr "Метод повідомлень додано"
@@ -13490,6 +13569,10 @@ msgstr[2] "Методи повідомлень дезактивовано"
 
 #: app/views/administration.user.edit.php:359
 msgid "Media type disabled by Administration."
+msgstr ""
+
+#: app/controllers/CControllerPopup.php:51
+msgid "Media type edit"
 msgstr ""
 
 #: app/controllers/CControllerMediatypeEnable.php:87
@@ -13842,6 +13925,10 @@ msgid_plural "Modules disabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+
+#: app/controllers/CControllerPopup.php:52
+msgid "Module edit"
+msgstr ""
 
 #: app/controllers/CControllerModuleEnable.php:91
 msgid "Module enabled"
@@ -16227,6 +16314,10 @@ msgstr "Вставити без зовнішніх зв'язків"
 msgid "Pattern"
 msgstr ""
 
+#: widgets/topitems/includes/CWidgetFieldColumnsListView.php:58
+msgid "Patterns"
+msgstr ""
+
 #: app/views/popup.action.edit.php:238
 msgid "Pause operations for suppressed problems"
 msgstr "Призупиняти операції для подавлених проблем"
@@ -16887,6 +16978,10 @@ msgstr[0] "Проксі видалено"
 msgstr[1] "Проксі видалено"
 msgstr[2] "Проксі видалено"
 
+#: app/controllers/CControllerPopup.php:53
+msgid "Proxy edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:239
 #: app/partials/configuration.host.edit.html.php:266
 #: app/views/configuration.host.list.php:153
@@ -16921,6 +17016,10 @@ msgid_plural "Proxy groups deleted"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+
+#: app/controllers/CControllerPopup.php:54
+msgid "Proxy group edit"
+msgstr ""
 
 #: app/controllers/CControllerProxyGroupUpdate.php:74
 msgid "Proxy group updated"
@@ -18033,6 +18132,10 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
+#: app/controllers/CControllerPopup.php:58
+msgid "SLA edit"
+msgstr ""
+
 #: app/controllers/CControllerSlaEnable.php:73
 msgid "SLA enabled"
 msgid_plural "SLAs enabled"
@@ -18477,6 +18580,10 @@ msgstr[2] "Скрипти видалено"
 msgid "Script does not have parameters."
 msgstr ""
 
+#: app/controllers/CControllerPopup.php:56
+msgid "Script edit"
+msgstr ""
+
 #: app/views/administration.timeouts.edit.php:168
 msgid "Script execution"
 msgstr ""
@@ -18689,6 +18796,10 @@ msgstr "Надіслати"
 msgid "Send to back"
 msgstr "Перемістити на самий зад"
 
+#: app/views/popup.operation.edit.php:189
+msgid "Send to media type"
+msgstr ""
+
 #: app/views/popup.operation.edit.php:108
 msgid "Send to user groups"
 msgstr ""
@@ -18807,6 +18918,10 @@ msgid_plural "Services deleted"
 msgstr[0] "Послугу видалено"
 msgstr[1] "Послугу видалено"
 msgstr[2] "Послугу видалено"
+
+#: app/controllers/CControllerPopup.php:57
+msgid "Service edit"
+msgstr ""
 
 #: app/views/administration.userrole.edit.php:166
 #: app/views/administration.userrole.edit.php:207
@@ -19450,6 +19565,10 @@ msgstr "Іспанська (es_ES)"
 #: widgets/tophosts/views/column.edit.php:155
 #: widgets/tophosts/views/column.edit.php:162
 msgid "Sparkline"
+msgstr ""
+
+#: app/views/mediatype.list.php:83 app/views/mediatype.list.php:91
+msgid "Specific"
 msgstr ""
 
 #: include/classes/helpers/CRoleHelper.php:199
@@ -20201,6 +20320,10 @@ msgstr[0] "Шаблон видалено"
 msgstr[1] "Шаблон видалено"
 msgstr[2] "Шаблон видалено"
 
+#: app/controllers/CControllerPopup.php:59
+msgid "Template edit"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:259
 #: app/partials/configuration.templategroup.edit.html.php:52
 #: app/views/configuration.templategroup.edit.php:52
@@ -20224,6 +20347,10 @@ msgid_plural "Template groups deleted"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+
+#: app/controllers/CControllerPopup.php:55
+msgid "Template group edit"
+msgstr ""
 
 #: app/controllers/CControllerTemplateGroupUpdate.php:86
 msgid "Template group updated"
@@ -20897,6 +21024,10 @@ msgstr "Сьогодні"
 msgid "Today so far"
 msgstr "Сьогодні по нині"
 
+#: app/controllers/CControllerPopup.php:60
+msgid "Token edit"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:40
 #: include/views/js/monitoring.sysmaps.js.php:159
 #: include/views/js/monitoring.sysmaps.js.php:684
@@ -20924,6 +21055,10 @@ msgstr ""
 
 #: widgets/tophosts/Widget.php:34
 msgid "Top hosts"
+msgstr ""
+
+#: widgets/topitems/Widget.php:32
+msgid "Top items"
 msgstr ""
 
 #: widgets/toptriggers/Widget.php:29
@@ -21158,6 +21293,10 @@ msgstr[2] "Тригери дезактивовано"
 msgid "Trigger displaying options"
 msgstr "Параметри відображення тригера"
 
+#: app/controllers/CControllerPopup.php:61
+msgid "Trigger edit"
+msgstr ""
+
 #: app/controllers/CControllerTriggerEnable.php:67
 msgid "Trigger enabled"
 msgid_plural "Triggers enabled"
@@ -21299,6 +21438,10 @@ msgid_plural "Trigger prototypes deleted"
 msgstr[0] "Прототип тригера видалено"
 msgstr[1] "Прототип тригера видалено"
 msgstr[2] "Прототип тригера видалено"
+
+#: app/controllers/CControllerPopup.php:62
+msgid "Trigger prototype edit"
+msgstr ""
 
 #: app/controllers/CControllerTriggerMassupdate.php:219
 #: app/controllers/CControllerTriggerPrototypeDisable.php:76
@@ -24776,6 +24919,18 @@ msgstr ""
 #: include/classes/api/services/CTask.php:562
 #, c-format
 msgid "discovery rule \"%1$s\" on host \"%2$s\" is not monitored"
+msgstr ""
+
+#: app/views/mediatype.list.php:78
+msgid "display all actions"
+msgstr ""
+
+#: app/views/mediatype.list.php:80
+msgid "display only actions where All available media types are used in action operation"
+msgstr ""
+
+#: app/views/mediatype.list.php:84
+msgid "display only actions where specific media type is used in action operation"
 msgstr ""
 
 #: app/views/popup.lldoperation.php:65 include/actions.inc.php:27
