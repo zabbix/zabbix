@@ -318,7 +318,7 @@ zbx_odbc_data_source_t	*zbx_odbc_connect(const char *dsn, const char *connection
 		{
 			rc = SQLAllocHandle(SQL_HANDLE_DBC, data_source->henv, &data_source->hdbc);
 
-			if(SUCCEED == zbx_odbc_diag(SQL_HANDLE_ENV, data_source->henv, rc, &diag))
+			if (SUCCEED == zbx_odbc_diag(SQL_HANDLE_ENV, data_source->henv, rc, &diag))
 			{
 				rc = SQLSetConnectAttr(data_source->hdbc, (SQLINTEGER)SQL_LOGIN_TIMEOUT,
 						(SQLPOINTER)(intptr_t)timeout, (SQLINTEGER)0);
@@ -432,7 +432,7 @@ zbx_odbc_query_result_t	*zbx_odbc_select(const zbx_odbc_data_source_t *data_sour
 	zbx_odbc_query_result_t	*query_result = NULL;
 	SQLRETURN		rc;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In %s() query:'%s' timeout:%d", __func__, query, timeout);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() query:'%s'", __func__, query);
 
 	if (NULL == query || '\0' == *query)
 	{
@@ -491,7 +491,7 @@ zbx_odbc_query_result_t	*zbx_odbc_select(const zbx_odbc_data_source_t *data_sour
 out:
 	zbx_free(diag);
 
-	zabbix_log(LOG_LEVEL_WARNING, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return query_result;
 }
