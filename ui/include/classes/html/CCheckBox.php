@@ -67,7 +67,7 @@ class CCheckBox extends CInput {
 	private $label_position = self::LABEL_POSITION_RIGHT;
 
 	/**
-	 * Checkbox title
+	 * Checkbox title.
 	 *
 	 * @var string|null
 	 */
