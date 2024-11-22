@@ -71,6 +71,9 @@ static int	send_heartbeat(void)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send heartbeat message to server at \"%s\": %s", sock.peer,
 				error);
+
+		/* initiate failover on exchange failure */
+		zbx_addrs_failover(&zbx_addrs);
 	}
 
 	disconnect_server(&sock);

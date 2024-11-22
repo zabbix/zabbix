@@ -21,6 +21,7 @@ package smart
 
 import (
 	"encoding/json"
+	"runtime"
 	"strings"
 
 	"golang.zabbix.com/sdk/conf"
@@ -53,8 +54,9 @@ type Options struct {
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	options Options
-	ctl     SmartController
+	options  Options
+	ctl      SmartController
+	cpuCount int
 }
 
 func init() {
@@ -64,9 +66,17 @@ func init() {
 		"smart.disk.get", "Returns JSON data of smart device.",
 		"smart.attribute.discovery", "Returns JSON array of smart device attributes.",
 	)
+
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
+
+	cpuCount := runtime.NumCPU()
+	if cpuCount < 1 {
+		cpuCount = 1
+	}
+
+	impl.cpuCount = cpuCount
 }
 
 // Configure -

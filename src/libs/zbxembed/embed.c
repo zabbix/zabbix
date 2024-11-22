@@ -253,6 +253,19 @@ fail:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: push result string on duktape value stack                         *
+ *                                                                            *
+ * Comments: The string might be modified by this function.                   *
+ *                                                                            *
+ ******************************************************************************/
+void	es_push_result_string(duk_context *ctx, char *str, size_t size)
+{
+	zbx_replace_invalid_utf8(str);
+	duk_push_lstring(ctx, str, size);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: timeout checking callback                                         *
  *                                                                            *
  ******************************************************************************/
@@ -825,15 +838,14 @@ zbx_es_env_t	*zbx_es_get_env(duk_context *ctx)
  *                                                                            *
  * Purpose: attach data pointer to current object                             *
  *                                                                            *
- * Comments: The object must be on the top of the stack (-1)                  *
- *           This function must be used only from object constructor          *
+ * Comments: This function must be used only from object constructor          *
  *                                                                            *
  ******************************************************************************/
-void	es_obj_attach_data(zbx_es_env_t *env, void *data)
+void	es_obj_attach_data(zbx_es_env_t *env, void *objptr, void *data)
 {
 	zbx_es_obj_data_t	obj_local;
 
-	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
+	obj_local.heapptr = objptr;
 
 	obj_local.data = data;
 	zbx_hashset_insert(&env->objmap, &obj_local, sizeof(obj_local));
@@ -868,8 +880,8 @@ void	*es_obj_get_data(zbx_es_env_t *env)
  *                                                                            *
  * Purpose: detach data pointer from current object                           *
  *                                                                            *
- * Parameters: env - [IN]                                                     *
- *             ref - [IN] pointer reference, returned by es_put_ptr()         *
+ * Parameters: env    - [IN]                                                  *
+ *             objptr - [IN] object js heap pointer                           *
  *                                                                            *
  * Return value: detached data pointer                                        *
  *                                                                            *
@@ -879,18 +891,23 @@ void	*es_obj_get_data(zbx_es_env_t *env)
  *           This function must be used only from object destructor.          *
  *                                                                            *
  ******************************************************************************/
-void	*es_obj_detach_data(zbx_es_env_t *env)
+void	*es_obj_detach_data(zbx_es_env_t *env, void *objptr)
 {
-	zbx_es_obj_data_t	obj_local, *obj;
-	void			*data;
+	if (NULL != objptr)
+	{
+		zbx_es_obj_data_t	obj_local, *obj;
+		void			*data;
 
-	obj_local.heapptr = duk_require_heapptr(env->ctx, -1);
+		obj_local.heapptr = objptr;
 
-	if (NULL == (obj = zbx_hashset_search(&env->objmap, &obj_local)))
+		if (NULL == (obj = zbx_hashset_search(&env->objmap, &obj_local)))
+			return NULL;
+
+		data = obj->data;
+		zbx_hashset_remove_direct(&env->objmap, obj);
+
+		return data;
+	}
+	else
 		return NULL;
-
-	data = obj->data;
-	zbx_hashset_remove_direct(&env->objmap, obj);
-
-	return data;
 }

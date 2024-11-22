@@ -66,7 +66,8 @@ SERVICE_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_tsdb_recalc_time_period \
 	-Wl,--wrap=zbx_config_get \
 	-Wl,--wrap=zbx_rtc_subscribe \
-	-Wl,--wrap=zbx_rtc_notify_finished_sync
+	-Wl,--wrap=zbx_rtc_notify_finished_sync \
+	-Wl,--wrap=zbx_dc_set_itservices_num
 	
 # service_get_rootcause_eventids
 

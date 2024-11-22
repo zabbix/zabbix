@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[6.0.34rc1])
+AC_INIT([Zabbix],[6.0.37rc1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -1116,6 +1116,7 @@ AC_DEFINE_UNQUOTED([ARCH], "${ARCH}", [Define to OS name for code managing])
 AC_SUBST(ARCH)
 
 AC_CHECK_SIZEOF([void *])
+AC_CHECK_SIZEOF([size_t])
 
 dnl *****************************************************************
 dnl *                                                               *

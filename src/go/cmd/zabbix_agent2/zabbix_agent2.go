@@ -407,6 +407,10 @@ func main() {
 			fatalExit("cannot initialize user parameters", err)
 		}
 
+		if err = loadOSDependentItems(); err != nil {
+			fatalExit("cannot load os dependent items", err)
+		}
+
 		var m *scheduler.Manager
 
 		if m, err = scheduler.NewManager(&agent.Options, systemOpt); err != nil {

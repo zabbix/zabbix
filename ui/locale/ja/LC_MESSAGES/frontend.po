@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2024-04-25 07:50+0000\n"
+"PO-Revision-Date: 2024-11-18 07:27+0000\n"
 "Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -1398,7 +1398,7 @@ msgstr "試行回数"
 
 #: app/views/administration.geomaps.edit.php:86
 msgid "Attribution text"
-msgstr ""
+msgstr "帰属情報"
 
 #: app/views/administration.housekeeping.edit.php:250
 #: include/classes/helpers/CMenuHelper.php:148
@@ -1707,6 +1707,14 @@ msgstr "境界タイプ"
 #: include/views/js/monitoring.sysmaps.js.php:575
 msgid "Border width"
 msgstr "境界幅"
+
+#: include/classes/api/services/CHost.php:1314
+msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1321
+msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
+msgstr ""
 
 #: app/controllers/CControllerUserUpdateGeneral.php:106
 msgid "Both passwords must be equal."
@@ -8458,7 +8466,7 @@ msgstr "このメッセージが間違っている場合は、必要な権限を
 
 #: app/views/administration.miscconfig.edit.php:158
 msgid "Iframe sandboxing exceptions"
-msgstr "Iframeサンドボックスの例外"
+msgstr "iframeサンドボックスの例外"
 
 #: include/classes/helpers/CServiceHelper.php:151
 msgid "Ignore this service"
@@ -9445,7 +9453,7 @@ msgstr "\"%1$s\"フィールドのための値が正しくありません。"
 #: include/validate.inc.php:364
 #, c-format
 msgid "Incorrect value for field \"%1$s\": %2$s."
-msgstr "フィールド\"%1$s\": %2$sの値が正しくありません。"
+msgstr "フィールド\"%1$s\"の値が正しくありません: %2$s。"
 
 #: include/classes/helpers/CServiceHelper.php:149
 msgid "Increase by"
@@ -16548,7 +16556,7 @@ msgstr "ソースの種類"
 
 #: include/locales.inc.php:62
 msgid "Spanish (es_ES)"
-msgstr "スペイン語(es_ES)"
+msgstr "スペイン語 (es_ES)"
 
 #: include/classes/helpers/CRoleHelper.php:176
 msgid "Specified role was not found."
@@ -18797,7 +18805,7 @@ msgstr "アップタイム/ダウンタイム"
 
 #: app/views/administration.miscconfig.edit.php:115
 msgid "Use X-Frame-Options HTTP header"
-msgstr ""
+msgstr "X-Frame-Options HTTPヘッダを使用する"
 
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
@@ -18900,6 +18908,11 @@ msgstr "ユーザーエージェント文字列"
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr "ユーザーは無効のグループやGUIアクセスが無効のグループに自分自身を追加できません。"
 
+#: include/classes/api/services/CUserGroup.php:534
+#: include/classes/api/services/CUser.php:756
+msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
+msgstr ""
+
 #: app/views/administration.user.edit.php:421
 #: include/classes/api/services/CUser.php:951
 msgid "User cannot change own role."
@@ -18996,6 +19009,10 @@ msgstr "ユーザーグループ"
 #: include/classes/api/services/CUser.php:1225
 msgid "User is not allowed to delete himself."
 msgstr "自身のユーザーアカウントは削除できません。"
+
+#: include/classes/api/services/CUser.php:1291
+msgid "User is not allowed to delete oneself."
+msgstr ""
 
 #: include/classes/widgets/views/widget.item.form.view.php:62
 msgid "User macros"
@@ -20538,6 +20555,14 @@ msgstr "英字の大文字と小文字"
 #: app/views/administration.geomaps.edit.php:47
 msgid "and"
 msgstr "と"
+
+#: include/classes/api/helpers/CApiPskHelper.php:32
+#: include/classes/api/helpers/CApiPskHelper.php:62
+#: include/classes/api/helpers/CApiPskHelper.php:78
+#: include/classes/api/helpers/CApiPskHelper.php:111
+#: include/classes/api/helpers/CApiPskHelper.php:127
+msgid "another tls_psk value is already associated with given tls_psk_identity"
+msgstr ""
 
 #: include/views/monitoring.history.php:186
 msgid "as Blue"

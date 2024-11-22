@@ -570,7 +570,7 @@ void	zbx_preprocessor_pack_dep_request(const zbx_variant_t *value, const zbx_tim
 		fields_num += deps[i].history.values_num * 5;
 	}
 
-	fields = (zbx_packed_field_t *)zbx_malloc(NULL, (size_t)fields_num * sizeof(zbx_packed_field_t));
+	fields = (zbx_packed_field_t *)zbx_calloc(NULL, (size_t)fields_num, sizeof(zbx_packed_field_t));
 
 	offset = fields;
 	offset += preprocessor_pack_variant(offset, value);

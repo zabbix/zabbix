@@ -2526,6 +2526,7 @@ class CMacrosResolverGeneral {
 			}
 		}
 
+		$user_macro_parser_with_regex = new CUserMacroParser(['allow_regex' => true]);
 		$user_macro_parser = new CUserMacroParser();
 
 		/*
@@ -2555,14 +2556,14 @@ class CMacrosResolverGeneral {
 				]);
 
 				foreach ($db_host_macros as $db_host_macro) {
-					if ($user_macro_parser->parse($db_host_macro['macro']) != CParser::PARSE_SUCCESS) {
+					if ($user_macro_parser_with_regex->parse($db_host_macro['macro']) != CParser::PARSE_SUCCESS) {
 						continue;
 					}
 
 					$hostid = $db_host_macro['hostid'];
-					$macro = $user_macro_parser->getMacro();
-					$context = $user_macro_parser->getContext();
-					$regex = $user_macro_parser->getRegex();
+					$macro = $user_macro_parser_with_regex->getMacro();
+					$context = $user_macro_parser_with_regex->getContext();
+					$regex = $user_macro_parser_with_regex->getRegex();
 					$value = self::getMacroValue($db_host_macro);
 
 					if (!array_key_exists($hostid, $host_macros)) {
@@ -2660,10 +2661,10 @@ class CMacrosResolverGeneral {
 			$global_macros = [];
 
 			foreach ($db_global_macros as $db_global_macro) {
-				if ($user_macro_parser->parse($db_global_macro['macro']) == CParser::PARSE_SUCCESS) {
-					$macro = $user_macro_parser->getMacro();
-					$context = $user_macro_parser->getContext();
-					$regex = $user_macro_parser->getRegex();
+				if ($user_macro_parser_with_regex->parse($db_global_macro['macro']) == CParser::PARSE_SUCCESS) {
+					$macro = $user_macro_parser_with_regex->getMacro();
+					$context = $user_macro_parser_with_regex->getContext();
+					$regex = $user_macro_parser_with_regex->getRegex();
 					$value = self::getMacroValue($db_global_macro);
 
 					if (!array_key_exists($macro, $global_macros)) {
@@ -2697,7 +2698,7 @@ class CMacrosResolverGeneral {
 							}
 							elseif ($context !== null && count($global_macros[$macro]['regex'])) {
 								foreach ($global_macros[$macro]['regex'] as $regex => $val) {
-									if (preg_match('/'.strtr(trim($regex, '/'), ['/' => '\\/']).'/', $context) === 1) {
+									if (preg_match('/'.self::handleSlashEscaping($regex).'/', $context) === 1) {
 										$value['value'] = $val;
 										break;
 									}
@@ -2774,7 +2775,7 @@ class CMacrosResolverGeneral {
 				// Searching context coincidence, if regex array not empty.
 				elseif ($context !== null && count($host_macros[$hostid][$macro]['regex'])) {
 					foreach ($host_macros[$hostid][$macro]['regex'] as $regex => $val) {
-						if (preg_match('/'.strtr(trim($regex, '/'), ['/' => '\\/']).'/', $context) === 1) {
+						if (preg_match('/'.self::handleSlashEscaping($regex).'/', $context) === 1) {
 							return [
 								'value' => $val,
 								'value_default' => $value_default
@@ -2818,6 +2819,34 @@ class CMacrosResolverGeneral {
 		}
 
 		return ['value' => null, 'value_default' => $value_default];
+	}
+
+	/**
+	 * Escape slashes in the regular expression based on preceding backslashes.
+	 *
+	 * @param string $regex
+	 *
+	 * @return string
+	 */
+	private static function handleSlashEscaping(string $regex): string {
+		$formatted_regex = '';
+		$backslash_count = 0;
+
+		for ($p = 0; isset($regex[$p]); $p++) {
+			if ($regex[$p] === '\\') {
+				$backslash_count++;
+			}
+			else {
+				if ($regex[$p] === '/' && $backslash_count % 2 == 0) {
+					$formatted_regex .= '\\';
+				}
+				$backslash_count = 0;
+			}
+
+			$formatted_regex .= $regex[$p];
+		}
+
+		return $formatted_regex;
 	}
 
 	/**

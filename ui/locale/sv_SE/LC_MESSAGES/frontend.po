@@ -1732,6 +1732,14 @@ msgstr ""
 msgid "Border width"
 msgstr ""
 
+#: include/classes/api/services/CHost.php:1314
+msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1321
+msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
+msgstr ""
+
 #: app/controllers/CControllerUserUpdateGeneral.php:106
 msgid "Both passwords must be equal."
 msgstr ""
@@ -19020,6 +19028,11 @@ msgstr ""
 msgid "User cannot add himself to a disabled group or a group with disabled GUI access."
 msgstr ""
 
+#: include/classes/api/services/CUserGroup.php:534
+#: include/classes/api/services/CUser.php:756
+msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
+msgstr ""
+
 #: app/views/administration.user.edit.php:421
 #: include/classes/api/services/CUser.php:951
 msgid "User cannot change own role."
@@ -19118,6 +19131,10 @@ msgstr "Användargrupper"
 
 #: include/classes/api/services/CUser.php:1225
 msgid "User is not allowed to delete himself."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:1291
+msgid "User is not allowed to delete oneself."
 msgstr ""
 
 #: include/classes/widgets/views/widget.item.form.view.php:62
@@ -20661,6 +20678,14 @@ msgstr ""
 
 #: app/views/administration.geomaps.edit.php:47
 msgid "and"
+msgstr ""
+
+#: include/classes/api/helpers/CApiPskHelper.php:32
+#: include/classes/api/helpers/CApiPskHelper.php:62
+#: include/classes/api/helpers/CApiPskHelper.php:78
+#: include/classes/api/helpers/CApiPskHelper.php:111
+#: include/classes/api/helpers/CApiPskHelper.php:127
+msgid "another tls_psk value is already associated with given tls_psk_identity"
 msgstr ""
 
 #: include/views/monitoring.history.php:186

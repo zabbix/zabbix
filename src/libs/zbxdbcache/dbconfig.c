@@ -7327,6 +7327,8 @@ int	init_configuration_cache(char **error)
 	else
 		config->session_token = NULL;
 
+	config->itservices_num = 0;
+
 #undef CREATE_HASHSET
 #undef CREATE_HASHSET_EXT
 out:
@@ -13938,6 +13940,25 @@ int	zbx_dc_maintenance_has_tags(void)
 
 	return ret;
 }
+
+void	zbx_dc_set_itservices_num(int num)
+{
+	WRLOCK_CACHE;
+	config->itservices_num = num;
+	UNLOCK_CACHE;
+}
+
+int	zbx_dc_get_itservices_num(void)
+{
+	int	num;
+
+	RDLOCK_CACHE;
+	num = config->itservices_num;
+	UNLOCK_CACHE;
+
+	return num;
+}
+
 
 #ifdef HAVE_TESTS
 #	include "../../../tests/libs/zbxdbcache/dc_item_poller_type_update_test.c"

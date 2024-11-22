@@ -1701,7 +1701,8 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Cancel"]');
 		$this->zbxTestWaitUntilElementClickable(WebDriverBy::id('add'));
 
-		$this->zbxTestDoubleClickBeforeMessage('add', 'filter_name');
+		$this->query('xpath://div[contains(@class, tfoot-buttons)]/button[@id="add"]')->waitUntilClickable()->one()->click();
+		$this->assertMessage(TEST_GOOD);
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action added');
 
 		$sql = "SELECT actionid FROM actions WHERE name='action test'";

@@ -137,7 +137,7 @@ static duk_ret_t	es_httprequest_dtor(duk_context *ctx)
 	if (NULL == (env = zbx_es_get_env(ctx)))
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot access internal environment");
 
-	if (NULL != (request = (zbx_es_httprequest_t *)es_obj_detach_data(env)))
+	if (NULL != (request = (zbx_es_httprequest_t *)es_obj_detach_data(env, duk_require_heapptr(ctx, -1))))
 	{
 		env->http_req_objects--;
 		es_httprequest_free(request);
@@ -158,6 +158,7 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 	CURLcode		err;
 	zbx_es_env_t		*env;
 	int			err_index = -1;
+	void			*objptr;
 
 	if (!duk_is_constructor_call(ctx))
 		return DUK_RET_TYPE_ERROR;
@@ -169,10 +170,11 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 		return duk_error(ctx, DUK_RET_EVAL_ERROR, "maximum count of HttpRequest objects was reached");
 
 	duk_push_this(ctx);
+	objptr = duk_require_heapptr(ctx, -1);
 
 	request = (zbx_es_httprequest_t *)zbx_malloc(NULL, sizeof(zbx_es_httprequest_t));
 	memset(request, 0, sizeof(zbx_es_httprequest_t));
-	es_obj_attach_data(env, request);
+	es_obj_attach_data(env, objptr, request);
 
 	if (NULL == (request->handle = curl_easy_init()))
 	{
@@ -197,7 +199,7 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 out:
 	if (-1 != err_index)
 	{
-		es_obj_detach_data(env);
+		es_obj_detach_data(env, objptr);
 
 		if (NULL != request->handle)
 			curl_easy_cleanup(request->handle);
@@ -415,6 +417,7 @@ out:
 	if (-1 != err_index)
 		return duk_throw(ctx);
 
+	/* request->data already contains valid utf-8 string, sto it can be pushed directly */
 	duk_push_lstring(ctx, request->data, request->data_offset);
 
 	return 1;
@@ -615,7 +618,7 @@ static void	es_put_header(duk_context *ctx, int idx, char *header)
 	if (FAIL == parse_header(header, &value))
 		return;
 
-	duk_push_string(ctx, value);
+	es_push_result_string(ctx, value, strlen(value));
 
 	/* duk_put_prop_string() throws error on failure, no need to check return code */
 	(void)duk_put_prop_string(ctx, idx, header);
@@ -731,7 +734,7 @@ static duk_ret_t	get_headers_as_arrays(duk_context *ctx, zbx_es_httprequest_t *r
 
 		for (j = 0; j < h->values.values_num; j++)
 		{
-			duk_push_string(ctx, h->values.values[j]);
+			es_push_result_string(ctx, h->values.values[j], strlen(h->values.values[j]));
 			duk_put_prop_index(ctx, arr_idx, (duk_uarridx_t)j);
 		}
 

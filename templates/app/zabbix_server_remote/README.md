@@ -28,7 +28,6 @@ Specify the address of the remote Zabbix server by changing `{$ZABBIX.SERVER.ADD
 |----|-----------|-------|
 |{$ZABBIX.SERVER.ADDRESS}|<p>IP/DNS/network mask list of servers to be remotely queried (default is 127.0.0.1).</p>||
 |{$ZABBIX.SERVER.PORT}|<p>Port of server to be remotely queried (default is 10051).</p>||
-|{$PROXY.LAST_SEEN.MAX}|<p>The maximum number of seconds that Zabbix proxy has not been seen.</p>|`600`|
 |{$ZABBIX.SERVER.NODATA_TIMEOUT}|<p>The time threshold after which statistics are considered unavailable. Used in trigger expression.</p>|`5m`|
 |{$ZABBIX.SERVER.UTIL.MAX}|<p>Default maximum threshold for percentage utilization triggers (use macro context for specification).</p>|`75`|
 |{$ZABBIX.SERVER.UTIL.MIN}|<p>Default minimum threshold for percentage utilization triggers (use macro context for specification).</p>|`65`|

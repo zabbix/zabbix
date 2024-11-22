@@ -270,7 +270,7 @@ static zbx_uint32_t	preprocessor_create_task(zbx_preprocessing_manager_t *manage
 	zbx_vector_ptr_t	*phistory;
 
 	if (ITEM_STATE_NOTSUPPORTED == request->value.state)
-		zbx_variant_set_str(&value, "");
+		zbx_variant_set_none(&value);
 	else
 		preprocessing_ar_to_variant(request->value.result, &value);
 
@@ -1046,10 +1046,10 @@ static void	preprocessor_enqueue_dependent(zbx_preprocessing_manager_t *manager,
 				0 != item->dep_itemids_num)
 		{
 			zbx_preprocessing_dep_request_t	*dep_request;
-			zbx_variant_t			value;
+			zbx_variant_t			value = {0};
 			zbx_list_item_t			*enqueued_at;
 
-			dep_request = zbx_malloc(NULL, sizeof(zbx_preprocessing_dep_request_t));
+			dep_request = zbx_calloc(NULL, 1, sizeof(zbx_preprocessing_dep_request_t));
 			dep_request->base.kind = ZBX_PREPROC_DEPS;
 			dep_request->base.state = REQUEST_STATE_QUEUED;
 			dep_request->base.pending = NULL;
