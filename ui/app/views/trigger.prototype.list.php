@@ -102,6 +102,7 @@ foreach ($data['triggers'] as $trigger) {
 				$trigger_dependencies[] = (new CLink($dep_trigger_description))
 					->addClass(triggerIndicatorStyle($dep_trigger['status']))
 					->addClass('js-trigger-prototype-edit')
+					->addClass(ZBX_STYLE_LINK_ALT)
 					->setAttribute('data-triggerid', $dep_trigger['triggerid']);
 			}
 			elseif ($dep_trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
