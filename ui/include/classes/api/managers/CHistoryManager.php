@@ -729,12 +729,16 @@ class CHistoryManager {
 					$row = [
 						'itemid' => $item['key'],
 						'tick' => (int) $point['key'],
-						'count' => $point['doc_count'],
+						'num' => $point['doc_count'],
 						'clock' => (int) $point['clock']['value_as_string']
 					];
 
-					if ($function == AGGREGATE_FIRST || $function == AGGREGATE_LAST) {
+					if ($function == AGGREGATE_COUNT) {
+						$row['value'] = $point['doc_count'];
+					}
+					elseif ($function == AGGREGATE_FIRST || $function == AGGREGATE_LAST) {
 						$row['value'] = $point['value']['hits']['hits'][0]['_source']['value'];
+						$row['ns'] = $point['value']['hits']['hits'][0]['_source']['ns'];
 					}
 					else {
 						$row['value'] = array_key_exists('value', $point) ? $point['value']['value'] : null;
@@ -783,19 +787,19 @@ class CHistoryManager {
 				if ($source === 'history') {
 					switch ($function) {
 						case AGGREGATE_MIN:
-							$sql_select[] = 'MIN(value) AS value, MAX(clock) AS clock';
+							$sql_select[] = 'MIN(value) AS value,MAX(clock) AS clock';
 							break;
 						case AGGREGATE_MAX:
-							$sql_select[] = 'MAX(value) AS value, MAX(clock) AS clock';
+							$sql_select[] = 'MAX(value) AS value,MAX(clock) AS clock';
 							break;
 						case AGGREGATE_AVG:
-							$sql_select[] = 'AVG(value) AS value, MAX(clock) AS clock';
+							$sql_select[] = 'AVG(value) AS value,MAX(clock) AS clock,COUNT(*) AS num';
 							break;
 						case AGGREGATE_COUNT:
-							$sql_select[] = 'COUNT(*) AS count, MAX(clock) AS clock';
+							$sql_select[] = 'COUNT(*) AS value,MAX(clock) AS clock';
 							break;
 						case AGGREGATE_SUM:
-							$sql_select[] = 'SUM(value) AS value, MAX(clock) AS clock';
+							$sql_select[] = 'SUM(value) AS value,MAX(clock) AS clock';
 							break;
 						case AGGREGATE_FIRST:
 							$sql_select[] = 'MIN(clock) AS clock';
@@ -813,19 +817,19 @@ class CHistoryManager {
 				else {
 					switch ($function) {
 						case AGGREGATE_MIN:
-							$sql_select[] = 'MIN(value_min) AS value, MAX(clock) AS clock';
+							$sql_select[] = 'MIN(value_min) AS value,MAX(clock) AS clock';
 							break;
 						case AGGREGATE_MAX:
-							$sql_select[] = 'MAX(value_max) AS value, MAX(clock) AS clock';
+							$sql_select[] = 'MAX(value_max) AS value,MAX(clock) AS clock';
 							break;
 						case AGGREGATE_AVG:
-							$sql_select[] = 'AVG(value_avg) AS value, MAX(clock) AS clock';
+							$sql_select[] = 'AVG(value_avg) AS value,MAX(clock) AS clock,SUM(num) AS num';
 							break;
 						case AGGREGATE_COUNT:
-							$sql_select[] = 'SUM(num) AS count, MAX(clock) AS clock';
+							$sql_select[] = 'SUM(num) AS value,MAX(clock) AS clock';
 							break;
 						case AGGREGATE_SUM:
-							$sql_select[] = 'SUM(value_avg * num) AS value, MAX(clock) AS clock';
+							$sql_select[] = 'SUM(value_avg * num) AS value,MAX(clock) AS clock';
 							break;
 						case AGGREGATE_FIRST:
 							$sql_select[] = 'MIN(clock) AS clock';
@@ -851,7 +855,7 @@ class CHistoryManager {
 				if ($function == AGGREGATE_FIRST || $function == AGGREGATE_LAST) {
 					if ($source === 'history') {
 						$sql =
-							'SELECT h.itemid,h.value,h.clock,s.tick'.
+							'SELECT h.itemid,h.value,h.clock,h.ns,s.tick'.
 							' FROM '.$sql_from.' h'.
 							' JOIN ('.
 								'SELECT h2.itemid,h2.clock,'.($function == AGGREGATE_FIRST ? 'MIN' : 'MAX').'(h2.ns) AS ns,s2.tick'.
@@ -862,7 +866,7 @@ class CHistoryManager {
 					}
 					else {
 						$sql =
-							'SELECT DISTINCT h.itemid,h.value_avg AS value,h.clock,s.tick'.
+							'SELECT DISTINCT h.itemid,h.value_avg AS value,h.clock,0 AS ns,s.tick'.
 							' FROM '.$sql_from.' h'.
 							' JOIN ('.$sql.') s ON h.itemid=s.itemid AND h.clock=s.clock';
 					}
@@ -904,7 +908,7 @@ class CHistoryManager {
 								$result[$itemid]['data'][] = [
 									'itemid' => (string) $itemid,
 									'tick' => (string) $tick,
-									'count' => '0',
+									'value' => '0',
 									'clock' => (string) $tick
 								];
 							}

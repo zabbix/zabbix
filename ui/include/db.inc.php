@@ -479,7 +479,7 @@ function DBfetch($cursor, $convertNulls = true) {
 }
 
 function zbx_sql_mod($x, $y) {
-	return ' MOD('.$x.','.$y.')';
+	return 'MOD('.$x.','.$y.')';
 }
 
 function get_dbid($table, $field) {
