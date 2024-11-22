@@ -3,6 +3,7 @@ Changes for 7.2.0rc2
 New features:
 
 Bug fixes:
+A.F....... [ZBX-22350] fixed aggregations for dataset in SVG graph widget (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 7.2.0rc1
@@ -115,6 +116,7 @@ Changes for 7.0.7rc1
 New features:
 
 Bug fixes:
+A.F....... [ZBX-22350] fixed aggregations for dataset in SVG graph widget (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.6
