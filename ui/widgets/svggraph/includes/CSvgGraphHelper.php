@@ -748,11 +748,7 @@ class CSvgGraphHelper {
 		unset($metric);
 
 		foreach ($metrics as &$metric) {
-			if ($metric['options']['aggregate_function'] == AGGREGATE_NONE) {
-				continue;
-			}
-
-			if (!$metric['items']) {
+			if ($metric['options']['aggregate_function'] == AGGREGATE_NONE || !$metric['items']) {
 				continue;
 			}
 
@@ -761,46 +757,103 @@ class CSvgGraphHelper {
 				$metric['options']['aggregate_function'], $metric['options']['aggregate_interval']
 			);
 
-			if ($result) {
-				$metric_points = [];
+			if (!$result) {
+				continue;
+			}
 
-				$period = $metric['time_period']['time_to'] - $metric['time_period']['time_from'];
-				$approximation_tick_delta = ($period / $metric['options']['aggregate_interval']) > $width
-					? ceil($period / $width)
-					: 0;
+			$metric_points = [];
 
-				foreach ($result as $points) {
-					$tick = 0;
+			$period = $metric['time_period']['time_to'] - $metric['time_period']['time_from'];
+			$approximation_tick_delta = ($period / $metric['options']['aggregate_interval']) > $width
+				? ceil($period / $width)
+				: 0;
 
-					usort($points['data'],
-						static function (array $point_a, array $point_b): int {
-							return $point_a['clock'] <=> $point_b['clock'];
-						}
-					);
+			foreach ($result as $points) {
+				$tick = 0;
 
-					foreach ($points['data'] as $point) {
-						if ($point['tick'] > ($tick + $approximation_tick_delta)) {
-							$tick = $point['tick'];
-						}
-						if (array_key_exists('count', $point)) {
-							$metric_points[$tick]['value'][] = $point['count'];
-						}
-						if (array_key_exists('value', $point)) {
-							$metric_points[$tick]['value'][] = $point['value'];
+				usort($points['data'],
+					static function (array $point_a, array $point_b): int {
+						return $point_a['clock'] <=> $point_b['clock'];
+					}
+				);
+
+				foreach ($points['data'] as $point) {
+					if ($point['tick'] > ($tick + $approximation_tick_delta)) {
+						$tick = $point['tick'];
+					}
+
+					$metric_points[$tick][] = $point;
+				}
+			}
+
+			$approximation_functions = ['min', 'avg', 'max'];
+
+			switch ($metric['options']['aggregate_function']) {
+				case AGGREGATE_MIN:
+					foreach ($metric_points as $tick => $points) {
+						$metric['points'][$tick] = array_fill_keys($approximation_functions,
+							min(array_column($points, 'value'))
+						);
+					}
+					break;
+
+				case AGGREGATE_MAX:
+					foreach ($metric_points as $tick => $points) {
+						$metric['points'][$tick] = array_fill_keys($approximation_functions,
+							max(array_column($points, 'value'))
+						);
+					}
+					break;
+
+				case AGGREGATE_AVG:
+					if ($metric['options']['aggregate_grouping'] == GRAPH_AGGREGATE_BY_DATASET) {
+						foreach ($metric_points as $tick => $points) {
+							$value_sum = 0;
+							$num_sum = 0;
+
+							foreach ($points as $point) {
+								$value_sum += $point['value'] * $point['num'];
+								$num_sum += $point['num'];
+							}
+
+							$metric['points'][$tick] = array_fill_keys($approximation_functions, $value_sum / $num_sum);
 						}
 					}
-				}
+					else {
+						foreach ($metric_points as $tick => $points) {
+							$metric['points'][$tick] = array_fill_keys($approximation_functions,
+								CMathHelper::safeAvg(array_column($points, 'value'))
+							);
+						}
+					}
+					break;
 
-				foreach ($metric_points as $tick => $point) {
-					$metric['points'][$tick] = [
-						'min' => min($point['value']),
-						'avg' => CMathHelper::safeAvg($point['value']),
-						'max' => max($point['value'])
-					];
-				}
+				case AGGREGATE_COUNT:
+				case AGGREGATE_SUM:
+					foreach ($metric_points as $tick => $points) {
+						$metric['points'][$tick] = array_fill_keys($approximation_functions,
+							array_sum(array_column($points, 'value'))
+						);
+					}
+					break;
 
-				ksort($metric['points'], SORT_NUMERIC);
+				case AGGREGATE_FIRST:
+				case AGGREGATE_LAST:
+					foreach ($metric_points as $tick => $points) {
+						usort($points, static fn(array $point_a, array $point_b): int =>
+							[$point_a['clock'], $point_a['ns']] <=> [$point_b['clock'], $point_b['ns']]
+						);
+
+						$point = $metric['options']['aggregate_function'] == AGGREGATE_FIRST
+							? $points[0]
+							: $points[count($points) - 1];
+
+						$metric['points'][$tick] = array_fill_keys($approximation_functions, $point['value']);
+					}
+					break;
 			}
+
+			ksort($metric['points'], SORT_NUMERIC);
 		}
 	}
 
