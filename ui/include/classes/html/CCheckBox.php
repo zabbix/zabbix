@@ -160,7 +160,7 @@ class CCheckBox extends CInput {
 	/**
 	 * Set the title for the checkbox.
 	 *
-	 * @param string $title
+	 * @param string|null $title
 	 *
 	 * @return CCheckBox
 	 */
