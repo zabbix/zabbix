@@ -258,18 +258,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			switch ($value_type) {
 				case ITEM_VALUE_TYPE_LOG:
-					$values = ['itemid', 'value', 'clock', 'ns', 'timestamp'];
+					$output = ['itemid', 'value', 'clock', 'ns', 'timestamp'];
 					break;
 				case ITEM_VALUE_TYPE_BINARY:
-					$values = ['itemid', 'clock', 'ns'];
+					$output = ['itemid', 'clock', 'ns'];
 					break;
 				default:
-					$values = ['itemid', 'value', 'clock', 'ns'];
+					$output = ['itemid', 'value', 'clock', 'ns'];
 					break;
 			}
 
 			$db_items_values = API::History()->get([
-				'output' => $values,
+				'output' => $output,
 				'history' => $value_type,
 				'itemids' => $itemids,
 				'time_from' => $time_from,

@@ -238,7 +238,7 @@ $form_grid->addItem([
 $form_grid->addItem([
 	(new CLabel([
 		_('Display log time'),
-		makeHelpIcon(_("This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."))
+		makeHelpIcon(_('This setting will display log time instead of item\'s timestamp. "Show timestamp" must also be checked in the advanced configuration.'))
 	], 'local_time'))->addClass('js-local-time-row'),
 	(new CFormField(
 		(new CCheckBox('local_time'))->setChecked($data['local_time'])
