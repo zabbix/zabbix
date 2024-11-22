@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.4\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-11-21 08:57+0000\n"
-"Last-Translator: natalja.romancaka <natalja.romancaka@zabbix.com>\n"
+"PO-Revision-Date: 2024-11-22 07:48+0000\n"
+"Last-Translator: Ryan Skov <rsk@capmon.dk>\n"
 "Language-Team: none\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
@@ -11257,11 +11257,11 @@ msgstr ""
 
 #: app/views/administration.script.edit.php:349
 msgid "Input type"
-msgstr ""
+msgstr "Input type"
 
 #: app/views/administration.script.edit.php:376
 msgid "Input validation rule"
-msgstr ""
+msgstr "Input valideringsregel"
 
 #: app/views/popup.triggerexpr.php:275
 msgid "Insert"
@@ -11430,7 +11430,7 @@ msgstr "Ugyldig LDAP-konfiguration"
 #: app/controllers/CControllerMfaCheck.php:53
 #: app/controllers/CControllerMfaEdit.php:48
 msgid "Invalid MFA configuration"
-msgstr ""
+msgstr "Ugyldig MFA-konfiguration"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:208
 msgid "Invalid SAML JIT provisioning media type mapping configuration."
@@ -11443,7 +11443,7 @@ msgstr "Ugyldig konfiguration af SAML JIT-klargøringsbrugergruppetilknytnings."
 #: jsLoader.php:438
 #, c-format
 msgid "Invalid URL: %1$s"
-msgstr ""
+msgstr "Ugyldig URL: %1$s"
 
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
@@ -11475,7 +11475,7 @@ msgstr "Ugyldig e-mailadresse for medietype med id \"%1$s\"."
 
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
-msgstr ""
+msgstr "Ugyldigt input"
 
 #: app/controllers/CControllerPopupLldOperation.php:176
 #: app/controllers/CControllerPopupLldOperation.php:181
@@ -11915,7 +11915,7 @@ msgstr "Datapunktet indeholder brugerdefinerede makroer med hemmelige værdier. 
 msgid "Item copied"
 msgid_plural "Items copied"
 msgstr[0] "Datapunkt kopieret"
-msgstr[1] ""
+msgstr[1] "Datapunkter kopieret"
 
 #: app/views/administration.proxy.list.php:92
 msgid "Item count"
@@ -11925,17 +11925,17 @@ msgstr "Datapunkt kopieret"
 msgid "Item deleted"
 msgid_plural "Items deleted"
 msgstr[0] "Datapunkt slettet"
-msgstr[1] ""
+msgstr[1] "Datapunkter slettet"
 
 #: items.php:708
 msgid "Item disabled"
 msgid_plural "Items disabled"
-msgstr[0] "Datapunkt slettet"
-msgstr[1] ""
+msgstr[0] "Datapunkt deaktiveret"
+msgstr[1] "Datapunkt deaktiveret"
 
 #: app/controllers/CControllerPopup.php:48
 msgid "Item edit"
-msgstr ""
+msgstr "Datapunkt redigering"
 
 #: items.php:707
 msgid "Item enabled"
@@ -11945,7 +11945,7 @@ msgstr[1] "Datapunkter aktiveret"
 
 #: widgets/itemhistory/Widget.php:26
 msgid "Item history"
-msgstr ""
+msgstr "Datapunkt historik"
 
 #: include/actions.inc.php:1074
 msgid "Item in \"not supported\" state"
@@ -11962,11 +11962,11 @@ msgstr "Datapunkt liste"
 
 #: widgets/tophosts/views/column.edit.php:123
 msgid "Item name"
-msgstr ""
+msgstr "Datapunkt navn"
 
 #: widgets/itemnavigator/Widget.php:29
 msgid "Item navigator"
-msgstr ""
+msgstr "Datapunkt navigator"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1622
 msgid "Item not selected"
@@ -11976,7 +11976,7 @@ msgstr "Datapunkt ikke valgt"
 #: widgets/topitems/includes/WidgetForm.php:157
 #: widgets/topitems/views/widget.edit.php:81
 msgid "Item ordering"
-msgstr ""
+msgstr "Datapunkt sortering"
 
 #: widgets/piechart/views/widget.edit.js.php:203
 #: widgets/svggraph/views/widget.edit.js.php:281
@@ -11988,7 +11988,7 @@ msgstr "Datapunkt mønster"
 #: widgets/piechart/views/widget.edit.js.php:208
 #: widgets/svggraph/views/widget.edit.js.php:279
 msgid "Item patterns"
-msgstr ""
+msgstr "Datapunkt mønstrer"
 
 #: app/controllers/CControllerAuditLogList.php:241
 #: app/views/popup.lldoperation.php:49 app/views/popup.massupdate.item.php:512
@@ -12012,7 +12012,7 @@ msgstr[1] "Datapunkt prototyper slettet"
 
 #: app/controllers/CControllerPopup.php:49
 msgid "Item prototype edit"
-msgstr ""
+msgstr "Datapunkt prototype redigering"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:286
 #: disc_prototypes.php:457 disc_prototypes.php:483 disc_prototypes.php:522
@@ -12039,11 +12039,11 @@ msgstr "Datapunkt prototyper"
 
 #: widgets/itemnavigator/Widget.php:44
 msgid "Item tag"
-msgstr ""
+msgstr "Datapunkt tag"
 
 #: widgets/itemnavigator/includes/CWidgetFieldItemGroupingView.php:81
 msgid "Item tag value"
-msgstr ""
+msgstr "Datapunkt tag værdi"
 
 #: app/partials/configuration.tags.tab.php:165
 #: widgets/dataover/includes/WidgetForm.php:51
@@ -12471,7 +12471,7 @@ msgstr "Seneste data"
 
 #: app/partials/administration.system.info.php:101
 msgid "Latest release"
-msgstr ""
+msgstr "Seneste udgivelse"
 
 #: jsLoader.php:376
 msgid "Latest values"
@@ -12532,11 +12532,11 @@ msgstr "Licenseret under"
 #: widgets/topitems/includes/WidgetForm.php:125
 #: widgets/topitems/includes/WidgetForm.php:154
 msgid "Limit"
-msgstr ""
+msgstr "Grænse"
 
 #: widgets/topitems/views/widget.edit.php:95
 msgid "Limit applies to each \"Item pattern\" separately"
-msgstr ""
+msgstr "Grænsen gælder for hvert \"datapunkt mønster\" separat"
 
 #: app/views/administration.gui.edit.php:93
 msgid "Limit for search and filter results"
@@ -12567,7 +12567,7 @@ msgstr "Linjebredde"
 #: widgets/svggraph/includes/WidgetForm.php:301
 #: widgets/svggraph/includes/WidgetForm.php:333
 msgid "Linear"
-msgstr ""
+msgstr "Lineær"
 
 #: app/views/popup.massupdate.host.php:42 app/views/template.massupdate.php:45
 #: include/views/monitoring.sysmap.constructor.php:43
@@ -12637,15 +12637,15 @@ msgstr "Liste over Zabbix proxyer med navn, tilstand, kryptering, komprimering, 
 
 #: include/classes/data/CItemData.php:2877
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name if proxy belongs to group, state (unknown/offline/online). Returns JSON."
-msgstr ""
+msgstr "Liste over Zabbix proxyer med navn, tilstand, kryptering, komprimering, version, sidst set, værtsantal, vareantal, nødvendige værdier pr. sekund (vps), kompatibilitet (aktuel/forældet/ikke-understøttet), timeouts, proxygruppenavn, hvis proxy tilhører gruppe, tilstand (ukendt/offline/online). Returnerer JSON."
 
 #: include/classes/data/CItemData.php:2905
 msgid "List of Zabbix proxies with name, mode, encryption, compression, version, last seen, host count, item count, required values per second (vps), compatibility (current/outdated/unsupported), timeouts, proxy group name, state (unknown/offline/online). Returns JSON."
-msgstr ""
+msgstr "Liste over Zabbix proxyer med navn, tilstand, kryptering, komprimering, version, sidst set, værtsantal, vareantal, nødvendige værdier pr. sekund (vps), kompatibilitet (aktuel/forældet/ikke-understøttet), timeouts, proxygruppenavn, tilstand (ukendt) /offline/online). Returnerer JSON."
 
 #: include/classes/data/CItemData.php:2935
 msgid "List of Zabbix proxy groups configuration data and real-time data. Configuration data includes proxy group name, failover delay, and minimum number of online proxies required for the group to be online. Real-time data includes number of online proxies, percentage of online proxies, and state of proxy group (unknown, offline, recovering, online, degrading). This item does not return groupless proxies. Returns JSON."
-msgstr ""
+msgstr "Liste over Zabbix proxy grupper konfigurationsdata og realtidsdata. Konfigurationsdata inkluderer proxygruppenavn, failover-forsinkelse og minimumsantal af online-proxyer, der kræves for, at gruppen er online. Realtidsdata inkluderer antallet af online proxyer, procentdelen af online proxyer og proxygruppens tilstand (ukendt, offline, gendannelse, online, nedværdigende). Denne vare returnerer ikke gruppeløse fuldmagter. Returnerer JSON."
 
 #: include/classes/data/CItemData.php:1559
 msgid "List of block devices and their type. Returns JSON"
@@ -12754,7 +12754,7 @@ msgstr "Log"
 
 #: app/views/administration.audit.settings.edit.php:50
 msgid "Log changes by low-level discovery, network discovery and autoregistration"
-msgstr ""
+msgstr "Logændringer ved registrering på lavt niveau, netværksregistrering og autoregistrering"
 
 #: include/classes/data/CItemData.php:1063
 msgid "Log file monitoring with log rotation support. Returns log"
@@ -12766,7 +12766,7 @@ msgstr "Logfil overvågning. Returnerer log"
 
 #: app/views/administration.audit.settings.edit.php:49
 msgid "Log system actions"
-msgstr ""
+msgstr "Log systemhandlinger"
 
 #: app/views/popup.massupdate.item.php:365
 #: include/views/configuration.item.edit.php:948
@@ -12781,7 +12781,7 @@ msgstr "Log umatchede SNMP traps"
 #: widgets/svggraph/includes/WidgetForm.php:302
 #: widgets/svggraph/includes/WidgetForm.php:334
 msgid "Logarithmic"
-msgstr ""
+msgstr "Logaritmisk"
 
 #: app/controllers/CControllerAuditLogList.php:201
 #: app/views/administration.user.list.php:135
@@ -12945,7 +12945,7 @@ msgstr "Vedligeholdelse \"%1$s\" eksisterer allerede."
 
 #: app/controllers/CControllerPopup.php:50
 msgid "Maintenance edit"
-msgstr ""
+msgstr "Vedligeholdelsesredigering"
 
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:238
@@ -13376,7 +13376,7 @@ msgstr "Medietypen \"%1$s\" findes allerede."
 #: include/classes/api/services/CMediatype.php:878
 #, c-format
 msgid "Media type \"%1$s\" is used by action \"%2$s\"."
-msgstr ""
+msgstr "Medietypen \"%1$s\" bruges af handlingen \"%2$s\"."
 
 #: app/controllers/CControllerMediatypeCreate.php:187
 msgid "Media type added"
@@ -13400,7 +13400,7 @@ msgstr "Medietype deaktiveret af administrationen."
 
 #: app/controllers/CControllerPopup.php:51
 msgid "Media type edit"
-msgstr ""
+msgstr "Medietype redigering"
 
 #: app/controllers/CControllerMediatypeEnable.php:87
 #: app/controllers/CControllerMediatypeEnable.php:94
@@ -13509,7 +13509,7 @@ msgstr "Menusti"
 
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
-msgstr ""
+msgstr "Flet sektorer mindre end "
 
 #: app/partials/scheduledreport.formgrid.html.php:178
 #: app/views/mediatype.message.edit.php:96
@@ -13750,7 +13750,7 @@ msgstr[1] "Moduler deaktiveret"
 
 #: app/controllers/CControllerPopup.php:52
 msgid "Module edit"
-msgstr ""
+msgstr "Modul redigering"
 
 #: app/controllers/CControllerModuleEnable.php:91
 msgid "Module enabled"
@@ -14235,7 +14235,7 @@ msgstr "Nyt element"
 
 #: app/views/correlation.edit.php:309 app/views/correlation.edit.php:339
 msgid "New event correlation"
-msgstr ""
+msgstr "Ny begivenhedskorrelation"
 
 #: app/views/js/correlation.edit.js.php:255
 #: include/classes/helpers/CCorrelationHelper.php:54
@@ -16037,7 +16037,7 @@ msgstr "Overordned web scenarie"
 #: include/classes/api/services/CService.php:1357
 #, c-format
 msgid "Parent-child relation conflict in services \"%1$s\" and \"%2$s\"."
-msgstr ""
+msgstr "Over-under relationskonflikt i tjenesterne \"%1$s\" og \"%2$s\"."
 
 #: app/views/webscenario.step.edit.php:57
 #: include/views/configuration.host.discovery.edit.php:101
@@ -16134,7 +16134,7 @@ msgstr "Mønster"
 
 #: widgets/topitems/includes/CWidgetFieldColumnsListView.php:58
 msgid "Patterns"
-msgstr ""
+msgstr "Mønstre"
 
 #: app/views/popup.action.edit.php:238
 msgid "Pause operations for suppressed problems"
@@ -24229,7 +24229,7 @@ msgstr "mindst én mulighed skal vælges"
 
 #: widgets/svggraph/includes/CWidgetFieldOverride.php:87
 msgid "at least one override option must be specified"
-msgstr ""
+msgstr "mindst én tilsidesættelsesmulighed skal angives"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:360
 msgid "atan() - The arctangent of a value as an angle, expressed in radians"

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-11-16 07:37+0000\n"
+"PO-Revision-Date: 2024-11-21 10:54+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -695,7 +695,7 @@ msgstr[1] "Accions desactivades"
 
 #: app/controllers/CControllerPopup.php:42
 msgid "Action edit"
-msgstr ""
+msgstr "Edició d'acció"
 
 #: app/controllers/CControllerActionEnable.php:84
 msgid "Action enabled"
@@ -1291,7 +1291,7 @@ msgstr "Tots"
 #: app/views/mediatype.list.php:79 app/views/mediatype.list.php:81
 #: app/views/mediatype.list.php:90 app/views/popup.operation.edit.php:160
 msgid "All available"
-msgstr ""
+msgstr "Tot disponible"
 
 #: app/views/monitoring.dashboard.view.php:189
 msgid "All dashboards"
@@ -5083,7 +5083,7 @@ msgstr[1] "Connectors desactivats"
 
 #: app/controllers/CControllerPopup.php:43
 msgid "Connector edit"
-msgstr ""
+msgstr "Edició del connector"
 
 #: app/controllers/CControllerConnectorEnable.php:69
 msgid "Connector enabled"
@@ -5245,7 +5245,7 @@ msgstr "Copiar al portapapers"
 
 #: app/controllers/CControllerPopup.php:44
 msgid "Correlation edit"
-msgstr ""
+msgstr "Edició de correlació"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:52
 #: app/controllers/CControllerPopupTriggerExpr.php:693
@@ -7185,7 +7185,7 @@ msgstr[1] "Regles de descobriment desactivades"
 
 #: app/controllers/CControllerPopup.php:45
 msgid "Discovery rule edit"
-msgstr ""
+msgstr "Edició de la regla de descoberta"
 
 #: app/controllers/CControllerDiscoveryEnable.php:68 host_discovery.php:580
 msgid "Discovery rule enabled"
@@ -7234,7 +7234,7 @@ msgstr "Mostra els triggers en bon estat per"
 
 #: app/views/mediatype.list.php:75
 msgid "Display actions"
-msgstr ""
+msgstr "Veure accions"
 
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
@@ -7266,7 +7266,7 @@ msgstr "Mostra el gràfic apilat"
 
 #: widgets/topitems/views/column.edit.php:90
 msgid "Display value as"
-msgstr ""
+msgstr "Veure el valor com a"
 
 #: app/controllers/CControllerHintboxActionlist.php:99
 #: app/views/administration.queue.details.php:86
@@ -8575,7 +8575,7 @@ msgstr "Filtre"
 
 #: app/views/mediatype.list.php:76
 msgid "Filter actions by the scope of media type usage:"
-msgstr ""
+msgstr "Filtrar les accions per l'abast de l'ús del tipus de suport:"
 
 #: app/views/js/popup.tabfilter.edit.js.php:63
 msgid "Filter deleted"
@@ -9563,7 +9563,7 @@ msgstr[1] "Equips desactivats"
 
 #: app/controllers/CControllerPopup.php:46
 msgid "Host edit"
-msgstr ""
+msgstr "Edició de l'equip"
 
 #: app/controllers/CControllerHostGroupEnable.php:76
 #: app/controllers/CControllerPopupMassupdateHost.php:491
@@ -9626,7 +9626,7 @@ msgstr[1] "S'han esborrat els grups d'equips"
 
 #: app/controllers/CControllerPopup.php:47
 msgid "Host group edit"
-msgstr ""
+msgstr "Edició del grup d'equips"
 
 #: include/views/js/monitoring.sysmaps.js.php:112
 msgid "Host group elements"
@@ -9764,7 +9764,7 @@ msgstr "Xarxes d'equips"
 #: widgets/topitems/includes/WidgetForm.php:128
 #: widgets/topitems/views/widget.edit.php:63
 msgid "Host ordering"
-msgstr ""
+msgstr "Comandes de l'equip"
 
 #: widgets/hostnavigator/includes/WidgetForm.php:65
 msgid "Host patterns"
@@ -11936,7 +11936,7 @@ msgstr[1] "Elements desactivats"
 
 #: app/controllers/CControllerPopup.php:48
 msgid "Item edit"
-msgstr ""
+msgstr "Edició d'elements"
 
 #: items.php:707
 msgid "Item enabled"
@@ -11977,7 +11977,7 @@ msgstr "Element no triat"
 #: widgets/topitems/includes/WidgetForm.php:157
 #: widgets/topitems/views/widget.edit.php:81
 msgid "Item ordering"
-msgstr ""
+msgstr "Comanda d'elements"
 
 #: widgets/piechart/views/widget.edit.js.php:203
 #: widgets/svggraph/views/widget.edit.js.php:281
@@ -12013,7 +12013,7 @@ msgstr[1] "S'han esborrat els prototips d'elements"
 
 #: app/controllers/CControllerPopup.php:49
 msgid "Item prototype edit"
-msgstr ""
+msgstr "Edició del prototip d'element"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:286
 #: disc_prototypes.php:457 disc_prototypes.php:483 disc_prototypes.php:522
@@ -12533,11 +12533,11 @@ msgstr "Llicenciat sota"
 #: widgets/topitems/includes/WidgetForm.php:125
 #: widgets/topitems/includes/WidgetForm.php:154
 msgid "Limit"
-msgstr ""
+msgstr "Límit"
 
 #: widgets/topitems/views/widget.edit.php:95
 msgid "Limit applies to each \"Item pattern\" separately"
-msgstr ""
+msgstr "El límit s'aplica a cada \"patró d'element\" per separat"
 
 #: app/views/administration.gui.edit.php:93
 msgid "Limit for search and filter results"
@@ -12946,7 +12946,7 @@ msgstr "El manteniment \"%1$s\" ja existeix."
 
 #: app/controllers/CControllerPopup.php:50
 msgid "Maintenance edit"
-msgstr ""
+msgstr "Edició de manteniment"
 
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:238
@@ -13377,7 +13377,7 @@ msgstr "El tipus de suport \"%1$s\" ja existeix."
 #: include/classes/api/services/CMediatype.php:878
 #, c-format
 msgid "Media type \"%1$s\" is used by action \"%2$s\"."
-msgstr ""
+msgstr "El tipus de suport \"%1$s\" s'empra per l'acció \"%2$s\"."
 
 #: app/controllers/CControllerMediatypeCreate.php:187
 msgid "Media type added"
@@ -13401,7 +13401,7 @@ msgstr "Tipus de suport desactivat per l'Administrador."
 
 #: app/controllers/CControllerPopup.php:51
 msgid "Media type edit"
-msgstr ""
+msgstr "Edició del tipus de suport"
 
 #: app/controllers/CControllerMediatypeEnable.php:87
 #: app/controllers/CControllerMediatypeEnable.php:94
@@ -13751,7 +13751,7 @@ msgstr[1] "Mòduls desactivats"
 
 #: app/controllers/CControllerPopup.php:52
 msgid "Module edit"
-msgstr ""
+msgstr "Edició del mòdul"
 
 #: app/controllers/CControllerModuleEnable.php:91
 msgid "Module enabled"
@@ -16135,7 +16135,7 @@ msgstr "Patró"
 
 #: widgets/topitems/includes/CWidgetFieldColumnsListView.php:58
 msgid "Patterns"
-msgstr ""
+msgstr "Patrons"
 
 #: app/views/popup.action.edit.php:238
 msgid "Pause operations for suppressed problems"
@@ -16798,7 +16798,7 @@ msgstr[1] "S'han esborrat els servidors intermediaris"
 
 #: app/controllers/CControllerPopup.php:53
 msgid "Proxy edit"
-msgstr ""
+msgstr "Edició de proxy"
 
 #: app/controllers/CControllerAuditLogList.php:239
 #: app/partials/configuration.host.edit.html.php:266
@@ -16836,7 +16836,7 @@ msgstr[1] "S'han esborrat els grups de proxys"
 
 #: app/controllers/CControllerPopup.php:54
 msgid "Proxy group edit"
-msgstr ""
+msgstr "Edició del grup de proxys"
 
 #: app/controllers/CControllerProxyGroupUpdate.php:74
 msgid "Proxy group updated"
@@ -17948,7 +17948,7 @@ msgstr[1] "SLAs desactivats"
 
 #: app/controllers/CControllerPopup.php:58
 msgid "SLA edit"
-msgstr ""
+msgstr "Edició d'SLA"
 
 #: app/controllers/CControllerSlaEnable.php:73
 msgid "SLA enabled"
@@ -18391,7 +18391,7 @@ msgstr "L'script no té paràmetres."
 
 #: app/controllers/CControllerPopup.php:56
 msgid "Script edit"
-msgstr ""
+msgstr "Edició d'script"
 
 #: app/views/administration.timeouts.edit.php:168
 msgid "Script execution"
@@ -18607,7 +18607,7 @@ msgstr "Enviar enrere"
 
 #: app/views/popup.operation.edit.php:189
 msgid "Send to media type"
-msgstr ""
+msgstr "Enviar a tipus de suport"
 
 #: app/views/popup.operation.edit.php:108
 msgid "Send to user groups"
@@ -18728,7 +18728,7 @@ msgstr[1] "Serveis esborrats"
 
 #: app/controllers/CControllerPopup.php:57
 msgid "Service edit"
-msgstr ""
+msgstr "Edició del servei"
 
 #: app/views/administration.userrole.edit.php:166
 #: app/views/administration.userrole.edit.php:207
@@ -19376,7 +19376,7 @@ msgstr "Sparkline"
 
 #: app/views/mediatype.list.php:83 app/views/mediatype.list.php:91
 msgid "Specific"
-msgstr ""
+msgstr "Específic"
 
 #: include/classes/helpers/CRoleHelper.php:199
 msgid "Specified role was not found."
@@ -20127,7 +20127,7 @@ msgstr[1] "S'han esborrat les plantilles"
 
 #: app/controllers/CControllerPopup.php:59
 msgid "Template edit"
-msgstr ""
+msgstr "Edició de la plantilla"
 
 #: app/controllers/CControllerAuditLogList.php:259
 #: app/partials/configuration.templategroup.edit.html.php:52
@@ -20154,7 +20154,7 @@ msgstr[1] "S'han esborrat els grups de plantilles"
 
 #: app/controllers/CControllerPopup.php:55
 msgid "Template group edit"
-msgstr ""
+msgstr "Edició del grup de plantilles"
 
 #: app/controllers/CControllerTemplateGroupUpdate.php:86
 msgid "Template group updated"
@@ -20825,7 +20825,7 @@ msgstr "El que duem de dia"
 
 #: app/controllers/CControllerPopup.php:60
 msgid "Token edit"
-msgstr ""
+msgstr "Edició del token"
 
 #: include/views/js/monitoring.sysmaps.js.php:40
 #: include/views/js/monitoring.sysmaps.js.php:159
@@ -20858,7 +20858,7 @@ msgstr "Els equips top"
 
 #: widgets/topitems/Widget.php:32
 msgid "Top items"
-msgstr ""
+msgstr "Elements principals"
 
 #: widgets/toptriggers/Widget.php:29
 msgid "Top triggers"
@@ -21090,7 +21090,7 @@ msgstr "Opcions de visualització dels triggers"
 
 #: app/controllers/CControllerPopup.php:61
 msgid "Trigger edit"
-msgstr ""
+msgstr "Edició de trigger"
 
 #: app/controllers/CControllerTriggerEnable.php:67
 msgid "Trigger enabled"
@@ -21233,7 +21233,7 @@ msgstr[1] "S'han esborrat els prototips de triggers"
 
 #: app/controllers/CControllerPopup.php:62
 msgid "Trigger prototype edit"
-msgstr ""
+msgstr "Edició de prototip de trigger"
 
 #: app/controllers/CControllerTriggerMassupdate.php:219
 #: app/controllers/CControllerTriggerPrototypeDisable.php:76
@@ -24705,15 +24705,15 @@ msgstr "la regla de descobriment \"%1$s\" a l'equip \"%2$s\" no es supervisa pas
 
 #: app/views/mediatype.list.php:78
 msgid "display all actions"
-msgstr ""
+msgstr "Veure totes les accions"
 
 #: app/views/mediatype.list.php:80
 msgid "display only actions where All available media types are used in action operation"
-msgstr ""
+msgstr "Veure només les accions on s'empren tots els tipus de suport disponibles a l'operació d'acció"
 
 #: app/views/mediatype.list.php:84
 msgid "display only actions where specific media type is used in action operation"
-msgstr ""
+msgstr "veure només accions on s'empra un tipus de suport específic a l'operació d'acció"
 
 #: app/views/popup.lldoperation.php:65 include/actions.inc.php:27
 #: include/classes/helpers/CCorrelationHelper.php:37

@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-11-18 07:26+0000\n"
-"Last-Translator: Akira <g42getd@gmail.com>\n"
+"PO-Revision-Date: 2024-11-21 12:47+0000\n"
+"Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -674,7 +674,7 @@ msgstr[0] "アクションを無効にしました"
 
 #: app/controllers/CControllerPopup.php:42
 msgid "Action edit"
-msgstr ""
+msgstr "アクションの編集"
 
 #: app/controllers/CControllerActionEnable.php:84
 msgid "Action enabled"
@@ -1642,7 +1642,7 @@ msgstr "少なくとも1つのホストグループまたはホストが選択�
 
 #: include/classes/setup/CFrontendSetup.php:252
 msgid "At least one of MySQL or PostgreSQL should be supported."
-msgstr ""
+msgstr "MySQLまたはPostgreSQLの少なくとも1つをサポートする必要があります。"
 
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
@@ -1897,7 +1897,7 @@ msgstr "推測されやすいパスワードの回避"
 
 #: jsLoader.php:172
 msgid "Awaiting data"
-msgstr ""
+msgstr "データを待っています"
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -4468,11 +4468,11 @@ msgstr "複製"
 #: app/views/configuration.host.edit.php:61
 #: app/views/js/popup.host.edit.js.php:44 host_prototypes.php:203
 msgid "Cloned host parameter values have been modified."
-msgstr ""
+msgstr "クローンされたホストのパラメーター値が変更されました。"
 
 #: app/views/js/template.edit.js.php:40
 msgid "Cloned template parameter values have been modified."
-msgstr ""
+msgstr "クローンされたテンプレートのパラメーター値が変更されました。"
 
 #: app/views/popup.import.compare.php:47 app/views/popup.token.view.php:84
 #: include/func.inc.php:1814 include/views/js/monitoring.sysmaps.js.php:86
@@ -4979,7 +4979,7 @@ msgstr[0] "コネクタを無効にしました"
 
 #: app/controllers/CControllerPopup.php:43
 msgid "Connector edit"
-msgstr ""
+msgstr "コネクタの編集"
 
 #: app/controllers/CControllerConnectorEnable.php:69
 msgid "Connector enabled"
@@ -5137,7 +5137,7 @@ msgstr "クリップボードにコピー"
 
 #: app/controllers/CControllerPopup.php:44
 msgid "Correlation edit"
-msgstr ""
+msgstr "相関関係の編集"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:52
 #: app/controllers/CControllerPopupTriggerExpr.php:693
@@ -5166,7 +5166,7 @@ msgstr "ログの一致行数。整数値を返す。"
 
 #: include/classes/data/CItemData.php:2645
 msgid "Count of network checks enqueued in the discovery queue."
-msgstr ""
+msgstr "ディスカバリキュー内に登録されたネットワークチェックの数。"
 
 #: include/classes/data/CItemData.php:2638
 msgid "Count of values enqueued in the connector queue."
@@ -5366,7 +5366,7 @@ msgstr "新規作成"
 
 #: jsLoader.php:372
 msgid "Create new report"
-msgstr ""
+msgstr "新規レポートの作成"
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -6124,7 +6124,7 @@ msgstr "削除とクリア"
 
 #: app/views/js/template.list.js.php:130
 msgid "Delete and clear selected template? (Warning: all linked hosts will be cleared!)"
-msgstr ""
+msgstr "選択したテンプレートとデータを削除しますか？(警告: リンクしているすべてのホストからデータが削除されます！)"
 
 #: app/views/js/template.list.js.php:127
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
@@ -6182,7 +6182,7 @@ msgstr "選択した要素間のリンクを削除しますか？"
 #: include/views/configuration.host.discovery.edit.php:716
 #: include/views/configuration.host.discovery.list.php:151
 msgid "Delete lost resources"
-msgstr ""
+msgstr "ディスカバリできなくなったリソースを削除する"
 
 #: app/views/maintenance.edit.php:275
 msgid "Delete maintenance period?"
@@ -6609,7 +6609,7 @@ msgstr "説明"
 
 #: widgets/gauge/includes/WidgetForm.php:204
 msgid "Description size"
-msgstr ""
+msgstr "説明のサイズ"
 
 #: include/classes/data/CItemData.php:1503
 msgid "Detailed listing of installed packages. Returns text in JSON format"
@@ -6725,7 +6725,7 @@ msgstr "選択したプロキシによるホストの監視を無効にします
 #: include/views/configuration.host.discovery.edit.php:730
 #: include/views/configuration.host.discovery.list.php:166
 msgid "Disable lost resources"
-msgstr ""
+msgstr "ディスカバリできなくなったリソースを無効にする"
 
 #: app/views/administration.token.list.php:211
 #: app/views/administration.user.token.list.php:164
@@ -6894,7 +6894,7 @@ msgstr "無効"
 #: app/views/configuration.host.list.php:511 app/views/item.list.php:219
 #: app/views/trigger.list.php:358
 msgid "Disabled automatically by an LLD rule."
-msgstr ""
+msgstr "LLDルールによって自動的に無効になりました。"
 
 #: app/views/administration.trigdisplay.edit.php:146
 #: widgets/geomap/Widget.php:44
@@ -7074,7 +7074,7 @@ msgstr[0] "ディスカバリルールを無効にしました"
 
 #: app/controllers/CControllerPopup.php:45
 msgid "Discovery rule edit"
-msgstr ""
+msgstr "ディスカバリルールの編集"
 
 #: app/controllers/CControllerDiscoveryEnable.php:68 host_discovery.php:580
 msgid "Discovery rule enabled"
@@ -7834,7 +7834,7 @@ msgstr "エラーバジェット"
 
 #: include/classes/api/services/CUser.php:3506
 msgid "Error decoding Duo result."
-msgstr ""
+msgstr "Duoの結果のデコード中にエラーが発生しました。"
 
 #: include/db.inc.php:554
 #, c-format
@@ -8272,7 +8272,7 @@ msgstr "ダッシュボードの共有の更新に失敗しました。"
 
 #: jsLoader.php:128
 msgid "Failed to update time selector."
-msgstr ""
+msgstr "タイムセレクターの更新に失敗しました。"
 
 #: jsLoader.php:143
 msgid "Failed to update widget properties."
