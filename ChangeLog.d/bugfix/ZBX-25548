@@ -1,0 +1,1 @@
+.......PS. [ZBX-25548] fixed SNMP agent walk and get keys returning non printable ascii as string if hints are missing (vso)

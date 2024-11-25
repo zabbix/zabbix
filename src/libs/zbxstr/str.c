@@ -1538,6 +1538,29 @@ int	zbx_is_utf8(const char *text)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: checks ascii characters to be printable                           *
+ *                                                                            *
+ * Parameters: text - [IN] pointer to string                                  *
+ *                                                                            *
+ * Return value: SUCCEED if string is valid or FAIL otherwise                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_is_ascii_printable(const char *text)
+{
+	while ('\0' != *text)
+	{
+		/* single ASCII character */
+		if (0 == (*text & 0x80) && 0 == isprint(*text) && 0 == isspace(*text))
+			return FAIL;
+
+		text++;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: replaces invalid UTF-8 sequences of bytes with '?' character      *
  *                                                                            *
  * Parameters: text - [IN/OUT] pointer to first char                          *

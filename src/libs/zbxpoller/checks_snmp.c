@@ -1033,20 +1033,26 @@ static void	zbx_snmp_close_session(zbx_snmp_sess_t	session)
 
 static char	*zbx_sprint_asn_octet_str_dyn(const struct variable_list *var)
 {
-	if (var->type != ASN_OCTET_STR || NULL != memchr(var->val.string, '\0', var->val_len))
+#define ZBX_MAC_ADDRESS_LEN	6
+	/* don't guess output format if length is equal to MAC address to avoid false positive UTF-8 */
+	if (var->type != ASN_OCTET_STR || NULL != memchr(var->val.string, '\0', var->val_len) ||
+			ZBX_MAC_ADDRESS_LEN == var->val_len)
+	{
 		return NULL;
+	}
 
 	char	*strval_dyn = (char *)zbx_malloc(NULL, var->val_len + 1);
 
 	memcpy(strval_dyn, var->val.string, var->val_len);
 	strval_dyn[var->val_len] = '\0';
 
-	if (FAIL == zbx_is_utf8(strval_dyn))
+	if (FAIL == zbx_is_ascii_printable(strval_dyn) || FAIL == zbx_is_utf8(strval_dyn))
 		zbx_free(strval_dyn);
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() full value:'%s'", __func__, strval_dyn);
 
 	return strval_dyn;
+#undef ZBX_MAC_ADDRESS_LEN
 }
 
 static char	*zbx_snmp_get_octet_string(const struct variable_list *var, unsigned char *string_type,
