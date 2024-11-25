@@ -64,7 +64,7 @@ class CCheckBoxList extends CList {
 	/**
 	 * @var bool
 	 */
-	protected bool $showTitles = false;
+	protected bool $show_titles = false;
 
 	/**
 	 * @param string $name
@@ -197,11 +197,12 @@ class CCheckBoxList extends CList {
 	/**
 	 * Set if checkboxes inside have a title.
 	 *
-	 * @param bool $flag
-	 * @return $this
+	 * @param bool $show_titles
+	 *
+	 * @return CCheckBoxList
 	 */
-	public function showTitles(bool $flag = true): self {
-		$this->showTitles = $flag;
+	public function showTitles(bool $show_titles = true): self {
+		$this->show_titles = $show_titles;
 
 		return $this;
 	}
@@ -234,7 +235,7 @@ class CCheckBoxList extends CList {
 				->setEnabled($this->enabled)
 				->setReadonly($this->readonly);
 
-			if ($this->showTitles) {
+			if ($this->show_titles) {
 				$checkbox->setTitle($value['label']);
 			}
 

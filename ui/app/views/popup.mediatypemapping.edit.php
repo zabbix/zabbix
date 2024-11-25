@@ -82,7 +82,7 @@ $form
 						(new CCheckBoxList('severity'))
 							->setOptions(CSeverityHelper::getSeverities())
 							->setChecked($data['severities'])
-							->setVertical(true)
+							->setVertical()
 							->showTitles()
 					)
 				],

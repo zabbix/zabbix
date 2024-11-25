@@ -120,7 +120,7 @@ $left_column = (new CFormList())
 			->setOptions(CSeverityHelper::getSeverities())
 			->setChecked($data['severities'])
 			->setColumns(3)
-			->setVertical(true)
+			->setVertical()
 			->showTitles()
 	);
 
