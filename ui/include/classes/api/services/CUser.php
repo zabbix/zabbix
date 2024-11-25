@@ -119,9 +119,17 @@ class CUser extends CApiService {
 
 		// output
 		if (!$options['countOutput']) {
-			$options['output'] = $options['output'] === API_OUTPUT_EXTEND
-				? self::OUTPUT_FIELDS
-				: array_intersect($options['output'], self::OUTPUT_FIELDS);
+			if (is_array($options['output'])) {
+				if (in_array('alias', $options['output'])) {
+					$this->deprecated(_s('Parameter "%1$s" is deprecated.', '/output/alias'));
+					$options['output'][] = 'username';
+				}
+
+				$options['output'] = array_intersect($options['output'], self::OUTPUT_FIELDS);
+			}
+			elseif ($options['output'] === API_OUTPUT_EXTEND) {
+				$options['output'] = self::OUTPUT_FIELDS;
+			}
 		}
 
 		// userids
@@ -239,11 +247,6 @@ class CUser extends CApiService {
 		// limit
 		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
 			$sqlParts['limit'] = $options['limit'];
-		}
-
-		if (is_array($options['output']) && in_array('alias', $options['output'])) {
-			$this->deprecated(_s('Parameter "%1$s" is deprecated.', '/output/alias'));
-			$options['output'][] = 'username';
 		}
 
 		if ($options['sortfield']) {
