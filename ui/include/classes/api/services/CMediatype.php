@@ -897,21 +897,40 @@ class CMediatype extends CApiService {
 
 		$db_mediatypes = DB::select('media_type', [
 			'output' => ['mediatypeid', 'name'],
-			'mediatypeids' => $mediatypeids
+			'mediatypeids' => $mediatypeids,
+			'preservekeys' => true
 		]);
 
 		if (count($db_mediatypes) != count($mediatypeids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$actions = API::Action()->get([
-			'output' => ['name'],
+		$db_actions = API::Action()->get([
+			'output' => ['actionid', 'name'],
 			'mediatypeids' => $mediatypeids,
 			'limit' => 1
 		]);
 
-		if ($actions) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media types used by action "%1$s".', $actions[0]['name']));
+		if ($db_actions) {
+			$db_action_operations = API::Action()->get([
+				'output' => [],
+				'selectOperations' => ['opmessage'],
+				'selectRecoveryOperations' => ['opmessage'],
+				'selectUpdateOperations' => ['opmessage'],
+				'actionids' => $db_actions[0]['actionid']
+			]);
+
+			foreach (['operations', 'recovery_operations', 'update_operations'] as $operations) {
+				foreach ($db_action_operations[0][$operations] as $operation) {
+					if (array_key_exists('opmessage', $operation)
+							&& array_key_exists($operation['opmessage']['mediatypeid'], $db_mediatypes)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%1$s" is used by action "%2$s".',
+							$db_mediatypes[$operation['opmessage']['mediatypeid']]['name'],
+							$db_actions[0]['name']
+						));
+					}
+				}
+			}
 		}
 
 		DB::delete('media_type', ['mediatypeid' => $mediatypeids]);

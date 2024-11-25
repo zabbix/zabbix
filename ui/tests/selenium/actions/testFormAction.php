@@ -928,11 +928,11 @@ class testFormAction extends CLegacyWebTest {
 			$this->zbxTestAssertVisibleXpath('//div[@id="operation-message-users"]//button');
 			$this->zbxTestAssertElementText('//div[@id="operation-message-users"]//button', 'Select');
 
-			$this->zbxTestTextPresent('Send only to');
+			$this->zbxTestTextPresent('Send to media type');
 			$this->zbxTestAssertVisibleId('operation-message-mediatype-only-label');
-			$this->zbxTestDropdownAssertSelected('operation[opmessage][mediatypeid]', '- All -');
+			$this->zbxTestDropdownAssertSelected('operation[opmessage][mediatypeid]', 'All available');
 			$this->zbxTestDropdownHasOptions('operation[opmessage][mediatypeid]', [
-					'- All -',
+					'All available',
 					'Email',
 					'SMS'
 			]);
@@ -1418,7 +1418,7 @@ class testFormAction extends CLegacyWebTest {
 				}
 
 				if (array_key_exists('media', $operation)) {
-					$operation_form->getField('Send only to')->fill($operation['media']);
+					$operation_form->getField('Send to media type')->fill($operation['media']);
 				}
 
 				$operation_form->submit();
@@ -1528,7 +1528,7 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
 
 		$operation_form = $this->query('id:popup-operation')->asForm()->one();
-		$operation_form->getField('Send only to')->select('SMS');
+		$operation_form->getField('Send to media type')->select('SMS');
 		$operation_form->submit();
 		$this->zbxTestAssertElementText("//tr[@id='operations_0']//td[@class='wordbreak']",
 			"Send message to users: Admin (Zabbix Administrator) via SMS ".

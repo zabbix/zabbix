@@ -157,7 +157,7 @@ $form_grid->addItem([
 	)->setId('operation-message-users')
 ]);
 
-array_unshift($data['mediatype_options'], ['name' => '- '._('All').' -', 'mediatypeid' => 0, 'status' => 0]);
+array_unshift($data['mediatype_options'], ['name' => _('All available'), 'mediatypeid' => 0, 'status' => 0]);
 
 $mediatypes = [];
 foreach ($data['mediatype_options'] as $mediatype) {
@@ -186,7 +186,7 @@ $select_opmessage_mediatype = (new CSelect('operation[opmessage][mediatypeid]'))
 	->setValue($operation['opmessage']['mediatypeid'] ?? 0);
 
 $form_grid->addItem([
-	(new CLabel(_('Send only to'), $select_opmessage_mediatype->getFocusableElementId()))
+	(new CLabel(_('Send to media type'), $select_opmessage_mediatype->getFocusableElementId()))
 		->setId('operation-message-mediatype-only-label'),
 	(new CFormField($select_opmessage_mediatype))
 		->setId('operation-message-mediatype-only')

@@ -885,6 +885,10 @@ define('ZBX_MEDIA_TYPE_TAGS_DISABLED',	0);
 define('ZBX_MEDIA_TYPE_TAGS_ENABLED',	1);
 define('ZBX_EVENT_MENU_HIDE',	0);
 define('ZBX_EVENT_MENU_SHOW',	1);
+// Media types used in actions filter.
+define('ZBX_MEDIA_TYPE_ACTIONS_ALL', -1);
+define('ZBX_MEDIA_TYPE_ACTIONS_AVAILABLE', 0);
+define('ZBX_MEDIA_TYPE_ACTIONS_SPECIFIC', 1);
 
 define('MEDIA_TYPE_EMAIL',		0);
 define('MEDIA_TYPE_EXEC',		1);

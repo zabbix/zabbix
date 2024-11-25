@@ -91,14 +91,30 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_fields = [
 			'Name' => '',
-			'Status' => 'Any'
+			'Status' => 'Any',
+			'Display actions' => 'All'
 		];
 		$filter->checkValue($filter_fields);
 
 		$this->assertEquals(255, $filter->getField('Name')->getAttribute('maxlength'));
-		$this->assertEquals(['Any', 'Enabled', 'Disabled'], $filter->getField('Status')->asSegmentedRadio()
-				->getLabels()->asText()
-		);
+
+		$radio_buttons = [
+			'Status' => ['Any', 'Enabled', 'Disabled'],
+			'Display actions' => ['All', 'All available', 'Specific']
+		];
+		foreach ($radio_buttons as $label => $options) {
+			$this->assertEquals($options, $filter->getField($label)->asSegmentedRadio()->getLabels()->asText());
+		}
+
+		$filter->getLabel('Display actions')->query('xpath:./button[@data-hintbox]')->one()->click();
+		$popup = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
+		$popup_text = "Filter actions by the scope of media type usage:\n".
+				"All - display all actions\n".
+				"All available - display only actions where All available media types are used in action operation\n".
+				"Specific - display only actions where specific media type is used in action operation";
+
+		$this->assertEquals($popup_text, $popup->getText());
+		$popup->close();
 
 		// Check table headers.
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -212,6 +228,34 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					],
 					'result' => ['Email', 'Email (HTML)']
 				]
+			],
+			// Filter the actions displayed in Used in actions" column.
+			[
+				[
+					'filter' => [
+						'Name' => 'Email',
+						'Display actions' => 'All'
+					],
+					'sql_part' => ' WHERE mediatypeid=1 or mediatypeid IS NULL'
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Name' => 'Email',
+						'Display actions' => 'All available'
+					],
+					'sql_part' => ' WHERE mediatypeid IS NULL'
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Name' => 'Email',
+						'Display actions' => 'Specific'
+					],
+					'sql_part' => ' WHERE mediatypeid=1'
+				]
 			]
 		];
 	}
@@ -242,7 +286,18 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				$data['result'][] = $name['name'];
 			}
 		}
-		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []));
+
+		if (array_key_exists('Display actions', $data['filter'])) {
+			// Get the list of expected actions from DB and compare it to the value in the "Used in actions" column.
+			$sql = 'SELECT name FROM actions WHERE actionid IN (SELECT DISTINCT actionid FROM operations WHERE'.
+					' operationid IN (SELECT operationid FROM opmessage'.$data['sql_part'].')) ORDER BY name';
+
+			$actions = $this->getTable()->findRow('Name', $data['filter']['Name'])->getColumn('Used in actions')->getText();
+			$this->assertEquals(CDBHelper::getColumn($sql, 'name'), explode(', ', $actions));
+		}
+		else {
+			$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []));
+		}
 	}
 
 	/**
@@ -634,7 +689,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			$message_title = (count(CTestArrayHelper::get($data, 'rows', [])) === 1)
 				? 'Cannot delete media type'
 				: 'Cannot delete media types';
-			$this->assertMessage(TEST_BAD, $message_title, 'Media types used by action "'.$data['used_by_action']);
+			$this->assertMessage(TEST_BAD, $message_title, 'Media type "Email" is used by action "'.$data['used_by_action']);
 
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 		}
