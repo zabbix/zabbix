@@ -74,6 +74,7 @@ $filter_column1 = (new CFormList())
 			->setChecked($data['filter_priority'])
 			->setColumns(3)
 			->setVertical()
+			->showTitles()
 	);
 
 if ($data['context'] === 'host') {
