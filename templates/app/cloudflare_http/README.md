@@ -73,8 +73,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Cached bandwidth is too low||`max(/Cloudflare by HTTP/cloudflare.bandwidth.cache_hit_ratio,#3) < {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}`|Warning||
-|Ratio of non-2xx responses is too high|<p>A large number of errors can indicate a malfunction of the site.</p>|`min(/Cloudflare by HTTP/cloudflare.requests.others_ratio,#3) > {$CLOUDFLARE.ERRORS.MAX.WARN}`|Average||
+|Cloudflare: Cached bandwidth is too low||`max(/Cloudflare by HTTP/cloudflare.bandwidth.cache_hit_ratio,#3) < {$CLOUDFLARE.CACHED_BANDWIDTH.MIN.WARN}`|Warning||
+|Cloudflare: Ratio of non-2xx responses is too high|<p>A large number of errors can indicate a malfunction of the site.</p>|`min(/Cloudflare by HTTP/cloudflare.requests.others_ratio,#3) > {$CLOUDFLARE.ERRORS.MAX.WARN}`|Average||
 
 ## Feedback
 

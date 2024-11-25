@@ -125,19 +125,19 @@ Test availability: `zabbix_get -s 127.0.0.1 -k redis.ping[tcp://127.0.0.1:6379]`
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Redis by Zabbix agent 2/redis.info["{$REDIS.CONN.URI}"],30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Service is down</li></ul>|
-|Configuration has changed|<p>Redis configuration has changed. Acknowledge to close the problem manually.</p>|`last(/Redis by Zabbix agent 2/redis.config["{$REDIS.CONN.URI}"],#1)<>last(/Redis by Zabbix agent 2/redis.config["{$REDIS.CONN.URI}"],#2) and length(last(/Redis by Zabbix agent 2/redis.config["{$REDIS.CONN.URI}"]))>0`|Info|**Manual close**: Yes|
-|Service is down||`last(/Redis by Zabbix agent 2/redis.ping["{$REDIS.CONN.URI}"])=0`|Average|**Manual close**: Yes|
-|Too many entries in the slowlog||`min(/Redis by Zabbix agent 2/redis.slowlog.count["{$REDIS.CONN.URI}"],5m)>{$REDIS.SLOWLOG.COUNT.MAX.WARN}`|Info||
-|Total number of connected clients is too high|<p>When the number of clients reaches the value of the "maxclients" parameter, new connections will be rejected.<br><br>https://redis.io/topics/clients#maximum-number-of-clients</p>|`min(/Redis by Zabbix agent 2/redis.clients.connected,5m)/last(/Redis by Zabbix agent 2/redis.config.maxclients)*100>{$REDIS.CLIENTS.PRC.MAX.WARN}`|Warning||
-|Memory fragmentation ratio is too high|<p>This ratio is an indication of memory mapping efficiency:<br>  - Value over 1.0 indicate that memory fragmentation is very likely. Consider restarting the Redis server so the operating system can recover fragmented memory, especially with a ratio over 1.5.<br>  - Value under 1.0 indicate that Redis likely has insufficient memory available. Consider optimizing memory usage or adding more RAM.<br><br>Note: If your peak memory usage is much higher than your current memory usage, the memory fragmentation ratio may be unreliable.<br><br>https://redis.io/topics/memory-optimization</p>|`min(/Redis by Zabbix agent 2/redis.memory.fragmentation_ratio,15m)>{$REDIS.MEM.FRAG_RATIO.MAX.WARN}`|Warning||
-|Last AOF write operation failed|<p>Detailed information about persistence: https://redis.io/topics/persistence</p>|`last(/Redis by Zabbix agent 2/redis.persistence.aof_last_write_status)=0`|Warning||
-|Last RDB save operation failed|<p>Detailed information about persistence: https://redis.io/topics/persistence</p>|`last(/Redis by Zabbix agent 2/redis.persistence.rdb_last_bgsave_status)=0`|Warning||
-|Number of slaves has changed|<p>Redis number of slaves has changed. Acknowledge to close the problem manually.</p>|`last(/Redis by Zabbix agent 2/redis.replication.connected_slaves,#1)<>last(/Redis by Zabbix agent 2/redis.replication.connected_slaves,#2)`|Info|**Manual close**: Yes|
-|Replication role has changed|<p>Redis replication role has changed. Acknowledge to close the problem manually.</p>|`last(/Redis by Zabbix agent 2/redis.replication.role,#1)<>last(/Redis by Zabbix agent 2/redis.replication.role,#2) and length(last(/Redis by Zabbix agent 2/redis.replication.role))>0`|Warning|**Manual close**: Yes|
-|Version has changed|<p>The Redis version has changed. Acknowledge to close the problem manually.</p>|`last(/Redis by Zabbix agent 2/redis.server.redis_version,#1)<>last(/Redis by Zabbix agent 2/redis.server.redis_version,#2) and length(last(/Redis by Zabbix agent 2/redis.server.redis_version))>0`|Info|**Manual close**: Yes|
-|Host has been restarted|<p>The host uptime is less than 10 minutes.</p>|`last(/Redis by Zabbix agent 2/redis.server.uptime)<10m`|Info|**Manual close**: Yes|
-|Connections are rejected|<p>The number of connections has reached the value of "maxclients".<br><br>https://redis.io/topics/clients</p>|`last(/Redis by Zabbix agent 2/redis.stats.rejected_connections)>0`|High||
+|Redis: Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Redis by Zabbix agent 2/redis.info["{$REDIS.CONN.URI}"],30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Redis: Service is down</li></ul>|
+|Redis: Configuration has changed|<p>Redis configuration has changed. Acknowledge to close the problem manually.</p>|`last(/Redis by Zabbix agent 2/redis.config["{$REDIS.CONN.URI}"],#1)<>last(/Redis by Zabbix agent 2/redis.config["{$REDIS.CONN.URI}"],#2) and length(last(/Redis by Zabbix agent 2/redis.config["{$REDIS.CONN.URI}"]))>0`|Info|**Manual close**: Yes|
+|Redis: Service is down||`last(/Redis by Zabbix agent 2/redis.ping["{$REDIS.CONN.URI}"])=0`|Average|**Manual close**: Yes|
+|Redis: Too many entries in the slowlog||`min(/Redis by Zabbix agent 2/redis.slowlog.count["{$REDIS.CONN.URI}"],5m)>{$REDIS.SLOWLOG.COUNT.MAX.WARN}`|Info||
+|Redis: Total number of connected clients is too high|<p>When the number of clients reaches the value of the "maxclients" parameter, new connections will be rejected.<br><br>https://redis.io/topics/clients#maximum-number-of-clients</p>|`min(/Redis by Zabbix agent 2/redis.clients.connected,5m)/last(/Redis by Zabbix agent 2/redis.config.maxclients)*100>{$REDIS.CLIENTS.PRC.MAX.WARN}`|Warning||
+|Redis: Memory fragmentation ratio is too high|<p>This ratio is an indication of memory mapping efficiency:<br>  - Value over 1.0 indicate that memory fragmentation is very likely. Consider restarting the Redis server so the operating system can recover fragmented memory, especially with a ratio over 1.5.<br>  - Value under 1.0 indicate that Redis likely has insufficient memory available. Consider optimizing memory usage or adding more RAM.<br><br>Note: If your peak memory usage is much higher than your current memory usage, the memory fragmentation ratio may be unreliable.<br><br>https://redis.io/topics/memory-optimization</p>|`min(/Redis by Zabbix agent 2/redis.memory.fragmentation_ratio,15m)>{$REDIS.MEM.FRAG_RATIO.MAX.WARN}`|Warning||
+|Redis: Last AOF write operation failed|<p>Detailed information about persistence: https://redis.io/topics/persistence</p>|`last(/Redis by Zabbix agent 2/redis.persistence.aof_last_write_status)=0`|Warning||
+|Redis: Last RDB save operation failed|<p>Detailed information about persistence: https://redis.io/topics/persistence</p>|`last(/Redis by Zabbix agent 2/redis.persistence.rdb_last_bgsave_status)=0`|Warning||
+|Redis: Number of slaves has changed|<p>Redis number of slaves has changed. Acknowledge to close the problem manually.</p>|`last(/Redis by Zabbix agent 2/redis.replication.connected_slaves,#1)<>last(/Redis by Zabbix agent 2/redis.replication.connected_slaves,#2)`|Info|**Manual close**: Yes|
+|Redis: Replication role has changed|<p>Redis replication role has changed. Acknowledge to close the problem manually.</p>|`last(/Redis by Zabbix agent 2/redis.replication.role,#1)<>last(/Redis by Zabbix agent 2/redis.replication.role,#2) and length(last(/Redis by Zabbix agent 2/redis.replication.role))>0`|Warning|**Manual close**: Yes|
+|Redis: Version has changed|<p>The Redis version has changed. Acknowledge to close the problem manually.</p>|`last(/Redis by Zabbix agent 2/redis.server.redis_version,#1)<>last(/Redis by Zabbix agent 2/redis.server.redis_version,#2) and length(last(/Redis by Zabbix agent 2/redis.server.redis_version))>0`|Info|**Manual close**: Yes|
+|Redis: Host has been restarted|<p>The host uptime is less than 10 minutes.</p>|`last(/Redis by Zabbix agent 2/redis.server.uptime)<10m`|Info|**Manual close**: Yes|
+|Redis: Connections are rejected|<p>The number of connections has reached the value of "maxclients".<br><br>https://redis.io/topics/clients</p>|`last(/Redis by Zabbix agent 2/redis.stats.rejected_connections)>0`|High||
 
 ### LLD rule Keyspace discovery
 
@@ -195,7 +195,7 @@ Test availability: `zabbix_get -s 127.0.0.1 -k redis.ping[tcp://127.0.0.1:6379]`
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Replication lag with master is too high||`min(/Redis by Zabbix agent 2/redis.replication.master_last_io_seconds_ago[{#SINGLETON}],5m)>{$REDIS.REPL.LAG.MAX.WARN}`|Warning||
+|Redis: Replication lag with master is too high||`min(/Redis by Zabbix agent 2/redis.replication.master_last_io_seconds_ago[{#SINGLETON}],5m)>{$REDIS.REPL.LAG.MAX.WARN}`|Warning||
 
 ### LLD rule Replication metrics discovery
 
@@ -228,7 +228,7 @@ Test availability: `zabbix_get -s 127.0.0.1 -k redis.ping[tcp://127.0.0.1:6379]`
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Process is not running||`last(/Redis by Zabbix agent 2/proc.num["{$REDIS.PROCESS_NAME}{#SINGLETON}"])=0`|High||
+|Redis: Process is not running||`last(/Redis by Zabbix agent 2/proc.num["{$REDIS.PROCESS_NAME}{#SINGLETON}"])=0`|High||
 
 ### LLD rule Version 4+ metrics discovery
 
@@ -266,7 +266,7 @@ Test availability: `zabbix_get -s 127.0.0.1 -k redis.ping[tcp://127.0.0.1:6379]`
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Memory usage is too high||`last(/Redis by Zabbix agent 2/redis.memory.used_memory)/min(/Redis by Zabbix agent 2/redis.memory.maxmemory[{#SINGLETON}],5m)*100>{$REDIS.MEM.PUSED.MAX.WARN}`|Warning||
+|Redis: Memory usage is too high||`last(/Redis by Zabbix agent 2/redis.memory.used_memory)/min(/Redis by Zabbix agent 2/redis.memory.maxmemory[{#SINGLETON}],5m)*100>{$REDIS.MEM.PUSED.MAX.WARN}`|Warning||
 
 ### LLD rule Version 5+ metrics discovery
 

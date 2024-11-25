@@ -86,17 +86,17 @@ The user must be included in the Administrators group.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Server information unavailable|<p>Failed to get server information.</p>|`last(/Nextcloud by HTTP/nextcloud.serverinfo.status)<>"OK"`|High||
-|Version has changed|<p>Nextcloud version has changed. Acknowledge to close the problem manually.</p>|`change(/Nextcloud by HTTP/nextcloud.serverinfo.version)=1 and length(last(/Nextcloud by HTTP/nextcloud.serverinfo.version))>0`|Info|**Manual close**: Yes|
-|Disk space is low|<p>Condition should be the following:<br>- the disk free space is less than `{$NEXTCLOUD.STORAGE.FREE.MIN}`;</p>|`last(/Nextcloud by HTTP/nextcloud.serverinfo.freespace)<{$NEXTCLOUD.STORAGE.FREE.MIN}`|Average|**Manual close**: Yes|
-|CPU load is too high|<p>High CPU load.</p>|`min(/Nextcloud by HTTP/nextcloud.serverinfo.cpu.avg.1m,5m) > {$NEXTCLOUD.CPU.LOAD.MAX}`|Average||
-|High memory utilization|<p>The system is running out of free memory.</p>|`min(/Nextcloud by HTTP/nextcloud.serverinfo.mem.pused,5m) > {$NEXTCLOUD.MEM.PUSED.MAX}`|Average||
-|High swap utilization|<p>The system is running out of free swap.</p>|`min(/Nextcloud by HTTP/nextcloud.serverinfo.swap.pused,5m) > {$NEXTCLOUD.SWAP.PUSED.MAX}`|Average||
-|Number of installed apps has been changed|<p>Applications have been installed or removed.</p>|`change(/Nextcloud by HTTP/nextcloud.serverinfo.apps.installed)<>0`|Info|**Manual close**: Yes|
-|Application updates are available|<p>Updates are available for some of the installed applications.</p>|`last(/Nextcloud by HTTP/nextcloud.serverinfo.apps.update)<>0`|Warning|**Manual close**: Yes|
-|PHP version has changed|<p>The PHP version has changed. Acknowledge to close the problem manually.</p>|`change(/Nextcloud by HTTP/nextcloud.serverinfo.php.version)=1 and length(last(/Nextcloud by HTTP/nextcloud.serverinfo.php.version))>0`|Info|**Manual close**: Yes|
-|High PHP memory utilization|<p>The PHP is running out of free memory.</p>|`min(/Nextcloud by HTTP/nextcloud.serverinfo.php.memory.pused,5m) > {$NEXTCLOUD.PHP.MEM.PUSED.MAX}`|Average||
-|Database version has changed|<p>The Database version has changed. Acknowledge to close the problem manually.</p>|`change(/Nextcloud by HTTP/nextcloud.serverinfo.db.version)=1 and length(last(/Nextcloud by HTTP/nextcloud.serverinfo.db.version))>0`|Info|**Manual close**: Yes|
+|Nextcloud: Server information unavailable|<p>Failed to get server information.</p>|`last(/Nextcloud by HTTP/nextcloud.serverinfo.status)<>"OK"`|High||
+|Nextcloud: Version has changed|<p>Nextcloud version has changed. Acknowledge to close the problem manually.</p>|`change(/Nextcloud by HTTP/nextcloud.serverinfo.version)=1 and length(last(/Nextcloud by HTTP/nextcloud.serverinfo.version))>0`|Info|**Manual close**: Yes|
+|Nextcloud: Disk space is low|<p>Condition should be the following:<br>- the disk free space is less than `{$NEXTCLOUD.STORAGE.FREE.MIN}`;</p>|`last(/Nextcloud by HTTP/nextcloud.serverinfo.freespace)<{$NEXTCLOUD.STORAGE.FREE.MIN}`|Average|**Manual close**: Yes|
+|Nextcloud: CPU load is too high|<p>High CPU load.</p>|`min(/Nextcloud by HTTP/nextcloud.serverinfo.cpu.avg.1m,5m) > {$NEXTCLOUD.CPU.LOAD.MAX}`|Average||
+|Nextcloud: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Nextcloud by HTTP/nextcloud.serverinfo.mem.pused,5m) > {$NEXTCLOUD.MEM.PUSED.MAX}`|Average||
+|Nextcloud: High swap utilization|<p>The system is running out of free swap.</p>|`min(/Nextcloud by HTTP/nextcloud.serverinfo.swap.pused,5m) > {$NEXTCLOUD.SWAP.PUSED.MAX}`|Average||
+|Nextcloud: Number of installed apps has been changed|<p>Applications have been installed or removed.</p>|`change(/Nextcloud by HTTP/nextcloud.serverinfo.apps.installed)<>0`|Info|**Manual close**: Yes|
+|Nextcloud: Application updates are available|<p>Updates are available for some of the installed applications.</p>|`last(/Nextcloud by HTTP/nextcloud.serverinfo.apps.update)<>0`|Warning|**Manual close**: Yes|
+|Nextcloud: PHP version has changed|<p>The PHP version has changed. Acknowledge to close the problem manually.</p>|`change(/Nextcloud by HTTP/nextcloud.serverinfo.php.version)=1 and length(last(/Nextcloud by HTTP/nextcloud.serverinfo.php.version))>0`|Info|**Manual close**: Yes|
+|Nextcloud: High PHP memory utilization|<p>The PHP is running out of free memory.</p>|`min(/Nextcloud by HTTP/nextcloud.serverinfo.php.memory.pused,5m) > {$NEXTCLOUD.PHP.MEM.PUSED.MAX}`|Average||
+|Nextcloud: Database version has changed|<p>The Database version has changed. Acknowledge to close the problem manually.</p>|`change(/Nextcloud by HTTP/nextcloud.serverinfo.db.version)=1 and length(last(/Nextcloud by HTTP/nextcloud.serverinfo.db.version))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Nextcloud: User discovery
 
@@ -125,9 +125,9 @@ The user must be included in the Administrators group.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|User "{#NEXTCLOUD.USER}" status changed|<p>User account status has changed.</p>|`change(/Nextcloud by HTTP/nextcloud.user.enabled[{#NEXTCLOUD.USER}]) = 1`|Info||
-|User "{#NEXTCLOUD.USER}": inactive|<p>The user has not logged in for more than {$NEXTCLOUD.USER.MAX.INACTIVE:"{#NEXTCLOUD.USER}"} days.</p>|`last(/Nextcloud by HTTP/nextcloud.user.inactive[{#NEXTCLOUD.USER}]) > {$NEXTCLOUD.USER.MAX.INACTIVE:"{#NEXTCLOUD.USER}"}`|Info||
-|User "{#NEXTCLOUD.USER}": High quota utilization|<p>More than {$NEXTCLOUD.USER.QUOTA.PUSED.MAX:"{#NEXTCLOUD.USER}"} percent of the allocated storage space has been used.</p>|`min(/Nextcloud by HTTP/nextcloud.user.quota.pused[{#NEXTCLOUD.USER}],5m) > {$NEXTCLOUD.USER.QUOTA.PUSED.MAX:"{#NEXTCLOUD.USER}"}`|Warning||
+|Nextcloud: User "{#NEXTCLOUD.USER}" status changed|<p>User account status has changed.</p>|`change(/Nextcloud by HTTP/nextcloud.user.enabled[{#NEXTCLOUD.USER}]) = 1`|Info||
+|Nextcloud: User "{#NEXTCLOUD.USER}": inactive|<p>The user has not logged in for more than {$NEXTCLOUD.USER.MAX.INACTIVE:"{#NEXTCLOUD.USER}"} days.</p>|`last(/Nextcloud by HTTP/nextcloud.user.inactive[{#NEXTCLOUD.USER}]) > {$NEXTCLOUD.USER.MAX.INACTIVE:"{#NEXTCLOUD.USER}"}`|Info||
+|Nextcloud: User "{#NEXTCLOUD.USER}": High quota utilization|<p>More than {$NEXTCLOUD.USER.QUOTA.PUSED.MAX:"{#NEXTCLOUD.USER}"} percent of the allocated storage space has been used.</p>|`min(/Nextcloud by HTTP/nextcloud.user.quota.pused[{#NEXTCLOUD.USER}],5m) > {$NEXTCLOUD.USER.QUOTA.PUSED.MAX:"{#NEXTCLOUD.USER}"}`|Warning||
 
 ## Feedback
 

@@ -113,18 +113,18 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Node is unhealthy|<p>Node's /health endpoint has returned HTTP 500 Internal Server Error which indicates unhealthy mode.</p>|`last(/CockroachDB by HTTP/cockroachdb.get_health) = 500`|Average|**Depends on**:<br><ul><li>Service is down</li></ul>|
-|Node is not ready|<p>Node's /health?ready=1 endpoint has returned HTTP 503 Service Unavailable. Possible reasons:<br>- node is in the wait phase of the node shutdown sequence;<br>- node is unable to communicate with a majority of the other nodes in the cluster, likely because the cluster is unavailable due to too many nodes being down.</p>|`last(/CockroachDB by HTTP/cockroachdb.get_readiness) = 503 and last(/CockroachDB by HTTP/cockroachdb.uptime) > 5m`|Average|**Depends on**:<br><ul><li>Service is down</li></ul>|
-|Service is down||`last(/CockroachDB by HTTP/net.tcp.service["{$COCKROACHDB.API.SCHEME}","{$COCKROACHDB.API.HOST}","{$COCKROACHDB.API.PORT}"]) = 0`|Average||
-|Clock offset is too high|<p>Cockroach-measured clock offset is nearing limit (by default, servers kill themselves at 400ms from the mean).</p>|`min(/CockroachDB by HTTP/cockroachdb.clock.offset,5m) > {$COCKROACHDB.CLOCK.OFFSET.MAX.WARN} * 0.001`|Warning||
-|Version has changed||`last(/CockroachDB by HTTP/cockroachdb.version) <> last(/CockroachDB by HTTP/cockroachdb.version,#2) and length(last(/CockroachDB by HTTP/cockroachdb.version)) > 0`|Info||
-|Current number of open files is too high|<p>Getting close to open file descriptor limit.</p>|`min(/CockroachDB by HTTP/cockroachdb.descriptors.open,10m) / last(/CockroachDB by HTTP/cockroachdb.descriptors.limit) * 100 > {$COCKROACHDB.OPEN.FDS.MAX.WARN}`|Warning||
-|Node is not executing SQL|<p>Node is not executing SQL despite having connections.</p>|`last(/CockroachDB by HTTP/cockroachdb.sql.sessions) > 0 and last(/CockroachDB by HTTP/cockroachdb.sql.statements.executed.rate) = 0`|Warning||
-|SQL statements errors rate is too high||`min(/CockroachDB by HTTP/cockroachdb.sql.statements.errors.rate,5m) > {$COCKROACHDB.STATEMENTS.ERRORS.MAX.WARN}`|Warning||
-|Node has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/CockroachDB by HTTP/cockroachdb.uptime) < 10m`|Info||
-|Failed to fetch node data|<p>Zabbix has not received data for items for the last 5 minutes.</p>|`nodata(/CockroachDB by HTTP/cockroachdb.uptime,5m) = 1`|Warning|**Depends on**:<br><ul><li>Service is down</li></ul>|
-|Node certificate expires soon|<p>Node certificate expires soon.</p>|`(last(/CockroachDB by HTTP/cockroachdb.cert.expire_date.node) - now()) / 86400 < {$COCKROACHDB.CERT.NODE.EXPIRY.WARN}`|Warning||
-|CA certificate expires soon|<p>CA certificate expires soon.</p>|`(last(/CockroachDB by HTTP/cockroachdb.cert.expire_date.ca) - now()) / 86400 < {$COCKROACHDB.CERT.CA.EXPIRY.WARN}`|Warning||
+|CockroachDB: Node is unhealthy|<p>Node's /health endpoint has returned HTTP 500 Internal Server Error which indicates unhealthy mode.</p>|`last(/CockroachDB by HTTP/cockroachdb.get_health) = 500`|Average|**Depends on**:<br><ul><li>CockroachDB: Service is down</li></ul>|
+|CockroachDB: Node is not ready|<p>Node's /health?ready=1 endpoint has returned HTTP 503 Service Unavailable. Possible reasons:<br>- node is in the wait phase of the node shutdown sequence;<br>- node is unable to communicate with a majority of the other nodes in the cluster, likely because the cluster is unavailable due to too many nodes being down.</p>|`last(/CockroachDB by HTTP/cockroachdb.get_readiness) = 503 and last(/CockroachDB by HTTP/cockroachdb.uptime) > 5m`|Average|**Depends on**:<br><ul><li>CockroachDB: Service is down</li></ul>|
+|CockroachDB: Service is down||`last(/CockroachDB by HTTP/net.tcp.service["{$COCKROACHDB.API.SCHEME}","{$COCKROACHDB.API.HOST}","{$COCKROACHDB.API.PORT}"]) = 0`|Average||
+|CockroachDB: Clock offset is too high|<p>Cockroach-measured clock offset is nearing limit (by default, servers kill themselves at 400ms from the mean).</p>|`min(/CockroachDB by HTTP/cockroachdb.clock.offset,5m) > {$COCKROACHDB.CLOCK.OFFSET.MAX.WARN} * 0.001`|Warning||
+|CockroachDB: Version has changed||`last(/CockroachDB by HTTP/cockroachdb.version) <> last(/CockroachDB by HTTP/cockroachdb.version,#2) and length(last(/CockroachDB by HTTP/cockroachdb.version)) > 0`|Info||
+|CockroachDB: Current number of open files is too high|<p>Getting close to open file descriptor limit.</p>|`min(/CockroachDB by HTTP/cockroachdb.descriptors.open,10m) / last(/CockroachDB by HTTP/cockroachdb.descriptors.limit) * 100 > {$COCKROACHDB.OPEN.FDS.MAX.WARN}`|Warning||
+|CockroachDB: Node is not executing SQL|<p>Node is not executing SQL despite having connections.</p>|`last(/CockroachDB by HTTP/cockroachdb.sql.sessions) > 0 and last(/CockroachDB by HTTP/cockroachdb.sql.statements.executed.rate) = 0`|Warning||
+|CockroachDB: SQL statements errors rate is too high||`min(/CockroachDB by HTTP/cockroachdb.sql.statements.errors.rate,5m) > {$COCKROACHDB.STATEMENTS.ERRORS.MAX.WARN}`|Warning||
+|CockroachDB: Node has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/CockroachDB by HTTP/cockroachdb.uptime) < 10m`|Info||
+|CockroachDB: Failed to fetch node data|<p>Zabbix has not received data for items for the last 5 minutes.</p>|`nodata(/CockroachDB by HTTP/cockroachdb.uptime,5m) = 1`|Warning|**Depends on**:<br><ul><li>CockroachDB: Service is down</li></ul>|
+|CockroachDB: Node certificate expires soon|<p>Node certificate expires soon.</p>|`(last(/CockroachDB by HTTP/cockroachdb.cert.expire_date.node) - now()) / 86400 < {$COCKROACHDB.CERT.NODE.EXPIRY.WARN}`|Warning||
+|CockroachDB: CA certificate expires soon|<p>CA certificate expires soon.</p>|`(last(/CockroachDB by HTTP/cockroachdb.cert.expire_date.ca) - now()) / 86400 < {$COCKROACHDB.CERT.CA.EXPIRY.WARN}`|Warning||
 
 ### LLD rule Storage metrics discovery
 
@@ -172,8 +172,8 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Storage [{#STORE}]: Available storage capacity is low|<p>Storage is running low on free space (less than {$COCKROACHDB.STORE.USED.MIN.WARN}% available).</p>|`max(/CockroachDB by HTTP/cockroachdb.storage.capacity.[{#STORE},available_percent],5m) < {$COCKROACHDB.STORE.USED.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>Storage [{#STORE}]: Available storage capacity is critically low</li></ul>|
-|Storage [{#STORE}]: Available storage capacity is critically low|<p>Storage is running critically low on free space (less than {$COCKROACHDB.STORE.USED.MIN.CRIT}% available).</p>|`max(/CockroachDB by HTTP/cockroachdb.storage.capacity.[{#STORE},available_percent],5m) < {$COCKROACHDB.STORE.USED.MIN.CRIT}`|Average||
+|CockroachDB: Storage [{#STORE}]: Available storage capacity is low|<p>Storage is running low on free space (less than {$COCKROACHDB.STORE.USED.MIN.WARN}% available).</p>|`max(/CockroachDB by HTTP/cockroachdb.storage.capacity.[{#STORE},available_percent],5m) < {$COCKROACHDB.STORE.USED.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>CockroachDB: Storage [{#STORE}]: Available storage capacity is critically low</li></ul>|
+|CockroachDB: Storage [{#STORE}]: Available storage capacity is critically low|<p>Storage is running critically low on free space (less than {$COCKROACHDB.STORE.USED.MIN.CRIT}% available).</p>|`max(/CockroachDB by HTTP/cockroachdb.storage.capacity.[{#STORE},available_percent],5m) < {$COCKROACHDB.STORE.USED.MIN.CRIT}`|Average||
 
 ## Feedback
 

@@ -93,14 +93,14 @@ Metrics are collected by JMX.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|DB: Connection lost|<p>Database connection lost</p>|`max(/Jira Data Center by JMX/jmx["com.atlassian.jira:type=metrics,category00=db,category01=connection,category02=state,name=value",Value],3m)=0`|Average|**Manual close**: Yes|
-|DB: Pool: Out of idle connections|<p>Fires when out of idle connections in database pool for 5 minutes.</p>|`min(/Jira Data Center by JMX/jmx["com.atlassian.jira:type=metrics,category00=db,category01=connection,category02=pool,category03=numIdle,name=value",Value],5m)<=0`|Warning|**Manual close**: Yes|
-|DB: Connection usage is near the limit||`100*min(/Jira Data Center by JMX/jmx["com.atlassian.jira:name=BasicDataSource,connectionpool=connections",NumActive],5m)/last(/Jira Data Center by JMX/jmx["com.atlassian.jira:name=BasicDataSource,connectionpool=connections",MaxTotal])>{$JIRA_DC.DB.CONNECTION.USAGE.WARN}`|Warning|**Manual close**: Yes|
-|DB: Connection limit reached||`min(/Jira Data Center by JMX/jmx["com.atlassian.jira:name=BasicDataSource,connectionpool=connections",NumActive],5m)=last(/Jira Data Center by JMX/jmx["com.atlassian.jira:name=BasicDataSource,connectionpool=connections",MaxTotal])`|Warning|**Manual close**: Yes|
-|HTTP: Pool: Out of idle connections|<p>All available connections are utilized. It can cause outages for users as the system is unable to serve their requests.</p>|`min(/Jira Data Center by JMX/jmx["com.atlassian.jira:type=metrics,category00=http,category01=connection,category02=pool,category03=numIdle,name=value",Value],5m)<=0`|Warning|**Manual close**: Yes|
-|Mail: Queue: Doesn’t empty over an extended period|<p>Might indicate SMTP performance or connection problems.</p>|`min(/Jira Data Center by JMX/jmx["com.atlassian.jira:type=metrics,category00=mail,category01=queue,category02=numItems,name=value",Value],30m)>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Mail: Queue job is not running</li></ul>|
-|Mail: Error queue contains one or more items|<p>A mail queue attempts to resend items up to 10 times. If the operation fails for the 11th time, the items are put into an error mail queue.<br>You can remove items from the error mail queue in one of the following ways:<br>  - Manually clear the whole error queue.<br>  - Manually resend all items from the error queue to a mail queue.<br>You should pay attention to the cases where an error mail queue item gets back to an error mail queue after you resend the items manually. These cases might indicate permanent performance issues.</p>|`max(/Jira Data Center by JMX/jmx["com.atlassian.jira:type=metrics,category00=mail,category01=queue,category02=numErrors,name=value",Value],5m)>0`|Warning|**Manual close**: Yes|
-|Mail: Queue job is not running|<p>It should be running when its queue is not empty.<br>Might indicate SMTP server connection problems.</p>|`max(/Jira Data Center by JMX/jmx["com.atlassian.jira:type=metrics,category00=mail,category01=queue,category02=jobRunning,name=value",Value],15m)=0 and min(/Jira Data Center by JMX/jmx["com.atlassian.jira:type=metrics,category00=mail,category01=queue,category02=numItems,name=value",Value],15m)>0`|Average|**Manual close**: Yes|
+|Jira Data Center: DB: Connection lost|<p>Database connection lost</p>|`max(/Jira Data Center by JMX/jmx["com.atlassian.jira:type=metrics,category00=db,category01=connection,category02=state,name=value",Value],3m)=0`|Average|**Manual close**: Yes|
+|Jira Data Center: DB: Pool: Out of idle connections|<p>Fires when out of idle connections in database pool for 5 minutes.</p>|`min(/Jira Data Center by JMX/jmx["com.atlassian.jira:type=metrics,category00=db,category01=connection,category02=pool,category03=numIdle,name=value",Value],5m)<=0`|Warning|**Manual close**: Yes|
+|Jira Data Center: DB: Connection usage is near the limit||`100*min(/Jira Data Center by JMX/jmx["com.atlassian.jira:name=BasicDataSource,connectionpool=connections",NumActive],5m)/last(/Jira Data Center by JMX/jmx["com.atlassian.jira:name=BasicDataSource,connectionpool=connections",MaxTotal])>{$JIRA_DC.DB.CONNECTION.USAGE.WARN}`|Warning|**Manual close**: Yes|
+|Jira Data Center: DB: Connection limit reached||`min(/Jira Data Center by JMX/jmx["com.atlassian.jira:name=BasicDataSource,connectionpool=connections",NumActive],5m)=last(/Jira Data Center by JMX/jmx["com.atlassian.jira:name=BasicDataSource,connectionpool=connections",MaxTotal])`|Warning|**Manual close**: Yes|
+|Jira Data Center: HTTP: Pool: Out of idle connections|<p>All available connections are utilized. It can cause outages for users as the system is unable to serve their requests.</p>|`min(/Jira Data Center by JMX/jmx["com.atlassian.jira:type=metrics,category00=http,category01=connection,category02=pool,category03=numIdle,name=value",Value],5m)<=0`|Warning|**Manual close**: Yes|
+|Jira Data Center: Mail: Queue: Doesn’t empty over an extended period|<p>Might indicate SMTP performance or connection problems.</p>|`min(/Jira Data Center by JMX/jmx["com.atlassian.jira:type=metrics,category00=mail,category01=queue,category02=numItems,name=value",Value],30m)>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Jira Data Center: Mail: Queue job is not running</li></ul>|
+|Jira Data Center: Mail: Error queue contains one or more items|<p>A mail queue attempts to resend items up to 10 times. If the operation fails for the 11th time, the items are put into an error mail queue.<br>You can remove items from the error mail queue in one of the following ways:<br>  - Manually clear the whole error queue.<br>  - Manually resend all items from the error queue to a mail queue.<br>You should pay attention to the cases where an error mail queue item gets back to an error mail queue after you resend the items manually. These cases might indicate permanent performance issues.</p>|`max(/Jira Data Center by JMX/jmx["com.atlassian.jira:type=metrics,category00=mail,category01=queue,category02=numErrors,name=value",Value],5m)>0`|Warning|**Manual close**: Yes|
+|Jira Data Center: Mail: Queue job is not running|<p>It should be running when its queue is not empty.<br>Might indicate SMTP server connection problems.</p>|`max(/Jira Data Center by JMX/jmx["com.atlassian.jira:type=metrics,category00=mail,category01=queue,category02=jobRunning,name=value",Value],15m)=0 and min(/Jira Data Center by JMX/jmx["com.atlassian.jira:type=metrics,category00=mail,category01=queue,category02=numItems,name=value",Value],15m)>0`|Average|**Manual close**: Yes|
 
 ### LLD rule Storage discovery
 
@@ -118,7 +118,7 @@ Metrics are collected by JMX.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Storage [{#JMXCATEGORY01}]: Slow performance|<p>Fires when latency grows above the threshold: `{$JIRA_DC.STORAGE.LATENCY.WARN:"{#JMXCATEGORY01}"}`s</p>|`min(/Jira Data Center by JMX/jmx["{#JMXOBJ}",Value],5m)>{$JIRA_DC.STORAGE.LATENCY.WARN:"{#JMXCATEGORY01}"}`|Warning|**Manual close**: Yes|
+|Jira Data Center: Storage [{#JMXCATEGORY01}]: Slow performance|<p>Fires when latency grows above the threshold: `{$JIRA_DC.STORAGE.LATENCY.WARN:"{#JMXCATEGORY01}"}`s</p>|`min(/Jira Data Center by JMX/jmx["{#JMXOBJ}",Value],5m)>{$JIRA_DC.STORAGE.LATENCY.WARN:"{#JMXCATEGORY01}"}`|Warning|**Manual close**: Yes|
 
 ### LLD rule Mail server discovery
 
@@ -137,7 +137,7 @@ Metrics are collected by JMX.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Mail [{#JMXCATEGORY01}-{#JMXNAME}]: Server disconnected|<p>Trigger is fired when discovered mail server `{#JMXCATEGORY01}-{#JMXNAME}` becomes unavailable</p>|`max(/Jira Data Center by JMX/jmx["{#JMXOBJ}",Connected],5m)=0`|Average|**Manual close**: Yes|
+|Jira Data Center: Mail [{#JMXCATEGORY01}-{#JMXNAME}]: Server disconnected|<p>Trigger is fired when discovered mail server `{#JMXCATEGORY01}-{#JMXNAME}` becomes unavailable</p>|`max(/Jira Data Center by JMX/jmx["{#JMXOBJ}",Connected],5m)=0`|Average|**Manual close**: Yes|
 
 ### LLD rule  Indexing latency discovery
 
@@ -155,7 +155,7 @@ Metrics are collected by JMX.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Indexing [{#JMXNAME}]: Slow performance|<p>Fires when latency grows above the threshold: `{$JIRA_DC.INDEXING.LATENCY.WARN:"{#JMXNAME}"}`s</p>|`min(/Jira Data Center by JMX/jmx["com.atlassian.jira:type=metrics,category00=indexing,name={#JMXNAME}",Mean],5m)>{$JIRA_DC.INDEXING.LATENCY.WARN:"{#JMXNAME}"}`|Warning|**Manual close**: Yes|
+|Jira Data Center: Indexing [{#JMXNAME}]: Slow performance|<p>Fires when latency grows above the threshold: `{$JIRA_DC.INDEXING.LATENCY.WARN:"{#JMXNAME}"}`s</p>|`min(/Jira Data Center by JMX/jmx["com.atlassian.jira:type=metrics,category00=indexing,name={#JMXNAME}",Mean],5m)>{$JIRA_DC.INDEXING.LATENCY.WARN:"{#JMXNAME}"}`|Warning|**Manual close**: Yes|
 
 ### LLD rule  Issue latency discovery
 
@@ -173,7 +173,7 @@ Metrics are collected by JMX.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Issue [{#JMXNAME}]: Slow operations|<p>Fires when latency grows above the threshold: `{$JIRA_DC.ISSUE.LATENCY.WARN:"{#JMXNAME}"}`s</p>|`min(/Jira Data Center by JMX/jmx["{#JMXOBJ}",Mean],5m)>{$JIRA_DC.ISSUE.LATENCY.WARN:"{#JMXNAME}"}`|Warning|**Manual close**: Yes|
+|Jira Data Center: Issue [{#JMXNAME}]: Slow operations|<p>Fires when latency grows above the threshold: `{$JIRA_DC.ISSUE.LATENCY.WARN:"{#JMXNAME}"}`s</p>|`min(/Jira Data Center by JMX/jmx["{#JMXOBJ}",Mean],5m)>{$JIRA_DC.ISSUE.LATENCY.WARN:"{#JMXNAME}"}`|Warning|**Manual close**: Yes|
 
 ### LLD rule  License discovery
 
@@ -192,8 +192,8 @@ Metrics are collected by JMX.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|License [{#LICENSE.TYPE}]: Low user capacity|<p>Fires when relative user quantity grows above the threshold: `{$JIRA_DC.LICENSE.USER.CAPACITY.WARN:"{#LICENSE.TYPE}"}`%</p>|`last(/Jira Data Center by JMX/jmx.license.get.user.max["{#LICENSE.TYPE}"])>=0 * (100*last(/Jira Data Center by JMX/jmx.license.get.user.current["{#LICENSE.TYPE}"])/last(/Jira Data Center by JMX/jmx.license.get.user.max["{#LICENSE.TYPE}"])>{$JIRA_DC.LICENSE.USER.CAPACITY.WARN:"{#LICENSE.TYPE}"})`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>License [{#LICENSE.TYPE}]: User count reached the limit</li></ul>|
-|License [{#LICENSE.TYPE}]: User count reached the limit|<p>Fires when user quantity reaches the limit.<br>It won't fire if the limit is disabled (set to `-1`).</p>|`last(/Jira Data Center by JMX/jmx.license.get.user.max["{#LICENSE.TYPE}"])>=0 * ((last(/Jira Data Center by JMX/jmx.license.get.user.max["{#LICENSE.TYPE}"])-last(/Jira Data Center by JMX/jmx.license.get.user.current["{#LICENSE.TYPE}"]))<=0)`|Average|**Manual close**: Yes|
+|Jira Data Center: License [{#LICENSE.TYPE}]: Low user capacity|<p>Fires when relative user quantity grows above the threshold: `{$JIRA_DC.LICENSE.USER.CAPACITY.WARN:"{#LICENSE.TYPE}"}`%</p>|`last(/Jira Data Center by JMX/jmx.license.get.user.max["{#LICENSE.TYPE}"])>=0 * (100*last(/Jira Data Center by JMX/jmx.license.get.user.current["{#LICENSE.TYPE}"])/last(/Jira Data Center by JMX/jmx.license.get.user.max["{#LICENSE.TYPE}"])>{$JIRA_DC.LICENSE.USER.CAPACITY.WARN:"{#LICENSE.TYPE}"})`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Jira Data Center: License [{#LICENSE.TYPE}]: User count reached the limit</li></ul>|
+|Jira Data Center: License [{#LICENSE.TYPE}]: User count reached the limit|<p>Fires when user quantity reaches the limit.<br>It won't fire if the limit is disabled (set to `-1`).</p>|`last(/Jira Data Center by JMX/jmx.license.get.user.max["{#LICENSE.TYPE}"])>=0 * ((last(/Jira Data Center by JMX/jmx.license.get.user.max["{#LICENSE.TYPE}"])-last(/Jira Data Center by JMX/jmx.license.get.user.current["{#LICENSE.TYPE}"]))<=0)`|Average|**Manual close**: Yes|
 
 ## Feedback
 

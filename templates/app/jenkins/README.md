@@ -128,15 +128,15 @@ Don't forget to change macros {$JENKINS.URL}.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Disk space is too low|<p>Jenkins disk space monitors are reporting the disk space as less than the configured threshold. The message will reference the first node which fails this check.<br>Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}</p>|`last(/Jenkins by HTTP/jenkins.disk_space)=0 and length(last(/Jenkins by HTTP/jenkins.disk_space.message))>0`|Warning||
-|One or more Jenkins plugins failed to start|<p>A failure is typically indicative of a potential issue within the Jenkins installation that will either be solved by explicitly disabling the failing plugin(s) or by resolving the corresponding plugin dependency issues.<br>Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}</p>|`last(/Jenkins by HTTP/jenkins.plugins)=0 and length(last(/Jenkins by HTTP/jenkins.plugins.message))>0`|Info|**Manual close**: Yes|
-|Temporary space is too low|<p>Jenkins temporary space monitors are reporting the temporary space as less than the configured threshold. The message will reference the first node which fails this check.<br>Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}</p>|`last(/Jenkins by HTTP/jenkins.temporary_space)=0 and length(last(/Jenkins by HTTP/jenkins.temporary_space.message))>0`|Warning||
-|There are deadlocked threads in Jenkins master JVM|<p>There are any deadlocked threads in the Jenkins master JVM.<br>Health check message: {{ITEM.LASTVALUE2}.regsub('(.*)',\1)}</p>|`last(/Jenkins by HTTP/jenkins.thread_deadlock)=0 and length(last(/Jenkins by HTTP/jenkins.thread_deadlock.message))>0`|Warning||
-|Service has no online nodes||`last(/Jenkins by HTTP/jenkins.node.online)=0`|Average||
-|Version has changed|<p>The Jenkins version has changed. Acknowledge to close the problem manually.</p>|`last(/Jenkins by HTTP/jenkins.version,#1)<>last(/Jenkins by HTTP/jenkins.version,#2) and length(last(/Jenkins by HTTP/jenkins.version))>0`|Info|**Manual close**: Yes|
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Jenkins by HTTP/jenkins.system.uptime)<10m`|Info|**Manual close**: Yes|
-|Current number of used files is too high||`min(/Jenkins by HTTP/jenkins.descriptor.ratio,5m)>{$JENKINS.FILE_DESCRIPTORS.MAX.WARN}`|Warning||
-|Service is down||`last(/Jenkins by HTTP/jenkins.ping)=0`|Average|**Manual close**: Yes|
+|Jenkins: Disk space is too low|<p>Jenkins disk space monitors are reporting the disk space as less than the configured threshold. The message will reference the first node which fails this check.<br>Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}</p>|`last(/Jenkins by HTTP/jenkins.disk_space)=0 and length(last(/Jenkins by HTTP/jenkins.disk_space.message))>0`|Warning||
+|Jenkins: One or more Jenkins plugins failed to start|<p>A failure is typically indicative of a potential issue within the Jenkins installation that will either be solved by explicitly disabling the failing plugin(s) or by resolving the corresponding plugin dependency issues.<br>Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}</p>|`last(/Jenkins by HTTP/jenkins.plugins)=0 and length(last(/Jenkins by HTTP/jenkins.plugins.message))>0`|Info|**Manual close**: Yes|
+|Jenkins: Temporary space is too low|<p>Jenkins temporary space monitors are reporting the temporary space as less than the configured threshold. The message will reference the first node which fails this check.<br>Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}</p>|`last(/Jenkins by HTTP/jenkins.temporary_space)=0 and length(last(/Jenkins by HTTP/jenkins.temporary_space.message))>0`|Warning||
+|Jenkins: There are deadlocked threads in Jenkins master JVM|<p>There are any deadlocked threads in the Jenkins master JVM.<br>Health check message: {{ITEM.LASTVALUE2}.regsub('(.*)',\1)}</p>|`last(/Jenkins by HTTP/jenkins.thread_deadlock)=0 and length(last(/Jenkins by HTTP/jenkins.thread_deadlock.message))>0`|Warning||
+|Jenkins: Service has no online nodes||`last(/Jenkins by HTTP/jenkins.node.online)=0`|Average||
+|Jenkins: Version has changed|<p>The Jenkins version has changed. Acknowledge to close the problem manually.</p>|`last(/Jenkins by HTTP/jenkins.version,#1)<>last(/Jenkins by HTTP/jenkins.version,#2) and length(last(/Jenkins by HTTP/jenkins.version))>0`|Info|**Manual close**: Yes|
+|Jenkins: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Jenkins by HTTP/jenkins.system.uptime)<10m`|Info|**Manual close**: Yes|
+|Jenkins: Current number of used files is too high||`min(/Jenkins by HTTP/jenkins.descriptor.ratio,5m)>{$JENKINS.FILE_DESCRIPTORS.MAX.WARN}`|Warning||
+|Jenkins: Service is down||`last(/Jenkins by HTTP/jenkins.ping)=0`|Average|**Manual close**: Yes|
 
 ### LLD rule Jobs discovery
 
@@ -165,7 +165,7 @@ Don't forget to change macros {$JENKINS.URL}.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Job [{#NAME}]: Job is unhealthy||`last(/Jenkins by HTTP/jenkins.build.health[{#NAME}])<{$JENKINS.JOB.HEALTH.SCORE.MIN.WARN}`|Warning|**Manual close**: Yes|
+|Jenkins: Job [{#NAME}]: Job is unhealthy||`last(/Jenkins by HTTP/jenkins.build.health[{#NAME}])<{$JENKINS.JOB.HEALTH.SCORE.MIN.WARN}`|Warning|**Manual close**: Yes|
 
 ### LLD rule Computers discovery
 
@@ -196,8 +196,8 @@ Don't forget to change macros {$JENKINS.URL}.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Computer [{#DISPLAY_NAME}]: Node is down|<p>Node down with reason: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}</p>|`last(/Jenkins by HTTP/jenkins.computer.state[{#DISPLAY_NAME}])=1 and length(last(/Jenkins by HTTP/jenkins.computer.offline.reason[{#DISPLAY_NAME}]))>0`|Average|**Depends on**:<br><ul><li>Service has no online nodes</li><li>Computer [{#DISPLAY_NAME}]: Node is temporarily offline</li></ul>|
-|Computer [{#DISPLAY_NAME}]: Node is temporarily offline|<p>Node is temporarily Offline with reason: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}</p>|`last(/Jenkins by HTTP/jenkins.computer.temp_offline[{#DISPLAY_NAME}])=1 and length(last(/Jenkins by HTTP/jenkins.computer.offline.reason[{#DISPLAY_NAME}]))>0`|Info|**Manual close**: Yes|
+|Jenkins: Computer [{#DISPLAY_NAME}]: Node is down|<p>Node down with reason: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}</p>|`last(/Jenkins by HTTP/jenkins.computer.state[{#DISPLAY_NAME}])=1 and length(last(/Jenkins by HTTP/jenkins.computer.offline.reason[{#DISPLAY_NAME}]))>0`|Average|**Depends on**:<br><ul><li>Jenkins: Service has no online nodes</li><li>Jenkins: Computer [{#DISPLAY_NAME}]: Node is temporarily offline</li></ul>|
+|Jenkins: Computer [{#DISPLAY_NAME}]: Node is temporarily offline|<p>Node is temporarily Offline with reason: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}</p>|`last(/Jenkins by HTTP/jenkins.computer.temp_offline[{#DISPLAY_NAME}])=1 and length(last(/Jenkins by HTTP/jenkins.computer.offline.reason[{#DISPLAY_NAME}]))>0`|Info|**Manual close**: Yes|
 
 ## Feedback
 

@@ -79,14 +79,14 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/Cisco Catalyst 3750V2-24FS by SNMP/icmpping,#3)=0`|High||
-|High ICMP ping loss||`min(/Cisco Catalyst 3750V2-24FS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco Catalyst 3750V2-24FS by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|High ICMP ping response time||`avg(/Cisco Catalyst 3750V2-24FS by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>High ICMP ping loss</li><li>Unavailable by ICMP ping</li></ul>|
-|Device has been replaced|<p>The device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.serialnumber,#1)<>last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.serialnumber,#2) and length(last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.serialnumber))>0`|Info|**Manual close**: Yes|
-|System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Cisco Catalyst 3750V2-24FS by SNMP/system.name,#1)<>last(/Cisco Catalyst 3750V2-24FS by SNMP/system.name,#2) and length(last(/Cisco Catalyst 3750V2-24FS by SNMP/system.name))>0`|Info|**Manual close**: Yes|
-|Operating system description has changed|<p>The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.</p>|`last(/Cisco Catalyst 3750V2-24FS by SNMP/system.sw.os,#1)<>last(/Cisco Catalyst 3750V2-24FS by SNMP/system.sw.os,#2) and length(last(/Cisco Catalyst 3750V2-24FS by SNMP/system.sw.os))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>System name has changed</li></ul>|
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.uptime)>0 and last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.uptime)<10m) or (last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.uptime)=0 and last(/Cisco Catalyst 3750V2-24FS by SNMP/system.net.uptime)<10m)`|Warning|**Manual close**: Yes|
-|No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Cisco Catalyst 3750V2-24FS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
+|Cisco Catalyst 3750V2-24FS: Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/Cisco Catalyst 3750V2-24FS by SNMP/icmpping,#3)=0`|High||
+|Cisco Catalyst 3750V2-24FS: High ICMP ping loss||`min(/Cisco Catalyst 3750V2-24FS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco Catalyst 3750V2-24FS by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Cisco Catalyst 3750V2-24FS: Unavailable by ICMP ping</li></ul>|
+|Cisco Catalyst 3750V2-24FS: High ICMP ping response time||`avg(/Cisco Catalyst 3750V2-24FS by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>Cisco Catalyst 3750V2-24FS: High ICMP ping loss</li><li>Cisco Catalyst 3750V2-24FS: Unavailable by ICMP ping</li></ul>|
+|Cisco Catalyst 3750V2-24FS: Device has been replaced|<p>The device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.serialnumber,#1)<>last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.serialnumber,#2) and length(last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.serialnumber))>0`|Info|**Manual close**: Yes|
+|Cisco Catalyst 3750V2-24FS: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Cisco Catalyst 3750V2-24FS by SNMP/system.name,#1)<>last(/Cisco Catalyst 3750V2-24FS by SNMP/system.name,#2) and length(last(/Cisco Catalyst 3750V2-24FS by SNMP/system.name))>0`|Info|**Manual close**: Yes|
+|Cisco Catalyst 3750V2-24FS: Operating system description has changed|<p>The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.</p>|`last(/Cisco Catalyst 3750V2-24FS by SNMP/system.sw.os,#1)<>last(/Cisco Catalyst 3750V2-24FS by SNMP/system.sw.os,#2) and length(last(/Cisco Catalyst 3750V2-24FS by SNMP/system.sw.os))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Cisco Catalyst 3750V2-24FS: System name has changed</li></ul>|
+|Cisco Catalyst 3750V2-24FS: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.uptime)>0 and last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.uptime)<10m) or (last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.uptime)=0 and last(/Cisco Catalyst 3750V2-24FS by SNMP/system.net.uptime)<10m)`|Warning|**Manual close**: Yes|
+|Cisco Catalyst 3750V2-24FS: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Cisco Catalyst 3750V2-24FS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
 
 ### LLD rule CPU discovery
 
@@ -104,7 +104,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|#{#SNMPINDEX}: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Cisco Catalyst 3750V2-24FS by SNMP/system.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}`|Warning||
+|Cisco Catalyst 3750V2-24FS: #{#SNMPINDEX}: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Cisco Catalyst 3750V2-24FS by SNMP/system.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}`|Warning||
 
 ### LLD rule Entity Serial Numbers discovery
 
@@ -122,7 +122,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#ENT_NAME}: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.serialnumber[{#SNMPINDEX}],#1)<>last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.serialnumber[{#SNMPINDEX}],#2) and length(last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.serialnumber[{#SNMPINDEX}]))>0`|Info||
+|Cisco Catalyst 3750V2-24FS: {#ENT_NAME}: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.serialnumber[{#SNMPINDEX}],#1)<>last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.serialnumber[{#SNMPINDEX}],#2) and length(last(/Cisco Catalyst 3750V2-24FS by SNMP/system.hw.serialnumber[{#SNMPINDEX}]))>0`|Info||
 
 ### LLD rule FAN discovery
 
@@ -140,8 +140,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SNMPVALUE}: Fan is in critical state|<p>Please check the fan unit</p>|`last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.fan.status[{#SNMPINDEX}])=3 or last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.fan.status[{#SNMPINDEX}])=4`|Average||
-|{#SNMPVALUE}: Fan is in warning state|<p>Please check the fan unit</p>|`last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.fan.status[{#SNMPINDEX}])=2`|Warning|**Depends on**:<br><ul><li>{#SNMPVALUE}: Fan is in critical state</li></ul>|
+|Cisco Catalyst 3750V2-24FS: {#SNMPVALUE}: Fan is in critical state|<p>Please check the fan unit</p>|`last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.fan.status[{#SNMPINDEX}])=3 or last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.fan.status[{#SNMPINDEX}])=4`|Average||
+|Cisco Catalyst 3750V2-24FS: {#SNMPVALUE}: Fan is in warning state|<p>Please check the fan unit</p>|`last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.fan.status[{#SNMPINDEX}])=2`|Warning|**Depends on**:<br><ul><li>Cisco Catalyst 3750V2-24FS: {#SNMPVALUE}: Fan is in critical state</li></ul>|
 
 ### LLD rule Memory discovery
 
@@ -161,7 +161,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SNMPVALUE}: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Cisco Catalyst 3750V2-24FS by SNMP/vm.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}`|Average||
+|Cisco Catalyst 3750V2-24FS: {#SNMPVALUE}: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Cisco Catalyst 3750V2-24FS by SNMP/vm.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}`|Average||
 
 ### LLD rule Network interfaces discovery
 
@@ -187,12 +187,12 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Interface {#IFNAME}({#IFALIAS}): High input error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): High inbound bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.in[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.speed[{#SNMPINDEX}])) and last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.speed[{#SNMPINDEX}])>0`|Warning|**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): High output error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): High outbound bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.speed[{#SNMPINDEX}])) and last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.speed[{#SNMPINDEX}])>0`|Warning|**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.</p>|`change(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.speed[{#SNMPINDEX}])<0 and last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.speed[{#SNMPINDEX}])>0 and ( last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.type[{#SNMPINDEX}])=6 or last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.type[{#SNMPINDEX}])=7 or last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.type[{#SNMPINDEX}])=11 or last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.type[{#SNMPINDEX}])=62 or last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.type[{#SNMPINDEX}])=69 or last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.type[{#SNMPINDEX}])=117 ) and (last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.status[{#SNMPINDEX}])<>2)`|Info|**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.status[{#SNMPINDEX}])=2)`|Average||
+|Cisco Catalyst 3750V2-24FS: Interface {#IFNAME}({#IFALIAS}): High input error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Depends on**:<br><ul><li>Cisco Catalyst 3750V2-24FS: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|Cisco Catalyst 3750V2-24FS: Interface {#IFNAME}({#IFALIAS}): High inbound bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.in[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.speed[{#SNMPINDEX}])) and last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.speed[{#SNMPINDEX}])>0`|Warning|**Depends on**:<br><ul><li>Cisco Catalyst 3750V2-24FS: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|Cisco Catalyst 3750V2-24FS: Interface {#IFNAME}({#IFALIAS}): High output error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Depends on**:<br><ul><li>Cisco Catalyst 3750V2-24FS: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|Cisco Catalyst 3750V2-24FS: Interface {#IFNAME}({#IFALIAS}): High outbound bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.speed[{#SNMPINDEX}])) and last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.speed[{#SNMPINDEX}])>0`|Warning|**Depends on**:<br><ul><li>Cisco Catalyst 3750V2-24FS: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|Cisco Catalyst 3750V2-24FS: Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.</p>|`change(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.speed[{#SNMPINDEX}])<0 and last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.speed[{#SNMPINDEX}])>0 and ( last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.type[{#SNMPINDEX}])=6 or last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.type[{#SNMPINDEX}])=7 or last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.type[{#SNMPINDEX}])=11 or last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.type[{#SNMPINDEX}])=62 or last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.type[{#SNMPINDEX}])=69 or last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.type[{#SNMPINDEX}])=117 ) and (last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.status[{#SNMPINDEX}])<>2)`|Info|**Depends on**:<br><ul><li>Cisco Catalyst 3750V2-24FS: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|Cisco Catalyst 3750V2-24FS: Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.status[{#SNMPINDEX}])=2)`|Average||
 
 ### LLD rule EtherLike discovery
 
@@ -210,7 +210,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Interface {#IFNAME}({#IFALIAS}): In half-duplex mode|<p>Please check autonegotiation settings and cabling</p>|`last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.duplex[{#SNMPINDEX}])=2`|Warning||
+|Cisco Catalyst 3750V2-24FS: Interface {#IFNAME}({#IFALIAS}): In half-duplex mode|<p>Please check autonegotiation settings and cabling</p>|`last(/Cisco Catalyst 3750V2-24FS by SNMP/net.if.duplex[{#SNMPINDEX}])=2`|Warning||
 
 ### LLD rule PSU discovery
 
@@ -228,8 +228,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SNMPVALUE}: Power supply is in critical state|<p>Please check the power supply unit for errors</p>|`last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.psu.status[{#SNMPINDEX}])=3 or last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.psu.status[{#SNMPINDEX}])=4`|Average||
-|{#SNMPVALUE}: Power supply is in warning state|<p>Please check the power supply unit for errors</p>|`last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.psu.status[{#SNMPINDEX}])=2`|Warning|**Depends on**:<br><ul><li>{#SNMPVALUE}: Power supply is in critical state</li></ul>|
+|Cisco Catalyst 3750V2-24FS: {#SNMPVALUE}: Power supply is in critical state|<p>Please check the power supply unit for errors</p>|`last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.psu.status[{#SNMPINDEX}])=3 or last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.psu.status[{#SNMPINDEX}])=4`|Average||
+|Cisco Catalyst 3750V2-24FS: {#SNMPVALUE}: Power supply is in warning state|<p>Please check the power supply unit for errors</p>|`last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.psu.status[{#SNMPINDEX}])=2`|Warning|**Depends on**:<br><ul><li>Cisco Catalyst 3750V2-24FS: {#SNMPVALUE}: Power supply is in critical state</li></ul>|
 
 ### LLD rule Temperature discovery
 
@@ -248,11 +248,11 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SNMPVALUE}: Temperature is in critical state|<p>This trigger uses temperature sensor state</p>|`last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.status[{#SNMPINDEX}])=3 or last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.status[{#SNMPINDEX}])=4`|High||
-|{#SNMPVALUE}: Temperature is in warning state|<p>This trigger uses temperature sensor state</p>|`last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.status[{#SNMPINDEX}])=2`|Warning|**Depends on**:<br><ul><li>{#SNMPVALUE}: Temperature is in critical state</li></ul>|
-|{#SNMPVALUE}: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}`|High||
-|{#SNMPVALUE}: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}`|Warning|**Depends on**:<br><ul><li>{#SNMPVALUE}: Temperature is above critical threshold</li></ul>|
-|{#SNMPVALUE}: Temperature is too low||`avg(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}`|Average||
+|Cisco Catalyst 3750V2-24FS: {#SNMPVALUE}: Temperature is in critical state|<p>This trigger uses temperature sensor state</p>|`last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.status[{#SNMPINDEX}])=3 or last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.status[{#SNMPINDEX}])=4`|High||
+|Cisco Catalyst 3750V2-24FS: {#SNMPVALUE}: Temperature is in warning state|<p>This trigger uses temperature sensor state</p>|`last(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.status[{#SNMPINDEX}])=2`|Warning|**Depends on**:<br><ul><li>Cisco Catalyst 3750V2-24FS: {#SNMPVALUE}: Temperature is in critical state</li></ul>|
+|Cisco Catalyst 3750V2-24FS: {#SNMPVALUE}: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}`|High||
+|Cisco Catalyst 3750V2-24FS: {#SNMPVALUE}: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}`|Warning|**Depends on**:<br><ul><li>Cisco Catalyst 3750V2-24FS: {#SNMPVALUE}: Temperature is above critical threshold</li></ul>|
+|Cisco Catalyst 3750V2-24FS: {#SNMPVALUE}: Temperature is too low||`avg(/Cisco Catalyst 3750V2-24FS by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}`|Average||
 
 ## Feedback
 

@@ -63,9 +63,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|SSL certificate is invalid|<p>SSL certificate has expired or it is issued for another domain.</p>|`find(/Website certificate by Zabbix agent 2 active/cert.validation,,"like","invalid")=1`|High||
-|SSL certificate expires soon|<p>The SSL certificate should be updated or it will become untrusted.</p>|`(last(/Website certificate by Zabbix agent 2 active/cert.not_after) - now()) / 86400 < {$CERT.EXPIRY.WARN}`|Warning|**Depends on**:<br><ul><li>SSL certificate is invalid</li></ul>|
-|Fingerprint has changed|<p>The SSL certificate fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Acknowledge to close the problem manually.<br>There could be multiple valid certificates on some installations. In this case, the trigger will have a false positive. You can ignore it or disable the trigger.</p>|`last(/Website certificate by Zabbix agent 2 active/cert.sha1_fingerprint) <> last(/Website certificate by Zabbix agent 2 active/cert.sha1_fingerprint,#2)`|Info|**Manual close**: Yes|
+|Certificate: SSL certificate is invalid|<p>SSL certificate has expired or it is issued for another domain.</p>|`find(/Website certificate by Zabbix agent 2 active/cert.validation,,"like","invalid")=1`|High||
+|Certificate: SSL certificate expires soon|<p>The SSL certificate should be updated or it will become untrusted.</p>|`(last(/Website certificate by Zabbix agent 2 active/cert.not_after) - now()) / 86400 < {$CERT.EXPIRY.WARN}`|Warning|**Depends on**:<br><ul><li>Certificate: SSL certificate is invalid</li></ul>|
+|Certificate: Fingerprint has changed|<p>The SSL certificate fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Acknowledge to close the problem manually.<br>There could be multiple valid certificates on some installations. In this case, the trigger will have a false positive. You can ignore it or disable the trigger.</p>|`last(/Website certificate by Zabbix agent 2 active/cert.sha1_fingerprint) <> last(/Website certificate by Zabbix agent 2 active/cert.sha1_fingerprint,#2)`|Info|**Manual close**: Yes|
 
 ## Feedback
 

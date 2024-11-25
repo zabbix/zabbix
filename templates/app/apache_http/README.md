@@ -119,11 +119,11 @@ This is an example configuration of the Apache web server:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Failed to fetch status page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Apache by HTTP/apache.get_status,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Service is down</li></ul>|
-|Service is down||`last(/Apache by HTTP/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0`|Average|**Manual close**: Yes|
-|Service response time is too high||`min(/Apache by HTTP/net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Service is down</li></ul>|
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Apache by HTTP/apache.uptime)<10m`|Info|**Manual close**: Yes|
-|Version has changed|<p>Apache version has changed. Acknowledge to close the problem manually.</p>|`last(/Apache by HTTP/apache.version,#1)<>last(/Apache by HTTP/apache.version,#2) and length(last(/Apache by HTTP/apache.version))>0`|Info|**Manual close**: Yes|
+|Apache: Failed to fetch status page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Apache by HTTP/apache.get_status,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Apache: Service is down</li></ul>|
+|Apache: Service is down||`last(/Apache by HTTP/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0`|Average|**Manual close**: Yes|
+|Apache: Service response time is too high||`min(/Apache by HTTP/net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Apache: Service is down</li></ul>|
+|Apache: Service has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Apache by HTTP/apache.uptime)<10m`|Info|**Manual close**: Yes|
+|Apache: Version has changed|<p>Apache version has changed. Acknowledge to close the problem manually.</p>|`last(/Apache by HTTP/apache.version,#1)<>last(/Apache by HTTP/apache.version,#2) and length(last(/Apache by HTTP/apache.version))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Event MPM discovery
 

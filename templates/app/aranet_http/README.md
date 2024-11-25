@@ -79,8 +79,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#METRIC}: Low humidity on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"||`max(/Aranet Cloud/aranet.humidity["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) < {$ARANET.HUMIDITY.MIN.WARN:"{#SENSOR_NAME}"}`|Warning|**Depends on**:<br><ul><li>{#METRIC}: High humidity on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"</li></ul>|
-|{#METRIC}: High humidity on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"||`min(/Aranet Cloud/aranet.humidity["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) > {$ARANET.HUMIDITY.MAX.WARN:"{#SENSOR_NAME}"}`|High||
+|Aranet: {#METRIC}: Low humidity on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"||`max(/Aranet Cloud/aranet.humidity["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) < {$ARANET.HUMIDITY.MIN.WARN:"{#SENSOR_NAME}"}`|Warning|**Depends on**:<br><ul><li>Aranet: {#METRIC}: High humidity on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"</li></ul>|
+|Aranet: {#METRIC}: High humidity on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"||`min(/Aranet Cloud/aranet.humidity["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) > {$ARANET.HUMIDITY.MAX.WARN:"{#SENSOR_NAME}"}`|High||
 
 ### LLD rule RSSI discovery
 
@@ -110,8 +110,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#METRIC}: Low battery voltage on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"||`max(/Aranet Cloud/aranet.battery.voltage["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) < {$ARANET.BATT.VOLTAGE.MIN.WARN:"{#SENSOR_NAME}"}`|Warning|**Depends on**:<br><ul><li>{#METRIC}: Critically low battery voltage on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"</li></ul>|
-|{#METRIC}: Critically low battery voltage on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"||`max(/Aranet Cloud/aranet.battery.voltage["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) < {$ARANET.BATT.VOLTAGE.MIN.CRIT:"{#SENSOR_NAME}"}`|High||
+|Aranet: {#METRIC}: Low battery voltage on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"||`max(/Aranet Cloud/aranet.battery.voltage["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) < {$ARANET.BATT.VOLTAGE.MIN.WARN:"{#SENSOR_NAME}"}`|Warning|**Depends on**:<br><ul><li>Aranet: {#METRIC}: Critically low battery voltage on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"</li></ul>|
+|Aranet: {#METRIC}: Critically low battery voltage on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"||`max(/Aranet Cloud/aranet.battery.voltage["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) < {$ARANET.BATT.VOLTAGE.MIN.CRIT:"{#SENSOR_NAME}"}`|High||
 
 ### LLD rule CO2 discovery
 
@@ -129,8 +129,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#METRIC}: High CO2 level on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"||`min(/Aranet Cloud/aranet.co2["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) > {$ARANET.CO2.MAX.WARN:"{#SENSOR_NAME}"}`|Warning|**Depends on**:<br><ul><li>{#METRIC}: Critically high CO2 level on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"</li></ul>|
-|{#METRIC}: Critically high CO2 level on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"||`min(/Aranet Cloud/aranet.co2["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) > {$ARANET.CO2.MAX.CRIT:"{#SENSOR_NAME}"}`|High||
+|Aranet: {#METRIC}: High CO2 level on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"||`min(/Aranet Cloud/aranet.co2["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) > {$ARANET.CO2.MAX.WARN:"{#SENSOR_NAME}"}`|Warning|**Depends on**:<br><ul><li>Aranet: {#METRIC}: Critically high CO2 level on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"</li></ul>|
+|Aranet: {#METRIC}: Critically high CO2 level on "[{#GATEWAY_NAME}] {#SENSOR_NAME}"||`min(/Aranet Cloud/aranet.co2["{#GATEWAY_ID}", "{#SENSOR_ID}"],5m) > {$ARANET.CO2.MAX.CRIT:"{#SENSOR_NAME}"}`|High||
 
 ### LLD rule Atmospheric pressure discovery
 
@@ -328,7 +328,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#METRIC}: Sensor data "[{#GATEWAY_NAME}] {#SENSOR_NAME}" is not updated||`last(/Aranet Cloud/aranet.last_update["{#GATEWAY_ID}", "{#SENSOR_ID}"]) > {$ARANET.LAST_UPDATE.MAX.WARN:"{#SENSOR_NAME}"}`|Warning||
+|Aranet: {#METRIC}: Sensor data "[{#GATEWAY_NAME}] {#SENSOR_NAME}" is not updated||`last(/Aranet Cloud/aranet.last_update["{#GATEWAY_ID}", "{#SENSOR_ID}"]) > {$ARANET.LAST_UPDATE.MAX.WARN:"{#SENSOR_NAME}"}`|Warning||
 
 ## Feedback
 

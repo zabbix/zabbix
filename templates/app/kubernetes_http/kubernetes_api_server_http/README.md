@@ -73,8 +73,8 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Too many server errors|<p>"Kubernetes API server is experiencing high error rate (with 5xx HTTP code).</p>|`min(/Kubernetes API server by HTTP/kubernetes.api.apiserver_request_total_500.rate,5m)>{$KUBE.API.HTTP.SERVER.ERROR}`|Warning||
-|Too many client errors|<p>"Kubernetes API client is experiencing high error rate (with 5xx HTTP code).</p>|`min(/Kubernetes API server by HTTP/kubernetes.api.rest_client_requests_total_500.rate,5m)>{$KUBE.API.HTTP.CLIENT.ERROR}`|Warning||
+|Kubernetes API server: Too many server errors|<p>"Kubernetes API server is experiencing high error rate (with 5xx HTTP code).</p>|`min(/Kubernetes API server by HTTP/kubernetes.api.apiserver_request_total_500.rate,5m)>{$KUBE.API.HTTP.SERVER.ERROR}`|Warning||
+|Kubernetes API server: Too many client errors|<p>"Kubernetes API client is experiencing high error rate (with 5xx HTTP code).</p>|`min(/Kubernetes API server by HTTP/kubernetes.api.rest_client_requests_total_500.rate,5m)>{$KUBE.API.HTTP.CLIENT.ERROR}`|Warning||
 
 ### LLD rule Long-running requests
 
@@ -206,8 +206,8 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Kubernetes client certificate is expiring|<p>A client certificate used to authenticate to the apiserver is expiring in {$KUBE.API.CERT.EXPIRATION} days.</p>|`last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) < {$KUBE.API.CERT.EXPIRATION}*24*60*60`|Warning|**Depends on**:<br><ul><li>Kubernetes client certificate expires soon</li></ul>|
-|Kubernetes client certificate expires soon|<p>A client certificate used to authenticate to the apiserver is expiring in less than 24.0 hours.</p>|`last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) < 24*60*60`|Warning||
+|Kubernetes API server: Kubernetes client certificate is expiring|<p>A client certificate used to authenticate to the apiserver is expiring in {$KUBE.API.CERT.EXPIRATION} days.</p>|`last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) < {$KUBE.API.CERT.EXPIRATION}*24*60*60`|Warning|**Depends on**:<br><ul><li>Kubernetes API server: Kubernetes client certificate expires soon</li></ul>|
+|Kubernetes API server: Kubernetes client certificate expires soon|<p>A client certificate used to authenticate to the apiserver is expiring in less than 24.0 hours.</p>|`last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) > 0 and last(/Kubernetes API server by HTTP/kubernetes.api.client_certificate_expiration_p1[{#SINGLETON}]) < 24*60*60`|Warning||
 
 ## Feedback
 

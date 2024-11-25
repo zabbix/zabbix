@@ -53,8 +53,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Cisco ASAv by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Cisco ASAv by SNMP/cisco.asav.uptime)<10m`|Info|**Manual close**: Yes|
+|Cisco ASAv: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Cisco ASAv by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
+|Cisco ASAv: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Cisco ASAv by SNMP/cisco.asav.uptime)<10m`|Info|**Manual close**: Yes|
 
 ### LLD rule Physical entry discovery
 
@@ -79,7 +79,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#CISCO.ASAV.PHYS.NAME} has been replaced|<p>{#CISCO.ASAV.PHYS.NAME} serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Cisco ASAv by SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#1)<>last(/Cisco ASAv by SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#2) and length(last(/Cisco ASAv by SNMP/cisco.asav.phys.sn[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|Cisco ASAv: {#CISCO.ASAV.PHYS.NAME} has been replaced|<p>{#CISCO.ASAV.PHYS.NAME} serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Cisco ASAv by SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#1)<>last(/Cisco ASAv by SNMP/cisco.asav.phys.sn[{#SNMPINDEX}],#2) and length(last(/Cisco ASAv by SNMP/cisco.asav.phys.sn[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Interface discovery
 
@@ -111,7 +111,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#CISCO.IF.NAME} Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'eternal off' interfaces.)<br><br>WARNING: if closed manually - won't fire again on next poll, because of .diff.</p>|`last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}])=2 and last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#2)`|Average|**Manual close**: Yes|
+|Cisco ASAv: {#CISCO.IF.NAME} Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'eternal off' interfaces.)<br><br>WARNING: if closed manually - won't fire again on next poll, because of .diff.</p>|`last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}])=2 and last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/Cisco ASAv by SNMP/cisco.asav.net.if.operstatus[{#SNMPINDEX}],#2)`|Average|**Manual close**: Yes|
 
 ### LLD rule Memory discovery
 
@@ -131,7 +131,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|High memory utilization|<p>The system is running out of free memory.</p>|`min(/Cisco ASAv by SNMP/cisco.asav.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}`|Average||
+|Cisco ASAv: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Cisco ASAv by SNMP/cisco.asav.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}`|Average||
 
 ### LLD rule CPU discovery
 
@@ -149,7 +149,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Cisco ASAv by SNMP/cisco.asav.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}`|Warning||
+|Cisco ASAv: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Cisco ASAv by SNMP/cisco.asav.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}`|Warning||
 
 ### LLD rule Session discovery
 

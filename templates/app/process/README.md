@@ -67,7 +67,7 @@ Custom processes set in macros:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Process [{#NAME}]: Process is not running||`last(/OS processes by Zabbix agent/custom.proc.num[{#NAME}])=0`|High|**Manual close**: Yes|
+|OS: Process [{#NAME}]: Process is not running||`last(/OS processes by Zabbix agent/custom.proc.num[{#NAME}])=0`|High|**Manual close**: Yes|
 
 ## Feedback
 

@@ -91,18 +91,18 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Instance is not responding||`last(/TiDB by HTTP/tidb.status)=0`|Average||
-|Too many region related errors||`min(/TiDB by HTTP/tidb.tikvclient_region_err.rate,5m)>{$TIDB.REGION_ERROR.MAX.WARN}`|Average||
-|Too many DDL waiting jobs||`min(/TiDB by HTTP/tidb.ddl_waiting_jobs,5m)>{$TIDB.DDL.WAITING.MAX.WARN}`|Warning||
-|Too many schema lease errors||`min(/TiDB by HTTP/tidb.domain_load_schema.failed.rate,5m)>{$TIDB.SCHEMA_LOAD_ERRORS.MAX.WARN}`|Average||
-|Too many schema lease errors|<p>The latest schema information is not reloaded in TiDB within one lease.</p>|`min(/TiDB by HTTP/tidb.session_schema_lease_error.outdate.rate,5m)>{$TIDB.SCHEMA_LEASE_ERRORS.MAX.WARN}`|Average||
-|Too few keep alive operations|<p>Indicates whether the TiDB process still exists. If the number of times for tidb_monitor_keep_alive_total increases less than 10 per minute, the TiDB process might already exit and an alert is triggered.</p>|`max(/TiDB by HTTP/tidb.monitor_keep_alive.rate,5m)<{$TIDB.MONITOR_KEEP_ALIVE.MAX.WARN}`|Average||
-|Heap memory usage is too high||`min(/TiDB by HTTP/tidb.heap_bytes,5m)>{$TIDB.HEAP.USAGE.MAX.WARN}`|Warning||
-|Current number of open files is too high|<p>Heavy file descriptor usage (i.e., near the process's file descriptor limit) indicates a potential file descriptor exhaustion issue.</p>|`min(/TiDB by HTTP/tidb.process_open_fds,5m)/last(/TiDB by HTTP/tidb.process_max_fds)*100>{$TIDB.OPEN.FDS.MAX.WARN}`|Warning||
-|has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/TiDB by HTTP/tidb.uptime)<10m`|Info|**Manual close**: Yes|
-|Version has changed|<p>TiDB version has changed. Acknowledge to close the problem manually.</p>|`last(/TiDB by HTTP/tidb.version,#1)<>last(/TiDB by HTTP/tidb.version,#2) and length(last(/TiDB by HTTP/tidb.version))>0`|Info|**Manual close**: Yes|
-|Too many time jump backs||`min(/TiDB by HTTP/tidb.monitor_time_jump_back.rate,5m)>{$TIDB.TIME_JUMP_BACK.MAX.WARN}`|Warning||
-|There are panicked TiDB threads|<p>When a panic occurs, an alert is triggered. The thread is often recovered, otherwise, TiDB will frequently restart.</p>|`last(/TiDB by HTTP/tidb.tidb_server_panic_total.rate)>0`|Average||
+|TiDB: Instance is not responding||`last(/TiDB by HTTP/tidb.status)=0`|Average||
+|TiDB: Too many region related errors||`min(/TiDB by HTTP/tidb.tikvclient_region_err.rate,5m)>{$TIDB.REGION_ERROR.MAX.WARN}`|Average||
+|TiDB: Too many DDL waiting jobs||`min(/TiDB by HTTP/tidb.ddl_waiting_jobs,5m)>{$TIDB.DDL.WAITING.MAX.WARN}`|Warning||
+|TiDB: Too many schema lease errors||`min(/TiDB by HTTP/tidb.domain_load_schema.failed.rate,5m)>{$TIDB.SCHEMA_LOAD_ERRORS.MAX.WARN}`|Average||
+|TiDB: Too many schema lease errors|<p>The latest schema information is not reloaded in TiDB within one lease.</p>|`min(/TiDB by HTTP/tidb.session_schema_lease_error.outdate.rate,5m)>{$TIDB.SCHEMA_LEASE_ERRORS.MAX.WARN}`|Average||
+|TiDB: Too few keep alive operations|<p>Indicates whether the TiDB process still exists. If the number of times for tidb_monitor_keep_alive_total increases less than 10 per minute, the TiDB process might already exit and an alert is triggered.</p>|`max(/TiDB by HTTP/tidb.monitor_keep_alive.rate,5m)<{$TIDB.MONITOR_KEEP_ALIVE.MAX.WARN}`|Average||
+|TiDB: Heap memory usage is too high||`min(/TiDB by HTTP/tidb.heap_bytes,5m)>{$TIDB.HEAP.USAGE.MAX.WARN}`|Warning||
+|TiDB: Current number of open files is too high|<p>Heavy file descriptor usage (i.e., near the process's file descriptor limit) indicates a potential file descriptor exhaustion issue.</p>|`min(/TiDB by HTTP/tidb.process_open_fds,5m)/last(/TiDB by HTTP/tidb.process_max_fds)*100>{$TIDB.OPEN.FDS.MAX.WARN}`|Warning||
+|TiDB: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/TiDB by HTTP/tidb.uptime)<10m`|Info|**Manual close**: Yes|
+|TiDB: Version has changed|<p>TiDB version has changed. Acknowledge to close the problem manually.</p>|`last(/TiDB by HTTP/tidb.version,#1)<>last(/TiDB by HTTP/tidb.version,#2) and length(last(/TiDB by HTTP/tidb.version))>0`|Info|**Manual close**: Yes|
+|TiDB: Too many time jump backs||`min(/TiDB by HTTP/tidb.monitor_time_jump_back.rate,5m)>{$TIDB.TIME_JUMP_BACK.MAX.WARN}`|Warning||
+|TiDB: There are panicked TiDB threads|<p>When a panic occurs, an alert is triggered. The thread is often recovered, otherwise, TiDB will frequently restart.</p>|`last(/TiDB by HTTP/tidb.tidb_server_panic_total.rate)>0`|Average||
 
 ### LLD rule QPS metrics discovery
 
@@ -182,7 +182,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Too many failed GC-related operations||`min(/TiDB by HTTP/tidb.tikvclient_gc_action.rate[{#TYPE}],5m)>{$TIDB.GC_ACTIONS.ERRORS.MAX.WARN}`|Warning||
+|TiDB: Too many failed GC-related operations||`min(/TiDB by HTTP/tidb.tikvclient_gc_action.rate[{#TYPE}],5m)>{$TIDB.GC_ACTIONS.ERRORS.MAX.WARN}`|Warning||
 
 ## Feedback
 

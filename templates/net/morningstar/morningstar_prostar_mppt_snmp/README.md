@@ -73,61 +73,61 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Status: Device has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Morningstar ProStar MPPT by SNMP/status.hw.uptime)>0 and last(/Morningstar ProStar MPPT by SNMP/status.hw.uptime)<10m) or (last(/Morningstar ProStar MPPT by SNMP/status.hw.uptime)=0 and last(/Morningstar ProStar MPPT by SNMP/status.net.uptime)<10m)`|Info|**Manual close**: Yes|
-|Status: Failed to fetch data|<p>Zabbix has not received data for items for the last 5 minutes.</p>|`nodata(/Morningstar ProStar MPPT by SNMP/status.net.uptime,5m)=1`|Warning|**Manual close**: Yes|
-|Battery: Device charge in warning state||`last(/Morningstar ProStar MPPT by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.WARN}`|Warning|**Depends on**:<br><ul><li>Battery: Device charge in critical state</li></ul>|
-|Battery: Device charge in critical state||`last(/Morningstar ProStar MPPT by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}`|High||
-|Load: Device load in warning state||`last(/Morningstar ProStar MPPT by SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"lvdWarning"}  or last(/Morningstar ProStar MPPT by SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"override"}`|Warning|**Depends on**:<br><ul><li>Load: Device load in critical state</li></ul>|
-|Load: Device load in critical state||`last(/Morningstar ProStar MPPT by SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar ProStar MPPT by SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}`|High||
-|Temperature: Low battery temperature||`max(/Morningstar ProStar MPPT by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>Temperature: Critically low battery temperature</li></ul>|
-|Temperature: Critically low battery temperature||`max(/Morningstar ProStar MPPT by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}`|High||
-|Temperature: High battery temperature||`min(/Morningstar ProStar MPPT by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Temperature: Critically high battery temperature</li></ul>|
-|Temperature: Critically high battery temperature||`min(/Morningstar ProStar MPPT by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}`|High||
-|Status: Device has "overcurrent" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","overcurrent")=2`|High||
-|Status: Device has "mosfetSShorted" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","mosfetSShorted")=2`|High||
-|Status: Device has "software" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","software")=2`|High||
-|Status: Device has "batteryHvd" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryHvd")=2`|High||
-|Status: Device has "arrayHvd" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","arrayHvd")=2`|High||
-|Status: Device has "customSettingsEdit" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","customSettingsEdit")=2`|High||
-|Status: Device has "rtsShorted" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsShorted")=2`|High||
-|Status: Device has "rtsNoLongerValid" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsNoLongerValid")=2`|High||
-|Status: Device has "localTempSensorDamaged" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","localTempSensorDamaged")=2`|High||
-|Status: Device has "batteryLowVoltageDisconnect" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryLowVoltageDisconnect")=2`|High||
-|Status: Device has "slaveTimeout" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","slaveTimeout")=2`|High||
-|Status: Device has "dipSwitchChanged" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","dipSwitchChanged")=2`|High||
-|Status: Device has "externalShortCircuit" load faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","externalShortCircuit")=2`|High||
-|Status: Device has "overcurrent" load faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","overcurrent")=2`|High||
-|Status: Device has "mosfetShorted" load faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","mosfetShorted")=2`|High||
-|Status: Device has "software" load faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","software")=2`|High||
-|Status: Device has "loadHvd" load faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","loadHvd")=2`|High||
-|Status: Device has "highTempDisconnect" load faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","highTempDisconnect")=2`|High||
-|Status: Device has "dipSwitchChanged" load faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","dipSwitchChanged")=2`|High||
-|Status: Device has "customSettingsEdit" load faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","customSettingsEdit")=2`|High||
-|Status: Device has "rtsShorted" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2`|Warning||
-|Status: Device has "rtsDisconnected" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2`|Warning||
-|Status: Device has "heatsinkTempSensorOpen" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2`|Warning||
-|Status: Device has "heatsinkTempSensorShorted" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2`|Warning||
-|Status: Device has "heatsinkTempLimit" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempLimit")=2`|Warning||
-|Status: Device has "inductorTempSensorOpen" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","inductorTempSensorOpen")=2`|Warning||
-|Status: Device has "inductorTempSensorShorted" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","inductorTempSensorShorted")=2`|Warning||
-|Status: Device has "inductorTempLimit" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","inductorTempLimit")=2`|Warning||
-|Status: Device has "currentLimit" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2`|Warning||
-|Status: Device has "currentMeasurementError" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","currentMeasurementError")=2`|Warning||
-|Status: Device has "batterySenseOutOfRange" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","batterySenseOutOfRange")=2`|Warning||
-|Status: Device has "batterySenseDisconnected" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","batterySenseDisconnected")=2`|Warning||
-|Status: Device has "uncalibrated" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2`|Warning||
-|Status: Device has "tb5v" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","tb5v")=2`|Warning||
-|Status: Device has "fp10SupplyOutOfRange" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","fp10SupplyOutOfRange")=2`|Warning||
-|Status: Device has "mosfetOpen" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","mosfetOpen")=2`|Warning||
-|Status: Device has "arrayCurrentOffset" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","arrayCurrentOffset")=2`|Warning||
-|Status: Device has "loadCurrentOffset" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","loadCurrentOffset")=2`|Warning||
-|Status: Device has "p33SupplyOutOfRange" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","p33SupplyOutOfRange")=2`|Warning||
-|Status: Device has "p12SupplyOutOfRange" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","p12SupplyOutOfRange")=2`|Warning||
-|Status: Device has "hightInputVoltageLimit" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","hightInputVoltageLimit")=2`|Warning||
-|Status: Device has "controllerReset" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","controllerReset")=2`|Warning||
-|Status: Device has "loadLvd" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","loadLvd")=2`|Warning||
-|Status: Device has "logTimeout" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","logTimeout")=2`|Warning||
-|Status: Device has "eepromAccessFailure" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","eepromAccessFailure")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Morningstar ProStar MPPT by SNMP/status.hw.uptime)>0 and last(/Morningstar ProStar MPPT by SNMP/status.hw.uptime)<10m) or (last(/Morningstar ProStar MPPT by SNMP/status.hw.uptime)=0 and last(/Morningstar ProStar MPPT by SNMP/status.net.uptime)<10m)`|Info|**Manual close**: Yes|
+|Morningstar ProStar MPPT: Status: Failed to fetch data|<p>Zabbix has not received data for items for the last 5 minutes.</p>|`nodata(/Morningstar ProStar MPPT by SNMP/status.net.uptime,5m)=1`|Warning|**Manual close**: Yes|
+|Morningstar ProStar MPPT: Battery: Device charge in warning state||`last(/Morningstar ProStar MPPT by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar ProStar MPPT: Battery: Device charge in critical state</li></ul>|
+|Morningstar ProStar MPPT: Battery: Device charge in critical state||`last(/Morningstar ProStar MPPT by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}`|High||
+|Morningstar ProStar MPPT: Load: Device load in warning state||`last(/Morningstar ProStar MPPT by SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"lvdWarning"}  or last(/Morningstar ProStar MPPT by SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"override"}`|Warning|**Depends on**:<br><ul><li>Morningstar ProStar MPPT: Load: Device load in critical state</li></ul>|
+|Morningstar ProStar MPPT: Load: Device load in critical state||`last(/Morningstar ProStar MPPT by SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar ProStar MPPT by SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}`|High||
+|Morningstar ProStar MPPT: Temperature: Low battery temperature||`max(/Morningstar ProStar MPPT by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar ProStar MPPT: Temperature: Critically low battery temperature</li></ul>|
+|Morningstar ProStar MPPT: Temperature: Critically low battery temperature||`max(/Morningstar ProStar MPPT by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}`|High||
+|Morningstar ProStar MPPT: Temperature: High battery temperature||`min(/Morningstar ProStar MPPT by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar ProStar MPPT: Temperature: Critically high battery temperature</li></ul>|
+|Morningstar ProStar MPPT: Temperature: Critically high battery temperature||`min(/Morningstar ProStar MPPT by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}`|High||
+|Morningstar ProStar MPPT: Status: Device has "overcurrent" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","overcurrent")=2`|High||
+|Morningstar ProStar MPPT: Status: Device has "mosfetSShorted" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","mosfetSShorted")=2`|High||
+|Morningstar ProStar MPPT: Status: Device has "software" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","software")=2`|High||
+|Morningstar ProStar MPPT: Status: Device has "batteryHvd" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryHvd")=2`|High||
+|Morningstar ProStar MPPT: Status: Device has "arrayHvd" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","arrayHvd")=2`|High||
+|Morningstar ProStar MPPT: Status: Device has "customSettingsEdit" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","customSettingsEdit")=2`|High||
+|Morningstar ProStar MPPT: Status: Device has "rtsShorted" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsShorted")=2`|High||
+|Morningstar ProStar MPPT: Status: Device has "rtsNoLongerValid" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsNoLongerValid")=2`|High||
+|Morningstar ProStar MPPT: Status: Device has "localTempSensorDamaged" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","localTempSensorDamaged")=2`|High||
+|Morningstar ProStar MPPT: Status: Device has "batteryLowVoltageDisconnect" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryLowVoltageDisconnect")=2`|High||
+|Morningstar ProStar MPPT: Status: Device has "slaveTimeout" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","slaveTimeout")=2`|High||
+|Morningstar ProStar MPPT: Status: Device has "dipSwitchChanged" array faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","dipSwitchChanged")=2`|High||
+|Morningstar ProStar MPPT: Status: Device has "externalShortCircuit" load faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","externalShortCircuit")=2`|High||
+|Morningstar ProStar MPPT: Status: Device has "overcurrent" load faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","overcurrent")=2`|High||
+|Morningstar ProStar MPPT: Status: Device has "mosfetShorted" load faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","mosfetShorted")=2`|High||
+|Morningstar ProStar MPPT: Status: Device has "software" load faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","software")=2`|High||
+|Morningstar ProStar MPPT: Status: Device has "loadHvd" load faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","loadHvd")=2`|High||
+|Morningstar ProStar MPPT: Status: Device has "highTempDisconnect" load faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","highTempDisconnect")=2`|High||
+|Morningstar ProStar MPPT: Status: Device has "dipSwitchChanged" load faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","dipSwitchChanged")=2`|High||
+|Morningstar ProStar MPPT: Status: Device has "customSettingsEdit" load faults flag||`count(/Morningstar ProStar MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","customSettingsEdit")=2`|High||
+|Morningstar ProStar MPPT: Status: Device has "rtsShorted" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "rtsDisconnected" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "heatsinkTempSensorOpen" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "heatsinkTempSensorShorted" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "heatsinkTempLimit" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempLimit")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "inductorTempSensorOpen" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","inductorTempSensorOpen")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "inductorTempSensorShorted" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","inductorTempSensorShorted")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "inductorTempLimit" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","inductorTempLimit")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "currentLimit" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "currentMeasurementError" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","currentMeasurementError")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "batterySenseOutOfRange" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","batterySenseOutOfRange")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "batterySenseDisconnected" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","batterySenseDisconnected")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "uncalibrated" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "tb5v" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","tb5v")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "fp10SupplyOutOfRange" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","fp10SupplyOutOfRange")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "mosfetOpen" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","mosfetOpen")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "arrayCurrentOffset" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","arrayCurrentOffset")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "loadCurrentOffset" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","loadCurrentOffset")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "p33SupplyOutOfRange" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","p33SupplyOutOfRange")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "p12SupplyOutOfRange" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","p12SupplyOutOfRange")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "hightInputVoltageLimit" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","hightInputVoltageLimit")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "controllerReset" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","controllerReset")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "loadLvd" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","loadLvd")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "logTimeout" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","logTimeout")=2`|Warning||
+|Morningstar ProStar MPPT: Status: Device has "eepromAccessFailure" alarm flag||`count(/Morningstar ProStar MPPT by SNMP/status.alarms[alarms.0],#3,"like","eepromAccessFailure")=2`|Warning||
 
 ### LLD rule Battery voltage discovery
 
@@ -145,10 +145,10 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Battery: Low battery voltage||`max(/Morningstar ProStar MPPT by SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>Battery: Critically low battery voltage</li></ul>|
-|Battery: Critically low battery voltage||`max(/Morningstar ProStar MPPT by SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}`|High||
-|Battery: High battery voltage||`min(/Morningstar ProStar MPPT by SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Battery: Critically high battery voltage</li></ul>|
-|Battery: Critically high battery voltage||`min(/Morningstar ProStar MPPT by SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}`|High||
+|Morningstar ProStar MPPT: Battery: Low battery voltage||`max(/Morningstar ProStar MPPT by SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar ProStar MPPT: Battery: Critically low battery voltage</li></ul>|
+|Morningstar ProStar MPPT: Battery: Critically low battery voltage||`max(/Morningstar ProStar MPPT by SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}`|High||
+|Morningstar ProStar MPPT: Battery: High battery voltage||`min(/Morningstar ProStar MPPT by SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar ProStar MPPT: Battery: Critically high battery voltage</li></ul>|
+|Morningstar ProStar MPPT: Battery: Critically high battery voltage||`min(/Morningstar ProStar MPPT by SNMP/battery.voltage[batteryTerminalVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}`|High||
 
 ## Feedback
 

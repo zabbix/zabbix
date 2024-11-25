@@ -59,22 +59,22 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Status: Device has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Morningstar SureSine by SNMP/status.hw.uptime)>0 and last(/Morningstar SureSine by SNMP/status.hw.uptime)<10m) or (last(/Morningstar SureSine by SNMP/status.hw.uptime)=0 and last(/Morningstar SureSine by SNMP/status.net.uptime)<10m)`|Info|**Manual close**: Yes|
-|Status: Failed to fetch data|<p>Zabbix has not received data for items for the last 5 minutes.</p>|`nodata(/Morningstar SureSine by SNMP/status.net.uptime,5m)=1`|Warning|**Manual close**: Yes|
-|Load: Device load in warning state||`last(/Morningstar SureSine by SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"lvdWarning"}  or last(/Morningstar SureSine by SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"override"}`|Warning|**Depends on**:<br><ul><li>Load: Device load in critical state</li></ul>|
-|Load: Device load in critical state||`last(/Morningstar SureSine by SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar SureSine by SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}`|High||
-|Status: Device has "reset" faults flag||`count(/Morningstar SureSine by SNMP/status.faults[faults.0],#3,"like","reset")=2`|High||
-|Status: Device has "overcurrent" faults flag||`count(/Morningstar SureSine by SNMP/status.faults[faults.0],#3,"like","overcurrent")=2`|High||
-|Status: Device has "unknownFault" faults flag||`count(/Morningstar SureSine by SNMP/status.faults[faults.0],#3,"like","unknownFault")=2`|High||
-|Status: Device has "software" faults flag||`count(/Morningstar SureSine by SNMP/status.faults[faults.0],#3,"like","software")=2`|High||
-|Status: Device has "highVoltageDisconnect" faults flag||`count(/Morningstar SureSine by SNMP/status.faults[faults.0],#3,"like","highVoltageDisconnect")=2`|High||
-|Status: Device has "suresineHot" faults flag||`count(/Morningstar SureSine by SNMP/status.faults[faults.0],#3,"like","suresineHot")=2`|High||
-|Status: Device has "dipSwitchChanged" faults flag||`count(/Morningstar SureSine by SNMP/status.faults[faults.0],#3,"like","dipSwitchChanged")=2`|High||
-|Status: Device has "customSettingsEdit" faults flag||`count(/Morningstar SureSine by SNMP/status.faults[faults.0],#3,"like","customSettingsEdit")=2`|High||
-|Status: Device has "heatsinkTempSensorOpen" alarm flag||`count(/Morningstar SureSine by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2`|Warning||
-|Status: Device has "heatsinkTempSensorShort" alarm flag||`count(/Morningstar SureSine by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShort")=2`|Warning||
-|Status: Device has "unknownAlarm" alarm flag||`count(/Morningstar SureSine by SNMP/status.alarms[alarms.0],#3,"like","unknownAlarm")=2`|Warning||
-|Status: Device has "suresineHot" alarm flag||`count(/Morningstar SureSine by SNMP/status.alarms[alarms.0],#3,"like","suresineHot")=2`|Warning||
+|Morningstar SureSine: Status: Device has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Morningstar SureSine by SNMP/status.hw.uptime)>0 and last(/Morningstar SureSine by SNMP/status.hw.uptime)<10m) or (last(/Morningstar SureSine by SNMP/status.hw.uptime)=0 and last(/Morningstar SureSine by SNMP/status.net.uptime)<10m)`|Info|**Manual close**: Yes|
+|Morningstar SureSine: Status: Failed to fetch data|<p>Zabbix has not received data for items for the last 5 minutes.</p>|`nodata(/Morningstar SureSine by SNMP/status.net.uptime,5m)=1`|Warning|**Manual close**: Yes|
+|Morningstar SureSine: Load: Device load in warning state||`last(/Morningstar SureSine by SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"lvdWarning"}  or last(/Morningstar SureSine by SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"override"}`|Warning|**Depends on**:<br><ul><li>Morningstar SureSine: Load: Device load in critical state</li></ul>|
+|Morningstar SureSine: Load: Device load in critical state||`last(/Morningstar SureSine by SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar SureSine by SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}`|High||
+|Morningstar SureSine: Status: Device has "reset" faults flag||`count(/Morningstar SureSine by SNMP/status.faults[faults.0],#3,"like","reset")=2`|High||
+|Morningstar SureSine: Status: Device has "overcurrent" faults flag||`count(/Morningstar SureSine by SNMP/status.faults[faults.0],#3,"like","overcurrent")=2`|High||
+|Morningstar SureSine: Status: Device has "unknownFault" faults flag||`count(/Morningstar SureSine by SNMP/status.faults[faults.0],#3,"like","unknownFault")=2`|High||
+|Morningstar SureSine: Status: Device has "software" faults flag||`count(/Morningstar SureSine by SNMP/status.faults[faults.0],#3,"like","software")=2`|High||
+|Morningstar SureSine: Status: Device has "highVoltageDisconnect" faults flag||`count(/Morningstar SureSine by SNMP/status.faults[faults.0],#3,"like","highVoltageDisconnect")=2`|High||
+|Morningstar SureSine: Status: Device has "suresineHot" faults flag||`count(/Morningstar SureSine by SNMP/status.faults[faults.0],#3,"like","suresineHot")=2`|High||
+|Morningstar SureSine: Status: Device has "dipSwitchChanged" faults flag||`count(/Morningstar SureSine by SNMP/status.faults[faults.0],#3,"like","dipSwitchChanged")=2`|High||
+|Morningstar SureSine: Status: Device has "customSettingsEdit" faults flag||`count(/Morningstar SureSine by SNMP/status.faults[faults.0],#3,"like","customSettingsEdit")=2`|High||
+|Morningstar SureSine: Status: Device has "heatsinkTempSensorOpen" alarm flag||`count(/Morningstar SureSine by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2`|Warning||
+|Morningstar SureSine: Status: Device has "heatsinkTempSensorShort" alarm flag||`count(/Morningstar SureSine by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShort")=2`|Warning||
+|Morningstar SureSine: Status: Device has "unknownAlarm" alarm flag||`count(/Morningstar SureSine by SNMP/status.alarms[alarms.0],#3,"like","unknownAlarm")=2`|Warning||
+|Morningstar SureSine: Status: Device has "suresineHot" alarm flag||`count(/Morningstar SureSine by SNMP/status.alarms[alarms.0],#3,"like","suresineHot")=2`|Warning||
 
 ### LLD rule Battery voltage discovery
 
@@ -92,10 +92,10 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Battery: Low battery voltage||`max(/Morningstar SureSine by SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>Battery: Critically low battery voltage</li></ul>|
-|Battery: Critically low battery voltage||`max(/Morningstar SureSine by SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}`|High||
-|Battery: High battery voltage||`min(/Morningstar SureSine by SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Battery: Critically high battery voltage</li></ul>|
-|Battery: Critically high battery voltage||`min(/Morningstar SureSine by SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}`|High||
+|Morningstar SureSine: Battery: Low battery voltage||`max(/Morningstar SureSine by SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar SureSine: Battery: Critically low battery voltage</li></ul>|
+|Morningstar SureSine: Battery: Critically low battery voltage||`max(/Morningstar SureSine by SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}`|High||
+|Morningstar SureSine: Battery: High battery voltage||`min(/Morningstar SureSine by SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar SureSine: Battery: Critically high battery voltage</li></ul>|
+|Morningstar SureSine: Battery: Critically high battery voltage||`min(/Morningstar SureSine by SNMP/battery.voltage[batteryVoltageSlow.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}`|High||
 
 ## Feedback
 

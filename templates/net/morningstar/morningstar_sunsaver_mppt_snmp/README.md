@@ -73,46 +73,46 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Status: Device has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Morningstar SunSaver MPPT by SNMP/status.hw.uptime)>0 and last(/Morningstar SunSaver MPPT by SNMP/status.hw.uptime)<10m) or (last(/Morningstar SunSaver MPPT by SNMP/status.hw.uptime)=0 and last(/Morningstar SunSaver MPPT by SNMP/status.net.uptime)<10m)`|Info|**Manual close**: Yes|
-|Status: Failed to fetch data|<p>Zabbix has not received data for items for the last 5 minutes.</p>|`nodata(/Morningstar SunSaver MPPT by SNMP/status.net.uptime,5m)=1`|Warning|**Manual close**: Yes|
-|Battery: Device charge in warning state||`last(/Morningstar SunSaver MPPT by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.WARN}`|Warning|**Depends on**:<br><ul><li>Battery: Device charge in critical state</li></ul>|
-|Battery: Device charge in critical state||`last(/Morningstar SunSaver MPPT by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}`|High||
-|Load: Device load in warning state||`last(/Morningstar SunSaver MPPT by SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"lvdWarning"}  or last(/Morningstar SunSaver MPPT by SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"override"}`|Warning|**Depends on**:<br><ul><li>Load: Device load in critical state</li></ul>|
-|Load: Device load in critical state||`last(/Morningstar SunSaver MPPT by SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar SunSaver MPPT by SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}`|High||
-|Temperature: Low battery temperature||`max(/Morningstar SunSaver MPPT by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>Temperature: Critically low battery temperature</li></ul>|
-|Temperature: Critically low battery temperature||`max(/Morningstar SunSaver MPPT by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}`|High||
-|Temperature: High battery temperature||`min(/Morningstar SunSaver MPPT by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Temperature: Critically high battery temperature</li></ul>|
-|Temperature: Critically high battery temperature||`min(/Morningstar SunSaver MPPT by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}`|High||
-|Status: Device has "overcurrent" array faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","overcurrent")=2`|High||
-|Status: Device has "mosfetSShorted" array faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","mosfetSShorted")=2`|High||
-|Status: Device has "softwareFault" array faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","softwareFault")=2`|High||
-|Status: Device has "batteryHvd" array faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryHvd")=2`|High||
-|Status: Device has "arrayHvd" array faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","arrayHvd")=2`|High||
-|Status: Device has "customSettingsEdit" array faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","customSettingsEdit")=2`|High||
-|Status: Device has "rtsShorted" array faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsShorted")=2`|High||
-|Status: Device has "rtsNoLongerValid" array faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsNoLongerValid")=2`|High||
-|Status: Device has "localTempSensorDamaged" array faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","localTempSensorDamaged")=2`|High||
-|Status: Device has "externalShortCircuit" load faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","externalShortCircuit")=2`|High||
-|Status: Device has "overcurrent" load faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","overcurrent")=2`|High||
-|Status: Device has "mosfetShorted" load faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","mosfetShorted")=2`|High||
-|Status: Device has "software" load faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","software")=2`|High||
-|Status: Device has "loadHvd" load faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","loadHvd")=2`|High||
-|Status: Device has "highTempDisconnect" load faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","highTempDisconnect")=2`|High||
-|Status: Device has "customSettingsEdit" load faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","customSettingsEdit")=2`|High||
-|Status: Device has "unknownLoadFault" load faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","unknownLoadFault")=2`|High||
-|Status: Device has "rtsShorted" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2`|Warning||
-|Status: Device has "rtsDisconnected" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2`|Warning||
-|Status: Device has "heatsinkTempSensorOpen" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2`|Warning||
-|Status: Device has "heatsinkTempSensorShorted" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2`|Warning||
-|Status: Device has "sspptHot" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","sspptHot")=2`|Warning||
-|Status: Device has "currentLimit" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2`|Warning||
-|Status: Device has "currentOffset" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","currentOffset")=2`|Warning||
-|Status: Device has "uncalibrated" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2`|Warning||
-|Status: Device has "rtsMiswire" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","rtsMiswire")=2`|Warning||
-|Status: Device has "systemMiswire" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","systemMiswire")=2`|Warning||
-|Status: Device has "mosfetSOpen" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","mosfetSOpen")=2`|Warning||
-|Status: Device has "p12VoltageReferenceOff" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","p12VoltageReferenceOff")=2`|Warning||
-|Status: Device has "highVaCurrentLimit" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","highVaCurrentLimit")=2`|Warning||
+|Morningstar SunSaver MPPT: Status: Device has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Morningstar SunSaver MPPT by SNMP/status.hw.uptime)>0 and last(/Morningstar SunSaver MPPT by SNMP/status.hw.uptime)<10m) or (last(/Morningstar SunSaver MPPT by SNMP/status.hw.uptime)=0 and last(/Morningstar SunSaver MPPT by SNMP/status.net.uptime)<10m)`|Info|**Manual close**: Yes|
+|Morningstar SunSaver MPPT: Status: Failed to fetch data|<p>Zabbix has not received data for items for the last 5 minutes.</p>|`nodata(/Morningstar SunSaver MPPT by SNMP/status.net.uptime,5m)=1`|Warning|**Manual close**: Yes|
+|Morningstar SunSaver MPPT: Battery: Device charge in warning state||`last(/Morningstar SunSaver MPPT by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar SunSaver MPPT: Battery: Device charge in critical state</li></ul>|
+|Morningstar SunSaver MPPT: Battery: Device charge in critical state||`last(/Morningstar SunSaver MPPT by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}`|High||
+|Morningstar SunSaver MPPT: Load: Device load in warning state||`last(/Morningstar SunSaver MPPT by SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"lvdWarning"}  or last(/Morningstar SunSaver MPPT by SNMP/load.state[loadState.0])={$LOAD.STATE.WARN:"override"}`|Warning|**Depends on**:<br><ul><li>Morningstar SunSaver MPPT: Load: Device load in critical state</li></ul>|
+|Morningstar SunSaver MPPT: Load: Device load in critical state||`last(/Morningstar SunSaver MPPT by SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar SunSaver MPPT by SNMP/load.state[loadState.0])={$LOAD.STATE.CRIT:"fault"}`|High||
+|Morningstar SunSaver MPPT: Temperature: Low battery temperature||`max(/Morningstar SunSaver MPPT by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar SunSaver MPPT: Temperature: Critically low battery temperature</li></ul>|
+|Morningstar SunSaver MPPT: Temperature: Critically low battery temperature||`max(/Morningstar SunSaver MPPT by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}`|High||
+|Morningstar SunSaver MPPT: Temperature: High battery temperature||`min(/Morningstar SunSaver MPPT by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar SunSaver MPPT: Temperature: Critically high battery temperature</li></ul>|
+|Morningstar SunSaver MPPT: Temperature: Critically high battery temperature||`min(/Morningstar SunSaver MPPT by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}`|High||
+|Morningstar SunSaver MPPT: Status: Device has "overcurrent" array faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","overcurrent")=2`|High||
+|Morningstar SunSaver MPPT: Status: Device has "mosfetSShorted" array faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","mosfetSShorted")=2`|High||
+|Morningstar SunSaver MPPT: Status: Device has "softwareFault" array faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","softwareFault")=2`|High||
+|Morningstar SunSaver MPPT: Status: Device has "batteryHvd" array faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","batteryHvd")=2`|High||
+|Morningstar SunSaver MPPT: Status: Device has "arrayHvd" array faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","arrayHvd")=2`|High||
+|Morningstar SunSaver MPPT: Status: Device has "customSettingsEdit" array faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","customSettingsEdit")=2`|High||
+|Morningstar SunSaver MPPT: Status: Device has "rtsShorted" array faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsShorted")=2`|High||
+|Morningstar SunSaver MPPT: Status: Device has "rtsNoLongerValid" array faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","rtsNoLongerValid")=2`|High||
+|Morningstar SunSaver MPPT: Status: Device has "localTempSensorDamaged" array faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.array_faults[arrayFaults.0],#3,"like","localTempSensorDamaged")=2`|High||
+|Morningstar SunSaver MPPT: Status: Device has "externalShortCircuit" load faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","externalShortCircuit")=2`|High||
+|Morningstar SunSaver MPPT: Status: Device has "overcurrent" load faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","overcurrent")=2`|High||
+|Morningstar SunSaver MPPT: Status: Device has "mosfetShorted" load faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","mosfetShorted")=2`|High||
+|Morningstar SunSaver MPPT: Status: Device has "software" load faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","software")=2`|High||
+|Morningstar SunSaver MPPT: Status: Device has "loadHvd" load faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","loadHvd")=2`|High||
+|Morningstar SunSaver MPPT: Status: Device has "highTempDisconnect" load faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","highTempDisconnect")=2`|High||
+|Morningstar SunSaver MPPT: Status: Device has "customSettingsEdit" load faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","customSettingsEdit")=2`|High||
+|Morningstar SunSaver MPPT: Status: Device has "unknownLoadFault" load faults flag||`count(/Morningstar SunSaver MPPT by SNMP/status.load_faults[loadFaults.0],#3,"like","unknownLoadFault")=2`|High||
+|Morningstar SunSaver MPPT: Status: Device has "rtsShorted" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2`|Warning||
+|Morningstar SunSaver MPPT: Status: Device has "rtsDisconnected" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2`|Warning||
+|Morningstar SunSaver MPPT: Status: Device has "heatsinkTempSensorOpen" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2`|Warning||
+|Morningstar SunSaver MPPT: Status: Device has "heatsinkTempSensorShorted" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2`|Warning||
+|Morningstar SunSaver MPPT: Status: Device has "sspptHot" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","sspptHot")=2`|Warning||
+|Morningstar SunSaver MPPT: Status: Device has "currentLimit" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2`|Warning||
+|Morningstar SunSaver MPPT: Status: Device has "currentOffset" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","currentOffset")=2`|Warning||
+|Morningstar SunSaver MPPT: Status: Device has "uncalibrated" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2`|Warning||
+|Morningstar SunSaver MPPT: Status: Device has "rtsMiswire" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","rtsMiswire")=2`|Warning||
+|Morningstar SunSaver MPPT: Status: Device has "systemMiswire" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","systemMiswire")=2`|Warning||
+|Morningstar SunSaver MPPT: Status: Device has "mosfetSOpen" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","mosfetSOpen")=2`|Warning||
+|Morningstar SunSaver MPPT: Status: Device has "p12VoltageReferenceOff" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","p12VoltageReferenceOff")=2`|Warning||
+|Morningstar SunSaver MPPT: Status: Device has "highVaCurrentLimit" alarm flag||`count(/Morningstar SunSaver MPPT by SNMP/status.alarms[alarms.0],#3,"like","highVaCurrentLimit")=2`|Warning||
 
 ### LLD rule Battery voltage discovery
 
@@ -130,10 +130,10 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Battery: Low battery voltage||`max(/Morningstar SunSaver MPPT by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>Battery: Critically low battery voltage</li></ul>|
-|Battery: Critically low battery voltage||`max(/Morningstar SunSaver MPPT by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}`|High||
-|Battery: High battery voltage||`min(/Morningstar SunSaver MPPT by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Battery: Critically high battery voltage</li></ul>|
-|Battery: Critically high battery voltage||`min(/Morningstar SunSaver MPPT by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}`|High||
+|Morningstar SunSaver MPPT: Battery: Low battery voltage||`max(/Morningstar SunSaver MPPT by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar SunSaver MPPT: Battery: Critically low battery voltage</li></ul>|
+|Morningstar SunSaver MPPT: Battery: Critically low battery voltage||`max(/Morningstar SunSaver MPPT by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}`|High||
+|Morningstar SunSaver MPPT: Battery: High battery voltage||`min(/Morningstar SunSaver MPPT by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar SunSaver MPPT: Battery: Critically high battery voltage</li></ul>|
+|Morningstar SunSaver MPPT: Battery: Critically high battery voltage||`min(/Morningstar SunSaver MPPT by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}`|High||
 
 ## Feedback
 

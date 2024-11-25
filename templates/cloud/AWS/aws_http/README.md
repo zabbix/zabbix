@@ -484,16 +484,16 @@ Also, see the Macros section for a list of macros used for LLD filters.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Failed to get metrics data|<p>Failed to get CloudWatch metrics for EC2.</p>|`length(last(/AWS EC2 by HTTP/aws.ec2.metrics.check))>0`|Warning||
-|Failed to get alarms data|<p>Failed to get CloudWatch alarms for EC2.</p>|`length(last(/AWS EC2 by HTTP/aws.ec2.alarms.check))>0`|Warning||
-|Failed to get volumes info|<p>Failed to get CloudWatch volumes for EC2.</p>|`length(last(/AWS EC2 by HTTP/aws.ec2.volumes.check))>0`|Warning||
-|Instance CPU Credit balance is too low|<p>The number of earned CPU credits has been less than {$AWS.EC2.CPU.CREDIT.BALANCE.MIN.WARN} in the last 5 minutes.</p>|`max(/AWS EC2 by HTTP/aws.ec2.cpu.credit_balance,5m)<{$AWS.EC2.CPU.CREDIT.BALANCE.MIN.WARN}`|Warning||
-|Instance has spent too many CPU surplus credits|<p>The number of spent surplus credits that are not paid down and which thus incur an additional charge is over {$AWS.EC2.CPU.CREDIT.SURPLUS.BALANCE.MAX.WARN}.</p>|`last(/AWS EC2 by HTTP/aws.ec2.cpu.surplus_credit_charged)>{$AWS.EC2.CPU.CREDIT.SURPLUS.BALANCE.MAX.WARN}`|Warning||
-|High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS EC2 by HTTP/aws.ec2.cpu_utilization,15m)>{$AWS.EC2.CPU.UTIL.WARN.MAX}`|Warning||
-|Byte Credit balance is too low||`max(/AWS EC2 by HTTP/aws.ec2.ebs.byte_balance,5m)<{$AWS.EBS.BYTE.CREDIT.BALANCE.MIN.WARN}`|Warning||
-|I/O Credit balance is too low||`max(/AWS EC2 by HTTP/aws.ec2.ebs.io_balance,5m)<{$AWS.EBS.IO.CREDIT.BALANCE.MIN.WARN}`|Warning||
-|Instance status check failed|<p>These checks detect problems that require your involvement to repair.<br>The following are examples of problems that can cause instance status checks to fail:<br><br>Failed system status checks<br>Incorrect networking or startup configuration<br>Exhausted memory<br>Corrupted file system<br>Incompatible kernel</p>|`last(/AWS EC2 by HTTP/aws.ec2.status_check_failed_instance)=1`|Average||
-|System status check failed|<p>These checks detect underlying problems with your instance that require AWS involvement to repair.<br>The following are examples of problems that can cause system status checks to fail:<br><br>Loss of network connectivity<br>Loss of system power<br>Software issues on the physical host<br>Hardware issues on the physical host that impact network reachability</p>|`last(/AWS EC2 by HTTP/aws.ec2.status_check_failed_system)=1`|Average||
+|AWS EC2: Failed to get metrics data|<p>Failed to get CloudWatch metrics for EC2.</p>|`length(last(/AWS EC2 by HTTP/aws.ec2.metrics.check))>0`|Warning||
+|AWS EC2: Failed to get alarms data|<p>Failed to get CloudWatch alarms for EC2.</p>|`length(last(/AWS EC2 by HTTP/aws.ec2.alarms.check))>0`|Warning||
+|AWS EC2: Failed to get volumes info|<p>Failed to get CloudWatch volumes for EC2.</p>|`length(last(/AWS EC2 by HTTP/aws.ec2.volumes.check))>0`|Warning||
+|AWS EC2: Instance CPU Credit balance is too low|<p>The number of earned CPU credits has been less than {$AWS.EC2.CPU.CREDIT.BALANCE.MIN.WARN} in the last 5 minutes.</p>|`max(/AWS EC2 by HTTP/aws.ec2.cpu.credit_balance,5m)<{$AWS.EC2.CPU.CREDIT.BALANCE.MIN.WARN}`|Warning||
+|AWS EC2: Instance has spent too many CPU surplus credits|<p>The number of spent surplus credits that are not paid down and which thus incur an additional charge is over {$AWS.EC2.CPU.CREDIT.SURPLUS.BALANCE.MAX.WARN}.</p>|`last(/AWS EC2 by HTTP/aws.ec2.cpu.surplus_credit_charged)>{$AWS.EC2.CPU.CREDIT.SURPLUS.BALANCE.MAX.WARN}`|Warning||
+|AWS EC2: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS EC2 by HTTP/aws.ec2.cpu_utilization,15m)>{$AWS.EC2.CPU.UTIL.WARN.MAX}`|Warning||
+|AWS EC2: Byte Credit balance is too low||`max(/AWS EC2 by HTTP/aws.ec2.ebs.byte_balance,5m)<{$AWS.EBS.BYTE.CREDIT.BALANCE.MIN.WARN}`|Warning||
+|AWS EC2: I/O Credit balance is too low||`max(/AWS EC2 by HTTP/aws.ec2.ebs.io_balance,5m)<{$AWS.EBS.IO.CREDIT.BALANCE.MIN.WARN}`|Warning||
+|AWS EC2: Instance status check failed|<p>These checks detect problems that require your involvement to repair.<br>The following are examples of problems that can cause instance status checks to fail:<br><br>Failed system status checks<br>Incorrect networking or startup configuration<br>Exhausted memory<br>Corrupted file system<br>Incompatible kernel</p>|`last(/AWS EC2 by HTTP/aws.ec2.status_check_failed_instance)=1`|Average||
+|AWS EC2: System status check failed|<p>These checks detect underlying problems with your instance that require AWS involvement to repair.<br>The following are examples of problems that can cause system status checks to fail:<br><br>Loss of network connectivity<br>Loss of system power<br>Software issues on the physical host<br>Hardware issues on the physical host that impact network reachability</p>|`last(/AWS EC2 by HTTP/aws.ec2.status_check_failed_system)=1`|Average||
 
 ### LLD rule Instance Alarms discovery
 
@@ -513,8 +513,8 @@ Also, see the Macros section for a list of macros used for LLD filters.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|[{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state.<br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS EC2 by HTTP/aws.ec2.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
-|[{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=1`|Info||
+|AWS EC2: [{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state.<br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS EC2 by HTTP/aws.ec2.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
+|AWS EC2: [{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
 ### LLD rule Instance Volumes discovery
 
@@ -549,8 +549,8 @@ Also, see the Macros section for a list of macros used for LLD filters.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Volume [{#VOLUME_ID}] has 'error' state||`last(/AWS EC2 by HTTP/aws.ec2.ebs.status["{#VOLUME_ID}"])=5`|Warning||
-|Burst balance is too low||`max(/AWS EC2 by HTTP/aws.ec2.ebs.volume.burst_balance["{#VOLUME_ID}"],5m)<{$AWS.EBS.BURST.CREDIT.BALANCE.MIN.WARN}`|Warning||
+|AWS EC2: Volume [{#VOLUME_ID}] has 'error' state||`last(/AWS EC2 by HTTP/aws.ec2.ebs.status["{#VOLUME_ID}"])=5`|Warning||
+|AWS EC2: Burst balance is too low||`max(/AWS EC2 by HTTP/aws.ec2.ebs.volume.burst_balance["{#VOLUME_ID}"],5m)<{$AWS.EBS.BURST.CREDIT.BALANCE.MIN.WARN}`|Warning||
 
 # AWS RDS instance by HTTP
 
@@ -787,16 +787,16 @@ Also, see the Macros section for a list of macros used for LLD filters.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Failed to get metrics data|<p>Failed to get CloudWatch metrics for RDS.</p>|`length(last(/AWS RDS instance by HTTP/aws.rds.metrics.check))>0`|Warning||
-|Failed to get instance data|<p>Failed to get CloudWatch instance info for RDS.</p>|`length(last(/AWS RDS instance by HTTP/aws.rds.instance_info.check))>0`|Warning||
-|Failed to get alarms data|<p>Failed to get CloudWatch alarms for RDS.</p>|`length(last(/AWS RDS instance by HTTP/aws.rds.alarms.check))>0`|Warning||
-|Failed to get events data|<p>Failed to get CloudWatch events for RDS.</p>|`length(last(/AWS RDS instance by HTTP/aws.rds.events.check))>0`|Warning||
-|Read replica in error state|<p>The status of a read replica.<br>False if the instance is in an error state.</p>|`last(/AWS RDS instance by HTTP/aws.rds.read_replica_state)=0`|Average||
-|Burst balance is too low||`max(/AWS RDS instance by HTTP/aws.rds.burst_balance,5m)<{$AWS.RDS.BURST.CREDIT.BALANCE.MIN.WARN}`|Warning||
-|High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS RDS instance by HTTP/aws.rds.cpu.utilization,15m)>{$AWS.RDS.CPU.UTIL.WARN.MAX}`|Warning||
-|Instance CPU Credit balance is too low|<p>The number of earned CPU credits has been less than {$AWS.RDS.CPU.CREDIT.BALANCE.MIN.WARN} in the last 5 minutes.</p>|`max(/AWS RDS instance by HTTP/aws.rds.cpu.credit_balance,5m)<{$AWS.RDS.CPU.CREDIT.BALANCE.MIN.WARN}`|Warning||
-|Byte Credit balance is too low||`max(/AWS RDS instance by HTTP/aws.rds.ebs_byte_balance,5m)<{$AWS.EBS.BYTE.CREDIT.BALANCE.MIN.WARN}`|Warning||
-|I/O Credit balance is too low||`max(/AWS RDS instance by HTTP/aws.rds.ebs_io_balance,5m)<{$AWS.EBS.IO.CREDIT.BALANCE.MIN.WARN}`|Warning||
+|AWS RDS: Failed to get metrics data|<p>Failed to get CloudWatch metrics for RDS.</p>|`length(last(/AWS RDS instance by HTTP/aws.rds.metrics.check))>0`|Warning||
+|AWS RDS: Failed to get instance data|<p>Failed to get CloudWatch instance info for RDS.</p>|`length(last(/AWS RDS instance by HTTP/aws.rds.instance_info.check))>0`|Warning||
+|AWS RDS: Failed to get alarms data|<p>Failed to get CloudWatch alarms for RDS.</p>|`length(last(/AWS RDS instance by HTTP/aws.rds.alarms.check))>0`|Warning||
+|AWS RDS: Failed to get events data|<p>Failed to get CloudWatch events for RDS.</p>|`length(last(/AWS RDS instance by HTTP/aws.rds.events.check))>0`|Warning||
+|AWS RDS: Read replica in error state|<p>The status of a read replica.<br>False if the instance is in an error state.</p>|`last(/AWS RDS instance by HTTP/aws.rds.read_replica_state)=0`|Average||
+|AWS RDS: Burst balance is too low||`max(/AWS RDS instance by HTTP/aws.rds.burst_balance,5m)<{$AWS.RDS.BURST.CREDIT.BALANCE.MIN.WARN}`|Warning||
+|AWS RDS: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS RDS instance by HTTP/aws.rds.cpu.utilization,15m)>{$AWS.RDS.CPU.UTIL.WARN.MAX}`|Warning||
+|AWS RDS: Instance CPU Credit balance is too low|<p>The number of earned CPU credits has been less than {$AWS.RDS.CPU.CREDIT.BALANCE.MIN.WARN} in the last 5 minutes.</p>|`max(/AWS RDS instance by HTTP/aws.rds.cpu.credit_balance,5m)<{$AWS.RDS.CPU.CREDIT.BALANCE.MIN.WARN}`|Warning||
+|AWS RDS: Byte Credit balance is too low||`max(/AWS RDS instance by HTTP/aws.rds.ebs_byte_balance,5m)<{$AWS.EBS.BYTE.CREDIT.BALANCE.MIN.WARN}`|Warning||
+|AWS RDS: I/O Credit balance is too low||`max(/AWS RDS instance by HTTP/aws.rds.ebs_io_balance,5m)<{$AWS.EBS.IO.CREDIT.BALANCE.MIN.WARN}`|Warning||
 
 ### LLD rule Instance Alarms discovery
 
@@ -815,8 +815,8 @@ Also, see the Macros section for a list of macros used for LLD filters.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|[{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state.<br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS RDS instance by HTTP/aws.rds.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS RDS instance by HTTP/aws.rds.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
-|[{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS RDS instance by HTTP/aws.rds.alarm.state["{#ALARM_NAME}"])=1`|Info||
+|AWS RDS: [{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state.<br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS RDS instance by HTTP/aws.rds.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS RDS instance by HTTP/aws.rds.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
+|AWS RDS: [{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS RDS instance by HTTP/aws.rds.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
 ### LLD rule Aurora metrics discovery
 
@@ -1068,8 +1068,8 @@ Also, see the Macros section for a list of macros used for LLD filters.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Failed to get metrics data|<p>Failed to get CloudWatch metrics for S3 bucket.</p>|`length(last(/AWS S3 bucket by HTTP/aws.s3.metrics.check))>0`|Warning||
-|Failed to get alarms data|<p>Failed to get CloudWatch alarms for S3 bucket.</p>|`length(last(/AWS S3 bucket by HTTP/aws.s3.alarms.check))>0`|Warning||
+|AWS S3: Failed to get metrics data|<p>Failed to get CloudWatch metrics for S3 bucket.</p>|`length(last(/AWS S3 bucket by HTTP/aws.s3.metrics.check))>0`|Warning||
+|AWS S3: Failed to get alarms data|<p>Failed to get CloudWatch alarms for S3 bucket.</p>|`length(last(/AWS S3 bucket by HTTP/aws.s3.alarms.check))>0`|Warning||
 
 ### LLD rule Bucket Alarms discovery
 
@@ -1088,8 +1088,8 @@ Also, see the Macros section for a list of macros used for LLD filters.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|[{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state.<br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS S3 bucket by HTTP/aws.s3.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
-|[{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=1`|Info||
+|AWS S3: [{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state.<br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS S3 bucket by HTTP/aws.s3.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
+|AWS S3: [{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
 ### LLD rule Request Metrics discovery
 
@@ -1315,10 +1315,10 @@ Refer to the Macros section for a list of macros used for LLD filters.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Failed to get metrics data|<p>Failed to get CloudWatch metrics for ECS Cluster.</p>|`length(last(/AWS ECS Serverless Cluster by HTTP/aws.ecs.metrics.check))>0`|Warning||
-|Failed to get alarms data|<p>Failed to get CloudWatch alarms for ECS Cluster.</p>|`length(last(/AWS ECS Serverless Cluster by HTTP/aws.ecs.alarms.check))>0`|Warning||
-|High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS ECS Serverless Cluster by HTTP/aws.ecs.cpu_utilization,15m)>{$AWS.ECS.CLUSTER.CPU.UTIL.WARN}`|Warning||
-|High memory utilization|<p>The system is running out of free memory.</p>|`min(/AWS ECS Serverless Cluster by HTTP/aws.ecs.memory_utilization,15m)>{$AWS.ECS.CLUSTER.MEMORY.UTIL.WARN}`|Warning||
+|AWS ECS Serverless: Failed to get metrics data|<p>Failed to get CloudWatch metrics for ECS Cluster.</p>|`length(last(/AWS ECS Serverless Cluster by HTTP/aws.ecs.metrics.check))>0`|Warning||
+|AWS ECS Serverless: Failed to get alarms data|<p>Failed to get CloudWatch alarms for ECS Cluster.</p>|`length(last(/AWS ECS Serverless Cluster by HTTP/aws.ecs.alarms.check))>0`|Warning||
+|AWS ECS Serverless: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS ECS Serverless Cluster by HTTP/aws.ecs.cpu_utilization,15m)>{$AWS.ECS.CLUSTER.CPU.UTIL.WARN}`|Warning||
+|AWS ECS Serverless: High memory utilization|<p>The system is running out of free memory.</p>|`min(/AWS ECS Serverless Cluster by HTTP/aws.ecs.memory_utilization,15m)>{$AWS.ECS.CLUSTER.MEMORY.UTIL.WARN}`|Warning||
 
 ### LLD rule Cluster Alarms discovery
 
@@ -1338,8 +1338,8 @@ Refer to the Macros section for a list of macros used for LLD filters.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|[{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state.<br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS ECS Serverless Cluster by HTTP/aws.ecs.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS ECS Serverless Cluster by HTTP/aws.ecs.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
-|[{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS ECS Serverless Cluster by HTTP/aws.ecs.alarm.state["{#ALARM_NAME}"])=1`|Info||
+|AWS ECS Serverless: [{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state.<br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS ECS Serverless Cluster by HTTP/aws.ecs.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS ECS Serverless Cluster by HTTP/aws.ecs.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
+|AWS ECS Serverless: [{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS ECS Serverless Cluster by HTTP/aws.ecs.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
 ### LLD rule Cluster Services discovery
 
@@ -1372,8 +1372,8 @@ Refer to the Macros section for a list of macros used for LLD filters.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|[{#AWS.ECS.SERVICE.NAME}]: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS ECS Serverless Cluster by HTTP/aws.ecs.services.cpu.utilization["{#AWS.ECS.SERVICE.NAME}"],15m)>{$AWS.ECS.CLUSTER.SERVICE.CPU.UTIL.WARN}`|Warning||
-|[{#AWS.ECS.SERVICE.NAME}]: High memory utilization|<p>The system is running out of free memory.</p>|`min(/AWS ECS Serverless Cluster by HTTP/aws.ecs.services.memory.utilization["{#AWS.ECS.SERVICE.NAME}"],15m)>{$AWS.ECS.CLUSTER.SERVICE.MEMORY.UTIL.WARN}`|Warning||
+|AWS ECS Serverless: [{#AWS.ECS.SERVICE.NAME}]: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS ECS Serverless Cluster by HTTP/aws.ecs.services.cpu.utilization["{#AWS.ECS.SERVICE.NAME}"],15m)>{$AWS.ECS.CLUSTER.SERVICE.CPU.UTIL.WARN}`|Warning||
+|AWS ECS Serverless: [{#AWS.ECS.SERVICE.NAME}]: High memory utilization|<p>The system is running out of free memory.</p>|`min(/AWS ECS Serverless Cluster by HTTP/aws.ecs.services.memory.utilization["{#AWS.ECS.SERVICE.NAME}"],15m)>{$AWS.ECS.CLUSTER.SERVICE.MEMORY.UTIL.WARN}`|Warning||
 
 # AWS ECS Cluster by HTTP
 
@@ -1564,10 +1564,10 @@ Refer to the Macros section for a list of macros used for LLD filters.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Failed to get metrics data|<p>Failed to get CloudWatch metrics for ECS Cluster.</p>|`length(last(/AWS ECS Cluster by HTTP/aws.ecs.metrics.check))>0`|Warning||
-|Failed to get alarms data|<p>Failed to get CloudWatch alarms for ECS Cluster.</p>|`length(last(/AWS ECS Cluster by HTTP/aws.ecs.alarms.check))>0`|Warning||
-|High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS ECS Cluster by HTTP/aws.ecs.cpu_utilization,15m)>{$AWS.ECS.CLUSTER.CPU.UTIL.WARN}`|Warning||
-|High memory utilization|<p>The system is running out of free memory.</p>|`min(/AWS ECS Cluster by HTTP/aws.ecs.memory_utilization,15m)>{$AWS.ECS.CLUSTER.MEMORY.UTIL.WARN}`|Warning||
+|AWS ECS Cluster: Failed to get metrics data|<p>Failed to get CloudWatch metrics for ECS Cluster.</p>|`length(last(/AWS ECS Cluster by HTTP/aws.ecs.metrics.check))>0`|Warning||
+|AWS ECS Cluster: Failed to get alarms data|<p>Failed to get CloudWatch alarms for ECS Cluster.</p>|`length(last(/AWS ECS Cluster by HTTP/aws.ecs.alarms.check))>0`|Warning||
+|AWS ECS Cluster: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS ECS Cluster by HTTP/aws.ecs.cpu_utilization,15m)>{$AWS.ECS.CLUSTER.CPU.UTIL.WARN}`|Warning||
+|AWS ECS Cluster: High memory utilization|<p>The system is running out of free memory.</p>|`min(/AWS ECS Cluster by HTTP/aws.ecs.memory_utilization,15m)>{$AWS.ECS.CLUSTER.MEMORY.UTIL.WARN}`|Warning||
 
 ### LLD rule Cluster Alarms discovery
 
@@ -1587,8 +1587,8 @@ Refer to the Macros section for a list of macros used for LLD filters.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|[{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has `Alarm` state.<br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS ECS Cluster by HTTP/aws.ecs.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS ECS Cluster by HTTP/aws.ecs.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
-|[{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS ECS Cluster by HTTP/aws.ecs.alarm.state["{#ALARM_NAME}"])=1`|Info||
+|AWS ECS Cluster: [{#ALARM_NAME}] has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has `Alarm` state.<br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS ECS Cluster by HTTP/aws.ecs.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS ECS Cluster by HTTP/aws.ecs.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
+|AWS ECS Cluster: [{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS ECS Cluster by HTTP/aws.ecs.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
 ### LLD rule Cluster Services discovery
 
@@ -1617,8 +1617,8 @@ Refer to the Macros section for a list of macros used for LLD filters.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|[{#AWS.ECS.SERVICE.NAME}]: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS ECS Cluster by HTTP/aws.ecs.services.cpu.utilization["{#AWS.ECS.SERVICE.NAME}"],15m)>{$AWS.ECS.CLUSTER.SERVICE.CPU.UTIL.WARN}`|Warning||
-|[{#AWS.ECS.SERVICE.NAME}]: High memory utilization|<p>The system is running out of free memory.</p>|`min(/AWS ECS Cluster by HTTP/aws.ecs.services.memory.utilization["{#AWS.ECS.SERVICE.NAME}"],15m)>{$AWS.ECS.CLUSTER.SERVICE.MEMORY.UTIL.WARN}`|Warning||
+|AWS ECS Cluster: [{#AWS.ECS.SERVICE.NAME}]: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS ECS Cluster by HTTP/aws.ecs.services.cpu.utilization["{#AWS.ECS.SERVICE.NAME}"],15m)>{$AWS.ECS.CLUSTER.SERVICE.CPU.UTIL.WARN}`|Warning||
+|AWS ECS Cluster: [{#AWS.ECS.SERVICE.NAME}]: High memory utilization|<p>The system is running out of free memory.</p>|`min(/AWS ECS Cluster by HTTP/aws.ecs.services.memory.utilization["{#AWS.ECS.SERVICE.NAME}"],15m)>{$AWS.ECS.CLUSTER.SERVICE.MEMORY.UTIL.WARN}`|Warning||
 
 # AWS ELB Application Load Balancer by HTTP
 
@@ -1831,10 +1831,10 @@ See the section below for a list of macros used for LLD filters.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Failed to get metrics data|<p>Failed to get CloudWatch metrics for Application Load Balancer.</p>|`length(last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.metrics.check))>0`|Warning||
-|Failed to get alarms data|<p>Failed to get CloudWatch alarms for Application Load Balancer.</p>|`length(last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.alarms.check))>0`|Warning||
-|Too many HTTP 4XX error codes|<p>Too many requests failed with HTTP 4XX code.</p>|`min(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.http_4xx_count,5m)>{$AWS.HTTP.4XX.FAIL.MAX.WARN}`|Warning||
-|Too many HTTP 5XX error codes|<p>Too many requests failed with HTTP 5XX code.</p>|`min(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.http_5xx_count,5m)>{$AWS.HTTP.5XX.FAIL.MAX.WARN}`|Warning||
+|AWS ELB ALB: Failed to get metrics data|<p>Failed to get CloudWatch metrics for Application Load Balancer.</p>|`length(last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.metrics.check))>0`|Warning||
+|AWS ELB ALB: Failed to get alarms data|<p>Failed to get CloudWatch alarms for Application Load Balancer.</p>|`length(last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.alarms.check))>0`|Warning||
+|AWS ELB ALB: Too many HTTP 4XX error codes|<p>Too many requests failed with HTTP 4XX code.</p>|`min(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.http_4xx_count,5m)>{$AWS.HTTP.4XX.FAIL.MAX.WARN}`|Warning||
+|AWS ELB ALB: Too many HTTP 5XX error codes|<p>Too many requests failed with HTTP 5XX code.</p>|`min(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.http_5xx_count,5m)>{$AWS.HTTP.5XX.FAIL.MAX.WARN}`|Warning||
 
 ### LLD rule Load Balancer alarm discovery
 
@@ -1854,8 +1854,8 @@ See the section below for a list of macros used for LLD filters.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|[{#ALARM_NAME}] has 'Alarm' state|<p>The alarm `{#ALARM_NAME}` is in the ALARM state.<br>Reason: `{ITEM.LASTVALUE2}`</p>|`last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
-|[{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.alarm.state["{#ALARM_NAME}"])=1`|Info||
+|AWS ELB ALB: [{#ALARM_NAME}] has 'Alarm' state|<p>The alarm `{#ALARM_NAME}` is in the ALARM state.<br>Reason: `{ITEM.LASTVALUE2}`</p>|`last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
+|AWS ELB ALB: [{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
 ### LLD rule Target groups discovery
 
@@ -2095,8 +2095,8 @@ See the section below for a list of macros used for LLD filters.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Failed to get metrics data|<p>Failed to get CloudWatch metrics for Network Load Balancer.</p>|`length(last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.metrics.check))>0`|Warning||
-|Failed to get alarms data|<p>Failed to get CloudWatch alarms for Network Load Balancer.</p>|`length(last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.alarms.check))>0`|Warning||
+|AWS ELB NLB: Failed to get metrics data|<p>Failed to get CloudWatch metrics for Network Load Balancer.</p>|`length(last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.metrics.check))>0`|Warning||
+|AWS ELB NLB: Failed to get alarms data|<p>Failed to get CloudWatch alarms for Network Load Balancer.</p>|`length(last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.alarms.check))>0`|Warning||
 
 ### LLD rule Load Balancer alarm discovery
 
@@ -2116,8 +2116,8 @@ See the section below for a list of macros used for LLD filters.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|[{#ALARM_NAME}] has 'Alarm' state|<p>The alarm `{#ALARM_NAME}` is in the ALARM state.<br>Reason: `{ITEM.LASTVALUE2}`</p>|`last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
-|[{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.alarm.state["{#ALARM_NAME}"])=1`|Info||
+|AWS ELB NLB: [{#ALARM_NAME}] has 'Alarm' state|<p>The alarm `{#ALARM_NAME}` is in the ALARM state.<br>Reason: `{ITEM.LASTVALUE2}`</p>|`last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
+|AWS ELB NLB: [{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
 ### LLD rule Target groups discovery
 
@@ -2137,8 +2137,8 @@ See the section below for a list of macros used for LLD filters.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|[{#AWS.ELB.TARGET.GROUP.NAME}]: Target have become unhealthy|<p>This trigger helps in identifying when your targets have become unhealthy.</p>|`last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.target_groups.healthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]) = 0`|Average||
-|[{#AWS.ELB.TARGET.GROUP.NAME}]: Target have unhealthy host|<p>This trigger allows you to become aware when there are no more registered targets.</p>|`last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.target_groups.unhealthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]) > {$AWS.ELB.UNHEALTHY.HOST.MAX}`|Warning|**Depends on**:<br><ul><li>[{#AWS.ELB.TARGET.GROUP.NAME}]: Target have become unhealthy</li></ul>|
+|AWS ELB NLB: [{#AWS.ELB.TARGET.GROUP.NAME}]: Target have become unhealthy|<p>This trigger helps in identifying when your targets have become unhealthy.</p>|`last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.target_groups.healthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]) = 0`|Average||
+|AWS ELB NLB: [{#AWS.ELB.TARGET.GROUP.NAME}]: Target have unhealthy host|<p>This trigger allows you to become aware when there are no more registered targets.</p>|`last(/AWS ELB Network Load Balancer by HTTP/aws.elb.nlb.target_groups.unhealthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]) > {$AWS.ELB.UNHEALTHY.HOST.MAX}`|Warning|**Depends on**:<br><ul><li>AWS ELB NLB: [{#AWS.ELB.TARGET.GROUP.NAME}]: Target have become unhealthy</li></ul>|
 
 # AWS Lambda by HTTP
 
@@ -2320,8 +2320,8 @@ See the section below for a list of macros used for LLD filters.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Failed to get metrics data|<p>Failed to get CloudWatch metrics for the Lambda function.</p>|`length(last(/AWS Lambda by HTTP/aws.lambda.metrics.check))>0`|Warning||
-|Failed to get alarms data|<p>Failed to get CloudWatch alarms for the Lambda function.</p>|`length(last(/AWS Lambda by HTTP/aws.lambda.alarms.check))>0`|Warning||
+|AWS Lambda: Failed to get metrics data|<p>Failed to get CloudWatch metrics for the Lambda function.</p>|`length(last(/AWS Lambda by HTTP/aws.lambda.metrics.check))>0`|Warning||
+|AWS Lambda: Failed to get alarms data|<p>Failed to get CloudWatch alarms for the Lambda function.</p>|`length(last(/AWS Lambda by HTTP/aws.lambda.alarms.check))>0`|Warning||
 
 ### LLD rule Lambda alarm discovery
 
@@ -2341,8 +2341,8 @@ See the section below for a list of macros used for LLD filters.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|[{#ALARM_NAME}] has 'Alarm' state|<p>The alarm `{#ALARM_NAME}` is in the ALARM state.<br>Reason: `{ITEM.LASTVALUE2}`</p>|`last(/AWS Lambda by HTTP/aws.lambda.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS Lambda by HTTP/aws.lambda.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
-|[{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS Lambda by HTTP/aws.lambda.alarm.state["{#ALARM_NAME}"])=1`|Info||
+|AWS Lambda: [{#ALARM_NAME}] has 'Alarm' state|<p>The alarm `{#ALARM_NAME}` is in the ALARM state.<br>Reason: `{ITEM.LASTVALUE2}`</p>|`last(/AWS Lambda by HTTP/aws.lambda.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS Lambda by HTTP/aws.lambda.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
+|AWS Lambda: [{#ALARM_NAME}] has 'Insufficient data' state|<p>Either the alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.</p>|`last(/AWS Lambda by HTTP/aws.lambda.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
 # AWS Cost Explorer by HTTP
 

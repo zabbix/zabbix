@@ -122,7 +122,7 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Authorization has failed|<p>GCP: Authorization has failed.<br>Check the authorization parameters and GCP API availability from a network segment, where Zabbix-server/proxy is located.<br></p>|`length(last(/GCP by HTTP/gcp.auth.err.check)) > 0`|Average||
+|GCP: Authorization has failed|<p>GCP: Authorization has failed.<br>Check the authorization parameters and GCP API availability from a network segment, where Zabbix-server/proxy is located.<br></p>|`length(last(/GCP by HTTP/gcp.auth.err.check)) > 0`|Average||
 
 ### LLD rule GCP Compute Engine: Instances discovery
 
@@ -167,9 +167,9 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Quota [{#GCE.QUOTA.NAME}] limit has been changed|<p>GCP Compute Engine: The limit for the `{#GCE.QUOTA.NAME}` quota has been changed.</p>|`change(/GCP by HTTP/gcp.gce.quota.limit[{#GCE.QUOTA.NAME}]) <> 0`|Info|**Manual close**: Yes|
-|Quota [{#GCE.QUOTA.NAME}] usage is close to reaching the limit|<p>GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota is close to reaching the limit.</p>|`last(/GCP by HTTP/gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]) >= {$GCP.GCE.QUOTA.PUSED.MIN.WARN:"{#GCE.QUOTA.NAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Quota [{#GCE.QUOTA.NAME}] usage is critically close to reaching the limit</li></ul>|
-|Quota [{#GCE.QUOTA.NAME}] usage is critically close to reaching the limit|<p>GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota is critically close to reaching the limit.</p>|`last(/GCP by HTTP/gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]) >= {$GCP.GCE.QUOTA.PUSED.MIN.CRIT:"{#GCE.QUOTA.NAME}"}`|Average|**Manual close**: Yes|
+|GCP: Quota [{#GCE.QUOTA.NAME}] limit has been changed|<p>GCP Compute Engine: The limit for the `{#GCE.QUOTA.NAME}` quota has been changed.</p>|`change(/GCP by HTTP/gcp.gce.quota.limit[{#GCE.QUOTA.NAME}]) <> 0`|Info|**Manual close**: Yes|
+|GCP: Quota [{#GCE.QUOTA.NAME}] usage is close to reaching the limit|<p>GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota is close to reaching the limit.</p>|`last(/GCP by HTTP/gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]) >= {$GCP.GCE.QUOTA.PUSED.MIN.WARN:"{#GCE.QUOTA.NAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>GCP: Quota [{#GCE.QUOTA.NAME}] usage is critically close to reaching the limit</li></ul>|
+|GCP: Quota [{#GCE.QUOTA.NAME}] usage is critically close to reaching the limit|<p>GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota is critically close to reaching the limit.</p>|`last(/GCP by HTTP/gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]) >= {$GCP.GCE.QUOTA.PUSED.MIN.CRIT:"{#GCE.QUOTA.NAME}"}`|Average|**Manual close**: Yes|
 
 # GCP Compute Engine Instance by HTTP
 
@@ -251,12 +251,12 @@ This template will be automatically connected to discovered entities with all th
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/GCP Compute Engine Instance by HTTP/gcp.gce.cpu.utilization,15m) >= {$GCE.CPU.UTIL.MAX}`|Average|**Manual close**: Yes|
-|High memory utilization|<p>RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Compute Engine Instance by HTTP/gcp.gce.memory.ram_pused,15m) >= {$GCE.RAM.UTIL.MAX}`|Average||
-|Instance is in suspended state|<p>The VM is in a suspended state. You can resume the VM or delete it.</p>|`last(/GCP Compute Engine Instance by HTTP/gcp.gce.instance.state) = 7`|Info|**Manual close**: Yes|
-|The instance is in repairing state|<p>The VM is being repaired.<br>Repairing occurs when the VM encounters an internal error or the underlying machine is unavailable due to maintenance.<br>During this time, the VM is unusable.<br></p>|`last(/GCP Compute Engine Instance by HTTP/gcp.gce.instance.state) = 4`|Warning|**Manual close**: Yes|
-|The instance is in terminated state|<p>The VM is stopped. You stopped the VM, or the VM encountered a failure.</p>|`last(/GCP Compute Engine Instance by HTTP/gcp.gce.instance.state) = 5`|Average|**Manual close**: Yes|
-|Failed to get the instance state|<p>Failed to get the instance state.<br>Check access permissions to GCP API or service account.<br></p>|`last(/GCP Compute Engine Instance by HTTP/gcp.gce.instance.state) = 10`|Average|**Manual close**: Yes|
+|GCP Compute Engine Instance: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/GCP Compute Engine Instance by HTTP/gcp.gce.cpu.utilization,15m) >= {$GCE.CPU.UTIL.MAX}`|Average|**Manual close**: Yes|
+|GCP Compute Engine Instance: High memory utilization|<p>RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Compute Engine Instance by HTTP/gcp.gce.memory.ram_pused,15m) >= {$GCE.RAM.UTIL.MAX}`|Average||
+|GCP Compute Engine Instance: Instance is in suspended state|<p>The VM is in a suspended state. You can resume the VM or delete it.</p>|`last(/GCP Compute Engine Instance by HTTP/gcp.gce.instance.state) = 7`|Info|**Manual close**: Yes|
+|GCP Compute Engine Instance: The instance is in repairing state|<p>The VM is being repaired.<br>Repairing occurs when the VM encounters an internal error or the underlying machine is unavailable due to maintenance.<br>During this time, the VM is unusable.<br></p>|`last(/GCP Compute Engine Instance by HTTP/gcp.gce.instance.state) = 4`|Warning|**Manual close**: Yes|
+|GCP Compute Engine Instance: The instance is in terminated state|<p>The VM is stopped. You stopped the VM, or the VM encountered a failure.</p>|`last(/GCP Compute Engine Instance by HTTP/gcp.gce.instance.state) = 5`|Average|**Manual close**: Yes|
+|GCP Compute Engine Instance: Failed to get the instance state|<p>Failed to get the instance state.<br>Check access permissions to GCP API or service account.<br></p>|`last(/GCP Compute Engine Instance by HTTP/gcp.gce.instance.state) = 10`|Average|**Manual close**: Yes|
 
 ### LLD rule GCP Compute Engine: Physical disks discovery
 
@@ -350,17 +350,17 @@ This template will be automatically connected to discovered entities with all th
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.cpu.utilization,5m) >= {$CLOUD_SQL.MYSQL.CPU.UTIL.MAX}`|Average||
-|Disk space is low|<p>High utilization of the storage space.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.disk.utilization) >= {$CLOUD_SQL.MYSQL.DISK.UTIL.WARN}`|Warning|**Depends on**:<br><ul><li>Disk space is critically low</li></ul>|
-|Disk space is critically low|<p>Critical utilization of the disk space.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.disk.utilization) >= {$CLOUD_SQL.MYSQL.DISK.UTIL.CRIT}`|Average||
-|High memory utilization|<p>RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.memory.utilization,5m) >= {$CLOUD_SQL.MYSQL.RAM.UTIL.MAX}`|High||
-|Instance is in suspended state|<p>The instance is in suspended state. <br>It is not available, for example, due to problems with billing. <br></p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 1`|Warning||
-|Instance is stopped by the owner|<p>The instance has been stopped by the owner. <br>It is not currently running, but it's ready to be restarted.<br></p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 2`|Info||
-|Instance is in maintenance|<p>The instance is down for maintenance.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 4`|Info||
-|Instance is in failed state|<p>The instance creation failed, or an operation left the instance in an own bad state.<br></p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 5`|Average||
-|Instance is in unknown state|<p>The state of the instance is unknown.<br></p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 6`|Average||
-|Failed to get the instance state|<p>Failed to get the instance state. <br>Check access permissions to GCP API or service account.<br></p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 10`|Average||
-|Database engine is down|<p>Database engine is down.<br>If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.<br></p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.db.state)=0`|Average|**Depends on**:<br><ul><li>Instance is stopped by the owner</li><li>Instance is in suspended state</li><li>Instance is in maintenance</li><li>Instance is in failed state</li><li>Instance is in unknown state</li><li>Failed to get the instance state</li></ul>|
+|GCP MySQL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.cpu.utilization,5m) >= {$CLOUD_SQL.MYSQL.CPU.UTIL.MAX}`|Average||
+|GCP MySQL: Disk space is low|<p>High utilization of the storage space.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.disk.utilization) >= {$CLOUD_SQL.MYSQL.DISK.UTIL.WARN}`|Warning|**Depends on**:<br><ul><li>GCP MySQL: Disk space is critically low</li></ul>|
+|GCP MySQL: Disk space is critically low|<p>Critical utilization of the disk space.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.disk.utilization) >= {$CLOUD_SQL.MYSQL.DISK.UTIL.CRIT}`|Average||
+|GCP MySQL: High memory utilization|<p>RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.memory.utilization,5m) >= {$CLOUD_SQL.MYSQL.RAM.UTIL.MAX}`|High||
+|GCP MySQL: Instance is in suspended state|<p>The instance is in suspended state. <br>It is not available, for example, due to problems with billing. <br></p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 1`|Warning||
+|GCP MySQL: Instance is stopped by the owner|<p>The instance has been stopped by the owner. <br>It is not currently running, but it's ready to be restarted.<br></p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 2`|Info||
+|GCP MySQL: Instance is in maintenance|<p>The instance is down for maintenance.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 4`|Info||
+|GCP MySQL: Instance is in failed state|<p>The instance creation failed, or an operation left the instance in an own bad state.<br></p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 5`|Average||
+|GCP MySQL: Instance is in unknown state|<p>The state of the instance is unknown.<br></p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 6`|Average||
+|GCP MySQL: Failed to get the instance state|<p>Failed to get the instance state. <br>Check access permissions to GCP API or service account.<br></p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 10`|Average||
+|GCP MySQL: Database engine is down|<p>Database engine is down.<br>If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.<br></p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.db.state)=0`|Average|**Depends on**:<br><ul><li>GCP MySQL: Instance is stopped by the owner</li><li>GCP MySQL: Instance is in suspended state</li><li>GCP MySQL: Instance is in maintenance</li><li>GCP MySQL: Instance is in failed state</li><li>GCP MySQL: Instance is in unknown state</li><li>GCP MySQL: Failed to get the instance state</li></ul>|
 
 # GCP Cloud SQL MySQL Replica by HTTP
 
@@ -481,17 +481,17 @@ This template will be automatically connected to discovered entities with all th
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.cpu.utilization,5m) >= {$CLOUD_SQL.PGSQL.CPU.UTIL.MAX}`|Average||
-|Disk space is low|<p>High utilization of the storage space.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.disk.utilization) >= {$CLOUD_SQL.PGSQL.DISK.UTIL.WARN}`|Warning|**Depends on**:<br><ul><li>Disk space is critically low</li></ul>|
-|Disk space is critically low|<p>Critical utilization of the disk space.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.disk.utilization) >= {$CLOUD_SQL.PGSQL.DISK.UTIL.CRIT}`|Average||
-|High memory utilization|<p>RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.memory.utilization,5m) >= {$CLOUD_SQL.PGSQL.RAM.UTIL.MAX}`|High||
-|Instance is in suspended state|<p>The instance is in suspended state. <br>It is not available, for example, due to problems with billing. <br></p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 1`|Warning||
-|Instance is stopped by the owner|<p>The instance has been stopped by the owner. <br>It is not currently running, but it's ready to be restarted.<br></p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 2`|Info||
-|Instance is in maintenance|<p>The instance is down for maintenance.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 4`|Info||
-|Instance is in failed state|<p>The instance creation failed, or an operation left the instance in an own bad state.<br></p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 5`|Average||
-|Instance is in unknown state|<p>The state of the instance is unknown.<br></p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 6`|Average||
-|Failed to get the instance state|<p>Failed to get the instance state. <br>Check access permissions to GCP API or service account.<br></p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 10`|Average||
-|Database engine is down|<p>Database engine is down.<br>If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.<br></p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.db.state)=0`|Average|**Depends on**:<br><ul><li>Instance is stopped by the owner</li><li>Instance is in suspended state</li><li>Instance is in maintenance</li><li>Instance is in failed state</li><li>Instance is in unknown state</li><li>Failed to get the instance state</li></ul>|
+|GCP PostgreSQL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.cpu.utilization,5m) >= {$CLOUD_SQL.PGSQL.CPU.UTIL.MAX}`|Average||
+|GCP PostgreSQL: Disk space is low|<p>High utilization of the storage space.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.disk.utilization) >= {$CLOUD_SQL.PGSQL.DISK.UTIL.WARN}`|Warning|**Depends on**:<br><ul><li>GCP PostgreSQL: Disk space is critically low</li></ul>|
+|GCP PostgreSQL: Disk space is critically low|<p>Critical utilization of the disk space.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.disk.utilization) >= {$CLOUD_SQL.PGSQL.DISK.UTIL.CRIT}`|Average||
+|GCP PostgreSQL: High memory utilization|<p>RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.memory.utilization,5m) >= {$CLOUD_SQL.PGSQL.RAM.UTIL.MAX}`|High||
+|GCP PostgreSQL: Instance is in suspended state|<p>The instance is in suspended state. <br>It is not available, for example, due to problems with billing. <br></p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 1`|Warning||
+|GCP PostgreSQL: Instance is stopped by the owner|<p>The instance has been stopped by the owner. <br>It is not currently running, but it's ready to be restarted.<br></p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 2`|Info||
+|GCP PostgreSQL: Instance is in maintenance|<p>The instance is down for maintenance.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 4`|Info||
+|GCP PostgreSQL: Instance is in failed state|<p>The instance creation failed, or an operation left the instance in an own bad state.<br></p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 5`|Average||
+|GCP PostgreSQL: Instance is in unknown state|<p>The state of the instance is unknown.<br></p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 6`|Average||
+|GCP PostgreSQL: Failed to get the instance state|<p>Failed to get the instance state. <br>Check access permissions to GCP API or service account.<br></p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 10`|Average||
+|GCP PostgreSQL: Database engine is down|<p>Database engine is down.<br>If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.<br></p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.db.state)=0`|Average|**Depends on**:<br><ul><li>GCP PostgreSQL: Instance is stopped by the owner</li><li>GCP PostgreSQL: Instance is in suspended state</li><li>GCP PostgreSQL: Instance is in maintenance</li><li>GCP PostgreSQL: Instance is in failed state</li><li>GCP PostgreSQL: Instance is in unknown state</li><li>GCP PostgreSQL: Failed to get the instance state</li></ul>|
 
 ### LLD rule GCP Cloud SQL PostgreSQL: Databases discovery
 
@@ -657,17 +657,17 @@ This template will be automatically connected to discovered entities with all th
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.cpu.utilization,5m) >= {$CLOUD_SQL.MSSQL.CPU.UTIL.MAX}`|Average||
-|Disk space is low|<p>High utilization of the storage space.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.disk.utilization) >= {$CLOUD_SQL.MSSQL.DISK.UTIL.WARN}`|Warning|**Depends on**:<br><ul><li>Disk space is critically low</li></ul>|
-|Disk space is critically low|<p>Critical utilization of the disk space.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.disk.utilization) >= {$CLOUD_SQL.MSSQL.DISK.UTIL.CRIT}`|Average||
-|High memory utilization|<p>RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.memory.utilization,5m) >= {$CLOUD_SQL.MSSQL.RAM.UTIL.MAX}`|High||
-|Instance is in suspended state|<p>The instance is in suspended state. <br>It is not available, for example, due to problems with billing. <br></p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 1`|Warning||
-|Instance is stopped by the owner|<p>The instance has been stopped by the owner. <br>It is not currently running, but it's ready to be restarted.<br></p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 2`|Info||
-|Instance is in maintenance|<p>The instance is down for maintenance.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 4`|Info||
-|Instance is in failed state|<p>The instance creation failed, or an operation left the instance in an own bad state.<br></p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 5`|Average||
-|Instance is in unknown state|<p>The state of the instance is unknown.<br></p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 6`|Average||
-|Failed to get the instance state|<p>Failed to get the instance state. <br>Check access permissions to GCP API or service account.<br></p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 10`|Average||
-|Database engine is down|<p>Database engine is down.<br>If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.<br></p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.db.state)=0`|Average|**Depends on**:<br><ul><li>Instance is stopped by the owner</li><li>Instance is in suspended state</li><li>Instance is in maintenance</li><li>Instance is in failed state</li><li>Instance is in unknown state</li><li>Failed to get the instance state</li></ul>|
+|GCP MSSQL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.cpu.utilization,5m) >= {$CLOUD_SQL.MSSQL.CPU.UTIL.MAX}`|Average||
+|GCP MSSQL: Disk space is low|<p>High utilization of the storage space.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.disk.utilization) >= {$CLOUD_SQL.MSSQL.DISK.UTIL.WARN}`|Warning|**Depends on**:<br><ul><li>GCP MSSQL: Disk space is critically low</li></ul>|
+|GCP MSSQL: Disk space is critically low|<p>Critical utilization of the disk space.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.disk.utilization) >= {$CLOUD_SQL.MSSQL.DISK.UTIL.CRIT}`|Average||
+|GCP MSSQL: High memory utilization|<p>RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.memory.utilization,5m) >= {$CLOUD_SQL.MSSQL.RAM.UTIL.MAX}`|High||
+|GCP MSSQL: Instance is in suspended state|<p>The instance is in suspended state. <br>It is not available, for example, due to problems with billing. <br></p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 1`|Warning||
+|GCP MSSQL: Instance is stopped by the owner|<p>The instance has been stopped by the owner. <br>It is not currently running, but it's ready to be restarted.<br></p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 2`|Info||
+|GCP MSSQL: Instance is in maintenance|<p>The instance is down for maintenance.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 4`|Info||
+|GCP MSSQL: Instance is in failed state|<p>The instance creation failed, or an operation left the instance in an own bad state.<br></p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 5`|Average||
+|GCP MSSQL: Instance is in unknown state|<p>The state of the instance is unknown.<br></p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 6`|Average||
+|GCP MSSQL: Failed to get the instance state|<p>Failed to get the instance state. <br>Check access permissions to GCP API or service account.<br></p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 10`|Average||
+|GCP MSSQL: Database engine is down|<p>Database engine is down.<br>If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.<br></p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.db.state)=0`|Average|**Depends on**:<br><ul><li>GCP MSSQL: Instance is stopped by the owner</li><li>GCP MSSQL: Instance is in suspended state</li><li>GCP MSSQL: Instance is in maintenance</li><li>GCP MSSQL: Instance is in failed state</li><li>GCP MSSQL: Instance is in unknown state</li><li>GCP MSSQL: Failed to get the instance state</li></ul>|
 
 ### LLD rule Resources discovery
 

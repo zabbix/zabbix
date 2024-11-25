@@ -82,20 +82,20 @@ You should define the IP address (or FQDN) and Web-UI port for the ResourceManag
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|ResourceManager: Service is unavailable||`last(/Hadoop by HTTP/net.tcp.service["tcp","{$HADOOP.RESOURCEMANAGER.HOST}","{$HADOOP.RESOURCEMANAGER.PORT}"])=0`|Average|**Manual close**: Yes|
-|ResourceManager: Service response time is too high||`min(/Hadoop by HTTP/net.tcp.service.perf["tcp","{$HADOOP.RESOURCEMANAGER.HOST}","{$HADOOP.RESOURCEMANAGER.PORT}"],5m)>{$HADOOP.RESOURCEMANAGER.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>ResourceManager: Service is unavailable</li></ul>|
-|ResourceManager: Service has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Hadoop by HTTP/hadoop.resourcemanager.uptime)<10m`|Info|**Manual close**: Yes|
-|ResourceManager: Failed to fetch ResourceManager API page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Hadoop by HTTP/hadoop.resourcemanager.uptime,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>ResourceManager: Service is unavailable</li></ul>|
-|ResourceManager: Cluster has no active NodeManagers|<p>Cluster is unable to execute any jobs without at least one NodeManager.</p>|`max(/Hadoop by HTTP/hadoop.resourcemanager.num_active_nm,5m)=0`|High||
-|ResourceManager: Cluster has unhealthy NodeManagers|<p>YARN considers any node with disk utilization exceeding the value specified under the property yarn.nodemanager.disk-health-checker.max-disk-utilization-per-disk-percentage (in yarn-site.xml) to be unhealthy. Ample disk space is critical to ensure uninterrupted operation of a Hadoop cluster, and large numbers of unhealthyNodes (the number to alert on depends on the size of your cluster) should be quickly investigated and resolved.</p>|`min(/Hadoop by HTTP/hadoop.resourcemanager.num_unhealthy_nm,15m)>0`|Average||
-|NameNode: Service is unavailable||`last(/Hadoop by HTTP/net.tcp.service["tcp","{$HADOOP.NAMENODE.HOST}","{$HADOOP.NAMENODE.PORT}"])=0`|Average|**Manual close**: Yes|
-|NameNode: Service response time is too high||`min(/Hadoop by HTTP/net.tcp.service.perf["tcp","{$HADOOP.NAMENODE.HOST}","{$HADOOP.NAMENODE.PORT}"],5m)>{$HADOOP.NAMENODE.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>NameNode: Service is unavailable</li></ul>|
-|NameNode: Service has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Hadoop by HTTP/hadoop.namenode.uptime)<10m`|Info|**Manual close**: Yes|
-|NameNode: Failed to fetch NameNode API page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Hadoop by HTTP/hadoop.namenode.uptime,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>NameNode: Service is unavailable</li></ul>|
-|NameNode: Cluster capacity remaining is low|<p>A good practice is to ensure that disk use never exceeds 80 percent capacity.</p>|`max(/Hadoop by HTTP/hadoop.namenode.percent_remaining,15m)<{$HADOOP.CAPACITY_REMAINING.MIN.WARN}`|Warning||
-|NameNode: Cluster has missing blocks|<p>A missing block is far worse than a corrupt block, because a missing block cannot be recovered by copying a replica.</p>|`min(/Hadoop by HTTP/hadoop.namenode.missing_blocks,15m)>0`|Average||
-|NameNode: Cluster has volume failures|<p>HDFS now allows for disks to fail in place, without affecting DataNode operations, until a threshold value is reached. This is set on each DataNode via the dfs.datanode.failed.volumes.tolerated property; it defaults to 0, meaning that any volume failure will shut down the DataNode; on a production cluster where DataNodes typically have 6, 8, or 12 disks, setting this parameter to 1 or 2 is typically the best practice.</p>|`min(/Hadoop by HTTP/hadoop.namenode.volume_failures_total,15m)>0`|Average||
-|NameNode: Cluster has DataNodes in Dead state|<p>The death of a DataNode causes a flurry of network activity, as the NameNode initiates replication of blocks lost on the dead nodes.</p>|`min(/Hadoop by HTTP/hadoop.namenode.num_dead_data_nodes,5m)>0`|Average||
+|Hadoop: ResourceManager: Service is unavailable||`last(/Hadoop by HTTP/net.tcp.service["tcp","{$HADOOP.RESOURCEMANAGER.HOST}","{$HADOOP.RESOURCEMANAGER.PORT}"])=0`|Average|**Manual close**: Yes|
+|Hadoop: ResourceManager: Service response time is too high||`min(/Hadoop by HTTP/net.tcp.service.perf["tcp","{$HADOOP.RESOURCEMANAGER.HOST}","{$HADOOP.RESOURCEMANAGER.PORT}"],5m)>{$HADOOP.RESOURCEMANAGER.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Hadoop: ResourceManager: Service is unavailable</li></ul>|
+|Hadoop: ResourceManager: Service has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Hadoop by HTTP/hadoop.resourcemanager.uptime)<10m`|Info|**Manual close**: Yes|
+|Hadoop: ResourceManager: Failed to fetch ResourceManager API page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Hadoop by HTTP/hadoop.resourcemanager.uptime,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Hadoop: ResourceManager: Service is unavailable</li></ul>|
+|Hadoop: ResourceManager: Cluster has no active NodeManagers|<p>Cluster is unable to execute any jobs without at least one NodeManager.</p>|`max(/Hadoop by HTTP/hadoop.resourcemanager.num_active_nm,5m)=0`|High||
+|Hadoop: ResourceManager: Cluster has unhealthy NodeManagers|<p>YARN considers any node with disk utilization exceeding the value specified under the property yarn.nodemanager.disk-health-checker.max-disk-utilization-per-disk-percentage (in yarn-site.xml) to be unhealthy. Ample disk space is critical to ensure uninterrupted operation of a Hadoop cluster, and large numbers of unhealthyNodes (the number to alert on depends on the size of your cluster) should be quickly investigated and resolved.</p>|`min(/Hadoop by HTTP/hadoop.resourcemanager.num_unhealthy_nm,15m)>0`|Average||
+|Hadoop: NameNode: Service is unavailable||`last(/Hadoop by HTTP/net.tcp.service["tcp","{$HADOOP.NAMENODE.HOST}","{$HADOOP.NAMENODE.PORT}"])=0`|Average|**Manual close**: Yes|
+|Hadoop: NameNode: Service response time is too high||`min(/Hadoop by HTTP/net.tcp.service.perf["tcp","{$HADOOP.NAMENODE.HOST}","{$HADOOP.NAMENODE.PORT}"],5m)>{$HADOOP.NAMENODE.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Hadoop: NameNode: Service is unavailable</li></ul>|
+|Hadoop: NameNode: Service has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Hadoop by HTTP/hadoop.namenode.uptime)<10m`|Info|**Manual close**: Yes|
+|Hadoop: NameNode: Failed to fetch NameNode API page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Hadoop by HTTP/hadoop.namenode.uptime,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Hadoop: NameNode: Service is unavailable</li></ul>|
+|Hadoop: NameNode: Cluster capacity remaining is low|<p>A good practice is to ensure that disk use never exceeds 80 percent capacity.</p>|`max(/Hadoop by HTTP/hadoop.namenode.percent_remaining,15m)<{$HADOOP.CAPACITY_REMAINING.MIN.WARN}`|Warning||
+|Hadoop: NameNode: Cluster has missing blocks|<p>A missing block is far worse than a corrupt block, because a missing block cannot be recovered by copying a replica.</p>|`min(/Hadoop by HTTP/hadoop.namenode.missing_blocks,15m)>0`|Average||
+|Hadoop: NameNode: Cluster has volume failures|<p>HDFS now allows for disks to fail in place, without affecting DataNode operations, until a threshold value is reached. This is set on each DataNode via the dfs.datanode.failed.volumes.tolerated property; it defaults to 0, meaning that any volume failure will shut down the DataNode; on a production cluster where DataNodes typically have 6, 8, or 12 disks, setting this parameter to 1 or 2 is typically the best practice.</p>|`min(/Hadoop by HTTP/hadoop.namenode.volume_failures_total,15m)>0`|Average||
+|Hadoop: NameNode: Cluster has DataNodes in Dead state|<p>The death of a DataNode causes a flurry of network activity, as the NameNode initiates replication of blocks lost on the dead nodes.</p>|`min(/Hadoop by HTTP/hadoop.namenode.num_dead_data_nodes,5m)>0`|Average||
 
 ### LLD rule Node manager discovery
 
@@ -125,9 +125,9 @@ You should define the IP address (or FQDN) and Web-UI port for the ResourceManag
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#HOSTNAME}: Service has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Hadoop by HTTP/hadoop.nodemanager.uptime[{#HOSTNAME}])<10m`|Info|**Manual close**: Yes|
-|{#HOSTNAME}: Failed to fetch NodeManager API page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Hadoop by HTTP/hadoop.nodemanager.uptime[{#HOSTNAME}],30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>{#HOSTNAME}: NodeManager has state {ITEM.VALUE}.</li></ul>|
-|{#HOSTNAME}: NodeManager has state {ITEM.VALUE}.|<p>The state is different from normal.</p>|`last(/Hadoop by HTTP/hadoop.nodemanager.state[{#HOSTNAME}])<>"RUNNING"`|Average||
+|Hadoop: {#HOSTNAME}: Service has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Hadoop by HTTP/hadoop.nodemanager.uptime[{#HOSTNAME}])<10m`|Info|**Manual close**: Yes|
+|Hadoop: {#HOSTNAME}: Failed to fetch NodeManager API page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Hadoop by HTTP/hadoop.nodemanager.uptime[{#HOSTNAME}],30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Hadoop: {#HOSTNAME}: NodeManager has state {ITEM.VALUE}.</li></ul>|
+|Hadoop: {#HOSTNAME}: NodeManager has state {ITEM.VALUE}.|<p>The state is different from normal.</p>|`last(/Hadoop by HTTP/hadoop.nodemanager.state[{#HOSTNAME}])<>"RUNNING"`|Average||
 
 ### LLD rule Data node discovery
 
@@ -156,9 +156,9 @@ You should define the IP address (or FQDN) and Web-UI port for the ResourceManag
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#HOSTNAME}: Service has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Hadoop by HTTP/hadoop.datanode.uptime[{#HOSTNAME}])<10m`|Info|**Manual close**: Yes|
-|{#HOSTNAME}: Failed to fetch DataNode API page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Hadoop by HTTP/hadoop.datanode.uptime[{#HOSTNAME}],30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>{#HOSTNAME}: DataNode has state {ITEM.VALUE}.</li></ul>|
-|{#HOSTNAME}: DataNode has state {ITEM.VALUE}.|<p>The state is different from normal.</p>|`last(/Hadoop by HTTP/hadoop.datanode.oper_state[{#HOSTNAME}])<>"Live"`|Average||
+|Hadoop: {#HOSTNAME}: Service has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Hadoop by HTTP/hadoop.datanode.uptime[{#HOSTNAME}])<10m`|Info|**Manual close**: Yes|
+|Hadoop: {#HOSTNAME}: Failed to fetch DataNode API page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Hadoop by HTTP/hadoop.datanode.uptime[{#HOSTNAME}],30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Hadoop: {#HOSTNAME}: DataNode has state {ITEM.VALUE}.</li></ul>|
+|Hadoop: {#HOSTNAME}: DataNode has state {ITEM.VALUE}.|<p>The state is different from normal.</p>|`last(/Hadoop by HTTP/hadoop.datanode.oper_state[{#HOSTNAME}])<>"Live"`|Average||
 
 ## Feedback
 

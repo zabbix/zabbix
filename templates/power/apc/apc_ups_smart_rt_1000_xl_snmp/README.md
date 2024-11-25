@@ -78,28 +78,28 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Battery has an internal error condition|<p>A battery installed has an internal error condition.</p>|`last(/APC Smart-UPS RT 1000 XL by SNMP/battery.status[upsBasicBatteryStatus])=4`|Average||
-|Battery is Low|<p>The UPS will be unable to sustain the current load, and its services will be lost if power is not restored.</p>|`last(/APC Smart-UPS RT 1000 XL by SNMP/battery.status[upsBasicBatteryStatus])=3`|Average||
-|Battery has low capacity||`last(/APC Smart-UPS RT 1000 XL by SNMP/battery.capacity[upsHighPrecBatteryCapacity]) < {$BATTERY.CAPACITY.MIN.WARN}`|High||
-|Battery needs replacement|<p>A battery installed has an internal error condition.</p>|`last(/APC Smart-UPS RT 1000 XL by SNMP/battery.replace_indicator[upsAdvBatteryReplaceIndicator])=2`|High||
-|Battery has high temperature||`min(/APC Smart-UPS RT 1000 XL by SNMP/battery.temperature[upsHighPrecBatteryTemperature],{$TIME.PERIOD}) > {$BATTERY.TEMP.MAX.WARN}`|High||
-|Unacceptable input voltage||`min(/APC Smart-UPS RT 1000 XL by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > 0 and (min(/APC Smart-UPS RT 1000 XL by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC Smart-UPS RT 1000 XL by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN})`|High||
-|Unacceptable input frequency||`min(/APC Smart-UPS RT 1000 XL by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > 0 and (min(/APC Smart-UPS RT 1000 XL by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > {$UPS.INPUT_FREQ.MAX.WARN} or max(/APC Smart-UPS RT 1000 XL by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) < {$UPS.INPUT_FREQ.MIN.WARN})`|High||
-|Output load is high|<p>A battery installed has an internal error condition.</p>|`min(/APC Smart-UPS RT 1000 XL by SNMP/output.load[upsHighPrecOutputLoad],{$TIME.PERIOD}) > {$UPS.OUTPUT.MAX.WARN}`|High||
-|UPS is Timed Sleeping||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=5`|Average||
-|UPS is Switched Bypass||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=9`|Average||
-|UPS is Software Bypass||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=6`|Average||
-|UPS is Sleeping Until Power Return||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=11`|Average||
-|UPS is Rebooting||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=8`|Average||
-|UPS is On Smart Trim||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=12`|Average||
-|UPS is on Smart Boost||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=4`|Average||
-|UPS is on battery||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=3`|Average||
-|UPS is Off||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=7`|Average||
-|UPS is Emergency Static Bypass||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=16`|Average||
-|UPS is Hardware Failure Bypass||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=10`|Average||
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/APC Smart-UPS RT 1000 XL by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/APC Smart-UPS RT 1000 XL by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/APC Smart-UPS RT 1000 XL by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/APC Smart-UPS RT 1000 XL by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>No SNMP data collection</li></ul>|
-|System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/APC Smart-UPS RT 1000 XL by SNMP/system.name[sysName.0],#1)<>last(/APC Smart-UPS RT 1000 XL by SNMP/system.name[sysName.0],#2) and length(last(/APC Smart-UPS RT 1000 XL by SNMP/system.name[sysName.0]))>0`|Info|**Manual close**: Yes|
-|No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/APC Smart-UPS RT 1000 XL by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
+|APC Smart-UPS: Battery has an internal error condition|<p>A battery installed has an internal error condition.</p>|`last(/APC Smart-UPS RT 1000 XL by SNMP/battery.status[upsBasicBatteryStatus])=4`|Average||
+|APC Smart-UPS: Battery is Low|<p>The UPS will be unable to sustain the current load, and its services will be lost if power is not restored.</p>|`last(/APC Smart-UPS RT 1000 XL by SNMP/battery.status[upsBasicBatteryStatus])=3`|Average||
+|APC Smart-UPS: Battery has low capacity||`last(/APC Smart-UPS RT 1000 XL by SNMP/battery.capacity[upsHighPrecBatteryCapacity]) < {$BATTERY.CAPACITY.MIN.WARN}`|High||
+|APC Smart-UPS: Battery needs replacement|<p>A battery installed has an internal error condition.</p>|`last(/APC Smart-UPS RT 1000 XL by SNMP/battery.replace_indicator[upsAdvBatteryReplaceIndicator])=2`|High||
+|APC Smart-UPS: Battery has high temperature||`min(/APC Smart-UPS RT 1000 XL by SNMP/battery.temperature[upsHighPrecBatteryTemperature],{$TIME.PERIOD}) > {$BATTERY.TEMP.MAX.WARN}`|High||
+|APC Smart-UPS: Unacceptable input voltage||`min(/APC Smart-UPS RT 1000 XL by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > 0 and (min(/APC Smart-UPS RT 1000 XL by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC Smart-UPS RT 1000 XL by SNMP/input.voltage[upsHighPrecInputLineVoltage],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN})`|High||
+|APC Smart-UPS: Unacceptable input frequency||`min(/APC Smart-UPS RT 1000 XL by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > 0 and (min(/APC Smart-UPS RT 1000 XL by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) > {$UPS.INPUT_FREQ.MAX.WARN} or max(/APC Smart-UPS RT 1000 XL by SNMP/input.frequency[upsHighPrecInputFrequency],{$TIME.PERIOD}) < {$UPS.INPUT_FREQ.MIN.WARN})`|High||
+|APC Smart-UPS: Output load is high|<p>A battery installed has an internal error condition.</p>|`min(/APC Smart-UPS RT 1000 XL by SNMP/output.load[upsHighPrecOutputLoad],{$TIME.PERIOD}) > {$UPS.OUTPUT.MAX.WARN}`|High||
+|APC Smart-UPS: UPS is Timed Sleeping||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=5`|Average||
+|APC Smart-UPS: UPS is Switched Bypass||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=9`|Average||
+|APC Smart-UPS: UPS is Software Bypass||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=6`|Average||
+|APC Smart-UPS: UPS is Sleeping Until Power Return||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=11`|Average||
+|APC Smart-UPS: UPS is Rebooting||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=8`|Average||
+|APC Smart-UPS: UPS is On Smart Trim||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=12`|Average||
+|APC Smart-UPS: UPS is on Smart Boost||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=4`|Average||
+|APC Smart-UPS: UPS is on battery||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=3`|Average||
+|APC Smart-UPS: UPS is Off||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=7`|Average||
+|APC Smart-UPS: UPS is Emergency Static Bypass||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=16`|Average||
+|APC Smart-UPS: UPS is Hardware Failure Bypass||`last(/APC Smart-UPS RT 1000 XL by SNMP/output.status[upsBasicOutputStatus])=10`|Average||
+|APC Smart-UPS: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/APC Smart-UPS RT 1000 XL by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/APC Smart-UPS RT 1000 XL by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/APC Smart-UPS RT 1000 XL by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/APC Smart-UPS RT 1000 XL by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>APC Smart-UPS: No SNMP data collection</li></ul>|
+|APC Smart-UPS: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/APC Smart-UPS RT 1000 XL by SNMP/system.name[sysName.0],#1)<>last(/APC Smart-UPS RT 1000 XL by SNMP/system.name[sysName.0],#2) and length(last(/APC Smart-UPS RT 1000 XL by SNMP/system.name[sysName.0]))>0`|Info|**Manual close**: Yes|
+|APC Smart-UPS: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/APC Smart-UPS RT 1000 XL by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
 
 ### LLD rule Input phases discovery
 
@@ -118,7 +118,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} input voltage||`min(/APC Smart-UPS RT 1000 XL by SNMP/phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC Smart-UPS RT 1000 XL by SNMP/phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN}`|High||
+|APC Smart-UPS: {#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} input voltage||`min(/APC Smart-UPS RT 1000 XL by SNMP/phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC Smart-UPS RT 1000 XL by SNMP/phase.input.voltage[upsPhaseInputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN}`|High||
 
 ### LLD rule Output phases discovery
 
@@ -138,7 +138,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} output voltage||`min(/APC Smart-UPS RT 1000 XL by SNMP/phase.output.voltage[upsPhaseOutputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC Smart-UPS RT 1000 XL by SNMP/phase.output.voltage[upsPhaseOutputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN}`|High||
+|APC Smart-UPS: {#PHASEINDEX}: Unacceptable phase {#PHASEINDEX} output voltage||`min(/APC Smart-UPS RT 1000 XL by SNMP/phase.output.voltage[upsPhaseOutputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) > {$UPS.INPUT_VOLT.MAX.WARN} or max(/APC Smart-UPS RT 1000 XL by SNMP/phase.output.voltage[upsPhaseOutputVoltage.1.1.{#PHASEINDEX}],{$TIME.PERIOD}) < {$UPS.INPUT_VOLT.MIN.WARN}`|High||
 
 ### LLD rule External battery packs discovery
 
@@ -160,9 +160,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery status is not okay|<p>The battery cartridge status:<br>bit 0 Disconnected<br>bit 1 Overvoltage<br>bit 2 NeedsReplacement<br>bit 3 OvertemperatureCritical<br>bit 4 Charger<br>bit 5 TemperatureSensor<br>bit 6 BusSoftStart<br>bit 7 OvertemperatureWarning<br>bit 8 GeneralError<br>bit 9 Communication<br>bit 10 DisconnectedFrame<br>bit 11 FirmwareMismatch</p>|`find(/APC Smart-UPS RT 1000 XL by SNMP/battery.pack.status[upsHighPrecBatteryPackCartridgeStatus.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],,"regexp","^(0{16})$")=0`|Warning||
-|{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery has high temperature||`min(/APC Smart-UPS RT 1000 XL by SNMP/battery.temperature[upsHighPrecBatteryPackTemperature.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],{$TIME.PERIOD}) > {$BATTERY.TEMP.MAX.WARN}`|High||
-|{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery lifetime is not okay|<p>The battery cartridge health.<br>  bit 0 Battery lifetime okay<br>  bit 1 Battery lifetime near end, order replacement cartridge<br>  bit 2 Battery lifetime exceeded, replace battery<br>  bit 3 Battery lifetime near end acknowledged, order replacement cartridge<br>  bit 4 Battery lifetime exceeded acknowledged, replace battery<br>  bit 5 Battery measured lifetime near end, order replacement cartridge<br>  bit 6 Battery measured lifetime near end acknowledged, order replacement cartridge</p>|`find(/APC Smart-UPS RT 1000 XL by SNMP/battery.pack.cartridge_health[upsHighPrecBatteryPackCartridgeHealth.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],,"regexp","^(0)[0\|1]{15}$")=1`|Warning||
+|APC Smart-UPS: {#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery status is not okay|<p>The battery cartridge status:<br>bit 0 Disconnected<br>bit 1 Overvoltage<br>bit 2 NeedsReplacement<br>bit 3 OvertemperatureCritical<br>bit 4 Charger<br>bit 5 TemperatureSensor<br>bit 6 BusSoftStart<br>bit 7 OvertemperatureWarning<br>bit 8 GeneralError<br>bit 9 Communication<br>bit 10 DisconnectedFrame<br>bit 11 FirmwareMismatch</p>|`find(/APC Smart-UPS RT 1000 XL by SNMP/battery.pack.status[upsHighPrecBatteryPackCartridgeStatus.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],,"regexp","^(0{16})$")=0`|Warning||
+|APC Smart-UPS: {#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery has high temperature||`min(/APC Smart-UPS RT 1000 XL by SNMP/battery.temperature[upsHighPrecBatteryPackTemperature.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],{$TIME.PERIOD}) > {$BATTERY.TEMP.MAX.WARN}`|High||
+|APC Smart-UPS: {#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery lifetime is not okay|<p>The battery cartridge health.<br>  bit 0 Battery lifetime okay<br>  bit 1 Battery lifetime near end, order replacement cartridge<br>  bit 2 Battery lifetime exceeded, replace battery<br>  bit 3 Battery lifetime near end acknowledged, order replacement cartridge<br>  bit 4 Battery lifetime exceeded acknowledged, replace battery<br>  bit 5 Battery measured lifetime near end, order replacement cartridge<br>  bit 6 Battery measured lifetime near end acknowledged, order replacement cartridge</p>|`find(/APC Smart-UPS RT 1000 XL by SNMP/battery.pack.cartridge_health[upsHighPrecBatteryPackCartridgeHealth.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],,"regexp","^(0)[0\|1]{15}$")=1`|Warning||
 
 ### LLD rule External bad battery packs discovery
 
@@ -194,9 +194,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#EXTERNAL_SENSOR1_NAME}: Sensor has status Not Applicable|<p>The external sensor does not work or is not connected.</p>|`last(/APC Smart-UPS RT 1000 XL by SNMP/external.sensor.status[uioSensorStatusAlarmStatus.1.{#SNMPINDEX}])=4`|Info||
-|{#EXTERNAL_SENSOR1_NAME}: Sensor has status Warning|<p>The external sensor has returned a value greater than the warning threshold.</p>|`last(/APC Smart-UPS RT 1000 XL by SNMP/external.sensor.status[uioSensorStatusAlarmStatus.1.{#SNMPINDEX}])=2`|Average||
-|{#EXTERNAL_SENSOR1_NAME}: Sensor has status Critical|<p>The external sensor has returned a value greater than the critical threshold.</p>|`last(/APC Smart-UPS RT 1000 XL by SNMP/external.sensor.status[uioSensorStatusAlarmStatus.1.{#SNMPINDEX}])=3`|High||
+|APC Smart-UPS: {#EXTERNAL_SENSOR1_NAME}: Sensor has status Not Applicable|<p>The external sensor does not work or is not connected.</p>|`last(/APC Smart-UPS RT 1000 XL by SNMP/external.sensor.status[uioSensorStatusAlarmStatus.1.{#SNMPINDEX}])=4`|Info||
+|APC Smart-UPS: {#EXTERNAL_SENSOR1_NAME}: Sensor has status Warning|<p>The external sensor has returned a value greater than the warning threshold.</p>|`last(/APC Smart-UPS RT 1000 XL by SNMP/external.sensor.status[uioSensorStatusAlarmStatus.1.{#SNMPINDEX}])=2`|Average||
+|APC Smart-UPS: {#EXTERNAL_SENSOR1_NAME}: Sensor has status Critical|<p>The external sensor has returned a value greater than the critical threshold.</p>|`last(/APC Smart-UPS RT 1000 XL by SNMP/external.sensor.status[uioSensorStatusAlarmStatus.1.{#SNMPINDEX}])=3`|High||
 
 ### LLD rule External sensor port 2 discovery
 
@@ -216,9 +216,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#EXTERNAL_SENSOR2_NAME}: Sensor has status Not Applicable|<p>The external sensor does not work or is not connected.</p>|`last(/APC Smart-UPS RT 1000 XL by SNMP/external.sensor.status[uioSensorStatusAlarmStatus.2.{#SNMPINDEX}])=4`|Info||
-|{#EXTERNAL_SENSOR2_NAME}: Sensor has status Warning|<p>The external sensor has returned a value greater than the warning threshold.</p>|`last(/APC Smart-UPS RT 1000 XL by SNMP/external.sensor.status[uioSensorStatusAlarmStatus.2.{#SNMPINDEX}])=2`|Average||
-|{#EXTERNAL_SENSOR2_NAME}: Sensor has status Critical|<p>The external sensor has returned a value greater than the critical threshold.</p>|`last(/APC Smart-UPS RT 1000 XL by SNMP/external.sensor.status[uioSensorStatusAlarmStatus.2.{#SNMPINDEX}])=3`|High||
+|APC Smart-UPS: {#EXTERNAL_SENSOR2_NAME}: Sensor has status Not Applicable|<p>The external sensor does not work or is not connected.</p>|`last(/APC Smart-UPS RT 1000 XL by SNMP/external.sensor.status[uioSensorStatusAlarmStatus.2.{#SNMPINDEX}])=4`|Info||
+|APC Smart-UPS: {#EXTERNAL_SENSOR2_NAME}: Sensor has status Warning|<p>The external sensor has returned a value greater than the warning threshold.</p>|`last(/APC Smart-UPS RT 1000 XL by SNMP/external.sensor.status[uioSensorStatusAlarmStatus.2.{#SNMPINDEX}])=2`|Average||
+|APC Smart-UPS: {#EXTERNAL_SENSOR2_NAME}: Sensor has status Critical|<p>The external sensor has returned a value greater than the critical threshold.</p>|`last(/APC Smart-UPS RT 1000 XL by SNMP/external.sensor.status[uioSensorStatusAlarmStatus.2.{#SNMPINDEX}])=3`|High||
 
 ## Feedback
 

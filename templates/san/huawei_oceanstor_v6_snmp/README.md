@@ -76,13 +76,13 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Storage version has changed||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.version,#1)<>last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.version,#2) and length(last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.version))>0`|Info|**Manual close**: Yes|
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Huawei OceanStor V6 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Huawei OceanStor V6 by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Huawei OceanStor V6 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Huawei OceanStor V6 by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>No SNMP data collection</li></ul>|
-|System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Huawei OceanStor V6 by SNMP/system.name,#1)<>last(/Huawei OceanStor V6 by SNMP/system.name,#2) and length(last(/Huawei OceanStor V6 by SNMP/system.name))>0`|Info|**Manual close**: Yes|
-|No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Huawei OceanStor V6 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/Huawei OceanStor V6 by SNMP/icmpping,#3)=0`|High||
-|High ICMP ping loss||`min(/Huawei OceanStor V6 by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Huawei OceanStor V6 by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/Huawei OceanStor V6 by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>High ICMP ping loss</li><li>Unavailable by ICMP ping</li></ul>|
+|Huawei OceanStor V6: Storage version has changed||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.version,#1)<>last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.version,#2) and length(last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.version))>0`|Info|**Manual close**: Yes|
+|Huawei OceanStor V6: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Huawei OceanStor V6 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Huawei OceanStor V6 by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Huawei OceanStor V6 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Huawei OceanStor V6 by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Huawei OceanStor V6: No SNMP data collection</li></ul>|
+|Huawei OceanStor V6: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Huawei OceanStor V6 by SNMP/system.name,#1)<>last(/Huawei OceanStor V6 by SNMP/system.name,#2) and length(last(/Huawei OceanStor V6 by SNMP/system.name))>0`|Info|**Manual close**: Yes|
+|Huawei OceanStor V6: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Huawei OceanStor V6 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Huawei OceanStor V6: Unavailable by ICMP ping</li></ul>|
+|Huawei OceanStor V6: Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/Huawei OceanStor V6 by SNMP/icmpping,#3)=0`|High||
+|Huawei OceanStor V6: High ICMP ping loss||`min(/Huawei OceanStor V6 by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Huawei OceanStor V6 by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Huawei OceanStor V6: Unavailable by ICMP ping</li></ul>|
+|Huawei OceanStor V6: High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/Huawei OceanStor V6 by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>Huawei OceanStor V6: High ICMP ping loss</li><li>Huawei OceanStor V6: Unavailable by ICMP ping</li></ul>|
 
 ### LLD rule Controller discovery
 
@@ -104,11 +104,11 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Controller [{#ID}]: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.cpu["{#ID}"],5m)>{$CPU.UTIL.CRIT}`|Warning||
-|Controller [{#ID}]: Memory usage is too high||`min(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.memory["{#ID}"],{$HUAWEI.OCEANSTOR_V6.MEM.MAX.TIME})>{$HUAWEI.OCEANSTOR_V6.MEM.MAX.WARN}`|Average||
-|Controller [{#ID}]: Health status is not Normal||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.health_status["{#ID}"])<>1`|High||
-|Controller [{#ID}]: Running status is not Online||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.running_status["{#ID}"])<>27`|Average||
-|Controller [{#ID}]: Role has been changed||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.role["{#ID}"],#1)<>last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.role["{#ID}"],#2)`|Warning|**Manual close**: Yes|
+|Huawei OceanStor V6: Controller [{#ID}]: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.cpu["{#ID}"],5m)>{$CPU.UTIL.CRIT}`|Warning||
+|Huawei OceanStor V6: Controller [{#ID}]: Memory usage is too high||`min(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.memory["{#ID}"],{$HUAWEI.OCEANSTOR_V6.MEM.MAX.TIME})>{$HUAWEI.OCEANSTOR_V6.MEM.MAX.WARN}`|Average||
+|Huawei OceanStor V6: Controller [{#ID}]: Health status is not Normal||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.health_status["{#ID}"])<>1`|High||
+|Huawei OceanStor V6: Controller [{#ID}]: Running status is not Online||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.running_status["{#ID}"])<>27`|Average||
+|Huawei OceanStor V6: Controller [{#ID}]: Role has been changed||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.role["{#ID}"],#1)<>last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.controller.role["{#ID}"],#2)`|Warning|**Manual close**: Yes|
 
 ### LLD rule Enclosure discovery
 
@@ -128,9 +128,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Enclosure [{#NAME}]: Health status is not Normal||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.enclosure.health_status["{#NAME}"])<>1`|High||
-|Enclosure [{#NAME}]: Running status is not Online||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.enclosure.running_status["{#NAME}"])<>27`|Average||
-|Enclosure [{#NAME}]: Temperature is too high||`min(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.enclosure.temperature["{#NAME}"],{$HUAWEI.OCEANSTOR_V6.TEMP.MAX.TIME})>{$HUAWEI.OCEANSTOR_V6.TEMP.MAX.WARN}`|High||
+|Huawei OceanStor V6: Enclosure [{#NAME}]: Health status is not Normal||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.enclosure.health_status["{#NAME}"])<>1`|High||
+|Huawei OceanStor V6: Enclosure [{#NAME}]: Running status is not Online||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.enclosure.running_status["{#NAME}"])<>27`|Average||
+|Huawei OceanStor V6: Enclosure [{#NAME}]: Temperature is too high||`min(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.enclosure.temperature["{#NAME}"],{$HUAWEI.OCEANSTOR_V6.TEMP.MAX.TIME})>{$HUAWEI.OCEANSTOR_V6.TEMP.MAX.WARN}`|High||
 
 ### LLD rule Fan discovery
 
@@ -149,8 +149,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Fan [{#ID}] on [{#LOCATION}]: Health status is not Normal||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.fan.health_status["{#ID}:{#LOCATION}"])<>1`|High||
-|Fan [{#ID}] on [{#LOCATION}]: Running status is not Running||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.fan.running_status["{#ID}:{#LOCATION}"])<>2`|Average||
+|Huawei OceanStor V6: Fan [{#ID}] on [{#LOCATION}]: Health status is not Normal||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.fan.health_status["{#ID}:{#LOCATION}"])<>1`|High||
+|Huawei OceanStor V6: Fan [{#ID}] on [{#LOCATION}]: Running status is not Running||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.fan.running_status["{#ID}:{#LOCATION}"])<>2`|Average||
 
 ### LLD rule BBU discovery
 
@@ -169,8 +169,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|BBU [{#ID}] on [{#LOCATION}]: Health status is not Normal||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.bbu.health_status["{#ID}:{#LOCATION}"])<>1`|High||
-|BBU [{#ID}] on [{#LOCATION}]: Running status is not Online||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.bbu.running_status["{#ID}:{#LOCATION}"])<>27`|Average||
+|Huawei OceanStor V6: BBU [{#ID}] on [{#LOCATION}]: Health status is not Normal||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.bbu.health_status["{#ID}:{#LOCATION}"])<>1`|High||
+|Huawei OceanStor V6: BBU [{#ID}] on [{#LOCATION}]: Running status is not Online||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.bbu.running_status["{#ID}:{#LOCATION}"])<>27`|Average||
 
 ### LLD rule Disk discovery
 
@@ -190,9 +190,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Disk [{#MODEL}] on [{#LOCATION}]: Health status is not Normal||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.disk.health_status["{#ID}"])<>1`|High||
-|Disk [{#MODEL}] on [{#LOCATION}]: Running status is not Online||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.disk.running_status["{#ID}"])<>27`|Average||
-|Disk [{#MODEL}] on [{#LOCATION}]: Temperature is too high||`min(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.disk.temperature["{#ID}"],{$HUAWEI.OCEANSTOR_V6.DISK.TEMP.MAX.TIME})>{$HUAWEI.OCEANSTOR_V6.DISK.TEMP.MAX.WARN:"{#MODEL}"}`|High||
+|Huawei OceanStor V6: Disk [{#MODEL}] on [{#LOCATION}]: Health status is not Normal||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.disk.health_status["{#ID}"])<>1`|High||
+|Huawei OceanStor V6: Disk [{#MODEL}] on [{#LOCATION}]: Running status is not Online||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.disk.running_status["{#ID}"])<>27`|Average||
+|Huawei OceanStor V6: Disk [{#MODEL}] on [{#LOCATION}]: Temperature is too high||`min(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.disk.temperature["{#ID}"],{$HUAWEI.OCEANSTOR_V6.DISK.TEMP.MAX.TIME})>{$HUAWEI.OCEANSTOR_V6.DISK.TEMP.MAX.WARN:"{#MODEL}"}`|High||
 
 ### LLD rule Node performance discovery
 
@@ -216,7 +216,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Node [{#NODE}]: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.node.cpu["{#NODE}"],5m)>{$CPU.UTIL.CRIT}`|Warning||
+|Huawei OceanStor V6: Node [{#NODE}]: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.node.cpu["{#NODE}"],5m)>{$CPU.UTIL.CRIT}`|Warning||
 
 ### LLD rule LUN discovery
 
@@ -244,8 +244,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|LUN [{#NAME}]: Status is not Normal||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.lun.status["{#NAME}"])<>1`|Average||
-|LUN [{#NAME}]: Average I/O response time is too high||`min(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.lun.latency.total["{#NAME}"],{$HUAWEI.OCEANSTOR_V6.LUN.IO.TIME.MAX.TIME})>{$HUAWEI.OCEANSTOR_V6.LUN.IO.TIME.MAX.WARN}`|Warning||
+|Huawei OceanStor V6: LUN [{#NAME}]: Status is not Normal||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.lun.status["{#NAME}"])<>1`|Average||
+|Huawei OceanStor V6: LUN [{#NAME}]: Average I/O response time is too high||`min(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.lun.latency.total["{#NAME}"],{$HUAWEI.OCEANSTOR_V6.LUN.IO.TIME.MAX.TIME})>{$HUAWEI.OCEANSTOR_V6.LUN.IO.TIME.MAX.WARN}`|Warning||
 
 ### LLD rule Storage pool discovery
 
@@ -266,8 +266,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Storage pool [{#NAME}]: Health status is not Normal||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.pool.health_status["{#NAME}"])<>1`|High||
-|Storage pool [{#NAME}]: Running status is not Online||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.pool.running_status["{#NAME}"])<>27`|Average||
+|Huawei OceanStor V6: Storage pool [{#NAME}]: Health status is not Normal||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.pool.health_status["{#NAME}"])<>1`|High||
+|Huawei OceanStor V6: Storage pool [{#NAME}]: Running status is not Online||`last(/Huawei OceanStor V6 by SNMP/huawei.oceanstor.v6.pool.running_status["{#NAME}"])<>27`|Average||
 
 ## Feedback
 

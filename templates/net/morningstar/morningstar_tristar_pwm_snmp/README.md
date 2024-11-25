@@ -61,41 +61,41 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Status: Device has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Morningstar TriStar PWM by SNMP/status.hw.uptime)>0 and last(/Morningstar TriStar PWM by SNMP/status.hw.uptime)<10m) or (last(/Morningstar TriStar PWM by SNMP/status.hw.uptime)=0 and last(/Morningstar TriStar PWM by SNMP/status.net.uptime)<10m)`|Info|**Manual close**: Yes|
-|Status: Failed to fetch data|<p>Zabbix has not received data for items for the last 5 minutes.</p>|`nodata(/Morningstar TriStar PWM by SNMP/status.net.uptime,5m)=1`|Warning|**Manual close**: Yes|
-|Temperature: Low battery temperature||`max(/Morningstar TriStar PWM by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>Temperature: Critically low battery temperature</li></ul>|
-|Temperature: Critically low battery temperature||`max(/Morningstar TriStar PWM by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}`|High||
-|Temperature: High battery temperature||`min(/Morningstar TriStar PWM by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Temperature: Critically high battery temperature</li></ul>|
-|Temperature: Critically high battery temperature||`min(/Morningstar TriStar PWM by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}`|High||
-|Status: Device has "externalShort" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","externalShort")=2`|High||
-|Status: Device has "overcurrent" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","overcurrent")=2`|High||
-|Status: Device has "mosfetSShorted" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","mosfetSShorted")=2`|High||
-|Status: Device has "softwareFault" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","softwareFault")=2`|High||
-|Status: Device has "highVoltageDisconnect" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","highVoltageDisconnect")=2`|High||
-|Status: Device has "tristarHot" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","tristarHot")=2`|High||
-|Status: Device has "dipSwitchChange" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","dipSwitchChange")=2`|High||
-|Status: Device has "customSettingsEdit" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","customSettingsEdit")=2`|High||
-|Status: Device has "reset" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","reset")=2`|High||
-|Status: Device has "systemMiswire" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","systemMiswire")=2`|High||
-|Status: Device has "rtsShorted" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","rtsShorted")=2`|High||
-|Status: Device has "rtsDisconnected" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","rtsDisconnected")=2`|High||
-|Status: Device has "rtsShorted" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2`|Warning||
-|Status: Device has "rtsDisconnected" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2`|Warning||
-|Status: Device has "heatsinkTempSensorOpen" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2`|Warning||
-|Status: Device has "heatsinkTempSensorShorted" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2`|Warning||
-|Status: Device has "tristarHot" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","tristarHot")=2`|Warning||
-|Status: Device has "currentLimit" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2`|Warning||
-|Status: Device has "currentOffset" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","currentOffset")=2`|Warning||
-|Status: Device has "batterySense" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","batterySense")=2`|Warning||
-|Status: Device has "batterySenseDisconnected" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","batterySenseDisconnected")=2`|Warning||
-|Status: Device has "uncalibrated" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2`|Warning||
-|Status: Device has "rtsMiswire" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","rtsMiswire")=2`|Warning||
-|Status: Device has "highVoltageDisconnect" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","highVoltageDisconnect")=2`|Warning||
-|Status: Device has "diversionLoadNearMax" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","diversionLoadNearMax")=2`|Warning||
-|Status: Device has "systemMiswire" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","systemMiswire")=2`|Warning||
-|Status: Device has "mosfetSOpen" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","mosfetSOpen")=2`|Warning||
-|Status: Device has "p12VoltageReferenceOff" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","p12VoltageReferenceOff")=2`|Warning||
-|Status: Device has "loadDisconnectState" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","loadDisconnectState")=2`|Warning||
+|Morningstar TriStar PWM: Status: Device has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Morningstar TriStar PWM by SNMP/status.hw.uptime)>0 and last(/Morningstar TriStar PWM by SNMP/status.hw.uptime)<10m) or (last(/Morningstar TriStar PWM by SNMP/status.hw.uptime)=0 and last(/Morningstar TriStar PWM by SNMP/status.net.uptime)<10m)`|Info|**Manual close**: Yes|
+|Morningstar TriStar PWM: Status: Failed to fetch data|<p>Zabbix has not received data for items for the last 5 minutes.</p>|`nodata(/Morningstar TriStar PWM by SNMP/status.net.uptime,5m)=1`|Warning|**Manual close**: Yes|
+|Morningstar TriStar PWM: Temperature: Low battery temperature||`max(/Morningstar TriStar PWM by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar TriStar PWM: Temperature: Critically low battery temperature</li></ul>|
+|Morningstar TriStar PWM: Temperature: Critically low battery temperature||`max(/Morningstar TriStar PWM by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}`|High||
+|Morningstar TriStar PWM: Temperature: High battery temperature||`min(/Morningstar TriStar PWM by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar TriStar PWM: Temperature: Critically high battery temperature</li></ul>|
+|Morningstar TriStar PWM: Temperature: Critically high battery temperature||`min(/Morningstar TriStar PWM by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}`|High||
+|Morningstar TriStar PWM: Status: Device has "externalShort" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","externalShort")=2`|High||
+|Morningstar TriStar PWM: Status: Device has "overcurrent" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","overcurrent")=2`|High||
+|Morningstar TriStar PWM: Status: Device has "mosfetSShorted" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","mosfetSShorted")=2`|High||
+|Morningstar TriStar PWM: Status: Device has "softwareFault" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","softwareFault")=2`|High||
+|Morningstar TriStar PWM: Status: Device has "highVoltageDisconnect" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","highVoltageDisconnect")=2`|High||
+|Morningstar TriStar PWM: Status: Device has "tristarHot" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","tristarHot")=2`|High||
+|Morningstar TriStar PWM: Status: Device has "dipSwitchChange" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","dipSwitchChange")=2`|High||
+|Morningstar TriStar PWM: Status: Device has "customSettingsEdit" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","customSettingsEdit")=2`|High||
+|Morningstar TriStar PWM: Status: Device has "reset" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","reset")=2`|High||
+|Morningstar TriStar PWM: Status: Device has "systemMiswire" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","systemMiswire")=2`|High||
+|Morningstar TriStar PWM: Status: Device has "rtsShorted" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","rtsShorted")=2`|High||
+|Morningstar TriStar PWM: Status: Device has "rtsDisconnected" faults flag||`count(/Morningstar TriStar PWM by SNMP/status.faults[faults.0],#3,"like","rtsDisconnected")=2`|High||
+|Morningstar TriStar PWM: Status: Device has "rtsShorted" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2`|Warning||
+|Morningstar TriStar PWM: Status: Device has "rtsDisconnected" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2`|Warning||
+|Morningstar TriStar PWM: Status: Device has "heatsinkTempSensorOpen" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2`|Warning||
+|Morningstar TriStar PWM: Status: Device has "heatsinkTempSensorShorted" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2`|Warning||
+|Morningstar TriStar PWM: Status: Device has "tristarHot" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","tristarHot")=2`|Warning||
+|Morningstar TriStar PWM: Status: Device has "currentLimit" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2`|Warning||
+|Morningstar TriStar PWM: Status: Device has "currentOffset" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","currentOffset")=2`|Warning||
+|Morningstar TriStar PWM: Status: Device has "batterySense" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","batterySense")=2`|Warning||
+|Morningstar TriStar PWM: Status: Device has "batterySenseDisconnected" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","batterySenseDisconnected")=2`|Warning||
+|Morningstar TriStar PWM: Status: Device has "uncalibrated" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2`|Warning||
+|Morningstar TriStar PWM: Status: Device has "rtsMiswire" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","rtsMiswire")=2`|Warning||
+|Morningstar TriStar PWM: Status: Device has "highVoltageDisconnect" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","highVoltageDisconnect")=2`|Warning||
+|Morningstar TriStar PWM: Status: Device has "diversionLoadNearMax" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","diversionLoadNearMax")=2`|Warning||
+|Morningstar TriStar PWM: Status: Device has "systemMiswire" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","systemMiswire")=2`|Warning||
+|Morningstar TriStar PWM: Status: Device has "mosfetSOpen" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","mosfetSOpen")=2`|Warning||
+|Morningstar TriStar PWM: Status: Device has "p12VoltageReferenceOff" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","p12VoltageReferenceOff")=2`|Warning||
+|Morningstar TriStar PWM: Status: Device has "loadDisconnectState" alarm flag||`count(/Morningstar TriStar PWM by SNMP/status.alarms[alarms.0],#3,"like","loadDisconnectState")=2`|Warning||
 
 ### LLD rule Battery voltage discovery
 
@@ -113,10 +113,10 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Battery: Low battery voltage||`max(/Morningstar TriStar PWM by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>Battery: Critically low battery voltage</li></ul>|
-|Battery: Critically low battery voltage||`max(/Morningstar TriStar PWM by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}`|High||
-|Battery: High battery voltage||`min(/Morningstar TriStar PWM by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Battery: Critically high battery voltage</li></ul>|
-|Battery: Critically high battery voltage||`min(/Morningstar TriStar PWM by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}`|High||
+|Morningstar TriStar PWM: Battery: Low battery voltage||`max(/Morningstar TriStar PWM by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar TriStar PWM: Battery: Critically low battery voltage</li></ul>|
+|Morningstar TriStar PWM: Battery: Critically low battery voltage||`max(/Morningstar TriStar PWM by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}`|High||
+|Morningstar TriStar PWM: Battery: High battery voltage||`min(/Morningstar TriStar PWM by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar TriStar PWM: Battery: Critically high battery voltage</li></ul>|
+|Morningstar TriStar PWM: Battery: Critically high battery voltage||`min(/Morningstar TriStar PWM by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}`|High||
 
 ### LLD rule Charge mode discovery
 
@@ -147,8 +147,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Load: Device load in warning state||`last(/Morningstar TriStar PWM by SNMP/load.state[loadState.0{#SINGLETON}])={$LOAD.STATE.WARN:"lvdWarning"}  or last(/Morningstar TriStar PWM by SNMP/load.state[loadState.0{#SINGLETON}])={$LOAD.STATE.WARN:"override"}`|Warning|**Depends on**:<br><ul><li>Load: Device load in critical state</li></ul>|
-|Load: Device load in critical state||`last(/Morningstar TriStar PWM by SNMP/load.state[loadState.0{#SINGLETON}])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar TriStar PWM by SNMP/load.state[loadState.0{#SINGLETON}])={$LOAD.STATE.CRIT:"fault"}`|High||
+|Morningstar TriStar PWM: Load: Device load in warning state||`last(/Morningstar TriStar PWM by SNMP/load.state[loadState.0{#SINGLETON}])={$LOAD.STATE.WARN:"lvdWarning"}  or last(/Morningstar TriStar PWM by SNMP/load.state[loadState.0{#SINGLETON}])={$LOAD.STATE.WARN:"override"}`|Warning|**Depends on**:<br><ul><li>Morningstar TriStar PWM: Load: Device load in critical state</li></ul>|
+|Morningstar TriStar PWM: Load: Device load in critical state||`last(/Morningstar TriStar PWM by SNMP/load.state[loadState.0{#SINGLETON}])={$LOAD.STATE.CRIT:"lvd"} or last(/Morningstar TriStar PWM by SNMP/load.state[loadState.0{#SINGLETON}])={$LOAD.STATE.CRIT:"fault"}`|High||
 
 ### LLD rule Diversion mode discovery
 
@@ -179,8 +179,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Battery: Device charge in warning state||`last(/Morningstar TriStar PWM by SNMP/charge.state[controlState.0{#SINGLETON}])={$CHARGE.STATE.WARN}`|Warning|**Depends on**:<br><ul><li>Battery: Device charge in critical state</li></ul>|
-|Battery: Device charge in critical state||`last(/Morningstar TriStar PWM by SNMP/charge.state[controlState.0{#SINGLETON}])={$CHARGE.STATE.CRIT}`|High||
+|Morningstar TriStar PWM: Battery: Device charge in warning state||`last(/Morningstar TriStar PWM by SNMP/charge.state[controlState.0{#SINGLETON}])={$CHARGE.STATE.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar TriStar PWM: Battery: Device charge in critical state</li></ul>|
+|Morningstar TriStar PWM: Battery: Device charge in critical state||`last(/Morningstar TriStar PWM by SNMP/charge.state[controlState.0{#SINGLETON}])={$CHARGE.STATE.CRIT}`|High||
 
 ### LLD rule Load + Diversion mode discovery
 

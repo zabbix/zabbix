@@ -84,7 +84,7 @@ rabbitmqctl set_user_tags zbx_monitor monitoring
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Failed to fetch overview data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/RabbitMQ cluster by HTTP/rabbitmq.get_overview,30m)=1`|Warning|**Manual close**: Yes|
+|RabbitMQ cluster: Failed to fetch overview data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/RabbitMQ cluster by HTTP/rabbitmq.get_overview,30m)=1`|Warning|**Manual close**: Yes|
 
 ### LLD rule Health Check 3.8.10+ discovery
 
@@ -102,7 +102,7 @@ rabbitmqctl set_user_tags zbx_monitor monitoring
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|There are active alarms in the cluster|<p>This is the default API endpoint path: http://{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ cluster by HTTP/rabbitmq.healthcheck.alarms[{#SINGLETON}])=0`|Average||
+|RabbitMQ cluster: There are active alarms in the cluster|<p>This is the default API endpoint path: http://{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ cluster by HTTP/rabbitmq.healthcheck.alarms[{#SINGLETON}])=0`|Average||
 
 ### LLD rule Exchanges discovery
 
@@ -214,15 +214,15 @@ rabbitmqctl set_user_tags zbx_monitor monitoring
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Service is down||`last(/RabbitMQ node by HTTP/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0`|Average|**Manual close**: Yes|
-|Failed to fetch nodes data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/RabbitMQ node by HTTP/rabbitmq.get_nodes,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Service is down</li></ul>|
-|Version has changed|<p>RabbitMQ version has changed. Acknowledge to close the problem manually.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.node.overview.rabbitmq_version,#1)<>last(/RabbitMQ node by HTTP/rabbitmq.node.overview.rabbitmq_version,#2) and length(last(/RabbitMQ node by HTTP/rabbitmq.node.overview.rabbitmq_version))>0`|Info|**Manual close**: Yes|
-|Number of network partitions is too high|<p>For more details see [Detecting Network Partitions](https://www.rabbitmq.com/partitions.html#detecting).</p>|`min(/RabbitMQ node by HTTP/rabbitmq.node.partitions,5m)>0`|Warning||
-|Node is not running|<p>RabbitMQ node is not running.</p>|`max(/RabbitMQ node by HTTP/rabbitmq.node.running,5m)=0`|Average|**Depends on**:<br><ul><li>Service is down</li></ul>|
-|Memory alarm|<p>For more details see [Memory Alarms](https://www.rabbitmq.com/memory.html).</p>|`last(/RabbitMQ node by HTTP/rabbitmq.node.mem_alarm)=1`|Average||
-|Free disk space alarm|<p>For more details see [Free Disk Space Alarms](https://www.rabbitmq.com/disk-alarms.html).</p>|`last(/RabbitMQ node by HTTP/rabbitmq.node.disk_free_alarm)=1`|Average||
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.node.uptime)<10m`|Info|**Manual close**: Yes|
-|Service response time is too high||`min(/RabbitMQ node by HTTP/net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Service is down</li></ul>|
+|RabbitMQ node: Service is down||`last(/RabbitMQ node by HTTP/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0`|Average|**Manual close**: Yes|
+|RabbitMQ node: Failed to fetch nodes data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/RabbitMQ node by HTTP/rabbitmq.get_nodes,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>RabbitMQ node: Service is down</li></ul>|
+|RabbitMQ node: Version has changed|<p>RabbitMQ version has changed. Acknowledge to close the problem manually.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.node.overview.rabbitmq_version,#1)<>last(/RabbitMQ node by HTTP/rabbitmq.node.overview.rabbitmq_version,#2) and length(last(/RabbitMQ node by HTTP/rabbitmq.node.overview.rabbitmq_version))>0`|Info|**Manual close**: Yes|
+|RabbitMQ node: Number of network partitions is too high|<p>For more details see [Detecting Network Partitions](https://www.rabbitmq.com/partitions.html#detecting).</p>|`min(/RabbitMQ node by HTTP/rabbitmq.node.partitions,5m)>0`|Warning||
+|RabbitMQ node: Node is not running|<p>RabbitMQ node is not running.</p>|`max(/RabbitMQ node by HTTP/rabbitmq.node.running,5m)=0`|Average|**Depends on**:<br><ul><li>RabbitMQ node: Service is down</li></ul>|
+|RabbitMQ node: Memory alarm|<p>For more details see [Memory Alarms](https://www.rabbitmq.com/memory.html).</p>|`last(/RabbitMQ node by HTTP/rabbitmq.node.mem_alarm)=1`|Average||
+|RabbitMQ node: Free disk space alarm|<p>For more details see [Free Disk Space Alarms](https://www.rabbitmq.com/disk-alarms.html).</p>|`last(/RabbitMQ node by HTTP/rabbitmq.node.disk_free_alarm)=1`|Average||
+|RabbitMQ node: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.node.uptime)<10m`|Info|**Manual close**: Yes|
+|RabbitMQ node: Service response time is too high||`min(/RabbitMQ node by HTTP/net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>RabbitMQ node: Service is down</li></ul>|
 
 ### LLD rule Health Check 3.8.10+ discovery
 
@@ -244,11 +244,11 @@ rabbitmqctl set_user_tags zbx_monitor monitoring
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|There are active alarms in the node|<p>This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.local_alarms[{#SINGLETON}])=0`|Average||
-|There are valid TLS certificates expiring in the next month|<p>This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.certificate_expiration[{#SINGLETON}])=0`|Average||
-|There are not running virtual hosts|<p>This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.virtual_hosts[{#SINGLETON}])=0`|Average||
-|There are queues that could potentially lose data if this node goes offline.|<p>This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.mirror_sync[{#SINGLETON}])=0`|Average||
-|There are queues that would lose their quorum and availability if this node is shut down.|<p>This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.quorum[{#SINGLETON}])=0`|Average||
+|RabbitMQ node: There are active alarms in the node|<p>This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.local_alarms[{#SINGLETON}])=0`|Average||
+|RabbitMQ node: There are valid TLS certificates expiring in the next month|<p>This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.certificate_expiration[{#SINGLETON}])=0`|Average||
+|RabbitMQ node: There are not running virtual hosts|<p>This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.virtual_hosts[{#SINGLETON}])=0`|Average||
+|RabbitMQ node: There are queues that could potentially lose data if this node goes offline.|<p>This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.mirror_sync[{#SINGLETON}])=0`|Average||
+|RabbitMQ node: There are queues that would lose their quorum and availability if this node is shut down.|<p>This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by HTTP/rabbitmq.healthcheck.quorum[{#SINGLETON}])=0`|Average||
 
 ### LLD rule Health Check 3.8.9- discovery
 
@@ -266,7 +266,7 @@ rabbitmqctl set_user_tags zbx_monitor monitoring
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Node healthcheck failed|<p>For more details see [Health Checks](https://www.rabbitmq.com/monitoring.html#health-checks).</p>|`last(/RabbitMQ node by HTTP/rabbitmq.healthcheck[{#SINGLETON}])=0`|Average||
+|RabbitMQ node: Node healthcheck failed|<p>For more details see [Health Checks](https://www.rabbitmq.com/monitoring.html#health-checks).</p>|`last(/RabbitMQ node by HTTP/rabbitmq.healthcheck[{#SINGLETON}])=0`|Average||
 
 ### LLD rule Queues discovery
 
@@ -302,7 +302,7 @@ rabbitmqctl set_user_tags zbx_monitor monitoring
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Too many messages in queue [{#VHOST}][{#QUEUE}]||`min(/RabbitMQ node by HTTP/rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"],5m)>{$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"}`|Warning||
+|RabbitMQ node: Too many messages in queue [{#VHOST}][{#QUEUE}]||`min(/RabbitMQ node by HTTP/rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"],5m)>{$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"}`|Warning||
 
 ## Feedback
 

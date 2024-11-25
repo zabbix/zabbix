@@ -40,17 +40,17 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|BB +1.8V SM Critical [{ITEM.VALUE}]||`last(/Intel SR1530 IPMI/bb_1.8v_sm)<1.597 or last(/Intel SR1530 IPMI/bb_1.8v_sm)>2.019`|Disaster|**Depends on**:<br><ul><li>Power</li></ul>|
-|BB +1.8V SM Non-Critical [{ITEM.VALUE}]||`last(/Intel SR1530 IPMI/bb_1.8v_sm)<1.646 or last(/Intel SR1530 IPMI/bb_1.8v_sm)>1.960`|High|**Depends on**:<br><ul><li>BB +1.8V SM Critical [{ITEM.VALUE}]</li><li>Power</li></ul>|
-|BB +3.3V Critical [{ITEM.VALUE}]||`last(/Intel SR1530 IPMI/bb_3.3v)<2.876 or last(/Intel SR1530 IPMI/bb_3.3v)>3.729`|Disaster|**Depends on**:<br><ul><li>Power</li></ul>|
-|BB +3.3V Non-Critical [{ITEM.VALUE}]||`last(/Intel SR1530 IPMI/bb_3.3v)<2.970 or last(/Intel SR1530 IPMI/bb_3.3v)>3.618`|High|**Depends on**:<br><ul><li>BB +3.3V Critical [{ITEM.VALUE}]</li><li>Power</li></ul>|
-|BB +3.3V STBY Critical [{ITEM.VALUE}]||`last(/Intel SR1530 IPMI/bb_3.3v_stby)<2.876 or last(/Intel SR1530 IPMI/bb_3.3v_stby)>3.729`|Disaster||
-|BB +3.3V STBY Non-Critical [{ITEM.VALUE}]||`last(/Intel SR1530 IPMI/bb_3.3v_stby)<2.970 or last(/Intel SR1530 IPMI/bb_3.3v_stby)>3.618`|High|**Depends on**:<br><ul><li>BB +3.3V STBY Critical [{ITEM.VALUE}]</li></ul>|
-|BB +5.0V Critical [{ITEM.VALUE}]||`last(/Intel SR1530 IPMI/bb_5.0v)<4.362 or last(/Intel SR1530 IPMI/bb_5.0v)>5.663`|Disaster|**Depends on**:<br><ul><li>Power</li></ul>|
-|BB +5.0V Non-Critical [{ITEM.VALUE}]||`last(/Intel SR1530 IPMI/bb_5.0v)<4.483 or last(/Intel SR1530 IPMI/bb_5.0v)>5.495`|High|**Depends on**:<br><ul><li>BB +5.0V Critical [{ITEM.VALUE}]</li><li>Power</li></ul>|
-|BB Ambient Temp Critical [{ITEM.VALUE}]||`last(/Intel SR1530 IPMI/bb_ambient_temp)<5 or last(/Intel SR1530 IPMI/bb_ambient_temp)>66`|Disaster||
-|BB Ambient Temp Non-Critical [{ITEM.VALUE}]||`last(/Intel SR1530 IPMI/bb_ambient_temp)<10 or last(/Intel SR1530 IPMI/bb_ambient_temp)>61`|High|**Depends on**:<br><ul><li>BB Ambient Temp Critical [{ITEM.VALUE}]</li></ul>|
-|Power||`last(/Intel SR1530 IPMI/power)=0`|Warning||
+|Intel SR1530: BB +1.8V SM Critical [{ITEM.VALUE}]||`last(/Intel SR1530 IPMI/bb_1.8v_sm)<1.597 or last(/Intel SR1530 IPMI/bb_1.8v_sm)>2.019`|Disaster|**Depends on**:<br><ul><li>Intel SR1530: Power</li></ul>|
+|Intel SR1530: BB +1.8V SM Non-Critical [{ITEM.VALUE}]||`last(/Intel SR1530 IPMI/bb_1.8v_sm)<1.646 or last(/Intel SR1530 IPMI/bb_1.8v_sm)>1.960`|High|**Depends on**:<br><ul><li>Intel SR1530: BB +1.8V SM Critical [{ITEM.VALUE}]</li><li>Intel SR1530: Power</li></ul>|
+|Intel SR1530: BB +3.3V Critical [{ITEM.VALUE}]||`last(/Intel SR1530 IPMI/bb_3.3v)<2.876 or last(/Intel SR1530 IPMI/bb_3.3v)>3.729`|Disaster|**Depends on**:<br><ul><li>Intel SR1530: Power</li></ul>|
+|Intel SR1530: BB +3.3V Non-Critical [{ITEM.VALUE}]||`last(/Intel SR1530 IPMI/bb_3.3v)<2.970 or last(/Intel SR1530 IPMI/bb_3.3v)>3.618`|High|**Depends on**:<br><ul><li>Intel SR1530: BB +3.3V Critical [{ITEM.VALUE}]</li><li>Intel SR1530: Power</li></ul>|
+|Intel SR1530: BB +3.3V STBY Critical [{ITEM.VALUE}]||`last(/Intel SR1530 IPMI/bb_3.3v_stby)<2.876 or last(/Intel SR1530 IPMI/bb_3.3v_stby)>3.729`|Disaster||
+|Intel SR1530: BB +3.3V STBY Non-Critical [{ITEM.VALUE}]||`last(/Intel SR1530 IPMI/bb_3.3v_stby)<2.970 or last(/Intel SR1530 IPMI/bb_3.3v_stby)>3.618`|High|**Depends on**:<br><ul><li>Intel SR1530: BB +3.3V STBY Critical [{ITEM.VALUE}]</li></ul>|
+|Intel SR1530: BB +5.0V Critical [{ITEM.VALUE}]||`last(/Intel SR1530 IPMI/bb_5.0v)<4.362 or last(/Intel SR1530 IPMI/bb_5.0v)>5.663`|Disaster|**Depends on**:<br><ul><li>Intel SR1530: Power</li></ul>|
+|Intel SR1530: BB +5.0V Non-Critical [{ITEM.VALUE}]||`last(/Intel SR1530 IPMI/bb_5.0v)<4.483 or last(/Intel SR1530 IPMI/bb_5.0v)>5.495`|High|**Depends on**:<br><ul><li>Intel SR1530: BB +5.0V Critical [{ITEM.VALUE}]</li><li>Intel SR1530: Power</li></ul>|
+|Intel SR1530: BB Ambient Temp Critical [{ITEM.VALUE}]||`last(/Intel SR1530 IPMI/bb_ambient_temp)<5 or last(/Intel SR1530 IPMI/bb_ambient_temp)>66`|Disaster||
+|Intel SR1530: BB Ambient Temp Non-Critical [{ITEM.VALUE}]||`last(/Intel SR1530 IPMI/bb_ambient_temp)<10 or last(/Intel SR1530 IPMI/bb_ambient_temp)>61`|High|**Depends on**:<br><ul><li>Intel SR1530: BB Ambient Temp Critical [{ITEM.VALUE}]</li></ul>|
+|Intel SR1530: Power||`last(/Intel SR1530 IPMI/power)=0`|Warning||
 
 ## Feedback
 

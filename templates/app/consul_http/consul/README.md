@@ -115,11 +115,11 @@ In case of Open Source version service namespace will be set to 'None'.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Version has been changed|<p>Consul version has changed. Acknowledge to close the problem manually.</p>|`last(/HashiCorp Consul Node by HTTP/consul.version,#1)<>last(/HashiCorp Consul Node by HTTP/consul.version,#2) and length(last(/HashiCorp Consul Node by HTTP/consul.version))>0`|Info|**Manual close**: Yes|
-|Current number of open files is too high|<p>"Heavy file descriptor usage (i.e., near the process’s file descriptor limit) indicates a potential file descriptor exhaustion issue."</p>|`min(/HashiCorp Consul Node by HTTP/consul.process_open_fds,5m)/last(/HashiCorp Consul Node by HTTP/consul.process_max_fds)*100>{$CONSUL.OPEN.FDS.MAX.WARN}`|Warning||
-|Node's health score is warning|<p>This metric ranges from 0 to 8, where 0 indicates "totally healthy".<br>This health score is used to scale the time between outgoing probes, and higher scores translate into longer probing intervals.<br>For more details see section IV of the Lifeguard paper: https://arxiv.org/pdf/1707.00788.pdf</p>|`max(/HashiCorp Consul Node by HTTP/consul.memberlist.health_score,#3)>{$CONSUL.NODE.HEALTH_SCORE.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Node's health score is critical</li></ul>|
-|Node's health score is critical|<p>This metric ranges from 0 to 8, where 0 indicates "totally healthy".<br>This health score is used to scale the time between outgoing probes, and higher scores translate into longer probing intervals.<br>For more details see section IV of the Lifeguard paper: https://arxiv.org/pdf/1707.00788.pdf</p>|`max(/HashiCorp Consul Node by HTTP/consul.memberlist.health_score,#3)>{$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}`|Average||
-|Failed to get local services|<p>Failed to get local services. Check debug log for more information.</p>|`length(last(/HashiCorp Consul Node by HTTP/consul.get_local_services.check))>0`|Warning||
+|HashiCorp Consul Node: Version has been changed|<p>Consul version has changed. Acknowledge to close the problem manually.</p>|`last(/HashiCorp Consul Node by HTTP/consul.version,#1)<>last(/HashiCorp Consul Node by HTTP/consul.version,#2) and length(last(/HashiCorp Consul Node by HTTP/consul.version))>0`|Info|**Manual close**: Yes|
+|HashiCorp Consul Node: Current number of open files is too high|<p>"Heavy file descriptor usage (i.e., near the process’s file descriptor limit) indicates a potential file descriptor exhaustion issue."</p>|`min(/HashiCorp Consul Node by HTTP/consul.process_open_fds,5m)/last(/HashiCorp Consul Node by HTTP/consul.process_max_fds)*100>{$CONSUL.OPEN.FDS.MAX.WARN}`|Warning||
+|HashiCorp Consul Node: Node's health score is warning|<p>This metric ranges from 0 to 8, where 0 indicates "totally healthy".<br>This health score is used to scale the time between outgoing probes, and higher scores translate into longer probing intervals.<br>For more details see section IV of the Lifeguard paper: https://arxiv.org/pdf/1707.00788.pdf</p>|`max(/HashiCorp Consul Node by HTTP/consul.memberlist.health_score,#3)>{$CONSUL.NODE.HEALTH_SCORE.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>HashiCorp Consul Node: Node's health score is critical</li></ul>|
+|HashiCorp Consul Node: Node's health score is critical|<p>This metric ranges from 0 to 8, where 0 indicates "totally healthy".<br>This health score is used to scale the time between outgoing probes, and higher scores translate into longer probing intervals.<br>For more details see section IV of the Lifeguard paper: https://arxiv.org/pdf/1707.00788.pdf</p>|`max(/HashiCorp Consul Node by HTTP/consul.memberlist.health_score,#3)>{$CONSUL.NODE.HEALTH_SCORE.MAX.HIGH}`|Average||
+|HashiCorp Consul Node: Failed to get local services|<p>Failed to get local services. Check debug log for more information.</p>|`length(last(/HashiCorp Consul Node by HTTP/consul.get_local_services.check))>0`|Warning||
 
 ### LLD rule Local node services discovery
 
@@ -139,8 +139,8 @@ In case of Open Source version service namespace will be set to 'None'.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Aggregated status is 'warning'|<p>Aggregated state of service on the local agent is 'warning'.</p>|`last(/HashiCorp Consul Node by HTTP/consul.service.aggregated_state["{#SERVICE_ID}"]) = 1`|Warning||
-|Aggregated status is 'critical'|<p>Aggregated state of service on the local agent is 'critical'.</p>|`last(/HashiCorp Consul Node by HTTP/consul.service.aggregated_state["{#SERVICE_ID}"]) = 2`|Average||
+|HashiCorp Consul Node: Aggregated status is 'warning'|<p>Aggregated state of service on the local agent is 'warning'.</p>|`last(/HashiCorp Consul Node by HTTP/consul.service.aggregated_state["{#SERVICE_ID}"]) = 1`|Warning||
+|HashiCorp Consul Node: Aggregated status is 'critical'|<p>Aggregated state of service on the local agent is 'critical'.</p>|`last(/HashiCorp Consul Node by HTTP/consul.service.aggregated_state["{#SERVICE_ID}"]) = 2`|Average||
 
 ### LLD rule HTTP API methods discovery
 

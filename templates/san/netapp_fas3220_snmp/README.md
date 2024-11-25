@@ -76,13 +76,13 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Number of failed disks has changed|<p>{{ITEM.LASTVALUE2}.regsub("(.*)", \1)}</p>|`last(/NetApp FAS3220 by SNMP/fas3220.disk[diskFailedCount])>0 and last(/NetApp FAS3220 by SNMP/fas3220.disk[diskFailedMessage],#1)<>last(/NetApp FAS3220 by SNMP/fas3220.disk[diskFailedMessage],#2)`|Warning||
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/NetApp FAS3220 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/NetApp FAS3220 by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/NetApp FAS3220 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/NetApp FAS3220 by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>No SNMP data collection</li></ul>|
-|System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/NetApp FAS3220 by SNMP/system.name,#1)<>last(/NetApp FAS3220 by SNMP/system.name,#2) and length(last(/NetApp FAS3220 by SNMP/system.name))>0`|Info|**Manual close**: Yes|
-|No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/NetApp FAS3220 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/NetApp FAS3220 by SNMP/icmpping,#3)=0`|High||
-|High ICMP ping loss||`min(/NetApp FAS3220 by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/NetApp FAS3220 by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/NetApp FAS3220 by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>High ICMP ping loss</li><li>Unavailable by ICMP ping</li></ul>|
+|NetApp FAS3220: Number of failed disks has changed|<p>{{ITEM.LASTVALUE2}.regsub("(.*)", \1)}</p>|`last(/NetApp FAS3220 by SNMP/fas3220.disk[diskFailedCount])>0 and last(/NetApp FAS3220 by SNMP/fas3220.disk[diskFailedMessage],#1)<>last(/NetApp FAS3220 by SNMP/fas3220.disk[diskFailedMessage],#2)`|Warning||
+|NetApp FAS3220: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/NetApp FAS3220 by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/NetApp FAS3220 by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/NetApp FAS3220 by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/NetApp FAS3220 by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>NetApp FAS3220: No SNMP data collection</li></ul>|
+|NetApp FAS3220: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/NetApp FAS3220 by SNMP/system.name,#1)<>last(/NetApp FAS3220 by SNMP/system.name,#2) and length(last(/NetApp FAS3220 by SNMP/system.name))>0`|Info|**Manual close**: Yes|
+|NetApp FAS3220: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/NetApp FAS3220 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>NetApp FAS3220: Unavailable by ICMP ping</li></ul>|
+|NetApp FAS3220: Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/NetApp FAS3220 by SNMP/icmpping,#3)=0`|High||
+|NetApp FAS3220: High ICMP ping loss||`min(/NetApp FAS3220 by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/NetApp FAS3220 by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>NetApp FAS3220: Unavailable by ICMP ping</li></ul>|
+|NetApp FAS3220: High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/NetApp FAS3220 by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>NetApp FAS3220: High ICMP ping loss</li><li>NetApp FAS3220: Unavailable by ICMP ping</li></ul>|
 
 ### LLD rule CPU discovery
 
@@ -100,7 +100,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Node {#NODE.NAME}: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/NetApp FAS3220 by SNMP/fas3220.cpu[cDOTCpuBusyTimePerCent, "{#NODE.NAME}"],5m)>{$CPU.UTIL.CRIT}`|Warning||
+|NetApp FAS3220: Node {#NODE.NAME}: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/NetApp FAS3220 by SNMP/fas3220.cpu[cDOTCpuBusyTimePerCent, "{#NODE.NAME}"],5m)>{$CPU.UTIL.CRIT}`|Warning||
 
 ### LLD rule Cluster metrics discovery
 
@@ -128,12 +128,12 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Node {#NODE.NAME}: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeUptime, "{#NODE.NAME}"])<10m`|Info|**Manual close**: Yes|
-|Node {#NODE.NAME}: Node can not communicate with the cluster||`last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeHealth, "{#NODE.NAME}"])=0`|High|**Manual close**: Yes|
-|Node {#NODE.NAME}: NVRAM battery status is not OK||`last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeNvramBatteryStatus, "{#NODE.NAME}"])<>1`|Average|**Manual close**: Yes|
-|Node {#NODE.NAME}: Temperature is over than recommended|<p>The hardware will shutdown if the temperature exceeds critical thresholds.</p>|`last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeEnvOverTemperature, "{#NODE.NAME}"])=2`|High||
-|Node {#NODE.NAME}: Failed FAN count is over than zero|<p>{{ITEM.VALUE2}.regsub("(.*)", \1)}</p>|`last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeEnvFailedFanCount, "{#NODE.NAME}"])>0 and last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"])=last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"])`|High||
-|Node {#NODE.NAME}: Degraded power supplies count is more than zero|<p>{{ITEM.VALUE2}.regsub("(.*)", \1)}</p>|`last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeEnvFailedPowerSupplyCount, "{#NODE.NAME}"])>0 and last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"])=last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"])`|Average||
+|NetApp FAS3220: Node {#NODE.NAME}: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeUptime, "{#NODE.NAME}"])<10m`|Info|**Manual close**: Yes|
+|NetApp FAS3220: Node {#NODE.NAME}: Node can not communicate with the cluster||`last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeHealth, "{#NODE.NAME}"])=0`|High|**Manual close**: Yes|
+|NetApp FAS3220: Node {#NODE.NAME}: NVRAM battery status is not OK||`last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeNvramBatteryStatus, "{#NODE.NAME}"])<>1`|Average|**Manual close**: Yes|
+|NetApp FAS3220: Node {#NODE.NAME}: Temperature is over than recommended|<p>The hardware will shutdown if the temperature exceeds critical thresholds.</p>|`last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeEnvOverTemperature, "{#NODE.NAME}"])=2`|High||
+|NetApp FAS3220: Node {#NODE.NAME}: Failed FAN count is over than zero|<p>{{ITEM.VALUE2}.regsub("(.*)", \1)}</p>|`last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeEnvFailedFanCount, "{#NODE.NAME}"])>0 and last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"])=last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeEnvFailedFanMessage, "{#NODE.NAME}"])`|High||
+|NetApp FAS3220: Node {#NODE.NAME}: Degraded power supplies count is more than zero|<p>{{ITEM.VALUE2}.regsub("(.*)", \1)}</p>|`last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeEnvFailedPowerSupplyCount, "{#NODE.NAME}"])>0 and last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"])=last(/NetApp FAS3220 by SNMP/fas3220.cluster[nodeEnvFailedPowerSupplyMessage, "{#NODE.NAME}"])`|Average||
 
 ### LLD rule HA discovery
 
@@ -152,9 +152,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Node {#NODE.NAME}: Node cannot takeover it's HA partner {#PARTNER.NAME}. Reason: {ITEM.VALUE}|<p>Possible reasons:<br>  unknownReason(2),<br>  disabledByOperator(3),<br>  interconnectOffline(4),<br>  disabledByPartner(5),<br>  takeoverFailed(6),<br>  mailboxIsInDegradedState(7),<br>  partnermailboxIsInUninitialisedState(8),<br>  mailboxVersionMismatch(9),<br>  nvramSizeMismatch(10),<br>  kernelVersionMismatch(11),<br>  partnerIsInBootingStage(12),<br>  diskshelfIsTooHot(13),<br>  partnerIsPerformingRevert(14),<br>  nodeIsPerformingRevert(15),<br>  sametimePartnerIsAlsoTryingToTakeUsOver(16),<br>  alreadyInTakenoverMode(17),<br>  nvramLogUnsynchronized(18),<br>  stateofBackupMailboxIsDoubtful(19).</p>|`last(/NetApp FAS3220 by SNMP/fas3220.ha[haCannotTakeoverCause, "{#NODE.NAME}"])<>1`|High||
-|Node {#NODE.NAME}: Node has been taken over|<p>The thisNodeDead(5) setting indicates that this node has been takenover.</p>|`last(/NetApp FAS3220 by SNMP/fas3220.ha[haSettings, "{#NODE.NAME}"])=5`|High||
-|Node {#NODE.NAME}: HA is not licensed|<p>The value notConfigured(1) indicates that the HA is not licensed.</p>|`last(/NetApp FAS3220 by SNMP/fas3220.ha[haSettings, "{#NODE.NAME}"])=1`|Average||
+|NetApp FAS3220: Node {#NODE.NAME}: Node cannot takeover it's HA partner {#PARTNER.NAME}. Reason: {ITEM.VALUE}|<p>Possible reasons:<br>  unknownReason(2),<br>  disabledByOperator(3),<br>  interconnectOffline(4),<br>  disabledByPartner(5),<br>  takeoverFailed(6),<br>  mailboxIsInDegradedState(7),<br>  partnermailboxIsInUninitialisedState(8),<br>  mailboxVersionMismatch(9),<br>  nvramSizeMismatch(10),<br>  kernelVersionMismatch(11),<br>  partnerIsInBootingStage(12),<br>  diskshelfIsTooHot(13),<br>  partnerIsPerformingRevert(14),<br>  nodeIsPerformingRevert(15),<br>  sametimePartnerIsAlsoTryingToTakeUsOver(16),<br>  alreadyInTakenoverMode(17),<br>  nvramLogUnsynchronized(18),<br>  stateofBackupMailboxIsDoubtful(19).</p>|`last(/NetApp FAS3220 by SNMP/fas3220.ha[haCannotTakeoverCause, "{#NODE.NAME}"])<>1`|High||
+|NetApp FAS3220: Node {#NODE.NAME}: Node has been taken over|<p>The thisNodeDead(5) setting indicates that this node has been takenover.</p>|`last(/NetApp FAS3220 by SNMP/fas3220.ha[haSettings, "{#NODE.NAME}"])=5`|High||
+|NetApp FAS3220: Node {#NODE.NAME}: HA is not licensed|<p>The value notConfigured(1) indicates that the HA is not licensed.</p>|`last(/NetApp FAS3220 by SNMP/fas3220.ha[haSettings, "{#NODE.NAME}"])=1`|Average||
 
 ### LLD rule Filesystems discovery
 
@@ -177,8 +177,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#VSERVER}{#FSNAME}: Disk space is too low||`min(/NetApp FAS3220 by SNMP/fas3220.fs[df64AvailKBytes, "{#VSERVER}{#FSNAME}"],{$FAS3220.FS.TIME:"{#FSNAME}"})<{$FAS3220.FS.AVAIL.MIN.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=0`|High||
-|{#VSERVER}{#FSNAME}: Disk space is too low||`max(/NetApp FAS3220 by SNMP/fas3220.fs[dfPerCentKBytesCapacity, "{#VSERVER}{#FSNAME}"],{$FAS3220.FS.TIME:"{#FSNAME}"})>{$FAS3220.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=1`|High||
+|NetApp FAS3220: {#VSERVER}{#FSNAME}: Disk space is too low||`min(/NetApp FAS3220 by SNMP/fas3220.fs[df64AvailKBytes, "{#VSERVER}{#FSNAME}"],{$FAS3220.FS.TIME:"{#FSNAME}"})<{$FAS3220.FS.AVAIL.MIN.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=0`|High||
+|NetApp FAS3220: {#VSERVER}{#FSNAME}: Disk space is too low||`max(/NetApp FAS3220 by SNMP/fas3220.fs[dfPerCentKBytesCapacity, "{#VSERVER}{#FSNAME}"],{$FAS3220.FS.TIME:"{#FSNAME}"})>{$FAS3220.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and {$FAS3220.FS.USE.PCT:"{#FSNAME}"}=1`|High||
 
 ### LLD rule Network ports discovery
 
@@ -207,9 +207,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Node {#NODE}: port {#IFNAME} ({#TYPE}): High error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/NetApp FAS3220 by SNMP/fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"} or min(/NetApp FAS3220 by SNMP/fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes|
-|Node {#NODE}: port {#IFNAME} ({#TYPE}): Link down|<p>Link state is not UP and the port status is set 'UP' by an administrator.</p>|`last(/NetApp FAS3220 by SNMP/fas3220.net.port[netportLinkState, "{#NODE}", "{#IFNAME}"])<>2 and last(/NetApp FAS3220 by SNMP/fas3220.net.port[netportUpAdmin, "{#NODE}", "{#IFNAME}"])=1`|Average|**Manual close**: Yes|
-|Node {#NODE}: port {#IFNAME} ({#TYPE}): Port is not healthy|<p>{{ITEM.LASTVALUE2}.regsub("(.*)", \1)}</p>|`last(/NetApp FAS3220 by SNMP/fas3220.net.port[netportHealthStatus, "{#NODE}", "{#IFNAME}"])<>0 and length(last(/NetApp FAS3220 by SNMP/fas3220.net.port[netportDegradedReason, "{#NODE}", "{#IFNAME}"]))>0`|Info||
+|NetApp FAS3220: Node {#NODE}: port {#IFNAME} ({#TYPE}): High error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/NetApp FAS3220 by SNMP/fas3220.net.if[if64InErrors, "{#NODE}", "{#IFNAME}"],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"} or min(/NetApp FAS3220 by SNMP/fas3220.net.if[if64OutErrors, "{#NODE}", "{#IFNAME}"],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes|
+|NetApp FAS3220: Node {#NODE}: port {#IFNAME} ({#TYPE}): Link down|<p>Link state is not UP and the port status is set 'UP' by an administrator.</p>|`last(/NetApp FAS3220 by SNMP/fas3220.net.port[netportLinkState, "{#NODE}", "{#IFNAME}"])<>2 and last(/NetApp FAS3220 by SNMP/fas3220.net.port[netportUpAdmin, "{#NODE}", "{#IFNAME}"])=1`|Average|**Manual close**: Yes|
+|NetApp FAS3220: Node {#NODE}: port {#IFNAME} ({#TYPE}): Port is not healthy|<p>{{ITEM.LASTVALUE2}.regsub("(.*)", \1)}</p>|`last(/NetApp FAS3220 by SNMP/fas3220.net.port[netportHealthStatus, "{#NODE}", "{#IFNAME}"])<>0 and length(last(/NetApp FAS3220 by SNMP/fas3220.net.port[netportDegradedReason, "{#NODE}", "{#IFNAME}"]))>0`|Info||
 
 ## Feedback
 

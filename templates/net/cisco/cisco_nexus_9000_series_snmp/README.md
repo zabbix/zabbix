@@ -89,14 +89,14 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Unavailable by ICMP ping|<p>The last three attempts returned a timeout. Check the connectivity of a device.</p>|`max(/Cisco Nexus 9000 Series by SNMP/icmpping,#3)=0`|High||
-|High ICMP ping loss||`min(/Cisco Nexus 9000 Series by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco Nexus 9000 Series by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|High ICMP ping response time||`avg(/Cisco Nexus 9000 Series by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>High ICMP ping loss</li><li>Unavailable by ICMP ping</li></ul>|
-|Device has been replaced|<p>The serial number of a device has changed. Acknowledge to close the problem manually.</p>|`change(/Cisco Nexus 9000 Series by SNMP/system.hw.serialnumber)=1 and length(last(/Cisco Nexus 9000 Series by SNMP/system.hw.serialnumber))>0`|Info|**Manual close**: Yes|
-|System name has changed|<p>The system name has changed. Acknowledge to close the problem manually.</p>|`change(/Cisco Nexus 9000 Series by SNMP/system.name)=1 and length(last(/Cisco Nexus 9000 Series by SNMP/system.name))>0`|Info|**Manual close**: Yes|
-|Operating system description has changed|<p>The description of the operating system has changed. Possible reasons that system has been updated or replaced. Acknowledge to close the problem manually.</p>|`change(/Cisco Nexus 9000 Series by SNMP/system.sw.os)=1 and length(last(/Cisco Nexus 9000 Series by SNMP/system.sw.os))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>System name has changed</li></ul>|
-|Device has been restarted or reinitialized|<p>The record of SNMP Boots has changed in less than 10 minutes. The restart of a device also counts.</p>|`last(/Cisco Nexus 9000 Series by SNMP/system.uptime)<10m`|Warning|**Manual close**: Yes|
-|No SNMP data collection|<p>SNMP is not available for polling. Check the connectivity of a device and SNMP settings.</p>|`max(/Cisco Nexus 9000 Series by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
+|Cisco Nexus 9000: Unavailable by ICMP ping|<p>The last three attempts returned a timeout. Check the connectivity of a device.</p>|`max(/Cisco Nexus 9000 Series by SNMP/icmpping,#3)=0`|High||
+|Cisco Nexus 9000: High ICMP ping loss||`min(/Cisco Nexus 9000 Series by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco Nexus 9000 Series by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Cisco Nexus 9000: Unavailable by ICMP ping</li></ul>|
+|Cisco Nexus 9000: High ICMP ping response time||`avg(/Cisco Nexus 9000 Series by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>Cisco Nexus 9000: High ICMP ping loss</li><li>Cisco Nexus 9000: Unavailable by ICMP ping</li></ul>|
+|Cisco Nexus 9000: Device has been replaced|<p>The serial number of a device has changed. Acknowledge to close the problem manually.</p>|`change(/Cisco Nexus 9000 Series by SNMP/system.hw.serialnumber)=1 and length(last(/Cisco Nexus 9000 Series by SNMP/system.hw.serialnumber))>0`|Info|**Manual close**: Yes|
+|Cisco Nexus 9000: System name has changed|<p>The system name has changed. Acknowledge to close the problem manually.</p>|`change(/Cisco Nexus 9000 Series by SNMP/system.name)=1 and length(last(/Cisco Nexus 9000 Series by SNMP/system.name))>0`|Info|**Manual close**: Yes|
+|Cisco Nexus 9000: Operating system description has changed|<p>The description of the operating system has changed. Possible reasons that system has been updated or replaced. Acknowledge to close the problem manually.</p>|`change(/Cisco Nexus 9000 Series by SNMP/system.sw.os)=1 and length(last(/Cisco Nexus 9000 Series by SNMP/system.sw.os))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Cisco Nexus 9000: System name has changed</li></ul>|
+|Cisco Nexus 9000: Device has been restarted or reinitialized|<p>The record of SNMP Boots has changed in less than 10 minutes. The restart of a device also counts.</p>|`last(/Cisco Nexus 9000 Series by SNMP/system.uptime)<10m`|Warning|**Manual close**: Yes|
+|Cisco Nexus 9000: No SNMP data collection|<p>SNMP is not available for polling. Check the connectivity of a device and SNMP settings.</p>|`max(/Cisco Nexus 9000 Series by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
 
 ### LLD rule CPU discovery
 
@@ -114,7 +114,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|#{#SNMPINDEX}: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Cisco Nexus 9000 Series by SNMP/system.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}`|Warning||
+|Cisco Nexus 9000: #{#SNMPINDEX}: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Cisco Nexus 9000 Series by SNMP/system.cpu.util[{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}`|Warning||
 
 ### LLD rule Entity serial numbers discovery
 
@@ -132,7 +132,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#ENT_NAME}: Device has been replaced|<p>The device serial number has changed. Acknowledge to close the problem manually.</p>|`change(/Cisco Nexus 9000 Series by SNMP/system.hw.serialnumber[{#SNMPINDEX}])=1 and length(last(/Cisco Nexus 9000 Series by SNMP/system.hw.serialnumber[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|Cisco Nexus 9000: {#ENT_NAME}: Device has been replaced|<p>The device serial number has changed. Acknowledge to close the problem manually.</p>|`change(/Cisco Nexus 9000 Series by SNMP/system.hw.serialnumber[{#SNMPINDEX}])=1 and length(last(/Cisco Nexus 9000 Series by SNMP/system.hw.serialnumber[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Fan status discovery
 
@@ -150,9 +150,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SNMPVALUE}: Fan is down|<p>The fan unit requires immediate attention.</p>|`last(/Cisco Nexus 9000 Series by SNMP/sensor.fan.status[{#SNMPINDEX}])=3`|Average||
-|{#SNMPVALUE}: Fan is in warning state|<p>The fan unit requires attention.</p>|`last(/Cisco Nexus 9000 Series by SNMP/sensor.fan.status[{#SNMPINDEX}])=4`|Warning|**Depends on**:<br><ul><li>{#SNMPVALUE}: Fan is down</li></ul>|
-|{#SNMPVALUE}: Fan is in unknown state|<p>The fan unit requires attention.</p>|`last(/Cisco Nexus 9000 Series by SNMP/sensor.fan.status[{#SNMPINDEX}])=1`|Info|**Depends on**:<br><ul><li>{#SNMPVALUE}: Fan is down</li></ul>|
+|Cisco Nexus 9000: {#SNMPVALUE}: Fan is down|<p>The fan unit requires immediate attention.</p>|`last(/Cisco Nexus 9000 Series by SNMP/sensor.fan.status[{#SNMPINDEX}])=3`|Average||
+|Cisco Nexus 9000: {#SNMPVALUE}: Fan is in warning state|<p>The fan unit requires attention.</p>|`last(/Cisco Nexus 9000 Series by SNMP/sensor.fan.status[{#SNMPINDEX}])=4`|Warning|**Depends on**:<br><ul><li>Cisco Nexus 9000: {#SNMPVALUE}: Fan is down</li></ul>|
+|Cisco Nexus 9000: {#SNMPVALUE}: Fan is in unknown state|<p>The fan unit requires attention.</p>|`last(/Cisco Nexus 9000 Series by SNMP/sensor.fan.status[{#SNMPINDEX}])=1`|Info|**Depends on**:<br><ul><li>Cisco Nexus 9000: {#SNMPVALUE}: Fan is down</li></ul>|
 
 ### LLD rule Memory discovery
 
@@ -172,7 +172,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SNMPVALUE}: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Cisco Nexus 9000 Series by SNMP/vm.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}`|Average||
+|Cisco Nexus 9000: {#SNMPVALUE}: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Cisco Nexus 9000 Series by SNMP/vm.memory.util[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}`|Average||
 
 ### LLD rule Network interfaces discovery
 
@@ -198,12 +198,12 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Interface {#IFNAME}({#IFALIAS}): High input error rate|<p>It recovers when it goes below 80% of the {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.</p>|`min(/Cisco Nexus 9000 Series by SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): High inbound bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/Cisco Nexus 9000 Series by SNMP/net.if.in[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])) and last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): High output error rate|<p>It recovers when it goes below 80% of the {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.</p>|`min(/Cisco Nexus 9000 Series by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): High outbound bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/Cisco Nexus 9000 Series by SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])) and last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of issues with autonegotiation. Acknowledge to close the problem manually.</p>|`change(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])<0 and last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])>0 and find(/Cisco Nexus 9000 Series by SNMP/net.if.type[{#SNMPINDEX}],#1,"regexp","^(6\|7\|11\|62\|69\|117)$") and last(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])<>2`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. Use $IFCONTROL macro with context "{#IFNAME}" to void trigger firing on specific interfaces. Values:<br>-  0 : Marks an interface as not important. Trigger does not fire when interface is down.<br>-  1 : Default value to fire the trigger when interface is down<br>3. change(//net.if.status[{#IFNAME}]) - condition prevents firing of trigger if status did not change. It helps in cases, when interfaces were initially down.<br>BEWARE, manual close will ceasefire until at least two status changes happens again!</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and last(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])=2 and change(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])`|Average|**Manual close**: Yes|
+|Cisco Nexus 9000: Interface {#IFNAME}({#IFALIAS}): High input error rate|<p>It recovers when it goes below 80% of the {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.</p>|`min(/Cisco Nexus 9000 Series by SNMP/net.if.in.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Cisco Nexus 9000: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|Cisco Nexus 9000: Interface {#IFNAME}({#IFALIAS}): High inbound bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/Cisco Nexus 9000 Series by SNMP/net.if.in[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])) and last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Cisco Nexus 9000: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|Cisco Nexus 9000: Interface {#IFNAME}({#IFALIAS}): High output error rate|<p>It recovers when it goes below 80% of the {$IF.ERRORS.WARN:"{#IFNAME}"} threshold.</p>|`min(/Cisco Nexus 9000 Series by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Cisco Nexus 9000: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|Cisco Nexus 9000: Interface {#IFNAME}({#IFALIAS}): High outbound bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/Cisco Nexus 9000 Series by SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])) and last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Cisco Nexus 9000: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|Cisco Nexus 9000: Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of issues with autonegotiation. Acknowledge to close the problem manually.</p>|`change(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])<0 and last(/Cisco Nexus 9000 Series by SNMP/net.if.speed[{#SNMPINDEX}])>0 and find(/Cisco Nexus 9000 Series by SNMP/net.if.type[{#SNMPINDEX}],#1,"regexp","^(6\|7\|11\|62\|69\|117)$") and last(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])<>2`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Cisco Nexus 9000: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|Cisco Nexus 9000: Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. Use $IFCONTROL macro with context "{#IFNAME}" to void trigger firing on specific interfaces. Values:<br>-  0 : Marks an interface as not important. Trigger does not fire when interface is down.<br>-  1 : Default value to fire the trigger when interface is down<br>3. change(//net.if.status[{#IFNAME}]) - condition prevents firing of trigger if status did not change. It helps in cases, when interfaces were initially down.<br>BEWARE, manual close will ceasefire until at least two status changes happens again!</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and last(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])=2 and change(/Cisco Nexus 9000 Series by SNMP/net.if.status[{#SNMPINDEX}])`|Average|**Manual close**: Yes|
 
 ### LLD rule EtherLike discovery
 
@@ -221,7 +221,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Interface {#IFNAME}({#IFALIAS}): In half-duplex mode|<p>Check the autonegotiation settings and cabling.</p>|`last(/Cisco Nexus 9000 Series by SNMP/net.if.duplex[{#SNMPINDEX}])=2`|Warning|**Manual close**: Yes|
+|Cisco Nexus 9000: Interface {#IFNAME}({#IFALIAS}): In half-duplex mode|<p>Check the autonegotiation settings and cabling.</p>|`last(/Cisco Nexus 9000 Series by SNMP/net.if.duplex[{#SNMPINDEX}])=2`|Warning|**Manual close**: Yes|
 
 ### LLD rule PSU discovery
 
@@ -239,9 +239,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SNMPVALUE}: PSU is off or out of optimal state|<p>The PSU requires attention. Compare the current state from operational data with the table below:<br>-  offEnvOther (1): FRU is powered off because of a problem not listed below;<br>-  on (2): FRU is powered on;<br>-  offAdmin (3): administratively off;<br>-  offDenied (4): FRU is powered off because available system power is insufficient;<br>-  offEnvPower (5): FRU is powered off because of a power problem in the FRU. For example, the FRU's power translation (DC-DC converter) or distribution failed;<br>-  offEnvTemp (6): FRU is powered off because of temperature problem;<br>-  offEnvFan (7): FRU is powered off because of fan problems;<br>-  failed (8): FRU is in failed state;<br>-  onButFanFail (9): FRU is on but fan has failed;<br>-  offCooling (10): FRU is powered off because of the system's insufficient cooling capacity;<br>-  offConnectorRating (11): FRU is powered off because of the system's connector rating exceeded;<br>-  onButInlinePowerFail (12): The FRU is on but no inline power is being delivered as the data/inline power component of the FRU has failed.</p>|`find(/Cisco Nexus 9000 Series by SNMP/sensor.psu.status[{#SNMPINDEX}],#1,"regexp",{$PSU.PROBLEM.STATES})`|Average|**Depends on**:<br><ul><li>{#SNMPVALUE}: PSU is in failed state</li></ul>|
-|{#SNMPVALUE}: PSU is off: Administratively|<p>The FRU is administratively off.</p>|`last(/Cisco Nexus 9000 Series by SNMP/sensor.psu.status[{#SNMPINDEX}])=3`|Info|**Depends on**:<br><ul><li>{#SNMPVALUE}: PSU is in failed state</li></ul>|
-|{#SNMPVALUE}: PSU is in failed state|<p>The FRU is in a failed state.</p>|`last(/Cisco Nexus 9000 Series by SNMP/sensor.psu.status[{#SNMPINDEX}])=8`|High||
+|Cisco Nexus 9000: {#SNMPVALUE}: PSU is off or out of optimal state|<p>The PSU requires attention. Compare the current state from operational data with the table below:<br>-  offEnvOther (1): FRU is powered off because of a problem not listed below;<br>-  on (2): FRU is powered on;<br>-  offAdmin (3): administratively off;<br>-  offDenied (4): FRU is powered off because available system power is insufficient;<br>-  offEnvPower (5): FRU is powered off because of a power problem in the FRU. For example, the FRU's power translation (DC-DC converter) or distribution failed;<br>-  offEnvTemp (6): FRU is powered off because of temperature problem;<br>-  offEnvFan (7): FRU is powered off because of fan problems;<br>-  failed (8): FRU is in failed state;<br>-  onButFanFail (9): FRU is on but fan has failed;<br>-  offCooling (10): FRU is powered off because of the system's insufficient cooling capacity;<br>-  offConnectorRating (11): FRU is powered off because of the system's connector rating exceeded;<br>-  onButInlinePowerFail (12): The FRU is on but no inline power is being delivered as the data/inline power component of the FRU has failed.</p>|`find(/Cisco Nexus 9000 Series by SNMP/sensor.psu.status[{#SNMPINDEX}],#1,"regexp",{$PSU.PROBLEM.STATES})`|Average|**Depends on**:<br><ul><li>Cisco Nexus 9000: {#SNMPVALUE}: PSU is in failed state</li></ul>|
+|Cisco Nexus 9000: {#SNMPVALUE}: PSU is off: Administratively|<p>The FRU is administratively off.</p>|`last(/Cisco Nexus 9000 Series by SNMP/sensor.psu.status[{#SNMPINDEX}])=3`|Info|**Depends on**:<br><ul><li>Cisco Nexus 9000: {#SNMPVALUE}: PSU is in failed state</li></ul>|
+|Cisco Nexus 9000: {#SNMPVALUE}: PSU is in failed state|<p>The FRU is in a failed state.</p>|`last(/Cisco Nexus 9000 Series by SNMP/sensor.psu.status[{#SNMPINDEX}])=8`|High||
 
 ### LLD rule Temperature sensors discovery
 
@@ -260,11 +260,11 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SNMPVALUE}: Temperature sensor is not operational|<p>It means that the agent considers that the sensor is broken. The sensor could have a hard failure (e.g., disconnected wire), or a soft failure (e.g., out-of-range, jittery, or wildly fluctuating readings).</p>|`last(/Cisco Nexus 9000 Series by SNMP/sensor.temp.status[{#SNMPINDEX}])=3`|High||
-|{#SNMPVALUE}: Temperature sensor is not available|<p>It means that the agent presently can not report the sensor value.</p>|`last(/Cisco Nexus 9000 Series by SNMP/sensor.temp.status[{#SNMPINDEX}])=2`|Warning||
-|{#SNMPVALUE}: Temperature is above critical threshold|<p>This trigger uses the values of the temperature sensor.</p>|`avg(/Cisco Nexus 9000 Series by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}`|High||
-|{#SNMPVALUE}: Temperature is above warning threshold|<p>This trigger uses the values of the temperature sensor.</p>|`avg(/Cisco Nexus 9000 Series by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}`|Warning|**Depends on**:<br><ul><li>{#SNMPVALUE}: Temperature is above critical threshold</li></ul>|
-|{#SNMPVALUE}: Temperature is too low||`avg(/Cisco Nexus 9000 Series by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}`|Average||
+|Cisco Nexus 9000: {#SNMPVALUE}: Temperature sensor is not operational|<p>It means that the agent considers that the sensor is broken. The sensor could have a hard failure (e.g., disconnected wire), or a soft failure (e.g., out-of-range, jittery, or wildly fluctuating readings).</p>|`last(/Cisco Nexus 9000 Series by SNMP/sensor.temp.status[{#SNMPINDEX}])=3`|High||
+|Cisco Nexus 9000: {#SNMPVALUE}: Temperature sensor is not available|<p>It means that the agent presently can not report the sensor value.</p>|`last(/Cisco Nexus 9000 Series by SNMP/sensor.temp.status[{#SNMPINDEX}])=2`|Warning||
+|Cisco Nexus 9000: {#SNMPVALUE}: Temperature is above critical threshold|<p>This trigger uses the values of the temperature sensor.</p>|`avg(/Cisco Nexus 9000 Series by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}`|High||
+|Cisco Nexus 9000: {#SNMPVALUE}: Temperature is above warning threshold|<p>This trigger uses the values of the temperature sensor.</p>|`avg(/Cisco Nexus 9000 Series by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}`|Warning|**Depends on**:<br><ul><li>Cisco Nexus 9000: {#SNMPVALUE}: Temperature is above critical threshold</li></ul>|
+|Cisco Nexus 9000: {#SNMPVALUE}: Temperature is too low||`avg(/Cisco Nexus 9000 Series by SNMP/sensor.temp.value[{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}`|Average||
 
 ## Feedback
 

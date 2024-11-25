@@ -115,58 +115,58 @@ Link this template to the local Zabbix server host.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|More than 100 items having missing data for more than 10 minutes||`min(/Zabbix server health/zabbix[queue,10m],10m)>100`|Warning|**Manual close**: Yes|
-|Utilization of alert manager processes is high||`avg(/Zabbix server health/zabbix[process,alert manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"alert manager"}`|Average|**Manual close**: Yes|
-|Utilization of alert syncer processes is high||`avg(/Zabbix server health/zabbix[process,alert syncer,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"alert syncer"}`|Average|**Manual close**: Yes|
-|Utilization of alerter processes is high||`avg(/Zabbix server health/zabbix[process,alerter,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"alerter"}`|Average|**Manual close**: Yes|
-|Utilization of availability manager processes is high||`avg(/Zabbix server health/zabbix[process,availability manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"availability manager"}`|Average|**Manual close**: Yes|
-|Utilization of configuration syncer processes is high||`avg(/Zabbix server health/zabbix[process,configuration syncer,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"configuration syncer"}`|Average|**Manual close**: Yes|
-|Utilization of configuration syncer worker processes is high||`avg(/Zabbix server health/zabbix[process,configuration syncer worker,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"configuration syncer worker"}`|Average|**Manual close**: Yes|
-|Utilization of escalator processes is high||`avg(/Zabbix server health/zabbix[process,escalator,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"escalator"}`|Average|**Manual close**: Yes|
-|Utilization of history poller processes is high||`avg(/Zabbix server health/zabbix[process,history poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"history poller"}`|Average|**Manual close**: Yes|
-|Utilization of ODBC poller processes is high||`avg(/Zabbix server health/zabbix[process,odbc poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"ODBC poller"}`|Average|**Manual close**: Yes|
-|Utilization of history syncer processes is high||`avg(/Zabbix server health/zabbix[process,history syncer,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"history syncer"}`|Average|**Manual close**: Yes|
-|Utilization of housekeeper processes is high||`avg(/Zabbix server health/zabbix[process,housekeeper,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"housekeeper"}`|Average|**Manual close**: Yes|
-|Utilization of http poller processes is high||`avg(/Zabbix server health/zabbix[process,http poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"http poller"}`|Average|**Manual close**: Yes|
-|Utilization of icmp pinger processes is high||`avg(/Zabbix server health/zabbix[process,icmp pinger,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"icmp pinger"}`|Average|**Manual close**: Yes|
-|Utilization of ipmi manager processes is high||`avg(/Zabbix server health/zabbix[process,ipmi manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"ipmi manager"}`|Average|**Manual close**: Yes|
-|Utilization of ipmi poller processes is high||`avg(/Zabbix server health/zabbix[process,ipmi poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"ipmi poller"}`|Average|**Manual close**: Yes|
-|Utilization of java poller processes is high||`avg(/Zabbix server health/zabbix[process,java poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"java poller"}`|Average|**Manual close**: Yes|
-|Utilization of LLD manager processes is high||`avg(/Zabbix server health/zabbix[process,lld manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"LLD manager"}`|Average|**Manual close**: Yes|
-|Utilization of LLD worker processes is high||`avg(/Zabbix server health/zabbix[process,lld worker,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"LLD worker"}`|Average|**Manual close**: Yes|
-|Utilization of connector manager processes is high||`avg(/Zabbix server health/zabbix[process,connector manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"connector manager"}`|Average|**Manual close**: Yes|
-|Utilization of connector worker processes is high||`avg(/Zabbix server health/zabbix[process,connector worker,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"connector worker"}`|Average|**Manual close**: Yes|
-|Utilization of discovery manager processes is high||`avg(/Zabbix server health/zabbix[process,discovery manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"discovery manager"}`|Average|**Manual close**: Yes|
-|Utilization of discovery worker processes is high||`avg(/Zabbix server health/zabbix[process,discovery worker,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"discovery worker"}`|Average|**Manual close**: Yes|
-|Utilization of poller processes is high||`avg(/Zabbix server health/zabbix[process,poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"poller"}`|Average|**Manual close**: Yes|
-|Utilization of preprocessing worker processes is high||`avg(/Zabbix server health/zabbix[process,preprocessing worker,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"preprocessing worker"}`|Average|**Manual close**: Yes|
-|Utilization of preprocessing manager processes is high||`avg(/Zabbix server health/zabbix[process,preprocessing manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"preprocessing manager"}`|Average|**Manual close**: Yes|
-|Utilization of proxy poller processes is high||`avg(/Zabbix server health/zabbix[process,proxy poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"proxy poller"}`|Average|**Manual close**: Yes|
-|Utilization of proxy group manager processes is high||`avg(/Zabbix server health/zabbix[process,proxy group manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"proxy group manager"}`|Average|**Manual close**: Yes|
-|Utilization of report manager processes is high||`avg(/Zabbix server health/zabbix[process,report manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"report manager"}`|Average|**Manual close**: Yes|
-|Utilization of report writer processes is high||`avg(/Zabbix server health/zabbix[process,report writer,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"report writer"}`|Average|**Manual close**: Yes|
-|Utilization of self-monitoring processes is high||`avg(/Zabbix server health/zabbix[process,self-monitoring,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"self-monitoring"}`|Average|**Manual close**: Yes|
-|Utilization of snmp trapper processes is high||`avg(/Zabbix server health/zabbix[process,snmp trapper,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"snmp trapper"}`|Average|**Manual close**: Yes|
-|Utilization of task manager processes is high||`avg(/Zabbix server health/zabbix[process,task manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"task manager"}`|Average|**Manual close**: Yes|
-|Utilization of timer processes is high||`avg(/Zabbix server health/zabbix[process,timer,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"timer"}`|Average|**Manual close**: Yes|
-|Utilization of service manager processes is high||`avg(/Zabbix server health/zabbix[process,service manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"service manager"}`|Average|**Manual close**: Yes|
-|Utilization of trigger housekeeper processes is high||`avg(/Zabbix server health/zabbix[process,trigger housekeeper,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"trigger housekeeper"}`|Average|**Manual close**: Yes|
-|Utilization of trapper processes is high||`avg(/Zabbix server health/zabbix[process,trapper,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"trapper"}`|Average|**Manual close**: Yes|
-|Utilization of unreachable poller processes is high||`avg(/Zabbix server health/zabbix[process,unreachable poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"unreachable poller"}`|Average|**Manual close**: Yes|
-|Utilization of vmware collector processes is high||`avg(/Zabbix server health/zabbix[process,vmware collector,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"vmware collector"}`|Average|**Manual close**: Yes|
-|Utilization of agent poller processes is high||`avg(/Zabbix server health/zabbix[process,agent poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"agent poller"}`|Average|**Manual close**: Yes|
-|Utilization of http agent poller processes is high||`avg(/Zabbix server health/zabbix[process,http agent poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"http agent poller"}`|Average|**Manual close**: Yes|
-|Utilization of snmp poller processes is high||`avg(/Zabbix server health/zabbix[process,snmp poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"snmp poller"}`|Average|**Manual close**: Yes|
-|Utilization of internal poller processes is high||`avg(/Zabbix server health/zabbix[process,internal poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"internal poller"}`|Average|**Manual close**: Yes|
-|Utilization of browser poller processes is high||`avg(/Zabbix server health/zabbix[process,browser poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"browser poller"}`|Average|**Manual close**: Yes|
-|More than {$ZABBIX.SERVER.UTIL.MAX:"configuration cache"}% used in the configuration cache|<p>Consider increasing `CacheSize` in the `zabbix_server.conf` configuration file.</p>|`max(/Zabbix server health/zabbix[rcache,buffer,pused],10m)>{$ZABBIX.SERVER.UTIL.MAX:"configuration cache"}`|Average|**Manual close**: Yes|
-|More than {$ZABBIX.SERVER.UTIL.MAX:"value cache"}% used in the value cache|<p>Consider increasing `ValueCacheSize` in the `zabbix_server.conf` configuration file.</p>|`max(/Zabbix server health/zabbix[vcache,buffer,pused],10m)>{$ZABBIX.SERVER.UTIL.MAX:"value cache"}`|Average|**Manual close**: Yes|
-|Zabbix value cache working in low memory mode|<p>Once the low memory mode has been switched on, the value cache will remain in this state for 24 hours, even if the problem that triggered this mode is resolved sooner.</p>|`last(/Zabbix server health/zabbix[vcache,cache,mode])=1`|High|**Manual close**: Yes|
-|Version has changed|<p>Zabbix server version has changed. Acknowledge to close the problem manually.</p>|`last(/Zabbix server health/zabbix[version],#1)<>last(/Zabbix server health/zabbix[version],#2) and length(last(/Zabbix server health/zabbix[version]))>0`|Info|**Manual close**: Yes|
-|More than {$ZABBIX.SERVER.UTIL.MAX:"vmware cache"}% used in the vmware cache|<p>Consider increasing `VMwareCacheSize` in the `zabbix_server.conf` configuration file.</p>|`max(/Zabbix server health/zabbix[vmware,buffer,pused],10m)>{$ZABBIX.SERVER.UTIL.MAX:"vmware cache"}`|Average|**Manual close**: Yes|
-|More than {$ZABBIX.SERVER.UTIL.MAX:"history cache"}% used in the history cache|<p>Consider increasing `HistoryCacheSize` in the `zabbix_server.conf` configuration file.</p>|`max(/Zabbix server health/zabbix[wcache,history,pused],10m)>{$ZABBIX.SERVER.UTIL.MAX:"history cache"}`|Average|**Manual close**: Yes|
-|More than {$ZABBIX.SERVER.UTIL.MAX:"index cache"}% used in the history index cache|<p>Consider increasing `HistoryIndexCacheSize` in the `zabbix_server.conf` configuration file.</p>|`max(/Zabbix server health/zabbix[wcache,index,pused],10m)>{$ZABBIX.SERVER.UTIL.MAX:"index cache"}`|Average|**Manual close**: Yes|
-|More than {$ZABBIX.SERVER.UTIL.MAX:"trend cache"}% used in the trends cache|<p>Consider increasing `TrendCacheSize` in the `zabbix_server.conf` configuration file.</p>|`max(/Zabbix server health/zabbix[wcache,trend,pused],10m)>{$ZABBIX.SERVER.UTIL.MAX:"trend cache"}`|Average|**Manual close**: Yes|
+|Zabbix server: More than 100 items having missing data for more than 10 minutes||`min(/Zabbix server health/zabbix[queue,10m],10m)>100`|Warning|**Manual close**: Yes|
+|Zabbix server: Utilization of alert manager processes is high||`avg(/Zabbix server health/zabbix[process,alert manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"alert manager"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of alert syncer processes is high||`avg(/Zabbix server health/zabbix[process,alert syncer,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"alert syncer"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of alerter processes is high||`avg(/Zabbix server health/zabbix[process,alerter,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"alerter"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of availability manager processes is high||`avg(/Zabbix server health/zabbix[process,availability manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"availability manager"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of configuration syncer processes is high||`avg(/Zabbix server health/zabbix[process,configuration syncer,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"configuration syncer"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of configuration syncer worker processes is high||`avg(/Zabbix server health/zabbix[process,configuration syncer worker,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"configuration syncer worker"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of escalator processes is high||`avg(/Zabbix server health/zabbix[process,escalator,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"escalator"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of history poller processes is high||`avg(/Zabbix server health/zabbix[process,history poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"history poller"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of ODBC poller processes is high||`avg(/Zabbix server health/zabbix[process,odbc poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"ODBC poller"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of history syncer processes is high||`avg(/Zabbix server health/zabbix[process,history syncer,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"history syncer"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of housekeeper processes is high||`avg(/Zabbix server health/zabbix[process,housekeeper,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"housekeeper"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of http poller processes is high||`avg(/Zabbix server health/zabbix[process,http poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"http poller"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of icmp pinger processes is high||`avg(/Zabbix server health/zabbix[process,icmp pinger,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"icmp pinger"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of ipmi manager processes is high||`avg(/Zabbix server health/zabbix[process,ipmi manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"ipmi manager"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of ipmi poller processes is high||`avg(/Zabbix server health/zabbix[process,ipmi poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"ipmi poller"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of java poller processes is high||`avg(/Zabbix server health/zabbix[process,java poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"java poller"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of LLD manager processes is high||`avg(/Zabbix server health/zabbix[process,lld manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"LLD manager"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of LLD worker processes is high||`avg(/Zabbix server health/zabbix[process,lld worker,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"LLD worker"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of connector manager processes is high||`avg(/Zabbix server health/zabbix[process,connector manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"connector manager"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of connector worker processes is high||`avg(/Zabbix server health/zabbix[process,connector worker,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"connector worker"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of discovery manager processes is high||`avg(/Zabbix server health/zabbix[process,discovery manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"discovery manager"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of discovery worker processes is high||`avg(/Zabbix server health/zabbix[process,discovery worker,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"discovery worker"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of poller processes is high||`avg(/Zabbix server health/zabbix[process,poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"poller"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of preprocessing worker processes is high||`avg(/Zabbix server health/zabbix[process,preprocessing worker,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"preprocessing worker"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of preprocessing manager processes is high||`avg(/Zabbix server health/zabbix[process,preprocessing manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"preprocessing manager"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of proxy poller processes is high||`avg(/Zabbix server health/zabbix[process,proxy poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"proxy poller"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of proxy group manager processes is high||`avg(/Zabbix server health/zabbix[process,proxy group manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"proxy group manager"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of report manager processes is high||`avg(/Zabbix server health/zabbix[process,report manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"report manager"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of report writer processes is high||`avg(/Zabbix server health/zabbix[process,report writer,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"report writer"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of self-monitoring processes is high||`avg(/Zabbix server health/zabbix[process,self-monitoring,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"self-monitoring"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of snmp trapper processes is high||`avg(/Zabbix server health/zabbix[process,snmp trapper,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"snmp trapper"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of task manager processes is high||`avg(/Zabbix server health/zabbix[process,task manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"task manager"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of timer processes is high||`avg(/Zabbix server health/zabbix[process,timer,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"timer"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of service manager processes is high||`avg(/Zabbix server health/zabbix[process,service manager,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"service manager"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of trigger housekeeper processes is high||`avg(/Zabbix server health/zabbix[process,trigger housekeeper,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"trigger housekeeper"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of trapper processes is high||`avg(/Zabbix server health/zabbix[process,trapper,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"trapper"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of unreachable poller processes is high||`avg(/Zabbix server health/zabbix[process,unreachable poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"unreachable poller"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of vmware collector processes is high||`avg(/Zabbix server health/zabbix[process,vmware collector,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"vmware collector"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of agent poller processes is high||`avg(/Zabbix server health/zabbix[process,agent poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"agent poller"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of http agent poller processes is high||`avg(/Zabbix server health/zabbix[process,http agent poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"http agent poller"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of snmp poller processes is high||`avg(/Zabbix server health/zabbix[process,snmp poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"snmp poller"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of internal poller processes is high||`avg(/Zabbix server health/zabbix[process,internal poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"internal poller"}`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of browser poller processes is high||`avg(/Zabbix server health/zabbix[process,browser poller,avg,busy],10m)>{$ZABBIX.SERVER.UTIL.MAX:"browser poller"}`|Average|**Manual close**: Yes|
+|Zabbix server: More than {$ZABBIX.SERVER.UTIL.MAX:"configuration cache"}% used in the configuration cache|<p>Consider increasing `CacheSize` in the `zabbix_server.conf` configuration file.</p>|`max(/Zabbix server health/zabbix[rcache,buffer,pused],10m)>{$ZABBIX.SERVER.UTIL.MAX:"configuration cache"}`|Average|**Manual close**: Yes|
+|Zabbix server: More than {$ZABBIX.SERVER.UTIL.MAX:"value cache"}% used in the value cache|<p>Consider increasing `ValueCacheSize` in the `zabbix_server.conf` configuration file.</p>|`max(/Zabbix server health/zabbix[vcache,buffer,pused],10m)>{$ZABBIX.SERVER.UTIL.MAX:"value cache"}`|Average|**Manual close**: Yes|
+|Zabbix server: Zabbix value cache working in low memory mode|<p>Once the low memory mode has been switched on, the value cache will remain in this state for 24 hours, even if the problem that triggered this mode is resolved sooner.</p>|`last(/Zabbix server health/zabbix[vcache,cache,mode])=1`|High|**Manual close**: Yes|
+|Zabbix server: Version has changed|<p>Zabbix server version has changed. Acknowledge to close the problem manually.</p>|`last(/Zabbix server health/zabbix[version],#1)<>last(/Zabbix server health/zabbix[version],#2) and length(last(/Zabbix server health/zabbix[version]))>0`|Info|**Manual close**: Yes|
+|Zabbix server: More than {$ZABBIX.SERVER.UTIL.MAX:"vmware cache"}% used in the vmware cache|<p>Consider increasing `VMwareCacheSize` in the `zabbix_server.conf` configuration file.</p>|`max(/Zabbix server health/zabbix[vmware,buffer,pused],10m)>{$ZABBIX.SERVER.UTIL.MAX:"vmware cache"}`|Average|**Manual close**: Yes|
+|Zabbix server: More than {$ZABBIX.SERVER.UTIL.MAX:"history cache"}% used in the history cache|<p>Consider increasing `HistoryCacheSize` in the `zabbix_server.conf` configuration file.</p>|`max(/Zabbix server health/zabbix[wcache,history,pused],10m)>{$ZABBIX.SERVER.UTIL.MAX:"history cache"}`|Average|**Manual close**: Yes|
+|Zabbix server: More than {$ZABBIX.SERVER.UTIL.MAX:"index cache"}% used in the history index cache|<p>Consider increasing `HistoryIndexCacheSize` in the `zabbix_server.conf` configuration file.</p>|`max(/Zabbix server health/zabbix[wcache,index,pused],10m)>{$ZABBIX.SERVER.UTIL.MAX:"index cache"}`|Average|**Manual close**: Yes|
+|Zabbix server: More than {$ZABBIX.SERVER.UTIL.MAX:"trend cache"}% used in the trends cache|<p>Consider increasing `TrendCacheSize` in the `zabbix_server.conf` configuration file.</p>|`max(/Zabbix server health/zabbix[wcache,trend,pused],10m)>{$ZABBIX.SERVER.UTIL.MAX:"trend cache"}`|Average|**Manual close**: Yes|
 
 ### LLD rule Zabbix proxy discovery
 
@@ -195,10 +195,10 @@ Link this template to the local Zabbix server host.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Proxy [{#PROXY.NAME}]: Zabbix proxy last seen|<p>Zabbix proxy is not updating the configuration data.</p>|`last(/Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)>{$PROXY.LAST_SEEN.MAX}`|Warning||
-|Proxy [{#PROXY.NAME}]: Zabbix proxy never seen|<p>Zabbix proxy is not updating the configuration data.</p>|`last(/Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)=-1`|Warning||
-|Proxy [{#PROXY.NAME}]: Zabbix proxy is outdated|<p>Zabbix proxy version is older than server version, but is partially supported. Only data collection and remote execution is available.</p>|`last(/Zabbix server health/zabbix.proxy.compatibility[{#PROXY.NAME}],#1)=2`|Warning||
-|Proxy [{#PROXY.NAME}]: Zabbix proxy is not supported|<p>Zabbix proxy version is older than server previous LTS release version or server major version is older than proxy major version.</p>|`last(/Zabbix server health/zabbix.proxy.compatibility[{#PROXY.NAME}],#1)=3`|High||
+|Zabbix server: Proxy [{#PROXY.NAME}]: Zabbix proxy last seen|<p>Zabbix proxy is not updating the configuration data.</p>|`last(/Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)>{$PROXY.LAST_SEEN.MAX}`|Warning||
+|Zabbix server: Proxy [{#PROXY.NAME}]: Zabbix proxy never seen|<p>Zabbix proxy is not updating the configuration data.</p>|`last(/Zabbix server health/zabbix.proxy.last_seen[{#PROXY.NAME}],#1)=-1`|Warning||
+|Zabbix server: Proxy [{#PROXY.NAME}]: Zabbix proxy is outdated|<p>Zabbix proxy version is older than server version, but is partially supported. Only data collection and remote execution is available.</p>|`last(/Zabbix server health/zabbix.proxy.compatibility[{#PROXY.NAME}],#1)=2`|Warning||
+|Zabbix server: Proxy [{#PROXY.NAME}]: Zabbix proxy is not supported|<p>Zabbix proxy version is older than server previous LTS release version or server major version is older than proxy major version.</p>|`last(/Zabbix server health/zabbix.proxy.compatibility[{#PROXY.NAME}],#1)=3`|High||
 
 ### LLD rule Zabbix proxy groups discovery
 
@@ -222,12 +222,12 @@ Link this template to the local Zabbix server host.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Proxy group [{#PROXY.GROUP.NAME}]: Status "offline"|<p>The state of the Zabbix proxy group is "offline".</p>|`last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}],#1)=1`|High||
-|Proxy group [{#PROXY.GROUP.NAME}]: Status "degrading"|<p>The state of the Zabbix proxy group is "degrading".</p>|`last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}],#1)=4`|Average|**Depends on**:<br><ul><li>Proxy group [{#PROXY.GROUP.NAME}]: Status "offline"</li></ul>|
-|Proxy group [{#PROXY.GROUP.NAME}]: Status changed|<p>The state of the Zabbix proxy group has changed. Acknowledge to close the problem manually.</p>|`last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}],#1)<>last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}],#2) and length(last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}]))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Proxy group [{#PROXY.GROUP.NAME}]: Status "degrading"</li></ul>|
-|Proxy group [{#PROXY.GROUP.NAME}]: Availability too low|<p>The availability of proxies in a proxy group is below {$PROXY.GROUP.AVAIL.PERCENT.MIN}% for at least 3 minutes.</p>|`max(/Zabbix server health/zabbix.proxy.group.avail.proxies.percent[{#PROXY.GROUP.NAME}],3m)<{$PROXY.GROUP.AVAIL.PERCENT.MIN}`|Warning||
-|Proxy group [{#PROXY.GROUP.NAME}]: Failover invalid value|<p>Proxy group failover has an invalid value.</p>|`last(/Zabbix server health/zabbix.proxy.group.failover[{#PROXY.GROUP.NAME}],#1)=-1`|Warning||
-|Proxy group [{#PROXY.GROUP.NAME}]: Minimum number of proxies invalid value|<p>Proxy group minimum number of proxies has an invalid value.</p>|`last(/Zabbix server health/zabbix.proxy.group.online.min[{#PROXY.GROUP.NAME}],#1)=-1`|Warning||
+|Zabbix server: Proxy group [{#PROXY.GROUP.NAME}]: Status "offline"|<p>The state of the Zabbix proxy group is "offline".</p>|`last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}],#1)=1`|High||
+|Zabbix server: Proxy group [{#PROXY.GROUP.NAME}]: Status "degrading"|<p>The state of the Zabbix proxy group is "degrading".</p>|`last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}],#1)=4`|Average|**Depends on**:<br><ul><li>Zabbix server: Proxy group [{#PROXY.GROUP.NAME}]: Status "offline"</li></ul>|
+|Zabbix server: Proxy group [{#PROXY.GROUP.NAME}]: Status changed|<p>The state of the Zabbix proxy group has changed. Acknowledge to close the problem manually.</p>|`last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}],#1)<>last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}],#2) and length(last(/Zabbix server health/zabbix.proxy.group.state[{#PROXY.GROUP.NAME}]))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Zabbix server: Proxy group [{#PROXY.GROUP.NAME}]: Status "degrading"</li></ul>|
+|Zabbix server: Proxy group [{#PROXY.GROUP.NAME}]: Availability too low|<p>The availability of proxies in a proxy group is below {$PROXY.GROUP.AVAIL.PERCENT.MIN}% for at least 3 minutes.</p>|`max(/Zabbix server health/zabbix.proxy.group.avail.proxies.percent[{#PROXY.GROUP.NAME}],3m)<{$PROXY.GROUP.AVAIL.PERCENT.MIN}`|Warning||
+|Zabbix server: Proxy group [{#PROXY.GROUP.NAME}]: Failover invalid value|<p>Proxy group failover has an invalid value.</p>|`last(/Zabbix server health/zabbix.proxy.group.failover[{#PROXY.GROUP.NAME}],#1)=-1`|Warning||
+|Zabbix server: Proxy group [{#PROXY.GROUP.NAME}]: Minimum number of proxies invalid value|<p>Proxy group minimum number of proxies has an invalid value.</p>|`last(/Zabbix server health/zabbix.proxy.group.online.min[{#PROXY.GROUP.NAME}],#1)=-1`|Warning||
 
 ### LLD rule High availability cluster node discovery
 
@@ -249,7 +249,7 @@ Link this template to the local Zabbix server host.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Cluster node [{#NODE.NAME}]: Status changed|<p>The state of the node has changed. Acknowledge to close the problem manually.</p>|`last(/Zabbix server health/zabbix.node.status[{#NODE.ID}],#1)<>last(/Zabbix server health/zabbix.node.status[{#NODE.ID}],#2)`|Info|**Manual close**: Yes|
+|Zabbix server: Cluster node [{#NODE.NAME}]: Status changed|<p>The state of the node has changed. Acknowledge to close the problem manually.</p>|`last(/Zabbix server health/zabbix.node.status[{#NODE.ID}],#1)<>last(/Zabbix server health/zabbix.node.status[{#NODE.ID}],#2)`|Info|**Manual close**: Yes|
 
 ## Feedback
 

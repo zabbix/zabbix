@@ -56,11 +56,11 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Server is in a critical state|<p>Please check the device for faults.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.status,,"like","Critical")=1`|High||
-|Server is in warning state|<p>Please check the device for warnings.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.status,,"like","Warning")=1`|Warning|**Depends on**:<br><ul><li>Server is in a critical state</li></ul>|
-|Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/DELL PowerEdge R840 by HTTP/dell.server.hw.serialnumber,#1)<>last(/DELL PowerEdge R840 by HTTP/dell.server.hw.serialnumber,#2) and length(last(/DELL PowerEdge R840 by HTTP/dell.server.hw.serialnumber))>0`|Info|**Manual close**: Yes|
-|Firmware has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/DELL PowerEdge R840 by HTTP/dell.server.hw.firmware,#1)<>last(/DELL PowerEdge R840 by HTTP/dell.server.hw.firmware,#2) and length(last(/DELL PowerEdge R840 by HTTP/dell.server.hw.firmware))>0`|Info|**Manual close**: Yes|
-|Redfish API service is unavailable|<p>The service is unavailable or does not accept TCP connections.</p>|`last(/DELL PowerEdge R840 by HTTP/net.tcp.service[https])=0`|High||
+|DELL PowerEdge R840: Server is in a critical state|<p>Please check the device for faults.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.status,,"like","Critical")=1`|High||
+|DELL PowerEdge R840: Server is in warning state|<p>Please check the device for warnings.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.status,,"like","Warning")=1`|Warning|**Depends on**:<br><ul><li>DELL PowerEdge R840: Server is in a critical state</li></ul>|
+|DELL PowerEdge R840: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/DELL PowerEdge R840 by HTTP/dell.server.hw.serialnumber,#1)<>last(/DELL PowerEdge R840 by HTTP/dell.server.hw.serialnumber,#2) and length(last(/DELL PowerEdge R840 by HTTP/dell.server.hw.serialnumber))>0`|Info|**Manual close**: Yes|
+|DELL PowerEdge R840: Firmware has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/DELL PowerEdge R840 by HTTP/dell.server.hw.firmware,#1)<>last(/DELL PowerEdge R840 by HTTP/dell.server.hw.firmware,#2) and length(last(/DELL PowerEdge R840 by HTTP/dell.server.hw.firmware))>0`|Info|**Manual close**: Yes|
+|DELL PowerEdge R840: Redfish API service is unavailable|<p>The service is unavailable or does not accept TCP connections.</p>|`last(/DELL PowerEdge R840 by HTTP/net.tcp.service[https])=0`|High||
 
 ### LLD rule Temperature discovery
 
@@ -80,8 +80,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SENSOR_NAME} is in a critical state|<p>Please check the device for faults.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.temp.status[{#SENSOR_NAME}],,"like","Critical")=1`|High||
-|{#SENSOR_NAME} is in warning state|<p>Please check the device for warnings.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.temp.status[{#SENSOR_NAME}],,"like","Warning")=1`|Warning|**Depends on**:<br><ul><li>{#SENSOR_NAME} is in a critical state</li></ul>|
+|DELL PowerEdge R840: {#SENSOR_NAME} is in a critical state|<p>Please check the device for faults.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.temp.status[{#SENSOR_NAME}],,"like","Critical")=1`|High||
+|DELL PowerEdge R840: {#SENSOR_NAME} is in warning state|<p>Please check the device for warnings.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.temp.status[{#SENSOR_NAME}],,"like","Warning")=1`|Warning|**Depends on**:<br><ul><li>DELL PowerEdge R840: {#SENSOR_NAME} is in a critical state</li></ul>|
 
 ### LLD rule PSU discovery
 
@@ -100,8 +100,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SENSOR_NAME} is in a critical state|<p>Please check the device for faults.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.psu.status[{#SENSOR_NAME}],,"like","Critical")=1`|High||
-|{#SENSOR_NAME} is in warning state|<p>Please check the device for warnings.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.psu.status[{#SENSOR_NAME}],,"like","Warning")=1`|Warning|**Depends on**:<br><ul><li>{#SENSOR_NAME} is in a critical state</li></ul>|
+|DELL PowerEdge R840: {#SENSOR_NAME} is in a critical state|<p>Please check the device for faults.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.psu.status[{#SENSOR_NAME}],,"like","Critical")=1`|High||
+|DELL PowerEdge R840: {#SENSOR_NAME} is in warning state|<p>Please check the device for warnings.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.psu.status[{#SENSOR_NAME}],,"like","Warning")=1`|Warning|**Depends on**:<br><ul><li>DELL PowerEdge R840: {#SENSOR_NAME} is in a critical state</li></ul>|
 
 ### LLD rule FAN discovery
 
@@ -121,8 +121,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SENSOR_NAME} is in a critical state|<p>Please check the device for faults.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.fan.status[{#SENSOR_NAME}],,"like","Critical")=1`|High||
-|{#SENSOR_NAME} is in warning state|<p>Please check the device for warnings.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.fan.status[{#SENSOR_NAME}],,"like","Warning")=1`|Warning|**Depends on**:<br><ul><li>{#SENSOR_NAME} is in a critical state</li></ul>|
+|DELL PowerEdge R840: {#SENSOR_NAME} is in a critical state|<p>Please check the device for faults.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.fan.status[{#SENSOR_NAME}],,"like","Critical")=1`|High||
+|DELL PowerEdge R840: {#SENSOR_NAME} is in warning state|<p>Please check the device for warnings.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.sensor.fan.status[{#SENSOR_NAME}],,"like","Warning")=1`|Warning|**Depends on**:<br><ul><li>DELL PowerEdge R840: {#SENSOR_NAME} is in a critical state</li></ul>|
 
 ### LLD rule Array controller discovery
 
@@ -140,8 +140,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#CNTLR_NAME} in slot {#SLOT} is in a critical state|<p>Please check the device for faults.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}],,"like","Critical")=1`|High||
-|{#CNTLR_NAME} in slot {#SLOT} is in warning state|<p>Please check the device for warnings.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}],,"like","Warning")=1`|Warning|**Depends on**:<br><ul><li>{#CNTLR_NAME} in slot {#SLOT} is in a critical state</li></ul>|
+|DELL PowerEdge R840: {#CNTLR_NAME} in slot {#SLOT} is in a critical state|<p>Please check the device for faults.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}],,"like","Critical")=1`|High||
+|DELL PowerEdge R840: {#CNTLR_NAME} in slot {#SLOT} is in warning state|<p>Please check the device for warnings.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}],,"like","Warning")=1`|Warning|**Depends on**:<br><ul><li>DELL PowerEdge R840: {#CNTLR_NAME} in slot {#SLOT} is in a critical state</li></ul>|
 
 ### LLD rule Array controller cache discovery
 
@@ -159,8 +159,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#BATTERY_NAME} is in a critical state|<p>Please check the device for faults.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}],,"like","Critical")=1`|High||
-|{#BATTERY_NAME} is in warning state|<p>Please check the device for warnings.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}],,"like","Warning")=1`|Warning|**Depends on**:<br><ul><li>{#BATTERY_NAME} is in a critical state</li></ul>|
+|DELL PowerEdge R840: {#BATTERY_NAME} is in a critical state|<p>Please check the device for faults.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}],,"like","Critical")=1`|High||
+|DELL PowerEdge R840: {#BATTERY_NAME} is in warning state|<p>Please check the device for warnings.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}],,"like","Warning")=1`|Warning|**Depends on**:<br><ul><li>DELL PowerEdge R840: {#BATTERY_NAME} is in a critical state</li></ul>|
 
 ### LLD rule Physical disk discovery
 
@@ -183,9 +183,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#DISK_NAME} is in a critical state|<p>Please check the device for faults.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],,"like","Critical")=1`|High||
-|{#DISK_NAME} is in warning state|<p>Please check the device for warnings.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],,"like","Warning")=1`|Warning|**Depends on**:<br><ul><li>{#DISK_NAME} is in a critical state</li></ul>|
-|{#DISK_NAME} has been replaced|<p>{#DISK_NAME} serial number has changed. Acknowledge to close the problem manually.</p>|`last(/DELL PowerEdge R840 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#1)<>last(/DELL PowerEdge R840 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#2) and length(last(/DELL PowerEdge R840 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}]))>0`|Info|**Manual close**: Yes|
+|DELL PowerEdge R840: {#DISK_NAME} is in a critical state|<p>Please check the device for faults.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],,"like","Critical")=1`|High||
+|DELL PowerEdge R840: {#DISK_NAME} is in warning state|<p>Please check the device for warnings.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],,"like","Warning")=1`|Warning|**Depends on**:<br><ul><li>DELL PowerEdge R840: {#DISK_NAME} is in a critical state</li></ul>|
+|DELL PowerEdge R840: {#DISK_NAME} has been replaced|<p>{#DISK_NAME} serial number has changed. Acknowledge to close the problem manually.</p>|`last(/DELL PowerEdge R840 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#1)<>last(/DELL PowerEdge R840 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#2) and length(last(/DELL PowerEdge R840 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Virtual disk discovery
 
@@ -209,8 +209,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#DISK_NAME} is in a critical state|<p>Please check the device for faults.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.hw.virtualdisk.status[{#DISK_NAME}],,"like","Critical")=1`|High||
-|{#DISK_NAME} is in warning state|<p>Please check the device for warnings.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.hw.virtualdisk.status[{#DISK_NAME}],,"like","Warning")=1`|Warning|**Depends on**:<br><ul><li>{#DISK_NAME} is in a critical state</li></ul>|
+|DELL PowerEdge R840: {#DISK_NAME} is in a critical state|<p>Please check the device for faults.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.hw.virtualdisk.status[{#DISK_NAME}],,"like","Critical")=1`|High||
+|DELL PowerEdge R840: {#DISK_NAME} is in warning state|<p>Please check the device for warnings.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.hw.virtualdisk.status[{#DISK_NAME}],,"like","Warning")=1`|Warning|**Depends on**:<br><ul><li>DELL PowerEdge R840: {#DISK_NAME} is in a critical state</li></ul>|
 
 ### LLD rule Network interface discovery
 
@@ -232,9 +232,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#IFNAME} Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and (find(/DELL PowerEdge R840 by HTTP/dell.server.net.if.status[{#IFNAME}],,"like")="Down" and last(/DELL PowerEdge R840 by HTTP/dell.server.net.if.status[{#IFNAME}],#1)<>last(/DELL PowerEdge R840 by HTTP/dell.server.net.if.status[{#IFNAME}],#2))`|Average|**Manual close**: Yes|
-|{#IFNAME} is in a critical state|<p>Please check the device for faults.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.net.if.health[{#IFNAME}],,"like","Critical")=1`|High||
-|{#IFNAME} is in warning state|<p>Please check the device for warnings.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.net.if.health[{#IFNAME}],,"like","Warning")=1`|Warning|**Depends on**:<br><ul><li>{#IFNAME} is in a critical state</li></ul>|
+|DELL PowerEdge R840: {#IFNAME} Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and (find(/DELL PowerEdge R840 by HTTP/dell.server.net.if.status[{#IFNAME}],,"like")="Down" and last(/DELL PowerEdge R840 by HTTP/dell.server.net.if.status[{#IFNAME}],#1)<>last(/DELL PowerEdge R840 by HTTP/dell.server.net.if.status[{#IFNAME}],#2))`|Average|**Manual close**: Yes|
+|DELL PowerEdge R840: {#IFNAME} is in a critical state|<p>Please check the device for faults.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.net.if.health[{#IFNAME}],,"like","Critical")=1`|High||
+|DELL PowerEdge R840: {#IFNAME} is in warning state|<p>Please check the device for warnings.</p>|`find(/DELL PowerEdge R840 by HTTP/dell.server.net.if.health[{#IFNAME}],,"like","Warning")=1`|Warning|**Depends on**:<br><ul><li>DELL PowerEdge R840: {#IFNAME} is in a critical state</li></ul>|
 
 ## Feedback
 

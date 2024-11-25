@@ -55,8 +55,8 @@ You must set {$TRAVIS.API.TOKEN} and {$TRAVIS.API.URL} macros.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Service is unavailable|<p>Travis API is unavailable. Please check if the correct macros are set.</p>|`last(/Travis CI by HTTP/travis.get_health)=0`|High|**Manual close**: Yes|
-|Failed to fetch home page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Travis CI by HTTP/travis.get_health,30m)=1`|Warning|**Manual close**: Yes|
+|Travis CI: Service is unavailable|<p>Travis API is unavailable. Please check if the correct macros are set.</p>|`last(/Travis CI by HTTP/travis.get_health)=0`|High|**Manual close**: Yes|
+|Travis CI: Failed to fetch home page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Travis CI by HTTP/travis.get_health,30m)=1`|Warning|**Manual close**: Yes|
 
 ### LLD rule Repos metrics discovery
 
@@ -86,8 +86,8 @@ You must set {$TRAVIS.API.TOKEN} and {$TRAVIS.API.URL} macros.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Repo [{#SLUG}]: Percent of successful builds|<p>Low successful builds rate.</p>|`last(/Travis CI by HTTP/travis.repo.builds.passed.pct[{#SLUG}])<{$TRAVIS.BUILDS.SUCCESS.PERCENT}`|Warning|**Manual close**: Yes|
-|Repo [{#SLUG}]: Last build status is 'errored'|<p>Last build status is errored.</p>|`find(/Travis CI by HTTP/travis.repo.last_build.state[{#SLUG}],,"like","errored")=1`|Warning|**Manual close**: Yes|
+|Travis CI: Repo [{#SLUG}]: Percent of successful builds|<p>Low successful builds rate.</p>|`last(/Travis CI by HTTP/travis.repo.builds.passed.pct[{#SLUG}])<{$TRAVIS.BUILDS.SUCCESS.PERCENT}`|Warning|**Manual close**: Yes|
+|Travis CI: Repo [{#SLUG}]: Last build status is 'errored'|<p>Last build status is errored.</p>|`find(/Travis CI by HTTP/travis.repo.last_build.state[{#SLUG}],,"like","errored")=1`|Warning|**Manual close**: Yes|
 
 ## Feedback
 

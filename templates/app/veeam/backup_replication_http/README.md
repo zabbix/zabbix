@@ -78,7 +78,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Veeam Backup and Replication by HTTP/veeam.get.errors))>0`|Average||
+|Veeam Backup: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Veeam Backup and Replication by HTTP/veeam.get.errors))>0`|Average||
 
 ### LLD rule Proxies discovery
 
@@ -130,7 +130,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Last result session failed||`find(/Veeam Backup and Replication by HTTP/veeam.sessions.result[{#ID}],,"like","Failed")=1`|Average|**Manual close**: Yes|
+|Veeam Backup: Last result session failed||`find(/Veeam Backup and Replication by HTTP/veeam.sessions.result[{#ID}],,"like","Failed")=1`|Average|**Manual close**: Yes|
 
 ### LLD rule Jobs states discovery
 
@@ -150,7 +150,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Last result job failed||`find(/Veeam Backup and Replication by HTTP/veeam.jobs.last.result[{#ID}],,"like","Failed")=1`|Average|**Manual close**: Yes|
+|Veeam Backup: Last result job failed||`find(/Veeam Backup and Replication by HTTP/veeam.jobs.last.result[{#ID}],,"like","Failed")=1`|Average|**Manual close**: Yes|
 
 ## Feedback
 

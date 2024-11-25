@@ -59,15 +59,15 @@
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|System status is in critical state|<p>Please check the device for errors</p>|`count(/Juniper by SNMP/system.status[jnxRedAlarmState.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1`|High||
-|Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Juniper by SNMP/system.hw.serialnumber,#1)<>last(/Juniper by SNMP/system.hw.serialnumber,#2) and length(last(/Juniper by SNMP/system.hw.serialnumber))>0`|Info|**Manual close**: Yes|
-|Operating system description has changed|<p>Operating system description has changed. Possible reasons that system has been updated or replaced. Acknowledge to close the problem manually.</p>|`last(/Juniper by SNMP/system.sw.os[sysDescr.0],#1)<>last(/Juniper by SNMP/system.sw.os[sysDescr.0],#2) and length(last(/Juniper by SNMP/system.sw.os[sysDescr.0]))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>System name has changed</li></ul>|
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Juniper by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Juniper by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Juniper by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Juniper by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>No SNMP data collection</li></ul>|
-|System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Juniper by SNMP/system.name,#1)<>last(/Juniper by SNMP/system.name,#2) and length(last(/Juniper by SNMP/system.name))>0`|Info|**Manual close**: Yes|
-|No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Juniper by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/Juniper by SNMP/icmpping,#3)=0`|High||
-|High ICMP ping loss||`min(/Juniper by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Juniper by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/Juniper by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>High ICMP ping loss</li><li>Unavailable by ICMP ping</li></ul>|
+|Juniper: System status is in critical state|<p>Please check the device for errors</p>|`count(/Juniper by SNMP/system.status[jnxRedAlarmState.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1`|High||
+|Juniper: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Juniper by SNMP/system.hw.serialnumber,#1)<>last(/Juniper by SNMP/system.hw.serialnumber,#2) and length(last(/Juniper by SNMP/system.hw.serialnumber))>0`|Info|**Manual close**: Yes|
+|Juniper: Operating system description has changed|<p>Operating system description has changed. Possible reasons that system has been updated or replaced. Acknowledge to close the problem manually.</p>|`last(/Juniper by SNMP/system.sw.os[sysDescr.0],#1)<>last(/Juniper by SNMP/system.sw.os[sysDescr.0],#2) and length(last(/Juniper by SNMP/system.sw.os[sysDescr.0]))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Juniper: System name has changed</li></ul>|
+|Juniper: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Juniper by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Juniper by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Juniper by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Juniper by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Juniper: No SNMP data collection</li></ul>|
+|Juniper: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Juniper by SNMP/system.name,#1)<>last(/Juniper by SNMP/system.name,#2) and length(last(/Juniper by SNMP/system.name))>0`|Info|**Manual close**: Yes|
+|Juniper: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Juniper by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Juniper: Unavailable by ICMP ping</li></ul>|
+|Juniper: Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/Juniper by SNMP/icmpping,#3)=0`|High||
+|Juniper: High ICMP ping loss||`min(/Juniper by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Juniper by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Juniper: Unavailable by ICMP ping</li></ul>|
+|Juniper: High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/Juniper by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>Juniper: High ICMP ping loss</li><li>Juniper: Unavailable by ICMP ping</li></ul>|
 
 ### LLD rule CPU and Memory Discovery
 
@@ -86,8 +86,8 @@
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SNMPVALUE}: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Juniper by SNMP/system.cpu.util[jnxOperatingCPU.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}`|Warning||
-|{#SNMPVALUE}: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Juniper by SNMP/vm.memory.util[jnxOperatingBuffer.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}`|Average||
+|Juniper: {#SNMPVALUE}: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Juniper by SNMP/system.cpu.util[jnxOperatingCPU.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}`|Warning||
+|Juniper: {#SNMPVALUE}: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Juniper by SNMP/vm.memory.util[jnxOperatingBuffer.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}`|Average||
 
 ### LLD rule Temperature discovery
 
@@ -105,9 +105,9 @@
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SENSOR_INFO}: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Juniper by SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SENSOR_INFO}"}`|Warning|**Depends on**:<br><ul><li>{#SENSOR_INFO}: Temperature is above critical threshold</li></ul>|
-|{#SENSOR_INFO}: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Juniper by SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_INFO}"}`|High||
-|{#SENSOR_INFO}: Temperature is too low||`avg(/Juniper by SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SENSOR_INFO}"}`|Average||
+|Juniper: {#SENSOR_INFO}: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Juniper by SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SENSOR_INFO}"}`|Warning|**Depends on**:<br><ul><li>Juniper: {#SENSOR_INFO}: Temperature is above critical threshold</li></ul>|
+|Juniper: {#SENSOR_INFO}: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Juniper by SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_INFO}"}`|High||
+|Juniper: {#SENSOR_INFO}: Temperature is too low||`avg(/Juniper by SNMP/sensor.temp.value[jnxOperatingTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SENSOR_INFO}"}`|Average||
 
 ### LLD rule FAN Discovery
 
@@ -125,7 +125,7 @@
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SNMPVALUE}: Fan is in critical state|<p>Please check the fan unit</p>|`count(/Juniper by SNMP/sensor.fan.status[jnxOperatingState.4.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1`|Average||
+|Juniper: {#SNMPVALUE}: Fan is in critical state|<p>Please check the fan unit</p>|`count(/Juniper by SNMP/sensor.fan.status[jnxOperatingState.4.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1`|Average||
 
 ### LLD rule PSU Discovery
 
@@ -143,7 +143,7 @@
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SNMPVALUE}: Power supply is in critical state|<p>Please check the power supply unit for errors</p>|`count(/Juniper by SNMP/sensor.psu.status[jnxOperatingState.2.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1`|Average||
+|Juniper: {#SNMPVALUE}: Power supply is in critical state|<p>Please check the power supply unit for errors</p>|`count(/Juniper by SNMP/sensor.psu.status[jnxOperatingState.2.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1`|Average||
 
 ### LLD rule Network interfaces discovery
 
@@ -169,10 +169,10 @@
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))`|Average|**Manual close**: Yes|
-|Interface {#IFNAME}({#IFALIAS}): High bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/Juniper by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Juniper by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or avg(/Juniper by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Juniper by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and last(/Juniper by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): High error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/Juniper by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"} or min(/Juniper by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.</p>|`change(/Juniper by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Juniper by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and ( last(/Juniper by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or last(/Juniper by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or last(/Juniper by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or last(/Juniper by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or last(/Juniper by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or last(/Juniper by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117 ) and (last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|Juniper: Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))`|Average|**Manual close**: Yes|
+|Juniper: Interface {#IFNAME}({#IFALIAS}): High bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/Juniper by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Juniper by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or avg(/Juniper by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Juniper by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and last(/Juniper by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Juniper: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|Juniper: Interface {#IFNAME}({#IFALIAS}): High error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/Juniper by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"} or min(/Juniper by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Juniper: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|Juniper: Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.</p>|`change(/Juniper by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Juniper by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and ( last(/Juniper by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or last(/Juniper by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or last(/Juniper by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or last(/Juniper by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or last(/Juniper by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or last(/Juniper by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117 ) and (last(/Juniper by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Juniper: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
 
 ### LLD rule EtherLike-MIB Discovery
 
@@ -190,7 +190,7 @@
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Interface {#IFNAME}({#IFALIAS}): In half-duplex mode|<p>Please check autonegotiation settings and cabling.</p>|`last(/Juniper by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2`|Warning|**Manual close**: Yes|
+|Juniper: Interface {#IFNAME}({#IFALIAS}): In half-duplex mode|<p>Please check autonegotiation settings and cabling.</p>|`last(/Juniper by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2`|Warning|**Manual close**: Yes|
 
 ## Feedback
 

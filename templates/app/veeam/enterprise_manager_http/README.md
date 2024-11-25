@@ -78,9 +78,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.get.errors))>0`|Average||
-|Warning job runs is too high||`last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.warning.jobs)>{$VEEAM.MANAGER.JOB.MAX.WARN}`|Warning|**Manual close**: Yes|
-|Failed job runs is too high||`last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.failed.jobs)>{$VEEAM.MANAGER.JOB.MAX.FAIL}`|Average|**Manual close**: Yes|
+|Veeam Backup: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.get.errors))>0`|Average||
+|Veeam Backup: Warning job runs is too high||`last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.warning.jobs)>{$VEEAM.MANAGER.JOB.MAX.WARN}`|Warning|**Manual close**: Yes|
+|Veeam Backup: Failed job runs is too high||`last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.failed.jobs)>{$VEEAM.MANAGER.JOB.MAX.FAIL}`|Average|**Manual close**: Yes|
 
 ### LLD rule Backup Files discovery
 

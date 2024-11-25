@@ -75,9 +75,9 @@ Add in configuration file WebDriver interface HTTP[S] URL. For example http://lo
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Failed to get metrics data|<p>Failed to get JSON with performance counters of the requested website '{$WEBSITE.DOMAIN}'.</p>|`length(last(/Website by Browser/website.metrics.check))>0`|High||
-|Website navigation load event time is too slow||`last(/Website by Browser/website.navigation.load_time)>{$WEBSITE.NAVIGATION.LOAD.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Failed to get metrics data</li></ul>|
-|Website resource load event time is too slow||`last(/Website by Browser/website.resource.load_time)>{$WEBSITE.RESOURCE.LOAD.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Failed to get metrics data</li></ul>|
+|Website by Browser: Failed to get metrics data|<p>Failed to get JSON with performance counters of the requested website '{$WEBSITE.DOMAIN}'.</p>|`length(last(/Website by Browser/website.metrics.check))>0`|High||
+|Website by Browser: Website navigation load event time is too slow||`last(/Website by Browser/website.navigation.load_time)>{$WEBSITE.NAVIGATION.LOAD.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Website by Browser: Failed to get metrics data</li></ul>|
+|Website by Browser: Website resource load event time is too slow||`last(/Website by Browser/website.resource.load_time)>{$WEBSITE.RESOURCE.LOAD.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Website by Browser: Failed to get metrics data</li></ul>|
 
 ## Feedback
 

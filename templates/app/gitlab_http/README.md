@@ -101,15 +101,15 @@ Also, see the Macros section for a list of [macros used](#Macros-used) to set tr
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Gitlab instance is not able to accept traffic||`last(/GitLab by HTTP/gitlab.readiness)=0`|High|**Depends on**:<br><ul><li>Liveness check was failed</li></ul>|
-|Liveness check was failed|<p>The application server is not running or Rails Controllers are deadlocked.</p>|`last(/GitLab by HTTP/gitlab.liveness)=0`|High||
-|Version has changed|<p>The GitLab version has changed. Acknowledge to close the problem manually.</p>|`last(/GitLab by HTTP/gitlab.deployments.version,#1)<>last(/GitLab by HTTP/gitlab.deployments.version,#2) and length(last(/GitLab by HTTP/gitlab.deployments.version))>0`|Info|**Manual close**: Yes|
-|Too many Redis queues client exceptions|<p>"Too many  Redis client exceptions during the requests to  Redis instance queues."</p>|`min(/GitLab by HTTP/gitlab.redis.client_exceptions.queues.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}`|Warning||
-|Too many Redis cache client exceptions|<p>"Too many  Redis client exceptions during the requests to  Redis instance cache."</p>|`min(/GitLab by HTTP/gitlab.redis.client_exceptions.cache.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}`|Warning||
-|Too many Redis shared_state client exceptions|<p>"Too many  Redis client exceptions during the requests to  Redis instance shared_state."</p>|`min(/GitLab by HTTP/gitlab.redis.client_exceptions.shared_state.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}`|Warning||
-|Failed to fetch info data|<p>Zabbix has not received a metrics data for the last 30 minutes</p>|`nodata(/GitLab by HTTP/gitlab.ruby.threads_running,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Liveness check was failed</li></ul>|
-|Current number of open files is too high||`min(/GitLab by HTTP/gitlab.ruby.file_descriptors.max,5m)/last(/GitLab by HTTP/gitlab.ruby.process_max_fds)*100>{$GITLAB.OPEN.FDS.MAX.WARN}`|Warning||
-|Too many HTTP requests failures|<p>"Too many requests failed on GitLab instance with 5xx HTTP code"</p>|`min(/GitLab by HTTP/gitlab.http.requests.5xx.rate,5m)>{$GITLAB.HTTP.FAIL.MAX.WARN}`|Warning||
+|GitLab: Gitlab instance is not able to accept traffic||`last(/GitLab by HTTP/gitlab.readiness)=0`|High|**Depends on**:<br><ul><li>GitLab: Liveness check was failed</li></ul>|
+|GitLab: Liveness check was failed|<p>The application server is not running or Rails Controllers are deadlocked.</p>|`last(/GitLab by HTTP/gitlab.liveness)=0`|High||
+|GitLab: Version has changed|<p>The GitLab version has changed. Acknowledge to close the problem manually.</p>|`last(/GitLab by HTTP/gitlab.deployments.version,#1)<>last(/GitLab by HTTP/gitlab.deployments.version,#2) and length(last(/GitLab by HTTP/gitlab.deployments.version))>0`|Info|**Manual close**: Yes|
+|GitLab: Too many Redis queues client exceptions|<p>"Too many  Redis client exceptions during the requests to  Redis instance queues."</p>|`min(/GitLab by HTTP/gitlab.redis.client_exceptions.queues.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}`|Warning||
+|GitLab: Too many Redis cache client exceptions|<p>"Too many  Redis client exceptions during the requests to  Redis instance cache."</p>|`min(/GitLab by HTTP/gitlab.redis.client_exceptions.cache.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}`|Warning||
+|GitLab: Too many Redis shared_state client exceptions|<p>"Too many  Redis client exceptions during the requests to  Redis instance shared_state."</p>|`min(/GitLab by HTTP/gitlab.redis.client_exceptions.shared_state.rate,5m)>{$GITLAB.REDIS.FAIL.MAX.WARN}`|Warning||
+|GitLab: Failed to fetch info data|<p>Zabbix has not received a metrics data for the last 30 minutes</p>|`nodata(/GitLab by HTTP/gitlab.ruby.threads_running,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>GitLab: Liveness check was failed</li></ul>|
+|GitLab: Current number of open files is too high||`min(/GitLab by HTTP/gitlab.ruby.file_descriptors.max,5m)/last(/GitLab by HTTP/gitlab.ruby.process_max_fds)*100>{$GITLAB.OPEN.FDS.MAX.WARN}`|Warning||
+|GitLab: Too many HTTP requests failures|<p>"Too many requests failed on GitLab instance with 5xx HTTP code"</p>|`min(/GitLab by HTTP/gitlab.http.requests.5xx.rate,5m)>{$GITLAB.HTTP.FAIL.MAX.WARN}`|Warning||
 
 ### LLD rule Unicorn metrics discovery
 
@@ -129,8 +129,8 @@ Also, see the Macros section for a list of [macros used](#Macros-used) to set tr
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Unicorn worker utilization is too high||`min(/GitLab by HTTP/gitlab.unicorn.active_connections[{#SINGLETON}],5m)/last(/GitLab by HTTP/gitlab.unicorn.unicorn_workers[{#SINGLETON}])*100>{$GITLAB.UNICORN.UTILIZATION.MAX.WARN}`|Warning||
-|Unicorn is queueing requests||`min(/GitLab by HTTP/gitlab.unicorn.queued_connections[{#SINGLETON}],5m)>{$GITLAB.UNICORN.QUEUE.MAX.WARN}`|Warning||
+|GitLab: Unicorn worker utilization is too high||`min(/GitLab by HTTP/gitlab.unicorn.active_connections[{#SINGLETON}],5m)/last(/GitLab by HTTP/gitlab.unicorn.unicorn_workers[{#SINGLETON}])*100>{$GITLAB.UNICORN.UTILIZATION.MAX.WARN}`|Warning||
+|GitLab: Unicorn is queueing requests||`min(/GitLab by HTTP/gitlab.unicorn.queued_connections[{#SINGLETON}],5m)>{$GITLAB.UNICORN.QUEUE.MAX.WARN}`|Warning||
 
 ### LLD rule Puma metrics discovery
 
@@ -157,8 +157,8 @@ Also, see the Macros section for a list of [macros used](#Macros-used) to set tr
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Puma instance thread utilization is too high||`min(/GitLab by HTTP/gitlab.puma.active_connections[{#SINGLETON}],5m)/last(/GitLab by HTTP/gitlab.puma.max_threads[{#SINGLETON}])*100>{$GITLAB.PUMA.UTILIZATION.MAX.WARN}`|Warning||
-|Puma is queueing requests||`min(/GitLab by HTTP/gitlab.puma.queued_connections[{#SINGLETON}],15m)>{$GITLAB.PUMA.QUEUE.MAX.WARN}`|Warning||
+|GitLab: Puma instance thread utilization is too high||`min(/GitLab by HTTP/gitlab.puma.active_connections[{#SINGLETON}],5m)/last(/GitLab by HTTP/gitlab.puma.max_threads[{#SINGLETON}])*100>{$GITLAB.PUMA.UTILIZATION.MAX.WARN}`|Warning||
+|GitLab: Puma is queueing requests||`min(/GitLab by HTTP/gitlab.puma.queued_connections[{#SINGLETON}],15m)>{$GITLAB.PUMA.QUEUE.MAX.WARN}`|Warning||
 
 ## Feedback
 

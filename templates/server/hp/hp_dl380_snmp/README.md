@@ -74,12 +74,12 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|System status is in critical state|<p>Please check the device for errors.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.CRIT}`|High||
-|System status is in warning state|<p>Please check the device for warnings.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.WARN}`|Warning|**Depends on**:<br><ul><li>System status is in critical state</li></ul>|
-|Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#1)<>last(/HPE ProLiant DL380 by SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#2) and length(last(/HPE ProLiant DL380 by SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum]))>0`|Info|**Manual close**: Yes|
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/HPE ProLiant DL380 by SNMP/hp.server.hw.uptime[hrSystemUptime])>0 and last(/HPE ProLiant DL380 by SNMP/hp.server.hw.uptime[hrSystemUptime])<10m) or (last(/HPE ProLiant DL380 by SNMP/hp.server.hw.uptime[hrSystemUptime])=0 and last(/HPE ProLiant DL380 by SNMP/hp.server.net.uptime[sysUpTime])<10m)`|Warning|**Manual close**: Yes|
-|System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.name[sysName],#1)<>last(/HPE ProLiant DL380 by SNMP/hp.server.name[sysName],#2) and length(last(/HPE ProLiant DL380 by SNMP/hp.server.name[sysName]))>0`|Info|**Manual close**: Yes|
-|No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/HPE ProLiant DL380 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
+|HPE ProLiant DL380: System status is in critical state|<p>Please check the device for errors.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.CRIT}`|High||
+|HPE ProLiant DL380: System status is in warning state|<p>Please check the device for warnings.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.status[cpqHeMibCondition])={$HEALTH.STATUS.WARN}`|Warning|**Depends on**:<br><ul><li>HPE ProLiant DL380: System status is in critical state</li></ul>|
+|HPE ProLiant DL380: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#1)<>last(/HPE ProLiant DL380 by SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum],#2) and length(last(/HPE ProLiant DL380 by SNMP/hp.server.hw.serialnumber[cpqSiSysSerialNum]))>0`|Info|**Manual close**: Yes|
+|HPE ProLiant DL380: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/HPE ProLiant DL380 by SNMP/hp.server.hw.uptime[hrSystemUptime])>0 and last(/HPE ProLiant DL380 by SNMP/hp.server.hw.uptime[hrSystemUptime])<10m) or (last(/HPE ProLiant DL380 by SNMP/hp.server.hw.uptime[hrSystemUptime])=0 and last(/HPE ProLiant DL380 by SNMP/hp.server.net.uptime[sysUpTime])<10m)`|Warning|**Manual close**: Yes|
+|HPE ProLiant DL380: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.name[sysName],#1)<>last(/HPE ProLiant DL380 by SNMP/hp.server.name[sysName],#2) and length(last(/HPE ProLiant DL380 by SNMP/hp.server.name[sysName]))>0`|Info|**Manual close**: Yes|
+|HPE ProLiant DL380: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/HPE ProLiant DL380 by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
 
 ### LLD rule Temperature discovery
 
@@ -99,9 +99,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
-|{#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 3`|Warning||
-|{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 4`|High||
+|HPE ProLiant DL380: {#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
+|HPE ProLiant DL380: {#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 3`|Warning||
+|HPE ProLiant DL380: {#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 4`|High||
 
 ### LLD rule Temperature ambient discovery
 
@@ -120,9 +120,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Ambient: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
-|Ambient: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 3`|Warning||
-|Ambient: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 4`|High||
+|HPE ProLiant DL380: Ambient: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
+|HPE ProLiant DL380: Ambient: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 3`|Warning||
+|HPE ProLiant DL380: Ambient: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 4`|High||
 
 ### LLD rule Temperature CPU discovery
 
@@ -141,9 +141,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|CPU-{#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
-|CPU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 3`|Warning||
-|CPU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 4`|High||
+|HPE ProLiant DL380: CPU-{#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
+|HPE ProLiant DL380: CPU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 3`|Warning||
+|HPE ProLiant DL380: CPU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 4`|High||
 
 ### LLD rule Temperature memory discovery
 
@@ -162,9 +162,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Memory-{#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
-|Memory-{#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 3`|Warning||
-|Memory-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 4`|High||
+|HPE ProLiant DL380: Memory-{#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
+|HPE ProLiant DL380: Memory-{#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 3`|Warning||
+|HPE ProLiant DL380: Memory-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 4`|High||
 
 ### LLD rule Temperature PSU discovery
 
@@ -183,9 +183,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|PSU-{#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
-|PSU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 3`|Warning||
-|PSU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 4`|High||
+|HPE ProLiant DL380: PSU-{#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
+|HPE ProLiant DL380: PSU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 3`|Warning||
+|HPE ProLiant DL380: PSU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 4`|High||
 
 ### LLD rule Temperature I/O discovery
 
@@ -204,9 +204,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|I/O-{#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 1`|Info|**Manual close**: Yes|
-|I/O-{#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 3`|Warning||
-|I/O-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 4`|High||
+|HPE ProLiant DL380: I/O-{#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 1`|Info|**Manual close**: Yes|
+|HPE ProLiant DL380: I/O-{#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 3`|Warning||
+|HPE ProLiant DL380: I/O-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 4`|High||
 
 ### LLD rule Temperature system discovery
 
@@ -225,9 +225,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|System-{#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
-|System-{#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 3`|Warning||
-|System-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 4`|High||
+|HPE ProLiant DL380: System-{#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
+|HPE ProLiant DL380: System-{#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 3`|Warning||
+|HPE ProLiant DL380: System-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 4`|High||
 
 ### LLD rule PSU discovery
 
@@ -245,8 +245,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state|<p>Please check the power supply unit for errors.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}])={$PSU.STATUS.CRIT}`|Average||
-|Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in warning state|<p>Please check the power supply unit for errors.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}])={$PSU.STATUS.WARN}`|Warning|**Depends on**:<br><ul><li>Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state</li></ul>|
+|HPE ProLiant DL380: Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state|<p>Please check the power supply unit for errors.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}])={$PSU.STATUS.CRIT}`|Average||
+|HPE ProLiant DL380: Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in warning state|<p>Please check the power supply unit for errors.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}])={$PSU.STATUS.WARN}`|Warning|**Depends on**:<br><ul><li>HPE ProLiant DL380: Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state</li></ul>|
 
 ### LLD rule FAN discovery
 
@@ -264,8 +264,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Fan {#SNMPINDEX}: Fan is in critical state|<p>Please check the fan unit.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}])={$FAN.STATUS.CRIT}`|Average||
-|Fan {#SNMPINDEX}: Fan is in warning state|<p>Please check the fan unit.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}])={$FAN.STATUS.WARN}`|Warning|**Depends on**:<br><ul><li>Fan {#SNMPINDEX}: Fan is in critical state</li></ul>|
+|HPE ProLiant DL380: Fan {#SNMPINDEX}: Fan is in critical state|<p>Please check the fan unit.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}])={$FAN.STATUS.CRIT}`|Average||
+|HPE ProLiant DL380: Fan {#SNMPINDEX}: Fan is in warning state|<p>Please check the fan unit.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}])={$FAN.STATUS.WARN}`|Warning|**Depends on**:<br><ul><li>HPE ProLiant DL380: Fan {#SNMPINDEX}: Fan is in critical state</li></ul>|
 
 ### LLD rule Array controller discovery
 
@@ -284,8 +284,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#CNTLR_LOCATION}: Disk array controller is in critical state|<p>Please check the device for faults.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT}`|High||
-|{#CNTLR_LOCATION}: Disk array controller is in warning state|<p>Please check the device for faults.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.WARN}`|Average|**Depends on**:<br><ul><li>{#CNTLR_LOCATION}: Disk array controller is in critical state</li></ul>|
+|HPE ProLiant DL380: {#CNTLR_LOCATION}: Disk array controller is in critical state|<p>Please check the device for faults.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.CRIT}`|High||
+|HPE ProLiant DL380: {#CNTLR_LOCATION}: Disk array controller is in warning state|<p>Please check the device for faults.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}])={$DISK.ARRAY.STATUS.WARN}`|Average|**Depends on**:<br><ul><li>HPE ProLiant DL380: {#CNTLR_LOCATION}: Disk array controller is in critical state</li></ul>|
 
 ### LLD rule Array controller cache discovery
 
@@ -304,11 +304,11 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!|<p>Please check the device for faults.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.CRIT:"cacheModCriticalFailure"}`|Average||
-|#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state|<p>Please check the device for faults.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModDegradedFailsafeSpeed"} or last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheReadCacheNotMapped"} or last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModFlashMemNotAttached"}`|Warning|**Depends on**:<br><ul><li>#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!</li></ul>|
-|#{#CACHE_CNTRL_INDEX}: Disk array cache controller is not in optimal state|<p>Please check the device for faults.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.STATUS.OK:"enabled"} and last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.STATUS.WARN:"invalid"}`|Warning|**Depends on**:<br><ul><li>#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state</li><li>#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!</li></ul>|
-|#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state|<p>Please check the device for faults.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"failed"} or last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"capacitorFailed"}`|Average||
-|#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in warning state|<p>Please check the device for faults.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN:"degraded"}`|Warning|**Depends on**:<br><ul><li>#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state</li></ul>|
+|HPE ProLiant DL380: #{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!|<p>Please check the device for faults.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.CRIT:"cacheModCriticalFailure"}`|Average||
+|HPE ProLiant DL380: #{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state|<p>Please check the device for faults.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModDegradedFailsafeSpeed"} or last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheReadCacheNotMapped"} or last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.STATUS.WARN:"cacheModFlashMemNotAttached"}`|Warning|**Depends on**:<br><ul><li>HPE ProLiant DL380: #{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!</li></ul>|
+|HPE ProLiant DL380: #{#CACHE_CNTRL_INDEX}: Disk array cache controller is not in optimal state|<p>Please check the device for faults.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.STATUS.OK:"enabled"} and last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])<>{$DISK.ARRAY.CACHE.STATUS.WARN:"invalid"}`|Warning|**Depends on**:<br><ul><li>HPE ProLiant DL380: #{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state</li><li>HPE ProLiant DL380: #{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!</li></ul>|
+|HPE ProLiant DL380: #{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state|<p>Please check the device for faults.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"failed"} or last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT:"capacitorFailed"}`|Average||
+|HPE ProLiant DL380: #{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in warning state|<p>Please check the device for faults.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}])={$DISK.ARRAY.CACHE.BATTERY.STATUS.WARN:"degraded"}`|Warning|**Depends on**:<br><ul><li>HPE ProLiant DL380: #{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state</li></ul>|
 
 ### LLD rule Physical disk discovery
 
@@ -331,10 +331,10 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#DISK_LOCATION}: Physical disk failed|<p>Please check physical disk for warnings or errors.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL}`|High||
-|{#DISK_LOCATION}: Physical disk is in warning state|<p>Please check physical disk for warnings or errors.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.WARN}`|Warning|**Depends on**:<br><ul><li>{#DISK_LOCATION}: Physical disk failed</li></ul>|
-|{#DISK_LOCATION}: Physical disk S.M.A.R.T. failed|<p>Disk probably requires replacement.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDrive"} or last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}`|High|**Depends on**:<br><ul><li>{#DISK_LOCATION}: Physical disk failed</li></ul>|
-|{#DISK_LOCATION}: Disk has been replaced|<p>Disk serial number has changed. Acknowledge to close the problem manually.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#1)<>last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#2) and length(last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|HPE ProLiant DL380: {#DISK_LOCATION}: Physical disk failed|<p>Please check physical disk for warnings or errors.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.FAIL}`|High||
+|HPE ProLiant DL380: {#DISK_LOCATION}: Physical disk is in warning state|<p>Please check physical disk for warnings or errors.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}])={$DISK.STATUS.WARN}`|Warning|**Depends on**:<br><ul><li>HPE ProLiant DL380: {#DISK_LOCATION}: Physical disk failed</li></ul>|
+|HPE ProLiant DL380: {#DISK_LOCATION}: Physical disk S.M.A.R.T. failed|<p>Disk probably requires replacement.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDrive"} or last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}`|High|**Depends on**:<br><ul><li>HPE ProLiant DL380: {#DISK_LOCATION}: Physical disk failed</li></ul>|
+|HPE ProLiant DL380: {#DISK_LOCATION}: Disk has been replaced|<p>Disk serial number has changed. Acknowledge to close the problem manually.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#1)<>last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#2) and length(last(/HPE ProLiant DL380 by SNMP/hp.server.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Virtual disk discovery
 
@@ -354,8 +354,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed|<p>Please check virtual disk for warnings or errors.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}])={$VDISK.STATUS.CRIT}`|High||
-|Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk is not in OK state|<p>Please check virtual disk for warnings or errors.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}])<>{$VDISK.STATUS.OK}`|Warning|**Depends on**:<br><ul><li>Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed</li></ul>|
+|HPE ProLiant DL380: Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed|<p>Please check virtual disk for warnings or errors.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}])={$VDISK.STATUS.CRIT}`|High||
+|HPE ProLiant DL380: Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk is not in OK state|<p>Please check virtual disk for warnings or errors.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}])<>{$VDISK.STATUS.OK}`|Warning|**Depends on**:<br><ul><li>HPE ProLiant DL380: Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed</li></ul>|
 
 ### LLD rule Network interface discovery
 
@@ -373,8 +373,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#ADAPTER_NAME} port {#ADAPTER_INDEX}: Adapter has failed|<p>Please check the physical adapter.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}])=3`|High||
-|{#ADAPTER_NAME} port {#ADAPTER_INDEX}: Adapter has lost link|<p>Please check the cable connections to this adapter.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}])=4`|Average|**Depends on**:<br><ul><li>{#ADAPTER_NAME} port {#ADAPTER_INDEX}: Adapter has failed</li></ul>|
+|HPE ProLiant DL380: {#ADAPTER_NAME} port {#ADAPTER_INDEX}: Adapter has failed|<p>Please check the physical adapter.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}])=3`|High||
+|HPE ProLiant DL380: {#ADAPTER_NAME} port {#ADAPTER_INDEX}: Adapter has lost link|<p>Please check the cable connections to this adapter.</p>|`last(/HPE ProLiant DL380 by SNMP/hp.server.net.if.status[cpqNicIfPhysAdapterStatus.{#SNMPINDEX}])=4`|Average|**Depends on**:<br><ul><li>HPE ProLiant DL380: {#ADAPTER_NAME} port {#ADAPTER_INDEX}: Adapter has failed</li></ul>|
 
 ## Feedback
 

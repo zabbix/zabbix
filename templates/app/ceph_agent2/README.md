@@ -99,10 +99,10 @@ Test availability: `zabbix_get -s ceph-host -k ceph.ping["{$CEPH.CONNSTRING}","{
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Can not connect to cluster|<p>The connection to the Ceph RESTful module is broken (if there is any error presented including *AUTH* and the configuration issues).</p>|`last(/Ceph by Zabbix agent 2/ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"])=0`|Average||
-|Cluster in ERROR state||`last(/Ceph by Zabbix agent 2/ceph.overall_status)=2`|Average|**Manual close**: Yes|
-|Cluster in WARNING state||`last(/Ceph by Zabbix agent 2/ceph.overall_status)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Cluster in ERROR state</li></ul>|
-|Minimum monitor release version has changed|<p>A Ceph version has changed. Acknowledge to close the problem manually.</p>|`last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#1)<>last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#2) and length(last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name))>0`|Info|**Manual close**: Yes|
+|Ceph: Can not connect to cluster|<p>The connection to the Ceph RESTful module is broken (if there is any error presented including *AUTH* and the configuration issues).</p>|`last(/Ceph by Zabbix agent 2/ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"])=0`|Average||
+|Ceph: Cluster in ERROR state||`last(/Ceph by Zabbix agent 2/ceph.overall_status)=2`|Average|**Manual close**: Yes|
+|Ceph: Cluster in WARNING state||`last(/Ceph by Zabbix agent 2/ceph.overall_status)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Ceph: Cluster in ERROR state</li></ul>|
+|Ceph: Minimum monitor release version has changed|<p>A Ceph version has changed. Acknowledge to close the problem manually.</p>|`last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#1)<>last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name,#2) and length(last(/Ceph by Zabbix agent 2/ceph.min_mon_release_name))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule OSD
 
@@ -125,9 +125,9 @@ Test availability: `zabbix_get -s ceph-host -k ceph.ping["{$CEPH.CONNSTRING}","{
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|OSD osd.{#OSDNAME} is down|<p>OSD osd.{#OSDNAME} is marked "down" in the *osdmap*.<br>The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OSD over the network.</p>|`last(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},up]) = 0`|Average||
-|OSD osd.{#OSDNAME} is full||`min(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix agent 2/ceph.osd_full_ratio)*100`|Average||
-|Ceph OSD osd.{#OSDNAME} is near full||`min(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix agent 2/ceph.osd_nearfull_ratio)*100`|Warning|**Depends on**:<br><ul><li>OSD osd.{#OSDNAME} is full</li></ul>|
+|Ceph: OSD osd.{#OSDNAME} is down|<p>OSD osd.{#OSDNAME} is marked "down" in the *osdmap*.<br>The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OSD over the network.</p>|`last(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},up]) = 0`|Average||
+|Ceph: OSD osd.{#OSDNAME} is full||`min(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix agent 2/ceph.osd_full_ratio)*100`|Average||
+|Ceph: Ceph OSD osd.{#OSDNAME} is near full||`min(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix agent 2/ceph.osd_nearfull_ratio)*100`|Warning|**Depends on**:<br><ul><li>Ceph: OSD osd.{#OSDNAME} is full</li></ul>|
 
 ### LLD rule Pool
 

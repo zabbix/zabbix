@@ -58,12 +58,12 @@ Set Orchestrator URl for {$VELOCLOUD.URL}. e.g. example.com (where you replace e
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Failed to fetch aggregate data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.api_version,30m)=1`|Average|**Manual close**: Yes|
-|Orchestrator build has been changed|<p>Velocloud Orchestrator build has been changed.</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.build,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.build,#2) and length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.build))>0`|Info|**Manual close**: Yes|
-|Orchestrator version has been changed|<p>Velocloud Orchestrator version has been changed.</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.version,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.version,#2) and length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.version))>0`|Info|**Manual close**: Yes|
-|There are errors in aggregate script item|<p>There are errors in aggregate script item.</p>|`length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.get.error))>0`|Warning||
-|There are errors in edges item preprocessing script|<p>There are errors in aggregate script item.</p>|`length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.get.edges.error))>0`|Warning||
-|System properties have changed|<p>System properties have changed.</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.system.properties,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.system.properties,#2)`|Info|**Manual close**: Yes|
+|VeloCloud: Failed to fetch aggregate data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.api_version,30m)=1`|Average|**Manual close**: Yes|
+|VeloCloud: Orchestrator build has been changed|<p>Velocloud Orchestrator build has been changed.</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.build,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.build,#2) and length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.build))>0`|Info|**Manual close**: Yes|
+|VeloCloud: Orchestrator version has been changed|<p>Velocloud Orchestrator version has been changed.</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.version,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.version,#2) and length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.orchestrator.version))>0`|Info|**Manual close**: Yes|
+|VeloCloud: There are errors in aggregate script item|<p>There are errors in aggregate script item.</p>|`length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.get.error))>0`|Warning||
+|VeloCloud: There are errors in edges item preprocessing script|<p>There are errors in aggregate script item.</p>|`length(last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.get.edges.error))>0`|Warning||
+|VeloCloud: System properties have changed|<p>System properties have changed.</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.system.properties,#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.system.properties,#2)`|Info|**Manual close**: Yes|
 
 ### LLD rule Edges metrics discovery
 
@@ -89,9 +89,9 @@ Set Orchestrator URl for {$VELOCLOUD.URL}. e.g. example.com (where you replace e
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Edge [{#NAME}]: HA state is in "FAILED" state|<p>High availability state is "FAILED".</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.ha_state[{#ID}])=3`|Warning||
-|Edge [{#NAME}]: Edge is in "OFFLINE" state|<p>Edge state is "OFFLINE".</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.state[{#ID}])=0`|Warning||
-|Edge [{#NAME}]: Edge has been restarted|<p>Edge was restarted.</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.system_uptime[{#ID}])>0 and last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.system_uptime[{#ID}])<600`|Warning||
+|VeloCloud: Edge [{#NAME}]: HA state is in "FAILED" state|<p>High availability state is "FAILED".</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.ha_state[{#ID}])=3`|Warning||
+|VeloCloud: Edge [{#NAME}]: Edge is in "OFFLINE" state|<p>Edge state is "OFFLINE".</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.state[{#ID}])=0`|Warning||
+|VeloCloud: Edge [{#NAME}]: Edge has been restarted|<p>Edge was restarted.</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.system_uptime[{#ID}])>0 and last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.edge.system_uptime[{#ID}])<600`|Warning||
 
 ### LLD rule Gateways metrics discovery
 
@@ -119,8 +119,8 @@ Set Orchestrator URl for {$VELOCLOUD.URL}. e.g. example.com (where you replace e
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Gateway [{#NAME}]: The number of connected edges is changed|<p>The number of connected edges is changed.</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.connected_edges[{#ID}],#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.connected_edges[{#ID}],#2)`|Warning|**Manual close**: Yes|
-|Gateway [{#NAME}]: Gateway has been restarted|<p>Gateway was restarted.</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.system_uptime[{#ID}])>0 and last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.system_uptime[{#ID}])<600`|Warning||
+|VeloCloud: Gateway [{#NAME}]: The number of connected edges is changed|<p>The number of connected edges is changed.</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.connected_edges[{#ID}],#1)<>last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.connected_edges[{#ID}],#2)`|Warning|**Manual close**: Yes|
+|VeloCloud: Gateway [{#NAME}]: Gateway has been restarted|<p>Gateway was restarted.</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.system_uptime[{#ID}])>0 and last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.gateway.system_uptime[{#ID}])<600`|Warning||
 
 ### LLD rule Links metrics discovery
 
@@ -148,7 +148,7 @@ Set Orchestrator URl for {$VELOCLOUD.URL}. e.g. example.com (where you replace e
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Link [{#NAME}]:[{#IP}]: Link state is not "STABLE"|<p>Link state is not "STABLE".</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.link.state[{#ID}])<>1`|Warning||
+|VeloCloud: Link [{#NAME}]:[{#IP}]: Link state is not "STABLE"|<p>Link state is not "STABLE".</p>|`last(/VMWare SD-WAN VeloCloud by HTTP/velocloud.link.state[{#ID}])<>1`|Warning||
 
 ### LLD rule SDWAN peers metrics discovery
 

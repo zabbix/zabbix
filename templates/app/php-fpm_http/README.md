@@ -166,13 +166,13 @@ If you use another web server port or scheme for the location of the PHP-FPM sta
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Service is down||`last(/PHP-FPM by HTTP/php-fpm.ping)=0 or nodata(/PHP-FPM by HTTP/php-fpm.ping,3m)=1`|High|**Manual close**: Yes|
-|Version has changed|<p>The PHP-FPM version has changed. Acknowledge to close the problem manually.</p>|`last(/PHP-FPM by HTTP/php-fpm.version,#1)<>last(/PHP-FPM by HTTP/php-fpm.version,#2) and length(last(/PHP-FPM by HTTP/php-fpm.version))>0`|Info|**Manual close**: Yes|
-|Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/PHP-FPM by HTTP/php-fpm.uptime,30m)=1`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Service is down</li></ul>|
-|Pool has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/PHP-FPM by HTTP/php-fpm.uptime)<10m`|Info|**Manual close**: Yes|
-|Manager changed|<p>The PHP-FPM manager has changed. Acknowledge to close the problem manually.</p>|`last(/PHP-FPM by HTTP/php-fpm.process_manager,#1)<>last(/PHP-FPM by HTTP/php-fpm.process_manager,#2)`|Info|**Manual close**: Yes|
-|Detected slow requests|<p>The PHP-FPM has detected a slow request. <br>The slow request means that it took more time to execute than expected (defined in the configuration of your pool).</p>|`min(/PHP-FPM by HTTP/php-fpm.slow_requests,#3)>0`|Warning||
-|Queue utilization is high|<p>The queue for this pool has reached `{$PHP_FPM.QUEUE.WARN.MAX}%` of its maximum capacity. <br>Items in the queue represent the current number of connections that have been initiated on this pool but not yet accepted.</p>|`min(/PHP-FPM by HTTP/php-fpm.listen_queue_usage,15m) > {$PHP_FPM.QUEUE.WARN.MAX}`|Warning||
+|PHP-FPM: Service is down||`last(/PHP-FPM by HTTP/php-fpm.ping)=0 or nodata(/PHP-FPM by HTTP/php-fpm.ping,3m)=1`|High|**Manual close**: Yes|
+|PHP-FPM: Version has changed|<p>The PHP-FPM version has changed. Acknowledge to close the problem manually.</p>|`last(/PHP-FPM by HTTP/php-fpm.version,#1)<>last(/PHP-FPM by HTTP/php-fpm.version,#2) and length(last(/PHP-FPM by HTTP/php-fpm.version))>0`|Info|**Manual close**: Yes|
+|PHP-FPM: Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/PHP-FPM by HTTP/php-fpm.uptime,30m)=1`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>PHP-FPM: Service is down</li></ul>|
+|PHP-FPM: Pool has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/PHP-FPM by HTTP/php-fpm.uptime)<10m`|Info|**Manual close**: Yes|
+|PHP-FPM: Manager changed|<p>The PHP-FPM manager has changed. Acknowledge to close the problem manually.</p>|`last(/PHP-FPM by HTTP/php-fpm.process_manager,#1)<>last(/PHP-FPM by HTTP/php-fpm.process_manager,#2)`|Info|**Manual close**: Yes|
+|PHP-FPM: Detected slow requests|<p>The PHP-FPM has detected a slow request. <br>The slow request means that it took more time to execute than expected (defined in the configuration of your pool).</p>|`min(/PHP-FPM by HTTP/php-fpm.slow_requests,#3)>0`|Warning||
+|PHP-FPM: Queue utilization is high|<p>The queue for this pool has reached `{$PHP_FPM.QUEUE.WARN.MAX}%` of its maximum capacity. <br>Items in the queue represent the current number of connections that have been initiated on this pool but not yet accepted.</p>|`min(/PHP-FPM by HTTP/php-fpm.listen_queue_usage,15m) > {$PHP_FPM.QUEUE.WARN.MAX}`|Warning||
 
 ## Feedback
 
