@@ -72,6 +72,21 @@ ZBX_PTR_VECTOR_IMPL(correlation_ptr, zbx_correlation_t *)
 ZBX_PTR_VECTOR_IMPL(trigger_dep_ptr, zbx_trigger_dep_t *)
 ZBX_PTR_VECTOR_IMPL(trigger_timer_ptr, zbx_trigger_timer_t *)
 
+ZBX_VECTOR_IMPL(dc_item_tag, zbx_dc_item_tag_t)
+
+typedef struct
+{
+	zbx_uint64_t	itemtagid;
+	zbx_uint64_t	itemid;
+}
+zbx_dc_item_tag_link;
+
+typedef struct
+{
+	zbx_hashset_t	item_tag_links;
+}
+zbx_dc_config_private_t;
+
 void	zbx_corr_operation_free(zbx_corr_operation_t *corr_operation)
 {
 	zbx_free(corr_operation);
@@ -191,7 +206,8 @@ void	zbx_proxy_counter_ptr_free(zbx_proxy_counter_t *proxy_counter)
 static zbx_get_program_type_f	get_program_type_cb = NULL;
 static zbx_get_config_forks_f	get_config_forks_cb = NULL;
 
-zbx_dc_config_t	*config = NULL;
+zbx_dc_config_t		*config = NULL;
+zbx_dc_config_private_t	config_private;
 
 zbx_dc_config_t	*get_dc_config(void)
 {
@@ -3812,8 +3828,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 			if (ZBX_SYNCED_NEW_CONFIG_YES == synced && 0 == host->proxyid)
 				flags |= ZBX_ITEM_NEW;
 
-			zbx_vector_ptr_create_ext(&item->tags, __config_shmem_malloc_func, __config_shmem_realloc_func,
-					__config_shmem_free_func);
+			zbx_vector_dc_item_tag_create_ext(&item->tags, __config_shmem_malloc_func,
+					__config_shmem_realloc_func, __config_shmem_free_func);
 
 			zbx_hashset_insert_ext(&host->items, &ref_local, sizeof(ref_local), 0, sizeof(ref_local), uniq);
 
@@ -4074,7 +4090,13 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 		if (NULL != item->triggers)
 			config->items.mem_free_func(item->triggers);
 
-		zbx_vector_ptr_destroy(&item->tags);
+		for (i = 0; i < item->tags.values_num; i++)
+		{
+			dc_strpool_release(item->tags.values[i].tag);
+			dc_strpool_release(item->tags.values[i].value);
+		}
+
+		zbx_vector_dc_item_tag_destroy(&item->tags);
 
 		if (NULL != item->preproc_item)
 			dc_preprocitem_free(item->preproc_item);
@@ -5829,24 +5851,26 @@ static void	DCsync_item_tags(zbx_dbsync_t *sync)
 	unsigned char		tag;
 	zbx_hashset_uniq_t	uniq = ZBX_HASHSET_UNIQ_FALSE;
 	int			found, ret, index;
-	zbx_uint64_t		itemid, itemtagid;
 	ZBX_DC_ITEM		*item;
-	zbx_dc_item_tag_t	*item_tag;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_dcsync_sync_start(sync, dbconfig_used_size());
 
-	if (0 == config->item_tags.num_slots)
+	if (0 == config_private.item_tag_links.num_slots)
 	{
 		int	row_num = zbx_dbsync_get_row_num(sync);
 
-		zbx_hashset_reserve(&config->item_tags, MAX(row_num, 100));
+		zbx_hashset_reserve(&config_private.item_tag_links, MAX(row_num, 100));
 		uniq = ZBX_HASHSET_UNIQ_TRUE;
 	}
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
+		zbx_dc_item_tag_t	item_tag_local;
+		zbx_dc_item_tag_link	*item_tag_link;
+		zbx_uint64_t		itemid;
+
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
 			break;
@@ -5856,50 +5880,59 @@ static void	DCsync_item_tags(zbx_dbsync_t *sync)
 		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
 			continue;
 
-		ZBX_STR2UINT64(itemtagid, row[0]);
+		ZBX_STR2UINT64(item_tag_local.itemtagid, row[0]);
 
-		item_tag = (zbx_dc_item_tag_t *)DCfind_id_ext(&config->item_tags, itemtagid, sizeof(zbx_dc_item_tag_t),
-				&found, uniq);
-		dc_strpool_replace(found, &item_tag->tag, row[2]);
-		dc_strpool_replace(found, &item_tag->value, row[3]);
+		item_tag_link = (zbx_dc_item_tag_link *)DCfind_id_ext(&config_private.item_tag_links,
+				item_tag_local.itemtagid, sizeof(zbx_dc_item_tag_link), &found, uniq);
 
-		if (0 == found)
+		if (0 == found || FAIL == (index = zbx_vector_dc_item_tag_search(&item->tags, item_tag_local,
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 		{
-			item_tag->itemid = itemid;
-			zbx_vector_ptr_reserve(&item->tags, ZBX_VECTOR_ARRAY_RESERVE);
-			zbx_vector_ptr_append(&item->tags, item_tag);
-
+			found = 0;
+			item_tag_link->itemid = itemid;
+			zbx_vector_dc_item_tag_reserve(&item->tags, item->tags.values_alloc + 1);
+			zbx_vector_dc_item_tag_append(&item->tags, item_tag_local);
+			index = item->tags.values_num - 1;
 		}
+
+		dc_strpool_replace(found, &item->tags.values[index].tag, row[2]);
+		dc_strpool_replace(found, &item->tags.values[index].value, row[3]);
 	}
 
 	/* remove unused item tags */
 
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
-		if (NULL == (item_tag = (zbx_dc_item_tag_t *)zbx_hashset_search(&config->item_tags, &rowid)))
-			continue;
+		zbx_dc_item_tag_link	*item_tag_link;
 
-		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &item_tag->itemid)))
+		if (NULL == (item_tag_link = (zbx_dc_item_tag_link *)zbx_hashset_search(&config_private.item_tag_links,
+				&rowid)))
 		{
-			if (FAIL != (index = zbx_vector_ptr_search(&item->tags, item_tag,
-					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
-			{
-				zbx_vector_ptr_remove_noorder(&item->tags, index);
+			continue;
+		}
 
-				/* recreate empty tags vector to release used memory */
+		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &item_tag_link->itemid)))
+		{
+			zbx_dc_item_tag_t	item_tag_local = {.itemtagid = item_tag_link->itemtagid};
+
+			if (FAIL != (index = zbx_vector_dc_item_tag_search(&item->tags, item_tag_local,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			{
+				dc_strpool_release(item->tags.values[index].tag);
+				dc_strpool_release(item->tags.values[index].value);
+
+				zbx_vector_dc_item_tag_remove_noorder(&item->tags, index);
+
 				if (0 == item->tags.values_num)
 				{
-					zbx_vector_ptr_destroy(&item->tags);
-					zbx_vector_ptr_create_ext(&item->tags, __config_shmem_malloc_func,
+					zbx_vector_dc_item_tag_destroy(&item->tags);
+					zbx_vector_dc_item_tag_create_ext(&item->tags, __config_shmem_malloc_func,
 							__config_shmem_realloc_func, __config_shmem_free_func);
 				}
 			}
 		}
 
-		dc_strpool_release(item_tag->tag);
-		dc_strpool_release(item_tag->value);
-
-		zbx_hashset_remove_direct(&config->item_tags, item_tag);
+		zbx_hashset_remove_direct(&config_private.item_tag_links, item_tag_link);
 	}
 
 	zbx_dcsync_sync_end(sync, dbconfig_used_size());
@@ -8369,6 +8402,8 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 				config->template_items.num_data, config->template_items.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() preprocitems: %d (%d slots)", __func__,
 				config->preprocops.num_data, config->preprocops.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() item_tag_links: %d (%d slots)", __func__,
+				config_private.item_tag_links.num_data, config_private.item_tag_links.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : %d (%d slots)", __func__,
 				config->functions.num_data, config->functions.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : %d (%d slots)", __func__,
@@ -8994,7 +9029,6 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	CREATE_HASHSET(config->actions, 0);
 	CREATE_HASHSET(config->action_conditions, 0);
 	CREATE_HASHSET(config->trigger_tags, 0);
-	CREATE_HASHSET(config->item_tags, 0);
 	CREATE_HASHSET(config->host_tags, 0);
 	CREATE_HASHSET(config->host_tags_index, 0);
 	CREATE_HASHSET(config->correlations, 0);
@@ -9152,6 +9186,8 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	config->proxy_lastonline = 0;
 
 	zbx_dbsync_env_init(config);
+	zbx_hashset_create(&config_private.item_tag_links, 0, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 #undef CREATE_HASHSET
 #undef CREATE_HASHSET_EXT
@@ -9182,6 +9218,9 @@ void	zbx_free_configuration_cache(void)
 	config_mem = NULL;
 	zbx_rwlock_destroy(&config_history_lock);
 	zbx_rwlock_destroy(&config_lock);
+
+	zbx_hashset_destroy(&config_private.item_tag_links);
+	memset(&config_private, 0, sizeof(config_private));
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -15534,7 +15573,7 @@ static void	zbx_gather_item_tags(ZBX_DC_ITEM *item, zbx_vector_item_tag_t *item_
 {
 	for (int i = 0; i < item->tags.values_num; i++)
 	{
-		zbx_dc_item_tag_t	*dc_tag = item->tags.values[i];
+		zbx_dc_item_tag_t	*dc_tag = &item->tags.values[i];
 		zbx_item_tag_t		*tag = (zbx_item_tag_t *) zbx_malloc(NULL, sizeof(zbx_item_tag_t));
 
 		tag->tag.tag = zbx_strdup(NULL, dc_tag->tag);

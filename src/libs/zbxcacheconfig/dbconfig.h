@@ -268,6 +268,16 @@ ZBX_DC_ITEMVALUETYPE;
 
 typedef struct
 {
+	zbx_uint64_t	itemtagid;
+	const char	*tag;
+	const char	*value;
+}
+zbx_dc_item_tag_t;
+
+ZBX_VECTOR_DECL(dc_item_tag, zbx_dc_item_tag_t)
+
+typedef struct
+{
 	zbx_uint64_t		itemid;
 	zbx_uint64_t		hostid;
 	zbx_uint64_t		interfaceid;
@@ -287,7 +297,7 @@ typedef struct
 	zbx_uint64_t		templateid;
 	ZBX_DC_PREPROCITEM	*preproc_item;
 	ZBX_DC_MASTERITEM	*master_item;
-	zbx_vector_ptr_t	tags;
+	zbx_vector_dc_item_tag_t	tags;
 	int			nextcheck;
 	int			mtime;
 	int			data_expected_from;
@@ -693,14 +703,6 @@ typedef struct
 }
 zbx_dc_trigger_tag_t;
 
-typedef struct
-{
-	zbx_uint64_t	itemtagid;
-	zbx_uint64_t	itemid;
-	const char	*tag;
-	const char	*value;
-}
-zbx_dc_item_tag_t;
 
 typedef struct
 {
@@ -1012,7 +1014,6 @@ typedef struct
 	zbx_hashset_t		actions;
 	zbx_hashset_t		action_conditions;
 	zbx_hashset_t		trigger_tags;
-	zbx_hashset_t		item_tags;
 	zbx_hashset_t		host_tags;
 	zbx_hashset_t		host_tags_index;	/* host tag index by hostid */
 	zbx_hashset_t		correlations;
