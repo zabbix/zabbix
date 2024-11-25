@@ -20,7 +20,8 @@
 #define ZBX_RES_CONF_FILE "/etc/resolv.conf"
 
 #ifdef HAVE_LIBEVENT
-#include <event.h>
+#include <event2/dns.h>
+#include <event2/event.h>
 
 typedef enum
 {

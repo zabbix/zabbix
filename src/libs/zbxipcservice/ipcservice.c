@@ -17,8 +17,9 @@
 #ifdef HAVE_IPCSERVICE
 
 #ifdef HAVE_LIBEVENT
-#	include <event.h>
+#	include <event2/event.h>
 #	include <event2/thread.h>
+#	include <event2/util.h>
 #endif
 
 #include "zbxipcservice.h"
