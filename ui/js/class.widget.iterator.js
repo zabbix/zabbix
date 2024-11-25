@@ -17,6 +17,8 @@ class CWidgetIterator extends CWidget {
 
 	#unique_id_index = 0;
 
+	#ready_callback = () => {};
+
 	onInitialize() {
 		this._css_classes = {
 			...this._css_classes,
@@ -34,6 +36,7 @@ class CWidgetIterator extends CWidget {
 		};
 
 		this._widgets = new Map();
+		this._widgets_data = new Map();
 		this._placeholders = [];
 
 		this._grid_pos = [];
@@ -48,6 +51,25 @@ class CWidgetIterator extends CWidget {
 	onStart() {
 		this._events = {
 			...this._events,
+
+			widgetReady: e => {
+				const widget = e.detail.target;
+
+				this._widgets_data.get(widget.getWidgetId()).is_ready = true;
+
+				let is_ready = true;
+
+				for (const data of this._widgets_data.values()) {
+					if (!data.is_ready) {
+						is_ready = false;
+						break;
+					}
+				}
+
+				if (is_ready) {
+					this.#ready_callback();
+				}
+			},
 
 			widgetEnter: e => {
 				const widget = e.detail.target;
@@ -110,6 +132,18 @@ class CWidgetIterator extends CWidget {
 		this._target.removeEventListener('mousemove', this._events.iteratorEnter);
 		this._button_previous_page.removeEventListener('click', this._events.previousPageClick);
 		this._button_next_page.removeEventListener('click', this._events.nextPageClick);
+	}
+
+	promiseReady() {
+		return new Promise(resolve => {
+			const parent_ready_promise = super.promiseReady();
+
+			this.#ready_callback = () => resolve(parent_ready_promise);
+
+			if (this._widgets.size === 0) {
+				resolve(parent_ready_promise);
+			}
+		});
 	}
 
 	getNumHeaderLines() {
@@ -323,6 +357,7 @@ class CWidgetIterator extends CWidget {
 	_addWidget(data) {
 		const widget = this._createWidget(data);
 
+		widget.on(CWidgetBase.EVENT_READY, this._events.widgetReady);
 		widget.start();
 
 		this._body.append(widget.getView());
@@ -330,6 +365,7 @@ class CWidgetIterator extends CWidget {
 		this._truncateWidget(widget);
 
 		this._widgets.set(data.widgetid, widget);
+		this._widgets_data.set(data.widgetid, {is_ready: false});
 
 		return widget;
 	}
@@ -364,9 +400,11 @@ class CWidgetIterator extends CWidget {
 		this._body.removeChild(widget.getView());
 
 		this._removeWidgetEventListeners(widget);
+		widget.off(CWidgetBase.EVENT_READY, this._events.widgetReady);
 		widget.destroy();
 
 		this._widgets.delete(widgetid);
+		this._widgets_data.delete(widgetid);
 	}
 
 	_updateWidget(widget) {
