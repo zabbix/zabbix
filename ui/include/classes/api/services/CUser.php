@@ -107,9 +107,12 @@ class CUser extends CApiService {
 
 		// output
 		if (!$options['countOutput']) {
-			$options['output'] = $options['output'] === API_OUTPUT_EXTEND
-				? self::OUTPUT_FIELDS
-				: array_intersect($options['output'], self::OUTPUT_FIELDS);
+			if (is_array($options['output'])) {
+				$options['output'] = array_intersect($options['output'], self::OUTPUT_FIELDS);
+			}
+			elseif ($options['output'] === API_OUTPUT_EXTEND) {
+				$options['output'] = self::OUTPUT_FIELDS;
+			}
 		}
 
 		// userids
