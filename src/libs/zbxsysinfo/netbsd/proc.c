@@ -446,7 +446,7 @@ static char	*get_state(struct kinfo_proc2 *proc)
 
 int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char				*procname, *proccomm, *param, *args;
+	char				*procname, *proccomm, *param, *args, *rxp_error = NULL;
 	int				count, zbx_proc_mode, pagesize, op, arg, invalid_user = 0;
 	struct passwd			*usrinfo;
 	zbx_vector_proc_data_ptr_t	proc_data_ctx;
