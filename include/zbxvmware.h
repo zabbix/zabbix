@@ -386,6 +386,7 @@ typedef struct
 	time_t		interval;	/* last interval of vmware.eventlog[] item */
 	zbx_uint64_t	owner_itemid;	/* single item that will receive all events */
 	int		job_revision;	/* actual revision of the responsible (last created) job */
+	int		expect_num;	/* total number of events in the vc queue */
 
 	/* service event log data object that is swapped with new one during service event log update */
 	zbx_vmware_eventlog_data_t	*data;

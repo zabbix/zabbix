@@ -942,6 +942,7 @@ static	void vmware_service_clear_event_data_mem(const zbx_uint64_t max_mem, zbx_
  *             skip_old      - [IN/OUT] reset last_key of event               *
  *             events        - [OUT] pointer to output variable               *
  *             strpool_sz    - [OUT] allocated memory size for events         *
+ *             evt_top_key   - [OUT] newest event id                          *
  *             error         - [OUT] error message in case of failure         *
  *                                                                            *
  * Return value: SUCCEED - operation has completed successfully               *
@@ -951,7 +952,7 @@ static	void vmware_service_clear_event_data_mem(const zbx_uint64_t max_mem, zbx_
 static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CURL *easyhandle,
 		const zbx_uint64_t last_key, const time_t last_ts, const zbx_uint64_t shmem_free_sz,
 		const unsigned char evt_severity, unsigned char *skip_old, zbx_vector_vmware_event_ptr_t *events,
-		zbx_uint64_t *strpool_sz, char **error)
+		zbx_uint64_t *strpool_sz, zbx_uint64_t *evt_top_key, char **error)
 {
 #	define ATTEMPTS_NUM	4
 #	define EVENT_TAG	1
@@ -980,9 +981,12 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "%s() latestPage events:%d", __func__, events->values_num);
 
+		*evt_top_key = events->values[0]->key;
 		ret = SUCCEED;
 		goto end_session;
 	}
+
+	*evt_top_key = 0;
 
 	do
 	{
@@ -997,6 +1001,10 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 		{
 			soap_count = (int)(LAST_KEY(events) - last_key - 1);
 		}
+
+		/* we store the identifier here because later we can trim the vector according to the memory limit */
+		if (0 == *evt_top_key && 0 != events->values_num)
+			*evt_top_key = events->values[0]->key;
 
 		if (!ZBX_IS_RUNNING() || (0 < soap_count && SUCCEED != vmware_service_read_previous_events(easyhandle,
 				event_session, soap_count, &doc, error)))
@@ -1019,6 +1027,9 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 			&service->eventlog, evt_severity, strpool_sz, &node_count, skip_old)) ||
 			(0 == node_count && 0 < soap_retry--)) && 0 == *skip_old &&
 			(0 == events->values_num || LAST_KEY(events) != last_key + 1));
+
+	if (0 == *evt_top_key)
+		*evt_top_key = 0 != events->values_num ? events->values[0]->key : last_key;
 
 	if (shmem_free_sz < *strpool_sz + vmware_service_evt_vector_memsize(events))
 		vmware_service_clear_event_data_mem(shmem_free_sz, strpool_sz, events);
@@ -1195,9 +1206,10 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 	int				ret = FAIL;
 	ZBX_HTTPPAGE			page;	/* 347K/87K */
 	unsigned char			evt_pause = 0, evt_skip_old, evt_severity;
-	zbx_uint64_t			evt_last_key, events_sz = 0, shmem_free_sz = 0;
+	zbx_uint64_t			evt_last_key, evt_top_key, events_sz = 0, shmem_free_sz = 0;
 	time_t				evt_last_ts;
 	char				msg[VMWARE_SHORT_STR_LEN];
+	float				shmem_factor = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, service->username, service->url);
 
@@ -1229,14 +1241,10 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 			shmem_free_sz = vmware_shmem_get_vmware_mem()->free_size -
 					vmware_shmem_get_vmware_mem()->total_size * 5 / 100;
 
-			/* we read events small 1MB (13.5k events) chunks because: */
-			/* - easy for poller */
-			/* - getting data in UI faster */
-			/* - more predictable memory split across multiple VC */
-			/* - memory fragmentation: no need for one monotonic huge chunk of memory */
-			if (shmem_free_sz > ZBX_MEBIBYTE)
-				shmem_free_sz = ZBX_MEBIBYTE;
-
+			/* we try to escape the scenario when new events happen faster than we can read them */
+			/* in case of small memory chunk and long item polling interval */
+			shmem_factor = vmware_shared_evtpart_size(service->eventlog.expect_num);
+			shmem_free_sz *= shmem_factor;
 			service->eventlog.req_sz = 0;
 
 			if (FAIL == vmware_shared_is_ready())
@@ -1294,7 +1302,7 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 	/* we stopped last time or item can't accept values 	*/
 	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED != evt_last_key && 0 == evt_skip_old && 0 != shmem_free_sz &&
 			SUCCEED != vmware_service_get_event_data(service, easyhandle, evt_last_key, evt_last_ts,
-			shmem_free_sz, evt_severity, &evt_skip_old, &evt_data->events, &events_sz,
+			shmem_free_sz, evt_severity, &evt_skip_old, &evt_data->events, &events_sz, &evt_top_key,
 			&evt_data->error))
 	{
 		goto clean;
@@ -1312,7 +1320,10 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 			zbx_free(error);
 		}
 		else
+		{
 			evt_skip_old = 0;
+			evt_top_key = evt_data->events.values[0]->key;
+		}
 	}
 
 	if (SUCCEED != vmware_service_logout(service, easyhandle, &evt_data->error))
@@ -1333,6 +1344,10 @@ out:
 	{
 		if (0 != service->eventlog.oom)
 			service->eventlog.oom = 0;
+
+		/* statistically we can expect the same number of events next time */
+		service->eventlog.expect_num = evt_data->events.values_num +
+				evt_top_key - evt_data->events.values[0]->key;
 
 		events_sz += vmware_service_evt_vector_memsize(&evt_data->events);
 
@@ -1382,9 +1397,11 @@ out:
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 		zbx_shmem_dump_stats(LOG_LEVEL_DEBUG, vmware_shmem_get_vmware_mem());
 
-	zbx_snprintf(msg, sizeof(msg), "Events:%d VMwareCache memory usage (free/strpool/total): " ZBX_FS_UI64 " / "
+	zbx_snprintf(msg, sizeof(msg), "Events (number/expect/factor/chunk):%d / %d / %.2f / " ZBX_FS_UI64
+			" VMwareCache memory usage (free/strpool/total): " ZBX_FS_UI64 " / "
 			ZBX_FS_UI64 " / " ZBX_FS_UI64,
 			NULL != service->eventlog.data ? service->eventlog.data->events.values_num : 0,
+			service->eventlog.expect_num, shmem_factor, shmem_free_sz,
 			vmware_shmem_get_vmware_mem()->free_size, zbx_vmware_get_vmware()->strpool_sz,
 			vmware_shmem_get_vmware_mem()->total_size);
 
