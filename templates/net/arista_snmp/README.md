@@ -84,13 +84,13 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/Arista by SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}`|Warning||
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Arista by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Arista by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Arista by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Arista by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>No SNMP data collection</li></ul>|
-|System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Arista by SNMP/system.name,#1)<>last(/Arista by SNMP/system.name,#2) and length(last(/Arista by SNMP/system.name))>0`|Info|**Manual close**: Yes|
-|No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Arista by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/Arista by SNMP/icmpping,#3)=0`|High||
-|High ICMP ping loss||`min(/Arista by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Arista by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/Arista by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>High ICMP ping loss</li><li>Unavailable by ICMP ping</li></ul>|
+|Arista: High CPU utilization|<p>CPU utilization is too high. The system might be slow to respond.</p>|`min(/Arista by SNMP/system.cpu.util,5m)>{$CPU.UTIL.CRIT}`|Warning||
+|Arista: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Arista by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Arista by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Arista by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Arista by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Arista: No SNMP data collection</li></ul>|
+|Arista: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Arista by SNMP/system.name,#1)<>last(/Arista by SNMP/system.name,#2) and length(last(/Arista by SNMP/system.name))>0`|Info|**Manual close**: Yes|
+|Arista: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Arista by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Arista: Unavailable by ICMP ping</li></ul>|
+|Arista: Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/Arista by SNMP/icmpping,#3)=0`|High||
+|Arista: High ICMP ping loss||`min(/Arista by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Arista by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Arista: Unavailable by ICMP ping</li></ul>|
+|Arista: High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/Arista by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>Arista: High ICMP ping loss</li><li>Arista: Unavailable by ICMP ping</li></ul>|
 
 ### LLD rule Temperature discovery
 
@@ -109,10 +109,10 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SENSOR_INFO}: Temperature is below the warning threshold|<p>This trigger uses temperature sensor values defined in the device.</p>|`max(/Arista by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_WARN}`|Warning|**Depends on**:<br><ul><li>{#SENSOR_INFO}: Temperature is below the critical threshold</li></ul>|
-|{#SENSOR_INFO}: Temperature is below the critical threshold|<p>This trigger uses temperature sensor values defined in the device.</p>|`max(/Arista by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}`|High||
-|{#SENSOR_INFO}: Temperature is above the warning threshold|<p>This trigger uses temperature sensor values defined in the device.</p>|`min(/Arista by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_WARN}`|Warning|**Depends on**:<br><ul><li>{#SENSOR_INFO}: Temperature is above the critical threshold</li></ul>|
-|{#SENSOR_INFO}: Temperature is above the critical threshold|<p>This trigger uses temperature sensor values defined in the device.</p>|`min(/Arista by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}`|High||
+|Arista: {#SENSOR_INFO}: Temperature is below the warning threshold|<p>This trigger uses temperature sensor values defined in the device.</p>|`max(/Arista by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_WARN}`|Warning|**Depends on**:<br><ul><li>Arista: {#SENSOR_INFO}: Temperature is below the critical threshold</li></ul>|
+|Arista: {#SENSOR_INFO}: Temperature is below the critical threshold|<p>This trigger uses temperature sensor values defined in the device.</p>|`max(/Arista by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}`|High||
+|Arista: {#SENSOR_INFO}: Temperature is above the warning threshold|<p>This trigger uses temperature sensor values defined in the device.</p>|`min(/Arista by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_WARN}`|Warning|**Depends on**:<br><ul><li>Arista: {#SENSOR_INFO}: Temperature is above the critical threshold</li></ul>|
+|Arista: {#SENSOR_INFO}: Temperature is above the critical threshold|<p>This trigger uses temperature sensor values defined in the device.</p>|`min(/Arista by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}`|High||
 
 ### LLD rule Fan discovery
 
@@ -131,11 +131,11 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SENSOR_INFO}: Fan speed is below the warning threshold|<p>This trigger uses fan sensor values defined in the device.</p>|`max(/Arista by SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_WARN}`|Warning|**Depends on**:<br><ul><li>{#SENSOR_INFO}: Fan speed is below the critical threshold</li><li>{#SENSOR_INFO}: Fan is in critical state</li></ul>|
-|{#SENSOR_INFO}: Fan speed is below the critical threshold|<p>This trigger uses fan sensor values defined in the device.</p>|`max(/Arista by SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}`|High|**Depends on**:<br><ul><li>{#SENSOR_INFO}: Fan is in critical state</li></ul>|
-|{#SENSOR_INFO}: Fan speed is above the warning threshold|<p>This trigger uses fan sensor values defined in the device.</p>|`min(/Arista by SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_WARN}`|Warning|**Depends on**:<br><ul><li>{#SENSOR_INFO}: Fan speed is above the critical threshold</li><li>{#SENSOR_INFO}: Fan is in critical state</li></ul>|
-|{#SENSOR_INFO}: Fan speed is above the critical threshold|<p>This trigger uses fan sensor values defined in the device.</p>|`min(/Arista by SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}`|High|**Depends on**:<br><ul><li>{#SENSOR_INFO}: Fan is in critical state</li></ul>|
-|{#SENSOR_INFO}: Fan is in critical state|<p>Please check the fan unit</p>|`count(/Arista by SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1`|Average||
+|Arista: {#SENSOR_INFO}: Fan speed is below the warning threshold|<p>This trigger uses fan sensor values defined in the device.</p>|`max(/Arista by SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_WARN}`|Warning|**Depends on**:<br><ul><li>Arista: {#SENSOR_INFO}: Fan speed is below the critical threshold</li><li>Arista: {#SENSOR_INFO}: Fan is in critical state</li></ul>|
+|Arista: {#SENSOR_INFO}: Fan speed is below the critical threshold|<p>This trigger uses fan sensor values defined in the device.</p>|`max(/Arista by SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}`|High|**Depends on**:<br><ul><li>Arista: {#SENSOR_INFO}: Fan is in critical state</li></ul>|
+|Arista: {#SENSOR_INFO}: Fan speed is above the warning threshold|<p>This trigger uses fan sensor values defined in the device.</p>|`min(/Arista by SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_WARN}`|Warning|**Depends on**:<br><ul><li>Arista: {#SENSOR_INFO}: Fan speed is above the critical threshold</li><li>Arista: {#SENSOR_INFO}: Fan is in critical state</li></ul>|
+|Arista: {#SENSOR_INFO}: Fan speed is above the critical threshold|<p>This trigger uses fan sensor values defined in the device.</p>|`min(/Arista by SNMP/sensor.fan.speed[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}`|High|**Depends on**:<br><ul><li>Arista: {#SENSOR_INFO}: Fan is in critical state</li></ul>|
+|Arista: {#SENSOR_INFO}: Fan is in critical state|<p>Please check the fan unit</p>|`count(/Arista by SNMP/sensor.fan.status[entPhySensorOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1`|Average||
 
 ### LLD rule Voltage discovery
 
@@ -153,10 +153,10 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SENSOR_INFO}: Voltage is below the warning threshold|<p>This trigger uses voltage sensor values defined in the device.</p>|`max(/Arista by SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_WARN}`|Warning|**Depends on**:<br><ul><li>{#SENSOR_INFO}: Voltage is below the critical threshold</li></ul>|
-|{#SENSOR_INFO}: Voltage is below the critical threshold|<p>This trigger uses voltage sensor values defined in the device.</p>|`max(/Arista by SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}`|High||
-|{#SENSOR_INFO}: Voltage is above the warning threshold|<p>This trigger uses voltage sensor values defined in the device.</p>|`min(/Arista by SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_WARN}`|Warning|**Depends on**:<br><ul><li>{#SENSOR_INFO}: Voltage is above the critical threshold</li></ul>|
-|{#SENSOR_INFO}: Voltage is above the critical threshold|<p>This trigger uses voltage sensor values defined in the device.</p>|`min(/Arista by SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}`|High||
+|Arista: {#SENSOR_INFO}: Voltage is below the warning threshold|<p>This trigger uses voltage sensor values defined in the device.</p>|`max(/Arista by SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_WARN}`|Warning|**Depends on**:<br><ul><li>Arista: {#SENSOR_INFO}: Voltage is below the critical threshold</li></ul>|
+|Arista: {#SENSOR_INFO}: Voltage is below the critical threshold|<p>This trigger uses voltage sensor values defined in the device.</p>|`max(/Arista by SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) < {#THRESHOLD_LO_CRIT}`|High||
+|Arista: {#SENSOR_INFO}: Voltage is above the warning threshold|<p>This trigger uses voltage sensor values defined in the device.</p>|`min(/Arista by SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_WARN}`|Warning|**Depends on**:<br><ul><li>Arista: {#SENSOR_INFO}: Voltage is above the critical threshold</li></ul>|
+|Arista: {#SENSOR_INFO}: Voltage is above the critical threshold|<p>This trigger uses voltage sensor values defined in the device.</p>|`min(/Arista by SNMP/sensor.voltage.value[entPhySensorValue.{#SNMPINDEX}],5m) > {#THRESHOLD_HI_CRIT}`|High||
 
 ### LLD rule Entity discovery
 
@@ -175,7 +175,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#ENT_NAME}: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Arista by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Arista by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/Arista by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|Arista: {#ENT_NAME}: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Arista by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/Arista by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/Arista by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule PSU discovery
 
@@ -193,7 +193,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#ENT_NAME}: Power supply is in critical state|<p>Please check the power supply unit for errors</p>|`count(/Arista by SNMP/sensor.psu.status[entStateOper.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1`|Average||
+|Arista: {#ENT_NAME}: Power supply is in critical state|<p>Please check the power supply unit for errors</p>|`count(/Arista by SNMP/sensor.psu.status[entStateOper.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1`|Average||
 
 ### LLD rule Storage discovery
 
@@ -213,8 +213,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#FSNAME}: Disk space is critically low|<p>Two conditions should match:<br>1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}`.<br>2. The second condition should be one of the following:<br>- the disk free space is less than `{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}`;<br>- the disk will be full in less than 24 hours.</p>|`last(/Arista by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and ((last(/Arista by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Arista by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Arista by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)`|Average|**Manual close**: Yes|
-|{#FSNAME}: Disk space is low|<p>Two conditions should match:<br>1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}`.<br>2. The second condition should be one of the following:<br>- the disk free space is less than `{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}`;<br>- the disk will be full in less than 24 hours.</p>|`last(/Arista by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and ((last(/Arista by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Arista by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Arista by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>{#FSNAME}: Disk space is critically low</li></ul>|
+|Arista: {#FSNAME}: Disk space is critically low|<p>Two conditions should match:<br>1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}`.<br>2. The second condition should be one of the following:<br>- the disk free space is less than `{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}`;<br>- the disk will be full in less than 24 hours.</p>|`last(/Arista by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and ((last(/Arista by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Arista by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Arista by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)`|Average|**Manual close**: Yes|
+|Arista: {#FSNAME}: Disk space is low|<p>Two conditions should match:<br>1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}`.<br>2. The second condition should be one of the following:<br>- the disk free space is less than `{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}`;<br>- the disk will be full in less than 24 hours.</p>|`last(/Arista by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and ((last(/Arista by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Arista by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Arista by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Arista: {#FSNAME}: Disk space is critically low</li></ul>|
 
 ### LLD rule Memory discovery
 
@@ -234,7 +234,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#MEMNAME}: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Arista by SNMP/vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}`|Average||
+|Arista: {#MEMNAME}: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Arista by SNMP/vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}`|Average||
 
 ### LLD rule Network interfaces discovery
 
@@ -260,10 +260,10 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))`|Average|**Manual close**: Yes|
-|Interface {#IFNAME}({#IFALIAS}): High bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/Arista by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Arista by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or avg(/Arista by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Arista by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and last(/Arista by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): High error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/Arista by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"} or min(/Arista by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.</p>|`change(/Arista by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Arista by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and ( last(/Arista by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or last(/Arista by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or last(/Arista by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or last(/Arista by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or last(/Arista by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or last(/Arista by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117 ) and (last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|Arista: Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))`|Average|**Manual close**: Yes|
+|Arista: Interface {#IFNAME}({#IFALIAS}): High bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/Arista by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Arista by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or avg(/Arista by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Arista by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and last(/Arista by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Arista: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|Arista: Interface {#IFNAME}({#IFALIAS}): High error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/Arista by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"} or min(/Arista by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Arista: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|Arista: Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.</p>|`change(/Arista by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Arista by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and ( last(/Arista by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or last(/Arista by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or last(/Arista by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or last(/Arista by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or last(/Arista by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or last(/Arista by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117 ) and (last(/Arista by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Arista: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
 
 ### LLD rule EtherLike-MIB Discovery
 
@@ -281,7 +281,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Interface {#IFNAME}({#IFALIAS}): In half-duplex mode|<p>Please check autonegotiation settings and cabling.</p>|`last(/Arista by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2`|Warning|**Manual close**: Yes|
+|Arista: Interface {#IFNAME}({#IFALIAS}): In half-duplex mode|<p>Please check autonegotiation settings and cabling.</p>|`last(/Arista by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2`|Warning|**Manual close**: Yes|
 
 ## Feedback
 

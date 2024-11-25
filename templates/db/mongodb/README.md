@@ -102,13 +102,13 @@ Test availability: `zabbix_get -s mongodb.node -k 'mongodb.ping["{$MONGODB.CONNS
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Connection to MongoDB is unavailable|<p>Connection to MongoDB instance is currently unavailable.</p>|`last(/MongoDB node by Zabbix agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0`|High||
-|Version has changed|<p>MongoDB version has changed. Acknowledge to close the problem manually.</p>|`last(/MongoDB node by Zabbix agent 2/mongodb.version["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"],#1)<>last(/MongoDB node by Zabbix agent 2/mongodb.version["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"],#2) and length(last(/MongoDB node by Zabbix agent 2/mongodb.version["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]))>0`|Info|**Manual close**: Yes|
-|mongod process has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/MongoDB node by Zabbix agent 2/mongodb.uptime)<10m`|Info|**Manual close**: Yes|
-|Failed to fetch info data|<p>Zabbix has not received data for items for the last 10 minutes</p>|`nodata(/MongoDB node by Zabbix agent 2/mongodb.uptime,10m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Connection to MongoDB is unavailable</li></ul>|
-|Total number of open connections is too high|<p>Too few available connections.<br>If MongoDB runs low on connections, in may not be able to handle incoming requests in a timely manner.</p>|`min(/MongoDB node by Zabbix agent 2/mongodb.connections.current,5m)/(last(/MongoDB node by Zabbix agent 2/mongodb.connections.available)+last(/MongoDB node by Zabbix agent 2/mongodb.connections.current))*100>{$MONGODB.CONNS.PCT.USED.MAX.WARN}`|Warning||
-|Too many cursors opened by MongoDB for clients||`min(/MongoDB node by Zabbix agent 2/mongodb.cursor.open.total,5m)>{$MONGODB.CURSOR.OPEN.MAX.WARN}`|Warning||
-|Too many cursors are timing out||`min(/MongoDB node by Zabbix agent 2/mongodb.cursor.timed_out.rate,5m)>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}`|Warning||
+|MongoDB node: Connection to MongoDB is unavailable|<p>Connection to MongoDB instance is currently unavailable.</p>|`last(/MongoDB node by Zabbix agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0`|High||
+|MongoDB node: Version has changed|<p>MongoDB version has changed. Acknowledge to close the problem manually.</p>|`last(/MongoDB node by Zabbix agent 2/mongodb.version["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"],#1)<>last(/MongoDB node by Zabbix agent 2/mongodb.version["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"],#2) and length(last(/MongoDB node by Zabbix agent 2/mongodb.version["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"]))>0`|Info|**Manual close**: Yes|
+|MongoDB node: mongod process has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/MongoDB node by Zabbix agent 2/mongodb.uptime)<10m`|Info|**Manual close**: Yes|
+|MongoDB node: Failed to fetch info data|<p>Zabbix has not received data for items for the last 10 minutes</p>|`nodata(/MongoDB node by Zabbix agent 2/mongodb.uptime,10m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>MongoDB node: Connection to MongoDB is unavailable</li></ul>|
+|MongoDB node: Total number of open connections is too high|<p>Too few available connections.<br>If MongoDB runs low on connections, in may not be able to handle incoming requests in a timely manner.</p>|`min(/MongoDB node by Zabbix agent 2/mongodb.connections.current,5m)/(last(/MongoDB node by Zabbix agent 2/mongodb.connections.available)+last(/MongoDB node by Zabbix agent 2/mongodb.connections.current))*100>{$MONGODB.CONNS.PCT.USED.MAX.WARN}`|Warning||
+|MongoDB node: Too many cursors opened by MongoDB for clients||`min(/MongoDB node by Zabbix agent 2/mongodb.cursor.open.total,5m)>{$MONGODB.CURSOR.OPEN.MAX.WARN}`|Warning||
+|MongoDB node: Too many cursors are timing out||`min(/MongoDB node by Zabbix agent 2/mongodb.cursor.timed_out.rate,5m)>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}`|Warning||
 
 ### LLD rule Database discovery
 
@@ -204,9 +204,9 @@ Test availability: `zabbix_get -s mongodb.node -k 'mongodb.ping["{$MONGODB.CONNS
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Node in ReplicaSet changed the state|<p>Node in ReplicaSet  changed the state. Acknowledge to close the problem manually.</p>|`last(/MongoDB node by Zabbix agent 2/mongodb.rs.state[{#RS_NAME}],#1)<>last(/MongoDB node by Zabbix agent 2/mongodb.rs.state[{#RS_NAME}],#2)`|Warning|**Manual close**: Yes|
-|Replication lag with primary is too high||`min(/MongoDB node by Zabbix agent 2/mongodb.rs.lag[{#RS_NAME}],5m)>{$MONGODB.REPL.LAG.MAX.WARN}`|Warning||
-|There are unhealthy replicas in ReplicaSet||`last(/MongoDB node by Zabbix agent 2/mongodb.rs.unhealthy_count[{#RS_NAME}])>0 and length(last(/MongoDB node by Zabbix agent 2/mongodb.rs.unhealthy[{#RS_NAME}]))>0`|Average||
+|MongoDB node: Node in ReplicaSet changed the state|<p>Node in ReplicaSet  changed the state. Acknowledge to close the problem manually.</p>|`last(/MongoDB node by Zabbix agent 2/mongodb.rs.state[{#RS_NAME}],#1)<>last(/MongoDB node by Zabbix agent 2/mongodb.rs.state[{#RS_NAME}],#2)`|Warning|**Manual close**: Yes|
+|MongoDB node: Replication lag with primary is too high||`min(/MongoDB node by Zabbix agent 2/mongodb.rs.lag[{#RS_NAME}],5m)>{$MONGODB.REPL.LAG.MAX.WARN}`|Warning||
+|MongoDB node: There are unhealthy replicas in ReplicaSet||`last(/MongoDB node by Zabbix agent 2/mongodb.rs.unhealthy_count[{#RS_NAME}])>0 and length(last(/MongoDB node by Zabbix agent 2/mongodb.rs.unhealthy[{#RS_NAME}]))>0`|Average||
 
 ### LLD rule WiredTiger metrics
 
@@ -240,8 +240,8 @@ Test availability: `zabbix_get -s mongodb.node -k 'mongodb.ping["{$MONGODB.CONNS
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Available WiredTiger read tickets is low|<p>Too few available read tickets.<br>When the number of available read tickets remaining reaches zero, new read requests will be queued until a new read ticket is available.</p>|`max(/MongoDB node by Zabbix agent 2/mongodb.wired_tiger.concurrent_transactions.read.available[{#SINGLETON}],5m)<{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}`|Warning||
-|Available WiredTiger write tickets is low|<p>Too few available write tickets.<br>When the number of available write tickets remaining reaches zero, new write requests will be queued until a new write ticket is available.</p>|`max(/MongoDB node by Zabbix agent 2/mongodb.wired_tiger.concurrent_transactions.write.available[{#SINGLETON}],5m)<{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}`|Warning||
+|MongoDB node: Available WiredTiger read tickets is low|<p>Too few available read tickets.<br>When the number of available read tickets remaining reaches zero, new read requests will be queued until a new read ticket is available.</p>|`max(/MongoDB node by Zabbix agent 2/mongodb.wired_tiger.concurrent_transactions.read.available[{#SINGLETON}],5m)<{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}`|Warning||
+|MongoDB node: Available WiredTiger write tickets is low|<p>Too few available write tickets.<br>When the number of available write tickets remaining reaches zero, new write requests will be queued until a new write ticket is available.</p>|`max(/MongoDB node by Zabbix agent 2/mongodb.wired_tiger.concurrent_transactions.write.available[{#SINGLETON}],5m)<{$MONGODB.WIRED_TIGER.TICKETS.AVAILABLE.MIN.WARN}`|Warning||
 
 ## Feedback
 

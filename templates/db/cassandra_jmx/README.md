@@ -114,12 +114,12 @@ Metrics are collected by JMX.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|There are down nodes in cluster||`last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.net:type=FailureDetector","DownEndpointCount"])>0`|Average||
-|Version has changed|<p>Cassandra version has changed. Acknowledge to close the problem manually.</p>|`last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"],#1)<>last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"],#2) and length(last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"]))>0`|Info|**Manual close**: Yes|
-|Failed to fetch info data|<p>Zabbix has not received data for items for the last 15 minutes</p>|`nodata(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Storage,name=Load","Count"],15m)=1`|Warning||
-|Too many storage exceptions||`min(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Storage,name=Exceptions","Count"],5m)>0`|Warning||
-|Many pending tasks||`min(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"],15m)>{$CASSANDRA.PENDING_TASKS.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Too many pending tasks</li></ul>|
-|Too many pending tasks||`min(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"],15m)>{$CASSANDRA.PENDING_TASKS.MAX.HIGH}`|Average||
+|Apache Cassandra: There are down nodes in cluster||`last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.net:type=FailureDetector","DownEndpointCount"])>0`|Average||
+|Apache Cassandra: Version has changed|<p>Cassandra version has changed. Acknowledge to close the problem manually.</p>|`last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"],#1)<>last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"],#2) and length(last(/Apache Cassandra by JMX/jmx["org.apache.cassandra.db:type=StorageService","ReleaseVersion"]))>0`|Info|**Manual close**: Yes|
+|Apache Cassandra: Failed to fetch info data|<p>Zabbix has not received data for items for the last 15 minutes</p>|`nodata(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Storage,name=Load","Count"],15m)=1`|Warning||
+|Apache Cassandra: Too many storage exceptions||`min(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Storage,name=Exceptions","Count"],5m)>0`|Warning||
+|Apache Cassandra: Many pending tasks||`min(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"],15m)>{$CASSANDRA.PENDING_TASKS.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Apache Cassandra: Too many pending tasks</li></ul>|
+|Apache Cassandra: Too many pending tasks||`min(/Apache Cassandra by JMX/jmx["org.apache.cassandra.metrics:type=Compaction,name=PendingTasks","Value"],15m)>{$CASSANDRA.PENDING_TASKS.MAX.HIGH}`|Average||
 
 ### LLD rule Tables
 

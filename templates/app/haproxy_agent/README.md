@@ -76,10 +76,10 @@ frontend stats
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Version has changed|<p>HAProxy version has changed. Acknowledge to close the problem manually.</p>|`last(/HAProxy by Zabbix agent/haproxy.version,#1)<>last(/HAProxy by Zabbix agent/haproxy.version,#2) and length(last(/HAProxy by Zabbix agent/haproxy.version))>0`|Info|**Manual close**: Yes|
-|has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/HAProxy by Zabbix agent/haproxy.uptime)<10m`|Info|**Manual close**: Yes|
-|Service is down||`last(/HAProxy by Zabbix agent/net.tcp.service["{$HAPROXY.STATS.SCHEME}","{$HAPROXY.STATS.HOST}","{$HAPROXY.STATS.PORT}"])=0`|Average|**Manual close**: Yes|
-|Service response time is too high||`min(/HAProxy by Zabbix agent/net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{$HAPROXY.STATS.HOST}","{$HAPROXY.STATS.PORT}"],5m)>{$HAPROXY.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Service is down</li></ul>|
+|HAProxy: Version has changed|<p>HAProxy version has changed. Acknowledge to close the problem manually.</p>|`last(/HAProxy by Zabbix agent/haproxy.version,#1)<>last(/HAProxy by Zabbix agent/haproxy.version,#2) and length(last(/HAProxy by Zabbix agent/haproxy.version))>0`|Info|**Manual close**: Yes|
+|HAProxy: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/HAProxy by Zabbix agent/haproxy.uptime)<10m`|Info|**Manual close**: Yes|
+|HAProxy: Service is down||`last(/HAProxy by Zabbix agent/net.tcp.service["{$HAPROXY.STATS.SCHEME}","{$HAPROXY.STATS.HOST}","{$HAPROXY.STATS.PORT}"])=0`|Average|**Manual close**: Yes|
+|HAProxy: Service response time is too high||`min(/HAProxy by Zabbix agent/net.tcp.service.perf["{$HAPROXY.STATS.SCHEME}","{$HAPROXY.STATS.HOST}","{$HAPROXY.STATS.PORT}"],5m)>{$HAPROXY.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HAProxy: Service is down</li></ul>|
 
 ### LLD rule Backend discovery
 
@@ -117,11 +117,11 @@ frontend stats
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|backend {#PXNAME}: Server is DOWN|<p>Backend is not available.</p>|`count(/HAProxy by Zabbix agent/haproxy.backend.status[{#PXNAME},{#SVNAME}],#5,"eq","DOWN")=5`|Average||
-|backend {#PXNAME}: Average response time is high|<p>Average backend response time (in ms) for the last 1,024 requests is more than {$HAPROXY.BACK_RTIME.MAX.WARN}.</p>|`min(/HAProxy by Zabbix agent/haproxy.backend.rtime[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.BACK_RTIME.MAX.WARN}`|Warning||
-|backend {#PXNAME}: Number of responses with error is high|<p>Number of requests on backend, whose responses yielded an error, is more than {$HAPROXY.BACK_ERESP.MAX.WARN}.</p>|`min(/HAProxy by Zabbix agent/haproxy.backend.eresp.rate[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.BACK_ERESP.MAX.WARN}`|Warning||
-|backend {#PXNAME}: Current number of requests unassigned in queue is high|<p>Current number of requests on backend unassigned in queue is more than {$HAPROXY.BACK_QCUR.MAX.WARN}.</p>|`min(/HAProxy by Zabbix agent/haproxy.backend.qcur[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.BACK_QCUR.MAX.WARN}`|Warning||
-|backend {#PXNAME}: Average time spent in queue is high|<p>Average time spent in queue (in ms) for the last 1,024 requests is more than {$HAPROXY.BACK_QTIME.MAX.WARN}.</p>|`min(/HAProxy by Zabbix agent/haproxy.backend.qtime[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.BACK_QTIME.MAX.WARN}`|Warning||
+|HAProxy: backend {#PXNAME}: Server is DOWN|<p>Backend is not available.</p>|`count(/HAProxy by Zabbix agent/haproxy.backend.status[{#PXNAME},{#SVNAME}],#5,"eq","DOWN")=5`|Average||
+|HAProxy: backend {#PXNAME}: Average response time is high|<p>Average backend response time (in ms) for the last 1,024 requests is more than {$HAPROXY.BACK_RTIME.MAX.WARN}.</p>|`min(/HAProxy by Zabbix agent/haproxy.backend.rtime[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.BACK_RTIME.MAX.WARN}`|Warning||
+|HAProxy: backend {#PXNAME}: Number of responses with error is high|<p>Number of requests on backend, whose responses yielded an error, is more than {$HAPROXY.BACK_ERESP.MAX.WARN}.</p>|`min(/HAProxy by Zabbix agent/haproxy.backend.eresp.rate[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.BACK_ERESP.MAX.WARN}`|Warning||
+|HAProxy: backend {#PXNAME}: Current number of requests unassigned in queue is high|<p>Current number of requests on backend unassigned in queue is more than {$HAPROXY.BACK_QCUR.MAX.WARN}.</p>|`min(/HAProxy by Zabbix agent/haproxy.backend.qcur[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.BACK_QCUR.MAX.WARN}`|Warning||
+|HAProxy: backend {#PXNAME}: Average time spent in queue is high|<p>Average time spent in queue (in ms) for the last 1,024 requests is more than {$HAPROXY.BACK_QTIME.MAX.WARN}.</p>|`min(/HAProxy by Zabbix agent/haproxy.backend.qtime[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.BACK_QTIME.MAX.WARN}`|Warning||
 
 ### LLD rule Frontend discovery
 
@@ -154,9 +154,9 @@ frontend stats
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|frontend {#PXNAME}: Session utilization is high|<p>Alerting on this metric is essential to ensure your server has sufficient capacity to handle all concurrent sessions. Unlike requests, upon reaching the session limit HAProxy will deny additional clients until resource consumption drops. Furthermore, if you find your session usage percentage to be hovering above 80%, it could be time to either modify HAProxy's configuration to allow more sessions, or migrate your HAProxy server to a bigger box.</p>|`min(/HAProxy by Zabbix agent/haproxy.frontend.sutil[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.FRONT_SUTIL.MAX.WARN}`|Warning||
-|frontend {#PXNAME}: Number of request errors is high|<p>Number of request errors is more than {$HAPROXY.FRONT_EREQ.MAX.WARN}.</p>|`min(/HAProxy by Zabbix agent/haproxy.frontend.ereq.rate[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.FRONT_EREQ.MAX.WARN}`|Warning||
-|frontend {#PXNAME}: Number of requests denied is high|<p>Number of requests denied due to security concerns (ACL-restricted) is more than {$HAPROXY.FRONT_DREQ.MAX.WARN}.</p>|`min(/HAProxy by Zabbix agent/haproxy.frontend.dreq.rate[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.FRONT_DREQ.MAX.WARN}`|Warning||
+|HAProxy: frontend {#PXNAME}: Session utilization is high|<p>Alerting on this metric is essential to ensure your server has sufficient capacity to handle all concurrent sessions. Unlike requests, upon reaching the session limit HAProxy will deny additional clients until resource consumption drops. Furthermore, if you find your session usage percentage to be hovering above 80%, it could be time to either modify HAProxy's configuration to allow more sessions, or migrate your HAProxy server to a bigger box.</p>|`min(/HAProxy by Zabbix agent/haproxy.frontend.sutil[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.FRONT_SUTIL.MAX.WARN}`|Warning||
+|HAProxy: frontend {#PXNAME}: Number of request errors is high|<p>Number of request errors is more than {$HAPROXY.FRONT_EREQ.MAX.WARN}.</p>|`min(/HAProxy by Zabbix agent/haproxy.frontend.ereq.rate[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.FRONT_EREQ.MAX.WARN}`|Warning||
+|HAProxy: frontend {#PXNAME}: Number of requests denied is high|<p>Number of requests denied due to security concerns (ACL-restricted) is more than {$HAPROXY.FRONT_DREQ.MAX.WARN}.</p>|`min(/HAProxy by Zabbix agent/haproxy.frontend.dreq.rate[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.FRONT_DREQ.MAX.WARN}`|Warning||
 
 ### LLD rule Server discovery
 
@@ -197,12 +197,12 @@ frontend stats
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#PXNAME} {#SVNAME}: Server is DOWN|<p>Server is not available.</p>|`count(/HAProxy by Zabbix agent/haproxy.server.status[{#PXNAME},{#SVNAME}],#5,"eq","DOWN")=5`|Warning||
-|{#PXNAME} {#SVNAME}: Average response time is high|<p>Average server response time (in ms) for the last 1,024 requests is more than {$HAPROXY.SERVER_RTIME.MAX.WARN}.</p>|`min(/HAProxy by Zabbix agent/haproxy.server.rtime[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.SERVER_RTIME.MAX.WARN}`|Warning||
-|{#PXNAME} {#SVNAME}: Number of responses with error is high|<p>Number of requests on server, whose responses yielded an error, is more than {$HAPROXY.SERVER_ERESP.MAX.WARN}.</p>|`min(/HAProxy by Zabbix agent/haproxy.server.eresp.rate[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.SERVER_ERESP.MAX.WARN}`|Warning||
-|{#PXNAME} {#SVNAME}: Current number of requests unassigned in queue is high|<p>Current number of requests unassigned in queue is more than {$HAPROXY.SERVER_QCUR.MAX.WARN}.</p>|`min(/HAProxy by Zabbix agent/haproxy.server.qcur[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.SERVER_QCUR.MAX.WARN}`|Warning||
-|{#PXNAME} {#SVNAME}: Average time spent in queue is high|<p>Average time spent in queue (in ms) for the last 1,024 requests is more than {$HAPROXY.SERVER_QTIME.MAX.WARN}.</p>|`min(/HAProxy by Zabbix agent/haproxy.server.qtime[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.SERVER_QTIME.MAX.WARN}`|Warning||
-|{#PXNAME} {#SVNAME}: Health check error|<p>Please check the server for faults.</p>|`find(/HAProxy by Zabbix agent/haproxy.server.check_status[{#PXNAME},{#SVNAME}],#3,"regexp","(?:L[4-7]OK\|^$)")=0`|Warning|**Depends on**:<br><ul><li>{#PXNAME} {#SVNAME}: Server is DOWN</li></ul>|
+|HAProxy: {#PXNAME} {#SVNAME}: Server is DOWN|<p>Server is not available.</p>|`count(/HAProxy by Zabbix agent/haproxy.server.status[{#PXNAME},{#SVNAME}],#5,"eq","DOWN")=5`|Warning||
+|HAProxy: {#PXNAME} {#SVNAME}: Average response time is high|<p>Average server response time (in ms) for the last 1,024 requests is more than {$HAPROXY.SERVER_RTIME.MAX.WARN}.</p>|`min(/HAProxy by Zabbix agent/haproxy.server.rtime[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.SERVER_RTIME.MAX.WARN}`|Warning||
+|HAProxy: {#PXNAME} {#SVNAME}: Number of responses with error is high|<p>Number of requests on server, whose responses yielded an error, is more than {$HAPROXY.SERVER_ERESP.MAX.WARN}.</p>|`min(/HAProxy by Zabbix agent/haproxy.server.eresp.rate[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.SERVER_ERESP.MAX.WARN}`|Warning||
+|HAProxy: {#PXNAME} {#SVNAME}: Current number of requests unassigned in queue is high|<p>Current number of requests unassigned in queue is more than {$HAPROXY.SERVER_QCUR.MAX.WARN}.</p>|`min(/HAProxy by Zabbix agent/haproxy.server.qcur[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.SERVER_QCUR.MAX.WARN}`|Warning||
+|HAProxy: {#PXNAME} {#SVNAME}: Average time spent in queue is high|<p>Average time spent in queue (in ms) for the last 1,024 requests is more than {$HAPROXY.SERVER_QTIME.MAX.WARN}.</p>|`min(/HAProxy by Zabbix agent/haproxy.server.qtime[{#PXNAME},{#SVNAME}],5m)>{$HAPROXY.SERVER_QTIME.MAX.WARN}`|Warning||
+|HAProxy: {#PXNAME} {#SVNAME}: Health check error|<p>Please check the server for faults.</p>|`find(/HAProxy by Zabbix agent/haproxy.server.check_status[{#PXNAME},{#SVNAME}],#3,"regexp","(?:L[4-7]OK\|^$)")=0`|Warning|**Depends on**:<br><ul><li>HAProxy: {#PXNAME} {#SVNAME}: Server is DOWN</li></ul>|
 
 ## Feedback
 

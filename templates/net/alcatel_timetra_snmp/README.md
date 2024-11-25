@@ -59,15 +59,15 @@
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Alcatel Timetra TiMOS by SNMP/system.cpu.util[sgiCpuUsage.0],5m)>{$CPU.UTIL.CRIT}`|Warning||
-|High memory utilization|<p>The system is running out of free memory.</p>|`min(/Alcatel Timetra TiMOS by SNMP/vm.memory.util[vm.memory.util.0],5m)>{$MEMORY.UTIL.MAX}`|Average||
-|Operating system description has changed|<p>The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.</p>|`last(/Alcatel Timetra TiMOS by SNMP/system.sw.os[sysDescr.0],#1)<>last(/Alcatel Timetra TiMOS by SNMP/system.sw.os[sysDescr.0],#2) and length(last(/Alcatel Timetra TiMOS by SNMP/system.sw.os[sysDescr.0]))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>System name has changed</li></ul>|
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Alcatel Timetra TiMOS by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Alcatel Timetra TiMOS by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Alcatel Timetra TiMOS by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Alcatel Timetra TiMOS by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>No SNMP data collection</li></ul>|
-|System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Alcatel Timetra TiMOS by SNMP/system.name,#1)<>last(/Alcatel Timetra TiMOS by SNMP/system.name,#2) and length(last(/Alcatel Timetra TiMOS by SNMP/system.name))>0`|Info|**Manual close**: Yes|
-|No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Alcatel Timetra TiMOS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/Alcatel Timetra TiMOS by SNMP/icmpping,#3)=0`|High||
-|High ICMP ping loss||`min(/Alcatel Timetra TiMOS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Alcatel Timetra TiMOS by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/Alcatel Timetra TiMOS by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>High ICMP ping loss</li><li>Unavailable by ICMP ping</li></ul>|
+|Alcatel TiMOS: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Alcatel Timetra TiMOS by SNMP/system.cpu.util[sgiCpuUsage.0],5m)>{$CPU.UTIL.CRIT}`|Warning||
+|Alcatel TiMOS: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Alcatel Timetra TiMOS by SNMP/vm.memory.util[vm.memory.util.0],5m)>{$MEMORY.UTIL.MAX}`|Average||
+|Alcatel TiMOS: Operating system description has changed|<p>The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.</p>|`last(/Alcatel Timetra TiMOS by SNMP/system.sw.os[sysDescr.0],#1)<>last(/Alcatel Timetra TiMOS by SNMP/system.sw.os[sysDescr.0],#2) and length(last(/Alcatel Timetra TiMOS by SNMP/system.sw.os[sysDescr.0]))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Alcatel TiMOS: System name has changed</li></ul>|
+|Alcatel TiMOS: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Alcatel Timetra TiMOS by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Alcatel Timetra TiMOS by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Alcatel Timetra TiMOS by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Alcatel Timetra TiMOS by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Alcatel TiMOS: No SNMP data collection</li></ul>|
+|Alcatel TiMOS: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Alcatel Timetra TiMOS by SNMP/system.name,#1)<>last(/Alcatel Timetra TiMOS by SNMP/system.name,#2) and length(last(/Alcatel Timetra TiMOS by SNMP/system.name))>0`|Info|**Manual close**: Yes|
+|Alcatel TiMOS: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Alcatel Timetra TiMOS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Alcatel TiMOS: Unavailable by ICMP ping</li></ul>|
+|Alcatel TiMOS: Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/Alcatel Timetra TiMOS by SNMP/icmpping,#3)=0`|High||
+|Alcatel TiMOS: High ICMP ping loss||`min(/Alcatel Timetra TiMOS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Alcatel Timetra TiMOS by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Alcatel TiMOS: Unavailable by ICMP ping</li></ul>|
+|Alcatel TiMOS: High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/Alcatel Timetra TiMOS by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>Alcatel TiMOS: High ICMP ping loss</li><li>Alcatel TiMOS: Unavailable by ICMP ping</li></ul>|
 
 ### LLD rule Temperature Discovery
 
@@ -85,9 +85,9 @@
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SNMPVALUE}: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Alcatel Timetra TiMOS by SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}`|Warning|**Depends on**:<br><ul><li>{#SNMPVALUE}: Temperature is above critical threshold</li></ul>|
-|{#SNMPVALUE}: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Alcatel Timetra TiMOS by SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}`|High||
-|{#SNMPVALUE}: Temperature is too low||`avg(/Alcatel Timetra TiMOS by SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}`|Average||
+|Alcatel TiMOS: {#SNMPVALUE}: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Alcatel Timetra TiMOS by SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}`|Warning|**Depends on**:<br><ul><li>Alcatel TiMOS: {#SNMPVALUE}: Temperature is above critical threshold</li></ul>|
+|Alcatel TiMOS: {#SNMPVALUE}: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Alcatel Timetra TiMOS by SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}`|High||
+|Alcatel TiMOS: {#SNMPVALUE}: Temperature is too low||`avg(/Alcatel Timetra TiMOS by SNMP/sensor.temp.value[tmnxHwTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}`|Average||
 
 ### LLD rule FAN Discovery
 
@@ -105,7 +105,7 @@
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|#{#SNMPINDEX}: Fan is in critical state|<p>Please check the fan unit</p>|`count(/Alcatel Timetra TiMOS by SNMP/sensor.fan.status[tmnxChassisFanOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1`|Average||
+|Alcatel TiMOS: #{#SNMPINDEX}: Fan is in critical state|<p>Please check the fan unit</p>|`count(/Alcatel Timetra TiMOS by SNMP/sensor.fan.status[tmnxChassisFanOperStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1`|Average||
 
 ### LLD rule PSU Discovery
 
@@ -124,8 +124,8 @@
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|#{#SNMPINDEX}: Power supply is in critical state|<p>Please check the power supply unit for errors</p>|`count(/Alcatel Timetra TiMOS by SNMP/sensor.psu.status[tmnxChassisPowerSupply1Status.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1`|Average||
-|#{#SNMPINDEX}: Power supply is in critical state|<p>Please check the power supply unit for errors</p>|`count(/Alcatel Timetra TiMOS by SNMP/sensor.psu.status[tmnxChassisPowerSupply2Status.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1`|Average||
+|Alcatel TiMOS: #{#SNMPINDEX}: Power supply is in critical state|<p>Please check the power supply unit for errors</p>|`count(/Alcatel Timetra TiMOS by SNMP/sensor.psu.status[tmnxChassisPowerSupply1Status.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1`|Average||
+|Alcatel TiMOS: #{#SNMPINDEX}: Power supply is in critical state|<p>Please check the power supply unit for errors</p>|`count(/Alcatel Timetra TiMOS by SNMP/sensor.psu.status[tmnxChassisPowerSupply2Status.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1`|Average||
 
 ### LLD rule Entity Serial Numbers Discovery
 
@@ -143,7 +143,7 @@
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#ENT_NAME}: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Alcatel Timetra TiMOS by SNMP/system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}],#1)<>last(/Alcatel Timetra TiMOS by SNMP/system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}],#2) and length(last(/Alcatel Timetra TiMOS by SNMP/system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|Alcatel TiMOS: {#ENT_NAME}: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Alcatel Timetra TiMOS by SNMP/system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}],#1)<>last(/Alcatel Timetra TiMOS by SNMP/system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}],#2) and length(last(/Alcatel Timetra TiMOS by SNMP/system.hw.serialnumber[tmnxHwSerialNumber.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Network interfaces discovery
 
@@ -169,10 +169,10 @@
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))`|Average|**Manual close**: Yes|
-|Interface {#IFNAME}({#IFALIAS}): High bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/Alcatel Timetra TiMOS by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Alcatel Timetra TiMOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or avg(/Alcatel Timetra TiMOS by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Alcatel Timetra TiMOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and last(/Alcatel Timetra TiMOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): High error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/Alcatel Timetra TiMOS by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"} or min(/Alcatel Timetra TiMOS by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.</p>|`change(/Alcatel Timetra TiMOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Alcatel Timetra TiMOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and ( last(/Alcatel Timetra TiMOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or last(/Alcatel Timetra TiMOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or last(/Alcatel Timetra TiMOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or last(/Alcatel Timetra TiMOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or last(/Alcatel Timetra TiMOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or last(/Alcatel Timetra TiMOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117 ) and (last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|Alcatel TiMOS: Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))`|Average|**Manual close**: Yes|
+|Alcatel TiMOS: Interface {#IFNAME}({#IFALIAS}): High bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/Alcatel Timetra TiMOS by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Alcatel Timetra TiMOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or avg(/Alcatel Timetra TiMOS by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Alcatel Timetra TiMOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and last(/Alcatel Timetra TiMOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Alcatel TiMOS: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|Alcatel TiMOS: Interface {#IFNAME}({#IFALIAS}): High error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/Alcatel Timetra TiMOS by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"} or min(/Alcatel Timetra TiMOS by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Alcatel TiMOS: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|Alcatel TiMOS: Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.</p>|`change(/Alcatel Timetra TiMOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/Alcatel Timetra TiMOS by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and ( last(/Alcatel Timetra TiMOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or last(/Alcatel Timetra TiMOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or last(/Alcatel Timetra TiMOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or last(/Alcatel Timetra TiMOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or last(/Alcatel Timetra TiMOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or last(/Alcatel Timetra TiMOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117 ) and (last(/Alcatel Timetra TiMOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Alcatel TiMOS: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
 
 ### LLD rule EtherLike-MIB Discovery
 
@@ -190,7 +190,7 @@
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Interface {#IFNAME}({#IFALIAS}): In half-duplex mode|<p>Please check autonegotiation settings and cabling.</p>|`last(/Alcatel Timetra TiMOS by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2`|Warning|**Manual close**: Yes|
+|Alcatel TiMOS: Interface {#IFNAME}({#IFALIAS}): In half-duplex mode|<p>Please check autonegotiation settings and cabling.</p>|`last(/Alcatel Timetra TiMOS by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2`|Warning|**Manual close**: Yes|
 
 ## Feedback
 

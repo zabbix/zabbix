@@ -151,17 +151,17 @@ EOF
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Service is down|<p>MySQL is down.</p>|`last(/MySQL by Zabbix agent active/mysql.ping["{$MYSQL.HOST}","{$MYSQL.PORT}"])=0`|High||
-|Version has changed|<p>The MySQL version has changed. Acknowledge to close the problem manually.</p>|`last(/MySQL by Zabbix agent active/mysql.version["{$MYSQL.HOST}","{$MYSQL.PORT}"],#1)<>last(/MySQL by Zabbix agent active/mysql.version["{$MYSQL.HOST}","{$MYSQL.PORT}"],#2) and length(last(/MySQL by Zabbix agent active/mysql.version["{$MYSQL.HOST}","{$MYSQL.PORT}"]))>0`|Info|**Manual close**: Yes|
-|Service has been restarted|<p>MySQL uptime is less than 10 minutes.</p>|`last(/MySQL by Zabbix agent active/mysql.uptime)<10m`|Info||
-|Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/MySQL by Zabbix agent active/mysql.uptime,30m)=1`|Info|**Depends on**:<br><ul><li>Service is down</li></ul>|
-|Server has aborted connections|<p>The number of failed attempts to connect to the MySQL server is more than `{$MYSQL.ABORTED_CONN.MAX.WARN}` in the last 5 minutes.</p>|`min(/MySQL by Zabbix agent active/mysql.aborted_connects.rate,5m)>{$MYSQL.ABORTED_CONN.MAX.WARN}`|Average|**Depends on**:<br><ul><li>Refused connections</li></ul>|
-|Refused connections|<p>Number of refused connections due to the `max_connections` limit being reached.</p>|`last(/MySQL by Zabbix agent active/mysql.connection_errors_max_connections.rate)>0`|Average||
-|Buffer pool utilization is too low|<p>The buffer pool utilization is less than `{$MYSQL.BUFF_UTIL.MIN.WARN}`% in the last 5 minutes. This means that there is a lot of unused RAM allocated for the buffer pool, which you can easily reallocate at the moment.</p>|`max(/MySQL by Zabbix agent active/mysql.buffer_pool_utilization,5m)<{$MYSQL.BUFF_UTIL.MIN.WARN}`|Warning||
-|Number of temporary files created per second is high|<p>The application using the database may be in need of query optimization.</p>|`min(/MySQL by Zabbix agent active/mysql.created_tmp_files.rate,5m)>{$MYSQL.CREATED_TMP_FILES.MAX.WARN}`|Warning||
-|Number of on-disk temporary tables created per second is high|<p>The application using the database may be in need of query optimization.</p>|`min(/MySQL by Zabbix agent active/mysql.created_tmp_disk_tables.rate,5m)>{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN}`|Warning||
-|Number of internal temporary tables created per second is high|<p>The application using the database may be in need of query optimization.</p>|`min(/MySQL by Zabbix agent active/mysql.created_tmp_tables.rate,5m)>{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}`|Warning||
-|Server has slow queries|<p>The number of slow queries is more than `{$MYSQL.SLOW_QUERIES.MAX.WARN}` in the last 5 minutes.</p>|`min(/MySQL by Zabbix agent active/mysql.slow_queries.rate,5m)>{$MYSQL.SLOW_QUERIES.MAX.WARN}`|Warning||
+|MySQL: Service is down|<p>MySQL is down.</p>|`last(/MySQL by Zabbix agent active/mysql.ping["{$MYSQL.HOST}","{$MYSQL.PORT}"])=0`|High||
+|MySQL: Version has changed|<p>The MySQL version has changed. Acknowledge to close the problem manually.</p>|`last(/MySQL by Zabbix agent active/mysql.version["{$MYSQL.HOST}","{$MYSQL.PORT}"],#1)<>last(/MySQL by Zabbix agent active/mysql.version["{$MYSQL.HOST}","{$MYSQL.PORT}"],#2) and length(last(/MySQL by Zabbix agent active/mysql.version["{$MYSQL.HOST}","{$MYSQL.PORT}"]))>0`|Info|**Manual close**: Yes|
+|MySQL: Service has been restarted|<p>MySQL uptime is less than 10 minutes.</p>|`last(/MySQL by Zabbix agent active/mysql.uptime)<10m`|Info||
+|MySQL: Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/MySQL by Zabbix agent active/mysql.uptime,30m)=1`|Info|**Depends on**:<br><ul><li>MySQL: Service is down</li></ul>|
+|MySQL: Server has aborted connections|<p>The number of failed attempts to connect to the MySQL server is more than `{$MYSQL.ABORTED_CONN.MAX.WARN}` in the last 5 minutes.</p>|`min(/MySQL by Zabbix agent active/mysql.aborted_connects.rate,5m)>{$MYSQL.ABORTED_CONN.MAX.WARN}`|Average|**Depends on**:<br><ul><li>MySQL: Refused connections</li></ul>|
+|MySQL: Refused connections|<p>Number of refused connections due to the `max_connections` limit being reached.</p>|`last(/MySQL by Zabbix agent active/mysql.connection_errors_max_connections.rate)>0`|Average||
+|MySQL: Buffer pool utilization is too low|<p>The buffer pool utilization is less than `{$MYSQL.BUFF_UTIL.MIN.WARN}`% in the last 5 minutes. This means that there is a lot of unused RAM allocated for the buffer pool, which you can easily reallocate at the moment.</p>|`max(/MySQL by Zabbix agent active/mysql.buffer_pool_utilization,5m)<{$MYSQL.BUFF_UTIL.MIN.WARN}`|Warning||
+|MySQL: Number of temporary files created per second is high|<p>The application using the database may be in need of query optimization.</p>|`min(/MySQL by Zabbix agent active/mysql.created_tmp_files.rate,5m)>{$MYSQL.CREATED_TMP_FILES.MAX.WARN}`|Warning||
+|MySQL: Number of on-disk temporary tables created per second is high|<p>The application using the database may be in need of query optimization.</p>|`min(/MySQL by Zabbix agent active/mysql.created_tmp_disk_tables.rate,5m)>{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN}`|Warning||
+|MySQL: Number of internal temporary tables created per second is high|<p>The application using the database may be in need of query optimization.</p>|`min(/MySQL by Zabbix agent active/mysql.created_tmp_tables.rate,5m)>{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}`|Warning||
+|MySQL: Server has slow queries|<p>The number of slow queries is more than `{$MYSQL.SLOW_QUERIES.MAX.WARN}` in the last 5 minutes.</p>|`min(/MySQL by Zabbix agent active/mysql.slow_queries.rate,5m)>{$MYSQL.SLOW_QUERIES.MAX.WARN}`|Warning||
 
 ### LLD rule Database discovery
 
@@ -195,10 +195,10 @@ EOF
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Replication lag is too high|<p>Replication delay is too long.</p>|`min(/MySQL by Zabbix agent active/mysql.seconds_behind_master["{#MASTER_HOST}"],5m)>{$MYSQL.REPL_LAG.MAX.WARN}`|Warning||
-|The slave I/O thread is not running|<p>Whether the I/O thread for reading the master's binary log is running.</p>|`count(/MySQL by Zabbix agent active/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1`|Average||
-|The slave I/O thread is not connected to a replication master|<p>Whether the slave I/O thread is connected to the master.</p>|`count(/MySQL by Zabbix agent active/mysql.slave_io_running["{#MASTER_HOST}"],#1,"ne","Yes")=1`|Warning|**Depends on**:<br><ul><li>The slave I/O thread is not running</li></ul>|
-|The SQL thread is not running|<p>Whether the SQL thread for executing events in the relay log is running.</p>|`count(/MySQL by Zabbix agent active/mysql.slave_sql_running["{#MASTER_HOST}"],#1,"eq","No")=1`|Warning|**Depends on**:<br><ul><li>The slave I/O thread is not running</li></ul>|
+|MySQL: Replication lag is too high|<p>Replication delay is too long.</p>|`min(/MySQL by Zabbix agent active/mysql.seconds_behind_master["{#MASTER_HOST}"],5m)>{$MYSQL.REPL_LAG.MAX.WARN}`|Warning||
+|MySQL: The slave I/O thread is not running|<p>Whether the I/O thread for reading the master's binary log is running.</p>|`count(/MySQL by Zabbix agent active/mysql.slave_io_running["{#MASTER_HOST}"],#1,"eq","No")=1`|Average||
+|MySQL: The slave I/O thread is not connected to a replication master|<p>Whether the slave I/O thread is connected to the master.</p>|`count(/MySQL by Zabbix agent active/mysql.slave_io_running["{#MASTER_HOST}"],#1,"ne","Yes")=1`|Warning|**Depends on**:<br><ul><li>MySQL: The slave I/O thread is not running</li></ul>|
+|MySQL: The SQL thread is not running|<p>Whether the SQL thread for executing events in the relay log is running.</p>|`count(/MySQL by Zabbix agent active/mysql.slave_sql_running["{#MASTER_HOST}"],#1,"eq","No")=1`|Warning|**Depends on**:<br><ul><li>MySQL: The slave I/O thread is not running</li></ul>|
 
 ### LLD rule MariaDB discovery
 

@@ -82,8 +82,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|There are errors in requests to WSAPI|<p>Zabbix has received errors in requests to WSAPI.</p>|`length(last(/HPE Primera by HTTP/hpe.primera.get.errors))>0`|Average|**Depends on**:<br><ul><li>Service is unavailable</li></ul>|
-|Service is unavailable||`max(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{$HPE.PRIMERA.API.HOST}","{$HPE.PRIMERA.API.PORT}"],5m)=0`|High|**Manual close**: Yes|
+|HPE Primera: There are errors in requests to WSAPI|<p>Zabbix has received errors in requests to WSAPI.</p>|`length(last(/HPE Primera by HTTP/hpe.primera.get.errors))>0`|Average|**Depends on**:<br><ul><li>HPE Primera: Service is unavailable</li></ul>|
+|HPE Primera: Service is unavailable||`max(/HPE Primera by HTTP/net.tcp.service["{$HPE.PRIMERA.API.SCHEME}","{$HPE.PRIMERA.API.HOST}","{$HPE.PRIMERA.API.PORT}"],5m)=0`|High|**Manual close**: Yes|
 
 ### LLD rule Common provisioning groups discovery
 
@@ -125,8 +125,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|CPG [{#NAME}]: Degraded|<p>CPG [{#NAME}] is in degraded state.</p>|`last(/HPE Primera by HTTP/hpe.primera.cpg.state["{#ID}"])=2`|Average||
-|CPG [{#NAME}]: Failed|<p>CPG [{#NAME}] is in failed state.</p>|`last(/HPE Primera by HTTP/hpe.primera.cpg.state["{#ID}"])=3`|High||
+|HPE Primera: CPG [{#NAME}]: Degraded|<p>CPG [{#NAME}] is in degraded state.</p>|`last(/HPE Primera by HTTP/hpe.primera.cpg.state["{#ID}"])=2`|Average||
+|HPE Primera: CPG [{#NAME}]: Failed|<p>CPG [{#NAME}] is in failed state.</p>|`last(/HPE Primera by HTTP/hpe.primera.cpg.state["{#ID}"])=3`|High||
 
 ### LLD rule Disks discovery
 
@@ -156,13 +156,13 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Disk [{#POSITION}]: Path A0 degraded|<p>Disk [{#POSITION}] path A0 in degraded state.</p>|`last(/HPE Primera by HTTP/hpe.primera.disk["{#ID}",loop_a0_degraded])=1`|Average||
-|Disk [{#POSITION}]: Path A1 degraded|<p>Disk [{#POSITION}] path A1 in degraded state.</p>|`last(/HPE Primera by HTTP/hpe.primera.disk["{#ID}",loop_a1_degraded])=1`|Average||
-|Disk [{#POSITION}]: Path B0 degraded|<p>Disk [{#POSITION}] path B0 in degraded state.</p>|`last(/HPE Primera by HTTP/hpe.primera.disk["{#ID}",loop_b0_degraded])=1`|Average||
-|Disk [{#POSITION}]: Path B1 degraded|<p>Disk [{#POSITION}] path B1 in degraded state.</p>|`last(/HPE Primera by HTTP/hpe.primera.disk["{#ID}",loop_b1_degraded])=1`|Average||
-|Disk [{#POSITION}]: Degraded|<p>Disk [{#POSITION}] in degraded state.</p>|`last(/HPE Primera by HTTP/hpe.primera.disk["{#ID}",state])=2`|Average||
-|Disk [{#POSITION}]: Failed|<p>Disk [{#POSITION}] in failed state.</p>|`last(/HPE Primera by HTTP/hpe.primera.disk["{#ID}",state])=3`|High||
-|Disk [{#POSITION}]: Unknown issue|<p>Disk [{#POSITION}] in unknown state.</p>|`last(/HPE Primera by HTTP/hpe.primera.disk["{#ID}",state])=99`|Info||
+|HPE Primera: Disk [{#POSITION}]: Path A0 degraded|<p>Disk [{#POSITION}] path A0 in degraded state.</p>|`last(/HPE Primera by HTTP/hpe.primera.disk["{#ID}",loop_a0_degraded])=1`|Average||
+|HPE Primera: Disk [{#POSITION}]: Path A1 degraded|<p>Disk [{#POSITION}] path A1 in degraded state.</p>|`last(/HPE Primera by HTTP/hpe.primera.disk["{#ID}",loop_a1_degraded])=1`|Average||
+|HPE Primera: Disk [{#POSITION}]: Path B0 degraded|<p>Disk [{#POSITION}] path B0 in degraded state.</p>|`last(/HPE Primera by HTTP/hpe.primera.disk["{#ID}",loop_b0_degraded])=1`|Average||
+|HPE Primera: Disk [{#POSITION}]: Path B1 degraded|<p>Disk [{#POSITION}] path B1 in degraded state.</p>|`last(/HPE Primera by HTTP/hpe.primera.disk["{#ID}",loop_b1_degraded])=1`|Average||
+|HPE Primera: Disk [{#POSITION}]: Degraded|<p>Disk [{#POSITION}] in degraded state.</p>|`last(/HPE Primera by HTTP/hpe.primera.disk["{#ID}",state])=2`|Average||
+|HPE Primera: Disk [{#POSITION}]: Failed|<p>Disk [{#POSITION}] in failed state.</p>|`last(/HPE Primera by HTTP/hpe.primera.disk["{#ID}",state])=3`|High||
+|HPE Primera: Disk [{#POSITION}]: Unknown issue|<p>Disk [{#POSITION}] in unknown state.</p>|`last(/HPE Primera by HTTP/hpe.primera.disk["{#ID}",state])=99`|Info||
 
 ### LLD rule Hosts discovery
 
@@ -202,9 +202,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Port [{#NODE}:{#SLOT}:{#CARD.PORT}]: Failover state is {ITEM.VALUE1}|<p>Port [{#NODE}:{#SLOT}:{#CARD.PORT}] has failover error.</p>|`last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",failover_state])<>1 and last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",failover_state])<>4`|Average||
-|Port [{#NODE}:{#SLOT}:{#CARD.PORT}]: Link state is {ITEM.VALUE1}|<p>Port [{#NODE}:{#SLOT}:{#CARD.PORT}] not in ready state.</p>|`last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])<>4 and last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])<>1 and last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])<>3 and last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])<>13 and last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])<>15 and last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])<>16`|High||
-|Port [{#NODE}:{#SLOT}:{#CARD.PORT}]: Link state is {ITEM.VALUE1}|<p>Port [{#NODE}:{#SLOT}:{#CARD.PORT}] not in ready state.</p>|`last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])=1 or last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])=3 or last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])=13 or last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])=15 or last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])=16`|Average||
+|HPE Primera: Port [{#NODE}:{#SLOT}:{#CARD.PORT}]: Failover state is {ITEM.VALUE1}|<p>Port [{#NODE}:{#SLOT}:{#CARD.PORT}] has failover error.</p>|`last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",failover_state])<>1 and last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",failover_state])<>4`|Average||
+|HPE Primera: Port [{#NODE}:{#SLOT}:{#CARD.PORT}]: Link state is {ITEM.VALUE1}|<p>Port [{#NODE}:{#SLOT}:{#CARD.PORT}] not in ready state.</p>|`last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])<>4 and last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])<>1 and last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])<>3 and last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])<>13 and last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])<>15 and last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])<>16`|High||
+|HPE Primera: Port [{#NODE}:{#SLOT}:{#CARD.PORT}]: Link state is {ITEM.VALUE1}|<p>Port [{#NODE}:{#SLOT}:{#CARD.PORT}] not in ready state.</p>|`last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])=1 or last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])=3 or last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])=13 or last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])=15 or last(/HPE Primera by HTTP/hpe.primera.port["{#NODE}:{#SLOT}:{#CARD.PORT}",link_state])=16`|Average||
 
 ### LLD rule Tasks discovery
 
@@ -226,8 +226,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Task [{#NAME}]: Cancelled|<p>Task [{#NAME}] is cancelled.</p>|`last(/HPE Primera by HTTP/hpe.primera.task["{#ID}",status])=3`|Info||
-|Task [{#NAME}]: Failed|<p>Task [{#NAME}] is failed.</p>|`last(/HPE Primera by HTTP/hpe.primera.task["{#ID}",status])=4`|Average||
+|HPE Primera: Task [{#NAME}]: Cancelled|<p>Task [{#NAME}] is cancelled.</p>|`last(/HPE Primera by HTTP/hpe.primera.task["{#ID}",status])=3`|Info||
+|HPE Primera: Task [{#NAME}]: Failed|<p>Task [{#NAME}] is failed.</p>|`last(/HPE Primera by HTTP/hpe.primera.task["{#ID}",status])=4`|Average||
 
 ### LLD rule Volumes discovery
 
@@ -271,8 +271,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Volume [{#NAME}]: Degraded|<p>Volume [{#NAME}] is in degraded state.</p>|`last(/HPE Primera by HTTP/hpe.primera.volume.state["{#ID}"])=2`|Average||
-|Volume [{#NAME}]: Failed|<p>Volume [{#NAME}] is in failed state.</p>|`last(/HPE Primera by HTTP/hpe.primera.volume.state["{#ID}"])=3`|High||
+|HPE Primera: Volume [{#NAME}]: Degraded|<p>Volume [{#NAME}] is in degraded state.</p>|`last(/HPE Primera by HTTP/hpe.primera.volume.state["{#ID}"])=2`|Average||
+|HPE Primera: Volume [{#NAME}]: Failed|<p>Volume [{#NAME}] is in failed state.</p>|`last(/HPE Primera by HTTP/hpe.primera.volume.state["{#ID}"])=3`|High||
 
 ## Feedback
 

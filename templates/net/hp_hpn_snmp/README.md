@@ -79,15 +79,15 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/HP Enterprise Switch by SNMP/system.cpu.util[hpSwitchCpuStat.0],5m)>{$CPU.UTIL.CRIT}`|Warning||
-|Device has been replaced|<p>The device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/HP Enterprise Switch by SNMP/system.hw.serialnumber,#1)<>last(/HP Enterprise Switch by SNMP/system.hw.serialnumber,#2) and length(last(/HP Enterprise Switch by SNMP/system.hw.serialnumber))>0`|Info|**Manual close**: Yes|
-|Firmware has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/HP Enterprise Switch by SNMP/system.hw.firmware,#1)<>last(/HP Enterprise Switch by SNMP/system.hw.firmware,#2) and length(last(/HP Enterprise Switch by SNMP/system.hw.firmware))>0`|Info|**Manual close**: Yes|
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/HP Enterprise Switch by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/HP Enterprise Switch by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/HP Enterprise Switch by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/HP Enterprise Switch by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>No SNMP data collection</li></ul>|
-|System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/HP Enterprise Switch by SNMP/system.name,#1)<>last(/HP Enterprise Switch by SNMP/system.name,#2) and length(last(/HP Enterprise Switch by SNMP/system.name))>0`|Info|**Manual close**: Yes|
-|No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/HP Enterprise Switch by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/HP Enterprise Switch by SNMP/icmpping,#3)=0`|High||
-|High ICMP ping loss||`min(/HP Enterprise Switch by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/HP Enterprise Switch by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/HP Enterprise Switch by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>High ICMP ping loss</li><li>Unavailable by ICMP ping</li></ul>|
+|HP Enterprise Switch: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/HP Enterprise Switch by SNMP/system.cpu.util[hpSwitchCpuStat.0],5m)>{$CPU.UTIL.CRIT}`|Warning||
+|HP Enterprise Switch: Device has been replaced|<p>The device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/HP Enterprise Switch by SNMP/system.hw.serialnumber,#1)<>last(/HP Enterprise Switch by SNMP/system.hw.serialnumber,#2) and length(last(/HP Enterprise Switch by SNMP/system.hw.serialnumber))>0`|Info|**Manual close**: Yes|
+|HP Enterprise Switch: Firmware has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/HP Enterprise Switch by SNMP/system.hw.firmware,#1)<>last(/HP Enterprise Switch by SNMP/system.hw.firmware,#2) and length(last(/HP Enterprise Switch by SNMP/system.hw.firmware))>0`|Info|**Manual close**: Yes|
+|HP Enterprise Switch: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/HP Enterprise Switch by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/HP Enterprise Switch by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/HP Enterprise Switch by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/HP Enterprise Switch by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HP Enterprise Switch: No SNMP data collection</li></ul>|
+|HP Enterprise Switch: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/HP Enterprise Switch by SNMP/system.name,#1)<>last(/HP Enterprise Switch by SNMP/system.name,#2) and length(last(/HP Enterprise Switch by SNMP/system.name))>0`|Info|**Manual close**: Yes|
+|HP Enterprise Switch: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/HP Enterprise Switch by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>HP Enterprise Switch: Unavailable by ICMP ping</li></ul>|
+|HP Enterprise Switch: Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/HP Enterprise Switch by SNMP/icmpping,#3)=0`|High||
+|HP Enterprise Switch: High ICMP ping loss||`min(/HP Enterprise Switch by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/HP Enterprise Switch by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>HP Enterprise Switch: Unavailable by ICMP ping</li></ul>|
+|HP Enterprise Switch: High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/HP Enterprise Switch by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>HP Enterprise Switch: High ICMP ping loss</li><li>HP Enterprise Switch: Unavailable by ICMP ping</li></ul>|
 
 ### LLD rule Temperature Discovery
 
@@ -105,9 +105,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SENSOR_INFO}: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/HP Enterprise Switch by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SENSOR_INFO}"}`|Warning|**Depends on**:<br><ul><li>{#SENSOR_INFO}: Temperature is above critical threshold</li></ul>|
-|{#SENSOR_INFO}: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/HP Enterprise Switch by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_INFO}"}`|High||
-|{#SENSOR_INFO}: Temperature is too low||`avg(/HP Enterprise Switch by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SENSOR_INFO}"}`|Average||
+|HP Enterprise Switch: {#SENSOR_INFO}: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/HP Enterprise Switch by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SENSOR_INFO}"}`|Warning|**Depends on**:<br><ul><li>HP Enterprise Switch: {#SENSOR_INFO}: Temperature is above critical threshold</li></ul>|
+|HP Enterprise Switch: {#SENSOR_INFO}: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/HP Enterprise Switch by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_INFO}"}`|High||
+|HP Enterprise Switch: {#SENSOR_INFO}: Temperature is too low||`avg(/HP Enterprise Switch by SNMP/sensor.temp.value[entPhySensorValue.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SENSOR_INFO}"}`|Average||
 
 ### LLD rule Memory Discovery
 
@@ -128,7 +128,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|#{#SNMPVALUE}: High memory utilization|<p>The system is running out of free memory.</p>|`min(/HP Enterprise Switch by SNMP/vm.memory.util[snmp.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}`|Average||
+|HP Enterprise Switch: #{#SNMPVALUE}: High memory utilization|<p>The system is running out of free memory.</p>|`min(/HP Enterprise Switch by SNMP/vm.memory.util[snmp.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}`|Average||
 
 ### LLD rule FAN Discovery
 
@@ -146,8 +146,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#ENT_DESCR}: Fan is in critical state|<p>Please check the fan unit</p>|`count(/HP Enterprise Switch by SNMP/sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"bad\"}")=1`|Average||
-|{#ENT_DESCR}: Fan is in warning state|<p>Please check the fan unit</p>|`count(/HP Enterprise Switch by SNMP/sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"warning\"}")=1`|Warning|**Depends on**:<br><ul><li>{#ENT_DESCR}: Fan is in critical state</li></ul>|
+|HP Enterprise Switch: {#ENT_DESCR}: Fan is in critical state|<p>Please check the fan unit</p>|`count(/HP Enterprise Switch by SNMP/sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"bad\"}")=1`|Average||
+|HP Enterprise Switch: {#ENT_DESCR}: Fan is in warning state|<p>Please check the fan unit</p>|`count(/HP Enterprise Switch by SNMP/sensor.fan.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"warning\"}")=1`|Warning|**Depends on**:<br><ul><li>HP Enterprise Switch: {#ENT_DESCR}: Fan is in critical state</li></ul>|
 
 ### LLD rule PSU Discovery
 
@@ -165,8 +165,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#ENT_DESCR}: Power supply is in critical state|<p>Please check the power supply unit for errors</p>|`count(/HP Enterprise Switch by SNMP/sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"bad\"}")=1`|Average||
-|{#ENT_DESCR}: Power supply is in warning state|<p>Please check the power supply unit for errors</p>|`count(/HP Enterprise Switch by SNMP/sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"warning\"}")=1`|Warning|**Depends on**:<br><ul><li>{#ENT_DESCR}: Power supply is in critical state</li></ul>|
+|HP Enterprise Switch: {#ENT_DESCR}: Power supply is in critical state|<p>Please check the power supply unit for errors</p>|`count(/HP Enterprise Switch by SNMP/sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"bad\"}")=1`|Average||
+|HP Enterprise Switch: {#ENT_DESCR}: Power supply is in warning state|<p>Please check the power supply unit for errors</p>|`count(/HP Enterprise Switch by SNMP/sensor.psu.status[hpicfSensorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"warning\"}")=1`|Warning|**Depends on**:<br><ul><li>HP Enterprise Switch: {#ENT_DESCR}: Power supply is in critical state</li></ul>|
 
 ### LLD rule Temp Status Discovery
 
@@ -209,7 +209,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Interface {#IFNAME}({#IFALIAS}): In half-duplex mode|<p>Please check autonegotiation settings and cabling.</p>|`last(/HP Enterprise Switch by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2`|Warning|**Manual close**: Yes|
+|HP Enterprise Switch: Interface {#IFNAME}({#IFALIAS}): In half-duplex mode|<p>Please check autonegotiation settings and cabling.</p>|`last(/HP Enterprise Switch by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2`|Warning|**Manual close**: Yes|
 
 ### LLD rule Network interfaces discovery
 
@@ -235,10 +235,10 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))`|Average|**Manual close**: Yes|
-|Interface {#IFNAME}({#IFALIAS}): High bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/HP Enterprise Switch by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/HP Enterprise Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or avg(/HP Enterprise Switch by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/HP Enterprise Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and last(/HP Enterprise Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): High error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/HP Enterprise Switch by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"} or min(/HP Enterprise Switch by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.</p>|`change(/HP Enterprise Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/HP Enterprise Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and ( last(/HP Enterprise Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or last(/HP Enterprise Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or last(/HP Enterprise Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or last(/HP Enterprise Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or last(/HP Enterprise Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or last(/HP Enterprise Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117 ) and (last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|HP Enterprise Switch: Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))`|Average|**Manual close**: Yes|
+|HP Enterprise Switch: Interface {#IFNAME}({#IFALIAS}): High bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/HP Enterprise Switch by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/HP Enterprise Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or avg(/HP Enterprise Switch by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/HP Enterprise Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and last(/HP Enterprise Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HP Enterprise Switch: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|HP Enterprise Switch: Interface {#IFNAME}({#IFALIAS}): High error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/HP Enterprise Switch by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"} or min(/HP Enterprise Switch by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HP Enterprise Switch: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|HP Enterprise Switch: Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.</p>|`change(/HP Enterprise Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/HP Enterprise Switch by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and ( last(/HP Enterprise Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or last(/HP Enterprise Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or last(/HP Enterprise Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or last(/HP Enterprise Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or last(/HP Enterprise Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or last(/HP Enterprise Switch by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117 ) and (last(/HP Enterprise Switch by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HP Enterprise Switch: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
 
 ## Feedback
 

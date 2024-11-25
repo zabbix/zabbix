@@ -66,7 +66,7 @@ For example, for clusters created with `kubeadm` it can be set in the following 
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Too many HTTP client errors|<p>"Kubernetes Controller manager is experiencing high error rate (with 5xx HTTP code).</p>|`min(/Kubernetes Controller manager by HTTP/kubernetes.controller.client_http_requests_500.rate,5m)>{$KUBE.CONTROLLER.HTTP.CLIENT.ERROR}`|Warning||
+|Kubernetes Controller manager: Too many HTTP client errors|<p>"Kubernetes Controller manager is experiencing high error rate (with 5xx HTTP code).</p>|`min(/Kubernetes Controller manager by HTTP/kubernetes.controller.client_http_requests_500.rate,5m)>{$KUBE.CONTROLLER.HTTP.CLIENT.ERROR}`|Warning||
 
 ### LLD rule Workqueue metrics discovery
 

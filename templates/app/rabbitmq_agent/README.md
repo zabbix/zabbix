@@ -94,7 +94,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.2/manual
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Failed to fetch overview data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/RabbitMQ cluster by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"],30m)=1`|Warning|**Manual close**: Yes|
+|RabbitMQ cluster: Failed to fetch overview data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/RabbitMQ cluster by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/overview"],30m)=1`|Warning|**Manual close**: Yes|
 
 ### LLD rule Health Check 3.8.10+ discovery
 
@@ -112,7 +112,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.2/manual
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|There are active alarms in the cluster|<p>This is the default API endpoint path: http://{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ cluster by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/health/checks/alarms{#SINGLETON}"])=0`|Average||
+|RabbitMQ cluster: There are active alarms in the cluster|<p>This is the default API endpoint path: http://{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ cluster by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/health/checks/alarms{#SINGLETON}"])=0`|Average||
 
 ### LLD rule Exchanges discovery
 
@@ -236,11 +236,11 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.2/manual
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Version has changed|<p>RabbitMQ version has changed. Acknowledge to close the problem manually.</p>|`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version,#1)<>last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version,#2) and length(last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version))>0`|Info|**Manual close**: Yes|
-|Number of network partitions is too high|<p>For more details see [Detecting Network Partitions](https://www.rabbitmq.com/partitions.html#detecting).</p>|`min(/RabbitMQ node by Zabbix agent/rabbitmq.node.partitions,5m)>0`|Warning||
-|Memory alarm|<p>For more details see [Memory Alarms](https://www.rabbitmq.com/memory.html).</p>|`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.mem_alarm)=1`|Average||
-|Free disk space alarm|<p>For more details see [Free Disk Space Alarms](https://www.rabbitmq.com/disk-alarms.html).</p>|`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.disk_free_alarm)=1`|Average||
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.uptime)<10m`|Info|**Manual close**: Yes|
+|RabbitMQ node: Version has changed|<p>RabbitMQ version has changed. Acknowledge to close the problem manually.</p>|`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version,#1)<>last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version,#2) and length(last(/RabbitMQ node by Zabbix agent/rabbitmq.node.overview.rabbitmq_version))>0`|Info|**Manual close**: Yes|
+|RabbitMQ node: Number of network partitions is too high|<p>For more details see [Detecting Network Partitions](https://www.rabbitmq.com/partitions.html#detecting).</p>|`min(/RabbitMQ node by Zabbix agent/rabbitmq.node.partitions,5m)>0`|Warning||
+|RabbitMQ node: Memory alarm|<p>For more details see [Memory Alarms](https://www.rabbitmq.com/memory.html).</p>|`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.mem_alarm)=1`|Average||
+|RabbitMQ node: Free disk space alarm|<p>For more details see [Free Disk Space Alarms](https://www.rabbitmq.com/disk-alarms.html).</p>|`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.disk_free_alarm)=1`|Average||
+|RabbitMQ node: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/RabbitMQ node by Zabbix agent/rabbitmq.node.uptime)<10m`|Info|**Manual close**: Yes|
 
 ### LLD rule RabbitMQ process discovery
 
@@ -263,11 +263,11 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.2/manual
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Process is not running||`last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])=0`|High||
-|Failed to fetch nodes data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"],30m)=1 and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Process is not running</li></ul>|
-|Service is down||`last(/RabbitMQ node by Zabbix agent/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0 and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])>0`|Average|**Manual close**: Yes|
-|Node is not running|<p>RabbitMQ node is not running.</p>|`max(/RabbitMQ node by Zabbix agent/rabbitmq.node.running,5m)=0 and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])>0`|Average|**Depends on**:<br><ul><li>Service is down</li></ul>|
-|Service response time is too high||`min(/RabbitMQ node by Zabbix agent/net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN} and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Service is down</li></ul>|
+|RabbitMQ node: Process is not running||`last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])=0`|High||
+|RabbitMQ node: Failed to fetch nodes data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"],30m)=1 and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>RabbitMQ node: Process is not running</li></ul>|
+|RabbitMQ node: Service is down||`last(/RabbitMQ node by Zabbix agent/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0 and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])>0`|Average|**Manual close**: Yes|
+|RabbitMQ node: Node is not running|<p>RabbitMQ node is not running.</p>|`max(/RabbitMQ node by Zabbix agent/rabbitmq.node.running,5m)=0 and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])>0`|Average|**Depends on**:<br><ul><li>RabbitMQ node: Service is down</li></ul>|
+|RabbitMQ node: Service response time is too high||`min(/RabbitMQ node by Zabbix agent/net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN} and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>RabbitMQ node: Service is down</li></ul>|
 
 ### LLD rule Health Check 3.8.10+ discovery
 
@@ -289,11 +289,11 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.2/manual
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|There are active alarms in the node|<p>It checks the active alarms in the nodes via API. This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms{#SINGLETON}"])=0`|Average||
-|There are valid TLS certificates expiring in the next month|<p>It checks if there are valid TLS certificates expiring in the next month. This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/certificate-expiration/1/months{#SINGLETON}"])=0`|Average||
-|There are not running virtual hosts|<p>It checks if there are not running virtual hosts via API. This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/virtual-hosts{#SINGLETON}"])=0`|Average||
-|There are queues that could potentially lose data if this node goes offline.|<p>It checks whether there are queues that could potentially lose data if this node goes offline via API. This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-mirror-sync-critical{#SINGLETON}"])=0`|Average||
-|There are queues that would lose their quorum and availability if this node is shut down.|<p>It checks if there are queues that could potentially lose data if this node goes offline via API. This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-quorum-critical{#SINGLETON}"])=0`|Average||
+|RabbitMQ node: There are active alarms in the node|<p>It checks the active alarms in the nodes via API. This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms{#SINGLETON}"])=0`|Average||
+|RabbitMQ node: There are valid TLS certificates expiring in the next month|<p>It checks if there are valid TLS certificates expiring in the next month. This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/certificate-expiration/1/months{#SINGLETON}"])=0`|Average||
+|RabbitMQ node: There are not running virtual hosts|<p>It checks if there are not running virtual hosts via API. This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/virtual-hosts{#SINGLETON}"])=0`|Average||
+|RabbitMQ node: There are queues that could potentially lose data if this node goes offline.|<p>It checks whether there are queues that could potentially lose data if this node goes offline via API. This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-mirror-sync-critical{#SINGLETON}"])=0`|Average||
+|RabbitMQ node: There are queues that would lose their quorum and availability if this node is shut down.|<p>It checks if there are queues that could potentially lose data if this node goes offline via API. This is the default API endpoint path: http://{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-quorum-critical{#SINGLETON}"])=0`|Average||
 
 ### LLD rule Health Check 3.8.9- discovery
 
@@ -311,7 +311,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.2/manual
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Node healthcheck failed|<p>For more details see [Health Checks](https://www.rabbitmq.com/monitoring.html#health-checks).</p>|`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/healthchecks/node{#SINGLETON}"])=0`|Average||
+|RabbitMQ node: Node healthcheck failed|<p>For more details see [Health Checks](https://www.rabbitmq.com/monitoring.html#health-checks).</p>|`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/healthchecks/node{#SINGLETON}"])=0`|Average||
 
 ### LLD rule Queues discovery
 
@@ -347,7 +347,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.2/manual
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Too many messages in queue [{#VHOST}][{#QUEUE}]||`min(/RabbitMQ node by Zabbix agent/rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"],5m)>{$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"}`|Warning||
+|RabbitMQ node: Too many messages in queue [{#VHOST}][{#QUEUE}]||`min(/RabbitMQ node by Zabbix agent/rabbitmq.queue.messages["{#VHOST}/{#QUEUE}"],5m)>{$RABBITMQ.MESSAGES.MAX.WARN:"{#QUEUE}"}`|Warning||
 
 ## Feedback
 

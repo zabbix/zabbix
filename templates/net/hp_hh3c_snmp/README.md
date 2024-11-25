@@ -84,12 +84,12 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/HP Comware HH3C by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/HP Comware HH3C by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/HP Comware HH3C by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/HP Comware HH3C by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>No SNMP data collection</li></ul>|
-|System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/HP Comware HH3C by SNMP/system.name,#1)<>last(/HP Comware HH3C by SNMP/system.name,#2) and length(last(/HP Comware HH3C by SNMP/system.name))>0`|Info|**Manual close**: Yes|
-|No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/HP Comware HH3C by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/HP Comware HH3C by SNMP/icmpping,#3)=0`|High||
-|High ICMP ping loss||`min(/HP Comware HH3C by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/HP Comware HH3C by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/HP Comware HH3C by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>High ICMP ping loss</li><li>Unavailable by ICMP ping</li></ul>|
+|HP Comware HH3C: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/HP Comware HH3C by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/HP Comware HH3C by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/HP Comware HH3C by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/HP Comware HH3C by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HP Comware HH3C: No SNMP data collection</li></ul>|
+|HP Comware HH3C: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/HP Comware HH3C by SNMP/system.name,#1)<>last(/HP Comware HH3C by SNMP/system.name,#2) and length(last(/HP Comware HH3C by SNMP/system.name))>0`|Info|**Manual close**: Yes|
+|HP Comware HH3C: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/HP Comware HH3C by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>HP Comware HH3C: Unavailable by ICMP ping</li></ul>|
+|HP Comware HH3C: Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/HP Comware HH3C by SNMP/icmpping,#3)=0`|High||
+|HP Comware HH3C: High ICMP ping loss||`min(/HP Comware HH3C by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/HP Comware HH3C by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>HP Comware HH3C: Unavailable by ICMP ping</li></ul>|
+|HP Comware HH3C: High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/HP Comware HH3C by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>HP Comware HH3C: High ICMP ping loss</li><li>HP Comware HH3C: Unavailable by ICMP ping</li></ul>|
 
 ### LLD rule Module Discovery
 
@@ -108,8 +108,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#MODULE_NAME}: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/HP Comware HH3C by SNMP/system.cpu.util[hh3cEntityExtCpuUsage.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}`|Warning||
-|{#MODULE_NAME}: High memory utilization|<p>The system is running out of free memory.</p>|`min(/HP Comware HH3C by SNMP/vm.memory.util[hh3cEntityExtMemUsage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}`|Average||
+|HP Comware HH3C: {#MODULE_NAME}: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/HP Comware HH3C by SNMP/system.cpu.util[hh3cEntityExtCpuUsage.{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}`|Warning||
+|HP Comware HH3C: {#MODULE_NAME}: High memory utilization|<p>The system is running out of free memory.</p>|`min(/HP Comware HH3C by SNMP/vm.memory.util[hh3cEntityExtMemUsage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}`|Average||
 
 ### LLD rule Temperature Discovery
 
@@ -127,9 +127,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SNMPVALUE}: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/HP Comware HH3C by SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}`|Warning|**Depends on**:<br><ul><li>{#SNMPVALUE}: Temperature is above critical threshold</li></ul>|
-|{#SNMPVALUE}: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/HP Comware HH3C by SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}`|High||
-|{#SNMPVALUE}: Temperature is too low||`avg(/HP Comware HH3C by SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}`|Average||
+|HP Comware HH3C: {#SNMPVALUE}: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/HP Comware HH3C by SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SNMPVALUE}"}`|Warning|**Depends on**:<br><ul><li>HP Comware HH3C: {#SNMPVALUE}: Temperature is above critical threshold</li></ul>|
+|HP Comware HH3C: {#SNMPVALUE}: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/HP Comware HH3C by SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SNMPVALUE}"}`|High||
+|HP Comware HH3C: {#SNMPVALUE}: Temperature is too low||`avg(/HP Comware HH3C by SNMP/sensor.temp.value[hh3cEntityExtTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SNMPVALUE}"}`|Average||
 
 ### LLD rule FAN Discovery
 
@@ -147,7 +147,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#ENT_NAME}: Fan is in critical state|<p>Please check the fan unit</p>|`count(/HP Comware HH3C by SNMP/sensor.fan.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"fanError\"}")=1 or count(/HP Comware HH3C by SNMP/sensor.fan.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"hardwareFaulty\"}")=1`|Average||
+|HP Comware HH3C: {#ENT_NAME}: Fan is in critical state|<p>Please check the fan unit</p>|`count(/HP Comware HH3C by SNMP/sensor.fan.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"fanError\"}")=1 or count(/HP Comware HH3C by SNMP/sensor.fan.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"hardwareFaulty\"}")=1`|Average||
 
 ### LLD rule PSU Discovery
 
@@ -165,7 +165,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#ENT_NAME}: Power supply is in critical state|<p>Please check the power supply unit for errors</p>|`count(/HP Comware HH3C by SNMP/sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"psuError\"}")=1 or count(/HP Comware HH3C by SNMP/sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"rpsError\"}")=1 or count(/HP Comware HH3C by SNMP/sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"hardwareFaulty\"}")=1`|Average||
+|HP Comware HH3C: {#ENT_NAME}: Power supply is in critical state|<p>Please check the power supply unit for errors</p>|`count(/HP Comware HH3C by SNMP/sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"psuError\"}")=1 or count(/HP Comware HH3C by SNMP/sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"rpsError\"}")=1 or count(/HP Comware HH3C by SNMP/sensor.psu.status[hh3cEntityExtErrorStatus.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"hardwareFaulty\"}")=1`|Average||
 
 ### LLD rule Entity Discovery
 
@@ -187,9 +187,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#ENT_NAME}: Device has been replaced|<p>The device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/HP Comware HH3C by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/HP Comware HH3C by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
-|{#ENT_NAME}: Firmware has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/HP Comware HH3C by SNMP/system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C by SNMP/system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}],#2) and length(last(/HP Comware HH3C by SNMP/system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
-|{#ENT_NAME}: Operating system description has changed|<p>The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.</p>|`last(/HP Comware HH3C by SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C by SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}],#2) and length(last(/HP Comware HH3C by SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>System name has changed</li></ul>|
+|HP Comware HH3C: {#ENT_NAME}: Device has been replaced|<p>The device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/HP Comware HH3C by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}],#2) and length(last(/HP Comware HH3C by SNMP/system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|HP Comware HH3C: {#ENT_NAME}: Firmware has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/HP Comware HH3C by SNMP/system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C by SNMP/system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}],#2) and length(last(/HP Comware HH3C by SNMP/system.hw.firmware[entPhysicalFirmwareRev.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|HP Comware HH3C: {#ENT_NAME}: Operating system description has changed|<p>The description of the operating system has changed. Possible reasons are that the system has been updated or replaced. Acknowledge to close the problem manually.</p>|`last(/HP Comware HH3C by SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C by SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}],#2) and length(last(/HP Comware HH3C by SNMP/system.sw.os[entPhysicalSoftwareRev.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HP Comware HH3C: System name has changed</li></ul>|
 
 ### LLD rule EtherLike-MIB Discovery
 
@@ -207,7 +207,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Interface {#IFNAME}({#IFALIAS}): In half-duplex mode|<p>Please check autonegotiation settings and cabling.</p>|`last(/HP Comware HH3C by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2`|Warning|**Manual close**: Yes|
+|HP Comware HH3C: Interface {#IFNAME}({#IFALIAS}): In half-duplex mode|<p>Please check autonegotiation settings and cabling.</p>|`last(/HP Comware HH3C by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2`|Warning|**Manual close**: Yes|
 
 ### LLD rule Network interfaces discovery
 
@@ -233,10 +233,10 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))`|Average|**Manual close**: Yes|
-|Interface {#IFNAME}({#IFALIAS}): High bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/HP Comware HH3C by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/HP Comware HH3C by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or avg(/HP Comware HH3C by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/HP Comware HH3C by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and last(/HP Comware HH3C by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): High error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/HP Comware HH3C by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"} or min(/HP Comware HH3C by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.</p>|`change(/HP Comware HH3C by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/HP Comware HH3C by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and ( last(/HP Comware HH3C by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or last(/HP Comware HH3C by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or last(/HP Comware HH3C by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or last(/HP Comware HH3C by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or last(/HP Comware HH3C by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or last(/HP Comware HH3C by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117 ) and (last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|HP Comware HH3C: Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for "eternal off" interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))`|Average|**Manual close**: Yes|
+|HP Comware HH3C: Interface {#IFNAME}({#IFALIAS}): High bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/HP Comware HH3C by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/HP Comware HH3C by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or avg(/HP Comware HH3C by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/HP Comware HH3C by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and last(/HP Comware HH3C by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HP Comware HH3C: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|HP Comware HH3C: Interface {#IFNAME}({#IFALIAS}): High error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/HP Comware HH3C by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"} or min(/HP Comware HH3C by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HP Comware HH3C: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
+|HP Comware HH3C: Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.</p>|`change(/HP Comware HH3C by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/HP Comware HH3C by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and ( last(/HP Comware HH3C by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or last(/HP Comware HH3C by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or last(/HP Comware HH3C by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or last(/HP Comware HH3C by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or last(/HP Comware HH3C by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or last(/HP Comware HH3C by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117 ) and (last(/HP Comware HH3C by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HP Comware HH3C: Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
 
 ## Feedback
 

@@ -80,15 +80,15 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|System status is in critical state|<p>Please check the device for errors</p>|`count(/HP iLO by SNMP/system.status[cpqHeMibCondition.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1`|High||
-|System status is in warning state|<p>Please check the device for warnings</p>|`count(/HP iLO by SNMP/system.status[cpqHeMibCondition.0],#1,"eq","{$HEALTH_WARN_STATUS}")=1`|Warning|**Depends on**:<br><ul><li>System status is in critical state</li></ul>|
-|Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/HP iLO by SNMP/system.hw.serialnumber,#1)<>last(/HP iLO by SNMP/system.hw.serialnumber,#2) and length(last(/HP iLO by SNMP/system.hw.serialnumber))>0`|Info|**Manual close**: Yes|
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/HP iLO by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/HP iLO by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/HP iLO by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/HP iLO by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>No SNMP data collection</li></ul>|
-|System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/HP iLO by SNMP/system.name,#1)<>last(/HP iLO by SNMP/system.name,#2) and length(last(/HP iLO by SNMP/system.name))>0`|Info|**Manual close**: Yes|
-|No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/HP iLO by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/HP iLO by SNMP/icmpping,#3)=0`|High||
-|High ICMP ping loss||`min(/HP iLO by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/HP iLO by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/HP iLO by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>High ICMP ping loss</li><li>Unavailable by ICMP ping</li></ul>|
+|HP iLO: System status is in critical state|<p>Please check the device for errors</p>|`count(/HP iLO by SNMP/system.status[cpqHeMibCondition.0],#1,"eq","{$HEALTH_CRIT_STATUS}")=1`|High||
+|HP iLO: System status is in warning state|<p>Please check the device for warnings</p>|`count(/HP iLO by SNMP/system.status[cpqHeMibCondition.0],#1,"eq","{$HEALTH_WARN_STATUS}")=1`|Warning|**Depends on**:<br><ul><li>HP iLO: System status is in critical state</li></ul>|
+|HP iLO: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/HP iLO by SNMP/system.hw.serialnumber,#1)<>last(/HP iLO by SNMP/system.hw.serialnumber,#2) and length(last(/HP iLO by SNMP/system.hw.serialnumber))>0`|Info|**Manual close**: Yes|
+|HP iLO: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/HP iLO by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/HP iLO by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/HP iLO by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/HP iLO by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HP iLO: No SNMP data collection</li></ul>|
+|HP iLO: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/HP iLO by SNMP/system.name,#1)<>last(/HP iLO by SNMP/system.name,#2) and length(last(/HP iLO by SNMP/system.name))>0`|Info|**Manual close**: Yes|
+|HP iLO: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/HP iLO by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>HP iLO: Unavailable by ICMP ping</li></ul>|
+|HP iLO: Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/HP iLO by SNMP/icmpping,#3)=0`|High||
+|HP iLO: High ICMP ping loss||`min(/HP iLO by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/HP iLO by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>HP iLO: Unavailable by ICMP ping</li></ul>|
+|HP iLO: High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/HP iLO by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>HP iLO: High ICMP ping loss</li><li>HP iLO: Unavailable by ICMP ping</li></ul>|
 
 ### LLD rule Temperature Discovery
 
@@ -108,9 +108,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
-|{#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 3`|Warning||
-|{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 4`|High||
+|HP iLO: {#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
+|HP iLO: {#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 3`|Warning||
+|HP iLO: {#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.{#SNMPINDEX}]) = 4`|High||
 
 ### LLD rule Temperature Discovery Ambient
 
@@ -129,9 +129,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Ambient: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
-|Ambient: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 3`|Warning||
-|Ambient: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 4`|High||
+|HP iLO: Ambient: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
+|HP iLO: Ambient: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 3`|Warning||
+|HP iLO: Ambient: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.Ambient.{#SNMPINDEX}]) = 4`|High||
 
 ### LLD rule Temperature Discovery CPU
 
@@ -150,9 +150,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|CPU-{#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
-|CPU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 3`|Warning||
-|CPU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 4`|High||
+|HP iLO: CPU-{#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
+|HP iLO: CPU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 3`|Warning||
+|HP iLO: CPU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.CPU.{#SNMPINDEX}]) = 4`|High||
 
 ### LLD rule Temperature Discovery Memory
 
@@ -171,9 +171,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Memory-{#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
-|Memory-{#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 3`|Warning||
-|Memory-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 4`|High||
+|HP iLO: Memory-{#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
+|HP iLO: Memory-{#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 3`|Warning||
+|HP iLO: Memory-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.Memory.{#SNMPINDEX}]) = 4`|High||
 
 ### LLD rule Temperature Discovery PSU
 
@@ -192,9 +192,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|PSU-{#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
-|PSU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 3`|Warning||
-|PSU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 4`|High||
+|HP iLO: PSU-{#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
+|HP iLO: PSU-{#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 3`|Warning||
+|HP iLO: PSU-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.PSU.{#SNMPINDEX}]) = 4`|High||
 
 ### LLD rule Temperature Discovery I/O
 
@@ -213,9 +213,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|I/O-{#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 1`|Info|**Manual close**: Yes|
-|I/O-{#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 3`|Warning||
-|I/O-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 4`|High||
+|HP iLO: I/O-{#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 1`|Info|**Manual close**: Yes|
+|HP iLO: I/O-{#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 3`|Warning||
+|HP iLO: I/O-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition."I/O.{#SNMPINDEX}"]) = 4`|High||
 
 ### LLD rule Temperature Discovery System
 
@@ -234,9 +234,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|System-{#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
-|System-{#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 3`|Warning||
-|System-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 4`|High||
+|HP iLO: System-{#SNMPINDEX}: Temperature could not be determined|<p>Temperature could not be determined.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 1`|Info|**Manual close**: Yes|
+|HP iLO: System-{#SNMPINDEX}: The temperature sensor is outside of normal operating range|<p>If the cpqHeThermalDegradedAction is set to shutdown(3) the system will be shutdown if the degraded(3) condition occurs.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 3`|Warning||
+|HP iLO: System-{#SNMPINDEX}: The temperature sensor detects a condition that could permanently damage the system.|<p>The system will automatically shutdown if the failed(4) condition results, so it is unlikely that this value will ever be returned by the agent.</p>|`last(/HP iLO by SNMP/sensor.temp.condition[cpqHeTemperatureCondition.System.{#SNMPINDEX}]) = 4`|High||
 
 ### LLD rule PSU Discovery
 
@@ -254,8 +254,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state|<p>Please check the power supply unit for errors</p>|`count(/HP iLO by SNMP/sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1`|Average||
-|Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in warning state|<p>Please check the power supply unit for errors</p>|`count(/HP iLO by SNMP/sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS}")=1`|Warning|**Depends on**:<br><ul><li>Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state</li></ul>|
+|HP iLO: Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state|<p>Please check the power supply unit for errors</p>|`count(/HP iLO by SNMP/sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS}")=1`|Average||
+|HP iLO: Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in warning state|<p>Please check the power supply unit for errors</p>|`count(/HP iLO by SNMP/sensor.psu.status[cpqHeFltTolPowerSupplyCondition.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS}")=1`|Warning|**Depends on**:<br><ul><li>HP iLO: Chassis {#CHASSIS_NUM}, bay {#BAY_NUM}: Power supply is in critical state</li></ul>|
 
 ### LLD rule FAN Discovery
 
@@ -273,8 +273,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Fan {#SNMPINDEX}: Fan is in critical state|<p>Please check the fan unit</p>|`count(/HP iLO by SNMP/sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1`|Average||
-|Fan {#SNMPINDEX}: Fan is in warning state|<p>Please check the fan unit</p>|`count(/HP iLO by SNMP/sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS}")=1`|Warning|**Depends on**:<br><ul><li>Fan {#SNMPINDEX}: Fan is in critical state</li></ul>|
+|HP iLO: Fan {#SNMPINDEX}: Fan is in critical state|<p>Please check the fan unit</p>|`count(/HP iLO by SNMP/sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS}")=1`|Average||
+|HP iLO: Fan {#SNMPINDEX}: Fan is in warning state|<p>Please check the fan unit</p>|`count(/HP iLO by SNMP/sensor.fan.status[cpqHeFltTolFanCondition.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS}")=1`|Warning|**Depends on**:<br><ul><li>HP iLO: Fan {#SNMPINDEX}: Fan is in critical state</li></ul>|
 
 ### LLD rule Physical Disk Discovery
 
@@ -297,10 +297,10 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#DISK_LOCATION}: Physical disk failed|<p>Please check physical disk for warnings or errors</p>|`count(/HP iLO by SNMP/system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS}")=1`|High||
-|{#DISK_LOCATION}: Physical disk is in warning state|<p>Please check physical disk for warnings or errors</p>|`count(/HP iLO by SNMP/system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}],#1,"eq","{$DISK_WARN_STATUS}")=1`|Warning|**Depends on**:<br><ul><li>{#DISK_LOCATION}: Physical disk failed</li></ul>|
-|{#DISK_LOCATION}: Physical disk S.M.A.R.T. failed|<p>Disk probably requires replacement.</p>|`count(/HP iLO by SNMP/system.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}],#1,"eq","{$DISK_SMART_FAIL_STATUS:\"replaceDrive\"}")=1 or count(/HP iLO by SNMP/system.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}],#1,"eq","{$DISK_SMART_FAIL_STATUS:\"replaceDriveSSDWearOut\"}")=1`|High|**Depends on**:<br><ul><li>{#DISK_LOCATION}: Physical disk failed</li></ul>|
-|{#DISK_LOCATION}: Disk has been replaced|<p>Disk serial number has changed. Acknowledge to close the problem manually.</p>|`last(/HP iLO by SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#1)<>last(/HP iLO by SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#2) and length(last(/HP iLO by SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|HP iLO: {#DISK_LOCATION}: Physical disk failed|<p>Please check physical disk for warnings or errors</p>|`count(/HP iLO by SNMP/system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS}")=1`|High||
+|HP iLO: {#DISK_LOCATION}: Physical disk is in warning state|<p>Please check physical disk for warnings or errors</p>|`count(/HP iLO by SNMP/system.hw.physicaldisk.status[cpqDaPhyDrvStatus.{#SNMPINDEX}],#1,"eq","{$DISK_WARN_STATUS}")=1`|Warning|**Depends on**:<br><ul><li>HP iLO: {#DISK_LOCATION}: Physical disk failed</li></ul>|
+|HP iLO: {#DISK_LOCATION}: Physical disk S.M.A.R.T. failed|<p>Disk probably requires replacement.</p>|`count(/HP iLO by SNMP/system.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}],#1,"eq","{$DISK_SMART_FAIL_STATUS:\"replaceDrive\"}")=1 or count(/HP iLO by SNMP/system.hw.physicaldisk.smart_status[cpqDaPhyDrvSmartStatus.{#SNMPINDEX}],#1,"eq","{$DISK_SMART_FAIL_STATUS:\"replaceDriveSSDWearOut\"}")=1`|High|**Depends on**:<br><ul><li>HP iLO: {#DISK_LOCATION}: Physical disk failed</li></ul>|
+|HP iLO: {#DISK_LOCATION}: Disk has been replaced|<p>Disk serial number has changed. Acknowledge to close the problem manually.</p>|`last(/HP iLO by SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#1)<>last(/HP iLO by SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}],#2) and length(last(/HP iLO by SNMP/system.hw.physicaldisk.serialnumber[cpqDaPhyDrvSerialNum.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Virtual Disk Discovery
 
@@ -320,8 +320,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed|<p>Please check virtual disk for warnings or errors</p>|`count(/HP iLO by SNMP/system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}],#1,"eq","{$VDISK_CRIT_STATUS}")=1`|High||
-|Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk is not in OK state|<p>Please check virtual disk for warnings or errors</p>|`count(/HP iLO by SNMP/system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}],#1,"ne","{$VDISK_OK_STATUS}")=1`|Warning|**Depends on**:<br><ul><li>Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed</li></ul>|
+|HP iLO: Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed|<p>Please check virtual disk for warnings or errors</p>|`count(/HP iLO by SNMP/system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}],#1,"eq","{$VDISK_CRIT_STATUS}")=1`|High||
+|HP iLO: Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk is not in OK state|<p>Please check virtual disk for warnings or errors</p>|`count(/HP iLO by SNMP/system.hw.virtualdisk.status[cpqDaLogDrvStatus.{#SNMPINDEX}],#1,"ne","{$VDISK_OK_STATUS}")=1`|Warning|**Depends on**:<br><ul><li>HP iLO: Disk {#SNMPINDEX}({#DISK_NAME}): Virtual disk failed</li></ul>|
 
 ### LLD rule Array Controller Discovery
 
@@ -340,8 +340,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#CNTLR_LOCATION}: Disk array controller is in critical state|<p>Please check the device for faults</p>|`count(/HP iLO by SNMP/system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CRIT_STATUS}")=1`|High||
-|{#CNTLR_LOCATION}: Disk array controller is in warning state|<p>Please check the device for faults</p>|`count(/HP iLO by SNMP/system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_WARN_STATUS}")=1`|Average|**Depends on**:<br><ul><li>{#CNTLR_LOCATION}: Disk array controller is in critical state</li></ul>|
+|HP iLO: {#CNTLR_LOCATION}: Disk array controller is in critical state|<p>Please check the device for faults</p>|`count(/HP iLO by SNMP/system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CRIT_STATUS}")=1`|High||
+|HP iLO: {#CNTLR_LOCATION}: Disk array controller is in warning state|<p>Please check the device for faults</p>|`count(/HP iLO by SNMP/system.hw.diskarray.status[cpqDaCntlrCondition.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_WARN_STATUS}")=1`|Average|**Depends on**:<br><ul><li>HP iLO: {#CNTLR_LOCATION}: Disk array controller is in critical state</li></ul>|
 
 ### LLD rule Array Controller Cache Discovery
 
@@ -360,11 +360,11 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!|<p>Please check the device for faults</p>|`count(/HP iLO by SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_CRIT_STATUS:\"cacheModCriticalFailure\"}")=1`|Average||
-|#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state|<p>Please check the device for faults</p>|`count(/HP iLO by SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_WARN_STATUS:\"cacheModDegradedFailsafeSpeed\"}")=1 or count(/HP iLO by SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_WARN_STATUS:\"cacheReadCacheNotMapped\"}")=1 or count(/HP iLO by SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_WARN_STATUS:\"cacheModFlashMemNotAttached\"}")=1`|Warning|**Depends on**:<br><ul><li>#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!</li></ul>|
-|#{#CACHE_CNTRL_INDEX}: Disk array cache controller is not in optimal state|<p>Please check the device for faults</p>|`count(/HP iLO by SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"ne","{$DISK_ARRAY_CACHE_OK_STATUS:\"enabled\"}")=1 and last(/HP iLO by SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])<>{$DISK_ARRAY_CACHE_WARN_STATUS:"invalid"}`|Warning|**Depends on**:<br><ul><li>#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state</li><li>#{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!</li></ul>|
-|#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state!|<p>Please check the device for faults</p>|`count(/HP iLO by SNMP/system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:\"failed\"}")=1 or count(/HP iLO by SNMP/system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:\"capacitorFailed\"}")=1`|Average||
-|#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in warning state|<p>Please check the device for faults</p>|`count(/HP iLO by SNMP/system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS:\"degraded\"}")=1`|Warning|**Depends on**:<br><ul><li>#{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state!</li></ul>|
+|HP iLO: #{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!|<p>Please check the device for faults</p>|`count(/HP iLO by SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_CRIT_STATUS:\"cacheModCriticalFailure\"}")=1`|Average||
+|HP iLO: #{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state|<p>Please check the device for faults</p>|`count(/HP iLO by SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_WARN_STATUS:\"cacheModDegradedFailsafeSpeed\"}")=1 or count(/HP iLO by SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_WARN_STATUS:\"cacheReadCacheNotMapped\"}")=1 or count(/HP iLO by SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_WARN_STATUS:\"cacheModFlashMemNotAttached\"}")=1`|Warning|**Depends on**:<br><ul><li>HP iLO: #{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!</li></ul>|
+|HP iLO: #{#CACHE_CNTRL_INDEX}: Disk array cache controller is not in optimal state|<p>Please check the device for faults</p>|`count(/HP iLO by SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}],#1,"ne","{$DISK_ARRAY_CACHE_OK_STATUS:\"enabled\"}")=1 and last(/HP iLO by SNMP/system.hw.diskarray.cache.status[cpqDaAccelStatus.{#SNMPINDEX}])<>{$DISK_ARRAY_CACHE_WARN_STATUS:"invalid"}`|Warning|**Depends on**:<br><ul><li>HP iLO: #{#CACHE_CNTRL_INDEX}: Disk array cache controller is in warning state</li><li>HP iLO: #{#CACHE_CNTRL_INDEX}: Disk array cache controller is in critical state!</li></ul>|
+|HP iLO: #{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state!|<p>Please check the device for faults</p>|`count(/HP iLO by SNMP/system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:\"failed\"}")=1 or count(/HP iLO by SNMP/system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS:\"capacitorFailed\"}")=1`|Average||
+|HP iLO: #{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in warning state|<p>Please check the device for faults</p>|`count(/HP iLO by SNMP/system.hw.diskarray.cache.battery.status[cpqDaAccelBattery.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_WARN_STATUS:\"degraded\"}")=1`|Warning|**Depends on**:<br><ul><li>HP iLO: #{#CACHE_CNTRL_INDEX}: Disk array cache controller battery is in critical state!</li></ul>|
 
 ## Feedback
 

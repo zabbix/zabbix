@@ -78,12 +78,12 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Cisco UCS by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Cisco UCS by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Cisco UCS by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Cisco UCS by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>No SNMP data collection</li></ul>|
-|System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Cisco UCS by SNMP/system.name,#1)<>last(/Cisco UCS by SNMP/system.name,#2) and length(last(/Cisco UCS by SNMP/system.name))>0`|Info|**Manual close**: Yes|
-|No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Cisco UCS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/Cisco UCS by SNMP/icmpping,#3)=0`|High||
-|High ICMP ping loss||`min(/Cisco UCS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco UCS by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/Cisco UCS by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>High ICMP ping loss</li><li>Unavailable by ICMP ping</li></ul>|
+|Cisco UCS: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Cisco UCS by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Cisco UCS by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Cisco UCS by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Cisco UCS by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Cisco UCS: No SNMP data collection</li></ul>|
+|Cisco UCS: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Cisco UCS by SNMP/system.name,#1)<>last(/Cisco UCS by SNMP/system.name,#2) and length(last(/Cisco UCS by SNMP/system.name))>0`|Info|**Manual close**: Yes|
+|Cisco UCS: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Cisco UCS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Cisco UCS: Unavailable by ICMP ping</li></ul>|
+|Cisco UCS: Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/Cisco UCS by SNMP/icmpping,#3)=0`|High||
+|Cisco UCS: High ICMP ping loss||`min(/Cisco UCS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Cisco UCS by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Cisco UCS: Unavailable by ICMP ping</li></ul>|
+|Cisco UCS: High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/Cisco UCS by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>Cisco UCS: High ICMP ping loss</li><li>Cisco UCS: Unavailable by ICMP ping</li></ul>|
 
 ### LLD rule Temperature Discovery
 
@@ -104,18 +104,18 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SENSOR_LOCATION}.Ambient: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Ambient"}`|Warning|**Depends on**:<br><ul><li>{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold</li></ul>|
-|{#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Ambient"}`|High||
-|{#SENSOR_LOCATION}.Ambient: Temperature is too low||`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Ambient"}`|Average||
-|{#SENSOR_LOCATION}.Front: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Ambient"}`|Warning|**Depends on**:<br><ul><li>{#SENSOR_LOCATION}.Front: Temperature is above critical threshold</li></ul>|
-|{#SENSOR_LOCATION}.Front: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Ambient"}`|High||
-|{#SENSOR_LOCATION}.Front: Temperature is too low||`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Ambient"}`|Average||
-|{#SENSOR_LOCATION}.Rear: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Ambient"}`|Warning|**Depends on**:<br><ul><li>{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold</li></ul>|
-|{#SENSOR_LOCATION}.Rear: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Ambient"}`|High||
-|{#SENSOR_LOCATION}.Rear: Temperature is too low||`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Ambient"}`|Average||
-|{#SENSOR_LOCATION}.IOH: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Ambient"}`|Warning|**Depends on**:<br><ul><li>{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold</li></ul>|
-|{#SENSOR_LOCATION}.IOH: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Ambient"}`|High||
-|{#SENSOR_LOCATION}.IOH: Temperature is too low||`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Ambient"}`|Average||
+|Cisco UCS: {#SENSOR_LOCATION}.Ambient: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Ambient"}`|Warning|**Depends on**:<br><ul><li>Cisco UCS: {#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold</li></ul>|
+|Cisco UCS: {#SENSOR_LOCATION}.Ambient: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Ambient"}`|High||
+|Cisco UCS: {#SENSOR_LOCATION}.Ambient: Temperature is too low||`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsAmbientTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Ambient"}`|Average||
+|Cisco UCS: {#SENSOR_LOCATION}.Front: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Ambient"}`|Warning|**Depends on**:<br><ul><li>Cisco UCS: {#SENSOR_LOCATION}.Front: Temperature is above critical threshold</li></ul>|
+|Cisco UCS: {#SENSOR_LOCATION}.Front: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Ambient"}`|High||
+|Cisco UCS: {#SENSOR_LOCATION}.Front: Temperature is too low||`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsFrontTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Ambient"}`|Average||
+|Cisco UCS: {#SENSOR_LOCATION}.Rear: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Ambient"}`|Warning|**Depends on**:<br><ul><li>Cisco UCS: {#SENSOR_LOCATION}.Rear: Temperature is above critical threshold</li></ul>|
+|Cisco UCS: {#SENSOR_LOCATION}.Rear: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Ambient"}`|High||
+|Cisco UCS: {#SENSOR_LOCATION}.Rear: Temperature is too low||`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempStatsRearTemp.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Ambient"}`|Average||
+|Cisco UCS: {#SENSOR_LOCATION}.IOH: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP_WARN:"Ambient"}`|Warning|**Depends on**:<br><ul><li>Cisco UCS: {#SENSOR_LOCATION}.IOH: Temperature is above critical threshold</li></ul>|
+|Cisco UCS: {#SENSOR_LOCATION}.IOH: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"Ambient"}`|High||
+|Cisco UCS: {#SENSOR_LOCATION}.IOH: Temperature is too low||`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsComputeRackUnitMbTempSltatsIoh1Temp.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"Ambient"}`|Average||
 
 ### LLD rule Temperature CPU Discovery
 
@@ -133,9 +133,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SENSOR_LOCATION}: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"CPU"}`|Warning|**Depends on**:<br><ul><li>{#SENSOR_LOCATION}: Temperature is above critical threshold</li></ul>|
-|{#SENSOR_LOCATION}: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}`|High||
-|{#SENSOR_LOCATION}: Temperature is too low||`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"CPU"}`|Average||
+|Cisco UCS: {#SENSOR_LOCATION}: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)>{$TEMP_WARN:"CPU"}`|Warning|**Depends on**:<br><ul><li>Cisco UCS: {#SENSOR_LOCATION}: Temperature is above critical threshold</li></ul>|
+|Cisco UCS: {#SENSOR_LOCATION}: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"CPU"}`|High||
+|Cisco UCS: {#SENSOR_LOCATION}: Temperature is too low||`avg(/Cisco UCS by SNMP/sensor.temp.value[cucsProcessorEnvStatsTemperature.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"CPU"}`|Average||
 
 ### LLD rule PSU Discovery
 
@@ -153,8 +153,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#PSU_LOCATION}: Power supply is in critical state|<p>Please check the power supply unit for errors</p>|`count(/Cisco UCS by SNMP/sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"inoperable\"}")=1`|Average||
-|{#PSU_LOCATION}: Power supply is in warning state|<p>Please check the power supply unit for errors</p>|`count(/Cisco UCS by SNMP/sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"degraded\"}")=1`|Warning|**Depends on**:<br><ul><li>{#PSU_LOCATION}: Power supply is in critical state</li></ul>|
+|Cisco UCS: {#PSU_LOCATION}: Power supply is in critical state|<p>Please check the power supply unit for errors</p>|`count(/Cisco UCS by SNMP/sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}],#1,"eq","{$PSU_CRIT_STATUS:\"inoperable\"}")=1`|Average||
+|Cisco UCS: {#PSU_LOCATION}: Power supply is in warning state|<p>Please check the power supply unit for errors</p>|`count(/Cisco UCS by SNMP/sensor.psu.status[cucsEquipmentPsuOperState.{#SNMPINDEX}],#1,"eq","{$PSU_WARN_STATUS:\"degraded\"}")=1`|Warning|**Depends on**:<br><ul><li>Cisco UCS: {#PSU_LOCATION}: Power supply is in critical state</li></ul>|
 
 ### LLD rule Unit Discovery
 
@@ -174,9 +174,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#UNIT_LOCATION}: System status is in critical state|<p>Please check the device for errors</p>|`count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_CRIT_STATUS:\"computeFailed\"}")=1 or count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_CRIT_STATUS:\"configFailure\"}")=1 or count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_CRIT_STATUS:\"unconfigFailure\"}")=1 or count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_CRIT_STATUS:\"inoperable\"}")=1`|High||
-|{#UNIT_LOCATION}: System status is in warning state|<p>Please check the device for warnings</p>|`count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_WARN_STATUS:\"testFailed\"}")=1 or count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_WARN_STATUS:\"thermalProblem\"}")=1 or count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_WARN_STATUS:\"powerProblem\"}")=1 or count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_WARN_STATUS:\"voltageProblem\"}")=1 or count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_WARN_STATUS:\"diagnosticsFailed\"}")=1`|Warning|**Depends on**:<br><ul><li>{#UNIT_LOCATION}: System status is in critical state</li></ul>|
-|{#UNIT_LOCATION}: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Cisco UCS by SNMP/system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}],#1)<>last(/Cisco UCS by SNMP/system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}],#2) and length(last(/Cisco UCS by SNMP/system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|Cisco UCS: {#UNIT_LOCATION}: System status is in critical state|<p>Please check the device for errors</p>|`count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_CRIT_STATUS:\"computeFailed\"}")=1 or count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_CRIT_STATUS:\"configFailure\"}")=1 or count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_CRIT_STATUS:\"unconfigFailure\"}")=1 or count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_CRIT_STATUS:\"inoperable\"}")=1`|High||
+|Cisco UCS: {#UNIT_LOCATION}: System status is in warning state|<p>Please check the device for warnings</p>|`count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_WARN_STATUS:\"testFailed\"}")=1 or count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_WARN_STATUS:\"thermalProblem\"}")=1 or count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_WARN_STATUS:\"powerProblem\"}")=1 or count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_WARN_STATUS:\"voltageProblem\"}")=1 or count(/Cisco UCS by SNMP/system.status[cucsComputeRackUnitOperState.{#SNMPINDEX}],#1,"eq","{$HEALTH_WARN_STATUS:\"diagnosticsFailed\"}")=1`|Warning|**Depends on**:<br><ul><li>Cisco UCS: {#UNIT_LOCATION}: System status is in critical state</li></ul>|
+|Cisco UCS: {#UNIT_LOCATION}: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Cisco UCS by SNMP/system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}],#1)<>last(/Cisco UCS by SNMP/system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}],#2) and length(last(/Cisco UCS by SNMP/system.hw.serialnumber[cucsComputeRackUnitSerial.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule FAN Discovery
 
@@ -194,8 +194,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#FAN_LOCATION}: Fan is in warning state|<p>Please check the fan unit</p>|`count(/Cisco UCS by SNMP/sensor.fan.status[cucsEquipmentFanOperState.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"degraded\"}")=1`|Warning|**Depends on**:<br><ul><li>{#FAN_LOCATION}: Fan is in critical state</li></ul>|
-|{#FAN_LOCATION}: Fan is in critical state|<p>Please check the fan unit</p>|`count(/Cisco UCS by SNMP/sensor.fan.status[cucsEquipmentFanOperState.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"inoperable\"}")=1`|Average||
+|Cisco UCS: {#FAN_LOCATION}: Fan is in warning state|<p>Please check the fan unit</p>|`count(/Cisco UCS by SNMP/sensor.fan.status[cucsEquipmentFanOperState.{#SNMPINDEX}],#1,"eq","{$FAN_WARN_STATUS:\"degraded\"}")=1`|Warning|**Depends on**:<br><ul><li>Cisco UCS: {#FAN_LOCATION}: Fan is in critical state</li></ul>|
+|Cisco UCS: {#FAN_LOCATION}: Fan is in critical state|<p>Please check the fan unit</p>|`count(/Cisco UCS by SNMP/sensor.fan.status[cucsEquipmentFanOperState.{#SNMPINDEX}],#1,"eq","{$FAN_CRIT_STATUS:\"inoperable\"}")=1`|Average||
 
 ### LLD rule Physical Disk Discovery
 
@@ -216,8 +216,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#DISK_LOCATION}: Physical disk failed|<p>Please check physical disk for warnings or errors</p>|`count(/Cisco UCS by SNMP/system.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"failed\"}")=1`|High||
-|{#DISK_LOCATION}: Physical disk error|<p>Please check physical disk for warnings or errors</p>|`count(/Cisco UCS by SNMP/system.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}],#1,"eq","{$DISK_CRIT_STATUS:\"bad\"}")=1 or count(/Cisco UCS by SNMP/system.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}],#1,"eq","{$DISK_CRIT_STATUS:\"predictiveFailure\"}")=1`|Average|**Depends on**:<br><ul><li>{#DISK_LOCATION}: Physical disk failed</li></ul>|
+|Cisco UCS: {#DISK_LOCATION}: Physical disk failed|<p>Please check physical disk for warnings or errors</p>|`count(/Cisco UCS by SNMP/system.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}],#1,"eq","{$DISK_FAIL_STATUS:\"failed\"}")=1`|High||
+|Cisco UCS: {#DISK_LOCATION}: Physical disk error|<p>Please check physical disk for warnings or errors</p>|`count(/Cisco UCS by SNMP/system.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}],#1,"eq","{$DISK_CRIT_STATUS:\"bad\"}")=1 or count(/Cisco UCS by SNMP/system.hw.physicaldisk.status[cucsStorageLocalDiskDiskState.{#SNMPINDEX}],#1,"eq","{$DISK_CRIT_STATUS:\"predictiveFailure\"}")=1`|Average|**Depends on**:<br><ul><li>Cisco UCS: {#DISK_LOCATION}: Physical disk failed</li></ul>|
 
 ### LLD rule Virtual Disk Discovery
 
@@ -237,7 +237,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#VDISK_LOCATION}: Virtual disk is not in OK state|<p>Please check virtual disk for warnings or errors</p>|`count(/Cisco UCS by SNMP/system.hw.virtualdisk.status[cucsStorageLocalLunPresence.{#SNMPINDEX}],#1,"ne","{$VDISK_OK_STATUS:\"equipped\"}")=1`|Warning||
+|Cisco UCS: {#VDISK_LOCATION}: Virtual disk is not in OK state|<p>Please check virtual disk for warnings or errors</p>|`count(/Cisco UCS by SNMP/system.hw.virtualdisk.status[cucsStorageLocalLunPresence.{#SNMPINDEX}],#1,"ne","{$VDISK_OK_STATUS:\"equipped\"}")=1`|Warning||
 
 ### LLD rule Array Controller Discovery
 
@@ -256,9 +256,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#DISKARRAY_LOCATION}: Disk array controller is in critical state|<p>Please check the device for faults</p>|`count(/Cisco UCS by SNMP/system.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CRIT_STATUS:\"inoperable\"}")=1`|High||
-|{#DISKARRAY_LOCATION}: Disk array controller is in warning state|<p>Please check the device for faults</p>|`count(/Cisco UCS by SNMP/system.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_WARN_STATUS:\"degraded\"}")=1`|Average|**Depends on**:<br><ul><li>{#DISKARRAY_LOCATION}: Disk array controller is in critical state</li></ul>|
-|{#DISKARRAY_LOCATION}: Disk array controller is not in optimal state|<p>Please check the device for faults</p>|`count(/Cisco UCS by SNMP/system.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}],#1,"ne","{$DISK_ARRAY_OK_STATUS:\"operable\"}")=1`|Warning|**Depends on**:<br><ul><li>{#DISKARRAY_LOCATION}: Disk array controller is in critical state</li><li>{#DISKARRAY_LOCATION}: Disk array controller is in warning state</li></ul>|
+|Cisco UCS: {#DISKARRAY_LOCATION}: Disk array controller is in critical state|<p>Please check the device for faults</p>|`count(/Cisco UCS by SNMP/system.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CRIT_STATUS:\"inoperable\"}")=1`|High||
+|Cisco UCS: {#DISKARRAY_LOCATION}: Disk array controller is in warning state|<p>Please check the device for faults</p>|`count(/Cisco UCS by SNMP/system.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_WARN_STATUS:\"degraded\"}")=1`|Average|**Depends on**:<br><ul><li>Cisco UCS: {#DISKARRAY_LOCATION}: Disk array controller is in critical state</li></ul>|
+|Cisco UCS: {#DISKARRAY_LOCATION}: Disk array controller is not in optimal state|<p>Please check the device for faults</p>|`count(/Cisco UCS by SNMP/system.hw.diskarray.status[cucsStorageControllerOperState.{#SNMPINDEX}],#1,"ne","{$DISK_ARRAY_OK_STATUS:\"operable\"}")=1`|Warning|**Depends on**:<br><ul><li>Cisco UCS: {#DISKARRAY_LOCATION}: Disk array controller is in critical state</li><li>Cisco UCS: {#DISKARRAY_LOCATION}: Disk array controller is in warning state</li></ul>|
 
 ### LLD rule Array Controller Cache Discovery
 
@@ -276,8 +276,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#DISKARRAY_CACHE_LOCATION}: Disk array cache controller battery is in critical state!|<p>Please check the device for faults</p>|`count(/Cisco UCS by SNMP/system.hw.diskarray.cache.battery.status[cucsStorageRaidBatteryOperability.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS}")=1`|Average||
-|{#DISKARRAY_CACHE_LOCATION}: Disk array cache controller battery is not in optimal state|<p>Please check the device for faults</p>|`count(/Cisco UCS by SNMP/system.hw.diskarray.cache.battery.status[cucsStorageRaidBatteryOperability.{#SNMPINDEX}],#1,"ne","{$DISK_ARRAY_CACHE_BATTERY_OK_STATUS}")=1`|Warning|**Depends on**:<br><ul><li>{#DISKARRAY_CACHE_LOCATION}: Disk array cache controller battery is in critical state!</li></ul>|
+|Cisco UCS: {#DISKARRAY_CACHE_LOCATION}: Disk array cache controller battery is in critical state!|<p>Please check the device for faults</p>|`count(/Cisco UCS by SNMP/system.hw.diskarray.cache.battery.status[cucsStorageRaidBatteryOperability.{#SNMPINDEX}],#1,"eq","{$DISK_ARRAY_CACHE_BATTERY_CRIT_STATUS}")=1`|Average||
+|Cisco UCS: {#DISKARRAY_CACHE_LOCATION}: Disk array cache controller battery is not in optimal state|<p>Please check the device for faults</p>|`count(/Cisco UCS by SNMP/system.hw.diskarray.cache.battery.status[cucsStorageRaidBatteryOperability.{#SNMPINDEX}],#1,"ne","{$DISK_ARRAY_CACHE_BATTERY_OK_STATUS}")=1`|Warning|**Depends on**:<br><ul><li>Cisco UCS: {#DISKARRAY_CACHE_LOCATION}: Disk array cache controller battery is in critical state!</li></ul>|
 
 ## Feedback
 

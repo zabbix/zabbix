@@ -225,12 +225,12 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Services: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Microsoft 365 reports by HTTP/ms365.services.errors))>0`|Average||
-|Teams: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Microsoft 365 reports by HTTP/ms365.teams.errors))>0`|Average||
-|Outlook: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Microsoft 365 reports by HTTP/ms365.outlook.errors))>0`|Average||
-|OneDrive: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Microsoft 365 reports by HTTP/ms365.onedrive.errors))>0`|Average||
-|SharePoint: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Microsoft 365 reports by HTTP/ms365.sharepoint.errors))>0`|Average||
-|Apps: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Microsoft 365 reports by HTTP/ms365.apps.errors))>0`|Average||
+|Microsoft 365: Services: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Microsoft 365 reports by HTTP/ms365.services.errors))>0`|Average||
+|Microsoft 365: Teams: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Microsoft 365 reports by HTTP/ms365.teams.errors))>0`|Average||
+|Microsoft 365: Outlook: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Microsoft 365 reports by HTTP/ms365.outlook.errors))>0`|Average||
+|Microsoft 365: OneDrive: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Microsoft 365 reports by HTTP/ms365.onedrive.errors))>0`|Average||
+|Microsoft 365: SharePoint: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Microsoft 365 reports by HTTP/ms365.sharepoint.errors))>0`|Average||
+|Microsoft 365: Apps: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Microsoft 365 reports by HTTP/ms365.apps.errors))>0`|Average||
 
 ### LLD rule Microsoft cloud service discovery
 
@@ -248,8 +248,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|MS365: Services: {#NAME} is degraded.|<p>The service has the "Degraded" health status.<br>An issue is confirmed that may affect the use of a service or feature. You might see this status if a service is performing slower than usual, there are intermittent interruptions, or if a feature isn't working.</p>|`last(/Microsoft 365 reports by HTTP/ms365.service.health[{#NAME}])=6`|Warning|**Manual close**: Yes|
-|MS365: Services: {#NAME} is interrupted.|<p>The service has the "Interruption" health status.<br>An issue was determined that affects users being able to access the service. In this case, the issue is significant and can be reproduced consistently.</p>|`last(/Microsoft 365 reports by HTTP/ms365.service.health[{#NAME}])=7`|Average|**Manual close**: Yes|
+|Microsoft 365: Services: {#NAME} is degraded.|<p>The service has the "Degraded" health status.<br>An issue is confirmed that may affect the use of a service or feature. You might see this status if a service is performing slower than usual, there are intermittent interruptions, or if a feature isn't working.</p>|`last(/Microsoft 365 reports by HTTP/ms365.service.health[{#NAME}])=6`|Warning|**Manual close**: Yes|
+|Microsoft 365: Services: {#NAME} is interrupted.|<p>The service has the "Interruption" health status.<br>An issue was determined that affects users being able to access the service. In this case, the issue is significant and can be reproduced consistently.</p>|`last(/Microsoft 365 reports by HTTP/ms365.service.health[{#NAME}])=7`|Average|**Manual close**: Yes|
 
 ## Feedback
 

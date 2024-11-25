@@ -56,12 +56,12 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Supermicro Aten by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Supermicro Aten by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Supermicro Aten by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Supermicro Aten by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>No SNMP data collection</li></ul>|
-|System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Supermicro Aten by SNMP/system.name,#1)<>last(/Supermicro Aten by SNMP/system.name,#2) and length(last(/Supermicro Aten by SNMP/system.name))>0`|Info|**Manual close**: Yes|
-|No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Supermicro Aten by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/Supermicro Aten by SNMP/icmpping,#3)=0`|High||
-|High ICMP ping loss||`min(/Supermicro Aten by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Supermicro Aten by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/Supermicro Aten by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>High ICMP ping loss</li><li>Unavailable by ICMP ping</li></ul>|
+|Supermicro Aten: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Supermicro Aten by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Supermicro Aten by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Supermicro Aten by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Supermicro Aten by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Supermicro Aten: No SNMP data collection</li></ul>|
+|Supermicro Aten: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Supermicro Aten by SNMP/system.name,#1)<>last(/Supermicro Aten by SNMP/system.name,#2) and length(last(/Supermicro Aten by SNMP/system.name))>0`|Info|**Manual close**: Yes|
+|Supermicro Aten: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Supermicro Aten by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Supermicro Aten: Unavailable by ICMP ping</li></ul>|
+|Supermicro Aten: Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/Supermicro Aten by SNMP/icmpping,#3)=0`|High||
+|Supermicro Aten: High ICMP ping loss||`min(/Supermicro Aten by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Supermicro Aten by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Supermicro Aten: Unavailable by ICMP ping</li></ul>|
+|Supermicro Aten: High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/Supermicro Aten by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>Supermicro Aten: High ICMP ping loss</li><li>Supermicro Aten: Unavailable by ICMP ping</li></ul>|
 
 ### LLD rule Temperature Discovery
 
@@ -79,9 +79,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SENSOR_DESCR}: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Supermicro Aten by SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SENSOR_DESCR}"}`|Warning|**Depends on**:<br><ul><li>{#SENSOR_DESCR}: Temperature is above critical threshold</li></ul>|
-|{#SENSOR_DESCR}: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Supermicro Aten by SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_DESCR}"}`|High||
-|{#SENSOR_DESCR}: Temperature is too low||`avg(/Supermicro Aten by SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SENSOR_DESCR}"}`|Average||
+|Supermicro Aten: {#SENSOR_DESCR}: Temperature is above warning threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Supermicro Aten by SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_WARN:"{#SENSOR_DESCR}"}`|Warning|**Depends on**:<br><ul><li>Supermicro Aten: {#SENSOR_DESCR}: Temperature is above critical threshold</li></ul>|
+|Supermicro Aten: {#SENSOR_DESCR}: Temperature is above critical threshold|<p>This trigger uses temperature sensor values as well as temperature sensor status if available</p>|`avg(/Supermicro Aten by SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)>{$TEMP_CRIT:"{#SENSOR_DESCR}"}`|High||
+|Supermicro Aten: {#SENSOR_DESCR}: Temperature is too low||`avg(/Supermicro Aten by SNMP/sensor.temp.value[sensorReading.{#SNMPINDEX}],5m)<{$TEMP_CRIT_LOW:"{#SENSOR_DESCR}"}`|Average||
 
 ### LLD rule FAN Discovery
 

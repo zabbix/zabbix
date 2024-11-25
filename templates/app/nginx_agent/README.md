@@ -97,7 +97,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.2/manual
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Version has changed|<p>The Nginx version has changed. Acknowledge to close the problem manually.</p>|`last(/Nginx by Zabbix agent/nginx.version,#1)<>last(/Nginx by Zabbix agent/nginx.version,#2) and length(last(/Nginx by Zabbix agent/nginx.version))>0`|Info|**Manual close**: Yes|
+|Nginx: Version has changed|<p>The Nginx version has changed. Acknowledge to close the problem manually.</p>|`last(/Nginx by Zabbix agent/nginx.version,#1)<>last(/Nginx by Zabbix agent/nginx.version,#2) and length(last(/Nginx by Zabbix agent/nginx.version))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Nginx process discovery
 
@@ -120,11 +120,11 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.2/manual
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Process is not running||`last(/Nginx by Zabbix agent/nginx.proc.num[{#NGINX.NAME}])=0`|High||
-|Service is down||`last(/Nginx by Zabbix agent/net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"])=0 and last(/Nginx by Zabbix agent/nginx.proc.num[{#NGINX.NAME}])>0`|Average|**Manual close**: Yes|
-|High connections drop rate|<p>The rate of dropping connections has been greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.</p>|`min(/Nginx by Zabbix agent/nginx.connections.dropped.rate,5m) > {$NGINX.DROP_RATE.MAX.WARN} and last(/Nginx by Zabbix agent/nginx.proc.num[{#NGINX.NAME}])>0`|Warning|**Depends on**:<br><ul><li>Service is down</li></ul>|
-|Service response time is too high||`min(/Nginx by Zabbix agent/net.tcp.service.perf[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"],5m)>{$NGINX.RESPONSE_TIME.MAX.WARN} and last(/Nginx by Zabbix agent/nginx.proc.num[{#NGINX.NAME}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Service is down</li></ul>|
-|Failed to fetch stub status page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`(find(/Nginx by Zabbix agent/web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"],,"iregexp","HTTP\\/[\\d.]+\\s+200")=0 or nodata(/Nginx by Zabbix agent/web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"],30m)) and last(/Nginx by Zabbix agent/nginx.proc.num[{#NGINX.NAME}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Service is down</li></ul>|
+|Nginx: Process is not running||`last(/Nginx by Zabbix agent/nginx.proc.num[{#NGINX.NAME}])=0`|High||
+|Nginx: Service is down||`last(/Nginx by Zabbix agent/net.tcp.service[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"])=0 and last(/Nginx by Zabbix agent/nginx.proc.num[{#NGINX.NAME}])>0`|Average|**Manual close**: Yes|
+|Nginx: High connections drop rate|<p>The rate of dropping connections has been greater than {$NGINX.DROP_RATE.MAX.WARN} for the last 5 minutes.</p>|`min(/Nginx by Zabbix agent/nginx.connections.dropped.rate,5m) > {$NGINX.DROP_RATE.MAX.WARN} and last(/Nginx by Zabbix agent/nginx.proc.num[{#NGINX.NAME}])>0`|Warning|**Depends on**:<br><ul><li>Nginx: Service is down</li></ul>|
+|Nginx: Service response time is too high||`min(/Nginx by Zabbix agent/net.tcp.service.perf[http,"{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PORT}"],5m)>{$NGINX.RESPONSE_TIME.MAX.WARN} and last(/Nginx by Zabbix agent/nginx.proc.num[{#NGINX.NAME}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Nginx: Service is down</li></ul>|
+|Nginx: Failed to fetch stub status page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`(find(/Nginx by Zabbix agent/web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"],,"iregexp","HTTP\\/[\\d.]+\\s+200")=0 or nodata(/Nginx by Zabbix agent/web.page.get["{$NGINX.STUB_STATUS.HOST}","{$NGINX.STUB_STATUS.PATH}","{$NGINX.STUB_STATUS.PORT}"],30m)) and last(/Nginx by Zabbix agent/nginx.proc.num[{#NGINX.NAME}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Nginx: Service is down</li></ul>|
 
 ## Feedback
 

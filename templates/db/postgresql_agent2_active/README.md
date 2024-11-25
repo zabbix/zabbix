@@ -151,12 +151,12 @@ Then set the `{$PG.CONNSTRING.AGENT2}` macro to `myconn` to use this named sessi
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Version has changed||`last(/PostgreSQL by Zabbix agent 2 active/pgsql.version["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],#1)<>last(/PostgreSQL by Zabbix agent 2 active/pgsql.version["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],#2) and length(last(/PostgreSQL by Zabbix agent 2 active/pgsql.version["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]))>0`|Info||
-|Dbstat: Checksum failures detected|<p>Data page checksum failures were detected on that DB instance:<br>https://www.postgresql.org/docs/current/checksums.html</p>|`last(/PostgreSQL by Zabbix agent 2 active/pgsql.dbstat.sum.checksum_failures.rate)>0`|Average||
-|Total number of connections is too high|<p>Total number of current connections exceeds the limit of {$PG.CONN_TOTAL_PCT.MAX.WARN}% out of the maximum number of concurrent connections to the database server (the "max_connections" setting).</p>|`min(/PostgreSQL by Zabbix agent 2 active/pgsql.connections.sum.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}`|Average||
-|Oldest xid is too big||`last(/PostgreSQL by Zabbix agent 2 active/pgsql.oldest.xid["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]) > 18000000`|Average||
-|Service has been restarted|<p>PostgreSQL uptime is less than 10 minutes.</p>|`last(/PostgreSQL by Zabbix agent 2 active/pgsql.uptime["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]) < 10m`|Average||
-|Service is down|<p>Last test of a connection was unsuccessful.</p>|`last(/PostgreSQL by Zabbix agent 2 active/pgsql.ping["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"])=0`|High||
+|PostgreSQL: Version has changed||`last(/PostgreSQL by Zabbix agent 2 active/pgsql.version["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],#1)<>last(/PostgreSQL by Zabbix agent 2 active/pgsql.version["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],#2) and length(last(/PostgreSQL by Zabbix agent 2 active/pgsql.version["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]))>0`|Info||
+|PostgreSQL: Dbstat: Checksum failures detected|<p>Data page checksum failures were detected on that DB instance:<br>https://www.postgresql.org/docs/current/checksums.html</p>|`last(/PostgreSQL by Zabbix agent 2 active/pgsql.dbstat.sum.checksum_failures.rate)>0`|Average||
+|PostgreSQL: Total number of connections is too high|<p>Total number of current connections exceeds the limit of {$PG.CONN_TOTAL_PCT.MAX.WARN}% out of the maximum number of concurrent connections to the database server (the "max_connections" setting).</p>|`min(/PostgreSQL by Zabbix agent 2 active/pgsql.connections.sum.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}`|Average||
+|PostgreSQL: Oldest xid is too big||`last(/PostgreSQL by Zabbix agent 2 active/pgsql.oldest.xid["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]) > 18000000`|Average||
+|PostgreSQL: Service has been restarted|<p>PostgreSQL uptime is less than 10 minutes.</p>|`last(/PostgreSQL by Zabbix agent 2 active/pgsql.uptime["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]) < 10m`|Average||
+|PostgreSQL: Service is down|<p>Last test of a connection was unsuccessful.</p>|`last(/PostgreSQL by Zabbix agent 2 active/pgsql.ping["{$PG.CONNSTRING.AGENT2}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"])=0`|High||
 
 ### LLD rule Replication discovery
 
@@ -229,10 +229,10 @@ Then set the `{$PG.CONNSTRING.AGENT2}` macro to `myconn` to use this named sessi
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|DB [{#DBNAME}]: Too many recovery conflicts|<p>The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.<br>https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</p>|`min(/PostgreSQL by Zabbix agent 2 active/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}`|Average||
-|DB [{#DBNAME}]: Deadlock occurred|<p>Number of deadlocks detected per second exceeds {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} for 5m.</p>|`min(/PostgreSQL by Zabbix agent 2 active/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}`|High||
-|DB [{#DBNAME}]: Checksum failures detected|<p>Data page checksum failures were detected on that database:<br>https://www.postgresql.org/docs/current/checksums.html</p>|`last(/PostgreSQL by Zabbix agent 2 active/pgsql.dbstat.checksum_failures.rate["{#DBNAME}"])>0`|Average||
-|DB [{#DBNAME}]: Too many slow queries|<p>The number of detected slow queries exceeds the limit of {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}.</p>|`min(/PostgreSQL by Zabbix agent 2 active/pgsql.queries.query.slow_count["{#DBNAME}"],5m)>{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}`|Warning||
+|PostgreSQL: DB [{#DBNAME}]: Too many recovery conflicts|<p>The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.<br>https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</p>|`min(/PostgreSQL by Zabbix agent 2 active/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}`|Average||
+|PostgreSQL: DB [{#DBNAME}]: Deadlock occurred|<p>Number of deadlocks detected per second exceeds {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} for 5m.</p>|`min(/PostgreSQL by Zabbix agent 2 active/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}`|High||
+|PostgreSQL: DB [{#DBNAME}]: Checksum failures detected|<p>Data page checksum failures were detected on that database:<br>https://www.postgresql.org/docs/current/checksums.html</p>|`last(/PostgreSQL by Zabbix agent 2 active/pgsql.dbstat.checksum_failures.rate["{#DBNAME}"])>0`|Average||
+|PostgreSQL: DB [{#DBNAME}]: Too many slow queries|<p>The number of detected slow queries exceeds the limit of {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}.</p>|`min(/PostgreSQL by Zabbix agent 2 active/pgsql.queries.query.slow_count["{#DBNAME}"],5m)>{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}`|Warning||
 
 ## Feedback
 

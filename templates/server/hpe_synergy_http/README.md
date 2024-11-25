@@ -62,8 +62,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|There are errors in requests to API|<p>Zabbix has received errors from API.</p>|`length(last(/HPE Synergy by HTTP/hpe.synergy.get.errors))>0`|Average|**Depends on**:<br><ul><li>Service is unavailable</li></ul>|
-|Service is unavailable||`max(/HPE Synergy by HTTP/net.tcp.service["{$HPE.SYNERGY.API.SCHEME}","{$HPE.SYNERGY.API.HOST}","{$HPE.SYNERGY.API.PORT}"],5m)=0`|High|**Manual close**: Yes|
+|HPE Synergy: There are errors in requests to API|<p>Zabbix has received errors from API.</p>|`length(last(/HPE Synergy by HTTP/hpe.synergy.get.errors))>0`|Average|**Depends on**:<br><ul><li>HPE Synergy: Service is unavailable</li></ul>|
+|HPE Synergy: Service is unavailable||`max(/HPE Synergy by HTTP/net.tcp.service["{$HPE.SYNERGY.API.SCHEME}","{$HPE.SYNERGY.API.HOST}","{$HPE.SYNERGY.API.PORT}"],5m)=0`|High|**Manual close**: Yes|
 
 ### LLD rule Appliance bays discovery
 
@@ -89,9 +89,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has critical status|<p>The appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=0`|High||
-|Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has warning status|<p>The appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=4`|Warning||
-|Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is disabled|<p>The appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is currently not operational</p>|`last(/HPE Synergy by HTTP/hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=1`|Info||
+|HPE Synergy: Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has critical status|<p>The appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=0`|High||
+|HPE Synergy: Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has warning status|<p>The appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=4`|Warning||
+|HPE Synergy: Appliance bay [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is disabled|<p>The appliance [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is currently not operational</p>|`last(/HPE Synergy by HTTP/hpe.synergy.appliance["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=1`|Info||
 
 ### LLD rule Cross bars discovery
 
@@ -114,10 +114,10 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is subsumed|<p>The device slot is configured to be part of another device slot.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",presence])=4`|Average||
-|Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has critical status|<p>The crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=0`|High||
-|Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has warning status|<p>The crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=4`|Warning||
-|Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is disabled|<p>The crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=1`|Info||
+|HPE Synergy: Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is subsumed|<p>The device slot is configured to be part of another device slot.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",presence])=4`|Average||
+|HPE Synergy: Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has critical status|<p>The crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=0`|High||
+|HPE Synergy: Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has warning status|<p>The crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=4`|Warning||
+|HPE Synergy: Crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is disabled|<p>The crossbar [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.crossbar["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=1`|Info||
 
 ### LLD rule Datacenters discovery
 
@@ -137,13 +137,13 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Datacenter [{#NAME}]: Add error|<p>The adding of the datacenter [{#NAME}] has failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",state])=1`|Average||
-|Datacenter [{#NAME}]: Has credential error|<p>The datacenter [{#NAME}] has a credential error.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",state])=3`|Average||
-|Datacenter [{#NAME}]: Has refresh error|<p>The datacenter [{#NAME}] has a refresh error.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",state])=5`|Average||
-|Datacenter [{#NAME}]: Has remove error|<p>The datacenter [{#NAME}] has a remove error.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",state])=7`|Average||
-|Datacenter [{#NAME}]: Has critical status|<p>The datacenter [{#NAME}] status is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",status])=0`|High||
-|Datacenter [{#NAME}]: Has warning status|<p>The datacenter [{#NAME}] status is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",status])=4`|Warning||
-|Datacenter [{#NAME}]: Is disabled|<p>the datacenter [{#NAME}] currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",status])=1`|Info||
+|HPE Synergy: Datacenter [{#NAME}]: Add error|<p>The adding of the datacenter [{#NAME}] has failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",state])=1`|Average||
+|HPE Synergy: Datacenter [{#NAME}]: Has credential error|<p>The datacenter [{#NAME}] has a credential error.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",state])=3`|Average||
+|HPE Synergy: Datacenter [{#NAME}]: Has refresh error|<p>The datacenter [{#NAME}] has a refresh error.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",state])=5`|Average||
+|HPE Synergy: Datacenter [{#NAME}]: Has remove error|<p>The datacenter [{#NAME}] has a remove error.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",state])=7`|Average||
+|HPE Synergy: Datacenter [{#NAME}]: Has critical status|<p>The datacenter [{#NAME}] status is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",status])=0`|High||
+|HPE Synergy: Datacenter [{#NAME}]: Has warning status|<p>The datacenter [{#NAME}] status is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",status])=4`|Warning||
+|HPE Synergy: Datacenter [{#NAME}]: Is disabled|<p>the datacenter [{#NAME}] currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.datacenter["{#NAME}",status])=1`|Info||
 
 ### LLD rule Devices discovery
 
@@ -165,7 +165,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Device [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is subsumed|<p>The device slot is configured to be part of another device slot.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.device["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",presence])=4`|Average||
+|HPE Synergy: Device [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is subsumed|<p>The device slot is configured to be part of another device slot.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.device["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",presence])=4`|Average||
 
 ### LLD rule Enclosures discovery
 
@@ -204,14 +204,14 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Enclosure [{#NAME}]: Is interrupted|<p>The previous operation on the enclosure did not complete. The operation should be re-attempted.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state])=3 and last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state_reason])>-1`|Warning||
-|Enclosure [{#NAME}]: Is unsupported|<p>The enclosure model or version is not currently supported by HPE OneView. It cannot be configured or monitored.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state])=9 and last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state_reason])>-1`|Average||
-|Enclosure [{#NAME}]: Remove failed|<p>The previous operation to remove the enclosure did not succeed. The operation should be re-attempted.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state])=6 and last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state_reason])>-1`|Warning||
-|Enclosure [{#NAME}]: Is missing|<p>The enclosure is no longer connected into the frame link topology.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state_reason])=0`|Average||
-|Enclosure [{#NAME}]: Is unowned|<p>The enclosure reports are not being under the management.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state_reason])=5`|Average||
-|Enclosure [{#NAME}]: Has critical status|<p>The status of the enclosure [{#NAME}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",status])=0`|High||
-|Enclosure [{#NAME}]: Has warning status|<p>The status of the enclosure [{#NAME}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",status])=4`|Warning||
-|Enclosure [{#NAME}]: Is disabled|<p>The enclosure [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",status])=1`|Info||
+|HPE Synergy: Enclosure [{#NAME}]: Is interrupted|<p>The previous operation on the enclosure did not complete. The operation should be re-attempted.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state])=3 and last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state_reason])>-1`|Warning||
+|HPE Synergy: Enclosure [{#NAME}]: Is unsupported|<p>The enclosure model or version is not currently supported by HPE OneView. It cannot be configured or monitored.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state])=9 and last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state_reason])>-1`|Average||
+|HPE Synergy: Enclosure [{#NAME}]: Remove failed|<p>The previous operation to remove the enclosure did not succeed. The operation should be re-attempted.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state])=6 and last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state_reason])>-1`|Warning||
+|HPE Synergy: Enclosure [{#NAME}]: Is missing|<p>The enclosure is no longer connected into the frame link topology.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state_reason])=0`|Average||
+|HPE Synergy: Enclosure [{#NAME}]: Is unowned|<p>The enclosure reports are not being under the management.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",state_reason])=5`|Average||
+|HPE Synergy: Enclosure [{#NAME}]: Has critical status|<p>The status of the enclosure [{#NAME}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",status])=0`|High||
+|HPE Synergy: Enclosure [{#NAME}]: Has warning status|<p>The status of the enclosure [{#NAME}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",status])=4`|Warning||
+|HPE Synergy: Enclosure [{#NAME}]: Is disabled|<p>The enclosure [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.enclosure["{#NAME}",status])=1`|Info||
 
 ### LLD rule Ethernet networks discovery
 
@@ -231,9 +231,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Ethernet network [{#NAME}]: Has critical status|<p>The ethernet network [{#NAME}] status is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.ethernet.network["{#NAME}",status])=0`|High||
-|Ethernet network [{#NAME}]: Has warning status|<p>The ethernet network [{#NAME}] status is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.ethernet.network["{#NAME}",status])=4`|Warning||
-|Ethernet network [{#NAME}]: Is disabled|<p>The ethernet network [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.ethernet.network["{#NAME}",status])=1`|Info||
+|HPE Synergy: Ethernet network [{#NAME}]: Has critical status|<p>The ethernet network [{#NAME}] status is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.ethernet.network["{#NAME}",status])=0`|High||
+|HPE Synergy: Ethernet network [{#NAME}]: Has warning status|<p>The ethernet network [{#NAME}] status is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.ethernet.network["{#NAME}",status])=4`|Warning||
+|HPE Synergy: Ethernet network [{#NAME}]: Is disabled|<p>The ethernet network [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.ethernet.network["{#NAME}",status])=1`|Info||
 
 ### LLD rule Fabrics discovery
 
@@ -253,9 +253,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Fabric [{#NAME}]: Has critical status|<p>The status of the fabric [{#NAME}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fabric["{#NAME}",status])=0`|High||
-|Fabric [{#NAME}]: Has warning status|<p>The status of the fabric [{#NAME}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fabric["{#NAME}",status])=4`|Warning||
-|Fabric [{#NAME}]: Is disabled|<p>The status of the fabric [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fabric["{#NAME}",status])=1`|Info||
+|HPE Synergy: Fabric [{#NAME}]: Has critical status|<p>The status of the fabric [{#NAME}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fabric["{#NAME}",status])=0`|High||
+|HPE Synergy: Fabric [{#NAME}]: Has warning status|<p>The status of the fabric [{#NAME}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fabric["{#NAME}",status])=4`|Warning||
+|HPE Synergy: Fabric [{#NAME}]: Is disabled|<p>The status of the fabric [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fabric["{#NAME}",status])=1`|Info||
 
 ### LLD rule Fans discovery
 
@@ -281,13 +281,13 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is degraded|<p>The fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is in degraded state.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",state])=0`|Average||
-|Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is failed|<p>The fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is in failed state.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",state])=1`|High||
-|Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is misplaced|<p>The fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is misplaced.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",state])=2`|Warning||
-|Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is missing|<p>The fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is missing.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",state])=3`|Average||
-|Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has critical status|<p>The fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=0`|High||
-|Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has warning status|<p>The fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=4`|Warning||
-|Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is disabled|<p>The fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=1`|Info||
+|HPE Synergy: Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is degraded|<p>The fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is in degraded state.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",state])=0`|Average||
+|HPE Synergy: Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is failed|<p>The fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is in failed state.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",state])=1`|High||
+|HPE Synergy: Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is misplaced|<p>The fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is misplaced.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",state])=2`|Warning||
+|HPE Synergy: Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is missing|<p>The fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is missing.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",state])=3`|Average||
+|HPE Synergy: Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has critical status|<p>The fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=0`|High||
+|HPE Synergy: Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has warning status|<p>The fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] status is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=4`|Warning||
+|HPE Synergy: Fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is disabled|<p>The fan [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fan["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=1`|Info||
 
 ### LLD rule FC networks discovery
 
@@ -307,9 +307,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|FC network [{#NAME}]: Has critical status|<p>The FC network [{#NAME}] status is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fc.network["{#NAME}",status])=0`|High||
-|FC network [{#NAME}]: Has warning status|<p>The FC network [{#NAME}] status is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fc.network["{#NAME}",status])=4`|Warning||
-|FC network [{#NAME}]: Is disabled|<p>The FC network [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fc.network["{#NAME}",status])=1`|Info||
+|HPE Synergy: FC network [{#NAME}]: Has critical status|<p>The FC network [{#NAME}] status is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fc.network["{#NAME}",status])=0`|High||
+|HPE Synergy: FC network [{#NAME}]: Has warning status|<p>The FC network [{#NAME}] status is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fc.network["{#NAME}",status])=4`|Warning||
+|HPE Synergy: FC network [{#NAME}]: Is disabled|<p>The FC network [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.fc.network["{#NAME}",status])=1`|Info||
 
 ### LLD rule Hypervisor managers discovery
 
@@ -330,10 +330,10 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Hypervisor manager [{#NAME}]: Is in error state|<p>The hypervisor manager [{#NAME}] has an error.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.hypervisor_manager["{#NAME}",state])=3 and length(last(/HPE Synergy by HTTP/hpe.synergy.hypervisor_manager["{#NAME}",state_reason]))>0`|High||
-|Hypervisor manager [{#NAME}]: Has critical status|<p>The hypervisor manager [{#NAME}] status is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.hypervisor_manager["{#NAME}",status])=0`|High||
-|Hypervisor manager [{#NAME}]: Has warning status|<p>The hypervisor manager [{#NAME}] status is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.hypervisor_manager["{#NAME}",status])=4`|Warning||
-|Hypervisor manager [{#NAME}]: Is disabled|<p>The hypervisor manager [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.hypervisor_manager["{#NAME}",status])=1`|Info||
+|HPE Synergy: Hypervisor manager [{#NAME}]: Is in error state|<p>The hypervisor manager [{#NAME}] has an error.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.hypervisor_manager["{#NAME}",state])=3 and length(last(/HPE Synergy by HTTP/hpe.synergy.hypervisor_manager["{#NAME}",state_reason]))>0`|High||
+|HPE Synergy: Hypervisor manager [{#NAME}]: Has critical status|<p>The hypervisor manager [{#NAME}] status is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.hypervisor_manager["{#NAME}",status])=0`|High||
+|HPE Synergy: Hypervisor manager [{#NAME}]: Has warning status|<p>The hypervisor manager [{#NAME}] status is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.hypervisor_manager["{#NAME}",status])=4`|Warning||
+|HPE Synergy: Hypervisor manager [{#NAME}]: Is disabled|<p>The hypervisor manager [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.hypervisor_manager["{#NAME}",status])=1`|Info||
 
 ### LLD rule Interconnects discovery
 
@@ -359,9 +359,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Interconnect [{#NAME}]: Has critical status|<p>The interconnect [{#NAME}] status is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.interconnect["{#NAME}",status])=0`|High||
-|Interconnect [{#NAME}]: Has warning status|<p>The interconnect [{#NAME}] status is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.interconnect["{#NAME}",status])=4`|Warning||
-|Interconnect [{#NAME}]: Is disabled|<p>The interconnect [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.interconnect["{#NAME}",status])=1`|Info||
+|HPE Synergy: Interconnect [{#NAME}]: Has critical status|<p>The interconnect [{#NAME}] status is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.interconnect["{#NAME}",status])=0`|High||
+|HPE Synergy: Interconnect [{#NAME}]: Has warning status|<p>The interconnect [{#NAME}] status is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.interconnect["{#NAME}",status])=4`|Warning||
+|HPE Synergy: Interconnect [{#NAME}]: Is disabled|<p>The interconnect [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.interconnect["{#NAME}",status])=1`|Info||
 
 ### LLD rule Logical enclosures discovery
 
@@ -381,11 +381,11 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Logical enclosure [{#NAME}]: Delete failed|<p>Indicator that the deletion of a logical enclosure failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.logical_enclosure["{#NAME}",state])=2`|Average||
-|Logical enclosure [{#NAME}]: Is inconsistent|<p>The configuration of the logical enclosure differs from that of the enclosure group, or the configuration of the hardware resources is inconsistent with the logical enclosure configuration. Perform an Update from group, Reapply configuration, or Update firmware action as an appropriate to bring the configuration back into consistency.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.logical_enclosure["{#NAME}",state])=0`|Average||
-|Logical enclosure [{#NAME}]: Has critical status|<p>The status of the logical enclosure [{#NAME}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.logical_enclosure["{#NAME}",status])=0`|High||
-|Logical enclosure [{#NAME}]: Has warning status|<p>The status of the logical enclosure [{#NAME}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.logical_enclosure["{#NAME}",status])=4`|Warning||
-|Logical enclosure [{#NAME}]: Is disabled|<p>The logical enclosure [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.logical_enclosure["{#NAME}",status])=1`|Info||
+|HPE Synergy: Logical enclosure [{#NAME}]: Delete failed|<p>Indicator that the deletion of a logical enclosure failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.logical_enclosure["{#NAME}",state])=2`|Average||
+|HPE Synergy: Logical enclosure [{#NAME}]: Is inconsistent|<p>The configuration of the logical enclosure differs from that of the enclosure group, or the configuration of the hardware resources is inconsistent with the logical enclosure configuration. Perform an Update from group, Reapply configuration, or Update firmware action as an appropriate to bring the configuration back into consistency.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.logical_enclosure["{#NAME}",state])=0`|Average||
+|HPE Synergy: Logical enclosure [{#NAME}]: Has critical status|<p>The status of the logical enclosure [{#NAME}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.logical_enclosure["{#NAME}",status])=0`|High||
+|HPE Synergy: Logical enclosure [{#NAME}]: Has warning status|<p>The status of the logical enclosure [{#NAME}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.logical_enclosure["{#NAME}",status])=4`|Warning||
+|HPE Synergy: Logical enclosure [{#NAME}]: Is disabled|<p>The logical enclosure [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.logical_enclosure["{#NAME}",status])=1`|Info||
 
 ### LLD rule nPar discovery
 
@@ -408,9 +408,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Partition [{#ENCLOSURE_NAME}:{#PARTITION_ID}]: Health is invalid|<p>The partition health is invalid.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.partition["{#PARTITION_ID}","{#ENCLOSURE_NAME}",health])=1`|Average||
-|Partition [{#ENCLOSURE_NAME}:{#PARTITION_ID}]: Health is degraded|<p>One or more resources in the partition are unhealthy.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.partition["{#PARTITION_ID}","{#ENCLOSURE_NAME}",health])=0`|High||
-|Partition [{#ENCLOSURE_NAME}:{#PARTITION_ID}]: Is invalid|<p>The partition status is invalid.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.partition["{#PARTITION_ID}","{#ENCLOSURE_NAME}",status])=2`|Average||
+|HPE Synergy: Partition [{#ENCLOSURE_NAME}:{#PARTITION_ID}]: Health is invalid|<p>The partition health is invalid.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.partition["{#PARTITION_ID}","{#ENCLOSURE_NAME}",health])=1`|Average||
+|HPE Synergy: Partition [{#ENCLOSURE_NAME}:{#PARTITION_ID}]: Health is degraded|<p>One or more resources in the partition are unhealthy.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.partition["{#PARTITION_ID}","{#ENCLOSURE_NAME}",health])=0`|High||
+|HPE Synergy: Partition [{#ENCLOSURE_NAME}:{#PARTITION_ID}]: Is invalid|<p>The partition status is invalid.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.partition["{#PARTITION_ID}","{#ENCLOSURE_NAME}",status])=2`|Average||
 
 ### LLD rule Power supplies discovery
 
@@ -435,9 +435,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has critical status|<p>The status of the power supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=0`|High||
-|Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has warning status|<p>The status of the power supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=4`|Warning||
-|Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is disabled|<p>The status of Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=1`|Info||
+|HPE Synergy: Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has critical status|<p>The status of the power supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=0`|High||
+|HPE Synergy: Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has warning status|<p>The status of the power supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=4`|Warning||
+|HPE Synergy: Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is disabled|<p>The status of Power Supply [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.power_supply["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=1`|Info||
 
 ### LLD rule Racks discovery
 
@@ -457,13 +457,13 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Rack [{#NAME}]: Add error|<p>Adding the rack [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",state])=1`|Average||
-|Rack [{#NAME}]: Has credential error|<p>The rack [{#NAME}] has credential error.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",state])=3`|Average||
-|Rack [{#NAME}]: Has refresh error|<p>The rack [{#NAME}] has refresh error.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",state])=5`|Average||
-|Rack [{#NAME}]: Has remove error|<p>The rack [{#NAME}] has remove error.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",state])=7`|Average||
-|Rack [{#NAME}]: Has critical status|<p>The rack [{#NAME}] status is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",status])=0`|High||
-|Rack [{#NAME}]: Has warning status|<p>The rack [{#NAME}] status is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",status])=4`|Warning||
-|Rack [{#NAME}]: Is disabled|<p>The rack [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",status])=1`|Info||
+|HPE Synergy: Rack [{#NAME}]: Add error|<p>Adding the rack [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",state])=1`|Average||
+|HPE Synergy: Rack [{#NAME}]: Has credential error|<p>The rack [{#NAME}] has credential error.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",state])=3`|Average||
+|HPE Synergy: Rack [{#NAME}]: Has refresh error|<p>The rack [{#NAME}] has refresh error.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",state])=5`|Average||
+|HPE Synergy: Rack [{#NAME}]: Has remove error|<p>The rack [{#NAME}] has remove error.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",state])=7`|Average||
+|HPE Synergy: Rack [{#NAME}]: Has critical status|<p>The rack [{#NAME}] status is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",status])=0`|High||
+|HPE Synergy: Rack [{#NAME}]: Has warning status|<p>The rack [{#NAME}] status is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",status])=4`|Warning||
+|HPE Synergy: Rack [{#NAME}]: Is disabled|<p>The rack [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.rack["{#NAME}",status])=1`|Info||
 
 ### LLD rule Server hardware discovery
 
@@ -496,15 +496,15 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Server [{#SERVER_NAME}:{#LOCATION}]: Is in maintenance mode|<p>The disruptive maintenance operations like firmware update can cause many server hardware alerts to be generated in a short period of time. Example: Network connectivity is lost or the server reset is detected.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",maintenance_state])=0 and length(last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",maintenance_state_reason]))>0`|Info||
-|Server [{#SERVER_NAME}:{#LOCATION}]: Has profile error|<p>The unsuccessful profile application or removal.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",state])=11`|Average||
-|Server [{#SERVER_NAME}:{#LOCATION}]: Is not initialized|<p>The server is not initialized.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",state])=0`|Warning||
-|Server [{#SERVER_NAME}:{#LOCATION}]: Is unsupported|<p>The server model or version is not currently supported by the appliance.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",state])=12`|Average||
-|Server [{#SERVER_NAME}:{#LOCATION}]: Remove failed|<p>The previous operation to remove the server hardware did not succeed. The operation should be re-attempted.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",state])=6`|Average||
-|Server [{#SERVER_NAME}:{#LOCATION}]: Is unmanaged|<p>Discovered a supported server.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",state])=4 and length(last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",state_reason]))>0`|Average||
-|Server [{#SERVER_NAME}:{#LOCATION}]: Has critical status|<p>The status of the server [{#SERVER_NAME}:{#LOCATION}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",status])=0`|High||
-|Server [{#SERVER_NAME}:{#LOCATION}]: Has warning status|<p>The status of the server [{#SERVER_NAME}:{#LOCATION}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",status])=4`|Warning||
-|Server [{#SERVER_NAME}:{#LOCATION}]: Is disabled|<p>The server [{#SERVER_NAME}:{#LOCATION}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",status])=1`|Info||
+|HPE Synergy: Server [{#SERVER_NAME}:{#LOCATION}]: Is in maintenance mode|<p>The disruptive maintenance operations like firmware update can cause many server hardware alerts to be generated in a short period of time. Example: Network connectivity is lost or the server reset is detected.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",maintenance_state])=0 and length(last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",maintenance_state_reason]))>0`|Info||
+|HPE Synergy: Server [{#SERVER_NAME}:{#LOCATION}]: Has profile error|<p>The unsuccessful profile application or removal.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",state])=11`|Average||
+|HPE Synergy: Server [{#SERVER_NAME}:{#LOCATION}]: Is not initialized|<p>The server is not initialized.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",state])=0`|Warning||
+|HPE Synergy: Server [{#SERVER_NAME}:{#LOCATION}]: Is unsupported|<p>The server model or version is not currently supported by the appliance.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",state])=12`|Average||
+|HPE Synergy: Server [{#SERVER_NAME}:{#LOCATION}]: Remove failed|<p>The previous operation to remove the server hardware did not succeed. The operation should be re-attempted.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",state])=6`|Average||
+|HPE Synergy: Server [{#SERVER_NAME}:{#LOCATION}]: Is unmanaged|<p>Discovered a supported server.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",state])=4 and length(last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",state_reason]))>0`|Average||
+|HPE Synergy: Server [{#SERVER_NAME}:{#LOCATION}]: Has critical status|<p>The status of the server [{#SERVER_NAME}:{#LOCATION}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",status])=0`|High||
+|HPE Synergy: Server [{#SERVER_NAME}:{#LOCATION}]: Has warning status|<p>The status of the server [{#SERVER_NAME}:{#LOCATION}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",status])=4`|Warning||
+|HPE Synergy: Server [{#SERVER_NAME}:{#LOCATION}]: Is disabled|<p>The server [{#SERVER_NAME}:{#LOCATION}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.server_hardware["{#LOCATION}",status])=1`|Info||
 
 ### LLD rule Storage pools discovery
 
@@ -528,13 +528,13 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Storage pool [{#NAME}]: Add error|<p>Adding of the storage pool [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",state])=0`|Average||
-|Storage pool [{#NAME}]: Create failed|<p>Creating of the storage pool [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",state])=5`|Average||
-|Storage pool [{#NAME}]: Delete failed|<p>Deletion of the storage pool [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",state])=7`|Average||
-|Storage pool [{#NAME}]: Update failed|<p>Updating of the storage pool [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",state])=12`|Average||
-|Storage pool [{#NAME}]: Has critical status|<p>The status of the storage pool [{#NAME}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",status])=0`|High||
-|Storage pool [{#NAME}]: Has warning status|<p>The status of the storage pool [{#NAME}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",status])=4`|Warning||
-|Storage pool [{#NAME}]: Is disabled|<p>The storage pool [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",status])=1`|Info||
+|HPE Synergy: Storage pool [{#NAME}]: Add error|<p>Adding of the storage pool [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",state])=0`|Average||
+|HPE Synergy: Storage pool [{#NAME}]: Create failed|<p>Creating of the storage pool [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",state])=5`|Average||
+|HPE Synergy: Storage pool [{#NAME}]: Delete failed|<p>Deletion of the storage pool [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",state])=7`|Average||
+|HPE Synergy: Storage pool [{#NAME}]: Update failed|<p>Updating of the storage pool [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",state])=12`|Average||
+|HPE Synergy: Storage pool [{#NAME}]: Has critical status|<p>The status of the storage pool [{#NAME}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",status])=0`|High||
+|HPE Synergy: Storage pool [{#NAME}]: Has warning status|<p>The status of the storage pool [{#NAME}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",status])=4`|Warning||
+|HPE Synergy: Storage pool [{#NAME}]: Is disabled|<p>The storage pool [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.pools["{#NAME}",status])=1`|Info||
 
 ### LLD rule Storage systems discovery
 
@@ -557,13 +557,13 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Storage system [{#NAME}]: Add error|<p>Adding the storage system [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",state])=0`|Average||
-|Storage system [{#NAME}]: Create failed|<p>Creating of the storage system [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",state])=5`|Average||
-|Storage system [{#NAME}]: Delete failed|<p>Deletion of the storage system [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",state])=7`|Average||
-|Storage system [{#NAME}]: Update failed|<p>Updating of the storage system [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",state])=12`|Average||
-|Storage system [{#NAME}]: Has critical status|<p>The status of the storage system [{#NAME}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",status])=0`|High||
-|Storage system [{#NAME}]: Has warning status|<p>The status of the storage system [{#NAME}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",status])=4`|Warning||
-|Storage system [{#NAME}]: Is disabled|<p>The storage system [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",status])=1`|Info||
+|HPE Synergy: Storage system [{#NAME}]: Add error|<p>Adding the storage system [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",state])=0`|Average||
+|HPE Synergy: Storage system [{#NAME}]: Create failed|<p>Creating of the storage system [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",state])=5`|Average||
+|HPE Synergy: Storage system [{#NAME}]: Delete failed|<p>Deletion of the storage system [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",state])=7`|Average||
+|HPE Synergy: Storage system [{#NAME}]: Update failed|<p>Updating of the storage system [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",state])=12`|Average||
+|HPE Synergy: Storage system [{#NAME}]: Has critical status|<p>The status of the storage system [{#NAME}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",status])=0`|High||
+|HPE Synergy: Storage system [{#NAME}]: Has warning status|<p>The status of the storage system [{#NAME}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",status])=4`|Warning||
+|HPE Synergy: Storage system [{#NAME}]: Is disabled|<p>The storage system [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.system["{#NAME}",status])=1`|Info||
 
 ### LLD rule Storage volumes discovery
 
@@ -585,13 +585,13 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Storage volume [{#NAME}]: Add error|<p>Adding the storage volume [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",state])=0`|Average||
-|Storage volume [{#NAME}]: Create failed|<p>Creating of the storage volume [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",state])=5`|Average||
-|Storage volume [{#NAME}]: Delete failed|<p>Deletion of the storage volume [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",state])=7`|Average||
-|Storage volume [{#NAME}]: Update failed|<p>Updating of the storage volume [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",state])=12`|Average||
-|Storage volume [{#NAME}]: Has critical status|<p>The status of the storage volume [{#NAME}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",status])=0`|High||
-|Storage volume [{#NAME}]: Has warning status|<p>The status of the storage volume [{#NAME}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",status])=4`|Warning||
-|Storage volume [{#NAME}]: Is disabled|<p>The storage volume [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",status])=1`|Info||
+|HPE Synergy: Storage volume [{#NAME}]: Add error|<p>Adding the storage volume [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",state])=0`|Average||
+|HPE Synergy: Storage volume [{#NAME}]: Create failed|<p>Creating of the storage volume [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",state])=5`|Average||
+|HPE Synergy: Storage volume [{#NAME}]: Delete failed|<p>Deletion of the storage volume [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",state])=7`|Average||
+|HPE Synergy: Storage volume [{#NAME}]: Update failed|<p>Updating of the storage volume [{#NAME}] failed.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",state])=12`|Average||
+|HPE Synergy: Storage volume [{#NAME}]: Has critical status|<p>The status of the storage volume [{#NAME}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",status])=0`|High||
+|HPE Synergy: Storage volume [{#NAME}]: Has warning status|<p>The status of the storage volume [{#NAME}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",status])=4`|Warning||
+|HPE Synergy: Storage volume [{#NAME}]: Is disabled|<p>The storage volume [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.storage.volumes["{#NAME}",status])=1`|Info||
 
 ### LLD rule Managers discovery
 
@@ -620,16 +620,16 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Link port has critical status|<p>The link port status of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",link_port_status])=0`|High||
-|Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Link port has warning status|<p>The link port status of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",link_port_status])=4`|Warning||
-|Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Link port is disabled|<p>The link port of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",link_port_status])=1`|Info||
-|Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: MGMT port has critical status|<p>The MGMT port status of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",mgmt_port_status])=0`|High||
-|Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: MGMT port has warning status|<p>The MGMT port status of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",mgmt_port_status])=4`|Warning||
-|Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: MGMT port is disabled|<p>The MGMT port of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",mgmt_port_status])=1`|Info||
-|Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is subsumed|<p>The device slot is configured to be part of another device slot.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",presence])=4`|Average||
-|Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has critical status|<p>The status of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=0`|High||
-|Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has warning status|<p>The status of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=4`|Warning||
-|Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is disabled|<p>The manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=1`|Info||
+|HPE Synergy: Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Link port has critical status|<p>The link port status of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",link_port_status])=0`|High||
+|HPE Synergy: Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Link port has warning status|<p>The link port status of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",link_port_status])=4`|Warning||
+|HPE Synergy: Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Link port is disabled|<p>The link port of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",link_port_status])=1`|Info||
+|HPE Synergy: Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: MGMT port has critical status|<p>The MGMT port status of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",mgmt_port_status])=0`|High||
+|HPE Synergy: Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: MGMT port has warning status|<p>The MGMT port status of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",mgmt_port_status])=4`|Warning||
+|HPE Synergy: Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: MGMT port is disabled|<p>The MGMT port of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",mgmt_port_status])=1`|Info||
+|HPE Synergy: Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is subsumed|<p>The device slot is configured to be part of another device slot.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",presence])=4`|Average||
+|HPE Synergy: Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has critical status|<p>The status of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=0`|High||
+|HPE Synergy: Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Has warning status|<p>The status of the manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=4`|Warning||
+|HPE Synergy: Manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}]: Is disabled|<p>The manager [{#ENCLOSURE_NAME}:{#BAY_NUMBER}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.manager["{#BAY_NUMBER}","{#ENCLOSURE_NAME}",status])=1`|Info||
 
 ### LLD rule Uplink sets discovery
 
@@ -649,9 +649,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Uplink set [{#NAME}]: Has critical status|<p>The status of the uplink set [{#NAME}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.uplink_set["{#NAME}",status])=0`|High||
-|Uplink set [{#NAME}]: Has warning status|<p>The status of the uplink set [{#NAME}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.uplink_set["{#NAME}",status])=4`|Warning||
-|Uplink set [{#NAME}]: Is disabled|<p>The uplink set [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.uplink_set["{#NAME}",status])=1`|Info||
+|HPE Synergy: Uplink set [{#NAME}]: Has critical status|<p>The status of the uplink set [{#NAME}] is critical. Needs immediate attention.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.uplink_set["{#NAME}",status])=0`|High||
+|HPE Synergy: Uplink set [{#NAME}]: Has warning status|<p>The status of the uplink set [{#NAME}] is warning. Needs attention soon.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.uplink_set["{#NAME}",status])=4`|Warning||
+|HPE Synergy: Uplink set [{#NAME}]: Is disabled|<p>The uplink set [{#NAME}] is currently not operational.</p>|`last(/HPE Synergy by HTTP/hpe.synergy.uplink_set["{#NAME}",status])=1`|Info||
 
 ## Feedback
 

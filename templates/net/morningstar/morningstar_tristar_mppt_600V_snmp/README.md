@@ -69,71 +69,71 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Status: Device has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Morningstar TriStar MPPT 600V by SNMP/status.hw.uptime)>0 and last(/Morningstar TriStar MPPT 600V by SNMP/status.hw.uptime)<10m) or (last(/Morningstar TriStar MPPT 600V by SNMP/status.hw.uptime)=0 and last(/Morningstar TriStar MPPT 600V by SNMP/status.net.uptime)<10m)`|Info|**Manual close**: Yes|
-|Status: Failed to fetch data|<p>Zabbix has not received data for items for the last 5 minutes.</p>|`nodata(/Morningstar TriStar MPPT 600V by SNMP/status.net.uptime,5m)=1`|Warning|**Manual close**: Yes|
-|Battery: Device charge in warning state||`last(/Morningstar TriStar MPPT 600V by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.WARN}`|Warning|**Depends on**:<br><ul><li>Battery: Device charge in critical state</li></ul>|
-|Battery: Device charge in critical state||`last(/Morningstar TriStar MPPT 600V by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}`|High||
-|Temperature: Low battery temperature||`max(/Morningstar TriStar MPPT 600V by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>Temperature: Critically low battery temperature</li></ul>|
-|Temperature: Critically low battery temperature||`max(/Morningstar TriStar MPPT 600V by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}`|High||
-|Temperature: High battery temperature||`min(/Morningstar TriStar MPPT 600V by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Temperature: Critically high battery temperature</li></ul>|
-|Temperature: Critically high battery temperature||`min(/Morningstar TriStar MPPT 600V by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}`|High||
-|Status: Device has "overcurrent" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","overcurrent")=2`|High||
-|Status: Device has "fetShort" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","fetShort")=2`|High||
-|Status: Device has "softwareFault" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","softwareFault")=2`|High||
-|Status: Device has "batteryHvd" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","batteryHvd")=2`|High||
-|Status: Device has "arrayHvd" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","arrayHvd")=2`|High||
-|Status: Device has "dipSwitchChange" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","dipSwitchChange")=2`|High||
-|Status: Device has "customSettingsEdit" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","customSettingsEdit")=2`|High||
-|Status: Device has "rtsShorted" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","rtsShorted")=2`|High||
-|Status: Device has "rtsDisconnected" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","rtsDisconnected")=2`|High||
-|Status: Device has "eepromRetryLimit" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","eepromRetryLimit")=2`|High||
-|Status: Device has "controllerWasReset" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","controllerWasReset")=2`|High||
-|Status: Device has "chargeSlaveControlTimeout" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","chargeSlaveControlTimeout")=2`|High||
-|Status: Device has "rs232SerialToMeterBridge" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","rs232SerialToMeterBridge")=2`|High||
-|Status: Device has "batteryLvd" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","batteryLvd")=2`|High||
-|Status: Device has "powerboardCommunicationFault" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","powerboardCommunicationFault")=2`|High||
-|Status: Device has "fault16Software" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","fault16Software")=2`|High||
-|Status: Device has "fault17Software" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","fault17Software")=2`|High||
-|Status: Device has "fault18Software" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","fault18Software")=2`|High||
-|Status: Device has "fault19Software" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","fault19Software")=2`|High||
-|Status: Device has "fault20Software" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","fault20Software")=2`|High||
-|Status: Device has "fault21Software" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","fault21Software")=2`|High||
-|Status: Device has "fpgaVersion" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","fpgaVersion")=2`|High||
-|Status: Device has "currentSensorReferenceOutOfRange" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","currentSensorReferenceOutOfRange")=2`|High||
-|Status: Device has "ia-refSlaveModeTimeout" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","ia-refSlaveModeTimeout")=2`|High||
-|Status: Device has "blockbusBoot" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","blockbusBoot")=2`|High||
-|Status: Device has "hscommMaster" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","hscommMaster")=2`|High||
-|Status: Device has "hscomm" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","hscomm")=2`|High||
-|Status: Device has "slave" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","slave")=2`|High||
-|Status: Device has "rtsShorted" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2`|Warning||
-|Status: Device has "rtsDisconnected" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2`|Warning||
-|Status: Device has "heatsinkTempSensorOpen" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2`|Warning||
-|Status: Device has "heatsinkTempSensorShorted" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2`|Warning||
-|Status: Device has "highTemperatureCurrentLimit" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","highTemperatureCurrentLimit")=2`|Warning||
-|Status: Device has "currentLimit" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2`|Warning||
-|Status: Device has "currentOffset" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","currentOffset")=2`|Warning||
-|Status: Device has "batterySense" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","batterySense")=2`|Warning||
-|Status: Device has "batterySenseDisconnected" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","batterySenseDisconnected")=2`|Warning||
-|Status: Device has "uncalibrated" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2`|Warning||
-|Status: Device has "rtsMiswire" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","rtsMiswire")=2`|Warning||
-|Status: Device has "highVoltageDisconnect" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","highVoltageDisconnect")=2`|Warning||
-|Status: Device has "systemMiswire" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","systemMiswire")=2`|Warning||
-|Status: Device has "mosfetSOpen" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","mosfetSOpen")=2`|Warning||
-|Status: Device has "p12VoltageOutOfRange" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","p12VoltageOutOfRange")=2`|Warning||
-|Status: Device has "highArrayVCurrentLimit" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","highArrayVCurrentLimit")=2`|Warning||
-|Status: Device has "maxAdcValueReached" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","maxAdcValueReached")=2`|Warning||
-|Status: Device has "controllerWasReset" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","controllerWasReset")=2`|Warning||
-|Status: Device has "alarm21Internal" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","alarm21Internal")=2`|Warning||
-|Status: Device has "p3VoltageOutOfRange" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","p3VoltageOutOfRange")=2`|Warning||
-|Status: Device has "derateLimit" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","derateLimit")=2`|Warning||
-|Status: Device has "arrayCurrentOffset" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","arrayCurrentOffset")=2`|Warning||
-|Status: Device has "ee-i2cRetryLimit" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","ee-i2cRetryLimit")=2`|Warning||
-|Status: Device has "ethernetAlarm" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","ethernetAlarm")=2`|Warning||
-|Status: Device has "lvd" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","lvd")=2`|Warning||
-|Status: Device has "software" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","software")=2`|Warning||
-|Status: Device has "fp12VoltageOutOfRange" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","fp12VoltageOutOfRange")=2`|Warning||
-|Status: Device has "extflashFault" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","extflashFault")=2`|Warning||
-|Status: Device has "slaveControlFault" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","slaveControlFault")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Morningstar TriStar MPPT 600V by SNMP/status.hw.uptime)>0 and last(/Morningstar TriStar MPPT 600V by SNMP/status.hw.uptime)<10m) or (last(/Morningstar TriStar MPPT 600V by SNMP/status.hw.uptime)=0 and last(/Morningstar TriStar MPPT 600V by SNMP/status.net.uptime)<10m)`|Info|**Manual close**: Yes|
+|Morningstar TriStar MPPT 600V: Status: Failed to fetch data|<p>Zabbix has not received data for items for the last 5 minutes.</p>|`nodata(/Morningstar TriStar MPPT 600V by SNMP/status.net.uptime,5m)=1`|Warning|**Manual close**: Yes|
+|Morningstar TriStar MPPT 600V: Battery: Device charge in warning state||`last(/Morningstar TriStar MPPT 600V by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar TriStar MPPT 600V: Battery: Device charge in critical state</li></ul>|
+|Morningstar TriStar MPPT 600V: Battery: Device charge in critical state||`last(/Morningstar TriStar MPPT 600V by SNMP/charge.state[chargeState.0])={$CHARGE.STATE.CRIT}`|High||
+|Morningstar TriStar MPPT 600V: Temperature: Low battery temperature||`max(/Morningstar TriStar MPPT 600V by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar TriStar MPPT 600V: Temperature: Critically low battery temperature</li></ul>|
+|Morningstar TriStar MPPT 600V: Temperature: Critically low battery temperature||`max(/Morningstar TriStar MPPT 600V by SNMP/temp.battery[batteryTemperature.0],5m)<{$BATTERY.TEMP.MIN.CRIT}`|High||
+|Morningstar TriStar MPPT 600V: Temperature: High battery temperature||`min(/Morningstar TriStar MPPT 600V by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar TriStar MPPT 600V: Temperature: Critically high battery temperature</li></ul>|
+|Morningstar TriStar MPPT 600V: Temperature: Critically high battery temperature||`min(/Morningstar TriStar MPPT 600V by SNMP/temp.battery[batteryTemperature.0],5m)>{$BATTERY.TEMP.MAX.CRIT}`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "overcurrent" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","overcurrent")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "fetShort" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","fetShort")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "softwareFault" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","softwareFault")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "batteryHvd" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","batteryHvd")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "arrayHvd" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","arrayHvd")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "dipSwitchChange" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","dipSwitchChange")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "customSettingsEdit" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","customSettingsEdit")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "rtsShorted" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","rtsShorted")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "rtsDisconnected" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","rtsDisconnected")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "eepromRetryLimit" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","eepromRetryLimit")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "controllerWasReset" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","controllerWasReset")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "chargeSlaveControlTimeout" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","chargeSlaveControlTimeout")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "rs232SerialToMeterBridge" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","rs232SerialToMeterBridge")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "batteryLvd" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","batteryLvd")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "powerboardCommunicationFault" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","powerboardCommunicationFault")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "fault16Software" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","fault16Software")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "fault17Software" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","fault17Software")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "fault18Software" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","fault18Software")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "fault19Software" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","fault19Software")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "fault20Software" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","fault20Software")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "fault21Software" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","fault21Software")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "fpgaVersion" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","fpgaVersion")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "currentSensorReferenceOutOfRange" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","currentSensorReferenceOutOfRange")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "ia-refSlaveModeTimeout" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","ia-refSlaveModeTimeout")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "blockbusBoot" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","blockbusBoot")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "hscommMaster" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","hscommMaster")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "hscomm" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","hscomm")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "slave" faults flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.faults[faults.0],#3,"like","slave")=2`|High||
+|Morningstar TriStar MPPT 600V: Status: Device has "rtsShorted" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","rtsShorted")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "rtsDisconnected" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","rtsDisconnected")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "heatsinkTempSensorOpen" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorOpen")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "heatsinkTempSensorShorted" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","heatsinkTempSensorShorted")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "highTemperatureCurrentLimit" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","highTemperatureCurrentLimit")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "currentLimit" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","currentLimit")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "currentOffset" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","currentOffset")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "batterySense" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","batterySense")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "batterySenseDisconnected" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","batterySenseDisconnected")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "uncalibrated" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","uncalibrated")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "rtsMiswire" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","rtsMiswire")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "highVoltageDisconnect" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","highVoltageDisconnect")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "systemMiswire" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","systemMiswire")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "mosfetSOpen" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","mosfetSOpen")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "p12VoltageOutOfRange" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","p12VoltageOutOfRange")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "highArrayVCurrentLimit" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","highArrayVCurrentLimit")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "maxAdcValueReached" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","maxAdcValueReached")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "controllerWasReset" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","controllerWasReset")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "alarm21Internal" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","alarm21Internal")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "p3VoltageOutOfRange" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","p3VoltageOutOfRange")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "derateLimit" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","derateLimit")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "arrayCurrentOffset" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","arrayCurrentOffset")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "ee-i2cRetryLimit" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","ee-i2cRetryLimit")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "ethernetAlarm" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","ethernetAlarm")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "lvd" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","lvd")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "software" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","software")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "fp12VoltageOutOfRange" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","fp12VoltageOutOfRange")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "extflashFault" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","extflashFault")=2`|Warning||
+|Morningstar TriStar MPPT 600V: Status: Device has "slaveControlFault" alarm flag||`count(/Morningstar TriStar MPPT 600V by SNMP/status.alarms[alarms.0],#3,"like","slaveControlFault")=2`|Warning||
 
 ### LLD rule Battery voltage discovery
 
@@ -151,10 +151,10 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Battery: Low battery voltage||`max(/Morningstar TriStar MPPT 600V by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>Battery: Critically low battery voltage</li></ul>|
-|Battery: Critically low battery voltage||`max(/Morningstar TriStar MPPT 600V by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}`|High||
-|Battery: High battery voltage||`min(/Morningstar TriStar MPPT 600V by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Battery: Critically high battery voltage</li></ul>|
-|Battery: Critically high battery voltage||`min(/Morningstar TriStar MPPT 600V by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}`|High||
+|Morningstar TriStar MPPT 600V: Battery: Low battery voltage||`max(/Morningstar TriStar MPPT 600V by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar TriStar MPPT 600V: Battery: Critically low battery voltage</li></ul>|
+|Morningstar TriStar MPPT 600V: Battery: Critically low battery voltage||`max(/Morningstar TriStar MPPT 600V by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)<{#VOLTAGE.MIN.CRIT}`|High||
+|Morningstar TriStar MPPT 600V: Battery: High battery voltage||`min(/Morningstar TriStar MPPT 600V by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Morningstar TriStar MPPT 600V: Battery: Critically high battery voltage</li></ul>|
+|Morningstar TriStar MPPT 600V: Battery: Critically high battery voltage||`min(/Morningstar TriStar MPPT 600V by SNMP/battery.voltage[batteryVoltage.0{#SINGLETON}],5m)>{#VOLTAGE.MAX.CRIT}`|High||
 
 ## Feedback
 

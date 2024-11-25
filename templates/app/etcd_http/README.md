@@ -112,18 +112,18 @@ Additional points to consider:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Service is unavailable||`last(/Etcd by HTTP/net.tcp.service["{$ETCD.SCHEME}","{$ETCD.HOST}","{$ETCD.PORT}"])=0`|Average|**Manual close**: Yes|
-|Node healthcheck failed|<p>See more details on https://etcd.io/docs/v3.5/op-guide/monitoring/#health-check.</p>|`last(/Etcd by HTTP/etcd.health)=0`|Average|**Depends on**:<br><ul><li>Service is unavailable</li></ul>|
-|Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Etcd by HTTP/etcd.is.leader,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Service is unavailable</li></ul>|
-|Member has no leader|<p>If a member does not have a leader, it is totally unavailable.</p>|`last(/Etcd by HTTP/etcd.has.leader)=0`|Average||
-|Instance has seen too many leader changes|<p>Rapid leadership changes impact the performance of `etcd` significantly. It also signals that the leader is unstable, perhaps due to network connectivity issues or excessive load hitting the `etcd cluster`.</p>|`(max(/Etcd by HTTP/etcd.leader.changes,15m)-min(/Etcd by HTTP/etcd.leader.changes,15m))>{$ETCD.LEADER.CHANGES.MAX.WARN}`|Warning||
-|Too many proposal failures|<p>Normally related to two issues: temporary failures related to a leader election or longer downtime caused by a loss of quorum in the cluster.</p>|`min(/Etcd by HTTP/etcd.proposals.failed.rate,5m)>{$ETCD.PROPOSAL.FAIL.MAX.WARN}`|Warning||
-|Too many proposals are queued to commit|<p>Rising pending proposals suggests there is a high client load, or the member cannot commit proposals.</p>|`min(/Etcd by HTTP/etcd.proposals.pending,5m)>{$ETCD.PROPOSAL.PENDING.MAX.WARN}`|Warning||
-|Too many HTTP requests failures|<p>Too many requests failed on `etcd` instance with the `5xx HTTP code`.</p>|`min(/Etcd by HTTP/etcd.http.requests.5xx.rate,5m)>{$ETCD.HTTP.FAIL.MAX.WARN}`|Warning||
-|Server version has changed|<p>Etcd version has changed. Acknowledge to close the problem manually.</p>|`last(/Etcd by HTTP/etcd.server.version,#1)<>last(/Etcd by HTTP/etcd.server.version,#2) and length(last(/Etcd by HTTP/etcd.server.version))>0`|Info|**Manual close**: Yes|
-|Cluster version has changed|<p>Etcd version has changed. Acknowledge to close the problem manually.</p>|`last(/Etcd by HTTP/etcd.cluster.version,#1)<>last(/Etcd by HTTP/etcd.cluster.version,#2) and length(last(/Etcd by HTTP/etcd.cluster.version))>0`|Info|**Manual close**: Yes|
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Etcd by HTTP/etcd.uptime)<10m`|Info|**Manual close**: Yes|
-|Current number of open files is too high|<p>Heavy usage of a file descriptor (i.e., near the limit of the process's file descriptor) indicates a potential file descriptor exhaustion issue.<br>If the file descriptors are exhausted, `etcd` may panic because it cannot create new WAL files.</p>|`min(/Etcd by HTTP/etcd.open.fds,5m)/last(/Etcd by HTTP/etcd.max.fds)*100>{$ETCD.OPEN.FDS.MAX.WARN}`|Warning||
+|Etcd: Service is unavailable||`last(/Etcd by HTTP/net.tcp.service["{$ETCD.SCHEME}","{$ETCD.HOST}","{$ETCD.PORT}"])=0`|Average|**Manual close**: Yes|
+|Etcd: Node healthcheck failed|<p>See more details on https://etcd.io/docs/v3.5/op-guide/monitoring/#health-check.</p>|`last(/Etcd by HTTP/etcd.health)=0`|Average|**Depends on**:<br><ul><li>Etcd: Service is unavailable</li></ul>|
+|Etcd: Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Etcd by HTTP/etcd.is.leader,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Etcd: Service is unavailable</li></ul>|
+|Etcd: Member has no leader|<p>If a member does not have a leader, it is totally unavailable.</p>|`last(/Etcd by HTTP/etcd.has.leader)=0`|Average||
+|Etcd: Instance has seen too many leader changes|<p>Rapid leadership changes impact the performance of `etcd` significantly. It also signals that the leader is unstable, perhaps due to network connectivity issues or excessive load hitting the `etcd cluster`.</p>|`(max(/Etcd by HTTP/etcd.leader.changes,15m)-min(/Etcd by HTTP/etcd.leader.changes,15m))>{$ETCD.LEADER.CHANGES.MAX.WARN}`|Warning||
+|Etcd: Too many proposal failures|<p>Normally related to two issues: temporary failures related to a leader election or longer downtime caused by a loss of quorum in the cluster.</p>|`min(/Etcd by HTTP/etcd.proposals.failed.rate,5m)>{$ETCD.PROPOSAL.FAIL.MAX.WARN}`|Warning||
+|Etcd: Too many proposals are queued to commit|<p>Rising pending proposals suggests there is a high client load, or the member cannot commit proposals.</p>|`min(/Etcd by HTTP/etcd.proposals.pending,5m)>{$ETCD.PROPOSAL.PENDING.MAX.WARN}`|Warning||
+|Etcd: Too many HTTP requests failures|<p>Too many requests failed on `etcd` instance with the `5xx HTTP code`.</p>|`min(/Etcd by HTTP/etcd.http.requests.5xx.rate,5m)>{$ETCD.HTTP.FAIL.MAX.WARN}`|Warning||
+|Etcd: Server version has changed|<p>Etcd version has changed. Acknowledge to close the problem manually.</p>|`last(/Etcd by HTTP/etcd.server.version,#1)<>last(/Etcd by HTTP/etcd.server.version,#2) and length(last(/Etcd by HTTP/etcd.server.version))>0`|Info|**Manual close**: Yes|
+|Etcd: Cluster version has changed|<p>Etcd version has changed. Acknowledge to close the problem manually.</p>|`last(/Etcd by HTTP/etcd.cluster.version,#1)<>last(/Etcd by HTTP/etcd.cluster.version,#2) and length(last(/Etcd by HTTP/etcd.cluster.version))>0`|Info|**Manual close**: Yes|
+|Etcd: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Etcd by HTTP/etcd.uptime)<10m`|Info|**Manual close**: Yes|
+|Etcd: Current number of open files is too high|<p>Heavy usage of a file descriptor (i.e., near the limit of the process's file descriptor) indicates a potential file descriptor exhaustion issue.<br>If the file descriptors are exhausted, `etcd` may panic because it cannot create new WAL files.</p>|`min(/Etcd by HTTP/etcd.open.fds,5m)/last(/Etcd by HTTP/etcd.max.fds)*100>{$ETCD.OPEN.FDS.MAX.WARN}`|Warning||
 
 ### LLD rule gRPC codes discovery
 
@@ -141,7 +141,7 @@ Additional points to consider:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Too many failed gRPC requests with code: {#GRPC.CODE}||`min(/Etcd by HTTP/etcd.grpc.handled.rate[{#GRPC.CODE}],5m)>{$ETCD.GRPC.ERRORS.MAX.WARN}`|Warning||
+|Etcd: Too many failed gRPC requests with code: {#GRPC.CODE}||`min(/Etcd by HTTP/etcd.grpc.handled.rate[{#GRPC.CODE}],5m)>{$ETCD.GRPC.ERRORS.MAX.WARN}`|Warning||
 
 ### LLD rule Peers discovery
 

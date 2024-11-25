@@ -52,7 +52,7 @@ Metrics are collected by JMX.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Version has been changed|<p>The Tomcat version has changed. Acknowledge to close the problem manually.</p>|`last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#1)<>last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#2) and length(last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo]))>0`|Info|**Manual close**: Yes|
+|Apache Tomcat: Version has been changed|<p>The Tomcat version has changed. Acknowledge to close the problem manually.</p>|`last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#1)<>last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo],#2) and length(last(/Apache Tomcat by JMX/jmx["Catalina:type=Server",serverInfo]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Global request processors discovery
 
@@ -86,7 +86,7 @@ Metrics are collected by JMX.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#JMXVALUE}: Gzip compression is disabled|<p>gzip compression is disabled for connector {#JMXVALUE}.</p>|`find(/Apache Tomcat by JMX/jmx[{#JMXOBJ},compression],,"like","off") = 1`|Info|**Manual close**: Yes|
+|Apache Tomcat: {#JMXVALUE}: Gzip compression is disabled|<p>gzip compression is disabled for connector {#JMXVALUE}.</p>|`find(/Apache Tomcat by JMX/jmx[{#JMXOBJ},compression],,"like","off") = 1`|Info|**Manual close**: Yes|
 
 ### LLD rule Thread pools discovery
 
@@ -106,7 +106,7 @@ Metrics are collected by JMX.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#JMXNAME}: Busy worker threads count is high|<p>When current threads busy counter reaches the limit, no more requests could be handled, and the application chokes.</p>|`min(/Apache Tomcat by JMX/jmx[{#JMXOBJ},currentThreadsBusy],{$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})>last(/Apache Tomcat by JMX/jmx[{#JMXOBJ},maxThreads])*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100`|High||
+|Apache Tomcat: {#JMXNAME}: Busy worker threads count is high|<p>When current threads busy counter reaches the limit, no more requests could be handled, and the application chokes.</p>|`min(/Apache Tomcat by JMX/jmx[{#JMXOBJ},currentThreadsBusy],{$TOMCAT.THREADS.MAX.TIME:"{#JMXNAME}"})>last(/Apache Tomcat by JMX/jmx[{#JMXOBJ},maxThreads])*{$TOMCAT.THREADS.MAX.PCT:"{#JMXNAME}"}/100`|High||
 
 ### LLD rule Contexts discovery
 

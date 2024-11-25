@@ -62,9 +62,9 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Instance is not responding||`last(/TiDB PD by HTTP/pd.status)=0`|Average||
-|Version has changed|<p>PD version has changed. Acknowledge to close the problem manually.</p>|`last(/TiDB PD by HTTP/pd.version,#1)<>last(/TiDB PD by HTTP/pd.version,#2) and length(last(/TiDB PD by HTTP/pd.version))>0`|Info|**Manual close**: Yes|
-|has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/TiDB PD by HTTP/pd.uptime)<10m`|Info|**Manual close**: Yes|
+|TiDB PD: Instance is not responding||`last(/TiDB PD by HTTP/pd.status)=0`|Average||
+|TiDB PD: Version has changed|<p>PD version has changed. Acknowledge to close the problem manually.</p>|`last(/TiDB PD by HTTP/pd.version,#1)<>last(/TiDB PD by HTTP/pd.version,#2) and length(last(/TiDB PD by HTTP/pd.version))>0`|Info|**Manual close**: Yes|
+|TiDB PD: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/TiDB PD by HTTP/pd.uptime)<10m`|Info|**Manual close**: Yes|
 
 ### LLD rule Cluster metrics discovery
 
@@ -92,10 +92,10 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|There are offline TiKV nodes|<p>PD has not received a TiKV heartbeat for a long time.</p>|`last(/TiDB PD by HTTP/pd.cluster_status.store_down[{#SINGLETON}])>0`|Average||
-|There are low space TiKV nodes|<p>Indicates that there is no sufficient space on the TiKV node.</p>|`last(/TiDB PD by HTTP/pd.cluster_status.store_low_space[{#SINGLETON}])>0`|Average||
-|There are disconnected TiKV nodes|<p>PD does not receive a TiKV heartbeat within 20 seconds. Normally a TiKV heartbeat comes in every 10 seconds.</p>|`last(/TiDB PD by HTTP/pd.cluster_status.store_disconnected[{#SINGLETON}])>0`|Warning||
-|Current storage usage is too high|<p>Over {$PD.STORAGE_USAGE.MAX.WARN}% of the cluster space is occupied.</p>|`min(/TiDB PD by HTTP/pd.cluster_status.storage_size[{#SINGLETON}],5m)/last(/TiDB PD by HTTP/pd.cluster_status.storage_capacity[{#SINGLETON}])*100>{$PD.STORAGE_USAGE.MAX.WARN}`|Warning||
+|TiDB PD: There are offline TiKV nodes|<p>PD has not received a TiKV heartbeat for a long time.</p>|`last(/TiDB PD by HTTP/pd.cluster_status.store_down[{#SINGLETON}])>0`|Average||
+|TiDB PD: There are low space TiKV nodes|<p>Indicates that there is no sufficient space on the TiKV node.</p>|`last(/TiDB PD by HTTP/pd.cluster_status.store_low_space[{#SINGLETON}])>0`|Average||
+|TiDB PD: There are disconnected TiKV nodes|<p>PD does not receive a TiKV heartbeat within 20 seconds. Normally a TiKV heartbeat comes in every 10 seconds.</p>|`last(/TiDB PD by HTTP/pd.cluster_status.store_disconnected[{#SINGLETON}])>0`|Warning||
+|TiDB PD: Current storage usage is too high|<p>Over {$PD.STORAGE_USAGE.MAX.WARN}% of the cluster space is occupied.</p>|`min(/TiDB PD by HTTP/pd.cluster_status.storage_size[{#SINGLETON}],5m)/last(/TiDB PD by HTTP/pd.cluster_status.storage_capacity[{#SINGLETON}])*100>{$PD.STORAGE_USAGE.MAX.WARN}`|Warning||
 
 ### LLD rule Region labels discovery
 
@@ -125,8 +125,8 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Too many missed regions|<p>The number of Region replicas is smaller than the value of max-replicas. When a TiKV machine is down and its downtime exceeds max-down-time, it usually leads to missing replicas for some Regions during a period of time. When a TiKV node is made offline, it might result in a small number of Regions with missing replicas.</p>|`min(/TiDB PD by HTTP/pd.region_status[{#TYPE}],5m)>{$PD.MISS_REGION.MAX.WARN}`|Warning||
-|There are unresponsive peers|<p>The number of Regions with an unresponsive peer reported by the Raft leader.</p>|`min(/TiDB PD by HTTP/pd.region_status[{#TYPE}],5m)>0`|Warning||
+|TiDB PD: Too many missed regions|<p>The number of Region replicas is smaller than the value of max-replicas. When a TiKV machine is down and its downtime exceeds max-down-time, it usually leads to missing replicas for some Regions during a period of time. When a TiKV node is made offline, it might result in a small number of Regions with missing replicas.</p>|`min(/TiDB PD by HTTP/pd.region_status[{#TYPE}],5m)>{$PD.MISS_REGION.MAX.WARN}`|Warning||
+|TiDB PD: There are unresponsive peers|<p>The number of Regions with an unresponsive peer reported by the Raft leader.</p>|`min(/TiDB PD by HTTP/pd.region_status[{#TYPE}],5m)>0`|Warning||
 
 ### LLD rule Running scheduler discovery
 

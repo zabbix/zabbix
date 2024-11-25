@@ -85,9 +85,9 @@ For example, `https://monitored.controlm.instance:8443/automation-api`.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status [{ITEM.VALUE}]|<p>The service has encountered an issue.</p>|`last(/Control-M enterprise manager by HTTP/service.status['{#SERVICE.NAME}','{#SERVICE.JOB}'],#1)=0 or last(/Control-M enterprise manager by HTTP/service.status['{#SERVICE.NAME}','{#SERVICE.JOB}'],#1)=10`|Average|**Manual close**: Yes|
-|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status [{ITEM.VALUE}]|<p>The service has finished its job late.</p>|`last(/Control-M enterprise manager by HTTP/service.status['{#SERVICE.NAME}','{#SERVICE.JOB}'],#1)=3`|Warning|**Manual close**: Yes|
-|Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs in 'error' state|<p>There are services present which are in the state - `error`.</p>|`last(/Control-M enterprise manager by HTTP/service.jobs.status['{#SERVICE.NAME}','{#SERVICE.JOB}',error],#1)>0`|Average||
+|Control-M: Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status [{ITEM.VALUE}]|<p>The service has encountered an issue.</p>|`last(/Control-M enterprise manager by HTTP/service.status['{#SERVICE.NAME}','{#SERVICE.JOB}'],#1)=0 or last(/Control-M enterprise manager by HTTP/service.status['{#SERVICE.NAME}','{#SERVICE.JOB}'],#1)=10`|Average|**Manual close**: Yes|
+|Control-M: Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: status [{ITEM.VALUE}]|<p>The service has finished its job late.</p>|`last(/Control-M enterprise manager by HTTP/service.status['{#SERVICE.NAME}','{#SERVICE.JOB}'],#1)=3`|Warning|**Manual close**: Yes|
+|Control-M: Service [{#SERVICE.NAME}, {#SERVICE.JOB}]: jobs in 'error' state|<p>There are services present which are in the state - `error`.</p>|`last(/Control-M enterprise manager by HTTP/service.jobs.status['{#SERVICE.NAME}','{#SERVICE.JOB}',error],#1)>0`|Average||
 
 # Control-M server by HTTP
 
@@ -163,10 +163,10 @@ For example, `https://monitored.controlm.instance:8443/automation-api`.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Server is down|<p>The server is down.</p>|`last(/Control-M server by HTTP/server.state)=0 or last(/Control-M server by HTTP/server.state)=10`|High||
-|Server disconnected|<p>The server is disconnected.</p>|`last(/Control-M server by HTTP/server.message,#1)="Disconnected"`|High||
-|Server error|<p>The server has encountered an error.</p>|`last(/Control-M server by HTTP/server.message,#1)<>"Connected" and last(/Control-M server by HTTP/server.message,#1)<>"Disconnected" and last(/Control-M server by HTTP/server.message,#1)<>""`|High||
-|Server version has changed|<p>The server version has changed. Acknowledge to close the problem manually.</p>|`last(/Control-M server by HTTP/server.version,#1)<>last(/Control-M server by HTTP/server.version,#2) and length(last(/Control-M server by HTTP/server.version))>0`|Info|**Manual close**: Yes|
+|Control-M: Server is down|<p>The server is down.</p>|`last(/Control-M server by HTTP/server.state)=0 or last(/Control-M server by HTTP/server.state)=10`|High||
+|Control-M: Server disconnected|<p>The server is disconnected.</p>|`last(/Control-M server by HTTP/server.message,#1)="Disconnected"`|High||
+|Control-M: Server error|<p>The server has encountered an error.</p>|`last(/Control-M server by HTTP/server.message,#1)<>"Connected" and last(/Control-M server by HTTP/server.message,#1)<>"Disconnected" and last(/Control-M server by HTTP/server.message,#1)<>""`|High||
+|Control-M: Server version has changed|<p>The server version has changed. Acknowledge to close the problem manually.</p>|`last(/Control-M server by HTTP/server.version,#1)<>last(/Control-M server by HTTP/server.version,#2) and length(last(/Control-M server by HTTP/server.version))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Jobs discovery
 
@@ -188,7 +188,7 @@ For example, `https://monitored.controlm.instance:8443/automation-api`.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Job [{#JOB.ID}]: status [{ITEM.VALUE}]|<p>The job has encountered an issue.</p>|`last(/Control-M server by HTTP/job.status['{#JOB.ID}'],#1)=1 or last(/Control-M server by HTTP/job.status['{#JOB.ID}'],#1)=10`|Warning|**Manual close**: Yes|
+|Control-M: Job [{#JOB.ID}]: status [{ITEM.VALUE}]|<p>The job has encountered an issue.</p>|`last(/Control-M server by HTTP/job.status['{#JOB.ID}'],#1)=1 or last(/Control-M server by HTTP/job.status['{#JOB.ID}'],#1)=10`|Warning|**Manual close**: Yes|
 
 ### LLD rule Agent discovery
 
@@ -208,10 +208,10 @@ For example, `https://monitored.controlm.instance:8443/automation-api`.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Agent [{#AGENT.NAME}]: status [{ITEM.VALUE}]|<p>The agent has encountered an issue.</p>|`last(/Control-M server by HTTP/agent.status['{#AGENT.NAME}'],#1)=1 or last(/Control-M server by HTTP/agent.status['{#AGENT.NAME}'],#1)=10`|Average|**Manual close**: Yes|
-|Agent [{#AGENT.NAME}}: status disabled|<p>The agent is disabled.</p>|`last(/Control-M server by HTTP/agent.status['{#AGENT.NAME}'],#1)=2 or last(/Control-M server by HTTP/agent.status['{#AGENT.NAME}'],#1)=3`|Info|**Manual close**: Yes|
-|Agent [{#AGENT.NAME}]: version has changed|<p>The agent version has changed. Acknowledge to close the problem manually.</p>|`last(/Control-M server by HTTP/agent.version['{#AGENT.NAME}'],#1)<>last(/Control-M server by HTTP/agent.version['{#AGENT.NAME}'],#2)`|Info|**Manual close**: Yes|
-|Agent [{#AGENT.NAME}]: unknown version|<p>The agent version is unknown.</p>|`last(/Control-M server by HTTP/agent.version['{#AGENT.NAME}'],#1)="Unknown"`|Warning|**Manual close**: Yes|
+|Control-M: Agent [{#AGENT.NAME}]: status [{ITEM.VALUE}]|<p>The agent has encountered an issue.</p>|`last(/Control-M server by HTTP/agent.status['{#AGENT.NAME}'],#1)=1 or last(/Control-M server by HTTP/agent.status['{#AGENT.NAME}'],#1)=10`|Average|**Manual close**: Yes|
+|Control-M: Agent [{#AGENT.NAME}}: status disabled|<p>The agent is disabled.</p>|`last(/Control-M server by HTTP/agent.status['{#AGENT.NAME}'],#1)=2 or last(/Control-M server by HTTP/agent.status['{#AGENT.NAME}'],#1)=3`|Info|**Manual close**: Yes|
+|Control-M: Agent [{#AGENT.NAME}]: version has changed|<p>The agent version has changed. Acknowledge to close the problem manually.</p>|`last(/Control-M server by HTTP/agent.version['{#AGENT.NAME}'],#1)<>last(/Control-M server by HTTP/agent.version['{#AGENT.NAME}'],#2)`|Info|**Manual close**: Yes|
+|Control-M: Agent [{#AGENT.NAME}]: unknown version|<p>The agent version is unknown.</p>|`last(/Control-M server by HTTP/agent.version['{#AGENT.NAME}'],#1)="Unknown"`|Warning|**Manual close**: Yes|
 
 ## Feedback
 

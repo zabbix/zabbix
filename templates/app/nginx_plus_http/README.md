@@ -96,11 +96,11 @@ Therefore, use the following filters with these macros:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Server response error||`length(last(/NGINX Plus by HTTP/nginx.info.error))>0`|High||
-|Version has changed|<p>The Nginx version has changed. Acknowledge to close the problem manually.</p>|`last(/NGINX Plus by HTTP/nginx.info.version,#1)<>last(/NGINX Plus by HTTP/nginx.info.version,#2) and length(last(/NGINX Plus by HTTP/nginx.info.version))>0`|Info|**Manual close**: Yes|
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/NGINX Plus by HTTP/nginx.info.uptime)<10m`|Info|**Manual close**: Yes|
-|Failed to fetch info data|<p>Zabbix has not received any data for metrics for the last 30 minutes</p>|`nodata(/NGINX Plus by HTTP/nginx.info.uptime,30m)=1`|Warning|**Manual close**: Yes|
-|High connections drop rate|<p>The rate of dropped connections is greater than `{$NGINX.DROP_RATE.MAX.WARN}` for the last 5 minutes.</p>|`min(/NGINX Plus by HTTP/nginx.connections.dropped,5m) > {$NGINX.DROP_RATE.MAX.WARN}`|Warning||
+|NGINX Plus: Server response error||`length(last(/NGINX Plus by HTTP/nginx.info.error))>0`|High||
+|NGINX Plus: Version has changed|<p>The Nginx version has changed. Acknowledge to close the problem manually.</p>|`last(/NGINX Plus by HTTP/nginx.info.version,#1)<>last(/NGINX Plus by HTTP/nginx.info.version,#2) and length(last(/NGINX Plus by HTTP/nginx.info.version))>0`|Info|**Manual close**: Yes|
+|NGINX Plus: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/NGINX Plus by HTTP/nginx.info.uptime)<10m`|Info|**Manual close**: Yes|
+|NGINX Plus: Failed to fetch info data|<p>Zabbix has not received any data for metrics for the last 30 minutes</p>|`nodata(/NGINX Plus by HTTP/nginx.info.uptime,30m)=1`|Warning|**Manual close**: Yes|
+|NGINX Plus: High connections drop rate|<p>The rate of dropped connections is greater than `{$NGINX.DROP_RATE.MAX.WARN}` for the last 5 minutes.</p>|`min(/NGINX Plus by HTTP/nginx.connections.dropped,5m) > {$NGINX.DROP_RATE.MAX.WARN}`|Warning||
 
 ### LLD rule HTTP server zones discovery
 
@@ -196,9 +196,9 @@ Therefore, use the following filters with these macros:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|HTTP upstream server is not in UP or DOWN state.||`find(/NGINX Plus by HTTP/nginx.http.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","up")=0 and find(/NGINX Plus by HTTP/nginx.http.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","down")=0`|Warning||
-|Too many HTTP requests with code 4xx||`sum(/NGINX Plus by HTTP/nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}],5m) > (sum(/NGINX Plus by HTTP/nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}],5m)*({$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}/100))`|Warning||
-|Too many HTTP requests with code 5xx||`sum(/NGINX Plus by HTTP/nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}],5m) > (sum(/NGINX Plus by HTTP/nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}],5m)*({$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}/100))`|High||
+|NGINX Plus: HTTP upstream server is not in UP or DOWN state.||`find(/NGINX Plus by HTTP/nginx.http.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","up")=0 and find(/NGINX Plus by HTTP/nginx.http.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","down")=0`|Warning||
+|NGINX Plus: Too many HTTP requests with code 4xx||`sum(/NGINX Plus by HTTP/nginx.http.upstream.peer.responses.4xx.rate[{#UPSTREAM},{#PEER}],5m) > (sum(/NGINX Plus by HTTP/nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}],5m)*({$NGINX.HTTP.UPSTREAM.4XX.MAX.WARN}/100))`|Warning||
+|NGINX Plus: Too many HTTP requests with code 5xx||`sum(/NGINX Plus by HTTP/nginx.http.upstream.peer.responses.5xx.rate[{#UPSTREAM},{#PEER}],5m) > (sum(/NGINX Plus by HTTP/nginx.http.upstream.peer.responses.total.rate[{#UPSTREAM},{#PEER}],5m)*({$NGINX.HTTP.UPSTREAM.5XX.MAX.WARN}/100))`|High||
 
 ### LLD rule Stream server zones discovery
 
@@ -264,7 +264,7 @@ Therefore, use the following filters with these macros:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Stream upstream server is not in UP or DOWN state.||`find(/NGINX Plus by HTTP/nginx.stream.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","up")=0 and find(/NGINX Plus by HTTP/nginx.stream.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","down")=0`|Warning||
+|NGINX Plus: Stream upstream server is not in UP or DOWN state.||`find(/NGINX Plus by HTTP/nginx.stream.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","up")=0 and find(/NGINX Plus by HTTP/nginx.stream.upstream.peer.state[{#UPSTREAM},{#PEER}],,"like","down")=0`|Warning||
 
 ### LLD rule Resolvers discovery
 

@@ -92,13 +92,13 @@ Test availability: `zabbix_get -s mongos.node -k 'mongodb.ping["{$MONGODB.CONNST
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Connection to mongos proxy is unavailable|<p>Connection to mongos proxy instance is currently unavailable.</p>|`last(/MongoDB cluster by Zabbix agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0`|High||
-|Version has changed|<p>MongoDB cluster version has changed. Acknowledge to close the problem manually.</p>|`last(/MongoDB cluster by Zabbix agent 2/mongodb.version,#1)<>last(/MongoDB cluster by Zabbix agent 2/mongodb.version,#2) and length(last(/MongoDB cluster by Zabbix agent 2/mongodb.version))>0`|Info|**Manual close**: Yes|
-|Mongos server has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/MongoDB cluster by Zabbix agent 2/mongodb.uptime)<10m`|Info|**Manual close**: Yes|
-|Failed to fetch info data|<p>Zabbix has not received data for items for the last 10 minutes</p>|`nodata(/MongoDB cluster by Zabbix agent 2/mongodb.uptime,10m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Connection to mongos proxy is unavailable</li></ul>|
-|Available connections is low|<p>Too few available connections.<br>Consider this value in combination with the value of connections current to understand the connection load on the database.</p>|`max(/MongoDB cluster by Zabbix agent 2/mongodb.connections.available,5m)<{$MONGODB.CONNS.AVAILABLE.MIN.WARN}`|Warning||
-|Too many cursors opened by MongoDB for clients||`min(/MongoDB cluster by Zabbix agent 2/mongodb.cursor.open.total,5m)>{$MONGODB.CURSOR.OPEN.MAX.WARN}`|Warning||
-|Too many cursors are timing out||`min(/MongoDB cluster by Zabbix agent 2/mongodb.cursor.timed_out.rate,5m)>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}`|Warning||
+|MongoDB cluster: Connection to mongos proxy is unavailable|<p>Connection to mongos proxy instance is currently unavailable.</p>|`last(/MongoDB cluster by Zabbix agent 2/mongodb.ping["{$MONGODB.CONNSTRING}","{$MONGODB.USER}","{$MONGODB.PASSWORD}"])=0`|High||
+|MongoDB cluster: Version has changed|<p>MongoDB cluster version has changed. Acknowledge to close the problem manually.</p>|`last(/MongoDB cluster by Zabbix agent 2/mongodb.version,#1)<>last(/MongoDB cluster by Zabbix agent 2/mongodb.version,#2) and length(last(/MongoDB cluster by Zabbix agent 2/mongodb.version))>0`|Info|**Manual close**: Yes|
+|MongoDB cluster: Mongos server has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/MongoDB cluster by Zabbix agent 2/mongodb.uptime)<10m`|Info|**Manual close**: Yes|
+|MongoDB cluster: Failed to fetch info data|<p>Zabbix has not received data for items for the last 10 minutes</p>|`nodata(/MongoDB cluster by Zabbix agent 2/mongodb.uptime,10m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>MongoDB cluster: Connection to mongos proxy is unavailable</li></ul>|
+|MongoDB cluster: Available connections is low|<p>Too few available connections.<br>Consider this value in combination with the value of connections current to understand the connection load on the database.</p>|`max(/MongoDB cluster by Zabbix agent 2/mongodb.connections.available,5m)<{$MONGODB.CONNS.AVAILABLE.MIN.WARN}`|Warning||
+|MongoDB cluster: Too many cursors opened by MongoDB for clients||`min(/MongoDB cluster by Zabbix agent 2/mongodb.cursor.open.total,5m)>{$MONGODB.CURSOR.OPEN.MAX.WARN}`|Warning||
+|MongoDB cluster: Too many cursors are timing out||`min(/MongoDB cluster by Zabbix agent 2/mongodb.cursor.timed_out.rate,5m)>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}`|Warning||
 
 ### LLD rule Database discovery
 

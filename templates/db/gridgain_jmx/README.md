@@ -66,9 +66,9 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",UpTime])<10m`|Info|**Manual close**: Yes|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: Failed to fetch info data|<p>Zabbix has not received data for items for the last 10 minutes.</p>|`nodata(/GridGain by JMX/jmx["{#JMXOBJ}",UpTime],10m)=1`|Warning|**Manual close**: Yes|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: Version has changed|<p>The GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Acknowledge to close the problem manually.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion]))>0`|Info|**Manual close**: Yes|
+|GridGain: GridGain [{#JMXIGNITEINSTANCENAME}]: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",UpTime])<10m`|Info|**Manual close**: Yes|
+|GridGain: GridGain [{#JMXIGNITEINSTANCENAME}]: Failed to fetch info data|<p>Zabbix has not received data for items for the last 10 minutes.</p>|`nodata(/GridGain by JMX/jmx["{#JMXOBJ}",UpTime],10m)=1`|Warning|**Manual close**: Yes|
+|GridGain: GridGain [{#JMXIGNITEINSTANCENAME}]: Version has changed|<p>The GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Acknowledge to close the problem manually.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",FullVersion]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Cluster metrics
 
@@ -90,9 +90,9 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: Server node left the topology|<p>One or more server node left the topology. Acknowledge to close the problem manually.</p>|`change(/GridGain by JMX/jmx["{#JMXOBJ}",TotalServerNodes])<0`|Warning|**Manual close**: Yes|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: Server node added to the topology|<p>One or more server node added to the topology. Acknowledge to close the problem manually.</p>|`change(/GridGain by JMX/jmx["{#JMXOBJ}",TotalServerNodes])>0`|Info|**Manual close**: Yes|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: There are nodes is not in topology|<p>One or more server node left the topology. Acknowledge to close the problem manually.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",TotalServerNodes])>last(/GridGain by JMX/jmx["{#JMXOBJ}",TotalBaselineNodes])`|Info|**Manual close**: Yes|
+|GridGain: GridGain [{#JMXIGNITEINSTANCENAME}]: Server node left the topology|<p>One or more server node left the topology. Acknowledge to close the problem manually.</p>|`change(/GridGain by JMX/jmx["{#JMXOBJ}",TotalServerNodes])<0`|Warning|**Manual close**: Yes|
+|GridGain: GridGain [{#JMXIGNITEINSTANCENAME}]: Server node added to the topology|<p>One or more server node added to the topology. Acknowledge to close the problem manually.</p>|`change(/GridGain by JMX/jmx["{#JMXOBJ}",TotalServerNodes])>0`|Info|**Manual close**: Yes|
+|GridGain: GridGain [{#JMXIGNITEINSTANCENAME}]: There are nodes is not in topology|<p>One or more server node left the topology. Acknowledge to close the problem manually.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",TotalServerNodes])>last(/GridGain by JMX/jmx["{#JMXOBJ}",TotalBaselineNodes])`|Info|**Manual close**: Yes|
 
 ### LLD rule Local node metrics
 
@@ -119,10 +119,10 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: Number of queued jobs is too high|<p>Number of queued jobs is over {$GRIDGAIN.JOBS.QUEUE.MAX.WARN}.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",CurrentWaitingJobs],15m) > {$GRIDGAIN.JOBS.QUEUE.MAX.WARN}`|Warning||
-|GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long|<p>PME duration is over {$GRIDGAIN.PME.DURATION.MAX.WARN}ms.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$GRIDGAIN.PME.DURATION.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long</li></ul>|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long|<p>PME duration is over {$GRIDGAIN.PME.DURATION.MAX.HIGH}ms. Looks like PME is hung.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$GRIDGAIN.PME.DURATION.MAX.HIGH}`|High||
-|GridGain [{#JMXIGNITEINSTANCENAME}]: Number of running threads is too high|<p>Number of running threads is over {$GRIDGAIN.THREADS.COUNT.MAX.WARN}.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",CurrentThreadCount],15m) > {$GRIDGAIN.THREADS.COUNT.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long</li></ul>|
+|GridGain: GridGain [{#JMXIGNITEINSTANCENAME}]: Number of queued jobs is too high|<p>Number of queued jobs is over {$GRIDGAIN.JOBS.QUEUE.MAX.WARN}.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",CurrentWaitingJobs],15m) > {$GRIDGAIN.JOBS.QUEUE.MAX.WARN}`|Warning||
+|GridGain: GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long|<p>PME duration is over {$GRIDGAIN.PME.DURATION.MAX.WARN}ms.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$GRIDGAIN.PME.DURATION.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>GridGain: GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long</li></ul>|
+|GridGain: GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long|<p>PME duration is over {$GRIDGAIN.PME.DURATION.MAX.HIGH}ms. Looks like PME is hung.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",CurrentPmeDuration],5m) > {$GRIDGAIN.PME.DURATION.MAX.HIGH}`|High||
+|GridGain: GridGain [{#JMXIGNITEINSTANCENAME}]: Number of running threads is too high|<p>Number of running threads is over {$GRIDGAIN.THREADS.COUNT.MAX.WARN}.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",CurrentThreadCount],15m) > {$GRIDGAIN.THREADS.COUNT.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>GridGain: GridGain [{#JMXIGNITEINSTANCENAME}]: PME duration is too long</li></ul>|
 
 ### LLD rule TCP discovery SPI
 
@@ -147,7 +147,7 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|GridGain [{#JMXIGNITEINSTANCENAME}]: Coordinator has changed|<p>The GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Acknowledge to close the problem manually.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator]))>0`|Warning|**Manual close**: Yes|
+|GridGain: GridGain [{#JMXIGNITEINSTANCENAME}]: Coordinator has changed|<p>The GridGain [{#JMXIGNITEINSTANCENAME}] version has changed. Acknowledge to close the problem manually.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",Coordinator]))>0`|Warning|**Manual close**: Yes|
 
 ### LLD rule TCP Communication SPI metrics
 
@@ -204,9 +204,9 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Cache group [{#JMXGROUP}]: There are no success transactions for cache for 5m||`min(/GridGain by JMX/jmx["{#JMXOBJ}",CacheTxRollbacks],5m)>0 and max(/GridGain by JMX/jmx["{#JMXOBJ}",CacheTxCommits],5m)=0`|Average||
-|Cache group [{#JMXGROUP}]: Success transactions less than rollbacks for 5m||`min(/GridGain by JMX/jmx["{#JMXOBJ}",CacheTxRollbacks],5m) > max(/GridGain by JMX/jmx["{#JMXOBJ}",CacheTxCommits],5m)`|Warning|**Depends on**:<br><ul><li>Cache group [{#JMXGROUP}]: There are no success transactions for cache for 5m</li></ul>|
-|Cache group [{#JMXGROUP}]: All entries are in heap|<p>All entries are in heap. Possibly you use eager queries it may cause out of memory exceptions for big caches. Acknowledge to close the problem manually.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",CacheSize])=last(/GridGain by JMX/jmx["{#JMXOBJ}",HeapEntriesCount])`|Info|**Manual close**: Yes|
+|GridGain: Cache group [{#JMXGROUP}]: There are no success transactions for cache for 5m||`min(/GridGain by JMX/jmx["{#JMXOBJ}",CacheTxRollbacks],5m)>0 and max(/GridGain by JMX/jmx["{#JMXOBJ}",CacheTxCommits],5m)=0`|Average||
+|GridGain: Cache group [{#JMXGROUP}]: Success transactions less than rollbacks for 5m||`min(/GridGain by JMX/jmx["{#JMXOBJ}",CacheTxRollbacks],5m) > max(/GridGain by JMX/jmx["{#JMXOBJ}",CacheTxCommits],5m)`|Warning|**Depends on**:<br><ul><li>GridGain: Cache group [{#JMXGROUP}]: There are no success transactions for cache for 5m</li></ul>|
+|GridGain: Cache group [{#JMXGROUP}]: All entries are in heap|<p>All entries are in heap. Possibly you use eager queries it may cause out of memory exceptions for big caches. Acknowledge to close the problem manually.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",CacheSize])=last(/GridGain by JMX/jmx["{#JMXOBJ}",HeapEntriesCount])`|Info|**Manual close**: Yes|
 
 ### LLD rule Data region metrics
 
@@ -234,12 +234,12 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Data region {#JMXNAME}: Node started to evict pages|<p>You store more data than region can accommodate. Data started to move to disk it can make requests work slower. Acknowledge to close the problem manually.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",EvictionRate],5m)>0`|Info|**Manual close**: Yes|
-|Data region {#JMXNAME}: Data region utilization is too high|<p>Data region utilization is high. Increase data region size or delete any data.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$GRIDGAIN.DATA.REGION.PUSED.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Data region {#JMXNAME}: Data region utilization is too high</li></ul>|
-|Data region {#JMXNAME}: Data region utilization is too high|<p>Data region utilization is high. Increase data region size or delete any data.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH}`|High||
-|Data region {#JMXNAME}: Pages replace rate more than 0|<p>There is more data than DataRegionMaxSize. Cluster started to replace pages in memory. Page replacement can slow down operations.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",PagesReplaceRate],5m)>0`|Warning||
-|Data region {#JMXNAME}: Checkpoint buffer utilization is too high|<p>Checkpoint buffer utilization is high. Threads will be throttled to avoid buffer overflow. It can be caused by high disk utilization.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",UsedCheckpointBufferSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",CheckpointBufferSize])*100>{$GRIDGAIN.CHECKPOINT.PUSED.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Data region {#JMXNAME}: Checkpoint buffer utilization is too high</li></ul>|
-|Data region {#JMXNAME}: Checkpoint buffer utilization is too high|<p>Checkpoint buffer utilization is high. Threads will be throttled to avoid buffer overflow. It can be caused by high disk utilization.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",UsedCheckpointBufferSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",CheckpointBufferSize])*100>{$GRIDGAIN.CHECKPOINT.PUSED.MAX.HIGH}`|High||
+|GridGain: Data region {#JMXNAME}: Node started to evict pages|<p>You store more data than region can accommodate. Data started to move to disk it can make requests work slower. Acknowledge to close the problem manually.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",EvictionRate],5m)>0`|Info|**Manual close**: Yes|
+|GridGain: Data region {#JMXNAME}: Data region utilization is too high|<p>Data region utilization is high. Increase data region size or delete any data.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$GRIDGAIN.DATA.REGION.PUSED.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>GridGain: Data region {#JMXNAME}: Data region utilization is too high</li></ul>|
+|GridGain: Data region {#JMXNAME}: Data region utilization is too high|<p>Data region utilization is high. Increase data region size or delete any data.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",OffheapUsedSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",OffHeapSize])*100>{$GRIDGAIN.DATA.REGION.PUSED.MAX.HIGH}`|High||
+|GridGain: Data region {#JMXNAME}: Pages replace rate more than 0|<p>There is more data than DataRegionMaxSize. Cluster started to replace pages in memory. Page replacement can slow down operations.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",PagesReplaceRate],5m)>0`|Warning||
+|GridGain: Data region {#JMXNAME}: Checkpoint buffer utilization is too high|<p>Checkpoint buffer utilization is high. Threads will be throttled to avoid buffer overflow. It can be caused by high disk utilization.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",UsedCheckpointBufferSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",CheckpointBufferSize])*100>{$GRIDGAIN.CHECKPOINT.PUSED.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>GridGain: Data region {#JMXNAME}: Checkpoint buffer utilization is too high</li></ul>|
+|GridGain: Data region {#JMXNAME}: Checkpoint buffer utilization is too high|<p>Checkpoint buffer utilization is high. Threads will be throttled to avoid buffer overflow. It can be caused by high disk utilization.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",UsedCheckpointBufferSize],5m)/last(/GridGain by JMX/jmx["{#JMXOBJ}",CheckpointBufferSize])*100>{$GRIDGAIN.CHECKPOINT.PUSED.MAX.HIGH}`|High||
 
 ### LLD rule Cache groups
 
@@ -265,10 +265,10 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Cache group [{#JMXNAME}]: One or more backups are unavailable||`min(/GridGain by JMX/jmx["{#JMXOBJ}",Backups],5m)>=max(/GridGain by JMX/jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies],5m)`|Warning||
-|Cache group [{#JMXNAME}]: List of caches has changed|<p>List of caches has changed. Significant changes have occurred in the cluster. Acknowledge to close the problem manually.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",Caches],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",Caches],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",Caches]))>0`|Info|**Manual close**: Yes|
-|Cache group [{#JMXNAME}]: Rebalance in progress|<p>Acknowledge to close the problem manually.</p>|`max(/GridGain by JMX/jmx["{#JMXOBJ}",LocalNodeMovingPartitionsCount],30m)>0`|Info|**Manual close**: Yes|
-|Cache group [{#JMXNAME}]: There is no copy for partitions||`max(/GridGain by JMX/jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies],30m)=0`|Warning||
+|GridGain: Cache group [{#JMXNAME}]: One or more backups are unavailable||`min(/GridGain by JMX/jmx["{#JMXOBJ}",Backups],5m)>=max(/GridGain by JMX/jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies],5m)`|Warning||
+|GridGain: Cache group [{#JMXNAME}]: List of caches has changed|<p>List of caches has changed. Significant changes have occurred in the cluster. Acknowledge to close the problem manually.</p>|`last(/GridGain by JMX/jmx["{#JMXOBJ}",Caches],#1)<>last(/GridGain by JMX/jmx["{#JMXOBJ}",Caches],#2) and length(last(/GridGain by JMX/jmx["{#JMXOBJ}",Caches]))>0`|Info|**Manual close**: Yes|
+|GridGain: Cache group [{#JMXNAME}]: Rebalance in progress|<p>Acknowledge to close the problem manually.</p>|`max(/GridGain by JMX/jmx["{#JMXOBJ}",LocalNodeMovingPartitionsCount],30m)>0`|Info|**Manual close**: Yes|
+|GridGain: Cache group [{#JMXNAME}]: There is no copy for partitions||`max(/GridGain by JMX/jmx["{#JMXOBJ}",MinimumNumberOfPartitionCopies],30m)=0`|Warning||
 
 ### LLD rule Thread pool metrics
 
@@ -289,7 +289,7 @@ This template works with standalone and cluster instances. Metrics are collected
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Thread pool [{#JMXNAME}]: Too many messages in queue|<p>Number of messages in queue more than {$GRIDGAIN.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"}.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",QueueSize],5m) > {$GRIDGAIN.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"}`|Average||
+|GridGain: Thread pool [{#JMXNAME}]: Too many messages in queue|<p>Number of messages in queue more than {$GRIDGAIN.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"}.</p>|`min(/GridGain by JMX/jmx["{#JMXOBJ}",QueueSize],5m) > {$GRIDGAIN.THREAD.QUEUE.MAX.WARN:"{#JMXNAME}"}`|Average||
 
 ## Feedback
 

@@ -68,13 +68,13 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/ZYXEL MGS3520-28x by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
-|Template does not match hardware|<p>This template is for Zyxel MGS3520-28x series, but connected to {ITEM.VALUE}</p>|`not(last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.model)="MGS3520-28" or last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.model)="MGS3520-28F")`|Info|**Manual close**: Yes|
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.hw.uptime)>0 and last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.hw.uptime)<10m) or (last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.hw.uptime)=0 and last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.net.uptime)<10m)`|Info|**Manual close**: Yes|
-|Firmware has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.fwversion,#1)<>last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.fwversion,#2) and length(last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.fwversion))>0`|Info|**Manual close**: Yes|
-|Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.serialnumber,#1)<>last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.serialnumber,#2) and length(last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.serialnumber))>0`|Info|**Manual close**: Yes|
-|High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.cpuusage,5m)>{$CPU.UTIL.CRIT}`|Warning||
-|High memory utilization|<p>The system is running out of free memory.</p>|`min(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.memusage,5m)>{$MEMORY.UTIL.MAX}`|Average||
+|ZYXEL: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/ZYXEL MGS3520-28x by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
+|ZYXEL: Template does not match hardware|<p>This template is for Zyxel MGS3520-28x series, but connected to {ITEM.VALUE}</p>|`not(last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.model)="MGS3520-28" or last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.model)="MGS3520-28F")`|Info|**Manual close**: Yes|
+|ZYXEL: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.hw.uptime)>0 and last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.hw.uptime)<10m) or (last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.hw.uptime)=0 and last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.net.uptime)<10m)`|Info|**Manual close**: Yes|
+|ZYXEL: Firmware has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.fwversion,#1)<>last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.fwversion,#2) and length(last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.fwversion))>0`|Info|**Manual close**: Yes|
+|ZYXEL: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.serialnumber,#1)<>last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.serialnumber,#2) and length(last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.serialnumber))>0`|Info|**Manual close**: Yes|
+|ZYXEL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.cpuusage,5m)>{$CPU.UTIL.CRIT}`|Warning||
+|ZYXEL: High memory utilization|<p>The system is running out of free memory.</p>|`min(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.memusage,5m)>{$MEMORY.UTIL.MAX}`|Average||
 
 ### LLD rule Fan discovery
 
@@ -92,7 +92,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#ZYXEL.FAN.DESCRIPTION} is in critical state|<p>Please check the fan unit</p>|`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW}`|Average||
+|ZYXEL: {#ZYXEL.FAN.DESCRIPTION} is in critical state|<p>Please check the fan unit</p>|`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW}`|Average||
 
 ### LLD rule Temperature discovery
 
@@ -110,7 +110,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Temperature {#ZYXEL.TEMPDESCRIPTION} is in critical state|<p>Please check the temperature</p>|`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}`|Average||
+|ZYXEL: Temperature {#ZYXEL.TEMPDESCRIPTION} is in critical state|<p>Please check the temperature</p>|`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}`|Average||
 
 ### LLD rule Voltage discovery
 
@@ -128,7 +128,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Voltage {#ZYXEL.DESCRIPTION} is in critical state|<p>Please check the power supply</p>|`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}`|Average||
+|ZYXEL: Voltage {#ZYXEL.DESCRIPTION} is in critical state|<p>Please check the power supply</p>|`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}`|Average||
 
 ### LLD rule Interface discovery
 
@@ -162,7 +162,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Port {#SNMPINDEX}: Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}],#2)`|Average|**Manual close**: Yes|
+|ZYXEL: Port {#SNMPINDEX}: Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.net.if.operstatus[{#SNMPINDEX}],#2)`|Average|**Manual close**: Yes|
 
 ### LLD rule SFP without DDM discovery
 
@@ -186,7 +186,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|SFP {#SNMPINDEX} has been replaced|<p>SFP {#SNMPINDEX} serial number has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|ZYXEL: SFP {#SNMPINDEX} has been replaced|<p>SFP {#SNMPINDEX} serial number has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.sfp.serialnumber[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule SFP with DDM discovery
 
@@ -204,8 +204,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION}|<p>The upper threshold value of the parameter is exceeded</p>|`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}`|Warning|**Manual close**: Yes|
-|SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION}|<p>The parameter values are less than the lower threshold</p>|`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}`|Warning|**Manual close**: Yes|
+|ZYXEL: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION}|<p>The upper threshold value of the parameter is exceeded</p>|`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}`|Warning|**Manual close**: Yes|
+|ZYXEL: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION}|<p>The parameter values are less than the lower threshold</p>|`last(/ZYXEL MGS3520-28x by SNMP/zyxel.3520_28.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}`|Warning|**Manual close**: Yes|
 
 ## Feedback
 

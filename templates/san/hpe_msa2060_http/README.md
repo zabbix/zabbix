@@ -75,11 +75,11 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|There are errors in method requests to API|<p>There are errors in method requests to API.</p>|`length(last(/HPE MSA 2060 Storage by HTTP/hpe.msa.get.errors))>0`|Average|**Depends on**:<br><ul><li>Service is down or unavailable</li></ul>|
-|System health is in degraded state|<p>System health is in degraded state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.system.health)=1`|Warning||
-|System health is in fault state|<p>System health is in fault state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.system.health)=2`|Average||
-|System health is in unknown state|<p>System health is in unknown state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.system.health)=3`|Info||
-|Service is down or unavailable|<p>HTTP/HTTPS service is down or unable to establish TCP connection.</p>|`max(/HPE MSA 2060 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{$HPE.MSA.API.HOST}","{$HPE.MSA.API.PORT}"],5m)=0`|High||
+|HPE MSA 2060 Storage: There are errors in method requests to API|<p>There are errors in method requests to API.</p>|`length(last(/HPE MSA 2060 Storage by HTTP/hpe.msa.get.errors))>0`|Average|**Depends on**:<br><ul><li>HPE MSA 2060 Storage: Service is down or unavailable</li></ul>|
+|HPE MSA 2060 Storage: System health is in degraded state|<p>System health is in degraded state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.system.health)=1`|Warning||
+|HPE MSA 2060 Storage: System health is in fault state|<p>System health is in fault state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.system.health)=2`|Average||
+|HPE MSA 2060 Storage: System health is in unknown state|<p>System health is in unknown state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.system.health)=3`|Info||
+|HPE MSA 2060 Storage: Service is down or unavailable|<p>HTTP/HTTPS service is down or unable to establish TCP connection.</p>|`max(/HPE MSA 2060 Storage by HTTP/net.tcp.service["{$HPE.MSA.API.SCHEME}","{$HPE.MSA.API.HOST}","{$HPE.MSA.API.PORT}"],5m)=0`|High||
 
 ### LLD rule Controllers discovery
 
@@ -121,12 +121,12 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Controller [{#CONTROLLER.ID}]: Controller health is in degraded state|<p>Controller health is in degraded state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.controllers["{#CONTROLLER.ID}",health])=1`|Warning|**Depends on**:<br><ul><li>Controller [{#CONTROLLER.ID}]: Controller is down</li></ul>|
-|Controller [{#CONTROLLER.ID}]: Controller health is in fault state|<p>Controller health is in fault state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.controllers["{#CONTROLLER.ID}",health])=2`|Average|**Depends on**:<br><ul><li>Controller [{#CONTROLLER.ID}]: Controller is down</li></ul>|
-|Controller [{#CONTROLLER.ID}]: Controller health is in unknown state|<p>Controller health is in unknown state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.controllers["{#CONTROLLER.ID}",health])=3`|Info|**Depends on**:<br><ul><li>Controller [{#CONTROLLER.ID}]: Controller is down</li></ul>|
-|Controller [{#CONTROLLER.ID}]: Controller is down|<p>The controller is down.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.controllers["{#CONTROLLER.ID}",status])=1`|High||
-|Controller [{#CONTROLLER.ID}]: High CPU utilization|<p>Controller CPU utilization is too high. The system might be slow to respond.</p>|`min(/HPE MSA 2060 Storage by HTTP/hpe.msa.controllers.cpu["{#CONTROLLER.ID}",util],5m)>{$HPE.MSA.CONTROLLER.CPU.UTIL.CRIT}`|Warning||
-|Controller [{#CONTROLLER.ID}]: Controller has been restarted|<p>The controller uptime is less than 10 minutes.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.controllers["{#CONTROLLER.ID}",uptime])<10m`|Warning||
+|HPE MSA 2060 Storage: Controller [{#CONTROLLER.ID}]: Controller health is in degraded state|<p>Controller health is in degraded state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.controllers["{#CONTROLLER.ID}",health])=1`|Warning|**Depends on**:<br><ul><li>HPE MSA 2060 Storage: Controller [{#CONTROLLER.ID}]: Controller is down</li></ul>|
+|HPE MSA 2060 Storage: Controller [{#CONTROLLER.ID}]: Controller health is in fault state|<p>Controller health is in fault state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.controllers["{#CONTROLLER.ID}",health])=2`|Average|**Depends on**:<br><ul><li>HPE MSA 2060 Storage: Controller [{#CONTROLLER.ID}]: Controller is down</li></ul>|
+|HPE MSA 2060 Storage: Controller [{#CONTROLLER.ID}]: Controller health is in unknown state|<p>Controller health is in unknown state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.controllers["{#CONTROLLER.ID}",health])=3`|Info|**Depends on**:<br><ul><li>HPE MSA 2060 Storage: Controller [{#CONTROLLER.ID}]: Controller is down</li></ul>|
+|HPE MSA 2060 Storage: Controller [{#CONTROLLER.ID}]: Controller is down|<p>The controller is down.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.controllers["{#CONTROLLER.ID}",status])=1`|High||
+|HPE MSA 2060 Storage: Controller [{#CONTROLLER.ID}]: High CPU utilization|<p>Controller CPU utilization is too high. The system might be slow to respond.</p>|`min(/HPE MSA 2060 Storage by HTTP/hpe.msa.controllers.cpu["{#CONTROLLER.ID}",util],5m)>{$HPE.MSA.CONTROLLER.CPU.UTIL.CRIT}`|Warning||
+|HPE MSA 2060 Storage: Controller [{#CONTROLLER.ID}]: Controller has been restarted|<p>The controller uptime is less than 10 minutes.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.controllers["{#CONTROLLER.ID}",uptime])<10m`|Warning||
 
 ### LLD rule Disk groups discovery
 
@@ -165,21 +165,21 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Disk group [{#NAME}]: Disk group health is in degraded state|<p>Disk group health is in degraded state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",health])=1`|Warning||
-|Disk group [{#NAME}]: Disk group health is in fault state|<p>Disk group health is in fault state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",health])=2`|Average||
-|Disk group [{#NAME}]: Disk group health is in unknown state|<p>Disk group health is in unknown state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",health])=3`|Info||
-|Disk group [{#NAME}]: Disk group space is low|<p>Disk group is running low on free space (less than {$HPE.MSA.DISKS.GROUP.PUSED.MAX.WARN:"{#NAME}"}% available).</p>|`min(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups.space["{#NAME}",util],5m)>{$HPE.MSA.DISKS.GROUP.PUSED.MAX.WARN:"{#NAME}"}`|Warning|**Depends on**:<br><ul><li>Disk group [{#NAME}]: Disk group space is critically low</li></ul>|
-|Disk group [{#NAME}]: Disk group space is critically low|<p>Disk group is running low on free space (less than {$HPE.MSA.DISKS.GROUP.PUSED.MAX.CRIT:"{#NAME}"}% available).</p>|`min(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups.space["{#NAME}",util],5m)>{$HPE.MSA.DISKS.GROUP.PUSED.MAX.CRIT:"{#NAME}"}`|Average||
-|Disk group [{#NAME}]: Disk group is fault tolerant with a down disk|<p>The disk group is online and fault tolerant, but some of it's disks are down.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",status])=1`|Average||
-|Disk group [{#NAME}]: Disk group has damaged disks|<p>The disk group is online and fault tolerant, but some of it's disks are damaged.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",status])=9`|Average||
-|Disk group [{#NAME}]: Disk group has missing disks|<p>The disk group is online and fault tolerant, but some of it's disks are missing.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",status])=8`|Average||
-|Disk group [{#NAME}]: Disk group is offline|<p>Either the disk group is using offline initialization, or it's disks are down and data may be lost.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",status])=3`|Average||
-|Disk group [{#NAME}]: Disk group is quarantined critical|<p>The disk group is critical with at least one inaccessible disk. For example, two disks are inaccessible in a RAID 6 disk group or one disk is inaccessible for other fault-tolerant RAID levels. If the inaccessible disks come online or if after 60 seconds from being quarantined the disk group is QTCRor QTDN, the disk group is automatically dequarantined.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",status])=4`|Average||
-|Disk group [{#NAME}]: Disk group is quarantined offline|<p>The disk group is offline with multiple inaccessible disks causing user data to be incomplete, or is an NRAID or RAID 0 disk group.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",status])=5`|Average||
-|Disk group [{#NAME}]: Disk group is quarantined unsupported|<p>The disk group contains data in a format that is not supported by this system. For example, this system does not support linear disk groups.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",status])=5`|Average||
-|Disk group [{#NAME}]: Disk group is quarantined with an inaccessible disk|<p>The RAID6 disk group has one inaccessible disk. The disk group is fault tolerant but degraded. If the inaccessible disks come online or if after 60 seconds from being quarantined the disk group is QTCRor QTDN, the disk group is automatically dequarantined.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",status])=6`|Average||
-|Disk group [{#NAME}]: Disk group is stopped|<p>The disk group is stopped.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",status])=7`|Average||
-|Disk group [{#NAME}]: Disk group status is critical|<p>The disk group is online but isn't fault tolerant because some of its disks are down.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",status])=2`|Average||
+|HPE MSA 2060 Storage: Disk group [{#NAME}]: Disk group health is in degraded state|<p>Disk group health is in degraded state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",health])=1`|Warning||
+|HPE MSA 2060 Storage: Disk group [{#NAME}]: Disk group health is in fault state|<p>Disk group health is in fault state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",health])=2`|Average||
+|HPE MSA 2060 Storage: Disk group [{#NAME}]: Disk group health is in unknown state|<p>Disk group health is in unknown state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",health])=3`|Info||
+|HPE MSA 2060 Storage: Disk group [{#NAME}]: Disk group space is low|<p>Disk group is running low on free space (less than {$HPE.MSA.DISKS.GROUP.PUSED.MAX.WARN:"{#NAME}"}% available).</p>|`min(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups.space["{#NAME}",util],5m)>{$HPE.MSA.DISKS.GROUP.PUSED.MAX.WARN:"{#NAME}"}`|Warning|**Depends on**:<br><ul><li>HPE MSA 2060 Storage: Disk group [{#NAME}]: Disk group space is critically low</li></ul>|
+|HPE MSA 2060 Storage: Disk group [{#NAME}]: Disk group space is critically low|<p>Disk group is running low on free space (less than {$HPE.MSA.DISKS.GROUP.PUSED.MAX.CRIT:"{#NAME}"}% available).</p>|`min(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups.space["{#NAME}",util],5m)>{$HPE.MSA.DISKS.GROUP.PUSED.MAX.CRIT:"{#NAME}"}`|Average||
+|HPE MSA 2060 Storage: Disk group [{#NAME}]: Disk group is fault tolerant with a down disk|<p>The disk group is online and fault tolerant, but some of it's disks are down.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",status])=1`|Average||
+|HPE MSA 2060 Storage: Disk group [{#NAME}]: Disk group has damaged disks|<p>The disk group is online and fault tolerant, but some of it's disks are damaged.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",status])=9`|Average||
+|HPE MSA 2060 Storage: Disk group [{#NAME}]: Disk group has missing disks|<p>The disk group is online and fault tolerant, but some of it's disks are missing.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",status])=8`|Average||
+|HPE MSA 2060 Storage: Disk group [{#NAME}]: Disk group is offline|<p>Either the disk group is using offline initialization, or it's disks are down and data may be lost.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",status])=3`|Average||
+|HPE MSA 2060 Storage: Disk group [{#NAME}]: Disk group is quarantined critical|<p>The disk group is critical with at least one inaccessible disk. For example, two disks are inaccessible in a RAID 6 disk group or one disk is inaccessible for other fault-tolerant RAID levels. If the inaccessible disks come online or if after 60 seconds from being quarantined the disk group is QTCRor QTDN, the disk group is automatically dequarantined.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",status])=4`|Average||
+|HPE MSA 2060 Storage: Disk group [{#NAME}]: Disk group is quarantined offline|<p>The disk group is offline with multiple inaccessible disks causing user data to be incomplete, or is an NRAID or RAID 0 disk group.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",status])=5`|Average||
+|HPE MSA 2060 Storage: Disk group [{#NAME}]: Disk group is quarantined unsupported|<p>The disk group contains data in a format that is not supported by this system. For example, this system does not support linear disk groups.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",status])=5`|Average||
+|HPE MSA 2060 Storage: Disk group [{#NAME}]: Disk group is quarantined with an inaccessible disk|<p>The RAID6 disk group has one inaccessible disk. The disk group is fault tolerant but degraded. If the inaccessible disks come online or if after 60 seconds from being quarantined the disk group is QTCRor QTDN, the disk group is automatically dequarantined.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",status])=6`|Average||
+|HPE MSA 2060 Storage: Disk group [{#NAME}]: Disk group is stopped|<p>The disk group is stopped.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",status])=7`|Average||
+|HPE MSA 2060 Storage: Disk group [{#NAME}]: Disk group status is critical|<p>The disk group is online but isn't fault tolerant because some of its disks are down.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks.groups["{#NAME}",status])=2`|Average||
 
 ### LLD rule Pools discovery
 
@@ -204,11 +204,11 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Pool [{#NAME}]: Pool health is in degraded state|<p>Pool health is in degraded state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.pools["{#NAME}",health])=1`|Warning||
-|Pool [{#NAME}]: Pool health is in fault state|<p>Pool health is in fault state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.pools["{#NAME}",health])=2`|Average||
-|Pool [{#NAME}]: Pool health is in unknown state|<p>Pool [{#NAME}] health is in unknown state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.pools["{#NAME}",health])=3`|Info||
-|Pool [{#NAME}]: Pool space is low|<p>Pool is running low on free space (less than {$HPE.MSA.POOL.PUSED.MAX.WARN:"{#NAME}"}% available).</p>|`min(/HPE MSA 2060 Storage by HTTP/hpe.msa.pools.space["{#NAME}",util],5m)>{$HPE.MSA.POOL.PUSED.MAX.WARN:"{#NAME}"}`|Warning|**Depends on**:<br><ul><li>Pool [{#NAME}]: Pool space is critically low</li></ul>|
-|Pool [{#NAME}]: Pool space is critically low|<p>Pool is running low on free space (less than {$HPE.MSA.POOL.PUSED.MAX.CRIT:"{#NAME}"}% available).</p>|`min(/HPE MSA 2060 Storage by HTTP/hpe.msa.pools.space["{#NAME}",util],5m)>{$HPE.MSA.POOL.PUSED.MAX.CRIT:"{#NAME}"}`|Average||
+|HPE MSA 2060 Storage: Pool [{#NAME}]: Pool health is in degraded state|<p>Pool health is in degraded state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.pools["{#NAME}",health])=1`|Warning||
+|HPE MSA 2060 Storage: Pool [{#NAME}]: Pool health is in fault state|<p>Pool health is in fault state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.pools["{#NAME}",health])=2`|Average||
+|HPE MSA 2060 Storage: Pool [{#NAME}]: Pool health is in unknown state|<p>Pool [{#NAME}] health is in unknown state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.pools["{#NAME}",health])=3`|Info||
+|HPE MSA 2060 Storage: Pool [{#NAME}]: Pool space is low|<p>Pool is running low on free space (less than {$HPE.MSA.POOL.PUSED.MAX.WARN:"{#NAME}"}% available).</p>|`min(/HPE MSA 2060 Storage by HTTP/hpe.msa.pools.space["{#NAME}",util],5m)>{$HPE.MSA.POOL.PUSED.MAX.WARN:"{#NAME}"}`|Warning|**Depends on**:<br><ul><li>HPE MSA 2060 Storage: Pool [{#NAME}]: Pool space is critically low</li></ul>|
+|HPE MSA 2060 Storage: Pool [{#NAME}]: Pool space is critically low|<p>Pool is running low on free space (less than {$HPE.MSA.POOL.PUSED.MAX.CRIT:"{#NAME}"}% available).</p>|`min(/HPE MSA 2060 Storage by HTTP/hpe.msa.pools.space["{#NAME}",util],5m)>{$HPE.MSA.POOL.PUSED.MAX.CRIT:"{#NAME}"}`|Average||
 
 ### LLD rule Volumes discovery
 
@@ -243,9 +243,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Volume [{#NAME}]: Volume health is in degraded state|<p>Volume health is in degraded state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.volumes["{#DURABLE.ID}",health])=1`|Warning||
-|Volume [{#NAME}]: Volume health is in fault state|<p>Volume health is in fault state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.volumes["{#DURABLE.ID}",health])=2`|Average||
-|Volume [{#NAME}]: Volume health is in unknown state|<p>Volume health is in unknown state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.volumes["{#DURABLE.ID}",health])=3`|Info||
+|HPE MSA 2060 Storage: Volume [{#NAME}]: Volume health is in degraded state|<p>Volume health is in degraded state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.volumes["{#DURABLE.ID}",health])=1`|Warning||
+|HPE MSA 2060 Storage: Volume [{#NAME}]: Volume health is in fault state|<p>Volume health is in fault state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.volumes["{#DURABLE.ID}",health])=2`|Average||
+|HPE MSA 2060 Storage: Volume [{#NAME}]: Volume health is in unknown state|<p>Volume health is in unknown state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.volumes["{#DURABLE.ID}",health])=3`|Info||
 
 ### LLD rule Enclosures discovery
 
@@ -269,14 +269,14 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Enclosure [{#DURABLE.ID}]: Enclosure health is in degraded state|<p>Enclosure health is in degraded state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.enclosures["{#DURABLE.ID}",health])=1`|Warning||
-|Enclosure [{#DURABLE.ID}]: Enclosure health is in fault state|<p>Enclosure health is in fault state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.enclosures["{#DURABLE.ID}",health])=2`|Average||
-|Enclosure [{#DURABLE.ID}]: Enclosure health is in unknown state|<p>Enclosure health is in unknown state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.enclosures["{#DURABLE.ID}",health])=3`|Info||
-|Enclosure [{#DURABLE.ID}]: Enclosure has critical status|<p>Enclosure has critical status.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.enclosures["{#DURABLE.ID}",status])=2`|High||
-|Enclosure [{#DURABLE.ID}]: Enclosure has warning status|<p>Enclosure has warning status.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.enclosures["{#DURABLE.ID}",status])=3`|Warning||
-|Enclosure [{#DURABLE.ID}]: Enclosure is unavailable|<p>Enclosure is unavailable.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.enclosures["{#DURABLE.ID}",status])=7`|High||
-|Enclosure [{#DURABLE.ID}]: Enclosure is unrecoverable|<p>Enclosure is unrecoverable.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.enclosures["{#DURABLE.ID}",status])=4`|High||
-|Enclosure [{#DURABLE.ID}]: Enclosure has unknown status|<p>Enclosure has unknown status.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.enclosures["{#DURABLE.ID}",status])=6`|Info||
+|HPE MSA 2060 Storage: Enclosure [{#DURABLE.ID}]: Enclosure health is in degraded state|<p>Enclosure health is in degraded state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.enclosures["{#DURABLE.ID}",health])=1`|Warning||
+|HPE MSA 2060 Storage: Enclosure [{#DURABLE.ID}]: Enclosure health is in fault state|<p>Enclosure health is in fault state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.enclosures["{#DURABLE.ID}",health])=2`|Average||
+|HPE MSA 2060 Storage: Enclosure [{#DURABLE.ID}]: Enclosure health is in unknown state|<p>Enclosure health is in unknown state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.enclosures["{#DURABLE.ID}",health])=3`|Info||
+|HPE MSA 2060 Storage: Enclosure [{#DURABLE.ID}]: Enclosure has critical status|<p>Enclosure has critical status.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.enclosures["{#DURABLE.ID}",status])=2`|High||
+|HPE MSA 2060 Storage: Enclosure [{#DURABLE.ID}]: Enclosure has warning status|<p>Enclosure has warning status.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.enclosures["{#DURABLE.ID}",status])=3`|Warning||
+|HPE MSA 2060 Storage: Enclosure [{#DURABLE.ID}]: Enclosure is unavailable|<p>Enclosure is unavailable.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.enclosures["{#DURABLE.ID}",status])=7`|High||
+|HPE MSA 2060 Storage: Enclosure [{#DURABLE.ID}]: Enclosure is unrecoverable|<p>Enclosure is unrecoverable.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.enclosures["{#DURABLE.ID}",status])=4`|High||
+|HPE MSA 2060 Storage: Enclosure [{#DURABLE.ID}]: Enclosure has unknown status|<p>Enclosure has unknown status.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.enclosures["{#DURABLE.ID}",status])=6`|Info||
 
 ### LLD rule Power supplies discovery
 
@@ -298,12 +298,12 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Power supply [{#DURABLE.ID}]: Power supply health is in degraded state|<p>Power supply health is in degraded state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.power_supplies["{#DURABLE.ID}",health])=1`|Warning||
-|Power supply [{#DURABLE.ID}]: Power supply health is in fault state|<p>Power supply health is in fault state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.power_supplies["{#DURABLE.ID}",health])=2`|Average||
-|Power supply [{#DURABLE.ID}]: Power supply health is in unknown state|<p>Power supply health is in unknown state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.power_supplies["{#DURABLE.ID}",health])=3`|Info||
-|Power supply [{#DURABLE.ID}]: Power supply has error status|<p>Power supply has error status.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.power_supplies["{#DURABLE.ID}",status])=2`|Average||
-|Power supply [{#DURABLE.ID}]: Power supply has warning status|<p>Power supply has warning status.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.power_supplies["{#DURABLE.ID}",status])=1`|Warning||
-|Power supply [{#DURABLE.ID}]: Power supply has unknown status|<p>Power supply has unknown status.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.power_supplies["{#DURABLE.ID}",status])=4`|Info||
+|HPE MSA 2060 Storage: Power supply [{#DURABLE.ID}]: Power supply health is in degraded state|<p>Power supply health is in degraded state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.power_supplies["{#DURABLE.ID}",health])=1`|Warning||
+|HPE MSA 2060 Storage: Power supply [{#DURABLE.ID}]: Power supply health is in fault state|<p>Power supply health is in fault state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.power_supplies["{#DURABLE.ID}",health])=2`|Average||
+|HPE MSA 2060 Storage: Power supply [{#DURABLE.ID}]: Power supply health is in unknown state|<p>Power supply health is in unknown state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.power_supplies["{#DURABLE.ID}",health])=3`|Info||
+|HPE MSA 2060 Storage: Power supply [{#DURABLE.ID}]: Power supply has error status|<p>Power supply has error status.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.power_supplies["{#DURABLE.ID}",status])=2`|Average||
+|HPE MSA 2060 Storage: Power supply [{#DURABLE.ID}]: Power supply has warning status|<p>Power supply has warning status.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.power_supplies["{#DURABLE.ID}",status])=1`|Warning||
+|HPE MSA 2060 Storage: Power supply [{#DURABLE.ID}]: Power supply has unknown status|<p>Power supply has unknown status.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.power_supplies["{#DURABLE.ID}",status])=4`|Info||
 
 ### LLD rule Ports discovery
 
@@ -324,12 +324,12 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Port [{#NAME}]: Port health is in degraded state|<p>Port health is in degraded state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.ports["{#NAME}",health])=1`|Warning||
-|Port [{#NAME}]: Port health is in fault state|<p>Port health is in fault state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.ports["{#NAME}",health])=2`|Average||
-|Port [{#NAME}]: Port health is in unknown state|<p>Port health is in unknown state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.ports["{#NAME}",health])=3`|Info||
-|Port [{#NAME}]: Port has error status|<p>Port has error status.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.ports["{#NAME}",status])=2`|Average||
-|Port [{#NAME}]: Port has warning status|<p>Port has warning status.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.ports["{#NAME}",status])=1`|Warning||
-|Port [{#NAME}]: Port has unknown status|<p>Port has unknown status.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.ports["{#NAME}",status])=4`|Info||
+|HPE MSA 2060 Storage: Port [{#NAME}]: Port health is in degraded state|<p>Port health is in degraded state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.ports["{#NAME}",health])=1`|Warning||
+|HPE MSA 2060 Storage: Port [{#NAME}]: Port health is in fault state|<p>Port health is in fault state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.ports["{#NAME}",health])=2`|Average||
+|HPE MSA 2060 Storage: Port [{#NAME}]: Port health is in unknown state|<p>Port health is in unknown state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.ports["{#NAME}",health])=3`|Info||
+|HPE MSA 2060 Storage: Port [{#NAME}]: Port has error status|<p>Port has error status.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.ports["{#NAME}",status])=2`|Average||
+|HPE MSA 2060 Storage: Port [{#NAME}]: Port has warning status|<p>Port has warning status.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.ports["{#NAME}",status])=1`|Warning||
+|HPE MSA 2060 Storage: Port [{#NAME}]: Port has unknown status|<p>Port has unknown status.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.ports["{#NAME}",status])=4`|Info||
 
 ### LLD rule Fans discovery
 
@@ -350,12 +350,12 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Fan [{#DURABLE.ID}]: Fan health is in degraded state|<p>Fan health is in degraded state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.fans["{#DURABLE.ID}",health])=1`|Warning||
-|Fan [{#DURABLE.ID}]: Fan health is in fault state|<p>Fan health is in fault state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.fans["{#DURABLE.ID}",health])=2`|Average||
-|Fan [{#DURABLE.ID}]: Fan health is in unknown state|<p>Fan health is in unknown state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.fans["{#DURABLE.ID}",health])=3`|Info||
-|Fan [{#DURABLE.ID}]: Fan has error status|<p>Fan has error status.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.fans["{#DURABLE.ID}",status])=1`|Average||
-|Fan [{#DURABLE.ID}]: Fan is missing|<p>Fan is missing.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.fans["{#DURABLE.ID}",status])=3`|Info||
-|Fan [{#DURABLE.ID}]: Fan is off|<p>Fan is off.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.fans["{#DURABLE.ID}",status])=2`|Warning||
+|HPE MSA 2060 Storage: Fan [{#DURABLE.ID}]: Fan health is in degraded state|<p>Fan health is in degraded state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.fans["{#DURABLE.ID}",health])=1`|Warning||
+|HPE MSA 2060 Storage: Fan [{#DURABLE.ID}]: Fan health is in fault state|<p>Fan health is in fault state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.fans["{#DURABLE.ID}",health])=2`|Average||
+|HPE MSA 2060 Storage: Fan [{#DURABLE.ID}]: Fan health is in unknown state|<p>Fan health is in unknown state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.fans["{#DURABLE.ID}",health])=3`|Info||
+|HPE MSA 2060 Storage: Fan [{#DURABLE.ID}]: Fan has error status|<p>Fan has error status.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.fans["{#DURABLE.ID}",status])=1`|Average||
+|HPE MSA 2060 Storage: Fan [{#DURABLE.ID}]: Fan is missing|<p>Fan is missing.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.fans["{#DURABLE.ID}",status])=3`|Info||
+|HPE MSA 2060 Storage: Fan [{#DURABLE.ID}]: Fan is off|<p>Fan is off.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.fans["{#DURABLE.ID}",status])=2`|Warning||
 
 ### LLD rule Disks discovery
 
@@ -386,12 +386,12 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Disk [{#DURABLE.ID}]: Disk health is in degraded state|<p>Disk health is in degraded state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks["{#DURABLE.ID}",health])=1`|Warning||
-|Disk [{#DURABLE.ID}]: Disk health is in fault state|<p>Disk health is in fault state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks["{#DURABLE.ID}",health])=2`|Average||
-|Disk [{#DURABLE.ID}]: Disk health is in unknown state|<p>Disk health is in unknown state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks["{#DURABLE.ID}",health])=3`|Info||
-|Disk [{#DURABLE.ID}]: Disk temperature is high|<p>Disk temperature is high.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks["{#DURABLE.ID}",temperature_status])=3`|Warning||
-|Disk [{#DURABLE.ID}]: Disk temperature is critically high|<p>Disk temperature is critically high.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks["{#DURABLE.ID}",temperature_status])=2`|Average||
-|Disk [{#DURABLE.ID}]: Disk temperature is unknown|<p>Disk temperature is unknown.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks["{#DURABLE.ID}",temperature_status])=4`|Info||
+|HPE MSA 2060 Storage: Disk [{#DURABLE.ID}]: Disk health is in degraded state|<p>Disk health is in degraded state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks["{#DURABLE.ID}",health])=1`|Warning||
+|HPE MSA 2060 Storage: Disk [{#DURABLE.ID}]: Disk health is in fault state|<p>Disk health is in fault state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks["{#DURABLE.ID}",health])=2`|Average||
+|HPE MSA 2060 Storage: Disk [{#DURABLE.ID}]: Disk health is in unknown state|<p>Disk health is in unknown state.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks["{#DURABLE.ID}",health])=3`|Info||
+|HPE MSA 2060 Storage: Disk [{#DURABLE.ID}]: Disk temperature is high|<p>Disk temperature is high.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks["{#DURABLE.ID}",temperature_status])=3`|Warning||
+|HPE MSA 2060 Storage: Disk [{#DURABLE.ID}]: Disk temperature is critically high|<p>Disk temperature is critically high.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks["{#DURABLE.ID}",temperature_status])=2`|Average||
+|HPE MSA 2060 Storage: Disk [{#DURABLE.ID}]: Disk temperature is unknown|<p>Disk temperature is unknown.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.disks["{#DURABLE.ID}",temperature_status])=4`|Info||
 
 ### LLD rule FRU discovery
 
@@ -412,8 +412,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|FRU [{#ENCLOSURE.ID}: {#LOCATION}]: FRU status is Degraded or Fault|<p>FRU status is Degraded or Fault.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.frus["{#ENCLOSURE.ID}:{#LOCATION}",status])=1`|Average||
-|FRU [{#ENCLOSURE.ID}: {#LOCATION}]: FRU ID data is invalid|<p>The FRU ID data is invalid. The FRU's EEPROM is improperly programmed.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.frus["{#ENCLOSURE.ID}:{#LOCATION}",status])=0`|Warning||
+|HPE MSA 2060 Storage: FRU [{#ENCLOSURE.ID}: {#LOCATION}]: FRU status is Degraded or Fault|<p>FRU status is Degraded or Fault.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.frus["{#ENCLOSURE.ID}:{#LOCATION}",status])=1`|Average||
+|HPE MSA 2060 Storage: FRU [{#ENCLOSURE.ID}: {#LOCATION}]: FRU ID data is invalid|<p>The FRU ID data is invalid. The FRU's EEPROM is improperly programmed.</p>|`last(/HPE MSA 2060 Storage by HTTP/hpe.msa.frus["{#ENCLOSURE.ID}:{#LOCATION}",status])=0`|Warning||
 
 ## Feedback
 

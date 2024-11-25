@@ -273,12 +273,12 @@ Note that a restart of OpenStack Nova services might be needed for these new cha
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Current instances count is too high|<p>Current instances count has exceeded {$OPENSTACK.NOVA.INSTANCES.UTIL.HIGH}% of the max available instances count.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.current) >= ({$OPENSTACK.NOVA.INSTANCES.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.max))`|High||
-|Current instances count is high|<p>Current instances count has exceeded {$OPENSTACK.NOVA.INSTANCES.UTIL.WARN}% of the max available instances count.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.current) >= ({$OPENSTACK.NOVA.INSTANCES.UTIL.WARN} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.max))`|Warning|**Depends on**:<br><ul><li>Current instances count is too high</li></ul>|
-|Current vCPU usage is too high|<p>Current vCPU usage has exceeded {$OPENSTACK.NOVA.CPU.UTIL.HIGH}% of the max available vCPU usage.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.current) >= ({$OPENSTACK.NOVA.CPU.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.max))`|High||
-|Current vCPU usage is high|<p>Current vCPU usage has exceeded {$OPENSTACK.NOVA.CPU.UTIL.WARN}% of the max available vCPU usage.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.current) >= ({$OPENSTACK.NOVA.CPU.UTIL.WARN} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.max))`|Warning|**Depends on**:<br><ul><li>Current vCPU usage is too high</li></ul>|
-|Current RAM usage is too high|<p>Current RAM usage has exceeded {$OPENSTACK.NOVA.RAM.UTIL.HIGH}% of the max available RAM usage.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.current) >= ({$OPENSTACK.NOVA.RAM.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.max))`|High||
-|Current RAM usage is high|<p>Current RAM usage has exceeded {$OPENSTACK.NOVA.RAM.UTIL.WARN}% of the max available RAM usage.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.current) >= ({$OPENSTACK.NOVA.RAM.UTIL.WARN} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.max))`|Warning|**Depends on**:<br><ul><li>Current RAM usage is too high</li></ul>|
+|OpenStack Nova: Current instances count is too high|<p>Current instances count has exceeded {$OPENSTACK.NOVA.INSTANCES.UTIL.HIGH}% of the max available instances count.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.current) >= ({$OPENSTACK.NOVA.INSTANCES.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.max))`|High||
+|OpenStack Nova: Current instances count is high|<p>Current instances count has exceeded {$OPENSTACK.NOVA.INSTANCES.UTIL.WARN}% of the max available instances count.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.current) >= ({$OPENSTACK.NOVA.INSTANCES.UTIL.WARN} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.max))`|Warning|**Depends on**:<br><ul><li>OpenStack Nova: Current instances count is too high</li></ul>|
+|OpenStack Nova: Current vCPU usage is too high|<p>Current vCPU usage has exceeded {$OPENSTACK.NOVA.CPU.UTIL.HIGH}% of the max available vCPU usage.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.current) >= ({$OPENSTACK.NOVA.CPU.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.max))`|High||
+|OpenStack Nova: Current vCPU usage is high|<p>Current vCPU usage has exceeded {$OPENSTACK.NOVA.CPU.UTIL.WARN}% of the max available vCPU usage.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.current) >= ({$OPENSTACK.NOVA.CPU.UTIL.WARN} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.max))`|Warning|**Depends on**:<br><ul><li>OpenStack Nova: Current vCPU usage is too high</li></ul>|
+|OpenStack Nova: Current RAM usage is too high|<p>Current RAM usage has exceeded {$OPENSTACK.NOVA.RAM.UTIL.HIGH}% of the max available RAM usage.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.current) >= ({$OPENSTACK.NOVA.RAM.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.max))`|High||
+|OpenStack Nova: Current RAM usage is high|<p>Current RAM usage has exceeded {$OPENSTACK.NOVA.RAM.UTIL.WARN}% of the max available RAM usage.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.current) >= ({$OPENSTACK.NOVA.RAM.UTIL.WARN} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.max))`|Warning|**Depends on**:<br><ul><li>OpenStack Nova: Current RAM usage is too high</li></ul>|
 
 ### LLD rule Nova: Servers discovery
 
@@ -296,8 +296,8 @@ Note that a restart of OpenStack Nova services might be needed for these new cha
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Server [{#SERVER_ID}]:[{#SERVER_NAME}]: Status is "ERROR"|<p>Server is in "ERROR" status.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}])=5`|High|**Manual close**: Yes|
-|Server [{#SERVER_ID}]:[{#SERVER_NAME}]: Status has changed|<p>Status of the server has changed. Acknowledge to close the problem manually.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}])<>last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}],#2) and length(last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}]))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Server [{#SERVER_ID}]:[{#SERVER_NAME}]: Status is "ERROR"</li></ul>|
+|OpenStack Nova: Server [{#SERVER_ID}]:[{#SERVER_NAME}]: Status is "ERROR"|<p>Server is in "ERROR" status.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}])=5`|High|**Manual close**: Yes|
+|OpenStack Nova: Server [{#SERVER_ID}]:[{#SERVER_NAME}]: Status has changed|<p>Status of the server has changed. Acknowledge to close the problem manually.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}])<>last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}],#2) and length(last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}]))>0`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>OpenStack Nova: Server [{#SERVER_ID}]:[{#SERVER_NAME}]: Status is "ERROR"</li></ul>|
 
 ### LLD rule Nova: Compute services discovery
 
@@ -318,8 +318,8 @@ Note that a restart of OpenStack Nova services might be needed for these new cha
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: State is "down"|<p>State of the service is "down".</p>|`last(/OpenStack Nova by HTTP/openstack.nova.services.state[{#ID}])=0`|Warning|**Manual close**: Yes|
-|Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: Status is "disabled"|<p>Status of the server is disabled. Acknowledge to close the problem manually.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.services.status[{#ID}])=0 and length(last(/OpenStack Nova by HTTP/openstack.nova.services.disabled.reason[{#ID}]))>=0`|Info|**Manual close**: Yes|
+|OpenStack Nova: Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: State is "down"|<p>State of the service is "down".</p>|`last(/OpenStack Nova by HTTP/openstack.nova.services.state[{#ID}])=0`|Warning|**Manual close**: Yes|
+|OpenStack Nova: Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: Status is "disabled"|<p>Status of the server is disabled. Acknowledge to close the problem manually.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.services.status[{#ID}])=0 and length(last(/OpenStack Nova by HTTP/openstack.nova.services.disabled.reason[{#ID}]))>=0`|Info|**Manual close**: Yes|
 
 ### LLD rule Nova: Hypervisor discovery
 
@@ -340,9 +340,9 @@ Note that a restart of OpenStack Nova services might be needed for these new cha
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Hypervisor [{#ID}]:[{#HOSTNAME}]: State is "down"|<p>State of the hypervisor is "down".</p>|`last(/OpenStack Nova by HTTP/openstack.nova.hypervisors.state[{#ID}])=0`|Warning|**Manual close**: Yes|
-|Hypervisor [{#ID}]:[{#HOSTNAME}]: Status is "disabled"|<p>Status of the hypervisor is disabled.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.hypervisors.status[{#ID}])=0`|Info|**Manual close**: Yes|
-|Hypervisor [{#ID}]:[{#HOSTNAME}]: Version has changed|<p>Version of the hypervisor has changed. Acknowledge to close the problem manually.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.hypervisors.version[{#ID}])<>last(/OpenStack Nova by HTTP/openstack.nova.hypervisors.version[{#ID}],#2) and length(last(/OpenStack Nova by HTTP/openstack.nova.hypervisors.version[{#ID}]))>0`|Info|**Manual close**: Yes|
+|OpenStack Nova: Hypervisor [{#ID}]:[{#HOSTNAME}]: State is "down"|<p>State of the hypervisor is "down".</p>|`last(/OpenStack Nova by HTTP/openstack.nova.hypervisors.state[{#ID}])=0`|Warning|**Manual close**: Yes|
+|OpenStack Nova: Hypervisor [{#ID}]:[{#HOSTNAME}]: Status is "disabled"|<p>Status of the hypervisor is disabled.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.hypervisors.status[{#ID}])=0`|Info|**Manual close**: Yes|
+|OpenStack Nova: Hypervisor [{#ID}]:[{#HOSTNAME}]: Version has changed|<p>Version of the hypervisor has changed. Acknowledge to close the problem manually.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.hypervisors.version[{#ID}])<>last(/OpenStack Nova by HTTP/openstack.nova.hypervisors.version[{#ID}],#2) and length(last(/OpenStack Nova by HTTP/openstack.nova.hypervisors.version[{#ID}]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Nova: Availability zones discovery
 
@@ -362,7 +362,7 @@ Note that a restart of OpenStack Nova services might be needed for these new cha
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Availability zone [{#ZONE_NAME}]: Zone is unavailable|<p>Availability zone is not available.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.availability_zone.state[{#ZONE_NAME}])=0`|Warning|**Manual close**: Yes|
+|OpenStack Nova: Availability zone [{#ZONE_NAME}]: Zone is unavailable|<p>Availability zone is not available.</p>|`last(/OpenStack Nova by HTTP/openstack.nova.availability_zone.state[{#ZONE_NAME}])=0`|Warning|**Manual close**: Yes|
 
 ### LLD rule Nova: Tenant discovery
 

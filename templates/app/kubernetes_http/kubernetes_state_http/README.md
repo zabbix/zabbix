@@ -216,7 +216,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|NS [{#NAMESPACE}] PVC [{#NAME}]: PVC is pending||`count(/Kubernetes cluster state by HTTP/kube.pvc.status_phase[{#NAMESPACE}/{#NAME}],2m,,5)>=2`|Warning||
+|Kubernetes cluster state: NS [{#NAMESPACE}] PVC [{#NAME}]: PVC is pending||`count(/Kubernetes cluster state by HTTP/kube.pvc.status_phase[{#NAMESPACE}/{#NAME}],2m,,5)>=2`|Warning||
 
 ### LLD rule PV discovery
 
@@ -240,7 +240,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|PV [{#NAME}]: PV has failed||`count(/Kubernetes cluster state by HTTP/kube.pv.status_phase[{#NAME}],2m,,3)>=2`|Warning||
+|Kubernetes cluster state: PV [{#NAME}]: PV has failed||`count(/Kubernetes cluster state by HTTP/kube.pv.status_phase[{#NAME}],2m,,3)>=2`|Warning||
 
 ### LLD rule Deployment discovery
 
@@ -265,7 +265,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Deployment replicas mismatch|<p>Deployment has not matched the expected number of replicas during the specified trigger evaluation period.</p>|`min(/Kubernetes cluster state by HTTP/kube.deployment.replicas_mismatched[{#NAMESPACE}/{#NAME}],{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:"deployment:{#NAMESPACE}:{#NAME}"})>0 and last(/Kubernetes cluster state by HTTP/kube.deployment.replicas_desired[{#NAMESPACE}/{#NAME}])>=0 and last(/Kubernetes cluster state by HTTP/kube.deployment.replicas_available[{#NAMESPACE}/{#NAME}])>=0`|Warning||
+|Kubernetes cluster state: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Deployment replicas mismatch|<p>Deployment has not matched the expected number of replicas during the specified trigger evaluation period.</p>|`min(/Kubernetes cluster state by HTTP/kube.deployment.replicas_mismatched[{#NAMESPACE}/{#NAME}],{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:"deployment:{#NAMESPACE}:{#NAME}"})>0 and last(/Kubernetes cluster state by HTTP/kube.deployment.replicas_desired[{#NAMESPACE}/{#NAME}])>=0 and last(/Kubernetes cluster state by HTTP/kube.deployment.replicas_available[{#NAMESPACE}/{#NAME}])>=0`|Warning||
 
 ### LLD rule Endpoint discovery
 
@@ -332,8 +332,8 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Namespace [{#NAMESPACE}] Pod [{#NAME}]: Pod is not healthy||`min(/Kubernetes cluster state by HTTP/kube.pod.phase.failed[{#NAMESPACE}/{#NAME}],10m)>0 or min(/Kubernetes cluster state by HTTP/kube.pod.phase.pending[{#NAMESPACE}/{#NAME}],10m)>0 or min(/Kubernetes cluster state by HTTP/kube.pod.phase.unknown[{#NAMESPACE}/{#NAME}],10m)>0`|High||
-|Namespace [{#NAMESPACE}] Pod [{#NAME}]: Pod is crash looping|<p>Containers of the pod keep restarting. This most likely indicates that the pod is in the CrashLoopBackOff state.</p>|`(last(/Kubernetes cluster state by HTTP/kube.pod.containers_restarts[{#NAMESPACE}/{#NAME}])-min(/Kubernetes cluster state by HTTP/kube.pod.containers_restarts[{#NAMESPACE}/{#NAME}],15m))>1`|Warning||
+|Kubernetes cluster state: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Pod is not healthy||`min(/Kubernetes cluster state by HTTP/kube.pod.phase.failed[{#NAMESPACE}/{#NAME}],10m)>0 or min(/Kubernetes cluster state by HTTP/kube.pod.phase.pending[{#NAMESPACE}/{#NAME}],10m)>0 or min(/Kubernetes cluster state by HTTP/kube.pod.phase.unknown[{#NAMESPACE}/{#NAME}],10m)>0`|High||
+|Kubernetes cluster state: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Pod is crash looping|<p>Containers of the pod keep restarting. This most likely indicates that the pod is in the CrashLoopBackOff state.</p>|`(last(/Kubernetes cluster state by HTTP/kube.pod.containers_restarts[{#NAMESPACE}/{#NAME}])-min(/Kubernetes cluster state by HTTP/kube.pod.containers_restarts[{#NAMESPACE}/{#NAME}],15m))>1`|Warning||
 
 ### LLD rule ReplicaSet discovery
 
@@ -355,7 +355,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Namespace [{#NAMESPACE}] RS [{#NAME}]: ReplicaSet mismatch|<p>ReplicaSet has not matched the expected number of replicas during the specified trigger evaluation period.</p>|`min(/Kubernetes cluster state by HTTP/kube.replicaset.replicas_mismatched[{#NAMESPACE}/{#NAME}],{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:"replicaset:{#NAMESPACE}:{#NAME}"})>0 and last(/Kubernetes cluster state by HTTP/kube.replicaset.replicas_desired[{#NAMESPACE}/{#NAME}])>=0 and last(/Kubernetes cluster state by HTTP/kube.replicaset.ready[{#NAMESPACE}/{#NAME}])>=0`|Warning||
+|Kubernetes cluster state: Namespace [{#NAMESPACE}] RS [{#NAME}]: ReplicaSet mismatch|<p>ReplicaSet has not matched the expected number of replicas during the specified trigger evaluation period.</p>|`min(/Kubernetes cluster state by HTTP/kube.replicaset.replicas_mismatched[{#NAMESPACE}/{#NAME}],{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:"replicaset:{#NAMESPACE}:{#NAME}"})>0 and last(/Kubernetes cluster state by HTTP/kube.replicaset.replicas_desired[{#NAMESPACE}/{#NAME}])>=0 and last(/Kubernetes cluster state by HTTP/kube.replicaset.ready[{#NAMESPACE}/{#NAME}])>=0`|Warning||
 
 ### LLD rule StatefulSet discovery
 
@@ -378,8 +378,8 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: StatefulSet is down||`(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]) / last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_current[{#NAMESPACE}/{#NAME}]))<>1`|High||
-|Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: StatefulSet replicas mismatch|<p>StatefulSet has not matched the number of replicas during the specified trigger evaluation period.</p>|`min(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_mismatched[{#NAMESPACE}/{#NAME}],{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:"statefulset:{#NAMESPACE}:{#NAME}"})>0 and last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas[{#NAMESPACE}/{#NAME}])>=0 and last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}])>=0`|Warning||
+|Kubernetes cluster state: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: StatefulSet is down||`(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]) / last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_current[{#NAMESPACE}/{#NAME}]))<>1`|High||
+|Kubernetes cluster state: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: StatefulSet replicas mismatch|<p>StatefulSet has not matched the number of replicas during the specified trigger evaluation period.</p>|`min(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_mismatched[{#NAMESPACE}/{#NAME}],{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:"statefulset:{#NAMESPACE}:{#NAME}"})>0 and last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas[{#NAMESPACE}/{#NAME}])>=0 and last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}])>=0`|Warning||
 
 ### LLD rule PodDisruptionBudget discovery
 
@@ -446,7 +446,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Component [{#NAME}] is unhealthy||`count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],#2,"ne","True")=2 and length(last(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}]))>0`|Warning||
+|Kubernetes cluster state: Component [{#NAME}] is unhealthy||`count(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}],#2,"ne","True")=2 and length(last(/Kubernetes cluster state by HTTP/kube.componentstatuses.healthy[{#NAME}]))>0`|Warning||
 
 ### LLD rule Readyz discovery
 
@@ -464,7 +464,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Readyz [{#NAME}] is unhealthy||`count(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}],#2,"ne","ok")=2 and length(last(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}]))>0`|Warning||
+|Kubernetes cluster state: Readyz [{#NAME}] is unhealthy||`count(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}],#2,"ne","ok")=2 and length(last(/Kubernetes cluster state by HTTP/kube.readyz.healthcheck[{#NAME}]))>0`|Warning||
 
 ### LLD rule Livez discovery
 
@@ -482,7 +482,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Livez [{#NAME}] is unhealthy||`count(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}],#2,"ne","ok")=2 and length(last(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}]))>0`|Warning||
+|Kubernetes cluster state: Livez [{#NAME}] is unhealthy||`count(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}],#2,"ne","ok")=2 and length(last(/Kubernetes cluster state by HTTP/kube.livez.healthcheck[{#NAME}]))>0`|Warning||
 
 ### LLD rule OpenShift BuildConfig discovery
 
@@ -516,7 +516,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Build [{#NAME}]: Build has failed||`count(/Kubernetes cluster state by HTTP/openshift.build.status_phase[{#NAMESPACE}/{#NAME}],2m,"ge",6)>=2`|Warning||
+|Kubernetes cluster state: Build [{#NAME}]: Build has failed||`count(/Kubernetes cluster state by HTTP/openshift.build.status_phase[{#NAMESPACE}/{#NAME}],2m,"ge",6)>=2`|Warning||
 
 ### LLD rule OpenShift ClusterResourceQuota discovery
 
@@ -547,7 +547,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Route [{#NAME}] with issue: Status is false||`count(/Kubernetes cluster state by HTTP/openshift.route.status[{#NAMESPACE}/{#NAME}],2m,,0)>=2`|Warning||
+|Kubernetes cluster state: Route [{#NAME}] with issue: Status is false||`count(/Kubernetes cluster state by HTTP/openshift.route.status[{#NAMESPACE}/{#NAME}],2m,,0)>=2`|Warning||
 
 ## Feedback
 

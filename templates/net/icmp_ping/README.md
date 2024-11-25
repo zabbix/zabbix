@@ -20,9 +20,9 @@
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/ICMP Ping/icmpping,#3)=0`|High||
-|High ICMP ping loss||`min(/ICMP Ping/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/ICMP Ping/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Unavailable by ICMP ping</li></ul>|
-|High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/ICMP Ping/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>High ICMP ping loss</li><li>Unavailable by ICMP ping</li></ul>|
+|ICMP Ping: Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/ICMP Ping/icmpping,#3)=0`|High||
+|ICMP Ping: High ICMP ping loss||`min(/ICMP Ping/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/ICMP Ping/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>ICMP Ping: Unavailable by ICMP ping</li></ul>|
+|ICMP Ping: High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/ICMP Ping/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>ICMP Ping: High ICMP ping loss</li><li>ICMP Ping: Unavailable by ICMP ping</li></ul>|
 
 ## Feedback
 

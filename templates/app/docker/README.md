@@ -89,9 +89,9 @@ Test availability: `zabbix_get -s docker-host -k docker.info`
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Service is down||`last(/Docker by Zabbix agent 2/docker.ping)=0`|Average|**Manual close**: Yes|
-|Failed to fetch info data|<p>Zabbix has not received data for items for the last 30 minutes.</p>|`nodata(/Docker by Zabbix agent 2/docker.name,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Service is down</li></ul>|
-|Version has changed|<p>Docker version has changed. Acknowledge to close the problem manually.</p>|`last(/Docker by Zabbix agent 2/docker.server_version,#1)<>last(/Docker by Zabbix agent 2/docker.server_version,#2) and length(last(/Docker by Zabbix agent 2/docker.server_version))>0`|Info|**Manual close**: Yes|
+|Docker: Service is down||`last(/Docker by Zabbix agent 2/docker.ping)=0`|Average|**Manual close**: Yes|
+|Docker: Failed to fetch info data|<p>Zabbix has not received data for items for the last 30 minutes.</p>|`nodata(/Docker by Zabbix agent 2/docker.name,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Docker: Service is down</li></ul>|
+|Docker: Version has changed|<p>Docker version has changed. Acknowledge to close the problem manually.</p>|`last(/Docker by Zabbix agent 2/docker.server_version,#1)<>last(/Docker by Zabbix agent 2/docker.server_version,#2) and length(last(/Docker by Zabbix agent 2/docker.server_version))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Images discovery
 
@@ -161,9 +161,9 @@ Test availability: `zabbix_get -s docker-host -k docker.info`
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Container {#NAME}: Health state container is unhealthy|<p>Container health state is unhealthy.</p>|`count(/Docker by Zabbix agent 2/docker.container_info.state.health["{#NAME}"],2m,,2)>=2`|High||
-|Container {#NAME}: Container has been stopped with error code||`last(/Docker by Zabbix agent 2/docker.container_info.state.exitcode["{#NAME}"])>0 and last(/Docker by Zabbix agent 2/docker.container_info.state.running["{#NAME}"])=0`|Average|**Manual close**: Yes|
-|Container {#NAME}: An error has occurred in the container|<p>Container {#NAME} has an error. Acknowledge to close the problem manually.</p>|`last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#1)<>last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#2) and length(last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"]))>0`|Warning|**Manual close**: Yes|
+|Docker: Container {#NAME}: Health state container is unhealthy|<p>Container health state is unhealthy.</p>|`count(/Docker by Zabbix agent 2/docker.container_info.state.health["{#NAME}"],2m,,2)>=2`|High||
+|Docker: Container {#NAME}: Container has been stopped with error code||`last(/Docker by Zabbix agent 2/docker.container_info.state.exitcode["{#NAME}"])>0 and last(/Docker by Zabbix agent 2/docker.container_info.state.running["{#NAME}"])=0`|Average|**Manual close**: Yes|
+|Docker: Container {#NAME}: An error has occurred in the container|<p>Container {#NAME} has an error. Acknowledge to close the problem manually.</p>|`last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#1)<>last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"],#2) and length(last(/Docker by Zabbix agent 2/docker.container_info.state.error["{#NAME}"]))>0`|Warning|**Manual close**: Yes|
 
 ## Feedback
 

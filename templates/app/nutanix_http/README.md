@@ -71,9 +71,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Failed to get cluster data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Prism Element by HTTP/nutanix.cluster.get.check))>0`|High||
-|Failed to get host data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Prism Element by HTTP/nutanix.host.get.check))>0`|High||
-|Failed to get storage container data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Prism Element by HTTP/nutanix.storage.container.get.check))>0`|High||
+|Nutanix: Failed to get cluster data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Prism Element by HTTP/nutanix.cluster.get.check))>0`|High||
+|Nutanix: Failed to get host data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Prism Element by HTTP/nutanix.host.get.check))>0`|High||
+|Nutanix: Failed to get storage container data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Prism Element by HTTP/nutanix.storage.container.get.check))>0`|High||
 
 ### LLD rule Cluster discovery
 
@@ -271,9 +271,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Failed to get metric data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.metric.get.check))>0`|High||
-|Failed to get alert data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.alert.get.check))>0`|High||
-|Redundancy factor mismatched|<p>Current redundancy factor does not match the desired redundancy factor.</p>|`last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.redundancy.factor.current)<>last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.redundancy.factor.desired)`|High||
+|Nutanix: Failed to get metric data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.metric.get.check))>0`|High||
+|Nutanix: Failed to get alert data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.alert.get.check))>0`|High||
+|Nutanix: Redundancy factor mismatched|<p>Current redundancy factor does not match the desired redundancy factor.</p>|`last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.redundancy.factor.current)<>last(/Nutanix Cluster Prism Element by HTTP/nutanix.cluster.redundancy.factor.desired)`|High||
 
 ### LLD rule Alert discovery
 
@@ -476,10 +476,10 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Failed to get metric data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Host Prism Element by HTTP/nutanix.host.metric.get.check))>0`|High||
-|Failed to get disk data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Host Prism Element by HTTP/nutanix.host.disk.get.check))>0`|High||
-|Failed to get alert data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Host Prism Element by HTTP/nutanix.host.alert.get.check))>0`|High||
-|Host is in degraded status|<p>Host is in a degraded status. The host may soon become unavailable.</p>|`last(/Nutanix Host Prism Element by HTTP/nutanix.host.general.degraded)=1`|High||
+|Nutanix: Failed to get metric data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Host Prism Element by HTTP/nutanix.host.metric.get.check))>0`|High||
+|Nutanix: Failed to get disk data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Host Prism Element by HTTP/nutanix.host.disk.get.check))>0`|High||
+|Nutanix: Failed to get alert data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Nutanix Host Prism Element by HTTP/nutanix.host.alert.get.check))>0`|High||
+|Nutanix: Host is in degraded status|<p>Host is in a degraded status. The host may soon become unavailable.</p>|`last(/Nutanix Host Prism Element by HTTP/nutanix.host.general.degraded)=1`|High||
 
 ### LLD rule Disk discovery
 

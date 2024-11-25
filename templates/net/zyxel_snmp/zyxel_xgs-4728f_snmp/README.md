@@ -66,12 +66,12 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/ZYXEL XGS-4728F by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
-|Template does not match hardware|<p>This template is for Zyxel XGS-4728F, but connected to {ITEM.VALUE}</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.model)<>"XGS-4728F"`|Info|**Manual close**: Yes|
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.hw.uptime)>0 and last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.hw.uptime)<10m) or (last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.hw.uptime)=0 and last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.uptime)<10m)`|Info|**Manual close**: Yes|
-|Firmware has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.fwversion,#1)<>last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.fwversion,#2) and length(last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.fwversion))>0`|Info|**Manual close**: Yes|
-|Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.serialnumber,#1)<>last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.serialnumber,#2) and length(last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.serialnumber))>0`|Info|**Manual close**: Yes|
-|High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.cpuusage,5m)>{$CPU.UTIL.CRIT}`|Warning||
+|ZYXEL: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/ZYXEL XGS-4728F by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
+|ZYXEL: Template does not match hardware|<p>This template is for Zyxel XGS-4728F, but connected to {ITEM.VALUE}</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.model)<>"XGS-4728F"`|Info|**Manual close**: Yes|
+|ZYXEL: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.hw.uptime)>0 and last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.hw.uptime)<10m) or (last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.hw.uptime)=0 and last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.uptime)<10m)`|Info|**Manual close**: Yes|
+|ZYXEL: Firmware has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.fwversion,#1)<>last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.fwversion,#2) and length(last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.fwversion))>0`|Info|**Manual close**: Yes|
+|ZYXEL: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.serialnumber,#1)<>last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.serialnumber,#2) and length(last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.serialnumber))>0`|Info|**Manual close**: Yes|
+|ZYXEL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.cpuusage,5m)>{$CPU.UTIL.CRIT}`|Warning||
 
 ### LLD rule Fan discovery
 
@@ -89,7 +89,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|FAN{#SNMPINDEX} is in critical state|<p>Please check the fan unit</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW}`|Average||
+|ZYXEL: FAN{#SNMPINDEX} is in critical state|<p>Please check the fan unit</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW}`|Average||
 
 ### LLD rule Temperature discovery
 
@@ -107,7 +107,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Temperature {#ZYXEL.TEMP.ID} is in critical state|<p>Please check the temperature</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}`|Average||
+|ZYXEL: Temperature {#ZYXEL.TEMP.ID} is in critical state|<p>Please check the temperature</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH}`|Average||
 
 ### LLD rule Voltage discovery
 
@@ -125,7 +125,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state|<p>Please check the power supply</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}`|Average||
+|ZYXEL: Voltage {#ZYXEL.VOLT.NOMINAL} is in critical state|<p>Please check the power supply</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW}`|Average||
 
 ### LLD rule Interface discovery
 
@@ -159,7 +159,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Port {#SNMPINDEX}: Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}],#2)`|Average|**Manual close**: Yes|
+|ZYXEL: Port {#SNMPINDEX}: Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.net.if.operstatus[{#SNMPINDEX}],#2)`|Average|**Manual close**: Yes|
 
 ### LLD rule SFP without DDM discovery
 
@@ -183,7 +183,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|SFP {#SNMPINDEX} has been replaced|<p>SFP {#SNMPINDEX} serial number has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|ZYXEL: SFP {#SNMPINDEX} has been replaced|<p>SFP {#SNMPINDEX} serial number has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}],#1)<>last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}],#2) and length(last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.sfp.serialnumber[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule SFP with DDM discovery
 
@@ -201,8 +201,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION}|<p>The upper threshold value of the parameter is exceeded</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}`|Warning|**Manual close**: Yes|
-|SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION}|<p>The parameter values are less than the lower threshold</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}`|Warning|**Manual close**: Yes|
+|ZYXEL: SFP {#ZYXEL.SFP.PORT}: High {#ZYXEL.SFP.DESCRIPTION}|<p>The upper threshold value of the parameter is exceeded</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.sfp.ddm[{#SNMPINDEX}]) > {#ZYXEL.SFP.WARN.MAX}`|Warning|**Manual close**: Yes|
+|ZYXEL: SFP {#ZYXEL.SFP.PORT}: Low {#ZYXEL.SFP.DESCRIPTION}|<p>The parameter values are less than the lower threshold</p>|`last(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.sfp.ddm[{#SNMPINDEX}]) < {#ZYXEL.SFP.WARN.MIN}`|Warning|**Manual close**: Yes|
 
 ### LLD rule Memory pool discovery
 
@@ -220,7 +220,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool|<p>The system is running out of free memory.</p>|`min(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.memory[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}`|Average||
+|ZYXEL: High memory utilization in "{#ZYXEL.MEMORY.NAME}" pool|<p>The system is running out of free memory.</p>|`min(/ZYXEL XGS-4728F by SNMP/zyxel.4728f.memory[{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}`|Average||
 
 ## Feedback
 

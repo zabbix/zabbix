@@ -124,8 +124,8 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.2/manual
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Apache by Zabbix agent active/apache.uptime)<10m`|Info|**Manual close**: Yes|
-|Version has changed|<p>Apache version has changed. Acknowledge to close the problem manually.</p>|`last(/Apache by Zabbix agent active/apache.version,#1)<>last(/Apache by Zabbix agent active/apache.version,#2) and length(last(/Apache by Zabbix agent active/apache.version))>0`|Info|**Manual close**: Yes|
+|Apache: Service has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Apache by Zabbix agent active/apache.uptime)<10m`|Info|**Manual close**: Yes|
+|Apache: Version has changed|<p>Apache version has changed. Acknowledge to close the problem manually.</p>|`last(/Apache by Zabbix agent active/apache.version,#1)<>last(/Apache by Zabbix agent active/apache.version,#2) and length(last(/Apache by Zabbix agent active/apache.version))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Event MPM discovery
 
@@ -165,10 +165,10 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.2/manual
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Process is not running||`last(/Apache by Zabbix agent active/apache.proc.num[{#APACHE.NAME}])=0`|High||
-|Service is down||`last(/Apache by Zabbix agent active/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0 and last(/Apache by Zabbix agent active/apache.proc.num[{#APACHE.NAME}])>0`|Average|**Manual close**: Yes|
-|Failed to fetch status page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Apache by Zabbix agent active/web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"],30m)=1 and last(/Apache by Zabbix agent active/apache.proc.num[{#APACHE.NAME}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Service is down</li></ul>|
-|Service response time is too high||`min(/Apache by Zabbix agent active/net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN} and last(/Apache by Zabbix agent active/apache.proc.num[{#APACHE.NAME}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Service is down</li></ul>|
+|Apache: Process is not running||`last(/Apache by Zabbix agent active/apache.proc.num[{#APACHE.NAME}])=0`|High||
+|Apache: Service is down||`last(/Apache by Zabbix agent active/net.tcp.service[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"])=0 and last(/Apache by Zabbix agent active/apache.proc.num[{#APACHE.NAME}])>0`|Average|**Manual close**: Yes|
+|Apache: Failed to fetch status page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Apache by Zabbix agent active/web.page.get["{$APACHE.STATUS.SCHEME}://{$APACHE.STATUS.HOST}:{$APACHE.STATUS.PORT}/{$APACHE.STATUS.PATH}"],30m)=1 and last(/Apache by Zabbix agent active/apache.proc.num[{#APACHE.NAME}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Apache: Service is down</li></ul>|
+|Apache: Service response time is too high||`min(/Apache by Zabbix agent active/net.tcp.service.perf[http,"{$APACHE.STATUS.HOST}","{$APACHE.STATUS.PORT}"],5m)>{$APACHE.RESPONSE_TIME.MAX.WARN} and last(/Apache by Zabbix agent active/apache.proc.num[{#APACHE.NAME}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Apache: Service is down</li></ul>|
 
 ## Feedback
 

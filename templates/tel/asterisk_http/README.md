@@ -80,15 +80,15 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Service is down||`last(/Asterisk by HTTP/net.tcp.service["tcp","{$AMI.HOST}","{$AMI.PORT}"])=0`|Average|**Manual close**: Yes|
-|Service response time is too high||`min(/Asterisk by HTTP/net.tcp.service.perf["tcp","{$AMI.HOST}","{$AMI.PORT}"],5m)>{$AMI.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Service is down</li></ul>|
-|Version has changed|<p>The Asterisk version has changed. Acknowledge to close the problem manually.</p>|`last(/Asterisk by HTTP/asterisk.version,#1)<>last(/Asterisk by HTTP/asterisk.version,#2) and length(last(/Asterisk by HTTP/asterisk.version))>0`|Info|**Manual close**: Yes|
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Asterisk by HTTP/asterisk.uptime)<10m`|Info|**Manual close**: Yes|
-|Failed to fetch AMI page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Asterisk by HTTP/asterisk.uptime,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Service is down</li></ul>|
-|has been reloaded|<p>Uptime is less than 10 minutes.</p>|`last(/Asterisk by HTTP/asterisk.uptime_reload)<10m`|Info|**Manual close**: Yes|
-|Total number of active channels of SIP trunks is too high|<p>The SIP trunks may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.sip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"}`|Warning||
-|Total number of active channels of IAX trunks is too high|<p>The IAX trunks may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.iax.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"}`|Warning||
-|Total number of active channels of PJSIP trunks is too high|<p>The PJSIP trunks may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.pjsip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"}`|Warning||
+|Asterisk: Service is down||`last(/Asterisk by HTTP/net.tcp.service["tcp","{$AMI.HOST}","{$AMI.PORT}"])=0`|Average|**Manual close**: Yes|
+|Asterisk: Service response time is too high||`min(/Asterisk by HTTP/net.tcp.service.perf["tcp","{$AMI.HOST}","{$AMI.PORT}"],5m)>{$AMI.RESPONSE_TIME.MAX.WARN}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Asterisk: Service is down</li></ul>|
+|Asterisk: Version has changed|<p>The Asterisk version has changed. Acknowledge to close the problem manually.</p>|`last(/Asterisk by HTTP/asterisk.version,#1)<>last(/Asterisk by HTTP/asterisk.version,#2) and length(last(/Asterisk by HTTP/asterisk.version))>0`|Info|**Manual close**: Yes|
+|Asterisk: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Asterisk by HTTP/asterisk.uptime)<10m`|Info|**Manual close**: Yes|
+|Asterisk: Failed to fetch AMI page|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Asterisk by HTTP/asterisk.uptime,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Asterisk: Service is down</li></ul>|
+|Asterisk: has been reloaded|<p>Uptime is less than 10 minutes.</p>|`last(/Asterisk by HTTP/asterisk.uptime_reload)<10m`|Info|**Manual close**: Yes|
+|Asterisk: Total number of active channels of SIP trunks is too high|<p>The SIP trunks may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.sip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"SIP"}`|Warning||
+|Asterisk: Total number of active channels of IAX trunks is too high|<p>The IAX trunks may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.iax.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"IAX"}`|Warning||
+|Asterisk: Total number of active channels of PJSIP trunks is too high|<p>The PJSIP trunks may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.pjsip.active_channels,10m)>={$AMI.TRUNK_ACTIVE_CHANNELS_TOTAL.MAX.WARN:"PJSIP"}`|Warning||
 
 ### LLD rule SIP peers discovery
 
@@ -108,8 +108,8 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|SIP trunk "{#OBJECTNAME}": SIP trunk {#OBJECTNAME} has a state {ITEM.VALUE}|<p>The SIP trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.</p>|`last(/Asterisk by HTTP/asterisk.sip.trunk.status[{#OBJECTNAME}])="UNKNOWN" or last(/Asterisk by HTTP/asterisk.sip.trunk.status[{#OBJECTNAME}])="UNREACHABLE"`|Average||
-|SIP trunk "{#OBJECTNAME}": Number of the SIP trunk "{#OBJECTNAME}" active channels is too high|<p>The SIP trunk may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.sip.trunk.active_channels[{#OBJECTNAME}],10m)>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}`|Warning||
+|Asterisk: SIP trunk "{#OBJECTNAME}": SIP trunk {#OBJECTNAME} has a state {ITEM.VALUE}|<p>The SIP trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.</p>|`last(/Asterisk by HTTP/asterisk.sip.trunk.status[{#OBJECTNAME}])="UNKNOWN" or last(/Asterisk by HTTP/asterisk.sip.trunk.status[{#OBJECTNAME}])="UNREACHABLE"`|Average||
+|Asterisk: SIP trunk "{#OBJECTNAME}": Number of the SIP trunk "{#OBJECTNAME}" active channels is too high|<p>The SIP trunk may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.sip.trunk.active_channels[{#OBJECTNAME}],10m)>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}`|Warning||
 
 ### LLD rule IAX peers discovery
 
@@ -129,8 +129,8 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|IAX trunk "{#OBJECTNAME}": IAX trunk {#OBJECTNAME} has a state {ITEM.VALUE}|<p>The IAX trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.</p>|`last(/Asterisk by HTTP/asterisk.iax.trunk.status[{#OBJECTNAME}])="UNKNOWN" or last(/Asterisk by HTTP/asterisk.iax.trunk.status[{#OBJECTNAME}])="UNREACHABLE"`|Average||
-|IAX trunk "{#OBJECTNAME}": Number of the IAX trunk "{#OBJECTNAME}" active channels is too high|<p>The IAX trunk may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.iax.trunk.active_channels[{#OBJECTNAME}],10m)>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}`|Warning||
+|Asterisk: IAX trunk "{#OBJECTNAME}": IAX trunk {#OBJECTNAME} has a state {ITEM.VALUE}|<p>The IAX trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.</p>|`last(/Asterisk by HTTP/asterisk.iax.trunk.status[{#OBJECTNAME}])="UNKNOWN" or last(/Asterisk by HTTP/asterisk.iax.trunk.status[{#OBJECTNAME}])="UNREACHABLE"`|Average||
+|Asterisk: IAX trunk "{#OBJECTNAME}": Number of the IAX trunk "{#OBJECTNAME}" active channels is too high|<p>The IAX trunk may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.iax.trunk.active_channels[{#OBJECTNAME}],10m)>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}`|Warning||
 
 ### LLD rule PJSIP endpoints discovery
 
@@ -150,8 +150,8 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|PJSIP trunk "{#OBJECTNAME}": PJSIP trunk {#OBJECTNAME} has a state Unavailable|<p>The PJSIP trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.</p>|`last(/Asterisk by HTTP/asterisk.pjsip.trunk.devicestate[{#OBJECTNAME}])="Unavailable"`|Average||
-|PJSIP trunk "{#OBJECTNAME}": Number of the PJSIP trunk "{#OBJECTNAME}" active channels is too high|<p>The PJSIP trunk may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.pjsip.trunk.active_channels[{#OBJECTNAME}],10m)>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}`|Warning||
+|Asterisk: PJSIP trunk "{#OBJECTNAME}": PJSIP trunk {#OBJECTNAME} has a state Unavailable|<p>The PJSIP trunk is unable to establish a connection with a neighbor due to network issues or incorrect configuration.</p>|`last(/Asterisk by HTTP/asterisk.pjsip.trunk.devicestate[{#OBJECTNAME}])="Unavailable"`|Average||
+|Asterisk: PJSIP trunk "{#OBJECTNAME}": Number of the PJSIP trunk "{#OBJECTNAME}" active channels is too high|<p>The PJSIP trunk may not be able to process new calls.</p>|`min(/Asterisk by HTTP/asterisk.pjsip.trunk.active_channels[{#OBJECTNAME}],10m)>={$AMI.TRUNK_ACTIVE_CHANNELS.MAX.WARN:"{#OBJECTNAME}"}`|Warning||
 
 ### LLD rule Queues discovery
 
@@ -172,7 +172,7 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|"{#QUEUE}": Number of callers in the queue "{#QUEUE}" is too high|<p>There is a large number of calls in the queue.</p>|`min(/Asterisk by HTTP/asterisk.queue.callers[{#QUEUE}],10m)>{$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"}`|Warning||
+|Asterisk: "{#QUEUE}": Number of callers in the queue "{#QUEUE}" is too high|<p>There is a large number of calls in the queue.</p>|`min(/Asterisk by HTTP/asterisk.queue.callers[{#QUEUE}],10m)>{$AMI.QUEUE_CALLERS.MAX.WARN:"{#QUEUE}"}`|Warning||
 
 ## Feedback
 

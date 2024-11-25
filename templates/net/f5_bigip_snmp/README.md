@@ -71,12 +71,12 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/F5 Big-IP by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
-|Chassis has been replaced|<p>Chassis serial number has changed. Acknowledge to close the problem manually.</p>|`last(/F5 Big-IP by SNMP/bigip.serialnumber,#1)<>last(/F5 Big-IP by SNMP/bigip.serialnumber,#2) and length(last(/F5 Big-IP by SNMP/bigip.serialnumber))>0`|Info|**Manual close**: Yes|
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/F5 Big-IP by SNMP/bigip.uptime)<10m`|Info|**Manual close**: Yes|
-|Cluster not in sync||`count(/F5 Big-IP by SNMP/bigip.failover,10m,"ne","3")>8 and count(/F5 Big-IP by SNMP/bigip.failover,10m,"ne","4")>6`|Warning|**Manual close**: Yes|
-|The device is inconsistent with the device group|<p>The device is inconsistent with the device group, requires user intervention</p>|`last(/F5 Big-IP by SNMP/bigip.syncstatus)=4`|Warning|**Manual close**: Yes|
-|Changes have been made on the device not sync|<p>Changes have been made on the device not sync to the device group, requires user intervention</p>|`last(/F5 Big-IP by SNMP/bigip.syncstatus)=2`|Warning|**Manual close**: Yes|
+|F5 Big-IP: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/F5 Big-IP by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
+|F5 Big-IP: Chassis has been replaced|<p>Chassis serial number has changed. Acknowledge to close the problem manually.</p>|`last(/F5 Big-IP by SNMP/bigip.serialnumber,#1)<>last(/F5 Big-IP by SNMP/bigip.serialnumber,#2) and length(last(/F5 Big-IP by SNMP/bigip.serialnumber))>0`|Info|**Manual close**: Yes|
+|F5 Big-IP: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/F5 Big-IP by SNMP/bigip.uptime)<10m`|Info|**Manual close**: Yes|
+|F5 Big-IP: Cluster not in sync||`count(/F5 Big-IP by SNMP/bigip.failover,10m,"ne","3")>8 and count(/F5 Big-IP by SNMP/bigip.failover,10m,"ne","4")>6`|Warning|**Manual close**: Yes|
+|F5 Big-IP: The device is inconsistent with the device group|<p>The device is inconsistent with the device group, requires user intervention</p>|`last(/F5 Big-IP by SNMP/bigip.syncstatus)=4`|Warning|**Manual close**: Yes|
+|F5 Big-IP: Changes have been made on the device not sync|<p>Changes have been made on the device not sync to the device group, requires user intervention</p>|`last(/F5 Big-IP by SNMP/bigip.syncstatus)=2`|Warning|**Manual close**: Yes|
 
 ### LLD rule File system discovery
 
@@ -98,7 +98,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Low free space in file system [{#PART.NAME}]|<p>The system is running out of free space.</p>|`last(/F5 Big-IP by SNMP/bigip.disktable.freeblocks[{#PART.NAME}])/last(/F5 Big-IP by SNMP/bigip.disktable.totalblocks[{#PART.NAME}])*100<{$BIGIP.FS.FREE.WARN.MIN:"{#PART.NAME}"}`|Warning|**Manual close**: Yes|
+|F5 Big-IP: Low free space in file system [{#PART.NAME}]|<p>The system is running out of free space.</p>|`last(/F5 Big-IP by SNMP/bigip.disktable.freeblocks[{#PART.NAME}])/last(/F5 Big-IP by SNMP/bigip.disktable.totalblocks[{#PART.NAME}])*100<{$BIGIP.FS.FREE.WARN.MIN:"{#PART.NAME}"}`|Warning|**Manual close**: Yes|
 
 ### LLD rule Memory discovery
 
@@ -121,8 +121,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|High memory utilization in host [{#HOST.ID}]|<p>The system is running out of free memory.</p>|`last(/F5 Big-IP by SNMP/bigip.memory.used[{#HOST.ID}])/last(/F5 Big-IP by SNMP/bigip.memory.total[{#HOST.ID}])*100>{$BIGIP.MEMORY.UTIL.WARN.MAX}`|Warning|**Manual close**: Yes|
-|High swap utilization in host [{#HOST.ID}]|<p>The system is running out of free swap memory.</p>|`last(/F5 Big-IP by SNMP/bigip.memory.used.swap[{#HOST.ID}])/last(/F5 Big-IP by SNMP/bigip.memory.total.swap[{#HOST.ID}])*100>{$BIGIP.SWAP.UTIL.WARN.MAX}`|Warning|**Manual close**: Yes|
+|F5 Big-IP: High memory utilization in host [{#HOST.ID}]|<p>The system is running out of free memory.</p>|`last(/F5 Big-IP by SNMP/bigip.memory.used[{#HOST.ID}])/last(/F5 Big-IP by SNMP/bigip.memory.total[{#HOST.ID}])*100>{$BIGIP.MEMORY.UTIL.WARN.MAX}`|Warning|**Manual close**: Yes|
+|F5 Big-IP: High swap utilization in host [{#HOST.ID}]|<p>The system is running out of free swap memory.</p>|`last(/F5 Big-IP by SNMP/bigip.memory.used.swap[{#HOST.ID}])/last(/F5 Big-IP by SNMP/bigip.memory.total.swap[{#HOST.ID}])*100>{$BIGIP.SWAP.UTIL.WARN.MAX}`|Warning|**Manual close**: Yes|
 
 ### LLD rule CPU discovery
 
@@ -166,7 +166,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`last(/F5 Big-IP by SNMP/bigip.cpu.usageratio.5m[{#HOST.ID},{#CPU.ID}])>{$BIGIP.CPU.UTIL.WARN.MAX}`|Warning|**Manual close**: Yes|
+|F5 Big-IP: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`last(/F5 Big-IP by SNMP/bigip.cpu.usageratio.5m[{#HOST.ID},{#CPU.ID}])>{$BIGIP.CPU.UTIL.WARN.MAX}`|Warning|**Manual close**: Yes|
 
 ### LLD rule Network interface discovery
 
@@ -197,7 +197,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|There are errors on the network interface||`last(/F5 Big-IP by SNMP/bigip.net.in.error[{#IF.NAME}])>last(/F5 Big-IP by SNMP/bigip.net.in.error[{#IF.NAME}],#2) or last(/F5 Big-IP by SNMP/bigip.net.out.error[{#IF.NAME}])>last(/F5 Big-IP by SNMP/bigip.net.out.error[{#IF.NAME}],#2)`|Average|**Manual close**: Yes|
+|F5 Big-IP: There are errors on the network interface||`last(/F5 Big-IP by SNMP/bigip.net.in.error[{#IF.NAME}])>last(/F5 Big-IP by SNMP/bigip.net.in.error[{#IF.NAME}],#2) or last(/F5 Big-IP by SNMP/bigip.net.out.error[{#IF.NAME}])>last(/F5 Big-IP by SNMP/bigip.net.out.error[{#IF.NAME}],#2)`|Average|**Manual close**: Yes|
 
 ### LLD rule Chassis fan discovery
 
@@ -216,8 +216,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Fan[{#FAN.INDEX}] is in critical state|<p>Please check the fan unit</p>|`last(/F5 Big-IP by SNMP/bigip.chassis.fan.status[{#FAN.INDEX}])=0`|Average|**Manual close**: Yes|
-|Fan[{#FAN.INDEX}] is not present|<p>Please check the fan unit</p>|`last(/F5 Big-IP by SNMP/bigip.chassis.fan.status[{#FAN.INDEX}])=2`|Info|**Manual close**: Yes|
+|F5 Big-IP: Fan[{#FAN.INDEX}] is in critical state|<p>Please check the fan unit</p>|`last(/F5 Big-IP by SNMP/bigip.chassis.fan.status[{#FAN.INDEX}])=0`|Average|**Manual close**: Yes|
+|F5 Big-IP: Fan[{#FAN.INDEX}] is not present|<p>Please check the fan unit</p>|`last(/F5 Big-IP by SNMP/bigip.chassis.fan.status[{#FAN.INDEX}])=2`|Info|**Manual close**: Yes|
 
 ### LLD rule Chassis power supply discovery
 
@@ -235,8 +235,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Power supply [{#POWER.INDEX}] is in critical state|<p>Please check the power supply unit</p>|`last(/F5 Big-IP by SNMP/bigip.chassis.power.status[{#POWER.INDEX}])=0`|High|**Manual close**: Yes|
-|Power supply [{#POWER.INDEX}] is not present|<p>Please check the power supply unit</p>|`last(/F5 Big-IP by SNMP/bigip.chassis.power.status[{#POWER.INDEX}])=2`|Info|**Manual close**: Yes|
+|F5 Big-IP: Power supply [{#POWER.INDEX}] is in critical state|<p>Please check the power supply unit</p>|`last(/F5 Big-IP by SNMP/bigip.chassis.power.status[{#POWER.INDEX}])=0`|High|**Manual close**: Yes|
+|F5 Big-IP: Power supply [{#POWER.INDEX}] is not present|<p>Please check the power supply unit</p>|`last(/F5 Big-IP by SNMP/bigip.chassis.power.status[{#POWER.INDEX}])=2`|Info|**Manual close**: Yes|
 
 ### LLD rule Chassis temperature discovery
 
@@ -254,8 +254,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Chassis temperature||`last(/F5 Big-IP by SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.HIGH}`|High||
-|Chassis temperature||`last(/F5 Big-IP by SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.WARN}`|Warning|**Depends on**:<br><ul><li>Chassis temperature</li></ul>|
+|F5 Big-IP: Chassis temperature||`last(/F5 Big-IP by SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.HIGH}`|High||
+|F5 Big-IP: Chassis temperature||`last(/F5 Big-IP by SNMP/bigip.chassis.temp.value[{#TEMP.INDEX}])>{$BIGIP.TEMP.WARN}`|Warning|**Depends on**:<br><ul><li>F5 Big-IP: Chassis temperature</li></ul>|
 
 ### LLD rule Blade temperature discovery
 
@@ -327,7 +327,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Certificate expires ({#CERT.NAME})|<p>Please check certificate</p>|`last(/F5 Big-IP by SNMP/bigip.cert.expiration.date[{#CERT.NAME}]) - 86400 * {$BIGIP.CERT.MIN} < now()`|Warning|**Manual close**: Yes|
+|F5 Big-IP: Certificate expires ({#CERT.NAME})|<p>Please check certificate</p>|`last(/F5 Big-IP by SNMP/bigip.cert.expiration.date[{#CERT.NAME}]) - 86400 * {$BIGIP.CERT.MIN} < now()`|Warning|**Manual close**: Yes|
 
 ### LLD rule Virtual server discovery
 
@@ -394,8 +394,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Pool {#POOL.NAME} is not available in some capacity: {ITEM.VALUE1}||`count(/F5 Big-IP by SNMP/bigip.pool.available[{#POOL.NAME}],120m,"ne","1")>20`|Average|**Depends on**:<br><ul><li>Pool {#POOL.NAME} is not enabled in some capacity: {ITEM.VALUE1}</li></ul>|
-|Pool {#POOL.NAME} is not enabled in some capacity: {ITEM.VALUE1}||`count(/F5 Big-IP by SNMP/bigip.pool.enabled[{#POOL.NAME}],120m,"ne","1")>4`|Average||
+|F5 Big-IP: Pool {#POOL.NAME} is not available in some capacity: {ITEM.VALUE1}||`count(/F5 Big-IP by SNMP/bigip.pool.available[{#POOL.NAME}],120m,"ne","1")>20`|Average|**Depends on**:<br><ul><li>F5 Big-IP: Pool {#POOL.NAME} is not enabled in some capacity: {ITEM.VALUE1}</li></ul>|
+|F5 Big-IP: Pool {#POOL.NAME} is not enabled in some capacity: {ITEM.VALUE1}||`count(/F5 Big-IP by SNMP/bigip.pool.enabled[{#POOL.NAME}],120m,"ne","1")>4`|Average||
 
 ## Feedback
 

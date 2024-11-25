@@ -81,8 +81,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Version has changed|<p>The NetApp AFF A700 version has changed. Acknowledge to close the problem manually.</p>|`last(/NetApp AFF A700 by HTTP/netapp.cluster.version,#1)<>last(/NetApp AFF A700 by HTTP/netapp.cluster.version,#2) and length(last(/NetApp AFF A700 by HTTP/netapp.cluster.version))>0`|Info|**Manual close**: Yes|
-|Cluster status is abnormal|<p>Any errors associated with the sample. For example, if the aggregation of data over multiple nodes fails then any of the partial errors might be returned, “ok” on success, or “error” on any internal uncategorized failure. Whenever a sample collection is missed but done at a later time, it is back filled to the previous 15 second timestamp and tagged with "backfilled_data". “Inconsistent_ delta_time” is encountered when the time between two collections is not the same for all nodes. Therefore, the aggregated value might be over or under inflated. “Negative_delta” is returned when an expected monotonically increasing value has decreased in value. “Inconsistent_old_data” is returned when one or more nodes do not have the latest data.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.cluster.status)<>"ok")`|Average||
+|NetApp AFF A700: Version has changed|<p>The NetApp AFF A700 version has changed. Acknowledge to close the problem manually.</p>|`last(/NetApp AFF A700 by HTTP/netapp.cluster.version,#1)<>last(/NetApp AFF A700 by HTTP/netapp.cluster.version,#2) and length(last(/NetApp AFF A700 by HTTP/netapp.cluster.version))>0`|Info|**Manual close**: Yes|
+|NetApp AFF A700: Cluster status is abnormal|<p>Any errors associated with the sample. For example, if the aggregation of data over multiple nodes fails then any of the partial errors might be returned, “ok” on success, or “error” on any internal uncategorized failure. Whenever a sample collection is missed but done at a later time, it is back filled to the previous 15 second timestamp and tagged with "backfilled_data". “Inconsistent_ delta_time” is encountered when the time between two collections is not the same for all nodes. Therefore, the aggregated value might be over or under inflated. “Negative_delta” is returned when an expected monotonically increasing value has decreased in value. “Inconsistent_old_data” is returned when one or more nodes do not have the latest data.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.cluster.status)<>"ok")`|Average||
 
 ### LLD rule Nodes discovery
 
@@ -105,10 +105,10 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#NODENAME}: Version has changed|<p>{#NODENAME} version has changed. Acknowledge to close the problem manually.</p>|`last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}],#2) and length(last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}]))>0`|Info|**Manual close**: Yes|
-|{#NODENAME}: Node state is abnormal|<p>The state of the node is different from up:<br>booting - Node is booting up.<br>down - Node has stopped or is dumping core.<br>taken_over - Node has been taken over by its HA partner and is not yet waiting for giveback.<br>waiting_for_giveback - Node has been taken over by its HA partner and is waiting for the HA partner to giveback disks.<br>degraded - Node has one or more critical services offline.<br>unknown - Node or its HA partner cannot be contacted and there is no information on the node's state.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.nodes.state[{#NODENAME}])<>"up")`|Average||
-|{#NODENAME}: Node has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/NetApp AFF A700 by HTTP/netapp.nodes.uptime[{#NODENAME}])<10m`|Info|**Manual close**: Yes|
-|{#NODENAME}: Node has over temperature|<p>The hardware shuts down if the temperature exceeds critical thresholds(item's value is "over").</p>|`(last(/NetApp AFF A700 by HTTP/netapp.nodes.controller.over_temperature[{#NODENAME}])<>"normal")`|Average||
+|NetApp AFF A700: {#NODENAME}: Version has changed|<p>{#NODENAME} version has changed. Acknowledge to close the problem manually.</p>|`last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}],#2) and length(last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}]))>0`|Info|**Manual close**: Yes|
+|NetApp AFF A700: {#NODENAME}: Node state is abnormal|<p>The state of the node is different from up:<br>booting - Node is booting up.<br>down - Node has stopped or is dumping core.<br>taken_over - Node has been taken over by its HA partner and is not yet waiting for giveback.<br>waiting_for_giveback - Node has been taken over by its HA partner and is waiting for the HA partner to giveback disks.<br>degraded - Node has one or more critical services offline.<br>unknown - Node or its HA partner cannot be contacted and there is no information on the node's state.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.nodes.state[{#NODENAME}])<>"up")`|Average||
+|NetApp AFF A700: {#NODENAME}: Node has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/NetApp AFF A700 by HTTP/netapp.nodes.uptime[{#NODENAME}])<10m`|Info|**Manual close**: Yes|
+|NetApp AFF A700: {#NODENAME}: Node has over temperature|<p>The hardware shuts down if the temperature exceeds critical thresholds(item's value is "over").</p>|`(last(/NetApp AFF A700 by HTTP/netapp.nodes.controller.over_temperature[{#NODENAME}])<>"normal")`|Average||
 
 ### LLD rule Ethernet ports discovery
 
@@ -126,7 +126,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#ETHPORTNAME}: Ethernet port of the Node "{#NODENAME}" is down|<p>Something is wrong with the ethernet port.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}])="down")`|Average|**Manual close**: Yes|
+|NetApp AFF A700: {#ETHPORTNAME}: Ethernet port of the Node "{#NODENAME}" is down|<p>Something is wrong with the ethernet port.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}])="down")`|Average|**Manual close**: Yes|
 
 ### LLD rule FC ports discovery
 
@@ -145,7 +145,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#FCPORTNAME}: FC port of the Node "{#NODENAME}" has state different from "online"|<p>Something is wrong with the FC port.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}])<>"online")`|Average|**Manual close**: Yes|
+|NetApp AFF A700: {#FCPORTNAME}: FC port of the Node "{#NODENAME}" has state different from "online"|<p>Something is wrong with the FC port.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.port.fc.state[{#NODENAME},{#FCPORTNAME}])<>"online")`|Average|**Manual close**: Yes|
 
 ### LLD rule Disks discovery
 
@@ -163,7 +163,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#DISKNAME}: Disk of the Node "{#NODENAME}" has state different from "present"|<p>Something is wrong with the disk.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}])<>"present")`|Average|**Manual close**: Yes|
+|NetApp AFF A700: {#DISKNAME}: Disk of the Node "{#NODENAME}" has state different from "present"|<p>Something is wrong with the disk.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.disk.state[{#NODENAME},{#DISKNAME}])<>"present")`|Average|**Manual close**: Yes|
 
 ### LLD rule Chassis discovery
 
@@ -181,7 +181,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#ID}: Chassis has something errors|<p>Something is wrong with the chassis.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}],#2) and last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}])="error")`|Average|**Manual close**: Yes|
+|NetApp AFF A700: {#ID}: Chassis has something errors|<p>Something is wrong with the chassis.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}],#2) and last(/NetApp AFF A700 by HTTP/netapp.chassis.state[{#ID}])="error")`|Average|**Manual close**: Yes|
 
 ### LLD rule FRUs discovery
 
@@ -199,7 +199,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#FRUID}: FRU of the chassis "{#ID}" state is error|<p>Something is wrong with the FRU.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}],#2) and last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}])="error")`|Average|**Manual close**: Yes|
+|NetApp AFF A700: {#FRUID}: FRU of the chassis "{#ID}" state is error|<p>Something is wrong with the FRU.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}],#2) and last(/NetApp AFF A700 by HTTP/netapp.chassis.fru.state[{#CHASSISID},{#FRUID}])="error")`|Average|**Manual close**: Yes|
 
 ### LLD rule SVMs discovery
 
@@ -218,7 +218,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SVMNAME}: SVM state is abnormal|<p>Something is wrong with the SVM.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}])<>"running")`|Average|**Manual close**: Yes|
+|NetApp AFF A700: {#SVMNAME}: SVM state is abnormal|<p>Something is wrong with the SVM.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.svm.state[{#SVMNAME}])<>"running")`|Average|**Manual close**: Yes|
 
 ### LLD rule LUNs discovery
 
@@ -239,8 +239,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#LUNNAME}: LUN of the SVM "{#SVMNAME}" has abnormal state|<p>Normal states for a LUN are online and offline. Other states indicate errors.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}])<>"online")`|Average|**Manual close**: Yes|
-|{#LUNNAME}: LUN of the SVM "{#SVMNAME}" has abnormal container state|<p>LUNs are only available when their containers are available.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}])<>"online")`|Average|**Manual close**: Yes|
+|NetApp AFF A700: {#LUNNAME}: LUN of the SVM "{#SVMNAME}" has abnormal state|<p>Normal states for a LUN are online and offline. Other states indicate errors.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.lun.status.state[{#SVMNAME},{#LUNNAME}])<>"online")`|Average|**Manual close**: Yes|
+|NetApp AFF A700: {#LUNNAME}: LUN of the SVM "{#SVMNAME}" has abnormal container state|<p>LUNs are only available when their containers are available.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.lun.status.container_state[{#SVMNAME},{#LUNNAME}])<>"online")`|Average|**Manual close**: Yes|
 
 ### LLD rule Volumes discovery
 
@@ -284,7 +284,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#VOLUMENAME}: Volume state is abnormal|<p>A volume can only be brought online if it is offline. Taking a volume offline removes its junction path. The 'mixed' state applies to FlexGroup volumes only and cannot be specified as a target state. An 'error' state implies that the volume is not in a state to serve data.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}])<>"online")`|Average|**Manual close**: Yes|
+|NetApp AFF A700: {#VOLUMENAME}: Volume state is abnormal|<p>A volume can only be brought online if it is offline. Taking a volume offline removes its junction path. The 'mixed' state applies to FlexGroup volumes only and cannot be specified as a target state. An 'error' state implies that the volume is not in a state to serve data.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}],#2) and last(/NetApp AFF A700 by HTTP/netapp.volume.state[{#VOLUMENAME}])<>"online")`|Average|**Manual close**: Yes|
 
 ## Feedback
 

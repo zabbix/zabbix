@@ -172,11 +172,11 @@ If you use another web server port for the location of the PHP-FPM status/ping p
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Version has changed|<p>The PHP-FPM version has changed. Acknowledge to close the problem manually.</p>|`last(/PHP-FPM by Zabbix agent active/php-fpm.version,#1)<>last(/PHP-FPM by Zabbix agent active/php-fpm.version,#2) and length(last(/PHP-FPM by Zabbix agent active/php-fpm.version))>0`|Info|**Manual close**: Yes|
-|Pool has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/PHP-FPM by Zabbix agent active/php-fpm.uptime)<10m`|Info|**Manual close**: Yes|
-|Queue utilization is high|<p>The queue for this pool has reached `{$PHP_FPM.QUEUE.WARN.MAX}%` of its maximum capacity. <br>Items in the queue represent the current number of connections that have been initiated on this pool but not yet accepted.</p>|`min(/PHP-FPM by Zabbix agent active/php-fpm.listen_queue_usage,15m) > {$PHP_FPM.QUEUE.WARN.MAX}`|Warning||
-|Manager changed|<p>The PHP-FPM manager has changed. Acknowledge to close the problem manually.</p>|`last(/PHP-FPM by Zabbix agent active/php-fpm.process_manager,#1)<>last(/PHP-FPM by Zabbix agent active/php-fpm.process_manager,#2)`|Info|**Manual close**: Yes|
-|Detected slow requests|<p>The PHP-FPM has detected a slow request. <br>The slow request means that it took more time to execute than expected (defined in the configuration of your pool).</p>|`min(/PHP-FPM by Zabbix agent active/php-fpm.slow_requests,#3)>0`|Warning||
+|PHP-FPM: Version has changed|<p>The PHP-FPM version has changed. Acknowledge to close the problem manually.</p>|`last(/PHP-FPM by Zabbix agent active/php-fpm.version,#1)<>last(/PHP-FPM by Zabbix agent active/php-fpm.version,#2) and length(last(/PHP-FPM by Zabbix agent active/php-fpm.version))>0`|Info|**Manual close**: Yes|
+|PHP-FPM: Pool has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/PHP-FPM by Zabbix agent active/php-fpm.uptime)<10m`|Info|**Manual close**: Yes|
+|PHP-FPM: Queue utilization is high|<p>The queue for this pool has reached `{$PHP_FPM.QUEUE.WARN.MAX}%` of its maximum capacity. <br>Items in the queue represent the current number of connections that have been initiated on this pool but not yet accepted.</p>|`min(/PHP-FPM by Zabbix agent active/php-fpm.listen_queue_usage,15m) > {$PHP_FPM.QUEUE.WARN.MAX}`|Warning||
+|PHP-FPM: Manager changed|<p>The PHP-FPM manager has changed. Acknowledge to close the problem manually.</p>|`last(/PHP-FPM by Zabbix agent active/php-fpm.process_manager,#1)<>last(/PHP-FPM by Zabbix agent active/php-fpm.process_manager,#2)`|Info|**Manual close**: Yes|
+|PHP-FPM: Detected slow requests|<p>The PHP-FPM has detected a slow request. <br>The slow request means that it took more time to execute than expected (defined in the configuration of your pool).</p>|`min(/PHP-FPM by Zabbix agent active/php-fpm.slow_requests,#3)>0`|Warning||
 
 ### LLD rule PHP-FPM process discovery
 
@@ -199,9 +199,9 @@ If you use another web server port for the location of the PHP-FPM status/ping p
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Process is not running||`last(/PHP-FPM by Zabbix agent active/php-fpm.proc.num[{#PHP_FPM.NAME}])=0`|High||
-|Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/PHP-FPM by Zabbix agent active/php-fpm.uptime,30m)=1 and last(/PHP-FPM by Zabbix agent active/php-fpm.proc.num[{#PHP_FPM.NAME}])>0`|Info|**Manual close**: Yes|
-|Service is down||`(last(/PHP-FPM by Zabbix agent active/php-fpm.ping)=0 or nodata(/PHP-FPM by Zabbix agent active/php-fpm.ping,3m)=1) and last(/PHP-FPM by Zabbix agent active/php-fpm.proc.num[{#PHP_FPM.NAME}])>0`|High|**Manual close**: Yes|
+|PHP-FPM: Process is not running||`last(/PHP-FPM by Zabbix agent active/php-fpm.proc.num[{#PHP_FPM.NAME}])=0`|High||
+|PHP-FPM: Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/PHP-FPM by Zabbix agent active/php-fpm.uptime,30m)=1 and last(/PHP-FPM by Zabbix agent active/php-fpm.proc.num[{#PHP_FPM.NAME}])>0`|Info|**Manual close**: Yes|
+|PHP-FPM: Service is down||`(last(/PHP-FPM by Zabbix agent active/php-fpm.ping)=0 or nodata(/PHP-FPM by Zabbix agent active/php-fpm.ping,3m)=1) and last(/PHP-FPM by Zabbix agent active/php-fpm.proc.num[{#PHP_FPM.NAME}])>0`|High|**Manual close**: Yes|
 
 ## Feedback
 

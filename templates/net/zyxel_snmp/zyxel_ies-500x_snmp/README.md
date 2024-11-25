@@ -60,9 +60,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/ZYXEL IES-500x by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
-|Template does not match hardware|<p>This template is for Zyxel IES-500x, but connected to {ITEM.VALUE}</p>|`not(last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.model)="IES-5000" or last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.model)="IES-5005")`|Info|**Manual close**: Yes|
-|Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime)>0 and last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime)<10m) or (last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime)=0 and last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.uptime)<10m)`|Info|**Manual close**: Yes|
+|ZYXEL: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/ZYXEL IES-500x by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning||
+|ZYXEL: Template does not match hardware|<p>This template is for Zyxel IES-500x, but connected to {ITEM.VALUE}</p>|`not(last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.model)="IES-5000" or last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.model)="IES-5005")`|Info|**Manual close**: Yes|
+|ZYXEL: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime)>0 and last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime)<10m) or (last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.hw.uptime)=0 and last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.uptime)<10m)`|Info|**Manual close**: Yes|
 
 ### LLD rule Slot discovery
 
@@ -91,13 +91,13 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Slot {#ZYXEL.SLOT.ID}: Firmware has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.fw.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.fw.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.fw.ver[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
-|Slot {#ZYXEL.SLOT.ID}: Driver has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.dv.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.dv.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.dv.ver[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
-|Slot {#ZYXEL.SLOT.ID}: DSL modem code has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.cv.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.cv.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.cv.ver[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
-|Slot {#ZYXEL.SLOT.ID} alarm|<p>The slot reported an error.</p>|`find(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.alarm[{#SNMPINDEX}],,"like","moduleNoDefect")=0`|Average|**Manual close**: Yes|
-|Slot {#ZYXEL.SLOT.ID}: Hardware version has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.hw.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.hw.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.hw.ver[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
-|Slot {#ZYXEL.SLOT.ID} has been replaced|<p>Slot {#ZYXEL.SLOT.ID} serial number has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.serial[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.serial[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.serial[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
-|Slot {#ZYXEL.SLOT.ID} has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.uptime[{#SNMPINDEX}])<10m`|Info|**Manual close**: Yes|
+|ZYXEL: Slot {#ZYXEL.SLOT.ID}: Firmware has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.fw.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.fw.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.fw.ver[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|ZYXEL: Slot {#ZYXEL.SLOT.ID}: Driver has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.dv.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.dv.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.dv.ver[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|ZYXEL: Slot {#ZYXEL.SLOT.ID}: DSL modem code has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.cv.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.cv.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.cv.ver[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|ZYXEL: Slot {#ZYXEL.SLOT.ID} alarm|<p>The slot reported an error.</p>|`find(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.alarm[{#SNMPINDEX}],,"like","moduleNoDefect")=0`|Average|**Manual close**: Yes|
+|ZYXEL: Slot {#ZYXEL.SLOT.ID}: Hardware version has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.hw.ver[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.hw.ver[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.hw.ver[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|ZYXEL: Slot {#ZYXEL.SLOT.ID} has been replaced|<p>Slot {#ZYXEL.SLOT.ID} serial number has changed. Acknowledge to close the problem manually.</p>|`last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.serial[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.serial[{#SNMPINDEX}],#2) and length(last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.serial[{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|ZYXEL: Slot {#ZYXEL.SLOT.ID} has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.slot.uptime[{#SNMPINDEX}])<10m`|Info|**Manual close**: Yes|
 
 ### LLD rule Fan discovery
 
@@ -115,7 +115,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|FAN{#SNMPINDEX} is in critical state|<p>Please check the fan unit</p>|`last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW} or last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.fan[{#SNMPINDEX}])>{#ZYXEL.FANRPM.THRESH.HIGH}`|Average||
+|ZYXEL: FAN{#SNMPINDEX} is in critical state|<p>Please check the fan unit</p>|`last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.fan[{#SNMPINDEX}])<{#ZYXEL.FANRPM.THRESH.LOW} or last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.fan[{#SNMPINDEX}])>{#ZYXEL.FANRPM.THRESH.HIGH}`|Average||
 
 ### LLD rule Temperature discovery
 
@@ -133,7 +133,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Temperature Slot {#ZYXEL.SLOT.ID} Sensor: {#ZYXEL.TEMP.ID} is in critical state|<p>Please check the temperature</p>|`last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH} or last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.temp[{#SNMPINDEX}])<{#ZYXEL.TEMP.THRESH.LOW}`|Average||
+|ZYXEL: Temperature Slot {#ZYXEL.SLOT.ID} Sensor: {#ZYXEL.TEMP.ID} is in critical state|<p>Please check the temperature</p>|`last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.temp[{#SNMPINDEX}])>{#ZYXEL.TEMP.THRESH.HIGH} or last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.temp[{#SNMPINDEX}])<{#ZYXEL.TEMP.THRESH.LOW}`|Average||
 
 ### LLD rule Voltage discovery
 
@@ -151,7 +151,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Voltage Slot {#ZYXEL.SLOT.ID} {#ZYXEL.VOLT.NOMINAL} is in critical state|<p>Please check the power supply</p>|`last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW} or last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.volt[{#SNMPINDEX}])>{#ZYXEL.VOLT.THRESH.HIGH}`|Average||
+|ZYXEL: Voltage Slot {#ZYXEL.SLOT.ID} {#ZYXEL.VOLT.NOMINAL} is in critical state|<p>Please check the power supply</p>|`last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.volt[{#SNMPINDEX}])<{#ZYXEL.VOLT.THRESH.LOW} or last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.volt[{#SNMPINDEX}])>{#ZYXEL.VOLT.THRESH.HIGH}`|Average||
 
 ### LLD rule CPU discovery
 
@@ -169,7 +169,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Slot {#ZYXEL.SLOT.ID} high CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/ZYXEL IES-500x by SNMP/zyxel.ies500x.cpu[{#SNMPINDEX}],5m)>{#ZYXEL.CPU.THRESH.HIGH}`|Warning||
+|ZYXEL: Slot {#ZYXEL.SLOT.ID} high CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/ZYXEL IES-500x by SNMP/zyxel.ies500x.cpu[{#SNMPINDEX}],5m)>{#ZYXEL.CPU.THRESH.HIGH}`|Warning||
 
 ### LLD rule Memory discovery
 
@@ -187,7 +187,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|High memory utilization in Slot {#ZYXEL.SLOT.ID} pool|<p>The system is running out of free memory.</p>|`min(/ZYXEL IES-500x by SNMP/zyxel.ies500x.memory[{#SNMPINDEX}],5m)>{#ZYXEL.MEMORYHIGHTHRESH}`|Average||
+|ZYXEL: High memory utilization in Slot {#ZYXEL.SLOT.ID} pool|<p>The system is running out of free memory.</p>|`min(/ZYXEL IES-500x by SNMP/zyxel.ies500x.memory[{#SNMPINDEX}],5m)>{#ZYXEL.MEMORYHIGHTHRESH}`|Average||
 
 ### LLD rule Packet buffer discovery
 
@@ -205,7 +205,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|High Packet buffer utilization in Slot {#ZYXEL.SLOT.ID}|<p>The system is running out of free buffer.</p>|`min(/ZYXEL IES-500x by SNMP/zyxel.ies500x.buffer[{#SNMPINDEX}],5m)>{#ZYXEL.BUFFERHIGHTHRESH}`|Average||
+|ZYXEL: High Packet buffer utilization in Slot {#ZYXEL.SLOT.ID}|<p>The system is running out of free buffer.</p>|`min(/ZYXEL IES-500x by SNMP/zyxel.ies500x.buffer[{#SNMPINDEX}],5m)>{#ZYXEL.BUFFERHIGHTHRESH}`|Average||
 
 ### LLD rule Ethernet interface discovery
 
@@ -237,7 +237,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Port {#SNMPINDEX}: Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.if.operstatus[{#SNMPINDEX}],#2)`|Average|**Manual close**: Yes|
+|ZYXEL: Port {#SNMPINDEX}: Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.if.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.if.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.if.operstatus[{#SNMPINDEX}],#2)`|Average|**Manual close**: Yes|
 
 ### LLD rule ADSL interface discovery
 
@@ -272,11 +272,11 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.adsl.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.adsl.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.adsl.operstatus[{#SNMPINDEX}],#2)`|Average|**Manual close**: Yes|
-|Low the DSL line noise margins in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}|<p>Signal-to-noise margin (SNR Margin) which is the difference between the actual SNR and the SNR required to sync at a specific speed</p>|`min(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.adsl.atuc.snrmgn[{#SNMPINDEX}],5m)<{$ZYXEL.ADSL.SNR.MIN}`|Warning||
-|High the DSL line attenuation in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}|<p>The reductions in amplitude of the downstream and upstream DSL signals.</p>|`min(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.adsl.atuc.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}`|Warning||
-|Low the DSL line noise margins in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}|<p>Signal-to-noise margin (SNR Margin) which is the difference between the actual SNR and the SNR required to sync at a specific speed</p>|`min(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.adsl.atur.snrmgn[{#SNMPINDEX}],5m)<{$ZYXEL.ADSL.SNR.MIN}`|Warning||
-|High the DSL line attenuation in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}|<p>The reductions in amplitude of the downstream and upstream DSL signals.</p>|`min(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.adsl.atur.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}`|Warning||
+|ZYXEL: Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}: Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.adsl.operstatus[{#SNMPINDEX}])=2 and last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.adsl.operstatus[{#SNMPINDEX}],#1)<>last(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.adsl.operstatus[{#SNMPINDEX}],#2)`|Average|**Manual close**: Yes|
+|ZYXEL: Low the DSL line noise margins in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}|<p>Signal-to-noise margin (SNR Margin) which is the difference between the actual SNR and the SNR required to sync at a specific speed</p>|`min(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.adsl.atuc.snrmgn[{#SNMPINDEX}],5m)<{$ZYXEL.ADSL.SNR.MIN}`|Warning||
+|ZYXEL: High the DSL line attenuation in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}|<p>The reductions in amplitude of the downstream and upstream DSL signals.</p>|`min(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.adsl.atuc.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}`|Warning||
+|ZYXEL: Low the DSL line noise margins in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}|<p>Signal-to-noise margin (SNR Margin) which is the difference between the actual SNR and the SNR required to sync at a specific speed</p>|`min(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.adsl.atur.snrmgn[{#SNMPINDEX}],5m)<{$ZYXEL.ADSL.SNR.MIN}`|Warning||
+|ZYXEL: High the DSL line attenuation in Slot {#ZYXEL.SLOT.ID} Port {#ZYXEL.PORTID}|<p>The reductions in amplitude of the downstream and upstream DSL signals.</p>|`min(/ZYXEL IES-500x by SNMP/zyxel.ies500x.net.adsl.atur.atn[{#SNMPINDEX}],5m)>{$ZYXEL.ADSL.ATN.MAX}`|Warning||
 
 ## Feedback
 

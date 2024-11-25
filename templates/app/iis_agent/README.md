@@ -91,10 +91,10 @@ You can also add additional context macro {$IIS.APPPOOL.MONITORED:<AppPoolName>}
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|The World Wide Web Publishing Service (W3SVC) is not running|<p>The World Wide Web Publishing Service (W3SVC) is not in the running state. IIS cannot start.</p>|`last(/IIS by Zabbix agent/service.info[W3SVC])<>0`|High|**Depends on**:<br><ul><li>Windows process Activation Service (WAS) is not running</li></ul>|
-|Windows process Activation Service (WAS) is not running|<p>Windows Process Activation Service (WAS) is not in the running state. IIS cannot start.</p>|`last(/IIS by Zabbix agent/service.info[WAS])<>0`|High||
-|Port {$IIS.PORT} is down||`last(/IIS by Zabbix agent/net.tcp.service[{$IIS.SERVICE},,{$IIS.PORT}])=0`|Average|**Manual close**: Yes<br>**Depends on**:<br><ul><li>The World Wide Web Publishing Service (W3SVC) is not running</li></ul>|
-|has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/IIS by Zabbix agent/perf_counter_en["\Web Service(_Total)\Service Uptime"])<10m`|Info|**Manual close**: Yes|
+|IIS: The World Wide Web Publishing Service (W3SVC) is not running|<p>The World Wide Web Publishing Service (W3SVC) is not in the running state. IIS cannot start.</p>|`last(/IIS by Zabbix agent/service.info[W3SVC])<>0`|High|**Depends on**:<br><ul><li>IIS: Windows process Activation Service (WAS) is not running</li></ul>|
+|IIS: Windows process Activation Service (WAS) is not running|<p>Windows Process Activation Service (WAS) is not in the running state. IIS cannot start.</p>|`last(/IIS by Zabbix agent/service.info[WAS])<>0`|High||
+|IIS: Port {$IIS.PORT} is down||`last(/IIS by Zabbix agent/net.tcp.service[{$IIS.SERVICE},,{$IIS.PORT}])=0`|Average|**Manual close**: Yes<br>**Depends on**:<br><ul><li>IIS: The World Wide Web Publishing Service (W3SVC) is not running</li></ul>|
+|IIS: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/IIS by Zabbix agent/perf_counter_en["\Web Service(_Total)\Service Uptime"])<10m`|Info|**Manual close**: Yes|
 
 ### LLD rule Application pools discovery
 
@@ -115,10 +115,10 @@ You can also add additional context macro {$IIS.APPPOOL.MONITORED:<AppPoolName>}
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#APPPOOL} has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/IIS by Zabbix agent/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool Uptime"])<10m`|Info|**Manual close**: Yes|
-|Application pool {#APPPOOL} is not in Running state||`last(/IIS by Zabbix agent/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"])<>3 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1`|High|**Depends on**:<br><ul><li>The World Wide Web Publishing Service (W3SVC) is not running</li></ul>|
-|Application pool {#APPPOOL} has been recycled||`last(/IIS by Zabbix agent/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"],#1)<>last(/IIS by Zabbix agent/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"],#2) and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1`|Info||
-|Request queue of {#APPPOOL} is too large||`min(/IIS by Zabbix agent/perf_counter_en["\HTTP Service Request Queues({#APPPOOL})\CurrentQueueSize"],{$IIS.QUEUE.MAX.TIME})>{$IIS.QUEUE.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Application pool {#APPPOOL} is not in Running state</li></ul>|
+|IIS: {#APPPOOL} has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/IIS by Zabbix agent/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool Uptime"])<10m`|Info|**Manual close**: Yes|
+|IIS: Application pool {#APPPOOL} is not in Running state||`last(/IIS by Zabbix agent/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Current Application Pool State"])<>3 and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1`|High|**Depends on**:<br><ul><li>IIS: The World Wide Web Publishing Service (W3SVC) is not running</li></ul>|
+|IIS: Application pool {#APPPOOL} has been recycled||`last(/IIS by Zabbix agent/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"],#1)<>last(/IIS by Zabbix agent/perf_counter_en["\APP_POOL_WAS({#APPPOOL})\Total Application Pool Recycles"],#2) and {$IIS.APPPOOL.MONITORED:"{#APPPOOL}"}=1`|Info||
+|IIS: Request queue of {#APPPOOL} is too large||`min(/IIS by Zabbix agent/perf_counter_en["\HTTP Service Request Queues({#APPPOOL})\CurrentQueueSize"],{$IIS.QUEUE.MAX.TIME})>{$IIS.QUEUE.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>IIS: Application pool {#APPPOOL} is not in Running state</li></ul>|
 
 ## Feedback
 
