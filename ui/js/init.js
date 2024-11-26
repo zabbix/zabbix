@@ -260,17 +260,23 @@ jQuery(function($) {
 					my: 'left top',
 					at: 'left bottom',
 					using: (pos, data) => {
+						const wrapper = document.querySelector('.wrapper');
+						const menu = data.element.element[0];
 						const wrapper_rect = document.querySelector('.wrapper').getBoundingClientRect();
+						const margin_right = Math.max(10, wrapper_rect.width - wrapper.clientWidth);
+						const margin_bottom = Math.max(10, wrapper_rect.height - wrapper.clientHeight);
 
-						const max_left = data.horizontal === 'left'
-							? wrapper_rect.right
-							: wrapper_rect.right - data.element.width;
+						menu.style.maxHeight = `calc(100vh - ${10 + margin_bottom}px)`;
 
-						pos.top = Math.max(0, pos.top);
+						const max_left = wrapper_rect.right - menu.offsetWidth - margin_right;
+
+						pos.top = Math.max(10,
+							Math.min(pos.top, wrapper_rect.bottom - margin_bottom - data.element.height)
+						);
 						pos.left = Math.max(wrapper_rect.left, Math.min(max_left, pos.left));
 
-						data.element.element[0].style.top = `${pos.top}px`;
-						data.element.element[0].style.left = `${pos.left}px`;
+						menu.style.top = `${pos.top}px`;
+						menu.style.left = `${pos.left}px`;
 					}
 				};
 		}

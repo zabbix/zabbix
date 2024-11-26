@@ -627,13 +627,7 @@ class CTabFilter extends CBaseComponent {
 					dropdown.push({items: dropdown_items});
 				}
 
-				$(this._target).menuPopup(dropdown, new jQuery.Event(ev), {
-					position: {
-						of: ev.target,
-						my: 'left bottom',
-						at: 'left top'
-					}
-				});
+				$(this._target).menuPopup(dropdown, new jQuery.Event(ev));
 			},
 
 			/**

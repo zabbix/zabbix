@@ -3029,11 +3029,12 @@ $form-icon-btn: (
 
 .menu-popup {
 	position: fixed;
-	overflow-y: auto;
 	z-index: 1001;
 	padding: 5px 15px 5px 25px;
+	box-sizing: border-box;
 	min-width: 166px;
 	max-width: 250px;
+	overflow-y: auto;
 	background-color: $ui-bg-color;
 	border: 1px solid $overlay-border-color;
 	border-bottom-color: darken($overlay-border-color, 1%);
