@@ -18,12 +18,12 @@ You can extend it or create your template for your specific needs.
 ## DB configuration
 The plugin requires a user with the following permissions.
 
-* For MySQL (version 5.7), Percona (version 8.0), MariaDB (version 10.4).
+* MySQL (version 5.7), Percona (version 8.0), MariaDB (version 10.4).
 ```
 CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
 GRANT REPLICATION CLIENT, PROCESS, SHOW DATABASES, SHOW VIEW ON *.* TO 'zbx_monitor'@'%';
 ```
-* MariaDB (version >= 10.5.8-5).
+* MariaDB slave instance (version >= 10.5.8-5).
 ```
 CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
 GRANT REPLICATION CLIENT, PROCESS, SHOW DATABASES, SHOW VIEW, SLAVE MONITOR ON *.* TO 'zbx_monitor'@'%';
