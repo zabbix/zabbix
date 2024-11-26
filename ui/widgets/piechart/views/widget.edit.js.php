@@ -43,6 +43,11 @@ window.widget_pie_chart_form = new class {
 	 */
 	#templateid;
 
+	/**
+	 * @type {number}
+	 */
+	#dataset_row_unique_id = 0;
+
 	init({form_tabs_id, color_palette, templateid}) {
 		colorPalette.setThemeColors(color_palette);
 
@@ -50,6 +55,9 @@ window.widget_pie_chart_form = new class {
 		this.#dataset_wrapper = document.getElementById('data_sets');
 
 		this.#templateid = templateid;
+
+		this.#dataset_row_unique_id =
+			this.#dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').length;
 
 		jQuery('.overlay-dialogue-body').off('scroll');
 
@@ -73,22 +81,36 @@ window.widget_pie_chart_form = new class {
 		this.#updateDatasetsLabel();
 
 		// Initialize vertical accordion.
-		jQuery(this.#dataset_wrapper)
-			.on('focus', '.<?= CMultiSelect::ZBX_STYLE_CLASS ?> input.input', function() {
-				jQuery('#data_sets').zbx_vertical_accordion('expandNth',
-					jQuery(this).closest('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').index()
+
+		const $data_sets = jQuery(this.#dataset_wrapper);
+
+		$data_sets
+			.on('focus', '.<?= CMultiSelect::ZBX_STYLE_CLASS ?> input.input', function(e) {
+				const list_item = e.target.closest('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>');
+
+				if (list_item.classList.contains('<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>')) {
+					return;
+				}
+
+				$data_sets.zbx_vertical_accordion('expandNth',
+					[...list_item.parentElement.children].indexOf(list_item)
 				);
 			})
-			.on('click', function(e) {
+			.on('click', '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', function(e) {
 				if (!e.target.classList.contains('color-picker-preview')) {
 					jQuery.colorpicker('hide');
 				}
 
+				const list_item = e.target.closest('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>');
+
+				if (list_item.classList.contains('<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>')) {
+					return;
+				}
+
 				if (e.target.classList.contains('js-click-expand')
-						|| e.target.classList.contains('color-picker-preview')
-						|| e.target.classList.contains('<?= ZBX_STYLE_BTN_GREY ?>')) {
-					jQuery('#data_sets').zbx_vertical_accordion('expandNth',
-						jQuery(e.target).closest('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').index()
+						|| e.target.classList.contains('color-picker-preview')) {
+					$data_sets.zbx_vertical_accordion('expandNth',
+						[...list_item.parentElement.children].indexOf(list_item)
 					);
 				}
 			})
@@ -120,9 +142,6 @@ window.widget_pie_chart_form = new class {
 				}
 			})
 			.zbx_vertical_accordion({handler: '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE ?>'});
-
-		// Initialize pattern fields.
-		jQuery('.multiselect', jQuery(this.#dataset_wrapper)).multiSelect();
 
 		for (const colorpicker of jQuery('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			jQuery(colorpicker).colorpicker({
@@ -251,21 +270,22 @@ window.widget_pie_chart_form = new class {
 			}
 		}
 
-		this.#dataset_wrapper.insertAdjacentHTML('beforeend', template.evaluate({
-			rowNum: this.#dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').length,
+		const fragment = document.createRange().createContextualFragment(template.evaluate({
+			rowNum: this.#dataset_row_unique_id++,
 			color: type == <?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>
 				? ''
 				: colorPalette.getNextColor(used_colors)
 		}));
 
+		this.#dataset_wrapper.append(fragment);
+
+		this.#updateVariableOrder(this.#dataset_wrapper, '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
+		this.#updateDatasetsLabel();
+
 		const dataset = this.#getOpenedDataset();
 
 		for (const colorpicker of dataset.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			jQuery(colorpicker).colorpicker({appendTo: '.overlay-dialogue-body'});
-		}
-
-		for (const multiselect of dataset.querySelectorAll('.multiselect')) {
-			jQuery(multiselect).multiSelect();
 		}
 
 		const $overlay_body = jQuery('.overlay-dialogue-body')
