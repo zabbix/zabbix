@@ -300,21 +300,34 @@ func PdhEnumObjectItems(objectName string) (instances []Instance, err error) {
 }
 
 func PdhEnumObject() (objects []string, err error) {
+	const objectListSizeInit = 16384
 	var objectListSize uint32
-	ret, _, _ := syscall.Syscall6(pdhEnumObjects, 6, 0, 0, 0, uintptr(unsafe.Pointer(&objectListSize)),
-		uintptr(PERF_DETAIL_WIZARD), bool2uintptr(true))
-	if ret != PDH_MORE_DATA {
-		return nil, newPdhError(ret)
-	}
 
-	if objectListSize < 1 {
-		return nil, fmt.Errorf("No objects found.")
-	}
-
+	objectListSize = objectListSizeInit
+	objectListSizeLog := objectListSize
 	objectBuf := make([]uint16, objectListSize)
-	ret, _, _ = syscall.Syscall6(pdhEnumObjects, 6, 0, 0, uintptr(unsafe.Pointer(&objectBuf[0])),
-		uintptr(unsafe.Pointer(&objectListSize)), uintptr(PERF_DETAIL_WIZARD),
-		bool2uintptr(false))
+
+	ret, _, _ := syscall.Syscall6(pdhEnumObjects, 6, 0, 0, uintptr(unsafe.Pointer(&objectBuf[0])),
+		uintptr(unsafe.Pointer(&objectListSize)), uintptr(PERF_DETAIL_WIZARD), bool2uintptr(true))
+	if ret == PDH_MORE_DATA {
+		log.Debugf("PdhEnumObject() %d is not enough buffer size", objectListSizeLog)
+		objectListSize = 0
+		ret, _, _ = syscall.Syscall6(pdhEnumObjects, 6, 0, 0, 0, uintptr(unsafe.Pointer(&objectListSize)),
+			uintptr(PERF_DETAIL_WIZARD), bool2uintptr(true))
+		if ret != PDH_MORE_DATA {
+			return nil, newPdhError(ret)
+		}
+		log.Debugf("pdhEnumObjects() asks for buffer size: %d", objectListSize)
+
+		if objectListSize < 1 {
+			return nil, fmt.Errorf("No objects found.")
+		}
+
+		objectListSize *= 2
+		objectBuf = make([]uint16, objectListSize)
+		ret, _, _ = syscall.Syscall6(pdhEnumObjects, 6, 0, 0, uintptr(unsafe.Pointer(&objectBuf[0])),
+			uintptr(unsafe.Pointer(&objectListSize)), uintptr(PERF_DETAIL_WIZARD), bool2uintptr(false))
+	}
 	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
 		return nil, newPdhError(ret)
 	}
@@ -328,6 +341,8 @@ func PdhEnumObject() (objects []string, err error) {
 		}
 		objects = append(objects, windows.UTF16ToString(singleName))
 	}
+
+	log.Debugf("PdhEnumObject() got %d objects", len(objects))
 
 	return objects, nil
 }
