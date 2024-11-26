@@ -64,7 +64,7 @@ class CCheckBoxList extends CList {
 	/**
 	 * @var bool
 	 */
-	protected $show_titles = false;
+	protected bool $show_titles = false;
 
 	/**
 	 * @param string $name
