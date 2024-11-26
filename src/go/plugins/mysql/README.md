@@ -29,7 +29,6 @@ CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
 GRANT REPLICATION CLIENT, PROCESS, SHOW DATABASES, SHOW VIEW, SLAVE MONITOR ON *.* TO 'zbx_monitor'@'%';
 ```
 
-
 ## Plugin Installation
 The plugin is supplied as part of the Zabbix Agent 2 and does not require any special installation steps. Once 
 Zabbix Agent 2 is installed, the plugin is ready to work. Now you need to make sure that a MySQL instance is 
