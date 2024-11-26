@@ -399,9 +399,10 @@ static void	db_get_query_events(zbx_vector_ptr_t *event_queries, zbx_vector_ptr_
  * Parameters: suppressed_num - [OUT] the number of suppressed events         *
  *                                                                            *
  ******************************************************************************/
-static void	db_update_event_suppress_data(int *suppressed_num)
+static int	db_update_event_suppress_data(int *suppressed_num)
 {
 	zbx_vector_ptr_t	event_queries, event_data;
+	int			txn_rc = ZBX_DB_OK;
 
 	*suppressed_num = 0;
 
@@ -551,17 +552,18 @@ static void	db_update_event_suppress_data(int *suppressed_num)
 		zbx_db_insert_autoincrement(&db_insert, "event_suppressid");
 		zbx_db_insert_execute(&db_insert);
 cleanup:
-		DBcommit();
-
-		if (0 != del_event_maintenances.values_num || 0 != suppressed.values_num)
+		if (ZBX_DB_OK == (txn_rc = DBcommit()))
 		{
-			if (0 != zbx_dc_get_itservices_num())
+			if (0 != del_event_maintenances.values_num || 0 != suppressed.values_num)
 			{
-				if (0 != del_event_maintenances.values_num)
-					service_send_suppression_data(&del_event_maintenances, 0);
+				if (0 != zbx_dc_get_itservices_num())
+				{
+					if (0 != del_event_maintenances.values_num)
+						service_send_suppression_data(&del_event_maintenances, 0);
 
-				if (0 != suppressed.values_num)
-					service_send_suppression_data(&suppressed, 1);
+					if (0 != suppressed.values_num)
+						service_send_suppression_data(&suppressed, 1);
+				}
 			}
 		}
 
@@ -579,6 +581,8 @@ cleanup:
 
 	zbx_vector_ptr_clear_ext(&event_queries, (zbx_clean_func_t)zbx_event_suppress_query_free);
 	zbx_vector_ptr_destroy(&event_queries);
+
+	return txn_rc;
 }
 
 /******************************************************************************
@@ -681,7 +685,8 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 				if (SUCCEED == update)
 				{
 					zbx_dc_maintenance_set_update_flags();
-					db_update_event_suppress_data(&events_num);
+					while (ZBX_DB_DOWN == db_update_event_suppress_data(&events_num))
+						;
 					zbx_dc_maintenance_reset_update_flag(process_num);
 				}
 				else
@@ -700,7 +705,8 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 			zbx_setproctitle("%s #%d [%s, processing maintenances]", get_process_type_string(process_type),
 					process_num, info);
 
-			db_update_event_suppress_data(&events_num);
+			while (ZBX_DB_DOWN == db_update_event_suppress_data(&events_num))
+				;
 
 			info_offset = 0;
 			zbx_snprintf_alloc(&info, &info_alloc, &info_offset, "suppressed %d events in " ZBX_FS_DBL

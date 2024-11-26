@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-06-12T11:59:16Z'
+  date: '2024-10-31T12:21:41Z'
   groups:
     - uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -1236,10 +1236,6 @@ zabbix_export:
                   item:
                     host: 'Linux by Zabbix agent active'
                     key: 'vfs.dev.util[{#DEVNAME}]'
-          preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
         - uuid: 5c9b5dbed44c4af0957ff9316f8fb761
           name: 'Mounted filesystem discovery'
           type: ZABBIX_ACTIVE

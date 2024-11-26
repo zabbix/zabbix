@@ -815,36 +815,6 @@ else {
 		$data['graphs'][$gnum]['graphtype'] = graphType($graph['graphtype']);
 	}
 
-	if (!hasRequest('parent_discoveryid')) {
-		$items = API::Item()->get([
-			'output' => ['itemid'],
-			'selectGraphs' => ['graphid'],
-			'selectItemDiscovery' => ['ts_delete'],
-			'graphids' => array_keys($data['graphs']),
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
-		]);
-
-		foreach ($items as $item) {
-			$ts_delete = $item['itemDiscovery']['ts_delete'];
-
-			if ($ts_delete == 0) {
-				continue;
-			}
-
-			foreach (array_column($item['graphs'], 'graphid') as $graphid) {
-				if (!array_key_exists('ts_delete', $data['graphs'][$graphid]['graphDiscovery'])) {
-					$data['graphs'][$graphid]['graphDiscovery']['ts_delete'] = $ts_delete;
-				}
-				else {
-					$graph_ts_delete = $data['graphs'][$graphid]['graphDiscovery']['ts_delete'];
-					$data['graphs'][$graphid]['graphDiscovery']['ts_delete'] = ($graph_ts_delete > 0)
-						? min($ts_delete, $graph_ts_delete)
-						: $ts_delete;
-				}
-			}
-		}
-	}
-
 	order_result($data['graphs'], $sort_field, $sort_order);
 
 	$data['parent_templates'] = getGraphParentTemplates($data['graphs'], ($data['parent_discoveryid'] === null)

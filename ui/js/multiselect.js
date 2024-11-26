@@ -281,19 +281,11 @@
 		setDisabledEntries: function (entries) {
 			this.each(function() {
 				const $obj = $(this);
-				const ms_parameters = $obj.data('multiSelect');
+				const ms = $obj.data('multiSelect');
 
-				if (typeof ms_parameters === 'undefined') {
-					return;
+				if (ms?.options.popup.parameters !== undefined) {
+					ms.options.popup.parameters.disableids = entries;
 				}
-
-				const link = new Curl(ms_parameters.options.url, false);
-				link.setArgument('disabledids', entries);
-
-				ms_parameters.options.url = link.getUrl();
-				ms_parameters.options.popup.parameters.disableids = entries;
-
-				$obj.data('multiSelect', ms_parameters);
 			});
 		}
 	};
@@ -312,7 +304,6 @@
 	 * @param bool   options['data'][inaccessible]	(optional)
 	 * @param bool   options['data'][disabled]		(optional)
 	 * @param string options['placeholder']			set custom placeholder (optional)
-	 * @param array  options['excludeids']			the list of excluded ids (optional)
 	 * @param string options['defaultValue']		default value for input element (optional)
 	 * @param bool   options['disabled']			turn on/off disabled state (optional)
 	 * @param bool   options['readonly']		    turn on/off readonly state (optional)
@@ -352,7 +343,6 @@
 			},
 			placeholder: t('type here to search'),
 			data: [],
-			excludeids: [],
 			addNew: false,
 			defaultValue: null,
 			disabled: false,
@@ -598,7 +588,9 @@
 									cache: false,
 									data: jQuery.extend({
 										search: search,
-										limit: getLimit($obj),
+										limit: ms.options.limit !== 0
+											? ms.options.limit + getSkipSearchIds($obj).length + 1
+											: undefined
 									}, preselect_values)
 								})
 									.then(function(response) {
@@ -996,13 +988,13 @@
 			}
 		}
 
+		const skip_search_ids = getSkipSearchIds($obj);
+
 		var available_more = false;
 
 		$.each(data, function(i, item) {
 			if (ms.options.limit == 0 || objectSize(ms.values.available) < ms.options.limit) {
-				if (typeof ms.values.available[item.id] === 'undefined'
-						&& typeof ms.values.selected[item.id] === 'undefined'
-						&& ms.options.excludeids.indexOf(item.id) === -1) {
+				if (!skip_search_ids.includes(item.id)) {
 					ms.values.available[item.id] = item;
 				}
 			}
@@ -1282,11 +1274,13 @@
 		return !$obj.hasClass('search-disabled');
 	}
 
-	function getLimit($obj) {
-		var ms = $obj.data('multiSelect');
+	function getSkipSearchIds($obj) {
+		const ms = $obj.data('multiSelect');
 
-		return (ms.options.limit != 0)
-			? ms.options.limit + objectSize(ms.values.selected) + ms.options.excludeids.length + 1
-			: null;
+		return [...new Set([
+			...Object.keys(ms.values.selected),
+			...(ms.options.popup.parameters?.excludeids || []),
+			...(ms.options.popup.parameters?.disableids || [])
+		])];
 	}
 })(jQuery);
