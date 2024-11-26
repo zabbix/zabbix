@@ -566,7 +566,8 @@ class testPageNetworkDiscovery extends CWebTest {
 					],
 					'single' => true,
 					'action' => 'Delete',
-					'error' => 'Discovery rule "Discovery rule for deleting, used in Action" is used in "Action with discovery rule" action.'
+					'error' => 'Cannot delete discovery rule "Discovery rule for deleting, used in Action" because it is'.
+							' used in action "Action with discovery rule".'
 				]
 			],
 			// Delete action for discovery rule check which is used in action.
@@ -577,7 +578,8 @@ class testPageNetworkDiscovery extends CWebTest {
 					],
 					'single' => true,
 					'action' => 'Delete',
-					'error' => 'Discovery rule "Discovery rule for deleting, check used in Action" is used in "Action with discovery check" action.'
+					'error' => 'Cannot delete discovery rule "Discovery rule for deleting, check used in Action" because'.
+							' it is used in action "Action with discovery check".'
 				]
 			]
 		];

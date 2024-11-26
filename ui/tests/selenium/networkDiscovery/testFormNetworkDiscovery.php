@@ -1756,15 +1756,15 @@ class testFormNetworkDiscovery extends CWebTest {
 			[
 				[
 					'discovery' => self::DELETE_RULES['action_used'],
-					'error' => 'Discovery rule '.CXPathHelper::escapeQuotes(self::DELETE_RULES['action_used']).
-						' is used in "Action with discovery rule" action.'
+					'error' => 'Cannot delete discovery rule '.CXPathHelper::escapeQuotes(self::DELETE_RULES['action_used']).
+						' because it is used in action "Action with discovery rule".'
 				]
 			],
 			[
 				[
 					'discovery' => self::DELETE_RULES['action_check_used'],
-					'error' => 'Discovery rule '.CXPathHelper::escapeQuotes(self::DELETE_RULES['action_check_used']).
-						' is used in "Action with discovery check" action.'
+					'error' => 'Cannot delete discovery rule '.CXPathHelper::escapeQuotes(self::DELETE_RULES['action_check_used']).
+						' because it is used in action "Action with discovery rule".'
 				]
 			]
 		];
