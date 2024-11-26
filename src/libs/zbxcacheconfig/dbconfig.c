@@ -10423,7 +10423,9 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 			}
 
 			if (HOST_MONITORED_BY_SERVER == dc_host->monitored_by ||
-					SUCCEED == zbx_is_item_processed_by_server(dc_item->type, dc_item->key))
+					SUCCEED == zbx_is_item_processed_by_server(dc_item->type, dc_item->key) ||
+					ITEM_TYPE_TRAPPER == dc_item->type || (ITEM_TYPE_HTTPAGENT == dc_item->type &&
+					1 == dc_item->itemtype.httpitem->allow_traps))
 			{
 				dc_preproc_add_item_rec(dc_item, &items_sync);
 			}
