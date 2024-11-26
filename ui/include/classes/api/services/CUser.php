@@ -2064,6 +2064,10 @@ class CUser extends CApiService {
 				? $userIds
 				: [self::$userData['userid']];
 
+			if (!is_array($options['selectMedias']) && $options['selectMedias'] != API_OUTPUT_EXTEND) {
+				$options['selectMedias'] = ['mediaid'];
+			}
+
 			$db_medias = API::getApiService()->select('media', [
 				'output' => $this->outputExtend($options['selectMedias'], ['userid', 'mediaid', 'mediatypeid']),
 				'filter' => ['userid' => $media_userids],
