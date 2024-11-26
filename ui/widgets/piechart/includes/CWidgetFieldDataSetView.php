@@ -220,7 +220,6 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 			if ($host_pattern_field !== null) {
 				$dataset_head[] = $host_pattern_field;
 				$dataset_head[] = new CScriptTag($host_pattern_field->getPostJS());
-
 			}
 
 			$dataset_head[] = $item_pattern_field;
