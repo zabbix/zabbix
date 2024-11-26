@@ -57,11 +57,9 @@
 		$(window).scrollTop(scroll_pos);
 	}
 
+	// Update textarea height.
 	function updateHeight($textarea) {
-		const value = $textarea.val().replace(/\r?\n+$/g, '').replace(/\r?\n/g, ' ');
-
-		// Update textarea height.
-		if (value === '' && $textarea.attr('placeholder') !== '') {
+		if ($textarea.val() === '' && $textarea.attr('placeholder') !== '') {
 			// Calculation of scrollHeight property in firefox do not count placeholder dimension when value is empty.
 			const $clone = $textarea.clone()
 				.css('position', 'absolute')
@@ -71,12 +69,13 @@
 
 			$textarea.innerHeight($clone[0].scrollHeight);
 			$clone.remove();
+
+			return;
 		}
-		else {
-			$textarea
-				.height(0)
-				.innerHeight($textarea[0].scrollHeight);
-		}
+
+		$textarea
+			.height(0)
+			.innerHeight($textarea[0].scrollHeight);
 	}
 
 	var methods = {
