@@ -49,8 +49,19 @@
 			$textarea[0].setSelectionRange(pos, pos);
 		}
 
+		updateHeight($textarea);
+
+		// Fire event.
+		$textarea.trigger('resize');
+
+		$(window).scrollTop(scroll_pos);
+	}
+
+	function updateHeight($textarea) {
+		const value = $textarea.val().replace(/\r?\n+$/g, '').replace(/\r?\n/g, ' ');
+
 		// Update textarea height.
-		if (new_value === '' && $textarea.attr('placeholder') !== '') {
+		if (value === '' && $textarea.attr('placeholder') !== '') {
 			// Calculation of scrollHeight property in firefox do not count placeholder dimension when value is empty.
 			const $clone = $textarea.clone()
 				.css('position', 'absolute')
@@ -66,11 +77,6 @@
 				.height(0)
 				.innerHeight($textarea[0].scrollHeight);
 		}
-
-		// Fire event.
-		$textarea.trigger('resize');
-
-		$(window).scrollTop(scroll_pos);
 	}
 
 	var methods = {
@@ -82,6 +88,13 @@
 					.off('input keydown paste', update)
 					.on('input keydown paste', update)
 					.trigger('input');
+			});
+		},
+		updateHeight: function() {
+			return this.each(function() {
+				const $textarea = $(this);
+
+				updateHeight($textarea);
 			});
 		},
 		clean: function() {
