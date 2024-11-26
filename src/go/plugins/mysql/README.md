@@ -10,17 +10,32 @@ You can extend it or create your template for your specific needs.
 * Zabbix Agent 2
 * Go >= 1.13 (required only to build from source)
 
-## Supported versions
-* MySQL, version 5.7+
-* Percona, version 8.0+
-* MariaDB, version 10.4+
+## Tested DB versions
+* MySQL, version 5.7
+* Percona, version 8.0
+* MariaDB, version 10.4
 
-## Installation
+## DB configuration
+The plugin requires a user with the following permissions.
+
+* For MySQL (version 5.7), Percona (version 8.0), MariaDB (version 10.4).
+```
+CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
+GRANT REPLICATION CLIENT, PROCESS, SHOW DATABASES, SHOW VIEW ON *.* TO 'zbx_monitor'@'%';
+```
+* MariaDB (version >10.5.8-5).
+```
+CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
+GRANT REPLICATION CLIENT, PROCESS, SHOW DATABASES, SHOW VIEW, SLAVE MONITOR ON *.* TO 'zbx_monitor'@'%';
+```
+
+
+## Plugin Installation
 The plugin is supplied as part of the Zabbix Agent 2 and does not require any special installation steps. Once 
 Zabbix Agent 2 is installed, the plugin is ready to work. Now you need to make sure that a MySQL instance is 
 available for connection and configure monitoring.
 
-## Configuration
+## Plugin configuration
 Open the Zabbix Agent configuration file (zabbix_agent2.conf) and set the required parameters.
 
 **Plugins.Mysql.CallTimeout** — The maximum time in seconds for waiting when a request has to be done.  
