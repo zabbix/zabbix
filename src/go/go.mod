@@ -28,7 +28,7 @@ require (
 	golang.org/x/sync v0.8.0
 	golang.org/x/sys v0.26.0
 	golang.org/x/text v0.19.0
-	golang.zabbix.com/sdk v1.2.2-0.20241126085703-0f9ce62e28e1
+	golang.zabbix.com/sdk v1.2.2-0.20241126142911-f24a7742d7dd
 )
 
 require (
