@@ -23,7 +23,7 @@ The plugin requires a user with the following permissions.
 CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
 GRANT REPLICATION CLIENT, PROCESS, SHOW DATABASES, SHOW VIEW ON *.* TO 'zbx_monitor'@'%';
 ```
-* MariaDB (version >10.5.8-5).
+* MariaDB (version >= 10.5.8-5).
 ```
 CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
 GRANT REPLICATION CLIENT, PROCESS, SHOW DATABASES, SHOW VIEW, SLAVE MONITOR ON *.* TO 'zbx_monitor'@'%';
