@@ -7899,6 +7899,8 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
 .sidebar.is-compact:not(.is-opened) .menu-main > li.is-selected > a {
   background: #0c0c0c;
   border-left-color: transparent; }
+  .sidebar.is-compact:not(.is-opened) .menu-main > li.is-selected > a::before {
+    color: #ffffff; }
 
 a.btn-icon:link, a.btn-icon:hover, a.btn-icon:focus, a.btn-icon:visited,
 .btn-icon:link,
