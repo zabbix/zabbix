@@ -199,7 +199,7 @@ typedef struct
 	char			ssl_cert_file_orig[ZBX_ITEM_SSL_CERT_FILE_LEN_MAX], *ssl_cert_file;
 	char			ssl_key_file_orig[ZBX_ITEM_SSL_KEY_FILE_LEN_MAX], *ssl_key_file;
 	char			ssl_key_password_orig[ZBX_ITEM_SSL_KEY_PASSWORD_LEN_MAX], *ssl_key_password;
-	char			*script_params;
+	zbx_vector_ptr_pair_t 	script_params;
 	char			*error;
 	unsigned char		*formula_bin;
 	int			snmp_max_repetitions;

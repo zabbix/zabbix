@@ -15,6 +15,7 @@
 #include "checks_browser.h"
 
 #include "zbxembed.h"
+#include "zbxjson.h"
 
 int	get_value_browser(zbx_dc_item_t *item, const char *config_webdriver_url, const char *config_source_ip,
 		AGENT_RESULT *result)
@@ -22,6 +23,7 @@ int	get_value_browser(zbx_dc_item_t *item, const char *config_webdriver_url, con
 	char		*error = NULL, *script_bin = NULL, *output = NULL;
 	int		script_bin_sz, ret = NOTSUPPORTED;
 	zbx_es_t	es_engine;
+	struct zbx_json	json;
 
 	if (NULL == config_webdriver_url)
 	{
@@ -57,6 +59,8 @@ int	get_value_browser(zbx_dc_item_t *item, const char *config_webdriver_url, con
 		return ret;
 	}
 
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+
 	if (SUCCEED != zbx_es_compile(&es_engine, item->params, &script_bin, &script_bin_sz, &error))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot compile script: %s", error));
@@ -65,7 +69,13 @@ int	get_value_browser(zbx_dc_item_t *item, const char *config_webdriver_url, con
 
 	zbx_es_set_timeout(&es_engine, item->timeout);
 
-	if (SUCCEED != zbx_es_execute(&es_engine, NULL, script_bin, script_bin_sz, item->script_params, &output,
+	for (int i = 0; i < item->script_params.values_num; i++)
+	{
+		zbx_json_addstring(&json, (const char *)item->script_params.values[i].first,
+				(const char *)item->script_params.values[i].second, ZBX_JSON_TYPE_STRING);
+	}
+
+	if (SUCCEED != zbx_es_execute(&es_engine, NULL, script_bin, script_bin_sz, json.buffer, &output,
 			&error))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot execute script: %s", error));
@@ -75,6 +85,7 @@ int	get_value_browser(zbx_dc_item_t *item, const char *config_webdriver_url, con
 	ret = SUCCEED;
 	SET_TEXT_RESULT(result, NULL != output ? output : zbx_strdup(NULL, ""));
 err:
+	zbx_json_free(&json);
 	zbx_free(script_bin);
 	zbx_free(error);
 
