@@ -243,6 +243,10 @@ $arrow-fill-up-down: #000000;
 					> a {
 						background: $menu-main-expanded-bg-color;
 						border-left-color: $menu-main-expanded-border-color;
+
+						&::before {
+							color: $menu-main-expanded-icon-color;
+						}
 					}
 				}
 			}
