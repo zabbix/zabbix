@@ -48,6 +48,34 @@ class CWidgetHoneycomb extends CWidget {
 	 */
 	#items_loaded_count = 0;
 
+	/**
+	 * Cells data from the request.
+	 *
+	 * @type {Map<string, Object>}
+	 */
+	#cells_data = new Map();
+
+	/**
+	 * Host ID of selected cell
+	 *
+	 * @type {string|null}
+	 */
+	#selected_hostid = null;
+
+	/**
+	 * Item ID of selected cell
+	 *
+	 * @type {string|null}
+	 */
+	#selected_itemid = null;
+
+	/**
+	 * Key of selected item.
+	 *
+	 * @type {string|null}
+	 */
+	#selected_key_ = null;
+
 	onActivate() {
 		this.#items_max_count = this.#getItemsMaxCount();
 	}
@@ -98,12 +126,11 @@ class CWidgetHoneycomb extends CWidget {
 			this.#honeycomb.setSize(super._getContentsSize());
 
 			this.#honeycomb.getSVGElement().addEventListener(CSVGHoneycomb.EVENT_CELL_CLICK, e => {
-				this.broadcast({
-					[CWidgetsData.DATA_TYPE_HOST_ID]: [e.detail.hostid],
-					[CWidgetsData.DATA_TYPE_HOST_IDS]: [e.detail.hostid],
-					[CWidgetsData.DATA_TYPE_ITEM_ID]: [e.detail.itemid],
-					[CWidgetsData.DATA_TYPE_ITEM_IDS]: [e.detail.itemid]
-				});
+					this.#selected_hostid = e.detail.hostid;
+					this.#selected_itemid = e.detail.itemid;
+					this.#selected_key_ = this.#cells_data.get(this.#selected_itemid).key_;
+
+					this.#broadcast();
 			});
 
 			this.#honeycomb.getSVGElement().addEventListener(CSVGHoneycomb.EVENT_CELL_ENTER, e => {
@@ -123,6 +150,72 @@ class CWidgetHoneycomb extends CWidget {
 		this.#honeycomb.setValue({
 			cells: response.cells
 		});
+
+		if (this.#items_loaded_count === 0) {
+			return;
+		}
+
+		this.#cells_data.clear();
+		response.cells.forEach(cell => this.#cells_data.set(cell.itemid, cell));
+
+		if (!this.hasEverUpdated() && this.isReferred()) {
+			const selected_cell = this.#getDefaultSelectable();
+
+			if (selected_cell !== null) {
+				this.#selected_hostid = selected_cell.hostid;
+				this.#selected_itemid = selected_cell.itemid;
+				this.#selected_key_ = this.#cells_data.get(this.#selected_itemid).key_;
+
+				this.#honeycomb.selectCell(this.#selected_itemid);
+				this.#broadcast();
+			}
+		}
+		else if (this.#selected_itemid !== null) {
+			if (!this.#cells_data.has(this.#selected_itemid)) {
+				for (let [itemid, cell] of this.#cells_data) {
+					if (cell.key_ === this.#selected_key_) {
+						this.#selected_itemid = itemid;
+
+						this.#broadcast();
+						break;
+					}
+				}
+			}
+
+			this.#honeycomb.selectCell(this.#selected_itemid);
+		}
+	}
+
+	#broadcast() {
+		this.broadcast({
+			[CWidgetsData.DATA_TYPE_HOST_ID]: [this.#selected_hostid],
+			[CWidgetsData.DATA_TYPE_HOST_IDS]: [this.#selected_hostid],
+			[CWidgetsData.DATA_TYPE_ITEM_ID]: [this.#selected_itemid],
+			[CWidgetsData.DATA_TYPE_ITEM_IDS]: [this.#selected_itemid]
+		});
+	}
+
+	#getDefaultSelectable() {
+		return this.#honeycomb.getCellsData().length > 0
+			? this.#honeycomb.getCellsData()[0]
+			: null;
+	}
+
+	onReferredUpdate() {
+		if (this.#items_loaded_count === 0 || this.#selected_itemid !== null) {
+			return;
+		}
+
+		const selected_cell = this.#getDefaultSelectable();
+
+		if (selected_cell !== null) {
+			this.#selected_hostid = selected_cell.hostid;
+			this.#selected_itemid = selected_cell.itemid;
+			this.#selected_key_ = this.#cells_data.get(this.#selected_itemid).key_;
+
+			this.#honeycomb.selectCell(this.#selected_itemid);
+			this.#broadcast();
+		}
 	}
 
 	onClearContents() {

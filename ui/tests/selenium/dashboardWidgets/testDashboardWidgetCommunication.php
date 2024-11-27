@@ -3622,43 +3622,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 
 	public function getMixedBroadcastingWidgetData() {
 		return [
-			'Broadcasting only hostgroup' => [
-				[
-					'page' => 'Multi-broadcasting page',
-					'broadcasters' => [
-						'Map mixed broadcaster' => self::SECOND_HOSTGROUP_NAME
-
-					],
-					'expected' => [
-						'Both host and group from single broadcaster' => [
-							self::SECOND_HOST_NAME => 4
-						],
-						'Host and group from different broadcasters' => [
-							'Hosts' => self::SECOND_HOST_NAME,
-							'Trapper item' => '4'
-						]
-					]
-				]
-			],
-			'Broadcasting only host' => [
-				[
-					'page' => 'Multi-broadcasting page',
-					'broadcasters' => [
-						'Map mixed broadcaster' => self::THIRD_HOST_NAME,
-						'Honeycomb mixed broadcaster' => self::FIRST_HOST_NAME
-
-					],
-					'expected' => [
-						'Both host and group from single broadcaster' => [
-							self::THIRD_HOST_NAME => 5
-						],
-						'Host and group from different broadcasters' => [
-							'Hosts' => self::FIRST_HOST_NAME,
-							'Trapper item' => '3'
-						]
-					]
-				]
-			],
 			'Broadcasting hostgroups and hosts from the same map widget - first group and then host' => [
 				[
 					'page' => 'Multi-broadcasting page',
@@ -3674,14 +3637,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 							[
 								'Hosts' => self::FIRST_HOST_NAME,
 								'Trapper item' => '3'
-							],
-							[
-								'Hosts' => self::SECOND_HOST_NAME,
-								'Trapper item' => '4'
-							],
-							[
-								'Hosts' => self::THIRD_HOST_NAME,
-								'Trapper item' => '5'
 							]
 						]
 					]
@@ -3692,8 +3647,8 @@ class testDashboardWidgetCommunication extends testWidgets {
 					'page' => 'Multi-broadcasting page',
 					'broadcasters' => [
 						'Map mixed broadcaster' => self::SECOND_HOST_NAME,
-						'Map mixed broadcaster' => self::THIRD_HOSTGROUP_NAME
-
+						'Map mixed broadcaster' => self::THIRD_HOSTGROUP_NAME,
+						'Honeycomb mixed broadcaster' => self::THIRD_HOST_NAME
 					],
 					'expected' => [
 						'Both host and group from single broadcaster' => [
@@ -3765,32 +3720,6 @@ class testDashboardWidgetCommunication extends testWidgets {
 	}
 
 	/**
-	 * Check state of item listening widgets if nothing is selected in the broadcasting widget.
-	 */
-	public function testDashboardWidgetCommunication_CheckNoData() {
-		$no_data_listeners = [
-			'Gauge listener' => 'Awaiting data',
-			'Graph (classic) listener' => 'Awaiting data',
-			'Item value listener' => 'Awaiting data',
-			'Pie chart listener' => 'No data'
-		];
-
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
-		$dashboard->selectPage('Items page');
-
-		foreach ($no_data_listeners as $listener_name => $no_data_text) {
-			$element_class = ($no_data_text === 'Awaiting data')
-				? 'no-data-message'
-				: 'svg-pie-chart-total-value-no-data';
-
-			$this->assertEquals($no_data_text, $dashboard->getWidget($listener_name)->query('class', $element_class)
-					->one()->getText()
-			);
-		}
-	}
-
-	/**
 	 * Check listener widget behavior when broadcasting widget is deleted.
 	 */
 	public function testDashboardWidgetCommunication_BroadcasterDeletion() {
@@ -3824,12 +3753,12 @@ class testDashboardWidgetCommunication extends testWidgets {
 					],
 					'select' => [
 						'widget' => 'new',
-						'element' => self::SECOND_HOST_NAME
+						'element' => self::FIRST_HOST_NAME
 					],
 					'expected' => [
 						'Problems host listener' => [
-							'Host' => self::SECOND_HOST_NAME,
-							'Problem • Severity' => self::SECOND_HOST_TRIGGER
+							'Host' => self::FIRST_HOST_NAME,
+							'Problem • Severity' => self::FIRST_HOST_TRIGGER
 						]
 					]
 				]
@@ -3851,21 +3780,13 @@ class testDashboardWidgetCommunication extends testWidgets {
 					],
 					'select' => [
 						'widget' => 'new',
-						'element' => self::THIRD_HOST_NAME
+						'element' => self::SECOND_HOST_NAME
 					],
 					'expected' => [
 						'Problems host listener' => [
 							[
 								'Host' => self::THIRD_HOST_NAME,
 								'Problem • Severity' => self::THIRD_HOST_TRIGGER
-							],
-							[
-								'Host' => self::SECOND_HOST_NAME,
-								'Problem • Severity' => self::SECOND_HOST_TRIGGER
-							],
-							[
-								'Host' => self::FIRST_HOST_NAME,
-								'Problem • Severity' => self::FIRST_HOST_TRIGGER
 							]
 						]
 					]

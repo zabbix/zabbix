@@ -15,11 +15,21 @@
 
 class CEventHub {
 
+	static EVENT = '_EVENT';
+	static EVENT_NATIVE = 'native';
+	static EVENT_SUBSCRIBE = 'subscribe';
+	static EVENT_UNSUBSCRIBE = 'unsubscribe';
+
 	#subscribers = new Map();
 
 	#latest_data = new Map();
 
 	publish({data, descriptor}) {
+		descriptor = {
+			[CEventHub.EVENT]: CEventHub.EVENT_NATIVE,
+			...descriptor
+		};
+
 		descriptor = Object.keys(descriptor).sort().reduce(
 			(descriptor_sorted, key) => {
 				descriptor_sorted[key] = descriptor[key];
@@ -39,9 +49,13 @@ class CEventHub {
 				callback({data, descriptor});
 			}
 		}
+
+		return this;
 	}
 
 	subscribe({require = {}, callback}) {
+		require = {[CEventHub.EVENT]: CEventHub.EVENT_NATIVE, ...require};
+
 		for (const {data, descriptor} of [...this.#latest_data.values()].reverse()) {
 			if (CEventHub.#match(require, descriptor)) {
 				callback({data, descriptor});
@@ -54,11 +68,45 @@ class CEventHub {
 
 		this.#subscribers.set(subscription, {require, callback});
 
+		this
+			.publish({
+				data: require,
+				descriptor: {...require, [CEventHub.EVENT]: CEventHub.EVENT_SUBSCRIBE}
+			})
+			.invalidateData({[CEventHub.EVENT]: CEventHub.EVENT_SUBSCRIBE});
+
 		return subscription;
 	}
 
 	unsubscribe(subscription) {
-		return this.#subscribers.delete(subscription);
+		if (!this.#subscribers.has(subscription)) {
+			return false;
+		}
+
+		const {require} = this.#subscribers.get(subscription);
+
+		this.#subscribers.delete(subscription);
+
+		this
+			.publish({
+				data: require,
+				descriptor: {...require, [CEventHub.EVENT]: CEventHub.EVENT_UNSUBSCRIBE}
+			})
+			.invalidateData({[CEventHub.EVENT]: CEventHub.EVENT_UNSUBSCRIBE});
+
+		return true;
+	}
+
+	hasSubscribers(require = {}) {
+		require = {[CEventHub.EVENT]: CEventHub.EVENT_NATIVE, ...require};
+
+		for (const subscriber of this.#subscribers.values()) {
+			if (CEventHub.#match(require, subscriber.require)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	getData(require) {
@@ -77,6 +125,8 @@ class CEventHub {
 				this.#latest_data.delete(descriptor_hash);
 			}
 		}
+
+		return this;
 	}
 
 	static #match(require, descriptor) {

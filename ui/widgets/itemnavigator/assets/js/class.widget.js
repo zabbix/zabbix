@@ -37,6 +37,27 @@ class CWidgetItemNavigator extends CWidget {
 	#contents_scroll_top = 0;
 
 	/**
+	 * ID of selected item.
+	 *
+	 * @type {string|null}
+	 */
+	#selected_itemid = null;
+
+	/**
+	 * Key of selected item.
+	 *
+	 * @type {string|null}
+	 */
+	#selected_key_ = null;
+
+	/**
+	 * Items data from the request.
+	 *
+	 * @type {Map<string, {hostid: string, itemid: string, key_: string, name: string, problem_count: number[]}>}
+	 */
+	#items_data = new Map();
+
+	/**
 	 * CSRF token for navigation.tree.toggle action.
 	 *
 	 * @type {string|null}
@@ -75,6 +96,9 @@ class CWidgetItemNavigator extends CWidget {
 
 		this.#csrf_token = response[CSRF_TOKEN_NAME];
 
+		this.#items_data.clear();
+		response.items.forEach(item => this.#items_data.set(item.itemid, item));
+
 		if (this.#item_navigator === null) {
 			this.clearContents();
 
@@ -88,17 +112,67 @@ class CWidgetItemNavigator extends CWidget {
 		this.#item_navigator.setValue({
 			items: response.items,
 			hosts: response.hosts,
-			is_limit_exceeded: response.is_limit_exceeded
+			is_limit_exceeded: response.is_limit_exceeded,
+			selected_itemid: this.#selected_itemid
 		});
+
+		if (!this.hasEverUpdated() && this.isReferred()) {
+			this.#selected_itemid = this.#getDefaultSelectable();
+
+			if (this.#selected_itemid !== null) {
+				this.#selected_key_ = this.#items_data.get(this.#selected_itemid).key_;
+
+				this.#item_navigator.selectItem(this.#selected_itemid);
+			}
+		}
+		else if (this.#selected_itemid !== null) {
+			if (!this.#items_data.has(this.#selected_itemid)) {
+				for (let [itemid, item] of this.#items_data) {
+					if (item.key_ === this.#selected_key_) {
+						this.#selected_itemid = itemid;
+
+						this.#item_navigator.selectItem(this.#selected_itemid);
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	#broadcast() {
+		this.broadcast({
+			[CWidgetsData.DATA_TYPE_ITEM_ID]: [this.#selected_itemid],
+			[CWidgetsData.DATA_TYPE_ITEM_IDS]: [this.#selected_itemid]
+		});
+	}
+
+	#getDefaultSelectable() {
+		const selected_element = this._body.querySelector(`.${CNavigationTree.ZBX_STYLE_NODE_IS_ITEM}`);
+
+		return selected_element !== null ? selected_element.dataset.id : null;
+	}
+
+	onReferredUpdate() {
+		if (this.#item_navigator === null || this.#selected_itemid !== null) {
+			return;
+		}
+
+		this.#selected_itemid = this.#getDefaultSelectable();
+
+		if (this.#selected_itemid !== null) {
+			this.#selected_key_ = this.#items_data.get(this.#selected_itemid).key_;
+
+			this.#item_navigator.selectItem(this.#selected_itemid);
+		}
 	}
 
 	#registerListeners() {
 		this.#listeners = {
 			itemSelect: e => {
-				this.broadcast({
-					[CWidgetsData.DATA_TYPE_ITEM_ID]: [e.detail.itemid],
-					[CWidgetsData.DATA_TYPE_ITEM_IDS]: [e.detail.itemid]
-				});
+				this.#selected_itemid = e.detail.itemid;
+				this.#selected_key_ = this.#items_data.get(this.#selected_itemid).key_;
+
+				this.#broadcast();
 			},
 
 			groupToggle: e => {

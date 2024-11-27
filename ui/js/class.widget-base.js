@@ -91,6 +91,8 @@ class CWidgetBase {
 
 	#is_awaiting_data = false;
 
+	#has_ever_updated = false;
+
 	/**
 	 * Widget constructor. Invoked by a dashboard page.
 	 *
@@ -371,7 +373,7 @@ class CWidgetBase {
 	/**
 	 * Broadcast data to dependent widgets.
 	 *
-	 * @param {Object} data  Object containing key-value pairs, like { _hostid: "123", _itemid: "789" }.
+	 * @param {Object} data  Object containing key-value pairs, like { _hostid: ["123"], _itemid: ["789"] }.
 	 */
 	broadcast(data) {
 		const broadcast_types = this.getBroadcastTypes();
@@ -538,40 +540,64 @@ class CWidgetBase {
 
 		const broadcast_types = this.getBroadcastTypes();
 
-		const feedback_subscription = ZABBIX.EventHub.subscribe({
-			require: {
-				context: 'dashboard',
-				event_type: 'feedback',
-				reference: this._fields.reference
-			},
-			callback: ({data, descriptor}) => {
-				if (!('type' in descriptor) || !broadcast_types.includes(descriptor.type)) {
-					return;
-				}
+		if (broadcast_types.length > 0) {
+			for (const event of [CEventHub.EVENT_SUBSCRIBE, CEventHub.EVENT_UNSUBSCRIBE]) {
+				const event_subscription = ZABBIX.EventHub.subscribe({
+					require: {
+						[CEventHub.EVENT]: event,
+						context: 'dashboard',
+						event_type: 'broadcast',
+						reference: this._fields.reference
+					},
+					callback: ({descriptor}) => {
+						if (!('type' in descriptor) || !broadcast_types.includes(descriptor.type)) {
+							return;
+						}
 
-				if (JSON.stringify(this.#broadcast_cache.get(descriptor.type)) !== JSON.stringify(data)) {
-					this.#broadcast_cache.set(descriptor.type, data);
+						if (this._state === WIDGET_STATE_ACTIVE) {
+							this.onReferredUpdate();
+						}
+					}
+				});
 
-					if (this.onFeedback({type: descriptor.type, value: data})) {
-						ZABBIX.EventHub.publish({
-							data,
-							descriptor: {
-								context: 'dashboard',
-								sender_unique_id: this._unique_id,
-								sender_type: 'widget',
-								widget_type: this._type,
-								event_type: 'broadcast',
-								event_origin: descriptor.event_origin,
-								reference: this._fields.reference,
-								type: descriptor.type
-							}
-						});
+				this.#fields_referred_data_subscriptions.push(event_subscription);
+			}
+
+			const feedback_subscription = ZABBIX.EventHub.subscribe({
+				require: {
+					context: 'dashboard',
+					event_type: 'feedback',
+					reference: this._fields.reference
+				},
+				callback: ({data, descriptor}) => {
+					if (!('type' in descriptor) || !broadcast_types.includes(descriptor.type)) {
+						return;
+					}
+
+					if (JSON.stringify(this.#broadcast_cache.get(descriptor.type)) !== JSON.stringify(data)) {
+						this.#broadcast_cache.set(descriptor.type, data);
+
+						if (this.onFeedback({type: descriptor.type, value: data})) {
+							ZABBIX.EventHub.publish({
+								data,
+								descriptor: {
+									context: 'dashboard',
+									sender_unique_id: this._unique_id,
+									sender_type: 'widget',
+									widget_type: this._type,
+									event_type: 'broadcast',
+									event_origin: descriptor.event_origin,
+									reference: this._fields.reference,
+									type: descriptor.type
+								}
+							});
+						}
 					}
 				}
-			}
-		});
+			});
 
-		this.#fields_referred_data_subscriptions.push(feedback_subscription);
+			this.#fields_referred_data_subscriptions.push(feedback_subscription);
+		}
 	}
 
 	/**
@@ -689,6 +715,37 @@ class CWidgetBase {
 		}
 
 		return fields_data;
+	}
+
+	/**
+	 * Is this widget expected by other widgets to broadcast data of specified type.
+	 *
+	 * @param {string|null} type  Particular data type or null for any data type.
+	 *
+	 * @returns {boolean}
+	 */
+	isReferred(type = null) {
+		if (!('reference' in this._fields)) {
+			return false;
+		}
+
+		const require = {
+			context: 'dashboard',
+			event_type: 'broadcast',
+			reference: this._fields.reference
+		};
+
+		if (type !== null) {
+			require.type = type;
+		}
+
+		return ZABBIX.EventHub.hasSubscribers(require);
+	}
+
+	/**
+	 * Stub method redefined in class.widget.js.
+	 */
+	onReferredUpdate() {
 	}
 
 	// External events management methods.
@@ -1334,6 +1391,8 @@ class CWidgetBase {
 						}
 					});
 				}
+
+				this.#has_ever_updated = true;
 			})
 			.catch(exception => {
 				if (this._update_abort_controller.signal.aborted) {
@@ -1354,6 +1413,15 @@ class CWidgetBase {
 	 * Stub method redefined in class.widget.js.
 	 */
 	promiseUpdate() {
+	}
+
+	/**
+	 * Check if widget has ever been updated. Returns true if "promiseUpdate" promise has once been resolved.
+	 *
+	 * @returns {boolean}
+	 */
+	hasEverUpdated() {
+		return this.#has_ever_updated;
 	}
 
 	/**

@@ -25,37 +25,66 @@ class CWidgetWeb extends CWidget {
 	/**
 	 * ID of selected host group.
 	 *
-	 * @type {string}
+	 * @type {string|null}
 	 */
-	#selected_host_group_id = '';
+	#selected_hostgroupid = null;
 
 	setContents(response) {
 		super.setContents(response);
 
 		this.#table_body = this._contents.querySelector(`.${ZBX_STYLE_LIST_TABLE} tbody`);
 
-		if (this.#table_body !== null) {
-			if (this.#selected_host_group_id !== '') {
-				const row = this.#table_body.querySelector(`tr[data-hostgroupid="${this.#selected_host_group_id}"]`);
+		if (this.#table_body == null) {
+			return;
+		}
 
-				if (row !== null) {
-					this.#selectHostGroup();
-				}
-				else {
-					this.#selected_host_group_id = '';
-				}
+		this.#table_body.addEventListener('click', e => this.#onTableBodyClick(e));
+
+		if (!this.hasEverUpdated() && this.isReferred()) {
+			this.#selected_hostgroupid = this.#getDefaultSelectable();
+
+			if (this.#selected_hostgroupid !== null) {
+				this.#selectHostGroup();
+				this.#broadcast();
 			}
-
-			this.#table_body.addEventListener('click', e => this.#onTableBodyClick(e));
+		}
+		else if (this.#selected_hostgroupid !== null) {
+			this.#selectHostGroup();
 		}
 	}
 
+	onReferredUpdate() {
+		if (this.#table_body === null || this.#selected_hostgroupid !== null) {
+			return;
+		}
+
+		this.#selected_hostgroupid = this.#getDefaultSelectable();
+
+		if (this.#selected_hostgroupid !== null) {
+			this.#selectHostGroup();
+			this.#broadcast();
+		}
+	}
+
+	#getDefaultSelectable() {
+		const row = this.#table_body.querySelector('[data-hostgroupid]');
+
+		return row !== null ? row.dataset.hostgroupid : null;
+	}
+
 	#selectHostGroup() {
-		const rows = this.#table_body.querySelectorAll('tr[data-hostgroupid]');
+		const rows = this.#table_body.querySelectorAll('[data-hostgroupid]');
 
 		for (const row of rows) {
-			row.classList.toggle(ZBX_STYLE_ROW_SELECTED, row.dataset.hostgroupid === this.#selected_host_group_id);
+			row.classList.toggle(ZBX_STYLE_ROW_SELECTED, row.dataset.hostgroupid === this.#selected_hostgroupid);
 		}
+	}
+
+	#broadcast() {
+		this.broadcast({
+			[CWidgetsData.DATA_TYPE_HOST_GROUP_ID]: [this.#selected_hostgroupid],
+			[CWidgetsData.DATA_TYPE_HOST_GROUP_IDS]: [this.#selected_hostgroupid]
+		});
 	}
 
 	#onTableBodyClick(e) {
@@ -63,21 +92,13 @@ class CWidgetWeb extends CWidget {
 			return;
 		}
 
-		const row = e.target.closest('tr');
+		const row = e.target.closest('[data-hostgroupid]');
 
 		if (row !== null) {
-			const hostgroupid = row.dataset.hostgroupid;
+			this.#selected_hostgroupid = row.dataset.hostgroupid;
 
-			if (hostgroupid !== undefined) {
-				this.#selected_host_group_id = hostgroupid;
-
-				this.#selectHostGroup();
-
-				this.broadcast({
-					[CWidgetsData.DATA_TYPE_HOST_GROUP_ID]: [hostgroupid],
-					[CWidgetsData.DATA_TYPE_HOST_GROUP_IDS]: [hostgroupid]
-				});
-			}
+			this.#selectHostGroup();
+			this.#broadcast();
 		}
 	}
 }
