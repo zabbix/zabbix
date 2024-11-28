@@ -279,7 +279,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_event_session(const zbx_vmware_service_t *service, CURL *easyhandle,
-		const unsigned char evt_severity, time_t top_time, char **event_session, char **error)
+		const unsigned char evt_severity, const time_t top_time, char **event_session, char **error)
 {
 #	define ZBX_POST_VMWARE_CREATE_EVENT_COLLECTOR				\
 		ZBX_POST_VSPHERE_HEADER						\
@@ -967,7 +967,7 @@ static	void vmware_service_clear_event_data_mem(const zbx_uint64_t max_mem, zbx_
  ******************************************************************************/
 static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CURL *easyhandle,
 		const zbx_uint64_t last_key, const time_t last_ts, const zbx_uint64_t shmem_free_sz,
-		const unsigned char evt_severity, time_t top_time, unsigned char *skip_old,
+		const unsigned char evt_severity, const time_t top_time, unsigned char *skip_old,
 		zbx_vector_vmware_event_ptr_t *events, zbx_uint64_t *strpool_sz, zbx_uint64_t *evt_top_key,
 		char **error)
 {
@@ -1297,7 +1297,7 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 			/* we try to escape the scenario when new events happen faster than we can read them */
 			/* in case of small memory chunk and long item polling interval */
 			shmem_factor = vmware_shared_evtpart_size(service->eventlog.expect_num);
-			shmem_free_sz *= shmem_factor;
+			shmem_free_sz = (zbx_uint64_t)(shmem_free_sz * shmem_factor);
 			service->eventlog.req_sz = 0;
 			evt_top_time = vmware_evt_toptime(&service->eventlog, shmem_free_sz);
 
