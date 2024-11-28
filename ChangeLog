@@ -1,7 +1,5 @@
 Changes for 7.2.0rc2
 
-New features:
-
 Bug fixes:
 ...G...... [ZBX-25562] fixed Zabbix agent build problem on NetBSD due to zbxsysinfo issue (dgoloscapov)
 ...G...... [ZBX-25043] added config parameter validation in case of an empty value (dgoloscapov)
