@@ -1494,6 +1494,8 @@ class testPageProblems extends CWebTest {
 		}
 
 		$form->submit();
+		$table->waitUntilReloaded();
+		$this->page->waitUntilReady();
 
 		if (array_key_exists('time_selector', $data)) {
 			$this->query('xpath://a[contains(@class, "zi-clock")]')->waitUntilClickable()->one()->click();
@@ -1509,10 +1511,10 @@ class testPageProblems extends CWebTest {
 			}
 
 			$this->query('button:Apply')->one()->click();
+			$this->page->waitUntilReady();
+			$table->waitUntilReloaded();
 		}
 
-		$this->page->waitUntilReady();
-		$table->waitUntilReloaded();
 		$this->assertTableData($data['result']);
 
 		// Check "Compact view" and "Highlight whole row" filter checkboxes.
