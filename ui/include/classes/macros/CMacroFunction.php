@@ -185,8 +185,9 @@ class CMacroFunction {
 				$replacement = static function (array $matches) use ($replacement) {
 					$result = $replacement;
 
-					foreach ($matches as $key => $match) {
-						$result = str_replace('\\'.$key, $match ?? '', $result);
+					for ($i = 0; $i <= 9; $i++) {
+						$repl = $result === '\\'.$i ? $result : '';
+						$result = str_replace('\\'.$i, array_key_exists($i, $matches) ? $matches[$i] : $repl, $result);
 					}
 
 					return $result;
