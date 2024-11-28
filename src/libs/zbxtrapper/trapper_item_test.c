@@ -32,7 +32,7 @@
 #endif
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
-#include "trapper_preproc.h"
+#include "zbx_item_constants.h"
 
 static void	dump_item(const zbx_dc_item_t *item)
 {
@@ -159,6 +159,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	memset(&item, 0, sizeof(item));
+
 	// item JSON object presence is checked in the calling function
 	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_ITEM, &jp_item))
 	{
@@ -171,6 +173,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 				jp_data_contents);
 		zbx_free(jp_data_contents);
 		THIS_SHOULD_NEVER_HAPPEN;
+
+		goto out;
 	}
 
 	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_HOST, &jp_host))
@@ -178,8 +182,6 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 
 	if (FAIL == zbx_json_brackets_by_name(&jp_item, ZBX_PROTO_TAG_STEPS, &jp_steps))
 		jp_steps.end = jp_steps.start = NULL;
-
-	memset(&item, 0, sizeof(item));
 
 	if (NULL == table_items)
 		table_items = zbx_db_get_table("items");
@@ -190,8 +192,13 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 
 	if (0 != proxyid && FAIL == zbx_is_item_processed_by_server(item.type, item.key))
 	{
-		ret = zbx_tm_execute_task_data(jp_data->start, (size_t)(jp_data->end - jp_data->start + 1),
-				proxyid, info);
+		struct zbx_json	json;
+
+		zbx_json_init_with(&json, jp_data->start, (size_t)(jp_data->end - jp_data->start + 1));
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_PREPROC, 1);
+		ret = zbx_tm_execute_task_data(json.buffer, json.buffer_size, proxyid, info);
+		zbx_json_free(&json);
+
 		goto out;
 	}
 
@@ -513,6 +520,27 @@ static int	try_find_preproc_value(const struct zbx_json_parse *jp_first, const c
 	return ret;
 }
 
+void	zbx_trapper_item_test_add_value(struct zbx_json *json, int ret, const char *info)
+{
+	size_t	original_size;
+
+	zbx_json_addobject(json, ZBX_PROTO_TAG_ITEM);
+	original_size = zbx_json_addstring_limit(json,
+			SUCCEED == ret ? ZBX_PROTO_TAG_RESULT : ZBX_PROTO_TAG_ERROR, info, ZBX_JSON_TYPE_STRING,
+			ZBX_JSON_TEST_DATA_MAX_SIZE);
+
+	if (ZBX_JSON_TEST_DATA_MAX_SIZE < original_size)
+	{
+		zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED, "true", ZBX_JSON_TYPE_TRUE);
+		zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, original_size);
+	}
+
+	zbx_json_addstring(json, ZBX_PROTO_TAG_EOL, NULL != strstr(info, "\r\n") ? "CRLF" : "LF",
+			ZBX_JSON_TYPE_STRING);
+
+	zbx_json_close(json);
+}
+
 static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_comms_args_t *config_comms,
 		int config_startup_time, unsigned char program_type, const char *progname,
 		zbx_get_config_forks_f get_config_forks, const char *config_java_gateway, int config_java_gateway_port,
@@ -523,7 +551,7 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 	zbx_user_t		user;
 	struct zbx_json_parse	jp_data, jp_item, jp_host, jp_options, jp_steps;
 	char			tmp[MAX_ID_LEN + 1], *info = NULL, *value = NULL, buffer[MAX_STRING_LEN], *key = NULL;
-	zbx_uint64_t		proxyid;
+	zbx_uint64_t		proxyid = 0;
 	int			ret = FAIL, state = 0, value_found;
 	size_t			value_size = 0, key_size = 0;
 
@@ -559,7 +587,7 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 	if (SUCCEED == zbx_json_value_by_name(&jp_options, ZBX_PROTO_TAG_STATE, buffer, sizeof(buffer), NULL))
 		state = atoi(buffer);
 
-	if (ZBX_STATE_NOT_SUPPORTED == state)
+	if (ITEM_STATE_NOTSUPPORTED == state)
 	{
 		value_found = try_find_preproc_value(&jp_options, ZBX_PROTO_TAG_RUNTIME_ERROR, &jp_item,
 				ZBX_PROTO_TAG_VALUE, &value, &value_size);
@@ -589,8 +617,6 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 
 	if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_PROXYID, tmp, sizeof(tmp), NULL))
 		ZBX_STR2UINT64(proxyid, tmp);
-	else
-		proxyid = 0;
 
 	ret = zbx_trapper_item_test_run(&jp_data, proxyid, &info, config_comms, config_startup_time, program_type,
 			progname, get_config_forks, config_java_gateway, config_java_gateway_port,
@@ -598,40 +624,43 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 			config_webdriver_url);
 
 	if (FAIL == ret)
-		state = ZBX_STATE_NOT_SUPPORTED;
+		state = ITEM_STATE_NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __func__, json->buffer);
 
 preproc_test:
 	zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
-	zbx_json_addobject(json, ZBX_PROTO_TAG_DATA);
 
-	if (NULL != info)
+	if (0 != proxyid && zbx_dc_get_proxy_version(proxyid) >= ZBX_COMPONENT_VERSION(7, 0, 7))
 	{
-		size_t	original_size;
+		struct zbx_json_parse	jp_result;
 
-		zbx_json_addobject(json, ZBX_PROTO_TAG_ITEM);
-		original_size = zbx_json_addstring_limit(json,
-				SUCCEED == ret ? ZBX_PROTO_TAG_RESULT : ZBX_PROTO_TAG_ERROR, info, ZBX_JSON_TYPE_STRING,
-				ZBX_JSON_TEST_DATA_MAX_SIZE);
-
-		if (ZBX_JSON_TEST_DATA_MAX_SIZE < original_size)
+		if (SUCCEED == (ret = zbx_json_open(info, &jp_result)))
 		{
-			zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED, "true", ZBX_JSON_TYPE_TRUE);
-			zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, original_size);
+			zbx_json_addraw(json, ZBX_PROTO_TAG_DATA, info);
+		}
+		else
+		{
+			*error = info;
+			info = NULL;
+		}
+	}
+	else
+	{
+		zbx_json_addobject(json, ZBX_PROTO_TAG_DATA);
+
+		if (NULL != info)
+		{
+			zbx_trapper_item_test_add_value(json, ret, info);
+
+			value = zbx_strdup(NULL, info);
+			value_size = strlen(value);
 		}
 
-		zbx_json_addstring(json, ZBX_PROTO_TAG_EOL, NULL != strstr(info, "\r\n") ? "CRLF" : "LF",
-				ZBX_JSON_TYPE_STRING);
-
-		zbx_json_close(json);
-
-		value = zbx_strdup(NULL, info);
-		value_size = strlen(value);
+		zbx_json_addobject(json, ZBX_PROTO_TAG_PREPROCESSING);
+		ret = zbx_trapper_preproc_test_run(&jp_item, &jp_options, &jp_steps, value, value_size, state, json,
+				error);
 	}
-
-	zbx_json_addobject(json, ZBX_PROTO_TAG_PREPROCESSING);
-	ret = zbx_trapper_preproc_test_run(&jp_item, &jp_options, &jp_steps, value, value_size, state, json, error);
 	zbx_json_close(json);
 out:
 	zbx_free(value);

@@ -17394,3 +17394,25 @@ int	zbx_dc_get_itservices_num(void)
 
 	return num;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get proxy version from cache                                      *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_get_proxy_version(zbx_uint64_t proxyid)
+{
+	ZBX_DC_PROXY	*dc_proxy;
+	int		version;
+
+	RDLOCK_CACHE;
+
+	if (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxyid)))
+		version = dc_proxy->version_int;
+	else
+		version = 0;
+
+	UNLOCK_CACHE;
+
+	return version;
+}

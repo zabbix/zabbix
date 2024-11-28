@@ -138,7 +138,7 @@ void	zbx_json_initarray(struct zbx_json *j, size_t allocate)
  *          to the closing bracket                                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_json_init_with(struct zbx_json *j, const char *src)
+void	zbx_json_init_with(struct zbx_json *j, const char *src, size_t len)
 {
 	if (NULL == src)
 	{
@@ -146,13 +146,12 @@ void	zbx_json_init_with(struct zbx_json *j, const char *src)
 		return;
 	}
 
-	size_t	len = strlen(src);
-
 	j->buffer = NULL;
 	j->buffer_allocated = 0;
 	__zbx_json_realloc(j, len + 1);
 
-	memcpy(j->buffer, src, len + 1);
+	memcpy(j->buffer, src, len);
+	j->buffer[len] = '\0';
 
 	j->buffer_size = len;
 	j->buffer_offset = len - 1;	/* position to the closing bracket */

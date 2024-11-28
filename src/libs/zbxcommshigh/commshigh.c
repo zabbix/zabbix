@@ -240,7 +240,7 @@ int	zbx_send_response_json(zbx_socket_t *sock, int result, const char *info, con
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_json_init_with(&json, ext);
+	zbx_json_init_with(&json, ext, NULL == ext ? 0 : strlen(ext));
 
 	resp = SUCCEED == result ? ZBX_PROTO_VALUE_SUCCESS : ZBX_PROTO_VALUE_FAILED;
 

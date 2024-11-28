@@ -988,7 +988,6 @@ static void	preprocessor_reply_test_result(zbx_pp_task_t *task)
 
 	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_TEST_RESULT, data, len);
 	zbx_free(data);
-	zbx_pp_history_free(history);
 }
 
 /******************************************************************************
