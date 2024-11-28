@@ -217,6 +217,7 @@
 #define ZBX_PROTO_TAG_VARIANT			"variant"
 #define ZBX_PROTO_TAG_AUTH			"auth"
 #define ZBX_PROTO_TAG_LEASE_DURATION		"lease_duration"
+#define ZBX_PROTO_TAG_PREPROC			"preproc"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -311,7 +312,7 @@ const char	*zbx_json_strerror(void);
 
 void	zbx_json_init(struct zbx_json *j, size_t allocate);
 void	zbx_json_initarray(struct zbx_json *j, size_t allocate);
-void	zbx_json_init_with(struct zbx_json *j, const char *src);
+void	zbx_json_init_with(struct zbx_json *j, const char *src, size_t len);
 void	zbx_json_clean(struct zbx_json *j);
 void	zbx_json_free(struct zbx_json *j);
 void	zbx_json_addobject(struct zbx_json *j, const char *name);

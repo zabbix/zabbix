@@ -9,7 +9,6 @@ libzbxtrapper_a_SOURCES = \
 	nodecommand.c \
 	nodecommand.h \
 	trapper_preproc.c \
-	trapper_preproc.h \
 	trapper_expressions_evaluate.c \
 	trapper_expressions_evaluate.h \
 	trapper_item_test.c \
