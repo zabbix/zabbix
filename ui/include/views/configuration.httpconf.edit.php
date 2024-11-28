@@ -203,6 +203,25 @@ $scenario_tab
 		)
 	]);
 
+// The variables and headers data that should be removed after the scenario tab is initialized.
+$variable_header_removable_data = (new CFormField())->addClass('to-remove-after-init');
+
+foreach ($data['variables'] as $key => $variable) {
+	$variable_header_removable_data->addItem([
+		(new CTextArea('variables['.$key.'][name]', $variable['name'])),
+		(new CTextArea('variables['.$key.'][value]', $variable['value']))
+	]);
+}
+
+foreach ($data['headers'] as $key => $header) {
+	$variable_header_removable_data->addItem([
+		(new CTextArea('headers['.$key.'][name]', $header['name'])),
+		(new CTextArea('headers['.$key.'][value]', $header['value']))
+	]);
+}
+
+$scenario_tab->addItem($variable_header_removable_data);
+
 // Steps tab.
 $steps_tab = (new CFormGrid())->addItem([
 	(new CLabel(_('Steps')))->setAsteriskMark(),
