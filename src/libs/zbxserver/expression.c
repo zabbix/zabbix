@@ -4229,7 +4229,7 @@ static int	substitute_simple_macros_impl(zbx_uint64_t *actionid, const DB_EVENT 
 
 			if (ZBX_TOKEN_USER_MACRO == token.type)
 			{
-				DCget_user_macro(&dc_item->host.hostid, 1, m, &replace_to);
+				DCget_user_macro(&c_hostid, 1, m, &replace_to);
 				pos = token.loc.r;
 			}
 			else if (0 == strcmp(m, MVAR_HOST_HOST) || 0 == strcmp(m, MVAR_HOSTNAME))
