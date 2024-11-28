@@ -475,8 +475,8 @@ class testDashboardItemHistoryWidget extends testWidgets {
 
 			if ($item === 'Log item') {
 				$this->checkHint($column_form, 'Display log time', 'This setting will display log time'.
-						' instead of item\'s timestamp. "Show timestamp" must also be checked in the advanced'
-						. ' configuration.'
+						' instead of item\'s timestamp. "Show timestamp" must also be checked in the advanced'.
+						' configuration.'
 				);
 			}
 		}
