@@ -208,15 +208,15 @@ $variable_header_removable_data = (new CFormField())->addClass('to-remove-after-
 
 foreach ($data['variables'] as $key => $variable) {
 	$variable_header_removable_data->addItem([
-		(new CTextArea('variables['.$key.'][name]', $variable['name'])),
-		(new CTextArea('variables['.$key.'][value]', $variable['value']))
+		(new CVar('variables['.$key.'][name]', $variable['name'])),
+		(new CVar('variables['.$key.'][value]', $variable['value']))
 	]);
 }
 
 foreach ($data['headers'] as $key => $header) {
 	$variable_header_removable_data->addItem([
-		(new CTextArea('headers['.$key.'][name]', $header['name'])),
-		(new CTextArea('headers['.$key.'][value]', $header['value']))
+		(new CVar('headers['.$key.'][name]', $header['name'])),
+		(new CVar('headers['.$key.'][value]', $header['value']))
 	]);
 }
 
