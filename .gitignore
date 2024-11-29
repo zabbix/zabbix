@@ -213,6 +213,7 @@ tests/libs/zbxserver/macro_fmttime
 tests/libs/zbxserver/substitute_lld_macros
 tests/libs/zbxserver/valuemaps
 tests/libs/zbxsysinfo/check_key_access_rules
+tests/libs/zbxsysinfo/agent/MODBUS_GET
 tests/libs/zbxsysinfo/common/SYSTEM_LOCALTIME
 tests/libs/zbxsysinfo/common/VFS_FILE_EXISTS
 tests/libs/zbxsysinfo/common/WEB_PAGE_GET
