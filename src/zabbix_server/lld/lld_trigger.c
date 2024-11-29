@@ -2019,7 +2019,8 @@ static int	lld_trigger_changed(const zbx_lld_trigger_t *trigger)
  *               the triggers are identical; FAIL - otherwise                 *
  *                                                                            *
  ******************************************************************************/
-static int	lld_triggers_equal(const zbx_lld_trigger_t *trigger, const zbx_lld_trigger_t *db_trigger)
+static int	lld_triggers_equal(const zbx_lld_trigger_t *trigger, const zbx_lld_trigger_t *db_trigger,
+		int uniq_names)
 {
 	int	ret = FAIL;
 	char	*expression = NULL;
@@ -2028,6 +2029,8 @@ static int	lld_triggers_equal(const zbx_lld_trigger_t *trigger, const zbx_lld_tr
 
 	if (0 != strcmp(trigger->description, db_trigger->description))
 		goto out;
+	else if (1 == uniq_names)
+		return SUCCEED;
 
 	expression = lld_trigger_expression_expand(trigger, trigger->expression, &trigger->functions);
 
@@ -2047,48 +2050,46 @@ out:
 	return ret;
 }
 
-static void	lld_triggers_validate_descriptions(zbx_vector_str_t *descriptions, zbx_vector_ptr_t *triggers,
-		zbx_vector_uint64_t *triggerids, char **error)
+static void	lld_triggers_handle_discovered_duplicates(zbx_vector_ptr_t *triggers, zbx_vector_uint64_t *triggerids,
+		char **error)
 {
 	int	i, j;
 
-	for (i = 1; i < descriptions->values_num; i++)
+	for (i = 0; i < triggers->values_num; i++)
 	{
-		int	excluded = 0;
+		zbx_lld_trigger_t	*t1 = triggers->values[i];
 
-		if (0 == strcmp(descriptions->values[i - 1], descriptions->values[i]))
+		if (0 == (t1->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
+			continue;
+
+		for (j = i + 1; j < triggers->values_num; j++)
 		{
-			for (j = triggers->values_num - 1; j >= 0; j--)
+			zbx_lld_trigger_t	*t2 = triggers->values[j];
+			int			idx;
+
+			if (0 == (t2->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
+				continue;
+
+			if (SUCCEED == lld_triggers_equal(t1, t2, 1))
 			{
-				zbx_lld_trigger_t	*t = triggers->values[j];
+				*error = zbx_strdcatf(*error,
+						"Cannot create trigger \"%s\": "
+						"duplicate trigger was discovered.\n",
+						t2->description);
 
-				if (0 == strcmp(descriptions->values[i], t->description))
+				if (t2->triggerid != 0)
 				{
-					int	idx;
-
-					if (0 == t->triggerid)
-					{
-						t->flags &= ~ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
-
-						*error = zbx_strdcatf(*error,
-								"Cannot create trigger: "
-								"trigger \"%s\" already exists.\n",
-								t->description);
-					}
-					else if (FAIL != (idx = zbx_vector_uint64_bsearch(triggerids, t->triggerid,
+					if (FAIL != (idx = zbx_vector_uint64_bsearch(triggerids, t2->triggerid,
 							ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 					{
 						zbx_vector_uint64_remove(triggerids, idx);
 					}
 				}
+				else
+					t2->flags &= ~ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
 
-				if (SUCCEED != lld_trigger_changed(t))
-					excluded = 1;
 			}
 		}
-
-		if (1 == excluded)
-			zbx_vector_str_remove(descriptions, i);
 	}
 }
 
@@ -2159,7 +2160,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 		zbx_vector_str_sort(&descriptions, ZBX_DEFAULT_STR_COMPARE_FUNC);
 		zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		lld_triggers_validate_descriptions(&descriptions, triggers, &triggerids, error);
+		lld_triggers_handle_discovered_duplicates(triggers, &triggerids, error);
 
 		sql = (char *)zbx_malloc(sql, sql_alloc);
 
@@ -2241,7 +2242,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 				if (0 == (trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
 					continue;
 
-				if (SUCCEED != lld_triggers_equal(trigger, db_trigger))
+				if (SUCCEED != lld_triggers_equal(trigger, db_trigger, 0))
 					continue;
 
 				*error = zbx_strdcatf(*error, "Cannot %s trigger: trigger \"%s\" already exists.\n",
