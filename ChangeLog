@@ -6,6 +6,9 @@ New features:
 A.F....... [ZBXNEXT-8690] implemented a new filter in media type list view to display actions based on the scope of their media type usage (Ivo)
 
 Bug fixes:
+.......PS. [ZBX-25590] fixed failures to convert double to uint64 in preprocessing (dgoloscapov)
+.......PS. [ZBX-25596] fixed handling of preprocessing history when value type of an item is changed (dgoloscapov)
+.......PS. [ZBX-25136] fixed item testing preprocessing not being performed on Zabbix proxy when the item itself is being tested on Zabbix proxy (wiper)
 ........S. [ZBX-24970] fixed forgotten places for macro functions support (akozlovs)
 ..F....... [ZBX-25183] fixed the selected items color of collapsed main menu for high contrast themes (wczerneha)
 ........S. [ZBX-25551] fixed preprocessing being skipped during history push if host is monitored by Zabbix proxy (vso)
