@@ -343,6 +343,10 @@ WHERE
 
     oracle.custom.query[<commonParams>,payment,"John Doe",1,"10/25/2020"]
 
+### Notes:
+ * Returned data is automatically marshalled into JSON.
+ * Avoid returning JSON directly from queries, as it will become corrupted when the plugin attempts to marshall it into JSON again.
+
 ## Current limitations
 
 * The System Identifier (SID) connection method is not supported.
