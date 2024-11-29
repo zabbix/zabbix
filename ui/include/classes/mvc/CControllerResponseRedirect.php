@@ -31,6 +31,10 @@ class CControllerResponseRedirect extends CControllerResponse {
 			$location = $location->getUrl();
 		}
 
+		if (!CHtmlUrlValidator::validateSameSite($location)) {
+			access_deny();
+		}
+
 		$this->location = $location;
 	}
 
