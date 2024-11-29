@@ -1,0 +1,1 @@
+.......PS. [ZBX-25590] fixed failures to convert double to uint64 in preprocessing (dgoloscapov)

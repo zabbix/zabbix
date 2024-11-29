@@ -113,15 +113,7 @@ int	zbx_item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const zb
 	}
 
 	if (ZBX_VARIANT_NONE != (type_hint = item_preproc_numeric_type_hint(value_type)))
-	{
-		if (FAIL == zbx_variant_convert(value_num, type_hint))
-		{
-			*errmsg = zbx_dsprintf(*errmsg, "cannot convert value from %s to %s",
-					zbx_variant_type_desc(value_num), zbx_get_variant_type_desc(type_hint));
-
-			return FAIL;
-		}
-	}
+		zbx_variant_convert(value_num, type_hint);
 
 	return SUCCEED;
 }
