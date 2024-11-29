@@ -41,22 +41,22 @@ class testMultiselects extends CWebTest {
 	}
 
 	public function checkSuggest($link, $query, $name, $string, $class) {
-		if ($link == 'zabbix.php?action=host.list') {
-			$this->page->login()->open($link)->waitUntilReady();
+		$this->page->login()->open($link)->waitUntilReady();
+
+		if ($query === 'host-form') {
 			$this->query('button:Create host')->one()->waitUntilClickable()->click();
+			COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
 		}
-		else {
-			$this->page->login()->open($link)->waitUntilReady();
-			$this->page->updateViewport();
-		}
+
 		$field = $this->query('name:'.$query)->asForm()->one()->getField($name);
+		$this->page->updateViewport();
 		$element = $field->query('tag:input')->one();
 		$element->type($string);
 		$this->query('class', $class)->waitUntilVisible();
 
 		// Cover proxy selection field, because it gets changed depending on proxy names' lengths in the dropdown.
 		$covered_region = ($query === 'host-form')
-			? [$element, ['x' => 193, 'y' => 317, 'width' => 452, 'height' => 22]]
+			? [$element, ['x' => 111, 'y' => 317, 'width' => 452, 'height' => 22]]
 			: [$element];
 
 		$this->assertScreenshotExcept($element->parents('class', (($query === 'host-form') ? 'form-grid' : 'table-forms'))
