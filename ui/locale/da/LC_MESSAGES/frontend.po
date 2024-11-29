@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.4\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-11-22 07:48+0000\n"
+"PO-Revision-Date: 2024-11-28 09:01+0000\n"
 "Last-Translator: Ryan Skov <rsk@capmon.dk>\n"
 "Language-Team: none\n"
 "Language: da\n"
@@ -10264,7 +10264,7 @@ msgstr "Billedetikettype"
 
 #: widgets/itemhistory/Widget.php:33
 msgid "Image loading error."
-msgstr ""
+msgstr "Fejl ved indlæsning af billede."
 
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
@@ -10594,7 +10594,7 @@ msgstr "Ukorrekt handlings betingelse udløser alvorlighedsgrad."
 
 #: include/classes/api/services/CAction.php:3370
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
-msgstr ""
+msgstr "Udløser for forkert handlingstilstand. Udløseren findes ikke, eller du har ikke adgang til den."
 
 #: include/classes/validators/CActionCondValidator.php:211
 msgid "Incorrect action condition type."
@@ -16151,7 +16151,7 @@ msgstr "Maksimal hukommelsesbrug: %1$s"
 
 #: include/classes/data/CItemData.php:2254
 msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Procentdel af tiden, hvor den virtuelle maskine ikke er i stand til at køre, fordi den kæmper om adgang til den eller de fysiske CPU'er, \"url\" - VMware service URL, \"uuid\" - VMware virtuel maskine globalt unikt id"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:244
 msgid "Percentage"
@@ -17089,7 +17089,7 @@ msgstr "Recordset ID"
 #: app/views/administration.proxygroup.list.php:57
 #: app/views/administration.proxygroup.list.php:103
 msgid "Recovering"
-msgstr ""
+msgstr "Gendannelse"
 
 #: app/views/administration.user.edit.php:752 app/views/trigger.list.php:323
 #: app/views/trigger.prototype.list.php:146
@@ -17947,7 +17947,7 @@ msgstr[1] "SLA deaktiveret"
 
 #: app/controllers/CControllerPopup.php:58
 msgid "SLA edit"
-msgstr ""
+msgstr "SLA-redigering"
 
 #: app/controllers/CControllerSlaEnable.php:73
 msgid "SLA enabled"
@@ -18250,11 +18250,11 @@ msgstr "Gem det som \"%1$s\""
 #: widgets/gauge/includes/WidgetForm.php:191
 #: widgets/gauge/views/widget.edit.php:207
 msgid "Scale"
-msgstr ""
+msgstr "Skala"
 
 #: widgets/gauge/includes/WidgetForm.php:288
 msgid "Scale size"
-msgstr ""
+msgstr "Skala størrelse"
 
 #: app/views/module.list.php:45
 msgid "Scan directory"
@@ -18390,7 +18390,7 @@ msgstr "Scriptet har ikke parametre."
 
 #: app/controllers/CControllerPopup.php:56
 msgid "Script edit"
-msgstr ""
+msgstr "Script redigering"
 
 #: app/views/administration.timeouts.edit.php:168
 msgid "Script execution"
@@ -18606,7 +18606,7 @@ msgstr "Send tilbage"
 
 #: app/views/popup.operation.edit.php:189
 msgid "Send to media type"
-msgstr ""
+msgstr "Send til medietype"
 
 #: app/views/popup.operation.edit.php:108
 msgid "Send to user groups"
@@ -18727,7 +18727,7 @@ msgstr[1] "Tjenesterne er slettet"
 
 #: app/controllers/CControllerPopup.php:57
 msgid "Service edit"
-msgstr ""
+msgstr "Serviceredigering"
 
 #: app/views/administration.userrole.edit.php:166
 #: app/views/administration.userrole.edit.php:207
@@ -19104,7 +19104,7 @@ msgstr "Vis tekst som HTML"
 
 #: widgets/itemhistory/views/column.edit.php:251
 msgid "Show thumbnail"
-msgstr ""
+msgstr "Vis thumbnail"
 
 #: app/partials/monitoring.problem.filter.php:297
 #: widgets/problemsbysv/includes/WidgetForm.php:122
@@ -19375,7 +19375,7 @@ msgstr ""
 
 #: app/views/mediatype.list.php:83 app/views/mediatype.list.php:91
 msgid "Specific"
-msgstr ""
+msgstr "Bestemt"
 
 #: include/classes/helpers/CRoleHelper.php:199
 msgid "Specified role was not found."
