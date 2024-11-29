@@ -3082,7 +3082,6 @@ static void	lld_hostmacro_make(zbx_vector_lld_hostmacro_ptr_t *hostmacros, zbx_u
  * Parameters: hostmacros - [IN] List of host macros which should be present   *
  *                               on each discovered host.                      *
  *             hosts      - [IN/OUT] list of hosts, should be sorted by hostid *
- *             lld_macros - [IN]                                               *
  *                                                                             *
  ******************************************************************************/
 static void	lld_hostmacros_make(const zbx_vector_lld_hostmacro_ptr_t *hostmacros, zbx_vector_lld_host_ptr_t *hosts)

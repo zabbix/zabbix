@@ -262,7 +262,7 @@ int	zbx_jsonobj_to_string(char **str, size_t *str_alloc, size_t *str_offset, con
  ******************************************************************************/
 int	zbx_jsonobj_open(const char *data, zbx_jsonobj_t *obj)
 {
-	zbx_uint64_t	offset;
+	zbx_int64_t	offset;
 	int		ret = FAIL;
 	char		*error = NULL;
 

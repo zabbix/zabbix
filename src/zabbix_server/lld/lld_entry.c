@@ -54,7 +54,7 @@ zbx_hash_t	lld_entry_hash(const void *data)
 	return hash;
 }
 
-int        lld_entry_compare(const void *d1, const void *d2)
+int	lld_entry_compare(const void *d1, const void *d2)
 {
 	const zbx_lld_entry_t	*e1 = (zbx_lld_entry_t *)d1;
 	const zbx_lld_entry_t	*e2 = (zbx_lld_entry_t *)d2;
@@ -77,7 +77,8 @@ int        lld_entry_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create lld entry (row)                                            *
+ * Purpose: create lld entry consisting of lld macro-value pairs from json    *
+ *          row and LLD macro paths                                           *
  *                                                                            *
  ******************************************************************************/
 static void	lld_entry_create(zbx_lld_entry_t *entry, const zbx_jsonobj_t *obj,
@@ -86,7 +87,7 @@ static void	lld_entry_create(zbx_lld_entry_t *entry, const zbx_jsonobj_t *obj,
 	size_t	size;
 
 	if (0 < lld_macro_paths->values_num)
-		size = lld_macro_paths->values_num;
+		size = (size_t)lld_macro_paths->values_num;
 	else
 		size = 5;
 
