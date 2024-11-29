@@ -10346,6 +10346,9 @@ static void	dc_preproc_add_item_rec(ZBX_DC_ITEM *dc_item, zbx_vector_dc_item_ptr
 
 static int	dc_preproc_item_changed(ZBX_DC_ITEM *dc_item, zbx_pp_item_t *pp_item)
 {
+	if (dc_item->value_type != pp_item->preproc->value_type)
+		return SUCCEED;
+
 	if (dc_item->type != pp_item->preproc->type)
 		return SUCCEED;
 
