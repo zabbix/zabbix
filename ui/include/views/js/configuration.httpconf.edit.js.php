@@ -62,6 +62,8 @@
 			this.#steps = document.getElementById('steps');
 
 			this.#initTemplates();
+			this.#initVariables(variables);
+			this.#initHeaders(headers);
 
 			this.#form.addEventListener('click', e => {
 				const target = e.target;
@@ -69,20 +71,6 @@
 				if (target.matches('.js-edit-template')) {
 					e.preventDefault();
 					this.#openTemplatePopup(target.dataset);
-				}
-			});
-
-			jQuery('#tabs').on('tabscreate tabsactivate', (e, ui) => {
-				const panel = e.type === 'tabscreate' ? ui.panel : ui.newPanel;
-
-				if (panel.attr('id') === 'scenario-tab' && !this.#variables_headers_initialized) {
-					this.#initVariables(variables);
-					this.#initHeaders(headers);
-
-					// Removing unnecessary variables and headers data.
-					document.querySelector('.to-remove-after-init').remove();
-
-					this.#variables_headers_initialized = true;
 				}
 			});
 
