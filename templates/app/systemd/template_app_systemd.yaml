@@ -65,10 +65,10 @@ zabbix_export:
                 - tag: component
                   value: service
               trigger_prototypes:
-                - uuid: 5237bd423307449b8a58f692082d2a0a
-                  expression: 'last(/Systemd by Zabbix agent 2/systemd.service.active_state["{#UNIT.NAME}"])<>1'
-                  name: '{#UNIT.NAME}: Service is not running'
-                  priority: WARNING
+                - uuid: d149192e3d4b48ba9fd5e800ce1538f0
+                  expression: 'last(/Systemd by Zabbix agent 2/systemd.service.active_state["{#UNIT.NAME}"])=4'
+                  name: '{#UNIT.NAME}: Service failed'
+                  priority: AVERAGE
                   manual_close: 'YES'
                   tags:
                     - tag: scope
