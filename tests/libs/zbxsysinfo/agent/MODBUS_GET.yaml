@@ -1,7 +1,26 @@
 ---
 test case: "RTU protocol"
 in:
-  key: modbus.get[rtu://COM1:9600:8n1,1,4,13958,1,uint32,be,0]
+  key: modbus.get[rtu://COM1:9600:8n1,2,4,13958,1,uint32,be,0]
+  data: 0000 0A12
+out:
+  endpoint:
+    protocol: rtu
+    port: /dev/COM1
+    baudrate: 9600
+    data_bits: 8
+    parity: N
+    stop_bits: 1
+  slaveid: 2
+  function: 4
+  address: 13958
+  total_count: 2
+  result: 2578
+  return: SYSINFO_RET_OK
+---
+test case: "RTU protocol, default slaveid"
+in:
+  key: modbus.get[rtu://COM1:9600:8n1,,4,13958,1,uint32,be,0]
   data: 0000 0A12
 out:
   endpoint:
@@ -33,6 +52,47 @@ out:
   total_count: 2
   result: '[13,163,171]'
   return: SYSINFO_RET_OK
+---
+test case: "TCP protocol, default slaveid"
+in:
+  key: modbus.get[tcp://localhost,,3,40000,3,uint8,be,0]
+  data: 0DA3ABCD
+out:
+  endpoint:
+    protocol: tcp
+    ip: localhost
+    port: 502
+  slaveid: 255
+  function: 3
+  address: 40000
+  total_count: 2
+  result: '[13,163,171]'
+  return: SYSINFO_RET_OK
+---
+test case: "RTU protocol, out of range slaveid"
+in:
+  key: modbus.get[rtu://COM1:9600:8n1,248,4,13958,1,uint32,be,0]
+  data: 0000 0A12
+out:
+  endpoint:
+    protocol: rtu
+    port: /dev/COM1
+    baudrate: 9600
+    data_bits: 8
+    parity: N
+    stop_bits: 1
+  return: SYSINFO_RET_FAIL
+---
+test case: "TCP protocol, out of range slaveid"
+in:
+  key: modbus.get[tcp://localhost,256,3,40000,3,uint8,be,0]
+  data: 0DA3ABCD
+out:
+  endpoint:
+    protocol: tcp
+    ip: localhost
+    port: 502
+  return: SYSINFO_RET_FAIL
 ---
 test case: "Read coil, default data type"
 in:
@@ -288,5 +348,69 @@ out:
   address: 1
   total_count: 2
   result: 31326208
+  return: SYSINFO_RET_OK
+---
+test case: "Mid-Little Endian, int32 data type"
+in:
+  key: modbus.get[tcp://localhost:502,255,3,00001,2,int32,mle]
+  data: 0102 0409  0102 8488
+out:
+  endpoint:
+    protocol: tcp
+    ip: localhost
+    port: 502
+  slaveid: 255
+  function: 3
+  address: 1
+  total_count: 4
+  result: '[33622276,33654916]'
+  return: SYSINFO_RET_OK
+---
+test case: "Mid-Big Endian, int32 data type"
+in:
+  key: modbus.get[tcp://localhost:502,255,3,00001,2,int32,mbe]
+  data: 0102 0409  0102 8488
+out:
+  endpoint:
+    protocol: tcp
+    ip: localhost
+    port: 502
+  slaveid: 255
+  function: 3
+  address: 1
+  total_count: 4
+  result: '[67698946,-2071461630]'
+  return: SYSINFO_RET_OK
+---
+test case: "Little Endian, int32 data type"
+in:
+  key: modbus.get[tcp://localhost:502,255,3,00001,2,int32,le]
+  data: 0102 0409  0102 8488
+out:
+  endpoint:
+    protocol: tcp
+    ip: localhost
+    port: 502
+  slaveid: 255
+  function: 3
+  address: 1
+  total_count: 4
+  result: '[151257601,-2004614655]'
+  return: SYSINFO_RET_OK
+---
+test case: "Big Endian, int32 data type"
+in:
+  key: modbus.get[tcp://localhost:502,255,3,00001,2,int32,be]
+  data: 0102 0409  0102 8488
+out:
+  endpoint:
+    protocol: tcp
+    ip: localhost
+    port: 502
+  slaveid: 255
+  function: 3
+  address: 1
+  total_count: 4
+  result: '[16909321,16942216]'
   return: SYSINFO_RET_OK
 ...

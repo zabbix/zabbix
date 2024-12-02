@@ -182,6 +182,7 @@ void	zbx_mock_test_entry(void **state)
 	AGENT_REQUEST	request;
 	AGENT_RESULT	result;
 	char		*item_key;
+	int		ret;
 
 	ZBX_UNUSED(state);
 
@@ -194,8 +195,11 @@ void	zbx_mock_test_entry(void **state)
 	init_result(&result);
 
 	zbx_mock_assert_sysinfo_ret_eq("Return value",
-			zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return")),
+			ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return")),
 			MODBUS_GET(&request, &result));
+
+	if (SUCCEED != ret)
+		goto out;
 
 	if (0 != ISSET_STR(&result))
 	{
@@ -214,7 +218,7 @@ void	zbx_mock_test_entry(void **state)
 	}
 	else
 		fail_msg("Invalid result type");
-
+out:
 	free_request(&request);
 	free_result(&result);
 }
