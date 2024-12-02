@@ -21,20 +21,7 @@ class CControllerAutoregEdit extends CController {
 	}
 
 	protected function checkInput() {
-		$fields = [
-			'tls_accept' =>				'in 0,'.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK),
-			'tls_psk_identity' =>		'db config_autoreg_tls.tls_psk_identity',
-			'tls_psk' =>				'db config_autoreg_tls.tls_psk',
-			'change_psk' =>				'in 1'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
-		}
-
-		return $ret;
+		return true;
 	}
 
 	protected function checkPermissions() {
@@ -42,21 +29,17 @@ class CControllerAutoregEdit extends CController {
 	}
 
 	protected function doAction() {
-		// get values from the database
 		$autoreg = API::Autoregistration()->get([
 			'output' => ['tls_accept']
 		]);
 
 		$data = [
-			'tls_accept' => $autoreg['tls_accept'],
-			'tls_psk_identity' => '',
-			'tls_psk' => '',
-			'change_psk' => !($autoreg['tls_accept'] & HOST_ENCRYPTION_PSK) || $this->hasInput('change_psk')
-				|| $this->hasInput('tls_psk_identity')
+			'tls_in_none' => ($autoreg['tls_accept'] & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE,
+			'tls_in_psk' => ($autoreg['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK,
+			'js_validation_rules' => CControllerAutoregUpdate::getValidationRules()
 		];
 
-		// overwrite with input variables
-		$this->getInputs($data, ['tls_accept', 'tls_psk_identity', 'tls_psk']);
+		$data['js_validation_rules'] = (new CFormValidator($data['js_validation_rules']))->getRules();
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Autoregistration'));

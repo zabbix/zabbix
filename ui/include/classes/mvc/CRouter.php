@@ -58,7 +58,7 @@ class CRouter {
 		'authentication.edit'						=> ['CControllerAuthenticationEdit',					'layout.htmlpage',		'administration.authentication.edit'],
 		'authentication.update'						=> ['CControllerAuthenticationUpdate',					null,					null],
 		'autoreg.edit'								=> ['CControllerAutoregEdit',							'layout.htmlpage',		'administration.autoreg.edit'],
-		'autoreg.update'							=> ['CControllerAutoregUpdate',							null,					null],
+		'autoreg.update'							=> ['CControllerAutoregUpdate',							'layout.json',			null],
 		'availabilityreport.list'					=> ['CControllerAvailabilityReportList',				'layout.htmlpage',		'reports.availabilityreport.list'],
 		'availabilityreport.trigger'				=> ['CControllerAvailabilityReportTrigger',				'layout.htmlpage',		'reports.availabilityreport.trigger'],
 		'charts.view'								=> ['CControllerChartsView',							'layout.htmlpage',		'monitoring.charts.view'],
