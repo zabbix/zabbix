@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-12-02T10:13:48Z'
+  date: '2024-12-02T16:50:04Z'
   groups:
     - uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
@@ -164,13 +164,13 @@ zabbix_export:
           name: 'Dell iDRAC: Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.2.5.0
-          key: 'dell.server.hw.uptime[hrSystemUptime]'
+          key: 'dell.server.hw.uptime[systemPowerUpTime]'
           history: 7d
           trends: '0'
           units: uptime
           description: |
-            MIB: HOST-RESOURCES-MIB
-            The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.
+            MIB: IDRAC-MIB-SMIv2
+            This attribute defines the power-up time of the system in seconds.
           tags:
             - tag: component
               value: system
@@ -253,13 +253,13 @@ zabbix_export:
           name: 'Dell iDRAC: Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.6.3.10.2.1.3.0
-          key: 'dell.server.net.uptime[sysUpTime]'
+          key: 'dell.server.net.uptime[snmpEngineTime]'
           history: 7d
           trends: '0'
           units: uptime
           description: |
-            MIB: SNMPv2-MIB
-            The time (in hundredths of a second) since the network management portion of the system was last re-initialized.
+            MIB: SNMP-FRAMEWORK-MIB
+            The number of seconds since the value of the snmpEngineBoots object last changed.
           tags:
             - tag: component
               value: system
@@ -2035,7 +2035,7 @@ zabbix_export:
               newvalue: unknown
   triggers:
     - uuid: e9fc724fff1840a9931ef9d379475349
-      expression: '(last(/Dell iDRAC by SNMP/dell.server.hw.uptime[hrSystemUptime])>0 and last(/Dell iDRAC by SNMP/dell.server.hw.uptime[hrSystemUptime])<10m) or (last(/Dell iDRAC by SNMP/dell.server.hw.uptime[hrSystemUptime])=0 and last(/Dell iDRAC by SNMP/dell.server.net.uptime[sysUpTime])<10m)'
+      expression: '(last(/Dell iDRAC by SNMP/dell.server.hw.uptime[systemPowerUpTime])>0 and last(/Dell iDRAC by SNMP/dell.server.hw.uptime[systemPowerUpTime])<10m) or (last(/Dell iDRAC by SNMP/dell.server.hw.uptime[systemPowerUpTime])=0 and last(/Dell iDRAC by SNMP/dell.server.net.uptime[snmpEngineTime])<10m)'
       name: 'Dell iDRAC: Host has been restarted'
       event_name: 'Dell iDRAC: {HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
@@ -2051,9 +2051,9 @@ zabbix_export:
         - color: 199C0D
           item:
             host: 'Dell iDRAC by SNMP'
-            key: 'dell.server.hw.uptime[hrSystemUptime]'
+            key: 'dell.server.hw.uptime[systemPowerUpTime]'
         - sortorder: '1'
           color: F63100
           item:
             host: 'Dell iDRAC by SNMP'
-            key: 'dell.server.net.uptime[sysUpTime]'
+            key: 'dell.server.net.uptime[snmpEngineTime]'
