@@ -69,22 +69,22 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Overall system health status|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the overall rollup status of all components in the system being monitored by the remote access card. Includes system, storage, IO devices, iDRAC, CPU, memory, etc.</p>|SNMP agent|dell.server.status[globalSystemStatus]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Hardware model name|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the model name of the system.</p>|SNMP agent|dell.server.hw.model[systemModelName]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Hardware serial number|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the service tag of the system.</p>|SNMP agent|dell.server.hw.serialnumber[systemServiceTag]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Operating system|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the name of the operating system that the host is running.</p>|SNMP agent|dell.server.sw.os[systemOSName]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Firmware version|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the firmware version of a remote access card.</p>|SNMP agent|dell.server.hw.firmware[racFirmwareVersion]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Uptime (network)|<p>MIB: SNMPv2-MIB</p><p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p>|SNMP agent|dell.server.net.uptime[sysUpTime]|
-|Uptime (hardware)|<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p>|SNMP agent|dell.server.hw.uptime[hrSystemUptime]|
-|SNMP traps (fallback)|<p>The item is used to collect all SNMP traps unmatched by other snmptrap items</p>|SNMP trap|snmptrap.fallback|
-|System location|<p>MIB: SNMPv2-MIB</p><p>The physical location of this node (e.g., 'telephone closet, 3rd floor'). If the location is unknown, the value is the zero-length string.</p>|SNMP agent|dell.server.location[sysLocation]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|System contact details|<p>MIB: SNMPv2-MIB</p><p>The textual identification of the contact person for this managed node, together with information on how to contact this person. If no contact information is known, the value is the zero-length string.</p>|SNMP agent|dell.server.contact[sysContact]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|System object ID|<p>MIB: SNMPv2-MIB</p><p>The vendor's authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining 'what kind of box' is being managed. For example, if vendor 'Flintstones, Inc.' was assigned the subtree 1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its 'Fred Router'.</p>|SNMP agent|dell.server.objectid[sysObjectID]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|System name|<p>MIB: SNMPv2-MIB</p><p>An administratively-assigned name for this managed node. By convention, this is the node's fully-qualified domain name. If the name is unknown, the value is the zero-length string.</p>|SNMP agent|dell.server.name[sysName]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|System description|<p>MIB: SNMPv2-MIB</p><p>A textual description of the entity. This value should</p><p>include the full name and version identification of the system's hardware type, software operating-system, and</p><p>networking software.</p>|SNMP agent|dell.server.descr[sysDescr]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|SNMP agent availability||Zabbix internal|zabbix[host,snmp,available]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Memory, total size|<p>Total memory amount on the device.</p>|Calculated|dell.server.memory.size.total<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|BIOS version|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the version name of the system BIOS.</p>|SNMP agent|dell.server.bios.version<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Overall system health status|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the overall rollup status of all components in the system being monitored by the remote access card. Includes system, storage, IO devices, iDRAC, CPU, memory, etc.</p>|SNMP agent|dell.server.status[globalSystemStatus]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Hardware model name|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the model name of the system.</p>|SNMP agent|dell.server.hw.model[systemModelName]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Hardware serial number|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the service tag of the system.</p>|SNMP agent|dell.server.hw.serialnumber[systemServiceTag]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Operating system|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the name of the operating system that the host is running.</p>|SNMP agent|dell.server.sw.os[systemOSName]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Dell R720: Firmware version|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the firmware version of a remote access card.</p>|SNMP agent|dell.server.hw.firmware[racFirmwareVersion]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Dell R720: Uptime (network)|<p>MIB: SNMPv2-MIB</p><p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p>|SNMP agent|dell.server.net.uptime[sysUpTime]|
+|Dell R720: Uptime (hardware)|<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p>|SNMP agent|dell.server.hw.uptime[hrSystemUptime]|
+|Dell R720: SNMP traps (fallback)|<p>The item is used to collect all SNMP traps unmatched by other snmptrap items</p>|SNMP trap|snmptrap.fallback|
+|Dell R720: System location|<p>MIB: SNMPv2-MIB</p><p>The physical location of this node (e.g., 'telephone closet, 3rd floor'). If the location is unknown, the value is the zero-length string.</p>|SNMP agent|dell.server.location[sysLocation]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: System contact details|<p>MIB: SNMPv2-MIB</p><p>The textual identification of the contact person for this managed node, together with information on how to contact this person. If no contact information is known, the value is the zero-length string.</p>|SNMP agent|dell.server.contact[sysContact]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Dell R720: System object ID|<p>MIB: SNMPv2-MIB</p><p>The vendor's authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining 'what kind of box' is being managed. For example, if vendor 'Flintstones, Inc.' was assigned the subtree 1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its 'Fred Router'.</p>|SNMP agent|dell.server.objectid[sysObjectID]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: System name|<p>MIB: SNMPv2-MIB</p><p>An administratively-assigned name for this managed node. By convention, this is the node's fully-qualified domain name. If the name is unknown, the value is the zero-length string.</p>|SNMP agent|dell.server.name[sysName]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: System description|<p>MIB: SNMPv2-MIB</p><p>A textual description of the entity. This value should</p><p>include the full name and version identification of the system's hardware type, software operating-system, and</p><p>networking software.</p>|SNMP agent|dell.server.descr[sysDescr]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Dell R720: SNMP agent availability||Zabbix internal|zabbix[host,snmp,available]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Memory, total size|<p>Total memory amount on the device.</p>|Calculated|dell.server.memory.size.total<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: BIOS version|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the version name of the system BIOS.</p>|SNMP agent|dell.server.bios.version<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Triggers
 
@@ -111,8 +111,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Probe [{#SENSOR_LOCALE}]: Value|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the reading for a temperature probe of type other than temperatureProbeTypeIsDiscrete. When the value for temperatureProbeType is other than temperatureProbeTypeIsDiscrete, the value returned for this attribute is the temperature that the probe is reading in Centigrade. When the value for temperatureProbeType is temperatureProbeTypeIsDiscrete, a value is not returned for this attribute.</p>|SNMP agent|dell.server.sensor.temp.value[temperatureProbeReading.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.1`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Probe [{#SENSOR_LOCALE}]: Status|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the probe status of the temperature probe.</p><p>Possible values:</p><p>other(1),               -- probe status is not one of the following:</p><p>unknown(2),             -- probe status is unknown (not known or monitored)</p><p>ok(3),                  -- probe is reporting a value within the thresholds</p><p>nonCriticalUpper(4),    -- probe has crossed the upper noncritical threshold</p><p>criticalUpper(5),       -- probe has crossed the upper critical threshold</p><p>nonRecoverableUpper(6), -- probe has crossed the upper non-recoverable threshold</p><p>nonCriticalLower(7),    -- probe has crossed the lower noncritical threshold</p><p>criticalLower(8),       -- probe has crossed the lower critical threshold</p><p>nonRecoverableLower(9), -- probe has crossed the lower non-recoverable threshold</p><p>failed(10)              -- probe is not functional</p>|SNMP agent|dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Probe [{#SENSOR_LOCALE}]: Value|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the reading for a temperature probe of type other than temperatureProbeTypeIsDiscrete. When the value for temperatureProbeType is other than temperatureProbeTypeIsDiscrete, the value returned for this attribute is the temperature that the probe is reading in Centigrade. When the value for temperatureProbeType is temperatureProbeTypeIsDiscrete, a value is not returned for this attribute.</p>|SNMP agent|dell.server.sensor.temp.value[temperatureProbeReading.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.1`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Probe [{#SENSOR_LOCALE}]: Status|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the probe status of the temperature probe.</p><p>Possible values:</p><p>other(1),               -- probe status is not one of the following:</p><p>unknown(2),             -- probe status is unknown (not known or monitored)</p><p>ok(3),                  -- probe is reporting a value within the thresholds</p><p>nonCriticalUpper(4),    -- probe has crossed the upper noncritical threshold</p><p>criticalUpper(5),       -- probe has crossed the upper critical threshold</p><p>nonRecoverableUpper(6), -- probe has crossed the upper non-recoverable threshold</p><p>nonCriticalLower(7),    -- probe has crossed the lower noncritical threshold</p><p>criticalLower(8),       -- probe has crossed the lower critical threshold</p><p>nonRecoverableLower(9), -- probe has crossed the lower non-recoverable threshold</p><p>failed(10)              -- probe is not functional</p>|SNMP agent|dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for Temperature discovery
 
@@ -132,7 +132,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Power supply [{#PSU_DESCR}]: State|<p>MIB: IDRAC-MIB-SMIv2</p><p>0600.0012.0001.0005 This attribute defines the status of the power supply.</p>|SNMP agent|dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Power supply [{#PSU_DESCR}]: State|<p>MIB: IDRAC-MIB-SMIv2</p><p>0600.0012.0001.0005 This attribute defines the status of the power supply.</p>|SNMP agent|dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for PSU discovery
 
@@ -151,8 +151,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Fan [{#FAN_DESCR}]: Status|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the probe status of the cooling device.</p>|SNMP agent|dell.server.sensor.fan.status[{#FAN_DESCR}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Fan [{#FAN_DESCR}]: Speed|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the reading for a cooling device</p><p>of subtype other than coolingDeviceSubTypeIsDiscrete. When the value</p><p>for coolingDeviceSubType is other than coolingDeviceSubTypeIsDiscrete, the</p><p>value returned for this attribute is the speed in RPM or the OFF/ON value</p><p>of the cooling device. When the value for coolingDeviceSubType is</p><p>coolingDeviceSubTypeIsDiscrete, a value is not returned for this attribute.</p>|SNMP agent|dell.server.sensor.fan.speed[{#FAN_DESCR}]|
+|Dell R720: Fan [{#FAN_DESCR}]: Status|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the probe status of the cooling device.</p>|SNMP agent|dell.server.sensor.fan.status[{#FAN_DESCR}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Fan [{#FAN_DESCR}]: Speed|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the reading for a cooling device</p><p>of subtype other than coolingDeviceSubTypeIsDiscrete. When the value</p><p>for coolingDeviceSubType is other than coolingDeviceSubTypeIsDiscrete, the</p><p>value returned for this attribute is the speed in RPM or the OFF/ON value</p><p>of the cooling device. When the value for coolingDeviceSubType is</p><p>coolingDeviceSubTypeIsDiscrete, a value is not returned for this attribute.</p>|SNMP agent|dell.server.sensor.fan.speed[{#FAN_DESCR}]|
 
 ### Trigger prototypes for Fan discovery
 
@@ -171,8 +171,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Controller [{#CNTLR_NAME}]: Status|<p>MIB: IDRAC-MIB-SMIv2</p><p>The status of the controller itself without the propagation of any contained component status.</p><p>Possible values:</p><p>1: Other</p><p>2: Unknown</p><p>3: OK</p><p>4: Non-critical</p><p>5: Critical</p><p>6: Non-recoverable</p>|SNMP agent|dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Controller [{#CNTLR_NAME}]: Model|<p>MIB: IDRAC-MIB-SMIv2</p><p>The controller's name as represented in Storage Management.</p>|SNMP agent|dell.server.hw.diskarray.model[controllerName.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Controller [{#CNTLR_NAME}]: Status|<p>MIB: IDRAC-MIB-SMIv2</p><p>The status of the controller itself without the propagation of any contained component status.</p><p>Possible values:</p><p>1: Other</p><p>2: Unknown</p><p>3: OK</p><p>4: Non-critical</p><p>5: Critical</p><p>6: Non-recoverable</p>|SNMP agent|dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Controller [{#CNTLR_NAME}]: Model|<p>MIB: IDRAC-MIB-SMIv2</p><p>The controller's name as represented in Storage Management.</p>|SNMP agent|dell.server.hw.diskarray.model[controllerName.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for Array controller discovery
 
@@ -192,7 +192,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Battery [{#BATTERY_NAME}]: Status|<p>MIB: IDRAC-MIB-SMIv2</p><p>Current state of battery.</p><p>Possible values:</p><p>1: The current state could not be determined.</p><p>2: The battery is operating normally.</p><p>3: The battery has failed and needs to be replaced.</p><p>4: The battery temperature is high or charge level is depleting.</p><p>5: The battery is missing or not detected.</p><p>6: The battery is undergoing the re-charge phase.</p><p>7: The battery voltage or charge level is below the threshold.</p>|SNMP agent|dell.server.hw.battery.status[batteryState.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Battery [{#BATTERY_NAME}]: Status|<p>MIB: IDRAC-MIB-SMIv2</p><p>Current state of battery.</p><p>Possible values:</p><p>1: The current state could not be determined.</p><p>2: The battery is operating normally.</p><p>3: The battery has failed and needs to be replaced.</p><p>4: The battery temperature is high or charge level is depleting.</p><p>5: The battery is missing or not detected.</p><p>6: The battery is undergoing the re-charge phase.</p><p>7: The battery voltage or charge level is below the threshold.</p>|SNMP agent|dell.server.hw.battery.status[batteryState.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for Battery discovery
 
@@ -212,12 +212,12 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Physical disk [{#DISK_NAME}]: Status|<p>MIB: IDRAC-MIB-SMIv2</p><p>The status of the physical disk itself without the propagation of any contained component status.</p><p>Possible values:</p><p>1: Other</p><p>2: Unknown</p><p>3: OK</p><p>4: Non-critical</p><p>5: Critical</p><p>6: Non-recoverable</p>|SNMP agent|dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Physical disk [{#DISK_NAME}]: S.M.A.R.T. Status|<p>MIB: IDRAC-MIB-SMIv2</p><p>Indicates whether the physical disk has received a predictive failure alert.</p>|SNMP agent|dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Physical disk [{#DISK_NAME}]: Serial number|<p>MIB: IDRAC-MIB-SMIv2</p><p>The physical disk's unique identification number from the manufacturer.</p>|SNMP agent|dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Physical disk [{#DISK_NAME}]: Model name|<p>MIB: IDRAC-MIB-SMIv2</p><p>The model number of the physical disk.</p>|SNMP agent|dell.server.hw.physicaldisk.model[physicalDiskProductID.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Physical disk [{#DISK_NAME}]: Media type|<p>MIB: IDRAC-MIB-SMIv2</p><p>The media type of the physical disk. Possible Values:</p><p>1: The media type could not be determined.</p><p>2: Hard Disk Drive (HDD).</p><p>3: Solid State Drive (SSD).</p>|SNMP agent|dell.server.hw.physicaldisk.media_type[physicalDiskMediaType.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Physical disk [{#DISK_NAME}]: Size|<p>MIB: IDRAC-MIB-SMIv2</p><p>The size of the physical disk in megabytes.</p>|SNMP agent|dell.server.hw.physicaldisk.size[physicalDiskCapacityInMB.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Physical disk [{#DISK_NAME}]: Status|<p>MIB: IDRAC-MIB-SMIv2</p><p>The status of the physical disk itself without the propagation of any contained component status.</p><p>Possible values:</p><p>1: Other</p><p>2: Unknown</p><p>3: OK</p><p>4: Non-critical</p><p>5: Critical</p><p>6: Non-recoverable</p>|SNMP agent|dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Physical disk [{#DISK_NAME}]: S.M.A.R.T. Status|<p>MIB: IDRAC-MIB-SMIv2</p><p>Indicates whether the physical disk has received a predictive failure alert.</p>|SNMP agent|dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Physical disk [{#DISK_NAME}]: Serial number|<p>MIB: IDRAC-MIB-SMIv2</p><p>The physical disk's unique identification number from the manufacturer.</p>|SNMP agent|dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Physical disk [{#DISK_NAME}]: Model name|<p>MIB: IDRAC-MIB-SMIv2</p><p>The model number of the physical disk.</p>|SNMP agent|dell.server.hw.physicaldisk.model[physicalDiskProductID.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Physical disk [{#DISK_NAME}]: Media type|<p>MIB: IDRAC-MIB-SMIv2</p><p>The media type of the physical disk. Possible Values:</p><p>1: The media type could not be determined.</p><p>2: Hard Disk Drive (HDD).</p><p>3: Solid State Drive (SSD).</p>|SNMP agent|dell.server.hw.physicaldisk.media_type[physicalDiskMediaType.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Physical disk [{#DISK_NAME}]: Size|<p>MIB: IDRAC-MIB-SMIv2</p><p>The size of the physical disk in megabytes.</p>|SNMP agent|dell.server.hw.physicaldisk.size[physicalDiskCapacityInMB.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for Physical disk discovery
 
@@ -238,12 +238,12 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Virtual disk [{#DISK_NAME}]: Status|<p>MIB: IDRAC-MIB-SMIv2</p><p>The current state of this virtual disk (which includes any member physical disks.)</p><p>Possible states:</p><p>1: The current state could not be determined.</p><p>2: The virtual disk is operating normally or optimally.</p><p>3: The virtual disk has encountered a failure. Data on the disk is lost or is about to be lost.</p><p>4: The virtual disk encountered a failure with one or all of the constituent redundant physical disks.</p><p>The data on the virtual disk might no longer be fault tolerant.</p>|SNMP agent|dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Virtual disk [{#DISK_NAME}]: Layout type|<p>MIB: IDRAC-MIB-SMIv2</p><p>The virtual disk's RAID type.</p><p>Possible values:</p><p>1: Not one of the following</p><p>2: RAID-0</p><p>3: RAID-1</p><p>4: RAID-5</p><p>5: RAID-6</p><p>6: RAID-10</p><p>7: RAID-50</p><p>8: RAID-60</p><p>9: Concatenated RAID 1</p><p>10: Concatenated RAID 5</p>|SNMP agent|dell.server.hw.virtualdisk.layout[virtualDiskLayout.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Virtual disk [{#DISK_NAME}]: Size|<p>MIB: IDRAC-MIB-SMIv2</p><p>The size of the virtual disk in megabytes.</p>|SNMP agent|dell.server.hw.virtualdisk.size[virtualDiskSizeInMB.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Virtual disk [{#DISK_NAME}]: Operational state|<p>MIB: IDRAC-MIB-SMIv2</p><p>The state of the virtual disk when there are progressive operations ongoing.</p><p>Possible values:</p><p>1: There is no active operation running.</p><p>2: The virtual disk configuration has changed. The physical disks included in the virtual disk are being modified to support the new configuration.</p><p>3: A Consistency Check (CC) is being performed on the virtual disk.</p><p>4: The virtual disk is being initialized.</p><p>5: BackGround Initialization (BGI) is being performed on the virtual disk.</p>|SNMP agent|dell.server.hw.virtualdisk.state[virtualDiskOperationalState.{#SNMPINDEX}]|
-|Virtual disk [{#DISK_NAME}]: Read policy|<p>MIB: IDRAC-MIB-SMIv2</p><p>The read policy used by the controller for read operations on this virtual disk.</p><p>Possible values:</p><p>1: No Read Ahead.</p><p>2: Read Ahead.</p><p>3: Adaptive Read Ahead.</p>|SNMP agent|dell.server.hw.virtualdisk.read_policy[virtualDiskReadPolicy.{#SNMPINDEX}]|
-|Virtual disk [{#DISK_NAME}]: Write policy|<p>MIB: IDRAC-MIB-SMIv2</p><p>The write policy used by the controller for write operations on this virtual disk.</p><p>Possible values:</p><p>1: Write Through.</p><p>2: Write Back.</p><p>3: Force Write Back.</p>|SNMP agent|dell.server.hw.virtualdisk.write_policy[virtualDiskWritePolicy.{#SNMPINDEX}]|
+|Dell R720: Virtual disk [{#DISK_NAME}]: Status|<p>MIB: IDRAC-MIB-SMIv2</p><p>The current state of this virtual disk (which includes any member physical disks.)</p><p>Possible states:</p><p>1: The current state could not be determined.</p><p>2: The virtual disk is operating normally or optimally.</p><p>3: The virtual disk has encountered a failure. Data on the disk is lost or is about to be lost.</p><p>4: The virtual disk encountered a failure with one or all of the constituent redundant physical disks.</p><p>The data on the virtual disk might no longer be fault tolerant.</p>|SNMP agent|dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Virtual disk [{#DISK_NAME}]: Layout type|<p>MIB: IDRAC-MIB-SMIv2</p><p>The virtual disk's RAID type.</p><p>Possible values:</p><p>1: Not one of the following</p><p>2: RAID-0</p><p>3: RAID-1</p><p>4: RAID-5</p><p>5: RAID-6</p><p>6: RAID-10</p><p>7: RAID-50</p><p>8: RAID-60</p><p>9: Concatenated RAID 1</p><p>10: Concatenated RAID 5</p>|SNMP agent|dell.server.hw.virtualdisk.layout[virtualDiskLayout.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Virtual disk [{#DISK_NAME}]: Size|<p>MIB: IDRAC-MIB-SMIv2</p><p>The size of the virtual disk in megabytes.</p>|SNMP agent|dell.server.hw.virtualdisk.size[virtualDiskSizeInMB.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1048576`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Virtual disk [{#DISK_NAME}]: Operational state|<p>MIB: IDRAC-MIB-SMIv2</p><p>The state of the virtual disk when there are progressive operations ongoing.</p><p>Possible values:</p><p>1: There is no active operation running.</p><p>2: The virtual disk configuration has changed. The physical disks included in the virtual disk are being modified to support the new configuration.</p><p>3: A Consistency Check (CC) is being performed on the virtual disk.</p><p>4: The virtual disk is being initialized.</p><p>5: BackGround Initialization (BGI) is being performed on the virtual disk.</p>|SNMP agent|dell.server.hw.virtualdisk.state[virtualDiskOperationalState.{#SNMPINDEX}]|
+|Dell R720: Virtual disk [{#DISK_NAME}]: Read policy|<p>MIB: IDRAC-MIB-SMIv2</p><p>The read policy used by the controller for read operations on this virtual disk.</p><p>Possible values:</p><p>1: No Read Ahead.</p><p>2: Read Ahead.</p><p>3: Adaptive Read Ahead.</p>|SNMP agent|dell.server.hw.virtualdisk.read_policy[virtualDiskReadPolicy.{#SNMPINDEX}]|
+|Dell R720: Virtual disk [{#DISK_NAME}]: Write policy|<p>MIB: IDRAC-MIB-SMIv2</p><p>The write policy used by the controller for write operations on this virtual disk.</p><p>Possible values:</p><p>1: Write Through.</p><p>2: Write Back.</p><p>3: Force Write Back.</p>|SNMP agent|dell.server.hw.virtualdisk.write_policy[virtualDiskWritePolicy.{#SNMPINDEX}]|
 
 ### Trigger prototypes for Virtual disk discovery
 
@@ -262,8 +262,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|NIC [{#NIC_FQDD}/{#NIC_MAC}]: Link status|<p>This attribute defines the connection status of the network device.</p>|SNMP agent|dell.server.net.if.link[{#NIC_FQDD}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|NIC [{#NIC_FQDD}/{#NIC_MAC}]: Status|<p>This attribute defines the status of the network device.</p>|SNMP agent|dell.server.net.if.status[{#NIC_FQDD}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Link status|<p>This attribute defines the connection status of the network device.</p>|SNMP agent|dell.server.net.if.link[{#NIC_FQDD}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Status|<p>This attribute defines the status of the network device.</p>|SNMP agent|dell.server.net.if.status[{#NIC_FQDD}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for Network interface discovery
 
@@ -282,8 +282,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|CPU [{#CPU_FQDD}]: Status|<p>This attribute defines the status of the processor device status probe. This status will be joined into the processorDeviceStatus attribute.</p>|SNMP agent|dell.server.cpu.status[cpu.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|CPU [{#CPU_FQDD}]: State|<p>This attribute defines the reading of the processor device status probe.</p>|SNMP agent|dell.server.cpu.state[cpu.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: CPU [{#CPU_FQDD}]: Status|<p>This attribute defines the status of the processor device status probe. This status will be joined into the processorDeviceStatus attribute.</p>|SNMP agent|dell.server.cpu.status[cpu.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: CPU [{#CPU_FQDD}]: State|<p>This attribute defines the reading of the processor device status probe.</p>|SNMP agent|dell.server.cpu.state[cpu.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for CPU status discovery
 
@@ -302,7 +302,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|System battery [{#SNMPVALUE}]: Status|<p>This attribute defines the status of the battery.</p>|SNMP agent|dell.server.system.battery[{#SNMPVALUE}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: System battery [{#SNMPVALUE}]: Status|<p>This attribute defines the status of the battery.</p>|SNMP agent|dell.server.system.battery[{#SNMPVALUE}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for System battery discovery
 
@@ -320,8 +320,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Memory [{#SNMPVALUE}]: Status|<p>This attribute defines the status of the memory device.</p>|SNMP agent|dell.server.memory.status[{#SNMPVALUE}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Memory [{#SNMPVALUE}]: Size|<p>This attribute defines the size in KBytes of the memory device. Zero indicates no memory installed; 2,147,483,647 indicates an unknown memory size.</p>|SNMP agent|dell.server.memory.size[{#SNMPVALUE}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li><li><p>Custom multiplier: `1024`</p></li></ul>|
+|Dell R720: Memory [{#SNMPVALUE}]: Status|<p>This attribute defines the status of the memory device.</p>|SNMP agent|dell.server.memory.status[{#SNMPVALUE}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Memory [{#SNMPVALUE}]: Size|<p>This attribute defines the size in KBytes of the memory device. Zero indicates no memory installed; 2,147,483,647 indicates an unknown memory size.</p>|SNMP agent|dell.server.memory.size[{#SNMPVALUE}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li><li><p>Custom multiplier: `1024`</p></li></ul>|
 
 ### Trigger prototypes for Memory discovery
 
@@ -339,8 +339,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Voltage probe [{#VPROBE_NAME}]: Voltage|<p>This attribute defines the reading for a voltage probe.</p>|SNMP agent|dell.server.voltage.value[{#VPROBE_NAME}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li></ul>|
-|Voltage probe [{#VPROBE_NAME}]: Status|<p>This attribute defines the status of the voltage probe.</p>|SNMP agent|dell.server.voltage.status[{#VPROBE_NAME}]|
+|Dell R720: Voltage probe [{#VPROBE_NAME}]: Voltage|<p>This attribute defines the reading for a voltage probe.</p>|SNMP agent|dell.server.voltage.value[{#VPROBE_NAME}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li></ul>|
+|Dell R720: Voltage probe [{#VPROBE_NAME}]: Status|<p>This attribute defines the status of the voltage probe.</p>|SNMP agent|dell.server.voltage.status[{#VPROBE_NAME}]|
 
 ### Trigger prototypes for Voltage probe discovery
 

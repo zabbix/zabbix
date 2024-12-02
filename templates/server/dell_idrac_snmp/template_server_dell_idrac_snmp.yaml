@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-12-02T09:27:07Z'
+  date: '2024-12-02T10:13:48Z'
   groups:
     - uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
@@ -23,7 +23,7 @@ zabbix_export:
         - name: 'Templates/Server hardware'
       items:
         - uuid: 1c9a75cfdbf94f3a8a4fdbef2914506c
-          name: 'BIOS version'
+          name: 'Dell iDRAC: BIOS version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.4.300.50.1.8.1.1
           key: dell.server.bios.version
@@ -41,7 +41,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d0b46eadaeb04edbb9cfc27637397c91
-          name: 'System contact details'
+          name: 'Dell iDRAC: System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'dell.server.contact[sysContact]'
@@ -61,7 +61,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 9ef776ba14ab4eb7aed993711832cf4e
-          name: 'System description'
+          name: 'Dell iDRAC: System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'dell.server.descr[sysDescr]'
@@ -82,7 +82,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: ea7ba9945a13407d9d9cba8b34ec480f
-          name: 'Firmware version'
+          name: 'Dell iDRAC: Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.1.8.0
           key: 'dell.server.hw.firmware[racFirmwareVersion]'
@@ -112,7 +112,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 7cd756be916e4173a653ea424d8d5232
-          name: 'Hardware model name'
+          name: 'Dell iDRAC: Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.12.0
           key: 'dell.server.hw.model[systemModelName]'
@@ -131,7 +131,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d0b2ed5ce8e84a06ad1081ade25da16a
-          name: 'Hardware serial number'
+          name: 'Dell iDRAC: Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.2.0
           key: 'dell.server.hw.serialnumber[systemServiceTag]'
@@ -161,7 +161,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 78cf22c146e4432594d844c592c25d76
-          name: 'Uptime (hardware)'
+          name: 'Dell iDRAC: Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.2.5.0
           key: 'dell.server.hw.uptime[hrSystemUptime]'
@@ -175,7 +175,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 97044f584e954ae9b3d57abf0ced73eb
-          name: 'System location'
+          name: 'Dell iDRAC: System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'dell.server.location[sysLocation]'
@@ -195,7 +195,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 94191a9ec1584435974cb3c8e2d65f99
-          name: 'Memory, total size'
+          name: 'Dell iDRAC: Memory, total size'
           type: CALCULATED
           key: dell.server.memory.size.total
           history: 7d
@@ -219,7 +219,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 9032ffe4b0314a47a2f3241b38156592
-          name: 'System name'
+          name: 'Dell iDRAC: System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: 'dell.server.name[sysName]'
@@ -250,7 +250,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 11d66130f1d04acfb439ef65dec31ea4
-          name: 'Uptime (network)'
+          name: 'Dell iDRAC: Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.6.3.10.2.1.3.0
           key: 'dell.server.net.uptime[sysUpTime]'
@@ -264,7 +264,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 3930a7fa88de48beac130cedfe8dc0f7
-          name: 'System object ID'
+          name: 'Dell iDRAC: System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'dell.server.objectid[sysObjectID]'
@@ -283,7 +283,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 6164d49ba01c4fe895bed48ee3489edc
-          name: 'Overall system health status'
+          name: 'Dell iDRAC: Overall system health status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.2.1.0
           key: 'dell.server.status[globalSystemStatus]'
@@ -335,7 +335,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 3c93c8909ad14324947beda64c02f386
-          name: 'Operating system'
+          name: 'Dell iDRAC: Operating system'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.6.0
           key: 'dell.server.sw.os[systemOSName]'
@@ -365,7 +365,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 7e7e65916304419a8b5c43c9c08a20fc
-          name: 'SNMP traps (fallback)'
+          name: 'Dell iDRAC: SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           history: 7d
@@ -377,7 +377,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 2e3b11fcdd2146018676621143fd297b
-          name: 'SNMP agent availability'
+          name: 'Dell iDRAC: SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -412,7 +412,7 @@ zabbix_export:
           description: 'Scanning table of Array controllers: IDRAC-MIB-SMIv2::controllerTable'
           item_prototypes:
             - uuid: 94b5a43e08af4771bc91927ba8c42f18
-              name: 'Controller [{#CNTLR_NAME}]: Model'
+              name: 'Dell iDRAC: Controller [{#CNTLR_NAME}]: Model'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.2.{#SNMPINDEX}'
               key: 'dell.server.hw.diskarray.model[controllerName.{#SNMPINDEX}]'
@@ -432,7 +432,7 @@ zabbix_export:
                 - tag: component
                   value: storage
             - uuid: a282d4269206436c8d7773ccb07ac342
-              name: 'Controller [{#CNTLR_NAME}]: Status'
+              name: 'Dell iDRAC: Controller [{#CNTLR_NAME}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.38.{#SNMPINDEX}'
               key: 'dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}]'
@@ -508,7 +508,7 @@ zabbix_export:
           description: 'Scanning Battery Table: IDRAC-MIB-SMIv2::batteryTable'
           item_prototypes:
             - uuid: 8a97e10049c74f1d95c900f0b7623c21
-              name: 'Battery [{#BATTERY_NAME}]: Status'
+              name: 'Dell iDRAC: Battery [{#BATTERY_NAME}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.15.1.4.{#SNMPINDEX}'
               key: 'dell.server.hw.battery.status[batteryState.{#SNMPINDEX}]'
@@ -585,7 +585,7 @@ zabbix_export:
           description: 'CPU status discovery.'
           item_prototypes:
             - uuid: c5e3ef25855e4351bf439a2a24e49177
-              name: 'CPU [{#CPU_FQDD}]: State'
+              name: 'Dell iDRAC: CPU [{#CPU_FQDD}]: State'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.32.1.6.{#SNMPINDEX}'
               key: 'dell.server.cpu.state[cpu.{#SNMPINDEX}]'
@@ -613,7 +613,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: 8a40af6feb214ab7b2ebd9b04b19503f
-              name: 'CPU [{#CPU_FQDD}]: Status'
+              name: 'Dell iDRAC: CPU [{#CPU_FQDD}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.32.1.5.{#SNMPINDEX}'
               key: 'dell.server.cpu.status[cpu.{#SNMPINDEX}]'
@@ -658,7 +658,7 @@ zabbix_export:
           description: 'IDRAC-MIB-SMIv2::coolingDeviceTable'
           item_prototypes:
             - uuid: 643c0597d2674bce8bbf1a3726f0a744
-              name: 'Fan [{#FAN_DESCR}]: Speed'
+              name: 'Dell iDRAC: Fan [{#FAN_DESCR}]: Speed'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.12.1.6.{#SNMPINDEX}'
               key: 'dell.server.sensor.fan.speed[{#FAN_DESCR}]'
@@ -676,7 +676,7 @@ zabbix_export:
                 - tag: component
                   value: fan
             - uuid: 6dcd0f28f3df424cbc5a5e738e0f5983
-              name: 'Fan [{#FAN_DESCR}]: Status'
+              name: 'Dell iDRAC: Fan [{#FAN_DESCR}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.12.1.5.{#SNMPINDEX}'
               key: 'dell.server.sensor.fan.status[{#FAN_DESCR}]'
@@ -737,7 +737,7 @@ zabbix_export:
           description: 'Memory discovery.'
           item_prototypes:
             - uuid: 046db252dba84fdaa80e9e69a3df060e
-              name: 'Memory [{#SNMPVALUE}]: Size'
+              name: 'Dell iDRAC: Memory [{#SNMPVALUE}]: Size'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.50.1.14.1.{#SNMPINDEX}'
               key: 'dell.server.memory.size[{#SNMPVALUE}]'
@@ -755,7 +755,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: 6a0e3835c71c4f1eae9c374e61bb6805
-              name: 'Memory [{#SNMPVALUE}]: Status'
+              name: 'Dell iDRAC: Memory [{#SNMPVALUE}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.50.1.5.1.{#SNMPINDEX}'
               key: 'dell.server.memory.status[{#SNMPVALUE}]'
@@ -795,7 +795,7 @@ zabbix_export:
           description: 'Network devices discovery.'
           item_prototypes:
             - uuid: dd3ce480008540ea87bb4859f2b00dac
-              name: 'NIC [{#NIC_FQDD}/{#NIC_MAC}]: Link status'
+              name: 'Dell iDRAC: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Link status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.90.1.4.1.{#SNMPINDEX}'
               key: 'dell.server.net.if.link[{#NIC_FQDD}]'
@@ -828,7 +828,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: 331e57997cde491f8c8eed6227a0caf7
-              name: 'NIC [{#NIC_FQDD}/{#NIC_MAC}]: Status'
+              name: 'Dell iDRAC: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.90.1.3.1.{#SNMPINDEX}'
               key: 'dell.server.net.if.status[{#NIC_FQDD}]'
@@ -868,7 +868,7 @@ zabbix_export:
           description: 'Scanning  table of physical drive entries IDRAC-MIB-SMIv2::physicalDiskTable.'
           item_prototypes:
             - uuid: 7a96303e96fe41de9688004ccc80361d
-              name: 'Physical disk [{#DISK_NAME}]: Media type'
+              name: 'Dell iDRAC: Physical disk [{#DISK_NAME}]: Media type'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.35.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.media_type[physicalDiskMediaType.{#SNMPINDEX}]'
@@ -892,7 +892,7 @@ zabbix_export:
                 - tag: component
                   value: storage
             - uuid: b652991190a24899b1cb03a02865b444
-              name: 'Physical disk [{#DISK_NAME}]: Model name'
+              name: 'Dell iDRAC: Physical disk [{#DISK_NAME}]: Model name'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.6.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.model[physicalDiskProductID.{#SNMPINDEX}]'
@@ -912,7 +912,7 @@ zabbix_export:
                 - tag: component
                   value: storage
             - uuid: 77316e778e184eb3b803afe74e2ed6a3
-              name: 'Physical disk [{#DISK_NAME}]: Serial number'
+              name: 'Dell iDRAC: Physical disk [{#DISK_NAME}]: Serial number'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.7.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]'
@@ -943,7 +943,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 443246cd62cd4a22aa6e308ab11b67e5
-              name: 'Physical disk [{#DISK_NAME}]: Size'
+              name: 'Dell iDRAC: Physical disk [{#DISK_NAME}]: Size'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.11.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.size[physicalDiskCapacityInMB.{#SNMPINDEX}]'
@@ -966,7 +966,7 @@ zabbix_export:
                 - tag: component
                   value: storage
             - uuid: 3c202df55c6e450188e98fdf81cdf2ee
-              name: 'Physical disk [{#DISK_NAME}]: S.M.A.R.T. Status'
+              name: 'Dell iDRAC: Physical disk [{#DISK_NAME}]: S.M.A.R.T. Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.31.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}]'
@@ -1000,7 +1000,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: 4e044a6c6c024a4abb8ef0aabb5d4ca3
-              name: 'Physical disk [{#DISK_NAME}]: Status'
+              name: 'Dell iDRAC: Physical disk [{#DISK_NAME}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.24.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}]'
@@ -1070,7 +1070,7 @@ zabbix_export:
           description: 'IDRAC-MIB-SMIv2::powerSupplyTable'
           item_prototypes:
             - uuid: c91156b9b0c54d89a4d354c4af517400
-              name: 'Power supply [{#PSU_DESCR}]: State'
+              name: 'Dell iDRAC: Power supply [{#PSU_DESCR}]: State'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.600.12.1.5.{#SNMPINDEX}'
               key: 'dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}]'
@@ -1123,7 +1123,7 @@ zabbix_export:
           description: 'System battery discovery.'
           item_prototypes:
             - uuid: 5e0b908594654cf5abd16347ee8bc2b0
-              name: 'System battery [{#SNMPVALUE}]: Status'
+              name: 'Dell iDRAC: System battery [{#SNMPVALUE}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.600.50.1.5.1.{#SNMPINDEX}'
               key: 'dell.server.system.battery[{#SNMPVALUE}]'
@@ -1163,7 +1163,7 @@ zabbix_export:
           description: 'Scanning table of Temperature Probe Table IDRAC-MIB-SMIv2::temperatureProbeTable'
           item_prototypes:
             - uuid: b3e4d0bd456f4269b7a890c81730d1de
-              name: 'Probe [{#SENSOR_LOCALE}]: Status'
+              name: 'Dell iDRAC: Probe [{#SENSOR_LOCALE}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.5.{#SNMPINDEX}'
               key: 'dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}]'
@@ -1231,7 +1231,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: 468ab65099214451839a879d000dcfc4
-              name: 'Probe [{#SENSOR_LOCALE}]: Value'
+              name: 'Dell iDRAC: Probe [{#SENSOR_LOCALE}]: Value'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.6.{#SNMPINDEX}'
               key: 'dell.server.sensor.temp.value[temperatureProbeReading.{#SNMPINDEX}]'
@@ -1272,7 +1272,7 @@ zabbix_export:
           description: 'IDRAC-MIB-SMIv2::virtualDiskTable'
           item_prototypes:
             - uuid: 3cbaee68e37643d5b22bfbf415bd21ba
-              name: 'Virtual disk [{#DISK_NAME}]: Layout type'
+              name: 'Dell iDRAC: Virtual disk [{#DISK_NAME}]: Layout type'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.13.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.layout[virtualDiskLayout.{#SNMPINDEX}]'
@@ -1303,7 +1303,7 @@ zabbix_export:
                 - tag: component
                   value: virtualdisk
             - uuid: 19abe143c3f843acb98fbbcfecb851c9
-              name: 'Virtual disk [{#DISK_NAME}]: Read policy'
+              name: 'Dell iDRAC: Virtual disk [{#DISK_NAME}]: Read policy'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.11.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.read_policy[virtualDiskReadPolicy.{#SNMPINDEX}]'
@@ -1324,7 +1324,7 @@ zabbix_export:
                 - tag: component
                   value: virtualdisk
             - uuid: 6d9441c59d64422784d07af93282c68f
-              name: 'Virtual disk [{#DISK_NAME}]: Size'
+              name: 'Dell iDRAC: Virtual disk [{#DISK_NAME}]: Size'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.6.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.size[virtualDiskSizeInMB.{#SNMPINDEX}]'
@@ -1347,7 +1347,7 @@ zabbix_export:
                 - tag: component
                   value: virtualdisk
             - uuid: ca74d7a5d1144d50a707c0e04c031c33
-              name: 'Virtual disk [{#DISK_NAME}]: Operational state'
+              name: 'Dell iDRAC: Virtual disk [{#DISK_NAME}]: Operational state'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.30.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.state[virtualDiskOperationalState.{#SNMPINDEX}]'
@@ -1370,7 +1370,7 @@ zabbix_export:
                 - tag: component
                   value: virtualdisk
             - uuid: 130ceb3a44554ff19e14e70fd5a6a9bf
-              name: 'Virtual disk [{#DISK_NAME}]: Status'
+              name: 'Dell iDRAC: Virtual disk [{#DISK_NAME}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}]'
@@ -1418,7 +1418,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: 932cf26c451b4854a3b5dd2375a8ae76
-              name: 'Virtual disk [{#DISK_NAME}]: Write policy'
+              name: 'Dell iDRAC: Virtual disk [{#DISK_NAME}]: Write policy'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.10.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.write_policy[virtualDiskWritePolicy.{#SNMPINDEX}]'
@@ -1476,7 +1476,7 @@ zabbix_export:
           description: 'Voltage probe discovery.'
           item_prototypes:
             - uuid: 7b84ee06ac3b419eb5b10a3253bcaf59
-              name: 'Voltage probe [{#VPROBE_NAME}]: Status'
+              name: 'Dell iDRAC: Voltage probe [{#VPROBE_NAME}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.600.20.1.5.1.{#SNMPINDEX}'
               key: 'dell.server.voltage.status[{#VPROBE_NAME}]'
@@ -1498,7 +1498,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: 4cd12baa6c274747a284c2a45b654497
-              name: 'Voltage probe [{#VPROBE_NAME}]: Voltage'
+              name: 'Dell iDRAC: Voltage probe [{#VPROBE_NAME}]: Voltage'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.600.20.1.6.1.{#SNMPINDEX}'
               key: 'dell.server.voltage.value[{#VPROBE_NAME}]'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-12-02T09:27:23Z'
+  date: '2024-12-02T10:14:04Z'
   groups:
     - uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
@@ -23,7 +23,7 @@ zabbix_export:
         - name: 'Templates/Server hardware'
       items:
         - uuid: 5e8cd7ff8b5b4ac796147f72087ea925
-          name: 'BIOS version'
+          name: 'Dell R720: BIOS version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.4.300.50.1.8.1.1
           key: dell.server.bios.version
@@ -41,7 +41,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: cd86d6203a874b27be4ed91578928dcf
-          name: 'System contact details'
+          name: 'Dell R720: System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'dell.server.contact[sysContact]'
@@ -61,7 +61,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: d5c65ffddfff45319a3f6ba856b73f6b
-          name: 'System description'
+          name: 'Dell R720: System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'dell.server.descr[sysDescr]'
@@ -82,7 +82,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 00928da92ab7499aba169837b2fffc83
-          name: 'Firmware version'
+          name: 'Dell R720: Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.1.8.0
           key: 'dell.server.hw.firmware[racFirmwareVersion]'
@@ -112,7 +112,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 34fd8f0eaae041828cd1743ef55c16f9
-          name: 'Hardware model name'
+          name: 'Dell R720: Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.12.0
           key: 'dell.server.hw.model[systemModelName]'
@@ -131,7 +131,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: f5753d89e11f43fba46959b60601d45c
-          name: 'Hardware serial number'
+          name: 'Dell R720: Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.2.0
           key: 'dell.server.hw.serialnumber[systemServiceTag]'
@@ -161,7 +161,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 3240487059234b49bb822113c1964693
-          name: 'Uptime (hardware)'
+          name: 'Dell R720: Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.2.5.0
           key: 'dell.server.hw.uptime[hrSystemUptime]'
@@ -175,7 +175,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: ca9019fd89654c52889a12153150151d
-          name: 'System location'
+          name: 'Dell R720: System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'dell.server.location[sysLocation]'
@@ -195,7 +195,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: beac13b3dfa04b0a9edf1a01e559021e
-          name: 'Memory, total size'
+          name: 'Dell R720: Memory, total size'
           type: CALCULATED
           key: dell.server.memory.size.total
           history: 7d
@@ -219,7 +219,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 8b72816906274e1281929a318c44e8c6
-          name: 'System name'
+          name: 'Dell R720: System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: 'dell.server.name[sysName]'
@@ -250,7 +250,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 767944c5d9e0470580f813948d9dbe96
-          name: 'Uptime (network)'
+          name: 'Dell R720: Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.6.3.10.2.1.3.0
           key: 'dell.server.net.uptime[sysUpTime]'
@@ -264,7 +264,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 18c324fe6e714549bc337c2711795c40
-          name: 'System object ID'
+          name: 'Dell R720: System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'dell.server.objectid[sysObjectID]'
@@ -283,7 +283,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 341699ea98c64951b1d94d89b5c81362
-          name: 'Overall system health status'
+          name: 'Dell R720: Overall system health status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.2.1.0
           key: 'dell.server.status[globalSystemStatus]'
@@ -335,7 +335,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: c8d519bdde9a4c3b89976f7b0dab0696
-          name: 'Operating system'
+          name: 'Dell R720: Operating system'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.6.0
           key: 'dell.server.sw.os[systemOSName]'
@@ -365,7 +365,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 65097a06ef764129bcb0cb7fdd1f0ec8
-          name: 'SNMP traps (fallback)'
+          name: 'Dell R720: SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           history: 7d
@@ -377,7 +377,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 943b9c35a40c4ca7811212b20b27677d
-          name: 'SNMP agent availability'
+          name: 'Dell R720: SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -412,7 +412,7 @@ zabbix_export:
           description: 'Scanning table of Array controllers: IDRAC-MIB-SMIv2::controllerTable'
           item_prototypes:
             - uuid: 0f565dd530fa4a0bb93b642c8ee19b0f
-              name: 'Controller [{#CNTLR_NAME}]: Model'
+              name: 'Dell R720: Controller [{#CNTLR_NAME}]: Model'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.2.{#SNMPINDEX}'
               key: 'dell.server.hw.diskarray.model[controllerName.{#SNMPINDEX}]'
@@ -432,7 +432,7 @@ zabbix_export:
                 - tag: component
                   value: storage
             - uuid: 69ed8def6e2c4025abcc565217064600
-              name: 'Controller [{#CNTLR_NAME}]: Status'
+              name: 'Dell R720: Controller [{#CNTLR_NAME}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.38.{#SNMPINDEX}'
               key: 'dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}]'
@@ -508,7 +508,7 @@ zabbix_export:
           description: 'Scanning Battery Table: IDRAC-MIB-SMIv2::batteryTable'
           item_prototypes:
             - uuid: 9444982ba8cf4c70a03a780fab18a36a
-              name: 'Battery [{#BATTERY_NAME}]: Status'
+              name: 'Dell R720: Battery [{#BATTERY_NAME}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.15.1.4.{#SNMPINDEX}'
               key: 'dell.server.hw.battery.status[batteryState.{#SNMPINDEX}]'
@@ -585,7 +585,7 @@ zabbix_export:
           description: 'CPU status discovery.'
           item_prototypes:
             - uuid: 668835ea1b0a4146a6296d298a9f1607
-              name: 'CPU [{#CPU_FQDD}]: State'
+              name: 'Dell R720: CPU [{#CPU_FQDD}]: State'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.32.1.6.{#SNMPINDEX}'
               key: 'dell.server.cpu.state[cpu.{#SNMPINDEX}]'
@@ -613,7 +613,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: 201313c89ba245a794e5e76778c0dfa4
-              name: 'CPU [{#CPU_FQDD}]: Status'
+              name: 'Dell R720: CPU [{#CPU_FQDD}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.32.1.5.{#SNMPINDEX}'
               key: 'dell.server.cpu.status[cpu.{#SNMPINDEX}]'
@@ -658,7 +658,7 @@ zabbix_export:
           description: 'IDRAC-MIB-SMIv2::coolingDeviceTable'
           item_prototypes:
             - uuid: fdd01d80c11e41e3aa1c8975b4f2b926
-              name: 'Fan [{#FAN_DESCR}]: Speed'
+              name: 'Dell R720: Fan [{#FAN_DESCR}]: Speed'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.12.1.6.{#SNMPINDEX}'
               key: 'dell.server.sensor.fan.speed[{#FAN_DESCR}]'
@@ -676,7 +676,7 @@ zabbix_export:
                 - tag: component
                   value: fan
             - uuid: 028a4cd49fd04e92aac769f4e38a40c9
-              name: 'Fan [{#FAN_DESCR}]: Status'
+              name: 'Dell R720: Fan [{#FAN_DESCR}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.12.1.5.{#SNMPINDEX}'
               key: 'dell.server.sensor.fan.status[{#FAN_DESCR}]'
@@ -737,7 +737,7 @@ zabbix_export:
           description: 'Memory discovery.'
           item_prototypes:
             - uuid: 4c857762cecb45fe8bb545b5cc786d9c
-              name: 'Memory [{#SNMPVALUE}]: Size'
+              name: 'Dell R720: Memory [{#SNMPVALUE}]: Size'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.50.1.14.1.{#SNMPINDEX}'
               key: 'dell.server.memory.size[{#SNMPVALUE}]'
@@ -755,7 +755,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: c692910b52774a33aabaff78e46cc855
-              name: 'Memory [{#SNMPVALUE}]: Status'
+              name: 'Dell R720: Memory [{#SNMPVALUE}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.50.1.5.1.{#SNMPINDEX}'
               key: 'dell.server.memory.status[{#SNMPVALUE}]'
@@ -795,7 +795,7 @@ zabbix_export:
           description: 'Network devices discovery.'
           item_prototypes:
             - uuid: e6728405f5c64aec8822190e868625d3
-              name: 'NIC [{#NIC_FQDD}/{#NIC_MAC}]: Link status'
+              name: 'Dell R720: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Link status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.90.1.4.1.{#SNMPINDEX}'
               key: 'dell.server.net.if.link[{#NIC_FQDD}]'
@@ -828,7 +828,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: 396dee5189a14314a861a04d9a0dcacc
-              name: 'NIC [{#NIC_FQDD}/{#NIC_MAC}]: Status'
+              name: 'Dell R720: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.90.1.3.1.{#SNMPINDEX}'
               key: 'dell.server.net.if.status[{#NIC_FQDD}]'
@@ -868,7 +868,7 @@ zabbix_export:
           description: 'Scanning  table of physical drive entries IDRAC-MIB-SMIv2::physicalDiskTable.'
           item_prototypes:
             - uuid: 6830d155acf647fd990822137efa9d02
-              name: 'Physical disk [{#DISK_NAME}]: Media type'
+              name: 'Dell R720: Physical disk [{#DISK_NAME}]: Media type'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.35.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.media_type[physicalDiskMediaType.{#SNMPINDEX}]'
@@ -892,7 +892,7 @@ zabbix_export:
                 - tag: component
                   value: storage
             - uuid: 3cae98ed317a43e7920d4ae9106fe9cd
-              name: 'Physical disk [{#DISK_NAME}]: Model name'
+              name: 'Dell R720: Physical disk [{#DISK_NAME}]: Model name'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.6.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.model[physicalDiskProductID.{#SNMPINDEX}]'
@@ -912,7 +912,7 @@ zabbix_export:
                 - tag: component
                   value: storage
             - uuid: 27f4105ce0c24d9f8509f71b59ce8714
-              name: 'Physical disk [{#DISK_NAME}]: Serial number'
+              name: 'Dell R720: Physical disk [{#DISK_NAME}]: Serial number'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.7.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]'
@@ -943,7 +943,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 20d406f393fc4a6b9963569d24a02106
-              name: 'Physical disk [{#DISK_NAME}]: Size'
+              name: 'Dell R720: Physical disk [{#DISK_NAME}]: Size'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.11.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.size[physicalDiskCapacityInMB.{#SNMPINDEX}]'
@@ -966,7 +966,7 @@ zabbix_export:
                 - tag: component
                   value: storage
             - uuid: aa58b1d10ae8498a9f6ca736e083ec91
-              name: 'Physical disk [{#DISK_NAME}]: S.M.A.R.T. Status'
+              name: 'Dell R720: Physical disk [{#DISK_NAME}]: S.M.A.R.T. Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.31.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}]'
@@ -1000,7 +1000,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: 551bee86234a4c99a6c7c5ac7db89f37
-              name: 'Physical disk [{#DISK_NAME}]: Status'
+              name: 'Dell R720: Physical disk [{#DISK_NAME}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.24.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}]'
@@ -1070,7 +1070,7 @@ zabbix_export:
           description: 'IDRAC-MIB-SMIv2::powerSupplyTable'
           item_prototypes:
             - uuid: 43fe09a202994622bbef420c9b018d49
-              name: 'Power supply [{#PSU_DESCR}]: State'
+              name: 'Dell R720: Power supply [{#PSU_DESCR}]: State'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.600.12.1.5.{#SNMPINDEX}'
               key: 'dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}]'
@@ -1123,7 +1123,7 @@ zabbix_export:
           description: 'System battery discovery.'
           item_prototypes:
             - uuid: 89887fe6674e42ac985018f1da7c86e0
-              name: 'System battery [{#SNMPVALUE}]: Status'
+              name: 'Dell R720: System battery [{#SNMPVALUE}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.600.50.1.5.1.{#SNMPINDEX}'
               key: 'dell.server.system.battery[{#SNMPVALUE}]'
@@ -1163,7 +1163,7 @@ zabbix_export:
           description: 'Scanning table of Temperature Probe Table IDRAC-MIB-SMIv2::temperatureProbeTable'
           item_prototypes:
             - uuid: 8933cb6596154baca790294c37d0a3b9
-              name: 'Probe [{#SENSOR_LOCALE}]: Status'
+              name: 'Dell R720: Probe [{#SENSOR_LOCALE}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.5.{#SNMPINDEX}'
               key: 'dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}]'
@@ -1231,7 +1231,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: 9c03b7da06874b69a43943de63912d82
-              name: 'Probe [{#SENSOR_LOCALE}]: Value'
+              name: 'Dell R720: Probe [{#SENSOR_LOCALE}]: Value'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.6.{#SNMPINDEX}'
               key: 'dell.server.sensor.temp.value[temperatureProbeReading.{#SNMPINDEX}]'
@@ -1272,7 +1272,7 @@ zabbix_export:
           description: 'IDRAC-MIB-SMIv2::virtualDiskTable'
           item_prototypes:
             - uuid: 6f63f8bbeba44c3a85a874f6e2796b26
-              name: 'Virtual disk [{#DISK_NAME}]: Layout type'
+              name: 'Dell R720: Virtual disk [{#DISK_NAME}]: Layout type'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.13.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.layout[virtualDiskLayout.{#SNMPINDEX}]'
@@ -1303,7 +1303,7 @@ zabbix_export:
                 - tag: component
                   value: virtualdisk
             - uuid: 9bcd5c8774d64293a3c03135df0026bf
-              name: 'Virtual disk [{#DISK_NAME}]: Read policy'
+              name: 'Dell R720: Virtual disk [{#DISK_NAME}]: Read policy'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.11.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.read_policy[virtualDiskReadPolicy.{#SNMPINDEX}]'
@@ -1324,7 +1324,7 @@ zabbix_export:
                 - tag: component
                   value: virtualdisk
             - uuid: f52835c258ea4b2ab16ab91fa14f2cd9
-              name: 'Virtual disk [{#DISK_NAME}]: Size'
+              name: 'Dell R720: Virtual disk [{#DISK_NAME}]: Size'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.6.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.size[virtualDiskSizeInMB.{#SNMPINDEX}]'
@@ -1347,7 +1347,7 @@ zabbix_export:
                 - tag: component
                   value: virtualdisk
             - uuid: 100faa8a115f4f34a61938fc9fe2b056
-              name: 'Virtual disk [{#DISK_NAME}]: Operational state'
+              name: 'Dell R720: Virtual disk [{#DISK_NAME}]: Operational state'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.30.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.state[virtualDiskOperationalState.{#SNMPINDEX}]'
@@ -1370,7 +1370,7 @@ zabbix_export:
                 - tag: component
                   value: virtualdisk
             - uuid: 9f49cd360dc849d19abe10cd5cf94a10
-              name: 'Virtual disk [{#DISK_NAME}]: Status'
+              name: 'Dell R720: Virtual disk [{#DISK_NAME}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}]'
@@ -1418,7 +1418,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: d599f3c67807443b82c9ec83af325142
-              name: 'Virtual disk [{#DISK_NAME}]: Write policy'
+              name: 'Dell R720: Virtual disk [{#DISK_NAME}]: Write policy'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.10.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.write_policy[virtualDiskWritePolicy.{#SNMPINDEX}]'
@@ -1476,7 +1476,7 @@ zabbix_export:
           description: 'Voltage probe discovery.'
           item_prototypes:
             - uuid: 2b9a84f4a7fb429081a22394ba9ef81f
-              name: 'Voltage probe [{#VPROBE_NAME}]: Status'
+              name: 'Dell R720: Voltage probe [{#VPROBE_NAME}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.600.20.1.5.1.{#SNMPINDEX}'
               key: 'dell.server.voltage.status[{#VPROBE_NAME}]'
@@ -1498,7 +1498,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: 053c9f3e14cc438795b0a7911ab57854
-              name: 'Voltage probe [{#VPROBE_NAME}]: Voltage'
+              name: 'Dell R720: Voltage probe [{#VPROBE_NAME}]: Voltage'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.600.20.1.6.1.{#SNMPINDEX}'
               key: 'dell.server.voltage.value[{#VPROBE_NAME}]'

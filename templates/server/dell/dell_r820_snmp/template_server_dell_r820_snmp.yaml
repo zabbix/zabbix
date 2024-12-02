@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-12-02T09:27:45Z'
+  date: '2024-12-02T10:14:27Z'
   groups:
     - uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
@@ -23,7 +23,7 @@ zabbix_export:
         - name: 'Templates/Server hardware'
       items:
         - uuid: cf0d3ec990d94f949157ea9c22ba37b0
-          name: 'BIOS version'
+          name: 'Dell R820: BIOS version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.4.300.50.1.8.1.1
           key: dell.server.bios.version
@@ -41,7 +41,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: ca6fac1eee9f41d88df43b4e870e8e84
-          name: 'System contact details'
+          name: 'Dell R820: System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
           key: 'dell.server.contact[sysContact]'
@@ -61,7 +61,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: b738b9531e5049df8c31f1c37868f34f
-          name: 'System description'
+          name: 'Dell R820: System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
           key: 'dell.server.descr[sysDescr]'
@@ -82,7 +82,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 7a4e5160d533407194d63d90f93352bd
-          name: 'Firmware version'
+          name: 'Dell R820: Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.1.8.0
           key: 'dell.server.hw.firmware[racFirmwareVersion]'
@@ -112,7 +112,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 70068169a3b74328a803fcd2d69954ee
-          name: 'Hardware model name'
+          name: 'Dell R820: Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.12.0
           key: 'dell.server.hw.model[systemModelName]'
@@ -131,7 +131,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: a3881855713847d286c3acd0de95a416
-          name: 'Hardware serial number'
+          name: 'Dell R820: Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.2.0
           key: 'dell.server.hw.serialnumber[systemServiceTag]'
@@ -161,7 +161,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 2308ce0f18f249258d3b05a5d08e6a83
-          name: 'Uptime (hardware)'
+          name: 'Dell R820: Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.2.5.0
           key: 'dell.server.hw.uptime[hrSystemUptime]'
@@ -175,7 +175,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 286a4143fb464b31bb5cd581e7458959
-          name: 'System location'
+          name: 'Dell R820: System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
           key: 'dell.server.location[sysLocation]'
@@ -195,7 +195,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 190388551b5144c49a4afefe0347cdc0
-          name: 'Memory, total size'
+          name: 'Dell R820: Memory, total size'
           type: CALCULATED
           key: dell.server.memory.size.total
           history: 7d
@@ -219,7 +219,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: eccac199b19143c0b3e275d5dae16729
-          name: 'System name'
+          name: 'Dell R820: System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
           key: 'dell.server.name[sysName]'
@@ -250,7 +250,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 55193d35960a410abf32f903b3b04406
-          name: 'Uptime (network)'
+          name: 'Dell R820: Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.6.3.10.2.1.3.0
           key: 'dell.server.net.uptime[sysUpTime]'
@@ -264,7 +264,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 3561ed916061452e8597b8265c7305f3
-          name: 'System object ID'
+          name: 'Dell R820: System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
           key: 'dell.server.objectid[sysObjectID]'
@@ -283,7 +283,7 @@ zabbix_export:
             - tag: component
               value: system
         - uuid: 3924d9aae3ac44b1b14d9c19204cbe2c
-          name: 'Overall system health status'
+          name: 'Dell R820: Overall system health status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.2.1.0
           key: 'dell.server.status[globalSystemStatus]'
@@ -335,7 +335,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 168398f2c797467fb7830dce8a9510b9
-          name: 'Operating system'
+          name: 'Dell R820: Operating system'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.6.0
           key: 'dell.server.sw.os[systemOSName]'
@@ -365,7 +365,7 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: 2f33eafc892b487dba32aa46823eafd4
-          name: 'SNMP traps (fallback)'
+          name: 'Dell R820: SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
           history: 7d
@@ -377,7 +377,7 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 5dd178b40f28436db3c71a1dd50b8ea8
-          name: 'SNMP agent availability'
+          name: 'Dell R820: SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
           history: 7d
@@ -412,7 +412,7 @@ zabbix_export:
           description: 'Scanning table of Array controllers: IDRAC-MIB-SMIv2::controllerTable'
           item_prototypes:
             - uuid: 259703858717407585f403d886114af5
-              name: 'Controller [{#CNTLR_NAME}]: Model'
+              name: 'Dell R820: Controller [{#CNTLR_NAME}]: Model'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.2.{#SNMPINDEX}'
               key: 'dell.server.hw.diskarray.model[controllerName.{#SNMPINDEX}]'
@@ -432,7 +432,7 @@ zabbix_export:
                 - tag: component
                   value: storage
             - uuid: 1aed396b98904eb49c2a4089841dac10
-              name: 'Controller [{#CNTLR_NAME}]: Status'
+              name: 'Dell R820: Controller [{#CNTLR_NAME}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.38.{#SNMPINDEX}'
               key: 'dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}]'
@@ -508,7 +508,7 @@ zabbix_export:
           description: 'Scanning Battery Table: IDRAC-MIB-SMIv2::batteryTable'
           item_prototypes:
             - uuid: acea5c462a964f0fb371db6a5fbb7bbb
-              name: 'Battery [{#BATTERY_NAME}]: Status'
+              name: 'Dell R820: Battery [{#BATTERY_NAME}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.15.1.4.{#SNMPINDEX}'
               key: 'dell.server.hw.battery.status[batteryState.{#SNMPINDEX}]'
@@ -585,7 +585,7 @@ zabbix_export:
           description: 'CPU status discovery.'
           item_prototypes:
             - uuid: 550842e315774bd9b47b5d463f5a6f0e
-              name: 'CPU [{#CPU_FQDD}]: State'
+              name: 'Dell R820: CPU [{#CPU_FQDD}]: State'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.32.1.6.{#SNMPINDEX}'
               key: 'dell.server.cpu.state[cpu.{#SNMPINDEX}]'
@@ -613,7 +613,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: 0082b3b5a4a14afca309c643a82d9ba0
-              name: 'CPU [{#CPU_FQDD}]: Status'
+              name: 'Dell R820: CPU [{#CPU_FQDD}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.32.1.5.{#SNMPINDEX}'
               key: 'dell.server.cpu.status[cpu.{#SNMPINDEX}]'
@@ -658,7 +658,7 @@ zabbix_export:
           description: 'IDRAC-MIB-SMIv2::coolingDeviceTable'
           item_prototypes:
             - uuid: c505c8858ffc4cbca8f1719b93d6f0a6
-              name: 'Fan [{#FAN_DESCR}]: Speed'
+              name: 'Dell R820: Fan [{#FAN_DESCR}]: Speed'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.12.1.6.{#SNMPINDEX}'
               key: 'dell.server.sensor.fan.speed[{#FAN_DESCR}]'
@@ -676,7 +676,7 @@ zabbix_export:
                 - tag: component
                   value: fan
             - uuid: bcf401ebc1294bcab14bc1c0003f3fb7
-              name: 'Fan [{#FAN_DESCR}]: Status'
+              name: 'Dell R820: Fan [{#FAN_DESCR}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.12.1.5.{#SNMPINDEX}'
               key: 'dell.server.sensor.fan.status[{#FAN_DESCR}]'
@@ -737,7 +737,7 @@ zabbix_export:
           description: 'Memory discovery.'
           item_prototypes:
             - uuid: 6eefc7d8c0d14f96bed7d77ea2bb6022
-              name: 'Memory [{#SNMPVALUE}]: Size'
+              name: 'Dell R820: Memory [{#SNMPVALUE}]: Size'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.50.1.14.1.{#SNMPINDEX}'
               key: 'dell.server.memory.size[{#SNMPVALUE}]'
@@ -755,7 +755,7 @@ zabbix_export:
                 - tag: component
                   value: memory
             - uuid: 4cdb3a43a0d847318269db509abb5926
-              name: 'Memory [{#SNMPVALUE}]: Status'
+              name: 'Dell R820: Memory [{#SNMPVALUE}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.50.1.5.1.{#SNMPINDEX}'
               key: 'dell.server.memory.status[{#SNMPVALUE}]'
@@ -795,7 +795,7 @@ zabbix_export:
           description: 'Network devices discovery.'
           item_prototypes:
             - uuid: 71c070e0a1c7471989f2cebb89f1adcf
-              name: 'NIC [{#NIC_FQDD}/{#NIC_MAC}]: Link status'
+              name: 'Dell R820: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Link status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.90.1.4.1.{#SNMPINDEX}'
               key: 'dell.server.net.if.link[{#NIC_FQDD}]'
@@ -828,7 +828,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: 15743aecf8f046559094380f25617c03
-              name: 'NIC [{#NIC_FQDD}/{#NIC_MAC}]: Status'
+              name: 'Dell R820: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.90.1.3.1.{#SNMPINDEX}'
               key: 'dell.server.net.if.status[{#NIC_FQDD}]'
@@ -868,7 +868,7 @@ zabbix_export:
           description: 'Scanning  table of physical drive entries IDRAC-MIB-SMIv2::physicalDiskTable.'
           item_prototypes:
             - uuid: 0d6e0fed749445afbe8a4e392e12abbe
-              name: 'Physical disk [{#DISK_NAME}]: Media type'
+              name: 'Dell R820: Physical disk [{#DISK_NAME}]: Media type'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.35.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.media_type[physicalDiskMediaType.{#SNMPINDEX}]'
@@ -892,7 +892,7 @@ zabbix_export:
                 - tag: component
                   value: storage
             - uuid: 6138dd1248e24a3d979947046e161a16
-              name: 'Physical disk [{#DISK_NAME}]: Model name'
+              name: 'Dell R820: Physical disk [{#DISK_NAME}]: Model name'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.6.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.model[physicalDiskProductID.{#SNMPINDEX}]'
@@ -912,7 +912,7 @@ zabbix_export:
                 - tag: component
                   value: storage
             - uuid: 838834fd85bb4abc888963e3d6633ac9
-              name: 'Physical disk [{#DISK_NAME}]: Serial number'
+              name: 'Dell R820: Physical disk [{#DISK_NAME}]: Serial number'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.7.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]'
@@ -943,7 +943,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 43e78bf47b4d424b82ee69c5114fb002
-              name: 'Physical disk [{#DISK_NAME}]: Size'
+              name: 'Dell R820: Physical disk [{#DISK_NAME}]: Size'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.11.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.size[physicalDiskCapacityInMB.{#SNMPINDEX}]'
@@ -966,7 +966,7 @@ zabbix_export:
                 - tag: component
                   value: storage
             - uuid: d5a1505bdab14808a818c3337010cdce
-              name: 'Physical disk [{#DISK_NAME}]: S.M.A.R.T. Status'
+              name: 'Dell R820: Physical disk [{#DISK_NAME}]: S.M.A.R.T. Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.31.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}]'
@@ -1000,7 +1000,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: 71d28a0808384915bf1f08bb8cdad3f6
-              name: 'Physical disk [{#DISK_NAME}]: Status'
+              name: 'Dell R820: Physical disk [{#DISK_NAME}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.24.{#SNMPINDEX}'
               key: 'dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}]'
@@ -1070,7 +1070,7 @@ zabbix_export:
           description: 'IDRAC-MIB-SMIv2::powerSupplyTable'
           item_prototypes:
             - uuid: fa618cb76eeb4f3495fe6dfa5f516104
-              name: 'Power supply [{#PSU_DESCR}]: State'
+              name: 'Dell R820: Power supply [{#PSU_DESCR}]: State'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.600.12.1.5.{#SNMPINDEX}'
               key: 'dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}]'
@@ -1123,7 +1123,7 @@ zabbix_export:
           description: 'System battery discovery.'
           item_prototypes:
             - uuid: 7c35f1486da64a2880bdd9cafc0b4cf4
-              name: 'System battery [{#SNMPVALUE}]: Status'
+              name: 'Dell R820: System battery [{#SNMPVALUE}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.600.50.1.5.1.{#SNMPINDEX}'
               key: 'dell.server.system.battery[{#SNMPVALUE}]'
@@ -1163,7 +1163,7 @@ zabbix_export:
           description: 'Scanning table of Temperature Probe Table IDRAC-MIB-SMIv2::temperatureProbeTable'
           item_prototypes:
             - uuid: 24139838c42248f3b9d7f8244daacc0e
-              name: 'Probe [{#SENSOR_LOCALE}]: Status'
+              name: 'Dell R820: Probe [{#SENSOR_LOCALE}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.5.{#SNMPINDEX}'
               key: 'dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}]'
@@ -1231,7 +1231,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: ef279c5ff8694f28916f6bd0d9615089
-              name: 'Probe [{#SENSOR_LOCALE}]: Value'
+              name: 'Dell R820: Probe [{#SENSOR_LOCALE}]: Value'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.6.{#SNMPINDEX}'
               key: 'dell.server.sensor.temp.value[temperatureProbeReading.{#SNMPINDEX}]'
@@ -1272,7 +1272,7 @@ zabbix_export:
           description: 'IDRAC-MIB-SMIv2::virtualDiskTable'
           item_prototypes:
             - uuid: 57e6784821914279a1fe8d11f20ad66b
-              name: 'Virtual disk [{#DISK_NAME}]: Layout type'
+              name: 'Dell R820: Virtual disk [{#DISK_NAME}]: Layout type'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.13.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.layout[virtualDiskLayout.{#SNMPINDEX}]'
@@ -1303,7 +1303,7 @@ zabbix_export:
                 - tag: component
                   value: virtualdisk
             - uuid: 882a140fafd340c8b888337c0ca051ad
-              name: 'Virtual disk [{#DISK_NAME}]: Read policy'
+              name: 'Dell R820: Virtual disk [{#DISK_NAME}]: Read policy'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.11.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.read_policy[virtualDiskReadPolicy.{#SNMPINDEX}]'
@@ -1324,7 +1324,7 @@ zabbix_export:
                 - tag: component
                   value: virtualdisk
             - uuid: 56a908b58aff4639b0b6a53911619746
-              name: 'Virtual disk [{#DISK_NAME}]: Size'
+              name: 'Dell R820: Virtual disk [{#DISK_NAME}]: Size'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.6.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.size[virtualDiskSizeInMB.{#SNMPINDEX}]'
@@ -1347,7 +1347,7 @@ zabbix_export:
                 - tag: component
                   value: virtualdisk
             - uuid: cba60a18965843dba5bdadfdabfb1b83
-              name: 'Virtual disk [{#DISK_NAME}]: Operational state'
+              name: 'Dell R820: Virtual disk [{#DISK_NAME}]: Operational state'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.30.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.state[virtualDiskOperationalState.{#SNMPINDEX}]'
@@ -1370,7 +1370,7 @@ zabbix_export:
                 - tag: component
                   value: virtualdisk
             - uuid: 7daf3f6a7af6490688d9800b6542590f
-              name: 'Virtual disk [{#DISK_NAME}]: Status'
+              name: 'Dell R820: Virtual disk [{#DISK_NAME}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}]'
@@ -1418,7 +1418,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: e0b2638cf3dd4dd0809aa5b73101deea
-              name: 'Virtual disk [{#DISK_NAME}]: Write policy'
+              name: 'Dell R820: Virtual disk [{#DISK_NAME}]: Write policy'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.10.{#SNMPINDEX}'
               key: 'dell.server.hw.virtualdisk.write_policy[virtualDiskWritePolicy.{#SNMPINDEX}]'
@@ -1476,7 +1476,7 @@ zabbix_export:
           description: 'Voltage probe discovery.'
           item_prototypes:
             - uuid: 2623885d4d204b3faae8037d1c1cc19b
-              name: 'Voltage probe [{#VPROBE_NAME}]: Status'
+              name: 'Dell R820: Voltage probe [{#VPROBE_NAME}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.600.20.1.5.1.{#SNMPINDEX}'
               key: 'dell.server.voltage.status[{#VPROBE_NAME}]'
@@ -1498,7 +1498,7 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: 34887c269ced46e9bcf6108b83f0338f
-              name: 'Voltage probe [{#VPROBE_NAME}]: Voltage'
+              name: 'Dell R820: Voltage probe [{#VPROBE_NAME}]: Voltage'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.600.20.1.6.1.{#SNMPINDEX}'
               key: 'dell.server.voltage.value[{#VPROBE_NAME}]'
