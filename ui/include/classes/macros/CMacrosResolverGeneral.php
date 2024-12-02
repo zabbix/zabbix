@@ -1204,14 +1204,10 @@ class CMacrosResolverGeneral {
 										)
 								)
 							]);
-						$macro_value = new CSpan([
-							(new CSpan())
-								->addClass('main-hint')
-								->setHint($hint_table),
+						$macro_value =
 							(new CLinkAction($macro_value))
-								->addClass('hint-item')
 								->setAttribute('data-hintbox', '1')
-						]);
+								->setHint($hint_table);
 					}
 
 					$macro_values[$function['triggerid']][$token['token']] = $macro_value;

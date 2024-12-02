@@ -1821,8 +1821,9 @@ class CScreenProblem extends CScreenBase {
 						? _('binary value')
 						: $last_value['value']
 				))
-					->addClass('hint-item')
-					->setAttribute('data-hintbox', '1');
+					->setAttribute('data-hintbox', '1')
+					->setHint($hint_table)
+				;
 				$latest_values[] = ', ';
 			}
 			else {
@@ -1834,10 +1835,6 @@ class CScreenProblem extends CScreenBase {
 
 		if ($html) {
 			array_pop($latest_values);
-			array_unshift($latest_values, (new CDiv())
-				->addClass('main-hint')
-				->setHint($hint_table)
-			);
 
 			return $latest_values;
 		}
