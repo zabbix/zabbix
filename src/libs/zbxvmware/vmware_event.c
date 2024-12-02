@@ -1006,8 +1006,6 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 		goto end_session;
 	}
 
-	*evt_top_key = 0;
-
 	do
 	{
 		zbx_xml_doc_free(doc);
@@ -1259,7 +1257,7 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 	int				ret = FAIL;
 	ZBX_HTTPPAGE			page;	/* 347K/87K */
 	unsigned char			evt_pause = 0, evt_skip_old, evt_severity;
-	zbx_uint64_t			evt_last_key, evt_top_key, events_sz = 0, shmem_free_sz = 0;
+	zbx_uint64_t			evt_last_key, evt_top_key = 0, events_sz = 0, shmem_free_sz = 0;
 	time_t				evt_last_ts, evt_top_time = 0;
 	char				msg[VMWARE_SHORT_STR_LEN];
 	float				shmem_factor = 0;
