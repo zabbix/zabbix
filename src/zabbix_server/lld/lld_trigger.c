@@ -2124,7 +2124,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 						"Cannot create trigger \"%s\": "
 						"duplicate trigger was discovered.\n",
 						t2->description);
-				
+
 				if (0 == t2->triggerid)
 					t2->flags &= ~ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
 				else if (0 == trigger->triggerid)
