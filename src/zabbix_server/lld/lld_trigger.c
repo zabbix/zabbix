@@ -2013,12 +2013,19 @@ static int	lld_trigger_changed(const zbx_lld_trigger_t *trigger)
 	return FAIL;
 }
 
-static char	*lld_triggers_equal_expand_expr(const zbx_lld_trigger_t *trigger, const char *expression,
-		int expand_db_trigger)
+#define ZBX_LLD_TRIGGER_VALUE_NO_EXPAND	0
+#define ZBX_LLD_TRIGGER_VALUE_EXPAND	1
+
+/******************************************************************************
+ *                                                                            *
+ * Return value: returns original or expanded expression                      *
+ *                                                                            *
+ ******************************************************************************/
+static char	*lld_triggers_equal_expand_expr(const zbx_lld_trigger_t *trigger, const char *expression, int expand)
 {
 	char	*expr;
 
-	expr = (1 == expand_db_trigger ? lld_trigger_expression_expand(trigger, expression, &trigger->functions) :
+	expr = (1 == expand ? lld_trigger_expression_expand(trigger, expression, &trigger->functions) :
 			zbx_strdup(NULL, expression));
 
 	return expr;
@@ -2041,7 +2048,7 @@ static int	lld_triggers_equal(const zbx_lld_trigger_t *trigger, const zbx_lld_tr
 	if (0 != strcmp(trigger->description, db_trigger->description))
 		goto out;
 
-	expression1 = lld_triggers_equal_expand_expr(trigger, trigger->expression, 1);
+	expression1 = lld_triggers_equal_expand_expr(trigger, trigger->expression, ZBX_LLD_TRIGGER_VALUE_EXPAND);
 	expression2 = lld_triggers_equal_expand_expr(db_trigger, db_trigger->expression, expand_db_trigger);
 
 	if (0 != strcmp(expression1, expression2))
@@ -2050,7 +2057,9 @@ static int	lld_triggers_equal(const zbx_lld_trigger_t *trigger, const zbx_lld_tr
 	zbx_free(expression1);
 	zbx_free(expression2);
 
-	expression1 = lld_triggers_equal_expand_expr(trigger, trigger->recovery_expression, 1);
+	expression1 = lld_triggers_equal_expand_expr(trigger, trigger->recovery_expression,
+			ZBX_LLD_TRIGGER_VALUE_EXPAND);
+
 	expression2 = lld_triggers_equal_expand_expr(db_trigger, db_trigger->recovery_expression, expand_db_trigger);
 
 	if (0 == strcmp(expression1, expression2))
@@ -2118,7 +2127,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 			if (0 == (t2->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
 				continue;
 
-			if (SUCCEED == lld_triggers_equal(trigger, t2, 1))
+			if (SUCCEED == lld_triggers_equal(trigger, t2, ZBX_LLD_TRIGGER_VALUE_EXPAND))
 			{
 				*error = zbx_strdcatf(*error,
 						"Cannot create trigger \"%s\": "
@@ -2153,7 +2162,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 		zbx_vector_ptr_create(&db_triggers);
 
 		zbx_vector_str_sort(&descriptions, ZBX_DEFAULT_STR_COMPARE_FUNC);
-		zbx_vector_uint64_sort(&triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_str_uniq(&descriptions, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
 		sql = (char *)zbx_malloc(sql, sql_alloc);
 
@@ -2235,7 +2244,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 				if (0 == (trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
 					continue;
 
-				if (SUCCEED != lld_triggers_equal(trigger, db_trigger, 0))
+				if (SUCCEED != lld_triggers_equal(trigger, db_trigger, ZBX_LLD_TRIGGER_VALUE_NO_EXPAND))
 					continue;
 
 				*error = zbx_strdcatf(*error, "Cannot %s trigger: trigger \"%s\" already exists.\n",
