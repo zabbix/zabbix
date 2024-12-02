@@ -2104,14 +2104,14 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 
 	/* checking duplicated triggers in DB */
 
-	for (i = 0; i < triggers->values_num; i++)
+	for (i = triggers->values_num - 1; i > 0; i--)
 	{
 		trigger = (zbx_lld_trigger_t *)triggers->values[i];
 
 		if (0 == (trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
 			continue;
 
-		for (j = i + 1; j < triggers->values_num; j++)
+		for (j = i - 1; j >= 0; j--)
 		{
 			zbx_lld_trigger_t	*t2 = triggers->values[j];
 
@@ -2127,8 +2127,6 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 
 				if (0 == t2->triggerid)
 					t2->flags &= ~ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
-				else if (0 == trigger->triggerid)
-					trigger->flags &= ~ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
 			}
 		}
 
