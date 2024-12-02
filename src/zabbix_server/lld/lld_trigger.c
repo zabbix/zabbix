@@ -2013,6 +2013,17 @@ static int	lld_trigger_changed(const zbx_lld_trigger_t *trigger)
 	return FAIL;
 }
 
+static char	*lld_triggers_equal_expand_expr(const zbx_lld_trigger_t *trigger, const char *expression,
+		int expand_db_trigger)
+{
+	char	*expr;
+
+	expr = (1 == expand_db_trigger ? lld_trigger_expression_expand(trigger, expression, &trigger->functions) :
+			zbx_strdup(NULL, expression));
+
+	return expr;
+}
+
 /******************************************************************************
  *                                                                            *
  * Return value: returns SUCCEED if descriptions and expressions of           *
@@ -2020,30 +2031,33 @@ static int	lld_trigger_changed(const zbx_lld_trigger_t *trigger)
  *                                                                            *
  ******************************************************************************/
 static int	lld_triggers_equal(const zbx_lld_trigger_t *trigger, const zbx_lld_trigger_t *db_trigger,
-		int uniq_names)
+		int expand_db_trigger)
 {
 	int	ret = FAIL;
-	char	*expression = NULL;
+	char	*expression1 = NULL, *expression2 = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (0 != strcmp(trigger->description, db_trigger->description))
 		goto out;
-	else if (1 == uniq_names)
-		return SUCCEED;
 
-	expression = lld_trigger_expression_expand(trigger, trigger->expression, &trigger->functions);
+	expression1 = lld_triggers_equal_expand_expr(trigger, trigger->expression, 1);
+	expression2 = lld_triggers_equal_expand_expr(db_trigger, db_trigger->expression, expand_db_trigger);
 
-	if (0 != strcmp(expression, db_trigger->expression))
+	if (0 != strcmp(expression1, expression2))
 		goto out;
 
-	zbx_free(expression);
-	expression = lld_trigger_expression_expand(trigger, trigger->recovery_expression, &trigger->functions);
+	zbx_free(expression1);
+	zbx_free(expression2);
 
-	if (0 == strcmp(expression, db_trigger->recovery_expression))
+	expression1 = lld_triggers_equal_expand_expr(trigger, trigger->recovery_expression, 1);
+	expression2 = lld_triggers_equal_expand_expr(db_trigger, db_trigger->recovery_expression, expand_db_trigger);
+
+	if (0 == strcmp(expression1, expression2))
 		ret = SUCCEED;
 out:
-	zbx_free(expression);
+	zbx_free(expression1);
+	zbx_free(expression2);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -2141,7 +2155,12 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 			continue;
 
 		if (0 != trigger->triggerid)
+		{
 			zbx_vector_uint64_append(&triggerids, trigger->triggerid);
+
+			if (SUCCEED != lld_trigger_changed(trigger))
+				continue;
+		}
 
 		zbx_vector_str_append(&descriptions, trigger->description);
 	}
