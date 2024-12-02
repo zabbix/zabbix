@@ -1703,7 +1703,7 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
  * Purpose: deserialize agent result                                          *
  *                                                                            *
  * Parameters: data        - [IN] the data to deserialize                     *
- #             data_offset - [IN] the data length                             *
+ *             data_offset - [IN] the data length                             *
  *             result      - [OUT] the agent result                           *
  *                                                                            *
  * Return value: the agent result return code (SYSINFO_RET_*)                 *
