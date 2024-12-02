@@ -1,15 +1,15 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-12-02T09:27:45Z'
+  date: '2024-12-02T09:27:15Z'
   groups:
     - uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
   templates:
-    - uuid: d41c5d0fa91545d68cced1b5dabe4bf1
-      template: 'DELL PowerEdge R820 by SNMP'
-      name: 'DELL PowerEdge R820 by SNMP'
+    - uuid: 3ba7dec7c0034d86ad1c73b4f8ee8994
+      template: 'DELL PowerEdge R660 by SNMP'
+      name: 'DELL PowerEdge R660 by SNMP'
       description: |
-        Template for DELL PowerEdge R820 servers with iDRAC version 7 and later.
+        Template for DELL PowerEdge R660 servers with iDRAC version 7 and later.
         
         MIBs used:
         HOST-RESOURCES-MIB
@@ -22,7 +22,7 @@ zabbix_export:
       groups:
         - name: 'Templates/Server hardware'
       items:
-        - uuid: cf0d3ec990d94f949157ea9c22ba37b0
+        - uuid: 10c7c6dfa9d645d19595f143cbeafb18
           name: 'BIOS version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.4.300.50.1.8.1.1
@@ -40,7 +40,7 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: ca6fac1eee9f41d88df43b4e870e8e84
+        - uuid: 543172398a8a46238b3b2d6e2e176db9
           name: 'System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
@@ -60,7 +60,7 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: b738b9531e5049df8c31f1c37868f34f
+        - uuid: ed8c53e78cf1430895f819a1c79f1881
           name: 'System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
@@ -81,7 +81,7 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: 7a4e5160d533407194d63d90f93352bd
+        - uuid: 0523d1c71ec648d3b7f72152bcdd3980
           name: 'Firmware version'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.1.8.0
@@ -101,9 +101,9 @@ zabbix_export:
             - tag: component
               value: system
           triggers:
-            - uuid: bf0330b9e03c40b3a8aa4f799ab4d677
-              expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.firmware[racFirmwareVersion],#1)<>last(/DELL PowerEdge R820 by SNMP/dell.server.hw.firmware[racFirmwareVersion],#2) and length(last(/DELL PowerEdge R820 by SNMP/dell.server.hw.firmware[racFirmwareVersion]))>0'
-              name: 'Dell R820: Firmware has changed'
+            - uuid: 06ad53c66cf241d285dd0e4a19b30105
+              expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.firmware[racFirmwareVersion],#1)<>last(/DELL PowerEdge R660 by SNMP/dell.server.hw.firmware[racFirmwareVersion],#2) and length(last(/DELL PowerEdge R660 by SNMP/dell.server.hw.firmware[racFirmwareVersion]))>0'
+              name: 'Dell R660: Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'Firmware version has changed. Acknowledge to close the problem manually.'
@@ -111,7 +111,7 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: notice
-        - uuid: 70068169a3b74328a803fcd2d69954ee
+        - uuid: 3f474f2cc921445392d4153b4070c581
           name: 'Hardware model name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.12.0
@@ -130,7 +130,7 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: a3881855713847d286c3acd0de95a416
+        - uuid: cd1220099942408eab14e854a9f556fe
           name: 'Hardware serial number'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.2.0
@@ -150,17 +150,17 @@ zabbix_export:
             - tag: component
               value: system
           triggers:
-            - uuid: 85fc427d143b4bd784fc851464e30c60
-              expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.serialnumber[systemServiceTag],#1)<>last(/DELL PowerEdge R820 by SNMP/dell.server.hw.serialnumber[systemServiceTag],#2) and length(last(/DELL PowerEdge R820 by SNMP/dell.server.hw.serialnumber[systemServiceTag]))>0'
-              name: 'Dell R820: Device has been replaced'
-              event_name: 'Dell R820: Device has been replaced (new serial number received)'
+            - uuid: ab50b7de4a004c1bb8bae012e87a9fae
+              expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.serialnumber[systemServiceTag],#1)<>last(/DELL PowerEdge R660 by SNMP/dell.server.hw.serialnumber[systemServiceTag],#2) and length(last(/DELL PowerEdge R660 by SNMP/dell.server.hw.serialnumber[systemServiceTag]))>0'
+              name: 'Dell R660: Device has been replaced'
+              event_name: 'Dell R660: Device has been replaced (new serial number received)'
               priority: INFO
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 - tag: scope
                   value: notice
-        - uuid: 2308ce0f18f249258d3b05a5d08e6a83
+        - uuid: 86f3503ad4ce4210a9d367536075c78d
           name: 'Uptime (hardware)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.2.5.0
@@ -174,7 +174,7 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: 286a4143fb464b31bb5cd581e7458959
+        - uuid: 94dacb3e9ce94c8abe29f5a1f3ed7414
           name: 'System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
@@ -194,7 +194,7 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: 190388551b5144c49a4afefe0347cdc0
+        - uuid: aa5060ea16f54e348d0093600bc1369b
           name: 'Memory, total size'
           type: CALCULATED
           key: dell.server.memory.size.total
@@ -210,15 +210,15 @@ zabbix_export:
             - tag: component
               value: memory
           triggers:
-            - uuid: d7121d536e9e472e84ed8521c66dc63b
-              expression: 'change(/DELL PowerEdge R820 by SNMP/dell.server.memory.size.total)>0'
-              name: 'Dell R820: Memory amount has changed'
+            - uuid: 9f583d671b3842798f0bd4d50d395c6e
+              expression: 'change(/DELL PowerEdge R660 by SNMP/dell.server.memory.size.total)>0'
+              name: 'Dell R660: Memory amount has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               tags:
                 - tag: scope
                   value: availability
-        - uuid: eccac199b19143c0b3e275d5dae16729
+        - uuid: feddc0222dab4e89a6caa661b67020a7
           name: 'System name'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.5.0
@@ -239,17 +239,17 @@ zabbix_export:
             - tag: component
               value: system
           triggers:
-            - uuid: 34d5734804fd4e28960e76d85b26230b
-              expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.name[sysName],#1)<>last(/DELL PowerEdge R820 by SNMP/dell.server.name[sysName],#2) and length(last(/DELL PowerEdge R820 by SNMP/dell.server.name[sysName]))>0'
-              name: 'Dell R820: System name has changed'
-              event_name: 'Dell R820: System name has changed (new name: {ITEM.VALUE})'
+            - uuid: 59cb6156e1f84f0fb28beb51a8046da3
+              expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.name[sysName],#1)<>last(/DELL PowerEdge R660 by SNMP/dell.server.name[sysName],#2) and length(last(/DELL PowerEdge R660 by SNMP/dell.server.name[sysName]))>0'
+              name: 'Dell R660: System name has changed'
+              event_name: 'Dell R660: System name has changed (new name: {ITEM.VALUE})'
               priority: INFO
               description: 'The name of the system has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 - tag: scope
                   value: notice
-        - uuid: 55193d35960a410abf32f903b3b04406
+        - uuid: 62a708d5e13b4d8fbf3d12b77164e2a0
           name: 'Uptime (network)'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.6.3.10.2.1.3.0
@@ -263,7 +263,7 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: 3561ed916061452e8597b8265c7305f3
+        - uuid: 443fb640977a492f83cba1b7fb9454fe
           name: 'System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
@@ -282,7 +282,7 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: 3924d9aae3ac44b1b14d9c19204cbe2c
+        - uuid: 4acbcd1baf9e456a9d3e30d33282858a
           name: 'Overall system health status'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.2.1.0
@@ -304,37 +304,37 @@ zabbix_export:
             - tag: component
               value: system
           triggers:
-            - uuid: 4109ee28d6d54d568965c21fc147791c
-              expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.status[globalSystemStatus])={$DELL.SNMP.HEALTH.STATUS.DISASTER}'
-              name: 'Dell R820: System is in unrecoverable state'
+            - uuid: 81762ad908ba492c897572f690606da3
+              expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.status[globalSystemStatus])={$DELL.SNMP.HEALTH.STATUS.DISASTER}'
+              name: 'Dell R660: System is in unrecoverable state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for faults.'
               tags:
                 - tag: scope
                   value: availability
-            - uuid: 126c5d57fecc4785b1f620c413c5dd12
-              expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.status[globalSystemStatus])={$DELL.SNMP.HEALTH.STATUS.CRIT}'
-              name: 'Dell R820: System status is in critical state'
+            - uuid: 04c60944973d402b9d3a0e96049c42ad
+              expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.status[globalSystemStatus])={$DELL.SNMP.HEALTH.STATUS.CRIT}'
+              name: 'Dell R660: System status is in critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Please check the device for errors.'
               tags:
                 - tag: scope
                   value: availability
-            - uuid: da0537de8fdb4cff88cd19ec031cf562
-              expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.status[globalSystemStatus])={$DELL.SNMP.HEALTH.STATUS.WARN}'
-              name: 'Dell R820: System status is in warning state'
+            - uuid: 31fbf1a98d0646bd9082efc946e2a424
+              expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.status[globalSystemStatus])={$DELL.SNMP.HEALTH.STATUS.WARN}'
+              name: 'Dell R660: System status is in warning state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Please check the device for warnings.'
               dependencies:
-                - name: 'Dell R820: System status is in critical state'
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.status[globalSystemStatus])={$DELL.SNMP.HEALTH.STATUS.CRIT}'
+                - name: 'Dell R660: System status is in critical state'
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.status[globalSystemStatus])={$DELL.SNMP.HEALTH.STATUS.CRIT}'
               tags:
                 - tag: scope
                   value: availability
-        - uuid: 168398f2c797467fb7830dce8a9510b9
+        - uuid: 069326e2f88d4ef9bbed30e94d08af5d
           name: 'Operating system'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.674.10892.5.1.3.6.0
@@ -355,16 +355,16 @@ zabbix_export:
             - tag: component
               value: system
           triggers:
-            - uuid: b6a26d0134054b75b88dbcfcd3dc8d3c
-              expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.sw.os[systemOSName],#1)<>last(/DELL PowerEdge R820 by SNMP/dell.server.sw.os[systemOSName],#2) and length(last(/DELL PowerEdge R820 by SNMP/dell.server.sw.os[systemOSName]))>0'
-              name: 'Dell R820: Operating system description has changed'
+            - uuid: d76ca22d7fd742efb84e04940fa9a846
+              expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.sw.os[systemOSName],#1)<>last(/DELL PowerEdge R660 by SNMP/dell.server.sw.os[systemOSName],#2) and length(last(/DELL PowerEdge R660 by SNMP/dell.server.sw.os[systemOSName]))>0'
+              name: 'Dell R660: Operating system description has changed'
               priority: INFO
               description: 'Operating system description has changed. Possibly, the system has been updated or replaced. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 - tag: scope
                   value: notice
-        - uuid: 2f33eafc892b487dba32aa46823eafd4
+        - uuid: 9beb49cb322d48cfa061fc206b679a3e
           name: 'SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
@@ -376,7 +376,7 @@ zabbix_export:
           tags:
             - tag: component
               value: network
-        - uuid: 5dd178b40f28436db3c71a1dd50b8ea8
+        - uuid: 3847459063014aafae40a59263c6cd21
           name: 'SNMP agent availability'
           type: INTERNAL
           key: 'zabbix[host,snmp,available]'
@@ -393,9 +393,9 @@ zabbix_export:
             - tag: component
               value: system
           triggers:
-            - uuid: 81826abcb02d45b089024c47892bc52f
-              expression: 'max(/DELL PowerEdge R820 by SNMP/zabbix[host,snmp,available],{$DELL.SNMP.TIMEOUT})=0'
-              name: 'Dell R820: No SNMP data collection'
+            - uuid: b7121bb9605148c299aa571ae0baaeac
+              expression: 'max(/DELL PowerEdge R660 by SNMP/zabbix[host,snmp,available],{$DELL.SNMP.TIMEOUT})=0'
+              name: 'Dell R660: No SNMP data collection'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'SNMP is not available for polling. Please check device connectivity and SNMP settings.'
@@ -403,7 +403,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
       discovery_rules:
-        - uuid: dd11819fb5e34d60bd8d9c7b658a79ac
+        - uuid: ce45d29db5664f2a8057b59dbacb406c
           name: 'Array controller discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.38,{#CNTLR_NAME},1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.79]'
@@ -411,7 +411,7 @@ zabbix_export:
           delay: 1h
           description: 'Scanning table of Array controllers: IDRAC-MIB-SMIv2::controllerTable'
           item_prototypes:
-            - uuid: 259703858717407585f403d886114af5
+            - uuid: 0d3726a29096447ab2e6bc777266e24c
               name: 'Controller [{#CNTLR_NAME}]: Model'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.2.{#SNMPINDEX}'
@@ -431,7 +431,7 @@ zabbix_export:
                   value: diskarray
                 - tag: component
                   value: storage
-            - uuid: 1aed396b98904eb49c2a4089841dac10
+            - uuid: dccc777dbf40477d99824475e0899546
               name: 'Controller [{#CNTLR_NAME}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.1.1.38.{#SNMPINDEX}'
@@ -460,38 +460,38 @@ zabbix_export:
                 - tag: component
                   value: storage
               trigger_prototypes:
-                - uuid: dfe26fe9fe2d4cbfa48ac3e65fee1b95
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.STATUS.CRIT}'
-                  name: 'Dell R820: Controller [{#CNTLR_NAME}]: Critical state'
+                - uuid: 922d9b5a81a24331bc127c537cce7844
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.STATUS.CRIT}'
+                  name: 'Dell R660: Controller [{#CNTLR_NAME}]: Critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the device for faults.'
                   dependencies:
-                    - name: 'Dell R820: Controller [{#CNTLR_NAME}]: Unrecoverable state'
-                      expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.STATUS.FAIL}'
+                    - name: 'Dell R660: Controller [{#CNTLR_NAME}]: Unrecoverable state'
+                      expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.STATUS.FAIL}'
                   tags:
                     - tag: scope
                       value: availability
-                - uuid: 2d8e50f7be4e49da9c3e014393c07333
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.STATUS.FAIL}'
-                  name: 'Dell R820: Controller [{#CNTLR_NAME}]: Unrecoverable state'
+                - uuid: 651b100a1d6f4319af973417dcc846c8
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.STATUS.FAIL}'
+                  name: 'Dell R660: Controller [{#CNTLR_NAME}]: Unrecoverable state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
                   tags:
                     - tag: scope
                       value: availability
-                - uuid: 9e70c7098eb24c62926abc8a88d66643
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.STATUS.WARN}'
-                  name: 'Dell R820: Controller [{#CNTLR_NAME}]: Warning state'
+                - uuid: aec00889d9d2419d8fd1e5b4cfc1095b
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.STATUS.WARN}'
+                  name: 'Dell R660: Controller [{#CNTLR_NAME}]: Warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check the device for faults.'
                   dependencies:
-                    - name: 'Dell R820: Controller [{#CNTLR_NAME}]: Critical state'
-                      expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.STATUS.CRIT}'
-                    - name: 'Dell R820: Controller [{#CNTLR_NAME}]: Unrecoverable state'
-                      expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.STATUS.FAIL}'
+                    - name: 'Dell R660: Controller [{#CNTLR_NAME}]: Critical state'
+                      expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.STATUS.CRIT}'
+                    - name: 'Dell R660: Controller [{#CNTLR_NAME}]: Unrecoverable state'
+                      expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.STATUS.FAIL}'
                   tags:
                     - tag: scope
                       value: availability
@@ -499,7 +499,7 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
-        - uuid: 161ef832d536461f90f47e914cdcbe44
+        - uuid: f24ac636401c47ddbbafb571ddbc9653
           name: 'Battery discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#BATTERY_NUM},1.3.6.1.4.1.674.10892.5.5.1.20.130.15.1.1,{#BATTERY_NAME},1.3.6.1.4.1.674.10892.5.5.1.20.130.15.1.21]'
@@ -507,7 +507,7 @@ zabbix_export:
           delay: 1h
           description: 'Scanning Battery Table: IDRAC-MIB-SMIv2::batteryTable'
           item_prototypes:
-            - uuid: acea5c462a964f0fb371db6a5fbb7bbb
+            - uuid: 641a35177d934e58afd3abf701dafcde
               name: 'Battery [{#BATTERY_NAME}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.15.1.4.{#SNMPINDEX}'
@@ -537,38 +537,38 @@ zabbix_export:
                 - tag: component
                   value: diskarray
               trigger_prototypes:
-                - uuid: cdc3002046db4124ab5396a832a31d33
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.battery.status[batteryState.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
-                  name: 'Dell R820: Battery [{#BATTERY_NAME}]: Critical state'
+                - uuid: 30752fbc757f47b4a44ce2e348b4be1c
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.battery.status[batteryState.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
+                  name: 'Dell R660: Battery [{#BATTERY_NAME}]: Critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the device for faults.'
                   tags:
                     - tag: scope
                       value: availability
-                - uuid: 0e80311a3cf04eb3b2119f4accbe8378
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.battery.status[batteryState.{#SNMPINDEX}])<>{$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.OK}'
-                  name: 'Dell R820: Battery [{#BATTERY_NAME}]: Not in optimal state'
+                - uuid: c7c2724e188f4a568601d77f3f698212
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.battery.status[batteryState.{#SNMPINDEX}])<>{$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.OK}'
+                  name: 'Dell R660: Battery [{#BATTERY_NAME}]: Not in optimal state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: INFO
                   description: 'Please check the device for faults.'
                   dependencies:
-                    - name: 'Dell R820: Battery [{#BATTERY_NAME}]: Critical state'
-                      expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.battery.status[batteryState.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
-                    - name: 'Dell R820: Battery [{#BATTERY_NAME}]: Warning state'
-                      expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.battery.status[batteryState.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}'
+                    - name: 'Dell R660: Battery [{#BATTERY_NAME}]: Critical state'
+                      expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.battery.status[batteryState.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
+                    - name: 'Dell R660: Battery [{#BATTERY_NAME}]: Warning state'
+                      expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.battery.status[batteryState.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}'
                   tags:
                     - tag: scope
                       value: availability
-                - uuid: aa9dc7776f844a6fb414f3f1ec6df936
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.battery.status[batteryState.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}'
-                  name: 'Dell R820: Battery [{#BATTERY_NAME}]: Warning state'
+                - uuid: 4c5fca69653e4b02a0646b1f06947893
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.battery.status[batteryState.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}'
+                  name: 'Dell R660: Battery [{#BATTERY_NAME}]: Warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check the device for faults.'
                   dependencies:
-                    - name: 'Dell R820: Battery [{#BATTERY_NAME}]: Critical state'
-                      expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.battery.status[batteryState.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
+                    - name: 'Dell R660: Battery [{#BATTERY_NAME}]: Critical state'
+                      expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.battery.status[batteryState.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}'
                   tags:
                     - tag: scope
                       value: availability
@@ -576,7 +576,7 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
-        - uuid: f7291777ed604b249f0ff1dcb5e824e9
+        - uuid: 4eccdae6174d47b0808bba46de0bad6e
           name: 'CPU status discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#CPU_FQDD},1.3.6.1.4.1.674.10892.5.4.1100.30.1.26]'
@@ -584,7 +584,7 @@ zabbix_export:
           delay: 1h
           description: 'CPU status discovery.'
           item_prototypes:
-            - uuid: 550842e315774bd9b47b5d463f5a6f0e
+            - uuid: 3e5f3afa1bd9466f80bc384df5e6adde
               name: 'CPU [{#CPU_FQDD}]: State'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.32.1.6.{#SNMPINDEX}'
@@ -601,9 +601,9 @@ zabbix_export:
                 - tag: component
                   value: cpu
               trigger_prototypes:
-                - uuid: 4a936613afb742aba3008630245d1a4b
-                  expression: 'bitand(last(/DELL PowerEdge R820 by SNMP/dell.server.cpu.state[cpu.{#SNMPINDEX}],#1),128)=0'
-                  name: 'Dell R820: CPU [{#CPU_FQDD}]: Reading error'
+                - uuid: 67364b2e5a8a4a98a51846d23449510e
+                  expression: 'bitand(last(/DELL PowerEdge R660 by SNMP/dell.server.cpu.state[cpu.{#SNMPINDEX}],#1),128)=0'
+                  name: 'Dell R660: CPU [{#CPU_FQDD}]: Reading error'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -612,7 +612,7 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: availability
-            - uuid: 0082b3b5a4a14afca309c643a82d9ba0
+            - uuid: badfdf4bb0d54474b841335e6f31225b
               name: 'CPU [{#CPU_FQDD}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.32.1.5.{#SNMPINDEX}'
@@ -629,9 +629,9 @@ zabbix_export:
                 - tag: component
                   value: cpu
               trigger_prototypes:
-                - uuid: 75a71a22dd4e4e18a6361475e951138d
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.cpu.status[cpu.{#SNMPINDEX}],#1)<>3'
-                  name: 'Dell R820: CPU [{#CPU_FQDD}]: Status is not OK'
+                - uuid: 906617c75c7a4b9ebb8d5a8e0cfbb569
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.cpu.status[cpu.{#SNMPINDEX}],#1)<>3'
+                  name: 'Dell R660: CPU [{#CPU_FQDD}]: Status is not OK'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -644,7 +644,7 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
-        - uuid: 9b755a619c074bd1a99737f1fbf97708
+        - uuid: 7c25c6c19ca44a47adc20f6abcafc765
           name: 'Fan discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.4.700.12.1.5,{#FAN_DESCR},1.3.6.1.4.1.674.10892.5.4.700.12.1.8,{#TYPE},1.3.6.1.4.1.674.10892.5.4.700.12.1.7]'
@@ -657,7 +657,7 @@ zabbix_export:
                 formulaid: A
           description: 'IDRAC-MIB-SMIv2::coolingDeviceTable'
           item_prototypes:
-            - uuid: c505c8858ffc4cbca8f1719b93d6f0a6
+            - uuid: aed80b32cd744e74a3dd6be26fb7264d
               name: 'Fan [{#FAN_DESCR}]: Speed'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.12.1.6.{#SNMPINDEX}'
@@ -675,7 +675,7 @@ zabbix_export:
               tags:
                 - tag: component
                   value: fan
-            - uuid: bcf401ebc1294bcab14bc1c0003f3fb7
+            - uuid: 77640960a1c14237af2a9241453b01bc
               name: 'Fan [{#FAN_DESCR}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.12.1.5.{#SNMPINDEX}'
@@ -695,40 +695,40 @@ zabbix_export:
                 - tag: component
                   value: fan
               trigger_prototypes:
-                - uuid: 48b46c8badaa486da4cbb4815bebd5d8
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"nonRecoverableLower"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"failed"}'
-                  name: 'Dell R820: Fan [{#FAN_DESCR}]: Critical state'
+                - uuid: 5b8056a1bef340baa9c265719b644d6d
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"nonRecoverableLower"} or last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"failed"}'
+                  name: 'Dell R660: Fan [{#FAN_DESCR}]: Critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit.'
                   tags:
                     - tag: scope
                       value: availability
-                - uuid: ad5ee26a70f0461d90ff13f2b4cc022b
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.WARN:"nonCriticalLower"}'
-                  name: 'Dell R820: Fan [{#FAN_DESCR}]: Warning state'
+                - uuid: 01d33d235a964bb59c409ee6f802077a
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.WARN:"nonCriticalLower"}'
+                  name: 'Dell R660: Fan [{#FAN_DESCR}]: Warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check the fan unit.'
                   dependencies:
-                    - name: 'Dell R820: Fan [{#FAN_DESCR}]: Critical state'
-                      expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"nonRecoverableLower"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"failed"}'
+                    - name: 'Dell R660: Fan [{#FAN_DESCR}]: Critical state'
+                      expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"nonRecoverableLower"} or last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"failed"}'
                   tags:
                     - tag: scope
                       value: availability
           graph_prototypes:
-            - uuid: 0fb616bc58b8480893047514cf7425bf
-              name: 'Dell R820: Fan [{#FAN_DESCR}]: Speed'
+            - uuid: 8572ad519aba4125bca793fa58c3ee7a
+              name: 'Dell R660: Fan [{#FAN_DESCR}]: Speed'
               graph_items:
                 - color: 199C0D
                   item:
-                    host: 'DELL PowerEdge R820 by SNMP'
+                    host: 'DELL PowerEdge R660 by SNMP'
                     key: 'dell.server.sensor.fan.speed[{#FAN_DESCR}]'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
-        - uuid: 5909e149acca4eddad89d3a43cdec880
+        - uuid: a5af413068f44de78fbd8439b77c0e4a
           name: 'Memory discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.4.1100.50.1.8.1]'
@@ -736,7 +736,7 @@ zabbix_export:
           delay: 1h
           description: 'Memory discovery.'
           item_prototypes:
-            - uuid: 6eefc7d8c0d14f96bed7d77ea2bb6022
+            - uuid: bc5e6f0f7f854bddab8540eaff42469c
               name: 'Memory [{#SNMPVALUE}]: Size'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.50.1.14.1.{#SNMPINDEX}'
@@ -754,7 +754,7 @@ zabbix_export:
               tags:
                 - tag: component
                   value: memory
-            - uuid: 4cdb3a43a0d847318269db509abb5926
+            - uuid: 51e7926cb91747ceb27e7e592b2567c8
               name: 'Memory [{#SNMPVALUE}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.50.1.5.1.{#SNMPINDEX}'
@@ -771,9 +771,9 @@ zabbix_export:
                 - tag: component
                   value: memory
               trigger_prototypes:
-                - uuid: 6fdceebb428e4961bc38c0f089eb8c16
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.memory.status[{#SNMPVALUE}],#1)<>3'
-                  name: 'Dell R820: Memory [{#SNMPVALUE}]: Status is not OK'
+                - uuid: 2d2d197d92d14a3b85e2a188bc76be2d
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.memory.status[{#SNMPVALUE}],#1)<>3'
+                  name: 'Dell R660: Memory [{#SNMPVALUE}]: Status is not OK'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -786,7 +786,7 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
-        - uuid: ec7f3a6a75da48d69a5178a3acdeec2d
+        - uuid: e9a4dcd3d9974b1ca2ee36ecfaba92d3
           name: 'Network interface discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#NIC_FQDD},1.3.6.1.4.1.674.10892.5.4.1100.90.1.30.1,{#NIC_MAC},1.3.6.1.4.1.674.10892.5.4.1100.90.1.15.1]'
@@ -794,7 +794,7 @@ zabbix_export:
           delay: 1h
           description: 'Network devices discovery.'
           item_prototypes:
-            - uuid: 71c070e0a1c7471989f2cebb89f1adcf
+            - uuid: eb081fef5f304d199607a1ed5e4f0128
               name: 'NIC [{#NIC_FQDD}/{#NIC_MAC}]: Link status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.90.1.4.1.{#SNMPINDEX}'
@@ -811,11 +811,11 @@ zabbix_export:
                 - tag: component
                   value: network
               trigger_prototypes:
-                - uuid: df1c4ad1e9a1481db69cee6ca8651674
-                  expression: '{$DELL.SNMP.IFCONTROL:"{#NIC_FQDD}"}=1 and last(/DELL PowerEdge R820 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#1)<>1 and last(/DELL PowerEdge R820 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#1)<>last(/DELL PowerEdge R820 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#2)'
+                - uuid: 9740ccc648034cbebc73167b6b6692f0
+                  expression: '{$DELL.SNMP.IFCONTROL:"{#NIC_FQDD}"}=1 and last(/DELL PowerEdge R660 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#1)<>1 and last(/DELL PowerEdge R660 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#1)<>last(/DELL PowerEdge R660 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#2)'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#1)=1 or {$DELL.SNMP.IFCONTROL:"{#NIC_FQDD}"}=0'
-                  name: 'Dell R820: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Link down'
+                  recovery_expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#1)=1 or {$DELL.SNMP.IFCONTROL:"{#NIC_FQDD}"}=0'
+                  name: 'Dell R660: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Link down'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -827,7 +827,7 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: availability
-            - uuid: 15743aecf8f046559094380f25617c03
+            - uuid: dae8d6b509ef4de7ac65f12f87b23b66
               name: 'NIC [{#NIC_FQDD}/{#NIC_MAC}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.1100.90.1.3.1.{#SNMPINDEX}'
@@ -844,9 +844,9 @@ zabbix_export:
                 - tag: component
                   value: network
               trigger_prototypes:
-                - uuid: 386e1c9194904163b6e42030e4ae357b
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.net.if.status[{#NIC_FQDD}],#1)<>3'
-                  name: 'Dell R820: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Status is not OK'
+                - uuid: e54d6f6ae07a4e608e4e3a2a0e2cb248
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.net.if.status[{#NIC_FQDD}],#1)<>3'
+                  name: 'Dell R660: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Status is not OK'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -859,7 +859,7 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
-        - uuid: df58f76c952a4dbf9556490168bd39de
+        - uuid: 9b9014d6da704b1b825f879e162efdc8
           name: 'Physical disk discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.1,{#DISK_NAME},1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.2]'
@@ -867,7 +867,7 @@ zabbix_export:
           delay: 1h
           description: 'Scanning  table of physical drive entries IDRAC-MIB-SMIv2::physicalDiskTable.'
           item_prototypes:
-            - uuid: 0d6e0fed749445afbe8a4e392e12abbe
+            - uuid: 72c8a17c7d2a4613a83a729cd4ca64e6
               name: 'Physical disk [{#DISK_NAME}]: Media type'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.35.{#SNMPINDEX}'
@@ -891,7 +891,7 @@ zabbix_export:
                   value: physicaldisk
                 - tag: component
                   value: storage
-            - uuid: 6138dd1248e24a3d979947046e161a16
+            - uuid: d3d350bc81854a3da72ae694d57062c5
               name: 'Physical disk [{#DISK_NAME}]: Model name'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.6.{#SNMPINDEX}'
@@ -911,7 +911,7 @@ zabbix_export:
                   value: physicaldisk
                 - tag: component
                   value: storage
-            - uuid: 838834fd85bb4abc888963e3d6633ac9
+            - uuid: 83f108ffd84444e2b7bbc9e0b103c02b
               name: 'Physical disk [{#DISK_NAME}]: Serial number'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.7.{#SNMPINDEX}'
@@ -932,17 +932,17 @@ zabbix_export:
                 - tag: component
                   value: storage
               trigger_prototypes:
-                - uuid: ef809a7388a141009f0e955d2fd74913
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#1)<>last(/DELL PowerEdge R820 by SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#2) and length(last(/DELL PowerEdge R820 by SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]))>0'
-                  name: 'Dell R820: Physical disk [{#DISK_NAME}]: Has been replaced'
-                  event_name: 'Dell R820: [{#DISK_NAME}] has been replaced (new serial number received)'
+                - uuid: 387ab14c93784076b776a8dd6eac7cd5
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#1)<>last(/DELL PowerEdge R660 by SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#2) and length(last(/DELL PowerEdge R660 by SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]))>0'
+                  name: 'Dell R660: Physical disk [{#DISK_NAME}]: Has been replaced'
+                  event_name: 'Dell R660: [{#DISK_NAME}] has been replaced (new serial number received)'
                   priority: INFO
                   description: '[{#DISK_NAME}] serial number has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
                       value: notice
-            - uuid: 43e78bf47b4d424b82ee69c5114fb002
+            - uuid: 21601518669d483daea2e5950c449d6e
               name: 'Physical disk [{#DISK_NAME}]: Size'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.11.{#SNMPINDEX}'
@@ -965,7 +965,7 @@ zabbix_export:
                   value: physicaldisk
                 - tag: component
                   value: storage
-            - uuid: d5a1505bdab14808a818c3337010cdce
+            - uuid: 0e4f4c25cfb144cf8728ece8ddcf6b90
               name: 'Physical disk [{#DISK_NAME}]: S.M.A.R.T. Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.31.{#SNMPINDEX}'
@@ -987,19 +987,19 @@ zabbix_export:
                 - tag: component
                   value: storage
               trigger_prototypes:
-                - uuid: ef5b3157e92f4cd98b0b0ce19777a54e
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDrive"} or last(/DELL PowerEdge R820 by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}'
-                  name: 'Dell R820: Physical disk [{#DISK_NAME}]: S.M.A.R.T. failed'
+                - uuid: 48741d6a36484dfba7edc893d1f06f68
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDrive"} or last(/DELL PowerEdge R660 by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}'
+                  name: 'Dell R660: Physical disk [{#DISK_NAME}]: S.M.A.R.T. failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Disk probably requires replacement.'
                   dependencies:
-                    - name: 'Dell R820: Physical disk [{#DISK_NAME}]: Failed state'
-                      expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R820 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.FAIL:"nonRecoverable"}'
+                    - name: 'Dell R660: Physical disk [{#DISK_NAME}]: Failed state'
+                      expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R660 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.FAIL:"nonRecoverable"}'
                   tags:
                     - tag: scope
                       value: availability
-            - uuid: 71d28a0808384915bf1f08bb8cdad3f6
+            - uuid: f58be233639845038d8dad2452f6003a
               name: 'Physical disk [{#DISK_NAME}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.24.{#SNMPINDEX}'
@@ -1028,40 +1028,40 @@ zabbix_export:
                 - tag: component
                   value: storage
               trigger_prototypes:
-                - uuid: 8f80413f2f694cd7a293b9345872c99a
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R820 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.FAIL:"nonRecoverable"}'
-                  name: 'Dell R820: Physical disk [{#DISK_NAME}]: Failed state'
+                - uuid: 090de34ecef14ebc8a6383a50b4255ad
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R660 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.FAIL:"nonRecoverable"}'
+                  name: 'Dell R660: Physical disk [{#DISK_NAME}]: Failed state'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check physical disk for warnings or errors.'
                   tags:
                     - tag: scope
                       value: availability
-                - uuid: 07beb08e93ba48aaa57d989d947a430e
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.WARN:"nonCritical"}'
-                  name: 'Dell R820: Physical disk [{#DISK_NAME}]: Warning state'
+                - uuid: 11dffa72d07e43c5a63f624e126b38ac
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.WARN:"nonCritical"}'
+                  name: 'Dell R660: Physical disk [{#DISK_NAME}]: Warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check physical disk for warnings or errors.'
                   dependencies:
-                    - name: 'Dell R820: Physical disk [{#DISK_NAME}]: Failed state'
-                      expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R820 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.FAIL:"nonRecoverable"}'
+                    - name: 'Dell R660: Physical disk [{#DISK_NAME}]: Failed state'
+                      expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R660 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.FAIL:"nonRecoverable"}'
                   tags:
                     - tag: scope
                       value: availability
           graph_prototypes:
-            - uuid: 7d235725b2e24ef3843ec59f597e26c7
-              name: 'Dell R820: Physical disk [{#DISK_NAME}]: Size'
+            - uuid: 7041ed04c6f14703b36b52aa68b49b2e
+              name: 'Dell R660: Physical disk [{#DISK_NAME}]: Size'
               graph_items:
                 - color: 199C0D
                   item:
-                    host: 'DELL PowerEdge R820 by SNMP'
+                    host: 'DELL PowerEdge R660 by SNMP'
                     key: 'dell.server.hw.physicaldisk.size[physicalDiskCapacityInMB.{#SNMPINDEX}]'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
-        - uuid: 1f4854fdfc9b4c1683a9c3b023373a83
+        - uuid: a303f72921fe4aaf87a58b53409d3e93
           name: 'PSU discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.4.600.12.1.5,{#PSU_DESCR},1.3.6.1.4.1.674.10892.5.4.600.12.1.8]'
@@ -1069,7 +1069,7 @@ zabbix_export:
           delay: 1h
           description: 'IDRAC-MIB-SMIv2::powerSupplyTable'
           item_prototypes:
-            - uuid: fa618cb76eeb4f3495fe6dfa5f516104
+            - uuid: ded0373d94e4467c9495cf94a7d96628
               name: 'Power supply [{#PSU_DESCR}]: State'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.600.12.1.5.{#SNMPINDEX}'
@@ -1089,24 +1089,24 @@ zabbix_export:
                 - tag: component
                   value: psu
               trigger_prototypes:
-                - uuid: 260129e48fe24ba8af0b628c303d23a3
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$DELL.SNMP.PSU.STATUS.CRIT:"critical"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$DELL.SNMP.PSU.STATUS.CRIT:"nonRecoverable"}'
-                  name: 'Dell R820: Power supply [{#PSU_DESCR}]: Critical state'
+                - uuid: 14698cb8183340818414f36d05abb428
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$DELL.SNMP.PSU.STATUS.CRIT:"critical"} or last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$DELL.SNMP.PSU.STATUS.CRIT:"nonRecoverable"}'
+                  name: 'Dell R660: Power supply [{#PSU_DESCR}]: Critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the power supply unit for errors.'
                   tags:
                     - tag: scope
                       value: availability
-                - uuid: 97957af2d68048879527882edf8bfe7e
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$DELL.SNMP.PSU.STATUS.WARN:"nonCritical"}'
-                  name: 'Dell R820: Power supply [{#PSU_DESCR}]: Warning state'
+                - uuid: 20c0b3af5ad24a1bbb29c759452f6620
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$DELL.SNMP.PSU.STATUS.WARN:"nonCritical"}'
+                  name: 'Dell R660: Power supply [{#PSU_DESCR}]: Warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check the power supply unit for errors.'
                   dependencies:
-                    - name: 'Dell R820: Power supply [{#PSU_DESCR}]: Critical state'
-                      expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$DELL.SNMP.PSU.STATUS.CRIT:"critical"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$DELL.SNMP.PSU.STATUS.CRIT:"nonRecoverable"}'
+                    - name: 'Dell R660: Power supply [{#PSU_DESCR}]: Critical state'
+                      expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$DELL.SNMP.PSU.STATUS.CRIT:"critical"} or last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$DELL.SNMP.PSU.STATUS.CRIT:"nonRecoverable"}'
                   tags:
                     - tag: scope
                       value: availability
@@ -1114,7 +1114,7 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
-        - uuid: 05262c1eb7af4bdfb9be4b87eb67c573
+        - uuid: b0440590b39848758e67dd614844b1bd
           name: 'System battery discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.4.600.50.1.7.1]'
@@ -1122,7 +1122,7 @@ zabbix_export:
           delay: 1h
           description: 'System battery discovery.'
           item_prototypes:
-            - uuid: 7c35f1486da64a2880bdd9cafc0b4cf4
+            - uuid: 73e8b6ae099a4109b03417d2c9b849cc
               name: 'System battery [{#SNMPVALUE}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.600.50.1.5.1.{#SNMPINDEX}'
@@ -1139,9 +1139,9 @@ zabbix_export:
                 - tag: component
                   value: battery
               trigger_prototypes:
-                - uuid: 77dfa584df524f6c9e5bfef9f44012f7
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.system.battery[{#SNMPVALUE}],#1)<>3'
-                  name: 'Dell R820: System battery [{#SNMPVALUE}]: Status is not OK'
+                - uuid: 272f79a4c334434489c026133e7faea6
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.system.battery[{#SNMPVALUE}],#1)<>3'
+                  name: 'Dell R660: System battery [{#SNMPVALUE}]: Status is not OK'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: |
@@ -1154,7 +1154,7 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
-        - uuid: 43c9a9c046b943e7aa257a86540aae22
+        - uuid: 4dcc455d35774521b8b9c37cf0f8ddb3
           name: 'Temperature discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.4.700.20.1.1,{#SENSOR_LOCALE},1.3.6.1.4.1.674.10892.5.4.700.20.1.8]'
@@ -1162,7 +1162,7 @@ zabbix_export:
           delay: 1h
           description: 'Scanning table of Temperature Probe Table IDRAC-MIB-SMIv2::temperatureProbeTable'
           item_prototypes:
-            - uuid: 24139838c42248f3b9d7f8244daacc0e
+            - uuid: e6f3ff1e7a4d460eb436b5798ea73762
               name: 'Probe [{#SENSOR_LOCALE}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.5.{#SNMPINDEX}'
@@ -1194,43 +1194,43 @@ zabbix_export:
                 - tag: component
                   value: temperature
               trigger_prototypes:
-                - uuid: bcc2ecc5b254457288547aacf59176eb
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}'
-                  name: 'Dell R820: Probe [{#SENSOR_LOCALE}]: Critical status'
+                - uuid: ad72d86ab2ff47e081d56d755c9f38cf
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}'
+                  name: 'Dell R660: Probe [{#SENSOR_LOCALE}]: Critical status'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the device for faults.'
                   tags:
                     - tag: scope
                       value: availability
-                - uuid: c53be3b3a911410896fcd2e94bed62e1
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])<>{$DELL.SNMP.SENSOR.TEMP.STATUS.OK}'
-                  name: 'Dell R820: Probe [{#SENSOR_LOCALE}]: Not in optimal status'
+                - uuid: 2bedce1701084c30a4e443f6a5681bde
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])<>{$DELL.SNMP.SENSOR.TEMP.STATUS.OK}'
+                  name: 'Dell R660: Probe [{#SENSOR_LOCALE}]: Not in optimal status'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: INFO
                   description: 'Please check the device for faults.'
                   manual_close: 'YES'
                   dependencies:
-                    - name: 'Dell R820: Probe [{#SENSOR_LOCALE}]: Critical status'
-                      expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}'
-                    - name: 'Dell R820: Probe [{#SENSOR_LOCALE}]: Warning status'
-                      expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}'
+                    - name: 'Dell R660: Probe [{#SENSOR_LOCALE}]: Critical status'
+                      expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}'
+                    - name: 'Dell R660: Probe [{#SENSOR_LOCALE}]: Warning status'
+                      expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}'
                   tags:
                     - tag: scope
                       value: notice
-                - uuid: 365c6cbbee2440c2a62e4d5376058f0a
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}'
-                  name: 'Dell R820: Probe [{#SENSOR_LOCALE}]: Warning status'
+                - uuid: abcff76920ca4f64b58f7bdcde618181
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}'
+                  name: 'Dell R660: Probe [{#SENSOR_LOCALE}]: Warning status'
                   opdata: 'Current status: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check the device for faults.'
                   dependencies:
-                    - name: 'Dell R820: Probe [{#SENSOR_LOCALE}]: Critical status'
-                      expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}'
+                    - name: 'Dell R660: Probe [{#SENSOR_LOCALE}]: Critical status'
+                      expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R660 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}'
                   tags:
                     - tag: scope
                       value: availability
-            - uuid: ef279c5ff8694f28916f6bd0d9615089
+            - uuid: 3710a01c29e84b55ae9040c1f69de95a
               name: 'Probe [{#SENSOR_LOCALE}]: Value'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.700.20.1.6.{#SNMPINDEX}'
@@ -1252,18 +1252,18 @@ zabbix_export:
                 - tag: component
                   value: temperature
           graph_prototypes:
-            - uuid: 17bc3aea55c443a2b04b1a23b8462e66
-              name: 'Dell R820: Probe [{#SENSOR_LOCALE}]: Value'
+            - uuid: e6fa96c07eed45f4be0c3c63b3782804
+              name: 'Dell R660: Probe [{#SENSOR_LOCALE}]: Value'
               graph_items:
                 - color: 199C0D
                   item:
-                    host: 'DELL PowerEdge R820 by SNMP'
+                    host: 'DELL PowerEdge R660 by SNMP'
                     key: 'dell.server.sensor.temp.value[temperatureProbeReading.{#SNMPINDEX}]'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
-        - uuid: 871e0b2895a141aab83c71eb0cb181a8
+        - uuid: 59ebee32aa89490a9a6ac84c8706fc04
           name: 'Virtual disk discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.1,{#DISK_NAME},1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.2]'
@@ -1271,7 +1271,7 @@ zabbix_export:
           delay: 1h
           description: 'IDRAC-MIB-SMIv2::virtualDiskTable'
           item_prototypes:
-            - uuid: 57e6784821914279a1fe8d11f20ad66b
+            - uuid: 43e9d39607614eae80550101d029aa6f
               name: 'Virtual disk [{#DISK_NAME}]: Layout type'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.13.{#SNMPINDEX}'
@@ -1302,7 +1302,7 @@ zabbix_export:
                   value: storage
                 - tag: component
                   value: virtualdisk
-            - uuid: 882a140fafd340c8b888337c0ca051ad
+            - uuid: 94b642e109cf4b509e8e778d4c465cdd
               name: 'Virtual disk [{#DISK_NAME}]: Read policy'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.11.{#SNMPINDEX}'
@@ -1323,7 +1323,7 @@ zabbix_export:
                   value: storage
                 - tag: component
                   value: virtualdisk
-            - uuid: 56a908b58aff4639b0b6a53911619746
+            - uuid: 485837b0fe5a40699210fefaba81ccec
               name: 'Virtual disk [{#DISK_NAME}]: Size'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.6.{#SNMPINDEX}'
@@ -1346,7 +1346,7 @@ zabbix_export:
                   value: storage
                 - tag: component
                   value: virtualdisk
-            - uuid: cba60a18965843dba5bdadfdabfb1b83
+            - uuid: 0a1ec895744b4cfc86410de425f82fa3
               name: 'Virtual disk [{#DISK_NAME}]: Operational state'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.30.{#SNMPINDEX}'
@@ -1369,7 +1369,7 @@ zabbix_export:
                   value: storage
                 - tag: component
                   value: virtualdisk
-            - uuid: 7daf3f6a7af6490688d9800b6542590f
+            - uuid: 1751727ae3a74e719d5aa66b4fe7254f
               name: 'Virtual disk [{#DISK_NAME}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4.{#SNMPINDEX}'
@@ -1396,28 +1396,28 @@ zabbix_export:
                 - tag: component
                   value: virtualdisk
               trigger_prototypes:
-                - uuid: 194a88954cb543d6aabf8c42839d22b7
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$DELL.SNMP.VDISK.STATUS.CRIT:"failed"}'
-                  name: 'Dell R820: Virtual disk [{#DISK_NAME}]: Failed state'
+                - uuid: 29cab0ba7b674b298435e7babd4d13d4
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$DELL.SNMP.VDISK.STATUS.CRIT:"failed"}'
+                  name: 'Dell R660: Virtual disk [{#DISK_NAME}]: Failed state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the virtual disk for warnings or errors.'
                   tags:
                     - tag: scope
                       value: availability
-                - uuid: a7f94854f30b420d9aa00cbab12d8418
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$DELL.SNMP.VDISK.STATUS.WARN:"degraded"}'
-                  name: 'Dell R820: Virtual disk [{#DISK_NAME}]: Warning state'
+                - uuid: aeeb4eac4abc4b6bb92de1a22e9840eb
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$DELL.SNMP.VDISK.STATUS.WARN:"degraded"}'
+                  name: 'Dell R660: Virtual disk [{#DISK_NAME}]: Warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check the virtual disk for warnings or errors.'
                   dependencies:
-                    - name: 'Dell R820: Virtual disk [{#DISK_NAME}]: Failed state'
-                      expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$DELL.SNMP.VDISK.STATUS.CRIT:"failed"}'
+                    - name: 'Dell R660: Virtual disk [{#DISK_NAME}]: Failed state'
+                      expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$DELL.SNMP.VDISK.STATUS.CRIT:"failed"}'
                   tags:
                     - tag: scope
                       value: availability
-            - uuid: e0b2638cf3dd4dd0809aa5b73101deea
+            - uuid: c80bd3fd5d1249a7b808512a3c62d28b
               name: 'Virtual disk [{#DISK_NAME}]: Write policy'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.10.{#SNMPINDEX}'
@@ -1439,18 +1439,18 @@ zabbix_export:
                 - tag: component
                   value: virtualdisk
           graph_prototypes:
-            - uuid: b129721d9c064bec908414d69fd6173c
-              name: 'Dell R820: Virtual disk [{#DISK_NAME}]: Size'
+            - uuid: 7128dd52533e43c582946dc346c6882b
+              name: 'Dell R660: Virtual disk [{#DISK_NAME}]: Size'
               graph_items:
                 - color: 199C0D
                   item:
-                    host: 'DELL PowerEdge R820 by SNMP'
+                    host: 'DELL PowerEdge R660 by SNMP'
                     key: 'dell.server.hw.virtualdisk.size[virtualDiskSizeInMB.{#SNMPINDEX}]'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
-        - uuid: b84ca44320644f46919c9535da909782
+        - uuid: 85322325c90646d29fe6db928f28fa03
           name: 'Voltage probe discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#VPROBE_NAME},1.3.6.1.4.1.674.10892.5.4.600.20.1.8.1,{#VPROBE_TYPE},1.3.6.1.4.1.674.10892.5.4.600.20.1.7.1]'
@@ -1475,7 +1475,7 @@ zabbix_export:
                 formulaid: D
           description: 'Voltage probe discovery.'
           item_prototypes:
-            - uuid: 2623885d4d204b3faae8037d1c1cc19b
+            - uuid: 61c9b167810f48ccb092b9a558159191
               name: 'Voltage probe [{#VPROBE_NAME}]: Status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.600.20.1.5.1.{#SNMPINDEX}'
@@ -1488,16 +1488,16 @@ zabbix_export:
                 - tag: component
                   value: voltage
               trigger_prototypes:
-                - uuid: b2c7a3c6ccc74b24a1261171038ef059
-                  expression: 'last(/DELL PowerEdge R820 by SNMP/dell.server.voltage.status[{#VPROBE_NAME}])<>3'
-                  name: 'Dell R820: Voltage probe [{#VPROBE_NAME}]: Status is not OK'
+                - uuid: c68730ac9acf427b9c03c3d3a68197d5
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.voltage.status[{#VPROBE_NAME}])<>3'
+                  name: 'Dell R660: Voltage probe [{#VPROBE_NAME}]: Status is not OK'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the device''s voltage.'
                   tags:
                     - tag: scope
                       value: availability
-            - uuid: 34887c269ced46e9bcf6108b83f0338f
+            - uuid: 05894e7311ee4a5ab0108e4135416ebf
               name: 'Voltage probe [{#VPROBE_NAME}]: Voltage'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.674.10892.5.4.600.20.1.6.1.{#SNMPINDEX}'
@@ -1514,12 +1514,12 @@ zabbix_export:
                 - tag: component
                   value: voltage
           graph_prototypes:
-            - uuid: 37267e51adc1418c8f14ef391f719340
-              name: 'Dell R820: Voltage probe [{#VPROBE_NAME}]: Voltage'
+            - uuid: 2c0c884b124b4abc8869cdac905df0ef
+              name: 'Dell R660: Voltage probe [{#VPROBE_NAME}]: Voltage'
               graph_items:
                 - color: 199C0D
                   item:
-                    host: 'DELL PowerEdge R820 by SNMP'
+                    host: 'DELL PowerEdge R660 by SNMP'
                     key: 'dell.server.voltage.value[{#VPROBE_NAME}]'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1648,7 +1648,7 @@ zabbix_export:
           value: '4'
           description: 'The warning status of the virtual disk for trigger expression.'
       dashboards:
-        - uuid: 65209bf05b134cb2bc8e7e60e8bd747c
+        - uuid: 1bbf4fc1f4cf4581835b8272b042a144
           name: Overview
           pages:
             - name: Overview
@@ -1678,7 +1678,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid
                       value:
-                        host: 'DELL PowerEdge R820 by SNMP'
+                        host: 'DELL PowerEdge R660 by SNMP'
                         key: 'dell.server.status[globalSystemStatus]'
                     - type: INTEGER
                       name: show
@@ -1717,7 +1717,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid
                       value:
-                        host: 'DELL PowerEdge R820 by SNMP'
+                        host: 'DELL PowerEdge R660 by SNMP'
                         key: 'dell.server.hw.serialnumber[systemServiceTag]'
                     - type: INTEGER
                       name: show
@@ -1756,7 +1756,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid
                       value:
-                        host: 'DELL PowerEdge R820 by SNMP'
+                        host: 'DELL PowerEdge R660 by SNMP'
                         key: 'dell.server.hw.model[systemModelName]'
                     - type: INTEGER
                       name: show
@@ -1796,7 +1796,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid
                       value:
-                        host: 'DELL PowerEdge R820 by SNMP'
+                        host: 'DELL PowerEdge R660 by SNMP'
                         key: 'dell.server.hw.firmware[racFirmwareVersion]'
                     - type: INTEGER
                       name: show
@@ -1821,8 +1821,8 @@ zabbix_export:
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'DELL PowerEdge R820 by SNMP'
-                        name: 'Dell R820: Probe [{#SENSOR_LOCALE}]: Value'
+                        host: 'DELL PowerEdge R660 by SNMP'
+                        name: 'Dell R660: Probe [{#SENSOR_LOCALE}]: Value'
                 - type: GRAPH_PROTOTYPE
                   name: 'Power Supplies'
                   'y': '6'
@@ -1832,10 +1832,10 @@ zabbix_export:
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
-                        host: 'DELL PowerEdge R820 by SNMP'
-                        name: 'Dell R820: Voltage probe [{#VPROBE_NAME}]: Voltage'
+                        host: 'DELL PowerEdge R660 by SNMP'
+                        name: 'Dell R660: Voltage probe [{#VPROBE_NAME}]: Voltage'
       valuemaps:
-        - uuid: 1a2c68f0f2384c0da7027981bd4bb5be
+        - uuid: ffad2b2a57364726ba31cfc89f363e2b
           name: 'IDRAC-MIB-SMIv2::batteryState'
           mappings:
             - value: '1'
@@ -1852,14 +1852,14 @@ zabbix_export:
               newvalue: Charging
             - value: '7'
               newvalue: 'Below threshold'
-        - uuid: 045512ecd6b94fbab71dd17abf5b8f4b
+        - uuid: 053a4a529ddf4bc7b1971958e4dce5c9
           name: 'IDRAC-MIB-SMIv2::BooleanType'
           mappings:
             - value: '0'
               newvalue: ok
             - value: '1'
               newvalue: failed
-        - uuid: 8a60520959be4ec5aa525f637beb8472
+        - uuid: 2216bf2485f548be90060048eec6547d
           name: 'IDRAC-MIB-SMIv2::NetworkDeviceConnectionStatusEnum'
           mappings:
             - value: '0'
@@ -1880,7 +1880,7 @@ zabbix_export:
               newvalue: hardwareClosing
             - value: '13'
               newvalue: hardwareNotReady
-        - uuid: 82b2ff6e115d4d098ae1025547853b4b
+        - uuid: 58480240826e49b09bf73f682f252148
           name: 'IDRAC-MIB-SMIv2::ObjectStatusEnum'
           mappings:
             - value: '1'
@@ -1895,7 +1895,7 @@ zabbix_export:
               newvalue: critical
             - value: '6'
               newvalue: nonRecoverable
-        - uuid: 168707d69c984df4837638c72f103749
+        - uuid: e44bc856e8d449f9a288b614b7d6a143
           name: 'IDRAC-MIB-SMIv2::physicalDiskComponentStatus'
           mappings:
             - value: '1'
@@ -1910,7 +1910,7 @@ zabbix_export:
               newvalue: critical
             - value: '6'
               newvalue: nonRecoverable
-        - uuid: 1f138e6846544243a2729b41be9a97aa
+        - uuid: e17dbbe344994170afa47b3d76b393f8
           name: 'IDRAC-MIB-SMIv2::physicalDiskMediaType'
           mappings:
             - value: '1'
@@ -1919,7 +1919,7 @@ zabbix_export:
               newvalue: HDD
             - value: '3'
               newvalue: SSD
-        - uuid: 7ad96a534bc84f32afd6ae59011db2a0
+        - uuid: c9543b611d434fba99d4be3614813419
           name: 'IDRAC-MIB-SMIv2::ProcessorDeviceStatusReadingFlags'
           mappings:
             - value: '1'
@@ -1936,7 +1936,7 @@ zabbix_export:
               newvalue: terminatorPresent
             - value: '1024'
               newvalue: processorThrottled
-        - uuid: 9d25c114ba8046f5b126be9111d95184
+        - uuid: d2f5ad57814e4c3ab8f1e7b1fa076557
           name: 'IDRAC-MIB-SMIv2::StatusProbeEnum'
           mappings:
             - value: '1'
@@ -1959,7 +1959,7 @@ zabbix_export:
               newvalue: nonRecoverableLower
             - value: '10'
               newvalue: failed
-        - uuid: e81dcef10a30448db51b9805ec60b863
+        - uuid: 70851c009b4d4f0484f3bb955558c1db
           name: 'IDRAC-MIB-SMIv2::virtualDiskLayout'
           mappings:
             - value: '1'
@@ -1982,7 +1982,7 @@ zabbix_export:
               newvalue: 'Concatenated RAID 1'
             - value: '10'
               newvalue: 'Concatenated RAID 5'
-        - uuid: e9e9b851915747c4b608934cd1235bc5
+        - uuid: 160204c8609542038d31357ce58424df
           name: 'IDRAC-MIB-SMIv2::virtualDiskOperationalState'
           mappings:
             - value: '1'
@@ -1995,7 +1995,7 @@ zabbix_export:
               newvalue: Initializing
             - value: '5'
               newvalue: 'Background init'
-        - uuid: 92115895f7b9477983c67012b111afb3
+        - uuid: c1686f5a938f4dac977d55517687358e
           name: 'IDRAC-MIB-SMIv2::virtualDiskReadPolicy'
           mappings:
             - value: '1'
@@ -2004,7 +2004,7 @@ zabbix_export:
               newvalue: 'Read Ahead'
             - value: '3'
               newvalue: 'Adaptive Read Ahead'
-        - uuid: 7573aa4192534f44863508890606f917
+        - uuid: 1c3e3bcf7ff14f59ac24f9d62f6671af
           name: 'IDRAC-MIB-SMIv2::virtualDiskState'
           mappings:
             - value: '1'
@@ -2015,7 +2015,7 @@ zabbix_export:
               newvalue: Failed
             - value: '4'
               newvalue: Degraded
-        - uuid: c6d4cfe5cf8b43808dce81cc1bcc4be3
+        - uuid: 0a940bdd7900425b941e11e486e70c8a
           name: 'IDRAC-MIB-SMIv2::virtualDiskWritePolicy'
           mappings:
             - value: '1'
@@ -2024,7 +2024,7 @@ zabbix_export:
               newvalue: 'Write Back'
             - value: '3'
               newvalue: 'Force Write Back'
-        - uuid: c5660f822c4a4567888e7f98d3bfab13
+        - uuid: 20182c95fb0e494a826a7ae3f932127b
           name: zabbix.host.available
           mappings:
             - value: '0'
@@ -2034,10 +2034,10 @@ zabbix_export:
             - value: '2'
               newvalue: unknown
   triggers:
-    - uuid: 75be35da1fa9433081562ce9c02af907
-      expression: '(last(/DELL PowerEdge R820 by SNMP/dell.server.hw.uptime[hrSystemUptime])>0 and last(/DELL PowerEdge R820 by SNMP/dell.server.hw.uptime[hrSystemUptime])<10m) or (last(/DELL PowerEdge R820 by SNMP/dell.server.hw.uptime[hrSystemUptime])=0 and last(/DELL PowerEdge R820 by SNMP/dell.server.net.uptime[sysUpTime])<10m)'
-      name: 'Dell R820: Host has been restarted'
-      event_name: 'Dell R820: {HOST.NAME} has been restarted (uptime < 10m)'
+    - uuid: 0c72f52ac52c46adab21c577c27381b1
+      expression: '(last(/DELL PowerEdge R660 by SNMP/dell.server.hw.uptime[hrSystemUptime])>0 and last(/DELL PowerEdge R660 by SNMP/dell.server.hw.uptime[hrSystemUptime])<10m) or (last(/DELL PowerEdge R660 by SNMP/dell.server.hw.uptime[hrSystemUptime])=0 and last(/DELL PowerEdge R660 by SNMP/dell.server.net.uptime[sysUpTime])<10m)'
+      name: 'Dell R660: Host has been restarted'
+      event_name: 'Dell R660: {HOST.NAME} has been restarted (uptime < 10m)'
       priority: WARNING
       description: 'Uptime is less than 10 minutes.'
       manual_close: 'YES'
@@ -2045,15 +2045,15 @@ zabbix_export:
         - tag: scope
           value: notice
   graphs:
-    - uuid: 28d29c2050784efa961c8c8a38195917
-      name: 'Dell R820: Uptime'
+    - uuid: 92c35ca847fb44cbae6542f1b11e41da
+      name: 'Dell R660: Uptime'
       graph_items:
         - color: 199C0D
           item:
-            host: 'DELL PowerEdge R820 by SNMP'
+            host: 'DELL PowerEdge R660 by SNMP'
             key: 'dell.server.hw.uptime[hrSystemUptime]'
         - sortorder: '1'
           color: F63100
           item:
-            host: 'DELL PowerEdge R820 by SNMP'
+            host: 'DELL PowerEdge R660 by SNMP'
             key: 'dell.server.net.uptime[sysUpTime]'

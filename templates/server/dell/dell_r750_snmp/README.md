@@ -1,9 +1,9 @@
 
-# DELL PowerEdge R820 by SNMP
+# DELL PowerEdge R750 by SNMP
 
 ## Overview
 
-This is a template for monitoring DELL PowerEdge R820 servers with iDRAC version 7 and later via Zabbix SNMP agent that works without any external scripts.
+This is a template for monitoring DELL PowerEdge R750 servers with iDRAC version 7 and later via Zabbix SNMP agent that works without any external scripts.
 
 ## Requirements
 
@@ -12,7 +12,7 @@ Zabbix version: 6.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- DELL PowerEdge R820
+- DELL PowerEdge R750xs
 
 ## Configuration
 
@@ -90,16 +90,16 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Dell R820: System is in unrecoverable state|<p>Please check the device for faults.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.status[globalSystemStatus])={$DELL.SNMP.HEALTH.STATUS.DISASTER}`|High||
-|Dell R820: System status is in critical state|<p>Please check the device for errors.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.status[globalSystemStatus])={$DELL.SNMP.HEALTH.STATUS.CRIT}`|Average||
-|Dell R820: System status is in warning state|<p>Please check the device for warnings.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.status[globalSystemStatus])={$DELL.SNMP.HEALTH.STATUS.WARN}`|Warning|**Depends on**:<br><ul><li>Dell R820: System status is in critical state</li></ul>|
-|Dell R820: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.hw.serialnumber[systemServiceTag],#1)<>last(/DELL PowerEdge R820 by SNMP/dell.server.hw.serialnumber[systemServiceTag],#2) and length(last(/DELL PowerEdge R820 by SNMP/dell.server.hw.serialnumber[systemServiceTag]))>0`|Info|**Manual close**: Yes|
-|Dell R820: Operating system description has changed|<p>Operating system description has changed. Possibly, the system has been updated or replaced. Acknowledge to close the problem manually.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.sw.os[systemOSName],#1)<>last(/DELL PowerEdge R820 by SNMP/dell.server.sw.os[systemOSName],#2) and length(last(/DELL PowerEdge R820 by SNMP/dell.server.sw.os[systemOSName]))>0`|Info|**Manual close**: Yes|
-|Dell R820: Firmware has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.hw.firmware[racFirmwareVersion],#1)<>last(/DELL PowerEdge R820 by SNMP/dell.server.hw.firmware[racFirmwareVersion],#2) and length(last(/DELL PowerEdge R820 by SNMP/dell.server.hw.firmware[racFirmwareVersion]))>0`|Info|**Manual close**: Yes|
-|Dell R820: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/DELL PowerEdge R820 by SNMP/dell.server.hw.uptime[hrSystemUptime])>0 and last(/DELL PowerEdge R820 by SNMP/dell.server.hw.uptime[hrSystemUptime])<10m) or (last(/DELL PowerEdge R820 by SNMP/dell.server.hw.uptime[hrSystemUptime])=0 and last(/DELL PowerEdge R820 by SNMP/dell.server.net.uptime[sysUpTime])<10m)`|Warning|**Manual close**: Yes|
-|Dell R820: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.name[sysName],#1)<>last(/DELL PowerEdge R820 by SNMP/dell.server.name[sysName],#2) and length(last(/DELL PowerEdge R820 by SNMP/dell.server.name[sysName]))>0`|Info|**Manual close**: Yes|
-|Dell R820: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/DELL PowerEdge R820 by SNMP/zabbix[host,snmp,available],{$DELL.SNMP.TIMEOUT})=0`|Warning||
-|Dell R820: Memory amount has changed||`change(/DELL PowerEdge R820 by SNMP/dell.server.memory.size.total)>0`|Average||
+|Dell R750: System is in unrecoverable state|<p>Please check the device for faults.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.status[globalSystemStatus])={$DELL.SNMP.HEALTH.STATUS.DISASTER}`|High||
+|Dell R750: System status is in critical state|<p>Please check the device for errors.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.status[globalSystemStatus])={$DELL.SNMP.HEALTH.STATUS.CRIT}`|Average||
+|Dell R750: System status is in warning state|<p>Please check the device for warnings.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.status[globalSystemStatus])={$DELL.SNMP.HEALTH.STATUS.WARN}`|Warning|**Depends on**:<br><ul><li>Dell R750: System status is in critical state</li></ul>|
+|Dell R750: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.hw.serialnumber[systemServiceTag],#1)<>last(/DELL PowerEdge R750 by SNMP/dell.server.hw.serialnumber[systemServiceTag],#2) and length(last(/DELL PowerEdge R750 by SNMP/dell.server.hw.serialnumber[systemServiceTag]))>0`|Info|**Manual close**: Yes|
+|Dell R750: Operating system description has changed|<p>Operating system description has changed. Possibly, the system has been updated or replaced. Acknowledge to close the problem manually.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.sw.os[systemOSName],#1)<>last(/DELL PowerEdge R750 by SNMP/dell.server.sw.os[systemOSName],#2) and length(last(/DELL PowerEdge R750 by SNMP/dell.server.sw.os[systemOSName]))>0`|Info|**Manual close**: Yes|
+|Dell R750: Firmware has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.hw.firmware[racFirmwareVersion],#1)<>last(/DELL PowerEdge R750 by SNMP/dell.server.hw.firmware[racFirmwareVersion],#2) and length(last(/DELL PowerEdge R750 by SNMP/dell.server.hw.firmware[racFirmwareVersion]))>0`|Info|**Manual close**: Yes|
+|Dell R750: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/DELL PowerEdge R750 by SNMP/dell.server.hw.uptime[hrSystemUptime])>0 and last(/DELL PowerEdge R750 by SNMP/dell.server.hw.uptime[hrSystemUptime])<10m) or (last(/DELL PowerEdge R750 by SNMP/dell.server.hw.uptime[hrSystemUptime])=0 and last(/DELL PowerEdge R750 by SNMP/dell.server.net.uptime[sysUpTime])<10m)`|Warning|**Manual close**: Yes|
+|Dell R750: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.name[sysName],#1)<>last(/DELL PowerEdge R750 by SNMP/dell.server.name[sysName],#2) and length(last(/DELL PowerEdge R750 by SNMP/dell.server.name[sysName]))>0`|Info|**Manual close**: Yes|
+|Dell R750: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/DELL PowerEdge R750 by SNMP/zabbix[host,snmp,available],{$DELL.SNMP.TIMEOUT})=0`|Warning||
+|Dell R750: Memory amount has changed||`change(/DELL PowerEdge R750 by SNMP/dell.server.memory.size.total)>0`|Average||
 
 ### LLD rule Temperature discovery
 
@@ -118,9 +118,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Dell R820: Probe [{#SENSOR_LOCALE}]: Critical status|<p>Please check the device for faults.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}`|Average||
-|Dell R820: Probe [{#SENSOR_LOCALE}]: Warning status|<p>Please check the device for faults.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}`|Warning|**Depends on**:<br><ul><li>Dell R820: Probe [{#SENSOR_LOCALE}]: Critical status</li></ul>|
-|Dell R820: Probe [{#SENSOR_LOCALE}]: Not in optimal status|<p>Please check the device for faults.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])<>{$DELL.SNMP.SENSOR.TEMP.STATUS.OK}`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Dell R820: Probe [{#SENSOR_LOCALE}]: Critical status</li><li>Dell R820: Probe [{#SENSOR_LOCALE}]: Warning status</li></ul>|
+|Dell R750: Probe [{#SENSOR_LOCALE}]: Critical status|<p>Please check the device for faults.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R750 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R750 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R750 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}`|Average||
+|Dell R750: Probe [{#SENSOR_LOCALE}]: Warning status|<p>Please check the device for faults.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R750 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])={$DELL.SNMP.SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}`|Warning|**Depends on**:<br><ul><li>Dell R750: Probe [{#SENSOR_LOCALE}]: Critical status</li></ul>|
+|Dell R750: Probe [{#SENSOR_LOCALE}]: Not in optimal status|<p>Please check the device for faults.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}])<>{$DELL.SNMP.SENSOR.TEMP.STATUS.OK}`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Dell R750: Probe [{#SENSOR_LOCALE}]: Critical status</li><li>Dell R750: Probe [{#SENSOR_LOCALE}]: Warning status</li></ul>|
 
 ### LLD rule PSU discovery
 
@@ -138,8 +138,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Dell R820: Power supply [{#PSU_DESCR}]: Critical state|<p>Please check the power supply unit for errors.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$DELL.SNMP.PSU.STATUS.CRIT:"critical"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$DELL.SNMP.PSU.STATUS.CRIT:"nonRecoverable"}`|Average||
-|Dell R820: Power supply [{#PSU_DESCR}]: Warning state|<p>Please check the power supply unit for errors.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$DELL.SNMP.PSU.STATUS.WARN:"nonCritical"}`|Warning|**Depends on**:<br><ul><li>Dell R820: Power supply [{#PSU_DESCR}]: Critical state</li></ul>|
+|Dell R750: Power supply [{#PSU_DESCR}]: Critical state|<p>Please check the power supply unit for errors.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$DELL.SNMP.PSU.STATUS.CRIT:"critical"} or last(/DELL PowerEdge R750 by SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$DELL.SNMP.PSU.STATUS.CRIT:"nonRecoverable"}`|Average||
+|Dell R750: Power supply [{#PSU_DESCR}]: Warning state|<p>Please check the power supply unit for errors.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}])={$DELL.SNMP.PSU.STATUS.WARN:"nonCritical"}`|Warning|**Depends on**:<br><ul><li>Dell R750: Power supply [{#PSU_DESCR}]: Critical state</li></ul>|
 
 ### LLD rule Fan discovery
 
@@ -158,8 +158,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Dell R820: Fan [{#FAN_DESCR}]: Critical state|<p>Please check the fan unit.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"nonRecoverableLower"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"failed"}`|Average||
-|Dell R820: Fan [{#FAN_DESCR}]: Warning state|<p>Please check the fan unit.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R820 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.WARN:"nonCriticalLower"}`|Warning|**Depends on**:<br><ul><li>Dell R820: Fan [{#FAN_DESCR}]: Critical state</li></ul>|
+|Dell R750: Fan [{#FAN_DESCR}]: Critical state|<p>Please check the fan unit.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"criticalUpper"} or last(/DELL PowerEdge R750 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"nonRecoverableUpper"} or last(/DELL PowerEdge R750 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"criticalLower"} or last(/DELL PowerEdge R750 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"nonRecoverableLower"} or last(/DELL PowerEdge R750 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.CRIT:"failed"}`|Average||
+|Dell R750: Fan [{#FAN_DESCR}]: Warning state|<p>Please check the fan unit.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.WARN:"nonCriticalUpper"} or last(/DELL PowerEdge R750 by SNMP/dell.server.sensor.fan.status[{#FAN_DESCR}])={$DELL.SNMP.FAN.STATUS.WARN:"nonCriticalLower"}`|Warning|**Depends on**:<br><ul><li>Dell R750: Fan [{#FAN_DESCR}]: Critical state</li></ul>|
 
 ### LLD rule Array controller discovery
 
@@ -178,9 +178,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Dell R820: Controller [{#CNTLR_NAME}]: Unrecoverable state|<p>Please check the device for faults.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.STATUS.FAIL}`|High||
-|Dell R820: Controller [{#CNTLR_NAME}]: Critical state|<p>Please check the device for faults.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.STATUS.CRIT}`|Average|**Depends on**:<br><ul><li>Dell R820: Controller [{#CNTLR_NAME}]: Unrecoverable state</li></ul>|
-|Dell R820: Controller [{#CNTLR_NAME}]: Warning state|<p>Please check the device for faults.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.STATUS.WARN}`|Warning|**Depends on**:<br><ul><li>Dell R820: Controller [{#CNTLR_NAME}]: Critical state</li><li>Dell R820: Controller [{#CNTLR_NAME}]: Unrecoverable state</li></ul>|
+|Dell R750: Controller [{#CNTLR_NAME}]: Unrecoverable state|<p>Please check the device for faults.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.STATUS.FAIL}`|High||
+|Dell R750: Controller [{#CNTLR_NAME}]: Critical state|<p>Please check the device for faults.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.STATUS.CRIT}`|Average|**Depends on**:<br><ul><li>Dell R750: Controller [{#CNTLR_NAME}]: Unrecoverable state</li></ul>|
+|Dell R750: Controller [{#CNTLR_NAME}]: Warning state|<p>Please check the device for faults.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.hw.diskarray.status[controllerComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.STATUS.WARN}`|Warning|**Depends on**:<br><ul><li>Dell R750: Controller [{#CNTLR_NAME}]: Critical state</li><li>Dell R750: Controller [{#CNTLR_NAME}]: Unrecoverable state</li></ul>|
 
 ### LLD rule Battery discovery
 
@@ -198,9 +198,9 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Dell R820: Battery [{#BATTERY_NAME}]: Critical state|<p>Please check the device for faults.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.hw.battery.status[batteryState.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}`|Average||
-|Dell R820: Battery [{#BATTERY_NAME}]: Warning state|<p>Please check the device for faults.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.hw.battery.status[batteryState.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}`|Warning|**Depends on**:<br><ul><li>Dell R820: Battery [{#BATTERY_NAME}]: Critical state</li></ul>|
-|Dell R820: Battery [{#BATTERY_NAME}]: Not in optimal state|<p>Please check the device for faults.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.hw.battery.status[batteryState.{#SNMPINDEX}])<>{$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.OK}`|Info|**Depends on**:<br><ul><li>Dell R820: Battery [{#BATTERY_NAME}]: Critical state</li><li>Dell R820: Battery [{#BATTERY_NAME}]: Warning state</li></ul>|
+|Dell R750: Battery [{#BATTERY_NAME}]: Critical state|<p>Please check the device for faults.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.hw.battery.status[batteryState.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}`|Average||
+|Dell R750: Battery [{#BATTERY_NAME}]: Warning state|<p>Please check the device for faults.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.hw.battery.status[batteryState.{#SNMPINDEX}])={$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}`|Warning|**Depends on**:<br><ul><li>Dell R750: Battery [{#BATTERY_NAME}]: Critical state</li></ul>|
+|Dell R750: Battery [{#BATTERY_NAME}]: Not in optimal state|<p>Please check the device for faults.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.hw.battery.status[batteryState.{#SNMPINDEX}])<>{$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.OK}`|Info|**Depends on**:<br><ul><li>Dell R750: Battery [{#BATTERY_NAME}]: Critical state</li><li>Dell R750: Battery [{#BATTERY_NAME}]: Warning state</li></ul>|
 
 ### LLD rule Physical disk discovery
 
@@ -223,10 +223,10 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Dell R820: Physical disk [{#DISK_NAME}]: Failed state|<p>Please check physical disk for warnings or errors.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R820 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.FAIL:"nonRecoverable"}`|High||
-|Dell R820: Physical disk [{#DISK_NAME}]: Warning state|<p>Please check physical disk for warnings or errors.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.WARN:"nonCritical"}`|Warning|**Depends on**:<br><ul><li>Dell R820: Physical disk [{#DISK_NAME}]: Failed state</li></ul>|
-|Dell R820: Physical disk [{#DISK_NAME}]: S.M.A.R.T. failed|<p>Disk probably requires replacement.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDrive"} or last(/DELL PowerEdge R820 by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}`|High|**Depends on**:<br><ul><li>Dell R820: Physical disk [{#DISK_NAME}]: Failed state</li></ul>|
-|Dell R820: Physical disk [{#DISK_NAME}]: Has been replaced|<p>[{#DISK_NAME}] serial number has changed. Acknowledge to close the problem manually.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#1)<>last(/DELL PowerEdge R820 by SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#2) and length(last(/DELL PowerEdge R820 by SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
+|Dell R750: Physical disk [{#DISK_NAME}]: Failed state|<p>Please check physical disk for warnings or errors.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.FAIL:"critical"} or last(/DELL PowerEdge R750 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.FAIL:"nonRecoverable"}`|High||
+|Dell R750: Physical disk [{#DISK_NAME}]: Warning state|<p>Please check physical disk for warnings or errors.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.hw.physicaldisk.status[physicalDiskComponentStatus.{#SNMPINDEX}])={$DELL.SNMP.DISK.STATUS.WARN:"nonCritical"}`|Warning|**Depends on**:<br><ul><li>Dell R750: Physical disk [{#DISK_NAME}]: Failed state</li></ul>|
+|Dell R750: Physical disk [{#DISK_NAME}]: S.M.A.R.T. failed|<p>Disk probably requires replacement.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDrive"} or last(/DELL PowerEdge R750 by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}`|High|**Depends on**:<br><ul><li>Dell R750: Physical disk [{#DISK_NAME}]: Failed state</li></ul>|
+|Dell R750: Physical disk [{#DISK_NAME}]: Has been replaced|<p>[{#DISK_NAME}] serial number has changed. Acknowledge to close the problem manually.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#1)<>last(/DELL PowerEdge R750 by SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}],#2) and length(last(/DELL PowerEdge R750 by SNMP/dell.server.hw.physicaldisk.serialnumber[physicalDiskSerialNo.{#SNMPINDEX}]))>0`|Info|**Manual close**: Yes|
 
 ### LLD rule Virtual disk discovery
 
@@ -249,8 +249,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Dell R820: Virtual disk [{#DISK_NAME}]: Failed state|<p>Please check the virtual disk for warnings or errors.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$DELL.SNMP.VDISK.STATUS.CRIT:"failed"}`|High||
-|Dell R820: Virtual disk [{#DISK_NAME}]: Warning state|<p>Please check the virtual disk for warnings or errors.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$DELL.SNMP.VDISK.STATUS.WARN:"degraded"}`|Warning|**Depends on**:<br><ul><li>Dell R820: Virtual disk [{#DISK_NAME}]: Failed state</li></ul>|
+|Dell R750: Virtual disk [{#DISK_NAME}]: Failed state|<p>Please check the virtual disk for warnings or errors.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$DELL.SNMP.VDISK.STATUS.CRIT:"failed"}`|High||
+|Dell R750: Virtual disk [{#DISK_NAME}]: Warning state|<p>Please check the virtual disk for warnings or errors.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.hw.virtualdisk.status[virtualDiskState.{#SNMPINDEX}])={$DELL.SNMP.VDISK.STATUS.WARN:"degraded"}`|Warning|**Depends on**:<br><ul><li>Dell R750: Virtual disk [{#DISK_NAME}]: Failed state</li></ul>|
 
 ### LLD rule Network interface discovery
 
@@ -269,8 +269,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Dell R820: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$DELL.SNMP.IFCONTROL:"{#NIC_FQDD}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)</p>|`{$DELL.SNMP.IFCONTROL:"{#NIC_FQDD}"}=1 and last(/DELL PowerEdge R820 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#1)<>1 and last(/DELL PowerEdge R820 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#1)<>last(/DELL PowerEdge R820 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#2)`|Average|**Manual close**: Yes|
-|Dell R820: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Status is not OK|<p>MIB: IDRAC-MIB-SMIv2<br>Network interface status is not OK.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.net.if.status[{#NIC_FQDD}],#1)<>3`|Average||
+|Dell R750: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$DELL.SNMP.IFCONTROL:"{#NIC_FQDD}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)</p>|`{$DELL.SNMP.IFCONTROL:"{#NIC_FQDD}"}=1 and last(/DELL PowerEdge R750 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#1)<>1 and last(/DELL PowerEdge R750 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#1)<>last(/DELL PowerEdge R750 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#2)`|Average|**Manual close**: Yes|
+|Dell R750: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Status is not OK|<p>MIB: IDRAC-MIB-SMIv2<br>Network interface status is not OK.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.net.if.status[{#NIC_FQDD}],#1)<>3`|Average||
 
 ### LLD rule CPU status discovery
 
@@ -289,8 +289,8 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Dell R820: CPU [{#CPU_FQDD}]: Status is not OK|<p>MIB: IDRAC-MIB-SMIv2<br>CPU status is not OK.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.cpu.status[cpu.{#SNMPINDEX}],#1)<>3`|Average||
-|Dell R820: CPU [{#CPU_FQDD}]: Reading error|<p>MIB: IDRAC-MIB-SMIv2<br>CPU probe reading flag is not processorPresent.</p>|`bitand(last(/DELL PowerEdge R820 by SNMP/dell.server.cpu.state[cpu.{#SNMPINDEX}],#1),128)=0`|Average||
+|Dell R750: CPU [{#CPU_FQDD}]: Status is not OK|<p>MIB: IDRAC-MIB-SMIv2<br>CPU status is not OK.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.cpu.status[cpu.{#SNMPINDEX}],#1)<>3`|Average||
+|Dell R750: CPU [{#CPU_FQDD}]: Reading error|<p>MIB: IDRAC-MIB-SMIv2<br>CPU probe reading flag is not processorPresent.</p>|`bitand(last(/DELL PowerEdge R750 by SNMP/dell.server.cpu.state[cpu.{#SNMPINDEX}],#1),128)=0`|Average||
 
 ### LLD rule System battery discovery
 
@@ -308,7 +308,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Dell R820: System battery [{#SNMPVALUE}]: Status is not OK|<p>MIB: IDRAC-MIB-SMIv2<br>System battery status is not OK.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.system.battery[{#SNMPVALUE}],#1)<>3`|Average||
+|Dell R750: System battery [{#SNMPVALUE}]: Status is not OK|<p>MIB: IDRAC-MIB-SMIv2<br>System battery status is not OK.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.system.battery[{#SNMPVALUE}],#1)<>3`|Average||
 
 ### LLD rule Memory discovery
 
@@ -327,7 +327,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Dell R820: Memory [{#SNMPVALUE}]: Status is not OK|<p>MIB: IDRAC-MIB-SMIv2<br>Memory status is not OK.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.memory.status[{#SNMPVALUE}],#1)<>3`|Average||
+|Dell R750: Memory [{#SNMPVALUE}]: Status is not OK|<p>MIB: IDRAC-MIB-SMIv2<br>Memory status is not OK.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.memory.status[{#SNMPVALUE}],#1)<>3`|Average||
 
 ### LLD rule Voltage probe discovery
 
@@ -346,7 +346,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Dell R820: Voltage probe [{#VPROBE_NAME}]: Status is not OK|<p>Please check the device's voltage.</p>|`last(/DELL PowerEdge R820 by SNMP/dell.server.voltage.status[{#VPROBE_NAME}])<>3`|Average||
+|Dell R750: Voltage probe [{#VPROBE_NAME}]: Status is not OK|<p>Please check the device's voltage.</p>|`last(/DELL PowerEdge R750 by SNMP/dell.server.voltage.status[{#VPROBE_NAME}])<>3`|Average||
 
 ## Feedback
 
