@@ -1730,7 +1730,7 @@ static int	deserialize_agent_result(char *data, size_t data_offset, AGENT_RESULT
 		SET_MSG_RESULT(result, zbx_strdup(NULL, data));
 		return agent_ret;
 	}
-	
+
 	switch (type)
 	{
 		case 't':
