@@ -2143,7 +2143,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 
 	/* checking duplicated triggers in DB */
 
-	for (i = 0; i < triggers->values_num; i++)	
+	for (i = 0; i < triggers->values_num; i++)
 	{
 		int	trigger_changed;
 
