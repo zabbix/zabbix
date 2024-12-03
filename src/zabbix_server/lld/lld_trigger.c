@@ -2073,6 +2073,37 @@ out:
 	return ret;
 }
 
+static void	lld_trigger_rollback(zbx_lld_trigger_t *trigger)
+{
+	int			i;
+	zbx_lld_function_t	*function;
+
+	if (0 != trigger->triggerid)
+	{
+		lld_field_str_rollback(&trigger->description, &trigger->description_orig,
+				&trigger->flags, ZBX_FLAG_LLD_TRIGGER_UPDATE_DESCRIPTION);
+
+		lld_field_str_rollback(&trigger->expression, &trigger->expression_orig,
+				&trigger->flags, ZBX_FLAG_LLD_TRIGGER_UPDATE_EXPRESSION);
+
+		lld_field_str_rollback(&trigger->recovery_expression,
+				&trigger->recovery_expression_orig, &trigger->flags,
+				ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_EXPRESSION);
+
+		for (i = 0; i < trigger->functions.values_num; i++)
+		{
+			function = (zbx_lld_function_t *)trigger->functions.values[i];
+
+			if (0 != function->functionid)
+				function->flags &= ~ZBX_FLAG_LLD_FUNCTION_DELETE;
+			else
+				function->flags &= ~ZBX_FLAG_LLD_FUNCTION_DISCOVERED;
+		}
+	}
+	else
+		trigger->flags &= ~ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Parameters: triggers - [IN] sorted list of triggers                        *
@@ -2080,9 +2111,8 @@ out:
  ******************************************************************************/
 static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *triggers, char **error)
 {
-	int			i, j, k;
+	int			i, j;
 	zbx_lld_trigger_t	*trigger;
-	zbx_lld_function_t	*function;
 	zbx_vector_uint64_t	triggerids;
 	zbx_vector_str_t	descriptions;
 
@@ -2113,37 +2143,47 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 
 	/* checking duplicated triggers in DB */
 
-	for (i = triggers->values_num - 1; i > 0; i--)
+	for (i = 0; i < triggers->values_num; i++)	
 	{
+		int	trigger_changed;
+
 		trigger = (zbx_lld_trigger_t *)triggers->values[i];
 
 		if (0 == (trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
 			continue;
 
-		for (j = i - 1; j >= 0; j--)
+		if (SUCCEED == (trigger_changed = lld_trigger_changed(trigger)))
 		{
-			zbx_lld_trigger_t	*t2 = triggers->values[j];
+			for (j = i + 1; j < triggers->values_num; j++)
+			{
+				zbx_lld_trigger_t	*t2 = triggers->values[j];
 
-			if (0 == (t2->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
+				if (0 == (t2->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
+					continue;
+
+				if (SUCCEED == lld_triggers_equal(trigger, t2, ZBX_LLD_TRIGGER_VALUE_EXPAND))
+				{
+					*error = zbx_strdcatf(*error,
+							"Cannot create trigger \"%s\": "
+							"duplicate trigger was discovered.\n",
+							t2->description);
+
+					lld_trigger_rollback(trigger);
+					break;
+				}
+			}
+
+			if (0 == (trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED))
 				continue;
 
-			if (SUCCEED == lld_triggers_equal(trigger, t2, ZBX_LLD_TRIGGER_VALUE_EXPAND))
-			{
-				*error = zbx_strdcatf(*error,
-						"Cannot create trigger \"%s\": "
-						"duplicate trigger was discovered.\n",
-						t2->description);
-
-				if (0 == t2->triggerid)
-					t2->flags &= ~ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
-			}
+			trigger_changed = FAIL;
 		}
 
 		if (0 != trigger->triggerid)
 		{
 			zbx_vector_uint64_append(&triggerids, trigger->triggerid);
 
-			if (SUCCEED != lld_trigger_changed(trigger))
+			if (SUCCEED != trigger_changed)
 				continue;
 		}
 
@@ -2250,30 +2290,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 				*error = zbx_strdcatf(*error, "Cannot %s trigger: trigger \"%s\" already exists.\n",
 						(0 != trigger->triggerid ? "update" : "create"), trigger->description);
 
-				if (0 != trigger->triggerid)
-				{
-					lld_field_str_rollback(&trigger->description, &trigger->description_orig,
-							&trigger->flags, ZBX_FLAG_LLD_TRIGGER_UPDATE_DESCRIPTION);
-
-					lld_field_str_rollback(&trigger->expression, &trigger->expression_orig,
-							&trigger->flags, ZBX_FLAG_LLD_TRIGGER_UPDATE_EXPRESSION);
-
-					lld_field_str_rollback(&trigger->recovery_expression,
-							&trigger->recovery_expression_orig, &trigger->flags,
-							ZBX_FLAG_LLD_TRIGGER_UPDATE_RECOVERY_EXPRESSION);
-
-					for (k = 0; k < trigger->functions.values_num; k++)
-					{
-						function = (zbx_lld_function_t *)trigger->functions.values[k];
-
-						if (0 != function->functionid)
-							function->flags &= ~ZBX_FLAG_LLD_FUNCTION_DELETE;
-						else
-							function->flags &= ~ZBX_FLAG_LLD_FUNCTION_DISCOVERED;
-					}
-				}
-				else
-					trigger->flags &= ~ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
+				lld_trigger_rollback(trigger);
 
 				break;	/* only one same trigger can be here */
 			}
