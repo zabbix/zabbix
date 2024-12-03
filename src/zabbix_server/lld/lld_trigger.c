@@ -2073,10 +2073,13 @@ out:
 	return ret;
 }
 
-static void	lld_trigger_rollback(zbx_lld_trigger_t *trigger)
+static void	lld_trigger_rollback(zbx_lld_trigger_t *trigger, char **error)
 {
 	int			i;
 	zbx_lld_function_t	*function;
+
+	*error = zbx_strdcatf(*error, "Cannot %s trigger: trigger \"%s\" already exists.\n",
+			(0 != trigger->triggerid ? "update" : "create"), trigger->description);
 
 	if (0 != trigger->triggerid)
 	{
@@ -2163,12 +2166,8 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 
 				if (SUCCEED == lld_triggers_equal(trigger, t2, ZBX_LLD_TRIGGER_VALUE_EXPAND))
 				{
-					*error = zbx_strdcatf(*error,
-							"Cannot create trigger \"%s\": "
-							"duplicate trigger was discovered.\n",
-							t2->description);
+					lld_trigger_rollback(trigger, error);
 
-					lld_trigger_rollback(trigger);
 					break;
 				}
 			}
@@ -2287,10 +2286,7 @@ static void	lld_triggers_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger
 				if (SUCCEED != lld_triggers_equal(trigger, db_trigger, ZBX_LLD_TRIGGER_VALUE_NO_EXPAND))
 					continue;
 
-				*error = zbx_strdcatf(*error, "Cannot %s trigger: trigger \"%s\" already exists.\n",
-						(0 != trigger->triggerid ? "update" : "create"), trigger->description);
-
-				lld_trigger_rollback(trigger);
+				lld_trigger_rollback(trigger, error);
 
 				break;	/* only one same trigger can be here */
 			}
