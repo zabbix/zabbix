@@ -1216,7 +1216,7 @@ static void	vmware_eventlog_data_free(zbx_vmware_eventlog_data_t *evt_data)
  ******************************************************************************/
 static time_t	vmware_evt_toptime(const zbx_vmware_eventlog_state_t *eventlog, const zbx_uint64_t mem_sz)
 {
-#	define	EVTNUM_PER_ONE_MB	6200
+#	define	EVTNUM_PER_ONE_MB	8000
 
 	zbx_uint64_t	x_evt;
 	time_t		top_time, now = time(NULL);
@@ -1401,8 +1401,7 @@ out:
 		if (service->eventlog.top_key < evt_top_key)
 			service->eventlog.top_key = evt_top_key;
 
-		service->eventlog.expect_num = evt_data->events.values_num +
-				service->eventlog.top_key - evt_data->events.values[0]->key;
+		service->eventlog.expect_num = service->eventlog.top_key - evt_data->events.values[0]->key;
 
 		events_sz += vmware_service_evt_vector_memsize(&evt_data->events);
 
