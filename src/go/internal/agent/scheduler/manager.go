@@ -868,16 +868,22 @@ func NewManager(options *agent.AgentOptions, systemOpt agent.PluginSystemOptions
 				}
 
 				log.Infof(
-					"using plugin '%s' (%s) providing following interfaces: %s",
+					"using plugin '%s' (%s) providing following interfaces: %s, maximum capacity: %d, "+
+						"active checks on start enabled: %t",
 					metric.Plugin.Name(),
 					ext.Path,
 					getPluginInterfaceNames(metric.Plugin),
+					pagent.maxCapacity,
+					pagent.forceActiveChecksOnStart,
 				)
 			} else {
 				log.Infof(
-					"using plugin '%s' (built-in) providing following interfaces: %s",
+					"using plugin '%s' (built-in) providing following interfaces: %s, maximum capacity: %d, "+
+						"active checks on start enabled: %t",
 					metric.Plugin.Name(),
 					getPluginInterfaceNames(metric.Plugin),
+					pagent.maxCapacity,
+					pagent.forceActiveChecksOnStart,
 				)
 			}
 		}
