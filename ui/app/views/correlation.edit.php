@@ -324,7 +324,8 @@ else {
 						'cancel' => true,
 						'action' => ''
 					]
-				]
+				],
+				'rules' => (new CFormValidator(CControllerCorrelationCreate::getValidationRules()))->getRules()
 			]).');'
 		],
 		[

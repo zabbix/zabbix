@@ -33,11 +33,11 @@ class CControllerCorrelationUpdate extends CController {
 			'evaltype' => ['db correlation.evaltype', 'required', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]],
 			'status' => ['db correlation.status', 'required', 'in' => [ZBX_CORRELATION_ENABLED, ZBX_CORRELATION_DISABLED]],
 			'formula' => ['db correlation.formula'],
-			'op_close_new' => [
+			'op_close_new' => ['boolean'],
+			'op_close_old' => [
 				['boolean'],
-				['boolean', 'required', 'when' => ['op_close_old', false]]
+				['boolean', 'required', 'when' => ['op_close_new', false]]
 			],
-			'op_close_old' => ['boolean'],
 			'conditions' =>	['objects', 'required', 'uniq' => [['type', 'operator', 'tag', 'oldtag', 'newtag', 'value', 'groupid']], 'not_empty', 'fields' => [
 				'type' => ['db corr_condition.type', 'required', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE]],
 				'operator' => [

@@ -26,6 +26,7 @@ window.correlation_edit_popup = new class {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form_class = new Form(this.form_element, rules);
+		this.form = new CForm(this.form_element, rules);
 		this.correlation = correlation;
 		this.correlationid = correlation.correlationid;
 
@@ -324,11 +325,8 @@ window.correlation_edit_popup = new class {
 	clone({title, buttons}) {
 		this.correlationid = null;
 
-<<<<<<< HEAD
-=======
 		this.form.reload(rules);
 
->>>>>>> 60e4259d879 (..F....... [ZBXNEXT-8791] fixed variable naming)
 		this.overlay.setProperties({title, buttons});
 		this.overlay.unsetLoading();
 		this.overlay.recoverFocus();
@@ -349,24 +347,11 @@ window.correlation_edit_popup = new class {
 	}
 
 	submit() {
-<<<<<<< HEAD
-		const fields = getFormFields(this.form);
-
-		['name', 'description'].forEach((field) => fields[field] = fields[field].trim());
-
-=======
 		const fields = this.form.getAllValues();
->>>>>>> 60e4259d879 (..F....... [ZBXNEXT-8791] fixed variable naming)
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', this.correlationid === null ? 'correlation.create' : 'correlation.update');
 
-<<<<<<< HEAD
-		this.#post(curl.getUrl(), fields, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
-
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-=======
 		this.form.validateSubmit(fields)
 			.then((result) => {
 				this.overlay.unsetLoading();
@@ -389,7 +374,6 @@ window.correlation_edit_popup = new class {
 						this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 					}
 				});
->>>>>>> 60e4259d879 (..F....... [ZBXNEXT-8791] fixed variable naming)
 		});
 	}
 

@@ -32,12 +32,12 @@ class CControllerCorrelationCreate extends CController {
 			'evaltype' => ['db correlation.evaltype', 'required', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]],
 			'status' => ['db correlation.status', 'required', 'in' => [ZBX_CORRELATION_ENABLED, ZBX_CORRELATION_DISABLED]],
 			'formula' => ['db correlation.formula'],
-			'op_close_new' => [
+			'op_close_new' => ['boolean'],
+			'op_close_old' => [
 				['boolean'],
-				['boolean', 'required', 'when' => ['op_close_old', false]]
+				['boolean', 'required', 'when' => ['op_close_new', false]]
 			],
-			'op_close_old' => ['boolean'],
-			'conditions' =>	['objects', 'required', 'uniq' => [['type', 'operator', 'tag', 'oldtag', 'newtag', 'value', 'groupid']], 'not_empty', 'fields' => [
+			'conditions' =>	['objects', 'required', 'uniq' => ['type', 'operator', 'tag', 'oldtag', 'newtag', 'value', 'groupid'], 'not_empty', 'fields' => [
 				'type' => ['db corr_condition.type', 'required', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE]],
 				'operator' => [
 					['db conditions.operator', 'required', 'in' => [CONDITION_OPERATOR_EQUAL], 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_EVENT_TAG_PAIR]]],
@@ -59,22 +59,29 @@ class CControllerCorrelationCreate extends CController {
 
 	static function getValidationRulesForConditionPopup() {
 		$rules = self::getValidationRules();
+		$rules['fields']['conditions']['fields']['groupid'] = [
+			'db corr_condition_group.groupid', 'required', 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP]]
+		];
 
-		return ['objects', 'fields' => [
-			'groupid' => ['array', 'required',
-				'field' => ['db corr_condition_group.groupid'],
-				'when' => ['type', 'in' => [ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP]]
-			]
-		] + $rules['fields']['conditions']['fields']];
+		return ['objects', 'fields' => $rules['fields']['conditions']['fields']];
 	}
 
 	protected function checkInput(): bool {
 		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
+<<<<<<< HEAD
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
+=======
+			$form_errors = $this->getValidationError();
+
+			$response = array_filter([
+				'form_errors' => $form_errors ?? null,
+				'error' => !$form_errors
+					? [
+>>>>>>> 762e65405ca (..F....... [ZBXNEXT-8791] fixed silent conflicts in event correlation form)
 						'title' => _('Cannot create event correlation'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]

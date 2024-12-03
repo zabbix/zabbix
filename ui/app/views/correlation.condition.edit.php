@@ -39,6 +39,7 @@ $form_grid = (new CFormGrid())
 			->setValue($condition_type)
 			->setId('condition-type')
 			->addOptions(CSelect::createOptionsFromArray(CCorrelationHelper::getConditionTypes()))
+			->setAttribute('data-prevent-validation-on-change', 1)
 		)
 	]);
 
