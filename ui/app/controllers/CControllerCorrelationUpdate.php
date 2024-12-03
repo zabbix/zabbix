@@ -32,7 +32,10 @@ class CControllerCorrelationUpdate extends CController {
 			'description' => ['db correlation.description'],
 			'evaltype' => ['db correlation.evaltype', 'required', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]],
 			'status' => ['db correlation.status', 'required', 'in' => [ZBX_CORRELATION_ENABLED, ZBX_CORRELATION_DISABLED]],
-			'formula' => ['db correlation.formula'],
+			'formula' => [
+				['db correlation.formula'],
+				['db correlation.formula', 'required', 'not_empty', 'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]]
+			],
 			'op_close_new' => ['boolean'],
 			'op_close_old' => [
 				['boolean'],
