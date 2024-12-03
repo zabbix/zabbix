@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-11-30T07:56:14Z'
+  date: '2024-12-02T18:49:58Z'
   groups:
     - uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
@@ -333,7 +333,7 @@ zabbix_export:
               name: 'Dell R840: Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: INFO
-              description: 'Firmware version has changed. Acknowledge to close the problem manually.'
+              description: 'The firmware version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -388,7 +388,7 @@ zabbix_export:
               name: 'Dell R840: Device has been replaced'
               event_name: 'Dell R840: Device has been replaced (new serial number received)'
               priority: INFO
-              description: 'Device serial number has changed. Acknowledge to close the problem manually.'
+              description: 'The device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -751,7 +751,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           trends: '0'
-          description: 'This attribute defines the overall rollup status of all components in the system being monitored by the remote access card. Includes system, storage, IO devices, iDRAC, CPU, memory, etc.'
+          description: 'This attribute defines the overall rollup status of all the components in the system monitored by the remote access card. Includes system, storage, IO devices, iDRAC, CPU, memory, etc.'
           valuemap:
             name: 'Redfish status health'
           preprocessing:
@@ -1110,10 +1110,10 @@ zabbix_export:
           key: 'net.tcp.service[https]'
           history: 7d
           description: |
-            The availability of Redfish API on the server.
+            Availability of Redfish API on the server.
             Possible values:
-              0 Unavailable
-              1 Available
+              0 - Unavailable
+              1 - Available
           valuemap:
             name: 'Redfish API availability'
           tags:
@@ -1321,7 +1321,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: '!rpm'
-              description: 'The sensor value.'
+              description: 'Sensor value.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1602,7 +1602,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: bps
-              description: 'Network port current link speed.'
+              description: 'The network port current link speed.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1624,7 +1624,7 @@ zabbix_export:
               key: 'dell.server.net.if.state[{#IFNAME}]'
               delay: '0'
               history: 7d
-              description: 'The known state of the Resource, for example, enabled. Possible values: Enabled, Disabled, StandbyOffline, StandbySpare, InTest, Starting, Absent, UnavailableOffline, Deferring, Quiesced, Updating, Qualified.'
+              description: 'The known state of the Resource, for example, Enabled. Possible values: Enabled, Disabled, StandbyOffline, StandbySpare, InTest, Starting, Absent, UnavailableOffline, Deferring, Quiesced, Updating, Qualified.'
               valuemap:
                 name: 'Redfish status state'
               preprocessing:
@@ -1698,11 +1698,11 @@ zabbix_export:
                   priority: AVERAGE
                   description: |
                     This trigger expression works as follows:
-                    1. It can be triggered if the operations status is "Down" (2).
-                    2. `{$DELL.HTTP.IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is "Down" (2).
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
+                    1. It can be triggered if the operations status is Down (2).
+                    2. `{$DELL.HTTP.IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is Down (2).
+                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for the "eternal off" interfaces.)
                     
-                    WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
+                    WARNING: if closed manually - it will not fire again on the next poll because of `.diff`.
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -1716,11 +1716,11 @@ zabbix_export:
                   priority: AVERAGE
                   description: |
                     This trigger expression works as follows:
-                    1. It can be triggered if the operations status is "Null" (1) or "Unknown" (0).
-                    2. `{$DELL.HTTP.IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is "Null" (1) or "Unknown" (0).
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
+                    1. It can be triggered if the operations status is Null (1) or Unknown (0).
+                    2. `{$DELL.HTTP.IFCONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is Null (1) or Unknown (0).
+                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for the "eternal off" interfaces.)
                     
-                    WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
+                    WARNING: if closed manually - it will not fire again on the next poll because of `.diff`.
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -2133,7 +2133,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: A
-              description: 'The sensor value.'
+              description: 'Sensor value.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2227,7 +2227,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: V
-              description: 'The sensor value.'
+              description: 'Sensor value.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2355,7 +2355,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: °C
-              description: 'The sensor value.'
+              description: 'Sensor value.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2641,7 +2641,7 @@ zabbix_export:
               key: 'dell.server.hw.virtualdisk.state[{#DISK_NAME}]'
               delay: '0'
               history: 7d
-              description: 'The known state of the Resource, for example, enabled. Possible values: Enabled, Disabled, StandbyOffline, StandbySpare, InTest, Starting, Absent, UnavailableOffline, Deferring, Quiesced, Updating, Qualified.'
+              description: 'The known state of the Resource, for example, Enabled. Possible values: Enabled, Disabled, StandbyOffline, StandbySpare, InTest, Starting, Absent, UnavailableOffline, Deferring, Quiesced, Updating, Qualified.'
               valuemap:
                 name: 'Redfish status state'
               preprocessing:
@@ -2812,7 +2812,7 @@ zabbix_export:
           description: 'Sets the percentage threshold for creating a "warning" severity event about CPU utilization.'
         - macro: '{$DELL.HTTP.IFCONTROL}'
           value: '1'
-          description: 'Link status trigger will be fired only for interfaces that have the context macro equaled 1.'
+          description: 'Link status trigger will be fired only for interfaces that have the context macro equal to "1".'
         - macro: '{$DELL.HTTP.IO.UTIL.HIGH}'
           value: '90'
           description: 'Sets the percentage threshold for creating a "high" severity event about IO utilization.'

@@ -3,7 +3,7 @@
 
 ## Overview
 
-This is a template for monitoring DELL PowerEdge R720 servers with iDRAC version 7 and later via Zabbix SNMP agent that works without any external scripts.
+This is a template for monitoring DELL PowerEdge R720 servers with iDRAC version 7 (and later) via Zabbix SNMP agent that works without any external scripts.
 
 ## Requirements
 
@@ -30,59 +30,59 @@ Refer to the vendor documentation.
 |{$DELL.SNMP.DISCOVERY.VOLTAGE.NAME.NOT_MATCHES}|<p>Sets the regex string of voltage probe names to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
 |{$DELL.SNMP.DISCOVERY.VOLTAGE.TYPE.MATCHES}|<p>Sets the regex string of voltage probe types to allow in discovery.</p>|`18\|16`|
 |{$DELL.SNMP.DISCOVERY.VOLTAGE.TYPE.NOT_MATCHES}|<p>Sets the regex string of voltage probe types to ignore in discovery.</p>|`CHANGE_IF_NEEDED`|
-|{$DELL.SNMP.SENSOR.TEMP.STATUS.OK}|<p>The OK status of the temperature probe for trigger expression.</p>|`3`|
-|{$DELL.SNMP.SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"}|<p>The warning status of the temperature probe for trigger expression.</p>|`4`|
-|{$DELL.SNMP.SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}|<p>The warning status of the temperature probe for trigger expression.</p>|`7`|
-|{$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"criticalUpper"}|<p>The critical status of the temperature probe for trigger expression.</p>|`5`|
-|{$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"}|<p>The critical status of the temperature probe for trigger expression.</p>|`6`|
-|{$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"criticalLower"}|<p>The critical status of the temperature probe for trigger expression.</p>|`8`|
-|{$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}|<p>The critical status of the temperature probe for trigger expression.</p>|`9`|
-|{$DELL.SNMP.HEALTH.STATUS.DISASTER}|<p>The disaster status of the health for trigger expression.</p>|`6`|
-|{$DELL.SNMP.HEALTH.STATUS.CRIT}|<p>The critical status of the health for trigger expression.</p>|`5`|
-|{$DELL.SNMP.HEALTH.STATUS.WARN}|<p>The warning status of the health for trigger expression.</p>|`4`|
-|{$DELL.SNMP.PSU.STATUS.WARN:"nonCritical"}|<p>The warning value of the PSU sensor for trigger expression.</p>|`4`|
-|{$DELL.SNMP.PSU.STATUS.CRIT:"critical"}|<p>The critical value of the PSU sensor for trigger expression.</p>|`5`|
-|{$DELL.SNMP.PSU.STATUS.CRIT:"nonRecoverable"}|<p>The critical value of the PSU sensor for trigger expression.</p>|`6`|
-|{$DELL.SNMP.FAN.STATUS.WARN:"nonCriticalUpper"}|<p>The warning value of the FAN sensor for trigger expression.</p>|`4`|
-|{$DELL.SNMP.FAN.STATUS.WARN:"nonCriticalLower"}|<p>The warning value of the FAN sensor for trigger expression.</p>|`7`|
-|{$DELL.SNMP.FAN.STATUS.CRIT:"criticalUpper"}|<p>The critical value of the FAN sensor for trigger expression.</p>|`5`|
-|{$DELL.SNMP.FAN.STATUS.CRIT:"nonRecoverableUpper"}|<p>The critical value of the FAN sensor for trigger expression.</p>|`6`|
-|{$DELL.SNMP.FAN.STATUS.CRIT:"criticalLower"}|<p>The critical value of the FAN sensor for trigger expression.</p>|`8`|
-|{$DELL.SNMP.FAN.STATUS.CRIT:"nonRecoverableLower"}|<p>The critical value of the FAN sensor for trigger expression.</p>|`9`|
-|{$DELL.SNMP.FAN.STATUS.CRIT:"failed"}|<p>The critical value of the FAN sensor for trigger expression.</p>|`10`|
-|{$DELL.SNMP.DISK.ARRAY.STATUS.FAIL}|<p>The disaster status of the disk array for trigger expression.</p>|`6`|
-|{$DELL.SNMP.DISK.ARRAY.STATUS.CRIT}|<p>The critical status of the disk array for trigger expression.</p>|`5`|
-|{$DELL.SNMP.DISK.ARRAY.STATUS.WARN}|<p>The warning status of the disk array for trigger expression.</p>|`4`|
-|{$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}|<p>The critical status of the disk array cache battery for trigger expression.</p>|`3`|
-|{$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}|<p>The warning status of the disk array cache battery for trigger expression.</p>|`4`|
-|{$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.OK}|<p>The OK status of the disk array cache battery for trigger expression.</p>|`2`|
-|{$DELL.SNMP.VDISK.STATUS.CRIT:"failed"}|<p>The critical status of the virtual disk for trigger expression.</p>|`3`|
-|{$DELL.SNMP.VDISK.STATUS.WARN:"degraded"}|<p>The warning status of the virtual disk for trigger expression.</p>|`4`|
-|{$DELL.SNMP.DISK.STATUS.WARN:"nonCritical"}|<p>The warning status of the disk for trigger expression.</p>|`4`|
-|{$DELL.SNMP.DISK.STATUS.FAIL:"critical"}|<p>The critical status of the disk for trigger expression.</p>|`5`|
-|{$DELL.SNMP.DISK.STATUS.FAIL:"nonRecoverable"}|<p>The critical status of the disk for trigger expression.</p>|`6`|
-|{$DELL.SNMP.DISK.SMART.STATUS.FAIL}|<p>The critical S.M.A.R.T status of the disk for trigger expression.</p>|`1`|
-|{$DELL.SNMP.TIMEOUT}|<p>The time interval for SNMP agent availability trigger expression.</p>|`5m`|
-|{$DELL.SNMP.IFCONTROL}|<p>Link status trigger will be fired only for interfaces that have the context macro equaled 1.</p>|`1`|
+|{$DELL.SNMP.SENSOR.TEMP.STATUS.OK}|<p>The OK status of the temperature probe for the trigger expression.</p>|`3`|
+|{$DELL.SNMP.SENSOR.TEMP.STATUS.WARN:"nonCriticalUpper"}|<p>The warning status of the temperature probe for the trigger expression.</p>|`4`|
+|{$DELL.SNMP.SENSOR.TEMP.STATUS.WARN:"nonCriticalLower"}|<p>The warning status of the temperature probe for the trigger expression.</p>|`7`|
+|{$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"criticalUpper"}|<p>The critical status of the temperature probe for the trigger expression.</p>|`5`|
+|{$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"nonRecoverableUpper"}|<p>The critical status of the temperature probe for the trigger expression.</p>|`6`|
+|{$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"criticalLower"}|<p>The critical status of the temperature probe for the trigger expression.</p>|`8`|
+|{$DELL.SNMP.SENSOR.TEMP.STATUS.CRIT:"nonRecoverableLower"}|<p>The critical status of the temperature probe for the trigger expression.</p>|`9`|
+|{$DELL.SNMP.HEALTH.STATUS.DISASTER}|<p>The disaster status of health for the trigger expression.</p>|`6`|
+|{$DELL.SNMP.HEALTH.STATUS.CRIT}|<p>The critical status of health for the trigger expression.</p>|`5`|
+|{$DELL.SNMP.HEALTH.STATUS.WARN}|<p>The warning status of health for the trigger expression.</p>|`4`|
+|{$DELL.SNMP.PSU.STATUS.WARN:"nonCritical"}|<p>The warning value of the PSU sensor for the trigger expression.</p>|`4`|
+|{$DELL.SNMP.PSU.STATUS.CRIT:"critical"}|<p>The critical value of the PSU sensor for the trigger expression.</p>|`5`|
+|{$DELL.SNMP.PSU.STATUS.CRIT:"nonRecoverable"}|<p>The critical value of the PSU sensor for the trigger expression.</p>|`6`|
+|{$DELL.SNMP.FAN.STATUS.WARN:"nonCriticalUpper"}|<p>The warning value of the FAN sensor for the trigger expression.</p>|`4`|
+|{$DELL.SNMP.FAN.STATUS.WARN:"nonCriticalLower"}|<p>The warning value of the FAN sensor for the trigger expression.</p>|`7`|
+|{$DELL.SNMP.FAN.STATUS.CRIT:"criticalUpper"}|<p>The critical value of the FAN sensor for the trigger expression.</p>|`5`|
+|{$DELL.SNMP.FAN.STATUS.CRIT:"nonRecoverableUpper"}|<p>The critical value of the FAN sensor for the trigger expression.</p>|`6`|
+|{$DELL.SNMP.FAN.STATUS.CRIT:"criticalLower"}|<p>The critical value of the FAN sensor for the trigger expression.</p>|`8`|
+|{$DELL.SNMP.FAN.STATUS.CRIT:"nonRecoverableLower"}|<p>The critical value of the FAN sensor for the trigger expression.</p>|`9`|
+|{$DELL.SNMP.FAN.STATUS.CRIT:"failed"}|<p>The critical value of the FAN sensor for the trigger expression.</p>|`10`|
+|{$DELL.SNMP.DISK.ARRAY.STATUS.FAIL}|<p>The disaster status of the disk array for the trigger expression.</p>|`6`|
+|{$DELL.SNMP.DISK.ARRAY.STATUS.CRIT}|<p>The critical status of the disk array for the trigger expression.</p>|`5`|
+|{$DELL.SNMP.DISK.ARRAY.STATUS.WARN}|<p>The warning status of the disk array for the trigger expression.</p>|`4`|
+|{$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.CRIT}|<p>The critical status of the disk array cache battery for the trigger expression.</p>|`3`|
+|{$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.WARN}|<p>The warning status of the disk array cache battery for the trigger expression.</p>|`4`|
+|{$DELL.SNMP.DISK.ARRAY.CACHE.BATTERY.STATUS.OK}|<p>The OK status of the disk array cache battery for the trigger expression.</p>|`2`|
+|{$DELL.SNMP.VDISK.STATUS.CRIT:"failed"}|<p>The critical status of the virtual disk for the trigger expression.</p>|`3`|
+|{$DELL.SNMP.VDISK.STATUS.WARN:"degraded"}|<p>The warning status of the virtual disk for the trigger expression.</p>|`4`|
+|{$DELL.SNMP.DISK.STATUS.WARN:"nonCritical"}|<p>The warning status of the disk for the trigger expression.</p>|`4`|
+|{$DELL.SNMP.DISK.STATUS.FAIL:"critical"}|<p>The critical status of the disk for the trigger expression.</p>|`5`|
+|{$DELL.SNMP.DISK.STATUS.FAIL:"nonRecoverable"}|<p>The critical status of the disk for the trigger expression.</p>|`6`|
+|{$DELL.SNMP.DISK.SMART.STATUS.FAIL}|<p>The critical S.M.A.R.T status of the disk for the trigger expression.</p>|`1`|
+|{$DELL.SNMP.TIMEOUT}|<p>The time interval for the SNMP agent availability trigger expression.</p>|`5m`|
+|{$DELL.SNMP.IFCONTROL}|<p>The link status trigger will be fired only for interfaces that have the context macro equal to "1".</p>|`1`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Dell R720: Overall system health status|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the overall rollup status of all components in the system being monitored by the remote access card. Includes system, storage, IO devices, iDRAC, CPU, memory, etc.</p>|SNMP agent|dell.server.status[globalSystemStatus]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Overall system health status|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the overall rollup status of all the components in the system monitored by the remote access card. Includes system, storage, IO devices, iDRAC, CPU, memory, etc.</p>|SNMP agent|dell.server.status[globalSystemStatus]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Dell R720: Hardware model name|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the model name of the system.</p>|SNMP agent|dell.server.hw.model[systemModelName]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Dell R720: Hardware serial number|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the service tag of the system.</p>|SNMP agent|dell.server.hw.serialnumber[systemServiceTag]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Dell R720: Operating system|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the name of the operating system that the host is running.</p>|SNMP agent|dell.server.sw.os[systemOSName]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Dell R720: Firmware version|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the firmware version of a remote access card.</p>|SNMP agent|dell.server.hw.firmware[racFirmwareVersion]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Dell R720: Uptime (network)|<p>MIB: SNMP-FRAMEWORK-MIB</p><p>The number of seconds since the value of the snmpEngineBoots object last changed.</p>|SNMP agent|dell.server.net.uptime[snmpEngineTime]|
 |Dell R720: Uptime (hardware)|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the power-up time of the system in seconds.</p>|SNMP agent|dell.server.hw.uptime[systemPowerUpTime]|
-|Dell R720: SNMP traps (fallback)|<p>The item is used to collect all SNMP traps unmatched by other snmptrap items</p>|SNMP trap|snmptrap.fallback|
-|Dell R720: System location|<p>MIB: SNMPv2-MIB</p><p>The physical location of this node (e.g., 'telephone closet, 3rd floor'). If the location is unknown, the value is the zero-length string.</p>|SNMP agent|dell.server.location[sysLocation]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Dell R720: System contact details|<p>MIB: SNMPv2-MIB</p><p>The textual identification of the contact person for this managed node, together with information on how to contact this person. If no contact information is known, the value is the zero-length string.</p>|SNMP agent|dell.server.contact[sysContact]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Dell R720: System object ID|<p>MIB: SNMPv2-MIB</p><p>The vendor's authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining 'what kind of box' is being managed. For example, if vendor 'Flintstones, Inc.' was assigned the subtree 1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its 'Fred Router'.</p>|SNMP agent|dell.server.objectid[sysObjectID]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Dell R720: System name|<p>MIB: SNMPv2-MIB</p><p>An administratively-assigned name for this managed node. By convention, this is the node's fully-qualified domain name. If the name is unknown, the value is the zero-length string.</p>|SNMP agent|dell.server.name[sysName]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Dell R720: System description|<p>MIB: SNMPv2-MIB</p><p>A textual description of the entity. This value should</p><p>include the full name and version identification of the system's hardware type, software operating-system, and</p><p>networking software.</p>|SNMP agent|dell.server.descr[sysDescr]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Dell R720: SNMP agent availability||Zabbix internal|zabbix[host,snmp,available]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: SNMP traps (fallback)|<p>The item is used to collect all SNMP traps unmatched by other `snmptrap` items</p>|SNMP trap|snmptrap.fallback|
+|Dell R720: System location|<p>MIB: SNMPv2-MIB</p><p>The physical location of this node (e.g., 'telephone closet, 3rd floor'). If the location is unknown, the value is a zero-length string.</p>|SNMP agent|dell.server.location[sysLocation]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: System contact details|<p>MIB: SNMPv2-MIB</p><p>Name and contact information of the contact person for the node. If not provided, the value is a zero-length string.</p>|SNMP agent|dell.server.contact[sysContact]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Dell R720: System object ID|<p>MIB: SNMPv2-MIB</p><p>The vendor's authoritative identification of the entity as part of the vendor's SMI enterprises subtree with the prefix 1.3.6.1.4.1 (e.g., a vendor with the identifier 1.3.6.1.4.1.4242 might assign a system object with the OID 1.3.6.1.4.1.4242.1.1).</p>|SNMP agent|dell.server.objectid[sysObjectID]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: System name|<p>MIB: SNMPv2-MIB</p><p>An administratively-assigned name for this managed node. By convention, this is the node's fully-qualified domain name. If the name is unknown, the value is a zero-length string.</p>|SNMP agent|dell.server.name[sysName]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: System description|<p>MIB: SNMPv2-MIB</p><p>A textual description of the entity. This value should include the full name and version identification of the system's hardware type, software operating system, and networking software.</p>|SNMP agent|dell.server.descr[sysDescr]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Dell R720: SNMP agent availability|<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible values:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p>|Zabbix internal|zabbix[host,snmp,available]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Dell R720: Memory, total size|<p>Total memory amount on the device.</p>|Calculated|dell.server.memory.size.total<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Dell R720: BIOS version|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the version name of the system BIOS.</p>|SNMP agent|dell.server.bios.version<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
@@ -111,7 +111,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Dell R720: Probe [{#SENSOR_LOCALE}]: Value|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the reading for a temperature probe of type other than temperatureProbeTypeIsDiscrete. When the value for temperatureProbeType is other than temperatureProbeTypeIsDiscrete, the value returned for this attribute is the temperature that the probe is reading in Centigrade. When the value for temperatureProbeType is temperatureProbeTypeIsDiscrete, a value is not returned for this attribute.</p>|SNMP agent|dell.server.sensor.temp.value[temperatureProbeReading.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.1`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Probe [{#SENSOR_LOCALE}]: Value|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the reading for a temperature probe of type other than `temperatureProbeTypeIsDiscrete`.</p><p>When the value for `temperatureProbeType` is other than `temperatureProbeTypeIsDiscrete`, the value returned for this attribute is the temperature that the probe is reading in Centigrade.</p><p>When the value for `temperatureProbeType` is `temperatureProbeTypeIsDiscrete`, a value is not returned for this attribute.</p>|SNMP agent|dell.server.sensor.temp.value[temperatureProbeReading.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.1`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Dell R720: Probe [{#SENSOR_LOCALE}]: Status|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the probe status of the temperature probe.</p><p>Possible values:</p><p>other(1),               -- probe status is not one of the following:</p><p>unknown(2),             -- probe status is unknown (not known or monitored)</p><p>ok(3),                  -- probe is reporting a value within the thresholds</p><p>nonCriticalUpper(4),    -- probe has crossed the upper noncritical threshold</p><p>criticalUpper(5),       -- probe has crossed the upper critical threshold</p><p>nonRecoverableUpper(6), -- probe has crossed the upper non-recoverable threshold</p><p>nonCriticalLower(7),    -- probe has crossed the lower noncritical threshold</p><p>criticalLower(8),       -- probe has crossed the lower critical threshold</p><p>nonRecoverableLower(9), -- probe has crossed the lower non-recoverable threshold</p><p>failed(10)              -- probe is not functional</p>|SNMP agent|dell.server.sensor.temp.status[temperatureProbeStatus.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for Temperature discovery
@@ -132,7 +132,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Dell R720: Power supply [{#PSU_DESCR}]: State|<p>MIB: IDRAC-MIB-SMIv2</p><p>0600.0012.0001.0005 This attribute defines the status of the power supply.</p>|SNMP agent|dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: Power supply [{#PSU_DESCR}]: State|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the status of the power supply.</p>|SNMP agent|dell.server.sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for PSU discovery
 
@@ -152,7 +152,7 @@ Refer to the vendor documentation.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Dell R720: Fan [{#FAN_DESCR}]: Status|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the probe status of the cooling device.</p>|SNMP agent|dell.server.sensor.fan.status[{#FAN_DESCR}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Dell R720: Fan [{#FAN_DESCR}]: Speed|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the reading for a cooling device</p><p>of subtype other than coolingDeviceSubTypeIsDiscrete. When the value</p><p>for coolingDeviceSubType is other than coolingDeviceSubTypeIsDiscrete, the</p><p>value returned for this attribute is the speed in RPM or the OFF/ON value</p><p>of the cooling device. When the value for coolingDeviceSubType is</p><p>coolingDeviceSubTypeIsDiscrete, a value is not returned for this attribute.</p>|SNMP agent|dell.server.sensor.fan.speed[{#FAN_DESCR}]|
+|Dell R720: Fan [{#FAN_DESCR}]: Speed|<p>MIB: IDRAC-MIB-SMIv2</p><p>This attribute defines the reading for a cooling device of a subtype other than `coolingDeviceSubTypeIsDiscrete`.</p><p>When the value for `coolingDeviceSubType` is other than `coolingDeviceSubTypeIsDiscrete`, the value returned for this attribute is the speed in RPM or the "OFF/ON" value of the cooling device.</p><p>When the value for `coolingDeviceSubType` is `coolingDeviceSubTypeIsDiscrete`, a value is not returned for this attribute.</p>|SNMP agent|dell.server.sensor.fan.speed[{#FAN_DESCR}]|
 
 ### Trigger prototypes for Fan discovery
 
@@ -256,7 +256,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Network interface discovery|<p>Network devices discovery.</p>|SNMP agent|net.if.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Network interface discovery|<p>Discovery of network interfaces.</p>|SNMP agent|net.if.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Item prototypes for Network interface discovery
 
@@ -269,7 +269,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Dell R720: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$DELL.SNMP.IFCONTROL:"{#NIC_FQDD}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)</p>|`{$DELL.SNMP.IFCONTROL:"{#NIC_FQDD}"}=1 and last(/DELL PowerEdge R720 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#1)<>1 and last(/DELL PowerEdge R720 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#1)<>last(/DELL PowerEdge R720 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#2)`|Average|**Manual close**: Yes|
+|Dell R720: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is Down.<br>2. `{$DELL.SNMP.IFCONTROL:"{#NIC_FQDD}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is Down.<br>3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for the "eternal off" interfaces.)</p>|`{$DELL.SNMP.IFCONTROL:"{#NIC_FQDD}"}=1 and last(/DELL PowerEdge R720 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#1)<>1 and last(/DELL PowerEdge R720 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#1)<>last(/DELL PowerEdge R720 by SNMP/dell.server.net.if.link[{#NIC_FQDD}],#2)`|Average|**Manual close**: Yes|
 |Dell R720: NIC [{#NIC_FQDD}/{#NIC_MAC}]: Status is not OK|<p>MIB: IDRAC-MIB-SMIv2<br>Network interface status is not OK.</p>|`last(/DELL PowerEdge R720 by SNMP/dell.server.net.if.status[{#NIC_FQDD}],#1)<>3`|Average||
 
 ### LLD rule CPU status discovery
@@ -282,7 +282,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Dell R720: CPU [{#CPU_FQDD}]: Status|<p>This attribute defines the status of the processor device status probe. This status will be joined into the processorDeviceStatus attribute.</p>|SNMP agent|dell.server.cpu.status[cpu.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Dell R720: CPU [{#CPU_FQDD}]: Status|<p>This attribute defines the status of the processor device status probe. This status will be joined into the `processorDeviceStatus` attribute.</p>|SNMP agent|dell.server.cpu.status[cpu.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Dell R720: CPU [{#CPU_FQDD}]: State|<p>This attribute defines the reading of the processor device status probe.</p>|SNMP agent|dell.server.cpu.state[cpu.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Trigger prototypes for CPU status discovery
@@ -290,7 +290,7 @@ Refer to the vendor documentation.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Dell R720: CPU [{#CPU_FQDD}]: Status is not OK|<p>MIB: IDRAC-MIB-SMIv2<br>CPU status is not OK.</p>|`last(/DELL PowerEdge R720 by SNMP/dell.server.cpu.status[cpu.{#SNMPINDEX}],#1)<>3`|Average||
-|Dell R720: CPU [{#CPU_FQDD}]: Reading error|<p>MIB: IDRAC-MIB-SMIv2<br>CPU probe reading flag is not processorPresent.</p>|`bitand(last(/DELL PowerEdge R720 by SNMP/dell.server.cpu.state[cpu.{#SNMPINDEX}],#1),128)=0`|Average||
+|Dell R720: CPU [{#CPU_FQDD}]: Reading error|<p>MIB: IDRAC-MIB-SMIv2<br>CPU probe reading flag is not `processorPresent`.</p>|`bitand(last(/DELL PowerEdge R720 by SNMP/dell.server.cpu.state[cpu.{#SNMPINDEX}],#1),128)=0`|Average||
 
 ### LLD rule System battery discovery
 
@@ -321,7 +321,7 @@ Refer to the vendor documentation.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Dell R720: Memory [{#SNMPVALUE}]: Status|<p>This attribute defines the status of the memory device.</p>|SNMP agent|dell.server.memory.status[{#SNMPVALUE}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Dell R720: Memory [{#SNMPVALUE}]: Size|<p>This attribute defines the size in KBytes of the memory device. Zero indicates no memory installed; 2,147,483,647 indicates an unknown memory size.</p>|SNMP agent|dell.server.memory.size[{#SNMPVALUE}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li><li><p>Custom multiplier: `1024`</p></li></ul>|
+|Dell R720: Memory [{#SNMPVALUE}]: Size|<p>This attribute defines the size, in KB, of the memory device. Zero indicates no memory installed; 2,147,483,647 indicates an unknown memory size.</p>|SNMP agent|dell.server.memory.size[{#SNMPVALUE}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li><li><p>Custom multiplier: `1024`</p></li></ul>|
 
 ### Trigger prototypes for Memory discovery
 
