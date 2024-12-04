@@ -58,6 +58,6 @@ void	pp_task_queue_push_immediate(zbx_pp_queue_t *queue, zbx_pp_task_t *task);
 void	pp_task_queue_push_finished(zbx_pp_queue_t *queue, zbx_pp_task_t *task);
 zbx_pp_task_t	*pp_task_queue_pop_finished(zbx_pp_queue_t *queue);
 
-void	pp_task_queue_get_sequence_stats(zbx_pp_queue_t *queue, zbx_vector_pp_sequence_stats_ptr_t *stats);
+void	pp_task_queue_get_sequence_stats(zbx_pp_queue_t *queue, zbx_vector_pp_top_stats_ptr_t *stats);
 
 #endif

@@ -21,7 +21,7 @@
 #define PP_TASK_QUEUE_INIT_LOCK		0x01
 #define PP_TASK_QUEUE_INIT_EVENT	0x02
 
-ZBX_PTR_VECTOR_IMPL(pp_sequence_stats_ptr, zbx_pp_sequence_stats_t *)
+ZBX_PTR_VECTOR_IMPL(pp_top_stats_ptr, zbx_pp_top_stats_t *)
 
 /* task sequence registry by itemid */
 typedef struct
@@ -446,11 +446,11 @@ void	pp_task_queue_notify_all(zbx_pp_queue_t *queue)
  *             stats - [IN] sequence statistics                               *
  *                                                                            *
  ******************************************************************************/
-void	pp_task_queue_get_sequence_stats(zbx_pp_queue_t *queue, zbx_vector_pp_sequence_stats_ptr_t *stats)
+void	pp_task_queue_get_sequence_stats(zbx_pp_queue_t *queue, zbx_vector_pp_top_stats_ptr_t *stats)
 {
 	zbx_hashset_iter_t		iter;
 	zbx_pp_item_task_sequence_t	*sequence;
-	zbx_pp_sequence_stats_t		*stat;
+	zbx_pp_top_stats_t		*stat;
 	zbx_list_iterator_t		li;
 
 	pp_task_queue_lock(queue);
@@ -458,7 +458,7 @@ void	pp_task_queue_get_sequence_stats(zbx_pp_queue_t *queue, zbx_vector_pp_seque
 	zbx_hashset_iter_reset(&queue->sequences, &iter);
 	while (NULL != (sequence = (zbx_pp_item_task_sequence_t *)zbx_hashset_iter_next(&iter)))
 	{
-		stat = (zbx_pp_sequence_stats_t *)zbx_malloc(NULL, sizeof(zbx_pp_sequence_stats_t));
+		stat = (zbx_pp_top_stats_t *)zbx_malloc(NULL, sizeof(zbx_pp_top_stats_t));
 		stat->tasks_num = 0;
 		stat->itemid = sequence->itemid;
 
@@ -475,7 +475,7 @@ void	pp_task_queue_get_sequence_stats(zbx_pp_queue_t *queue, zbx_vector_pp_seque
 			while (SUCCEED == zbx_list_iterator_next(&li));
 		}
 
-		zbx_vector_pp_sequence_stats_ptr_append(stats, stat);
+		zbx_vector_pp_top_stats_ptr_append(stats, stat);
 	}
 
 	pp_task_queue_unlock(queue);

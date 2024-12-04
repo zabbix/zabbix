@@ -538,7 +538,7 @@ zbx_uint32_t	zbx_preprocessor_pack_usage_stats(unsigned char **data, const zbx_v
  *             limit - [IN] number of top values to return                    *
  *                                                                            *
  ******************************************************************************/
-zbx_uint32_t	zbx_preprocessor_pack_top_sequences_request(unsigned char **data, int limit)
+zbx_uint32_t	zbx_preprocessor_pack_top_stats_request(unsigned char **data, int limit)
 {
 	zbx_uint32_t	data_len = 0;
 
@@ -554,33 +554,33 @@ zbx_uint32_t	zbx_preprocessor_pack_top_sequences_request(unsigned char **data, i
  * Purpose: pack top result data into a single buffer that can be used in IPC *
  *                                                                            *
  * Parameters: data          - [OUT] memory buffer for packed data            *
- *             sequences     - [IN] list of sequences                         *
- *             sequences_num - [IN] number of sequences to pack               *
+ *             stats     - [IN] list of stats                                 *
+ *             stats_num - [IN] number of sequences to pack                   *
  *                                                                            *
  ******************************************************************************/
-zbx_uint32_t	zbx_preprocessor_pack_top_sequences_result(unsigned char **data,
-		zbx_vector_pp_sequence_stats_ptr_t *sequences, int sequences_num)
+zbx_uint32_t	zbx_preprocessor_pack_top_stats_result(unsigned char **data, zbx_vector_pp_top_stats_ptr_t *stats,
+		int stats_num)
 {
 	unsigned char	*ptr;
-	zbx_uint32_t	data_len = 0, sequence_len = 0;
+	zbx_uint32_t	data_len = 0, stat_len = 0;
 
-	if (0 != sequences_num)
+	if (0 != stats_num)
 	{
-		zbx_serialize_prepare_value(sequence_len, sequences->values[0]->itemid);
-		zbx_serialize_prepare_value(sequence_len, sequences->values[0]->tasks_num);
+		zbx_serialize_prepare_value(stat_len, stats->values[0]->itemid);
+		zbx_serialize_prepare_value(stat_len, stats->values[0]->tasks_num);
 	}
 
-	zbx_serialize_prepare_value(data_len, sequences_num);
-	data_len += sequence_len * (zbx_uint32_t)sequences_num;
+	zbx_serialize_prepare_value(data_len, stats_num);
+	data_len += stat_len * (zbx_uint32_t)stats_num;
 	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 
 	ptr = *data;
-	ptr += zbx_serialize_value(ptr, sequences_num);
+	ptr += zbx_serialize_value(ptr, stats_num);
 
-	for (int i = 0; i < sequences_num; i++)
+	for (int i = 0; i < stats_num; i++)
 	{
-		ptr += zbx_serialize_value(ptr, sequences->values[i]->itemid);
-		ptr += zbx_serialize_value(ptr, sequences->values[i]->tasks_num);
+		ptr += zbx_serialize_value(ptr, stats->values[i]->itemid);
+		ptr += zbx_serialize_value(ptr, stats->values[i]->tasks_num);
 	}
 
 	return data_len;
@@ -762,25 +762,24 @@ void	zbx_preprocessor_unpack_top_request(int *limit, const unsigned char *data)
  *             data      - [IN] memory buffer for packed data                 *
  *                                                                            *
  ******************************************************************************/
-void	zbx_preprocessor_unpack_top_sequences_result(zbx_vector_pp_sequence_stats_ptr_t *sequences,
-		const unsigned char *data)
+void	zbx_preprocessor_unpack_top_stats_result(zbx_vector_pp_top_stats_ptr_t *stats, const unsigned char *data)
 {
-	int	sequences_num;
+	int	stats_num;
 
-	data += zbx_deserialize_value(data, &sequences_num);
+	data += zbx_deserialize_value(data, &stats_num);
 
-	if (0 != sequences_num)
+	if (0 != stats_num)
 	{
-		zbx_vector_pp_sequence_stats_ptr_reserve(sequences, (size_t)sequences_num);
+		zbx_vector_pp_top_stats_ptr_reserve(stats, (size_t)stats_num);
 
-		for (int i = 0; i < sequences_num; i++)
+		for (int i = 0; i < stats_num; i++)
 		{
-			zbx_pp_sequence_stats_t	*stat;
+			zbx_pp_top_stats_t	*stat;
 
-			stat = (zbx_pp_sequence_stats_t *)zbx_malloc(NULL, sizeof(zbx_pp_sequence_stats_t));
+			stat = (zbx_pp_top_stats_t *)zbx_malloc(NULL, sizeof(zbx_pp_top_stats_t));
 			data += zbx_deserialize_value(data, &stat->itemid);
 			data += zbx_deserialize_value(data, &stat->tasks_num);
-			zbx_vector_pp_sequence_stats_ptr_append(sequences, stat);
+			zbx_vector_pp_top_stats_ptr_append(stats, stat);
 		}
 	}
 }
@@ -1077,14 +1076,14 @@ int	zbx_preprocessor_get_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t *pen
  * Purpose: get the top N items by the number of queued values                *
  *                                                                            *
  ******************************************************************************/
-static int	preprocessor_get_top_view(int limit, zbx_vector_pp_sequence_stats_ptr_t *sequences, char **error,
+static int	preprocessor_get_top_view(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error,
 		zbx_uint32_t code)
 {
 	int		ret;
 	unsigned char	*data, *result;
 	zbx_uint32_t	data_len;
 
-	data_len = zbx_preprocessor_pack_top_sequences_request(&data, limit);
+	data_len = zbx_preprocessor_pack_top_stats_request(&data, limit);
 
 	if (SUCCEED != (ret = zbx_ipc_async_exchange(ZBX_IPC_SERVICE_PREPROCESSING, code, SEC_PER_MIN, data, data_len,
 			&result, error)))
@@ -1092,7 +1091,7 @@ static int	preprocessor_get_top_view(int limit, zbx_vector_pp_sequence_stats_ptr
 		goto out;
 	}
 
-	zbx_preprocessor_unpack_top_sequences_result(sequences, result);
+	zbx_preprocessor_unpack_top_stats_result(stats, result);
 	zbx_free(result);
 out:
 	zbx_free(data);
@@ -1105,9 +1104,19 @@ out:
  * Purpose: get the top N items by the number of queued values                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_preprocessor_get_top_sequences(int limit, zbx_vector_pp_sequence_stats_ptr_t *sequences, char **error)
+int	zbx_preprocessor_get_top_sequences(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error)
 {
-	return preprocessor_get_top_view(limit, sequences, error, ZBX_IPC_PREPROCESSOR_TOP_SEQUENCES);
+	return preprocessor_get_top_view(limit, stats, error, ZBX_IPC_PREPROCESSOR_TOP_SEQUENCES);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get the top N items by the number of queued values                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_preprocessor_get_top_peak(int limit, zbx_vector_pp_top_stats_ptr_t *stats, char **error)
+{
+	return preprocessor_get_top_view(limit, stats, error, ZBX_IPC_PREPROCESSOR_TOP_PEAK);
 }
 
 /******************************************************************************
