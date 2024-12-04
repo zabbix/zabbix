@@ -1002,6 +1002,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 		zabbix_log(LOG_LEVEL_TRACE, "%s() latestPage events:%d", __func__, events->values_num);
 
 		*evt_top_key = events->values[0]->key;
+		*evt_top_time = events->values[0]->timestamp;
 		ret = SUCCEED;
 		goto end_session;
 	}
@@ -1052,7 +1053,7 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 	if (0 == *evt_top_key)
 	{
 		*evt_top_key = 0 != events->values_num ? events->values[0]->key : last_key;
-		*evt_top_time = 0 != events->values_num ? events->values[0]->timestamp : 0;
+		*evt_top_time = 0 != events->values_num ? events->values[0]->timestamp : last_ts;
 	}
 
 	if (shmem_free_sz < *strpool_sz + vmware_service_evt_vector_memsize(events))
@@ -1382,6 +1383,7 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 		{
 			evt_skip_old = 0;
 			evt_top_key = evt_data->events.values[0]->key;
+			evt_top_time = evt_data->events.values[0]->timestamp;
 		}
 	}
 
