@@ -182,6 +182,14 @@ class CUser extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to filter by user password.'));
 			}
 
+			if (array_key_exists('autologout', $options['filter']) && $options['filter']['autologout'] !== null) {
+				$options['filter']['autologout'] = getTimeUnitFilters($options['filter']['autologout']);
+			}
+
+			if (array_key_exists('refresh', $options['filter']) && $options['filter']['refresh'] !== null) {
+				$options['filter']['refresh'] = getTimeUnitFilters($options['filter']['refresh']);
+			}
+
 			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 				$private_fields_filter = [];
 
@@ -192,14 +200,6 @@ class CUser extends CApiService {
 				elseif (array_diff_key($options['filter'], $limited_output_fields)) {
 					$sqlParts['where']['userid'] = 'u.userid='.self::$userData['userid'];
 				}
-			}
-
-			if (array_key_exists('autologout', $options['filter']) && $options['filter']['autologout'] !== null) {
-				$options['filter']['autologout'] = getTimeUnitFilters($options['filter']['autologout']);
-			}
-
-			if (array_key_exists('refresh', $options['filter']) && $options['filter']['refresh'] !== null) {
-				$options['filter']['refresh'] = getTimeUnitFilters($options['filter']['refresh']);
 			}
 
 			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && $private_fields_filter) {
