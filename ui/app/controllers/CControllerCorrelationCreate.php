@@ -40,7 +40,7 @@ class CControllerCorrelationCreate extends CController {
 				['boolean'],
 				['boolean', 'required', 'when' => ['op_close_new', false]]
 			],
-			'conditions' =>	['objects', 'required', 'uniq' => ['type', 'operator', 'tag', 'oldtag', 'newtag', 'value', 'groupid'], 'not_empty', 'fields' => [
+			'conditions' => ['objects', 'required', 'uniq' => ['type', 'operator', 'tag', 'oldtag', 'newtag', 'value', 'groupid'], 'not_empty', 'fields' => [
 				'type' => ['db corr_condition.type', 'required', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE]],
 				'operator' => [
 					['db conditions.operator', 'required', 'in' => [CONDITION_OPERATOR_EQUAL], 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_EVENT_TAG_PAIR]]],
@@ -62,11 +62,12 @@ class CControllerCorrelationCreate extends CController {
 
 	static function getValidationRulesForConditionPopup() {
 		$rules = self::getValidationRules();
-		$rules['fields']['conditions']['fields']['groupid'] = [
-			'db corr_condition_group.groupid', 'required', 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP]]
-		];
 
-		return ['objects', 'fields' => $rules['fields']['conditions']['fields']];
+		$rules['fields']['conditions']['fields']['groupid'] = ['array', 'field' => [
+			'db corr_condition_group.groupid', 'required'
+		], 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP]]];
+
+		return ['object', 'fields' => $rules['fields']['conditions']['fields']];
 	}
 
 	protected function checkInput(): bool {
