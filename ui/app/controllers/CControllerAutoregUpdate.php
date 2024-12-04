@@ -31,7 +31,7 @@ class CControllerAutoregUpdate extends CController {
 			'psk_required' => ['boolean'],
 			'tls_psk_identity' => [
 				['db config_autoreg_tls.tls_psk_identity'],
-				['db config_autoreg_tls.tls_psk_identity', 'not_empty',
+				['db config_autoreg_tls.tls_psk_identity', 'required', 'not_empty',
 					'when' => [['tls_in_psk', true], ['psk_required', true]]
 				]
 			],
@@ -48,7 +48,7 @@ class CControllerAutoregUpdate extends CController {
 					'regex' => '/^[0-9a-f]*$/i',
 					'messages' => ['regex' => _('PSK must contain only hexadecimal characters.')]
 				],
-				['db config_autoreg_tls.tls_psk', 'not_empty',
+				['db config_autoreg_tls.tls_psk', 'required', 'not_empty',
 					'when' => [['tls_in_psk', true], ['psk_required', true]]
 				]
 			]
