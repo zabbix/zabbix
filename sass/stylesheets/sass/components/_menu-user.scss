@@ -21,7 +21,7 @@
 	span {
 		position: relative;
 		display: block;
-		padding: 12px 34px 12px 44px;
+		padding: 12px 14px 12px 44px;
 		font-size: 12px;
 		white-space: nowrap;
 		border-left: 3px solid transparent;
@@ -95,6 +95,8 @@
 
 	.has-submenu {
 		& > a {
+			padding-right: 34px;
+
 			&::after {
 				@extend %icons-font;
 				position: absolute;
@@ -155,7 +157,7 @@
 		}
 
 		a {
-			padding: 8px 34px 8px 20px;
+			padding: 8px 20px;
 			background: $menu-user-submenu-bg-color;
 			color: $menu-user-submenu-color;
 
