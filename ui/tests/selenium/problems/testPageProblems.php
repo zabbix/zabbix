@@ -58,13 +58,20 @@ class testPageProblems extends CWebTest {
 			'groups' => [['groupid' => $hostgroups['groupids'][0]]]
 		]);
 
-		// Create item on previously created host.
-		$items = CDataHelper::call('item.create',[
+		// Create items on previously created host.
+		$item1 = CDataHelper::call('item.create',[
 			'hostid' => $hosts['hostids'][0],
 			'name' => 'Age problem item',
 			'key_' => 'trap',
 			'type' => ITEM_TYPE_TRAPPER,
 			'value_type' => ITEM_VALUE_TYPE_FLOAT
+		]);
+		$item2 = CDataHelper::call('item.create',[
+			'hostid' => $hosts['hostids'][0],
+			'name' => 'String in operational data',
+			'key_' => 'trap1',
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_TEXT
 		]);
 
 		// Create trigger based on item.
@@ -85,12 +92,19 @@ class testPageProblems extends CWebTest {
 				'expression' => 'last(/Host for Problems Page/trap)=0',
 				'priority' => TRIGGER_SEVERITY_AVERAGE,
 				'manual_close' => 1
+			],
+			[
+				'description' => 'Trigger for String problem',
+				'expression' => 'last(/Host for Problems Page/trap1)<>""',
+				'priority' => TRIGGER_SEVERITY_AVERAGE,
+				'manual_close' => 1
 			]
 		]);
 
 		// Create event with recent age.
 		$time = time();
-		CDataHelper::addItemData($items['itemids'][0], [0, 20, 150]);
+		CDataHelper::addItemData($item1['itemids'][0], [0, 20, 150]);
+		CDataHelper::addItemData($item2['itemids'][0], ["Text", "Essay", "ParagraphParagraphParagraphParagraph"]);
 		CDBHelper::setTriggerProblem('Trigger for Age problem', TRIGGER_VALUE_TRUE, ['clock' => $time]);
 		CDBHelper::setTriggerProblem('Trigger for Age problem 1 day', TRIGGER_VALUE_TRUE,
 				['clock' => $time - 86400]
@@ -98,7 +112,7 @@ class testPageProblems extends CWebTest {
 		CDBHelper::setTriggerProblem('Trigger for Age problem 1 month', TRIGGER_VALUE_TRUE,
 				['clock' => $time - 2.628e+6]
 		);
-
+		CDBHelper::setTriggerProblem('Trigger for String problem', TRIGGER_VALUE_TRUE, ['clock' => $time]);
 		$dayid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Trigger for Age problem 1 day'));
 		$monthid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Trigger for Age problem 1 month'));
 
@@ -833,6 +847,7 @@ class testPageProblems extends CWebTest {
 						]
 					],
 					'result' => [
+						['Problem' => 'Trigger for String problem'],
 						['Problem' => 'Trigger for Age problem'],
 						['Problem' => 'Trigger for tag permissions Oracle'],
 						['Problem' => 'Trigger for tag permissions MySQL'],
@@ -1011,7 +1026,75 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #24 Filter by all filter fields. Show tags = 3, Shortened.
+			// #24 Show separately operational data
+			[
+				[
+					'fields' => [
+						'Host groups' => 'Host group for tag permissions',
+						'Hosts' => 'Host for tag permissions',
+						'Problem' => 'Trigger for tag permissions',
+						'Show operational data' => 'Separately',
+						'Show timeline' => false
+					],
+					'result' => [
+						[
+							'Severity' => 'Not classified',
+							'Recovery time' => '',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => 'Host for tag permissions',
+							'Problem' => 'Trigger for tag permissions Oracle',
+							'Operational data' => 0,
+							'Update' => 'Update',
+							'Actions' => '',
+							'Tags' => 'Service: Oracle'
+						],
+						[
+							'Severity' => 'Not classified',
+							'Recovery time' => '',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => 'Host for tag permissions',
+							'Problem' => 'Trigger for tag permissions MySQL',
+							'Operational data' => 0,
+							'Update' => 'Update',
+							'Actions' => '',
+							'Tags' => 'Service: MySQL'
+						]
+					],
+					'Host' => 'Host for tag permissions',
+					'Item' => 'tag.item',
+					'Check operational link' => 'Graph'
+				]
+			],
+			// #25 Show separately operational data with history link
+			[
+				[
+					'fields' => [
+						'Problem' => 'Trigger for String problem',
+						'Show operational data' => 'Separately',
+						'Show timeline' => false
+					],
+					'result' => [
+						[
+							'Severity' => 'Average',
+							'Recovery time' => '',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => 'Host for Problems Page',
+							'Problem' => 'Trigger for String problem',
+							'Operational data' => 'ParagraphParagraphPa...',
+							'Update' => 'Update',
+							'Actions' => ''
+						]
+					],
+					'Host' => 'Host for Problems Page',
+					'Item' => 'String in operational data',
+					'Check operational link' => 'History',
+					'Non truncated data' => 'ParagraphParagraphParagraphParagraph'
+				]
+			],
+			// #26 Filter by all filter fields. Show tags = 3, Shortened.
 			[
 				[
 					'fields' => [
@@ -1062,10 +1145,11 @@ class testPageProblems extends CWebTest {
 						'Ser: abc' => 'Service: abc',
 						'Dat' => 'Database',
 						'...' => 'DatabaseService: abcservice: abcdefTag4Tag5: 5'
-					]
+					],
+					'Check operational link' => 'Graph'
 				]
 			],
-			// #25 Show tags = 2, Full.
+			// #27 Show tags = 2, Full.
 			[
 				[
 					'fields' => [
@@ -1087,7 +1171,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #26 Show tags = 1, None.
+			// #28 Show tags = 1, None.
 			[
 				[
 					'fields' => [
@@ -1108,7 +1192,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #27 Show tags = None. Tags column absence is being checked in _Layout.
+			// #29 Show tags = None. Tags column absence is being checked in _Layout.
 			[
 				[
 					'fields' => [
@@ -1123,7 +1207,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #28 Tags priority check 1.
+			// #30 Tags priority check 1.
 			[
 				[
 					'fields' => [
@@ -1151,7 +1235,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #29 Tags priority check 2.
+			// #31 Tags priority check 2.
 			[
 				[
 					'fields' => [
@@ -1179,7 +1263,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #30 Tags priority check 3.
+			// #32 Tags priority check 3.
 			[
 				[
 					'fields' => [
@@ -1207,7 +1291,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #31 Test result with 2 tags, and then result after removing one tag.
+			// #33 Test result with 2 tags, and then result after removing one tag.
 			[
 				[
 					'Tags' => [
@@ -1226,7 +1310,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #32 Suppressed problem not shown.
+			// #34 Suppressed problem not shown.
 			[
 				[
 					'fields' => [
@@ -1236,7 +1320,7 @@ class testPageProblems extends CWebTest {
 					'result' => []
 				]
 			],
-			// #33 Suppressed problem is shown.
+			// #35 Suppressed problem is shown.
 			[
 				[
 					'fields' => [
@@ -1256,7 +1340,7 @@ class testPageProblems extends CWebTest {
 					'check_suppressed' => "Suppressed till: 12:17\nMaintenance: Maintenance for suppression test"
 				]
 			],
-			// #34 Show timeline.
+			// #36 Show timeline.
 			[
 				[
 					'fields' => [
@@ -1274,7 +1358,7 @@ class testPageProblems extends CWebTest {
 					'table_timeline' => true
 				]
 			],
-			// #35 Age filter - 999.
+			// #37 Age filter - 999.
 			[
 				[
 					'fields' => [
@@ -1283,6 +1367,7 @@ class testPageProblems extends CWebTest {
 						'Show timeline' => false
 					],
 					'result' => [
+						['Problem' => 'Trigger for String problem'],
 						['Problem' => 'Trigger for Age problem'],
 						['Problem' => 'Trigger for tag permissions Oracle'],
 						['Problem' => 'Trigger for tag permissions MySQL'],
@@ -1291,7 +1376,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #36 Age filter - 0.
+			// #38 Age filter - 0.
 			[
 				[
 					'fields' => [
@@ -1301,7 +1386,7 @@ class testPageProblems extends CWebTest {
 					'result' => []
 				]
 			],
-			// #37 Age filter - 1.
+			// #39 Age filter - 1.
 			[
 				[
 					'fields' => [
@@ -1310,6 +1395,7 @@ class testPageProblems extends CWebTest {
 						'Show timeline' => false
 					],
 					'result' => [
+						['Problem' => 'Trigger for String problem'],
 						['Problem' => 'Trigger for Age problem'],
 						['Problem' => 'Trigger for tag permissions Oracle'],
 						['Problem' => 'Trigger for tag permissions MySQL'],
@@ -1317,7 +1403,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #38 History.
+			// #40 History.
 			[
 				[
 					'fields' => [
@@ -1328,13 +1414,14 @@ class testPageProblems extends CWebTest {
 						'link' => 'Last 1 day'
 					],
 					'result' => [
+						['Problem' => 'Trigger for String problem'],
 						['Problem' => 'Trigger for Age problem'],
 						['Problem' => 'Trigger for tag permissions Oracle'],
 						['Problem' => 'Trigger for tag permissions MySQL']
 					]
 				]
 			],
-			// #39 Problems.
+			// #41 Problems.
 			[
 				[
 					'fields' => [
@@ -1349,7 +1436,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #40 Unacknowledged.
+			// #42 Unacknowledged.
 			[
 				[
 					'fields' => [
@@ -1367,7 +1454,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #41 Acknowledged.
+			// #43 Acknowledged.
 			[
 				[
 					'fields' => [
@@ -1381,7 +1468,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #42 Acknowledged by me.
+			// #44 Acknowledged by me.
 			[
 				[
 					'fields' => [
@@ -1395,7 +1482,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #43 Compact view.
+			// #45 Compact view.
 			[
 				[
 					'fields' => [
@@ -1407,7 +1494,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #44 Highlight whole row.
+			// #46 Highlight whole row.
 			[
 				[
 					'fields' => [
@@ -1420,7 +1507,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #45 Time selector 1 day.
+			// #47 Time selector 1 day.
 			[
 				[
 					'fields' => [
@@ -1433,11 +1520,12 @@ class testPageProblems extends CWebTest {
 						'id:to' => 'now'
 					],
 					'result' => [
+						['Problem' => 'Trigger for String problem'],
 						['Problem' => 'Trigger for Age problem']
 					]
 				]
 			],
-			// #46 Time selector 2 weeks.
+			// #48 Time selector 2 weeks.
 			[
 				[
 					'fields' => [
@@ -1450,12 +1538,13 @@ class testPageProblems extends CWebTest {
 						'id:to' => 'now'
 					],
 					'result' => [
+						['Problem' => 'Trigger for String problem'],
 						['Problem' => 'Trigger for Age problem'],
 						['Problem' => 'Trigger for Age problem 1 day']
 					]
 				]
 			],
-			// #47 Time selector Last 1 year.
+			// #49 Time selector Last 1 year.
 			[
 				[
 					'fields' => [
@@ -1467,6 +1556,7 @@ class testPageProblems extends CWebTest {
 						'link' => 'Last 1 year'
 					],
 					'result' => [
+						['Problem' => 'Trigger for String problem'],
 						['Problem' => 'Trigger for Age problem'],
 						['Problem' => 'Trigger for Age problem 1 day'],
 						['Problem' => 'Trigger for Age problem 1 month']
@@ -1589,6 +1679,35 @@ class testPageProblems extends CWebTest {
 					$this->assertEquals("Depends on\n".$dependency, $dependency_dialog->getText());
 					$dependency_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
 					$dependency_dialog->waitUntilNotPresent();
+				}
+			}
+		}
+		// Check Operational data value in popup.
+		if (array_key_exists('Show operational data', $data) && $data['fields']['Show operational data'] == 'Separately' ) {
+			foreach ($data['result'] as $i => $result) {
+				// Check if operational data is truncated.
+				if (strlen($result['Operational data']) >= 20) {
+					$non_truncated_data = substr($result['Operational data'], 0, 20).'...';
+					$this->assertEquals($non_truncated_data, $table->getRow($i)->getColumn('Operational data')
+							->query('class:hint-item')->one()->getText());
+				}
+				$table->getRow($i)->getColumn('Operational data')->query('class:hint-item')->one()->click();
+				$popup = $this->query($dialog_selector)->one()->waitUntilVisible();
+				$this->assertEquals($data['Non truncated data'],
+						$popup->query("xpath://div[@class='hintbox-wrap']//td[3]")->one()->getText()
+				);
+
+				// Check correct graph or history link if needed.
+				if(array_key_exists('Check operational link', $data)) {
+					$popup->query("xpath://div[@class='hintbox-wrap']//a[text()='"
+							.$data['Check operational link']."']")->one()->click();
+					$this->page->waitUntilReady();
+					$this->assertEquals($data['Host'].': '.$data['Item'], $this->query('tag:h1')->one()->getText());
+					$this->page->login()->open('zabbix.php?action=problem.view');
+				}
+				else {
+					$popup->query('xpath:.//button[@title="Close"]')->one()->click();
+					$popup->waitUntilNotPresent();
 				}
 			}
 		}
