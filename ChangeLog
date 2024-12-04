@@ -1,8 +1,12 @@
 Changes for 6.0.37rc1
 
 New features:
+...G...... [ZBXNEXT-8914] reworked Oracle plugin queries to use variable binding (dgoloscapov, esneiders)
 
 Bug fixes:
+...G...... [ZBX-25267] fixed Zabbix agent 2 refusing PSK connections when using PSK and certs (dgoloscapov)
+...G...... [ZBX-25404] fixed trapper item fails, if space character is used in 'Allowed hosts' field (MVekslers)
+..F....... [ZBX-25269] fixed widget iterator readiness (apoga, averza)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.36
