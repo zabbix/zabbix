@@ -270,7 +270,7 @@ out:
  * Parameters: service       - [IN] vmware service                            *
  *             easyhandle    - [IN] CURL handle                               *
  *             evt_severity  - [IN] event severities                          *
- *             top_time      - [IN] end of the time range                     *
+ *             end_time      - [IN] end of the time range                     *
  *             event_session - [OUT] pointer to output variable               *
  *             error         - [OUT] error message in case of failure         *
  *                                                                            *
@@ -959,6 +959,7 @@ static	void vmware_service_clear_event_data_mem(const zbx_uint64_t max_mem, zbx_
  *             events        - [OUT] pointer to output variable               *
  *             strpool_sz    - [OUT] allocated memory size for events         *
  *             evt_top_key   - [OUT] newest event id                          *
+ *             evt_top_time  - [OUT] timestamp of evt_top_key event           *
  *             error         - [OUT] error message in case of failure         *
  *                                                                            *
  * Return value: SUCCEED - operation has completed successfully               *
