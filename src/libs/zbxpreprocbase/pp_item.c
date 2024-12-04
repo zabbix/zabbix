@@ -36,6 +36,7 @@ zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(zbx_uint64_t hostid, unsigned 
 	zbx_pp_item_preproc_t	*preproc = zbx_malloc(NULL, sizeof(zbx_pp_item_preproc_t));
 
 	preproc->refcount = 1;
+	preproc->refcount_peak = 1;
 	preproc->steps_num = 0;
 	preproc->steps = NULL;
 	preproc->pp_revision = 0;
@@ -99,6 +100,9 @@ zbx_pp_item_preproc_t	*zbx_pp_item_preproc_copy(zbx_pp_item_preproc_t *preproc)
 		return NULL;
 
 	preproc->refcount++;
+
+	if (preproc->refcount_peak < preproc->refcount)
+		preproc->refcount_peak = preproc->refcount;
 
 	return preproc;
 }

@@ -70,6 +70,7 @@ ZBX_PTR_VECTOR_DECL(pp_step_ptr, zbx_pp_step_t *)
 typedef struct
 {
 	zbx_uint32_t		refcount;
+	zbx_uint32_t		refcount_peak;
 
 	zbx_uint64_t		hostid;
 	int			steps_num;
