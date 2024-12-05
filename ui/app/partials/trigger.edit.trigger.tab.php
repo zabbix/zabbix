@@ -299,7 +299,6 @@ if (array_key_exists('parent_discoveryid', $data)) {
 			new CFormField(
 				(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
 					->setChecked($data['discover'] == ZBX_PROTOTYPE_DISCOVER)
-					->setUncheckedValue(ZBX_PROTOTYPE_NO_DISCOVER)
 			)
 		]);
 } else {
