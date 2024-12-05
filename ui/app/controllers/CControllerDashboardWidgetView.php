@@ -97,7 +97,7 @@ class CControllerDashboardWidgetView extends CController {
 
 	protected function doAction(): void {
 		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $this->widget->getName()),
+			'name' => $this->getInput('name', $this->widget->getDefaultName()),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
