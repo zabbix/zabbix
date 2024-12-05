@@ -833,21 +833,26 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 	if (SUCCEED != zbx_is_utf8(*field))
 	{
 		zbx_replace_invalid_utf8(*field);
-		*error = zbx_strdcatf(*error, "Cannot %s item: value \"%s\" has invalid UTF-8 sequence.\n",
-				(0 != item->itemid ? "update" : "create"), *field);
+		*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": value \"%s\" has invalid UTF-8 sequence.\n",
+				(0 != item->itemid ? "update" : "create"), item->name, *field);
 	}
 	else if (zbx_strlen_utf8(*field) > field_len)
 	{
-		const char	*err_val;
-		char		key_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+		char	value_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
 		if (0 != (flag & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
-			err_val = zbx_truncate_itemkey(*field, VALUE_ERRMSG_MAX, key_short, sizeof(key_short));
+		{
+			zbx_truncate_itemkey(*field, VALUE_ERRMSG_MAX, value_short, sizeof(value_short));
+			*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": key is too long.\n",
+					(0 != item->itemid ? "update" : "create"), value_short);
+		}
 		else
-			err_val = zbx_truncate_value(*field, VALUE_ERRMSG_MAX, key_short, sizeof(key_short));
+		{
+			zbx_truncate_value(*field, VALUE_ERRMSG_MAX, value_short, sizeof(value_short));
 
-		*error = zbx_strdcatf(*error, "Cannot %s item: value \"%s\" is too long.\n",
-				(0 != item->itemid ? "update" : "create"), err_val);
+			*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": value \"%s\" is too long.\n",
+					(0 != item->itemid ? "update" : "create"), item->key, value_short);
+		}
 	}
 	else
 	{
@@ -860,8 +865,8 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 				if ('\0' != **field)
 					return;
 
-				*error = zbx_strdcatf(*error, "Cannot %s item: name is empty.\n",
-						(0 != item->itemid ? "update" : "create"));
+				*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": name is empty.\n",
+						(0 != item->itemid ? "update" : "create"), item->key);
 				break;
 			case ZBX_FLAG_LLD_ITEM_UPDATE_DELAY:
 				switch (item->type)
@@ -881,8 +886,8 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 				if (SUCCEED == zbx_validate_interval(*field, &errmsg))
 					return;
 
-				*error = zbx_strdcatf(*error, "Cannot %s item: %s\n",
-						(0 != item->itemid ? "update" : "create"), errmsg);
+				*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": %s\n",
+						(0 != item->itemid ? "update" : "create"), item->key, errmsg);
 				zbx_free(errmsg);
 
 				/* delay alone cannot be rolled back as it depends on item type, revert all updates */
@@ -902,8 +907,8 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 					return;
 				}
 
-				*error = zbx_strdcatf(*error, "Cannot %s item: invalid history storage period"
-						" \"%s\".\n", (0 != item->itemid ? "update" : "create"), *field);
+				*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": invalid history storage period"
+						" \"%s\".\n", (0 != item->itemid ? "update" : "create"), item->key, *field);
 				break;
 			case ZBX_FLAG_LLD_ITEM_UPDATE_TRENDS:
 				if (SUCCEED == is_user_macro(*field))
@@ -915,8 +920,8 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 					return;
 				}
 
-				*error = zbx_strdcatf(*error, "Cannot %s item: invalid trends storage period"
-						" \"%s\".\n", (0 != item->itemid ? "update" : "create"), *field);
+				*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": invalid trends storage period"
+						" \"%s\".\n", (0 != item->itemid ? "update" : "create"), item->key, *field);
 				break;
 			default:
 				return;
@@ -936,13 +941,15 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
  *                                                                            *
  * Parameters: pp       - [IN] item preprocessing step                        *
  *             itemid   - [IN] item id for logging                            *
+ *             key      - [IN] item key for error message                     *
  *             error    - [OUT] error message                                 *
  *                                                                            *
  * Return value: SUCCEED - if preprocessing step is valid                     *
  *               FAIL    - if preprocessing step is not valid                 *
  *                                                                            *
  ******************************************************************************/
-static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zbx_uint64_t itemid, char ** error)
+static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zbx_uint64_t itemid,
+		const char *key, char **error)
 {
 	int		ret = SUCCEED;
 	zbx_token_t	token;
@@ -1136,8 +1143,8 @@ static int	lld_items_preproc_step_validate(const zbx_lld_item_preproc_t * pp, zb
 out:
 	if (SUCCEED != ret)
 	{
-		*error = zbx_strdcatf(*error, "Cannot %s item: invalid value for preprocessing step #%d: %s.\n",
-				(0 != itemid ? "update" : "create"), pp->step, err);
+		*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": invalid value for preprocessing step #%d: %s.\n",
+				(0 != itemid ? "update" : "create"), key, pp->step, err);
 	}
 
 	return ret;
@@ -1394,7 +1401,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 		for (int j = 0; j < item->preproc_ops.values_num; j++)
 		{
 			if (SUCCEED != lld_items_preproc_step_validate(item->preproc_ops.values[j], item->itemid,
-					error))
+					item->key, error))
 			{
 				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
 				break;

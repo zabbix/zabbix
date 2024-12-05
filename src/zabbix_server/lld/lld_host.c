@@ -788,6 +788,7 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 	for (int i = 0; i < hosts->values_num; i++)
 	{
 		char	*ch_error;
+		char	name_trunc[VALUE_ERRMSG_MAX + 1];
 
 		host = hosts->values[i];
 
@@ -802,8 +803,10 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 		if (SUCCEED == zbx_check_hostname(host->host, &ch_error))
 			continue;
 
+		zbx_strlcpy(name_trunc, host->host, sizeof(name_trunc));
+
 		*error = zbx_strdcatf(*error, "Cannot %s host \"%s\": %s.\n",
-				(0 != host->hostid ? "update" : "create"), host->host, ch_error);
+				(0 != host->hostid ? "update" : "create"), name_trunc, ch_error);
 
 		zbx_free(ch_error);
 
@@ -829,15 +832,19 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 			continue;
 
 		/* visible host name is valid utf8 sequence and has a valid length */
-		if (SUCCEED == zbx_is_utf8(host->name) && '\0' != *host->name &&
-				ZBX_MAX_HOSTNAME_LEN >= zbx_strlen_utf8(host->name))
+		if (SUCCEED != zbx_is_utf8(host->name) || '\0' == *host->name)
 		{
-			continue;
+			zbx_replace_invalid_utf8(host->name);
+			*error = zbx_strdcatf(*error, "Cannot %s host \"%s\": invalid visible host name \"%s\".\n",
+					(0 != host->hostid ? "update" : "create"), host->host, host->name);
 		}
-
-		zbx_replace_invalid_utf8(host->name);
-		*error = zbx_strdcatf(*error, "Cannot %s host: invalid visible host name \"%s\".\n",
-				(0 != host->hostid ? "update" : "create"), host->name);
+		else if (zbx_strlen_utf8(host->name) > ZBX_MAX_HOSTNAME_LEN)
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s host \"%s\": visible name is too long.\n",
+					(0 != host->hostid ? "update" : "create"), host->host);
+		}
+		else
+			continue;
 
 		if (0 != host->hostid)
 		{
@@ -914,9 +921,9 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 		if (num_data != host_names.num_data)
 			continue;
 
-		*error = zbx_strdcatf(*error, "Cannot %s host:"
+		*error = zbx_strdcatf(*error, "Cannot %s host \"%s\":"
 				" host with the same visible name \"%s\" already exists.\n",
-				(0 != host->hostid ? "update" : "create"), host->name);
+				(0 != host->hostid ? "update" : "create"), host->host, host->name);
 
 		if (0 != host->hostid)
 		{
@@ -1018,9 +1025,9 @@ static void	lld_hosts_validate(zbx_vector_lld_host_ptr_t *hosts, char **error)
 			{
 				host = *phost;
 
-				*error = zbx_strdcatf(*error, "Cannot %s host:"
+				*error = zbx_strdcatf(*error, "Cannot %s host \"%s\":"
 						" host with the same visible name \"%s\" already exists.\n",
-						(0 != host->hostid ? "update" : "create"), host->name);
+						(0 != host->hostid ? "update" : "create"), host->host, host->name);
 
 				if (0 != host->hostid)
 				{
@@ -1238,7 +1245,8 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_lld_host_ptr_t *hosts, zbx_vecto
 			if (0 == host->hostid)
 			{
 				host->flags &= ~ZBX_FLAG_LLD_HOST_DISCOVERED;
-				*error = zbx_strdcatf(*error, "Cannot create host: tag validation failed.\n");
+				*error = zbx_strdcatf(*error, "Cannot create host \"%s\": tag validation failed.\n",
+						host->name);
 			}
 		}
 
@@ -4536,7 +4544,8 @@ static void	lld_templates_link(const zbx_vector_lld_host_ptr_t *hosts, char **er
 			if (SUCCEED != zbx_db_delete_template_elements(host->hostid, host->host,
 					&host->del_templateids, ZBX_AUDIT_LLD_CONTEXT, &err))
 			{
-				*error = zbx_strdcatf(*error, "Cannot unlink template: %s.\n", err);
+				*error = zbx_strdcatf(*error, "Cannot unlink template from host \"%s\": %s.\n",
+						host->name, err);
 				zbx_free(err);
 			}
 		}
@@ -4546,7 +4555,8 @@ static void	lld_templates_link(const zbx_vector_lld_host_ptr_t *hosts, char **er
 			if (SUCCEED != zbx_db_copy_template_elements(host->hostid, &host->lnk_templateids,
 					ZBX_TEMPLATE_LINK_LLD, ZBX_AUDIT_LLD_CONTEXT, &err))
 			{
-				*error = zbx_strdcatf(*error, "Cannot link template(s) %s.\n", err);
+				*error = zbx_strdcatf(*error, "Cannot link template(s) to host \"%s\": %s.\n",
+						host->name, err);
 				zbx_free(err);
 			}
 		}

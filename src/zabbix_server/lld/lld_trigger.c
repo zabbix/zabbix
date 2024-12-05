@@ -1466,7 +1466,7 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 {
 	zbx_lld_trigger_t		*trigger;
 	char				*buffer = NULL, *expression = NULL, *recovery_expression = NULL, err[64];
-	char				*err_msg = NULL;
+	char				*err_msg = NULL, *description = NULL;
 	const char			*operation_msg;
 	const struct zbx_json_parse	*jp_row = &lld_row->jp_row;
 	unsigned char			discover;
@@ -1477,13 +1477,17 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 	trigger = lld_trigger_get(trigger_prototype->triggerid, items_triggers, &lld_row->item_links);
 	operation_msg = NULL != trigger ? "update" : "create";
 
+	description = zbx_strdup(buffer, trigger_prototype->description);
+	zbx_substitute_lld_macros(&description, jp_row, lld_macros, ZBX_MACRO_FUNC, NULL, 0);
+	zbx_lrtrim(description, ZBX_WHITESPACE);
+
 	if (NULL == (expression = lld_eval_get_expanded_expression(&trigger_prototype->eval_ctx, jp_row, lld_macros,
 			err, sizeof(err))) ||
 			NULL == (recovery_expression = lld_eval_get_expanded_expression(&trigger_prototype->eval_ctx_r,
 					jp_row, lld_macros, err, sizeof(err))))
 	{
-		*error = zbx_strdcatf(*error, "Cannot %s trigger: failed to expand LLD macros in %s expression: %s.\n",
-				operation_msg, (NULL == expression ? "" : " recovery"), err);
+		*error = zbx_strdcatf(*error, "Cannot %s trigger \"%s\": failed to expand LLD macros in%s expression: %s.\n",
+				operation_msg, description, (NULL == expression ? "" : " recovery"), err);
 		goto out;
 	}
 
@@ -1493,9 +1497,6 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 	{
 		unsigned char	priority;
 
-		buffer = zbx_strdup(buffer, trigger_prototype->description);
-		zbx_substitute_lld_macros(&buffer, jp_row, lld_macros, ZBX_MACRO_FUNC, NULL, 0);
-		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 		priority = trigger_prototype->priority;
 
 		lld_override_trigger(&lld_row->overrides, buffer, &priority, &trigger->override_tags, NULL, &discover);
@@ -1503,11 +1504,11 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		if (ZBX_PROTOTYPE_NO_DISCOVER == discover)
 			goto out;
 
-		if (0 != strcmp(trigger->description, buffer))
+		if (0 != strcmp(trigger->description, description))
 		{
 			trigger->description_orig = trigger->description;
-			trigger->description = buffer;
-			buffer = NULL;
+			trigger->description = description;
+			description = NULL;
 			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_DESCRIPTION;
 		}
 
@@ -1612,10 +1613,9 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		trigger->disable_source = ZBX_DISABLE_SOURCE_DEFAULT;
 		trigger->parent_triggerid = trigger_prototype->triggerid;
 
-		trigger->description = zbx_strdup(NULL, trigger_prototype->description);
+		trigger->description = description;
 		trigger->description_orig = NULL;
-		zbx_substitute_lld_macros(&trigger->description, jp_row, lld_macros, ZBX_MACRO_FUNC, NULL, 0);
-		zbx_lrtrim(trigger->description, ZBX_WHITESPACE);
+		description = NULL;
 
 		trigger->status = trigger_prototype->status;
 		trigger->priority = trigger_prototype->priority;
@@ -1690,7 +1690,7 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 	{
 		if (err_msg)
 		{
-			*error = zbx_strdcatf(*error, "Cannot %s trigger: %s.\n", operation_msg, err_msg);
+			*error = zbx_strdcatf(*error, "Cannot %s trigger \"%s\": %s.\n", trigger->description, operation_msg, err_msg);
 			zbx_free(err_msg);
 		}
 		goto out;
@@ -1721,6 +1721,7 @@ out:
 	zbx_free(recovery_expression);
 	zbx_free(expression);
 	zbx_free(buffer);
+	zbx_free(description);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -2123,13 +2124,25 @@ static void	lld_validate_trigger_field(zbx_lld_trigger_t *trigger, char **field,
 	if (SUCCEED != zbx_is_utf8(*field))
 	{
 		zbx_replace_invalid_utf8(*field);
-		*error = zbx_strdcatf(*error, "Cannot %s trigger: value \"%s\" has invalid UTF-8 sequence.\n",
-				(0 != trigger->triggerid ? "update" : "create"), *field);
+		*error = zbx_strdcatf(*error, "Cannot %s trigger \"%s\": value \"%s\" has invalid UTF-8 sequence.\n",
+				(0 != trigger->triggerid ? "update" : "create"), trigger->description, *field);
 	}
 	else if (zbx_strlen_utf8(*field) > field_len)
 	{
-		*error = zbx_strdcatf(*error, "Cannot %s trigger: value \"%s\" is too long.\n",
-				(0 != trigger->triggerid ? "update" : "create"), *field);
+		char	value_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+
+		zbx_truncate_value(*field, VALUE_ERRMSG_MAX, value_short, sizeof(value_short));
+
+		if (0 != (flag & ZBX_FLAG_LLD_TRIGGER_UPDATE_DESCRIPTION))
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s trigger \"%s\": name is too long.\n",
+					(0 != trigger->triggerid ? "update" : "create"), value_short);
+		}
+		else
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s trigger \"%s\": value \"%s\" is too long.\n",
+					(0 != trigger->triggerid ? "update" : "create"), trigger->description, *field);
+		}
 	}
 	else if (ZBX_FLAG_LLD_TRIGGER_UPDATE_DESCRIPTION == flag && '\0' == **field)
 	{

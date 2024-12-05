@@ -852,13 +852,25 @@ static void	lld_validate_graph_field(zbx_lld_graph_t *graph, char **field, char 
 	if (SUCCEED != zbx_is_utf8(*field))
 	{
 		zbx_replace_invalid_utf8(*field);
-		*error = zbx_strdcatf(*error, "Cannot %s graph: value \"%s\" has invalid UTF-8 sequence.\n",
-				(0 != graph->graphid ? "update" : "create"), *field);
+		*error = zbx_strdcatf(*error, "Cannot %s graph \"%s\": value \"%s\" has invalid UTF-8 sequence.\n",
+				(0 != graph->graphid ? "update" : "create"), graph->name, *field);
 	}
 	else if (zbx_strlen_utf8(*field) > field_len)
 	{
-		*error = zbx_strdcatf(*error, "Cannot %s graph: value \"%s\" is too long.\n",
-				(0 != graph->graphid ? "update" : "create"), *field);
+		char	value_short[VALUE_ERRMSG_MAX * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+
+		zbx_truncate_value(*field, VALUE_ERRMSG_MAX, value_short, sizeof(value_short));
+
+		if (0 != (flag & ZBX_FLAG_LLD_GRAPH_UPDATE_NAME))
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s graph \"%s\": name is too long.\n",
+					(0 != graph->graphid ? "update" : "create"), value_short);
+		}
+		else
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s graph \"%s\": value \"%s\" is too long.\n",
+					(0 != graph->graphid ? "update" : "create"), graph->name, value_short);
+		}
 	}
 	else if (ZBX_FLAG_LLD_GRAPH_UPDATE_NAME == flag && '\0' == **field)
 	{
