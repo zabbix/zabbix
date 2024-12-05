@@ -24,7 +24,7 @@
 		init({rules}) {
 			this.form_element = document.getElementById('autoreg-form');
 			this.form = new CForm(this.form_element, rules);
-			this.psk_required = this.form_element.querySelector('#psk_required');
+			this.psk_required = document.getElementById('psk_required');
 			this.#addEventListeners();
 		}
 
@@ -35,9 +35,9 @@
 				}
 			});
 
-			this.form_element.querySelector('#tls_in_psk').addEventListener('change', () => this.#updateFormFields());
+			document.getElementById('tls_in_psk').addEventListener('change', () => this.#updateFormFields());
 
-			const change_psk = this.form_element.querySelector('#change_psk');
+			const change_psk = document.getElementById('change_psk');
 
 			if (change_psk) {
 				change_psk.addEventListener('click', () => {
@@ -98,7 +98,7 @@
 		}
 
 		#updateFormFields() {
-			const tls_in_psk = this.form_element.querySelector('#tls_in_psk').checked;
+			const tls_in_psk = document.getElementById('tls_in_psk').checked;
 
 			if (tls_in_psk) {
 				this.#toggle('change_psk', this.psk_required.value == 0);
@@ -117,7 +117,7 @@
 		}
 
 		#toggle(id, show, disable = false) {
-			const field = this.form_element.querySelector(`#${id}`);
+			const field = document.getElementById(id);
 			const label = this.form_element.querySelector(`label[for="${id}"]`);
 
 			if (show) {
