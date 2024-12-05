@@ -1146,7 +1146,9 @@ class testPageProblems extends CWebTest {
 						'Dat' => 'Database',
 						'...' => 'DatabaseService: abcservice: abcdefTag4Tag5: 5'
 					],
-					'Check operational link' => 'Graph'
+					'Check operational link' => 'Graph',
+					'Host' => 'ЗАББИКС Сервер',
+					'Item' => 'Number of processes'
 				]
 			],
 			// #27 Show tags = 2, Full.
@@ -1682,32 +1684,39 @@ class testPageProblems extends CWebTest {
 				}
 			}
 		}
-		// Check Operational data value in popup.
-		if (array_key_exists('Show operational data', $data) && $data['fields']['Show operational data'] == 'Separately' ) {
-			foreach ($data['result'] as $i => $result) {
-				// Check if operational data is truncated.
-				if (strlen($result['Operational data']) >= 20) {
-					$non_truncated_data = substr($result['Operational data'], 0, 20).'...';
-					$this->assertEquals($non_truncated_data, $table->getRow($i)->getColumn('Operational data')
-							->query('class:hint-item')->one()->getText());
-				}
-				$table->getRow($i)->getColumn('Operational data')->query('class:hint-item')->one()->click();
-				$popup = $this->query($dialog_selector)->one()->waitUntilVisible();
-				$this->assertEquals($data['Non truncated data'],
-						$popup->query("xpath://div[@class='hintbox-wrap']//td[3]")->one()->getText()
-				);
 
-				// Check correct graph or history link if needed.
-				if(array_key_exists('Check operational link', $data)) {
-					$popup->query("xpath://div[@class='hintbox-wrap']//a[text()='"
-							.$data['Check operational link']."']")->one()->click();
-					$this->page->waitUntilReady();
-					$this->assertEquals($data['Host'].': '.$data['Item'], $this->query('tag:h1')->one()->getText());
-					$this->page->login()->open('zabbix.php?action=problem.view');
-				}
-				else {
-					$popup->query('xpath:.//button[@title="Close"]')->one()->click();
-					$popup->waitUntilNotPresent();
+		// Check Operational data value in popup.
+		if (array_key_exists('fields', $data)) {
+			if (array_key_exists('Show operational data', $data['fields']) && $data['fields']['Show operational data'] == 'Separately' ) {
+				foreach ($data['result'] as $i => $result) {
+					// Check if operational data is truncated.
+					if (strlen($result['Operational data']) >= 20) {
+						$this->assertEquals($result['Operational data'], $table->getRow($i)->getColumn('Operational data')
+								->query('class:hint-item')->one()->getText());
+						$table->getRow($i)->getColumn('Operational data')->query('class:hint-item')->one()->click();
+						$popup = $this->query($dialog_selector)->one()->waitUntilVisible();
+						$this->assertEquals($data['Non truncated data'],
+							$popup->query("xpath://div[@class='hintbox-wrap']//td[3]")->one()->getText());
+					}
+					else {
+						$table->getRow($i)->getColumn('Operational data')->query('class:hint-item')->one()->click();
+						$popup = $this->query($dialog_selector)->one()->waitUntilVisible();
+						$this->assertEquals($result['Operational data'],
+							$popup->query("xpath://div[@class='hintbox-wrap']//td[3]")->one()->getText());
+					}
+
+					// Check correct graph or history link if needed.
+					if(array_key_exists('Check operational link', $data)) {
+						$popup->query("xpath://div[@class='hintbox-wrap']//a[text()='"
+								.$data['Check operational link']."']")->one()->click();
+						$this->page->waitUntilReady();
+						$this->assertEquals($data['Host'].': '.$data['Item'], $this->query('tag:h1')->one()->getText());
+						$this->page->login()->open('zabbix.php?action=problem.view');
+					}
+					else {
+						$popup->query('xpath:.//button[@title="Close"]')->one()->click();
+						$popup->waitUntilNotPresent();
+					}
 				}
 			}
 		}
