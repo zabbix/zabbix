@@ -1821,9 +1821,7 @@ class CScreenProblem extends CScreenBase {
 						? _('binary value')
 						: $last_value['value']
 				))
-					->setAttribute('data-hintbox', '1')
-					->setHint($hint_table)
-				;
+					->setHint($hint_table);
 				$latest_values[] = ', ';
 			}
 			else {
