@@ -26,7 +26,7 @@ class CControllerTriggerPrototypeUpdate extends CController {
 			'name' =>					'required|db triggers.description|not_empty',
 			'event_name' =>				'db triggers.event_name',
 			'opdata' =>					'db triggers.opdata',
-			'priority' =>				'db triggers.priority|in 0,1,2,3,4,5',
+			'priority' =>				'required|db triggers.priority|in 0,1,2,3,4,5',
 			'expression' =>				'required|string|not_empty',
 			'recovery_mode' =>			'db triggers.recovery_mode|in '.implode(',', [ZBX_RECOVERY_MODE_EXPRESSION, ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, ZBX_RECOVERY_MODE_NONE]),
 			'recovery_expression' =>	'string',
@@ -34,14 +34,14 @@ class CControllerTriggerPrototypeUpdate extends CController {
 			'correlation_mode' =>		'db triggers.correlation_mode|in '.implode(',', [ZBX_TRIGGER_CORRELATION_NONE, ZBX_TRIGGER_CORRELATION_TAG]),
 			'correlation_tag' =>		'db triggers.correlation_tag',
 			'manual_close' =>			'db triggers.manual_close|in '.implode(',',[ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED, ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED]),
-			'url_name' =>				'db triggers.url_name',
-			'url' =>					'db triggers.url',
-			'description' =>			'db triggers.comments',
-			'status' =>					'db triggers.status|in '.implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]),
+			'url_name' =>				'required|db triggers.url_name',
+			'url' =>					'required|db triggers.url',
+			'description' =>			'required|db triggers.comments',
+			'status' =>					'db triggers.status|in '.TRIGGER_STATUS_ENABLED,
 			'tags' =>					'array',
 			'dependencies' =>			'array',
 			'hostid' =>					'db hosts.hostid',
-			'discover' =>				'db triggers.discover|in '.implode(',', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]),
+			'discover' =>				'db triggers.discover|in '.ZBX_PROTOTYPE_DISCOVER,
 			'parent_discoveryid'=>		'required|db triggers.triggerid',
 			'context' =>				'in '.implode(',', ['host', 'template'])
 		];
@@ -134,16 +134,50 @@ class CControllerTriggerPrototypeUpdate extends CController {
 
 		$trigger_prototype += [
 			'type' => $this->getInput('type', 0),
-			'url_name' => $this->getInput('url_name', ''),
-			'url' => $this->getInput('url', ''),
-			'priority' => $this->getInput('priority', TRIGGER_SEVERITY_NOT_CLASSIFIED),
-			'comments' => $this->getInput('description', ''),
 			'dependencies' => zbx_toObject($this->getInput('dependencies', []), 'triggerid'),
-			'tags' => $tags,
-			'status' => $this->getInput('status', TRIGGER_STATUS_DISABLED),
-			'triggerid' => $this->getInput('triggerid'),
-			'discover' => $this->getInput('discover', ZBX_PROTOTYPE_NO_DISCOVER)
+			'triggerid' => $this->getInput('triggerid')
 		];
+
+		if ($db_trigger_prototype) {
+			foreach (['url', 'url_name'] as $element) {
+				$input_element = $this->getInput($element);
+
+				if ($db_trigger_prototype[$element] !== $input_element) {
+					$trigger_prototype[$element] = $input_element;
+				}
+			}
+
+			$priority = $this->getInput('priority');
+
+			if ($db_trigger_prototype['priority'] != $priority) {
+				$trigger_prototype['priority'] = $priority;
+			}
+
+			$description = $this->getInput('description');
+
+			if ($db_trigger_prototype['comments'] !== $description) {
+				$trigger_prototype['comments'] = $description;
+			}
+
+			$status = $this->hasInput('status') ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
+
+			if ($db_trigger_prototype['status'] != $status) {
+				$trigger_prototype['status'] = $status;
+			}
+
+			$discover = $this->hasInput('discover') ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER;
+
+			if ($db_trigger_prototype['discover'] != $discover) {
+				$trigger_prototype['discover'] = $discover;
+			}
+
+			CArrayHelper::sort($db_trigger_prototype['tags'], ['tag', 'value']);
+			CArrayHelper::sort($tags, ['tag', 'value']);
+
+			if (array_values($db_trigger_prototype['tags']) !== array_values($tags)) {
+				$trigger_prototype['tags'] = $tags;
+			}
+		}
 
 		$result = (bool) API::TriggerPrototype()->update($trigger_prototype);
 
