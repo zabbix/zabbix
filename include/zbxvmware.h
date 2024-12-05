@@ -560,7 +560,8 @@ typedef struct
 	int				jobs_num;
 
 	/* linked jobs types */
-#define ZBX_VMWARE_REQ				(8*2)
+#define ZBX_VMWARE_REQ				(8)
+#define ZBX_VMWARE_REQ_MASK			(0xFF00)
 #define ZBX_VMWARE_REQ_UPDATE_CONF		(ZBX_VMWARE_UPDATE_CONF		<< ZBX_VMWARE_REQ)
 #define ZBX_VMWARE_REQ_UPDATE_PERFCOUNTERS	(ZBX_VMWARE_UPDATE_PERFCOUNTERS	<< ZBX_VMWARE_REQ)
 #define ZBX_VMWARE_REQ_UPDATE_REST_TAGS		(ZBX_VMWARE_UPDATE_REST_TAGS	<< ZBX_VMWARE_REQ)
@@ -568,6 +569,7 @@ typedef struct
 #define ZBX_VMWARE_REQ_UPDATE_ALL										\
 					(ZBX_VMWARE_REQ_UPDATE_CONF | ZBX_VMWARE_REQ_UPDATE_PERFCOUNTERS |	\
 					ZBX_VMWARE_REQ_UPDATE_REST_TAGS | ZBX_VMWARE_REQ_UPDATE_EVENTLOG)
+#define ZBX_VMWARE_JOB_RUN			(8*2)
 	int				jobs_flag;
 
 	/* vmware entity (vm, hv etc) and linked tags */

@@ -3138,7 +3138,7 @@ static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *servi
  ******************************************************************************/
 static void	zbx_vmware_jobs_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service)
 {
-	int	req_flag = 0x1, jobs_req = service->jobs_flag >> ZBX_VMWARE_REQ;
+	int	req_flag = 0x1, jobs_req = ((service->jobs_flag & ZBX_VMWARE_REQ_MASK) >> ZBX_VMWARE_REQ);
 
 	while (0 != jobs_req)
 	{
