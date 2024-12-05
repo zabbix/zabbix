@@ -183,7 +183,9 @@ $condition_table = (new CTable())
 						->addClass('js-condition-add')
 				))->setColSpan(4)
 			)
-	);
+	)
+	->setAttribute('data-field-type', 'set')
+	->setAttribute('data-field-name', 'conditions');
 
 $form_grid
 	->addItem([
