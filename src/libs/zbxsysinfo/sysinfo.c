@@ -1670,15 +1670,23 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
  * Purpose: deserializes agent result                                         *
  *                                                                            *
  * Parameters: data        - [IN] data to deserialize                         *
+ *             data_offset - [IN] the data length                             *
  *             result      - [OUT] agent result                               *
  *                                                                            *
  * Return value: the agent result return code (SYSINFO_RET_*)                 *
  *                                                                            *
  ******************************************************************************/
-static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
+static int	deserialize_agent_result(char *data, size_t data_offset, AGENT_RESULT *result)
 {
 	int	ret, agent_ret;
 	char	type;
+
+	/* normally forked program should return data or error on abnormal termination, handle unexpected case */
+	if (data_offset < sizeof(int) + 1)
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid data length:" ZBX_FS_SIZE_T, data_offset));
+		return SYSINFO_RET_FAIL;
+	}
 
 	memcpy(&agent_ret, data, sizeof(int));
 	data += sizeof(int);
@@ -1842,7 +1850,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 			ret = SYSINFO_RET_FAIL;
 		}
 		else
-			ret = deserialize_agent_result(data, result);
+			ret = deserialize_agent_result(data, data_offset, result);
 	}
 
 	zbx_free(data);
