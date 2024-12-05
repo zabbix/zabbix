@@ -193,13 +193,28 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("Cannot parse item key: '%s'", item_key);
 
 	init_result(&result);
+	ret = MODBUS_GET(&request, &result);
 
 	zbx_mock_assert_sysinfo_ret_eq("Return value",
-			ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return")),
-			MODBUS_GET(&request, &result));
+			zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return")), ret);
 
 	if (SUCCEED != ret)
+	{
+		zbx_mock_handle_t	handle;
+
+		if (ZBX_MOCK_SUCCESS == zbx_mock_out_parameter("msg", &handle))
+		{
+			if (0 != ISSET_MSG(&result))
+			{
+				zbx_mock_assert_str_eq("Error message", zbx_mock_get_parameter_string("out.msg"),
+						*GET_MSG_RESULT(&result));
+			}
+			else
+				fail_msg("No error message");
+		}
+
 		goto out;
+	}
 
 	if (0 != ISSET_STR(&result))
 	{
