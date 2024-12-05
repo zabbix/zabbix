@@ -2627,12 +2627,23 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 		{
 			if (ZBX_SNMP_GET == snmp_oid_type)
 			{
-				zbx_snprintf(error, max_error_len, "OID mismatched");
-				ret = NOTSUPPORTED;
-			}
+				if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+				{
+					char	oid_resp[MAX_OID_LEN], oid_req[MAX_OID_LEN];
 
-			bulkwalk_context->running = 0;
-			break;
+					snprint_objid(oid_resp, sizeof(oid_req), var->name, var->name_length);
+					snprint_objid(oid_req, sizeof(oid_resp), bulkwalk_context->name,
+							bulkwalk_context->name_length);
+
+					zabbix_log(LOG_LEVEL_DEBUG, "OID mismatch: GET response OID (%s) doesn't"
+							" match  request OID (%s)", oid_resp, oid_req);
+				}
+			}
+			else
+			{
+				bulkwalk_context->running = 0;
+				break;
+			}
 		}
 
 		if (ZBX_SNMP_GET == snmp_oid_type)

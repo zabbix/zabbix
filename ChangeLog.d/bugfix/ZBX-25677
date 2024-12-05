@@ -1,0 +1,1 @@
+.......PS. [ZBX-25677] removed failure when encountering mismatched OID in SNMP async poller (dgoloscapov, vso)
