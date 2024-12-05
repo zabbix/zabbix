@@ -25,7 +25,6 @@ $form = (new CForm())
 	->setId('correlation-condition-form')
 	->setName('conditions')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-	->addVar('conditiontype', $data['conditiontype'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 $condition_type = (int) $data['last_type'];
