@@ -730,6 +730,7 @@ void	zbx_vmware_eventlog_job_create(zbx_vmware_service_t *service);
 #define ZBX_VMWARE_UNIT_WATT			13
 #define ZBX_VMWARE_UNIT_CELSIUS			14
 #define ZBX_VMWARE_UNIT_NANOSECOND		15
+#define ZBX_VMWARE_UNIT_GIGABYTES		16
 
 /*
  * SOAP support

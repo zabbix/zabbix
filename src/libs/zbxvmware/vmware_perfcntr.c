@@ -384,10 +384,14 @@ int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL *easyha
 			unit = ZBX_VMWARE_UNIT_JOULE;						\
 		else if (0 == strcmp("kiloBytes",val))						\
 			unit = ZBX_VMWARE_UNIT_KILOBYTES;					\
-		else if (0 == strcmp("kiloBytesPerSecond",val))					\
-			unit = ZBX_VMWARE_UNIT_KILOBYTESPERSECOND;				\
 		else if (0 == strcmp("megaBytes",val))						\
 			unit = ZBX_VMWARE_UNIT_MEGABYTES;					\
+		else if (0 == strcmp("gigaBytes",val))						\
+			unit = ZBX_VMWARE_UNIT_GIGABYTES;					\
+		else if (0 == strcmp("teraBytes",val))						\
+			unit = ZBX_VMWARE_UNIT_TERABYTES;					\
+		else if (0 == strcmp("kiloBytesPerSecond",val))					\
+			unit = ZBX_VMWARE_UNIT_KILOBYTESPERSECOND;				\
 		else if (0 == strcmp("megaBytesPerSecond",val))					\
 			unit = ZBX_VMWARE_UNIT_MEGABYTESPERSECOND;				\
 		else if (0 == strcmp("megaHertz",val))						\
@@ -398,14 +402,12 @@ int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL *easyha
 			unit = ZBX_VMWARE_UNIT_MICROSECOND;					\
 		else if (0 == strcmp("millisecond",val))					\
 			unit = ZBX_VMWARE_UNIT_MILLISECOND;					\
+		else if (0 == strcmp("second",val))						\
+			unit = ZBX_VMWARE_UNIT_SECOND;						\
 		else if (0 == strcmp("number",val))						\
 			unit = ZBX_VMWARE_UNIT_NUMBER;						\
 		else if (0 == strcmp("percent",val))						\
 			unit = ZBX_VMWARE_UNIT_PERCENT;						\
-		else if (0 == strcmp("second",val))						\
-			unit = ZBX_VMWARE_UNIT_SECOND;						\
-		else if (0 == strcmp("teraBytes",val))						\
-			unit = ZBX_VMWARE_UNIT_TERABYTES;					\
 		else if (0 == strcmp("watt",val))						\
 			unit = ZBX_VMWARE_UNIT_WATT;						\
 		else if (0 == strcmp("celsius",val))						\
