@@ -174,23 +174,22 @@ class CUser extends CApiService {
 			}
 
 			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-				$private_fields_filter = [];
+				$private_fields_filter = array_diff_key($options['filter'], $limited_output_fields);
 
-				if ($options['searchByAny'] !== null && $options['searchByAny'] !== false) {
-					$private_fields_filter = array_diff_key($options['filter'], $limited_output_fields);
-					$options['filter'] = array_intersect_key($options['filter'], $limited_output_fields);
-				}
-				elseif (array_diff_key($options['filter'], $limited_output_fields)) {
-					$sqlParts['where']['userid'] = 'u.userid='.self::$userData['userid'];
-				}
-			}
+				if ($private_fields_filter) {
+					if ($options['searchByAny'] !== null && $options['searchByAny'] !== false) {
+						$options['filter'] = array_intersect_key($options['filter'], $limited_output_fields);
 
-			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && $private_fields_filter) {
-				$this->dbFilter('users u', ['filter' => $private_fields_filter] + $options, $sqlParts);
+						$this->dbFilter('users u', ['filter' => $private_fields_filter] + $options, $sqlParts);
 
-				if (array_key_exists('filter', $sqlParts['where'])) {
-					$sqlParts['where']['filter'] =
-						'(u.userid='.self::$userData['userid'].' AND '.$sqlParts['where']['filter'].')';
+						if (array_key_exists('filter', $sqlParts['where'])) {
+							$sqlParts['where']['filter'] =
+								'(u.userid='.self::$userData['userid'].' AND '.$sqlParts['where']['filter'].')';
+						}
+					}
+					else {
+						$sqlParts['where']['userid'] = 'u.userid='.self::$userData['userid'];
+					}
 				}
 			}
 
@@ -204,23 +203,22 @@ class CUser extends CApiService {
 			}
 
 			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-				$private_fields_search = [];
+				$private_fields_search = array_diff_key($options['search'], $limited_output_fields);
 
-				if ($options['searchByAny']) {
-					$private_fields_search = array_diff_key($options['search'], $limited_output_fields);
-					$options['search'] = array_intersect_key($options['search'], $limited_output_fields);
-				}
-				elseif (array_diff_key($options['search'], $limited_output_fields)) {
-					$sqlParts['where']['userid'] = 'u.userid='.self::$userData['userid'];
-				}
-			}
+				if ($private_fields_search) {
+					if ($options['searchByAny']) {
+						$options['search'] = array_intersect_key($options['search'], $limited_output_fields);
 
-			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && $private_fields_search) {
-				zbx_db_search('users u', ['search' => $private_fields_search] + $options, $sqlParts);
+						zbx_db_search('users u', ['search' => $private_fields_search] + $options, $sqlParts);
 
-				if (array_key_exists('search', $sqlParts['where'])) {
-					$sqlParts['where']['search'] =
-						'(u.userid='.self::$userData['userid'].' AND '.$sqlParts['where']['search'].')';
+						if (array_key_exists('search', $sqlParts['where'])) {
+							$sqlParts['where']['search'] =
+								'(u.userid='.self::$userData['userid'].' AND '.$sqlParts['where']['search'].')';
+						}
+					}
+					else {
+						$sqlParts['where']['userid'] = 'u.userid='.self::$userData['userid'];
+					}
 				}
 			}
 
