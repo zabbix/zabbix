@@ -1,11 +1,21 @@
 Changes for 7.0.7rc1
 
 New features:
+.......PS. [ZBXNEXT-9622] added top.peak in diaginfo to identify items with highest task queue (vso)
 ...G...... [ZBXNEXT-8914] reworked Oracle plugin queries to use variable binding (dgoloscapov, esneiders)
 ..F....... [ZBXNEXT-9228] implemented automatic selection of the first element of a broadcast-capable widget (averza, wczerneha)
 A.F....... [ZBXNEXT-8690] implemented a new filter in media type list view to display actions based on the scope of their media type usage (Ivo)
 
 Bug fixes:
+........S. [ZBX-25686] fixed SQL error in network discovery action processing (wiper)
+.......P.. [ZBX-25664] fixed nested transactions on Zabbix proxy when using hybrid buffer (dgoloscapov)
+A......... [ZBX-25350] prohibited deleting user groups which are used in userdirectory user group mappings (gcalenko)
+..F....... [ZBX-24895] changed double quotes to single quotes for string in SQL statement (rgontarski)
+..F....... [ZBX-25010] fixed trigger being displayed in its own dependency list (rgontarski)
+.......PS. [ZBX-25515] improved LLD error messages when being unable to create or update an entity (dgoloscapov)
+..F....... [ZBX-25525] fixed parent template changes affecting linked template overrides in trigger and trigger prototype forms (esekace)
+...G...... [ZBX-25377] fixed crash when executing vfs.fs.size or other metrics and forked metric is terminated abnormally (vso)
+...G...... [ZBX-25390] fixed vfs.fs.get item for Digital Audio CD disks on Windows (MVekslers)
 .......PS. [ZBX-25590] fixed failures to convert double to uint64 in preprocessing (dgoloscapov)
 .......PS. [ZBX-25596] fixed handling of preprocessing history when value type of an item is changed (dgoloscapov)
 .......PS. [ZBX-25136] fixed item testing preprocessing not being performed on Zabbix proxy when the item itself is being tested on Zabbix proxy (wiper)
@@ -3180,6 +3190,10 @@ New features:
 ...G...... [ZBXNEXT-8914] reworked Oracle plugin queries to use variable binding (dgoloscapov, esneiders)
 
 Bug fixes:
+..F....... [ZBX-24895] changed double quotes to single quotes for string in SQL statement (rgontarski)
+...G...... [ZBX-25377] fixed crash when executing vfs.fs.size or other metrics and forked metric is terminated abnormally (vso)
+...G...... [ZBX-25390] fixed vfs.fs.get item for Digital Audio CD disks on Windows (MVekslers)
+..F....... [ZBX-25375] fixed command icon visibility in acknowledges hc-light theme (dpankins)
 ...G...... [ZBX-25267] fixed Zabbix agent 2 refusing PSK connections when using PSK and certs (dgoloscapov)
 ...G...... [ZBX-25404] fixed trapper item fails, if space character is used in 'Allowed hosts' field (MVekslers)
 ..F....... [ZBX-25269] fixed widget iterator readiness (apoga, averza)
@@ -6512,6 +6526,7 @@ Changes for 5.0.46rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-25633] fixed crash if macro is used in allowed hosts (vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.45
