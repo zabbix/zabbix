@@ -47,7 +47,7 @@ func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvid
 		return nil, err
 	}
 
-	uri, err := uri.NewWithCreds(params["URI"], "zabbix", params["Password"], uriDefaults)
+	uri, err := uri.NewWithCreds(params["URI"], params["User"], params["Password"], uriDefaults)
 	if err != nil {
 		return nil, err
 	}
