@@ -1,7 +1,5 @@
 Changes for 7.2.0rc3
 
-New features:
-
 Bug fixes:
 ........S. [ZBX-25686] fixed SQL error in network discovery action processing (wiper)
 .......P.. [ZBX-25664] fixed nested transactions on Zabbix proxy when using hybrid buffer (dgoloscapov)
