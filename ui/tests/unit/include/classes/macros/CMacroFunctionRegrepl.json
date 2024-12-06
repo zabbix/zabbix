@@ -434,5 +434,45 @@
             "parameters": ["(test2)", "{\\1}{\\2}{\\3}"]
         },
         "result": "test1 {test2}{}{} test3"
+    },
+    {
+        "value": "TEST abc",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([a-z])", "\\\\\\2"]
+        },
+        "result": "TEST \\\\\\"
+    },
+    {
+        "value": "TEST abc",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([a-z])", "\\2"]
+        },
+        "result": "TEST "
+    },
+    {
+        "value": "TEST abc",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([a-z])", "\\1"]
+        },
+        "result": "TEST abc"
+    },
+    {
+        "value": "TEST abc",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([a-z])", "\\10"]
+        },
+        "result": "TEST a0b0c0"
+    },
+    {
+        "value": "abc TEST",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["[a-z]", "\\10"]
+        },
+        "result": "000 TEST"
     }
 ]
