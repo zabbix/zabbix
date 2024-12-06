@@ -1261,6 +1261,7 @@ class CUserGroup extends CApiService {
 		}
 
 		self::checkProvisionedUsersExist($db_usrgrps);
+		self::checkUsedInProvisionGroupMapping($db_usrgrps);
 	}
 
 	private static function checkProvisionedUsersExist(array $db_user_groups): void {
@@ -1280,6 +1281,34 @@ class CUserGroup extends CApiService {
 				)
 			);
 		}
+	}
+
+	private static function checkUsedInProvisionGroupMapping(array $db_usrgrps): void {
+		$row = DBfetch(DBselect(
+			'SELECT ud.name,ud.idp_type,udug.usrgrpid'.
+			' FROM userdirectory_usrgrp udug'.
+			' JOIN userdirectory_idpgroup udig ON udug.userdirectory_idpgroupid=udig.userdirectory_idpgroupid'.
+			' JOIN userdirectory ud ON udig.userdirectoryid=ud.userdirectoryid'.
+			' WHERE '.dbConditionId('udug.usrgrpid', array_keys($db_usrgrps)),
+			1
+		));
+
+		if (!$row) {
+			return;
+		}
+
+		if ($row['idp_type'] == IDP_TYPE_SAML) {
+			$error = _s('Cannot delete user group "%1$s", because it is used by SAML userdirectory.',
+				$db_usrgrps[$row['usrgrpid']]['name']
+			);
+		}
+		else {
+			$error = _s('Cannot delete user group "%1$s", because it is used by LDAP userdirectory "%2$s".',
+				$db_usrgrps[$row['usrgrpid']]['name'], $row['name']
+			);
+		}
+
+		self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 	}
 
 	private static function unlinkUsers(array $db_groups): void {
