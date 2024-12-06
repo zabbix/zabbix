@@ -5622,27 +5622,24 @@ class testDashboardTopHostsWidget extends testWidgets {
 				]
 			],
 			// #2 Filtered so that widget shows No data.
-			// TODO: This case is failing until ZBX-24828 is fixed.
-//			[
-//				[
-//					'main_fields' => [
-//						'Name' => 'No data'
-//					],
-//					'column_fields' => [
-//						[
-//							'fields' => [
-//								'Name' => 'Item2',
-//								'Item name' => [
-//									'values' => 'Item2',
-//									'context' => ['values' => 'HostA']
-//								]
-//							]
-//						]
-//					],
-//					'result' => [],
-//					'headers' => ['Item2']
-//				]
-//			],
+			[
+				[
+					'main_fields' => [
+						'Name' => 'No data'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'Item2',
+							'Item name' => [
+								'values' => 'Item2',
+								'context' => ['values' => 'HostA']
+							]
+						]
+					],
+					'result' => [],
+					'headers' => ['Item2']
+				]
+			],
 			// #3 Filtered by tags, columns: text and item, order newest in bottom.
 			[
 				[
