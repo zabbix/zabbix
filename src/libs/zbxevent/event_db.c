@@ -63,7 +63,7 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 			break;
 		case EVENT_SOURCE_DISCOVERY:
 			offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-					" from hosts h,interface i,dservices ds"
+					" from interface i,dservices ds,hosts h"
 					" left join host_proxy hp on h.hostid=hp.hostid"
 					" where h.hostid=i.hostid"
 						" and i.ip=ds.ip"
