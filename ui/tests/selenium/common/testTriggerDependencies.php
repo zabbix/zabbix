@@ -155,12 +155,79 @@ class testTriggerDependencies extends CWebTest {
 			// Check-in (add) triggers for dependence and submit
 			foreach ($triggers as $trigger) {
 				$dialog->asTable()->findRows(function ($row) use ($trigger) {
-					return $row->getColumn('Name')->query('tag:a')->one()->getText() === $trigger;
+					$element = $row->getColumn('Name')->query('tag:a')->one(false);
+					return $element->isValid() && $element->getText() === $trigger;
 				})->select();
 			}
 
 			$dialog->getFooter()->query('button:Select')->one()->click();
 			$dialog->waitUntilNotVisible();
 		}
+	}
+
+	/**
+	 * Function for checking trigger dependence list.
+	 *
+	 * @param array  $data        data provider
+	 * @param string $name        name of a host or template
+	 * @param string $objectid    id of host or template
+	 * @param string $lldid       id of low level discovery for trigger prototypes
+	 * @param string $context     host or template
+	 */
+	protected function checkDependencyList($data, $name, $objectid, $lldid, $context) {
+		$url = (str_contains($data['dependant_trigger'], 'prototype'))
+			? 'zabbix.php?action=trigger.prototype.list&parent_discoveryid='.$lldid.'&context='.$context
+			: 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D='.$objectid.'&context='.$context;
+
+		$this->page->login()->open($url)->waitUntilReady();
+		$this->query('link', $data['dependant_trigger'])->waitUntilClickable()->one()->click();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$form->selectTab('Dependencies');
+
+		$button_selector = (str_contains($data['dependant_trigger'], 'prototype')) ? 'Add prototype' : 'Add';
+		$this->selectTriggersAndCheck($form, $button_selector, $data['master_triggers'], $name);
+
+		if (array_key_exists('host_master_triggers', $data)) {
+			$this->selectTriggersAndCheck($form, 'Add host trigger', $data['host_master_triggers'],
+					'Host for trigger tags filtering'
+			);
+		}
+
+		COverlayDialogElement::closeAll();
+	}
+
+	/**
+	 * Function for opening triggers overlay and checking that selected triggers are disabled after save.
+	 *
+	 * @param CFormElement  $form        trigger creation form
+	 * @param string $button_selector    Add, Add prototype or Add host trigger
+	 * @param string $master_triggers    selected triggers
+	 * @param string $host_name          host or template where triggers are selected from
+	 */
+	protected function selectTriggersAndCheck($form, $button_selector, $master_triggers, $host_name) {
+		$button = $form->getFieldContainer('Dependencies')->query('button', $button_selector)->waitUntilClickable()->one();
+		$button->click();
+		$initial_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$table = $initial_dialog->query('class:list-table')->asTable()->one();
+
+		if ($button_selector === 'Add host trigger') {
+			$initial_dialog->asForm(['normalized' => true])->fill(['Host' => $host_name]);
+			$table->waitUntilReloaded();
+		}
+
+		$table->findRows('Name', $master_triggers)->select();
+		$initial_dialog->asForm()->submit();
+		$initial_dialog->waitUntilNotVisible();
+		$button->click();
+		$saved_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$checked_table = $saved_dialog->query('class:list-table')->asTable()->one();
+
+		// Check that selected triggers are disabled in the list.
+		foreach ($master_triggers as $master_trigger) {
+			$row = $checked_table->findRow('Name', $host_name.': '.$master_trigger);
+			$this->assertTrue($row->query('tag:input')->one()->isEnabled(false) && $row->isSelected());
+		}
+
+		$saved_dialog->close();
 	}
 }
