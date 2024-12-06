@@ -130,6 +130,25 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 						'delay' => 0
 					]
 				]
+			],
+			[
+				'host' => 'Host for trigger dependency list',
+				'groups' => [['groupid' => 4]],
+				'items' => [
+					[
+						'name' => 'Trap1',
+						'key_' => 'trap1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				],
+				'discoveryrules' => [
+					[
+						'name' => 'Drule for trigger prototypes dependency list',
+						'key_' => 'drule_triggers_dependency',
+						'type' => ITEM_TYPE_TRAPPER
+					]
+				]
 			]
 		]);
 		self::$hostids = $host_result['hostids'];
@@ -155,6 +174,18 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 			[
 				'description' => 'Host trigger with dependence',
 				'expression' => 'last(/Host with everything/host_item_1)=0'
+			],
+			[
+				'description' => 'Trigger for dependency list test 1',
+				'expression' => 'last(/Host for trigger dependency list/trap1)=0'
+			],
+			[
+				'description' => 'Trigger for dependency list test 2',
+				'expression' => 'last(/Host for trigger dependency list/trap1)=1'
+			],
+			[
+				'description' => 'Trigger for dependency list test 3',
+				'expression' => 'last(/Host for trigger dependency list/trap1)=2'
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $host_triggers);
@@ -185,6 +216,14 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'delay' => 0
+			],
+			[
+				'name' => 'Host Item prototype for trigger dependency list',
+				'key_' => 'trigger_dep_item[{#KEY}]',
+				'hostid' => self::$hostids['Host for trigger dependency list'],
+				'ruleid' => self::$host_druleids['Host for trigger dependency list:drule_triggers_dependency'],
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_UINT64
 			]
 		]);
 		$this->assertArrayHasKey('itemids', $host_item_prototype);
@@ -209,6 +248,18 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 			[
 				'description' => 'Host trigger prot for linked update{#KEY}',
 				'expression' => 'last(/Host with linked template/host_linking_prot_[{#KEY}])=0'
+			],
+			[
+				'description' => '1 Host trigger prototype for dependency list{#KEY}',
+				'expression' => 'last(/Host for trigger dependency list/trigger_dep_item[{#KEY}])=0'
+			],
+			[
+				'description' => '2 Host trigger prototype for dependency list{#KEY}',
+				'expression' => 'last(/Host for trigger dependency list/trigger_dep_item[{#KEY}])=0'
+			],
+			[
+				'description' => '3 Host trigger prototype for dependency list{#KEY}',
+				'expression' => 'last(/Host for trigger dependency list/trigger_dep_item[{#KEY}])=0'
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $host_trigger_prototype);
@@ -303,20 +354,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 
 	public static function getTriggerUpdateData() {
 		return [
-			// #0 dependencies on itself.
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Host trigger update',
-					'dependencies' => [
-						'Host with everything' => ['Host trigger update']
-					],
-					'error_message' => 'Trigger "Host trigger update" cannot depend on the trigger'.
-							' "Host trigger update", because a circular linkage'.
-							' ("Host trigger update" -> "Host trigger update") would occur.'
-				]
-			],
-			// #1 dependencies on trigger that depends on updated trigger.
+			// Dependencies on trigger that depends on updated trigger.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -347,26 +385,9 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 		$this->triggerCreateUpdate($data, 'Trigger updated', null, 'Cannot update trigger', 'Host trigger update');
 	}
 
-	public static function getLinkedTriggerUpdateData() {
-		return [
-			// #0 dependencies on itself.
-			[
-				[
-					'expected' => TEST_BAD,
-					'dependencies' => [
-						'Host with everything' => ['Trigger that linked']
-					],
-					'error_message' => 'Trigger "Trigger that linked" cannot depend on the trigger "Trigger that linked", because'.
-							' a circular linkage ("Trigger that linked" -> "Trigger that linked") would occur.'
-				]
-			]
-		];
-	}
-
 	/**
 	 * Update linked trigger on host with dependencies.
 	 *
-	 * @dataProvider getLinkedTriggerUpdateData
 	 * @dataProvider getTriggerCreateData
 	 */
 	public function testHostTriggerDependencies_LinkedTriggerUpdate($data) {
@@ -444,28 +465,9 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 		);
 	}
 
-	public static function getTriggerPrototypeUpdateData() {
-		return [
-			// #0 dependencies on itself.
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Host trigger prototype update{#KEY}',
-					'prototype_dependencies' => [
-						'Host trigger prototype update{#KEY}'
-					],
-					'error_message' => 'Trigger prototype "Host trigger prototype update{#KEY}" cannot depend on the'.
-							' trigger prototype "Host trigger prototype update{#KEY}", because a circular linkage ("Host'.
-							' trigger prototype update{#KEY}" -> "Host trigger prototype update{#KEY}") would occur.'
-				]
-			]
-		];
-	}
-
 	/**
 	 * Update trigger prototype on host with dependencies.
 	 *
-	 * @dataProvider getTriggerPrototypeUpdateData
 	 * @dataProvider getTriggerCreateData
 	 * @dataProvider getTriggerPrototypeCreateData
 	 */
@@ -482,19 +484,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 
 	public static function getLinkedTriggerPrototypeUpdateData() {
 		return [
-			// #0 dependencies on itself.
-			[
-				[
-					'expected' => TEST_BAD,
-					'prototype_dependencies' => [
-						'trigger prototype linked update{#KEY}'
-					],
-					'error_message' => 'Trigger prototype "trigger prototype linked update{#KEY}" cannot depend on the'.
-							' trigger prototype "trigger prototype linked update{#KEY}", because a circular linkage'.
-							' ("trigger prototype linked update{#KEY}" -> "trigger prototype linked update{#KEY}") would occur.'
-				]
-			],
-			// #1 dependencies on one correct trigger prototype.
+			// Dependencies on one correct trigger prototype.
 			[
 				[
 					'prototype_dependencies' => [
@@ -505,7 +495,7 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 					]
 				]
 			],
-			// #2 dependencies on trigger prototype and trigger.
+			// Dependencies on trigger prototype and trigger.
 			[
 				[
 					'prototype_dependencies' => [
@@ -562,5 +552,44 @@ class testHostTriggerDependencies extends testTriggerDependencies {
 
 		// Check that link with discovered trigger exists in table.
 		$this->assertTrue($table->query('link:Host for triggers filtering: Trigger disabled with tags')->one()->isClickable());
+
+		COverlayDialogElement::find()->one()->close();
+	}
+
+	public static function getDependencyListData() {
+		return [
+			[
+				[
+					'dependant_trigger' => 'Trigger for dependency list test 1',
+					'master_triggers' => [
+						'Trigger for dependency list test 2',
+						'Trigger for dependency list test 3'
+					]
+				]
+			],
+			[
+				[
+					'dependant_trigger' => '1 Host trigger prototype for dependency list{#KEY}',
+					'master_triggers' => [
+						'2 Host trigger prototype for dependency list{#KEY}',
+						'3 Host trigger prototype for dependency list{#KEY}'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Check that trigger doesn't present in its own dependency list and
+	 * that checked master triggers are disabled in list.
+	 *
+	 * @dataProvider getDependencyListData
+	 */
+	public function testHostTriggerDependencies_DependencyList($data) {
+		$host_name = 'Host for trigger dependency list';
+		$hostid = self::$hostids[$host_name];
+		$lldid = self::$host_druleids[$host_name.':drule_triggers_dependency'];
+
+		$this->checkDependencyList($data, $host_name, $hostid, $lldid, 'host');
 	}
 }

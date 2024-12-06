@@ -709,6 +709,9 @@ class testPageServicesSla extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=sla.list');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 
+		// Expand filter if it is collapsed.
+		CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_RIGHT)->expand();
+
 		// Fill filter fields if such present in data provider.
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
 

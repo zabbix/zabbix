@@ -94,6 +94,25 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 						'delay' => 0
 					]
 				]
+			],
+			[
+				'host' => 'Template for trigger dependency list',
+				'groups' => [['groupid' => 1]],
+				'items' => [
+					[
+						'name' => 'Trap1',
+						'key_' => 'trap1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				],
+				'discoveryrules' => [
+					[
+						'name' => 'Drule for trigger prototypes dependency list',
+						'key_' => 'drule_triggers_dependency',
+						'type' => ITEM_TYPE_TRAPPER
+					]
+				]
 			]
 		]);
 		self::$templateids = $template_result['templateids'];
@@ -151,6 +170,18 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 			[
 				'description' => 'trigger that depends on linked trigger',
 				'expression' => 'last(/Template that linked to template/linked_temp)=0'
+			],
+			[
+				'description' => 'Trigger for dependency list test 1',
+				'expression' => 'last(/Template for trigger dependency list/trap1)=0'
+			],
+			[
+				'description' => 'Trigger for dependency list test 2',
+				'expression' => 'last(/Template for trigger dependency list/trap1)=1'
+			],
+			[
+				'description' => 'Trigger for dependency list test 3',
+				'expression' => 'last(/Template for trigger dependency list/trap1)=2'
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $template_triggers);
@@ -185,6 +216,14 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'delay' => 0
+			],
+			[
+				'name' => 'Template Item prototype for trigger dependency list',
+				'key_' => 'trigger_dep_item[{#KEY}]',
+				'hostid' => self::$templateids['Template for trigger dependency list'],
+				'ruleid' => self::$template_druleids['Template for trigger dependency list:drule_triggers_dependency'],
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_UINT64
 			]
 		]);
 		$this->assertArrayHasKey('itemids', $item_prototype);
@@ -205,6 +244,18 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 			[
 				'description' => 'trigger prototype template update{#KEY}',
 				'expression' => 'last(/Template that linked to template/template_prot_[{#KEY}])=0'
+			],
+			[
+				'description' => '1 Template trigger prototype for dependency list{#KEY}',
+				'expression' => 'last(/Template for trigger dependency list/trigger_dep_item[{#KEY}])=0'
+			],
+			[
+				'description' => '2 Template trigger prototype for dependency list{#KEY}',
+				'expression' => 'last(/Template for trigger dependency list/trigger_dep_item[{#KEY}])=0'
+			],
+			[
+				'description' => '3 Template trigger prototype for dependency list{#KEY}',
+				'expression' => 'last(/Template for trigger dependency list/trigger_dep_item[{#KEY}])=0'
 			]
 		]);
 		$this->assertArrayHasKey('triggerids', $trigger_prototype);
@@ -423,19 +474,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 
 	public static function getTriggerUpdateData() {
 		return [
-			// #0 dependencies on itself.
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Template trigger update',
-					'dependencies' => [
-						'Template with everything' => ['Template trigger update']
-					],
-					'error_message' => 'Trigger "Template trigger update" cannot depend on the trigger "Template trigger update",'.
-							' because a circular linkage ("Template trigger update" -> "Template trigger update") would occur.'
-				]
-			],
-			// #1 dependencies on parent templates trigger.
+			// Dependencies on parent templates trigger.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -448,7 +487,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 							' on triggers from the parent template are not allowed.'
 				]
 			],
-			// #2 dependencies on dependent trigger.
+			// Dependencies on dependent trigger.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -481,19 +520,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 
 	public static function getLinkedTriggerUpdateData() {
 		return [
-			// #0 dependencies on itself.
-			[
-				[
-					'expected' => TEST_BAD,
-					'dependencies' => [
-						'Template with everything' => ['trigger template linked update']
-					],
-					'error_message' => 'Trigger "trigger template linked update" cannot depend on the trigger'.
-							' "trigger template linked update", because a circular linkage ("trigger template'.
-							' linked update" -> "trigger template linked update") would occur.'
-				]
-			],
-			// #1 depends on linked trigger that already depends on this trigger.
+			// Depends on linked trigger that already depends on this trigger.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -506,7 +533,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 						' trigger") would occur.'
 				]
 			],
-			// #2 dependencies on parent templates trigger.
+			// Dependencies on parent templates trigger.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -593,28 +620,9 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 		);
 	}
 
-	public static function getTriggerPrototypeUpdateData() {
-		return [
-			// #0 dependencies on itself.
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Depends on trigger, hosts trigger and prototype_{#KEY}',
-					'prototype_dependencies' => [
-						'Template trigger prototype update{#KEY}'
-					],
-					'error_message' => 'Trigger prototype "Template trigger prototype update{#KEY}" cannot depend on the trigger'.
-							' prototype "Template trigger prototype update{#KEY}", because a circular linkage ("Template'.
-							' trigger prototype update{#KEY}" -> "Template trigger prototype update{#KEY}") would occur.'
-				]
-			]
-		];
-	}
-
 	/**
 	 * Update trigger prototype on template with dependencies.
 	 *
-	 * @dataProvider getTriggerPrototypeUpdateData
 	 * @dataProvider getTriggerCreateData
 	 * @dataProvider getTriggerPrototypeCreateData
 	 */
@@ -631,19 +639,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 
 	public static function getLinkedTriggerPrototypeUpdateData() {
 		return [
-			// #0 dependencies on itself.
-			[
-				[
-					'expected' => TEST_BAD,
-					'prototype_dependencies' => [
-						'trigger prototype template update{#KEY}'
-					],
-					'error_message' => 'Trigger prototype "trigger prototype template update{#KEY}" cannot depend on the trigger'.
-							' prototype "trigger prototype template update{#KEY}", because a circular linkage'.
-							' ("trigger prototype template update{#KEY}" -> "trigger prototype template update{#KEY}") would occur.'
-				]
-			],
-			// #1 depends on trigger, host trigger, prototype trigger.
+			// Depends on trigger, host trigger, prototype trigger.
 			[
 				[
 					'host_dependencies' => [
@@ -662,7 +658,7 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 					]
 				]
 			],
-			// #2 dependencies on prototype only.
+			// Dependencies on prototype only.
 			[
 				[
 					'prototype_dependencies' => [
@@ -693,5 +689,50 @@ class testTemplateTriggerDependencies extends testTriggerDependencies {
 		$this->triggerCreateUpdate($data, 'Trigger prototype updated', null, 'Cannot update trigger prototype',
 				'trigger prototype template update{#KEY}'
 		);
+	}
+
+	public static function getDependencyListData() {
+		return [
+			[
+				[
+					'dependant_trigger' => 'Trigger for dependency list test 1',
+					'master_triggers' => [
+						'Trigger for dependency list test 2',
+						'Trigger for dependency list test 3'
+					],
+					'host_master_triggers' => [
+						'First trigger for tag filtering',
+						'Fourth trigger for tag filtering'
+					]
+				]
+			],
+			[
+				[
+					'dependant_trigger' => '1 Template trigger prototype for dependency list{#KEY}',
+					'master_triggers' => [
+						'2 Template trigger prototype for dependency list{#KEY}',
+						'3 Template trigger prototype for dependency list{#KEY}'
+					],
+					'host_master_triggers' => [
+						'First trigger for tag filtering',
+						'Fourth trigger for tag filtering'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Check that trigger doesn't present in its own dependency list and
+	 * that checked master triggers are disabled in list.
+	 *
+	 * @dataProvider getDependencyListData
+	 */
+	public function testTemplateTriggerDependencies_DependencyList($data) {
+		$template_name = 'Template for trigger dependency list';
+		$templateid = self::$templateids[$template_name];
+		$lldid = self::$template_druleids[$template_name.':drule_triggers_dependency'];
+
+		$this->checkDependencyList($data, $template_name, $templateid, $lldid, 'template');
 	}
 }

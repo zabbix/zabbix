@@ -44,6 +44,7 @@ window.trigger_edit_popup = new class {
 		this.recovery_expr_temp = this.form.querySelector('#recovery_expr_temp');
 		this.expression_constructor_active = false;
 		this.recovery_expression_constructor_active = false;
+		this.selected_dependencies = [];
 
 		window.addPopupValues = (data) => {
 			this.addPopupValues(data.values);
@@ -243,7 +244,9 @@ window.trigger_edit_popup = new class {
 			srcfld1: 'triggerid',
 			reference: 'deptrigger',
 			multiselect: 1,
-			with_triggers: 1
+			with_triggers: 1,
+			excludeids: [this.triggerid],
+			disableids: this.selected_dependencies
 		};
 
 		if (button.id === 'add-dep-trigger') {
@@ -265,7 +268,9 @@ window.trigger_edit_popup = new class {
 		let popup_parameters = {
 			srcfld1: 'triggerid',
 			reference: 'deptrigger',
-			multiselect: 1
+			multiselect: 1,
+			excludeids: [this.triggerid],
+			disableids: this.selected_dependencies
 		};
 
 		if (button.id === 'add-dep-trigger') {
@@ -352,6 +357,7 @@ window.trigger_edit_popup = new class {
 		const dependency_element = document.querySelector('#dependency_' + triggerid);
 
 		dependency_element.parentNode.removeChild(dependency_element);
+		this.selected_dependencies = this.selected_dependencies.filter((el) => el !== triggerid);
 	}
 
 	#prepareDependencies(data) {
@@ -379,6 +385,7 @@ window.trigger_edit_popup = new class {
 		const tbody = Object.values(dependencies).map(row => template.evaluate(row)).join('');
 
 		this.form.querySelector('#dependency-table tbody').insertAdjacentHTML('beforeend', tbody);
+		this.selected_dependencies = dependencies.map(({triggerid}) => triggerid);
 	}
 
 	#toggleExpressionConstructor(id) {
