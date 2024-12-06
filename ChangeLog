@@ -129,6 +129,7 @@ New features:
 A.F....... [ZBXNEXT-8690] implemented a new filter in media type list view to display actions based on the scope of their media type usage (Ivo)
 
 Bug fixes:
+.......PS. [ZBX-25497] added support for VMware perfCounter measured in gigaBytes (MVekslers)
 ........S. [ZBX-25686] fixed SQL error in network discovery action processing (wiper)
 .......P.. [ZBX-25664] fixed nested transactions on Zabbix proxy when using hybrid buffer (dgoloscapov)
 A......... [ZBX-25350] prohibited deleting user groups which are used in userdirectory user group mappings (gcalenko)
@@ -3312,6 +3313,7 @@ New features:
 ...G...... [ZBXNEXT-8914] reworked Oracle plugin queries to use variable binding (dgoloscapov, esneiders)
 
 Bug fixes:
+........S. [ZBX-25542] added SQL_ATTR_QUERY_TIMEOUT timeout for ODBC monitoring (sboidenko)
 ..F....... [ZBX-24895] changed double quotes to single quotes for string in SQL statement (rgontarski)
 ...G...... [ZBX-25377] fixed crash when executing vfs.fs.size or other metrics and forked metric is terminated abnormally (vso)
 ...G...... [ZBX-25390] fixed vfs.fs.get item for Digital Audio CD disks on Windows (MVekslers)
