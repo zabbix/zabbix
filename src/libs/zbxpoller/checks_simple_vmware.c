@@ -395,6 +395,9 @@ static int	vmware_service_get_counter_value_by_id(const zbx_vmware_service_t *se
 		case ZBX_VMWARE_UNIT_MEGABYTESPERSECOND:
 			SET_UI64_RESULT(result, perfvalue->value * ZBX_MEBIBYTE);
 			break;
+		case ZBX_VMWARE_UNIT_GIGABYTES:
+			SET_UI64_RESULT(result, perfvalue->value * ZBX_GIBIBYTE);
+			break;
 		case ZBX_VMWARE_UNIT_TERABYTES:
 			SET_UI64_RESULT(result, perfvalue->value * ZBX_TEBIBYTE);
 			break;
