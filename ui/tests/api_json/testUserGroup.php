@@ -80,7 +80,9 @@ class testUserGroup extends CAPITest {
 		// usergroup.delete
 		CTestDataHelper::createObjects([
 			'user_groups' => [
-				['name' => 'user group 2']
+				['name' => 'user group 2'],
+				['name' => 'ldap provision group'],
+				['name' => 'saml provision group']
 			],
 			'users' => [
 				[
@@ -89,6 +91,44 @@ class testUserGroup extends CAPITest {
 					'passwd' => 'zabbix123456',
 					'usrgrps' => [
 						['usrgrpid' => ':user_group:user group 2']
+					]
+				]
+			]
+		]);
+		CDataHelper::call('userdirectory.create', [
+			[
+				'name' => 'ldap provision',
+				'idp_type' => IDP_TYPE_LDAP,
+				'host' => 'provision',
+				'port' => 389,
+				'base_dn' => 'provision',
+				'search_attribute' => 'provision',
+				'provision_status' => JIT_PROVISIONING_ENABLED,
+				'provision_groups' => [
+					[
+						'name' => '*',
+						'roleid' => CTestDataHelper::getConvertedValueReference(':role:api admin role'),
+						'user_groups' => [
+							['usrgrpid' => CTestDataHelper::getConvertedValueReference(':user_group:ldap provision group')]
+						]
+					]
+				]
+			],
+			[
+				'idp_type' => IDP_TYPE_SAML,
+				'idp_entityid' => 'provision',
+				'sso_url' => 'http://127.0.0.1',
+				'username_attribute' => 'provision',
+				'group_name' => 'provision',
+				'sp_entityid' => 'provision',
+				'provision_status' => JIT_PROVISIONING_ENABLED,
+				'provision_groups' => [
+					[
+						'name' => '*',
+						'roleid' => CTestDataHelper::getConvertedValueReference(':role:api admin role'),
+						'user_groups' => [
+							['usrgrpid' => CTestDataHelper::getConvertedValueReference(':user_group:saml provision group')]
+						]
 					]
 				]
 			]
@@ -752,6 +792,16 @@ class testUserGroup extends CAPITest {
 			[
 				'usergroup' => ['22'],
 				'expected_error' => 'User group "API user group in configuration" is used in configuration for database down messages.'
+			],
+			// Check user group used in LDAP userdirectory provision
+			[
+				'usergroup'	=> [':user_group:ldap provision group'],
+				'expected_error' => 'Cannot delete user group "ldap provision group", because it is used by LDAP userdirectory "ldap provision".'
+			],
+			// Check user group used in SAML userdirectory provision
+			[
+				'usergroup'	=> [':user_group:saml provision group'],
+				'expected_error' => 'Cannot delete user group "saml provision group", because it is used by SAML userdirectory.'
 			],
 			// Check successfully delete of user group.
 			[
