@@ -250,7 +250,9 @@ fail:
  ******************************************************************************/
 void	es_push_result_string(duk_context *ctx, char *str, size_t size)
 {
-	zbx_replace_invalid_utf8(str);
+	if (NULL != str)
+		zbx_replace_invalid_utf8(str);
+
 	duk_push_lstring(ctx, str, size);
 }
 
