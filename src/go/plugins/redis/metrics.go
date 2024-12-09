@@ -33,7 +33,9 @@ var (
 	uriDefaults    = &uri.Defaults{Scheme: "tcp", Port: "6379"}
 )
 
-// Common params: [URI|Session][,User][,Password]
+// Common params: [URI|Session][,Password][,User]
+//
+//nolint:gochecknoglobals
 var (
 	paramURI = metric.NewConnParam("URI", "URI to connect or session name.").
 			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).WithSession().
