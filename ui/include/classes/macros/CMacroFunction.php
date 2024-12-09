@@ -183,14 +183,13 @@ class CMacroFunction {
 				}
 
 				$replacement = static function (array $matches) use ($replacement) {
-					$result = $replacement;
+					$repl = [];
 
 					for ($i = 0; $i <= 9; $i++) {
-						$repl = $result === '\\'.$i && $result !== $replacement ? $result : '';
-						$result = str_replace('\\'.$i, array_key_exists($i, $matches) ? $matches[$i] : $repl, $result);
+						$repl['\\'.$i] = array_key_exists($i, $matches) ? $matches[$i] : '';
 					}
 
-					return $result;
+					return strtr($replacement, $repl);
 				};
 
 				$value = preg_replace_callback($pattern, $replacement, $value);

@@ -474,5 +474,13 @@
             "parameters": ["[a-z]", "\\10"]
         },
         "result": "000 TEST"
+    },
+    {
+        "value": "TEST 012345",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["([^a-z])", "\\\\\\1;"]
+        },
+        "result": "\\T;\\E;\\S;\\T;\\ ;\\0;\\1;\\2;\\3;\\4;\\5;"
     }
 ]
