@@ -173,6 +173,8 @@ class CUser extends CApiService {
 				$options['filter']['refresh'] = getTimeUnitFilters($options['filter']['refresh']);
 			}
 
+			$filter_within_own_user = false;
+
 			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 				$private_fields_filter = array_diff_key($options['filter'], $limited_output_fields);
 
@@ -188,12 +190,16 @@ class CUser extends CApiService {
 						}
 					}
 					else {
-						$sqlParts['where']['userid'] = 'u.userid='.self::$userData['userid'];
+						$filter_within_own_user = true;
 					}
 				}
 			}
 
 			$this->dbFilter('users u', $options, $sqlParts);
+
+			if ($filter_within_own_user && array_key_exists('filter', $sqlParts['where'])) {
+				$sqlParts['where']['userid'] = 'u.userid='.self::$userData['userid'];
+			}
 		}
 
 		// search
@@ -201,6 +207,8 @@ class CUser extends CApiService {
 			if (isset($options['search']['passwd'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to search by user password.'));
 			}
+
+			$search_within_own_user = false;
 
 			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 				$private_fields_search = array_diff_key($options['search'], $limited_output_fields);
@@ -217,12 +225,16 @@ class CUser extends CApiService {
 						}
 					}
 					else {
-						$sqlParts['where']['userid'] = 'u.userid='.self::$userData['userid'];
+						$search_within_own_user = true;
 					}
 				}
 			}
 
 			zbx_db_search('users u', $options, $sqlParts);
+
+			if ($search_within_own_user && array_key_exists('filter', $sqlParts['where'])) {
+				$sqlParts['where']['userid'] = 'u.userid='.self::$userData['userid'];
+			}
 		}
 
 		// limit
