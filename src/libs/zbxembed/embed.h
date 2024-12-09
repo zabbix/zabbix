@@ -54,5 +54,6 @@ struct zbx_es_env
 zbx_es_env_t	*zbx_es_get_env(duk_context *ctx);
 
 int	es_duktape_string_decode(const char *duk_str, char **out_str);
+void	es_push_result_string(duk_context *ctx, char *str, size_t size);
 
 #endif /* ZABBIX_EMBED_H */
