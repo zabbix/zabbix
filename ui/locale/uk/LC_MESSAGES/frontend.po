@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-10-12 06:04+0000\n"
-"Last-Translator: Yurii Denys <yurii.denys@meest.com>\n"
+"PO-Revision-Date: 2024-12-09 16:58+0000\n"
+"Last-Translator: Maksym <maxim@ua.fm>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
@@ -703,11 +703,10 @@ msgid "Action class %1$s must extend %2$s class."
 msgstr "Клас дії %1$s повинен розширювати клас %2$s."
 
 #: app/controllers/CControllerActionDelete.php:79
-#, fuzzy
 msgid "Action deleted"
 msgid_plural "Actions deleted"
 msgstr[0] "Дію видалено"
-msgstr[1] "Дію видалено"
+msgstr[1] "Дії видалено"
 msgstr[2] "Дію видалено"
 
 #: app/controllers/CControllerActionDisable.php:84
@@ -981,7 +980,7 @@ msgstr "Додати новий віджет"
 
 #: widgets/navtree/Widget.php:34
 msgid "Add child element"
-msgstr ""
+msgstr "Додати підлеглий елемент"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
@@ -1020,7 +1019,7 @@ msgstr "Додати тригер вузла мережі"
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
-msgstr ""
+msgstr "Додати елемент"
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1136,7 +1135,7 @@ msgstr "Адреса"
 #: app/controllers/CControllerProxyUpdate.php:75
 #: app/views/popup.proxy.edit.php:90
 msgid "Address for active agents"
-msgstr ""
+msgstr "Адреса для активних агентів"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -1168,7 +1167,7 @@ msgstr "Розширені опції"
 #: include/views/configuration.host.discovery.list.php:157
 #: include/views/configuration.host.discovery.list.php:172
 msgid "After"
-msgstr ""
+msgstr "Після"
 
 #: app/views/js/mfa.edit.js.php:168
 msgid "After this change, users who have already enrolled in this MFA method will have to complete the enrollment process again because TOTP secrets will be reset."
@@ -1195,11 +1194,11 @@ msgstr "Агент"
 
 #: widgets/hostavail/views/widget.view.php:82
 msgid "Agent (active)"
-msgstr ""
+msgstr "Агент (активний)"
 
 #: widgets/hostavail/views/widget.view.php:83
 msgid "Agent (passive)"
-msgstr ""
+msgstr "Агент (пасивний)"
 
 #: include/classes/data/CItemData.php:911
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
@@ -1308,6 +1307,11 @@ msgstr "Вирівняти елементи карти"
 #: widgets/problems/includes/WidgetForm.php:131
 msgid "All"
 msgstr "Все"
+
+#: app/views/mediatype.list.php:79 app/views/mediatype.list.php:81
+#: app/views/mediatype.list.php:90 app/views/popup.operation.edit.php:160
+msgid "All available"
+msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:189
 msgid "All dashboards"
@@ -1509,11 +1513,11 @@ msgstr "Містить будь-який рядок символів"
 
 #: app/views/js/popup.import.js.php:109
 msgid "Any existing host entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "Усі наявні вузли, яких немає у файлі імпорту, буде видалено. Натисніть OK, щоб продовжити."
 
 #: app/views/js/popup.import.js.php:106
 msgid "Any existing template entities not present in the import file will be deleted. Click OK to proceed."
-msgstr ""
+msgstr "Усі наявні шаблони, яких немає у файлі імпорту, буде видалено. Натисніть OK, щоб продовжити."
 
 #: include/classes/core/CJsonRpc.php:225
 msgid "Application error."
@@ -1611,7 +1615,7 @@ msgstr "Етикетка власника"
 
 #: app/partials/configuration.host.edit.html.php:331
 msgid "Assigned proxy"
-msgstr ""
+msgstr "Призначений проксі"
 
 #: include/classes/helpers/CMaintenanceHelper.php:86
 #, c-format
@@ -1625,9 +1629,9 @@ msgstr[2] ""
 #, c-format
 msgid "At %1$s every %2$s day"
 msgid_plural "At %1$s every %2$s days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Об %1$s кожен %2$s день"
+msgstr[1] "Об %1$s кожні %2$s дні"
+msgstr[2] "Об %1$s кожні %2$s дні"
 
 #: include/classes/helpers/CMaintenanceHelper.php:114
 #, c-format
@@ -1649,7 +1653,7 @@ msgstr "Принаймні один LDAP сервер має існувати."
 
 #: include/classes/api/services/CAuthentication.php:234
 msgid "At least one MFA method must exist."
-msgstr ""
+msgstr "Має існувати принаймні один метод MFA."
 
 #: app/views/administration.userrole.edit.php:137
 msgid "At least one UI element must be checked."
@@ -1701,7 +1705,7 @@ msgstr "Принаймні один параметр \"%1$s\" або \"%2$s\" м
 
 #: widgets/gauge/views/widget.edit.php:50
 msgid "At least one parameter must be enabled."
-msgstr ""
+msgstr "Принаймні один параметр має бути увімкнений."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
@@ -1930,7 +1934,7 @@ msgstr "Уникайте паролів, які легко вгадати"
 
 #: jsLoader.php:172
 msgid "Awaiting data"
-msgstr ""
+msgstr "Очікуються дані"
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -2128,7 +2132,7 @@ msgstr "Перемістити на самий перед"
 #: app/views/administration.timeouts.edit.php:130
 #: app/views/popup.proxy.edit.php:342 include/items.inc.php:99
 msgid "Browser"
-msgstr ""
+msgstr "Браузер"
 
 #: include/locales.inc.php:35
 msgid "Bulgarian (bg_BG)"
@@ -2197,15 +2201,15 @@ msgstr "CRLF"
 
 #: tests/selenium/modules/module_number_7/Module.php:17
 msgid "CSRF test"
-msgstr ""
+msgstr "CSRF тест"
 
 #: tests/selenium/modules/module_number_7/views/csrf.form.view.php:25
 msgid "CSRF token test"
-msgstr ""
+msgstr "Тест CSRF токена"
 
 #: tests/selenium/modules/module_number_7/actions/CsrfFormUpdate.php:35
 msgid "CSRF token validation succeeded."
-msgstr ""
+msgstr "Перевірка токену CSRF пройшла успішно."
 
 #: include/items.inc.php:1554
 msgid "CSV to JSON"
@@ -2380,7 +2384,7 @@ msgstr "Не вдалося додати проксі"
 #: app/controllers/CControllerProxyGroupCreate.php:42
 #: app/controllers/CControllerProxyGroupCreate.php:74
 msgid "Cannot add proxy group"
-msgstr ""
+msgstr "Неможливо додати групу проксі"
 
 #: app/controllers/CControllerRegExCreate.php:41
 #: app/controllers/CControllerRegExCreate.php:72
@@ -2479,7 +2483,7 @@ msgstr "Неможливо змінити тип користувача влас
 
 #: httpconf.php:190 httpconf.php:406 items.php:687 items.php:723
 msgid "Cannot clear history and trends"
-msgstr ""
+msgstr "Неможливо очистити історію та тренди"
 
 #: include/classes/api/services/CDiscoveryRule.php:3834
 msgid "Cannot clone graph prototypes."
@@ -2678,12 +2682,11 @@ msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Не вдалося видалити внутрішнього користувача Zabbix \"%1$s\", спробуйте відключити цього користувача."
 
 #: app/controllers/CControllerActionDelete.php:87
-#, fuzzy
 msgid "Cannot delete action"
 msgid_plural "Cannot delete actions"
 msgstr[0] "Не вдалося видалити дію"
-msgstr[1] "Не вдалося видалити дію"
-msgstr[2] "Не вдалося видалити дію"
+msgstr[1] "Не вдалося видалити дії"
+msgstr[2] "Не вдалося видалити дії"
 
 #: include/classes/api/services/CRole.php:368
 #, c-format
@@ -2746,12 +2749,11 @@ msgstr[1] "Не вдалося видалити прототип графіка"
 msgstr[2] "Не вдалося видалити прототип графіка"
 
 #: app/controllers/CControllerHostMassDelete.php:76
-#, fuzzy
 msgid "Cannot delete host"
 msgid_plural "Cannot delete hosts"
-msgstr[0] "Не вдалося видалити вузел мережі"
-msgstr[1] "Не вдалося видалити вузел мережі"
-msgstr[2] "Не вдалося видалити вузел мережі"
+msgstr[0] "Не вдалося видалити вузол мережі"
+msgstr[1] "Не вдалося видалити вузли мережі"
+msgstr[2] "Не вдалося видалити вузли мережі"
 
 #: include/classes/api/services/CHost.php:1461
 #, c-format
@@ -2810,20 +2812,18 @@ msgid "Cannot delete inventory."
 msgstr "Не вдалося видалити інвентарні дані."
 
 #: items.php:524 items.php:736
-#, fuzzy
 msgid "Cannot delete item"
 msgid_plural "Cannot delete items"
 msgstr[0] "Не вдалося видалити елемент даних"
-msgstr[1] "Не вдалося видалити елемент даних"
-msgstr[2] "Не вдалося видалити елемент даних"
+msgstr[1] "Не вдалося видалити елементи даних"
+msgstr[2] "Не вдалося видалити елементи даних"
 
 #: disc_prototypes.php:302 disc_prototypes.php:500
-#, fuzzy
 msgid "Cannot delete item prototype"
 msgid_plural "Cannot delete item prototypes"
-msgstr[0] "Не вдалося видалити прототип елементів даних"
-msgstr[1] "Не вдалося видалити прототип елементів даних"
-msgstr[2] "Не вдалося видалити прототип елементів даних"
+msgstr[0] "Не вдалося видалити прототип елементу даних"
+msgstr[1] "Не вдалося видалити прототипи елементу даних"
+msgstr[2] "Не вдалося видалити прототипи елементу даних"
 
 #: app/controllers/CControllerMaintenanceDelete.php:71
 msgid "Cannot delete maintenance period"
@@ -2848,12 +2848,11 @@ msgstr[1] "Неможливо видалити модулі: %1$s."
 msgstr[2] "Неможливо видалити модулі: %1$s."
 
 #: sysmaps.php:266
-#, fuzzy
 msgid "Cannot delete network map"
 msgid_plural "Cannot delete network maps"
 msgstr[0] "Не вдалося видалити карту мережі"
-msgstr[1] "Не вдалося видалити карту мережі"
-msgstr[2] "Не вдалося видалити карту мережі"
+msgstr[1] "Не вдалося видалити карти мереж"
+msgstr[2] "Не вдалося видалити карти мереж"
 
 #: app/controllers/CControllerProxyDelete.php:39
 msgid "Cannot delete proxies"
@@ -2993,6 +2992,16 @@ msgid_plural "Cannot delete user groups"
 msgstr[0] "Не вдалося видалити групу користувачів"
 msgstr[1] "Не вдалося видалити групи користувачів"
 msgstr[2] "Не вдалося видалити групи користувачів"
+
+#: include/classes/api/services/CUserGroup.php:1340
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CUserGroup.php:1335
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
+msgstr ""
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
@@ -7332,6 +7341,10 @@ msgstr "Відображення"
 msgid "Display OK triggers for"
 msgstr "Відображати тригери ОК протягом"
 
+#: app/views/mediatype.list.php:75
+msgid "Display actions"
+msgstr ""
+
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
 msgstr "Показати графік"
@@ -8664,6 +8677,10 @@ msgstr "Заповнений регіон"
 #: include/views/monitoring.sysmap.list.php:60 report2.php:506
 msgid "Filter"
 msgstr "Фільтр"
+
+#: app/views/mediatype.list.php:76
+msgid "Filter actions by the scope of media type usage:"
+msgstr ""
 
 #: app/views/js/popup.tabfilter.edit.js.php:63
 msgid "Filter deleted"
@@ -13436,6 +13453,11 @@ msgstr ""
 #, c-format
 msgid "Media type \"%1$s\" already exists."
 msgstr "Метод повідомлень \"%1$s\" вже існує."
+
+#: include/classes/api/services/CMediatype.php:927
+#, c-format
+msgid "Media type \"%1$s\" is used by action \"%2$s\"."
+msgstr ""
 
 #: app/controllers/CControllerMediatypeCreate.php:187
 msgid "Media type added"
@@ -18656,6 +18678,10 @@ msgstr "Надіслати"
 msgid "Send to back"
 msgstr "Перемістити на самий зад"
 
+#: app/views/popup.operation.edit.php:189
+msgid "Send to media type"
+msgstr ""
+
 #: app/views/popup.operation.edit.php:108
 msgid "Send to user groups"
 msgstr ""
@@ -19411,6 +19437,10 @@ msgstr ""
 #: include/locales.inc.php:62
 msgid "Spanish (es_ES)"
 msgstr "Іспанська (es_ES)"
+
+#: app/views/mediatype.list.php:83 app/views/mediatype.list.php:91
+msgid "Specific"
+msgstr ""
 
 #: include/classes/helpers/CRoleHelper.php:199
 msgid "Specified role was not found."
@@ -24728,6 +24758,18 @@ msgstr ""
 #: include/classes/api/services/CTask.php:562
 #, c-format
 msgid "discovery rule \"%1$s\" on host \"%2$s\" is not monitored"
+msgstr ""
+
+#: app/views/mediatype.list.php:78
+msgid "display all actions"
+msgstr ""
+
+#: app/views/mediatype.list.php:80
+msgid "display only actions where All available media types are used in action operation"
+msgstr ""
+
+#: app/views/mediatype.list.php:84
+msgid "display only actions where specific media type is used in action operation"
 msgstr ""
 
 #: app/views/popup.lldoperation.php:65 include/actions.inc.php:27

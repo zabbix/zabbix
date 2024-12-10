@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-10-14 08:38+0000\n"
-"Last-Translator: Grzegorz Deja <deg@best.pl>\n"
+"PO-Revision-Date: 2024-12-10 12:18+0000\n"
+"Last-Translator: sergejs.olonkins <sergejs.olonkins@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -980,7 +980,7 @@ msgstr "Dodaj nowy widżet"
 
 #: widgets/navtree/Widget.php:34
 msgid "Add child element"
-msgstr ""
+msgstr "Dodaj element potomny"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
@@ -1019,7 +1019,7 @@ msgstr "Dodaj wyzwalacz hosta"
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:260
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:263
 msgid "Add item"
-msgstr ""
+msgstr "Dodaj pozycję"
 
 #: app/partials/massupdate.macros.tab.php:96
 #: app/partials/massupdate.valuemaps.tab.php:38
@@ -1307,6 +1307,11 @@ msgstr "Dopasuj elementy map"
 #: widgets/problems/includes/WidgetForm.php:131
 msgid "All"
 msgstr "Wszystkie"
+
+#: app/views/mediatype.list.php:79 app/views/mediatype.list.php:81
+#: app/views/mediatype.list.php:90 app/views/popup.operation.edit.php:160
+msgid "All available"
+msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:189
 msgid "All dashboards"
@@ -1929,7 +1934,7 @@ msgstr "Unikaj haseł, które są łatwe do odgadnięcia"
 
 #: jsLoader.php:172
 msgid "Awaiting data"
-msgstr ""
+msgstr "Oczekiwanie na dane"
 
 #: widgets/svggraph/views/widget.edit.php:51
 msgid "Axes"
@@ -2091,11 +2096,11 @@ msgstr "Szerokość pogrubienia"
 
 #: include/classes/api/services/CHost.php:1445
 msgid "Both \"tls_connect\" and \"tls_accept\" fields must be specified when changing settings of connection encryption."
-msgstr ""
+msgstr "Oba pola \"tls_connect\" i \"tls_accept\" muszą być określone podczas zmiany ustawień szyfrowania połączenia."
 
 #: include/classes/api/services/CHost.php:1452
 msgid "Both \"tls_psk_identity\" and \"tls_psk\" fields must be specified when changing the PSK for connection encryption."
-msgstr ""
+msgstr "Oba pola \"tls_psk_identity\" i \"tls_psk\" muszą być określone podczas zmiany klucza PSK do szyfrowania połączenia."
 
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
@@ -2983,6 +2988,16 @@ msgstr[0] "Nie można usunąć grupy użytkowników"
 msgstr[1] "Nie można usunąć grup użytkowników"
 msgstr[2] "Nie można usunąć grup użytkowników"
 
+#: include/classes/api/services/CUserGroup.php:1340
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CUserGroup.php:1335
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
+msgstr ""
+
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by provisioned user \"%2$s\"."
@@ -3470,12 +3485,12 @@ msgstr "Nie można odziedziczyć reguły LLD z kluczem „%1$s” szablonu „%2
 #: include/classes/api/services/CItemGeneral.php:684
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on host \"%4$s\"."
-msgstr ""
+msgstr "Nie można dziedziczyć reguł LLD z kluczem \"%1$s” szablonów \"%2$s” i \"%3$s”, ponieważ klucz musi być unikalny na hoście \"%4$s”."
 
 #: include/classes/api/services/CItemGeneral.php:685
 #, c-format
 msgid "Cannot inherit LLD rules with key \"%1$s\" of both \"%2$s\" and \"%3$s\" templates, because the key must be unique on template \"%4$s\"."
-msgstr ""
+msgstr "Nie można dziedziczyć reguł LLD z kluczem \"%1$s” szablonów \"%2$s” i \"%3$s”, ponieważ klucz musi być unikalny na hoście \"%4$s”."
 
 #: include/classes/api/services/CItemPrototype.php:1220
 #, c-format
@@ -5558,7 +5573,7 @@ msgstr "Utwórz nowy"
 
 #: jsLoader.php:372
 msgid "Create new report"
-msgstr ""
+msgstr "Utwórz nowy raport"
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -7316,6 +7331,10 @@ msgstr "Wyświetl"
 msgid "Display OK triggers for"
 msgstr "Wyświetlanie wyzwalaczy w stanie OK przez"
 
+#: app/views/mediatype.list.php:75
+msgid "Display actions"
+msgstr ""
+
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
 msgstr "Wyświetl wykres"
@@ -8649,6 +8668,10 @@ msgstr "Obszar wypełniony"
 msgid "Filter"
 msgstr "Filtr"
 
+#: app/views/mediatype.list.php:76
+msgid "Filter actions by the scope of media type usage:"
+msgstr ""
+
 #: app/views/js/popup.tabfilter.edit.js.php:63
 msgid "Filter deleted"
 msgstr "Usunięto filtr"
@@ -9702,7 +9725,7 @@ msgstr "Elementy grupy hostów"
 
 #: jsLoader.php:292
 msgid "Host group is not selected."
-msgstr ""
+msgstr "Grupa hostów nie została wybrana."
 
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
@@ -9785,7 +9808,7 @@ msgstr "Przegląd inwentarza hosta"
 
 #: jsLoader.php:289
 msgid "Host is not selected."
-msgstr ""
+msgstr "Host nie został wybrany."
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -13130,7 +13153,7 @@ msgstr "Typ elementu etykiety mapy"
 
 #: jsLoader.php:290
 msgid "Map is not selected."
-msgstr ""
+msgstr "Mapa nie została wybrana."
 
 #: sysmap.php:128
 msgid "Map is updated! Return to map list?"
@@ -13413,6 +13436,11 @@ msgstr "Typ mediów"
 msgid "Media type \"%1$s\" already exists."
 msgstr "Typ mediów \"%1$s\" już istnieje."
 
+#: include/classes/api/services/CMediatype.php:927
+#, c-format
+msgid "Media type \"%1$s\" is used by action \"%2$s\"."
+msgstr ""
+
 #: app/controllers/CControllerMediatypeCreate.php:187
 msgid "Media type added"
 msgstr "Dodano typ mediów"
@@ -13543,7 +13571,7 @@ msgstr "Ścieżka menu"
 
 #: widgets/piechart/includes/WidgetForm.php:149
 msgid "Merge sectors smaller than"
-msgstr ""
+msgstr "Połącz sektory mniejsze niż"
 
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
@@ -15402,13 +15430,13 @@ msgstr "Dostępne proxy"
 #: include/classes/api/services/CUser.php:889
 #, c-format
 msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "Tylko użytkownicy z uprawnieniami Admin lub Super Admin mogą edytować parametr \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:812
 #: include/classes/api/services/CUser.php:853
 #, c-format
 msgid "Only Super admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "Tylko użytkownicy z uprawnieniami Super Admin mogą edytować parametr \"%1$s\"."
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -18631,6 +18659,10 @@ msgstr "Wyślij do"
 msgid "Send to back"
 msgstr "Wyślij do tyłu"
 
+#: app/views/popup.operation.edit.php:189
+msgid "Send to media type"
+msgstr ""
+
 #: app/views/popup.operation.edit.php:108
 msgid "Send to user groups"
 msgstr "Wyślij do grup użytkowników"
@@ -19386,6 +19418,10 @@ msgstr "Przestrzeń pomiędzy sektorami"
 msgid "Spanish (es_ES)"
 msgstr "Hiszpański (es_ES)"
 
+#: app/views/mediatype.list.php:83 app/views/mediatype.list.php:91
+msgid "Specific"
+msgstr ""
+
 #: include/classes/helpers/CRoleHelper.php:199
 msgid "Specified role was not found."
 msgstr "Określona rola nie została znaleziona."
@@ -19715,7 +19751,7 @@ msgstr "Funkcje łańcuchów znaków"
 
 #: widgets/piechart/includes/WidgetForm.php:137
 msgid "Stroke width"
-msgstr ""
+msgstr "Grubość obramowania"
 
 #: include/items.inc.php:1545 include/items.inc.php:1549
 #: include/items.inc.php:1553 include/items.inc.php:1557
@@ -20420,7 +20456,7 @@ msgstr "Sklonowany szablon zawiera zdefiniowane makra użytkownika o typie \"Sec
 
 #: include/classes/api/services/CHost.php:1433
 msgid "The field \"monitored_by\" must be specified when changing proxy or proxy group for host monitoring."
-msgstr ""
+msgstr "Pole \"monitored_by” musi zostać określone przy zmianie serwera proxy lub grupy serwerów proxy na potrzeby monitorowania hosta."
 
 #: app/views/administration.geomaps.edit.php:36
 msgid "The following placeholders are supported:"
@@ -20542,9 +20578,9 @@ msgstr "Parametry zostaną przekazane do skryptu jako argumenty wiersza poleceń
 #, c-format
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
 msgid_plural "This check cannot be removed, as it is used as a condition in %1$s discovery actions."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Podane sprawdzenie nie może zostać usunięte, ponieważ jest używane jako warunek w akcji wykrywania %1$s."
+msgstr[1] "Tego sprawdzenia nie można usunąć, ponieważ jest ono używane jako warunek w akcjach wykrywania %1$s."
+msgstr[2] "Tego sprawdzenia nie można usunąć, ponieważ jest ono używane jako warunek w akcjach wykrywania %1$s."
 
 #: include/func.inc.php:2566
 msgid "This day last week"
@@ -21112,7 +21148,7 @@ msgstr "Wyzwalacz w szablonie \"%1$s\" jest zależny od wyzwalacza w szablonie \
 
 #: jsLoader.php:291
 msgid "Trigger is not selected."
-msgstr ""
+msgstr "Wyzwalacz nie jest wybrany."
 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
@@ -22170,7 +22206,7 @@ msgstr "Użytkownik nie może dodać samego siebie do wyłączonej grupy lub do 
 #: include/classes/api/services/CUserGroup.php:673
 #: include/classes/api/services/CUser.php:843
 msgid "User cannot add oneself to a disabled group or a group with disabled GUI access."
-msgstr ""
+msgstr "Użytkownik nie może dodać samego siebie do wyłączonej grupy lub do grupy z wyłączonym dostępem do graficznego interfejsu użytkownika."
 
 #: app/views/administration.user.edit.php:461
 #: include/classes/api/services/CUser.php:980
@@ -22313,7 +22349,7 @@ msgstr "Użytkownik nie może siebie usunąć."
 
 #: include/classes/api/services/CUser.php:1837
 msgid "User is not allowed to delete oneself."
-msgstr ""
+msgstr "Użytkownik nie może usunąc samego siebie."
 
 #: app/views/administration.authentication.edit.php:462
 #: app/views/popup.ldap.edit.php:222
@@ -23186,7 +23222,7 @@ msgstr "Podgląd jako"
 
 #: jsLoader.php:417
 msgid "View related reports"
-msgstr ""
+msgstr "Zobacz powiązane raporty"
 
 #: include/classes/data/CItemData.php:1735
 msgid "Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -23402,7 +23438,7 @@ msgstr "Widżet jest za mały dla okreśłonej liczby kolumn i wierszy."
 
 #: jsLoader.php:205
 msgid "Widgets"
-msgstr ""
+msgstr "Widżety"
 
 #: graphs.php:39 include/views/configuration.graph.edit.php:100
 #: include/views/configuration.graph.list.php:170
@@ -23778,7 +23814,7 @@ msgstr "Należy się zalogować, aby zobaczyć tą stronę."
 
 #: jsLoader.php:287
 msgid "You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section."
-msgstr ""
+msgstr "Aby utworzyć element mapy, musisz mieć przesłany co najmniej jeden obraz. Obrazy można przesyłać w sekcji Administracja->Ogólne->Obrazy."
 
 #: include/classes/db/DB.php:133
 msgid "Your database is not working properly. Please wait a few minutes and try to repeat this action. If the problem still persists, please contact system administrator. The problem might be caused by long running transaction or row level lock accomplished by your database management system."
@@ -24176,7 +24212,7 @@ msgstr "i"
 #: include/classes/api/helpers/CApiPskHelper.php:160
 #: include/classes/api/helpers/CApiPskHelper.php:176
 msgid "another tls_psk value is already associated with given tls_psk_identity"
-msgstr ""
+msgstr "Inna wartość tls_psk jest juz powiązana z danym tls_psk_identity"
 
 #: include/forms.inc.php:1450 include/views/js/item.preprocessing.js.php:237
 msgid "any error"
@@ -24700,6 +24736,18 @@ msgstr "folder nie może być pusty"
 #, c-format
 msgid "discovery rule \"%1$s\" on host \"%2$s\" is not monitored"
 msgstr "reguła wykrywania \"%1$s\" nie jest monitorowana na hoście \"%2$s\""
+
+#: app/views/mediatype.list.php:78
+msgid "display all actions"
+msgstr ""
+
+#: app/views/mediatype.list.php:80
+msgid "display only actions where All available media types are used in action operation"
+msgstr ""
+
+#: app/views/mediatype.list.php:84
+msgid "display only actions where specific media type is used in action operation"
+msgstr ""
 
 #: app/views/popup.lldoperation.php:65 include/actions.inc.php:27
 #: include/classes/helpers/CCorrelationHelper.php:37
@@ -25800,7 +25848,7 @@ msgstr "right() - Zwraca określoną liczę znaków z prawej strony ciągu"
 
 #: widgets/navtree/Widget.php:41
 msgid "root"
-msgstr ""
+msgstr "root"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"

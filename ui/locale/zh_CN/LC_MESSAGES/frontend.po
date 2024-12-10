@@ -1265,6 +1265,11 @@ msgstr "对齐拓扑元素"
 msgid "All"
 msgstr "所有"
 
+#: app/views/mediatype.list.php:79 app/views/mediatype.list.php:81
+#: app/views/mediatype.list.php:90 app/views/popup.operation.edit.php:160
+msgid "All available"
+msgstr ""
+
 #: app/views/monitoring.dashboard.view.php:189
 msgid "All dashboards"
 msgstr "仪表盘"
@@ -2863,6 +2868,16 @@ msgstr "无法删除默认用户目录 %1$s"
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
 msgstr[0] "无法删除用户组"
+
+#: include/classes/api/services/CUserGroup.php:1340
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CUserGroup.php:1335
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
+msgstr ""
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
@@ -7093,6 +7108,10 @@ msgstr "显示"
 msgid "Display OK triggers for"
 msgstr "显示OK触发器予"
 
+#: app/views/mediatype.list.php:75
+msgid "Display actions"
+msgstr ""
+
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
 msgstr "显示图表"
@@ -8417,6 +8436,10 @@ msgstr "填满区域"
 #: include/views/monitoring.sysmap.list.php:60 report2.php:506
 msgid "Filter"
 msgstr "条件检索"
+
+#: app/views/mediatype.list.php:76
+msgid "Filter actions by the scope of media type usage:"
+msgstr ""
 
 #: app/views/js/popup.tabfilter.edit.js.php:63
 msgid "Filter deleted"
@@ -13125,6 +13148,11 @@ msgstr "报警媒介类型"
 #, c-format
 msgid "Media type \"%1$s\" already exists."
 msgstr "媒体类型 \"%1$s\" 已经存在。"
+
+#: include/classes/api/services/CMediatype.php:927
+#, c-format
+msgid "Media type \"%1$s\" is used by action \"%2$s\"."
+msgstr ""
 
 #: app/controllers/CControllerMediatypeCreate.php:187
 msgid "Media type added"
@@ -18304,6 +18332,10 @@ msgstr "收件人"
 msgid "Send to back"
 msgstr "发回"
 
+#: app/views/popup.operation.edit.php:189
+msgid "Send to media type"
+msgstr ""
+
 #: app/views/popup.operation.edit.php:108
 msgid "Send to user groups"
 msgstr "发送给用户组"
@@ -19056,6 +19088,10 @@ msgstr "扇区的间隙"
 #: include/locales.inc.php:62
 msgid "Spanish (es_ES)"
 msgstr "西班牙语 (es_ES)"
+
+#: app/views/mediatype.list.php:83 app/views/mediatype.list.php:91
+msgid "Specific"
+msgstr ""
 
 #: include/classes/helpers/CRoleHelper.php:199
 msgid "Specified role was not found."
@@ -24327,6 +24363,18 @@ msgstr "目录不能为空"
 #, c-format
 msgid "discovery rule \"%1$s\" on host \"%2$s\" is not monitored"
 msgstr "主机“%2$s”上的自动发现规则“%1$s”不受监控"
+
+#: app/views/mediatype.list.php:78
+msgid "display all actions"
+msgstr ""
+
+#: app/views/mediatype.list.php:80
+msgid "display only actions where All available media types are used in action operation"
+msgstr ""
+
+#: app/views/mediatype.list.php:84
+msgid "display only actions where specific media type is used in action operation"
+msgstr ""
 
 #: app/views/popup.lldoperation.php:65 include/actions.inc.php:27
 #: include/classes/helpers/CCorrelationHelper.php:37

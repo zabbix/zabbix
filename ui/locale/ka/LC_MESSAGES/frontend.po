@@ -1261,6 +1261,11 @@ msgstr "რუკის ელემენტების სწორება"
 msgid "All"
 msgstr "ყველა"
 
+#: app/views/mediatype.list.php:79 app/views/mediatype.list.php:81
+#: app/views/mediatype.list.php:90 app/views/popup.operation.edit.php:160
+msgid "All available"
+msgstr ""
+
 #: app/views/monitoring.dashboard.view.php:189
 msgid "All dashboards"
 msgstr "ყველა სამუშაო დაფა"
@@ -2859,6 +2864,16 @@ msgstr ""
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
 msgstr[0] "მომხმარებლის ჯგუფის წაშლა შეუძლებელია"
+
+#: include/classes/api/services/CUserGroup.php:1340
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CUserGroup.php:1335
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
+msgstr ""
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
@@ -7078,6 +7093,10 @@ msgstr "ჩვენება"
 msgid "Display OK triggers for"
 msgstr "OK ტრიგერების ჩვენების დროა"
 
+#: app/views/mediatype.list.php:75
+msgid "Display actions"
+msgstr ""
+
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
 msgstr "გრაფიკის ჩვენება"
@@ -8402,6 +8421,10 @@ msgstr "შევსებული რეგიონი"
 #: include/views/monitoring.sysmap.list.php:60 report2.php:506
 msgid "Filter"
 msgstr "ფილტრი"
+
+#: app/views/mediatype.list.php:76
+msgid "Filter actions by the scope of media type usage:"
+msgstr ""
 
 #: app/views/js/popup.tabfilter.edit.js.php:63
 msgid "Filter deleted"
@@ -13109,6 +13132,11 @@ msgstr "მედიის ტიპი"
 #: include/classes/api/services/CMediatype.php:423
 #, c-format
 msgid "Media type \"%1$s\" already exists."
+msgstr ""
+
+#: include/classes/api/services/CMediatype.php:927
+#, c-format
+msgid "Media type \"%1$s\" is used by action \"%2$s\"."
 msgstr ""
 
 #: app/controllers/CControllerMediatypeCreate.php:187
@@ -18289,6 +18317,10 @@ msgstr ""
 msgid "Send to back"
 msgstr ""
 
+#: app/views/popup.operation.edit.php:189
+msgid "Send to media type"
+msgstr ""
+
 #: app/views/popup.operation.edit.php:108
 msgid "Send to user groups"
 msgstr ""
@@ -19041,6 +19073,10 @@ msgstr ""
 #: include/locales.inc.php:62
 msgid "Spanish (es_ES)"
 msgstr "ესპანური (es_ES)"
+
+#: app/views/mediatype.list.php:83 app/views/mediatype.list.php:91
+msgid "Specific"
+msgstr ""
 
 #: include/classes/helpers/CRoleHelper.php:199
 msgid "Specified role was not found."
@@ -24308,6 +24344,18 @@ msgstr "საქაღალდე, ცარიელი, არ შეიძ�
 #: include/classes/api/services/CTask.php:562
 #, c-format
 msgid "discovery rule \"%1$s\" on host \"%2$s\" is not monitored"
+msgstr ""
+
+#: app/views/mediatype.list.php:78
+msgid "display all actions"
+msgstr ""
+
+#: app/views/mediatype.list.php:80
+msgid "display only actions where All available media types are used in action operation"
+msgstr ""
+
+#: app/views/mediatype.list.php:84
+msgid "display only actions where specific media type is used in action operation"
 msgstr ""
 
 #: app/views/popup.lldoperation.php:65 include/actions.inc.php:27
