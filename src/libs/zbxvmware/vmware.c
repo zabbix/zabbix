@@ -134,7 +134,7 @@ int	vmware_shared_is_ready(void)
  * Purpose: getting size of shared memory available for events of VC instance *
  *                                                                            *
  ******************************************************************************/
-float	vmware_shared_evtpart_size(int num)
+float	vmware_shared_evtpart_size(const int num)
 {
 #	define	DEFAULT_FACTOR(n)	((float)1/n)
 	int	i, total = 0, vc_active = 0;
@@ -171,8 +171,7 @@ float	vmware_shared_evtpart_size(int num)
 
 		if (factor < MIN_FACTOR)
 			factor = MIN_FACTOR;
-
-		if (factor > (1 - MIN_FACTOR * (vc_active - 1)))
+		else if (factor > (1 - MIN_FACTOR * (vc_active - 1)))
 			factor = 1 - MIN_FACTOR * (vc_active - 1);
 
 		return factor;

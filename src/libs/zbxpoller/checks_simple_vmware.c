@@ -1062,6 +1062,9 @@ static void	vmware_get_events(const zbx_vector_vmware_event_ptr_t *events,
 		const zbx_vmware_eventlog_state_t *evt_state, const zbx_dc_item_t *item,
 		zbx_vector_agent_result_ptr_t *add_results)
 {
+	zbx_uint64_t	key;
+	time_t		timestamp;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() last_key:" ZBX_FS_UI64 " last_ts:" ZBX_FS_TIME_T " events:%d top event id:"
 			ZBX_FS_UI64 " top event ts:" ZBX_FS_TIME_T, __func__, evt_state->last_key, evt_state->last_ts,
 			events->values_num, events->values[0]->key, events->values[0]->timestamp);
@@ -1081,7 +1084,8 @@ static void	vmware_get_events(const zbx_vector_vmware_event_ptr_t *events,
 
 		if (SUCCEED == zbx_set_agent_result_type(add_result, item->value_type, event->message))
 		{
-			zbx_set_agent_result_meta(add_result, event->key, 0);
+			key = event->key;
+			timestamp = event->timestamp;
 
 			if (ITEM_VALUE_TYPE_LOG == item->value_type)
 			{
@@ -1094,6 +1098,9 @@ static void	vmware_get_events(const zbx_vector_vmware_event_ptr_t *events,
 		else
 			zbx_free(add_result);
 	}
+
+	if (0 != add_results->values_num)
+		zbx_set_agent_result_meta(add_results->values[add_results->values_num - 1], key, (int)timestamp);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): events:%d", __func__, add_results->values_num);
 }
@@ -1234,7 +1241,7 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 	{
 		/* this may happen if recreate item vmware.eventlog for same service URL */
 		service->eventlog.last_key = request->lastlogsize;
-		service->eventlog.last_ts = 0;
+		service->eventlog.last_ts = request->mtime;
 		service->eventlog.skip_old = skip_old;
 		service->eventlog.owner_itemid = item->itemid;
 	}

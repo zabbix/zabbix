@@ -1029,8 +1029,8 @@ static int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CU
 			*evt_top_time = events->values[0]->timestamp;
 		}
 
-		if (!ZBX_IS_RUNNING() || (0 < soap_count && SUCCEED != vmware_service_read_previous_events(easyhandle,
-				event_session, soap_count, &doc, error)))
+		if (!ZBX_IS_RUNNING() || 0 == soap_count || SUCCEED != vmware_service_read_previous_events(easyhandle,
+				event_session, soap_count, &doc, error))
 		{
 			goto end_session;
 		}
@@ -1282,8 +1282,8 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 
 	zbx_vmware_lock();
 	evt_last_key = service->eventlog.last_key;
-	evt_skip_old = service->eventlog.skip_old;
 	evt_last_ts = service->eventlog.last_ts;
+	evt_skip_old = service->eventlog.skip_old;
 	evt_severity = service->eventlog.severity;
 
 	if (NULL != service->eventlog.data && 0 != service->eventlog.data->events.values_num && 0 == evt_skip_old &&
@@ -1362,14 +1362,14 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 	/* skip collection of event data if we don't know where	*/
 	/* we stopped last time or item can't accept values 	*/
 	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED != evt_last_key && 0 == evt_skip_old && 0 != shmem_free_sz &&
-			SUCCEED != vmware_service_get_event_data(service, easyhandle, evt_last_key, evt_last_ts,
-			shmem_free_sz, evt_severity, evt_end_time, &evt_skip_old, &evt_data->events, &events_sz,
-			&evt_top_key, &evt_top_time, &evt_data->error))
+			0 != service->eventlog.top_time && SUCCEED != vmware_service_get_event_data(service,
+			easyhandle, evt_last_key, evt_last_ts, shmem_free_sz, evt_severity, evt_end_time,
+			&evt_skip_old, &evt_data->events, &events_sz, &evt_top_key, &evt_top_time, &evt_data->error))
 	{
 		goto clean;
 	}
 
-	if (0 != evt_skip_old)
+	if (0 != evt_skip_old || 0 == service->eventlog.top_key)	/* or first run after reboot */
 	{
 		char	*error = NULL;
 
@@ -1382,9 +1382,13 @@ int	zbx_vmware_service_eventlog_update(zbx_vmware_service_t *service, const char
 		}
 		else
 		{
-			evt_skip_old = 0;
 			evt_top_key = evt_data->events.values[0]->key;
 			evt_top_time = evt_data->events.values[0]->timestamp;
+
+			if (0 == evt_skip_old)
+				zbx_vector_vmware_event_ptr_clear_ext(&evt_data->events, vmware_event_free);
+			else
+				evt_skip_old = 0;
 		}
 	}
 
@@ -1402,20 +1406,22 @@ clean:
 out:
 	zbx_vmware_lock();
 
+	/* statistically we can expect the same number of events next time */
+	if (service->eventlog.top_key < evt_top_key)
+	{
+		if (0 == service->eventlog.top_key)	/* first run after reboot */
+			service->eventlog.expect_num = evt_top_key - service->eventlog.last_key;
+
+		service->eventlog.top_key = evt_top_key;
+		service->eventlog.top_time = evt_top_time;
+	}
+
 	if (0 < evt_data->events.values_num)
 	{
 		if (0 != service->eventlog.oom)
 			service->eventlog.oom = 0;
 
-		/* statistically we can expect the same number of events next time */
-		if (service->eventlog.top_key < evt_top_key)
-		{
-			service->eventlog.top_key = evt_top_key;
-			service->eventlog.top_time = evt_top_time;
-		}
-
 		service->eventlog.expect_num = service->eventlog.top_key - evt_data->events.values[0]->key;
-
 		events_sz += vmware_service_evt_vector_memsize(&evt_data->events);
 
 		if (0 == service->eventlog.last_key || vmware_shmem_get_vmware_mem()->free_size < events_sz ||
