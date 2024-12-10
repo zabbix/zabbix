@@ -43,9 +43,6 @@
 		/** @type {HTMLTableElement} */
 		#headers;
 
-		/** @type {boolean} */
-		#variables_headers_initialized = false;
-
 		/** @type {HTMLTableElement} */
 		#steps;
 
