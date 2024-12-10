@@ -110,7 +110,7 @@ window.template_edit_popup = new class {
 
 		show_inherited_macros_element.addEventListener('change', e => {
 			this.show_inherited_macros = e.target.value == 1;
-			this.macros_templateids = this.linked_templateids.concat(this.#getNewTemplates();
+			this.macros_templateids = this.linked_templateids.concat(this.#getNewTemplates());
 
 			this.macros_manager.load(this.show_inherited_macros, this.macros_templateids);
 		});
