@@ -37,6 +37,15 @@
 
 ZBX_PTR_VECTOR_IMPL(valuemaps_ptr, zbx_valuemaps_t *)
 
+/* value types */
+typedef enum
+{
+	ZBX_ACCEPT_TYPE_VALUE,
+	ZBX_ACCEPT_TYPE_TIMESTAMP,
+	ZBX_ACCEPT_TYPE_LOG_TIMESTAMP
+}
+zbx_accept_value_type_t;
+
 /******************************************************************************
  *                                                                            *
  * Purpose: process suffix 'uptime'.                                          *
@@ -1376,6 +1385,7 @@ out:
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] Nth last value and time shift (optional)     *
  *             ts         - [IN] starting timestamp                           *
+ *             value_type - [IN] type of result value                         *
  *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
@@ -1383,7 +1393,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	evaluate_LAST(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *parameters,
-		const zbx_timespec_t *ts, char **error)
+		const zbx_timespec_t *ts, zbx_accept_value_type_t value_type, char **error)
 {
 	int			ret;
 	zbx_history_record_t	vc_value;
@@ -1392,7 +1402,23 @@ static int	evaluate_LAST(zbx_variant_t *value, const zbx_dc_evaluate_item_t *ite
 
 	if (SUCCEED == (ret = get_last_n_value(item, parameters, ts, &vc_value, error)))
 	{
-		zbx_history_value2variant(&vc_value.value, item->value_type, value);
+		switch (value_type)
+		{
+			case ZBX_ACCEPT_TYPE_VALUE:
+				zbx_history_value2variant(&vc_value.value, item->value_type, value);
+				break;
+			case ZBX_ACCEPT_TYPE_TIMESTAMP:
+				zbx_variant_set_ui64(value, (zbx_uint64_t)vc_value.timestamp.sec);
+				break;
+			case ZBX_ACCEPT_TYPE_LOG_TIMESTAMP:
+				zbx_variant_set_ui64(value, (zbx_uint64_t)vc_value.value.log->timestamp);
+				break;
+			default:
+				*error = zbx_strdup(*error, "invalid parameter");
+				ret = FAIL;
+				break;
+		}
+
 		zbx_history_record_clear(&vc_value, item->value_type);
 	}
 
@@ -1952,7 +1978,7 @@ static int	evaluate_BITAND(zbx_variant_t *value, const zbx_dc_evaluate_item_t *i
 	/* bitand(<item_key>,#0,1)                                                       */
 	/* First parameter is the item name, second is history count, third is the mask. */
 	/* First and second parameters are resent to evaluate_LAST().                    */
-	if (SUCCEED == evaluate_LAST(value, item, last_parameters, ts, error))
+	if (SUCCEED == evaluate_LAST(value, item, last_parameters, ts, ZBX_ACCEPT_TYPE_VALUE, error))
 	{
 		/* the evaluate_LAST() should return uint64 value, but just to be sure try to convert it */
 		if (SUCCEED != zbx_variant_convert(value, ZBX_VARIANT_UI64))
@@ -2579,6 +2605,7 @@ static int	validate_params_and_get_data(const zbx_dc_evaluate_item_t *item, cons
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] Nth first value and time shift (optional)    *
  *             ts         - [IN] starting timestamp                           *
+ *             value_type - [IN] type of result value                         *
  *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in        *
@@ -2587,7 +2614,7 @@ static int	validate_params_and_get_data(const zbx_dc_evaluate_item_t *item, cons
  *                                                                            *
  ******************************************************************************/
 static int	evaluate_FIRST(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *parameters,
-		const zbx_timespec_t *ts, char **error)
+		const zbx_timespec_t *ts, zbx_accept_value_type_t value_type, char **error)
 {
 	int				arg1 = 1, ret = FAIL, seconds = 0, time_shift;
 	zbx_value_type_t		arg1_type = ZBX_VALUE_NVALUES;
@@ -2639,7 +2666,19 @@ static int	evaluate_FIRST(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 	{
 		if (0 < values.values_num)
 		{
-			zbx_history_value2variant(&values.values[values.values_num - 1].value, item->value_type, value);
+			switch (value_type)
+			{
+				case ZBX_ACCEPT_TYPE_VALUE:
+					zbx_history_value2variant(&values.values[values.values_num - 1].value,
+							item->value_type, value);
+					break;
+				case ZBX_ACCEPT_TYPE_TIMESTAMP:
+					zbx_variant_set_ui64(value, values.values[values.values_num - 1].timestamp.sec);
+					break;
+				default:
+					*error = zbx_strdup(*error, "invalid parameter");
+					goto out;
+			}
 			ret = SUCCEED;
 		}
 		else
@@ -3435,7 +3474,7 @@ int	zbx_evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 
 	if (0 == strcmp(function, "last"))
 	{
-		ret = evaluate_LAST(value, item, parameter, ts, error);
+		ret = evaluate_LAST(value, item, parameter, ts, ZBX_ACCEPT_TYPE_VALUE, error);
 	}
 	else if (0 == strcmp(function, "min"))
 	{
@@ -3511,7 +3550,7 @@ int	zbx_evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 	}
 	else if (0 == strcmp(function, "first"))
 	{
-		ret = evaluate_FIRST(value, item, parameter, ts, error);
+		ret = evaluate_FIRST(value, item, parameter, ts, ZBX_ACCEPT_TYPE_VALUE, error);
 	}
 	else if (0 == strcmp(function, "kurtosis"))
 	{
@@ -3564,6 +3603,18 @@ int	zbx_evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 	else if (0 == strncmp(function, "baseline", 8))
 	{
 		ret = evaluate_BASELINE(value, item, function + 8, parameter, ts, error);
+	}
+	else if (0 == strncmp(function, "lastclock", 9))
+	{
+		ret = evaluate_LAST(value, item, parameter, ts, ZBX_ACCEPT_TYPE_TIMESTAMP, error);
+	}
+	else if (0 == strncmp(function, "logtimestamp", 12))
+	{
+		ret = evaluate_LAST(value, item, parameter, ts, ZBX_ACCEPT_TYPE_LOG_TIMESTAMP, error);
+	}
+	else if (0 == strncmp(function, "firstclock", 10))
+	{
+		ret = evaluate_FIRST(value, item, parameter, ts, ZBX_ACCEPT_TYPE_TIMESTAMP, error);
 	}
 	else if (NULL != (ptr = strstr(function, "_foreach")) && ZBX_CONST_STRLEN("_foreach") == strlen(ptr))
 	{

@@ -47,6 +47,16 @@
 #define ZBX_REQUEST_ITEM_LOG_EVENTID		207
 #define ZBX_REQUEST_ITEM_LOG_TIMESTAMP		208
 
+typedef enum
+{
+	ZBX_VALUE_TYPE_VALUE,
+	ZBX_VALUE_TYPE_TIME,
+	ZBX_VALUE_TYPE_DATE,
+	ZBX_VALUE_TYPE_AGE,
+	ZBX_VALUE_TYPE_TIMESTAMP
+}
+zbx_expr_db_item_value_type_t;
+
 const char	*item_logtype_string(unsigned char logtype);
 const char	*alert_type_string(unsigned char type);
 const char	*alert_status_string(unsigned char type, unsigned char status);
@@ -66,9 +76,11 @@ int	expr_db_get_trigger_value(const zbx_db_trigger *trigger, char **replace_to, 
 int	expr_db_get_trigger_error(const zbx_db_trigger *trigger, char **replace_to);
 int	expr_db_get_history_log_value(zbx_uint64_t itemid, char **replace_to, int request, int clock, int ns,
 		const char *tz);
-int	expr_db_item_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_timespec_t *ts);
-int	expr_db_item_value(const zbx_db_trigger *trigger, char **value, int N_functionid, int clock, int ns, int raw);
-int	expr_db_item_lastvalue(const zbx_db_trigger *trigger, char **lastvalue, int N_functionid, int raw);
+int	expr_db_item_get_value(zbx_uint64_t itemid, int raw, zbx_timespec_t *ts, char **lastvalue, zbx_int64_t *tstamp);
+int	expr_db_item_value(const zbx_db_trigger *trigger, char **value, int N_functionid, int clock, int ns, int raw,
+		const char *tz, zbx_expr_db_item_value_type_t value_type);
+int	expr_db_item_lastvalue(const zbx_db_trigger *trigger, char **lastvalue, int N_functionid, int raw,
+		const char *tz, zbx_expr_db_item_value_type_t value_type);
 void	expr_db_get_escalation_history(zbx_uint64_t actionid, const zbx_db_event *event, const zbx_db_event *r_event,
 			char **replace_to, const zbx_uint64_t *recipient_userid, const char *tz);
 int	expr_db_get_action_value(const char *macro, zbx_uint64_t actionid, char **replace_to);

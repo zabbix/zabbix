@@ -263,7 +263,7 @@ static void	resolve_opdata(const zbx_db_event *event, char **replace_to, const c
 			if (NULL != *replace_to)
 				*replace_to = zbx_strdcat(*replace_to, ", ");
 
-			if (SUCCEED == expr_db_item_get_value(itemids.values[i], &val, 0, &ts))
+			if (SUCCEED == expr_db_item_get_value(itemids.values[i], 0, &ts, &val, NULL))
 			{
 				*replace_to = zbx_strdcat(*replace_to, val);
 				zbx_free(val);
@@ -847,7 +847,27 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
 				{
 					ret = expr_db_item_lastvalue(&c_event->trigger, &replace_to, N_functionid,
-							raw_value);
+							raw_value, tz, ZBX_VALUE_TYPE_VALUE);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE_TIMESTAMP))
+				{
+					ret = expr_db_item_lastvalue(&c_event->trigger, &replace_to, N_functionid,
+							raw_value, tz, ZBX_VALUE_TYPE_TIMESTAMP);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE_TIME))
+				{
+					ret = expr_db_item_lastvalue(&c_event->trigger, &replace_to, N_functionid,
+							raw_value, tz, ZBX_VALUE_TYPE_TIME);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE_DATE))
+				{
+					ret = expr_db_item_lastvalue(&c_event->trigger, &replace_to, N_functionid,
+							raw_value, tz, ZBX_VALUE_TYPE_DATE);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE_AGE))
+				{
+					ret = expr_db_item_lastvalue(&c_event->trigger, &replace_to, N_functionid,
+							raw_value, tz, ZBX_VALUE_TYPE_AGE);
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_NAME))
 				{
@@ -862,7 +882,31 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
 				{
 					ret = expr_db_item_value(&c_event->trigger, &replace_to, N_functionid,
-							c_event->clock, c_event->ns, raw_value);
+							c_event->clock, c_event->ns, raw_value, tz,
+							ZBX_VALUE_TYPE_VALUE);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE_TIMESTAMP))
+				{
+					ret = expr_db_item_value(&c_event->trigger, &replace_to, N_functionid,
+							c_event->clock, c_event->ns, raw_value, tz,
+							ZBX_VALUE_TYPE_TIMESTAMP);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE_TIME))
+				{
+					ret = expr_db_item_value(&c_event->trigger, &replace_to, N_functionid,
+							c_event->clock, c_event->ns, raw_value, tz,
+							ZBX_VALUE_TYPE_TIME);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE_DATE))
+				{
+					ret = expr_db_item_value(&c_event->trigger, &replace_to, N_functionid,
+							c_event->clock, c_event->ns, raw_value, tz,
+							ZBX_VALUE_TYPE_DATE);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE_AGE))
+				{
+					ret = expr_db_item_value(&c_event->trigger, &replace_to, N_functionid,
+							c_event->clock, c_event->ns, raw_value, tz, ZBX_VALUE_TYPE_AGE);
 				}
 				else if (0 == strncmp(m, MVAR_ITEM_LOG, ZBX_CONST_STRLEN(MVAR_ITEM_LOG)))
 				{
@@ -2123,7 +2167,27 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
 				{
 					ret = expr_db_item_value(&event->trigger, &replace_to, N_functionid,
-							event->clock, event->ns, raw_value);
+							event->clock, event->ns, raw_value, tz, ZBX_VALUE_TYPE_VALUE);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE_TIMESTAMP))
+				{
+					ret = expr_db_item_value(&event->trigger, &replace_to, N_functionid,
+							event->clock, event->ns, raw_value, tz, ZBX_VALUE_TYPE_TIMESTAMP);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE_TIME))
+				{
+					ret = expr_db_item_value(&event->trigger, &replace_to, N_functionid,
+							event->clock, event->ns, raw_value, tz, ZBX_VALUE_TYPE_TIME);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE_DATE))
+				{
+					ret = expr_db_item_value(&event->trigger, &replace_to, N_functionid,
+							event->clock, event->ns, raw_value, tz, ZBX_VALUE_TYPE_DATE);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE_AGE))
+				{
+					ret = expr_db_item_value(&event->trigger, &replace_to, N_functionid,
+							event->clock, event->ns, raw_value, tz, ZBX_VALUE_TYPE_AGE);
 				}
 				else if (0 == strncmp(m, MVAR_ITEM_LOG, ZBX_CONST_STRLEN(MVAR_ITEM_LOG)))
 				{
@@ -2133,7 +2197,27 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
 				{
 					ret = expr_db_item_lastvalue(&event->trigger, &replace_to, N_functionid,
-							raw_value);
+							raw_value, tz, ZBX_VALUE_TYPE_VALUE);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE_TIMESTAMP))
+				{
+					ret = expr_db_item_lastvalue(&event->trigger, &replace_to, N_functionid,
+							raw_value, tz, ZBX_VALUE_TYPE_TIMESTAMP);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE_TIME))
+				{
+					ret = expr_db_item_lastvalue(&event->trigger, &replace_to, N_functionid,
+							raw_value, tz, ZBX_VALUE_TYPE_TIME);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE_DATE))
+				{
+					ret = expr_db_item_lastvalue(&event->trigger, &replace_to, N_functionid,
+							raw_value, tz, ZBX_VALUE_TYPE_DATE);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE_AGE))
+				{
+					ret = expr_db_item_lastvalue(&event->trigger, &replace_to, N_functionid,
+							raw_value, tz, ZBX_VALUE_TYPE_AGE);
 				}
 				else if (0 != (macro_type & ZBX_MACRO_TYPE_EVENT_NAME))
 				{
@@ -2219,12 +2303,52 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
 				{
 					ret = expr_db_item_lastvalue(&event->trigger, &replace_to, N_functionid,
-							raw_value);
+							raw_value, tz, ZBX_VALUE_TYPE_VALUE);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE_TIMESTAMP))
+				{
+					ret = expr_db_item_lastvalue(&event->trigger, &replace_to, N_functionid,
+							raw_value, tz, ZBX_VALUE_TYPE_TIMESTAMP);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE_TIME))
+				{
+					ret = expr_db_item_lastvalue(&event->trigger, &replace_to, N_functionid,
+							raw_value, tz, ZBX_VALUE_TYPE_TIME);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE_DATE))
+				{
+					ret = expr_db_item_lastvalue(&event->trigger, &replace_to, N_functionid,
+							raw_value, tz, ZBX_VALUE_TYPE_DATE);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE_AGE))
+				{
+					ret = expr_db_item_lastvalue(&event->trigger, &replace_to, N_functionid,
+							raw_value, tz, ZBX_VALUE_TYPE_AGE);
 				}
 				else if (0 == strcmp(m, MVAR_ITEM_VALUE))
 				{
 					ret = expr_db_item_value(&event->trigger, &replace_to, N_functionid,
-							event->clock, event->ns, raw_value);
+							event->clock, event->ns, raw_value, tz, ZBX_VALUE_TYPE_VALUE);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE_TIMESTAMP))
+				{
+					ret = expr_db_item_value(&event->trigger, &replace_to, N_functionid,
+							event->clock, event->ns, raw_value, tz, ZBX_VALUE_TYPE_TIMESTAMP);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE_TIME))
+				{
+					ret = expr_db_item_value(&event->trigger, &replace_to, N_functionid,
+							event->clock, event->ns, raw_value, tz, ZBX_VALUE_TYPE_TIME);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE_DATE))
+				{
+					ret = expr_db_item_value(&event->trigger, &replace_to, N_functionid,
+							event->clock, event->ns, raw_value, tz, ZBX_VALUE_TYPE_DATE);
+				}
+				else if (0 == strcmp(m, MVAR_ITEM_VALUE_AGE))
+				{
+					ret = expr_db_item_value(&event->trigger, &replace_to, N_functionid,
+							event->clock, event->ns, raw_value, tz, ZBX_VALUE_TYPE_AGE);
 				}
 				else if (0 == strncmp(m, MVAR_ITEM_LOG, ZBX_CONST_STRLEN(MVAR_ITEM_LOG)))
 				{
@@ -2558,12 +2682,57 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 					if (0 == strcmp(m, MVAR_ITEM_LASTVALUE))
 					{
 						ret = expr_db_item_lastvalue(&event->trigger, &replace_to, N_functionid,
-								raw_value);
+								raw_value, tz, ZBX_VALUE_TYPE_VALUE);
+					}
+					else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE_TIMESTAMP))
+					{
+						ret = expr_db_item_lastvalue(&event->trigger, &replace_to, N_functionid,
+								raw_value, tz, ZBX_VALUE_TYPE_TIMESTAMP);
+					}
+					else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE_TIME))
+					{
+						ret = expr_db_item_lastvalue(&event->trigger, &replace_to, N_functionid,
+								raw_value, tz, ZBX_VALUE_TYPE_TIME);
+					}
+					else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE_DATE))
+					{
+						ret = expr_db_item_lastvalue(&event->trigger, &replace_to, N_functionid,
+								raw_value, tz, ZBX_VALUE_TYPE_DATE);
+					}
+					else if (0 == strcmp(m, MVAR_ITEM_LASTVALUE_AGE))
+					{
+						ret = expr_db_item_lastvalue(&event->trigger, &replace_to, N_functionid,
+								raw_value, tz, ZBX_VALUE_TYPE_AGE);
 					}
 					else if (0 == strcmp(m, MVAR_ITEM_VALUE))
 					{
 						ret = expr_db_item_value(&event->trigger, &replace_to, N_functionid,
-								event->clock, event->ns, raw_value);
+								event->clock, event->ns, raw_value, tz,
+								ZBX_VALUE_TYPE_VALUE);
+					}
+					else if (0 == strcmp(m, MVAR_ITEM_VALUE_TIMESTAMP))
+					{
+						ret = expr_db_item_value(&event->trigger, &replace_to, N_functionid,
+								event->clock, event->ns, raw_value, tz,
+								ZBX_VALUE_TYPE_TIMESTAMP);
+					}
+					else if (0 == strcmp(m, MVAR_ITEM_VALUE_TIME))
+					{
+						ret = expr_db_item_value(&event->trigger, &replace_to, N_functionid,
+								event->clock, event->ns, raw_value, tz,
+								ZBX_VALUE_TYPE_TIME);
+					}
+					else if (0 == strcmp(m, MVAR_ITEM_VALUE_DATE))
+					{
+						ret = expr_db_item_value(&event->trigger, &replace_to, N_functionid,
+								event->clock, event->ns, raw_value, tz,
+								ZBX_VALUE_TYPE_DATE);
+					}
+					else if (0 == strcmp(m, MVAR_ITEM_VALUE_AGE))
+					{
+						ret = expr_db_item_value(&event->trigger, &replace_to, N_functionid,
+								event->clock, event->ns, raw_value, tz,
+								ZBX_VALUE_TYPE_AGE);
 					}
 					else if (0 == strncmp(m, MVAR_ITEM_LOG, ZBX_CONST_STRLEN(MVAR_ITEM_LOG)))
 					{

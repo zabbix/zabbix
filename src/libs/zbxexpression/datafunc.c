@@ -571,13 +571,13 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve item value by item id.                                   *
+ * Purpose: retrieve item value and timestamp by item id.                     *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-int	expr_db_item_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_timespec_t *ts)
+int	expr_db_item_get_value(zbx_uint64_t itemid, int raw, zbx_timespec_t *ts, char **lastvalue, zbx_int64_t *tstamp)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -613,6 +613,9 @@ int	expr_db_item_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_t
 
 			*lastvalue = zbx_strdup(*lastvalue, tmp);
 
+			if (NULL != tstamp)
+				*tstamp = vc_value.timestamp.sec;
+
 			ret = SUCCEED;
 		}
 	}
@@ -625,23 +628,42 @@ int	expr_db_item_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_t
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve item value by trigger expression and number of function. *
+ * Purpose: retrieve item value by trigger expression and number of function, *
+ *          retriverd value depends from value type.                          *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-int	expr_db_item_value(const zbx_db_trigger *trigger, char **value, int N_functionid, int clock, int ns, int raw)
+int	expr_db_item_value(const zbx_db_trigger *trigger, char **value, int N_functionid, int clock, int ns, int raw,
+		const char *tz, zbx_expr_db_item_value_type_t value_type)
 {
-	zbx_uint64_t	itemid;
+	zbx_uint64_t	itemid, timestamp;
 	zbx_timespec_t	ts = {clock, ns};
 	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED == (ret = zbx_db_trigger_get_itemid(trigger, N_functionid, &itemid)))
-		ret = expr_db_item_get_value(itemid, value, raw, &ts);
+		ret = expr_db_item_get_value(itemid, raw, &ts, value, &timestamp);
 
+	switch (value_type)
+	{
+		case ZBX_VALUE_TYPE_TIME:
+			*value = zbx_strdup(*value, zbx_time2str(timestamp, tz));
+			break;
+		case ZBX_VALUE_TYPE_TIMESTAMP:
+			*value = zbx_dsprintf(*value, ZBX_FS_UI64, timestamp);
+			break;
+		case ZBX_VALUE_TYPE_DATE:
+			*value = zbx_strdup(*value, zbx_date2str(timestamp, tz));
+			break;
+		case ZBX_VALUE_TYPE_AGE:
+			*value = zbx_dsprintf(*value, ZBX_FS_UI64, time(NULL) - timestamp);
+			break;
+		default:
+			break;
+	}
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -650,20 +672,41 @@ int	expr_db_item_value(const zbx_db_trigger *trigger, char **value, int N_functi
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve item lastvalue by trigger expression                     *
- *          and number of function.                                           *
+ *          and number of function,                                           *
+ *          retriverd value depends from value type.                          *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-int	expr_db_item_lastvalue(const zbx_db_trigger *trigger, char **lastvalue, int N_functionid, int raw)
+int	expr_db_item_lastvalue(const zbx_db_trigger *trigger, char **lastvalue, int N_functionid, int raw,
+		const char *tz, zbx_expr_db_item_value_type_t value_type)
 {
 	int		ret;
+	zbx_uint64_t	timestamp;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	ret = expr_db_item_value(trigger, lastvalue, N_functionid, (int)time(NULL), 999999999, raw);
+	ret = expr_db_item_value(trigger, lastvalue, N_functionid, (int)time(NULL), 999999999, raw, &timestamp,
+			ZBX_VALUE_TYPE_VALUE);
 
+	switch (value_type)
+	{
+		case ZBX_VALUE_TYPE_TIME:
+			*lastvalue = zbx_strdup(*lastvalue, zbx_time2str(timestamp, tz));
+			break;
+		case ZBX_VALUE_TYPE_TIMESTAMP:
+			*lastvalue = zbx_dsprintf(*lastvalue, ZBX_FS_UI64, timestamp);
+			break;
+		case ZBX_VALUE_TYPE_DATE:
+			*lastvalue = zbx_strdup(*lastvalue, zbx_date2str(timestamp, tz));
+			break;
+		case ZBX_VALUE_TYPE_AGE:
+			*lastvalue = zbx_dsprintf(*lastvalue, ZBX_FS_UI64, time(NULL) - timestamp);
+			break;
+		default:
+			break;
+	}
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
