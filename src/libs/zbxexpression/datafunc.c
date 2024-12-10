@@ -577,7 +577,7 @@ out:
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-int	expr_db_item_get_value(zbx_uint64_t itemid, int raw, zbx_timespec_t *ts, char **lastvalue, zbx_int64_t *tstamp)
+int	expr_db_item_get_value(zbx_uint64_t itemid, int raw, zbx_timespec_t *ts, char **lastvalue, zbx_uint64_t *tstamp)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -614,7 +614,7 @@ int	expr_db_item_get_value(zbx_uint64_t itemid, int raw, zbx_timespec_t *ts, cha
 			*lastvalue = zbx_strdup(*lastvalue, tmp);
 
 			if (NULL != tstamp)
-				*tstamp = vc_value.timestamp.sec;
+				*tstamp = (zbx_uint64_t)vc_value.timestamp.sec;
 
 			ret = SUCCEED;
 		}
