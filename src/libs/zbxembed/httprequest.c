@@ -386,7 +386,7 @@ out:
 	if (-1 != err_index)
 		return duk_throw(ctx);
 
-	duk_push_string(ctx, request->data);
+	es_push_result_string(ctx, request->data, request->data_offset);
 
 	return 1;
 }
@@ -509,7 +509,7 @@ static void	es_put_header(duk_context *ctx, int idx, char *header)
 	while (' ' == *value || '\t' == *value)
 		value++;
 
-	duk_push_string(ctx, value);
+	es_push_result_string(ctx, value, strlen(value));
 
 	/* duk_put_prop_string() throws error on failure, no need to check return code */
 	(void)duk_put_prop_string(ctx, idx, header);
