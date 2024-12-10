@@ -24,9 +24,9 @@ import (
 const (
 	ZABBIX_REVDATE          = "9 December 2024"
 	ZABBIX_VERSION_MAJOR    = 7
-	ZABBIX_VERSION_MINOR    = 2
+	ZABBIX_VERSION_MINOR    = 4
 	ZABBIX_VERSION_PATCH    = 0
-	ZABBIX_VERSION_RC       = ""
+	ZABBIX_VERSION_RC       = "alpha1"
 	ZABBIX_VERSION_RC_NUM   = "{ZABBIX_RC_NUM}"
 	ZABBIX_VERSION_REVISION = "{ZABBIX_REVISION}"
 	copyrightMessage        = "Copyright (C) 2024 Zabbix SIA\n" +
