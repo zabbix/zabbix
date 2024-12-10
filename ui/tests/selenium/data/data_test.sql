@@ -1415,7 +1415,7 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value
 
 -- Dashboard for sharing testing
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1210, 'Testing share dashboard', 9, 0);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (13345, 1210);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (133456, 1210);
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1220, 'Dashboard for Admin share testing', 1, 1);
 INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (14345, 1220);
 INSERT INTO dashboard_user (dashboard_userid, dashboardid, userid, permission) VALUES (1, 1220, 9, 2);
