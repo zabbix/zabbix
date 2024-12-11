@@ -1690,6 +1690,8 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
  ******************************************************************************/
 int	zbx_hc_check_proxy(zbx_uint64_t proxyid)
 {
+#	define	NOLOCK	0
+
 	double	hc_pused;
 	int	ret;
 
@@ -1697,8 +1699,7 @@ int	zbx_hc_check_proxy(zbx_uint64_t proxyid)
 
 	zbx_dbcache_lock();
 
-	hc_pused = 100 * (double)(zbx_dbcache_get_hc_mem()->total_size - zbx_dbcache_get_hc_mem()->free_size) /
-			zbx_dbcache_get_hc_mem()->total_size;
+	hc_pused = zbx_hc_mem_pused(NOLOCK);
 
 	if (20 >= hc_pused)
 	{
@@ -1748,4 +1749,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+
+#	undef	NOLOCK
 }

@@ -1409,6 +1409,11 @@ out:
 	/* statistically we can expect the same number of events next time */
 	if (service->eventlog.top_key < evt_top_key)
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() update top_time:" ZBX_FS_TIME_T "/" ZBX_FS_TIME_T " top_key:"
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 " last_key:" ZBX_FS_UI64 " last_ts:" ZBX_FS_TIME_T,__func__,
+				service->eventlog.top_time, evt_top_time, service->eventlog.top_key, evt_top_key,
+				service->eventlog.last_key, service->eventlog.last_ts);
+
 		if (0 == service->eventlog.top_key)	/* first run after reboot */
 			service->eventlog.expect_num = evt_top_key - service->eventlog.last_key;
 
@@ -1470,7 +1475,7 @@ out:
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 		zbx_shmem_dump_stats(LOG_LEVEL_DEBUG, vmware_shmem_get_vmware_mem());
 
-	zbx_snprintf(msg, sizeof(msg), "Events (number/expect/factor/chunk/toptime):%d / %d / %.2f / " ZBX_FS_UI64
+	zbx_snprintf(msg, sizeof(msg), "Events (number/expect/factor/chunk/endtime):%d / %d / %.2f / " ZBX_FS_UI64
 			" / " ZBX_FS_TIME_T " VMwareCache memory usage (free/strpool/total): " ZBX_FS_UI64 " / "
 			ZBX_FS_UI64 " / " ZBX_FS_UI64,
 			NULL != service->eventlog.data ? service->eventlog.data->events.values_num : 0,
