@@ -18,6 +18,8 @@ class CWidgetItemHistory extends CWidget {
 	static VALUE_TYPE_IMAGE = 'image';
 	static VALUE_TYPE_RAW = 'raw';
 
+	static NEW_VALUES_BOTTOM = 1;
+
 	#binary_data_cache = new Map();
 	#binary_buttons = new Map();
 
@@ -27,11 +29,19 @@ class CWidgetItemHistory extends CWidget {
 
 	#values_table;
 
+	#move_scroll_to_bottom = null;
+
 	#selected_itemid = null;
 	#selected_clock = null;
 	#selected_key_ = null;
 
 	setContents(response) {
+		if (this._fields.sortorder === CWidgetItemHistory.NEW_VALUES_BOTTOM) {
+			this.#move_scroll_to_bottom = this.#move_scroll_to_bottom !== null
+				? this._contents.clientHeight + this._contents.scrollTop >= this._contents.scrollHeight
+				: true;
+		}
+
 		super.setContents(response);
 
 		if (this.#abort_controller !== null) {
@@ -97,6 +107,10 @@ class CWidgetItemHistory extends CWidget {
 			}
 
 			this.#markSelected();
+		}
+
+		if (this._fields.sortorder === CWidgetItemHistory.NEW_VALUES_BOTTOM && this.#move_scroll_to_bottom) {
+			this._contents.scrollTop = this._contents.scrollHeight + 1;
 		}
 	}
 
