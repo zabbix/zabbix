@@ -683,30 +683,11 @@ int	expr_db_item_lastvalue(const zbx_db_trigger *trigger, char **lastvalue, int 
 		const char *tz, zbx_expr_db_item_value_type_t value_type)
 {
 	int		ret;
-	zbx_uint64_t	timestamp;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	ret = expr_db_item_value(trigger, lastvalue, N_functionid, (int)time(NULL), 999999999, raw, &timestamp,
-			ZBX_VALUE_TYPE_VALUE);
+	ret = expr_db_item_value(trigger, lastvalue, N_functionid, (int)time(NULL), 999999999, raw, tz, value_type);
 
-	switch (value_type)
-	{
-		case ZBX_VALUE_TYPE_TIME:
-			*lastvalue = zbx_strdup(*lastvalue, zbx_time2str(timestamp, tz));
-			break;
-		case ZBX_VALUE_TYPE_TIMESTAMP:
-			*lastvalue = zbx_dsprintf(*lastvalue, ZBX_FS_UI64, timestamp);
-			break;
-		case ZBX_VALUE_TYPE_DATE:
-			*lastvalue = zbx_strdup(*lastvalue, zbx_date2str(timestamp, tz));
-			break;
-		case ZBX_VALUE_TYPE_AGE:
-			*lastvalue = zbx_dsprintf(*lastvalue, ZBX_FS_UI64, time(NULL) - timestamp);
-			break;
-		default:
-			break;
-	}
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
