@@ -2293,7 +2293,25 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/host_availability'
 				]
 			],
-			// #217 Start creating Item value widget.
+			// #217 Start creating Host Card widget.
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Host card',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/host_card'
+				]
+			],
+			// #218 Start creating Item value widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2311,7 +2329,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_value'
 				]
 			],
-			// #218 Start creating Map widget.
+			// #219 Start creating Map widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2329,7 +2347,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/map'
 				]
 			],
-			// #219 Start creating Map tree widget.
+			// #220 Start creating Map tree widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2347,7 +2365,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/map_tree'
 				]
 			],
-			// #220 Start creating Plain text widget.
+			// #221 Start creating Plain text widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2365,7 +2383,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/item_history'
 				]
 			],
-			// #221 Start creating Problem hosts widget.
+			// #222 Start creating Problem hosts widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2383,7 +2401,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/problem_hosts'
 				]
 			],
-			// #222 Start creating Problems widget.
+			// #223 Start creating Problems widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2401,7 +2419,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/problems'
 				]
 			],
-			// #223 Start creating Problems severity widget.
+			// #224 Start creating Problems severity widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2419,7 +2437,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/problems_severity'
 				]
 			],
-			// #224 Start creating SLA report widget.
+			// #225 Start creating SLA report widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2437,7 +2455,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/sla_report'
 				]
 			],
-			// #225 Start creating System widget.
+			// #226 Start creating System widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2455,7 +2473,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/system'
 				]
 			],
-			// #226 Start creating Top hosts widget.
+			// #227 Start creating Top hosts widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2473,7 +2491,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/top_hosts'
 				]
 			],
-			// #227 Start creating Top triggers widget.
+			// #228 Start creating Top triggers widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2491,7 +2509,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/top_triggers'
 				]
 			],
-			// #228 Start creating Trigger overview widget.
+			// #229 Start creating Trigger overview widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2509,7 +2527,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/trigger_overview'
 				]
 			],
-			// #229 Start creating URL widget.
+			// #230 Start creating URL widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2527,7 +2545,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/url'
 				]
 			],
-			// #230 Start creating Web monitoring widget.
+			// #231 Start creating Web monitoring widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2545,7 +2563,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/web_monitoring'
 				]
 			],
-			// #231 Start creating Data overview widget.
+			// #232 Start creating Data overview widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2563,7 +2581,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/top_items'
 				]
 			],
-			// #232 Start creating Gauge widget.
+			// #233 Start creating Gauge widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2581,14 +2599,14 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/gauge'
 				]
 			],
-			// #233 Connectors list view.
+			// #234 Connectors list view.
 			[
 				[
 					'url' => 'zabbix.php?action=connector.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#connectors'
 				]
 			],
-			// #234 Create connectors popup.
+			// #235 Create connectors popup.
 			[
 				[
 					'url' => 'zabbix.php?action=connector.list',
@@ -2601,7 +2619,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/config/export/streaming#configuration'
 				]
 			],
-			// #235 Edit connectors popup.
+			// #236 Edit connectors popup.
 			[
 				[
 					'url' => 'zabbix.php?action=connector.list',
@@ -2614,14 +2632,14 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/config/export/streaming#configuration'
 				]
 			],
-			// #236 Administration -> General -> Timeouts.
+			// #237 Administration -> General -> Timeouts.
 			[
 				[
 					'url' => 'zabbix.php?action=timeouts.edit',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#timeouts'
 				]
 			],
-			// #237 Create Pie chart.
+			// #238 Create Pie chart.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2639,7 +2657,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/pie_chart'
 				]
 			],
-			// #238 Start creating Host navigator widget.
+			// #239 Start creating Host navigator widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2657,7 +2675,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/host_navigator'
 				]
 			],
-			// #239 Start creating Item navigator widget.
+			// #240 Start creating Item navigator widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
