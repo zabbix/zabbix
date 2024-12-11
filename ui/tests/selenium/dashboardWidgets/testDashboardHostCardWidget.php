@@ -462,9 +462,8 @@ class testDashboardHostCardWidget extends testWidgets {
 		$this->assertEquals($label[1], $dialogs->last()->waitUntilReady()->getTitle());
 		$dialogs->last()->close(true);
 
-		// Check default and available options in 'Show' section
-		$show_options = ['Host groups', 'Description', 'Monitoring', 'Availability', 'Monitored by', 'Templates', 
-				'Inventory', 'Tags'];
+		// Check default and available options in 'Show' section.
+		$show_options = ['Host groups', 'Description', 'Monitoring', 'Availability', 'Monitored by', 'Templates', 'Inventory', 'Tags'];
 		$show_form = $form->query("xpath", "//div[contains(@class, 'form-field')]//table[@id='sections-table']")->one();
 
 		// Clear all default options
