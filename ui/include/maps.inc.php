@@ -630,8 +630,6 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 
 	$triggers = $triggers + $selement_triggers;
 
-	//sdff($triggers);
-
 	$triggers_by_hostids = array_fill_keys(array_keys($hosts), []);
 	foreach ($triggers as $trigger) {
 		foreach ($trigger['hosts'] as $host) {
@@ -718,7 +716,6 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 		unset($selement);
 	}
 	unset($_sysmap);
-
 
 	$sysmap = $all_sysmaps[0];
 	$sysmaps_data = array_slice($all_sysmaps, 1, null, true);
