@@ -134,8 +134,8 @@ if ($data['correlations']) {
 					->setArgument('correlationid', $correlation['correlationid'])
 					->setArgument('action', 'correlation.edit')
 				)
-			))->addClass(ZBX_STYLE_WORDBREAK),
-			(new CCol($conditions))->addClass(ZBX_STYLE_WORDBREAK),
+			)),
+			(new CCol($conditions)),
 			$operations,
 			$status
 		]);
