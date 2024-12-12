@@ -1704,7 +1704,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		if (FAIL == dbsync_compare_uchar(dbrow[47], item->itemtype.httpitem->allow_traps))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[10], item->itemtype.httpitem->trapper_hosts))
+		if (FAIL == dbsync_compare_str(dbrow[9], item->itemtype.httpitem->trapper_hosts))
 			return FAIL;
 	}
 

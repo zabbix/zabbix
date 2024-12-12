@@ -1,8 +1,17 @@
 Changes for 6.0.37rc1
 
 New features:
+...G...... [ZBXNEXT-8914] reworked Oracle plugin queries to use variable binding (dgoloscapov, esneiders)
 
 Bug fixes:
+........S. [ZBX-25542] added SQL_ATTR_QUERY_TIMEOUT timeout for ODBC monitoring (sboidenko)
+..F....... [ZBX-24895] changed double quotes to single quotes for a string in an SQL statement (rgontarski)
+...G...... [ZBX-25377] fixed crash when executing vfs.fs.size or other metrics and forked metric is terminated abnormally (vso)
+...G...... [ZBX-25390] fixed vfs.fs.get item for Digital Audio CD disks on Windows (MVekslers)
+..F....... [ZBX-25375] fixed command icon visibility in acknowledges for hc-light theme (dpankins)
+...G...... [ZBX-25267] fixed Zabbix agent 2 refusing PSK connections when using PSK and certs (dgoloscapov)
+...G...... [ZBX-25404] fixed issue of trapper item failing when space character is used in the 'Allowed hosts' field (MVekslers)
+..F....... [ZBX-25269] fixed widget iterator readiness (apoga, averza)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.36
@@ -3332,6 +3341,7 @@ Changes for 5.0.46rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-25633] fixed crash if macro is used in allowed hosts (vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.45
