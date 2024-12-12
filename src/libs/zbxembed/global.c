@@ -94,7 +94,7 @@ static duk_ret_t	es_btoa(duk_context *ctx)
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot obtain parameter");
 
 	str_base64_encode_dyn(str, &b64str, (int)len);
-	duk_push_string(ctx, b64str);
+	es_push_result_string(ctx, b64str, strlen(b64str));
 	zbx_free(str);
 	zbx_free(b64str);
 
@@ -174,7 +174,7 @@ static duk_ret_t	es_md5(duk_context *ctx)
 
 	*ptr = '\0';
 
-	duk_push_string(ctx, md5sum);
+	es_push_result_string(ctx, md5sum, MD5_DIGEST_SIZE * 2);
 	zbx_free(str);
 	zbx_free(md5sum);
 	return 1;
@@ -216,7 +216,7 @@ static duk_ret_t	es_sha256(duk_context *ctx)
 
 	hash_res_stringhexes[ZBX_SHA256_DIGEST_SIZE * 2] = '\0';
 
-	duk_push_string(ctx, hash_res_stringhexes);
+	es_push_result_string(ctx, hash_res_stringhexes, ZBX_SHA256_DIGEST_SIZE * 2);
 	zbx_free(str);
 	return 1;
 }
