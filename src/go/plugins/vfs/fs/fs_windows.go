@@ -133,7 +133,7 @@ func getFsStats(path string) (stats *FsStats, err error) {
 
 	err = windows.GetDiskFreeSpaceEx(windows.StringToUTF16Ptr(path), &callerFree, &total, nil)
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	totalUsed := total - callerFree
@@ -148,7 +148,7 @@ func getFsStats(path string) (stats *FsStats, err error) {
 		stats.PUsed = float64(totalUsed) * 100.0 / float64(total)
 	}
 
-	return stats, err
+	return
 }
 
 func (p *Plugin) getFsInfo() (data []*FsInfo, err error) {
