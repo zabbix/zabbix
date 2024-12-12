@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.0.35rc1');
-define('ZABBIX_API_VERSION',	'6.0.35');
+define('ZABBIX_VERSION',		'6.0.37rc1');
+define('ZABBIX_API_VERSION',	'6.0.37');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
 define('ZABBIX_DB_VERSION',		6000000);
@@ -2134,9 +2134,8 @@ define('ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND', 'interface-input-expand');
 
 define('ZBX_STYLE_ZSELECT_HOST_INTERFACE', 'z-select-host-interface');
 
-// Dashboard list table classes.
+// Dashboard list table class.
 define('ZBX_STYLE_DASHBOARD_LIST', 'dashboard-list');
-define('ZBX_STYLE_DASHBOARD_LIST_ITEM', 'dashboard-list-item');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');

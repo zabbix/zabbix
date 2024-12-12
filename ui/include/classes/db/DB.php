@@ -27,6 +27,7 @@ class DB {
 	const RESERVEIDS_ERROR = 2;
 	const SCHEMA_ERROR = 3;
 	const INPUT_ERROR = 4;
+	const INIT_ERROR = 5;
 
 	const TABLE_TYPE_CONFIG = 1;
 	const TABLE_TYPE_HISTORY = 2;

@@ -2874,6 +2874,7 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 
 			if (0 == found)
 			{
+				zbx_trim_str_list(row[9], ',');
 				item->itemtype.trapitem = (ZBX_DC_TRAPITEM *)__config_mem_malloc_func(NULL,
 						sizeof(ZBX_DC_TRAPITEM));
 			}
@@ -3003,6 +3004,7 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 		case ITEM_TYPE_HTTPAGENT:
 			if (0 == found)
 			{
+				zbx_trim_str_list(row[9], ',');
 				item->itemtype.httpitem = (ZBX_DC_HTTPITEM *)__config_mem_malloc_func(NULL,
 						sizeof(ZBX_DC_HTTPITEM));
 			}
@@ -3905,7 +3907,7 @@ static int	dc_function_calculate_trends_nextcheck(time_t from, const char *perio
 		if (*nextcheck > from)
 			return SUCCEED;
 
-		zbx_tm_add(&tm, 1, base, NULL);
+		zbx_tm_add(&tm, 1, base);
 		if (-1 == (next = mktime(&tm)))
 		{
 			*error = zbx_strdup(*error, zbx_strerror(errno));
@@ -3945,7 +3947,7 @@ static int	dc_function_calculate_nextcheck(const zbx_trigger_timer_t *timer, tim
 		if (ZBX_TIME_UNIT_HOUR == timer->trend_base)
 		{
 			localtime_r(&from, &tm);
-			zbx_tm_round_up(&tm, timer->trend_base, NULL);
+			zbx_tm_round_up(&tm, timer->trend_base);
 
 			if (-1 == (nextcheck = mktime(&tm)))
 			{

@@ -565,7 +565,7 @@ button {
 				background-color: $ui-bg-selected-color !important;
 			}
 
-			&:focus + label {
+			&:not([readonly]):focus + label {
 				background-color: lighten($btn-bg-color, 10%) !important;
 				box-shadow: 0 0 0 2px $blue !important;
 				color: $white;
@@ -573,6 +573,11 @@ button {
 
 			&:checked[disabled] + label {
 				background-color: #d3d3d3 !important;
+			}
+
+			&[readonly]:checked + label {
+				background-color: #b2b4bb !important;
+				-webkit-text-fill-color: #292929;
 			}
 		}
 	}
@@ -1166,7 +1171,7 @@ td.inactive-bg {
 }
 
 .icon-action-command::before {
-	background-position: -249px -325px;
+	background-position: -249px -285px;
 }
 
 .icon-action-close::before {

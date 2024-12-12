@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-06-12T12:07:28Z'
+  date: '2024-10-31T12:21:31Z'
   groups:
     - uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
@@ -271,10 +271,6 @@ zabbix_export:
                   item:
                     host: 'Linux block devices by Zabbix agent'
                     key: 'vfs.dev.util[{#DEVNAME}]'
-          preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
       macros:
         - macro: '{$VFS.DEV.DEVNAME.MATCHES}'
           value: .+

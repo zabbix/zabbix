@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2024-08-19 05:57+0000\n"
+"PO-Revision-Date: 2024-11-18 07:27+0000\n"
 "Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -1398,7 +1398,7 @@ msgstr "試行回数"
 
 #: app/views/administration.geomaps.edit.php:86
 msgid "Attribution text"
-msgstr ""
+msgstr "帰属情報"
 
 #: app/views/administration.housekeeping.edit.php:250
 #: include/classes/helpers/CMenuHelper.php:148
@@ -9453,7 +9453,7 @@ msgstr "\"%1$s\"フィールドのための値が正しくありません。"
 #: include/validate.inc.php:364
 #, c-format
 msgid "Incorrect value for field \"%1$s\": %2$s."
-msgstr "フィールド\"%1$s\": %2$sの値が正しくありません。"
+msgstr "フィールド\"%1$s\"の値が正しくありません: %2$s。"
 
 #: include/classes/helpers/CServiceHelper.php:149
 msgid "Increase by"
@@ -16556,7 +16556,7 @@ msgstr "ソースの種類"
 
 #: include/locales.inc.php:62
 msgid "Spanish (es_ES)"
-msgstr "スペイン語(es_ES)"
+msgstr "スペイン語 (es_ES)"
 
 #: include/classes/helpers/CRoleHelper.php:176
 msgid "Specified role was not found."
@@ -18805,7 +18805,7 @@ msgstr "アップタイム/ダウンタイム"
 
 #: app/views/administration.miscconfig.edit.php:115
 msgid "Use X-Frame-Options HTTP header"
-msgstr ""
+msgstr "X-Frame-Options HTTPヘッダを使用する"
 
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
