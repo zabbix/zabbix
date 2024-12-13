@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-12-09 16:58+0000\n"
+"PO-Revision-Date: 2024-12-13 11:06+0000\n"
 "Last-Translator: Maksym <maxim@ua.fm>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -87,12 +87,12 @@ msgstr "%1$d співпадінь для %2$s знайдено"
 #: widgets/hostnavigator/Widget.php:39
 #, c-format
 msgid "%1$d of %1$d+ hosts are shown"
-msgstr ""
+msgstr "Показано %1$d з %1$d+ вузлів мережі"
 
 #: widgets/itemnavigator/Widget.php:39
 #, c-format
 msgid "%1$d of %1$d+ items are shown"
-msgstr ""
+msgstr "Показано %1$d із %1$d+ елементів"
 
 #: widgets/problems/actions/WidgetView.php:78
 #, c-format
@@ -2733,12 +2733,11 @@ msgstr[1] "Не вдалося видалити кореляції подій"
 msgstr[2] "Не вдалося видалити кореляцій подій"
 
 #: graphs.php:281 graphs.php:338
-#, fuzzy
 msgid "Cannot delete graph"
 msgid_plural "Cannot delete graphs"
 msgstr[0] "Не вдалося видалити графік"
-msgstr[1] "Не вдалося видалити графік"
-msgstr[2] "Не вдалося видалити графік"
+msgstr[1] "Не вдалося видалити графіки"
+msgstr[2] "Не вдалося видалити графіки"
 
 #: graphs.php:273 graphs.php:317
 #, fuzzy
@@ -4135,12 +4134,11 @@ msgstr "Не вдалося оновити групи для виявленог�
 #: app/controllers/CControllerHostUpdate.php:36
 #: app/controllers/CControllerHostUpdate.php:160
 #: app/controllers/CControllerPopupMassupdateHost.php:521
-#, fuzzy
 msgid "Cannot update host"
 msgid_plural "Cannot update hosts"
-msgstr[0] "Не вдалося оновити вузел мережі"
-msgstr[1] "Не вдалося оновити вузел мережі"
-msgstr[2] "Не вдалося оновити вузел мережі"
+msgstr[0] "Не вдалося оновити вузол мережі"
+msgstr[1] "Не вдалося оновити вузли мережі"
+msgstr[2] "Не вдалося оновити вузли мережі"
 
 #: include/classes/api/services/CHost.php:982
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
