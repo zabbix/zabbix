@@ -286,9 +286,7 @@ foreach ($data['hosts'] as $host) {
 		->setArgument('hostid', $host['hostid'])
 		->getUrl();
 
-	$description[] = (new CLink($host['name'], $host_url))
-		->setAttribute('data-hostid', $host['hostid'])
-		->setAttribute('data-action', 'host.edit');
+	$description[] = new CLink($host['name'], $host_url);
 
 	$maintenance_icon = false;
 
@@ -345,8 +343,6 @@ foreach ($data['hosts'] as $host) {
 
 			$caption = [
 				(new CLink($template['name'], $template_url))
-					->setAttribute('data-templateid', $template['templateid'])
-					->setAttribute('data-action', 'template.edit')
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->addClass(ZBX_STYLE_GREY)
 			];
@@ -374,8 +370,6 @@ foreach ($data['hosts'] as $host) {
 						->getUrl();
 
 					$caption[] = (new CLink($parent_template['name'], $parent_template_url))
-						->setAttribute('data-templateid', $parent_template['templateid'])
-						->setAttribute('data-action', 'template.edit')
 						->addClass(ZBX_STYLE_LINK_ALT)
 						->addClass(ZBX_STYLE_GREY);
 				}
@@ -470,8 +464,6 @@ foreach ($data['hosts'] as $host) {
 				? (new CLink($data['proxies'][$host['proxyid']]['name'],
 					$proxy_url->setArgument('proxyid', $host['proxyid'])
 				))
-					->setAttribute('data-proxyid', $host['proxyid'])
-					->setAttribute('data-action', 'proxy.edit')
 				: $data['proxies'][$host['proxyid']]['name'];
 		}
 		elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
@@ -485,8 +477,6 @@ foreach ($data['hosts'] as $host) {
 				? (new CLink($data['proxy_groups'][$host['proxy_groupid']]['name'], $proxy_group_url))
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->addClass(ZBX_STYLE_GREY)
-					->setAttribute('data-proxy_groupid', $host['proxy_groupid'])
-					->setAttribute('data-action', 'proxygroup.edit')
 				: $data['proxy_groups'][$host['proxy_groupid']]['name'];
 
 			if ($host['assigned_proxyid'] != 0) {
@@ -496,8 +486,6 @@ foreach ($data['hosts'] as $host) {
 					? (new CLink($data['proxies'][$host['assigned_proxyid']]['name'],
 						$proxy_url->setArgument('proxyid', $host['assigned_proxyid'])
 					))
-						->setAttribute('data-proxyid', $host['assigned_proxyid'])
-						->setAttribute('data-action', 'proxy.edit')
 					: $data['proxies'][$host['assigned_proxyid']]['name'];
 			}
 		}

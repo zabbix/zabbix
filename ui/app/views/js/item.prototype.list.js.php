@@ -30,7 +30,7 @@
 
 			this.initFilterForm();
 			this.initEvents();
-			this.#setSubmitCallback();
+			this.#registerSubscribers();
 		}
 
 		initFilterForm() {
@@ -40,8 +40,8 @@
 		}
 
 		initEvents() {
-			document.querySelector('.js-create-item-prototype')?.addEventListener('click', (e) => {
-				window.popupManagerInstance.openPopup('item.prototype.edit', e.target.dataset);
+			document.querySelector('.js-create-item-prototype').addEventListener('click', e => {
+				ZABBIX.PopupManager.openPopup('item.prototype.edit', e.target.dataset);
 			});
 
 			this.form.addEventListener('click', e => {
@@ -152,9 +152,33 @@
 			);
 		}
 
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				this.elementSuccess(e);
+		#registerSubscribers() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_SUBMIT
+				},
+				callback: ({data}) => {
+					if ('error' in data) {
+						if ('title' in data.error) {
+							postMessageError(data.error.title);
+						}
+
+						postMessageDetails('error', data.error.messages);
+					}
+					else {
+						chkbxRange.clearSelectedOnFilterChange();
+					}
+
+					if (data.success.action === 'delete') {
+						const url = new Curl('host_discovery.php');
+
+						url.setArgument('context', this.context);
+						url.setArgument('filter_set', 1);
+
+						ZABBIX.PopupManager.setCurrentUrl(url.getUrl());
+					}
+				}
 			});
 		}
 

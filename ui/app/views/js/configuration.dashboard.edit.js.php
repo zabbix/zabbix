@@ -122,7 +122,7 @@
 				ZABBIX.Dashboard.editProperties();
 			}
 
-			this.setSubmitCallback();
+			this.registerSubscribers();
 		},
 
 		save() {
@@ -208,30 +208,20 @@
 			window.removeEventListener('beforeunload', this.events.beforeUnload);
 		},
 
-		setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				const data = e.detail;
-				let curl = null;
+		registerSubscribers() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_SUBMIT
+				},
+				callback: ({data}) => {
+					if (data.success.action === 'delete') {
+						const url = new Curl('zabbix.php');
 
-				if ('success' in data) {
-					postMessageOk(data.success.title);
+						url.setArgument('action', 'template.list');
 
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
+						ZABBIX.PopupManager.setCurrentUrl(url.getUrl());
 					}
-
-					if ('action' in data.success && data.success.action === 'delete') {
-						curl = new Curl('zabbix.php');
-
-						curl.setArgument('action', 'template.list');
-					}
-				}
-
-				if (curl === null) {
-					location.href = location.href;
-				}
-				else {
-					location.href = curl.getUrl();
 				}
 			});
 		},

@@ -42,13 +42,7 @@ $formgrid = (new CFormGrid())
 	)
 	->addItem($item['discovered'] ? [
 		new CLabel(_('Discovered by')),
-		(new CFormField(
-			(new CLink($item['discoveryRule']['name'], $discovered_url))
-				->setAttribute('data-action', 'item.prototype.edit')
-				->setAttribute('data-parent_discoveryid', $item['discoveryRule']['itemid'])
-				->setAttribute('data-itemid', $item['itemDiscovery']['parent_itemid'])
-				->setAttribute('data-context', $item['context'])
-		))->addClass('js-parent-items')
+		(new CFormField(new CLink($item['discoveryRule']['name'], $discovered_url)))->addClass('js-parent-items')
 	] : null)
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
@@ -703,11 +697,7 @@ if ($data['can_edit_source_timeouts'] && (!$readonly || !$custom_timeout_enabled
 			->setArgument('popup', 'proxy.edit')
 			->setArgument('proxyid', $data['host']['proxyid'])
 			->getUrl()
-		))
-			->addClass(ZBX_STYLE_LINK)
-			->addClass('js-edit-proxy')
-			->setAttribute('data-proxyid', $data['host']['proxyid'])
-			->setAttribute('data-action', 'proxy.edit')
+		))->addClass(ZBX_STYLE_LINK)
 		: (new CLink(_('Timeouts'),
 			(new CUrl('zabbix.php'))->setArgument('action', 'timeouts.edit')
 		))

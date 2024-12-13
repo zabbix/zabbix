@@ -35,8 +35,7 @@ $html_page = (new CHtmlPage())
 	))
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())
-				->addItem((new CButton('create_trigger',_('Create trigger prototype')))->setId('js-create'))
+			(new CList())->addItem((new CButton('create_trigger', _('Create trigger prototype')))->setId('js-create'))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->setNavigation(getHostNavigation('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
@@ -91,11 +90,7 @@ foreach ($data['triggers'] as $trigger) {
 		->setArgument('triggerid', $triggerid)
 		->setArgument('context', $data['context']);
 
-	$description[] = (new CLink($trigger['description'], $trigger_url))
-		->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
-		->setAttribute('data-triggerid', $triggerid)
-		->setAttribute('data-context', $data['context'])
-		->setAttribute('data-action', 'trigger.prototype.edit');
+	$description[] = new CLink($trigger['description'], $trigger_url);
 
 	if ($trigger['dependencies']) {
 		$description[] = [BR(), bold(_('Depends on').':')];
@@ -118,11 +113,7 @@ foreach ($data['triggers'] as $trigger) {
 
 				$trigger_dependencies[] = (new CLink($dep_trigger_description, $dep_trigger_prototype_url))
 					->addClass(triggerIndicatorStyle($dep_trigger['status']))
-					->addClass(ZBX_STYLE_LINK_ALT)
-					->setAttribute('data-action', 'trigger.prototype.edit')
-					->setAttribute('data-triggerid', $dep_trigger['triggerid'])
-					->setAttribute('data-context', $data['context'])
-					->setAttribute('data-parent_discoveryid', $data['parent_discoveryid']);
+					->addClass(ZBX_STYLE_LINK_ALT);
 			}
 			elseif ($dep_trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 				$dep_trigger_url = (new CUrl('zabbix.php'))
@@ -134,10 +125,7 @@ foreach ($data['triggers'] as $trigger) {
 
 				$trigger_dependencies[] = (new CLink($dep_trigger_description, $dep_trigger_url))
 					->addClass(triggerIndicatorStyle($dep_trigger['status']))
-					->addClass(ZBX_STYLE_LINK_ALT)
-					->setAttribute('data-action', 'trigger.edit')
-					->setAttribute('data-triggerid', $dep_trigger['triggerid'])
-					->setAttribute('data-context', $data['context']);
+					->addClass(ZBX_STYLE_LINK_ALT);
 			}
 
 			$trigger_dependencies[] = BR();

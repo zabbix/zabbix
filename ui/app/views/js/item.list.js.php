@@ -27,18 +27,18 @@
 <script>
 	const view = new class {
 
-		init({context, confirm_messages, field_switches, form_name, hostids, token}) {
+		init({context, confirm_messages, field_switches, form_name, hostid, token}) {
 			this.confirm_messages = confirm_messages;
 			this.token = token;
 			this.context = context;
-			this.hostids = hostids;
+			this.hostid = hostid;
 
 			this.form = document.forms[form_name];
 			this.filter_form = document.querySelector('form[name="zbx_filter"]');
 
 			this.initForm(field_switches);
 			this.initEvents();
-			this.#setSubmitCallback();
+			this.#registerSubscribers();
 		}
 
 		initForm(field_switches) {
@@ -84,7 +84,8 @@
 					});
 				}
 			});
-			this.form.addEventListener('click', (e) => {
+
+			this.form.addEventListener('click', e => {
 				const target = e.target;
 				const itemids = Object.keys(chkbxRange.getSelectedIds());
 
@@ -117,9 +118,9 @@
 				}
 			});
 
-			document.querySelector('.js-create-item')?.addEventListener('click', (e) =>
-				window.popupManagerInstance.openPopup('item.edit', e.target.dataset)
-			);
+			document.querySelector('.js-create-item')?.addEventListener('click', () => {
+				ZABBIX.PopupManager.openPopup('item.edit', {hostid: this.hostid, context: this.context});
+			});
 		}
 
 		executeNow(target, data) {
@@ -231,9 +232,35 @@
 				});
 		}
 
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				this.elementSuccess(e);
+		#registerSubscribers() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_SUBMIT
+				},
+				callback: ({data}) => {
+					if ('error' in data) {
+						if ('title' in data.error) {
+							postMessageError(data.error.title);
+						}
+
+						postMessageDetails('error', data.error.messages);
+					}
+					else {
+						chkbxRange.clearSelectedOnFilterChange();
+					}
+
+					// If host or template was deleted while being in item list, redirect to item list.
+					if (data.success.action === 'delete' && data.action !== 'item.delete') {
+						const url = new Curl('zabbix.php');
+
+						url.setArgument('action', 'item.list');
+						url.setArgument('context', this.context);
+						url.setArgument('filter_set', 1);
+
+						ZABBIX.PopupManager.setCurrentUrl(url.getUrl());
+					}
+				}
 			});
 		}
 

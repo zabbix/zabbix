@@ -31,13 +31,13 @@
 			this.delete_url = delete_url;
 
 			this.initActionButtons();
-			this.setSubmitCallback();
+			this.registerSubscribers();
 		},
 
 		initActionButtons() {
-			document.addEventListener('click', (e) => {
+			document.addEventListener('click', e => {
 				if (e.target.classList.contains('js-create-hostgroup')) {
-					window.popupManagerInstance.openPopup('hostgroup.edit', {});
+					ZABBIX.PopupManager.openPopup('hostgroup.edit');
 				}
 				else if (e.target.classList.contains('js-massenable-hostgroup')) {
 					this.enable(e.target, Object.keys(chkbxRange.getSelectedIds()));
@@ -126,18 +126,15 @@
 				});
 		},
 
-		setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
+		registerSubscribers() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_SUBMIT
+				},
+				callback: () => {
+					uncheckTableRows('hostgroup');
 				}
-
-				uncheckTableRows('hostgroup');
-				location.href = location.href;
 			});
 		},
 	};

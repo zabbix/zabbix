@@ -494,7 +494,7 @@
 
 			!this.graphs.readonly && this.rewriteNameLinks();
 
-			this.setSubmitCallback();
+			this.registerSubscribers();
 		},
 
 		loadItem(item) {
@@ -654,27 +654,23 @@
 			post(url.getUrl(), fields);
 		},
 
-		setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				let curl = null;
+		registerSubscribers() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_SUBMIT
+				},
+				callback: ({data}) => {
+					if (data.success.action === 'delete') {
+						const url = this.is_discovery ? new Curl('host_discovery.php') : new Curl('graphs.php');
 
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
+						url.setArgument('context', this.context);
 
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
+						ZABBIX.PopupManager.setCurrentUrl(url.getUrl());
 					}
-
-					if ('action' in e.detail.success && e.detail.success.action === 'delete') {
-						curl = this.is_discovery ? new Curl('host_discovery.php') : new Curl('graphs.php');
-						curl.setArgument('context', this.context);
+					else {
+						this.refresh();
 					}
-				}
-				if (curl) {
-					location.href = curl.getUrl();
-				}
-				else {
-					view.refresh();
 				}
 			});
 		}

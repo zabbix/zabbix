@@ -44,20 +44,33 @@ window.proxy_group_edit_popup = new class {
 		this.#proxy_groupid = proxy_groupid;
 		this.#initial_form_fields = getFormFields(this.#form);
 
-		const backurl = new Curl('zabbix.php');
+		const back_url = new Curl('zabbix.php');
+		back_url.setArgument('action', 'proxygroup.list');
+		ZABBIX.PopupManager.setBackUrl(back_url.getUrl());
 
-		backurl.setArgument('action', 'proxygroup.list');
-		this.#overlay.backurl = backurl.getUrl();
-
-		this.#initActions();
+		this.#registerSubscribers();
 	}
 
-	#initActions() {
-		this.#form.addEventListener('click', (e) => {
-			if (e.target.classList.contains('js-edit-proxy')) {
-				this.setActions(e.target.dataset.proxyid);
+	#registerSubscribers() {
+		const subscription = ZABBIX.EventHub.subscribe({
+			require: {
+				context: CPopupManager.CONTEXT_POPUP,
+				event: CPopupManager.EVENT_BEFORE_OPEN,
+				action: 'proxy.edit'
+			},
+			callback: ({event}) => {
+				if (!this.#isConfirmed()) {
+					event.is_prevented = true;
+				}
 			}
 		});
+
+		ZABBIX.PopupManager.addSubscriber(subscription);
+	}
+
+	#isConfirmed() {
+		return JSON.stringify(this.#initial_form_fields) === JSON.stringify(getFormFields(this.#form))
+			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
 	clone({title, buttons}) {
@@ -144,33 +157,5 @@ window.proxy_group_edit_popup = new class {
 				this.#form.parentNode.insertBefore(message_box, this.#form);
 			})
 			.finally(() => this.#overlay.unsetLoading());
-	}
-
-	setActions(proxyid) {
-		window.popupManagerInstance.setAdditionalActions(() => {
-			const form_fields = getFormFields(this.#form);
-
-			const url = new Curl('zabbix.php');
-			url.setArgument('action', 'popup');
-			url.setArgument('popup', 'proxy.edit');
-			url.setArgument('proxyid', proxyid);
-
-			if (JSON.stringify(this.#initial_form_fields) !== JSON.stringify(form_fields)) {
-				if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
-					return false;
-				}
-				else {
-					overlayDialogueDestroy(this.#overlay.dialogueid);
-					history.replaceState(null, '', url.getUrl());
-
-					return true;
-				}
-			}
-
-			overlayDialogueDestroy(this.#overlay.dialogueid);
-			history.replaceState(null, '', url.getUrl());
-
-			return true;
-		});
 	}
 }

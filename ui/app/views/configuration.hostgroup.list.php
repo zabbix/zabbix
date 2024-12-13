@@ -99,10 +99,7 @@ foreach ($data['groups'] as $group) {
 				->setArgument('hostid', $host['hostid'])
 				->getUrl();
 
-			$host_output = (new CLink($host['name'], $host_url))
-				->setAttribute('data-hostid', $host['hostid'])
-				->setAttribute('data-action', 'host.edit')
-				->addClass(ZBX_STYLE_LINK_ALT);
+			$host_output = (new CLink($host['name'], $host_url))->addClass(ZBX_STYLE_LINK_ALT);
 		}
 		else {
 			$host_output = new CSpan($host['name']);
@@ -167,9 +164,7 @@ foreach ($data['groups'] as $group) {
 		->setArgument('groupid', $group['groupid'])
 		->getUrl();
 
-	$name[] = (new CLink($group['name'], $group_url))
-		->setAttribute('data-groupid', $group['groupid'])
-		->setAttribute('data-action', 'hostgroup.edit');
+	$name[] = new CLink($group['name'], $group_url);
 
 	$info_icons = [];
 

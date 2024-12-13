@@ -1202,6 +1202,10 @@ document.addEventListener('DOMContentLoaded', () => {
 	if (typeof CSoftwareVersionCheck !== 'undefined') {
 		ZABBIX.SoftwareVersionCheck = new CSoftwareVersionCheck();
 	}
+
+	// Popup manager initialization.
+
+	ZABBIX.PopupManager = new CPopupManager();
 });
 
 window.addEventListener('load', () => {

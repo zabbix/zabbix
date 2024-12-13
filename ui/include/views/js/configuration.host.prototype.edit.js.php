@@ -39,14 +39,7 @@
 			this.initMacrosTab();
 			this.initInventoryTab();
 			this.initEncryptionTab();
-			this.setSubmitCallback();
-			this.setPopupOpeningCallback();
-		}
-
-		setPopupOpeningCallback() {
-			window.popupManagerInstance.setPopupOpeningCallback((action) => {
-				return action !== 'host.edit';
-			});
+			this.#registerSubscribers();
 		}
 
 		initHostTab() {
@@ -210,6 +203,39 @@
 			jQuery('input[name=tls_connect]').trigger('change');
 		}
 
+		#registerSubscribers() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_BEFORE_OPEN,
+					action: 'host.edit'
+				},
+				callback: ({event}) => {
+					event.is_prevented = true;
+					event.prevent_default = false;
+				}
+			});
+
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_SUBMIT
+				},
+				callback: ({data}) => {
+					if (data.success.action === 'delete') {
+						const url = new Curl('host_discovery.php');
+
+						url.setArgument('context', 'template');
+
+						ZABBIX.PopupManager.setCurrentUrl(url.getUrl());
+					}
+					else {
+						this.refresh();
+					}
+				}
+			});
+		}
+
 		addGroupPrototypeRow(groupPrototype) {
 			const addButton = jQuery('#group_prototype_add');
 
@@ -269,32 +295,6 @@
 			const fields = getFormFields(form);
 
 			post(url.getUrl(), fields);
-		}
-
-		setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				let curl = null;
-
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-
-					if ('action' in e.detail.success && e.detail.success.action === 'delete') {
-						curl = new Curl('host_discovery.php');
-						curl.setArgument('context', 'template');
-					}
-				}
-
-				if (curl) {
-					location.href = curl.getUrl();
-				}
-				else {
-					view.refresh();
-				}
-			});
 		}
 	}
 </script>

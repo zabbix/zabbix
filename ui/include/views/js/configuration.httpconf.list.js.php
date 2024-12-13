@@ -40,22 +40,18 @@
 			// Init existing fields once loaded.
 			document.querySelectorAll('#filter-tags .form_row').forEach(row => new CTagFilterItem(row));
 
-			this.setSubmitCallback();
+			this.registerSubscribers();
 		},
 
-		setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
+		registerSubscribers() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_SUBMIT
+				},
+				callback: () => {
+					uncheckTableRows('httpconf_'+ view.checkbox_hash, [], false);
 				}
-
-				uncheckTableRows('httpconf_'+ view.checkbox_hash, [], false);
-
-				location.href = location.href;
 			});
 		}
 	};

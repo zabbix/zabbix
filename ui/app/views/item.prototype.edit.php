@@ -162,7 +162,7 @@ $tabs = (new CTabView(['id' => $tabsid]))
 		TAB_INDICATOR_PREPROCESSING
 	);
 
-$backurl = (new CUrl('zabbix.php'))
+$back_url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'item.prototype.list')
 	->setArgument('parent_discoveryid', $item['parent_discoveryid'])
 	->setArgument('context', $item['context'])
@@ -187,7 +187,7 @@ $form
 			'testable_item_types' => $data['testable_item_types'],
 			'type_with_key_select' => $type_with_key_select,
 			'value_type_keys' => $data['value_type_keys'],
-			'backurl' => $backurl
+			'back_url' => $back_url
 		]).');'))->setOnDocumentReady()
 	);
 $output = [

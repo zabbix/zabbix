@@ -25,7 +25,7 @@
 			this.delete_url = delete_url;
 
 			document.querySelector('.js-create-templategroup').addEventListener('click', () => {
-				window.popupManagerInstance.openPopup('templategroup.edit', {});
+				ZABBIX.PopupManager.openPopup('templategroup.edit');
 			});
 
 			document.addEventListener('click', (e) => {
@@ -34,7 +34,7 @@
 				}
 			});
 
-			this.#setSubmitCallback();
+			this.#registerSubscribers();
 		}
 
 		delete(target, groupids) {
@@ -93,18 +93,15 @@
 				});
 		}
 
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
+		#registerSubscribers() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_SUBMIT
+				},
+				callback: () => {
+					uncheckTableRows('templategroup');
 				}
-
-				uncheckTableRows('templategroup');
-				location.href = location.href;
 			});
 		}
 	}

@@ -20,6 +20,11 @@ class CEventHub {
 	static EVENT_SUBSCRIBE = 'subscribe';
 	static EVENT_UNSUBSCRIBE = 'unsubscribe';
 
+	publish_event = {
+		is_prevented: false,
+		prevent_default: true
+	};
+
 	#subscribers = new Map();
 
 	#latest_data = new Map();
@@ -44,9 +49,14 @@ class CEventHub {
 		this.#latest_data.delete(descriptor_hash);
 		this.#latest_data.set(descriptor_hash, {data, descriptor});
 
+		this.publish_event = {
+			is_prevented: false,
+			prevent_default: true
+		};
+
 		for (const {require, callback} of this.#subscribers.values()) {
 			if (CEventHub.#match(require, descriptor)) {
-				callback({data, descriptor});
+				callback({data, descriptor, event: this.publish_event});
 			}
 		}
 

@@ -28,7 +28,7 @@
 			this.token = token;
 
 			this.#initActions();
-			this.#setSubmitCallback();
+			this.#registerSubscribers();
 		}
 
 		#initActions() {
@@ -53,15 +53,12 @@
 				}
 			});
 
-			document.getElementById('js-create').addEventListener('click', (e) => {
-				window.popupManagerInstance.openPopup('trigger.prototype.edit',
-					{
-						parent_discoveryid: this.parent_discoveryid,
-						triggerid: e.target.dataset.triggerid,
-						hostid: this.hostid,
-						context: this.context
-					}
-				);
+			document.getElementById('js-create').addEventListener('click', () => {
+				ZABBIX.PopupManager.openPopup('trigger.prototype.edit', {
+					parent_discoveryid: this.parent_discoveryid,
+					hostid: this.hostid,
+					context: this.context
+				});
 			});
 		}
 
@@ -177,31 +174,22 @@
 				});
 		}
 
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				const data = e.detail;
-				let curl = null;
+		#registerSubscribers() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_SUBMIT
+				},
+				callback: ({data}) => {
+					uncheckTableRows('trigger_prototypes_' + this.parent_discoveryid, [], false);
 
-				if ('success' in data) {
-					postMessageOk(data.success.title);
+					if (data.success.action === 'delete') {
+						const url = new Curl('host_discovery.php');
 
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
+						url.setArgument('context', this.context);
+
+						ZABBIX.PopupManager.setCurrentUrl(url.getUrl());
 					}
-
-					if ('action' in data.success && data.success.action === 'delete') {
-						curl = new Curl('host_discovery.php');
-						curl.setArgument('context', this.context);
-					}
-				}
-
-				uncheckTableRows('trigger_prototypes_' + this.parent_discoveryid, [] ,false);
-
-				if (curl) {
-					location.href = curl.getUrl();
-				}
-				else {
-					location.href = location.href;
 				}
 			});
 		}

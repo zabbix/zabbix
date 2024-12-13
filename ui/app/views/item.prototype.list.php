@@ -73,11 +73,7 @@ foreach ($data['items'] as $item) {
 
 				$name[] = (new CLink($item['master_item']['name'], $item_prototype_url))
 					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_TEAL)
-					->setAttribute('data-action', 'item.prototype.edit')
-					->setAttribute('data-itemid', $item['master_item']['itemid'])
-					->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
-					->setAttribute('data-context', $data['context']);
+					->addClass(ZBX_STYLE_TEAL);
 			}
 			else {
 				$item_url = (new CUrl('zabbix.php'))
@@ -89,10 +85,7 @@ foreach ($data['items'] as $item) {
 
 				$name[] = (new CLink($item['master_item']['name'], $item_url))
 					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_TEAL)
-					->setAttribute('data-action', 'item.edit')
-					->setAttribute('data-itemid', $item['master_item']['itemid'])
-					->setAttribute('data-context', $data['context']);
+					->addClass(ZBX_STYLE_TEAL);
 			}
 		}
 
@@ -107,11 +100,7 @@ foreach ($data['items'] as $item) {
 		->setArgument('context', $data['context'])
 		->getUrl();
 
-	$name[] = (new CLink($item['name'], $item_prototype_url))
-		->setAttribute('data-action', 'item.prototype.edit')
-		->setAttribute('data-itemid', $item['itemid'])
-		->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
-		->setAttribute('data-context', $data['context']);
+	$name[] = new CLink($item['name'], $item_prototype_url);
 
 	$table->addRow([
 		new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']),

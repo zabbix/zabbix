@@ -31,7 +31,7 @@
 			this.form = document.forms[form_name];
 
 			this.#initActions();
-			this.#setSubmitCallback();
+			this.#registerSubscribers();
 		}
 
 		#initActions() {
@@ -79,25 +79,23 @@
 			});
 		}
 
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				let curl = null;
+		#registerSubscribers() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_SUBMIT
+				},
+				callback: ({data}) => {
+					uncheckTableRows('graphs_' + this.checkbox_hash, [], false);
 
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
+					if (data.success.action === 'delete') {
+						const url = this.is_discovery ? new Curl('host_discovery.php') : new Curl('graphs.php');
 
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
+						url.setArgument('context', this.context);
 
-					if ('action' in e.detail.success && e.detail.success.action === 'delete') {
-						curl = this.is_discovery ? new Curl('host_discovery.php') : new Curl('graphs.php');
-						curl.setArgument('context', this.context);
+						ZABBIX.PopupManager.setCurrentUrl(url.getUrl());
 					}
 				}
-
-				uncheckTableRows('graphs_' + this.checkbox_hash, [], false);
-				location.href = curl === null ? location.href : curl.getUrl();
 			});
 		}
 	};

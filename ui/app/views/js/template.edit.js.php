@@ -29,10 +29,9 @@ window.template_edit_popup = new class {
 		this.linked_templateids = this.#getLinkedTemplates();
 		this.macros_templateids = null;
 
-		const backurl = new Curl('zabbix.php');
-
-		backurl.setArgument('action', 'template.list');
-		this.overlay.backurl = backurl.getUrl();
+		const back_url = new Curl('zabbix.php');
+		back_url.setArgument('action', 'template.list');
+		ZABBIX.PopupManager.setBackUrl(back_url.getUrl());
 
 		if (warnings.length > 0) {
 			const message_box = warnings.length > 1
@@ -47,15 +46,13 @@ window.template_edit_popup = new class {
 		this.#initActions();
 		this.#initTemplateTab();
 		this.#initMacrosTab();
+		this.#registerSubscribers();
 
 		this.initial_form_fields = getFormFields(this.form);
 	}
 
 	#initActions() {
-		this.form.addEventListener('click', (e) => {
-			if (e.target.classList.contains('js-edit-template')) {
-				this.setActions(e.target.dataset.templateid);
-			}
+		this.form.addEventListener('click', e => {
 			if (e.target.classList.contains('js-unlink')) {
 				this.#unlink(e);
 			}
@@ -71,35 +68,6 @@ window.template_edit_popup = new class {
 
 		template_name.addEventListener('input', () => visible_name.placeholder = template_name.value);
 		template_name.dispatchEvent(new Event('input'));
-	}
-
-	setActions(templateid) {
-		window.popupManagerInstance.setAdditionalActions(() => {
-			const form_fields = getFormFields(this.form);
-
-			if (JSON.stringify(this.initial_form_fields) !== JSON.stringify(form_fields)) {
-				if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
-					return false;
-				}
-				else {
-					overlayDialogueDestroy(this.overlay.dialogueid);
-
-					const url = new Curl(location.href);
-
-					url.setArgument('templateid', templateid);
-					history.replaceState(null, '', url.getUrl());
-
-					return true;
-				}
-			}
-
-			const url = new Curl(location.href);
-
-			url.setArgument('templateid', templateid);
-			history.replaceState(null, '', url.getUrl());
-
-			return true;
-		});
 	}
 
 	#initTemplateTab() {
@@ -159,6 +127,32 @@ window.template_edit_popup = new class {
 		this.form.querySelector('#show_inherited_template_macros').onchange = (e) => {
 			this.macros_manager.load(e.target.value == 1, this.linked_templateids.concat(this.#getNewTemplates()));
 		}
+	}
+
+	#registerSubscribers() {
+		const subscription = ZABBIX.EventHub.subscribe({
+			require: {
+				context: CPopupManager.CONTEXT_POPUP,
+				event: CPopupManager.EVENT_BEFORE_OPEN,
+				action: 'template.edit'
+			},
+			callback: ({data, event}) => {
+				if (data.templateid === this.templateid || this.templateid === null) {
+					return;
+				}
+
+				if (!this.#isConfirmed()) {
+					event.is_prevented = true;
+				}
+			}
+		});
+
+		ZABBIX.PopupManager.addSubscriber(subscription);
+	}
+
+	#isConfirmed() {
+		return JSON.stringify(this.initial_form_fields) === JSON.stringify(getFormFields(this.form))
+			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
 	/**
@@ -231,7 +225,7 @@ window.template_edit_popup = new class {
 		parameters.templateid = this.templateid;
 		this.#prepareFields(parameters);
 
-		this.overlay = window.popupManagerInstance.openPopup('template.edit', parameters);
+		this.overlay = ZABBIX.PopupManager.openPopup('template.edit', parameters);
 	}
 
 	deleteAndClear() {

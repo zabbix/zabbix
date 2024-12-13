@@ -44,7 +44,7 @@ window.item_edit_form = new class {
 
 	init({
 		actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly, testable_item_types,
-		type_with_key_select, value_type_keys, source, backurl
+		type_with_key_select, value_type_keys, source, back_url
 	}) {
 		this.actions = actions;
 		this.form_data = form_data;
@@ -78,10 +78,12 @@ window.item_edit_form = new class {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
-		this.overlay.backurl = backurl;
+
+		ZABBIX.PopupManager.setBackUrl(back_url);
 
 		this.initForm(field_switches);
 		this.initEvents();
+		this.#registerSubscribers();
 
 		if (this.source === 'itemprototype') {
 			this.initItemPrototypeForm();
@@ -245,10 +247,6 @@ window.item_edit_form = new class {
 
 					break;
 			}
-
-			if (target.matches('a') && target.closest('.js-parent-items')) {
-				this.setActions(e.target.dataset);
-			}
 		});
 		this.form.querySelector('#delay-flex-table').addEventListener('click', e => this.#intervalTypeChangeHandler(e));
 
@@ -265,13 +263,6 @@ window.item_edit_form = new class {
 		// Tags tab events.
 		this.form.querySelectorAll('[name="show_inherited_tags"]')
 			.forEach(o => o.addEventListener('change', this.#inheritedTagsChangeHandler.bind(this)));
-		this.form.addEventListener('click', e => {
-			const target = e.target;
-
-			if (target.matches('.js-edit-template') || target.matches('.js-edit-proxy')) {
-				this.setActions(e.target.dataset);
-			}
-		});
 
 		// Preprocessing tab events.
 		this.field.value_type_steps.addEventListener('change', e => this.#valueTypeChangeHandler(e));
@@ -284,49 +275,40 @@ window.item_edit_form = new class {
 		});
 	}
 
-	setActions(dataset) {
-		const {action, ...params} = dataset;
-
-		window.popupManagerInstance.setAdditionalActions(() => {
-			const fields = this.#getFormFields(this.form);
-
-			fields.show_inherited_tags = this.initial_form_fields.show_inherited_tags;
-
-			if (!fields.tags.length) {
-				fields.tags.push({tag: '', value: ''});
-			}
-
-			const url = new Curl('zabbix.php');
-			url.setArgument('action', 'popup');
-			url.setArgument('popup', action);
-
-			for (const [key, value] of Object.entries(params)) {
-				url.setArgument(key, value);
-			}
-
-			if (JSON.stringify(this.initial_form_fields) !== JSON.stringify(fields)) {
-				if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
-					return false;
-				}
-				else {
-					overlayDialogueDestroy(this.overlay.dialogueid);
-
-					const url = new Curl(location.href);
-					for (const [key, value] of Object.entries(params)) {
-						url.setArgument(key, value);
+	#registerSubscribers() {
+		for (const action of ['template.edit', 'proxy.edit', 'item.edit', 'item.prototype.edit']) {
+			const subscription = ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_BEFORE_OPEN,
+					action
+				},
+				callback: ({data, descriptor, event}) => {
+					if (data.itemid === this.form_data.itemid || this.form_data.itemid === 0) {
+						return;
 					}
 
-					history.replaceState(null, '', url.getUrl());
-
-					return true;
+					if (!this.#isConfirmed()) {
+						event.is_prevented = true;
+					}
 				}
-			}
+			});
 
-			overlayDialogueDestroy(this.overlay.dialogueid);
-			history.replaceState(null, '', url.getUrl());
+			ZABBIX.PopupManager.addSubscriber(subscription);
+		}
+	}
 
-			return true;
-		});
+	#isConfirmed() {
+		const fields = this.#getFormFields(this.form);
+
+		fields.show_inherited_tags = this.initial_form_fields.show_inherited_tags;
+
+		if (!fields.tags.length) {
+			fields.tags.push({tag: '', value: ''});
+		}
+
+		return JSON.stringify(this.initial_form_fields) === JSON.stringify(fields)
+			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
 	initItemPrototypeEvents() {
@@ -338,8 +320,7 @@ window.item_edit_form = new class {
 	}
 
 	clone() {
-		this.overlay.setLoading();
-		window.popupManagerInstance.openPopup(
+		this.overlay = ZABBIX.PopupManager.openPopup(
 			this.source === 'itemprototype' ? 'item.prototype.edit' : 'item.edit',
 			{clone: 1, ...this.#getFormFields()}
 		);
@@ -578,22 +559,6 @@ window.item_edit_form = new class {
 		return type == ITEM_TYPE_SIMPLE
 			? key.substr(0, 7) !== 'vmware.' && key.substr(0, 8) !== 'icmpping'
 			: this.testable_item_types.indexOf(type) != -1;
-	}
-
-	#isFormModified() {
-		const fields = this.#getFormFields(this.form);
-
-		fields.show_inherited_tags = this.initial_form_fields.show_inherited_tags;
-
-		if (!fields.tags.length) {
-			fields.tags.push({tag: '', value: ''});
-		}
-
-		return JSON.stringify(this.initial_form_fields) !== JSON.stringify(fields);
-	}
-
-	#isConfirmed() {
-		return window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
 	#updateActionButtons() {
