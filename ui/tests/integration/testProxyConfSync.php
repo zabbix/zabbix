@@ -956,7 +956,7 @@ class testProxyConfSync extends CIntegrationTest
 		$diff_keys = array_diff_key($expected_objects, $got);
 
 		$this->assertEmpty($diff_keys,
-			'following objects are missing from sync log:\n'.var_export(array_keys($diff_keys)));
+			'following objects are missing from sync log:\n'.var_export(array_keys($diff_keys), true));
 
 		$diff_objects = [];
 
