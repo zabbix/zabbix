@@ -3234,7 +3234,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 		}
 
 		$dashboard->waitUntilReady();
-		$this->assertMessage('Dashboard updated');
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		if (array_key_exists('zoom_filter', $data)) {
 			// Check that zoom filter tab link is valid.
