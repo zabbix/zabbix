@@ -498,7 +498,7 @@ class testDashboardsPages extends CWebTest {
 				->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit()->addPage();
-		$this->assertMessage(TEST_BAD, 'Cannot add dashboard page: maximum number of 50 dashboard pages has been added.');
+		$this->assertMessage('warning', 'Cannot add dashboard page: maximum number of 50 dashboard pages has been added.');
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		$this->assertEquals(CDBHelper::getHash($sql), $hash);

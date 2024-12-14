@@ -31,13 +31,13 @@ class CMessageBehavior extends CBehavior {
 		$message = CMessageElement::find()->waitUntilVisible()->one();
 
 		if ($expected === TEST_GOOD) {
-			$message->isGood();
+			$this->test->assertTrue($message->isGood());
 		}
 		elseif ($expected === TEST_BAD) {
-			$message->isBad();
+			$this->test->assertTrue($message->isBad());
 		}
 		else {
-			$message->isWarning();
+			$this->test->assertTrue($message->isWarning());
 		}
 
 		if ($title !== null) {

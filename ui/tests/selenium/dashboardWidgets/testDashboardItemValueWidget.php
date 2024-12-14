@@ -2641,7 +2641,7 @@ class testDashboardItemValueWidget extends testWidgets {
 		COverlayDialogElement::ensureNotPresent();
 		$this->page->waitUntilReady();
 		$dashboard->save();
-		$this->assertMessage('Dashboard updated');
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		// Value for threshold trigger.
 		foreach ($data['thresholds'] as $threshold) {
@@ -2802,7 +2802,7 @@ class testDashboardItemValueWidget extends testWidgets {
 		}
 
 		$dashboard->waitUntilReady();
-		$this->assertMessage('Dashboard updated');
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		if (array_key_exists('zoom_filter', $data)) {
 			// Check that zoom filter tab link is valid.
