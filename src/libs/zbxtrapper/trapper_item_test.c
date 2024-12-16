@@ -161,7 +161,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 
 	memset(&item, 0, sizeof(item));
 
-	// item JSON object presence is checked in the calling function
+	/* item JSON object presence is checked in the calling function */
 	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_ITEM, &jp_item))
 	{
 		char	*jp_data_contents = NULL;
