@@ -32,8 +32,8 @@ class CIntegrationTest extends CAPITest {
 	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 3; // Shutdown may legitimately take a lot of time
 	const CACHE_RELOAD_DELAY			= 5; // Configuration cache reload delay.
 	const USER_PARAM_RELOAD_DELAY			= 3; // User parameters reload delay.
-	const HOUSEKEEPER_EXEC_DELAY	= 5; // Housekeeper execution delay.
-	const DATA_PROCESSING_DELAY		= 5; // Data processing delay.
+	const HOUSEKEEPER_EXEC_DELAY			= 5; // Housekeeper execution delay.
+	const DATA_PROCESSING_DELAY			= 10; // Data processing delay.
 
 	// Zabbix component constants.
 	const COMPONENT_SERVER			= 'server';
@@ -341,6 +341,7 @@ class CIntegrationTest extends CAPITest {
 	protected static function waitForStartup($component, $waitLogLineOverride = '', $skip_pid = false) {
 		self::validateComponent($component);
 
+		$saved_time = time();
 		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
 			$pid = @file_get_contents(self::getPidPath($component));
 			if ($skip_pid == true || ($pid && is_numeric($pid) && posix_kill($pid, 0))) {
@@ -368,7 +369,7 @@ class CIntegrationTest extends CAPITest {
 			sleep(self::WAIT_ITERATION_DELAY);
 		}
 
-		throw new Exception('Failed to wait for component "'.$component.'" to start.');
+		throw new Exception('Failed to wait for component "'.$component.'" to start. Waited '.(time() - $saved_time).' seconds..');
 	}
 
 	/**
