@@ -15,7 +15,7 @@
 * If you need help use [forum](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/393216-discussion-thread-for-official-integration-with-pagerduty) 
 * If you have encountered a bug, please report it using [Zabbix Jira bug tracker](https://support.zabbix.com/).
 # Description
-This guide describes how to integrate your Zabbix 7.0 installation with PagerDuty using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
+This guide describes how to integrate your Zabbix 7.4 installation with PagerDuty using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
 
 ## In PagerDuty
 
@@ -114,8 +114,8 @@ The configuration consists of a _media type_ in Zabbix, which will invoke webhoo
 
 8\. Use the PagerDuty User in any Actions of your choice.
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/7.2/manual/config/notifications) and [PagerDuty](https://v2.developer.pagerduty.com/docs/send-an-event-events-api-v2) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [PagerDuty](https://v2.developer.pagerduty.com/docs/send-an-event-events-api-v2) documentations.
 
 # Supported Versions
 
-Zabbix 7.0, PagerDuty Events API v2.
+Zabbix 7.4, PagerDuty Events API v2.

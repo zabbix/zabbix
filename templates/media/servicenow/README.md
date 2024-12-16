@@ -1,6 +1,6 @@
 # ServiceNow webhook 
 
-This guide describes how to integrate Zabbix 7.0 installation with ServiceNow using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.<br>
+This guide describes how to integrate Zabbix 7.4 installation with ServiceNow using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.<br>
 Please note that recovery and update operations and ServiceNow's custom fields are supported only for trigger-based events.
 
 ## Setting up ServiceNow
@@ -37,7 +37,7 @@ To export information into a ServiceNow custom field, add a parameter with the c
 The **Send to** field must contain the full URL of your ServiceNow instance (https://\<INSTANCE>.service-now.com/).<br>
 Make sure this user has access to all hosts for which you would like problem notifications to be converted into ServiceNow tasks.
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/7.2/manual/config/notifications) and [ServiceNow](https://docs.servicenow.com/) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [ServiceNow](https://docs.servicenow.com/) documentations.
 
 ## Supported Versions
-Zabbix 7.0
+Zabbix 7.4

@@ -2,7 +2,7 @@
 
 ![](images/telegram_logo.png?raw=true)
 
-This guide describes how to send notifications from Zabbix 7.0 to the Telegram messenger using Telegram Bot API and Zabbix webhook feature.
+This guide describes how to send notifications from Zabbix 7.4 to the Telegram messenger using Telegram Bot API and Zabbix webhook feature.
 
 ## Supported features:
 * Personal and group notifications

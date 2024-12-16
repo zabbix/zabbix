@@ -26,7 +26,7 @@ You can check the [instruction](https://support.mantishub.com/hc/en-us/articles/
 
 MantisBT _media type_ must be configured in Zabbix, which will invoke the webhook to send alerts to MantisBT issues through [MantisBT Rest API](https://www.mantisbt.org/docs/master/en-US/Developers_Guide/html/restapi.html).
 
-1\. [Import](https://www.zabbix.com/documentation/7.2/manual/web_interface/frontend_sections/administration/mediatypes) MantisBT media type from [media_mantisbt.yaml](media_mantisbt.yaml) file.
+1\. [Import](https://www.zabbix.com/documentation/7.4/manual/web_interface/frontend_sections/administration/mediatypes) MantisBT media type from [media_mantisbt.yaml](media_mantisbt.yaml) file.
 
 2\. Change values of the following parameters in the imported media:
 
@@ -43,9 +43,9 @@ MantisBT _media type_ must be configured in Zabbix, which will invoke the webhoo
 
 4\. Set up a global macro {$ZABBIX.URL} with the current Zabbix URL. Please note that HTTPS will be used by default if HTTP/HTTPS schema is not present in the URL.
 
-For more information, please see [Zabbix](https://www.zabbix.com/documentation/7.2/manual/config/notifications) and [MantisBT](https://www.mantisbt.org/documentation.php) documentation.
+For more information, please see [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [MantisBT](https://www.mantisbt.org/documentation.php) documentation.
 <br/><br/>
 
 ## Supported Versions
 
-Zabbix 7.0, MantisBT 2.22
+Zabbix 7.4, MantisBT 2.22

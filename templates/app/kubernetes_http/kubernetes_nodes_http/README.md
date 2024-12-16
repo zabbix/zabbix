@@ -5,7 +5,7 @@
 
 The template to monitor Kubernetes nodes that work without any external scripts.  
 It works without external scripts and uses the script item to make HTTP requests to the Kubernetes API.
-Install the Zabbix Helm Chart (https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F7.2) in your Kubernetes cluster.
+Install the Zabbix Helm Chart (https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F7.4) in your Kubernetes cluster.
 
 Change the values according to the environment in the file $HOME/zabbix_values.yaml.
 
@@ -27,7 +27,7 @@ Set up the macros to filter the metrics of discovered nodes
 
 ## Requirements
 
-Zabbix version: 7.2 and higher.
+Zabbix version: 7.4 and higher.
 
 ## Tested versions
 
@@ -36,11 +36,11 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
-Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F7.2) in your Kubernetes cluster.
+Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F7.4) in your Kubernetes cluster.
 
 Set the `{$KUBE.API.URL}` such as `<scheme>://<host>:<port>`.
 

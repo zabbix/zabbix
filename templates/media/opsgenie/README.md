@@ -13,11 +13,11 @@ This guide describes how to integrate your Zabbix installation with Opsgenie usi
 
 The configuration consists of a _media type_ in Zabbix, which will invoke the webhook to send alerts to Opsgenie through the Opsgenie Rest API.
 
-1. Create a global macro `{$ZABBIX.URL}` following instructions in [Zabbix documentation](https://www.zabbix.com/documentation/7.2/manual/config/macros/user_macros)  with Zabbix frontend URL - for example, `http://192.168.7.123:8081`.
+1. Create a global macro `{$ZABBIX.URL}` following instructions in [Zabbix documentation](https://www.zabbix.com/documentation/7.4/manual/config/macros/user_macros)  with Zabbix frontend URL - for example, `http://192.168.7.123:8081`.
 
 [![](images/tn_1.png?raw=true)](images/1.png)
 
-2. Import Opsgenie media type from this file [media_opsgenie.yaml](media_opsgenie.yaml) following instructions in [Zabbix documentation](https://www.zabbix.com/documentation/7.2/manual/web_interface/frontend_sections/alerts/mediatypes). 
+2. Import Opsgenie media type from this file [media_opsgenie.yaml](media_opsgenie.yaml) following instructions in [Zabbix documentation](https://www.zabbix.com/documentation/7.4/manual/web_interface/frontend_sections/alerts/mediatypes). 
 
 [![](images/tn_2.png?raw=true)](images/2.png)
 
@@ -31,10 +31,10 @@ The priority level in `severity_default` will be used for non-triggered actions.
 
 [![](images/tn_3.png?raw=true)](images/3.png)
 
-For more information on Zabbix webhook configuration, see [Zabbix documentation](https://www.zabbix.com/documentation/7.2/manual/config/notifications/media/webhook).
+For more information on Zabbix webhook configuration, see [Zabbix documentation](https://www.zabbix.com/documentation/7.4/manual/config/notifications/media/webhook).
 
 To utilize the media type, it is recommended to create a dedicated Zabbix user to represent Opsgenie.
-See more details on creating [Zabbix user](https://www.zabbix.com/documentation/7.2/manual/web_interface/frontend_sections/users/user_list).
+See more details on creating [Zabbix user](https://www.zabbix.com/documentation/7.4/manual/web_interface/frontend_sections/users/user_list).
 Opsgenie user should suffice the default settings as this user will not be logging into Zabbix. Note that in order to be notified about problems on a host, this user must have at least read permissions for this host.  
 When configuring alert action, add this user in the _Send to users_ field (in Operation details) - this will tell Zabbix to use Opsgenie webhook when sending notifications from this action.
 Use the Opsgenie user in any actions of your choice. A text from "Action Operations" will be sent to "Opsgenie Alert" when the problem occurs. The text from "Action Recovery Operations" and "Action Update Operations" will be sent to "Opsgenie Alert Notes" when the problem is resolved or updated.
@@ -59,7 +59,7 @@ To receive notifications about an internal problem and recovery events in Opsgen
 If an internal action operation is configured without a custom message, the notification will not be sent. 
 Note that this step is required only for notifications about internal events; for other event types specifying a custom message is optional. 
 
-See more details on [Notifications upon events](https://www.zabbix.com/documentation/7.2/manual/config/notifications) in Zabbix documentation and on [Alert API](https://docs.opsgenie.com/docs/alert-api) in Opsgenie documentation.
+See more details on [Notifications upon events](https://www.zabbix.com/documentation/7.4/manual/config/notifications) in Zabbix documentation and on [Alert API](https://docs.opsgenie.com/docs/alert-api) in Opsgenie documentation.
 
 ### Known issues
 
@@ -68,7 +68,7 @@ Update operations for the resolved event will not be executed but the status of 
 
 ## Supported Versions
 
-Zabbix 7.0, Opsgenie Alert API.
+Zabbix 7.4, Opsgenie Alert API.
 
 ## Feedback
 Please report any issues with this media type at https://support.zabbix.com.

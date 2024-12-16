@@ -1,6 +1,6 @@
 # Event-Driven Ansible webhook
 
-This guide describes how to integrate your Zabbix 7.0 installation with Event-Driven Ansible using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
+This guide describes how to integrate your Zabbix 7.4 installation with Event-Driven Ansible using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
 
 ## Setting up Event-Driven Ansible Webhook
 
@@ -76,13 +76,13 @@ To utilize the media type, you need to create a Zabbix user to represent Event-D
 
 > Note: Because each new rulebook requires a separate port, you have to create a separate user for each rulebook, specifying the ip:port.
 
-6\. Use Event-Driven Ansible user in any [actions](https://www.zabbix.com/documentation/7.2/manual/config/notifications/action) of your choice.
+6\. Use Event-Driven Ansible user in any [actions](https://www.zabbix.com/documentation/7.4/manual/config/notifications/action) of your choice.
 
 [![](images/thumb.4.png?raw=true)](images/4.png)
 
 7\. Start getting alerts! You have made it!
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/7.2/manual/config/notifications), [Event-Driven Ansible](https://github.com/ansible/eda-server/blob/main/README.md) and [Ansible-Rulebook](https://ansible-rulebook.readthedocs.io/en/latest/getting_started.html) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications), [Event-Driven Ansible](https://github.com/ansible/eda-server/blob/main/README.md) and [Ansible-Rulebook](https://ansible-rulebook.readthedocs.io/en/latest/getting_started.html) documentations.
 
 ## Supported Versions
 Zabbix 6.0 and higher

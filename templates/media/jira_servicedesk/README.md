@@ -1,6 +1,6 @@
 # Jira Service Desk webhook 
 
-This guide describes how to integrate Zabbix 7.0 installation with Jira Service Desk using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.<br>
+This guide describes how to integrate Zabbix 7.4 installation with Jira Service Desk using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.<br>
 Please note that recovery and update operations and Jira Service Desk's custom fields are supported only for trigger-based events.
 
 ## Setting up webhook in Zabbix 
@@ -34,7 +34,7 @@ You can use "{EVENT.DATE}T{EVENT.TIME}" pattern, all dots from Zabbix yyyy.MM.dd
 Though a "Send to" field is not used in the Jira Service Desk webhook, it cannot be empty. To comply with frontend requirements, you can put any symbol there.
 Make sure this user has access to all hosts for which you would like problem notifications to be converted into Jira Service Desk tasks.
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/7.2/manual/config/notifications) and [Jira Service Desk](https://confluence.atlassian.com/servicedesk) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [Jira Service Desk](https://confluence.atlassian.com/servicedesk) documentations.
 
 ## Supported Versions
-Zabbix 7.0
+Zabbix 7.4

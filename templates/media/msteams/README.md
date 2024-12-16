@@ -1,6 +1,6 @@
 # Microsoft Teams webhook
 
-This guide describes how to integrate Zabbix 7.0 with MS Teams using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix. 
+This guide describes how to integrate Zabbix 7.4 with MS Teams using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix. 
 This integration is supported only for **Teams** as part of Office 365. Note, that **Teams** free plan does not support [incoming webhook](https://docs.microsoft.com/en-US/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook) feature.
 
 ## Setting up webhook in MS Teams 
@@ -56,7 +56,7 @@ Make sure this user has access to all hosts for which you would like problem not
 
 6\. Great! You can now start receiving alerts!
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/7.2/manual/config/notifications) and [MS Teams webhook](https://docs.microsoft.com/en-US/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [MS Teams webhook](https://docs.microsoft.com/en-US/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook) documentations.
 
 ## Supported Versions
-Zabbix 7.0
+Zabbix 7.4

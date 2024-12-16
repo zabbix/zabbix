@@ -2,7 +2,7 @@
 # ((OTRS)) Community Edition webhook
 ![](images/otrs_logo.png?raw=true)
 
-This guide describes how to integrate your Zabbix 7.0 installation with ((OTRS)) Community Edition, hereinafter - "((OTRS)) CE", using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
+This guide describes how to integrate your Zabbix 7.4 installation with ((OTRS)) Community Edition, hereinafter - "((OTRS)) CE", using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
 
 ## Requirements
 
@@ -58,8 +58,8 @@ For **Send to**: enter any text, as this value is not used, but is required.
 
 [![](images/thumb.09.png?raw=true)](images/09.png)
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/7.2/manual/config/notifications) and [((OTRS)) CE](https://otrscommunityedition.com/doc/) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [((OTRS)) CE](https://otrscommunityedition.com/doc/) documentations.
 
 ## Supported Versions
 
-Zabbix 7.0
+Zabbix 7.4

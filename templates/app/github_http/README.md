@@ -9,7 +9,7 @@ For more details about GitHub REST API, refer to the [official documentation](ht
 
 ## Requirements
 
-Zabbix version: 7.2 and higher.
+Zabbix version: 7.4 and higher.
 
 ## Tested versions
 
@@ -18,7 +18,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.2/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.4/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -74,7 +74,7 @@ Note: Update intervals and timeouts for script items can be changed individually
 |Name|Description|Default|
 |----|-----------|-------|
 |{$GITHUB.API.URL}|<p>Set the API URL here.</p>|`https://api.github.com/`|
-|{$GITHUB.USER_AGENT}|<p>The user agent that is used in headers for HTTP requests.</p>|`Zabbix/7.2`|
+|{$GITHUB.USER_AGENT}|<p>The user agent that is used in headers for HTTP requests.</p>|`Zabbix/7.4`|
 |{$GITHUB.API_VERSION}|<p>The API version that is used in headers for HTTP requests.</p>|`2022-11-28`|
 |{$GITHUB.REPO.OWNER}|<p>Set the repository owner here.</p>|`<SET THE REPO OWNER>`|
 |{$GITHUB.REPO.NAME}|<p>Set the repository name here.</p>|`<SET THE REPO NAME>`|

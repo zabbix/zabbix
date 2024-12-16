@@ -1,6 +1,6 @@
 # Brevis.one webhook
 
-This guide describes how to integrate Zabbix 7.0 installation with Brevis.one SMS Gateway using HTTP API and Zabbix webhook feature. This guide provides instructions on setting up a media type, a user, and an action in Zabbix.<br>
+This guide describes how to integrate Zabbix 7.4 installation with Brevis.one SMS Gateway using HTTP API and Zabbix webhook feature. This guide provides instructions on setting up a media type, a user, and an action in Zabbix.<br>
 
 ## Setting up Brevis.one
 1\. Create a user for HTTP API or use an existing one.<br>
@@ -33,7 +33,7 @@ See Brevis.one [documentation](https://docs.brevis.one/current/en/Content/Functi
 Note, that the "Send to" field cannot be empty. If the phone number or user/group ID is already specified in the **send_to** parameter, you can put any symbol in this field to comply with frontend requirements.
 Make sure this user has access to all hosts, for which you would like problem notifications to be sent via Brevis.one HTTP API.
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/7.2/manual/config/notifications) and [Brevis.one](https://docs.brevis.one/current/en/Content/Home.htm) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [Brevis.one](https://docs.brevis.one/current/en/Content/Home.htm) documentations.
 
 ## Supported versions
-Zabbix 7.0 and higher
+Zabbix 7.4 and higher

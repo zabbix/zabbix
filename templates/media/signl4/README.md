@@ -2,7 +2,7 @@
 
 ## Why SIGNL4
 
-When critical systems fail, SIGNL4 is the fastest way to alert your staff, engineers, IT admins on call and "in the field". SIGNL4 provides reliable notifications via mobile app push, text and voice calls with tracking, escalations and duty scheduling. Discover how to integrate with Zabbix 7.0 and get the SIGNL4 app at https://www.signl4.com.
+When critical systems fail, SIGNL4 is the fastest way to alert your staff, engineers, IT admins on call and "in the field". SIGNL4 provides reliable notifications via mobile app push, text and voice calls with tracking, escalations and duty scheduling. Discover how to integrate with Zabbix 7.4 and get the SIGNL4 app at https://www.signl4.com.
 
 Pairing Zabbix with SIGNL4 can enhance your daily operations with an extension to your team wherever it is. The two-way integration allows service engineers or IT administrators not only to receive alerts but also to acknowledge, annotate and close alerts, no matter where they are.
 
@@ -16,7 +16,7 @@ This section describes the setup and configuration of the SIGNL4 webhook for Zab
 If not already done, sign up for your SIGNL4 account at https://www.signl4.com or directly from within your SIGNL4 app you can download from the Play Store or App Store.
 
 2. Get the Webhook XML  
-If you use Zabbix 7.0 for higher, SIGNL4 is already available as a media type by default. Otherwise you can get the XML file (zabbix-signl4.xml) for Zabbix from Git (https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/signl4).
+If you use Zabbix 7.4 for higher, SIGNL4 is already available as a media type by default. Otherwise you can get the XML file (zabbix-signl4.xml) for Zabbix from Git (https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/signl4).
 
 3. Import and Configure the Media Type  
 In the SIGNL4 media type you just need to configure the parameter "teamsecret". This is the team secret of your SIGNL4 team. This is the last part of your webhook URL: https://connect.signl4.com/webhook/<team-secret>.

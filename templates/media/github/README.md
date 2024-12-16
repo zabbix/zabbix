@@ -22,13 +22,13 @@ Example of permissions for private repository.
 The configuration consists of a _media type_ in Zabbix, which will invoke the webhook to send alerts to Github issues through the Github Rest API.
 
 
-1\. [Import](https://www.zabbix.com/documentation/7.2/manual/web_interface/frontend_sections/alerts/mediatypes) the Github media type from file [media_github.yaml](media_github.yaml).
+1\. [Import](https://www.zabbix.com/documentation/7.4/manual/web_interface/frontend_sections/alerts/mediatypes) the Github media type from file [media_github.yaml](media_github.yaml).
 
 2\. Change in the imported media the values of the variable github_token.
 
 Change github_url only for integrations with Github Enterprise.
 
-For more information about the Zabbix Webhook configuration, please see the [documentation](https://www.zabbix.com/documentation/7.2/manual/config/notifications/media/webhook).
+For more information about the Zabbix Webhook configuration, please see the [documentation](https://www.zabbix.com/documentation/7.4/manual/config/notifications/media/webhook).
 
 3\. Create user and add Github media type to it. In field "Send to" use your full repo name (\<owner\>/\<project name\>) e.g. johndoe/example-project.
 
@@ -36,8 +36,8 @@ For more information about the Zabbix Webhook configuration, please see the [doc
 
 4\. Set up a global macro {$ZABBIX.URL} with URL of current zabbix. Please notice that HTTPS will be used by default if HTTP/HTTPS schema is not present in the URL.
 
-For more information, please see [Zabbix](https://www.zabbix.com/documentation/7.2/manual/config/notifications) and [Github](https://docs.github.com/en/rest) documentation.
+For more information, please see [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [Github](https://docs.github.com/en/rest) documentation.
 <br/><br/>
 ## Supported Versions
 
-Zabbix 7.0, Github RestApi v3
+Zabbix 7.4, Github RestApi v3

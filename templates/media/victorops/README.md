@@ -1,6 +1,6 @@
 # VictorOps webhook
 
-This guide describes how to integrate Zabbix 7.0 installation with VictorOps using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.<br>
+This guide describes how to integrate Zabbix 7.4 installation with VictorOps using the Zabbix webhook feature. This guide provides instructions on setting up a media type, a user and an action in Zabbix.<br>
 
 
 ## Setting up VictorOps
@@ -36,7 +36,7 @@ Format explanation:<br>
 "Send to" field should be filled as "Default" or your routing key.<br>
 Make sure this user has access to all hosts, for which you would like problem notifications to be converted into VictorOps tasks.
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/7.2/manual/config/notifications) and [VictorOps](https://help.victorops.com/) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [VictorOps](https://help.victorops.com/) documentations.
 
 ## Supported versions
-Zabbix 7.0 and higher
+Zabbix 7.4 and higher

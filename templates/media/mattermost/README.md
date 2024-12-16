@@ -2,7 +2,7 @@
 # Mattermost webhook
 ![](images/logoHorizontal.png?raw=true)
 
-This guide describes how to integrate your Zabbix 7.0 installation with Mattermost using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
+This guide describes how to integrate your Zabbix 7.4 installation with Mattermost using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
 
 ## Setting up a Mattermost bot
 
@@ -81,8 +81,8 @@ You can view the channel identifier in the channel properties.
 [![](images/thumb.7.png?raw=true)](images/7.png)
 [![](images/thumb.6.png?raw=true)](images/6.png)
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/7.2/manual/config/notifications) and [Mattermost](https://docs.mattermost.com) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [Mattermost](https://docs.mattermost.com) documentations.
 
 ## Supported Versions
 
-Zabbix 7.0
+Zabbix 7.4

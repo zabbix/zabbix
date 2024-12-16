@@ -2,7 +2,7 @@
 # Zammad webhook
 ![](images/zammad_logo.png?raw=true)
 
-This guide describes how to integrate your Zabbix 7.0 installation with Zammad using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
+This guide describes how to integrate your Zabbix 7.4 installation with Zammad using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
 
 ## Requirements
 
@@ -52,8 +52,8 @@ For **Send to**: enter any text, as this value is not used, but is required.
 
 [![](images/thumb.06.png?raw=true)](images/06.png)
 
-For more information, use the [Zabbix](https://www.zabbix.com/documentation/7.2/manual/config/notifications) and [Zammad](https://zammad.org/documentation) documentations.
+For more information, use the [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [Zammad](https://zammad.org/documentation) documentations.
 
 ## Supported Versions
 
-Zabbix 7.0
+Zabbix 7.4

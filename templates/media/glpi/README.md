@@ -43,12 +43,12 @@ This guide describes how to integrate your Zabbix installation with GLPi problem
 The configuration consists of a _media type_ in Zabbix, which will invoke the webhook to send alerts to GLPi problems through the GLPi Rest API.
 
 
-1\. [Import](https://www.zabbix.com/documentation/7.2/manual/web_interface/frontend_sections/administration/mediatypes) the GLPi media type from file [media_glpi.yaml](media_glpi.yaml).
+1\. [Import](https://www.zabbix.com/documentation/7.4/manual/web_interface/frontend_sections/administration/mediatypes) the GLPi media type from file [media_glpi.yaml](media_glpi.yaml).
 
 2\. Change in the imported media the values of the variable *glpi_token* and *glpi_url*.
 
 
-For more information about the Zabbix Webhook configuration, please see the [documentation](https://www.zabbix.com/documentation/7.2/manual/config/notifications/media/webhook).
+For more information about the Zabbix Webhook configuration, please see the [documentation](https://www.zabbix.com/documentation/7.4/manual/config/notifications/media/webhook).
 
 3\. Create a **Zabbix user** and add **Media** with the **GLPi** media type. 
 Though a "Send to" field is not used in GLPi webhook, it cannot be empty. To comply with frontend requirements, you can put any symbol there.
@@ -56,7 +56,7 @@ Make sure this user has access to all hosts for which you would like problem not
 
 4\. Set up a global macro {$ZABBIX.URL} with URL of current zabbix. Please notice that HTTPS will be used by default if HTTP/HTTPS schema is not present in the URL.
 
-For more information, please see [Zabbix](https://www.zabbix.com/documentation/7.2/manual/config/notifications) and [GLPi](https://glpi-project.org/DOC/EN/) documentation.
+For more information, please see [Zabbix](https://www.zabbix.com/documentation/7.4/manual/config/notifications) and [GLPi](https://glpi-project.org/DOC/EN/) documentation.
 <br/><br/>
 
 ## Tested on 
@@ -64,4 +64,4 @@ GLPI 9.5.7
 <br/><br/>
 ## Supported Versions
 
-Zabbix 7.0
+Zabbix 7.4
