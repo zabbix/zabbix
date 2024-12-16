@@ -851,7 +851,7 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 			zbx_truncate_value(*field, VALUE_ERRMSG_MAX, value_short, sizeof(value_short));
 
 			*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": value \"%s\" is too long.\n",
-					(0 != item->itemid ? "update" : "create"), item->key, value_short);
+					(0 != item->itemid ? "update" : "create"), item->key_, value_short);
 		}
 	}
 	else
@@ -866,7 +866,7 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 					return;
 
 				*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": name is empty.\n",
-						(0 != item->itemid ? "update" : "create"), item->key);
+						(0 != item->itemid ? "update" : "create"), item->key_);
 				break;
 			case ZBX_FLAG_LLD_ITEM_UPDATE_DELAY:
 				switch (item->type)
@@ -887,7 +887,7 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 					return;
 
 				*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": %s\n",
-						(0 != item->itemid ? "update" : "create"), item->key, errmsg);
+						(0 != item->itemid ? "update" : "create"), item->key_, errmsg);
 				zbx_free(errmsg);
 
 				/* delay alone cannot be rolled back as it depends on item type, revert all updates */
@@ -908,7 +908,7 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 				}
 
 				*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": invalid history storage period"
-						" \"%s\".\n", (0 != item->itemid ? "update" : "create"), item->key, *field);
+						" \"%s\".\n", (0 != item->itemid ? "update" : "create"), item->key_, *field);
 				break;
 			case ZBX_FLAG_LLD_ITEM_UPDATE_TRENDS:
 				if (SUCCEED == is_user_macro(*field))
@@ -921,7 +921,7 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 				}
 
 				*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": invalid trends storage period"
-						" \"%s\".\n", (0 != item->itemid ? "update" : "create"), item->key, *field);
+						" \"%s\".\n", (0 != item->itemid ? "update" : "create"), item->key_, *field);
 				break;
 			default:
 				return;
@@ -1401,7 +1401,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 		for (int j = 0; j < item->preproc_ops.values_num; j++)
 		{
 			if (SUCCEED != lld_items_preproc_step_validate(item->preproc_ops.values[j], item->itemid,
-					item->key, error))
+					item->key_, error))
 			{
 				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
 				break;
