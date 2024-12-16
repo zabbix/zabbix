@@ -16,12 +16,15 @@
 AC_DEFUN([LIBEVENT_TRY_LINK],
 [
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[
-#include <stdlib.h>
-#include <event.h>
+#include <event2/event.h>
 #include <event2/thread.h>
 ]], [[
+	struct event_base *evb;
+
+	evb = event_base_new();
+
 	evthread_use_pthreads();
-	event_init();
+	event_base_free(evb);
 ]])],[found_libevent="yes"],[])
 ])dnl
 
@@ -32,7 +35,7 @@ If you want to specify libevent installation directories:
 AS_HELP_STRING([--with-libevent@<:@=DIR@:>@], [use libevent from given base install directory (DIR), default is to search through a number of common places for the libevent files.])],
 		[
 			if test "x$withval" = "xyes"; then
-				if test -f /usr/local/include/event.h; then withval=/usr/local; else withval=/usr; fi
+				if test -f /usr/local/include/event2/event.h; then withval=/usr/local; else withval=/usr; fi
 			fi
 
 			LIBEVENT_CFLAGS="-I$withval/include"
@@ -63,15 +66,11 @@ AS_HELP_STRING([--with-libevent@<:@=DIR@:>@], [use libevent from given base inst
 
 	AC_MSG_CHECKING(for libevent support)
 
-	if test "x$ARCH" = "xopenbsd"; then
-		LIBEVENT_LIBS="-levent_core -levent_pthreads"
-	else
-		LIBEVENT_LIBS="-levent -levent_pthreads"
-	fi
+	LIBEVENT_LIBS="-levent_core -levent_extra -levent_pthreads"
 
-	if test -n "$_libevent_dir_set" -o -f /usr/include/event.h; then
+	if test -n "$_libevent_dir_set" -o -f /usr/include/event2/event.h; then
 		found_libevent="yes"
-	elif test -f /usr/local/include/event.h; then
+	elif test -f /usr/local/include/event2/event.h; then
 		LIBEVENT_CFLAGS="-I/usr/local/include"
 		LIBEVENT_LDFLAGS="-L/usr/local/lib"
 		found_libevent="yes"

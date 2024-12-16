@@ -19,8 +19,9 @@
 
 #ifdef HAVE_LIBEVENT
 #include "zbxip.h"
-#include <event2/util.h>
 #include <event2/dns.h>
+#include <event2/event.h>
+#include <event2/util.h>
 typedef struct
 {
 	void				*data;
