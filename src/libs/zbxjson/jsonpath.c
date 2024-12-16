@@ -529,7 +529,7 @@ static int	jsonpath_next(const char **pnext)
 		{
 			start = next;
 
-			while (0 != isalnum((unsigned char)*next) || '_' == *next)
+			while (0 != isalnum((unsigned char)*next) || '_' == *next || '$' == *next)
 				next++;
 
 			if (start == next)
@@ -1515,7 +1515,7 @@ static int	jsonpath_parse_dot_segment(const char *start, zbx_jsonpath_t *jsonpat
 		return SUCCEED;
 	}
 
-	for (ptr = start; 0 != isalnum((unsigned char)*ptr) || '_' == *ptr;)
+	for (ptr = start; 0 != isalnum((unsigned char)*ptr) || '_' == *ptr || '$' == *ptr;)
 		ptr++;
 
 	len = (size_t)(ptr - start);
