@@ -123,14 +123,7 @@ $filter->addFilterTab(_('Filter'), [
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())
-				->addItem(
-					(new CSimpleButton(_('Create service')))
-						->addClass('js-create-service')
-						->setAttribute('data-serviceid', $data['service'] !== null
-							? $data['service']['serviceid']
-							: null
-						)
-				)
+				->addItem((new CSimpleButton(_('Create service')))->addClass('js-create-service'))
 				->addItem(
 					(new CRadioButtonList('list_mode', ZBX_LIST_MODE_EDIT))
 						->addValue(_('View'), ZBX_LIST_MODE_VIEW)
