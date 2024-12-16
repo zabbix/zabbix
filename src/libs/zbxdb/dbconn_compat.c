@@ -41,15 +41,21 @@ void	zbx_db_init_autoincrement_options(void)
  ******************************************************************************/
 int	zbx_db_connect(int flag)
 {
+	int		ret;
+	zbx_dbconn_t	*db;
+
 	if (NULL != dbconn)
 		THIS_SHOULD_NEVER_HAPPEN;
 
-	dbconn = zbx_dbconn_create();
+	db = zbx_dbconn_create();
 
-	zbx_dbconn_set_connect_options(dbconn, flag);
-	zbx_dbconn_set_autoincrement(dbconn, db_autoincrement);
+	zbx_dbconn_set_connect_options(db, flag);
+	zbx_dbconn_set_autoincrement(db, db_autoincrement);
+	ret = zbx_dbconn_open(db);
 
-	return zbx_dbconn_open(dbconn);
+	dbconn = db;
+
+	return ret;
 }
 
 /******************************************************************************

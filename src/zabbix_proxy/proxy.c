@@ -1427,7 +1427,7 @@ static void	proxy_db_init(void)
 					zbx_db_config->dbname, zbx_strerror(errno));
 			exit(EXIT_FAILURE);
 		}
-		zbx_db_close();
+
 		proxy_db_init();
 
 		return;
