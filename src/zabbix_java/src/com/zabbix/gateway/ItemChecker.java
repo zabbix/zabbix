@@ -67,6 +67,7 @@ abstract class ItemChecker
 		}
 	}
 
+	@SuppressWarnings("removal")
 	protected final void finalize() throws Throwable
 	{
 	}

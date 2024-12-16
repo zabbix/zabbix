@@ -33,6 +33,7 @@ class IntegerValidator implements InputValidator
 		this.hi = hi;
 	}
 
+	@SuppressWarnings("removal")
 	protected final void finalize() throws Throwable
 	{
 	}
