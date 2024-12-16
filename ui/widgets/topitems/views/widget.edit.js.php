@@ -54,30 +54,6 @@ window.widget_topitems_form = new class {
 		this.#list_column_tmpl = new Template(this.#list_columns.querySelector('template').innerHTML);
 		this.#templateid = templateid;
 
-		new CSortable(this.#list_columns.querySelector('tbody'), {
-			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
-			freeze_end: 1
-		}).on(CSortable.EVENT_SORT, (e) => {
-			const form_fields = getFormFields(this.#form);
-			if (form_fields.columns === undefined) {
-				return;
-			}
-
-			const columns_size = Object.keys(form_fields.columns).length - 1;
-
-			const rows = {};
-			for (let i = 0; i <= columns_size; i++) {
-				const column = e.target.querySelector(`tr:nth-child(${i + 1})`);
-				const column_data = form_fields.columns[column.dataset.index];
-				rows[i] = this.#makeColumnRow(column_data, i);
-			}
-
-			// Replacing nodes in separate loop as template contains the new data index.
-			for (let i = 0; i <= columns_size; i++) {
-				e.target.rows[i].replaceWith(rows[i]);
-			}
-		});
-
 		// Initialize form elements accessibility.
 		this.#updateForm();
 
@@ -218,7 +194,7 @@ window.widget_topitems_form = new class {
 
 			case 'remove':
 				target.closest('tr').remove();
-				this.#list_columns.querySelector('tbody').dispatchEvent(new CustomEvent(CSortable.EVENT_SORT));
+				this.#updateRows();
 				this.#triggerUpdate();
 				break;
 		}
@@ -319,5 +295,21 @@ window.widget_topitems_form = new class {
 	// Need to remove function after sub-popups auto close.
 	#removeColorpicker() {
 		$('#color_picker').hide();
+	}
+
+	#updateRows() {
+		const form_fields = getFormFields(this.#form);
+
+		this.#list_columns.querySelectorAll('tbody > tr[data-index]').forEach(node => node.remove());
+
+		if (form_fields.columns === undefined) {
+			return;
+		}
+
+		const target = document.getElementById('add').closest('tr');
+
+		Object.values(form_fields.columns)
+			.map((column_data, index) => this.#makeColumnRow(column_data, index))
+			.map(row => target.insertAdjacentElement('beforebegin', row));
 	}
 };
