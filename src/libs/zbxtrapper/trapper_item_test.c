@@ -33,6 +33,7 @@
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
+#include "zbxalgo.h"
 
 static void	dump_item(const zbx_dc_item_t *item)
 {

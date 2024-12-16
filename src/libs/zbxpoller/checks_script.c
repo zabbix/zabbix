@@ -16,6 +16,7 @@
 
 #include "zbxembed.h"
 #include "zbxjson.h"
+#include "zbxalgo.h"
 
 static zbx_es_t	es_engine;
 
