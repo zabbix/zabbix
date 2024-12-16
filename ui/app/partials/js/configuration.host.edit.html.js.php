@@ -314,7 +314,6 @@
 				this.macros_templateids = this.getAllTemplates();
 
 				this.macros_manager.load(this.show_inherited_macros, this.macros_templateids);
-				this.updateEncryptionFields();
 			});
 		},
 
