@@ -653,12 +653,6 @@ int	zbx_http_handle_response(CURL *easyhandle, zbx_http_context_t *context, CURL
 	switch (context->retrieve_mode)
 	{
 		case ZBX_RETRIEVE_MODE_CONTENT:
-			if (NULL == context->body.data)
-			{
-				*error = zbx_strdup(NULL, "Server returned empty content");
-				return FAIL;
-			}
-
 			zbx_http_convert_to_utf8(easyhandle, &context->body.data, &context->body.offset,
 					&context->body.allocated);
 
@@ -702,11 +696,6 @@ int	zbx_http_handle_response(CURL *easyhandle, zbx_http_context_t *context, CURL
 			}
 			break;
 		case ZBX_RETRIEVE_MODE_BOTH:
-			if (NULL == context->body.data)
-			{
-				*error = zbx_dsprintf(NULL, "Server returned empty content");
-				return FAIL;
-			}
 
 			zbx_replace_invalid_utf8(context->header.data);
 
@@ -928,6 +917,9 @@ void	zbx_http_convert_to_utf8(CURL *easyhandle, char **body, size_t *size, size_
 {
 	char		*charset;
 	const char	*content_type;
+
+	if (NULL == *body)
+		return;
 
 	content_type = zbx_curl_content_type(easyhandle);
 
