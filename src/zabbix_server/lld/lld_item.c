@@ -101,7 +101,7 @@ static zbx_hash_t	lld_item_ref_key_hash_func(const void *data)
 {
 	const zbx_lld_item_ref_t	*ref = (const zbx_lld_item_ref_t *)data;
 
-	return ZBX_DEFAULT_STRING_HASH_FUNC(ref->item->key);
+	return ZBX_DEFAULT_STRING_HASH_FUNC(ref->item->key_);
 }
 
 static int	lld_item_ref_key_compare_func(const void *d1, const void *d2)
@@ -109,7 +109,7 @@ static int	lld_item_ref_key_compare_func(const void *d1, const void *d2)
 	const zbx_lld_item_ref_t	*ref1 = (const zbx_lld_item_ref_t *)d1;
 	const zbx_lld_item_ref_t	*ref2 = (const zbx_lld_item_ref_t *)d2;
 
-	return strcmp(ref1->item->key, ref2->item->key);
+	return strcmp(ref1->item->key_, ref2->item->key_);
 }
 
 static void	lld_item_preproc_free(zbx_lld_item_preproc_t *op)
@@ -177,7 +177,7 @@ static void	lld_item_free(zbx_lld_item_full_t *item)
 	zbx_free(item->key_proto);
 	zbx_free(item->name);
 	zbx_free(item->name_proto);
-	zbx_free(item->key);
+	zbx_free(item->key_);
 	zbx_free(item->key_orig);
 	zbx_free(item->delay);
 	zbx_free(item->delay_orig);
@@ -427,7 +427,7 @@ static void	lld_items_get(const zbx_vector_lld_item_prototype_ptr_t *item_protot
 
 			item->name = zbx_strdup(NULL, row[1]);
 			item->name_proto = NULL;
-			item->key = zbx_strdup(NULL, row[2]);
+			item->key_ = zbx_strdup(NULL, row[2]);
 			item->key_orig = NULL;
 			item->flags = ZBX_FLAG_LLD_ITEM_UNSET;
 
@@ -871,8 +871,11 @@ static void	lld_validate_item_field(zbx_lld_item_full_t *item, char **field, cha
 					case ITEM_TYPE_DEPENDENT:
 						return;
 					case ITEM_TYPE_ZABBIX_ACTIVE:
-						if (0 == strncmp(item->key, "mqtt.get[", ZBX_CONST_STRLEN("mqtt.get[")))
+						if (0 == strncmp(item->key_, "mqtt.get[",
+								ZBX_CONST_STRLEN("mqtt.get[")))
+						{
 							return;
+						}
 				}
 
 				if (SUCCEED == zbx_validate_interval(*field, &errmsg))
@@ -1186,7 +1189,7 @@ static void	lld_items_validate_db_key(zbx_uint64_t hostid, zbx_vector_lld_item_f
 			continue;
 
 		if (0 == item->itemid || 0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
-			zbx_vector_str_append(&keys, item->key);
+			zbx_vector_str_append(&keys, item->key_);
 	}
 
 	if (0 == keys.values_num)
@@ -1221,7 +1224,7 @@ static void	lld_items_validate_db_key(zbx_uint64_t hostid, zbx_vector_lld_item_f
 			zbx_lld_item_ref_t	*ref, ref_local = {.item = &item_stub};
 
 			ZBX_STR2UINT64(item_stub.itemid, row[1]);
-			item_stub.key = row[0];
+			item_stub.key_ = row[0];
 
 			if (NULL == (ref = (zbx_lld_item_ref_t *)zbx_hashset_search(key_index, &ref_local)) ||
 					ref->item->itemid == ref_local.item->itemid ||
@@ -1237,12 +1240,12 @@ static void	lld_items_validate_db_key(zbx_uint64_t hostid, zbx_vector_lld_item_f
 			*error = zbx_strdcatf(*error, "Cannot %s item:"
 					" item with the same key \"%s\" already exists.\n",
 					(0 != item->itemid ? "update" : "create"),
-					zbx_truncate_itemkey(item->key, VALUE_ERRMSG_MAX,
+					zbx_truncate_itemkey(item->key_, VALUE_ERRMSG_MAX,
 					key_short, sizeof(key_short)));
 
 			if (0 != item->itemid)
 			{
-				lld_field_str_rollback(&item->key, &item->key_orig, &item->flags,
+				lld_field_str_rollback(&item->key_, &item->key_orig, &item->flags,
 						ZBX_FLAG_LLD_ITEM_UPDATE_KEY);
 			}
 			else
@@ -1280,7 +1283,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 
 		lld_validate_item_field(item, &item->name, &item->name_proto,
 				ZBX_FLAG_LLD_ITEM_UPDATE_NAME, ZBX_ITEM_NAME_LEN, error);
-		lld_validate_item_field(item, &item->key, &item->key_orig,
+		lld_validate_item_field(item, &item->key_, &item->key_orig,
 				ZBX_FLAG_LLD_ITEM_UPDATE_KEY, ZBX_ITEM_KEY_LEN, error);
 		lld_validate_item_field(item, &item->delay, &item->delay_orig,
 				ZBX_FLAG_LLD_ITEM_UPDATE_DELAY, ZBX_ITEM_DELAY_LEN, error);
@@ -1367,12 +1370,12 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 
 			*error = zbx_strdcatf(*error, "Cannot %s item: item with the same key \"%s\" already exists.\n",
 						(0 != item->itemid ? "update" : "create"),
-						zbx_truncate_itemkey(item->key, VALUE_ERRMSG_MAX,
+						zbx_truncate_itemkey(item->key_, VALUE_ERRMSG_MAX,
 						key_short, sizeof(key_short)));
 
 			if (0 != item->itemid)
 			{
-				lld_field_str_rollback(&item->key, &item->key_orig, &item->flags,
+				lld_field_str_rollback(&item->key_, &item->key_orig, &item->flags,
 						ZBX_FLAG_LLD_ITEM_UPDATE_KEY);
 			}
 			else
@@ -1489,10 +1492,10 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 	lld_override_item(&lld_row->overrides, item->name, &delay, &history, &trends, &item->override_tags,
 			&item->status, &discover);
 
-	item->key = zbx_strdup(NULL, item_prototype->key);
+	item->key_ = zbx_strdup(NULL, item_prototype->key);
 	item->key_orig = NULL;
 
-	if (FAIL == (ret = zbx_substitute_key_macros(&item->key, NULL, NULL, jp_row, lld_macro_paths,
+	if (FAIL == (ret = zbx_substitute_key_macros(&item->key_, NULL, NULL, jp_row, lld_macro_paths,
 			ZBX_MACRO_TYPE_ITEM_KEY, err, sizeof(err))))
 	{
 		*error = zbx_strdcatf(*error, "Cannot create item, error in item key parameters %s.\n", err);
@@ -1716,8 +1719,8 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 		if (SUCCEED == zbx_substitute_key_macros(&buffer, NULL, NULL, jp_row, lld_macro_paths,
 				ZBX_MACRO_TYPE_ITEM_KEY, err, sizeof(err)))
 		{
-			item->key_orig = item->key;
-			item->key = buffer;
+			item->key_orig = item->key_;
+			item->key_ = buffer;
 			buffer = NULL;
 			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_KEY;
 		}
@@ -2110,9 +2113,9 @@ static void	lld_items_make(const zbx_vector_lld_item_prototype_ptr_t *item_proto
 
 			for (int k = 0; k < item_prototype->keys.values_num; k++)
 			{
-				item_stub.key = zbx_strdup(item_stub.key, item_prototype->keys.values[k]);
+				item_stub.key_ = zbx_strdup(item_stub.key_, item_prototype->keys.values[k]);
 
-				if (SUCCEED != zbx_substitute_key_macros(&item_stub.key, NULL, NULL, &lld_row->jp_row,
+				if (SUCCEED != zbx_substitute_key_macros(&item_stub.key_, NULL, NULL, &lld_row->jp_row,
 						lld_macro_paths, ZBX_MACRO_TYPE_ITEM_KEY, NULL, 0))
 				{
 					continue;
@@ -2142,7 +2145,7 @@ static void	lld_items_make(const zbx_vector_lld_item_prototype_ptr_t *item_proto
 			}
 		}
 
-		zbx_free(item_stub.key);
+		zbx_free(item_stub.key_);
 	}
 
 	/* update/create discovered items */
@@ -2573,7 +2576,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 	{
 		const zbx_lld_item_prototype_t	*item_prototype = item_prototypes->values[index];
 
-		zbx_db_insert_add_values(db_insert_items, *itemid, item->name, item->key, hostid,
+		zbx_db_insert_add_values(db_insert_items, *itemid, item->name, item->key_, hostid,
 				(int)item_prototype->type, (int)item_prototype->value_type,
 				item->delay, item->history, item->trends,
 				(int)item->status, item_prototype->trapper_hosts, item->units,
@@ -2644,11 +2647,11 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_KEY))
 	{
-		value_esc = zbx_db_dyn_escape_string(item->key);
+		value_esc = zbx_db_dyn_escape_string(item->key_);
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%skey_='%s'", d, value_esc);
 		d = ",";
-		zbx_audit_item_update_json_update_key(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
-				(int)ZBX_FLAG_DISCOVERY_CREATED, item->key_orig, item->key);
+		zbx_audit_item_update_json_update_key_(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
+				(int)ZBX_FLAG_DISCOVERY_CREATED, item->key_orig, item->key_);
 		zbx_free(value_esc);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_TYPE))
@@ -2788,6 +2791,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		value_esc = zbx_db_dyn_escape_string(item->password);
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%spassword='%s'", d, value_esc);
 		d = ",";
+
 		zbx_audit_item_update_json_update_password(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
 				(int)ZBX_FLAG_DISCOVERY_CREATED, (0 == strcmp("", item->password_orig) ? "" :
 				ZBX_MACRO_SECRET_MASK), (0 == strcmp("", item->password) ? "" : ZBX_MACRO_SECRET_MASK));

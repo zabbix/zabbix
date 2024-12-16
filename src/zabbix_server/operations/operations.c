@@ -640,7 +640,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 							ZBX_AUDIT_ACTION_ADD, hostid, hostname);
 					zbx_audit_host_update_json_add_tls_and_psk(
 							zbx_map_db_event_to_audit_context(event), hostid, tls_accepted,
-							tls_accepted, psk_identity, psk);
+							tls_accepted);
 				}
 				else
 				{

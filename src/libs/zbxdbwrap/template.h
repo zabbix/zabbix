@@ -91,7 +91,7 @@ typedef struct
 	zbx_uint64_t			master_itemid;
 	char				*name_orig;
 	char				*name;
-	char				*key;
+	char				*key_;
 	char				*delay_orig;
 	char				*delay;
 	char				*history_orig;

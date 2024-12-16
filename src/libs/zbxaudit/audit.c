@@ -412,13 +412,19 @@ int	zbx_audit_flush_dbconn(zbx_dbconn_t *db, int audit_context_mode)
 	return ret;
 }
 
-static int	audit_field_default(const char *table_name, const char *field_name, const char *value, uint64_t id)
+/*********************************************************************************************
+ *                                                                                           *
+ * Purpose: Checks if supplied 'value' and 'id' are equal with DB table field default value. *
+ *                                                                                           *
+ *********************************************************************************************/
+int	audit_field_value_matches_db_default(const char *table_name, const char *field_name, const char *value,
+		uint64_t id)
 {
 	static ZBX_THREAD_LOCAL char			cached_table_name[ZBX_TABLENAME_LEN_MAX];
 	static ZBX_THREAD_LOCAL const zbx_db_table_t	*table = NULL;
 	const zbx_db_field_t				*field;
 
-	if (NULL == table_name)
+	if (NULL == table_name || NULL == field_name)
 		return FAIL;
 
 	/* Often 'table_name' stays the same and only 'field_name' changes in successive calls of this function. */
@@ -466,7 +472,7 @@ void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const int id_tab
 	zbx_audit_entry_t	local_audit_entry, **found_audit_entry;
 	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;
 
-	if (SUCCEED == audit_field_default(table, field, value, 0))
+	if (SUCCEED == audit_field_value_matches_db_default(table, field, value, 0))
 		return;
 
 	local_audit_entry.id = id;
@@ -483,14 +489,35 @@ void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const int id_tab
 	append_str_json(&((*found_audit_entry)->details_json), audit_op, key, value);
 }
 
+int	zbx_audit_item_has_password(int item_type)
+{
+	if (ITEM_TYPE_JMX == item_type || ITEM_TYPE_SIMPLE == item_type || ITEM_TYPE_SSH == item_type ||
+			ITEM_TYPE_TELNET == item_type || ITEM_TYPE_DB_MONITOR == item_type ||
+			ITEM_TYPE_HTTPAGENT == item_type)
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+int	zbx_audit_item_has_ssl_key_password(int item_type)
+{
+	if (ITEM_TYPE_HTTPAGENT == item_type)
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
 void	zbx_audit_update_json_append_string_secret(const zbx_uint64_t id, const int id_table, const char *audit_op,
-		const char *key, const char *value, const char *table, const char *field)
+		const char *key)
 {
 	zbx_audit_entry_t	local_audit_entry, **found_audit_entry;
 	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;
 
-	if (SUCCEED == audit_field_default(table, field, value, 0))
-		return;
+	/* audit_field_value_matches_db_default() is not missing here, this is intentional for security purposes */
 
 	local_audit_entry.id = id;
 	local_audit_entry.cuid = NULL;
@@ -514,7 +541,7 @@ void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const int id_tab
 	zbx_audit_entry_t	*local_audit_entry_x = &local_audit_entry;
 
 	zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, value);
-	if (SUCCEED == audit_field_default(table, field, buffer, value))
+	if (SUCCEED == audit_field_value_matches_db_default(table, field, buffer, value))
 		return;
 
 	local_audit_entry.id = id;
@@ -575,7 +602,7 @@ void	zbx_audit_update_json_append_int(const zbx_uint64_t id, const int id_table,
 
 	zbx_snprintf(buffer, sizeof(buffer), "%d", value);
 
-	if (SUCCEED == audit_field_default(table, field, buffer, 0))
+	if (SUCCEED == audit_field_value_matches_db_default(table, field, buffer, 0))
 	{
 		return;
 	}
@@ -593,7 +620,7 @@ void	zbx_audit_update_json_append_double(const zbx_uint64_t id, const int id_tab
 
 	zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL, value);
 
-	if (SUCCEED == audit_field_default(table, field, buffer, 0))
+	if (SUCCEED == audit_field_value_matches_db_default(table, field, buffer, 0))
 	{
 		return;
 	}

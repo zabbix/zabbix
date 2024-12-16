@@ -99,8 +99,12 @@ void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const int id_tab
 		const char *key, uint64_t value, const char *table, const char *field);
 void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const int id_table, const char *audit_op,
 		const char *key, const char *value, const char *table, const char *field);
+
+int	zbx_audit_item_has_password(int item_type);
+int	zbx_audit_item_has_ssl_key_password(int item_type);
+
 void	zbx_audit_update_json_append_string_secret(const zbx_uint64_t id, const int id_table, const char *audit_op,
-		const char *key, const char *value, const char *table, const char *field);
+		const char *key);
 
 int	zbx_auditlog_history_push(zbx_uint64_t userid, const char *username, const char *clientip, int processed_num,
 		int failed_num, double time_spent);
@@ -129,7 +133,6 @@ zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const int id_table, con
 #define ZBX_AUDIT_RESOURCE_HOST_GROUP			14
 #define ZBX_AUDIT_RESOURCE_ITEM				15
 #define ZBX_AUDIT_RESOURCE_SCENARIO			22
-#define ZBX_AUDIT_RESOURCE_DISCOVERY_RULE		23
 #define ZBX_AUDIT_RESOURCE_SCRIPT			25
 #define ZBX_AUDIT_RESOURCE_PROXY			26
 
@@ -139,6 +142,7 @@ zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const int id_table, con
 #define ZBX_AUDIT_RESOURCE_HOST_PROTOTYPE		37
 #define ZBX_AUDIT_RESOURCE_SETTINGS			40
 #define ZBX_AUDIT_RESOURCE_HA_NODE			47
+#define ZBX_AUDIT_RESOURCE_LLD_RULE			52
 #define ZBX_AUDIT_RESOURCE_HISTORY			53
 
 zbx_audit_entry_t	*zbx_audit_get_entry(zbx_uint64_t id, const char *cuid, int id_table);

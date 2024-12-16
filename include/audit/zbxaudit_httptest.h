@@ -22,9 +22,9 @@ void	zbx_audit_httptest_create_entry(int audit_context_mode, int audit_action, z
 
 void	zbx_audit_httptest_update_json_add_data(int audit_context_mode, zbx_uint64_t httptestid,
 		zbx_uint64_t templateid, const char *name, const char *delay, unsigned char status, const char *agent,
-		unsigned char authentication, const char *httpuser, const char *httppassword, const char *http_proxy,
-		int retries, const char *ssl_cert_file, const char *ssl_key_file, const char *ssl_key_password,
-		int verify_peer, int verify_host, zbx_uint64_t hostid);
+		unsigned char authentication, const char *httpuser, const char *http_proxy, int retries,
+		const char *ssl_cert_file, const char *ssl_key_file, int verify_peer, int verify_host,
+		zbx_uint64_t hostid);
 
 #define PREPARE_AUDIT_HTTPTEST_UPDATE_H(resource, type1)							\
 void	zbx_audit_httptest_update_json_update_##resource(int audit_context_mode, zbx_uint64_t httptestid,	\

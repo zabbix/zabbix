@@ -50,9 +50,9 @@ void	zbx_audit_httptest_create_entry(int audit_context_mode, int audit_action, z
 
 void	zbx_audit_httptest_update_json_add_data(int audit_context_mode, zbx_uint64_t httptestid,
 		zbx_uint64_t templateid, const char *name, const char *delay, unsigned char status, const char *agent,
-		unsigned char authentication, const char *httpuser, const char *httppassword, const char *http_proxy,
-		int retries, const char *ssl_cert_file, const char *ssl_key_file, const char *ssl_key_password,
-		int verify_peer, int verify_host, zbx_uint64_t hostid)
+		unsigned char authentication, const char *httpuser, const char *http_proxy, int retries,
+		const char *ssl_cert_file, const char *ssl_key_file, int verify_peer, int verify_host,
+		zbx_uint64_t hostid)
 {
 	char	audit_key_templateid[AUDIT_DETAILS_KEY_LEN], audit_key_name[AUDIT_DETAILS_KEY_LEN],
 		audit_key_delay[AUDIT_DETAILS_KEY_LEN], audit_key_status[AUDIT_DETAILS_KEY_LEN],
@@ -97,13 +97,13 @@ void	zbx_audit_httptest_update_json_add_data(int audit_context_mode, zbx_uint64_
 	ADD_INT(authentication, AUDIT_TABLE_NAME, "authentication")
 	ADD_STR(httpuser, AUDIT_TABLE_NAME, "http_user")
 	zbx_audit_update_json_append_string_secret(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD,
-			"httptest.httppassword", httppassword, AUDIT_TABLE_NAME, "http_password");
+			"httptest.httppassword");
 	ADD_STR(http_proxy, AUDIT_TABLE_NAME, "http_proxy")
 	ADD_INT(retries, AUDIT_TABLE_NAME, "retries")
 	ADD_STR(ssl_cert_file, AUDIT_TABLE_NAME, "ssl_cert_file")
 	ADD_STR(ssl_key_file, AUDIT_TABLE_NAME, "ssl_key_file")
 	zbx_audit_update_json_append_string_secret(httptestid, AUDIT_HTTPTEST_ID, AUDIT_DETAILS_ACTION_ADD,
-			"httptest.ssl_key_password", ssl_key_password, AUDIT_TABLE_NAME, "ssl_key_password");
+			"httptest.ssl_key_password");
 	ADD_INT(verify_peer, AUDIT_TABLE_NAME, "verify_peer")
 	ADD_INT(verify_host, AUDIT_TABLE_NAME, "verify_host")
 	ADD_UINT64(hostid, AUDIT_TABLE_NAME, "hostid")

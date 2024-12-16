@@ -87,7 +87,7 @@ PREPARE_AUDIT_ITEM_UPDATE_H(verify_peer, int)
 PREPARE_AUDIT_ITEM_UPDATE_H(verify_host, int)
 PREPARE_AUDIT_ITEM_UPDATE_H(allow_traps, int)
 PREPARE_AUDIT_ITEM_UPDATE_H(discover, int)
-PREPARE_AUDIT_ITEM_UPDATE_H(key, const char*)
+PREPARE_AUDIT_ITEM_UPDATE_H(key_, const char*)
 
 void	zbx_audit_item_delete(int audit_context_mode, zbx_vector_uint64_t *itemids);
 
@@ -183,7 +183,8 @@ void	zbx_audit_discovery_rule_update_json_add_lld_override_condition(int audit_c
 		const char *value);
 
 void	zbx_audit_discovery_rule_update_json_add_lld_override_operation(int audit_context_mode, zbx_uint64_t itemid,
-		zbx_uint64_t overrideid, zbx_uint64_t override_operationid,  int condition_operator, const char *value);
+		zbx_uint64_t overrideid, zbx_uint64_t override_operationid, zbx_uint64_t operationobject,
+		int condition_operator, const char *value);
 
 #define PREPARE_AUDIT_DISCOVERY_RULE_OVERRIDE_ADD_H(resource, type)						\
 void	zbx_audit_discovery_rule_update_json_add_lld_override_##resource(int audit_context_mode,		\
@@ -197,9 +198,18 @@ PREPARE_AUDIT_DISCOVERY_RULE_OVERRIDE_ADD_H(ophistory, const char*)
 PREPARE_AUDIT_DISCOVERY_RULE_OVERRIDE_ADD_H(opseverity, int)
 PREPARE_AUDIT_DISCOVERY_RULE_OVERRIDE_ADD_H(opinventory, int)
 
-void	zbx_audit_discovery_rule_update_json_add_lld_override_optag(int audit_context_mode, zbx_uint64_t itemid,
-		zbx_uint64_t overrideid, zbx_uint64_t lld_override_optagid, const char *tag, const char *value);
+void    zbx_audit_discovery_rule_update_json_add_lld_override_optag(int audit_context_mode, zbx_uint64_t itemid,
+		zbx_uint64_t overrideid, zbx_uint64_t override_operationid, zbx_uint64_t lld_override_optagid,
+		const char *tag, const char *value);
 
 void	zbx_audit_discovery_rule_update_json_add_lld_override_optemplate(int audit_context_mode, zbx_uint64_t itemid,
 		zbx_uint64_t overrideid, zbx_uint64_t lld_override_optemplateid, zbx_uint64_t templateid);
+
+void	zbx_audit_item_prototype_update_json_add_lldruleid(int audit_context_mode, zbx_uint64_t itemid,
+		zbx_uint64_t lldrule_id);
+
+void	zbx_audit_item_update_json_add_query_fields_json(int audit_context_mode, zbx_uint64_t itemid, int flags,
+		const char *val);
+void	zbx_audit_item_update_json_add_headers(int audit_context_mode, zbx_uint64_t itemid, int flags,
+		const char *val);
 #endif	/* ZABBIX_AUDIT_ITEM_H */

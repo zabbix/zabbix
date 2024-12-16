@@ -37,12 +37,13 @@ void	zbx_audit_item_update_json_add_data(int audit_context_mode, zbx_uint64_t it
 	zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
 			ZBX_AUDIT_IT_OR_ITP_OR_DR(hostid), hostid, AUDIT_TABLE_NAME, "hostid");
 	ADD_JSON_UI(interfaceid, AUDIT_TABLE_NAME, "interfaceid");
-	ADD_JSON_S(key, AUDIT_TABLE_NAME, "key_");
+	ADD_JSON_S(key_, AUDIT_TABLE_NAME, "key_");
 	ADD_JSON_S(name, AUDIT_TABLE_NAME, "name");
 	ADD_JSON_UI(type, AUDIT_TABLE_NAME, "type");
 	ADD_JSON_S(url, AUDIT_TABLE_NAME, "url");
 
-	if (1 == zbx_audit_item_resource_is_only_item_prototype(resource_type))
+	/* API intentionally does not provide value_type for LLD rules */
+	if (1 == zbx_audit_item_resource_is_only_item_and_item_prototype(resource_type))
 	{
 		zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
 				(1 == zbx_audit_item_resource_is_only_item(resource_type)) ? "item.value_type" :
@@ -60,7 +61,8 @@ void	zbx_audit_item_update_json_add_data(int audit_context_mode, zbx_uint64_t it
 	}
 
 	ADD_JSON_UI(follow_redirects, AUDIT_TABLE_NAME, "follow_redirects");
-	ADD_JSON_S(headers, AUDIT_TABLE_NAME, "headers");
+
+	zbx_audit_item_update_json_add_headers(audit_context_mode, itemid, item->flags, item->headers);
 
 	if (1 == zbx_audit_item_resource_is_only_item_and_item_prototype(resource_type))
 	{
@@ -106,23 +108,30 @@ void	zbx_audit_item_update_json_add_data(int audit_context_mode, zbx_uint64_t it
 	ADD_JSON_UI(output_format, AUDIT_TABLE_NAME, "output_format");
 	ADD_JSON_S(params, AUDIT_TABLE_NAME, "params");
 
-	zbx_audit_update_json_append_string_secret(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-			ZBX_AUDIT_IT_OR_ITP_OR_DR(password), item->password, AUDIT_TABLE_NAME, "password");
+	if (SUCCEED == zbx_audit_item_has_password(item->type))
+	{
+		zbx_audit_update_json_append_string_secret(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
+				ZBX_AUDIT_IT_OR_ITP_OR_DR(password));
+	}
 
 	ADD_JSON_UI(post_type, AUDIT_TABLE_NAME, "post_type");
 	ADD_JSON_S(posts, AUDIT_TABLE_NAME, "posts");
 	ADD_JSON_S(privatekey, AUDIT_TABLE_NAME, "privatekey");
 	ADD_JSON_S(publickey, AUDIT_TABLE_NAME, "publickey");
-	ADD_JSON_S(query_fields, AUDIT_TABLE_NAME, "query_fields");
+
+	zbx_audit_item_update_json_add_query_fields_json(audit_context_mode, itemid, item->flags, item->query_fields);
+
 	ADD_JSON_UI(request_method, AUDIT_TABLE_NAME, "request_method");
 	ADD_JSON_UI(retrieve_mode, AUDIT_TABLE_NAME, "retrieve_mode");
 	ADD_JSON_S(snmp_oid, AUDIT_TABLE_NAME, "snmp_oid");
 	ADD_JSON_S(ssl_cert_file, AUDIT_TABLE_NAME, "ssl_cert_file");
 	ADD_JSON_S(ssl_key_file, AUDIT_TABLE_NAME, "ssl_key_file");
 
-	zbx_audit_update_json_append_string_secret(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-			ZBX_AUDIT_IT_OR_ITP_OR_DR(ssl_key_password), item->ssl_key_password, AUDIT_TABLE_NAME,
-			"ssl_key_password");
+	if (SUCCEED == zbx_audit_item_has_ssl_key_password(item->type))
+	{
+		zbx_audit_update_json_append_string_secret(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
+				ZBX_AUDIT_IT_OR_ITP_OR_DR(ssl_key_password));
+	}
 
 	ADD_JSON_UI(status, AUDIT_TABLE_NAME, "status");
 	ADD_JSON_S(status_codes, AUDIT_TABLE_NAME, "status_codes");

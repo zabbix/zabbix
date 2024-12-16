@@ -270,7 +270,7 @@ struct zbx_lld_item_full_s
 	char					*name;
 	char					*name_proto;
 	char					*key_orig;
-	char					*key;
+	char					*key_;
 	char					*delay_orig;
 	char					*delay;
 	char					*history_orig;

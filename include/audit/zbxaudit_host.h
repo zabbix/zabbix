@@ -40,7 +40,7 @@ void	zbx_audit_host_update_json_add_monitoring_and_hostname_and_inventory_mode(i
 		zbx_uint64_t hostid, unsigned char monitored_by, zbx_uint64_t proxyid, zbx_uint64_t proxy_groupid,
 		const char *hostname, int inventory_mode);
 void	zbx_audit_host_update_json_add_tls_and_psk(int audit_context_mode, zbx_uint64_t hostid, int tls_connect,
-		int tls_accept, const char *tls_psk_identity, const char *tls_psk);
+		int tls_accept);
 void	zbx_audit_host_update_json_add_inventory_mode(int audit_context_mode, zbx_uint64_t hostid, int inventory_mode);
 void	zbx_audit_host_update_json_update_inventory_mode(int audit_context_mode, zbx_uint64_t hostid,
 		int inventory_mode_old, int inventory_mode_new);
@@ -103,8 +103,9 @@ PREPARE_AUDIT_HOST_UPDATE_H(custom_interfaces, int)
 
 void	zbx_audit_host_update_json_delete_interface(int audit_context_mode, zbx_uint64_t hostid,
 		zbx_uint64_t interfaceid);
-void	zbx_audit_host_update_json_add_hostmacro(int audit_context_mode, zbx_uint64_t hostid, zbx_uint64_t macroid,
-		const char *macro, const char *value, const char *description, int type, int automatic);
+void	zbx_audit_host_update_json_add_hostmacro(int audit_context_mode, zbx_uint64_t hostid, int audit_resource,
+		zbx_uint64_t macroid, const char *macro, const char *value, const char *description, int type,
+		int automatic);
 
 #define PREPARE_AUDIT_HOST_UPDATE_HOSTMACRO_H(resource, type1)							\
 void	zbx_audit_host_update_json_update_hostmacro_##resource(int audit_context_mode, zbx_uint64_t hostid,	\
@@ -137,13 +138,12 @@ void	zbx_audit_host_hostgroup_delete(int audit_context_mode, zbx_uint64_t hostid
 void	zbx_audit_host_del(int audit_context_mode, zbx_uint64_t hostid, const char *hostname);
 void	zbx_audit_host_update_json_add_details(int audit_context_mode, zbx_uint64_t hostid, const char *host,
 		unsigned char monitored_by, zbx_uint64_t proxyid, zbx_uint64_t proxy_groupid, int ipmi_authtype,
-		int ipmi_privilege, const char *ipmi_username, const char *ipmi_password, int status, int flags,
-		int tls_connect, int tls_accept, const char *tls_issuer, const char *tls_subject,
-		const char *tls_psk_identity, const char *tls_psk, int custom_interfaces, int inventory_mode);
+		int ipmi_privilege, const char *ipmi_username, int status, int flags, int tls_connect, int tls_accept,
+		const char *tls_issuer, const char *tls_subject, int custom_interfaces, int inventory_mode);
 void	zbx_audit_host_prototype_del(int audit_context_mode, zbx_uint64_t hostid, const char *hostname);
 void	zbx_audit_host_prototype_update_json_add_details(int audit_context_mode, zbx_uint64_t hostid,
 		zbx_uint64_t templateid, const char *name, int status, int discover, int custom_interfaces,
-		int inventory_mode);
+		int inventory_mode, const char *host);
 void	zbx_audit_host_prototype_update_json_update_templateid(int audit_context_mode, zbx_uint64_t hostid,
 		zbx_uint64_t templateid_orig, zbx_uint64_t templateid);
 
@@ -178,9 +178,6 @@ PREPARE_AUDIT_TEMPLATE_DELETE_H(host_prototype)
 void	zbx_audit_host_prototype_update_json_delete_interface(int audit_context_mode, zbx_uint64_t hostid,
 		zbx_uint64_t interfaceid);
 
-void	zbx_audit_host_prototype_update_json_add_hostmacro(int audit_context_mode, zbx_uint64_t hostid,
-		zbx_uint64_t macroid, const char *macro, const char *value, const char *description, int type,
-		int automatic);
 void	zbx_audit_host_update_json_update_hostmacro_create_entry(int audit_context_mode, zbx_uint64_t hostid,
 		zbx_uint64_t hostmacroid);
 void	zbx_audit_host_prototype_update_json_update_hostmacro_create_entry(int audit_context_mode, zbx_uint64_t hostid,
@@ -223,4 +220,7 @@ PREPARE_AUDIT_HOST_GROUP_UPDATE_H(name, const char*)
 #undef PREPARE_AUDIT_HOST_UPDATE_H
 
 void	zbx_audit_host_update_json_add_proxyid(int audit_context_mode, zbx_uint64_t hostid, zbx_uint64_t proxyid);
+
+void	zbx_audit_host_prototype_update_json_add_lldruleid(int audit_context_mode, zbx_uint64_t hostid,
+		zbx_uint64_t lldrule_id);
 #endif	/* ZABBIX_AUDIT_HOST_H */

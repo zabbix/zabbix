@@ -3842,10 +3842,9 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 
 			zbx_audit_host_update_json_add_details(ZBX_AUDIT_LLD_CONTEXT, host->hostid, host->host,
 					monitored_by, proxyid, proxy_groupid, (int)ipmi_authtype, (int)ipmi_privilege,
-					ipmi_username, ipmi_password, (int)host->status,
-					(int)ZBX_FLAG_DISCOVERY_CREATED, (int)tls_connect, (int)tls_accept, tls_issuer,
-					tls_subject, tls_psk_identity, tls_psk, host->custom_interfaces,
-					(int)host->inventory_mode);
+					ipmi_username, (int)host->status, (int)ZBX_FLAG_DISCOVERY_CREATED,
+					(int)tls_connect, (int)tls_accept, tls_issuer, tls_subject,
+					host->custom_interfaces, (int)host->inventory_mode);
 		}
 		else
 		{
@@ -4215,11 +4214,12 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_lld_host_ptr_t
 				zbx_db_insert_add_values(&db_insert_hmacro, hostmacroid, host->hostid,
 						hostmacro->macro, hostmacro->value, hostmacro->description,
 						(int)hostmacro->type, (int)hostmacro->automatic);
+
 				zbx_audit_host_update_json_add_hostmacro(ZBX_AUDIT_LLD_CONTEXT, host->hostid,
-						hostmacroid, hostmacro->macro, (ZBX_MACRO_VALUE_SECRET ==
-						(int)hostmacro->type) ? ZBX_MACRO_SECRET_MASK : hostmacro->value,
-						hostmacro->description, (int)hostmacro->type,
-						(int)hostmacro->automatic);
+						ZBX_AUDIT_RESOURCE_HOST, hostmacroid, hostmacro->macro,
+						(ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type) ?
+						ZBX_MACRO_SECRET_MASK : hostmacro->value, hostmacro->description,
+						(int)hostmacro->type, (int)hostmacro->automatic);
 				hostmacroid++;
 			}
 			else if (0 != (hostmacro->flags & ZBX_FLAG_LLD_HMACRO_UPDATE))

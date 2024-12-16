@@ -435,7 +435,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		}						\
 	}							\
 	while(0)
-			item->key = NULL;
+			item->key_ = NULL;
 			ZBX_STR2UINT64(item->itemid, row[26]);
 
 			SET_FLAG_UINT64(row[52], item->interfaceid, ZBX_FLAG_TEMPLATE_ITEM_UPDATE_INTERFACEID);
@@ -492,7 +492,7 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		}
 		else
 		{
-			item->key = zbx_strdup(NULL, row[2]);
+			item->key_ = zbx_strdup(NULL, row[2]);
 			item->itemid = 0;
 		}
 
@@ -809,15 +809,16 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (NULL == item->key) /* existing item */
+	if (NULL == item->key_) /* existing item */
 	{
 		char		*str_esc;
 		const char	*d = "";
 
 		/* Even if there are no updates for an item, we must create audit entry for it */
 		/* to accommodate other entities changes that depend on an item (like tags).   */
-		zbx_audit_item_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_UPDATE, item->itemid, item->name,
-				item->flags);
+		zbx_audit_item_create_entry(audit_context_mode, ZBX_AUDIT_ACTION_UPDATE, item->itemid,
+				((0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_NAME)) ? item->name_orig :
+				item->name), item->flags);
 
 		if (0 == item->upd_flags)
 			goto dependent;
@@ -954,7 +955,7 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 	}
 	else
 	{
-		zbx_db_insert_add_values(db_insert_items, *itemid, item->name, item->key, hostid, (int)item->type,
+		zbx_db_insert_add_values(db_insert_items, *itemid, item->name, item->key_, hostid, (int)item->type,
 				(int)item->value_type, item->delay, item->history, item->trends,
 				(int)item->status, item->trapper_hosts, item->units, item->formula, item->logtimefmt,
 				item->valuemapid, item->params, item->ipmi_sensor, item->snmp_oid, (int)item->authtype,
@@ -1020,7 +1021,7 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items, in
 	{
 		item = (zbx_template_item_t *)items->values[i];
 
-		if (NULL == item->key)
+		if (NULL == item->key_)
 			upd_items++;
 		else
 			new_items++;
@@ -1125,7 +1126,7 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 		{
 			zbx_template_item_t	*item = (zbx_template_item_t *)items->values[i];
 
-			if (NULL == item->key)
+			if (NULL == item->key_)
 				continue;
 
 			if (0 == (ZBX_FLAG_DISCOVERY_RULE & item->flags))
@@ -1268,11 +1269,12 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
  *                                                                            *
  * Purpose: saves host item prototypes in database                            *
  *                                                                            *
- * Parameters:  hostid  - [IN] target host                                    *
- *              items   - [IN] template items                                 *
+ * Parameters:  hostid             - [IN] target host                         *
+ *              items              - [IN] template items                      *
+ *              audit_context_mode - [IN]                                     *
  *                                                                            *
  ******************************************************************************/
-static void	save_template_discovery_prototypes(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
+static void	save_template_discovery_prototypes(zbx_uint64_t hostid, zbx_vector_ptr_t *items, int audit_context_mode)
 {
 	typedef struct
 	{
@@ -1299,7 +1301,7 @@ static void	save_template_discovery_prototypes(zbx_uint64_t hostid, zbx_vector_p
 		zbx_template_item_t	*item = (zbx_template_item_t *)items->values[i];
 
 		/* process only new prototype items */
-		if (NULL == item->key || 0 == (ZBX_FLAG_DISCOVERY_PROTOTYPE & item->flags))
+		if (NULL == item->key_ || 0 == (ZBX_FLAG_DISCOVERY_PROTOTYPE & item->flags))
 			continue;
 
 		zbx_vector_uint64_append(&itemids, item->itemid);
@@ -1328,9 +1330,11 @@ static void	save_template_discovery_prototypes(zbx_uint64_t hostid, zbx_vector_p
 
 		ZBX_STR2UINT64(proto->itemid, row[0]);
 		ZBX_STR2UINT64(proto->parent_itemid, row[1]);
-
 		zbx_vector_ptr_append(&prototypes, proto);
+		zbx_audit_item_prototype_update_json_add_lldruleid(audit_context_mode, proto->itemid,
+				proto->parent_itemid);
 	}
+
 	zbx_db_free_result(result);
 
 	if (0 == prototypes.values_num)
@@ -1470,7 +1474,7 @@ static void	free_template_item(zbx_template_item_t *item)
 	CLEAN_ORIG(SSL_KEY_FILE, ssl_key_file)
 	CLEAN_ORIG(SSL_KEY_PASSWORD, ssl_key_password)
 #undef CLEAN_ORIG
-	zbx_free(item->key);
+	zbx_free(item->key_);
 
 	zbx_free(item);
 }
@@ -2331,10 +2335,10 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 					(int)override_condition->operator, override_condition->macro,
 					override_condition->value);
 
-			zbx_audit_discovery_rule_update_json_add_lld_override_condition(audit_context_mode, (*pitem)->itemid,
-					overrideid,
-				override_conditionid, (int)override_condition->operator, override_condition->macro,
-				override_condition->value);
+			zbx_audit_discovery_rule_update_json_add_lld_override_condition(audit_context_mode,
+					(*pitem)->itemid, overrideid, override_conditionid,
+					(int)override_condition->operator, override_condition->macro,
+					override_condition->value);
 
 			if (ZBX_CONDITION_EVAL_TYPE_EXPRESSION == override->evaltype)
 			{
@@ -2365,7 +2369,8 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 
 			zbx_audit_discovery_rule_update_json_add_lld_override_operation(audit_context_mode,
 					(*pitem)->itemid, overrideid, override_operationid,
-					(int)override_operation->operator, override_operation->value);
+					(int)override_operation->operationtype, (int)override_operation->operator,
+					override_operation->value);
 
 			if (ZBX_PROTOTYPE_STATUS_COUNT != override_operation->status)
 			{
@@ -2442,8 +2447,8 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 							override_operationid, tag->tag, tag->value);
 
 					zbx_audit_discovery_rule_update_json_add_lld_override_optag(audit_context_mode,
-							(*pitem)->itemid, overrideid, lld_override_optagid, tag->tag,
-							tag->value);
+							(*pitem)->itemid, overrideid, override_operationid,
+							lld_override_optagid, tag->tag, tag->value);
 
 					lld_override_optagid++;
 				}
@@ -2727,7 +2732,7 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 	{
 		item = (zbx_template_item_t *)items->values[i];
 
-		if (NULL == item->key)
+		if (NULL == item->key_)
 			zbx_vector_uint64_append(&itemids, item->itemid);
 
 		zbx_hashset_insert(&items_t, &item, sizeof(zbx_template_item_t *));
@@ -2906,7 +2911,7 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 	{
 		item = (zbx_template_item_t *)items->values[i];
 
-		if (NULL == item->key)
+		if (NULL == item->key_)
 			zbx_vector_uint64_append(&itemids, item->itemid);
 
 		zbx_hashset_insert(&items_t, &item, sizeof(zbx_template_item_t *));
@@ -3014,7 +3019,7 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 	{
 		item = (zbx_template_item_t *)items->values[i];
 
-		if (NULL == item->key)
+		if (NULL == item->key_)
 			zbx_vector_uint64_append(&itemids, item->itemid);
 
 		zbx_hashset_insert(&items_t, &item, sizeof(zbx_template_item_t *));
@@ -3277,7 +3282,7 @@ static void	prepare_lld_items(const zbx_vector_ptr_t *items, zbx_vector_uint64_t
 		if (0 == (ZBX_FLAG_DISCOVERY_RULE & item->flags))
 			continue;
 
-		if (NULL == item->key)	/* item already existed */
+		if (NULL == item->key_)	/* item already existed */
 			zbx_vector_uint64_append(lld_itemids, item->itemid);
 
 		zbx_hashset_insert(lld_items, &item, sizeof(zbx_template_item_t *));
@@ -3324,7 +3329,7 @@ void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 	link_template_items_param(templateids, &items);
 	save_template_items(hostid, &items, audit_context_mode);
 	save_template_lld_rules(&items, &lld_rules, new_conditions, audit_context_mode);
-	save_template_discovery_prototypes(hostid, &items);
+	save_template_discovery_prototypes(hostid, &items, audit_context_mode);
 	copy_template_items_preproc(&items, audit_context_mode);
 	copy_template_item_script_params(&items, audit_context_mode);
 	copy_template_item_tags(&items, audit_context_mode);

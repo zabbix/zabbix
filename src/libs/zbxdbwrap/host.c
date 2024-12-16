@@ -3690,6 +3690,9 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 
 			zbx_db_insert_add_values(&db_insert_hdiscovery, host_prototype->hostid, host_prototype->itemid);
 
+			zbx_audit_host_prototype_update_json_add_lldruleid(audit_context_mode,
+					host_prototype->hostid, host_prototype->itemid);
+
 			if (HOST_INVENTORY_DISABLED != host_prototype->inventory_mode)
 			{
 				zbx_db_insert_add_values(&db_insert_inventory_mode, host_prototype->hostid,
@@ -3699,7 +3702,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 			zbx_audit_host_prototype_update_json_add_details(audit_context_mode, host_prototype->hostid,
 					host_prototype->templateid, host_prototype->name, (int)host_prototype->status,
 					(int)host_prototype->discover, (int)host_prototype->custom_interfaces,
-					host_prototype->inventory_mode);
+					host_prototype->inventory_mode, host_prototype->host);
 		}
 		else
 		{
@@ -3836,11 +3839,12 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 						hostmacro->macro, hostmacro->value, hostmacro->description,
 						(int)hostmacro->type, (int)hostmacro->automatic);
 
-				zbx_audit_host_prototype_update_json_add_hostmacro(audit_context_mode,
-						host_prototype->hostid, new_hostmacroid, hostmacro->macro,
-						(ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type) ?
-						ZBX_MACRO_SECRET_MASK : hostmacro->value, hostmacro->description,
-						(int)hostmacro->type, (int)hostmacro->automatic);
+				zbx_audit_host_update_json_add_hostmacro(audit_context_mode,
+						host_prototype->hostid, ZBX_AUDIT_RESOURCE_HOST_PROTOTYPE,
+						new_hostmacroid, hostmacro->macro, (ZBX_MACRO_VALUE_SECRET ==
+						(int)hostmacro->type) ? ZBX_MACRO_SECRET_MASK : hostmacro->value,
+						hostmacro->description, (int)hostmacro->type,
+						(int)hostmacro->automatic);
 				new_hostmacroid++;
 			}
 			else if (0 != (hostmacro->flags & ZBX_FLAG_HPMACRO_UPDATE))
@@ -5070,9 +5074,8 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 			zbx_audit_httptest_update_json_add_data(audit_context_mode, httptest->httptestid,
 					httptest->templateid, httptest->name, httptest->delay, (int)httptest->status,
 					httptest->agent, (int)httptest->authentication, httptest->http_user,
-					httptest->http_password, httptest->http_proxy, httptest->retries,
-					httptest->ssl_cert_file, httptest->ssl_key_file, httptest->ssl_key_password,
-					httptest->verify_peer, httptest->verify_host, hostid);
+					httptest->http_proxy, httptest->retries, httptest->ssl_cert_file,
+					httptest->ssl_key_file, httptest->verify_peer, httptest->verify_host, hostid);
 
 			for (j = 0; j < httptest->httpsteps.values_num; j++)
 			{
