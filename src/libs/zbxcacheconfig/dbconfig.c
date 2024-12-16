@@ -5867,7 +5867,7 @@ static void	DCsync_item_tags(zbx_dbsync_t *sync)
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
-		zbx_dc_item_tag_t	item_tag_local;
+		zbx_dc_item_tag_t	item_tag_local = {0};
 		zbx_dc_item_tag_link	*item_tag_link;
 		zbx_uint64_t		itemid;
 
