@@ -31,10 +31,9 @@ window.sla_edit_popup = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
 
-		const backurl = new Curl('zabbix.php');
-
-		backurl.setArgument('action', 'sla.list');
-		this.overlay.backurl = backurl.getUrl();
+		const back_url = new Curl('zabbix.php');
+		back_url.setArgument('action', 'sla.list');
+		ZABBIX.PopupManager.setBackUrl(back_url.getUrl());
 
 		for (const excluded_downtime of excluded_downtimes) {
 			this._addExcludedDowntime(excluded_downtime);
