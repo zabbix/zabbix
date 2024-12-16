@@ -252,14 +252,27 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	item.ssl_key_password = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_SSL_KEY_PASSWORD, table_items,
 			"ssl_key_password");
 
+	zbx_vector_ptr_pair_create(&item.script_params);
 	if ((ITEM_TYPE_SCRIPT == item.type || ITEM_TYPE_BROWSER == item.type) &&
 			SUCCEED == zbx_json_brackets_by_name(&jp_item, ZBX_PROTO_TAG_PARAMETERS, &jp_script_params))
 	{
-		item.script_params = zbx_dsprintf(NULL, "%.*s",
-				(int)(jp_script_params.end - jp_script_params.start + 1), jp_script_params.start);
+#define	MAX_PARAM_NAME	255
+		const char	*pnext = NULL;
+		char		name[MAX_PARAM_NAME], value[MAX_STRING_LEN];
+
+		while (NULL != (pnext = zbx_json_pair_next(&jp_script_params, pnext, name, sizeof(name))))
+		{
+			if (NULL != zbx_json_decodevalue(pnext, value, sizeof(value), NULL))
+			{
+				zbx_ptr_pair_t	pair;
+
+				pair.first = zbx_strdup(NULL, name);
+				pair.second = zbx_strdup(NULL, value);
+				zbx_vector_ptr_pair_append(&item.script_params, pair);
+			}
+		}
+#undef	MAX_PARAM_NAME
 	}
-	else
-		item.script_params = zbx_strdup(NULL, "");
 
 	if (NULL == table_interface)
 		table_interface = zbx_db_get_table("interface");
@@ -476,7 +489,12 @@ out:
 	zbx_free(item.snmpv3_authpassphrase);
 	zbx_free(item.snmpv3_privpassphrase);
 	zbx_free(item.snmpv3_contextname);
-	zbx_free(item.script_params);
+	for (int i = 0; i < item.script_params.values_num; i++)
+	{
+		zbx_free(item.script_params.values[i].first);
+		zbx_free(item.script_params.values[i].second);
+	}
+	zbx_vector_ptr_pair_destroy(&item.script_params);
 	zbx_free(item.formula_bin);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));

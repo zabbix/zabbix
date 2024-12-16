@@ -15,6 +15,7 @@
 #include "checks_script.h"
 
 #include "zbxembed.h"
+#include "zbxjson.h"
 
 static zbx_es_t	es_engine;
 
@@ -33,6 +34,7 @@ int	get_value_script(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RE
 {
 	char		*error = NULL, *script_bin = NULL, *output = NULL;
 	int		script_bin_sz, ret = NOTSUPPORTED;
+	struct zbx_json	json;
 
 	if (SUCCEED != zbx_es_is_env_initialized(&es_engine) && SUCCEED != zbx_es_init_env(&es_engine, config_source_ip,
 			&error))
@@ -40,6 +42,8 @@ int	get_value_script(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RE
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot initialize scripting environment: %s", error));
 		return ret;
 	}
+
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	if (SUCCEED != zbx_es_compile(&es_engine, item->params, &script_bin, &script_bin_sz, &error))
 	{
@@ -49,7 +53,13 @@ int	get_value_script(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RE
 
 	zbx_es_set_timeout(&es_engine, item->timeout);
 
-	if (SUCCEED != zbx_es_execute(&es_engine, NULL, script_bin, script_bin_sz, item->script_params, &output,
+	for (int i = 0; i < item->script_params.values_num; i++)
+	{
+		zbx_json_addstring(&json, (const char *)item->script_params.values[i].first,
+				(const char *)item->script_params.values[i].second, ZBX_JSON_TYPE_STRING);
+	}
+
+	if (SUCCEED != zbx_es_execute(&es_engine, NULL, script_bin, script_bin_sz, json.buffer, &output,
 			&error))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot execute script: %s", error));
@@ -70,6 +80,8 @@ err:
 			zbx_free(errlog);
 		}
 	}
+
+	zbx_json_free(&json);
 
 	zbx_free(script_bin);
 	zbx_free(error);

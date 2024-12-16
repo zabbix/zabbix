@@ -9703,7 +9703,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 	const ZBX_DC_TRAPITEM		*trapitem;
 	const ZBX_DC_INTERFACE		*dc_interface;
 	int				i;
-	struct zbx_json			json;
 
 	dst_item->type = src_item->type;
 	dst_item->value_type = src_item->value_type;
@@ -9862,39 +9861,37 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			dst_item->password = NULL;
 			break;
 		case ITEM_TYPE_SCRIPT:
-			zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-
 			dst_item->params = zbx_strdup(NULL, src_item->itemtype.scriptitem->script);
 
+			zbx_vector_ptr_pair_create(&dst_item->script_params);
 			for (i = 0; i < src_item->itemtype.scriptitem->params.values_num; i++)
 			{
 				zbx_dc_item_param_t	*params =
 						(zbx_dc_item_param_t*)(src_item->itemtype.scriptitem->params.values[i]);
+				zbx_ptr_pair_t	pair;
 
-				zbx_json_addstring(&json, params->name, params->value, ZBX_JSON_TYPE_STRING);
+				pair.first = zbx_strdup(NULL, params->name);
+				pair.second = zbx_strdup(NULL, params->value);
+				zbx_vector_ptr_pair_append(&dst_item->script_params, pair);
 			}
-
-			dst_item->script_params = zbx_strdup(NULL, json.buffer);
-			zbx_json_free(&json);
 
 			dst_item->timeout = 0;
 
 			break;
 		case ITEM_TYPE_BROWSER:
-			zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-
 			dst_item->params = zbx_strdup(NULL, src_item->itemtype.browseritem->script);
 
+			zbx_vector_ptr_pair_create(&dst_item->script_params);
 			for (i = 0; i < src_item->itemtype.browseritem->params.values_num; i++)
 			{
-				zbx_dc_item_param_t	*params;
+				zbx_dc_item_param_t	*params =
+						(zbx_dc_item_param_t*)(src_item->itemtype.browseritem->params.values[i]);
+				zbx_ptr_pair_t	pair;
 
-				params = (zbx_dc_item_param_t*)(src_item->itemtype.browseritem->params.values[i]);
-				zbx_json_addstring(&json, params->name, params->value, ZBX_JSON_TYPE_STRING);
+				pair.first = zbx_strdup(NULL, params->name);
+				pair.second = zbx_strdup(NULL, params->value);
+				zbx_vector_ptr_pair_append(&dst_item->script_params, pair);
 			}
-
-			dst_item->script_params = zbx_strdup(NULL, json.buffer);
-			zbx_json_free(&json);
 
 			dst_item->timeout = 0;
 
@@ -9954,7 +9951,12 @@ void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
 				break;
 			case ITEM_TYPE_SCRIPT:
 			case ITEM_TYPE_BROWSER:
-				zbx_free(items[i].script_params);
+				for (int j = 0; j < items[i].script_params.values_num; j++)
+				{
+					zbx_free(items[i].script_params.values[j].first);
+					zbx_free(items[i].script_params.values[j].second);
+				}
+				zbx_vector_ptr_pair_destroy(&items[i].script_params);
 				ZBX_FALLTHROUGH;
 			case ITEM_TYPE_DB_MONITOR:
 			case ITEM_TYPE_SSH:
