@@ -50,6 +50,7 @@ class ZabbixItem
 		this.key = key;
 	}
 
+	@SuppressWarnings("removal")
 	protected final void finalize() throws Throwable
 	{
 	}
