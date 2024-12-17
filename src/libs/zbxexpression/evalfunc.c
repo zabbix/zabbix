@@ -37,15 +37,6 @@
 
 ZBX_PTR_VECTOR_IMPL(valuemaps_ptr, zbx_valuemaps_t *)
 
-/* value types */
-typedef enum
-{
-	ZBX_ACCEPT_TYPE_VALUE,
-	ZBX_ACCEPT_TYPE_TIMESTAMP,
-	ZBX_ACCEPT_TYPE_LOG_TIMESTAMP
-}
-zbx_accept_value_type_t;
-
 /******************************************************************************
  *                                                                            *
  * Purpose: process suffix 'uptime'.                                          *
@@ -653,6 +644,94 @@ static int	get_last_n_value(const zbx_dc_evaluate_item_t *item, const char *para
 		*error = zbx_strdup(*error, "not enough data");
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get first Nth value defined by #num:now-timeshift first parameter.*
+ *                                                                            *
+ * Parameters: item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] Nth first value and time shift (optional)    *
+ *             ts         - [IN] starting timestamp                           *
+ *             value      - [OUT]                                             *
+ *             error      - [OUT]                                             *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in        *
+ *                         'value'                                            *
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_first_n_value(const zbx_dc_evaluate_item_t *item, const char *parameters, const zbx_timespec_t *ts,
+		zbx_history_record_t *value, char **error)
+{
+	int				arg1 = 1, ret = FAIL, seconds = 0, time_shift;
+	zbx_value_type_t		arg1_type = ZBX_VALUE_NVALUES;
+	zbx_vector_history_record_t	values;
+	zbx_timespec_t			ts_end = *ts;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_history_record_vector_create(&values);
+
+	if (1 != zbx_function_param_parse_count(parameters))
+	{
+		*error = zbx_strdup(*error, "invalid number of parameters");
+		goto out;
+	}
+
+	if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 1, &arg1, &arg1_type, &time_shift))
+	{
+		*error = zbx_strdup(*error, "invalid parameter");
+		goto out;
+	}
+
+	switch (arg1_type)
+	{
+		case ZBX_VALUE_SECONDS:
+			seconds = arg1;
+			break;
+		case ZBX_VALUE_NONE:
+			*error = zbx_strdup(*error, "the first argument is not specified");
+			goto out;
+		case ZBX_VALUE_NVALUES:
+			*error = zbx_strdup(*error, "the first argument cannot be number of value");
+			goto out;
+		default:
+			*error = zbx_strdup(*error, "invalid type of first argument");
+			THIS_SHOULD_NEVER_HAPPEN;
+			goto out;
+	}
+
+	if (0 >= arg1)
+	{
+		*error = zbx_strdup(*error, "the first argument must be greater than 0");
+		goto out;
+	}
+
+	ts_end.sec -= time_shift;
+
+	if (SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, seconds, 0, &ts_end))
+	{
+		if (0 < values.values_num)
+		{
+			*value = values.values[values.values_num - 1];
+			zbx_vector_history_record_remove(&values, values.values_num - 1);
+			ret = SUCCEED;
+		}
+		else
+		{
+			*error = zbx_strdup(*error, "not enough data");
+			goto out;
+		}
+	}
+	else
+		*error = zbx_strdup(*error, "cannot get values from value cache");
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -1385,7 +1464,6 @@ out:
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] Nth last value and time shift (optional)     *
  *             ts         - [IN] starting timestamp                           *
- *             value_type - [IN] type of result value                         *
  *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
@@ -1393,7 +1471,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	evaluate_LAST(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *parameters,
-		const zbx_timespec_t *ts, zbx_accept_value_type_t value_type, char **error)
+		const zbx_timespec_t *ts, char **error)
 {
 	int			ret;
 	zbx_history_record_t	vc_value;
@@ -1402,23 +1480,73 @@ static int	evaluate_LAST(zbx_variant_t *value, const zbx_dc_evaluate_item_t *ite
 
 	if (SUCCEED == (ret = get_last_n_value(item, parameters, ts, &vc_value, error)))
 	{
-		switch (value_type)
-		{
-			case ZBX_ACCEPT_TYPE_VALUE:
-				zbx_history_value2variant(&vc_value.value, item->value_type, value);
-				break;
-			case ZBX_ACCEPT_TYPE_TIMESTAMP:
-				zbx_variant_set_ui64(value, (zbx_uint64_t)vc_value.timestamp.sec);
-				break;
-			case ZBX_ACCEPT_TYPE_LOG_TIMESTAMP:
-				zbx_variant_set_ui64(value, (zbx_uint64_t)vc_value.value.log->timestamp);
-				break;
-			default:
-				*error = zbx_strdup(*error, "invalid parameter");
-				ret = FAIL;
-				break;
-		}
+		zbx_history_value2variant(&vc_value.value, item->value_type, value);
+		zbx_history_record_clear(&vc_value, item->value_type);
+	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evaluate function 'lastclock' for the item.                       *
+ *                                                                            *
+ * Parameters: value      - [OUT] result                                      *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] Nth last value and time shift (optional)     *
+ *             ts         - [IN] starting timestamp                           *
+ *             error      - [OUT]                                             *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_LASTCLOCK(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *parameters,
+		const zbx_timespec_t *ts, char **error)
+{
+	int			ret;
+	zbx_history_record_t	vc_value;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED == (ret = get_last_n_value(item, parameters, ts, &vc_value, error)))
+	{
+		zbx_variant_set_ui64(value, (zbx_uint64_t)vc_value.timestamp.sec);
+		zbx_history_record_clear(&vc_value, item->value_type);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evaluate function 'logtimestamp' for the item.                    *
+ *                                                                            *
+ * Parameters: value      - [OUT] result                                      *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] Nth last value and time shift (optional)     *
+ *             ts         - [IN] starting timestamp                           *
+ *             error      - [OUT]                                             *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_LOGTIMESTAMP(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *parameters,
+		const zbx_timespec_t *ts, char **error)
+{
+	int			ret;
+	zbx_history_record_t	vc_value;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED == (ret = get_last_n_value(item, parameters, ts, &vc_value, error)))
+	{
+		zbx_variant_set_ui64(value, (zbx_uint64_t)vc_value.value.log->timestamp);
 		zbx_history_record_clear(&vc_value, item->value_type);
 	}
 
@@ -1978,7 +2106,7 @@ static int	evaluate_BITAND(zbx_variant_t *value, const zbx_dc_evaluate_item_t *i
 	/* bitand(<item_key>,#0,1)                                                       */
 	/* First parameter is the item name, second is history count, third is the mask. */
 	/* First and second parameters are resent to evaluate_LAST().                    */
-	if (SUCCEED == evaluate_LAST(value, item, last_parameters, ts, ZBX_ACCEPT_TYPE_VALUE, error))
+	if (SUCCEED == evaluate_LAST(value, item, last_parameters, ts, error))
 	{
 		/* the evaluate_LAST() should return uint64 value, but just to be sure try to convert it */
 		if (SUCCEED != zbx_variant_convert(value, ZBX_VARIANT_UI64))
@@ -2605,7 +2733,6 @@ static int	validate_params_and_get_data(const zbx_dc_evaluate_item_t *item, cons
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] Nth first value and time shift (optional)    *
  *             ts         - [IN] starting timestamp                           *
- *             value_type - [IN] type of result value                         *
  *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in        *
@@ -2614,83 +2741,52 @@ static int	validate_params_and_get_data(const zbx_dc_evaluate_item_t *item, cons
  *                                                                            *
  ******************************************************************************/
 static int	evaluate_FIRST(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *parameters,
-		const zbx_timespec_t *ts, zbx_accept_value_type_t value_type, char **error)
+		const zbx_timespec_t *ts, char **error)
 {
-	int				arg1 = 1, ret = FAIL, seconds = 0, time_shift;
-	zbx_value_type_t		arg1_type = ZBX_VALUE_NVALUES;
-	zbx_vector_history_record_t	values;
-	zbx_timespec_t			ts_end = *ts;
+	int			ret;
+	zbx_history_record_t	vc_value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_history_record_vector_create(&values);
-
-	if (1 != zbx_function_param_parse_count(parameters))
+	if (SUCCEED == (ret = get_first_n_value(item, parameters, ts, &vc_value, error)))
 	{
-		*error = zbx_strdup(*error, "invalid number of parameters");
-		goto out;
+		zbx_history_value2variant(&vc_value.value, item->value_type, value);
+		zbx_history_record_clear(&vc_value, item->value_type);
 	}
 
-	if (SUCCEED != get_function_parameter_hist_range(ts->sec, parameters, 1, &arg1, &arg1_type, &time_shift))
-	{
-		*error = zbx_strdup(*error, "invalid parameter");
-		goto out;
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
-	switch (arg1_type)
-	{
-		case ZBX_VALUE_SECONDS:
-			seconds = arg1;
-			break;
-		case ZBX_VALUE_NONE:
-			*error = zbx_strdup(*error, "the first argument is not specified");
-			goto out;
-		case ZBX_VALUE_NVALUES:
-			*error = zbx_strdup(*error, "the first argument cannot be number of value");
-			goto out;
-		default:
-			*error = zbx_strdup(*error, "invalid type of first argument");
-			THIS_SHOULD_NEVER_HAPPEN;
-			goto out;
-	}
+	return ret;
+}
 
-	if (0 >= arg1)
-	{
-		*error = zbx_strdup(*error, "the first argument must be greater than 0");
-		goto out;
-	}
+/******************************************************************************
+ *                                                                            *
+ * Purpose: evaluate function 'firstclock' for the item.                      *
+ *                                                                            *
+ * Parameters: value      - [OUT] result                                      *
+ *             item       - [IN] item (performance metric)                    *
+ *             parameters - [IN] Nth first value and time shift (optional)    *
+ *             ts         - [IN] starting timestamp                           *
+ *             error      - [OUT]                                             *
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in        *
+ *                         'value'                                            *
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_FIRSTCLOCK(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *parameters,
+		const zbx_timespec_t *ts, char **error)
+{
+	int			ret;
+	zbx_history_record_t	vc_value;
 
-	ts_end.sec -= time_shift;
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED == zbx_vc_get_values(item->itemid, item->value_type, &values, seconds, 0, &ts_end))
+	if (SUCCEED == (ret = get_first_n_value(item, parameters, ts, &vc_value, error)))
 	{
-		if (0 < values.values_num)
-		{
-			switch (value_type)
-			{
-				case ZBX_ACCEPT_TYPE_VALUE:
-					zbx_history_value2variant(&values.values[values.values_num - 1].value,
-							item->value_type, value);
-					break;
-				case ZBX_ACCEPT_TYPE_TIMESTAMP:
-					zbx_variant_set_ui64(value, values.values[values.values_num - 1].timestamp.sec);
-					break;
-				default:
-					*error = zbx_strdup(*error, "invalid parameter");
-					goto out;
-			}
-			ret = SUCCEED;
-		}
-		else
-		{
-			*error = zbx_strdup(*error, "not enough data");
-			goto out;
-		}
+		zbx_variant_set_ui64(value, (uint64_t)vc_value.timestamp.sec);
+		zbx_history_record_clear(&vc_value, item->value_type);
 	}
-	else
-		*error = zbx_strdup(*error, "cannot get values from value cache");
-out:
-	zbx_history_record_vector_destroy(&values, item->value_type);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -3474,7 +3570,7 @@ int	zbx_evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 
 	if (0 == strcmp(function, "last"))
 	{
-		ret = evaluate_LAST(value, item, parameter, ts, ZBX_ACCEPT_TYPE_VALUE, error);
+		ret = evaluate_LAST(value, item, parameter, ts, error);
 	}
 	else if (0 == strcmp(function, "min"))
 	{
@@ -3550,7 +3646,7 @@ int	zbx_evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 	}
 	else if (0 == strcmp(function, "first"))
 	{
-		ret = evaluate_FIRST(value, item, parameter, ts, ZBX_ACCEPT_TYPE_VALUE, error);
+		ret = evaluate_FIRST(value, item, parameter, ts, error);
 	}
 	else if (0 == strcmp(function, "kurtosis"))
 	{
@@ -3606,15 +3702,15 @@ int	zbx_evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 	}
 	else if (0 == strncmp(function, "lastclock", 9))
 	{
-		ret = evaluate_LAST(value, item, parameter, ts, ZBX_ACCEPT_TYPE_TIMESTAMP, error);
+		ret = evaluate_LASTCLOCK(value, item, parameter, ts, error);
 	}
 	else if (0 == strncmp(function, "logtimestamp", 12))
 	{
-		ret = evaluate_LAST(value, item, parameter, ts, ZBX_ACCEPT_TYPE_LOG_TIMESTAMP, error);
+		ret = evaluate_LOGTIMESTAMP(value, item, parameter, ts, error);
 	}
 	else if (0 == strncmp(function, "firstclock", 10))
 	{
-		ret = evaluate_FIRST(value, item, parameter, ts, ZBX_ACCEPT_TYPE_TIMESTAMP, error);
+		ret = evaluate_FIRSTCLOCK(value, item, parameter, ts, error);
 	}
 	else if (NULL != (ptr = strstr(function, "_foreach")) && ZBX_CONST_STRLEN("_foreach") == strlen(ptr))
 	{
