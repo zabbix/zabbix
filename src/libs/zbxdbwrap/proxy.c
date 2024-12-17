@@ -2181,7 +2181,7 @@ json_parse_return:
  *                                                                            *
  * Parameters:                                                                *
  *    jp_data                 - [IN] JSON with autoregistration data          *
- *    proxyid                 - [IN] proxy identifier from database           *
+ *    proxy                   - [IN]                                          *
  *    events_cbs              - [IN]                                          *
  *    autoreg_host_free_cb    - [IN]                                          *
  *    autoreg_flush_hosts_cb  - [IN]                                          *
@@ -2193,7 +2193,7 @@ json_parse_return:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx_uint64_t proxyid,
+static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, const zbx_dc_proxy_t *proxy,
 		const zbx_events_funcs_t *events_cbs, zbx_autoreg_host_free_func_t autoreg_host_free_cb,
 		zbx_autoreg_flush_hosts_func_t autoreg_flush_hosts_cb,
 		zbx_autoreg_prepare_host_func_t autoreg_prepare_host_cb, char **error)
@@ -2325,9 +2325,9 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 	if (0 != autoreg_hosts.values_num)
 	{
 		zbx_db_begin();
-		autoreg_flush_hosts_cb(&autoreg_hosts, proxyid, events_cbs);
+		autoreg_flush_hosts_cb(&autoreg_hosts, proxy, events_cbs);
 		zbx_db_commit();
-		zbx_dc_config_delete_autoreg_host(&autoreg_hosts);
+		zbx_autoreg_host_invalidate_cache(&autoreg_hosts);
 	}
 
 	zbx_free(host_metadata);
@@ -2589,7 +2589,7 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_pa
 
 	if (SUCCEED == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_AUTOREGISTRATION, &jp_data))
 	{
-		if (SUCCEED != (ret = process_autoregistration_contents(&jp_data, proxy->proxyid, events_cbs,
+		if (SUCCEED != (ret = process_autoregistration_contents(&jp_data, proxy, events_cbs,
 				autoreg_host_free_cb, autoreg_flush_hosts_cb, autoreg_prepare_host_cb, &error_step)))
 		{
 			zbx_strcatnl_alloc(error, &error_alloc, &error_offset, error_step);

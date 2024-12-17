@@ -23,7 +23,6 @@
 #include "zbxvault.h"
 #include "zbxregexp.h"
 #include "zbxtagfilter.h"
-#include "zbxautoreg.h"
 #include "zbxpgservice.h"
 #include "zbxalgo.h"
 
@@ -890,7 +889,7 @@ size_t	zbx_dc_config_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, zbx
 
 void	zbx_dc_config_update_autoreg_host(const char *host, const char *listen_ip, const char *listen_dns,
 		unsigned short listen_port, const char *host_metadata, zbx_conn_flags_t flags, int now);
-void	zbx_dc_config_delete_autoreg_host(const zbx_vector_autoreg_host_ptr_t *autoreg_hosts);
+void	zbx_dc_config_delete_autoreg_host(const zbx_vector_str_t *autoreg_hosts);
 
 #define ZBX_HK_OPTION_DISABLED		0
 #define ZBX_HK_OPTION_ENABLED		1
@@ -940,10 +939,11 @@ int	zbx_dc_config_get_proxypoller_nextcheck(void);
 #define ZBX_PROXY_TASKS_NEXTCHECK	0x04
 void	zbx_dc_requeue_proxy(zbx_uint64_t proxyid, unsigned char update_nextcheck, int proxy_conn_err,
 		int proxyconfig_frequency, int proxydata_frequency);
-int	zbx_dc_check_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
-		zbx_uint64_t *revision, zbx_comms_redirect_t *redirect, char **error);
+int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
+		unsigned char *status, unsigned char *monitored_by, zbx_uint64_t *revision,
+		zbx_comms_redirect_t *redirect, char **error);
 int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const char *host_metadata,
-		zbx_conn_flags_t flag, const char *interface, int now, int heartbeat);
+		zbx_conn_flags_t flag, const char *interface, int now);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned char *psk_buf, unsigned int *psk_usage);

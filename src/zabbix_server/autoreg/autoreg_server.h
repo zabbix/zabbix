@@ -20,11 +20,11 @@
 
 void	zbx_autoreg_host_free_server(zbx_autoreg_host_t *autoreg_host);
 
-void	zbx_autoreg_update_host_server(zbx_uint64_t proxyid, const char *host, const char *ip, const char *dns,
+void	zbx_autoreg_update_host_server(const zbx_dc_proxy_t *proxy, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flags,
 		int clock, const zbx_events_funcs_t *events_cbs);
 
-void	zbx_autoreg_flush_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts, zbx_uint64_t proxyid,
+void	zbx_autoreg_flush_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts, const zbx_dc_proxy_t *proxy,
 		const zbx_events_funcs_t *events_cbs);
 
 void	zbx_autoreg_prepare_host_server(zbx_vector_autoreg_host_ptr_t *autoreg_hosts, const char *host, const char *ip,

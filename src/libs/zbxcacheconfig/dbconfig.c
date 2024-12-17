@@ -9337,25 +9337,30 @@ int	zbx_dc_get_host_by_hostid(zbx_dc_host_t *host, zbx_uint64_t hostid)
 /******************************************************************************
  *                                                                            *
  * Purpose:                                                                   *
- *     Check access rights for host and get host ID and revision              *
+ *     Check connection access rights for host and get host data              *
  *                                                                            *
  * Parameters:                                                                *
- *     host     - [IN] host name                                              *
- *     sock     - [IN] connection socket context                              *
- *     hostid   - [OUT] host ID found in configuration cache                  *
- *     revision - [OUT] host configuration revision                           *
- *     error    - [OUT] error message why access was denied                   *
+ *     host         - [IN] host name                                          *
+ *     sock         - [IN] connection socket context                          *
+ *     hostid       - [OUT] host ID found in configuration cache              *
+ *     status       - [OUT] host status                                       *
+ *     monitored_by - [OUT]                                                   *
+ *     revision     - [OUT] host configuration revision                       *
+ *     redirect     - [OUT] host redirection information (optional)           *
+ *     error        - [OUT] error message why access was denied               *
  *                                                                            *
  * Return value:                                                              *
- *     SUCCEED - access is allowed or host not found, FAIL - access denied    *
+ *     SUCCEED - access is allowed or host not found, FAIL - access denied or *
+ *               host redirection error if redirection data is requested      *
  *                                                                            *
  * Comments:                                                                  *
  *     Generating of error messages is done outside of configuration cache    *
  *     locking.                                                               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_check_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
-		zbx_uint64_t *revision, zbx_comms_redirect_t *redirect, char **error)
+int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
+		unsigned char *status, unsigned char *monitored_by, zbx_uint64_t *revision,
+		zbx_comms_redirect_t *redirect, char **error)
 {
 	const ZBX_DC_HOST	*dc_host = NULL;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -9385,21 +9390,8 @@ int	zbx_dc_check_host_permissions(const char *host, const zbx_socket_t *sock, zb
 	{
 		UNLOCK_CACHE;
 		*hostid = 0;
+
 		return SUCCEED;
-	}
-
-	if (HOST_STATUS_MONITORED != dc_host->status)
-	{
-		UNLOCK_CACHE;
-		*error = zbx_dsprintf(NULL, "host \"%s\" not monitored", host);
-		return FAIL;
-	}
-
-	if (HOST_MONITORED_BY_SERVER != dc_host->monitored_by)
-	{
-		UNLOCK_CACHE;
-		*error = zbx_dsprintf(NULL, "host \"%s\" is monitored by a proxy or proxy group", host);
-		return FAIL;
 	}
 
 	if (0 == ((unsigned int)dc_host->tls_accept & sock->connection_type))
@@ -9420,7 +9412,8 @@ int	zbx_dc_check_host_permissions(const char *host, const zbx_socket_t *sock, zb
 		return FAIL;
 	}
 #endif
-
+	*status = dc_host->status;
+	*monitored_by = dc_host->monitored_by;
 	*hostid = dc_host->hostid;
 	*revision = MAX(dc_host->revision, config->revision.expression);
 
@@ -9437,8 +9430,10 @@ int	zbx_dc_check_host_permissions(const char *host, const zbx_socket_t *sock, zb
 }
 
 int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const char *host_metadata,
-		zbx_conn_flags_t flag, const char *interface, int now, int heartbeat)
+		zbx_conn_flags_t flag, const char *interface, int now)
 {
+#define AUTO_REGISTRATION_HEARTBEAT	120
+
 	const ZBX_DC_AUTOREG_HOST	*dc_autoreg_host;
 	int				ret;
 
@@ -9466,7 +9461,7 @@ int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const 
 	{
 		ret = SUCCEED;
 	}
-	else if (0 != heartbeat && heartbeat < now - dc_autoreg_host->timestamp)
+	else if (AUTO_REGISTRATION_HEARTBEAT < now - dc_autoreg_host->timestamp)
 	{
 		ret = SUCCEED;
 	}
@@ -9516,9 +9511,9 @@ static void	autoreg_host_free_data(ZBX_DC_AUTOREG_HOST *autoreg_host)
 	dc_strpool_release(autoreg_host->host_metadata);
 }
 
-void	zbx_dc_config_delete_autoreg_host(const zbx_vector_autoreg_host_ptr_t *autoreg_hosts)
+void	zbx_dc_config_delete_autoreg_host(const zbx_vector_str_t *autoreg_hosts)
 {
-	int			cached = 0, i;
+	int	cached = 0, i;
 
 	/* hosts monitored by Zabbix proxy shouldn't be changed too frequently */
 	if (0 == autoreg_hosts->values_num)
@@ -9528,7 +9523,7 @@ void	zbx_dc_config_delete_autoreg_host(const zbx_vector_autoreg_host_ptr_t *auto
 	RDLOCK_CACHE;
 	for (i = 0; i < autoreg_hosts->values_num; i++)
 	{
-		if (NULL != DCfind_autoreg_host(((const zbx_autoreg_host_t *)autoreg_hosts->values[i])->host))
+		if (NULL != DCfind_autoreg_host(autoreg_hosts->values[i]))
 			cached++;
 	}
 	UNLOCK_CACHE;
@@ -9544,7 +9539,7 @@ void	zbx_dc_config_delete_autoreg_host(const zbx_vector_autoreg_host_ptr_t *auto
 	{
 		ZBX_DC_AUTOREG_HOST	*autoreg_host;
 
-		autoreg_host = DCfind_autoreg_host(((const zbx_autoreg_host_t *)autoreg_hosts->values[i])->host);
+		autoreg_host = DCfind_autoreg_host(autoreg_hosts->values[i]);
 		if (NULL != autoreg_host)
 		{
 			autoreg_host_free_data(autoreg_host);
