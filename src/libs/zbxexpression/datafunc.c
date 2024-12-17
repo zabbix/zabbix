@@ -636,7 +636,7 @@ int	expr_db_item_get_value(zbx_uint64_t itemid, int raw, zbx_timespec_t *ts, cha
  *                                                                            *
  ******************************************************************************/
 int	expr_db_item_value(const zbx_db_trigger *trigger, char **value, int N_functionid, int clock, int ns, int raw,
-		const char *tz, zbx_expr_db_item_value_type_t value_type)
+		const char *tz, zbx_expr_db_item_value_property_t value_property)
 {
 	zbx_uint64_t	itemid, timestamp;
 	zbx_timespec_t	ts = {clock, ns};
@@ -647,18 +647,18 @@ int	expr_db_item_value(const zbx_db_trigger *trigger, char **value, int N_functi
 	if (SUCCEED == (ret = zbx_db_trigger_get_itemid(trigger, N_functionid, &itemid)))
 		ret = expr_db_item_get_value(itemid, raw, &ts, value, &timestamp);
 
-	switch (value_type)
+	switch (value_property)
 	{
-		case ZBX_VALUE_TYPE_TIME:
+		case ZBX_VALUE_PROPERTY_TIME:
 			*value = zbx_strdup(*value, zbx_time2str(timestamp, tz));
 			break;
-		case ZBX_VALUE_TYPE_TIMESTAMP:
+		case ZBX_VALUE_PROPERTY_TIMESTAMP:
 			*value = zbx_dsprintf(*value, ZBX_FS_UI64, timestamp);
 			break;
-		case ZBX_VALUE_TYPE_DATE:
+		case ZBX_VALUE_PROPERTY_DATE:
 			*value = zbx_strdup(*value, zbx_date2str(timestamp, tz));
 			break;
-		case ZBX_VALUE_TYPE_AGE:
+		case ZBX_VALUE_PROPERTY_AGE:
 			*value = zbx_dsprintf(*value, ZBX_FS_UI64, time(NULL) - timestamp);
 			break;
 		default:
@@ -680,13 +680,13 @@ int	expr_db_item_value(const zbx_db_trigger *trigger, char **value, int N_functi
  *                                                                            *
  ******************************************************************************/
 int	expr_db_item_lastvalue(const zbx_db_trigger *trigger, char **lastvalue, int N_functionid, int raw,
-		const char *tz, zbx_expr_db_item_value_type_t value_type)
+		const char *tz, zbx_expr_db_item_value_property_t value_property)
 {
 	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	ret = expr_db_item_value(trigger, lastvalue, N_functionid, (int)time(NULL), 999999999, raw, tz, value_type);
+	ret = expr_db_item_value(trigger, lastvalue, N_functionid, (int)time(NULL), 999999999, raw, tz, value_property);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
