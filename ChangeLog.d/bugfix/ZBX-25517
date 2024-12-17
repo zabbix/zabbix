@@ -1,1 +1,0 @@
-.......PS. [ZBX-25517] reduced shared memory usage for item tags by storing links in heap (vso)

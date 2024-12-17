@@ -1,15 +1,77 @@
 Changes for 7.4.0alpha1
 
 New features:
+.........T [ZBXNEXT-9545] added Nvidia by Zabbix agent 2 templates (abrosimovs)
+.........T [ZBXNEXT-9572] added Juniper MX by SNMP template (egordymov)
+.......PS. [ZBXNEXT-9622] added top.peak in diaginfo to identify items with highest task queue (vso)
 
 Bug fixes:
+.......PS. [ZBX-25391] fixed error in the log file when retrieving VMware tags from an ESXi host (MVekslers)
+....I..PS. [ZBX-25722] fixed Zabbix proxy throwing errors when removing/creating sqlite database (dgoloscapov)
+.......PS. [ZBX-25517] reduced shared memory usage for item tags by storing links in heap (vso)
+A......... [ZBX-25732] fixed inability to make cross-origin requests to API when passing authentication token using Authorization HTTP header; fixed inability to make cross-origin HTTP OPTIONS request to API endpoint (vmaksimovs)
+..F....... [ZBX-25010] fixed trigger being displayed in its own dependency list (rgontarski)
+....I..... [ZBX-25321] dropped relying on pre-2.x libevent API and headers (jxl)
+........S. [ZBX-25363] fixed connector error spam to log (sboidenko)
+........S. [ZBX-24970] fixed forgotten places for macro functions support (akozlovs)
+.......PS. [ZBX-25515] improved LLD error messages when being unable to create or update an entity (dgoloscapov)
+.......PS. [ZBX-25497] added support for VMware perfCounter measured in gigaBytes (MVekslers)
+...G...... [ZBX-25267] fixed Zabbix agent 2 refusing PSK connections when using PSK and certs (dgoloscapov)
+........S. [ZBX-23103] fixed parsing of JSONPath containing dollar sign (arimdjonoks)
+...G...... [ZBX-25390] fixed vfs.fs.get item for Digital Audio CD disks on Windows (MVekslers)
+..F....... [ZBX-25022] fixed copying of master and dependent items to multiple destinations (Ivo)
+........S. [ZBX-21857] fixed inconsistencies in auditlog between Zabbix server and Zabbix frontend (arimdjonoks)
+.......PS. [ZBX-25136] fixed item testing preprocessing not being performed on Zabbix proxy when the item itself is being tested on Zabbix proxy (wiper)
+..F....... [ZBX-24895] changed double quotes to single quotes for string in SQL statement (rgontarski)
+..F....... [ZBX-25183] fixed the selected items color of collapsed main menu for high contrast themes (wczerneha)
+.......PS. [ZBX-25590] fixed failures to convert double to uint64 in preprocessing (dgoloscapov)
+.......PS. [ZBX-25596] fixed handling of preprocessing history when value type of an item is changed (dgoloscapov)
+..F....... [ZBX-25269] fixed widget iterator readiness (apoga, averza)
+..F.....S. [ZBX-24916] fixed date/time calculation for numeric (unsigned) item values with unixtime units after the year 2038 (dfofanovs, sboidenko)
+A......... [ZBX-25350] prohibited deleting user groups which are used in userdirectory user group mappings (gcalenko)
+...G...... [ZBX-25550] fixed crash in Zabbix agent when Zabbix server is restarted in the middle of connection (vso)
+.......PS. [ZBX-25548] fixed SNMP agent walk and get keys returning non printable ascii as string if hints are missing (vso)
+........S. [ZBX-25551] fixed preprocessing being skipped during history push if host is monitored by Zabbix proxy (vso)
+...G...... [ZBX-25377] fixed crash when executing vfs.fs.size or other metrics and forked metric is terminated abnormally (vso)
+..F....... [ZBX-25525] fixed parent template changes affecting linked template overrides in trigger and trigger prototype forms (esekace)
 
 --------------------------------------------------------------------------------
 Changes for 7.2.1rc1
 
 New features:
+.........T [ZBXNEXT-9545] added Nvidia by Zabbix agent 2 templates (abrosimovs)
+.........T [ZBXNEXT-9572] added Juniper MX by SNMP template (egordymov)
+.......PS. [ZBXNEXT-9622] added top.peak in diaginfo to identify items with highest task queue (vso)
 
 Bug fixes:
+.......PS. [ZBX-25391] fixed error in the log file when retrieving VMware tags from an ESXi host (MVekslers)
+....I..PS. [ZBX-25722] fixed Zabbix proxy throwing errors when removing/creating sqlite database (dgoloscapov)
+.......PS. [ZBX-25517] reduced shared memory usage for item tags by storing links in heap (vso)
+A......... [ZBX-25732] fixed inability to make cross-origin requests to API when passing authentication token using Authorization HTTP header; fixed inability to make cross-origin HTTP OPTIONS request to API endpoint (vmaksimovs)
+..F....... [ZBX-24895] changed double quotes to single quotes for string in SQL statement (rgontarski)
+........S. [ZBX-25363] fixed connector error spam to log (sboidenko)
+........S. [ZBX-24970] fixed forgotten places for macro functions support (akozlovs)
+.......PS. [ZBX-25515] improved LLD error messages when being unable to create or update an entity (dgoloscapov)
+..F....... [ZBX-25010] fixed trigger being displayed in its own dependency list (rgontarski)
+....I..... [ZBX-25321] dropped relying on pre-2.x libevent API and headers (jxl)
+.......PS. [ZBX-25497] added support for VMware perfCounter measured in gigaBytes (MVekslers)
+...G...... [ZBX-25267] fixed Zabbix agent 2 refusing PSK connections when using PSK and certs (dgoloscapov)
+........S. [ZBX-23103] fixed parsing of JSONPath containing dollar sign (arimdjonoks)
+........S. [ZBX-21857] fixed inconsistencies in auditlog between Zabbix server and Zabbix frontend (arimdjonoks)
+...G...... [ZBX-25390] fixed vfs.fs.get item for Digital Audio CD disks on Windows (MVekslers)
+..F....... [ZBX-25022] fixed copying of master and dependent items to multiple destinations (Ivo)
+.......PS. [ZBX-25136] fixed item testing preprocessing not being performed on Zabbix proxy when the item itself is being tested on Zabbix proxy (wiper)
+.......PS. [ZBX-25590] fixed failures to convert double to uint64 in preprocessing (dgoloscapov)
+..F....... [ZBX-25183] fixed the selected items color of collapsed main menu for high contrast themes (wczerneha)
+..F.....S. [ZBX-24916] fixed date/time calculation for numeric (unsigned) item values with unixtime units after the year 2038 (dfofanovs, sboidenko)
+.......PS. [ZBX-25596] fixed handling of preprocessing history when value type of an item is changed (dgoloscapov)
+..F....... [ZBX-25269] fixed widget iterator readiness (apoga, averza)
+A......... [ZBX-25350] prohibited deleting user groups which are used in userdirectory user group mappings (gcalenko)
+...G...... [ZBX-25550] fixed crash in Zabbix agent when Zabbix server is restarted in the middle of connection (vso)
+.......PS. [ZBX-25548] fixed SNMP agent walk and get keys returning non printable ascii as string if hints are missing (vso)
+........S. [ZBX-25551] fixed preprocessing being skipped during history push if host is monitored by Zabbix proxy (vso)
+...G...... [ZBX-25377] fixed crash when executing vfs.fs.size or other metrics and forked metric is terminated abnormally (vso)
+..F....... [ZBX-25525] fixed parent template changes affecting linked template overrides in trigger and trigger prototype forms (esekace)
 
 --------------------------------------------------------------------------------
 Changes for 7.2.0
@@ -1375,6 +1437,8 @@ Changes for 6.4.21rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-25732] fixed inability to make cross-origin requests to API when passing authentication token using Authorization HTTP header; fixed inability to make cross-origin HTTP OPTIONS request to API endpoint (vmaksimovs)
+.......PS. [ZBX-24692] fixed crash during invalid JSONPath preprocessing (vso)
 ..F....... [ZBX-24895] changed double quotes to single quotes for a string in an SQL statement (rgontarski)
 ...G...... [ZBX-25377] fixed crash when executing vfs.fs.size or other metrics and forked metric is terminated abnormally (vso)
 
