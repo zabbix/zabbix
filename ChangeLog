@@ -6,6 +6,8 @@ New features:
 .......PS. [ZBXNEXT-9622] added top.peak in diaginfo to identify items with highest task queue (vso)
 
 Bug fixes:
+.......PS. [ZBX-25677] removed failure when encountering mismatched OID in SNMP async poller (dgoloscapov, vso)
+....I..PS. [ZBX-25722] fixed Zabbix proxy throwing errors when removing/creating SQLite database (dgoloscapov)
 ........S. [ZBX-25671] fixed compilaltion with libevent version less 2.1.6 (sboidenko)
 .......PS. [ZBX-25089] fixed auto registration loop with proxy group (sboidenko)
 .......PS. [ZBX-25391] fixed error in the log file when retrieving VMware tags from an ESXi host (MVekslers)
@@ -46,6 +48,8 @@ New features:
 .......PS. [ZBXNEXT-9622] added top.peak in diaginfo to identify items with highest task queue (vso)
 
 Bug fixes:
+.......PS. [ZBX-25677] removed failure when encountering mismatched OID in SNMP async poller (dgoloscapov, vso)
+....I..PS. [ZBX-25722] fixed Zabbix proxy throwing errors when removing/creating SQLite database (dgoloscapov)
 .......PS. [ZBX-25089] fixed auto registration loop with proxy group (sboidenko)
 ........S. [ZBX-25671] fixed compilaltion with libevent version less 2.1.6 (sboidenko)
 .......PS. [ZBX-25391] fixed error in the log file when retrieving VMware tags from an ESXi host (MVekslers)
