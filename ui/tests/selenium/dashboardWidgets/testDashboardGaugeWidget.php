@@ -43,19 +43,6 @@ class testDashboardGaugeWidget extends testWidgets {
 	const DELETE_GAUGE = 'Gauge for deleting';
 	const GAUGE_ITEM = 'Float item';
 	const GAUGE_MACROFUNCTIONS = 'Gauge for macrofunctions';
-	const USER_MACRO = '{$USER.MACRO}';
-	const USER_MACRO_VALUE = 'Test5';
-	const USER_SECRET_MACRO = '{$SECRET.MACRO}';
-	const MACRO_CHAR = '{$MACRO.CHAR}';
-	const MACRO_HTML_ENCODE = '{$MACRO.HTML.ENCODE}';
-	const MACRO_HTML_ENCODE_VALUE = '<h1>"test&"</h1>';
-	const MACRO_HTML_DECODE = '{$MACRO.HTML.DECODE}';
-	const MACRO_HTML_DECODE_VALUE = '&lt;h1&gt;&quot;test&amp;&quot;&lt;/h1&gt;';
-	const MACRO_CHAR_VALUE = 'Тест 123 ŽzŠsšĒĀīī 🌴🌴🌴';
-	const MACRO_URL_ENCODE = '{$MACRO.URL.ENCODE}';
-	const MACRO_URL_ENCODE_VALUE = 'h://test.com/macro?functions=urlencode&urld=a';
-	const MACRO_URL_DECODE = '{$MACRO.URL.DECODE}';
-	const MACRO_URL_DECODE_VALUE = 'h%3A%2F%2Ftest.com%2Fmacro%3Ffunctions%3Durlencode%26urld%3Da';
 
 	/**
 	 * Id of the dashboard where gauge widget is created and updated.
@@ -1350,122 +1337,113 @@ class testDashboardGaugeWidget extends testWidgets {
 
 	public static function getMacroFunctions() {
 		return [
-			// #0 Arguments added to macro functions, which doesn't require such to be specified.
 			[
-				[
+				'Incorrectly added parameter for non-argument macro functions' => [
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{{ITEM.NAME}.btoa(\)}, {'.self::USER_MACRO.'.htmldecode(test)}, '.
-							'{'.self::USER_MACRO.'.htmlencode(test)}, {{ITEM.NAME}.lowercase([test])}, '.
-							'{{ITEM.NAME}.uppercase([test])}, {{ITEM.NAME}.urldecode([test])}, '.
-							'{'.self::USER_SECRET_MACRO.'.urlencode(\/)}',
+								'{'.self::USER_MACRO.'.htmlencode(test)}, {{ITEM.NAME}.lowercase([test])}, '.
+								'{{ITEM.NAME}.uppercase([test])}, {{ITEM.NAME}.urldecode([test])}, '.
+								'{'.self::USER_SECRET_MACRO.'.urlencode(\/)}',
 						'id:desc_size' => 5
 					],
 					'result' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*'
 				]
 			],
-			// #1 Check that secret macro value is not exposed by macro functions on the dashboard.
 			[
-				[
+				'Secret macro value is not exposed when using macro functions' => [
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::USER_SECRET_MACRO.'.btoa()}, {'.self::USER_SECRET_MACRO.'.htmldecode()}, '.
-							'{'.self::USER_SECRET_MACRO.'.htmlencode()}, {'.self::USER_SECRET_MACRO.'.lowercase()}, '.
-							'{'.self::USER_SECRET_MACRO.'.uppercase()}, {'.self::USER_SECRET_MACRO.'.regrepl(a, b)}, '.
-							'{'.self::USER_SECRET_MACRO.'.tr(a-z, b)}, {'.self::USER_SECRET_MACRO.'.urldecode()}, '.
-							'{'.self::USER_SECRET_MACRO.'.urlencode()}',
+								'{'.self::USER_SECRET_MACRO.'.htmlencode()}, {'.self::USER_SECRET_MACRO.'.lowercase()}, '.
+								'{'.self::USER_SECRET_MACRO.'.uppercase()}, {'.self::USER_SECRET_MACRO.'.regrepl(a, b)}, '.
+								'{'.self::USER_SECRET_MACRO.'.tr(a-z, b)}, {'.self::USER_SECRET_MACRO.'.urldecode()}, '.
+								'{'.self::USER_SECRET_MACRO.'.urlencode()}',
 						'id:desc_size' => 5
 					],
 					'result' => 'KioqKioq, ******, ******, ******, ******, ******, ******, ******, %2A%2A%2A%2A%2A%2A'
 				]
 			],
-			// #2 Built-in macro with non-argument functions.
 			[
-				[
+				'Built-in macros with non-argument macro functions' => [
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{{ITEM.NAME}.btoa()}, {{ITEM.NAME}.htmldecode()}, {{ITEM.NAME}.htmlencode()}, '.
-							'{{ITEM.NAME}.lowercase()}, {{ITEM.NAME}.uppercase()}, {{ITEM.NAME}.urlencode()}, '.
-							'{{ITEM.NAME}.urldecode()}',
+								'{{ITEM.NAME}.lowercase()}, {{ITEM.NAME}.uppercase()}, {{ITEM.NAME}.urlencode()}, '.
+								'{{ITEM.NAME}.urldecode()}',
 						'id:desc_size' => 5
 					],
 					'result' => 'RmxvYXQgaXRlbQ==, Float item, Float item, float item, FLOAT ITEM, Float%20item, Float item'
 				]
 			],
-			// #3 User macro with non-argument functions.
 			[
-				[
+				'User macros with non-argument macro functions' => [
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::USER_MACRO.'.btoa()}, {'.self::MACRO_HTML_ENCODE.'.htmlencode()}, '.
-							'{'.self::MACRO_HTML_DECODE.'.htmldecode()}, {'.self::MACRO_URL_ENCODE.'.urlencode()}, '.
-							'{'.self::MACRO_URL_DECODE.'.urldecode()}, {'.self::USER_MACRO.'.uppercase()}, '.
-							'{'.self::USER_MACRO.'.lowercase()}',
+								'{'.self::MACRO_HTML_DECODE.'.htmldecode()}, {'.self::MACRO_URL_ENCODE.'.urlencode()}, '.
+								'{'.self::MACRO_URL_DECODE.'.urldecode()}, {'.self::USER_MACRO.'.uppercase()}, '.
+								'{'.self::USER_MACRO.'.lowercase()}',
 						'id:desc_size' => 5
 					],
 					'result' => base64_encode(self::USER_MACRO_VALUE).', '.self::MACRO_HTML_DECODE_VALUE.', '.
 							self::MACRO_HTML_ENCODE_VALUE.', '.self::MACRO_URL_DECODE_VALUE.', '.self::MACRO_URL_ENCODE_VALUE.
-							', TEST5, test5'
+							', MACRO FUNCTION TEST 12345, macro function test 12345'
 				]
 			],
-			// #4 Wrong, missing or odd argument number in regrepl(), tr(), regsub(), irregsub() functions.
 			[
-				[
+				'Incorrectly used parameters in regrepl(), tr(), regsub(), iregsub() macro functions' => [
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::USER_MACRO.'.regrepl()}, {'.self::MACRO_CHAR.'.regrepl([a])}, '.
-							'{'.self::USER_MACRO.'.tr()}, {'.self::USER_MACRO.'.tr(z-a,Z-A)}, {'.self::USER_MACRO.'.tr(1,2,3)}'.
-							', {'.self::USER_MACRO.'.regsub()}, {'.self::USER_MACRO.'.irregsub()}',
+								'{'.self::USER_MACRO.'.tr()}, {'.self::USER_MACRO.'.tr(z-a,Z-A)}, {'.self::USER_MACRO.'.tr(1,2,3)}'.
+								', {'.self::USER_MACRO.'.regsub()}, {'.self::USER_MACRO.'.iregsub()}',
 						'id:desc_size' => 5
 					],
 					'result' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*'
 				]
 			],
-			// #5 Check that regrepl() works with digits, multiple byte characters and is case-sensitive.
 			[
-				[
+				'Regrepl function - multibyte characters and case sensitive check' => [
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::USER_MACRO.'.regrepl([[:digit:]], /, [A-Z], \)}, '.
-							'{'.self::MACRO_CHAR.'.regrepl(🌴, 🌝, [а-я], Q, \d, 🌞)}',
+								'{'.self::MACRO_CHAR.'.regrepl(🌴, 🌝, [а-я], Q, \d, 🌞)}',
 						'id:desc_size' => 5
 					],
-					'result' => '\est/, ТQQQ 🌞🌞🌞 ŽzŠsšĒĀīī 🌝🌝🌝'
+					'result' => '\acro function \est /////, 🌞🌞🌞 ЙQQQQЖŽzŠsšĒĀīī🌝 ₰₰₰'
 				]
 			],
-			// #6 Check that regrepl() with too many processed data is not breaking the widget.
 			[
-				[
+				'Regrepl function with big amount of processed data' => [
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::USER_MACRO.''.
-							'.regrepl(1{0}, test, 1{0}, test, 1{0},test, 1{0}, test, 1{0}, test, 1{0}, test)}',
+								'.regrepl(1{0}, test, 1{0}, test, 1{0},test, 1{0}, test, 1{0}, test, 1{0}, test)}',
 						'id:desc_size' => 5
 					],
 					'result' => '*UNKNOWN*'
 				]
 			],
-			// #7 Check that tr(), uppercase(), lowercase() are not working with non-ascii.
 			[
-				[
+				'Macro functions tr(), uppercase(), lowercase() with non-ascii characters' => [
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::MACRO_CHAR.'.tr(0-9, Ī)}, {'.self::MACRO_CHAR.'.lowercase()}, '.
-							'{'.self::MACRO_CHAR.'.uppercase()}',
+								'{'.self::MACRO_CHAR.'.uppercase()}',
 						'id:desc_size' => 5
 					],
-					'result' => 'Тест ??? ŽzŠsšĒĀīī 🌴🌴🌴, Тест 123 ŽzŠsšĒĀīī 🌴🌴🌴, Тест 123 ŽZŠSšĒĀīī 🌴🌴🌴'
+					'result' => '??? ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰, 000 ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰, 000 ЙщфхжЖŽZŠSšĒĀīī🌴 ₰₰₰'
 				]
 			],
-			// #8 Check example of tr() function with escaping, range and characters.
 			[
-				[
+				'Macro function tr() - use of escaping and range' => [
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::MACRO_URL_ENCODE.'.tr("\/","\"")}, {'.self::MACRO_CHAR.'.tr(0-9abcA-L,*)}',
 						'id:desc_size' => 5
 					],
-					'result' => 'h:""test.com"macro?functions=urlencode&urld=a, Тест *** ŽzŠsšĒĀīī 🌴🌴🌴'
+					'result' => 'h:""test.com"macro?functions=urlencode&urld=a🎸, *** ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰'
 				]
 			]
 		];
@@ -1475,7 +1453,9 @@ class testDashboardGaugeWidget extends testWidgets {
 	 * @dataProvider getMacroFunctions
 	 */
 	public function testDashboardGaugeWidget_CheckMacroFunctions($data) {
-		$this->setWidgetConfiguration(self::$macrofunction_dashboardid, self::GAUGE_MACROFUNCTIONS, $data['fields']);
+		$this->setWidgetConfiguration(self::$macrofunction_dashboardid,
+				self::GAUGE_MACROFUNCTIONS, $data['fields']
+		);
 		CDashboardElement::find()->one()->save()->waitUntilReady();
 
 		// Check the resolution of macrofunction.

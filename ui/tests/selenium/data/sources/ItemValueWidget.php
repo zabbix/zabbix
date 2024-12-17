@@ -324,12 +324,7 @@ class ItemValueWidget {
 								]
 							]
 						]
-					]
-				]
-			],
-			[
-				'name' => 'Dashboard for macro function check',
-				'pages' => [
+					],
 					[
 						'name' => 'Page for macrofunctions',
 						'widgets' => [
