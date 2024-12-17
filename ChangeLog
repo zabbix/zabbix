@@ -1234,6 +1234,8 @@ Changes for 6.4.21rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-25732] fixed inability to make cross-origin requests to API when passing authentication token using Authorization HTTP header; fixed inability to make cross-origin HTTP OPTIONS request to API endpoint (vmaksimovs)
+.......PS. [ZBX-24692] fixed crash during invalid JSONPath preprocessing (vso)
 ..F....... [ZBX-24895] changed double quotes to single quotes for a string in an SQL statement (rgontarski)
 ...G...... [ZBX-25377] fixed crash when executing vfs.fs.size or other metrics and forked metric is terminated abnormally (vso)
 
