@@ -76,33 +76,59 @@ class testFormMapConstructor extends CLegacyWebTest {
 				'expand_macros' => SYSMAP_EXPAND_MACROS_ON,
 				'label_type' => MAP_LABEL_TYPE_LABEL,
 				'selements' => [
-					// For testing the built-in macros with macrofunctions.
+					// For testing the built-in macros with macro functions.
 					[
 						'selementid' => 1,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
 						'iconid_off' => 182,
-						'label' => '{{HOST.HOST}.btoa()}, {{HOST.HOST}.htmldecode()}, {{HOST.HOST}.htmlencode()}, '.
-							'{{HOST.HOST}.lowercase()}, {{HOST.HOST}.uppercase()}, {{HOST.HOST}.regrepl("([^a-z])", 0)}, '.
-							'{{HOST.HOST}.tr(0-9abcA-L,*)}, {{HOST.HOST}.urlencode()}, {{HOST.HOST}.urldecode()}, '.
-							'{{HOST.HOST}.regsub(1, test)}, {{HOST.HOST}.iregsub(1, test)}',
-						'x' => 151,
+						'label' => '{{HOST.HOST}.btoa()}, {{HOST.HOST}.htmldecode()}, {{HOST.HOST}.htmlencode()}',
+						'x' => 351,
 						'y' => 101,
 						'elements' => [['hostid' => $host['hostids'][self::HOST_MACRO_FUNCTIONS]]]
 					],
-					// For testing the expression macros with macrofunctions.
+					[
+						'selementid' => 1,
+						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
+						'iconid_off' => 182,
+						'label' => '{{HOST.HOST}.lowercase()}, {{HOST.HOST}.uppercase()}, '.
+								'{{HOST.HOST}.regrepl("([^a-z])", 0)}, {{HOST.HOST}.regsub(1, test)}',
+						'x' => 351,
+						'y' => 201,
+						'elements' => [['hostid' => $host['hostids'][self::HOST_MACRO_FUNCTIONS]]]
+					],
+					[
+						'selementid' => 1,
+						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
+						'iconid_off' => 182,
+						'label' => '{{HOST.HOST}.tr(0-9abcA-L,*)}, {{HOST.HOST}.urlencode()}, {{HOST.HOST}.urldecode()}, '.
+								'{{HOST.HOST}.iregsub(1, test)}',
+						'x' => 351,
+						'y' => 301,
+						'elements' => [['hostid' => $host['hostids'][self::HOST_MACRO_FUNCTIONS]]]
+					],
+					// For testing the expression macros with macro functions.
 					[
 						'selementid' => 2,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
 						'iconid_off' => 152,
 						'label' => '{{?last(//'.self::ITEM_KEY.')}.btoa()}, {{?last(//'.self::ITEM_KEY.')}.fmtnum(0)}, '.
-							'{{?last(//'.self::ITEM_KEY.')}.htmldecode()} '.
-							'{{?last(//'.self::ITEM_KEY.')}.htmlencode()}, {{?last(//'.self::ITEM_KEY.')}.iregsub(2, test)} '.
-							'{{?last(//'.self::ITEM_KEY.')}.lowercase()}, {{?last(//'.self::ITEM_KEY.')}.uppercase()} '.
-							'{{?last(//'.self::ITEM_KEY.')}.regrepl([0-9], A)}, {{?last(//'.self::ITEM_KEY.')}.regsub(2, test)} '.
-							'{{?last(//'.self::ITEM_KEY.')}.tr(0-9,a-z)}, {{?last(//'.self::ITEM_KEY.')}.urldecode()}, '.
-							'{{?last(//'.self::ITEM_KEY.')}.urlencode()}',
-						'x' => 451,
-						'y' => 101,
+								'{{?last(//'.self::ITEM_KEY.')}.htmldecode()}, {{?last(//'.self::ITEM_KEY.')}.htmlencode()}, '.
+								'{{?last(//'.self::ITEM_KEY.')}.iregsub(2, test)}, {{?last(//'.self::ITEM_KEY.')}.lowercase()}',
+						'x' => 351,
+						'y' => 401,
+						'elements' => [['triggerid' => $triggers['triggerids'][0]]]
+					],
+					[
+						'selementid' => 2,
+						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
+						'iconid_off' => 152,
+						'label' => '{{?last(//'.self::ITEM_KEY.')}.uppercase()}, '.
+								'{{?last(//'.self::ITEM_KEY.')}.regrepl([0-9], A)}, '.
+								'{{?last(//'.self::ITEM_KEY.')}.regsub(2, test)}, '.
+								'{{?last(//'.self::ITEM_KEY.')}.tr(0-9,a-z)}, {{?last(//'.self::ITEM_KEY.')}.urldecode()}, '.
+								'{{?last(//'.self::ITEM_KEY.')}.urlencode()}',
+						'x' => 351,
+						'y' => 501,
 						'elements' => [['triggerid' => $triggers['triggerids'][0]]]
 					],
 					// For testing incorrectly used arguments of macro functions.
@@ -110,14 +136,23 @@ class testFormMapConstructor extends CLegacyWebTest {
 						'selementid' => 2,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
 						'iconid_off' => 152,
-						'label' => '{{?last(//'.self::ITEM_KEY.')}.btoa(\)}, {{HOST.HOST}.htmldecode(/)} '.
-							'{{?last(//'.self::ITEM_KEY.')}.fmtnum()}, {{HOST.HOST}.htmlencode(test)} '.
-							'{{HOST.HOST}.fmttime()}, {{HOST.HOST}.iregsub(a-z)}, {{?last(//'.self::ITEM_KEY.')}.regsub()}, '.
-							'{{HOST.HOST}.lowercase(///)}, {{HOST.HOST}.uppercase(//\\)}, {{HOST.HOST}.regrepl(1, 2, 3)}, '.
-							'{{?last(//'.self::ITEM_KEY.')}.tr()}, {{HOST.HOST}.urldecode(1, 2)}, '.
-							'{{?last(//'.self::ITEM_KEY.')}.urlencode(\)}',
-						'x' => 451,
-						'y' => 501,
+						'label' => '{{?last(//'.self::ITEM_KEY.')}.btoa(\)}, {{HOST.HOST}.htmldecode(/)}, '.
+								'{{?last(//'.self::ITEM_KEY.')}.fmtnum()}, {{HOST.HOST}.htmlencode(test)}, '.
+								'{{HOST.HOST}.fmttime()}, {{HOST.HOST}.iregsub(a-z)}',
+						'x' => 351,
+						'y' => 601,
+						'elements' => [['triggerid' => $triggers['triggerids'][1]]]
+					],
+					[
+						'selementid' => 2,
+						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
+						'iconid_off' => 152,
+						'label' => '{{?last(//'.self::ITEM_KEY.')}.regsub()}, {{HOST.HOST}.lowercase(///)}, '.
+								'{{HOST.HOST}.uppercase(//\\)}, {{HOST.HOST}.regrepl(1, 2, 3)}, '.
+								'{{?last(//'.self::ITEM_KEY.')}.tr()}, {{HOST.HOST}.urldecode(1, 2)}, '.
+								'{{?last(//'.self::ITEM_KEY.')}.urlencode(\)}',
+						'x' => 351,
+						'y' => 701,
 						'elements' => [['triggerid' => $triggers['triggerids'][1]]]
 					]
 				]
@@ -310,25 +345,48 @@ class testFormMapConstructor extends CLegacyWebTest {
 			[
 				[
 					'label' => 'VGVzdGluZyBtYWNybyBmdW5jdGlvbnMgMTIzNDU=, Testing macro functions 12345, '.
-						'Testing macro functions 12345, testing macro functions 12345, TESTING MACRO FUNCTIONS 12345, '.
-						'0esting0macro0functions000000, '.'Testing m**ro fun*tions *****, Testing%20macro%20functions%2012345, '.
-						'Testing macro functions 12345, test, test',
+							'Testing macro functions 12345',
 					'id' => 2
+				]
+			],
+			[
+				[
+					'label' => 'testing macro functions 12345, TESTING MACRO FUNCTIONS 12345, '.
+							'0esting0macro0functions000000, test',
+					'id' => 4
+				]
+			],
+			[
+				[
+					'label' => 'Testing m**ro fun*tions *****, Testing%20macro%20functions%2012345, '.
+							'Testing macro functions 12345, test',
+					'id' => 6
 				]
 			],
 			// Expression macros with macro functions.
 			[
 				[
-					'label' => 'MTIzLjMz, 123, 123.33 123.33, test 123.33, 123.33 AAA.AA, test bcd.dd, 123.33, 123.33',
-					'id' => 4
+					'label' => 'MTIzLjMz, 123, 123.33, 123.33, test, 123.33',
+					'id' => 8
+				]
+			],
+			[
+				[
+					'label' => '123.33, AAA.AA, test, bcd.dd, 123.33, 123.33',
+					'id' => 10
 				]
 			],
 			// Incorrectly used macro functions.
 			[
 				[
-					'label' => '*UNKNOWN*, *UNKNOWN* *UNKNOWN*, *UNKNOWN* *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, '.
-					'*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*',
-					'id' => 6
+					'label' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*',
+					'id' => 12
+				]
+			],
+			[
+				[
+					'label' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*',
+					'id' => 14
 				]
 			]
 		];
@@ -345,7 +403,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 		$this->assertEquals($data['label'], $this->query('xpath://*[@id="map-area"]/*[1]/*[2]/*[7]/*['.$data['id'].']')
 				->waitUntilVisible()->one()->getText()
 		);
-
 	}
 
 	/**
