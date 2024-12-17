@@ -49,7 +49,7 @@ int	zbx_db_connect(int flag)
 
 	db = zbx_dbconn_create();
 
-	zbx_dbconn_set_connect_options(db, flag);
+	(void)zbx_dbconn_set_connect_options(db, flag);
 	zbx_dbconn_set_autoincrement(db, db_autoincrement);
 	ret = zbx_dbconn_open(db);
 

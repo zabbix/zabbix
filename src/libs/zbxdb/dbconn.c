@@ -87,16 +87,19 @@ int	dbconn_init(char **error)
 
 		if (ZBX_DB_OK != (ret = dbconn_open(db)))
 		{
-			dbconn_errlog(db, ERR_Z3002, 0, sqlite3_errmsg(db->conn), db_config->dbname);
+			if (ZBX_DB_FAIL == ret)
+				dbconn_errlog(db, ERR_Z3002, 0, sqlite3_errmsg(db->conn), db_config->dbname);
+
 			*error = zbx_strdup(*error, "cannot open database");
-			return FAIL;
+			ret = FAIL;
 		}
 		else
 		{
 			zbx_dbconn_execute(db, "%s", zbx_dbschema_get_schema());
 			zbx_dbconn_close(db);
-			zbx_dbconn_free(db);
 		}
+
+		zbx_dbconn_free(db);
 
 		return (ZBX_DB_OK == ret ? SUCCEED : FAIL);
 	}
