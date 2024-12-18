@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-12-13 11:06+0000\n"
+"PO-Revision-Date: 2024-12-17 05:31+0000\n"
 "Last-Translator: Maksym <maxim@ua.fm>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -3775,7 +3775,7 @@ msgstr "Неможливо масово оновити видиме ім'я ву
 
 #: jsLoader.php:435
 msgid "Cannot open URL"
-msgstr ""
+msgstr "Не вдається відкрити URL"
 
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
@@ -4172,12 +4172,11 @@ msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "Не вдалося оновити інтерфейс для виявленого вузла мережі \"%1$s\"."
 
 #: app/controllers/CControllerPopupMassupdateItem.php:279 items.php:670
-#, fuzzy
 msgid "Cannot update item"
 msgid_plural "Cannot update items"
 msgstr[0] "Не вдалося оновити елемент даних"
-msgstr[1] "Не вдалося оновити елемент даних"
-msgstr[2] "Не вдалося оновити елемент даних"
+msgstr[1] "Не вдалося оновити елементи даних"
+msgstr[2] "Не вдалося оновити елементи даних"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:278
 #: disc_prototypes.php:457 disc_prototypes.php:484 disc_prototypes.php:523
@@ -4632,7 +4631,7 @@ msgstr "Клацніть для перегляду або редагування
 
 #: app/views/mfa.edit.php:111
 msgid "Client ID"
-msgstr ""
+msgstr "ID клієнта"
 
 #: app/views/mfa.edit.php:120
 msgid "Client secret"
@@ -4724,7 +4723,7 @@ msgstr "Закрити проблеми"
 
 #: app/views/mfa.edit.php:90
 msgid "Code length"
-msgstr ""
+msgstr "Довжина коду"
 
 #: app/views/js/monitoring.problem.view.js.php:194
 #: app/views/js/monitoring.problem.view.js.php:221
@@ -4772,7 +4771,7 @@ msgstr "Колір (ОК)"
 
 #: widgets/honeycomb/includes/WidgetForm.php:213
 msgid "Color interpolation"
-msgstr ""
+msgstr "Інтерполяція кольорів"
 
 #: widgets/gauge/views/widget.edit.php:92
 msgid "Colors"
@@ -5291,7 +5290,7 @@ msgstr "Ім'я контексту"
 
 #: app/views/script.userinput.edit.php:82
 msgid "Continue"
-msgstr ""
+msgstr "Продовжити"
 
 #: app/views/popup.lldoverride.php:54
 msgid "Continue overrides"
@@ -5581,7 +5580,7 @@ msgstr "Створити нові"
 
 #: jsLoader.php:372
 msgid "Create new report"
-msgstr ""
+msgstr "Створити новий звіт"
 
 #: app/views/administration.proxy.list.php:239
 msgid "Create proxy"
@@ -5589,7 +5588,7 @@ msgstr "Створити проксі"
 
 #: app/views/administration.proxygroup.list.php:168
 msgid "Create proxy group"
-msgstr ""
+msgstr "Створити проксі-групу"
 
 #: app/views/reports.scheduledreport.list.php:37
 msgid "Create report"
@@ -6227,7 +6226,7 @@ msgstr "Режим інвентаризації вузлів мережі по �
 
 #: app/views/administration.script.edit.php:358
 msgid "Default input string"
-msgstr ""
+msgstr "Рядок введення за замовчуванням"
 
 #: app/views/administration.gui.edit.php:73
 #: include/classes/setup/CSetupWizard.php:458
@@ -6399,7 +6398,7 @@ msgstr "Видалити лінки між обраними елементами
 #: include/views/configuration.host.discovery.edit.php:716
 #: include/views/configuration.host.discovery.list.php:151
 msgid "Delete lost resources"
-msgstr ""
+msgstr "Видалення втрачених ресурсів"
 
 #: app/views/maintenance.edit.php:275
 msgid "Delete maintenance period?"
@@ -6587,11 +6586,11 @@ msgstr "Видалити вибрані проксі?"
 #: app/views/js/administration.proxygroup.list.js.php:88
 #: app/views/popup.proxygroup.edit.php:147
 msgid "Delete selected proxy group?"
-msgstr ""
+msgstr "Видалити вибрану проксі-групу?"
 
 #: app/views/js/administration.proxygroup.list.js.php:87
 msgid "Delete selected proxy groups?"
-msgstr ""
+msgstr "Видалити вибрані проксі-групи?"
 
 #: app/views/js/administration.proxy.list.js.php:144
 #: app/views/popup.proxy.edit.php:367
@@ -6826,7 +6825,7 @@ msgstr "Опис"
 
 #: widgets/gauge/includes/WidgetForm.php:204
 msgid "Description size"
-msgstr ""
+msgstr "Розмір опису"
 
 #: include/classes/data/CItemData.php:1503
 msgid "Detailed listing of installed packages. Returns text in JSON format"
@@ -6942,7 +6941,7 @@ msgstr "Вимкнути хости, які мониторяться вибра�
 #: include/views/configuration.host.discovery.edit.php:730
 #: include/views/configuration.host.discovery.list.php:166
 msgid "Disable lost resources"
-msgstr ""
+msgstr "Вимкнення втрачених ресурсів"
 
 #: app/views/administration.token.list.php:211
 #: app/views/administration.user.token.list.php:164
@@ -7703,7 +7702,7 @@ msgstr "Пустий ID карти мережі."
 
 #: widgets/itemhistory/Widget.php:32
 msgid "Empty value."
-msgstr ""
+msgstr "Порожнє значення."
 
 #: app/views/action.list.php:167 app/views/administration.token.list.php:204
 #: app/views/administration.user.token.list.php:157
@@ -7800,7 +7799,7 @@ msgstr "Активувати внутрішню очистку"
 
 #: app/views/administration.authentication.edit.php:564
 msgid "Enable multi-factor authentication"
-msgstr ""
+msgstr "Увімкніть багатофакторну автентифікацію"
 
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
@@ -8594,7 +8593,7 @@ msgstr "Ім'я поля"
 #: include/views/configuration.item.edit.php:633
 #: include/views/configuration.item.prototype.edit.php:604
 msgid "Field requirements:"
-msgstr ""
+msgstr "Вимоги до поля:"
 
 #: include/classes/data/CItemData.php:1607
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -8687,7 +8686,7 @@ msgstr "Фільтр видалено"
 #: app/partials/monitoring.latest.view.html.php:36
 #: app/views/popup.generic.php:180
 msgid "Filter is not set"
-msgstr ""
+msgstr "Фільтр не встановлено"
 
 #: app/controllers/CControllerPopupTabFilterEdit.php:115
 msgid "Filter properties"
@@ -8935,7 +8934,7 @@ msgstr "Наданий вираз це не макрос"
 #: include/views/configuration.item.edit.php:866
 #: include/views/configuration.item.prototype.edit.php:820
 msgid "Global"
-msgstr ""
+msgstr "Глобальний"
 
 #: include/classes/api/services/CIconMap.php:366
 #, c-format
@@ -9243,7 +9242,7 @@ msgstr "Базовий DN для пошуку групи (Base DN)"
 #: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
 #: widgets/hostnavigator/includes/WidgetForm.php:102
 msgid "Group by"
-msgstr ""
+msgstr "Групувати за"
 
 #: app/views/popup.ldap.edit.php:126
 msgid "Group configuration"
@@ -9360,7 +9359,7 @@ msgstr "Значення апаратного сенсору. Повертає �
 
 #: app/views/mfa.edit.php:77
 msgid "Hash function"
-msgstr ""
+msgstr "Хеш-функція"
 
 #: app/views/administration.miscconfig.edit.php:102
 #: include/classes/setup/CSetupWizard.php:560
@@ -9972,12 +9971,11 @@ msgstr "Помилка при оновленні вузла мережі."
 
 #: app/controllers/CControllerHostUpdate.php:150
 #: app/controllers/CControllerPopupMassupdateHost.php:510
-#, fuzzy
 msgid "Host updated"
 msgid_plural "Hosts updated"
-msgstr[0] "Вузел мережі оновлено"
-msgstr[1] "Вузел мережі оновлено"
-msgstr[2] "Вузел мережі оновлено"
+msgstr[0] "Вузол мережі оновлено"
+msgstr[1] "Вузли мережі оновлено"
+msgstr[2] "Вузли мережі оновлено"
 
 #: include/classes/api/services/CDashboardGeneral.php:583
 #, c-format
@@ -10368,7 +10366,7 @@ msgstr "Тип ярлика до картинки"
 
 #: widgets/itemhistory/Widget.php:33
 msgid "Image loading error."
-msgstr ""
+msgstr "Помилка завантаження зображення."
 
 #: include/classes/helpers/CUploadFile.php:129
 #, c-format
@@ -11312,7 +11310,7 @@ msgstr "Інформація про сервіс. Повертає ціле чи
 
 #: include/views/configuration.host.prototype.edit.php:270
 msgid "Inherit"
-msgstr ""
+msgstr "Успадкувати"
 
 #: app/partials/configuration.filter.items.php:204
 #: app/views/trigger.list.php:133
@@ -11325,15 +11323,15 @@ msgstr "Макроси вузла мережі та успадковані"
 
 #: include/views/configuration.host.prototype.edit.php:371
 msgid "Inherited and host prototype macros"
-msgstr ""
+msgstr "Успадковані та прототипи макросів вузла мережі"
 
 #: app/partials/configuration.tags.tab.php:165
 msgid "Inherited and item tags"
-msgstr ""
+msgstr "Успадковані та власні теги"
 
 #: app/partials/configuration.tags.tab.php:160
 msgid "Inherited and scenario tags"
-msgstr ""
+msgstr "Успадковані та сценарні теги"
 
 #: app/views/template.edit.php:184
 msgid "Inherited and template macros"
@@ -11349,23 +11347,23 @@ msgstr "Успадковані елементи даних"
 
 #: widgets/geomap/includes/WidgetForm.php:62
 msgid "Initial view"
-msgstr ""
+msgstr "Початковий вигляд"
 
 #: include/classes/html/widgets/fields/CWidgetFieldLatLngView.php:45
 msgid "Initial view is ignored if the default view is set."
-msgstr ""
+msgstr "Початковий вигляд ігнорується, якщо встановлено перегляд за умовчанням."
 
 #: app/views/administration.script.edit.php:339
 msgid "Input prompt"
-msgstr ""
+msgstr "Підказка введення"
 
 #: app/views/administration.script.edit.php:349
 msgid "Input type"
-msgstr ""
+msgstr "Тип введення"
 
 #: app/views/administration.script.edit.php:376
 msgid "Input validation rule"
-msgstr ""
+msgstr "Правило перевірки введення"
 
 #: app/views/popup.triggerexpr.php:275
 msgid "Insert"
@@ -11395,11 +11393,11 @@ msgstr "Ім'я інсталятора"
 #: include/views/js/item.preprocessing.js.php:224
 #: include/views/js/item.preprocessing.js.php:258
 msgid "Integer from BITS"
-msgstr ""
+msgstr "BITS в ціле число"
 
 #: include/classes/helpers/CMenuHelper.php:431
 msgid "Integrations"
-msgstr ""
+msgstr "Інтеграції"
 
 #: app/partials/monitoring.host.view.html.php:36
 #: app/views/configuration.host.list.php:208 app/views/popup.proxy.edit.php:68
@@ -11415,7 +11413,7 @@ msgstr "Інтерфейс зв'язаний з елементом даних \"
 
 #: widgets/hostavail/includes/WidgetForm.php:46
 msgid "Interface type"
-msgstr ""
+msgstr "Тип інтерфейсу"
 
 #: include/classes/api/services/CHostInterface.php:332
 #, c-format
@@ -11435,7 +11433,7 @@ msgstr "У інтерфейсу з IP адресою \"%1$s\" не може бу
 #: app/partials/configuration.host.edit.html.php:222
 #: include/views/configuration.host.prototype.edit.php:267
 msgid "Interfaces"
-msgstr ""
+msgstr "Інтерфейси"
 
 #: app/views/administration.authentication.edit.php:45
 msgctxt "authentication"
@@ -11454,7 +11452,7 @@ msgstr "Внутрішня помилка JSON-RPC."
 #: app/views/action.list.php:48 include/classes/helpers/CMenuHelper.php:267
 #: include/classes/helpers/CRoleHelper.php:474
 msgid "Internal actions"
-msgstr ""
+msgstr "Внутрішні дії"
 
 #: app/views/administration.housekeeping.edit.php:68
 msgid "Internal data storage period"
@@ -11476,13 +11474,13 @@ msgstr "Внутрішня помилка."
 #: app/views/popup.mediatype.message.php:72
 #: include/classes/helpers/CMediatypeHelper.php:311
 msgid "Internal problem"
-msgstr ""
+msgstr "Внутрішня проблема"
 
 #: app/views/mediatype.message.edit.php:74
 #: app/views/popup.mediatype.message.php:75
 #: include/classes/helpers/CMediatypeHelper.php:322
 msgid "Internal problem recovery"
-msgstr ""
+msgstr "Відновлення внутрішньої проблеми"
 
 #: include/httptest.inc.php:396
 msgid "Internet Explorer"
@@ -11505,7 +11503,7 @@ msgstr "Інтервал"
 #: include/classes/api/services/CRole.php:731
 #, c-format
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
-msgstr ""
+msgstr "Недійсний метод API \"%2$s\" для ролі користувача \"%1$s\"."
 
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
@@ -11518,7 +11516,7 @@ msgstr "Неправильний JSON. На сервері виникла пом
 
 #: app/controllers/CControllerAuthenticationUpdate.php:165
 msgid "Invalid LDAP JIT provisioning media type mapping configuration."
-msgstr ""
+msgstr "Помилкова конфігурація відповідності способів оповіщення LDAP JIT ініціалізації."
 
 #: app/controllers/CControllerAuthenticationUpdate.php:158
 msgid "Invalid LDAP JIT provisioning user group mapping configuration."
@@ -11547,11 +11545,11 @@ msgstr ""
 #: jsLoader.php:438
 #, c-format
 msgid "Invalid URL: %1$s"
-msgstr ""
+msgstr "Недійсна URL-адреса: %1$s"
 
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
-msgstr ""
+msgstr "Недійсний вміст файлу YAML"
 
 #: include/classes/validators/CActionCondValidator.php:113
 #, c-format
@@ -11561,7 +11559,7 @@ msgstr "Неправильна умова дії: %1$s."
 #: app/controllers/CControllerPopupTriggerExpr.php:1629
 #, c-format
 msgid "Invalid condition: %1$s."
-msgstr ""
+msgstr "Неправильна умова: %1$s."
 
 #: app/controllers/CControllerTimeSelectorUpdate.php:96
 msgid "Invalid date."
@@ -11869,7 +11867,7 @@ msgstr "Неправильні параметри."
 
 #: include/classes/core/CJsonRpc.php:205
 msgid "Invalid request."
-msgstr ""
+msgstr "Невірний запит."
 
 #: app/controllers/CControllerWebScenarioStepCheck.php:109
 #: include/classes/api/services/CHttpTest.php:936
@@ -11930,12 +11928,12 @@ msgstr "Неправильний період часу."
 #: app/controllers/CControllerPopupUserGroupMappingCheck.php:42
 #: app/controllers/CControllerPopupUserGroupMappingEdit.php:44
 msgid "Invalid user group mapping configuration."
-msgstr ""
+msgstr "Неправильна конфігурація зіставлення груп користувачів."
 
 #: include/classes/validators/CApiInputValidator.php:3323
 #, c-format
 msgid "Invalid zoomparameter \"%1$s\": %2$s."
-msgstr ""
+msgstr "Недійсний параметр масштабування \"%1$s\": %2$s."
 
 #: app/partials/configuration.host.edit.html.php:512
 #: app/views/popup.massupdate.host.php:290
@@ -11961,7 +11959,7 @@ msgstr "Режим інвентарних даних"
 
 #: include/classes/helpers/CRoleHelper.php:560
 msgid "Invoke \"Execute now\" on read-only hosts"
-msgstr ""
+msgstr "Виклик \"Виконати зараз\" над вузлами мережі тільки для читання"
 
 #: app/views/administration.user.list.php:134
 msgid "Is online?"
@@ -12007,7 +12005,7 @@ msgstr "Елемент додано"
 
 #: app/views/popup.itemtestedit.view.php:433
 msgid "Item contains user-defined macros with secret values. Values of these macros should be entered manually."
-msgstr ""
+msgstr "Елемент містить визначені користувачем макроси з секретними значеннями. Значення цих макросів слід вводити вручну."
 
 #: app/controllers/CControllerCopyCreate.php:160
 msgid "Item copied"
@@ -12021,12 +12019,11 @@ msgid "Item count"
 msgstr "Кількість елементів даних"
 
 #: items.php:524 items.php:735
-#, fuzzy
 msgid "Item deleted"
 msgid_plural "Items deleted"
 msgstr[0] "Елемент даних видалено"
-msgstr[1] "Елемент даних видалено"
-msgstr[2] "Елемент даних видалено"
+msgstr[1] "Елементи даних видалено"
+msgstr[2] "Елементи даних видалено"
 
 #: items.php:708
 msgid "Item disabled"
@@ -12057,7 +12054,7 @@ msgstr ""
 #: widgets/piechart/views/widget.edit.js.php:209
 #: widgets/svggraph/views/widget.edit.js.php:287
 msgid "Item list"
-msgstr ""
+msgstr "Список елементів даних"
 
 #: widgets/tophosts/views/column.edit.php:123
 msgid "Item name"
@@ -12238,11 +12235,11 @@ msgstr "Інтерфейси JMX"
 
 #: include/classes/html/CButtonExport.php:79
 msgid "JSON"
-msgstr ""
+msgstr "JSON"
 
 #: include/classes/mvc/CController.php:240
 msgid "JSON array input is expected."
-msgstr ""
+msgstr "Очікується вхідний масив JSON."
 
 #: app/views/popup.massupdate.item.php:92
 #: include/views/configuration.host.discovery.edit.php:285
@@ -12253,7 +12250,7 @@ msgstr "JSON дані"
 
 #: include/classes/validators/CApiInputValidator.php:3982
 msgid "JSON is expected"
-msgstr ""
+msgstr "Очікується JSON"
 
 #: include/classes/validators/CNewValidator.php:113
 msgid "JSON string is expected"
@@ -12262,7 +12259,7 @@ msgstr "очікувався JSON рядок"
 #: include/classes/core/CJsonRpc.php:175
 #, c-format
 msgid "JSON-RPC error generation failed. No such error \"%1$s\"."
-msgstr ""
+msgstr "Не вдалося створити помилку JSON-RPC. Немає такої помилки \"%1$s\"."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:702
 #: include/items.inc.php:1550
@@ -12316,7 +12313,7 @@ msgstr "Період зберігання втрачених ресурсів"
 
 #: app/views/connector.edit.php:130 include/httptest.inc.php:30
 msgid "Kerberos"
-msgstr ""
+msgstr "Kerberos"
 
 #: app/controllers/CControllerPopupGeneric.php:304
 #: app/controllers/CControllerPopupGeneric.php:320
@@ -12357,7 +12354,7 @@ msgstr "LDAP"
 
 #: app/views/popup.ldap.edit.php:327 app/views/usergroup.edit.php:102
 msgid "LDAP Server"
-msgstr ""
+msgstr "LDAP сервер"
 
 #: include/perm.inc.php:49
 msgid "LDAP authentication"
@@ -12402,11 +12399,11 @@ msgstr "LLD макроси"
 
 #: app/controllers/CControllerAuditLogList.php:242
 msgid "LLD rule"
-msgstr ""
+msgstr "Правило LLD"
 
 #: include/classes/api/services/CItemGeneral.php:539
 msgid "LLD rule with the same UUID already exists"
-msgstr ""
+msgstr "Правило LLD з таким самим UUID вже існує"
 
 #: app/views/correlation.edit.php:175 app/views/popup.action.edit.php:53
 #: app/views/popup.lldoverride.php:99 app/views/popup.operation.edit.php:435
@@ -12430,7 +12427,7 @@ msgstr "Мова"
 #: include/classes/api/services/CUser.php:776
 #, c-format
 msgid "Language \"%1$s\" is not supported."
-msgstr ""
+msgstr "Мова \"%1$s\" не підтримується."
 
 #: include/classes/helpers/CPagerHelper.php:232
 msgctxt "page navigation"
@@ -12487,12 +12484,12 @@ msgstr[2] "Останні %1$d років"
 
 #: app/partials/administration.ha.nodes.php:28
 msgid "Last access"
-msgstr ""
+msgstr "Останній доступ"
 
 #: app/views/administration.token.list.php:146
 #: app/views/administration.user.token.list.php:103
 msgid "Last accessed at"
-msgstr ""
+msgstr "Час останнього використання"
 
 #: app/partials/monitoring.latest.view.html.php:76
 #: app/partials/monitoring.latest.view.html.php:89
@@ -12509,7 +12506,7 @@ msgstr "Графік за останню годину"
 #: widgets/svggraph/includes/CWidgetFieldOverrideView.php:258
 msgctxt "missing data function"
 msgid "Last known"
-msgstr ""
+msgstr "Останній відомий"
 
 #: jsLoader.php:378
 msgid "Last month graph"
@@ -12520,7 +12517,7 @@ msgstr "Графік за останній місяць"
 #: app/views/administration.user.list.php:68
 #: app/views/administration.user.list.php:131
 msgid "Last name"
-msgstr ""
+msgstr "Прізвище"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:63
 #: app/controllers/CControllerPopupTriggerExpr.php:77
@@ -12584,7 +12581,7 @@ msgstr "Латвійська (lv_LV)"
 #: widgets/hostavail/includes/WidgetForm.php:55
 #: widgets/problemsbysv/includes/WidgetForm.php:87
 msgid "Layout"
-msgstr ""
+msgstr "Розташування"
 
 #: include/views/js/configuration.graph.edit.js.php:86
 #: include/views/js/configuration.graph.edit.js.php:156
@@ -12623,11 +12620,11 @@ msgstr "Легенда"
 #: app/controllers/CControllerPopupTriggerExpr.php:673
 #: app/controllers/CControllerPopupTriggerExpr.php:821
 msgid "Length"
-msgstr ""
+msgstr "Довжина"
 
 #: setup.php:189
 msgid "Licensed under"
-msgstr ""
+msgstr "Поширюється за ліцензією"
 
 #: app/views/administration.gui.edit.php:93
 msgid "Limit for search and filter results"
@@ -12645,7 +12642,7 @@ msgstr "Лінія"
 
 #: include/views/js/monitoring.sysmaps.js.php:608
 msgid "Line color"
-msgstr ""
+msgstr "Колір лінії"
 
 #: include/views/js/monitoring.sysmaps.js.php:586
 msgid "Line type"
@@ -12664,13 +12661,13 @@ msgstr "Лінк"
 #: include/classes/api/services/CMap.php:1476
 #, c-format
 msgid "Link \"selementid1\" field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "Поле посилання \"selementid1\" вказує на неіснуючий ідентифікатор елемента карти \"%1$s\" для карти \"%2$s\"."
 
 #: include/classes/api/services/CMap.php:1014
 #: include/classes/api/services/CMap.php:1484
 #, c-format
 msgid "Link \"selementid2\" field is pointing to a nonexistent map selement ID \"%1$s\" for map \"%2$s\"."
-msgstr ""
+msgstr "Поле посилання \"selementid2\" вказує на неіснуючий ідентифікатор елемента карти \"%1$s\" для карти \"%2$s\"."
 
 #: include/views/js/monitoring.sysmaps.js.php:758
 #: include/views/js/monitoring.sysmaps.js.php:769
@@ -12801,7 +12798,7 @@ msgstr "Повний час завантаження веб сторінки (в
 
 #: include/classes/mvc/CControllerResponse.php:42
 msgid "Loading..."
-msgstr ""
+msgstr "Завантаження..."
 
 #: tests/selenium/modules/clock32/actions/WidgetView.php:61
 #: widgets/clock/actions/WidgetView.php:61
@@ -12810,7 +12807,7 @@ msgstr "Локальний"
 
 #: include/classes/widgets/fields/CWidgetFieldTimeZone.php:37
 msgid "Local default"
-msgstr ""
+msgstr "Локальний за замовчуванням"
 
 #: include/classes/screens/CScreenHistory.php:267
 #: include/views/monitoring.history.php:290
@@ -12874,15 +12871,15 @@ msgstr "Вхід в систему"
 
 #: app/views/administration.miscconfig.edit.php:88
 msgid "Login attempts"
-msgstr ""
+msgstr "Спроби входу"
 
 #: app/views/administration.miscconfig.edit.php:94
 msgid "Login blocking interval"
-msgstr ""
+msgstr "Інтервал блокування входу"
 
 #: app/controllers/CControllerPopupLdapTestSend.php:150
 msgid "Login failed"
-msgstr ""
+msgstr "Помилка входу"
 
 #: include/classes/validators/CLdapAuthValidator.php:82
 msgid "Login name or password is incorrect."
@@ -12890,7 +12887,7 @@ msgstr "Некоректне ім'я користувача або пароль.
 
 #: app/controllers/CControllerPopupLdapTestSend.php:118
 msgid "Login successful"
-msgstr ""
+msgstr "Успішний вхід"
 
 #: app/controllers/CControllerAuditLogList.php:203
 msgid "Logout"
@@ -12898,7 +12895,7 @@ msgstr "Вихід із системи"
 
 #: app/views/administration.authentication.edit.php:378
 msgid "Logout requests"
-msgstr ""
+msgstr "Запити на вихід"
 
 #: app/views/administration.authentication.edit.php:384
 msgid "Logout responses"
@@ -13075,15 +13072,15 @@ msgstr ""
 
 #: include/classes/helpers/CRoleHelper.php:549
 msgid "Manage API tokens"
-msgstr ""
+msgstr "Управління API токенами"
 
 #: include/classes/helpers/CRoleHelper.php:555
 msgid "Manage SLA"
-msgstr ""
+msgstr "Управління SLA"
 
 #: include/classes/helpers/CRoleHelper.php:554
 msgid "Manage scheduled reports"
-msgstr ""
+msgstr "Управління регулярними звітами"
 
 #: app/partials/configuration.host.edit.html.php:344
 #: app/views/administration.miscconfig.edit.php:61
@@ -13097,7 +13094,7 @@ msgstr "Вручну"
 #: app/views/administration.script.list.php:69
 #: app/views/administration.script.list.php:163
 msgid "Manual event action"
-msgstr ""
+msgstr "Дія вручну над подіями"
 
 #: app/views/administration.script.edit.php:83
 #: app/views/administration.script.list.php:68
@@ -13809,7 +13806,7 @@ msgstr "Модель"
 
 #: app/controllers/CControllerAuditLogList.php:247 app/views/module.edit.php:81
 msgid "Module"
-msgstr ""
+msgstr "Модуль"
 
 #: app/controllers/CControllerModuleScan.php:100
 #, c-format
@@ -13901,7 +13898,7 @@ msgstr "Місяць"
 #: include/classes/helpers/CSlaHelper.php:70
 msgctxt "compact table header"
 msgid "Month"
-msgstr ""
+msgstr "Місяць"
 
 #: app/partials/scheduledreport.formgrid.html.php:100
 #: app/partials/scheduledreport.table.html.php:52
@@ -13974,7 +13971,7 @@ msgstr ""
 
 #: app/views/monitoring.dashboard.list.php:95
 msgid "My"
-msgstr ""
+msgstr "Моя"
 
 #: include/classes/helpers/CServiceHelper.php:37
 #: include/classes/helpers/CServiceHelper.php:47
@@ -14180,7 +14177,7 @@ msgstr "Ім'я"
 #: widgets/plaintext/views/widget.view.php:51
 msgctxt "compact table header"
 msgid "Name"
-msgstr ""
+msgstr "Ім'я"
 
 #: app/controllers/CControllerPopupGeneric.php:290
 #: app/views/administration.user.edit.php:89
@@ -14191,11 +14188,11 @@ msgstr "Ім'я"
 
 #: app/views/administration.authentication.edit.php:524
 msgid "Name "
-msgstr ""
+msgstr "Ім'я"
 
 #: app/views/administration.authentication.edit.php:397
 msgid "Name ID"
-msgstr ""
+msgstr "ID імені"
 
 #: app/views/js/webscenario.step.edit.js.php:286
 msgid "Name of the form field should not exceed 255 characters."
@@ -14203,11 +14200,11 @@ msgstr "Ім'я поля форми не має перевищувати 255 с�
 
 #: app/views/module.edit.php:57
 msgid "Namespace"
-msgstr ""
+msgstr "Простір імен"
 
 #: app/views/popup.usergroupmapping.edit.php:77
 msgid "Naming requirements:"
-msgstr ""
+msgstr "Вимоги до іменування:"
 
 #: widgets/geomap/Widget.php:52
 msgid "Navigate to default view"
@@ -14283,15 +14280,15 @@ msgstr ""
 #: app/views/js/popup.action.edit.js.php:413
 #: app/views/popup.action.edit.php:313
 msgid "New action"
-msgstr ""
+msgstr "Нова дія"
 
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "New additional rule"
-msgstr ""
+msgstr "Нове додаткове правило"
 
 #: widgets/tophosts/views/column.edit.php:300
 msgid "New column"
-msgstr ""
+msgstr "Новий стовпець"
 
 #: app/controllers/CControllerActionConditionCheck.php:107
 #: app/controllers/CControllerCorrelationConditionEdit.php:62
@@ -14344,12 +14341,12 @@ msgstr ""
 
 #: app/views/configuration.host.edit.php:71 app/views/popup.host.edit.php:83
 msgid "New host"
-msgstr ""
+msgstr "Новий вузол мережі"
 
 #: app/views/configuration.hostgroup.edit.php:52
 #: app/views/popup.hostgroup.edit.php:59
 msgid "New host group"
-msgstr ""
+msgstr "Нова група вузлів мережі"
 
 #: app/views/item.edit.php:218
 msgid "New item"
@@ -14378,12 +14375,12 @@ msgstr ""
 
 #: app/views/popup.proxy.edit.php:347 app/views/popup.proxy.edit.php:376
 msgid "New proxy"
-msgstr ""
+msgstr "Новий проксі"
 
 #: app/views/popup.proxygroup.edit.php:127
 #: app/views/popup.proxygroup.edit.php:156
 msgid "New proxy group"
-msgstr ""
+msgstr "Нова група проксі"
 
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
@@ -14392,40 +14389,40 @@ msgstr "Новий регулярний вираз"
 #: app/views/administration.script.edit.php:369
 #: app/views/administration.script.edit.php:409
 msgid "New script"
-msgstr ""
+msgstr "Новий скрипт"
 
 #: app/views/popup.service.edit.php:336 app/views/popup.service.edit.php:365
 msgid "New service"
-msgstr ""
+msgstr "Нова послуга"
 
 #: app/views/webscenario.step.edit.php:295
 msgid "New step of web scenario"
-msgstr ""
+msgstr "Новий крок веб сценарію"
 
 #: app/controllers/CControllerUsergroupTagFilterEdit.php:65
 msgid "New tag filter"
-msgstr ""
+msgstr "Новий фільтр тегів"
 
 #: app/views/correlation.condition.edit.php:136
 msgid "New tag name"
-msgstr ""
+msgstr "Нова назва тегу"
 
 #: app/views/template.edit.php:347
 msgid "New template"
-msgstr ""
+msgstr "Новий шаблон"
 
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
 msgid "New template group"
-msgstr ""
+msgstr "Нова група шаблонів"
 
 #: app/views/trigger.edit.php:144
 msgid "New trigger"
-msgstr ""
+msgstr "Новий тригер"
 
 #: app/views/trigger.prototype.edit.php:144
 msgid "New trigger prototype"
-msgstr ""
+msgstr "Новий прототип тригера"
 
 #: include/views/js/monitoring.sysmaps.js.php:191
 msgid "New triggers"
@@ -14434,7 +14431,7 @@ msgstr "Нові тригери"
 #: app/partials/administration.system.info.php:58
 #: app/partials/administration.system.info.php:63
 msgid "New update available"
-msgstr ""
+msgstr "Доступне оновлення"
 
 #: app/views/popup.usergroupmapping.edit.php:112
 msgid "New user group mapping"
@@ -14446,7 +14443,7 @@ msgstr ""
 
 #: app/views/monitoring.host.dashboard.view.php:146
 msgid "Next dashboard"
-msgstr ""
+msgstr "Наступна панель"
 
 #: app/views/configuration.dashboard.edit.php:114
 #: app/views/monitoring.dashboard.view.php:184
@@ -14454,7 +14451,7 @@ msgstr ""
 #: app/views/monitoring.host.dashboard.view.php:111
 #: app/views/monitoring.host.dashboard.view.php:187 jsLoader.php:184
 msgid "Next page"
-msgstr ""
+msgstr "Наступна сторінка"
 
 #: include/classes/setup/CSetupWizard.php:390
 #: include/classes/setup/CSetupWizard.php:698
@@ -14515,7 +14512,7 @@ msgstr ""
 #: widgets/clock/views/widget.view.php:83
 #: widgets/item/views/widget.view.php:148 widgets/piechart/Widget.php:37
 msgid "No data"
-msgstr ""
+msgstr "Немає даних"
 
 #: app/views/maintenance.edit.php:138 app/views/maintenance.list.php:122
 msgid "No data collection"
@@ -14525,7 +14522,7 @@ msgstr "Без збору даних"
 #: app/views/search.php:394 include/classes/html/CTableInfo.php:72
 #: widgets/hostnavigator/Widget.php:40
 msgid "No data found"
-msgstr ""
+msgstr "Дані не знайдено"
 
 #: include/classes/html/CTableInfo.php:35
 msgid "No data found."
@@ -14560,7 +14557,7 @@ msgstr "ID правил виявлення не вказано."
 #: app/views/administration.user.edit.php:647
 #: app/views/administration.userrole.edit.php:278
 msgid "No enabled modules found."
-msgstr ""
+msgstr "Не знайдено ввімкнених модулів."
 
 #: app/partials/configuration.host.edit.html.php:416
 #: app/partials/configuration.host.edit.html.php:429
@@ -14582,7 +14579,7 @@ msgstr "Файл не було завантажено."
 #: include/graphs.inc.php:153
 #, c-format
 msgid "No graph item with graph ID \"%1$s\"."
-msgstr ""
+msgstr "Немає елемента даних графіку з ID графіку \"%1$s\"."
 
 #: widgets/favgraphs/views/widget.view.php:29
 msgid "No graphs added."
@@ -14599,12 +14596,12 @@ msgstr "Не вибрано вузел мережі."
 #: include/hosts.inc.php:550
 #, c-format
 msgid "No host with host ID \"%1$s\"."
-msgstr ""
+msgstr "Немає вузла мережі з ID \"%1$s\"."
 
 #: include/classes/api/services/CMapElement.php:176
 #, c-format
 msgid "No icon for map element \"\"%1$s\"."
-msgstr ""
+msgstr "Відсутня іконка для елемента мапи \"\"%1$s\"."
 
 #: include/views/monitoring.sysmap.edit.php:119
 msgid "No image"
@@ -14619,7 +14616,7 @@ msgstr "Інтерфейсу не знайдено"
 
 #: jsLoader.php:312
 msgid "No interfaces are defined."
-msgstr ""
+msgstr "Інтерфейси не визначені."
 
 #: app/controllers/CControllerActionOperationCheck.php:181
 msgid "No inventory mode specified for action operation."
@@ -14628,7 +14625,7 @@ msgstr "Не вказано режим інвентарних даних для 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:227
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:230
 msgid "No item selected."
-msgstr ""
+msgstr "Елемент не вибрано."
 
 #: chart3.php:146 chart7.php:57
 msgid "No items defined."
@@ -14649,12 +14646,12 @@ msgstr "Відповідностей не знайдено"
 
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"
-msgstr ""
+msgstr "Нових модулів не виявлено"
 
 #: include/classes/api/services/CAction.php:2915
 #, c-format
 msgid "No operations defined for action \"%1$s\"."
-msgstr ""
+msgstr "Для дії \"%1$s\" не визначено операцій."
 
 #: include/classes/api/services/CUser.php:1567
 #: include/classes/api/services/CUser.php:1579
@@ -14704,7 +14701,7 @@ msgstr "Немає прав доступу до системи."
 #: include/classes/api/services/CUser.php:252
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
-msgstr ""
+msgstr "Немає дозволу на виклик \"%1$s.%2$s\"."
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -14920,7 +14917,7 @@ msgstr "Немає прав доступу до запитуваного об'є
 
 #: widgets/geomap/Widget.php:38
 msgid "No problems"
-msgstr ""
+msgstr "Немає проблем"
 
 #: app/views/configuration.discovery.edit.php:55
 msgid "No proxy"
@@ -14929,7 +14926,7 @@ msgstr "Без проксі"
 #: app/controllers/CControllerActionOperationCheck.php:119
 #: include/classes/api/services/CAction.php:2972
 msgid "No recipients specified for action operation message."
-msgstr ""
+msgstr "Не вказано одержувачів для повідомлення операції дії."
 
 #: include/classes/core/CWidget.php:197 jsLoader.php:174
 msgid "No refresh"
@@ -14937,7 +14934,7 @@ msgstr "Не оновлювати"
 
 #: include/classes/api/services/CUser.php:3489
 msgid "No saved state, please login again."
-msgstr ""
+msgstr "Немає збереженого стану, увійдіть знову."
 
 #: app/controllers/CControllerActionOperationCheck.php:141
 msgid "No script specified for action operation command."
@@ -14951,7 +14948,7 @@ msgstr ""
 #: include/triggers.inc.php:91
 #, c-format
 msgid "No trigger with trigger ID \"%1$s\"."
-msgstr ""
+msgstr "Немає тригера з ID \"%1$s\"."
 
 #: chart4.php:43
 msgid "No triggers defined."
@@ -15033,17 +15030,17 @@ msgstr "Не підтверджено"
 #: widgets/trigover/partials/table.left.php:67
 #: widgets/trigover/partials/table.top.php:65
 msgid "Not all results are displayed. Please provide more specific search criteria."
-msgstr ""
+msgstr "Відображаються не всі результати. Надайте більш конкретні критерії пошуку."
 
 #: include/classes/api/services/CHostBase.php:1992
 #: include/classes/api/services/CUserMacro.php:569
 #, c-format
 msgid "Not allowed to modify automatic user macro \"%1$s\"."
-msgstr ""
+msgstr "Не дозволено змінювати автоматичний макрос користувача \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:514
 msgid "Not allowed to set language for user \"guest\"."
-msgstr ""
+msgstr "Не дозволено встановлювати мову для користувача \"гість\"."
 
 #: include/classes/api/services/CUser.php:522
 msgid "Not allowed to set password for user \"guest\"."
@@ -15051,20 +15048,20 @@ msgstr "Забороняється встановлювати пароль дл�
 
 #: include/classes/api/services/CUser.php:518
 msgid "Not allowed to set theme for user \"guest\"."
-msgstr ""
+msgstr "Не дозволено встановлювати тему для користувача \"гість\"."
 
 #: include/classes/api/services/CUser.php:339
 #: include/classes/api/services/CUser.php:469
 #, c-format
 msgid "Not allowed to update field \"%1$s\" for provisioned user."
-msgstr ""
+msgstr "Не дозволено оновлювати поле \"%1$s\" для підключеного користувача."
 
 #: include/classes/api/clients/CLocalApiClient.php:174
 #: include/classes/api/services/CUser.php:1769
 #: include/classes/api/services/CUser.php:1801
 #: include/classes/scim/clients/ScimApiClient.php:66
 msgid "Not authorized."
-msgstr ""
+msgstr "Відсутній доступ."
 
 #: include/classes/html/CHostAvailability.php:81
 #: widgets/hostavail/views/widget.view.php:35
@@ -15074,7 +15071,7 @@ msgstr "Недоступний"
 #: widgets/hostavail/views/widget.view.php:36
 msgctxt "compact table header"
 msgid "Not available"
-msgstr ""
+msgstr "Недоступний"
 
 #: app/views/administration.trigdisplay.edit.php:101
 #: widgets/geomap/Widget.php:39
@@ -15083,7 +15080,7 @@ msgstr "Не класифіковано"
 
 #: app/controllers/CControllerMediatypeEnable.php:88
 msgid "Not enabled"
-msgstr ""
+msgstr "Не включено"
 
 #: include/forms.inc.php:308
 msgid "Not inherited items"
@@ -15101,7 +15098,7 @@ msgstr "Не підтримується"
 #: app/views/administration.miscconfig.edit.php:138
 #, c-format
 msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
-msgstr ""
+msgstr "Зауважте, що %1$s або %2$s вважатимуться іменами вузлів мережі, якщо використовувати їх без одинарних лапок."
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -15122,7 +15119,7 @@ msgstr "Повідомлення"
 
 #: app/views/popup.action.edit.php:244
 msgid "Notify about canceled escalations"
-msgstr ""
+msgstr "Оповіщення про скасовані ескалації"
 
 #: include/actions.inc.php:723 include/actions.inc.php:869
 #: include/actions.inc.php:870
@@ -15148,11 +15145,11 @@ msgstr ""
 #: widgets/piechart/includes/WidgetForm.php:216
 #: widgets/svggraph/includes/WidgetForm.php:366
 msgid "Number of columns"
-msgstr ""
+msgstr "Кількість стовпців"
 
 #: include/classes/data/CItemData.php:1034
 msgid "Number of currently open file descriptors. Returns integer"
-msgstr ""
+msgstr "Кількість відкритих файлових дескрипторів. Повертає ціле число"
 
 #: include/classes/data/CItemData.php:2652
 msgid "Number of enabled items on the host."
@@ -15160,7 +15157,7 @@ msgstr "Кількість активованих елементів даних 
 
 #: app/partials/administration.system.info.php:50
 msgid "Number of hosts (enabled/disabled)"
-msgstr ""
+msgstr "Кількість вузлів мережі (активованих/деактивованих)"
 
 #: app/partials/administration.system.info.php:65
 msgid "Number of items (enabled/disabled/not supported)"
@@ -15176,7 +15173,7 @@ msgstr "Кількість елементів даних в історії пр�
 
 #: include/classes/data/CItemData.php:2757
 msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
-msgstr ""
+msgstr "Кількість елементів даних в черзі, які затримуються від до секунд, включно."
 
 #: include/classes/data/CItemData.php:2615
 #: include/classes/data/CItemData.php:2778
@@ -15296,14 +15293,14 @@ msgstr "OEM"
 
 #: include/forms.inc.php:1470 include/views/js/item.preprocessing.js.php:134
 msgid "OID"
-msgstr ""
+msgstr "OID"
 
 #: include/forms.inc.php:1501 include/forms.inc.php:1531
 #: include/views/js/item.preprocessing.js.php:155
 #: include/views/js/item.preprocessing.js.php:170
 #: include/views/js/item.preprocessing.js.php:214
 msgid "OID prefix"
-msgstr ""
+msgstr "Префікс OID"
 
 #: app/views/js/popup.import.js.php:115 app/views/js/popup.import.js.php:248
 #: app/views/js/reports.scheduledreport.edit.js.php:78
@@ -15352,7 +15349,7 @@ msgstr "ОС (Короткий опис)"
 
 #: app/views/popup.lldoperation.php:44
 msgid "Object"
-msgstr ""
+msgstr "Об'єкт"
 
 #: include/func.inc.php:245
 msgid "Oct"
@@ -15375,7 +15372,7 @@ msgstr "Вимкн"
 #: app/views/administration.proxygroup.list.php:99
 #: app/views/administration.proxy.list.php:166
 msgid "Offline"
-msgstr ""
+msgstr "Офлайн"
 
 #: app/views/administration.user.list.php:174
 #: app/views/js/administration.authentication.edit.js.php:165
@@ -15392,7 +15389,7 @@ msgstr "Ок"
 #: widgets/web/views/widget.view.php:41
 msgctxt "compact table header"
 msgid "Ok"
-msgstr ""
+msgstr "Ок"
 
 #: app/views/js/correlation.edit.js.php:243
 #: include/classes/helpers/CCorrelationHelper.php:52
@@ -15436,24 +15433,24 @@ msgstr "Одноразово"
 #: app/views/administration.proxygroup.list.php:107
 #: app/views/administration.proxy.list.php:170
 msgid "Online"
-msgstr ""
+msgstr "Онлайн"
 
 #: app/views/administration.proxygroup.list.php:80
 msgid "Online proxies"
-msgstr ""
+msgstr "Онлайн проксі"
 
 #: include/classes/api/services/CUser.php:874
 #: include/classes/api/services/CUser.php:882
 #: include/classes/api/services/CUser.php:889
 #, c-format
 msgid "Only Super admin or Admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "Лише суперкористувачі або адміністратори можуть оновлювати параметр \"%1$s\"."
 
 #: include/classes/api/services/CUser.php:812
 #: include/classes/api/services/CUser.php:853
 #, c-format
 msgid "Only Super admin users can update \"%1$s\" parameter."
-msgstr ""
+msgstr "Лише суперадміністратори можуть оновлювати параметр \"%1$s\"."
 
 #: include/classes/api/services/CDRule.php:509
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
@@ -15466,7 +15463,7 @@ msgstr "Тільки адміністратори можуть задавати 
 
 #: app/views/administration.authentication.edit.php:54
 msgid "Only disabled group can be set for deprovisioned users."
-msgstr ""
+msgstr "Для деініціалізованих користувачів можна встановити лише вимкнену групу."
 
 #: app/partials/administration.system.info.php:66
 msgid "Only items assigned to enabled hosts are counted"
@@ -15479,7 +15476,7 @@ msgstr "Тільки одна перевірка може бути унікал�
 #: include/classes/api/services/CUserDirectory.php:520
 #, c-format
 msgid "Only one user directory of type \"%1$s\" can exist."
-msgstr ""
+msgstr "Може існувати лише один каталог користувача типу \"%1$s\"."
 
 #: app/views/popup.acknowledge.edit.php:58
 msgid "Only selected problem"
@@ -15490,11 +15487,11 @@ msgstr[2] "Тільки вибрані проблеми"
 
 #: app/views/service.list.edit.php:89
 msgid "Only services without children"
-msgstr ""
+msgstr "Лише послуги без дочірніх"
 
 #: app/views/service.list.edit.php:97
 msgid "Only services without problem tags"
-msgstr ""
+msgstr "Лише послуги без проблемних тегів"
 
 #: include/classes/api/services/CDashboard.php:405
 msgid "Only super admins can set dashboard owner."
@@ -15502,7 +15499,7 @@ msgstr "Тільки супер адмін може встановлювати �
 
 #: include/classes/api/services/CReport.php:354
 msgid "Only super admins can set report owner."
-msgstr ""
+msgstr "Лише супер адміністратор може встановлювати власника звіту."
 
 #: app/partials/administration.system.info.php:78
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
@@ -15510,15 +15507,15 @@ msgstr "Підраховуються тригери тільки у вузлів
 
 #: jsLoader.php:439
 msgid "Open URL"
-msgstr ""
+msgstr "Відкрити URL"
 
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
-msgstr ""
+msgstr "Відкрити в новому вікні"
 
 #: app/views/mediatype.test.edit.php:101 app/views/popup.scriptexec.php:41
 msgid "Open log"
-msgstr ""
+msgstr "Відкрити журнал"
 
 #: include/httptest.inc.php:414
 msgid "Opera"
@@ -15530,22 +15527,22 @@ msgstr "Інформація про операційну систему. Пов�
 
 #: include/classes/data/CItemData.php:1487
 msgid "Operating system version information. Returns JSON"
-msgstr ""
+msgstr "Інформація щодо версії операційної системи. Повертає JSON"
 
 #: app/views/popup.operation.edit.php:61 app/views/popup.service.edit.php:67
 #: app/views/popup.sla.edit.php:130
 msgid "Operation"
-msgstr ""
+msgstr "Операція"
 
 #: include/classes/api/services/CAction.php:2941
 #, c-format
 msgid "Operation \"%1$s\" already exists for action \"%2$s\"."
-msgstr ""
+msgstr "Операція \"%1$s\" вже існує у дії \"%2$s\"."
 
 #: app/controllers/CControllerPopupActionOperationsList.php:117
 #, c-format
 msgid "Operation \"%1$s\" already exists."
-msgstr ""
+msgstr "Операція \"%1$s\" вже існує."
 
 #: include/classes/mvc/CController.php:197
 #: include/classes/mvc/CController.php:214 include/validate.inc.php:334
@@ -15569,12 +15566,12 @@ msgstr "Операція не має шаблону для функціонув�
 #: include/classes/screens/CScreenProblem.php:1100
 #: include/classes/screens/CScreenProblem.php:1179 include/events.inc.php:104
 msgid "Operational data"
-msgstr ""
+msgstr "Оперативні дані"
 
 #: widgets/problems/includes/WidgetProblems.php:103
 msgctxt "compact table header"
 msgid "Operational data"
-msgstr ""
+msgstr "Оперативні дані"
 
 #: app/views/action.list.php:117 app/views/correlation.edit.php:241
 #: app/views/correlation.list.php:84 app/views/popup.action.edit.php:200
@@ -15614,7 +15611,7 @@ msgstr "Оператор"
 
 #: app/views/popup.triggerexpr.php:131
 msgid "Operator functions"
-msgstr ""
+msgstr "Функції оператора"
 
 #: app/views/administration.mediatype.edit.php:360
 #: app/views/mediatype.edit.php:475
@@ -15648,15 +15645,15 @@ msgstr "Або"
 
 #: widgets/tophosts/includes/WidgetForm.php:144
 msgid "Order"
-msgstr ""
+msgstr "Сортування"
 
 #: widgets/tophosts/includes/WidgetForm.php:144
 msgid "Order by"
-msgstr ""
+msgstr "Сортування за"
 
 #: widgets/tophosts/includes/WidgetForm.php:150
 msgid "Order column"
-msgstr ""
+msgstr "Сортування по колонці"
 
 #: app/partials/massupdate.macros.tab.php:120
 #: app/partials/massupdate.valuemaps.tab.php:88
@@ -15735,7 +15732,7 @@ msgstr "Інші"
 
 #: app/views/administration.proxy.list.php:67
 msgid "Outdated"
-msgstr ""
+msgstr "Застаріла"
 
 #: include/classes/data/CItemData.php:1133
 msgid "Outgoing traffic statistics on network interface. Returns integer"
@@ -15743,7 +15740,7 @@ msgstr "Статистика вихідного трафіку на мереже
 
 #: app/views/popup.scriptexec.php:48
 msgid "Output"
-msgstr ""
+msgstr "Вивід"
 
 #: include/classes/api/services/CDashboardGeneral.php:339
 #, c-format
@@ -15762,7 +15759,7 @@ msgstr "Перевизначено в"
 #: include/views/configuration.item.edit.php:867
 #: include/views/configuration.item.prototype.edit.php:821
 msgid "Override"
-msgstr ""
+msgstr "Заміщення"
 
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectOverrideHost.php:30
 msgid "Override host"
@@ -15818,11 +15815,11 @@ msgstr "PHP LDAP модуль відсутній."
 
 #: include/classes/setup/CFrontendSetup.php:548
 msgid "PHP OpenSSL"
-msgstr ""
+msgstr "PHP OpenSSL"
 
 #: include/classes/setup/CFrontendSetup.php:552
 msgid "PHP OpenSSL extension missing."
-msgstr ""
+msgstr "Розширення PHP OpenSSL відсутнє."
 
 #: include/classes/setup/CFrontendSetup.php:291
 msgid "PHP bcmath"
@@ -15842,11 +15839,11 @@ msgstr "Розширення PHP ctype відсутнє (параметр кон
 
 #: include/classes/setup/CFrontendSetup.php:687
 msgid "PHP curl"
-msgstr ""
+msgstr "PHP curl"
 
 #: include/classes/setup/CFrontendSetup.php:691
 msgid "PHP curl extension missing."
-msgstr ""
+msgstr "Розширення PHP curl відсутнє."
 
 #: include/classes/setup/CFrontendSetup.php:237
 msgid "PHP databases support"
@@ -16026,15 +16023,15 @@ msgstr "Ідентифікатор PSK"
 #: jsLoader.php:146
 #, c-format
 msgid "Page %1$d"
-msgstr ""
+msgstr "Сторінка %1$d"
 
 #: app/views/dashboard.page.properties.edit.php:54
 msgid "Page display period"
-msgstr ""
+msgstr "Період відображення сторінки"
 
 #: include/classes/core/ZBase.php:580
 msgid "Page not found"
-msgstr ""
+msgstr "Сторінка не знайдена"
 
 #: include/validate.inc.php:460
 #: widgets/graphprototype/actions/WidgetView.php:55
@@ -16044,7 +16041,7 @@ msgstr "Сторінка отримала некоректні дані"
 #: include/classes/helpers/CPagerHelper.php:159
 msgctxt "page navigation"
 msgid "Pager"
-msgstr ""
+msgstr "Навігація по сторінках"
 
 #: app/partials/administration.system.info.php:30
 msgid "Parameter"
@@ -16064,7 +16061,7 @@ msgstr "Параметр \"%1$s\" застарів."
 #: include/classes/api/services/CTemplateGroup.php:1251
 #, c-format
 msgid "Parameter \"%1$s\" must be enabled."
-msgstr ""
+msgstr "Параметр \"%1$s\" має бути ввімкненим."
 
 #: app/views/administration.mediatype.edit.php:227
 #: app/views/administration.script.edit.php:210
@@ -16079,7 +16076,7 @@ msgstr "Параметри"
 #: app/controllers/CControllerActionOperationCheck.php:85
 #: include/classes/api/services/CAction.php:2953
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
-msgstr ""
+msgstr "Параметри \"esc_step_from\" та \"esc_step_to\" повинні встановлюватись одночасно."
 
 #: include/views/configuration.host.discovery.edit.php:56
 #: include/views/configuration.host.prototype.edit.php:66
@@ -16092,7 +16089,7 @@ msgstr "Батьківські графіки"
 
 #: app/partials/hostmacros.inherited.list.html.php:53
 msgid "Parent host value"
-msgstr ""
+msgstr "Значення батьківського вузла мережі"
 
 #: include/views/configuration.item.edit.php:60
 #: include/views/configuration.item.prototype.edit.php:57
@@ -16102,7 +16099,7 @@ msgstr "Батьківські елементи даних"
 #: app/partials/service.info.php:110 app/partials/service.list.edit.php:41
 #: app/partials/service.list.php:35 app/views/popup.service.edit.php:56
 msgid "Parent services"
-msgstr ""
+msgstr "Батьківські послуги"
 
 #: app/partials/configuration.tags.tab.php:46
 msgid "Parent templates"
@@ -16199,7 +16196,7 @@ msgstr "Вставити"
 #: app/views/js/configuration.dashboard.edit.js.php:254
 #: app/views/js/monitoring.dashboard.view.js.php:381
 msgid "Paste page"
-msgstr ""
+msgstr "Вставити сторінку"
 
 #: app/views/js/configuration.dashboard.edit.js.php:247
 #: app/views/js/monitoring.dashboard.view.js.php:374 jsLoader.php:147
@@ -16440,7 +16437,7 @@ msgstr "Португальська (pt_PT)"
 #: widgets/gauge/includes/WidgetForm.php:263
 #: widgets/item/includes/WidgetForm.php:207
 msgid "Position"
-msgstr ""
+msgstr "Розташування"
 
 #: widgets/gauge/views/widget.edit.php:178
 #: widgets/item/views/widget.edit.php:162
@@ -16515,12 +16512,12 @@ msgstr "Попередній перегляд"
 
 #: app/views/monitoring.host.dashboard.view.php:135
 msgid "Previous dashboard"
-msgstr ""
+msgstr "Попередня панель"
 
 #: app/partials/scheduledreport.formgrid.html.php:86
 #: app/partials/scheduledreport.table.html.php:57
 msgid "Previous day"
-msgstr ""
+msgstr "Попередній день"
 
 #: app/partials/scheduledreport.formgrid.html.php:88
 #: app/partials/scheduledreport.table.html.php:59 include/func.inc.php:2568
@@ -16533,7 +16530,7 @@ msgstr "Попередній місяць"
 #: app/views/monitoring.host.dashboard.view.php:91
 #: app/views/monitoring.host.dashboard.view.php:184 jsLoader.php:185
 msgid "Previous page"
-msgstr ""
+msgstr "Попередня сторінка"
 
 #: app/views/popup.itemtestedit.view.php:303
 msgid "Previous value"
@@ -16648,7 +16645,7 @@ msgstr "Проблема"
 #: widgets/problems/includes/WidgetProblems.php:96
 msgctxt "compact table header"
 msgid "Problem"
-msgstr ""
+msgstr "Проблема"
 
 #: include/actions.inc.php:1978
 msgid "Problem created"
@@ -16686,7 +16683,7 @@ msgstr "Проблема на"
 #: app/views/popup.mediatype.message.php:51
 #: include/classes/helpers/CMediatypeHelper.php:175
 msgid "Problem recovery"
-msgstr ""
+msgstr "Відновлення проблеми"
 
 #: include/actions.inc.php:1981
 msgid "Problem resolved"
@@ -18978,7 +18975,7 @@ msgstr "Важливість"
 #: widgets/problems/includes/WidgetProblems.php:100
 msgctxt "compact table header"
 msgid "Severity"
-msgstr ""
+msgstr "Важливість"
 
 #: include/actions.inc.php:1726
 msgctxt "screen reader"
@@ -18996,7 +18993,7 @@ msgstr "Важливість зменшено"
 
 #: jsLoader.php:161
 msgid "Severity filter"
-msgstr ""
+msgstr "Фільтр важливості"
 
 #: include/actions.inc.php:1721
 msgctxt "screen reader"
@@ -19498,11 +19495,11 @@ msgstr "Початок в"
 #: app/views/monitoring.host.dashboard.view.php:99
 #: app/views/monitoring.host.dashboard.view.php:191 jsLoader.php:149
 msgid "Start slideshow"
-msgstr ""
+msgstr "Почати слайд-шоу"
 
 #: app/views/dashboard.properties.edit.php:80
 msgid "Start slideshow automatically"
-msgstr ""
+msgstr "Починати слайд-шоу автоматично"
 
 #: app/partials/scheduledreport.formgrid.html.php:107
 #: app/views/popup.sla.edit.php:182
@@ -19725,7 +19722,7 @@ msgstr ""
 #: app/views/monitoring.host.dashboard.view.php:98
 #: app/views/monitoring.host.dashboard.view.php:192 jsLoader.php:150
 msgid "Stop slideshow"
-msgstr ""
+msgstr "Зупинити слайд-шоу"
 
 #: app/partials/administration.ha.nodes.php:40
 msgid "Stopped"
@@ -20747,7 +20744,7 @@ msgstr "Час"
 #: widgets/problems/includes/WidgetProblems.php:61
 msgctxt "compact table header"
 msgid "Time"
-msgstr ""
+msgstr "Час"
 
 #: include/classes/data/CItemData.php:2729
 msgid "Time a particular Zabbix process or a group of processes (identified by <type> and <mode>) spent in <state> in percentage."
@@ -20756,7 +20753,7 @@ msgstr "Час конкретного процесу Zabbix або групи п
 #: app/views/js/mediatype.test.edit.js.php:91
 #: app/views/js/popup.scriptexec.js.php:44
 msgid "Time elapsed:"
-msgstr ""
+msgstr "Час, що минув:"
 
 #: app/views/administration.gui.edit.php:132
 msgid "Time filter default period"
@@ -20807,7 +20804,7 @@ msgstr "Тип часу"
 #: widgets/clock/includes/WidgetForm.php:130
 #: widgets/clock/views/widget.edit.php:113
 msgid "Time zone"
-msgstr ""
+msgstr "Часовий пояс"
 
 #: app/views/administration.mediatype.edit.php:246
 #: app/views/administration.script.edit.php:253
@@ -20833,7 +20830,7 @@ msgstr "Час очікування"
 #: include/views/configuration.item.prototype.edit.php:806
 #: include/views/configuration.item.prototype.edit.php:809
 msgid "Timeouts"
-msgstr ""
+msgstr "Час очікування"
 
 #: app/views/popup.proxy.edit.php:186
 msgid "Timeouts are disabled because the proxy and server versions do not match."
@@ -20858,7 +20855,7 @@ msgstr ""
 
 #: app/views/sla.list.php:91
 msgid "Timezone"
-msgstr ""
+msgstr "Часовий пояс"
 
 #: app/controllers/CControllerSlaReportList.php:170
 #: app/controllers/CControllerSlaReportList.php:174
@@ -20928,7 +20925,7 @@ msgstr "Всього"
 #: widgets/problemhosts/views/widget.view.php:43
 msgctxt "compact table header"
 msgid "Total"
-msgstr ""
+msgstr "Разом"
 
 #: include/classes/debug/CProfiler.php:153
 #, c-format
@@ -23210,7 +23207,7 @@ msgstr "Версія Zabbix агента. Повертає рядок"
 
 #: include/classes/data/CItemData.php:2827
 msgid "Version of Zabbix server or proxy"
-msgstr ""
+msgstr "Версія Zabbix-серверу або проксі"
 
 #: widgets/hostavail/includes/WidgetForm.php:57
 #: widgets/problemsbysv/includes/WidgetForm.php:89
@@ -23513,7 +23510,7 @@ msgstr ""
 #: widgets/problemhosts/views/widget.view.php:42
 msgctxt "compact table header"
 msgid "With problems"
-msgstr ""
+msgstr "З проблемами"
 
 #: widgets/tophosts/views/column.edit.php:130
 msgid "With this setting only numeric data will be displayed."
@@ -23539,7 +23536,7 @@ msgstr ""
 #: widgets/problemhosts/views/widget.view.php:41
 msgctxt "compact table header"
 msgid "Without problems"
-msgstr ""
+msgstr "Без проблем"
 
 #: include/forms.inc.php:336
 msgid "Without triggers"
@@ -23881,7 +23878,7 @@ msgstr ""
 
 #: app/partials/administration.system.info.php:45
 msgid "Zabbix frontend version"
-msgstr ""
+msgstr "Версія веб-інтерфейсу Zabbix"
 
 #: include/validate.inc.php:387
 msgid "Zabbix has received an incorrect request."
@@ -23934,7 +23931,7 @@ msgstr "Ім'я Zabbix сервера"
 
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
-msgstr ""
+msgstr "Версія Zabbix-серверу"
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -25172,7 +25169,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:118
 msgid "invalid time"
-msgstr ""
+msgstr "недійсний час"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:278
 #: include/classes/graphdraw/CPieGraphDraw.php:203
