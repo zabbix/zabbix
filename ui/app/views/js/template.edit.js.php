@@ -137,7 +137,7 @@ window.template_edit_popup = new class {
 				action: 'template.edit'
 			},
 			callback: ({data, event}) => {
-				if (data.templateid === this.templateid || this.templateid === null) {
+				if (data.parameters.templateid === this.templateid || this.templateid === null) {
 					return;
 				}
 

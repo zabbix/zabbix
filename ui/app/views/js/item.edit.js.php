@@ -284,7 +284,7 @@ window.item_edit_form = new class {
 					action
 				},
 				callback: ({data, event}) => {
-					if (data.itemid === this.form_data.itemid || this.form_data.itemid === 0) {
+					if (data.parameters.itemid === this.form_data.itemid || this.form_data.itemid === 0) {
 						return;
 					}
 

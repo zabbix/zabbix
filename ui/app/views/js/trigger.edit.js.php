@@ -196,7 +196,8 @@ window.trigger_edit_popup = new class {
 					action
 				},
 				callback: ({data, event}) => {
-					if (data.triggerid === this.triggerid || this.triggerid === null || event === undefined) {
+					if (data.parameters.triggerid === this.triggerid || this.triggerid === null
+							|| event === undefined) {
 						return;
 					}
 
