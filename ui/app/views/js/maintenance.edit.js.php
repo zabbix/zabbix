@@ -36,7 +36,7 @@ window.maintenance_edit = new class {
 			allow_empty: true
 		});
 
-		if (this._allowed_edit) {
+		if (allowed_edit) {
 			// Setup Time periods.
 			document.getElementById('timeperiods').addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-add')) {
