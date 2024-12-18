@@ -23,27 +23,22 @@
 	const view = new class {
 
 		init() {
-			this.setSubmitCallback();
+			this.#registerSubscribers();
 		}
 
-		setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				const data = e.detail;
-				let curl = null;
+		#registerSubscribers() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_SUBMIT
+				},
+				callback: ({data}) => {
+					if (data.success.action === 'delete') {
+						const url = new Curl('hostinventories.php');
 
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
-					}
-
-					if ('action' in data.success && data.success.action === 'delete') {
-						curl = new Curl('hostinventories.php').getUrl();
+						ZABBIX.PopupManager.setCurrentUrl(url.getUrl());
 					}
 				}
-
-				location.href = curl === null ? location.href : curl;
 			});
 		}
 	};
