@@ -83,10 +83,6 @@ window.maintenance_edit = new class {
 		});
 
 		tags_container.querySelectorAll('[name="tags_evaltype"], [name$="[operator]"]').forEach((radio_button) => {
-			radio_button.disabled = !tags_enabled;
-		});
-
-		tags_container.querySelectorAll('[name="tags_evaltype"], [name$="[operator]"]').forEach((radio_button) => {
 			radio_button.disabled = !tags_enabled || !this._allowed_edit;
 		});
 
