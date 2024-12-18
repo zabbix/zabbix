@@ -339,7 +339,7 @@ class testDashboardHostCardWidget extends testWidgets {
 									[
 										'type' => 1,
 										'name' => 'items.0',
-										'value' => 'Numeric for honeycomb 1'
+										'value' => 'Numeric for hostcard 1'
 									]
 								]
 							]
@@ -364,7 +364,7 @@ class testDashboardHostCardWidget extends testWidgets {
 									[
 										'type' => 1,
 										'name' => 'items.0',
-										'value' => 'Numeric for honeycomb 1'
+										'value' => 'Numeric for host 1'
 									]
 								]
 							]
@@ -389,7 +389,7 @@ class testDashboardHostCardWidget extends testWidgets {
 									[
 										'type' => 1,
 										'name' => 'items.0',
-										'value' => 'Numeric for honeycomb 1'
+										'value' => 'Numeric for hostcard 1'
 									]
 								]
 							]
