@@ -35,7 +35,7 @@ $nav_items = new CList();
 if ($data['can_create_hosts']) {
 	$nav_items->addItem(
 		(new CSimpleButton(_('Create host')))
-			->onClick('view.createHost()')
+			->addClass('js-create-host')
 	);
 }
 

@@ -29,11 +29,9 @@ window.update_problem_popup = new class {
 		document.getElementById('unsuppress_problem').addEventListener('change', () => this._update());
 		document.getElementById('close_problem').addEventListener('change', () => this._update());
 
-		const overlay = overlays_stack.getById('acknowledge.edit');
-		const backurl = new Curl('zabbix.php');
-
-		backurl.setArgument('action', 'problem.view');
-		overlay.backurl = backurl.getUrl();
+		const back_url = new Curl('zabbix.php');
+		back_url.setArgument('action', 'problem.view');
+		ZABBIX.PopupManager.setBackUrl(back_url.getUrl());
 	}
 
 	_update() {

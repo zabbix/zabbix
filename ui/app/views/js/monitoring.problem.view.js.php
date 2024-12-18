@@ -47,8 +47,9 @@
 			this.initFilter(filter_options);
 			$.subscribe('event.rank_change', () => view.refreshNow());
 
-			this.initAcknowledge();
 			this.initExpandables();
+			this.initEvents();
+			this.registerSubscribers();
 
 			if (this.refresh_interval != 0) {
 				this.running = true;
@@ -144,58 +145,6 @@
 			});
 		},
 
-		initAcknowledge() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				clearMessages();
-
-				if (chkbxRange.prefix === 'problem') {
-					chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
-					chkbxRange.clearSelectedOnFilterChange();
-				}
-
-				const data = e.detail;
-
-				if ('success' in data) {
-					let messages = [];
-
-					if ('messages' in data.success) {
-						messages = data.success.messages;
-					}
-
-					addMessage(makeMessageBox('good', messages, data.success.title));
-				}
-
-				uncheckTableRows('problem');
-				view.refreshResults();
-				view.refreshCounters();
-			});
-
-			$(document).on('submit', '#problem_form', (e) => {
-				e.preventDefault();
-
-				// Save current url before opening the popup and modifying the URL.
-				this.current_url = location.href;
-				window.popupManagerInstance.setUrl(this.current_url);
-
-				// Set the URL for popup.
-				this.setPopupLink(Object.keys(chkbxRange.getSelectedIds()));
-
-				window.popupManagerInstance.openPopup('acknowledge.edit',
-					{eventids: Object.keys(chkbxRange.getSelectedIds())}, false
-				);
-			});
-		},
-
-		setPopupLink(eventids) {
-			const url = new Curl('zabbix.php');
-
-			url.setArgument('action', 'popup');
-			url.setArgument('popup', 'acknowledge.edit');
-			url.setArgument('eventids', eventids);
-
-			history.replaceState(null, '', url.getUrl());
-		},
-
 		initExpandables() {
 			const table = this.getCurrentResultsTable();
 			const expandable_buttons = table.querySelectorAll("button[data-action='show_symptoms']");
@@ -231,6 +180,76 @@
 
 				[...row.children].forEach((td) => td.style.borderBottomStyle = is_collapsed ? 'hidden' : 'solid');
 			}
+		},
+
+		initEvents() {
+			$(document).on('submit', '#problem_form', e => {
+				e.preventDefault();
+
+				ZABBIX.PopupManager.setCurrentUrl(location.href);
+
+				const eventids = Object.keys(chkbxRange.getSelectedIds());
+
+				ZABBIX.PopupManager.openPopup('acknowledge.edit', {eventids});
+
+				const url = new Curl('zabbix.php');
+
+				url.setArgument('action', 'popup');
+				url.setArgument('popup', 'acknowledge.edit');
+				url.setArgument('eventids', eventids);
+
+				history.replaceState(null, '', url.getUrl());
+			});
+		},
+
+		registerSubscribers() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_BEFORE_OPEN
+				},
+				callback: () => {
+					this.unscheduleRefresh();
+				}
+			});
+
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_CLOSE
+				},
+				callback: () => {
+					this.scheduleRefresh();
+				}
+			});
+
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_SUBMIT
+				},
+				callback: ({data, event}) => {
+					event.is_prevented = true;
+
+					clearMessages();
+
+					if (chkbxRange.prefix === 'problem') {
+						chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
+						chkbxRange.clearSelectedOnFilterChange();
+					}
+
+					if ('success' in data) {
+						addMessage(makeMessageBox('good', data.success.messages, data.success.title));
+					}
+
+					uncheckTableRows('problem');
+
+					this.refreshResults();
+					this.refreshCounters();
+
+					history.replaceState(null, '', ZABBIX.PopupManager.getCurrentUrl());
+				}
+			});
 		},
 
 		showSymptoms(btn, idx, array) {

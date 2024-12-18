@@ -52,20 +52,12 @@
 			this.initTabFilter(filter_options);
 			this.initExpandableSubfilter();
 			this.initListActions();
+			this.registerSubscribers();
 
 			if (this.refresh_interval != 0 && this.filter_set) {
 				this.running = true;
 				this.scheduleRefresh();
 			}
-
-			document.addEventListener('click', (e) => {
-				if (e.target.closest('.menu-popup-item')) {
-					this._removePopupMessage();
-					this.unscheduleRefresh();
-				}
-			});
-
-			this.setSubmitCallback();
 		},
 
 		initTabFilter(filter_options) {
@@ -125,6 +117,47 @@
 
 			form.querySelector('.js-massexecute-item').addEventListener('click', e => {
 				this.executeNow(e.target, {itemids: Object.keys(chkbxRange.getSelectedIds())});
+			});
+		},
+
+		registerSubscribers() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_BEFORE_OPEN
+				},
+				callback: () => {
+					this.unscheduleRefresh();
+				}
+			});
+
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_CLOSE
+				},
+				callback: () => {
+					this.scheduleRefresh();
+				}
+			});
+
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_SUBMIT
+				},
+				callback: ({data, event}) => {
+					event.is_prevented = true;
+
+					if ('success' in data) {
+						this._addPopupMessage(makeMessageBox('good', data.success.messages, data.success.title));
+					}
+
+					uncheckTableRows('latest');
+					this.refresh();
+
+					history.replaceState(null, '', ZABBIX.PopupManager.getCurrentUrl());
+				}
 			});
 		},
 
@@ -426,26 +459,6 @@
 
 		unsetSubfilter(field) {
 			this.filter.unsetSubfilter(field[0], field[1]);
-		},
-
-		setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				const data = e.detail;
-
-				if ('success' in data) {
-					const title = data.success.title;
-					let messages = [];
-
-					if ('messages' in data.success) {
-						messages = data.success.messages;
-					}
-
-					view._addPopupMessage(makeMessageBox('good', messages, title));
-				}
-
-				uncheckTableRows('latest');
-				view.refresh();
-			});
 		}
 	};
 </script>
