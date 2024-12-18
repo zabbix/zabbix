@@ -87,7 +87,7 @@ class testDashboardItemValueWidget extends testWidgets {
 			[
 				'macro' => self::USER_SECRET_MACRO,
 				'type' => 1,
-				'value' => 'secret'
+				'value' => self::USER_MACRO_VALUE
 			],
 			[
 				'macro' => self::MACRO_CHAR,
@@ -4376,7 +4376,36 @@ class testDashboardItemValueWidget extends testWidgets {
 					],
 					'result' => 'h:""test.com"macro?functions=urlencode&urld=a🎸, *** ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰'
 				]
+			],
+			'Macro functions regsub(), iregsub() - successful scenarios' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_MACRO.'.regsub(^[0-9]+, Problem)}, '.
+								'{'.self::USER_MACRO.'.iregsub(^[0-9]+, Problem)}, '.
+								'{'.self::USER_SECRET_MACRO.'.regsub(^[0-9]+, Problem)}, '.
+								'{'.self::USER_SECRET_MACRO.'.iregsub(^[0-9]+, Problem)}, '.
+								'{{ITEM.NAME}.regsub(CPU, test)}, {{ITEM.NAME}.iregsub(CPU, test)}',
+						'id:desc_size' => 5
+					],
+					'result' => 'Problem, Problem, Problem, Problem, test, test'
+				]
 			]
+			// TODO: Uncomment and check the test case, after ZBX-25420 fix.
+//			'Macro functions regsub(), iregsub() - empty value in case of no match' => [
+//				[
+//					'fields' => [
+//						'Advanced configuration' => true,
+//						'id:description' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
+//								'{'.self::USER_MACRO.'.iregsub(0, Problem)}, '.
+//								'{'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
+//								'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '.
+//								'{{ITEM.NAME}.regsub(0, test)}, {{ITEM.NAME}.iregsub(0, test)}',
+//						'id:desc_size' => 5
+//					],
+//					'result' => ', , , , ,'
+//				]
+//			]
 		];
 	}
 

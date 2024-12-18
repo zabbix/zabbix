@@ -2333,8 +2333,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 
 	public static function getMacroFunctions() {
 		return [
-			[
-				'Incorrectly added parameter for non-argument macro functions' => [
+			'Incorrectly added parameter for non-argument macro functions' => [
+				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
@@ -2354,8 +2354,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			[
-				'Secret macro value is not exposed when using macro functions' => [
+			'Secret macro value is not exposed when using macro functions' => [
+				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
@@ -2377,8 +2377,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			[
-				'Built-in macros with non-argument macro functions' => [
+			'Built-in macros with non-argument macro functions' => [
+				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
@@ -2398,8 +2398,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			[
-				'User macros with btoa(), htmlencode(), htmldecode() macro functions' => [
+			'User macros with btoa(), htmlencode(), htmldecode() macro functions' => [
+				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
@@ -2417,8 +2417,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			[
-				'User macros with urlencode(), urldecode(), uppercase(), lowercase() macro functions' => [
+			'User macros with urlencode(), urldecode(), uppercase(), lowercase() macro functions' => [
+				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
@@ -2438,8 +2438,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			[
-				'Incorrectly used parameters in regrepl(), tr(), regsub(), iregsub() macro functions' => [
+			'Incorrectly used parameters in regrepl(), tr(), regsub(), iregsub() macro functions' => [
+				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
@@ -2457,8 +2457,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			[
-				'Regrepl function - multibyte characters and case sensitive check' => [
+			'Regrepl function - multibyte characters and case sensitive check' => [
+				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
@@ -2472,8 +2472,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			[
-				'Regrepl function with big amount of processed data' => [
+			'Regrepl function with big amount of processed data' => [
+				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
@@ -2489,8 +2489,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			[
-				'Macro functions tr(), uppercase(), lowercase() with non-ascii characters' => [
+			'Macro functions tr(), uppercase(), lowercase() with non-ascii characters' => [
+				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
@@ -2506,8 +2506,8 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			[
-				'Macro function tr() - use of escaping and range' => [
+			'Macro function tr() - use of escaping and range' => [
+				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
@@ -2520,7 +2520,50 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'secondary' => 'h:""test.com"macro?functions=urlencode&urld=a🎸, *** ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰'
 					]
 				]
+			],
+			'Macro functions regsub(), iregsub() - successful scenarios' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:primary_label_type' => 'Text',
+						'id:primary_label' => '{'.self::USER_MACRO.'.regsub(^[0-9]+, Problem)}, '.
+								'{'.self::USER_MACRO.'.iregsub(^[0-9]+, Problem)}, {{ITEM.NAME}.regsub(^[0-9]+, Problem)}, '.
+								'{{ITEM.NAME}.iregsub(^[0-9]+, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub(^[0-9]+, Problem)}, '.
+								'{'.self::USER_SECRET_MACRO.'.iregsub(^[0-9]+, Problem)}',
+						'id:secondary_label_type' => 'Text',
+						'id:secondary_label' => '{'.self::USER_MACRO.'.regsub(^[0-9]+, Problem)}, '.
+								'{'.self::USER_MACRO.'.iregsub(^[0-9]+, Problem)}, {{ITEM.NAME}.regsub(^[0-9]+, Problem)}, '.
+								'{{ITEM.NAME}.iregsub(^[0-9]+, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub(^[0-9]+, Problem)}, '.
+								'{'.self::USER_SECRET_MACRO.'.iregsub(^[0-9]+, Problem)}'
+					],
+					'result' => [
+						'primary' => 'Problem, Problem, Problem, Problem, Problem, Problem',
+						'secondary' => 'Problem, Problem, Problem, Problem, Problem, Problem'
+					]
+				]
 			]
+			// TODO: Uncomment and check the test case, after ZBX-25420 fix.
+//			'Macro functions regsub(), iregsub() -  empty value in case of no match' => [
+//				[
+//					'fields' => [
+//						'Advanced configuration' => true,
+//						'id:primary_label_type' => 'Text',
+//						'id:primary_label' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
+//								'{'.self::USER_MACRO.'.iregsub(0, Problem)}, {{ITEM.NAME}.regsub(0, Problem)}, '.
+//								'{{ITEM.NAME}.iregsub(0, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
+//								'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, ',
+//						'id:secondary_label_type' => 'Text',
+//						'id:secondary_label' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
+//								'{'.self::USER_MACRO.'.iregsub(0, Problem)}, {{ITEM.NAME}.regsub(0, Problem)}, '.
+//								'{{ITEM.NAME}.iregsub(0, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
+//								'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '
+//					],
+//					'result' => [
+//						'primary' => ', , , , ,',
+//						'secondary' => ', , , , ,'
+//					]
+//				]
+//			]
 		];
 	}
 

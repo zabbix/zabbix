@@ -1337,8 +1337,8 @@ class testDashboardGaugeWidget extends testWidgets {
 
 	public static function getMacroFunctions() {
 		return [
-			[
-				'Incorrectly added parameter for non-argument macro functions' => [
+			'Incorrectly added parameter for non-argument macro functions' => [
+					[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{{ITEM.NAME}.btoa(\)}, {'.self::USER_MACRO.'.htmldecode(test)}, '.
@@ -1350,8 +1350,8 @@ class testDashboardGaugeWidget extends testWidgets {
 					'result' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*'
 				]
 			],
-			[
-				'Secret macro value is not exposed when using macro functions' => [
+			'Secret macro value is not exposed when using macro functions' => [
+					[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::USER_SECRET_MACRO.'.btoa()}, {'.self::USER_SECRET_MACRO.'.htmldecode()}, '.
@@ -1364,8 +1364,8 @@ class testDashboardGaugeWidget extends testWidgets {
 					'result' => 'KioqKioq, ******, ******, ******, ******, ******, ******, ******, %2A%2A%2A%2A%2A%2A'
 				]
 			],
-			[
-				'Built-in macros with non-argument macro functions' => [
+			'Built-in macros with non-argument macro functions' => [
+				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{{ITEM.NAME}.btoa()}, {{ITEM.NAME}.htmldecode()}, {{ITEM.NAME}.htmlencode()}, '.
@@ -1376,8 +1376,8 @@ class testDashboardGaugeWidget extends testWidgets {
 					'result' => 'RmxvYXQgaXRlbQ==, Float item, Float item, float item, FLOAT ITEM, Float%20item, Float item'
 				]
 			],
-			[
-				'User macros with non-argument macro functions' => [
+			'User macros with non-argument macro functions' => [
+				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::USER_MACRO.'.btoa()}, {'.self::MACRO_HTML_ENCODE.'.htmlencode()}, '.
@@ -1391,8 +1391,8 @@ class testDashboardGaugeWidget extends testWidgets {
 							', MACRO FUNCTION TEST 12345, macro function test 12345'
 				]
 			],
-			[
-				'Incorrectly used parameters in regrepl(), tr(), regsub(), iregsub() macro functions' => [
+			'Incorrectly used parameters in regrepl(), tr(), regsub(), iregsub() macro functions' => [
+				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::USER_MACRO.'.regrepl()}, {'.self::MACRO_CHAR.'.regrepl([a])}, '.
@@ -1403,8 +1403,8 @@ class testDashboardGaugeWidget extends testWidgets {
 					'result' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*'
 				]
 			],
-			[
-				'Regrepl function - multibyte characters and case sensitive check' => [
+			'Regrepl function - multibyte characters and case sensitive check' => [
+				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::USER_MACRO.'.regrepl([[:digit:]], /, [A-Z], \)}, '.
@@ -1414,8 +1414,8 @@ class testDashboardGaugeWidget extends testWidgets {
 					'result' => '\acro function \est /////, 🌞🌞🌞 ЙQQQQЖŽzŠsšĒĀīī🌝 ₰₰₰'
 				]
 			],
-			[
-				'Regrepl function with big amount of processed data' => [
+			'Regrepl function with big amount of processed data' => [
+				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::USER_MACRO.''.
@@ -1425,8 +1425,8 @@ class testDashboardGaugeWidget extends testWidgets {
 					'result' => '*UNKNOWN*'
 				]
 			],
-			[
-				'Macro functions tr(), uppercase(), lowercase() with non-ascii characters' => [
+			'Macro functions tr(), uppercase(), lowercase() with non-ascii characters' => [
+				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::MACRO_CHAR.'.tr(0-9, Ī)}, {'.self::MACRO_CHAR.'.lowercase()}, '.
@@ -1436,8 +1436,8 @@ class testDashboardGaugeWidget extends testWidgets {
 					'result' => '??? ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰, 000 ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰, 000 ЙщфхжЖŽZŠSšĒĀīī🌴 ₰₰₰'
 				]
 			],
-			[
-				'Macro function tr() - use of escaping and range' => [
+			'Macro function tr() - use of escaping and range' => [
+				[
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::MACRO_URL_ENCODE.'.tr("\/","\"")}, {'.self::MACRO_CHAR.'.tr(0-9abcA-L,*)}',
@@ -1445,7 +1445,36 @@ class testDashboardGaugeWidget extends testWidgets {
 					],
 					'result' => 'h:""test.com"macro?functions=urlencode&urld=a🎸, *** ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰'
 				]
+			],
+			'Macro functions regsub() / iregsub() - successful scenarios' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_MACRO.'.regsub(^[0-9]+, Problem)}, '.
+								'{'.self::USER_MACRO.'.iregsub(^[0-9]+, Problem)}, '.
+								'{'.self::USER_SECRET_MACRO.'.regsub(^[0-9]+, Problem)}, '.
+								'{'.self::USER_SECRET_MACRO.'.iregsub(^[0-9]+, Problem)}, '.
+								'{{ITEM.NAME}.regsub(Float, test)}, {{ITEM.NAME}.iregsub(Float, test)}',
+						'id:desc_size' => 5
+					],
+					'result' => 'Problem, Problem, Problem, Problem, test, test'
+				]
 			]
+			// TODO: Uncomment and check the test case, after ZBX-25420 fix.
+//			'Macro functions regsub() / iregsub() - successful scenarios' => [
+//				[
+//					'fields' => [
+//						'Advanced configuration' => true,
+//						'id:description' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
+//								'{'.self::USER_MACRO.'.iregsub(0, Problem)}, '.
+//								'{'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
+//								'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '.
+//								'{{ITEM.NAME}.regsub(0, test)}, {{ITEM.NAME}.iregsub(0, test)}',
+//						'id:desc_size' => 5
+//					],
+//					'result' => ', , , , ,'
+//				]
+//			]
 		];
 	}
 

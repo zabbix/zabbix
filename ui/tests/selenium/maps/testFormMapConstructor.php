@@ -72,7 +72,7 @@ class testFormMapConstructor extends CLegacyWebTest {
 			[
 				'name' => self::MAP_MACRO_FUNCTIONS,
 				'width' => 800,
-				'height' => 800,
+				'height' => 1000,
 				'expand_macros' => SYSMAP_EXPAND_MACROS_ON,
 				'label_type' => MAP_LABEL_TYPE_LABEL,
 				'selements' => [
@@ -153,6 +153,17 @@ class testFormMapConstructor extends CLegacyWebTest {
 								'{{?last(//'.self::ITEM_KEY.')}.urlencode(\)}',
 						'x' => 351,
 						'y' => 701,
+						'elements' => [['triggerid' => $triggers['triggerids'][1]]]
+					],
+					// Check that regsub and iregsub functions working correctly without match.
+					[
+						'selementid' => 2,
+						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
+						'iconid_off' => 152,
+						'label' => '{{?last(//'.self::ITEM_KEY.')}.regsub(0, test)}, {{HOST.HOST}.regsub(0, test)}, '.
+								'{{HOST.HOST}.iregsub(0, test)}, {{?last(//'.self::ITEM_KEY.')}.iregsub(0, test)}',
+						'x' => 351,
+						'y' => 801,
 						'elements' => [['triggerid' => $triggers['triggerids'][1]]]
 					]
 				]
@@ -341,54 +352,58 @@ class testFormMapConstructor extends CLegacyWebTest {
 
 	public function getMacroFunctionResolution() {
 		return [
-			// Built-in macros with macro functions.
-			[
+			'Built-in macros with macro functions #1' => [
 				[
 					'label' => 'VGVzdGluZyBtYWNybyBmdW5jdGlvbnMgMTIzNDU=, Testing macro functions 12345, '.
 							'Testing macro functions 12345',
 					'id' => 2
 				]
 			],
-			[
+			'Built-in macros with macro functions #2' => [
 				[
 					'label' => 'testing macro functions 12345, TESTING MACRO FUNCTIONS 12345, '.
 							'0esting0macro0functions000000, test',
 					'id' => 4
 				]
 			],
-			[
+			'Built-in macros with macro functions #3' => [
 				[
 					'label' => 'Testing m**ro fun*tions *****, Testing%20macro%20functions%2012345, '.
 							'Testing macro functions 12345, test',
 					'id' => 6
 				]
 			],
-			// Expression macros with macro functions.
-			[
+			'Expression macros with macro functions #1' => [
 				[
 					'label' => 'MTIzLjMz, 123, 123.33, 123.33, test, 123.33',
 					'id' => 8
 				]
 			],
-			[
+			'Expression macros with macro functions #2' => [
 				[
 					'label' => '123.33, AAA.AA, test, bcd.dd, 123.33, 123.33',
 					'id' => 10
 				]
 			],
-			// Incorrectly used macro functions.
-			[
+			'Incorrectly used macro functions #1' => [
 				[
 					'label' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*',
 					'id' => 12
 				]
 			],
-			[
+			'Incorrectly used macro functions #2' => [
 				[
 					'label' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*',
 					'id' => 14
 				]
 			]
+			// TODO: Uncomment and check the test case, after ZBX-25420 fix.
+//			'Regsub and iregsub returning no result in case of no match' => [
+//				[
+//					'label' => ', , ,',
+//					'id' => 16
+//				]
+//			]
 		];
 	}
 
