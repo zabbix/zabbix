@@ -659,7 +659,7 @@ int	expr_db_item_value(const zbx_db_trigger *trigger, char **value, int N_functi
 			*value = zbx_strdup(*value, zbx_date2str(timestamp, tz));
 			break;
 		case ZBX_VALUE_PROPERTY_AGE:
-			*value = zbx_dsprintf(*value, ZBX_FS_UI64, time(NULL) - timestamp);
+			*value = zbx_strdup(*value, zbx_age2str(time(NULL) - timestamp));
 			break;
 		default:
 			break;
