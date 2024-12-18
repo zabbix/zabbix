@@ -37,6 +37,7 @@ Changes for 5.0.43
 Changes for 5.0.43rc1
 
 Bug fixes:
+.......PS. [ZBX-25611] removed possibility of accessing internal duktape properties with atob function (wiper)
 .........T [ZBX-23788] added SNMP OID ifAlias in Network interfaces discovery (egordymov)
 .....J.... [ZBX-24298] allowed any JNDI service providers back in JMX monitoring (dimir)
 ..F.....S. [ZBX-25015] fixed information exposure in System information widget for users without proper permissions (vmurzins)
