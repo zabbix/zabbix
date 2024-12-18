@@ -577,7 +577,7 @@ out:
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-int	expr_db_item_get_value(zbx_uint64_t itemid, int raw, zbx_timespec_t *ts, char **lastvalue, zbx_uint64_t *tstamp)
+int	expr_db_item_get_value(zbx_uint64_t itemid, int raw, zbx_timespec_t *ts, char **lastvalue, time_t *tstamp)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -614,7 +614,7 @@ int	expr_db_item_get_value(zbx_uint64_t itemid, int raw, zbx_timespec_t *ts, cha
 			*lastvalue = zbx_strdup(*lastvalue, tmp);
 
 			if (NULL != tstamp)
-				*tstamp = (zbx_uint64_t)vc_value.timestamp.sec;
+				*tstamp = (time_t)vc_value.timestamp.sec;
 
 			ret = SUCCEED;
 		}
@@ -629,7 +629,7 @@ int	expr_db_item_get_value(zbx_uint64_t itemid, int raw, zbx_timespec_t *ts, cha
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve item value by trigger expression and number of function, *
- *          retriverd value depends from value type.                          *
+ *          retrieved value depends from value property.                      *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -638,9 +638,10 @@ int	expr_db_item_get_value(zbx_uint64_t itemid, int raw, zbx_timespec_t *ts, cha
 int	expr_db_item_value(const zbx_db_trigger *trigger, char **value, int N_functionid, int clock, int ns, int raw,
 		const char *tz, zbx_expr_db_item_value_property_t value_property)
 {
-	zbx_uint64_t	itemid, timestamp;
+	zbx_uint64_t	itemid;
 	zbx_timespec_t	ts = {clock, ns};
 	int		ret;
+	time_t		timestamp;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -673,7 +674,7 @@ int	expr_db_item_value(const zbx_db_trigger *trigger, char **value, int N_functi
  *                                                                            *
  * Purpose: retrieve item lastvalue by trigger expression                     *
  *          and number of function,                                           *
- *          retriverd value depends from value type.                          *
+ *          retrieved value depends from value property.                      *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
