@@ -77,7 +77,7 @@ window.host_edit_popup = {
 				},
 				callback: ({event}) => {
 					if (!this.isConfirmed()) {
-						event.is_prevented = true;
+						event.preventDefault();
 					}
 				}
 			});

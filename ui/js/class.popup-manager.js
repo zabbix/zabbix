@@ -36,26 +36,29 @@ class CPopupManager {
 			}
 
 			const target_element = e.target.closest('a') || e.target.closest('button');
-			const link = target_element?.getAttribute('href') || target_element?.dataset.href || '';
+			const href = target_element?.getAttribute('href') || target_element?.dataset.href || '';
 
-			if (link === '') {
+			if (href === '') {
 				return;
 			}
 
-			const url = new Curl(link);
+			const url = new Curl(href);
 
 			if (url.getArgument('action') !== CPopupManager.CONTEXT_POPUP) {
 				return;
 			}
+
+			e.preventDefault();
 
 			const action = url.getArgument('popup');
 
 			// Get all arguments from url except "action" and "popup".
 			const parameters = (({action, popup, ...args}) => args)(url.getArguments());
 
-			const event_hub = ZABBIX.EventHub.publish({
+			const event = new CEventHubEvent({
 				data: {
-					...parameters
+					href,
+					parameters
 				},
 				descriptor: {
 					context: CPopupManager.CONTEXT_POPUP,
@@ -64,11 +67,9 @@ class CPopupManager {
 				}
 			});
 
-			if (event_hub.publish_event.prevent_default) {
-				e.preventDefault();
-			}
+			ZABBIX.EventHub.publish(event);
 
-			if (event_hub.publish_event.is_prevented) {
+			if (event.isDefaultPrevented()) {
 				return;
 			}
 
@@ -85,7 +86,7 @@ class CPopupManager {
 				this.stopEvents();
 			}
 
-			this.openPopup(action, parameters, this.#is_popup_page, undefined, link);
+			this.openPopup(action, parameters, this.#is_popup_page, undefined, href);
 		});
 	}
 
@@ -96,7 +97,7 @@ class CPopupManager {
 		this.#is_popup_page = is_popup_page;
 		this.#action = action;
 
-		const event_hub = ZABBIX.EventHub.publish({
+		const event = new CEventHubEvent({
 			data: {
 				...parameters
 			},
@@ -107,7 +108,9 @@ class CPopupManager {
 			}
 		});
 
-		if (event_hub.publish_event.is_prevented) {
+		ZABBIX.EventHub.publish(event);
+
+		if (event.isDefaultPrevented()) {
 			return;
 		}
 
@@ -120,7 +123,7 @@ class CPopupManager {
 		this.#overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
 			const detail = e.detail;
 
-			const event_hub = ZABBIX.EventHub.publish({
+			const event = new CEventHubEvent({
 				data: {
 					...detail,
 					...parameters
@@ -132,7 +135,9 @@ class CPopupManager {
 				}
 			});
 
-			if (event_hub.publish_event.is_prevented) {
+			ZABBIX.EventHub.publish(event);
+
+			if (event.isDefaultPrevented()) {
 				return;
 			}
 
@@ -160,7 +165,7 @@ class CPopupManager {
 		}, {once: true});
 
 		this.#overlay.$dialogue[0].addEventListener('dialogue.close', () => {
-			const event_hub = ZABBIX.EventHub.publish({
+			const event = new CEventHubEvent({
 				descriptor: {
 					context: CPopupManager.CONTEXT_POPUP,
 					event: CPopupManager.EVENT_CLOSE,
@@ -168,7 +173,9 @@ class CPopupManager {
 				}
 			});
 
-			if (event_hub.publish_event.is_prevented) {
+			ZABBIX.EventHub.publish(event);
+
+			if (event.isDefaultPrevented()) {
 				return;
 			}
 

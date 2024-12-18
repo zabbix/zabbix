@@ -229,7 +229,7 @@
 					event: CPopupManager.EVENT_SUBMIT
 				},
 				callback: ({data, event}) => {
-					event.is_prevented = true;
+					event.preventDefault();
 
 					clearMessages();
 

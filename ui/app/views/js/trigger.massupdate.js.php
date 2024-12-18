@@ -79,12 +79,13 @@
 			},
 			callback: ({event}) => {
 				if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
-					event.is_prevented = true;
+					event.preventDefault();
+
+					return;
 				}
-				else {
-					const massupdate_overlay = overlays_stack.end();
-					overlayDialogueDestroy(massupdate_overlay.dialogueid);
-				}
+
+				const massupdate_overlay = overlays_stack.end();
+				overlayDialogueDestroy(massupdate_overlay.dialogueid);
 			}
 		});
 

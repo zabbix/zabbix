@@ -283,13 +283,13 @@ window.item_edit_form = new class {
 					event: CPopupManager.EVENT_BEFORE_OPEN,
 					action
 				},
-				callback: ({data, descriptor, event}) => {
+				callback: ({data, event}) => {
 					if (data.itemid === this.form_data.itemid || this.form_data.itemid === 0) {
 						return;
 					}
 
 					if (!this.#isConfirmed()) {
-						event.is_prevented = true;
+						event.preventDefault();
 					}
 				}
 			});

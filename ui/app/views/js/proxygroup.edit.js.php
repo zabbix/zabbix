@@ -60,7 +60,7 @@ window.proxy_group_edit_popup = new class {
 			},
 			callback: ({event}) => {
 				if (!this.#isConfirmed()) {
-					event.is_prevented = true;
+					event.preventDefault();
 				}
 			}
 		});

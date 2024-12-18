@@ -147,7 +147,7 @@
 					event: CPopupManager.EVENT_SUBMIT
 				},
 				callback: ({data, event}) => {
-					event.is_prevented = true;
+					event.preventDefault();
 
 					if ('success' in data) {
 						this._addPopupMessage(makeMessageBox('good', data.success.messages, data.success.title));

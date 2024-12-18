@@ -210,9 +210,12 @@
 					event: CPopupManager.EVENT_BEFORE_OPEN,
 					action: 'host.edit'
 				},
-				callback: ({event}) => {
-					event.is_prevented = true;
-					event.prevent_default = false;
+				callback: ({data, event}) => {
+					event.preventDefault();
+
+					if (window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
+						location.href = data.href;
+					}
 				}
 			});
 

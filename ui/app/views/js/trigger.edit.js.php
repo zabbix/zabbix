@@ -201,7 +201,7 @@ window.trigger_edit_popup = new class {
 					}
 
 					if (!this.#isConfirmed()) {
-						event.is_prevented = true;
+						event.preventDefault();
 					}
 				}
 			});
