@@ -154,6 +154,7 @@ foreach ($data['items'] as $itemid => $item) {
 				->addClass(ZBX_STYLE_CURSOR_POINTER)
 				->setHint(
 					(new CDiv(mb_substr($last_history['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))
+						->addClass(ZBX_STYLE_HINTBOX_RAW_DATA)
 						->addClass(ZBX_STYLE_HINTBOX_WRAP),
 					'', true, '', 0
 				);

@@ -136,7 +136,9 @@ else {
 									->addClass(ZBX_STYLE_CENTER)
 									->addClass(ZBX_STYLE_CURSOR_POINTER)
 									->setHint(
-										(new CDiv($column['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
+										(new CDiv($column['value']))
+											->addClass(ZBX_STYLE_HINTBOX_RAW_DATA)
+											->addClass(ZBX_STYLE_HINTBOX_WRAP)
 									)
 							);
 
