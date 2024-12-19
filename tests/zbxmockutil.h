@@ -24,6 +24,7 @@ zbx_mock_handle_t	zbx_mock_get_parameter_handle(const char *path);
 zbx_mock_handle_t	zbx_mock_get_object_member_handle(zbx_mock_handle_t object, const char *name);
 
 zbx_uint64_t	zbx_mock_get_parameter_uint64(const char *path);
+int		zbx_mock_get_parameter_int(const char *path);
 zbx_uint64_t	zbx_mock_get_object_member_uint64(zbx_mock_handle_t object, const char *name);
 
 double	zbx_mock_get_parameter_float(const char *path);

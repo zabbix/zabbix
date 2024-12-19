@@ -10,7 +10,8 @@ BINARIES_tests = \
 	is_double_suffix \
 	zbx_user_macro_parse \
 	zbx_get_report_nextcheck \
-	zbx_function_param_parse_ext
+	zbx_function_param_parse_ext \
+	zbx_function_param_quote
 
 if SERVER
 BINARIES_tests += macro_func \
@@ -278,3 +279,16 @@ macro_func_LDADD += @SERVER_LIBS@
 macro_func_LDFLAGS = @SERVER_LDFLAGS@
 
 macro_func_CFLAGS = $(EXPR_COMPILER_FLAGS)
+
+zbx_function_param_quote_SOURCES = \
+	zbx_function_param_quote.c \
+	$(COMMON_SRC_FILES)
+
+zbx_function_param_quote_LDADD = \
+	$(EXPR_LIBS)
+
+zbx_function_param_quote_LDADD += @SERVER_LIBS@
+
+zbx_function_param_quote_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_function_param_quote_CFLAGS = $(EXPR_COMPILER_FLAGS)
