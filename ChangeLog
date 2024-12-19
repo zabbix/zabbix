@@ -798,7 +798,7 @@ A......... [ZBX-22285] fixed honoring of the excludeSearch parameter in API (jfr
 ..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
 ..F....... [ZBX-22714] fixed signature for mqtt.get key in Standard items popup (dpetra)
 .........T [ZBX-21397] fixed preprocessing step in discovery for Kubernetes kubelet template (egordymov)
-..F....... [ZBX-22526] refactored jQuery onclick CButtonExport code, changed usage of form.action to form.getAttribute/setAttribute('action') in CActionButtonList. (epulke)
+..F....... [ZBX-22526] refactored jQuery onclick CButtonExport code, changed usage of form.action to form.getAttribute/setAttribute('action') in CActionButtonList (epulke)
 .........T [ZBX-20202] improved tablespace handling to support Oracle multitenant architecture in Oracle by ODBC template (knaglis)
 ........S. [ZBX-22713] fixed Zabbix server compilation problem for NetBSD (kprutkovs, wiper)
 ...G...... [ZBX-22703] fixed build for HP-UX (kprutkovs)
