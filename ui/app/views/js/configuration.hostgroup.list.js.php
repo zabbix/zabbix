@@ -120,9 +120,9 @@
 
 					clearMessages();
 					addMessage(message_box);
-				})
-				.finally(() => {
+
 					target.classList.remove('is-loading');
+					target.blur();
 				});
 		},
 

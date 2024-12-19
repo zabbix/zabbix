@@ -98,7 +98,7 @@
 
 			this.postAction(curl, parameters)
 				.then(response => this.reload(response))
-				.finally(() => {
+				.catch(() => {
 					target.classList.remove('is-loading');
 					target.blur();
 				});
@@ -112,7 +112,7 @@
 
 			this.postAction(curl, parameters)
 				.then(response => this.reload(response))
-				.finally(() => {
+				.catch(() => {
 					target.classList.remove('is-loading');
 					target.blur();
 				});
@@ -128,12 +128,14 @@
 				})
 			})
 				.then(response => response.json())
-				.catch(() => {
+				.catch(error => {
 					clearMessages();
 
 					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
 
 					addMessage(message_box);
+
+					throw error;
 				});
 		},
 
