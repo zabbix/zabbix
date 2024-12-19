@@ -39,6 +39,13 @@ A......... [ZBX-25350] prohibited deleting user groups which are used in userdir
 ..F....... [ZBX-25525] fixed parent template changes affecting linked template overrides in trigger and trigger prototype forms (esekace)
 
 --------------------------------------------------------------------------------
+Changes for 7.2.1rc2
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 7.2.1rc1
 
 New features:
