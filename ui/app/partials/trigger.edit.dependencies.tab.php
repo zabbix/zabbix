@@ -37,7 +37,9 @@ if (array_key_exists('parent_discoveryid', $data)) {
 $dependency_template_default = (new CTemplateTag('dependency-row-tmpl'))->addItem(
 	(new CRow([
 		$dependency_link,
-		(new CButtonLink(_('Remove')))
+		$discovered_trigger
+			? null
+			: (new CButtonLink(_('Remove')))
 			->addClass('js-remove-dependency')
 			->setAttribute('data-triggerid', '#{triggerid}'),
 		(new CInput('hidden', 'dependencies[]', '#{triggerid}'))
