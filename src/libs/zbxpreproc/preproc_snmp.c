@@ -471,6 +471,9 @@ static int	preproc_snmp_walk_to_pairs(zbx_hashset_t *pairs, const char *data, ch
 
 	while (FAIL != preproc_snmp_parse_line(data, &p, &len, error))
 	{
+		if (NULL == p.value)
+			p.value = zbx_strdup(NULL, "NULL");
+
 		if (NULL == zbx_hashset_insert(pairs, &p, sizeof(zbx_snmp_value_pair_t)))
 		{
 			*error = zbx_dsprintf(*error, "duplicate OID detected: %s", p.oid);
@@ -675,7 +678,7 @@ static int	preproc_snmp_value_from_walk(const char *data, const char *params, ch
 			}
 
 			zbx_free(p.oid);
-			*output = p.value;
+			*output = (NULL != p.value ? p.value : zbx_strdup(NULL, "NULL"));
 			ret = SUCCEED;
 			goto out;
 		}

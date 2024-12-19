@@ -1,0 +1,1 @@
+.......PS. [ZBX-25719] fixed crash during SNMP walk value preprocessing if value contains NULL (vso)
