@@ -44,7 +44,7 @@ class WidgetForm extends CWidgetForm {
 	private const SIZE_PERCENT_MAX = 100;
 
 	private const DEFAULT_DATE_SIZE = 20;
-	private const DEFAULT_TIME_SIZE = 30;
+	public const DEFAULT_TIME_SIZE = 30;
 	private const DEFAULT_TIMEZONE_SIZE = 20;
 
 	public function validate(bool $strict = false): array {

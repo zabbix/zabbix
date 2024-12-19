@@ -4114,18 +4114,17 @@ div.dashboard-widget-clock .clock-digital {
   align-items: center; }
   div.dashboard-widget-clock .clock-digital .clock-date,
   div.dashboard-widget-clock .clock-digital .clock-time,
-  div.dashboard-widget-clock .clock-digital .clock-time-zone {
+  div.dashboard-widget-clock .clock-digital .clock-time-zone,
+  div.dashboard-widget-clock .clock-digital .clock-disabled {
     max-width: 100%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: calc(var(--content-height) * var(--widget-clock-font) / 1.14);
-    line-height: 1.14;
-    flex-shrink: 0; }
+    font-size: calc(max(12px, var(--content-height) * var(--widget-clock-font) / 1.14));
+    line-height: 1.14; }
   div.dashboard-widget-clock .clock-digital .bold {
     font-weight: bold; }
   div.dashboard-widget-clock .clock-digital .clock-disabled {
-    font-size: calc(var(--content-height) * 0.6 / 1.14);
     color: #333333;
     font-weight: bold; }
 

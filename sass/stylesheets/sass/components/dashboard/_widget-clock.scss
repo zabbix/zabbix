@@ -51,14 +51,14 @@ div.dashboard-widget-clock {
 
 		.clock-date,
 		.clock-time,
-		.clock-time-zone {
+		.clock-time-zone,
+		.clock-disabled {
 			max-width: 100%;
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
-			font-size: calc(var(--content-height) * var(--widget-clock-font) / #{$line-height});
+			font-size: calc(max(12px, var(--content-height) * var(--widget-clock-font) / #{$line-height}));
 			line-height: $line-height;
-			flex-shrink: 0;
 		}
 
 		.bold {
@@ -66,7 +66,6 @@ div.dashboard-widget-clock {
 		}
 
 		.clock-disabled {
-			font-size: calc(var(--content-height) * 0.6 / #{$line-height});
 			color: $font-alt-color;
 			font-weight: bold;
 		}

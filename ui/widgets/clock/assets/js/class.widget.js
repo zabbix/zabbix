@@ -46,14 +46,15 @@ class CWidgetClock extends CWidget {
 
 	onStart() {
 		this._events.resize = () => {
-			const padding = 25;
+			const margin = 5;
+			const padding = 10;
 			const header_height = this.getViewMode() === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
 				? 0
 				: this._header.offsetHeight;
 
 			this._target.style.setProperty(
 				'--content-height',
-				`${this._cell_height * this._pos.height - padding * 2 - header_height}px`
+				`${this._cell_height * this._pos.height - margin * 2 - padding * 2 - header_height}px`
 			);
 		}
 	}

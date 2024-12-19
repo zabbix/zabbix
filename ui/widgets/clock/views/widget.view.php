@@ -22,6 +22,7 @@
  */
 
 use Widgets\Clock\Widget;
+use Widgets\Clock\Includes\WidgetForm;
 
 $view = new CWidgetView($data);
 
@@ -74,9 +75,14 @@ else {
 			}
 		}
 		else {
+			$font_size = array_key_exists('time', $data['styles'])
+				? $data['styles']['time']['size']
+				: WidgetForm::DEFAULT_TIME_SIZE;
+
 			$rows[] = (new CDiv())
 				->addItem(_('No data'))
-				->addClass('clock-disabled');
+				->addClass('clock-disabled')
+				->addStyle(sprintf('--widget-clock-font: %1$s;', number_format($font_size / 100, 2)));
 		}
 
 		$body = (new CDiv($rows))->addClass('clock-digital');
