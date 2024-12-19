@@ -1465,7 +1465,7 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 		const zbx_vector_lld_macro_path_ptr_t *lld_macros, int lastcheck, char **error)
 {
 	zbx_lld_trigger_t		*trigger;
-	char				*buffer = NULL, *expression = NULL, *recovery_expression = NULL, err[64];
+	char				*expression = NULL, *recovery_expression = NULL, err[64];
 	char				*err_msg = NULL, *description = NULL;
 	const char			*operation_msg;
 	const struct zbx_json_parse	*jp_row = &lld_row->jp_row;
@@ -1477,7 +1477,7 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 	trigger = lld_trigger_get(trigger_prototype->triggerid, items_triggers, &lld_row->item_links);
 	operation_msg = NULL != trigger ? "update" : "create";
 
-	description = zbx_strdup(buffer, trigger_prototype->description);
+	description = zbx_strdup(NULL, trigger_prototype->description);
 	zbx_substitute_lld_macros(&description, jp_row, lld_macros, ZBX_MACRO_FUNC, NULL, 0);
 	zbx_lrtrim(description, ZBX_WHITESPACE);
 
@@ -1496,10 +1496,11 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 	if (NULL != trigger)
 	{
 		unsigned char	priority;
+		char		*buffer = NULL;
 
 		priority = trigger_prototype->priority;
 
-		lld_override_trigger(&lld_row->overrides, buffer, &priority, &trigger->override_tags, NULL, &discover);
+		lld_override_trigger(&lld_row->overrides, description, &priority, &trigger->override_tags, NULL, &discover);
 
 		if (ZBX_PROTOTYPE_NO_DISCOVER == discover)
 			goto out;
@@ -1600,6 +1601,8 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 			buffer = NULL;
 			trigger->flags |= ZBX_FLAG_LLD_TRIGGER_UPDATE_EVENT_NAME;
 		}
+
+		zbx_free(buffer);
 	}
 	else
 	{
@@ -1720,7 +1723,6 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 out:
 	zbx_free(recovery_expression);
 	zbx_free(expression);
-	zbx_free(buffer);
 	zbx_free(description);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
