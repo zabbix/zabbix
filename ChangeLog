@@ -3,6 +3,7 @@ Changes for 7.0.8rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-24652] fixed name filtering for Maps and Discovery rules (wczerneha)
 ..F.....S. [ZBX-24916] fixed date/time calculation for numeric (unsigned) item values with unixtime units after the year 2038 (dfofanovs, sboidenko)
 ........S. [ZBX-25671] fixed compilaltion with libevent version less 2.1.6 (sboidenko)
 ..F....... [ZBX-25374] fixed loading animation for the enable/disable action (wczerneha)
