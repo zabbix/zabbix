@@ -3,6 +3,24 @@ Changes for 7.0.8rc1
 New features:
 
 Bug fixes:
+..F.....S. [ZBX-24916] fixed date/time calculation for numeric (unsigned) item values with unixtime units after the year 2038 (dfofanovs, sboidenko)
+........S. [ZBX-25671] fixed compilaltion with libevent version less 2.1.6 (sboidenko)
+..F....... [ZBX-25374] fixed loading animation for the enable/disable action (wczerneha)
+..F....... [ZBX-25467] fixed tabulation in Item history widget, Top hosts widget and latest data last value hintbox (dfofanovs)
+.......PS. [ZBX-25765] fixed crash when overriding LLD trigger (dgoloscapov)
+........S. [ZBX-25363] fixed connector error spam to log (sboidenko)
+.......PS. [ZBX-25642] enhanced JavaScript preprocessing to execute in parallel when handling multiple values for the same item (vso)
+..F....... [ZBX-25259] fixed hintbox positioning (apoga)
+..F....... [ZBX-25206] removed padding in Geomap widget (apoga)
+..F....... [ZBX-25489] removed action remove from discovered trigger (rgontarski)
+..F....... [ZBX-24963] fixed links in graph widgets on host dashboard created by graph prototype (rgontarski)
+........S. [ZBX-23103] fixed parsing of JSONPath containing dollar sign (arimdjonoks)
+.......PS. [ZBX-25089] fixed auto registration loop with proxy group (sboidenko)
+..F....... [ZBX-24608] fixed "No data" words overlapping in Clock widget (apoga, ddauksa)
+..F....... [ZBX-25410] fixed incorrectly displayed password field for public key authentication method in item form (esekace)
+..F....... [ZBX-25222] fixed cloning host with a graph that contains an item from another host (gcalenko)
+..F....... [ZBX-24616] fixed permissions check for trigger expression constructor (gcalenko)
+A......... [ZBX-25732] fixed inability to make cross-origin requests to API when passing authentication token using Authorization HTTP header; fixed inability to make cross-origin HTTP OPTIONS request to API endpoint (vmaksimovs)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.7
@@ -3221,6 +3239,9 @@ Changes for 6.0.38rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-25363] fixed connector error spam to log (sboidenko)
+..F....... [ZBX-25206] removed padding in Geomap widget (apoga)
+........S. [ZBX-23103] fixed parsing of JSONPath containing dollar sign (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.37
