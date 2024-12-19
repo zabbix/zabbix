@@ -1,6 +1,4 @@
-SQLFILES = images.sql
-
-EXTRA_DIST = $(SQLFILES)
+EXTRA_DIST =
 
 if DBSCHEMA
 GENSQLFILES = schema.sql
