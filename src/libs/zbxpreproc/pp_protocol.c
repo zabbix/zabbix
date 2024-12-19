@@ -13,8 +13,10 @@
 **/
 
 #include "pp_protocol.h"
+#include "zbxcommon.h"
 #include "zbxpreproc.h"
 
+#include "zbxpreprocbase.h"
 #include "zbxserialize.h"
 #include "zbx_item_constants.h"
 #include "zbxvariant.h"
@@ -990,6 +992,7 @@ void	zbx_preprocessor_unpack_test_request(zbx_pp_item_preproc_t *preproc, zbx_va
 	zbx_uint32_t		str_len;
 	const unsigned char	*offset = data;
 	unsigned char		state;
+	zbx_pp_history_t	*history;
 
 	offset += zbx_deserialize_char(offset, &preproc->value_type);
 	offset += zbx_deserialize_str(offset, &str, str_len);
@@ -1004,8 +1007,9 @@ void	zbx_preprocessor_unpack_test_request(zbx_pp_item_preproc_t *preproc, zbx_va
 	else
 		zbx_variant_set_error(value, str);
 
-	preproc->history = zbx_pp_history_create(0);
-	offset += preprocessor_unpack_history(offset, preproc->history);
+	history = zbx_pp_history_create(0);
+
+	offset += preprocessor_unpack_history(offset, history);
 	(void)preprocessor_unpack_steps(offset, preproc);
 
 	for (int i = 0; i < preproc->steps_num; i++)
@@ -1013,6 +1017,9 @@ void	zbx_preprocessor_unpack_test_request(zbx_pp_item_preproc_t *preproc, zbx_va
 		if (SUCCEED == zbx_pp_preproc_has_history(preproc->steps[i].type))
 			preproc->history_num++;
 	}
+
+	preproc->history_cache = zbx_pp_history_cache_create();
+	zbx_pp_history_cache_history_set_and_release(preproc->history_cache, NULL, history);
 }
 
 /******************************************************************************

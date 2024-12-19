@@ -337,5 +337,17 @@ void	zbx_pp_test_task_get_data(zbx_pp_task_t *task, zbx_ipc_client_t **client, z
 	*value = &d->result;
 	*results = d->results;
 	*results_num = d->results_num;
-	*history = d->preproc->history;
+	*history = zbx_pp_history_cache_history_acquire(d->preproc->history_cache);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: release test task history data                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pp_test_task_history_release(zbx_pp_task_t *task, zbx_pp_history_t **history)
+{
+	zbx_pp_task_test_t	*d = (zbx_pp_task_test_t *)PP_TASK_DATA(task);
+
+	zbx_pp_history_cache_history_set_and_release(d->preproc->history_cache, *history, NULL);
 }

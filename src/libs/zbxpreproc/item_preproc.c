@@ -249,7 +249,8 @@ static int	item_preproc_delta_uint64(zbx_variant_t *value, const zbx_timespec_t 
  *             value         - [IN/OUT] value to process                      *
  *             ts            - [IN] value timestamp                           *
  *             op_type       - [IN] operation type                            *
- *             history_value - [IN/OUT] historical (previous) data            *
+ *             history_value_in - [IN] historical (previous) data             *
+ *             history_value_out - [OUT] historical (next) data               *
  *             history_ts    - [IN/OUT] timestamp of the historical data      *
  *             errmsg        - [OUT]                                          *
  *                                                                            *
@@ -258,22 +259,25 @@ static int	item_preproc_delta_uint64(zbx_variant_t *value, const zbx_timespec_t 
  *                                                                            *
  ******************************************************************************/
 int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx_timespec_t *ts,
-		int op_type, zbx_variant_t *history_value, zbx_timespec_t *history_ts, char **errmsg)
+		int op_type, const zbx_variant_t *history_value_in, zbx_variant_t *history_value_out,
+		zbx_timespec_t *history_ts, char **errmsg)
 {
 	zbx_variant_t	value_num;
 
 	if (FAIL == zbx_item_preproc_convert_value_to_numeric(&value_num, value, value_type, errmsg))
 		return FAIL;
 
+	zbx_variant_copy(history_value_out, history_value_in);
+
 	zbx_variant_clear(value);
 
-	if (ZBX_VARIANT_NONE != history_value->type)
+	if (ZBX_VARIANT_NONE != history_value_out->type)
 	{
 		int	ret;
 
 		zbx_variant_copy(value, &value_num);
 
-		if (ZBX_VARIANT_DBL == value->type || ZBX_VARIANT_DBL == history_value->type)
+		if (ZBX_VARIANT_DBL == value->type || ZBX_VARIANT_DBL == history_value_out->type)
 		{
 			if (FAIL == zbx_variant_convert(value, ZBX_VARIANT_DBL))
 			{
@@ -286,10 +290,10 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 				return FAIL;
 			}
 
-			if (FAIL == zbx_variant_convert(history_value, ZBX_VARIANT_DBL))
+			if (FAIL == zbx_variant_convert(history_value_out, ZBX_VARIANT_DBL))
 			{
 				*errmsg = zbx_dsprintf(*errmsg, "cannot convert value from %s to %s",
-						zbx_variant_type_desc(history_value),
+						zbx_variant_type_desc(history_value_out),
 						zbx_get_variant_type_desc(ZBX_VARIANT_DBL));
 
 				zabbix_log(LOG_LEVEL_CRIT, *errmsg);
@@ -297,7 +301,7 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 				return FAIL;
 			}
 
-			ret = item_preproc_delta_float(value, ts, op_type, history_value, history_ts);
+			ret = item_preproc_delta_float(value, ts, op_type, history_value_out, history_ts);
 		}
 		else
 		{
@@ -312,10 +316,10 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 				return FAIL;
 			}
 
-			if (FAIL == zbx_variant_convert(history_value, ZBX_VARIANT_UI64))
+			if (FAIL == zbx_variant_convert(history_value_out, ZBX_VARIANT_UI64))
 			{
 				*errmsg = zbx_dsprintf(*errmsg, "cannot convert value from %s to %s",
-						zbx_variant_type_desc(history_value),
+						zbx_variant_type_desc(history_value_out),
 						zbx_get_variant_type_desc(ZBX_VARIANT_UI64));
 
 				zabbix_log(LOG_LEVEL_CRIT, *errmsg);
@@ -323,7 +327,7 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 				return FAIL;
 			}
 
-			ret = item_preproc_delta_uint64(value, ts, op_type, history_value, history_ts);
+			ret = item_preproc_delta_uint64(value, ts, op_type, history_value_out, history_ts);
 		}
 
 		if (SUCCEED != ret)
@@ -331,8 +335,8 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 	}
 
 	*history_ts = *ts;
-	zbx_variant_clear(history_value);
-	zbx_variant_copy(history_value, &value_num);
+	zbx_variant_clear(history_value_out);
+	zbx_variant_copy(history_value_out, &value_num);
 	zbx_variant_clear(&value_num);
 
 	return SUCCEED;
@@ -1165,25 +1169,25 @@ out:
  *                                                                            *
  * Purpose: throttles value by suppressing identical values                   *
  *                                                                            *
- * Parameters: value         - [IN/OUT] value to process                      *
- *             ts            - [IN] value timestamp                           *
- *             history_value - [IN] historical data of item with delta        *
- *                                  preprocessing operation                   *
- *             history_ts    - [OUT] timestamp of historical data             *
+ * Parameters: value             - [IN/OUT] value to process                  *
+ *             ts                - [IN] value timestamp                       *
+ *             history_value_in  - [IN] historical (previous) data            *
+ *             history_value_out - [OUT] historical (next) data               *
+ *             history_ts        - [OUT] timestamp of historical data         *
  *                                                                            *
  * Return value: SUCCEED - the value was calculated successfully              *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
 int	item_preproc_throttle_value(zbx_variant_t *value, const zbx_timespec_t *ts,
-		zbx_variant_t *history_value, zbx_timespec_t *history_ts)
+		const zbx_variant_t *history_value_in, zbx_variant_t *history_value_out, zbx_timespec_t *history_ts)
 {
 	int	ret;
 
-	ret = zbx_variant_compare(value, history_value);
+	ret = zbx_variant_compare(value, history_value_in);
 
-	zbx_variant_clear(history_value);
-	zbx_variant_copy(history_value, value);
+	zbx_variant_clear(history_value_out);
+	zbx_variant_copy(history_value_out, value);
 
 	if (0 == ret)
 		zbx_variant_clear(value);
@@ -1197,36 +1201,37 @@ int	item_preproc_throttle_value(zbx_variant_t *value, const zbx_timespec_t *ts,
  *                                                                            *
  * Purpose: throttles value by suppressing identical values                   *
  *                                                                            *
- * Parameters: value         - [IN/OUT] value to process                      *
- *             ts            - [IN] value timestamp                           *
- *             params        - [IN] throttle period                           *
- *             history_value - [IN] historical data of item with delta        *
- *                                  preprocessing operation                   *
- *             history_ts    - [IN/OUT] timestamp of historical data          *
- *             errmsg        - [OUT]                                          *
+ * Parameters: value             - [IN/OUT] value to process                  *
+ *             ts                - [IN] value timestamp                       *
+ *             params            - [IN] throttle period                       *
+ *             history_value_in  - [IN] historical (previous) data            *
+ *             history_value_out - [OUT] historical (next) data               *
+ *             history_ts        - [IN/OUT] timestamp of historical data      *
+ *             errmsg            - [OUT]                                      *
  *                                                                            *
  * Return value: SUCCEED - the value was calculated successfully              *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
 int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_timespec_t *ts, const char *params,
-		zbx_variant_t *history_value, zbx_timespec_t *history_ts, char **errmsg)
+		const zbx_variant_t *history_value_in, zbx_variant_t *history_value_out, zbx_timespec_t *history_ts,
+		char **errmsg)
 {
 	int	ret, timeout, period = 0;
 
 	if (FAIL == zbx_is_time_suffix(params, &timeout, (int)strlen(params)))
 	{
 		*errmsg = zbx_dsprintf(*errmsg, "invalid time period: %s", params);
-		zbx_variant_clear(history_value);
+		zbx_variant_clear(history_value_out);
 		return FAIL;
 	}
 
-	ret = zbx_variant_compare(value, history_value);
+	ret = zbx_variant_compare(value, history_value_in);
 
-	zbx_variant_clear(history_value);
-	zbx_variant_copy(history_value, value);
+	zbx_variant_clear(history_value_out);
+	zbx_variant_copy(history_value_out, value);
 
-	if (ZBX_VARIANT_NONE != history_value->type)
+	if (ZBX_VARIANT_NONE != history_value_out->type)
 		period = ts->sec - history_ts->sec;
 
 	if (0 == ret && period < timeout )
@@ -1245,6 +1250,8 @@ int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_timespec_t
  *             value            - [IN/OUT] value to process                   *
  *             params           - [IN] script to execute                      *
  *             bytecode         - [IN] precompiled bytecode, can be NULL      *
+ *             bytecode_in      - [IN] historical (previous) bytecode         *
+ *             bytecode_out     - [IN] historical (next) bytecode             *
  *             config_source_ip - [IN]                                        *
  *             errmsg           - [OUT]                                       *
  *                                                                            *
@@ -1252,8 +1259,8 @@ int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_timespec_t
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
-int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, zbx_variant_t *bytecode,
-		const char *config_source_ip, char **errmsg)
+int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, const zbx_variant_t *bytecode_in,
+		zbx_variant_t *bytecode_out, const char *config_source_ip, char **errmsg)
 {
 	char		*output = NULL, *error = NULL;
 	const char	*code2;
@@ -1268,19 +1275,20 @@ int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, 
 			return FAIL;
 	}
 
-	if (ZBX_VARIANT_BIN != bytecode->type)
+	if (ZBX_VARIANT_BIN != bytecode_in->type)
 	{
 		char	*code;
 
 		if (SUCCEED != zbx_es_compile(es, params, &code, &size, errmsg))
 			goto fail;
 
-		zbx_variant_clear(bytecode);
-		zbx_variant_set_bin(bytecode, zbx_variant_data_bin_create(code, (zbx_uint32_t)size));
+		zbx_variant_set_bin(bytecode_out, zbx_variant_data_bin_create(code, (zbx_uint32_t)size));
 		zbx_free(code);
 	}
+	else
+		zbx_variant_copy(bytecode_out, bytecode_in);
 
-	size = (int)zbx_variant_data_bin_get(bytecode->data.bin, (const void ** const)&code2);
+	size = (int)zbx_variant_data_bin_get(bytecode_out->data.bin, (const void ** const)&code2);
 
 	if (SUCCEED == zbx_es_execute(es, params, code2, size, value->data.str, &output, errmsg))
 	{

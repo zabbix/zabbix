@@ -10252,7 +10252,7 @@ static void	dc_preproc_sync_preprocitem(zbx_pp_item_preproc_t *preproc, const ZB
 
 /******************************************************************************
  *                                                                            *
- * Purpose: sync mater-dependent item links                                   *
+ * Purpose: sync master-dependent item links                                  *
  *                                                                            *
  ******************************************************************************/
 static void	dc_preproc_sync_masteritem(zbx_pp_item_preproc_t *preproc, ZBX_DC_MASTERITEM *masteritem)
@@ -10277,7 +10277,7 @@ static void	dc_preproc_sync_masteritem(zbx_pp_item_preproc_t *preproc, ZBX_DC_MA
 static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx_uint64_t revision)
 {
 	zbx_pp_item_t		*pp_item;
-	zbx_pp_history_t	*history = NULL;
+	zbx_pp_history_cache_t	*history_cache = NULL;
 
 	if (NULL == (pp_item = (zbx_pp_item_t *)zbx_hashset_search(items, &dc_item->itemid)))
 	{
@@ -10288,7 +10288,7 @@ static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx
 	else
 	{
 		if (NULL != dc_item->preproc_item && pp_item->preproc->pp_revision == dc_item->preproc_item->revision)
-			history = zbx_pp_history_clone(pp_item->preproc->history);
+			history_cache = zbx_pp_history_cache_acquire(pp_item->preproc->history_cache);
 
 		zbx_pp_item_preproc_release(pp_item->preproc);
 	}
@@ -10307,11 +10307,18 @@ static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx
 		if (SUCCEED == zbx_pp_preproc_has_history(pp_item->preproc->steps[i].type))
 		{
 			pp_item->preproc->history_num++;
-			pp_item->preproc->mode = ZBX_PP_PROCESS_SERIAL;
+
+			if (SUCCEED == zbx_pp_preproc_has_serial_history(pp_item->preproc->steps[i].type))
+				pp_item->preproc->mode = ZBX_PP_PROCESS_SERIAL;
 		}
 	}
 
-	pp_item->preproc->history = history;
+	pp_item->preproc->history_cache = history_cache;
+	if (0 != pp_item->preproc->history_num)
+	{
+		if (NULL == pp_item->preproc->history_cache)
+			pp_item->preproc->history_cache = zbx_pp_history_cache_create();
+	}
 }
 
 static void	dc_preproc_add_item_rec(ZBX_DC_ITEM *dc_item, zbx_vector_dc_item_ptr_t *items_sync)

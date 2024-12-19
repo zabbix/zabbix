@@ -390,7 +390,7 @@ out:
 	for (i = 0; i < values_num; i++)
 		zbx_free(values[i]);
 
-	zbx_pp_history_free(history);
+	zbx_pp_history_release(history);
 
 	zbx_vector_pp_result_ptr_clear_ext(&results, zbx_pp_result_free);
 	zbx_vector_pp_result_ptr_destroy(&results);

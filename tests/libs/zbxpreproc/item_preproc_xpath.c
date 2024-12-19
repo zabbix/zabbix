@@ -26,7 +26,7 @@ zbx_es_t	es_engine;
 
 void	zbx_mock_test_entry(void **state)
 {
-	zbx_variant_t		value, history_value;
+	zbx_variant_t		value, history_value_in, history_value_out;
 	const char		*xml;
 	const char		*exp_xml;
 	int			act_ret, exp_ret;
@@ -46,11 +46,12 @@ void	zbx_mock_test_entry(void **state)
 	step.params = (char *)zbx_mock_get_parameter_string("in.xpath");
 	step.error_handler = ZBX_PREPROC_FAIL_DEFAULT;
 
-	zbx_variant_set_none(&history_value);
+	zbx_variant_set_none(&history_value_in);
+	zbx_variant_set_none(&history_value_out);
 	zbx_timespec(&ts);
 
-	act_ret = pp_execute_step(&ctx, NULL, NULL, 0, ITEM_VALUE_TYPE_TEXT, &value, ts, &step, &history_value,
-		&history_ts, get_zbx_config_source_ip());
+	act_ret = pp_execute_step(&ctx, NULL, NULL, 0, ITEM_VALUE_TYPE_TEXT, &value, ts, &step, &history_value_in,
+		&history_value_out, &history_ts, get_zbx_config_source_ip());
 
 	exp_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	zbx_mock_assert_int_eq("return value", exp_ret, act_ret);

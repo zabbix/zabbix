@@ -86,6 +86,7 @@ void	zbx_pp_value_task_get_data(zbx_pp_task_t *task, unsigned char *value_type, 
 		zbx_variant_t **value, zbx_timespec_t *ts, zbx_pp_value_opt_t **value_opt);
 void	zbx_pp_test_task_get_data(zbx_pp_task_t *task, zbx_ipc_client_t **client, zbx_variant_t **value,
 		zbx_pp_result_t **results, int *results_num, zbx_pp_history_t **history);
+void	zbx_pp_test_task_history_release(zbx_pp_task_t *task, zbx_pp_history_t **history);
 void	zbx_pp_tasks_clear(zbx_vector_pp_task_ptr_t *tasks);
 
 zbx_hashset_t	*zbx_pp_manager_items(zbx_pp_manager_t *manager);

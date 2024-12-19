@@ -47,8 +47,7 @@ zbx_pp_item_preproc_t	*zbx_pp_item_preproc_create(zbx_uint64_t hostid, unsigned 
 	preproc->type = type;
 	preproc->value_type = value_type;
 	preproc->flags = flags;
-
-	preproc->history = NULL;
+	preproc->history_cache = NULL;
 	preproc->history_num = 0;
 
 	preproc->mode = ZBX_PP_PROCESS_PARALLEL;
@@ -79,8 +78,7 @@ static void	pp_item_preproc_free(zbx_pp_item_preproc_t *preproc)
 	zbx_free(preproc->steps);
 	zbx_free(preproc->dep_itemids);
 
-	if (NULL != preproc->history)
-		zbx_pp_history_free(preproc->history);
+	zbx_pp_history_cache_release(preproc->history_cache);
 
 	zbx_free(preproc);
 }
@@ -141,6 +139,31 @@ int	zbx_pp_preproc_has_history(int type)
 		case ZBX_PREPROC_THROTTLE_VALUE:
 		case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 		case ZBX_PREPROC_SCRIPT:
+			return SUCCEED;
+		default:
+			return FAIL;
+
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if preprocessing step require serial processing             *
+ *                                                                            *
+ * Parameters: preproc - [IN] item preprocessing data                         *
+ *                                                                            *
+ * Return value: SUCCEED - the step requires serial processing                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_pp_preproc_has_serial_history(int type)
+{
+	switch (type)
+	{
+		case ZBX_PREPROC_DELTA_VALUE:
+		case ZBX_PREPROC_DELTA_SPEED:
+		case ZBX_PREPROC_THROTTLE_VALUE:
+		case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 			return SUCCEED;
 		default:
 			return FAIL;

@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxcommon.h"
 #include "zbxpreprocbase.h"
 
 #include "zbxalgo.h"
@@ -19,6 +20,13 @@
 #include "zbxvariant.h"
 
 ZBX_VECTOR_IMPL(pp_step_history, zbx_pp_step_history_t)
+
+struct zbx_pp_history_cache
+{
+	pthread_mutex_t		lock;
+	zbx_pp_history_t	*history;
+	unsigned int		refcount;
+};
 
 /******************************************************************************
  *                                                                            *
@@ -42,15 +50,10 @@ zbx_pp_history_t	*zbx_pp_history_create(int history_num)
 	return history;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: free preprocessing history                                        *
- *                                                                            *
- ******************************************************************************/
-void	zbx_pp_history_free(zbx_pp_history_t *history)
+zbx_pp_history_t	*zbx_pp_history_release(zbx_pp_history_t *history)
 {
 	if (NULL == history || 0 != --history->refcount)
-		return;
+		return history;
 
 	for (int i = 0; i < history->step_history.values_num; i++)
 		zbx_variant_clear(&history->step_history.values[i].value);
@@ -58,6 +61,8 @@ void	zbx_pp_history_free(zbx_pp_history_t *history)
 	zbx_vector_pp_step_history_destroy(&history->step_history);
 
 	zbx_free(history);
+
+	return NULL;
 }
 
 /******************************************************************************
@@ -102,13 +107,13 @@ void	zbx_pp_history_add(zbx_pp_history_t *history, int index, zbx_variant_t *val
  *             index   - [IN] preprocessing step index                        *
  *             value   - [OUT] value. If there is no history for the          *
  *                             requested step then empty variant              *
- *                             (ZBX_VBARIANT_NONE) is returned                *
+ *                             NULL is returned                               *
  *             ts      - [OUT] value timestamp. If there is no history        *
  *                             for the requested step then 0 timestamp is     *
  *                             returned                                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_pp_history_pop(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t *ts)
+void	zbx_pp_history_get(const zbx_pp_history_t *history, int index, const zbx_variant_t **value, zbx_timespec_t *ts)
 {
 	if (NULL != history)
 	{
@@ -116,16 +121,16 @@ void	zbx_pp_history_pop(zbx_pp_history_t *history, int index, zbx_variant_t *val
 		{
 			if (history->step_history.values[i].index == index)
 			{
-				*value = history->step_history.values[i].value;
+				*value = &history->step_history.values[i].value;
 				*ts = history->step_history.values[i].ts;
-				zbx_vector_pp_step_history_remove_noorder(&history->step_history, i);
 
 				return;
 			}
 		}
 	}
 
-	zbx_variant_set_none(value);
+	*value = NULL;
+
 	ts->sec = 0;
 	ts->ns = 0;
 }
@@ -143,10 +148,78 @@ void	zbx_pp_history_clear(zbx_pp_history_t *history)
 	zbx_vector_pp_step_history_destroy(&history->step_history);
 }
 
-zbx_pp_history_t	*zbx_pp_history_clone(zbx_pp_history_t *history)
+zbx_pp_history_cache_t	*zbx_pp_history_cache_create(void)
 {
+	zbx_pp_history_cache_t	*history_cache;
+	int			err;
+
+	history_cache = (zbx_pp_history_cache_t *)zbx_malloc(NULL, sizeof(zbx_pp_history_cache_t));
+	memset(history_cache, 0, sizeof(zbx_pp_history_cache_t));
+	history_cache->refcount = 1;
+
+	if (0 != (err = pthread_mutex_init(&history_cache->lock, NULL)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot initialize preprocessing history cache mutex: %s",
+				zbx_strerror(err));
+		zbx_free(history_cache);
+	}
+
+	return history_cache;
+}
+
+zbx_pp_history_cache_t	*zbx_pp_history_cache_acquire(zbx_pp_history_cache_t *history_cache)
+{
+	if (NULL == history_cache)
+		return NULL;
+
+	history_cache->refcount++;
+
+	return history_cache;
+}
+
+void	zbx_pp_history_cache_release(zbx_pp_history_cache_t *history_cache)
+{
+	/* history cache is created/destroyed only by manager */
+	if (NULL == history_cache || 0 != --history_cache->refcount)
+		return;
+
+	pthread_mutex_lock(&history_cache->lock);
+	history_cache->history = zbx_pp_history_release(history_cache->history);
+	pthread_mutex_unlock(&history_cache->lock);
+
+	pthread_mutex_destroy(&history_cache->lock);
+	zbx_free(history_cache);
+}
+
+zbx_pp_history_t	*zbx_pp_history_cache_history_acquire(zbx_pp_history_cache_t *history_cache)
+{
+	zbx_pp_history_t	*history;
+
+	if (NULL == history_cache)
+		return NULL;
+
+	pthread_mutex_lock(&history_cache->lock);
+
+	history = history_cache->history;
 	if (NULL != history)
 		history->refcount++;
 
+	pthread_mutex_unlock(&history_cache->lock);
+
 	return history;
+}
+
+void	zbx_pp_history_cache_history_set_and_release(zbx_pp_history_cache_t *history_cache, zbx_pp_history_t *history_in,
+		zbx_pp_history_t *history_out)
+{
+	if (NULL == history_cache)
+		return;
+
+	pthread_mutex_lock(&history_cache->lock);
+
+	zbx_pp_history_release(history_in);
+	zbx_pp_history_release(history_cache->history);
+	history_cache->history = history_out;
+
+	pthread_mutex_unlock(&history_cache->lock);
 }
