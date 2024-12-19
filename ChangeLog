@@ -217,8 +217,12 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.8rc1
 
 New features:
+.........T [ZBXNEXT-9572] added Juniper MX by SNMP template (egordymov)
 
 Bug fixes:
+.......PS. [ZBX-25719] fixed crash during SNMP walk value preprocessing if value contains NULL (vso)
+........S. [ZBX-25754] fixed LLD rollback when reaching 30k dependent item limit (wiper)
+.......PS. [ZBX-25677] removed failure when encountering mismatched OID in SNMP async poller (dgoloscapov, vso)
 ..F....... [ZBX-24652] fixed name filtering for Maps and Discovery rules (wczerneha)
 ..F.....S. [ZBX-24916] fixed date/time calculation for numeric (unsigned) item values with unixtime units after the year 2038 (dfofanovs, sboidenko)
 ........S. [ZBX-25671] fixed compilaltion with libevent version less 2.1.6 (sboidenko)
@@ -3456,6 +3460,8 @@ Changes for 6.0.38rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-25373] fixed possibily to insert duplicate triggers via LLD (dgoloscapov)
+....I..... [ZBX-22307] fixed automake templates producing broken Makefiles on OpenBSD (jxl)
 ........S. [ZBX-25363] fixed connector error spam to log (sboidenko)
 ..F....... [ZBX-25206] removed padding in Geomap widget (apoga)
 ........S. [ZBX-23103] fixed parsing of JSONPath containing dollar sign (arimdjonoks)
