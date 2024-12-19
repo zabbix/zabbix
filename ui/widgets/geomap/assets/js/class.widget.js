@@ -724,4 +724,8 @@ class CWidgetGeoMap extends CWidget {
 			this._map.severityFilterControl.disable();
 		}
 	}
+
+	hasPadding() {
+		return false;
+	}
 }
