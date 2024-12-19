@@ -645,26 +645,28 @@ int	expr_db_item_value(const zbx_db_trigger *trigger, char **value, int N_functi
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED == (ret = zbx_db_trigger_get_itemid(trigger, N_functionid, &itemid)))
-		ret = expr_db_item_get_value(itemid, raw, &ts, value, &timestamp);
-
-	switch (value_property)
+	if (SUCCEED == (ret = zbx_db_trigger_get_itemid(trigger, N_functionid, &itemid)) &&
+		SUCCEED == (ret = expr_db_item_get_value(itemid, raw, &ts, value, &timestamp)))
 	{
-		case ZBX_VALUE_PROPERTY_TIME:
-			*value = zbx_strdup(*value, zbx_time2str(timestamp, tz));
-			break;
-		case ZBX_VALUE_PROPERTY_TIMESTAMP:
-			*value = zbx_dsprintf(*value, ZBX_FS_UI64, timestamp);
-			break;
-		case ZBX_VALUE_PROPERTY_DATE:
-			*value = zbx_strdup(*value, zbx_date2str(timestamp, tz));
-			break;
-		case ZBX_VALUE_PROPERTY_AGE:
-			*value = zbx_strdup(*value, zbx_age2str(time(NULL) - timestamp));
-			break;
-		default:
-			break;
+		switch (value_property)
+		{
+			case ZBX_VALUE_PROPERTY_TIME:
+				*value = zbx_strdup(*value, zbx_time2str(timestamp, tz));
+				break;
+			case ZBX_VALUE_PROPERTY_TIMESTAMP:
+				*value = zbx_dsprintf(*value, ZBX_FS_UI64, timestamp);
+				break;
+			case ZBX_VALUE_PROPERTY_DATE:
+				*value = zbx_strdup(*value, zbx_date2str(timestamp, tz));
+				break;
+			case ZBX_VALUE_PROPERTY_AGE:
+				*value = zbx_strdup(*value, zbx_age2str(time(NULL) - timestamp));
+				break;
+			default:
+				break;
+		}
 	}
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
