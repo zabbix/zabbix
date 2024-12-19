@@ -26,6 +26,7 @@ Changes for 5.0.44
 Changes for 5.0.44rc1
 
 Bug fixes:
+A......... [ZBX-25610] removed reliability on "sysmapelementurlid", "sysmapurlid" in URLs for map.create and map.update (Ivo)
 ..F....... [ZBX-24966] fixed sorting in Map navigation tree widget (apoga)
 
 --------------------------------------------------------------------------------
@@ -37,6 +38,7 @@ Changes for 5.0.43
 Changes for 5.0.43rc1
 
 Bug fixes:
+A......... [ZBX-25614] prohibited ability to change own username, role, and user groups for users of type Admin or User (jfreibergs)
 .......PS. [ZBX-25611] removed possibility of accessing internal duktape properties with atob function (wiper)
 .........T [ZBX-23788] added SNMP OID ifAlias in Network interfaces discovery (egordymov)
 .....J.... [ZBX-24298] allowed any JNDI service providers back in JMX monitoring (dimir)
