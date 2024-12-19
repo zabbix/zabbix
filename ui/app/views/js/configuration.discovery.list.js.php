@@ -155,9 +155,9 @@
 					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
 
 					addMessage(message_box);
-				})
-				.finally(() => {
+
 					target.classList.remove('is-loading');
+					target.blur();
 				});
 		}
 	};
