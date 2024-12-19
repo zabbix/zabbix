@@ -142,18 +142,18 @@ Overlay.prototype.centerDialog = function() {
  */
 Overlay.prototype.recoverFocus = function() {
 	if (this.$btn_focus) {
-		this.$btn_focus.focus();
+		this.$btn_focus[0].focus({preventScroll: true});
 		return;
 	}
 
 	if (jQuery('[autofocus=autofocus]', this.$dialogue).length) {
-		jQuery('[autofocus=autofocus]', this.$dialogue)[0].focus();
+		jQuery('[autofocus=autofocus]', this.$dialogue)[0].focus({preventScroll: true});
 	}
 	else if (jQuery('.overlay-dialogue-body form :focusable', this.$dialogue).length) {
-		jQuery('.overlay-dialogue-body form :focusable', this.$dialogue)[0].focus();
+		jQuery('.overlay-dialogue-body form :focusable', this.$dialogue)[0].focus({preventScroll: true});
 	}
 	else {
-		jQuery(':focusable:first', this.$dialogue)[0].focus();
+		jQuery(':focusable:first', this.$dialogue)[0].focus({preventScroll: true});
 	}
 };
 
