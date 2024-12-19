@@ -53,25 +53,25 @@ class testPageProblems extends CWebTest {
 		$hostgroups = CDataHelper::call('hostgroup.create', [['name' => 'Group for Problems Page']]);
 
 		// Create host.
-		$hosts = CDataHelper::call('host.create', [
-			'host' => 'Host for Problems Page',
-			'groups' => [['groupid' => $hostgroups['groupids'][0]]]
-		]);
-
-		// Create items on previously created host.
-		$item1 = CDataHelper::call('item.create',[
-			'hostid' => $hosts['hostids'][0],
-			'name' => 'Age problem item',
-			'key_' => 'trap',
-			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_FLOAT
-		]);
-		$item2 = CDataHelper::call('item.create',[
-			'hostid' => $hosts['hostids'][0],
-			'name' => 'String in operational data',
-			'key_' => 'trap1',
-			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_TEXT
+		$result = CDataHelper::createHosts([
+			[
+				'host' => 'Host for Problems Page',
+				'groups' => [['groupid' => $hostgroups['groupids'][0]]],
+				'items' => [
+					[
+						'name' => 'Age problem item',
+						'key_' => 'trap',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'String in operational data',
+						'key_' => 'trap1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_TEXT
+					]
+				]
+			]
 		]);
 
 		// Create trigger based on item.
@@ -103,8 +103,9 @@ class testPageProblems extends CWebTest {
 
 		// Create event with recent age.
 		$time = time();
-		CDataHelper::addItemData($item1['itemids'][0], [0, 20, 150]);
-		CDataHelper::addItemData($item2['itemids'][0], ["Text", "Essay", "ParagraphParagraphParagraphParagraph"]);
+		CDataHelper::addItemData($result['itemids']['Host for Problems Page:trap'], [0, 20, 150]);
+		CDataHelper::addItemData($result['itemids']['Host for Problems Page:trap1'],
+				['Text', 'Essay', 'ParagraphParagraphParagraphParagraph']);
 		CDBHelper::setTriggerProblem('Trigger for Age problem', TRIGGER_VALUE_TRUE, ['clock' => $time]);
 		CDBHelper::setTriggerProblem('Trigger for Age problem 1 day', TRIGGER_VALUE_TRUE,
 				['clock' => $time - 86400]
@@ -112,7 +113,7 @@ class testPageProblems extends CWebTest {
 		CDBHelper::setTriggerProblem('Trigger for Age problem 1 month', TRIGGER_VALUE_TRUE,
 				['clock' => $time - 2.628e+6]
 		);
-		CDBHelper::setTriggerProblem('Trigger for String problem', TRIGGER_VALUE_TRUE, ['clock' => $time]);
+		CDBHelper::setTriggerProblem('Trigger for String problem');
 		$dayid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Trigger for Age problem 1 day'));
 		$monthid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Trigger for Age problem 1 month'));
 
@@ -1062,9 +1063,10 @@ class testPageProblems extends CWebTest {
 							'Tags' => 'Service: MySQL'
 						]
 					],
-					'Host' => 'Host for tag permissions',
-					'Item' => 'tag.item',
-					'Check operational link' => 'Graph'
+					'check_operational_data' => [
+						'header' => 'Host for tag permissions: tag.item',
+						'link' => 'Graph'
+					]
 				]
 			],
 			// #25 Show separately operational data with history link
@@ -1088,10 +1090,11 @@ class testPageProblems extends CWebTest {
 							'Actions' => ''
 						]
 					],
-					'Host' => 'Host for Problems Page',
-					'Item' => 'String in operational data',
-					'Check operational link' => 'History',
-					'Non truncated data' => 'ParagraphParagraphParagraphParagraph'
+					'check_operational_data' => [
+						'header' => 'Host for Problems Page: String in operational data',
+						'link' => 'History',
+						'Non truncated data' => 'ParagraphParagraphParagraphParagraph'
+					]
 				]
 			],
 			// #26 Filter by all filter fields. Show tags = 3, Shortened.
@@ -1146,9 +1149,11 @@ class testPageProblems extends CWebTest {
 						'Dat' => 'Database',
 						'...' => 'DatabaseService: abcservice: abcdefTag4Tag5: 5'
 					],
-					'Check operational link' => 'Graph',
-					'Host' => 'ЗАББИКС Сервер',
-					'Item' => 'Number of processes'
+					'check_operational_data' => [
+						'header' => 'ЗАББИКС Сервер: Number of processes',
+						'link' => 'Graph',
+						'Non truncated data' => 'ParagraphParagraphParagraphParagraph'
+					]
 				]
 			],
 			// #27 Show tags = 2, Full.
@@ -1687,15 +1692,14 @@ class testPageProblems extends CWebTest {
 
 		// Check Operational data value in popup.
 		if (array_key_exists('fields', $data)) {
-			if (array_key_exists('Show operational data', $data['fields']) && $data['fields']['Show operational data'] == 'Separately' ) {
+			if (array_key_exists('Show operational data', $data['fields'])
+					&& $data['fields']['Show operational data'] === 'Separately' ) {
 				foreach ($data['result'] as $i => $result) {
 					// Check if operational data is truncated.
 					if (strlen($result['Operational data']) >= 20) {
-						$this->assertEquals($result['Operational data'], $table->getRow($i)->getColumn('Operational data')
-								->query('class:hint-item')->one()->getText());
 						$table->getRow($i)->getColumn('Operational data')->query('class:hint-item')->one()->click();
 						$popup = $this->query($dialog_selector)->one()->waitUntilVisible();
-						$this->assertEquals($data['Non truncated data'],
+						$this->assertEquals($data['check_operational_data']['Non truncated data'],
 							$popup->query("xpath://div[@class='hintbox-wrap']//td[3]")->one()->getText());
 					}
 					else {
@@ -1706,12 +1710,11 @@ class testPageProblems extends CWebTest {
 					}
 
 					// Check correct graph or history link if needed.
-					if(array_key_exists('Check operational link', $data)) {
-						$popup->query("xpath://div[@class='hintbox-wrap']//a[text()='"
-								.$data['Check operational link']."']")->one()->click();
+					if (array_key_exists('check_operational_data', $data)) {
+						$popup->query('link', $data['check_operational_data']['link'])->one()->click();
 						$this->page->waitUntilReady();
-						$this->assertEquals($data['Host'].': '.$data['Item'], $this->query('tag:h1')->one()->getText());
-						$this->page->login()->open('zabbix.php?action=problem.view');
+						$this->page->assertHeader($data['check_operational_data']['header']);
+						$this->page->open('zabbix.php?action=problem.view');
 					}
 					else {
 						$popup->query('xpath:.//button[@title="Close"]')->one()->click();
