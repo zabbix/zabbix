@@ -40,7 +40,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 
 int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shared_handle_t *um_handle,
 		zbx_uint64_t hostid, unsigned char value_type, zbx_variant_t *value, zbx_timespec_t ts,
-		zbx_pp_step_t *step, zbx_variant_t *history_value, zbx_timespec_t *history_ts,
-		const char *config_source_ip);
+		zbx_pp_step_t *step, const zbx_variant_t *history_value_last, zbx_variant_t *history_value,
+		zbx_timespec_t *history_ts, const char *config_source_ip);
 
 #endif

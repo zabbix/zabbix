@@ -275,7 +275,7 @@ ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, "preproc_mock_prog
 
 void	zbx_mock_test_entry(void **state)
 {
-	zbx_variant_t		value, value_in, history_value, history_value_in;
+	zbx_variant_t		value, value_in, history_value_in;
 	unsigned char		value_type;
 	zbx_timespec_t		ts, history_ts, history_ts_in, expected_history_ts;
 	zbx_pp_step_t		step, step_orig;
@@ -347,8 +347,11 @@ void	zbx_mock_test_entry(void **state)
 
 	for (i = 0; i < 4; i++)
 	{
+		zbx_variant_t	history_value_out;
+
+		zbx_variant_set_none(&history_value_out);
+
 		zbx_variant_copy(&value, &value_in);
-		zbx_variant_copy(&history_value, &history_value_in);
 		history_ts = history_ts_in;
 
 		/* run first and last test with no cache */
@@ -358,7 +361,7 @@ void	zbx_mock_test_entry(void **state)
 			step_cache = cache;
 
 		if (FAIL == (returned_ret = pp_execute_step(&ctx, step_cache, NULL, 0, value_type, &value, ts, &step,
-				&history_value, &history_ts, get_zbx_config_source_ip())))
+				&history_value_in, &history_value_out, &history_ts, get_zbx_config_source_ip())))
 		{
 			pp_error_on_fail(NULL, 0, &value, &step);
 
@@ -413,13 +416,13 @@ void	zbx_mock_test_entry(void **state)
 
 				if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.history"))
 				{
-					if (ZBX_VARIANT_NONE == history_value.type)
+					if (ZBX_VARIANT_NONE == history_value_out.type)
 						fail_msg("preprocessing history was empty value");
 
-					zbx_variant_convert(&history_value, ZBX_VARIANT_STR);
+					zbx_variant_convert(&history_value_out, ZBX_VARIANT_STR);
 					zbx_mock_assert_str_eq("preprocessing step history value",
 							zbx_mock_get_parameter_string("out.history.data"),
-							history_value.data.str);
+							history_value_out.data.str);
 
 					zbx_strtime_to_timespec(zbx_mock_get_parameter_string("out.history.time"),
 							&expected_history_ts);
@@ -429,10 +432,10 @@ void	zbx_mock_test_entry(void **state)
 				else
 				{
 					/* history_value will contain duktape bytecode if step is a script */
-					if (ZBX_VARIANT_NONE != history_value.type && ZBX_PREPROC_SCRIPT != step.type)
+					if (ZBX_VARIANT_NONE != history_value_out.type && ZBX_PREPROC_SCRIPT != step.type)
 					{
 						fail_msg("expected empty history, but got %s",
-								zbx_variant_value_desc(&history_value));
+								zbx_variant_value_desc(&history_value_out));
 					}
 				}
 			}
@@ -441,7 +444,7 @@ void	zbx_mock_test_entry(void **state)
 			zbx_mock_assert_int_eq("result variant type", ZBX_VARIANT_ERR, value.type);
 
 		zbx_variant_clear(&value);
-		zbx_variant_clear(&history_value);
+		zbx_variant_clear(&history_value_out);
 	}
 
 	pp_cache_release(cache);
