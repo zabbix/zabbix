@@ -95,7 +95,7 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	/* update before changing database in case Zabbix proxy also changed database and then deleted from cache */
 	zbx_dc_config_update_autoreg_host(host, p_ip, p_dns, port, host_metadata, flag, now);
 
-	autoreg_update_host_func_cb(0, host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag,
+	autoreg_update_host_func_cb(NULL, host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag,
 			now, events_cbs);
 }
 
@@ -176,9 +176,13 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 		zbx_autoreg_update_host_func_t autoreg_update_host_func_cb, zbx_uint64_t *hostid,
 		zbx_uint64_t *revision, zbx_comms_redirect_t *redirect, char *error)
 {
-#define AUTO_REGISTRATION_HEARTBEAT	120
-	char	*ch_error;
-	int	ret = FAIL, heartbeat;
+#define AUTOREG_ENABLED			0
+#define AUTOREG_DISABLED		1
+
+	char		*ch_error;
+	int		ret = FAIL;
+	int		autoreg = AUTOREG_ENABLED;
+	unsigned char	status, monitored_by;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' metadata:'%s'", __func__, host, host_metadata);
 
@@ -190,56 +194,58 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 	}
 
 	/* if host exists then check host connection permissions */
-	if (FAIL == zbx_dc_check_host_permissions(host, sock, hostid, revision, redirect, &ch_error))
+	if (FAIL == zbx_dc_check_host_conn_permissions(host, sock, hostid, &status, &monitored_by, revision, redirect,
+			&ch_error))
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "%s", ch_error);
 		zbx_free(ch_error);
 		goto out;
 	}
 
+	if (0 != (trapper_get_program_type()() & ZBX_PROGRAM_TYPE_SERVER))
+	{
+		if (0 == zbx_dc_get_auto_registration_action_count())
+			autoreg = AUTOREG_DISABLED;
+	}
+
 	/* if host does not exist then check autoregistration connection permissions */
+	if (0 == *hostid && AUTOREG_ENABLED == autoreg &&
+		SUCCEED != zbx_autoreg_host_check_permissions(host, ip, port, sock))
+	{
+		autoreg = AUTOREG_DISABLED;
+	}
+
+	if (AUTOREG_ENABLED == autoreg && SUCCEED == zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag,
+			interface, (int)time(NULL)))
+	{
+		db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface, events_cbs,
+				config_timeout, autoreg_update_host_func_cb);
+	}
+
 	if (0 == *hostid)
 	{
 		zbx_snprintf(error, MAX_STRING_LEN, "host [%s] not found", host);
-
-		if (0 == (trapper_get_program_type()() & ZBX_PROGRAM_TYPE_SERVER) ||
-				0 != zbx_dc_get_auto_registration_action_count())
-		{
-			if (SUCCEED == zbx_autoreg_host_check_permissions(host, ip, port, sock))
-			{
-				if (SUCCEED == zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag,
-						interface, (int)time(NULL), AUTO_REGISTRATION_HEARTBEAT))
-				{
-					db_register_host(host, ip, port, sock->connection_type, host_metadata, flag,
-							interface, events_cbs, config_timeout,
-							autoreg_update_host_func_cb);
-				}
-			}
-		}
-
 		goto out;
 	}
 
-	if (0 == (trapper_get_program_type()() & ZBX_PROGRAM_TYPE_SERVER))
-		heartbeat = AUTO_REGISTRATION_HEARTBEAT;
-	else
-		heartbeat = 0;
-
-	if (0 == (trapper_get_program_type()() & ZBX_PROGRAM_TYPE_SERVER) ||
-			0 != zbx_dc_get_auto_registration_action_count())
+	if (HOST_STATUS_MONITORED != status)
 	{
-		if (SUCCEED == zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag, interface,
-				(int)time(NULL), heartbeat))
-		{
-			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface,
-					events_cbs, config_timeout, autoreg_update_host_func_cb);
-		}
+		zbx_snprintf(error, MAX_STRING_LEN, "host \"%s\" not monitored", host);
+		goto out;
+	}
+
+	if (HOST_MONITORED_BY_SERVER != monitored_by)
+	{
+		zbx_snprintf(error, MAX_STRING_LEN, "host \"%s\" is monitored by a proxy", host);
+		goto out;
 	}
 
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-#undef AUTO_REGISTRATION_HEARTBEAT
+
+#undef AUTOREG_DISABLED
+#undef AUTOREG_ENABLED
 	return ret;
 }
 
@@ -407,7 +413,7 @@ static void	zbx_itemkey_extract_global_regexps(const char *key, zbx_vector_str_t
 
 	zbx_init_agent_request(&request);
 
-	if(SUCCEED != zbx_parse_item_key(key, &request))
+	if (SUCCEED != zbx_parse_item_key(key, &request))
 		goto out;
 
 	/* "params" parameter */

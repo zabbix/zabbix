@@ -650,7 +650,7 @@ typedef enum
 {
 	ZBX_CONN_DEFAULT = 0,
 	ZBX_CONN_IP,
-	ZBX_CONN_DNS,
+	ZBX_CONN_DNS
 }
 zbx_conn_flags_t;
 

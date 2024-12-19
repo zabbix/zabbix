@@ -16,6 +16,9 @@
 #define ZABBIX_AUTOREG_H
 
 #include "zbxdbhigh.h"
+#include "zbxcacheconfig.h"
+
+#define ZBX_AUTOREG_FLAGS_SKIP_EVENT		0x01
 
 typedef struct
 {
@@ -29,6 +32,7 @@ typedef struct
 	unsigned short	port;
 	unsigned short	flag;
 	unsigned int	connection_type;
+	zbx_uint32_t	autoreg_flags;
 }
 zbx_autoreg_host_t;
 
@@ -36,14 +40,16 @@ ZBX_PTR_VECTOR_DECL(autoreg_host_ptr, zbx_autoreg_host_t*)
 
 int      zbx_autoreg_host_compare_func(const void *d1, const void *d2);
 
+void	zbx_autoreg_host_invalidate_cache(const zbx_vector_autoreg_host_ptr_t *autoreg_hosts);
+
 typedef void	(*zbx_autoreg_host_free_func_t)(zbx_autoreg_host_t *autoreg_host);
 
-typedef void	(*zbx_autoreg_update_host_func_t)(zbx_uint64_t proxyid, const char *host, const char *ip,
+typedef void	(*zbx_autoreg_update_host_func_t)(const zbx_dc_proxy_t *proxy, const char *host, const char *ip,
 		const char *dns, unsigned short port, unsigned int connection_type, const char *host_metadata,
 		unsigned short flags, int clock, const zbx_events_funcs_t *events_cbs);
 
-typedef void	(*zbx_autoreg_flush_hosts_func_t)(zbx_vector_autoreg_host_ptr_t *autoreg_hosts, zbx_uint64_t proxyid,
-		const zbx_events_funcs_t *events_cbs);
+typedef void	(*zbx_autoreg_flush_hosts_func_t)(zbx_vector_autoreg_host_ptr_t *autoreg_hosts,
+		const zbx_dc_proxy_t *proxy, const zbx_events_funcs_t *events_cbs);
 
 typedef void	(*zbx_autoreg_prepare_host_func_t)(zbx_vector_autoreg_host_ptr_t *autoreg_hosts, const char *host,
 		const char *ip, const char *dns, unsigned short port, unsigned int connection_type,
