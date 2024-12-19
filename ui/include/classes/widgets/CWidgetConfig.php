@@ -387,6 +387,7 @@ class CWidgetConfig {
 				case WIDGET_PROBLEMS_BY_SV:
 					return $fields['show_type'] != WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS;
 
+				case WIDGET_GEOMAP:
 				case WIDGET_GRAPH_PROTOTYPE:
 				case WIDGET_ITEM:
 				case WIDGET_URL:
