@@ -178,7 +178,7 @@ class testConfiguration extends CAPITest {
 			[
 				[
 					'options' => [
-							'groups' => []
+						'groups' => []
 					],
 					'prettyprint' => true
 				]
@@ -186,7 +186,7 @@ class testConfiguration extends CAPITest {
 			[
 				[
 					'options' => [
-							'groups' => ['11111111111111']
+						'groups' => ['11111111111111']
 					],
 					'prettyprint' => true
 				]
@@ -194,7 +194,7 @@ class testConfiguration extends CAPITest {
 			[
 				[
 					'options' => [
-							'groups' => ['50012']
+						'groups' => ['50012']
 					],
 					'prettyprint' => true
 				]
@@ -248,6 +248,37 @@ class testConfiguration extends CAPITest {
 		foreach ($formats as $parameter) {
 			$this->call('configuration.export', array_merge($data, ['format' => $parameter]));
 		}
+	}
+
+	public function testConfiguration_YamlExportImport() {
+		['hostids' => $hostids] = CDataHelper::createHosts([
+			[
+				'host' => 'API yaml compact nested mapping',
+				'groups' => [['groupid' => 4]],
+				'description' => "yaml export check\r\n-\r\n\r\n"
+			]
+		]);
+
+		['result' => $source] = $this->call('configuration.export', [
+			'format' => 'yaml',
+			'options' => ['hosts' => $hostids]
+		]);
+
+		$this->call('configuration.import', [
+			'format' => 'yaml',
+			'rules' => [
+				'hosts' => ['updateExisting' => true]
+			],
+			'source' => $source
+		]);
+
+		['result' => $hosts] = $this->call('host.get', [
+			'output' => ['description'],
+			'hostids' => $hostids
+		]);
+
+		$expected = json_encode("yaml export check\r\n- ");
+		$this->assertSame($expected, json_encode($hosts[0]['description']));
 	}
 
 	public static function import_fail_data() {
