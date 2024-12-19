@@ -299,18 +299,13 @@ class ItemValueWidget {
 				'pages' => [
 					[
 						'name' => 'Page with widgets'
-					]
-				]
-			],
-			[
-				'name' => 'Dashboard for aggregation function data check',
-				'pages' => [
+					],
 					[
-						'name' => 'Page with widgets',
+						'name' => 'Page for macrofunctions',
 						'widgets' => [
 							[
 								'type' => 'item',
-								'name' => 'Widget for aggregation function data check',
+								'name' => 'Widget for macro function check',
 								'x' => 0,
 								'y' => 0,
 								'width' => 54,
@@ -324,13 +319,18 @@ class ItemValueWidget {
 								]
 							]
 						]
-					],
+					]
+				]
+			],
+			[
+				'name' => 'Dashboard for aggregation function data check',
+				'pages' => [
 					[
-						'name' => 'Page for macrofunctions',
+						'name' => 'Page with widgets',
 						'widgets' => [
 							[
 								'type' => 'item',
-								'name' => 'Widget for macro function check',
+								'name' => 'Widget for aggregation function data check',
 								'x' => 0,
 								'y' => 0,
 								'width' => 54,

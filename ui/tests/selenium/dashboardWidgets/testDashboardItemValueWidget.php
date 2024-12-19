@@ -4413,7 +4413,7 @@ class testDashboardItemValueWidget extends testWidgets {
 	 * @dataProvider getMacroFunctions
 	 */
 	public function testDashboardItemValueWidget_CheckMacroFunctions($data) {
-		$this->setWidgetConfiguration(self::$dashboardids[self::DASHBOARD_AGGREGATION].'&page=2',
+		$this->setWidgetConfiguration(self::$dashboardids[self::DASHBOARD_THRESHOLD].'&page=2',
 				self::MACRO_FUNCTION_WIDGET, $data['fields']
 		);
 		CDashboardElement::find()->one()->save()->waitUntilReady();
