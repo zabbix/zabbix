@@ -52,6 +52,9 @@
 				? <?= json_encode(_('Key passphrase')) ?>
 				: <?= json_encode(_('Password')) ?>;
 		}
+		else {
+			document.getElementById('js-item-password-label').innerText = <?= json_encode(_('Password')) ?>;
+		}
 	}
 
 	const item_form = {
