@@ -42,8 +42,6 @@ A......... [ZBX-25350] prohibited deleting user groups which are used in userdir
 --------------------------------------------------------------------------------
 Changes for 7.2.1rc2
 
-New features:
-
 Bug fixes:
 .......PS. [ZBX-25765] fixed crash when overriding LLD trigger (dgoloscapov)
 
