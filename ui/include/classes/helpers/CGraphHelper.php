@@ -30,7 +30,7 @@ class CGraphHelper extends CGraphGeneralHelper {
 
 		$dst_options = ['templateids' => [$dst_templateid]];
 
-		return self::copy($src_options, $dst_options);
+		return self::clone($src_options, $dst_options);
 	}
 
 	/**
@@ -48,7 +48,69 @@ class CGraphHelper extends CGraphGeneralHelper {
 
 		$dst_options = ['hostids' => [$dst_hostid]];
 
-		return self::copy($src_options, $dst_options);
+		return self::clone($src_options, $dst_options);
+	}
+
+	/**
+	 * Clone graphs. Graphs with an item from other than cloned host are ignored.
+	 *
+	 * @param array $src_options
+	 * @param array $dst_options
+	 *
+	 * @return bool
+	 */
+	private static function clone(array $src_options, array $dst_options): bool {
+		$src_graphs = self::getSourceGraphs($src_options);
+
+		if (!$src_graphs) {
+			return true;
+		}
+
+		try {
+			$dst_itemids = self::getDestinationItems($src_graphs, $dst_options, $src_options);
+		}
+		catch (Throwable $e) {
+			return false;
+		}
+
+		$dst_hostids = reset($dst_options);
+		$dst_graphs = [];
+
+		foreach ($dst_hostids as $dst_hostid) {
+			foreach ($src_graphs as $dst_graph) {
+				$check_itemids = array_column($dst_graph['gitems'], 'itemid', 'itemid');
+
+				if ($dst_graph['ymin_itemid'] != 0) {
+					$check_itemids[$dst_graph['ymin_itemid']] = true;
+				}
+
+				if ($dst_graph['ymax_itemid'] != 0) {
+					$check_itemids[$dst_graph['ymax_itemid']] = true;
+				}
+
+				// Skip graph with items from other than the cloned host.
+				if (array_diff_key($check_itemids, $dst_itemids)) {
+					continue;
+				}
+
+				if ($dst_graph['ymin_itemid'] != 0) {
+					$dst_graph['ymin_itemid'] = $dst_itemids[$dst_graph['ymin_itemid']][$dst_hostid];
+				}
+
+				if ($dst_graph['ymax_itemid'] != 0) {
+					$dst_graph['ymax_itemid'] = $dst_itemids[$dst_graph['ymax_itemid']][$dst_hostid];
+				}
+
+				foreach ($dst_graph['gitems'] as &$dst_gitem) {
+					$dst_gitem['itemid'] = $dst_itemids[$dst_gitem['itemid']][$dst_hostid];
+				}
+				unset($dst_gitem);
+
+				$dst_graphs[] = array_diff_key($dst_graph, array_flip(['graphid', 'flags']));
+			}
+		}
+
+		return $dst_graphs ? (bool) API::Graph()->create($dst_graphs) : true;
 	}
 
 	/**
