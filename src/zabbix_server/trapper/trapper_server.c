@@ -121,11 +121,20 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 
 	string_alloc = 0;
 	if (SUCCEED == zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_SENDTO, &sendto, &string_alloc, NULL))
+	{
+		zbx_replace_invalid_utf8(sendto);
 		string_alloc = 0;
+	}
 	if (SUCCEED == zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_SUBJECT, &subject, &string_alloc, NULL))
+	{
+		zbx_replace_invalid_utf8(subject);
 		string_alloc = 0;
+	}
 	if (SUCCEED == zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_MESSAGE, &message, &string_alloc, NULL))
+	{
+		zbx_replace_invalid_utf8(message);
 		string_alloc = 0;
+	}
 
 	if (SUCCEED == zbx_json_brackets_by_name(&jp_data, ZBX_PROTO_TAG_PARAMETERS, &jp_params))
 	{
@@ -133,6 +142,7 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 
 		zbx_strncpy_alloc(&params, &string_alloc, &string_offset, jp_params.start,
 				(size_t)(jp_params.end - jp_params.start + 1));
+		zbx_replace_invalid_utf8(params);
 	}
 
 	result = zbx_db_select(
