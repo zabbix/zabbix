@@ -22,7 +22,8 @@ import (
 type Session struct {
 	// URI is a connection string consisting of a network scheme, a "host:port" address or a path to a Unix-socket.
 	URI string `conf:"name=Uri,optional"`
-
+	// User to send to a protected Redis server.
+	User string `conf:"optional"`
 	// Password to send to a protected Redis server.
 	Password string `conf:"optional"`
 }
