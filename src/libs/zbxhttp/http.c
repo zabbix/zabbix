@@ -424,6 +424,9 @@ void	zbx_http_convert_to_utf8(CURL *easyhandle, char **body, size_t *size, size_
 		zabbix_log(LOG_LEVEL_DEBUG, "content_type '%s'", content_type);
 #endif
 
+	if (NULL == *body)
+		return;
+
 	charset = zbx_determine_charset(content_type, *body, *size);
 
 	if (0 != strcmp(charset, "UTF-8"))
