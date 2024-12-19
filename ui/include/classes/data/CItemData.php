@@ -2514,7 +2514,7 @@ final class CItemData {
 				]
 			],
 			'vmware.vm.memory.size.private[url,uuid]' => [
-				'description' => _('VMware virtual machine private memory size, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifierr'),
+				'description' => _('VMware virtual machine private memory size, "url" - VMware service URL, "uuid" - VMware virtual machine global unique identifier'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'documentation_link' => [
 					ITEM_TYPE_SIMPLE => 'vm_monitoring/vmware_keys#vmware.vm.memory.size.private'
