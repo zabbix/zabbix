@@ -172,6 +172,19 @@ window.item_edit_form = new class {
 			row.querySelector('[name$="[period]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, !flexible);
 			row.querySelector('[name$="[schedule]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, flexible);
 		});
+
+		const authtype = document.getElementById('authtype');
+		const passphrase = document.getElementById('passphrase');
+		const password = document.getElementById('password');
+
+		authtype.addEventListener('change', () => {
+			if (authtype.value == <?= ITEM_AUTHTYPE_PASSWORD ?>) {
+				password.value = passphrase.value;
+			}
+			else {
+				passphrase.value = password.value;
+			}
+		});
 	}
 
 	initItemPrototypeForm() {
