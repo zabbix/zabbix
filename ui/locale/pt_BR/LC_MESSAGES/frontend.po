@@ -22652,6 +22652,10 @@ msgstr "Contador de desempenho da máquina virtual VMware, \"url\" - URL do serv
 msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "Estado de energia da máquina virtual da VMware, \"url\" - URL do serviço da VMware, \"uuid\" - identificador exclusivo global da máquina virtual da VMware"
 
+#: include/classes/data/CItemData.php:2490
+msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
 msgstr "Tamanho da memória privada da máquina virtual da VMware, \"url\" - URL do serviço da VMware, \"uuid\" - identificador exclusivo global da máquina virtual da VMware"

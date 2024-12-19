@@ -22833,6 +22833,10 @@ msgstr "Čítač výkonu virtuálního stroje VMware, \"url\" - URL služby VMwa
 msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "Stav spuštění virtuálního stroje hypervisoru VMWare, \"url\" - URL služby VMware služby, \"uuid\" - globální unikátní identifikátor virtuálního stroje VMware"
 
+#: include/classes/data/CItemData.php:2490
+msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
 msgstr "Velikost privátní paměti virtuálního stroje VMware, \"url\" - URL služby VMware, \"uuid\" - globální unikátní identifikátor virtuálního stroje VMware"

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-12-17 05:31+0000\n"
+"PO-Revision-Date: 2024-12-19 05:21+0000\n"
 "Last-Translator: Maksym <maxim@ua.fm>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -1311,7 +1311,7 @@ msgstr "Все"
 #: app/views/mediatype.list.php:79 app/views/mediatype.list.php:81
 #: app/views/mediatype.list.php:90 app/views/popup.operation.edit.php:160
 msgid "All available"
-msgstr ""
+msgstr "Всі доступні"
 
 #: app/views/monitoring.dashboard.view.php:189
 msgid "All dashboards"
@@ -4290,12 +4290,11 @@ msgstr "Не вдалося оновити групу шаблонів"
 #: app/controllers/CControllerTriggerMassupdate.php:212
 #: app/controllers/CControllerTriggerUpdate.php:58
 #: app/controllers/CControllerTriggerUpdate.php:155
-#, fuzzy
 msgid "Cannot update trigger"
 msgid_plural "Cannot update triggers"
 msgstr[0] "Не вдалося оновити тригер"
-msgstr[1] "Не вдалося оновити тригер"
-msgstr[2] "Не вдалося оновити тригер"
+msgstr[1] "Не вдалося оновити тригери"
+msgstr[2] "Не вдалося оновити тригери"
 
 #: include/classes/api/services/CTriggerGeneral.php:2305
 #, c-format
@@ -9652,12 +9651,11 @@ msgid "Host dashboards"
 msgstr "Панелі вузлів"
 
 #: app/controllers/CControllerHostMassDelete.php:66
-#, fuzzy
 msgid "Host deleted"
 msgid_plural "Hosts deleted"
-msgstr[0] "Вузел мережі видалено"
-msgstr[1] "Вузел мережі видалено"
-msgstr[2] "Вузел мережі видалено"
+msgstr[0] "Вузол мережі видалено"
+msgstr[1] "Вузли мережі видалено"
+msgstr[2] "Вузли мережі видалено"
 
 #: app/controllers/CControllerHostGroupDisable.php:76
 #: app/controllers/CControllerPopupMassupdateHost.php:492
@@ -9735,7 +9733,7 @@ msgstr "Елементи групи вузлів мережі"
 
 #: jsLoader.php:292
 msgid "Host group is not selected."
-msgstr ""
+msgstr "Групу вузла мережі не вибрано."
 
 #: include/views/monitoring.sysmap.edit.php:168
 msgid "Host group label type"
@@ -9818,7 +9816,7 @@ msgstr "Огляд інвентарних даних вузла мережі"
 
 #: jsLoader.php:289
 msgid "Host is not selected."
-msgstr ""
+msgstr "Вузол мережі не вибрано."
 
 #: include/views/monitoring.sysmap.edit.php:183
 msgid "Host label type"
@@ -22851,6 +22849,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:2443
 msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
+#: include/classes/data/CItemData.php:2490
+msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
 
 #: include/classes/data/CItemData.php:2359
