@@ -53,7 +53,7 @@ class CControllerTriggerExpressionConstructor extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS);
+		return true;
 	}
 
 	protected function doAction() {
