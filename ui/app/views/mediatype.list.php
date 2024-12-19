@@ -166,9 +166,6 @@ foreach ($data['mediatypes'] as $media_type) {
 
 			$actions[] = $action['is_editable']
 				? (new CLink($action['name'], $action_url))
-					->setAttribute('data-actionid', $action['actionid'])
-					->setAttribute('data-eventsource', $action['eventsource'])
-					->setAttribute('data-action', 'action.edit')
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->addClass(ZBX_STYLE_GREY)
 				: (new CSpan($action['name']))->addClass(ZBX_STYLE_GREY);
@@ -207,9 +204,7 @@ foreach ($data['mediatypes'] as $media_type) {
 		->setArgument('mediatypeid', $media_type['mediatypeid'])
 		->getUrl();
 
-	$name = (new CLink($media_type['name'], $media_type_url))
-		->setAttribute('data-mediatypeid', $media_type['mediatypeid'])
-		->setAttribute('data-action', 'mediatype.edit');
+	$name = new CLink($media_type['name'], $media_type_url);
 
 	// append row
 	$media_type_table->addRow([
