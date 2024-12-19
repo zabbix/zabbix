@@ -46,7 +46,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 	protected static $dashboardids;
 	protected static $other_dashboardids;
 	protected static $dashboardid;
-
 	const DASHBOARD_UPDATE = 'top_host_update';
 	const DASHBOARD_CREATE = 'top_host_create';
 	const DASHBOARD_DELETE = 'top_host_delete';
@@ -254,7 +253,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Host groups', 'Hosts', 'Host tags',
 				'Show hosts in maintenance', 'Columns', 'Order by', 'Order', 'Host limit'], $form->getLabels()->asText()
 		);
-		$form->getRequiredLabels(['Columns', 'Order by', 'Host limit']);
+		$this->assertEquals(['Columns', 'Order by', 'Host limit'], $form->getRequiredLabels());
 
 		// Check default fields.
 		$fields = [
@@ -265,7 +264,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			'id:evaltype' => ['value' => 'And/Or', 'labels' => ['And/Or', 'Or']],
 			'id:tags_0_tag' => ['value' => '', 'placeholder' => 'tag', 'maxlength' => 255],
 			'id:tags_0_operator' => ['value' => 'Contains', 'options' => ['Exists', 'Equals', 'Contains',
-					'Does not exist', 'Does not equal', 'Does not contain']
+				'Does not exist', 'Does not equal', 'Does not contain']
 			],
 			'id:tags_0_value' => ['value' => '', 'placeholder' => 'value', 'maxlength' => 255],
 			'Order' => ['value' => 'Top N', 'labels' => ['Top N', 'Bottom N']],
@@ -296,49 +295,77 @@ class testDashboardTopHostsWidget extends testWidgets {
 				->filter(CElementFilter::CLICKABLE)->asText()
 		);
 		$visible_labels = ['Name', 'Data', 'Item name', 'Base colour', 'Display item value as', 'Display', 'Thresholds',
-				'Decimal places', 'Advanced configuration'
+			'Decimal places', 'Advanced configuration'
 		];
-		$hidden_labels = ['Text', 'Sparkline', 'Min', 'Max', 'Highlights', 'Show thumbnail', 'Aggregation function', 'Time period', 'Widget', 'From', 'To', 'History data'];
+		$hidden_labels = ['Text', 'Sparkline', 'Min', 'Max', 'Highlights', 'Show thumbnail', 'Aggregation function',
+			'Time period', 'Widget', 'From', 'To', 'History data'
+		];
 		$this->assertEquals($visible_labels, array_values($column_form->getLabels()->filter(CElementFilter::VISIBLE)->asText()));
 		$this->assertEquals($hidden_labels, array_values($column_form->getLabels()->filter(CElementFilter::NOT_VISIBLE)->asText()));
-		$form->getRequiredLabels(['Name', 'Item name']);
+
+		$this->assertEquals(['Name', 'Item name'], $column_form->getRequiredLabels());
+		$column_form->fill(['Advanced configuration' => true]);
 
 		$column_default_fields = [
 			'Name' => ['value' => '', 'maxlength' => 255],
 			'Data' => ['value' => 'Item value', 'options' => ['Item value', 'Host name', 'Text']],
-			'Text' => ['value' => '', 'placeholder' => 'Text, supports {INVENTORY.*}, {HOST.*} macros','maxlength' => 255,
-					'visible' => false, 'enabled' => false
+			'Text' => ['value' => '', 'placeholder' => 'Text, supports {INVENTORY.*}, {HOST.*} macros', 'maxlength' => 255,
+				'visible' => false, 'enabled' => false
 			],
 			'Item name' => ['value' => ''],
-			'Display' => ['value' => 'As is', 'labels' => ['As is', 'Bar', 'Indicators', 'Sparkline']],
+			'xpath:.//input[@id="base_color"]/..' => ['color' => ''],
 			'Display item value as' => ['value' => 'Numeric', 'labels' => ['Numeric', 'Text', 'Binary']],
+			'Display' => ['value' => 'As is', 'labels' => ['As is', 'Bar', 'Indicators', 'Sparkline']],
 			'Min' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
 			'Max' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
-			'xpath:.//input[@id="base_color"]/..' => ['color' => ''],
+			'id:sparkline_width' => ['value' => 1, 'maxlength' => 2, 'visible' => false, 'enabled' => false],
+			'id:sparkline_fill' => ['value' => 3, 'maxlength' => 2, 'visible' => false, 'enabled' => false],
+			'xpath:.//input[@id="sparkline_color"]/..' => ['color' => '42A5F5', 'visible' => false, 'enabled' => false],
+			'id:sparkline_time_period_data_source' => ['value' => 'Custom', 'labels' => ['Dashboard', 'Widget', 'Custom'],
+				'visible' => false, 'enabled' => false
+			],
+			'id:sparkline_time_period_reference' => ['value' => '', 'visible' => false],
+			'id:sparkline_time_period_from' => ['value' => 'now-1h', 'placeholder' => 'YYYY-MM-DD hh:mm:ss', 'maxlength' => 255,
+				'visible' => false, 'enabled' => false
+			],
+			'id:sparkline_time_period_to' => ['value' => 'now', 'placeholder' => 'YYYY-MM-DD hh:mm:ss', 'maxlength' => 255,
+				'visible' => false, 'enabled' => false
+			],
+			'id:sparkline_history' => ['value' => 'Auto', 'labels' => ['Auto', 'History', 'Trends'], 'visible' => false,
+				'enabled' => false
+			],
 			'Thresholds' => ['visible' => true],
 			'Highlights' => ['visible' => false],
 			'Decimal places' => ['value' => 2, 'maxlength' => 2],
-			'Advanced configuration' => ['value' => false, 'visible' => true, 'enabled' => true],
+			'Advanced configuration' => ['visible' => true, 'enabled' => true],
 			'Aggregation function' => ['value' => 'not used', 'options' => ['not used', 'min', 'max', 'avg', 'count', 'sum',
-					'first', 'last']
+				'first', 'last']
 			],
-			'Time period' => ['value' => 'Dashboard', 'labels' => ['Dashboard', 'Widget', 'Custom'], 'visible' => false, 'enabled' => false],
+			'Time period' => ['value' => 'Dashboard', 'labels' => ['Dashboard', 'Widget', 'Custom'], 'visible' => false,
+				'enabled' => false
+			],
 			'Widget' => ['value' => '', 'visible' => false, 'enabled' => false],
-			'id:time_period_from' => ['value' => 'now-1h', 'placeholder' => 'YYYY-MM-DD hh:mm:ss', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
-			'id:time_period_to' => ['value' => 'now', 'placeholder' => 'YYYY-MM-DD hh:mm:ss', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
+			'id:time_period_from' => ['value' => 'now-1h', 'placeholder' => 'YYYY-MM-DD hh:mm:ss', 'maxlength' => 255,
+				'visible' => false, 'enabled' => false
+			],
+			'id:time_period_to' => ['value' => 'now', 'placeholder' => 'YYYY-MM-DD hh:mm:ss', 'maxlength' => 255,
+				'visible' => false, 'enabled' => false
+			],
 			'History data' => ['value' => 'Auto', 'labels' => ['Auto', 'History', 'Trends']],
 			'Show thumbnail' => ['value' => false, 'visible' => false, 'enabled' => false]
 		];
+		$this->checkFieldsAttributes($column_default_fields, $column_form);
 
 		// Reassign new fields' values for comparing them in other 'Data' values.
-		foreach (['Aggregation function', 'Item name', 'Display item value as', 'Display', 'History data', 'Min',
-					'Max', 'Decimal places', 'Advanced configuration'] as $field) {
+		foreach (['Aggregation function', 'Item name', 'Display item value as', 'Display', 'History data', 'Min', 'Max',
+			'Decimal places', 'Advanced configuration'] as $field) {
 			$column_default_fields[$field]['visible'] = false;
 			$column_default_fields[$field]['enabled'] = false;
 		}
 
 		foreach (['Host name', 'Text'] as $data) {
 			$column_form->fill(['Data' => CFormElement::RELOADABLE_FILL($data)]);
+			$required_fields = ($data === 'Host name') ? ['Name'] : ['Name', 'Text'];
 			$column_default_fields['Data']['value'] = ($data === 'Host name') ? 'Host name' : 'Text';
 			$column_default_fields['Text']['visible'] = $data === 'Text';
 			$column_default_fields['Text']['enabled'] = $data === 'Text';
@@ -347,37 +374,82 @@ class testDashboardTopHostsWidget extends testWidgets {
 			$column_default_fields['Advanced configuration']['visible'] = false;
 			$column_default_fields['Advanced configuration']['enabled'] = true;
 			$this->checkFieldsAttributes($column_default_fields, $column_form);
+			$this->assertEquals($required_fields, $column_form->getRequiredLabels());
 		}
 
-		// Check hidden fields dependency.
-		$column_form->fill([
-			'Data' => CFormElement::RELOADABLE_FILL('Item value'),
-			'Advanced configuration' => true
-		]);
+		$column_form->fill(['Data' => CFormElement::RELOADABLE_FILL('Item value')]);
 
-		// Adding those fields new info icons appear.
-		$fields_visibility = [
-			'Aggregation function' => ['not used' => false, 'min' => true, 'max' => true, 'avg' => true, 'count' => false,
-					'sum' => true, 'first' => false, 'last' => false
-			],
-			'Display' => ['As is' => false, 'Bar' => true, 'Indicators' => true],
-			'History data' => ['Auto' => false, 'History' => false, 'Trends' => true]
+		// 'Sparkline' displayed fields when Display => Sparkline option is set.
+		$sparkline_fields = ['id:sparkline_width', 'id:sparkline_fill', 'xpath:.//input[@id="sparkline_color"]/..',
+			'id:sparkline_history', 'id:sparkline_time_period_data_source', 'id:sparkline_time_period_from',
+			'id:sparkline_time_period_to'
 		];
 
-		// Check Aggregation function and Min/Max fields visibility.
+		// Check hidden fields dependency.
+		$fields_visibility = [
+			'Aggregation function' => ['min', 'max', 'avg', 'count', 'sum', 'first', 'last'],
+			'Display' => ['Bar', 'Indicators', 'Sparkline']
+		];
 		foreach ($fields_visibility as $field => $options) {
-			foreach ($options as $option => $visible) {
+			foreach ($options as $option) {
 				$column_form->fill([$field => $option]);
 
-				if ($field === 'Aggregation function' && $option !== 'not used') {
+				if ($field === 'Aggregation function') {
 					$this->assertTrue($column_form->getLabel('Time period')->isDisplayed());
 				}
 
-				if ($field === 'Display') {
+				if ($option === 'Bar' || $option === 'Indicators') {
 					foreach (['Min', 'Max'] as $bar_range) {
-						$this->assertTrue($column_form->getField($bar_range)->isVisible($visible));
+						$this->assertTrue($column_form->getField($bar_range)->isDisplayed());
 					}
 				}
+
+				if ($option === 'Sparkline') {
+					foreach ($sparkline_fields as $locator) {
+						$this->assertTrue($column_form->query($locator)->one()->isDisplayed());
+					}
+
+					foreach (['id:sparkline_width', 'id:sparkline_fill'] as $id) {
+						$this->assertRangeSliderParameters($column_form, $id, ['min' => '0', 'max' => '10', 'step' => '1']);
+					}
+
+				// Check that reference widget multiselect is not visible by default.
+				$this->assertFalse($column_form->query('id:sparkline_time_period_reference')->one()->isDisplayed());
+				}
+			}
+		}
+
+		// Check required fields and calendar element when Aggregation and Sparkline Custom/Widget time period is selected.
+		foreach (['Custom', 'Widget'] as $time_selector) {
+			$column_form->fill([
+				'Time period' => $time_selector,
+				'id:sparkline_time_period_data_source' => $time_selector
+			]);
+
+			if ($time_selector === 'Custom') {
+				foreach (['from', 'to'] as $element) {
+					$this->assertTrue($column_form->query('id', 'sparkline_time_period_'.$element.'_calendar')->one()
+							->isClickable()
+					);
+
+					// Check that 'From' and 'To' are required fields.
+					$this->assertTrue($column_form->query('xpath:.//label[@for="sparkline_time_period_'.$element.'"]')->one()
+							->hasClass('form-label-asterisk')
+					);
+					$this->assertEquals(['Name', 'Item name', 'From', 'To'], $column_form->getRequiredLabels());
+				}
+			}
+			else {
+				foreach (['id:sparkline_time_period_from', 'id:sparkline_time_period_to', 'From', 'To'] as $locator) {
+					$this->assertFalse($column_form->getField($locator)->isDisplayed());
+				}
+
+				$this->assertEquals(['Name', 'Item name', 'Widget'], $column_form->getRequiredLabels());
+
+				// Check sparkline required field with selected widget time period.
+				$this->assertTrue($column_form->query('xpath:.//label[@for="sparkline_time_period_reference_ms"]')
+						->one()->hasClass('form-label-asterisk')
+				);
 			}
 		}
 
@@ -431,7 +503,670 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 	public static function getCreateData() {
 		return [
-			// #0 Minimum needed values to create and submit widget.
+			// #0 Error message adding widget without any column.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Widget without columns'
+					],
+					'main_error' => [
+						'Invalid parameter "Columns": cannot be empty.',
+						'Invalid parameter "Order by": an integer is expected.'
+					]
+				]
+			],
+			// #1 error message adding widget without item column.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Widget without item column name'
+					],
+					'column_fields' => [
+						[
+							'Data' => 'Host name'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/name": cannot be empty.'
+					]
+				]
+			],
+			// #2 Add characters in host limit field.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Host limit error with item column',
+						'Host limit' => 'zzz'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory'
+						]
+					],
+					'main_error' => [
+						'Invalid parameter "Host limit": value must be one of 1-1000.'
+					]
+				]
+			],
+			// #3 Add incorrect value to host limit field without item column.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Host limit error without item column',
+						'Host limit' => '3333'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Host name'
+						]
+					],
+					'main_error' => [
+						'Invalid parameter "Host limit": value must be one of 1-1000.'
+					]
+				]
+			],
+			// #4 Colour error in host name column.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Colour error in Host name column'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Host name',
+							'Base colour' => '!@#$%^'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/base_color": a hexadecimal colour code (6 symbols) is expected.'
+					]
+				]
+			],
+			// #5 Check error adding text column without any value.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Error in empty text column'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Text'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/text": cannot be empty.'
+					]
+				]
+			],
+			// #6 Colour error in text column.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Error in text column colour'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Text',
+							'Text' => 'Here is some text',
+							'Base colour' => '!@#$%^'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/base_color": a hexadecimal colour code (6 symbols) is expected.'
+					]
+				]
+			],
+			// #7 Error when there is no item in item column.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Error without item in item column'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/item": cannot be empty.'
+					]
+				]
+			],
+			// #8 Error when time period "From" is below minimum time period.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Incorrect time period'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Advanced configuration' => true,
+							'Aggregation function' => 'min',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-58s'
+						]
+					],
+					'column_error' => [
+						'Minimum time period to display is 1 minute.'
+					]
+				]
+			],
+			// #9 Error when time period "From" is above maximum time period.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Maximum time period in From field'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Advanced configuration' => true,
+							'Aggregation function' => 'max',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-2y-2s'
+						]
+					],
+					'column_error' => [
+						'Maximum time period to display is {days} days.'
+					],
+					'days_count' => true
+				]
+			],
+			// #10 Error when time period "To" is below minimum time period.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Incorrect time period'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Advanced configuration' => true,
+							'Aggregation function' => 'avg',
+							'Time period' => 'Custom',
+							'id:time_period_to' => 'now-59m-2s'
+						]
+					],
+					'column_error' => [
+						'Minimum time period to display is 1 minute.'
+					]
+				]
+			],
+			// #11 Error when time period between "From" and "To" fields is > 730 days (731 days in case of leap year).
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Incorrect time period'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Advanced configuration' => true,
+							'Aggregation function' => 'count',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-3y-25h',
+							'id:time_period_to' => 'now-1y'
+						]
+					],
+					'column_error' => [
+						'Maximum time period to display is {days} days.'
+					],
+					'days_count' => true
+				]
+			],
+			// #12 Error when both time period selectors have invalid values.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Both time selectors have invalid values'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Advanced configuration' => true,
+							'Aggregation function' => 'sum',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'a',
+							'id:time_period_to' => 'b'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/From": a time is expected.',
+						'Invalid parameter "/1/To": a time is expected.'
+					]
+				]
+			],
+			// #13 Error when both time period selectors are empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Both time selectors have invalid values'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Advanced configuration' => true,
+							'Aggregation function' => 'first',
+							'Time period' => 'Custom',
+							'id:time_period_from' => '',
+							'id:time_period_to' => ''
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/From": cannot be empty.',
+						'Invalid parameter "/1/To": cannot be empty.'
+					]
+				]
+			],
+			// #14 Error when widget field is empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Widget field is empty'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Advanced configuration' => true,
+							'Aggregation function' => 'last',
+							'Time period' => 'Widget'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/Widget": cannot be empty.'
+					]
+				]
+			],
+			/**
+			 * TODO: At the moment error handling is inconsistent for column fields. Uncomment or replace expected column
+			 *  error(s) after the DEV-3951 fix.
+			 */
+			// #15 Error when Sparkline time period "From" is below minimum time period.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Incorrect Sparkline time period'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_time_period_from' => 'now-58s'
+						]
+					],
+					'column_error' => [
+						'Minimum time period to display is 1 minute.'
+//						'Invalid parameter "/1/sparkline/time_period/from": minimum time period to display is 1 minute.'
+					]
+				]
+			],
+			// #16 Error when sparkline time period "From" is above maximum time period.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Incorrect Sparkline time period'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_time_period_from' => 'now-2y-2s'
+						]
+					],
+					'column_error' => [
+						'Maximum time period to display is {days} days.'
+//						'Invalid parameter "/1/sparkline/time_period/from": maximum time period to display is {days} days.'
+					],
+					'days_count' => true
+				]
+			],
+			// #17 Error when sparkline time period "To" is below minimum time period.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Incorrect Sparkline time period'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_time_period_to' => 'now-59m-2s'
+						]
+					],
+					'column_error' => [
+						'Minimum time period to display is 1 minute.'
+//						'Invalid parameter "/1/sparkline/time_period/to": minimum time period to display is 1 minute.'
+					]
+				]
+			],
+			// #18 Error when sparkline time period between "From" and "To" fields is > 730 days (731 days in case of leap year).
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Incorrect Sparkline time period'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_time_period_from' => 'now-3y-25h',
+							'id:sparkline_time_period_to' => 'now-1y'
+						]
+					],
+					'column_error' => [
+						'Maximum time period to display is {days} days.'
+//						'Invalid parameter "/1/sparkline/time_period/from": maximum time period to display is {days} days.'
+					],
+					'days_count' => true
+				]
+			],
+			// #19 Error when sparkline time period fields 'From' and 'To' are empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Incorrect Sparkline time period'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_time_period_from' => '',
+							'id:sparkline_time_period_to' => ''
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "Time period/From": cannot be empty.',
+						'Invalid parameter "Time period/To": cannot be empty.'
+//						'Invalid parameter "/1/sparkline/time_period/from": cannot be empty.',
+//						'Invalid parameter "/1/sparkline/time_period/to": cannot be empty.'
+					]
+				]
+			],
+			// #20 Error when sparkline time period fields 'From' and 'To' with invalid value.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Incorrect Sparkline time period'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_time_period_from' => '!',
+							'id:sparkline_time_period_to' => '@'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "Time period/From": a time is expected.',
+						'Invalid parameter "Time period/To": a time is expected.'
+//						'Invalid parameter "/1/sparkline/time_period/from": a time is expected.',
+//						'Invalid parameter "/1/sparkline/time_period/to": a time is expected.'
+					]
+				]
+			],
+			// #21 Error when sparkline widget field is empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Widget field is empty'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_time_period_data_source' => 'Widget'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "Time period/Widget": cannot be empty.'
+//						'Invalid parameter "/1/sparkline/time_period/widget": cannot be empty.'
+					]
+				]
+			],
+			// #22 Error when invalid colour is picked for sparkline charts.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Invalid sparkline colour'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Display' => 'Sparkline',
+							'Item name' => 'Available memory',
+							'xpath:.//input[@id="sparkline_color"]/..' => '!@#$%^'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "Colour": a hexadecimal colour code (6 symbols) is expected.'
+//						'Invalid parameter "/1/sparkline/sparkline_color": a hexadecimal colour code (6 symbols) is expected.'
+					]
+				]
+			],
+			// #23 Error when colour picker is empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Invalid sparkline colour picker is empty'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Display' => 'Sparkline',
+							'Item name' => 'Available memory',
+							'xpath:.//input[@id="sparkline_color"]/..' => ''
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "Colour": cannot be empty.'
+//						'Invalid parameter "/1/sparkline/sparkline_color": cannot be empty.'
+					]
+				]
+			],
+			// #24 Error when incorrect min value added.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Incorrect min value'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Bar',
+							'Min' => 'zzz'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/min": a number is expected.'
+					]
+				]
+			],
+			// #25 Error when incorrect max value added.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Incorrect max value'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Bar',
+							'Max' => 'zzz'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/max": a number is expected.'
+					]
+				]
+			],
+			// #26 Color error in item column.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Error in item column color'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Base colour' => '!@#$%^'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/base_color": a hexadecimal colour code (6 symbols) is expected.'
+					]
+				]
+			],
+			// #27 Color error when incorrect hexadecimal added in first threshold.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Error in item column threshold color'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Thresholds' => [
+								[
+									'threshold' => '1',
+									'color' => '!@#$%^'
+								]
+							]
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/thresholds/1/color": a hexadecimal colour code (6 symbols) is expected.'
+					]
+				]
+			],
+			// #28 Color error when incorrect hexadecimal added in second threshold.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Error in item column second threshold color'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Thresholds' => [
+								[
+									'threshold' => '1',
+									'color' => '4000FF'
+								],
+								[
+									'threshold' => '2',
+									'color' => '!@#$%^'
+								]
+							]
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/thresholds/2/color": a hexadecimal colour code (6 symbols) is expected.'
+					]
+				]
+			],
+			// #29 Error message when incorrect value added to threshold.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Error in item column second threshold color'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Thresholds' => [
+								[
+									'threshold' => 'zzz',
+									'color' => '4000FF'
+								]
+							]
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/thresholds/1/threshold": a number is expected.'
+					]
+				]
+			],
+			// #30 Minimum needed values to create and submit widget.
 			[
 				[
 					'main_fields' => [],
@@ -444,7 +1179,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #1 All fields filled for main form with all tags.
+			// #31 All fields filled for main form with all tags.
 			[
 				[
 					'main_fields' => [
@@ -473,7 +1208,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #2 Change order column for several items.
+			// #32 Change order column for several items.
 			[
 				[
 					'main_fields' => [
@@ -494,7 +1229,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #3 Several item columns with different Aggregation function and custom "From" time period.
+			// #33 Several item columns with different Aggregation function and custom "From" time period.
 			[
 				[
 					'main_fields' => [
@@ -568,7 +1303,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'screenshot' => true
 				]
 			],
-			// #4 Several item columns with different display, custom "From" time period, min/max and history data.
+			// #34 Several item columns with different display, custom "From" time period, min/max and history data.
 			[
 				[
 					'main_fields' => [
@@ -661,7 +1396,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #5 Add column with different Base color.
+			// #35 Add column with different Base color.
 			[
 				[
 					'main_fields' => [
@@ -677,7 +1412,85 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #6 Add column with Threshold without color change.
+			// #36 Add sparkline columns with custom configuration.
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Sparkline columns with custom configuration'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'Sparkline_0',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_width' => '😅',
+							'id:sparkline_fill' => '-1',
+							'id:sparkline_history' => 'Trends'
+						],
+						[
+							'Name' => 'Sparkline_1',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_width' => '0',
+							'id:sparkline_fill' => '10',
+							'xpath:.//input[@id="sparkline_color"]/..' => 'BF00FF',
+							'id:sparkline_time_period_from' => 'now-33m-33s',
+							'id:sparkline_time_period_to' => 'now-32m-33s',
+							'id:sparkline_history' => 'Auto'
+						],
+						[
+							'Name' => 'Sparkline_2',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_width' => '10',
+							'id:sparkline_fill' => '0',
+							'xpath:.//input[@id="sparkline_color"]/..' => '000000',
+							'id:sparkline_time_period_from' => 'now-2y',
+							'id:sparkline_time_period_to' => 'now-1y',
+							'id:sparkline_history' => 'History'
+						],
+						[
+							'Name' => 'Sparkline_3',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_width' => '0',
+							'id:sparkline_fill' => '0',
+							'xpath:.//input[@id="sparkline_color"]/..' => 'FFBF00',
+							'id:sparkline_time_period_from' => 'now-2h',
+							'id:sparkline_time_period_to' => 'now-1h',
+							'id:sparkline_history' => 'Trends'
+						],
+						[
+							'Name' => 'Sparkline_4',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_width' => '10',
+							'id:sparkline_fill' => '10',
+							'xpath:.//input[@id="sparkline_color"]/..' => 'BFFF00',
+							'id:sparkline_time_period_data_source' => 'Widget',
+							'xpath:.//div[@id="sparkline_time_period_reference"]/..' => 'Graph (classic) for time period '.
+								'check via widget'
+						],
+						[
+							'Name' => 'Sparkline_5',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_width' => '5',
+							'id:sparkline_fill' => '5',
+							'xpath:.//input[@id="sparkline_color"]/..' => '558B2F',
+							'id:sparkline_time_period_data_source' => 'Dashboard'
+						]
+					],
+					'replace' => true
+				]
+			],
+			// #37 Add column with Threshold without color change.
 			[
 				[
 					'main_fields' => [
@@ -697,7 +1510,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #7 Add several columns with Threshold without color change.
+			// #38 Add several columns with Threshold without color change.
 			[
 				[
 					'main_fields' => [
@@ -723,7 +1536,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #8 Add several columns with Threshold with color change and without color.
+			// #39 Add several columns with Threshold with color change and without color.
 			[
 				[
 					'main_fields' => [
@@ -756,7 +1569,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #9 Add Host name columns.
+			// #40 Add Host name columns.
 			[
 				[
 					'main_fields' => [
@@ -780,7 +1593,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #10 Add Text columns.
+			// #41 Add Text columns.
 			[
 				[
 					'main_fields' => [
@@ -811,551 +1624,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #11 Error message adding widget without any column.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Widget without columns'
-					],
-					'main_error' => [
-						'Invalid parameter "Columns": cannot be empty.',
-						'Invalid parameter "Order by": an integer is expected.'
-					]
-				]
-			],
-			// #12 error message adding widget without item column.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Widget without item column name'
-					],
-					'column_fields' => [
-						[
-							'Data' => 'Host name'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/name": cannot be empty.'
-					]
-				]
-			],
-			// #13 Add characters in host limit field.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Host limit error with item column',
-						'Host limit' => 'zzz'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory'
-						]
-					],
-					'main_error' => [
-						'Invalid parameter "Host limit": value must be one of 1-1000.'
-					]
-				]
-			],
-			// #14 Add incorrect value to host limit field without item column.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Host limit error without item column',
-						'Host limit' => '3333'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Host name'
-						]
-					],
-					'main_error' => [
-						'Invalid parameter "Host limit": value must be one of 1-1000.'
-					]
-				]
-			],
-			// #15 Color error in host name column.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Color error in Host name column'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Host name',
-							'Base colour' => '!@#$%^'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/base_color": a hexadecimal colour code (6 symbols) is expected.'
-					]
-				]
-			],
-			// #16 Check error adding text column without any value.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Error in empty text column'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Text'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/text": cannot be empty.'
-					]
-				]
-			],
-			// #17 Color error in text column.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Error in text column color'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Text',
-							'Text' => 'Here is some text',
-							'Base colour' => '!@#$%^'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/base_color": a hexadecimal colour code (6 symbols) is expected.'
-					]
-				]
-			],
-			// #18 Error when there is no item in item column.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Error without item in item column'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/item": cannot be empty.'
-					]
-				]
-			],
-			// #19 Error when time period "From" is below minimum time period.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Incorrect time period'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Advanced configuration' => true,
-							'Aggregation function' => 'min',
-							'Time period' => 'Custom',
-							'id:time_period_from' => 'now-58s'
-						]
-					],
-					'column_error' => [
-						'Minimum time period to display is 1 minute.'
-					]
-				]
-			],
-			// #20 Error when time period "From" is above maximum time period.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Maximum time period in From field'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Advanced configuration' => true,
-							'Aggregation function' => 'max',
-							'Time period' => 'Custom',
-							'id:time_period_from' => 'now-2y-2s'
-						]
-					],
-					'column_error' => [
-						'Maximum time period to display is {days} days.'
-					],
-					'days_count' => true
-				]
-			],
-			// #21 Error when time period "From" is empty.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'From field is empty'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Advanced configuration' => true,
-							'Aggregation function' => 'avg',
-							'Time period' => 'Custom',
-							'id:time_period_from' => ''
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/From": cannot be empty.'
-					]
-				]
-			],
-			// #22 Incorrect value in "From" field.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'From field is with incorrect value'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Advanced configuration' => true,
-							'Aggregation function' => 'count',
-							'Time period' => 'Custom',
-							'id:time_period_from' => 'a'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/From": a time is expected.'
-					]
-				]
-			],
-			// #23 Error when time period "To" is below minimum time period.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Incorrect time period'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Advanced configuration' => true,
-							'Aggregation function' => 'sum',
-							'Time period' => 'Custom',
-							'id:time_period_to' => 'now-59m-2s'
-						]
-					],
-					'column_error' => [
-						'Minimum time period to display is 1 minute.'
-					]
-				]
-			],
-			// #24 Error when time period between "From" and "To" fields is > 730 days (731 days in case of leap year).
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Incorrect time period'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Advanced configuration' => true,
-							'Aggregation function' => 'first',
-							'Time period' => 'Custom',
-							'id:time_period_from' => 'now-3y-25h',
-							'id:time_period_to' => 'now-1y'
-						]
-					],
-					'column_error' => [
-						'Maximum time period to display is {days} days.'
-					],
-					'days_count' => true
-				]
-			],
-			// #25 Error when time period "To" is empty.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'To field is empty'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Advanced configuration' => true,
-							'Aggregation function' => 'last',
-							'Time period' => 'Custom',
-							'id:time_period_to' => ''
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/To": cannot be empty.'
-					]
-				]
-			],
-			// #26 Incorrect value passed in "To" field.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'To field is with incorrect value'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Advanced configuration' => true,
-							'Aggregation function' => 'sum',
-							'Time period' => 'Custom',
-							'id:time_period_to' => 'b'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/To": a time is expected.'
-					]
-				]
-			],
-			// #27 Error when both time period selectors have invalid values.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Both time selectors have invalid values'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Advanced configuration' => true,
-							'Aggregation function' => 'sum',
-							'Time period' => 'Custom',
-							'id:time_period_from' => 'b',
-							'id:time_period_to' => 'b'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/From": a time is expected.',
-						'Invalid parameter "/1/To": a time is expected.'
-					]
-				]
-			],
-			// #28 Error when both time period selectors are empty.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Both time selectors have invalid values'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Advanced configuration' => true,
-							'Aggregation function' => 'sum',
-							'Time period' => 'Custom',
-							'id:time_period_from' => '',
-							'id:time_period_to' => ''
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/From": cannot be empty.',
-						'Invalid parameter "/1/To": cannot be empty.'
-					]
-				]
-			],
-			// #29 Error when widget field is empty.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Both time selectors have invalid values'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Advanced configuration' => true,
-							'Aggregation function' => 'sum',
-							'Time period' => 'Widget'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/Widget": cannot be empty.'
-					]
-				]
-			],
-			// #30 Error when incorrect min value added.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Incorrect min value'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Display' => 'Bar',
-							'Min' => 'zzz'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/min": a number is expected.'
-					]
-				]
-			],
-			// #31 Error when incorrect max value added.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Incorrect max value'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Display' => 'Bar',
-							'Max' => 'zzz'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/max": a number is expected.'
-					]
-				]
-			],
-			// #32 Color error in item column.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Error in item column color'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Base colour' => '!@#$%^'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/base_color": a hexadecimal colour code (6 symbols) is expected.'
-					]
-				]
-			],
-			// #33 Color error when incorrect hexadecimal added in first threshold.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Error in item column threshold color'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Thresholds' => [
-								[
-									'threshold' => '1',
-									'color' => '!@#$%^'
-								]
-							]
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/thresholds/1/color": a hexadecimal colour code (6 symbols) is expected.'
-					]
-				]
-			],
-			// #34 Color error when incorrect hexadecimal added in second threshold.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Error in item column second threshold color'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Thresholds' => [
-								[
-									'threshold' => '1',
-									'color' => '4000FF'
-								],
-								[
-									'threshold' => '2',
-									'color' => '!@#$%^'
-								]
-							]
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/thresholds/2/color": a hexadecimal colour code (6 symbols) is expected.'
-					]
-				]
-			],
-			// #35 Error message when incorrect value added to threshold.
-			[
-				[
-					'expected' => TEST_BAD,
-					'main_fields' => [
-						'Name' => 'Error in item column second threshold color'
-					],
-					'column_fields' => [
-						[
-							'Name' => 'test name',
-							'Data' => 'Item value',
-							'Item name' => 'Available memory',
-							'Thresholds' => [
-								[
-									'threshold' => 'zzz',
-									'color' => '4000FF'
-								]
-							]
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/thresholds/1/threshold": a number is expected.'
-					]
-				]
-			],
-			// #36 Spaces in fields' values.
+			// #42 Spaces in input fields.
 			[
 				[
 					'trim' => true,
@@ -1379,7 +1648,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Base colour' => '0040FF'
 						],
 						[
-							'Name' => '     Text column name with spaces 3     ',
+							'Name' => '     🦉Text column name with spaces 3     ',
 							'Data' => 'Item value',
 							'Item name' => 'Available memory',
 							'Advanced configuration' => true,
@@ -1397,11 +1666,22 @@ class testDashboardTopHostsWidget extends testWidgets {
 								]
 							],
 							'History data' => 'Trends'
+						],
+						[
+							'Name' => '     Text column name with spaces 4🦉     ',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_width' => ' 0',
+							'id:sparkline_fill' => ' 5',
+							'id:sparkline_time_period_from' => '         now-2m         ',
+							'id:sparkline_time_period_to' => '         now-1m         ',
+							'id:sparkline_history' => 'Trends'
 						]
 					]
 				]
 			],
-			// #37 User macros in fields' values.
+			// #43 User macros in input fields.
 			[
 				[
 					'main_fields' => [
@@ -1429,7 +1709,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #38 Global macros in fields' values.
+			// #44 Global macros in input fields.
 			[
 				[
 					'main_fields' => [
@@ -1495,6 +1775,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 		// Trim trailing and leading spaces in expected values before comparison.
 		if (CTestArrayHelper::get($data, 'trim', false)) {
 			$data = CTestArrayHelper::trim($data);
+		}
+
+		// Sparkline 'Width' and 'Fill' values are replaced by 0 when invalid data is passed.
+		if (array_key_exists('replace', $data)) {
+			$data['column_fields'][0]['id:sparkline_width'] = '0';
+			$data['column_fields'][0]['id:sparkline_fill'] = '0';
 		}
 
 		// Check error message in main widget form.
@@ -1656,43 +1942,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'days_count' => true
 				]
 			],
-			// #6 Empty "From" field.
-			[
-				[
-					'expected' => TEST_BAD,
-					'column_fields' => [
-						[
-							'Data' => 'Item value',
-							'Advanced configuration' => true,
-							'Aggregation function' => 'avg',
-							'Time period' => 'Custom',
-							'id:time_period_from' => ''
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/From": cannot be empty.'
-					]
-				]
-			],
-			// #7 Error when time period "From" is invalid.
-			[
-				[
-					'expected' => TEST_BAD,
-					'column_fields' => [
-						[
-							'Data' => 'Item value',
-							'Advanced configuration' => true,
-							'Aggregation function' => 'count',
-							'Time period' => 'Custom',
-							'id:time_period_from' => 'a'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/From": a time is expected.'
-					]
-				]
-			],
-			// #8 Error when time period "To" is below minimum time period.
+			// #6 Error when time period "To" is below minimum time period.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1710,7 +1960,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #9 Error when time period between "From" and "To" fields is > 730 days (731 days in case of leap year).
+			// #7 Error when time period between "From" and "To" fields is > 730 days (731 days in case of leap year).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1730,43 +1980,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'days_count' => true
 				]
 			],
-			// #10 Error when time period "To" is empty.
-			[
-				[
-					'expected' => TEST_BAD,
-					'column_fields' => [
-						[
-							'Data' => 'Item value',
-							'Advanced configuration' => true,
-							'Aggregation function' => 'sum',
-							'Time period' => 'Custom',
-							'id:time_period_to' => ''
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/To": cannot be empty.'
-					]
-				]
-			],
-			// #11 Error when time period "To" is invalid.
-			[
-				[
-					'expected' => TEST_BAD,
-					'column_fields' => [
-						[
-							'Data' => 'Item value',
-							'Advanced configuration' => true,
-							'Aggregation function' => 'sum',
-							'Time period' => 'Custom',
-							'id:time_period_to' => 'b'
-						]
-					],
-					'column_error' => [
-						'Invalid parameter "/1/To": a time is expected.'
-					]
-				]
-			],
-			// #12 Error when both time period selectors have invalid values.
+			// #8 Error when both time period selectors have invalid values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1786,7 +2000,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #13 Error when both time period selectors are empty.
+			// #9 Error when both time period selectors are empty.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1806,7 +2020,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #14 Error when widget field is empty.
+			// #10 Error when widget field is empty.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1823,7 +2037,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #15 No item error in column.
+			// #11 No item error in column.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1838,7 +2052,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #16 Incorrect base color.
+			// #12 Incorrect base color.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1854,7 +2068,191 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #17 Update all main fields.
+			/**
+			 * TODO: At the moment error handling is inconsistent for column fields. Uncomment or replace expected column
+			 *  error(s) after the DEV-3951 fix.
+			 */
+			// #13 Error when Sparkline time period "From" is below minimum time period.
+			[
+				[
+					'expected' => TEST_BAD,
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_time_period_from' => 'now-58s'
+						]
+					],
+					'column_error' => [
+						'Minimum time period to display is 1 minute.'
+//						'Invalid parameter "/1/sparkline/time_period/from": minimum time period to display is 1 minute.'
+					]
+				]
+			],
+			// #14 Error when sparkline time period "From" is above maximum time period.
+			[
+				[
+					'expected' => TEST_BAD,
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_time_period_from' => 'now-2y-2s'
+						]
+					],
+					'column_error' => [
+						'Maximum time period to display is {days} days.'
+//						'Invalid parameter "/1/sparkline/time_period/from": maximum time period to display is {days} days.'
+					],
+					'days_count' => true
+				]
+			],
+			// #15 Error when sparkline time period "To" is below minimum time period.
+			[
+				[
+					'expected' => TEST_BAD,
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_time_period_to' => 'now-59m-2s'
+						]
+					],
+					'column_error' => [
+						'Minimum time period to display is 1 minute.'
+//						'Invalid parameter "/1/sparkline/time_period/to": minimum time period to display is 1 minute.'
+					]
+				]
+			],
+			// #16 Error when sparkline time period between "From" and "To" fields is > 730 days (731 days in case of leap year).
+			[
+				[
+					'expected' => TEST_BAD,
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_time_period_from' => 'now-3y-25h',
+							'id:sparkline_time_period_to' => 'now-1y'
+						]
+					],
+					'column_error' => [
+						'Maximum time period to display is {days} days.'
+//						'Invalid parameter "/1/sparkline/time_period/from": maximum time period to display is {days} days.'
+					],
+					'days_count' => true
+				]
+			],
+			// #17 Error when sparkline time period From/To are empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_time_period_from' => '',
+							'id:sparkline_time_period_to' => ''
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "Time period/From": cannot be empty.',
+						'Invalid parameter "Time period/To": cannot be empty.'
+//						'Invalid parameter "/1/sparkline/time_period/from": cannot be empty.',
+//						'Invalid parameter "/1/sparkline/time_period/to": cannot be empty.'
+					]
+				]
+			],
+			// #18 Error when sparkline time period From/To with invalid value.
+			[
+				[
+					'expected' => TEST_BAD,
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_time_period_from' => '!',
+							'id:sparkline_time_period_to' => '@'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "Time period/From": a time is expected.',
+						'Invalid parameter "Time period/To": a time is expected.'
+//						'Invalid parameter "/1/sparkline/time_period/from": a time is expected.',
+//						'Invalid parameter "/1/sparkline/time_period/to": a time is expected.'
+					]
+				]
+			],
+			// #19 Error when sparkline widget field is empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_time_period_data_source' => 'Widget'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "Time period/Widget": cannot be empty.'
+//						'Invalid parameter "/1/sparkline/time_period/widget": cannot be empty.'
+					]
+				]
+			],
+			// #20 Error when invalid colour is picked for sparkline charts.
+			[
+				[
+					'expected' => TEST_BAD,
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Display' => 'Sparkline',
+							'Item name' => 'Available memory',
+							'xpath:.//input[@id="sparkline_color"]/..' => '!@#$%^'
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "Colour": a hexadecimal colour code (6 symbols) is expected.'
+//						'Invalid parameter "/1/sparkline/sparkline_color": a hexadecimal colour code (6 symbols) is expected.'
+					]
+				]
+			],
+			// #21 Error when colour picker is empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'column_fields' => [
+						[
+							'Name' => 'test name',
+							'Data' => 'Item value',
+							'Display' => 'Sparkline',
+							'Item name' => 'Available memory',
+							'xpath:.//input[@id="sparkline_color"]/..' => ''
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "Colour": cannot be empty.'
+//						'Invalid parameter "/1/sparkline/sparkline_color": cannot be empty.'
+					]
+				]
+			],
+			// #22 Update all main fields.
 			[
 				[
 					'main_fields' => [
@@ -1869,7 +2267,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #18 Update first item column to Text column and add some values.
+			// #23 Update first item column to Text column and add some values.
 			[
 				[
 					'main_fields' => [
@@ -1886,7 +2284,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #19 Update first column to Host name column and add some values.
+			// #24 Update first column to Host name column and add some values.
 			[
 				[
 					'main_fields' => [
@@ -1901,7 +2299,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #20 Update first column to Item column and check time From/To.
+			// #25 Update first column to Item column and check time From/To.
 			[
 				[
 					'main_fields' => [
@@ -1920,7 +2318,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #21 Update time From/To.
+			// #26 Update time From/To.
 			[
 				[
 					'main_fields' => [
@@ -1939,7 +2337,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #22 Update time From/To (day before yesterday).
+			// #27 Update time From/To (day before yesterday).
 			[
 				[
 					'main_fields' => [
@@ -1958,7 +2356,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #23 Update time From/To.
+			// #28 Update time From/To.
 			[
 				[
 					'main_fields' => [
@@ -1977,7 +2375,60 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #24 Spaces in fields' values.
+			// #29 Update to sparkline fields.
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Sparkline fields'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'Sparkline_0',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_width' => '-1',
+							'id:sparkline_fill' => '',
+							'id:sparkline_history' => 'Auto'
+						],
+						[
+							'Name' => 'Sparkline_1',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_width' => '0',
+							'id:sparkline_fill' => '10',
+							'xpath:.//input[@id="sparkline_color"]/..' => '000000',
+							'id:sparkline_time_period_from' => 'now-1w',
+							'id:sparkline_time_period_to' => 'now-1d'
+						],
+						[
+							'Name' => 'Sparkline_2',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_width' => '10',
+							'id:sparkline_fill' => '0',
+							'id:sparkline_time_period_data_source' => 'Widget',
+							'xpath:.//div[@id="sparkline_time_period_reference"]/..' => 'Graph (classic) for time period '.
+								'check via widget',
+							'id:sparkline_history' => 'Trends'
+						],
+						[
+							'Name' => 'Sparkline_3',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_width' => '10',
+							'id:sparkline_fill' => '10',
+							'id:sparkline_time_period_data_source' => 'Dashboard',
+							'id:sparkline_history' => 'History'
+						]
+					],
+					'replace' => true
+				]
+			],
+			// #30 Spaces in input fields.
 			[
 				[
 					'trim' => true,
@@ -1996,7 +2447,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Base colour' => 'A5D6A7'
 						],
 						[
-							'Name' => '     Text column name with spaces2      ',
+							'Name' => '     🦉Text column name with spaces2      ',
 							'Data' => 'Item value',
 							'Item name' => 'Available memory',
 							'Display' => 'Bar',
@@ -2021,11 +2472,23 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'id:time_period_from' => '  now-2d/d  ',
 							'id:time_period_to' => '  now-2d/d  ',
 							'History data' => 'Trends'
+						],
+						[
+							'Name' => '     Text column name with spaces 3🦉     ',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display' => 'Sparkline',
+							'id:sparkline_width' => ' 0',
+							'id:sparkline_fill' => ' 5',
+							'id:sparkline_time_period_data_source' => 'Custom',
+							'id:sparkline_time_period_from' => '         now-2m         ',
+							'id:sparkline_time_period_to' => '         now-1m         ',
+							'id:sparkline_history' => 'Trends'
 						]
 					]
 				]
 			],
-			// #25 User macros in fields' values.
+			// #31 User macros in input fields.
 			[
 				[
 					'main_fields' => [
@@ -2048,7 +2511,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #26 Global macros in fields' values.
+			// #32 Global macros in input fields.
 			[
 				[
 					'main_fields' => [
@@ -2071,7 +2534,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// #27 Update item column adding new values and fields.
+			// #33 Update item column adding new values and fields.
 			[
 				[
 					'main_fields' => [
@@ -2157,6 +2620,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 		// Trim trailing and leading spaces in expected values before comparison.
 		if (CTestArrayHelper::get($data, 'trim', false)) {
 			$data = CTestArrayHelper::trim($data);
+		}
+
+		// Sparkline 'Width' and 'Fill' values are replaced by 0 when invalid data is passed.
+		if (array_key_exists('replace', $data)) {
+			$data['column_fields'][0]['id:sparkline_width'] = '0';
+			$data['column_fields'][0]['id:sparkline_fill'] = '0';
 		}
 
 		// Check error message in main widget form.
@@ -2425,7 +2894,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 		}
 	}
 
-	public static function getBarScreenshotsData() {
+	public static function getScreenshotsData() {
 		return [
 			// #0 As is.
 			[
@@ -2539,11 +3008,11 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'screen_name' => 'indi_thre'
 				]
 			],
-			// #5 All 5 types visually.
+			// #5 Combined Bar & Indicators.
 			[
 				[
 					'main_fields' => [
-						'Name' => 'All three'
+						'Name' => 'Bars & Indicators'
 					],
 					'column_fields' => [
 						[
@@ -2605,18 +3074,305 @@ class testDashboardTopHostsWidget extends testWidgets {
 							]
 						]
 					],
-					'screen_name' => 'all_types'
+					'screen_name' => 'bar_and_indi'
 				]
-			]
+			],
+			/**
+			 * TODO: Sparkline cases should be uncommented after ZBX-25761 fix.
+			 * TODO: Screenshots should be replaced after ZBX-25744 fix.
+			 */
+			// #6 Sparkline with no fluctuations and custom color.
+//			[
+//				[
+//					'main_fields' => [
+//						'Name' => 'No fluctuations'
+//					],
+//					'column_fields' => [
+//						[
+//							'Name' => 'test column 1',
+//							'Data' => 'Item value',
+//							'Item name' => 'Item with type of information - numeric (unsigned)',
+//							'Display' => 'Sparkline',
+//							'xpath:.//input[@id="sparkline_color"]/..' => 'BFFF00',
+//							'id:sparkline_time_period_from' => '2024-12-15 12:00:00',
+//							'id:sparkline_time_period_to' => '2024-12-15 13:00:00'
+//						]
+//					],
+//					'item_data' => [
+//						[
+//							'value' => '1',
+//							'name' => 'Item with type of information - numeric (unsigned)',
+//							'time' => '2024-12-15 13:00:00'
+//						],
+//						[
+//							'value' => '1',
+//							'name' => 'Item with type of information - numeric (unsigned)',
+//							'time' => '2024-12-15 12:00:00'
+//						]
+//					],
+//					'screen_name' => 'sparkline'
+//				]
+//			],
+			// #7 Sparkline with uptrend and custom color.
+//			[
+//				[
+//					'main_fields' => [
+//						'Name' => 'Uptrend'
+//					],
+//					'column_fields' => [
+//						[
+//							'Name' => 'test column 1',
+//							'Data' => 'Item value',
+//							'Item name' => 'Item with type of information - numeric (unsigned)',
+//							'Display' => 'Sparkline',
+//							'xpath:.//input[@id="sparkline_color"]/..' => 'B2EBF2',
+//							'id:sparkline_time_period_from' => '2024-12-15 12:00:00',
+//							'id:sparkline_time_period_to' => '2024-12-15 13:00:00'
+//						]
+//					],
+//					'item_data' => [
+//						[
+//							'value' => '1',
+//							'name' => 'Item with type of information - numeric (unsigned)',
+//							'time' => '2024-12-15 13:00:00'
+//						],
+//						[
+//							'value' => '0',
+//							'name' => 'Item with type of information - numeric (unsigned)',
+//							'time' => '2024-12-15 12:00:00'
+//						]
+//					],
+//					'screen_name' => 'sparkline_up'
+//				]
+//			],
+			// #8 Sparkline with downtrend and custom color.
+//			[
+//				[
+//					'main_fields' => [
+//						'Name' => 'Downtrend'
+//					],
+//					'column_fields' => [
+//						[
+//							'Name' => 'test column 1',
+//							'Data' => 'Item value',
+//							'Item name' => 'Item with type of information - numeric (unsigned)',
+//							'Display' => 'Sparkline',
+//							'xpath:.//input[@id="sparkline_color"]/..' => 'EF5350',
+//							'id:sparkline_time_period_from' => '2024-12-15 12:00:00',
+//							'id:sparkline_time_period_to' => '2024-12-15 13:00:00'
+//						]
+//					],
+//					'item_data' => [
+//						[
+//							'value' => '0',
+//							'name' => 'Item with type of information - numeric (unsigned)',
+//							'time' => '2024-12-15 13:00:00'
+//						],
+//						[
+//							'value' => '1',
+//							'name' => 'Item with type of information - numeric (unsigned)',
+//							'time' => '2024-12-15 12:00:00'
+//						]
+//					],
+//					'screen_name' => 'sparkline_down'
+//				]
+//			],
+			// #9 'Fill' and 'Width' fields are equal 0.
+//			[
+//				[
+//					'main_fields' => [
+//						'Name' => 'Invisible sparkline'
+//					],
+//					'column_fields' => [
+//						[
+//							'Name' => 'test column 1',
+//							'Data' => 'Item value',
+//							'Item name' => 'Item with type of information - numeric (unsigned)',
+//							'Display' => 'Sparkline',
+//							'id:sparkline_width' => '0',
+//							'id:sparkline_fill' => '0',
+//							'id:sparkline_time_period_from' => '2024-12-15 12:00:00',
+//							'id:sparkline_time_period_to' => '2024-12-15 13:00:00'
+//						]
+//					],
+//					'item_data' => [
+//						[
+//							'value' => '0',
+//							'name' => 'Item with type of information - numeric (unsigned)',
+//							'time' => '2024-12-15 13:00:00'
+//						],
+//						[
+//							'value' => '1',
+//							'name' => 'Item with type of information - numeric (unsigned)',
+//							'time' => '2024-12-15 12:00:00'
+//						]
+//					],
+//					'screen_name' => 'sparkline_transparent'
+//				]
+//			],
+			// #10 Sparkline with fluctuation and default color.
+//			[
+//				[
+//					'main_fields' => [
+//						'Name' => 'With fluctuation'
+//					],
+//					'column_fields' => [
+//						[
+//							'Name' => 'test column 1',
+//							'Data' => 'Item value',
+//							'Item name' => 'Item with type of information - numeric (unsigned)',
+//							'Display' => 'Sparkline',
+//							'id:sparkline_time_period_from' => '2024-12-15 12:00:00',
+//							'id:sparkline_time_period_to' => '2024-12-15 13:00:00'
+//						]
+//					],
+//					'item_data' => [
+//						[
+//							'value' => '1',
+//							'name' => 'Item with type of information - numeric (unsigned)',
+//							'time' => '2024-12-15 13:00:00'
+//						],
+//						[
+//							'value' => '5',
+//							'name' => 'Item with type of information - numeric (unsigned)',
+//							'time' => '2024-12-15 12:30:00'
+//						],
+//						[
+//							'value' => '1',
+//							'name' => 'Item with type of information - numeric (unsigned)',
+//							'time' => '2024-12-15 12:00:00'
+//						]
+//					],
+//					'screen_name' => 'sparkline_fluctuation'
+//				]
+//			],
+			// #11 Sparkline with fluctuations and custom color.
+//			[
+//				[
+//					'main_fields' => [
+//						'Name' => 'With fluctuations'
+//					],
+//					'column_fields' => [
+//						[
+//							'Name' => 'test column 1',
+//							'Data' => 'Item value',
+//							'Item name' => 'Item with type of information - numeric (unsigned)',
+//							'Display' => 'Sparkline',
+//							'xpath:.//input[@id="sparkline_color"]/..' => 'FFBF00',
+//							'id:sparkline_time_period_from' => '2024-12-15 12:00:00',
+//							'id:sparkline_time_period_to' => '2024-12-15 13:00:00'
+//						]
+//					],
+//					'item_data' => [
+//						[
+//							'value' => '10',
+//							'name' => 'Item with type of information - numeric (unsigned)',
+//							'time' => '2024-12-15 13:00:00'
+//						],
+//						[
+//							'value' => '15',
+//							'name' => 'Item with type of information - numeric (unsigned)',
+//							'time' => '2024-12-15 12:50:00'
+//						],
+//						[
+//							'value' => '2',
+//							'name' => 'Item with type of information - numeric (unsigned)',
+//							'time' => '2024-12-15 12:40:00'
+//						],
+//						[
+//							'value' => '7',
+//							'name' => 'Item with type of information - numeric (unsigned)',
+//							'time' => '2024-12-15 12:30:00'
+//						],
+//						[
+//							'value' => '1',
+//							'name' => 'Item with type of information - numeric (unsigned)',
+//							'time' => '2024-12-15 12:20:00'
+//						],
+//						[
+//							'value' => '5',
+//							'name' => 'Item with type of information - numeric (unsigned)',
+//							'time' => '2024-12-15 12:10:00'
+//						],
+//						[
+//							'value' => '0',
+//							'name' => 'Item with type of information - numeric (unsigned)',
+//							'time' => '2024-12-15 12:00:00'
+//						]
+//					],
+//					'screen_name' => 'sparkline_fluctuation2'
+//				]
+//			],
+			// #12 Two sparkline columns.
+//			[
+//				[
+//					'main_fields' => [
+//						'Name' => 'Two sparkline columns'
+//					],
+//					'column_fields' => [
+//						[
+//							'Name' => 'test column 1',
+//							'Data' => 'Item value',
+//							'Item name' => 'Item with type of information - numeric (unsigned)',
+//							'Display' => 'Sparkline',
+//							'xpath:.//input[@id="sparkline_color"]/..' => 'BFFF00',
+//							'id:sparkline_time_period_from' => '2024-12-15 12:00:00',
+//							'id:sparkline_time_period_to' => '2024-12-15 13:00:00'
+//						],
+//						[
+//							'Name' => 'test column 2',
+//							'Data' => 'Item value',
+//							'Item name' => 'Item with type of information - numeric (float)',
+//							'Display' => 'Sparkline',
+//							'xpath:.//input[@id="sparkline_color"]/..' => 'FFBF00'
+//						]
+//					],
+//					'item_data' => [
+//						[
+//							'value' => '1',
+//							'name' => 'Item with type of information - numeric (unsigned)',
+//							'time' => '2024-12-15 13:00:00'
+//						],
+//						[
+//							'value' => '1',
+//							'name' => 'Item with type of information - numeric (unsigned)',
+//							'time' => '2024-12-15 12:00:00'
+//						],
+//						[
+//							'value' => '1.11',
+//							'name' => 'Item with type of information - numeric (float)',
+//							'time' => '2024-12-15 13:00:00'
+//						],
+//						[
+//							'value' => '5.55',
+//							'name' => 'Item with type of information - numeric (float)',
+//							'time' => '2024-12-15 12:30:00'
+//						],
+//						[
+//							'value' => '2.22',
+//							'name' => 'Item with type of information - numeric (float)',
+//							'time' => '2024-12-15 12:00:00'
+//						]
+//					],
+//					'screen_name' => 'sparkline_columns'
+//				]
+//			]
 		];
 	}
 
 	/**
-	 * Check widget bars with screenshots.
+	 * Check widget bars, indicators and sparkline with screenshots.
 	 *
-	 * @dataProvider getBarScreenshotsData
+	 * @backup !history, !history_log, !history_str, !history_text, !history_uint
+	 * @dataProvider getScreenshotsData
 	 */
 	public function testDashboardTopHostsWidget_WidgetAppearance($data) {
+		if (array_key_exists('item_data', $data)) {
+			foreach ($data['item_data'] as $params) {
+				CDataHelper::addItemData(self::$aggregation_itemids[$params['name']], $params['value'], strtotime($params['time']));
+			}
+		}
+
 		$this->createTopHostsWidget($data, self::$dashboardids[self::DASHBOARD_SCREENSHOTS]);
 
 		// Check widget added and assert screenshots.
@@ -2697,7 +3453,25 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'text' => "column1\nNo data found"
 				]
 			],
-			// #4 Text item, Aggregation function max - value not displayed.
+			// #4 Text item, display sparkline - value not displayed.
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Text display sparkline'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'column1',
+							'Data' => 'Item value',
+							'Item name' => 'top_hosts_trap_text',
+							'Display item value as' => 'Numeric',
+							'Display' => 'Sparkline'
+						]
+					],
+					'text' => "column1\nNo data found"
+				]
+			],
+			// #5 Text item, Aggregation function max - value not displayed.
 			[
 				[
 					'main_fields' => [
@@ -2716,7 +3490,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'text' => "column1\nNo data found"
 				]
 			],
-			// #5 Text item, Threshold - value is displayed ignoring thresholds.
+			// #6 Text item, Threshold - value is displayed ignoring thresholds.
 			[
 				[
 					'main_fields' => [
@@ -2738,7 +3512,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'text' => "column1\nText for text item"
 				]
 			],
-			// #6 Log item - value displayed.
+			// #7 Log item - value displayed.
 			[
 				[
 					'main_fields' => [
@@ -2754,7 +3528,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'text' => "column1\nLogs for text item"
 				]
 			],
-			// #7 Log item, history data Trends - value displayed.
+			// #8 Log item, history data Trends - value displayed.
 			[
 				[
 					'main_fields' => [
@@ -2773,7 +3547,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'text' => "column1\nLogs for text item"
 				]
 			],
-			// #8 Log item, display Bar - value not displayed.
+			// #9 Log item, display Bar - value not displayed.
 			[
 				[
 					'main_fields' => [
@@ -2791,7 +3565,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'text' => "column1\nNo data found"
 				]
 			],
-			// #9 Log item, display Indicators - value not displayed.
+			// #10 Log item, display Indicators - value not displayed.
 			[
 				[
 					'main_fields' => [
@@ -2809,7 +3583,25 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'text' => "column1\nNo data found"
 				]
 			],
-			// #10 Log item, Aggregation function max - value not displayed.
+			// #11 Log item, display sparkline - value not displayed.
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Log display sparkline'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'column1',
+							'Data' => 'Item value',
+							'Item name' => 'top_hosts_trap_log',
+							'Display item value as' => 'Numeric',
+							'Display' => 'Sparkline'
+						]
+					],
+					'text' => "column1\nNo data found"
+				]
+			],
+			// #12 Log item, Aggregation function max - value not displayed.
 			[
 				[
 					'main_fields' => [
@@ -2828,7 +3620,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'text' => "column1\nNo data found"
 				]
 			],
-			// #11 Log item, Threshold - value is displayed ignoring thresholds.
+			// #13 Log item, Threshold - value is displayed ignoring thresholds.
 			[
 				[
 					'main_fields' => [
@@ -2850,7 +3642,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'text' => "column1\nLogs for text item"
 				]
 			],
-			// #12 Char item - value displayed.
+			// #14 Char item - value displayed.
 			[
 				[
 					'main_fields' => [
@@ -2866,7 +3658,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'text' => "column1\ncharacters_here"
 				]
 			],
-			// #13 Char item, history data Trends - value displayed.
+			// #15 Char item, history data Trends - value displayed.
 			[
 				[
 					'main_fields' => [
@@ -2885,7 +3677,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'text' => "column1\ncharacters_here"
 				]
 			],
-			// #14 Char item, display Bar - value not displayed.
+			// #16 Char item, display Bar - value not displayed.
 			[
 				[
 					'main_fields' => [
@@ -2903,7 +3695,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'text' => "column1\nNo data found"
 				]
 			],
-			// #15 Char item, display Indicators - value not displayed.
+			// #17 Char item, display Indicators - value not displayed.
 			[
 				[
 					'main_fields' => [
@@ -2921,7 +3713,25 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'text' => "column1\nNo data found"
 				]
 			],
-			// #16 Char item, Aggregation function max - value not displayed.
+			// #18 Char item, display sparkline - value not displayed.
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Char display sparkline'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'column1',
+							'Data' => 'Item value',
+							'Item name' => 'top_hosts_trap_char',
+							'Display item value as' => 'Numeric',
+							'Display' => 'Sparkline'
+						]
+					],
+					'text' => "column1\nNo data found"
+				]
+			],
+			// #19 Char item, Aggregation function max - value not displayed.
 			[
 				[
 					'main_fields' => [
@@ -2940,7 +3750,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'text' => "column1\nNo data found"
 				]
 			],
-			// #17 Char item, Threshold - value is displayed ignoring thresholds.
+			// #20 Char item, Threshold - value is displayed ignoring thresholds.
 			[
 				[
 					'main_fields' => [
@@ -3822,7 +4632,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Thresholds and non-nmeric (Character) item with aggregation function first',
 							'Item name' => 'Item with type of information - Character',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'first',//'max' is not available for text elements, changed to 'first'
+							'Aggregation function' => 'first', //'max' is not available for text elements, changed to 'first'
 							'Highlights' => [
 								['color' => 'D32F2F', 'regexp' => '-1'],
 								['color' => '8BC34A', 'regexp' => '0']
@@ -3842,7 +4652,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Thresholds and non-nmeric (Text) item with aggregation function last',
 							'Item name' => 'Item with type of information - Text',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'last',//'avg' is not available for text elements, changed to 'last'
+							'Aggregation function' => 'last', //'avg' is not available for text elements, changed to 'last'
 							'Highlights' => [
 								['color' => 'D1C4E9', 'regexp' => '1'],
 								['color' => '80CBC4', 'regexp' => '2']
@@ -5551,7 +6361,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 						break;
 
 					case 'color':
-						$this->assertEquals($value,  $form->query($label)->asColorPicker()->one()->getValue());
+						$this->assertEquals($value, $form->query($label)->asColorPicker()->one()->getValue());
 						break;
 				}
 			}
@@ -5562,8 +6372,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 	 * Test function for assuring that binary items are not available in Top hosts widget.
 	 */
 	public function testDashboardTopHostsWidget_CheckAvailableItems() {
-		$this->checkAvailableItems('zabbix.php?action=dashboard.view&dashboardid='
-				.self::$dashboardids[self::DASHBOARD_CREATE], self::DEFAULT_WIDGET_NAME
+		$this->checkAvailableItems('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardids[self::DASHBOARD_CREATE], self::DEFAULT_WIDGET_NAME
 		);
 	}
 

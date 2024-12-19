@@ -311,4 +311,22 @@ class testWidgets extends CWebTest {
 
 		return $db_values;
 	}
+
+	/**
+	 * Assert range input attributes.
+	 *
+	 * @param CFormElement $form               parent form
+	 * @param string       $field              id or label of the range input
+	 * @param array        $expected_values    the attribute values expected
+	 */
+	public function assertRangeSliderParameters($form, $field, $expected_values) {
+		$path = (COverlayDialogElement::find()->one()->asForm()->getField('Type')->getText() == 'Pie chart')
+			? 'xpath:.//'
+			: 'xpath://div/';
+		$range = $form->getField($field)->query($path.'input[@type="range"]')->one();
+
+		foreach ($expected_values as $attribute => $expected_value) {
+			$this->assertEquals($expected_value, $range->getAttribute($attribute));
+		}
+	}
 }

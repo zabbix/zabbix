@@ -59,7 +59,7 @@ class TopHostsWidget {
 				'auto_start' => 1,
 				'pages' => [
 					[
-						'name' => '',
+						'name' => 'UPDATE SCENARIO',
 						'widgets' => [
 							[
 								'type' => 'tophosts',
@@ -162,8 +162,68 @@ class TopHostsWidget {
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.2.name',
+										'value' => 'test update column 3'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.2.data',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.2.item',
+										'value' => 'Available memory'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.3.name',
+										'value' => 'test update column 4'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'columns.3.data',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'columns.3.item',
+										'value' => 'Available memory'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'reference',
 										'value' => 'EDTTA'
+									]
+								]
+							],
+							[
+								'type' => 'graph',
+								'name' => 'Graph (classic) for time period check via widget',
+								'x' => 36,
+								'y' => 0,
+								'width' => 36,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
+										'name' => 'graphid.0',
+										'value' => 2232 // Linux: CPU utilization.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.from',
+										'value' => 'now-3h'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.to',
+										'value' => 'now-1h'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'HDTTX'
 									]
 								]
 							]
@@ -175,7 +235,43 @@ class TopHostsWidget {
 				'name' => 'top_host_create',
 				'display_period' => 30,
 				'auto_start' => 1,
-				'pages' => [[]]
+				'pages' => [
+					[
+						'name' => 'CREATE SCENARIO',
+						'widgets' => [
+							[
+								'type' => 'graph',
+								'name' => 'Graph (classic) for time period check via widget',
+								'x' => 0,
+								'y' => 0,
+								'width' => 24,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
+										'name' => 'graphid.0',
+										'value' => 2232 // Linux: CPU utilization.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.from',
+										'value' => 'now-3h'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.to',
+										'value' => 'now-1h'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'EDTHX'
+									]
+								]
+							]
+						]
+					]
+				]
 			],
 			[
 				'name' => 'top_host_delete',

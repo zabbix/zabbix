@@ -416,7 +416,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				$form->fill(['Aggregation function' => 'min', 'id:sparkline_time_period_data_source' => 'Custom', 'Time period' => 'Custom']);
 				$this->assertEquals(['Item', 'Show', 'Description', 'From', 'To'], $form->getRequiredLabels());
 
-				foreach (['time_period_from', 'time_period_to'] as $element) {
+				foreach (['sparkline_time_period_from', 'sparkline_time_period_to'] as $element) {
 					$this->assertTrue($form->query('xpath:.//label[@for="'.$element.'"]')->one()->hasClass('form-label-asterisk'));
 				}
 
@@ -470,21 +470,6 @@ class testDashboardItemValueWidget extends testWidgets {
 		$dialog_count = $dialogs->count();
 		for ($i = $dialog_count - 1; $i >= 0; $i--) {
 			$dialogs->get($i)->close(true);
-		}
-	}
-
-	/**
-	 * Assert range input attributes.
-	 *
-	 * @param CFormElement $form               parent form
-	 * @param string       $id                 id of the range input
-	 * @param array        $expected_values    the attribute values expected
-	 */
-	protected function assertRangeSliderParameters($form, $id, $expected_values) {
-		$range = $form->getField($id)->query('xpath://div/input[@type="range"]')->one();
-
-		foreach ($expected_values as $attribute => $expected_value) {
-			$this->assertEquals($expected_value, $range->getAttribute($attribute));
 		}
 	}
 

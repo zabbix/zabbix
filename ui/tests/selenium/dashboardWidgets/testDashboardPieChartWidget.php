@@ -1344,21 +1344,6 @@ class testDashboardPieChartWidget extends testWidgets {
 	}
 
 	/**
-	 * Asserts range input attributes.
-	 *
-	 * @param CFormElement $form               parent form
-	 * @param string       $label              label of the range input
-	 * @param array        $expected_values    the attribute values expected
-	 */
-	protected function assertRangeSliderParameters($form, $label, $expected_values) {
-		$range = $form->getField($label)->query('xpath:.//input[@type="range"]')->one();
-
-		foreach ($expected_values as $attribute => $expected_value) {
-			$this->assertEquals($expected_value, $range->getAttribute($attribute));
-		}
-	}
-
-	/**
 	 * Asserts that data is saved and displayed as expected in the edit form.
 	 *
 	 * @param CDashboardElement $dashboard    dashboard element
