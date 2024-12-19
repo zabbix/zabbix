@@ -400,7 +400,6 @@ var hintBox = {
 					width: '',
 					height: '',
 					top: '',
-					right: '',
 					left: ''
 				});
 
@@ -590,75 +589,93 @@ var hintBox = {
 	},
 
 	positionElement: function(e, target, $elem) {
-		if (e.clientX) {
-			target.clientX = e.clientX;
-			target.clientY = e.clientY;
-		}
+		const hint = $elem[0];
+		const host = hint.offsetParent;
+		const host_rect = host.getBoundingClientRect();
+		const event_offset = 10;
+		const css = {
+			width: null,
+			height: null,
+			top: null,
+			left: null
+		};
 
-		var $host = $elem.offsetParent(),
-			host_offset = $host.offset(),
-			// Usable area relative to host.
-			host_x_min = $host.scrollLeft(),
-			host_x_max = Math.min($host[0].scrollWidth,
-				$(window).width() + $(window).scrollLeft() - host_offset.left + $host.scrollLeft()
-			) - 1,
-			host_y_min = $host.scrollTop(),
-			host_y_max = Math.min($host[0].scrollHeight,
-				$(window).height() + $(window).scrollTop() - host_offset.top + $host.scrollTop()
-			) - 1,
-			// Event coordinates relative to host.
-			event_x = target.clientX - host_offset.left + $host.scrollLeft(),
-			event_y = target.clientY - host_offset.top + $host.scrollTop(),
-			event_offset = 10,
-			// Hint box width and height.
-			hint_width = $elem.outerWidth(),
-			hint_height = $elem.outerHeight(),
-			/*
-				Fix popup width and height since browsers will tend to reduce the size of the popup, if positioned further
-				than the width of window when horizontal scrolling is active.
-			*/
-			css = {
-				width: null,
-				height: null,
-				top: null,
-				right: null,
-				left: null
-			};
+		const resetPosition = () => {
+			Object.keys(css).forEach(key => {
+				css[key] = null;
+				hint.style[key] = null;
+			});
+		};
 
-		if ($host[0].clientWidth > hint_width) {
-			css.width = Math.ceil($elem.width());
-			css.height = Math.ceil($elem.height());
-		}
+		resetPosition();
 
-		if (event_x + event_offset + hint_width <= host_x_max) {
-			css.left = event_x + event_offset;
-		}
-		else {
-			css.right = -$host.scrollLeft() || 0;
-		}
+		let host_client_width = host.clientWidth;
+		let host_client_height = host.clientHeight;
 
-		if (event_y + event_offset + hint_height <= host_y_max) {
-			css.top = event_y + event_offset;
-		}
-		else if (event_y - event_offset - hint_height >= host_y_min) {
-			css.top = event_y - event_offset - hint_height;
-		}
-		else {
-			css.top = Math.max(host_y_min, Math.min(host_y_max - hint_height, event_y + event_offset));
-
-			if (css.right !== null) {
-				css.right = null;
-
-				css.left = ((event_x - event_offset - hint_width >= host_x_min)
-					? event_x - event_offset - hint_width
-					: event_x + event_offset
-				);
+		do {
+			// Check if client size has decreased (because of scrollbars).
+			if (host_client_width > host.clientWidth) {
+				host.style.overflowY = 'scroll';
 			}
-		}
+			if (host_client_height > host.clientHeight) {
+				host.style.overflowX = 'scroll';
+			}
 
-		for (const [key, value] of Object.entries(css)) {
-			$elem[0].style[key] = value !== null ? `${value}px` : null;
+			host_client_width = host.clientWidth;
+			host_client_height = host.clientHeight;
+
+			resetPosition();
+
+			const scrollbar_vertical_width = host.offsetWidth - host.clientWidth;
+			const scrollbar_horizontal_height = host.offsetHeight - host.clientHeight;
+
+			// Usable area relative to host.
+			const host_x_min = host.scrollLeft;
+			const host_x_max = Math.min(host.scrollWidth, host_rect.width - scrollbar_vertical_width + host_x_min);
+			const host_y_min = host.scrollTop;
+			const host_y_max = Math.min(host.scrollHeight, host_rect.height - scrollbar_horizontal_height + host_y_min);
+
+			// Hint size.
+			const hint_rect = hint.getBoundingClientRect();
+			const hint_computed_style = getComputedStyle(hint);
+
+			/*
+				Fix popup width and height since browsers will tend to reduce the size of the popup,
+				if positioned further than the width of window when horizontal scrolling is active.
+			*/
+			css.width = Math.ceil(parseFloat(hint_computed_style.width));
+			css.height = Math.ceil(parseFloat(hint_computed_style.height));
+
+			// Event coordinates relative to host.
+			if ((target.event_x === null || target.event_x === undefined) && e.originalEvent.clientX !== undefined) {
+				target.event_x = e.originalEvent.clientX - host_rect.left + host_x_min;
+				target.event_y = e.originalEvent.clientY - host_rect.top + host_y_min;
+			}
+
+			css.left = target.event_x + event_offset + hint_rect.width <= host_x_max
+				? target.event_x + event_offset
+				: host_x_max - hint_rect.width;
+
+			// Hint fits under event.
+			if (target.event_y + event_offset + hint_rect.height <= host_y_max) {
+				css.top = target.event_y + event_offset;
+			}
+			// Hint fits above event.
+			else if (target.event_y - event_offset - hint_rect.height >= host_y_min) {
+				css.top = target.event_y - event_offset - hint_rect.height;
+			}
+			// Hint fits neither under nor above event - then show it under event.
+			else {
+				css.top = target.event_y + event_offset;
+			}
+
+			// Assign css rules to hint.
+			Object.entries(css).forEach(([key, value]) => hint.style[key] = value !== null ? `${value}px` : null);
 		}
+		while (host_client_width > host.clientWidth || host_client_height > host.clientHeight);
+
+		host.style.overflowX = null;
+		host.style.overflowY = null;
 	},
 
 	hideHint: function(target, hideStatic) {
@@ -674,6 +691,9 @@ var hintBox = {
 	},
 
 	deleteHint: function(target, do_focus_target = true) {
+		target.event_x = null;
+		target.event_y = null;
+
 		if (typeof target.hintboxid !== 'undefined') {
 			jQuery(target).removeAttr('data-expanded');
 			removeFromOverlaysStack(target.hintboxid, do_focus_target);
