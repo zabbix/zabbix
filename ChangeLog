@@ -3,6 +3,8 @@ Changes for 6.0.38rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-25373] fixed possibily to insert duplicate triggers via LLD (dgoloscapov)
+....I..... [ZBX-22307] fixed automake templates producing broken Makefiles on OpenBSD (jxl)
 ..F.....S. [ZBX-24916] fixed date/time calculation for numeric (unsigned) item values with unixtime units after the year 2038 (dfofanovs, sboidenko)
 ........S. [ZBX-25363] fixed connector error spam to log (sboidenko)
 ..F....... [ZBX-25206] removed padding in Geomap widget (apoga)
