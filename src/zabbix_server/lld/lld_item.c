@@ -1162,25 +1162,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: reset discovery flags for all dependent item tree                 *
- *                                                                            *
- *****************************************************************************/
-static void	lld_item_update_dep_discovery(zbx_lld_item_full_t *item, zbx_uint64_t reset_flags)
-{
-	if (0 == reset_flags && 0 != (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
-		return;
-
-	for (int i = 0; i < item->dependent_items.values_num; i++)
-	{
-		zbx_lld_item_full_t	*dep = item->dependent_items.values[i];
-
-		dep->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
-		lld_item_update_dep_discovery(item->dependent_items.values[i], ZBX_FLAG_LLD_ITEM_DISCOVERED);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Parameters: hostid            - [IN]                                       *
  *             items             - [IN]                                       *
  *             error             - [OUT] error message                        *
@@ -1410,7 +1391,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_ptr
 
 	/* update discovered flags for dependent items */
 	for (int i = 0; i < items->values_num; i++)
-		lld_item_update_dep_discovery(items->values[i], 0);
+		lld_update_dependent_item_discovery(items->values[i], 0);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -4241,6 +4222,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	zbx_db_begin();
 	lld_items_get(&item_prototypes, &items);
 	zbx_db_commit();
+
 	lld_items_make(&item_prototypes, lld_rows, lld_macro_paths, &items, &items_index, lastcheck, error);
 	lld_items_preproc_make(&item_prototypes, lld_macro_paths, &items);
 	lld_items_param_make(&item_prototypes, lld_macro_paths, &items, error);

@@ -384,6 +384,7 @@ static void	lld_item_node_update_parent(zbx_vector_lld_item_full_ptr_t *items,
 			if (ZBX_DEPENDENT_ITEM_MAX_LEVELS < depth)
 			{
 				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+				lld_update_dependent_item_discovery(item, 0);
 
 				*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": too many dependency levels.\n",
 						(0 != item->itemid ? "update" : "create"), item->key);
@@ -396,6 +397,8 @@ static void	lld_item_node_update_parent(zbx_vector_lld_item_full_ptr_t *items,
 			if (ZBX_DEPENDENT_ITEM_MAX_COUNT < total)
 			{
 				item->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+				lld_update_dependent_item_discovery(item, 0);
+
 				*error = zbx_strdcatf(*error, "Cannot %s item \"%s\": too many dependent items.\n",
 						(0 != item->itemid ? "update" : "create"), item->key);
 				continue;
@@ -467,4 +470,23 @@ void	lld_update_dependent_items_and_validate(zbx_vector_lld_item_full_ptr_t *ite
 	zbx_vector_lld_item_full_ptr_destroy(&moved_items);
 
 	zbx_hashset_destroy(&nodes);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: reset discovery flags for all dependent item tree                 *
+ *                                                                            *
+ *****************************************************************************/
+void	lld_update_dependent_item_discovery(zbx_lld_item_full_t *item, zbx_uint64_t reset_flags)
+{
+	if (0 == reset_flags && 0 != (item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+		return;
+
+	for (int i = 0; i < item->dependent_items.values_num; i++)
+	{
+		zbx_lld_item_full_t	*dep = item->dependent_items.values[i];
+
+		dep->flags &= ~ZBX_FLAG_LLD_ITEM_DISCOVERED;
+		lld_update_dependent_item_discovery(item->dependent_items.values[i], ZBX_FLAG_LLD_ITEM_DISCOVERED);
+	}
 }

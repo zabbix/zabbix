@@ -458,4 +458,6 @@ zbx_lld_item_ref_t;
 void	lld_update_dependent_items_and_validate(zbx_vector_lld_item_full_ptr_t *items,
 		zbx_vector_lld_item_prototype_ptr_t *item_prototypes, zbx_hashset_t *items_index, char **error);
 
+void	lld_update_dependent_item_discovery(zbx_lld_item_full_t *item, zbx_uint64_t reset_flags);
+
 #endif
