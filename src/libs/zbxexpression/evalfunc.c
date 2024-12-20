@@ -15,7 +15,7 @@
 #include "evalfunc.h"
 #include "funcparam.h"
 #include "zbxexpression.h"
-
+#include "zbx_expression_constants.h"
 #include "zbxregexp.h"
 #include "zbxcachevalue.h"
 #include "zbxtrends.h"
@@ -1539,15 +1539,26 @@ static int	evaluate_LASTCLOCK(zbx_variant_t *value, const zbx_dc_evaluate_item_t
 static int	evaluate_LOGTIMESTAMP(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *parameters,
 		const zbx_timespec_t *ts, char **error)
 {
-	int			ret;
+	int			ret = FAIL;
 	zbx_history_record_t	vc_value;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED == (ret = get_last_n_value(item, parameters, ts, &vc_value, error)))
+	if (ITEM_VALUE_TYPE_LOG == item->value_type)
 	{
-		zbx_variant_set_ui64(value, (zbx_uint64_t)vc_value.value.log->timestamp);
-		zbx_history_record_clear(&vc_value, item->value_type);
+		if (SUCCEED == (ret = get_last_n_value(item, parameters, ts, &vc_value, error)))
+		{
+			if (0 != vc_value.value.log->timestamp)
+				zbx_variant_set_ui64(value, (zbx_uint64_t)vc_value.value.log->timestamp);
+			else
+				zbx_variant_set_str(value, zbx_strdup(NULL, STR_UNKNOWN_VARIABLE));
+
+			zbx_history_record_clear(&vc_value, item->value_type);
+		}
+	}
+	else
+	{
+		*error = zbx_strdup(*error, "non-log item type");
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
@@ -3696,19 +3707,19 @@ int	zbx_evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 	{
 		ret = evaluate_CHANGECOUNT(value, item, parameter, ts, error);
 	}
-	else if (0 == strncmp(function, "baseline", 8))
+	else if (0 == strncmp(function, "baseline", ZBX_CONST_STRLEN("baseline")))
 	{
 		ret = evaluate_BASELINE(value, item, function + 8, parameter, ts, error);
 	}
-	else if (0 == strncmp(function, "lastclock", 9))
+	else if (0 == strncmp(function, "lastclock", ZBX_CONST_STRLEN("lastclock")))
 	{
 		ret = evaluate_LASTCLOCK(value, item, parameter, ts, error);
 	}
-	else if (0 == strncmp(function, "logtimestamp", 12))
+	else if (0 == strncmp(function, "logtimestamp", ZBX_CONST_STRLEN("logtimestamp")))
 	{
 		ret = evaluate_LOGTIMESTAMP(value, item, parameter, ts, error);
 	}
-	else if (0 == strncmp(function, "firstclock", 10))
+	else if (0 == strncmp(function, "firstclock", ZBX_CONST_STRLEN("firstclock")))
 	{
 		ret = evaluate_FIRSTCLOCK(value, item, parameter, ts, error);
 	}
