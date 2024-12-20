@@ -22,36 +22,24 @@
 <script>
 	const view = new class {
 		init() {
-			$.subscribe("acknowledge.create", function(event, response) {
-				postMessageOk(response.success.title);
-				location.href = location.href;
-			});
-
-			this.#setSubmitCallback();
+			this.#registerSubscribers();
 		}
 
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				let new_href = location.href;
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
-					}
-
+		#registerSubscribers() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_SUBMIT
+				},
+				callback: ({data}) => {
 					if (data.success.action === 'delete') {
-						// If item or trigger is deleted redirect to problems page.
-						let list_url = new Curl('zabbix.php');
+						const url = new Curl('zabbix.php');
 
-						list_url.setArgument('action', 'problem.view');
-						new_href = list_url.getUrl();
+						url.setArgument('action', 'problem.view');
+
+						ZABBIX.PopupManager.setCurrentUrl(url.getUrl());
 					}
 				}
-
-				location.href = new_href;
 			});
 		}
 	};
