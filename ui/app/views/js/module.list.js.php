@@ -23,7 +23,7 @@
 	const view = new class {
 
 		init() {
-			document.addEventListener('click', (e) => {
+			document.addEventListener('click', e => {
 				if (e.target.classList.contains('js-enable-module')) {
 					this.#enable(e.target, [e.target.dataset.moduleid]);
 				}
@@ -38,7 +38,7 @@
 				}
 			});
 
-			this.#setSubmitCallback();
+			this.#registerSubscribers();
 		}
 
 		#enable(target, moduleids, massenable = false) {
@@ -120,18 +120,15 @@
 				});
 		}
 
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
+		#registerSubscribers() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_SUBMIT
+				},
+				callback: () => {
+					uncheckTableRows('modules');
 				}
-
-				uncheckTableRows('modules');
-				location.href = location.href;
 			});
 		}
 
