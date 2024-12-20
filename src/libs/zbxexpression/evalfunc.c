@@ -15,7 +15,7 @@
 #include "evalfunc.h"
 #include "funcparam.h"
 #include "zbxexpression.h"
-#include "zbx_expression_constants.h"
+
 #include "zbxregexp.h"
 #include "zbxcachevalue.h"
 #include "zbxtrends.h"
@@ -1551,7 +1551,10 @@ static int	evaluate_LOGTIMESTAMP(zbx_variant_t *value, const zbx_dc_evaluate_ite
 			if (0 != vc_value.value.log->timestamp)
 				zbx_variant_set_ui64(value, (zbx_uint64_t)vc_value.value.log->timestamp);
 			else
-				zbx_variant_set_str(value, zbx_strdup(NULL, STR_UNKNOWN_VARIABLE));
+			{
+				*error = zbx_strdup(*error, "invalid timestamp value");
+				ret = FAIL;
+			}
 
 			zbx_history_record_clear(&vc_value, item->value_type);
 		}
