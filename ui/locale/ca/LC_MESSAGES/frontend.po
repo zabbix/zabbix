@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-12-10 20:37+0000\n"
+"PO-Revision-Date: 2024-12-19 18:54+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -22649,7 +22649,7 @@ msgstr "Estat d'energia de la màquina virtual de VMware, \"url\" - URL del serv
 
 #: include/classes/data/CItemData.php:2490
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Mida de memòria privada de la màquina virtual de VMware, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de la màquina virtual de VMware"
 
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
