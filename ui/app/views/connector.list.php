@@ -94,9 +94,7 @@ foreach ($data['connectors'] as $connectorid => $connector) {
 	$row = [
 		new CCheckBox('connectorids['.$connectorid.']', $connectorid),
 		(new CCol(
-			(new CLink($connector['name'], $connector_url))
-				->setAttribute('data-connectorid', $connectorid)
-				->setAttribute('data-action', 'connector.edit')
+			new CLink($connector['name'], $connector_url)
 		))->addClass(ZBX_STYLE_WORDBREAK),
 		$connector['data_type'] == ZBX_CONNECTOR_DATA_TYPE_ITEM_VALUES ? _('Item values') : _('Events'),
 		$status_tag

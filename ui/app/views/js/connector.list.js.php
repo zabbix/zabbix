@@ -24,11 +24,12 @@
 
 		init() {
 			this.#initActions();
+			this.#registerSubscribers();
 		}
 
 		#initActions() {
 			document.querySelector('.js-create-connector').addEventListener('click', () => {
-				window.popupManagerInstance.openPopup('connector.edit', {})
+				ZABBIX.PopupManager.openPopup('connector.edit');
 			});
 
 			const form = document.getElementById('connector-list');
@@ -53,8 +54,18 @@
 			form.querySelector('.js-massdelete-connector').addEventListener('click', (e) => {
 				this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 			});
+		}
 
-			this.#setSubmitCallback();
+		#registerSubscribers() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_SUBMIT
+				},
+				callback: () => {
+					uncheckTableRows('connector');
+				}
+			});
 		}
 
 		#enable(target, connectorids, massenable = false) {
@@ -149,21 +160,6 @@
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
-		}
-
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				uncheckTableRows('connector');
-				location.href = location.href;
-			});
 		}
 	};
 </script>
