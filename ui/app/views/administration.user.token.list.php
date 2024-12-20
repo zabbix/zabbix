@@ -118,10 +118,7 @@ foreach ($data['tokens'] as $token) {
 		->setArgument('admin_mode', 0)
 		->getUrl();
 
-	$name = (new CLink($token['name'], $token_url))
-		->setAttribute('data-tokenid', $token['tokenid'])
-		->setAttribute('data-action', 'token.edit')
-		->setAttribute('data-admin_mode', '0');
+	$name = new CLink($token['name'], $token_url);
 
 	$token_table->addRow([
 		new CCheckBox('tokenids['.$token['tokenid'].']', $token['tokenid']),

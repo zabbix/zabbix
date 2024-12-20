@@ -24,14 +24,14 @@
 
 		init() {
 			this.#initActionButtons();
-			this.#setSubmitCallback();
+			this.#registerSubscribers();
 			this.expiresDaysHandler();
 		}
 
 		#initActionButtons() {
-			document.addEventListener('click', (e) => {
+			document.addEventListener('click', e => {
 				if (e.target.classList.contains('js-create-token')) {
-					window.popupManagerInstance.openPopup('token.edit', {admin_mode: '1'});
+					ZABBIX.PopupManager.openPopup('token.edit', {admin_mode: '1'});
 				}
 				else if (e.target.classList.contains('js-massdelete-token')) {
 					this.#massDeleteToken(e.target, Object.keys(chkbxRange.getSelectedIds()));
@@ -39,11 +39,16 @@
 			});
 		}
 
-		expiresDaysHandler() {
-			const filter_expires_state = document.getElementById('filter-expires-state');
-			const filter_expires_days = document.getElementById('filter-expires-days');
-
-			filter_expires_days.disabled = !filter_expires_state.checked;
+		#registerSubscribers() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.CONTEXT_POPUP,
+					event: CPopupManager.EVENT_SUBMIT
+				},
+				callback: () => {
+					uncheckTableRows('token');
+				}
+			});
 		}
 
 		#massDeleteToken(target, tokenids) {
@@ -103,19 +108,11 @@
 				});
 		}
 
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				if (e.detail && 'success' in e.detail) {
-					postMessageOk(e.detail.success.title);
+		expiresDaysHandler() {
+			const filter_expires_state = document.getElementById('filter-expires-state');
+			const filter_expires_days = document.getElementById('filter-expires-days');
 
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				uncheckTableRows('token');
-				location.href = location.href;
-			});
+			filter_expires_days.disabled = !filter_expires_state.checked;
 		}
 	};
 </script>
