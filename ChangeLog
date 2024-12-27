@@ -6,6 +6,17 @@ New features:
 .......PS. [ZBXNEXT-9622] added top.peak in diaginfo to identify items with highest task queue (vso)
 
 Bug fixes:
+.......PS. [ZBX-25719] fixed crash during SNMP walk value preprocessing if value contains NULL (vso)
+..F....... [ZBX-25374] fixed loading animation for the enable/disable action (wczerneha)
+.......PS. [ZBX-25642] enhanced JavaScript preprocessing to execute in parallel when handling multiple values for the same item (vso)
+..F....... [ZBX-25259] fixed hintbox positioning (apoga)
+..F....... [ZBX-25489] removed action remove from discovered trigger (rgontarski)
+..F....... [ZBX-24963] fixed links in graph widgets on host dashboard created by graph prototype (rgontarski)
+..F....... [ZBX-24608] fixed "No data" words overlapping in Clock widget (apoga, ddauksa)
+..F....... [ZBX-25410] fixed incorrectly displayed password field for public key authentication method in item form (esekace)
+..F....... [ZBX-25222] fixed cloning host with a graph that contains an item from another host (gcalenko)
+..F....... [ZBX-24616] fixed permissions check for trigger expression constructor (gcalenko)
+..F....... [ZBX-25206] removed padding in Geomap widget (apoga)
 .......PS. [ZBX-25765] fixed crash when overriding LLD trigger (dgoloscapov)
 .......PS. [ZBX-25677] removed failure when encountering mismatched OID in SNMP async poller (dgoloscapov, vso)
 ....I..PS. [ZBX-25722] fixed Zabbix proxy throwing errors when removing/creating SQLite database (dgoloscapov)
@@ -45,6 +56,17 @@ Changes for 7.2.2rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-25719] fixed crash during SNMP walk value preprocessing if value contains NULL (vso)
+..F....... [ZBX-25374] fixed loading animation for the enable/disable action (wczerneha)
+.......PS. [ZBX-25642] enhanced JavaScript preprocessing to execute in parallel when handling multiple values for the same item (vso)
+..F....... [ZBX-25259] fixed hintbox positioning (apoga)
+..F....... [ZBX-25489] removed action remove from discovered trigger (rgontarski)
+..F....... [ZBX-24963] fixed links in graph widgets on host dashboard created by graph prototype (rgontarski)
+..F....... [ZBX-24608] fixed "No data" words overlapping in Clock widget (apoga, ddauksa)
+..F....... [ZBX-25410] fixed incorrectly displayed password field for public key authentication method in item form (esekace)
+..F....... [ZBX-25222] fixed cloning host with a graph that contains an item from another host (gcalenko)
+..F....... [ZBX-24616] fixed permissions check for trigger expression constructor (gcalenko)
+..F....... [ZBX-25206] removed padding in Geomap widget (apoga)
 
 --------------------------------------------------------------------------------
 Changes for 7.2.1
