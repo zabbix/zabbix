@@ -73,10 +73,7 @@ require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphWidgetSelectedHosts.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHoneycombWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHostAvailabilityWidget.php';
-
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHostCardWidget.php';
-// require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHostCardWidgetDisplay.php';
-
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHostNavigatorWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardItemHistoryWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardItemNavigatorWidget.php';
