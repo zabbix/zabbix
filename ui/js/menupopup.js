@@ -1127,10 +1127,8 @@ function getMenuPopupItem(options) {
 		config_urls.push({
 			label: t('Create trigger'),
 			disabled: options.binary_value_type,
-			clickCallback: function(e) {
-				jQuery(this).closest('.menu-popup').menuPopup('close', null);
-
-				window.popupManagerInstance.openPopup('trigger.edit', {
+			clickCallback: function() {
+				ZABBIX.PopupManager.openPopup('trigger.edit', {
 					hostid: options.hostid,
 					name: options.name,
 					expression: 'func(/' + options.host + '/' + options.key + ')',
@@ -1149,7 +1147,7 @@ function getMenuPopupItem(options) {
 			config_urls.push({
 				label: t('Create dependent item'),
 				clickCallback: () => {
-					window.popupManagerInstance.openPopup('item.edit', {
+					ZABBIX.PopupManager.openPopup('item.edit', {
 						context: options.context,
 						hostid: options.hostid,
 						master_itemid: options.itemid,
@@ -1267,11 +1265,8 @@ function getMenuPopupItemPrototype(options) {
 
 	config_urls.push({
 		label: t('Create trigger prototype'),
-		clickCallback: function(e) {
-			e.preventDefault();
-			jQuery(this).closest('.menu-popup').menuPopup('close', null);
-
-			window.popupManagerInstance.openPopup('trigger.prototype.edit', {
+		clickCallback: function() {
+			ZABBIX.PopupManager.openPopup('trigger.prototype.edit', {
 				parent_discoveryid: options.parent_discoveryid,
 				name: options.name,
 				hostid: options.hostid,
@@ -1284,7 +1279,7 @@ function getMenuPopupItemPrototype(options) {
 	config_urls.push({
 		label: t('Create dependent item'),
 		clickCallback: () => {
-			window.popupManagerInstance.openPopup('item.prototype.edit', {
+			ZABBIX.PopupManager.openPopup('item.prototype.edit', {
 				context: options.context,
 				master_itemid: options.itemid,
 				parent_discoveryid: options.parent_discoveryid,
