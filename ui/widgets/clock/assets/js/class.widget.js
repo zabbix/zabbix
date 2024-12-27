@@ -374,6 +374,16 @@ class CWidgetClock extends CWidget {
 				}
 			}
 
+			const parts_height = Math.floor(Number(
+				Object.values(clock_parts).reduce((sum, part) => sum + part.font_size * CWidgetClock.LINE_HEIGHT, 0)
+			));
+
+			if (parts_height > max_height) {
+				for (const clock_part of Object.values(clock_parts)) {
+					clock_part.font_size = 0;
+				}
+			}
+
 			for (const clock_part of Object.values(clock_parts)) {
 				clock_part.element.style.fontSize = `${clock_part.font_size}px`;
 			}
@@ -393,6 +403,10 @@ class CWidgetClock extends CWidget {
 				}
 
 				font_size = Math.max(CWidgetClock.MIN_FONT_SIZE, font_size);
+
+				if (font_size * CWidgetClock.LINE_HEIGHT > max_height) {
+					font_size = 0;
+				}
 
 				no_data_element.style.fontSize = `${font_size}px`;
 			}
