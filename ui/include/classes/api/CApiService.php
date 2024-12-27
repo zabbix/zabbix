@@ -517,10 +517,12 @@ class CApiService {
 			}
 			elseif (array_key_exists('groupBy', $options) && $options['groupBy']) {
 				foreach ($options['groupBy'] as $field) {
-					$field = $this->fieldId($field, $table_alias);
+					if ($this->hasField($field, $table_name)) {
+						$field = $this->fieldId($field, $table_alias);
 
-					array_unshift($sql_parts['select'], $field);
-					$sql_parts['group'][] = $field;
+						array_unshift($sql_parts['select'], $field);
+						$sql_parts['group'][] = $field;
+					}
 				}
 			}
 		}
@@ -528,10 +530,12 @@ class CApiService {
 			$sql_parts['select'] = [];
 
 			foreach ($options['groupBy'] as $field) {
-				$field = $this->fieldId($field, $table_alias);
+				if ($this->hasField($field, $table_name)) {
+					$field = $this->fieldId($field, $table_alias);
 
-				array_unshift($sql_parts['select'], $field);
-				$sql_parts['group'][] = $field;
+					array_unshift($sql_parts['select'], $field);
+					$sql_parts['group'][] = $field;
+				}
 			}
 		}
 		// custom output
