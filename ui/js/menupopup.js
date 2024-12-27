@@ -1652,6 +1652,7 @@ function getMenuPopupDRule(options) {
 
 	config_urls.push({
 		label: t('Discovery rule'),
+		disabled: !options.allowed_ui_conf_drules,
 		url: url.getUrl()
 	});
 
