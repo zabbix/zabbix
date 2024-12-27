@@ -10,10 +10,10 @@ You can extend it or create your template for your specific needs.
 * Zabbix Agent 2
 * Go >= 1.13 (required only to build from source)
 
-## Tested DB versions
-* MySQL, version 5.7
-* Percona, version 8.0
-* MariaDB, version 10.4
+## Supported versions
+* MySQL, version 5.7+
+* Percona, version 8.0+
+* MariaDB, version 10.4+
 
 ## DB configuration
 The plugin requires a user with the following permissions.
