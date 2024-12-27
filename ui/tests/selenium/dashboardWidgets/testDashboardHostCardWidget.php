@@ -1189,9 +1189,7 @@ class testDashboardHostCardWidget extends testWidgets {
 			[
 				[
 					'Header' => 'Host Card',
-					'Sections' => ['monitored-by', 'monitoring', 'templates', 
-						'description', 'host-groups'
-					],
+					'Sections' => ['monitored-by', 'monitoring', 'templates', 'description', 'host-groups'],
 					'Host' => 'Host with full inventory list',
 					'Availability' => [
 						'ZBX' => 'status-grey',
