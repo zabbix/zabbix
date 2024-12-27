@@ -380,7 +380,10 @@ class CWidgetIterator extends CWidget {
 			widgetid: data.widgetid,
 			is_new: false,
 			rf_rate: 0,
-			dashboard: this._dashboard,
+			dashboard: {
+				templateid: null,
+				dashboardid: null
+			},
 			dashboard_page: this._dashboard_page,
 			cell_width: this._cell_width,
 			cell_height: this._cell_height,
