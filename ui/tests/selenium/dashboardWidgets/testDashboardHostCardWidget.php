@@ -70,9 +70,30 @@ class testDashboardHostCardWidget extends testWidgets {
 				'name' => 'Disabled hosts for HostCard widget'
 			]
 		]);
+
+		// Get array with Host Group names.
 		$groupids = CDataHelper::getIds('name');
+
+		// Get Template IDs.
 		$template1 = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('Zabbix server health'));
 		$template2 = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('Inheritance test template'));
+
+		// Create Proxy.
+		$proxies = CDataHelper::call('proxy.create', [
+			[
+				'name' => 'Proxy for host card widget',
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
+			]
+		]);
+
+		// Create Proxy groups.
+		$proxie_group = CDataHelper::call('proxygroup.create', [
+			[
+				'name' => 'Proxy group for host card widget',
+				'failover_delay' => '10',
+				'min_online' => '1'
+			]
+		]);
 
 		$response = CDataHelper::createHosts([
 			[
@@ -222,7 +243,9 @@ class testDashboardHostCardWidget extends testWidgets {
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
-				]
+				],
+				'monitored_by' => 2,
+				'proxy_groupid' => $proxie_group['proxy_groupids'][0]
 			],
 			[
 				'host' => 'Host tags group for HostCard widget',
@@ -306,7 +329,9 @@ class testDashboardHostCardWidget extends testWidgets {
 							]
 						]
 					]
-				]
+				],
+				'monitored_by' => 1,
+				'proxyid' => $proxies['proxyids'][0]
 			]
 		]);
 		$itemids = $response['itemids'];
@@ -534,6 +559,46 @@ class testDashboardHostCardWidget extends testWidgets {
 										'name' => 'sections.7',
 										'value' => 0
 									],
+								]
+							],
+							[
+								'type' => 'hostcard',
+								'name' => 'Check link to proxy configuration form',
+								'x' => 0,
+								'y' => 10,
+								'width' => 25,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 3,
+										'name' => 'hostid.0',
+										'value' => $response['hostids']['Host with items with tags']
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.0',
+										'value' => 4
+									]
+								]
+							],
+							[
+								'type' => 'hostcard',
+								'name' => 'Check link to proxy group configuration form',
+								'x' => 25,
+								'y' => 10,
+								'width' => 25,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 3,
+										'name' => 'hostid.0',
+										'value' => $response['hostids']['Host for maintenance icon in HostCard widget']
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.0',
+										'value' => 4
+									]
 								]
 							]
 						]
@@ -1143,9 +1208,7 @@ class testDashboardHostCardWidget extends testWidgets {
 			[
 				[
 					'Header' => 'Display host card with 1 column layout (Default)',
-					'Sections' => [
-						'availability', 'monitored-by', 'templates'
-					],
+					'Sections' => ['availability', 'monitored-by', 'templates'],
 					'Severity' => [
 						'average' => 1,
 						'warning' => 5
@@ -1154,11 +1217,11 @@ class testDashboardHostCardWidget extends testWidgets {
 					'Availability' => [
 						'ZBX' => 'status-grey',
 					],
-					'Monitored by' => 'Zabbix server',
+					'Monitored by' => ['Zabbix server'],
 					'Templates' => ['Linux by Zabbix agent', 'Zabbix server health']
 				]
 			],
-			// #2.
+			// #1.
 			[
 				[
 					'Header' => 'Display host card with 2 column layout',
@@ -1169,7 +1232,32 @@ class testDashboardHostCardWidget extends testWidgets {
 					'Availability' => [
 						'ZBX' => 'status-grey',
 					],
-					'Monitored by' => 'Zabbix server',
+					'Monitored by' => ['Zabbix server'],
+					'Monitoring' => [
+						'Dashboards' => 1,
+						'Latest data' => 103,
+						'Graphs' => 4,
+						'Web' => 4
+					],
+					'Templates' => ['Inheritance test template', 'Zabbix server health'],
+					'Tags' => ['class: software', 'target: server', 'target: zabbix'],
+					'Description' => 'Long Description Long Description Long Description Long Description Long '
+						.'Description Long Description Long Description Long Description Long Description Long '
+						.'Description Long Description Long Description Long Description Long Description Long '
+						.'Description',
+					'Host groups' => 'Zabbix servers',
+				]
+			],
+			// #2.
+			[
+				[
+					'Header' => 'Display host card with 3 column layout',
+					'Sections' => ['monitored-by', 'monitoring', 'templates', 'description', 'host-groups'],
+					'Host' => 'Host with full inventory list',
+					'Availability' => [
+						'ZBX' => 'status-grey',
+					],
+					'Monitored by' => ['Zabbix server'],
 					'Monitoring' => [
 						'Dashboards' => 1,
 						'Latest data' => 103,
@@ -1188,26 +1276,19 @@ class testDashboardHostCardWidget extends testWidgets {
 			// #3.
 			[
 				[
-					'Header' => 'Host Card',
-					'Sections' => ['monitored-by', 'monitoring', 'templates', 'description', 'host-groups'],
-					'Host' => 'Host with full inventory list',
-					'Availability' => [
-						'ZBX' => 'status-grey',
-					],
-					'Monitored by' => 'Zabbix server',
-					'Monitoring' => [
-						'Dashboards' => 1,
-						'Latest data' => 103,
-						'Graphs' => 4,
-						'Web' => 4
-					],
-					'Templates' => ['Inheritance test template', 'Zabbix server health'],
-					'Tags' => ['class: software', 'target: server', 'target: zabbix'],
-					'Description' => 'Long Description Long Description Long Description Long Description Long '
-						.'Description Long Description Long Description Long Description Long Description Long '
-						.'Description Long Description Long Description Long Description Long Description Long '
-						.'Description',
-					'Host groups' => 'Zabbix servers',
+					'Header' => 'Check link to proxy configuration form',
+					'Host' => 'Host with items with tags',
+					'Sections' => ['monitored-by'],
+					'Monitored by' => ['Proxy', 'Proxy for host card widget']
+				]
+			],
+			// #4.
+			[
+				[
+					'Header' => 'Check link to proxy group configuration form',
+					'Host' => 'Host for maintenance icon in HostCard widget',
+					'Sections' => ['monitored-by'],
+					'Monitored by' => ['Proxy Group', 'Proxy group for host card widget']
 				]
 			]
 		];
@@ -1221,7 +1302,56 @@ class testDashboardHostCardWidget extends testWidgets {
 	public function testDashboardHostCardWidget_Display($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for HostCard widget display check'])->waitUntilReady();
-		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
+		$dashboard = CDashboardElement::find()->one();
+		$widget = $dashboard::find()->one()->getWidget($data['Header']);
+
+		$this->assertEquals($data['Host'], $widget->query('xpath:.//div[@class="host-name"]')
+				->one()->getText());
+
+		if (array_key_exists('Sections', $data)) {
+			foreach ($data['Sections'] as $section) {
+
+			}
+		}
+		if (array_key_exists('Availability', $data)) {
+
+		}
+		if (array_key_exists('Monitored by', $data)) {
+			// Uncomment when ZBX-25709 will be done.
+			switch ($data['Monitored by'][0]) {
+				case 'Zabbix server':
+
+					break;
+				case 'Proxy Group':
+
+					break;
+				case 'Proxy':
+
+					break;
+			}
+		}
+		if (array_key_exists('Monitoring', $data)) {
+			foreach ($data['Monitoring'] as $entity => $value) {
+				$this->assertEquals($value, $widget->query('xpath:..//div[@class="monitoring-item" '
+						. 'and .//a[@class="monitoring-item-name" '
+						. 'and normalize-space(text())="'.$entity.'"]]//span[@class="entity-count"]')->one()->getText()
+					);
+			}
+		}
+		if (array_key_exists('Templates', $data)) {
+			$templates = $widget->query('xpath:.//div[@class="section section-templates"]//span[@class="template-name"]');
+			$templateElements = $templates->all();
+			foreach ($templateElements as $templateElement) {
+				$template = $templateElement->getText();
+				$this->AssertTrue(in_array($template, $data['Templates']));
+			}
+		}
+		if (array_key_exists('Description', $data)) {
+
+		}
+		if (array_key_exists('Host groups', $data)) {
+
+		}
 	}
 
 	public function getCancelData() {
