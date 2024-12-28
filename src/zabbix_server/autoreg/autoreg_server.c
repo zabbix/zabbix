@@ -80,13 +80,13 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 			if (0 != strcmp(autoreg_host->host, row[0]))
 				continue;
 
-			ZBX_STR2UINT64(autoreg_host->autoreg_hostid, row[8]);
-			ZBX_STR2UINT64(autoreg_host->hostid, row[1]);
-
 			if (SUCCEED == zbx_db_is_null(row[8]) ||
 					0 != strcmp(autoreg_host->host_metadata, row[3]) ||
 					autoreg_host->flag != atoi(row[7]))
 				break;
+
+			ZBX_STR2UINT64(autoreg_host->autoreg_hostid, row[8]);
+			ZBX_STR2UINT64(autoreg_host->hostid, row[1]);
 
 			/* process with autoregistration if the connection type was forced and */
 			/* is different from the last registered connection type               */
