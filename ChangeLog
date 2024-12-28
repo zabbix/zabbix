@@ -56,6 +56,8 @@ Changes for 7.2.2rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-25797] fixed Zabbix server crash during autoregistration (arimdjonoks)
+.......PS. [ZBX-25776] fixed Zabbix server crash when testing some internal items (arimdjonoks)
 .......PS. [ZBX-25719] fixed crash during SNMP walk value preprocessing if value contains NULL (vso)
 ..F....... [ZBX-25374] fixed loading animation for the enable/disable action (wczerneha)
 .......PS. [ZBX-25642] enhanced JavaScript preprocessing to execute in parallel when handling multiple values for the same item (vso)
@@ -253,6 +255,8 @@ Changes for 7.0.8rc2
 New features:
 
 Bug fixes:
+........S. [ZBX-25797] fixed Zabbix server crash during autoregistration (arimdjonoks)
+.......PS. [ZBX-25776] fixed Zabbix server crash when testing some internal items (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.8rc1
