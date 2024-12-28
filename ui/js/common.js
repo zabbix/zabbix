@@ -472,28 +472,30 @@ function addToOverlaysStack(id, element, type, xhr) {
 
 // Keydown handler. Closes last opened overlay UI element.
 function closeDialogHandler(event) {
-	if (event.which == 27) { // ESC
-		var dialog = overlays_stack.end();
-		if (typeof dialog !== 'undefined') {
-			switch (dialog.type) {
+	if (event.which === KEY_ESCAPE) {
+		const overlay = overlays_stack.end();
+
+		if (typeof overlay !== 'undefined') {
+			switch (overlay.type) {
 				// Close overlay popup.
 				case 'popup':
-					overlayDialogueDestroy(dialog.dialogueid, true);
+					overlayDialogueDestroy(overlay.dialogueid);
+					overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.close'));
 					break;
 
 				// Close overlay hintbox.
 				case 'hintbox':
-					hintBox.hideHint(dialog.element, true);
+					hintBox.hideHint(overlay.element, true);
 					break;
 
 				// Close popup menu overlays.
 				case 'menu-popup':
-					jQuery('.menu-popup.menu-popup-top:visible').menuPopup('close', dialog.element);
+					jQuery('.menu-popup.menu-popup-top:visible').menuPopup('close', overlay.element);
 					break;
 
 				// Close context menu preloader.
 				case 'preloader':
-					overlayPreloaderDestroy(dialog.dialogueid);
+					overlayPreloaderDestroy(overlay.dialogueid);
 					break;
 
 				// Close overlay time picker.

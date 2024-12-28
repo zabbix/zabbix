@@ -441,11 +441,11 @@ function overlayPreloaderDestroy(id) {
  * Function to close overlay dialogue and moves focus to IU element that was clicked to open it.
  *
  * @param string   dialogueid  Dialogue identifier to identify dialogue.
- * @param boolean  close       Flag for dispatching close event.
  */
-function overlayDialogueDestroy(dialogueid, close = false) {
+function overlayDialogueDestroy(dialogueid) {
 	if (typeof dialogueid !== 'undefined') {
-		var overlay = overlays_stack.getById(dialogueid);
+		const overlay = overlays_stack.getById(dialogueid);
+
 		if (!overlay) {
 			return;
 		}
@@ -462,10 +462,6 @@ function overlayDialogueDestroy(dialogueid, close = false) {
 		jQuery('[data-dialogueid="'+dialogueid+'"]').remove();
 
 		removeFromOverlaysStack(dialogueid);
-
-		if (close) {
-			overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.close', {detail: {dialogueid}}));
-		}
 	}
 }
 
