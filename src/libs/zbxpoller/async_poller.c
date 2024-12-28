@@ -595,7 +595,7 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 		if (ZBX_IS_RUNNING())
 		{
 			if (FAIL == zbx_vps_monitor_capped())
-				async_initiate_queued_checks(&poller_config, poller_args_in->zbx_get_progname_cb_arg());
+				async_initiate_queued_checks(&poller_config, poller_args_in->progname);
 
 			zbx_async_manager_requeue_flush(poller_config.manager);
 			zbx_async_manager_interfaces_flush(poller_config.manager, &poller_config.interfaces);

@@ -12,7 +12,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "poller.h"
 #include "zbxpoller.h"
 
 #include "zbxdb.h"
@@ -64,20 +63,6 @@
 #include "zbx_expression_constants.h"
 #include "zbxinterface.h"
 
-static zbx_get_progname_f	zbx_get_progname_cb = NULL;
-
-zbx_get_progname_f	poller_get_progname(void)
-{
-	return zbx_get_progname_cb;
-}
-
-static zbx_get_program_type_f	zbx_get_program_type_cb = NULL;
-
-zbx_get_program_type_f	poller_get_program_type(void)
-{
-	return zbx_get_program_type_cb;
-}
-
 void	zbx_free_agent_result_ptr(AGENT_RESULT *result)
 {
 	zbx_free_agent_result(result);
@@ -105,7 +90,8 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_agent
 			break;
 		case ITEM_TYPE_INTERNAL:
 			res = get_value_internal(item, result, config_comms, config_startup_time, config_java_gateway,
-					config_java_gateway_port, get_config_forks, get_value_internal_ext_cb);
+					config_java_gateway_port, get_config_forks, get_value_internal_ext_cb,
+					program_type);
 			break;
 		case ITEM_TYPE_DB_MONITOR:
 #ifdef HAVE_UNIXODBC
@@ -971,8 +957,6 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 
 	scriptitem_es_engine_init();
 
-	zbx_get_program_type_cb = poller_args_in->zbx_get_program_type_cb_arg;
-	zbx_get_progname_cb = poller_args_in->zbx_get_progname_cb_arg;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(poller_args_in->config_comms->config_tls,
 			poller_args_in->zbx_get_program_type_cb_arg, zbx_dc_get_psk_by_identity);
@@ -1011,7 +995,7 @@ ZBX_THREAD_ENTRY(zbx_poller_thread, args)
 					poller_args_in->config_startup_time, poller_args_in->config_unavailable_delay,
 					poller_args_in->config_unreachable_period,
 					poller_args_in->config_unreachable_delay, info->program_type,
-					poller_args_in->zbx_get_progname_cb_arg(), poller_args_in->get_config_forks,
+					poller_args_in->progname, poller_args_in->get_config_forks,
 					poller_args_in->config_java_gateway, poller_args_in->config_java_gateway_port,
 					poller_args_in->config_externalscripts,
 					poller_args_in->zbx_get_value_internal_ext_cb,

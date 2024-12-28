@@ -1535,7 +1535,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	zbx_thread_args_t		thread_args;
 
-	zbx_thread_poller_args		poller_args = {&config_comms, get_zbx_program_type, get_zbx_progname,
+	zbx_thread_poller_args		poller_args = {&config_comms, get_zbx_program_type, zbx_progname,
 							ZBX_NO_POLLER, config_startup_time, config_unavailable_delay,
 							config_unreachable_period, config_unreachable_delay,
 							config_max_concurrent_checks_per_poller, get_config_forks,

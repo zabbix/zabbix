@@ -1461,7 +1461,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_ssl_ca_location, config_ssl_cert_location,
 								config_ssl_key_location};
 	zbx_thread_args_t			thread_args;
-	zbx_thread_poller_args			poller_args = {&config_comms, get_zbx_program_type, get_zbx_progname,
+	zbx_thread_poller_args			poller_args = {&config_comms, get_zbx_program_type, zbx_progname,
 								ZBX_NO_POLLER, config_startup_time,
 								config_unavailable_delay, config_unreachable_period,
 								config_unreachable_delay,

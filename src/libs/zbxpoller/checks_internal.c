@@ -14,7 +14,6 @@
 
 #include "checks_internal.h"
 #include "checks_java.h"
-#include "poller.h"
 
 #include "zbxpoller.h"
 
@@ -247,6 +246,7 @@ out:
  *             config_java_gateway_port  - [IN]                                   *
  *             get_config_forks          - [IN]                                   *
  *             get_value_internal_ext_cb - [IN]                                   *
+ *             program_type              - [IN]                                   *
  *                                                                                *
  * Return value: SUCCEED - data successfully retrieved and stored in result       *
  *               NOTSUPPORTED - requested item is not supported                   *
@@ -254,7 +254,8 @@ out:
  **********************************************************************************/
 int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zbx_config_comms_args_t *config_comms,
 		int config_startup_time, const char *config_java_gateway, int config_java_gateway_port,
-		zbx_get_config_forks_f get_config_forks, zbx_get_value_internal_ext_f get_value_internal_ext_cb)
+		zbx_get_config_forks_f get_config_forks, zbx_get_value_internal_ext_f get_value_internal_ext_cb,
+		unsigned char program_type)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED, nparams;
@@ -493,11 +494,11 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 			case ZBX_PROCESS_TYPE_ESCALATOR:
 			case ZBX_PROCESS_TYPE_PROXYPOLLER:
 			case ZBX_PROCESS_TYPE_TIMER:
-				if (0 == (poller_get_program_type()() & ZBX_PROGRAM_TYPE_SERVER))
+				if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 					process_type = ZBX_PROCESS_TYPE_UNKNOWN;
 				break;
 			case ZBX_PROCESS_TYPE_DATASENDER:
-				if (0 == (poller_get_program_type()() & ZBX_PROGRAM_TYPE_PROXY))
+				if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
 					process_type = ZBX_PROCESS_TYPE_UNKNOWN;
 				break;
 		}
@@ -665,7 +666,7 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 		}
 		else if (0 == strcmp(tmp, "trend"))
 		{
-			if (0 == (poller_get_program_type()() & ZBX_PROGRAM_TYPE_SERVER))
+			if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 				goto out;
@@ -969,7 +970,7 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 		char		*error = NULL;
 		zbx_tfc_stats_t	stats;
 
-		if (0 == (poller_get_program_type()() & ZBX_PROGRAM_TYPE_SERVER))
+		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 			goto out;
