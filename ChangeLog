@@ -1,7 +1,5 @@
 Changes for 7.0.8rc2
 
-New features:
-
 Bug fixes:
 ........S. [ZBX-25797] fixed Zabbix server crash during autoregistration (arimdjonoks)
 .......PS. [ZBX-25776] fixed Zabbix server crash when testing some internal items (arimdjonoks)
