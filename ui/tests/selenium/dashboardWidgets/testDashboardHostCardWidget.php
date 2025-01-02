@@ -1593,7 +1593,7 @@ class testDashboardHostCardWidget extends testWidgets {
 
 		if (array_key_exists('Screenshot', $data)) {
 			$this->assertScreenshot($form->query('class:table-forms-separator')->waitUntilPresent()->one(),
-					'Full list of show options' .$data['Host']
+					'Full list of show options' .$data['fields']['Host']
 			);
 		}
 
