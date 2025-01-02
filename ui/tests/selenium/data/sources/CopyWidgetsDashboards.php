@@ -2456,6 +2456,21 @@ class CopyWidgetsDashboards {
 										'value' => 'ENJSC'
 									]
 								]
+							],
+							[
+								'type' => 'hostcard',
+								'name' => 'Host card widget',
+								'x' => 18,
+								'y' => 17,
+								'width' => 20,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 3,
+										'name' => 'hostid.0',
+										'value' => 10084
+									]
+								]
 							]
 						]
 					],
@@ -3198,6 +3213,21 @@ class CopyWidgetsDashboards {
 										'type' => 1,
 										'name' => 'reference',
 										'value' => 'FAXKO'
+									]
+								]
+							],
+							[
+								'type' => 'hostcard',
+								'name' => 'Host card widget',
+								'x' => 25,
+								'y' => 10,
+								'width' => 15,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 3,
+										'name' => 'hostid.0',
+										'value' => 10084
 									]
 								]
 							]

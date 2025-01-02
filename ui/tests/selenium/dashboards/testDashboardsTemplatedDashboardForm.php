@@ -548,6 +548,21 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 										'value' => 'Test dashboard honeycomb'
 									]
 								]
+							],
+							[
+								'type' => 'hostcard',
+								'name' => 'Host card widget',
+								'x' => 0,
+								'y' => 20,
+								'width' => 20,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 3,
+										'name' => 'hostid.0',
+										'value' => 10084
+									]
+								]
 							]
 						]
 					]
