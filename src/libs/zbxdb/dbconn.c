@@ -644,7 +644,8 @@ static int	dbconn_open(zbx_dbconn_t *db)
 out:
 #elif defined(HAVE_SQLITE3)
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
-	if (SQLITE_OK != sqlite3_open_v2(db->config->dbname, &db->conn, SQLITE_OPEN_READWRITE, NULL))
+	if (SQLITE_OK != sqlite3_open_v2(db->config->dbname, &db->conn, SQLITE_OPEN_READWRITE |
+			SQLITE_OPEN_CREATE, NULL))
 #else
 	if (SQLITE_OK != sqlite3_open(db->config->dbname, &db->conn))
 #endif
