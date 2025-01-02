@@ -168,7 +168,7 @@ window.widget_topitems_form = new class {
 				break;
 
 			case 'edit':
-				const column_index = e.target.closest('tr').rowIndex - 1;
+				const column_index = e.target.closest('tr').dataset.index;
 				column_popup = PopUp(
 					'widget.topitems.column.edit',
 					{
