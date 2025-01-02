@@ -503,6 +503,31 @@ class testDashboardHostCardWidget extends testWidgets {
 										'type' => 0,
 										'name' => 'sections.2',
 										'value' => 5
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.3',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.4',
+										'value' => 6
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.5',
+										'value' => 2
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.6',
+										'value' => 7
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.7',
+										'value' => 0
 									]
 								]
 							],
@@ -558,7 +583,7 @@ class testDashboardHostCardWidget extends testWidgets {
 										'type' => 0,
 										'name' => 'sections.7',
 										'value' => 0
-									],
+									]
 								]
 							],
 							[
@@ -610,9 +635,8 @@ class testDashboardHostCardWidget extends testWidgets {
 	}
 
 	public function testDashboardHostCardWidget_Layout() {
-		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for creating HostCard widgets'])->waitUntilReady();
-
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Host card')]);
@@ -1006,7 +1030,7 @@ class testDashboardHostCardWidget extends testWidgets {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for HostCard widget update'])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
-		$dashboard->edit()->getWidget('Update Host card')->edit()->submit();
+		$dashboard->edit()->getWidget('Host card')->edit()->submit();
 		$dashboard->getWidget('Host card');
 		$dashboard->save();
 		$this->page->waitUntilReady();
@@ -1214,9 +1238,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'warning' => 5
 					],
 					'Host' => 'ЗАББИКС Сервер',
-					'Availability' => [
-						'ZBX' => 'status-grey',
-					],
+					'Availability' => ['ZBX'],
 					'Monitored by' => ['Zabbix server'],
 					'Templates' => ['Linux by Zabbix agent', 'Zabbix server health']
 				]
@@ -1229,9 +1251,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'description', 'host-groups'
 					],
 					'Host' => 'Host with full inventory list',
-					'Availability' => [
-						'ZBX' => 'status-grey',
-					],
+					'Availability' => ['ZBX'],
 					'Monitored by' => ['Zabbix server'],
 					'Monitoring' => [
 						'Dashboards' => 1,
@@ -1245,7 +1265,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						.'Description Long Description Long Description Long Description Long Description Long '
 						.'Description Long Description Long Description Long Description Long Description Long '
 						.'Description',
-					'Host groups' => 'Zabbix servers',
+					'Host groups' => ['Zabbix servers']
 				]
 			],
 			// #2.
@@ -1254,9 +1274,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					'Header' => 'Display host card with 3 column layout',
 					'Sections' => ['monitored-by', 'monitoring', 'templates', 'description', 'host-groups'],
 					'Host' => 'Host with full inventory list',
-					'Availability' => [
-						'ZBX' => 'status-grey',
-					],
+					'Availability' => ['ZBX'],
 					'Monitored by' => ['Zabbix server'],
 					'Monitoring' => [
 						'Dashboards' => 1,
@@ -1270,7 +1288,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						.'Description Long Description Long Description Long Description Long Description Long '
 						.'Description Long Description Long Description Long Description Long Description Long '
 						.'Description',
-					'Host groups' => 'Zabbix servers',
+					'Host groups' => ['Zabbix servers']
 				]
 			],
 			// #3.
@@ -1308,31 +1326,26 @@ class testDashboardHostCardWidget extends testWidgets {
 		$this->assertEquals($data['Host'], $widget->query('xpath:.//div[@class="host-name"]')
 				->one()->getText());
 
-		if (array_key_exists('Sections', $data)) {
-			foreach ($data['Sections'] as $section) {
-
+		if (array_key_exists('Availability', $data)) {
+			$availabilities = $widget->query('xpath:.//div[@class="section section-availability"]//span')->all();
+			foreach ($availabilities as $available) {
+				$this->AssertTrue(in_array($available->getText(), $data['Availability']));
 			}
 		}
-		if (array_key_exists('Availability', $data)) {
-
-		}
 		if (array_key_exists('Monitored by', $data)) {
-			// Uncomment when ZBX-25709 will be done.
-			switch ($data['Monitored by'][0]) {
-				case 'Zabbix server':
-
-					break;
-				case 'Proxy Group':
-
-					break;
-				case 'Proxy':
-
-					break;
+			// TODO: Finish when ZBX-25709 will be done.
+		}
+		if (array_key_exists('Tags', $data)) {
+			$tag_elements = $widget->query('xpath:.//div[@class="section section-tags"]'
+					. '//div[@class="tags"]//span[@class="tag"]');
+			$tags = $tag_elements->all();
+			foreach ($tags as $tag) {
+				$this->AssertTrue(in_array($tag->getText(), $data['Tags']));
 			}
 		}
 		if (array_key_exists('Monitoring', $data)) {
 			foreach ($data['Monitoring'] as $entity => $value) {
-				$this->assertEquals($value, $widget->query('xpath:..//div[@class="monitoring-item" '
+				$this->assertEquals($value, $widget->query('xpath:.//div[@class="monitoring-item" '
 						. 'and .//a[@class="monitoring-item-name" '
 						. 'and normalize-space(text())="'.$entity.'"]]//span[@class="entity-count"]')->one()->getText()
 					);
@@ -1347,11 +1360,84 @@ class testDashboardHostCardWidget extends testWidgets {
 			}
 		}
 		if (array_key_exists('Description', $data)) {
-
+			$this->assertEquals($data['Description'], $widget->query('xpath:.//div[@class="section section-description"]')
+					->one()->getText()
+			);
 		}
 		if (array_key_exists('Host groups', $data)) {
-
+			$host_groups = $widget->query('xpath:.//div[@class="section section-host-groups"]//span[@class="host-group-name"]');
+			$host_groups_elements = $host_groups->all();
+			foreach ($host_groups_elements as $host_groups_element) {
+				$host_group = $host_groups_element->getText();
+				$this->AssertTrue(in_array($host_group, $data['Host groups']));
+			}
 		}
+	}
+
+	/**
+	 * Check correct links in Host Card widget.
+	 */
+	public function testDashboardHostCardWidget_DisplayLinks() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for HostCard widget display check'])->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$widget = $dashboard::find()->one()->getWidget('Display host card with 3 column layout');
+
+		// Problem link.
+		$widget->query('xpath://div[@class="sections-header"]//a[@class="problem-icon-link"]')->one()->click();
+		$this->page->waitUntilReady();
+		$this->page->assertHeader('Problems');
+		$this->page->assertTitle('Problems');
+
+		// Inventory link.
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for HostCard widget display check'])->waitUntilReady();
+		$widget->query('xpath:.//div[@class="section section-inventory"]'
+				. '//div[@class="section-name"]'
+				. '/a[text()="Inventory"]')->one()->click();
+		$this->page->waitUntilReady();
+		$this->page->assertHeader('Host inventory');
+		$this->page->assertTitle('Host inventory');
+
+		// Dashboard link.
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for HostCard widget display check'])->waitUntilReady();
+		$widget->query('xpath:.//div[@class="section section-monitoring"]'
+				. '//div[@class="monitoring-item"]'
+				. '/a[text()="Dashboards"]')->one()->click();
+		$this->page->waitUntilReady();
+		$this->page->assertHeader('Host dashboards');
+		$this->page->assertTitle('Dashboards');
+
+		// Latest data link.
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for HostCard widget display check'])->waitUntilReady();
+		$widget->query('xpath:.//div[@class="section section-monitoring"]'
+				. '//div[@class="monitoring-item"]'
+				. '/a[text()="Latest data"]')->one()->click();
+		$this->page->waitUntilReady();
+		$this->page->assertHeader('Latest data');
+		$this->page->assertTitle('Latest data');
+
+		// Graphs link.
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for HostCard widget display check'])->waitUntilReady();
+		$widget->query('xpath:.//div[@class="section section-monitoring"]'
+				. '//div[@class="monitoring-item"]'
+				. '/a[text()="Graphs"]')->one()->click();
+		$this->page->waitUntilReady();
+		$this->page->assertHeader('Graphs');
+		$this->page->assertTitle('Custom graphs');
+
+		// Web link.
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for HostCard widget display check'])->waitUntilReady();
+		$widget->query('xpath:.//div[@class="section section-monitoring"]'
+				. '//div[@class="monitoring-item"]'
+				. '/a[text()="Web"]')->one()->click();
+		$this->page->waitUntilReady();
+		$this->page->assertHeader('Web monitoring');
+		$this->page->assertTitle('Web monitoring');
 	}
 
 	public function getCancelData() {
