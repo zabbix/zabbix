@@ -19,8 +19,6 @@
  * @var array $data
  */
 
-$this->addJsFile('multilineinput.js');
-$this->addJsFile('items.js');
 $this->includeJsFile('item.prototype.list.js.php');
 
 $form = (new CForm())

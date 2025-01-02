@@ -37,7 +37,7 @@
 		initActionButtons() {
 			document.addEventListener('click', e => {
 				if (e.target.classList.contains('js-create-hostgroup')) {
-					ZABBIX.PopupManager.openPopup('hostgroup.edit');
+					ZABBIX.PopupManager.open('hostgroup.edit');
 				}
 				else if (e.target.classList.contains('js-massenable-hostgroup')) {
 					this.enable(e.target, Object.keys(chkbxRange.getSelectedIds()));
@@ -129,8 +129,8 @@
 		registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
 				callback: () => {
 					uncheckTableRows('hostgroup');

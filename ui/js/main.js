@@ -1203,9 +1203,10 @@ document.addEventListener('DOMContentLoaded', () => {
 		ZABBIX.SoftwareVersionCheck = new CSoftwareVersionCheck();
 	}
 
-	// Popup manager initialization.
+	// Popup manager initialization (no object creation).
 
-	ZABBIX.PopupManager = new CPopupManager();
+	ZABBIX.PopupManager = CPopupManager;
+	ZABBIX.PopupManager.init();
 });
 
 window.addEventListener('load', () => {

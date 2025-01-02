@@ -32,9 +32,9 @@ window.host_edit_popup = {
 		this.initial_proxy_groupid = proxy_groupid;
 		this.macros_templateids = null;
 
-		const back_url = new Curl('zabbix.php');
-		back_url.setArgument('action', 'host.list');
-		ZABBIX.PopupManager.setBackUrl(back_url.getUrl());
+		const return_url = new URL('zabbix.php', location.origin);
+		return_url.searchParams.set('action', 'host.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		if (warnings.length) {
 			const message_box = warnings.length == 1
@@ -68,11 +68,13 @@ window.host_edit_popup = {
 	},
 
 	registerSubscribers() {
+		const subscriptions = [];
+
 		for (const action of ['template.edit', 'proxy.edit', 'item.edit']) {
 			const subscription = ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_BEFORE_OPEN,
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_OPEN,
 					action
 				},
 				callback: ({event}) => {
@@ -82,8 +84,14 @@ window.host_edit_popup = {
 				}
 			});
 
-			ZABBIX.PopupManager.addSubscriber(subscription);
+			subscriptions.push(subscription);
 		}
+
+		this.dialogue.addEventListener('dialogue.close', () => {
+			for (const subscription of subscriptions) {
+				ZABBIX.EventHub.unsubscribe(subscription);
+			}
+		});
 	},
 
 	/**
@@ -514,7 +522,7 @@ window.host_edit_popup = {
 		delete parameters.sid;
 		parameters.clone = 1;
 
-		this.overlay = ZABBIX.PopupManager.openPopup('host.edit', parameters);
+		this.overlay = ZABBIX.PopupManager.open('host.edit', parameters);
 	},
 
 	delete(hostid) {

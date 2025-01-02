@@ -194,15 +194,15 @@
 			});
 
 			document.querySelector('.js-create-host').addEventListener('click', () => {
-				ZABBIX.PopupManager.openPopup('host.edit', {groupids: this.applied_filter_groupids});
+				ZABBIX.PopupManager.open('host.edit', {groupids: this.applied_filter_groupids});
 			});
 		},
 
 		registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
 				callback: () => {
 					uncheckTableRows('hosts');

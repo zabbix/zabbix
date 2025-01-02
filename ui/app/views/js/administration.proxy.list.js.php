@@ -25,7 +25,7 @@
 
 		#initActions() {
 			document.querySelector('.js-create-proxy').addEventListener('click', () => {
-				ZABBIX.PopupManager.openPopup('proxy.edit');
+				ZABBIX.PopupManager.open('proxy.edit');
 			});
 
 			const form = document.getElementById('proxy-list');
@@ -57,8 +57,8 @@
 		#registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
 				callback: () => {
 					uncheckTableRows('proxy');

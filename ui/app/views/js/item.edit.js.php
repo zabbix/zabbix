@@ -79,7 +79,7 @@ window.item_edit_form = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
 
-		ZABBIX.PopupManager.setBackUrl(back_url);
+		ZABBIX.PopupManager.setReturnUrl(back_url);
 
 		this.initForm(field_switches);
 		this.initEvents();
@@ -276,15 +276,17 @@ window.item_edit_form = new class {
 	}
 
 	#registerSubscribers() {
+		const subscriptions = [];
+
 		for (const action of ['template.edit', 'proxy.edit', 'item.edit', 'item.prototype.edit']) {
 			const subscription = ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_BEFORE_OPEN,
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_OPEN,
 					action
 				},
 				callback: ({data, event}) => {
-					if (data.parameters.itemid === this.form_data.itemid || this.form_data.itemid === 0) {
+					if (data.action_parameters.itemid === this.form_data.itemid || this.form_data.itemid === 0) {
 						return;
 					}
 
@@ -294,8 +296,14 @@ window.item_edit_form = new class {
 				}
 			});
 
-			ZABBIX.PopupManager.addSubscriber(subscription);
+			subscriptions.push(subscription);
 		}
+
+		this.dialogue.addEventListener('dialogue.close', () => {
+			for (const subscription of subscriptions) {
+				ZABBIX.EventHub.unsubscribe(subscription);
+			}
+		});
 	}
 
 	#isConfirmed() {
@@ -320,7 +328,7 @@ window.item_edit_form = new class {
 	}
 
 	clone() {
-		this.overlay = ZABBIX.PopupManager.openPopup(
+		this.overlay = ZABBIX.PopupManager.open(
 			this.source === 'itemprototype' ? 'item.prototype.edit' : 'item.edit',
 			{clone: 1, ...this.#getFormFields()}
 		);

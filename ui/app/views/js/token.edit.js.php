@@ -34,9 +34,9 @@ window.token_edit_popup = {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
-		const back_url = new Curl('zabbix.php');
-		back_url.setArgument('action', admin_mode == 1 ? 'token.list' : 'user.token.list');
-		ZABBIX.PopupManager.setBackUrl(back_url.getUrl());
+		const return_url = new URL('zabbix.php', location.origin);
+		return_url.searchParams.set('action', admin_mode == 1 ? 'token.list' : 'user.token.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		this.expires_at_field = document.getElementById('expires-at-row').parentNode;
 		this.expires_at_label = this.expires_at_field.previousSibling;

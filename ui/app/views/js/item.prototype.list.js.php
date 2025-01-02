@@ -41,7 +41,7 @@
 
 		initEvents() {
 			document.querySelector('.js-create-item-prototype').addEventListener('click', e => {
-				ZABBIX.PopupManager.openPopup('item.prototype.edit', e.target.dataset);
+				ZABBIX.PopupManager.open('item.prototype.edit', e.target.dataset);
 			});
 
 			this.form.addEventListener('click', e => {
@@ -155,28 +155,28 @@
 		#registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
-				callback: ({data}) => {
-					if ('error' in data) {
-						if ('title' in data.error) {
-							postMessageError(data.error.title);
+				callback: ({data, event}) => {
+					if ('error' in data.submit) {
+						if ('title' in data.submit.error) {
+							postMessageError(data.submit.error.title);
 						}
 
-						postMessageDetails('error', data.error.messages);
+						postMessageDetails('error', data.submit.error.messages);
 					}
 					else {
 						chkbxRange.clearSelectedOnFilterChange();
 					}
 
-					if (data.success.action === 'delete') {
-						const url = new Curl('host_discovery.php');
+					if (data.submit.success.action === 'delete') {
+						const url = new URL('host_discovery.php', location.origin);
 
-						url.setArgument('context', this.context);
-						url.setArgument('filter_set', 1);
+						url.searchParams.set('context', this.context);
+						url.searchParams.set('filter_set', 1);
 
-						ZABBIX.PopupManager.setCurrentUrl(url.getUrl());
+						event.setRedirectUrl(url.href);
 					}
 				}
 			});

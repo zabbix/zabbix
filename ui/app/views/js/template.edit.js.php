@@ -29,9 +29,9 @@ window.template_edit_popup = new class {
 		this.linked_templateids = this.#getLinkedTemplates();
 		this.macros_templateids = null;
 
-		const back_url = new Curl('zabbix.php');
-		back_url.setArgument('action', 'template.list');
-		ZABBIX.PopupManager.setBackUrl(back_url.getUrl());
+		const return_url = new URL('zabbix.php', location.origin);
+		return_url.searchParams.set('action', 'template.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		if (warnings.length > 0) {
 			const message_box = warnings.length > 1
@@ -132,12 +132,12 @@ window.template_edit_popup = new class {
 	#registerSubscribers() {
 		const subscription = ZABBIX.EventHub.subscribe({
 			require: {
-				context: CPopupManager.CONTEXT_POPUP,
-				event: CPopupManager.EVENT_BEFORE_OPEN,
+				context: CPopupManager.EVENT_CONTEXT,
+				event: CPopupManagerEvent.EVENT_OPEN,
 				action: 'template.edit'
 			},
 			callback: ({data, event}) => {
-				if (data.parameters.templateid === this.templateid || this.templateid === null) {
+				if (data.action_parameters.templateid === this.templateid || this.templateid === null) {
 					return;
 				}
 
@@ -147,7 +147,7 @@ window.template_edit_popup = new class {
 			}
 		});
 
-		ZABBIX.PopupManager.addSubscriber(subscription);
+		this.dialogue.addEventListener('dialogue.close', () => ZABBIX.EventHub.unsubscribe(subscription));
 	}
 
 	#isConfirmed() {
@@ -225,7 +225,7 @@ window.template_edit_popup = new class {
 		parameters.templateid = this.templateid;
 		this.#prepareFields(parameters);
 
-		this.overlay = ZABBIX.PopupManager.openPopup('template.edit', parameters);
+		this.overlay = ZABBIX.PopupManager.open('template.edit', parameters);
 	}
 
 	deleteAndClear() {

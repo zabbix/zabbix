@@ -25,7 +25,7 @@
 			this.delete_url = delete_url;
 
 			document.querySelector('.js-create-templategroup').addEventListener('click', () => {
-				ZABBIX.PopupManager.openPopup('templategroup.edit');
+				ZABBIX.PopupManager.open('templategroup.edit');
 			});
 
 			document.addEventListener('click', (e) => {
@@ -96,8 +96,8 @@
 		#registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
 				callback: () => {
 					uncheckTableRows('templategroup');

@@ -28,9 +28,9 @@ window.correlation_edit_popup = new class {
 		this.correlation = correlation;
 		this.correlationid = correlation.correlationid;
 
-		const back_url = new Curl('zabbix.php');
-		back_url.setArgument('action', 'correlation.list');
-		ZABBIX.PopupManager.setBackUrl(back_url.getUrl());
+		const return_url = new URL('zabbix.php', location.origin);
+		return_url.searchParams.set('action', 'correlation.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-condition-add')) {

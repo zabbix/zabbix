@@ -49,7 +49,7 @@
 		#initActions() {
 			document.addEventListener('click', e => {
 				if (e.target.classList.contains('js-create-sla')) {
-					ZABBIX.PopupManager.openPopup('sla.edit');
+					ZABBIX.PopupManager.open('sla.edit');
 				}
 				else if (e.target.classList.contains('js-enable-sla')) {
 					this.#enable(e.target, [e.target.dataset.slaid]);
@@ -166,8 +166,8 @@
 		#registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
 				callback: () => {
 					uncheckTableRows('sla');

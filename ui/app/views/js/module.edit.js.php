@@ -22,9 +22,9 @@ window.module_edit = new class {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
-		const back_url = new Curl('zabbix.php');
-		back_url.setArgument('action', 'module.list');
-		ZABBIX.PopupManager.setBackUrl(back_url.getUrl());
+		const return_url = new URL('zabbix.php', location.origin);
+		return_url.searchParams.set('action', 'module.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 	}
 
 	submit() {

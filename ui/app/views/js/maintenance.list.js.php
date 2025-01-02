@@ -35,7 +35,7 @@
 		#initActions() {
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-create-maintenance')) {
-					ZABBIX.PopupManager.openPopup('maintenance.edit');
+					ZABBIX.PopupManager.open('maintenance.edit');
 				}
 				else if (e.target.classList.contains('js-massdelete-maintenance')) {
 					this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
@@ -113,8 +113,8 @@
 		#registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
 				callback: () => {
 					uncheckTableRows('maintenance');

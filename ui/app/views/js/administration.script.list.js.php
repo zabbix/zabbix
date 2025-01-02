@@ -29,7 +29,7 @@
 
 		#initActions() {
 			document.getElementById('js-create').addEventListener('click', () => {
-				ZABBIX.PopupManager.openPopup('script.edit');
+				ZABBIX.PopupManager.open('script.edit');
 			});
 
 			document.getElementById('js-massdelete').addEventListener('click', e => {
@@ -40,8 +40,8 @@
 		#registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
 				callback: () => {
 					uncheckTableRows('script');

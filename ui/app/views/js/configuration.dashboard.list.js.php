@@ -30,18 +30,18 @@
 		#registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
-				callback: ({data}) => {
+				callback: ({data, event}) => {
 					uncheckTableRows(this.checkbox_hash);
 
-					if (data.success.action === 'delete') {
-						const url = new Curl('zabbix.php');
+					if (data.submit.success.action === 'delete') {
+						const url = new URL('zabbix.php', location.origin);
 
-						url.setArgument('action', 'template.list');
+						url.searchParams.set('action', 'template.list');
 
-						ZABBIX.PopupManager.setCurrentUrl(url.getUrl());
+						event.setRedirectUrl(url.href);
 					}
 				}
 			});

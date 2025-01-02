@@ -206,31 +206,39 @@
 		#registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_BEFORE_OPEN,
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_OPEN,
 					action: 'host.edit'
 				},
 				callback: ({data, event}) => {
 					event.preventDefault();
 
 					if (window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
-						location.href = data.href;
+						const standalone_url_params = objectToSearchParams({
+							action: CPopupManager.STANDALONE_ACTION,
+							popup: 'host.edit',
+							...data.action_parameters
+						}).toString();
+
+						const standalone_url = new URL(`zabbix.php?${standalone_url_params}`, location.origin);
+
+						location.href = standalone_url.href;
 					}
 				}
 			});
 
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
-				callback: ({data}) => {
-					if (data.success.action === 'delete') {
-						const url = new Curl('host_discovery.php');
+				callback: ({data, event}) => {
+					if (data.submit.success.action === 'delete') {
+						const url = new URL('host_discovery.php', location.origin);
 
-						url.setArgument('context', 'template');
+						url.searchParams.set('context', this.context);
 
-						ZABBIX.PopupManager.setCurrentUrl(url.getUrl());
+						event.setRedirectUrl(url.href);
 					}
 					else {
 						this.refresh();

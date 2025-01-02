@@ -76,12 +76,12 @@
 		#initActions() {
 			document.addEventListener('click', e => {
 				if (e.target.matches('.js-create-service')) {
-					ZABBIX.PopupManager.openPopup('service.edit',
-							this.serviceid !== null ? {parent_serviceids: [this.serviceid]} : {}
+					ZABBIX.PopupManager.open('service.edit',
+						this.serviceid !== null ? {parent_serviceids: [this.serviceid]} : {}
 					);
 				}
 				else if (e.target.classList.contains('js-add-child-service')) {
-					ZABBIX.PopupManager.openPopup('service.edit', {parent_serviceids: [e.target.dataset.serviceid]});
+					ZABBIX.PopupManager.open('service.edit', {parent_serviceids: [e.target.dataset.serviceid]});
 				}
 				else if (e.target.classList.contains('js-delete-service')) {
 					this.#delete(e.target, [e.target.dataset.serviceid]);
@@ -110,8 +110,8 @@
 		#registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_BEFORE_OPEN
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_OPEN
 				},
 				callback: () => {
 					this.#pauseRefresh();
@@ -120,8 +120,8 @@
 
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_CLOSE
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_CANCEL
 				},
 				callback: () => {
 					this.#resumeRefresh();
@@ -130,14 +130,14 @@
 
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
-				callback: ({data}) => {
+				callback: ({data, event}) => {
 					uncheckTableRows(chkbxRange.prefix);
 
-					if (data.success.action === 'delete' && data.serviceid === this.serviceid) {
-						ZABBIX.PopupManager.setCurrentUrl(this.parent_url);
+					if (data.submit.success.action === 'delete' && data.submit.serviceid === this.serviceid) {
+						event.setRedirectUrl(this.parent_url);
 					}
 				}
 			});

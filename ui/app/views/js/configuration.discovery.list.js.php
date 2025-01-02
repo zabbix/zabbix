@@ -24,7 +24,7 @@
 
 		init() {
 			document.getElementById('js-create').addEventListener('click', () => {
-				ZABBIX.PopupManager.openPopup('discovery.edit');
+				ZABBIX.PopupManager.open('discovery.edit');
 			});
 
 			document.getElementById('js-massenable').addEventListener('click', (e) => {
@@ -146,8 +146,8 @@
 		#registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
 				callback: () => {
 					uncheckTableRows('discovery');

@@ -31,7 +31,7 @@
 		#initActionButtons() {
 			document.addEventListener('click', e => {
 				if (e.target.classList.contains('js-create-token')) {
-					ZABBIX.PopupManager.openPopup('token.edit', {admin_mode: '1'});
+					ZABBIX.PopupManager.open('token.edit', {admin_mode: '1'});
 				}
 				else if (e.target.classList.contains('js-massdelete-token')) {
 					this.#massDeleteToken(e.target, Object.keys(chkbxRange.getSelectedIds()));
@@ -42,8 +42,8 @@
 		#registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
 				callback: () => {
 					uncheckTableRows('token');

@@ -45,7 +45,7 @@ window.trigger_edit_popup = new class {
 		this.recovery_expression_constructor_active = false;
 		this.selected_dependencies = [];
 
-		ZABBIX.PopupManager.setBackUrl(back_url);
+		ZABBIX.PopupManager.setReturnUrl(back_url);
 
 		window.addPopupValues = (data) => {
 			this.addPopupValues(data.values);
@@ -185,18 +185,17 @@ window.trigger_edit_popup = new class {
 	}
 
 	#registerSubscribers() {
-		// Stop all existing events, so they are not duplicated when reloadPopup function is executed.
-		ZABBIX.PopupManager.stopEvents();
+		const subscriptions = [];
 
 		for (const action of ['template.edit', 'trigger.edit', 'trigger.prototype.edit']) {
 			const subscription = ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_BEFORE_OPEN,
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_OPEN,
 					action
 				},
 				callback: ({data, event}) => {
-					if (data.parameters.triggerid === this.triggerid || this.triggerid === null
+					if (data.action_parameters.triggerid === this.triggerid || this.triggerid === null
 							|| event === undefined) {
 						return;
 					}
@@ -207,8 +206,14 @@ window.trigger_edit_popup = new class {
 				}
 			});
 
-			ZABBIX.PopupManager.addSubscriber(subscription);
+			subscriptions.push(subscription);
 		}
+
+		this.dialogue.addEventListener('dialogue.close', () => {
+			for (const subscription of subscriptions) {
+				ZABBIX.EventHub.unsubscribe(subscription);
+			}
+		});
 	}
 
 	#initTriggersTab() {

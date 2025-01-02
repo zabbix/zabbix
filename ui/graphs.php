@@ -21,7 +21,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = hasRequest('parent_discoveryid') ? _('Configuration of graph prototypes') : _('Configuration of graphs');
 $page['file'] = 'graphs.php';
-$page['scripts'] = ['colorpicker.js', 'multiselect.js', 'items.js', 'multilineinput.js'];
+$page['scripts'] = ['colorpicker.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

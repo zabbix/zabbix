@@ -19,9 +19,6 @@
  * @var array $data
  */
 
-$this->addJsFile('items.js');
-$this->addJsFile('multilineinput.js');
-
 $sections = [];
 
 $table = (new CTableInfo())

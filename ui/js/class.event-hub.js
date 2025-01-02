@@ -130,8 +130,8 @@ class CEventHub {
 	/**
 	 * Check if subscribers exist matching the criteria.
 	 *
-	 * @param {Object} require        Event descriptor requirements.
-	 * @param {string} require_type   Event type requirement.
+	 * @param {Object} require       Event descriptor requirements.
+	 * @param {string} require_type  Event type requirement.
 	 *
 	 * @returns {boolean}
 	 */
@@ -148,8 +148,8 @@ class CEventHub {
 	/**
 	 * Get cached event data matching the criteria.
 	 *
-	 * @param {Object} require        Event descriptor requirements.
-	 * @param {string} require_type   Event type requirement.
+	 * @param {Object} require       Event descriptor requirements.
+	 * @param {string} require_type  Event type requirement.
 	 *
 	 * @returns {*|undefined}  Data of the last cached event matching the criteria, undefined otherwise.
 	 */
@@ -166,8 +166,8 @@ class CEventHub {
 	/**
 	 * Invalidate cached event data matching the criteria.
 	 *
-	 * @param {Object} require        Event descriptor requirements.
-	 * @param {string} require_type   Event type requirement.
+	 * @param {Object} require       Event descriptor requirements.
+	 * @param {string} require_type  Event type requirement.
 	 *
 	 * @returns {this}
 	 */

@@ -19,8 +19,6 @@
  * @var array $data
  */
 
-$this->addJsFile('items.js');
-$this->addJsFile('multilineinput.js');
 $this->includeJsFile('configuration.hostgroup.list.js.php');
 
 $html_page = (new CHtmlPage())

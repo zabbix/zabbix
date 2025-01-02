@@ -31,7 +31,7 @@
 		 */
 		#initActions() {
 			document.getElementById('js-create').addEventListener('click', () => {
-				ZABBIX.PopupManager.openPopup('correlation.edit');
+				ZABBIX.PopupManager.open('correlation.edit');
 			});
 			document.getElementById('js-massdelete').addEventListener('click',
 				(e) => this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()))
@@ -183,8 +183,8 @@
 		#registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
 				callback: () => {
 					uncheckTableRows('correlation');

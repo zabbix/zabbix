@@ -20,7 +20,6 @@
  */
 
 $this->includeJsFile('mediatype.list.js.php');
-$this->addJsFile('multilineinput.js');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Media types'))

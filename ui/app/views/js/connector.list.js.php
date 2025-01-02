@@ -29,7 +29,7 @@
 
 		#initActions() {
 			document.querySelector('.js-create-connector').addEventListener('click', () => {
-				ZABBIX.PopupManager.openPopup('connector.edit');
+				ZABBIX.PopupManager.open('connector.edit');
 			});
 
 			const form = document.getElementById('connector-list');
@@ -59,8 +59,8 @@
 		#registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
 				callback: () => {
 					uncheckTableRows('connector');

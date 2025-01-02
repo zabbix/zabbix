@@ -44,9 +44,9 @@ window.proxy_group_edit_popup = new class {
 		this.#proxy_groupid = proxy_groupid;
 		this.#initial_form_fields = getFormFields(this.#form);
 
-		const back_url = new Curl('zabbix.php');
-		back_url.setArgument('action', 'proxygroup.list');
-		ZABBIX.PopupManager.setBackUrl(back_url.getUrl());
+		const return_url = new URL('zabbix.php', location.origin);
+		return_url.searchParams.set('action', 'proxygroup.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		this.#registerSubscribers();
 	}
@@ -54,8 +54,8 @@ window.proxy_group_edit_popup = new class {
 	#registerSubscribers() {
 		const subscription = ZABBIX.EventHub.subscribe({
 			require: {
-				context: CPopupManager.CONTEXT_POPUP,
-				event: CPopupManager.EVENT_BEFORE_OPEN,
+				context: CPopupManager.EVENT_CONTEXT,
+				event: CPopupManagerEvent.EVENT_OPEN,
 				action: 'proxy.edit'
 			},
 			callback: ({event}) => {
@@ -65,7 +65,7 @@ window.proxy_group_edit_popup = new class {
 			}
 		});
 
-		ZABBIX.PopupManager.addSubscriber(subscription);
+		this.#dialogue.addEventListener('dialogue.close', () => ZABBIX.EventHub.unsubscribe(subscription));
 	}
 
 	#isConfirmed() {

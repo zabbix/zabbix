@@ -15,217 +15,231 @@
 
 class CPopupManager {
 
-	static CONTEXT_POPUP =			'popup';
+	/**
+	 * Name of standalone popup action.
+	 *
+	 * @type {string}
+	 */
+	static STANDALONE_ACTION = 'popup';
 
-	static EVENT_BEFORE_OPEN =		'before.open';
-	static EVENT_OPEN =				'open';
-	static EVENT_CLOSE =			'close';
-	static EVENT_SUBMIT =			'submit';
+	/**
+	 * Context name for popup manager events.
+	 *
+	 * @type {string}
+	 */
+	static EVENT_CONTEXT = 'popup-manager';
 
-	#overlay = null;
-	#current_url = null;
-	#back_url = null;
-	#is_popup_page = false;
-	#action = '';
-	#subscribers = [];
+	/**
+	 * Current popup overlay.
+	 *
+	 * @type {Overlay|null}
+	 */
+	static #overlay = null;
 
-	constructor() {
+	/**
+	 * Close event handler for currently open dialogue overlay.
+	 *
+	 * @type {function|null}
+	 */
+	static #on_close = null;
+
+	/**
+	 * Submit event handler for currently open dialogue overlay.
+	 *
+	 * @type {function|null}
+	 */
+	static #on_submit = null;
+
+	/**
+	 * Non-standalone origin URL from where the first popup was opened.
+	 *
+	 * @type {string|null}
+	 */
+	static #origin_url = null;
+
+	/**
+	 * Default URL to redirect to from standalone popup page after dialogue submit or close.
+	 *
+	 * @type {string|null}
+	 */
+	static #return_url = null;
+
+	/**
+	 * Initialize popup manager.
+	 */
+	static init() {
 		document.addEventListener('click', e => {
-			if (e.ctrlKey || e.metaKey || e.button === 1) {
+			if (e.ctrlKey || e.metaKey || e.button !== 0) {
 				return;
 			}
 
-			const target_element = e.target.closest('a') || e.target.closest('button');
-			const href = target_element?.getAttribute('href') || target_element?.dataset.href || '';
+			const target_element = e.target.closest('a, button');
 
-			if (href === '') {
-				return;
-			}
+			const standalone_url = target_element?.getAttribute('href') || target_element?.dataset.href || '';
 
-			const url = new Curl(href);
+			const {action, popup, ...action_parameters} = searchParamsToObject(
+				new URL(standalone_url, location.origin).searchParams
+			);
 
-			if (url.getArgument('action') !== CPopupManager.CONTEXT_POPUP) {
+			if (action !== CPopupManager.STANDALONE_ACTION) {
 				return;
 			}
 
 			e.preventDefault();
 
-			const action = url.getArgument('popup');
-
-			// Get all arguments from url except "action" and "popup".
-			const parameters = (({action, popup, ...args}) => args)(url.getArguments());
-
-			const event = new CEventHubEvent({
-				data: {
-					href,
-					parameters
-				},
-				descriptor: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_BEFORE_OPEN,
-					action
-				}
-			});
-
-			ZABBIX.EventHub.publish(event);
-
-			if (event.isDefaultPrevented()) {
-				return;
-			}
-
-			if (this.#overlay === null) {
-				this.#is_popup_page = new URL(location.href).searchParams.get('action') === CPopupManager.CONTEXT_POPUP;
-
-				this.#current_url = location.href;
-			}
-			else {
-				overlayDialogueDestroy(this.#overlay.dialogueid);
-
-				this.#overlay = null;
-
-				this.stopEvents();
-			}
-
-			this.openPopup(action, parameters, this.#is_popup_page, undefined, href);
+			CPopupManager.open(popup, action_parameters, {}, true);
 		});
 	}
 
-	openPopup(action, parameters = {}, is_popup_page = false, options = {
-		dialogueid: action,
-		prevent_navigation: true
-	}, target_url = null) {
-		this.#is_popup_page = is_popup_page;
-		this.#action = action;
-
-		const event = new CEventHubEvent({
-			data: {
-				...parameters
-			},
+	/**
+	 * Open popup dialogue.
+	 *
+	 * @param {string}  action               MVC action of the popup dialogue.
+	 * @param {Object}  action_parameters    MVC action parameters.
+	 * @param {Object}  popup_options        Popup options ("prevent_navigation", etc.)
+	 * @param {boolean} supports_standalone  Whether the popup dialogue supports opening on standalone page.
+	 *
+	 * @returns {Overlay|null}
+	 */
+	static open(
+		action,
+		action_parameters = {},
+		popup_options = {},
+		supports_standalone = false
+	) {
+		const open_event = new CPopupManagerEvent({
+			data: {action_parameters, popup_options, supports_standalone},
 			descriptor: {
-				context: CPopupManager.CONTEXT_POPUP,
-				event: CPopupManager.EVENT_OPEN,
+				context: CPopupManager.EVENT_CONTEXT,
+				event: CPopupManagerEvent.EVENT_OPEN,
 				action
 			}
 		});
 
-		ZABBIX.EventHub.publish(event);
+		ZABBIX.EventHub.publish(open_event);
 
-		if (event.isDefaultPrevented()) {
-			return;
+		if (open_event.isDefaultPrevented()) {
+			return null;
 		}
 
-		if (target_url !== null) {
-			history.replaceState(null, '', target_url);
+		if (new URLSearchParams(location.search).get('action') !== CPopupManager.STANDALONE_ACTION) {
+			CPopupManager.#origin_url = location.href;
 		}
 
-		this.#overlay = PopUp(action, parameters, options);
+		if (supports_standalone) {
+			const standalone_url_params = objectToSearchParams({
+				action: CPopupManager.STANDALONE_ACTION,
+				popup: action,
+				...action_parameters
+			}).toString();
 
-		this.#overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
-			const detail = e.detail;
+			const standalone_url = new URL(`zabbix.php?${standalone_url_params}`, location.origin);
 
-			const event = new CEventHubEvent({
-				data: {
-					...detail,
-					...parameters
-				},
+			history.replaceState(null, '', standalone_url);
+		}
+
+		if (CPopupManager.#overlay !== null) {
+			CPopupManager.#overlay.$dialogue[0].removeEventListener('dialogue.submit', CPopupManager.#on_submit);
+			CPopupManager.#overlay.$dialogue[0].removeEventListener('dialogue.close', CPopupManager.#on_close);
+
+			overlayDialogueDestroy(this.#overlay.dialogueid);
+		}
+
+		CPopupManager.#overlay = PopUp(action, action_parameters, {
+			dialogueid: action,
+			prevent_navigation: true,
+			...popup_options
+		});
+
+		CPopupManager.#on_close = e => {
+			this.#overlay = null;
+
+			if (e.detail.close_by !== Overlay.prototype.CLOSE_BY_USER) {
+				return;
+			}
+
+			const cancel_event = new CPopupManagerEvent({
+				data: {action_parameters, popup_options, supports_standalone},
 				descriptor: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT,
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_CANCEL,
 					action
 				}
 			});
 
-			ZABBIX.EventHub.publish(event);
+			ZABBIX.EventHub.publish(cancel_event);
 
-			if (event.isDefaultPrevented()) {
+			if (cancel_event.isDefaultPrevented()) {
 				return;
 			}
 
-			if ('success' in detail) {
-				postMessageOk(detail.success.title);
+			if (CPopupManager.#origin_url !== null) {
+				const redirect_url = cancel_event.getRedirectUrl();
 
-				if ('messages' in detail.success) {
-					postMessageDetails('success', detail.success.messages);
+				if (redirect_url !== null) {
+					history.replaceState(null, '', redirect_url);
+
+					location.href = location.href;
+				}
+				else {
+					history.replaceState(null, '', CPopupManager.#origin_url);
+				}
+			}
+			else {
+				location.href = cancel_event.getRedirectUrl() || CPopupManager.#return_url || location.href;
+			}
+		}
+
+		CPopupManager.#on_submit = e => {
+			const submit_event = new CPopupManagerEvent({
+				data: {action_parameters, popup_options, supports_standalone, submit: e.detail},
+				descriptor: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT,
+					action
+				}
+			});
+
+			ZABBIX.EventHub.publish(submit_event);
+
+			if (submit_event.isDefaultPrevented()) {
+				if (CPopupManager.#origin_url !== null) {
+					history.replaceState(null, '', CPopupManager.#origin_url);
+				}
+
+				return;
+			}
+
+			if ('success' in e.detail) {
+				postMessageOk(e.detail.success.title);
+
+				if ('messages' in e.detail.success) {
+					postMessageDetails('success', e.detail.success.messages);
 				}
 			}
 
-			if (this.#is_popup_page) {
-				const back_url = this.#back_url;
-
-				setTimeout(() => redirect(back_url));
-			}
-			else {
-				history.replaceState(null, '', this.#current_url);
+			if (CPopupManager.#origin_url !== null) {
+				history.replaceState(null, '', submit_event.getRedirectUrl() || CPopupManager.#origin_url);
 
 				location.href = location.href;
 			}
-
-			this.#overlay = null;
-
-		}, {once: true});
-
-		this.#overlay.$dialogue[0].addEventListener('dialogue.close', () => {
-			const event = new CEventHubEvent({
-				descriptor: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_CLOSE,
-					action
-				}
-			});
-
-			ZABBIX.EventHub.publish(event);
-
-			if (event.isDefaultPrevented()) {
-				return;
-			}
-
-			if (this.#is_popup_page) {
-				const back_url = this.#back_url;
-
-				setTimeout(() => redirect(back_url));
-			}
 			else {
-				history.replaceState(null, '', this.#current_url);
+				location.href = submit_event.getRedirectUrl() || CPopupManager.#return_url || location.href;
 			}
+		};
 
-			this.#overlay = null;
+		CPopupManager.#overlay.$dialogue[0].addEventListener('dialogue.submit', CPopupManager.#on_submit, {once: true});
+		CPopupManager.#overlay.$dialogue[0].addEventListener('dialogue.close', CPopupManager.#on_close, {once: true});
 
-			this.stopEvents();
-		});
-
-		return this.#overlay;
+		return CPopupManager.#overlay;
 	}
 
-	stopEvents() {
-		for (const subscription of this.#subscribers) {
-			ZABBIX.EventHub.unsubscribe(subscription);
-		}
-
-		this.#subscribers = [];
-
-		ZABBIX.EventHub.invalidateData({
-			context: CPopupManager.CONTEXT_POPUP,
-			action: this.#action
-		});
-	}
-
-	setCurrentUrl(url) {
-		this.#current_url = url;
-	}
-
-	getCurrentUrl() {
-		return this.#current_url;
-	}
-
-	setBackUrl(url) {
-		this.#back_url = url;
-	}
-
-	getBackUrl() {
-		return this.#back_url;
-	}
-
-	addSubscriber(subscription) {
-		this.#subscribers.push(subscription);
+	/**
+	 * Set default URL to redirect to from standalone popup page after dialogue submit or close.
+	 *
+	 * @param {string} url
+	 */
+	static setReturnUrl(url) {
+		CPopupManager.#return_url = url;
 	}
 }

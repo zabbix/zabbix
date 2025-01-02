@@ -19,9 +19,6 @@
  * @var array $data
  */
 
-$this->addJsFile('class.tagfilteritem.js');
-$this->addJsFile('class.calendar.js');
-
 $this->includeJsFile('sla.list.js.php');
 
 $filter = (new CFilter())

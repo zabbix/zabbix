@@ -19,9 +19,6 @@
  * @var array $data
  */
 
-$this->addJsFile('class.tagfilteritem.js');
-$this->addJsFile('items.js');
-$this->addJsFile('multilineinput.js');
 $this->includeJsFile('configuration.host.list.js.php');
 
 if ($data['uncheck']) {

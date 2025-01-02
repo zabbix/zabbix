@@ -31,7 +31,7 @@
 		#initActions() {
 			document.addEventListener('click', e => {
 				if (e.target.classList.contains('js-action-create')) {
-					ZABBIX.PopupManager.openPopup('action.edit', {eventsource: this.eventsource});
+					ZABBIX.PopupManager.open('action.edit', {eventsource: this.eventsource});
 				}
 				else if (e.target.classList.contains('js-enable-action')) {
 					this.#enable(e.target, [e.target.dataset.actionid]);
@@ -54,8 +54,8 @@
 		#registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
 				callback: () => {
 					uncheckTableRows('action_' + this.eventsource);

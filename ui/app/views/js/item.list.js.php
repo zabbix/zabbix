@@ -119,7 +119,7 @@
 			});
 
 			document.querySelector('.js-create-item')?.addEventListener('click', () => {
-				ZABBIX.PopupManager.openPopup('item.edit', {hostid: this.hostid, context: this.context});
+				ZABBIX.PopupManager.open('item.edit', {hostid: this.hostid, context: this.context});
 			});
 		}
 
@@ -235,30 +235,30 @@
 		#registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
-				callback: ({data}) => {
-					if ('error' in data) {
-						if ('title' in data.error) {
-							postMessageError(data.error.title);
+				callback: ({data, descriptor, event}) => {
+					if ('error' in data.submit) {
+						if ('title' in data.submit.error) {
+							postMessageError(data.submit.error.title);
 						}
 
-						postMessageDetails('error', data.error.messages);
+						postMessageDetails('error', data.submit.error.messages);
 					}
 					else {
 						chkbxRange.clearSelectedOnFilterChange();
 					}
 
 					// If host or template was deleted while being in item list, redirect to item list.
-					if (data.success.action === 'delete' && data.action !== 'item.delete') {
-						const url = new Curl('zabbix.php');
+					if (descriptor.action !== 'item.delete' && data.submit.success.action === 'delete') {
+						const url = new URL('zabbix.php', location.origin);
 
-						url.setArgument('action', 'item.list');
-						url.setArgument('context', this.context);
-						url.setArgument('filter_set', 1);
+						url.searchParams.set('action', 'item.list');
+						url.searchParams.set('context', this.context);
+						url.searchParams.set('filter_set', 1);
 
-						ZABBIX.PopupManager.setCurrentUrl(url.getUrl());
+						event.setRedirectUrl(url.href);
 					}
 				}
 			});

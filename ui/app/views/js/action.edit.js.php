@@ -26,10 +26,10 @@ window.action_edit_popup = new class {
 		this.actionid = actionid;
 		this.eventsource = eventsource;
 
-		const back_url = new Curl('zabbix.php');
-		back_url.setArgument('action', 'action.list');
-		back_url.setArgument('eventsource', this.eventsource);
-		ZABBIX.PopupManager.setBackUrl(back_url.getUrl());
+		const return_url = new URL('zabbix.php', location.origin);
+		return_url.searchParams.set('action', 'action.list');
+		return_url.searchParams.set('eventsource', this.eventsource);
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		this._initActionButtons();
 		this.#processTypeOfCalculation();

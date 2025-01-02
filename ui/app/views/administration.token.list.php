@@ -24,7 +24,6 @@ if ($data['uncheck']) {
 }
 
 $this->includeJsFile('administration.token.list.js.php');
-$this->addJsFile('class.calendar.js');
 
 $filter = (new CFilter())
 	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'token.list'))

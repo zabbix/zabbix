@@ -29,7 +29,7 @@
 
 		#initActions() {
 			document.querySelector('.js-create-proxy-group').addEventListener('click', () => {
-				ZABBIX.PopupManager.openPopup('proxygroup.edit');
+				ZABBIX.PopupManager.open('proxygroup.edit');
 			});
 
 			const form = document.getElementById('proxy-group-list');
@@ -42,8 +42,8 @@
 		#registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
 				callback: () => {
 					uncheckTableRows('proxygroup');

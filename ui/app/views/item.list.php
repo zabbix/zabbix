@@ -19,9 +19,6 @@
  * @var array $data
  */
 
-$this->addJsFile('multilineinput.js');
-$this->addJsFile('items.js');
-$this->addJsFile('class.tagfilteritem.js');
 $this->includeJsFile('item.list.js.php', $data);
 
 $filter = new CPartial('item.list.filter', [

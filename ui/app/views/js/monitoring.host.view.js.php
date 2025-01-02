@@ -66,15 +66,15 @@
 
 		initEvents() {
 			document.querySelector('.js-create-host')?.addEventListener('click', () => {
-				ZABBIX.PopupManager.openPopup('host.edit', {groupids: this.applied_filter_groupids});
+				ZABBIX.PopupManager.open('host.edit', {groupids: this.applied_filter_groupids});
 			});
 		},
 
 		registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_BEFORE_OPEN
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_OPEN
 				},
 				callback: () => {
 					this.unscheduleRefresh();
@@ -83,8 +83,8 @@
 
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_CLOSE
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_CANCEL
 				},
 				callback: () => {
 					this.scheduleRefresh();
@@ -93,19 +93,19 @@
 
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
 				callback: ({data, event}) => {
 					event.preventDefault();
 
-					if ('success' in data) {
-						this._addPopupMessage(makeMessageBox('good', data.success.messages, data.success.title));
+					if ('success' in data.submit) {
+						this._addPopupMessage(
+							makeMessageBox('good', data.submit.success.messages, data.submit.success.title)
+						);
 					}
 
 					this.reloadPartialAndTabCounters();
-
-					history.replaceState(null, '', ZABBIX.PopupManager.getCurrentUrl());
 				}
 			});
 		},

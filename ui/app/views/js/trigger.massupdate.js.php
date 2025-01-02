@@ -70,25 +70,36 @@
 		jQuery('#dependencies_' + triggerid).remove();
 	}
 
-	for (const action of ['trigger.edit', 'trigger.prototype.edit']) {
-		const subscription = ZABBIX.EventHub.subscribe({
-			require: {
-				context: CPopupManager.CONTEXT_POPUP,
-				event: CPopupManager.EVENT_BEFORE_OPEN,
-				action
-			},
-			callback: ({event}) => {
-				if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
-					event.preventDefault();
+	(() => {
+		const massupdate_overlay = overlays_stack.end();
 
-					return;
+		const subscriptions = [];
+
+		for (const action of ['trigger.edit', 'trigger.prototype.edit']) {
+			const subscription = ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_OPEN,
+					action
+				},
+				callback: ({event}) => {
+					if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
+						event.preventDefault();
+
+						return;
+					}
+
+					overlayDialogueDestroy(massupdate_overlay.dialogueid);
 				}
+			});
 
-				const massupdate_overlay = overlays_stack.end();
-				overlayDialogueDestroy(massupdate_overlay.dialogueid);
+			subscriptions.push(subscription);
+		}
+
+		massupdate_overlay.$dialogue[0].addEventListener('dialogue.close', () => {
+			for (const subscription of subscriptions) {
+				ZABBIX.EventHub.unsubscribe(subscription);
 			}
 		});
-
-		ZABBIX.PopupManager.addSubscriber(subscription);
-	}
+	})();
 </script>

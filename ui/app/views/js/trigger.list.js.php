@@ -82,7 +82,7 @@
 			});
 
 			document.getElementById('js-create')?.addEventListener('click', e => {
-				ZABBIX.PopupManager.openPopup('trigger.edit', {hostid: e.target.dataset.hostid, context: this.context});
+				ZABBIX.PopupManager.open('trigger.edit', {hostid: e.target.dataset.hostid, context: this.context});
 			});
 			document.getElementById('js-copy').addEventListener('click', () => this.#copy());
 			document.getElementById('js-massenable-trigger').addEventListener('click', (e) => {
@@ -102,8 +102,8 @@
 		#registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
 				callback: () => {
 					uncheckTableRows('trigger');

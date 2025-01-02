@@ -29,14 +29,14 @@
 		#registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
-				callback: ({data}) => {
-					if (data.success.action === 'delete') {
-						const url = new Curl('hostinventories.php');
+				callback: ({data, event}) => {
+					if (data.submit.success.action === 'delete') {
+						const url = new URL('hostinventories.php', location.origin);
 
-						ZABBIX.PopupManager.setCurrentUrl(url.getUrl());
+						event.setRedirectUrl(url.href);
 					}
 				}
 			});

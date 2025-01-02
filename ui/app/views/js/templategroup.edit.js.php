@@ -25,9 +25,9 @@ window.templategroup_edit_popup = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
 
-		const back_url = new Curl('zabbix.php');
-		back_url.setArgument('action', 'templategroup.list');
-		ZABBIX.PopupManager.setBackUrl(back_url.getUrl());
+		const return_url = new URL('zabbix.php', location.origin);
+		return_url.searchParams.set('action', 'templategroup.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 	}
 
 	submit() {

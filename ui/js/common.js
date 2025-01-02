@@ -300,13 +300,13 @@ function getPosition(obj) {
  * Opens popup content in overlay dialogue.
  *
  * @param {string}           action              Popup controller related action.
- * @param {array|object}     parameters          Array with key/value pairs that will be used as query for popup
+ * @param {Array|Object}     parameters          Array with key/value pairs that will be used as query for popup
  *                                               request.
  *
  * @param {string}           dialogue_class      CSS class, usually based on .modal-popup and .modal-popup-{size}.
  * @param {string|null}      dialogueid          ID of overlay dialogue.
  * @param {HTMLElement|null} trigger_element     UI element which was clicked to open overlay dialogue.
- * @param {bool}             prevent_navigation  Show warning when navigating away from an active dialogue.
+ * @param {boolean}          prevent_navigation  Show warning when navigating away from an active dialogue.
  *
  * @returns {Overlay}
  */
@@ -479,8 +479,7 @@ function closeDialogHandler(event) {
 			switch (overlay.type) {
 				// Close overlay popup.
 				case 'popup':
-					overlayDialogueDestroy(overlay.dialogueid);
-					overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.close'));
+					overlayDialogueDestroy(overlay.dialogueid, Overlay.prototype.CLOSE_BY_USER);
 					break;
 
 				// Close overlay hintbox.
@@ -525,18 +524,14 @@ function closeDialogHandler(event) {
 }
 
 /**
- * Removed overlay from overlays stack and sets focus to source element.
+ * Remove overlay from stack and set focus to source element.
  *
- * @param {string} dialogueid		Id of dialogue, that is being closed.
- * @param {boolean} return_focus	If not FALSE, the element stored in overlay.element will be focused.
+ * @param {string}  dialogueid
+ * @param {boolean} return_focus  If true, overlay.element will be focused.
  *
- * @return {object|undefined|null}  Overlay object, if found.
+ * @return {Object|undefined}  Overlay object, if found.
  */
-function removeFromOverlaysStack(dialogueid, return_focus) {
-	if (return_focus !== false) {
-		return_focus = true;
-	}
-
+function removeFromOverlaysStack(dialogueid, return_focus = true) {
 	const overlay = overlays_stack.removeById(dialogueid);
 
 	if (overlay && return_focus) {

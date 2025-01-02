@@ -373,24 +373,24 @@
 		#registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
-				callback: ({data}) => {
-					if ('error' in data) {
-						if ('title' in data.error) {
-							postMessageError(data.error.title);
+				callback: ({data, event}) => {
+					if ('error' in data.submit) {
+						if ('title' in data.submit.error) {
+							postMessageError(data.submit.error.title);
 						}
 
-						postMessageDetails('error', data.error.messages);
+						postMessageDetails('error', data.submit.error.messages);
 					}
 
-					if (data.success.action === 'delete') {
-						const url = new Curl('zabbix.php');
+					if (data.submit.success.action === 'delete') {
+						const url = new URL('zabbix.php', location.origin);
 
-						url.setArgument('action', 'host.view');
+						url.searchParams.set('action', 'host.view');
 
-						ZABBIX.PopupManager.setCurrentUrl(url.getUrl());
+						event.setRedirectUrl(url.href);
 					}
 				}
 			});

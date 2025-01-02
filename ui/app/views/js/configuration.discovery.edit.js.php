@@ -32,9 +32,9 @@ window.drule_edit_popup = new class {
 		this.dcheckid = getUniqueId();
 		this.available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
 
-		const back_url = new Curl('zabbix.php');
-		back_url.setArgument('action', 'discovery.list');
-		ZABBIX.PopupManager.setBackUrl(back_url.getUrl());
+		const return_url = new URL('zabbix.php', location.origin);
+		return_url.searchParams.set('action', 'discovery.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		document.getElementById('discovery_by').addEventListener('change', () => this.#updateForm());
 

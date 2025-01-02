@@ -19,7 +19,6 @@
  * @var array $data
  */
 
-$this->addJsFile('class.calendar.js');
 $this->includeJsFile('maintenance.list.js.php');
 
 $filter = (new CFilter())

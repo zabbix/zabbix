@@ -20,9 +20,6 @@
  */
 
 $this->addJsFile('layout.mode.js');
-$this->addJsFile('class.tagfilteritem.js');
-$this->addJsFile('class.calendar.js');
-$this->addJsFile('class.form.fieldset.collapsible.js');
 
 $this->includeJsFile('service.list.js.php');
 

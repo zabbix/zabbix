@@ -50,7 +50,7 @@
 			});
 
 			document.getElementById('js-create').addEventListener('click', e => {
-				ZABBIX.PopupManager.openPopup('template.edit', {groupids: JSON.parse(e.target.dataset.groupids)});
+				ZABBIX.PopupManager.open('template.edit', {groupids: JSON.parse(e.target.dataset.groupids)});
 			});
 
 			document.getElementById('js-import').addEventListener('click', () => {
@@ -88,8 +88,8 @@
 		#registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
 				callback: () => {
 					uncheckTableRows('templates');

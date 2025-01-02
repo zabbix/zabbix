@@ -28,16 +28,16 @@
 		#registerSubscribers() {
 			ZABBIX.EventHub.subscribe({
 				require: {
-					context: CPopupManager.CONTEXT_POPUP,
-					event: CPopupManager.EVENT_SUBMIT
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
-				callback: ({data}) => {
-					if (data.success.action === 'delete') {
-						const url = new Curl('zabbix.php');
+				callback: ({data, event}) => {
+					if (data.submit.success.action === 'delete') {
+						const url = new URL('zabbix.php', location.origin);
 
-						url.setArgument('action', 'problem.view');
+						url.searchParams.set('action', 'problem.view');
 
-						ZABBIX.PopupManager.setCurrentUrl(url.getUrl());
+						event.setRedirectUrl(url.href);
 					}
 				}
 			});
