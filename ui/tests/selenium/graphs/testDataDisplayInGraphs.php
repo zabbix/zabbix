@@ -944,7 +944,7 @@ class testDataDisplayInGraphs extends CWebTest {
 						]
 					],
 					[
-						'name' => 'SVG graph types',
+						'name' => 'SVG graphs',
 						'widgets' => [
 							[
 								'type' => 'svggraph',
@@ -2098,6 +2098,2228 @@ class testDataDisplayInGraphs extends CWebTest {
 								]
 							]
 						]
+					],
+					// Pages with different aggregation and approximation functions combinations for two items in data set.
+					[
+						'name' => 'Aggregation+Auto+History',
+						'widgets' => [
+							[
+								'type' => 'svggraph',
+								'name' => 'Auto, Aggregation function = not used',
+								'x' => 0,
+								'y' => 0,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 0
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Auto, Aggregation function = min',
+								'x' => 36,
+								'y' => 0,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Auto, Aggregation function = max',
+								'x' => 0,
+								'y' => 4,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 2
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.approximation',
+										'value' => 7
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Auto, Aggregation function = avg',
+								'x' => 36,
+								'y' => 4,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 3
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.approximation',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Auto, Aggregation function = count',
+								'x' => 0,
+								'y' => 8,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 4
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.approximation',
+										'value' => 2
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Aggregation function = sum',
+								'x' => 36,
+								'y' => 8,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 5
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.approximation',
+										'value' => 4
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Auto, Aggregation function = first',
+								'x' => 0,
+								'y' => 12,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 6
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Auto, Aggregation function = last',
+								'x' => 36,
+								'y' => 12,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 7
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'History, Aggregation function = not used',
+								'x' => 0,
+								'y' => 16,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for history data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for history data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 0
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => '2023-10-06 00:00:00'
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => '2023-10-08 12:00:00'
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'History, Aggregation function = min',
+								'x' => 36,
+								'y' => 16,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for history data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for history data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => '2023-10-06 00:00:00'
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => '2023-10-08 12:00:00'
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'History, Aggregation function = max',
+								'x' => 0,
+								'y' => 20,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for history data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for history data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 2
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.approximation',
+										'value' => 7
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => '2023-10-06 00:00:00'
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => '2023-10-08 12:00:00'
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'History, Aggregation function = avg',
+								'x' => 36,
+								'y' => 20,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for history data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for history data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 3
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.approximation',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => '2023-10-06 00:00:00'
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => '2023-10-08 12:00:00'
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'History, Aggregation function = count',
+								'x' => 0,
+								'y' => 24,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for history data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for history data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 4
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.approximation',
+										'value' => 2
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => '2023-10-06 00:00:00'
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => '2023-10-08 12:00:00'
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'History, Aggregation function = sum',
+								'x' => 36,
+								'y' => 24,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for history data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for history data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 5
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.approximation',
+										'value' => 4
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => '2023-10-06 00:00:00'
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => '2023-10-08 12:00:00'
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'History, Aggregation function = first',
+								'x' => 0,
+								'y' => 28,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for history data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for history data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 6
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => '2023-10-06 00:00:00'
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => '2023-10-08 12:00:00'
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'History, Aggregation function = last',
+								'x' => 36,
+								'y' => 28,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for history data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for history data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 7
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => '2023-10-06 00:00:00'
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => '2023-10-08 12:00:00'
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							]
+						]
+					],
+					[
+						'name' => 'Aggregation+Trends',
+						'widgets' => [
+							[
+								'type' => 'svggraph',
+								'name' => 'Data set, Aggregation = not used',
+								'x' => 0,
+								'y' => 0,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 2
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 0
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Data set, Aggregation function = min',
+								'x' => 36,
+								'y' => 0,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 2
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Data set, Aggregation function = max',
+								'x' => 0,
+								'y' => 4,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 2
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 2
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.approximation',
+										'value' => 7
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Data set, Aggregation function = avg',
+								'x' => 36,
+								'y' => 4,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 2
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 3
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.approximation',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Data set, Aggregation function = count',
+								'x' => 0,
+								'y' => 8,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 2
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 4
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.approximation',
+										'value' => 2
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Data set, Aggregation function = sum',
+								'x' => 36,
+								'y' => 8,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 2
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 5
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.approximation',
+										'value' => 4
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Data set, Aggregation function = first',
+								'x' => 0,
+								'y' => 12,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 2
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 6
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Data set, Aggregation function = last',
+								'x' => 36,
+								'y' => 12,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 2
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 7
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Each item, Aggregation function = min',
+								'x' => 0,
+								'y' => 16,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 2
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 0
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Each item, Aggregation function = max',
+								'x' => 36,
+								'y' => 16,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 2
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 2
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 0
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.approximation',
+										'value' => 7
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Each item, Aggregation function = avg',
+								'x' => 0,
+								'y' => 20,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 2
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 3
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 0
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.approximation',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Each item, Aggregation function = count',
+								'x' => 36,
+								'y' => 20,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 2
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 4
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.approximation',
+										'value' => 2
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Each item, Aggregation function = sum',
+								'x' => 0,
+								'y' => 24,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 2
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 5
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.approximation',
+										'value' => 4
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Each item, Aggregation function = first',
+								'x' => 36,
+								'y' => 24,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 2
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 6
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Each item, Aggregation function = last',
+								'x' => 0,
+								'y' => 28,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'source',
+										'value' => 2
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.items.1',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_function',
+										'value' => 7
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.0.aggregate_interval',
+										'value' => '12h'
+									],
+									[
+										'type' => 0,
+										'name' => 'ds.0.aggregate_grouping',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['trends']['from']
+									],
+									[
+										'type' => 1,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['trends']['to']
+									],
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									]
+								]
+							]
+						]
 					]
 				]
 			]
@@ -2286,12 +4508,26 @@ class testDataDisplayInGraphs extends CWebTest {
 			],
 			[
 				[
-					'page' => 'SVG graph types'
+					'page' => 'SVG graphs'
 				]
 			],
 			[
 				[
 					'page' => 'Missing data + axes + timeshift + agg func'
+				]
+			],
+			/*
+			 * Widgets with different aggregation and approximation functions combinations for two items in data set.
+			 * These cases cover runtime errors detection in Aggregation and Trends settings combinations found during ZBX-22350.
+			 */
+			[
+				[
+					'page' => 'Aggregation+Auto+History'
+				]
+			],
+			[
+				[
+					'page' => 'Aggregation+Trends'
 				]
 			]
 		];

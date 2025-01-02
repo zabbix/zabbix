@@ -28,6 +28,8 @@ require_once dirname(__FILE__).'/../common/testWidgets.php';
  */
 class testDashboardGraphWidget extends testWidgets {
 
+	const DASHBOARD_URL = 'zabbix.php?action=dashboard.view&dashboardid=1030';
+
 	/**
 	 * Attach MessageBehavior and TagBehavior to the test.
 	 */
@@ -41,8 +43,6 @@ class testDashboardGraphWidget extends testWidgets {
 			CTableBehavior::class
 		];
 	}
-
-	const DASHBOARD_URL = 'zabbix.php?action=dashboard.view&dashboardid=1030';
 
 	/*
 	 * Set "Graph" as default widget type.
