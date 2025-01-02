@@ -110,6 +110,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 		// Add value to items for CheckTextItems test.
 		CDataHelper::addItemData(99086, 1000); // 1_item.
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_trap_text'], 'Text for text item');
+		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_text2'],  '2.00');
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_trap_log'], 'Logs for text item');
 		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_trap_char'], 'characters_here');
 	}
@@ -1736,6 +1737,64 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					]
 				]
+			],
+			// #45 Error message when empty highlight is passed.
+			[
+				[
+					'expected' => TEST_BAD,
+					'main_fields' => [
+						'Name' => 'Error in item column with empty highlight'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'Test column name',
+							'Data' => 'Item value',
+							'Item name' => 'Available memory',
+							'Display item value as' => 'Text',
+							'Highlights' => [
+								['color' => 'D1C4E9', 'regexp' => '']
+							]
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/highlights/1/pattern": cannot be empty.'
+					]
+				]
+			],
+			// #46 Successfully adding item with highlight.
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Column with item highlight'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'Test column name',
+							'Data' => 'Item value',
+							'Item name' => 'Item with type of information - Character',
+							'Highlights' => [
+								['color' => 'D1C4F6', 'regexp' => 'test_pattern']
+							]
+						]
+					]
+				]
+			],
+			// #47 Binary item in column.
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Column with binary item.'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'Test column with binary item',
+							'Data' => 'Item value',
+							'Item name' => 'Binary item',
+							'Display item value as' => 'Binary',
+							'Show thumbnail' => true
+						]
+					]
+				]
 			]
 		];
 	}
@@ -2583,6 +2642,62 @@ class testDashboardTopHostsWidget extends testWidgets {
 						['name' => 'aaa6 😅', 'value' => 'bbb6 😅', 'operator' => 'Does not contain']
 					]
 				]
+			],
+			// #34 Error message when empty highlight is passed.
+			[
+				[
+					'expected' => TEST_BAD,
+					'column_fields' => [
+						[
+							'Name' => 'Test column name',
+							'Data' => 'Item value',
+							'Item name' => 'Item with type of information - Character',
+							'Display item value as' => 'Text',
+							'Highlights' => [
+								['color' => 'D1C4E9', 'regexp' => '']
+							]
+						]
+					],
+					'column_error' => [
+						'Invalid parameter "/1/highlights/1/pattern": cannot be empty.'
+					]
+				]
+			],
+			// #35 Successful Highlights update.
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Updated values with Highlights'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'Test column name',
+							'Data' => 'Item value',
+							'Item name' => 'Item with type of information - Character',
+							'Display item value as' => 'Text',
+							'Highlights' => [
+								['color' => 'FFEB3B', 'regexp' => '(\W|^)test\zabbix(\W|$)']
+							]
+						]
+					]
+				]
+			],
+			// #36 Update to Binary item in column.
+			[
+				[
+					'main_fields' => [
+						'Name' => 'Column with binary item.'
+					],
+					'column_fields' => [
+						[
+							'Name' => 'Test column with binary item',
+							'Data' => 'Item value',
+							'Item name' => 'Binary item',
+							'Display item value as' => 'Binary',
+							'Show thumbnail' => true
+						]
+					]
+				]
 			]
 		];
 	}
@@ -2822,6 +2937,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 					unset($values['Thresholds']);
 				}
 
+				// Check Highlights values.
+				if (array_key_exists('Highlights', $values)) {
+					$this->getHighlightsTable()->checkValue($values['Highlights']);
+					unset($values['Highlights']);
+				}
+
 				// Advanced configuration in saved form is always false.
 				$values['Advanced configuration'] = false;
 				$column_dialog->asForm()->checkValue($values);
@@ -2864,12 +2985,16 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 			// Fill Highlights values.
 			if (array_key_exists('Highlights', $column)) {
-				$column_form->fill(['Display item value as' => 'Text']);
-				$this->getHighlightsTable()->fill($column['Highlights']);
+				// To get Highlights table visible we need to fill other column fields first.
+				$highlights = $column['Highlights'];
 				unset($column['Highlights']);
+				$column_form->fill($column);
+				$this->getHighlightsTable()->fill($highlights);
+			}
+			else {
+				$column_form->fill($column);
 			}
 
-			$column_form->fill($column);
 			$column_form->submit();
 
 			// Updating top host several columns, change it count number.
@@ -4093,7 +4218,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 		);
 	}
 
-	public static function getThresholdData() {
+	public static function getThresholdHighlightsData() {
 		return [
 			// Numeric (unsigned) item without data.
 			[
@@ -4205,17 +4330,32 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'opacity' => 'transparent'
 				]
 			],
-			// Non-numeric (Character) item without data and with aggregation function first.
+			// Non-numeric (Character) item with data and with matching Highlight.
 			[
 				[
 					'column_fields' => [
 						[
 							'Name' => 'Non-numeric (Character) item without data and with aggregation function first',
-							'Item name' => 'Item with type of information - Character',
-							'Advanced configuration' => true,
-							'Aggregation function' => 'first',
+							'Item name' => 'top_hosts_trap_char',
+							'Display item value as' => 'Text',
 							'Highlights' => [
-								['color' => '7E57C2', 'regexp' => '-1']
+								['color' => '7E57C2', 'regexp' => 'char']
+							]
+						]
+					],
+					'expected_color' => '7E57C2'
+				]
+			],
+			// Non-numeric (Character) item with data and with unmatching Highlight.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'Non-numeric (Character) item without data and with aggregation function first',
+							'Item name' => 'top_hosts_trap_char',
+							'Display item value as' => 'Text',
+							'Highlights' => [
+								['color' => '7E57C2', 'regexp' => 'test']
 							]
 						]
 					],
@@ -4223,17 +4363,16 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'opacity' => 'transparent'
 				]
 			],
-			// Non-numeric (Text) item without data and with aggregation function last.
+			// Non-numeric (Text) item with data displayed as numeric.
 			[
 				[
 					'column_fields' => [
 						[
 							'Name' => 'Non-numeric (Text) item without data and with aggregation function last',
-							'Item name' => 'Item with type of information - Text',
-							'Advanced configuration' => true,
-							'Aggregation function' => 'last',
-							'Highlights' => [
-								['color' => '7E57C2', 'regexp' => '0.00']
+							'Item name' => 'top_hosts_text2',
+							'Display item value as' => 'Numeric',
+							'Thresholds' => [
+								['color' => '0288D1', 'threshold' => '2.00']
 							]
 						]
 					],
@@ -4613,7 +4752,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Thresholds and non-nmeric (Log) item with aggregation function last',
 							'Item name' => 'Item with type of information - Log',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'last', //'min' is not available for text elements, changed to 'last'
+							'Aggregation function' => 'last',
 							'Highlights' => [
 								['color' => 'DDAAFF', 'regexp' => '0']
 							]
@@ -4632,7 +4771,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Thresholds and non-nmeric (Character) item with aggregation function first',
 							'Item name' => 'Item with type of information - Character',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'first', //'max' is not available for text elements, changed to 'first'
+							'Aggregation function' => 'first',
 							'Highlights' => [
 								['color' => 'D32F2F', 'regexp' => '-1'],
 								['color' => '8BC34A', 'regexp' => '0']
@@ -4652,7 +4791,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Name' => 'Thresholds and non-nmeric (Text) item with aggregation function last',
 							'Item name' => 'Item with type of information - Text',
 							'Advanced configuration' => true,
-							'Aggregation function' => 'last', //'avg' is not available for text elements, changed to 'last'
+							'Aggregation function' => 'last',
 							'Highlights' => [
 								['color' => 'D1C4E9', 'regexp' => '1'],
 								['color' => '80CBC4', 'regexp' => '2']
@@ -4745,9 +4884,9 @@ class testDashboardTopHostsWidget extends testWidgets {
 	/**
 	 * @backup !history, !history_log, !history_str, !history_text, !history_uint
 	 *
-	 * @dataProvider getThresholdData
+	 * @dataProvider getThresholdHighlightsData
 	 */
-	public function testDashboardTopHostsWidget_ThresholdColor($data) {
+	public function testDashboardTopHostsWidget_ThresholdHighlightsColor($data) {
 		$time = strtotime('now');
 		$this->createTopHostsWidget($data, self::$other_dashboardids[self::DASHBOARD_THRESHOLD]);
 		$dashboard = CDashboardElement::find()->one();

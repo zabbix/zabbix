@@ -35,6 +35,13 @@ class TopHostsWidget {
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			[
+				'name' => 'top_hosts_text2',
+				'key_' => 'top_hosts_text2',
+				'hostid' => self::ZABBIX_SERVER_HOSTID,
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_TEXT
+			],
+			[
 				'name' => 'top_hosts_trap_log',
 				'key_' => 'top_hosts_log',
 				'hostid' => self::ZABBIX_SERVER_HOSTID,

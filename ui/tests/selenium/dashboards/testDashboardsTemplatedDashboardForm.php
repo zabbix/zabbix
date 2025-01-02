@@ -4302,6 +4302,37 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					],
 					'page' => '2nd page'
 				]
+			],
+			// #98 Top hosts widget with all parameters.
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Top hosts'),
+						'Name' => 'Top hosts widget with other fields',
+						'Show data in maintenance' => true,
+						'Order' => 'Bottom N'
+					],
+					'Column' => [
+						'Name' => 'Column1',
+						'Item name' => [
+							'values' => self::TEMPLATE_ITEM,
+							'context' => ['values' => self::TEMPLATE]
+						],
+						'xpath:.//input[@id="base_color"]/..' => '00796B',
+						'Display item value as' => 'Numeric',
+						'Display' => 'Indicators',
+						'Min' => 10,
+						'Max' => 99,
+						'Decimal places' => 9,
+						'Advanced configuration' => true,
+						'Aggregation function' => 'sum',
+						'Time period' => 'Custom',
+						'From' => 'now-20h',
+						'To' => 'now-10h',
+						'History data' => 'Trends'
+					],
+					'page' => '2nd page'
+				]
 			]
 		];
 	}
