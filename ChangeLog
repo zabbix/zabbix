@@ -6,6 +6,8 @@ New features:
 .......PS. [ZBXNEXT-9622] added top.peak in diaginfo to identify items with highest task queue (vso)
 
 Bug fixes:
+........S. [ZBX-25797] fixed Zabbix server crash during autoregistration (arimdjonoks)
+.......PS. [ZBX-25776] fixed Zabbix server crash when testing some internal items (arimdjonoks)
 .......PS. [ZBX-25719] fixed crash during SNMP walk value preprocessing if value contains NULL (vso)
 ..F....... [ZBX-25374] fixed loading animation for the enable/disable action (wczerneha)
 .......PS. [ZBX-25642] enhanced JavaScript preprocessing to execute in parallel when handling multiple values for the same item (vso)
