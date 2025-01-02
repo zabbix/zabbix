@@ -902,7 +902,8 @@ class testDashboardHostCardWidget extends testWidgets {
 						'sections_5' => 'Templates',
 						'sections_6' => 'Inventory',
 						'sections_7' => 'Tags'
-					]
+					],
+					'Screenshot' => true
 				]
 			],
 			// #11.
@@ -1534,19 +1535,37 @@ class testDashboardHostCardWidget extends testWidgets {
 		$this->assertEquals(self::$old_hash, CDBHelper::getHash(self::SQL));
 	}
 
+	public function getWidgetName() {
+		return [
+			[
+				[
+					'Name' => 'Display host card with 2 column layout'
+				]
+			],
+			[
+				[
+					'Name' => 'Display host card with 3 column layout'
+				]
+			],
+			[
+				[
+					'Name' => 'Display host card with 1 column layout (Default)'
+				]
+			]
+		];
+	}
+
 	/**
 	 * Check different compositions for Host Card widget.
+	 *
+	 * @dataProvider getWidgetName
 	 */
-	public function testDashboardHostCardWidget_Screenshots() {
-		$this->page->login();
-
-		for ($i = 1; $i <= 3; $i++) {
-			$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.
-					self::$dashboardid['Dashboard for HostCard screenshot'].'&page='.$i)->waitUntilReady();
-
-			$element = CDashboardElement::find()->one()->getWidget('Host card');
-			$this->assertScreenshot($element, 'hostcard_'.$i);
-		}
+	public function testDashboardHostCardWidget_Screenshots($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				self::$dashboardid['Dashboard for HostCard widget display check'])->waitUntilReady();
+		$this->assertScreenshot(CDashboardElement::find()->one()->getWidget($data['Name']),
+				'hostcard_' .$data['Name']
+			);
 	}
 
 	/**
@@ -1570,6 +1589,12 @@ class testDashboardHostCardWidget extends testWidgets {
 			if (array_key_exists('Inventory', $data)) {
 				$form->getField('Inventory fields')->fill($data['Inventory']);
 			}
+		}
+
+		if (array_key_exists('Screenshot', $data)) {
+			$this->assertScreenshot($form->query('class:table-forms-separator')->waitUntilPresent()->one(),
+					'Full list of show options' .$data['Host']
+			);
 		}
 
 		$form->submit();
