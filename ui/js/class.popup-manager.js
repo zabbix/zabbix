@@ -146,7 +146,9 @@ class CPopupManager {
 			CPopupManager.#overlay.$dialogue[0].removeEventListener('dialogue.submit', CPopupManager.#on_submit);
 			CPopupManager.#overlay.$dialogue[0].removeEventListener('dialogue.close', CPopupManager.#on_close);
 
-			overlayDialogueDestroy(this.#overlay.dialogueid);
+			if (action !== this.#overlay.dialogueid) {
+				overlayDialogueDestroy(this.#overlay.dialogueid);
+			}
 		}
 
 		CPopupManager.#overlay = PopUp(action, action_parameters, {
