@@ -56,8 +56,6 @@ A......... [ZBX-25350] prohibited deleting user groups which are used in userdir
 --------------------------------------------------------------------------------
 Changes for 7.2.2rc1
 
-New features:
-
 Bug fixes:
 .......P.. [ZBX-25782] fixed Zabbix proxy failing to create database on RHEL (dgoloscapov)
 ........S. [ZBX-25797] fixed Zabbix server crash during autoregistration (arimdjonoks)
