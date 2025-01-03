@@ -44,7 +44,7 @@ window.proxy_group_edit_popup = new class {
 		this.#proxy_groupid = proxy_groupid;
 		this.#initial_form_fields = getFormFields(this.#form);
 
-		const return_url = new URL('zabbix.php', location.origin);
+		const return_url = new URL('zabbix.php', document.baseURI);
 		return_url.searchParams.set('action', 'proxygroup.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 

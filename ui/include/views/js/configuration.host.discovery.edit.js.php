@@ -349,7 +349,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 				},
 				callback: ({data, event}) => {
 					if (data.submit.success.action === 'delete') {
-						const url = new URL('host_discovery.php', location.origin);
+						const url = new URL('host_discovery.php', document.baseURI);
 
 						url.searchParams.set('context', this.context);
 

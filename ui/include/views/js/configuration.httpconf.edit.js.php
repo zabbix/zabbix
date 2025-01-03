@@ -245,7 +245,7 @@
 				},
 				callback: ({data, event}) => {
 					if (data.submit.success.action === 'delete') {
-						const url = new URL('httpconf.php', location.origin);
+						const url = new URL('httpconf.php', document.baseURI);
 
 						url.searchParams.set('context', this.#context);
 

@@ -33,7 +33,7 @@
 				},
 				callback: ({data, event}) => {
 					if (data.submit.success.action === 'delete') {
-						const url = new URL('zabbix.php', location.origin);
+						const url = new URL('zabbix.php', document.baseURI);
 
 						url.searchParams.set('action', 'problem.view');
 

@@ -77,8 +77,12 @@ class CPopupManager {
 
 			const standalone_url = target_element?.getAttribute('href') || target_element?.dataset.href || '';
 
+			if (standalone_url === '' || standalone_url[0] === '#') {
+				return;
+			}
+
 			const {action, popup, ...action_parameters} = searchParamsToObject(
-				new URL(standalone_url, location.origin).searchParams
+				new URL(standalone_url, document.baseURI).searchParams
 			);
 
 			if (action !== CPopupManager.STANDALONE_ACTION) {
@@ -133,7 +137,7 @@ class CPopupManager {
 				...action_parameters
 			}).toString();
 
-			const standalone_url = new URL(`zabbix.php?${standalone_url_params}`, location.origin);
+			const standalone_url = new URL(`zabbix.php?${standalone_url_params}`, document.baseURI);
 
 			history.replaceState(null, '', standalone_url);
 		}
@@ -186,7 +190,11 @@ class CPopupManager {
 				}
 			}
 			else {
-				location.href = cancel_event.getRedirectUrl() || CPopupManager.#return_url || location.href;
+				const redirect_url = cancel_event.getRedirectUrl() || CPopupManager.#return_url;
+
+				if (redirect_url !== null) {
+					location.href = redirect_url;
+				}
 			}
 		}
 
@@ -228,8 +236,8 @@ class CPopupManager {
 			}
 		};
 
-		CPopupManager.#overlay.$dialogue[0].addEventListener('dialogue.submit', CPopupManager.#on_submit, {once: true});
 		CPopupManager.#overlay.$dialogue[0].addEventListener('dialogue.close', CPopupManager.#on_close, {once: true});
+		CPopupManager.#overlay.$dialogue[0].addEventListener('dialogue.submit', CPopupManager.#on_submit, {once: true});
 
 		return CPopupManager.#overlay;
 	}

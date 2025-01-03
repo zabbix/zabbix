@@ -24,7 +24,7 @@ window.maintenance_edit = new class {
 		this._dialogue = this._overlay.$dialogue[0];
 		this._form = this._overlay.$dialogue.$body[0].querySelector('form');
 
-		const return_url = new URL('zabbix.php', location.origin);
+		const return_url = new URL('zabbix.php', document.baseURI);
 		return_url.searchParams.set('action', 'maintenance.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 

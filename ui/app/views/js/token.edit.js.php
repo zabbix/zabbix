@@ -34,7 +34,7 @@ window.token_edit_popup = {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
-		const return_url = new URL('zabbix.php', location.origin);
+		const return_url = new URL('zabbix.php', document.baseURI);
 		return_url.searchParams.set('action', admin_mode == 1 ? 'token.list' : 'user.token.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 

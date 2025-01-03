@@ -32,7 +32,7 @@ window.host_edit_popup = {
 		this.initial_proxy_groupid = proxy_groupid;
 		this.macros_templateids = null;
 
-		const return_url = new URL('zabbix.php', location.origin);
+		const return_url = new URL('zabbix.php', document.baseURI);
 		return_url.searchParams.set('action', 'host.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
