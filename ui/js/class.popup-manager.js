@@ -91,7 +91,7 @@ class CPopupManager {
 
 			e.preventDefault();
 
-			CPopupManager.open(popup, action_parameters, {}, true);
+			CPopupManager.open(popup, action_parameters, {reuse_existing: false, supports_standalone: true});
 		});
 	}
 
@@ -101,18 +101,21 @@ class CPopupManager {
 	 * @param {string}  action               MVC action of the popup dialogue.
 	 * @param {Object}  action_parameters    MVC action parameters.
 	 * @param {Object}  popup_options        Popup options ("prevent_navigation", etc.)
+	 * @param {boolean} reuse_existing       Whether to reuse the existing popup for the same action.
 	 * @param {boolean} supports_standalone  Whether the popup dialogue supports opening on standalone page.
-	 *
 	 * @returns {Overlay|null}
 	 */
 	static open(
 		action,
 		action_parameters = {},
-		popup_options = {},
-		supports_standalone = false
+		{
+			popup_options = {},
+			reuse_existing = true,
+			supports_standalone = false
+		} = {}
 	) {
 		const open_event = new CPopupManagerEvent({
-			data: {action_parameters, popup_options, supports_standalone},
+			data: {action_parameters, popup_options, reuse_existing, supports_standalone},
 			descriptor: {
 				context: CPopupManager.EVENT_CONTEXT,
 				event: CPopupManagerEvent.EVENT_OPEN,
@@ -146,7 +149,7 @@ class CPopupManager {
 			CPopupManager.#overlay.$dialogue[0].removeEventListener('dialogue.submit', CPopupManager.#on_submit);
 			CPopupManager.#overlay.$dialogue[0].removeEventListener('dialogue.close', CPopupManager.#on_close);
 
-			if (action !== this.#overlay.dialogueid) {
+			if (action !== this.#overlay.dialogueid || !reuse_existing) {
 				overlayDialogueDestroy(this.#overlay.dialogueid);
 			}
 		}
@@ -165,7 +168,7 @@ class CPopupManager {
 			}
 
 			const cancel_event = new CPopupManagerEvent({
-				data: {action_parameters, popup_options, supports_standalone},
+				data: {action_parameters, popup_options, reuse_existing, supports_standalone},
 				descriptor: {
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_CANCEL,
@@ -202,7 +205,7 @@ class CPopupManager {
 
 		CPopupManager.#on_submit = e => {
 			const submit_event = new CPopupManagerEvent({
-				data: {action_parameters, popup_options, supports_standalone, submit: e.detail},
+				data: {action_parameters, popup_options, reuse_existing, supports_standalone, submit: e.detail},
 				descriptor: {
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_SUBMIT,
