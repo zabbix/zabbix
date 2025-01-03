@@ -193,7 +193,7 @@ class CPopupManager {
 				const redirect_url = cancel_event.getRedirectUrl() || CPopupManager.#return_url;
 
 				if (redirect_url !== null) {
-					location.href = redirect_url;
+					setTimeout(() => location.href = redirect_url);
 				}
 			}
 		}
