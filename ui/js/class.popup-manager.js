@@ -82,7 +82,7 @@ class CPopupManager {
 			}
 
 			const {action, popup, ...action_parameters} = searchParamsToObject(
-				new URL(standalone_url, document.baseURI).searchParams
+				new URL(standalone_url, location.href).searchParams
 			);
 
 			if (action !== CPopupManager.STANDALONE_ACTION) {
@@ -137,7 +137,7 @@ class CPopupManager {
 				...action_parameters
 			}).toString();
 
-			const standalone_url = new URL(`zabbix.php?${standalone_url_params}`, document.baseURI);
+			const standalone_url = new URL(`zabbix.php?${standalone_url_params}`, location.href);
 
 			history.replaceState(null, '', standalone_url);
 		}

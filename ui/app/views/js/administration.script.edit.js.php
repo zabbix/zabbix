@@ -28,7 +28,7 @@ window.script_edit_popup = new class {
 		this.script = script;
 		this.scriptid = script.scriptid;
 
-		const return_url = new URL('zabbix.php', document.baseURI);
+		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'script.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 

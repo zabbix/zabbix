@@ -29,7 +29,7 @@ window.template_edit_popup = new class {
 		this.linked_templateids = this.#getLinkedTemplates();
 		this.macros_templateids = null;
 
-		const return_url = new URL('zabbix.php', document.baseURI);
+		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'template.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 

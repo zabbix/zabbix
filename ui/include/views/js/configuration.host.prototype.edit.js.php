@@ -220,7 +220,7 @@
 							...data.action_parameters
 						}).toString();
 
-						const standalone_url = new URL(`zabbix.php?${standalone_url_params}`, document.baseURI);
+						const standalone_url = new URL(`zabbix.php?${standalone_url_params}`, location.href);
 
 						location.href = standalone_url.href;
 					}
@@ -234,7 +234,7 @@
 				},
 				callback: ({data, event}) => {
 					if (data.submit.success.action === 'delete') {
-						const url = new URL('host_discovery.php', document.baseURI);
+						const url = new URL('host_discovery.php', location.href);
 
 						url.searchParams.set('context', this.context);
 

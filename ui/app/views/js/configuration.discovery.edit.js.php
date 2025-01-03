@@ -32,7 +32,7 @@ window.drule_edit_popup = new class {
 		this.dcheckid = getUniqueId();
 		this.available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
 
-		const return_url = new URL('zabbix.php', document.baseURI);
+		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'discovery.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 

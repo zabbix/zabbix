@@ -34,7 +34,7 @@
 				},
 				callback: ({data, event}) => {
 					if (data.submit.success.action === 'delete') {
-						const url = new URL('hostinventories.php', document.baseURI);
+						const url = new URL('hostinventories.php', location.href);
 
 						event.setRedirectUrl(url.href);
 					}

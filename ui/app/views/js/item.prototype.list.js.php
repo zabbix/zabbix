@@ -171,7 +171,7 @@
 					}
 
 					if (data.submit.success.action === 'delete') {
-						const url = new URL('host_discovery.php', document.baseURI);
+						const url = new URL('host_discovery.php', location.href);
 
 						url.searchParams.set('context', this.context);
 						url.searchParams.set('filter_set', 1);

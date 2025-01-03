@@ -662,7 +662,7 @@
 				},
 				callback: ({data, event}) => {
 					if (data.submit.success.action === 'delete') {
-						const url = new URL(this.is_discovery ? 'host_discovery.php' : 'graphs.php', document.baseURI);
+						const url = new URL(this.is_discovery ? 'host_discovery.php' : 'graphs.php', location.href);
 
 						url.searchParams.set('context', this.context);
 

@@ -27,7 +27,7 @@ window.hostgroup_edit_popup = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
 
-		const return_url = new URL('zabbix.php', document.baseURI);
+		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'hostgroup.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 	}

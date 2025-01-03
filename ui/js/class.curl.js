@@ -23,8 +23,8 @@
  *         - Use "objectToSearchParams" to convert nested data object into URL search parameters object.
  *
  *     Example:
- *         const url = new URL(document.baseURI); // Current URL.
- *         const url = new URL('zabbix.php?action=test', document.baseURI);
+ *         const url = new URL(location.href); // Current URL.
+ *         const url = new URL('zabbix.php?action=test', location.href);
  *         const search_params = url.searchParams;
  *         const action = search_params.get('action');
  *         const deep_object = searchParamsToObject(search_params);
@@ -33,7 +33,7 @@
  *             action: 'test',
  *             itemids: [123, 456, 789]
  *         });
- *         const url = new URL(`zabbix.php?${url_params}`, document.baseURI);
+ *         const url = new URL(`zabbix.php?${url_params}`, location.href);
  *
  * @see searchParamsToObject
  * @see objectToSearchParams
