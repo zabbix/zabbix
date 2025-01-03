@@ -181,7 +181,7 @@
 					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
 				callback: ({data, event}) => {
-					uncheckTableRows('trigger_prototypes_' + this.parent_discoveryid, [], false);
+					uncheckTableRows(`trigger_prototypes_${this.parent_discoveryid}`);
 
 					if (data.submit.success.action === 'delete') {
 						const url = new URL('host_discovery.php', location.href);

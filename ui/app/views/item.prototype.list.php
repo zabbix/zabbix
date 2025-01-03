@@ -163,7 +163,7 @@ $buttons = [
 	]
 ];
 
-$form->addItem(new CActionButtonList('action', 'itemids', $buttons, $data['parent_discoveryid']));
+$form->addItem(new CActionButtonList('action', 'itemids', $buttons, 'item_prototypes_'.$data['parent_discoveryid']));
 
 (new CHtmlPage())
 	->setTitle(_('Item prototypes'))

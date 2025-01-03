@@ -207,7 +207,7 @@ $trigger_form->addItem([
 					->setId('js-massdelete-trigger')
 			]
 		],
-		$this->data['parent_discoveryid']
+		'trigger_prototypes_'.$this->data['parent_discoveryid']
 	)
 ]);
 
