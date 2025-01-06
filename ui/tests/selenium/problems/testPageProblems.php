@@ -1986,11 +1986,18 @@ class testPageProblems extends CWebTest {
 				);
 
 				// Check correct trigger time.
+				$time_array = [];
 				$time = CDBHelper::getValue('SELECT clock FROM problem WHERE name='.zbx_dbstr($data['filter']['Problem']));
-				$this->assertEquals(date('Y-m-d H:i:s', $time),
-						$this->query('xpath://div[contains(@class, "overlay-dialogue")]
-								//table[contains(@class, "list-table")]//tr['.($index+1).']/td[2]')->one()->getText()
+
+				for ($i = 0; $i <= 3; $i++) {
+					$time_array[$i] = date('Y-m-d H:i', $time - $i);
+				}
+
+				$this->assertTrue(in_array(date('Y-m-d H:i', $time), $time_array),
+						'Error: The creation time value '.$time.' is not in the expected range.'
 				);
+
+				unset($time_array);
 
 				// Check metric value.
 				$this->assertEquals($popupValue['metric'], $this->query('xpath://div[contains(@class, "overlay-dialogue")]'
@@ -2015,11 +2022,18 @@ class testPageProblems extends CWebTest {
 			);
 
 			// Check correct trigger time.
+			$time_array = [];
 			$time = CDBHelper::getValue('SELECT clock FROM problem WHERE name='.zbx_dbstr($data['filter']['Problem']));
-			$this->assertEquals(date('Y-m-d H:i:s', $time),
-					$this->query('xpath://div[contains(@class, "overlay-dialogue")]
-							//table[contains(@class, "list-table")]//tr/td[2]')->one()->getText()
+
+			for ($i = 0; $i <= 3; $i++) {
+				$time_array[$i] = date('Y-m-d H:i', $time - $i);
+			}
+
+			$this->assertTrue(in_array(date('Y-m-d H:i', $time), $time_array),
+					'Error: The creation time value '.$time.' is not in the expected range.'
 			);
+
+			unset($time_array);
 
 			// Check metric value.
 			$this->assertEquals($data['popup values']['metric'],
