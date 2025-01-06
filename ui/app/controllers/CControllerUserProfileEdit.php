@@ -51,43 +51,12 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			];
 		}
 
-		$ret = $this->validateInput($fields) && $this->validateMedias();
-
+		$ret = $this->validateInput($fields);
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
 
 		return $ret;
-	}
-
-	protected function validateMedias(): bool {
-		$validation_rules = [
-			'mediaid' =>		'id',
-			'mediatypeid' =>	'required|db media_type.mediatypeid',
-			'sendto' =>			'required',
-			'period' =>			'required|time_periods',
-			'active' =>			'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]),
-			'severity' =>		'int32|ge 0|le '.(pow(2, TRIGGER_SEVERITY_COUNT) - 1)
-		];
-
-		foreach ($this->getInput('medias', []) as $media) {
-			$validator = new CNewValidator($media, $validation_rules);
-
-			if ($validator->isError()) {
-				return false;
-			}
-		}
-
-		$new_media = $this->getInput('new_media', []);
-
-		if (!$new_media) {
-			return true;
-		}
-
-		unset($validation_rules['mediaid']);
-		$validator = new CNewValidator($new_media, $validation_rules);
-
-		return !$validator->isError();
 	}
 
 	protected function checkPermissions() {
@@ -99,9 +68,6 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'output' => ['username', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
 				'rows_per_page', 'url', 'timezone', 'userdirectoryid'
 			],
-			'selectMedias' => (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER)
-				? ['mediaid', 'mediatypeid', 'period', 'sendto', 'severity', 'active', 'userdirectory_mediaid']
-				: null,
 			'userids' => CWebUser::$data['userid'],
 			'selectUsrgrps' => ['userdirectoryid'],
 			'editable' => true
@@ -141,6 +107,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'url' => $this->user['url'],
 			'messages' => $this->getInput('messages', []) + getMessageSettings(),
 			'form_refresh' => 0,
+			'db_user' => ['username' => ''],
 			'action' => $this->getAction()
 		];
 
@@ -153,39 +120,21 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			}
 		}
 
-		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-			$data['medias'] = $this->user['medias'];
-		}
-
 		// Overwrite with input variables.
 		$this->getInputs($data, ['current_password', 'password1', 'password2', 'lang', 'timezone', 'theme', 'autologin',
 			'autologout', 'refresh', 'rows_per_page', 'url', 'form_refresh'
 		]);
 
-		$data['password_requirements'] = $this->getPasswordRequirements();
-
-		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-			if ($data['form_refresh'] != 0) {
-				$data['medias'] = $this->getInput('medias', []);
-			}
-
-			$data = $this->setUserMedias($data);
-		}
-
-		$data['readonly'] = false;
-		$data['userdirectoryid'] = $this->user['userdirectoryid'];
-
-		if ($this->user['userdirectoryid'] != 0) {
-			$data['readonly'] = true;
-		}
-
-		$data['mediatypes'] = API::MediaType()->get([
-			'output' => ['status'],
-			'preservekeys' => true
-		]);
+		$data = [
+			...$data,
+			'db_user' => ['username' => $this->user['username']],
+			'password_requirements' => $this->getPasswordRequirements(),
+			'readonly' => $this->user['userdirectoryid'] != 0,
+			'userdirectoryid' => $this->user['userdirectoryid']
+		];
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('User profile'));
+		$response->setTitle(_('Profile'));
 		$this->setResponse($response);
 	}
 }

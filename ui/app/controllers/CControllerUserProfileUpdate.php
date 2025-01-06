@@ -30,7 +30,6 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 			'current_password' =>	'string',
 			'password1' =>			'string',
 			'password2' =>			'string',
-			'medias' =>				'array',
 			'lang' =>				'db users.lang|in '.implode(',', $locales),
 			'timezone' =>			'db users.timezone|in '.implode(',', $this->timezones),
 			'theme' =>				'db users.theme|in '.implode(',', $themes),
@@ -98,10 +97,6 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		if ($this->getInput('password1', '') !== ''
 				|| ($this->hasInput('password1') && CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL)) {
 			$user['passwd'] = $this->getInput('password1');
-		}
-
-		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-			$user['medias'] = $this->getInputUserMedia();
 		}
 
 		DBstart();
