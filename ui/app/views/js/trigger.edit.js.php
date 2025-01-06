@@ -22,7 +22,7 @@
 window.trigger_edit_popup = new class {
 
 	init({triggerid, expression_popup_parameters, recovery_popup_parameters, readonly, dependencies, action,
-			context, db_trigger, back_url, overlayid, parent_discoveryid
+			context, db_trigger, return_url, overlayid, parent_discoveryid
 	}) {
 		this.triggerid = triggerid;
 		this.expression_popup_parameters = expression_popup_parameters;
@@ -45,7 +45,7 @@ window.trigger_edit_popup = new class {
 		this.recovery_expression_constructor_active = false;
 		this.selected_dependencies = [];
 
-		ZABBIX.PopupManager.setReturnUrl(back_url);
+		ZABBIX.PopupManager.setReturnUrl(return_url);
 
 		window.addPopupValues = (data) => {
 			this.addPopupValues(data.values);

@@ -32,7 +32,7 @@
 		}
 
 		init({serviceid, path = null, is_filtered = null, mode_switch_url, parent_url = null, refresh_url,
-				refresh_interval, back_url = null}) {
+				refresh_interval, return_url = null}) {
 			this.serviceid = serviceid;
 			this.path = path;
 			this.is_filtered = is_filtered;
@@ -40,7 +40,7 @@
 			this.parent_url = parent_url;
 			this.refresh_url = refresh_url;
 			this.refresh_interval = refresh_interval;
-			this.back_url = back_url;
+			this.return_url = return_url;
 
 			this.#initViewModeSwitcher();
 			this.#initTagFilter();
@@ -88,7 +88,7 @@
 				}
 				else if (e.target.classList.contains('js-massupdate-service')) {
 					openMassupdatePopup('popup.massupdate.service', {
-						location_url: this.back_url,
+						location_url: this.return_url,
 						[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('service')) ?>
 					}, {
 						dialogue_class: 'modal-popup-static',

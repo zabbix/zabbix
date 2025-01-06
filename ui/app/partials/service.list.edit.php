@@ -22,7 +22,7 @@
 $form = (new CForm())
 	->setId('service-list')
 	->setName('service_list')
-	->addVar('back_url', $data['back_url']);
+	->addVar('return_url', $data['return_url']);
 
 $header = [
 	(new CColHeader(

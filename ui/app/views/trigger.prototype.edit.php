@@ -114,14 +114,14 @@ $popup_parameters = [
 	'context' => $data['context']
 ];
 
-$back_url = (new CUrl('zabbix.php'))
+$return_url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'trigger.prototype.list')
 	->setArgument('context', $data['context']);
 
 if (array_key_exists('parent_discoveryid', $data)) {
 	$popup_parameters['parent_discoveryid'] = $data['parent_discoveryid'];
 
-	$back_url->setArgument('parent_discoveryid', $data['parent_discoveryid']);
+	$return_url->setArgument('parent_discoveryid', $data['parent_discoveryid']);
 }
 
 if ($data['hostid']) {
@@ -138,7 +138,7 @@ $trigger_form
 			'action' => 'trigger.prototype.edit',
 			'context' => $data['context'],
 			'db_trigger' => $data['db_trigger'],
-			'back_url' => $back_url->getUrl(),
+			'return_url' => $return_url->getUrl(),
 			'overlayid' => 'trigger.prototype.edit',
 			'parent_discoveryid' => array_key_exists('parent_discoveryid', $data) ? $data['parent_discoveryid'] : null
 		]).');'))->setOnDocumentReady()

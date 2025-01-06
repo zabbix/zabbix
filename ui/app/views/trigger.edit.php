@@ -121,7 +121,7 @@ if ($data['hostid']) {
 	$popup_parameters['hostid'] = $data['hostid'];
 }
 
-$back_url = (new CUrl('zabbix.php'))
+$return_url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'trigger.list')
 	->setArgument('context', $data['context'])
 	->getUrl();
@@ -137,7 +137,7 @@ $trigger_form
 			'action' => 'trigger.edit',
 			'context' => $data['context'],
 			'db_trigger' => $data['db_trigger'],
-			'back_url' => $back_url,
+			'return_url' => $return_url,
 			'overlayid' => 'trigger.edit',
 			'parent_discoveryid' => null
 		]).');'))->setOnDocumentReady()

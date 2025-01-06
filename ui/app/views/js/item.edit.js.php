@@ -44,7 +44,7 @@ window.item_edit_form = new class {
 
 	init({
 		actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly, testable_item_types,
-		type_with_key_select, value_type_keys, source, back_url
+		type_with_key_select, value_type_keys, source, return_url
 	}) {
 		this.actions = actions;
 		this.form_data = form_data;
@@ -79,7 +79,7 @@ window.item_edit_form = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
 
-		ZABBIX.PopupManager.setReturnUrl(back_url);
+		ZABBIX.PopupManager.setReturnUrl(return_url);
 
 		this.initForm(field_switches);
 		this.initEvents();
