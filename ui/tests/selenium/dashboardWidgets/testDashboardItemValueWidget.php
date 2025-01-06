@@ -4272,9 +4272,9 @@ class testDashboardItemValueWidget extends testWidgets {
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{{ITEM.NAME}.btoa(\)}, {'.self::USER_MACRO.'.htmldecode(test)}, '.
-								'{'.self::USER_MACRO.'.htmlencode(test)}, {{ITEM.NAME}.lowercase([test])}, '.
-								'{{ITEM.NAME}.uppercase([test])}, {{ITEM.NAME}.urldecode([test])}, '.
-								'{'.self::USER_SECRET_MACRO.'.urlencode(\/)}',
+							'{'.self::USER_MACRO.'.htmlencode(test)}, {{ITEM.NAME}.lowercase([test])}, '.
+							'{{ITEM.NAME}.uppercase([test])}, {{ITEM.NAME}.urldecode([test])}, '.
+							'{'.self::USER_SECRET_MACRO.'.urlencode(\/)}',
 						'id:desc_size' => 5
 					],
 					'result' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*'
@@ -4285,10 +4285,10 @@ class testDashboardItemValueWidget extends testWidgets {
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::USER_SECRET_MACRO.'.btoa()}, {'.self::USER_SECRET_MACRO.'.htmldecode()}, '.
-								'{'.self::USER_SECRET_MACRO.'.htmlencode()}, {'.self::USER_SECRET_MACRO.'.lowercase()}, '.
-								'{'.self::USER_SECRET_MACRO.'.uppercase()}, {'.self::USER_SECRET_MACRO.'.regrepl(a, b)}, '.
-								'{'.self::USER_SECRET_MACRO.'.tr(a-z, b)}, {'.self::USER_SECRET_MACRO.'.urldecode()}, '.
-								'{'.self::USER_SECRET_MACRO.'.urlencode()}',
+							'{'.self::USER_SECRET_MACRO.'.htmlencode()}, {'.self::USER_SECRET_MACRO.'.lowercase()}, '.
+							'{'.self::USER_SECRET_MACRO.'.uppercase()}, {'.self::USER_SECRET_MACRO.'.regrepl(a, b)}, '.
+							'{'.self::USER_SECRET_MACRO.'.tr(a-z, b)}, {'.self::USER_SECRET_MACRO.'.urldecode()}, '.
+							'{'.self::USER_SECRET_MACRO.'.urlencode()}',
 						'id:desc_size' => 5
 					],
 					'result' => 'KioqKioq, ******, ******, ******, ******, ******, ******, ******, %2A%2A%2A%2A%2A%2A'
@@ -4299,8 +4299,8 @@ class testDashboardItemValueWidget extends testWidgets {
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{{ITEM.NAME}.btoa()}, {{ITEM.NAME}.htmldecode()}, {{ITEM.NAME}.htmlencode()}, '.
-								'{{ITEM.NAME}.lowercase()}, {{ITEM.NAME}.uppercase()}, {{ITEM.NAME}.urlencode()}, '.
-								'{{ITEM.NAME}.urldecode()}',
+							'{{ITEM.NAME}.lowercase()}, {{ITEM.NAME}.uppercase()}, {{ITEM.NAME}.urlencode()}, '.
+							'{{ITEM.NAME}.urldecode()}',
 						'id:desc_size' => 5
 					],
 					'result' => 'Q1BVIHVzZXIgdGltZQ==, CPU user time, CPU user time, cpu user time, CPU USER TIME, '.
@@ -4312,14 +4312,14 @@ class testDashboardItemValueWidget extends testWidgets {
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::USER_MACRO.'.btoa()}, {'.self::MACRO_HTML_ENCODE.'.htmlencode()}, '.
-								'{'.self::MACRO_HTML_DECODE.'.htmldecode()}, {'.self::MACRO_URL_ENCODE.'.urlencode()}, '.
-								'{'.self::MACRO_URL_DECODE.'.urldecode()}, {'.self::USER_MACRO.'.uppercase()}, '.
-								'{'.self::USER_MACRO.'.lowercase()}',
+							'{'.self::MACRO_HTML_DECODE.'.htmldecode()}, {'.self::MACRO_URL_ENCODE.'.urlencode()}, '.
+							'{'.self::MACRO_URL_DECODE.'.urldecode()}, {'.self::USER_MACRO.'.uppercase()}, '.
+							'{'.self::USER_MACRO.'.lowercase()}',
 						'id:desc_size' => 5
 					],
 					'result' => base64_encode(self::USER_MACRO_VALUE).', '.self::MACRO_HTML_DECODE_VALUE.', '.
-							self::MACRO_HTML_ENCODE_VALUE.', '.self::MACRO_URL_DECODE_VALUE.', '.self::MACRO_URL_ENCODE_VALUE.
-							', MACRO FUNCTION TEST 12345, macro function test 12345'
+						self::MACRO_HTML_ENCODE_VALUE.', '.self::MACRO_URL_DECODE_VALUE.', '.self::MACRO_URL_ENCODE_VALUE.
+						', MACRO FUNCTION TEST 12345, macro function test 12345'
 				]
 			],
 			'Incorrectly used parameters in regrepl(), tr(), regsub(), iregsub() macro functions' => [
@@ -4327,8 +4327,8 @@ class testDashboardItemValueWidget extends testWidgets {
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::USER_MACRO.'.regrepl()}, {'.self::MACRO_CHAR.'.regrepl(,[a]~,\\\1)}, '.
-								'{'.self::USER_MACRO.'.tr()}, {'.self::USER_MACRO.'.tr(z-a,Z-A)}, {'.self::USER_MACRO.'.tr(1,2,3)}'.
-								', {'.self::USER_MACRO.'.regsub()}, {'.self::USER_MACRO.'.iregsub()}',
+							'{'.self::USER_MACRO.'.tr()}, {'.self::USER_MACRO.'.tr(z-a,Z-A)}, {'.self::USER_MACRO.'.tr(1,2,3)}'.
+							', {'.self::USER_MACRO.'.regsub()}, {'.self::USER_MACRO.'.iregsub()}',
 						'id:desc_size' => 5
 					],
 					'result' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*'
@@ -4339,7 +4339,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::USER_MACRO.'.regrepl("[^a-z]", /, [A-Z], \)}, '.
-								'{'.self::MACRO_CHAR.'.regrepl(🌴, 🌝, [а-я], Q, \d, 🌞, ₰, *)}',
+							'{'.self::MACRO_CHAR.'.regrepl(🌴, 🌝, [а-я], Q, \d, 🌞, ₰, *)}',
 						'id:desc_size' => 5
 					],
 					'result' => '/acro/function//est//////, 🌞🌞🌞 ЙQQQQЖŽzŠsšĒĀīī🌝 ***'
@@ -4350,7 +4350,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::USER_MACRO.''.
-								'.regrepl(1{0}, test, 1{0}, test, 1{0},test, 1{0}, test, 1{0}, test, 1{0}, test)}',
+							'.regrepl(1{0}, test, 1{0}, test, 1{0},test, 1{0}, test, 1{0}, test, 1{0}, test)}',
 						'id:desc_size' => 5
 					],
 					'result' => '*UNKNOWN*'
@@ -4361,7 +4361,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::MACRO_CHAR.'.tr(0-9, Ī)}, {'.self::MACRO_CHAR.'.lowercase()}, '.
-								'{'.self::MACRO_CHAR.'.uppercase()}',
+							'{'.self::MACRO_CHAR.'.uppercase()}',
 						'id:desc_size' => 5
 					],
 					'result' => '??? ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰, 000 ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰, 000 ЙщфхжЖŽZŠSšĒĀīī🌴 ₰₰₰'
@@ -4382,10 +4382,10 @@ class testDashboardItemValueWidget extends testWidgets {
 					'fields' => [
 						'Advanced configuration' => true,
 						'id:description' => '{'.self::USER_MACRO.'.regsub(^[0-9]+, Problem)}, '.
-								'{'.self::USER_MACRO.'.iregsub(^[0-9]+, Problem)}, '.
-								'{'.self::USER_SECRET_MACRO.'.regsub(^[0-9]+, Problem)}, '.
-								'{'.self::USER_SECRET_MACRO.'.iregsub(^[0-9]+, Problem)}, '.
-								'{{ITEM.NAME}.regsub(CPU, test)}, {{ITEM.NAME}.iregsub(CPU, test)}',
+							'{'.self::USER_MACRO.'.iregsub(^[0-9]+, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.regsub(^[0-9]+, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.iregsub(^[0-9]+, Problem)}, '.
+							'{{ITEM.NAME}.regsub(CPU, test)}, {{ITEM.NAME}.iregsub(CPU, test)}',
 						'id:desc_size' => 5
 					],
 					'result' => 'Problem, Problem, Problem, Problem, test, test'
@@ -4397,10 +4397,10 @@ class testDashboardItemValueWidget extends testWidgets {
 //					'fields' => [
 //						'Advanced configuration' => true,
 //						'id:description' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
-//								'{'.self::USER_MACRO.'.iregsub(0, Problem)}, '.
-//								'{'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
-//								'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '.
-//								'{{ITEM.NAME}.regsub(0, test)}, {{ITEM.NAME}.iregsub(0, test)}',
+//							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, '.
+//							'{'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
+//							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '.
+//							'{{ITEM.NAME}.regsub(0, test)}, {{ITEM.NAME}.iregsub(0, test)}',
 //						'id:desc_size' => 5
 //					],
 //					'result' => ', , , , ,'

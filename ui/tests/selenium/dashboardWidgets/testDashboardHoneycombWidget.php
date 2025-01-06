@@ -2339,14 +2339,14 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
 						'id:primary_label' => '{{ITEM.NAME}.btoa(\)}, {'.self::USER_MACRO.'.htmldecode(test)}, '.
-								'{'.self::USER_MACRO.'.htmlencode(test)}, {{ITEM.NAME}.lowercase([test])}, '.
-								'{{ITEM.NAME}.uppercase([test])}, {{ITEM.NAME}.urldecode([test])}, '.
-								'{'.self::USER_SECRET_MACRO.'.urlencode(\/)}',
+							'{'.self::USER_MACRO.'.htmlencode(test)}, {{ITEM.NAME}.lowercase([test])}, '.
+							'{{ITEM.NAME}.uppercase([test])}, {{ITEM.NAME}.urldecode([test])}, '.
+							'{'.self::USER_SECRET_MACRO.'.urlencode(\/)}',
 						'id:secondary_label_type' => 'Text',
 						'id:secondary_label' => '{{ITEM.NAME}.btoa(\)}, {'.self::USER_MACRO.'.htmldecode(test)}, '.
-								'{'.self::USER_MACRO.'.htmlencode(test)}, {{ITEM.NAME}.lowercase([test])}, '.
-								'{{ITEM.NAME}.uppercase([test])}, {{ITEM.NAME}.urldecode([test])}, '.
-								'{'.self::USER_SECRET_MACRO.'.urlencode(\/)}'
+							'{'.self::USER_MACRO.'.htmlencode(test)}, {{ITEM.NAME}.lowercase([test])}, '.
+							'{{ITEM.NAME}.uppercase([test])}, {{ITEM.NAME}.urldecode([test])}, '.
+							'{'.self::USER_SECRET_MACRO.'.urlencode(\/)}'
 					],
 					'result' => [
 						'primary' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*',
@@ -2360,16 +2360,16 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
 						'id:primary_label' => '{'.self::USER_SECRET_MACRO.'.btoa()}, {'.self::USER_SECRET_MACRO.'.htmldecode()}, '.
-								'{'.self::USER_SECRET_MACRO.'.htmlencode()}, {'.self::USER_SECRET_MACRO.'.lowercase()}, '.
-								'{'.self::USER_SECRET_MACRO.'.uppercase()}, {'.self::USER_SECRET_MACRO.'.regrepl(a, b)}, '.
-								'{'.self::USER_SECRET_MACRO.'.tr(a-z, b)}, {'.self::USER_SECRET_MACRO.'.urldecode()}, '.
-								'{'.self::USER_SECRET_MACRO.'.urlencode()}',
+							'{'.self::USER_SECRET_MACRO.'.htmlencode()}, {'.self::USER_SECRET_MACRO.'.lowercase()}, '.
+							'{'.self::USER_SECRET_MACRO.'.uppercase()}, {'.self::USER_SECRET_MACRO.'.regrepl(a, b)}, '.
+							'{'.self::USER_SECRET_MACRO.'.tr(a-z, b)}, {'.self::USER_SECRET_MACRO.'.urldecode()}, '.
+							'{'.self::USER_SECRET_MACRO.'.urlencode()}',
 						'id:secondary_label_type' => 'Text',
 						'id:secondary_label' => '{'.self::USER_SECRET_MACRO.'.btoa()}, {'.self::USER_SECRET_MACRO.'.htmldecode()}, '.
-								'{'.self::USER_SECRET_MACRO.'.htmlencode()}, {'.self::USER_SECRET_MACRO.'.lowercase()}, '.
-								'{'.self::USER_SECRET_MACRO.'.uppercase()}, {'.self::USER_SECRET_MACRO.'.regrepl(a, b)}, '.
-								'{'.self::USER_SECRET_MACRO.'.tr(a-z, b)}, {'.self::USER_SECRET_MACRO.'.urldecode()}, '.
-								'{'.self::USER_SECRET_MACRO.'.urlencode()}'
+							'{'.self::USER_SECRET_MACRO.'.htmlencode()}, {'.self::USER_SECRET_MACRO.'.lowercase()}, '.
+							'{'.self::USER_SECRET_MACRO.'.uppercase()}, {'.self::USER_SECRET_MACRO.'.regrepl(a, b)}, '.
+							'{'.self::USER_SECRET_MACRO.'.tr(a-z, b)}, {'.self::USER_SECRET_MACRO.'.urldecode()}, '.
+							'{'.self::USER_SECRET_MACRO.'.urlencode()}'
 					],
 					'result' => [
 						'primary' => 'KioqKioq, ******, ******, ******, ******, ******, ******, ******, %2A%2A%2A%2A%2A%2A',
@@ -2383,18 +2383,18 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
 						'id:primary_label' => '{{ITEM.NAME}.btoa()}, {{ITEM.NAME}.htmldecode()}, {{ITEM.NAME}.htmlencode()}, '.
-								'{{ITEM.NAME}.lowercase()}, {{ITEM.NAME}.uppercase()}, {{ITEM.NAME}.urlencode()}, '.
-								'{{ITEM.NAME}.urldecode()}',
+							'{{ITEM.NAME}.lowercase()}, {{ITEM.NAME}.uppercase()}, {{ITEM.NAME}.urlencode()}, '.
+							'{{ITEM.NAME}.urldecode()}',
 						'id:secondary_label_type' => 'Text',
 						'id:secondary_label' => '{{ITEM.NAME}.btoa()}, {{ITEM.NAME}.htmldecode()}, {{ITEM.NAME}.htmlencode()}, '.
-								'{{ITEM.NAME}.lowercase()}, {{ITEM.NAME}.uppercase()}, {{ITEM.NAME}.urlencode()}, '.
-								'{{ITEM.NAME}.urldecode()}'
+							'{{ITEM.NAME}.lowercase()}, {{ITEM.NAME}.uppercase()}, {{ITEM.NAME}.urlencode()}, '.
+							'{{ITEM.NAME}.urldecode()}'
 					],
 					'result' => [
 						'primary' => 'RGlzcGxheSBpdGVtIDU=, Display item 5, Display item 5, display item 5, '.
-								'DISPLAY ITEM 5, Display%20item%205, Display item 5',
+							'DISPLAY ITEM 5, Display%20item%205, Display item 5',
 						'secondary' => 'RGlzcGxheSBpdGVtIDU=, Display item 5, Display item 5, display item 5, '.
-								'DISPLAY ITEM 5, Display%20item%205, Display item 5'
+							'DISPLAY ITEM 5, Display%20item%205, Display item 5'
 					]
 				]
 			],
@@ -2404,16 +2404,16 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
 						'id:primary_label' => '{'.self::USER_MACRO.'.btoa()}, {'.self::MACRO_HTML_ENCODE.'.htmlencode()}, '.
-								'{'.self::MACRO_HTML_DECODE.'.htmldecode()}',
+							'{'.self::MACRO_HTML_DECODE.'.htmldecode()}',
 						'id:secondary_label_type' => 'Text',
 						'id:secondary_label' => '{'.self::USER_MACRO.'.btoa()}, {'.self::MACRO_HTML_ENCODE.'.htmlencode()}, '.
-								'{'.self::MACRO_HTML_DECODE.'.htmldecode()}'
+							'{'.self::MACRO_HTML_DECODE.'.htmldecode()}'
 					],
 					'result' => [
 						'primary' => base64_encode(self::USER_MACRO_VALUE).', '.self::MACRO_HTML_DECODE_VALUE.', '.
-								self::MACRO_HTML_ENCODE_VALUE,
+							self::MACRO_HTML_ENCODE_VALUE,
 						'secondary' => base64_encode(self::USER_MACRO_VALUE).', '.self::MACRO_HTML_DECODE_VALUE.', '.
-								self::MACRO_HTML_ENCODE_VALUE
+							self::MACRO_HTML_ENCODE_VALUE
 					]
 				]
 			],
@@ -2423,18 +2423,18 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
 						'id:primary_label' => '{'.self::MACRO_URL_ENCODE.'.urlencode()}, '.
-								'{'.self::MACRO_URL_DECODE.'.urldecode()}, {'.self::USER_MACRO.'.uppercase()}, '.
-								'{'.self::USER_MACRO.'.lowercase()}',
+							'{'.self::MACRO_URL_DECODE.'.urldecode()}, {'.self::USER_MACRO.'.uppercase()}, '.
+							'{'.self::USER_MACRO.'.lowercase()}',
 						'id:secondary_label_type' => 'Text',
 						'id:secondary_label' => '{'.self::MACRO_URL_ENCODE.'.urlencode()}, '.
-								'{'.self::MACRO_URL_DECODE.'.urldecode()}, {'.self::USER_MACRO.'.uppercase()}, '.
-								'{'.self::USER_MACRO.'.lowercase()}'
+							'{'.self::MACRO_URL_DECODE.'.urldecode()}, {'.self::USER_MACRO.'.uppercase()}, '.
+							'{'.self::USER_MACRO.'.lowercase()}'
 					],
 					'result' => [
 						'primary' => self::MACRO_URL_DECODE_VALUE.', '.self::MACRO_URL_ENCODE_VALUE.
-								', MACRO FUNCTION TEST 12345, macro function test 12345',
+							', MACRO FUNCTION TEST 12345, macro function test 12345',
 						'secondary' => self::MACRO_URL_DECODE_VALUE.', '.self::MACRO_URL_ENCODE_VALUE.
-								', MACRO FUNCTION TEST 12345, macro function test 12345'
+							', MACRO FUNCTION TEST 12345, macro function test 12345'
 					]
 				]
 			],
@@ -2444,12 +2444,12 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
 						'id:primary_label' => '{'.self::USER_MACRO.'.regrepl()}, {'.self::MACRO_CHAR.'.regrepl([a])}, '.
-								'{'.self::USER_MACRO.'.tr()}, {'.self::USER_MACRO.'.tr(z-a,Z-A)}, {'.self::USER_MACRO.'.tr(1,2,3)}'.
-								', {'.self::USER_MACRO.'.regsub()}, {'.self::USER_MACRO.'.iregsub()}',
+							'{'.self::USER_MACRO.'.tr()}, {'.self::USER_MACRO.'.tr(z-a,Z-A)}, {'.self::USER_MACRO.'.tr(1,2,3)}'.
+							', {'.self::USER_MACRO.'.regsub()}, {'.self::USER_MACRO.'.iregsub()}',
 						'id:secondary_label_type' => 'Text',
 						'id:secondary_label' => '{'.self::USER_MACRO.'.regrepl()}, {'.self::MACRO_CHAR.'.regrepl([a])}, '.
-								'{'.self::USER_MACRO.'.tr()}, {'.self::USER_MACRO.'.tr(z-a,Z-A)}, {'.self::USER_MACRO.'.tr(1,2,3)}'.
-								', {'.self::USER_MACRO.'.regsub()}, {'.self::USER_MACRO.'.iregsub()}'
+							'{'.self::USER_MACRO.'.tr()}, {'.self::USER_MACRO.'.tr(z-a,Z-A)}, {'.self::USER_MACRO.'.tr(1,2,3)}'.
+							', {'.self::USER_MACRO.'.regsub()}, {'.self::USER_MACRO.'.iregsub()}'
 					],
 					'result' => [
 						'primary' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*',
@@ -2478,10 +2478,10 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
 						'id:primary_label' => '{'.self::USER_MACRO.''.
-								'.regrepl(1{0}, test, 1{0}, test, 1{0},test, 1{0}, test, 1{0}, test, 1{0}, test)}',
+							'.regrepl(1{0}, test, 1{0}, test, 1{0},test, 1{0}, test, 1{0}, test, 1{0}, test)}',
 						'id:secondary_label_type' => 'Text',
 						'id:secondary_label' => '{'.self::USER_MACRO.''.
-								'.regrepl(1{0}, test, 1{0}, test, 1{0},test, 1{0}, test, 1{0}, test, 1{0}, test)}'
+							'.regrepl(1{0}, test, 1{0}, test, 1{0},test, 1{0}, test, 1{0}, test, 1{0}, test)}'
 					],
 					'result' => [
 						'primary' => '*UNKNOWN*',
@@ -2495,10 +2495,10 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
 						'id:primary_label' => '{'.self::MACRO_CHAR.'.tr(0-9, Ī)}, {'.self::MACRO_CHAR.'.lowercase()}, '.
-								'{'.self::MACRO_CHAR.'.uppercase()}',
+							'{'.self::MACRO_CHAR.'.uppercase()}',
 						'id:secondary_label_type' => 'Text',
 						'id:secondary_label' => '{'.self::MACRO_CHAR.'.tr(0-9, Ī)}, {'.self::MACRO_CHAR.'.lowercase()}, '.
-								'{'.self::MACRO_CHAR.'.uppercase()}'
+							'{'.self::MACRO_CHAR.'.uppercase()}'
 					],
 					'result' => [
 						'primary' => '??? ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰, 000 ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰, 000 ЙщфхжЖŽZŠSšĒĀīī🌴 ₰₰₰',
@@ -2527,14 +2527,14 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'id:primary_label_type' => 'Text',
 						'id:primary_label' => '{'.self::USER_MACRO.'.regsub(^[0-9]+, Problem)}, '.
-								'{'.self::USER_MACRO.'.iregsub(^[0-9]+, Problem)}, {{ITEM.NAME}.regsub(^[0-9]+, Problem)}, '.
-								'{{ITEM.NAME}.iregsub(^[0-9]+, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub(^[0-9]+, Problem)}, '.
-								'{'.self::USER_SECRET_MACRO.'.iregsub(^[0-9]+, Problem)}',
+							'{'.self::USER_MACRO.'.iregsub(^[0-9]+, Problem)}, {{ITEM.NAME}.regsub(^[0-9]+, Problem)}, '.
+							'{{ITEM.NAME}.iregsub(^[0-9]+, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub(^[0-9]+, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.iregsub(^[0-9]+, Problem)}',
 						'id:secondary_label_type' => 'Text',
 						'id:secondary_label' => '{'.self::USER_MACRO.'.regsub(^[0-9]+, Problem)}, '.
-								'{'.self::USER_MACRO.'.iregsub(^[0-9]+, Problem)}, {{ITEM.NAME}.regsub(^[0-9]+, Problem)}, '.
-								'{{ITEM.NAME}.iregsub(^[0-9]+, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub(^[0-9]+, Problem)}, '.
-								'{'.self::USER_SECRET_MACRO.'.iregsub(^[0-9]+, Problem)}'
+							'{'.self::USER_MACRO.'.iregsub(^[0-9]+, Problem)}, {{ITEM.NAME}.regsub(^[0-9]+, Problem)}, '.
+							'{{ITEM.NAME}.iregsub(^[0-9]+, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub(^[0-9]+, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.iregsub(^[0-9]+, Problem)}'
 					],
 					'result' => [
 						'primary' => 'Problem, Problem, Problem, Problem, Problem, Problem',
@@ -2549,14 +2549,14 @@ class testDashboardHoneycombWidget extends testWidgets {
 //						'Advanced configuration' => true,
 //						'id:primary_label_type' => 'Text',
 //						'id:primary_label' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
-//								'{'.self::USER_MACRO.'.iregsub(0, Problem)}, {{ITEM.NAME}.regsub(0, Problem)}, '.
-//								'{{ITEM.NAME}.iregsub(0, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
-//								'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, ',
+//							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, {{ITEM.NAME}.regsub(0, Problem)}, '.
+//							'{{ITEM.NAME}.iregsub(0, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
+//							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, ',
 //						'id:secondary_label_type' => 'Text',
 //						'id:secondary_label' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
-//								'{'.self::USER_MACRO.'.iregsub(0, Problem)}, {{ITEM.NAME}.regsub(0, Problem)}, '.
-//								'{{ITEM.NAME}.iregsub(0, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
-//								'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '
+//							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, {{ITEM.NAME}.regsub(0, Problem)}, '.
+//							'{{ITEM.NAME}.iregsub(0, Problem)}, {'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
+//							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '
 //					],
 //					'result' => [
 //						'primary' => ', , , , ,',
