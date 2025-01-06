@@ -57,7 +57,7 @@ class CControllerUserProfileNotificationUpdate extends CControllerUserUpdateGene
 
 	protected function doAction() {
 		$user = [];
-		
+
 		$user['userid'] = CWebUser::$data['userid'];
 
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
