@@ -80,20 +80,20 @@ AS_HELP_STRING([--with-ssh@<:@=DIR@:>@],[use SSH package @<:@default=no@:>@, DIR
 	 LIBSSH_ACCEPT_VERSION([/usr/include/libssh/libssh_version.h])
        fi
 
-       if test "x$accept_ssh_version" == xno && test -f /usr/include/libssh/libssh.h; then
-         SSH_CFLAGS=-I/usr/include
-         SSH_LDFLAGS=-L/usr/lib
-         SSH_LIBS="-lssh"
-         found_ssh="yes"
-	 LIBSSH_ACCEPT_VERSION([/usr/include/libssh/libssh.h])
-       fi
-
        if test "x$accept_ssh_version" == xno && test -f /usr/local/include/libssh/libssh.h; then
          SSH_CFLAGS=-I/usr/local/include
          SSH_LDFLAGS=-L/usr/local/lib
          SSH_LIBS="-lssh"
          found_ssh="yes"
 	 LIBSSH_ACCEPT_VERSION([/usr/local/include/libssh/libssh.h])
+       fi
+
+       if test "x$accept_ssh_version" == xno && test -f /usr/include/libssh/libssh.h; then
+         SSH_CFLAGS=-I/usr/include
+         SSH_LDFLAGS=-L/usr/lib
+         SSH_LIBS="-lssh"
+         found_ssh="yes"
+	 LIBSSH_ACCEPT_VERSION([/usr/include/libssh/libssh.h])
        fi
 
        if test "x$accept_ssh_version" == xno; then
