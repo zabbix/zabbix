@@ -29,15 +29,21 @@ class CWidgetItemHistory extends CWidget {
 
 	#values_table;
 
-	#move_scroll_to_bottom = null;
+	#scroll_to_bottom = null;
 
 	#selected_itemid = null;
 	#selected_clock = null;
 	#selected_key_ = null;
 
+	onActivate() {
+		if (this._fields.sortorder === CWidgetItemHistory.NEW_VALUES_BOTTOM) {
+			this._contents.scrollTop = this._contents.scrollHeight + 1;
+		}
+	}
+
 	setContents(response) {
 		if (this._fields.sortorder === CWidgetItemHistory.NEW_VALUES_BOTTOM) {
-			this.#move_scroll_to_bottom = this.#move_scroll_to_bottom !== null
+			this.#scroll_to_bottom = this._contents.clientHeight && this.#scroll_to_bottom !== null
 				? this._contents.clientHeight + this._contents.scrollTop >= this._contents.scrollHeight
 				: true;
 		}
@@ -109,7 +115,7 @@ class CWidgetItemHistory extends CWidget {
 			this.#markSelected();
 		}
 
-		if (this._fields.sortorder === CWidgetItemHistory.NEW_VALUES_BOTTOM && this.#move_scroll_to_bottom) {
+		if (this._fields.sortorder === CWidgetItemHistory.NEW_VALUES_BOTTOM && this.#scroll_to_bottom) {
 			this._contents.scrollTop = this._contents.scrollHeight + 1;
 		}
 	}
