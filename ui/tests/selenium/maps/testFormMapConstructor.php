@@ -387,7 +387,7 @@ class testFormMapConstructor extends CLegacyWebTest {
 			[
 				'label' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*',
 				'id' => 14
-			],
+			]
 			// TODO: Uncomment and check the test case, after ZBX-25420 fix.
 //			[
 //				'label' => ', , ,',
