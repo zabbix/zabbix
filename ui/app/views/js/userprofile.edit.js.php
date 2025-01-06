@@ -67,25 +67,26 @@
 
 		if (!disabled) {
 			$hidden.remove();
-		} else if (!$hidden.length) {
+		}
+		else if (!$hidden.length) {
 			jQuery('<input>', {'type': 'hidden', 'name': $autologout.prop('name')})
 				.val('0')
 				.insertBefore($autologout);
 		}
 	}
 
-	jQuery(function ($) {
+	jQuery(function($) {
 		var $autologin_cbx = $('#autologin'),
 			$autologout_cbx = $('#autologout_visible');
 
-		$autologin_cbx.on('click', function () {
+		$autologin_cbx.on('click', function() {
 			if (this.checked) {
 				$autologout_cbx.prop('checked', false);
 			}
 			autologoutHandler();
 		});
 
-		$autologout_cbx.on('click', function () {
+		$autologout_cbx.on('click', function() {
 			if (this.checked) {
 				$autologin_cbx.prop('checked', false).change();
 			}
@@ -93,7 +94,7 @@
 		});
 	});
 
-	jQuery(document).ready(function ($) {
+	jQuery(document).ready(function() {
 		autologoutHandler();
 	});
 </script>
