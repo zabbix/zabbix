@@ -862,6 +862,10 @@ function getUserSettingsSubmenu(): array {
 		->setArgument('action', 'userprofile.edit')
 		->getUrl();
 
+	$notification = (new CUrl('zabbix.php'))
+		->setArgument('action', 'userprofile.notification.edit')
+		->getUrl();
+
 	$tokens_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'user.token.list')
 		->getUrl();
@@ -869,7 +873,8 @@ function getUserSettingsSubmenu(): array {
 	return [
 		'main_section' => [
 			'items' => array_filter([
-				$profile_url => _('User profile'),
+				$profile_url => _('Profile'),
+				$notification => _('Notifications'),
 				$tokens_url  => _('API tokens')
 			])
 		]

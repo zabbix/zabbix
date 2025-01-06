@@ -1,0 +1,84 @@
+<?php
+/*
+** Copyright (C) 2001-2024 Zabbix SIA
+**
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+**
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
+**
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
+**/
+
+
+/**
+ * Class containing operations for updating user profile notification.
+ */
+class CControllerUserProfileNotificationUpdate extends CControllerUserUpdateGeneral {
+
+	protected function checkInput() {
+		$fields = [
+			'userid' =>				'fatal|required|db users.userid',
+			'messages' =>			'array',
+			'medias' =>				'array',
+			'form_refresh' =>		'int32'
+		];
+
+		$ret = $this->validateInput($fields);
+		$error = $this->GetValidationError();
+
+		if (!$ret) {
+			switch ($error) {
+				case self::VALIDATION_ERROR:
+					$response = new CControllerResponseRedirect('zabbix.php?action=userprofile.notification.edit');
+					$response->setFormData($this->getInputAll());
+					CMessageHelper::setErrorTitle(_('Cannot update user'));
+					$this->setResponse($response);
+					break;
+
+				case self::VALIDATION_FATAL_ERROR:
+					$this->setResponse(new CControllerResponseFatal());
+					break;
+			}
+		}
+
+		return $ret;
+	}
+
+	protected function checkPermissions() {
+		return (bool) API::User()->get([
+			'userids' => $this->getInput('userid'),
+			'editable' => true
+		]);
+	}
+
+	protected function doAction() {
+		$user = [];
+		
+		$user['userid'] = CWebUser::$data['userid'];
+
+		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
+			$user['medias'] = $this->getInputUserMedia();
+		}
+
+		DBstart();
+		$result = updateMessageSettings($this->getInput('messages', []));
+		$result = $result && (bool) API::User()->update($user);
+		$result = DBend($result);
+
+		if ($result) {
+			$response = new CControllerResponseRedirect(CMenuHelper::getFirstUrl());
+			CMessageHelper::setSuccessTitle(_('User updated'));
+		}
+		else {
+			$response = new CControllerResponseRedirect('zabbix.php?action=userprofile.notification.edit');
+			$response->setFormData($this->getInputAll());
+			CMessageHelper::setErrorTitle(_('Cannot update user'));
+		}
+
+		$this->setResponse($response);
+	}
+}

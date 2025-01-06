@@ -462,6 +462,8 @@ class CMenuHelper {
 					->setSubMenu(new CMenu([
 						(new CMenuItem(_('Profile')))
 							->setAction('userprofile.edit'),
+						(new CMenuItem(_('Notifications')))
+							->setAction('userprofile.notification.edit'),
 						(new CMenuItem(_('API tokens')))
 							->setAction('user.token.list')
 					]))
