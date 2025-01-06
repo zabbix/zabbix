@@ -350,74 +350,57 @@ class testFormMapConstructor extends CLegacyWebTest {
 		}
 	}
 
-	public function getMacroFunctionResolution() {
-		return [
-			'Built-in macros with macro functions #1' => [
-				[
-					'label' => 'VGVzdGluZyBtYWNybyBmdW5jdGlvbnMgMTIzNDU=, Testing macro functions 12345, '.
-							'Testing macro functions 12345',
-					'id' => 2
-				]
-			],
-			'Built-in macros with macro functions #2' => [
-				[
-					'label' => 'testing macro functions 12345, TESTING MACRO FUNCTIONS 12345, '.
-							'0esting0macro0functions000000, test',
-					'id' => 4
-				]
-			],
-			'Built-in macros with macro functions #3' => [
-				[
-					'label' => 'Testing m**ro fun*tions *****, Testing%20macro%20functions%2012345, '.
-							'Testing macro functions 12345, test',
-					'id' => 6
-				]
-			],
-			'Expression macros with macro functions #1' => [
-				[
-					'label' => 'MTIzLjMz, 123, 123.33, 123.33, test, 123.33',
-					'id' => 8
-				]
-			],
-			'Expression macros with macro functions #2' => [
-				[
-					'label' => '123.33, AAA.AA, test, bcd.dd, 123.33, 123.33',
-					'id' => 10
-				]
-			],
-			'Incorrectly used macro functions #1' => [
-				[
-					'label' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*',
-					'id' => 12
-				]
-			],
-			'Incorrectly used macro functions #2' => [
-				[
-					'label' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*',
-					'id' => 14
-				]
-			]
-			// TODO: Uncomment and check the test case, after ZBX-25420 fix.
-//			'Regsub and iregsub returning no result in case of no match' => [
-//				[
-//					'label' => ', , ,',
-//					'id' => 16
-//				]
-//			]
-		];
-	}
-
 	/**
 	 * Check that macro functions are resolved for map element labels.
-	 * @dataProvider getMacroFunctionResolution
 	 */
-	public function testFormMapConstructor_MacroFunctions($data) {
+	public function testFormMapConstructor_MacroFunctions() {
 		$this->page->login()->open('sysmap.php?sysmapid='.self::$macro_map_id)->waitUntilReady();
 
-		// Check that macros are resolved correctly for specific elements.
-		$this->assertEquals($data['label'], $this->query('xpath://*[@id="map-area"]/*[1]/*[2]/*[7]/*['.$data['id'].']')
-				->waitUntilVisible()->one()->getText()
-		);
+		$objects = [
+			[
+				'label' => 'VGVzdGluZyBtYWNybyBmdW5jdGlvbnMgMTIzNDU=, Testing macro functions 12345, '.
+					'Testing macro functions 12345',
+				'id' => 2
+			],
+			[
+				'label' => 'testing macro functions 12345, TESTING MACRO FUNCTIONS 12345, '.
+					'0esting0macro0functions000000, test',
+				'id' => 4
+			],
+			[
+				'label' => 'Testing m**ro fun*tions *****, Testing%20macro%20functions%2012345, '.
+					'Testing macro functions 12345, test',
+				'id' => 6
+			],
+			[
+				'label' => 'MTIzLjMz, 123, 123.33, 123.33, test, 123.33',
+				'id' => 8
+			],
+			[
+				'label' => '123.33, AAA.AA, test, bcd.dd, 123.33, 123.33',
+				'id' => 10
+			],
+			[
+				'label' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*',
+				'id' => 12
+			],
+			[
+				'label' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*',
+				'id' => 14
+			],
+			// TODO: Uncomment and check the test case, after ZBX-25420 fix.
+//			[
+//				'label' => ', , ,',
+//				'id' => 16
+//			]
+		];
+
+		foreach ($objects as $object) {
+			// Check that macros are resolved correctly for specific elements.
+			$this->assertEquals($object['label'], $this->query('xpath://*[@id="map-area"]/*[1]/*[2]/*[7]/*['.$object['id'].']')
+					->waitUntilVisible()->one()->getText(), 'Object expected label does not match, id='.$object['id']
+			);
+		}
 	}
 
 	/**
