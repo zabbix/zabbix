@@ -141,6 +141,12 @@ class testPageProblems extends CWebTest {
 				'expression' => 'last(/Host for Problems Page/trap1)<>""',
 				'priority' => TRIGGER_SEVERITY_AVERAGE,
 				'manual_close' => 1
+			],
+			[
+				'description' => 'Two trigger expressions',
+				'expression' => 'last(/Host for Problems Page/trap1)<>"" and last(/Host for Problems Page/trapSQL)<>""',
+				'priority' => TRIGGER_SEVERITY_AVERAGE,
+				'manual_close' => 1
 			]
 		]);
 
@@ -169,6 +175,7 @@ class testPageProblems extends CWebTest {
 		CDBHelper::setTriggerProblem('XSS code in Item metric');
 		CDBHelper::setTriggerProblem('SQL Injection Item metric');
 		CDBHelper::setTriggerProblem('Trigger for String problem');
+		CDBHelper::setTriggerProblem('Two trigger expressions');
 		$dayid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Trigger for Age problem 1 day'));
 		$monthid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Trigger for Age problem 1 month'));
 
@@ -903,7 +910,12 @@ class testPageProblems extends CWebTest {
 						]
 					],
 					'result' => [
+						['Problem' => 'Two trigger expressions'],
 						['Problem' => 'Trigger for String problem'],
+						['Problem' => 'SQL Injection Item metric'],
+						['Problem' => 'XSS code in Item metric'],
+						['Problem' => 'Filled opdata'],
+						['Problem' => 'Symbols in Item metric'],
 						['Problem' => 'Trigger for Age problem'],
 						['Problem' => 'Trigger for tag permissions Oracle'],
 						['Problem' => 'Trigger for tag permissions MySQL'],
@@ -1354,7 +1366,12 @@ class testPageProblems extends CWebTest {
 						'Show timeline' => false
 					],
 					'result' => [
+						['Problem' => 'Two trigger expressions'],
 						['Problem' => 'Trigger for String problem'],
+						['Problem' => 'SQL Injection Item metric'],
+						['Problem' => 'XSS code in Item metric'],
+						['Problem' => 'Filled opdata'],
+						['Problem' => 'Symbols in Item metric'],
 						['Problem' => 'Trigger for Age problem'],
 						['Problem' => 'Trigger for tag permissions Oracle'],
 						['Problem' => 'Trigger for tag permissions MySQL'],
@@ -1382,7 +1399,12 @@ class testPageProblems extends CWebTest {
 						'Show timeline' => false
 					],
 					'result' => [
+						['Problem' => 'Two trigger expressions'],
 						['Problem' => 'Trigger for String problem'],
+						['Problem' => 'SQL Injection Item metric'],
+						['Problem' => 'XSS code in Item metric'],
+						['Problem' => 'Filled opdata'],
+						['Problem' => 'Symbols in Item metric'],
 						['Problem' => 'Trigger for Age problem'],
 						['Problem' => 'Trigger for tag permissions Oracle'],
 						['Problem' => 'Trigger for tag permissions MySQL'],
@@ -1401,7 +1423,12 @@ class testPageProblems extends CWebTest {
 						'link' => 'Last 1 day'
 					],
 					'result' => [
+						['Problem' => 'Two trigger expressions'],
 						['Problem' => 'Trigger for String problem'],
+						['Problem' => 'SQL Injection Item metric'],
+						['Problem' => 'XSS code in Item metric'],
+						['Problem' => 'Filled opdata'],
+						['Problem' => 'Symbols in Item metric'],
 						['Problem' => 'Trigger for Age problem'],
 						['Problem' => 'Trigger for tag permissions Oracle'],
 						['Problem' => 'Trigger for tag permissions MySQL']
@@ -1507,7 +1534,12 @@ class testPageProblems extends CWebTest {
 						'id:to' => 'now'
 					],
 					'result' => [
+						['Problem' => 'Two trigger expressions'],
 						['Problem' => 'Trigger for String problem'],
+						['Problem' => 'SQL Injection Item metric'],
+						['Problem' => 'XSS code in Item metric'],
+						['Problem' => 'Filled opdata'],
+						['Problem' => 'Symbols in Item metric'],
 						['Problem' => 'Trigger for Age problem']
 					]
 				]
@@ -1525,7 +1557,12 @@ class testPageProblems extends CWebTest {
 						'id:to' => 'now'
 					],
 					'result' => [
+						['Problem' => 'Two trigger expressions'],
 						['Problem' => 'Trigger for String problem'],
+						['Problem' => 'SQL Injection Item metric'],
+						['Problem' => 'XSS code in Item metric'],
+						['Problem' => 'Filled opdata'],
+						['Problem' => 'Symbols in Item metric'],
 						['Problem' => 'Trigger for Age problem'],
 						['Problem' => 'Trigger for Age problem 1 day']
 					]
@@ -1543,7 +1580,12 @@ class testPageProblems extends CWebTest {
 						'link' => 'Last 1 year'
 					],
 					'result' => [
+						['Problem' => 'Two trigger expressions'],
 						['Problem' => 'Trigger for String problem'],
+						['Problem' => 'SQL Injection Item metric'],
+						['Problem' => 'XSS code in Item metric'],
+						['Problem' => 'Filled opdata'],
+						['Problem' => 'Symbols in Item metric'],
 						['Problem' => 'Trigger for Age problem'],
 						['Problem' => 'Trigger for Age problem 1 day'],
 						['Problem' => 'Trigger for Age problem 1 month']
@@ -1709,7 +1751,7 @@ class testPageProblems extends CWebTest {
 						'Show operational data' => 'Separately',
 						'Show timeline' => false
 					],
-					'popup columns' => ['item name', 'time', 'value', 'link'],
+					'table row' => 0,
 					'popup values' => [
 						'item' => 'String in operational data',
 						'metric' => 'ParagraphParagraphParagraphParagraph',
@@ -1718,7 +1760,8 @@ class testPageProblems extends CWebTest {
 					'link' => [
 						'button' => 'History',
 						'header' => 'Host for Problems Page: String in operational data'
-					]
+					],
+					'popup rows' => 1
 				]
 			],
 			'Number in operational data' => [
@@ -1730,7 +1773,7 @@ class testPageProblems extends CWebTest {
 						'Show operational data' => 'Separately',
 						'Show timeline' => false
 					],
-					'popup columns' => ['item name', 'time', 'value', 'link'],
+					'table row' => 0,
 					'popup values' => [
 						'item' => 'tag.item',
 						'metric' => 0,
@@ -1739,7 +1782,8 @@ class testPageProblems extends CWebTest {
 					'link' => [
 						'button' => 'Graph',
 						'header' => 'Host for tag permissions: tag.item'
-					]
+					],
+					'popup rows' => 1
 				]
 			],
 			'Macro expansion and operational text' => [
@@ -1748,7 +1792,7 @@ class testPageProblems extends CWebTest {
 						'Problem' => 'Filled opdata',
 						'Show operational data' => 'Separately'
 					],
-					'popup columns' => ['item name', 'time', 'value', 'link'],
+					'table row' => 0,
 					'popup values' => [
 						'item' => 'Age problem item',
 						'opdata' => 'Operational data - ',
@@ -1758,7 +1802,8 @@ class testPageProblems extends CWebTest {
 					'link' => [
 						'button' => 'Graph',
 						'header' => 'Host for Problems Page: Age problem item'
-					]
+					],
+					'popup rows' => 1
 				]
 			],
 			'ASCII symbols in metric' => [
@@ -1767,7 +1812,7 @@ class testPageProblems extends CWebTest {
 						'Problem' => 'Symbols in Item metric',
 						'Show operational data' => 'Separately'
 					],
-					'popup columns' => ['item name', 'time', 'value', 'link'],
+					'table row' => 0,
 					'popup values' => [
 						'item' => 'Symbols in Item metric',
 						'metric' => '♥♥♥♥♥♥♥',
@@ -1776,7 +1821,8 @@ class testPageProblems extends CWebTest {
 					'link' => [
 						'button' => 'History',
 						'header' => 'Host for Problems Page: Symbols in Item metric'
-					]
+					],
+					'popup rows' => 1
 				]
 			],
 			'XSS code in Item metric' => [
@@ -1785,7 +1831,7 @@ class testPageProblems extends CWebTest {
 						'Problem' => 'XSS code in Item metric',
 						'Show operational data' => 'Separately'
 					],
-					'popup columns' => ['item name', 'time', 'value', 'link'],
+					'table row' => 0,
 					'popup values' => [
 						'item' => 'XSS text',
 						'metric' => '<script>alert("TEST");</script>',
@@ -1794,7 +1840,8 @@ class testPageProblems extends CWebTest {
 					'link' => [
 						'button' => 'History',
 						'header' => 'Host for Problems Page: XSS text'
-					]
+					],
+					'popup rows' => 1
 				]
 			],
 			'XSS code in Item metric' => [
@@ -1803,7 +1850,7 @@ class testPageProblems extends CWebTest {
 						'Problem' => 'SQL Injection Item metric',
 						'Show operational data' => 'Separately'
 					],
-					'popup columns' => ['item name', 'time', 'value', 'link'],
+					'table row' => 0,
 					'popup values' => [
 						'item' => 'SQL Injection',
 						'metric' => '105; DROP TABLE Users',
@@ -1812,11 +1859,57 @@ class testPageProblems extends CWebTest {
 					'link' => [
 						'button' => 'History',
 						'header' => 'Host for Problems Page: SQL Injection'
-					]
+					],
+					'popup rows' => 1
+				]
+			],
+			'Two metrics in operational data pop-up window' => [
+				[
+					'filter' => [
+						'Problem' => 'Two trigger expressions',
+						'Show operational data' => 'Separately'
+					],
+					'table row' => 0,
+					'popup values' => [
+						[
+							'item' => 'String in operational data',
+							'metric' => 'ParagraphParagraphParagraphParagraph',
+							'truncated' => true,
+							'button' => 'History'
+						],
+						[
+							'item' => 'SQL Injection',
+							'metric' => '105; DROP TABLE Users',
+							'truncated' => true,
+							'button' => 'History'
+						]
+					],
+					'popup rows' => 2
+				]
+			],
+			'Operational data with problem name' => [
+				[
+					'filter' => [
+						'Problem' => 'Filled opdata',
+						'Show operational data' => 'With problem name'
+					],
+					'table row' => 0,
+					'popup values' => [
+						'item' => 'Age problem item',
+						'opdata' => 'Operational data - ',
+						'metric' => 150,
+						'truncated' => false
+					],
+					'link' => [
+						'button' => 'Graph',
+						'header' => 'Host for Problems Page: Age problem item'
+					],
+					'popup rows' => 1
 				]
 			]
 		];
 	}
+
 	/**
 	 * @dataProvider getFilterForOperationalData
 	 */
@@ -1829,50 +1922,117 @@ class testPageProblems extends CWebTest {
 		$form->submit();
 		$table->waitUntilReloaded();
 
-		// Check if operational data is truncated.
-		$metric = $data['popup values']['metric'];
-		$expectedValue = $data['popup values']['truncated']
-			? (strlen($metric) >= 20 ? mb_substr($metric, 0, 20) . '...' : $metric)
-			: $metric;
+		$column = ($data['filter']['Show operational data'] === 'With problem name') ? 'Problem' : 'Operational data';
 
-		if (isset($data['popup values']['opdata'])) {
-			$expectedValue = $data['popup values']['opdata'] . $expectedValue;
+
+		// Check if operational data is truncated.
+		if ($data['popup rows'] > 1) {
+			$expectedValues = array_map(function ($popupValue) {
+				$metric = $popupValue['metric'];
+				$truncatedValue = $popupValue['truncated']
+					? (strlen($metric) >= 20 ? mb_substr($metric, 0, 20) . '...' : $metric)
+					: $metric;
+
+				if (isset($popupValue['opdata'])) {
+					$truncatedValue = $popupValue['opdata'] . $truncatedValue;
+				}
+
+				return $truncatedValue;
+			}, $data['popup values']);
+
+			$expectedText = implode(', ', $expectedValues);
+			$actualText = $table->getRow($data['table row'])->getColumn($column)
+					->query('xpath://td[contains(@class, "latest-values")]')->one()->getText();
+			$this->assertEquals($expectedText, $actualText);
+		}
+		else {
+			$metric = $data['popup values']['metric'];
+			$expectedValue = $data['popup values']['truncated']
+				? (strlen($metric) >= 20 ? mb_substr($metric, 0, 20) . '...' : $metric)
+				: $metric;
+
+			if (isset($data['popup values']['opdata'])) {
+				$expectedValue = $data['popup values']['opdata'] . $expectedValue;
+			}
+
+			$xpath = isset($data['popup values']['opdata'])
+				? 'xpath://td//span[@class="opdata wordbreak"]'
+				: 'class:hint-item';
+
+			if ($data['filter']['Show operational data'] === 'With problem name') {
+				$expected_value = $data['filter']['Problem'] .' ('. $data['popup values']['opdata']
+						.''.$data['popup values']['metric'].')';
+				$actual_value = $table->query('xpath:.//tr[1]/td[10]')->one()->getText();
+				$this->assertEquals($expected_value, $actual_value);
+			}
+			else {
+				$this->assertEquals($expectedValue,
+					$table->getRow($data['table row'])->getColumn($column)->query($xpath)->one()->getText()
+				);
+			}
 		}
 
-		$xpath = isset($data['popup values']['opdata'])
-			? 'xpath://td//span[@class="opdata wordbreak"]'
-			: 'class:hint-item';
-
-		$this->assertEquals(
-			$expectedValue,
-			$table->getRow(0)->getColumn('Operational data')->query($xpath)->one()->getText()
-		);
-
-		$table->getRow(0)->getColumn('Operational data')->query('class:hint-item')->one()->click();
+		$table->getRow($data['table row'])->getColumn($column)->query('class:hint-item')->one()->click();
 		$popup = $this->query('css:.overlay-dialogue.wordbreak')->one()->waitUntilVisible();
 
-		// Check item name.
-		$this->assertEquals($data['popup values']['item'],
-		$this->query('xpath://div[contains(@class, "overlay-dialogue")]
-				//table[contains(@class, "list-table")]//tr/td[1]')->one()->getText()
-		);
+		$popupRows = $popup->query('class:list-table')->asTable()->one()->getRows()->count();
+		$this->assertEquals($data['popup rows'], $popupRows);
 
-		// Check correct trigger time.
-		$time = CDBHelper::getValue('SELECT clock FROM problem WHERE name='.zbx_dbstr($data['filter']['Problem']));
-		$this->assertEquals(date('Y-m-d H:i:s', $time),
-				$this->query('xpath://div[contains(@class, "overlay-dialogue")]
-						//table[contains(@class, "list-table")]//tr/td[2]')->one()->getText()
-		);
+		if ($data['popup rows'] > 1) {
+			foreach ($data['popup values'] as $index => $popupValue) {
+				// Check item name.
+				$this->assertEquals($popupValue['item'], $this->query('xpath://div[contains(@class, "overlay-dialogue")]'
+						. '//table[contains(@class, "list-table")]//tr['.($index+1).']/td[1]')->one()->getText()
+				);
 
-		// Check correct graph or history link if needed.
-		$popup->query('link', $data['link']['button'])->one()->click();
-		$this->page->waitUntilReady();
-		$this->page->assertHeader($data['link']['header']);
-		$this->page->open('zabbix.php?action=problem.view');
+				// Check correct trigger time.
+				$time = CDBHelper::getValue('SELECT clock FROM problem WHERE name='.zbx_dbstr($data['filter']['Problem']));
+				$this->assertEquals(date('Y-m-d H:i:s', $time),
+						$this->query('xpath://div[contains(@class, "overlay-dialogue")]
+								//table[contains(@class, "list-table")]//tr['.($index+1).']/td[2]')->one()->getText()
+				);
 
-		// Close popup.
-		$popup->query('xpath:.//button[@title="Close"]')->one()->click();
-		$popup->waitUntilNotPresent();
+				// Check metric value.
+				$this->assertEquals($popupValue['metric'], $this->query('xpath://div[contains(@class, "overlay-dialogue")]'
+						. '//table[contains(@class, "list-table")]//tr['.($index+1).']/td[3]')->one()->getText()
+				);
+
+				// Check link label.
+				$this->assertEquals($popupValue['button'], $this->query('xpath://div[contains(@class, "overlay-dialogue")]'
+						. '//table[contains(@class, "list-table")]//tr['.($index+1).']/td[4]')->one()->getText()
+				);
+			}
+		}
+		else {
+			// Check expected popup rows number.
+			$popupRows = $popup->query('class:list-table')->asTable()->one()->getRows()->count();
+			$this->assertEquals($data['popup rows'], $popupRows);
+
+			// Check item name.
+			$this->assertEquals($data['popup values']['item'],
+			$this->query('xpath://div[contains(@class, "overlay-dialogue")]
+					//table[contains(@class, "list-table")]//tr/td[1]')->one()->getText()
+			);
+
+			// Check correct trigger time.
+			$time = CDBHelper::getValue('SELECT clock FROM problem WHERE name='.zbx_dbstr($data['filter']['Problem']));
+			$this->assertEquals(date('Y-m-d H:i:s', $time),
+					$this->query('xpath://div[contains(@class, "overlay-dialogue")]
+							//table[contains(@class, "list-table")]//tr/td[2]')->one()->getText()
+			);
+
+			// Check metric value.
+			$this->assertEquals($data['popup values']['metric'],
+			$this->query('xpath://div[contains(@class, "overlay-dialogue")]
+					//table[contains(@class, "list-table")]//tr/td[3]')->one()->getText()
+			);
+
+			// Check correct graph or history link.
+			$popup->query('link', $data['link']['button'])->one()->click();
+			$this->page->waitUntilReady();
+			$this->page->assertHeader($data['link']['header']);
+			$this->page->open('zabbix.php?action=problem.view');
+		}
 	}
 
 	public function testPageProblems_ResetButton() {
