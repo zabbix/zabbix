@@ -1176,8 +1176,6 @@ static int	evt_severities_to_mask(const char *severity, unsigned char *mask, cha
 int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AGENT_RESULT *result,
 		zbx_vector_agent_result_ptr_t *add_results)
 {
-#	define	WITHLOCK	1
-
 	const char		*url, *skip, *severity_str;
 	unsigned char		skip_old, severity = 0;
 	zbx_vmware_service_t	*service;
@@ -1269,9 +1267,9 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 		SET_MSG_RESULT(result, zbx_strdup(NULL, service->eventlog.data->error));
 		goto unlock;
 	}
-	else if (80 < (hc_pused = zbx_hc_mem_pused(WITHLOCK)))
+	else if (80 < (hc_pused = zbx_hc_mem_pused_lock()))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s():eventlog data is suspended due to history cache is overloaded:%.2f%%",
+		zabbix_log(LOG_LEVEL_DEBUG,"%s():eventlog data is suspended due to history cache is overloaded:%.2f%%",
 				__func__, hc_pused);
 	}
 	else if (0 < service->eventlog.data->events.values_num)
@@ -1293,8 +1291,6 @@ out:
 			add_results->values[add_results->values_num - 1]->lastlogsize : 0);
 
 	return ret;
-
-#	undef	WITHLOCK
 }
 
 int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const char *password,

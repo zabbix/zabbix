@@ -3070,18 +3070,21 @@ int	zbx_hc_get_history_compression_age(void)
  * Purpose: calculate usage percentage of hc memory buffer                    *
  *                                                                            *
  ******************************************************************************/
-double	zbx_hc_mem_pused(int withlock)
+double	zbx_hc_mem_pused(void)
+{
+	return 100 * (double)(zbx_dbcache_get_hc_mem()->total_size - zbx_dbcache_get_hc_mem()->free_size) /
+			zbx_dbcache_get_hc_mem()->total_size;
+}
+
+double	zbx_hc_mem_pused_lock(void)
 {
 	double	pused;
 
-	if (0 != withlock)
-		zbx_dbcache_lock();
+	zbx_dbcache_lock();
 
-	pused = 100 * (double)(zbx_dbcache_get_hc_mem()->total_size - zbx_dbcache_get_hc_mem()->free_size) /
-			zbx_dbcache_get_hc_mem()->total_size;
+	pused = zbx_hc_mem_pused();
 
-	if (0 != withlock)
-		zbx_dbcache_unlock();
+	zbx_dbcache_unlock();
 
 	return pused;
 }
