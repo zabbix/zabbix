@@ -305,42 +305,43 @@ func PdhEnumObjectItems(objectName string) (instances []Instance, err error) {
 	return instances, nil
 }
 
+func pdhEnumObjectHelper(objListSize uint32, refresh bool) ([]uint16, uint32, uintptr) {
+	objSize := objListSize
+	objBuf := make([]uint16, objSize)
+	ret, _, _ := syscall.Syscall6(pdhEnumObjects, 6, 0, 0, uintptr(unsafe.Pointer(&objBuf[0])),
+		uintptr(unsafe.Pointer(&objSize)), uintptr(PERF_DETAIL_WIZARD), bool2uintptr(refresh))
+
+	return objBuf, objSize, ret
+}
+
 func PdhEnumObject() (objects []string, err error) {
 	objectListSizeMu.Lock()
 	defer objectListSizeMu.Unlock()
 
-	objectListSizeNew := objectListSize
-	objectBuf := make([]uint16, objectListSizeNew)
-
-	ret, _, _ := syscall.Syscall6(pdhEnumObjects, 6, 0, 0, uintptr(unsafe.Pointer(&objectBuf[0])),
-		uintptr(unsafe.Pointer(&objectListSizeNew)), uintptr(PERF_DETAIL_WIZARD), bool2uintptr(true))
+	objectBuf, objectListSizeRet, ret := pdhEnumObjectHelper(objectListSize, true)
 	if ret == PDH_MORE_DATA {
-		log.Debugf("PdhEnumObject() %d is not enough buffer size", objectListSize)
-		objectListSizeNew = 0
-		ret, _, _ = syscall.Syscall6(pdhEnumObjects, 6, 0, 0, 0, uintptr(unsafe.Pointer(&objectListSizeNew)),
+		log.Debugf("PdhEnumObject() insufficient buffer size: %d", objectListSize)
+		ret, _, _ = syscall.Syscall6(pdhEnumObjects, 6, 0, 0, 0, uintptr(unsafe.Pointer(&objectListSizeRet)),
 			uintptr(PERF_DETAIL_WIZARD), bool2uintptr(true))
 		if ret != PDH_MORE_DATA {
 			return nil, newPdhError(ret)
 		}
-		log.Debugf("pdhEnumObjects() asks for buffer size: %d", objectListSizeNew)
 
-		if objectListSizeNew < 1 {
+		if objectListSizeRet < 1 {
 			return nil, fmt.Errorf("No objects found.")
 		}
 
-		objectListSizeNew *= 2
-		objectBuf = make([]uint16, objectListSizeNew)
-		objectListSizeUpdate := objectListSizeNew
+		objectListSize = objectListSizeRet * 2
+		log.Debugf("PdhEnumObject() new buffer size: %d", objectListSize)
+		objectBuf, objectListSizeRet, ret = pdhEnumObjectHelper(objectListSize, false)
+	}
 
-		log.Debugf("pdhEnumObjects() retry, buffer size: %d", objectListSizeNew)
-		ret, _, _ = syscall.Syscall6(pdhEnumObjects, 6, 0, 0, uintptr(unsafe.Pointer(&objectBuf[0])),
-			uintptr(unsafe.Pointer(&objectListSizeNew)), uintptr(PERF_DETAIL_WIZARD), bool2uintptr(false))
-		if syscall.Errno(ret) != windows.ERROR_SUCCESS {
-			return nil, newPdhError(ret)
-		}
-		objectListSize = objectListSizeUpdate
-	} else if syscall.Errno(ret) != windows.ERROR_SUCCESS {
+	if syscall.Errno(ret) != windows.ERROR_SUCCESS {
 		return nil, newPdhError(ret)
+	}
+
+	if objectListSizeRet < 1 {
+		return nil, fmt.Errorf("No objects found.")
 	}
 
 	var singleName []uint16
@@ -353,7 +354,7 @@ func PdhEnumObject() (objects []string, err error) {
 		objects = append(objects, windows.UTF16ToString(singleName))
 	}
 
-	log.Debugf("PdhEnumObject() got %d objects", len(objects))
+	log.Debugf("PdhEnumObject() detected %d objects", len(objects))
 
 	return objects, nil
 }
