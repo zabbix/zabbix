@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
  */
 class testFormHostLinkTemplates extends CLegacyWebTest {
 	public $host_for_template = 'Visible host for template linkage';
+
 	protected static $hostid;
 
 	public function getBehaviors() {
@@ -33,7 +34,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 
 	public static function getLinkUnlinkTemplateData() {
 		return [
-			// 1. Attach Template to Template
+			// #0 Attach Template to Template
 			[
 				'fields' => [
 					'link' => 'templates.php',
@@ -42,25 +43,23 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 					'standalone' => 'true'
 				]
 			],
-			// 2. Attach Template to Host from Data collection -> Hosts
+			// #1 Attach Template to Host from Data collection -> Hosts
 			[
 				'fields' => [
 					'link' => 'zabbix.php?action=host.list',
 					'name' => 'Visible host for template linkage',
-					'entity' => 'Host',
-					'standalone' => 'false'
+					'entity' => 'Host'
 				]
 			],
-			// 3. Attach Template to Host from Monitoring -> Hosts
+			// #2 Attach Template to Host from Monitoring -> Hosts
 			[
 				'fields' => [
 					'link' => 'zabbix.php?action=host.view',
 					'name' => 'Visible host for template linkage',
-					'entity' => 'Host',
-					'standalone' => 'false'
+					'entity' => 'Host'
 				]
 			],
-			// 4. Attach Template to Host from Standalone view
+			// #3 Attach Template to Host from Standalone view
 			[
 				'fields' => [
 					'link' => 'zabbix.php?action=host.edit&hostid='.self::$hostid,
@@ -208,53 +207,60 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 	/**
 	 * @dataProvider getLinkUnlinkTemplateData
 	 */
-		public function testFormHostLinkTemplates_HostTemplateUnlinkAndAdd($data) {
-		$template = 'Aranet Cloud';
-		$host = 'Visible host for template linkage';
+	public function testFormHostLinkTemplates_HostTemplateRelinkage($data) {
+		$template = 'Linux by Zabbix agent active';
 
-		// Login, find host/template and open form
-		if ($data['standalone']==='true' && $data['entity']==='Host') {
-			$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($host));
+		// Login, find host/template and open form.
+		if (CTestArrayHelper::get($data, 'standalone') && $data['entity'] === 'Host') {
+			$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($this->host_for_template));
 			$this->page->login()->open($data['link'].$hostid)->waitUntilReady();
-			$form = $this->query('id:host-form')->asForm()->waitUntilReady()->one();
-		} else if ($data['standalone']==='true' && $data['entity']==='Template') {
-			$this->page->login()->open($data['link'])->waitUntilReady();
-			$this->query('link',$data['name'])->waitUntilVisible()->one()->click();
-			$form = $this->query('id:templates-form')->asForm()->waitUntilReady()->one();
-		} else {
-			$this->page->login()->open($data['link'])->waitUntilReady();
-			$this->query('link',$data['name'])->waitUntilVisible()->one()->click();
-			print_r('clicked');
-			if ($this->query('class:menu-popup')->exists()) {
-				print_r('i am here');
-				$this->query('class:menu-popup')->asList()->query('link:Configuration')->one()->click();
-			}
-			$form = COverlayDialogElement::find()->asForm()->waitUntilPresent()->one();
+			$form = $this->query('id:host-form')->asForm()->waitUntilVisible()->one();
 		}
-		//Check if template is linked from previous test runs and removes it
+		elseif (CTestArrayHelper::get($data, 'standalone') && $data['entity'] === 'Template') {
+			$this->page->login()->open($data['link'])->waitUntilReady();
+			$this->query('button:Reset')->one()->click();
+			$templateFilter = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
+			$templateFilter->fill(['Name' => $data['name']]);
+			$this->query('button:Apply')->one()->click();
+			$this->query('link', $data['name'])->waitUntilVisible()->one()->click();
+			$form = $this->query('id:templates-form')->asForm()->waitUntilVisible()->one();
+		}
+		else {
+			$this->page->login()->open($data['link'])->waitUntilReady();
+			$this->query('link', $data['name'])->waitUntilVisible()->one()->click();
+			if ($this->query('class:menu-popup')->exists()) {
+				$this->query('class:menu-popup')->query('link:Configuration')->one()->click();
+			}
+			$form = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
+		}
+
+		//Check if template is linked from previous test runs and removes it.
 		if($form->query('id:linked-templates')->exists()) {
 			$form->query('id:linked-templates')->asTable()->one()->findRow('Name', $template)->getColumn('Action')
 				->query('button:Unlink')->one()->click();
 		}
-		// Link template and save
+
+		// Link template and save form.
 		$form->getField('Templates')->asMultiselect()->fill($template);
 		$this->assertEquals($template, $form->query('class:subfilter-enabled')->one()->getText());
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, $data['entity'].' updated');
 
-		// Open host configuration again, remove template link
-		if($data['standalone']==='true' && $data['entity']==='Host'){
-			$this->page->login()->open($data['link'].$hostid)->waitUntilReady();
-		} else {
-			$this->query('link:'.$data['name'])->waitUntilVisible()->one()->click();
+		// Open host configuration again, remove template link.
+		if (CTestArrayHelper::get($data, 'standalone') && $data['entity'] === 'Host') {
+			$this->page->open($data['link'].$hostid)->waitUntilReady();
+		}
+		else {
+			$this->query('link', $data['name'])->waitUntilVisible()->one()->click();
 			if ($this->query('class:menu-popup')->exists()) {
-				$this->query('class:menu-popup')->asList()->query('link:Configuration')->one()->click();
+				$this->query('class:menu-popup')->query('link:Configuration')->one()->click();
 			}
 		}
 		$form->query('id:linked-templates')->asTable()->one()->findRow('Name', $template)->getColumn('Action')
 				->query('button:Unlink')->one()->click();
-		$this->assertEquals('',$form->query('id:add_templates__ms')->one()->getText());
-		// Add template link back, save, assert that save was successful
+		$this->assertEquals('', $form->query('id:add_templates__ms')->one()->getText());
+
+		// Relink the template, save the form and assert that template is successfully linked.
 		$form->invalidate();
 		$form->getField('Templates')->asMultiselect()->fill($template);
 		$this->assertEquals($template, $form->query('class:subfilter-enabled')->one()->getText());
