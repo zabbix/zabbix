@@ -43,11 +43,11 @@ class CWidgetItemHistory extends CWidget {
 			this._events = {
 				...this._events,
 				scrollHandler: () => {
-					if (this.#content_height === this._contents.clientHeight
-							&& this.#content_width === this._contents.clientWidth) {
-						const contents_scroll = this._contents.clientHeight + this._contents.scrollTop + 2;
+					if (this.#content_height == this._contents.clientHeight
+							&& this.#content_width == this._contents.clientWidth) {
+						const contents_scroll = this._contents.clientHeight + this._contents.scrollTop + 1;
 
-						this.#scroll_bottom = contents_scroll >= this._contents.scrollHeight;
+						this.#scroll_bottom = contents_scroll > this._contents.scrollHeight;
 					}
 
 					if (this.#scroll_bottom) {
