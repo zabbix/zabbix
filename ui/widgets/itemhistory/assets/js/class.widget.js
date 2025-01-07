@@ -29,24 +29,54 @@ class CWidgetItemHistory extends CWidget {
 
 	#values_table;
 
-	#scroll_to_bottom = null;
+	#scroll_bottom = true;
+
+	#content_height = null;
+	#content_width = null;
 
 	#selected_itemid = null;
 	#selected_clock = null;
 	#selected_key_ = null;
 
+	onStart() {
+		if (this._fields.sortorder === CWidgetItemHistory.NEW_VALUES_BOTTOM) {
+			this._events = {
+				...this._events,
+				scrollHandler: () => {
+					if (this.#content_height === this._contents.clientHeight
+							&& this.#content_width === this._contents.clientWidth) {
+						const contents_scroll = this._contents.clientHeight + this._contents.scrollTop + 2;
+
+						this.#scroll_bottom = contents_scroll >= this._contents.scrollHeight;
+					}
+
+					if (this.#scroll_bottom) {
+						this._contents.scrollTop = this._contents.scrollHeight + 1;
+					}
+
+					this.#content_height = this._contents.clientHeight;
+					this.#content_width = this._contents.clientWidth;
+				}
+			};
+		}
+	}
+
 	onActivate() {
 		if (this._fields.sortorder === CWidgetItemHistory.NEW_VALUES_BOTTOM) {
 			this._contents.scrollTop = this._contents.scrollHeight + 1;
+
+			this._contents.addEventListener('scroll', this._events.scrollHandler);
+		}
+	}
+
+	onDeactivate() {
+		if (this._fields.sortorder === CWidgetItemHistory.NEW_VALUES_BOTTOM) {
+			this._contents.removeEventListener('scroll', this._events.scrollHandler);
 		}
 	}
 
 	setContents(response) {
-		if (this._fields.sortorder === CWidgetItemHistory.NEW_VALUES_BOTTOM) {
-			this.#scroll_to_bottom = this._contents.clientHeight && this.#scroll_to_bottom !== null
-				? this._contents.clientHeight + this._contents.scrollTop >= this._contents.scrollHeight
-				: true;
-		}
+		const scroll_bottom = this.#scroll_bottom;
 
 		super.setContents(response);
 
@@ -115,8 +145,13 @@ class CWidgetItemHistory extends CWidget {
 			this.#markSelected();
 		}
 
-		if (this._fields.sortorder === CWidgetItemHistory.NEW_VALUES_BOTTOM && this.#scroll_to_bottom) {
-			this._contents.scrollTop = this._contents.scrollHeight + 1;
+		if (this._fields.sortorder === CWidgetItemHistory.NEW_VALUES_BOTTOM) {
+			if (scroll_bottom) {
+				this._contents.scrollTop = this._contents.scrollHeight + 1;
+			}
+
+			this.#content_height = this._contents.clientHeight;
+			this.#content_width = this._contents.clientWidth;
 		}
 	}
 
@@ -148,6 +183,17 @@ class CWidgetItemHistory extends CWidget {
 		return {
 			...super.getUpdateRequestData(),
 			has_custom_time_period: this.getFieldsReferredData().has('time_period') ? undefined : 1
+		}
+	}
+
+	onResize() {
+		if (this._fields.sortorder === CWidgetItemHistory.NEW_VALUES_BOTTOM) {
+			if (this.#scroll_bottom) {
+				this._contents.scrollTop = this._contents.scrollHeight + 1;
+			}
+
+			this.#content_height = this._contents.clientHeight;
+			this.#content_width = this._contents.clientWidth;
 		}
 	}
 
