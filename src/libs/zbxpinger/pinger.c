@@ -62,13 +62,13 @@ static zbx_hash_t	pinger_hash(const void *d)
 	const zbx_pinger_t	*pinger = (const zbx_pinger_t *)d;
 	zbx_hash_t		hash = 0;
 
-	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&pinger->allow_redirect, sizeof(pinger->allow_redirect), hash);
-	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&pinger->count, sizeof(pinger->count), hash);
-	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&pinger->interval, sizeof(pinger->interval), hash);
-	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&pinger->size, sizeof(pinger->size), hash);
-	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&pinger->timeout, sizeof(pinger->timeout), hash);
-	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&pinger->retries, sizeof(pinger->retries), hash);
-	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&pinger->backoff, sizeof(pinger->backoff), hash);
+	hash = ZBX_DEFAULT_HASH_ALGO(&pinger->allow_redirect, sizeof(pinger->allow_redirect), hash);
+	hash = ZBX_DEFAULT_HASH_ALGO(&pinger->count, sizeof(pinger->count), hash);
+	hash = ZBX_DEFAULT_HASH_ALGO(&pinger->interval, sizeof(pinger->interval), hash);
+	hash = ZBX_DEFAULT_HASH_ALGO(&pinger->size, sizeof(pinger->size), hash);
+	hash = ZBX_DEFAULT_HASH_ALGO(&pinger->timeout, sizeof(pinger->timeout), hash);
+	hash = ZBX_DEFAULT_HASH_ALGO(&pinger->retries, sizeof(pinger->retries), hash);
+	hash = ZBX_DEFAULT_HASH_ALGO(&pinger->backoff, sizeof(pinger->backoff), hash);
 
 	return hash;
 }
