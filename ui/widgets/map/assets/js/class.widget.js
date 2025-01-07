@@ -78,6 +78,7 @@ class CWidgetMap extends CWidget {
 			.then(response => response.json())
 			.then(response => {
 				if (response.mapid != 0) {
+					this.#map_svg.selected_element_id = this.#selected_element_id;
 					this.#map_svg.update(response);
 				}
 				else {
