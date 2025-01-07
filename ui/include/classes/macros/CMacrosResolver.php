@@ -42,7 +42,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * user: {$MACRO1}, {$MACRO2}, ...
 	 * host: {HOSTNAME}, {HOST.HOST}, {HOST.NAME}
 	 * ip: {IPADDRESS}, {HOST.IP}, {HOST.DNS}, {HOST.CONN}
-	 * item: {ITEM.LASTVALUE}, {ITEM.VALUE}
+	 * item: {ITEM.LASTVALUE}, {ITEM.VALUE}, {ITEM.VALUE.DATE}, {ITEM.VALUE.TIME}, {ITEM.LASTVALUE.DATE}, ...
 	 *
 	 * @param array  $options
 	 * @param string $options['config']
@@ -137,7 +137,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'macros_n' => [
 				'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}'],
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}', '{ITEM.VALUE.DATE}', '{ITEM.VALUE.TIME}',
+					'{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
+					'{ITEM.LASTVALUE.TIMESTAMP}', '{ITEM.LASTVALUE.AGE}'
+				],
 				'log' => ['{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}', '{ITEM.LOG.TIMESTAMP}', '{ITEM.LOG.AGE}',
 					'{ITEM.LOG.SOURCE}', '{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
 				]
@@ -224,7 +227,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'macros_n' => [
 				'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}'],
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}', '{ITEM.VALUE.DATE}', '{ITEM.VALUE.TIME}',
+					'{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
+					'{ITEM.LASTVALUE.TIMESTAMP}', '{ITEM.LASTVALUE.AGE}'
+				],
 				'log' => ['{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}', '{ITEM.LOG.TIMESTAMP}', '{ITEM.LOG.AGE}',
 					'{ITEM.LOG.SOURCE}', '{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
 				]
@@ -332,7 +338,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'macros_n' => [
 				'host' => ['{HOST.ID}', '{HOST.HOST}', '{HOST.NAME}'],
 				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}'],
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}', '{ITEM.VALUE.DATE}', '{ITEM.VALUE.TIME}',
+					'{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
+					'{ITEM.LASTVALUE.TIMESTAMP}', '{ITEM.LASTVALUE.AGE}'
+				],
 				'log' => ['{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}', '{ITEM.LOG.TIMESTAMP}', '{ITEM.LOG.AGE}',
 					'{ITEM.LOG.SOURCE}', '{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
 				]
@@ -992,7 +1001,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				'item' => ['{ITEM.DESCRIPTION}', '{ITEM.DESCRIPTION.ORIG}', '{ITEM.ID}', '{ITEM.KEY}',
 					'{ITEM.KEY.ORIG}', '{ITEM.NAME}', '{ITEM.NAME.ORIG}', '{ITEM.STATE}', '{ITEM.VALUETYPE}'
 				],
-				'item_value' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}', '{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}',
+				'item_value' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}', '{ITEM.VALUE.DATE}', '{ITEM.VALUE.TIME}',
+					'{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
+					'{ITEM.LASTVALUE.TIMESTAMP}', '{ITEM.LASTVALUE.AGE}', '{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}',
 					'{ITEM.LOG.TIMESTAMP}', '{ITEM.LOG.AGE}', '{ITEM.LOG.SOURCE}', '{ITEM.LOG.SEVERITY}',
 					'{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
 				],

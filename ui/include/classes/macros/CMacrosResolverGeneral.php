@@ -982,10 +982,42 @@ class CMacrosResolverGeneral {
 			CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)
 		));
 
+		$item_value_macros = ['ITEM.VALUE', 'ITEM.VALUE.DATE', 'ITEM.VALUE.TIME', 'ITEM.VALUE.TIMESTAMP',
+			'ITEM.VALUE.AGE'
+		];
+		$item_lastvalue_macros = ['ITEM.LASTVALUE', 'ITEM.LASTVALUE.DATE', 'ITEM.LASTVALUE.TIME',
+			'ITEM.LASTVALUE.TIMESTAMP', 'ITEM.LASTVALUE.AGE'
+		];
+
 		foreach ($history as $itemid => $item_history) {
 			foreach ($macros[$itemid] as $macro => $tokens) {
-				if ($macro === 'ITEM.VALUE' || $macro === 'ITEM.LASTVALUE') {
-					$value = $item_history[0]['value'];
+				if (in_array($macro, array_merge($item_value_macros, $item_lastvalue_macros))) {
+					switch ($macro) {
+						case 'ITEM.VALUE':
+						case 'ITEM.LASTVALUE':
+							$value = $item_history[0]['value'];
+							break;
+
+						case 'ITEM.VALUE.DATE':
+						case 'ITEM.LASTVALUE.DATE':
+							$value = date('Y.m.d', $history[$itemid][0]['clock']);
+							break;
+
+						case 'ITEM.VALUE.TIME':
+						case 'ITEM.LASTVALUE.TIME':
+							$value = date('H:i:s', $history[$itemid][0]['clock']);
+							break;
+
+						case 'ITEM.VALUE.TIMESTAMP':
+						case 'ITEM.LASTVALUE.TIMESTAMP':
+							$value = $history[$itemid][0]['clock'];
+							break;
+
+						case 'ITEM.VALUE.AGE':
+						case 'ITEM.LASTVALUE.AGE':
+							$value = zbx_date2age($history[$itemid][0]['clock']);
+							break;
+					}
 
 					foreach ($tokens as $token) {
 						$macro_values[$itemid][$token['token']] = array_key_exists('macrofunc', $token)
@@ -1135,13 +1167,30 @@ class CMacrosResolverGeneral {
 			foreach ($macros[$function['functionid']] as $m => $tokens) {
 				$clock = null;
 				$value = null;
+				$history = null;
+				$item_value_macros = ['ITEM.VALUE', 'ITEM.VALUE.DATE', 'ITEM.VALUE.TIME', 'ITEM.VALUE.TIMESTAMP',
+					'ITEM.VALUE.AGE'
+				];
+				$item_lastvalue_macros = ['ITEM.LASTVALUE', 'ITEM.LASTVALUE.DATE', 'ITEM.LASTVALUE.TIME',
+					'ITEM.LASTVALUE.TIMESTAMP', 'ITEM.LASTVALUE.AGE'
+				];
+
+				if (in_array($m, $item_value_macros)) {
+					if ($options['events']) {
+						$trigger = $triggers[$function['triggerid']];
+						$history = Manager::History()->getValueAt($function, $trigger['clock'], $trigger['ns']);
+					}
+				}
+
+				if (in_array($m, $item_lastvalue_macros) || !$history) {
+					$history = Manager::History()->getLastValues([$function], 1, timeUnitToSeconds(
+						CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)
+					));
+				}
 
 				switch ($m) {
 					case 'ITEM.VALUE':
 						if ($options['events']) {
-							$trigger = $triggers[$function['triggerid']];
-							$history = Manager::History()->getValueAt($function, $trigger['clock'], $trigger['ns']);
-
 							if (is_array($history)) {
 								if (array_key_exists('clock', $history)) {
 									$clock = $history['clock'];
@@ -1157,16 +1206,40 @@ class CMacrosResolverGeneral {
 						// break; is not missing here
 
 					case 'ITEM.LASTVALUE':
-						$history = Manager::History()->getLastValues([$function], 1, timeUnitToSeconds(
-							CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)
-						));
-
 						if (array_key_exists($function['itemid'], $history)) {
 							$clock = $history[$function['itemid']][0]['clock'];
 
 							if ($function['value_type'] != ITEM_VALUE_TYPE_BINARY) {
 								$value = $history[$function['itemid']][0]['value'];
 							}
+						}
+						break;
+
+					case 'ITEM.VALUE.DATE':
+					case 'ITEM.LASTVALUE.DATE':
+						if (array_key_exists($function['itemid'], $history)) {
+							$value = date('Y.m.d', $history[$function['itemid']][0]['clock']);
+						}
+						break;
+
+					case 'ITEM.VALUE.TIME':
+					case 'ITEM.LASTVALUE.TIME':
+						if (array_key_exists($function['itemid'], $history)) {
+							$value = date('H:i:s', $history[$function['itemid']][0]['clock']);
+						}
+						break;
+
+					case 'ITEM.VALUE.TIMESTAMP':
+					case 'ITEM.LASTVALUE.TIMESTAMP':
+						if (array_key_exists($function['itemid'], $history)) {
+							$value = $history[$function['itemid']][0]['clock'];
+						}
+						break;
+
+					case 'ITEM.VALUE.AGE':
+					case 'ITEM.LASTVALUE.AGE':
+						if (array_key_exists($function['itemid'], $history)) {
+							$value = zbx_date2age($history[$function['itemid']][0]['clock']);
 						}
 						break;
 				}
