@@ -338,8 +338,8 @@ static int	pinger_parse_key_params(const char *key, const char *host_addr, zbx_p
 		{
 			pinger->backoff = DEFAULT_BACKOFF;
 		}
-		else if (FAIL == zbx_is_uint31(tmp, &pinger->interval) || MIN_BACKOFF > pinger->backoff ||
-				MAX_BACKOFF > pinger->backoff)
+		else if (FAIL == zbx_is_uint31(tmp, &pinger->backoff) || MIN_BACKOFF > pinger->backoff ||
+				MAX_BACKOFF < pinger->backoff)
 		{
 			*error = zbx_dsprintf(NULL, "Backoff \"%s\" is not between %.1f and %.1f.", tmp,
 					MIN_BACKOFF, MAX_BACKOFF);
@@ -451,11 +451,12 @@ static void	add_icmpping_item(zbx_hashset_t *pinger_items, zbx_pinger_t *pinger_
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() addr:'%s' count:%d interval:%d size:%d timeout:%d retries:%d backoff:%.1f"
 			" allow_redirect:%u",
 			__func__, addr, pinger_local->count, pinger_local->interval, pinger_local->size,
-			pinger_local->timeout, pinger_local->retries, pinger_local->backoff, pinger->allow_redirect);
+			pinger_local->timeout, pinger_local->retries, pinger_local->backoff,
+			pinger_local->allow_redirect);
 
 	num = pinger_items->num_data;
 
-	pinger = (zbx_pinger_t *)zbx_hashset_insert(pinger_items, pinger_local, sizeof(pinger_local));
+	pinger = (zbx_pinger_t *)zbx_hashset_insert(pinger_items, pinger_local, sizeof(zbx_pinger_t));
 
 	if (pinger_items->num_data != num)
 	{
@@ -546,13 +547,22 @@ static void	get_pinger_hosts(zbx_hashset_t *pinger_items, int config_timeout)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, items_count);
 }
 
+static int	fping_host_compare(const void *d1, const void *d2)
+{
+	const zbx_fping_host_t        *h1 = (const zbx_fping_host_t *)d1;
+	const zbx_fping_host_t        *h2 = (const zbx_fping_host_t *)d2;
+
+	return strcmp(h1->addr, h2->addr);
+}
+
 static void	add_pinger_host(zbx_vector_fping_host_t *hosts, char *addr)
 {
 	zbx_fping_host_t	host = {.addr = addr};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() addr:'%s'", __func__, addr);
 
-	zbx_vector_fping_host_append_ptr(hosts, &host);
+	if (FAIL == zbx_vector_fping_host_search(hosts, host, fping_host_compare))
+		zbx_vector_fping_host_append_ptr(hosts, &host);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -589,6 +599,7 @@ static int	process_pinger_hosts(zbx_hashset_t *pinger_items, int process_num, in
 		if (FAIL != ping_result)
 			process_values(&pinger->items, hosts.values, hosts.values_num, &ts, ping_result, error);
 
+		zbx_vector_fping_host_clear(&hosts);
 	}
 
 	zbx_vector_fping_host_destroy(&hosts);
@@ -619,6 +630,8 @@ ZBX_THREAD_ENTRY(zbx_pinger_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
+	zbx_setproctitle("%s #%d [starting]", get_process_type_string(process_type), process_num);
+
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 	zbx_init_icmpping_env(get_process_type_string(process_type), zbx_get_thread_id());
 
@@ -636,6 +649,7 @@ ZBX_THREAD_ENTRY(zbx_pinger_thread, args)
 
 			get_pinger_hosts(&pinger_items, pinger_args_in->config_timeout);
 			itc = process_pinger_hosts(&pinger_items, process_num, process_type);
+			zbx_hashset_clear(&pinger_items);
 			sec = zbx_time() - sec;
 
 			nextcheck = zbx_dc_config_get_poller_nextcheck(ZBX_POLLER_TYPE_PINGER);
