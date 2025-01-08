@@ -91,7 +91,7 @@ function prepareUrlParam($value, $name = null): string {
  * @param bool        $getFromRequest  Detect data source - input array or $_REQUEST variable.
  * @param string|null $name            If $_REQUEST variable is used this variable not used.
  */
-function url_param($param, bool $getFromRequest = true, string $name = null): string {
+function url_param($param, bool $getFromRequest = true, ?string $name = null): string {
 	if (is_array($param)) {
 		if ($getFromRequest) {
 			fatal_error(_('URL parameter cannot be array.'));
@@ -613,7 +613,7 @@ function getSysmapNavigation($sysmapid, $name, $severity_min): CList {
  *
  * @throws InvalidArgumentException	if an element of $other_buttons contain something other than CButtonInterface
  */
-function makeFormFooter(CButtonInterface $main_button = null, array $other_buttons = []): CList {
+function makeFormFooter(?CButtonInterface $main_button = null, array $other_buttons = []): CList {
 	foreach ($other_buttons as $other_button) {
 		$other_button->addClass(ZBX_STYLE_BTN_ALT);
 	}

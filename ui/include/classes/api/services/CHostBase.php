@@ -26,8 +26,8 @@ abstract class CHostBase extends CApiService {
 	protected $tableName = 'hosts';
 	protected $tableAlias = 'h';
 
-	protected function checkTemplates(array &$hosts, array &$db_hosts = null, string $path = null,
-			array $template_indexes = null, string $path_clear = null, array $template_clear_indexes = null): void {
+	protected function checkTemplates(array &$hosts, ?array &$db_hosts = null, ?string $path = null,
+			?array $template_indexes = null, ?string $path_clear = null, ?array $template_clear_indexes = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$ins_template_indexes = [];
@@ -188,7 +188,7 @@ abstract class CHostBase extends CApiService {
 	 * @param array      $hosts
 	 * @param array|null $db_hosts
 	 */
-	protected function checkTemplatesLinks(array $hosts, array $db_hosts = null): void {
+	protected function checkTemplatesLinks(array $hosts, ?array $db_hosts = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$ins_templates = [];
@@ -692,7 +692,7 @@ abstract class CHostBase extends CApiService {
 	 * @return array|null
 	 */
 	private static function getScopedInsTemplates(array $ins_templates, ?array $scope,
-			array &$db_templates = null): array {
+			?array &$db_templates = null): array {
 		$scoped_ins_templates = [];
 		$db_templates = [];
 
@@ -1099,7 +1099,7 @@ abstract class CHostBase extends CApiService {
 	 * @return array
 	 */
 	private static function getTemplateOrTargetRelatedIds(array $links, array $sourceids,
-			string $ignore_relatedid = null): array {
+			?string $ignore_relatedid = null): array {
 		$processed_sourceids = $sourceids;
 		$relatedids = [];
 
@@ -1346,7 +1346,7 @@ abstract class CHostBase extends CApiService {
 	 * @param array|null $db_hosts
 	 * @param array|null $upd_hostids
 	 */
-	protected function updateTemplates(array &$hosts, array &$db_hosts = null, array &$upd_hostids = null): void {
+	protected function updateTemplates(array &$hosts, ?array &$db_hosts = null, ?array &$upd_hostids = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$ins_hosts_templates = [];
@@ -1443,7 +1443,7 @@ abstract class CHostBase extends CApiService {
 	 * @param array|null $db_hosts
 	 * @param array|null $upd_hostids
 	 */
-	protected function updateTags(array &$hosts, array &$db_hosts = null, array &$upd_hostids = null): void {
+	protected function updateTags(array &$hosts, ?array &$db_hosts = null, ?array &$upd_hostids = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$ins_tags = [];
@@ -1524,7 +1524,7 @@ abstract class CHostBase extends CApiService {
 	 * @param array|null $db_hosts
 	 * @param array|null $upd_hostids
 	 */
-	protected function updateMacros(array &$hosts, array &$db_hosts = null, array &$upd_hostids = null): void {
+	protected function updateMacros(array &$hosts, ?array &$db_hosts = null, ?array &$upd_hostids = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$ins_hostmacros = [];

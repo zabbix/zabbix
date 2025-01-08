@@ -1578,7 +1578,7 @@ class CHost extends CHostGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDelete(array &$hostids, array &$db_hosts = null): void {
+	private function validateDelete(array &$hostids, ?array &$db_hosts = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $hostids, '/', $error)) {
@@ -2264,8 +2264,8 @@ class CHost extends CHostGeneral {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkProxiesAndProxyGroups(array $hosts, array $db_hosts = null,
-			string $path = null): void {
+	private static function checkProxiesAndProxyGroups(array $hosts, ?array $db_hosts = null,
+			?string $path = null): void {
 		$host_indexes = [
 			'proxyids' => [],
 			'proxy_groupids' => []
@@ -2359,7 +2359,7 @@ class CHost extends CHostGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$hosts, array &$db_hosts = null): void {
+	protected function validateUpdate(array &$hosts, ?array &$db_hosts = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['hostid']], 'fields' => [
 			'hostid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
@@ -2709,7 +2709,7 @@ class CHost extends CHostGeneral {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkTlsPskPairs(array $hosts, array $db_hosts = null): void {
+	private static function checkTlsPskPairs(array $hosts, ?array $db_hosts = null): void {
 		$psk_pairs = [];
 		$tls_psk_fields = array_flip(['tls_psk_identity', 'tls_psk']);
 		$psk_hostids = $db_hosts !== null ? [] : null;

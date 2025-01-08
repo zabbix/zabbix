@@ -379,7 +379,7 @@ class CUser extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateUpdate(array &$users, array &$db_users = null) {
+	private function validateUpdate(array &$users, ?array &$db_users = null) {
 		$locales = LANG_DEFAULT.','.implode(',', array_keys(getLocales()));
 		$timezones = TIMEZONE_DEFAULT.','.implode(',', array_keys(CTimezoneHelper::getList()));
 		$themes = THEME_DEFAULT.','.implode(',', array_keys(APP::getThemes()));
@@ -876,7 +876,7 @@ class CUser extends CApiService {
 		}
 	}
 
-	private static function checkUserGroups(array $users, array &$db_user_groups = null, array $db_users = null): void {
+	private static function checkUserGroups(array $users, ?array &$db_user_groups = null, ?array $db_users = null): void {
 		$user_group_indexes = [];
 
 		foreach ($users as $i1 => $user) {
@@ -921,7 +921,7 @@ class CUser extends CApiService {
 		}
 	}
 
-	private static function checkEmptyPassword(array $users, ?array $db_user_groups, array $db_users = null): void {
+	private static function checkEmptyPassword(array $users, ?array $db_user_groups, ?array $db_users = null): void {
 		foreach ($users as $i => $user) {
 			$check = false;
 
@@ -1004,7 +1004,7 @@ class CUser extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkMediaTypes(array $users, array &$db_media_types = null): void {
+	private static function checkMediaTypes(array $users, ?array &$db_media_types = null): void {
 		$media_indexes = [];
 
 		foreach ($users as $i1 => &$user) {
@@ -1118,7 +1118,7 @@ class CUser extends CApiService {
 	 * @param array      $users
 	 * @param array|null $db_users
 	 */
-	private static function getDbRoles(array $users, array $db_users = null): array {
+	private static function getDbRoles(array $users, ?array $db_users = null): array {
 		$roleids = [];
 
 		foreach ($users as $user) {
@@ -1151,7 +1151,7 @@ class CUser extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkRoles(array $users, array $db_roles, array $db_users = null): void {
+	private static function checkRoles(array $users, array $db_roles, ?array $db_users = null): void {
 		foreach ($users as $i => $user) {
 			if (!array_key_exists('roleid', $user)) {
 				continue;
@@ -1177,7 +1177,7 @@ class CUser extends CApiService {
 	 * @param array      $db_roles
 	 * @param array|null $db_users
 	 */
-	private static function addRoleType(array &$users, array $db_roles, array &$db_users = null): void {
+	private static function addRoleType(array &$users, array $db_roles, ?array &$db_users = null): void {
 		foreach ($users as &$user) {
 			$user['role_type'] = null;
 
@@ -1249,7 +1249,7 @@ class CUser extends CApiService {
 	 * @param array      $users
 	 * @param null|array $db_users
 	 */
-	private static function updateGroups(array &$users, array $db_users = null): void {
+	private static function updateGroups(array &$users, ?array $db_users = null): void {
 		$ins_groups = [];
 		$del_groupids = [];
 
@@ -1303,7 +1303,7 @@ class CUser extends CApiService {
 		unset($user);
 	}
 
-	private static function updateUgSets(array $users, array $db_users = null): void {
+	private static function updateUgSets(array $users, ?array $db_users = null): void {
 		$ugsets = [];
 
 		foreach ($users as &$user) {
@@ -1670,7 +1670,7 @@ class CUser extends CApiService {
 	 * @param array      $users
 	 * @param null|array $db_users
 	 */
-	private static function updateMedias(array &$users, array $db_users = null): void {
+	private static function updateMedias(array &$users, ?array $db_users = null): void {
 		$ins_medias = [];
 		$upd_medias = [];
 		$del_mediaids = [];
@@ -1798,7 +1798,7 @@ class CUser extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDelete(array &$userids, array &$db_users = null) {
+	private function validateDelete(array &$userids, ?array &$db_users = null) {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 		if (!CApiInputValidator::validate($api_input_rules, $userids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -2296,8 +2296,8 @@ class CUser extends CApiService {
 	 * Add user group data fields to the given user and populates the given $group_status and $group_userdirectoryid.
 	 * Note: user without groups is able to log in with default user group field values.
 	 */
-	public static function addUserGroupFields(array &$db_user, int &$group_status = null, int &$group_auth_type = null,
-			string &$group_userdirectoryid = null): void {
+	public static function addUserGroupFields(array &$db_user, ?int &$group_status = null,
+			?int &$group_auth_type = null, ?string &$group_userdirectoryid = null): void {
 		$db_user['debug_mode'] = GROUP_DEBUG_MODE_DISABLED;
 		$db_user['deprovisioned'] = false;
 		$db_user['gui_access'] = GROUP_GUI_ACCESS_SYSTEM;

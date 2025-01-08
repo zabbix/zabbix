@@ -629,7 +629,7 @@ function make_trigger_details($trigger, $eventid) {
  *
  * @return array|bool
  */
-function analyzeExpression(string $expression, int $type, string &$error = null) {
+function analyzeExpression(string $expression, int $type, ?string &$error = null) {
 	if ($expression === '') {
 		return ['', null];
 	}
@@ -993,7 +993,7 @@ function getExpressionTree(CExpressionParser $expression_parser, int $start, int
  *
  * @return bool|string  Returns new expression or false if expression is incorrect.
  */
-function remakeExpression($expression, $expression_id, $action, $new_expression, string &$error = null) {
+function remakeExpression($expression, $expression_id, $action, $new_expression, ?string &$error = null) {
 	if ($expression === '') {
 		return false;
 	}
