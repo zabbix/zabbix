@@ -74,6 +74,25 @@ class CYamlExportWriterTest extends TestCase {
 					''
 				])
 			],
+			'Compact nested mapping applied for "collection.description" property content' => [
+				[
+					'yaml' => [
+						'collection' => [
+							['description' => "-\nitem1\n"],
+							['description' => 'item2']
+						]
+					]
+				],
+				implode("\n", [
+					'yaml:',
+					'  collection:',
+					'    - description: |',
+					'        - item1',
+					'        ',
+					'    - description: item2',
+					''
+				])
+			],
 			'CR with LF dump multiline string as quoted single line string' => [
 				[
 					'yaml' => [
