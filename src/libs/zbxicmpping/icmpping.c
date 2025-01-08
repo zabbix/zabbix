@@ -144,6 +144,8 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 	fd = mkstemp(filename);
 	umask(mode);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "prepare fping input file %s", filename);
+
 	if (-1 == fd)
 	{
 		zbx_snprintf(error, max_error_len, "Cannot create temporary file \"%s\": %s", filename,
@@ -166,6 +168,8 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 		(void)close(fd);
 		goto out;
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "    %s", address);
 
 	if (n != (ssize_t)len)
 	{
@@ -891,14 +895,14 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 		offset += zbx_snprintf(params, sizeof(params), "-C%d", requests_count);
 	if (0 < interval)
 		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -p%d", interval);
+	if (0 < retries)
+		offset += zbx_snprintf(params + offset, sizeof(params) - offset, "-r%d", retries);
+	if (0 < backoff)
+		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -B%.1f", backoff);
 	if (0 < size)
 		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -b%d", size);
 	if (0 < timeout)
 		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -t%d", timeout);
-	if (0 < retries)
-		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -r%d", retries);
-	if (0 < backoff)
-		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -B%.1f", backoff);
 	if (0 < rdns)
 		offset += zbx_snprintf(params + offset, sizeof(params) - offset, " -dA");
 
