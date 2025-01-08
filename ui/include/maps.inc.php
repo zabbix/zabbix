@@ -550,7 +550,7 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 		'hosts_to_get_inventories' => $hosts_to_get_inventories
 	] = getSysmapResourceIds($sysmap['selements'], $sysmaps_data, $sysmap['iconmapid'] != 0);
 
-	// Prepare hostg roups data including nested host groups.
+	// Prepare host groups data including nested host groups.
 	$nested_hostgroups = [];
 	if ($selement_hostgroupids) {
 		$nested_selement_hostgroupids = [];

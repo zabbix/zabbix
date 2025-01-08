@@ -587,7 +587,7 @@ class CMapHelper {
 				$groups[$groupid]['hosts'] = API::Host()->get([
 					'output' => ['hostid', 'name'],
 					'groupids' => $sub_groups
-				]);;
+				]);
 			}
 
 			$new_selementid = (count($sysmap['selements']) > 0)
