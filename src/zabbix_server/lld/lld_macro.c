@@ -42,7 +42,7 @@ int	zbx_lld_macro_paths_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve list of LLD macros                                       *
+ * Purpose: retrieve list of LLD macro values with their JSON paths           *
  *                                                                            *
  * Parameters: lld_ruleid      - [IN] LLD id                                  *
  *             lld_macro_paths - [OUT] use json path to extract from jp_row   *
@@ -848,7 +848,7 @@ exit:
  * Purpose: get value of LLD macro using json path if available or by         *
  *          searching for such key in key value pairs of array entry          *
  *                                                                            *
- * Parameters: lld_obj         - [IN] the lld data row                        *
+ * Parameters: lld_obj         - [IN] lld data row                            *
  *             macro           - [IN] LLD macro                               *
  *             value           - [OUT] value extracted from jp_row            *
  *                                                                            *

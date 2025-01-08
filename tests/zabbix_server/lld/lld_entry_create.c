@@ -51,7 +51,7 @@ static void	validate_lld_entry(const zbx_lld_entry_t *entry)
 {
 	zbx_mock_error_t 	error;
 	zbx_mock_handle_t	vector, element;
-	int		        i = 0;
+	int			i = 0;
 
 	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("macros", &vector)))
 		fail_msg("Cannot get out.macros handle: %s", zbx_mock_error_string(error));

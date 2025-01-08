@@ -122,9 +122,9 @@ ZBX_PTR_VECTOR_DECL(lld_entry_ptr, zbx_lld_entry_t *)
 void	lld_entry_clear(zbx_lld_entry_t *entry);
 
 zbx_hash_t	lld_entry_hash(const void *data);
-int        lld_entry_compare(const void *d1, const void *d2);
+int	lld_entry_compare(const void *d1, const void *d2);
 void	lld_entry_snprintf_alloc(const zbx_lld_entry_t *entry, char **str, size_t *str_alloc, size_t *str_offset);
-const char        *lld_entry_get_macro(const zbx_lld_entry_t *entry, const char *macro);
+const char	*lld_entry_get_macro(const zbx_lld_entry_t *entry, const char *macro);
 
 int	lld_extract_entries(zbx_hashset_t *entries, zbx_vector_lld_entry_ptr_t *entries_sorted,
 		const zbx_jsonobj_t *lld_obj, const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error);

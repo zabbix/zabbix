@@ -259,7 +259,7 @@ static int	lld_compare_value(const zbx_ipc_message_t *message, zbx_lld_value_t *
 	int		ret = FAIL;
 	zbx_hashset_t	entries;
 
-	zbx_hashset_create_ext(&entries, lld_value->entries.num_data, lld_entry_hash, lld_entry_compare,
+	zbx_hashset_create_ext(&entries, (size_t)lld_value->entries.num_data, lld_entry_hash, lld_entry_compare,
 			(zbx_clean_func_t)lld_entry_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
 			ZBX_DEFAULT_MEM_FREE_FUNC);
 

@@ -2888,7 +2888,7 @@ int	zbx_jsonobj_query_ext(const zbx_jsonobj_t *obj, zbx_jsonpath_index_t *index,
 		return FAIL;
 
 	ctx.found = 0;
-	ctx.root = (zbx_jsonobj_t *)obj;
+	ctx.root = obj;
 	ctx.path = &jsonpath;
 	zbx_vector_jsonobj_ref_create(&ctx.objects);
 	ctx.index = index;
