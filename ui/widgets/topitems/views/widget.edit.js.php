@@ -160,7 +160,11 @@ window.widget_topitems_form = new class {
 
 				column_popup.addEventListener('dialogue.submit', (e) => {
 					const last_row = this.#list_columns.querySelector(`tbody > tr:last-child`);
-					last_row.insertAdjacentElement('beforebegin', this.#makeColumnRow(e.detail, last_row.rowIndex - 1));
+					const index = last_row.previousSibling !== null
+						? parseInt(last_row.previousSibling.dataset.index) + 1
+						: 0;
+
+					last_row.insertAdjacentElement('beforebegin', this.#makeColumnRow(e.detail, index));
 					this.#triggerUpdate();
 				});
 
@@ -184,7 +188,7 @@ window.widget_topitems_form = new class {
 					).$dialogue[0];
 
 				column_popup.addEventListener('dialogue.submit', (e) => {
-					const row = this.#list_columns.querySelector(`tbody > tr:nth-child(${column_index + 1})`);
+					const row = this.#list_columns.querySelector(`tbody > tr[data-index="${column_index}"]`);
 					row.replaceWith(this.#makeColumnRow(e.detail, column_index));
 					this.#triggerUpdate();
 				});
@@ -194,7 +198,6 @@ window.widget_topitems_form = new class {
 
 			case 'remove':
 				target.closest('tr').remove();
-				this.#updateRows();
 				this.#triggerUpdate();
 				break;
 		}
@@ -295,21 +298,5 @@ window.widget_topitems_form = new class {
 	// Need to remove function after sub-popups auto close.
 	#removeColorpicker() {
 		$('#color_picker').hide();
-	}
-
-	#updateRows() {
-		const form_fields = getFormFields(this.#form);
-
-		this.#list_columns.querySelectorAll('tbody > tr[data-index]').forEach(node => node.remove());
-
-		if (form_fields.columns === undefined) {
-			return;
-		}
-
-		const target = document.getElementById('add').closest('tr');
-
-		Object.values(form_fields.columns)
-			.map((column_data, index) => this.#makeColumnRow(column_data, index))
-			.map(row => target.insertAdjacentElement('beforebegin', row));
 	}
 };
