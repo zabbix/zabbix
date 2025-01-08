@@ -156,7 +156,7 @@ window.template_edit_popup = new class {
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_END_SCRIPTING,
-					action: this.dialogue.dialogueid
+					action: this.overlay.dialogueid
 				},
 				callback: () => ZABBIX.EventHub.unsubscribeAll(subscriptions)
 			})
