@@ -42,6 +42,6 @@ class CYamlExportWriter extends CExportWriter {
 			return strpos($match[0], "\n") * 2 > strlen($match[0]) ? $match[0] : $match[1].' ';
 		};
 
-		return preg_replace_callback('/^(\s+-)\n[^\n\S]+/m', $callback, $output);
+		return preg_replace_callback('/^([^\n\S]+-)\n[^\n\S]+(?=\w)/m', $callback, $output);
 	}
 }
