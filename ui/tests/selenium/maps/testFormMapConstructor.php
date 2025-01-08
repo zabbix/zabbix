@@ -387,7 +387,6 @@ class testFormMapConstructor extends CLegacyWebTest {
 		];
 
 		foreach ($objects as $object) {
-			// Check that macros are resolved correctly for specific elements.
 			$this->assertEquals($object['label'], $this->query('xpath://*[@id="map-area"]/*[1]/*[2]/*[7]/*['.$object['id'].']')
 					->waitUntilVisible()->one()->getText(), 'Object expected label does not match, id='.$object['id']
 			);
