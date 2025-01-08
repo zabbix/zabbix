@@ -62,7 +62,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 			// #3 Attach Template to Host from Standalone view
 			[
 				'fields' => [
-					'link' => 'zabbix.php?action=host.edit&hostid='.self::$hostid,
+					'link' => 'zabbix.php?action=host.edit&hostid=',
 					'name' => 'Visible host for template linkage',
 					'entity' => 'Host',
 					'standalone' => 'true'
@@ -231,11 +231,11 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 			if ($this->query('class:menu-popup')->exists()) {
 				$this->query('class:menu-popup')->query('link:Configuration')->one()->click();
 			}
-			$form = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
+			$form = COverlayDialogElement::find()->asForm()->waitUntilPresent()->one();
 		}
 
-		//Check if template is linked from previous test runs and removes it.
-		if($form->query('id:linked-templates')->exists()) {
+		// Check if template is linked from previous test runs and removes it.
+		if ($form->query('id:linked-templates')->exists()) {
 			$form->query('id:linked-templates')->asTable()->one()->findRow('Name', $template)->getColumn('Action')
 				->query('button:Unlink')->one()->click();
 		}
@@ -267,5 +267,12 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$form->submit();
 
 		$this->assertMessage(TEST_GOOD, $data['entity'].' updated');
+
+		// Check that template is linked successfully.
+		$this->query('link', $data['name'])->waitUntilVisible()->one()->click();
+		if ($this->query('class:menu-popup')->exists()) {
+			$this->query('class:menu-popup')->query('link:Configuration')->one()->click();
+		}
+		$this->assertTrue($form->query('link', $template)->exists());
 	}
 }
