@@ -162,15 +162,15 @@ class CPopupManager {
 			CPopupManager.#overlay.$dialogue[0].removeEventListener('dialogue.submit', CPopupManager.#on_submit);
 			CPopupManager.#overlay.$dialogue[0].removeEventListener('dialogue.update', CPopupManager.#on_update);
 
-			if (action !== this.#overlay.dialogueid || !reuse_existing) {
-				overlayDialogueDestroy(this.#overlay.dialogueid);
+			if (action !== CPopupManager.#overlay.dialogueid || !reuse_existing) {
+				overlayDialogueDestroy(CPopupManager.#overlay.dialogueid);
 			}
 
 			const end_scripting_event = new CPopupManagerEvent({
 				descriptor: {
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_END_SCRIPTING,
-					action: this.#overlay.dialogueid
+					action: CPopupManager.#overlay.dialogueid
 				}
 			});
 
@@ -187,7 +187,7 @@ class CPopupManager {
 			CPopupManager.#overlay = overlay;
 
 			CPopupManager.#on_close = e => {
-				this.#overlay = null;
+				CPopupManager.#overlay = null;
 
 				if (e.detail.close_by !== Overlay.prototype.CLOSE_BY_USER) {
 					return;
