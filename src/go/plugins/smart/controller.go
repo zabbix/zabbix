@@ -87,7 +87,7 @@ func (s *SmartCtl) Execute(args ...string) ([]byte, error) {
 	if err != nil {
 		exitErr := &exec.ExitError{}
 		if errors.As(err, &exitErr) {
-			return nil, errs.Wrap(err, strings.TrimSuffix(string(out), "\n"))
+			return nil, errs.Wrapf(err, "%q", strings.TrimSuffix(string(out), "\n"))
 		}
 
 		return nil, errs.Wrap(
