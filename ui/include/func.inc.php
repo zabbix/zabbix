@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -196,14 +196,7 @@ function zbx_date2str($format, $time = null, string $timezone = null) {
 		return _('Never');
 	}
 
-	if ($time > ZBX_MAX_DATE) {
-		$prefix = '> ';
-		$datetime = new DateTime('@'.ZBX_MAX_DATE);
-	}
-	else {
-		$prefix = '';
-		$datetime = new DateTime('@'.(int) $time);
-	}
+	$datetime = new DateTime(sprintf('@%f', (float) $time));
 
 	$datetime->setTimezone(new DateTimeZone($timezone ?? date_default_timezone_get()));
 
@@ -288,7 +281,7 @@ function zbx_date2str($format, $time = null, string $timezone = null) {
 		}
 	}
 
-	return $prefix.$output;
+	return $output;
 }
 
 /**
