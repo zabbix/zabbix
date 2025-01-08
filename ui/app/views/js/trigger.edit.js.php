@@ -188,32 +188,36 @@ window.trigger_edit_popup = new class {
 		const subscriptions = [];
 
 		for (const action of ['template.edit', 'trigger.edit', 'trigger.prototype.edit']) {
-			const subscription = ZABBIX.EventHub.subscribe({
-				require: {
-					context: CPopupManager.EVENT_CONTEXT,
-					event: CPopupManagerEvent.EVENT_OPEN,
-					action
-				},
-				callback: ({data, event}) => {
-					if (data.action_parameters.triggerid === this.triggerid || this.triggerid === null
-							|| event === undefined) {
-						return;
-					}
+			subscriptions.push(
+				ZABBIX.EventHub.subscribe({
+					require: {
+						context: CPopupManager.EVENT_CONTEXT,
+						event: CPopupManagerEvent.EVENT_OPEN,
+						action
+					},
+					callback: ({data, event}) => {
+						if (data.action_parameters.triggerid === this.triggerid || this.triggerid === null) {
+							return;
+						}
 
-					if (!this.#isConfirmed()) {
-						event.preventDefault();
+						if (!this.#isConfirmed()) {
+							event.preventDefault();
+						}
 					}
-				}
-			});
-
-			subscriptions.push(subscription);
+				})
+			);
 		}
 
-		this.dialogue.addEventListener('dialogue.close', () => {
-			for (const subscription of subscriptions) {
-				ZABBIX.EventHub.unsubscribe(subscription);
-			}
-		});
+		subscriptions.push(
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_END_SCRIPTING,
+					action: this.overlay.dialogueid
+				},
+				callback: () => ZABBIX.EventHub.unsubscribeAll(subscriptions)
+			})
+		);
 	}
 
 	#initTriggersTab() {

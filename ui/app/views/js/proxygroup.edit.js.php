@@ -52,20 +52,33 @@ window.proxy_group_edit_popup = new class {
 	}
 
 	#registerSubscribers() {
-		const subscription = ZABBIX.EventHub.subscribe({
-			require: {
-				context: CPopupManager.EVENT_CONTEXT,
-				event: CPopupManagerEvent.EVENT_OPEN,
-				action: 'proxy.edit'
-			},
-			callback: ({event}) => {
-				if (!this.#isConfirmed()) {
-					event.preventDefault();
-				}
-			}
-		});
+		const subscriptions = [];
 
-		this.#dialogue.addEventListener('dialogue.close', () => ZABBIX.EventHub.unsubscribe(subscription));
+		subscriptions.push(
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_OPEN,
+					action: 'proxy.edit'
+				},
+				callback: ({event}) => {
+					if (!this.#isConfirmed()) {
+						event.preventDefault();
+					}
+				}
+			})
+		);
+
+		subscriptions.push(
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_END_SCRIPTING,
+					action: this.#overlay.dialogueid
+				},
+				callback: () => ZABBIX.EventHub.unsubscribeAll(subscriptions)
+			})
+		);
 	}
 
 	#isConfirmed() {

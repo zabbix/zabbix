@@ -279,31 +279,36 @@ window.item_edit_form = new class {
 		const subscriptions = [];
 
 		for (const action of ['template.edit', 'proxy.edit', 'item.edit', 'item.prototype.edit']) {
-			const subscription = ZABBIX.EventHub.subscribe({
-				require: {
-					context: CPopupManager.EVENT_CONTEXT,
-					event: CPopupManagerEvent.EVENT_OPEN,
-					action
-				},
-				callback: ({data, event}) => {
-					if (data.action_parameters.itemid === this.form_data.itemid || this.form_data.itemid === 0) {
-						return;
-					}
+			subscriptions.push(
+				ZABBIX.EventHub.subscribe({
+					require: {
+						context: CPopupManager.EVENT_CONTEXT,
+						event: CPopupManagerEvent.EVENT_OPEN,
+						action
+					},
+					callback: ({data, event}) => {
+						if (data.action_parameters.itemid === this.form_data.itemid || this.form_data.itemid === 0) {
+							return;
+						}
 
-					if (!this.#isConfirmed()) {
-						event.preventDefault();
+						if (!this.#isConfirmed()) {
+							event.preventDefault();
+						}
 					}
-				}
-			});
-
-			subscriptions.push(subscription);
+				})
+			);
 		}
 
-		this.dialogue.addEventListener('dialogue.close', () => {
-			for (const subscription of subscriptions) {
-				ZABBIX.EventHub.unsubscribe(subscription);
-			}
-		});
+		subscriptions.push(
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_END_SCRIPTING,
+					action: this.overlay.dialogueid
+				},
+				callback: () => ZABBIX.EventHub.unsubscribeAll(subscriptions)
+			})
+		);
 	}
 
 	#isConfirmed() {

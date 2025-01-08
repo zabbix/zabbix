@@ -13,6 +13,11 @@
 **/
 
 
+/**
+ * Class for standard popup form management.
+ *
+ * Standard popup forms are expected to generate "dialogue.submit" event when valid data is ready.
+ */
 class CPopupManager {
 
 	/**
@@ -49,6 +54,13 @@ class CPopupManager {
 	 * @type {function|null}
 	 */
 	static #on_submit = null;
+
+	/**
+	 * Update event handler for currently open dialogue overlay.
+	 *
+	 * @type {function|null}
+	 */
+	static #on_update = null;
 
 	/**
 	 * Non-standalone origin URL from where the first popup was opened.
@@ -146,105 +158,155 @@ class CPopupManager {
 		}
 
 		if (CPopupManager.#overlay !== null) {
-			CPopupManager.#overlay.$dialogue[0].removeEventListener('dialogue.submit', CPopupManager.#on_submit);
 			CPopupManager.#overlay.$dialogue[0].removeEventListener('dialogue.close', CPopupManager.#on_close);
+			CPopupManager.#overlay.$dialogue[0].removeEventListener('dialogue.submit', CPopupManager.#on_submit);
+			CPopupManager.#overlay.$dialogue[0].removeEventListener('dialogue.update', CPopupManager.#on_update);
 
 			if (action !== this.#overlay.dialogueid || !reuse_existing) {
 				overlayDialogueDestroy(this.#overlay.dialogueid);
 			}
+
+			const end_scripting_event = new CPopupManagerEvent({
+				descriptor: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_END_SCRIPTING,
+					action: this.#overlay.dialogueid
+				}
+			});
+
+			ZABBIX.EventHub.publish(end_scripting_event);
 		}
 
-		CPopupManager.#overlay = PopUp(action, action_parameters, {
+		const overlay = PopUp(action, action_parameters, {
 			dialogueid: action,
 			prevent_navigation: true,
 			...popup_options
 		});
 
-		CPopupManager.#on_close = e => {
-			this.#overlay = null;
+		overlay.xhr.then(() => {
+			CPopupManager.#overlay = overlay;
 
-			if (e.detail.close_by !== Overlay.prototype.CLOSE_BY_USER) {
-				return;
-			}
+			CPopupManager.#on_close = e => {
+				this.#overlay = null;
 
-			const cancel_event = new CPopupManagerEvent({
-				data: {action_parameters, popup_options, reuse_existing, supports_standalone},
-				descriptor: {
-					context: CPopupManager.EVENT_CONTEXT,
-					event: CPopupManagerEvent.EVENT_CANCEL,
-					action
+				if (e.detail.close_by !== Overlay.prototype.CLOSE_BY_USER) {
+					return;
 				}
-			});
 
-			ZABBIX.EventHub.publish(cancel_event);
+				const cancel_event = new CPopupManagerEvent({
+					data: {action_parameters, popup_options, reuse_existing, supports_standalone},
+					descriptor: {
+						context: CPopupManager.EVENT_CONTEXT,
+						event: CPopupManagerEvent.EVENT_CANCEL,
+						action
+					}
+				});
 
-			if (cancel_event.isDefaultPrevented()) {
-				return;
+				const end_scripting_event = new CPopupManagerEvent({
+					descriptor: {
+						context: CPopupManager.EVENT_CONTEXT,
+						event: CPopupManagerEvent.EVENT_END_SCRIPTING,
+						action
+					}
+				});
+
+				ZABBIX.EventHub.publish(cancel_event);
+				ZABBIX.EventHub.publish(end_scripting_event);
+
+				if (cancel_event.isDefaultPrevented()) {
+					return;
+				}
+
+				if (CPopupManager.#origin_url !== null) {
+					const redirect_url = cancel_event.getRedirectUrl();
+
+					if (redirect_url !== null) {
+						history.replaceState(null, '', redirect_url);
+
+						location.href = location.href;
+					}
+					else {
+						history.replaceState(null, '', CPopupManager.#origin_url);
+					}
+				}
+				else {
+					const redirect_url = cancel_event.getRedirectUrl() || CPopupManager.#return_url;
+
+					if (redirect_url !== null) {
+						setTimeout(() => location.href = redirect_url);
+					}
+				}
 			}
 
-			if (CPopupManager.#origin_url !== null) {
-				const redirect_url = cancel_event.getRedirectUrl();
+			CPopupManager.#on_submit = e => {
+				const submit_event = new CPopupManagerEvent({
+					data: {action_parameters, popup_options, reuse_existing, supports_standalone, submit: e.detail},
+					descriptor: {
+						context: CPopupManager.EVENT_CONTEXT,
+						event: CPopupManagerEvent.EVENT_SUBMIT,
+						action
+					}
+				});
 
-				if (redirect_url !== null) {
-					history.replaceState(null, '', redirect_url);
+				const end_scripting_event = new CPopupManagerEvent({
+					descriptor: {
+						context: CPopupManager.EVENT_CONTEXT,
+						event: CPopupManagerEvent.EVENT_END_SCRIPTING,
+						action
+					}
+				});
+
+				ZABBIX.EventHub.publish(submit_event);
+				ZABBIX.EventHub.publish(end_scripting_event);
+
+				if (submit_event.isDefaultPrevented()) {
+					if (CPopupManager.#origin_url !== null) {
+						history.replaceState(null, '', CPopupManager.#origin_url);
+					}
+
+					return;
+				}
+
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
+
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
+				}
+
+				if (CPopupManager.#origin_url !== null) {
+					history.replaceState(null, '', submit_event.getRedirectUrl() || CPopupManager.#origin_url);
 
 					location.href = location.href;
 				}
 				else {
-					history.replaceState(null, '', CPopupManager.#origin_url);
+					location.href = submit_event.getRedirectUrl() || CPopupManager.#return_url || location.href;
 				}
-			}
-			else {
-				const redirect_url = cancel_event.getRedirectUrl() || CPopupManager.#return_url;
+			};
 
-				if (redirect_url !== null) {
-					setTimeout(() => location.href = redirect_url);
-				}
-			}
-		}
-
-		CPopupManager.#on_submit = e => {
-			const submit_event = new CPopupManagerEvent({
-				data: {action_parameters, popup_options, reuse_existing, supports_standalone, submit: e.detail},
-				descriptor: {
-					context: CPopupManager.EVENT_CONTEXT,
-					event: CPopupManagerEvent.EVENT_SUBMIT,
-					action
-				}
-			});
-
-			ZABBIX.EventHub.publish(submit_event);
-
-			if (submit_event.isDefaultPrevented()) {
-				if (CPopupManager.#origin_url !== null) {
-					history.replaceState(null, '', CPopupManager.#origin_url);
+			CPopupManager.#on_update = e => {
+				if (!e.detail.properties.includes('script_inline')) {
+					return;
 				}
 
-				return;
-			}
+				const end_scripting_event = new CPopupManagerEvent({
+					descriptor: {
+						context: CPopupManager.EVENT_CONTEXT,
+						event: CPopupManagerEvent.EVENT_END_SCRIPTING,
+						action
+					}
+				});
 
-			if ('success' in e.detail) {
-				postMessageOk(e.detail.success.title);
+				ZABBIX.EventHub.publish(end_scripting_event);
+			};
 
-				if ('messages' in e.detail.success) {
-					postMessageDetails('success', e.detail.success.messages);
-				}
-			}
+			CPopupManager.#overlay.$dialogue[0].addEventListener('dialogue.close', CPopupManager.#on_close);
+			CPopupManager.#overlay.$dialogue[0].addEventListener('dialogue.submit', CPopupManager.#on_submit);
+			CPopupManager.#overlay.$dialogue[0].addEventListener('dialogue.update', CPopupManager.#on_update);
+		});
 
-			if (CPopupManager.#origin_url !== null) {
-				history.replaceState(null, '', submit_event.getRedirectUrl() || CPopupManager.#origin_url);
-
-				location.href = location.href;
-			}
-			else {
-				location.href = submit_event.getRedirectUrl() || CPopupManager.#return_url || location.href;
-			}
-		};
-
-		CPopupManager.#overlay.$dialogue[0].addEventListener('dialogue.close', CPopupManager.#on_close, {once: true});
-		CPopupManager.#overlay.$dialogue[0].addEventListener('dialogue.submit', CPopupManager.#on_submit, {once: true});
-
-		return CPopupManager.#overlay;
+		return overlay;
 	}
 
 	/**

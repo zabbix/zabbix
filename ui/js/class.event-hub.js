@@ -101,7 +101,7 @@ class CEventHub {
 	}
 
 	/**
-	 * Unsubscribe from events.
+	 * Unsubscribe single subscription from events.
 	 *
 	 * @param {Object} subscription  Subscription object received when subscribed to events.
 	 *
@@ -125,6 +125,25 @@ class CEventHub {
 			.invalidateData({}, CEventHubEvent.TYPE_UNSUBSCRIBE);
 
 		return true;
+	}
+
+	/**
+	 * Unsubscribe array of subscriptions from events.
+	 *
+	 * @param {Object[]} subscriptions  Array of subscription objects received when subscribed to events.
+	 *
+	 * @returns {boolean}  Whether unsubscription of all subscriptions was successful.
+	 */
+	unsubscribeAll(subscriptions) {
+		let result = true;
+
+		for (const subscription of subscriptions) {
+			if (!this.unsubscribe(subscription)) {
+				result = false;
+			}
+		}
+
+		return result;
 	}
 
 	/**

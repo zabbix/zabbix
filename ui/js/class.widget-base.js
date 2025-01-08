@@ -613,9 +613,7 @@ class CWidgetBase {
 			sender_unique_id: this._unique_id
 		});
 
-		for (const subscription of this.#fields_referred_data_subscriptions) {
-			ZABBIX.EventHub.unsubscribe(subscription);
-		}
+		ZABBIX.EventHub.unsubscribeAll(this.#fields_referred_data_subscriptions);
 
 		this.#fields_referred_data.clear();
 		this.#fields_referred_data_updated.clear();

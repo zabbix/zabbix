@@ -37,6 +37,13 @@ class CPopupManagerEvent extends CEventHubEvent {
 	static EVENT_CANCEL = 'cancel';
 
 	/**
+	 * Event is fired when popup is closed with success, cancelled by user or reloaded.
+	 *
+	 * @type {string}
+	 */
+	static EVENT_END_SCRIPTING = 'end-scripting';
+
+	/**
 	 * URL to redirect the page after the popup is submitted or cancelled.
 	 *
 	 * @type {string|null}

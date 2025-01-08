@@ -577,4 +577,6 @@ Overlay.prototype.setProperties = function(obj) {
 				break;
 		}
 	}
+
+	this.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.update', {detail: {properties: Object.keys(obj)}}));
 };

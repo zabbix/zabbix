@@ -130,24 +130,37 @@ window.template_edit_popup = new class {
 	}
 
 	#registerSubscribers() {
-		const subscription = ZABBIX.EventHub.subscribe({
-			require: {
-				context: CPopupManager.EVENT_CONTEXT,
-				event: CPopupManagerEvent.EVENT_OPEN,
-				action: 'template.edit'
-			},
-			callback: ({data, event}) => {
-				if (data.action_parameters.templateid === this.templateid || this.templateid === null) {
-					return;
-				}
+		const subscriptions = [];
 
-				if (!this.#isConfirmed()) {
-					event.preventDefault();
-				}
-			}
-		});
+		subscriptions.push(
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_OPEN,
+					action: 'template.edit'
+				},
+				callback: ({data, event}) => {
+					if (data.action_parameters.templateid === this.templateid || this.templateid === null) {
+						return;
+					}
 
-		this.dialogue.addEventListener('dialogue.close', () => ZABBIX.EventHub.unsubscribe(subscription));
+					if (!this.#isConfirmed()) {
+						event.preventDefault();
+					}
+				}
+			})
+		);
+
+		subscriptions.push(
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_END_SCRIPTING,
+					action: this.dialogue.dialogueid
+				},
+				callback: () => ZABBIX.EventHub.unsubscribeAll(subscriptions)
+			})
+		);
 	}
 
 	#isConfirmed() {
