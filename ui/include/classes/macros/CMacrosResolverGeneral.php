@@ -1175,71 +1175,66 @@ class CMacrosResolverGeneral {
 					'ITEM.LASTVALUE.TIMESTAMP', 'ITEM.LASTVALUE.AGE'
 				];
 
-				if (in_array($m, $item_value_macros)) {
-					if ($options['events']) {
-						$trigger = $triggers[$function['triggerid']];
-						$history = Manager::History()->getValueAt($function, $trigger['clock'], $trigger['ns']);
-					}
+				if (in_array($m, $item_value_macros) && $options['events']) {
+					$trigger = $triggers[$function['triggerid']];
+					$history = Manager::History()->getValueAt($function, $trigger['clock'], $trigger['ns']);
 				}
-
-				if (in_array($m, $item_lastvalue_macros) || !$history) {
+				elseif (in_array($m, $item_lastvalue_macros) || !$history) {
 					$history = Manager::History()->getLastValues([$function], 1, timeUnitToSeconds(
 						CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)
 					));
 				}
 
+				if (is_array($history) && array_key_exists('value', $history)) {
+					$clock = $history['clock'];
+				}
+				if (is_array($history) && array_key_exists($function['itemid'], $history)) {
+					$clock = $history[$function['itemid']][0]['clock'];
+				}
+
 				switch ($m) {
 					case 'ITEM.VALUE':
 						if ($options['events']) {
-							if (is_array($history)) {
-								if (array_key_exists('clock', $history)) {
-									$clock = $history['clock'];
-								}
-
-								if (array_key_exists('value', $history)
-										&& $function['value_type'] != ITEM_VALUE_TYPE_BINARY) {
-									$value = $history['value'];
-								}
+							if (is_array($history) && array_key_exists('value', $history)
+									&& $function['value_type'] != ITEM_VALUE_TYPE_BINARY) {
+								$value = $history['value'];
 							}
 							break;
 						}
 						// break; is not missing here
 
 					case 'ITEM.LASTVALUE':
-						if (array_key_exists($function['itemid'], $history)) {
-							$clock = $history[$function['itemid']][0]['clock'];
-
-							if ($function['value_type'] != ITEM_VALUE_TYPE_BINARY) {
-								$value = $history[$function['itemid']][0]['value'];
-							}
+						if (array_key_exists($function['itemid'], $history)
+								&& $function['value_type'] != ITEM_VALUE_TYPE_BINARY) {
+							$value = $history[$function['itemid']][0]['value'];
 						}
 						break;
 
 					case 'ITEM.VALUE.DATE':
 					case 'ITEM.LASTVALUE.DATE':
-						if (array_key_exists($function['itemid'], $history)) {
-							$value = date('Y.m.d', $history[$function['itemid']][0]['clock']);
+						if ($clock) {
+							$value = date('Y.m.d', $clock);
 						}
 						break;
 
 					case 'ITEM.VALUE.TIME':
 					case 'ITEM.LASTVALUE.TIME':
-						if (array_key_exists($function['itemid'], $history)) {
-							$value = date('H:i:s', $history[$function['itemid']][0]['clock']);
+						if ($clock) {
+							$value = date('H:i:s', $clock);
 						}
 						break;
 
 					case 'ITEM.VALUE.TIMESTAMP':
 					case 'ITEM.LASTVALUE.TIMESTAMP':
-						if (array_key_exists($function['itemid'], $history)) {
-							$value = $history[$function['itemid']][0]['clock'];
+						if ($clock) {
+							$value = $clock;
 						}
 						break;
 
 					case 'ITEM.VALUE.AGE':
 					case 'ITEM.LASTVALUE.AGE':
-						if (array_key_exists($function['itemid'], $history)) {
-							$value = zbx_date2age($history[$function['itemid']][0]['clock']);
+						if ($clock) {
+							$value = zbx_date2age($clock);
 						}
 						break;
 				}
