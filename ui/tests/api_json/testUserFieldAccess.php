@@ -21,43 +21,23 @@
 
 require_once __DIR__.'/../include/CAPITest.php';
 require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
+
 require_once __DIR__.'/../../include/classes/api/services/CUser.php';
 
 /**
  * @onBefore prepareTestData
  * @onAfter  cleanTestData
  */
-class testUserInformationAccess extends CAPITest {
+class testUserFieldAccess extends CAPITest {
 
-	private static $data = [
-		'sessionids' => [
-			':user:properties.user' => null,
-			':user:properties.admin' => null,
-			':user:properties.superadmin' => null
-		],
-		'mediaids' => [
-			':media:user@usertest.com' => null,
-			':media:user2@usertest.com' => null,
-			':media:admin@usertest.com' => null,
-			':media:admin2@usertest.com' => null,
-			':media:superadmin@usertest.com' => null,
-			':media:user_other@usertest.com' => null,
-			':media:admin_other@usertest.com' => null
-		],
-		'alertids' => [
-			':alert:properties.user' => null,
-			':alert:properties.user2' => null,
-			':alert:properties.admin' => null,
-			':alert:properties.admin2' => null,
-			':alert:properties.superadmin' => null,
-			':alert:properties.user.other.group' => null,
-			':alert:properties.admin.other.group' => null
-		],
-		'eventids' => []
+	private static $sessionids = [
+		':user:properties.user' => null,
+		':user:properties.admin' => null,
+		':user:properties.superadmin' => null
 	];
 
 	// Reference => User object with nested properties.
-	private static $user_properties = [
+	private static $users = [
 		':user:properties.user' => [
 			'userid' => ':user:properties.user',
 			'username' => 'properties.user',
@@ -259,7 +239,7 @@ class testUserInformationAccess extends CAPITest {
 			'debug_mode' => '0',
 			'users_status' => '0',
 			'usrgrps' => [
-				['usrgrpid' => ':user_group:API test user properties - other group']
+				['usrgrpid' => ':user_group:properties.other.group']
 			],
 			'medias' => [
 				[
@@ -294,7 +274,7 @@ class testUserInformationAccess extends CAPITest {
 			'debug_mode' => '0',
 			'users_status' => '0',
 			'usrgrps' => [
-				['usrgrpid' => ':user_group:API test user properties - other group']
+				['usrgrpid' => ':user_group:properties.other.group']
 			],
 			'medias' => [
 				[
@@ -310,20 +290,10 @@ class testUserInformationAccess extends CAPITest {
 	];
 
 	public function prepareTestData() {
-		$create_users = [];
-
-		foreach (self::$user_properties as $reference => $user) {
-			$user = self::getUserProperties($reference, ['username', 'name', 'surname', 'url',
-				'rows_per_page', 'roleid', 'passwd', 'timezone', 'autologout', 'refresh', 'usrgrps', 'medias'
-			]);
-
-			foreach ($user['medias'] as &$media) {
-				unset($media['mediaid']);
-			}
-			unset($media);
-
-			$create_users[] = $user;
-		}
+		$user_fields = ['username', 'name', 'surname', 'url', 'rows_per_page', 'roleid', 'passwd', 'timezone',
+			'autologout', 'refresh', 'usrgrps', 'medias'
+		];
+		$user_except_fields = ['medias.mediaid'];
 
 		CTestDataHelper::createObjects([
 			'host_groups' => [
@@ -339,7 +309,7 @@ class testUserInformationAccess extends CAPITest {
 					]
 				],
 				[
-					'name' => 'API test user properties - other group',
+					'name' => 'properties.other.group',
 					'users_status' => GROUP_STATUS_ENABLED,
 					'rights' => [
 						'id' => ':host_group:user.properties.group.main',
@@ -356,12 +326,6 @@ class testUserInformationAccess extends CAPITest {
 					]
 				]
 			],
-			'triggers' => [
-				'user.properties.action.trigger' => [
-					'description' => 'user.properties.action.trigger(user.properties.h1(i1))',
-					'expression' => 'last(/user.properties.h1/i1)=0'
-				]
-			],
 			'roles' => [
 				[
 					'name' => 'properties.user',
@@ -375,6 +339,15 @@ class testUserInformationAccess extends CAPITest {
 					'name' => 'properties.superadmin',
 					'type' => USER_TYPE_SUPER_ADMIN
 				]
+			],
+			'users' => [
+				self::getUserFields(':user:properties.user', $user_fields, $user_except_fields),
+				self::getUserFields(':user:properties.user2', $user_fields, $user_except_fields),
+				self::getUserFields(':user:properties.admin', $user_fields, $user_except_fields),
+				self::getUserFields(':user:properties.admin2', $user_fields, $user_except_fields),
+				self::getUserFields(':user:properties.superadmin', $user_fields, $user_except_fields),
+				self::getUserFields(':user:properties.user.other.group', $user_fields, $user_except_fields),
+				self::getUserFields(':user:properties.admin.other.group', $user_fields, $user_except_fields)
 			],
 			'actions' => [
 				[
@@ -391,58 +364,67 @@ class testUserInformationAccess extends CAPITest {
 					]
 				]
 			],
-			'users' => $create_users
+			'triggers' => [
+				'user.properties.action.trigger' => [
+					'description' => 'user.properties.action.trigger(user.properties.h1(i1))',
+					'expression' => 'last(/user.properties.h1/i1)=0'
+				]
+			],
+			'events' => [
+				'user.properties.event' => [
+					'name' => 'user.properties.event',
+					'source' => EVENT_SOURCE_TRIGGERS
+				]
+			],
+			'alerts' => [
+				'properties.user' => [
+					'subject' => 'properties.user',
+					'userid' => ':user:properties.user',
+					'mediatypeid' => 1,
+					'sendto' => self::$users[':user:properties.user']['medias'][0]['sendto'][0]
+				],
+				'properties.user2' => [
+					'subject' => 'properties.user2',
+					'userid' => ':user:properties.user2',
+					'mediatypeid' => 1,
+					'sendto' => self::$users[':user:properties.user2']['medias'][0]['sendto'][0]
+				],
+				'properties.admin' => [
+					'subject' => 'properties.admin',
+					'userid' => ':user:properties.admin',
+					'mediatypeid' => 1,
+					'sendto' => self::$users[':user:properties.admin']['medias'][0]['sendto'][0]
+				],
+				'properties.admin2' => [
+					'subject' => 'properties.admin2',
+					'userid' => ':user:properties.admin2',
+					'mediatypeid' => 1,
+					'sendto' => self::$users[':user:properties.admin2']['medias'][0]['sendto'][0]
+				],
+				'properties.superadmin' => [
+					'subject' => 'properties.superadmin',
+					'userid' => ':user:properties.superadmin',
+					'mediatypeid' => 1,
+					'sendto' => self::$users[':user:properties.superadmin']['medias'][0]['sendto'][0]
+				],
+				'properties.user.other.group' => [
+					'subject' => 'properties.user.other.group',
+					'userid' => ':user:properties.user.other.group',
+					'mediatypeid' => 1,
+					'sendto' => self::$users[':user:properties.user.other.group']['medias'][0]['sendto'][0]
+				],
+				'properties.admin.other.group' => [
+					'subject' => 'properties.admin.other.group',
+					'userid' => ':user:properties.admin.other.group',
+					'mediatypeid' => 1,
+					'sendto' => self::$users[':user:properties.admin.other.group']['medias'][0]['sendto'][0]
+				]
+			]
 		]);
-
-		self::$data['eventids'] = DB::insert('events', [[
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
-			'objectid' => CTestDataHelper::getConvertedValueReference(':trigger:user.properties.action.trigger'),
-			'clock' => time(),
-			'value' => 1,
-			'acknowledged' => 0,
-			'ns' => 0
-		]]);
-
-		$alerts = [];
-		foreach (self::$user_properties as $reference => $user) {
-			$alerts[] = [
-				'userid' => CTestDataHelper::getConvertedValueReference($reference),
-				'sendto' => $user['medias'][0]['sendto'][0],
-				'actionid' => CTestDataHelper::getConvertedValueReference(':action:user.properties.action'),
-				'eventid' => self::$data['eventids'][0],
-				'clock' => time(),
-				'mediatypeid' => 1,
-				'subject' => 'PROBLEM: Value of item key1 > 5',
-				'message' => 'Event at 2012.02.20 10:00:00 Hostname: H1 Value of item key1 > 5: PROBLEM Last value: 6',
-				'status' => 1,
-				'retries' => 0,
-				'error' => '',
-				'esc_step' => 1,
-				'alerttype' => 0,
-				'parameters' => ''
-			];
-		}
-		self::$data['alertids'] = array_combine(array_keys(self::$data['alertids']), DB::insert('alerts', $alerts));
-
-		$media_links = [];
-		foreach (self::$user_properties as $user) {
-			$media_links[$user['medias'][0]['sendto'][0]] = $user['medias'][0]['mediaid'];
-		}
-
-		$medias = DB::select('media', [
-			'output' => ['mediaid', 'sendto'],
-			'filter' => ['sendto' => array_keys($media_links)],
-			'sortfield' => ['userid']
-		]);
-
-		foreach ($medias as $media) {
-			self::$data['mediaids'][$media_links[$media['sendto']]] = $media['mediaid'];
-		}
 
 		$id = 0;
-		foreach (self::$data['sessionids'] as $reference => $foo) {
-			$actor = self::getUserProperties($reference, ['username', 'passwd']);
+		foreach (self::$sessionids as $reference => $foo) {
+			$actor = self::getUserFields($reference, ['username', 'passwd']);
 
 			$result = CDataHelper::callRaw([
 				'jsonrpc' => '2.0',
@@ -455,25 +437,25 @@ class testUserInformationAccess extends CAPITest {
 			]);
 			$this->assertArrayHasKey('result', $result);
 
-			self::$data['sessionids'][$reference] = $result['result'];
+			self::$sessionids[$reference] = $result['result'];
 		}
 	}
 
 	public static function cleanTestData(): void {
-		DB::delete('alerts', ['alertid' => array_values(self::$data['alertids'])]);
-		DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
-
 		CTestDataHelper::cleanUp();
 	}
 
 	public static function data_get_user_properties() {
+		// Exclude deprecated field.
+		$user_extend_output = array_diff(CUser::OUTPUT_FIELDS, ['alias']);
+
 		// User and admin requests should not return results for other user group users: user_other and admin_other.
 		return [
 			'User can get group-mates by userids' => [
 				'actor' => ':user:properties.user',
 				'parameters' => [
 					'output' => ['userid'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'sortfield' => ['userid']
 				],
 				'expected_result' => [
@@ -488,7 +470,7 @@ class testUserInformationAccess extends CAPITest {
 				'actor' => ':user:properties.admin',
 				'parameters' => [
 					'output' => ['userid'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'sortfield' => ['userid']
 				],
 				'expected_result' => [
@@ -503,7 +485,7 @@ class testUserInformationAccess extends CAPITest {
 				'actor' => ':user:properties.superadmin',
 				'parameters' => [
 					'output' => ['userid'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'sortfield' => ['userid']
 				],
 				'expected_result' => [
@@ -520,7 +502,15 @@ class testUserInformationAccess extends CAPITest {
 				'actor' => ':user:properties.user',
 				'parameters' => [
 					'output' => ['userid'],
-					'mediaids' => array_keys(self::$data['mediaids']),
+					'mediaids' => [
+						':media:user@usertest.com',
+						':media:user2@usertest.com',
+						':media:admin@usertest.com',
+						':media:admin2@usertest.com',
+						':media:superadmin@usertest.com',
+						':media:user_other@usertest.com',
+						':media:admin_other@usertest.com'
+					],
 					'sortfield' => ['userid']
 				],
 				'expected_result' => [['userid' => ':user:properties.user']]
@@ -529,7 +519,15 @@ class testUserInformationAccess extends CAPITest {
 				'actor' => ':user:properties.admin',
 				'parameters' => [
 					'output' => ['userid'],
-					'mediaids' => array_keys(self::$data['mediaids'])
+					'mediaids' => [
+						':media:user@usertest.com',
+						':media:user2@usertest.com',
+						':media:admin@usertest.com',
+						':media:admin2@usertest.com',
+						':media:superadmin@usertest.com',
+						':media:user_other@usertest.com',
+						':media:admin_other@usertest.com'
+					]
 				],
 				'expected_result' => [['userid' => ':user:properties.admin']]
 			],
@@ -537,7 +535,15 @@ class testUserInformationAccess extends CAPITest {
 				'actor' => ':user:properties.superadmin',
 				'parameters' => [
 					'output' => ['userid'],
-					'mediaids' => array_keys(self::$data['mediaids'])
+					'mediaids' => [
+						':media:user@usertest.com',
+						':media:user2@usertest.com',
+						':media:admin@usertest.com',
+						':media:admin2@usertest.com',
+						':media:superadmin@usertest.com',
+						':media:user_other@usertest.com',
+						':media:admin_other@usertest.com'
+					]
 				],
 				'expected_result' => [
 					['userid' => ':user:properties.user'],
@@ -584,70 +590,70 @@ class testUserInformationAccess extends CAPITest {
 			'User gets full own information' => [
 				'actor' => ':user:properties.user',
 				'parameters' => [
-					'output' => 'extend',
+					'output' => $user_extend_output,
 					'userids' => ':user:properties.user'
 				],
-				'expected_result' => [self::getUserProperties(':user:properties.user', CUser::OUTPUT_FIELDS)]
+				'expected_result' => [self::getUserFields(':user:properties.user', CUser::OUTPUT_FIELDS)]
 			],
 			'Admin gets full own information' => [
 				'actor' => ':user:properties.admin',
 				'parameters' => [
-					'output' => 'extend',
+					'output' => $user_extend_output,
 					'userids' => ':user:properties.admin'
 				],
-				'expected_result' => [self::getUserProperties(':user:properties.admin', CUser::OUTPUT_FIELDS)]
+				'expected_result' => [self::getUserFields(':user:properties.admin', CUser::OUTPUT_FIELDS)]
 			],
 			'Superadmin gets full own information' => [
 				'actor' => ':user:properties.superadmin',
 				'parameters' => [
-					'output' => 'extend',
+					'output' => $user_extend_output,
 					'userids' => ':user:properties.superadmin'
 				],
-				'expected_result' => [self::getUserProperties(':user:properties.superadmin', CUser::OUTPUT_FIELDS)]
+				'expected_result' => [self::getUserFields(':user:properties.superadmin', CUser::OUTPUT_FIELDS)]
 			],
 			'User gets full own information, limited info on group-mates' => [
 				'actor' => ':user:properties.user',
 				'parameters' => [
-					'output' => 'extend',
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'output' => $user_extend_output,
+					'userids' => array_column(self::$users, 'userid'),
 					'sortfield' => ['userid']
 				],
 				'expected_result' => [
-					self::getUserProperties(':user:properties.user', CUser::OUTPUT_FIELDS),
-					self::getUserProperties(':user:properties.user2', CUser::LIMITED_OUTPUT_FIELDS),
-					self::getUserProperties(':user:properties.admin', CUser::LIMITED_OUTPUT_FIELDS),
-					self::getUserProperties(':user:properties.admin2', CUser::LIMITED_OUTPUT_FIELDS),
-					self::getUserProperties(':user:properties.superadmin', CUser::LIMITED_OUTPUT_FIELDS)
+					self::getUserFields(':user:properties.user', CUser::OUTPUT_FIELDS),
+					self::getUserFields(':user:properties.user2', CUser::LIMITED_OUTPUT_FIELDS),
+					self::getUserFields(':user:properties.admin', CUser::LIMITED_OUTPUT_FIELDS),
+					self::getUserFields(':user:properties.admin2', CUser::LIMITED_OUTPUT_FIELDS),
+					self::getUserFields(':user:properties.superadmin', CUser::LIMITED_OUTPUT_FIELDS)
 				]
 			],
 			'Admin gets full own information, limited info on group-mates' => [
 				'actor' => ':user:properties.admin',
 				'parameters' => [
-					'output' => 'extend',
-					'userids' => array_column(self::$user_properties, 'userid')
+					'output' => $user_extend_output,
+					'userids' => array_column(self::$users, 'userid')
 				],
 				'expected_result' => [
-					self::getUserProperties(':user:properties.user', CUser::LIMITED_OUTPUT_FIELDS),
-					self::getUserProperties(':user:properties.user2', CUser::LIMITED_OUTPUT_FIELDS),
-					self::getUserProperties(':user:properties.admin', CUser::OUTPUT_FIELDS),
-					self::getUserProperties(':user:properties.admin2', CUser::LIMITED_OUTPUT_FIELDS),
-					self::getUserProperties(':user:properties.superadmin', CUser::LIMITED_OUTPUT_FIELDS)
+					self::getUserFields(':user:properties.user', CUser::LIMITED_OUTPUT_FIELDS),
+					self::getUserFields(':user:properties.user2', CUser::LIMITED_OUTPUT_FIELDS),
+					self::getUserFields(':user:properties.admin', CUser::OUTPUT_FIELDS),
+					self::getUserFields(':user:properties.admin2', CUser::LIMITED_OUTPUT_FIELDS),
+					self::getUserFields(':user:properties.superadmin', CUser::LIMITED_OUTPUT_FIELDS)
 				]
 			],
 			'Superadmin gets full info on everyone' => [
 				'actor' => ':user:properties.superadmin',
 				'parameters' => [
-					'output' => 'extend',
-					'userids' => array_column(self::$user_properties, 'userid')
+					'output' => $user_extend_output,
+					'userids' => array_column(self::$users, 'userid')
 				],
 				'expected_result' => [
-					self::getUserProperties(':user:properties.user', CUser::OUTPUT_FIELDS),
-					self::getUserProperties(':user:properties.user2', CUser::OUTPUT_FIELDS),
-					self::getUserProperties(':user:properties.admin', CUser::OUTPUT_FIELDS),
-					self::getUserProperties(':user:properties.admin2', CUser::OUTPUT_FIELDS),
-					self::getUserProperties(':user:properties.superadmin', CUser::OUTPUT_FIELDS),
-					self::getUserProperties(':user:properties.user.other.group', CUser::OUTPUT_FIELDS),
-					self::getUserProperties(':user:properties.admin.other.group', CUser::OUTPUT_FIELDS)
+					self::getUserFields(':user:properties.user', CUser::OUTPUT_FIELDS),
+					self::getUserFields(':user:properties.user2', CUser::OUTPUT_FIELDS),
+					self::getUserFields(':user:properties.admin', CUser::OUTPUT_FIELDS),
+					self::getUserFields(':user:properties.admin2', CUser::OUTPUT_FIELDS),
+					self::getUserFields(':user:properties.superadmin', CUser::OUTPUT_FIELDS),
+					self::getUserFields(':user:properties.user.other.group', CUser::OUTPUT_FIELDS),
+					self::getUserFields(':user:properties.admin.other.group', CUser::OUTPUT_FIELDS)
 				]
 			],
 			'User can use simple filter on oneself' => [
@@ -680,7 +686,7 @@ class testUserInformationAccess extends CAPITest {
 				'actor' => ':user:properties.user',
 				'parameters' => [
 					'output' => ['userid'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'filter' => ['timezone' => 'Europe/Rome']
 				],
 				'expected_result' => [['userid' => ':user:properties.user']]
@@ -689,7 +695,7 @@ class testUserInformationAccess extends CAPITest {
 				'actor' => ':user:properties.admin',
 				'parameters' => [
 					'output' => ['userid'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'filter' => ['timezone' => 'Europe/Rome']
 				],
 				'expected_result' => [['userid' => ':user:properties.admin']]
@@ -698,7 +704,7 @@ class testUserInformationAccess extends CAPITest {
 				'actor' => ':user:properties.superadmin',
 				'parameters' => [
 					'output' => ['userid'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'filter' => ['timezone' => 'Europe/Rome']
 				],
 				'expected_result' => [
@@ -742,7 +748,7 @@ class testUserInformationAccess extends CAPITest {
 					'filter' => ['rows_per_page' => [321]]
 				],
 				'expected_result' => [
-					self::getUserProperties(':user:properties.user', ['userid', 'rows_per_page'])
+					self::getUserFields(':user:properties.user', ['userid', 'rows_per_page'])
 				]
 			],
 			'Admin can use filter with private fields on oneself only' => [
@@ -752,7 +758,7 @@ class testUserInformationAccess extends CAPITest {
 					'filter' => ['rows_per_page' => [321]]
 				],
 				'expected_result' => [
-					self::getUserProperties(':user:properties.admin', ['userid', 'rows_per_page'])
+					self::getUserFields(':user:properties.admin', ['userid', 'rows_per_page'])
 				]
 			],
 			'Superadmin can use filter with private fields on everyone' => [
@@ -762,13 +768,13 @@ class testUserInformationAccess extends CAPITest {
 					'filter' => ['rows_per_page' => [321]]
 				],
 				'expected_result' => [
-					self::getUserProperties(':user:properties.user', ['userid', 'rows_per_page']),
-					self::getUserProperties(':user:properties.user2', ['userid', 'rows_per_page']),
-					self::getUserProperties(':user:properties.admin', ['userid', 'rows_per_page']),
-					self::getUserProperties(':user:properties.admin2', ['userid', 'rows_per_page']),
-					self::getUserProperties(':user:properties.superadmin', ['userid', 'rows_per_page']),
-					self::getUserProperties(':user:properties.user.other.group', ['userid', 'rows_per_page']),
-					self::getUserProperties(':user:properties.admin.other.group', ['userid', 'rows_per_page'])
+					self::getUserFields(':user:properties.user', ['userid', 'rows_per_page']),
+					self::getUserFields(':user:properties.user2', ['userid', 'rows_per_page']),
+					self::getUserFields(':user:properties.admin', ['userid', 'rows_per_page']),
+					self::getUserFields(':user:properties.admin2', ['userid', 'rows_per_page']),
+					self::getUserFields(':user:properties.superadmin', ['userid', 'rows_per_page']),
+					self::getUserFields(':user:properties.user.other.group', ['userid', 'rows_per_page']),
+					self::getUserFields(':user:properties.admin.other.group', ['userid', 'rows_per_page'])
 				]
 			],
 			'User can use filter with non-existing field, result defaults to all group-mates' => [
@@ -776,7 +782,7 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['userid'],
 					'filter' => ['undefined' => [321]],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'sortfield' => ['userid']
 				],
 				'expected_result' => [
@@ -792,7 +798,7 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['userid'],
 					'filter' => ['undefined' => [321]],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'sortfield' => ['userid']
 				],
 				'expected_result' => [
@@ -808,7 +814,7 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['userid'],
 					'filter' => ['undefined' => [321]],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'sortfield' => ['userid']
 				],
 				'expected_result' => [
@@ -828,7 +834,7 @@ class testUserInformationAccess extends CAPITest {
 					'filter' => ['autologout' => [45*60]]
 				],
 				'expected_result' => [
-					self::getUserProperties(':user:properties.user', ['userid', 'autologout']),
+					self::getUserFields(':user:properties.user', ['userid', 'autologout'])
 				]
 			],
 			'Admin can use filter with private field `autologout` in different time format' => [
@@ -838,7 +844,7 @@ class testUserInformationAccess extends CAPITest {
 					'filter' => ['autologout' => [45*60]]
 				],
 				'expected_result' => [
-					self::getUserProperties(':user:properties.admin', ['userid', 'autologout']),
+					self::getUserFields(':user:properties.admin', ['userid', 'autologout'])
 				]
 			],
 			'Superadmin can use filter with field `autologout` in different time format' => [
@@ -848,13 +854,13 @@ class testUserInformationAccess extends CAPITest {
 					'filter' => ['autologout' => [45*60]]
 				],
 				'expected_result' => [
-					self::getUserProperties(':user:properties.user', ['userid', 'autologout']),
-					self::getUserProperties(':user:properties.user2', ['userid', 'autologout']),
-					self::getUserProperties(':user:properties.admin', ['userid', 'autologout']),
-					self::getUserProperties(':user:properties.admin2', ['userid', 'autologout']),
-					self::getUserProperties(':user:properties.superadmin', ['userid', 'autologout']),
-					self::getUserProperties(':user:properties.user.other.group', ['userid', 'autologout']),
-					self::getUserProperties(':user:properties.admin.other.group', ['userid', 'autologout'])
+					self::getUserFields(':user:properties.user', ['userid', 'autologout']),
+					self::getUserFields(':user:properties.user2', ['userid', 'autologout']),
+					self::getUserFields(':user:properties.admin', ['userid', 'autologout']),
+					self::getUserFields(':user:properties.admin2', ['userid', 'autologout']),
+					self::getUserFields(':user:properties.superadmin', ['userid', 'autologout']),
+					self::getUserFields(':user:properties.user.other.group', ['userid', 'autologout']),
+					self::getUserFields(':user:properties.admin.other.group', ['userid', 'autologout'])
 				]
 			],
 			'User can use filter with private field `refresh` in different time format' => [
@@ -864,7 +870,7 @@ class testUserInformationAccess extends CAPITest {
 					'filter' => ['refresh' => [120]]
 				],
 				'expected_result' => [
-					self::getUserProperties(':user:properties.user', ['userid', 'refresh']),
+					self::getUserFields(':user:properties.user', ['userid', 'refresh'])
 				]
 			],
 			'Admin can use filter with private field `refresh` in different time format' => [
@@ -874,7 +880,7 @@ class testUserInformationAccess extends CAPITest {
 					'filter' => ['refresh' => [120]]
 				],
 				'expected_result' => [
-					self::getUserProperties(':user:properties.admin', ['userid', 'refresh']),
+					self::getUserFields(':user:properties.admin', ['userid', 'refresh'])
 				]
 			],
 			'Superadmin can use filter with field `refresh` in different time format' => [
@@ -884,20 +890,20 @@ class testUserInformationAccess extends CAPITest {
 					'filter' => ['refresh' => [120]]
 				],
 				'expected_result' => [
-					self::getUserProperties(':user:properties.user', ['userid', 'refresh']),
-					self::getUserProperties(':user:properties.user2', ['userid', 'refresh']),
-					self::getUserProperties(':user:properties.admin', ['userid', 'refresh']),
-					self::getUserProperties(':user:properties.admin2', ['userid', 'refresh']),
-					self::getUserProperties(':user:properties.superadmin', ['userid', 'refresh']),
-					self::getUserProperties(':user:properties.user.other.group', ['userid', 'refresh']),
-					self::getUserProperties(':user:properties.admin.other.group', ['userid', 'refresh'])
+					self::getUserFields(':user:properties.user', ['userid', 'refresh']),
+					self::getUserFields(':user:properties.user2', ['userid', 'refresh']),
+					self::getUserFields(':user:properties.admin', ['userid', 'refresh']),
+					self::getUserFields(':user:properties.admin2', ['userid', 'refresh']),
+					self::getUserFields(':user:properties.superadmin', ['userid', 'refresh']),
+					self::getUserFields(':user:properties.user.other.group', ['userid', 'refresh']),
+					self::getUserFields(':user:properties.admin.other.group', ['userid', 'refresh'])
 				]
 			],
 			'User can use searchByAny filter on oneself only' => [
 				'actor' => ':user:properties.user',
 				'parameters' => [
 					'output' => ['userid'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'searchByAny' => true,
 					'filter' => ['timezone' => 'Europe/Rome']
 				],
@@ -907,7 +913,7 @@ class testUserInformationAccess extends CAPITest {
 				'actor' => ':user:properties.admin',
 				'parameters' => [
 					'output' => ['userid'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'searchByAny' => true,
 					'filter' => ['timezone' => 'Europe/Rome']
 				],
@@ -917,7 +923,7 @@ class testUserInformationAccess extends CAPITest {
 				'actor' => ':user:properties.superadmin',
 				'parameters' => [
 					'output' => ['userid'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'searchByAny' => true,
 					'filter' => ['timezone' => 'Europe/Rome']
 				],
@@ -939,7 +945,7 @@ class testUserInformationAccess extends CAPITest {
 					'searchByAny' => true
 				],
 				'expected_result' => [
-					self::getUserProperties(':user:properties.user', ['userid', 'rows_per_page'])
+					self::getUserFields(':user:properties.user', ['userid', 'rows_per_page'])
 				]
 			],
 			'Admin can use filter with private fields and searchByAny on oneself only' => [
@@ -950,7 +956,7 @@ class testUserInformationAccess extends CAPITest {
 					'searchByAny' => true
 				],
 				'expected_result' => [
-					self::getUserProperties(':user:properties.admin', ['userid', 'rows_per_page'])
+					self::getUserFields(':user:properties.admin', ['userid', 'rows_per_page'])
 				]
 			],
 			'Superadmin can use filter with private fields and searchByAny fields on everyone' => [
@@ -961,13 +967,13 @@ class testUserInformationAccess extends CAPITest {
 					'searchByAny' => true
 				],
 				'expected_result' => [
-					self::getUserProperties(':user:properties.user', ['userid', 'rows_per_page']),
-					self::getUserProperties(':user:properties.user2', ['userid', 'rows_per_page']),
-					self::getUserProperties(':user:properties.admin', ['userid', 'rows_per_page']),
-					self::getUserProperties(':user:properties.admin2', ['userid', 'rows_per_page']),
-					self::getUserProperties(':user:properties.superadmin', ['userid', 'rows_per_page']),
-					self::getUserProperties(':user:properties.user.other.group', ['userid', 'rows_per_page']),
-					self::getUserProperties(':user:properties.admin.other.group', ['userid', 'rows_per_page'])
+					self::getUserFields(':user:properties.user', ['userid', 'rows_per_page']),
+					self::getUserFields(':user:properties.user2', ['userid', 'rows_per_page']),
+					self::getUserFields(':user:properties.admin', ['userid', 'rows_per_page']),
+					self::getUserFields(':user:properties.admin2', ['userid', 'rows_per_page']),
+					self::getUserFields(':user:properties.superadmin', ['userid', 'rows_per_page']),
+					self::getUserFields(':user:properties.user.other.group', ['userid', 'rows_per_page']),
+					self::getUserFields(':user:properties.admin.other.group', ['userid', 'rows_per_page'])
 				]
 			],
 			'User can use search with common fields only on group-mates' => [
@@ -1064,7 +1070,7 @@ class testUserInformationAccess extends CAPITest {
 				'actor' => ':user:properties.user',
 				'parameters' => [
 					'output' => ['userid'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'searchByAny' => true,
 					'search' => ['surname' => 'Smith']
 				],
@@ -1080,7 +1086,7 @@ class testUserInformationAccess extends CAPITest {
 				'actor' => ':user:properties.admin',
 				'parameters' => [
 					'output' => ['userid'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'searchByAny' => true,
 					'sortfield' => ['userid'],
 					'search' => ['surname' => 'Smith']
@@ -1097,7 +1103,7 @@ class testUserInformationAccess extends CAPITest {
 				'actor' => ':user:properties.superadmin',
 				'parameters' => [
 					'output' => ['userid'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'searchByAny' => true,
 					'search' => ['surname' => 'Smith']
 				],
@@ -1152,7 +1158,7 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['userid'],
 					'filter' => ['undefined' => [321], 'timezone' => 'Europe/Rome'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'searchByAny' => true,
 					'sortfield' => ['userid']
 				],
@@ -1163,7 +1169,7 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['userid'],
 					'filter' => ['undefined' => [321], 'timezone' => 'Europe/Rome'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'searchByAny' => true,
 					'sortfield' => ['userid']
 				],
@@ -1174,7 +1180,7 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['userid'],
 					'filter' => ['undefined' => [321], 'timezone' => 'Europe/Rome'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'searchByAny' => true,
 					'sortfield' => ['userid']
 				],
@@ -1193,7 +1199,7 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['userid'],
 					'search' => ['undefined' => '321', 'timezone' => 'Europe/Rome'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'searchByAny' => true,
 					'sortfield' => ['userid']
 				],
@@ -1204,7 +1210,7 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['userid'],
 					'search' => ['undefined' => '321', 'timezone' => 'Europe/Rome'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'searchByAny' => true,
 					'sortfield' => ['userid']
 				],
@@ -1215,7 +1221,7 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['userid'],
 					'search' => ['undefined' => '321', 'timezone' => 'Europe/Rome'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'searchByAny' => true,
 					'sortfield' => ['userid']
 				],
@@ -1236,10 +1242,8 @@ class testUserInformationAccess extends CAPITest {
 					'selectMedias' => ['mediaid'],
 					'filter' => ['userid' => [':user:properties.user']]
 				],
-				'expected_result' => [[
-					'userid' => ':user:properties.user',
-					'medias' => [['mediaid' => ':media:user@usertest.com']]
-				]]
+				'expected_result' => [
+					['userid' => ':user:properties.user', 'medias' => [['mediaid' => ':media:user@usertest.com']]]]
 			],
 			'Admin can use selectMedias on oneself' => [
 				'actor' => ':user:properties.admin',
@@ -1248,10 +1252,9 @@ class testUserInformationAccess extends CAPITest {
 					'selectMedias' => ['mediaid'],
 					'filter' => ['userid' => [':user:properties.admin']]
 				],
-				'expected_result' => [[
-					'userid' => ':user:properties.admin',
-					'medias' => [['mediaid' => ':media:admin@usertest.com']]
-				]]
+				'expected_result' => [
+					['userid' => ':user:properties.admin', 'medias' => [['mediaid' => ':media:admin@usertest.com']]]
+				]
 			],
 			'Superadmin can use selectMedias on oneself' => [
 				'actor' => ':user:properties.superadmin',
@@ -1269,7 +1272,7 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['userid'],
 					'selectMedias' => ['mediaid'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'sortfield' => ['userid']
 				],
 				'expected_result' => [
@@ -1285,7 +1288,7 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['userid'],
 					'selectMedias' => ['mediaid'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'sortfield' => ['userid']
 				],
 				'expected_result' => [
@@ -1301,7 +1304,7 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['userid'],
 					'selectMedias' => ['mediaid'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'sortfield' => ['userid']
 				],
 				'expected_result' => [
@@ -1352,7 +1355,7 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['userid'],
 					'selectMediatypes' => ['mediatypeid'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'sortfield' => ['userid']
 				],
 				'expected_result' => [
@@ -1368,7 +1371,7 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['userid'],
 					'selectMediatypes' => ['mediatypeid'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'sortfield' => ['userid']
 				],
 				'expected_result' => [
@@ -1384,7 +1387,7 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['userid'],
 					'selectMediatypes' => ['mediatypeid'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'sortfield' => ['userid']
 				],
 				'expected_result' => [
@@ -1435,7 +1438,7 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['userid'],
 					'selectRole' => ['roleid'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'sortfield' => ['userid']
 				],
 				'expected_result' => [
@@ -1451,7 +1454,7 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['userid'],
 					'selectRole' => ['roleid'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'sortfield' => ['userid']
 				],
 				'expected_result' => [
@@ -1467,7 +1470,7 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['userid'],
 					'selectRole' => ['roleid'],
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'sortfield' => ['userid']
 				],
 				'expected_result' => [
@@ -1488,7 +1491,7 @@ class testUserInformationAccess extends CAPITest {
 					'filter' => ['userid' => [':user:properties.user']]
 				],
 				'expected_result' => [
-					self::getUserProperties(':user:properties.user', ['userid', 'gui_access', 'debug_mode', 'users_status'])
+					self::getUserFields(':user:properties.user', ['userid', 'gui_access', 'debug_mode', 'users_status'])
 				]
 			],
 			'Admin can use getAccess on oneself' => [
@@ -1499,7 +1502,7 @@ class testUserInformationAccess extends CAPITest {
 					'filter' => ['userid' => [':user:properties.admin']]
 				],
 				'expected_result' => [
-					self::getUserProperties(':user:properties.admin', ['userid', 'gui_access', 'debug_mode', 'users_status'])
+					self::getUserFields(':user:properties.admin', ['userid', 'gui_access', 'debug_mode', 'users_status'])
 				]
 			],
 			'Superadmin can use getAccess on oneself' => [
@@ -1510,7 +1513,7 @@ class testUserInformationAccess extends CAPITest {
 					'filter' => ['userid' => [':user:properties.superadmin']]
 				],
 				'expected_result' => [
-					self::getUserProperties(':user:properties.superadmin', ['userid', 'gui_access', 'debug_mode', 'users_status'])
+					self::getUserFields(':user:properties.superadmin', ['userid', 'gui_access', 'debug_mode', 'users_status'])
 				]
 			],
 			'User can use getAccess only on oneself' => [
@@ -1518,11 +1521,11 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['userid'],
 					'getAccess' => true,
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'sortfield' => ['userid']
 				],
 				'expected_result' => [
-					self::getUserProperties(':user:properties.user', ['userid', 'gui_access', 'debug_mode', 'users_status']),
+					self::getUserFields(':user:properties.user', ['userid', 'gui_access', 'debug_mode', 'users_status']),
 					['userid' => ':user:properties.user2'],
 					['userid' => ':user:properties.admin'],
 					['userid' => ':user:properties.admin2'],
@@ -1534,13 +1537,13 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['userid'],
 					'getAccess' => true,
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'sortfield' => ['userid']
 				],
 				'expected_result' => [
 					['userid' => ':user:properties.user'],
 					['userid' => ':user:properties.user2'],
-					self::getUserProperties(':user:properties.admin', ['userid', 'gui_access', 'debug_mode', 'users_status']),
+					self::getUserFields(':user:properties.admin', ['userid', 'gui_access', 'debug_mode', 'users_status']),
 					['userid' => ':user:properties.admin2'],
 					['userid' => ':user:properties.superadmin']
 				]
@@ -1550,17 +1553,17 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['userid'],
 					'getAccess' => true,
-					'userids' => array_column(self::$user_properties, 'userid'),
+					'userids' => array_column(self::$users, 'userid'),
 					'sortfield' => ['userid']
 				],
 				'expected_result' => [
-					self::getUserProperties(':user:properties.user', ['userid', 'gui_access', 'debug_mode', 'users_status']),
-					self::getUserProperties(':user:properties.user2', ['userid', 'gui_access', 'debug_mode', 'users_status']),
-					self::getUserProperties(':user:properties.admin', ['userid', 'gui_access', 'debug_mode', 'users_status']),
-					self::getUserProperties(':user:properties.admin2', ['userid', 'gui_access', 'debug_mode', 'users_status']),
-					self::getUserProperties(':user:properties.superadmin', ['userid', 'gui_access', 'debug_mode', 'users_status']),
-					self::getUserProperties(':user:properties.user.other.group', ['userid', 'gui_access', 'debug_mode', 'users_status']),
-					self::getUserProperties(':user:properties.admin.other.group', ['userid', 'gui_access', 'debug_mode', 'users_status'])
+					self::getUserFields(':user:properties.user', ['userid', 'gui_access', 'debug_mode', 'users_status']),
+					self::getUserFields(':user:properties.user2', ['userid', 'gui_access', 'debug_mode', 'users_status']),
+					self::getUserFields(':user:properties.admin', ['userid', 'gui_access', 'debug_mode', 'users_status']),
+					self::getUserFields(':user:properties.admin2', ['userid', 'gui_access', 'debug_mode', 'users_status']),
+					self::getUserFields(':user:properties.superadmin', ['userid', 'gui_access', 'debug_mode', 'users_status']),
+					self::getUserFields(':user:properties.user.other.group', ['userid', 'gui_access', 'debug_mode', 'users_status']),
+					self::getUserFields(':user:properties.admin.other.group', ['userid', 'gui_access', 'debug_mode', 'users_status'])
 				]
 			]
 		];
@@ -1569,22 +1572,25 @@ class testUserInformationAccess extends CAPITest {
 	/**
 	 * @dataProvider data_get_user_properties
 	 */
-	public function testUserInformationAccess_getUserProperties(string $actor, array $parameters,
+	public function testUserFieldAccess_getUserProperties(string $actor, array $parameters,
 			array $expected_result) {
-		CAPIHelper::setSessionId(self::$data['sessionids'][$actor]);
+		CAPIHelper::setSessionId(self::$sessionids[$actor]);
 
-		self::resolveIds($parameters);
+		CTestDataHelper::resolveRequestReferences($parameters);
 
 		$result = $this->call('user.get', $parameters);
 
 		$this->assertArrayHasKey('result', $result);
 
-		self::resolveIds($expected_result);
+		CTestDataHelper::convertUserReferences($expected_result);
 
 		$this->assertEquals($expected_result, $result['result']);
 	}
 
 	public static function data_get_role_properties() {
+		// Exclude deprecated field.
+		$user_extend_output = array_diff(CUser::OUTPUT_FIELDS, ['alias']);
+
 		// User and admin requests should not return user info for other than themselves.
 		return [
 			'User gets own full users info' => [
@@ -1592,22 +1598,22 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['roleid'],
 					'roleids' => ':role:properties.user',
-					'selectUsers' => 'extend'
+					'selectUsers' => $user_extend_output
 				],
 				'expected_result' => [
-					['roleid' => ':role:properties.user', 'users' => [self::getUserProperties(':user:properties.user', CUser::OUTPUT_FIELDS)]]
+					['roleid' => ':role:properties.user', 'users' => [self::getUserFields(':user:properties.user', CUser::OUTPUT_FIELDS)]]
 				]
 			],
 			'User gets own full users info, empty for others' => [
 				'actor' => ':user:properties.user',
 				'parameters' => [
 					'output' => ['roleid'],
-					'roleids' => array_column(self::$user_properties, 'roleid'),
-					'selectUsers' => 'extend',
+					'roleids' => array_column(self::$users, 'roleid'),
+					'selectUsers' => $user_extend_output,
 					'sortfield' => ['roleid']
 				],
 				'expected_result' => [
-					['roleid' => ':role:properties.user', 'users' => [self::getUserProperties(':user:properties.user', CUser::OUTPUT_FIELDS)]],
+					['roleid' => ':role:properties.user', 'users' => [self::getUserFields(':user:properties.user', CUser::OUTPUT_FIELDS)]],
 					['roleid' => ':role:properties.admin', 'users' => []],
 					['roleid' => ':role:properties.superadmin', 'users' => []]
 				]
@@ -1617,23 +1623,23 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['roleid'],
 					'roleids' => ':role:properties.admin',
-					'selectUsers' => 'extend'
+					'selectUsers' => $user_extend_output
 				],
 				'expected_result' => [
-					['roleid' => ':role:properties.admin', 'users' => [self::getUserProperties(':user:properties.admin', CUser::OUTPUT_FIELDS)]]
+					['roleid' => ':role:properties.admin', 'users' => [self::getUserFields(':user:properties.admin', CUser::OUTPUT_FIELDS)]]
 				]
 			],
 			'Admin gets own full users info, empty for others' => [
 				'actor' => ':user:properties.admin',
 				'parameters' => [
 					'output' => ['roleid'],
-					'roleids' => array_column(self::$user_properties, 'roleid'),
-					'selectUsers' => 'extend',
+					'roleids' => array_column(self::$users, 'roleid'),
+					'selectUsers' => $user_extend_output,
 					'sortfield' => ['roleid']
 				],
 				'expected_result' => [
 					['roleid' => ':role:properties.user', 'users' => []],
-					['roleid' => ':role:properties.admin', 'users' => [self::getUserProperties(':user:properties.admin', CUser::OUTPUT_FIELDS)]],
+					['roleid' => ':role:properties.admin', 'users' => [self::getUserFields(':user:properties.admin', CUser::OUTPUT_FIELDS)]],
 					['roleid' => ':role:properties.superadmin', 'users' => []]
 				]
 			],
@@ -1642,33 +1648,33 @@ class testUserInformationAccess extends CAPITest {
 				'parameters' => [
 					'output' => ['roleid'],
 					'roleids' => ':role:properties.superadmin',
-					'selectUsers' => 'extend'
+					'selectUsers' => $user_extend_output
 				],
 				'expected_result' => [
-					['roleid' => ':role:properties.superadmin', 'users' => [self::getUserProperties(':user:properties.superadmin', CUser::OUTPUT_FIELDS)]]
+					['roleid' => ':role:properties.superadmin', 'users' => [self::getUserFields(':user:properties.superadmin', CUser::OUTPUT_FIELDS)]]
 				]
 			],
 			'Superadmin gets full users info on everyone, by role' => [
 				'actor' => ':user:properties.superadmin',
 				'parameters' => [
 					'output' => ['roleid'],
-					'roleids' => array_column(self::$user_properties, 'roleid'),
-					'selectUsers' => 'extend',
+					'roleids' => array_column(self::$users, 'roleid'),
+					'selectUsers' => $user_extend_output,
 					'sortfield' => ['roleid']
 				],
 				'expected_result' => [
 					['roleid' => ':role:properties.user', 'users' => [
-						self::getUserProperties(':user:properties.user', CUser::OUTPUT_FIELDS),
-						self::getUserProperties(':user:properties.user2', CUser::OUTPUT_FIELDS),
-						self::getUserProperties(':user:properties.user.other.group', CUser::OUTPUT_FIELDS)
+						self::getUserFields(':user:properties.user', CUser::OUTPUT_FIELDS),
+						self::getUserFields(':user:properties.user2', CUser::OUTPUT_FIELDS),
+						self::getUserFields(':user:properties.user.other.group', CUser::OUTPUT_FIELDS)
 					]],
 					['roleid' => ':role:properties.admin', 'users' => [
-						self::getUserProperties(':user:properties.admin', CUser::OUTPUT_FIELDS),
-						self::getUserProperties(':user:properties.admin2', CUser::OUTPUT_FIELDS),
-						self::getUserProperties(':user:properties.admin.other.group', CUser::OUTPUT_FIELDS)
+						self::getUserFields(':user:properties.admin', CUser::OUTPUT_FIELDS),
+						self::getUserFields(':user:properties.admin2', CUser::OUTPUT_FIELDS),
+						self::getUserFields(':user:properties.admin.other.group', CUser::OUTPUT_FIELDS)
 					]],
 					['roleid' => ':role:properties.superadmin', 'users' => [
-						self::getUserProperties(':user:properties.superadmin', CUser::OUTPUT_FIELDS)
+						self::getUserFields(':user:properties.superadmin', CUser::OUTPUT_FIELDS)
 					]]
 				]
 			]
@@ -1678,23 +1684,23 @@ class testUserInformationAccess extends CAPITest {
 	/**
 	 * @dataProvider data_get_role_properties
 	 */
-	public function testUserInformationAccess_getRoleProperties(string $actor, array $parameters,
+	public function testUserFieldAccess_getRoleProperties(string $actor, array $parameters,
 			array $expected_result) {
-		CAPIHelper::setSessionId(self::$data['sessionids'][$actor]);
+		CAPIHelper::setSessionId(self::$sessionids[$actor]);
 
-		self::resolveIds($parameters);
+		CTestDataHelper::resolveRequestReferences($parameters);
 
 		$result = $this->call('role.get', $parameters);
 
 		$this->assertArrayHasKey('result', $result);
 
-		self::resolveIds($expected_result);
+		CTestDataHelper::convertRoleReferences($expected_result);
 
 		$this->assertEquals($expected_result, $result['result']);
 	}
 
 	public static function data_get_alert_properties() {
-		// For non-super admin users only own alerts are accessible.
+		// For non-superadmin users only own alerts are accessible.
 		return [
 			'User gets own alerts' => [
 				'actor' => ':user:properties.user',
@@ -1724,7 +1730,7 @@ class testUserInformationAccess extends CAPITest {
 				'actor' => ':user:properties.user',
 				'parameters' => [
 					'output' => ['alertid'],
-					'userids' => array_column(self::$user_properties, 'userid')
+					'userids' => array_column(self::$users, 'userid')
 				],
 				'expected_result' => [['alertid' => ':alert:properties.user']]
 			],
@@ -1732,7 +1738,7 @@ class testUserInformationAccess extends CAPITest {
 				'actor' => ':user:properties.admin',
 				'parameters' => [
 					'output' => ['alertid'],
-					'userids' => array_column(self::$user_properties, 'userid')
+					'userids' => array_column(self::$users, 'userid')
 				],
 				'expected_result' => [['alertid' => ':alert:properties.admin']]
 			],
@@ -1740,7 +1746,7 @@ class testUserInformationAccess extends CAPITest {
 				'actor' => ':user:properties.superadmin',
 				'parameters' => [
 					'output' => ['alertid'],
-					'userids' => array_column(self::$user_properties, 'userid')
+					'userids' => array_column(self::$users, 'userid')
 				],
 				'expected_result' => [
 					['alertid' => ':alert:properties.user'],
@@ -1758,53 +1764,22 @@ class testUserInformationAccess extends CAPITest {
 	/**
 	 * @dataProvider data_get_alert_properties
 	 */
-	public function testUserInformationAccess_getAlerts(string $actor, array $parameters,
+	public function testUserFieldAccess_getAlerts(string $actor, array $parameters,
 			array $expected_result) {
-		CAPIHelper::setSessionId(self::$data['sessionids'][$actor]);
+		CAPIHelper::setSessionId(self::$sessionids[$actor]);
 
-		self::resolveIds($parameters);
+		CTestDataHelper::resolveRequestReferences($parameters);
 
 		$result = $this->call('alert.get', $parameters);
 
 		$this->assertArrayHasKey('result', $result);
 
-		self::resolveIds($expected_result);
+		CTestDataHelper::convertAlertReferences($expected_result);
 
 		$this->assertEquals($expected_result, $result['result']);
 	}
 
-	private static function resolveIds(array &$array) {
-		foreach ($array as &$value) {
-			is_array($value)
-				? self::resolveIds($value)
-				: self::convertValueReference($value);
-		}
-		unset($value);
-	}
-
-	private static function convertValueReference(&$reference) {
-		if (!is_string($reference) || $reference === '' || $reference[0] !== ':') {
-			return;
-		}
-
-		[, $object, $foo] = explode(':', $reference, 3);
-
-		switch ($object) {
-			case 'media':
-				$reference = self::$data['mediaids'][$reference];
-				break;
-
-			case 'alert':
-				$reference = self::$data['alertids'][$reference];
-				break;
-
-			default:
-				$reference = CTestDataHelper::getConvertedValueReference($reference);
-				break;
-		}
-	}
-
-	private static function getUserProperties(string $reference, array $output_fields) {
-		return array_intersect_key(self::$user_properties[$reference], array_flip($output_fields));
+	private static function getUserFields(string $reference, array $fields, ?array $except_fields = []) {
+		return CTestDataHelper::getObjectFields(self::$users[$reference], $fields, $except_fields);
 	}
 }

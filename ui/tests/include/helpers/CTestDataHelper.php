@@ -37,9 +37,9 @@ class CTestDataHelper {
 	 * @param array $objects
 	 */
 	public static function createObjects(array $objects): void {
-		$objects += array_fill_keys(['host_groups', 'hosts', 'triggers', 'roles', 'user_groups', 'users', 'actions'],
-			[]
-		);
+		$objects += array_fill_keys(['host_groups', 'hosts', 'triggers', 'roles', 'user_groups', 'users', 'actions',
+			'events', 'alerts'
+		], []);
 
 		try {
 			self::createHostGroups($objects['host_groups']);
@@ -49,6 +49,8 @@ class CTestDataHelper {
 			self::createUserGroups($objects['user_groups']);
 			self::createUsers($objects['users']);
 			self::createActions($objects['actions']);
+			self::createEvents($objects['events']);
+			self::createAlerts($objects['alerts']);
 		}
 		catch (Exception $e) {
 			self::cleanUp();
@@ -80,10 +82,7 @@ class CTestDataHelper {
 			return;
 		}
 
-		$value_maps = [];
 		$items = [];
-		$lld_rules = [];
-		$httptests = [];
 
 		foreach ($hosts as &$host) {
 			$host += [
@@ -92,36 +91,12 @@ class CTestDataHelper {
 				]
 			];
 
-			if (array_key_exists('value_maps', $host)) {
-				foreach ($host['value_maps'] as $value_map) {
-					$value_maps[] = $value_map + ['hostid' => ':host:'.$host['host']];
-				}
-
-				unset($host['value_maps']);
-			}
-
 			if (array_key_exists('items', $host)) {
 				foreach ($host['items'] as $item) {
 					$items[] = $item + ['hostid' => ':host:'.$host['host']];
 				}
 
 				unset($host['items']);
-			}
-
-			if (array_key_exists('lld_rules', $host)) {
-				foreach ($host['lld_rules'] as $lld_rule) {
-					$lld_rules[] = $lld_rule + ['hostid' => ':host:'.$host['host']];
-				}
-
-				unset($host['lld_rules']);
-			}
-
-			if (array_key_exists('httptests', $host)) {
-				foreach ($host['httptests'] as $httptest) {
-					$httptests[] = $httptest + ['hostid' => ':host:'.$host['host']];
-				}
-
-				unset($host['httptests']);
 			}
 		}
 		unset($host);
@@ -134,10 +109,7 @@ class CTestDataHelper {
 			self::$objectids['host'][$host['host']] = array_shift($result['hostids']);
 		}
 
-		self::createValueMaps($value_maps);
 		self::createItems($items);
-		self::createLldRules($lld_rules);
-		self::createHttptests($httptests);
 	}
 
 	public static function convertHostReferences(array &$hosts): void {
@@ -145,29 +117,6 @@ class CTestDataHelper {
 		self::convertPropertyReference($hosts, 'groups.groupid');
 		self::convertPropertyReference($hosts, 'templates.templateid');
 		self::convertPropertyReference($hosts, 'proxyid');
-	}
-
-	/**
-	 * @param array $value_maps
-	 */
-	private static function createValueMaps(array $value_maps): void {
-		if (!$value_maps) {
-			return;
-		}
-
-		self::convertValueMapReferences($value_maps);
-
-		$result = CDataHelper::call('valuemap.create', $value_maps);
-
-		foreach ($value_maps as $value_map) {
-			self::$objectids['value_map'][$value_map['name']] = array_shift($result['valuemapids']);
-		}
-	}
-
-	public static function convertValueMapReferences(array &$value_maps): void {
-		self::convertPropertyReference($value_maps, 'valuemapid');
-		self::convertPropertyReference($value_maps, 'hostid');
-
 	}
 
 	/**
@@ -247,356 +196,6 @@ class CTestDataHelper {
 		return $item;
 	}
 
-	/**
-	 * @param array $lld_rules
-	 */
-	private static function createLldRules(array $lld_rules): void {
-		if (!$lld_rules) {
-			return;
-		}
-
-		$host_refs = [];
-		$item_prototypes = [];
-		$host_prototypes = [];
-		$trigger_prototypes = [];
-		$graph_prototypes = [];
-
-		foreach ($lld_rules as $i => &$lld_rule) {
-			$host_refs[$i] = $lld_rule['hostid'];
-
-			$lld_rule = self::prepareLldRule($lld_rule);
-			$rule_reference = ['ruleid' => ':lld_rule:'.$lld_rule['key_'].$host_refs[$i]];
-
-			if (array_key_exists('item_prototypes', $lld_rule)) {
-				foreach ($lld_rule['item_prototypes'] as $item_prototype) {
-					$item_prototypes[] = $item_prototype + ['hostid' => $host_refs[$i]] + $rule_reference;
-				}
-
-				unset($lld_rule['item_prototypes']);
-			}
-
-			if (array_key_exists('trigger_prototypes', $lld_rule)) {
-				foreach ($lld_rule['trigger_prototypes'] as $alias => $trigger_prototype) {
-					$trigger_prototypes[$alias] = $trigger_prototype;
-				}
-
-				unset($lld_rule['trigger_prototypes']);
-			}
-
-			if (array_key_exists('host_prototypes', $lld_rule)) {
-				foreach ($lld_rule['host_prototypes'] as $host_prototype) {
-					$host_prototypes[] = $host_prototype + $rule_reference;
-				}
-
-				unset($lld_rule['host_prototypes']);
-			}
-
-			if (array_key_exists('graph_prototypes', $lld_rule)) {
-				foreach ($lld_rule['graph_prototypes'] as $alias => $graph_prototype) {
-					$graph_prototypes[$alias] = $graph_prototype + $rule_reference;
-				}
-
-				unset($lld_rule['graph_prototypes']);
-			}
-		}
-		unset($lld_rule);
-
-		self::convertLldRuleReferences($lld_rules);
-
-		$result = CDataHelper::call('discoveryrule.create', $lld_rules);
-
-		foreach ($lld_rules as $i => $lld_rule) {
-			self::$objectids['lld_rule'][$lld_rule['key_']][$host_refs[$i]] = array_shift($result['itemids']);
-		}
-
-		self::createItemPrototypes($item_prototypes);
-		self::createTriggerPrototypes($trigger_prototypes);
-		self::createGraphPrototypes($graph_prototypes);
-		self::createHostPrototypes($host_prototypes);
-	}
-
-	public static function convertLldRuleReferences(array &$lld_rules): void {
-		self::convertPropertyReference($lld_rules, 'itemid');
-		self::convertPropertyReference($lld_rules, 'hostid');
-		self::convertPropertyReference($lld_rules, 'interfaceid');
-		self::convertPropertyReference($lld_rules, 'master_itemid');
-	}
-
-	/**
-	 * @param array $lld_rule
-	 *
-	 * @return array
-	 */
-	public static function prepareLldRule(array $lld_rule): array {
-		$lld_rule += [
-			'name' => $lld_rule['key_'],
-			'type' => array_key_exists('master_itemid', $lld_rule) ? ITEM_TYPE_DEPENDENT : ITEM_TYPE_TRAPPER
-		];
-
-		return $lld_rule;
-	}
-
-	/**
-	 * @param array $lld_rule
-	 * @param int   $from
-	 * @param int   $to
-	 *
-	 * @return array
-	 */
-	public static function prepareLldRuleSet(array $lld_rule, int $from, int $to): array {
-		if ($from > $to) {
-			throw new Exception('Incorrect range parameters.');
-		}
-
-		$bracket_pos = strpos($lld_rule['key_'], '[');
-		$lld_rules = [];
-
-		for ($i = $from; $i <= $to; $i++) {
-			$key_ = $bracket_pos === false
-				? $lld_rule['key_'].'.'.$i
-				: substr_replace($lld_rule['key_'], '.'.$i, $bracket_pos, 0);
-
-			$lld_rules[] = self::prepareLldRule(['key_' => $key_] + $lld_rule);
-		}
-
-		return $lld_rules;
-	}
-
-	private static function createHttptests(array $httptests): void {
-		if (!$httptests) {
-			return;
-		}
-
-		$host_refs = [];
-
-		foreach ($httptests as $i => &$httptest) {
-			$host_refs[$i] = $httptest['hostid'];
-		}
-		unset($httptest);
-
-		self::convertHttptestReferences($httptests);
-
-		$result = CDataHelper::call('httptest.create', $httptests);
-
-		foreach ($httptests as $i => $httptest) {
-			self::$objectids['httptest'][$httptest['name']][$host_refs[$i]] = array_shift($result['httptestids']);
-		}
-	}
-
-	/**
-	 * @param array $httptest
-	 */
-	public static function convertHttptestReferences(array &$httptest): void {
-		self::convertPropertyReference($httptest, 'httptestid');
-		self::convertPropertyReference($httptest, 'hostid');
-	}
-
-	/**
-	 * @param array $items
-	 */
-	private static function createItemPrototypes(array $items): void {
-		if (!$items) {
-			return;
-		}
-
-		$host_refs = [];
-		$discovered_items = [];
-		$item_indexes = [];
-
-		foreach ($items as $i => &$item) {
-			$host_refs[$i] = $item['hostid'];
-
-			$item = self::prepareItemPrototype($item);
-
-			if (array_key_exists('discovered_items', $item)) {
-				foreach ($item['discovered_items'] as $discovered_item) {
-					$discovered_items[] = $discovered_item + [
-						'hostid' => $host_refs[$i],
-						'item_prototypeid' => ':item_prototype:'.$item['key_']
-					];
-				}
-
-				unset($item['discovered_items']);
-			}
-
-			$item_indexes[$item['ruleid']][':item_prototype:'.$item['key_']] = $i;
-		}
-		unset($item);
-
-		$dep_items = [];
-
-		foreach ($items as $i => $item) {
-			if ($item['type'] == ITEM_TYPE_DEPENDENT
-					&& strpos($item['master_itemid'], ':item_prototype:') === 0) {
-				if (!array_key_exists($item['ruleid'], $item_indexes)
-						|| !array_key_exists($item['master_itemid'], $item_indexes[$item['ruleid']])) {
-					throw new Exception(sprintf('Wrong master item ID for item prototype with key "%1$s" on "%2$s".',
-						$item['key_'], $host_refs[$i]
-					));
-				}
-
-				$dep_items[$item_indexes[$item['ruleid']][$item['master_itemid']]][$i] = $item;
-
-				unset($items[$i]);
-			}
-		}
-
-		do {
-			self::convertItemPrototypeReferences($items);
-
-			$result = CDataHelper::call('itemprototype.create', $items);
-
-			$_items = [];
-
-			foreach ($items as $i => $item) {
-				self::$objectids['item_prototype'][$item['key_']][$host_refs[$i]] = array_shift($result['itemids']);
-
-				if (array_key_exists($i, $dep_items)) {
-					$_items += $dep_items[$i];
-				}
-			}
-		} while ($items = $_items);
-
-		self::createDiscoveredItems($discovered_items);
-	}
-
-	public static function convertItemPrototypeReferences(array &$items): void {
-		self::convertPropertyReference($items, 'itemid');
-		self::convertPropertyReference($items, 'hostid');
-		self::convertPropertyReference($items, 'ruleid');
-		self::convertPropertyReference($items, 'valuemapid');
-		self::convertPropertyReference($items, 'interfaceid');
-		self::convertPropertyReference($items, 'master_itemid');
-	}
-
-	/**
-	 * @param array $item
-	 *
-	 * @return array
-	 */
-	public static function prepareItemPrototype(array $item): array {
-		$item += [
-			'name' => $item['key_'],
-			'type' => array_key_exists('master_itemid', $item) ? ITEM_TYPE_DEPENDENT : ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_STR
-		];
-
-		return $item;
-	}
-
-	/**
-	 * @param array $item
-	 * @param int   $from
-	 * @param int   $to
-	 *
-	 * @return array
-	 *
-	 * @throws Exception
-	 */
-	public static function prepareItemPrototypeSet(array $item, int $from, int $to): array {
-		if ($from > $to) {
-			throw new Exception('Incorrect range parameters.');
-		}
-
-		$bracket_pos = strpos($item['key_'], '[');
-		$items = [];
-
-		for ($i = $from; $i <= $to; $i++) {
-			$key_ = $bracket_pos === false
-				? $item['key_'].'.'.$i
-				: substr_replace($item['key_'], '.'.$i, $bracket_pos, 0);
-
-			$items[] = self::prepareItemPrototype(['key_' => $key_] + $item);
-		}
-
-		return $items;
-	}
-
-	/**
-	 * @param array $discovered_items
-	 */
-	private static function createDiscoveredItems(array $discovered_items): void {
-		if (!$discovered_items) {
-			return;
-		}
-
-		$host_refs = [];
-		$item_indexes = [];
-		$item_prototypeids = [];
-
-		foreach ($discovered_items as $i => &$item) {
-			$host_refs[$i] = $item['hostid'];
-
-			$item = self::prepareItem($item);
-
-			$item_indexes[$item['item_prototypeid']][':discovered_item:'.$item['key_']] = $i;
-
-			$item_prototypeids[$i] = $item['item_prototypeid'];
-			unset($item['item_prototypeid']);
-		}
-		unset($item);
-
-		$dep_items = [];
-
-		foreach ($discovered_items as $i => &$item) {
-			if ($item['type'] == ITEM_TYPE_DEPENDENT && strpos($item['master_itemid'], ':discovered_item:') === 0) {
-				if (!array_key_exists($item_prototypeids[$i], $item_indexes)
-						|| !array_key_exists($item['master_itemid'], $item_indexes[$item_prototypeids[$i]])) {
-					throw new Exception(sprintf('Wrong master item ID for discovered item with key "%1$s" on "%2$s".',
-						$item['key_'], $host_refs[$i]
-					));
-				}
-
-				$dep_items[$item_indexes[$item_prototypeids[$i]][$item['master_itemid']]][$i] = $item;
-
-				unset($discovered_items[$i]);
-			}
-		}
-		unset($item);
-
-		do {
-			self::convertDiscoveredItemReferences($discovered_items);
-
-			$result = CDataHelper::call('item.create', $discovered_items);
-
-			$item_discoveries = [];
-			$_discovered_items = [];
-
-			foreach ($discovered_items as $i => $item) {
-				$itemid = $result['itemids'][$i];
-
-				self::$objectids['discovered_item'][$item['key_']][$host_refs[$i]] = $itemid;
-				$item_discoveries[] = [
-					'itemid' => $itemid,
-					'parent_itemid' => $item_prototypeids[$i],
-					'key_' => $item['key_']
-				];
-
-				if (array_key_exists($i, $dep_items)) {
-					$_discovered_items += $dep_items[$i];
-				}
-			}
-
-			self::convertPropertyReference($item_discoveries, 'parent_itemid');
-
-			DB::insert('item_discovery', $item_discoveries);
-
-			DB::update('items', [
-				'values' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
-				'where' => ['itemid' => $result['itemids']]
-			]);
-		} while ($discovered_items = $_discovered_items);
-	}
-
-	public static function convertDiscoveredItemReferences(array &$discovered_items): void {
-		self::convertPropertyReference($discovered_items, 'itemid');
-		self::convertPropertyReference($discovered_items, 'hostid');
-		self::convertPropertyReference($discovered_items, 'item_prototypeid');
-		self::convertPropertyReference($discovered_items, 'valuemapid');
-		self::convertPropertyReference($discovered_items, 'interfaceid');
-		self::convertPropertyReference($discovered_items, 'master_itemid');
-	}
-
 	private static function createTriggers(array $triggers): void {
 		if (!$triggers) {
 			return;
@@ -618,90 +217,24 @@ class CTestDataHelper {
 		self::convertPropertyReferenceForObjects($triggers, 'dependencies.triggerid');
 	}
 
-	private static function createTriggerPrototypes(array $triggers): void {
-		if (!$triggers) {
-			return;
-		}
-
-		$trigger_aliases = array_keys($triggers);
-
-		self::convertTriggerPrototypeReferences($triggers);
-
-		$result = CDataHelper::call('triggerprototype.create', array_values($triggers));
-
-		foreach ($trigger_aliases as $trigger_alias) {
-			self::$objectids['trigger_prototype'][$trigger_alias] = array_shift($result['triggerids']);
-		}
-	}
-
-	public static function convertTriggerPrototypeReferences(array &$triggers): void {
-		self::convertPropertyReferenceForObjects($triggers, 'triggerid');
-		self::convertPropertyReferenceForObjects($triggers, 'dependencies.triggerid');
-	}
-
-
-	/**
-	 * @param array $graph_prototypes
-	 */
-	private static function createGraphPrototypes(array &$graph_prototypes): void {
-		if (!$graph_prototypes) {
-			return;
-		}
-
-		self::convertGraphPrototypeReferences($graph_prototypes);
-
-		$result = CDataHelper::call('graphprototype.create', array_values($graph_prototypes));
-
-		foreach ($graph_prototypes as $alias => &$graph_prototype) {
-			$graph_prototype['graphid'] = array_shift($result['graphids']);
-
-			self::$objectids['graph_prototype'][$alias] = $graph_prototype['graphid'];
-		}
-		unset($graph_prototype);
-	}
-
-	public static function convertGraphPrototypeReferences(array &$graph_prototypes): void {
-		self::convertPropertyReferenceForObjects($graph_prototypes, 'graphid');
-		self::convertPropertyReferenceForObjects($graph_prototypes, 'gitems.itemid');
-	}
-
-	/**
-	 * @param array $host_prototypes
-	 */
-	private static function createHostPrototypes(array &$host_prototypes): void {
-		if (!$host_prototypes) {
-			return;
-		}
-
-		self::convertHostPrototypeReferences($host_prototypes);
-
-		$result = CDataHelper::call('hostprototype.create', array_values($host_prototypes));
-
-		foreach ($host_prototypes as &$host_prototype) {
-			$host_prototype['hostid'] = array_shift($result['hostids']);
-
-			self::$objectids['host_prototype'][$host_prototype['host']] = $host_prototype['hostid'];
-		}
-		unset($host_prototype);
-	}
-
-	public static function convertHostPrototypeReferences(array &$host_prototypes): void {
-		self::convertPropertyReference($host_prototypes, 'hostid');
-		self::convertPropertyReference($host_prototypes, 'ruleid');
-		self::convertPropertyReference($host_prototypes, 'groupLinks.groupid');
-		self::convertPropertyReference($host_prototypes, 'templates.templateid');
-	}
-
 	private static function createRoles(array $roles): void {
 		if (!$roles) {
 			return;
 		}
+
+		self::convertRoleReferences($roles);
 
 		$result = CDataHelper::call('role.create', $roles);
 
 		foreach ($roles as $role) {
 			self::$objectids['role'][$role['name']] = array_shift($result['roleids']);
 		}
+	}
+
+	public static function convertRoleReferences(array &$roles): void {
+		self::convertPropertyReference($roles, 'roleid');
+		self::convertPropertyReference($roles, 'users.userid');
+		self::convertPropertyReference($roles, 'users.roleid');
 	}
 
 	private static function createUserGroups(array $user_groups): void {
@@ -729,6 +262,8 @@ class CTestDataHelper {
 			return;
 		}
 
+		$medias = [];
+
 		foreach ($users as &$user) {
 			$user += [
 				'roleid' => end(self::$objectids['role']),
@@ -736,6 +271,10 @@ class CTestDataHelper {
 					['usrgrpid' => end(self::$objectids['user_group'])]
 				]
 			];
+
+			if (array_key_exists('medias', $user)) {
+				$medias[$user['username']] = true;
+			}
 		}
 		unset($user);
 
@@ -746,12 +285,30 @@ class CTestDataHelper {
 		foreach ($users as $user) {
 			self::$objectids['user'][$user['username']] = array_shift($result['userids']);
 		}
+
+		if ($medias) {
+			$result = CDataHelper::call('user.get', [
+				'userids' => array_intersect_key(self::$objectids['user'], $medias),
+				'output' => ['username'],
+				'selectMedias' => ['mediaid', 'sendto']
+			]);
+
+			foreach ($result as $user) {
+				foreach ($user['medias'] as $media) {
+					foreach ($media['sendto'] as $email) {
+						self::$objectids['media'][$email][$user['username']] = $media['mediaid'];
+					}
+				}
+			}
+		}
 	}
 
 	public static function convertUserReferences(array &$users): void {
 		self::convertPropertyReference($users, 'userid');
 		self::convertPropertyReference($users, 'roleid');
 		self::convertPropertyReference($users, 'usrgrps.usrgrpid');
+		self::convertPropertyReference($users, 'medias.mediaid');
+		self::convertPropertyReference($users, 'role.roleid');
 	}
 
 	private static function createActions(array $actions): void {
@@ -794,6 +351,104 @@ class CTestDataHelper {
 		self::convertPropertyReference($actions, 'operations.opcommand_hst.hostid');
 		self::convertPropertyReference($actions, 'operations.opgroup.groupid');
 		self::convertPropertyReference($actions, 'operations.optemplate.templateid');
+	}
+
+	private static function createEvents(array $events): void {
+		if (!$events) {
+			return;
+		}
+
+		foreach ($events as &$event) {
+			$event = self::prepareEvent($event);
+		}
+		unset($event);
+
+		self::convertEventReferences($events);
+
+		$result = DB::insert('events', array_values($events));
+
+		foreach ($events as $alias => $event) {
+			self::$objectids['event'][$alias] = array_shift($result);
+		}
+	}
+
+	/**
+	 * @param array $event
+	 *
+	 * @return array
+	 */
+	public static function prepareEvent(array $event): array {
+		$time = time();
+
+		return $event + ($event['source'] == EVENT_SOURCE_TRIGGERS
+			? [
+				'object' => EVENT_OBJECT_TRIGGER,
+				'objectid' => end(self::$objectids['trigger']),
+				'clock' => $time,
+				'value' => $time
+			]
+			: [
+				'clock' => $time,
+				'value' => $time
+			]
+		);
+	}
+
+	public static function convertEventReferences(array &$events): void {
+		self::convertPropertyReferenceForObjects($events, 'objectid');
+	}
+
+	private static function createAlerts(array $alerts): void {
+		if (!$alerts) {
+			return;
+		}
+
+		foreach ($alerts as &$alert) {
+			$alert = self::prepareAlert($alert);
+		}
+		unset($alert);
+
+		self::convertAlertReferences($alerts);
+
+		$result = DB::insert('alerts', array_values($alerts));
+
+		foreach ($alerts as $alias => $alert) {
+			self::$objectids['alert'][$alias] = array_shift($result);
+		}
+	}
+
+	/**
+	 * @param array $alert
+	 *
+	 * @return array
+	 */
+	public static function prepareAlert(array $alert): array {
+		$defaults = [
+			'clock' => time(),
+			'message' => '',
+			'parameters' => ''
+		];
+
+		if (array_key_exists('action', self::$objectids)) {
+			$defaults['actionid'] = end(self::$objectids['action']);
+		}
+
+		if (array_key_exists('event', self::$objectids)) {
+			$defaults['eventid'] = end(self::$objectids['event']);
+		}
+
+		if (array_key_exists('user', self::$objectids)) {
+			$defaults['userid'] = end(self::$objectids['user']);
+		}
+
+		return $alert + $defaults;
+	}
+
+	public static function convertAlertReferences(array &$alerts): void {
+		self::convertPropertyReferenceForObjects($alerts, 'alertid');
+		self::convertPropertyReferenceForObjects($alerts, 'actionid');
+		self::convertPropertyReferenceForObjects($alerts, 'eventid');
+		self::convertPropertyReferenceForObjects($alerts, 'userid');
 	}
 
 	/**
@@ -840,7 +495,7 @@ class CTestDataHelper {
 				}
 				unset($_object);
 			}
-			else {
+			elseif (array_key_exists($sub_property, $object[$property])) {
 				self::convertValueReference($object[$property][$sub_property]);
 			}
 		}
@@ -894,13 +549,13 @@ class CTestDataHelper {
 	/**
 	 * Check for, and replace a reference ID in the given value with the corresponding object's record ID.
 	 *
-	 * @param string $value  The value possibly containing the reference. In case of matching object names (e.g. item
+	 * @param mixed $value  The value possibly containing the reference. In case of matching object names (e.g. item
 	 *                       inherited from template to host), the contained reference should include further specific
 	 *                       parent object references, e.g.: `:item:item.key:host:my.name` vs
 	 *                       `:items:item.key:template:my.name`.
 	 * @param bool  $unset   Whether to unset the value from the $objectids array, if it is convertible.
 	 */
-	private static function convertValueReference(string &$value, bool $unset = false): void {
+	private static function convertValueReference(&$value, bool $unset = false): void {
 		if (!is_string($value) || $value === '' || $value[0] !== ':') {
 			return;
 		}
@@ -981,6 +636,14 @@ class CTestDataHelper {
 	 * Delete inserted objects from the database and reset internal data.
 	 */
 	public static function cleanUp(): void {
+		if (array_key_exists('alert', self::$objectids)) {
+			DB::delete('alerts', ['alertid' => array_values(self::$objectids['alert'])]);
+		}
+
+		if (array_key_exists('event', self::$objectids)) {
+			DB::delete('events', ['eventid' => array_values(self::$objectids['event'])]);
+		}
+
 		if (array_key_exists('action', self::$objectids)) {
 			CDataHelper::call('action.delete', array_values(self::$objectids['action']));
 		}
@@ -1006,5 +669,54 @@ class CTestDataHelper {
 		}
 
 		self::$objectids = [];
+	}
+
+	public static function getObjectFields(array $object, array $fields, ?array $except_fields = []) {
+		$object = array_intersect_key($object, array_flip($fields));
+
+		foreach ($except_fields as $path) {
+			$nested_object = &$object;
+
+			while (true) {
+				[$field, $path] = explode('.', $path, 2);
+
+				if (!array_key_exists($field, $nested_object)) {
+					break;
+				}
+
+				$nested_object = &$nested_object[$field];
+
+				if (strpos($path, '.') === false) {
+					if (array_key_exists($path, $nested_object)) {
+						unset($nested_object[$path]);
+					}
+					else {
+						foreach ($nested_object as &$_object) {
+							unset($_object[$path]);
+						}
+						unset($_object);
+					}
+
+					break;
+				}
+			}
+			unset($nested_object);
+		}
+
+		return $object;
+	}
+
+	/**
+	 * Replace any references in the given array. Note that convert{Object}References methods are preferred for results.
+	 *
+	 * @param array $array
+	 */
+	public static function resolveRequestReferences(array &$array) {
+		foreach ($array as &$value) {
+			is_array($value)
+				? self::resolveRequestReferences($value)
+				: self::convertValueReference($value);
+		}
+		unset($value);
 	}
 }
