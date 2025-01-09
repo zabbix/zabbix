@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -31,6 +31,8 @@ class testFormTotpEnroll extends CWebTest {
 	protected static $mfa_id;
 	protected static $user_id;
 
+	// Maps built in PHP algorithms to Zabbix API. Key - string shown screen. Value - number used in Zabbix API.
+	// ToDo: This should probably be moved to CMfaTotpHelper.php instead.
 	protected static $algo_map = [
 		SHA_1 => TOTP_HASH_SHA1,
 		SHA_256 => TOTP_HASH_SHA256,
@@ -71,9 +73,10 @@ class testFormTotpEnroll extends CWebTest {
 	 * Assert elements and layout in the enroll form (the form with QR code).
 	 */
 	public function testFormTotpEnroll_Layout() {
+		// Open the MFA enroll form.
 		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
 
-		// The container contains most elements.
+		// Container of most elements.
 		$container = $this->page->query('class:signin-container')->one();
 
 		// Assert Zabbix logo.
@@ -93,15 +96,13 @@ class testFormTotpEnroll extends CWebTest {
 		$this->assertEquals(1, preg_match($regex, $qr_code->getAttribute('title'), $matches), 'Failed to assert the QR code url.');
 		// Save the secret string for later.
 		$secret = $matches[1];
-		// Assert the QR image visible.
+		// Assert the QR code image.
 		$qr_img = $qr_code->query('tag:img')->one();
 		$this->assertTrue($qr_img->isVisible());
 		$this->assertEquals("Scan me!", $qr_img->getAttribute('alt'));
 
 		// Assert the description text.
-		$this->validateDescription(SHA_1);
-		// Assert the secret is visible.
-		$this->assertTrue($container->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($secret).']')->one()->isVisible());
+		$this->assertEnrollDescription($container, SHA_1, $secret);
 
 		// Assert 'Verification code' label.
 		$label = $container->query('xpath:.//label[@for="verification_code"]')->one();
@@ -148,9 +149,11 @@ class testFormTotpEnroll extends CWebTest {
 			],
 			[
 				[
-					// SHA-256 algorithm.
+					// All MFA settings different.
 					'mfa_data' => [
+						'name' => 'Different TOTP method name',
 						'hash_function' => SHA_256,
+						'code_length' => TOTP_CODE_LENGTH_8
 					]
 				]
 			],
@@ -177,8 +180,24 @@ class testFormTotpEnroll extends CWebTest {
 	 * @onBefore      prepareEnrollData
 	 */
 	public function testFormTotpEnroll_Enroll($data) {
+		// Open the enroll form.
 		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
 
+		// Get elements.
+		$container = $this->page->query('class:signin-container')->one();
+		$qr_code = $container->query('class:qr-code')->one();
+
+		// Assert the QR code and get the secret string.
+		$regex = $this->buildExpectedQrCodeUrlRegex(
+			CTestArrayHelper::get($data, 'mfa_data.name', self::DEFAULT_METHOD_NAME),
+			self::USER_NAME,
+			CTestArrayHelper::get($data, 'mfa_data.hash_function', self::DEFAULT_ALGO),
+			CTestArrayHelper::get($data, 'mfa_data.code_length', self::DEFAULT_TOTP_CODE_LENGTH)
+		);
+		$this->assertEquals(1, preg_match($regex, $qr_code->getAttribute('title'), $matches), 'Failed to assert the QR code url.');
+		$secret = $matches[1];
+
+		var_dump($secret);
 	}
 
 	/**
@@ -200,19 +219,32 @@ class testFormTotpEnroll extends CWebTest {
 	}
 
 	/**
-	 * Validatest the description text under the QR code.
+	 * Asserts the description text under the QR code.
 	 *
-	 * @param string $algorithm    the cryptographic algorithm that should be displayed
+	 * @param CElement $container    container element that should contain the description
+	 * @param string   $algorithm    the cryptographic algorithm that should be displayed
+	 * @param string   $secret       the secret that should be displayed
 	 */
-	protected function validateDescription($algorithm) {
+	protected function assertEnrollDescription($container, $algorithm, $secret) {
 		$description = 'Unable to scan? You can use '.strtoupper($algorithm).
-				' secret key to manually configure your authenticator app:';
-		$this->assertTrue($this->page->query('xpath:.//div[text()='.
-				CXPathHelper::escapeQuotes($description).']')->one()->isVisible()
+			' secret key to manually configure your authenticator app:';
+		$this->assertTrue($container->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($description).
+			']')->one()->isVisible()
 		);
+
+		// Assert the secret is visible.
+		$this->assertTrue($container->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($secret).']')
+			->one()->isVisible());
 	}
 
-	protected function readSecret() {
+	/**
+	 * Gets the secret string from the enroll form.
+	 */
+	protected function getSecretString() {
+		$title = $this->page->query('class:qr-code')->one()->getAttribute('title');
+		$regex = $this->buildExpectedQrCodeUrlRegex('.+', '.+', '.+', '.+');
 
+		// Return either the secret or null.
+		return preg_match($regex, $title, $matches) ? $matches[1] : null;
 	}
 }
