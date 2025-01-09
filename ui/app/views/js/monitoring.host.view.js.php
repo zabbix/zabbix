@@ -76,9 +76,7 @@
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_OPEN
 				},
-				callback: () => {
-					this.unscheduleRefresh();
-				}
+				callback: () => this.unscheduleRefresh()
 			});
 
 			ZABBIX.EventHub.subscribe({
@@ -86,9 +84,7 @@
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_CANCEL
 				},
-				callback: () => {
-					this.scheduleRefresh();
-				}
+				callback: () => this.scheduleRefresh()
 			});
 
 			ZABBIX.EventHub.subscribe({

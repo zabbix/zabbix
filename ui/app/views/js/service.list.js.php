@@ -113,9 +113,7 @@
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_OPEN
 				},
-				callback: () => {
-					this.#pauseRefresh();
-				}
+				callback: () => this.#pauseRefresh()
 			});
 
 			ZABBIX.EventHub.subscribe({
@@ -123,9 +121,7 @@
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_CANCEL
 				},
-				callback: () => {
-					this.#resumeRefresh();
-				}
+				callback: () => this.#resumeRefresh()
 			});
 
 			ZABBIX.EventHub.subscribe({

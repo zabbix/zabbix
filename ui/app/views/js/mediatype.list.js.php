@@ -65,9 +65,7 @@
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
-				callback: () => {
-					uncheckTableRows('mediatype');
-				}
+				callback: () => uncheckTableRows('mediatype')
 			});
 		}
 

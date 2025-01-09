@@ -49,9 +49,7 @@
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
-				callback: () => {
-					uncheckTableRows('httpconf_'+ view.checkbox_hash, [], false);
-				}
+				callback: () => uncheckTableRows('httpconf_'+ view.checkbox_hash, [], false)
 			});
 		}
 	};

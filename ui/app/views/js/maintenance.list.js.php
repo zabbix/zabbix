@@ -116,9 +116,7 @@
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
-				callback: () => {
-					uncheckTableRows('maintenance');
-				}
+				callback: () => uncheckTableRows('maintenance')
 			});
 		}
 	};
