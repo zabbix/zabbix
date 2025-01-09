@@ -187,7 +187,7 @@
 				this.#addEventListeners();
 			}
 
-			this.#registerSubscribers();
+			this.#initPopupListeners();
 		}
 
 		#activateHostDashboardNavigation() {
@@ -370,7 +370,7 @@
 				});
 		}
 
-		#registerSubscribers() {
+		#initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

@@ -20,7 +20,7 @@
 
 		init() {
 			this.#initActions();
-			this.#registerSubscribers();
+			this.#initPopupListeners();
 		}
 
 		#initActions() {
@@ -54,7 +54,7 @@
 				});
 		}
 
-		#registerSubscribers() {
+		#initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

@@ -52,7 +52,7 @@
 			this.initTabFilter(filter_options);
 			this.initExpandableSubfilter();
 			this.initListActions();
-			this.registerSubscribers();
+			this.initPopupListeners();
 
 			if (this.refresh_interval != 0 && this.filter_set) {
 				this.running = true;
@@ -120,7 +120,7 @@
 			});
 		},
 
-		registerSubscribers() {
+		initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

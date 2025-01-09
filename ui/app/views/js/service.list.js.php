@@ -46,7 +46,7 @@
 			this.#initTagFilter();
 			this.#initActions();
 			this.#initRefresh();
-			this.#registerSubscribers();
+			this.#initPopupListeners();
 		}
 
 		#initViewModeSwitcher() {
@@ -107,7 +107,7 @@
 			}
 		}
 
-		#registerSubscribers() {
+		#initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

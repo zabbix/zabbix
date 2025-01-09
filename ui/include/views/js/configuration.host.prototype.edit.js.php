@@ -39,7 +39,7 @@
 			this.initMacrosTab();
 			this.initInventoryTab();
 			this.initEncryptionTab();
-			this.#registerSubscribers();
+			this.#initPopupListeners();
 		}
 
 		initHostTab() {
@@ -203,7 +203,7 @@
 			jQuery('input[name=tls_connect]').trigger('change');
 		}
 
-		#registerSubscribers() {
+		#initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

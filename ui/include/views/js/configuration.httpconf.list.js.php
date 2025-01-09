@@ -40,10 +40,10 @@
 			// Init existing fields once loaded.
 			document.querySelectorAll('#filter-tags .form_row').forEach(row => new CTagFilterItem(row));
 
-			this.registerSubscribers();
+			this.initPopupListeners();
 		},
 
-		registerSubscribers() {
+		initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

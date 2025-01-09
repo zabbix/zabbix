@@ -33,7 +33,7 @@
 			this.form = document.forms[form_name];
 
 			this.initEvents();
-			this.registerSubscribers();
+			this.initPopupListeners();
 		},
 
 		initEvents() {
@@ -118,7 +118,7 @@
 				});
 		},
 
-		registerSubscribers() {
+		initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

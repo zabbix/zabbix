@@ -29,7 +29,7 @@
 		init() {
 			this.#initTagFilter();
 			this.#initActions();
-			this.#registerSubscribers();
+			this.#initPopupListeners();
 		}
 
 		#initTagFilter() {
@@ -163,7 +163,7 @@
 				});
 		}
 
-		#registerSubscribers() {
+		#initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

@@ -48,7 +48,7 @@
 				}
 			});
 
-			this.#registerSubscribers();
+			this.#initPopupListeners();
 		}
 
 		#enable(target, druleids, massenable = false) {
@@ -143,7 +143,7 @@
 				});
 		}
 
-		#registerSubscribers() {
+		#initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

@@ -49,7 +49,7 @@
 
 			this.initExpandables();
 			this.initEvents();
-			this.registerSubscribers();
+			this.initPopupListeners();
 
 			if (this.refresh_interval != 0) {
 				this.running = true;
@@ -194,7 +194,7 @@
 			ZABBIX.PopupManager.open('acknowledge.edit', {eventids}, {supports_standalone: true});
 		},
 
-		registerSubscribers() {
+		initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

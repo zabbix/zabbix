@@ -56,10 +56,10 @@
 				}
 			});
 
-			this.#registerSubscribers();
+			this.#initPopupListeners();
 		}
 
-		#registerSubscribers() {
+		#initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

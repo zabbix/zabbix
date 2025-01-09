@@ -34,7 +34,7 @@
 				}
 			});
 
-			this.#registerSubscribers();
+			this.#initPopupListeners();
 		}
 
 		delete(target, groupids) {
@@ -93,7 +93,7 @@
 				});
 		}
 
-		#registerSubscribers() {
+		#initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

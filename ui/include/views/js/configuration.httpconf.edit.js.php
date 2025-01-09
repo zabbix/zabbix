@@ -77,7 +77,7 @@
 			}
 
 			this.#updateForm();
-			this.#registerSubscribers();
+			this.#initPopupListeners();
 		}
 
 		#initTemplates() {
@@ -237,7 +237,7 @@
 			}
 		}
 
-		#registerSubscribers() {
+		#initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

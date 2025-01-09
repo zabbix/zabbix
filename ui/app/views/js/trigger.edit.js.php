@@ -52,7 +52,7 @@ window.trigger_edit_popup = new class {
 		}
 
 		this.#initActions();
-		this.#registerSubscribers();
+		this.#initPopupListeners();
 		this.#initTriggersTab();
 		this.#changeRecoveryMode();
 		this.#changeCorrelationMode();
@@ -184,7 +184,7 @@ window.trigger_edit_popup = new class {
 		})
 	}
 
-	#registerSubscribers() {
+	#initPopupListeners() {
 		const subscriptions = [];
 
 		for (const action of ['template.edit', 'trigger.edit', 'trigger.prototype.edit']) {

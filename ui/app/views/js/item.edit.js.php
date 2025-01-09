@@ -83,7 +83,7 @@ window.item_edit_form = new class {
 
 		this.initForm(field_switches);
 		this.initEvents();
-		this.#registerSubscribers();
+		this.#initPopupListeners();
 
 		if (this.source === 'itemprototype') {
 			this.initItemPrototypeForm();
@@ -275,7 +275,7 @@ window.item_edit_form = new class {
 		});
 	}
 
-	#registerSubscribers() {
+	#initPopupListeners() {
 		const subscriptions = [];
 
 		for (const action of ['template.edit', 'proxy.edit', 'item.edit', 'item.prototype.edit']) {

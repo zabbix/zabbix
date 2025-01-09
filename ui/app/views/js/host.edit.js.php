@@ -53,7 +53,7 @@ window.host_edit_popup = {
 
 		this.initial_form_fields = getFormFields(this.form);
 		this.initEvents();
-		this.registerSubscribers();
+		this.initPopupListeners();
 	},
 
 	initEvents() {
@@ -67,7 +67,7 @@ window.host_edit_popup = {
 		});
 	},
 
-	registerSubscribers() {
+	initPopupListeners() {
 		const subscriptions = [];
 
 		for (const action of ['template.edit', 'proxy.edit', 'item.edit']) {

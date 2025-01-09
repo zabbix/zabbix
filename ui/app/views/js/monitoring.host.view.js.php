@@ -45,7 +45,7 @@
 
 			this.initTabFilter(filter_options);
 			this.initEvents();
-			this.registerSubscribers();
+			this.initPopupListeners();
 
 			this.host_view_form = $('form[name=host_view]');
 			this.running = true;
@@ -70,7 +70,7 @@
 			});
 		},
 
-		registerSubscribers() {
+		initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

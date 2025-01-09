@@ -220,7 +220,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			});
 
 			this.updateLostResourcesFields();
-			this.registerSubscribers();
+			this.initPopupListeners();
 		},
 
 		updateLostResourcesFields() {
@@ -341,7 +341,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			post(url.getUrl(), fields);
 		},
 
-		registerSubscribers() {
+		initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

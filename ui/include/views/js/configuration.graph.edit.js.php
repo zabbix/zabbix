@@ -494,7 +494,7 @@
 
 			!this.graphs.readonly && this.rewriteNameLinks();
 
-			this.registerSubscribers();
+			this.initPopupListeners();
 		},
 
 		loadItem(item) {
@@ -654,7 +654,7 @@
 			post(url.getUrl(), fields);
 		},
 
-		registerSubscribers() {
+		initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

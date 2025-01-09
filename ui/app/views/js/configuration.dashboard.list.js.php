@@ -24,10 +24,10 @@
 
 		init({checkbox_hash}) {
 			this.checkbox_hash = checkbox_hash;
-			this.#registerSubscribers();
+			this.#initPopupListeners();
 		}
 
-		#registerSubscribers() {
+		#initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

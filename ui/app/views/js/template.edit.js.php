@@ -46,7 +46,7 @@ window.template_edit_popup = new class {
 		this.#initActions();
 		this.#initTemplateTab();
 		this.#initMacrosTab();
-		this.#registerSubscribers();
+		this.#initPopupListeners();
 
 		this.initial_form_fields = getFormFields(this.form);
 	}
@@ -129,7 +129,7 @@ window.template_edit_popup = new class {
 		}
 	}
 
-	#registerSubscribers() {
+	#initPopupListeners() {
 		const subscriptions = [];
 
 		subscriptions.push(

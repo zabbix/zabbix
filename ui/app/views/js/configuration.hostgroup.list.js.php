@@ -31,7 +31,7 @@
 			this.delete_url = delete_url;
 
 			this.initActionButtons();
-			this.registerSubscribers();
+			this.initPopupListeners();
 		},
 
 		initActionButtons() {
@@ -126,7 +126,7 @@
 				});
 		},
 
-		registerSubscribers() {
+		initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

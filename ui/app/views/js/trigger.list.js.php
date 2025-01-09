@@ -34,7 +34,7 @@
 
 			this.#initFilter();
 			this.#initActions();
-			this.#registerSubscribers();
+			this.#initPopupListeners();
 		}
 
 		#initFilter() {
@@ -99,7 +99,7 @@
 			});
 		}
 
-		#registerSubscribers() {
+		#initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

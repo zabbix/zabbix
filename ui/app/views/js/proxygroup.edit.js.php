@@ -48,10 +48,10 @@ window.proxy_group_edit_popup = new class {
 		return_url.searchParams.set('action', 'proxygroup.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
-		this.#registerSubscribers();
+		this.#initPopupListeners();
 	}
 
-	#registerSubscribers() {
+	#initPopupListeners() {
 		const subscriptions = [];
 
 		subscriptions.push(

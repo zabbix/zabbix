@@ -33,7 +33,7 @@
 
 			this.initFilter();
 			this.initEvents();
-			this.registerSubscribers();
+			this.initPopupListeners();
 		},
 
 		enable(target, parameters) {
@@ -198,7 +198,7 @@
 			});
 		},
 
-		registerSubscribers() {
+		initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

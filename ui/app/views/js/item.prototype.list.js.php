@@ -30,7 +30,7 @@
 
 			this.initFilterForm();
 			this.initEvents();
-			this.#registerSubscribers();
+			this.#initPopupListeners();
 		}
 
 		initFilterForm() {
@@ -152,7 +152,7 @@
 			);
 		}
 
-		#registerSubscribers() {
+		#initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

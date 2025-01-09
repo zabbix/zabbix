@@ -122,7 +122,7 @@
 				ZABBIX.Dashboard.editProperties();
 			}
 
-			this.registerSubscribers();
+			this.initPopupListeners();
 		},
 
 		save() {
@@ -208,7 +208,7 @@
 			window.removeEventListener('beforeunload', this.events.beforeUnload);
 		},
 
-		registerSubscribers() {
+		initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

@@ -38,7 +38,7 @@
 
 			this.initForm(field_switches);
 			this.initEvents();
-			this.#registerSubscribers();
+			this.#initPopupListeners();
 		}
 
 		initForm(field_switches) {
@@ -232,7 +232,7 @@
 				});
 		}
 
-		#registerSubscribers() {
+		#initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

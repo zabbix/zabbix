@@ -29,7 +29,7 @@
 			this.#updateMultiselect($filter_groups);
 
 			this.#initActions();
-			this.#registerSubscribers();
+			this.#initPopupListeners();
 		}
 
 		#initActions() {
@@ -110,7 +110,7 @@
 			$ms.multiSelect('setDisabledEntries', [...$ms.multiSelect('getData').map((entry) => entry.id)]);
 		}
 
-		#registerSubscribers() {
+		#initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,

@@ -24,7 +24,7 @@
 
 		init() {
 			this.#initActionButtons();
-			this.#registerSubscribers();
+			this.#initPopupListeners();
 			this.expiresDaysHandler();
 		}
 
@@ -39,7 +39,7 @@
 			});
 		}
 
-		#registerSubscribers() {
+		#initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,
