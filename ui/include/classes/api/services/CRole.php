@@ -381,7 +381,7 @@ class CRole extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkDuplicates(array $roles, array $db_roles = null): void {
+	private function checkDuplicates(array $roles, ?array $db_roles = null): void {
 		$names = [];
 
 		foreach ($roles as $role) {
@@ -414,7 +414,7 @@ class CRole extends CApiService {
 	 *
 	 * @throws APIException if input is invalid.
 	 */
-	private function checkRules(array $roles, array $db_roles = null): void {
+	private function checkRules(array $roles, ?array $db_roles = null): void {
 		foreach ($roles as $role) {
 			if (!array_key_exists('rules', $role)) {
 				continue;
@@ -441,7 +441,7 @@ class CRole extends CApiService {
 
 	 * @throws APIException
 	 */
-	private static function checkUiRules(string $name, int $type, array $rules, array $db_rules = null): void {
+	private static function checkUiRules(string $name, int $type, array $rules, ?array $db_rules = null): void {
 		if (!array_key_exists('ui', $rules)) {
 			return;
 		}
@@ -491,7 +491,7 @@ class CRole extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkServicesRules(string $name, int $type, array $rules, array $db_rules = null): void {
+	private function checkServicesRules(string $name, int $type, array $rules, ?array $db_rules = null): void {
 		$this->checkServicesReadRules($name, $rules, $db_rules);
 		$this->checkServicesWriteRules($name, $type, $rules, $db_rules);
 
@@ -539,7 +539,7 @@ class CRole extends CApiService {
 
 	 * @throws APIException
 	 */
-	private function checkServicesReadRules(string $name, array $rules, array $db_rules = null): void {
+	private function checkServicesReadRules(string $name, array $rules, ?array $db_rules = null): void {
 		if (!array_key_exists('services.read.mode', $rules)
 				&& !array_key_exists('services.read.list', $rules)
 				&& !array_key_exists('services.read.tag', $rules)) {
@@ -612,7 +612,7 @@ class CRole extends CApiService {
 
 	 * @throws APIException
 	 */
-	private function checkServicesWriteRules(string $name, int $type, array $rules, array $db_rules = null): void {
+	private function checkServicesWriteRules(string $name, int $type, array $rules, ?array $db_rules = null): void {
 		if (!array_key_exists('services.write.mode', $rules)
 				&& !array_key_exists('services.write.list', $rules)
 				&& !array_key_exists('services.write.tag', $rules)) {
@@ -837,7 +837,7 @@ class CRole extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function updateRules(array $roles, array $db_roles = null): void {
+	private function updateRules(array $roles, ?array $db_roles = null): void {
 		$default_rules = [
 			'ui' => [],
 			'ui.default_access' => ZBX_ROLE_RULE_ENABLED,
