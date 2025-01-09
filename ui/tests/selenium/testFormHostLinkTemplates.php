@@ -43,7 +43,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 					'standalone' => 'true'
 				]
 			],
-			// #1 Attach Template to Host from Data collection -> Hosts
+			// #1 Attach Template to Host from Inventory -> Hosts
 			[
 				'fields' => [
 					'link' => 'zabbix.php?action=host.list',
@@ -225,12 +225,14 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 			$this->query('link', $data['name'])->waitUntilVisible()->one()->click();
 			$form = $this->query('id:templates-form')->asForm()->waitUntilVisible()->one();
 		}
+		elseif ($data['link'] === 'zabbix.php?action=host.view') {
+			$this->page->login()->open($data['link'])->waitUntilReady();
+			$this->query('link', $data['name'])->waitUntilVisible()->asPopupButton()->one()->select('Configuration');
+			$form = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
+		}
 		else {
 			$this->page->login()->open($data['link'])->waitUntilReady();
 			$this->query('link', $data['name'])->waitUntilVisible()->one()->click();
-			if ($this->query('class:menu-popup')->exists()) {
-				$this->query('class:menu-popup')->query('link:Configuration')->one()->click();
-			}
 			$form = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
 		}
 
@@ -250,11 +252,11 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		if (CTestArrayHelper::get($data, 'standalone') && $data['entity'] === 'Host') {
 			$this->page->open($data['link'].$hostid)->waitUntilReady();
 		}
+		elseif ($data['link'] === 'zabbix.php?action=host.view') {
+			$this->query('link', $data['name'])->waitUntilVisible()->asPopupButton()->one()->select('Configuration');
+		}
 		else {
 			$this->query('link', $data['name'])->waitUntilVisible()->one()->click();
-			if ($this->query('class:menu-popup')->exists()) {
-				$this->query('class:menu-popup')->query('link:Configuration')->one()->click();
-			}
 		}
 		$form->query('id:linked-templates')->asTable()->one()->findRow('Name', $template)->getColumn('Action')
 				->query('button:Unlink')->one()->click();
@@ -269,9 +271,11 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->assertMessage(TEST_GOOD, $data['entity'].' updated');
 
 		// Check that template is linked successfully.
-		$this->query('link', $data['name'])->waitUntilVisible()->one()->click();
-		if ($this->query('class:menu-popup')->exists()) {
-			$this->query('class:menu-popup')->query('link:Configuration')->one()->click();
+		if($data['link'] === 'zabbix.php?action=host.view') {
+			$this->query('link', $data['name'])->waitUntilVisible()->asPopupButton()->one()->select('Configuration');
+		}
+		else {
+			$this->query('link', $data['name'])->waitUntilVisible()->one()->click();
 		}
 		$this->assertTrue($form->query('link', $template)->exists());
 	}
