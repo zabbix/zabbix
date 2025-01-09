@@ -250,7 +250,7 @@
 			<arg line="--set ON_ERROR_STOP=1"/>
 			<arg line="-c 'create extension if not exists timescaledb cascade;'"/>
 		</exec>
-		<exec executable="psql" input="database/postgresql/timescaledb.sql" failonerror="on">
+		<exec executable="psql" input="database/postgresql/timescaledb/schema.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
 			<arg line="-h '${dbhost}'"/>
