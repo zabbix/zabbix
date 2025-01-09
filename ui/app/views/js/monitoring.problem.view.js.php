@@ -183,7 +183,7 @@
 		},
 
 		initEvents() {
-			document.querySelector('.wrapper').addEventListener('click', e => {
+			document.addEventListener('click', e => {
 				if (e.target.classList.contains('js-massupdate-problem')) {
 					this.massupdate({eventids: Object.keys(chkbxRange.getSelectedIds())});
 				}
