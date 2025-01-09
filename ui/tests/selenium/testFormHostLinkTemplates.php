@@ -231,7 +231,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 			if ($this->query('class:menu-popup')->exists()) {
 				$this->query('class:menu-popup')->query('link:Configuration')->one()->click();
 			}
-			$form = COverlayDialogElement::find()->asForm()->waitUntilPresent()->one();
+			$form = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
 		}
 
 		// Check if template is linked from previous test runs and removes it.
