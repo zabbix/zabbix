@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -38,7 +38,7 @@
 #define VER_PRODUCTVERSION_STR	ZBX_STR(ZABBIX_VERSION_MAJOR) "." ZBX_STR(ZABBIX_VERSION_MINOR) "." \
 					ZBX_STR(ZABBIX_VERSION_PATCH) ZABBIX_VERSION_RC "\0"
 #define VER_COMPANYNAME_STR	"Zabbix SIA\0"
-#define VER_LEGALCOPYRIGHT_STR	"Copyright (C) 2001-2024 " VER_COMPANYNAME_STR
+#define VER_LEGALCOPYRIGHT_STR	"Copyright (C) 2001-2025 " VER_COMPANYNAME_STR
 #define VER_PRODUCTNAME_STR	"Zabbix\0"
 
 // Next default values for new objects

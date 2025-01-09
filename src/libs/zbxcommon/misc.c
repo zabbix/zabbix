@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -211,7 +211,7 @@ void	*zbx_guaranteed_memset(void *v, int c, size_t n)
 }
 
 static const char	copyright_message[] =
-	"Copyright (C) 2024 Zabbix SIA\n"
+	"Copyright (C) 2025 Zabbix SIA\n"
 	"License AGPLv3: GNU Affero General Public License version 3 <https://www.gnu.org/licenses/>.\n"
 	"This is free software: you are free to change and redistribute it according to\n"
 	"the license. There is NO WARRANTY, to the extent permitted by law.";
