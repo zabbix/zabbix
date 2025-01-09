@@ -183,23 +183,15 @@
 		},
 
 		initEvents() {
-			$(document).on('submit', '#problem_form', e => {
-				e.preventDefault();
-
-				ZABBIX.PopupManager.setCurrentUrl(location.href);
-
-				const eventids = Object.keys(chkbxRange.getSelectedIds());
-
-				ZABBIX.PopupManager.open('acknowledge.edit', {eventids});
-
-				const url = new Curl('zabbix.php');
-
-				url.setArgument('action', 'popup');
-				url.setArgument('popup', 'acknowledge.edit');
-				url.setArgument('eventids', eventids);
-
-				history.replaceState(null, '', url.getUrl());
+			document.querySelector('.wrapper').addEventListener('click', e => {
+				if (e.target.classList.contains('js-massupdate-problem')) {
+					this.massupdate({eventids: Object.keys(chkbxRange.getSelectedIds())});
+				}
 			});
+		},
+
+		massupdate({eventids}) {
+			ZABBIX.PopupManager.open('acknowledge.edit', {eventids}, {supports_standalone: true});
 		},
 
 		registerSubscribers() {
@@ -208,9 +200,7 @@
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_OPEN
 				},
-				callback: () => {
-					this.unscheduleRefresh();
-				}
+				callback: () => this.unscheduleRefresh()
 			});
 
 			ZABBIX.EventHub.subscribe({
@@ -218,9 +208,7 @@
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_CANCEL
 				},
-				callback: () => {
-					this.scheduleRefresh();
-				}
+				callback: () => this.scheduleRefresh()
 			});
 
 			ZABBIX.EventHub.subscribe({
@@ -233,16 +221,12 @@
 
 					clearMessages();
 
-					if (chkbxRange.prefix === 'problem') {
-						chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
-						chkbxRange.clearSelectedOnFilterChange();
-					}
-
 					if ('success' in data.submit) {
 						addMessage(makeMessageBox('good', data.submit.success.messages, data.submit.success.title));
 					}
 
-					uncheckTableRows('problem');
+					chkbxRange.checkObjectAll('eventids', false);
+					chkbxRange.update('eventids');
 
 					this.refreshResults();
 					this.refreshCounters();

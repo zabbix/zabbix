@@ -1151,10 +1151,13 @@ class CScreenProblem extends CScreenBase {
 
 			$footer = new CActionButtonList('action', 'eventids', [
 				'acknowledge.edit' => [
-					'name' => _('Mass update'),
-					'disabled' => !($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
+					'content' => (new CSimpleButton(_('Mass update')))
+						->addClass(ZBX_STYLE_BTN_ALT)
+						->addClass('js-massupdate-problem')
+						->addClass('js-no-chkbxrange')
+						->setEnabled($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
 							|| $allowed['close'] || $allowed['suppress_problems'] || $allowed['rank_change']
-					)
+						)
 				]
 			], 'problem');
 
