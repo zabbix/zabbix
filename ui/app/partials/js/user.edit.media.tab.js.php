@@ -141,17 +141,16 @@
 			for (;severity < <?= TRIGGER_SEVERITY_COUNT ?>; severity++) {
 				const media_active = (data.severity & (1 << severity)) !== 0;
 				const span = severities_span[severity];
-				const hintboxData = {hintbox: 1, hintboxContents: this.severity_config.names[severity]};
+				const hintboxData = {hintbox: 1, hintboxContents: t(this.severity_config.names[severity])};
 
 				if (media_active) {
 					span.classList.replace('<?= ZBX_STYLE_STATUS_DISABLED ?>', this.severity_config.colors[severity]);
-					hintboxData.hintboxContents += ' (on)';
+					hintboxData.hintboxContents += ` (${t('on')})`;
 				} else {
 					span.classList.replace(this.severity_config.colors[severity], '<?= ZBX_STYLE_STATUS_DISABLED ?>');
-					hintboxData.hintboxContents += ' (off)';
+					hintboxData.hintboxContents += ` (${t('off')})`;
 				}
-
-				hintboxData.hintboxContents = t(hintboxData.hintboxContents)
+                
 				Object.assign(span.dataset, hintboxData);
 			}
 		}
