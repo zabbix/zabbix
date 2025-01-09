@@ -150,7 +150,11 @@ class CLdap {
 
 		$this->bound = static::BIND_NONE;
 
-		if (!$this->ds = @ldap_connect($this->cnf['host'], $this->cnf['port'])) {
+		$uri = $this->cnf['ldap_start_tls'] === ZBX_AUTH_START_TLS_OFF
+			? printf('ldap://%s:%s', $this->cnf['host'], $this->cnf['port'])
+			: printf('ldaps://%s:%s', $this->cnf['host'], $this->cnf['port']);
+
+		if (!$this->ds = @ldap_connect($uri)) {
 			$this->error = static::ERR_SERVER_UNAVAILABLE;
 
 			return false;
