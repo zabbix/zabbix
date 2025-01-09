@@ -193,6 +193,10 @@ class CPopupManager {
 					return;
 				}
 
+				if (CPopupManager.#origin_url !== null) {
+					history.replaceState(null, '', CPopupManager.#origin_url);
+				}
+
 				const cancel_event = new CPopupManagerEvent({
 					data: {action_parameters, popup_options, reuse_existing, supports_standalone},
 					descriptor: {
@@ -225,9 +229,6 @@ class CPopupManager {
 
 						location.href = location.href;
 					}
-					else {
-						history.replaceState(null, '', CPopupManager.#origin_url);
-					}
 				}
 				else {
 					const redirect_url = cancel_event.getRedirectUrl() || CPopupManager.#return_url;
@@ -239,6 +240,10 @@ class CPopupManager {
 			}
 
 			CPopupManager.#on_submit = e => {
+				if (CPopupManager.#origin_url !== null) {
+					history.replaceState(null, '', CPopupManager.#origin_url);
+				}
+
 				const submit_event = new CPopupManagerEvent({
 					data: {action_parameters, popup_options, reuse_existing, supports_standalone, submit: e.detail},
 					descriptor: {
@@ -260,10 +265,6 @@ class CPopupManager {
 				ZABBIX.EventHub.publish(end_scripting_event);
 
 				if (submit_event.isDefaultPrevented()) {
-					if (CPopupManager.#origin_url !== null) {
-						history.replaceState(null, '', CPopupManager.#origin_url);
-					}
-
 					return;
 				}
 
@@ -276,7 +277,11 @@ class CPopupManager {
 				}
 
 				if (CPopupManager.#origin_url !== null) {
-					history.replaceState(null, '', submit_event.getRedirectUrl() || CPopupManager.#origin_url);
+					const redirect_url = submit_event.getRedirectUrl();
+
+					if (redirect_url !== null) {
+						history.replaceState(null, '', redirect_url);
+					}
 
 					location.href = location.href;
 				}
