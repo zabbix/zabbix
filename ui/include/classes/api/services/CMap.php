@@ -3497,7 +3497,7 @@ class CMap extends CMapElement {
 				}
 				else {
 					$trigger_linkids = [];
-					$itemids = [];
+					$item_linkids = [];
 
 					foreach ($links as &$link) {
 						if ($link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER) {
@@ -3506,7 +3506,7 @@ class CMap extends CMapElement {
 						}
 						elseif ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
 							$link['permission'] = PERM_NONE;
-							$itemids[$link['itemid']][] = $link['linkid'];
+							$item_linkids[$link['itemid']][] = $link['linkid'];
 						}
 						else {
 							$link['permission'] = PERM_READ;
@@ -3544,14 +3544,14 @@ class CMap extends CMapElement {
 						}
 					}
 
-					if ($itemids) {
+					if ($item_linkids) {
 						$db_items = API::Item()->get([
 							'output' => [],
-							'itemids' => array_keys($itemids),
+							'itemids' => array_keys($item_linkids),
 							'preservekeys' => true
 						]);
 
-						foreach ($itemids as $itemid => $linkids) {
+						foreach ($item_linkids as $itemid => $linkids) {
 							if (array_key_exists($itemid, $db_items)) {
 								foreach ($linkids as $linkid) {
 									$links[$linkid]['permission'] = PERM_READ;
