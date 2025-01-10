@@ -24,6 +24,9 @@ use PragmaRX\Google2FA\Support\Constants;
  */
 class CUser extends CApiService {
 
+	// Acceptable execution time of internal login process, microseconds.
+	public const ACCEPTABLE_LOGIN_TIME = 1000000;
+
 	public const ACCESS_RULES = [
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
 		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
@@ -47,6 +50,9 @@ class CUser extends CApiService {
 	];
 
 	private const PROVISIONED_FIELDS = ['username', 'name', 'surname', 'usrgrps', 'medias', 'roleid'];
+
+	private static $login_start_time;
+	private static $microseconds_per_second = 1000000;
 
 	/**
 	 * Get users data.
@@ -2059,6 +2065,8 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		self::$login_start_time = microtime(true);
+
 		$db_users = self::findLoginUsersByUsername($data['username']);
 
 		$created = !$db_users && $data['username'] !== ZBX_GUEST_USER
@@ -2515,6 +2523,7 @@ class CUser extends CApiService {
 			CAudit::RESOURCE_USER
 		);
 
+		self::equalizeLoginTime();
 		self::exception($code, $error);
 	}
 
@@ -3573,5 +3582,17 @@ class CUser extends CApiService {
 		}
 
 		return ['userids' => $userids];
+	}
+
+	private static function equalizeLoginTime() {
+		if (self::$login_start_time === null) {
+			return;
+		}
+
+		$delay_microseconds = self::ACCEPTABLE_LOGIN_TIME
+			- intval((microtime(true) - self::$login_start_time) * self::$microseconds_per_second);
+
+		sleep(intdiv($delay_microseconds, self::$microseconds_per_second));
+		usleep($delay_microseconds % self::$microseconds_per_second);
 	}
 }
