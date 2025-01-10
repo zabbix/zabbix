@@ -6,6 +6,7 @@ New features:
 .......PS. [ZBXNEXT-9622] added top.peak in diaginfo to identify items with highest task queue (vso)
 
 Bug fixes:
+........S. [ZBX-24549] improved Elasticsearch performance by querying in time intervals and not calling index refresh; added slow query log; fixed queries not working with 8.16.1 (vso)
 .......P.. [ZBX-25782] fixed Zabbix proxy failing to create database on RHEL (dgoloscapov)
 ........S. [ZBX-25797] fixed Zabbix server crash during autoregistration (arimdjonoks)
 .......PS. [ZBX-25776] fixed Zabbix server crash when testing some internal items (arimdjonoks)
@@ -59,6 +60,7 @@ Changes for 7.2.3rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-24549] improved Elasticsearch performance by querying in time intervals and not calling index refresh; added slow query log; fixed queries not working with 8.16.1 (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.2.2
@@ -269,6 +271,7 @@ Changes for 7.0.9rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-24549] improved Elasticsearch performance by querying in time intervals and not calling index refresh; added slow query log; fixed queries not working with 8.16.1 (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.8
