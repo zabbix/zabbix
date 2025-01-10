@@ -4519,6 +4519,12 @@ return [
 				'length' => 6,
 				'default' => '000000'
 			],
+			'type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
 			'threshold' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -4530,12 +4536,6 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => ''
-			],
-			'type' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
 			]
 		]
 	],
