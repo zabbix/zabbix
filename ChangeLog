@@ -3,6 +3,7 @@ Changes for 5.0.46rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-25296] removed overzealous preprocessor tests for LIBRESSL_VERSION_NUMBER (jxl)
 .......PS. [ZBX-25633] fixed crash if macro is used in allowed hosts (vso)
 
 --------------------------------------------------------------------------------
