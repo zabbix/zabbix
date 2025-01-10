@@ -24,6 +24,9 @@
  */
 class CUser extends CApiService {
 
+	// Acceptable execution time of internal login process, microseconds.
+	public const ACCEPTABLE_LOGIN_TIME = 1000000;
+
 	public const ACCESS_RULES = [
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
 		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
@@ -38,6 +41,9 @@ class CUser extends CApiService {
 	protected $tableName = 'users';
 	protected $tableAlias = 'u';
 	protected $sortColumns = ['userid', 'username', 'alias']; // Field "alias" is deprecated in favor for "username".
+
+	private static $login_start_time;
+	private static $microseconds_per_second = 1000000;
 
 	/**
 	 * Get users data.
@@ -1540,6 +1546,8 @@ class CUser extends CApiService {
 			GROUP_GUI_ACCESS_DISABLED => CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE)
 		];
 
+		self::$login_start_time = microtime(true);
+
 		$user_data = $this->findAccessibleUser($user['username'],
 			(CAuthenticationHelper::get(CAuthenticationHelper::LDAP_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
 			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE), true
@@ -1550,6 +1558,7 @@ class CUser extends CApiService {
 				CWebUser::getIp(), $user['username'], CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER
 			);
 
+			self::equalizeLoginTime();
 			self::exception(ZBX_API_ERROR_PARAMETERS, $user_data['error']);
 		}
 
@@ -1565,6 +1574,7 @@ class CUser extends CApiService {
 					CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER
 				);
 
+				self::equalizeLoginTime();
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('Incorrect user name or password or account is temporarily blocked.')
 				);
@@ -1614,12 +1624,14 @@ class CUser extends CApiService {
 				);
 
 				if ($attempt_failed >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
+					self::equalizeLoginTime();
 					self::exception(ZBX_API_ERROR_PERMISSIONS,
 						_('Incorrect user name or password or account is temporarily blocked.')
 					);
 				}
 			}
 
+			self::equalizeLoginTime();
 			self::exception(ZBX_API_ERROR_PERMISSIONS, $e->getMessage());
 		}
 
@@ -2234,5 +2246,13 @@ class CUser extends CApiService {
 		}
 
 		return true;
+	}
+
+	private static function equalizeLoginTime() {
+		$delay_microseconds = self::ACCEPTABLE_LOGIN_TIME
+			- intval((microtime(true) - self::$login_start_time) * self::$microseconds_per_second);
+
+		sleep(intdiv($delay_microseconds, self::$microseconds_per_second));
+		usleep($delay_microseconds % self::$microseconds_per_second);
 	}
 }
