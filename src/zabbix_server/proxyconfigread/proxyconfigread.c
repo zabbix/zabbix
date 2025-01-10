@@ -353,7 +353,8 @@ out:
 	return ret;
 }
 
-static int	proxyconfig_get_config_table_data(const zbx_dc_proxy_t *proxy, struct zbx_json *j, char **error)
+static int	proxyconfig_get_config_table_data(const zbx_dc_proxy_t *proxy, struct zbx_json *j, char **error,
+				uint64_t proxy_secrets_provider)
 {
 	zbx_db_result_t			result;
 	zbx_db_row_t			row;
@@ -394,6 +395,14 @@ static int	proxyconfig_get_config_table_data(const zbx_dc_proxy_t *proxy, struct
 		{
 			if (0 == (table->fields[i].flags & ZBX_PROXY))
 				continue;
+
+			if (0 == strncmp(table->fields[i].name, ZBX_PROTO_TAG_PROXY_SECRETS_PROVIDER,
+				ZBX_CONST_STRLEN(ZBX_PROTO_TAG_PROXY_SECRETS_PROVIDER)))
+			{
+				zbx_json_adduint64(j, NULL, proxy_secrets_provider);
+				fld++;
+				continue;
+			}
 
 			if (0 == strncmp(table->fields[i].name, "timeout_", ZBX_CONST_STRLEN("timeout_")))
 			{
@@ -451,7 +460,7 @@ static int	proxyconfig_get_config_table_data(const zbx_dc_proxy_t *proxy, struct
 				}
 
 				zbx_json_addstring(j, NULL, timeout_value, ZBX_JSON_TYPE_STRING);
-
+				fld++;
 				continue;
 			}
 
@@ -1197,7 +1206,8 @@ static int	proxyconfig_get_tables(zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_conf
 		zbx_uint64_t hostmap_revision, const char *failover_delay, const zbx_vector_uint64_t *del_hostproxyids,
 		const zbx_config_vault_t *config_vault, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, struct zbx_json *j, zbx_proxyconfig_status_t *status, char **error)
+		const char *config_ssl_key_location, struct zbx_json *j, zbx_proxyconfig_status_t *status,
+		zbx_uint64_t proxy_secrets_provider, char **error)
 {
 #define ZBX_PROXYCONFIG_SYNC_HOSTS		0x0001
 #define ZBX_PROXYCONFIG_SYNC_GMACROS		0x0002
@@ -1337,7 +1347,7 @@ static int	proxyconfig_get_tables(zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_conf
 		}
 
 		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_CONFIG) &&
-				SUCCEED != proxyconfig_get_config_table_data(proxy, j, error))
+				SUCCEED != proxyconfig_get_config_table_data(proxy, j, error, proxy_secrets_provider))
 		{
 			goto out;
 		}
@@ -1430,8 +1440,11 @@ static int	proxyconfig_get_tables(zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_conf
 
 	if (0 != keys_paths.values_num)
 	{
-		get_macro_secrets(&keys_paths, j, config_vault, config_source_ip, config_ssl_ca_location,
-				config_ssl_cert_location, config_ssl_key_location);
+		if (ZBX_PROXY_SECRETS_PROVIDER_SERVER == proxy_secrets_provider)
+		{
+			get_macro_secrets(&keys_paths, j, config_vault, config_source_ip, config_ssl_ca_location,
+					config_ssl_cert_location, config_ssl_key_location);
+		}
 	}
 
 	if (0 == flags && 0 == removed_hostids.values_num && 0 == del_macro_hostids.values_num)
@@ -1478,10 +1491,11 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 {
 	int			ret = FAIL;
 	char			token[ZBX_SESSION_TOKEN_SIZE + 1], tmp[ZBX_MAX_UINT64_LEN + 1], *failover_delay = NULL;
-	zbx_uint64_t		proxy_config_revision, proxy_hostmap_revision, hostmap_revision;
+	zbx_uint64_t		proxy_config_revision, proxy_hostmap_revision, hostmap_revision, proxy_secrets_provider;
 	zbx_dc_revision_t	dc_revision;
 	zbx_vector_uint64_t	del_hostproxyids;
 	unsigned char		hostmap_sync;
+	zbx_config_t		cfg;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxyid:" ZBX_FS_UI64, __func__, proxy->proxyid);
 
@@ -1516,8 +1530,22 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 	else
 		proxy_hostmap_revision = 0;
 
+	if (SUCCEED == zbx_json_value_by_name(jp_request, ZBX_PROTO_TAG_PROXY_SECRETS_PROVIDER, tmp, sizeof(tmp), NULL))
+	{
+		if (SUCCEED != zbx_is_uint64(tmp, &proxy_secrets_provider))
+		{
+			*error = zbx_dsprintf(NULL, "invalid proxy_secrets_provider: %s", tmp);
+			goto out;
+		}
+	}
+	else
+		proxy_secrets_provider = 0;
+
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_PROXY_SECRETS_PROVIDER);
+
 	if (0 != zbx_dc_register_config_session(proxy->proxyid, token, proxy_config_revision, &dc_revision) ||
-			0 == proxy_config_revision)
+			0 == proxy_config_revision || ((int)proxy_secrets_provider != cfg.proxy_secrets_provider &&
+			proxy_secrets_provider == ZBX_PROXY_SECRETS_PROVIDER_PROXY))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() forcing full proxy configuration sync", __func__);
 		proxy_config_revision = 0;
@@ -1544,7 +1572,8 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 		if (SUCCEED != (ret = proxyconfig_get_tables(proxy, proxy_config_revision, &dc_revision,
 				hostmap_sync, proxy_hostmap_revision, hostmap_revision, failover_delay,
 				&del_hostproxyids, config_vault, config_source_ip, config_ssl_ca_location,
-				config_ssl_cert_location, config_ssl_key_location, j, status, error)))
+				config_ssl_cert_location, config_ssl_key_location, j, status, cfg.proxy_secrets_provider,
+				error)))
 		{
 			goto out;
 		}
