@@ -326,7 +326,7 @@ in:
 out:
   data_out: [["First", "1"], ["Fourth", "4"], ["Second", "2"], ["Third", "3"]]
 ---
-test case: "36. zbx_tag sort all ASCII"
+test case: "36. zbx_tag sort some ASCII"
 in:
   vector_type: "zbx_tag"
   func_type: "sort"
@@ -351,7 +351,7 @@ in:
 out:
   index: 0
 ---
-test case: "39. zbx_tag nearestindex all ASCII"
+test case: "39. zbx_tag nearestindex some ASCII"
 in:
   vector_type: "zbx_tag"
   func_type: "nearestindex"
@@ -360,7 +360,7 @@ in:
 out:
   index: 1
 ---
-test case: "40. zbx_tag bsearch all ASCII"
+test case: "40. zbx_tag bsearch some ASCII"
 in:
   vector_type: "zbx_tag"
   func_type: "bsearch"
@@ -388,7 +388,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: "43. zbx_tag lsearch all ASCII"
+test case: "43. zbx_tag lsearch some ASCII"
 in:
   vector_type: "zbx_tag"
   func_type: "lsearch"
@@ -407,7 +407,7 @@ in:
 out:
   index: 2
 ---
-test case: "45. zbx_tag search all ASCII"
+test case: "45. zbx_tag search some ASCII"
 in:
   vector_type: "zbx_tag"
   func_type: "search"

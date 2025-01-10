@@ -477,8 +477,7 @@ void	zbx_mock_extract_yaml_values_str(const char *path, zbx_vector_str_t *values
 			fail_msg("Cannot read value #%d: %s", value_num, zbx_mock_error_string(err));
 		}
 
-		char	*dup_value = zbx_strdup(NULL, value);
-		zbx_vector_str_append(values, dup_value);
+		zbx_vector_str_append(values, zbx_strdup(NULL, value));
 
 		value_num++;
 	}
@@ -487,7 +486,7 @@ void	zbx_mock_extract_yaml_values_str(const char *path, zbx_vector_str_t *values
 /******************************************************************************
  *                                                                            *
  * Parameters: path   - [IN]  YAML path                                       *
- *             values - [OUT] ptr vector                                      *
+ *             values - [OUT]                                                 *
  *                                                                            *
  ******************************************************************************/
 void	zbx_mock_extract_yaml_values_ptr (zbx_mock_handle_t hdata, zbx_vector_ptr_t *values)

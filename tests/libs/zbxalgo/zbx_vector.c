@@ -23,10 +23,10 @@
 static void	free_tag_vector(zbx_vector_tags_ptr_t v)
 {
 	for (int i = 0; i < v.values_num; i++)
-	{
-		zbx_tag_t	*tag = v.values[i];
-		zbx_free_tag(tag);
-	}
+		zbx_free_tag(v.values[i]);
+
+	zbx_vector_tags_ptr_clear(&v);
+	zbx_vector_tags_ptr_destroy(&v);
 }
 
 static int	zbx_default_uint32_compare_func(const void *d1, const void *d2)
@@ -563,10 +563,6 @@ void	zbx_mock_test_entry(void **state)
 				dump_debug_info_tag(vector_in, vector_out);
 
 			zbx_mock_assert_int_eq("return value", SUCCEED, compare_vectors_tag(vector_in, vector_out));
-			free_tag_vector(vector_out);
-			zbx_vector_tags_ptr_clear(&vector_out);
-			zbx_vector_tags_ptr_destroy(&vector_out);
-			free_tag_vector(vector_in);
 		}
 
 		if (SUCCEED == zbx_strcmp_natural(func_type, "append_array"))
@@ -580,7 +576,7 @@ void	zbx_mock_test_entry(void **state)
 
 			if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("array", &handle_in_tag)))
 			{
-				fail_msg("failed to extract tag %s", zbx_mock_error_string(error));
+				fail_msg("failed to extract tags array %s", zbx_mock_error_string(error));
 				return;
 			}
 
@@ -601,9 +597,6 @@ void	zbx_mock_test_entry(void **state)
 
 			zbx_mock_assert_int_eq("return value", SUCCEED, compare_vectors_tag(vector_in, vector_out));
 			free_tag_vector(vector_out);
-			zbx_vector_tags_ptr_clear(&vector_out);
-			zbx_vector_tags_ptr_destroy(&vector_out);
-			free_tag_vector(vector_in);
 			zbx_free(tags);
 		}
 
@@ -631,9 +624,6 @@ void	zbx_mock_test_entry(void **state)
 
 			zbx_mock_assert_int_eq("return value", SUCCEED, compare_vectors_tag(vector_in, vector_out));
 			free_tag_vector(vector_out);
-			zbx_vector_tags_ptr_clear(&vector_out);
-			zbx_vector_tags_ptr_destroy(&vector_out);
-			free_tag_vector(vector_in);
 		}
 
 		if (SUCCEED == zbx_strcmp_natural(func_type, "noorder"))
@@ -662,9 +652,6 @@ void	zbx_mock_test_entry(void **state)
 
 			zbx_mock_assert_int_eq("return value", SUCCEED, compare_vectors_tag(vector_in, vector_out));
 			free_tag_vector(vector_out);
-			zbx_vector_tags_ptr_clear(&vector_out);
-			zbx_vector_tags_ptr_destroy(&vector_out);
-			free_tag_vector(vector_in);
 		}
 
 		if (SUCCEED == zbx_strcmp_natural(func_type, "sort"))
@@ -687,9 +674,6 @@ void	zbx_mock_test_entry(void **state)
 
 			zbx_mock_assert_int_eq("return value", SUCCEED, compare_vectors_tag(vector_in, vector_out));
 			free_tag_vector(vector_out);
-			zbx_vector_tags_ptr_clear(&vector_out);
-			zbx_vector_tags_ptr_destroy(&vector_out);
-			free_tag_vector(vector_in);
 		}
 
 		if (SUCCEED == zbx_strcmp_natural(func_type, "uniq"))
@@ -717,10 +701,6 @@ void	zbx_mock_test_entry(void **state)
 
 			zbx_mock_assert_int_eq("return value", SUCCEED, compare_vectors_tag(vector_copy, vector_out));
 
-			free_tag_vector(vector_in);
-			free_tag_vector(vector_out);
-			zbx_vector_tags_ptr_clear(&vector_out);
-			zbx_vector_tags_ptr_destroy(&vector_out);
 			zbx_vector_tags_ptr_clear(&vector_copy);
 			zbx_vector_tags_ptr_destroy(&vector_copy);
 		}
@@ -761,10 +741,7 @@ void	zbx_mock_test_entry(void **state)
 			int	result = zbx_vector_tags_ptr_bsearch(&vector_in, tag, zbx_compare_tags_and_values);
 
 			zbx_mock_assert_int_eq("return value", index, result);
-			zbx_free(tag->tag);
-			zbx_free(tag->value);
-			zbx_free(tag);
-			free_tag_vector(vector_in);
+			zbx_free_tag(tag);
 		}
 
 		if (SUCCEED == zbx_strcmp_natural(func_type, "lsearch"))
@@ -787,7 +764,6 @@ void	zbx_mock_test_entry(void **state)
 
 			zbx_mock_assert_int_eq("return value", expected_result, result);
 			zbx_free_tag(tag);
-			free_tag_vector(vector_in);
 		}
 
 		if (SUCCEED == zbx_strcmp_natural(func_type, "search"))
@@ -807,10 +783,8 @@ void	zbx_mock_test_entry(void **state)
 
 			zbx_mock_assert_int_eq("return value", expected_result, result);
 			zbx_free_tag(tag);
-			free_tag_vector(vector_in);
 		}
 
-		zbx_vector_tags_ptr_clear(&vector_in);
-		zbx_vector_tags_ptr_destroy(&vector_in);
+		free_tag_vector(vector_in);
 	}
 }

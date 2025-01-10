@@ -267,7 +267,7 @@ static void test_queue_ptr_remove_head_tail(void)
 	zbx_vector_ptr_destroy(&values);
 }
 
-static int get_step_type_int(const char *str)
+static int	get_step_type_int(const char *str)
 {
 	if (0 == strcmp(str, "RANGE"))
 		return RANGE;
