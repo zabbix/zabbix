@@ -60,7 +60,7 @@ class CWidgetMap extends CWidget {
 			this.#sysmapid = sysmapid;
 			this.#map_svg = null;
 		}
-		else if (sysmapid != this.#sysmapid) {
+		else if (this.#sysmapid !== null && sysmapid != this.#sysmapid) {
 			this.feedback({sysmapid: [this.#sysmapid]});
 		}
 
