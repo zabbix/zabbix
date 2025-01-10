@@ -94,14 +94,14 @@ class testFormTotpEnroll extends CWebTest {
 		);
 		$this->assertEquals(1, preg_match($regex, $qr_code->getAttribute('title'), $matches), 'Failed to assert the QR code url.');
 		// Save the secret string for later.
-		$secret = $matches[1];
+		$totp_secret = $matches[1];
 		// Assert the QR code image.
 		$qr_img = $qr_code->query('tag:img')->one();
 		$this->assertTrue($qr_img->isVisible());
 		$this->assertEquals("Scan me!", $qr_img->getAttribute('alt'));
 
 		// Assert the description text.
-		$this->assertEnrollDescription($container, self::DEFAULT_ALGO, $secret);
+		$this->assertEnrollDescription($container, self::DEFAULT_ALGO, $totp_secret);
 
 		// Assert 'Verification code' label.
 		$label = $container->query('xpath:.//label[@for="verification_code"]')->one();
@@ -150,7 +150,7 @@ class testFormTotpEnroll extends CWebTest {
 				[
 					// All MFA settings different.
 					'mfa_data' => [
-						'name' => 'Different TOTP method name',
+						'name' => 'Different name',
 						'hash_function' => TOTP_HASH_SHA256,
 						'code_length' => TOTP_CODE_LENGTH_8
 					]
@@ -182,30 +182,41 @@ class testFormTotpEnroll extends CWebTest {
 		// Open the enroll form.
 		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
 
+		// Get the used TOTP parameters.
+		$totp_name = CTestArrayHelper::get($data, 'mfa_data.name', self::DEFAULT_METHOD_NAME);
+		$totp_algo = CTestArrayHelper::get($data, 'mfa_data.hash_function', self::DEFAULT_ALGO);
+		$totp_code_length = CTestArrayHelper::get($data, 'mfa_data.code_length', self::DEFAULT_TOTP_CODE_LENGTH);
+
 		// Get elements.
-		$container = $this->page->query('class:signin-container')->one();
-		$qr_code = $container->query('class:qr-code')->one();
+		$form = $this->page->query('class:signin-container')->asForm()->one();
+		$qr_code = $form->query('class:qr-code')->one();
 
-		// Assert the QR code and get the secret string.
-		$regex = $this->buildExpectedQrCodeUrlRegex(
-			CTestArrayHelper::get($data, 'mfa_data.name', self::DEFAULT_METHOD_NAME),
-			self::USER_NAME,
-			CTestArrayHelper::get($data, 'mfa_data.hash_function', self::DEFAULT_ALGO),
-			CTestArrayHelper::get($data, 'mfa_data.code_length', self::DEFAULT_TOTP_CODE_LENGTH)
+		// Assert the QR code by validating the title attribute.
+		$regex = $this->buildExpectedQrCodeUrlRegex($totp_name,self::USER_NAME, $totp_algo, $totp_code_length);
+		$this->assertEquals(1, preg_match($regex, urldecode($qr_code->getAttribute('title')), $matches),
+			'Failed to assert the QR code\'s title attribute.'
 		);
-		$this->assertEquals(1, preg_match($regex, $qr_code->getAttribute('title'), $matches), 'Failed to assert the QR code url.');
-		$secret = $matches[1];
+		$totp_secret = $matches[1];
 
-		var_dump($secret);
+		// Assert the description text.
+		$this->assertEnrollDescription($form, $totp_algo, $totp_secret);
+
+		// Fill in the verification code (the TOTP itself).
+		$totp = CMfaTotpHelper::generateTotp($totp_secret, $totp_code_length, $totp_algo);
+		$form->getField('id:verification_code')->fill($totp);
+		$form->query('button:Sign in')->one()->click();
+
+		// Check if login successful.
+
 	}
 
 	/**
 	 * Builds the QR code's URL as a regex string. Regex, because the secret string is not known.
 	 *
-	 * @param string $method_name    the expected TOTP method name
-	 * @param string $user_name      user that is trying to enroll
-	 * @param string $algorithm      the expected Cryptographic algorithm, used for creating tokens
-	 * @param int    $digits         the expected TOTP code length, number of digits
+	 * @param string $method_name    The expected TOTP method name.
+	 * @param string $user_name      User that is trying to enroll.
+	 * @param int    $algorithm      The expected TOTP Cryptographic algorithm.
+	 * @param int    $digits         The expected TOTP code length, number of digits.
 	 *
 	 * @return string    Regex that matches the expected QR code's URL.
 	 */
@@ -220,30 +231,19 @@ class testFormTotpEnroll extends CWebTest {
 	/**
 	 * Asserts the description text under the QR code.
 	 *
-	 * @param CElement $container    container element that should contain the description
-	 * @param string   $algorithm    the cryptographic algorithm that should be displayed
-	 * @param string   $secret       the secret that should be displayed
+	 * @param CElement $container    Container element that should contain the description.
+	 * @param int      $algorithm    The cryptographic algorithm that should be displayed.
+	 * @param string   $secret       The secret that should be displayed.
 	 */
 	protected function assertEnrollDescription($container, $algorithm, $secret) {
 		$description = 'Unable to scan? You can use '.self::$algo_ui_map[$algorithm].
 				' secret key to manually configure your authenticator app:';
-		$this->assertTrue($container->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($description).
-				']')->one()->isVisible()
+		$this->assertTrue($container->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($description).']')
+			->one()->isVisible()
 		);
 
 		// Assert the secret is visible.
 		$this->assertTrue($container->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($secret).']')
 			->one()->isVisible());
-	}
-
-	/**
-	 * Gets the secret string from the enroll form.
-	 */
-	protected function getSecretString() {
-		$title = $this->page->query('class:qr-code')->one()->getAttribute('title');
-		$regex = $this->buildExpectedQrCodeUrlRegex('.+', '.+', '.+', '.+');
-
-		// Return either the secret or null.
-		return preg_match($regex, $title, $matches) ? $matches[1] : null;
 	}
 }
