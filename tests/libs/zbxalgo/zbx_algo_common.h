@@ -12,26 +12,16 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxmocktest.h"
+#ifndef ZBX_ALGO_COMMON
+#define ZBX_ALGO_COMMON
+
 #include "zbxmockdata.h"
-#include "zbxmockassert.h"
-#include "zbxmockutil.h"
 
-#include "zbxip.h"
+void	vector_to_list(zbx_list_t *list, zbx_vector_ptr_t values);
+void	extract_yaml_values_uint64(const char *path, zbx_vector_uint64_t *values);
+int	binary_heap_elem_compare(const void *d1, const void *d2);
+void	dump_binary_heap(const char *name, const zbx_binary_heap_t *heap_in);
+int	binary_heaps_are_same(const zbx_binary_heap_t *heap1_in, const zbx_binary_heap_t *heap2_in);
+void	extract_binary_heap_from_yaml_int(zbx_binary_heap_t *heap, zbx_mock_handle_t *handle);
 
-#include "zbx_ip_common.h"
-
-int	compare_str_vectors(const zbx_vector_str_t *v1, const zbx_vector_str_t *v2)
-{
-	if (v1->values_num != v2->values_num)
-		return FAIL;
-
-	for (int i = 0; i < v1->values_num; i++)
-	{
-		if (0 != strcmp(v1->values[i], v2->values[i]))
-			return FAIL;
-	}
-
-	return SUCCEED;
-}
-
+#endif
