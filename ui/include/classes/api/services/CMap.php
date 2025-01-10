@@ -3500,19 +3500,16 @@ class CMap extends CMapElement {
 					$itemids = [];
 
 					foreach ($links as &$link) {
-						switch ($link['indicator_type']) {
-							case MAP_INDICATOR_TYPE_STATIC_LINK:
-								$link['permission'] = PERM_READ;
-								break;
-
-							case MAP_INDICATOR_TYPE_TRIGGER:
-								$link['permission'] = PERM_NONE;
-								$trigger_linkids[$link['linkid']] = true;
-								break;
-
-							case MAP_INDICATOR_TYPE_ITEM_VALUE:
-								$link['permission'] = PERM_NONE;
-								$itemids[$link['itemid']][] = $link['linkid'];
+						if ($link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER) {
+							$link['permission'] = PERM_NONE;
+							$trigger_linkids[$link['linkid']] = true;
+						}
+						elseif ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+							$link['permission'] = PERM_NONE;
+							$itemids[$link['itemid']][] = $link['linkid'];
+						}
+						else {
+							$link['permission'] = PERM_READ;
 						}
 					}
 					unset($link);
