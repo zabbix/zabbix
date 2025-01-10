@@ -3368,6 +3368,19 @@ void	zbx_hc_get_mem_stats(zbx_shmem_stats_t *data, zbx_shmem_stats_t *index)
 	UNLOCK_CACHE;
 }
 
+int	zbx_hc_is_itemid_in(zbx_uint64_t itemid)
+{
+	int	res = FAIL;
+
+	LOCK_CACHE;
+	if (NULL != zbx_hashset_search(&cache->history_items, &itemid))
+		res = SUCCEED;
+
+	UNLOCK_CACHE;
+
+	return res;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get statistics of cached items                                    *
