@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -201,7 +201,7 @@ class MysqlDbBackend extends DbBackend {
 	 * @return bool
 	 */
 	public function init() {
-		$db_encoding = DBselect('SHOW VARIABLES LIKE "character_set_database"');
+		$db_encoding = DBselect("SHOW VARIABLES LIKE 'character_set_database'");
 		$charset = $db_encoding ? DBfetch($db_encoding) : false;
 		if ($charset && strtoupper($charset['Value']) === 'UTF8MB4') {
 			DBexecute('SET NAMES utf8mb4');
