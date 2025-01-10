@@ -45,6 +45,7 @@ struct zbx_history_iface
 	zbx_history_add_values_func_t	add_values;
 	zbx_history_get_values_func_t	get_values;
 	zbx_history_flush_func_t	flush;
+	int				config_log_slow_queries;
 };
 
 /* SQL hist */
@@ -52,7 +53,7 @@ void	zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type);
 
 /* elastic hist */
 int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type,
-		const char *config_history_storage_url, char **error);
+		const char *config_history_storage_url, int config_log_slow_queries, char **error);
 void	zbx_elastic_version_extract(struct zbx_json *json, int *result, int config_allow_unsupported_db_versions,
 		const char *config_history_storage_url);
 zbx_uint32_t	zbx_elastic_version_get(void);

@@ -23,11 +23,13 @@
 #include "zbxtime.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
+#include "zbxjson.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
+#include "zbxtime.h"
 #include "zbxvariant.h"
 #include "zbxcurl.h"
-#include "zbxjson.h"
+#include "zbxcacheconfig.h"
 
 #define		ZBX_HISTORY_STORAGE_DOWN	10000 /* Timeout in milliseconds */
 
@@ -626,7 +628,7 @@ static void	elastic_destroy(zbx_history_iface_t *hist)
  * Parameters:  hist    - [IN] the history storage interface                        *
  *              itemid  - [IN] the itemid                                           *
  *              start   - [IN] the period start timestamp                           *
- *              count   - [IN] the number of values to read                         *
+ *              count   - [IN/OUT] the number of values to read                     *
  *              end     - [IN] the period end timestamp                             *
  *              values  - [OUT] the item history data values                        *
  *                                                                                  *
@@ -637,19 +639,32 @@ static void	elastic_destroy(zbx_history_iface_t *hist)
  *           all values from the specified interval if count is zero.               *
  *                                                                                  *
  ************************************************************************************/
-static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, int start, int count, int end,
-		zbx_vector_history_record_t *values)
+static int	elastic_get_values_for_period(zbx_history_iface_t *hist, zbx_uint64_t itemid, time_t start, int *count,
+		time_t end, zbx_vector_history_record_t *values)
 {
 	zbx_elastic_data_t	*data = hist->data.elastic_data;
 	size_t			url_alloc = 0, url_offset = 0, id_alloc = 0, scroll_alloc = 0, scroll_offset = 0;
-	int			total, empty, ret;
+	int			empty, ret;
 	CURLcode		err;
 	struct zbx_json		query;
 	struct curl_slist	*curl_headers = NULL;
 	char			*scroll_id = NULL, *scroll_query = NULL, errbuf[CURL_ERROR_SIZE], *error = NULL;
 	CURLoption		opt;
+	double			sec = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+	{
+		char	start_str[32], end_str[32];
+
+		strftime(start_str, sizeof(start_str), "%Y-%m-%d %H:%M:%S", localtime(&start));
+		strftime(end_str, sizeof(end_str), "%Y-%m-%d %H:%M:%S", localtime(&end));
+
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() window:(%s, %s] age: %s count:%d", __func__, start_str, end_str,
+				zbx_age2str(end - start), *count);
+	}
+
+	if (0 != hist->config_log_slow_queries)
+		sec = zbx_time();
 
 	ret = FAIL;
 
@@ -660,15 +675,16 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 		return FAIL;
 	}
 
+	url_offset = 0;
 	zbx_snprintf_alloc(&data->post_url, &url_alloc, &url_offset, "%s/%s*/_search?scroll=10s", data->base_url,
 			value_type_str[hist->value_type]);
 
 	/* prepare the json query for elasticsearch, apply ranges if needed */
 	zbx_json_init(&query, ZBX_JSON_ALLOCATE);
 
-	if (0 < count)
+	if (0 < *count)
 	{
-		zbx_json_adduint64(&query, "size", count);
+		zbx_json_adduint64(&query, "size", *count);
 		zbx_json_addarray(&query, "sort");
 		zbx_json_addobject(&query, NULL);
 		zbx_json_addobject(&query, "clock");
@@ -692,6 +708,7 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 	zbx_json_addobject(&query, "range");
 	zbx_json_addobject(&query, "clock");
 
+	zbx_json_addstring(&query, "format", "epoch_second", ZBX_JSON_TYPE_STRING);
 	if (0 < start)
 		zbx_json_adduint64(&query, "gt", start);
 
@@ -748,8 +765,6 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 		goto out;
 	}
 
-	total = (0 == count ? -1 : count);
-
 	/* For processing the records, we need to keep track of the total requested and if the response from the */
 	/* elasticsearch server is empty. For this we use two variables, empty and total. If the result is empty or */
 	/* the total reach zero, we terminate the scrolling query and return what we currently have. */
@@ -791,13 +806,15 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 
 			zbx_vector_history_record_append_ptr(values, &hr);
 
-			if (-1 != total)
-				--total;
-
-			if (0 == total)
+			if (0 != *count)
 			{
-				empty = 1;
-				break;
+				(*count)--;
+
+				if (0 == *count)
+				{
+					empty = 1;
+					break;
+				}
 			}
 		}
 
@@ -859,6 +876,13 @@ out:
 
 	curl_slist_free_all(curl_headers);
 
+	if (0 != hist->config_log_slow_queries)
+	{
+		sec = zbx_time() - sec;
+		if (sec > (double)hist->config_log_slow_queries / 1000.0)
+			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, query.buffer);
+	}
+
 	zbx_json_free(&query);
 
 	zbx_free(scroll_id);
@@ -867,9 +891,123 @@ out:
 
 	zbx_vector_history_record_sort(values, (zbx_compare_func_t)zbx_history_record_compare_desc_func);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() values:%d", __func__, values->values_num);
 
 	return ret;
+}
+
+
+/************************************************************************************
+ *                                                                                  *
+ * Purpose: gets period window                                                      *
+ *                                                                                  *
+ * Parameters:  periods         - [IN] history storage periods                      *
+ *              num             - [IN] count of history storage periods             *
+ *              step            - [IN] period step                                  *
+ *              clock_from      - [IN/OUT] period start timestamp                   *
+ *              clock_to        - [IN] period end timestamp (including)             *
+ *              clock_to_shift  - [OUT] next period end timestmap                   *
+ *                                                                                  *
+ * Return value: period - current period                                            *
+ *               FAIL - otherwise                                                   *
+ *                                                                                  *
+ * Comments: This function gets window in increments in order to touch as           *
+ *           less partitions as possible                                            *
+ *                                                                                  *
+ ************************************************************************************/
+static int	period_iter_next(const int *periods, int num, int *step, time_t *clock_from, time_t clock_to,
+		time_t *clock_to_shift)
+{
+	int	period = periods[*step];
+
+	if (-1 == period)
+		return period;
+
+	if (0 > (*clock_from = clock_to - period))
+	{
+		*clock_from = clock_to;
+
+		*step = num - 1;
+
+		return period;
+	}
+
+	*clock_to_shift = clock_to - period;
+	(*step)++;
+
+	return period;
+}
+
+/************************************************************************************
+ *                                                                                  *
+ * Purpose: gets item history data from history storage                             *
+ *                                                                                  *
+ * Parameters:  hist       - [IN] the history storage interface                     *
+ *              itemid     - [IN] the itemid                                        *
+ *              count      - [IN] the number of values to read                      *
+ *              clock_to   - [IN] the period end timestamp (including)              *
+ *              values     - [OUT] the item history data values                     *
+ *                                                                                  *
+ * Return value: SUCCEED - the history data were read successfully                  *
+ *               FAIL - otherwise                                                   *
+ *                                                                                  *
+ * Comments: This function reads <count> values and moves window in increments      *
+ *           in order to touch as less partitions as possible                       *
+ *                                                                                  *
+ ************************************************************************************/
+static int	elastic_read_values_by_count(zbx_history_iface_t *hist, zbx_uint64_t itemid,
+		int count, time_t clock_to, zbx_vector_history_record_t *values)
+{
+	const int	periods[] = {SEC_PER_HOUR, 12 * SEC_PER_HOUR, SEC_PER_DAY, SEC_PER_DAY, SEC_PER_WEEK,
+				SEC_PER_MONTH, 0, -1};
+	int		step = 0, ret = FAIL;
+	time_t		clock_from, clock_to_shift;
+
+	while (-1 != period_iter_next(periods, ARRSIZE(periods), &step, &clock_from, clock_to, &clock_to_shift) &&
+			1 < count)
+	{
+		if (clock_from == clock_to)
+			clock_from = 0;
+
+		zbx_recalc_time_period(&clock_from, ZBX_RECALC_TIME_PERIOD_HISTORY);
+
+		if (clock_from > clock_to)
+			return SUCCEED;
+
+		if (FAIL == (ret = elastic_get_values_for_period(hist, itemid, clock_from, &count, clock_to, values)))
+			break;
+
+		clock_to = clock_to_shift;
+	}
+
+	return ret;
+}
+
+/************************************************************************************
+ *                                                                                  *
+ * Purpose: gets item history data from history storage                             *
+ *                                                                                  *
+ * Parameters:  hist    - [IN] the history storage interface                        *
+ *              itemid  - [IN] the itemid                                           *
+ *              start   - [IN] the period start timestamp                           *
+ *              count   - [IN/OUT] the number of values to read                     *
+ *              end     - [IN] the period end timestamp                             *
+ *              values  - [OUT] the item history data values                        *
+ *                                                                                  *
+ * Return value: SUCCEED - the history data were read successfully                  *
+ *               FAIL - otherwise                                                   *
+ *                                                                                  *
+ * Comments: This function reads <count> values from ]<start>,<end>] interval or    *
+ *           all values from the specified interval if count is zero.               *
+ *                                                                                  *
+ ************************************************************************************/
+static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, int start, int count, int end,
+		zbx_vector_history_record_t *values)
+{
+	if (0 == count || 0 != start)
+		return elastic_get_values_for_period(hist, itemid, start, &count, end, values);
+
+	return elastic_read_values_by_count(hist, itemid, count, end, values);
 }
 
 /************************************************************************************
@@ -946,7 +1084,7 @@ static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_dc_his
 
 	if (num > 0)
 	{
-		data->post_url = zbx_dsprintf(NULL, "%s/_bulk?refresh=true", data->base_url);
+		data->post_url = zbx_dsprintf(NULL, "%s/_bulk", data->base_url);
 		elastic_writer_add_iface(hist);
 	}
 
@@ -989,7 +1127,7 @@ static int	elastic_flush(zbx_history_iface_t *hist)
  *                                                                                  *
  ************************************************************************************/
 int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type,
-		const char *config_history_storage_url, char **error)
+		const char *config_history_storage_url, int config_log_slow_queries, char **error)
 {
 	zbx_elastic_data_t	*data;
 
@@ -1017,6 +1155,7 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 	hist->flush = elastic_flush;
 	hist->get_values = elastic_get_values;
 	hist->requires_trends = 0;
+	hist->config_log_slow_queries = config_log_slow_queries;
 
 	return SUCCEED;
 }
@@ -1193,11 +1332,12 @@ zbx_uint32_t	zbx_elastic_version_get(void)
 }
 #else
 int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type,
-		const char *config_history_storage_url, char **error)
+		const char *config_history_storage_url, int config_log_slow_queries, char **error)
 {
 	ZBX_UNUSED(hist);
 	ZBX_UNUSED(value_type);
 	ZBX_UNUSED(config_history_storage_url);
+	ZBX_UNUSED(config_log_slow_queries);
 
 	*error = zbx_strdup(*error, "Zabbix must be compiled with cURL library for Elasticsearch history backend");
 

@@ -309,7 +309,7 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_mockdb_init();
 
-	err = zbx_history_init(NULL, NULL, &error);
+	err = zbx_history_init(NULL, NULL, 0, &error);
 	zbx_mock_assert_result_eq("zbx_history_init()", SUCCEED, err);
 
 	if (FAIL == zbx_is_uint64(zbx_mock_get_parameter_string("in.itemid"), &itemid))

@@ -42,7 +42,7 @@ zbx_history_iface_t	history_ifaces[ITEM_VALUE_TYPE_BIN + 1];
  *                                                                                  *
  ************************************************************************************/
 int	zbx_history_init(const char *config_history_storage_url, const char *config_history_storage_opts,
-		char **error)
+		int config_log_slow_queries, char **error)
 {
 	/* TODO: support per value type specific configuration */
 
@@ -64,8 +64,11 @@ int	zbx_history_init(const char *config_history_storage_url, const char *config_
 				return FAIL;
 			}
 
-			if (FAIL == zbx_history_elastic_init(&history_ifaces[i], i, config_history_storage_url, error))
+			if (FAIL == zbx_history_elastic_init(&history_ifaces[i], i, config_history_storage_url,
+					config_log_slow_queries, error))
+			{
 				return FAIL;
+			}
 		}
 	}
 
