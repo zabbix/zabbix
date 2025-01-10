@@ -25,18 +25,17 @@ class testFormTotpEnroll extends CWebTest {
 	private const USER_PASS = 'zabbixzabbix';
 
 	private const DEFAULT_METHOD_NAME = 'TOTP';
-	private const DEFAULT_ALGO = SHA_1;
+	private const DEFAULT_ALGO = TOTP_HASH_SHA1;
 	private const DEFAULT_TOTP_CODE_LENGTH = TOTP_CODE_LENGTH_6;
 
 	protected static $mfa_id;
 	protected static $user_id;
 
-	// Maps built in PHP algorithms to Zabbix API. Key - string shown screen. Value - number used in Zabbix API.
-	// ToDo: This should probably be moved to CMfaTotpHelper.php instead.
-	protected static $algo_map = [
-		SHA_1 => TOTP_HASH_SHA1,
-		SHA_256 => TOTP_HASH_SHA256,
-		SHA_512 => TOTP_HASH_SHA512
+	// Maps Zabbix API hash algorithms to their UI display name.
+	protected static $algo_ui_map = [
+		TOTP_HASH_SHA1 => 'SHA1',
+		TOTP_HASH_SHA256 => 'SHA256',
+		TOTP_HASH_SHA512 => 'SHA512'
 	];
 
 	public function prepareData() {
@@ -44,7 +43,7 @@ class testFormTotpEnroll extends CWebTest {
 		self::$mfa_id = CDataHelper::call('mfa.create', [
 			'type' => MFA_TYPE_TOTP,
 			'name' => self::DEFAULT_METHOD_NAME,
-			'hash_function' => self::$algo_map[self::DEFAULT_ALGO],
+			'hash_function' => self::DEFAULT_ALGO,
 			'code_length' => self::DEFAULT_TOTP_CODE_LENGTH
 		])['mfaids'][0];
 
@@ -102,7 +101,7 @@ class testFormTotpEnroll extends CWebTest {
 		$this->assertEquals("Scan me!", $qr_img->getAttribute('alt'));
 
 		// Assert the description text.
-		$this->assertEnrollDescription($container, SHA_1, $secret);
+		$this->assertEnrollDescription($container, self::DEFAULT_ALGO, $secret);
 
 		// Assert 'Verification code' label.
 		$label = $container->query('xpath:.//label[@for="verification_code"]')->one();
@@ -152,7 +151,7 @@ class testFormTotpEnroll extends CWebTest {
 					// All MFA settings different.
 					'mfa_data' => [
 						'name' => 'Different TOTP method name',
-						'hash_function' => SHA_256,
+						'hash_function' => TOTP_HASH_SHA256,
 						'code_length' => TOTP_CODE_LENGTH_8
 					]
 				]
@@ -168,7 +167,7 @@ class testFormTotpEnroll extends CWebTest {
 		CDataHelper::call('mfa.update', [
 			'mfaid' => self::$mfa_id,
 			'name' => CTestArrayHelper::get($data, 'mfa_data.name', self::DEFAULT_METHOD_NAME),
-			'hash_function' => self::$algo_map[CTestArrayHelper::get($data, 'mfa_data.hash_function', self::DEFAULT_ALGO)],
+			'hash_function' => CTestArrayHelper::get($data, 'mfa_data.hash_function', self::DEFAULT_ALGO),
 			'code_length' => CTestArrayHelper::get($data, 'mfa_data.code_length', self::DEFAULT_TOTP_CODE_LENGTH)
 		]);
 	}
@@ -214,7 +213,7 @@ class testFormTotpEnroll extends CWebTest {
 		// The expected QR url should follow this format:
 		// otpauth://totp/{method-name}:{user-name}?secret={secret}&issuer={method-name}&algorithm={algo}&digits={digits}&period=30
 		$regex = '/^otpauth:\/\/totp\/'.$method_name.':'.$user_name.'\?secret=(['.CMfaTotpHelper::VALID_BASE32_CHARS.
-				']{32})&issuer='.$method_name.'&algorithm='.strtoupper($algorithm).'&digits='.$digits.'&period=30$/';
+				']{32})&issuer='.$method_name.'&algorithm='.self::$algo_ui_map[$algorithm].'&digits='.$digits.'&period=30$/';
 		return $regex;
 	}
 
@@ -226,10 +225,10 @@ class testFormTotpEnroll extends CWebTest {
 	 * @param string   $secret       the secret that should be displayed
 	 */
 	protected function assertEnrollDescription($container, $algorithm, $secret) {
-		$description = 'Unable to scan? You can use '.strtoupper($algorithm).
-			' secret key to manually configure your authenticator app:';
+		$description = 'Unable to scan? You can use '.self::$algo_ui_map[$algorithm].
+				' secret key to manually configure your authenticator app:';
 		$this->assertTrue($container->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($description).
-			']')->one()->isVisible()
+				']')->one()->isVisible()
 		);
 
 		// Assert the secret is visible.

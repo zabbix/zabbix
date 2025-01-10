@@ -14,15 +14,18 @@
 **/
 
 
-define('SHA_1', 'sha1');
-define('SHA_256', 'sha256');
-define('SHA_512', 'sha512');
-
 /**
  * Class for generating MFA TOTP tokens. This simulates a phone's authenticator app.
  */
 class CMfaTotpHelper {
 	const VALID_BASE32_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+
+	// Maps Zabbix API hash algorithms to PHP hash_hmac_algos.
+	protected static $algo_map = [
+		TOTP_HASH_SHA1 => 'sha1',
+		TOTP_HASH_SHA256 => 'sha256',
+		TOTP_HASH_SHA512 => 'sha512'
+	];
 
 	/**
 	 * Generate a Time-based One-Time Password (TOTP) based on the provided secret.
@@ -35,14 +38,14 @@ class CMfaTotpHelper {
 	 * @return string                      The TOTP of specified digit length.
 	 * @throws InvalidArgumentException    If the number of digits is not 6 or 8, or if an unsupported hash provided.
 	 */
-	public static function generateTotp($secret, $digits = 6, $hash_func = SHA_1, $time_step_offset = 0) {
+	public static function generateTotp($secret, $digits = TOTP_CODE_LENGTH_6, $hash_func = TOTP_HASH_SHA1, $time_step_offset = 0) {
 		// Validate the number of digits.
-		if (!in_array($digits, [6, 8])) {
+		if (!in_array($digits, [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8])) {
 			throw new InvalidArgumentException('TOTP length must be either 6 or 8, unsupported value: '.$digits);
 		}
 
 		// Validate the provided hash function.
-		if (!in_array($hash_func, [SHA_1, SHA_256, SHA_512])) {
+		if (!in_array($hash_func, [TOTP_HASH_SHA1, TOTP_HASH_SHA256, TOTP_HASH_SHA512])) {
 			throw new InvalidArgumentException('Unsupported TOTP hash: '.$hash_func);
 		}
 
@@ -55,7 +58,7 @@ class CMfaTotpHelper {
 		$secret_binary = self::base32Decode($secret);
 
 		// Generate the hash that the TOTP is extracted from.
-		$hash_binary = hash_hmac($hash_func, $time_step_binary, $secret_binary, true);
+		$hash_binary = hash_hmac(self::$algo_map[$hash_func], $time_step_binary, $secret_binary, true);
 
 		// Determine the offset for TOTP extraction.
 		$offset = ord($hash_binary[strlen($hash_binary) - 1]) & 0xf;
