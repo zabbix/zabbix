@@ -699,5 +699,11 @@ out:
   func: 'func(param)'
   param: '(param)'
   return: SUCCEED
-
+---
+test case: "failed because of double backslash"
+in:
+  token_search: ZBX_TOKEN_SEARCH_FUNCTIONID
+  expression: '\"This is a backslash\\'
+out:
+  return: FAIL
 ...

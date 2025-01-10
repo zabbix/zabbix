@@ -1,0 +1,17 @@
+---
+test case: "1. hostname:[test]"
+in:
+  exp: "hostname:[test]"
+out:
+  return: SUCCEED
+  exp_host: "hostname"
+  exp_key: "[test]"
+---
+test case: "2. Empty"
+in:
+  exp: ""
+out:
+  return: FAIL
+  exp_host: "hostname"
+  exp_key: "[test]"
+...

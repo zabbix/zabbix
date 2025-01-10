@@ -1,0 +1,29 @@
+---
+test case: "macro_name"
+in:
+  context: "macro_name"
+  force_quote: 0
+out:
+  exp_result: "macro_name"
+---
+test case: "Space"
+in:
+  context: " "
+  force_quote: 0
+out:
+  exp_result: '" "'
+---
+test case: "Double quotes"
+in:
+  context: '"'
+  force_quote: 0
+out:
+  exp_result: '"\""'
+---
+test case: 'end with \\'
+in:
+  context: "macro_name\\"
+  force_quote: 1
+out:
+  exp_result: " "
+...

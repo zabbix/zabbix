@@ -1,0 +1,24 @@
+---
+test case: "1. Trends"
+in:
+  func: "trend"
+out:
+  func: "trends"
+---
+test case: "2. Baseline"
+in:
+  func: "baseline"
+out:
+  func: "trends"
+---
+test case: "3. Nodata"
+in:
+  func: "nodata"
+out:
+  func: "timer"
+---
+test case: "4. Something -> history"
+in:
+  func: "something"
+out:
+  func: "history"

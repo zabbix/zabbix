@@ -1,0 +1,37 @@
+---
+test case: "1. Delay 1s"
+in:
+  itemid: 1000
+  delay: "1s"
+  now: "2023-12-18T14:30:00"
+out:
+  return: SUCCEED
+  nextcheck: 1702902601
+---
+test case: "2. Delay 10s"
+in:
+  itemid: 1000
+  delay: "10s"
+  now: "2023-12-18T14:30:00"
+out:
+  return: SUCCEED
+  nextcheck: 1702902610
+---
+test case: "3. Delay 1d"
+in:
+  itemid: 1000
+  delay: "1d"
+  now: "2023-12-18T14:30:00"
+out:
+  return: SUCCEED
+  nextcheck: 1702945000
+---
+test case: "3. Delay 1d"
+in:
+  itemid: 1000
+  delay: "1w"
+  now: "2023-12-18T14:30:00"
+out:
+  return: FAIL
+  nextcheck: 2145916800
+...

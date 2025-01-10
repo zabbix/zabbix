@@ -1,0 +1,21 @@
+---
+test case: "Empty str"
+in:
+  source: ""
+out:
+  return: SUCCEED
+  result: ""
+---
+test case: "String +++"
+in:
+  source: "+++"
+out:
+  return: SUCCEED
+  result: "   "
+---
+test case: "String %xx"
+in:
+  source: "%xx"
+out:
+  return: FAIL
+

@@ -1,0 +1,13 @@
+---
+test case: "1. {#MACRO}"
+in:
+  name: "{#MACRO}"
+out:
+  result: SUCCEED
+---
+test case: "2. #MACRO}"
+in:
+  name: "#MACRO}"
+out:
+  result: FAIL
+...

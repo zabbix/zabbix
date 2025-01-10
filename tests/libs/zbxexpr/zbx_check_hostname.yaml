@@ -1,0 +1,37 @@
+---
+test case: "1. linux-w7x1"
+in:
+  host: "linux-w7x1"
+out:
+  return: SUCCEED
+---
+test case: "2. $$$"
+in:
+  host: "$$$"
+out:
+  return: FAIL
+---
+test case: "3. linux with newline"
+in:
+  host: "linux\n"
+out:
+  return: FAIL
+---
+test case: "4. linux with quotes"
+in:
+  host: "'linux'"
+out:
+  return: FAIL
+---
+test case: "5. Long host name over ZBX_MAX_HOSTNAME_LEN"
+in:
+  host: "linuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinuxlinux"
+out:
+  return: FAIL
+---
+test case: "6. Empty host name"
+in:
+  host: ""
+out:
+  return: FAIL
+...
