@@ -1298,7 +1298,7 @@ function getMapLabels($map, $map_info) {
 		$label_lines = [];
 		$msgs = explode("\n", $selement['label']);
 		foreach ($msgs as $msg) {
-			$label_lines[] = ['content' => $msg];
+			$label_lines[] = ['content' => $msg, 'attributes' => ['data-type' => 'label']];
 		}
 
 		$status_lines = [];
@@ -1312,8 +1312,9 @@ function getMapLabels($map, $map_info) {
 						$status_lines[] = [
 							'content' => $msg,
 							'attributes' => [
-								'fill' => '#'.$element_info['info'][$caption]['color']
-							]
+								'fill' => '#'.$element_info['info'][$caption]['color'],
+								'data-type' => 'trigger'
+							],
 						];
 					}
 				}
@@ -1321,13 +1322,16 @@ function getMapLabels($map, $map_info) {
 		}
 
 		if ($selement['label_type'] == MAP_LABEL_TYPE_IP && $selement['elementtype'] == SYSMAP_ELEMENT_TYPE_HOST) {
-			$label = array_merge([['content' => $selement['label']]], $status_lines);
+			$label = array_merge([['content' => $selement['label'], 'attributes' => ['data-type' => 'label']]],
+				$status_lines);
 		}
 		elseif ($selement['label_type'] == MAP_LABEL_TYPE_STATUS) {
 			$label = $status_lines;
 		}
 		elseif ($selement['label_type'] == MAP_LABEL_TYPE_NAME) {
-			$label = array_merge([['content' => $element_info['name']]], $status_lines);
+			$label = array_merge([['content' => $element_info['name'], 'attributes' => ['data-type' => 'label']]],
+				$status_lines
+			);
 		}
 		else {
 			$label = array_merge($label_lines, $status_lines);
@@ -1423,7 +1427,8 @@ function getMapLinkTriggerInfo($sysmap, $options) {
 	}
 
 	$trigger_options = [
-		'output' => ['status', 'value', 'priority'],
+		'output' => ['expression', 'description', 'status', 'value', 'priority'],
+		'selectHosts' => ['name'],
 		'triggerids' => array_keys($triggerids),
 		'monitored' => true,
 		'preservekeys' => true
@@ -1434,7 +1439,59 @@ function getMapLinkTriggerInfo($sysmap, $options) {
 		'acknowledged' => ($sysmap['show_unack'] == EXTACK_OPTION_UNACK) ? false : null
 	];
 
-	return getTriggersWithActualSeverity($trigger_options, $problem_options);
+	return CMacrosResolverHelper::resolveTriggerNames(
+		getTriggersWithActualSeverity($trigger_options, $problem_options)
+	);
+}
+
+/**
+ * Get trigger data for all linktriggers.
+ *
+ * @param array $sysmap
+ * @param array $sysmap['links']            Map element link options.
+ *
+ * @return array
+ */
+function getMapLinkItemInfo(array $sysmap): array {
+	$itemids = array_filter(array_column($sysmap['links'], 'itemid'));
+
+	$db_items = $itemids
+		? API::Item()->get([
+			'output' => ['itemid', 'name_resolved', 'value_type', 'history', 'trends'],
+			'selectHosts' => ['name'],
+			'itemids' => $itemids,
+			'preservekeys' => true
+		])
+		: [];
+
+	if (!$db_items) {
+		return [];
+	}
+
+	$db_items = array_filter($db_items, function ($item) {
+		return $item['value_type'] != ITEM_VALUE_TYPE_BINARY;
+	});
+
+	$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
+
+	$history = Manager::History();
+
+	foreach ($db_items as &$db_item) {
+		[$item] = CItemHelper::addDataSource([$db_item], time() - $history_period);
+
+		if ($item['source'] === 'trends') {
+			$item_value = $history->getAggregatedValues([$item], AGGREGATE_LAST, time() - $history_period);
+			$db_item['value'] = $item_value ? reset($item_value) : null;
+
+			continue;
+		}
+
+		$item_value = $history->getLastValues([$item], 1, $history_period);
+		$db_item['value'] = $item_value ? reset($item_value) : null;
+	}
+	unset($db_item);
+
+	return $db_items;
 }
 
 /**

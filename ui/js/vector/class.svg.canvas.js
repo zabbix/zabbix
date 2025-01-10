@@ -182,6 +182,7 @@ SVGCanvas.prototype.resize = function (width, height) {
 function SVGTextArea(canvas) {
 	this.canvas = canvas;
 	this.element = null;
+	this.resize_observer = null;
 }
 
 /**
@@ -318,7 +319,7 @@ SVGTextArea.prototype.wrapLine = function (line) {
 SVGTextArea.prototype.getHorizontalOffset = function () {
 	switch (this.anchor.horizontal) {
 		case 'center':
-			return Math.floor(this.width/2);
+			return Math.floor(this.width / 2);
 
 		case 'right':
 			return this.width;
@@ -394,9 +395,6 @@ SVGTextArea.prototype.parseContent = function(content, parse_links) {
 
 				skip = 1.2;
 			}, this);
-		}
-		else {
-			skip += 1.2;
 		}
 	}, this);
 };
@@ -497,6 +495,11 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 		return null;
 	}
 
+	if (this.resize_observer !== null) {
+		this.resize_observer.unobserve(this.text.element);
+		this.resize_observer = null;
+	}
+
 	if (Array.isArray(content)) {
 		var i;
 
@@ -537,32 +540,48 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 		this.background = null;
 	}
 
+	this.initial_x = this.x;
+
 	this.parseContent(content, parse_links);
 	this.text = this.element.add('text', attributes, this.lines);
 
-	size = this.ZBX_getBBox();
-	this.width = Math.ceil(size.width);
-	this.height = Math.ceil(size.height + size.y);
+	const onResize = () => {
+		if (this.text.element !== null) {
+			let size = this.ZBX_getBBox();
+			this.width = Math.ceil(size.width);
+			this.height = Math.ceil(size.height + size.y);
 
-	// Workaround for EDGE for proper text height calculation.
-	if (ED && this.lines.length > 0
-			&& typeof attributes['font-size'] !== 'undefined' && parseInt(attributes['font-size']) > 16) {
-		this.height = Math.ceil(this.lines.length * parseInt(attributes['font-size']) * 1.2);
+			// Workaround for EDGE for proper text height calculation.
+			if (ED && this.lines.length > 0
+					&& typeof attributes['font-size'] !== 'undefined' && parseInt(attributes['font-size']) > 16) {
+				this.height = Math.ceil(this.lines.length * parseInt(attributes['font-size']) * 1.2);
+			}
+
+			if (this.background !== null) {
+				this.background.update({
+					width: this.width + (this.canvas.textPadding * 2),
+					height: this.height + (this.canvas.textPadding * 2)
+				});
+			}
+
+			this.text.element.setAttribute('transform',
+				'translate(' + this.getHorizontalOffset() + ' ' + this.offset + ')'
+			);
+			this.element.element.setAttribute('transform',
+				'translate(' + (this.initial_x - this.getHorizontalOffset()) + ' ' + this.y + ')'
+			);
+		}
+	};
+
+	if (this.text !== null && this.text.element !== null && 'data-parent' in this.text.attributes) {
+		this.resize_observer = new ResizeObserver(onResize);
+		this.resize_observer.observe(this.text.element);
 	}
+
+	onResize();
 
 	this.alignToAnchor();
-
-	if (this.background !== null) {
-		this.background.update({
-			width: this.width + (this.canvas.textPadding * 2),
-			height: this.height + (this.canvas.textPadding * 2)
-		});
-	}
-
 	this.createClipping();
-
-	this.text.element.setAttribute('transform', 'translate(' + this.getHorizontalOffset() + ' ' + this.offset + ')');
-	this.element.element.setAttribute('transform', 'translate(' + this.x + ' ' + this.y + ')');
 
 	return this.element;
 };

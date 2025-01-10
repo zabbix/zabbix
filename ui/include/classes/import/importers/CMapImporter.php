@@ -211,26 +211,44 @@ class CMapImporter extends CImporter {
 		}
 		unset($selement);
 
-		foreach ($map['links'] as &$link) {
+		foreach ($map['links'] as $i => &$link) {
 			if (!$link['linktriggers']) {
 				unset($link['linktriggers']);
-				continue;
+			}
+			else {
+				foreach ($link['linktriggers'] as &$linktrigger) {
+					$trigger = $linktrigger['trigger'];
+					$triggerid = $this->referencer->findTriggeridByName($trigger['description'], $trigger['expression'],
+						$trigger['recovery_expression'], true
+					);
+
+					if ($triggerid === null) {
+						throw new Exception(_s('Cannot find trigger "%1$s" used in map "%2$s".',
+							$trigger['description'], $map['name']));
+					}
+
+					$linktrigger['triggerid'] = $triggerid;
+				}
+				unset($linktrigger);
 			}
 
-			foreach ($link['linktriggers'] as &$linktrigger) {
-				$trigger = $linktrigger['trigger'];
-				$triggerid = $this->referencer->findTriggeridByName($trigger['description'], $trigger['expression'],
-					$trigger['recovery_expression'], true
-				);
+			if (array_key_exists('item', $link) && $link['item']) {
+				$hostid = $this->referencer->findHostidByHost($link['item']['host']);
+				$itemid = $hostid
+					? $this->referencer->findItemidByKey($hostid, $link['item']['key'], true)
+					: null;
 
-				if ($triggerid === null) {
-					throw new Exception(_s('Cannot find trigger "%1$s" used in map "%2$s".',
-						$trigger['description'], $map['name']));
+				if ($itemid === null) {
+					throw new Exception(_s(
+						'Cannot find item "%1$s" on "%2$s" used as for links/"%3$s".',
+						$link['item']['key'],
+						$link['item']['host'],
+						$i
+					));
 				}
 
-				$linktrigger['triggerid'] = $triggerid;
+				$link['itemid'] = $itemid;
 			}
-			unset($linktrigger);
 		}
 		unset($link);
 

@@ -78,6 +78,8 @@ if (isset($_REQUEST['favobj'])) {
 				$sysmapUpdate['lines'] = [];
 
 				if (array_key_exists('selements', $sysmapUpdate)) {
+					$sysmapUpdate['selements'] = array_values($sysmapUpdate['selements']);
+
 					foreach ($sysmapUpdate['selements'] as $element) {
 						if (!array_key_exists('tags', $element)) {
 							continue;
@@ -110,6 +112,107 @@ if (isset($_REQUEST['favobj'])) {
 						}
 					}
 					unset($shape);
+				}
+
+				if (array_key_exists('links', $sysmapUpdate)) {
+					$sysmapUpdate['links'] = array_values($sysmapUpdate['links']);
+
+					$itemids = array_filter(array_column($sysmapUpdate['links'], 'itemid'));
+
+					$db_items = $itemids
+						? API::Item()->get([
+							'output' => ['value_type'],
+							'itemids' => $itemids,
+							'webitems' => true,
+							'preservekeys' => true
+						])
+						: [];
+
+					foreach ($sysmapUpdate['links'] as &$link) {
+						if (array_key_exists('linkid', $link) && substr($link['linkid'], 0, 3) === 'new') {
+							unset($link['linkid']);
+						}
+
+						$link = array_intersect_key($link, array_flip(['linkid', 'selementid1', 'selementid2', 'label',
+							'show_label', 'drawtype', 'color', 'indicator_type', 'linktriggers', 'itemid', 'thresholds',
+							'highlights'
+						]));
+
+						if (!array_key_exists('indicator_type', $link)) {
+							$link['indicator_type'] = MAP_INDICATOR_TYPE_STATIC_LINK;
+						}
+
+						switch ($link['indicator_type']) {
+							case MAP_INDICATOR_TYPE_STATIC_LINK:
+								unset($link['linktriggers'], $link['itemid'], $link['thresholds'],
+									$link['highlights']
+								);
+								break;
+
+							case MAP_INDICATOR_TYPE_TRIGGER:
+								unset($link['itemid'], $link['thresholds'], $link['highlights']);
+
+								if (array_key_exists('linktriggers', $link)) {
+									$link['linktriggers'] = array_values($link['linktriggers']);
+
+									foreach ($link['linktriggers'] as &$link_trigger) {
+										$link_trigger = array_intersect_key($link_trigger, array_flip(['triggerid',
+											'drawtype', 'color'
+										]));
+									}
+									unset($link_trigger);
+								}
+
+								break;
+
+							case MAP_INDICATOR_TYPE_ITEM_VALUE:
+								unset($link['linktriggers']);
+
+								if (!array_key_exists('itemid', $link) || $link['itemid'] === null
+										|| !array_key_exists($link['itemid'], $db_items)
+										|| $db_items[$link['itemid']]['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+									unset($link['itemid'], $link['thresholds'], $link['highlights']);
+
+									break;
+								}
+
+								switch ($db_items[$link['itemid']]['value_type']) {
+									case ITEM_VALUE_TYPE_FLOAT:
+									case ITEM_VALUE_TYPE_UINT64:
+										unset($link['highlights']);
+
+										if (array_key_exists('thresholds', $link)) {
+											$link['thresholds'] = array_values($link['thresholds']);
+
+											foreach ($link['thresholds'] as &$threshold) {
+												$threshold = array_intersect_key($threshold, array_flip(['threshold',
+													'drawtype', 'color'
+												]));
+											}
+											unset($threshold);
+										}
+
+										break;
+
+									case ITEM_VALUE_TYPE_STR:
+									case ITEM_VALUE_TYPE_LOG:
+									case ITEM_VALUE_TYPE_TEXT:
+										unset($link['thresholds']);
+
+										if (array_key_exists('highlights', $link)) {
+											$link['highlights'] = array_values($link['highlights']);
+
+											foreach ($link['highlights'] as &$highlight) {
+												$highlight = array_intersect_key($highlight, array_flip(['pattern',
+													'drawtype', 'color'
+												]));
+											}
+											unset($highlight);
+										}
+								}
+						}
+					}
+					unset($link);
 				}
 
 				$result = API::Map()->update($sysmapUpdate);
@@ -209,9 +312,10 @@ if ($page['type'] != PAGE_TYPE_HTML) {
 if (isset($_REQUEST['sysmapid'])) {
 	$sysmap = API::Map()->get([
 		'output' => ['sysmapid', 'name', 'expand_macros', 'grid_show', 'grid_align', 'grid_size', 'width', 'height',
-			'iconmapid', 'backgroundid', 'label_location', 'label_type', 'label_format', 'label_type_host',
-			'label_type_hostgroup', 'label_type_trigger', 'label_type_map', 'label_type_image', 'label_string_host',
-			'label_string_hostgroup', 'label_string_trigger', 'label_string_map', 'label_string_image'
+			'iconmapid', 'backgroundid', 'background_scale', 'label_location', 'show_element_label', 'show_link_label',
+			'label_type', 'label_format', 'label_type_host', 'label_type_hostgroup', 'label_type_trigger',
+			'label_type_map', 'label_type_image', 'label_string_host', 'label_string_hostgroup',
+			'label_string_trigger', 'label_string_map', 'label_string_image'
 		],
 		'selectShapes' => ['sysmap_shapeid', 'type', 'x', 'y', 'width', 'height', 'text', 'font', 'font_size',
 			'font_color', 'text_halign', 'text_valign', 'border_type', 'border_width', 'border_color',
@@ -274,22 +378,64 @@ foreach ($data['sysmap']['selements'] as $selementid => &$selement) {
 unset($selement);
 
 // get links
-foreach ($data['sysmap']['links'] as &$link) {
-	foreach ($link['linktriggers'] as $lnum => $linkTrigger) {
-		$dbTrigger = API::Trigger()->get([
-			'triggerids' => $linkTrigger['triggerid'],
-			'output' => ['description', 'expression'],
-			'selectHosts' => API_OUTPUT_EXTEND,
-			'preservekeys' => true,
-			'expandDescription' => true
-		]);
-		$dbTrigger = reset($dbTrigger);
-		$host = reset($dbTrigger['hosts']);
+$itemids = [];
 
-		$link['linktriggers'][$lnum]['desc_exp'] = $host['name'].NAME_DELIMITER.$dbTrigger['description'];
+foreach ($data['sysmap']['links'] as &$link) {
+	if (array_key_exists('linktriggers', $link)) {
+		foreach ($link['linktriggers'] as $lnum => $linkTrigger) {
+			$dbTrigger = API::Trigger()->get([
+				'triggerids' => $linkTrigger['triggerid'],
+				'output' => ['description', 'expression'],
+				'selectHosts' => API_OUTPUT_EXTEND,
+				'preservekeys' => true,
+				'expandDescription' => true
+			]);
+			$dbTrigger = reset($dbTrigger);
+			$host = reset($dbTrigger['hosts']);
+
+			$link['linktriggers'][$lnum]['desc_exp'] = $host['name'].NAME_DELIMITER.$dbTrigger['description'];
+		}
+
+		order_result($link['linktriggers'], 'desc_exp');
 	}
 
-	order_result($link['linktriggers'], 'desc_exp');
+	if (array_key_exists('itemid', $link) && $link['itemid'] !== null) {
+		$itemids[] = $link['itemid'];
+	}
+}
+unset($link);
+
+$data['sysmap']['items'] = [];
+
+if ($itemids) {
+	$items = API::Item()->get([
+		'output' => ['name', 'value_type'],
+		'selectHosts' => ['name'],
+		'itemids' => $itemids,
+		'webitems' => true,
+		'preservekeys' => true
+	]);
+
+	foreach ($items as $itemid => $item) {
+		if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+			continue;
+		}
+
+		$data['sysmap']['items'][$itemid] = [
+			'id' => $itemid,
+			'name' => $item['name'],
+			'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
+		];
+	}
+}
+
+foreach ($data['sysmap']['links'] as &$link) {
+	if (array_key_exists('indicator_type', $link) && $link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE
+			&& array_key_exists('itemid', $link) && $link['itemid'] != null
+			&& !array_key_exists($link['itemid'], $data['sysmap']['items'])) {
+		$link['indicator_type'] = MAP_INDICATOR_TYPE_STATIC_LINK;
+		$link['itemid'] = null;
+	}
 }
 unset($link);
 
