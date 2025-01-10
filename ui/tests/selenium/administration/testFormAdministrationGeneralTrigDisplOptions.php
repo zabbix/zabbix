@@ -17,7 +17,7 @@
 require_once dirname(__FILE__).'/../common/testFormAdministrationGeneral.php';
 
 /**
- * @backup config
+ * @backup settings
  */
 class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrationGeneral {
 
@@ -51,29 +51,33 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 	];
 
 	public $db_default_values = [
-		'custom_color' => 0,
-		'problem_unack_style' => 1,
-		'problem_ack_style'=> 1,
-		'ok_unack_style'=> 1,
-		'ok_ack_style'=> 1,
-		'problem_unack_color' => 'CC0000',
-		'problem_ack_color' => 'CC0000',
-		'ok_unack_color' => '009900',
-		'ok_ack_color' => '009900',
-		'ok_period' => '5m',
-		'blink_period' => '2m',
-		'severity_name_0' => 'Not classified',
-		'severity_name_1' => 'Information',
-		'severity_name_2' => 'Warning',
-		'severity_name_3' => 'Average',
-		'severity_name_4' => 'High',
-		'severity_name_5' => 'Disaster',
-		'severity_color_0' => '97AAB3',
-		'severity_color_1' => '7499FF',
-		'severity_color_2' => 'FFC859' ,
-		'severity_color_3' => 'FFA059',
-		'severity_color_4' => 'E97659',
-		'severity_color_5' => 'E45959'
+		'value_int' => [
+			'custom_color' => 0,
+			'problem_unack_style' => 1,
+			'problem_ack_style'=> 1,
+			'ok_unack_style'=> 1,
+			'ok_ack_style'=> 1
+		],
+		'value_str' => [
+			'problem_unack_color' => 'CC0000',
+			'problem_ack_color' => 'CC0000',
+			'ok_unack_color' => '009900',
+			'ok_ack_color' => '009900',
+			'ok_period' => '5m',
+			'blink_period' => '2m',
+			'severity_name_0' => 'Not classified',
+			'severity_name_1' => 'Information',
+			'severity_name_2' => 'Warning',
+			'severity_name_3' => 'Average',
+			'severity_name_4' => 'High',
+			'severity_name_5' => 'Disaster',
+			'severity_color_0' => '97AAB3',
+			'severity_color_1' => '7499FF',
+			'severity_color_2' => 'FFC859' ,
+			'severity_color_3' => 'FFA059',
+			'severity_color_4' => 'E97659',
+			'severity_color_5' => 'E45959'
+		]
 	];
 
 	public $custom_values = [
@@ -237,29 +241,33 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'xpath://button[@id="lbl_severity_color_5"]/..' => '4527A0'
 					],
 					'db' => [
-						'custom_color' => 1,
-						'problem_unack_style' => 1,
-						'problem_ack_style'=> 1,
-						'ok_unack_style'=> 1,
-						'ok_ack_style'=> 1,
-						'problem_unack_color' => 'D81B60',
-						'problem_ack_color' => 'F8BBD0',
-						'ok_unack_color' => '1A237E',
-						'ok_ack_color' => 'B3E5FC',
-						'ok_period' => '25m',
-						'blink_period' => '12m',
-						'severity_name_0' => 'Test Not classified',
-						'severity_name_1' => 'Test Information',
-						'severity_name_2' => 'Test Warning',
-						'severity_name_3' => 'Test Average',
-						'severity_name_4' => 'Test High',
-						'severity_name_5' => 'Test Disaster',
-						'severity_color_0' => 'E8EAF6',
-						'severity_color_1' => 'D1C4E9',
-						'severity_color_2' => 'B39DDB' ,
-						'severity_color_3' => '9575CD',
-						'severity_color_4' => '673AB7',
-						'severity_color_5' => '4527A0'
+						'value_int' => [
+							'custom_color' => 1,
+							'problem_unack_style' => 1,
+							'problem_ack_style'=> 1,
+							'ok_unack_style'=> 1,
+							'ok_ack_style'=> 1
+						],
+						'value_str' => [
+							'problem_unack_color' => 'D81B60',
+							'problem_ack_color' => 'F8BBD0',
+							'ok_unack_color' => '1A237E',
+							'ok_ack_color' => 'B3E5FC',
+							'ok_period' => '25m',
+							'blink_period' => '12m',
+							'severity_name_0' => 'Test Not classified',
+							'severity_name_1' => 'Test Information',
+							'severity_name_2' => 'Test Warning',
+							'severity_name_3' => 'Test Average',
+							'severity_name_4' => 'Test High',
+							'severity_name_5' => 'Test Disaster',
+							'severity_color_0' => 'E8EAF6',
+							'severity_color_1' => 'D1C4E9',
+							'severity_color_2' => 'B39DDB' ,
+							'severity_color_3' => '9575CD',
+							'severity_color_4' => '673AB7',
+							'severity_color_5' => '4527A0'
+						]
 					]
 				]
 			],
@@ -274,11 +282,13 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Acknowledged RESOLVED events' => false
 					],
 					'db' => [
-						'custom_color' => 0,
-						'problem_unack_style' => 0,
-						'problem_ack_style'=> 0,
-						'ok_unack_style'=> 0,
-						'ok_ack_style'=> 0
+						'value_int' => [
+							'custom_color' => 0,
+							'problem_unack_style' => 0,
+							'problem_ack_style'=> 0,
+							'ok_unack_style'=> 0,
+							'ok_ack_style'=> 0
+						]
 					]
 				]
 			],
@@ -299,17 +309,21 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'xpath://button[@id="lbl_severity_color_5"]/..' => '000000'
 					],
 					'db' => [
-						'custom_color' => 1,
-						'problem_unack_color' => '000000',
-						'problem_ack_color' => '000000',
-						'ok_unack_color' => '000000',
-						'ok_ack_color' => '000000',
-						'severity_color_0' => '000000',
-						'severity_color_1' => '000000',
-						'severity_color_2' => '000000' ,
-						'severity_color_3' => '000000',
-						'severity_color_4' => '000000',
-						'severity_color_5' => '000000'
+						'value_int' => [
+							'custom_color' => 1
+						],
+						'value_str' => [
+							'problem_unack_color' => '000000',
+							'problem_ack_color' => '000000',
+							'ok_unack_color' => '000000',
+							'ok_ack_color' => '000000',
+							'severity_color_0' => '000000',
+							'severity_color_1' => '000000',
+							'severity_color_2' => '000000' ,
+							'severity_color_3' => '000000',
+							'severity_color_4' => '000000',
+							'severity_color_5' => '000000'
+						]
 					]
 				]
 			],
@@ -330,17 +344,21 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'xpath://button[@id="lbl_severity_color_5"]/..' => 'DEDEDE'
 					],
 					'db' => [
-						'custom_color' => 1,
-						'problem_unack_color' => 'AAAAAA',
-						'problem_ack_color' => 'BBBBBB',
-						'ok_unack_color' => 'CCCCCC',
-						'ok_ack_color' => 'ABCDEF',
-						'severity_color_0' => 'AAAAAA',
-						'severity_color_1' => 'BBBBBB',
-						'severity_color_2' => 'CCCCCC' ,
-						'severity_color_3' => 'DDDDDD',
-						'severity_color_4' => 'EEEEEE',
-						'severity_color_5' => 'DEDEDE'
+						'value_int' => [
+							'custom_color' => 1
+						],
+						'value_str' => [
+							'problem_unack_color' => 'AAAAAA',
+							'problem_ack_color' => 'BBBBBB',
+							'ok_unack_color' => 'CCCCCC',
+							'ok_ack_color' => 'ABCDEF',
+							'severity_color_0' => 'AAAAAA',
+							'severity_color_1' => 'BBBBBB',
+							'severity_color_2' => 'CCCCCC' ,
+							'severity_color_3' => 'DDDDDD',
+							'severity_color_4' => 'EEEEEE',
+							'severity_color_5' => 'DEDEDE'
+						]
 					]
 				]
 			],
@@ -367,23 +385,27 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'xpath://button[@id="lbl_severity_color_5"]/..' => '999999'
 					],
 					'db' => [
-						'custom_color' => 1,
-						'problem_unack_color' => '999999',
-						'problem_ack_color' => '999999',
-						'ok_unack_color' => '999999',
-						'ok_ack_color' => '999999',
-						'severity_name_0' => 'NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN',
-						'severity_name_1' => 'IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII',
-						'severity_name_2' => 'WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW',
-						'severity_name_3' => 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-						'severity_name_4' => 'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
-						'severity_name_5' => 'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD',
-						'severity_color_0' => '999999',
-						'severity_color_1' => '999999',
-						'severity_color_2' => '999999' ,
-						'severity_color_3' => '999999',
-						'severity_color_4' => '999999',
-						'severity_color_5' => '999999'
+						'value_int' => [
+							'custom_color' => 1
+						],
+						'value_str' => [
+							'problem_unack_color' => '999999',
+							'problem_ack_color' => '999999',
+							'ok_unack_color' => '999999',
+							'ok_ack_color' => '999999',
+							'severity_name_0' => 'NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN',
+							'severity_name_1' => 'IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII',
+							'severity_name_2' => 'WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW',
+							'severity_name_3' => 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+							'severity_name_4' => 'HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH',
+							'severity_name_5' => 'DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD',
+							'severity_color_0' => '999999',
+							'severity_color_1' => '999999',
+							'severity_color_2' => '999999' ,
+							'severity_color_3' => '999999',
+							'severity_color_4' => '999999',
+							'severity_color_5' => '999999'
+						]
 					]
 				]
 			],
@@ -395,8 +417,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'On status change triggers blink for' => '0'
 					],
 					'db' => [
-						'ok_period' => '0',
-						'blink_period' => '0'
+						'value_str' => [
+							'ok_period' => '0',
+							'blink_period' => '0'
+						]
 					]
 				]
 			],
@@ -408,8 +432,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'On status change triggers blink for' => '0s'
 					],
 					'db' => [
-						'ok_period' => '0s',
-						'blink_period' => '0s'
+						'value_str' => [
+							'ok_period' => '0s',
+							'blink_period' => '0s'
+						]
 					]
 				]
 			],
@@ -421,8 +447,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'On status change triggers blink for' => '0m'
 					],
 					'db' => [
-						'ok_period' => '0m',
-						'blink_period' => '0m'
+						'value_str' => [
+							'ok_period' => '0m',
+							'blink_period' => '0m'
+						]
 					]
 				]
 			],
@@ -434,8 +462,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'On status change triggers blink for' => '0h'
 					],
 					'db' => [
-						'ok_period' => '0h',
-						'blink_period' => '0h'
+						'value_str' => [
+							'ok_period' => '0h',
+							'blink_period' => '0h'
+						]
 					]
 				]
 			],
@@ -447,8 +477,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'On status change triggers blink for' => '0d'
 					],
 					'db' => [
-						'ok_period' => '0d',
-						'blink_period' => '0d'
+						'value_str' => [
+							'ok_period' => '0d',
+							'blink_period' => '0d'
+						]
 					]
 				]
 			],
@@ -460,8 +492,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'On status change triggers blink for' => '0w'
 					],
 					'db' => [
-						'ok_period' => '0w',
-						'blink_period' => '0w'
+						'value_str' => [
+							'ok_period' => '0w',
+							'blink_period' => '0w'
+						]
 					]
 				]
 			],
@@ -473,8 +507,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'On status change triggers blink for' => '86400'
 					],
 					'db' => [
-						'ok_period' => '86400',
-						'blink_period' => '86400'
+						'value_str' => [
+							'ok_period' => '86400',
+							'blink_period' => '86400'
+						]
 					]
 				]
 			],
@@ -486,8 +522,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'On status change triggers blink for' => '86400s'
 					],
 					'db' => [
-						'ok_period' => '86400s',
-						'blink_period' => '86400s'
+						'value_str' => [
+							'ok_period' => '86400s',
+							'blink_period' => '86400s'
+						]
 					]
 				]
 			],
@@ -499,8 +537,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'On status change triggers blink for' => '1440m'
 					],
 					'db' => [
-						'ok_period' => '1440m',
-						'blink_period' => '1440m'
+						'value_str' => [
+							'ok_period' => '1440m',
+							'blink_period' => '1440m'
+						]
 					]
 				]
 			],
@@ -512,8 +552,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'On status change triggers blink for' => '24h'
 					],
 					'db' => [
-						'ok_period' => '24h',
-						'blink_period' => '24h'
+						'value_str' => [
+							'ok_period' => '24h',
+							'blink_period' => '24h'
+						]
 					]
 				]
 			],
@@ -525,8 +567,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'On status change triggers blink for' => '1d'
 					],
 					'db' => [
-						'ok_period' => '1d',
-						'blink_period' => '1d'
+						'value_str' => [
+							'ok_period' => '1d',
+							'blink_period' => '1d'
+						]
 					]
 				]
 			],
@@ -789,14 +833,16 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Disaster' => '     Test Disaster    '
 					],
 					'db' => [
-						'ok_period' => '25m',
-						'blink_period' => '12m',
-						'severity_name_0' => 'Test Not classified',
-						'severity_name_1' => 'Test Information',
-						'severity_name_2' => 'Test Warning',
-						'severity_name_3' => 'Test Average',
-						'severity_name_4' => 'Test High',
-						'severity_name_5' => 'Test Disaster'
+						'value_str' => [
+							'ok_period' => '25m',
+							'blink_period' => '12m',
+							'severity_name_0' => 'Test Not classified',
+							'severity_name_1' => 'Test Information',
+							'severity_name_2' => 'Test Warning',
+							'severity_name_3' => 'Test Average',
+							'severity_name_4' => 'Test High',
+							'severity_name_5' => 'Test Disaster'
+						]
 					]
 				]
 			]
@@ -805,7 +851,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 
 	/**
 	 * TODO: Backup is needed because of DEV-1673, and can be removed after bug is fixed.
-	 * @backup config
+	 * @backup settings
 	 *
 	 * @dataProvider getCheckFormData
 	 */

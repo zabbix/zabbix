@@ -18,7 +18,7 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
- * @backup config
+ * @backup settings
  */
 class testUsersAuthentication extends CWebTest {
 
@@ -98,18 +98,21 @@ class testUsersAuthentication extends CWebTest {
 		}
 
 		// Check default values in DB.
-		$db_values = [
-			[
-				'authentication_type' => 0,
-				'disabled_usrgrpid' => 0,
-				'passwd_min_length' => 8,
-				'passwd_check_rules' => 8
-			]
+		$expected_values = [
+			'authentication_type' => 0,
+			'disabled_usrgrpid' => 0,
+			'passwd_min_length' => 8,
+			'passwd_check_rules' => 8
 		];
+		$field_names = '\''.implode('\',\'', array_keys($expected_values)).'\'';
+		$db_values = CDBHelper::getAll('SELECT name, value_int FROM settings WHERE name IN ('.$field_names.') ORDER BY name');
 
-		$this->assertEquals($db_values, CDBHelper::getAll('SELECT authentication_type, disabled_usrgrpid,'.
-				' passwd_min_length, passwd_check_rules FROM config')
-		);
+		$indexed_values = [];
+		foreach ($db_values as $db_field) {
+			$indexed_values[$db_field['name']] = $db_field['value_int'];
+		}
+
+		$this->assertEquals($expected_values, $indexed_values);
 	}
 
 	public function getFormData() {
@@ -118,12 +121,12 @@ class testUsersAuthentication extends CWebTest {
 			[
 				[
 					'db_check' => [
-						[
+						'value_int' => [
 							'authentication_type' => 0,
-							'disabled_usrgrpid' => 0,
 							'passwd_min_length' => 8,
 							'passwd_check_rules' => 8
-						]
+						],
+						'disabled_usrgrpid' => 0
 					]
 				]
 			],
@@ -132,12 +135,12 @@ class testUsersAuthentication extends CWebTest {
 				[
 					'fields' => ['Deprovisioned users group' => 'Disabled'],
 					'db_check' => [
-						[
+						'value_int' => [
 							'authentication_type' => 0,
-							'disabled_usrgrpid' => 9,
 							'passwd_min_length' => 8,
 							'passwd_check_rules' => 8
-						]
+						],
+						'disabled_usrgrpid' => 9
 					]
 				]
 			],
@@ -146,12 +149,12 @@ class testUsersAuthentication extends CWebTest {
 				[
 					'fields' => ['Deprovisioned users group' => ''],
 					'db_check' => [
-						[
+						'value_int' => [
 							'authentication_type' => 0,
-							'disabled_usrgrpid' => 0,
 							'passwd_min_length' => 8,
 							'passwd_check_rules' => 8
-						]
+						],
+						'disabled_usrgrpid' => 0
 					]
 				]
 			],
@@ -173,7 +176,7 @@ class testUsersAuthentication extends CWebTest {
 	 */
 	public function testUsersAuthentication_Form($data) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$old_hash = CDBHelper::getHash('SELECT * FROM config');
+			$old_hash = CDBHelper::getHash('SELECT * FROM settings');
 		}
 
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
@@ -197,15 +200,25 @@ class testUsersAuthentication extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, 'Cannot update authentication', $data['error_message']);
-			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM config'));
+			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM settings'));
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 
 			// Check length fields saved in db.
-			$this->assertEquals($data['db_check'], CDBHelper::getAll('SELECT authentication_type, disabled_usrgrpid, passwd_min_length,'.
-					'passwd_check_rules FROM config')
+			$db_values = CDBHelper::getAll('SELECT name, value_int FROM settings WHERE name IN'.
+					' (\'authentication_type\', \'passwd_min_length\', \'passwd_check_rules\') ORDER BY name'
 			);
+
+			$indexed_values = [];
+			foreach ($db_values as $db_field) {
+				$indexed_values[$db_field['name']] = $db_field['value_int'];
+			}
+
+			$this->assertEquals($data['db_check']['value_int'], $indexed_values);
+			$this->assertEquals($data['db_check']['disabled_usrgrpid'], CDBHelper::getValue(
+					'SELECT value_usrgrpid FROM settings WHERE name=\'disabled_usrgrpid\''
+			));
 		}
 
 		/*

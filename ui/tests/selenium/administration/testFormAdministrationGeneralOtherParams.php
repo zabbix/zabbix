@@ -17,7 +17,7 @@
 require_once dirname(__FILE__).'/../common/testFormAdministrationGeneral.php';
 
 /**
- * @backup config
+ * @backup settings
  */
 class testFormAdministrationGeneralOtherParams extends testFormAdministrationGeneral {
 
@@ -45,22 +45,27 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 	];
 
 	public $db_default_values = [
-		'url' => '',
-		'discovery_groupid' => 50006,
-		'default_inventory_mode' => -1,
-		'alert_usrgrpid' => 7,
-		'snmptrap_logging' => 1,
-		// Authorization.
-		'login_attempts' => 5,
-		'login_block' => '30s',
-		// Storage of secrets
-		'vault_provider' => 0,
-		// Security.
-		'validate_uri_schemes' => 1,
-		'uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh',
-		'x_frame_options' => 'SAMEORIGIN',
-		'iframe_sandboxing_enabled' => 1,
-		'iframe_sandboxing_exceptions' => ''
+		'value_usrgrpid' => [
+			'alert_usrgrpid' => 7
+		],
+		'value_hostgroupid' => [
+			'discovery_groupid' => 50006
+		],
+		'value_int' => [
+			'default_inventory_mode' => -1,
+			'iframe_sandboxing_enabled' => 1,
+			'login_attempts' => 5,
+			'snmptrap_logging' => 1,
+			'validate_uri_schemes' => 1,
+			'vault_provider' => 0
+		],
+		'value_str' => [
+			'iframe_sandboxing_exceptions' => '',
+			'login_block' => '30s',
+			'uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh',
+			'url' => '',
+			'x_frame_options' => 'SAMEORIGIN'
+		]
 	];
 
 	public $custom_values = [
@@ -181,18 +186,24 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'id:iframe_sandboxing_enabled' => false
 					],
 					'db' => [
-						'url' => 'a',
-						'discovery_groupid' => 7,
-						'default_inventory_mode' => 0,
-						'alert_usrgrpid' => 92,
-						'snmptrap_logging' => 0,
-						// Authorization.
-						'login_attempts' => 1,
-						'login_block' => '30s',
-						// Security.
-						'validate_uri_schemes' => 0,
-						'x_frame_options' => 'X',
-						'iframe_sandboxing_enabled' => 0
+						'value_usrgrpid' => [
+							'alert_usrgrpid' => 92
+						],
+						'value_hostgroupid' => [
+							'discovery_groupid' => 7
+						],
+						'value_int' => [
+							'default_inventory_mode' => 0,
+							'iframe_sandboxing_enabled' => 0,
+							'login_attempts' => 1,
+							'snmptrap_logging' => 0,
+							'validate_uri_schemes' => 0
+						],
+						'value_str' => [
+							'login_block' => '30s',
+							'url' => 'a',
+							'x_frame_options' => 'X'
+						]
 					]
 				]
 			],
@@ -212,16 +223,18 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'id:iframe_sandboxing_exceptions' => ''
 					],
 					'db' => [
-						'url' => 'zabbix.php',
-						'default_inventory_mode' => 1,
-						'snmptrap_logging' => 1,
-						// Authorization.
-						'login_block' => '30',
-						// Security.
-						'validate_uri_schemes' => 1,
-						'uri_valid_schemes' => '',
-						'iframe_sandboxing_enabled' => 1,
-						'iframe_sandboxing_exceptions' => ''
+						'value_int' => [
+							'default_inventory_mode' => 1,
+							'iframe_sandboxing_enabled' => 1,
+							'snmptrap_logging' => 1,
+							'validate_uri_schemes' => 1
+						],
+						'value_str' => [
+							'iframe_sandboxing_exceptions' => '',
+							'login_block' => '30',
+							'uri_valid_schemes' => '',
+							'url' => 'zabbix.php'
+						]
 					]
 				]
 			],
@@ -233,8 +246,9 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login blocking interval' => '1m'
 					],
 					'db' => [
-						// Authorization.
-						'login_block' => '1m'
+						'value_str' => [
+							'login_block' => '1m'
+						]
 					]
 				]
 			],
@@ -246,8 +260,9 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login blocking interval' => '1h'
 					],
 					'db' => [
-						// Authorization.
-						'login_block' => '1h'
+						'value_str' => [
+							'login_block' => '1h'
+						]
 					]
 				]
 			],
@@ -273,21 +288,25 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 								'flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-som'
 					],
 					'db' => [
-						// Authorization.
-						'login_attempts' => 32,
-						'login_block' => '3600s',
-						// Security.
-						'validate_uri_schemes' => 1,
-						'uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,'.
-								'ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,'.
-						'http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https',
-						'x_frame_options' => 'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN '.
-								'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN '.
-								'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SA',
-						'iframe_sandboxing_enabled' => 1,
-						'iframe_sandboxing_exceptions' => 'some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag'.
-								'-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag'.
-								'-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-som'
+						'value_int' => [
+							'iframe_sandboxing_enabled' => 1,
+							'login_attempts' => 32,
+							'validate_uri_schemes' => 1
+						],
+						'value_str' => [
+							'iframe_sandboxing_exceptions' => 'some-new-flag-some-new-flag-some-new-flag-some-new-flag-'.
+									'some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-'.
+									'flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-'.
+									'flag-some-new-flag-some-new-flag-som',
+							'login_block' => '3600s',
+							'uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,'.
+									'ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,'.
+									'ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,tel,ssh,http,https,ftp,file,mailto,'.
+									'tel,ssh,http,https',
+							'x_frame_options' => 'SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN'.
+									' SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN'.
+									' SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SA'
+						]
 					]
 				]
 			],
@@ -299,8 +318,9 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login blocking interval' => '3600'
 					],
 					'db' => [
-						// Authorization.
-						'login_block' => '3600'
+						'value_str' => [
+							'login_block' => '3600'
+						]
 					]
 				]
 			],
@@ -312,8 +332,9 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login blocking interval' => '60m'
 					],
 					'db' => [
-						// Authorization.
-						'login_block' => '60m'
+						'value_str' => [
+							'login_block' => '60m'
+						]
 					]
 				]
 			],
@@ -324,7 +345,9 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login attempts' => '3M'
 					],
 					'db' => [
-						'login_attempts' => 3
+						'value_int' => [
+							'login_attempts' => 3
+						]
 					]
 				]
 			],
@@ -569,14 +592,16 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'id:iframe_sandboxing_exceptions' => '   test   '
 					],
 					'db' => [
-						'url' => 'zabbix.php',
-						// Authorization.
-						'login_attempts' => 5,
-						'login_block' => '32s',
-						// Security.
-						'uri_valid_schemes' => 'mailto,tel,ssh',
-						'x_frame_options' => 'SAMEORIGIN',
-						'iframe_sandboxing_exceptions' => 'test'
+						'value_int' => [
+							'login_attempts' => 5
+						],
+						'value_str' => [
+							'iframe_sandboxing_exceptions' => 'test',
+							'login_block' => '32s',
+							'uri_valid_schemes' => 'mailto,tel,ssh',
+							'url' => 'zabbix.php',
+							'x_frame_options' => 'SAMEORIGIN'
+						]
 					]
 				]
 			]

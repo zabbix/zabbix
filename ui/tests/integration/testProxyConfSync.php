@@ -20,12 +20,12 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
  *
  * @required-components server, proxy
  * @configurationDataProvider configurationProvider
- * @backup hosts, regexps, config_autoreg_tls, globalmacro, auditlog, changelog, ha_node, ids
+ * @backup hosts, regexps, settings, config_autoreg_tls, globalmacro, auditlog, changelog, ha_node, ids
  */
 class testProxyConfSync extends CIntegrationTest
 {
 	private $expected_initial = [
-		'config' =>
+		'settings' =>
 		[
 			'insert' => '1',
 			'update' => '0',
@@ -238,7 +238,7 @@ class testProxyConfSync extends CIntegrationTest
 	];
 
 	private $expected_update = [
-		"config" =>
+		"settings" =>
 		[
 			"insert" =>
 			"1",
@@ -547,7 +547,7 @@ class testProxyConfSync extends CIntegrationTest
 	];
 
 	private $expected_delete = [
-		"config" =>
+		"settings" =>
 		[
 			"insert" =>
 			"1",
@@ -956,7 +956,9 @@ class testProxyConfSync extends CIntegrationTest
 		$diff_keys = array_diff_key($expected_objects, $got);
 
 		$this->assertEmpty($diff_keys,
-			'following objects are missing from sync log:\n'.var_export(array_keys($diff_keys), true));
+			'following objects are missing from sync log:\n'.var_export(array_keys($diff_keys), true)."\n\n".
+			'Sync log: '.var_export($got, true)
+		);
 
 		$diff_objects = [];
 

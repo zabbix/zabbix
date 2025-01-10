@@ -1033,9 +1033,131 @@ ROW   |6          |4       |23           |0       |0    |      |
 ROW   |7          |5       |23           |0       |2    |      |
 ROW   |8          |6       |23           |0       |4    |      |
 
-TABLE |config
-FIELDS|configid|work_period    |alert_usrgrpid|discovery_groupid|dbversion_status|geomaps_tile_provider|ldap_userdirectoryid|server_status|mfaid|software_update_check_data|
-ROW   |1       |1-5,09:00-18:00|7             |5                |                |OpenStreetMap.Mapnik |NULL                |             |NULL |                          |
+TABLE |settings
+FIELDS|name                      |type|value_hostgroupid|value_userdirectoryid|value_usrgrpid|value_str|
+ROW   |alert_usrgrpid            |3   |NULL             |NULL                 |7             |         |
+ROW   |disabled_usrgrpid         |3   |NULL             |NULL                 |NULL          |         |
+ROW   |discovery_groupid         |4   |5                |NULL                 |NULL          |         |
+ROW   |ldap_userdirectoryid      |5   |NULL             |NULL                 |NULL          |         |
+ROW   |mfaid                     |6   |NULL             |NULL                 |NULL          |         |
+
+TABLE |settings
+FIELDS|name                     |type|value_int|value_str|
+ROW   |auditlog_enabled         |2   |1        |         |
+ROW   |auditlog_mode            |2   |1        |         |
+ROW   |authentication_type      |2   |0        |         |
+ROW   |autoreg_tls_accept       |2   |1        |         |
+ROW   |compression_status       |2   |0        |         |
+ROW   |custom_color             |2   |0        |         |
+ROW   |default_inventory_mode   |2   |-1       |         |
+ROW   |geomaps_max_zoom         |2   |0        |         |
+ROW   |hk_audit_mode            |2   |1        |         |
+ROW   |hk_events_mode           |2   |1        |         |
+ROW   |hk_history_global        |2   |0        |         |
+ROW   |hk_history_mode          |2   |1        |         |
+ROW   |hk_services_mode         |2   |1        |         |
+ROW   |hk_sessions_mode         |2   |1        |         |
+ROW   |hk_trends_global         |2   |0        |         |
+ROW   |hk_trends_mode           |2   |1        |         |
+ROW   |http_auth_enabled        |2   |0        |         |
+ROW   |http_case_sensitive      |2   |1        |         |
+ROW   |http_login_form          |2   |0        |         |
+ROW   |iframe_sandboxing_enabled|2   |1        |         |
+ROW   |ldap_auth_enabled        |2   |0        |         |
+ROW   |ldap_case_sensitive      |2   |1        |         |
+ROW   |ldap_jit_status          |2   |0        |         |
+ROW   |login_attempts           |2   |5        |         |
+ROW   |max_in_table             |2   |50       |         |
+ROW   |max_overview_table_size  |2   |50       |         |
+ROW   |mfa_status               |2   |0        |         |
+ROW   |ok_ack_style             |2   |1        |         |
+ROW   |ok_unack_style           |2   |1        |         |
+ROW   |passwd_check_rules       |2   |8        |         |
+ROW   |passwd_min_length        |2   |8        |         |
+ROW   |problem_ack_style        |2   |1        |         |
+ROW   |problem_unack_style      |2   |1        |         |
+ROW   |saml_auth_enabled        |2   |0        |         |
+ROW   |saml_case_sensitive      |2   |0        |         |
+ROW   |saml_jit_status          |2   |0        |         |
+ROW   |search_limit             |2   |1000     |         |
+ROW   |server_check_interval    |2   |10       |         |
+ROW   |show_technical_errors    |2   |0        |         |
+ROW   |snmptrap_logging         |2   |1        |         |
+ROW   |validate_uri_schemes     |2   |1        |         |
+ROW   |vault_provider           |2   |0        |         |
+
+TABLE |settings
+FIELDS|name                        |type|value_str                         |
+ROW   |blink_period                |1   |2m                                |
+ROW   |compress_older              |1   |7d                                |
+ROW   |connect_timeout             |1   |3s                                |
+ROW   |db_extension                |1   |                                  |
+ROW   |dbversion_status            |1   |                                  |
+ROW   |default_lang                |1   |en_US                             |
+ROW   |default_theme               |1   |blue-theme                        |
+ROW   |default_timezone            |1   |system                            |
+ROW   |geomaps_attribution         |1   |                                  |
+ROW   |geomaps_tile_provider       |1   |OpenStreetMap.Mapnik              |
+ROW   |geomaps_tile_url            |1   |                                  |
+ROW   |ha_failover_delay           |1   |1m                                |
+ROW   |history_period              |1   |24h                               |
+ROW   |hk_audit                    |1   |31d                               |
+ROW   |hk_events_autoreg           |1   |1d                                |
+ROW   |hk_events_discovery         |1   |1d                                |
+ROW   |hk_events_internal          |1   |1d                                |
+ROW   |hk_events_service           |1   |1d                                |
+ROW   |hk_events_trigger           |1   |365d                              |
+ROW   |hk_history                  |1   |31d                               |
+ROW   |hk_services                 |1   |365d                              |
+ROW   |hk_sessions                 |1   |365d                              |
+ROW   |hk_trends                   |1   |365d                              |
+ROW   |http_strip_domains          |1   |                                  |
+ROW   |iframe_sandboxing_exceptions|1   |                                  |
+ROW   |instanceid                  |1   |                                  |
+ROW   |item_test_timeout           |1   |60s                               |
+ROW   |jit_provision_interval      |1   |1h                                |
+ROW   |login_block                 |1   |30s                               |
+ROW   |max_period                  |1   |2y                                |
+ROW   |media_type_test_timeout     |1   |65s                               |
+ROW   |ok_ack_color                |1   |009900                            |
+ROW   |ok_period                   |1   |5m                                |
+ROW   |ok_unack_color              |1   |009900                            |
+ROW   |period_default              |1   |1h                                |
+ROW   |problem_ack_color           |1   |CC0000                            |
+ROW   |problem_unack_color         |1   |CC0000                            |
+ROW   |report_test_timeout         |1   |60s                               |
+ROW   |script_timeout              |1   |60s                               |
+ROW   |server_status               |1   |                                  |
+ROW   |session_key                 |1   |                                  |
+ROW   |severity_color_0            |1   |97AAB3                            |
+ROW   |severity_color_1            |1   |7499FF                            |
+ROW   |severity_color_2            |1   |FFC859                            |
+ROW   |severity_color_3            |1   |FFA059                            |
+ROW   |severity_color_4            |1   |E97659                            |
+ROW   |severity_color_5            |1   |E45959                            |
+ROW   |severity_name_0             |1   |Not classified                    |
+ROW   |severity_name_1             |1   |Information                       |
+ROW   |severity_name_2             |1   |Warning                           |
+ROW   |severity_name_3             |1   |Average                           |
+ROW   |severity_name_4             |1   |High                              |
+ROW   |severity_name_5             |1   |Disaster                          |
+ROW   |socket_timeout              |1   |3s                                |
+ROW   |software_update_check_data  |1   |                                  |
+ROW   |software_update_checkid     |1   |                                  |
+ROW   |timeout_browser             |1   |60s                               |
+ROW   |timeout_db_monitor          |1   |3s                                |
+ROW   |timeout_external_check      |1   |3s                                |
+ROW   |timeout_http_agent          |1   |3s                                |
+ROW   |timeout_script              |1   |3s                                |
+ROW   |timeout_simple_check        |1   |3s                                |
+ROW   |timeout_snmp_agent          |1   |3s                                |
+ROW   |timeout_ssh_agent           |1   |3s                                |
+ROW   |timeout_telnet_agent        |1   |3s                                |
+ROW   |timeout_zabbix_agent        |1   |3s                                |
+ROW   |uri_valid_schemes           |1   |http,https,ftp,file,mailto,tel,ssh|
+ROW   |url                         |1   |                                  |
+ROW   |work_period                 |1   |1-5,09:00-18:00                   |
+ROW   |x_frame_options             |1   |SAMEORIGIN                        |
 
 TABLE |graph_theme
 FIELDS|graphthemeid|theme     |backgroundcolor|graphcolor|gridcolor|maingridcolor|gridbordercolor|textcolor|highlightcolor|leftpercentilecolor|rightpercentilecolor|nonworktimecolor|colorpalette                                                                                                                                      |

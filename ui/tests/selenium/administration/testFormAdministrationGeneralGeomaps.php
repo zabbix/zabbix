@@ -17,11 +17,11 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
- * @backup config
+ * @backup settings
  */
 class testFormAdministrationGeneralGeomaps extends CWebTest {
 
-	private $sql = 'SELECT * FROM config';
+	private $sql = 'SELECT * FROM settings';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -410,24 +410,25 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 			// Check db values.
 			if ($data['fields']['Tile provider'] === 'Other') {
 				$expected_db = [
+					'geomaps_attribution' => CTestArrayHelper::get($data['fields'], 'Attribution text', ''),
 					'geomaps_tile_provider' => '',
 					'geomaps_tile_url' => $data['fields']['Tile URL'],
-					'geomaps_attribution' => CTestArrayHelper::get($data['fields'], 'Attribution text', ''),
 					'geomaps_max_zoom' => $data['fields']['Max zoom level']
 				];
+
 			}
 			else {
 				$expected_db = [
+					'geomaps_attribution' => '',
 					'geomaps_tile_provider' => $data['db'],
 					'geomaps_tile_url' => '',
-					'geomaps_attribution' => '',
 					'geomaps_max_zoom' => 0
 				];
 			}
 
-			$this->assertEquals($expected_db, CDBHelper::getRow('SELECT geomaps_tile_provider, geomaps_tile_url, '.
-				'geomaps_attribution, geomaps_max_zoom FROM config'
-			));
+			$this->assertEquals($expected_db, CTestDBSettingsHelper::getParameters([
+				'geomaps_tile_provider', 'geomaps_tile_url', 'geomaps_attribution', 'geomaps_max_zoom'
+			]));
 		}
 	}
 }

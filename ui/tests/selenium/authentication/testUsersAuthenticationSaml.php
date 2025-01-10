@@ -17,7 +17,7 @@
 require_once dirname(__FILE__).'/../common/testFormAuthentication.php';
 
 /**
- * @backup config
+ * @backup settings
  */
 class testUsersAuthenticationSaml extends testFormAuthentication {
 
@@ -262,12 +262,10 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'SP entity ID' => 'SP'
 					],
 					'db_check' => [
-						'config' => [
-							[
-								'saml_auth_enabled' => 1,
-								'saml_case_sensitive' => 0,
-								'saml_jit_status' => 0
-							]
+						'settings' => [
+							'saml_auth_enabled' => 1,
+							'saml_case_sensitive' => 0,
+							'saml_jit_status' => 0
 						],
 						'userdirectory_saml' => [
 							[
@@ -323,12 +321,10 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						]
 					],
 					'db_check' => [
-						'config' => [
-							[
-								'saml_auth_enabled' => 1,
-								'saml_case_sensitive' => 1,
-								'saml_jit_status' => 1
-							]
+						'settings' => [
+							'saml_auth_enabled' => 1,
+							'saml_case_sensitive' => 1,
+							'saml_jit_status' => 1
 						],
 						'userdirectory_saml' => [
 							[
@@ -557,7 +553,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 	}
 
 	/**
-	 * @backup config
+	 * @backup settings
 	 *
 	 * @dataProvider getConfigureData
 	 */
@@ -566,7 +562,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 	}
 
 	private function testSamlConfiguration($data) {
-		$old_hash = CDBHelper::getHash('SELECT * FROM config');
+		$old_hash = CDBHelper::getHash('SELECT * FROM settings');
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 
 		// Check that SAML settings are disabled by default and configure SAML authentication.
@@ -575,7 +571,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 		// Check SAML settings update messages and, in case of successful update, check that field values were saved.
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, 'Cannot update authentication',  $data['error']);
-			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM config'));
+			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM settings'));
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
@@ -591,13 +587,27 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 			$form->checkValue($data['fields']);
 
 			foreach ($data['db_check'] as $table => $rows) {
-				foreach ($rows as $i => $row) {
-					if (CTestArrayHelper::get($data, 'trim', false)) {
-						$rows = array_map('trim', $row);
+				if ($table === 'settings') {
+					$db_values = CDBHelper::getAll('SELECT name, value_int FROM settings WHERE name IN'.
+							' (\'saml_auth_enabled\', \'saml_case_sensitive\', \'saml_jit_status\') ORDER BY name'
+					);
+
+					$indexed_values = [];
+					foreach ($db_values as $db_field) {
+						$indexed_values[$db_field['name']] = $db_field['value_int'];
 					}
 
-					$sql = 'SELECT '.implode(",", array_keys($row)).' FROM '.$table.' LIMIT 1 OFFSET '.$i;
-					$this->assertEquals([$row], CDBHelper::getAll($sql));
+					$this->assertEquals($data['db_check']['settings'], $indexed_values);
+				}
+				else {
+					foreach ($rows as $i => $row) {
+						if (CTestArrayHelper::get($data, 'trim', false)) {
+							$rows = array_map('trim', $row);
+						}
+
+						$sql = 'SELECT '.implode(",", array_keys($row)).' FROM '.$table.' LIMIT 1 OFFSET '.$i;
+						$this->assertEquals([$row], CDBHelper::getAll($sql));
+					}
 				}
 			}
 		}
@@ -721,7 +731,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 	 * This annotation is put here for avoiding the following errors:
 	 * /favicon.ico - Failed to load resource: the server responded with a status of 404 (Not Found).
 	 *
-	 * @backup config
+	 * @backup settings
 	 *
 	 * @dataProvider getAuthenticationDetails
 	 */

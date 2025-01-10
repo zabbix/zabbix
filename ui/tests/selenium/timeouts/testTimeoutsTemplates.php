@@ -19,7 +19,7 @@ require_once dirname(__FILE__).'/../common/testTimeoutsDisplay.php';
 /**
  * @onBefore prepareTimeoutsData
  *
- * @backup config, hosts, proxy
+ * @backup settings, hosts, proxy
  */
 class testTimeoutsTemplates extends testTimeoutsDisplay {
 

@@ -19,7 +19,7 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 /**
  * @onBefore prepareUsersData
  *
- * @backup users, usrgrp, role, token, mfa, mfa_totp_secret, config
+ * @backup users, usrgrp, role, token, mfa, mfa_totp_secret, settings
  */
 class testUsers extends CAPITest {
 

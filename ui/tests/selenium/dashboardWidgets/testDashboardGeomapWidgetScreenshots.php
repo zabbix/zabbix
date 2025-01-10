@@ -18,7 +18,7 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
- * @backup config, widget, hosts
+ * @backup settings, widget, hosts
  *
  * @onBefore prepareZoomData
  *

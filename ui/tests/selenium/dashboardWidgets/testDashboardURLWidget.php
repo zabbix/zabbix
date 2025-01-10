@@ -21,6 +21,9 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
  * @ignoreBrowserErrors
  *
  * @backup dashboard
+ *
+ * @dataSource DynamicItemWidgets
+ *
  * @onBefore prepareData
  */
 class testDashboardURLWidget extends CWebTest {

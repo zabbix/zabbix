@@ -296,7 +296,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #27 GUI update.
 			[
 				[
-					'db' => 'SELECT * FROM config',
+					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?action=gui.edit',
 					'return_button' => true
 				]
@@ -376,7 +376,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #37 Trigger displaying options update.
 			[
 				[
-					'db' => 'SELECT * FROM config',
+					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?action=trigdisplay.edit',
 					'return_button' => true
 				]
@@ -400,7 +400,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #40 Other parameters update.
 			[
 				[
-					'db' => 'SELECT * FROM config',
+					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?action=miscconfig.edit',
 					'return_button' => true
 				]
@@ -424,7 +424,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #43 Authentication update.
 			[
 				[
-					'db' => 'SELECT * FROM config',
+					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?action=authentication.edit',
 					'return_button' => true
 				]
@@ -608,7 +608,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #66 Geomap update.
 			[
 				[
-					'db' => 'SELECT * FROM config',
+					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?action=geomaps.edit',
 					'return_button' => true
 				]
@@ -632,7 +632,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #69 Timeout options update.
 			[
 				[
-					'db' => 'SELECT * FROM config',
+					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?action=timeouts.edit',
 					'return_button' => true
 				]
@@ -789,7 +789,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #5 Incorrect token.
 			[
 				[
-					'db' => 'SELECT * FROM config',
+					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?_csrf_token=12345abcd&tls_accept=1&tls_in_none=1&tls_psk_identity=&tls_psk='.
 							'&action=autoreg.update',
 					'error' => self::ACCESS_DENIED,

@@ -261,7 +261,7 @@ class Proxies {
 		DBexecute('UPDATE proxy_rtdata SET version=60200, compatibility=2 WHERE proxyid='.zbx_dbstr($passive_proxyids['passive_outdated']));
 		DBexecute('UPDATE proxy_rtdata SET version=0, compatibility=0 WHERE proxyid='.zbx_dbstr($active_proxyids['active_unknown']));
 		DBexecute('UPDATE proxy_rtdata SET version=50401, compatibility=3 WHERE proxyid='.zbx_dbstr($passive_proxyids['passive_unsupported']));
-		DBexecute('UPDATE config SET server_status='.zbx_dbstr('{"version": "6.4.0alpha1"}'));
+		DBexecute('UPDATE settings SET value_str='.zbx_dbstr('{"version": "6.4.0alpha1"}').' WHERE name=\'server_status\'');
 
 		// Create Proxy groups.
 		CDataHelper::call('proxygroup.create', [

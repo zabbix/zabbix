@@ -18,20 +18,20 @@ class CControllerMiscConfigUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'url' =>							'db config.url',
-			'discovery_groupid' =>				'required|db config.discovery_groupid',
+			'url' =>							'setting url',
+			'discovery_groupid' =>				'required|setting discovery_groupid',
 			'default_inventory_mode' =>			'required|in '.HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC,
-			'alert_usrgrpid' =>					'db config.alert_usrgrpid',
-			'snmptrap_logging' =>				'required|db config.snmptrap_logging|in 0,1',
-			'login_attempts' =>					'required|db config.login_attempts|ge 1|le 32',
-			'login_block' =>					'required|db config.login_block|time_unit '.implode(':', [30, SEC_PER_HOUR]),
-			'validate_uri_schemes' =>			'required|db config.validate_uri_schemes|in 0,1',
-			'uri_valid_schemes' =>				'db config.uri_valid_schemes',
+			'alert_usrgrpid' =>					'setting alert_usrgrpid',
+			'snmptrap_logging' =>				'required|setting snmptrap_logging|in 0,1',
+			'login_attempts' =>					'required|setting login_attempts|ge 1|le 32',
+			'login_block' =>					'required|setting login_block|time_unit '.implode(':', [30, SEC_PER_HOUR]),
+			'validate_uri_schemes' =>			'required|setting validate_uri_schemes|in 0,1',
+			'uri_valid_schemes' =>				'setting uri_valid_schemes',
 			'x_frame_header_enabled' =>			'required|in 0,1',
-			'x_frame_options' =>				'db config.x_frame_options',
-			'iframe_sandboxing_enabled' =>		'required|db config.iframe_sandboxing_enabled|in 0,1',
-			'iframe_sandboxing_exceptions' =>	'db config.iframe_sandboxing_exceptions',
-			'vault_provider' =>					'db config.vault_provider|in '.ZBX_VAULT_TYPE_HASHICORP.','.ZBX_VAULT_TYPE_CYBERARK
+			'x_frame_options' =>				'setting x_frame_options',
+			'iframe_sandboxing_enabled' =>		'required|setting iframe_sandboxing_enabled|in 0,1',
+			'iframe_sandboxing_exceptions' =>	'setting iframe_sandboxing_exceptions',
+			'vault_provider' =>					'setting vault_provider|in '.ZBX_VAULT_TYPE_HASHICORP.','.ZBX_VAULT_TYPE_CYBERARK
 		];
 
 		$ret = $this->validateInput($fields);
@@ -90,7 +90,7 @@ class CControllerMiscConfigUpdate extends CController {
 
 		if ($settings[CSettingsHelper::VALIDATE_URI_SCHEMES] == 1) {
 			$settings[CSettingsHelper::URI_VALID_SCHEMES] = $this->getInput('uri_valid_schemes',
-				DB::getSchema('config')['fields']['uri_valid_schemes']['default']
+				CSettingsSchema::getDefault('uri_valid_schemes')
 			);
 		}
 
@@ -100,7 +100,7 @@ class CControllerMiscConfigUpdate extends CController {
 
 		if ($settings[CSettingsHelper::IFRAME_SANDBOXING_ENABLED] == 1) {
 			$settings[CSettingsHelper::IFRAME_SANDBOXING_EXCEPTIONS] = $this->getInput('iframe_sandboxing_exceptions',
-				DB::getSchema('config')['fields']['iframe_sandboxing_exceptions']['default']
+				CSettingsSchema::getDefault('iframe_sandboxing_exceptions')
 			);
 		}
 

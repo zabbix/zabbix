@@ -140,10 +140,12 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check' => [
-						'http_auth_enabled' => '0',
-						'http_login_form' => '0',
-						'http_strip_domains' => '',
-						'http_case_sensitive' => '1'
+						'value_int' => [
+							'http_auth_enabled' => 0,
+							'http_login_form' => 0,
+							'http_case_sensitive' => 1
+						],
+						'http_strip_domains' => ''
 					]
 				]
 			],
@@ -189,10 +191,12 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check' => [
-						'http_auth_enabled' => '1',
-						'http_login_form' => '0',
-						'http_strip_domains' => '',
-						'http_case_sensitive' => '1'
+						'value_int' => [
+							'http_auth_enabled' => 1,
+							'http_login_form' => 0,
+							'http_case_sensitive' => 1
+						],
+						'http_strip_domains' => ''
 					]
 				]
 			],
@@ -249,10 +253,12 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check' => [
-						'http_auth_enabled' => '1',
-						'http_login_form' => '0',
-						'http_strip_domains' => '',
-						'http_case_sensitive' => '1'
+						'value_int' => [
+							'http_auth_enabled' => 1,
+							'http_login_form' => 0,
+							'http_case_sensitive' => 1
+						],
+						'http_strip_domains' => ''
 					]
 				]
 			],
@@ -307,10 +313,12 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check' => [
-						'http_auth_enabled' => '1',
-						'http_login_form' => '1',
-						'http_strip_domains' => '',
-						'http_case_sensitive' => '1'
+						'value_int' => [
+							'http_auth_enabled' => 1,
+							'http_login_form' => 1,
+							'http_case_sensitive' => 1
+						],
+						'http_strip_domains' => ''
 					]
 				]
 			],
@@ -344,10 +352,12 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check' => [
-						'http_auth_enabled' => '1',
-						'http_login_form' => '1',
-						'http_strip_domains' => 'local.com',
-						'http_case_sensitive' => '1'
+						'value_int' => [
+							'http_auth_enabled' => 1,
+							'http_login_form' => 1,
+							'http_case_sensitive' => 1
+						],
+						'http_strip_domains' => 'local.com'
 					]
 				]
 			],
@@ -400,10 +410,12 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check' => [
-						'http_auth_enabled' => '1',
-						'http_login_form' => '1',
-						'http_strip_domains' => 'local.com',
-						'http_case_sensitive' => '1'
+						'value_int' => [
+							'http_auth_enabled' => 1,
+							'http_login_form' => 1,
+							'http_case_sensitive' => 1
+						],
+						'http_strip_domains' => 'local.com'
 					]
 				]
 			],
@@ -457,10 +469,12 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check' => [
-						'http_auth_enabled' => '1',
-						'http_login_form' => '1',
-						'http_strip_domains' => 'local.com',
-						'http_case_sensitive' => '1'
+						'value_int' => [
+							'http_auth_enabled' => 1,
+							'http_login_form' => 1,
+							'http_case_sensitive' => 1
+						],
+						'http_strip_domains' => 'local.com'
 					]
 				]
 			],
@@ -482,10 +496,12 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check'  => [
-						'http_auth_enabled' => '1',
-						'http_login_form' => '0',
-						'http_strip_domains' => '',
-						'http_case_sensitive' => '1'
+						'value_int' => [
+							'http_auth_enabled' => 1,
+							'http_login_form' => 0,
+							'http_case_sensitive' => 1
+						],
+						'http_strip_domains' => ''
 					]
 				]
 			],
@@ -508,10 +524,12 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check'  => [
-						'http_auth_enabled' => '1',
-						'http_login_form' => '0',
-						'http_strip_domains' => '',
-						'http_case_sensitive' => '0'
+						'value_int' => [
+							'http_auth_enabled' => 1,
+							'http_login_form' => 0,
+							'http_case_sensitive' => 0
+						],
+						'http_strip_domains' => ''
 					]
 				]
 			]
@@ -565,7 +583,7 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 
 	/**
 	 * @dataProvider getHttpData
-	 * @backup config
+	 * @backup settings
 	 * @onAfter removeConfigurationFiles
 	 *
 	 * Internal authentication with HTTP settings.
@@ -722,22 +740,36 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 
 		// Check DB configuration.
 		$default_values = [
-			'authentication_type' => '0',
-			'ldap_auth_enabled' => '0',
-			'ldap_case_sensitive' => '1',
-			'ldap_userdirectoryid' => '0'
+			'authentication_type' => 0,
+			'ldap_auth_enabled' => 0,
+			'ldap_case_sensitive' => 1
 		];
-		$sql = 'SELECT authentication_type,ldap_auth_enabled,ldap_case_sensitive,ldap_userdirectoryid,http_auth_enabled,http_login_form,'.
-				'http_strip_domains,http_case_sensitive FROM config';
 
-		$result = CDBHelper::getRow($sql);
-		$this->assertEquals(array_merge($default_values, $data['db_check']), $result);
+		// Prepare reference array for int values.
+		$expected_int = array_merge($default_values, $data['db_check']['value_int']);
+		ksort($expected_int);
+
+		// Get values from DB for fields from the reference array with int values and then index the result by name.
+		$field_names = '\''.implode('\',\'', array_keys($expected_int)).'\'';
+		$db_values = CDBHelper::getAll('SELECT name, value_int FROM settings WHERE name IN ('.$field_names.') ORDER BY name');
+
+		$indexed_values = [];
+		foreach ($db_values as $db_field) {
+			$indexed_values[$db_field['name']] = $db_field['value_int'];
+		}
+
+		// Assert separately different types of settings.
+		$this->assertEquals($expected_int, $indexed_values);
+		$this->assertEquals($data['db_check']['http_strip_domains'], CDBHelper::getValue('SELECT value_str FROM settings'.
+				' WHERE name=\'http_strip_domains\''
+		));
+		$this->assertEquals(0, CDBHelper::getValue('SELECT value_int FROM settings WHERE name=\'ldap_userdirectoryid\''));
 
 		$this->page->logout();
 	}
 
 	/**
-	 * Open page with username and password in url.
+	 * Open page with username and password in URL.
 	 */
 	private function openAsHttpUser($user, $password, $url) {
 		$parts = explode('//', PHPUNIT_URL.$url, 2);

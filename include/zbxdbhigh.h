@@ -772,4 +772,6 @@ int	zbx_get_proxy_protocol_version_int(const char *version_str);
 #define PROXY_OPERATING_MODE_ACTIVE	0
 #define PROXY_OPERATING_MODE_PASSIVE	1
 
+int	zbx_db_setting_exists(const char *config_name);
+
 #endif

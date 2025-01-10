@@ -22,20 +22,20 @@ class CControllerMiscConfigEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'url' =>							'db config.url',
-			'discovery_groupid' =>				'db config.discovery_groupid',
-			'default_inventory_mode' =>			'db config.default_inventory_mode',
-			'alert_usrgrpid' =>					'db config.alert_usrgrpid',
-			'snmptrap_logging' =>				'db config.snmptrap_logging',
-			'login_attempts' =>					'db config.login_attempts',
-			'login_block' =>					'db config.login_block',
-			'validate_uri_schemes' =>			'db config.validate_uri_schemes',
-			'uri_valid_schemes' =>				'db config.uri_valid_schemes',
+			'url' =>							'setting url',
+			'discovery_groupid' =>				'setting discovery_groupid',
+			'default_inventory_mode' =>			'setting default_inventory_mode',
+			'alert_usrgrpid' =>					'setting alert_usrgrpid',
+			'snmptrap_logging' =>				'setting snmptrap_logging',
+			'login_attempts' =>					'setting login_attempts',
+			'login_block' =>					'setting login_block',
+			'validate_uri_schemes' =>			'setting validate_uri_schemes',
+			'uri_valid_schemes' =>				'setting uri_valid_schemes',
 			'x_frame_header_enabled' =>			'in 0,1',
-			'x_frame_options' =>				'db config.x_frame_options',
-			'iframe_sandboxing_enabled' =>		'db config.iframe_sandboxing_enabled',
-			'iframe_sandboxing_exceptions' =>	'db config.iframe_sandboxing_exceptions',
-			'vault_provider' =>					'db config.vault_provider'
+			'x_frame_options' =>				'setting x_frame_options',
+			'iframe_sandboxing_enabled' =>		'setting iframe_sandboxing_enabled',
+			'iframe_sandboxing_exceptions' =>	'setting iframe_sandboxing_exceptions',
+			'vault_provider' =>					'setting vault_provider'
 		];
 
 		$ret = $this->validateInput($fields);

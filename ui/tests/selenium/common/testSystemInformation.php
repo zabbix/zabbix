@@ -98,7 +98,7 @@ class testSystemInformation extends CWebTest {
 
 	// Change failover delay not to wait too long for server to update its status.
 	public static function changeFailoverDelay() {
-		DBexecute('UPDATE config SET ha_failover_delay='.self::FAILOVER_DELAY);
+		DBexecute('UPDATE settings SET value_str='.self::FAILOVER_DELAY.' WHERE name=\'ha_failover_delay\'');
 	}
 
 	/**

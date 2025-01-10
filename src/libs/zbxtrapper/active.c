@@ -107,7 +107,7 @@ static int	zbx_autoreg_host_check_permissions(const char *host, const char *ip, 
 
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUTOREG_TLS_ACCEPT);
 
-	if (0 == (cfg.autoreg_tls_accept & sock->connection_type))
+	if (0 == ((unsigned int)cfg.autoreg_tls_accept & sock->connection_type))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "autoregistration from \"%s\" denied (host:\"%s\" ip:\"%s\""
 				" port:%hu): connection type \"%s\" is not allowed for autoregistration",

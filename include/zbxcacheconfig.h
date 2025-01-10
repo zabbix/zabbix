@@ -427,40 +427,63 @@ zbx_host_key_t;
 
 ZBX_VECTOR_DECL(host_key, zbx_host_key_t)
 
+/* type of value in settings table */
+#define ZBX_SETTING_TYPE_STR			1
+#define ZBX_SETTING_TYPE_INT			2
+#define ZBX_SETTING_TYPE_USRGRPID		3
+#define ZBX_SETTING_TYPE_HOSTGROUPID		4
+#define ZBX_SETTING_TYPE_USRDIRID		5
+#define ZBX_SETTING_TYPE_MFAID			6
+
+#define ZBX_SETTING_TYPE_MAX			7
+
+typedef struct
+{
+	const char	*name;
+	int		type;
+	int		flags;
+	const char	*default_value;
+}
+zbx_setting_entry_t;
+
+const zbx_setting_entry_t	*zbx_settings_desc_table_get(void);
+size_t				zbx_settings_descr_table_size(void);
+const zbx_setting_entry_t	*zbx_settings_descr_get(const char *name, int *index);
+
 /* housekeeping related configuration data */
 typedef struct
 {
-	int		events_trigger;
-	int		events_internal;
-	int		events_discovery;
-	int		events_autoreg;
-	int		events_service;
-	int		services;
-	int		audit;
-	int		sessions;
-	int		trends;
-	int		history;
+	int	events_trigger;
+	int	events_internal;
+	int	events_discovery;
+	int	events_autoreg;
+	int	events_service;
+	int	services;
+	int	audit;
+	int	sessions;
+	int	trends;
+	int	history;
 
-	unsigned char	services_mode;
-	unsigned char	audit_mode;
-	unsigned char	sessions_mode;
-	unsigned char	events_mode;
-	unsigned char	trends_mode;
-	unsigned char	trends_global;
-	unsigned char	history_mode;
-	unsigned char	history_global;
+	int	services_mode;
+	int	audit_mode;
+	int	sessions_mode;
+	int	events_mode;
+	int	trends_mode;
+	int	trends_global;
+	int	history_mode;
+	int	history_global;
 }
 zbx_config_hk_t;
 
 typedef struct
 {
-	char		*extension;
-	unsigned char	history_compression_status;
+	char	*extension;
+	int		history_compression_status;
 	int		history_compress_older;
 }
 zbx_config_db_t;
 
-/* global configuration data (loaded from config table) */
+/* global configuration data (loaded from settings table) */
 typedef struct
 {
 	/* the fields set by zbx_config_get() function, see ZBX_CONFIG_FLAGS_ defines */
@@ -469,8 +492,8 @@ typedef struct
 	char		**severity_name;
 	zbx_uint64_t	discovery_groupid;
 	int		default_inventory_mode;
-	unsigned char	snmptrap_logging;
-	unsigned char	autoreg_tls_accept;
+	int		snmptrap_logging;
+	int		autoreg_tls_accept;
 	char		*default_timezone;
 	int		auditlog_enabled;
 	int		auditlog_mode;
@@ -480,6 +503,8 @@ typedef struct
 
 	/* housekeeping related configuration data */
 	zbx_config_hk_t	hk;
+
+	zbx_uint64_t	alert_usrgrpid;
 }
 zbx_config_t;
 
@@ -493,6 +518,7 @@ zbx_config_t;
 #define ZBX_CONFIG_FLAGS_DEFAULT_TIMEZONE		__UINT64_C(0x0000000000000100)
 #define ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED		__UINT64_C(0x0000000000000200)
 #define ZBX_CONFIG_FLAGS_AUDITLOG_MODE			__UINT64_C(0x0000000000000400)
+#define ZBX_CONFIG_FLAGS_ALERT_USRGRPID			__UINT64_C(0x0000000000000800)
 
 typedef struct
 {
@@ -1012,7 +1038,7 @@ unsigned int	zbx_dc_get_auto_registration_action_count(void);
 #define ZBX_DISCOVERY_GROUPID_UNDEFINED	0
 void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags);
 void	zbx_config_clean(zbx_config_t *cfg);
-void	zbx_config_get_hk_mode(unsigned char *history_mode, unsigned char *trends_mode);
+void	zbx_config_get_hk_mode(int *history_mode, int *trends_mode);
 
 int	zbx_dc_set_interfaces_availability(zbx_vector_availability_ptr_t *availabilities);
 
@@ -1096,7 +1122,7 @@ typedef struct
 	zbx_uint64_t	drules;			/* drules revision */
 	zbx_uint64_t	upstream;		/* configuration revision received from server */
 	zbx_uint64_t	upstream_hostmap;	/* host mapping configuration revision received from server */
-	zbx_uint64_t	config_table;		/* the global configuration revision (config table) */
+	zbx_uint64_t	settings_table;		/* the global configuration revision (settings table) */
 	zbx_uint64_t	connector;
 	zbx_uint64_t	proxy_group;		/* summary revision of all proxy groups */
 	zbx_uint64_t	proxy;			/* summary revision of all proxies */

@@ -631,12 +631,14 @@ ZBX_DC_EXPRESSION;
 
 typedef struct
 {
+	zbx_uint64_t	alert_usrgrpid;
+
 	const char	*severity_name[TRIGGER_SEVERITY_COUNT];
 	const char	*instanceid;
 	zbx_uint64_t	discovery_groupid;
 	int		default_inventory_mode;
-	unsigned char	snmptrap_logging;
-	unsigned char	autoreg_tls_accept;
+	int		snmptrap_logging;
+	int		autoreg_tls_accept;
 	const char	*default_timezone;
 	int		auditlog_enabled;
 	int		auditlog_mode;

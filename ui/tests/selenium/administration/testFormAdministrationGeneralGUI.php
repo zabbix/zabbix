@@ -17,7 +17,7 @@
 require_once dirname(__FILE__).'/../common/testFormAdministrationGeneral.php';
 
 /**
- * @backup config
+ * @backup settings
  *
  * @dataSource GlobalMacros
  */
@@ -42,18 +42,22 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 	];
 
 	public $db_default_values = [
-		'default_lang' => 'en_US',
-		'default_timezone' => 'system',
-		'default_theme' => 'blue-theme',
-		'search_limit' => 1000,
-		'max_overview_table_size' => 50,
-		'max_in_table' => 50,
-		'server_check_interval' => 10,
-		'work_period' => '1-5,09:00-18:00',
-		'show_technical_errors' => 0,
-		'history_period' => '24h',
-		'period_default' => '1h',
-		'max_period' => '2y'
+		'value_int' => [
+			'max_in_table' => 50,
+			'max_overview_table_size' => 50,
+			'search_limit' => 1000,
+			'server_check_interval' => 10,
+			'show_technical_errors' => 0
+		],
+		'value_str' => [
+			'default_lang' => 'en_US',
+			'default_theme' => 'blue-theme',
+			'default_timezone' => 'system',
+			'history_period' => '24h',
+			'max_period' => '2y',
+			'period_default' => '1h',
+			'work_period' => '1-5,09:00-18:00'
+		]
 	];
 
 	public $custom_values = [
@@ -133,18 +137,22 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period for time selector' => '31536000s'
 					],
 					'db' => [
-						'default_lang' => 'en_US',
-						'default_timezone' => 'UTC',
-						'default_theme' => 'dark-theme',
-						'search_limit' => 1,
-						'max_overview_table_size' => 5,
-						'max_in_table' => 1,
-						'server_check_interval' => 0,
-						'work_period' => '1-1,00:00-00:01',
-						'show_technical_errors' => 1,
-						'history_period' => '86400s',
-						'period_default' => '60s',
-						'max_period' => '31536000s'
+						'value_int' => [
+							'max_in_table' => 1,
+							'max_overview_table_size' => 5,
+							'search_limit' => 1,
+							'server_check_interval' => 0,
+							'show_technical_errors' => 1
+						],
+						'value_str' => [
+							'default_lang' => 'en_US',
+							'default_theme' => 'dark-theme',
+							'default_timezone' => 'UTC',
+							'history_period' => '86400s',
+							'max_period' => '31536000s',
+							'period_default' => '60s',
+							'work_period' => '1-1,00:00-00:01'
+						]
 					]
 				]
 			],
@@ -158,10 +166,12 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period for time selector' => '31536000'
 					],
 					'db' => [
-						'work_period' => '1-5,09:00-18:00;5-7,12:00-16:00',
-						'history_period' => '86400',
-						'period_default' => '60',
-						'max_period' => '31536000'
+						'value_str' => [
+							'history_period' => '86400',
+							'max_period' => '31536000',
+							'period_default' => '60',
+							'work_period' => '1-5,09:00-18:00;5-7,12:00-16:00'
+						]
 					]
 				]
 			],
@@ -174,9 +184,11 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period for time selector' => '525600m'
 					],
 					'db' => [
-						'history_period' => '1440m',
-						'period_default' => '1m',
-						'max_period' => '525600m'
+						'value_str' => [
+							'history_period' => '1440m',
+							'max_period' => '525600m',
+							'period_default' => '1m'
+						]
 					]
 				]
 			],
@@ -188,8 +200,10 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period for time selector' => '8760h'
 					],
 					'db' => [
-						'history_period' => '24h',
-						'max_period' => '8760h'
+						'value_str' => [
+							'history_period' => '24h',
+							'max_period' => '8760h'
+						]
 					]
 				]
 			],
@@ -201,8 +215,10 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period for time selector' => '365d'
 					],
 					'db' => [
-						'history_period' => '1d',
-						'max_period' => '365d'
+						'value_str' => [
+							'history_period' => '1d',
+							'max_period' => '365d'
+						]
 					]
 				]
 			],
@@ -213,7 +229,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period for time selector' => '53w'
 					],
 					'db' => [
-						'max_period' => '53w'
+						'value_str' => [
+							'max_period' => '53w'
+						]
 					]
 				]
 			],
@@ -224,7 +242,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period for time selector' => '13M'
 					],
 					'db' => [
-						'max_period' => '13M'
+						'value_str' => [
+							'max_period' => '13M'
+						]
 					]
 				]
 			],
@@ -235,7 +255,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period for time selector' => '1y'
 					],
 					'db' => [
-						'max_period' => '1y'
+						'value_str' => [
+							'max_period' => '1y'
+						]
 					]
 				]
 			],
@@ -248,9 +270,11 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period for time selector' => '315360000s'
 					],
 					'db' => [
-						'history_period' => '604800s',
-						'period_default' => '315360000s',
-						'max_period' => '315360000s'
+						'value_str' => [
+							'history_period' => '604800s',
+							'max_period' => '315360000s',
+							'period_default' => '315360000s'
+						]
 					]
 				]
 			],
@@ -265,11 +289,13 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period for time selector' => '315360000'
 					],
 					'db' => [
-						'default_timezone' => 'system',
-						'default_theme' => 'hc-dark',
-						'history_period' => '604800',
-						'period_default' => '315360000',
-						'max_period' => '315360000'
+						'value_str' => [
+							'default_theme' => 'hc-dark',
+							'default_timezone' => 'system',
+							'history_period' => '604800',
+							'max_period' => '315360000',
+							'period_default' => '315360000'
+						]
 					]
 				]
 			],
@@ -282,9 +308,11 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period for time selector' => '5256000m'
 					],
 					'db' => [
-						'history_period' => '10080m',
-						'period_default' => '5256000m',
-						'max_period' => '5256000m'
+						'value_str' => [
+							'history_period' => '10080m',
+							'max_period' => '5256000m',
+							'period_default' => '5256000m'
+						]
 					]
 				]
 			],
@@ -297,9 +325,11 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period for time selector' => '3650d'
 					],
 					'db' => [
-						'history_period' => '7d',
-						'period_default' => '3650d',
-						'max_period' => '3650d'
+						'value_str' => [
+							'history_period' => '7d',
+							'max_period' => '3650d',
+							'period_default' => '3650d'
+						]
 					]
 				]
 			],
@@ -307,14 +337,16 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			[
 				[
 					'fields' => [
-						'Max history display period' => '7d',
-						'Time filter default period' => '3650d',
-						'Max period for time selector' => '3650d'
+						'Max history display period' => '1w',
+						'Time filter default period' => '521w',
+						'Max period for time selector' => '521w'
 					],
 					'db' => [
-						'history_period' => '7d',
-						'period_default' => '3650d',
-						'max_period' => '3650d'
+						'value_str' => [
+							'history_period' => '1w',
+							'max_period' => '521w',
+							'period_default' => '521w'
+						]
 					]
 				]
 			],
@@ -326,8 +358,10 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period for time selector' => '121M'
 					],
 					'db' => [
-						'period_default' => '121M',
-						'max_period' => '121M'
+						'value_str' => [
+							'max_period' => '121M',
+							'period_default' => '121M'
+						]
 					]
 				]
 			],
@@ -345,14 +379,18 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period for time selector' => '10y'
 					],
 					'db' => [
-						'default_timezone' => 'Pacific/Kiritimati',
-						'default_theme' => 'hc-light',
-						'search_limit' => 999999,
-						'max_overview_table_size' => 999999,
-						'max_in_table' => 99999,
-						'work_period' => '{$WORKING_HOURS}',
-						'period_default' => '10y',
-						'max_period' => '10y'
+						'value_int' => [
+							'max_in_table' => 99999,
+							'max_overview_table_size' => 999999,
+							'search_limit' => 999999
+						],
+						'value_str' => [
+							'default_theme' => 'hc-light',
+							'default_timezone' => 'Pacific/Kiritimati',
+							'max_period' => '10y',
+							'period_default' => '10y',
+							'work_period' => '{$WORKING_HOURS}'
+						]
 					]
 				]
 			],
@@ -889,13 +927,17 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Max period for time selector' => '   3y  '
 					],
 					'db' => [
-						'search_limit' => 50,
-						'max_overview_table_size' => 50,
-						'max_in_table' => 50,
-						'work_period' => '1-5,09:00-18:00',
-						'history_period' => '1d',
-						'period_default' => '60m',
-						'max_period' => '3y'
+						'value_int' => [
+							'max_in_table' => 50,
+							'max_overview_table_size' => 50,
+							'search_limit' => 50
+						],
+						'value_str' => [
+							'history_period' => '1d',
+							'max_period' => '3y',
+							'period_default' => '60m',
+							'work_period' => '1-5,09:00-18:00'
+						]
 					]
 				]
 			]

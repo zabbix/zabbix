@@ -21,7 +21,7 @@ require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
- * @backup widget, profiles, triggers, problem, config
+ * @backup widget, profiles, triggers, problem, settings
  *
  * @onBefore prepareData
  *

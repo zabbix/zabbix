@@ -1446,7 +1446,7 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 	zbx_vector_uint64_t	profileids;
 	const char		*event_tables[] = {"events"};
 	const char		*profile_idx = "web.favorite.graphids";
-	unsigned char		history_mode, trends_mode;
+	int			history_mode, trends_mode;
 	zbx_vector_str_t	hk_history;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __func__, itemids->values_num);
@@ -6314,9 +6314,26 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
 	zbx_vector_uint64_t	hostids;
 	zbx_uint64_t		groupid;
 	int			index;
+	uint64_t		discovery_groupid;
 
 	if (0 == groupids->values_num)
 		return;
+
+	if (NULL == (result = zbx_db_select("select value_hostgroupid from settings where name='discovery_groupid'")))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+
+	if (NULL == (row = zbx_db_fetch(result)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		zbx_db_free_result(result);
+		return;
+	}
+
+	ZBX_STR2UINT64(discovery_groupid, row[0]);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_create(&hostids);
 
@@ -6343,25 +6360,25 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select g.groupid,g.name,c.discovery_groupid"
-			" from hstgrp g,config c"
+			"select g.groupid,g.name"
+			" from hstgrp g"
 			" where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.groupid", groupids->values, groupids->values_num);
 	if (0 < hostids.values_num)
 	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				" and (g.groupid=c.discovery_groupid"
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				" and (g.groupid=" ZBX_FS_UI64
 					" or exists ("
 						"select null"
 						" from hosts_groups hg"
 						" where g.groupid=hg.groupid"
-							" and");
+							" and", discovery_groupid);
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.hostid", hostids.values,
 				hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "))");
 	}
 	else
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and g.groupid=c.discovery_groupid");
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and g.groupid=" ZBX_FS_UI64, discovery_groupid);
 
 	result = zbx_db_select("%s", sql);
 
@@ -6372,7 +6389,7 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
 		if (FAIL != (index = zbx_vector_uint64_bsearch(groupids, groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			zbx_vector_uint64_remove(groupids, index);
 
-		if (0 == hostids.values_num || 0 == strcmp(row[0], row[2]))
+		if (0 == hostids.values_num || groupid == discovery_groupid)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "host group \"%s\" is used for network discovery"
 					" and cannot be deleted", row[1]);
