@@ -563,6 +563,7 @@ void	zbx_mock_test_entry(void **state)
 				dump_debug_info_tag(vector_in, vector_out);
 
 			zbx_mock_assert_int_eq("return value", SUCCEED, compare_vectors_tag(vector_in, vector_out));
+			free_tag_vector(vector_out);
 		}
 
 		if (SUCCEED == zbx_strcmp_natural(func_type, "append_array"))
@@ -703,6 +704,7 @@ void	zbx_mock_test_entry(void **state)
 
 			zbx_vector_tags_ptr_clear(&vector_copy);
 			zbx_vector_tags_ptr_destroy(&vector_copy);
+			free_tag_vector(vector_out);
 		}
 
 		if (SUCCEED == zbx_strcmp_natural(func_type, "nearestindex"))
