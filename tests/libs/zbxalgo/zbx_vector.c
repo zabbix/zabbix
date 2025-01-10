@@ -722,7 +722,6 @@ void	zbx_mock_test_entry(void **state)
 
 			zbx_mock_assert_int_eq("return value", index, index_out);
 			zbx_free_tag(tag);
-			free_tag_vector(vector_in);
 		}
 
 		if (SUCCEED == zbx_strcmp_natural(func_type, "bsearch"))
