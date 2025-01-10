@@ -50,8 +50,8 @@ typedef struct zbx_tcpsvc_context
 zbx_tcpsvc_context_t;
 
 int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, unsigned char svc_type, AGENT_RESULT *result,
-		zbx_async_task_clear_cb_t clear_cb, void *arg, void *arg_action, struct event_base *base,
-		struct evdns_base *dnsbase, const char *config_source_ip,
+		zbx_async_task_process_result_cb_t async_task_process_result_tcpsvc_cb, void *arg,
+		void *arg_action, struct event_base *base, struct evdns_base *dnsbase, const char *config_source_ip,
 		zbx_async_resolve_reverse_dns_t resolve_reverse_dns);
 void	zbx_async_check_tcpsvc_free(zbx_tcpsvc_context_t *agent_context);
 

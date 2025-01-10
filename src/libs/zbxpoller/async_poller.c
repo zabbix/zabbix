@@ -340,7 +340,7 @@ exit:
 	zbx_vector_poller_item_destroy(&poller_items);
 }
 
-static void	async_wake_cb(void *data)
+static void	async_notify_cb(void *data)
 {
 	event_active((struct event *)data, 0, 0);
 }
@@ -406,7 +406,7 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 
 	evtimer_add(poller_config->async_timer, &tv);
 
-	if (NULL == (poller_config->manager = zbx_async_manager_create(1, async_wake_cb,
+	if (NULL == (poller_config->manager = zbx_async_manager_create(1, async_notify_cb,
 			(void *)poller_config->async_wake_timer, poller_args_in, &error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize async manager: %s", error);

@@ -814,7 +814,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	zbx_config_eventlog_max_lines_per_second = zbx_config_max_lines_per_second;
 }
 
-static int	add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
+static int	add_serveractive_host_agent_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
 {
 	int	forks, new_forks;
 
@@ -1085,7 +1085,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		char	*error;
 
 		if (FAIL == zbx_set_data_destination_hosts(active_hosts, ZBX_DEFAULT_SERVER_PORT, "ServerActive",
-				add_serveractive_host_cb, &hostnames, NULL, &error))
+				add_serveractive_host_agent_cb, &hostnames, NULL, &error))
 		{
 			zbx_error("%s", error);
 			exit(EXIT_FAILURE);

@@ -22,7 +22,7 @@
 #include "zbxip.h"
 #include "zbx_discoverer_constants.h"
 
-static int	http_task_process(short event, void *data, int *fd, const char *addr, char *dnserr,
+static int	process_task_http(short event, void *data, int *fd, const char *addr, char *dnserr,
 		struct event *timeout_event)
 {
 	int					 task_ret = ZBX_ASYNC_TASK_STOP;
@@ -67,14 +67,14 @@ void	process_http_response(CURL *easy_handle, CURLcode err, void *arg)
 	if (CURLE_OK != err)
 	{
 		http_context->res = FAIL;
-		process_http_result(http_context);
+		process_result_http(http_context);
 	}
 	else
 	{
 		http_context->res = SUCCEED;
 		zbx_async_poller_add_task(poller_config->base, poller_config->dnsbase,
 				http_context->async_result->dresult->ip, http_context, http_context->config_timeout,
-				http_task_process, process_http_result);
+				process_task_http, process_result_http);
 	}
 }
 

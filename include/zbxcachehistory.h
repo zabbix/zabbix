@@ -143,12 +143,12 @@ void	zbx_hc_push_items(zbx_vector_hc_item_ptr_t *history_items);
 int	zbx_hc_queue_get_size(void);
 int	zbx_hc_get_history_compression_age(void);
 
-typedef void (*zbx_history_sync_f)(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
+typedef void (*zbx_sync_history_cache_f)(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
 		zbx_ipc_async_socket_t *rtc, int config_history_storage_pipelines, int *more);
 
-int	zbx_init_database_cache(zbx_get_program_type_f get_program_type, zbx_history_sync_f sync_history,
-		zbx_uint64_t history_cache_size, zbx_uint64_t history_index_cache_size, zbx_uint64_t *trends_cache_size,
-		char **error);
+int	zbx_init_database_cache(zbx_get_program_type_f get_program_type,
+		zbx_sync_history_cache_f sync_history_cache_func, zbx_uint64_t history_cache_size,
+		zbx_uint64_t history_index_cache_size, zbx_uint64_t *trends_cache_size, char **error);
 
 void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs, int config_history_storage_pipelines);
 

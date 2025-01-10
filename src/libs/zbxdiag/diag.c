@@ -44,7 +44,7 @@
 
 ZBX_PTR_VECTOR_IMPL(diag_map_ptr, zbx_diag_map_t *)
 
-static zbx_diag_add_section_info_func_t	add_diag_cb;
+static zbx_diag_add_section_info_func_t	diag_add_section_info_cb;
 
 void	zbx_diag_map_free(zbx_diag_map_t *map)
 {
@@ -478,7 +478,7 @@ int	zbx_diag_get_info(const struct zbx_json_parse *jp, char **info)
 			goto out;
 		}
 
-		if (FAIL == (ret = add_diag_cb(section, &jp_section, &json, info)))
+		if (FAIL == (ret = diag_add_section_info_cb(section, &jp_section, &json, info)))
 			goto out;
 	}
 out:
@@ -1009,14 +1009,7 @@ out:
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: init section add callback function                                *
- *                                                                            *
- * Parameters: cb - [IN] callback function                                    *
- *                                                                            *
- ******************************************************************************/
-void	zbx_diag_init(zbx_diag_add_section_info_func_t cb)
+void	zbx_diag_init(zbx_diag_add_section_info_func_t diag_add_section_info_func)
 {
-	add_diag_cb = cb;
+	diag_add_section_info_cb = diag_add_section_info_func;
 }
