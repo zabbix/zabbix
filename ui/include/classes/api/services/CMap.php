@@ -1348,7 +1348,7 @@ class CMap extends CMapElement {
 			'links' =>	['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 				'indicator_type' =>	['type' => API_ANY],
 				'linktriggers' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'indicator_type', 'in' => MAP_INDICATOR_TYPE_TRIGGER], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
+										['if' => ['field' => 'indicator_type', 'in' => MAP_INDICATOR_TYPE_TRIGGER], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['triggerid']], 'fields' => [
 											'triggerid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 											'drawtype' =>	['type' => API_INT32, 'in' => implode(',', [GRAPH_ITEM_DRAWTYPE_LINE, GRAPH_ITEM_DRAWTYPE_BOLD_LINE, GRAPH_ITEM_DRAWTYPE_DOT, GRAPH_ITEM_DRAWTYPE_DASHED_LINE])],
 											'color' =>		['type' => API_COLOR, 'flags' => API_NOT_EMPTY]
