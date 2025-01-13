@@ -202,10 +202,26 @@ class testFormTotpEnroll extends CWebTest {
 			],
 			[
 				[
-					// TOTP is two steps in the future.
+					// TOTP is two time steps in the future.
 					'expected' => TEST_BAD,
 					'time_step_offset' => 2,
 					'error' => 'The verification code was incorrect, please try again.'
+				]
+			],
+			[
+				[
+					// Long MFA method name.
+					'mfa_data' => [
+						'name' => STRING_128
+					]
+				]
+			],
+			[
+				[
+					// MFA method name has special characters.
+					'mfa_data' => [
+						'name' => '<script>alert("hi!")</script>&nbsp;👍'
+					]
 				]
 			]
 		];
@@ -222,6 +238,9 @@ class testFormTotpEnroll extends CWebTest {
 			'hash_function' => CTestArrayHelper::get($data, 'mfa_data.hash_function', self::DEFAULT_ALGO),
 			'code_length' => CTestArrayHelper::get($data, 'mfa_data.code_length', self::DEFAULT_TOTP_CODE_LENGTH)
 		]);
+
+		// Reset the user's TOTP secret.
+		CDataHelper::call('user.resettotp', [self::$user_id]);
 	}
 
 	/**
@@ -288,8 +307,8 @@ class testFormTotpEnroll extends CWebTest {
 	protected function buildExpectedQrCodeUrlRegex($method_name, $user_name, $algorithm, $digits) {
 		// The expected QR url should follow this format:
 		// otpauth://totp/{method-name}:{user-name}?secret={secret}&issuer={method-name}&algorithm={algo}&digits={digits}&period=30
-		$regex = '/^otpauth:\/\/totp\/'.$method_name.':'.$user_name.'\?secret=(['.CMfaTotpHelper::VALID_BASE32_CHARS.
-				']{32})&issuer='.$method_name.'&algorithm='.self::$algo_ui_map[$algorithm].'&digits='.$digits.'&period=30$/';
+		$regex = '@^otpauth:\/\/totp\/'.preg_quote($method_name).':'.$user_name.'\?secret=(['.CMfaTotpHelper::VALID_BASE32_CHARS.
+				']{32})&issuer='.preg_quote($method_name).'&algorithm='.self::$algo_ui_map[$algorithm].'&digits='.$digits.'&period=30$@';
 		return $regex;
 	}
 
