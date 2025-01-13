@@ -18,9 +18,12 @@
  * Class for generating MFA TOTP tokens. This helper simulates a phone's authenticator app.
  */
 class CMfaTotpHelper {
+	// TOTP window time in seconds.
+	const TOTP_WINDOW_SIZE = 30;
+	// Characters for validating TOTP secrets.
 	const VALID_BASE32_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 
-	// Maps Zabbix API hash algorithms to PHP hash_algos.
+	// Maps Zabbix API hash algorithms to PHP hash_algos().
 	protected static $algo_map = [
 		TOTP_HASH_SHA1 => 'sha1',
 		TOTP_HASH_SHA256 => 'sha256',
@@ -50,7 +53,7 @@ class CMfaTotpHelper {
 		}
 
 		// Calculate the current time step. The TOTP changes every 30 seconds.
-		$time_step = floor(time() / 30) + $time_step_offset;
+		$time_step = floor(time() / self::TOTP_WINDOW_SIZE) + $time_step_offset;
 		// Convert time step to a 64-bit binary timestamp.
 		$time_step_binary = pack('J', $time_step);
 
@@ -73,6 +76,30 @@ class CMfaTotpHelper {
 
 		// Zero pad and return.
 		return str_pad($totp, $digits, '0', STR_PAD_LEFT);
+	}
+
+	/**
+	 * Waits until the current TOTP window is safely far from changing.
+	 * This prevents issues where a TOTP is generated too close to a window change and becomes invalid by the time it's used.
+	 * It also prevents a scenario where server and client time mismatches slightly and the client generates a future code
+	 * that the server rejects.
+	 *
+	 * @param float $tolerance    The maximum time (in seconds) allowed before a window change occurs.
+	 */
+	public static function waitForSafeTOTPWindow($tolerance = 1) {
+		// Calculate the remaining time in the current TOTP window.
+		$time_in_window = fmod(microtime(true), self::TOTP_WINDOW_SIZE);
+		$remaining_time = self::TOTP_WINDOW_SIZE - $time_in_window;
+
+		// Check if within tolerance, wait otherwise.
+		if ($remaining_time < $tolerance) {
+			// Sleep until next window starts and another tolerance amount to safely be in a TOTP window.
+			usleep(($remaining_time + $tolerance) * 1000000);
+		}
+		else if ($time_in_window < $tolerance) {
+			// Second case - the window has just started, wait the time to safely be in tolerance.
+			usleep(($tolerance - $time_in_window) * 1000000);
+		}
 	}
 
 	/**

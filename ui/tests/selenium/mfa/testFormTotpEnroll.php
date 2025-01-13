@@ -156,6 +156,58 @@ class testFormTotpEnroll extends CWebTest {
 					]
 				]
 			],
+			[
+				[
+					// SHA 512 algorithm.
+					'mfa_data' => [
+						'hash_function' => TOTP_HASH_SHA512
+					]
+				]
+			],
+			[
+				[
+					// Incorrect code - number.
+					'expected' => TEST_BAD,
+					'totp' => '999999', // correct once in a million times, but it is better to test with the expected length
+					'error' => 'The verification code was incorrect, please try again.'
+				]
+			],
+			[
+				[
+					// Incorrect code - invalid input.
+					'expected' => TEST_BAD,
+					'totp' => 'ABCD👍',
+					'error' => 'The verification code was incorrect, please try again.'
+				]
+			],
+			[
+				[
+					// TOTP is one time step in the past.
+					'time_step_offset' => -1
+				]
+			],
+			[
+				[
+					// TOTP is two time steps in the past.
+					'expected' => TEST_BAD,
+					'time_step_offset' => -2,
+					'error' => 'The verification code was incorrect, please try again.'
+				]
+			],
+			[
+				[
+					// TOTP is one time step in the future.
+					'time_step_offset' => 1
+				]
+			],
+			[
+				[
+					// TOTP is two steps in the future.
+					'expected' => TEST_BAD,
+					'time_step_offset' => 2,
+					'error' => 'The verification code was incorrect, please try again.'
+				]
+			]
 		];
 	}
 
@@ -201,13 +253,26 @@ class testFormTotpEnroll extends CWebTest {
 		// Assert the description text.
 		$this->assertEnrollDescription($form, $totp_algo, $totp_secret);
 
-		// Fill in the verification code (the TOTP itself).
-		$totp = CMfaTotpHelper::generateTotp($totp_secret, $totp_code_length, $totp_algo);
+		// Get the verification code (the TOTP itself). Generate if not defined in the data provider.
+		CMfaTotpHelper::waitForSafeTOTPWindow();
+		$time_step_offset = CTestArrayHelper::get($data, 'time_step_offset', 0);
+		$totp = CTestArrayHelper::get($data, 'totp',
+			CMfaTotpHelper::generateTotp($totp_secret, $totp_code_length, $totp_algo, $time_step_offset)
+		);
+
 		$form->getField('id:verification_code')->fill($totp);
 		$form->query('button:Sign in')->one()->click();
 
-		// Check if login successful.
-
+		// Validate a successful login or an expected error.
+		$this->page->waitUntilReady();
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
+			// Successful login.
+			$this->assertTrue($this->query('xpath://aside[@class="sidebar"]//a[text()="User settings"]')->exists());
+		}
+		else {
+			// Verify validation error.
+			$this->assertEquals($data['error'], $form->query('class:red')->one()->getText());
+		}
 	}
 
 	/**
