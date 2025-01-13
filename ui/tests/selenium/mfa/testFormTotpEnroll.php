@@ -24,6 +24,9 @@ class testFormTotpEnroll extends CWebTest {
 	private const USER_NAME = 'totp-user';
 	private const USER_PASS = 'zabbixzabbix';
 
+	// Number of times after which a user is blocked when a wrong TOTP is entered.
+	private const BLOCK_COUNT = 5;
+
 	private const DEFAULT_METHOD_NAME = 'TOTP';
 	private const DEFAULT_ALGO = TOTP_HASH_SHA1;
 	private const DEFAULT_TOTP_CODE_LENGTH = TOTP_CODE_LENGTH_6;
@@ -37,6 +40,17 @@ class testFormTotpEnroll extends CWebTest {
 		TOTP_HASH_SHA256 => 'SHA256',
 		TOTP_HASH_SHA512 => 'SHA512'
 	];
+
+	/**
+	 * Attach behaviors to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class
+		];
+	}
 
 	public function prepareData() {
 		// Create a TOTP MFA method.
@@ -292,6 +306,32 @@ class testFormTotpEnroll extends CWebTest {
 			// Verify validation error.
 			$this->assertEquals($data['error'], $form->query('class:red')->one()->getText());
 		}
+	}
+
+	/**
+	 * Test that user gets blocked if TOTP is entered wrong 5 times.
+	 */
+	public function testFormTotpEnroll_Blocking() {
+		// Open the enroll form.
+		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
+
+		$form = $this->page->query('class:signin-container')->asForm()->one();
+
+		for ($i = 1; $i <= self::BLOCK_COUNT; $i++) {
+			$form->getField('id:verification_code')->fill('999999');
+			$form->query('button:Sign in')->one()->click();
+
+			if ($i !== self::BLOCK_COUNT) {
+				// Validate the error message first 4 times.
+				$this->assertEquals('The verification code was incorrect, please try again.', $form->query('class:red')->one()->getText());
+			}
+			else {
+				// Validate the blocking message on 5th time.
+				$this->page->waitUntilReady();
+				$this->assertMessage(TEST_BAD, 'You are not logged in', 'Incorrect user name or password or account is temporarily blocked.');
+			}
+		}
+
 	}
 
 	/**
