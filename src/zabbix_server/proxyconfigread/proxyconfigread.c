@@ -397,7 +397,7 @@ static int	proxyconfig_get_config_table_data(const zbx_dc_proxy_t *proxy, struct
 				continue;
 
 			if (0 == strncmp(table->fields[i].name, ZBX_PROTO_TAG_PROXY_SECRETS_PROVIDER,
-				ZBX_CONST_STRLEN(ZBX_PROTO_TAG_PROXY_SECRETS_PROVIDER)))
+					ZBX_CONST_STRLEN(ZBX_PROTO_TAG_PROXY_SECRETS_PROVIDER)))
 			{
 				zbx_json_adduint64(j, NULL, proxy_secrets_provider);
 				fld++;
