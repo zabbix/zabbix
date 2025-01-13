@@ -354,7 +354,7 @@ out:
 }
 
 static int	proxyconfig_get_config_table_data(const zbx_dc_proxy_t *proxy, struct zbx_json *j, char **error,
-				zbx_uint64_t proxy_secrets_provider)
+		zbx_uint64_t proxy_secrets_provider)
 {
 	zbx_db_result_t			result;
 	zbx_db_row_t			row;
