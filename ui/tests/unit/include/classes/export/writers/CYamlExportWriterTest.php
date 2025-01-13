@@ -74,7 +74,7 @@ class CYamlExportWriterTest extends TestCase {
 					''
 				])
 			],
-			'Compact nested mapping applied for "collection.description" property content' => [
+			'Compact nested mapping is not applied for "collection.description" property content' => [
 				[
 					'yaml' => [
 						'collection' => [
@@ -87,7 +87,8 @@ class CYamlExportWriterTest extends TestCase {
 					'yaml:',
 					'  collection:',
 					'    - description: |',
-					'        - item1',
+					'        -',
+					'        item1',
 					'        ',
 					'    - description: item2',
 					''
