@@ -3437,7 +3437,7 @@ class CMap extends CMapElement {
 
 		// adding links
 		if ($options['selectLinks'] !== null && $options['selectLinks'] != API_OUTPUT_COUNT) {
-			$links = DB::select('sysmaps_links', [
+			$links = API::getApiService()->select('sysmaps_links', [
 				'output' => $this->outputExtend($options['selectLinks'], ['sysmapid', 'linkid', 'indicator_type',
 					'itemid'
 				]),
