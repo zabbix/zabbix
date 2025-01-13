@@ -3,6 +3,7 @@ Changes for 7.0.9rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-24549] improved Elasticsearch performance by querying in time intervals and not calling index refresh; added slow query log; fixed queries not working with 8.16.1 (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.8
@@ -3271,6 +3272,8 @@ Changes for 6.0.38rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-25460] fixed inconsistent report of free disk space by Zabbix agent 2 in response to vfs.fs.get on Windows (mprihodko)
+...G...PS. [ZBX-25296] removed overzealous preprocessor tests for LIBRESSL_VERSION_NUMBER (jxl)
 .......PS. [ZBX-25373] fixed possibility to insert duplicate triggers via LLD (dgoloscapov)
 ....I..... [ZBX-22307] fixed automake templates producing broken Makefiles on OpenBSD (jxl)
 ..F.....S. [ZBX-24916] fixed date/time calculation for numeric (unsigned) item values with unixtime units after the year 2038 (dfofanovs, sboidenko)
@@ -6636,6 +6639,7 @@ Changes for 5.0.46rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-25296] removed overzealous preprocessor tests for LIBRESSL_VERSION_NUMBER (jxl)
 .......PS. [ZBX-25633] fixed crash if macro is used in allowed hosts (vso)
 
 --------------------------------------------------------------------------------
