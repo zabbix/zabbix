@@ -86,6 +86,13 @@ class testFormHost extends CWebTest {
 	protected static $itemids;
 
 	/**
+	 * Id of the agent host interface. Required for locating the field with inline validation for Update scenario.
+	 *
+	 * @var array
+	 */
+	protected static $agent_interfaceid;
+
+	/**
 	 * Default values of interfaces.
 	 *
 	 * @var array
@@ -231,6 +238,9 @@ class testFormHost extends CWebTest {
 
 		self::$hostids = $result['hostids'];
 		self::$itemids = $result['itemids'];
+		self::$agent_interfaceid = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE type=1 AND'.
+				' hostid='.zbx_dbstr($result['hostids']['testFormHost_Update'])
+		);
 	}
 
 	/**
@@ -353,7 +363,11 @@ class testFormHost extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'error' => ['Field "groups" is mandatory.', 'Incorrect value for field "host": cannot be empty.']
+					'inline_errors' => [
+						'Host name' => 'This field cannot be empty.',
+						'Host groups' => 'This field cannot be empty.'
+					],
+					'submit_form' => true
 				]
 			],
 			// #1.
@@ -361,9 +375,11 @@ class testFormHost extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
-						'Host groups' => 'Zabbix servers'
+						'Host name' => ''
 					],
-					'error' => 'Incorrect value for field "host": cannot be empty.'
+					'inline_errors' => [
+						'Host name' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// #2.
@@ -371,9 +387,12 @@ class testFormHost extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
-						'Host name' => 'Empty host group'
+						'Host name' => 'Host name',
+						'Host groups' => ''
 					],
-					'error' => 'Field "groups" is mandatory.'
+					'inline_errors' => [
+						'Host groups' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// #3 Existing host name and visible name.
@@ -384,8 +403,9 @@ class testFormHost extends CWebTest {
 						'Host name' => 'Available host',
 						'Host groups' => 'Zabbix servers'
 					],
-					'error_title' => 'Cannot add host',
-					'error' => 'Host with the same name "Available host" already exists.'
+					'inline_errors' => [
+						'Host name' => 'This object already exists.'
+					]
 				]
 			],
 			// #4.
@@ -396,8 +416,9 @@ class testFormHost extends CWebTest {
 						'Host name' => 'Empty template',
 						'Host groups' => 'Zabbix servers'
 					],
-					'error_title' => 'Cannot add host',
-					'error' => 'Template with the same name "Empty template" already exists.'
+					'inline_errors' => [
+						'Host name' => 'This object already exists.'
+					]
 				]
 			],
 			// #5.
@@ -405,12 +426,13 @@ class testFormHost extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
-						'Host name' => 'Existed visible name',
+						'Host name' => 'Existing visible name',
 						'Host groups' => 'Zabbix servers',
 						'Visible name' => 'ЗАББИКС Сервер'
 					],
-					'error_title' => 'Cannot add host',
-					'error' => 'Host with the same visible name "ЗАББИКС Сервер" already exists.'
+					'inline_errors' => [
+						'Visible name' => 'This object already exists.'
+					]
 				]
 			],
 			// #6 Host name field validation.
@@ -421,8 +443,9 @@ class testFormHost extends CWebTest {
 						'Host name' => '@#$%^&*()_+',
 						'Host groups' => 'Zabbix servers'
 					],
-					'error_title' => 'Cannot add host',
-					'error' => 'Incorrect characters used for host name "@#$%^&*()_+".'
+					'inline_errors' => [
+						'Host name' => 'Incorrect characters used for host name.'
+					]
 				]
 			],
 			// #7 UTF8MB4 check.
@@ -430,11 +453,12 @@ class testFormHost extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
-						'Host groups' => 'Zabbix servers',
-						'Host name' => '😀'
+						'Host name' => '😀',
+						'Host groups' => 'Zabbix servers'
 					],
-					'error_title' => 'Cannot add host',
-					'error' => 'Incorrect characters used for host name "😀".'
+					'inline_errors' => [
+						'Host name' => 'Incorrect characters used for host name.'
+					]
 				]
 			],
 			// #8 Interface fields validation.
@@ -452,8 +476,9 @@ class testFormHost extends CWebTest {
 							'ip' => ''
 						]
 					],
-					'error_title' => 'Cannot add host',
-					'error' => 'IP and DNS cannot be empty for host interface.'
+					'inline_errors' => [
+						'id:interfaces_1_ip' => 'IP address: This field cannot be empty.'
+					]
 				]
 			],
 			// #9.
@@ -472,8 +497,9 @@ class testFormHost extends CWebTest {
 							'Connect to' => 'DNS'
 						]
 					],
-					'error_title' => 'Cannot add host',
-					'error' => 'IP and DNS cannot be empty for host interface.'
+					'inline_errors' => [
+						'id:interfaces_1_dns' => 'DNS name: This field cannot be empty.'
+					]
 				]
 			],
 			// 10.
@@ -492,8 +518,9 @@ class testFormHost extends CWebTest {
 							'dns' => 'test'
 						]
 					],
-					'error_title' => 'Cannot add host',
-					'error' => 'Interface with DNS "test" cannot have empty IP address.'
+					'inline_errors' => [
+						'id:interfaces_1_ip' => 'IP address: This field cannot be empty.'
+					]
 				]
 			],
 			// 11.
@@ -511,9 +538,9 @@ class testFormHost extends CWebTest {
 							'Connect to' => 'DNS'
 						]
 					],
-					'error_title' => 'Cannot add host',
-					'error' => 'Interface with IP "127.0.0.1" cannot have empty DNS name while having'.
-						' "Use DNS" property on "Empty dns and filled in IP".'
+					'inline_errors' => [
+						'id:interfaces_1_dns' => 'DNS name: This field cannot be empty.'
+					]
 				]
 			],
 			// 12.
@@ -531,8 +558,9 @@ class testFormHost extends CWebTest {
 							'port' => ''
 						]
 					],
-					'error_title' => 'Cannot add host',
-					'error' => 'Port cannot be empty for host interface.'
+					'inline_errors' => [
+						'id:interfaces_1_port' => 'Port: This field cannot be empty.'
+					]
 				]
 			],
 			// #13 IP validation.
@@ -550,8 +578,9 @@ class testFormHost extends CWebTest {
 							'ip' => 'test'
 						]
 					],
-					'error_title' => 'Cannot add host',
-					'error' => 'Invalid IP address "test".'
+					'inline_errors' => [
+						'id:interfaces_1_ip' => 'IP address: Invalid IP address.'
+					]
 				]
 			],
 			// #14.
@@ -569,8 +598,9 @@ class testFormHost extends CWebTest {
 							'ip' => '127.0.0.'
 						]
 					],
-					'error_title' => 'Cannot add host',
-					'error' => 'Invalid IP address "127.0.0.".'
+					'inline_errors' => [
+						'id:interfaces_1_ip' => 'IP address: Invalid IP address.'
+					]
 				]
 			],
 			// #15 Port validation.
@@ -588,8 +618,9 @@ class testFormHost extends CWebTest {
 							'port' => '100500'
 						]
 					],
-					'error_title' => 'Cannot add host',
-					'error' => 'Incorrect interface port "100500" provided.'
+					'inline_errors' => [
+						'id:interfaces_1_port' => 'Port: Incorrect port.'
+					]
 				]
 			],
 			// #16.
@@ -607,8 +638,9 @@ class testFormHost extends CWebTest {
 							'port' => 'test'
 						]
 					],
-					'error_title' => 'Cannot add host',
-					'error' => 'Incorrect interface port "test" provided.'
+					'inline_errors' => [
+						'id:interfaces_1_port' => 'Port: Incorrect port.'
+					]
 				]
 			],
 			// #17.
@@ -626,8 +658,9 @@ class testFormHost extends CWebTest {
 							'port' => '10.5'
 						]
 					],
-					'error_title' => 'Cannot add host',
-					'error' => 'Incorrect interface port "10.5" provided.'
+					'inline_errors' => [
+						'id:interfaces_1_port' => 'Port: Incorrect port.'
+					]
 				]
 			],
 			// #18 Empty SNMP community.
@@ -645,16 +678,17 @@ class testFormHost extends CWebTest {
 							'SNMP community' => ''
 						]
 					],
-					'error_title' => 'Cannot add host',
-					'error' => 'Incorrect arguments passed to function.'
+					'inline_errors' => [
+						'SNMP community' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// #19 Zero in SNMP Max repetition count.
+			// #19 Too low max repetition count.
 			[
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
-						'Host name' => 'Invalid snmp community',
+						'Host name' => 'Too low max repetition count',
 						'Host groups' => 'Zabbix servers'
 					],
 					'interfaces' => [
@@ -664,8 +698,9 @@ class testFormHost extends CWebTest {
 							'Max repetition count' => '0'
 						]
 					],
-					'error_title' => 'Cannot add host',
-					'error' => 'Incorrect arguments passed to function.'
+					'inline_errors' => [
+						'Max repetition count' => 'This value must be within range 1:2147483647.'
+					]
 				]
 			],
 			// #20 Empty proxy multiselect.
@@ -675,10 +710,12 @@ class testFormHost extends CWebTest {
 					'host_fields' => [
 						'Host name' => 'Empty proxy multiselect',
 						'Host groups' => 'Zabbix servers',
-						'Monitored by' => 'Proxy'
+						'Monitored by' => 'Proxy',
+						'xpath:.//div[@id="proxyid"]/..' => ''
 					],
-					'error_title' => 'Cannot add host',
-					'error' => 'Invalid parameter "/1/proxyid": object does not exist, or you have no permissions to it'
+					'inline_errors' => [
+						'xpath:.//div[@id="proxyid"]/..' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// #21 Empty proxy group multiselect.
@@ -688,13 +725,34 @@ class testFormHost extends CWebTest {
 					'host_fields' => [
 						'Host name' => 'Empty proxy multiselect',
 						'Host groups' => 'Zabbix servers',
-						'Monitored by' => 'Proxy group'
+						'Monitored by' => 'Proxy group',
+						'xpath:.//div[@id="proxy_groupid"]/..' => ''
 					],
-					'error_title' => 'Cannot add host',
-					'error' => 'Invalid parameter "/1/proxy_groupid": object does not exist, or you have no permissions to it'
+					'inline_errors' => [
+						'xpath:.//div[@id="proxy_groupid"]/..' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// #22 Host without interface.
+			// #22 Too high value in Max repetition count.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Too high max repetition count'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'type' => 'SNMP',
+							'Max repetition count' => '2147483648'
+						]
+					],
+					'inline_errors' => [
+						'Max repetition count' => 'This value is not a valid integer.'
+					]
+				]
+			],
+			// #23 Host without interface.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -704,7 +762,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #23 UTF8MB4 check.
+			// #24 UTF8MB4 check.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -716,7 +774,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #24 Default values of all interfaces.
+			// #25 Default values of all interfaces.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -744,7 +802,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #25 Change default host interface.
+			// #26 Change default host interface.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -770,7 +828,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #26 Different versions of SNMP interface and encryption.
+			// #27 Different versions of SNMP interface and encryption.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -828,7 +886,7 @@ class testFormHost extends CWebTest {
 					]
 				]
 			],
-			// #27 All interfaces and all fields in form.
+			// #28 All interfaces and all fields in form.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -930,7 +988,12 @@ class testFormHost extends CWebTest {
 		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names]);
 		$interfaces = CTestArrayHelper::get($data, 'interfaces', []);
 		$interfaces_form->fill($interfaces);
-		$form->submit();
+
+		$this->page->removeFocus();
+
+		if (!array_key_exists('inline_errors', $data) || CTestArrayHelper::get($data, 'submit_form')) {
+			$form->submit();
+		}
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
@@ -970,7 +1033,7 @@ class testFormHost extends CWebTest {
 			case TEST_BAD:
 				$this->assertEquals($old_hash, CDBHelper::getHash($this->hosts_sql));
 				$this->assertEquals($interface_old_hash, CDBHelper::getHash($this->interface_snmp_sql));
-				$this->assertMessage(TEST_BAD, CTestArrayHelper::get($data, 'error_title', 'Cannot add host'), $data['error']);
+				$this->assertInlineError($form, $data['inline_errors']);
 
 				if (!$this->standalone) {
 					COverlayDialogElement::find()->one()->close();
@@ -981,7 +1044,7 @@ class testFormHost extends CWebTest {
 
 	public static function getValidationUpdateData() {
 		return [
-			// Host form validation.
+			// #0 Host form validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1007,10 +1070,13 @@ class testFormHost extends CWebTest {
 							'index' => 0
 						]
 					],
-					'error' => ['Field "groups" is mandatory.', 'Incorrect value for field "host": cannot be empty.'
+					'inline_errors' => [
+						'Host name' => 'This field cannot be empty.',
+						'Host groups' => 'This field cannot be empty.'
 					]
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1018,18 +1084,25 @@ class testFormHost extends CWebTest {
 						'Host name' => '',
 						'Host groups' => ''
 					],
-					'error' => ['Field "groups" is mandatory.', 'Incorrect value for field "host": cannot be empty.']
+					'inline_errors' => [
+						'Host name' => 'This field cannot be empty.',
+						'Host groups' => 'This field cannot be empty.'
+					]
 				]
 			],
+			// 2.
 			[
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => ''
 					],
-					'error' => 'Incorrect value for field "host": cannot be empty.'
+					'inline_errors' => [
+						'Host name' => 'This field cannot be empty.'
+					]
 				]
 			],
+			// #3.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1037,63 +1110,72 @@ class testFormHost extends CWebTest {
 						'Host name' => 'Empty host group',
 						'Host groups' => ''
 					],
-					'error' => 'Field "groups" is mandatory.'
+					'inline_errors' => [
+						'Host groups' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// Existing host name and visible name.
+			// #4 Existing host name and visible name.
 			[
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => 'Available host'
 					],
-					'error_title' => 'Cannot update host',
-					'error' => 'Host with the same name "Available host" already exists.'
+					'inline_errors' => [
+						'Host name' => 'This object already exists.'
+					]
 				]
 			],
+			// #5.
 			[
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => 'Empty template'
 					],
-					'error_title' => 'Cannot update host',
-					'error' => 'Template with the same name "Empty template" already exists.'
+					'inline_errors' => [
+						'Host name' => 'This object already exists.'
+					]
 				]
 			],
+			// #6.
 			[
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Visible name' => 'ЗАББИКС Сервер'
 					],
-					'error_title' => 'Cannot update host',
-					'error' => 'Host with the same visible name "ЗАББИКС Сервер" already exists.'
+					'inline_errors' => [
+						'Visible name' => 'This object already exists.'
+					]
 				]
 			],
-			// Host name field validation.
+			// #7 Host name field validation.
 			[
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => '@#$%^&*()_+'
 					],
-					'error_title' => 'Cannot update host',
-					'error' => 'Incorrect characters used for host name "@#$%^&*()_+".'
+					'inline_errors' => [
+						'Host name' => 'Incorrect characters used for host name.'
+					]
 				]
 			],
-			// UTF8MB4 check.
+			// #8 UTF8MB4 check.
 			[
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => '😀'
 					],
-					'error_title' => 'Cannot update host',
-					'error' => 'Incorrect characters used for host name "😀".'
+					'inline_errors' => [
+						'Host name' => 'Incorrect characters used for host name.'
+					]
 				]
 			],
-			// Interface fields validation.
+			// #9 Interface fields validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1104,10 +1186,12 @@ class testFormHost extends CWebTest {
 							'ip' => ''
 						]
 					],
-					'error_title' => 'Cannot update host',
-					'error' => 'IP and DNS cannot be empty for host interface.'
+					'inline_errors' => [
+						'id:interfaces_{id}_ip' => 'IP address: This field cannot be empty.'
+					]
 				]
 			],
+			// #10.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1118,14 +1202,17 @@ class testFormHost extends CWebTest {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'ip' => '',
-							'Connect to' => 'DNS'
+							'Connect to' => 'DNS',
+							'ip' => ''
+
 						]
 					],
-					'error_title' => 'Cannot update host',
-					'error' => 'IP and DNS cannot be empty for host interface.'
+					'inline_errors' => [
+						'id:interfaces_{id}_dns' => 'DNS name: This field cannot be empty.'
+					]
 				]
 			],
+			// #11.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1140,10 +1227,12 @@ class testFormHost extends CWebTest {
 							'dns' => 'test'
 						]
 					],
-					'error_title' => 'Cannot update host',
-					'error' => 'Interface with DNS "test" cannot have empty IP address.'
+					'inline_errors' => [
+						'id:interfaces_{id}_ip' => 'IP address: This field cannot be empty.'
+					]
 				]
 			],
+			// #12.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1157,11 +1246,12 @@ class testFormHost extends CWebTest {
 							'Connect to' => 'DNS'
 						]
 					],
-					'error_title' => 'Cannot update host',
-					'error' => 'Interface with IP "127.1.1.1" cannot have empty DNS name while having'.
-						' "Use DNS" property on "Empty dns and filled in IP".'
+					'inline_errors' => [
+						'id:interfaces_{id}_dns' => 'DNS name: This field cannot be empty.'
+					]
 				]
 			],
+			// #13.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1175,11 +1265,12 @@ class testFormHost extends CWebTest {
 							'port' => ''
 						]
 					],
-					'error_title' => 'Cannot update host',
-					'error' => 'Port cannot be empty for host interface.'
+					'inline_errors' => [
+						'id:interfaces_{id}_port' => 'Port: This field cannot be empty.'
+					]
 				]
 			],
-			// IP validation.
+			// #14 IP validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1193,10 +1284,12 @@ class testFormHost extends CWebTest {
 							'ip' => 'test'
 						]
 					],
-					'error_title' => 'Cannot update host',
-					'error' => 'Invalid IP address "test".'
+					'inline_errors' => [
+						'id:interfaces_{id}_ip' => 'IP address: Invalid IP address.'
+					]
 				]
 			],
+			// #15.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1210,11 +1303,12 @@ class testFormHost extends CWebTest {
 							'ip' => '127.0.0.'
 						]
 					],
-					'error_title' => 'Cannot update host',
-					'error' => 'Invalid IP address "127.0.0.".'
+					'inline_errors' => [
+						'id:interfaces_{id}_ip' => 'IP address: Invalid IP address.'
+					]
 				]
 			],
-			// Port validation.
+			// #16 Port validation.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1228,10 +1322,12 @@ class testFormHost extends CWebTest {
 							'port' => '100500'
 						]
 					],
-					'error_title' => 'Cannot update host',
-					'error' => 'Incorrect interface port "100500" provided.'
+					'inline_errors' => [
+						'id:interfaces_{id}_port' => 'Port: Incorrect port.'
+					]
 				]
 			],
+			// #17.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1245,10 +1341,12 @@ class testFormHost extends CWebTest {
 							'port' => 'test'
 						]
 					],
-					'error_title' => 'Cannot update host',
-					'error' => 'Incorrect interface port "test" provided.'
+					'inline_errors' => [
+						'id:interfaces_{id}_port' => 'Port: Incorrect port.'
+					]
 				]
 			],
+			// #18.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1262,11 +1360,12 @@ class testFormHost extends CWebTest {
 							'port' => '10.5'
 						]
 					],
-					'error_title' => 'Cannot update host',
-					'error' => 'Incorrect interface port "10.5" provided.'
+					'inline_errors' => [
+						'id:interfaces_{id}_port' => 'Port: Incorrect port.'
+					]
 				]
 			],
-			// Empty SNMP community.
+			// #19 Empty SNMP community.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1280,16 +1379,17 @@ class testFormHost extends CWebTest {
 							'SNMP community' => ''
 						]
 					],
-					'error_title' => 'Cannot update host',
-					'error' => 'Incorrect arguments passed to function.'
+					'inline_errors' => [
+						'SNMP community' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// Zero Max repetition count.
+			// #20 Zero Max repetition count.
 			[
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
-						'Host name' => 'Invalid max repetition count'
+						'Host name' => 'Too low max repetition count'
 					],
 					'interfaces' => [
 						[
@@ -1300,11 +1400,33 @@ class testFormHost extends CWebTest {
 							'Max repetition count' => '0'
 						]
 					],
-					'error_title' => 'Cannot update host',
-					'error' => 'Incorrect arguments passed to function.'
+					'inline_errors' => [
+						'Max repetition count' => 'This value must be within range 1:2147483647.'
+					]
 				]
 			],
-			// Empty proxy.
+			// #21 Too high value in Max repetition count.
+			[
+				[
+					'expected' => TEST_BAD,
+					'host_fields' => [
+						'Host name' => 'Too high max repetition count'
+					],
+					'interfaces' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'SNMP version' => 'SNMPv2',
+							'SNMP community' => '{$SNMP_COMMUNITY}',
+							'Max repetition count' => '2147483648'
+						]
+					],
+					'inline_errors' => [
+						'Max repetition count' => 'This value is not a valid integer.'
+					]
+				]
+			],
+			// #22 Empty proxy.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1313,20 +1435,23 @@ class testFormHost extends CWebTest {
 						'Monitored by' => 'Proxy',
 						'xpath:.//div[@id="proxyid"]/..' => ''
 					],
-					'error_title' => 'Cannot update host',
-					'error' => 'Invalid parameter "/1/proxyid": object does not exist, or you have no permissions to it'
+					'inline_errors' => [
+						'xpath:.//div[@id="proxyid"]/..' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// Empty proxy group.
+			// #23 Empty proxy group.
 			[
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
 						'Host name' => 'Empty proxy',
-						'Monitored by' => 'Proxy group'
+						'Monitored by' => 'Proxy group',
+						'xpath:.//div[@id="proxy_groupid"]/..' => ''
 					],
-					'error_title' => 'Cannot update host',
-					'error' => 'Invalid parameter "/1/proxy_groupid": object does not exist, or you have no permissions to it'
+					'inline_errors' => [
+						'xpath:.//div[@id="proxy_groupid"]/..' => 'This field cannot be empty.'
+					]
 				]
 			]
 		];
@@ -1645,9 +1770,14 @@ class testFormHost extends CWebTest {
 		// Set name for field "Default".
 		$names = ['1' => 'default'];
 		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names]);
+
 		$interfaces_form->fill(CTestArrayHelper::get($data, 'interfaces', []));
-		$form->submit();
-		$this->page->WaitUntilReady();
+		$this->page->removeFocus();
+
+		if (!array_key_exists('inline_errors', $data) || CTestArrayHelper::get($data, 'submit_form')) {
+			$form->submit();
+			$this->page->WaitUntilReady();
+		}
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
@@ -1750,8 +1880,16 @@ class testFormHost extends CWebTest {
 				$this->assertEquals($host_old_hash, CDBHelper::getHash($this->hosts_sql));
 				$this->assertEquals($interface_old_hash, CDBHelper::getHash($this->interface_snmp_sql));
 
-				$error_title = CTestArrayHelper::get($data, 'error_title', 'Cannot update host');
-				$this->assertMessage(TEST_BAD, $error_title, $data['error']);
+				$result = [];
+				foreach ($data['inline_errors'] as $field_name => $error_text) {
+					if (str_contains($field_name, '{id}')) {
+						$field_name = str_replace('{id}', self::$agent_interfaceid, $field_name);
+					}
+
+					$result[$field_name] = $error_text;
+				}
+
+				$this->assertInlineError($form, $result);
 
 				if (!$this->standalone) {
 					COverlayDialogElement::find()->one()->close();

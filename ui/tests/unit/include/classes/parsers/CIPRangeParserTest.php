@@ -25,7 +25,7 @@ class CIPRangeParserTest extends TestCase {
 		return [
 			[
 				'{$MACRO}', ['usermacros' => true], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''
@@ -33,7 +33,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'{{$M}.regsub("^([0-9]+)", \1)}', ['usermacros' => true], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''
@@ -41,7 +41,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				"0.0.0.0,255.255.255.255 \t\r\n,\t\r\n 192.168.1.0,2002:0:0:0:0:0:0:0,2002:0:0:0:0:0:ffff:ffff,www.zabbix.com", [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '1',
 					'max_ip_range' => '0.0.0.0'
@@ -49,7 +49,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'www.zabbix.com', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '1',
 					'max_ip_range' => 'www.zabbix.com'
@@ -57,7 +57,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'www.zabbix.com,bad.dns-', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '1',
 					'max_ip_range' => 'www.zabbix.com'
@@ -65,7 +65,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'Zabbix server', [], [
-					'rc' => false,
+					'rc' => CParser::PARSE_FAIL,
 					'error' => 'incorrect address starting from "server"',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''
@@ -73,7 +73,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'0.0.0.0/0', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '4294967296',
 					'max_ip_range' => '0.0.0.0/0'
@@ -81,7 +81,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'0.0.0.0/30', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '4',
 					'max_ip_range' => '0.0.0.0/30'
@@ -89,7 +89,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'192.168.255.0/30', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '4',
 					'max_ip_range' => '192.168.255.0/30'
@@ -97,7 +97,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'192.168.0-255.0-255', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '65536',
 					'max_ip_range' => '192.168.0-255.0-255'
@@ -105,7 +105,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'0-255.0-255.0-255.0-255', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '4294967296',
 					'max_ip_range' => '0-255.0-255.0-255.0-255'
@@ -113,7 +113,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'192.168.0.0/16,192.168.0.1', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '65536',
 					'max_ip_range' => '192.168.0.0/16'
@@ -121,7 +121,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'127.0.0.1', ['ranges' => false, 'dns' => false], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '1',
 					'max_ip_range' => '127.0.0.1'
@@ -129,7 +129,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'{$M}', ['dns' => false, 'usermacros' => true], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''
@@ -137,7 +137,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'192.168.0.1-127,127.0.0.1', ['ranges' => false, 'dns' => false], [
-					'rc' => false,
+					'rc' => CParser::PARSE_FAIL,
 					'error' => 'incorrect address starting from "192.168.0.1-127,127.0.0.1"',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''
@@ -145,7 +145,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'192.168.0.1-127,192.168.2.1', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '127',
 					'max_ip_range' => '192.168.0.1-127'
@@ -153,7 +153,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				' 192.168.0.2 , 192.168.1-127.0  ,  192.168.255.0/16  ', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '65536',
 					'max_ip_range' => '192.168.255.0/16'
@@ -161,7 +161,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'2001:db8:3333:4444:CCCC:DDDD:EEEE:FFFF', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '1',
 					'max_ip_range' => '2001:db8:3333:4444:CCCC:DDDD:EEEE:FFFF'
@@ -169,7 +169,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'fe80:0:0:0:0:0:c0a8:0/128', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '1',
 					'max_ip_range' => 'fe80:0:0:0:0:0:c0a8:0/128'
@@ -177,7 +177,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/0', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '340282366920938463463374607431768211456',
 					'max_ip_range' => 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/0'
@@ -185,7 +185,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'::', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '1',
 					'max_ip_range' => '::'
@@ -193,7 +193,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'fe80::c0a8:0/112', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '65536',
 					'max_ip_range' => 'fe80::c0a8:0/112'
@@ -201,7 +201,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'fe80::c0a8:0/112', ['v6' => false], [
-					'rc' => false,
+					'rc' => CParser::PARSE_FAIL,
 					'error' => 'incorrect address starting from "::c0a8:0/112"',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''
@@ -209,7 +209,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'fe80::c0a8:0/128', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '1',
 					'max_ip_range' => 'fe80::c0a8:0/128'
@@ -217,7 +217,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'fe80:0:0:0:0:0:c0a8:0-ff', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '256',
 					'max_ip_range' => 'fe80:0:0:0:0:0:c0a8:0-ff'
@@ -225,7 +225,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'fe80::c0a8:0-ff', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '256',
 					'max_ip_range' => 'fe80::c0a8:0-ff'
@@ -233,7 +233,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '340282366920938463463374607431768211456',
 					'max_ip_range' => '0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff'
@@ -241,7 +241,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				' fe80::c0a8:100 , fe80::c0a8:0-ff:1  ,  fe80::c0a8:0:1/112  ', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '65536',
 					'max_ip_range' => 'fe80::c0a8:0:1/112'
@@ -249,7 +249,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'255.255.255.254/30', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '4',
 					'max_ip_range' => '255.255.255.254/30'
@@ -257,7 +257,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'255.255.0.0/16', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '65536',
 					'max_ip_range' => '255.255.0.0/16'
@@ -265,7 +265,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'fe80:0:0:0:0:0:c0a8:0/112', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '65536',
 					'max_ip_range' => 'fe80:0:0:0:0:0:c0a8:0/112'
@@ -273,7 +273,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'255.254.0.0/15', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '131072',
 					'max_ip_range' => '255.254.0.0/15'
@@ -281,7 +281,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'255.252.0.0/14', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '262144',
 					'max_ip_range' => '255.252.0.0/14'
@@ -289,7 +289,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'255.248.0.0/13', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '524288',
 					'max_ip_range' => '255.248.0.0/13'
@@ -297,7 +297,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'255.240.0.0/12', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '1048576',
 					'max_ip_range' => '255.240.0.0/12'
@@ -305,7 +305,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'255.224.0.0/11', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '2097152',
 					'max_ip_range' => '255.224.0.0/11'
@@ -313,7 +313,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'255.192.0.0/10', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '4194304',
 					'max_ip_range' => '255.192.0.0/10'
@@ -321,7 +321,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'255.128.0.0/9', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '8388608',
 					'max_ip_range' => '255.128.0.0/9'
@@ -329,7 +329,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'255.0.0.0/8', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '16777216',
 					'max_ip_range' => '255.0.0.0/8'
@@ -337,7 +337,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'64.0.0.0/4', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '268435456',
 					'max_ip_range' => '64.0.0.0/4'
@@ -345,7 +345,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'0.0.0.0/1', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '2147483648',
 					'max_ip_range' => '0.0.0.0/1'
@@ -353,7 +353,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				"192.168.1.1-2\t\r\n,\t\r\n192.168.1.2-3", [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '2',
 					'max_ip_range' => '192.168.1.1-2'
@@ -361,7 +361,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'::000ff-ffff', [], [
-					'rc' => false,
+					'rc' => CParser::PARSE_FAIL,
 					'error' => 'incorrect address starting from "f-ffff"',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''
@@ -369,7 +369,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'::ff-0ffff', [], [
-					'rc' => false,
+					'rc' => CParser::PARSE_FAIL,
 					'error' => 'incorrect address starting from "f"',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''
@@ -377,7 +377,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'0.0.0.0000-255', ['dns' => false], [
-					'rc' => false,
+					'rc' => CParser::PARSE_FAIL,
 					'error' => 'incorrect address starting from "0-255"',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''
@@ -385,7 +385,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'0.0.0.0-0255', ['dns' => false], [
-					'rc' => false,
+					'rc' => CParser::PARSE_FAIL,
 					'error' => 'incorrect address starting from "5"',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''
@@ -393,7 +393,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'0.0.0.0/024', [], [
-					'rc' => false,
+					'rc' => CParser::PARSE_FAIL,
 					'error' => 'incorrect address starting from "/024"',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''
@@ -401,7 +401,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'192.168.0-255.0/30', [], [
-					'rc' => false,
+					'rc' => CParser::PARSE_FAIL,
 					'error' => 'incorrect address starting from "/30"',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''
@@ -409,7 +409,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'192.168.0-255.0-255/16-30', [], [
-					'rc' => false,
+					'rc' => CParser::PARSE_FAIL,
 					'error' => 'incorrect address starting from "/16-30"',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''
@@ -417,7 +417,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'{$A}', [], [
-					'rc' => false,
+					'rc' => CParser::PARSE_FAIL,
 					'error' => 'incorrect address starting from "{$A}"',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''
@@ -425,7 +425,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'321.654.987.456', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '1',
 					'max_ip_range' => '321.654.987.456'
@@ -433,7 +433,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'321.654.987.456', ['dns' => false], [
-					'rc' => false,
+					'rc' => CParser::PARSE_FAIL,
 					'error' => 'incorrect address starting from "321.654.987.456"',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''
@@ -441,7 +441,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'321.654.987.456-456', [], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '1',
 					'max_ip_range' => '321.654.987.456-456'
@@ -449,7 +449,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'192.168.443.0/432', [], [
-					'rc' => false,
+					'rc' => CParser::PARSE_FAIL,
 					'error' => 'incorrect address starting from "/432"',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''
@@ -457,7 +457,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'fe80:0:0:0:0:0:c0a8:0/129', [], [
-					'rc' => false,
+					'rc' => CParser::PARSE_FAIL,
 					'error' => 'incorrect address starting from "/129"',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''
@@ -465,7 +465,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'{HOST.HOST}', ['macros' => ['{HOST.HOST}']], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''
@@ -473,7 +473,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'{{HOST.HOST}.regsub("(\d+)", \1)}', ['macros' => ['{HOST.HOST}']], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''
@@ -481,7 +481,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'{HOST.IP}', ['macros' => ['{HOST.IP}', '{HOST.HOST}']], [
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''
@@ -489,7 +489,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'{HOST.HOST1}', ['macros' => ['{HOST.HOST}']], [
-					'rc' => false,
+					'rc' => CParser::PARSE_FAIL,
 					'error' => 'incorrect address starting from "{HOST.HOST1}"',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''
@@ -501,7 +501,7 @@ class CIPRangeParserTest extends TestCase {
 					'macros' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.HOST}', '{HOST.NAME}']
 				],
 				[
-					'rc' => true,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
 					'max_ip_count' => '1',
 					'max_ip_range' => '0.0.0.0'
@@ -509,7 +509,7 @@ class CIPRangeParserTest extends TestCase {
 			],
 			[
 				'{HOST.IP}', ['macros' => ['{HOST.DNS}']], [
-					'rc' => false,
+					'rc' => CParser::PARSE_FAIL,
 					'error' => 'incorrect address starting from "{HOST.IP}"',
 					'max_ip_count' => '0',
 					'max_ip_range' => ''

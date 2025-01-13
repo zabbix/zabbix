@@ -46,17 +46,14 @@ foreach ($data['macros'] as $i => $macro) {
 		$macro_input->setAttribute('autofocus', 'autofocus');
 	}
 
-	$macro_value = new CMacroValue($macro['type'], 'macros['.$i.']');
+	$value = array_key_exists('value', $macro) ? $macro['value'] : null;
+	$macro_value = new CMacroValue($macro['type'], 'macros['.$i.']', $value);
 
 	if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
 		$macro_value->addRevertButton();
 		$macro_value->setRevertButtonVisibility(array_key_exists('value', $macro)
 			&& array_key_exists('globalmacroid', $macro)
 		);
-	}
-
-	if (array_key_exists('value', $macro)) {
-		$macro_value->setAttribute('value', $macro['value']);
 	}
 
 	$description_input = (new CTextAreaFlexible('macros['.$i.'][description]', $macro['description']))

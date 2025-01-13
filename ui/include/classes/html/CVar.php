@@ -49,7 +49,7 @@ class CVar {
 		}
 
 		if (strpos($value, "\n") === false) {
-			$hiddenVar = new CInput('hidden', $name, $value);
+			$hiddenVar = (new CInput('hidden', $name, $value))->setAttribute('data-field-type', 'hidden');
 		}
 		else {
 			$hiddenVar = (new CTextArea($name, $value))->addStyle('display: none;');

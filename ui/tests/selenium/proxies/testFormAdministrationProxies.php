@@ -863,7 +863,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'id:local_address' => '127.0.0.1',
 						'id:local_port' => '3k'
 					],
-					'error' => 'Invalid parameter "/1/local_port": an integer is expected.'
+					'error' => 'Invalid parameter "/1/local_port": a port number is expected.'
 				]
 			],
 			[
@@ -875,7 +875,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'id:local_address' => '127.0.0.1',
 						'id:local_port' => '65536'
 					],
-					'error' => 'Invalid parameter "/1/local_port": value must be one of 0-65535.'
+					'error' => 'Invalid parameter "/1/local_port": a port number is expected.'
 				]
 			],
 			[
@@ -887,7 +887,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'id:local_address' => '127.0.0.1',
 						'id:local_port' => '-1'
 					],
-					'error' => 'Invalid parameter "/1/local_port": value must be one of 0-65535.'
+					'error' => 'Invalid parameter "/1/local_port": a port number is expected.'
 				]
 			],
 			[
@@ -899,7 +899,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'id:local_address' => '127.0.0.1',
 						'id:local_port' => '{TIME}'
 					],
-					'error' => 'Invalid parameter "/1/local_port": an integer is expected.'
+					'error' => 'Invalid parameter "/1/local_port": a port number is expected.'
 				]
 			],
 			[
@@ -911,7 +911,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'id:local_address' => '127.0.0.1',
 						'id:local_port' => '{#PORT}'
 					],
-					'error' => 'Invalid parameter "/1/local_port": an integer is expected.'
+					'error' => 'Invalid parameter "/1/local_port": a port number is expected.'
 				]
 			],
 			[
@@ -955,7 +955,7 @@ class testFormAdministrationProxies extends CWebTest {
 						'Proxy mode' => 'Passive',
 						'id:port' => 65536
 					],
-					'error' => 'Invalid parameter "/1/port": value must be one of 0-65535.'
+					'error' => 'Invalid parameter "/1/port": a port number is expected.'
 				]
 			],
 			[

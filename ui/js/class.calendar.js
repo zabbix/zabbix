@@ -378,7 +378,9 @@ calendar.prototype = {
 			new_val = this.sdt.format(this.date_time_format);
 
 		if ($input.val() != new_val) {
-			$input.val(new_val).trigger('change');
+			$input.val(new_val);
+			$input.trigger('change');
+			$input[0].dispatchEvent(new CustomEvent('field.change', {detail: {source_fields: [$input.attr('name')]}}));
 		}
 	},
 

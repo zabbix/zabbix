@@ -168,7 +168,8 @@ $tags_tab = new CPartial('configuration.tags.tab', [
 	'tags' => $data['tags'],
 	'readonly' => $data['readonly'],
 	'tabs_id' => 'template-tabs',
-	'tags_tab_id' => 'template-tags-tab'
+	'tags_tab_id' => 'template-tags-tab',
+	'has_inline_validation' => false
 ]);
 
 $form->addItem(
@@ -187,7 +188,8 @@ $macros_tab = (new CFormList('macrosFormList'))
 	)
 	->addRow(null, new CPartial($tmpl, [
 		'macros' => $data['macros'],
-		'readonly' => $data['readonly']
+		'readonly' => $data['readonly'],
+		'has_inline_validation' => false
 	]), 'template_macros_container');
 
 if (!$data['readonly']) {
@@ -276,7 +278,7 @@ $valuemap_tab = (new CFormList('valuemap-formlist'))->addRow(
 		'source' => 'template',
 		'valuemaps' => $data['valuemaps'],
 		'readonly' => $data['readonly'],
-		'form' => 'templates',
+		'form' => 'template',
 		'table_id' => 'template-valuemap-table',
 		'with_label' => true
 	])

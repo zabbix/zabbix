@@ -44,6 +44,14 @@ $options = [
 	'source' => $data['source']
 ];
 
+if ($data['has_inline_validation']) {
+	$table
+		->setAttribute('data-field-type', 'set')
+		->setAttribute('data-field-name', 'tags');
+
+	$options['has_inline_validation'] = true;
+}
+
 // fields
 foreach (array_values($data['tags']) as $index  => $tag) {
 	if ($with_automatic) {

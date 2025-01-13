@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/CastableTrait.php';
 use Facebook\WebDriver\WebDriverExpectedCondition;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverKeys;
+use Facebook\WebDriver\Exception\StaleElementReferenceException;
 
 /**
  * Generic web page element.
@@ -258,8 +259,17 @@ class CElement extends CBaseElement implements IWaitable {
 	 * @inheritdoc
 	 */
 	public function getText() {
-		if (!$this->isVisible()) {
-			return CElementQuery::getDriver()->executeScript('return arguments[0].textContent;', [$this]);
+		try {
+			if (!$this->isVisible()) {
+				return CElementQuery::getDriver()->executeScript('return arguments[0].textContent;', [$this]);
+			}
+		}
+		catch (StaleElementReferenceException $exception) {
+			$this->reload();
+
+			if (!$this->isVisible()) {
+				return CElementQuery::getDriver()->executeScript('return arguments[0].textContent;', [$this]);
+			}
 		}
 
 		return parent::getText();

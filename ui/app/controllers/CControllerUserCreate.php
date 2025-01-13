@@ -43,15 +43,15 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 		];
 
 		$ret = $this->validateInput($fields);
-		$error = $this->GetValidationError();
+		$result = $this->GetValidationResult();
 
 		if ($ret && (!$this->validatePassword() || !$this->validateUserRole())) {
-			$error = self::VALIDATION_ERROR;
+			$result = self::VALIDATION_ERROR;
 			$ret = false;
 		}
 
 		if (!$ret) {
-			switch ($error) {
+			switch ($result) {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect('zabbix.php?action=user.edit');
 					$response->setFormData($this->getInputAll());

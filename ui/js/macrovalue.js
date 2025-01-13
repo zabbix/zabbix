@@ -52,10 +52,13 @@
 							id: $input.attr('id'),
 							name: $input.attr('name'),
 							type: 'password',
-							value: '******',
+							value: ZBX_SECRET_MASK,
 							placeholder: $input.attr('placeholder'),
 							maxlength: $input.attr('maxlength'),
-							disabled: true
+							disabled: true,
+							'data-field-type': 'text-box',
+							'data-error-container': $input.attr('data-error-container'),
+							'data-error-label': $input.attr('data-error-label')
 						})
 						.on('focus blur', btnUndoFocusEventHandle)
 				)
@@ -112,6 +115,8 @@
 				$input = $curr_control;
 		}
 
+		$this.closest('.textarea-flexible-parent').find('.error').remove();
+
 		if (value_type == ZBX_MACRO_TYPE_SECRET) {
 			$container.addClass(ZBX_STYLE_MACRO_VALUE_SECRET);
 
@@ -127,7 +132,10 @@
 							placeholder: t('value'),
 							maxlength: $input.attr('maxlength'),
 							autocomplete: 'off',
-							style: 'width: 100%;'
+							style: 'width: 100%;',
+							'data-field-type': 'text-box',
+							'data-error-container': $input.attr('data-error-container'),
+							'data-error-label': $input.attr('data-error-label')
 						})
 						.on('focus blur', btnUndoFocusEventHandle)
 				)
@@ -152,7 +160,10 @@
 					name: $input.attr('name'),
 					placeholder: t('value'),
 					maxlength: $input.attr('maxlength'),
-					spellcheck: false
+					spellcheck: false,
+					'data-field-type': 'textarea',
+					'data-error-container': $input.attr('data-error-container'),
+					'data-error-label': $input.attr('data-error-label')
 				})
 				.text($input.is(':disabled') ? '' : $input.val())
 				.on('focus blur', btnUndoFocusEventHandle)

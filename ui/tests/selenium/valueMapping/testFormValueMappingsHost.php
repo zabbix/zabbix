@@ -136,7 +136,7 @@ class testFormValueMappingsHost extends testFormValueMappings {
 	}
 
 	/**
-	 * Scenario for checking that the entered valuemap data is not lost if there is an error when saving the template.
+	 * Scenario for checking that the entered valuemap data is not lost if there is an error when saving the host/template.
 	 */
 	public function testFormValueMappingsHost_ErrorWhileSaving() {
 		$this->checkSavingError('host');

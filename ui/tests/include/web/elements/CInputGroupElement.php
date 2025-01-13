@@ -103,10 +103,6 @@ class CInputGroupElement extends CElement {
 			return $this;
 		}
 
-		if (array_key_exists('type', $input) && $this->getInputType() !== $input['type']) {
-			$this->changeInputType($input['type']);
-		}
-
 		if (array_key_exists('text', $input)) {
 			$change_button = $this->query('button:Set new value')->one(false);
 			if ($change_button->isValid()) {
@@ -115,6 +111,10 @@ class CInputGroupElement extends CElement {
 
 			$xpath = 'xpath:.//textarea[contains(@class, "textarea-flexible")]|.//input[@type="password"]';
 			$this->query($xpath)->one()->fill($input['text']);
+		}
+
+		if (array_key_exists('type', $input) && $this->getInputType() !== $input['type']) {
+			$this->changeInputType($input['type']);
 		}
 
 		return $this;

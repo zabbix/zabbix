@@ -14,21 +14,19 @@
 **/
 
 
-class CControllerPopupValueMapUpdate extends CController {
+class CControllerValueMapCheck extends CController {
+
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
 
 	protected function checkInput() {
-		$fields = [
-			'edit' => 'in 1,0',
-			'mappings' => 'array',
-			'name' => 'string',
-			'update' => 'in 1',
-			'valuemapid' => 'id',
+		$check_source = $this->validateInput([
+			'source' => 'required|in host,template,massupdate',
 			'valuemap_names' => 'array'
-		];
+		]);
 
-		$ret = $this->validateInput($fields) && $this->validateValueMap();
-
-		if (!$ret) {
+		if (!$check_source) {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
@@ -36,6 +34,54 @@ class CControllerPopupValueMapUpdate extends CController {
 					]
 				])])
 			);
+		}
+
+		switch ($this->getInput('source')) {
+			case 'host':
+				$rules = CControllerHostCreate::getValidationRules()['fields']['valuemaps'];
+
+				if ($this->hasInput('valuemap_names')) {
+					$rules['fields']['name'] += ['not_in' => $this->getInput('valuemap_names')];
+
+					if (!array_key_exists('messages', $rules['fields']['name'])) {
+						$rules['fields']['name']['messages'] = [];
+					}
+					$rules['fields']['name']['messages'] += ['not_in' => _('Given valuemap name is already taken.')];
+				}
+
+				$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
+				$ret = $this->validateInput($rules) && $this->validateValueMap();
+
+				$form_errors = $this->getValidationError();
+				$response = $form_errors
+					? ['form_errors' => $form_errors]
+					: ['error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]];
+
+				$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
+				break;
+
+			default:
+				$fields = [
+					'mappings' => 'array',
+					'name' => 'string',
+					'valuemapid' => 'id',
+					'valuemap_names' => 'array'
+				];
+
+				$ret = $this->validateInput($fields) && $this->validateValueMap();
+
+				if (!$ret) {
+					$this->setResponse(
+						new CControllerResponseData(['main_block' => json_encode([
+							'error' => [
+								'messages' => array_column(get_and_clear_messages(), 'message')
+							]
+						])])
+					);
+				}
+				break;
 		}
 
 		return $ret;
@@ -47,14 +93,11 @@ class CControllerPopupValueMapUpdate extends CController {
 	 * @return bool
 	 */
 	protected function validateValueMap(): bool {
-		if (!$this->hasInput('update')) {
-			return true;
-		}
-
 		$name = $this->getInput('name', '');
 
 		if ($name === '') {
 			error(_s('Incorrect value for field "%1$s": %2$s.', _('Name'), _('cannot be empty')));
+
 			return false;
 		}
 
@@ -154,11 +197,11 @@ class CControllerPopupValueMapUpdate extends CController {
 		$data = [];
 		$mappings = [];
 		$default = [];
-		$this->getInputs($data, ['valuemapid', 'name', 'mappings', 'edit']);
+		$this->getInputs($data, ['valuemapid', 'name', 'mappings']);
 
 		foreach ($data['mappings'] as $mapping) {
-			if ($mapping['type'] != VALUEMAP_MAPPING_TYPE_DEFAULT &&
-					$mapping['value'] === '' && $mapping['newvalue'] === '') {
+			if ($mapping['type'] != VALUEMAP_MAPPING_TYPE_DEFAULT
+					&& $mapping['value'] === '' && $mapping['newvalue'] === '') {
 				continue;
 			}
 			elseif ($mapping['type'] == VALUEMAP_MAPPING_TYPE_DEFAULT) {

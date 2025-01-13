@@ -120,7 +120,8 @@ window.template_edit_popup = new class {
 
 	#initMacrosTab() {
 		this.macros_manager = new HostMacrosManager({
-			container: $('#template_macros_container .table-forms-td-right')
+			container: $('#template_macros_container .table-forms-td-right'),
+			source: 'template'
 		});
 		let macros_initialized = false;
 

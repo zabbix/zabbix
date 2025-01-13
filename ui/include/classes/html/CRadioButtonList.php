@@ -54,6 +54,8 @@ class CRadioButtonList extends CList {
 		$this->modern = false;
 		$this->readonly = false;
 		$this->setId(zbx_formatDomId($name));
+
+		$this->setAttribute('data-field-type', 'radio-list');
 	}
 
 	public function setValues(array $values): self {

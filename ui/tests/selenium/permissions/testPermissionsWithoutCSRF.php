@@ -146,7 +146,11 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'link' => 'zabbix.php?action=popup&popup=host.edit&hostid=99062'
+					'link' => 'zabbix.php?action=popup&popup=host.edit&hostid=99062',
+					'fields' => [
+						'id:host' => 'CSRF validation host',
+						'xpath://div[@id="groups_"]/..' => 'Zabbix servers'
+					]
 				]
 			],
 			// #9 Item update.
@@ -665,6 +669,13 @@ class testPermissionsWithoutCSRF extends CWebTest {
 		}
 		else {
 			$element = $this;
+		}
+
+		// Mandatory fields in views with inline validation should be filled in, to stop it from preventing form submission.
+		if (array_key_exists('fields', $data)) {
+			foreach ($data['fields'] as $field => $value) {
+				$this->query($field)->one()->detect()->fill($value);
+			}
 		}
 
 		// Delete hidden input with CSRF token.

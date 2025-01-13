@@ -108,7 +108,9 @@ if ($data['host']['parentTemplates']) {
 		->setHeader([_('Name'), _('Actions')])
 		->setId('linked-templates')
 		->addClass(ZBX_STYLE_TABLE_FORMS)
-		->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
+		->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->setAttribute('data-field-type', 'array')
+		->setAttribute('data-field-name', 'templates');
 
 	foreach ($data['host']['parentTemplates'] as $template) {
 		if ($data['user']['can_edit_templates']
@@ -207,6 +209,7 @@ $host_tab
 		new CFormField(
 			(new CMultiSelect([
 				'name' => 'groups[]',
+				'new_item_name' => 'groups_new[]',
 				'object_name' => 'hostGroup',
 				'readonly' => $host_is_discovered,
 				'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
@@ -230,25 +233,41 @@ $host_tab
 		new CLabel(_('Interfaces')),
 		new CFormField([
 			(new CDiv([
-				renderInterfaceHeaders(),
-				$agent_interfaces,
-				$snmp_interfaces,
-				$jmx_interfaces,
-				$ipmi_interfaces
-			]))->addClass(ZBX_STYLE_HOST_INTERFACES),
-			$host_is_discovered
-				? null
-				: new CDiv(
-					(new CButtonLink(_('Add')))
-						->addClass('add-interface')
-						->setMenuPopup([
-							'type' => 'submenu',
-							'data' => [
-								'submenu' => getAddNewInterfaceSubmenu()
-							]
-						])
-						->setAttribute('aria-label', _('Add new interface'))
-				)
+				(new CDiv([
+					renderInterfaceHeaders(),
+					$agent_interfaces,
+					$snmp_interfaces,
+					$jmx_interfaces,
+					$ipmi_interfaces
+				]))->addClass(ZBX_STYLE_HOST_INTERFACES),
+				$host_is_discovered
+					? null
+					: new CDiv(
+						(new CButtonLink(_('Add')))
+							->addClass('add-interface')
+							->setMenuPopup([
+								'type' => 'submenu',
+								'data' => [
+									'submenu' => getAddNewInterfaceSubmenu()
+								]
+							])
+							->setAttribute('aria-label', _('Add new interface'))
+					)
+			]))
+				->setAttribute('data-field-type', 'set')
+				->setAttribute('data-field-name', 'interfaces'),
+			(new CInput('hidden', 'main_interface_'.INTERFACE_TYPE_AGENT, 0))
+				->setAttribute('data-prevent-validation-on-change', 1)
+				->setAttribute('data-field-type', 'hidden'),
+			(new CInput('hidden', 'main_interface_'.INTERFACE_TYPE_SNMP, 0))
+				->setAttribute('data-prevent-validation-on-change', 1)
+				->setAttribute('data-field-type', 'hidden'),
+			(new CInput('hidden', 'main_interface_'.INTERFACE_TYPE_IPMI, 0))
+				->setAttribute('data-prevent-validation-on-change', 1)
+				->setAttribute('data-field-type', 'hidden'),
+			(new CInput('hidden', 'main_interface_'.INTERFACE_TYPE_JMX, 0))
+				->setAttribute('data-prevent-validation-on-change', 1)
+				->setAttribute('data-field-type', 'hidden')
 		])
 	])
 	->addItem([
@@ -315,6 +334,7 @@ $host_tab
 		new CFormField(
 			(new CCheckBox('status', HOST_STATUS_MONITORED))
 				->setChecked($data['host']['status'] == HOST_STATUS_MONITORED)
+				->setUncheckedValue(HOST_STATUS_NOT_MONITORED)
 		)
 	]);
 
@@ -346,11 +366,14 @@ $host_tab->addItem([
 	]))->addClass('js-field-proxy-group-proxy')
 ]);
 
-$host_tab->addItem(
+$host_tab->addItem([
 	(new CTemplateTag('host-interface-row-tmpl'))->addItem(
-		new CPartial('configuration.host.interface.row')
+		new CPartial('configuration.host.interface.row', ['is_snmp' => false])
+	),
+	(new CTemplateTag('host-interface-row-snmp-tmpl'))->addItem(
+		new CPartial('configuration.host.interface.row', ['is_snmp' => true])
 	)
-);
+]);
 
 $ipmi_tab = (new CFormGrid())
 	->addItem([
@@ -404,7 +427,8 @@ $tags_tab = new CPartial('configuration.tags.tab', [
 	'tags' => $data['host']['tags'],
 	'with_automatic' => true,
 	'tabs_id' => 'host-tabs',
-	'tags_tab_id' => 'host-tags-tab'
+	'tags_tab_id' => 'host-tags-tab',
+	'has_inline_validation' => true
 ]);
 
 // Macros tab.
@@ -413,11 +437,13 @@ $macros_tab = (new CFormList('macrosFormList'))
 		->addValue(_('Host macros'), 0)
 		->addValue(_('Inherited and host macros'), 1)
 		->setModern(true)
+		->removeAttribute('data-field-type')
 	)
 	->addRow(null,
 		new CPartial('hostmacros.list.html', [
 			'macros' => $data['host']['macros'],
-			'readonly' => false
+			'readonly' => false,
+			'has_inline_validation' => true
 		]), 'macros_container'
 	);
 
@@ -426,19 +452,24 @@ $macro_row_tmpl = (new CTemplateTag('macro-row-tmpl'))
 		(new CRow([
 			(new CCol([
 				(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+					->setErrorContainer('macros_#{rowNum}_error_container')
 					->addClass('macro')
 					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 					->setAttribute('placeholder', '{$MACRO}')
-					->disableSpellcheck(),
+					->disableSpellcheck()
+					->setErrorLabel(_('Macro')),
 				new CInput('hidden', 'macros[#{rowNum}][discovery_state]',
 					CControllerHostMacrosList::DISCOVERY_STATE_MANUAL
 				)
 			]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
-				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
+				(new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false))
+					->setErrorContainer('macros_#{rowNum}_error_container')
+					->setErrorLabel(_('Value'))
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
 				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+					->setErrorContainer('macros_#{rowNum}_error_container')
 					->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 					->setAttribute('placeholder', _('description'))
@@ -449,6 +480,15 @@ $macro_row_tmpl = (new CTemplateTag('macro-row-tmpl'))
 				])
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->addClass('form_row')
+	)
+	->addItem(
+		new CRow(
+			(new CCol())
+				->setId('macros_#{rowNum}_error_container')
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
+				->setColSpan(4)
+		)
+
 	);
 
 $macro_row_inherited_tmpl = (new CTemplateTag('macro-row-tmpl-inherited'))
@@ -456,42 +496,46 @@ $macro_row_inherited_tmpl = (new CTemplateTag('macro-row-tmpl-inherited'))
 		(new CRow([
 			(new CCol([
 				(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+					->setErrorContainer('macros_#{rowNum}_error_container')
 					->addClass('macro')
 					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 					->setAttribute('placeholder', '{$MACRO}')
-					->disableSpellcheck(),
+					->disableSpellcheck()
+					->setErrorLabel(_('Macro')),
 				new CInput('hidden', 'macros[#{rowNum}][inherited_type]', ZBX_PROPERTY_OWN),
 				new CInput('hidden', 'macros[#{rowNum}][discovery_state]',
 					CControllerHostMacrosList::DISCOVERY_STATE_MANUAL
 				)
 			]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
-				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
+				(new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false))
+					->setErrorContainer('macros_#{rowNum}_error_container')
+					->setErrorLabel(_('Value'))
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
 				(new CButton('macros[#{rowNum}][remove]', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')
 			))->addClass(ZBX_STYLE_NOWRAP),
-			[
-				new CCol(
-					(new CDiv())
-						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
-						->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-				),
-				new CCol(),
-				new CCol(
-					(new CDiv())
-						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
-						->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-				)
-			]
+			new CCol(),
+			new CCol(
+				(new CDiv())
+					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+					->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+			),
+			new CCol(),
+			new CCol(
+				(new CDiv())
+					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+					->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+			)
 		]))->addClass('form_row')
 	)
 	->addItem(
 		(new CRow([
 			(new CCol(
 				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+					->setErrorContainer('macros_#{rowNum}_error_container')
 					->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setAttribute('placeholder', _('description'))
@@ -499,6 +543,14 @@ $macro_row_inherited_tmpl = (new CTemplateTag('macro-row-tmpl-inherited'))
 				->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
 				->setColSpan(7)
 		]))->addClass('form_row')
+	)
+	->addItem(
+		new CRow(
+			(new CCol())
+				->setId('macros_#{rowNum}_error_container')
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
+				->setColSpan(4)
+		)
 	);
 
 $macros_tab
@@ -516,7 +568,7 @@ $inventory_tab = (new CFormGrid())
 				->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
 				->setReadonly($host_is_discovered)
 				->setModern(),
-			$host_is_discovered ? new CInput('hidden', 'inventory_mode', $data['host']['inventory_mode']) : null
+			$host_is_discovered ? new CVar('inventory_mode', $data['host']['inventory_mode']) : null
 		])
 	]);
 
@@ -588,34 +640,34 @@ $is_psk_set = ($data['host']['tls_connect'] == HOST_ENCRYPTION_PSK || $tls_accep
 $encryption_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Connections to host')),
-		new CFormField(
+		new CFormField([
 			(new CRadioButtonList('tls_connect', (int) $data['host']['tls_connect']))
 				->addValue(_('No encryption'), HOST_ENCRYPTION_NONE)
 				->addValue(_('PSK'), HOST_ENCRYPTION_PSK)
 				->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
-				->setModern(true)
 				->setReadonly($host_is_discovered)
-		)
+				->setModern(),
+			$host_is_discovered ? new CVar('tls_connect', (int) $data['host']['tls_connect']) : null
+		])
 	])
 	->addItem([
 		new CLabel(_('Connections from host')),
 		new CFormField([
 			(new CList([
 				(new CCheckBox('tls_in_none'))
-					->setChecked(($tls_accept & HOST_ENCRYPTION_NONE))
+					->setChecked($tls_accept & HOST_ENCRYPTION_NONE)
 					->setLabel(_('No encryption'))
 					->setReadonly($host_is_discovered),
 				(new CCheckBox('tls_in_psk'))
-					->setChecked(($tls_accept & HOST_ENCRYPTION_PSK))
+					->setChecked($tls_accept & HOST_ENCRYPTION_PSK)
 					->setLabel(_('PSK'))
 					->setReadonly($host_is_discovered),
 				(new CCheckBox('tls_in_cert'))
-					->setChecked(($tls_accept & HOST_ENCRYPTION_CERTIFICATE))
+					->setChecked($tls_accept & HOST_ENCRYPTION_CERTIFICATE)
 					->setLabel(_('Certificate'))
 					->setReadonly($host_is_discovered)
 			]))
-				->addClass(ZBX_STYLE_LIST_CHECK_RADIO),
-			new CInput('hidden', 'tls_accept', $tls_accept)
+				->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
 		])
 	])
 	->addItem(
@@ -751,7 +803,7 @@ $output = [
 	'script_inline' => getPagePostJs().
 		$this->readJsFile('host.edit.js.php').
 		'host_edit_popup.init('.json_encode([
-			'form_name' => $data['form_name'],
+			'rules' => $data['js_validation_rules'],
 			'host_interfaces' => $data['host']['interfaces'],
 			'proxy_groupid' => $data['host']['proxy_groupid'],
 			'host_is_discovered' => ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED),

@@ -79,7 +79,9 @@ class CButtonDropdown extends CButton {
 			->addItem(new CObject(parent::toString($destroy)))
 			->addItem(
 				(new CInput('hidden', $this->getAttribute('name'), $this->dropdown_value))
+					->setAttribute('data-field-type', 'hidden')
 					->addClass(self::ZBX_STYLE_BTN_VALUE)
+					->setAttribute('data-skip-from-submit', $this->getAttribute('data-skip-from-submit'))
 			)
 			->toString(true);
 	}

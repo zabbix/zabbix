@@ -174,7 +174,8 @@ $tabs = (new CTabView(['id' => $tabsid]))
 			'source' => 'item',
 			'tabs_id' => $tabsid,
 			'tags' => $item['tags'],
-			'tags_tab_id' => 'tags-tab'
+			'tags_tab_id' => 'tags-tab',
+			'has_inline_validation' => false
 		]),
 		TAB_INDICATOR_TAGS
 	)

@@ -896,25 +896,26 @@ function getTriggerMassupdateFormData() {
 	return $data;
 }
 
+
 /**
  * Renders tag table row.
  *
- * @param int|string $index
  * @param array	     $tag
- * @param string     $tag['tag']                      Tag name.
- * @param string     $tag['value']                    Tag value.
- * @param int        $tag['type']                     (optional) Tag ownership type.
- * @param int        $tag['automatic']                (optional) Tag automatic flag.
- * @param array      $tag['parent_templates']         (optional) List of templates that tags are inherited from.
+ * @param string     $tag['tag']                          Tag name.
+ * @param string     $tag['value']                        Tag value.
+ * @param int        $tag['type']                         (optional) Tag ownership type.
+ * @param int        $tag['automatic']                    (optional) Tag automatic flag.
+ * @param array      $tag['parent_templates']             (optional) List of templates that tags are inherited from.
  * @param array      $options
- * @param bool       $options['add_post_js']          (optional) Parameter passed to CTextAreaFlexible.
- * @param bool       $options['show_inherited_tags']  (optional) Render row in inherited tag mode. This enables usage of $tag['type'].
- * @param bool       $options['with_automatic']       (optional) Render row with 'automatic' input. This enables usage of $tag['automatic'].
- * @param string     $options['field_name']           (optional) Re-define default field name.
- * @param bool       $options['readonly']             (optional) Render row in read-only mode.
- * @param string     $options['source']               (optional) The origin of tag.
+ * @param bool       $options['add_post_js']              (optional) Parameter passed to CTextAreaFlexible.
+ * @param bool       $options['show_inherited_tags']      (optional) Render row in inherited tag mode. This enables usage of $tag['type'].
+ * @param bool       $options['with_automatic']           (optional) Render row with 'automatic' input. This enables usage of $tag['automatic'].
+ * @param string     $options['field_name']               (optional) Re-define default field name.
+ * @param bool       $options['readonly']                 (optional) Render row in read-only mode.
+ * @param string     $options['source']                   (optional) The origin of tag.
+ * @param bool       $options['has_inline_validation']    (optional)
  *
- * @return CRow
+ * @return array
  */
 function renderTagTableRow($index, array $tag, array $options = []) {
 	$options += [
@@ -922,6 +923,7 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 		'field_name' => 'tags',
 		'with_automatic' => false,
 		'show_inherited_tags' => false,
+		'has_inline_validation' => false,
 		'source' => null
 	];
 
@@ -937,6 +939,8 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 	];
 
 	$tag_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][tag]', $tag['tag'], $textarea_options))
+		->setErrorContainer($options['has_inline_validation'] ? 'tag_'.$index.'_error_container' : null)
+		->setErrorLabel($options['has_inline_validation'] ? _('Name') : null)
 		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_WIDTH)
 		->setAttribute('placeholder', _('tag'));
 
@@ -951,6 +955,8 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 	$value_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $tag['value'],
 			$textarea_options
 		))
+		->setErrorContainer($options['has_inline_validation'] ? 'tag_'.$index.'_error_container' : null)
+		->setErrorLabel($options['has_inline_validation'] ? _('Value') : null)
 		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
 		->setAttribute('placeholder', _('value'));
 
@@ -977,7 +983,7 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 				->setEnabled(!$options['readonly']);
 	}
 
-	return (new CRow([
+	$fields_row = (new CRow([
 		(new CCol([$tag_field, $type_field, $automatic_field]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol($value_field))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol($actions))
@@ -987,6 +993,17 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 			? new CCol(makeParentTemplatesList($tag['parent_templates']))
 			: null
 	]))->addClass('form_row');
+
+	$error_container_row = $options['has_inline_validation']
+		? (new CRow(
+			(new CCol())
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
+				->setId('tag_'.$index.'_error_container')
+				->setColSpan($options['show_inherited_tags'] ? 4 : 3)
+		))
+		: null;
+
+	return array_filter([$fields_row, $error_container_row]);
 }
 
 /**
@@ -1034,6 +1051,9 @@ function makeParentTemplatesList(array $parent_templates): array {
  * @param array  $tags[]['tag']
  * @param array  $tags[]['value']
  * @param bool   $readonly         (optional)
+ * @param array  $options          (optional)
+ * @param bool   $options['with_automatic']
+ * @param string $options['field_name']
  *
  * @return CTable
  */

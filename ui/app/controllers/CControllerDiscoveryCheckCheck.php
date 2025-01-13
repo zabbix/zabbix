@@ -48,9 +48,13 @@ class CControllerDiscoveryCheckCheck extends CController {
 
 		$ret = $this->validateInput($fields);
 
-		if ($ret && $this->hasInput('ports') && !validate_port_list($this->getInput('ports'))) {
-			info(_('Incorrect port range.'));
-			$ret = false;
+		if ($ret && $this->hasInput('ports')) {
+			$port_range_parser = new CPortRangeParser();
+
+			if ($port_range_parser->parse($this->getInput('ports')) != CParser::PARSE_SUCCESS) {
+				info(_('Incorrect port range.'));
+				$ret = false;
+			}
 		}
 
 		if ($ret && $this->hasInput('type') && $this->getInput('type') == SVC_AGENT) {

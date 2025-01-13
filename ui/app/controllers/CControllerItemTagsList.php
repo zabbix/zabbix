@@ -60,7 +60,8 @@ class CControllerItemTagsList extends CController {
 		$data = [
 			'tags' => [],
 			'show_inherited_tags' => 0,
-			'source' => 'item'
+			'source' => 'item',
+			'has_inline_validation' => false
 		];
 		$this->getInputs($data, array_keys($data));
 

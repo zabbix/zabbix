@@ -128,7 +128,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'macro' => '{MACRO}'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "MACRO}".'
+					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "MACRO}".',
+					'inline_error' => [
+						'id:macros_0_macro' => 'Macro: Expected user macro format is "{$MACRO}".'
+					]
 				]
 			],
 			[
@@ -142,7 +145,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'macro' => '{$$MACRO}'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "$MACRO}".'
+					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "$MACRO}".',
+					'inline_error' => [
+						'id:macros_0_macro' => 'Macro: Expected user macro format is "{$MACRO}".'
+					]
 				]
 			],
 			[
@@ -156,7 +162,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'macro' => '{$MAC%^}'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "%^}".'
+					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "%^}".',
+					'inline_error' => [
+						'id:macros_0_macro' => 'Macro: Expected user macro format is "{$MACRO}".'
+					]
 				]
 			],
 			[
@@ -170,7 +179,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'macro' => '{#LLD_MACRO}'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "#LLD_MACRO}".'
+					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "#LLD_MACRO}".',
+					'inline_error' => [
+						'id:macros_0_macro' => 'Macro: Expected user macro format is "{$MACRO}".'
+					]
 				]
 			],
 			[
@@ -186,7 +198,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'description' => 'Macro Description'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": cannot be empty.'
+					'error' => 'Invalid parameter "/1/macros/1/macro": cannot be empty.',
+					'inline_error' => [
+						'id:macros_0_macro' => 'Macro: This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -207,7 +222,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.'
+					'error' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.',
+					'inline_error' => [
+						'id:macros_1_macro' => 'Macro name is not unique.'
+					]
 				]
 			],
 			[
@@ -228,7 +246,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO:regex:"^[0-9].*$"}) already exists.'
+					'error' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO:regex:"^[0-9].*$"}) already exists.',
+					'inline_error' => [
+						'id:macros_1_macro' => 'Macro name is not unique.'
+					]
 				]
 			]
 		];
@@ -355,7 +376,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'macro' => '{MACRO}'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "MACRO}".'
+					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "MACRO}".',
+					'inline_error' => [
+						'id:macros_0_macro' => 'Macro: Expected user macro format is "{$MACRO}".'
+					]
 				]
 			],
 			[
@@ -371,7 +395,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'description' => 'Macro Description'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": cannot be empty.'
+					'error' => 'Invalid parameter "/1/macros/1/macro": cannot be empty.',
+					'inline_error' => [
+						'id:macros_0_macro' => 'Macro: This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -385,7 +412,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'macro' => '{$$MACRO}'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "$MACRO}'
+					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "$MACRO}',
+					'inline_error' => [
+						'id:macros_0_macro' => 'Macro: Expected user macro format is "{$MACRO}".'
+					]
 				]
 			],
 			[
@@ -399,7 +429,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'macro' => '{$MAC%^}'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "%^}".'
+					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "%^}".',
+					'inline_error' => [
+						'id:macros_0_macro' => 'Macro: Expected user macro format is "{$MACRO}".'
+					]
 				]
 			],
 			[
@@ -413,7 +446,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'macro' => '{#LLD_MACRO}'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "#LLD_MACRO}".'
+					'error' => 'Invalid parameter "/1/macros/1/macro": incorrect syntax near "#LLD_MACRO}".',
+					'inline_error' => [
+						'id:macros_0_macro' => 'Macro: Expected user macro format is "{$MACRO}".'
+					]
 				]
 			],
 			[
@@ -436,7 +472,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.'
+					'error' => 'Invalid parameter "/1/macros/2": value (macro)=({$MACRO}) already exists.',
+					'inline_error' => [
+						'id:macros_1_macro' => 'Macro name is not unique.'
+					]
 				]
 			],
 			[
@@ -459,7 +498,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'description' => 'Macro Description_2'
 						]
 					],
-					'error' => 'Invalid parameter "/1/macros/2": value (macro)=({$M:regex:"[a-z]"}) already exists.'
+					'error' => 'Invalid parameter "/1/macros/2": value (macro)=({$M:regex:"[a-z]"}) already exists.',
+					'inline_error' => [
+						'id:macros_1_macro' => 'Macro name is not unique.'
+					]
 				]
 			],
 			[
@@ -502,7 +544,9 @@ abstract class testFormMacros extends CLegacyWebTest {
 		if ($data['expected'] === TEST_BAD) {
 			$old_hash = $this->getHash();
 		}
+
 		$form_type = ($host_type === 'host prototype') ? 'hostPrototype' : $host_type.'s';
+
 		if ($update) {
 			if ($host_type === 'host') {
 				$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1')->waitUntilReady();
@@ -576,7 +620,13 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 
 		$this->fillMacros($data['macros']);
-		$form->submit();
+
+		if ($host_type === 'host' && $data['expected'] === TEST_BAD && array_key_exists('inline_error', $data)) {
+			$this->page->removeFocus();
+		}
+		else {
+			$form->submit();
+		}
 
 		$object = $is_prototype ? 'host prototype' : $host_type;
 		switch ($data['expected']) {
@@ -590,10 +640,16 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 				// Check the results in form.
 				$this->checkMacrosFields($name, $is_prototype, $lld_id, $form_type, $host_type, $data);
+
 				break;
 
 			case TEST_BAD:
-				$this->assertMessage(TEST_BAD, ($update ? 'Cannot update '.$object : 'Cannot add '.$object), $data['error']);
+				if ($host_type === 'host' && array_key_exists('inline_error', $data)) {
+					$this->assertInlineError($form, $data['inline_error']);
+				}
+				else {
+					$this->assertMessage(TEST_BAD, ($update ? 'Cannot update '.$object : 'Cannot add '.$object), $data['error']);
+				}
 
 				// Check that DB hash is not changed.
 				$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL_HOSTS));
@@ -1357,16 +1413,16 @@ abstract class testFormMacros extends CLegacyWebTest {
 	public function getGlobalMacrosFrotendTable() {
 		// Write macros rows from Frontend to array.
 		$macros_frontend = [];
-		$table = $this->query('id:tbl_macros')->waitUntilVisible()->asTable()->one();
-		$count = $table->getRows()->count() - 1;
+		$rows = $this->query('id:tbl_macros')->waitUntilVisible()->asMultifieldTable()->one()->getRows();
 
+		$count = $rows->count() - 1;
 		for ($i = 0; $i < $count; $i += 2) {
 			$macro = [];
-			$row = $table->getRow($i);
+			$row = $rows->get($i);
 			$macro['macro'] = $row->query('xpath:./td[1]/textarea')->one()->getValue();
 			$macro_value = $this->getValueField($macro['macro']);
 			$macro['value'] = $macro_value->getValue();
-			$macro['description'] = $table->getRow($i + 1)->query('tag:textarea')->one()->getValue();
+			$macro['description'] = $rows->get($i + 1)->query('tag:textarea')->one()->getValue();
 			$macro['type'] = ($macro_value->getInputType() === CInputGroupElement::TYPE_SECRET) ?
 					ZBX_MACRO_TYPE_SECRET : ZBX_MACRO_TYPE_TEXT;
 			$macros_frontend[] = $macro;
@@ -1558,7 +1614,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$form = $this->openMacrosTab($url, $source, true, $name);
 
 		// Check that macro values have type plain text by default.
-		if (CTestArrayHelper::get($data, 'check_default_type', false)){
+		if (CTestArrayHelper::get($data, 'check_default_type', false)) {
 			$this->assertEquals(CInputGroupElement::TYPE_TEXT, $this->query('xpath://div[contains(@class, "macro-value")]')
 					->one()->asInputGroup()->getInputType());
 		}
@@ -1952,7 +2008,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 					],
 					'title' => 'Cannot update '.$this->vault_object,
 					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near ":".',
-					'vault' => 'Hashicorp'
+					'vault' => 'Hashicorp',
+					'inline_error' => [
+						'id:macros_{index}_value' => 'Value: Incorrect syntax near ":".'
+					]
 				]
 			],
 			[
@@ -1968,7 +2027,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 					],
 					'title' => 'Cannot update '.$this->vault_object,
 					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near "/path:key".',
-					'vault' => 'Hashicorp'
+					'vault' => 'Hashicorp',
+					'inline_error' => [
+						'id:macros_{index}_value' => 'Value: Incorrect syntax near "/path:key".'
+					]
 				]
 			],
 			[
@@ -1984,7 +2046,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 					],
 					'title' => 'Cannot update '.$this->vault_object,
 					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near ":key".',
-					'vault' => 'Hashicorp'
+					'vault' => 'Hashicorp',
+					'inline_error' => [
+						'id:macros_{index}_value' => 'Value: Incorrect syntax near ":key".'
+					]
 				]
 			],
 			[
@@ -2000,7 +2065,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 					],
 					'title' => 'Cannot update '.$this->vault_object,
 					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near "secret/path".',
-					'vault' => 'Hashicorp'
+					'vault' => 'Hashicorp',
+					'inline_error' => [
+						'id:macros_{index}_value' => 'Value: Incorrect syntax near "secret/path".'
+					]
 				]
 			],
 			[
@@ -2016,7 +2084,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 					],
 					'title' => 'Cannot update '.$this->vault_object,
 					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": incorrect syntax near "/secret/path:key".',
-					'vault' => 'Hashicorp'
+					'vault' => 'Hashicorp',
+					'inline_error' => [
+						'id:macros_{index}_value' => 'Value: Incorrect syntax near "/secret/path:key".'
+					]
 				]
 			],
 			[
@@ -2032,7 +2103,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 					],
 					'title' => 'Cannot update '.$this->vault_object,
 					'message' => 'Invalid parameter "'.$this->hashi_error_field.'": cannot be empty.',
-					'vault' => 'Hashicorp'
+					'vault' => 'Hashicorp',
+					'inline_error' => [
+						'id:macros_{index}_value' => 'Value: This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -2093,7 +2167,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 					],
 					'title' => 'Cannot update '.$this->vault_object,
 					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": cannot be empty.',
-					'vault' => 'Cyberark'
+					'vault' => 'Cyberark',
+					'inline_error' => [
+						'id:macros_{index}_value' => 'Value: This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -2109,7 +2186,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 					],
 					'title' => 'Cannot update '.$this->vault_object,
 					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": mandatory key is missing.',
-					'vault' => 'Cyberark'
+					'vault' => 'Cyberark',
+					'inline_error' => [
+						'id:macros_{index}_value' => 'Value: Mandatory key is missing.'
+					]
 				]
 			],
 			[
@@ -2125,7 +2205,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 					],
 					'title' => 'Cannot update '.$this->vault_object,
 					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": incorrect syntax near "AppID:key".',
-					'vault' => 'Cyberark'
+					'vault' => 'Cyberark',
+					'inline_error' => [
+						'id:macros_{index}_value' => 'Value: Incorrect syntax near "AppID:key".'
+					]
 				]
 			],
 			[
@@ -2141,7 +2224,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 					],
 					'title' => 'Cannot update '.$this->vault_object,
 					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": mandatory parameter "AppID" is missing.',
-					'vault' => 'Cyberark'
+					'vault' => 'Cyberark',
+					'inline_error' => [
+						'id:macros_{index}_value' => 'Value: Mandatory parameter "AppID" is missing.'
+					]
 				]
 			],
 			[
@@ -2157,7 +2243,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 					],
 					'title' => 'Cannot update '.$this->vault_object,
 					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": mandatory parameter "AppID" is missing.',
-					'vault' => 'Cyberark'
+					'vault' => 'Cyberark',
+					'inline_error' => [
+						'id:macros_{index}_value' => 'Value: Mandatory parameter "AppID" is missing.'
+					]
 				]
 			],
 			[
@@ -2173,7 +2262,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 					],
 					'title' => 'Cannot update '.$this->vault_object,
 					'message' => 'Invalid parameter "'.$this->cyber_error_field.'": mandatory parameter "AppID" is missing.',
-					'vault' => 'Cyberark'
+					'vault' => 'Cyberark',
+					'inline_error' => [
+						'id:macros_{index}_value' => 'Value: Mandatory parameter "AppID" is missing.'
+					]
 				]
 			]
 		];
@@ -2191,13 +2283,36 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$this->selectVault($data['vault']);
 		$form = $this->openMacrosTab($url, $source, true, $name);
 		$this->fillMacros([$data['macro_fields']]);
-		$form->submit();
 
-		if ($data['expected'] == TEST_BAD) {
-			$this->assertMessage($data['expected'], $data['title'], $data['message']);
+		if ($source === 'hosts'&& $data['expected'] == TEST_BAD) {
+			$this->page->removeFocus();
 		}
 		else {
-			if ($source === 'host') {
+			$form->submit();
+		}
+
+		if ($data['expected'] == TEST_BAD) {
+			if ($source === 'hosts') {
+				$inline_error = [];
+				$key = array_key_first($data['inline_error']);
+
+				if (str_contains($key, '{index}')) {
+					// Index of last macro is by 1 less than the count of macros.
+					$new_key = str_replace('{index}', count($this->getMacros()) - 1, $key);
+					$inline_error[$new_key] = $data['inline_error'][$key];
+				}
+				else {
+					$inline_error = $data['inline_error'];
+				}
+
+				$this->assertInlineError($form, $inline_error);
+			}
+			else {
+				$this->assertMessage($data['expected'], $data['title'], $data['message']);
+			}
+		}
+		else {
+			if ($source === 'hosts') {
 				COverlayDialogElement::ensureNotPresent();
 			}
 
@@ -2347,7 +2462,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		$this->assertEquals([$data['fields']['macro'], $data['fields']['value']['text'], $data['fields']['description']], $result);
 		array_push($result, ZBX_MACRO_TYPE_VAULT);
-		$sql = 'SELECT macro, value, description, type FROM hostmacro WHERE macro='.zbx_dbstr($data['fields']['macro']).' ORDER BY hostmacroid DESC';
+		$sql = 'SELECT macro, value, description, type FROM hostmacro WHERE macro='.zbx_dbstr($data['fields']['macro']).
+				' ORDER BY hostmacroid DESC';
 		$this->assertEquals($result, array_values(CDBHelper::getRow($sql)));
 
 		if ($source === 'hosts' || $source === 'templates') {
@@ -2379,8 +2495,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 */
 	public function checkVaultValidation($url, $source, $name = null, $discovered = false) {
 		$hashicorp = [
-			'fields' =>
-				[
+			'fields' => [
 				'action' => USER_ACTION_UPDATE,
 				'index' => 0,
 				'macro' => '{$VAULT}',
@@ -2390,7 +2505,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 				],
 				'description' => 'HashiCorp vault description'
 			],
-			'error' => 'Invalid parameter "/1/macros/1/value": incorrect syntax near "secret/path:key".'
+			'error' => 'Invalid parameter "/1/macros/1/value": incorrect syntax near "secret/path:key".',
+			'inline_error' => [
+				'id:macros_0_value' => 'Value: Incorrect syntax near "secret/path:key".'
+			]
 		];
 
 		$this->page->login();
@@ -2411,8 +2529,17 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 
 		$this->fillMacros([$hashicorp['fields']]);
-		$form->submit();
-		$this->assertMessage(TEST_BAD, 'Cannot update '.$this->vault_object, $hashicorp['error']);
+
+		if ($source === 'hosts') {
+			$form->getField(array_key_first($hashicorp['inline_error']))->click();
+			$this->page->removeFocus();
+			$this->assertInlineError($form, $hashicorp['inline_error']);
+		}
+		else {
+			$form->submit();
+			$this->assertMessage(TEST_BAD, 'Cannot update '.$this->vault_object, $hashicorp['error']);
+			CMessageElement::find()->one()->close();
+		}
 
 		// Hosts in edit view opens in overlay and need to be closed manually.
 		if ($source === 'hosts' || $source === 'templates') {

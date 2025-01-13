@@ -178,7 +178,10 @@ class testFormTags extends CWebTest {
 							'value' => 'value1'
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
+					'error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.',
+					'inline_error' => [
+						'id:tags_{index}_tag' => 'Name: This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -197,7 +200,10 @@ class testFormTags extends CWebTest {
 							'value' => 'value'
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(tag, value) already exists.'
+					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(tag, value) already exists.',
+					'inline_error' => [
+						'id:tags_{index}_tag' => 'Tag name and value combination is not unique.'
+					]
 				]
 			],
 			[
@@ -334,8 +340,13 @@ class testFormTags extends CWebTest {
 			$this->assertScreenshot($screenshot_area, $data['name'].' '.$screen_object);
 		}
 
-		$form->submit();
-		$this->page->waitUntilReady();
+		if ($object === 'host' && CTestArrayHelper::get($data, 'expected') === TEST_BAD) {
+			$this->page->removeFocus();
+		}
+		else {
+			$form->submit();
+			$this->page->waitUntilReady();
+		}
 
 		$this->checkResult($data, $object, $form, 'add', $sql, $old_hash);
 
@@ -356,7 +367,10 @@ class testFormTags extends CWebTest {
 							'value' => 'value1'
 						]
 					],
-					'error_details'=>'Invalid parameter "/1/tags/1/tag": cannot be empty.'
+					'error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.',
+					'inline_error' => [
+						'id:tags_0_tag' => 'Name: This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -370,7 +384,10 @@ class testFormTags extends CWebTest {
 							'value' => 'update'
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(action, update) already exists.'
+					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, value)=(action, update) already exists.',
+					'inline_error' => [
+						'id:tags_1_tag' => 'Tag name and value combination is not unique.'
+					]
 				]
 			],
 			[
@@ -384,7 +401,10 @@ class testFormTags extends CWebTest {
 							'value' => ''
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/tags/3": value (tag, value)=(tag without value, ) already exists.'
+					'error_details' => 'Invalid parameter "/1/tags/3": value (tag, value)=(tag without value, ) already exists.',
+					'inline_error' => [
+						'id:tags_2_tag' => 'Tag name and value combination is not unique.'
+					]
 				]
 			],
 			[
@@ -503,7 +523,7 @@ class testFormTags extends CWebTest {
 			$table->findRow('Name', $data['name'], true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 		}
 		else {
-			if ($object === 'template') {
+			if (in_array($object, ['template', 'host'])) {
 				$this->query('button:Reset')->one()->click();
 				$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 				$form->fill(['Name' => $this->update_name]);
@@ -522,8 +542,19 @@ class testFormTags extends CWebTest {
 		}
 
 		$this->query($this->tags_table)->asMultifieldTable()->waitUntilPresent()->one()->fill($data['tags']);
-		$form->submit();
-		$this->page->waitUntilReady();
+
+		if ($object === 'host' && CTestArrayHelper::get($data, 'expected') === TEST_BAD) {
+			$this->page->removeFocus();
+		}
+		else {
+			$form->submit();
+			$this->page->waitUntilReady();
+		}
+
+		// In discovered host scenario there are tags from the host prototype that will be present after update.
+		if (array_key_exists('existing_tags', $data)) {
+			$data['tags'] = array_merge($data['existing_tags'], $data['tags']);
+		}
 
 		$this->checkResult($data, $object, $form, 'update', $sql, $old_hash);
 	}
@@ -540,8 +571,24 @@ class testFormTags extends CWebTest {
 	 */
 	private function checkResult($data, $object, $form, $action, $sql = null, $old_hash = null) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			if ($object === 'host') {
+				$inline_error = [];
+				$key = array_key_first($data['inline_error']);
 
-			if ($object === 'service') {
+				// Index of last tag is by 1 less than the count of tags.
+				if (str_contains($key, '{index}')) {
+					$tag_count = $this->query('class:tags-table')->one()->asMultifieldTable()->getRows()->
+							filter(CElementFilter::CLASSES_PRESENT, 'form_row', true)->count();
+					$new_key = str_replace('{index}', $tag_count - 1, $key);
+					$inline_error[$new_key] = $data['inline_error'][$key];
+				}
+				else {
+					$inline_error = $data['inline_error'];
+				}
+
+				$this->assertInlineError($form, $inline_error);
+			}
+			elseif ($object === 'service') {
 				$title = null;
 			}
 			else {
@@ -550,7 +597,9 @@ class testFormTags extends CWebTest {
 					: 'Cannot update '.$object;
 			}
 
-			$this->assertMessage(TEST_BAD, $title, CTestArrayHelper::get($data, 'error_details'));
+			if ($object !== 'host') {
+				$this->assertMessage(TEST_BAD, $title, CTestArrayHelper::get($data, 'error_details'));
+			}
 
 			// Check that DB hash is not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
@@ -741,7 +790,7 @@ class testFormTags extends CWebTest {
 			$table->findRow('Name',  $new_name)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 		}
 		else {
-			if ($object === 'template') {
+			if ($object === 'template' || $object === 'discovered host') {
 				$this->query('button:Reset')->one()->click();
 				$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 				$filter->fill(['Name' => $new_name]);
@@ -1345,7 +1394,7 @@ class testFormTags extends CWebTest {
 			$table->findRow('Name', $data['name'], true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 		}
 		else {
-			if ($object === 'template') {
+			if ($object === 'template' || $object === 'host') {
 				$this->query('button:Reset')->one()->click();
 				$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 				$filter->fill(['Name' => $this->remove_name]);

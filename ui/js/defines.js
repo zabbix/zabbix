@@ -33,6 +33,10 @@ const ZBX_STYLE_BTN_SMALL = 'btn-small';
 
 const ZBX_STYLE_FORM_GRID = 'form-grid';
 
+const ZBX_STYLE_TEXTAREA_FLEXIBLE = 'textarea-flexible';
+const ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER = 'textarea-flexible-container';
+const ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT = 'textarea-flexible-parent';
+
 const ZBX_STYLE_COLOR_WARNING = 'color-warning';
 
 const ZBX_STYLE_ARROW_DOWN = 'arrow-down';
@@ -79,13 +83,6 @@ const ZBX_ICON_WIDGET_AWAITING_DATA_LARGE = 'zi-widget-awaiting-data-large';
 const ZBX_ICON_WIDGET_EMPTY_REFERENCES_LARGE = 'zi-widget-empty-references-large';
 const ZBX_ICON_WRENCH_ALT_SMALL = 'zi-wrench-alt-small';
 
-const TRIGGER_SEVERITY_NOT_CLASSIFIED = 0;
-const TRIGGER_SEVERITY_INFORMATION = 1;
-const TRIGGER_SEVERITY_WARNING = 2;
-const TRIGGER_SEVERITY_AVERAGE = 3;
-const TRIGGER_SEVERITY_HIGH = 4;
-const TRIGGER_SEVERITY_DISASTER = 5;
-
 const ZBX_STYLE_NA_BG = 'na-bg';
 const ZBX_STYLE_INFO_BG = 'info-bg';
 const ZBX_STYLE_WARNING_BG = 'warning-bg';
@@ -99,6 +96,15 @@ const ZBX_STYLE_STATUS_WARNING_BG = 'status-warning-bg';
 const ZBX_STYLE_STATUS_AVERAGE_BG = 'status-average-bg';
 const ZBX_STYLE_STATUS_HIGH_BG = 'status-high-bg';
 const ZBX_STYLE_STATUS_DISASTER_BG = 'status-disaster-bg';
+
+const TRIGGER_SEVERITY_NOT_CLASSIFIED = 0;
+const TRIGGER_SEVERITY_INFORMATION = 1;
+const TRIGGER_SEVERITY_WARNING = 2;
+const TRIGGER_SEVERITY_AVERAGE = 3;
+const TRIGGER_SEVERITY_HIGH = 4;
+const TRIGGER_SEVERITY_DISASTER = 5;
+
+const ZBX_SECRET_MASK = '******';
 
 const MAINTENANCE_TYPE_NORMAL = 0;
 const MAINTENANCE_TYPE_NODATA = 1;

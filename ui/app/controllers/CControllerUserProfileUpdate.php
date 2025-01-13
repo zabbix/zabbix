@@ -44,20 +44,20 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		];
 
 		$ret = $this->validateInput($fields);
-		$error = $this->GetValidationError();
+		$result = $this->GetValidationResult();
 
 		if ($ret && !$this->validateCurrentPassword()) {
-			$error = self::VALIDATION_ERROR;
+			$result = self::VALIDATION_ERROR;
 			$ret = false;
 		}
 
 		if ($ret && !$this->validatePassword()) {
-			$error = self::VALIDATION_ERROR;
+			$result = self::VALIDATION_ERROR;
 			$ret = false;
 		}
 
 		if (!$ret) {
-			switch ($error) {
+			switch ($result) {
 				case self::VALIDATION_ERROR:
 					$response = new CControllerResponseRedirect('zabbix.php?action=userprofile.edit');
 					$response->setFormData($this->getInputAll());

@@ -53,7 +53,7 @@ class CIPParser extends CParser {
 	/**
 	 * @param array $options
 	 */
-	public function __construct(array $options) {
+	public function __construct(array $options = []) {
 		$this->options = $options + $this->options;
 
 		if ($this->options['v6']) {
