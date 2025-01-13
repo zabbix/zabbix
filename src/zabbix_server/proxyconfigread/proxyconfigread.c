@@ -1539,7 +1539,7 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 		}
 	}
 	else
-		proxy_secrets_provider = 0;
+		proxy_secrets_provider = ZBX_PROXY_SECRETS_PROVIDER_SERVER;
 
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_PROXY_SECRETS_PROVIDER);
 
