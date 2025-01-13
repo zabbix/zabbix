@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -42,7 +42,6 @@ class testFormUserLdapMediaJit extends CWebTest {
 	const LDAP_SERVER_NAME = 'TEST';
 	const MEDIA_MAPPING_UPDATE = 'Media mapping with severity: none';
 	const MEDIA_MAPPING_ATRIBUTE_CHANGE = 'Media mapping with severity: all';
-	const UPDATE_MEDIA = 'MS Teams';
 	const DELETE_MEDIA = 'Zammad';
 
 	/**
@@ -50,8 +49,8 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 */
 	public function prepareJitMedia() {
 		$mediatypeids = CDBHelper::getAll("SELECT mediatypeid FROM media_type WHERE name IN ('iTop', 'SMS',".
-				" 'MS Teams', 'Slack', 'OTRS', 'Brevis.one', 'Discord', 'iLert', 'Jira', 'Line', 'Email',".
-				" 'SysAid', 'Pushover', 'Telegram', 'Redmine', 'SIGNL4', 'PagerDuty')"
+				" 'MS Teams', 'Slack', 'OTRS', 'Opsgenie', 'Brevis.one', 'Discord', 'iLert', 'Jira', 'Line', 'Email',".
+				" 'SysAid', 'Pushover', 'Telegram', 'Redmine', 'SIGNL4', 'PagerDuty', 'Zammad')"
 		);
 
 		foreach ($mediatypeids as $mediatype) {
@@ -71,7 +70,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 				'base_dn' => 'dc=zbx,dc=local',
 				'port' => 389,
 				'search_attribute' => 'uid',
-				'bind_password' => PHPUNIT_LDAP_USER_PASSWORD,
+				'bind_password' => PHPUNIT_LDAP_BIND_PASSWORD,
 				'provision_status' => 1,
 				'provision_groups' => [
 					[
@@ -93,6 +92,12 @@ class testFormUserLdapMediaJit extends CWebTest {
 					],
 					[
 						'name' => self::MEDIA_MAPPING_UPDATE,
+						'mediatypeid' => 6, // Opsgenie.
+						'attribute' => 'uid',
+						'active' => 1
+					],
+					[
+						'name' => 'Media to check disabling in user configuration',
 						'mediatypeid' => 21, // OTRS.
 						'attribute' => 'uid',
 						'severity' => 0 // None.
@@ -103,7 +108,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 						'attribute' => 'uid'
 					],
 					[
-						'name' => 'Disabled media that is disabled in Media types',
+						'name' => 'Disabled media that is enabled in Media types',
 						'mediatypeid' => 19, // Zammad.
 						'attribute' => 'uid',
 						'active' => 1
@@ -123,11 +128,12 @@ class testFormUserLdapMediaJit extends CWebTest {
 	public function testFormUserLdapMediaJit_CheckProvisionedMediaLayout() {
 
 		// Media type data to check after provisioning.
-		$media_type = ['MS Teams', 'OTRS', 'Zammad', 'Zendesk'];
-		$when_active = ['1-7,00:00-24:00', '1-7,00:00-24:00', '1-7,00:00-24:00', '1-7,00:00-24:00'];
-		$status = ['Enabled', 'Enabled', 'Disabled', 'Disabled'];
-		$send_to = [PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USERNAME];
+		$media_type = ['MS Teams', 'Opsgenie', 'OTRS', 'Zammad', 'Zendesk'];
+		$when_active = ['1-7,00:00-24:00', '1-7,00:00-24:00', '1-7,00:00-24:00', '1-7,00:00-24:00', '1-7,00:00-24:00'];
+		$status = ['Enabled', 'Disabled', 'Enabled', 'Disabled', 'Disabled'];
+		$send_to = [PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USERNAME];
 		$severity = [
+			['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
 			['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
 			[],
 			['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
@@ -142,21 +148,21 @@ class testFormUserLdapMediaJit extends CWebTest {
 				$this->query('class:msg-warning')->one()->getText()
 		);
 
-		$form = $this->query('id:user-form')->asForm()->waitUntilVisible()->one();
+		$form = $this->query('id:user-form')->waitUntilVisible()->asForm()->one();
 		$form->selectTab('Media');
 
 		// Check that correct amount of media is provisioned.
-		$this->assertEquals(4, $form->query('id:media-table')->asTable()->one()->getRows()->count());
+		$this->assertEquals(5, $form->query('id:media-table')->asTable()->one()->getRows()->count());
 
 		// Check that count of media is correctly displayed in the tab.
-		$this->assertEquals(4, $form->query('xpath:.//a[text()="Media"]')->one()->getAttribute('data-indicator-value'));
+		$this->assertEquals(5, $form->query('xpath:.//a[text()="Media"]')->one()->getAttribute('data-indicator-value'));
 
 		// Check parameters of the media.
 		foreach (['Type' => $media_type, 'Send to' => $send_to,	'When active' => $when_active, 'Status' => $status] as $column => $values) {
 			$this->assertTableDataColumn($values, $column, 'id:media-table');
 		}
 
-		for ($i = 0; $i <= 3; $i++) {
+		for ($i = 0; $i <= 4; $i++) {
 			$row = $this->query('xpath://tr[@id="medias_'.$i.'"]')->asTableRow()->one();
 
 			// Check that only edit action is enabled for provisioned media.
@@ -190,21 +196,29 @@ class testFormUserLdapMediaJit extends CWebTest {
 			$table = $form->selectTab('Media')->getField('Media')->asTable();
 
 			// Check hintbox and status for media that is disabled in Media types.
-			foreach (['Zendesk', 'Zammad'] as $mediatype) {
-				$row = $table->findRow('Type', $mediatype, true);
-				$this->assertTrue($row->getColumn('Type')->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')
-						->one()->isValid()
-				);
+			$row = $table->findRow('Type', 'Zendesk', true);
+			$this->assertTrue($row->getColumn('Type')->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')
+					->one()->isValid()
+			);
 
-				$this->assertFalse($row->getColumn('Status')->query('xpath:.//a')->one(false)->isValid());
-				$this->assertEquals('Media type disabled by Administration.', $row->getColumn('Type')
-						->query('tag:button')->one()->getAttribute('data-hintbox-contents')
-				);
-			}
+			$this->assertFalse($row->getColumn('Status')->query('xpath:.//a')->one(false)->isValid());
+			$this->assertEquals('Media type disabled by Administration.', $row->getColumn('Type')
+					->query('tag:button')->one()->getAttribute('data-hintbox-contents')
+			);
 		}
 
 		// Check that correct amount of hintboxes is present in the media table for disabled media.
-		$this->assertEquals(2, $table->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')->count());
+		$this->assertEquals(1, $table->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')->count());
+
+		// Check that Type and Send to fields are read-only for provisioned media.
+		$media_table = $this->query('name:user_form')->waitUntilVisible()->asForm()->one()->getField('Media')->asTable();
+		$media_table->findRow('Type', 'MS Teams')->getColumn('Actions')->query('button:Edit')->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$media_form = $dialog->asForm();
+
+		foreach( ['Type', 'Send to'] as $field) {
+			$this->assertTrue($media_form->getField($field)->isEnabled(false));
+		}
 	}
 
 	public function getMediaEditData() {
@@ -216,7 +230,8 @@ class testFormUserLdapMediaJit extends CWebTest {
 					'fields' => [
 						'When active' => ''
 					],
-					'message' => 'Incorrect value for field "period": a time period is expected.'
+					'message' => 'Incorrect value for field "period": a time period is expected.',
+					'media' => 'MS Teams',
 				]
 			],
 			// Invalid characters in When active.
@@ -226,15 +241,19 @@ class testFormUserLdapMediaJit extends CWebTest {
 					'fields' => [
 						'When active' => 'test'
 					],
-					'message' => 'Incorrect value for field "period": a time period is expected.'
+					'message' => 'Incorrect value for field "period": a time period is expected.',
+					'media' => 'MS Teams'
 				]
 			],
-			// Change editable fields - select all severities.
+			// Change editable fields - user macro in When active field.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'When active' => '{$TEST}',
+						'When active' => '{$TEST}'
+					],
+					'media' => 'Zendesk',
+					'check_configuration' => [
 						'Use if severity' => [
 							'Not classified',
 							'Information',
@@ -243,7 +262,38 @@ class testFormUserLdapMediaJit extends CWebTest {
 							'High',
 							'Disaster'
 						],
+						'When active' => '{$TEST}',
 						'Enabled' => false
+					]
+				]
+			],
+			// Change editable fields - select all severities.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Use if severity' => [
+							'Not classified',
+							'Information',
+							'Warning',
+							'Average',
+							'High',
+							'Disaster'
+						],
+						'Enabled' => true,
+					],
+					'media' => 'OTRS',
+					'check_configuration' => [
+						'Use if severity' => [
+							'Not classified',
+							'Information',
+							'Warning',
+							'Average',
+							'High',
+							'Disaster'
+						],
+						'When active' => '1-7,00:00-24:00',
+						'Enabled' => true
 					]
 				]
 			],
@@ -252,9 +302,50 @@ class testFormUserLdapMediaJit extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'When active' => '{$TEST2}',
 						'Use if severity' => [],
+					],
+					'media' => 'MS Teams',
+					'check_configuration' => [
+						'Use if severity' => [],
+						'When active' => '1-7,00:00-24:00',
+						'Enabled' => true
+					]
+				]
+			],
+			// Change editable fields - disable media which is enabled.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
 						'Enabled' => false
+					],
+					'media' => 'MS Teams',
+					'check_configuration' => [
+						'Use if severity' => [],
+						'When active' => '1-7,00:00-24:00',
+						'Enabled' => false
+					]
+				]
+			],
+			// Change editable fields - enable previously disabled media.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Enabled' => true
+					],
+					'media' => 'Opsgenie',
+					'check_configuration' => [
+						'Use if severity' => [
+							'Not classified',
+							'Information',
+							'Warning',
+							'Average',
+							'High',
+							'Disaster'
+						],
+						'When active' => '1-7,00:00-24:00',
+						'Enabled' => true
 					]
 				]
 			]
@@ -275,21 +366,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 		// Close the warning message, to not affect further message check.
 		$this->query('class:btn-overlay-close')->one()->click();
 
-		$form = $this->query('id:user-form')->asForm()->waitUntilVisible()->one();
+		$form = $this->query('id:user-form')->waitUntilVisible()->asForm()->one();
 		$form->selectTab('Media');
-		$media_field = $this->query('name:user_form')->asForm()->waitUntilVisible()->one()->getField('Media')->asTable();
-		$row = $media_field->findRow('Type', self::UPDATE_MEDIA);
+		$media_field = $this->query('name:user_form')->waitUntilVisible()->asForm()->one()->getField('Media')->asTable();
+		$row = $media_field->findRow('Type', $data['media']);
 		$row->getColumn('Actions')->query('button:Edit')->one()->click();
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$media_form = $dialog->asForm();
-
-		// Check that Type and Send to fields are read-only for provisioned media.
-		$this->assertEquals(['true', 'true'], [
-				$media_form->getField('Type')->getAttribute('readonly'),
-				$media_form->getField('Send to')->getAttribute('readonly')
-		]);
-
 		$media_form->fill($data['fields']);
 		$media_form->submit();
 
@@ -315,7 +399,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 			// Log in as the provisioned user, and check that manually changed fields are not affected by the provisioning.
 			$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
 			$this->page->open('zabbix.php?action=userprofile.edit');
-			$this->checkMediaConfiguration($data, self::UPDATE_MEDIA, PHPUNIT_LDAP_USERNAME);
+			$this->checkMediaConfiguration($data, $data['media'], PHPUNIT_LDAP_USERNAME, 'check_configuration');
 		}
 	}
 
@@ -354,7 +438,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
 		$this->page->open('zabbix.php?action=userprofile.edit');
 
-		$form = $this->query('id:user-form')->asForm()->waitUntilVisible()->one();
+		$form = $this->query('id:user-form')->waitUntilVisible()->asForm()->one();
 		$form->selectTab('Media');
 
 		$this->query('button:Add')->one()->click();
@@ -372,7 +456,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 		// Check that media can be removed.
 		$form->selectTab('Media');
-		$media_field = $this->query('name:user_form')->asForm()->waitUntilVisible()->one()->getField('Media')->asTable();
+		$media_field = $this->query('name:user_form')->waitUntilVisible()->asForm()->one()->getField('Media')->asTable();
 		$row = $media_field->findRow('Type', $data['fields']['Type'])->asTableRow();
 		$row->getColumn('Actions')->query('button:Remove')->one()->click();
 		$form->query('button:Update')->one()->click();
@@ -381,7 +465,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 		// Check that media is no longer present in the list.
 		$this->page->open('zabbix.php?action=userprofile.edit');
 		$form->selectTab('Media');
-		$media_updated = $this->query('name:user_form')->asForm()->waitUntilVisible()->one()->getField('Media')->asTable();
+		$media_updated = $this->query('name:user_form')->waitUntilVisible()->asForm()->one()->getField('Media')->asTable();
 		$this->assertFalse($media_updated->findRow('Type', $data['fields']['Type'])->isPresent());
 	}
 
@@ -440,7 +524,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$this->assertFalse($user_media_table->findRow('Type', $data['Media type'], true)->isPresent());
 	}
 
-	public function testFormUserLdapMediaJit_UpdateLdapMedia() {
+	public function testFormUserLdapMediaJit_UpdateMediaMapping() {
 
 		// Media type for edit - OTRS.
 		$media_type = [
@@ -779,8 +863,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 	/**
 	 * @dataProvider getNewMediaMappings
 	 */
-	public function testFormUserLdapMediaJit_NewMediaMapping($data) {
-
+	public function testFormUserLdapMediaJit_AddMediaMapping($data) {
 		$form = $this->openLdapForm();
 		$table = $form->query('id:ldap-servers')->asTable()->one();
 		$table->query('link:'.self::LDAP_SERVER_NAME)->one()->click();
@@ -836,10 +919,11 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * @param array		$data				data provider
 	 * @param string	$type				type of the media
 	 * @param string	$send_to			send to parameter of the media
+	 * @param string	$expected			name of the array with expected result
 	 */
-	private function checkMediaConfiguration($data, $type, $send_to) {
+	private function checkMediaConfiguration($data, $type, $send_to, $expected = 'fields') {
 		// Check media type.
-		$media_field = $this->query('name:user_form')->asForm()->waitUntilVisible()->one()->getField('Media')->asTable();
+		$media_field = $this->query('name:user_form')->waitUntilVisible()->asForm()->one()->getField('Media')->asTable();
 		$row = $media_field->findRow('Type', $type)->asTableRow();
 
 		$this->assertEquals($row->getColumn('Type')->getText(), $type);
@@ -851,11 +935,11 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 		// Check media active period.
 		$when_active = $row->getColumn('When active')->getText();
-		$this->assertEquals($when_active, CTestArrayHelper::get($data, 'fields.When active', '1-7,00:00-24:00'));
+		$this->assertEquals($when_active, CTestArrayHelper::get($data, $expected.'.When active', '1-7,00:00-24:00'));
 
 		// Check media status.
 		$get_status = $row->getColumn('Status')->getText();
-		$status = CTestArrayHelper::get($data, 'fields.Enabled', true) ? 'Enabled' : 'Disabled';
+		$status = CTestArrayHelper::get($data, $expected.'.Enabled', true) ? 'Enabled' : 'Disabled';
 		$this->assertEquals($get_status, $status);
 
 		// Check selected severities.
@@ -868,9 +952,9 @@ class testFormUserLdapMediaJit extends CWebTest {
 			'Disaster' => '6'
 		];
 
-		if (array_key_exists('Use if severity', $data['fields'])) {
+		if (array_key_exists('Use if severity', $data[$expected])) {
 			// Check that the passed severities are turned on.
-			foreach ($data['fields']['Use if severity'] as $used_severity) {
+			foreach ($data[$expected]['Use if severity'] as $used_severity) {
 				$actual_severity = $row->query('xpath:./td[4]/div/span['.$reference_severities[$used_severity].']')->one()
 						->getAttribute("data-hintbox-contents");
 				$this->assertEquals($actual_severity, $used_severity.' (on)');
@@ -918,7 +1002,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * Function for selecting the user and getting the media table.
 	 */
 	private function getUserMediaTable() {
-		$user_form = $this->query('id:user-form')->asForm()->waitUntilVisible()->one();
+		$user_form = $this->query('id:user-form')->waitUntilVisible()->asForm()->one();
 		$user_form->selectTab('Media');
 		$user_media_table = $this->query('id:media-table')->asTable()->one();
 
