@@ -19,230 +19,273 @@
  */
 ?>
 
-<script type="text/x-jquery-tmpl" id="row-expression-tmpl">
-	<?= (new CRow([
-			(new CSelect('expressions[#{rowNum}][expression_type]'))
-				->addClass('js-expression-type-select')
-				->setId('expressions_#{rowNum}_expression_type')
-				->addOptions(CSelect::createOptionsFromArray(CRegexHelper::expression_type2str())),
-			(new CTextBox('expressions[#{rowNum}][expression]', '', false, 255))
-				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-				->setAriaRequired(),
-			(new CSelect('expressions[#{rowNum}][exp_delimiter]'))
-				->addOptions(CSelect::createOptionsFromArray(CRegexHelper::expressionDelimiters()))
-				->setId('expressions_#{rowNum}_exp_delimiter')
-				->addClass('js-expression-delimiter-select')
-				->setDisabled(true)
-				->addStyle('display: none;'),
-			new CCheckBox('expressions[#{rowNum}][case_sensitive]'),
-			(new CCol(
-				(new CButton('expressions[#{rowNum}][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-			))->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->addClass('form_row')
-			->setAttribute('data-index', '#{rowNum}')
-			->toString()
-	?>
-</script>
-
-<script type="text/x-jquery-tmpl" id="test-table-row-tmpl">
-	<?= (new CRow([
-			'#{type}', '#{expression}', (new CSpan('#{result}'))->addClass('#{resultClass}')
-		]))
-			->addClass('test_row')
-			->toString()
-	?>
-</script>
-
-<script type="text/x-jquery-tmpl" id="test-combined-table-row-tmpl">
-	<?= (new CRow([
-			(new CCol(_('Combined result')))->setColspan(2), (new CSpan('#{result}'))->addClass('#{resultClass}')
-		]))
-			->addClass('test_row')
-			->toString()
-	?>
-</script>
-
 <script>
-	(function($) {
+
+	window.regular_expression_edit = new class {
+
 		/**
-		 * Object to manage expression related GUI elements.
-		 * @type {Object}
+		 * @type {CForm}
 		 */
-		window.zabbixRegExp = {
+		form;
 
-			/**
-			 * Template for expression row of testing results table.
-			 * @type {String}
-			 */
-			testTableRowTpl: new Template($('#test-table-row-tmpl').html()),
+		/**
+		 * @type {HTMLElement}
+		 */
+		form_element;
 
-			/**
-			 * Template for combined result row in testing results table.
-			 * @type {String}
-			 */
-			testCombinedTableRowTpl: new Template($('#test-combined-table-row-tmpl').html()),
+		/**
+		 * @type {HTMLElement}
+		 */
+		#test_results;
 
-			/**
-			 * Send all expressions data to server with test string.
-			 *
-			 * @param {string} string Test string to test expression against
-			 *
-			 * @return {jqXHR}
-			 */
-			testExpressions: function(string) {
-				var ajaxData = {
-					testString: string,
-					expressions: {}
-				};
+		/**
+		 * @type {string}
+		 */
+		#form_action;
 
-				$('#testResultTable').css({opacity: 0.5});
+		/**
+		 * @type {string}
+		 */
+		#clone_action;
 
-				$('#tbl_expr .form_row').each(function() {
-					var index = $(this).data('index');
+		/**
+		 * @type {string}
+		 */
+		#list_action;
 
-					ajaxData.expressions[index] = {
-						expression : $('#expressions_' + index + '_expression').val(),
-						expression_type : $('#expressions_' + index + '_expression_type').val(),
-						exp_delimiter : $('#expressions_' + index + '_exp_delimiter').val(),
-						case_sensitive : $('#expressions_' + index + '_case_sensitive').is(':checked') ? '1' : '0'
-					}
-				});
+		/**
+		 * @type {string}
+		 */
+		#test_action;
 
-				var url = new Curl('zabbix.php');
-				url.setArgument('action', 'regex.test');
+		/**
+		 * @type {Template}
+		 */
+		#row_template;
 
-				return $.post(
-					url.getUrl(),
-					{ajaxdata: ajaxData},
-					$.proxy(this.showTestResults, this),
-					'json'
-				);
-			},
+		/**
+		 * @type {Template}
+		 */
+		#result_row_template;
 
-			/**
-			 * Update test results table with data received form server.
-			 *
-			 * @param {Object} response ajax response
-			 */
-			showTestResults: function(response) {
-				var tplData,
-					hasErrors,
-					obj = this,
-					$expressions = $('#tbl_expr .form_row'),
-					expression_type_str;
+		/**
+		 * @type {Template}
+		 */
+		#combined_result_template;
 
-				$('#testResultTable .test_row').remove();
-				hasErrors = ($expressions.length == 0);
+		init({rules, action}) {
+			this.form_element = document.getElementById('regex');
+			this.form = new CForm(this.form_element, rules);
+			this.form_element.addEventListener('submit', e => {
+				e.preventDefault();
+				this.submit();
+			});
 
-				$expressions.each(function() {
-					var index = $(this).data('index'),
-						expr_result = response.data.expressions[index],
-						result;
+			document.getElementById('regular-expressions-table').addEventListener('change', e => this.#updateRow(e));
+			document.getElementById('regular-expressions-table').addEventListener('click', e => this.#processAction(e));
+			document.getElementById('test-expression').addEventListener('click', () => this.#testExpression());
+			document.getElementById('tab_test').addEventListener('click', () => this.#testExpression());
 
-					if (response.data.errors[index]) {
-						hasErrors = true;
-						result = response.data.errors[index];
-					}
-					else {
-						result = expr_result ? <?= json_encode(_('TRUE')) ?> : <?= json_encode(_('FALSE')) ?>;
-					}
+			const curl = new Curl(this.form_element.getAttribute('action'));
 
-					switch ($('#expressions_' + index + '_expression_type').val()) {
-						case '<?= EXPRESSION_TYPE_INCLUDED ?>':
-							expression_type_str = <?= json_encode(_('Character string included')) ?>;
-							break;
+			curl.setArgument('action', action);
+			this.#form_action = curl.getUrl();
+			curl.setArgument('action', 'regex.list');
+			this.#list_action = curl.getUrl();
+			curl.setArgument('action', 'regex.test');
+			this.#test_action = curl.getUrl();
+			curl.setArgument('action', 'regex.edit');
+			this.#clone_action = curl.getUrl();
 
-						case '<?= EXPRESSION_TYPE_ANY_INCLUDED ?>':
-							expression_type_str = <?= json_encode(_('Any character string included')) ?>;
-							break;
+			this.#test_results = document.getElementById('test-result-table').querySelector('tbody');
+			this.#row_template = new Template(document.getElementById('row-expression-template').innerHTML);
+			this.#result_row_template = new Template(document.getElementById('result-row-template').innerHTML);
+			this.#combined_result_template = new Template(
+				document.getElementById('combined-result-template').innerHTML
+			);
 
-						case '<?= EXPRESSION_TYPE_NOT_INCLUDED ?>':
-							expression_type_str = <?= json_encode(_('Character string not included')) ?>;
-							break;
+			const clone = document.getElementById('clone');
 
-						case '<?= EXPRESSION_TYPE_TRUE ?>':
-							expression_type_str = <?= json_encode(_('Result is TRUE')) ?>;
-							break;
+			clone && clone.addEventListener('click', () => this.#clone());
+		}
 
-						case '<?= EXPRESSION_TYPE_FALSE ?>':
-							expression_type_str = <?= json_encode(_('Result is FALSE')) ?>;
-							break;
+		submit() {
+			const fields = this.form.getAllValues();
 
-						default:
-							expression_type_str = '';
+			this.form.validateSubmit(fields)
+				.then((result) => {
+					if (!result) {
+						return;
 					}
 
-					$('#testResultTable').append(obj.testTableRowTpl.evaluate({
-						expression: $('#expressions_' + index + '_expression').val(),
-						type: expression_type_str,
-						result: result,
-						resultClass: expr_result ? '<?= ZBX_STYLE_GREEN ?>' : '<?= ZBX_STYLE_RED ?>'
+					fetch(this.#form_action, {
+						method: 'POST',
+						headers: {'Content-Type': 'application/json'},
+						body: JSON.stringify(fields)
+					})
+						.then(response => response.json())
+						.then(response => {
+							clearMessages();
+
+							if ('form_errors' in response) {
+								this.form.setErrors(response.form_errors, true, true);
+								this.form.renderErrors();
+							}
+							else if ('error' in response) {
+								addMessage(makeMessageBox('bad', response.error.messages, response.error.title));
+							}
+							else {
+								postMessageOk(response.success.title);
+								location.href = this.#list_action;
+							}
+						})
+						.catch(exception => {
+							addMessage(makeMessageBox('bad', [exception.message]));
+						});
+			});
+		}
+
+		#clone() {
+			const curl = new Curl(this.#clone_action),
+				{name, expressions, test_string} = this.form.getAllValues(),
+				indexes = Object.keys(expressions);
+
+			curl.setArgument('regex[name]', name);
+			curl.setArgument('regex[test_string]', test_string);
+
+			for (let index of indexes) {
+				const {case_sensitive, exp_delimiter, expression, expression_type} = expressions[index];
+
+				curl.setArgument(`regex[expressions][${index}][case_sensitive]`, case_sensitive);
+				curl.setArgument(`regex[expressions][${index}][exp_delimiter]`, exp_delimiter);
+				curl.setArgument(`regex[expressions][${index}][expression]`, expression);
+				curl.setArgument(`regex[expressions][${index}][expression_type]`, expression_type);
+			}
+
+			redirect(curl.getUrl(), 'post', 'action', undefined, true);
+		}
+
+		#processAction(e) {
+			const action = e.target.getAttribute('name');
+
+			if (action === 'remove')  {
+				const row = e.target.closest('tr')
+
+				row.nextSibling.remove();
+				row.remove();
+			}
+			else if (action === 'add')  {
+				const indexes = Object.keys(this.form.findFieldByName('expressions').getValue()),
+					next_index = indexes.length ? Math.max(...indexes) + 1 : 0;
+
+				document.getElementById('expression-list-footer')
+					.insertAdjacentHTML('beforebegin', this.#row_template.evaluate({
+						index: next_index
 					}));
-				});
+			}
+		}
 
-				if (hasErrors) {
-					tplData = {
-						resultClass: '<?= ZBX_STYLE_RED ?>',
-						result: <?= json_encode(_('UNKNOWN')) ?>
-					};
+		#testExpression() {
+			const {expressions, test_string} = this.form.getAllValues();
+
+			this.#testLoading(true);
+
+			fetch(this.#test_action, {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({ajaxdata: {expressions, test_string}})
+			})
+				.then(response => response.json())
+				.then(response => this.#showTestResult(response, expressions))
+				.catch(exception => addMessage(makeMessageBox('bad', [exception.message])))
+				.finally(() => this.#testLoading(false));
+		}
+
+		#testLoading(state) {
+			const button = document.getElementById('test-expression'),
+				textarea = document.getElementById('test-string');
+
+			if (state === true) {
+				button.classList.add('is-loading');
+				button.setAttribute('disabled', true);
+				textarea.setAttribute('disabled', true);
+			}
+			else {
+				button.classList.remove('is-loading');
+				button.removeAttribute('disabled');
+				textarea.removeAttribute('disabled');
+			}
+		}
+
+		#showTestResult(response, expressions) {
+			for (let row of this.#test_results.querySelectorAll('.js-expression-result-row')) {
+				row.remove();
+			}
+
+			const indexes = Object.keys(expressions),
+				combined_result = {message: response.final ? t('TRUE') : t('FALSE'), result: response.final};
+
+			if (indexes.length == 0) {
+				return this.#addTestResultCombined(false, t('UNKNOWN'));
+			}
+
+			for (let index of indexes) {
+				const result = response.expressions[index],
+					error = response.errors[index],
+					expression = expressions[index];
+
+				if (error !== undefined) {
+					combined_result.message = t('UNKNOWN');
+					this.#addTestResult(expression, result, error);
 				}
 				else {
-					tplData = {
-						resultClass: response.data.final ? '<?= ZBX_STYLE_GREEN ?>' : '<?= ZBX_STYLE_RED ?>',
-						result: response.data.final ? <?= json_encode(_('TRUE')) ?> : <?= json_encode(_('FALSE')) ?>
-					};
+					this.#addTestResult(expression, result, result ? t('TRUE') : t('FALSE'));
 				}
-
-				$('#testResultTable').append(this.testCombinedTableRowTpl.evaluate(tplData));
-				$('#testResultTable').css({opacity: 1});
 			}
-		};
-	}(jQuery));
 
-	jQuery(function($) {
-		var $form = $('form#regex'),
-			$test_string = $('#test_string');
-			$test_btn = $('#testExpression');
+			this.#addTestResultCombined(combined_result.result, combined_result.message);
+		}
 
-		$form.on('submit', function() {
-			$form.trimValues(['#name']);
-		});
+		#addTestResultCombined(result, message) {
+			this.#test_results.append(this.#combined_result_template.evaluateToElement({
+				resultClass: result ? '<?= ZBX_STYLE_GREEN ?>' : '<?= ZBX_STYLE_RED ?>',
+				result: message
+			}));
+		}
 
-		$('#testExpression, #tab_test').click(function() {
-			$test_btn.addClass('is-loading');
-			$test_btn.prop('disabled', true);
-			$test_string.prop('disabled', true);
+		#addTestResult({expression_type, expression}, result, message) {
+			this.#test_results.append(this.#result_row_template.evaluateToElement({
+				expression: expression,
+				type: this.#expressionTypeString(expression_type),
+				result: message,
+				resultClass: result ? '<?= ZBX_STYLE_GREEN ?>' : '<?= ZBX_STYLE_RED ?>'
+			}));
+		}
 
-			zabbixRegExp
-				.testExpressions($test_string.val())
-				.always(function() {
-					$test_btn.removeClass('is-loading');
-					$test_btn.prop('disabled', false);
-					$test_string.prop('disabled', false);
-				});
-		});
+		#expressionTypeString(type) {
+			switch (type) {
+				case '<?= EXPRESSION_TYPE_INCLUDED ?>': return t('Character string included');
+				case '<?= EXPRESSION_TYPE_ANY_INCLUDED ?>': return t('Any character string included');
+				case '<?= EXPRESSION_TYPE_NOT_INCLUDED ?>': return t('Character string not included');
+				case '<?= EXPRESSION_TYPE_TRUE ?>': return t('Result is TRUE');
+				case '<?= EXPRESSION_TYPE_FALSE ?>': return t('Result is FALSE');
+				default: return '';
+			}
+		}
+		#updateRow({target}) {
+			if (target instanceof ZSelect && target.classList.contains('js-expression-type-select')) {
+				const delimeter = target.closest('tr').querySelector('.js-expression-delimiter-select');
 
-		$('#tbl_expr')
-			.dynamicRows({template: '#row-expression-tmpl', allow_empty: true})
-			.on('change', '.js-expression-type-select', (e) => {
-				$(e.target)
-					.closest('[data-index]')
-					.find('.js-expression-delimiter-select')
-					.prop('disabled', e.target.value !== '<?= EXPRESSION_TYPE_ANY_INCLUDED ?>')
-					.toggle(e.target.value === '<?= EXPRESSION_TYPE_ANY_INCLUDED ?>');
-			});
+				if (target.value === '<?= EXPRESSION_TYPE_ANY_INCLUDED ?>') {
+					delimeter.removeAttribute('disabled');
+					delimeter.classList.remove(ZBX_STYLE_DISPLAY_NONE);
+				}
+				else {
+					delimeter.setAttribute('disabled', true);
+					delimeter.classList.add(ZBX_STYLE_DISPLAY_NONE);
+				}
+			}
+		}
+	}
 
-		$form.find('#clone').click(function() {
-			var url = new Curl('zabbix.php?action=regex.edit');
-
-			$form.serializeArray().forEach(function(field) {
-				url.setArgument(field.name, field.value);
-			});
-
-			redirect(url.getUrl(), 'post', 'action', undefined, true);
-		});
-	});
 </script>

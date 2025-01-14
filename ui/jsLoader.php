@@ -228,15 +228,23 @@ $translate_strings = [
 		'Unavailable widget' => _('Unavailable widget')
 	],
 	'functions.js' => [
+		'Any character string included' => _('Any character string included'),
+		'Character string included' => _('Character string included'),
+		'Character string not included' => _('Character string not included'),
 		'Close' => _('Close'),
 		'Details' => _('Details'),
-		'S_YEAR_SHORT' => _x('y', 'year short'),
-		'S_MONTH_SHORT' => _x('M', 'month short'),
+		'Error message' => _('Error message'),
+		'FALSE' => _('FALSE'),
+		'Result is FALSE' => _('Result is FALSE'),
+		'Result is TRUE' => _('Result is TRUE'),
 		'S_DAY_SHORT' => _x('d', 'day short'),
 		'S_HOUR_SHORT' => _x('h', 'hour short'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short'),
+		'S_MONTH_SHORT' => _x('M', 'month short'),
+		'S_YEAR_SHORT' => _x('y', 'year short'),
 		'Success message' => _('Success message'),
-		'Error message' => _('Error message'),
+		'TRUE' => _('TRUE'),
+		'UNKNOWN' => _('UNKNOWN'),
 		'Warning message' => _('Warning message')
 	],
 	'inputsecret.js' => [

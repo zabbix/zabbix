@@ -18,6 +18,7 @@ class CControllerRegExTest extends CController {
 
 	protected function init() {
 		$this->disableCsrfValidation();
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
 	protected function checkInput() {
@@ -39,7 +40,6 @@ class CControllerRegExTest extends CController {
 	}
 
 	protected function doAction() {
-		$response = new CAjaxResponse();
 		$data = $this->getInput('ajaxdata', []);
 
 		$result = [
@@ -52,7 +52,7 @@ class CControllerRegExTest extends CController {
 			foreach ($data['expressions'] as $id => $expression) {
 				try {
 					self::validateRegex($expression);
-					$result['expressions'][$id] = CGlobalRegexp::matchExpression($expression, $data['testString']);
+					$result['expressions'][$id] = CGlobalRegexp::matchExpression($expression, $data['test_string']);
 					$result['final'] = $result['final'] && $result['expressions'][$id];
 				}
 				catch (Exception $e) {
@@ -62,8 +62,7 @@ class CControllerRegExTest extends CController {
 			}
 		}
 
-		$response->success($result);
-		$response->send();
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($result)]));
 	}
 
 	private static function validateRegex(array $expression): void {
