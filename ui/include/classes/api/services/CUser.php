@@ -24,8 +24,12 @@ use PragmaRX\Google2FA\Support\Constants;
  */
 class CUser extends CApiService {
 
-	// Acceptable execution time of internal login process, microseconds.
-	public const ACCEPTABLE_LOGIN_TIME = 1000000;
+	/**
+	 * Acceptable execution time of internal login process in seconds.
+	 *
+	 * @var float
+	 */
+	public const ACCEPTABLE_LOGIN_TIME = 1.0;
 
 	public const ACCESS_RULES = [
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
@@ -51,8 +55,7 @@ class CUser extends CApiService {
 
 	private const PROVISIONED_FIELDS = ['username', 'name', 'surname', 'usrgrps', 'medias', 'roleid'];
 
-	private static $login_start_time;
-	private static $microseconds_per_second = 1000000;
+	private static $login_start_time = 0;
 
 	/**
 	 * Get users data.
@@ -2522,6 +2525,28 @@ class CUser extends CApiService {
 		}
 	}
 
+	/**
+	 * Equalizes response time to prevent username enumeration via timing attacks.
+	 */
+	private static function equalizeLoginTime(): void {
+		$current_interval = microtime(true) - self::$login_start_time;
+
+		if ($current_interval < self::ACCEPTABLE_LOGIN_TIME) {
+			$missing_interval = self::ACCEPTABLE_LOGIN_TIME - $current_interval;
+
+			$missing_seconds = (int) floor($missing_interval);
+			$missing_microseconds = (int) floor(($missing_interval - $missing_seconds) * 1000000);
+
+			if ($missing_seconds) {
+				sleep($missing_seconds);
+			}
+
+			if ($missing_microseconds) {
+				usleep($missing_microseconds);
+			}
+		}
+	}
+
 	private static function loginException(?string $userid, string $username, int $code, string $error): void {
 		self::addAuditLogByUser($userid, CWebUser::getIp(), $username, CAudit::ACTION_LOGIN_FAILED,
 			CAudit::RESOURCE_USER
@@ -3585,17 +3610,5 @@ class CUser extends CApiService {
 		}
 
 		return ['userids' => $userids];
-	}
-
-	private static function equalizeLoginTime() {
-		if (self::$login_start_time === null) {
-			return;
-		}
-
-		$delay_microseconds = self::ACCEPTABLE_LOGIN_TIME
-			- intval((microtime(true) - self::$login_start_time) * self::$microseconds_per_second);
-
-		sleep(intdiv($delay_microseconds, self::$microseconds_per_second));
-		usleep($delay_microseconds % self::$microseconds_per_second);
 	}
 }
