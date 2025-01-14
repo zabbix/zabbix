@@ -18,19 +18,7 @@
 
 #include "zbxexpr.h"
 
-static int	parse_time_from_string(const char *time_str)
-{
-	struct tm tm = {0};
-
-	if (sscanf(time_str, "%d-%d-%dT%d:%d:%d", &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min,
-			&tm.tm_sec) != 6)
-		fail_msg("Cannot read time: %s", time_str);
-
-	tm.tm_year -= 1900;
-	tm.tm_mon -= 1;
-
-	return mktime(&tm);
-}
+#include "zbx_expr_common.h"
 
 void	zbx_mock_test_entry(void **state)
 {

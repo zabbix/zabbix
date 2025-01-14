@@ -12,6 +12,6 @@ in:
   exp: ""
 out:
   return: FAIL
-  exp_host: "hostname"
-  exp_key: "[test]"
+  exp_host: " "
+  exp_key: " "
 ...

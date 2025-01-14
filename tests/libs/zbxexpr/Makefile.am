@@ -505,6 +505,7 @@ zbx_function_validate_parameters_CFLAGS = $(EXPR_COMPILER_FLAGS)
 
 zbx_check_time_period_SOURCES = \
 	zbx_check_time_period.c \
+	zbx_expr_common.c \
 	$(COMMON_SRC_FILES)
 
 zbx_check_time_period_LDADD = \
@@ -520,6 +521,7 @@ zbx_check_time_period_CFLAGS = $(EXPR_COMPILER_FLAGS)
 
 zbx_get_agent_item_nextcheck_SOURCES = \
 	zbx_get_agent_item_nextcheck.c \
+	zbx_expr_common.c \
 	$(COMMON_SRC_FILES)
 
 zbx_get_agent_item_nextcheck_LDADD = \
