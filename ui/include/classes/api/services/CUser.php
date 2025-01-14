@@ -2272,6 +2272,7 @@ class CUser extends CApiService {
 
 	private static function checkSingleUserExists(string $username, array $db_users): void {
 		if (!$db_users) {
+			self::equalizeLoginTime();
 			self::loginException(null, $username, ZBX_API_ERROR_PERMISSIONS,
 				_('Incorrect user name or password or account is temporarily blocked.')
 			);
@@ -2286,6 +2287,7 @@ class CUser extends CApiService {
 
 	private static function checkUserProvisionedByLdap(array $db_user) {
 		if (!self::isLdapUserDirectory($db_user['userdirectoryid'])) {
+			self::equalizeLoginTime();
 			self::loginException($db_user['userid'], $db_user['username'], ZBX_API_ERROR_PERMISSIONS,
 				_('Incorrect user name or password or account is temporarily blocked.')
 			);
@@ -2412,6 +2414,7 @@ class CUser extends CApiService {
 		$blocked_duration = time() - $db_user['attempt_clock'];
 
 		if ($blocked_duration < timeUnitToSeconds(CSettingsHelper::getPublic(CSettingsHelper::LOGIN_BLOCK))) {
+			self::equalizeLoginTime();
 			self::loginException($db_user['userid'], $db_user['username'], ZBX_API_ERROR_PERMISSIONS,
 				_('Incorrect user name or password or account is temporarily blocked.')
 			);
@@ -2472,6 +2475,7 @@ class CUser extends CApiService {
 		if (!password_verify($data['password'], $db_passwd)) {
 			self::increaseFailedLoginAttempts($db_user);
 
+			self::equalizeLoginTime();
 			self::loginException($db_user['userid'], $db_user['username'], ZBX_API_ERROR_PERMISSIONS,
 				_('Incorrect user name or password or account is temporarily blocked.')
 			);
@@ -2523,7 +2527,6 @@ class CUser extends CApiService {
 			CAudit::RESOURCE_USER
 		);
 
-		self::equalizeLoginTime();
 		self::exception($code, $error);
 	}
 
