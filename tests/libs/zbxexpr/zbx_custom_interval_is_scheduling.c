@@ -33,6 +33,7 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("Value of 'delay' is not a valid update interval: %s.", error);
 
 	int	result = zbx_custom_interval_is_scheduling(custom_intervals);
+	zbx_custom_interval_free(custom_intervals);
 
 	zbx_mock_assert_int_eq("return value:", exp_result, result);
 }

@@ -26,7 +26,7 @@ out:
   return: SUCCEED
   nextcheck: 1702945000
 ---
-test case: "3. Delay 1d"
+test case: "4. Delay 1w"
 in:
   itemid: 1000
   delay: "1w"

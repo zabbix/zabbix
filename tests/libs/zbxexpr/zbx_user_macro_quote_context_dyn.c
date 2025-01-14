@@ -31,4 +31,9 @@ void	zbx_mock_test_entry(void **state)
 
 	if (NULL != result)
 		zbx_mock_assert_str_eq("return value str", exp_result, result);
+
+	zbx_free(result);
+
+	if (SUCCEED != force_quote)
+		zbx_free(error);
 }

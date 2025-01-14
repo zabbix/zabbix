@@ -36,4 +36,6 @@ void	zbx_mock_test_entry(void **state)
 		const char	*exp_result = zbx_mock_get_parameter_string("out.result");
 		zbx_mock_assert_str_eq("return value str", exp_result, result);
 	}
+
+	zbx_free(result);
 }

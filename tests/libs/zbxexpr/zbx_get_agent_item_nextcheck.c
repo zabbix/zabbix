@@ -37,4 +37,7 @@ void	zbx_mock_test_entry(void **state)
 	int	result = zbx_get_agent_item_nextcheck(itemid, delay, time, &nextcheck, &scheduling, &error);
 	zbx_mock_assert_int_eq("return value", exp_result, result);
 	zbx_mock_assert_uint64_eq("return value", exp_nextcheck, (uint64_t)nextcheck);
+
+	if (FAIL == result)
+		zbx_free(error);
 }
