@@ -112,8 +112,16 @@ $form_grid = (new CFormGrid())
 				->setOptions($weekly_days_options)
 				->setVertical()
 				->setColumns(3)
+				->setAttribute('data-field-type', 'array')
+				->setAttribute('data-field-name', 'weekly_days')
+				->setAttribute('data-error-container', 'weekly_days_error_container')
 		))->addClass('js-weekly-days')
 	])
+	->addItem(
+		(new CFormField())
+			->addClass(ZBX_STYLE_ERROR_CONTAINER)
+			->setId('weekly_days_error_container')
+	)
 	->addItem([
 		(new CLabel(_('Month'), 'months'))
 			->addClass('js-months')
@@ -124,8 +132,16 @@ $form_grid = (new CFormGrid())
 				->setOptions($months_options)
 				->setVertical()
 				->setColumns(3)
+				->setAttribute('data-field-type', 'array')
+				->setAttribute('data-field-name', 'months')
+				->setAttribute('data-error-container', 'months_error_container')
 		))->addClass('js-months')
 	])
+	->addItem(
+		(new CFormField())
+			->addClass(ZBX_STYLE_ERROR_CONTAINER)
+			->setId('months_error_container')
+	)
 	->addItem([
 		(new CLabel(_('Date'), 'month_date_type'))->addClass('js-month-date-type'),
 		(new CFormField(
@@ -157,7 +173,15 @@ $form_grid = (new CFormGrid())
 				->setOptions($monthly_days_options)
 				->setVertical()
 				->setColumns(3)
+				->setAttribute('data-field-type', 'array')
+				->setAttribute('data-field-name', 'monthly_days')
+				->setAttribute('data-error-container', 'monthly_days_error_container')
 		))->addClass('js-monthly-days')
+	)
+	->addItem(
+		(new CFormField())
+			->addClass(ZBX_STYLE_ERROR_CONTAINER)
+			->setId('monthly_days_error_container')
 	)
 	->addItem([
 		(new CLabel(_('Day of month'), 'day'))
@@ -183,9 +207,18 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('At (hour:minute)'), 'hour'))->addClass('js-hour-minute'),
 		(new CFormField([
-			(new CNumericBox('hour', $data['form']['hour'], 2))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+			(new CNumericBox('hour', $data['form']['hour'], 2))
+				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+				->setErrorContainer('hour_minute_error_container')
+				->setErrorLabel(_('Hour')),
 			' : ',
-			(new CNumericBox('minute', $data['form']['minute'], 2))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			(new CNumericBox('minute', $data['form']['minute'], 2))
+				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+				->setErrorContainer('hour_minute_error_container')
+				->setErrorLabel(_('Minute')),
+			(new CDiv())
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
+				->setId('hour_minute_error_container')
 		]))->addClass('js-hour-minute')
 	])
 	->addItem([
@@ -193,19 +226,25 @@ $form_grid = (new CFormGrid())
 		(new CFormField([
 			(new CDiv([
 				(new CNumericBox('period_days', $data['form']['period_days'], 3))
-					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+					->setErrorContainer('period_length_error_container'),
 				new CLabel(_('Days'), 'period_days'),
 				(new CSelect('period_hours'))
 					->setFocusableElementId('period-hours-focusable')
 					->addOptions(CSelect::createOptionsFromArray(range(0, 23)))
-					->setValue($data['form']['period_hours']),
+					->setValue($data['form']['period_hours'])
+					->setErrorContainer('period_length_error_container'),
 				new CLabel(_('Hours'), 'period-hours-focusable'),
 				(new CSelect('period_minutes'))
 					->setFocusableElementId('period-minutes-focusable')
 					->addOptions(CSelect::createOptionsFromArray(range(0, 59)))
-					->setValue($data['form']['period_minutes']),
+					->setValue($data['form']['period_minutes'])
+					->setErrorContainer('period_length_error_container'),
 				new CLabel(_('Minutes'), 'period-minutes-focusable')
-			]))->addClass(ZBX_STYLE_FORM_FIELDS_INLINE)
+			]))->addClass(ZBX_STYLE_FORM_FIELDS_INLINE),
+			(new CDiv())
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
+				->setId('period_length_error_container')
 		]))
 	]);
 
@@ -213,7 +252,9 @@ $form
 	->addItem($form_grid)
 	->addItem(
 		(new CScriptTag('
-			maintenance_timeperiod_edit.init();
+			maintenance_timeperiod_edit.init('.json_encode([
+				'rules' => $data['js_validation_rules']
+			]).');
 		'))->setOnDocumentReady()
 	);
 

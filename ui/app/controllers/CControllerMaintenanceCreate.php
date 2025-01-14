@@ -17,57 +17,79 @@
 class CControllerMaintenanceCreate extends CController {
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	protected function checkInput(): bool {
-		$fields = [
-			'name' =>				'required|string|not_empty',
-			'maintenance_type' =>	'required|in '.implode(',', [MAINTENANCE_TYPE_NORMAL, MAINTENANCE_TYPE_NODATA]),
-			'active_since' =>		'required|abs_time',
-			'active_till' =>		'required|abs_time',
-			'timeperiods' =>		'required|array',
-			'groupids' =>			'array_id',
-			'hostids' => 			'array_id',
-			'tags_evaltype' =>		'in '.implode(',', [MAINTENANCE_TAG_EVAL_TYPE_AND_OR, MAINTENANCE_TAG_EVAL_TYPE_OR]),
-			'tags' =>				'array',
-			'description' =>		'required|string'
+	public static function getValidationRules() {
+		$api_uniq = [
+			['maintenance.get', ['name' => '{name}']]
 		];
 
-		$ret = $this->validateInput($fields);
+		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
+			'name' => ['db maintenances.name', 'required', 'not_empty'],
+			'maintenance_type' => ['db maintenances.maintenance_type', 'required', 'in' => [MAINTENANCE_TYPE_NORMAL, MAINTENANCE_TYPE_NODATA]],
+			'active_since' => ['string', 'required', 'not_empty', 'use' => [CAbsoluteTimeParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]], 'messages' => ['use' => _('Invalid date.')]],
+			'active_till' => ['string', 'required', 'not_empty', 'use' => [CAbsoluteTimeParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]], 'messages' => ['use' => _('Invalid date.')]],
+			'timeperiods' => ['objects', 'required', 'not_empty', 'fields' => [
+				'timeperiod_type' => ['db timeperiods.timeperiod_type', 'required', 'in' => [TIMEPERIOD_TYPE_ONETIME, TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]],
+				'every' => [
+					['db timeperiods.every', 'min' => 1, 'max' => 999, 'when' => ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_DAILY]]],
+					['db timeperiods.every', 'min' => 1, 'max' => 99, 'when' => ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_WEEKLY]]],
+					['db timeperiods.every', 'in' => [1, 2, 3, 4, 5], 'when' => ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_MONTHLY]]]
+				],
+				'month' => ['db timeperiods.month', 'min' => 1, 'messages' => ['min' => _('At least one month must be selected.')], 'when' => ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_MONTHLY]]],
+				'month_date_type' => ['integer', 'in' => [0, 1], 'when' => ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_MONTHLY]]],
+				'dayofweek' => [
+					['db timeperiods.dayofweek', 'min' => 1,
+						'when' => [['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_MONTHLY]], ['month_date_type', 'in' => [1]]],
+						'messages' => ['min' => _('At least one weekday must be selected.')]
+					],
+					['db timeperiods.dayofweek', 'min' => 1,
+						'when' => [['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_MONTHLY]], ['month_date_type', 'in' => [1]]],
+						'messages' => ['min' => _('At least one weekday must be selected.')]
+					]
+				],
+				'day' => [
+					['db timeperiods.day'],
+				],
+				'start_time' => ['db timeperiods.start_time', 'min' => 0, 'max' => SEC_PER_DAY, 'when' => ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_DAILY, TIMEPERIOD_TYPE_WEEKLY, TIMEPERIOD_TYPE_MONTHLY]]],
+				'period' => ['db timeperiods.period', 'required'],
+				'start_date' => ['db timeperiods.start_date', 'required', 'when' => ['timeperiod_type', 'in' => [TIMEPERIOD_TYPE_ONETIME]]]
+			]],
+			'hostids' => ['array', 'field' => ['db maintenances_hosts.hostid']],
+			'groupids' => [
+				['array', 'field' => ['db maintenances_groups.groupid']],
+				['array', 'required', 'not_empty', 'field' => ['db maintenances_groups.groupid'], 'when' => ['hostids', 'empty']]
+			],
+			'tags_evaltype' => [
+				['db maintenances.tags_evaltype', 'in' => [MAINTENANCE_TAG_EVAL_TYPE_AND_OR, MAINTENANCE_TAG_EVAL_TYPE_OR]],
+				['db maintenances.tags_evaltype', 'required', 'in' => [MAINTENANCE_TAG_EVAL_TYPE_AND_OR, MAINTENANCE_TAG_EVAL_TYPE_OR], 'when' => ['maintenance_type', 'in' => [MAINTENANCE_TYPE_NORMAL]]]
+			],
+			'tags' => ['objects', 'uniq' => [['tag', 'operator', 'value']], 'fields' => [
+				'operator' => ['db maintenance_tag.operator', 'in' => [MAINTENANCE_TAG_OPERATOR_LIKE, MAINTENANCE_TAG_OPERATOR_EQUAL]],
+				'value' => ['db maintenance_tag.value'],
+				'tag' => ['db maintenance_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+			], 'when' => ['maintenance_type', 'in' => [MAINTENANCE_TYPE_NORMAL]]],
+			'description' => ['db maintenances.description']
+		]];
+	}
 
-		if ($ret) {
-			if ($this->getInput('maintenance_type') == MAINTENANCE_TYPE_NORMAL) {
-				$fields = [
-					'tags_evaltype' => 'required'
-				];
-
-				$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
-
-				foreach ($validator->getAllErrors() as $error) {
-					error($error);
-				}
-
-				if ($validator->isErrorFatal() || $validator->isError()) {
-					$ret = false;
-				}
-			}
-
-			if (!$this->hasInput('groupids') && !$this->hasInput('hostids')) {
-				error(_('At least one host group or host must be selected.'));
-
-				$ret = false;
-			}
-		}
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules());
+		$ret = $ret && $this->validateTimePeriods();
 
 		if (!$ret) {
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot create maintenance period'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
 			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'title' => _('Cannot create maintenance period'),
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])])
+				new CControllerResponseData(['main_block' => json_encode($response)])
 			);
 		}
 
@@ -149,5 +171,28 @@ class CControllerMaintenanceCreate extends CController {
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 
+	}
+
+	/**
+	 * Function to compare values from fields "Active since" and "Active till".
+	 */
+	protected function validateTimePeriods(): bool {
+		$absolute_time_parser = new CAbsoluteTimeParser();
+
+		$absolute_time_parser->parse($this->getInput('active_since'));
+		$active_since_ts = $absolute_time_parser->getDateTime(true)->getTimestamp();
+
+		$absolute_time_parser->parse($this->getInput('active_till'));
+		$active_till_ts = $absolute_time_parser->getDateTime(true)->getTimestamp();
+
+		if ($active_since_ts >= $active_till_ts) {
+			$this->addFormError('/active_till', _s('Must be greater than "%1$s".', _('Active since')),
+				CFormValidator::ERROR_LEVEL_PRIMARY
+			);
+
+			return false;
+		}
+
+		return true;
 	}
 }

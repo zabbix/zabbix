@@ -72,51 +72,67 @@ $timeperiod_template = new CTemplateTag('timeperiod-row-tmpl',
 	]))->setAttribute('data-row_index', '#{row_index}')
 );
 
+$tags_evaltype = (new CDiv(
+	(new CRadioButtonList('tags_evaltype', (int) $data['tags_evaltype']))
+		->addValue(_('And/Or'), MAINTENANCE_TAG_EVAL_TYPE_AND_OR)
+		->addValue(_('Or'), MAINTENANCE_TAG_EVAL_TYPE_OR)
+		->setModern()
+		->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
+		->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
+))->addStyle('margin-bottom: 10px;');
+
 $tags = (new CTable())
 	->setId('tags')
 	->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-	->setHeader(
-		(new CCol(
-			(new CRadioButtonList('tags_evaltype', (int) $data['tags_evaltype']))
-				->addValue(_('And/Or'), MAINTENANCE_TAG_EVAL_TYPE_AND_OR)
-				->addValue(_('Or'), MAINTENANCE_TAG_EVAL_TYPE_OR)
-				->setModern()
-				->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
-				->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
-		))
-	)
 	->setFooter(
 		(new CCol(
 			(new CButtonLink(_('Add')))
 				->addClass('element-table-add')
 				->setEnabled($data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
 		))
-	);
+	)
+	->setAttribute('data-field-type', 'set')
+	->setAttribute('data-field-name', 'tags');
 
-$tag_template = new CTemplateTag('tag-row-tmpl',
-	(new CRow([
-		(new CTextBox('tags[#{rowNum}][tag]', '#{tag}', false, DB::getFieldLength('maintenance_tag', 'tag')))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-			->setAttribute('placeholder', _('tag'))
-			->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
-			->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL),
-		(new CRadioButtonList('tags[#{rowNum}][operator]', MAINTENANCE_TAG_OPERATOR_LIKE))
-			->addValue(_('Contains'), MAINTENANCE_TAG_OPERATOR_LIKE)
-			->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
-			->setModern()
-			->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
-			->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL),
-		(new CTextBox('tags[#{rowNum}][value]', '#{value}', false, DB::getFieldLength('maintenance_tag', 'value')))
-			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-			->setAttribute('placeholder',  _('value'))
-			->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
-			->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL),
-		(new CButton('tags[#{rowNum}][remove]', _('Remove')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-remove')
-			->setEnabled($data['allowed_edit'])
-	]))->addClass('form_row')
-);
+$tag_template = (new CTemplateTag('tag-row-tmpl'))
+	->addItem(
+		(new CRow([
+			(new CTextBox('tags[#{rowNum}][tag]', '#{tag}', false, DB::getFieldLength('maintenance_tag', 'tag')))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->setAttribute('placeholder', _('tag'))
+				->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
+				->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
+				->setErrorContainer('tags_#{rowNum}_error_container')
+				->setErrorLabel(_('Tag')),
+			(new CRadioButtonList('tags[#{rowNum}][operator]', MAINTENANCE_TAG_OPERATOR_LIKE))
+				->setAttribute('data-error-container', 'tags_#{rowNum}_error_container')
+				->setAttribute('data-error-label', _('Operator'))
+				->addValue(_('Contains'), MAINTENANCE_TAG_OPERATOR_LIKE)
+				->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
+				->setModern()
+				->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
+				->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL),
+			(new CTextBox('tags[#{rowNum}][value]', '#{value}', false, DB::getFieldLength('maintenance_tag', 'value')))
+				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->setAttribute('placeholder',  _('value'))
+				->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
+				->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
+				->setErrorContainer('tags_#{rowNum}_error_container')
+				->setErrorLabel(_('Value')),
+			(new CButton('tags[#{rowNum}][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+				->setEnabled($data['allowed_edit'])
+		]))->addClass('form_row')
+	)
+	->addItem(
+		(new CRow([
+			(new CCol())
+				->setId('tags_#{rowNum}_error_container')
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
+				->setColSpan(4)
+		]))->addClass('form_row')
+	);
 
 $form->addItem(
 	(new CFormGrid())
@@ -163,7 +179,10 @@ $form->addItem(
 		->addItem([
 			(new CLabel(_('Periods')))->setAsteriskMark(),
 			new CFormField(
-				(new CDiv([$timeperiods, $timeperiod_template]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				(new CDiv([$timeperiods, $timeperiod_template]))
+					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+					->setAttribute('data-field-type', 'set')
+					->setAttribute('data-field-name', 'timeperiods')
 			)
 		])
 		->addItem([
@@ -211,7 +230,7 @@ $form->addItem(
 		)
 		->addItem([
 			new CLabel(_('Tags')),
-			new CFormField([$tags, $tag_template])
+			new CFormField([$tags_evaltype, $tags, $tag_template])
 		])
 		->addItem([
 			new CLabel(_('Description'), 'description'),
@@ -223,17 +242,6 @@ $form->addItem(
 			)
 		])
 	);
-
-$form->addItem(
-	(new CScriptTag('
-		maintenance_edit.init('.json_encode([
-			'maintenanceid' => $data['maintenanceid'],
-			'timeperiods' => $data['timeperiods'],
-			'tags' => $data['tags'],
-			'allowed_edit' => $data['allowed_edit']
-		]).');
-	'))->setOnDocumentReady()
-);
 
 if ($data['maintenanceid'] !== null) {
 	$title = _('Maintenance period');
@@ -298,11 +306,18 @@ else {
 $output = [
 	'header' => $title,
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_MAINTENANCE_EDIT),
-	'body' => $form->toString(),
+	'body' => $form->toString().$this->readJsFile('maintenance.edit.js.php'),
 	'buttons' => $buttons,
+	'dialogue_class' => 'modal-popup-large',
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('maintenance.edit.js.php'),
-	'dialogue_class' => 'modal-popup-large'
+		'maintenance_edit.init('.json_encode([
+			'maintenanceid' => $data['maintenanceid'],
+			'timeperiods' => $data['timeperiods'],
+			'tags' => $data['tags'],
+			'allowed_edit' => $data['allowed_edit'],
+			'rules' => $data['js_validation_rules'],
+			'rules_for_clone' => $data['js_clone_validation_rules']
+		]).');'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

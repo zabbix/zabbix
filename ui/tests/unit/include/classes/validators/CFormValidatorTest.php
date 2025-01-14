@@ -2110,7 +2110,7 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
-					'value' => ['string', 'use' => [CAbsoluteTimeParser::class, [], ['min' => 0, 'max' => 2147464800]]]
+					'value' => ['string', 'use' => [CAbsoluteTimeParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]]]
 				]],
 				['value' => '2024-01-08 12:00:00'],
 				['value' => '2024-01-08 12:00:00'],

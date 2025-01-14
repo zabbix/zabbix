@@ -22,23 +22,25 @@ class CControllerMaintenanceEdit extends CController {
 	private $maintenance;
 
 	protected function init() {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
-		$fields = [
-			'maintenanceid' => 'db maintenances.maintenanceid'
-		];
-
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput(['object', 'fields' => [
+			'maintenanceid' => ['db maintenances.maintenanceid']
+		]]);
 
 		if (!$ret) {
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
 			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])]))->disableView()
+				(new CControllerResponseData(['main_block' => json_encode($response)]))->disableView()
 			);
 		}
 
@@ -150,6 +152,16 @@ class CControllerMaintenanceEdit extends CController {
 
 		$data['allowed_edit'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_MAINTENANCE);
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
+
+		$create_rules = (new CFormValidator(CControllerMaintenanceCreate::getValidationRules()))->getRules();
+		$rules = $this->maintenance
+			? (new CFormValidator(CControllerMaintenanceUpdate::getValidationRules()))->getRules()
+			: $create_rules;
+
+		$data += [
+			'js_validation_rules' => $rules,
+			'js_clone_validation_rules' => $create_rules
+		];
 
 		$this->setResponse(new CControllerResponseData($data));
 	}
