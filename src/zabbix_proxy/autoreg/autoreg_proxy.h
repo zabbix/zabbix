@@ -16,7 +16,6 @@
 #define ZABBIX_AUTOREG_PROXY_H
 
 #include "zbxdbhigh.h"
-#include "zbxcacheconfig.h"
 
 #include "zbxcacheconfig.h"
 

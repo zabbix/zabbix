@@ -14,7 +14,6 @@
 
 #include "zbxautoreg.h"
 #include "zbxalgo.h"
-#include "zbxcacheconfig.h"
 
 #include "zbxcacheconfig.h"
 

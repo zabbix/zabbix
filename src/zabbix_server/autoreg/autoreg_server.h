@@ -17,7 +17,6 @@
 
 #include "zbxautoreg.h"
 #include "zbxdbhigh.h"
-#include "zbxcacheconfig.h"
 
 #include "zbxcacheconfig.h"
 
