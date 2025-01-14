@@ -54,7 +54,6 @@
 #include "zbxcomms.h"
 #include "zbxdb.h"
 #include "zbxmutexs.h"
-#include "zbxautoreg.h"
 #include "zbxpgservice.h"
 #include "zbxinterface.h"
 #include "zbxhistory.h"
