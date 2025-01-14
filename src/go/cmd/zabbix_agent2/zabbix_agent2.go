@@ -257,7 +257,7 @@ func run() error {
 
 	systemOpt, err := agent.Options.RemovePluginSystemOptions()
 	if err != nil {
-		fatalExit("cannot initialize plugin system option", err)
+		return errs.Wrap(err, "cannot initialize plugin system option")
 	}
 
 	pluginSocket, err = initExternalPlugins(&agent.Options, systemOpt)
@@ -296,7 +296,7 @@ func run() error {
 		return errs.New("verbose parameter can be specified only with test or print parameters")
 	}
 
-	err = runAgent(args.foreground, args.configPath)
+	err = runAgent(args.foreground, args.configPath, systemOpt)
 	if err != nil {
 		if agent.Options.LogType == "file" {
 			log.Critf("%s", err.Error())
@@ -309,7 +309,7 @@ func run() error {
 }
 
 //nolint:gocognit,gocyclo,cyclop,maintidx
-func runAgent(isForeground bool, configPath string) error {
+func runAgent(isForeground bool, configPath string, systemOpt agent.PluginSystemOptions) error {
 	var logType int
 
 	switch agent.Options.LogType {
