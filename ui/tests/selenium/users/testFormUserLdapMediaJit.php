@@ -92,15 +92,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 					],
 					[
 						'name' => self::MEDIA_MAPPING_UPDATE,
-						'mediatypeid' => 6, // Opsgenie.
-						'attribute' => 'uid',
-						'active' => 1
-					],
-					[
-						'name' => 'Media to check disabling in user configuration',
 						'mediatypeid' => 21, // OTRS.
 						'attribute' => 'uid',
 						'severity' => 0 // None.
+					],
+					[
+						'name' => 'Media to check disabling in user configuration',
+						'mediatypeid' => 6, // Opsgenie.
+						'attribute' => 'uid'
 					],
 					[
 						'name' => 'Enabled media that is disabled in Media types',
@@ -130,12 +129,12 @@ class testFormUserLdapMediaJit extends CWebTest {
 		// Media type data to check after provisioning.
 		$media_type = ['MS Teams', 'Opsgenie', 'OTRS', 'Zammad', 'Zendesk'];
 		$when_active = ['1-7,00:00-24:00', '1-7,00:00-24:00', '1-7,00:00-24:00', '1-7,00:00-24:00', '1-7,00:00-24:00'];
-		$status = ['Enabled', 'Disabled', 'Enabled', 'Disabled', 'Disabled'];
+		$status = ['Enabled', 'Enabled', 'Enabled', 'Disabled', 'Disabled'];
 		$send_to = [PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USERNAME];
 		$severity = [
 			['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
-			['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
 			[],
+			['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
 			['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
 			['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']
 		];
@@ -319,9 +318,16 @@ class testFormUserLdapMediaJit extends CWebTest {
 					'fields' => [
 						'Enabled' => false
 					],
-					'media' => 'MS Teams',
+					'media' => 'Opsgenie',
 					'check_configuration' => [
-						'Use if severity' => [],
+						'Use if severity' => [
+							'Not classified',
+							'Information',
+							'Warning',
+							'Average',
+							'High',
+							'Disaster'
+						],
 						'When active' => '1-7,00:00-24:00',
 						'Enabled' => false
 					]
@@ -334,7 +340,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					'fields' => [
 						'Enabled' => true
 					],
-					'media' => 'Opsgenie',
+					'media' => 'Zammad',
 					'check_configuration' => [
 						'Use if severity' => [
 							'Not classified',
@@ -403,38 +409,29 @@ class testFormUserLdapMediaJit extends CWebTest {
 		}
 	}
 
-	public function getMediaAddData() {
-		return [
-			// Add media type with default parameters.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Type' => 'SMS',
-						'Send to' => 'test'
-					]
-				]
-			],
-			// Add media type with all parameters used.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Type' => 'SMS',
-						'Send to' => 'test',
-						'When active' => self::WHEN_ACTIVE,
-						'Use if severity' => [],
-						'Enabled' => false
-					]
-				]
+	/**
+	 * Check that LDAP provisioned user can add and remove non-provisioned media.
+	 */
+	public function testFormUserLdapMediaJit_AddRemoveMedia() {
+
+		// Media type configuration.
+		$data = [
+			'fields' => [
+				'Type' => 'SMS',
+				'Send to' => 'test',
+				'When active' => '1-7,00:00-24:00',
+				'Use if severity' => [
+					'Not classified',
+					'Information',
+					'Warning',
+					'Average',
+					'High',
+					'Disaster'
+				],
+				'Enabled' => true
 			]
 		];
-	}
 
-	/**
-	 * @dataProvider getMediaAddData
-	 */
-	public function testFormUserLdapMediaJit_AddRemoveMedia($data) {
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
 		$this->page->open('zabbix.php?action=userprofile.edit');
 
@@ -444,7 +441,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$this->query('button:Add')->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$media_form = $dialog->asForm();
-		$media_form->fill($data['fields']);
+		$media_form->fill(['Type' => 'SMS', 'Send to' => 'test']);
 
 		$media_form->submit();
 		$form->query('button:Update')->one()->click();
@@ -453,8 +450,19 @@ class testFormUserLdapMediaJit extends CWebTest {
 		// Check the media type that was added.
 		$this->page->open('zabbix.php?action=userprofile.edit');
 		$this->checkMediaConfiguration($data, $data['fields']['Type'], $data['fields']['Send to']);
+		$this->page->logout();
 
-		// Check that media can be removed.
+		// Provision LDAP user.
+		$this->page->login()->open('zabbix.php?action=user.list');
+		$this->provisionLdapUser();
+		$this->page->logout();
+
+		// Log in as LDAP user and check that added media is still present.
+		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
+		$this->page->open('zabbix.php?action=userprofile.edit');
+		$this->checkMediaConfiguration($data, $data['fields']['Type'], $data['fields']['Send to']);
+
+		// Check that media can be removed by LDAP provisioned user.
 		$form->selectTab('Media');
 		$media_field = $this->query('name:user_form')->waitUntilVisible()->asForm()->one()->getField('Media')->asTable();
 		$row = $media_field->findRow('Type', $data['fields']['Type'])->asTableRow();
@@ -467,61 +475,6 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$form->selectTab('Media');
 		$media_updated = $this->query('name:user_form')->waitUntilVisible()->asForm()->one()->getField('Media')->asTable();
 		$this->assertFalse($media_updated->findRow('Type', $data['fields']['Type'])->isPresent());
-	}
-
-	public function testFormUserLdapMediaJit_AddRemoveLdapMedia() {
-
-		// Log in as the LDAP user, to make sure, that user is provisioned.
-		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
-		$this->page->logout();
-
-		// Add new media mapping for existing LDAP server.
-		$form = $this->openLdapForm();
-		$table = $form->query('id:ldap-servers')->asTable()->one();
-		$table->query('link:'.self::LDAP_SERVER_NAME)->one()->click();
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$media_table = $dialog->query('id:ldap-media-type-mapping-table')->asTable()->one();
-		$media_table->query('button:Add')->one()->click();
-
-		$media_form = COverlayDialogElement::find()->all()->last()->asForm();
-		$data = ['Name' => 'New media type', 'Media type' => 'VictorOps', 'Attribute' => 'uid'];
-		$media_form->fill($data);
-		$media_form->submit();
-		$dialog->query('button:Update')->one()->click();
-		$form->submit();
-
-		// Check that new media is not added to LDAP user until user is provisioned again.
-		$this->page->open('zabbix.php?action=user.list')->waitUntilReady();
-		$this->query('link:'.PHPUNIT_LDAP_USERNAME)->one()->click();
-		$this->assertEquals(4, $this->getUserMediaTable()->getRows()->count());
-
-		// Provision the LDAP user.
-		$this->page->open('zabbix.php?action=user.list');
-		$this->provisionLdapUser();
-
-		// Check that new media is present after the provisioning.
-		$this->page->open('zabbix.php?action=user.list')->waitUntilReady();
-		$this->query('link:'.PHPUNIT_LDAP_USERNAME)->one()->click();
-		$user_media_table = $this->getUserMediaTable();
-		$this->assertEquals(5, $user_media_table->getRows()->count());
-		$this->assertTrue($user_media_table->findRow('Type', $data['Media type'], true)->isPresent());
-
-		// Remove previously added media mapping from LDAP configurations.
-		$form = $this->openLdapForm();
-		$table = $form->query('id:ldap-servers')->asTable()->one();
-		$table->query('link:'.self::LDAP_SERVER_NAME)->one()->click();
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$media_table = $dialog->query('id:ldap-media-type-mapping-table')->asTable()->one();
-		$media_table->findRow('Name', $data['Name'], true)->query('button:Remove')->one()->click();
-		$dialog->query('button:Update')->one()->click();
-		$form->submit();
-
-		// Check that media is not present for LDAP user.
-		$this->page->open('zabbix.php?action=user.list')->waitUntilReady();
-		$this->query('link:'.PHPUNIT_LDAP_USERNAME)->one()->click();
-		$user_media_table = $this->getUserMediaTable();
-		$this->assertEquals(4, $user_media_table->getRows()->count());
-		$this->assertFalse($user_media_table->findRow('Type', $data['Media type'], true)->isPresent());
 	}
 
 	public function testFormUserLdapMediaJit_UpdateMediaMapping() {
@@ -911,6 +864,30 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$this->page->open('zabbix.php?action=user.list')->waitUntilReady();
 		$this->query('link:'.PHPUNIT_LDAP_USERNAME)->one()->click();
 		$this->assertFalse($this->getUserMediaTable()->findRow('Type', self::DELETE_MEDIA, true)->isPresent());
+	}
+
+	public function testFormUserLdapMediaJit_RemoveMediaMapping() {
+
+		// Log in as the LDAP user, to make sure, that user is provisioned.
+		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
+		$this->page->logout();
+
+		// Remove media mapping from LDAP configurations.
+		$form = $this->openLdapForm();
+		$table = $form->query('id:ldap-servers')->asTable()->one();
+		$table->query('link:'.self::LDAP_SERVER_NAME)->one()->click();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$media_table = $dialog->query('id:ldap-media-type-mapping-table')->asTable()->one();
+		$media_table->findRow('Name', self::MEDIA_MAPPING_ATRIBUTE_CHANGE, true)->query('button:Remove')->one()->click();
+		$dialog->query('button:Update')->one()->click();
+		$form->submit();
+
+		// Check that media is not present for LDAP provisioned user.
+		$this->page->open('zabbix.php?action=user.list')->waitUntilReady();
+		$this->query('link:'.PHPUNIT_LDAP_USERNAME)->one()->click();
+		$user_media_table = $this->getUserMediaTable();
+		$this->assertEquals(4, $user_media_table->getRows()->count());
+		$this->assertFalse($user_media_table->findRow('Type', 'MS Teams', true)->isPresent());
 	}
 
 	/**
