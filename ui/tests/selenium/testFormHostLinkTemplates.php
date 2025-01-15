@@ -103,7 +103,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->query('button:Reset')->one()->click();
 		$this->zbxTestClickLinkTextWait(self::$host);
 
-		$dialog = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 		$dialog->fill(['Templates' => self::$link_template]);
 
 		$this->zbxTestTextPresent(self::$link_template);
@@ -122,7 +122,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->query('button:Reset')->one()->click();
 		$this->zbxTestClickLinkTextWait(self::$host);
 
-		$dialog = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 
 		// Clicks button named "Unlink" next to a template by name.
 		$this->assertTrue($dialog->query('link', self::$link_template)->exists());
@@ -151,7 +151,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->query('button:Reset')->one()->click();
 		$this->zbxTestClickLinkTextWait(self::$host);
 
-		$form = $this->query('name:host-form')->asForm()->waitUntilReady()->one();
+		$form = $this->query('name:host-form')->waitUntilReady()->asForm()->one();
 		$form->fill(['Templates' => self::$link_template]);
 
 		$this->zbxTestTextPresent(self::$link_template);
@@ -170,7 +170,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->query('button:Reset')->one()->click();
 		$this->zbxTestClickLinkTextWait(self::$host);
 
-		$dialog = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 
 		// Clicks button named "Unlink and clear" next to a template by name.
 		$this->assertTrue($dialog->query('link', self::$link_template)->exists());
