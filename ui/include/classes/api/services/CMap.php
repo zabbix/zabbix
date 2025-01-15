@@ -2102,21 +2102,11 @@ class CMap extends CMapElement {
 		}
 	}
 
-	private static function addAffectedLinkThresholds(array &$db_links,
-			int $type = self::LINK_THRESHOLD_TYPE_THRESHOLD): void {
-		if ($type == self::LINK_THRESHOLD_TYPE_THRESHOLD) {
-			$objects = 'thresholds';
-			$field = 'threshold';
-		}
-		else {
-			$objects = 'highlights';
-			$field = 'pattern';
-		}
-
+	private static function addAffectedLinkThresholds(array &$db_links): void {
 		$linkids = [];
 
 		foreach ($db_links as &$db_link) {
-			$db_link[$objects] = [];
+			$db_link['thresholds'] = [];
 
 			if ($db_link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
 				$linkids[] = $db_link['linkid'];
@@ -2129,20 +2119,45 @@ class CMap extends CMapElement {
 		}
 
 		$resource = DBselect(
-			'SELECT slt.linkthresholdid,slt.linkid,slt.'.$field.',slt.drawtype,slt.color'.
+			'SELECT slt.linkthresholdid,slt.linkid,slt.threshold,slt.drawtype,slt.color'.
 			' FROM sysmap_link_threshold slt'.
-			' WHERE slt.type='.$type.
+			' WHERE slt.type='.self::LINK_THRESHOLD_TYPE_THRESHOLD.
 				' AND '.dbConditionId('slt.linkid', $linkids)
 		);
 
 		while ($db_threshold = DBfetch($resource)) {
-			$db_links[$db_threshold['linkid']][$objects][$db_threshold['linkthresholdid']] =
+			$db_links[$db_threshold['linkid']]['thresholds'][$db_threshold['linkthresholdid']] =
 				array_diff_key($db_threshold, array_flip(['linkid']));
 		}
 	}
 
 	private static function addAffectedLinkHighlights(array &$db_links): void {
-		self::addAffectedLinkThresholds($db_links, self::LINK_THRESHOLD_TYPE_HIGHLIGHT);
+		$linkids = [];
+
+		foreach ($db_links as &$db_link) {
+			$db_link['highlights'] = [];
+
+			if ($db_link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+				$linkids[] = $db_link['linkid'];
+			}
+		}
+		unset($db_link);
+
+		if (!$linkids) {
+			return;
+		}
+
+		$resource = DBselect(
+			'SELECT slt.linkthresholdid,slt.linkid,slt.pattern,slt.drawtype,slt.color'.
+			' FROM sysmap_link_threshold slt'.
+			' WHERE slt.type='.self::LINK_THRESHOLD_TYPE_HIGHLIGHT.
+				' AND '.dbConditionId('slt.linkid', $linkids)
+		);
+
+		while ($db_threshold = DBfetch($resource)) {
+			$db_links[$db_threshold['linkid']]['highlights'][$db_threshold['linkthresholdid']] =
+				array_diff_key($db_threshold, array_flip(['linkid']));
+		}
 	}
 
 	/**
@@ -2686,35 +2701,25 @@ class CMap extends CMapElement {
 		unset($link);
 	}
 
-	private static function updateLinkThresholds(array &$links, ?array $db_links,
-			int $type = self::LINK_THRESHOLD_TYPE_THRESHOLD): void {
-		if ($type == self::LINK_THRESHOLD_TYPE_THRESHOLD) {
-			$objects = 'thresholds';
-			$field = 'threshold';
-		}
-		else {
-			$objects = 'highlights';
-			$field = 'pattern';
-		}
-
+	private static function updateLinkThresholds(array &$links, ?array $db_links): void {
 		$ins_link_thresholds = [];
 		$upd_link_thresholds = [];
 		$del_linkthresholdids = [];
 
 		foreach ($links as &$link) {
-			if (!array_key_exists($objects, $link)) {
+			if (!array_key_exists('thresholds', $link)) {
 				continue;
 			}
 
 			$db_link_thresholds = $db_links !== null
-				? array_column($db_links[$link['linkid']][$objects], null, $field)
+				? array_column($db_links[$link['linkid']]['thresholds'], null, 'threshold')
 				: [];
 
-			foreach ($link[$objects] as &$link_threshold) {
-				if (array_key_exists($link_threshold[$field], $db_link_thresholds)) {
-					$db_link_threshold = $db_link_thresholds[$link_threshold[$field]];
+			foreach ($link['thresholds'] as &$link_threshold) {
+				if (array_key_exists($link_threshold['threshold'], $db_link_thresholds)) {
+					$db_link_threshold = $db_link_thresholds[$link_threshold['threshold']];
 					$link_threshold['linkthresholdid'] = $db_link_threshold['linkthresholdid'];
-					unset($db_link_thresholds[$link_threshold[$field]]);
+					unset($db_link_thresholds[$link_threshold['threshold']]);
 
 					$upd_link_threshold = DB::getUpdatedValues('sysmap_link_threshold', $link_threshold,
 						$db_link_threshold
@@ -2730,7 +2735,7 @@ class CMap extends CMapElement {
 				else {
 					$ins_link_thresholds[] = [
 						'linkid' => $link['linkid'],
-						'type' => $type
+						'type' => self::LINK_THRESHOLD_TYPE_THRESHOLD
 					] + $link_threshold;
 				}
 			}
@@ -2757,11 +2762,11 @@ class CMap extends CMapElement {
 		}
 
 		foreach ($links as &$link) {
-			if (!array_key_exists($objects, $link)) {
+			if (!array_key_exists('thresholds', $link)) {
 				continue;
 			}
 
-			foreach ($link[$objects] as &$link_threshold) {
+			foreach ($link['thresholds'] as &$link_threshold) {
 				if (!array_key_exists('linkthresholdid', $link_threshold)) {
 					$link_threshold['linkthresholdid'] = array_shift($linkthresholdids);
 				}
@@ -2772,7 +2777,78 @@ class CMap extends CMapElement {
 	}
 
 	private static function updateLinkHighlights(array &$links, ?array $db_links): void {
-		self::updateLinkThresholds($links, $db_links, self::LINK_THRESHOLD_TYPE_HIGHLIGHT);
+		$ins_link_thresholds = [];
+		$upd_link_thresholds = [];
+		$del_linkthresholdids = [];
+
+		foreach ($links as &$link) {
+			if (!array_key_exists('highlights', $link)) {
+				continue;
+			}
+
+			$db_link_thresholds = $db_links !== null
+				? array_column($db_links[$link['linkid']]['highlights'], null, 'pattern')
+				: [];
+
+			foreach ($link['highlights'] as &$link_threshold) {
+				if (array_key_exists($link_threshold['pattern'], $db_link_thresholds)) {
+					$db_link_threshold = $db_link_thresholds[$link_threshold['pattern']];
+					$link_threshold['linkthresholdid'] = $db_link_threshold['linkthresholdid'];
+					unset($db_link_thresholds[$link_threshold['pattern']]);
+
+					$upd_link_threshold = DB::getUpdatedValues('sysmap_link_threshold', $link_threshold,
+						$db_link_threshold
+					);
+
+					if ($upd_link_threshold) {
+						$upd_link_thresholds[] = [
+							'values' => $upd_link_threshold,
+							'where' => ['linkthresholdid' => $db_link_threshold['linkthresholdid']]
+						];
+					}
+				}
+				else {
+					$ins_link_thresholds[] = [
+						'linkid' => $link['linkid'],
+						'type' => self::LINK_THRESHOLD_TYPE_HIGHLIGHT
+					] + $link_threshold;
+				}
+			}
+			unset($link_threshold);
+
+			$del_linkthresholdids = array_merge($del_linkthresholdids,
+				array_column($db_link_thresholds, 'linkthresholdid')
+			);
+		}
+		unset($link);
+
+		if ($del_linkthresholdids) {
+			DB::delete('sysmap_link_threshold', ['linkthresholdid' => $del_linkthresholdids]);
+		}
+
+		if ($upd_link_thresholds) {
+			DB::update('sysmap_link_threshold', $upd_link_thresholds);
+		}
+
+		$linkthresholdids = [];
+
+		if ($ins_link_thresholds) {
+			$linkthresholdids = DB::insert('sysmap_link_threshold', $ins_link_thresholds);
+		}
+
+		foreach ($links as &$link) {
+			if (!array_key_exists('highlights', $link)) {
+				continue;
+			}
+
+			foreach ($link['highlights'] as &$link_threshold) {
+				if (!array_key_exists('linkthresholdid', $link_threshold)) {
+					$link_threshold['linkthresholdid'] = array_shift($linkthresholdids);
+				}
+			}
+			unset($link_threshold);
+		}
+		unset($link);
 	}
 
 	/**
