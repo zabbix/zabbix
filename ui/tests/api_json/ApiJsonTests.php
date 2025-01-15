@@ -76,6 +76,7 @@ require_once dirname(__FILE__).'/testTriggers.php';
 require_once dirname(__FILE__).'/testUserDirectory.php';
 require_once dirname(__FILE__).'/testUserGroup.php';
 require_once dirname(__FILE__).'/testUserMacro.php';
+require_once dirname(__FILE__).'/testUserFieldAccess.php';
 require_once dirname(__FILE__).'/testUsers.php';
 require_once dirname(__FILE__).'/testValuemap.php';
 require_once dirname(__FILE__).'/testWebScenario.php';
@@ -148,6 +149,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testUserDirectory');
 		$suite->addTestSuite('testUserGroup');
 		$suite->addTestSuite('testUserMacro');
+		$suite->addTestSuite('testUserFieldAccess');
 		$suite->addTestSuite('testUsers');
 		$suite->addTestSuite('testValuemap');
 		$suite->addTestSuite('testWebScenario');

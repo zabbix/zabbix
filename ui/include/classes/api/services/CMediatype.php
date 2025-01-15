@@ -85,22 +85,27 @@ class CMediatype extends CApiService {
 			return [];
 		}
 
-		$output_fields = self::$userData['type'] == USER_TYPE_SUPER_ADMIN
-			? self::OUTPUT_FIELDS
-			: self::LIMITED_OUTPUT_FIELDS;
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+			$output_fields = self::OUTPUT_FIELDS;
+			$user_output_fields = CUser::OUTPUT_FIELDS;
+		}
+		else {
+			$output_fields = self::LIMITED_OUTPUT_FIELDS;
+			$user_output_fields = CUser::OWN_LIMITED_OUTPUT_FIELDS;
+		}
 
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			// filter
 			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => DB::getFilterFields('media_type', $output_fields)],
 			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => DB::getSearchFields('media_type', $output_fields)],
-
 			// output
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
 			'selectMessageTemplates' =>	['type' => API_MULTIPLE, 'rules' => [
 											['if' => static fn(): bool => self::$userData['type'] == USER_TYPE_SUPER_ADMIN, 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['eventsource', 'recovery', 'subject', 'message']), 'default' => null],
 											['else' => true, 'type' => API_UNEXPECTED]
 			]],
-			'selectActions' =>  		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CAction::OUTPUT_FIELDS), 'default' => null]
+			'selectActions' =>  		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CAction::OUTPUT_FIELDS), 'default' => null],
+			'selectUsers' => 			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $user_output_fields), 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -931,36 +936,7 @@ class CMediatype extends CApiService {
 			$result = $relation_map->mapMany($result, $message_templates, 'message_templates');
 		}
 
-		// adding users
-		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
-			$user_condition = self::$userData['type'] != USER_TYPE_SUPER_ADMIN
-				? ['userid' => self::$userData['userid']]
-				: [];
-			$_options = [
-				'output' => ['mediatypeid', 'userid'],
-				'filter' => ['mediatypeid' => array_keys($result)] + $user_condition
-			];
-			$medias = DBselect(DB::makeSql('media', $_options));
-
-			$relation_map = new CRelationMap();
-
-			while ($media = DBfetch($medias)) {
-				$relation_map->addRelation($media['mediatypeid'], $media['userid']);
-			}
-
-			$users = [];
-			$related_ids = $relation_map->getRelatedIds();
-
-			if ($related_ids) {
-				$users = API::User()->get([
-					'output' => $options['selectUsers'],
-					'userids' => $related_ids,
-					'preservekeys' => true
-				]);
-			}
-
-			$result = $relation_map->mapMany($result, $users, 'users');
-		}
+		$this->addRelatedUsers($options, $result);
 
 		if ($this->outputIsRequested('parameters', $options['output'])) {
 			foreach ($result as $mediatypeid => $mediatype) {
@@ -1093,5 +1069,39 @@ class CMediatype extends CApiService {
 				$result[$mediatypeid]['actions'][] = $action;
 			}
 		}
+	}
+
+	private function addRelatedUsers(array $options, array &$result): void {
+		if ($options['selectUsers'] === null) {
+			return;
+		}
+
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+			$relation_map = $this->createRelationMap($result, 'mediatypeid', 'userid', 'media');
+		}
+		else {
+			$_options = [
+				'output' => ['mediatypeid', 'userid'],
+				'filter' => [
+					'mediatypeid' => array_keys($result),
+					'userid' => self::$userData['userid']
+				]
+			];
+			$resource = DBselect(DB::makeSql('media', $_options));
+
+			$relation_map = new CRelationMap();
+
+			while ($media = DBfetch($resource)) {
+				$relation_map->addRelation($media['mediatypeid'], $media['userid']);
+			}
+		}
+
+		$users = API::User()->get([
+			'output' => $options['selectUsers'],
+			'userids' => $relation_map->getRelatedIds(),
+			'preservekeys' => true
+		]);
+
+		$result = $relation_map->mapMany($result, $users, 'users');
 	}
 }
