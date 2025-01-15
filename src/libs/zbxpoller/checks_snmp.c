@@ -2727,8 +2727,8 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 	if (reqid != bulkwalk_context->reqid && NULL != pdu && SNMP_MSG_REPORT != pdu->command)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "unexpected response request id:%d expected request id:%d command:%d"
-				" operation:%d itemid:" ZBX_FS_UI64 " snmp_error:%s", reqid, bulkwalk_context->reqid, pdu->command, operation,
-				snmp_context->item.itemid, snmp_api_errstring(SNMPERR_GENERR));
+				" operation:%d itemid:" ZBX_FS_UI64 " snmp_error:%s", reqid, bulkwalk_context->reqid,
+				pdu->command, operation, snmp_context->item.itemid, snmp_api_errstring(SNMPERR_GENERR));
 
 		zbx_free(bulkwalk_context->error);
 		bulkwalk_context->error = zbx_dsprintf(bulkwalk_context->error, "unexpected response");
