@@ -2613,7 +2613,8 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 
 	if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
 	{
-		ret = zbx_get_snmp_response_error(ssp, interface, status, response, error, max_error_len, 0);
+		ret = zbx_get_snmp_response_error(ssp, interface, status, response, error, max_error_len,
+				(int)snmp_context->results_offset);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() response error: %s", __func__, error);
 
