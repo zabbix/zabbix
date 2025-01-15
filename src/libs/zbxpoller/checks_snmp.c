@@ -3226,9 +3226,10 @@ stop:
 
 	if (ZBX_ASYNC_TASK_STOP == task_ret && ZBX_ISSET_MSG(&snmp_context->item.result))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s() %s event:%d fd:%d itemid:" ZBX_FS_UI64 " size:%d error:%s",
-				__func__, zbx_get_event_string(event), event, *fd, snmp_context->item.itemid,
-				snmp_context->results_offset, snmp_context->item.result.msg);
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s event:%d fd:%d itemid:" ZBX_FS_UI64 " size:%d error:%s",
+				__func__, zbx_result_string(snmp_context->item.ret), zbx_get_event_string(event),
+				event, *fd, snmp_context->item.itemid, snmp_context->results_offset,
+				snmp_context->item.result.msg);
 	}
 	else
 	{
