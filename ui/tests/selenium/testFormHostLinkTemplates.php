@@ -224,7 +224,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 			$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 		}
 
-		// Check if template is linked from previous test runs, if not then links it.
+		// Link template and save form.
 		if (!$form->query('id:linked-templates')->exists()) {
 			$form->getField('Templates')->asMultiselect()->fill(self::$template);
 			$this->assertEquals(self::$template, $form->query('class:subfilter-enabled')->one()->getText());
@@ -242,7 +242,6 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		else {
 			$this->query('link', $name)->waitUntilVisible()->one()->click();
 		}
-
 		$form->query('id:linked-templates')->waitUntilVisible()->asTable()->one()->findRow('Name', self::$template)
 				->getColumn('Action')->query('button:Unlink')->one()->click();
 		$this->assertEquals('', $form->query('id:add_templates__ms')->one()->getText());
@@ -251,7 +250,6 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$form->getField('Templates')->asMultiselect()->fill(self::$template);
 		$this->assertEquals(self::$template, $form->query('class:subfilter-enabled')->one()->getText());
 		$form->submit();
-
 		$this->assertMessage(TEST_GOOD, $data['entity'].' updated');
 
 		// Check that template is linked successfully.
