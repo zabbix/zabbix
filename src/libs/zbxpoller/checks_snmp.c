@@ -3290,8 +3290,9 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 	zbx_snmp_context_t	*snmp_context;
 	char			error[MAX_STRING_LEN];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s' timeout:%d retries:%d", __func__, item->key,
-			item->host.host, item->interface.addr, item->timeout, retries);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s' timeout:%d retries:%d max_repetitions:%d",
+			__func__, item->key, item->host.host, item->interface.addr, item->timeout, retries,
+			item->snmp_max_repetitions);
 
 	snmp_context = zbx_malloc(NULL, sizeof(zbx_snmp_context_t));
 
