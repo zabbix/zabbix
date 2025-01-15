@@ -33,22 +33,27 @@ class CTestDataHelper {
 	 */
 	public static function createObjects(array $objects): void {
 		$objects += array_fill_keys(['template_groups', 'host_groups', 'templates', 'proxies', 'hosts', 'triggers',
-			'roles', 'user_groups', 'users', 'scripts',  'drules', 'actions'
+			'roles', 'user_groups', 'users', 'scripts',  'drules', 'actions', 'user_directories', 'mfas', 'events',
+			'alerts'
 		], []);
 
 		try {
 			self::createTemplateGroups($objects['template_groups']);
 			self::createHostGroups($objects['host_groups']);
+			self::createMfas($objects['mfas']);
 			self::createTemplates($objects['templates']);
 			self::createProxies($objects['proxies']);
 			self::createHosts($objects['hosts']);
 			self::createTriggers($objects['triggers']);
 			self::createRoles($objects['roles']);
+			self::createUserDirectories($objects['user_directories']);
 			self::createUserGroups($objects['user_groups']);
 			self::createUsers($objects['users']);
 			self::createScripts($objects['scripts']);
 			self::createDrules($objects['drules']);
 			self::createActions($objects['actions']);
+			self::createEvents($objects['events']);
+			self::createAlerts($objects['alerts']);
 		}
 		catch (Exception $e) {
 			self::cleanUp();
@@ -721,8 +726,8 @@ class CTestDataHelper {
 	}
 
 	public static function convertTriggerReferences(array &$triggers): void {
-		self::convertPropertyReference($triggers, 'triggerid');
-		self::convertPropertyReference($triggers, 'dependencies.triggerid');
+		self::convertPropertyReferenceForObjects($triggers, 'triggerid');
+		self::convertPropertyReferenceForObjects($triggers, 'dependencies.triggerid');
 	}
 
 	private static function createRoles(array $roles): void {
@@ -730,11 +735,19 @@ class CTestDataHelper {
 			return;
 		}
 
+		self::convertRoleReferences($roles);
+
 		$result = CDataHelper::call('role.create', $roles);
 
 		foreach ($roles as $role) {
 			self::$objectids['role'][$role['name']] = array_shift($result['roleids']);
 		}
+	}
+
+	public static function convertRoleReferences(array &$roles): void {
+		self::convertPropertyReference($roles, 'roleid');
+		self::convertPropertyReference($roles, 'users.userid');
+		self::convertPropertyReference($roles, 'users.roleid');
 	}
 
 	private static function createUserGroups(array $user_groups): void {
@@ -753,8 +766,10 @@ class CTestDataHelper {
 
 	public static function convertUserGroupReferences(array &$user_groups): void {
 		self::convertPropertyReference($user_groups, 'usrgrpid');
-		self::convertPropertyReference($user_groups, 'templategroup_rights.id');
+		self::convertPropertyReference($user_groups, 'mfaid');
+		self::convertPropertyReference($user_groups, 'userdirectoryid');
 		self::convertPropertyReference($user_groups, 'hostgroup_rights.id');
+		self::convertPropertyReference($user_groups, 'templategroup_rights.id');
 		self::convertPropertyReference($user_groups, 'users.usrgrpid');
 	}
 
@@ -763,6 +778,8 @@ class CTestDataHelper {
 			return;
 		}
 
+		$medias = [];
+
 		foreach ($users as &$user) {
 			$user += [
 				'roleid' => end(self::$objectids['role']),
@@ -770,6 +787,10 @@ class CTestDataHelper {
 					['usrgrpid' => end(self::$objectids['user_group'])]
 				]
 			];
+
+			if (array_key_exists('medias', $user)) {
+				$medias[$user['username']] = true;
+			}
 		}
 		unset($user);
 
@@ -780,12 +801,30 @@ class CTestDataHelper {
 		foreach ($users as $user) {
 			self::$objectids['user'][$user['username']] = array_shift($result['userids']);
 		}
+
+		if ($medias) {
+			$result = CDataHelper::call('user.get', [
+				'userids' => array_intersect_key(self::$objectids['user'], $medias),
+				'output' => ['username'],
+				'selectMedias' => ['mediaid', 'sendto']
+			]);
+
+			foreach ($result as $user) {
+				foreach ($user['medias'] as $media) {
+					foreach ($media['sendto'] as $email) {
+						self::$objectids['media'][$email][$user['username']] = $media['mediaid'];
+					}
+				}
+			}
+		}
 	}
 
 	public static function convertUserReferences(array &$users): void {
 		self::convertPropertyReference($users, 'userid');
 		self::convertPropertyReference($users, 'roleid');
 		self::convertPropertyReference($users, 'usrgrps.usrgrpid');
+		self::convertPropertyReference($users, 'medias.mediaid');
+		self::convertPropertyReference($users, 'role.roleid');
 	}
 
 	private static function createScripts(array $scripts): void {
@@ -894,55 +933,238 @@ class CTestDataHelper {
 		self::convertPropertyReference($actions, 'operations.optemplate.templateid');
 	}
 
+	private static function createMfas(array $mfas): void {
+		if (!$mfas) {
+			return;
+		}
+
+		foreach ($mfas as &$mfa) {
+			$mfa = self::prepareMfa($mfa);
+		}
+		unset($action);
+
+		$result = CDataHelper::call('mfa.create', $mfas);
+
+		foreach ($mfas as $mfa) {
+			self::$objectids['mfa'][$mfa['name']] = array_shift($result['mfaids']);
+		}
+	}
+
 	/**
-	 * Check for, and replace a reference ID in the given object property with the corresponding object's record ID.
+	 * @param array $mfa
 	 *
-	 * @param array  $object    Array containing the referenced property.
+	 * @return array
+	 */
+	public static function prepareMfa(array $mfa): array {
+		return $mfa + [
+			'type' => MFA_TYPE_TOTP,
+			'hash_function' => TOTP_HASH_SHA1,
+			'code_length' => TOTP_CODE_LENGTH_6
+		];
+	}
+
+	private static function createUserdirectories(array $user_directories): void {
+		if (!$user_directories) {
+			return;
+		}
+
+		foreach ($user_directories as &$user_directory) {
+			$user_directory = self::prepareUserdirectory($user_directory);
+		}
+		unset($action);
+
+		$result = CDataHelper::call('userdirectory.create', $user_directories);
+
+		foreach ($user_directories as $user_directory) {
+			self::$objectids['user_directory'][$user_directory['name']] = array_shift($result['userdirectoryids']);
+		}
+	}
+
+	/**
+	 * @param array $mfa
+	 *
+	 * @return array
+	 */
+	public static function prepareUserdirectory(array $user_directory): array {
+		return $user_directory + [
+			'idp_type' => IDP_TYPE_LDAP,
+			'host' => 'ldap://local.ldap',
+			'port' => '389',
+			'base_dn' => 'ou=Users,dc=example,dc=org',
+			'bind_dn' => 'cn=ldap_search,dc=example,dc=org',
+			'bind_password' => 'ldapsecretpassword',
+			'search_attribute' => 'uid'
+		];
+	}
+
+	private static function createEvents(array $events): void {
+		if (!$events) {
+			return;
+		}
+
+		foreach ($events as &$event) {
+			$event = self::prepareEvent($event);
+		}
+		unset($event);
+
+		self::convertEventReferences($events);
+
+		$result = DB::insert('events', array_values($events));
+
+		foreach ($events as $alias => $event) {
+			self::$objectids['event'][$alias] = array_shift($result);
+		}
+	}
+
+	/**
+	 * @param array $event
+	 *
+	 * @return array
+	 */
+	public static function prepareEvent(array $event): array {
+		$time = time();
+
+		return $event + ($event['source'] == EVENT_SOURCE_TRIGGERS
+			? [
+				'object' => EVENT_OBJECT_TRIGGER,
+				'objectid' => end(self::$objectids['trigger']),
+				'clock' => $time,
+				'value' => $time
+			]
+			: [
+				'clock' => $time,
+				'value' => $time
+			]
+		);
+	}
+
+	public static function convertEventReferences(array &$events): void {
+		self::convertPropertyReferenceForObjects($events, 'objectid');
+	}
+
+	private static function createAlerts(array $alerts): void {
+		if (!$alerts) {
+			return;
+		}
+
+		foreach ($alerts as &$alert) {
+			$alert = self::prepareAlert($alert);
+		}
+		unset($alert);
+
+		self::convertAlertReferences($alerts);
+
+		$result = DB::insert('alerts', array_values($alerts));
+
+		foreach ($alerts as $alias => $alert) {
+			self::$objectids['alert'][$alias] = array_shift($result);
+		}
+	}
+
+	/**
+	 * @param array $alert
+	 *
+	 * @return array
+	 */
+	public static function prepareAlert(array $alert): array {
+		$defaults = [
+			'clock' => time(),
+			'message' => '',
+			'parameters' => ''
+		];
+
+		if (array_key_exists('action', self::$objectids)) {
+			$defaults['actionid'] = end(self::$objectids['action']);
+		}
+
+		if (array_key_exists('event', self::$objectids)) {
+			$defaults['eventid'] = end(self::$objectids['event']);
+		}
+
+		if (array_key_exists('user', self::$objectids)) {
+			$defaults['userid'] = end(self::$objectids['user']);
+		}
+
+		return $alert + $defaults;
+	}
+
+	public static function convertAlertReferences(array &$alerts): void {
+		self::convertPropertyReferenceForObjects($alerts, 'alertid');
+		self::convertPropertyReferenceForObjects($alerts, 'actionid');
+		self::convertPropertyReferenceForObjects($alerts, 'eventid');
+		self::convertPropertyReferenceForObjects($alerts, 'userid');
+		self::convertPropertyReferenceForObjects($alerts, 'users.userid');
+		self::convertPropertyReferenceForObjects($alerts, 'users.roleid');
+	}
+
+	/**
+	 * Check for, and replace a reference ID in the given objects' property with the corresponding object's record ID.
+	 *
+	 * @param array  $objects   Array of objects containing the referenced property.
 	 * @param string $property  The reference key. A "." symbol is used as a separator for nested property references,
 	 *                          f.e., `templates.templateid`. In case of matching object names (e.g. item inherited from
 	 *                          template to host), the contained reference should include further specific parent object
 	 *                          references, e.g.: `:item:item.key:host:my.name` vs `:items:item.key:template:my.name`.
 	 */
-	private static function convertPropertyReference(array &$object, string $property): void {
-		if (strpos($property, '.') !== false) {
+	private static function convertPropertyReference(array &$objects, string $property): void {
+		is_numeric(key($objects))
+			? self::convertPropertyReferenceForObjects($objects, $property)
+			: self::convertPropertyReferenceForObject($objects, $property);
+	}
+
+	private static function convertPropertyReferenceForObjects(array &$objects, string $property): void {
+		$nested = strpos($property, '.') !== false;
+
+		if ($nested) {
 			[$property, $sub_property] = explode('.', $property, 2);
+		}
 
-			if (is_string(key($object))) {
-				if (!array_key_exists($property, $object)) {
-					return;
-				}
-
-				self::convertPropertyReference($object[$property], $sub_property);
+		foreach ($objects as &$object) {
+			if (!array_key_exists($property, $object)) {
+				continue;
 			}
-			else {
-				foreach ($object as &$_object) {
-					if (!array_key_exists($property, $_object)) {
-						continue;
-					}
+			elseif (!$nested) {
+				self::convertValueReference($object[$property]);
+				continue;
+			}
 
-					self::convertPropertyReference($_object[$property], $sub_property);
+			if (strpos($sub_property, '.') !== false) {
+				self::convertPropertyReference($object[$property], $sub_property);
+				continue;
+			}
+
+			if (is_numeric(key($object[$property]))) {
+				foreach ($object[$property] as &$_object) {
+					if (array_key_exists($sub_property, $_object)) {
+						self::convertValueReference($_object[$sub_property]);
+					}
 				}
 				unset($_object);
 			}
-
-			return;
-		}
-		elseif (!is_string(key($object))) {
-			foreach ($object as &$_object) {
-				if (!array_key_exists($property, $_object)) {
-					continue;
-				}
-
-				self::convertPropertyReference($_object, $property);
+			elseif (array_key_exists($sub_property, $object[$property])) {
+				self::convertValueReference($object[$property][$sub_property]);
 			}
-			unset($_object);
+		}
+		unset($object);
+	}
+
+	private static function convertPropertyReferenceForObject(array &$object, string $property): void {
+		$nested = strpos($property, '.') !== false;
+
+		if ($nested) {
+			[$property, $sub_property] = explode('.', $property, 2);
 		}
 
-		if (!array_key_exists($property, $object)) {
-			return;
+		if (array_key_exists($property, $object)) {
+			if ($nested) {
+				is_numeric(key($object[$property]))
+					? self::convertPropertyReferenceForObjects($object[$property], $sub_property)
+					: self::convertPropertyReferenceForObject($object[$property], $sub_property);
+			}
+			else {
+				self::convertValueReference($object[$property]);
+			}
 		}
-
-		self::convertValueReference($object[$property]);
 	}
 
 	public static function unsetDeletedObjectIds(array $objectids): void {
@@ -973,13 +1195,13 @@ class CTestDataHelper {
 	/**
 	 * Check for, and replace a reference ID in the given value with the corresponding object's record ID.
 	 *
-	 * @param string $value  The value possibly containing the reference. In case of matching object names (e.g. item
+	 * @param mixed $value  The value possibly containing the reference. In case of matching object names (e.g. item
 	 *                       inherited from template to host), the contained reference should include further specific
 	 *                       parent object references, e.g.: `:item:item.key:host:my.name` vs
 	 *                       `:items:item.key:template:my.name`.
 	 * @param bool  $unset   Whether to unset the value from the $objectids array, if it is convertible.
 	 */
-	private static function convertValueReference(string &$value, bool $unset = false): void {
+	private static function convertValueReference(&$value, bool $unset = false): void {
 		if (!is_string($value) || $value === '' || $value[0] !== ':') {
 			return;
 		}
@@ -1060,6 +1282,14 @@ class CTestDataHelper {
 	 * Delete inserted objects from the database and reset internal data.
 	 */
 	public static function cleanUp(): void {
+		if (array_key_exists('alert', self::$objectids)) {
+			DB::delete('alerts', ['alertid' => array_values(self::$objectids['alert'])]);
+		}
+
+		if (array_key_exists('event', self::$objectids)) {
+			DB::delete('events', ['eventid' => array_values(self::$objectids['event'])]);
+		}
+
 		if (array_key_exists('action', self::$objectids)) {
 			CDataHelper::call('action.delete', array_values(self::$objectids['action']));
 		}
@@ -1090,6 +1320,14 @@ class CTestDataHelper {
 
 		if (array_key_exists('host', self::$objectids)) {
 			CDataHelper::call('host.delete', array_values(self::$objectids['host']));
+		}
+
+		if (array_key_exists('mfa', self::$objectids)) {
+			CDataHelper::call('mfa.delete', array_values(self::$objectids['mfa']));
+		}
+
+		if (array_key_exists('user_directory', self::$objectids)) {
+			CDataHelper::call('userdirectory.delete', array_values(self::$objectids['user_directory']));
 		}
 
 		if (array_key_exists('proxy', self::$objectids)) {
@@ -1177,5 +1415,54 @@ class CTestDataHelper {
 		if ($guest) {
 			CDataHelper::call('user.update', $guest);
 		}
+	}
+
+	public static function getObjectFields(array $object, array $fields, ?array $except_fields = []) {
+		$object = array_intersect_key($object, array_flip($fields));
+
+		foreach ($except_fields as $path) {
+			$nested_object = &$object;
+
+			while (true) {
+				[$field, $path] = explode('.', $path, 2);
+
+				if (!array_key_exists($field, $nested_object)) {
+					break;
+				}
+
+				$nested_object = &$nested_object[$field];
+
+				if (strpos($path, '.') === false) {
+					if (array_key_exists($path, $nested_object)) {
+						unset($nested_object[$path]);
+					}
+					else {
+						foreach ($nested_object as &$_object) {
+							unset($_object[$path]);
+						}
+						unset($_object);
+					}
+
+					break;
+				}
+			}
+			unset($nested_object);
+		}
+
+		return $object;
+	}
+
+	/**
+	 * Replace any references in the given array. Note that convert{Object}References methods are preferred for results.
+	 *
+	 * @param array $array
+	 */
+	public static function resolveRequestReferences(array &$array) {
+		foreach ($array as &$value) {
+			is_array($value)
+				? self::resolveRequestReferences($value)
+				: self::convertValueReference($value);
+		}
+		unset($value);
 	}
 }
