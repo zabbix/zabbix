@@ -54,30 +54,6 @@ window.widget_topitems_form = new class {
 		this.#list_column_tmpl = new Template(this.#list_columns.querySelector('template').innerHTML);
 		this.#templateid = templateid;
 
-		new CSortable(this.#list_columns.querySelector('tbody'), {
-			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
-			freeze_end: 1
-		}).on(CSortable.EVENT_SORT, (e) => {
-			const form_fields = getFormFields(this.#form);
-			if (form_fields.columns === undefined) {
-				return;
-			}
-
-			const columns_size = Object.keys(form_fields.columns).length - 1;
-
-			const rows = {};
-			for (let i = 0; i <= columns_size; i++) {
-				const column = e.target.querySelector(`tr:nth-child(${i + 1})`);
-				const column_data = form_fields.columns[column.dataset.index];
-				rows[i] = this.#makeColumnRow(column_data, i);
-			}
-
-			// Replacing nodes in separate loop as template contains the new data index.
-			for (let i = 0; i <= columns_size; i++) {
-				e.target.rows[i].replaceWith(rows[i]);
-			}
-		});
-
 		// Initialize form elements accessibility.
 		this.#updateForm();
 
@@ -184,7 +160,11 @@ window.widget_topitems_form = new class {
 
 				column_popup.addEventListener('dialogue.submit', (e) => {
 					const last_row = this.#list_columns.querySelector(`tbody > tr:last-child`);
-					last_row.insertAdjacentElement('beforebegin', this.#makeColumnRow(e.detail, last_row.rowIndex - 1));
+					const index = last_row.previousSibling !== null
+						? parseInt(last_row.previousSibling.dataset.index) + 1
+						: 0;
+
+					last_row.insertAdjacentElement('beforebegin', this.#makeColumnRow(e.detail, index));
 					this.#triggerUpdate();
 				});
 
@@ -192,7 +172,7 @@ window.widget_topitems_form = new class {
 				break;
 
 			case 'edit':
-				const column_index = e.target.closest('tr').rowIndex - 1;
+				const column_index = e.target.closest('tr').dataset.index;
 				column_popup = PopUp(
 					'widget.topitems.column.edit',
 					{
@@ -208,7 +188,7 @@ window.widget_topitems_form = new class {
 					).$dialogue[0];
 
 				column_popup.addEventListener('dialogue.submit', (e) => {
-					const row = this.#list_columns.querySelector(`tbody > tr:nth-child(${column_index + 1})`);
+					const row = this.#list_columns.querySelector(`tbody > tr[data-index="${column_index}"]`);
 					row.replaceWith(this.#makeColumnRow(e.detail, column_index));
 					this.#triggerUpdate();
 				});
@@ -218,7 +198,6 @@ window.widget_topitems_form = new class {
 
 			case 'remove':
 				target.closest('tr').remove();
-				this.#list_columns.querySelector('tbody').dispatchEvent(new CustomEvent(CSortable.EVENT_SORT));
 				this.#triggerUpdate();
 				break;
 		}

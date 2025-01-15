@@ -19,6 +19,19 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 class testWidgets extends CWebTest {
 	const HOST_ALL_ITEMS = 'Host for all item value types';
 	const TABLE_SELECTOR = 'xpath://form[@name="itemform"]//table';
+	const USER_MACRO = '{$USER.MACRO}';
+	const USER_MACRO_VALUE = 'Macro function Test 12345';
+	const USER_SECRET_MACRO = '{$SECRET.MACRO}';
+	const MACRO_CHAR = '{$MACRO.CHAR}';
+	const MACRO_HTML_ENCODE = '{$MACRO.HTML.ENCODE}';
+	const MACRO_HTML_ENCODE_VALUE = '<a href="test.url">"test&"</a>';
+	const MACRO_HTML_DECODE = '{$MACRO.HTML.DECODE}';
+	const MACRO_HTML_DECODE_VALUE = '&lt;a href=&quot;test.url&quot;&gt;&quot;test&amp;&quot;&lt;/a&gt;';
+	const MACRO_CHAR_VALUE = '000 ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰';
+	const MACRO_URL_ENCODE = '{$MACRO.URL.ENCODE}';
+	const MACRO_URL_ENCODE_VALUE = 'h://test.com/macro?functions=urlencode&urld=a🎸';
+	const MACRO_URL_DECODE = '{$MACRO.URL.DECODE}';
+	const MACRO_URL_DECODE_VALUE = 'h%3A%2F%2Ftest.com%2Fmacro%3Ffunctions%3Durlencode%26urld%3Da%F0%9F%8E%B8';
 
 	protected static $dashboardid;
 

@@ -19,11 +19,159 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 /**
  * @dataSource Maps
  *
- * @backup sysmaps
+ * @backup sysmaps, globalmacro
+ *
+ * @onBefore prepareMapForMacrofunctions
  */
+
 class testFormMapConstructor extends CLegacyWebTest {
 
+	protected static $macro_map_id;
 	const MAP_NAME = 'Map for form testing';
+	const MAP_MACRO_FUNCTIONS = 'Map for testing macro functions';
+	const HOST_MACRO_FUNCTIONS = 'Testing macro functions 12345';
+	const ITEM_KEY = 'trapmacrofunctions';
+	const ITEM_NAME = 'Item for testing macro functions with expression macros';
+
+	public function prepareMapForMacrofunctions() {
+
+		$host = CDataHelper::createHosts([
+			[
+				'host' => self::HOST_MACRO_FUNCTIONS,
+				'groups' => ['groupid' => 4], // Zabbix servers.
+				'items' => [
+					[
+						'name' => self::ITEM_NAME,
+						'key_' => self::ITEM_KEY,
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					]
+				]
+			]
+		]);
+
+		$item_id = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr(self::ITEM_NAME));
+
+		// Add value to item history table, to use expression macros.
+		CDataHelper::addItemData($item_id, 123.33);
+
+		$triggers = CDataHelper::call('trigger.create', [
+			[
+				'description' => 'Trigger testing macro functions',
+				'expression' => 'last(/'.self::HOST_MACRO_FUNCTIONS.'/'.self::ITEM_KEY.')=0',
+				'priority' => TRIGGER_SEVERITY_AVERAGE
+			],
+			[
+				'description' => 'Trigger for testing incorrectly used macro functions',
+				'expression' => 'last(/'.self::HOST_MACRO_FUNCTIONS.'/'.self::ITEM_KEY.')=0',
+				'priority' => TRIGGER_SEVERITY_AVERAGE
+			]
+		]);
+
+		CDataHelper::call('map.create', [
+			[
+				'name' => self::MAP_MACRO_FUNCTIONS,
+				'width' => 800,
+				'height' => 1000,
+				'expand_macros' => SYSMAP_EXPAND_MACROS_ON,
+				'label_type' => MAP_LABEL_TYPE_LABEL,
+				'selements' => [
+					// For testing the built-in macros with macro functions.
+					[
+						'selementid' => 1,
+						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
+						'iconid_off' => 182,
+						'label' => '{{HOST.HOST}.btoa()}, {{HOST.HOST}.htmldecode()}, {{HOST.HOST}.htmlencode()}',
+						'x' => 351,
+						'y' => 101,
+						'elements' => [['hostid' => $host['hostids'][self::HOST_MACRO_FUNCTIONS]]]
+					],
+					[
+						'selementid' => 1,
+						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
+						'iconid_off' => 182,
+						'label' => '{{HOST.HOST}.lowercase()}, {{HOST.HOST}.uppercase()}, '.
+								'{{HOST.HOST}.regrepl("([^a-z])", 0)}, {{HOST.HOST}.regsub(1, test)}',
+						'x' => 351,
+						'y' => 201,
+						'elements' => [['hostid' => $host['hostids'][self::HOST_MACRO_FUNCTIONS]]]
+					],
+					[
+						'selementid' => 1,
+						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST,
+						'iconid_off' => 182,
+						'label' => '{{HOST.HOST}.tr(0-9abcA-L,*)}, {{HOST.HOST}.urlencode()}, {{HOST.HOST}.urldecode()}, '.
+								'{{HOST.HOST}.iregsub(1, test)}',
+						'x' => 351,
+						'y' => 301,
+						'elements' => [['hostid' => $host['hostids'][self::HOST_MACRO_FUNCTIONS]]]
+					],
+					// For testing the expression macros with macro functions.
+					[
+						'selementid' => 2,
+						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
+						'iconid_off' => 152,
+						'label' => '{{?last(//'.self::ITEM_KEY.')}.btoa()}, {{?last(//'.self::ITEM_KEY.')}.fmtnum(0)}, '.
+								'{{?last(//'.self::ITEM_KEY.')}.htmldecode()}, {{?last(//'.self::ITEM_KEY.')}.htmlencode()}, '.
+								'{{?last(//'.self::ITEM_KEY.')}.iregsub(2, test)}, {{?last(//'.self::ITEM_KEY.')}.lowercase()}',
+						'x' => 351,
+						'y' => 401,
+						'elements' => [['triggerid' => $triggers['triggerids'][0]]]
+					],
+					[
+						'selementid' => 2,
+						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
+						'iconid_off' => 152,
+						'label' => '{{?last(//'.self::ITEM_KEY.')}.uppercase()}, '.
+								'{{?last(//'.self::ITEM_KEY.')}.regrepl([0-9], A)}, '.
+								'{{?last(//'.self::ITEM_KEY.')}.regsub(2, test)}, '.
+								'{{?last(//'.self::ITEM_KEY.')}.tr(0-9,a-z)}, {{?last(//'.self::ITEM_KEY.')}.urldecode()}, '.
+								'{{?last(//'.self::ITEM_KEY.')}.urlencode()}',
+						'x' => 351,
+						'y' => 501,
+						'elements' => [['triggerid' => $triggers['triggerids'][0]]]
+					],
+					// For testing incorrectly used arguments of macro functions.
+					[
+						'selementid' => 2,
+						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
+						'iconid_off' => 152,
+						'label' => '{{?last(//'.self::ITEM_KEY.')}.btoa(\)}, {{HOST.HOST}.htmldecode(/)}, '.
+								'{{?last(//'.self::ITEM_KEY.')}.fmtnum()}, {{HOST.HOST}.htmlencode(test)}, '.
+								'{{HOST.HOST}.fmttime()}, {{HOST.HOST}.iregsub(a-z)}',
+						'x' => 351,
+						'y' => 601,
+						'elements' => [['triggerid' => $triggers['triggerids'][1]]]
+					],
+					[
+						'selementid' => 2,
+						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
+						'iconid_off' => 152,
+						'label' => '{{?last(//'.self::ITEM_KEY.')}.regsub()}, {{HOST.HOST}.lowercase(///)}, '.
+								'{{HOST.HOST}.uppercase(//\\)}, {{HOST.HOST}.regrepl(1, 2, 3)}, '.
+								'{{?last(//'.self::ITEM_KEY.')}.tr()}, {{HOST.HOST}.urldecode(1, 2)}, '.
+								'{{?last(//'.self::ITEM_KEY.')}.urlencode(\)}',
+						'x' => 351,
+						'y' => 701,
+						'elements' => [['triggerid' => $triggers['triggerids'][1]]]
+					],
+					// Check that regsub and iregsub functions working correctly without match.
+					[
+						'selementid' => 2,
+						'elementtype' => SYSMAP_ELEMENT_TYPE_TRIGGER,
+						'iconid_off' => 152,
+						'label' => '{{?last(//'.self::ITEM_KEY.')}.regsub(0, test)}, {{HOST.HOST}.regsub(0, test)}, '.
+								'{{HOST.HOST}.iregsub(0, test)}, {{?last(//'.self::ITEM_KEY.')}.iregsub(0, test)}',
+						'x' => 351,
+						'y' => 801,
+						'elements' => [['triggerid' => $triggers['triggerids'][1]]]
+					]
+				]
+			]
+		]);
+
+		self::$macro_map_id = CDBHelper::getValue('SELECT sysmapid FROM sysmaps WHERE name='.zbx_dbstr(self::MAP_MACRO_FUNCTIONS));
+	}
 
 	/**
 	 * Possible combinations of grid settings
@@ -199,6 +347,58 @@ class testFormMapConstructor extends CLegacyWebTest {
 		}
 		else {
 			$this->zbxTestAssertElementText("//button[@id='gridautoalign']", 'Off');
+		}
+	}
+
+	/**
+	 * Check that macro functions are resolved for map element labels.
+	 */
+	public function testFormMapConstructor_MacroFunctions() {
+		$this->page->login()->open('sysmap.php?sysmapid='.self::$macro_map_id)->waitUntilReady();
+
+		$objects = [
+			[
+				'label' => 'VGVzdGluZyBtYWNybyBmdW5jdGlvbnMgMTIzNDU=, Testing macro functions 12345, '.
+					'Testing macro functions 12345',
+				'id' => 2
+			],
+			[
+				'label' => 'testing macro functions 12345, TESTING MACRO FUNCTIONS 12345, '.
+					'0esting0macro0functions000000, test',
+				'id' => 4
+			],
+			[
+				'label' => 'Testing m**ro fun*tions *****, Testing%20macro%20functions%2012345, '.
+					'Testing macro functions 12345, test',
+				'id' => 6
+			],
+			[
+				'label' => 'MTIzLjMz, 123, 123.33, 123.33, test, 123.33',
+				'id' => 8
+			],
+			[
+				'label' => '123.33, AAA.AA, test, bcd.dd, 123.33, 123.33',
+				'id' => 10
+			],
+			[
+				'label' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*',
+				'id' => 12
+			],
+			[
+				'label' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*',
+				'id' => 14
+			]
+			// TODO: Uncomment and check the test case, after ZBX-25420 fix.
+//			[
+//				'label' => ', , ,',
+//				'id' => 16
+//			]
+		];
+
+		foreach ($objects as $object) {
+			$this->assertEquals($object['label'], $this->query('xpath://*[@id="map-area"]/*[1]/*[2]/*[7]/*['.$object['id'].']')
+					->waitUntilVisible()->one()->getText(), 'Object expected label does not match, id='.$object['id']
+			);
 		}
 	}
 

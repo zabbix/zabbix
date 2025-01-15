@@ -15,7 +15,10 @@
 package mysql
 
 import (
+	"path/filepath"
+
 	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 )
 
@@ -30,7 +33,7 @@ type Session struct {
 	TLSKeyFile  string `conf:"name=TLSKeyFile,optional"`
 }
 
-// PluginOptions option from config file
+// PluginOptions option from config file.
 type PluginOptions struct {
 	// Timeout is the maximum time in seconds for waiting when a connection has to be established.
 	// Default value equals to the global timeout.
@@ -49,16 +52,21 @@ type PluginOptions struct {
 	// CustomQueriesPath is a full pathname of a directory containing *.sql files with custom queries.
 	CustomQueriesPath string `conf:"optional"`
 
+	// CustomQueriesEnabled disabled or enabled custom query functionality.
+	CustomQueriesEnabled bool `conf:"optional,default=false"`
+
 	// Default stores default connection parameter values from configuration file
 	Default Session `conf:"optional"`
 }
 
 // Configure implements the Configurator interface.
 // Initializes configuration structures.
-func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
+func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
+
+	p.options.setCustomQueriesPathDefault()
 
 	if p.options.Timeout == 0 {
 		p.options.Timeout = global.Timeout
@@ -74,5 +82,14 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 func (p *Plugin) Validate(options interface{}) error {
 	var opts PluginOptions
 
-	return conf.Unmarshal(options, &opts)
+	err := conf.Unmarshal(options, &opts)
+	if err != nil {
+		return errs.Wrap(err, "failed to unmarshal configuration options")
+	}
+
+	if opts.CustomQueriesEnabled && opts.CustomQueriesPath != "" && !filepath.IsAbs(opts.CustomQueriesPath) {
+		return errs.Errorf("opto.CustomQueriesPath path: '%s' must be absolute", opts.CustomQueriesPath)
+	}
+
+	return nil
 }
