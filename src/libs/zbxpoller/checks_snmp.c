@@ -2713,8 +2713,9 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 		}
 	}
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s running:%d, snmp_error:%s", __func__,
-			zbx_result_string(ret), bulkwalk_context->running, snmp_api_errstring(status));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s running:%d count:%d snmp_error:%s", __func__,
+			zbx_result_string(ret), bulkwalk_context->running, bulkwalk_context->vars_num,
+			snmp_api_errstring(status));
 
 	return ret;
 }
@@ -3289,8 +3290,8 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 	zbx_snmp_context_t	*snmp_context;
 	char			error[MAX_STRING_LEN];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s'", __func__, item->key,
-			item->host.host, item->interface.addr);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s' timeout:%d retries:%d", __func__, item->key,
+			item->host.host, item->interface.addr, item->timeout, retries);
 
 	snmp_context = zbx_malloc(NULL, sizeof(zbx_snmp_context_t));
 
