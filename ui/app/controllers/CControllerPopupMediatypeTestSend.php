@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ class CControllerPopupMediatypeTestSend extends CController {
 	}
 
 	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES);
 	}
 
 	/**
