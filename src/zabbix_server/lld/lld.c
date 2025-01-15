@@ -391,7 +391,8 @@ out:
  *           2) call zbx_evaluate() to calculate final result                 *
  *                                                                            *
  ******************************************************************************/
-static int	filter_evaluate_expression(const zbx_lld_filter_t *filter, const zbx_lld_entry_t *lld_obj, char **err_msg)
+static int	filter_evaluate_expression(const zbx_lld_filter_t *filter, const zbx_lld_entry_t *lld_obj,
+		char **err_msg)
 {
 	int			ret, res, error_num = 0;
 	char			*expression = NULL, id[ZBX_MAX_UINT64_LEN + 2], *p, error[256], value[16],

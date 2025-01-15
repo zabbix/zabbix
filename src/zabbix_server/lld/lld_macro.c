@@ -49,7 +49,8 @@ int	zbx_lld_macro_paths_compare(const void *d1, const void *d2)
  *             error           - [OUT] in case json path is invalid           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_macro_path_ptr_t *lld_macro_paths, char **error)
+int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_macro_path_ptr_t *lld_macro_paths,
+		char **error)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -258,7 +259,8 @@ static int	process_user_macro_token(char **data, zbx_token_t *token, const zbx_l
 		return SUCCEED;
 
 	force_quote = ('"' == (*data)[macro->context.l]);
-	context = zbx_user_macro_unquote_context_dyn(*data + macro->context.l, macro->context.r - macro->context.l + 1);
+	context = zbx_user_macro_unquote_context_dyn(*data + macro->context.l,
+			macro->context.r - macro->context.l + 1);
 
 	/* substitute_lld_macros() can't fail with ZBX_TOKEN_LLD_MACRO or ZBX_TOKEN_LLD_FUNC_MACRO flags set */
 	zbx_substitute_lld_macros(&context, lld_obj, ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO, NULL, 0);
@@ -323,7 +325,8 @@ static int	substitute_query_filter_lld_macros(char **filter, const zbx_lld_entry
 			case ZBX_EVAL_TOKEN_VAR_STR:
 				value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
 
-				if (FAIL == zbx_substitute_lld_macros(&value, lld_obj, ZBX_MACRO_ANY, err, sizeof(err)))
+				if (FAIL == zbx_substitute_lld_macros(&value, lld_obj, ZBX_MACRO_ANY, err,
+						sizeof(err)))
 				{
 					*error = zbx_strdup(NULL, err);
 					zbx_free(value);
@@ -444,7 +447,8 @@ int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const 
 			case ZBX_EVAL_TOKEN_ARG_PERIOD:
 				value = zbx_substr_unquote(ctx.expression, token->loc.l, token->loc.r);
 
-				if (FAIL == zbx_substitute_lld_macros(&value, lld_obj, ZBX_MACRO_ANY, err, sizeof(err)))
+				if (FAIL == zbx_substitute_lld_macros(&value, lld_obj, ZBX_MACRO_ANY, err,
+						sizeof(err)))
 				{
 					*error = zbx_strdup(NULL, err);
 					zbx_free(value);

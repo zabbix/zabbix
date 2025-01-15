@@ -2114,8 +2114,8 @@ static void	lld_items_make(const zbx_vector_lld_item_prototype_ptr_t *item_proto
 			{
 				item_stub.key_ = zbx_strdup(item_stub.key_, item_prototype->keys.values[k]);
 
-				if (SUCCEED != zbx_substitute_key_macros(&item_stub.key_, NULL, NULL, lld_resolve_macros,
-						lld_row->data, ZBX_MACRO_TYPE_ITEM_KEY, NULL, 0))
+				if (SUCCEED != zbx_substitute_key_macros(&item_stub.key_, NULL, NULL,
+						lld_resolve_macros, lld_row->data, ZBX_MACRO_TYPE_ITEM_KEY, NULL, 0))
 				{
 					continue;
 				}
