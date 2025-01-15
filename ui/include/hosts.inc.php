@@ -1414,11 +1414,20 @@ function getSanitizedHostPrototypeInterfaceDetailsFields(array $details): array 
 /**
  * Get summary interface availability status.
  *
- * @param array  $interfaces
+ * @param array $interfaces
+ * @param bool  $has_enabled_items
  *
  * @return int
  */
-function getInterfaceAvailabilityStatus(array $interfaces): int {
+function getInterfaceAvailabilityStatus(array $interfaces, bool $has_enabled_items = true): int {
+	if ($has_enabled_items) {
+		$interfaces_with_enabled_items = array_filter($interfaces, static function ($interface) {
+			return array_key_exists('has_enabled_items', $interface) && $interface['has_enabled_items'];
+		});
+
+		$interfaces = $interfaces_with_enabled_items ?: $interfaces;
+	}
+
 	$available = array_column($interfaces, 'available');
 
 	if (in_array(INTERFACE_AVAILABLE_MIXED, $available)) {
