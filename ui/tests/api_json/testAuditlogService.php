@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,7 +46,6 @@ class testAuditlogService extends testAuditlogCommon {
 	 */
 	protected static $problem_tagid;
 
-
 	public function testAuditlogService_Create() {
 		$create = $this->call('service.create', [
 			[
@@ -83,11 +82,13 @@ class testAuditlogService extends testAuditlogCommon {
 		]);
 
 		self::$resourceid = $create['result']['serviceids'][0];
-		self::$status_ruleid = CDBHelper::getRow('SELECT service_status_ruleid FROM service_status_rule WHERE serviceid='
-				.zbx_dbstr(self::$resourceid));
+		self::$status_ruleid = CDBHelper::getRow('SELECT service_status_ruleid FROM service_status_rule WHERE serviceid='.
+				zbx_dbstr(self::$resourceid)
+		);
 		self::$tagid = CDBHelper::getRow('SELECT servicetagid FROM service_tag WHERE serviceid='.zbx_dbstr(self::$resourceid));
-		self::$problem_tagid = CDBHelper::getRow('SELECT service_problem_tagid FROM service_problem_tag WHERE serviceid='
-				.zbx_dbstr(self::$resourceid));
+		self::$problem_tagid = CDBHelper::getRow('SELECT service_problem_tagid FROM service_problem_tag WHERE serviceid='.
+				zbx_dbstr(self::$resourceid)
+		);
 
 		$created = json_encode([
 			'service.name' => ['add', 'Created service 1'],
@@ -159,11 +160,13 @@ class testAuditlogService extends testAuditlogCommon {
 			]
 		]);
 
-		$upd_status_ruleid = CDBHelper::getRow('SELECT service_status_ruleid FROM service_status_rule WHERE serviceid='
-				.zbx_dbstr(self::$resourceid));
+		$upd_status_ruleid = CDBHelper::getRow('SELECT service_status_ruleid FROM service_status_rule WHERE serviceid='.
+				zbx_dbstr(self::$resourceid)
+		);
 		$upd_tagid = CDBHelper::getRow('SELECT servicetagid FROM service_tag WHERE serviceid='.zbx_dbstr(self::$resourceid));
-		$upd_problem_tagid = CDBHelper::getRow('SELECT service_problem_tagid FROM service_problem_tag WHERE serviceid='
-				.zbx_dbstr(self::$resourceid));
+		$upd_problem_tagid = CDBHelper::getRow('SELECT service_problem_tagid FROM service_problem_tag WHERE serviceid='.
+				zbx_dbstr(self::$resourceid)
+		);
 
 		$updated = json_encode([
 			'service.tags['.self::$tagid['servicetagid'].']' => ['delete'],
