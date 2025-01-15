@@ -45,8 +45,8 @@ class testDataDisplayInGraphs extends CWebTest {
 			'to' => '2023-10-07 14:20:00'
 		],
 		'scale_trends' => [
-			'from' => '2023-09-28 00:00:00',
-			'to' => '2023-10-02 12:00:00'
+			'from' => '2023-09-27 00:00:00',
+			'to' => '2023-10-01 12:00:00'
 		]
 	];
 
@@ -692,24 +692,24 @@ class testDataDisplayInGraphs extends CWebTest {
 			[
 				'itemid' => self::$itemids['Item for trends data display 1'],
 				'timestamps' => [
+					$timestamp.' - 11 days + 18 hours',
+					$timestamp.' - 10 days',
+					$timestamp.' - 10 days + 6 hours',
+					$timestamp.' - 10 days + 12 hours',
 					$timestamp.' - 10 days + 18 hours',
 					$timestamp.' - 9 days',
+					$timestamp.' - 9 days + 3 hours',
 					$timestamp.' - 9 days + 6 hours',
+					$timestamp.' - 9 days + 9 hours',
 					$timestamp.' - 9 days + 12 hours',
-					$timestamp.' - 9 days + 18 hours',
+					$timestamp.' - 9 days + 21 hours',
 					$timestamp.' - 8 days',
-					$timestamp.' - 8 days + 3 hours',
-					$timestamp.' - 8 days + 6 hours',
-					$timestamp.' - 8 days + 9 hours',
-					$timestamp.' - 8 days + 12 hours',
 					$timestamp.' - 8 days + 21 hours',
-					$timestamp.' - 7 days',
-					$timestamp.' - 7 days + 21 hours',
-					$timestamp.' - 6 day',
-					$timestamp.' - 6 day + 3 hours',
-					$timestamp.' - 6 day + 6 hours',
-					$timestamp.' - 6 day + 12 hours',
-					$timestamp.' - 6 day + 15 hours'
+					$timestamp.' - 7 day',
+					$timestamp.' - 7 day + 3 hours',
+					$timestamp.' - 7 day + 6 hours',
+					$timestamp.' - 7 day + 12 hours',
+					$timestamp.' - 7 day + 15 hours'
 				],
 				'values' => [
 					[
@@ -826,19 +826,19 @@ class testDataDisplayInGraphs extends CWebTest {
 			[
 				'itemid' => self::$itemids['Item for trends data display 2'],
 				'timestamps' => [
+					$timestamp.' - 11 days + 18 hours',
+					$timestamp.' - 10 days',
+					$timestamp.' - 10 days + 6 hours',
+					$timestamp.' - 10 days + 12 hours',
 					$timestamp.' - 10 days + 18 hours',
 					$timestamp.' - 9 days',
 					$timestamp.' - 9 days + 6 hours',
-					$timestamp.' - 9 days + 12 hours',
-					$timestamp.' - 9 days + 18 hours',
-					$timestamp.' - 8 days',
 					$timestamp.' - 8 days + 6 hours',
-					$timestamp.' - 7 days + 6 hours',
-					$timestamp.' - 7 days + 12 hours',
-					$timestamp.' - 7 days + 18 hours',
-					$timestamp.' - 6 day + 6 hours',
-					$timestamp.' - 6 day + 12 hours',
-					$timestamp.' - 6 day + 18 hours'
+					$timestamp.' - 8 days + 12 hours',
+					$timestamp.' - 8 days + 18 hours',
+					$timestamp.' - 7 day + 6 hours',
+					$timestamp.' - 7 day + 12 hours',
+					$timestamp.' - 7 day + 18 hours'
 				],
 				'values' => [
 					[
