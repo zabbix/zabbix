@@ -1410,9 +1410,9 @@ out:
 	if (service->eventlog.top_key < evt_top_key)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() update top_time:" ZBX_FS_TIME_T "/" ZBX_FS_TIME_T " top_key:"
-				ZBX_FS_UI64 "/" ZBX_FS_UI64 " last_key:" ZBX_FS_UI64 " last_ts:" ZBX_FS_TIME_T,__func__,
-				service->eventlog.top_time, evt_top_time, service->eventlog.top_key, evt_top_key,
-				service->eventlog.last_key, service->eventlog.last_ts);
+				ZBX_FS_UI64 "/" ZBX_FS_UI64 " last_key:" ZBX_FS_UI64 " last_ts:" ZBX_FS_TIME_T,
+				__func__, service->eventlog.top_time, evt_top_time, service->eventlog.top_key,
+				evt_top_key, service->eventlog.last_key, service->eventlog.last_ts);
 
 		if (0 == service->eventlog.top_key)	/* first run after reboot */
 			service->eventlog.expect_num = evt_top_key - service->eventlog.last_key;
