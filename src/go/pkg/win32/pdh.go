@@ -321,6 +321,7 @@ func PdhEnumObject() (objects []string, err error) {
 	objectBuf, objectListSizeRet, ret := pdhEnumObjectHelper(objectListSize, true)
 	if ret == PDH_MORE_DATA {
 		log.Debugf("PdhEnumObject() insufficient buffer size: %d", objectListSize)
+		objectListSizeRet = 0
 		ret, _, _ = syscall.Syscall6(pdhEnumObjects, 6, 0, 0, 0, uintptr(unsafe.Pointer(&objectListSizeRet)),
 			uintptr(PERF_DETAIL_WIZARD), bool2uintptr(true))
 		if ret != PDH_MORE_DATA {
