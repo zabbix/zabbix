@@ -106,6 +106,8 @@ class CTriggerManager {
 			}
 		}
 
+		API::Map()->unlinkTriggers($del_triggerids);
+
 		// Remove related events.
 		$ins_housekeeper = [];
 

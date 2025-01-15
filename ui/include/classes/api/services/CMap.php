@@ -3058,9 +3058,8 @@ class CMap extends CMapElement {
 		}
 
 		$this->updateSelements($maps, $db_maps);
-		self::updateLinks($maps, $db_maps);
 
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MAP, $maps, $db_maps);
+		$this->updateForce($maps, $db_maps);
 
 		return ['sysmapids' => array_column($maps, 'sysmapid')];
 	}
@@ -3100,6 +3099,140 @@ class CMap extends CMapElement {
 			unset($link);
 		}
 		unset($map);
+	}
+
+	public function updateForce(array $maps, array $db_maps): void {
+		self::updateLinks($maps, $db_maps);
+
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MAP, $maps, $db_maps);
+	}
+
+	public function unlinkTriggers(array $triggerids): void {
+		$resource = DBselect(
+			'SELECT slt.linktriggerid,slt.linkid,sl.indicator_type,s.sysmapid,s.name as map_name'.
+			' FROM sysmaps_link_triggers slt'.
+				' LEFT JOIN sysmaps_links sl ON slt.linkid=sl.linkid'.
+				' LEFT JOIN sysmaps s ON sl.sysmapid=s.sysmapid'.
+			' WHERE '.dbConditionId('slt.triggerid', $triggerids)
+		);
+
+		$db_maps = [];
+		$db_links = [];
+
+		while ($db_link_trigger = DBfetch($resource)) {
+			if (!array_key_exists($db_link_trigger['sysmapid'], $db_maps)) {
+				$db_maps[$db_link_trigger['sysmapid']] = [
+					'sysmapid' => $db_link_trigger['sysmapid'],
+					'name' => $db_link_trigger['map_name'],
+					'links' => []
+				];
+			}
+
+			if (!array_key_exists($db_link_trigger['linkid'], $db_maps[$db_link_trigger['sysmapid']]['links'])) {
+				$db_maps[$db_link_trigger['sysmapid']]['links'][$db_link_trigger['linkid']] = [
+					'linkid' => $db_link_trigger['linkid'],
+					'indicator_type' => $db_link_trigger['indicator_type']
+				];
+			}
+
+			$db_links[$db_link_trigger['linkid']] =
+				&$db_maps[$db_link_trigger['sysmapid']]['links'][$db_link_trigger['linkid']];
+		}
+
+		if (!$db_links) {
+			return;
+		}
+
+		self::addAffectedLinkTriggers($db_links);
+
+		$maps = [];
+
+		foreach ($db_maps as $db_map) {
+			$links = [];
+
+			foreach ($db_map['links'] as $db_link) {
+				$link_triggers = [];
+
+				foreach ($db_link['linktriggers'] as $link_trigger) {
+					if (!in_array($link_trigger['triggerid'], $triggerids)) {
+						$link_triggers[] = $link_trigger;
+					}
+				}
+
+				$links[] = [
+					'linkid' => $db_link['linkid'],
+					'indicator_type' => $link_triggers ? $db_link['indicator_type'] : MAP_INDICATOR_TYPE_STATIC_LINK,
+					'linktriggers' => $link_triggers
+				];
+			}
+
+			$maps[] = [
+				'sysmapid' => $db_map['sysmapid'],
+				'links' => $links
+			];
+		}
+
+		$this->updateForce($maps, $db_maps);
+	}
+
+	public function unlinkItems(array $itemids): void {
+		$resource = DBselect(
+			'SELECT sl.linkid,sl.sysmapid,sl.indicator_type,sl.itemid,s.name AS map_name'.
+			' FROM sysmaps_links sl'.
+			' LEFT JOIN sysmaps s ON sl.sysmapid=s.sysmapid'.
+			' WHERE '.dbConditionId('sl.itemid', $itemids)
+		);
+
+		$db_maps = [];
+		$db_links = [];
+
+		while ($db_link = DBfetch($resource)) {
+			if (!array_key_exists($db_link['sysmapid'], $db_maps)) {
+				$db_maps[$db_link['sysmapid']] = [
+					'sysmapid' => $db_link['sysmapid'],
+					'name' => $db_link['map_name'],
+					'links' => []
+				];
+			}
+
+			$db_maps[$db_link['sysmapid']]['links'][$db_link['linkid']] = [
+				'linkid' => $db_link['linkid'],
+				'indicator_type' => $db_link['indicator_type'],
+				'itemid' => $db_link['itemid']
+			];
+
+			$db_links[$db_link['linkid']] = &$db_maps[$db_link['sysmapid']]['links'][$db_link['linkid']];
+		}
+
+		if (!$db_links) {
+			return;
+		}
+
+		self::addAffectedLinkThresholds($db_links);
+		self::addAffectedLinkHighlights($db_links);
+
+		$maps = [];
+
+		foreach ($db_maps as $db_map) {
+			$links = [];
+
+			foreach ($db_map['links'] as $db_link) {
+				$links[] = [
+					'linkid' => $db_link['linkid'],
+					'indicator_type' => MAP_INDICATOR_TYPE_STATIC_LINK,
+					'itemid' => 0,
+					'thresholds' => [],
+					'highlights' => []
+				];
+			}
+
+			$maps[] = [
+				'sysmapid' => $db_map['sysmapid'],
+				'links' => $links
+			];
+		}
+
+		$this->updateForce($maps, $db_maps);
 	}
 
 	/**
