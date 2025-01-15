@@ -760,7 +760,7 @@ static char	*zbx_get_snmp_type_error(u_char type)
 }
 
 static int	zbx_get_snmp_response_error(const zbx_snmp_sess_t ssp, const zbx_dc_interface_t *interface, int status,
-		const struct snmp_pdu *response, char *error, size_t max_error_len, int got_values)
+		const struct snmp_pdu *response, char *error, size_t max_error_len, int got_vars)
 {
 	int	ret;
 
@@ -789,7 +789,7 @@ static int	zbx_get_snmp_response_error(const zbx_snmp_sess_t ssp, const zbx_dc_i
 	}
 	else if (STAT_TIMEOUT == status)
 	{
-		if (0 == got_values)
+		if (0 == got_vars)
 		{
 			zbx_snprintf(error, max_error_len, "Timeout while connecting to \"%s:%hu\".",
 					interface->addr, interface->port);
@@ -1471,7 +1471,7 @@ static int	zbx_snmp_walk(zbx_snmp_sess_t ssp, const zbx_dc_item_t *item, const c
 	size_t			anOID_len = MAX_OID_LEN, rootOID_len = MAX_OID_LEN, root_string_len, root_numeric_len;
 	char			oid_index[MAX_STRING_LEN], root_oid[MAX_STRING_LEN];
 	struct variable_list	*var;
-	int			status, level, running, num_vars, got_values = 0, check_oid_increase = 1, ret = SUCCEED;
+	int			status, level, running, num_vars, got_vars = 0, check_oid_increase = 1, ret = SUCCEED;
 	AGENT_RESULT		snmp_result;
 	zbx_hashset_t		oids_seen;
 	struct snmp_session	*ss;
@@ -1581,7 +1581,7 @@ reduce_max_vars:
 				goto reduce_max_vars;
 
 			ret = zbx_get_snmp_response_error(ssp, &item->interface, status, response, error,
-					max_error_len, got_values);
+					max_error_len, got_vars);
 			running = 0;
 			goto next;
 		}
@@ -1603,7 +1603,7 @@ reduce_max_vars:
 			char		**str_res;
 			unsigned char	val_type;
 
-			got_values = 1;
+			got_vars = 1;
 
 			/* verify if we are in the same subtree */
 			if (SNMP_ENDOFMIBVIEW == var->type || var->name_length < rootOID_len ||
