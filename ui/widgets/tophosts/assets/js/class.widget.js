@@ -154,7 +154,7 @@ class CWidgetTopHosts extends CWidget {
 			urls.push(url);
 		}
 
-		return urls;
+		return [...new Set(urls)];
 	}
 
 	#loadThumbnails(urls) {
@@ -296,13 +296,10 @@ class CWidgetTopHosts extends CWidget {
 					entries.forEach(entry => {
 						if (entry.contentBoxSize) {
 							const overlay = content.closest('.dashboard-widget-tophosts-hintbox-image');
+							const size = entry.contentBoxSize[0];
 
-							if (overlay instanceof Element) {
-								const size = entry.contentBoxSize[0];
-
-								overlay.style.width = `${size.inlineSize}px`;
-								overlay.style.height = `${size.blockSize}px`;
-							}
+							overlay.style.width = `${size.inlineSize}px`;
+							overlay.style.height = `${size.blockSize}px`;
 						}
 					})
 				});
