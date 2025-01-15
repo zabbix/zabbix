@@ -2422,7 +2422,7 @@ int	check_vcenter_hv_network_linkspeed(AGENT_REQUEST *request, const char *usern
 	if (FAIL == (i = zbx_vector_vmware_pnic_ptr_bsearch(&hv->pnics, &nic_cmp, zbx_vmware_pnic_compare)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown physical network interface name"));
-		goto out;
+		goto unlock;
 	}
 
 	SET_UI64_RESULT(result, hv->pnics.values[i]->speed);
