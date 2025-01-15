@@ -88,7 +88,7 @@ type PluginSystemOptions map[string]SystemOptions
 type SystemOptions struct {
 	Path                     *string `conf:"optional"`
 	ForceActiveChecksOnStart *int    `conf:"optional,range=0:1"`
-	Capacity                 int     `conf:"optional"`
+	Capacity                 int     `conf:"optional,range=1:1000"`
 }
 
 type pluginOptions struct {
