@@ -24,7 +24,6 @@
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxhistory.h"
-#include "zbxshmem.h"
 #include "zbxtime.h"
 #include "zbxtrends.h"
 #include "zbx_item_constants.h"
