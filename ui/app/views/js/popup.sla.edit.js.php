@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -184,6 +184,8 @@ window.sla_edit_popup = {
 
 		this.overlay.unsetLoading();
 		this.overlay.setProperties({title, buttons});
+		this.overlay.recoverFocus();
+		this.overlay.containFocus();
 	},
 
 	delete() {

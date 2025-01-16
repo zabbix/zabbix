@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2526,6 +2526,7 @@ class CMacrosResolverGeneral {
 			}
 		}
 
+		$user_macro_parser_with_regex = new CUserMacroParser(['allow_regex' => true]);
 		$user_macro_parser = new CUserMacroParser();
 
 		/*
@@ -2555,14 +2556,14 @@ class CMacrosResolverGeneral {
 				]);
 
 				foreach ($db_host_macros as $db_host_macro) {
-					if ($user_macro_parser->parse($db_host_macro['macro']) != CParser::PARSE_SUCCESS) {
+					if ($user_macro_parser_with_regex->parse($db_host_macro['macro']) != CParser::PARSE_SUCCESS) {
 						continue;
 					}
 
 					$hostid = $db_host_macro['hostid'];
-					$macro = $user_macro_parser->getMacro();
-					$context = $user_macro_parser->getContext();
-					$regex = $user_macro_parser->getRegex();
+					$macro = $user_macro_parser_with_regex->getMacro();
+					$context = $user_macro_parser_with_regex->getContext();
+					$regex = $user_macro_parser_with_regex->getRegex();
 					$value = self::getMacroValue($db_host_macro);
 
 					if (!array_key_exists($hostid, $host_macros)) {
@@ -2660,10 +2661,10 @@ class CMacrosResolverGeneral {
 			$global_macros = [];
 
 			foreach ($db_global_macros as $db_global_macro) {
-				if ($user_macro_parser->parse($db_global_macro['macro']) == CParser::PARSE_SUCCESS) {
-					$macro = $user_macro_parser->getMacro();
-					$context = $user_macro_parser->getContext();
-					$regex = $user_macro_parser->getRegex();
+				if ($user_macro_parser_with_regex->parse($db_global_macro['macro']) == CParser::PARSE_SUCCESS) {
+					$macro = $user_macro_parser_with_regex->getMacro();
+					$context = $user_macro_parser_with_regex->getContext();
+					$regex = $user_macro_parser_with_regex->getRegex();
 					$value = self::getMacroValue($db_global_macro);
 
 					if (!array_key_exists($macro, $global_macros)) {

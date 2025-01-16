@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -252,7 +252,7 @@ function DBselect($query, $limit = null, $offset = 0) {
 
 		case ZBX_DB_POSTGRESQL:
 			if (!$result = pg_query($DB['DB'], $query)) {
-				error('Error in query ['.$query.'] ['.pg_last_error($DB['DB']).']', true);
+				trigger_error('Error in query ['.$query.'] ['.pg_last_error($DB['DB']).']', E_USER_WARNING);
 			}
 
 			break;
@@ -262,14 +262,14 @@ function DBselect($query, $limit = null, $offset = 0) {
 
 			if ($result === false) {
 				$e = oci_error();
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', true);
+				trigger_error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', E_USER_WARNING);
 
 				break;
 			}
 
 			if (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
 				$e = oci_error($result);
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', true);
+				trigger_error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', E_USER_WARNING);
 			}
 
 			break;

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -783,6 +783,17 @@ static const char	*tls_version_static(void)
 	return OPENSSL_VERSION_TEXT;
 }
 
+static int	tls_has_peer_certificate(tls_t *tls)
+{
+	X509	*cert;
+
+	if (NULL == (cert = SSL_get_peer_certificate(tls->ssl)))
+		return 0;
+
+	X509_free(cert);
+	return 1;
+}
+
 #elif defined(HAVE_GNUTLS)
 #	error zabbix_agent2 does not support GnuTLS library. Compile with OpenSSL\
 		(configure parameter --with-openssl) or without encryption support.
@@ -934,6 +945,12 @@ static const char	*tls_version(void)
 static const char	*tls_version_static(void)
 {
 	return NULL;
+}
+
+static int	tls_has_peer_certificate(tls_t *tls)
+{
+	TLS_UNUSED(tls);
+	return 0;
 }
 
 #endif
@@ -1353,9 +1370,12 @@ func NewServer(nc net.Conn, cfg *Config, b []byte, timeout time.Duration, shiftD
 		s.conn.Close()
 		return
 	}
-	if err = s.verifyIssuerSubject(cfg); err != nil {
-		s.Close()
-		return
+
+	if C.tls_has_peer_certificate((*C.tls_t)(s.tls)) == 1 {
+		if err = s.verifyIssuerSubject(cfg); err != nil {
+			s.Close()
+			return
+		}
 	}
 
 	log.Debugf("connection established using %s", s.String())

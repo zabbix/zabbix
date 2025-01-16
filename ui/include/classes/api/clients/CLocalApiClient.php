@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -138,6 +138,10 @@ class CLocalApiClient extends CApiClient {
 				else {
 					DBend(false);
 				}
+			}
+
+			if ($e instanceof DBException) {
+				throw $e;
 			}
 
 			$response->errorCode = ($e instanceof APIException) ? $e->getCode() : ZBX_API_ERROR_INTERNAL;

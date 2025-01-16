@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -446,14 +446,12 @@ class testPageHostGroups extends CWebTest {
 			// Space trimming.
 			[
 				[
-					'Name' => '   enabled   ',
-					'expected' => ['Group with enabled host testPageHostGroups', self::GROUP_ENABLED]
+					'Name' => '   enabled   '
 				]
 			],
 			[
 				[
-					'Name' => '   ',
-					'all' => true
+					'Name' => '   '
 				]
 			],
 			// Not case sensitive.

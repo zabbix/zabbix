@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,9 +21,9 @@ package oracle
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -39,19 +39,19 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params map[string]s
 	_ ...string) (interface{}, error) {
 	var tablespaces string
 
-	query, err := getQuery(params)
+	query, args, err := getTablespacesQuery(params)
 	if err != nil {
-		return nil, err
+		return nil, errs.Wrap(err, "failed to retrieve tablespace query")
 	}
 
-	row, err := conn.QueryRow(ctx, query)
+	row, err := conn.QueryRow(ctx, query, args...)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	err = row.Scan(&tablespaces)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	// Add leading zeros for floats: ".03" -> "0.03".
@@ -62,32 +62,28 @@ func tablespacesHandler(ctx context.Context, conn OraClient, params map[string]s
 	return tablespaces, nil
 }
 
-func getQuery(params map[string]string) (string, error) {
+func getTablespacesQuery(params map[string]string) (string, []any, error) {
 	ts := params["Tablespace"]
 	t := params["Type"]
 
 	if ts == "" && t == "" {
-		return getFullQuery(), nil
+		return getFullQuery(), nil, nil
 	}
 
 	var err error
 	ts, t, err = prepValues(ts, t)
 	if err != nil {
-		return "", zbxerr.ErrorInvalidParams.Wrap(err)
+		return "", nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams)
 	}
-
-	var query string
 
 	switch t {
 	case perm, undo:
-		query = getPermQueryPart(ts)
+		return getPermQueryPart(), []any{ts}, nil
 	case temp:
-		query = getTempQueryPart(ts)
+		return getTempQueryPart(), []any{ts}, nil
 	default:
-		return "", zbxerr.ErrorInvalidParams.Wrap(fmt.Errorf("incorrect table-space type %s", t))
+		return "", nil, errs.Wrapf(zbxerr.ErrorInvalidParams, "incorrect table-space type %s", t)
 	}
-
-	return query, nil
 }
 
 func prepValues(ts, t string) (outTableSpace string, outType string, err error) {
@@ -104,7 +100,7 @@ func prepValues(ts, t string) (outTableSpace string, outType string, err error) 
 			return defaultTEMPTS, t, nil
 		}
 
-		return "", "", fmt.Errorf("incorrect type %s", t)
+		return "", "", errs.Errorf("incorrect type %s", t)
 	}
 
 	return ts, perm, nil
@@ -223,8 +219,8 @@ FROM (SELECT df.TABLESPACE_NAME          AS TABLESPACE_NAME,
 `
 }
 
-func getPermQueryPart(name string) string {
-	return fmt.Sprintf(`
+func getPermQueryPart() string {
+	return `
 SELECT JSON_ARRAYAGG(
                JSON_OBJECT(
                        TABLESPACE_NAME VALUE JSON_OBJECT(
@@ -279,15 +275,14 @@ FROM (SELECT df.TABLESPACE_NAME          AS TABLESPACE_NAME,
             FROM DBA_FREE_SPACE
             GROUP BY FILE_ID) f
       WHERE df.FILE_ID = f.FILE_ID (+)
-        AND df.TABLESPACE_NAME = '%s'
+        AND df.TABLESPACE_NAME = :1
       GROUP BY df.TABLESPACE_NAME,
                df.CONTENTS,
-               df.STATUS)
-`, name)
+               df.STATUS)`
 }
 
-func getTempQueryPart(name string) string {
-	return fmt.Sprintf(`
+func getTempQueryPart() string {
+	return `
 SELECT JSON_ARRAYAGG(
                JSON_OBJECT(
                        TABLESPACE_NAME VALUE JSON_OBJECT(
@@ -355,9 +350,8 @@ FROM (SELECT Y.NAME                            AS TABLESPACE_NAME,
             FROM sys.DBA_TEMP_FILES dtf,
                  sys.DBA_TABLESPACES dt
             WHERE dtf.TABLESPACE_NAME = dt.TABLESPACE_NAME
-              AND dtf.TABLESPACE_NAME = '%s') Y
+              AND dtf.TABLESPACE_NAME = :1) Y
       GROUP BY Y.NAME,
                Y.CONTENTS,
-               Y.TBS_STATUS)
-`, name)
+               Y.TBS_STATUS)`
 }

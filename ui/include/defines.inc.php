@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.0.35rc1');
-define('ZABBIX_API_VERSION',	'6.0.35');
+define('ZABBIX_VERSION',		'6.0.38rc1');
+define('ZABBIX_API_VERSION',	'6.0.38');
 define('ZABBIX_EXPORT_VERSION',	'6.0');
 
 define('ZABBIX_DB_VERSION',		6000000);
@@ -34,7 +34,7 @@ define('DB_VERSION_HIGHER_THAN_MAXIMUM_ERROR',		6);
 define('DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING',	7);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2024');
+define('ZABBIX_COPYRIGHT_TO',	'2025');
 
 define('ZBX_BCRYPT_COST',		10);
 define('ZBX_MD5_SIZE',			32);
@@ -2134,9 +2134,8 @@ define('ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND', 'interface-input-expand');
 
 define('ZBX_STYLE_ZSELECT_HOST_INTERFACE', 'z-select-host-interface');
 
-// Dashboard list table classes.
+// Dashboard list table class.
 define('ZBX_STYLE_DASHBOARD_LIST', 'dashboard-list');
-define('ZBX_STYLE_DASHBOARD_LIST_ITEM', 'dashboard-list-item');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');

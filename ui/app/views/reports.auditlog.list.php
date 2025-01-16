@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -133,7 +133,7 @@ foreach ($data['auditlogs'] as $auditlog) {
 				->setArgument('filter_set', 1)
 		),
 		(new CDiv([
-			(new CDiv(zbx_nl2br($auditlog['short_details'])))->addClass(ZBX_STYLE_WORDWRAP),
+			(new CDiv(zbx_nl2br($auditlog['short_details'])))->addClass(ZBX_STYLE_WORDBREAK),
 			($auditlog['details_button'] == 1)
 				? (new CDiv(
 					(new CLinkAction(_('Details')))->setAttribute('data-details', json_encode($auditlog['details']))

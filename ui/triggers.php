@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -90,7 +90,7 @@ $fields = [
 	'filter_inherited' =>						[T_ZBX_INT, O_OPT, null, IN([-1, 0, 1]), null],
 	'filter_discovered' =>						[T_ZBX_INT, O_OPT, null, IN([-1, 0, 1]), null],
 	'filter_dependent' =>						[T_ZBX_INT, O_OPT, null, IN([-1, 0, 1]), null],
-	'filter_name' =>							[T_ZBX_STR, O_OPT, null, null, null],
+	'filter_name' =>							[T_ZBX_STR, O_OPT, P_NO_TRIM,	 null,	 null],
 	'filter_state' =>							[T_ZBX_INT, O_OPT, null,
 													IN([-1, TRIGGER_STATE_NORMAL, TRIGGER_STATE_UNKNOWN]), null
 												],
@@ -827,38 +827,6 @@ else {
 			'preservekeys' => true,
 			'nopermissions' => true
 		]);
-
-		$items = API::Item()->get([
-			'output' => ['itemid'],
-			'selectTriggers' => ['triggerid'],
-			'selectItemDiscovery' => ['ts_delete'],
-			'triggerids' => array_keys($triggers),
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
-		]);
-
-		foreach ($items as $item) {
-			$ts_delete = $item['itemDiscovery']['ts_delete'];
-
-			if ($ts_delete == 0) {
-				continue;
-			}
-
-			foreach (array_column($item['triggers'], 'triggerid') as $triggerid) {
-				if (!array_key_exists($triggerid, $triggers)) {
-					continue;
-				}
-
-				if (!array_key_exists('ts_delete', $triggers[$triggerid]['triggerDiscovery'])) {
-					$triggers[$triggerid]['triggerDiscovery']['ts_delete'] = $ts_delete;
-				}
-				else {
-					$trigger_ts_delete = $triggers[$triggerid]['triggerDiscovery']['ts_delete'];
-					$triggers[$triggerid]['triggerDiscovery']['ts_delete'] = ($trigger_ts_delete > 0)
-						? min($ts_delete, $trigger_ts_delete)
-						: $ts_delete;
-				}
-			}
-		}
 
 		// We must maintain sort order that is applied on prefetched_triggers array.
 		foreach ($triggers as $triggerid => $trigger) {

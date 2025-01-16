@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ void	zbx_mock_test_entry(void **state)
 	time_tmp = ts_in.sec;
 	tm = *localtime(&time_tmp);
 
-	zbx_tm_round_up(&tm, base, NULL);
+	zbx_tm_round_up(&tm, base);
 
 	if (0 > tm.tm_hour || 23 < tm.tm_hour)
 		fail_msg("invalid tm_hour:%d", tm.tm_hour);

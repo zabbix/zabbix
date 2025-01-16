@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,8 +44,8 @@
 #define ZBX_POSTGRESQL_MIN_VERSION_STR				"10.9"
 #define ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION			130000
 #define ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION_STR		"13.0"
-#define ZBX_POSTGRESQL_MAX_VERSION				169999
-#define ZBX_POSTGRESQL_MAX_VERSION_STR				"16.x"
+#define ZBX_POSTGRESQL_MAX_VERSION				179999
+#define ZBX_POSTGRESQL_MAX_VERSION_STR				"17.x"
 
 #define ZBX_ORACLE_MIN_VERSION					1201000200
 #define ZBX_ORACLE_MIN_VERSION_STR				"Database 12c Release 12.01.00.02.x"
@@ -64,8 +64,8 @@
 #define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION 			20001
 #define ZBX_TIMESCALE_MIN_SUPPORTED_VERSION_STR 		"2.0.1"
 #define ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT	20000
-#define ZBX_TIMESCALE_MAX_VERSION				21699
-#define ZBX_TIMESCALE_MAX_VERSION_STR				"2.16"
+#define ZBX_TIMESCALE_MAX_VERSION				21799
+#define ZBX_TIMESCALE_MAX_VERSION_STR				"2.17"
 #define ZBX_TIMESCALE_LICENSE_APACHE				"apache"
 #define ZBX_TIMESCALE_LICENSE_APACHE_STR			"TimescaleDB Apache 2 Edition"
 #define ZBX_TIMESCALE_LICENSE_COMMUNITY				"timescale"

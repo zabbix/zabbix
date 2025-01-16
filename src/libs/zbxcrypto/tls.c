@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,8 +29,8 @@
 #include "tls_tcp.h"
 #include "tls_tcp_active.h"
 
-#if defined(HAVE_OPENSSL) && OPENSSL_VERSION_NUMBER < 0x1010000fL || defined(LIBRESSL_VERSION_NUMBER)
-/* for OpenSSL 1.0.1/1.0.2 (before 1.1.0) or LibreSSL */
+#if defined(HAVE_OPENSSL) && OPENSSL_VERSION_NUMBER < 0x1010000fL
+/* for OpenSSL 1.0.1/1.0.2 (before 1.1.0) */
 
 /* mutexes for multi-threaded OpenSSL (see "man 3ssl threads" and example in crypto/threads/mttest.c) */
 
@@ -119,7 +119,7 @@ static void	OPENSSL_cleanup(void)
 	zbx_openssl_thread_cleanup();
 #endif
 }
-#endif	/* defined(HAVE_OPENSSL) && OPENSSL_VERSION_NUMBER < 0x1010000fL || defined(LIBRESSL_VERSION_NUMBER) */
+#endif	/* defined(HAVE_OPENSSL) && OPENSSL_VERSION_NUMBER < 0x1010000fL */
 
 #if defined(HAVE_OPENSSL) && OPENSSL_VERSION_NUMBER >= 0x1010000fL && !defined(LIBRESSL_VERSION_NUMBER)
 /* OpenSSL 1.1.0 or newer, not LibreSSL */

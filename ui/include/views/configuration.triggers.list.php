@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -239,7 +239,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			->setArgument('form', 'update')
 			->setArgument('triggerid', $triggerid)
 			->setArgument('context', $data['context'])
-	))->addClass(ZBX_STYLE_WORDWRAP);
+	))->addClass(ZBX_STYLE_WORDBREAK);
 
 	if ($trigger['dependencies']) {
 		$description[] = [BR(), bold(_('Depends on').':')];

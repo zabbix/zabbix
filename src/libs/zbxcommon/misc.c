@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -473,49 +473,6 @@ const struct tm	*zbx_localtime_now(const time_t *time)
 	}
 
 	return &tm_last;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: convert local time to UTC                                         *
- *                                                                            *
- * Parameters: time - [IN] input time                                         *
- *             tz   - [IN] time zone                                          *
- *                                                                            *
- * Return value: Universal Coordinate Time                                    *
- *                                                                            *
- ******************************************************************************/
-time_t	zbx_mktime(struct tm *time, const char *tz)
-{
-#if defined(HAVE_GETENV) && defined(HAVE_PUTENV) && defined(HAVE_UNSETENV) && defined(HAVE_TZSET) && \
-		!defined(_WINDOWS) && !defined(__MINGW32__)
-	char		*old_tz;
-	time_t		ret;
-
-	if (NULL == tz || 0 == strcmp(tz, "system"))
-		return mktime(time);
-
-	if (NULL != (old_tz = getenv("TZ")))
-		old_tz = zbx_strdup(NULL, old_tz);
-
-	setenv("TZ", tz, 1);
-	tzset();
-	ret = (time_t)mktime(time);
-
-	if (NULL != old_tz)
-	{
-		setenv("TZ", old_tz, 1);
-		zbx_free(old_tz);
-	}
-	else
-		unsetenv("TZ");
-
-	tzset();
-
-	return ret;
-#else
-	return (time_t)mktime(time);
-#endif
 }
 
 /******************************************************************************
@@ -3743,20 +3700,18 @@ int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now
  *                               bitmask (0x01 - Monday, 0x02 - Tuesday...)   *
  *             start_time - [IN] the report start time in seconds after       *
  *                               midnight                                     *
- *             tz         - [IN] the report starting timezone                 *
  *                                                                            *
  * Return value: The timestamp when the report must be prepared or -1 if an   *
  *               error occurred.                                              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekdays, int start_time,
-		const char *tz)
+int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekdays, int start_time)
 {
 	struct tm	*tm;
 	time_t		yesterday = now - SEC_PER_DAY;
 	int		nextcheck, tm_hour, tm_min, tm_sec;
 
-	if (NULL == (tm = zbx_localtime(&yesterday, tz)))
+	if (NULL == (tm = localtime(&yesterday)))
 		return -1;
 
 	tm_sec = start_time % 60;
@@ -3769,27 +3724,27 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 	{
 		/* handle midnight startup times */
 		if (0 == tm->tm_sec && 0 == tm->tm_min && 0 == tm->tm_hour)
-			zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY, tz);
+			zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY);
 
 		switch (cycle)
 		{
 			case ZBX_REPORT_CYCLE_YEARLY:
-				zbx_tm_round_up(tm, ZBX_TIME_UNIT_YEAR, tz);
+				zbx_tm_round_up(tm, ZBX_TIME_UNIT_YEAR);
 				break;
 			case ZBX_REPORT_CYCLE_MONTHLY:
-				zbx_tm_round_up(tm, ZBX_TIME_UNIT_MONTH, tz);
+				zbx_tm_round_up(tm, ZBX_TIME_UNIT_MONTH);
 				break;
 			case ZBX_REPORT_CYCLE_WEEKLY:
 				if (0 == weekdays)
 					return -1;
-				zbx_tm_round_up(tm, ZBX_TIME_UNIT_DAY, tz);
+				zbx_tm_round_up(tm, ZBX_TIME_UNIT_DAY);
 
 				while (0 == (weekdays & (1 << (tm->tm_wday + 6) % 7)))
-					zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY, tz);
+					zbx_tm_add(tm, 1, ZBX_TIME_UNIT_DAY);
 
 				break;
 			case ZBX_REPORT_CYCLE_DAILY:
-				zbx_tm_round_up(tm, ZBX_TIME_UNIT_DAY, tz);
+				zbx_tm_round_up(tm, ZBX_TIME_UNIT_DAY);
 				break;
 		}
 
@@ -3797,7 +3752,7 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 		tm->tm_min = tm_min;
 		tm->tm_hour = tm_hour;
 
-		nextcheck = (int)zbx_mktime(tm, tz);
+		nextcheck = (int)mktime(tm);
 	}
 	while (-1 != nextcheck && nextcheck <= now);
 

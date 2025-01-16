@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,14 +77,14 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
+	cycle = mock_get_cycle("in.cycle");
+	weekdays = mock_get_weekdays("in.weekdays");
+
 	report_tz = zbx_mock_get_parameter_string("in.timezone");
 	if (0 != setenv("TZ", report_tz, 1))
 		fail_msg("Cannot set 'TZ' environment variable: %s", zbx_strerror(errno));
 
 	tzset();
-
-	cycle = mock_get_cycle("in.cycle");
-	weekdays = mock_get_weekdays("in.weekdays");
 
 	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_parameter_string("in.now"), &ts))
 		fail_msg("Invalid time format for 'now' parameter");
@@ -105,7 +105,7 @@ void	zbx_mock_test_entry(void **state)
 		if (ZBX_MOCK_SUCCESS != (err = zbx_strtime_to_timespec(value, &ts)))
 			fail_msg("[%d] cannot parse nextcheck timestamp: %s", step, zbx_mock_error_string(err));
 
-		if (FAIL == (nextcheck = zbx_get_report_nextcheck(now, cycle, weekdays, start_time, report_tz)))
+		if (FAIL == (nextcheck = zbx_get_report_nextcheck(now, cycle, weekdays, start_time)))
 			fail_msg("[%d] cannot calculate report nextcheck", step);
 
 		zbx_snprintf(buf, sizeof(buf), "[%d] invalid report nextchek value", step++);

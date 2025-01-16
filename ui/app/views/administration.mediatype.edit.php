@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -132,7 +132,7 @@ $mediatype_formlist->addRow((new CLabel(_('GSM modem'), 'gsm_modem'))->setAsteri
 );
 
 // Create password field.
-if ($data['passwd'] !== '' && !$data['change_passwd']) {
+if (!$data['display_password_input']) {
 	// Disabling 'passwd' field prevents stored passwords autofill by browser.
 	$passwd_field = [
 		(new CButton('chPass_btn', _('Change password'))),

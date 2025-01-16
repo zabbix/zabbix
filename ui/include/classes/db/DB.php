@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ class DB {
 	const RESERVEIDS_ERROR = 2;
 	const SCHEMA_ERROR = 3;
 	const INPUT_ERROR = 4;
+	const INIT_ERROR = 5;
 
 	const TABLE_TYPE_CONFIG = 1;
 	const TABLE_TYPE_HISTORY = 2;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1820,7 +1820,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$user_macro_parser = new CUserMacroParser();
+		$user_macro_parser = new CUserMacroParser(['allow_regex' => true]);
 
 		if ($user_macro_parser->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $user_macro_parser->getError());
@@ -2092,7 +2092,7 @@ class CApiInputValidator {
 	 * @return string
 	 */
 	public static function trimMacro(string $macro): string {
-		$user_macro_parser = new CUserMacroParser();
+		$user_macro_parser = new CUserMacroParser(['allow_regex' => true]);
 
 		$user_macro_parser->parse($macro);
 

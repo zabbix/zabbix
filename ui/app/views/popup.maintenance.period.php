@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -153,9 +153,13 @@ $form_list
 	)
 	->addRow(new CLabel(_('At (hour:minute)'), 'hour'),
 		(new CDiv([
-			(new CNumericBox('hour', $data['hour'], 2))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+			(new CNumericBox('hour', $data['hour'], 2, false, false, false))
+				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+				->padWithZeroes(2),
 			' : ',
-			(new CNumericBox('minute', $data['minute'], 2))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			(new CNumericBox('minute', $data['minute'], 2, false, false, false))
+				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+				->padWithZeroes(2)
 		]))->addClass(ZBX_STYLE_FORM_FIELDS_INLINE),
 		'row_timeperiod_period_at_hours_minutes'
 	)

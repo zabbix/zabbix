@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,25 +47,28 @@ class CEventNameValidator extends CValidator {
 		]);
 
 		while (isset($value[$p])) {
-			if (substr($value, $p, 2) !== '{?') {
-				$p++;
+			if (substr($value, $p, 3) === '{{?') {
+				if ($expr_func_macro->parse($value, $p) != CParser::PARSE_FAIL) {
+					$p += $expr_func_macro->getLength();
 
-				continue;
+					continue;
+				}
+				$p++;
 			}
 
-			if ($expr_func_macro->parse($value, $p) === CParser::PARSE_FAIL) {
-				if ($expr_macro->parse($value, $p) === CParser::PARSE_FAIL) {
+			if (substr($value, $p, 2) === '{?') {
+				if ($expr_macro->parse($value, $p) == CParser::PARSE_FAIL) {
 					$this->setError($expr_macro->getError());
 
 					return false;
 				}
-				else {
-					$p += $expr_macro->getLength();
-				}
+
+				$p += $expr_macro->getLength();
+
+				continue;
 			}
-			else {
-				$p += $expr_func_macro->getLength();
-			}
+
+			$p++;
 		}
 
 		return true;

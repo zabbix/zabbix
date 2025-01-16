@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -240,7 +240,10 @@ class CAudit {
 			'paths' => ['usermacro.value'],
 			'conditions' => ['type' => ZBX_MACRO_TYPE_SECRET]
 		],
-		self::RESOURCE_MEDIA_TYPE => ['paths' => ['mediatype.passwd']],
+		self::RESOURCE_MEDIA_TYPE => [
+			'paths' => ['mediatype.passwd'],
+			'conditions' => ['smtp_authentication' => SMTP_AUTHENTICATION_NORMAL]
+		],
 		self::RESOURCE_PROXY => ['paths' => ['proxy.tls_psk_identity', 'proxy.tls_psk']],
 		self::RESOURCE_SCRIPT => ['paths' => ['script.password']],
 		self::RESOURCE_TEMPLATE => [

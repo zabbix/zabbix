@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -89,7 +89,7 @@ class CControllerMediatypeEdit extends CController {
 		if ($this->hasInput('mediatypeid')) {
 			$mediatypes = API::Mediatype()->get([
 				'output' => ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email',
-					'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_security', 'smtp_verify_peer',
+					'exec_path', 'gsm_modem', 'username', 'status', 'smtp_security', 'smtp_verify_peer',
 					'smtp_verify_host', 'smtp_authentication', 'exec_params', 'maxsessions', 'maxattempts',
 					'attempt_interval', 'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu',
 					'event_menu_url', 'event_menu_name', 'parameters', 'description'
@@ -131,7 +131,7 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_username' => '',
 			'passwd' => '',
 			'status' => MEDIA_TYPE_STATUS_ACTIVE,
-			'change_passwd' => true,
+			'display_password_input' => true,
 			'maxsessions' => $db_defaults['maxsessions'],
 			'maxattempts' => $db_defaults['maxattempts'],
 			'attempt_interval' => $db_defaults['attempt_interval'],
@@ -181,7 +181,6 @@ class CControllerMediatypeEdit extends CController {
 			array_pop($data['exec_params']);
 
 			$data['gsm_modem'] = $this->mediatype['gsm_modem'];
-			$data['passwd'] = $this->mediatype['passwd'];
 			$data['status'] = $this->mediatype['status'];
 			$data['maxsessions'] = $this->mediatype['maxsessions'];
 			$data['maxattempts'] = $this->mediatype['maxattempts'];
@@ -190,6 +189,8 @@ class CControllerMediatypeEdit extends CController {
 			switch ($data['type']) {
 				case MEDIA_TYPE_EMAIL:
 					$data['smtp_username'] = $this->mediatype['username'];
+					$data['display_password_input'] =
+						$this->mediatype['smtp_authentication'] != SMTP_AUTHENTICATION_NORMAL;
 					break;
 
 				case MEDIA_TYPE_SMS:
@@ -207,8 +208,6 @@ class CControllerMediatypeEdit extends CController {
 					CArrayHelper::sort($data['parameters'], ['name']);
 					break;
 			}
-
-			$data['change_passwd'] = $this->hasInput('passwd');
 		}
 
 		// overwrite with input variables

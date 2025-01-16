@@ -49,19 +49,6 @@ build/win32/project/MSG00001.bin
 build/win32/project/messages.h
 build/win32/project/messages.rc
 build/win32/project/resource.res
-database/mysql/data.sql
-database/mysql/schema.sql
-database/mysql/history_pk_prepare.sql
-database/oracle/data.sql
-database/oracle/schema.sql
-database/oracle/history_pk_prepare.sql
-database/postgresql/data.sql
-database/postgresql/schema.sql
-database/postgresql/timescaledb.sql
-database/postgresql/history_pk_prepare.sql
-database/postgresql/tsdb_history_pk_upgrade_*
-database/sqlite3/data.sql
-database/sqlite3/schema.sql
 etc/agent.conf
 etc/zabbix_agent2.conf
 etc/zabbix_agentd.conf
@@ -165,6 +152,7 @@ tests/libs/zbxcommon/zbx_truncate_value
 tests/libs/zbxcommon/zbx_user_macro_parse
 tests/libs/zbxcommon/zbx_validate_interval
 tests/libs/zbxcommon/zbx_variant_compare
+tests/libs/zbxcommon/zbx_variant_to_value_type
 tests/libs/zbxcommon/zbx_xml_to_json
 tests/libs/zbxcommon/zbx_buf_readln
 tests/libs/zbxcomms/zbx_tcp_check_allowed_peers

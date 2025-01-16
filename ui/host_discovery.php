@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -214,7 +214,7 @@ $fields = [
 	'filter_rst' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_groupids' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
 	'filter_hostids' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
-	'filter_name' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_name' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,		null,	null],
 	'filter_key' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_type' =>			[T_ZBX_INT, O_OPT, null,
 									IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,

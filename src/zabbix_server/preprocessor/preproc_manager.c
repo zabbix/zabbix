@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -270,7 +270,7 @@ static zbx_uint32_t	preprocessor_create_task(zbx_preprocessing_manager_t *manage
 	zbx_vector_ptr_t	*phistory;
 
 	if (ITEM_STATE_NOTSUPPORTED == request->value.state)
-		zbx_variant_set_str(&value, "");
+		zbx_variant_set_none(&value);
 	else
 		preprocessing_ar_to_variant(request->value.result, &value);
 

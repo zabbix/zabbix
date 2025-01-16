@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -285,11 +285,11 @@ class testPageMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #2 Name with 2 empty spaces.
+			// #2 Name with empty spaces.
 			[
 				[
 					'filter' => [
-						'Name' => '  '
+						'Name' => ' '
 					],
 					'expected' => [
 						self::ACTIVE_MAINTENANCE,

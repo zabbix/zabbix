@@ -728,6 +728,12 @@ form {
 		white-space: nowrap;
 	}
 
+	.wordbreak {
+		white-space: normal;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
 	&.sticky-header {
 		thead {
 			position: sticky;
@@ -1536,6 +1542,10 @@ form {
 	display: inline-block;
 	padding: 5px;
 	position: relative;
+
+	.wordbreak {
+		white-space: normal;
+	}
 }
 
 .border-left {
@@ -3135,6 +3145,12 @@ $form-icon-btn: (
 	}
 }
 
+div {
+	.overlay-dialogue.wordbreak {
+		white-space: normal;
+	}
+}
+
 .overlay-dialogue {
 	display: table;
 	position: absolute;
@@ -3144,6 +3160,10 @@ $form-icon-btn: (
 	border: 1px solid $overlay-border-color;
 	border-bottom-color: darken($overlay-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
+
+	.wordbreak {
+		white-space: normal;
+	}
 
 	&.modal {
 		position: fixed;

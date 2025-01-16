@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,8 +40,8 @@ class CEventNameValidatorTest extends TestCase {
 			['', true, null],
 			['Macro except expression macro are ignored {ANY_MACRO_HERE}', true, null],
 			['Incorrect macro except expression macro are ignored {ANY_MACRO_HERE_ {}', true, null],
-			['Simple expression macro {?100+1} test', true, null],
-			['Expression macro with modificator {{?100+1-(2)}.anyfunc(2)}', true, null],
+			['Simple expression macro {?100+1} {{?100+1}} test', true, null],
+			['Expression macro with modificator {{?100+1-(2)}.anyfunc(2)}{{?100+1-(2)}.anyfunc("{?")}', true, null],
 			['Macro as host name {?func(/{HOST.HOST}/item)}', true, null],
 			['Expression macro with incorrect syntax {?123++321}', false, 'incorrect expression starting from "+321}"'],
 			['Missing closing curly bracket {?123+321', false, 'unexpected end of expression macro'],

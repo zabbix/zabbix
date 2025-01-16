@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -125,7 +125,7 @@ static int	macrofunc_fmttime(char **params, size_t nparam, char **out)
 					return FAIL;
 				}
 
-				zbx_tm_round_down(&local_time, unit, NULL);
+				zbx_tm_round_down(&local_time, unit);
 
 				p++;
 			}
@@ -144,9 +144,9 @@ static int	macrofunc_fmttime(char **params, size_t nparam, char **out)
 				}
 
 				if ('+' == op)
-					zbx_tm_add(&local_time, num, unit, NULL);
+					zbx_tm_add(&local_time, num, unit);
 				else
-					zbx_tm_sub(&local_time, num, unit, NULL);
+					zbx_tm_sub(&local_time, num, unit);
 
 				p += len;
 			}

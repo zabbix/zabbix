@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -151,7 +151,7 @@ static int	trends_parse_timeshift(time_t from, const char *timeshift, zbx_time_u
 				return FAIL;
 			}
 
-			zbx_tm_round_down(tm, unit, NULL);
+			zbx_tm_round_down(tm, unit);
 
 			/* unit is single character */
 			p++;
@@ -172,9 +172,9 @@ static int	trends_parse_timeshift(time_t from, const char *timeshift, zbx_time_u
 			}
 
 			if ('+' == op)
-				zbx_tm_add(tm, num, unit, NULL);
+				zbx_tm_add(tm, num, unit);
 			else
-				zbx_tm_sub(tm, num, unit, NULL);
+				zbx_tm_sub(tm, num, unit);
 
 			p += len;
 		}
@@ -280,7 +280,7 @@ int	zbx_trends_parse_range(time_t from, const char *param, int *start, int *end,
 
 	/* trends clock refers to the beginning of the hourly interval - subtract */
 	/* one hour to get the trends clock for the last hourly interval          */
-	zbx_tm_sub(&tm_end, 1, ZBX_TIME_UNIT_HOUR, NULL);
+	zbx_tm_sub(&tm_end, 1, ZBX_TIME_UNIT_HOUR);
 
 	if (-1 == (*end = mktime(&tm_end)))
 	{
@@ -294,7 +294,7 @@ int	zbx_trends_parse_range(time_t from, const char *param, int *start, int *end,
 		return FAIL;
 	}
 
-	zbx_tm_sub(&tm_start, period_num, period_unit, NULL);
+	zbx_tm_sub(&tm_start, period_num, period_unit);
 	if (-1 == (*start = mktime(&tm_start)))
 	{
 		*error = zbx_dsprintf(*error, "cannot calculate the period start time: %s", zbx_strerror(errno));
@@ -357,7 +357,7 @@ int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *ne
 				return FAIL;
 			}
 
-			zbx_tm_round_down(&tm, unit, NULL);
+			zbx_tm_round_down(&tm, unit);
 
 			/* unit is single character */
 			period_shift++;
@@ -376,9 +376,9 @@ int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *ne
 			if (unit < base)
 			{
 				if ('+' == op)
-					zbx_tm_add(&tm, num, unit, NULL);
+					zbx_tm_add(&tm, num, unit);
 				else
-					zbx_tm_sub(&tm, num, unit, NULL);
+					zbx_tm_sub(&tm, num, unit);
 			}
 
 			period_shift += len;
@@ -396,7 +396,7 @@ int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *ne
 
 	/* trends clock refers to the beginning of the hourly interval - subtract */
 	/* one hour to get the trends clock for the last hourly interval          */
-	zbx_tm_sub(&tm, 1, ZBX_TIME_UNIT_HOUR, NULL);
+	zbx_tm_sub(&tm, 1, ZBX_TIME_UNIT_HOUR);
 
 	if (-1 == (*nextcheck = mktime(&tm)))
 	{

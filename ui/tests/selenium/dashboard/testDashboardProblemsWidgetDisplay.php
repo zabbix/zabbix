@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -546,7 +546,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						],
 						[
 							'Problem • Severity' => 'Trigger for widget 2 unsigned',
-							'Operational data' => "Item value: \n0"
+							'Operational data' => "Item value:\n0"
 						],
 						[
 							'Problem • Severity' => 'Trigger for widget 2 log',
@@ -558,7 +558,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						],
 						[
 							'Problem • Severity' => 'Trigger for widget 1 float',
-							'Operational data' => "Item value: \n0"
+							'Operational data' => "Item value:\n0"
 						]
 					],
 					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
@@ -578,7 +578,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					'result' => [
 						['Problem • Severity' => 'Trigger for widget 2 log'],
 						['Problem • Severity' => 'Trigger for widget 1 char'],
-						['Problem • Severity' => "Trigger for widget 1 float (Item value: \n0)"]
+						['Problem • Severity' => "Trigger for widget 1 float (Item value:\n0)"]
 					]
 				]
 			],

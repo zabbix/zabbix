@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -177,7 +177,7 @@ foreach ($data['items'] as $item) {
 	$itemTable->addRow([
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$wizard,
-		(new CCol($description))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$item['delay'],
 		$item['history'],
