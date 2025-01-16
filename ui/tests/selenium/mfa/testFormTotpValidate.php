@@ -14,69 +14,17 @@
 **/
 
 
+require_once dirname(__FILE__).'/../common/testFormTotp.php';
+
 /**
  * @backup mfa, users
  *
  * @onBefore prepareData
  */
-class testFormTotpValidate extends CWebTest {
+class testFormTotpValidate extends testFormTotp {
 
-	private const USER_NAME = 'totp-user';
-	private const USER_PASS = 'zabbixzabbix';
-	private const TOTP_SECRET_16 = 'AAAAAAAAAAAAAAAA';
-	private const TOTP_SECRET_32 = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-
-	// Number of times after which a user is blocked when a wrong TOTP is entered.
-	private const BLOCK_COUNT = 5;
-
-	private const DEFAULT_METHOD_NAME = 'TOTP';
-	private const DEFAULT_ALGO = TOTP_HASH_SHA1;
-	private const DEFAULT_TOTP_CODE_LENGTH = TOTP_CODE_LENGTH_6;
-
-	protected static $mfa_id;
-	protected static $user_id;
-	protected static $usergroup_id;
-
-	/**
-	 * Attach behaviors to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [
-			CMessageBehavior::class
-		];
-	}
-
-	public function prepareData() {
-		// Create a TOTP MFA method.
-		self::$mfa_id = CDataHelper::call('mfa.create', [
-			'type' => MFA_TYPE_TOTP,
-			'name' => self::DEFAULT_METHOD_NAME,
-			'hash_function' => self::DEFAULT_ALGO,
-			'code_length' => self::DEFAULT_TOTP_CODE_LENGTH
-		])['mfaids'][0];
-
-		// Enable TOTP and set it as the default MFA method.
-		CDataHelper::call('authentication.update', [
-			'mfa_status' => MFA_ENABLED,
-			'mfaid' => self::$mfa_id // set as default
-		]);
-
-		// Create a user group for testing MFA.
-		self::$usergroup_id = CDataHelper::call('usergroup.create', [
-			'name' => 'TOTP group',
-			'mfa_status' => MFA_ENABLED
-		])['usrgrpids'][0];
-
-		// Create a user for testing MFA.
-		self::$user_id = CDataHelper::call('user.create', [
-			'username' => self::USER_NAME,
-			'passwd' => self::USER_PASS,
-			'roleid'=> 1, // User role
-			'usrgrps' => [['usrgrpid' => self::$usergroup_id]]
-		])['userids'][0];
-	}
+	protected const TOTP_SECRET_16 = 'AAAAAAAAAAAAAAAA';
+	protected const TOTP_SECRET_32 = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 
 	public function testFormTotpValidate_Layout() {
 		$this->quickEnrollUser(self::TOTP_SECRET_32);

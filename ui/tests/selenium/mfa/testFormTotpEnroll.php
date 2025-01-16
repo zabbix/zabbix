@@ -14,26 +14,14 @@
 **/
 
 
+require_once dirname(__FILE__).'/../common/testFormTotp.php';
+
 /**
  * @backup mfa, users
  *
  * @onBefore prepareData
  */
-class testFormTotpEnroll extends CWebTest {
-
-	private const USER_NAME = 'totp-user';
-	private const USER_PASS = 'zabbixzabbix';
-
-	// Number of times after which a user is blocked when a wrong TOTP is entered.
-	private const BLOCK_COUNT = 5;
-
-	private const DEFAULT_METHOD_NAME = 'TOTP';
-	private const DEFAULT_ALGO = TOTP_HASH_SHA1;
-	private const DEFAULT_TOTP_CODE_LENGTH = TOTP_CODE_LENGTH_6;
-
-	protected static $mfa_id;
-	protected static $user_id;
-	protected static $usergroup_id;
+class testFormTotpEnroll extends testFormTotp {
 
 	// Maps Zabbix API hash algorithms to their UI display name.
 	protected static $algo_ui_map = [
@@ -41,47 +29,6 @@ class testFormTotpEnroll extends CWebTest {
 		TOTP_HASH_SHA256 => 'SHA256',
 		TOTP_HASH_SHA512 => 'SHA512'
 	];
-
-	/**
-	 * Attach behaviors to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [
-			CMessageBehavior::class
-		];
-	}
-
-	public function prepareData() {
-		// Create a TOTP MFA method.
-		self::$mfa_id = CDataHelper::call('mfa.create', [
-			'type' => MFA_TYPE_TOTP,
-			'name' => self::DEFAULT_METHOD_NAME,
-			'hash_function' => self::DEFAULT_ALGO,
-			'code_length' => self::DEFAULT_TOTP_CODE_LENGTH
-		])['mfaids'][0];
-
-		// Enable TOTP and set it as the default MFA method.
-		CDataHelper::call('authentication.update', [
-			'mfa_status' => MFA_ENABLED,
-			'mfaid' => self::$mfa_id // set as default
-		]);
-
-		// Create a user group for testing MFA.
-		self::$usergroup_id = CDataHelper::call('usergroup.create', [
-			'name' => 'TOTP group',
-			'mfa_status' => MFA_ENABLED
-		])['usrgrpids'][0];
-
-		// Create a user for testing MFA.
-		self::$user_id = CDataHelper::call('user.create', [
-			'username' => self::USER_NAME,
-			'passwd' => self::USER_PASS,
-			'roleid'=> 1, // User role
-			'usrgrps' => [['usrgrpid' => self::$usergroup_id]]
-		])['userids'][0];
-	}
 
 	/**
 	 * Assert elements and layout in the enroll form (the form with QR code).
@@ -99,7 +46,8 @@ class testFormTotpEnroll extends CWebTest {
 		$this->assertTrue($container->query('xpath:.//div[text()="Scan this QR code"]')->one()->isVisible());
 		// Assert subtitle.
 		$subtitle = 'Please scan and get your verification code displayed in your authenticator app.';
-		$this->assertTrue($container->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($subtitle).']')->one()->isVisible());
+		$this->assertTrue($container->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($subtitle).']')
+			->one()->isVisible());
 
 		// Assert the QR code and get the secret.
 		$qr_code = $container->query('class:qr-code')->one();
@@ -178,7 +126,8 @@ class testFormTotpEnroll extends CWebTest {
 				[
 					// Incorrect code - number.
 					'expected' => TEST_BAD,
-					'totp' => '999999', // correct once in a million times, but it is better to test with the expected length
+					// Correct once in a million times, but it is better to test with a realistic TOTP.
+					'totp' => '999999',
 					'error' => 'The verification code was incorrect, please try again.'
 				]
 			],
@@ -381,32 +330,17 @@ class testFormTotpEnroll extends CWebTest {
 
 			if ($i !== self::BLOCK_COUNT) {
 				// Validate the error message first n minus 1 times.
-				$this->assertEquals('The verification code was incorrect, please try again.', $form->query('class:red')->one()->getText());
+				$this->assertEquals('The verification code was incorrect, please try again.',
+					$form->query('class:red')->one()->getText()
+				);
 			} else {
 				// Validate the blocking message on n-th time.
 				$this->page->waitUntilReady();
-				$this->assertMessage(TEST_BAD, 'You are not logged in', 'Incorrect user name or password or account is temporarily blocked.');
+				$this->assertMessage(TEST_BAD, 'You are not logged in',
+						'Incorrect user name or password or account is temporarily blocked.'
+				);
 			}
 		}
-	}
-
-	/**
-	 * Builds the QR code's URL as a regex string. Regex, because the secret string is not known.
-	 *
-	 * @param string $method_name    The expected TOTP method name.
-	 * @param string $user_name      User that is trying to enroll.
-	 * @param int    $algorithm      The expected TOTP Cryptographic algorithm.
-	 * @param int    $digits         The expected TOTP code length, number of digits.
-	 *
-	 * @return string    Regex that matches the expected QR code's URL.
-	 */
-	protected function buildExpectedQrCodeUrlRegex($method_name = self::DEFAULT_METHOD_NAME, $user_name = self::USER_NAME,
-			$algorithm = self::DEFAULT_ALGO, $digits = self::DEFAULT_TOTP_CODE_LENGTH) {
-		// The expected QR url should follow this format:
-		// otpauth://totp/{method-name}:{user-name}?secret={secret}&issuer={method-name}&algorithm={algo}&digits={digits}&period=30
-		$regex = '@^otpauth:\/\/totp\/'.preg_quote($method_name).':'.$user_name.'\?secret=(['.CMfaTotpHelper::VALID_BASE32_CHARS.
-				']{32})&issuer='.preg_quote($method_name).'&algorithm='.self::$algo_ui_map[$algorithm].'&digits='.$digits.'&period=30$@';
-		return $regex;
 	}
 
 	/**
@@ -421,8 +355,8 @@ class testFormTotpEnroll extends CWebTest {
 	 *
 	 * @return string    The TOTP secret this QR code shows.
 	 */
-	protected function validateQrCodeAndExtractSecret($qr_code = null, $method_name = self::DEFAULT_METHOD_NAME, $user_name = self::USER_NAME,
-			$algorithm = self::DEFAULT_ALGO, $digits = self::DEFAULT_TOTP_CODE_LENGTH) {
+	protected function validateQrCodeAndExtractSecret($qr_code = null, $method_name = self::DEFAULT_METHOD_NAME,
+			$user_name = self::USER_NAME, $algorithm = self::DEFAULT_ALGO, $digits = self::DEFAULT_TOTP_CODE_LENGTH) {
 		if ($qr_code === null) {
 			$qr_code = $this->page->query('class:qr-code')->one();
 		}
@@ -459,23 +393,6 @@ class testFormTotpEnroll extends CWebTest {
 	}
 
 	/**
-	 * Resets the TOTP configuration and secret.
-	 */
-	protected function resetTotpConfiguration($name = self::DEFAULT_METHOD_NAME, $hash_function = self::DEFAULT_ALGO,
-			$code_length = self::DEFAULT_TOTP_CODE_LENGTH) {
-		// Set the needed MFA configuration via API.
-		CDataHelper::call('mfa.update', [
-			'mfaid' => self::$mfa_id,
-			'name' => $name,
-			'hash_function' => $hash_function,
-			'code_length' => $code_length
-		]);
-
-		// Makes sure the user is not already enrolled.
-		CDataHelper::call('user.resettotp', [self::$user_id]);
-	}
-
-	/**
 	 * Asserts the description text under the QR code.
 	 *
 	 * @param CElement $container    Container element that should contain the description.
@@ -492,12 +409,5 @@ class testFormTotpEnroll extends CWebTest {
 		// Assert the secret is visible.
 		$this->assertTrue($container->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($secret).']')
 			->one()->isVisible());
-	}
-
-	/**
-	 * Checks that the user has successfully logged in.
-	 */
-	protected function verifyLoggedIn() {
-		$this->assertTrue($this->query('xpath://aside[@class="sidebar"]//a[text()="User settings"]')->exists());
 	}
 }
