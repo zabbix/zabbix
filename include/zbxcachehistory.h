@@ -140,6 +140,7 @@ size_t	zbx_dc_flush_history(void);
 void	zbx_hc_pop_items(zbx_vector_hc_item_ptr_t *history_items);
 void	zbx_hc_get_item_values(zbx_dc_history_t *history, zbx_vector_hc_item_ptr_t *history_items);
 void	zbx_hc_push_items(zbx_vector_hc_item_ptr_t *history_items);
+int	zbx_hc_clear_item_middle(zbx_uint64_t itemid);
 int	zbx_hc_queue_get_size(void);
 int	zbx_hc_get_history_compression_age(void);
 double	zbx_hc_mem_pused(void);
