@@ -7514,7 +7514,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	int		i, changelog_num, dberr = ZBX_DB_FAIL;
 	double		sec, update_sec, queues_sec, changelog_sec;
 
-	zbx_dbsync_t	config_sync, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
+	zbx_dbsync_t	config_settings, hosts_sync, hi_sync, htmpl_sync, gmacro_sync, hmacro_sync, if_sync, items_sync,
 			item_discovery_sync, triggers_sync, tdep_sync,
 			func_sync, expr_sync, action_sync, action_op_sync, action_condition_sync, trigger_tag_sync,
 			item_tag_sync, host_tag_sync, correlation_sync, corr_condition_sync, corr_operation_sync,
@@ -7570,7 +7570,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	changelog_sec = zbx_time() - sec;
 
 	/* global configuration must be synchronized directly with database */
-	zbx_dbsync_init(&config_sync, "config", ZBX_DBSYNC_INIT);
+	zbx_dbsync_init(&config_settings, "settings", ZBX_DBSYNC_INIT);
 
 	zbx_dbsync_init(&autoreg_config_sync, "config_autoreg_tls", mode);
 	zbx_dbsync_init(&autoreg_host_sync, "autoreg_host", mode);
@@ -7626,7 +7626,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 
 	zbx_dbsync_init_changelog(&proxy_sync, "proxy", changelog_sync_mode);
 
-	if (FAIL == zbx_dbsync_compare_settings(&config_sync))
+	if (FAIL == zbx_dbsync_compare_settings(&config_settings))
 		goto out;
 
 	if (FAIL == zbx_dbsync_compare_autoreg_psk(&autoreg_config_sync))
@@ -7641,7 +7641,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	/* sync global configuration settings */
 	START_SYNC;
 
-	dc_sync_settings(&config_sync, new_revision);
+	dc_sync_settings(&config_settings, new_revision);
 
 	/* must be done in the same cache locking with config sync */
 	DCsync_autoreg_config(&autoreg_config_sync, new_revision);
@@ -8142,7 +8142,7 @@ out:
 				" please check \"StartConnectors\" configuration parameter");
 	}
 clean:
-	zbx_dbsync_clear(&config_sync);
+	zbx_dbsync_clear(&config_settings);
 	zbx_dbsync_clear(&autoreg_config_sync);
 	zbx_dbsync_clear(&autoreg_host_sync);
 	zbx_dbsync_clear(&hosts_sync);
