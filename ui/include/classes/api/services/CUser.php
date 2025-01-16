@@ -1464,16 +1464,13 @@ class CUser extends CApiService {
 
 		$ldapValidator = new CLdapAuthValidator(['conf' => $cnf]);
 
-		if ($ldapValidator->validate($user)) {
-			return true;
-		}
-		else {
-			self::exception($ldapValidator->isConnectionError()
-					? ZBX_API_ERROR_PARAMETERS
-					: ZBX_API_ERROR_PERMISSIONS,
-				$ldapValidator->getError()
+		if (!$ldapValidator->validate($user)) {
+			self::exception($ldapValidator->isConnectionError() ? ZBX_API_ERROR_PARAMETERS : ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect user name or password or account is temporarily blocked.')
 			);
 		}
+
+		return true;
 	}
 
 	public function logout($user) {
@@ -1589,22 +1586,13 @@ class CUser extends CApiService {
 		}
 
 		try {
-			switch ($group_to_auth_map[$db_user['gui_access']]) {
-				case ZBX_AUTH_LDAP:
-					$this->ldapLogin($user);
-					break;
-
-				case ZBX_AUTH_INTERNAL:
-					if (!self::verifyPassword($user['password'], $db_user)) {
-						self::exception(ZBX_API_ERROR_PERMISSIONS,
-							_('Incorrect user name or password or account is temporarily blocked.')
-						);
-					}
-					break;
-
-				default:
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions for system access.'));
-					break;
+			if ($group_to_auth_map[$db_user['gui_access']] == ZBX_AUTH_LDAP) {
+				$this->ldapLogin($user);
+			}
+			elseif (!self::verifyPassword($user['password'], $db_user)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('Incorrect user name or password or account is temporarily blocked.')
+				);
 			}
 		}
 		catch (APIException $e) {
@@ -1629,17 +1617,9 @@ class CUser extends CApiService {
 				self::addAuditLogByUser($db_user['userid'], $db_user['userip'], $db_user['username'],
 					CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER
 				);
-
-				if ($group_to_auth_map[$db_user['gui_access']] == ZBX_AUTH_INTERNAL) {
-					self::equalizeUserVerificationTime();
-				}
-
-				if ($attempt_failed >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS,
-						_('Incorrect user name or password or account is temporarily blocked.')
-					);
-				}
 			}
+
+			self::equalizeUserVerificationTime();
 
 			self::exception(ZBX_API_ERROR_PERMISSIONS, $e->getMessage());
 		}
