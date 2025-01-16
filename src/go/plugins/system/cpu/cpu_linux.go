@@ -58,7 +58,7 @@ func init() {
 	}
 }
 
-// Period - interface function.
+// Period returns 1, for a required interface call for interface Collector.
 func (*Plugin) Period() int {
 	return 1
 }
