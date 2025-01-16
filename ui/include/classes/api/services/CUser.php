@@ -24,9 +24,18 @@
  */
 class CUser extends CApiService {
 
+	/**
+	 * Acceptable execution time of user verification process in seconds.
+	 *
+	 * @var float
+	 */
+	public const ACCEPTABLE_USER_VERIFICATION_TIME = 1.0;
+
 	protected $tableName = 'users';
 	protected $tableAlias = 'u';
 	protected $sortColumns = ['userid', 'alias'];
+
+	private static $user_verification_start_time;
 
 	/**
 	 * Get users data.
@@ -1213,6 +1222,8 @@ class CUser extends CApiService {
 	 * @return string|array
 	 */
 	public function login(array $user) {
+		self::$user_verification_start_time = microtime(true);
+
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'user' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
 			'password' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
@@ -1230,18 +1241,25 @@ class CUser extends CApiService {
 			GROUP_GUI_ACCESS_DISABLED => $config['authentication_type']
 		];
 
-		$db_user = $this->findByAlias($user['user'], ($config['ldap_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE),
-			$config['authentication_type'], true
-		);
+		try {
+			$db_user = $this->findByAlias($user['user'], ($config['ldap_case_sensitive'] == ZBX_AUTH_CASE_SENSITIVE),
+				$config['authentication_type'], true
+			);
 
-		if ($db_user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
-			$sec_left = ZBX_LOGIN_BLOCK - (time() - $db_user['attempt_clock']);
+			if ($db_user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
+				$sec_left = ZBX_LOGIN_BLOCK - (time() - $db_user['attempt_clock']);
 
-			if ($sec_left > 0) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('Incorrect user name or password or account is temporarily blocked.')
-				);
+				if ($sec_left > 0) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS,
+						_('Incorrect user name or password or account is temporarily blocked.')
+					);
+				}
 			}
+		}
+		catch (APIException $e) {
+			self::equalizeUserVerificationTime();
+
+			throw $e;
 		}
 
 		try {
@@ -1281,6 +1299,10 @@ class CUser extends CApiService {
 				$db_user['userip']
 			);
 
+			if ($group_to_auth_map[$db_user['gui_access']] == ZBX_AUTH_INTERNAL) {
+				self::equalizeUserVerificationTime();
+			}
+
 			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS && $db_user['attempt_failed'] >= ZBX_LOGIN_ATTEMPTS) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('Incorrect user name or password or account is temporarily blocked.')
@@ -1290,8 +1312,12 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, $e->getMessage());
 		}
 
+		if ($db_user['users_status'] == GROUP_STATUS_DISABLED) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
+		}
+
 		// Start session.
-		unset($db_user['passwd']);
+		unset($db_user['passwd'], $db_user['users_status']);
 		$db_user = self::createSession($user['user'], $db_user);
 		self::$userData = $db_user;
 
@@ -1344,7 +1370,11 @@ class CUser extends CApiService {
 
 		$db_user = $this->findByAlias($alias, $case_sensitive, $default_auth, false);
 
-		unset($db_user['passwd']);
+		if ($db_user['users_status'] == GROUP_STATUS_DISABLED) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
+		}
+
+		unset($db_user['passwd'], $db_user['users_status']);
 		$db_user = self::createSession($alias, $db_user);
 		self::$userData = $db_user;
 
@@ -1627,7 +1657,7 @@ class CUser extends CApiService {
 		}
 
 		if (!$db_users) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_('Incorrect user name or password or account is temporarily blocked.')
 			);
 		}
@@ -1640,14 +1670,27 @@ class CUser extends CApiService {
 		$db_user = reset($db_users);
 		$usrgrps = $this->getUserGroupsData($db_user['userid']);
 
-		if ($usrgrps['users_status'] == GROUP_STATUS_DISABLED) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
-		}
-
 		$db_user['debug_mode'] = $usrgrps['debug_mode'];
 		$db_user['userip'] = $usrgrps['userip'];
 		$db_user['gui_access'] = $usrgrps['gui_access'];
+		$db_user['users_status'] = $usrgrps['users_status'];
 
 		return $db_user;
+	}
+
+	/**
+	 * Equalizes user verification time to mitigate timing attacks.
+	 */
+	private static function equalizeUserVerificationTime(): void {
+		$actual_time = microtime(true) - self::$user_verification_start_time;
+
+		if ($actual_time < self::ACCEPTABLE_USER_VERIFICATION_TIME) {
+			$delay_time = self::ACCEPTABLE_USER_VERIFICATION_TIME - $actual_time;
+
+			$delay_time_sec = (int) $delay_time;
+			$delay_time_nsec = (int) (($delay_time - $delay_time_sec) * 10**9);
+
+			time_nanosleep($delay_time_sec, $delay_time_nsec);
+		}
 	}
 }
