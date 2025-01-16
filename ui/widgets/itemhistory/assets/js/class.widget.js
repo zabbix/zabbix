@@ -31,8 +31,10 @@ class CWidgetItemHistory extends CWidget {
 
 	#scroll_bottom = true;
 
-	#content_height = null;
-	#content_width = null;
+	#contents_client_height = null;
+	#contents_client_width = null;
+	#contents_scroll_height = null;
+	#contents_scroll_width = null;
 
 	#selected_itemid = null;
 	#selected_clock = null;
@@ -43,19 +45,16 @@ class CWidgetItemHistory extends CWidget {
 			this._events = {
 				...this._events,
 				scrollHandler: () => {
-					if (this.#content_height == this._contents.clientHeight
-							&& this.#content_width == this._contents.clientWidth) {
-						const contents_scroll = this._contents.clientHeight + this._contents.scrollTop + 1;
-
-						this.#scroll_bottom = contents_scroll > this._contents.scrollHeight;
+					if (!this.#hasContentsDimensionsChanged()) {
+						const contents_scroll = this._contents.clientHeight + this._contents.scrollTop + 2;
+						this.#scroll_bottom = contents_scroll >= this._contents.scrollHeight;
 					}
 
 					if (this.#scroll_bottom) {
 						this._contents.scrollTop = this._contents.scrollHeight + 1;
 					}
 
-					this.#content_height = this._contents.clientHeight;
-					this.#content_width = this._contents.clientWidth;
+					this.#updateContentsDimensions();
 				}
 			};
 		}
@@ -76,8 +75,6 @@ class CWidgetItemHistory extends CWidget {
 	}
 
 	setContents(response) {
-		const scroll_bottom = this.#scroll_bottom;
-
 		super.setContents(response);
 
 		if (this.#abort_controller !== null) {
@@ -146,12 +143,11 @@ class CWidgetItemHistory extends CWidget {
 		}
 
 		if (this._fields.sortorder === CWidgetItemHistory.NEW_VALUES_BOTTOM) {
-			if (scroll_bottom) {
+			if (this.#scroll_bottom) {
 				this._contents.scrollTop = this._contents.scrollHeight + 1;
 			}
 
-			this.#content_height = this._contents.clientHeight;
-			this.#content_width = this._contents.clientWidth;
+			this.#updateContentsDimensions();
 		}
 	}
 
@@ -192,9 +188,22 @@ class CWidgetItemHistory extends CWidget {
 				this._contents.scrollTop = this._contents.scrollHeight + 1;
 			}
 
-			this.#content_height = this._contents.clientHeight;
-			this.#content_width = this._contents.clientWidth;
+			this.#updateContentsDimensions();
 		}
+	}
+
+	#hasContentsDimensionsChanged() {
+		return this.#contents_client_height !== this._contents.clientHeight
+			|| this.#contents_client_width !== this._contents.clientWidth
+			|| this.#contents_scroll_height !== this._contents.scrollHeight
+			|| this.#contents_scroll_width !== this._contents.scrollWidth;
+	}
+
+	#updateContentsDimensions() {
+		this.#contents_client_height = this._contents.clientHeight;
+		this.#contents_client_width = this._contents.clientWidth;
+		this.#contents_scroll_height = this._contents.scrollHeight;
+		this.#contents_scroll_width = this._contents.scrollWidth;
 	}
 
 	#broadcast() {
