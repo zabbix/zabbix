@@ -233,11 +233,10 @@ class CUser extends CApiService {
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['roleid'], $options['output']);
-		}
 
-		// removing keys
-		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
+			if (!$options['preservekeys']) {
+				$result = array_values($result);
+			}
 		}
 
 		return $result;
