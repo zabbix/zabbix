@@ -178,7 +178,7 @@ class testConfiguration extends CAPITest {
 			[
 				[
 					'options' => [
-							'groups' => []
+						'groups' => []
 					],
 					'prettyprint' => true
 				]
@@ -186,7 +186,7 @@ class testConfiguration extends CAPITest {
 			[
 				[
 					'options' => [
-							'groups' => ['11111111111111']
+						'groups' => ['11111111111111']
 					],
 					'prettyprint' => true
 				]
@@ -194,7 +194,7 @@ class testConfiguration extends CAPITest {
 			[
 				[
 					'options' => [
-							'groups' => ['50012']
+						'groups' => ['50012']
 					],
 					'prettyprint' => true
 				]
