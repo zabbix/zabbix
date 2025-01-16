@@ -188,6 +188,7 @@ require_once dirname(__FILE__).'/mediaTypes/testPageAdministrationMediaTypes.php
 
 // MFA.
 require_once dirname(__FILE__).'/mfa/testFormTotpEnroll.php';
+require_once dirname(__FILE__).'/mfa/testFormTotpValidate.php';
 
 // Multiselects.
 require_once dirname(__FILE__).'/multiselects/testMultiselects.php';
@@ -528,6 +529,7 @@ class SeleniumTests {
 
 		// MFA.
 		$suite->addTestSuite('testFormTotpEnroll');
+		$suite->addTestSuite('testFormTotpValidate');
 
 		// Multiselects.
 		$suite->addTestSuite('testMultiselects');

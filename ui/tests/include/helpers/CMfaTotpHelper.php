@@ -103,6 +103,16 @@ class CMfaTotpHelper {
 	}
 
 	/**
+	 * @param string $secret    The secret string that must be validated.
+	 *
+	 * @return bool    True if the string is a valid TOTP secret (in the context of Zabbix).
+	 */
+	public static function isValidSecretString($secret) {
+		$pattern = '/^['.self::VALID_BASE32_CHARS.']{16,32}$/';
+		return preg_match($pattern, $secret) === 1;
+	}
+
+	/**
 	 * TOTP secrets are encoded in Base32. To generate a token, the secret needs to be decoded.
 	 *
 	 * @param string $base32_secret    Base32 secret string to be decoded.
