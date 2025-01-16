@@ -110,13 +110,14 @@ func (p *Plugin) Start() {
 				return
 			case <-t.C:
 				p.Debugf("starting to collect performance counters data")
-				err := p.collectPerfCounterData()
 
+				err := p.collectPerfCounterData()
 				if err != nil {
 					p.Warningf("failed to get performance counters data: '%s'", err)
-				} else {
-					p.Debugf("collected performance counters data")
+					continue
 				}
+
+				p.Debugf("collected performance counters data")
 			}
 		}
 	}()
