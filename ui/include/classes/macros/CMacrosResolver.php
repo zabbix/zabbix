@@ -1001,11 +1001,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				'item' => ['{ITEM.DESCRIPTION}', '{ITEM.DESCRIPTION.ORIG}', '{ITEM.ID}', '{ITEM.KEY}',
 					'{ITEM.KEY.ORIG}', '{ITEM.NAME}', '{ITEM.NAME.ORIG}', '{ITEM.STATE}', '{ITEM.VALUETYPE}'
 				],
-				'item_value' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}', '{ITEM.VALUE.DATE}', '{ITEM.VALUE.TIME}',
-					'{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
-					'{ITEM.LASTVALUE.TIMESTAMP}', '{ITEM.LASTVALUE.AGE}', '{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}',
+				'item_value' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}', '{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}',
 					'{ITEM.LOG.TIMESTAMP}', '{ITEM.LOG.AGE}', '{ITEM.LOG.SOURCE}', '{ITEM.LOG.SEVERITY}',
 					'{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
+				],
+				'item_time' => ['{ITEM.VALUE.DATE}', '{ITEM.VALUE.TIME}', '{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}',
+					'{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}', '{ITEM.LASTVALUE.TIMESTAMP}',
+					'{ITEM.LASTVALUE.AGE}'
 				],
 				'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap())
 			],
@@ -1013,8 +1015,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		$macro_values = [];
-		$macros =
-			['host' => [], 'interface' => [], 'item' => [], 'item_value' => [], 'inventory' => [], 'usermacros' => []];
+		$macros = ['host' => [], 'interface' => [], 'item' => [], 'item_value' => [], 'item_time' => [],
+			'inventory' => [], 'usermacros' => []
+		];
 
 		foreach ($items as $itemid => $item) {
 			$matched_macros = self::extractMacros(array_intersect_key($item, $fields), $types);
@@ -1037,6 +1040,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = self::getInterfaceMacrosByItemId($macros['interface'], $macro_values);
 		$macro_values = self::getItemMacrosByItemId($macros['item'], $macro_values);
 		$macro_values = self::getItemValueMacrosByItemId($macros['item_value'], $macro_values);
+		$macro_values = self::getItemTimeMacrosByItemId($macros['item_time'], $macro_values);
 		$macro_values = self::getInventoryMacrosByItemId($macros['inventory'], $macro_values);
 		$macro_values = self::getUserMacros($macros['usermacros'], $macro_values);
 

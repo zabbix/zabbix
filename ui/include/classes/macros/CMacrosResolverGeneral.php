@@ -982,42 +982,10 @@ class CMacrosResolverGeneral {
 			CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)
 		));
 
-		$item_value_macros = ['ITEM.VALUE', 'ITEM.VALUE.DATE', 'ITEM.VALUE.TIME', 'ITEM.VALUE.TIMESTAMP',
-			'ITEM.VALUE.AGE'
-		];
-		$item_lastvalue_macros = ['ITEM.LASTVALUE', 'ITEM.LASTVALUE.DATE', 'ITEM.LASTVALUE.TIME',
-			'ITEM.LASTVALUE.TIMESTAMP', 'ITEM.LASTVALUE.AGE'
-		];
-
 		foreach ($history as $itemid => $item_history) {
 			foreach ($macros[$itemid] as $macro => $tokens) {
-				if (in_array($macro, array_merge($item_value_macros, $item_lastvalue_macros))) {
-					switch ($macro) {
-						case 'ITEM.VALUE':
-						case 'ITEM.LASTVALUE':
-							$value = $item_history[0]['value'];
-							break;
-
-						case 'ITEM.VALUE.DATE':
-						case 'ITEM.LASTVALUE.DATE':
-							$value = date('Y.m.d', $history[$itemid][0]['clock']);
-							break;
-
-						case 'ITEM.VALUE.TIME':
-						case 'ITEM.LASTVALUE.TIME':
-							$value = date('H:i:s', $history[$itemid][0]['clock']);
-							break;
-
-						case 'ITEM.VALUE.TIMESTAMP':
-						case 'ITEM.LASTVALUE.TIMESTAMP':
-							$value = $history[$itemid][0]['clock'];
-							break;
-
-						case 'ITEM.VALUE.AGE':
-						case 'ITEM.LASTVALUE.AGE':
-							$value = zbx_date2age($history[$itemid][0]['clock']);
-							break;
-					}
+				if ($macro === 'ITEM.VALUE' || $macro === 'ITEM.LASTVALUE') {
+					$value = $item_history[0]['value'];
 
 					foreach ($tokens as $token) {
 						$macro_values[$itemid][$token['token']] = array_key_exists('macrofunc', $token)
@@ -1065,6 +1033,76 @@ class CMacrosResolverGeneral {
 							? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
 							: $value;
 					}
+				}
+			}
+		}
+
+		return $macro_values;
+	}
+
+	/**
+	 * Get item time macros by itemid.
+	 *
+	 * @param array  $macros
+	 * @param array  $macros[<itemid>]
+	 * @param array  $macros[<itemid>][<macro>]
+	 * @param array  $macros[<itemid>][<macro>][]
+	 * @param string $macros[<itemid>][<macro>][]['token']
+	 * @param array  $macros[<itemid>][<macro>][]['macrofunc']
+	 * @param array  $macro_values
+	 *
+	 * @return array
+	 */
+	protected static function getItemTimeMacrosByItemId(array $macros, array $macro_values) {
+		if (!$macros) {
+			return $macro_values;
+		}
+
+		$db_items = API::Item()->get([
+			'output' => ['itemid', 'value_type'],
+			'itemids' => array_keys($macros),
+			'webitems' => true,
+			'preservekeys' => true
+		]);
+		$db_items = self::getItemsValueMaps($db_items);
+
+		$history = Manager::History()->getLastValues($db_items, 1, timeUnitToSeconds(
+			CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)
+		));
+
+		foreach ($history as $itemid => $item_history) {
+			foreach ($macros[$itemid] as $macro => $tokens) {
+				switch ($macro) {
+					case 'ITEM.VALUE':
+					case 'ITEM.LASTVALUE':
+						$value = $item_history[0]['value'];
+						break;
+
+					case 'ITEM.VALUE.DATE':
+					case 'ITEM.LASTVALUE.DATE':
+						$value = date('Y.m.d', $history[$itemid][0]['clock']);
+						break;
+
+					case 'ITEM.VALUE.TIME':
+					case 'ITEM.LASTVALUE.TIME':
+						$value = date('H:i:s', $history[$itemid][0]['clock']);
+						break;
+
+					case 'ITEM.VALUE.TIMESTAMP':
+					case 'ITEM.LASTVALUE.TIMESTAMP':
+						$value = $history[$itemid][0]['clock'];
+						break;
+
+					case 'ITEM.VALUE.AGE':
+					case 'ITEM.LASTVALUE.AGE':
+						$value = zbx_date2age($history[$itemid][0]['clock']);
+						break;
+				}
+
+				foreach ($tokens as $token) {
+					$macro_values[$itemid][$token['token']] = array_key_exists('macrofunc', $token)
+						? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
+						: $value;
 				}
 			}
 		}
