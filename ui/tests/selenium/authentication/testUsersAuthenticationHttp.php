@@ -140,10 +140,10 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check' => [
-						'http_auth_enabled' => '0',
-						'http_login_form' => '0',
+						'http_auth_enabled' => 0,
+						'http_login_form' => 0,
 						'http_strip_domains' => '',
-						'http_case_sensitive' => '1'
+						'http_case_sensitive' => 1
 					]
 				]
 			],
@@ -189,10 +189,10 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check' => [
-						'http_auth_enabled' => '1',
-						'http_login_form' => '0',
+						'http_auth_enabled' => 1,
+						'http_login_form' => 0,
 						'http_strip_domains' => '',
-						'http_case_sensitive' => '1'
+						'http_case_sensitive' => 1
 					]
 				]
 			],
@@ -249,10 +249,10 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check' => [
-						'http_auth_enabled' => '1',
-						'http_login_form' => '0',
+						'http_auth_enabled' => 1,
+						'http_login_form' => 0,
 						'http_strip_domains' => '',
-						'http_case_sensitive' => '1'
+						'http_case_sensitive' => 1
 					]
 				]
 			],
@@ -307,10 +307,10 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check' => [
-						'http_auth_enabled' => '1',
-						'http_login_form' => '1',
+						'http_auth_enabled' => 1,
+						'http_login_form' => 1,
 						'http_strip_domains' => '',
-						'http_case_sensitive' => '1'
+						'http_case_sensitive' => 1
 					]
 				]
 			],
@@ -344,10 +344,10 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check' => [
-						'http_auth_enabled' => '1',
-						'http_login_form' => '1',
+						'http_auth_enabled' => 1,
+						'http_login_form' => 1,
 						'http_strip_domains' => 'local.com',
-						'http_case_sensitive' => '1'
+						'http_case_sensitive' => 1
 					]
 				]
 			],
@@ -400,10 +400,10 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check' => [
-						'http_auth_enabled' => '1',
-						'http_login_form' => '1',
+						'http_auth_enabled' => 1,
+						'http_login_form' => 1,
 						'http_strip_domains' => 'local.com',
-						'http_case_sensitive' => '1'
+						'http_case_sensitive' => 1
 					]
 				]
 			],
@@ -457,10 +457,10 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check' => [
-						'http_auth_enabled' => '1',
-						'http_login_form' => '1',
+						'http_auth_enabled' => 1,
+						'http_login_form' => 1,
 						'http_strip_domains' => 'local.com',
-						'http_case_sensitive' => '1'
+						'http_case_sensitive' => 1
 					]
 				]
 			],
@@ -482,10 +482,10 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check'  => [
-						'http_auth_enabled' => '1',
-						'http_login_form' => '0',
+						'http_auth_enabled' => 1,
+						'http_login_form' => 0,
 						'http_strip_domains' => '',
-						'http_case_sensitive' => '1'
+						'http_case_sensitive' => 1
 					]
 				]
 			],
@@ -508,10 +508,10 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 						]
 					],
 					'db_check'  => [
-						'http_auth_enabled' => '1',
-						'http_login_form' => '0',
+						'http_auth_enabled' => 1,
+						'http_login_form' => 0,
 						'http_strip_domains' => '',
-						'http_case_sensitive' => '0'
+						'http_case_sensitive' => 0
 					]
 				]
 			]
