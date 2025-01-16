@@ -2115,7 +2115,7 @@ class testFormHost extends CWebTest {
 		$table->waitUntilReloaded();
 
 		$host_link = $table->findRow('Name', $host, true)->getColumn('Name')
-				->query($this->monitoring ? 'tag:a' : 'xpath:.//a[@data-action="host.edit"]')->waitUntilClickable();
+				->query($this->monitoring ? 'tag:a' : 'xpath:.//a')->waitUntilClickable();
 
 		if ($this->monitoring) {
 			$host_link->asPopupButton()->one()->select('Host');
@@ -2139,12 +2139,8 @@ class testFormHost extends CWebTest {
 	}
 
 	public function checkDiscoveredHostLayout() {
-		$form = $this->openForm((
-				($this->standalone)
-					? $this->link.CDataHelper::get('DiscoveredHosts.discovered_hostid')
-					: $this->link
-				), self::DISCOVERED_HOST
-		);
+		$this->page->login()->open('zabbix.php?action=popup&popup=host.edit&hostid=90000079')->waitUntilReady();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 		$form_type = ($this->standalone) ? $form : COverlayDialogElement::find()->waitUntilReady()->one();
 
 		// Check tabs available in the form.
