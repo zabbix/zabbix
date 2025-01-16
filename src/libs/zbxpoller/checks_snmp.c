@@ -2353,8 +2353,8 @@ static int	snmp_bulkwalk_parse_param(const char *snmp_oid, zbx_vector_snmp_oid_t
 	if (NULL == snmp_parse_oid(oid_translated, root_oid->root_oid, &root_oid->root_oid_len))
 	{
 		zbx_free(root_oid);
-		zbx_snprintf(error, max_error_len, "snmp_parse_oid(): cannot parse OID \"%s\".",
-				oid_translated);
+		zbx_snprintf(error, max_error_len, "snmp_parse_oid(): cannot parse OID \"%s\": %s",
+				oid_translated, snmp_api_errstring(SNMPERR_GENERR));
 		return FAIL;
 	}
 
