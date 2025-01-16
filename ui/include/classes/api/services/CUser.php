@@ -2279,15 +2279,9 @@ class CUser extends CApiService {
 			$delay_time = self::ACCEPTABLE_USER_VERIFICATION_TIME - $actual_time;
 
 			$delay_time_sec = (int) $delay_time;
-			$delay_time_usec = (int) (($delay_time - $delay_time_sec) * 10**6);
+			$delay_time_nsec = (int) (($delay_time - $delay_time_sec) * 10**9);
 
-			if ($delay_time_sec) {
-				sleep($delay_time_sec);
-			}
-
-			if ($delay_time_usec) {
-				usleep($delay_time_usec);
-			}
+			time_nanosleep($delay_time_sec, $delay_time_nsec);
 		}
 	}
 }
