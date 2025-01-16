@@ -15,7 +15,7 @@
 
 
 class CSvgGraphMetricsPoint extends CSvgGroup {
-
+	public const Y_OUT_OF_RANGE = -10;
 	private const ZBX_STYLE_CLASS = 'svg-graph-points';
 
 	private $path;
@@ -54,7 +54,7 @@ class CSvgGraphMetricsPoint extends CSvgGroup {
 
 	protected function draw(): void {
 		$this->addItem(
-			(new CSvgCircle(-10, -10, $this->options['pointsize'] + 4))
+			(new CSvgCircle(-10, self::Y_OUT_OF_RANGE, $this->options['pointsize'] + 4))
 				->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE)
 		);
 
