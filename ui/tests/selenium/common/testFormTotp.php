@@ -80,10 +80,8 @@ class testFormTotp extends CWebTest {
 	}
 
 	/**
-	 * The Enroll anb Verify forms share a lot of elements.
-	 * This is for only having to test them once.
-	 *
-	 * @param CElement $container
+	 * The Enroll and Verify forms share a lot of elements.
+	 * This is for reusing code.
 	 */
 	protected function testTotpLayout () {
 		// Container of most elements.
@@ -127,6 +125,9 @@ class testFormTotp extends CWebTest {
 		$this->assertEquals(1, preg_match('/^© 2001–20\d\d, Zabbix SIA$/', $copyright->getText()));
 	}
 
+	/**
+	 * Blocking logic is shared in Enroll and Verify forms.
+	 */
 	public function testTotpBlocking() {
 		// Open the form.
 		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
@@ -150,6 +151,9 @@ class testFormTotp extends CWebTest {
 				);
 			}
 		}
+
+		// Unblock the user after.
+		CDataHelper::call('user.unblock', [self::$user_id]);
 	}
 
 	/**
