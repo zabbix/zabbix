@@ -124,21 +124,25 @@ func getFsInfo(path string) (fsname, fstype, drivetype, drivelabel string, err e
 }
 
 func getFsStats(path string) (stats *FsStats, err error) {
-	var totalFree, callerFree, total uint64
-	if err = windows.GetDiskFreeSpaceEx(windows.StringToUTF16Ptr(path), &callerFree, &total, &totalFree); err != nil {
+	var callerFree, total uint64
+
+	err = windows.GetDiskFreeSpaceEx(windows.StringToUTF16Ptr(path), &callerFree, &total, nil)
+	if err != nil {
 		return
 	}
-	totalUsed := total - totalFree
+
+	totalUsed := total - callerFree
 	stats = &FsStats{
 		Total: total,
-		Free:  totalFree,
+		Free:  callerFree,
 		Used:  totalUsed,
 	}
 
 	if total != 0 {
-		stats.PFree = float64(totalFree) * 100 / float64(total)
-		stats.PUsed = float64(totalUsed) * 100 / float64(total)
+		stats.PFree = float64(callerFree) * 100.0 / float64(total)
+		stats.PUsed = float64(totalUsed) * 100.0 / float64(total)
 	}
+
 	return
 }
 

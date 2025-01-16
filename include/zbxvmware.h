@@ -386,6 +386,9 @@ typedef struct
 	time_t		interval;	/* last interval of vmware.eventlog[] item */
 	zbx_uint64_t	owner_itemid;	/* single item that will receive all events */
 	int		job_revision;	/* actual revision of the responsible (last created) job */
+	zbx_uint64_t	top_key;	/* id of newest event */
+	zbx_uint64_t	top_time;	/* time of top_key event */
+	int		expect_num;	/* total number of events in the vc queue */
 
 	/* service event log data object that is swapped with new one during service event log update */
 	zbx_vmware_eventlog_data_t	*data;
@@ -557,7 +560,8 @@ typedef struct
 	int				jobs_num;
 
 	/* linked jobs types */
-#define ZBX_VMWARE_REQ				(8*2)
+#define ZBX_VMWARE_REQ				(8)
+#define ZBX_VMWARE_REQ_MASK			(0xFF00)
 #define ZBX_VMWARE_REQ_UPDATE_CONF		(ZBX_VMWARE_UPDATE_CONF		<< ZBX_VMWARE_REQ)
 #define ZBX_VMWARE_REQ_UPDATE_PERFCOUNTERS	(ZBX_VMWARE_UPDATE_PERFCOUNTERS	<< ZBX_VMWARE_REQ)
 #define ZBX_VMWARE_REQ_UPDATE_REST_TAGS		(ZBX_VMWARE_UPDATE_REST_TAGS	<< ZBX_VMWARE_REQ)
@@ -565,6 +569,7 @@ typedef struct
 #define ZBX_VMWARE_REQ_UPDATE_ALL										\
 					(ZBX_VMWARE_REQ_UPDATE_CONF | ZBX_VMWARE_REQ_UPDATE_PERFCOUNTERS |	\
 					ZBX_VMWARE_REQ_UPDATE_REST_TAGS | ZBX_VMWARE_REQ_UPDATE_EVENTLOG)
+#define ZBX_VMWARE_JOB_RUN			(8*2)
 	int				jobs_flag;
 
 	/* vmware entity (vm, hv etc) and linked tags */
