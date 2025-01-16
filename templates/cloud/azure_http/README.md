@@ -17,6 +17,7 @@
 - *Azure PostgreSQL Single Server by HTTP*
 - *Azure Microsoft SQL Serverless Database by HTTP*
 - *Azure Microsoft SQL Database by HTTP*
+- *Azure SQL Managed Instance by HTTP*
 - *Azure Cost Management by HTTP*
 
 ## Requirements
@@ -61,6 +62,10 @@ This template has been tested on:
 |{$AZURE.SCALESET.NAME.NOT.MATCHES}|<p>This macro is used in virtual machine scale sets discovery rule.</p>|`CHANGE_IF_NEEDED`|
 |{$AZURE.SCALESET.LOCATION.MATCHES}|<p>This macro is used in virtual machine scale sets discovery rule.</p>|`.*`|
 |{$AZURE.SCALESET.LOCATION.NOT.MATCHES}|<p>This macro is used in virtual machine scale sets discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.SQL.INST.NAME.MATCHES}|<p>This macro is used in Azure SQL managed instance discovery rule.</p>|`.*`|
+|{$AZURE.SQL.INST.NAME.NOT.MATCHES}|<p>This macro is used in Azure SQL managed instance discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.SQL.INST.LOCATION.MATCHES}|<p>This macro is used in Azure SQL managed instance discovery rule.</p>|`.*`|
+|{$AZURE.SQL.INST.LOCATION.NOT.MATCHES}|<p>This macro is used in Azure SQL managed instance discovery rule.</p>|`CHANGE_IF_NEEDED`|
 |{$AZURE.STORAGE.ACC.NAME.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`.*`|
 |{$AZURE.STORAGE.ACC.NAME.NOT.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`CHANGE_IF_NEEDED`|
 |{$AZURE.STORAGE.ACC.LOCATION.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`.*`|
@@ -180,6 +185,12 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Virtual machine scale set discovery|<p>The list of the virtual machine scale sets provided by the subscription.</p>|Dependent item|azure.scaleset.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### LLD rule Azure SQL managed instance discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Azure SQL managed instance discovery|<p>The list of the Azure SQL managed instances provided by the subscription.</p>|Dependent item|azure.sql_inst.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resources.value`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### LLD rule MySQL servers discovery
 
@@ -1159,6 +1170,89 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Month ["{#AZURE.BILLING.MONTH}"] cost|<p>The monthly cost.</p>|Dependent item|azure.monthly.cost["{#AZURE.BILLING.MONTH}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+
+# Azure SQL managed instance by HTTP
+
+## Overview
+
+This template is designed to monitor Microsoft Azure SQL managed instance by HTTP.
+It works without any external scripts and uses the script item.
+
+## Requirements
+
+Zabbix version: 7.0 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- Azure SQL managed instance
+
+## Configuration
+
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
+
+      `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+
+> See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+
+2. Link the template to a host.
+3. Configure the macros: `{$AZURE.APP.ID}`, `{$AZURE.PASSWORD}`, `{$AZURE.TENANT.ID}`, `{$AZURE.SUBSCRIPTION.ID}`, and `{$AZURE.RESOURCE.ID}`.
+
+### Macros used
+
+|Name|Description|Default|
+|----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
+|{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
+|{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
+|{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
+|{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
+|{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
+|{$AZURE.RESOURCE.ID}|<p>Microsoft Azure SQL managed instance ID.</p>||
+|{$AZURE.SQL.INST.SPACE.CRIT}|<p>Storage space critical threshold, expressed in %.</p>|`90`|
+|{$AZURE.SQL.INST.SPACE.WARN}|<p>Storage space warning threshold, expressed in %.</p>|`80`|
+|{$AZURE.SQL.INST.CPU.WARN}|<p>CPU utilization warning threshold, expressed in %.</p>|`80`|
+|{$AZURE.SQL.INST.CPU.CRIT}|<p>CPU utilization critical threshold, expressed in %.</p>|`90`|
+
+### Items
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Get data|<p>Gathers data of the Azure SQL managed instance.</p>|Script|azure.sql_inst.data.get|
+|Get errors|<p>A list of errors from API requests.</p>|Dependent item|azure.sql_inst.data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Availability state|<p>The availability status of the resource.</p><p>0 - Available - no events detected that affect the health of the resource.</p><p>1 - Degraded  - your resource detected a loss in performance, although it's still available for use.</p><p>2 - Unavailable - the service detected an ongoing platform or non-platform event that affects the health of the resource.</p><p>3 - Unknown - Resource Health hasn't received information about the resource for more than 10 minutes.</p>|Dependent item|azure.sql_inst.availability.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.health.availabilityState`</p><p>⛔️Custom on fail: Set value to: `3`</p></li><li><p>Replace: `Available -> 0`</p></li><li><p>Replace: `Degraded -> 1`</p></li><li><p>Replace: `Unavailable -> 2`</p></li><li><p>Replace: `Unknown -> 3`</p></li><li><p>In range: `0 -> 3`</p><p>⛔️Custom on fail: Set value to: `3`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Availability status detailed|<p>The summary description of availability status.</p>|Dependent item|azure.sql_inst.availability.details<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.health.summary`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Average CPU utilization|<p>Average CPU utilization of the instance.</p>|Dependent item|azure.sql_inst.cpu<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.avg_cpu_percent.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|IO bytes read|<p>Bytes read by the managed instance.</p>|Dependent item|azure.sql_inst.bytes.read<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.io_bytes_read.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|IO bytes write|<p>Bytes written by the managed instance.</p>|Dependent item|azure.sql_inst.bytes.write<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.io_bytes_written.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|IO requests count|<p>IO requests count by the managed instance.</p>|Dependent item|azure.sql_inst.requests<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.io_requests.average`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Storage space reserved|<p>Storage space reserved by managed instance.</p>|Dependent item|azure.sql_inst.storage.reserved<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.reserved_storage_mb.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1048576`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Storage space used|<p>Storage space used by managed instance.</p>|Dependent item|azure.sql_inst.storage.used<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.storage_space_used_mb.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
+|Storage space utilization|<p>Managed instance storage space utilization, in percent.</p>|Calculated|azure.sql_inst.storage.utilization|
+|Virtual core count|<p>Virtual core count available to managed instance.</p>|Dependent item|azure.sql_inst.core.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.virtual_core_count.average`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Instance state|<p>State of the managed instance.</p>|Dependent item|azure.sql_inst.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.instance.properties.state`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Instance collation|<p>Collation of the managed instance.</p>|Dependent item|azure.sql_inst.collation<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.instance.properties.collation`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Instance provisioning state|<p>Provisioning state of the managed instance.</p>|Dependent item|azure.sql_inst.provision<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.instance.properties.provisioningState`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure SQL instance: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure SQL managed instance by HTTP/azure.sql_inst.data.errors))>0`|Average||
+|Azure SQL instance: Azure SQL managed instance is unavailable|<p>The resource state is unavailable.</p>|`last(/Azure SQL managed instance by HTTP/azure.sql_inst.availability.state)=2`|High||
+|Azure SQL instance: Azure SQL managed instance is degraded|<p>The resource is in a degraded state.</p>|`last(/Azure SQL managed instance by HTTP/azure.sql_inst.availability.state)=1`|Average||
+|Azure SQL instance: Azure SQL managed instance is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure SQL managed instance by HTTP/azure.sql_inst.availability.state)=3`|Warning||
+|Azure SQL instance: Critically high CPU utilization|<p>CPU utilization is critically high.</p>|`min(/Azure SQL managed instance by HTTP/azure.sql_inst.cpu, 10m)>={$AZURE.SQL.INST.CPU.CRIT}`|Average|**Depends on**:<br><ul><li>Azure SQL instance: High CPU utilization</li></ul>|
+|Azure SQL instance: High CPU utilization|<p>CPU utilization is too high.</p>|`min(/Azure SQL managed instance by HTTP/azure.sql_inst.cpu, 10m)>={$AZURE.SQL.INST.CPU.WARN}`|Warning||
+|Azure SQL instance: Storage free space is critically low|<p>The storage free space has been less than `{$AZURE.SQL.INST.SPACE.CRIT}`% for 5m.</p>|`min(/Azure SQL managed instance by HTTP/azure.sql_inst.storage.utilization,5m)>{$AZURE.SQL.INST.SPACE.CRIT}`|Average|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Azure SQL instance: Storage free space is low</li></ul>|
+|Azure SQL instance: Storage free space is low|<p>The storage free space has been less than `{$AZURE.SQL.INST.SPACE.WARN}`% for 5m.</p>|`min(/Azure SQL managed instance by HTTP/azure.sql_inst.storage.utilization,5m)>{$AZURE.SQL.INST.SPACE.WARN}`|Warning|**Manual close**: Yes|
+|Azure SQL instance: Instance state has changed|<p>Azure SQL managed instance state has changed.</p>|`change(/Azure SQL managed instance by HTTP/azure.sql_inst.state)=1`|Warning||
+|Azure SQL instance: Instance collation has changed|<p>Azure SQL managed instance collation has changed.</p>|`change(/Azure SQL managed instance by HTTP/azure.sql_inst.collation)=1`|Average||
+|Azure SQL instance: Instance provisioning state has changed|<p>Azure SQL managed instance provisioning state has changed.</p>|`change(/Azure SQL managed instance by HTTP/azure.sql_inst.provision)=1`|Warning||
 
 ## Feedback
 
