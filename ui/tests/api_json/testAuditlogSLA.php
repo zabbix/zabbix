@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,12 +80,15 @@ class testAuditlogSLA extends testAuditlogCommon {
 		]);
 
 		self::$resourceid = $create['result']['slaids'][0];
-		self::$created_tagid = CDBHelper::getRow('SELECT sla_service_tagid FROM sla_service_tag WHERE slaid='
-				.zbx_dbstr(self::$resourceid));
-		self::$created_downtime = CDBHelper::getRow('SELECT sla_excluded_downtimeid FROM sla_excluded_downtime WHERE slaid='
-				.zbx_dbstr(self::$resourceid));
-		self::$created_schedule = CDBHelper::getRow('SELECT sla_scheduleid FROM sla_schedule WHERE slaid='
-				.zbx_dbstr(self::$resourceid));
+		self::$created_tagid = CDBHelper::getRow('SELECT sla_service_tagid FROM sla_service_tag WHERE slaid='.
+				zbx_dbstr(self::$resourceid)
+		);
+		self::$created_downtime = CDBHelper::getRow('SELECT sla_excluded_downtimeid FROM sla_excluded_downtime WHERE slaid='.
+				zbx_dbstr(self::$resourceid)
+		);
+		self::$created_schedule = CDBHelper::getRow('SELECT sla_scheduleid FROM sla_schedule WHERE slaid='.
+				zbx_dbstr(self::$resourceid)
+		);
 
 		$created = json_encode([
 			'sla.name' => ['add', 'Created SLA'],
@@ -157,12 +160,15 @@ class testAuditlogSLA extends testAuditlogCommon {
 			]
 		]);
 
-		$updated_tagid = CDBHelper::getRow('SELECT sla_service_tagid FROM sla_service_tag WHERE slaid='
-				.zbx_dbstr(self::$resourceid));
-		$updated_downtime = CDBHelper::getRow('SELECT sla_excluded_downtimeid FROM sla_excluded_downtime WHERE slaid='
-				.zbx_dbstr(self::$resourceid));
-		$updated_schedule = CDBHelper::getRow('SELECT sla_scheduleid FROM sla_schedule WHERE slaid='
-				.zbx_dbstr(self::$resourceid));
+		$updated_tagid = CDBHelper::getRow('SELECT sla_service_tagid FROM sla_service_tag WHERE slaid='.
+				zbx_dbstr(self::$resourceid)
+		);
+		$updated_downtime = CDBHelper::getRow('SELECT sla_excluded_downtimeid FROM sla_excluded_downtime WHERE slaid='.
+				zbx_dbstr(self::$resourceid)
+		);
+		$updated_schedule = CDBHelper::getRow('SELECT sla_scheduleid FROM sla_schedule WHERE slaid='.
+				zbx_dbstr(self::$resourceid)
+		);
 
 		$updated = json_encode([
 			'sla.service_tags['.self::$created_tagid['sla_service_tagid'].']' => ['delete'],
