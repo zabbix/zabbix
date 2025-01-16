@@ -1,0 +1,59 @@
+---
+test case: "1. udiv128_64 division"
+in:
+  func_type: "udiv128_64"
+  hi: 0
+  lo: 18446744073709551615
+  divider: 2
+out:
+  lo: 9223372036854775807
+  hi: 0
+---
+test case: "2. udiv128_64 division hi and lo"
+in:
+  func_type: "udiv128_64"
+  hi: 25
+  lo: 18446744073709551615
+  divider: 2
+out:
+  lo: 18446744073709551615
+  hi: 12
+---
+test case: "3. uinc128_64 max lo + 1"
+in:
+  func_type: "uinc128_64"
+  hi: 0
+  lo: 18446744073709551615
+  value: 1
+out:
+  exp_hi: 1
+---
+test case: "4. uinc128_128 basic increment"
+in:
+  func_type: "uinc128_128"
+  base_lo: 123
+  base_hi: 5
+  value_lo: 123
+  value_hi: 5
+out:
+  lo: 246
+  hi: 10
+---
+test case: "5. umul64_64 basic multiplication"
+in:
+  func_type: "umul64_64"
+  value: 123
+  factor: 5
+out:
+  lo: 615
+  hi: 0
+---
+test case: "6. umul64_64 multiplication over uint64 value"
+in:
+  func_type: "umul64_64"
+  value: 18446744073709551615
+  factor: 100
+out:
+  lo: 18446744073709551516
+  hi: 99
+...
