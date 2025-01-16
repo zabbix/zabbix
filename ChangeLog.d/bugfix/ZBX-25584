@@ -1,0 +1,1 @@
+.......PS. [ZBX-25584] fixed high load of VMware collector in case of large number of new events and added history cache overload control (MVekslers)

@@ -210,6 +210,7 @@ int	get_value_simple(const zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector
 
 	request.lastlogsize = item->lastlogsize;
 	request.timeout = item->timeout;
+	request.mtime = 0 == request.lastlogsize ? 0 : item->mtime;	/* manual reset of lastlogsize in DB */
 
 	if (0 == strcmp(request.key, "net.tcp.service") || 0 == strcmp(request.key, "net.udp.service"))
 	{

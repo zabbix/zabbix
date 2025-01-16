@@ -1,0 +1,1 @@
+...G...PS. [ZBX-25723] commented out macros AC_FUNC_MALLOC and AC_FUNC_REALLOC from configure.ac to fix compilation on AIX (Andris)

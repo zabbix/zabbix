@@ -31,6 +31,16 @@ Open the Zabbix Agent configuration file (zabbix_agent2.conf) and set the requir
 *Default value:* equals the global Timeout configuration parameter.    
 *Limits:* 1-30
 
+**Plugins.Mysql.CustomQueriesPath** — Full pathname of a directory containing *.sql* files with custom queries.  
+*Default value:*: `/usr/local/share/zabbix/custom-queries/mysql` for unix systems
+
+*Default value:* `*:\Program Files\Zabbix Agent 2\Custom Queries\Mysql` for windows systems,
+where * is drive name taken from `ProgramFiles` environment variable
+
+**Plugins.Mysql.CustomQueriesEnabled** — If set enables the execution of the `mysql.custom.query`item key.
+If disabled, will not load any queries from custom query dir path.
+*Default value:* false    
+
 **Plugins.Mysql.KeepAlive** — Sets a time for waiting before unused connections will be closed.  
 *Default value:* 300 sec.  
 *Limits:* 60-900
