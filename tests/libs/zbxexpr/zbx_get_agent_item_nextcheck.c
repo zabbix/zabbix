@@ -33,7 +33,7 @@ void	zbx_mock_test_entry(void **state)
 	char	*error = NULL;
 	int	nextcheck, scheduling;
 
-	int	time = (int)parse_time_from_string(now);
+	int	time = (int)human_time_to_unix_time(now);
 	int	result = zbx_get_agent_item_nextcheck(itemid, delay, time, &nextcheck, &scheduling, &error);
 	zbx_mock_assert_int_eq("return value", exp_result, result);
 	zbx_mock_assert_uint64_eq("return value", exp_nextcheck, (uint64_t)nextcheck);

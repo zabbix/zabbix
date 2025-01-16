@@ -32,16 +32,12 @@ void	zbx_mock_test_entry(void **state)
 
 	if(SUCCEED == result)
 	{
-		if(SUCCEED == zbx_mock_parameter_exists("out.exp_host") && SUCCEED ==
-				zbx_mock_parameter_exists("out.exp_key"))
-		{
-			const char	*exp_host = zbx_mock_get_parameter_string("out.exp_host");
-			const char	*exp_key = zbx_mock_get_parameter_string("out.exp_key");
-			zbx_mock_assert_str_eq("return value", exp_host, host);
-			zbx_mock_assert_str_eq("return value", exp_key, key);
-			zbx_free(host);
-			zbx_free(key);
-		}
+		const char	*exp_host = zbx_mock_get_parameter_string("out.exp_host");
+		const char	*exp_key = zbx_mock_get_parameter_string("out.exp_key");
+		zbx_mock_assert_str_eq("return value", exp_host, host);
+		zbx_mock_assert_str_eq("return value", exp_key, key);
+		zbx_free(host);
+		zbx_free(key);
 	}
 
 	zbx_free(exp);

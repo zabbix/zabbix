@@ -21,7 +21,7 @@
 
 #include "zbx_expr_common.h"
 
-time_t	parse_time_from_string(const char *time_str)
+time_t	human_time_to_unix_time(const char *time_str)
 {
 	struct tm tm = {0};
 

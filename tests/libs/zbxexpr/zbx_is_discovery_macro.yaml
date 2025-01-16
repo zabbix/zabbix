@@ -5,9 +5,21 @@ in:
 out:
   result: SUCCEED
 ---
-test case: "2. #MACRO}"
+test case: "2. #MACRO"
 in:
-  name: "#MACRO}"
+  name: "#MACRO"
+out:
+  result: FAIL
+---
+test case: "3. {#MACRO"
+in:
+  name: "{#MACRO"
+out:
+  result: FAIL
+---
+test case: "4. {MACRO}"
+in:
+  name: "{MACRO}"
 out:
   result: FAIL
 ...

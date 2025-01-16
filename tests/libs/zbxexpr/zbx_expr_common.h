@@ -15,6 +15,6 @@
 #ifndef ZBX_EXPR_COMMON
 #define ZBX_EXPR_COMMON
 
-time_t	parse_time_from_string(const char *time_str);
+time_t	human_time_to_unix_time(const char *time_str);
 
 #endif

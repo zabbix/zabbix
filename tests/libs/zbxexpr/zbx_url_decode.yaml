@@ -1,21 +1,40 @@
 ---
-test case: "Empty str"
+test case: "1. Empty str"
 in:
   source: ""
 out:
   return: SUCCEED
   result: ""
 ---
-test case: "String +++"
+test case: "2. Invalid Encoding"
 in:
-  source: "+++"
-out:
-  return: SUCCEED
-  result: "   "
----
-test case: "String %xx"
-in:
-  source: "%xx"
+  source: "Invalid%2GEncoding"
 out:
   return: FAIL
-
+---
+test case: "3. Input With % Only"
+in:
+  source: "%"
+out:
+  return: FAIL
+---
+test case: "4. Long Valid Input"
+in:
+  source: "This%20is%20a%20long%20string%20with%20multiple%20encodings%21"
+out:
+  return: SUCCEED
+  result: "This is a long string with multiple encodings!"
+---
+test case: "5. No Encoding"
+in:
+  source: "NoEncoding"
+out:
+  return: SUCCEED
+  result: "NoEncoding"
+---
+test case: "6. Multiple Pluses"
+in:
+  source: "Multiple++++Pluses"
+out:
+  return: SUCCEED
+  result: "Multiple    Pluses"

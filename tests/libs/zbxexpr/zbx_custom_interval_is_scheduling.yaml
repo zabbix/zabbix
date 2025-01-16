@@ -1,12 +1,13 @@
 ---
-test case: "Is custom interval"
+test case: "1. Is custom interval"
 in:
   params: "1m;0/1-7,00:00-13:00;0/1-7,13:00-24:00;wd1h15-18"
 out:
   result: SUCCEED
 ---
-test case: "No custom interval"
+test case: "2. No custom interval"
 in:
   params: "1m"
 out:
   result: FAIL
+...

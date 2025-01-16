@@ -30,7 +30,7 @@ void	zbx_mock_test_entry(void **state)
 	ZBX_UNUSED(state);
 
 	int	res;
-	time_t	time = parse_time_from_string(time_str);
+	time_t	time = human_time_to_unix_time(time_str);
 	int	result = zbx_check_time_period(period, time, tz, &res);
 
 	zbx_mock_assert_int_eq("return value function", out, result);

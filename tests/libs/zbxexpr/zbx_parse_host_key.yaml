@@ -12,6 +12,28 @@ in:
   exp: ""
 out:
   return: FAIL
-  exp_host: " "
-  exp_key: " "
+---
+test case: "3. Newlines"
+in:
+  exp: "hostname:\n\n\n"
+out:
+  return: SUCCEED
+  exp_host: "hostname"
+  exp_key: "\n\n\n"
+---
+test case: "4. some ASCII"
+in:
+  exp: "hostname:\n!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
+out:
+  return: SUCCEED
+  exp_host: "hostname"
+  exp_key: "\n!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
+---
+test case: "5. Newlines"
+in:
+  exp: "smth"
+out:
+  return: SUCCEED
+  exp_host: "hostname"
+  exp_key: "111"
 ...
