@@ -1,0 +1,1 @@
+...G...... [ZBX-25725] fixed wmi.getall causing crash in Zabbix agent 2 when result contains a pointer to IDispatch (dgoloscapov)

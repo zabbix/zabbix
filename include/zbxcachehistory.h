@@ -142,6 +142,8 @@ void	zbx_hc_get_item_values(zbx_dc_history_t *history, zbx_vector_hc_item_ptr_t 
 void	zbx_hc_push_items(zbx_vector_hc_item_ptr_t *history_items);
 int	zbx_hc_queue_get_size(void);
 int	zbx_hc_get_history_compression_age(void);
+double	zbx_hc_mem_pused(void);
+double	zbx_hc_mem_pused_lock(void);
 
 typedef void (*zbx_history_sync_f)(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
 		zbx_ipc_async_socket_t *rtc, int config_history_storage_pipelines, int *more);

@@ -3058,6 +3058,30 @@ int	zbx_hc_get_history_compression_age(void)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: calculate usage percentage of hc memory buffer                    *
+ *                                                                            *
+ ******************************************************************************/
+double	zbx_hc_mem_pused(void)
+{
+	return 100 * (double)(zbx_dbcache_get_hc_mem()->total_size - zbx_dbcache_get_hc_mem()->free_size) /
+			zbx_dbcache_get_hc_mem()->total_size;
+}
+
+double	zbx_hc_mem_pused_lock(void)
+{
+	double	pused;
+
+	zbx_dbcache_lock();
+
+	pused = zbx_hc_mem_pused();
+
+	zbx_dbcache_unlock();
+
+	return pused;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: Allocate shared memory for trend cache (part of database cache)   *
  *                                                                            *
  * Comments: Is optionally called from zbx_init_database_cache()              *
