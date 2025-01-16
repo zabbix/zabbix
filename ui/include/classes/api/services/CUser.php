@@ -2092,7 +2092,12 @@ class CUser extends CApiService {
 			if (!$created) {
 				self::checkLoginTemporarilyBlocked($db_user);
 
-				if ($db_user['auth_type'] == ZBX_AUTH_INTERNAL) {
+				if ($db_user['auth_type'] == ZBX_AUTH_LDAP) {
+					self::checkLdapAuthenticationEnabled($db_user);
+
+					$idp_user_data = self::verifyLdapCredentials($data, $db_user, $group_userdirectoryid);
+				}
+				else {
 					self::verifyPassword($data, $db_user);
 				}
 			}
@@ -2104,9 +2109,6 @@ class CUser extends CApiService {
 		}
 
 		if (!$created && $db_user['auth_type'] == ZBX_AUTH_LDAP) {
-			self::checkLdapAuthenticationEnabled($db_user);
-
-			$idp_user_data = self::verifyLdapCredentials($data, $db_user, $group_userdirectoryid);
 			$this->tryToUpdateLdapProvisionedUser($db_user, $group_status, $idp_user_data);
 		}
 
@@ -2456,7 +2458,9 @@ class CUser extends CApiService {
 				);
 			}
 
-			throw $e;
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect user name or password or account is temporarily blocked.')
+			);
 		}
 	}
 
