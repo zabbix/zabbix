@@ -27,19 +27,32 @@ class testFormTotpValidate extends testFormTotp {
 	protected const TOTP_SECRET_32 = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 
 	public function testFormTotpValidate_Layout() {
-		$this->quickEnrollUser(self::TOTP_SECRET_32);
+		$this->quickEnrollUser();
 		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
 
-		sleep(3);
+		// All elements in the Validate form are also present in the Enroll form, so reuse code from there.
+		$this->testTotpLayout();
 	}
 
 	/**
-	 * The secret can only be decided server-side, it can't be set by API or frontend.
-	 * Because of this the secret must be set directly in DB.
-	 *
-	 * @param $secret
+	 * Test that user gets blocked if TOTP is entered wrong n times.
 	 */
-	protected function quickEnrollUser($secret) {
+	public function testFormTotpVerify_Blocking() {
+		$this->resetTotpConfiguration();
+		$this->quickEnrollUser();
+
+		// Blocking behaviour is shared with the Enroll form, reuse code.
+		$this->testTotpBlocking();
+	}
+
+	/**
+	 * To enroll quickly, the TOTP secret must be set.
+	 * The secret can only be decided server-side, it can't be set by API or frontend.
+	 * This method avoids having to manually enroll via UI by setting the secret in DB directly.
+	 *
+	 * @param string $secret    TOTP secret to set in DB.
+	 */
+	protected function quickEnrollUser($secret = self::TOTP_SECRET_32) {
 		if (!CMfaTotpHelper::isValidSecretString($secret)) {
 			throw new Exception('Invalid TOTP secret: '.$secret);
 		}
@@ -50,8 +63,6 @@ class testFormTotpValidate extends testFormTotp {
 			'totp_secret' => $secret,
 			'status' => 1
 		];
-		var_dump(DB::insert('mfa_totp_secret', [$db_data]));
-
-		sleep(10);
+		DB::insert('mfa_totp_secret', [$db_data]);
 	}
 }

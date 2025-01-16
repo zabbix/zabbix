@@ -40,8 +40,6 @@ class testFormTotpEnroll extends testFormTotp {
 		// Container of most elements.
 		$container = $this->page->query('class:signin-container')->one();
 
-		// Assert Zabbix logo.
-		$this->assertTrue($container->query('class:zabbix-logo')->one()->isVisible());
 		// Assert title.
 		$this->assertTrue($container->query('xpath:.//div[text()="Scan this QR code"]')->one()->isVisible());
 		// Assert subtitle.
@@ -61,41 +59,9 @@ class testFormTotpEnroll extends testFormTotp {
 		// Assert the description text.
 		$this->assertEnrollDescription($container, self::DEFAULT_ALGO, $totp_secret);
 
-		// Assert 'Verification code' label.
-		$label = $container->query('xpath:.//label[@for="verification_code"]')->one();
-		$this->assertTrue($label->isVisible());
-		$this->assertEquals('Verification code', $label->getText());
-		// Assert 'Verification code' field.
-		$code_field = $container->query('id:verification_code')->one();
-		$this->assertTrue($code_field->isVisible() && $code_field->isEnabled());
-		$this->assertEquals('255', $code_field->getAttribute('maxlength'));
-
-		// Assert 'Sign in' button.
-		$button = $container->query('id:enter')->one();
-		$this->assertEquals('Sign in', $button->getText());
-		$this->assertEquals('submit', $button->getAttribute('type'));
-		$this->assertTrue($button->isClickable());
-
-		// Since index_mfa.php is a unique form, also check the generic elements.
-		$links = $this->page->query('class:signin-links')->one();
-
-		$help_link = $links->query('xpath:./a[text()="Help"]')->one();
-		$this->assertTrue($help_link->isClickable());
-		$this->assertEquals(1,
-			preg_match('/^https:\/\/www.zabbix.com\/documentation\/\d.\d\/$/', $help_link->getAttribute('href'))
-		);
-		$this->assertEquals('_blank', $help_link->getAttribute('target')); // opens link in a new tab
-
-		$support_link = $links->query('xpath:./a[text()="Support"]')->one();
-		$this->assertTrue($support_link->isClickable());
-		$this->assertEquals('https://www.zabbix.com/support', $support_link->getAttribute('href'));
-		$this->assertEquals('_blank', $support_link->getAttribute('target')); // opens link in a new tab
-
-		$copyright = $this->page->query('xpath://footer[@role="contentinfo"]')->one();
-		$this->assertTrue($copyright->isVisible());
-		$this->assertEquals(1, preg_match('/^© 2001–20\d\d, Zabbix SIA$/', $copyright->getText()));
+		// The other elements are common with the Verification form, reuse the code.
+		$this->testTotpLayout();
 	}
-
 
 	public function getEnrollData() {
 		return [
@@ -319,28 +285,8 @@ class testFormTotpEnroll extends testFormTotp {
 		// Reset TOTP secret to make sure user has not already been enrolled.
 		$this->resetTotpConfiguration();
 
-		// Open the enroll form.
-		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
-
-		$form = $this->page->query('class:signin-container')->asForm()->one();
-
-		for ($i = 1; $i <= self::BLOCK_COUNT; $i++) {
-			$form->getField('id:verification_code')->fill('999999');
-			$form->query('button:Sign in')->one()->click();
-
-			if ($i !== self::BLOCK_COUNT) {
-				// Validate the error message first n minus 1 times.
-				$this->assertEquals('The verification code was incorrect, please try again.',
-					$form->query('class:red')->one()->getText()
-				);
-			} else {
-				// Validate the blocking message on n-th time.
-				$this->page->waitUntilReady();
-				$this->assertMessage(TEST_BAD, 'You are not logged in',
-						'Incorrect user name or password or account is temporarily blocked.'
-				);
-			}
-		}
+		// Blocking behaviour is shared with the Verify form, reuse code.
+		$this->testTotpBlocking();
 	}
 
 	/**
