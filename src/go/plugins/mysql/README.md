@@ -8,7 +8,7 @@ You can extend it or create your template for your specific needs.
 
 ## Requirements
 * Zabbix Agent 2
-* Go >= 1.13 (required only to build from source)
+* Go >= 1.21 (required only to build from source)
 
 ## Supported versions
 * MySQL, version 5.7+
@@ -30,6 +30,16 @@ Open the Zabbix Agent configuration file (zabbix_agent2.conf) and set the requir
 **Plugins.Mysql.Timeout** — The maximum time in seconds for waiting when a connection has to be established.  
 *Default value:* equals the global Timeout configuration parameter.    
 *Limits:* 1-30
+
+**Plugins.Mysql.CustomQueriesPath** — Full pathname of a directory containing *.sql* files with custom queries.  
+*Default value:*: `/usr/local/share/zabbix/custom-queries/mysql` for unix systems
+
+*Default value:* `*:\Program Files\Zabbix Agent 2\Custom Queries\Mysql` for windows systems,
+where * is drive name taken from `ProgramFiles` environment variable
+
+**Plugins.Mysql.CustomQueriesEnabled** — If set enables the execution of the `mysql.custom.query`item key.
+If disabled, will not load any queries from custom query dir path.
+*Default value:* false    
 
 **Plugins.Mysql.KeepAlive** — Sets a time for waiting before unused connections will be closed.  
 *Default value:* 300 sec.  

@@ -1,0 +1,418 @@
+---
+test case: "1. uint32 insert"
+in:
+  vector_type: "uint32"
+  func_type: "insert"
+  not_empty_vector: 1
+  data: [4294967295,4294967295,4294967295]
+  insert_value: 1
+  index: 0
+out:
+  data: [1,4294967295,4294967295,4294967295]
+---
+test case: "2. uint32 insert empty vector"
+in:
+  vector_type: "uint32"
+  func_type: "insert"
+  insert_value: 1
+  index: 0
+out:
+  data: [1]
+---
+test case: "3. uint32 append_array"
+in:
+  vector_type: "uint32"
+  func_type: "append_array"
+  not_empty_vector: 1
+  data: [4294967295,4294967295,4294967295]
+  array_size: 3
+  array: [0,0,0]
+out:
+  data: [4294967295,4294967295,4294967295,0,0,0]
+---
+test case: "4. uint32 append_array empty vector"
+in:
+  vector_type: "uint32"
+  func_type: "append_array"
+  array_size: 3
+  array: [4294967295,4294967295,4294967295]
+out:
+  data: [4294967295,4294967295,4294967295]
+---
+test case: "5. uint32 noorder"
+in:
+  vector_type: "uint32"
+  func_type: "noorder"
+  not_empty_vector: 1
+  data: [4294967295,4294967295,4294967295,0]
+  index: 0
+out:
+  data: [0,4294967295,4294967295]
+---
+test case: "6. uint32 noorder empty vector"
+in:
+  vector_type: "uint32"
+  func_type: "noorder"
+  index: 0
+exit code: failure
+---
+test case: "7. uint32 remove"
+in:
+  vector_type: "uint32"
+  func_type: "remove"
+  not_empty_vector: 1
+  data: [4294967295,0,4294967295,0,0]
+  index: 2
+out:
+  data: [4294967295,0,0,0]
+---
+test case: "8. uint32 remove empty vector"
+in:
+  vector_type: "uint32"
+  func_type: "remove"
+  index: 2
+exit code: failure
+---
+test case: "9. uint32 sort"
+in:
+  vector_type: "uint32"
+  func_type: "sort"
+  not_empty_vector: 1
+  data: [0,0,0]
+out:
+  data: [0,0,0]
+---
+test case: "10. uint32 sort empty vector"
+in:
+  vector_type: "uint32"
+  func_type: "sort"
+out:
+  data: []
+---
+test case: "11. uint32 uniq"
+in:
+  vector_type: "uint32"
+  func_type: "uniq"
+  not_empty_vector: 1
+  data: [0,0,0,0,0,0,0,0,0,0,0,0,0]
+out:
+  data: [0]
+---
+test case: "12. uint32 uniq empty vector"
+in:
+  vector_type: "uint32"
+  func_type: "uniq"
+out:
+  data: []
+---
+test case: "13. uint32 nearestindex"
+in:
+  vector_type: "uint32"
+  func_type: "nearestindex"
+  not_empty_vector: 1
+  data: [10,0,4294967295,200]
+  target: 4294555295
+out:
+  index: 2
+---
+test case: "14. uint32 nearestindex empty vector"
+in:
+  vector_type: "uint32"
+  func_type: "nearestindex"
+  target: 0
+out:
+  index: 0
+---
+test case: "15. uint32 bsearch"
+in:
+  vector_type: "uint32"
+  func_type: "bsearch"
+  not_empty_vector: 1
+  data: [4294967295,0,4294967295,0,0]
+  target: 4294967295
+out:
+  index: 2
+---
+test case: "16. uint32 bsearch empty vector"
+in:
+  vector_type: "uint32"
+  func_type: "bsearch"
+  target: 4294967295
+out:
+  index: -1
+---
+test case: "17. uint32 lsearch"
+in:
+  vector_type: "uint32"
+  func_type: "lsearch"
+  not_empty_vector: 1
+  data: [4294967295,0,4294967295,0]
+  target: 0
+  index: 1
+out:
+  return: SUCCEED
+---
+test case: "18. uint32 lsearch empty vector"
+in:
+  vector_type: "uint32"
+  func_type: "lsearch"
+  target: 0
+  index: 2
+out:
+  return: FAIL
+---
+test case: "19. uint32 search"
+in:
+  vector_type: "uint32"
+  func_type: "search"
+  not_empty_vector: 1
+  data: [4294967295,4294967294,4294967293,4294967295,4294967295]
+  target: 4294967295
+out:
+  index: 0
+---
+test case: "20. uint32 search empty vector"
+in:
+  vector_type: "uint32"
+  func_type: "search"
+  target: 0
+out:
+  index: -1
+---
+test case: "21. int32 insert"
+in:
+  vector_type: "int32"
+  func_type: "insert"
+  not_empty_vector: 1
+  data: [-1,-2]
+  insert_value: 7
+  index: 1
+out:
+  data: [-1,7,-2]
+---
+test case: "22. int32 append_array"
+in:
+  vector_type: "int32"
+  func_type: "append_array"
+  not_empty_vector: 1
+  data: [2147483647,2147483647,2147483647]
+  array_size: 3
+  array: [-2147483647,-2147483647,-2147483647]
+out:
+  data: [2147483647,2147483647,2147483647,-2147483647,-2147483647,-2147483647]
+---
+test case: "23. int32 noorder"
+in:
+  vector_type: "int32"
+  func_type: "noorder"
+  not_empty_vector: 1
+  data: [2147483647,2147483647,-2147483647]
+  index: 1
+out:
+  data: [2147483647,-2147483647]
+---
+test case: "24. int32 remove"
+in:
+  vector_type: "int32"
+  func_type: "remove"
+  not_empty_vector: 1
+  data: [22,31,71]
+  index: 2
+out:
+  data: [22,31]
+---
+test case: "25. int32 sort"
+in:
+  vector_type: "int32"
+  func_type: "sort"
+  not_empty_vector: 1
+  data: [-2147483647,2147483647,0]
+out:
+  data: [-2147483647,0,2147483647]
+---
+test case: "26. int32 uniq"
+in:
+  vector_type: "int32"
+  func_type: "uniq"
+  not_empty_vector: 1
+  data: [-2147483647,-2147483647,-2147483647,2147483647,2147483647,2147483647]
+out:
+  data: [-2147483647,2147483647]
+---
+test case: "27. int32 nearestindex"
+in:
+  vector_type: "int32"
+  func_type: "nearestindex"
+  not_empty_vector: 1
+  data: [-2147483647,-2147483647,2147483647]
+  target: 2147483647
+out:
+  index: 2
+---
+test case: "28. int32 bsearch"
+in:
+  vector_type: "int32"
+  func_type: "bsearch"
+  not_empty_vector: 1
+  data: [-2147483647,-2147483647,-2147483647,2147483647,2147483647,2147483647]
+  target: -2147483647
+out:
+  index: 1
+---
+test case: "29. int32 lsearch"
+in:
+  vector_type: "int32"
+  func_type: "lsearch"
+  not_empty_vector: 1
+  data: [-2147483647,-2147483647,-2147483647,2147483647,2147483647,2147483647]
+  target: -2147483647
+  index: 1
+out:
+  return: SUCCEED
+---
+test case: "30. int32 search"
+in:
+  vector_type: "int32"
+  func_type: "search"
+  not_empty_vector: 1
+  data: [-2147483647,0,2147483647]
+  target: 1
+out:
+  index: -1
+---
+test case: "31. zbx_tag insert"
+in:
+  vector_type: "zbx_tag"
+  func_type: "insert"
+  data: [["First", "1"], ["Second", "2"], ["Third", "3"]]
+  tag: [["Zero", "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}\n"]]
+  index: 0
+out:
+  data_out: [["Zero", "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}\n"], ["First", "1"], ["Second", "2"], ["Third", "3"]]
+---
+test case: "32. zbx_tag append_array"
+in:
+  vector_type: "zbx_tag"
+  func_type: "append_array"
+  data: [["First", "1"], ["Second", "2"], ["Third", "3"]]
+  array_size: 3
+  array: [["Fourth", "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}\r"], ["Fifth", "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}\t"], ["Sixth", "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}\n"]]
+out:
+  data_out: [["First", "1"], ["Second", "2"], ["Third", "3"], ["Fourth", "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}\r"], ["Fifth", "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}\t"], ["Sixth", "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}\n"]]
+---
+test case: "33. zbx_tag remove"
+in:
+  vector_type: "zbx_tag"
+  func_type: "remove"
+  data: [["Zero", "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}\n"], ["Second", "2"], ["Third", "3"]]
+  index: 0
+out:
+  data_out: [["Second", "2"], ["Third", "3"]]
+---
+test case: "34. zbx_tag noorder"
+in:
+  vector_type: "zbx_tag"
+  func_type: "noorder"
+  data: [["First", "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}\n"], ["Fourth", "4"], ["Second", "2"], ["Third", "3"]]
+  index: 0
+out:
+  data_out: [["Third", "3"], ["Fourth", "4"], ["Second", "2"]]
+---
+test case: "35. zbx_tag sort"
+in:
+  vector_type: "zbx_tag"
+  func_type: "sort"
+  data: [["Fourth", "4"] ,["First", "1"], ["Second", "2"], ["Third", "3"]]
+out:
+  data_out: [["First", "1"], ["Fourth", "4"], ["Second", "2"], ["Third", "3"]]
+---
+test case: "36. zbx_tag sort some ASCII"
+in:
+  vector_type: "zbx_tag"
+  func_type: "sort"
+  data: [["\n!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}", "2"] ,["\r!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}", "2"], ["\t!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}", "2"]]
+out:
+  data_out: [["\t!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}", "2"] ,["\n!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}", "2"], ["\r!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}", "2"]]
+---
+test case: "37. zbx_tag uniq"
+in:
+  vector_type: "zbx_tag"
+  func_type: "uniq"
+  data: [["!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}", "1"], ["!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}", "1"], ["!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}", "1"]]
+out:
+  data_out: [["!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}", "1"]]
+---
+test case: "38. zbx_tag nearestindex"
+in:
+  vector_type: "zbx_tag"
+  func_type: "nearestindex"
+  data: [["First", "1"], ["Fourth", "4"], ["Second", "2"], ["Third", "3"]]
+  tag: [["Fifth", "5"]]
+out:
+  index: 0
+---
+test case: "39. zbx_tag nearestindex some ASCII"
+in:
+  vector_type: "zbx_tag"
+  func_type: "nearestindex"
+  data: [["!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}", "1"], [";<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}", "1"]]
+  tag: [[";<=>?@", "1"]]
+out:
+  index: 1
+---
+test case: "40. zbx_tag bsearch some ASCII"
+in:
+  vector_type: "zbx_tag"
+  func_type: "bsearch"
+  data: [["\n!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}", "1"], ["!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}", "1"]]
+  tag: [["\n!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}", "1"]]
+out:
+  index: 0
+---
+test case: "41. zbx_tag bsearch"
+in:
+  vector_type: "zbx_tag"
+  func_type: "bsearch"
+  data: [["First", "1"], ["First", "4"], ["First", "2"], ["First", "3"]]
+  tag: [["First", "3"]]
+out:
+  index: 3
+---
+test case: "42. zbx_tag lsearch"
+in:
+  vector_type: "zbx_tag"
+  func_type: "lsearch"
+  data: [["First", "1"], ["First", "4"], ["First", "2"], ["First", "3"]]
+  tag: [["First", "1"]]
+  index: 0
+out:
+  return: SUCCEED
+---
+test case: "43. zbx_tag lsearch some ASCII"
+in:
+  vector_type: "zbx_tag"
+  func_type: "lsearch"
+  data: [["First", "1"], ["\n!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}", 2]]
+  tag: [["Second", "2"]]
+  index: 1
+out:
+  return: FAIL
+---
+test case: "44. zbx_tag search"
+in:
+  vector_type: "zbx_tag"
+  func_type: "search"
+  data: [["First", "1"], ["Fourth", "4"], ["Second", "2"], ["Third", "3"]]
+  tag: [["Second", "2"]]
+out:
+  index: 2
+---
+test case: "45. zbx_tag search some ASCII"
+in:
+  vector_type: "zbx_tag"
+  func_type: "search"
+  data: [["\n!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}", "1"], ["\t!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}", "1"]]
+  tag: [["\n!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}", "1"]]
+out:
+  index: 0
+...

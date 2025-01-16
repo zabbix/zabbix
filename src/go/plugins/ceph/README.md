@@ -7,7 +7,7 @@ You can extend it or create your template for your specific needs.
 
 ## Requirements
 * Zabbix Agent 2
-* Go >= 1.13 (required only to build from source)
+* Go >= 1.21 (required only to build from source)
 
 ## Supported versions
 * Ceph, version 14+
