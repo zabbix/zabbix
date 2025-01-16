@@ -205,24 +205,11 @@ class testFormAdministrationGeneral extends CWebTest {
 		$form->checkValue($values);
 
 		// Check saved configuration in database.
-		foreach ($db as $value_type => $values) {
-			$keys = array_keys($values);
-			$keys_string = '';
-			$keys_count = count($values);
+		$expected_settings = CApiSettingsHelper::getParameters(array_keys($db));
 
-			for ($i = 0; $i < $keys_count; $i++) {
-				$ending = ($i === $keys_count - 1) ? '' : ',';
-				$keys_string = $keys_string.'\''.$keys[$i].'\''.$ending;
-			}
-
-			$db_values = CDBHelper::getAll('SELECT name,'.$value_type.' FROM settings WHERE name IN ('.$keys_string.') ORDER BY name');
-
-			$indexed_values = [];
-			foreach ($db_values as $db_field) {
-				$indexed_values[$db_field['name']] = $db_field[$value_type];
-			}
-
-			$this->assertEquals($values, $indexed_values);
+		foreach ($db as $key => $value) {
+			$this->assertArrayHasKey($key, $expected_settings);
+			$this->assertEquals($value, $expected_settings[$key]);
 		}
 
 		if ($expected === TEST_BAD && $timeouts) {

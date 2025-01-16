@@ -104,15 +104,8 @@ class testUsersAuthentication extends CWebTest {
 			'passwd_min_length' => 8,
 			'passwd_check_rules' => 8
 		];
-		$field_names = '\''.implode('\',\'', array_keys($expected_values)).'\'';
-		$db_values = CDBHelper::getAll('SELECT name, value_int FROM settings WHERE name IN ('.$field_names.') ORDER BY name');
 
-		$indexed_values = [];
-		foreach ($db_values as $db_field) {
-			$indexed_values[$db_field['name']] = $db_field['value_int'];
-		}
-
-		$this->assertEquals($expected_values, $indexed_values);
+		$this->assertEquals($expected_values, CApiSettingsHelper::getParameters(array_keys($expected_values)));
 	}
 
 	public function getFormData() {
@@ -121,12 +114,10 @@ class testUsersAuthentication extends CWebTest {
 			[
 				[
 					'db_check' => [
-						'value_int' => [
-							'authentication_type' => 0,
-							'passwd_min_length' => 8,
-							'passwd_check_rules' => 8
-						],
-						'disabled_usrgrpid' => 0
+						'authentication_type' => 0,
+						'disabled_usrgrpid' => 0,
+						'passwd_min_length' => 8,
+						'passwd_check_rules' => 8
 					]
 				]
 			],
@@ -135,12 +126,10 @@ class testUsersAuthentication extends CWebTest {
 				[
 					'fields' => ['Deprovisioned users group' => 'Disabled'],
 					'db_check' => [
-						'value_int' => [
-							'authentication_type' => 0,
-							'passwd_min_length' => 8,
-							'passwd_check_rules' => 8
-						],
-						'disabled_usrgrpid' => 9
+						'authentication_type' => 0,
+						'disabled_usrgrpid' => 9,
+						'passwd_min_length' => 8,
+						'passwd_check_rules' => 8
 					]
 				]
 			],
@@ -149,12 +138,10 @@ class testUsersAuthentication extends CWebTest {
 				[
 					'fields' => ['Deprovisioned users group' => ''],
 					'db_check' => [
-						'value_int' => [
-							'authentication_type' => 0,
-							'passwd_min_length' => 8,
-							'passwd_check_rules' => 8
-						],
-						'disabled_usrgrpid' => 0
+						'authentication_type' => 0,
+						'disabled_usrgrpid' => 0,
+						'passwd_min_length' => 8,
+						'passwd_check_rules' => 8
 					]
 				]
 			],
@@ -206,19 +193,9 @@ class testUsersAuthentication extends CWebTest {
 			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 
 			// Check length fields saved in db.
-			$db_values = CDBHelper::getAll('SELECT name, value_int FROM settings WHERE name IN'.
-					' (\'authentication_type\', \'passwd_min_length\', \'passwd_check_rules\') ORDER BY name'
-			);
-
-			$indexed_values = [];
-			foreach ($db_values as $db_field) {
-				$indexed_values[$db_field['name']] = $db_field['value_int'];
-			}
-
-			$this->assertEquals($data['db_check']['value_int'], $indexed_values);
-			$this->assertEquals($data['db_check']['disabled_usrgrpid'], CDBHelper::getValue(
-					'SELECT value_usrgrpid FROM settings WHERE name=\'disabled_usrgrpid\''
-			));
+			$this->assertEquals($data['db_check'], CApiSettingsHelper::getParameters([
+				'authentication_type', 'disabled_usrgrpid', 'passwd_min_length', 'passwd_check_rules'
+			]));
 		}
 
 		/*

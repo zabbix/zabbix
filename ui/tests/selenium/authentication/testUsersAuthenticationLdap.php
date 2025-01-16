@@ -98,14 +98,20 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			'Group name attribute' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
 			'Group member attribute' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
 			'Reference attribute' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
-			'Group filter' => ['visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => '(%{groupattr}=%{user})'],
-			'User group membership attribute' => ['visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => 'memberOf'],
+			'Group filter' => [
+				'visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => '(%{groupattr}=%{user})'
+			],
+			'User group membership attribute' => [
+				'visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => 'memberOf'
+			],
 			'User name attribute' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
 			'User last name attribute' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
 			'User group mapping' => ['visible' => false],
 			'Media type mapping' => ['visible' => false ],
 			'StartTLS' => ['visible'  => false, 'value' => false],
-			'Search filter' => ['visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => '(%{attr}=%{user})']
+			'Search filter' => [
+				'visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => '(%{attr}=%{user})'
+			]
 		];
 
 		foreach ($server_fields as $label => $attributes) {

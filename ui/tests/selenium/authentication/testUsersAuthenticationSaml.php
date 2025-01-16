@@ -588,16 +588,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 
 			foreach ($data['db_check'] as $table => $rows) {
 				if ($table === 'settings') {
-					$db_values = CDBHelper::getAll('SELECT name, value_int FROM settings WHERE name IN'.
-							' (\'saml_auth_enabled\', \'saml_case_sensitive\', \'saml_jit_status\') ORDER BY name'
-					);
-
-					$indexed_values = [];
-					foreach ($db_values as $db_field) {
-						$indexed_values[$db_field['name']] = $db_field['value_int'];
-					}
-
-					$this->assertEquals($data['db_check']['settings'], $indexed_values);
+					$this->assertEquals($rows, CApiSettingsHelper::getParameters(array_keys($rows)));
 				}
 				else {
 					foreach ($rows as $i => $row) {

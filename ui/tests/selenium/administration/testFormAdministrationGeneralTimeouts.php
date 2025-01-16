@@ -62,24 +62,22 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 	];
 
 	public $db_default_values = [
-		'value_str' => [
-			'timeout_zabbix_agent' => '3s',
-			'timeout_simple_check' => '3s',
-			'timeout_snmp_agent' => '3s',
-			'timeout_external_check' => '3s',
-			'timeout_db_monitor' => '3s',
-			'timeout_http_agent' => '3s',
-			'timeout_ssh_agent' => '3s',
-			'timeout_telnet_agent' => '3s',
-			'timeout_script' => '3s',
-			'timeout_browser' => '60s',
-			'socket_timeout' => '3s',
-			'connect_timeout' => '3s',
-			'media_type_test_timeout' => '65s',
-			'script_timeout' => '60s',
-			'item_test_timeout' => '60s',
-			'report_test_timeout' => '60s'
-		]
+		'timeout_zabbix_agent' => '3s',
+		'timeout_simple_check' => '3s',
+		'timeout_snmp_agent' => '3s',
+		'timeout_external_check' => '3s',
+		'timeout_db_monitor' => '3s',
+		'timeout_http_agent' => '3s',
+		'timeout_ssh_agent' => '3s',
+		'timeout_telnet_agent' => '3s',
+		'timeout_script' => '3s',
+		'timeout_browser' => '60s',
+		'socket_timeout' => '3s',
+		'connect_timeout' => '3s',
+		'media_type_test_timeout' => '65s',
+		'script_timeout' => '60s',
+		'item_test_timeout' => '60s',
+		'report_test_timeout' => '60s'
 	];
 
 	/**
@@ -154,9 +152,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Zabbix agent' => '15s'
 					],
 					'db' => [
-						'value_str' => [
-							'timeout_zabbix_agent' => '15s'
-						]
+						'timeout_zabbix_agent' => '15s'
 					]
 				]
 			],
@@ -167,9 +163,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Simple check' => '15s'
 					],
 					'db' => [
-						'value_str' => [
-							'timeout_simple_check' => '15s'
-						]
+						'timeout_simple_check' => '15s'
 					]
 				]
 			],
@@ -180,9 +174,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'SNMP agent' => '15s'
 					],
 					'db' => [
-						'value_str' => [
-							'timeout_snmp_agent' => '15s'
-						]
+						'timeout_snmp_agent' => '15s'
 					]
 				]
 			],
@@ -193,9 +185,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'External check' => '15s'
 					],
 					'db' => [
-						'value_str' => [
-							'timeout_external_check' => '15s'
-						]
+						'timeout_external_check' => '15s'
 					]
 				]
 			],
@@ -206,9 +196,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Database monitor' => '15s'
 					],
 					'db' => [
-						'value_str' => [
-							'timeout_db_monitor' => '15s'
-						]
+						'timeout_db_monitor' => '15s'
 					]
 				]
 			],
@@ -219,9 +207,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'HTTP agent' => '15s'
 					],
 					'db' => [
-						'value_str' => [
-							'timeout_http_agent' => '15s'
-						]
+						'timeout_http_agent' => '15s'
 					]
 				]
 			],
@@ -232,9 +218,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'SSH agent' => '15s'
 					],
 					'db' => [
-						'value_str' => [
-							'timeout_ssh_agent' => '15s'
-						]
+						'timeout_ssh_agent' => '15s'
 					]
 				]
 			],
@@ -245,9 +229,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'TELNET agent' => '15s'
 					],
 					'db' => [
-						'value_str' => [
-							'timeout_telnet_agent' => '15s'
-						]
+						'timeout_telnet_agent' => '15s'
 					]
 				]
 			],
@@ -258,9 +240,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Script' => '15s'
 					],
 					'db' => [
-						'value_str' => [
-							'timeout_script' => '15s'
-						]
+						'timeout_script' => '15s'
 					]
 				]
 			],
@@ -271,9 +251,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Browser' => '15s'
 					],
 					'db' => [
-						'value_str' => [
-							'timeout_browser' => '15s'
-						]
+						'timeout_browser' => '15s'
 					]
 				]
 			],
@@ -284,9 +262,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Communication' => '15s'
 					],
 					'db' => [
-						'value_str' => [
-							'socket_timeout' => '15s'
-						]
+						'socket_timeout' => '15s'
 					]
 				]
 			],
@@ -297,9 +273,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Connection' => '15s'
 					],
 					'db' => [
-						'value_str' => [
-							'connect_timeout' => '15s'
-						]
+						'connect_timeout' => '15s'
 					]
 				]
 			],
@@ -310,9 +284,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Media type test' => '15s'
 					],
 					'db' => [
-						'value_str' => [
-							'media_type_test_timeout' => '15s'
-						]
+						'media_type_test_timeout' => '15s'
 					]
 				]
 			],
@@ -323,9 +295,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Script execution' => '15s'
 					],
 					'db' => [
-						'value_str' => [
-							'script_timeout' => '15s'
-						]
+						'script_timeout' => '15s'
 					]
 				]
 			],
@@ -336,9 +306,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Item test' => '15s'
 					],
 					'db' => [
-						'value_str' => [
-							'item_test_timeout' => '15s'
-						]
+						'item_test_timeout' => '15s'
 					]
 				]
 			],
@@ -349,9 +317,7 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Scheduled report test' => '15s'
 					],
 					'db' => [
-						'value_str' => [
-							'report_test_timeout' => '15s'
-						]
+						'report_test_timeout' => '15s'
 					]
 				]
 			],
@@ -371,18 +337,16 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Browser' => '33s'
 					],
 					'db' => [
-						'value_str' => [
-							'timeout_zabbix_agent' => '33s',
-							'timeout_simple_check' => '33s',
-							'timeout_snmp_agent' => '33s',
-							'timeout_external_check' => '33s',
-							'timeout_db_monitor' => '33s',
-							'timeout_http_agent' => '33s',
-							'timeout_ssh_agent' => '33s',
-							'timeout_telnet_agent' => '33s',
-							'timeout_script' => '33s',
-							'timeout_browser' => '33s'
-						]
+						'timeout_zabbix_agent' => '33s',
+						'timeout_simple_check' => '33s',
+						'timeout_snmp_agent' => '33s',
+						'timeout_external_check' => '33s',
+						'timeout_db_monitor' => '33s',
+						'timeout_http_agent' => '33s',
+						'timeout_ssh_agent' => '33s',
+						'timeout_telnet_agent' => '33s',
+						'timeout_script' => '33s',
+						'timeout_browser' => '33s'
 					]
 				]
 			],
@@ -398,14 +362,12 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Scheduled report test' => '29s'
 					],
 					'db' => [
-						'value_str' => [
-							'socket_timeout' => '29s',
-							'connect_timeout' => '29s',
-							'media_type_test_timeout' => '29s',
-							'script_timeout' => '29s',
-							'item_test_timeout' => '29s',
-							'report_test_timeout' => '29s'
-						]
+						'socket_timeout' => '29s',
+						'connect_timeout' => '29s',
+						'media_type_test_timeout' => '29s',
+						'script_timeout' => '29s',
+						'item_test_timeout' => '29s',
+						'report_test_timeout' => '29s'
 					]
 				]
 			],
@@ -431,24 +393,22 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Scheduled report test' => '25s'
 					],
 					'db' => [
-						'value_str' => [
-							'timeout_zabbix_agent' => '22s',
-							'timeout_simple_check' => '22s',
-							'timeout_snmp_agent' => '22s',
-							'timeout_external_check' => '22s',
-							'timeout_db_monitor' => '22s',
-							'timeout_http_agent' => '22s',
-							'timeout_ssh_agent' => '22s',
-							'timeout_telnet_agent' => '22s',
-							'timeout_script' => '22s',
-							'timeout_browser' => '22s',
-							'socket_timeout' => '25s',
-							'connect_timeout' => '25s',
-							'media_type_test_timeout' => '25s',
-							'script_timeout' => '25s',
-							'item_test_timeout' => '25s',
-							'report_test_timeout' => '25s'
-						]
+						'timeout_zabbix_agent' => '22s',
+						'timeout_simple_check' => '22s',
+						'timeout_snmp_agent' => '22s',
+						'timeout_external_check' => '22s',
+						'timeout_db_monitor' => '22s',
+						'timeout_http_agent' => '22s',
+						'timeout_ssh_agent' => '22s',
+						'timeout_telnet_agent' => '22s',
+						'timeout_script' => '22s',
+						'timeout_browser' => '22s',
+						'socket_timeout' => '25s',
+						'connect_timeout' => '25s',
+						'media_type_test_timeout' => '25s',
+						'script_timeout' => '25s',
+						'item_test_timeout' => '25s',
+						'report_test_timeout' => '25s'
 					]
 				]
 			],
@@ -474,24 +434,22 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Scheduled report test' => '29'
 					],
 					'db' => [
-						'value_str' => [
-							'timeout_zabbix_agent' => '33',
-							'timeout_simple_check' => '33',
-							'timeout_snmp_agent' => '33',
-							'timeout_external_check' => '33',
-							'timeout_db_monitor' => '33',
-							'timeout_http_agent' => '33',
-							'timeout_ssh_agent' => '33',
-							'timeout_telnet_agent' => '33',
-							'timeout_script' => '33',
-							'timeout_browser' => '33',
-							'socket_timeout' => '29',
-							'connect_timeout' => '29',
-							'media_type_test_timeout' => '29',
-							'script_timeout' => '29',
-							'item_test_timeout' => '29',
-							'report_test_timeout' => '29'
-						]
+						'timeout_zabbix_agent' => '33',
+						'timeout_simple_check' => '33',
+						'timeout_snmp_agent' => '33',
+						'timeout_external_check' => '33',
+						'timeout_db_monitor' => '33',
+						'timeout_http_agent' => '33',
+						'timeout_ssh_agent' => '33',
+						'timeout_telnet_agent' => '33',
+						'timeout_script' => '33',
+						'timeout_browser' => '33',
+						'socket_timeout' => '29',
+						'connect_timeout' => '29',
+						'media_type_test_timeout' => '29',
+						'script_timeout' => '29',
+						'item_test_timeout' => '29',
+						'report_test_timeout' => '29'
 					]
 				]
 			],
@@ -511,18 +469,16 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Browser' => '{$MACROS}'
 					],
 					'db' => [
-						'value_str' => [
-							'timeout_zabbix_agent' => '{$MACROS}',
-							'timeout_simple_check' => '{$MACROS}',
-							'timeout_snmp_agent' => '{$MACROS}',
-							'timeout_external_check' => '{$MACROS}',
-							'timeout_db_monitor' => '{$MACROS}',
-							'timeout_http_agent' => '{$MACROS}',
-							'timeout_ssh_agent' => '{$MACROS}',
-							'timeout_telnet_agent' => '{$MACROS}',
-							'timeout_script' => '{$MACROS}',
-							'timeout_browser' => '{$MACROS}'
-						]
+						'timeout_zabbix_agent' => '{$MACROS}',
+						'timeout_simple_check' => '{$MACROS}',
+						'timeout_snmp_agent' => '{$MACROS}',
+						'timeout_external_check' => '{$MACROS}',
+						'timeout_db_monitor' => '{$MACROS}',
+						'timeout_http_agent' => '{$MACROS}',
+						'timeout_ssh_agent' => '{$MACROS}',
+						'timeout_telnet_agent' => '{$MACROS}',
+						'timeout_script' => '{$MACROS}',
+						'timeout_browser' => '{$MACROS}'
 					]
 				]
 			],
@@ -547,23 +503,21 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Scheduled report test' => '1m'
 					],
 					'db' => [
-						'value_str' => [
-							'timeout_zabbix_agent' => '10m',
-							'timeout_simple_check' => '10m',
-							'timeout_snmp_agent' => '10m',
-							'timeout_external_check' => '10m',
-							'timeout_db_monitor' => '10m',
-							'timeout_http_agent' => '10m',
-							'timeout_ssh_agent' => '10m',
-							'timeout_telnet_agent' => '10m',
-							'timeout_script' => '10m',
-							'timeout_browser' => '10m',
-							'socket_timeout' => '1m',
-							'media_type_test_timeout' => '1m',
-							'script_timeout' => '1m',
-							'item_test_timeout' => '1m',
-							'report_test_timeout' => '1m'
-						]
+						'timeout_zabbix_agent' => '10m',
+						'timeout_simple_check' => '10m',
+						'timeout_snmp_agent' => '10m',
+						'timeout_external_check' => '10m',
+						'timeout_db_monitor' => '10m',
+						'timeout_http_agent' => '10m',
+						'timeout_ssh_agent' => '10m',
+						'timeout_telnet_agent' => '10m',
+						'timeout_script' => '10m',
+						'timeout_browser' => '10m',
+						'socket_timeout' => '1m',
+						'media_type_test_timeout' => '1m',
+						'script_timeout' => '1m',
+						'item_test_timeout' => '1m',
+						'report_test_timeout' => '1m'
 					]
 				]
 			],
@@ -1774,24 +1728,22 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 						'Scheduled report test' => '   15s   '
 					],
 					'db' => [
-						'value_str' => [
-							'timeout_zabbix_agent' => '15s',
-							'timeout_simple_check' => '15s',
-							'timeout_snmp_agent' => '15s',
-							'timeout_external_check' => '15s',
-							'timeout_db_monitor' => '15s',
-							'timeout_http_agent' => '15s',
-							'timeout_ssh_agent' => '15s',
-							'timeout_telnet_agent' => '15s',
-							'timeout_script' => '15s',
-							'timeout_browser' => '15s',
-							'socket_timeout' => '15s',
-							'connect_timeout' => '15s',
-							'media_type_test_timeout' => '15s',
-							'script_timeout' => '15s',
-							'item_test_timeout' => '15s',
-							'report_test_timeout' => '15s'
-						]
+						'timeout_zabbix_agent' => '15s',
+						'timeout_simple_check' => '15s',
+						'timeout_snmp_agent' => '15s',
+						'timeout_external_check' => '15s',
+						'timeout_db_monitor' => '15s',
+						'timeout_http_agent' => '15s',
+						'timeout_ssh_agent' => '15s',
+						'timeout_telnet_agent' => '15s',
+						'timeout_script' => '15s',
+						'timeout_browser' => '15s',
+						'socket_timeout' => '15s',
+						'connect_timeout' => '15s',
+						'media_type_test_timeout' => '15s',
+						'script_timeout' => '15s',
+						'item_test_timeout' => '15s',
+						'report_test_timeout' => '15s'
 					]
 				]
 			]

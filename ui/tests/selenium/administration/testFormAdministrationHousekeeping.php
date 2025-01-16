@@ -48,25 +48,21 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 	];
 
 	public $db_default_values = [
-		'value_int' => [
-			'hk_events_mode' => 1,
-			'hk_history_global' => 0,
-			'hk_history_mode' => 1,
-			'hk_services_mode' => 1,
-			'hk_sessions_mode' => 1,
-			'hk_trends_mode' => 1,
-			'hk_trends_global' => 0
-		],
-		'value_str' => [
-			'hk_events_autoreg' => '1d',
-			'hk_events_discovery' => '1d',
-			'hk_events_internal' => '1d',
-			'hk_events_trigger' => '365d',
-			'hk_history' => '31d',
-			'hk_services' => '365d',
-			'hk_sessions' => '365d',
-			'hk_trends' => '365d'
-		]
+		'hk_events_mode' => 1,
+		'hk_events_trigger' => '365d',
+		'hk_events_internal' => '1d',
+		'hk_events_discovery' => '1d',
+		'hk_events_autoreg' => '1d',
+		'hk_services_mode' => 1,
+		'hk_services' => '365d',
+		'hk_sessions_mode' => 1,
+		'hk_sessions' => '365d',
+		'hk_history_mode' => 1,
+		'hk_history_global' => 0,
+		'hk_history' => '31d',
+		'hk_trends_mode' => 1,
+		'hk_trends_global' => 0,
+		'hk_trends' => '365d'
 	];
 
 	public $custom_values = [
@@ -185,15 +181,13 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends_global' => false
 					],
 					'db' => [
-						'value_int' => [
-							'hk_events_mode' => 0,
-							'hk_history_global' => 0,
-							'hk_history_mode' => 0,
-							'hk_services_mode' => 0,
-							'hk_sessions_mode' => 0,
-							'hk_trends_global' => 0,
-							'hk_trends_mode' => 0
-						]
+						'hk_events_mode' => 0,
+						'hk_services_mode' => 0,
+						'hk_sessions_mode' => 0,
+						'hk_history_mode' => 0,
+						'hk_history_global' => 0,
+						'hk_trends_mode' => 0,
+						'hk_trends_global' => 0
 					]
 				]
 			],
@@ -209,14 +203,10 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends' => '0'
 					],
 					'db' => [
-						'value_int' => [
-							'hk_history_global' => 1,
-							'hk_trends_global' => 1
-						],
-						'value_str' => [
-							'hk_history' => '0',
-							'hk_trends' => '0'
-						]
+						'hk_history_global' => 1,
+						'hk_history' => '0',
+						'hk_trends_global' => 1,
+						'hk_trends' => '0'
 					]
 				]
 			],
@@ -232,14 +222,10 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends' => '0s'
 					],
 					'db' => [
-						'value_int' => [
-							'hk_history_global' => 1,
-							'hk_trends_global' => 1
-						],
-						'value_str' => [
-							'hk_history' => '0s',
-							'hk_trends' => '0s'
-						]
+						'hk_history_global' => 1,
+						'hk_history' => '0s',
+						'hk_trends_global' => 1,
+						'hk_trends' => '0s'
 					]
 				]
 			],
@@ -255,14 +241,10 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends' => '0m'
 					],
 					'db' => [
-						'value_int' => [
-							'hk_history_global' => 1,
-							'hk_trends_global' => 1
-						],
-						'value_str' => [
-							'hk_history' => '0m',
-							'hk_trends' => '0m'
-						]
+						'hk_history_global' => 1,
+						'hk_history' => '0m',
+						'hk_trends_global' => 1,
+						'hk_trends' => '0m'
 					]
 				]
 			],
@@ -278,14 +260,10 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends' => '0h'
 					],
 					'db' => [
-						'value_int' => [
-							'hk_history_global' => 1,
-							'hk_trends_global' => 1
-						],
-						'value_str' => [
-							'hk_history' => '0h',
-							'hk_trends' => '0h'
-						]
+						'hk_history_global' => 1,
+						'hk_history' => '0h',
+						'hk_trends_global' => 1,
+						'hk_trends' => '0h'
 					]
 				]
 			],
@@ -301,14 +279,10 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends' => '0d'
 					],
 					'db' => [
-						'value_int' => [
-							'hk_history_global' => 1,
-							'hk_trends_global' => 1
-						],
-						'value_str' => [
-							'hk_history' => '0d',
-							'hk_trends' => '0d'
-						]
+						'hk_history_global' => 1,
+						'hk_history' => '0d',
+						'hk_trends_global' => 1,
+						'hk_trends' => '0d'
 					]
 				]
 			],
@@ -324,14 +298,10 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends' => '0w'
 					],
 					'db' => [
-						'value_int' => [
-							'hk_history_global' => 1,
-							'hk_trends_global' => 1
-						],
-						'value_str' => [
-							'hk_history' => '0w',
-							'hk_trends' => '0w'
-						]
+						'hk_history_global' => 1,
+						'hk_history' => '0w',
+						'hk_trends_global' => 1,
+						'hk_trends' => '0w'
 					]
 				]
 			],
@@ -361,25 +331,21 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends' => '86400'
 					],
 					'db' => [
-						'value_int' => [
-							'hk_events_mode' => 1,
-							'hk_history_global' => 1,
-							'hk_history_mode' => 1,
-							'hk_services_mode' => 1,
-							'hk_sessions_mode' => 1,
-							'hk_trends_global' => 1,
-							'hk_trends_mode' => 1
-						],
-						'value_str' => [
-							'hk_events_autoreg' => '86400',
-							'hk_events_discovery' => '86400',
-							'hk_events_internal' => '86400',
-							'hk_events_trigger' => '86400',
-							'hk_history' => '3600',
-							'hk_services' => '86400',
-							'hk_sessions' => '86400',
-							'hk_trends' => '86400'
-						]
+						'hk_events_mode' => 1,
+						'hk_events_trigger' => 86400,
+						'hk_events_internal' => 86400,
+						'hk_events_discovery' => 86400,
+						'hk_events_autoreg' => 86400,
+						'hk_services_mode' => 1,
+						'hk_services' => 86400,
+						'hk_sessions_mode' => 1,
+						'hk_sessions' => 86400,
+						'hk_history_mode' => 1,
+						'hk_history_global' => 1,
+						'hk_history' => 3600,
+						'hk_trends_mode' => 1,
+						'hk_trends_global' => 1,
+						'hk_trends' => 86400
 					]
 				]
 			],
@@ -407,23 +373,19 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends' => '86400s'
 					],
 					'db' => [
-						'value_int' => [
-							'hk_events_mode' => 1,
-							'hk_history_global' => 1,
-							'hk_services_mode' => 1,
-							'hk_sessions_mode' => 1,
-							'hk_trends_global' => 1
-						],
-						'value_str' => [
-							'hk_events_autoreg' => '86400s',
-							'hk_events_discovery' => '86400s',
-							'hk_events_internal' => '86400s',
-							'hk_events_trigger' => '86400s',
-							'hk_history' => '3600s',
-							'hk_services' => '86400s',
-							'hk_sessions' => '86400s',
-							'hk_trends' => '86400s'
-						]
+						'hk_events_mode' => 1,
+						'hk_events_trigger' => '86400s',
+						'hk_events_internal' => '86400s',
+						'hk_events_discovery' => '86400s',
+						'hk_events_autoreg' => '86400s',
+						'hk_services_mode' => 1,
+						'hk_services' => '86400s',
+						'hk_sessions_mode' => 1,
+						'hk_sessions' => '86400s',
+						'hk_history_global' => 1,
+						'hk_history' => '3600s',
+						'hk_trends_global' => 1,
+						'hk_trends' => '86400s'
 					]
 				]
 			],
@@ -451,23 +413,19 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends' => '1440m'
 					],
 					'db' => [
-						'value_int' => [
-							'hk_events_mode' => 1,
-							'hk_history_global' => 1,
-							'hk_services_mode' => 1,
-							'hk_sessions_mode' => 1,
-							'hk_trends_global' => 1
-						],
-						'value_str' => [
-							'hk_events_autoreg' => '1440m',
-							'hk_events_discovery' => '1440m',
-							'hk_events_internal' => '1440m',
-							'hk_events_trigger' => '1440m',
-							'hk_history' => '60m',
-							'hk_services' => '1440m',
-							'hk_sessions' => '1440m',
-							'hk_trends' => '1440m'
-						]
+						'hk_events_mode' => 1,
+						'hk_events_trigger' => '1440m',
+						'hk_events_internal' => '1440m',
+						'hk_events_discovery' => '1440m',
+						'hk_events_autoreg' => '1440m',
+						'hk_services_mode' => 1,
+						'hk_services' => '1440m',
+						'hk_sessions_mode' => 1,
+						'hk_sessions' => '1440m',
+						'hk_history_global' => 1,
+						'hk_history' => '60m',
+						'hk_trends_global' => 1,
+						'hk_trends' => '1440m'
 					]
 				]
 			],
@@ -495,23 +453,19 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends' => '24h'
 					],
 					'db' => [
-						'value_int' => [
-							'hk_events_mode' => 1,
-							'hk_history_global' => 1,
-							'hk_services_mode' => 1,
-							'hk_sessions_mode' => 1,
-							'hk_trends_global' => 1
-						],
-						'value_str' => [
-							'hk_events_autoreg' => '24h',
-							'hk_events_discovery' => '24h',
-							'hk_events_internal' => '24h',
-							'hk_events_trigger' => '24h',
-							'hk_history' => '1h',
-							'hk_services' => '24h',
-							'hk_sessions' => '24h',
-							'hk_trends' => '24h'
-						]
+						'hk_events_mode' => 1,
+						'hk_events_trigger' => '24h',
+						'hk_events_internal' => '24h',
+						'hk_events_discovery' => '24h',
+						'hk_events_autoreg' => '24h',
+						'hk_services_mode' => 1,
+						'hk_services' => '24h',
+						'hk_sessions_mode' => 1,
+						'hk_sessions' => '24h',
+						'hk_history_global' => 1,
+						'hk_history' => '1h',
+						'hk_trends_global' => 1,
+						'hk_trends' => '24h'
 					]
 				]
 			],
@@ -536,21 +490,17 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends' => '1d'
 					],
 					'db' => [
-						'value_int' => [
-							'hk_events_mode' => 1,
-							'hk_services_mode' => 1,
-							'hk_sessions_mode' => 1,
-							'hk_trends_global' => 1
-						],
-						'value_str' => [
-							'hk_events_autoreg' => '1d',
-							'hk_events_discovery' => '1d',
-							'hk_events_internal' => '1d',
-							'hk_events_trigger' => '1d',
-							'hk_services' => '1d',
-							'hk_sessions' => '1d',
-							'hk_trends' => '1d'
-						]
+						'hk_events_mode' => 1,
+						'hk_events_trigger' => '1d',
+						'hk_events_internal' => '1d',
+						'hk_events_discovery' => '1d',
+						'hk_events_autoreg' => '1d',
+						'hk_services_mode' => 1,
+						'hk_services' => '1d',
+						'hk_sessions_mode' => 1,
+						'hk_sessions' => '1d',
+						'hk_trends_global' => 1,
+						'hk_trends' => '1d'
 					]
 				]
 			],
@@ -578,23 +528,19 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends' => '788400000'
 					],
 					'db' => [
-						'value_int' => [
-							'hk_events_mode' => 1,
-							'hk_history_global' => 1,
-							'hk_services_mode' => 1,
-							'hk_sessions_mode' => 1,
-							'hk_trends_global' => 1
-						],
-						'value_str' => [
-							'hk_events_autoreg' => '788400000',
-							'hk_events_discovery' => '788400000',
-							'hk_events_internal' => '788400000',
-							'hk_events_trigger' => '788400000',
-							'hk_history' => '788400000',
-							'hk_services' => '788400000',
-							'hk_sessions' => '788400000',
-							'hk_trends' => '788400000'
-						]
+						'hk_events_mode' => 1,
+						'hk_events_trigger' => 788400000,
+						'hk_events_internal' => 788400000,
+						'hk_events_discovery' => 788400000,
+						'hk_events_autoreg' => 788400000,
+						'hk_services_mode' => 1,
+						'hk_services' => 788400000,
+						'hk_sessions_mode' => 1,
+						'hk_sessions' => 788400000,
+						'hk_history_global' => 1,
+						'hk_history' => 788400000,
+						'hk_trends_global' => 1,
+						'hk_trends' => 788400000
 					]
 				]
 			],
@@ -622,23 +568,19 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends' => '788400000s'
 					],
 					'db' => [
-						'value_int' => [
-							'hk_events_mode' => 1,
-							'hk_history_global' => 1,
-							'hk_services_mode' => 1,
-							'hk_sessions_mode' => 1,
-							'hk_trends_global' => 1
-						],
-						'value_str' => [
-							'hk_events_autoreg' => '788400000s',
-							'hk_events_discovery' => '788400000s',
-							'hk_events_internal' => '788400000s',
-							'hk_events_trigger' => '788400000s',
-							'hk_history' => '788400000s',
-							'hk_services' => '788400000s',
-							'hk_sessions' => '788400000s',
-							'hk_trends' => '788400000s'
-						]
+						'hk_events_mode' => 1,
+						'hk_events_trigger' => '788400000s',
+						'hk_events_internal' => '788400000s',
+						'hk_events_discovery' => '788400000s',
+						'hk_events_autoreg' => '788400000s',
+						'hk_services_mode' => 1,
+						'hk_services' => '788400000s',
+						'hk_sessions_mode' => 1,
+						'hk_sessions' => '788400000s',
+						'hk_history_global' => 1,
+						'hk_history' => '788400000s',
+						'hk_trends_global' => 1,
+						'hk_trends' => '788400000s'
 					]
 				]
 			],
@@ -666,23 +608,19 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends' => '13140000m'
 					],
 					'db' => [
-						'value_int' => [
-							'hk_events_mode' => 1,
-							'hk_history_global' => 1,
-							'hk_services_mode' => 1,
-							'hk_sessions_mode' => 1,
-							'hk_trends_global' => 1
-						],
-						'value_str' => [
-							'hk_events_autoreg' => '13140000m',
-							'hk_events_discovery' => '13140000m',
-							'hk_events_internal' => '13140000m',
-							'hk_events_trigger' => '13140000m',
-							'hk_history' => '13140000m',
-							'hk_services' => '13140000m',
-							'hk_sessions' => '13140000m',
-							'hk_trends' => '13140000m'
-						]
+						'hk_events_mode' => 1,
+						'hk_events_trigger' => '13140000m',
+						'hk_events_internal' => '13140000m',
+						'hk_events_discovery' => '13140000m',
+						'hk_events_autoreg' => '13140000m',
+						'hk_services_mode' => 1,
+						'hk_services' => '13140000m',
+						'hk_sessions_mode' => 1,
+						'hk_sessions' => '13140000m',
+						'hk_history_global' => 1,
+						'hk_history' => '13140000m',
+						'hk_trends_global' => 1,
+						'hk_trends' => '13140000m'
 					]
 				]
 			],
@@ -710,23 +648,19 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends' => '219000h'
 					],
 					'db' => [
-						'value_int' => [
-							'hk_events_mode' => 1,
-							'hk_history_global' => 1,
-							'hk_services_mode' => 1,
-							'hk_sessions_mode' => 1,
-							'hk_trends_global' => 1
-						],
-						'value_str' => [
-							'hk_events_autoreg' => '219000h',
-							'hk_events_discovery' => '219000h',
-							'hk_events_internal' => '219000h',
-							'hk_events_trigger' => '219000h',
-							'hk_history' => '219000h',
-							'hk_services' => '219000h',
-							'hk_sessions' => '219000h',
-							'hk_trends' => '219000h'
-						]
+						'hk_events_mode' => 1,
+						'hk_events_trigger' => '219000h',
+						'hk_events_internal' => '219000h',
+						'hk_events_discovery' => '219000h',
+						'hk_events_autoreg' => '219000h',
+						'hk_services_mode' => 1,
+						'hk_services' => '219000h',
+						'hk_sessions_mode' => 1,
+						'hk_sessions' => '219000h',
+						'hk_history_global' => 1,
+						'hk_history' => '219000h',
+						'hk_trends_global' => 1,
+						'hk_trends' => '219000h'
 					]
 				]
 			],
@@ -754,23 +688,19 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends' => '9125d'
 					],
 					'db' => [
-						'value_int' => [
-							'hk_events_mode' => 1,
-							'hk_history_global' => 1,
-							'hk_services_mode' => 1,
-							'hk_sessions_mode' => 1,
-							'hk_trends_global' => 1
-						],
-						'value_str' => [
-							'hk_events_autoreg' => '9125d',
-							'hk_events_discovery' => '9125d',
-							'hk_events_internal' => '9125d',
-							'hk_events_trigger' => '9125d',
-							'hk_history' => '9125d',
-							'hk_services' => '9125d',
-							'hk_sessions' => '9125d',
-							'hk_trends' => '9125d'
-						]
+						'hk_events_mode' => 1,
+						'hk_events_trigger' => '9125d',
+						'hk_events_internal' => '9125d',
+						'hk_events_discovery' => '9125d',
+						'hk_events_autoreg' => '9125d',
+						'hk_services_mode' => 1,
+						'hk_services' => '9125d',
+						'hk_sessions_mode' => 1,
+						'hk_sessions' => '9125d',
+						'hk_history_global' => 1,
+						'hk_history' => '9125d',
+						'hk_trends_global' => 1,
+						'hk_trends' => '9125d'
 					]
 				]
 			],
@@ -798,23 +728,19 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends' => '1303w'
 					],
 					'db' => [
-						'value_int' => [
-							'hk_events_mode' => 1,
-							'hk_history_global' => 1,
-							'hk_services_mode' => 1,
-							'hk_sessions_mode' => 1,
-							'hk_trends_global' => 1
-						],
-						'value_str' => [
-							'hk_events_autoreg' => '1303w',
-							'hk_events_discovery' => '1303w',
-							'hk_events_internal' => '1303w',
-							'hk_events_trigger' => '1303w',
-							'hk_history' => '1303w',
-							'hk_services' => '1303w',
-							'hk_sessions' => '1303w',
-							'hk_trends' => '1303w'
-						]
+						'hk_events_mode' => 1,
+						'hk_events_trigger' => '1303w',
+						'hk_events_internal' => '1303w',
+						'hk_events_discovery' => '1303w',
+						'hk_events_autoreg' => '1303w',
+						'hk_services_mode' => 1,
+						'hk_services' => '1303w',
+						'hk_sessions_mode' => 1,
+						'hk_sessions' => '1303w',
+						'hk_history_global' => 1,
+						'hk_history' => '1303w',
+						'hk_trends_global' => 1,
+						'hk_trends' => '1303w'
 					]
 				]
 			],
