@@ -205,7 +205,7 @@ class testFormAdministrationGeneral extends CWebTest {
 		$form->checkValue($values);
 
 		// Check saved configuration in database.
-		$expected_settings = CApiSettingsHelper::getParameters(array_keys($db));
+		$expected_settings = CTestDBSettingsHelper::getParameters(array_keys($db));
 
 		foreach ($db as $key => $value) {
 			$this->assertArrayHasKey($key, $expected_settings);

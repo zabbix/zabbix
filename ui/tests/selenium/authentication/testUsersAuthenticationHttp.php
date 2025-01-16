@@ -729,7 +729,7 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 		];
 
 		// Prepare reference array for int values.
-		$this->assertEquals(array_merge($default_values, $data['db_check']), CApiSettingsHelper::getParameters([
+		$this->assertEquals(array_merge($default_values, $data['db_check']), CTestDBSettingsHelper::getParameters([
 			'authentication_type', 'ldap_auth_enabled', 'ldap_case_sensitive', 'ldap_userdirectoryid',
 			'http_auth_enabled', 'http_login_form', 'http_strip_domains', 'http_case_sensitive'
 		]));

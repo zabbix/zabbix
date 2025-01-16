@@ -588,7 +588,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 
 			foreach ($data['db_check'] as $table => $rows) {
 				if ($table === 'settings') {
-					$this->assertEquals($rows, CApiSettingsHelper::getParameters(array_keys($rows)));
+					$this->assertEquals($rows, CTestDBSettingsHelper::getParameters(array_keys($rows)));
 				}
 				else {
 					foreach ($rows as $i => $row) {

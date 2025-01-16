@@ -105,7 +105,7 @@ class testUsersAuthentication extends CWebTest {
 			'passwd_check_rules' => 8
 		];
 
-		$this->assertEquals($expected_values, CApiSettingsHelper::getParameters(array_keys($expected_values)));
+		$this->assertEquals($expected_values, CTestDBSettingsHelper::getParameters(array_keys($expected_values)));
 	}
 
 	public function getFormData() {
@@ -193,7 +193,7 @@ class testUsersAuthentication extends CWebTest {
 			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 
 			// Check length fields saved in db.
-			$this->assertEquals($data['db_check'], CApiSettingsHelper::getParameters([
+			$this->assertEquals($data['db_check'], CTestDBSettingsHelper::getParameters([
 				'authentication_type', 'disabled_usrgrpid', 'passwd_min_length', 'passwd_check_rules'
 			]));
 		}
