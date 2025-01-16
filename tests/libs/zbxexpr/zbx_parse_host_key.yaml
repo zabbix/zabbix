@@ -28,12 +28,4 @@ out:
   return: SUCCEED
   exp_host: "hostname"
   exp_key: "\n!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
----
-test case: "5. Newlines"
-in:
-  exp: "smth"
-out:
-  return: SUCCEED
-  exp_host: "hostname"
-  exp_key: "111"
 ...
