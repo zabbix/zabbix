@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 class testScriptItems extends CIntegrationTest {
 	const HOST_NAME = 'test_hostconn';
 	const MACRO_PASSWORD_VALUE = 'badger_pa$$"\word';
-	const MACRO_PASSWORD_VALUE_ESCAPED = 'badger_pa$$\"\\word';
+	const MACRO_PASSWORD_VALUE_ESCAPED = 'badger_pa$$\"\\\\word';
 
 	/**
 	 * Component configuration provider for server related tests.
@@ -47,11 +47,6 @@ class testScriptItems extends CIntegrationTest {
 		];
 	}
 
-
-	/**
-	 * Test if both active and passive go agent checks are processed.
-	 *
-	 */
 	public function testScriptItems_checkData() {
 
 		$response = $this->call('host.create', [
@@ -86,7 +81,7 @@ class testScriptItems extends CIntegrationTest {
 			'timeout' => '3s',
 			'delay' => '1s',
 			'parameters' => ['name' => "mypassword", 'value' => '{$BADGER_PASSWORD}'],
-			'params'=> "  var obj = JSON.parse(value);   Zabbix.log(5, '[ BADGER X ] Debug auth: '+ JSON.stringify(obj.mypassword)); return 0;"]);
+			'params'=> "var obj = JSON.parse(value); Zabbix.log(5, '[ BADGER X ] Debug auth: '+ JSON.stringify(obj.mypassword)); return 0;"]);
 
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
