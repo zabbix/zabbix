@@ -90,6 +90,6 @@ class testScriptItems extends CIntegrationTest {
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "finished forced reloading of the configuration cache", true, 60, 1);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "[ BADGER X ] Debug auth: ".self::MACRO_PASSWORD_VALUE_ESCAPED, true, 60, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "[ BADGER X ] Debug auth: \"".self::MACRO_PASSWORD_VALUE_ESCAPED, true, 60, 1);
 	}
 }
