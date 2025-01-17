@@ -1664,7 +1664,7 @@ class testDataDisplayInGraphs extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'righty_static_units',
-										'value' => '€' // Units value (Axes tab).
+										'value' => 'cucumbers' // Units value (Axes tab).
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
