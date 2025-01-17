@@ -3085,8 +3085,6 @@ class C72XmlValidator extends CXmlValidatorGeneral {
 					'height' =>					['type' => XML_STRING | XML_REQUIRED],
 					'label_type' =>				['type' => XML_STRING | XML_REQUIRED],
 					'label_location' =>			['type' => XML_STRING | XML_REQUIRED],
-					'show_element_label' =>		['type' => XML_STRING | XML_REQUIRED],
-					'show_link_label' =>		['type' => XML_STRING | XML_REQUIRED],
 					'highlight' =>				['type' => XML_STRING | XML_REQUIRED],
 					'expandproblem' =>			['type' => XML_STRING | XML_REQUIRED],
 					'markelements' =>			['type' => XML_STRING | XML_REQUIRED],
@@ -3111,7 +3109,6 @@ class C72XmlValidator extends CXmlValidatorGeneral {
 					'background' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 						'name' =>					['type' => XML_STRING]
 					]],
-					'background_scale' =>		['type' => XML_STRING | XML_REQUIRED],
 					'iconmap' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 						'name' =>					['type' => XML_STRING]
 					]],
@@ -3129,7 +3126,6 @@ class C72XmlValidator extends CXmlValidatorGeneral {
 							'elements' =>				['type' => 0, 'ex_required' => [$this, 'requiredMapElement'], 'ex_validate' => [$this, 'validateMapElements'], 'ex_rules' => [$this, 'getMapElementsExtendedRules']],
 							'label' =>					['type' => XML_STRING | XML_REQUIRED],
 							'label_location' =>			['type' => XML_STRING | XML_REQUIRED],
-							'show_label' =>				['type' => XML_STRING | XML_REQUIRED],
 							'x' =>						['type' => XML_STRING | XML_REQUIRED],
 							'y' =>						['type' => XML_STRING | XML_REQUIRED],
 							'elementsubtype' =>			['type' => XML_STRING | XML_REQUIRED],
@@ -3204,11 +3200,10 @@ class C72XmlValidator extends CXmlValidatorGeneral {
 							'drawtype' =>				['type' => XML_STRING | XML_REQUIRED],
 							'color' =>					['type' => XML_STRING | XML_REQUIRED],
 							'label' =>					['type' => XML_STRING | XML_REQUIRED],
-							'show_label' =>				['type' => XML_STRING | XML_REQUIRED],
 							'selementid1' =>			['type' => XML_STRING | XML_REQUIRED],
 							'selementid2' =>			['type' => XML_STRING | XML_REQUIRED],
 							'linktriggers' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'linktrigger', 'rules' => [
-								'linktrigger' =>            ['type' => XML_ARRAY, 'rules' => [
+								'linktrigger' =>			['type' => XML_ARRAY, 'rules' => [
 									'drawtype' =>				['type' => XML_STRING | XML_REQUIRED],
 									'color' =>					['type' => XML_STRING | XML_REQUIRED],
 									'trigger' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
@@ -3217,25 +3212,7 @@ class C72XmlValidator extends CXmlValidatorGeneral {
 										'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED]
 									]]
 								]]
-							]],
-							'item' =>					['type' => XML_ARRAY, 'rules' => [
-								'host' =>					['type' => XML_STRING | XML_REQUIRED],
-								'key' =>					['type' => XML_STRING | XML_REQUIRED]
-							]],
-							'thresholds' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'threshold', 'rules' => [
-								'threshold' =>            ['type' => XML_ARRAY, 'rules' => [
-									'drawtype' =>				['type' => XML_STRING | XML_REQUIRED],
-									'color' =>					['type' => XML_STRING | XML_REQUIRED],
-									'threshold' =>				['type' => XML_STRING | XML_REQUIRED]
-								]]
-							]],
-							'highlights' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'highlight', 'rules' => [
-								'highlight' =>            ['type' => XML_ARRAY, 'rules' => [
-									'drawtype' =>				['type' => XML_STRING | XML_REQUIRED],
-									'color' =>					['type' => XML_STRING | XML_REQUIRED],
-									'pattern' =>				['type' => XML_STRING | XML_REQUIRED]
-								]]
-							]],
+							]]
 						]]
 					]]
 				]]

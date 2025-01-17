@@ -37,10 +37,6 @@ class C70ImportConverter extends CConverter {
 			$data['zabbix_export']['hosts'] = self::convertHosts($data['zabbix_export']['hosts']);
 		}
 
-		if (array_key_exists('maps', $data['zabbix_export'])) {
-			$data['zabbix_export']['maps'] = self::convertMaps($data['zabbix_export']['maps']);
-		}
-
 		return $data;
 	}
 
@@ -188,50 +184,5 @@ class C70ImportConverter extends CConverter {
 		unset($dashboard);
 
 		return $dashboards;
-	}
-
-	private static function convertMaps(array $maps): array {
-		foreach ($maps as &$map) {
-			if (!array_key_exists('show_element_label', $map)) {
-				$map['show_element_label'] = DB::getDefault('sysmaps', 'show_element_label');
-			}
-
-			if (!array_key_exists('show_link_label', $map)) {
-				$map['show_link_label'] = DB::getDefault('sysmaps', 'show_link_label');
-			}
-
-			if (!array_key_exists('background_scale', $map)) {
-				$map['background_scale'] = DB::getDefault('sysmaps', 'background_scale');
-			}
-
-			if (array_key_exists('selements', $map)) {
-				foreach ($map['selements'] as &$selement) {
-					if (!array_key_exists('show_label', $selement)) {
-						$selement['show_label'] = DB::getDefault('sysmaps_elements', 'show_label');
-					}
-				}
-				unset($selement);
-			}
-
-			if (array_key_exists('links', $map)) {
-				foreach ($map['links'] as &$link) {
-					if (!array_key_exists('show_label', $link)) {
-						$link['show_label'] = DB::getDefault('sysmaps_links', 'show_label');
-					}
-
-					if (!array_key_exists('thresholds', $link)) {
-						$link['thresholds'] = [];
-					}
-
-					if (!array_key_exists('highlights', $link)) {
-						$link['highlights'] = [];
-					}
-				}
-				unset($link);
-			}
-		}
-		unset($map);
-
-		return $maps;
 	}
 }
