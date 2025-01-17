@@ -1,2 +1,1 @@
 .......PS. [ZBXNEXT-9719] added history_cache_clear runtime command; improved disabled item to be cleared from history cache immediately; improved history cache message to log items with most values (vso)
-
