@@ -64,75 +64,8 @@ class testFormTotpEnroll extends testFormTotp {
 	}
 
 	public function getEnrollData() {
-		return [
-			[
-				[
-					// Default MFA settings.
-				]
-			],
-			[
-				[
-					// All MFA settings different.
-					'mfa_data' => [
-						'name' => 'Different name',
-						'hash_function' => TOTP_HASH_SHA256,
-						'code_length' => TOTP_CODE_LENGTH_8
-					]
-				]
-			],
-			[
-				[
-					// SHA 512 algorithm.
-					'mfa_data' => [
-						'hash_function' => TOTP_HASH_SHA512
-					]
-				]
-			],
-			[
-				[
-					// Incorrect code - number.
-					'expected' => TEST_BAD,
-					// Correct once in a million times, but it is better to test with a realistic TOTP.
-					'totp' => '999999',
-					'error' => 'The verification code was incorrect, please try again.'
-				]
-			],
-			[
-				[
-					// Incorrect code - invalid input.
-					'expected' => TEST_BAD,
-					'totp' => 'ABCD👍',
-					'error' => 'The verification code was incorrect, please try again.'
-				]
-			],
-			[
-				[
-					// TOTP is one time step in the past.
-					'time_step_offset' => -1
-				]
-			],
-			[
-				[
-					// TOTP is two time steps in the past.
-					'expected' => TEST_BAD,
-					'time_step_offset' => -2,
-					'error' => 'The verification code was incorrect, please try again.'
-				]
-			],
-			[
-				[
-					// TOTP is one time step in the future.
-					'time_step_offset' => 1
-				]
-			],
-			[
-				[
-					// TOTP is two time steps in the future.
-					'expected' => TEST_BAD,
-					'time_step_offset' => 2,
-					'error' => 'The verification code was incorrect, please try again.'
-				]
-			],
+		// Many test cases overlap with verify form, so reuse the data provider.
+		return array_merge($this->getGenericTotpData(), [
 			[
 				[
 					// Long MFA method name.
@@ -149,7 +82,7 @@ class testFormTotpEnroll extends testFormTotp {
 					]
 				]
 			]
-		];
+		]);
 	}
 
 	public function prepareEnrollData() {
@@ -189,7 +122,7 @@ class testFormTotpEnroll extends testFormTotp {
 		$this->assertEnrollDescription($form, $totp_algo, $totp_secret);
 
 		// Get the verification code (the TOTP itself). Generate if not defined in the data provider.
-		CMfaTotpHelper::waitForSafeTOTPWindow();
+		CMfaTotpHelper::waitForSafeTotpWindow();
 		$time_step_offset = CTestArrayHelper::get($data, 'time_step_offset', 0);
 		$totp = CTestArrayHelper::get($data, 'totp',
 			CMfaTotpHelper::generateTotp($totp_secret, $totp_code_length, $totp_algo, $time_step_offset)
@@ -202,7 +135,7 @@ class testFormTotpEnroll extends testFormTotp {
 		$this->page->waitUntilReady();
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
 			// Successful login.
-			$this->assertTrue($this->query('xpath://aside[@class="sidebar"]//a[text()="User settings"]')->exists());
+			$this->verifyLoggedIn();
 		}
 		else {
 			// Verify validation error.
@@ -285,8 +218,26 @@ class testFormTotpEnroll extends testFormTotp {
 		// Reset TOTP secret to make sure user has not already been enrolled.
 		$this->resetTotpConfiguration();
 
-		// Blocking behaviour is shared with the Verify form, reuse code.
+		// Blocking behaviour is shared with the verify form, reuse code.
 		$this->testTotpBlocking();
+	}
+
+	/**
+	 * Takes screenshot of the enroll form.
+	 */
+	public function testFormTotpEnroll_Screenshot() {
+		$this->resetTotpConfiguration();
+		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
+		$this->page->removeFocus();
+		$this->assertScreenshotExcept($this->page->query('class:signin-container')->one(),
+			[
+				// Hide the QR code and the secret string.
+				$this->page->query('class:qr-code')->one(),
+				// The secret string does not have a good selector, sadly.
+				$this->page->query('xpath://form/div[last()]')->one()
+			],
+			'TOTP enroll form'
+		);
 	}
 
 	/**

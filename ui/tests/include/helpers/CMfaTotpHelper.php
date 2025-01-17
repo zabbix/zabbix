@@ -84,9 +84,9 @@ class CMfaTotpHelper {
 	 * It also prevents a scenario where server and client time mismatches slightly and the client generates a future code
 	 * that the server rejects.
 	 *
-	 * @param float $tolerance    The maximum time (in seconds) allowed before a window change occurs.
+	 * @param float $tolerance    Minimum allowed time from a window change (seconds).
 	 */
-	public static function waitForSafeTOTPWindow($tolerance = 1) {
+	public static function waitForSafeTotpWindow($tolerance = 1) {
 		// Calculate the remaining time in the current TOTP window.
 		$time_in_window = fmod(microtime(true), self::TOTP_WINDOW_SIZE);
 		$remaining_time = self::TOTP_WINDOW_SIZE - $time_in_window;

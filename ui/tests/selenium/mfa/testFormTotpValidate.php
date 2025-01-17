@@ -30,8 +30,72 @@ class testFormTotpValidate extends testFormTotp {
 		$this->quickEnrollUser();
 		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
 
-		// All elements in the Validate form are also present in the Enroll form, so reuse code from there.
+		// All elements in the Validate form are also present in the enroll form, so reuse code from there.
 		$this->testTotpLayout();
+	}
+
+	public function getVerifyData() {
+		// Many test cases overlap with enroll form, so reuse the data provider.
+		return array_merge($this->getGenericTotpData(), [
+			[
+				[
+					// TOTP secret 16 characters long.
+					'totp_secret' => self::TOTP_SECRET_16
+				]
+			]
+		]);
+	}
+
+	public function prepareVerifyData() {
+		$providedData = $this->getProvidedData();
+		$data = reset($providedData);
+
+		$this->resetTotpConfiguration(
+			CTestArrayHelper::get($data, 'mfa_data.name', self::DEFAULT_METHOD_NAME),
+			CTestArrayHelper::get($data, 'mfa_data.hash_function', self::DEFAULT_ALGO),
+			CTestArrayHelper::get($data, 'mfa_data.code_length', self::DEFAULT_TOTP_CODE_LENGTH)
+		);
+
+		$this->quickEnrollUser(CTestArrayHelper::get($data, 'totp_secret', self::TOTP_SECRET_32));
+	}
+
+	/**
+	 * Test different verify scenarios.
+	 *
+	 * @dataProvider  getVerifyData
+	 * @onBefore      prepareVerifyData
+	 */
+	public function testFormTotpVerify_Verify($data) {
+		// Open the verify form.
+		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
+
+		// Get the used TOTP parameters.
+		$totp_algo = CTestArrayHelper::get($data, 'mfa_data.hash_function', self::DEFAULT_ALGO);
+		$totp_code_length = CTestArrayHelper::get($data, 'mfa_data.code_length', self::DEFAULT_TOTP_CODE_LENGTH);
+		$totp_secret = CTestArrayHelper::get($data, 'totp_secret', self::TOTP_SECRET_32);
+
+		$form = $this->page->query('class:signin-container')->asForm()->one();
+
+		// Get the verification code (the TOTP itself). Generate if not defined in the data provider.
+		CMfaTotpHelper::waitForSafeTotpWindow();
+		$time_step_offset = CTestArrayHelper::get($data, 'time_step_offset', 0);
+		$totp = CTestArrayHelper::get($data, 'totp',
+			CMfaTotpHelper::generateTotp($totp_secret, $totp_code_length, $totp_algo, $time_step_offset)
+		);
+
+		$form->getField('id:verification_code')->fill($totp);
+		$form->query('button:Sign in')->one()->click();
+
+		// Validate a successful login or an expected error.
+		$this->page->waitUntilReady();
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
+			// Successful login.
+			$this->verifyLoggedIn();
+		}
+		else {
+			// Verify validation error.
+			$this->assertEquals($data['error'], $form->query('class:red')->one()->getText());
+		}
 	}
 
 	/**
@@ -41,8 +105,19 @@ class testFormTotpValidate extends testFormTotp {
 		$this->resetTotpConfiguration();
 		$this->quickEnrollUser();
 
-		// Blocking behaviour is shared with the Enroll form, reuse code.
+		// Blocking behaviour is shared with the enroll form, reuse code.
 		$this->testTotpBlocking();
+	}
+
+	/**
+	 * Takes screenshot of the verify form.
+	 */
+	public function testFormTotpVerify_Screenshot() {
+		$this->resetTotpConfiguration();
+		$this->quickEnrollUser();
+		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
+		$this->page->removeFocus();
+		$this->assertScreenshot($this->page->query('class:signin-container')->one(), 'TOTP verify form');
 	}
 
 	/**
@@ -50,7 +125,9 @@ class testFormTotpValidate extends testFormTotp {
 	 * The secret can only be decided server-side, it can't be set by API or frontend.
 	 * This method avoids having to manually enroll via UI by setting the secret in DB directly.
 	 *
-	 * @param string $secret    TOTP secret to set in DB.
+	 * @param string $secret TOTP secret to set in DB.
+	 *
+	 * @throws Exception    Fails the test if the secret given is not valid.
 	 */
 	protected function quickEnrollUser($secret = self::TOTP_SECRET_32) {
 		if (!CMfaTotpHelper::isValidSecretString($secret)) {

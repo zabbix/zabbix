@@ -126,6 +126,90 @@ class testFormTotp extends CWebTest {
 	}
 
 	/**
+	 * Data provider cases that overlap for Enroll and Verify scenarios.
+	 */
+	protected function getGenericTotpData() {
+		return [
+			[
+				[
+					// Default MFA settings.
+				]
+			],
+			[
+				[
+					// All MFA settings different.
+					'mfa_data' => [
+						'name' => 'Different name',
+						'hash_function' => TOTP_HASH_SHA256,
+						'code_length' => TOTP_CODE_LENGTH_8
+					]
+				]
+			],
+			[
+				[
+					// SHA 512 algorithm.
+					'mfa_data' => [
+						'hash_function' => TOTP_HASH_SHA512
+					]
+				]
+			],
+			[
+				[
+					// Incorrect code - number.
+					'expected' => TEST_BAD,
+					// Correct once in a million times, but it is better to test with a realistic TOTP.
+					'totp' => '999999',
+					'error' => 'The verification code was incorrect, please try again.'
+				]
+			],
+			[
+				[
+					// Incorrect code - invalid input.
+					'expected' => TEST_BAD,
+					'totp' => 'ABCD👍',
+					'error' => 'The verification code was incorrect, please try again.'
+				]
+			],
+			[
+				[
+					// Incorrect code - max length.
+					'expected' => TEST_BAD,
+					'totp' => STRING_255,
+					'error' => 'The verification code was incorrect, please try again.'
+				]
+			],
+			[
+				[
+					// TOTP is one time step in the past.
+					'time_step_offset' => -1
+				]
+			],
+			[
+				[
+					// TOTP is two time steps in the past.
+					'expected' => TEST_BAD,
+					'time_step_offset' => -2,
+					'error' => 'The verification code was incorrect, please try again.'
+				]
+			],
+			[
+				[
+					// TOTP is one time step in the future.
+					'time_step_offset' => 1
+				]
+			],
+			[
+				[
+					// TOTP is two time steps in the future.
+					'expected' => TEST_BAD,
+					'time_step_offset' => 2,
+					'error' => 'The verification code was incorrect, please try again.'
+				]
+			]
+		];
+	}
+
+	/**
 	 * Blocking logic is shared in Enroll and Verify forms.
 	 */
 	public function testTotpBlocking() {
