@@ -44,7 +44,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$interface_type_count = array_fill_keys($interface_types, array_fill_keys(self::INTERFACE_STATUSES, 0));
 		$total_hosts = array_fill_keys(self::INTERFACE_STATUSES, 0);
 
-		if (!$this->isTemplateDashboard() || ($this->isTemplateDashboard() && $this->fields_values['override_hostid'])) {
+		if (!$this->isTemplateDashboard() || $this->isTemplateDashboard() && $this->fields_values['override_hostid']) {
 			$options = [
 				'output' => in_array(INTERFACE_TYPE_AGENT_ACTIVE, $interface_types) ? ['active_available'] : [],
 				'selectInterfaces' => ['interfaceid', 'type', 'available'],
@@ -86,7 +86,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 			unset($host);
 
-			$interface_enabled_items_count = filterInterfaceIdsByEnabledItems($interfaceids);
+			$interface_enabled_items_count = getEnabledItemsCountByInterfaceIds($interfaceids);
 
 			foreach ($db_hosts as $hostid => $host) {
 				$host_interfaces = array_fill_keys($interface_types, []);

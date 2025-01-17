@@ -2688,7 +2688,7 @@ function getEnabledItemTypeCountByHostId(int $item_type, array $hostids): array 
  *
  * @return array
  */
-function filterInterfaceIdsByEnabledItems(array $interfaceids): array {
+function getEnabledItemsCountByInterfaceIds(array $interfaceids): array {
 	if (!$interfaceids) {
 		return [];
 	}

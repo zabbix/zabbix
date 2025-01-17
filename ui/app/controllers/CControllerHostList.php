@@ -282,7 +282,7 @@ class CControllerHostList extends CController {
 		}
 
 		$templateids = array_keys(array_flip($templateids));
-		$interface_enabled_items_count = filterInterfaceIdsByEnabledItems($interfaceids);
+		$interface_enabled_items_count = getEnabledItemsCountByInterfaceIds($interfaceids);
 
 		$templates = API::Template()->get([
 			'output' => ['templateid', 'name'],

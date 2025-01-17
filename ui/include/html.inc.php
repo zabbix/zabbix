@@ -266,7 +266,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 	if (!$is_template) {
 		$items_count = getEnabledItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, [$hostid]);
 
-		$interface_enabled_items_count = filterInterfaceIdsByEnabledItems(
+		$interface_enabled_items_count = getEnabledItemsCountByInterfaceIds(
 			array_column($db_host['interfaces'], 'interfaceid')
 		);
 

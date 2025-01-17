@@ -174,7 +174,7 @@ abstract class CControllerHost extends CController {
 			$interfaceids = array_merge($interfaceids, array_column($host['interfaces'], 'interfaceid'));
 		}
 
-		$interface_enabled_items_count = filterInterfaceIdsByEnabledItems($interfaceids);
+		$interface_enabled_items_count = getEnabledItemsCountByInterfaceIds($interfaceids);
 
 		// Get count for every host with item type ITEM_TYPE_ZABBIX_ACTIVE (7).
 		$active_item_count_by_hostid = getEnabledItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, $hostids);
