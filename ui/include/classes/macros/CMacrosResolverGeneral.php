@@ -1193,8 +1193,139 @@ class CMacrosResolverGeneral {
 		$functions = DBfetchArray(DBselect(
 			'SELECT f.triggerid,f.functionid,i.itemid,i.name,i.value_type,i.units,i.valuemapid'.
 			' FROM functions f'.
-				' JOIN items i ON f.itemid=i.itemid'.
-				' JOIN hosts h ON i.hostid=h.hostid'.
+			' JOIN items i ON f.itemid=i.itemid'.
+			' JOIN hosts h ON i.hostid=h.hostid'.
+			' WHERE '.dbConditionInt('f.functionid', array_keys($macros))
+		));
+
+		$functions = self::getItemsValueMaps($functions);
+
+		// False passed to DBfetch to get data without null converted to 0, which is done by default.
+		foreach ($functions as $function) {
+			foreach ($macros[$function['functionid']] as $m => $tokens) {
+				$clock = null;
+				$value = null;
+
+				switch ($m) {
+					case 'ITEM.VALUE':
+						if ($options['events']) {
+							$trigger = $triggers[$function['triggerid']];
+							$history = Manager::History()->getValueAt($function, $trigger['clock'], $trigger['ns']);
+
+							if (is_array($history)) {
+								if (array_key_exists('clock', $history)) {
+									$clock = $history['clock'];
+								}
+
+								if (array_key_exists('value', $history)
+									&& $function['value_type'] != ITEM_VALUE_TYPE_BINARY) {
+									$value = $history['value'];
+								}
+							}
+							break;
+						}
+					// break; is not missing here
+
+					case 'ITEM.LASTVALUE':
+						$history = Manager::History()->getLastValues([$function], 1, timeUnitToSeconds(
+							CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)
+						));
+
+						if (array_key_exists($function['itemid'], $history)) {
+							$clock = $history[$function['itemid']][0]['clock'];
+
+							if ($function['value_type'] != ITEM_VALUE_TYPE_BINARY) {
+								$value = $history[$function['itemid']][0]['value'];
+							}
+						}
+						break;
+				}
+
+				foreach ($tokens as $token) {
+					if ($value !== null) {
+						$macro_value = array_key_exists('macrofunc', $token)
+							? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
+							: formatHistoryValue($value, $function);
+					}
+					else {
+						$macro_value = UNRESOLVED_MACRO_STRING;
+					}
+
+					if ($options['html']) {
+						$macro_value = str_replace(["\r\n", "\n"], [" "], $macro_value);
+						$hint_table = (new CTable())
+							->addClass(ZBX_STYLE_LIST_TABLE)
+							->addRow([
+								new CCol($function['name']),
+								new CCol(
+									($clock !== null)
+										? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock)
+										: UNRESOLVED_MACRO_STRING
+								),
+								new CCol($macro_value),
+								new CCol(
+									($function['value_type'] == ITEM_VALUE_TYPE_FLOAT
+										|| $function['value_type'] == ITEM_VALUE_TYPE_UINT64)
+										? new CLink(_('Graph'), (new CUrl('history.php'))
+										->setArgument('action', HISTORY_GRAPH)
+										->setArgument('itemids[]', $function['itemid'])
+										->getUrl()
+									)
+										: new CLink(_('History'), (new CUrl('history.php'))
+										->setArgument('action', HISTORY_VALUES)
+										->setArgument('itemids[]', $function['itemid'])
+										->getUrl()
+									)
+								)
+							]);
+						$macro_value = new CSpan([
+							(new CSpan())
+								->addClass('main-hint')
+								->setHint($hint_table),
+							(new CLinkAction($macro_value))
+								->addClass('hint-item')
+								->setAttribute('data-hintbox', '1')
+						]);
+					}
+
+					$macro_values[$function['triggerid']][$token['token']] = $macro_value;
+				}
+			}
+		}
+
+		return $macro_values;
+	}
+
+	/**
+	 * Get item macros.
+	 *
+	 * @param array $macros
+	 * @param array $macros[<functionid>]
+	 * @param array $macros[<functionid>][<macro>]  An array of the tokens.
+	 * @param array $macro_values
+	 * @param array $triggers
+	 * @param array $options
+	 * @param bool  $options['events']              Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
+	 * @param bool  $options['html']
+	 *
+	 * @return array
+	 */
+	protected static function getItemTimeMacros(array $macros, array $macro_values, array $triggers = [],
+			array $options = []) {
+		if (!$macros) {
+			return $macro_values;
+		}
+
+		$options += [
+			'events' => false,
+			'html' => false
+		];
+
+		$functions = DBfetchArray(DBselect(
+			'SELECT f.triggerid,f.functionid,i.itemid,i.value_type'.
+			' FROM functions f'.
+			' JOIN items i ON f.itemid=i.itemid'.
+			' JOIN hosts h ON i.hostid=h.hostid'.
 			' WHERE '.dbConditionInt('f.functionid', array_keys($macros))
 		));
 
@@ -1206,10 +1337,10 @@ class CMacrosResolverGeneral {
 				$clock = null;
 				$value = null;
 				$history = null;
-				$item_value_macros = ['ITEM.VALUE', 'ITEM.VALUE.DATE', 'ITEM.VALUE.TIME', 'ITEM.VALUE.TIMESTAMP',
+				$item_value_macros = ['ITEM.VALUE.DATE', 'ITEM.VALUE.TIME', 'ITEM.VALUE.TIMESTAMP',
 					'ITEM.VALUE.AGE'
 				];
-				$item_lastvalue_macros = ['ITEM.LASTVALUE', 'ITEM.LASTVALUE.DATE', 'ITEM.LASTVALUE.TIME',
+				$item_lastvalue_macros = ['ITEM.LASTVALUE.DATE', 'ITEM.LASTVALUE.TIME',
 					'ITEM.LASTVALUE.TIMESTAMP', 'ITEM.LASTVALUE.AGE'
 				];
 
@@ -1231,23 +1362,6 @@ class CMacrosResolverGeneral {
 				}
 
 				switch ($m) {
-					case 'ITEM.VALUE':
-						if ($options['events']) {
-							if (is_array($history) && array_key_exists('value', $history)
-									&& $function['value_type'] != ITEM_VALUE_TYPE_BINARY) {
-								$value = $history['value'];
-							}
-							break;
-						}
-						// break; is not missing here
-
-					case 'ITEM.LASTVALUE':
-						if (array_key_exists($function['itemid'], $history)
-								&& $function['value_type'] != ITEM_VALUE_TYPE_BINARY) {
-							$value = $history[$function['itemid']][0]['value'];
-						}
-						break;
-
 					case 'ITEM.VALUE.DATE':
 					case 'ITEM.LASTVALUE.DATE':
 						if ($clock) {
@@ -1279,52 +1393,13 @@ class CMacrosResolverGeneral {
 
 				foreach ($tokens as $token) {
 					if ($value !== null) {
-						$macro_value = array_key_exists('macrofunc', $token)
+						$macro_values[$function['triggerid']][$token['token']] = array_key_exists('macrofunc', $token)
 							? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
-							: formatHistoryValue($value, $function);
+							: $value;
 					}
 					else {
-						$macro_value = UNRESOLVED_MACRO_STRING;
+						$macro_values[$function['triggerid']][$token['token']] = UNRESOLVED_MACRO_STRING;
 					}
-
-					if ($options['html']) {
-						$macro_value = str_replace(["\r\n", "\n"], [" "], $macro_value);
-						$hint_table = (new CTable())
-							->addClass(ZBX_STYLE_LIST_TABLE)
-							->addRow([
-								new CCol($function['name']),
-								new CCol(
-									($clock !== null)
-										? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $clock)
-										: UNRESOLVED_MACRO_STRING
-								),
-								new CCol($macro_value),
-								new CCol(
-									($function['value_type'] == ITEM_VALUE_TYPE_FLOAT
-											|| $function['value_type'] == ITEM_VALUE_TYPE_UINT64)
-										? new CLink(_('Graph'), (new CUrl('history.php'))
-											->setArgument('action', HISTORY_GRAPH)
-											->setArgument('itemids[]', $function['itemid'])
-											->getUrl()
-										)
-										: new CLink(_('History'), (new CUrl('history.php'))
-											->setArgument('action', HISTORY_VALUES)
-											->setArgument('itemids[]', $function['itemid'])
-											->getUrl()
-										)
-								)
-							]);
-						$macro_value = new CSpan([
-							(new CSpan())
-								->addClass('main-hint')
-								->setHint($hint_table),
-							(new CLinkAction($macro_value))
-								->addClass('hint-item')
-								->setAttribute('data-hintbox', '1')
-						]);
-					}
-
-					$macro_values[$function['triggerid']][$token['token']] = $macro_value;
 				}
 			}
 		}

@@ -137,9 +137,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'macros_n' => [
 				'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}', '{ITEM.VALUE.DATE}', '{ITEM.VALUE.TIME}',
-					'{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
-					'{ITEM.LASTVALUE.TIMESTAMP}', '{ITEM.LASTVALUE.AGE}'
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}'],
+				'item_time' => ['{ITEM.VALUE.DATE}', '{ITEM.VALUE.TIME}', '{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}',
+					'{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}', '{ITEM.LASTVALUE.TIMESTAMP}',
+					'{ITEM.LASTVALUE.AGE}'
 				],
 				'log' => ['{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}', '{ITEM.LOG.TIMESTAMP}', '{ITEM.LOG.AGE}',
 					'{ITEM.LOG.SOURCE}', '{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
@@ -150,7 +151,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => [], 'item' => [], 'references' => [], 'log' => [], 'usermacros' => []];
+		$macros = ['host' => [], 'interface' => [], 'item' => [], 'item_time', 'references' => [], 'log' => [],
+			'usermacros' => []
+		];
 
 		$original_triggers = $triggers;
 		$triggers = self::resolveTriggerExpressions($triggers,
@@ -196,6 +199,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$macro_values = self::getHostMacros($macros['host'], $macro_values);
 			$macro_values = self::getIpMacros($macros['interface'], $macro_values);
 			$macro_values = self::getItemMacros($macros['item'], $macro_values);
+			$macro_values = self::getItemTimeMacros($macros['item_time'], $macro_values);
 			$macro_values = self::getItemLogMacros($macros['log'], $macro_values);
 			$macro_values = self::getTriggerUserMacros($macros['usermacros'], $macro_values);
 		}
@@ -227,9 +231,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'macros_n' => [
 				'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
 				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}', '{ITEM.VALUE.DATE}', '{ITEM.VALUE.TIME}',
-					'{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
-					'{ITEM.LASTVALUE.TIMESTAMP}', '{ITEM.LASTVALUE.AGE}'
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}'],
+				'item_time' => ['{ITEM.VALUE.DATE}', '{ITEM.VALUE.TIME}', '{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}',
+					'{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}', '{ITEM.LASTVALUE.TIMESTAMP}',
+					'{ITEM.LASTVALUE.AGE}'
 				],
 				'log' => ['{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}', '{ITEM.LOG.TIMESTAMP}', '{ITEM.LOG.AGE}',
 					'{ITEM.LOG.SOURCE}', '{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
@@ -239,7 +244,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => [], 'item' => [], 'log' => [], 'usermacros' => []];
+		$macros = ['host' => [], 'interface' => [], 'item' => [], 'item_time' => [], 'log' => [], 'usermacros' => []];
 
 		// Find macros.
 		foreach ($triggers as $triggerid => $trigger) {
@@ -272,6 +277,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = self::getHostMacros($macros['host'], $macro_values);
 		$macro_values = self::getIpMacros($macros['interface'], $macro_values);
 		$macro_values = self::getItemMacros($macros['item'], $macro_values, $triggers, $options);
+		$macro_values = self::getItemTimeMacros($macros['item_time'], $macro_values);
 		$macro_values = self::getItemLogMacros($macros['log'], $macro_values);
 		$macro_values = self::getTriggerUserMacros($macros['usermacros'], $macro_values);
 
@@ -338,9 +344,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			'macros_n' => [
 				'host' => ['{HOST.ID}', '{HOST.HOST}', '{HOST.NAME}'],
 				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}', '{ITEM.VALUE.DATE}', '{ITEM.VALUE.TIME}',
-					'{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}', '{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}',
-					'{ITEM.LASTVALUE.TIMESTAMP}', '{ITEM.LASTVALUE.AGE}'
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}'],
+				'item_time' => ['{ITEM.VALUE.DATE}', '{ITEM.VALUE.TIME}', '{ITEM.VALUE.TIMESTAMP}', '{ITEM.VALUE.AGE}',
+					'{ITEM.LASTVALUE.DATE}', '{ITEM.LASTVALUE.TIME}', '{ITEM.LASTVALUE.TIMESTAMP}',
+					'{ITEM.LASTVALUE.AGE}'
 				],
 				'log' => ['{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}', '{ITEM.LOG.TIMESTAMP}', '{ITEM.LOG.AGE}',
 					'{ITEM.LOG.SOURCE}', '{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
@@ -350,7 +357,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => [], 'item' => [], 'log' => [], 'usermacros' => []];
+		$macros = ['host' => [], 'interface' => [], 'item' => [], 'item_time' => [], 'log' => [], 'usermacros' => []];
 
 		$triggerid = $trigger['triggerid'];
 
@@ -389,6 +396,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = self::getHostMacros($macros['host'], $macro_values);
 		$macro_values = self::getIpMacros($macros['interface'], $macro_values);
 		$macro_values = self::getItemMacros($macros['item'], $macro_values);
+		$macro_values = self::getItemTimeMacros($macros['item_time'], $macro_values);
 		$macro_values = self::getItemLogMacros($macros['log'], $macro_values);
 		$macro_values = self::getTriggerUserMacros($macros['usermacros'], $macro_values);
 
