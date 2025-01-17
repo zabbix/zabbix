@@ -73,7 +73,8 @@ $filter_column1 = (new CFormList())
 			->setOptions(CSeverityHelper::getSeverities())
 			->setChecked($data['filter_priority'])
 			->setColumns(3)
-			->setVertical(true)
+			->setVertical()
+			->showTitles()
 	);
 
 if ($data['context'] === 'host') {
