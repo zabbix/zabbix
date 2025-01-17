@@ -98,6 +98,20 @@ $from_list = (new CFormList())
 			->addValue(_('CyberArk Vault'), ZBX_VAULT_TYPE_CYBERARK)
 			->setModern(true)
 	)
+	->addRow(
+			new CLabel([
+				_('Resolve secret vault macros by'),
+				makeHelpIcon([
+					_('Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed.'),
+					BR(),
+					_('Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently.')
+				])
+			], 'proxy_secrets_provider'),
+		(new CRadioButtonList('proxy_secrets_provider', (int) $data['proxy_secrets_provider']))
+			->addValue(_('Zabbix server'), ZBX_PROXY_SECRETS_PROVIDER_SERVER)
+			->addValue(_('Zabbix server and proxy'), ZBX_PROXY_SECRETS_PROVIDER_PROXY)
+			->setModern()
+	)
 	->addRow((new CTag('h4', true, _('Security')))->addClass('input-section-header'))
 	->addRow(
 		new CLabel(_('Validate URI schemes'), 'validate_uri_schemes'),
@@ -198,6 +212,7 @@ $html_page
 		'url' => DB::getDefault('config', 'url'),
 		'validate_uri_schemes' => DB::getDefault('config', 'validate_uri_schemes'),
 		'vault_provider' => DB::getDefault('config', 'vault_provider'),
+		'proxy_secrets_provider' => DB::getDefault('config', 'proxy_secrets_provider'),
 		'x_frame_options' => DB::getDefault('config', 'x_frame_options')
 	]).');
 '))

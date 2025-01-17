@@ -35,7 +35,8 @@ class CControllerMiscConfigEdit extends CController {
 			'x_frame_options' =>				'db config.x_frame_options',
 			'iframe_sandboxing_enabled' =>		'db config.iframe_sandboxing_enabled',
 			'iframe_sandboxing_exceptions' =>	'db config.iframe_sandboxing_exceptions',
-			'vault_provider' =>					'db config.vault_provider'
+			'vault_provider' =>					'db config.vault_provider',
+			'proxy_secrets_provider' =>			'db config.proxy_secrets_provider'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -82,7 +83,10 @@ class CControllerMiscConfigEdit extends CController {
 			'iframe_sandboxing_exceptions' => $this->getInput('iframe_sandboxing_exceptions', CSettingsHelper::get(
 				CSettingsHelper::IFRAME_SANDBOXING_EXCEPTIONS
 			)),
-			'vault_provider' => $this->getInput('vault_provider', CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER))
+			'vault_provider' => $this->getInput('vault_provider', CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER)),
+			'proxy_secrets_provider' => $this->getInput('proxy_secrets_provider',
+				CSettingsHelper::get(CSettingsHelper::PROXY_SECRETS_PROVIDER)
+			),
 		];
 
 		$x_frame_options = $this->getInput('x_frame_options', CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS));
