@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -423,6 +423,9 @@ void	zbx_http_convert_to_utf8(CURL *easyhandle, char **body, size_t *size, size_
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "content_type '%s'", content_type);
 #endif
+
+	if (NULL == *body)
+		return;
 
 	charset = zbx_determine_charset(content_type, *body, *size);
 
