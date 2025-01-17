@@ -46,6 +46,15 @@ class CUser extends CApiService {
 	public const LIMITED_OUTPUT_FIELDS = ['userid', 'username', 'name', 'surname'];
 
 	/**
+	 * Acceptable execution time of user verification process in seconds.
+	 *
+	 * @var float
+	 */
+	private const ACCEPTABLE_USER_VERIFICATION_TIME = 1.0;
+
+	private static $user_verification_start_time;
+
+	/**
 	 * Get users data.
 	 *
 	 * @param array  $options
@@ -1540,16 +1549,13 @@ class CUser extends CApiService {
 
 		$ldapValidator = new CLdapAuthValidator(['conf' => $cnf]);
 
-		if ($ldapValidator->validate($user)) {
-			return true;
-		}
-		else {
-			self::exception($ldapValidator->isConnectionError()
-					? ZBX_API_ERROR_PARAMETERS
-					: ZBX_API_ERROR_PERMISSIONS,
-				$ldapValidator->getError()
+		if (!$ldapValidator->validate($user)) {
+			self::exception($ldapValidator->isConnectionError() ? ZBX_API_ERROR_PARAMETERS : ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect user name or password or account is temporarily blocked.')
 			);
 		}
+
+		return true;
 	}
 
 	public function logout($user) {
@@ -1595,6 +1601,8 @@ class CUser extends CApiService {
 	 * @return string|array
 	 */
 	public function login(array $user) {
+		self::$user_verification_start_time = microtime(true);
+
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'username' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
 			'user' =>		['type' => API_STRING_UTF8, 'flags' => API_DEPRECATED, 'length' => 255],
@@ -1625,20 +1633,25 @@ class CUser extends CApiService {
 			GROUP_GUI_ACCESS_DISABLED => CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE)
 		];
 
-		$user_data = $this->findAccessibleUser($user['username'],
-			(CAuthenticationHelper::get(CAuthenticationHelper::LDAP_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
-			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE), true
-		);
-
-		if (array_key_exists('error', $user_data)) {
-			self::addAuditLogByUser(array_key_exists('db_user', $user_data) ? $user_data['db_user']['userid'] : null,
-				CWebUser::getIp(), $user['username'], CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER
+		try {
+			$db_user = $this->findAccessibleUser($user['username'],
+				(CAuthenticationHelper::get(CAuthenticationHelper::LDAP_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
+				CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE), true
+			);
+		}
+		catch (APIException $e) {
+			self::addAuditLogByUser(null, CWebUser::getIp(), $user['username'], CAudit::ACTION_LOGIN_FAILED,
+				CAudit::RESOURCE_USER
 			);
 
-			self::exception(ZBX_API_ERROR_PARAMETERS, $user_data['error']);
+			self::equalizeUserVerificationTime();
+
+			throw $e;
 		}
 
-		$db_user = $this->addExtraFields($user_data['db_user'], $user_data['permissions']);
+		$permissions = $this->getUserGroupsPermissions($db_user['userid']);
+		$db_user = $this->addExtraFields($db_user, $permissions);
+
 		$this->setTimezone($db_user['timezone']);
 
 		if ($db_user['attempt_failed'] >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
@@ -1650,6 +1663,7 @@ class CUser extends CApiService {
 					CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER
 				);
 
+				self::equalizeUserVerificationTime();
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('Incorrect user name or password or account is temporarily blocked.')
 				);
@@ -1657,22 +1671,13 @@ class CUser extends CApiService {
 		}
 
 		try {
-			switch ($group_to_auth_map[$db_user['gui_access']]) {
-				case ZBX_AUTH_LDAP:
-					$this->ldapLogin($user);
-					break;
-
-				case ZBX_AUTH_INTERNAL:
-					if (!self::verifyPassword($user['password'], $db_user)) {
-						self::exception(ZBX_API_ERROR_PERMISSIONS,
-							_('Incorrect user name or password or account is temporarily blocked.')
-						);
-					}
-					break;
-
-				default:
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions for system access.'));
-					break;
+			if ($group_to_auth_map[$db_user['gui_access']] == ZBX_AUTH_LDAP) {
+				$this->ldapLogin($user);
+			}
+			elseif (!self::verifyPassword($user['password'], $db_user)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('Incorrect user name or password or account is temporarily blocked.')
+				);
 			}
 		}
 		catch (APIException $e) {
@@ -1697,15 +1702,15 @@ class CUser extends CApiService {
 				self::addAuditLogByUser($db_user['userid'], $db_user['userip'], $db_user['username'],
 					CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER
 				);
-
-				if ($attempt_failed >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS,
-						_('Incorrect user name or password or account is temporarily blocked.')
-					);
-				}
 			}
 
+			self::equalizeUserVerificationTime();
+
 			self::exception(ZBX_API_ERROR_PERMISSIONS, $e->getMessage());
+		}
+
+		if ($permissions['users_status'] == GROUP_STATUS_DISABLED) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions for system access.'));
 		}
 
 		// Start session.
@@ -1760,17 +1765,28 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect method "%1$s.%2$s".', 'user', 'loginByUsername'));
 		}
 
-		$user_data = $this->findAccessibleUser($username, $case_sensitive, $default_auth, false);
-
-		if (array_key_exists('error', $user_data)) {
-			self::addAuditLogByUser(array_key_exists('db_user', $user_data) ? $user_data['db_user']['userid'] : null,
-				CWebUser::getIp(), $username, CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER
+		try {
+			$db_user = $this->findAccessibleUser($username, $case_sensitive, $default_auth, false);
+		}
+		catch (APIException $e) {
+			self::addAuditLogByUser(null, CWebUser::getIp(), $username, CAudit::ACTION_LOGIN_FAILED,
+				CAudit::RESOURCE_USER
 			);
 
-			self::exception(ZBX_API_ERROR_PARAMETERS, $user_data['error']);
+			throw $e;
 		}
 
-		$db_user = $this->addExtraFields($user_data['db_user'], $user_data['permissions']);
+		$permissions = $this->getUserGroupsPermissions($db_user['userid']);
+
+		if ($permissions['users_status'] == GROUP_STATUS_DISABLED) {
+			self::addAuditLogByUser($db_user['userid'], CWebUser::getIp(), $username, CAudit::ACTION_LOGIN_FAILED,
+				CAudit::RESOURCE_USER
+			);
+
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions for system access.'));
+		}
+
+		$db_user = $this->addExtraFields($db_user, $permissions);
 		$this->setTimezone($db_user['timezone']);
 
 		unset($db_user['passwd']);
@@ -2283,21 +2299,18 @@ class CUser extends CApiService {
 		}
 
 		if (!$db_users) {
-			return ['error' => _('Incorrect user name or password or account is temporarily blocked.')];
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect user name or password or account is temporarily blocked.')
+			);
 		}
 
 		if (count($db_users) > 1) {
-			return ['error' => _s('Authentication failed: %1$s.', _('supplied credentials are not unique'))];
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Authentication failed: %1$s.', _('supplied credentials are not unique'))
+			);
 		}
 
-		$db_user = reset($db_users);
-		$permissions = $this->getUserGroupsPermissions($db_user['userid']);
-
-		if ($permissions['users_status'] == GROUP_STATUS_DISABLED) {
-			return ['error' => _('No permissions for system access.'), 'db_user' => $db_user];
-		}
-
-		return ['db_user' => $db_user, 'permissions' => $permissions];
+		return reset($db_users);
 	}
 
 	/**
@@ -2366,5 +2379,21 @@ class CUser extends CApiService {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Equalizes user verification time to mitigate timing attacks.
+	 */
+	private static function equalizeUserVerificationTime(): void {
+		$actual_time = microtime(true) - self::$user_verification_start_time;
+
+		if ($actual_time < self::ACCEPTABLE_USER_VERIFICATION_TIME) {
+			$delay_time = self::ACCEPTABLE_USER_VERIFICATION_TIME - $actual_time;
+
+			$delay_time_sec = (int) $delay_time;
+			$delay_time_nsec = (int) (($delay_time - $delay_time_sec) * 10**9);
+
+			time_nanosleep($delay_time_sec, $delay_time_nsec);
+		}
 	}
 }

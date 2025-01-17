@@ -77,7 +77,8 @@ $filter_column = (new CFormList())
 			->setOptions(CSeverityHelper::getSeverities())
 			->setChecked($data['filter']['severities'])
 			->setColumns(3)
-			->setVertical(true)
+			->setVertical()
+			->showTitles()
 	);
 
 $filterForm

@@ -97,7 +97,7 @@ $form_list
 		(new CCheckBoxList('days'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setOptions($days_weekly)
-			->setVertical(true)
+			->setVertical()
 			->setColumns(3),
 		'row_timeperiod_dayofweek'
 	)
@@ -105,7 +105,7 @@ $form_list
 		(new CCheckBoxList('months'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setOptions($months)
-			->setVertical(true)
+			->setVertical()
 			->setColumns(3),
 		'row_timeperiod_months'
 	)
@@ -134,7 +134,7 @@ $form_list
 		(new CCheckBoxList('monthly_days'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setOptions($days_monthly)
-			->setVertical(true)
+			->setVertical()
 			->setColumns(3),
 		'row_timeperiod_week_days'
 	)
