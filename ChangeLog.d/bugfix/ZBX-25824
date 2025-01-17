@@ -1,0 +1,1 @@
+.......PS. [ZBX-25824] fixed SNMP-based discovery rules to prevent potential flooding with requests when a host has flapping availability (dgoloscapov)
