@@ -1193,8 +1193,8 @@ class CMacrosResolverGeneral {
 		$functions = DBfetchArray(DBselect(
 			'SELECT f.triggerid,f.functionid,i.itemid,i.name,i.value_type,i.units,i.valuemapid'.
 			' FROM functions f'.
-			' JOIN items i ON f.itemid=i.itemid'.
-			' JOIN hosts h ON i.hostid=h.hostid'.
+				' JOIN items i ON f.itemid=i.itemid'.
+				' JOIN hosts h ON i.hostid=h.hostid'.
 			' WHERE '.dbConditionInt('f.functionid', array_keys($macros))
 		));
 
@@ -1218,13 +1218,13 @@ class CMacrosResolverGeneral {
 								}
 
 								if (array_key_exists('value', $history)
-									&& $function['value_type'] != ITEM_VALUE_TYPE_BINARY) {
+										&& $function['value_type'] != ITEM_VALUE_TYPE_BINARY) {
 									$value = $history['value'];
 								}
 							}
 							break;
 						}
-					// break; is not missing here
+						// break; is not missing here
 
 					case 'ITEM.LASTVALUE':
 						$history = Manager::History()->getLastValues([$function], 1, timeUnitToSeconds(
@@ -1265,16 +1265,16 @@ class CMacrosResolverGeneral {
 								new CCol($macro_value),
 								new CCol(
 									($function['value_type'] == ITEM_VALUE_TYPE_FLOAT
-										|| $function['value_type'] == ITEM_VALUE_TYPE_UINT64)
+											|| $function['value_type'] == ITEM_VALUE_TYPE_UINT64)
 										? new CLink(_('Graph'), (new CUrl('history.php'))
-										->setArgument('action', HISTORY_GRAPH)
-										->setArgument('itemids[]', $function['itemid'])
-										->getUrl()
+											->setArgument('action', HISTORY_GRAPH)
+											->setArgument('itemids[]', $function['itemid'])
+											->getUrl()
 									)
 										: new CLink(_('History'), (new CUrl('history.php'))
-										->setArgument('action', HISTORY_VALUES)
-										->setArgument('itemids[]', $function['itemid'])
-										->getUrl()
+											->setArgument('action', HISTORY_VALUES)
+											->setArgument('itemids[]', $function['itemid'])
+											->getUrl()
 									)
 								)
 							]);
