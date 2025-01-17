@@ -72,7 +72,7 @@ $parameters += $data['templateid'] === ''
 $item_select = (new CMultiSelect([
 	'name' => 'itemid',
 	'object_name' => 'items',
-	'data' => $data['ms_item'] ? [$data['ms_item']] : '',
+	'data' => $data['ms_item'] ? [$data['ms_item']] : [],
 	'multiple' => false,
 	'popup' => [
 		'parameters' => $parameters

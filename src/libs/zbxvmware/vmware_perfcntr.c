@@ -893,8 +893,6 @@ static void	vmware_service_copy_perf_data(const zbx_vmware_service_t *service,
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-#define ZBX_XML_DATETIME		26
-
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieves performance counter values from vmware service          *
@@ -1237,8 +1235,6 @@ static void	vmware_perf_counters_availability_check(zbx_vmware_service_t *servic
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
-
-#undef ZBX_XML_DATETIME
 
 /******************************************************************************
  *                                                                            *

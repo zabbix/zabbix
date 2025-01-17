@@ -93,7 +93,7 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 					->addClass($this->getLabelClass())
 					->addClass('js-'.$field_selector.'-reference')
 					->setAsteriskMark(),
-				'view' =>  (new CMultiSelect([
+				'view' => (new CMultiSelect([
 					'name' => $field_name.'['.CWidgetField::FOREIGN_REFERENCE_KEY.']',
 					'add_post_js' => false
 				]))
