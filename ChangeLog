@@ -3,6 +3,14 @@ Changes for 6.0.38rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-25466] removed title from item mass update preprocessing steps checkbox (dpankins)
+..F....... [ZBX-25535] fixed overriding Y-axes in Graph widget (dpankins)
+...G...... [ZBX-24672] replaced collector interface with runner interface in Zabbix agent 2 perfmon plugin (asestakovs)
+...G...... [ZBX-25439] added MariaDB specific info to MySQL plugin README (sjurgensons)
+A......... [ZBX-24690] fixed yaml generation in compact nested mapping mode (gcalenko)
+...G...... [ZBX-25443] updated Go version requirement to 1.21 (esneiders)
+..F....... [ZBX-22979] added focus traps to popup sla edit, popup service edit (rgontarski)
+.......P.. [ZBX-25782] fixed Zabbix proxy failing to create database on RHEL (dgoloscapov)
 ...G...... [ZBX-25460] fixed inconsistent report of free disk space by Zabbix agent 2 in response to vfs.fs.get on Windows (mprihodko)
 ...G...PS. [ZBX-25296] removed overzealous preprocessor tests for LIBRESSL_VERSION_NUMBER (jxl)
 .......PS. [ZBX-25373] fixed possibility to insert duplicate triggers via LLD (dgoloscapov)
