@@ -39,6 +39,14 @@ class testDataDisplayInGraphs extends CWebTest {
 		'pie' => [
 			'from' => 'now-1h',
 			'to' => 'now'
+		],
+		'scale_history' => [
+			'from' => '2023-10-07 13:58:00',
+			'to' => '2023-10-07 14:20:00'
+		],
+		'scale_trends' => [
+			'from' => '2023-09-27 00:00:00',
+			'to' => '2023-10-01 12:00:00'
 		]
 	];
 
@@ -507,17 +515,17 @@ class testDataDisplayInGraphs extends CWebTest {
 				'timestamps' => [
 					$timestamp,
 					$timestamp.' + 1 minute',
-					$timestamp.' + 2 minute',
-					$timestamp.' + 3 minute',
-					$timestamp.' + 6 minute',
-					$timestamp.' + 7 minute',
-					$timestamp.' + 8 minute',
-					$timestamp.' + 13 minute',
-					$timestamp.' + 14 minute',
-					$timestamp.' + 15 minute',
-					$timestamp.' + 16 minute',
-					$timestamp.' + 17 minute',
-					$timestamp.' + 18 minute'
+					$timestamp.' + 2 minutes',
+					$timestamp.' + 3 minutes',
+					$timestamp.' + 6 minutes',
+					$timestamp.' + 7 minutes',
+					$timestamp.' + 8 minutes',
+					$timestamp.' + 13 minutes',
+					$timestamp.' + 14 minutes',
+					$timestamp.' + 15 minutes',
+					$timestamp.' + 16 minutes',
+					$timestamp.' + 17 minutes',
+					$timestamp.' + 18 minutes'
 				],
 				'values' => [10.5, 8.33, 12.69, 4.025, 3.1, 7, 6.66, -1.5, 0.31, 6.47, 2.11, 8.98, 10.01]
 			],
@@ -626,19 +634,292 @@ class testDataDisplayInGraphs extends CWebTest {
 				'timestamps' => [
 					$timestamp,
 					$timestamp.' + 1 minute',
-					$timestamp.' + 2 minute',
-					$timestamp.' + 3 minute',
-					$timestamp.' + 4 minute',
-					$timestamp.' + 5 minute',
-					$timestamp.' + 6 minute',
-					$timestamp.' + 11 minute',
-					$timestamp.' + 12 minute',
-					$timestamp.' + 13 minute',
-					$timestamp.' + 16 minute',
-					$timestamp.' + 17 minute',
-					$timestamp.' + 18 minute'
+					$timestamp.' + 2 minutes',
+					$timestamp.' + 3 minutes',
+					$timestamp.' + 4 minutes',
+					$timestamp.' + 5 minutes',
+					$timestamp.' + 6 minutes',
+					$timestamp.' + 11 minutes',
+					$timestamp.' + 12 minutes',
+					$timestamp.' + 13 minutes',
+					$timestamp.' + 16 minutes',
+					$timestamp.' + 17 minutes',
+					$timestamp.' + 18 minutes'
 				],
 				'values' => [4.31, -0.5, 7.53, 2.37, 5.55, 7.77, 9.11, 10.34, 2.23, 5.98, -3.21, 2.45, 5.1]
+			],
+			// History data for first axes scale scenario.
+			[
+				'itemid' => self::$itemids['Item for history data display 1'],
+				'timestamps' => [
+					$timestamp.' + 1 hour',
+					$timestamp.' + 1 hour 1 minute',
+					$timestamp.' + 1 hour 2 minutes',
+					$timestamp.' + 1 hour 3 minutes',
+					$timestamp.' + 1 hour 6 minutes',
+					$timestamp.' + 1 hour 7 minutes',
+					$timestamp.' + 1 hour 8 minutes',
+					$timestamp.' + 1 hour 13 minutes',
+					$timestamp.' + 1 hour 14 minutes',
+					$timestamp.' + 1 hour 15 minutes',
+					$timestamp.' + 1 hour 16 minutes',
+					$timestamp.' + 1 hour 17 minutes',
+					$timestamp.' + 1 hour 18 minutes'
+				],
+				'values' => [110.5, 80.33, 120.69, 40.025, 30.1, 70, 60.66, -10.5, 10.31, 60.47, 20.11, 80.98, 130.01]
+			],
+			// History data for second axes scale scenario.
+			[
+				'itemid' => self::$itemids['Item for history data display 2'],
+				'timestamps' => [
+					$timestamp.' + 1 hour',
+					$timestamp.' + 1 hour 1 minute',
+					$timestamp.' + 1 hour 2 minutes',
+					$timestamp.' + 1 hour 3 minutes',
+					$timestamp.' + 1 hour 4 minutes',
+					$timestamp.' + 1 hour 5 minutes',
+					$timestamp.' + 1 hour 6 minutes',
+					$timestamp.' + 1 hour 11 minutes',
+					$timestamp.' + 1 hour 12 minutes',
+					$timestamp.' + 1 hour 13 minutes',
+					$timestamp.' + 1 hour 16 minutes',
+					$timestamp.' + 1 hour 17 minutes',
+					$timestamp.' + 1 hour 18 minutes'
+				],
+				'values' => [40.31, -10.5, 70.53, 20.37, 50.55, 70.77, 90.11, 199.34, 70.23, 50.98, -30.21, 20.45, 50.1]
+			],
+			// Trends data for third axes scale scenario.
+			[
+				'itemid' => self::$itemids['Item for trends data display 1'],
+				'timestamps' => [
+					$timestamp.' - 11 days + 18 hours',
+					$timestamp.' - 10 days',
+					$timestamp.' - 10 days + 6 hours',
+					$timestamp.' - 10 days + 12 hours',
+					$timestamp.' - 10 days + 18 hours',
+					$timestamp.' - 9 days',
+					$timestamp.' - 9 days + 3 hours',
+					$timestamp.' - 9 days + 6 hours',
+					$timestamp.' - 9 days + 9 hours',
+					$timestamp.' - 9 days + 12 hours',
+					$timestamp.' - 9 days + 21 hours',
+					$timestamp.' - 8 days',
+					$timestamp.' - 8 days + 21 hours',
+					$timestamp.' - 7 day',
+					$timestamp.' - 7 day + 3 hours',
+					$timestamp.' - 7 day + 6 hours',
+					$timestamp.' - 7 day + 12 hours',
+					$timestamp.' - 7 day + 15 hours'
+				],
+				'values' => [
+					[
+						'num' => 30,
+						'avg' => 60.03,
+						'min' => -40.1,
+						'max' => 130.57
+					],
+					[
+						'num' => 30,
+						'avg' => 140.73,
+						'min' => -10.74,
+						'max' => 190.01
+					],
+					[
+						'num' => 30,
+						'avg' => 80.23,
+						'min' => 30.7,
+						'max' => 150.3
+					],
+					[
+						'num' => 30,
+						'avg' => -20.95,
+						'min' => -50.15,
+						'max' => -5.2
+					],
+					[
+						'num' => 30,
+						'avg' => 60.66,
+						'min' => 10.19,
+						'max' => 120.2
+					],
+					[
+						'num' => 30,
+						'avg' => 70.07,
+						'min' => 20.22,
+						'max' => 130.38
+					],
+					[
+						'num' => 30,
+						'avg' => 50.19,
+						'min' => 20.41,
+						'max' => 90.62
+					],
+					[
+						'num' => 33,
+						'avg' => 122.42,
+						'min' => 99.37,
+						'max' => 244.02
+					],
+					[
+						'num' => 30,
+						'avg' => 50.75,
+						'min' => 20.13,
+						'max' => 130.72
+					],
+					[
+						'num' => 30,
+						'avg' => 80,
+						'min' => 40.32,
+						'max' => 110.7
+					],
+					[
+						'num' => 30,
+						'avg' => 40.3,
+						'min' => 10.97,
+						'max' => 80.73
+					],
+					[
+						'num' => 30,
+						'avg' => 60.9,
+						'min' => 20.81,
+						'max' => 120.1
+					],
+					[
+						'num' => 30,
+						'avg' => 70.12,
+						'min' => 40.04,
+						'max' => 110.26
+					],
+					[
+						'num' => 30,
+						'avg' => 50.05,
+						'min' => 10.92,
+						'max' => 130.01
+					],
+					[
+						'num' => 30,
+						'avg' => 30.83,
+						'min' => -10.13,
+						'max' => 80.15
+					],
+					[
+						'num' => 30,
+						'avg' => 190.23,
+						'min' => -30.7,
+						'max' => 350.13
+					],
+					[
+						'num' => 30,
+						'avg' => 140.95,
+						'min' => 89.1,
+						'max' => 211.2
+					],
+					[
+						'num' => 30,
+						'avg' => 60.5,
+						'min' => 00.1,
+						'max' => 150.21
+					]
+				]
+			],
+			// Trends data for fourth axes scale scenario.
+			[
+				'itemid' => self::$itemids['Item for trends data display 2'],
+				'timestamps' => [
+					$timestamp.' - 11 days + 18 hours',
+					$timestamp.' - 10 days',
+					$timestamp.' - 10 days + 6 hours',
+					$timestamp.' - 10 days + 12 hours',
+					$timestamp.' - 10 days + 18 hours',
+					$timestamp.' - 9 days',
+					$timestamp.' - 9 days + 6 hours',
+					$timestamp.' - 8 days + 6 hours',
+					$timestamp.' - 8 days + 12 hours',
+					$timestamp.' - 8 days + 18 hours',
+					$timestamp.' - 7 day + 6 hours',
+					$timestamp.' - 7 day + 12 hours',
+					$timestamp.' - 7 day + 18 hours'
+				],
+				'values' => [
+					[
+						'num' => 590,
+						'avg' => 390.07,
+						'min' => 111.54,
+						'max' => 1130.81
+					],
+					[
+						'num' => 590,
+						'avg' => 170.62,
+						'min' => 33.91,
+						'max' => 333.77
+					],
+					[
+						'num' => 590,
+						'avg' => 90.99,
+						'min' => 10.01,
+						'max' => 190.45
+					],
+					[
+						'num' => 480,
+						'avg' => -104.31,
+						'min' => -145.56,
+						'max' => -55.1
+					],
+					[
+						'num' => 510,
+						'avg' => -15.12,
+						'min' => -55.45,
+						'max' => -10.23
+					],
+					[
+						'num' => 590,
+						'avg' => 80.31,
+						'min' => -10.05,
+						'max' => 170.26
+					],
+					[
+						'num' => 590,
+						'avg' => 122.71,
+						'min' => 20.19,
+						'max' => 210.11
+					],
+					[
+						'num' => 350,
+						'avg' => 401.96,
+						'min' => 111.41,
+						'max' => 703.35
+					],
+					[
+						'num' => 520,
+						'avg' => 190.1,
+						'min' => 130.01,
+						'max' => 340.45
+					],
+					[
+						'num' => 590,
+						'avg' => 90,
+						'min' => 50.5,
+						'max' => 160.5
+					],
+					[
+						'num' => 590,
+						'avg' => 40.21,
+						'min' => -20.1,
+						'max' => 120.31
+					],
+					[
+						'num' => 590,
+						'avg' => 00.74,
+						'min' => -60.05,
+						'max' => 90.26
+					],
+					[
+						'num' => 590,
+						'avg' => 70.12,
+						'min' => 10.55,
+						'max' => 100.42
+					]
+				]
 			]
 		];
 
@@ -675,7 +956,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 6,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
 										'name' => 'graphid.0',
 										'value' => $graph_responce['graphids'][0]
 									]
@@ -691,7 +972,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 6,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
 										'name' => 'graphid.0',
 										'value' => $graph_responce['graphids'][1]
 									]
@@ -707,7 +988,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 6,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
 										'name' => 'graphid.0',
 										'value' => $graph_responce['graphids'][2]
 									]
@@ -723,7 +1004,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 6,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
 										'name' => 'graphid.0',
 										'value' => $graph_responce['graphids'][3]
 									]
@@ -739,7 +1020,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 6,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
 										'name' => 'graphid.0',
 										'value' => $graph_responce['graphids'][4]
 									]
@@ -755,7 +1036,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 6,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
 										'name' => 'graphid.0',
 										'value' => $graph_responce['graphids'][5]
 									]
@@ -771,7 +1052,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 6,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
 										'name' => 'graphid.0',
 										'value' => $graph_responce['graphids'][6]
 									]
@@ -787,7 +1068,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 6,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
 										'name' => 'graphid.0',
 										'value' => $graph_responce['graphids'][7]
 									]
@@ -803,7 +1084,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 6,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
 										'name' => 'graphid.0',
 										'value' => $graph_responce['graphids'][8]
 									]
@@ -819,7 +1100,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 6,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
 										'name' => 'graphid.0',
 										'value' => $graph_responce['graphids'][9]
 									]
@@ -840,7 +1121,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 6,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
 										'name' => 'graphid.0',
 										'value' => $graph_responce['graphids'][10]
 									]
@@ -856,7 +1137,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 6,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
 										'name' => 'graphid.0',
 										'value' => $graph_responce['graphids'][11]
 									]
@@ -872,7 +1153,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 6,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
 										'name' => 'graphid.0',
 										'value' => $graph_responce['graphids'][12]
 									]
@@ -888,7 +1169,7 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 6,
+										'type' => ZBX_WIDGET_FIELD_TYPE_GRAPH,
 										'name' => 'graphid.0',
 										'value' => $graph_responce['graphids'][13]
 									]
@@ -909,12 +1190,12 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source_type',
 										'value' => 1
 									],
 									[
-										'type' => 4,
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid.0',
 										'value' => self::$itemids['Item for history data display 1']
 									]
@@ -930,12 +1211,12 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source_type',
 										'value' => 1
 									],
 									[
-										'type' => 4,
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid.0',
 										'value' => self::$itemids['Item for trends data display 1']
 									]
@@ -944,11 +1225,11 @@ class testDataDisplayInGraphs extends CWebTest {
 						]
 					],
 					[
-						'name' => 'SVG graphs',
+						'name' => 'SVG graphs with axes scale',
 						'widgets' => [
 							[
 								'type' => 'svggraph',
-								'name' => 'SVG Graph history draw = Line',
+								'name' => 'History data, line with linear left axis',
 								'x' => 0,
 								'y' => 0,
 								'width' => 36,
@@ -956,55 +1237,60 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for history data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.items.0',
 										'value' => 'Item for history data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.color',
 										'value' => '0080FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
-										'value' => self::TIMESTAMPS['history']['from']
+										'value' => self::TIMESTAMPS['scale_history']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
-										'value' => self::TIMESTAMPS['history']['to']
+										'value' => self::TIMESTAMPS['scale_history']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'lefty_scale',
+										'value' => 0 // Linear scale (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
-										'value' => 0
+										'value' => 0 // disabled Right Y (Axes tab).
 									]
 								]
 							],
 							[
 								'type' => 'svggraph',
-								'name' => 'SVG Graph history draw = Points',
+								'name' => 'History data, line with logarithmic right axis',
 								'x' => 36,
 								'y' => 0,
 								'width' => 36,
@@ -1012,65 +1298,70 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.axisy',
+										'value' => 1 // Y-axis right (Data set tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for history data display 1'
 									],
 									[
-										'type' => 0,
-										'name' => 'ds.0.type',
-										'value' => 1
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.1.axisy',
+										'value' => 1 // Y-axis right (Data set tab).
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.items.0',
 										'value' => 'Item for history data display 2'
 									],
 									[
-										'type' => 0,
-										'name' => 'ds.1.type',
-										'value' => 1
-									],
-									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.color',
 										'value' => '0080FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
-										'value' => self::TIMESTAMPS['history']['from']
+										'value' => self::TIMESTAMPS['scale_history']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
-										'value' => self::TIMESTAMPS['history']['to']
+										'value' => self::TIMESTAMPS['scale_history']['to']
 									],
 									[
-										'type' => 0,
-										'name' => 'righty',
-										'value' => 0
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'righty_scale',
+										'value' => 1 // Logarithmic scale (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'lefty',
+										'value' => 0 // disabled Left Y (Axes tab).
 									]
 								]
 							],
 							[
 								'type' => 'svggraph',
-								'name' => 'SVG Graph history draw = Staircase',
+								'name' => 'History data, points with linear right axis',
 								'x' => 0,
 								'y' => 4,
 								'width' => 36,
@@ -1078,65 +1369,80 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.axisy',
+										'value' => 1 // Y-axis right (Data set tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for history data display 1'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.type',
-										'value' => 2
+										'value' => 1 // Draw = Points.
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.1.axisy',
+										'value' => 1 // Y-axis right (Data set tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.items.0',
 										'value' => 'Item for history data display 2'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.1.type',
-										'value' => 2
+										'value' => 1 // Draw = Points.
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.color',
 										'value' => '0080FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
-										'value' => self::TIMESTAMPS['history']['from']
+										'value' => self::TIMESTAMPS['scale_history']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
-										'value' => self::TIMESTAMPS['history']['to']
+										'value' => self::TIMESTAMPS['scale_history']['to']
 									],
 									[
-										'type' => 0,
-										'name' => 'righty',
-										'value' => 0
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'righty_scale',
+										'value' => 0 // Linear scale (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'lefty',
+										'value' => 0 // disabled Left Y (Axes tab).
 									]
 								]
 							],
 							[
 								'type' => 'svggraph',
-								'name' => 'SVG Graph history draw = Bar',
+								'name' => 'History data, points with logarithmic left axis',
 								'x' => 36,
 								'y' => 4,
 								'width' => 36,
@@ -1144,65 +1450,70 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for history data display 1'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.type',
-										'value' => 3
+										'value' => 1 // Draw = Points.
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.items.0',
 										'value' => 'Item for history data display 2'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.1.type',
-										'value' => 3
+										'value' => 1 // Draw = Points.
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.color',
 										'value' => '0080FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
-										'value' => self::TIMESTAMPS['history']['from']
+										'value' => self::TIMESTAMPS['scale_history']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
-										'value' => self::TIMESTAMPS['history']['to']
+										'value' => self::TIMESTAMPS['scale_history']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'lefty_scale',
+										'value' => 1 // Logarithmic scale (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
-										'value' => 0
+										'value' => 0 // disabled Right Y (Axes tab).
 									]
 								]
 							],
 							[
 								'type' => 'svggraph',
-								'name' => 'SVG Graph trends draw = Line',
+								'name' => 'History data, staircase with linear left axis',
 								'x' => 0,
 								'y' => 8,
 								'width' => 36,
@@ -1210,60 +1521,70 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
-										'value' => 'Item for trends data display 1'
+										'value' => 'Item for history data display 1'
 									],
 									[
-										'type' => 1,
-										'name' => 'ds.0.color',
-										'value' => 'BF00FF'
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.type',
+										'value' => 2 // Draw = Staircase.
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.items.0',
-										'value' => 'Item for trends data display 2'
+										'value' => 'Item for history data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.1.type',
+										'value' => 2 // Draw = Staircase.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.color',
-										'value' => '009688'
+										'value' => '0080FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
-										'value' => self::TIMESTAMPS['trends']['from']
+										'value' => self::TIMESTAMPS['scale_history']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
-										'value' => self::TIMESTAMPS['trends']['to']
+										'value' => self::TIMESTAMPS['scale_history']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'lefty_scale',
+										'value' => 0 // Linear scale (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
-										'value' => 0
+										'value' => 0 // disabled Right Y (Axes tab).
 									]
 								]
 							],
 							[
 								'type' => 'svggraph',
-								'name' => 'SVG Graph trends draw = Points',
+								'name' => 'History data, staircase with logarithmic right axis and static units',
 								'x' => 36,
 								'y' => 8,
 								'width' => 36,
@@ -1271,70 +1592,90 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.axisy',
+										'value' => 1 // Y-axis right (Data set tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
-										'value' => 'Item for trends data display 1'
+										'value' => 'Item for history data display 1'
 									],
 									[
-										'type' => 1,
-										'name' => 'ds.0.color',
-										'value' => 'BF00FF'
-									],
-									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.type',
-										'value' => 1
+										'value' => 2 // Draw = Staircase.
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.1.axisy',
+										'value' => 1 // Y-axis right (Data set tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.items.0',
-										'value' => 'Item for trends data display 2'
+										'value' => 'Item for history data display 2'
 									],
 									[
-										'type' => 1,
-										'name' => 'ds.1.color',
-										'value' => '009688'
-									],
-									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.1.type',
-										'value' => 1
+										'value' => 2 // Draw = Staircase.
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.color',
+										'value' => '0080FF'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
-										'value' => self::TIMESTAMPS['trends']['from']
+										'value' => self::TIMESTAMPS['scale_history']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
-										'value' => self::TIMESTAMPS['trends']['to']
+										'value' => self::TIMESTAMPS['scale_history']['to']
 									],
 									[
-										'type' => 0,
-										'name' => 'righty',
-										'value' => 0
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'righty_scale',
+										'value' => 1 // Logarithmic scale (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'righty_units',
+										'value' => 1 // Units type (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'righty_static_units',
+										'value' => 'cucumbers' // Units value (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'lefty',
+										'value' => 0 // disabled Left Y (Axes tab).
 									]
 								]
 							],
 							[
 								'type' => 'svggraph',
-								'name' => 'SVG Graph trends draw = Staircase',
+								'name' => 'History data, bar with linear right axis',
 								'x' => 0,
 								'y' => 12,
 								'width' => 36,
@@ -1342,70 +1683,80 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.axisy',
+										'value' => 1 // Y-axis right (Data set tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
-										'value' => 'Item for trends data display 1'
+										'value' => 'Item for history data display 1'
 									],
 									[
-										'type' => 1,
-										'name' => 'ds.0.color',
-										'value' => 'BF00FF'
-									],
-									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.type',
-										'value' => 2
+										'value' => 3 // Draw = Bar.
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.1.axisy',
+										'value' => 1 // Y-axis right (Data set tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.items.0',
-										'value' => 'Item for trends data display 2'
+										'value' => 'Item for history data display 2'
 									],
 									[
-										'type' => 1,
-										'name' => 'ds.1.color',
-										'value' => '009688'
-									],
-									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.1.type',
-										'value' => 2
+										'value' => 3 // Draw = Bar.
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.color',
+										'value' => '0080FF'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
-										'value' => self::TIMESTAMPS['trends']['from']
+										'value' => self::TIMESTAMPS['scale_history']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
-										'value' => self::TIMESTAMPS['trends']['to']
+										'value' => self::TIMESTAMPS['scale_history']['to']
 									],
 									[
-										'type' => 0,
-										'name' => 'righty',
-										'value' => 0
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'righty_scale',
+										'value' => 0 // Linear scale (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'lefty',
+										'value' => 0 // disabled Left Y (Axes tab).
 									]
 								]
 							],
 							[
 								'type' => 'svggraph',
-								'name' => 'SVG Graph trends draw = Bar',
+								'name' => 'History data, bar with logarithmic left axis',
 								'x' => 36,
 								'y' => 12,
 								'width' => 36,
@@ -1413,64 +1764,804 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
-										'value' => 'Item for trends data display 1'
+										'value' => 'Item for history data display 1'
 									],
 									[
-										'type' => 1,
-										'name' => 'ds.0.color',
-										'value' => 'BF00FF'
-									],
-									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.type',
-										'value' => 3
+										'value' => 3 // Draw = Bar.
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.items.0',
-										'value' => 'Item for trends data display 2'
+										'value' => 'Item for history data display 2'
 									],
 									[
-										'type' => 1,
-										'name' => 'ds.1.color',
-										'value' => '009688'
-									],
-									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.1.type',
-										'value' => 3
+										'value' => 3 // Draw = Bar.
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.color',
+										'value' => '0080FF'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
-										'value' => self::TIMESTAMPS['trends']['from']
+										'value' => self::TIMESTAMPS['scale_history']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
-										'value' => self::TIMESTAMPS['trends']['to']
+										'value' => self::TIMESTAMPS['scale_history']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'lefty_scale',
+										'value' => 1 // Logarithmic scale (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
-										'value' => 0
+										'value' => 0 // disabled Right Y (Axes tab).
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Trends data, line with linear left axis',
+								'x' => 0,
+								'y' => 16,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.color',
+										'value' => 'BF00FF'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.items.0',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.color',
+										'value' => '009688'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['scale_trends']['from']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['scale_trends']['to']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'lefty_scale',
+										'value' => 0 // Linear scale (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'righty',
+										'value' => 0 // disabled Right Y (Axes tab).
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Trends data, line with logarithmic right axis',
+								'x' => 36,
+								'y' => 16,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.axisy',
+										'value' => 1 // Y-axis right (Data set tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.color',
+										'value' => 'BF00FF'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.1.axisy',
+										'value' => 1 // Y-axis right (Data set tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.items.0',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.color',
+										'value' => '009688'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['scale_trends']['from']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['scale_trends']['to']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'righty_scale',
+										'value' => 1 // Logarithmic scale (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'lefty',
+										'value' => 0 // disabled Left Y (Axes tab).
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Trends data, points with linear right axis',
+								'x' => 0,
+								'y' => 20,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.axisy',
+										'value' => 1 // Y-axis right (Data set tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.type',
+										'value' => 1 // Draw = Points.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.1.axisy',
+										'value' => 1 // Y-axis right (Data set tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.items.0',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.1.type',
+										'value' => 1 // Draw = Points.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.color',
+										'value' => '0080FF'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['scale_trends']['from']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['scale_trends']['to']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'righty_scale',
+										'value' => 0 // Linear scale (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'lefty',
+										'value' => 0 // disabled Left Y (Axes tab).
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Trends data, points with logarithmic left axis',
+								'x' => 36,
+								'y' => 20,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.type',
+										'value' => 1 // Draw = Points.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.items.0',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.1.type',
+										'value' => 1 // Draw = Points.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.color',
+										'value' => '0080FF'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['scale_trends']['from']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['scale_trends']['to']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'lefty_scale',
+										'value' => 1 // Linear scale (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'righty',
+										'value' => 0 // disabled Right Y (Axes tab).
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Trends data, staircase with linear left axis',
+								'x' => 0,
+								'y' => 24,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.type',
+										'value' => 2 // Draw = Staircase.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.items.0',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.1.type',
+										'value' => 2 // Draw = Staircase.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.color',
+										'value' => '0080FF'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['scale_trends']['from']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['scale_trends']['to']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'lefty_scale',
+										'value' => 0 // Linear scale (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'righty',
+										'value' => 0 // disabled Right Y (Axes tab).
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Trends data, staircase with logarithmic right axis',
+								'x' => 36,
+								'y' => 24,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.axisy',
+										'value' => 1 // Y-axis right (Data set tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.type',
+										'value' => 2 // Draw = Staircase.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.1.axisy',
+										'value' => 1 // Y-axis right (Data set tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.items.0',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.1.type',
+										'value' => 2 // Draw = Staircase.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.color',
+										'value' => '0080FF'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['scale_trends']['from']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['scale_trends']['to']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'righty_scale',
+										'value' => 1 // Logarithmic scale (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'lefty',
+										'value' => 0 // disabled Left Y (Axes tab).
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Trends data, bar with linear right axis',
+								'x' => 0,
+								'y' => 28,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.axisy',
+										'value' => 1 // Y-axis right (Data set tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.type',
+										'value' => 3 // Draw = Bar.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.1.axisy',
+										'value' => 1 // Y-axis right (Data set tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.items.0',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.1.type',
+										'value' => 3 // Draw = Bar.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.color',
+										'value' => '0080FF'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['scale_trends']['from']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['scale_trends']['to']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'righty_scale',
+										'value' => 0 // Linear scale (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'lefty',
+										'value' => 0 // disabled Left Y (Axes tab).
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Trends data, bar with logarithmic left axis',
+								'x' => 36,
+								'y' => 28,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.type',
+										'value' => 3 // Draw = Bar.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.items.0',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.1.type',
+										'value' => 3 // Draw = Bar.
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.color',
+										'value' => '0080FF'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['scale_trends']['from']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['scale_trends']['to']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'lefty_scale',
+										'value' => 1 // Logarithmic scale (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'righty',
+										'value' => 0 // disabled Right Y (Axes tab).
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'History data, line with linear left and logarithmic right axes',
+								'x' => 0,
+								'y' => 32,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for history data display 1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.1.axisy',
+										'value' => 1 // Y-axis right (Data set tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.items.0',
+										'value' => 'Item for history data display 2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.color',
+										'value' => '0080FF'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['scale_history']['from']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['scale_history']['to']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'lefty_scale',
+										'value' => 0 // Linear scale (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'righty_scale',
+										'value' => 1 // Logarithmic scale (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'righty',
+										'value' => 1 // Right Y (Axes tab).
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Trends data, line with logarithmic left and linear right axes',
+								'x' => 36,
+								'y' => 32,
+								'width' => 36,
+								'height' => 4,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.axisy',
+										'value' => 1 // Y-axis right (Data set tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.items.0',
+										'value' => 'Item for trends data display 1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.hosts.0',
+										'value' => 'Host for data display on graphs'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.items.0',
+										'value' => 'Item for trends data display 2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.1.color',
+										'value' => '0080FF'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'graph_time',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.from',
+										'value' => self::TIMESTAMPS['scale_trends']['from']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.to',
+										'value' => self::TIMESTAMPS['scale_trends']['to']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'lefty_scale',
+										'value' => 1 // Logarithmic scale (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'righty_scale',
+										'value' => 0 // Linear scale (Axes tab).
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'righty',
+										'value' => 1 // Right Y (Axes tab).
 									]
 								]
 							]
@@ -1489,57 +2580,57 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for history data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.items.0',
 										'value' => 'Item for history data display 2'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.missingdatafunc',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.color',
 										'value' => 'B0AF07'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.1.missingdatafunc',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['history']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['history']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -1555,57 +2646,57 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for history data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.items.0',
 										'value' => 'Item for history data display 2'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.missingdatafunc',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.color',
 										'value' => 'B0AF07'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.1.missingdatafunc',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['history']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['history']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -1621,62 +2712,62 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.items.0',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.missingdatafunc',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.color',
 										'value' => 'BF00FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.1.missingdatafunc',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -1692,62 +2783,62 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.items.0',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.missingdatafunc',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.color',
 										'value' => 'BF00FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.1.missingdatafunc',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -1763,87 +2854,87 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for history data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.items.0',
 										'value' => 'Item for history data display 2'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.axisy',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.timeshift',
 										'value' => '5m'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.color',
 										'value' => 'B0AF07'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => '2023-10-07 12:54:00'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['history']['to']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'lefty_min',
 										'value' => '-10'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'lefty_max',
 										'value' => '11'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'righty_min',
 										'value' => '-5'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'righty_max',
 										'value' => '30'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty_units',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'righty_static_units',
 										'value' => 'minions'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'axisx',
 										'value' => 0
 									]
@@ -1859,92 +2950,92 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.items.0',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '4000FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.axisy',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.timeshift',
 										'value' => '-1d'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.color',
 										'value' => 'B0AF07'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => '2023-10-08 12:00:00'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'lefty_min',
 										'value' => '-10'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'lefty_max',
 										'value' => '11'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'lefty_units',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'lefty_static_units',
 										'value' => 'girafs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'righty_min',
 										'value' => '-5'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'righty_max',
 										'value' => '30'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'axisx',
 										'value' => 0
 									]
@@ -1960,57 +3051,57 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for history data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.items.0',
 										'value' => 'Item for history data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.color',
 										'value' => 'B0AF07'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.1.missingdatafunc',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['history']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['history']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'legend',
 										'value' => 0
 									]
@@ -2026,72 +3117,72 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.items.0',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.color',
 										'value' => 'BF00FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.1.aggregate_function',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.1.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -2113,47 +3204,47 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 0
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -2169,57 +3260,57 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -2235,62 +3326,62 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.approximation',
 										'value' => 7
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -2306,62 +3397,62 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 3
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.approximation',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -2377,62 +3468,62 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 4
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.approximation',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -2448,62 +3539,62 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 5
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.approximation',
 										'value' => 4
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -2519,57 +3610,57 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 6
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -2585,57 +3676,57 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 7
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -2651,52 +3742,52 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for history data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for history data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 0
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => '2023-10-06 00:00:00'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => '2023-10-08 12:00:00'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -2712,62 +3803,62 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for history data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for history data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => '2023-10-06 00:00:00'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => '2023-10-08 12:00:00'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -2783,67 +3874,67 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for history data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for history data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.approximation',
 										'value' => 7
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => '2023-10-06 00:00:00'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => '2023-10-08 12:00:00'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -2859,67 +3950,67 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for history data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for history data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 3
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.approximation',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => '2023-10-06 00:00:00'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => '2023-10-08 12:00:00'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -2935,67 +4026,67 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for history data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for history data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 4
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.approximation',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => '2023-10-06 00:00:00'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => '2023-10-08 12:00:00'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -3011,67 +4102,67 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for history data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for history data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 5
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.approximation',
 										'value' => 4
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => '2023-10-06 00:00:00'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => '2023-10-08 12:00:00'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -3087,62 +4178,62 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for history data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for history data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 6
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => '2023-10-06 00:00:00'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => '2023-10-08 12:00:00'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -3158,62 +4249,62 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for history data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for history data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 7
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => '2023-10-06 00:00:00'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => '2023-10-08 12:00:00'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -3234,52 +4325,52 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 0
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -3295,62 +4386,62 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -3366,67 +4457,67 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.approximation',
 										'value' => 7
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -3442,67 +4533,67 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 3
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.approximation',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -3518,67 +4609,67 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 4
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.approximation',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -3594,67 +4685,67 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 5
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.approximation',
 										'value' => 4
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -3670,62 +4761,62 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 6
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -3741,62 +4832,62 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 7
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -3812,62 +4903,62 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 0
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -3883,67 +4974,67 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 0
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.approximation',
 										'value' => 7
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -3959,67 +5050,67 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 3
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 0
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.approximation',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -4035,67 +5126,67 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 4
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.approximation',
 										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -4111,67 +5202,67 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 5
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.approximation',
 										'value' => 4
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -4187,62 +5278,62 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 6
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -4258,62 +5349,62 @@ class testDataDisplayInGraphs extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'source',
 										'value' => 2
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.hosts.0',
 										'value' => 'Host for data display on graphs'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.0',
 										'value' => 'Item for trends data display 1'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.items.1',
 										'value' => 'Item for trends data display 2'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_function',
 										'value' => 7
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'ds.0.aggregate_interval',
 										'value' => '12h'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'ds.0.aggregate_grouping',
 										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'graph_time',
 										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.from',
 										'value' => self::TIMESTAMPS['trends']['from']
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'time_period.to',
 										'value' => self::TIMESTAMPS['trends']['to']
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'righty',
 										'value' => 0
 									]
@@ -4508,7 +5599,7 @@ class testDataDisplayInGraphs extends CWebTest {
 			],
 			[
 				[
-					'page' => 'SVG graphs'
+					'page' => 'SVG graphs with axes scale'
 				]
 			],
 			[
