@@ -160,7 +160,8 @@ function createFontSelect(string $name): CSelect {
 							'name' => 'elementNameHostGroup',
 							'object_name' => 'hostGroup',
 							'multiple' => false
-						]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						]))
+							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setAriaRequired(),
 						'hostGroupSelectRow'
 					)
@@ -169,7 +170,8 @@ function createFontSelect(string $name): CSelect {
 							'name' => 'elementNameHost',
 							'object_name' => 'hosts',
 							'multiple' => false
-						]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						]))
+							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setAriaRequired(),
 						'hostSelectRow'
 					)

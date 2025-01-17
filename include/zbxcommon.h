@@ -95,6 +95,7 @@ const char	*zbx_result_string(int result);
 
 #define ZBX_MAX_UINT64		(~__UINT64_C(0))
 #define ZBX_MAX_UINT64_LEN	21
+#define ZBX_MAX_UINT32_LEN	11
 #define ZBX_MAX_DOUBLE_LEN	24
 
 #define ZBX_SIZE_T_MAX	(~(size_t)0)

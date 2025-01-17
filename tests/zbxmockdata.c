@@ -568,6 +568,8 @@ const char	*zbx_mock_error_string(zbx_mock_error_t error)
 			return "Not enough space in output buffer.";
 		case ZBX_MOCK_NOT_AN_INT:
 			return "Provided handle is not a integer handle.";
+		case ZBX_MOCK_NOT_AN_UINT32:
+			return "Provided handle is not an unsigned 32 bit integer handle.";
 		default:
 			return "Unknown error.";
 	}
@@ -943,6 +945,26 @@ zbx_mock_error_t	zbx_mock_uint64(zbx_mock_handle_t object, zbx_uint64_t *value)
 			value))
 	{
 		return ZBX_MOCK_NOT_AN_UINT64;
+	}
+
+	return ZBX_MOCK_SUCCESS;
+}
+
+zbx_mock_error_t	zbx_mock_uint32(zbx_mock_handle_t object, zbx_uint32_t *value)
+{
+	const zbx_mock_pool_handle_t	*handle;
+
+	if (0 > object || object >= handle_pool.values_num)
+		return ZBX_MOCK_INVALID_HANDLE;
+
+	handle = handle_pool.values[object];
+
+	if (YAML_SCALAR_NODE != handle->node->type || ZBX_MAX_UINT32_LEN < handle->node->data.scalar.length)
+		return ZBX_MOCK_NOT_AN_UINT32;
+
+	if (SUCCEED != zbx_is_uint32((const char *)handle->node->data.scalar.value, value))
+	{
+		return ZBX_MOCK_NOT_AN_UINT32;
 	}
 
 	return ZBX_MOCK_SUCCESS;
