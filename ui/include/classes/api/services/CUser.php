@@ -24,6 +24,13 @@ use PragmaRX\Google2FA\Support\Constants;
  */
 class CUser extends CApiService {
 
+	/**
+	 * Acceptable execution time of user verification process in seconds and nanoseconds.
+	 *
+	 * @var array
+	 */
+	public const ACCEPTABLE_USER_VERIFICATION_TIME = [1, 0];
+
 	public const ACCESS_RULES = [
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
 		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
@@ -47,6 +54,8 @@ class CUser extends CApiService {
 	];
 
 	private const PROVISIONED_FIELDS = ['username', 'name', 'surname', 'usrgrps', 'medias', 'roleid'];
+
+	private static $user_verification_start_time;
 
 	/**
 	 * Get users data.
@@ -2048,6 +2057,8 @@ class CUser extends CApiService {
 	 * @return string|array
 	 */
 	public function login(array $data) {
+		self::$user_verification_start_time = hrtime();
+
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'username' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
 			'password' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
@@ -2064,30 +2075,40 @@ class CUser extends CApiService {
 			? $this->tryToCreateLdapProvisionedUser($data, $db_users)
 			: false;
 
-		self::checkSingleUserExists($data['username'], $db_users);
+		try {
+			self::checkSingleUserExists($data['username'], $db_users);
 
-		$db_user = $db_users[0];
+			$db_user = $db_users[0];
 
-		if (!$created && $db_user['userdirectoryid'] != 0) {
-			self::checkUserProvisionedByLdap($db_user);
+			if (!$created && $db_user['userdirectoryid'] != 0) {
+				self::checkUserProvisionedByLdap($db_user);
+			}
+
+			self::addUserGroupFields($db_user, $group_status, $group_auth_type, $group_userdirectoryid);
+
+			$db_user['auth_type'] = $db_user['userdirectoryid'] == 0 ? $group_auth_type : ZBX_AUTH_LDAP;
+
+			if (!$created) {
+				self::checkLoginTemporarilyBlocked($db_user);
+
+				if ($db_user['auth_type'] == ZBX_AUTH_LDAP) {
+					self::checkLdapAuthenticationEnabled($db_user);
+
+					$idp_user_data = self::verifyLdapCredentials($data, $db_user, $group_userdirectoryid);
+				}
+				else {
+					self::verifyPassword($data, $db_user);
+				}
+			}
+		}
+		catch (APIException $e) {
+			self::equalizeUserVerificationTime();
+
+			throw $e;
 		}
 
-		self::addUserGroupFields($db_user, $group_status, $group_auth_type, $group_userdirectoryid);
-
-		$db_user['auth_type'] = $db_user['userdirectoryid'] == 0 ? $group_auth_type : ZBX_AUTH_LDAP;
-
-		if (!$created) {
-			self::checkLoginTemporarilyBlocked($db_user);
-
-			if ($db_user['auth_type'] == ZBX_AUTH_LDAP) {
-				self::checkLdapAuthenticationEnabled($db_user);
-
-				$idp_user_data = self::verifyLdapCredentials($data, $db_user, $group_userdirectoryid);
-				$this->tryToUpdateLdapProvisionedUser($db_user, $group_status, $idp_user_data);
-			}
-			else {
-				self::verifyPassword($data, $db_user);
-			}
+		if (!$created && $db_user['auth_type'] == ZBX_AUTH_LDAP) {
+			$this->tryToUpdateLdapProvisionedUser($db_user, $group_status, $idp_user_data);
 		}
 
 		self::checkGroupStatus($db_user, $group_status);
@@ -2436,7 +2457,9 @@ class CUser extends CApiService {
 				);
 			}
 
-			throw $e;
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect user name or password or account is temporarily blocked.')
+			);
 		}
 	}
 
@@ -2506,6 +2529,37 @@ class CUser extends CApiService {
 			self::loginException($db_user['userid'], $db_user['username'], ZBX_API_ERROR_PARAMETERS,
 				_('No permissions for system access.')
 			);
+		}
+	}
+
+	/**
+	 * Equalizes user verification time to mitigate timing attacks.
+	 */
+	private static function equalizeUserVerificationTime(): void {
+		[$start_sec, $start_nsec] = self::$user_verification_start_time;
+		[$end_sec, $end_nsec] = hrtime();
+
+		$actual_time_sec = $end_sec - $start_sec;
+		$actual_time_nsec = $end_nsec - $start_nsec;
+
+		if ($actual_time_nsec < 0) {
+			$actual_time_sec -= 1;
+			$actual_time_nsec += 10**9;
+		}
+
+		[$acceptable_time_sec, $acceptable_time_nsec] = self::ACCEPTABLE_USER_VERIFICATION_TIME;
+
+		if ($actual_time_sec < $acceptable_time_sec
+				|| ($actual_time_sec == $acceptable_time_sec && $actual_time_nsec < $acceptable_time_nsec)) {
+			$delay_time_sec = $acceptable_time_sec - $actual_time_sec;
+			$delay_time_nsec = $acceptable_time_nsec - $actual_time_nsec;
+
+			if ($delay_time_nsec < 0) {
+				$delay_time_sec -= 1;
+				$delay_time_nsec += 10**9;
+			}
+
+			time_nanosleep($delay_time_sec, $delay_time_nsec);
 		}
 	}
 
