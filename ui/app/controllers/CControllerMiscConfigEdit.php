@@ -86,7 +86,7 @@ class CControllerMiscConfigEdit extends CController {
 			'vault_provider' => $this->getInput('vault_provider', CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER)),
 			'proxy_secrets_provider' => $this->getInput('proxy_secrets_provider',
 				CSettingsHelper::get(CSettingsHelper::PROXY_SECRETS_PROVIDER)
-			),
+			)
 		];
 
 		$x_frame_options = $this->getInput('x_frame_options', CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS));
