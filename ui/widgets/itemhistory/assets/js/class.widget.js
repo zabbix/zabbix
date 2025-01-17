@@ -49,12 +49,13 @@ class CWidgetItemHistory extends CWidget {
 						const contents_scroll_position = this._contents.clientHeight + this._contents.scrollTop + 2;
 						this.#scroll_bottom = contents_scroll_position >= this._contents.scrollHeight;
 					}
+					else {
+						this.#updateContentsDimensions();
+					}
 
 					if (this.#scroll_bottom) {
 						this._contents.scrollTop = this._contents.scrollHeight + 1;
 					}
-
-					this.#updateContentsDimensions();
 				}
 			};
 		}
