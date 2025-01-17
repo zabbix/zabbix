@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,6 +53,11 @@ class ZabbixItem
 				throw new IllegalArgumentException("bad key ID char '" + keyId.charAt(i) + "' in key: '" + key + "'");
 
 		this.key = key;
+	}
+
+	@SuppressWarnings("removal")
+	protected final void finalize() throws Throwable
+	{
 	}
 
 	String getKey()
