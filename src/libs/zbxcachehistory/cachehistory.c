@@ -2578,6 +2578,16 @@ static zbx_hc_item_t	*hc_add_item(zbx_uint64_t itemid, zbx_hc_data_t *data)
 	return (zbx_hc_item_t *)zbx_hashset_insert(&cache->history_items, &item_local, sizeof(item_local));
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: item might already being processed and last value might hold      *
+ *          metadata, clear all values except first and last                  *
+ *                                                                            *
+ * Parameters: itemid - [IN] the item id                                      *
+ *                                                                            *
+ * Return value: number of values cleared or FAIL if item was not found       *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_hc_clear_item_middle(zbx_uint64_t itemid)
 {
 	int	i = 0;
@@ -2837,6 +2847,11 @@ static int	diag_compare_pair_second_desc(const void *d1, const void *d2)
 	return 0;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: log history cache full message and top values                     *
+ *                                                                            *
+ ******************************************************************************/
 static void	hc_print_history_cache_full(zbx_vector_uint64_pair_t *items)
 {
 	int	limit;

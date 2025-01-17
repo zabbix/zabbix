@@ -12,8 +12,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxjson.h"
-#include "zbxnum.h"
 #include "zbxrtc.h"
 #include "zbx_rtc_constants.h"
 #include "rtc.h"
@@ -243,8 +241,7 @@ int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, struct zbx_json *
 		}
 		else
 		{
-			*error = zbx_dsprintf(NULL, "invalid history cache clear itemid parameter: %s\n",
-					ZBX_NULL2STR(param));
+			*error = zbx_dsprintf(NULL, "invalid history cache clear itemid parameter\n");
 			return FAIL;
 		}
 	}
