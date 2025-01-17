@@ -1270,12 +1270,12 @@ class CMacrosResolverGeneral {
 											->setArgument('action', HISTORY_GRAPH)
 											->setArgument('itemids[]', $function['itemid'])
 											->getUrl()
-									)
+										)
 										: new CLink(_('History'), (new CUrl('history.php'))
 											->setArgument('action', HISTORY_VALUES)
 											->setArgument('itemids[]', $function['itemid'])
 											->getUrl()
-									)
+										)
 								)
 							]);
 						$macro_value = new CSpan([
