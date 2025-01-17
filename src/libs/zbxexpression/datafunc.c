@@ -654,7 +654,7 @@ int	expr_db_item_value(const zbx_db_trigger *trigger, char **value, int N_functi
 				*value = zbx_strdup(*value, zbx_time2str(timestamp, tz));
 				break;
 			case ZBX_VALUE_PROPERTY_TIMESTAMP:
-				*value = zbx_dsprintf(*value, ZBX_FS_UI64, timestamp);
+				*value = zbx_dsprintf(*value, ZBX_FS_UI64, (uint64_t)timestamp);
 				break;
 			case ZBX_VALUE_PROPERTY_DATE:
 				*value = zbx_strdup(*value, zbx_date2str(timestamp, tz));
