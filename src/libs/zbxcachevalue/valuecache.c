@@ -2046,7 +2046,7 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t **item, int ran
 		return SUCCEED;
 
 	/* find if the cache should be updated to cover the required count */
-	if (NULL != (*item)->head)
+	if (0 != (*item)->db_cached_from && NULL != (*item)->head)
 	{
 		zbx_vc_chunk_t	*chunk;
 		int		index;
@@ -2065,7 +2065,7 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t **item, int ran
 		return SUCCEED;
 
 	/* get the end timestamp to which (including) the values should be cached */
-	if (NULL != (*item)->head)
+	if (0 != (*item)->db_cached_from && NULL != (*item)->head)
 		range_end = (*item)->tail->slots[(*item)->tail->first_value].timestamp.sec - 1;
 	else
 		range_end = ZBX_JAN_2038;
@@ -2549,7 +2549,7 @@ int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, int *ret_flush, int 
 		}
 
 		/* cache new values only after the item history database status is known */
-		if (NULL != item && (ZBX_ITEM_STATUS_CACHED_ALL == item->status || 0 != item->db_cached_from))
+		if (NULL != item)
 		{
 			zbx_history_record_t	record = {h->ts, h->value};
 			zbx_vc_chunk_t		*head = item->head;

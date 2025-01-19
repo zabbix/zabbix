@@ -2314,7 +2314,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_history_init(config_history_storage_url, config_history_storage_opts, &error))
+	if (SUCCEED != zbx_history_init(config_history_storage_url, config_history_storage_opts,
+			zbx_db_config->log_slow_queries, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize history storage: %s", error);
 		zbx_free(error);
