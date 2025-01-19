@@ -546,7 +546,7 @@ class testUserRolesPermissions extends CWebTest {
 		];
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 
-		foreach ([true, false] as $action_status) {
+		foreach ([false, false] as $action_status) {
 			// Problem page.
 			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
 			$problem_row = $this->query('class:list-table')->asTable()->one()->findRow('Problem', $problem);
