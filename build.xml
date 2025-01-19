@@ -416,11 +416,6 @@
 		<exec executable="make" failonerror="on">
 			<arg line="-j4"/>
 			<arg line="-s"/>
-			<arg line="dbschema"/>
-		</exec>
-		<exec executable="make" failonerror="on">
-			<arg line="-j4"/>
-			<arg line="-s"/>
 			<arg line="install"/>
 		</exec>
 
@@ -434,7 +429,6 @@
 			<arg line="--enable-server"/>
 			<arg line="--enable-proxy"/>
 			<arg line="--enable-agent"/>
-			<arg line="--enable-agent2"/>
 			<arg line="--with-mysql"/>
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
