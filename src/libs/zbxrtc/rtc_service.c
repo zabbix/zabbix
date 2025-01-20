@@ -67,9 +67,9 @@ static void	rtc_history_cache_clear(const char *data, char **out)
 		return;
 
 	if (FAIL == (num = zbx_hc_clear_item_middle(itemid)))
-		*out = zbx_dsprintf(NULL, "cannot clear item from history cache: item is not in cache\n");
+		*out = zbx_dsprintf(NULL, "Cannot clear item from history cache: item is not in cache\n");
 	else
-		*out = zbx_dsprintf(NULL, "cleared %d values from history cache\n", num);
+		*out = zbx_dsprintf(NULL, "Cleared %d values from history cache\n", num);
 }
 
 /******************************************************************************

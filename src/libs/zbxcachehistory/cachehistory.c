@@ -2596,17 +2596,20 @@ int	zbx_hc_clear_item_middle(zbx_uint64_t itemid)
 
 	zbx_hc_item_t	*item;
 
-	if (NULL != (item = hc_get_item(itemid)) && NULL != item->tail->next)
+	if (NULL != (item = hc_get_item(itemid)) 
 	{
-		for (zbx_hc_data_t *tail = item->tail; NULL != tail->next->next;)
+		if (NULL != item->tail->next)
 		{
-			zbx_hc_data_t	*next = tail->next;
+			for (zbx_hc_data_t *tail = item->tail; NULL != tail->next->next;)
+			{
+				zbx_hc_data_t	*next = tail->next;
 
-			tail->next = next->next;
+				tail->next = next->next;
 
-			hc_free_data(next);
-			item->values_num--;
-			i++;
+				hc_free_data(next);
+				item->values_num--;
+				i++;
+			}
 		}
 
 		cache->history_num -= i;
