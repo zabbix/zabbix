@@ -1324,8 +1324,6 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 --------------------------------------------------------------------------------
 Changes for 6.4.21rc1
 
-New features:
-
 Bug fixes:
 .......PS. [ZBX-25865] fixed issue causing vmware.hv.network.linkspeed metric failure and resulting in poller becoming unresponsive (MVekslers)
 A......... [ZBX-25732] fixed inability to make cross-origin requests to API when passing authentication token using Authorization HTTP header; fixed inability to make cross-origin HTTP OPTIONS request to API endpoint (vmaksimovs)
