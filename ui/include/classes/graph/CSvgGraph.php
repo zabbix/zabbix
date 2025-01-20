@@ -926,16 +926,13 @@ class CSvgGraph extends CSvg {
 								]);
 							}
 
-							$in_range = ($max_value >= $value && $min_value <= $value);
-							if (!$in_range) {
-								if ($metric['options']['type'] == SVG_GRAPH_TYPE_POINTS) {
-									$y = CSvgGraphMetricsPoint::Y_OUT_OF_RANGE;
-								} else {
-									$y = ($value > $max_value) ? max($y_min, $y) : min($y_max, $y);
-								}
-							}
+						if ($max_value <= $value && $min_value >= $value) {
+							$y = $metric['options']['type'] == SVG_GRAPH_TYPE_POINTS
+								? CSvgGraphMetricsPoint::Y_OUT_OF_RANGE
+								: ($value > $max_value ? max($y_min, $y) : min($y_max, $y));
+						}
 
-							$path_point[$type] = [
+						$path_point[$type] = [
 								(int) ceil($x),
 								(int) ceil($y),
 								convertUnits([
