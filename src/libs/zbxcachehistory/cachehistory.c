@@ -2596,9 +2596,9 @@ int	zbx_hc_clear_item_middle(zbx_uint64_t itemid)
 
 	zbx_hc_item_t	*item;
 
-	if (NULL != (item = hc_get_item(itemid)))
+	if (NULL != (item = hc_get_item(itemid)) && NULL != item->tail->next)
 	{
-		for (zbx_hc_data_t *tail = item->tail; NULL != tail->next && NULL != tail->next->next;)
+		for (zbx_hc_data_t *tail = item->tail; NULL != tail->next->next;)
 		{
 			zbx_hc_data_t	*next = tail->next;
 
@@ -2840,10 +2840,8 @@ static int	diag_compare_pair_second_desc(const void *d1, const void *d2)
 	const zbx_uint64_pair_t	*p1 = (const zbx_uint64_pair_t *)d1;
 	const zbx_uint64_pair_t	*p2 = (const zbx_uint64_pair_t *)d2;
 
-	if (p1->second < p2->second)
-		return 1;
-	if (p1->second > p2->second)
-		return -1;
+	ZBX_RETURN_IF_NOT_EQUAL(p2->second, p1->second);
+
 	return 0;
 }
 
@@ -2873,16 +2871,13 @@ static void	hc_print_history_cache_full(zbx_vector_uint64_pair_t *items)
 
 	limit = MIN(25, items->values_num);
 
-	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "== history cache diagnostic information ==\n");
-	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "Top.values:\n");
+	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "items with most values in history cache:\n");
 
 	for (int i = 0; i < limit; i++)
 	{
-		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "itemid:" ZBX_FS_UI64 " values:" ZBX_FS_UI64 "\n",
-				items->values[i].first, items->values[i].second);
+		zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "  itemid:" ZBX_FS_UI64 " values:" ZBX_FS_UI64
+				"\n", items->values[i].first, items->values[i].second);
 	}
-
-	zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "==");
 
 	zabbix_log(LOG_LEVEL_WARNING, "%s", str);
 

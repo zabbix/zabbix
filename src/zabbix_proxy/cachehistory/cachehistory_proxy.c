@@ -291,11 +291,14 @@ static void	proxy_prepare_history(zbx_dc_history_t *history, int history_num, zb
 	for (i = 0; i < history_num; i++)
 	{
 		if (SUCCEED != errcodes[i])
+		{
+			zbx_hc_clear_item_middle(history[i].itemid);
 			continue;
+		}
 
 		if (ITEM_STATUS_ACTIVE != items[i].status || HOST_STATUS_MONITORED != items[i].host.status)
 		{
-			zbx_hc_clear_item_middle(items->itemid);
+			zbx_hc_clear_item_middle(history[i].itemid);
 			continue;
 		}
 
