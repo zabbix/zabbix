@@ -34,4 +34,34 @@ in:
 out:
   return: FAIL
   nextcheck: 2145916800
+---
+test case: "5. Delay 1s over Jan 2038"
+in:
+  time_over_jan2038: 1
+  itemid: 1000
+  delay: "1s"
+  now: "2040-12-18T14:30:00"
+out:
+  return: SUCCEED
+  nextcheck:  2239446631
+---
+test case: "6. Delay 10s over Jan 2038"
+in:
+  time_over_jan2038: 1
+  itemid: 1000
+  delay: "10s"
+  now: "2023-12-18T14:30:00"
+out:
+  return: SUCCEED
+  nextcheck: 2239450230
+---
+test case: "7. Delay 1d over Jan 2038"
+in:
+  time_over_jan2038: 1
+  itemid: 1000
+  delay: "1d"
+  now: "2023-12-18T14:30:00"
+out:
+  return: SUCCEED
+  nextcheck: 2239533030
 ...
