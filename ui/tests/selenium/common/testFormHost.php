@@ -2139,8 +2139,9 @@ class testFormHost extends CWebTest {
 	}
 
 	public function checkDiscoveredHostLayout() {
-		$this->page->login()->open('zabbix.php?action=popup&popup=host.edit&hostid=90000079')->waitUntilReady();
-		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr(self::DISCOVERED_HOST));
+		$this->page->login()->open('zabbix.php?action=popup&popup=host.edit&hostid='.$hostid)->waitUntilReady();
+		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 		$form_type = ($this->standalone) ? $form : COverlayDialogElement::find()->waitUntilReady()->one();
 
 		// Check tabs available in the form.
