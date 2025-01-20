@@ -151,7 +151,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => [], 'item' => [], 'item_time', 'references' => [], 'log' => [],
+		$macros = ['host' => [], 'interface' => [], 'item' => [], 'item_time' => [], 'references' => [], 'log' => [],
 			'usermacros' => []
 		];
 
