@@ -926,7 +926,7 @@ class CSvgGraph extends CSvg {
 							]);
 						}
 
-						if ($max_value <= $value && $min_value >= $value) {
+						if (!($max_value >= $value && $min_value <= $value)) {
 							$y = $metric['options']['type'] == SVG_GRAPH_TYPE_POINTS
 								? CSvgGraphMetricsPoint::Y_OUT_OF_RANGE
 								: ($value > $max_value ? max($y_min, $y) : min($y_max, $y));
