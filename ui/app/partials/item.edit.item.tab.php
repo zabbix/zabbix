@@ -423,9 +423,9 @@ $formgrid = (new CFormGrid())
 				'readonly' => $readonly,
 				'data' => $item['master_item']
 					? [[
-							'id' => $item['master_item']['itemid'],
-							'prefix' => $data['host']['name'].NAME_DELIMITER,
-							'name' => $item['master_item']['name']
+						'id' => $item['master_item']['itemid'],
+						'prefix' => $data['host']['name'].NAME_DELIMITER,
+						'name' => $item['master_item']['name']
 					]]
 					: [],
 				'popup' => [
@@ -820,10 +820,8 @@ $formgrid
 				'readonly' => $readonly,
 				'multiple' => false,
 				'data' => $item['valuemap']
-					? [[
-							'id' => $item['valuemap']['valuemapid'],
-							'name' => $item['valuemap']['name']
-					]] : [],
+					? [['id' => $item['valuemap']['valuemapid'], 'name' => $item['valuemap']['name']]]
+					: [],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => $item['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
