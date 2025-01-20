@@ -1878,6 +1878,7 @@ class CMap extends CMapElement {
 								$link += array_intersect_key($db_link,
 									array_flip(['itemid', 'item_value_type', 'highlights'])
 								);
+								break;
 						}
 					}
 				}
@@ -1955,6 +1956,7 @@ class CMap extends CMapElement {
 
 				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 					$db_selement['elements'][] = ['groupid' => $db_selement['elementid']];
+					break;
 			}
 
 			unset($db_selement['elementid']);
@@ -3148,6 +3150,7 @@ class CMap extends CMapElement {
 
 						case MAP_INDICATOR_TYPE_ITEM_VALUE:
 							$link += array_intersect_key($defaults, array_flip(['linktriggers']));
+							break;
 					}
 				}
 			}
