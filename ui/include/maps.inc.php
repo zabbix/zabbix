@@ -1314,7 +1314,7 @@ function getMapLabels($map, $map_info) {
 							'attributes' => [
 								'fill' => '#'.$element_info['info'][$caption]['color'],
 								'data-type' => 'trigger'
-							],
+							]
 						];
 					}
 				}

@@ -858,7 +858,7 @@ function createFontSelect(string $name): CSelect {
 										'dstfrm' => 'linkForm',
 										'dstfld1' => 'itemid',
 										'editable' => 1,
-										'real_hosts' => true,
+										'real_hosts' => true
 									]
 								]
 							]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
