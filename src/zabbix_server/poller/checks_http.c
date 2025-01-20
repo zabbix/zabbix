@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -377,12 +377,6 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 	switch (item->retrieve_mode)
 	{
 		case ZBX_RETRIEVE_MODE_CONTENT:
-			if (NULL == body.data)
-			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned empty content"));
-				goto clean;
-			}
-
 			zbx_http_convert_to_utf8(easyhandle, &body.data, &body.offset, &body.allocated);
 
 			if (HTTP_STORE_JSON == item->output_format)
@@ -419,13 +413,6 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 			break;
 		case ZBX_RETRIEVE_MODE_BOTH:
 			zbx_replace_invalid_utf8(header.data);
-
-			if (NULL == body.data)
-			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned empty content"));
-				goto clean;
-			}
-
 			zbx_http_convert_to_utf8(easyhandle, &body.data, &body.offset, &body.allocated);
 
 			if (HTTP_STORE_JSON == item->output_format)

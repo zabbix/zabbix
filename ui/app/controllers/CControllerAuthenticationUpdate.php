@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -169,8 +169,7 @@ class CControllerAuthenticationUpdate extends CController {
 					'bind_dn' => $ldap_auth['ldap_bind_dn'],
 					'bind_password' => $ldap_auth['ldap_bind_password'],
 					'search_attribute' => $ldap_auth['ldap_search_attribute']
-				],
-				'detailed_errors' => true
+				]
 			]);
 
 			$login = $ldap_validator->validate([

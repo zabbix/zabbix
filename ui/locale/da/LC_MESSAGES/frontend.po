@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2024-12-10 11:40+0000\n"
-"Last-Translator: sergejs.olonkins <sergejs.olonkins@zabbix.com>\n"
+"PO-Revision-Date: 2025-01-20 08:42+0000\n"
+"Last-Translator: Sergejs <sergejs.maklakovs@zabbix.com>\n"
 "Language-Team: none\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
@@ -426,13 +426,13 @@ msgstr[1] "API-tokens slettet"
 msgid "API token disabled"
 msgid_plural "API tokens disabled"
 msgstr[0] "API-token deaktiveret"
-msgstr[1] ""
+msgstr[1] "API-tokens deaktiveret"
 
 #: app/controllers/CControllerTokenEnable.php:63
 msgid "API token enabled"
 msgid_plural "API tokens enabled"
 msgstr[0] "API-token deaktiveret"
-msgstr[1] ""
+msgstr[1] "API-tokens aktiveret"
 
 #: include/classes/api/services/CUser.php:1771
 msgid "API token expired."
@@ -629,13 +629,13 @@ msgstr "Handlingen er slettet"
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "Handling deaktiveret"
-msgstr[1] ""
+msgstr[1] "Handlinger deaktiveret"
 
 #: actionconf.php:489
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "Handling deaktiveret"
-msgstr[1] ""
+msgstr[1] "Handlinger aktiveret"
 
 #: auditacts.php:27 include/classes/helpers/CMenuHelper.php:151
 #: include/classes/helpers/CRoleHelper.php:387
@@ -1818,33 +1818,33 @@ msgstr "CPU-brug som en procentdel i intervallet, \"url\" - VMware-tjenestens UR
 
 #: include/classes/data/CItemData.php:1074
 msgid "CPU utilization percentage. Returns float"
-msgstr ""
+msgstr "CPU udnyttelses-procent. Returnerer float"
 
 #: app/views/popup.itemtestedit.view.php:301
 msgid "CRLF"
-msgstr ""
+msgstr "CRLF"
 
 #: include/items.inc.php:1966
 msgid "CSV to JSON"
-msgstr ""
+msgstr "CSV til JSON"
 
 #: include/classes/validators/CApiInputValidator.php:2836
 #: include/classes/validators/CNewValidator.php:352
 msgid "CUID is expected"
-msgstr ""
+msgstr "CUID blev forventet"
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:177
 #: include/views/configuration.graph.edit.php:272
 msgid "Calculated"
-msgstr ""
+msgstr "Beregnet"
 
 #: jsLoader.php:236
 msgid "Calendar"
-msgstr ""
+msgstr "Kalender"
 
 #: include/hosts.inc.php:60
 msgid "Callback"
-msgstr ""
+msgstr "Callback"
 
 #: app/partials/scheduledreport.formgrid.html.php:215
 #: app/views/administration.iconmap.edit.php:145
@@ -1884,452 +1884,452 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:661 jsLoader.php:208
 #: jsLoader.php:218 jsLoader.php:337 jsLoader.php:414
 msgid "Cancel"
-msgstr ""
+msgstr "Annullér"
 
 #: app/controllers/CControllerTokenCreate.php:74
 #: app/controllers/CControllerTokenCreate.php:146
 msgid "Cannot add API token"
-msgstr ""
+msgstr "Kan ikke tilføje API token"
 
 #: include/classes/api/services/CGraphGeneral.php:580
 #: include/classes/api/services/CGraphGeneral.php:602
 #: include/classes/api/services/CGraphGeneral.php:620
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
-msgstr ""
+msgstr "Kan ikke tilføje ikke-nummerisk genstand \"%1$s\" til graf \"%2$s\"."
 
 #: include/classes/api/services/CGraphGeneral.php:584
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
-msgstr ""
+msgstr "Kan ikke tilføje et ikke-numerisk element \"%1$s\" til grafprototypen \"%2$s\"."
 
 #: actionconf.php:301
 msgid "Cannot add action"
-msgstr ""
+msgstr "Kan ikke tilføje handling"
 
 #: app/controllers/CControllerCorrelationCreate.php:115
 msgid "Cannot add correlation"
-msgstr ""
+msgstr "Kan ikke slette korrelation"
 
 #: jsLoader.php:134
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
-msgstr ""
+msgstr "Kan ikke tilføje dashboard-side: maksimalt antal %1$d dashboard-sider er blevet tilføjet."
 
 #: host_discovery.php:735
 msgid "Cannot add discovery rule"
-msgstr ""
+msgstr "Kan ikke tilføje opdagelsesregel"
 
 #: graphs.php:253
 msgid "Cannot add graph"
-msgstr ""
+msgstr "Kan ikke tilføje graf"
 
 #: graphs.php:235
 msgid "Cannot add graph prototype"
-msgstr ""
+msgstr "Kan ikke tilføje graf prototype"
 
 #: hostgroups.php:113
 msgid "Cannot add group"
-msgstr ""
+msgstr "Kan ikke tilføje gruppe"
 
 #: app/controllers/CControllerHostCreate.php:34
 #: app/controllers/CControllerHostCreate.php:137
 msgid "Cannot add host"
-msgstr ""
+msgstr "Kan ikke tilføje vært"
 
 #: host_prototypes.php:263
 msgid "Cannot add host prototype"
-msgstr ""
+msgstr "Kan ikke tilføje vært prototype"
 
 #: app/controllers/CControllerImageCreate.php:41
 #: app/controllers/CControllerImageCreate.php:101
 #: app/controllers/CControllerImageCreate.php:133
 msgid "Cannot add image"
-msgstr ""
+msgstr "Kan ikke tilføje billede"
 
 #: items.php:883
 msgid "Cannot add item"
-msgstr ""
+msgstr "Kan ikke tilføje genstand"
 
 #: disc_prototypes.php:561
 msgid "Cannot add item prototype"
-msgstr ""
+msgstr "Kan ikke tilføje prototype"
 
 #: maintenance.php:123
 msgid "Cannot add maintenance"
-msgstr ""
+msgstr "Kan ikke tilføje vedligehold"
 
 #: include/classes/api/services/CMap.php:1559
 #, c-format
 msgid "Cannot add map element of the map \"%1$s\" due to circular reference."
-msgstr ""
+msgstr "Kan ikke tilføje kort element fra kortet \"%1$s\" på grund af circulær reference."
 
 #: app/controllers/CControllerMediatypeCreate.php:76
 #: app/controllers/CControllerMediatypeCreate.php:165
 msgid "Cannot add media type"
-msgstr ""
+msgstr "Kan ikke tilføje medie type"
 
 #: app/controllers/CControllerModuleScan.php:103
 #, c-format
 msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan ikke tilføje modul: %1$s."
+msgstr[1] "Kan ikke tilføje moduler: %1$s."
 
 #: include/classes/api/services/CGraph.php:42
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph \"%1$s\"."
-msgstr ""
+msgstr "Kan ikke tilføje modul: %1$s."
 
 #: include/classes/api/services/CGraphPrototype.php:42
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr ""
+msgstr "Kan ikke tilføje mere end en genstand af typen \"Graf sum\" på grapf prototype \"%1$s\"."
 
 #: sysmaps.php:219
 msgid "Cannot add network map"
-msgstr ""
+msgstr "Kan ikke tilføje netværk kort"
 
 #: app/controllers/CControllerProxyCreate.php:63
 #: app/controllers/CControllerProxyCreate.php:154
 msgid "Cannot add proxy"
-msgstr ""
+msgstr "Kan ikke tilføje proxy"
 
 #: app/controllers/CControllerRegExCreate.php:41
 #: app/controllers/CControllerRegExCreate.php:72
 msgid "Cannot add regular expression"
-msgstr ""
+msgstr "Kan ikke tilføje regular expression"
 
 #: app/controllers/CControllerScheduledReportCreate.php:152
 msgid "Cannot add scheduled report"
-msgstr ""
+msgstr "Kan ikke tilføje scheduleret rapport"
 
 #: app/controllers/CControllerScriptCreate.php:60
 #: app/controllers/CControllerScriptCreate.php:155
 msgid "Cannot add script"
-msgstr ""
+msgstr "Kan ikke tilføje script"
 
 #: app/views/monitoring.widget.navtreeitem.edit.php:65
 msgid "Cannot add submaps. Max depth reached."
-msgstr ""
+msgstr "Kan ikke tilføje under-kort. Max dybde nået."
 
 #: templates.php:237
 msgid "Cannot add template"
-msgstr ""
+msgstr "Kan ikke tilføje template"
 
 #: triggers.php:312
 msgid "Cannot add trigger"
-msgstr ""
+msgstr "Kan ikke tilføje udløser"
 
 #: trigger_prototypes.php:257
 msgid "Cannot add trigger prototype"
-msgstr ""
+msgstr "Kan ikke tilføje udløser-prototype"
 
 #: app/controllers/CControllerUserCreate.php:63
 #: app/controllers/CControllerUserCreate.php:119
 msgid "Cannot add user"
-msgstr ""
+msgstr "Kan ikke tilføje bruger"
 
 #: app/controllers/CControllerUsergroupCreate.php:51
 #: app/controllers/CControllerUsergroupCreate.php:101
 msgid "Cannot add user group"
-msgstr ""
+msgstr "Kan ikke tilføje bruger-gruppe"
 
 #: httpconf.php:198
 msgid "Cannot add web scenario"
-msgstr ""
+msgstr "Kan ikke tilføje web-scenarie"
 
 #: jsLoader.php:135
 msgid "Cannot add widget: not enough free space on the dashboard."
-msgstr ""
+msgstr "Kan ikke tilføje widget: ikke nok fri plads på dashboardet."
 
 #: jsLoader.php:348
 msgctxt "screen reader"
 msgid "Cannot be removed"
-msgstr ""
+msgstr "Kan ikke fjernes"
 
 #: include/classes/validators/CLdapAuthValidator.php:79
 msgid "Cannot bind anonymously to LDAP server."
-msgstr ""
+msgstr "Kan ikke forbinde anonymt til LDAP server"
 
 #: include/classes/validators/CLdapAuthValidator.php:78
 msgid "Cannot bind to LDAP server."
-msgstr ""
+msgstr "Kan ikke forbinde til LDAP server."
 
 #: include/forms.inc.php:1930 include/forms.inc.php:1937
 #: include/forms.inc.php:1947 include/forms.inc.php:1981
 #: include/forms.inc.php:1988 include/forms.inc.php:1998
 #, c-format
 msgid "Cannot build expression tree: %1$s."
-msgstr ""
+msgstr "Kan ikke bygge udtrykstræ: %1$s."
 
 #: include/classes/api/services/CRole.php:785
 msgid "Cannot change the user type of own role."
-msgstr ""
+msgstr "Kan ikke ændre bruger-type for egen rolle."
 
 #: httpconf.php:189 httpconf.php:436 items.php:908 items.php:987
 msgid "Cannot clear history and trends"
-msgstr ""
+msgstr "Kan ikke rydde historie og tendenser"
 
 #: include/classes/api/services/CDiscoveryRule.php:2545
 msgid "Cannot clone graph prototypes."
-msgstr ""
+msgstr "Kan ikke klone graf prototyper"
 
 #: include/classes/api/services/CDiscoveryRule.php:2348
 #: include/classes/api/services/CDiscoveryRule.php:2404
 #: include/classes/api/services/CDiscoveryRule.php:2422
 msgid "Cannot clone item prototypes."
-msgstr ""
+msgstr "Kan ikke klone element prototyper."
 
 #: include/classes/api/services/CDiscoveryRule.php:785
 msgid "Cannot clone trigger prototypes."
-msgstr ""
+msgstr "Kan ikke klone udløser prototyper."
 
 #: include/classes/api/services/CEvent.php:848
 #, c-format
 msgid "Cannot close problem: %1$s."
-msgstr ""
+msgstr "Kan ikke lukke problem: %1$s."
 
 #: include/classes/validators/CLdapAuthValidator.php:77
 msgid "Cannot connect to LDAP server."
-msgstr ""
+msgstr "Kan ikke forbinde til LDAP server."
 
 #: include/classes/setup/CSetupWizard.php:597
 msgid "Cannot connect to the database."
-msgstr ""
+msgstr "Kan ikke forbinde til databasen."
 
 #: include/views/js/configuration.httpconf.edit.js.php:186
 msgid "Cannot convert POST data:"
-msgstr ""
+msgstr "Kan ikke konvertere POST data:"
 
 #: graphs.php:398
 msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan ikke kopiere graf"
+msgstr[1] "Kan ikke kopiere grafer"
 
 #: items.php:972
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan ikke kopiere graf"
+msgstr[1] "Kan ikke kopiere datapunkter"
 
 #: triggers.php:544
 msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan ikke kopiere udløser"
+msgstr[1] "Kan ikke kopiere udløsere"
 
 #: include/triggers.inc.php:214
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "Kan ikke kopiere trigger \"%1$s\", fordi den har flere værter i udtrykket."
 
 #: include/classes/api/services/CHostPrototype.php:1278
 #, c-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
-msgstr ""
+msgstr "Kan ikke oprette en værtsprototype på en opdaget vært \"%1$s\"."
 
 #: include/db.inc.php:34
 msgid "Cannot create another database connection."
-msgstr ""
+msgstr "Kan ikke oprette endnu en database forbindelse."
 
 #: app/controllers/CControllerDiscoveryCreate.php:47
 #: app/controllers/CControllerDiscoveryCreate.php:92
 msgid "Cannot create discovery rule"
-msgstr ""
+msgstr "Kan ikke oprette opdagelsesregel"
 
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
-msgstr ""
+msgstr "Kan ikke oprette ikon kort"
 
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
-msgstr ""
+msgstr "Kan ikke oprette scheduleret rapport"
 
 #: include/classes/api/services/CService.php:2399
 #: include/classes/api/services/CService.php:2423
 #, c-format
 msgid "Cannot create service \"%1$s\": %2$s."
-msgstr ""
+msgstr "Kan ikke oprette service \"%1$s\": %2$s."
 
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Cannot create the configuration file."
-msgstr ""
+msgstr "Kan ikke oprette konfigurations-filen."
 
 #: app/controllers/CControllerUserroleCreate.php:103
 #: app/controllers/CControllerUserroleCreate.php:150
 msgid "Cannot create user role"
-msgstr ""
+msgstr "Kan ikke oprette bruger rolle"
 
 #: app/controllers/CControllerTokenDelete.php:64
 msgid "Cannot delete API token"
 msgid_plural "Cannot delete API tokens"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan ikke slette API tokens"
+msgstr[1] "Kan ikke slette API tokens"
 
 #: app/controllers/CControllerSlaDelete.php:79
 msgid "Cannot delete SLA"
 msgid_plural "Cannot delete SLAs"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan ikke slette SLA"
+msgstr[1] "Kan ikke slette SLA'er"
 
 #: include/classes/api/services/CUser.php:1230
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
-msgstr ""
+msgstr "Kan ikke slette Zabbix intern bruger \"%1$s\", prøv at deaktivere den bruger."
 
 #: actionconf.php:322
 msgid "Cannot delete action"
-msgstr ""
+msgstr "Kan ikke slette handling"
 
 #: include/classes/api/services/CRole.php:368
 #, c-format
 msgid "Cannot delete assigned user role \"%1$s\"."
-msgstr ""
+msgstr "Kan ikke slette tildelt bruger rolle \"%1$s\"."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete correlation"
 msgid_plural "Cannot delete correlations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan ikke slette korrelation"
+msgstr[1] "Kan ikke slette korrelationer"
 
 #: app/controllers/CControllerDashboardDelete.php:63
 #: app/controllers/CControllerTemplateDashboardDelete.php:61
 msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan ikke slette dashboard"
+msgstr[1] "Kan ikke slette dashboards"
 
 #: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:421
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan ikke slette opdagelsesregl"
+msgstr[1] "Kan ikke slette opdagelsesregler"
 
 #: host_discovery.php:789
 msgid "Cannot delete discovery rules"
-msgstr ""
+msgstr "Kan ikke slette opdagelsesregler"
 
 #: graphs.php:287
 msgid "Cannot delete graph"
-msgstr ""
+msgstr "Kan ikke slette graf"
 
 #: graphs.php:279
 msgid "Cannot delete graph prototype"
-msgstr ""
+msgstr "Kan ikke slette graf prototype"
 
 #: graphs.php:320
 msgid "Cannot delete graph prototypes"
-msgstr ""
+msgstr "Kan ikke slette graf prototyper"
 
 #: graphs.php:337
 msgid "Cannot delete graphs"
-msgstr ""
+msgstr "Kan ikke slette grafer"
 
 #: hostgroups.php:133 hostgroups.php:155
 msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan ikke slette gruppe"
+msgstr[1] "Kan ikke slette grupper"
 
 #: app/controllers/CControllerHostMassDelete.php:74
 msgid "Cannot delete host"
-msgstr ""
+msgstr "Kan ikke slette gruppe"
 
 #: include/classes/api/services/CHost.php:1390
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete hosts %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan ikke slette vært %1$s fordi vedligehold \"%2$s\" skal indeholde mindst en vært eller værts-gruppe."
+msgstr[1] "Kan ikke slette værter %1$s fordi vedligehold \"%2$s\" skal indeholde mindst en vært eller værts-gruppe."
 
 #: include/classes/api/services/CHostGroup.php:880
 #, c-format
 msgid "Cannot delete host group %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgid_plural "Cannot delete host groups %1$s because maintenance \"%2$s\" must contain at least one host or host group."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan ikke slette værtsgruppe %1$s fordi vedligehold \"%2$s\" skal indeholde mindst en vært eller værts-gruppe."
+msgstr[1] "Kan ikke slette værtsgrupper %1$s fordi vedligeholdelse \"%2$s\" skal indeholde mindst én vært eller værts-gruppe."
 
 #: host_prototypes.php:139 host_prototypes.php:316
 msgid "Cannot delete host prototypes"
-msgstr ""
+msgstr "Kan ikke slette vært prototyper"
 
 #: app/controllers/CControllerIconMapDelete.php:65
 msgid "Cannot delete icon map"
-msgstr ""
+msgstr "Kan ikke slette ikon kort"
 
 #: app/controllers/CControllerImageDelete.php:71
 msgid "Cannot delete image"
-msgstr ""
+msgstr "Kan ikke slette billede"
 
 #: include/classes/api/services/CHostInterface.php:636
 #, c-format
 msgid "Cannot delete interface for discovered host \"%1$s\"."
-msgstr ""
+msgstr "Kan ikke slette interface for den opdagede vært \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:1153
 msgid "Cannot delete inventory."
-msgstr ""
+msgstr "Kan ikke slette indholdsfortegnelse."
 
 #: items.php:519
 msgid "Cannot delete item"
-msgstr ""
+msgstr "Kan ikke slette datapunkt"
 
 #: disc_prototypes.php:316
 msgid "Cannot delete item prototype"
-msgstr ""
+msgstr "Kan ikke slette datapunkt prototype"
 
 #: disc_prototypes.php:604
 msgid "Cannot delete item prototypes"
-msgstr ""
+msgstr "Kan ikke slette element prototyper"
 
 #: items.php:997
 msgid "Cannot delete items"
-msgstr ""
+msgstr "Kan ikke slette elementer"
 
 #: maintenance.php:220
 msgid "Cannot delete maintenance"
-msgstr ""
+msgstr "Kan ikke slette vedligehold"
 
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
-msgstr[0] ""
+msgstr[0] "Kan ikke slette medie type"
 msgstr[1] ""
 
 #: app/controllers/CControllerModuleScan.php:118
 #, c-format
 msgid "Cannot delete module: %1$s."
 msgid_plural "Cannot delete modules: %1$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan ikke slette modul: %1$s."
+msgstr[1] "Kan ikke slette moduler: %1$s."
 
 #: sysmaps.php:262
 msgid "Cannot delete network map"
-msgstr ""
+msgstr "Kan ikke slette kort over netværk"
 
 #: app/controllers/CControllerProxyDelete.php:69
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
-msgstr[0] ""
+msgstr[0] "Kan ikke slette proxier"
 msgstr[1] ""
 
 #: include/classes/api/services/CRole.php:362
 #, c-format
 msgid "Cannot delete readonly user role \"%1$s\"."
-msgstr ""
+msgstr "Kan ikke slette readonly bruger rolle \"%1$s\"."
 
 #: app/controllers/CControllerRegExDelete.php:55
 msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kan ikke slette regulært udtryk"
+msgstr[1] "Kan ikke slette regulære udtryk"
 
 #: app/controllers/CControllerScheduledReportDelete.php:71
 msgid "Cannot delete scheduled report"
 msgid_plural "Cannot delete scheduled reports"
-msgstr[0] ""
+msgstr[0] "Kan ikke slette scheduleret rapport"
 msgstr[1] ""
 
 #: app/controllers/CControllerScriptDelete.php:69
@@ -2341,95 +2341,95 @@ msgstr[1] ""
 #: include/classes/api/services/CScript.php:857
 #, c-format
 msgid "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$s\"."
-msgstr ""
+msgstr "Kan ikke slette scripts. Scriptet \"%1$s\" bruges i handlingsoperationen \"%2$s\"."
 
 #: actionconf.php:509
 msgid "Cannot delete selected actions"
-msgstr ""
+msgstr "Kan ikke slette valgte handlinger"
 
 #: app/controllers/CControllerServiceDelete.php:78
 msgid "Cannot delete service"
 msgid_plural "Cannot delete services"
-msgstr[0] ""
+msgstr[0] "Kan ikke slette service"
 msgstr[1] ""
 
 #: include/classes/api/services/CService.php:451
 #: include/classes/api/services/CService.php:466
 #, c-format
 msgid "Cannot delete service \"%1$s\": %2$s."
-msgstr ""
+msgstr "Kan ikke slette service \"%1$s\": %2$s."
 
 #: templates.php:491 templates.php:505 templates.php:571
 msgid "Cannot delete template"
-msgstr ""
+msgstr "Kan ikke slette skabelon"
 
 #: include/classes/api/services/CGraphPrototype.php:346
 msgid "Cannot delete templated graph prototype."
-msgstr ""
+msgstr "Kan ikke slette skabelons graf prototype."
 
 #: include/classes/api/services/CGraph.php:346
 msgid "Cannot delete templated graph."
-msgstr ""
+msgstr "Kan ikke slette skabelons graf."
 
 #: include/classes/api/services/CItemPrototype.php:644
 msgid "Cannot delete templated item prototype."
-msgstr ""
+msgstr "Kan ikke slette skabelons elementprototype."
 
 #: include/classes/api/services/CItem.php:775
 msgid "Cannot delete templated item."
-msgstr ""
+msgstr "Kan ikke slette skabelons element."
 
 #: include/classes/api/services/CDiscoveryRule.php:584
 msgid "Cannot delete templated items."
-msgstr ""
+msgstr "Kan ikke slette skabelons elementer."
 
 #: include/classes/api/services/CTrigger.php:611
 #, c-format
 msgid "Cannot delete templated trigger \"%1$s:%2$s\"."
-msgstr ""
+msgstr "Kan ikke slette skabelonudløseren \"%1$s:%2$s\"."
 
 #: include/classes/api/services/CTriggerPrototype.php:506
 #, c-format
 msgid "Cannot delete templated trigger prototype \"%1$s:%2$s\"."
-msgstr ""
+msgstr "Kan ikke slette skabelonudløserprototypen \"%1$s:%2$s\"."
 
 #: include/classes/api/services/CHttpTest.php:670
 #, c-format
 msgid "Cannot delete templated web scenario \"%1$s\"."
-msgstr ""
+msgstr "Kan ikke slette skabelons webscenarie \"%1$s\"."
 
 #: triggers.php:450
 msgid "Cannot delete trigger"
-msgstr ""
+msgstr "Kan ikke slette udløser"
 
 #: trigger_prototypes.php:393
 msgid "Cannot delete trigger prototype"
-msgstr ""
+msgstr "Kan ikke slette udløser prototype"
 
 #: trigger_prototypes.php:450
 msgid "Cannot delete trigger prototypes"
-msgstr ""
+msgstr "Kan ikke slette udløser prototyper"
 
 #: triggers.php:558
 msgid "Cannot delete triggers"
-msgstr ""
+msgstr "Kan ikke slette udløsere"
 
 #: app/controllers/CControllerUserDelete.php:59
 msgid "Cannot delete user"
 msgid_plural "Cannot delete users"
-msgstr[0] ""
+msgstr[0] "Kan ikke slette bruger"
 msgstr[1] ""
 
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
-msgstr[0] ""
+msgstr[0] "Kan ikke slette bruger gruppe"
 msgstr[1] ""
 
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
 msgid_plural "Cannot delete user roles"
-msgstr[0] ""
+msgstr[0] "Kan ikke slette bruger rolle"
 msgstr[1] ""
 
 #: httpconf.php:177 httpconf.php:445
@@ -2439,7 +2439,7 @@ msgstr ""
 #: app/controllers/CControllerTokenDisable.php:66
 msgid "Cannot disable API token"
 msgid_plural "Cannot disable API tokens"
-msgstr[0] ""
+msgstr[0] "Kan ikke deaktivere API token"
 msgstr[1] ""
 
 #: app/controllers/CControllerSlaDisable.php:88
