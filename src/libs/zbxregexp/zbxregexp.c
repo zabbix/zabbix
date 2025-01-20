@@ -51,7 +51,7 @@ static void	zbx_match_free(zbx_match_t *match)
 	zbx_free(match);
 }
 
-static char	*decode_pcre2_compile_error(int error_code, PCRE2_SIZE error_offset, int flags)
+static char	*decode_pcre2_compile_error(int error_code, PCRE2_SIZE error_offset, uint32_t flags)
 {
 	/* 120 code units buffer is recommended in "man pcre2api" */
 #define BUF_SIZE	(120 * PCRE2_CODE_UNIT_WIDTH / 8)
@@ -61,7 +61,7 @@ static char	*decode_pcre2_compile_error(int error_code, PCRE2_SIZE error_offset,
 	if (0 > (ret = pcre2_get_error_message(error_code, (PCRE2_UCHAR *)buf, sizeof(buf))))
 		return zbx_dsprintf(NULL, "pcre2_get_error_message(%d, ...) failed with error %d", error_code, ret);
 
-	return zbx_dsprintf(NULL, "%s, position %zu, flags:0x%x", buf, (size_t)error_offset, (unsigned int)flags);
+	return zbx_dsprintf(NULL, "%s, position %zu, flags:0x%x", buf, (size_t)error_offset, flags);
 #undef BUF_SIZE
 }
 
@@ -82,7 +82,7 @@ static char	*decode_pcre2_compile_error(int error_code, PCRE2_SIZE error_offset,
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp, char **err_msg)
+static int	regexp_compile(const char *pattern, uint32_t flags, zbx_regexp_t **regexp, char **err_msg)
 {
 	pcre2_code	*pcre2_regexp;
 	int		error = 0;
@@ -187,7 +187,7 @@ int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, char **err_ms
  *     err_msg   - [OUT] error message if any.                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp, int flags, char **err_msg)
+int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp, uint32_t flags, char **err_msg)
 {
 	return regexp_compile(pattern, flags, regexp, err_msg);
 }
@@ -197,11 +197,11 @@ int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp, int flags
  * Purpose: wrapper for zbx_regexp_compile. Caches and reuses the last used regexp.                 *
  *                                                                                                  *
  ****************************************************************************************************/
-static int	regexp_prepare(const char *pattern, int flags, zbx_regexp_t **regexp, char **err_msg)
+static int	regexp_prepare(const char *pattern, uint32_t flags, zbx_regexp_t **regexp, char **err_msg)
 {
 	static ZBX_THREAD_LOCAL zbx_regexp_t	*curr_regexp = NULL;
 	static ZBX_THREAD_LOCAL char		*curr_pattern = NULL;
-	static ZBX_THREAD_LOCAL int		curr_flags = 0;
+	static ZBX_THREAD_LOCAL uint32_t	curr_flags = 0;
 	int					ret = SUCCEED;
 
 	if (NULL == curr_regexp || 0 != strcmp(curr_pattern, pattern) || curr_flags != flags)
@@ -451,7 +451,7 @@ int	zbx_regexp_match_precompiled2(const char *string, const zbx_regexp_t *regexp
  *               We may need to find a way how to silence the resulting '-Wcast-qual' warning.      *
  *                                                                                                  *
  ****************************************************************************************************/
-static char	*zbx_regexp(const char *string, const char *pattern, int flags, int *len)
+static char	*zbx_regexp(const char *string, const char *pattern, uint32_t flags, int *len)
 {
 	char		*error = NULL, *c = NULL;
 	zbx_regmatch_t	match;
@@ -504,7 +504,7 @@ static char	*zbx_regexp(const char *string, const char *pattern, int flags, int 
  *                   ZBX_REGEXP_RUNTIME_FAIL with error message in 'err_msg'                        *
  *                                                                                                  *
  ****************************************************************************************************/
-static int	zbx_regexp2(const char *string, const char *pattern, int flags, char **matched_pos, int *len,
+static int	zbx_regexp2(const char *string, const char *pattern, uint32_t flags, char **matched_pos, int *len,
 		char **err_msg)
 {
 	zbx_regmatch_t	match;
@@ -707,7 +707,7 @@ out:
  *               FAIL    - failed to compile regexp                              *
  *                                                                               *
  *********************************************************************************/
-static int	regexp_sub(const char *string, const char *pattern, const char *output_template, int flags,
+static int	regexp_sub(const char *string, const char *pattern, const char *output_template, uint32_t flags,
 		zbx_regexp_group_check_t group_check, char **out)
 {
 	char		*error = NULL;
@@ -774,7 +774,7 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
  *                   ZBX_REGEXP_RUNTIME_FAIL with error message in 'err_msg'     *
  *                                                                               *
  *********************************************************************************/
-static int	regexp_sub2(const char *string, const char *pattern, const char *output_template, int flags, char **out,
+static int	regexp_sub2(const char *string, const char *pattern, const char *output_template, uint32_t flags, char **out,
 		char **err_msg)
 {
 	zbx_regexp_t	*regexp = NULL;
@@ -1136,7 +1136,8 @@ void	zbx_add_regexp_ex(zbx_vector_expression_t *regexps, const char *name, const
 static int	regexp_match_ex_regsub(const char *string, const char *pattern, int case_sensitive,
 		const char *output_template, char **output)
 {
-	int	regexp_flags = PCRE2_MULTILINE, ret = FAIL;
+	int		ret = FAIL;
+	uint32_t	regexp_flags = PCRE2_MULTILINE;
 
 	if (ZBX_IGNORE_CASE == case_sensitive)
 		regexp_flags |= PCRE2_CASELESS;
@@ -1199,8 +1200,9 @@ static int	regexp_match_ex_regsub(const char *string, const char *pattern, int c
 static int	regexp_match_ex_regsub2(const char *string, const char *pattern, int case_sensitive,
 		const char *output_template, char **output, char **err_msg)
 {
-	int	regexp_flags = PCRE2_MULTILINE, ret;
-	char	*err_msg_local = NULL;
+	int		ret;
+	uint32_t	regexp_flags = PCRE2_MULTILINE;
+	char		*err_msg_local = NULL;
 
 	if (ZBX_IGNORE_CASE == case_sensitive)
 		regexp_flags |= PCRE2_CASELESS;
