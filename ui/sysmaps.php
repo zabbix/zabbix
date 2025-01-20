@@ -71,7 +71,7 @@ $fields = [
 	// filter
 	'filter_set' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	'filter_rst' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
-	'filter_name' =>			[T_ZBX_STR, O_OPT, null,	null,			null],
+	'filter_name' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,		null],
 	// sort and sortorder
 	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"height","name","width"'),				null],
 	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]

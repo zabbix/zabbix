@@ -41,9 +41,14 @@ class CAlert extends CApiService {
 	 * @return array|string
 	 */
 	public function get(array $options = []) {
-		$mediatype_output_fields = self::$userData['type'] == USER_TYPE_SUPER_ADMIN
-			? CMediatype::OUTPUT_FIELDS
-			: CMediatype::LIMITED_OUTPUT_FIELDS;
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+			$media_type_output_fields = CMediatype::OUTPUT_FIELDS;
+			$user_output_fields = CUser::OUTPUT_FIELDS;
+		}
+		else {
+			$media_type_output_fields = CMediatype::LIMITED_OUTPUT_FIELDS;
+			$user_output_fields = CUser::OWN_LIMITED_OUTPUT_FIELDS;
+		}
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
@@ -64,8 +69,8 @@ class CAlert extends CApiService {
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			'groupCount' =>				['type' => API_FLAG, 'default' => false],
 			'selectHosts' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CHost::OUTPUT_FIELDS), 'default' => null],
-			'selectMediatypes' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $mediatype_output_fields), 'default' => null],
-			'selectUsers' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CUser::OUTPUT_FIELDS), 'default' => null],
+			'selectMediatypes' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $media_type_output_fields), 'default' => null],
+			'selectUsers' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $user_output_fields), 'default' => null],
 			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['alertid', 'actionid', 'eventid', 'userid', 'mediatypeid', 'status', 'acknowledgeid']],
 			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['sendto', 'subject', 'message', 'error']],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
@@ -160,6 +165,10 @@ class CAlert extends CApiService {
 				$sql_parts['where'][] = dbConditionInt('e.source', [$options['eventsource']]);
 				$sql_parts['where'][] = dbConditionInt('e.object', [$options['eventobject']]);
 			}
+		}
+
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			$sql_parts['where'][] = '(a.userid IS NULL OR a.userid='.self::$userData['userid'].')';
 		}
 
 		// add filter options

@@ -134,11 +134,10 @@ class CMap extends CMapElement {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-		}
 
-		// removing keys (hash -> array)
-		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
+			if (!$options['preservekeys']) {
+				$result = array_values($result);
+			}
 		}
 
 		return $result;

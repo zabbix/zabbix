@@ -157,8 +157,9 @@ class CImage extends CApiService {
 		}
 
 		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
+			$result = array_values($result);
 		}
+
 		return $result;
 	}
 

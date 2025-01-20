@@ -1,11 +1,36 @@
 Changes for 7.4.0alpha1
 
 New features:
+...G...... [ZBXNEXT-9508] added custom query path to mysql and oracle plugins for Zabbix agent 2 (esneiders)
+...G...... [ZBXNEXT-9686] improved Zabbix agent 2 smart plugin error handling with missing privileges (esneiders)
 .........T [ZBXNEXT-9545] added Nvidia by Zabbix agent 2 templates (abrosimovs)
 .........T [ZBXNEXT-9572] added Juniper MX by SNMP template (egordymov)
 .......PS. [ZBXNEXT-9622] added top.peak in diaginfo to identify items with highest task queue (vso)
 
 Bug fixes:
+..F....... [ZBX-25466] removed title from item mass update preprocessing steps checkbox (dpankins)
+..F....... [ZBX-25532] fixed stacked line graph point rendering (dpankins)
+..F....... [ZBX-24751] fixed trigger and trigger prototype form event name field height update which spans multiple lines (gcalenko)
+..F....... [ZBX-25264] fixed display of log time in Item history widget (dpankins)
+..F....... [ZBX-24644] changed history trends compression header text in housekeeping to also include audit (dpankins)
+.......PS. [ZBX-25824] fixed SNMP-based discovery rules to prevent potential flooding with requests when a host has flapping availability (dgoloscapov)
+A......... [ZBX-24690] fixed yaml generation in compact nested mapping mode (gcalenko)
+...G...... [ZBX-24672] replaced collector interface with runner interface in Zabbix agent 2 perfmon plugin (asestakovs)
+...G...... [ZBX-25439] added MariaDB specific info to MySQL plugin README (sjurgensons)
+.......PS. [ZBX-25584] fixed high load of VMware collector in case of large number of new events and added history cache overload control (MVekslers)
+.......PS. [ZBX-25108] added more verbose logging of SNMP async agent failures, fixed error not being cleared in different edge cases (dgoloscapov, vso)
+...G...... [ZBX-25443] updated Go version requirement to 1.21 (esneiders)
+..F....... [ZBX-25445] fixed regrepl macro function when capturing groups are used (esekace)
+.......PS. [ZBX-25568] fixed user macros in preprocessing scripts not being resolved to latest values (wiper)
+...G...PS. [ZBX-25723] commented out macros AC_FUNC_MALLOC and AC_FUNC_REALLOC from configure.ac to fix compilation on AIX (Andris)
+.......PS. [ZBX-25672] fixed on-demand configuration sync between Zabbix server and proxy when TimescaleDB is used (mprihodko)
+...G...... [ZBX-25460] fixed inconsistent report of free disk space by Zabbix agent 2 in response to vfs.fs.get on Windows (mprihodko)
+.......PS. [ZBX-25865] fixed vmware.hv.network.linkspeed metric fails and hang of poller (MVekslers)
+..F....... [ZBX-22979] added focus traps to API Token creation and Event correlation, Scripts, Services clone popups (rgontarski)
+..F....... [ZBX-24652] fixed name filtering for Maps and Discovery rules (wczerneha)
+...G...... [ZBX-25725] fixed wmi.getall causing crash in Zabbix agent 2 when result contains a pointer to IDispatch (dgoloscapov)
+...G...... [ZBX-25501] fixed scheduled report generation failures when external dashboard resources fail to load (dgoloscapov)
+...G...... [ZBX-25502] fixed net.dns.record for Zabbix agent 2 (esneiders)
 ........S. [ZBX-24549] improved Elasticsearch performance by querying in time intervals and not calling index refresh; added slow query log; fixed queries not working with 8.16.1 (vso)
 .......P.. [ZBX-25782] fixed Zabbix proxy failing to create database on RHEL (dgoloscapov)
 ........S. [ZBX-25797] fixed Zabbix server crash during autoregistration (arimdjonoks)
@@ -58,8 +83,33 @@ A......... [ZBX-25350] prohibited deleting user groups which are used in userdir
 Changes for 7.2.3rc1
 
 New features:
+...G...... [ZBXNEXT-9686] improved Zabbix agent 2 smart plugin error handling with missing privileges (esneiders)
 
 Bug fixes:
+..F....... [ZBX-25466] removed title from item mass update preprocessing steps checkbox (dpankins)
+..F....... [ZBX-25532] fixed stacked line graph point rendering (dpankins)
+..F....... [ZBX-24751] fixed trigger and trigger prototype form event name field height update which spans multiple lines (gcalenko)
+..F....... [ZBX-25264] fixed display of log time in Item history widget (dpankins)
+..F....... [ZBX-24644] changed history trends compression header text in housekeeping to also include audit (dpankins)
+.......PS. [ZBX-25824] fixed SNMP-based discovery rules to prevent potential flooding with requests when a host has flapping availability (dgoloscapov)
+A......... [ZBX-24690] fixed yaml generation in compact nested mapping mode (gcalenko)
+..F....... [ZBX-25756] removed unused sortable function (talbergs)
+...G...... [ZBX-24672] replaced collector interface with runner interface in Zabbix agent 2 perfmon plugin (asestakovs)
+...G...... [ZBX-25439] added MariaDB specific info to MySQL plugin README (sjurgensons)
+.......PS. [ZBX-25584] fixed high load of VMware collector in case of large number of new events and added history cache overload control (MVekslers)
+.......PS. [ZBX-25108] added more verbose logging of SNMP async agent failures, fixed error not being cleared in different edge cases (dgoloscapov, vso)
+.......PS. [ZBX-25568] fixed user macros in preprocessing scripts not being resolved to latest values (wiper)
+...G...... [ZBX-25443] updated Go version requirement to 1.21 (esneiders)
+..F....... [ZBX-25445] fixed regrepl macro function when capturing groups are used (esekace)
+.......PS. [ZBX-25672] fixed on-demand configuration sync between Zabbix server and proxy when TimescaleDB is used (mprihodko)
+...G...... [ZBX-25460] fixed inconsistent report of free disk space by Zabbix agent 2 in response to vfs.fs.get on Windows (mprihodko)
+...G...PS. [ZBX-25723] commented out macros AC_FUNC_MALLOC and AC_FUNC_REALLOC from configure.ac to fix compilation on AIX (Andris)
+.......PS. [ZBX-25865] fixed vmware.hv.network.linkspeed metric fails and hang of poller (MVekslers)
+..F....... [ZBX-22979] added focus traps to API Token creation and Event correlation, Scripts, Services clone popups (rgontarski)
+..F....... [ZBX-24652] fixed name filtering for Maps and Discovery rules (wczerneha)
+...G...... [ZBX-25725] fixed wmi.getall causing crash in Zabbix agent 2 when result contains a pointer to IDispatch (dgoloscapov)
+...G...... [ZBX-25501] fixed scheduled report generation failures when external dashboard resources fail to load (dgoloscapov)
+...G...... [ZBX-25502] fixed net.dns.record for Zabbix agent 2 (esneiders)
 ........S. [ZBX-24549] improved Elasticsearch performance by querying in time intervals and not calling index refresh; added slow query log; fixed queries not working with 8.16.1 (vso)
 
 --------------------------------------------------------------------------------
@@ -269,8 +319,32 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.9rc1
 
 New features:
+...G...... [ZBXNEXT-9686] improved Zabbix agent 2 smart plugin error handling with missing privileges (esneiders)
 
 Bug fixes:
+..F....... [ZBX-25466] removed title from item mass update preprocessing steps checkbox (dpankins)
+..F....... [ZBX-24751] fixed trigger and trigger prototype form event name field height update which spans multiple lines (gcalenko)
+..F....... [ZBX-25532] fixed stacked line graph point rendering (dpankins)
+..F....... [ZBX-25264] fixed display of log time in Item history widget (dpankins)
+..F....... [ZBX-24644] changed history trends compression header text in housekeeping to also include audit (dpankins)
+.......PS. [ZBX-25824] fixed SNMP-based discovery rules to prevent potential flooding with requests when a host has flapping availability (dgoloscapov)
+A......... [ZBX-24690] fixed yaml generation in compact nested mapping mode (gcalenko)
+...G...... [ZBX-24672] replaced collector interface with runner interface in Zabbix agent 2 perfmon plugin (asestakovs)
+.......PS. [ZBX-25391] fixed error in the log file when retrieving VMware tags from an ESXi host (MVekslers)
+...G...... [ZBX-25439] added MariaDB specific info to MySQL plugin README (sjurgensons)
+.......PS. [ZBX-25108] added more verbose logging of SNMP async agent failures, fixed error not being cleared in different edge cases (dgoloscapov, vso)
+...G...... [ZBX-25443] updated Go version requirement to 1.21 (esneiders)
+..F....... [ZBX-25445] fixed regrepl macro function when capturing groups are used (esekace)
+.......PS. [ZBX-25568] fixed user macros in preprocessing scripts not being resolved to latest values (wiper)
+.......PS. [ZBX-25584] fixed high load of VMware collector in case of large number of new events and added history cache overload control (MVekslers)
+.......PS. [ZBX-25672] fixed on-demand configuration sync between Zabbix server and proxy when TimescaleDB is used (mprihodko)
+...G...... [ZBX-25460] fixed inconsistent report of free disk space by Zabbix agent 2 in response to vfs.fs.get on Windows (mprihodko)
+.......PS. [ZBX-25865] fixed vmware.hv.network.linkspeed metric fails and hang of poller (MVekslers)
+..F....... [ZBX-22979] added focus traps to API Token creation and Event correlation, Scripts, Services clone popups (rgontarski)
+...G...... [ZBX-25725] fixed wmi.getall causing crash in Zabbix agent 2 when result contains a pointer to IDispatch (dgoloscapov)
+.......P.. [ZBX-25782] fixed Zabbix proxy failing to create database on RHEL (dgoloscapov)
+...G...... [ZBX-25501] fixed scheduled report generation failures when external dashboard resources fail to load (dgoloscapov)
+...G...... [ZBX-25502] fixed net.dns.record for Zabbix agent 2 (esneiders)
 ........S. [ZBX-24549] improved Elasticsearch performance by querying in time intervals and not calling index refresh; added slow query log; fixed queries not working with 8.16.1 (vso)
 
 --------------------------------------------------------------------------------
@@ -1571,6 +1645,7 @@ Changes for 6.4.21rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-25865] fixed vmware.hv.network.linkspeed metric fails and hang of poller (MVekslers)
 A......... [ZBX-25732] fixed inability to make cross-origin requests to API when passing authentication token using Authorization HTTP header; fixed inability to make cross-origin HTTP OPTIONS request to API endpoint (vmaksimovs)
 .......PS. [ZBX-24692] fixed crash during invalid JSONPath preprocessing (vso)
 ..F....... [ZBX-24895] changed double quotes to single quotes for a string in an SQL statement (rgontarski)
@@ -3540,6 +3615,14 @@ Changes for 6.0.38rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-25466] removed title from item mass update preprocessing steps checkbox (dpankins)
+..F....... [ZBX-25535] fixed overriding Y-axes in Graph widget (dpankins)
+...G...... [ZBX-24672] replaced collector interface with runner interface in Zabbix agent 2 perfmon plugin (asestakovs)
+...G...... [ZBX-25439] added MariaDB specific info to MySQL plugin README (sjurgensons)
+A......... [ZBX-24690] fixed yaml generation in compact nested mapping mode (gcalenko)
+...G...... [ZBX-25443] updated Go version requirement to 1.21 (esneiders)
+..F....... [ZBX-22979] added focus traps to popup sla edit, popup service edit (rgontarski)
+.......P.. [ZBX-25782] fixed Zabbix proxy failing to create database on RHEL (dgoloscapov)
 ...G...... [ZBX-25460] fixed inconsistent report of free disk space by Zabbix agent 2 in response to vfs.fs.get on Windows (mprihodko)
 ...G...PS. [ZBX-25296] removed overzealous preprocessor tests for LIBRESSL_VERSION_NUMBER (jxl)
 .......PS. [ZBX-25373] fixed possibility to insert duplicate triggers via LLD (dgoloscapov)

@@ -33,6 +33,7 @@ require_once __DIR__.'/../../include/db.inc.php';
 
 // register autoloader
 require_once __DIR__.'/../../include/classes/core/CAutoloader.php';
+require_once __DIR__.'/../../vendor/autoload.php';
 
 $autoloader = new CAutoloader;
 $autoloader->addNamespace('', [
