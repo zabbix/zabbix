@@ -934,6 +934,7 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 		if (SUCCEED != errcodes[i])
 		{
 			h->flags |= ZBX_DC_FLAG_UNDEF;
+			zbx_hc_clear_item_middle(h->itemid);
 			continue;
 		}
 
@@ -941,7 +942,7 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 
 		if (ITEM_STATUS_ACTIVE != item->status || HOST_STATUS_MONITORED != item->host.status)
 		{
-			zbx_hc_clear_item_middle(item->itemid);
+			zbx_hc_clear_item_middle(h->itemid);
 			h->flags |= ZBX_DC_FLAG_UNDEF;
 			continue;
 		}
