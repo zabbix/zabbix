@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/testAuditlogIconMap.php';
 require_once dirname(__FILE__).'/testAuditlogMaintenance.php';
 require_once dirname(__FILE__).'/testAuditlogMediaType.php';
 require_once dirname(__FILE__).'/testAuditlogProxy.php';
+require_once dirname(__FILE__).'/testAuditlogRegexp.php';
 require_once dirname(__FILE__).'/testAuditlogScheduledReport.php';
 require_once dirname(__FILE__).'/testAuditlogSettings.php';
 require_once dirname(__FILE__).'/testAuditlogToken.php';
@@ -99,6 +100,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testAuditlogMaintenance');
 		$suite->addTestSuite('testAuditlogMediaType');
 		$suite->addTestSuite('testAuditlogProxy');
+		$suite->addTestSuite('testAuditlogRegexp');
 		$suite->addTestSuite('testAuditlogScheduledReport');
 		$suite->addTestSuite('testAuditlogSettings');
 		$suite->addTestSuite('testAuditlogToken');
