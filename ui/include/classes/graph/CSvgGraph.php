@@ -933,13 +933,13 @@ class CSvgGraph extends CSvg {
 						}
 
 						$path_point[$type] = [
-								(int) ceil($x),
-								(int) ceil($y),
-								convertUnits([
-									'value' => $value,
-									'units' => $metric['units']
-								])
-							];
+							(int) ceil($x),
+							(int) ceil($y),
+							convertUnits([
+								'value' => $value,
+								'units' => $metric['units']
+							])
+						];
 					}
 
 					$paths[$part_index][] = $path_point;

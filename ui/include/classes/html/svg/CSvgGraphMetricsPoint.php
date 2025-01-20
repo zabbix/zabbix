@@ -16,6 +16,7 @@
 
 class CSvgGraphMetricsPoint extends CSvgGroup {
 	public const Y_OUT_OF_RANGE = -10;
+
 	private const ZBX_STYLE_CLASS = 'svg-graph-points';
 
 	private $path;
