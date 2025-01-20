@@ -2450,7 +2450,8 @@ class CMap extends CMapElement {
 			$db_selements = $db_maps !== null ? $db_maps[$map['sysmapid']]['selements'] : [];
 
 			foreach ($map['selements'] as $selement) {
-				if (array_key_exists($selement['selementid'], $db_selements)) {
+				if (array_key_exists('selementid', $selement)
+						&& array_key_exists($selement['selementid'], $db_selements)) {
 					unset($db_selements[$selement['selementid']]);
 
 					$upd_selements[] = ['sysmapid' => $map['sysmapid']] + $selement;
