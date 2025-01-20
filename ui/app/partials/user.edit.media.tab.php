@@ -62,7 +62,7 @@ foreach ($data['medias'] as $index => $media) {
 		'period' => $media['period'],
 		'severity' => $media['severity'],
 		'active' => $media['active'],
-		'userdirectory_mediaid' => $media['userdirectory_mediaid']
+		'provisioned' => $media['provisioned']
 	];
 
 	if ($media['mediatype'] === MEDIA_TYPE_EMAIL) {
@@ -118,7 +118,7 @@ foreach ($data['medias'] as $index => $media) {
 								{dialogue_class: "modal-popup-generic"});'
 						),
 					(new CButtonLink(_('Remove')))
-						->setEnabled(!$parameters['userdirectory_mediaid'])
+						->setEnabled($parameters['provisioned'] == CUser::PROVISION_STATUS_NO)
 						->onClick('removeMedia(' . $index . ');')
 				])
 			))->addClass(ZBX_STYLE_NOWRAP)

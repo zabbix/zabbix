@@ -66,10 +66,9 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 
 		$users = API::User()->get([
 			'output' => ['username', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
-				'rows_per_page', 'url', 'timezone', 'userdirectoryid'
+				'rows_per_page', 'url', 'timezone', 'provisioned'
 			],
 			'userids' => CWebUser::$data['userid'],
-			'selectUsrgrps' => ['userdirectoryid'],
 			'editable' => true
 		]);
 
@@ -111,14 +110,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'action' => $this->getAction()
 		];
 
-		$data['internal_auth'] = true;
-
-		foreach ($this->user['usrgrps'] as $group) {
-			if ($group['userdirectoryid'] != 0) {
-				$data['internal_auth'] = false;
-				break;
-			}
-		}
+		$data['internal_auth'] = CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL;
 
 		// Overwrite with input variables.
 		$this->getInputs($data, ['current_password', 'password1', 'password2', 'lang', 'timezone', 'theme', 'autologin',
@@ -129,8 +121,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			...$data,
 			'db_user' => ['username' => $this->user['username']],
 			'password_requirements' => $this->getPasswordRequirements(),
-			'readonly' => $this->user['userdirectoryid'] != 0,
-			'userdirectoryid' => $this->user['userdirectoryid']
+			'readonly' => $this->user['provisioned'] == CUser::PROVISION_STATUS_YES
 		];
 
 		$response = new CControllerResponseData($data);

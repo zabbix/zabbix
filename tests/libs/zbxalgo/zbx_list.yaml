@@ -1,0 +1,138 @@
+---
+test case: '1. Test list range "1, 0"'
+in:
+  type: RANGE
+  values: [1,0]
+---
+test case: '2. Test list range "1, 2, 0"'
+in:
+  type: RANGE
+  values: [1,2,0]
+---
+test case: '3. Test list range "1, 2, 3, 0"'
+in:
+  type: RANGE
+  values: [1,2,3,0]
+---
+test case: "4. Test iterators equal"
+in:
+  type: ITERATOR_EQUAL
+  steps: 0
+  values: [18446744073709551615,0,18446744073709551615,0,18446744073709551615]
+out:
+  result: SUCCEED
+---
+test case: "5. Test iterators not equal"
+in:
+  type: ITERATOR_EQUAL
+  steps: 2
+  values: [0,0,0,0,0]
+out:
+  result: FAIL
+---
+test case: "6. Init iterator to list head item"
+in:
+  type: LIST_ITERATOR_INIT_WITH
+  steps: 0
+  values: [18446744073709551615,0,0,0,0]
+out:
+  result: SUCCEED
+  value: 18446744073709551615
+---
+test case: "7. Init iterator to list third item"
+in:
+  type: LIST_ITERATOR_INIT_WITH
+  steps: 3
+  values: [0,0,0,18446744073709551615,0]
+out:
+  result: SUCCEED
+  value: 18446744073709551615
+---
+test case: "8. Iterator next 1 step"
+in:
+  type: LIST_ITERATOR_NEXT
+  steps: 1
+  values: [18446744073709551615,0,0,0,18446744073709551615]
+out:
+  result: SUCCEED
+  value: 18446744073709551615
+---
+test case: "9. Iterator next 2 steps"
+in:
+  type: LIST_ITERATOR_NEXT
+  steps: 2
+  values: [1,18446744073709551615,3,4,5]
+out:
+  result: SUCCEED
+  value: 18446744073709551615
+---
+test case: "10. Iteration to next after last item"
+in:
+  type: LIST_ITERATOR_NEXT
+  steps: 4
+  values: [1,2,3]
+out:
+  result: FAIL
+  no_value: 1
+---
+test case: "11. Peek head element"
+in:
+  type: TEST_LIST_ITERATOR_PEEK
+  steps: 1
+  values: [18446744073709551615,0,0,0,0]
+out:
+  result: SUCCEED
+  value: 18446744073709551615
+---
+test case: "12. Peek fifth element "
+in:
+  type: TEST_LIST_ITERATOR_PEEK
+  steps: 5
+  values: [1,2,3,4,18446744073709551615]
+out:
+  result: SUCCEED
+  value: 18446744073709551615
+---
+test case: "13. Remove next after first element"
+in:
+  type: LIST_ITERATOR_REMOVE_NEXT
+  steps: 1
+  values: [1,18446744073709551615,0,0,0]
+out:
+  result: 18446744073709551615
+  value: 1
+---
+test case: "14.  Remove next after third element"
+in:
+  type: LIST_ITERATOR_REMOVE_NEXT
+  steps: 3
+  values: [1,2,3,4,5]
+out:
+  result: 4
+  value: 3
+---
+test case: "15. Peek list"
+in:
+  type: LIST_PEEK
+  values: [1,0,2,324,22]
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: "16. Peek empty list"
+in:
+  is_empty: 1
+  type: LIST_PEEK
+  values:
+out:
+  result: FAIL
+  value: 1
+---
+test case: "17. Simple linked list"
+in:
+  type: LIST_PREPEND
+  value: 5
+  values: [1,0,2,324,22]
+out:
+  result: SUCCEED
+...

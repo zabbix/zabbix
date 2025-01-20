@@ -24,11 +24,9 @@ require_once dirname(__FILE__).'/../common/testWidgets.php';
  *
  * @dataSource AllItemValueTypes
  *
- * @onBefore setDefaultWidgetType
+ * @onBefore setDefaultWidgetType, prepareData
  */
 class testDashboardGraphWidget extends testWidgets {
-
-	const DASHBOARD_URL = 'zabbix.php?action=dashboard.view&dashboardid=1030';
 
 	/**
 	 * Attach MessageBehavior and TagBehavior to the test.
@@ -36,15 +34,200 @@ class testDashboardGraphWidget extends testWidgets {
 	public function getBehaviors() {
 		return [
 			CMessageBehavior::class,
+			CTableBehavior::class,
 			[
 				'class' => CTagBehavior::class,
 				'tag_selector' => 'id:tags_table_tags'
-			],
-			CTableBehavior::class
+			]
 		];
 	}
 
-	/*
+	protected static $dashboardid;
+	const UPDATE_WIDGET = 'Test cases for update';
+	const DEFAULT_WIDGET = 'Test cases for simple update and deletion';
+
+	public static function prepareData() {
+		$response = CDataHelper::call('dashboard.create', [
+			[
+				'name' => 'Dashboard for graph widgets',
+				'pages' => [
+					[
+						'name' => 'graph widgets',
+						'widgets' => [
+							[
+								'type' => 'svggraph',
+								'name' => self::UPDATE_WIDGET,
+								'x' => 0,
+								'y' => 0,
+								'width' => 36,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.axisy',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.color',
+										'value' => 'FF465C'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.pointsize',
+										'value' => 4
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.transparency',
+										'value' => 6
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'ds.0.type',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'lefty',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'righty_units',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'legend_lines',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'or.0.pointsize',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'source',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'update host'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.items.0',
+										'value' => 'update item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.timeshift',
+										'value' => '1m'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'or.0.hosts.0',
+										'value' => 'override host'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'or.0.items.0',
+										'value' => 'override item'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_problems',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'problemhosts.0',
+										'value' => 'ЗАББИКС Сервер'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'severities.0',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'righty_max',
+										'value' => '5'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'righty_min',
+										'value' => '-2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'righty_static_units',
+										'value' => 'KB'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.from',
+										'value' => 'now-10m'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'time_period.to',
+										'value' => 'now-5m'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'LVRTA'
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => self::DEFAULT_WIDGET,
+								'x' => 36,
+								'y' => 0,
+								'width' => 36,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.color',
+										'value' => 'FF465C'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'righty',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.hosts.0',
+										'value' => 'Host*'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'ds.0.items.0',
+										'value' => 'Available memory'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'reference',
+										'value' => 'LVRTC'
+									]
+								]
+							]
+						]
+					]
+				]
+			]
+		]);
+		self::$dashboardid = $response['dashboardids'][0];
+	}
+
+	/**
 	 * Set "Graph" as default widget type.
 	 */
 	public function setDefaultWidgetType() {
@@ -58,7 +241,7 @@ class testDashboardGraphWidget extends testWidgets {
 	 *
 	 * @param string $name		name of graphic widget to be opened
 	 */
-	private function openGraphWidgetConfiguration($name = null) {
+	protected function openGraphWidgetConfiguration($name = null) {
 		$dashboard = CDashboardElement::find()->one()->edit();
 
 		// Open existed widget by widget name.
@@ -81,7 +264,7 @@ class testDashboardGraphWidget extends testWidgets {
 	 *
 	 * @param string $name		name of graphic widget to be checked
 	 */
-	private function saveGraphWidget($name) {
+	protected function saveGraphWidget($name) {
 		COverlayDialogElement::ensureNotPresent();
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->getWidget($name);
@@ -90,12 +273,12 @@ class testDashboardGraphWidget extends testWidgets {
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 	}
 
-	/*
+	/**
 	 * Check screenshots of graph widget form.
 	 * @browsers chrome
 	 */
 	public function testDashboardGraphWidget_FormLayout() {
-		$this->page->login()->open(self::DASHBOARD_URL);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
@@ -121,10 +304,10 @@ class testDashboardGraphWidget extends testWidgets {
 	/**
 	 * Check validation of graph widget fields.
 	 */
-	private function validate($data, $tab) {
+	protected function validate($data, $tab) {
 		$old_hash = CDBHelper::getHash(self::SQL);
 
-		$this->page->login()->open(self::DASHBOARD_URL);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Widget name'));
 
 		$this->fillDatasets(CTestArrayHelper::get($data, 'Data set'));
@@ -265,7 +448,7 @@ class testDashboardGraphWidget extends testWidgets {
 					'Data set' => [
 						[
 							'Aggregation function' => 'max',
-							'Aggregation interval' =>  '5.2'
+							'Aggregation interval' => '5.2'
 						]
 					],
 					'error' => 'Invalid parameter "Data set/1/aggregate_interval": a time unit is expected.'
@@ -436,8 +619,7 @@ class testDashboardGraphWidget extends testWidgets {
 
 		// Add existing widget name for each case in data provider.
 		foreach ($this->getDataSetValidationData() as $item) {
-			$item[0]['Widget name'] = 'Test cases for update';
-
+			$item[0]['Widget name'] = self::UPDATE_WIDGET;
 			$data[] = $item;
 		}
 
@@ -445,7 +627,7 @@ class testDashboardGraphWidget extends testWidgets {
 		return array_merge($data, [
 			[
 				[
-					'Widget name' => 'Test cases for update',
+					'Widget name' => self::UPDATE_WIDGET,
 					'Data set' => [
 						'host' => '',
 						'item' => ''
@@ -455,7 +637,7 @@ class testDashboardGraphWidget extends testWidgets {
 			],
 			[
 				[
-					'Widget name' => 'Test cases for update',
+					'Widget name' => self::UPDATE_WIDGET,
 					'Data set' => [
 						'host' => '',
 						'item' => '*'
@@ -465,7 +647,7 @@ class testDashboardGraphWidget extends testWidgets {
 			],
 			[
 				[
-					'Widget name' => 'Test cases for update',
+					'Widget name' => self::UPDATE_WIDGET,
 					'Data set' => [
 						'host' => '*',
 						'item' => ''
@@ -655,7 +837,7 @@ class testDashboardGraphWidget extends testWidgets {
 		$data = [];
 
 		foreach ($this->getTimePeriodValidationData() as $item) {
-			$item[0]['Widget name'] = 'Test cases for update';
+			$item[0]['Widget name'] = self::UPDATE_WIDGET;
 
 			$data[] = $item;
 		}
@@ -675,45 +857,63 @@ class testDashboardGraphWidget extends testWidgets {
 
 	public static function getAxesValidationData() {
 		return [
-			// Left Y-axis validation. Set by default in first data set.
+			// #0 Left Y-axis validation. Set by default in first data set.
 			[
 				[
 					'Axes' => [
-						'id:lefty_min' => 'abc'
-					],
-					'error' => 'Invalid parameter "Left Y: Min": a number is expected.'
-				]
-			],
-			[
-				[
-					'Axes' => [
-						'id:lefty_max' => 'abc'
-					],
-					'error' => 'Invalid parameter "Left Y: Max": a number is expected.'
-				]
-			],
-			[
-				[
-					'Axes' => [
-						'id:lefty_min' => '10',
-						'id:lefty_max' => '5',
+						'id:lefty_scale' => 'Logarithmic',
+						'id:lefty_min' => '🦉',
+						'id:lefty_max' => STRING_255,
 						'id:lefty_units' => 'Auto'
+					],
+					'error' => [
+						'Invalid parameter "Left Y: Min": a number is expected.',
+						'Invalid parameter "Left Y: Max": a number is expected.'
+					]
+				]
+			],
+			// #1.
+			[
+				[
+					'Axes' => [
+						'id:lefty_scale' => 'Logarithmic',
+						'id:lefty_min' => INT_255,
+						'id:lefty_max' => INT_255,
+						'id:lefty_units' => 'Static',
+						'id:lefty_static_units' => STRING_255
 					],
 					'error' => 'Invalid parameter "Left Y: Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
 			],
+			// #2.
 			[
 				[
 					'Axes' => [
+						'id:lefty_scale' => 'Linear',
+						'id:lefty_min' => 'abc',
+						'id:lefty_max' => '@#$',
+						'id:lefty_units' => 'Auto'
+					],
+					'error' => [
+						'Invalid parameter "Left Y: Min": a number is expected.',
+						'Invalid parameter "Left Y: Max": a number is expected.'
+					]
+				]
+			],
+			// #3.
+			[
+				[
+					'Axes' => [
+						'id:lefty_scale' => 'Linear',
 						'id:lefty_min' => '-5',
 						'id:lefty_max' => '-10',
 						'id:lefty_units' => 'Static',
-						'id:lefty_static_units' => 500
+						'id:lefty_static_units' => INT_255
 					],
 					'error' => 'Invalid parameter "Left Y: Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
 			],
-			// Change default Y-axis option on Right.
+			// #4 Change default Y-axis option on Right.
 			[
 				[
 					'Data set' => [
@@ -722,40 +922,19 @@ class testDashboardGraphWidget extends testWidgets {
 						]
 					],
 					'Axes' => [
-						'id:righty_min' => 'abc'
-					],
-					'error' => 'Invalid parameter "Right Y: Min": a number is expected.'
-				]
-			],
-			[
-				[
-					'Data set' => [
-						[
-							'Y-axis' => 'Right'
-						]
-					],
-					'Axes' => [
-						'id:righty_max' => 'abc'
-					],
-					'error' => 'Invalid parameter "Right Y: Max": a number is expected.'
-				]
-			],
-			[
-				[
-					'Data set' => [
-						[
-							'Y-axis' => 'Right'
-						]
-					],
-					'Axes' => [
-						'id:righty_min' => '10',
-						'id:righty_max' => '5',
+						'id:righty_scale' => 'Logarithmic',
+						'id:righty_min' => STRING_255,
+						'id:righty_max' => '🦉',
 						'id:righty_units' => 'Static',
-						'id:righty_static_units' => 500
+						'id:righty_static_units' => INT_255
 					],
-					'error' => 'Invalid parameter "Right Y: Max": Y axis MAX value must be greater than Y axis MIN value.'
+					'error' => [
+						'Invalid parameter "Right Y: Min": a number is expected.',
+						'Invalid parameter "Right Y: Max": a number is expected.'
+					]
 				]
 			],
+			// #5.
 			[
 				[
 					'Data set' => [
@@ -764,60 +943,53 @@ class testDashboardGraphWidget extends testWidgets {
 						]
 					],
 					'Axes' => [
-						'id:righty_min' => '-5',
-						'id:righty_max' => '-10',
+						'id:righty_scale' => 'Logarithmic',
+						'id:righty_min' => '0',
+						'id:righty_max' => '-1',
 						'id:righty_units' => 'Auto'
 					],
 					'error' => 'Invalid parameter "Right Y: Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
 			],
-			// Both axes validation.
+			// #6.
 			[
 				[
 					'Data set' => [
 						[
 							'Y-axis' => 'Right'
-						],
-						[
-							'host' => 'ЗАББИКС Сервер',
-							'item' => 'Agent ping',
-							'Y-axis' => 'Left'
 						]
 					],
 					'Axes' => [
-						'id:lefty_max' => 'abc',
-						'id:righty_max' => 'abc'
+						'id:righty_scale' => 'Linear',
+						'id:righty_min' => '%$?',
+						'id:righty_max' => '🦉',
+						'id:righty_units' => 'Static',
+						'id:righty_static_units' => INT_255
 					],
 					'error' => [
-						'Invalid parameter "Left Y: Max": a number is expected.',
+						'Invalid parameter "Right Y: Min": a number is expected.',
 						'Invalid parameter "Right Y: Max": a number is expected.'
 					]
 				]
 			],
+			// #7.
 			[
 				[
 					'Data set' => [
 						[
 							'Y-axis' => 'Right'
-						],
-						[
-							'host' => 'ЗАББИКС Сервер',
-							'item' => 'Agent ping',
-							'Y-axis' => 'Left'
 						]
 					],
 					'Axes' => [
-						'id:lefty_min' => '-5',
-						'id:lefty_max' => '-10',
-						'id:righty_min' => '10',
-						'id:righty_max' => '5'
+						'id:righty_scale' => 'Linear',
+						'id:righty_min' => '0.56',
+						'id:righty_max' => '0.55',
+						'id:righty_units' => 'Auto'
 					],
-					'error' => [
-						'Invalid parameter "Left Y: Max": Y axis MAX value must be greater than Y axis MIN value.',
-						'Invalid parameter "Right Y: Max": Y axis MAX value must be greater than Y axis MIN value.'
-					]
+					'error' => 'Invalid parameter "Right Y: Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
 			],
+			// #8 Both axes validation.
 			[
 				[
 					'Data set' => [
@@ -831,10 +1003,12 @@ class testDashboardGraphWidget extends testWidgets {
 						]
 					],
 					'Axes' => [
-						'id:lefty_min' => 'abc',
-						'id:lefty_max' => 'def',
-						'id:righty_min' => '!@#',
-						'id:righty_max' => '('
+						'id:lefty_scale' => 'Logarithmic',
+						'id:lefty_min' => STRING_255,
+						'id:lefty_max' => '@#!',
+						'id:righty_scale' => 'Linear',
+						'id:righty_min' => 'abc',
+						'id:righty_max' => '🦉'
 					],
 					'error' => [
 						'Invalid parameter "Left Y: Min": a number is expected.',
@@ -843,11 +1017,38 @@ class testDashboardGraphWidget extends testWidgets {
 						'Invalid parameter "Right Y: Max": a number is expected.'
 					]
 				]
+			],
+			// #9.
+			[
+				[
+					'Data set' => [
+						[
+							'Y-axis' => 'Right'
+						],
+						[
+							'host' => 'ЗАББИКС Сервер',
+							'item' => 'Agent ping',
+							'Y-axis' => 'Left'
+						]
+					],
+					'Axes' => [
+						'id:lefty_scale' => 'Logarithmic',
+						'id:lefty_min' => '0',
+						'id:lefty_max' => '-1',
+						'id:righty_scale' => 'Logarithmic',
+						'id:righty_min' => '1.11',
+						'id:righty_max' => '1.10'
+					],
+					'error' => [
+						'Invalid parameter "Left Y: Max": Y axis MAX value must be greater than Y axis MIN value.',
+						'Invalid parameter "Right Y: Max": Y axis MAX value must be greater than Y axis MIN value.'
+					]
+				]
 			]
 		];
 	}
 
-	/*
+	/**
 	 * Add host and item values in data provider.
 	 */
 	public function getAxesValidationCreateData() {
@@ -877,7 +1078,7 @@ class testDashboardGraphWidget extends testWidgets {
 		$data = [];
 
 		foreach ($this->getAxesValidationData() as $item) {
-			$item[0]['Widget name'] = 'Test cases for simple update and deletion';
+			$item[0]['Widget name'] = self::DEFAULT_WIDGET;
 
 			$data[] = $item;
 		}
@@ -1113,7 +1314,7 @@ class testDashboardGraphWidget extends testWidgets {
 		];
 	}
 
-	/*
+	/**
 	 * Data provider for "Overrides" tab validation on creating.
 	 */
 	public function getOverridesValidationCreateData() {
@@ -1174,7 +1375,7 @@ class testDashboardGraphWidget extends testWidgets {
 		]);
 	}
 
-	/*
+	/**
 	 * Data provider for "Overrides" tab validation on updating.
 	 */
 	public function getOverridesValidationUpdateData() {
@@ -1182,7 +1383,7 @@ class testDashboardGraphWidget extends testWidgets {
 
 		// Add existing widget name for each case in data provider.
 		foreach ($this->getOverridesValidationData() as $item) {
-			$item[0]['Widget name'] = 'Test cases for update';
+			$item[0]['Widget name'] = self::UPDATE_WIDGET;
 
 			$data[] = $item;
 		}
@@ -1191,14 +1392,14 @@ class testDashboardGraphWidget extends testWidgets {
 		return array_merge($data, [
 			[
 				[
-					'Widget name' => 'Test cases for update',
+					'Widget name' => self::UPDATE_WIDGET,
 					'remove_override_options' => true,
 					'error' => 'Invalid parameter "Overrides": at least one override option must be specified.'
 				]
 			],
 			[
 				[
-					'Widget name' => 'Test cases for update',
+					'Widget name' => self::UPDATE_WIDGET,
 					'Overrides' => [
 						'host' => '',
 						'item' => ''
@@ -1208,7 +1409,7 @@ class testDashboardGraphWidget extends testWidgets {
 			],
 			[
 				[
-					'Widget name' => 'Test cases for update',
+					'Widget name' => self::UPDATE_WIDGET,
 					'Overrides' => [
 						'host' => ''
 					],
@@ -1217,7 +1418,7 @@ class testDashboardGraphWidget extends testWidgets {
 			],
 			[
 				[
-					'Widget name' => 'Test cases for update',
+					'Widget name' => self::UPDATE_WIDGET,
 					'Overrides' => [
 						'item' => ''
 					],
@@ -1315,7 +1516,8 @@ class testDashboardGraphWidget extends testWidgets {
 					'check_form' => true
 				]
 			],
-			/* Add Width, Fill and Missing data fields in overrides, which are disabled in data set tab.
+			/**
+			 * Add Width, Fill and Missing data fields in overrides, which are disabled in data set tab.
 			 * Fill enabled right Y-axis fields.
 			 */
 			[
@@ -1337,6 +1539,7 @@ class testDashboardGraphWidget extends testWidgets {
 						'To' => 'now'
 					],
 					'Axes' => [
+						'id:righty_scale' => 'Logarithmic',
 						'id:righty_min' => '-15',
 						'id:righty_max' => '155.5',
 						'id:righty_units' => 'Static',
@@ -1354,7 +1557,8 @@ class testDashboardGraphWidget extends testWidgets {
 					'check_form' => true
 				]
 			],
-			/* Boundary values.
+			/**
+			 * Boundary values.
 			 * Creation with disabled axes and legend. Enabled Problems, but empty fields in problems tab.
 			 */
 			[
@@ -1479,12 +1683,14 @@ class testDashboardGraphWidget extends testWidgets {
 						'To' => '2018-11-15 14:20:00'
 					],
 					'Axes' => [
+						'id:lefty_scale' => 'Logarithmic',
 						'id:lefty_min' => '5',
 						'id:lefty_max' => '15.5',
-						'id:righty_min' => '-15',
-						'id:righty_max' => '-5',
 						'id:lefty_units' => 'Static',
 						'id:lefty_static_units' => 'MB',
+						'id:righty_scale' => 'Linear',
+						'id:righty_min' => '-15',
+						'id:righty_max' => '-5',
 						'id:righty_units' => 'Static'
 					],
 					'Legend' => [
@@ -1553,7 +1759,7 @@ class testDashboardGraphWidget extends testWidgets {
 	 * @dataProvider getCreateData
 	 */
 	public function testDashboardGraphWidget_Create($data) {
-		$this->page->login()->open(self::DASHBOARD_URL);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$form = $this->openGraphWidgetConfiguration();
 
 		$this->fillForm($data, $form);
@@ -1582,7 +1788,8 @@ class testDashboardGraphWidget extends testWidgets {
 					'check_form' => true
 				]
 			],
-			/* Add Width, Fill and Missing data fields in overrides, which are disabled in data set tab.
+			/**
+			 * Add Width, Fill and Missing data fields in overrides, which are disabled in data set tab.
 			 * Fill fields for enabled right Y-axis.
 			 */
 			[
@@ -1602,6 +1809,7 @@ class testDashboardGraphWidget extends testWidgets {
 						'To' => 'now'
 					],
 					'Axes' => [
+						'id:righty_scale' => 'Logarithmic',
 						'id:righty_min' => '-15',
 						'id:righty_max' => '155.5',
 						'id:righty_units' => 'Static',
@@ -1620,7 +1828,8 @@ class testDashboardGraphWidget extends testWidgets {
 					'check_form' => true
 				]
 			],
-			/* Boundary values.
+			/**
+			 * Boundary values.
 			 * Update with disabled axes and legend. Enabled Problems, but left empty fields in problems tab.
 			 */
 			[
@@ -1773,13 +1982,15 @@ class testDashboardGraphWidget extends testWidgets {
 						'Left Y' => true,
 						'Right Y' => true,
 						'X-Axis' => true,
+						'id:lefty_scale' => 'Logarithmic',
 						'id:lefty_min' => '5',
 						'id:lefty_max' => '15.5',
-						'id:righty_min' => '-15',
-						'id:righty_max' => '-5',
 						'id:lefty_units' => 'Static',
 						'id:lefty_static_units' => 'MB',
-						'id:righty_units' => 'Static'
+						'id:righty_scale' => 'Linear',
+						'id:righty_min' => '-15',
+						'id:righty_max' => '-5',
+						'id:righty_units' => 'Auto'
 					],
 					'Legend' => [
 						'Show legend' => true,
@@ -1850,17 +2061,17 @@ class testDashboardGraphWidget extends testWidgets {
 	 * @backup widget
 	 */
 	public function testDashboardGraphWidget_Update($data) {
-		$this->page->login()->open(self::DASHBOARD_URL);
-		$form = $this->openGraphWidgetConfiguration('Test cases for update');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$form = $this->openGraphWidgetConfiguration(self::UPDATE_WIDGET);
 
 		$this->fillForm($data, $form);
 		$form->parents('class:overlay-dialogue-body')->one()->query('tag:output')->asMessage()->waitUntilNotVisible();
 		$form->submit();
-		$this->saveGraphWidget(CTestArrayHelper::get($data, 'main_fields.Name', 'Test cases for update'));
+		$this->saveGraphWidget(CTestArrayHelper::get($data, 'main_fields.Name', self::UPDATE_WIDGET));
 
 		// Check values in updated widget.
 		if (CTestArrayHelper::get($data, 'check_form', false)) {
-			$this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'main_fields.Name', 'Test cases for update'));
+			$this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'main_fields.Name', self::UPDATE_WIDGET));
 			$this->checkWidgetForm($data);
 
 			COverlayDialogElement::find()->one()->close();
@@ -1871,13 +2082,12 @@ class testDashboardGraphWidget extends testWidgets {
 	 * Test update without any modification of graph widget data.
 	 */
 	public function testDashboardGraphWidget_SimpleUpdate() {
-		$name = 'Test cases for simple update and deletion';
 		$old_hash = CDBHelper::getHash(self::SQL);
 
-		$this->page->login()->open(self::DASHBOARD_URL);
-		$form = $this->openGraphWidgetConfiguration($name);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$form = $this->openGraphWidgetConfiguration(self::DEFAULT_WIDGET);
 		$form->submit();
-		$this->saveGraphWidget($name);
+		$this->saveGraphWidget(self::DEFAULT_WIDGET);
 
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
@@ -1888,7 +2098,7 @@ class testDashboardGraphWidget extends testWidgets {
 	 * @param array $data		data provider with fields values
 	 * @param array $form		CFormElement
 	 */
-	private function fillForm($data, $form) {
+	protected function fillForm($data, $form) {
 		$form->fill(CTestArrayHelper::get($data, 'main_fields', []));
 		$this->fillDatasets(CTestArrayHelper::get($data, 'Data set', []));
 
@@ -1922,7 +2132,7 @@ class testDashboardGraphWidget extends testWidgets {
 	/**
 	 * Fill "Data sets" with specified data.
 	 */
-	private function fillDatasets($data_sets) {
+	protected function fillDatasets($data_sets) {
 		$form = $this->query('id:widget-dialogue-form')->asForm()->one();
 		if ($data_sets) {
 			if (CTestArrayHelper::isAssociative($data_sets)) {
@@ -1969,7 +2179,7 @@ class testDashboardGraphWidget extends testWidgets {
 	/**
 	 * Fill "Overrides" with specified data.
 	 */
-	private function fillOverrides($overrides) {
+	protected function fillOverrides($overrides) {
 		$form = $this->query('id:widget-dialogue-form')->asForm()->one();
 
 		// Check if override already exist in list, if not, add new override.
@@ -2030,7 +2240,7 @@ class testDashboardGraphWidget extends testWidgets {
 	/**
 	 * Check widget field values after creating or updating.
 	 */
-	private function checkWidgetForm($data) {
+	protected function checkWidgetForm($data) {
 		$form = $this->query('id:widget-dialogue-form')->asForm()->one();
 
 		// Check values in "Data set" tab.
@@ -2147,7 +2357,7 @@ class testDashboardGraphWidget extends testWidgets {
 			// Update existing graph widget.
 			[
 				[
-					'Existing widget' => 'Test cases for simple update and deletion',
+					'Existing widget' => self::DEFAULT_WIDGET,
 					'main_fields' => [
 						'Name' => 'Update graph widget and cancel dashboard'
 					],
@@ -2168,7 +2378,7 @@ class testDashboardGraphWidget extends testWidgets {
 	public function testDashboardGraphWidget_cancelDashboardUpdate($data) {
 		$old_hash = CDBHelper::getHash(self::SQL);
 
-		$this->page->login()->open(self::DASHBOARD_URL);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Existing widget', []));
 		$form->fill(CTestArrayHelper::get($data, 'main_fields', []));
 		$this->fillDataSets($data['Data set']);
@@ -2201,7 +2411,7 @@ class testDashboardGraphWidget extends testWidgets {
 			// Update existing graph widget.
 			[
 				[
-					'Existing widget' => 'Test cases for simple update and deletion',
+					'Existing widget' => self::DEFAULT_WIDGET,
 					'main_fields' => [
 						'Name' => 'Cancel widget update'
 					],
@@ -2222,20 +2432,22 @@ class testDashboardGraphWidget extends testWidgets {
 	public function testDashboardGraphWidget_cancelWidgetEditing($data) {
 		$old_hash = CDBHelper::getHash(self::SQL);
 
-		$this->page->login()->open(self::DASHBOARD_URL);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Existing widget', []));
 		$form->fill($data['main_fields']);
 		$this->fillDataSets($data['Data set']);
 		$overlay = $this->query('xpath://div[contains(@class, "overlay-dialogue")][@data-dialogueid="widget_properties"]')
-						->asOverlayDialog()->one();
+				->asOverlayDialog()->one();
 		$overlay->close();
 
 		// Check canceled graph widget.
 		$dashboard = CDashboardElement::find()->one();
+
 		// If test fails and widget isn't canceled, need to wait until widget appears on the dashboard.
 		sleep(2);
 		$this->assertTrue(!$dashboard->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header")]/h4[text()='.
-				CXPathHelper::escapeQuotes($data['main_fields']['Name']).']')->one(false)->isValid());
+				CXPathHelper::escapeQuotes($data['main_fields']['Name']).']')->one(false)->isValid()
+		);
 		$dashboard->save();
 
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
@@ -2245,13 +2457,11 @@ class testDashboardGraphWidget extends testWidgets {
 	 * Test deleting of graph widget.
 	 */
 	public function testDashboardGraphWidget_Delete() {
-		$name = 'Test cases for simple update and deletion';
-
-		$this->page->login()->open(self::DASHBOARD_URL);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
-		$widget = $dashboard->edit()->getWidget($name);
+		$widget = $dashboard->edit()->getWidget(self::DEFAULT_WIDGET);
 		$this->assertEquals(true, $widget->isEditable());
-		$dashboard->deleteWidget($name);
+		$dashboard->deleteWidget(self::DEFAULT_WIDGET);
 
 		$dashboard->save();
 		$this->page->waitUntilReady();
@@ -2260,9 +2470,9 @@ class testDashboardGraphWidget extends testWidgets {
 		$this->assertEquals('Dashboard updated', $message->getTitle());
 
 		// Check that widget is not present on dashboard and in DB.
-		$this->assertTrue(!$dashboard->getWidget($name, false)->isValid());
+		$this->assertTrue(!$dashboard->getWidget(self::DEFAULT_WIDGET, false)->isValid());
 		$sql = 'SELECT * FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
-				' WHERE w.name='.zbx_dbstr($name);
+				' WHERE w.name='.zbx_dbstr(self::DEFAULT_WIDGET);
 		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
@@ -2270,7 +2480,7 @@ class testDashboardGraphWidget extends testWidgets {
 	 * Test disabled fields in "Data set" tab.
 	 */
 	public function testDashboardGraphWidget_DatasetDisabledFields() {
-		$this->page->login()->open(self::DASHBOARD_URL);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$form = $this->openGraphWidgetConfiguration();
 
 		foreach (['Line', 'Points', 'Staircase', 'Bar'] as $option) {
@@ -2303,11 +2513,11 @@ class testDashboardGraphWidget extends testWidgets {
 		COverlayDialogElement::find()->one()->close();
 	}
 
-	/*
+	/**
 	 * Test "From" and "To" fields in tab "Time period" by setting 'Time period' to 'Custom'.
 	 */
 	public function testDashboardGraphWidget_TimePeriodDisabledFields() {
-		$this->page->login()->open(self::DASHBOARD_URL);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Time period');
 		$fields = ['From', 'To'];
@@ -2325,11 +2535,11 @@ class testDashboardGraphWidget extends testWidgets {
 		COverlayDialogElement::find()->one()->close();
 	}
 
-	/*
+	/**
 	 * Test enable/disable "Number of rows" field by check/uncheck "Show legend".
 	 */
 	public function testDashboardGraphWidget_LegendFieldValidation() {
-		$this->page->login()->open(self::DASHBOARD_URL);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$fields = ['Rows', 'Number of rows', 'Display min/avg/max', 'Number of columns'];
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Legend');
@@ -2378,7 +2588,7 @@ class testDashboardGraphWidget extends testWidgets {
 		COverlayDialogElement::find()->one()->close();
 	}
 
-	public static function getSlidebarData () {
+	public static function getSlidebarData() {
 		return [
 			[
 				[
@@ -2501,7 +2711,7 @@ class testDashboardGraphWidget extends testWidgets {
 	 * @dataProvider getSlidebarData
 	 */
 	public function testDashboardGraphWidget_LegendRangeControlsValidation($data) {
-		$this->page->login()->open(self::DASHBOARD_URL);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Legend');
 
@@ -2530,7 +2740,7 @@ class testDashboardGraphWidget extends testWidgets {
 	 * Check "Displaying options" tab layout.
 	 */
 	public function testDashboardGraphWidget_DisplayingOptionsFieldValidation() {
-		$this->page->login()->open(self::DASHBOARD_URL);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Displaying options');
 
@@ -2582,7 +2792,7 @@ class testDashboardGraphWidget extends testWidgets {
 	}
 
 	public function testDashboardGraphWidget_ProblemsDisabledFields() {
-		$this->page->login()->open(self::DASHBOARD_URL);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Problems');
 
@@ -2654,7 +2864,7 @@ class testDashboardGraphWidget extends testWidgets {
 	 * @dataProvider getAxesDisabledFieldsData
 	 */
 	public function testDashboardGraphWidget_AxesDisabledFields($data) {
-		$this->page->login()->open(self::DASHBOARD_URL);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$form = $this->openGraphWidgetConfiguration();
 
 		$form->fill($data['Data set']);
@@ -2667,8 +2877,8 @@ class testDashboardGraphWidget extends testWidgets {
 		}
 
 		$form->selectTab('Axes');
-		$lefty_fields = ['id:lefty', 'id:lefty_min', 'id:lefty_max', 'id:lefty_units'];
-		$righty_fields = ['id:righty', 'id:righty_min', 'id:righty_max', 'id:righty_units'];
+		$lefty_fields = ['id:lefty', 'id:lefty_scale', 'id:lefty_min', 'id:lefty_max', 'id:lefty_units'];
+		$righty_fields = ['id:righty', 'id:righty_scale', 'id:righty_min', 'id:righty_max', 'id:righty_units'];
 
 		switch ($axis) {
 			case 'Right':
@@ -2742,7 +2952,7 @@ class testDashboardGraphWidget extends testWidgets {
 			]
 		];
 
-		$this->page->login()->open(self::DASHBOARD_URL);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$form = $this->openGraphWidgetConfiguration();
 
 		// Check hint next to the "Data set label" field.
@@ -2772,7 +2982,7 @@ class testDashboardGraphWidget extends testWidgets {
 	 * Test function for assuring that text, log, binary and char items are not available in Graph widget.
 	 */
 	public function testDashboardGraphWidget_CheckAvailableItems() {
-		$this->checkAvailableItems(self::DASHBOARD_URL, 'Graph');
+		$this->checkAvailableItems('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid, 'Graph');
 	}
 
 	/**
@@ -2782,7 +2992,7 @@ class testDashboardGraphWidget extends testWidgets {
 	 * @param boolean $enabled		fields state are enabled
 	 * @param boolean $id			is used field id instead of field name
 	 */
-	private function assertEnabledFields($fields, $enabled = true) {
+	protected function assertEnabledFields($fields, $enabled = true) {
 		$form = $this->query('id:widget-dialogue-form')->asForm()->one();
 
 		if (!is_array($fields)) {
