@@ -124,51 +124,6 @@ function getDayOfWeekCaption($num) {
 	return _s('[Wrong value for day: "%1$s" ]', $num);
 }
 
-// Convert seconds (0..SEC_PER_WEEK) to string representation. For example, 212400 -> 'Tuesday 11:00'
-function dowHrMinToStr($value, $display24Hours = false) {
-	$dow = $value - $value % SEC_PER_DAY;
-	$hr = $value - $dow;
-	$hr -= $hr % SEC_PER_HOUR;
-	$min = $value - $dow - $hr;
-	$min -= $min % SEC_PER_MIN;
-
-	$dow /= SEC_PER_DAY;
-	$hr /= SEC_PER_HOUR;
-	$min /= SEC_PER_MIN;
-
-	if ($display24Hours && $hr == 0 && $min == 0) {
-		$dow--;
-		$hr = 24;
-	}
-
-	return sprintf('%s %02d:%02d', getDayOfWeekCaption($dow), $hr, $min);
-}
-
-// Convert Day Of Week, Hours and Minutes to seconds representation. For example, 2 11:00 -> 212400. false if error occurred
-function dowHrMinToSec($dow, $hr, $min) {
-	if (zbx_empty($dow) || zbx_empty($hr) || zbx_empty($min) || !zbx_ctype_digit($dow) || !zbx_ctype_digit($hr) || !zbx_ctype_digit($min)) {
-		return false;
-	}
-
-	if ($dow == 7) {
-		$dow = 0;
-	}
-
-	if ($dow < 0 || $dow > 6) {
-		return false;
-	}
-
-	if ($hr < 0 || $hr > 24) {
-		return false;
-	}
-
-	if ($min < 0 || $min > 59) {
-		return false;
-	}
-
-	return $dow * SEC_PER_DAY + $hr * SEC_PER_HOUR + $min * SEC_PER_MIN;
-}
-
 /**
  * Convert time to a string representation. Return 'Never' if timestamp is 0.
  *
@@ -950,42 +905,6 @@ function zbx_array_diff(array $primary, array $secondary, $field) {
 	}
 
 	return $result;
-}
-
-function zbx_array_push(&$array, $add) {
-	foreach ($array as $key => $value) {
-		foreach ($add as $newKey => $newValue) {
-			$array[$key][$newKey] = $newValue;
-		}
-	}
-}
-
-/**
- * Find if array has any duplicate values and return an array with info about them.
- * In case of no duplicates, empty array is returned.
- * Example of usage:
- *     $result = zbx_arrayFindDuplicates(
- *         array('a', 'b', 'c', 'c', 'd', 'd', 'd', 'e')
- *     );
- *     array(
- *         'd' => 3,
- *         'c' => 2,
- *     )
- *
- * @param array $array
- *
- * @return array
- */
-function zbx_arrayFindDuplicates(array $array) {
-	$countValues = array_count_values($array); // counting occurrences of every value in array
-	foreach ($countValues as $value => $count) {
-		if ($count <= 1) {
-			unset($countValues[$value]);
-		}
-	}
-	arsort($countValues); // sorting, so that the most duplicates would be at the top
-
-	return $countValues;
 }
 
 /************* STRING *************/

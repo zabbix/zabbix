@@ -237,6 +237,8 @@ window.popup_import = new class {
 			})
 			.finally(() => {
 				this.overlay.unsetLoading();
+				this.overlay.recoverFocus();
+				this.overlay.containFocus();
 			});
 	}
 
@@ -285,4 +287,3 @@ window.popup_import = new class {
 		});
 	}
 }
-
