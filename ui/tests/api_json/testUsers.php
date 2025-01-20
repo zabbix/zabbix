@@ -678,9 +678,7 @@ class testUsers extends CAPITest {
 					'selectRole' => null,
 					'userids' => ['1']
 				],
-				'expected_result' => [[
-					'userid' => '1'
-				]],
+				'expected_result' => [[]],
 				'expected_error' => null
 			],
 			'Test user.get: "selectRole" (empty string)' => [
@@ -690,7 +688,7 @@ class testUsers extends CAPITest {
 					'userids' => ['1']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/output": value must be "extend".'
+				'expected_error' => 'Invalid parameter "/selectRole": value must be "extend".'
 			],
 			'Test user.get: "selectRole" (invalid parameter "abc")' => [
 				'request' => [
@@ -699,7 +697,7 @@ class testUsers extends CAPITest {
 					'userids' => ['1']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/output": value must be "extend".'
+				'expected_error' => 'Invalid parameter "/selectRole": value must be "extend".'
 			],
 			'Test user.get: "selectRole" (unsupported parameter "count")' => [
 				'request' => [
@@ -708,7 +706,7 @@ class testUsers extends CAPITest {
 					'userids' => ['1']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/output": value must be "extend".'
+				'expected_error' => 'Invalid parameter "/selectRole": value must be "extend".'
 			],
 			'Test user.get: "selectRole" with extended output' => [
 				'request' => [
@@ -717,7 +715,6 @@ class testUsers extends CAPITest {
 					'userids' => ['1']
 				],
 				'expected_result' => [[
-					'userid' => '1',
 					'role' => [
 						'roleid' => '3',
 						'name' => 'Super admin role',
@@ -734,7 +731,6 @@ class testUsers extends CAPITest {
 					'userids' => ['1']
 				],
 				'expected_result' => [[
-					'userid' => '1',
 					'role' => []
 				]],
 				'expected_error' => null
@@ -746,7 +742,7 @@ class testUsers extends CAPITest {
 					'userids' => ['1']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/output/1": value must be one of "roleid", "name", "type", "readonly".'
+				'expected_error' => 'Invalid parameter "/selectRole/1": value must be one of "roleid", "name", "type", "readonly".'
 			],
 
 			'Test user.get: "selectRole" with "roleid"' => [
@@ -756,7 +752,6 @@ class testUsers extends CAPITest {
 					'userids' => ['1']
 				],
 				'expected_result' => [[
-					'userid' => '1',
 					'role' => [
 						'roleid' => '3'
 					]

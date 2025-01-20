@@ -215,7 +215,7 @@ $house_keeper_tab = (new CFormList())
 			->setEnabled($data['compression_availability']);
 
 		$house_keeper_tab
-			->addRow((new CTag('h4', true, _('History and trends compression')))->addClass('input-section-header'))
+			->addRow((new CTag('h4', true, _('History, trends and audit log compression')))->addClass('input-section-header'))
 			->addRow(
 				new CLabel([_('Enable compression'), $timescaledb_error], 'compression_status'),
 				$compression_status_checkbox

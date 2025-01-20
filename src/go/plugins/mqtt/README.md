@@ -9,7 +9,7 @@ This plugin works using "Eclipse Paho MQTT Go client library" (https://github.co
 
 ## Requirements
 - Zabbix Agent 2
-- Go >= 1.12 (required only to build from source)
+- Go >= 1.21 (required only to build from source)
 
 ## Installation
 The plugin is supplied as part of the Zabbix Agent 2 and does not require any special installation steps. Once 

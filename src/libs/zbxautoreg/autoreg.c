@@ -14,6 +14,7 @@
 
 #include "zbxautoreg.h"
 #include "zbxalgo.h"
+#include "zbxcacheconfig.h"
 
 ZBX_PTR_VECTOR_IMPL(autoreg_host_ptr, zbx_autoreg_host_t*)
 

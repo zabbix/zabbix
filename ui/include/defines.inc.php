@@ -2047,6 +2047,7 @@ define('ZBX_STYLE_HOST_DASHBOARD_NAVIGATION', 'host-dashboard-navigation');
 define('ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_CONTROLS', 'host-dashboard-navigation-controls');
 define('ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_TABS', 'host-dashboard-navigation-tabs');
 define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');
+define('ZBX_STYLE_HINTBOX_RAW_DATA', 'hintbox-raw-data');
 define('ZBX_STYLE_HINTBOX_WRAP', 'hintbox-wrap');
 define('ZBX_STYLE_HINTBOX_WRAP_HORIZONTAL', 'hintbox-wrap-horizontal');
 define('ZBX_STYLE_ICON', 'icon');

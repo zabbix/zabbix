@@ -45,6 +45,7 @@
 #include "zbxcachehistory.h"
 #include "zbxconnector.h"
 #include "zbx_discoverer_constants.h"
+#include "zbxdbschema.h"
 #include "zbxeval.h"
 #include "zbxipcservice.h"
 #include "zbxjson.h"
