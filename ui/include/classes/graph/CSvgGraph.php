@@ -912,19 +912,19 @@ class CSvgGraph extends CSvg {
 					 */
 					$path_point = [];
 					foreach ($point as $type => $value) {
-							$x = $this->canvas_x + $this->canvas_width
-								- $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
+						$x = $this->canvas_x + $this->canvas_width
+							- $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
 
-							if ($max_value - $min_value == INF) {
-								$y = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
-									$max_value / 10 - $value / 10, 1 / ($max_value / 10 - $min_value / 10)
-								]);
-							}
-							else {
-								$y = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
-									$max_value - $value, 1 / ($max_value - $min_value)
-								]);
-							}
+						if ($max_value - $min_value == INF) {
+							$y = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
+								$max_value / 10 - $value / 10, 1 / ($max_value / 10 - $min_value / 10)
+							]);
+						}
+						else {
+							$y = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,
+								$max_value - $value, 1 / ($max_value - $min_value)
+							]);
+						}
 
 						if ($max_value <= $value && $min_value >= $value) {
 							$y = $metric['options']['type'] == SVG_GRAPH_TYPE_POINTS
