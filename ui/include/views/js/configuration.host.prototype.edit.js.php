@@ -213,17 +213,15 @@
 				callback: ({data, event}) => {
 					event.preventDefault();
 
-					if (window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
-						const standalone_url_params = objectToSearchParams({
-							action: CPopupManager.STANDALONE_ACTION,
-							popup: 'host.edit',
-							...data.action_parameters
-						}).toString();
+					const standalone_url_params = objectToSearchParams({
+						action: CPopupManager.STANDALONE_ACTION,
+						popup: 'host.edit',
+						...data.action_parameters
+					}).toString();
 
-						const standalone_url = new URL(`zabbix.php?${standalone_url_params}`, location.href);
+					const standalone_url = new URL(`zabbix.php?${standalone_url_params}`, location.href);
 
-						location.href = standalone_url.href;
-					}
+					location.href = standalone_url.href;
 				}
 			});
 
