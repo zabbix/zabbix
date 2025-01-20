@@ -84,6 +84,7 @@ class C72ImportConverter extends CConverter {
 
 							case MAP_LINK_DRAWTYPE_DASHED_LINE:
 								$link_trigger['drawtype'] = CXmlConstantName::DASHED_LINE;
+								break;
 						}
 					}
 					unset($link_trigger);
