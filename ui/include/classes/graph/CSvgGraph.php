@@ -912,8 +912,6 @@ class CSvgGraph extends CSvg {
 					 */
 					$path_point = [];
 					foreach ($point as $type => $value) {
-						$in_range = ($max_value >= $value && $min_value <= $value);
-
 							$x = $this->canvas_x + $this->canvas_width
 								- $this->canvas_width * ($this->time_till - $clock + $timeshift) / $time_range;
 
@@ -928,10 +926,13 @@ class CSvgGraph extends CSvg {
 								]);
 							}
 
-							if (!$in_range && $metric['options']['type'] != SVG_GRAPH_TYPE_POINTS) {
-								$y = CSvgGraphMetricsPoint::Y_OUT_OF_RANGE;
-							} else {
-								$y = ($value > $max_value) ? max($y_min, $y) : min($y_max, $y);
+							$in_range = ($max_value >= $value && $min_value <= $value);
+							if (!$in_range) {
+								if ($metric['options']['type'] == SVG_GRAPH_TYPE_POINTS) {
+									$y = CSvgGraphMetricsPoint::Y_OUT_OF_RANGE;
+								} else {
+									$y = ($value > $max_value) ? max($y_min, $y) : min($y_max, $y);
+								}
 							}
 
 							$path_point[$type] = [
