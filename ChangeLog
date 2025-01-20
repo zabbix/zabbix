@@ -3612,8 +3612,6 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 --------------------------------------------------------------------------------
 Changes for 6.0.38rc1
 
-New features:
-
 Bug fixes:
 ..F....... [ZBX-25466] removed title from item mass update preprocessing steps checkbox (dpankins)
 ..F....... [ZBX-25535] fixed overriding Y-axes in Graph widget (dpankins)
