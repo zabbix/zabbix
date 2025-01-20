@@ -28,5 +28,4 @@ void	zbx_mock_test_entry(void **state)
 
 	int	result = zbx_function_validate_parameters(expr, &length);
 	zbx_mock_assert_int_eq("return value", out, result);
-
 }

@@ -25,8 +25,8 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	char		*host, *key;
-	int 		result = zbx_parse_host_key(exp, &host, &key);
+	char	*host, *key;
+	int 	result = zbx_parse_host_key(exp, &host, &key);
 
 	zbx_mock_assert_int_eq("return value", exp_result, result);
 
@@ -41,5 +41,4 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	zbx_free(exp);
-
 }
