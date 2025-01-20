@@ -69,7 +69,7 @@ class testFormTagsHostPrototype extends testFormTags {
 		$this->host = 'Host with tags for cloning';
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->host.':trap_discovery');
 		$this->link = 'host_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=host';
-		$this->executeCloningByParent('host prototype', 'Host');
+		$this->executeCloningByParent('host prototype', 'Host', true);
 	}
 
 	/**

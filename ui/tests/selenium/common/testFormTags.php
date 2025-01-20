@@ -889,7 +889,7 @@ class testFormTags extends CWebTest {
 	 * @param string   $object   item, trigger, web scenario or prototype
 	 * @param string   $parent   host or template
 	 */
-	public function executeCloningByParent($object, $parent) {
+	public function executeCloningByParent($object, $parent, $alert = false) {
 		$new_name = '1Tags - cloning of '.$parent.' with '.$object;
 		$this->page->login()->open($this->link);
 		$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();
@@ -929,7 +929,7 @@ class testFormTags extends CWebTest {
 		$this->query('link', ($parent === 'Host') ? $this->host : $this->template)->waitUntilClickable()->one()->click();
 
 		// Accept alert.
-		if ($parent === 'Host'){
+		if ($alert) {
 			$this->assertEquals('Any changes made in the current form will be lost.', $this->page->getAlertText());
 			$this->page->acceptAlert();
 		}
