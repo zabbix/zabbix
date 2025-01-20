@@ -7574,10 +7574,10 @@ svg {
 
 .btn-split {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
   margin-right: 10px; }
   .btn-split li {
-    display: inline-block; }
+    display: inline-flex; }
     .btn-split li:first-child button {
       border-top-right-radius: 0;
       border-bottom-right-radius: 0; }
