@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,8 +53,9 @@ class testAuditlogRegexp extends testAuditlogCommon {
 		]);
 
 		self::$resourceid = $create['result']['regexpids'][0];
-		self::$expressionid = CDBHelper::getRow('SELECT expressionid FROM expressions WHERE regexpid='
-				.zbx_dbstr(self::$resourceid));
+		self::$expressionid = CDBHelper::getRow('SELECT expressionid FROM expressions WHERE regexpid='.
+				zbx_dbstr(self::$resourceid)
+		);
 
 		$created = json_encode([
 			'regexp.name' => ['add', 'Created regex'],
@@ -91,8 +92,9 @@ class testAuditlogRegexp extends testAuditlogCommon {
 			]
 		]);
 
-		$after_expressionid = CDBHelper::getRow('SELECT expressionid FROM expressions WHERE regexpid='
-				.zbx_dbstr(self::$resourceid));
+		$after_expressionid = CDBHelper::getRow('SELECT expressionid FROM expressions WHERE regexpid='.
+				zbx_dbstr(self::$resourceid)
+		);
 
 		$updated = json_encode([
 			'regexp.expressions['.self::$expressionid['expressionid'].']' => ['delete'],
