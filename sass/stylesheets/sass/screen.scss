@@ -1943,6 +1943,10 @@ div {
 		}
 	}
 
+	.hintbox-raw-data {
+		white-space: pre-wrap;
+	}
+
 	.hintbox-wrap,
 	.hintbox-wrap-horizontal {
 		overflow: auto;
