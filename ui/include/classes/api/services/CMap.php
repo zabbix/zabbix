@@ -3137,8 +3137,11 @@ class CMap extends CMapElement {
 			$db_links = $db_maps[$map['sysmapid']]['links'];
 
 			foreach ($map['links'] as &$link) {
-				if (array_key_exists('linkid', $link)
-						&& $link['indicator_type'] != $db_links[$link['linkid']]['indicator_type']) {
+				if (!array_key_exists('linkid', $link)) {
+					continue;
+				}
+
+				if ($link['indicator_type'] != $db_links[$link['linkid']]['indicator_type']) {
 					switch ($link['indicator_type']) {
 						case MAP_INDICATOR_TYPE_STATIC_LINK:
 							$link += $defaults;
@@ -3150,6 +3153,20 @@ class CMap extends CMapElement {
 
 						case MAP_INDICATOR_TYPE_ITEM_VALUE:
 							$link += array_intersect_key($defaults, array_flip(['linktriggers']));
+							break;
+					}
+				}
+				elseif ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+					switch ($link['item_value_type']) {
+						case ITEM_VALUE_TYPE_FLOAT:
+						case ITEM_VALUE_TYPE_UINT64:
+							$link['highlights'] = [];
+							break;
+
+						case ITEM_VALUE_TYPE_STR:
+						case ITEM_VALUE_TYPE_LOG:
+						case ITEM_VALUE_TYPE_TEXT:
+							$link['thresholds'] = [];
 							break;
 					}
 				}
