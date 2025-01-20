@@ -2481,7 +2481,12 @@ class CMap extends CMapElement {
 		$arbitrary_to_selementids = [];
 
 		foreach ($selementids as $index => $selementid) {
-			$arbitrary_to_selementids[$ins_selements[$index]['selementid']] = $selementid;
+			if (array_key_exists('selementid', $ins_selements[$index])) {
+				$arbitrary_to_selementids[$ins_selements[$index]['selementid']] = $selementid;
+			}
+			else {
+				$arbitrary_to_selementids[$selementid] = $selementid;
+			}
 		}
 
 		foreach ($upd_selements as $selement) {
