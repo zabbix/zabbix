@@ -2596,7 +2596,7 @@ int	zbx_hc_clear_item_middle(zbx_uint64_t itemid)
 
 	zbx_hc_item_t	*item;
 
-	if (NULL != (item = hc_get_item(itemid)) 
+	if (NULL != (item = hc_get_item(itemid)))
 	{
 		if (NULL != item->tail->next)
 		{
