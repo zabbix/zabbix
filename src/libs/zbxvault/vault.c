@@ -54,7 +54,7 @@ int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
 			return FAIL;
 		}
 
-		zbx_vault_kvs_get_cb = zbx_hashicorp_kvs_get;
+		zbx_vault_kvs_get_cb = zbx_vault_get_kvs_hashicorp;
 		zbx_vault_kvs_renew_cb = zbx_hashicorp_renew_token;
 		zbx_vault_dbuser_key = ZBX_HASHICORP_DBUSER_KEY;
 		zbx_vault_dbpassword_key = ZBX_HASHICORP_DBPASSWORD_KEY;
@@ -69,7 +69,7 @@ int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
 			return FAIL;
 		}
 
-		zbx_vault_kvs_get_cb = zbx_cyberark_kvs_get;
+		zbx_vault_kvs_get_cb = zbx_vault_get_kvs_cyberark;
 		zbx_vault_dbuser_key = ZBX_CYBERARK_DBUSER_KEY;
 		zbx_vault_dbpassword_key = ZBX_CYBERARK_DBPASSWORD_KEY;
 	}
