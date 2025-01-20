@@ -15,22 +15,31 @@
 
 class CEventHub {
 
-	static EVENT = '_EVENT';
-	static EVENT_NATIVE = 'native';
-	static EVENT_SUBSCRIBE = 'subscribe';
-	static EVENT_UNSUBSCRIBE = 'unsubscribe';
-
+	/**
+	 * Subscribers data.
+	 *
+	 * @type {Map}
+	 */
 	#subscribers = new Map();
 
-	#latest_data = new Map();
+	/**
+	 * Event cache for late subscribers.
+	 *
+	 * @type {Map}
+	 */
+	#cache = new Map();
 
-	publish({data, descriptor}) {
-		descriptor = {
-			[CEventHub.EVENT]: CEventHub.EVENT_NATIVE,
-			...descriptor
-		};
+	/**
+	 * Publish event.
+	 *
+	 * @param {CEventHubEvent} event
+	 *
+	 * @returns {this}
+	 */
+	publish(event) {
+		const descriptor = event.getDescriptor();
 
-		descriptor = Object.keys(descriptor).sort().reduce(
+		const descriptor_sorted = Object.keys(descriptor).sort().reduce(
 			(descriptor_sorted, key) => {
 				descriptor_sorted[key] = descriptor[key];
 
@@ -39,69 +48,115 @@ class CEventHub {
 			{}
 		);
 
-		const descriptor_hash = JSON.stringify(descriptor);
+		const event_hash = JSON.stringify([event.getType(), descriptor_sorted]);
 
-		this.#latest_data.delete(descriptor_hash);
-		this.#latest_data.set(descriptor_hash, {data, descriptor});
+		this.#cache.delete(event_hash);
+		this.#cache.set(event_hash, event);
 
-		for (const {require, callback} of this.#subscribers.values()) {
-			if (CEventHub.#match(require, descriptor)) {
-				callback({data, descriptor});
+		for (const {require, require_type, callback} of this.#subscribers.values()) {
+			if (CEventHub.#matchEvent(require, require_type, event)) {
+				callback({data: event.getData(), descriptor, event});
 			}
 		}
+
+		event.setCached();
 
 		return this;
 	}
 
-	subscribe({require = {}, callback}) {
-		require = {[CEventHub.EVENT]: CEventHub.EVENT_NATIVE, ...require};
+	/**
+	 * Subscribe to events.
+	 *
+	 * @param {Object}   require        Event descriptor requirements.
+	 * @param {string}   require_type   Event type requirement.
+	 * @param {function} callback       Callback to invoke for matching events.
+	 * @param {boolean}  accept_cached  Whether to invoke callback for the last cached event matching the criteria.
+	 *
+	 * @returns {Object}  Subscription object to use for unsubscription.
+	 */
+	subscribe({require = {}, require_type = CEventHubEvent.TYPE_NATIVE, callback, accept_cached = false}) {
+		if (accept_cached) {
+			for (const event of [...this.#cache.values()].reverse()) {
+				if (CEventHub.#matchEvent(require, require_type, event)) {
+					callback({data: event.getData(), descriptor: event.getDescriptor(), event});
 
-		for (const {data, descriptor} of [...this.#latest_data.values()].reverse()) {
-			if (CEventHub.#match(require, descriptor)) {
-				callback({data, descriptor});
-
-				break;
+					break;
+				}
 			}
 		}
 
 		const subscription = {};
 
-		this.#subscribers.set(subscription, {require, callback});
+		this.#subscribers.set(subscription, {require, require_type, callback});
 
 		this
-			.publish({
-				data: require,
-				descriptor: {...require, [CEventHub.EVENT]: CEventHub.EVENT_SUBSCRIBE}
-			})
-			.invalidateData({[CEventHub.EVENT]: CEventHub.EVENT_SUBSCRIBE});
+			.publish(new CEventHubEvent({
+				data: {require_type},
+				descriptor: require,
+				type: CEventHubEvent.TYPE_SUBSCRIBE
+			}))
+			.invalidateData({}, CEventHubEvent.TYPE_SUBSCRIBE);
 
 		return subscription;
 	}
 
+	/**
+	 * Unsubscribe single subscription from events.
+	 *
+	 * @param {Object} subscription  Subscription object received when subscribed to events.
+	 *
+	 * @returns {boolean}  Whether unsubscription was successful.
+	 */
 	unsubscribe(subscription) {
 		if (!this.#subscribers.has(subscription)) {
 			return false;
 		}
 
-		const {require} = this.#subscribers.get(subscription);
+		const {require, require_type} = this.#subscribers.get(subscription);
 
 		this.#subscribers.delete(subscription);
 
 		this
-			.publish({
-				data: require,
-				descriptor: {...require, [CEventHub.EVENT]: CEventHub.EVENT_UNSUBSCRIBE}
-			})
-			.invalidateData({[CEventHub.EVENT]: CEventHub.EVENT_UNSUBSCRIBE});
+			.publish(new CEventHubEvent({
+				data: {require_type},
+				descriptor: require,
+				type: CEventHubEvent.TYPE_UNSUBSCRIBE
+			}))
+			.invalidateData({}, CEventHubEvent.TYPE_UNSUBSCRIBE);
 
 		return true;
 	}
 
-	hasSubscribers(require = {}) {
-		require = {[CEventHub.EVENT]: CEventHub.EVENT_NATIVE, ...require};
+	/**
+	 * Unsubscribe array of subscriptions from events.
+	 *
+	 * @param {Object[]} subscriptions  Array of subscription objects received when subscribed to events.
+	 *
+	 * @returns {boolean}  Whether unsubscription of all subscriptions was successful.
+	 */
+	unsubscribeAll(subscriptions) {
+		let result = true;
 
+		for (const subscription of subscriptions) {
+			if (!this.unsubscribe(subscription)) {
+				result = false;
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Check if subscribers exist matching the criteria.
+	 *
+	 * @param {Object} require       Event descriptor requirements.
+	 * @param {string} require_type  Event type requirement.
+	 *
+	 * @returns {boolean}
+	 */
+	hasSubscribers(require = {}, require_type = CEventHubEvent.TYPE_NATIVE) {
 		for (const subscriber of this.#subscribers.values()) {
-			if (CEventHub.#match(require, subscriber.require)) {
+			if (subscriber.require_type === require_type && CEventHub.#matchDescriptor(require, subscriber.require)) {
 				return true;
 			}
 		}
@@ -109,27 +164,51 @@ class CEventHub {
 		return false;
 	}
 
-	getData(require) {
-		for (const {data, descriptor} of [...this.#latest_data.values()].reverse()) {
-			if (CEventHub.#match(require, descriptor)) {
-				return data;
+	/**
+	 * Get cached event data matching the criteria.
+	 *
+	 * @param {Object} require       Event descriptor requirements.
+	 * @param {string} require_type  Event type requirement.
+	 *
+	 * @returns {*|undefined}  Data of the last cached event matching the criteria, undefined otherwise.
+	 */
+	getData(require, require_type = CEventHubEvent.TYPE_NATIVE) {
+		for (const event of [...this.#cache.values()].reverse()) {
+			if (CEventHub.#matchEvent(require, require_type, event)) {
+				return event.getData();
 			}
 		}
 
 		return undefined;
 	}
 
-	invalidateData(require) {
-		for (const [descriptor_hash, {descriptor}] of this.#latest_data.entries()) {
-			if (CEventHub.#match(require, descriptor)) {
-				this.#latest_data.delete(descriptor_hash);
+	/**
+	 * Invalidate cached event data matching the criteria.
+	 *
+	 * @param {Object} require       Event descriptor requirements.
+	 * @param {string} require_type  Event type requirement.
+	 *
+	 * @returns {this}
+	 */
+	invalidateData(require = {}, require_type = CEventHubEvent.TYPE_NATIVE) {
+		for (const [descriptor_hash, event] of this.#cache.entries()) {
+			if (CEventHub.#matchEvent(require, require_type, event)) {
+				this.#cache.delete(descriptor_hash);
 			}
 		}
 
 		return this;
 	}
 
-	static #match(require, descriptor) {
+	static #matchEvent(require, require_type, event) {
+		if (event.getType() !== require_type) {
+			return false;
+		}
+
+		return CEventHub.#matchDescriptor(require, event.getDescriptor());
+	}
+
+	static #matchDescriptor(require, descriptor) {
 		for (const [key, value] of Object.entries(require)) {
 			if (!(key in descriptor) || descriptor[key] !== value) {
 				return false;

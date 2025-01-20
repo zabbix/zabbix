@@ -19,9 +19,6 @@
  * @var array $data
  */
 
-$this->addJsFile('multilineinput.js');
-$this->addJsFile('items.js');
-$this->addJsFile('class.tagfilteritem.js');
 $this->includeJsFile('item.list.js.php', $data);
 
 $filter = new CPartial('item.list.filter', [
@@ -101,19 +98,13 @@ foreach ($data['items'] as $item) {
 		else {
 			$name[] = (new CLink($item['master_item']['name'], $item_url))
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_TEAL)
-				->setAttribute('data-itemid', $item['master_item']['itemid'])
-				->setAttribute('data-context', $data['context'])
-				->setAttribute('data-action', 'item.edit');
+				->addClass(ZBX_STYLE_TEAL);
 		}
 
 		$name[] = NAME_DELIMITER;
 	}
 
-	$name[] = (new CLink($item['name'], $item_url))
-		->setAttribute('data-itemid', $item['itemid'])
-		->setAttribute('data-context', $data['context'])
-		->setAttribute('data-action', 'item.edit');
+	$name[] = new CLink($item['name'], $item_url);
 
 	// Trigger information
 	$hint_table = (new CTableInfo())->setHeader([_('Severity'), _('Name'), _('Expression'), _('Status')]);
@@ -135,11 +126,7 @@ foreach ($data['items'] as $item) {
 				makeTriggerTemplatePrefix($trigger['triggerid'], $data['trigger_parent_templates'],
 					ZBX_FLAG_DISCOVERY_NORMAL, $data['allowed_ui_conf_templates']
 				),
-				(new CLink($trigger['description'], $trigger_url))
-					->setAttribute('data-action', 'trigger.edit')
-					->setAttribute('data-hostid', key($trigger['hosts']))
-					->setAttribute('data-triggerid', $trigger['triggerid'])
-					->setAttribute('data-context', $data['context'])
+				new CLink($trigger['description'], $trigger_url)
 			],
 			(new CDiv(
 				$trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
@@ -212,9 +199,7 @@ foreach ($data['items'] as $item) {
 		->getUrl();
 
 	$host = $data['hostid'] == 0
-		? (new CLink($item['hosts'][0]['name'], $host_url))
-			->setAttribute($data['context'] === 'host' ? 'data-hostid' : 'data-templateid', $item['hosts'][0]['hostid'])
-			->setAttribute('data-action', $data['context'] === 'host' ? 'host.edit' : 'template.edit')
+		? new CLink($item['hosts'][0]['name'], $host_url)
 		: null;
 
 	$row = [
@@ -319,10 +304,7 @@ $form->addItem(new CActionButtonList('action', 'itemids', $buttons,
 			(new CList())
 				->addItem(
 					$data['hostid'] != 0
-						? (new CSimpleButton(_('Create item')))
-								->setAttribute('data-hostid', $data['hostid'])
-								->setAttribute('data-context', $data['context'])
-								->addClass('js-create-item')
+						? (new CSimpleButton(_('Create item')))->addClass('js-create-item')
 						: (new CSimpleButton(
 							$data['context'] === 'host'
 								? _('Create item (select host first)')
@@ -355,7 +337,7 @@ $confirm_messages = [
 		'confirm_messages' => $confirm_messages,
 		'field_switches' => CItemData::filterSwitchingConfiguration(),
 		'form_name' => $form->getName(),
-		'hostids' => $data['filter_data']['filter_hostids'],
+		'hostid' => $data['hostid'],
 		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')]
 	]).');
 '))

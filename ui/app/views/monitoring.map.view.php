@@ -23,8 +23,6 @@ $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
 $this->addJsFile('layout.mode.js');
-$this->addJsFile('items.js');
-$this->addJsFile('multilineinput.js');
 $this->includeJsFile('monitoring.map.view.js.php');
 
 $this->enableLayoutModes();

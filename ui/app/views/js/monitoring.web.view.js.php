@@ -37,22 +37,6 @@
 			document.querySelectorAll('#filter-tags .form_row').forEach(row => {
 				new CTagFilterItem(row);
 			});
-
-			this.#setSubmitCallback();
-		}
-
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				location.href = location.href;
-			}, {once: true});
 		}
 	}
 </script>
