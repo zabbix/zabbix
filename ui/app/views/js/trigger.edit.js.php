@@ -51,6 +51,8 @@ window.trigger_edit_popup = new class {
 			this.addPopupValues(data.values);
 		}
 
+		this.form.style.display = '';
+
 		this.#initActions();
 		this.#initPopupListeners();
 		this.#initTriggersTab();
@@ -61,14 +63,16 @@ window.trigger_edit_popup = new class {
 			this.#loadDependencyTable(this.dependencies);
 		}
 
-		this.form.style.display = '';
 		this.overlay.recoverFocus();
 	}
 
 	#initActions() {
 		['input', 'keydown', 'paste'].forEach((event_type) => {
 			this.name.addEventListener(event_type,
-				(e) => this.form.querySelector('#event_name').placeholder = e.target.value
+				(e) => {
+					this.form.querySelector('#event_name').placeholder = e.target.value;
+					$(this.form.querySelector('#event_name')).textareaFlexible('updateHeight');
+				}
 			);
 			this.name.dispatchEvent(new Event('input'));
 		});
@@ -221,15 +225,12 @@ window.trigger_edit_popup = new class {
 	}
 
 	#initTriggersTab() {
-		$('#tabs').one('tabscreate tabsactivate', (event, ui) => {
-			const panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
-
-			if (panel.attr('id') === 'triggersTab') {
-				$('#triggersTab')
-					.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
-					.textareaFlexible();
+		$('#tabs').on('tabsactivate', (event, ui) => {
+			if (ui.newPanel.is('#triggersTab')) {
+				ui.newPanel.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 			}
 		});
+		$('#triggersTab .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 	}
 
 	#addDepTrigger(button) {

@@ -231,6 +231,8 @@ window.token_edit_popup = {
 			.catch(this.ajaxExceptionHandler)
 			.finally(() => {
 				this.overlay.unsetLoading();
+				this.overlay.recoverFocus();
+				this.overlay.containFocus();
 			});
 	}
 };

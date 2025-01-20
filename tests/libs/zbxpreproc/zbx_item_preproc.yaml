@@ -4498,6 +4498,7 @@ in:
       fake.get = http.get;
       fake.get('http://localhost');
       return 0;
+  script_uses_curl: 1
 out:
   return: FAIL
 ---
@@ -4512,6 +4513,7 @@ in:
     params: |
       req = new HttpRequest();
       throw 0;
+  script_uses_curl: 1
 out:
   return: FAIL
 ---
@@ -4529,6 +4531,7 @@ in:
       req[atob('gkZpbmFsaXplcg==')] = null;
 
       return 0;
+  script_uses_curl: 1
 out:
   value: "0"
   return: SUCCEED

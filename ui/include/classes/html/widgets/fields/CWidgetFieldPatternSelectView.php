@@ -41,7 +41,7 @@ abstract class CWidgetFieldPatternSelectView extends CWidgetFieldView {
 		return $this->getId().'_ms';
 	}
 
-	public function getView(): CMultiSelect {
+	public function getView(): CPatternSelect {
 		return $this->getPatternSelect();
 	}
 

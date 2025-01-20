@@ -78,6 +78,7 @@ $filter_column1 = (new CFormGrid())
 			->setChecked($data['filter_priority'])
 			->setColumns(3)
 			->setVertical()
+			->showTitles()
 		)
 	]);
 
