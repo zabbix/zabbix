@@ -38,12 +38,12 @@ class C72ImportConverter extends CConverter {
 
 	private static function convertMaps(array $maps): array {
 		foreach ($maps as &$map) {
-			$map['show_element_label'] = DB::getDefault('sysmaps', 'show_element_label');
-			$map['show_link_label'] = DB::getDefault('sysmaps', 'show_link_label');
-			$map['background_scale'] = DB::getDefault('sysmaps', 'background_scale');
+			$map['show_element_label'] = (string) MAP_SHOW_LABEL_ALWAYS;
+			$map['show_link_label'] = (string) MAP_SHOW_LABEL_ALWAYS;
+			$map['background_scale'] = (string) SYSMAP_BACKGROUND_SCALE_COVER;
 
 			foreach ($map['selements'] as &$selement) {
-				$selement['show_label'] = DB::getDefault('sysmaps_elements', 'show_label');
+				$selement['show_label'] = (string) MAP_SHOW_LABEL_DEFAULT;
 			}
 			unset($selement);
 
