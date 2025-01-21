@@ -4,6 +4,8 @@ New features:
 ...G...... [ZBXNEXT-9686] improved Zabbix agent 2 smart plugin error handling with missing privileges (esneiders)
 
 Bug fixes:
+.......PS. [ZBX-25876] fixed escaping in script item parameters (askolmeisters)
+..F....... [ZBX-24936] fixed button positioning in button split of multiselect (dfofanovs)
 ..F....... [ZBX-25466] removed title from item mass update preprocessing steps checkbox (dpankins)
 ..F....... [ZBX-24751] fixed trigger and trigger prototype form event name field height update which spans multiple lines (gcalenko)
 ..F....... [ZBX-25532] fixed stacked line graph point rendering (dpankins)
