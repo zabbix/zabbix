@@ -1572,8 +1572,8 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 		if (SUCCEED != (ret = proxyconfig_get_tables(proxy, proxy_config_revision, &dc_revision,
 				hostmap_sync, proxy_hostmap_revision, hostmap_revision, failover_delay,
 				&del_hostproxyids, config_vault, config_source_ip, config_ssl_ca_location,
-				config_ssl_cert_location, config_ssl_key_location, j, status, cfg.proxy_secrets_provider,
-				error)))
+				config_ssl_cert_location, config_ssl_key_location, j, status,
+				(zbx_uint64_t)cfg.proxy_secrets_provider, error)))
 		{
 			goto out;
 		}
