@@ -29,7 +29,7 @@ A......... [ZBX-24690] fixed YAML generation in compact nested mapping mode (gca
 .......P.. [ZBX-25782] fixed Zabbix proxy failing to create database on RHEL (dgoloscapov)
 ...G...... [ZBX-25501] fixed scheduled report generation failures when external dashboard resources fail to load (dgoloscapov)
 ...G...... [ZBX-25502] fixed net.dns.record for Zabbix agent 2 (esneiders)
-........S. [ZBX-24549] improved Elasticsearch performance by querying in time intervals and not calling index refresh; added slow query log; fixed queries not working 
+........S. [ZBX-24549] improved Elasticsearch performance by querying in time intervals and not calling index refresh; added slow query log; fixed queries not working (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.8
