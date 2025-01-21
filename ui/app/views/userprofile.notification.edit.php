@@ -46,17 +46,16 @@ if ($data['readonly'] == true) {
 }
 
 // Create form.
-$user_form = (new CForm())
+$userprofile_notification_form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
-	->setId('user-form')
-	->setName('user_form')
+	->setName('userprofile_notification_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('action', $data['action'])
 	->addVar('userid', $data['userid']);
 
 // Media tab.
-$media = new CPartial('user.edit.media.tab', ['user_form' => $user_form] + $data);
+$media = new CPartial('user.edit.media.tab', ['form' => $userprofile_notification_form] + $data);
 
 if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
 	$tabs->addTab('mediaTab', _('Media'), $media, TAB_INDICATOR_MEDIA);
@@ -171,9 +170,9 @@ $tabs->setFooter(makeFormFooter(
 ));
 
 // Append tab to form.
-$user_form->addItem($tabs);
+$userprofile_notification_form->addItem($tabs);
 $html_page
-	->addItem($user_form)
+	->addItem($userprofile_notification_form)
 	->show();
 
 (new CScriptTag('view.init();'))

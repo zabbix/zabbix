@@ -21,10 +21,10 @@
 
 $this->includeJsFile('user.edit.media.tab.js.php');
 
-$user_form = $this->data['user_form'];
+$form = $this->data['form'];
 
 $media_form_list = new CFormList('userMediaFormList');
-$user_form->addVar('medias', $data['medias']);
+$form->addVar('medias', $data['medias']);
 
 $media_table_info = (new CTable())
 	->setId('media-table')
@@ -40,11 +40,11 @@ foreach ($data['medias'] as $index => $media) {
 
 		if ($media['active'] == MEDIA_STATUS_ACTIVE) {
 			$status = (new CButtonLink(_('Enabled')))
-				->onClick('return create_var("' . $user_form->getName() . '","disable_media",' . $index . ', true);')
+				->onClick('return create_var("' . $form->getName() . '","disable_media",' . $index . ', true);')
 				->addClass(ZBX_STYLE_GREEN);
 		} else {
 			$status = (new CButtonLink(_('Disabled')))
-				->onClick('return create_var("' . $user_form->getName() . '","enable_media",' . $index . ', true);')
+				->onClick('return create_var("' . $form->getName() . '","enable_media",' . $index . ', true);')
 				->addClass(ZBX_STYLE_RED);
 		}
 	} else {
@@ -56,7 +56,7 @@ foreach ($data['medias'] as $index => $media) {
 	}
 
 	$parameters = [
-		'dstfrm' => $user_form->getName(),
+		'dstfrm' => $form->getName(),
 		'media' => $index,
 		'mediatypeid' => $media['mediatypeid'],
 		'period' => $media['period'],
@@ -131,7 +131,7 @@ $media_form_list->addRow(_('Media'),
 		$media_table_info,
 		(new CButtonLink(_('Add')))
 			->onClick('PopUp("popup.media", ' .
-				json_encode(['dstfrm' => $user_form->getName()]) .
+				json_encode(['dstfrm' => $form->getName()]) .
 				', {dialogue_class: "modal-popup-generic"});'
 			)
 	]))

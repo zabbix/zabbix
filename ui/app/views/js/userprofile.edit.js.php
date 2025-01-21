@@ -23,7 +23,7 @@
 
 	const view = new class {
 		init() {
-			document.getElementById('user-form').addEventListener('submit', (e) => {
+			document.getElementById('userprofile-form').addEventListener('submit', (e) => {
 				if (!this._userFormSubmit()) {
 					e.preventDefault();
 				}
