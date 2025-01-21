@@ -905,7 +905,7 @@ out:
  *              step            - [IN] period step                                  *
  *              clock_from      - [IN/OUT] period start timestamp                   *
  *              clock_to        - [IN] period end timestamp (including)             *
- *              clock_to_shift  - [OUT] next period end timestmap                   *
+ *              clock_to_shift  - [OUT] next period end timestamp                   *
  *                                                                                  *
  * Return value: period - current period                                            *
  *               FAIL - otherwise                                                   *
