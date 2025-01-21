@@ -58,9 +58,15 @@ $user_form = (new CForm())
 // Create form list and user tab.
 $user_form_list = new CFormList('user_form_list');
 
+$user_full_name = $data['username'];
+
+if (strlen($data['name']) > 0 && strlen($data['surname']) > 0) {
+	$user_full_name = $data['name'] . ' ' . $data['surname'];
+}
+
 $user_form_list
 	->addRow(_x('Name', 'user full name'),
-		(new CSpan($data['name'] . ' ' . $data['surname']))
+		(new CSpan($user_full_name))
 	);
 
 if ($data['change_password']) {
