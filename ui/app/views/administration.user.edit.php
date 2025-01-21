@@ -303,9 +303,8 @@ $user_form_list
 $tabs->addTab('userTab', _('User'), $user_form_list);
 
 // Media tab.
-$media = new CPartial('user.edit.media.tab', ['form' => $user_form] + $data);
-
 if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
+	$media = new CPartial('user.edit.media.tab', ['form' => $user_form] + $data);
 	$tabs->addTab('mediaTab', _('Media'), $media, TAB_INDICATOR_MEDIA);
 }
 
