@@ -1036,6 +1036,40 @@ out:
       data: "'connections'"
       detached: 0
 ---
+test case: Compile success $.f$o
+in:
+  path: $.f$o
+out:
+  result: SUCCEED
+  definite: 1
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'f$o'"
+---
+test case: Compile success $[?(@.$)]
+in:
+  path: $[?(@.$)]
+out:
+  result: SUCCEED
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
+      data: "@.$"
+---
+test case: Compile success $.$.$[?(@.$ < $.$)]
+in:
+  path: $.$.$[?(@.$ < $.$)]
+out:
+  result: SUCCEED
+  definite: 0
+  segments:
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'$'"
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_LIST
+      data: "'$'"
+    - type: ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION
+      data: "@.$ , $.$ , <"
+---
 test case: Compile success $.sum()
 in:
   path: $.sum()

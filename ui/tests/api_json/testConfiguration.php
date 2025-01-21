@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -178,7 +178,7 @@ class testConfiguration extends CAPITest {
 			[
 				[
 					'options' => [
-							'groups' => []
+						'groups' => []
 					],
 					'prettyprint' => true
 				]
@@ -186,7 +186,7 @@ class testConfiguration extends CAPITest {
 			[
 				[
 					'options' => [
-							'groups' => ['11111111111111']
+						'groups' => ['11111111111111']
 					],
 					'prettyprint' => true
 				]
@@ -194,7 +194,7 @@ class testConfiguration extends CAPITest {
 			[
 				[
 					'options' => [
-							'groups' => ['50012']
+						'groups' => ['50012']
 					],
 					'prettyprint' => true
 				]
