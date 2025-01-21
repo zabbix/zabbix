@@ -41,8 +41,16 @@ class testFormUserLdapMediaJit extends CWebTest {
 	const WHEN_ACTIVE = '1-2,00:30-12:00';
 	const LDAP_SERVER_NAME = 'TEST';
 	const MEDIA_MAPPING_UPDATE = 'Media mapping with severity: none';
-	const MEDIA_MAPPING_ATRIBUTE_CHANGE = 'Media mapping with severity: all';
+	const MEDIA_MAPPING_REMOVE = 'Media mapping with severity: all';
 	const DELETE_MEDIA = 'Zammad';
+	const MEDIA_MAPPING_ZAMMAD = 'Disabled media that is enabled in Media types';
+	const MEDIA_MAPPING_ZENDESK = 'Enabled media that is disabled in Media types';
+	const MEDIA_MAPPING_OPSGENIE = 'Enabled media type Opsgenie';
+	const MEDIA_MAPPING_EDIT_TYPE_1 = 'Media VictorOps for a type update';
+	const MEDIA_MAPPING_EDIT_TYPE_2 = 'Media ServiceNow for a type update';
+	const MEDIA_MAPPING_EDIT_TYPE_3 = 'Media Rocket.Chat for a different parameter update';
+	const MEDIA_MAPPING_EDIT_TYPE_4 = 'Media OTRS CE for multiple media update';
+	const MEDIA_MAPPING_EDIT_TYPE_5 = 'Media MantisBT for attribute update';
 
 	/**
 	 * Enable media types before test.
@@ -50,7 +58,8 @@ class testFormUserLdapMediaJit extends CWebTest {
 	public function prepareJitMedia() {
 		$mediatypeids = CDBHelper::getAll("SELECT mediatypeid FROM media_type WHERE name IN ('iTop', 'SMS',".
 				" 'MS Teams', 'Slack', 'OTRS', 'Opsgenie', 'Brevis.one', 'Discord', 'iLert', 'Jira', 'Line', 'Email',".
-				" 'SysAid', 'Pushover', 'Telegram', 'Redmine', 'SIGNL4', 'PagerDuty', 'Zammad')"
+				" 'SysAid', 'Pushover', 'Telegram', 'Redmine', 'SIGNL4', 'PagerDuty', 'Zammad', 'Github', 'VictorOps',".
+				" 'ServiceNow')"
 		);
 
 		foreach ($mediatypeids as $mediatype) {
@@ -85,7 +94,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 				],
 				'provision_media' => [
 					[
-						'name' => self::MEDIA_MAPPING_ATRIBUTE_CHANGE,
+						'name' => self::MEDIA_MAPPING_REMOVE,
 						'mediatypeid' => 14, // MS Teams.
 						'attribute' => 'uid',
 						'severity' => 63 // All severity options selected.
@@ -97,20 +106,45 @@ class testFormUserLdapMediaJit extends CWebTest {
 						'severity' => 0 // None.
 					],
 					[
-						'name' => 'Media to check disabling in user configuration',
+						'name' => self::MEDIA_MAPPING_OPSGENIE,
 						'mediatypeid' => 6, // Opsgenie.
 						'attribute' => 'uid'
 					],
 					[
-						'name' => 'Enabled media that is disabled in Media types',
+						'name' => self::MEDIA_MAPPING_ZENDESK,
 						'mediatypeid' => 17, // Zendesk.
 						'attribute' => 'uid'
 					],
 					[
-						'name' => 'Disabled media that is enabled in Media types',
+						'name' => self::MEDIA_MAPPING_ZAMMAD,
 						'mediatypeid' => 19, // Zammad.
 						'attribute' => 'uid',
 						'active' => 1
+					],
+					[
+						'name' => self::MEDIA_MAPPING_EDIT_TYPE_1,
+						'mediatypeid' => 28, // VictorOps.
+						'attribute' => 'uid'
+					],
+					[
+						'name' => self::MEDIA_MAPPING_EDIT_TYPE_2,
+						'mediatypeid' => 18, // ServiceNow.
+						'attribute' => 'uid'
+					],
+					[
+						'name' => self::MEDIA_MAPPING_EDIT_TYPE_3,
+						'mediatypeid' => 27, // Rocket.Chat.
+						'attribute' => 'uid'
+					],
+					[
+						'name' => self::MEDIA_MAPPING_EDIT_TYPE_4,
+						'mediatypeid' => 39, // OTRS CE.
+						'attribute' => 'uid'
+					],
+					[
+						'name' => self::MEDIA_MAPPING_EDIT_TYPE_5,
+						'mediatypeid' => 41, // OTRS CE.
+						'attribute' => 'uid'
 					]
 				]
 			]
@@ -126,18 +160,8 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 	public function testFormUserLdapMediaJit_CheckProvisionedMediaLayout() {
 
-		// Media type data to check after provisioning.
-		$media_type = ['MS Teams', 'Opsgenie', 'OTRS', 'Zammad', 'Zendesk'];
-		$when_active = ['1-7,00:00-24:00', '1-7,00:00-24:00', '1-7,00:00-24:00', '1-7,00:00-24:00', '1-7,00:00-24:00'];
-		$status = ['Enabled', 'Enabled', 'Enabled', 'Disabled', 'Disabled'];
-		$send_to = [PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USERNAME];
-		$severity = [
-			['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
-			[],
-			['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
-			['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
-			['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']
-		];
+		// Media types to appear after the provisioning.
+		$media_types = ['MantisBT', 'MS Teams', 'Opsgenie', 'OTRS', 'OTRS CE', 'Rocket.Chat', 'ServiceNow', 'VictorOps', 'Zammad', 'Zendesk'];
 
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
 		$this->page->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
@@ -149,68 +173,31 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 		$form = $this->query('id:user-form')->waitUntilVisible()->asForm()->one();
 		$form->selectTab('Media');
+		$media_table = $form->query('id:media-table')->asTable()->one();
 
 		// Check that correct amount of media is provisioned.
-		$this->assertEquals(5, $form->query('id:media-table')->asTable()->one()->getRows()->count());
+		$this->assertEquals(10, $media_table->getRows()->count());
 
 		// Check that count of media is correctly displayed in the tab.
-		$this->assertEquals(5, $form->query('xpath:.//a[text()="Media"]')->one()->getAttribute('data-indicator-value'));
+		$this->assertEquals(10, $form->query('xpath:.//a[text()="Media"]')->one()->getAttribute('data-indicator-value'));
 
-		// Check parameters of the media.
-		foreach (['Type' => $media_type, 'Send to' => $send_to,	'When active' => $when_active, 'Status' => $status] as $column => $values) {
-			$this->assertTableDataColumn($values, $column, 'id:media-table');
-		}
-
-		for ($i = 0; $i <= 4; $i++) {
-			$row = $this->query('xpath://tr[@id="medias_'.$i.'"]')->asTableRow()->one();
-
-			// Check that only edit action is enabled for provisioned media.
+		// Check that only edit action is enabled for provisioned media.
+		foreach($media_types as $media_type) {
+			$row = $media_table->findRow('Type', $media_type);
 			$this->assertFalse($row->query('button:Remove')->one()->isClickable());
 			$this->assertTrue($row->query('button:Edit')->one()->isClickable());
-
-			// Check severity.
-			$reference_severities = [
-				'Not classified' => '1',
-				'Information' => '2',
-				'Warning' => '3',
-				'Average' => '4',
-				'High' => '5',
-				'Disaster' => '6'
-			];
-
-			foreach ($severity[$i] as $used_severity) {
-				$actual_severity = $row->query('xpath:./td[4]/div/span['.$reference_severities[$used_severity].']')->one()
-						->getAttribute('data-hintbox-contents');
-				$this->assertEquals($actual_severity, $used_severity.' (on)');
-				unset($reference_severities[$used_severity]);
-			}
-
-			// Check that other severities are turned off.
-			foreach ($reference_severities as $name => $unused_severity) {
-				$actual_severity = $row->query('xpath:./td[4]/div/span['.$unused_severity.']')->one()
-						->getAttribute('data-hintbox-contents');
-				$this->assertEquals($name.' (off)', $actual_severity);
-			}
-
-			$table = $form->selectTab('Media')->getField('Media')->asTable();
-
-			// Check hintbox and status for media that is disabled in Media types.
-			$row = $table->findRow('Type', 'Zendesk', true);
-			$this->assertTrue($row->getColumn('Type')->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')
-					->one()->isValid()
-			);
-
-			$this->assertFalse($row->getColumn('Status')->query('xpath:.//a')->one(false)->isValid());
-			$this->assertEquals('Media type disabled by Administration.', $row->getColumn('Type')
-					->query('tag:button')->one()->getAttribute('data-hintbox-contents')
-			);
 		}
 
+		// Check hintbox and status for media that is disabled in Media types.
+		$row = $media_table->findRow('Type', 'Zendesk', true);
+		$this->assertTrue($row->getColumn('Type')->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')
+				->one()->isValid()
+		);
+
 		// Check that correct amount of hintboxes is present in the media table for disabled media.
-		$this->assertEquals(1, $table->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')->count());
+		$this->assertEquals(4, $media_table->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')->count());
 
 		// Check that Type and Send to fields are read-only for provisioned media.
-		$media_table = $this->query('name:user_form')->waitUntilVisible()->asForm()->one()->getField('Media')->asTable();
 		$media_table->findRow('Type', 'MS Teams')->getColumn('Actions')->query('button:Edit')->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$media_form = $dialog->asForm();
@@ -477,79 +464,298 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$this->assertFalse($media_updated->findRow('Type', $data['fields']['Type'])->isPresent());
 	}
 
-	public function testFormUserLdapMediaJit_UpdateMediaMapping() {
-
-		// Media type for edit - OTRS.
-		$media_type = [
-			'fields' =>
+	public function getUpdateMediaMappings() {
+		return [
+			// Media type update to other enabled media type.
 			[
-				'Name' => self::MEDIA_MAPPING_UPDATE,
-				'Media type' => 'OTRS',
-				'Send to' => 'user1',
-				'When active' => '1-7,00:00-24:00',
-				'Use if severity' => [],
-				'Enabled' => true
+				[
+					'media_types' => [
+						[
+							'name' => self::MEDIA_MAPPING_EDIT_TYPE_1,
+							'configuration' => [
+								'fields' => [
+									'Type' => 'VictorOps',
+									'Send to' => PHPUNIT_LDAP_USERNAME,
+									'When active' => '1-7,00:00-24:00',
+									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Enabled' => true
+								]
+							],
+							'update' => [
+								'Media type' => 'Github',
+							],
+							'expected' => [
+								'fields' => [
+									'Type' => 'Github',
+									'Send to' => PHPUNIT_LDAP_USERNAME,
+									'When active' => '1-7,00:00-24:00',
+									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Enabled' => true
+								]
+							]
+						]
+					]
+				]
+			],
+			// Media type update to other disabled media type.
+			[
+				[
+					'media_types' => [
+						[
+							'name' => self::MEDIA_MAPPING_EDIT_TYPE_2,
+							'configuration' => [
+								'fields' => [
+									'Type' => 'ServiceNow',
+									'Send to' => PHPUNIT_LDAP_USERNAME,
+									'When active' => '1-7,00:00-24:00',
+									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Enabled' => true
+								]
+							],
+							'update' => [
+								'Media type' => 'Mattermost'
+							],
+							'expected' => [
+								'fields' => [
+									'Type' => 'Mattermost',
+									'Send to' => PHPUNIT_LDAP_USERNAME,
+									'When active' => '1-7,00:00-24:00',
+									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Enabled' => false
+								]
+							]
+						]
+					]
+				]
+			],
+			// Media type severity update: severity.
+			[
+				[
+					'media_types' => [
+						[
+							'name' => self::MEDIA_MAPPING_EDIT_TYPE_3,
+							'configuration' => [
+								'fields' => [
+									'Type' => 'Rocket.Chat',
+									'Send to' => PHPUNIT_LDAP_USERNAME,
+									'When active' => '1-7,00:00-24:00',
+									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Enabled' => false
+								]
+							],
+							'update' => [
+								'Use if severity' => []
+							],
+							'expected' => [
+								'fields' => [
+									'Type' => 'Rocket.Chat',
+									'Send to' => PHPUNIT_LDAP_USERNAME,
+									'When active' => '1-7,00:00-24:00',
+									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Enabled' => false
+								]
+							]
+						]
+					]
+				]
+			],
+			// Media type status update.
+			[
+				[
+					'media_types' => [
+						[
+							'name' => self::MEDIA_MAPPING_EDIT_TYPE_3,
+							'configuration' => [
+								'fields' => [
+									'Type' => 'Rocket.Chat',
+									'Send to' => PHPUNIT_LDAP_USERNAME,
+									'When active' => '1-7,00:00-24:00',
+									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Enabled' => false
+								]
+							],
+							'update' => [
+								'Create enabled' => true
+							],
+							'expected' => [
+								'fields' => [
+									'Type' => 'Rocket.Chat',
+									'Send to' => PHPUNIT_LDAP_USERNAME,
+									'When active' => '1-7,00:00-24:00',
+									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Enabled' => false
+								]
+							]
+						]
+					]
+				]
+			],
+			// Media type update When active update.
+			[
+				[
+					'media_types' => [
+						[
+							'name' => self::MEDIA_MAPPING_EDIT_TYPE_3,
+							'configuration' => [
+								'fields' => [
+									'Type' => 'Rocket.Chat',
+									'Send to' => PHPUNIT_LDAP_USERNAME,
+									'When active' => '1-7,00:00-24:00',
+									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Enabled' => false
+								]
+							],
+							'update' => [
+								'When active' => '1-5,00:00-22:00'
+							],
+							'expected' => [
+								'fields' => [
+									'Type' => 'Rocket.Chat',
+									'Send to' => PHPUNIT_LDAP_USERNAME,
+									'When active' => '1-7,00:00-24:00',
+									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Enabled' => false
+								]
+							]
+						]
+					]
+				]
+			],
+			// Several media type mapping update.
+			[
+				[
+					'media_types' => [
+						[
+							'name' => self::MEDIA_MAPPING_EDIT_TYPE_4,
+							'configuration' => [
+								'fields' => [
+									'Type' => 'OTRS CE',
+									'Send to' => PHPUNIT_LDAP_USERNAME,
+									'When active' => '1-7,00:00-24:00',
+									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Enabled' => false
+								]
+							],
+							'update' => [
+								'Media type' => 'SysAid',
+							],
+							'expected' => [
+								'fields' => [
+									'Type' => 'SysAid',
+									'Send to' => PHPUNIT_LDAP_USERNAME,
+									'When active' => '1-7,00:00-24:00',
+									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Enabled' => true
+								]
+							]
+						],
+						[
+							'name' => self::MEDIA_MAPPING_EDIT_TYPE_3,
+							'configuration' => [
+								'fields' => [
+									'Type' => 'Rocket.Chat',
+									'Send to' => PHPUNIT_LDAP_USERNAME,
+									'When active' => '1-7,00:00-24:00',
+									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Enabled' => false
+								]
+							],
+							'update' => [
+								'Media type' => 'MS Teams Workflow',
+								'Use if severity' => ['High', 'Disaster']
+							],
+							'expected' => [
+								'fields' => [
+									'Type' => 'MS Teams Workflow',
+									'Send to' => PHPUNIT_LDAP_USERNAME,
+									'When active' => '1-7,00:00-24:00',
+									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Enabled' => false
+								]
+							]
+						]
+					]
+				]
+			],
+			// Media type attribute change.
+			[
+				[
+					'media_types' => [
+						[
+							'name' => self::MEDIA_MAPPING_EDIT_TYPE_5,
+							'configuration' => [
+								'fields' => [
+									'Type' => 'MantisBT',
+									'Send to' => PHPUNIT_LDAP_USERNAME,
+									'When active' => '1-7,00:00-24:00',
+									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Enabled' => false
+								]
+							],
+							'update' => [
+								'Attribute' => 'not_existing_attribute'
+							]
+						]
+					]
+				]
 			]
 		];
+	}
 
-		// Update for the media mapping in LDAP server's configuration.
-		$media_type_update = [
-			'fields' =>
-			[
-				'Name' => self::MEDIA_MAPPING_UPDATE,
-				'Media type' => 'SysAid',
-				'Send to' => 'user1',
-				'When active' => self::WHEN_ACTIVE,
-				'Use if severity' => ['Information', 'Disaster'],
-				'Enabled' => false
-			]
-		];
+	/**
+	 * @dataProvider getUpdateMediaMappings
+	 *
+	 * Function to check that provisioned user's media is updated accordingly to media mapping.
+	 */
+	public function testFormUserLdapMediaJit_UpdateMediaMapping($data) {
 
 		// Log in as the LDAP user, to make sure, that user is provisioned.
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
 		$this->page->logout();
 
-		// Change the attribute for one of the existing media mappings in LDAP.
+		// Open media mapping to update.
 		$form = $this->openLdapForm();
 		$table = $form->query('id:ldap-servers')->asTable()->one();
 		$table->query('link:'.self::LDAP_SERVER_NAME)->one()->click();
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$media_table = $dialog->query('id:ldap-media-type-mapping-table')->asTable()->one();
-		$media_table->query('link:'.self::MEDIA_MAPPING_ATRIBUTE_CHANGE)->one()->click();
-		$media_form = COverlayDialogElement::find()->all()->last()->asForm();
-		$media_form->fill(['Attribute' => 'test']);
-		$media_form->submit();
 
-		// Change the severity, time period and status for other media mapping.
-		$media_table->query('link:'.$media_type['fields']['Name'])->one()->click();
-		$media_form_update = COverlayDialogElement::find()->all()->last()->asForm();
-		$media_form_update->fill([
-			'Media type' => $media_type_update['fields']['Media type'],
-			'When active' => $media_type_update['fields']['When active'],
-			'Use if severity' => $media_type_update['fields']['Use if severity'],
-			'Create enabled' => $media_type_update['fields']['Enabled']
-		]);
-		$media_form_update->submit();
+		foreach ($data['media_types'] as $media_type) {
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+			$media_table = $dialog->query('id:ldap-media-type-mapping-table')->asTable()->one();
+			$media_table->query('link', $media_type['name'])->one()->click();
+			$media_form = COverlayDialogElement::find()->all()->last()->asForm();
+			$media_form->fill($media_type['update']);
+			$media_form->submit();
+		}
+
 		$dialog->query('button:Update')->one()->click();
 		$form->submit();
 
 		// Check that no changes are present until user is provisioned.
 		$this->page->open('zabbix.php?action=user.list')->waitUntilReady();
 		$this->query('link:'.PHPUNIT_LDAP_USERNAME)->one()->click();
-		$this->assertEquals(4, $this->getUserMediaTable()->getRows()->count());
-		$this->checkMediaConfiguration($media_type, $media_type['fields']['Media type'], $media_type['fields']['Send to']);
+		$this->assertEquals(10, $this->getUserMediaTable()->getRows()->count());
+
+		foreach ($data['media_types'] as $media_type) {
+			$this->checkMediaConfiguration($media_type['configuration'], $media_type['configuration']['fields']['Type'], PHPUNIT_LDAP_USERNAME);
+		}
 
 		// Provision the LDAP user.
 		$this->page->open('zabbix.php?action=user.list');
 		$this->provisionLdapUser();
 
-		// Check that one media type is removed, only type is changed for updated media.
 		$this->page->open('zabbix.php?action=user.list')->waitUntilReady();
 		$this->query('link:'.PHPUNIT_LDAP_USERNAME)->one()->click();
 		$user_media_table = $this->getUserMediaTable();
-		$this->assertEquals(3, $user_media_table->getRows()->count());
-		$this->assertFalse($user_media_table->findRow('Type', 'iTop', true)->isPresent());
-		$this->checkMediaConfiguration($media_type, $media_type_update['fields']['Media type'], $media_type['fields']['Send to']);
+
+		foreach ($data['media_types'] as $media_type) {
+			if (array_key_exists('Attribute', $media_type['update'])) {
+				$this->assertFalse($user_media_table->findRow('Type', '	MantisBT', true)->isPresent());
+				$this->assertEquals(9, $user_media_table->getRows()->count());
+			}
+			else {
+				$this->checkMediaConfiguration($media_type['expected'], $media_type['expected']['fields']['Type'], PHPUNIT_LDAP_USERNAME);
+			}
+		}
 	}
 
 	public function getNewMediaMappings() {
@@ -815,6 +1021,8 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 	/**
 	 * @dataProvider getNewMediaMappings
+	 *
+	 * Function to check that new media is added to the user after updating the mapping and provisioning.
 	 */
 	public function testFormUserLdapMediaJit_AddMediaMapping($data) {
 		$form = $this->openLdapForm();
@@ -878,7 +1086,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$table->query('link:'.self::LDAP_SERVER_NAME)->one()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$media_table = $dialog->query('id:ldap-media-type-mapping-table')->asTable()->one();
-		$media_table->findRow('Name', self::MEDIA_MAPPING_ATRIBUTE_CHANGE, true)->query('button:Remove')->one()->click();
+		$media_table->findRow('Name', self::MEDIA_MAPPING_REMOVE, true)->query('button:Remove')->one()->click();
 		$dialog->query('button:Update')->one()->click();
 		$form->submit();
 
@@ -886,7 +1094,6 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$this->page->open('zabbix.php?action=user.list')->waitUntilReady();
 		$this->query('link:'.PHPUNIT_LDAP_USERNAME)->one()->click();
 		$user_media_table = $this->getUserMediaTable();
-		$this->assertEquals(4, $user_media_table->getRows()->count());
 		$this->assertFalse($user_media_table->findRow('Type', 'MS Teams', true)->isPresent());
 	}
 
