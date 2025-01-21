@@ -98,7 +98,7 @@ class CControllerPopup extends CController {
 		$data = [
 			'popup' => [
 				'action' => $this->action,
-				'options' => $this->popup_controller->getInputAll()
+				'action_parameters' => $this->popup_controller->getInputAll()
 			]
 		];
 

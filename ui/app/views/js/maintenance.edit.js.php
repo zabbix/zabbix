@@ -24,10 +24,9 @@ window.maintenance_edit = new class {
 		this._dialogue = this._overlay.$dialogue[0];
 		this._form = this._overlay.$dialogue.$body[0].querySelector('form');
 
-		const backurl = new Curl('zabbix.php');
-
-		backurl.setArgument('action', 'maintenance.list');
-		this._overlay.backurl = backurl.getUrl();
+		const return_url = new URL('zabbix.php', location.href);
+		return_url.searchParams.set('action', 'maintenance.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		timeperiods.forEach((timeperiod, row_index) => {
 			this._addTimePeriod({row_index, ...timeperiod});

@@ -132,12 +132,12 @@ class CIconMap extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
+
+			if (!$options['preservekeys']) {
+				$result = array_values($result);
+			}
 		}
 
-		// removing keys (hash -> array)
-		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
-		}
 		return $result;
 	}
 

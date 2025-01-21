@@ -32,7 +32,7 @@
 		}
 
 		init({serviceid, path = null, is_filtered = null, mode_switch_url, parent_url = null, refresh_url,
-				refresh_interval, back_url = null}) {
+				refresh_interval, return_url = null}) {
 			this.serviceid = serviceid;
 			this.path = path;
 			this.is_filtered = is_filtered;
@@ -40,12 +40,13 @@
 			this.parent_url = parent_url;
 			this.refresh_url = refresh_url;
 			this.refresh_interval = refresh_interval;
-			this.back_url = back_url;
+			this.return_url = return_url;
 
 			this.#initViewModeSwitcher();
 			this.#initTagFilter();
 			this.#initActions();
 			this.#initRefresh();
+			this.#initPopupListeners();
 		}
 
 		#initViewModeSwitcher() {
@@ -73,30 +74,21 @@
 		}
 
 		#initActions() {
-			document.addEventListener('click', (e) => {
-				if (e.target.matches('.js-create-service, .js-add-child-service')) {
-					const parameters = e.target.dataset.serviceid !== undefined
-						? {parent_serviceids: [e.target.dataset.serviceid]}
-						: {};
-
-					this.#edit(parameters);
+			document.addEventListener('click', e => {
+				if (e.target.matches('.js-create-service')) {
+					ZABBIX.PopupManager.open('service.edit',
+						this.serviceid !== null ? {parent_serviceids: [this.serviceid]} : {}
+					);
 				}
-				else if (e.target.classList.contains('js-edit-service')) {
-					popupManagerInstance.setBackUrl(this.#createBackurl());
-
-					this.#edit({serviceid: e.target.dataset.serviceid});
-				}
-				else if (e.target.classList.contains('js-edit-service-list')) {
-					popupManagerInstance.setBackUrl(location.href);
-
-					this.#edit({serviceid: e.target.dataset.serviceid});
+				else if (e.target.classList.contains('js-add-child-service')) {
+					ZABBIX.PopupManager.open('service.edit', {parent_serviceids: [e.target.dataset.serviceid]});
 				}
 				else if (e.target.classList.contains('js-delete-service')) {
 					this.#delete(e.target, [e.target.dataset.serviceid]);
 				}
 				else if (e.target.classList.contains('js-massupdate-service')) {
 					openMassupdatePopup('popup.massupdate.service', {
-						location_url: this.back_url,
+						location_url: this.return_url,
 						[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('service')) ?>
 					}, {
 						dialogue_class: 'modal-popup-static',
@@ -109,60 +101,43 @@
 			});
 		}
 
-		/**
-		 * Generates URL based on current element path (parent service elements).
-		 */
-		#createBackurl() {
-			let url = new Curl(popupManagerInstance.getUrl());
-			const url_args = url.getArguments();
-			const last_path = Object.keys(url_args).filter(key => key.startsWith('path')).length - 1;
-			const last_path_value = url_args[`path[${last_path}]`];
-
-			if (last_path_value) {
-				url.setArgument('serviceid', last_path_value);
-				url.unsetArgument(`path[${last_path}]`);
-			}
-			else {
-				url = new Curl('zabbix.php');
-
-				url.setArgument('action', 'service.list');
-			}
-
-			return url.getUrl();
-		}
-
 		#initRefresh() {
 			if (this.refresh_interval > 0) {
 				setInterval(() => this.#refresh(), this.refresh_interval);
 			}
 		}
 
-		#edit(parameters = {}) {
-			this.#pauseRefresh();
+		#initPopupListeners() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_OPEN
+				},
+				callback: () => this.#pauseRefresh()
+			});
 
-			// Save the current URL.
-			this.current_url = location.href;
-			window.popupManagerInstance.setUrl(this.current_url);
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_CANCEL
+				},
+				callback: () => this.#resumeRefresh()
+			});
 
-			// Update the browser's URL to the popup page URL when editing a service.
-			if (parameters.serviceid) {
-				this.#setPopupLink(parameters);
-			}
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
+				},
+				callback: ({data, event}) => {
+					uncheckTableRows(chkbxRange.prefix);
 
-			this.overlay = window.popupManagerInstance.openPopup('service.edit', parameters);
-
-			this.#setSubmitCallback();
-			this.#setCloseCallback();
-		}
-
-		#setPopupLink(parameters) {
-			const url = new Curl('zabbix.php');
-
-			url.setArgument('action', 'popup');
-			url.setArgument('popup', 'service.edit');
-			url.setArgument('serviceid', parameters.serviceid);
-
-			history.replaceState(null, '', url.getUrl());
+					if (data.submit.success.action === 'delete'
+							&& data.action_parameters.serviceid === this.serviceid) {
+						event.setRedirectUrl(this.parent_url);
+					}
+				}
+			});
 		}
 
 		#delete(target, serviceids) {
@@ -278,33 +253,6 @@
 
 					this.is_refresh_pending = false;
 				});
-		}
-
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				uncheckTableRows(chkbxRange.prefix);
-
-				if ('action' in e.detail && e.detail.action === 'delete') {
-					location.href = parameters.serviceid === this.serviceid ? this.parent_url : this.current_url;
-				}
-				else {
-					location.href = popupManagerInstance.getUrl();
-				}
-			});
-		}
-
-		#setCloseCallback() {
-			window.popupManagerInstance.setCloseCallback(() => {
-				this.overlay.$dialogue[0].addEventListener('dialogue.close', () => this.#resumeRefresh(), {once: true});
-			});
 		}
 	};
 </script>

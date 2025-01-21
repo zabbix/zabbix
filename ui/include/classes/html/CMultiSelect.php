@@ -93,7 +93,7 @@ class CMultiSelect extends CTag {
 		}
 
 		if (array_key_exists('data', $options)) {
-			$this->params['data'] = zbx_cleanHashes($options['data']);
+			$this->params['data'] = array_values($options['data']);
 		}
 
 		foreach (['defaultValue', 'disabled', 'selectedLimit', 'addNew', 'styles', 'placeholder', 'hidden', 'readonly']
