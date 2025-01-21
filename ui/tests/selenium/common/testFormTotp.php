@@ -29,6 +29,7 @@ class testFormTotp extends CWebTest {
 	protected const DEFAULT_METHOD_NAME = 'TOTP';
 	protected const DEFAULT_ALGO = TOTP_HASH_SHA1;
 	protected const DEFAULT_TOTP_CODE_LENGTH = TOTP_CODE_LENGTH_6;
+	protected const DEFAULT_ERROR = 'The verification code was incorrect, please try again.';
 
 	// Number of times after which a user is blocked when a wrong TOTP is entered.
 	protected const BLOCK_COUNT = 5;
@@ -159,7 +160,7 @@ class testFormTotp extends CWebTest {
 					'expected' => TEST_BAD,
 					// Correct once in a million times, but it is better to test with a realistic TOTP.
 					'totp' => '999999',
-					'error' => 'The verification code was incorrect, please try again.'
+					'error' => self::DEFAULT_ERROR
 				]
 			],
 			[
@@ -167,7 +168,7 @@ class testFormTotp extends CWebTest {
 					// Incorrect code - invalid input.
 					'expected' => TEST_BAD,
 					'totp' => 'ABCD👍',
-					'error' => 'The verification code was incorrect, please try again.'
+					'error' => self::DEFAULT_ERROR
 				]
 			],
 			[
@@ -175,7 +176,7 @@ class testFormTotp extends CWebTest {
 					// Incorrect code - max length.
 					'expected' => TEST_BAD,
 					'totp' => STRING_255,
-					'error' => 'The verification code was incorrect, please try again.'
+					'error' => self::DEFAULT_ERROR
 				]
 			],
 			[
@@ -189,7 +190,7 @@ class testFormTotp extends CWebTest {
 					// TOTP is two time steps in the past.
 					'expected' => TEST_BAD,
 					'time_step_offset' => -2,
-					'error' => 'The verification code was incorrect, please try again.'
+					'error' => self::DEFAULT_ERROR
 				]
 			],
 			[
@@ -203,7 +204,22 @@ class testFormTotp extends CWebTest {
 					// TOTP is two time steps in the future.
 					'expected' => TEST_BAD,
 					'time_step_offset' => 2,
-					'error' => 'The verification code was incorrect, please try again.'
+					'error' => self::DEFAULT_ERROR
+				]
+			],
+			[
+				[
+					// Leading and trailing spaces.
+					'totp_pre' => '   ',
+					'totp_after' => '   '
+				]
+			],
+			[
+				[
+					// Empty TOTP value.
+					'expected' => TEST_BAD,
+					'totp' => '',
+					'error' => self::DEFAULT_ERROR
 				]
 			]
 		];
@@ -223,10 +239,8 @@ class testFormTotp extends CWebTest {
 			$form->query('button:Sign in')->one()->click();
 
 			if ($i !== self::BLOCK_COUNT) {
-				// Validate the validation error message on first n minus 1 times.
-				$this->assertEquals('The verification code was incorrect, please try again.',
-					$form->query('class:red')->one()->getText()
-				);
+				// Validate the validation error message first n-1 times.
+				$this->assertEquals(self::DEFAULT_ERROR, $form->query('class:red')->one()->getText());
 			} else {
 				// Validate the blocked message on the n-th time.
 				$this->page->waitUntilReady();

@@ -34,7 +34,7 @@ class testFormTotpValidate extends testFormTotp {
 		$this->testTotpLayout();
 	}
 
-	public function getVerifyData() {
+	public function getCalidateData() {
 		// Many test cases overlap with enroll form, so reuse the data provider.
 		return array_merge($this->getGenericTotpData(), [
 			[
@@ -46,7 +46,7 @@ class testFormTotpValidate extends testFormTotp {
 		]);
 	}
 
-	public function prepareVerifyData() {
+	public function prepareValidateData() {
 		$providedData = $this->getProvidedData();
 		$data = reset($providedData);
 
@@ -60,13 +60,13 @@ class testFormTotpValidate extends testFormTotp {
 	}
 
 	/**
-	 * Test different verify scenarios.
+	 * Test different validation scenarios.
 	 *
-	 * @dataProvider  getVerifyData
-	 * @onBefore      prepareVerifyData
+	 * @dataProvider  getValidateData
+	 * @onBefore      prepareValidateData
 	 */
-	public function testFormTotpVerify_Verify($data) {
-		// Open the verify form.
+	public function testFormTotpValidate_Validate($data) {
+		// Open the validation form.
 		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
 
 		// Get the used TOTP parameters.
@@ -99,9 +99,37 @@ class testFormTotpValidate extends testFormTotp {
 	}
 
 	/**
+	 * Test that it is not possible to use the same TOTP twice. It is a security feature, so that a stolen TOTP is not
+	 * useful.
+	 */
+	public function testFormTotpValidate_ReuseTotp() {
+		$this->resetTotpConfiguration();
+		$this->quickEnrollUser();
+
+		// Log in the first time, must be OK.
+		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
+		CMfaTotpHelper::waitForSafeTotpWindow();
+		$totp = CMfaTotpHelper::generateTotp(self::TOTP_SECRET_32);
+		$form = $this->page->query('class:signin-container')->asForm()->one();
+		$form->getField('id:verification_code')->fill($totp);
+		$form->query('button:Sign in')->one()->click();
+		$this->page->waitUntilReady();
+		$this->verifyLoggedIn();
+
+		// Log out and try to log in using the same code. Should fail.
+		$this->page->logout();
+		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
+		$this->page->waitUntilReady();
+		$form->invalidate();
+		$form->getField('id:verification_code')->fill($totp);
+		$form->query('button:Sign in')->one()->click();
+		$this->assertEquals(self::DEFAULT_ERROR, $form->query('class:red')->one()->getText());
+	}
+
+	/**
 	 * Test that user gets blocked if TOTP is entered wrong n times.
 	 */
-	public function testFormTotpVerify_Blocking() {
+	public function testFormTotpValidate_Blocking() {
 		$this->resetTotpConfiguration();
 		$this->quickEnrollUser();
 
@@ -110,14 +138,14 @@ class testFormTotpValidate extends testFormTotp {
 	}
 
 	/**
-	 * Takes screenshot of the verify form.
+	 * Takes screenshot of the validation form.
 	 */
-	public function testFormTotpVerify_Screenshot() {
+	public function testFormTotpValidate_Screenshot() {
 		$this->resetTotpConfiguration();
 		$this->quickEnrollUser();
 		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
 		$this->page->removeFocus();
-		$this->assertScreenshot($this->page->query('class:signin-container')->one(), 'TOTP verify form');
+		$this->assertScreenshot($this->page->query('class:signin-container')->one(), 'TOTP validation form');
 	}
 
 	/**
