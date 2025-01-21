@@ -30,8 +30,7 @@ void	zbx_mock_test_entry(void **state)
 	const char		*expected_addr = NULL, *interface = NULL, *key = NULL;
 	char			*error = NULL;
 	int			ret;
-	int			count, interval, size, timeout;
-	unsigned char		allow_redirect;
+	int			count, interval, size;
 	char			*returned_addr = NULL;
 	zbx_pinger_t		pinger;
 
