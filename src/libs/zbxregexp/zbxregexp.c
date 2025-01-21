@@ -775,8 +775,8 @@ static int	regexp_sub(const char *string, const char *pattern, const char *outpu
  *                   ZBX_REGEXP_RUNTIME_FAIL with error message in 'err_msg'     *
  *                                                                               *
  *********************************************************************************/
-static int	regexp_sub2(const char *string, const char *pattern, const char *output_template, uint32_t flags, char **out,
-		char **err_msg)
+static int	regexp_sub2(const char *string, const char *pattern, const char *output_template,
+			uint32_t flags, char **out, char **err_msg)
 {
 	zbx_regexp_t	*regexp = NULL;
 	zbx_regmatch_t	match[ZBX_REGEXP_GROUPS_MAX];
