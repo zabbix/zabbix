@@ -546,31 +546,33 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 	this.text = this.element.add('text', attributes, this.lines);
 
 	const onResize = () => {
-		if (this.text.element !== null) {
-			let size = this.ZBX_getBBox();
-			this.width = Math.ceil(size.width);
-			this.height = Math.ceil(size.height + size.y);
-
-			// Workaround for EDGE for proper text height calculation.
-			if (ED && this.lines.length > 0
-					&& typeof attributes['font-size'] !== 'undefined' && parseInt(attributes['font-size']) > 16) {
-				this.height = Math.ceil(this.lines.length * parseInt(attributes['font-size']) * 1.2);
-			}
-
-			if (this.background !== null) {
-				this.background.update({
-					width: this.width + (this.canvas.textPadding * 2),
-					height: this.height + (this.canvas.textPadding * 2)
-				});
-			}
-
-			this.text.element.setAttribute('transform',
-				'translate(' + this.getHorizontalOffset() + ' ' + this.offset + ')'
-			);
-			this.element.element.setAttribute('transform',
-				'translate(' + (this.initial_x - this.getHorizontalOffset()) + ' ' + this.y + ')'
-			);
+		if (this.text.element === null) {
+			return;
 		}
+
+		const size = this.ZBX_getBBox();
+		this.width = Math.ceil(size.width);
+		this.height = Math.ceil(size.height + size.y);
+
+		// Workaround for EDGE for proper text height calculation.
+		if (ED && this.lines.length > 0
+				&& typeof attributes['font-size'] !== 'undefined' && parseInt(attributes['font-size']) > 16) {
+			this.height = Math.ceil(this.lines.length * parseInt(attributes['font-size']) * 1.2);
+		}
+
+		if (this.background !== null) {
+			this.background.update({
+				width: this.width + (this.canvas.textPadding * 2),
+				height: this.height + (this.canvas.textPadding * 2)
+			});
+		}
+
+		this.text.element.setAttribute('transform',
+			'translate(' + this.getHorizontalOffset() + ' ' + this.offset + ')'
+		);
+		this.element.element.setAttribute('transform',
+			'translate(' + (this.initial_x - this.getHorizontalOffset()) + ' ' + this.y + ')'
+		);
 	};
 
 	if (this.text !== null && this.text.element !== null && 'data-parent' in this.text.attributes) {

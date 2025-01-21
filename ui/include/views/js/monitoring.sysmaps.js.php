@@ -694,11 +694,11 @@ function createFontSelect(string $name): CSelect {
 						(new CCheckBox('checkbox-show-label'))
 							->setId('checkbox_show_label')
 							->setLabel(_('Show label')),
-						(new CRadioButtonList('show_label', MAP_SHOW_LABEL_DEFAULT,))
+						(new CRadioButtonList('show_label', MAP_SHOW_LABEL_DEFAULT))
 							->addValue(_('Default'), MAP_SHOW_LABEL_DEFAULT, 'mass_show_label_'.MAP_SHOW_LABEL_DEFAULT)
 							->addValue(_('Always'), MAP_SHOW_LABEL_ALWAYS, 'mass_show_label_'.MAP_SHOW_LABEL_ALWAYS)
 							->addValue(_('Auto hide'), MAP_SHOW_LABEL_AUTO_HIDE,
-								'mass_show_label'.MAP_SHOW_LABEL_AUTO_HIDE
+								'mass_show_label_'.MAP_SHOW_LABEL_AUTO_HIDE
 							)
 							->setModern(true)
 							->setId('mass_show_label')

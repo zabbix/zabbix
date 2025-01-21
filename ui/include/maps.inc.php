@@ -1448,7 +1448,7 @@ function getMapLinkTriggerInfo($sysmap, $options) {
  * Get trigger data for all linktriggers.
  *
  * @param array $sysmap
- * @param array $sysmap['links']            Map element link options.
+ * @param array $sysmap['links']  Map element link options.
  *
  * @return array
  */

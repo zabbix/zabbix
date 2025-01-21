@@ -281,8 +281,8 @@ SVGMap.prototype.updateBackground = function (background) {
 		element = this.layers.background.add('image', {
 			x: 0,
 			y: 0,
-			width: width,
-			height: height,
+			width,
+			height,
 			'xlink:href': this.getImageUrl(background)
 		});
 	}
@@ -814,8 +814,8 @@ SVGMapElement.prototype.updateImage = function() {
 
 			if (this.map.can_select_element && (this.options.elementtype == SYSMAP_ELEMENT_TYPE_HOST
 					|| this.options.elementtype == SYSMAP_ELEMENT_TYPE_HOST_GROUP)) {
-				this.image.element.addEventListener('mouseover', e => this.onMouseOver(e));
-				this.image.element.addEventListener('mouseout', e => this.onMouseOut(e));
+				this.image.element.addEventListener('mouseover', e => this.toggleSelected(e, true));
+				this.image.element.addEventListener('mouseout', e => this.toggleSelected(e, false));
 				this.image.element.addEventListener('click', () => this.onClick());
 			}
 
@@ -958,26 +958,17 @@ SVGMapElement.prototype.update = function(options) {
 	this.updateLabel();
 };
 
-/**
- * Element mouse over event.
- */
-SVGMapElement.prototype.onMouseOver = function(e) {
+SVGMapElement.prototype.toggleSelected = function(e, selected = true) {
 	if (e.target.classList.contains('selected')) {
 		return;
 	}
 
-	this.selection.element.classList.remove('display-none');
-};
-
-/**
- * Element mouse out event.
- */
-SVGMapElement.prototype.onMouseOut = function(e) {
-	if (e.target.classList.contains('selected')) {
-		return;
+	if (selected) {
+		this.selection.element.classList.remove('display-none');
 	}
-
-	this.selection.element.classList.add('display-none');
+	else {
+		this.selection.element.classList.add('display-none');
+	}
 };
 
 /**
@@ -1000,23 +991,25 @@ SVGMapElement.prototype.onClick = function() {
 SVGMapElement.prototype.toggleLabel = function(show) {
 	const label = document.querySelector(`text[data-parent=selement_${this.options.selementid}]`);
 
-	if (label !== null) {
-		const trigger_label = label.querySelector('tspan[data-type=trigger]');
+	if (label === null) {
+		return
+	}
 
-		if (trigger_label !== null) {
-			const label_parts = label.querySelectorAll('tspan[data-type=label]');
+	const trigger_label = label.querySelector('tspan[data-type=trigger]');
 
-			if (label_parts.length > 0) {
-				for (const label_part of label_parts) {
-					label_part.style.display = show ? '' : 'none';
-				}
+	if (trigger_label !== null) {
+		const label_parts = label.querySelectorAll('tspan[data-type=label]');
 
-				trigger_label.setAttribute('dy', show ? '1.2em' : '0.9em');
+		if (label_parts.length > 0) {
+			for (const label_part of label_parts) {
+				label_part.style.display = show ? '' : 'none';
 			}
+
+			trigger_label.setAttribute('dy', show ? '1.2em' : '0.9em');
 		}
-		else {
-			label.parentElement.style.display = show ? '' : 'none';
-		}
+	}
+	else {
+		label.parentElement.style.display = show ? '' : 'none';
 	}
 };
 
@@ -1096,7 +1089,7 @@ SVGMapLink.prototype.update = function(options) {
 	this.options = options;
 	this.remove();
 
-	const attributes = {}
+	const attributes = {};
 
 	if (options.hover_link) {
 		attributes['stroke'] = 'transparent';
@@ -1163,19 +1156,16 @@ SVGMapLink.prototype.update = function(options) {
 	}
 	else {
 		this.element.add('textarea', {
-				x: options.center.x,
-				y: options.center.y,
-				fill: '#' + this.map.options.theme.textcolor,
-				'font-size': '10px',
-				'stroke-width': 0,
-				anchor: {
-					horizontal: 'center',
-					vertical: 'middle'
-				},
-				background: {
-				}
-			}, options.label
-		);
+			x: options.center.x,
+			y: options.center.y,
+			fill: '#' + this.map.options.theme.textcolor,
+			'font-size': '10px',
+			'stroke-width': 0,
+			anchor: {
+				horizontal: 'center',
+				vertical: 'middle'
+			}
+		}, options.label);
 	}
 };
 
