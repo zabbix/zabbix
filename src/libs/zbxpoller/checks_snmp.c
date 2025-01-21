@@ -2761,7 +2761,7 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 		case NETSNMP_CALLBACK_OP_RECEIVED_MESSAGE:
 			if (NULL != pdu && SNMP_MSG_REPORT == pdu->command)
 				goto out;
-			
+
 			stat = STAT_SUCCESS;
 			break;
 		case NETSNMP_CALLBACK_OP_TIMED_OUT:
