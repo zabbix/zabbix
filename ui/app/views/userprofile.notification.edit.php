@@ -55,9 +55,8 @@ $userprofile_notification_form = (new CForm())
 	->addVar('userid', $data['userid']);
 
 // Media tab.
-$media = new CPartial('user.edit.media.tab', ['form' => $userprofile_notification_form] + $data);
-
-if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
+if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
+	$media = new CPartial('user.edit.media.tab', ['form' => $userprofile_notification_form] + $data);
 	$tabs->addTab('mediaTab', _('Media'), $media, TAB_INDICATOR_MEDIA);
 }
 
