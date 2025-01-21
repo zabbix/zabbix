@@ -932,7 +932,7 @@ function createFontSelect(string $name): CSelect {
 
 <script type="text/x-jquery-tmpl" id="elementLinkTableRowTpl">
 	<?= (new CRow([
-			'#{toElementName}',
+			'#{to_element_name}',
 			(new CCol())->addClass('element-urls'),
 			(new CCol(
 				(new CButtonLink(_('Edit')))
@@ -945,8 +945,8 @@ function createFontSelect(string $name): CSelect {
 
 <script type="text/x-jquery-tmpl" id="massElementLinkTableRowTpl">
 	<?= (new CRow([
-			'#{fromElementName}',
-			'#{toElementName}',
+			'#{from_element_name}',
+			'#{to_element_name}',
 			(new CCol())->addClass('element-urls'),
 			(new CCol(
 				(new CButtonLink(_('Edit')))
