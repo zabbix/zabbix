@@ -57,7 +57,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 */
 	public function prepareJitMedia() {
 		$mediatypeids = CDBHelper::getAll("SELECT mediatypeid FROM media_type WHERE name IN ('iTop', 'SMS',".
-				" 'MS Teams', 'Slack', 'OTRS', 'Opsgenie', 'Brevis.one', 'Discord', 'iLert', 'Jira', 'Line', 'Email',".
+				" 'MS Teams Workflow', 'Slack', 'OTRS', 'Opsgenie', 'Brevis.one', 'Discord', 'iLert', 'Jira', 'Line', 'Email',".
 				" 'SysAid', 'Pushover', 'Telegram', 'Redmine', 'SIGNL4', 'PagerDuty', 'Zammad', 'Github', 'VictorOps',".
 				" 'ServiceNow')"
 		);
@@ -95,7 +95,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 				'provision_media' => [
 					[
 						'name' => self::MEDIA_MAPPING_REMOVE,
-						'mediatypeid' => 14, // MS Teams.
+						'mediatypeid' => 42, // MS Teams Workflow.
 						'attribute' => 'uid',
 						'severity' => 63 // All severity options selected.
 					],
@@ -161,7 +161,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 	public function testFormUserLdapMediaJit_CheckProvisionedMediaLayout() {
 
 		// Media types to appear after the provisioning.
-		$media_types = ['MantisBT', 'MS Teams', 'Opsgenie', 'OTRS', 'OTRS CE', 'Rocket.Chat', 'ServiceNow', 'VictorOps', 'Zammad', 'Zendesk'];
+		$media_types = ['MantisBT', 'MS Teams Workflow', 'Opsgenie', 'OTRS', 'OTRS CE', 'Rocket.Chat', 'ServiceNow', 'VictorOps', 'Zammad', 'Zendesk'];
 
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
 		$this->page->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
@@ -198,7 +198,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$this->assertEquals(4, $media_table->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')->count());
 
 		// Check that Type and Send to fields are read-only for provisioned media.
-		$media_table->findRow('Type', 'MS Teams')->getColumn('Actions')->query('button:Edit')->one()->click();
+		$media_table->findRow('Type', 'MS Teams Workflow')->getColumn('Actions')->query('button:Edit')->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$media_form = $dialog->asForm();
 
@@ -217,7 +217,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 						'When active' => ''
 					],
 					'message' => 'Incorrect value for field "period": a time period is expected.',
-					'media' => 'MS Teams',
+					'media' => 'MS Teams Workflow'
 				]
 			],
 			// Invalid characters in When active.
@@ -228,7 +228,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 						'When active' => 'test'
 					],
 					'message' => 'Incorrect value for field "period": a time period is expected.',
-					'media' => 'MS Teams'
+					'media' => 'MS Teams Workflow'
 				]
 			],
 			// Change editable fields - user macro in When active field.
@@ -266,7 +266,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 							'High',
 							'Disaster'
 						],
-						'Enabled' => true,
+						'Enabled' => true
 					],
 					'media' => 'OTRS',
 					'check_configuration' => [
@@ -288,9 +288,9 @@ class testFormUserLdapMediaJit extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Use if severity' => [],
+						'Use if severity' => []
 					],
-					'media' => 'MS Teams',
+					'media' => 'MS Teams Workflow',
 					'check_configuration' => [
 						'Use if severity' => [],
 						'When active' => '1-7,00:00-24:00',
@@ -482,7 +482,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 								]
 							],
 							'update' => [
-								'Media type' => 'Github',
+								'Media type' => 'Github'
 							],
 							'expected' => [
 								'fields' => [
@@ -637,7 +637,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 								]
 							],
 							'update' => [
-								'Media type' => 'SysAid',
+								'Media type' => 'SysAid'
 							],
 							'expected' => [
 								'fields' => [
@@ -661,12 +661,12 @@ class testFormUserLdapMediaJit extends CWebTest {
 								]
 							],
 							'update' => [
-								'Media type' => 'MS Teams Workflow',
+								'Media type' => 'MS Teams',
 								'Use if severity' => ['High', 'Disaster']
 							],
 							'expected' => [
 								'fields' => [
-									'Type' => 'MS Teams Workflow',
+									'Type' => 'MS Teams',
 									'Send to' => PHPUNIT_LDAP_USERNAME,
 									'When active' => '1-7,00:00-24:00',
 									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
@@ -1094,7 +1094,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$this->page->open('zabbix.php?action=user.list')->waitUntilReady();
 		$this->query('link:'.PHPUNIT_LDAP_USERNAME)->one()->click();
 		$user_media_table = $this->getUserMediaTable();
-		$this->assertFalse($user_media_table->findRow('Type', 'MS Teams', true)->isPresent());
+		$this->assertFalse($user_media_table->findRow('Type', 'MS Teams Workflow', true)->isPresent());
 	}
 
 	/**
