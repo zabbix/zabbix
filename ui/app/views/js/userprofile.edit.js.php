@@ -30,7 +30,7 @@
 			});
 
 			this._changeVisibilityAutoLoginLogout();
-            this._autologoutHandler();
+			this._autologoutHandler();
 		}
 
 		_userFormSubmit() {
@@ -76,14 +76,14 @@
 				}
 				this._autologoutHandler();
 			});
-        }
+		}
 
 		_autologoutHandler() {
 			const autologout_visible = document.querySelector('#autologout_visible');
 			const disabled = !autologout_visible.checked;
 			const autologout = document.querySelector('#autologout');
-			const hidden = autologout.parentElement.
-			    querySelector(`input[type=hidden][name=${autologout.getAttribute('name')}]`);
+			const hidden = autologout.parentElement.querySelector(
+				`input[type=hidden][name=${autologout.getAttribute('name')}]`);
 
 			if (disabled) {
 				autologout.setAttribute('disabled', '')
@@ -100,10 +100,10 @@
 				hidden_input.value = '0';
 
 				autologout.parentElement.insertBefore(hidden_input, autologout);
-            }
+			}
 			else if (!disabled) {
 				hidden.remove();
-            }
-        }
+			}
+		}
 	}
 </script>
