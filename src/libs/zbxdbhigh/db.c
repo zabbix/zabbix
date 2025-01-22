@@ -2345,8 +2345,8 @@ static int	db_prepare_multiple_query_str(const char *query, const char *field_na
 	return ret;
 }
 
-int	zbx_db_prepare_multiple_query(const char *query, const char *field_name, const zbx_vector_uint64_t *ids, char **sql,
-		size_t	*sql_alloc, size_t *sql_offset)
+int	zbx_db_prepare_multiple_query(const char *query, const char *field_name, const zbx_vector_uint64_t *ids,
+		char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
 	return db_prepare_multiple_query(query, field_name, ids, sql, sql_alloc, sql_offset);
 }
