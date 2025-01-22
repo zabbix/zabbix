@@ -410,7 +410,7 @@ switch ($data['popup_type']) {
 				$values[$options['dstfld2']] = $item[$options['srcfld2']];
 			}
 
-			$name = (new CLink($key))
+			$name = (new CCol((new CLink($key))
 				->setAttribute('data-dstfld1', $options['dstfld1'])
 				->setAttribute('data-dstfld2', $options['dstfld2'])
 				->setAttribute('data-values', json_encode($values))
@@ -430,7 +430,9 @@ switch ($data['popup_type']) {
 					}
 
 					popup_generic.closePopup(event);
-				');
+				')))->addClass(ZBX_STYLE_WORDBREAK)->addStyle('width: 50%;');
+
+			$description = (new CCol($item['description']))->addStyle('width: 50%;');
 
 			$documentation_link = (new CLink(null, CDocHelper::getUrl($item['documentation_link'])))
 				->addClass(ZBX_STYLE_BTN_ICON)
@@ -438,7 +440,7 @@ switch ($data['popup_type']) {
 				->setTitle(_('Help'))
 				->setTarget('_blank');
 
-			$table->addRow([$name, $item['description'], $documentation_link]);
+			$table->addRow([$name, $description, $documentation_link]);
 		}
 		unset($data['table_records']);
 		break;
