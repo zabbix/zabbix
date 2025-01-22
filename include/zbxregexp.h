@@ -46,8 +46,7 @@ ZBX_PTR_VECTOR_DECL(expression, zbx_expression_t *)
 
 /* regular expressions */
 int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, char **err_msg);
-int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp,
-		zbx_uint32_t flags, char **err_msg);
+int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp, int flags, char **err_msg);
 void	zbx_regexp_free(zbx_regexp_t *regexp);
 int	zbx_regexp_match_precompiled(const char *string, const zbx_regexp_t *regexp);
 int	zbx_regexp_match_precompiled2(const char *string, const zbx_regexp_t *regexp, char **err_msg);
