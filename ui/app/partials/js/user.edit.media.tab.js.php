@@ -16,10 +16,48 @@
 ?>
 
 <script>
-	function removeMedia(index) {
-		// table row
-		jQuery('#medias_' + index).remove();
-		// hidden variables
-		jQuery(`[name^="medias[${index}]["]`).remove();
+	const mediaView = new class {
+		init({form_name}) {
+			this.form_name = form_name;
+			this._handleAction();
+		}
+
+		_handleAction() {
+			document.querySelector('#mediaTab').addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-add')) {
+					this._addMedia();
+				}
+				else if (e.target.classList.contains('js-edit')) {
+					this._editMedia(JSON.parse(e.target.dataset.parameters));
+				}
+				else if (e.target.classList.contains('js-remove')) {
+					this._removeMedia(e.target);
+				}
+				else if (e.target.classList.contains('js-status')) {
+					this._statusMedia(e.target);
+				}
+			})
+		}
+
+		_addMedia() {
+			PopUp('popup.media', {'dstfrm': this.form_name}, {dialogue_class: 'modal-popup-generic'});
+		}
+
+		_editMedia(parameters) {
+			PopUp('popup.media', parameters, {dialogue_class: 'modal-popup-generic'});
+		}
+
+		_removeMedia(target) {
+			const index = target.closest('tr').id.replace('medias_', '');
+
+			document.querySelector(`#medias_${index}`).remove();
+			document.querySelectorAll(`[name^="medias[${index}]["]`).forEach((element) => element.remove());
+		}
+
+		_statusMedia(target) {
+			const index = target.closest('tr').id.replace('medias_', '');
+
+			create_var(this.form_name, target.dataset.status_type, index, true);
+		}
 	}
 </script>

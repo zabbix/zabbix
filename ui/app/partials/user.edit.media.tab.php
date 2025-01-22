@@ -40,12 +40,14 @@ foreach ($data['medias'] as $index => $media) {
 
 		if ($media['active'] == MEDIA_STATUS_ACTIVE) {
 			$status = (new CButtonLink(_('Enabled')))
-				->onClick('return create_var("' . $form->getName() . '","disable_media",' . $index . ', true);')
-				->addClass(ZBX_STYLE_GREEN);
+				->addClass(ZBX_STYLE_GREEN)
+				->addClass('js-status')
+				->setAttribute('data-status_type', 'disable_media');
 		} else {
 			$status = (new CButtonLink(_('Disabled')))
-				->onClick('return create_var("' . $form->getName() . '","enable_media",' . $index . ', true);')
-				->addClass(ZBX_STYLE_RED);
+				->addClass(ZBX_STYLE_RED)
+				->addClass('js-status')
+				->setAttribute('data-status_type', 'enable_media');
 		}
 	} else {
 		$media_name = [
@@ -113,13 +115,11 @@ foreach ($data['medias'] as $index => $media) {
 			(new CCol(
 				new CHorList([
 					(new CButtonLink(_('Edit')))
-						->setAttribute('data-parameters', json_encode($parameters))
-						->onClick('PopUp("popup.media", JSON.parse(this.dataset.parameters),
-								{dialogue_class: "modal-popup-generic"});'
-						),
+						->setAttribute('data-parameters', $parameters)
+						->addClass('js-edit'),
 					(new CButtonLink(_('Remove')))
 						->setEnabled($parameters['provisioned'] == CUser::PROVISION_STATUS_NO)
-						->onClick('removeMedia(' . $index . ');')
+						->addClass('js-remove')
 				])
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->setId('medias_' . $index)
@@ -130,13 +130,18 @@ $media_form_list->addRow(_('Media'),
 	(new CDiv([
 		$media_table_info,
 		(new CButtonLink(_('Add')))
-			->onClick('PopUp("popup.media", ' .
-				json_encode(['dstfrm' => $form->getName()]) .
-				', {dialogue_class: "modal-popup-generic"});'
-			)
+			->addClass('js-add')
 	]))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: ' . ZBX_TEXTAREA_BIG_WIDTH . 'px;')
 );
+
+
+
+(new CScriptTag('mediaView.init('.json_encode([
+		'form_name' => $form->getName(),
+	]).');'))
+	->setOnDocumentReady()
+	->show();
 
 echo $media_form_list;
