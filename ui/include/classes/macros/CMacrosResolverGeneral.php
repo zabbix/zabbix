@@ -1180,7 +1180,7 @@ class CMacrosResolverGeneral {
 	 * @return array
 	 */
 	protected static function getItemMacros(array $macros, array $macro_values, array $triggers = [],
-		array $options = []): array {
+			array $options = []): array {
 		if (!$macros) {
 			return $macro_values;
 		}
@@ -1311,7 +1311,7 @@ class CMacrosResolverGeneral {
 	 * ]
 	 *
 	 * $options = [
-	 *      'events' => (boolean) Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
+	 *      'events' => (bool) Resolve {ITEM.VALUE.*} macro using 'clock' and 'ns' fields.
 	 * ]
 	 *
 	 * @return array
@@ -1339,11 +1339,9 @@ class CMacrosResolverGeneral {
 				$clock = null;
 				$value = null;
 				$history = null;
-				$item_value_macros = ['ITEM.VALUE.DATE', 'ITEM.VALUE.TIME', 'ITEM.VALUE.TIMESTAMP',
-					'ITEM.VALUE.AGE'
-				];
-				$item_lastvalue_macros = ['ITEM.LASTVALUE.DATE', 'ITEM.LASTVALUE.TIME',
-					'ITEM.LASTVALUE.TIMESTAMP', 'ITEM.LASTVALUE.AGE'
+				$item_value_macros = ['ITEM.VALUE.DATE', 'ITEM.VALUE.TIME', 'ITEM.VALUE.TIMESTAMP', 'ITEM.VALUE.AGE'];
+				$item_lastvalue_macros = ['ITEM.LASTVALUE.DATE', 'ITEM.LASTVALUE.TIME', 'ITEM.LASTVALUE.TIMESTAMP',
+					'ITEM.LASTVALUE.AGE'
 				];
 
 				if (in_array($macro, $item_value_macros) && $options['events']) {
@@ -1359,7 +1357,7 @@ class CMacrosResolverGeneral {
 				if (is_array($history) && array_key_exists('value', $history)) {
 					$clock = $history['clock'];
 				}
-				if (is_array($history) && array_key_exists($function['itemid'], $history)) {
+				elseif (is_array($history) && array_key_exists($function['itemid'], $history)) {
 					$clock = $history[$function['itemid']][0]['clock'];
 				}
 
