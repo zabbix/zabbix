@@ -340,7 +340,7 @@ class testDashboardHostCardWidget extends testWidgets {
 				'inventory_mode' => 0,
 				'inventory' => [
 					'location_lat' => '10',
-					'location_lon' => '10',
+					'location_lon' => '10'
 				]
 			]
 		]);
@@ -706,7 +706,7 @@ class testDashboardHostCardWidget extends testWidgets {
 			'Show suppressed problems' => false,
 			'id:sections_0' => 'Monitoring',
 			'id:sections_1' => 'Availability',
-			'id:sections_2' => 'Monitored by',
+			'id:sections_2' => 'Monitored by'
 		];
 
 		$form->checkValue($default_values);
@@ -819,7 +819,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Host' => 'Display',
-						'Name' => '"],*,a[x=": "],*,a[x="/\|',
+						'Name' => '"],*,a[x=": "],*,a[x="/\|'
 					]
 				]
 			],
@@ -831,7 +831,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Host' => 'Display',
 						'Name' => '<img src=\"x\" onerror=\"alert("ERROR");\"/>',
 						'Show header' => true,
-						'Show suppressed problems' => true,
+						'Show suppressed problems' => true
 					],
 					'Show' => [
 						'sections_0' => 'Host groups'
@@ -846,7 +846,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Host' => 'Display',
 						'Name' => '<script>alert("ERROR")</script>',
 						'Show header' => true,
-						'Show suppressed problems' => true,
+						'Show suppressed problems' => true
 					],
 					'Show' => [
 						'sections_0' => 'Host groups',
@@ -862,7 +862,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Host' => 'Display',
 						'Name' => 'Simple name for Host Card widget',
 						'Show header' => true,
-						'Show suppressed problems' => true,
+						'Show suppressed problems' => true
 					],
 					'Show' => [
 						'sections_0' => 'Host groups',
@@ -879,7 +879,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Host' => 'Display',
 						'Name' => 'trimming and    leading spaces',
 						'Show header' => true,
-						'Show suppressed problems' => true,
+						'Show suppressed problems' => true
 					],
 					'Show' => [
 						'sections_0' => 'Host groups',
@@ -897,7 +897,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Host' => 'Display',
 						'Name' => 'Наименование карточки Виджета',
 						'Show header' => true,
-						'Show suppressed problems' => true,
+						'Show suppressed problems' => true
 					],
 					'Show' => [
 						'sections_0' => 'Host groups',
@@ -916,7 +916,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Host' => 'Display',
 						'Name' => '105\'; --DROP TABLE Users',
 						'Show header' => true,
-						'Show suppressed problems' => true,
+						'Show suppressed problems' => true
 					],
 					'Show' => [
 						'sections_0' => 'Host groups',
@@ -936,7 +936,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Host' => 'Host with full inventory list',
 						'Name' => '127.0.0.1',
 						'Show header' => true,
-						'Show suppressed problems' => true,
+						'Show suppressed problems' => true
 					],
 					'Show' => [
 						'sections_0' => 'Host groups',
@@ -957,7 +957,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Host' => 'Host with full inventory list',
 						'Name' => 'Host card for "Host with full inventory list" host',
 						'Show header' => true,
-						'Show suppressed problems' => true,
+						'Show suppressed problems' => true
 					],
 					'Show' => [
 						'sections_0' => 'Host groups',
@@ -980,7 +980,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Host' => 'Display',
 						'Name' => '😅😅😅 TESThostCARD 😅😅😅',
 						'Show header' => true,
-						'Show suppressed problems' => true,
+						'Show suppressed problems' => true
 					],
 					'Show' => [
 						'sections_0' => 'Host groups',
@@ -997,7 +997,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Host' => 'Display',
 						'Name' => 'HostMixedCase',
 						'Show header' => false,
-						'Show suppressed problems' => true,
+						'Show suppressed problems' => true
 					],
 					'Show' => [
 						'sections_0' => 'Host groups',
@@ -1015,7 +1015,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Name' => 'longtextlongtextlongtextlongtextlongtextlongtextlongtextlongtextlongtextlongtext'
 								. 'longtextlongtextlongtextlongtextlongtextlongtextlongtextlongtextlongtextlongtext',
 						'Show header' => false,
-						'Show suppressed problems' => false,
+						'Show suppressed problems' => false
 					],
 					'Show' => [
 						'sections_0' => 'Host groups',
@@ -1031,7 +1031,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Host' => 'Host with full inventory list',
 						'Name' => 'Test-テスト-01',
 						'Show header' => false,
-						'Show suppressed problems' => false,
+						'Show suppressed problems' => false
 					],
 					'Show' => [
 						'sections_0' => 'Inventory',
@@ -1047,7 +1047,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Host' => 'Host with full inventory list',
-						'Name' => 'test<s><\x3cscript>alert(\'XSS\')</script><s>',
+						'Name' => 'test<s><\x3cscript>alert(\'XSS\')</script><s>'
 					]
 				]
 			]
@@ -1130,7 +1130,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					'fields' => [
 						'Host' => 'Display',
 						'Name' => 'Changed name and suppressed checkbox',
-						'Show suppressed problems' => false,
+						'Show suppressed problems' => false
 					]
 				]
 			],
@@ -1140,7 +1140,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => '😅😅😅Name of Host card widget 😅😅😅',
-						'Show header' => true,
+						'Show header' => true
 					],
 					'Show' => [
 						'sections_0' => 'Host groups'
@@ -1186,7 +1186,7 @@ class testDashboardHostCardWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Added few show sections',
+						'Name' => 'Added few show sections'
 					],
 					'Show' => [
 						'sections_0' => 'Inventory',
@@ -1201,13 +1201,13 @@ class testDashboardHostCardWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Host' => 'Host with full inventory list',
-						'Name' => 'Updated inventory list',
+						'Name' => 'Updated inventory list'
 					],
 					'Show' => [
 						'sections_0' => 'Host groups',
 						'sections_1' => 'Description',
 						'sections_2' => 'Monitoring',
-						'sections_3' => 'Inventory',
+						'sections_3' => 'Inventory'
 					],
 					'Inventory' => ['Name', 'OS', 'Hardware (Full details)', 'Contact']
 				]
@@ -1218,7 +1218,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Host' => 'Host with full inventory list',
-						'Name' => 'Added show sections',
+						'Name' => 'Added show sections'
 					],
 					'Show' => [
 						'sections_0' => 'Host groups',
@@ -1229,7 +1229,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'sections_5' => 'Templates',
 						'sections_6' => 'Inventory',
 						'sections_7' => 'Tags'
-					],
+					]
 				]
 			],
 		];
