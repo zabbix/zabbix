@@ -28,6 +28,9 @@
 					e.preventDefault();
 				}
 			});
+
+			this._changeVisibilityAutoLoginLogout();
+            this._autologoutHandler();
 		}
 
 		_userFormSubmit() {
@@ -55,46 +58,52 @@
 
 			return true;
 		}
-	}
 
-	function autologoutHandler() {
-		var $autologout_visible = jQuery('#autologout_visible'),
-			disabled = !$autologout_visible.prop('checked'),
-			$autologout = jQuery('#autologout'),
-			$hidden = $autologout.prev('input[type=hidden][name="' + $autologout.prop('name') + '"]');
+		_changeVisibilityAutoLoginLogout() {
+			const autologin_cbx = document.querySelector('#autologin');
+			const autologout_cbx = document.querySelector('#autologout_visible');
 
-		$autologout.prop('disabled', disabled);
+			autologin_cbx.addEventListener('click', (e) => {
+				if (e.target.checked) {
+					autologout_cbx.checked = false;
+				}
+				this._autologoutHandler();
+			});
 
-		if (!disabled) {
-			$hidden.remove();
-		}
-		else if (!$hidden.length) {
-			jQuery('<input>', {'type': 'hidden', 'name': $autologout.prop('name')})
-				.val('0')
-				.insertBefore($autologout);
-		}
-	}
+			autologout_cbx.addEventListener('click', (e) => {
+				if (e.target.checked) {
+					autologin_cbx.checked = false;
+				}
+				this._autologoutHandler();
+			});
+        }
 
-	jQuery(function($) {
-		var $autologin_cbx = $('#autologin'),
-			$autologout_cbx = $('#autologout_visible');
+		_autologoutHandler() {
+			const autologout_visible = document.querySelector('#autologout_visible');
+			const disabled = !autologout_visible.checked;
+			const autologout = document.querySelector('#autologout');
+			const hidden = autologout.parentElement.
+			    querySelector(`input[type=hidden][name=${autologout.getAttribute('name')}]`);
 
-		$autologin_cbx.on('click', function() {
-			if (this.checked) {
-				$autologout_cbx.prop('checked', false);
+			if (disabled) {
+				autologout.setAttribute('disabled', '')
 			}
-			autologoutHandler();
-		});
-
-		$autologout_cbx.on('click', function() {
-			if (this.checked) {
-				$autologin_cbx.prop('checked', false).change();
+			else {
+				autologout.removeAttribute('disabled')
 			}
-			autologoutHandler();
-		});
-	});
 
-	jQuery(document).ready(function() {
-		autologoutHandler();
-	});
+			if (!hidden) {
+				const hidden_input = document.createElement('input');
+
+				hidden_input.type = 'hidden';
+				hidden_input.name = autologout.getAttribute('name');
+				hidden_input.value = '0';
+
+				autologout.parentElement.insertBefore(hidden_input, autologout);
+            }
+			else if (!disabled) {
+				hidden.remove();
+            }
+        }
+	}
 </script>
