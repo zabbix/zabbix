@@ -36,7 +36,7 @@
 				else if (e.target.classList.contains('js-status')) {
 					this._statusMedia(e.target);
 				}
-			})
+			});
 		}
 
 		_addMedia() {

@@ -101,12 +101,13 @@ $triggers_table = (new CTable())
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('start', _('Play')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick("testUserSound('messages_sounds.recovery');")
+				->addClass('js-test_sound')
+				->setAttribute('data-message_sounds', 'recovery')
 				->removeId(),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('stop', _('Stop')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('AudioControl.stop();')
+				->addClass('js-audio_stop')
 				->removeId()
 		]
 	]);
@@ -126,12 +127,13 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('start', _('Play')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick("testUserSound('messages_sounds.".$severity."');")
+				->addClass('js-test_sound')
+				->setAttribute('data-message_sounds', $severity)
 				->removeId(),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('stop', _('Stop')))
 				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('AudioControl.stop();')
+				->addClass('js-audio_stop')
 				->removeId()
 		]
 	]);

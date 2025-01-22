@@ -27,6 +27,7 @@
 			});
 
 			this._updateForm();
+			this._handleAction();
 		}
 
 		_updateForm() {
@@ -36,6 +37,25 @@
 				.forEach((elem) => {
 					elem.toggleAttribute('disabled', !document.getElementById('messages_enabled').checked);
 				});
+		}
+
+		_handleAction() {
+			document.querySelector('#notificationsTab').addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-test_sound')) {
+					this._userSoundHandler(e.target.dataset.message_sounds);
+				}
+				else if (e.target.classList.contains('js-audio_stop')) {
+					this._stopAudioHandler();
+				}
+			});
+		}
+
+		_userSoundHandler(message_sounds) {
+			testUserSound(`messages_sounds.${message_sounds}`);
+		}
+
+		_stopAudioHandler() {
+			AudioControl.stop();
 		}
 	}
 </script>
