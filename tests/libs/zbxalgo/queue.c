@@ -267,7 +267,7 @@ static void test_queue_ptr_remove_head_tail(void)
 	zbx_vector_ptr_destroy(&values);
 }
 
-static int get_type(const char *str)
+static int	get_step_type_int(const char *str)
 {
 	if (0 == strcmp(str, "RANGE"))
 		return RANGE;
@@ -288,7 +288,7 @@ void	zbx_mock_test_entry(void **state)
 {
 	ZBX_UNUSED(state);
 
-	switch (get_type(zbx_mock_get_parameter_string("in.type")))
+	switch (get_step_type_int(zbx_mock_get_parameter_string("in.type")))
 	{
 		case RANGE:
 			test_queue_range();

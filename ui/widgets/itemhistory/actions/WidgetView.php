@@ -252,10 +252,20 @@ class WidgetView extends CControllerDashboardWidgetView {
 		foreach ($items_by_source[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY] as $value_type => $items) {
 			$itemids = array_keys($items);
 
+			switch ($value_type) {
+				case ITEM_VALUE_TYPE_LOG:
+					$output = ['itemid', 'value', 'clock', 'ns', 'timestamp'];
+					break;
+				case ITEM_VALUE_TYPE_BINARY:
+					$output = ['itemid', 'clock', 'ns'];
+					break;
+				default:
+					$output = ['itemid', 'value', 'clock', 'ns'];
+					break;
+			}
+
 			$db_items_values = API::History()->get([
-				'output' => $value_type == ITEM_VALUE_TYPE_BINARY
-					? ['itemid', 'clock', 'ns']
-					: ['itemid', 'value', 'clock', 'ns'],
+				'output' => $output,
 				'history' => $value_type,
 				'itemids' => $itemids,
 				'time_from' => $time_from,

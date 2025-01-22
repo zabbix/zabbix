@@ -21,7 +21,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Details of web scenario');
 $page['file'] = 'httpdetails.php';
-$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'layout.mode.js'];
+$page['scripts'] = ['gtlc.js', 'flickerfreescreen.js', 'layout.mode.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 $page['web_layout_mode'] = CViewHelper::loadLayoutMode();
 

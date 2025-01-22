@@ -68,10 +68,10 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		if ($this->getInput('userid', 0) != 0) {
 			$users = API::User()->get([
 				'output' => ['username', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
-					'rows_per_page', 'url', 'roleid', 'timezone', 'userdirectoryid'
+					'rows_per_page', 'url', 'roleid', 'timezone', 'provisioned'
 				],
 				'selectMedias' => ['mediaid', 'mediatypeid', 'period', 'sendto', 'severity', 'active',
-					'userdirectory_mediaid'
+					'provisioned'
 				],
 				'selectRole' => ['roleid'],
 				'selectUsrgrps' => ['usrgrpid'],
@@ -118,7 +118,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'form_refresh' => 0,
 			'action' => $this->getAction(),
 			'db_user' => ['username' => ''],
-			'userdirectoryid' => 0
+			'readonly' => false
 		];
 		$user_groups = [];
 
@@ -142,11 +142,14 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['url'] = $this->user['url'];
 			$data['medias'] = $this->user['medias'];
 			$data['db_user']['username'] = $this->user['username'];
-			$data['userdirectoryid'] = $this->user['userdirectoryid'];
 			$data['roleid_required'] = (bool) $this->user['role'];
 
 			if (!$this->getInput('form_refresh', 0)) {
 				$data['roleid'] = $this->user['roleid'];
+			}
+
+			if ($this->user['provisioned'] == CUser::PROVISION_STATUS_YES) {
+				$data['readonly'] = true;
 			}
 		}
 		else {
@@ -264,11 +267,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		$db_modules = API::Module()->get([
 			'output' => ['moduleid', 'relative_path', 'status']
 		]);
-
-		$data['readonly'] = false;
-		if ($data['userdirectoryid'] != 0) {
-			$data['readonly'] = true;
-		}
 
 		if ($db_modules) {
 			$module_manager = new CModuleManager(APP::getRootDir());

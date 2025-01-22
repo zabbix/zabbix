@@ -28,10 +28,9 @@ window.script_edit_popup = new class {
 		this.script = script;
 		this.scriptid = script.scriptid;
 
-		const backurl = new Curl('zabbix.php');
-
-		backurl.setArgument('action', 'script.list');
-		this.overlay.backurl = backurl.getUrl();
+		const return_url = new URL('zabbix.php', location.href);
+		return_url.searchParams.set('action', 'script.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		this.#loadView(script);
 		this.#initActions();
@@ -191,6 +190,7 @@ window.script_edit_popup = new class {
 		this.overlay.setProperties({title, buttons});
 		this.overlay.unsetLoading();
 		this.overlay.recoverFocus();
+		this.overlay.containFocus();
 	}
 
 	delete() {

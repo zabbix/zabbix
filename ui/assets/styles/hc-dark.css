@@ -4635,6 +4635,8 @@ form.dashboard-widget-itemhistory #list_columns .overflow-ellipsis {
 form.dashboard-widget-itemhistory #list_columns .inaccessible {
   color: #7d7d7d; }
 
+div.dashboard-widget-itemhistory .list-table pre {
+  font-family: inherit; }
 div.dashboard-widget-itemhistory .list-table.show-thumbnail tbody td {
   height: 56px;
   vertical-align: middle; }
@@ -6447,6 +6449,8 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     .overlay-dialogue.modal-popup.modal-popup-fullscreen {
       width: calc(100vw - 40px);
       max-width: calc(100vw - 40px); }
+  .overlay-dialogue .hintbox-raw-data {
+    white-space: pre-wrap; }
   .overlay-dialogue .hintbox-wrap,
   .overlay-dialogue .hintbox-wrap-horizontal {
     overflow: auto;
@@ -7573,10 +7577,10 @@ svg {
 
 .btn-split {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
   margin-right: 10px; }
   .btn-split li {
-    display: inline-block; }
+    display: inline-flex; }
     .btn-split li:first-child button {
       border-top-right-radius: 0;
       border-bottom-right-radius: 0; }
