@@ -637,11 +637,7 @@ class CMap extends CMapElement {
 				'show_label' =>			['type' => API_INT32, 'in' => implode(',', [MAP_SHOW_LABEL_DEFAULT, MAP_SHOW_LABEL_AUTO_HIDE, MAP_SHOW_LABEL_ALWAYS])]
 			]],
 			'links' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => [
-				'indicator_type' =>		['type' => API_INT32, 'in' => implode(',', [MAP_INDICATOR_TYPE_STATIC_LINK, MAP_INDICATOR_TYPE_TRIGGER, MAP_INDICATOR_TYPE_ITEM_VALUE]), 'default' => DB::getDefault('sysmaps_links', 'indicator_type')],
-				'itemid' =>				['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'indicator_type', 'in' => MAP_INDICATOR_TYPE_ITEM_VALUE], 'type' => API_ID, 'flags' => API_REQUIRED],
-											['else' => true, 'type' => API_ID, 'in' => '0']
-				]],
+				'linkid' =>				['type' => API_UNEXPECTED],
 				'item_value_type' =>	['type' => API_UNEXPECTED]
 			]]
 		]];
@@ -650,12 +646,7 @@ class CMap extends CMapElement {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		self::checkLinkItems($maps, null, $db_items, $link_indexes);
-		self::addLinkItemValueType($maps, $db_items, $link_indexes);
-
 		self::validateLinks($maps);
-
-		self::checkLinkTriggers($maps);
 
 		$user_data = self::$userData;
 
@@ -1086,207 +1077,6 @@ class CMap extends CMapElement {
 		}
 	}
 
-	private static function checkLinkItems(array $maps, array $db_maps = null, array &$db_items = null,
-			array &$link_indexes = null): void {
-		$db_items = [];
-		$link_indexes = [];
-
-		foreach ($maps as $i1 => $map) {
-			if (!array_key_exists('links', $map)) {
-				continue;
-			}
-
-			$db_links = $db_maps !== null ? $db_maps[$map['sysmapid']]['links'] : [];
-
-			foreach ($map['links'] as $i2 => $link) {
-				if ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE
-						&& (!array_key_exists('linkid', $link)
-							|| bccomp($link['itemid'], $db_links[$link['linkid']]['itemid']) != 0)) {
-					$link_indexes[$link['itemid']][$i1] = $i2;
-				}
-			}
-		}
-
-		if (!$link_indexes) {
-			return;
-		}
-
-		$db_items = API::Item()->get([
-			'output' => ['value_type'],
-			'selectHosts' => ['status'],
-			'webitems' => true,
-			'itemids' => array_keys($link_indexes),
-			'preservekeys' => true
-		]);
-
-		foreach ($link_indexes as $itemid => $indexes) {
-			$i1 = key($indexes);
-			$i2 = $indexes[$i1];
-			$path = '/'.($i1 + 1).'/links/'.($i2 + 1).'/itemid';
-
-			if (!array_key_exists($itemid, $db_items)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', $path,
-						_('object does not exist, or you have no permissions to it')
-					)
-				);
-			}
-
-			if ($db_items[$itemid]['hosts'][0]['status'] == HOST_STATUS_TEMPLATE) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', $path, _('host item ID is expected'))
-				);
-			}
-
-			if ($db_items[$itemid]['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', $path, _('binary item is not supported'))
-				);
-			}
-		}
-	}
-
-	private static function addLinkItemValueType(array &$maps, array $db_items, array $link_indexes): void {
-		foreach ($link_indexes as $itemid => $indexes) {
-			$i1 = key($indexes);
-			$i2 = $indexes[$i1];
-
-			$maps[$i1]['links'][$i2]['item_value_type'] = $db_items[$itemid]['value_type'];
-		}
-	}
-
-	private static function validateLinks(array &$maps, array $db_maps = null): void {
-		foreach ($maps as $i1 => &$map) {
-			if (!array_key_exists('links', $map)) {
-				continue;
-			}
-
-			$path = '/'.($i1 + 1).'/links';
-
-			foreach ($map['links'] as $i2 => &$link) {
-				$is_update = array_key_exists('linkid', $link);
-
-				if ($is_update && !array_key_exists($link['linkid'], $db_maps[$map['sysmapid']]['links'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-						$path.'/'.($i2 + 1).'/linkid', _('object does not exist or belongs to another object')
-					));
-				}
-
-				$api_input_rules = ['type' => API_OBJECT, 'fields' => self::getLinkValidationFields($is_update)];
-
-				if (!CApiInputValidator::validate($api_input_rules, $link, $path.'/'.($i2 + 1), $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
-			}
-			unset($link);
-		}
-		unset($map);
-	}
-
-	private static function getLinkValidationFields(bool $is_update = false): array {
-		$api_required = $is_update ? 0 : API_REQUIRED;
-
-		$specific_rules = $is_update
-			? [
-				'linkid' =>	['type' => API_ANY]
-			]
-			: [];
-
-		return $specific_rules + [
-			'selementid1' =>		['type' => API_SELEMENTID, 'flags' => $api_required],
-			'selementid2' =>		['type' => API_SELEMENTID, 'flags' => $api_required],
-			'label' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmaps_links', 'label')],
-			'show_label' =>			['type' => API_INT32, 'in' => implode(',', [MAP_SHOW_LABEL_DEFAULT, MAP_SHOW_LABEL_AUTO_HIDE, MAP_SHOW_LABEL_ALWAYS])],
-			'drawtype' =>			['type' => API_INT32, 'in' => implode(',', [MAP_LINK_DRAWTYPE_LINE, MAP_LINK_DRAWTYPE_BOLD_LINE, MAP_LINK_DRAWTYPE_DOT, MAP_LINK_DRAWTYPE_DASHED_LINE])],
-			'color' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
-			'indicator_type' =>		['type' => API_ANY],
-			'linktriggers' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'indicator_type', 'in' => MAP_INDICATOR_TYPE_TRIGGER], 'type' => API_OBJECTS, 'flags' => $api_required | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['triggerid']], 'fields' => [
-											'triggerid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-											'drawtype' =>	['type' => API_INT32, 'in' => implode(',', [MAP_LINK_DRAWTYPE_LINE, MAP_LINK_DRAWTYPE_BOLD_LINE, MAP_LINK_DRAWTYPE_DOT, MAP_LINK_DRAWTYPE_DASHED_LINE])],
-											'color' =>		['type' => API_COLOR, 'flags' => API_NOT_EMPTY]
-										]],
-										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
-			]],
-			'itemid' =>				['type' => API_ANY],
-			'item_value_type' =>	['type' => API_ANY],
-			'thresholds' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn($data): bool => $data['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE && in_array($data['item_value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]), 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['threshold']], 'fields' => [
-											'threshold' =>	['type' => API_NUMERIC, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('sysmap_link_threshold', 'threshold')],
-											'drawtype' =>	['type' => API_INT32, 'in' => implode(',', [MAP_LINK_DRAWTYPE_LINE, MAP_LINK_DRAWTYPE_BOLD_LINE, MAP_LINK_DRAWTYPE_DOT, MAP_LINK_DRAWTYPE_DASHED_LINE])],
-											'color' =>		['type' => API_COLOR, 'flags' => API_NOT_EMPTY]
-										]],
-										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
-			]],
-			'highlights' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => static fn($data): bool => $data['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE && in_array($data['item_value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]), 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['pattern']], 'fields' => [
-											'pattern' =>	['type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('sysmap_link_threshold', 'pattern')],
-											'drawtype' =>	['type' => API_INT32, 'in' => implode(',', [MAP_LINK_DRAWTYPE_LINE, MAP_LINK_DRAWTYPE_BOLD_LINE, MAP_LINK_DRAWTYPE_DOT, MAP_LINK_DRAWTYPE_DASHED_LINE])],
-											'color' =>		['type' => API_COLOR, 'flags' => API_NOT_EMPTY]
-										]],
-										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
-			]]
-		];
-	}
-
-	private static function checkLinkTriggers(array $maps, array $db_maps = null): void {
-		$link_indexes = [];
-
-		foreach ($maps as $i1 => $map) {
-			if (!array_key_exists('links', $map)) {
-				continue;
-			}
-
-			$db_links = $db_maps !== null ? $db_maps[$map['sysmapid']]['links'] : [];
-
-			foreach ($map['links'] as $i2 => $link) {
-				if ($link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER) {
-					$db_link_triggers = array_key_exists('linkid', $link)
-						? array_column($db_links[$link['linkid']]['linktriggers'], null, 'triggerid')
-						: [];
-
-					foreach ($link['linktriggers'] as $i3 => $linktrigger) {
-						if (!array_key_exists($linktrigger['triggerid'], $db_link_triggers)) {
-							$link_indexes[$linktrigger['triggerid']][$i1][$i2] = $i3;
-						}
-					}
-				}
-			}
-		}
-
-		if (!$link_indexes) {
-			return;
-		}
-
-		$db_triggers = API::Trigger()->get([
-			'output' => [],
-			'selectHosts' => ['status'],
-			'triggerids' => array_keys($link_indexes),
-			'preservekeys' => true
-		]);
-
-		foreach ($link_indexes as $triggerid => $indexes) {
-			$i1 = key($indexes);
-			$i2 = key($indexes[$i1]);
-			$i3 = $indexes[$i1][$i2];
-			$path = '/'.($i1 + 1).'/links/'.($i2 + 1).'/linktriggers/'.($i3 + 1).'/triggerid';
-
-			if (!array_key_exists($triggerid, $db_triggers)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', $path,
-						_('object does not exist, or you have no permissions to it')
-					)
-				);
-			}
-
-			if ($db_triggers[$triggerid]['hosts'][0]['status'] == HOST_STATUS_TEMPLATE) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', $path, _('host trigger ID is expected'))
-				);
-			}
-		}
-	}
-
 	/**
 	 * Validate the input parameters for the update() method.
 	 *
@@ -1335,7 +1125,8 @@ class CMap extends CMapElement {
 				'show_label' =>			['type' => API_INT32, 'in' => implode(',', [MAP_SHOW_LABEL_DEFAULT, MAP_SHOW_LABEL_AUTO_HIDE, MAP_SHOW_LABEL_ALWAYS])]
 			]],
 			'links' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['linkid']], 'fields' => [
-				'linkid' =>				['type' => API_ID]
+				'linkid' =>				['type' => API_ID],
+				'item_value_type' =>	['type' => API_UNEXPECTED]
 			]]
 		]];
 
@@ -1345,57 +1136,7 @@ class CMap extends CMapElement {
 
 		self::addAffectedObjects($maps, $db_maps);
 
-		foreach ($maps as $i1 => &$map) {
-			if (!array_key_exists('links', $map)) {
-				continue;
-			}
-
-			$map['links'] = $this->extendObjectsByKey($map['links'], $db_maps[$map['sysmapid']]['links'], 'linkid', [
-				'selementid1', 'selementid2', 'indicator_type'
-			]);
-
-			$path = '/'.($i1 + 1).'/links';
-
-			foreach ($map['links'] as $i2 => &$link) {
-				if (!array_key_exists('linkid', $link)) {
-					$fields = [
-						'indicator_type' =>		['type' => API_INT32, 'in' => implode(',', [MAP_INDICATOR_TYPE_STATIC_LINK, MAP_INDICATOR_TYPE_TRIGGER, MAP_INDICATOR_TYPE_ITEM_VALUE]), 'default' => DB::getDefault('sysmaps_links', 'indicator_type')],
-						'itemid' =>				['type' => API_MULTIPLE, 'rules' => [
-													['if' => ['field' => 'indicator_type', 'in' => MAP_INDICATOR_TYPE_ITEM_VALUE], 'type' => API_ID, 'flags' => API_REQUIRED],
-													['else' => true, 'type' => API_ID, 'in' => '0']
-						]],
-						'item_value_type' =>	['type' => API_UNEXPECTED]
-					];
-				}
-				else {
-					$fields = [
-						'indicator_type' =>		['type' => API_INT32, 'in' => implode(',', [MAP_INDICATOR_TYPE_STATIC_LINK, MAP_INDICATOR_TYPE_TRIGGER, MAP_INDICATOR_TYPE_ITEM_VALUE])],
-						'itemid' =>				['type' => API_MULTIPLE, 'rules' => [
-													['if' => ['field' => 'indicator_type', 'in' => MAP_INDICATOR_TYPE_ITEM_VALUE], 'type' => API_ID],
-													['else' => true, 'type' => API_ID, 'in' => '0']
-						]],
-						'item_value_type' =>	['type' => API_UNEXPECTED]
-					];
-				}
-
-				$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => $fields];
-
-				if (!CApiInputValidator::validate($api_input_rules, $link, $path.'/'.($i2 + 1), $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
-			}
-			unset($link);
-		}
-		unset($map);
-
-		self::addRequiredFieldsByLinkIndicatorType($maps, $db_maps);
-
-		self::checkLinkItems($maps, $db_maps, $db_items, $link_indexes);
-		self::addLinkItemValueType($maps, $db_items, $link_indexes);
-
 		self::validateLinks($maps, $db_maps);
-
-		self::checkLinkTriggers($maps, $db_maps);
 
 		$user_data = self::$userData;
 
@@ -1845,49 +1586,6 @@ class CMap extends CMapElement {
 		$this->validateCircularReference($maps);
 	}
 
-	private static function addRequiredFieldsByLinkIndicatorType(array &$maps, array $db_maps): void {
-		foreach ($maps as &$map) {
-			if (!array_key_exists('links', $map)) {
-				continue;
-			}
-
-			foreach ($map['links'] as &$link) {
-				if (!array_key_exists('linkid', $link)) {
-					continue;
-				}
-
-				$db_link = $db_maps[$map['sysmapid']]['links'][$link['linkid']];
-
-				if ($link['indicator_type'] != $db_link['indicator_type']
-						|| $link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
-					if ($link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER) {
-						$link += array_intersect_key($db_link, array_flip(['linktriggers']));
-					}
-					elseif ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
-						switch ($db_link['item_value_type']) {
-							case ITEM_VALUE_TYPE_FLOAT:
-							case ITEM_VALUE_TYPE_UINT64:
-								$link += array_intersect_key($db_link,
-									array_flip(['itemid', 'item_value_type', 'thresholds'])
-								);
-								break;
-
-							case ITEM_VALUE_TYPE_STR:
-							case ITEM_VALUE_TYPE_LOG:
-							case ITEM_VALUE_TYPE_TEXT:
-								$link += array_intersect_key($db_link,
-									array_flip(['itemid', 'item_value_type', 'highlights'])
-								);
-								break;
-						}
-					}
-				}
-			}
-			unset($link);
-		}
-		unset($map);
-	}
-
 	private static function addAffectedObjects(array $maps, array &$db_maps): void {
 		self::addAffectedSelements($maps, $db_maps);
 		self::addAffectedLinks($maps, $db_maps);
@@ -2138,6 +1836,355 @@ class CMap extends CMapElement {
 		while ($db_threshold = DBfetch($resource)) {
 			$db_links[$db_threshold['linkid']]['highlights'][$db_threshold['linkthresholdid']] =
 				array_diff_key($db_threshold, array_flip(['linkid']));
+		}
+	}
+
+	private static function validateLinks(array &$maps, array $db_maps = null): void {
+		self::validateLinkIndicatorTypes($maps, $db_maps);
+
+		if ($db_maps !== null) {
+			self::addRequiredFieldsByLinkIndicatorType($maps, $db_maps);
+		}
+
+		self::validateLinkItemids($maps, $db_maps);
+
+		self::checkLinkItems($maps, $db_maps, $db_items, $link_indexes);
+		self::addLinkItemValueType($maps, $db_items, $link_indexes);
+
+		if ($db_maps !== null) {
+			self::addRequiredFieldsByItemValueType($maps, $db_maps);
+		}
+
+		self::validateLinkFields($maps);
+
+		self::checkLinkTriggers($maps, $db_maps);
+	}
+
+	private static function validateLinkIndicatorTypes(array &$maps, ?array $db_maps): void {
+		foreach ($maps as $i1 => &$map) {
+			if (!array_key_exists('links', $map)) {
+				continue;
+			}
+
+			$path = '/'.($i1 + 1).'/links';
+
+			foreach ($map['links'] as $i2 => &$link) {
+				$is_update = array_key_exists('linkid', $link);
+
+				if ($is_update) {
+					if (!array_key_exists($link['linkid'], $db_maps[$map['sysmapid']]['links'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+							$path.'/'.($i2 + 1).'/linkid', _('object does not exist or belongs to another object')
+						));
+					}
+				}
+
+				$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+					'indicator_type' =>		['type' => API_INT32, 'in' => implode(',', [MAP_INDICATOR_TYPE_STATIC_LINK, MAP_INDICATOR_TYPE_TRIGGER, MAP_INDICATOR_TYPE_ITEM_VALUE])] + ($is_update ? [] : ['default' => DB::getDefault('sysmaps_links', 'indicator_type')])
+				]];
+
+				if (!CApiInputValidator::validate($api_input_rules, $link, $path.'/'.($i2 + 1), $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+
+				if ($is_update) {
+					$link +=
+						['indicator_type' => $db_maps[$map['sysmapid']]['links'][$link['linkid']]['indicator_type']];
+				}
+			}
+			unset($link);
+		}
+		unset($map);
+	}
+
+	private static function addRequiredFieldsByLinkIndicatorType(array &$maps, array $db_maps): void {
+		foreach ($maps as &$map) {
+			if (!array_key_exists('links', $map)) {
+				continue;
+			}
+
+			foreach ($map['links'] as &$link) {
+				if (!array_key_exists('linkid', $link)) {
+					continue;
+				}
+
+				$db_link = $db_maps[$map['sysmapid']]['links'][$link['linkid']];
+
+				if ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+					$link += array_intersect_key($db_link, array_flip(['itemid', 'item_value_type']));
+				}
+
+				if ($link['indicator_type'] != $db_link['indicator_type']
+						&& $link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER) {
+					$link += ['linktriggers' => $db_link['linktriggers']];
+				}
+			}
+			unset($link);
+		}
+		unset($map);
+	}
+
+	private static function validateLinkItemids(array &$maps, ?array $db_maps): void {
+		foreach ($maps as $i1 => &$map) {
+			if (!array_key_exists('links', $map)) {
+				continue;
+			}
+
+			$path = '/'.($i1 + 1).'/links';
+
+			foreach ($map['links'] as $i2 => &$link) {
+				$is_update = array_key_exists('linkid', $link);
+
+				$api_required = $is_update ? 0 : API_REQUIRED;
+
+				$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+					'itemid' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'indicator_type', 'in' => MAP_INDICATOR_TYPE_ITEM_VALUE], 'type' => API_ID, 'flags' => $api_required],
+									['else' => true, 'type' => API_ID, 'in' => '0']
+					]]
+				]];
+
+				if (!CApiInputValidator::validate($api_input_rules, $link, $path.'/'.($i2 + 1), $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+
+				if ($is_update) {
+					$link += ['itemid' => $db_maps[$map['sysmapid']]['links'][$link['linkid']]['itemid']];
+				}
+			}
+			unset($link);
+		}
+		unset($map);
+	}
+
+	private static function checkLinkItems(array $maps, ?array $db_maps, array &$db_items = null,
+			array &$link_indexes = null): void {
+		$db_items = [];
+		$link_indexes = [];
+
+		foreach ($maps as $i1 => $map) {
+			if (!array_key_exists('links', $map)) {
+				continue;
+			}
+
+			$db_links = $db_maps !== null ? $db_maps[$map['sysmapid']]['links'] : [];
+
+			foreach ($map['links'] as $i2 => $link) {
+				if ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE
+						&& (!array_key_exists('linkid', $link)
+							|| bccomp($link['itemid'], $db_links[$link['linkid']]['itemid']) != 0)) {
+					$link_indexes[$link['itemid']][$i1] = $i2;
+				}
+			}
+		}
+
+		if (!$link_indexes) {
+			return;
+		}
+
+		$db_items = API::Item()->get([
+			'output' => ['value_type'],
+			'selectHosts' => ['status'],
+			'webitems' => true,
+			'itemids' => array_keys($link_indexes),
+			'preservekeys' => true
+		]);
+
+		$host_statuses = [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED];
+
+		foreach ($link_indexes as $itemid => $indexes) {
+			$i1 = key($indexes);
+			$i2 = $indexes[$i1];
+			$path = '/'.($i1 + 1).'/links/'.($i2 + 1).'/itemid';
+
+			if (!array_key_exists($itemid, $db_items)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', $path,
+						_('object does not exist, or you have no permissions to it')
+					)
+				);
+			}
+
+			if (!in_array($db_items[$itemid]['hosts'][0]['status'], $host_statuses)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', $path, _('host item ID is expected'))
+				);
+			}
+
+			if ($db_items[$itemid]['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', $path, _('binary item is not supported'))
+				);
+			}
+		}
+	}
+
+	private static function addLinkItemValueType(array &$maps, array $db_items, array $link_indexes): void {
+		foreach ($link_indexes as $itemid => $indexes) {
+			foreach ($indexes as $i1 => $i2) {
+				$maps[$i1]['links'][$i2]['item_value_type'] = $db_items[$itemid]['value_type'];
+			}
+		}
+	}
+
+	private static function addRequiredFieldsByItemValueType(array &$maps, array $db_maps): void {
+		foreach ($maps as &$map) {
+			if (!array_key_exists('links', $map)) {
+				continue;
+			}
+
+			foreach ($map['links'] as &$link) {
+				if (!array_key_exists('linkid', $link)) {
+					continue;
+				}
+
+				$db_link = $db_maps[$map['sysmapid']]['links'][$link['linkid']];
+
+				if ($link['indicator_type'] != $db_link['indicator_type']
+						&& $link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER) {
+					$link += ['linktriggers' => $db_link['linktriggers']];
+				}
+				elseif ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+					if (in_array($link['item_value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+						$link += ['thresholds' => $db_link['thresholds']];
+					}
+					else {
+						$link += ['highlights' => $db_link['highlights']];
+					}
+				}
+			}
+			unset($link);
+		}
+		unset($map);
+	}
+
+	private static function validateLinkFields(array &$maps): void {
+		foreach ($maps as $i1 => &$map) {
+			if (!array_key_exists('links', $map)) {
+				continue;
+			}
+
+			$path = '/'.($i1 + 1).'/links';
+
+			foreach ($map['links'] as $i2 => &$link) {
+				$is_update = array_key_exists('linkid', $link);
+
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => self::getLinkValidationFields($is_update)];
+
+				if (!CApiInputValidator::validate($api_input_rules, $link, $path.'/'.($i2 + 1), $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+			}
+			unset($link);
+		}
+		unset($map);
+	}
+
+	private static function getLinkValidationFields(bool $is_update = false): array {
+		$api_required = $is_update ? 0 : API_REQUIRED;
+
+		$specific_rules = $is_update
+			? [
+				'linkid' =>	['type' => API_ANY]
+			]
+			: [];
+
+		return $specific_rules + [
+			'selementid1' =>		['type' => API_SELEMENTID, 'flags' => $api_required],
+			'selementid2' =>		['type' => API_SELEMENTID, 'flags' => $api_required],
+			'label' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmaps_links', 'label')],
+			'show_label' =>			['type' => API_INT32, 'in' => implode(',', [MAP_SHOW_LABEL_DEFAULT, MAP_SHOW_LABEL_AUTO_HIDE, MAP_SHOW_LABEL_ALWAYS])],
+			'drawtype' =>			['type' => API_INT32, 'in' => implode(',', [MAP_LINK_DRAWTYPE_LINE, MAP_LINK_DRAWTYPE_BOLD_LINE, MAP_LINK_DRAWTYPE_DOT, MAP_LINK_DRAWTYPE_DASHED_LINE])],
+			'color' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
+			'indicator_type' =>		['type' => API_ANY],
+			'linktriggers' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'indicator_type', 'in' => MAP_INDICATOR_TYPE_TRIGGER], 'type' => API_OBJECTS, 'flags' => $api_required | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['triggerid']], 'fields' => [
+											'triggerid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+											'drawtype' =>	['type' => API_INT32, 'in' => implode(',', [MAP_LINK_DRAWTYPE_LINE, MAP_LINK_DRAWTYPE_BOLD_LINE, MAP_LINK_DRAWTYPE_DOT, MAP_LINK_DRAWTYPE_DASHED_LINE])],
+											'color' =>		['type' => API_COLOR, 'flags' => API_NOT_EMPTY]
+										]],
+										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
+			]],
+			'itemid' =>				['type' => API_ANY],
+			'item_value_type' =>	['type' => API_ANY],
+			'thresholds' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn($data): bool => $data['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE && in_array($data['item_value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]), 'type' => API_OBJECTS, 'flags' => $api_required | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['threshold']], 'fields' => [
+											'threshold' =>	['type' => API_NUMERIC, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('sysmap_link_threshold', 'threshold')],
+											'drawtype' =>	['type' => API_INT32, 'in' => implode(',', [MAP_LINK_DRAWTYPE_LINE, MAP_LINK_DRAWTYPE_BOLD_LINE, MAP_LINK_DRAWTYPE_DOT, MAP_LINK_DRAWTYPE_DASHED_LINE])],
+											'color' =>		['type' => API_COLOR, 'flags' => API_NOT_EMPTY]
+										]],
+										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
+			]],
+			'highlights' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => static fn($data): bool => $data['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE && in_array($data['item_value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]), 'type' => API_OBJECTS, 'flags' => $api_required | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['pattern']], 'fields' => [
+											'pattern' =>	['type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('sysmap_link_threshold', 'pattern')],
+											'drawtype' =>	['type' => API_INT32, 'in' => implode(',', [MAP_LINK_DRAWTYPE_LINE, MAP_LINK_DRAWTYPE_BOLD_LINE, MAP_LINK_DRAWTYPE_DOT, MAP_LINK_DRAWTYPE_DASHED_LINE])],
+											'color' =>		['type' => API_COLOR, 'flags' => API_NOT_EMPTY]
+										]],
+										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
+			]]
+		];
+	}
+
+	private static function checkLinkTriggers(array $maps, ?array $db_maps): void {
+		$link_indexes = [];
+
+		foreach ($maps as $i1 => $map) {
+			if (!array_key_exists('links', $map)) {
+				continue;
+			}
+
+			$db_links = $db_maps !== null ? $db_maps[$map['sysmapid']]['links'] : [];
+
+			foreach ($map['links'] as $i2 => $link) {
+				if ($link['indicator_type'] != MAP_INDICATOR_TYPE_TRIGGER) {
+					continue;
+				}
+
+				$db_link_triggers = array_key_exists('linkid', $link)
+					? array_column($db_links[$link['linkid']]['linktriggers'], null, 'triggerid')
+					: [];
+
+				foreach ($link['linktriggers'] as $i3 => $linktrigger) {
+					if (!array_key_exists($linktrigger['triggerid'], $db_link_triggers)) {
+						$link_indexes[$linktrigger['triggerid']][$i1][$i2] = $i3;
+					}
+				}
+			}
+		}
+
+		if (!$link_indexes) {
+			return;
+		}
+
+		$db_triggers = API::Trigger()->get([
+			'output' => [],
+			'selectHosts' => ['status'],
+			'triggerids' => array_keys($link_indexes),
+			'preservekeys' => true
+		]);
+
+		$host_statuses = [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED];
+
+		foreach ($link_indexes as $triggerid => $indexes) {
+			$i1 = key($indexes);
+			$i2 = key($indexes[$i1]);
+			$i3 = $indexes[$i1][$i2];
+			$path = '/'.($i1 + 1).'/links/'.($i2 + 1).'/linktriggers/'.($i3 + 1).'/triggerid';
+
+			if (!array_key_exists($triggerid, $db_triggers)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', $path,
+						_('object does not exist, or you have no permissions to it')
+					)
+				);
+			}
+
+			if (!in_array($db_triggers[$triggerid]['hosts'][0]['status'], $host_statuses)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Invalid parameter "%1$s": %2$s.', $path, _('host trigger ID is expected'))
+				);
+			}
 		}
 	}
 
@@ -3192,8 +3239,8 @@ class CMap extends CMapElement {
 		$resource = DBselect(
 			'SELECT slt.linktriggerid,slt.linkid,sl.indicator_type,s.sysmapid,s.name as map_name'.
 			' FROM sysmaps_link_triggers slt'.
-				' LEFT JOIN sysmaps_links sl ON slt.linkid=sl.linkid'.
-				' LEFT JOIN sysmaps s ON sl.sysmapid=s.sysmapid'.
+			' LEFT JOIN sysmaps_links sl ON slt.linkid=sl.linkid'.
+			' LEFT JOIN sysmaps s ON sl.sysmapid=s.sysmapid'.
 			' WHERE '.dbConditionId('slt.triggerid', $triggerids)
 		);
 
@@ -3245,7 +3292,7 @@ class CMap extends CMapElement {
 					'indicator_type' => $link_triggers ? $db_link['indicator_type'] : MAP_INDICATOR_TYPE_STATIC_LINK,
 					'linktriggers' => $link_triggers
 				];
-			}
+		}
 
 			$maps[] = [
 				'sysmapid' => $db_map['sysmapid'],
