@@ -16,6 +16,7 @@
 	display: block;
 	margin-top: 4px;
 	white-space: break-spaces;
+	word-break: break-all;
 	line-height: $body-line-height;
 	color: $error;
 }

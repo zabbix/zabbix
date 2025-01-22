@@ -2317,6 +2317,7 @@ button {
   display: block;
   margin-top: 4px;
   white-space: break-spaces;
+  word-break: break-all;
   line-height: 1.4em;
   color: #cc0000; }
 
@@ -7750,7 +7751,7 @@ svg {
 
 .interfaces {
   display: grid;
-  grid-template-columns: 26px repeat(7, max-content);
+  grid-template-columns: 26px repeat(7, auto);
   margin-bottom: 5px;
   line-height: 24px; }
   .interfaces .interface-container {

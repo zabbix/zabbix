@@ -3706,7 +3706,7 @@ svg {
 
 .interfaces {
 	display: grid;
-	grid-template-columns: 26px repeat(7, max-content);
+	grid-template-columns: 26px repeat(7, auto);
 	margin-bottom: 5px;
 	line-height: 24px;
 
