@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -105,7 +105,8 @@ $left_column = (new CFormList())
 			->setOptions(CSeverityHelper::getSeverities())
 			->setChecked($data['severities'])
 			->setColumns(3)
-			->setVertical(true)
+			->setVertical()
+			->showTitles()
 	);
 
 $filter_age = (new CNumericBox('age', $data['age'], 3, false, false, false))
