@@ -332,10 +332,19 @@ class testDashboardHostCardWidget extends testWidgets {
 				],
 				'monitored_by' => 1,
 				'proxyid' => $proxies['proxyids'][0]
+			],
+			[
+				'host' => 'Disabled host',
+				'groups' => [['groupid' => 4]], // Zabbix servers.
+				'status' => 1,
+				'inventory_mode' => 0,
+				'inventory' => [
+					'location_lat' => '10',
+					'location_lon' => '10',
+				]
 			]
 		]);
 		$itemids = $response['itemids'];
-		$display_hostid = $response['hostids']['Display'];
 		$maintenance_hostid = $response['hostids']['Host for maintenance icon in HostCard widget'];
 
 		foreach ([100, 200, 300, 400, 500] as $i => $value) {
@@ -383,6 +392,21 @@ class testDashboardHostCardWidget extends testWidgets {
 										'type' => 3,
 										'name' => 'hostid.0',
 										'value' => 10084
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.0',
+										'value' => 2
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.1',
+										'value' => 3
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.2',
+										'value' => 4
 									]
 								]
 							]
@@ -536,7 +560,7 @@ class testDashboardHostCardWidget extends testWidgets {
 								'name' => 'Display host card with 3 column layout',
 								'x' => 0,
 								'y' => 5,
-								'width' => 72,
+								'width' => 64,
 								'height' => 5,
 								'fields' => [
 									[
@@ -625,6 +649,26 @@ class testDashboardHostCardWidget extends testWidgets {
 										'value' => 4
 									]
 								]
+							],
+							[
+								'type' => 'hostcard',
+								'name' => 'Disabled host',
+								'x' => 0,
+								'y' => 15,
+								'width' => 25,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => 3,
+										'name' => 'hostid.0',
+										'value' => $response['hostids']['Disabled host']
+									],
+									[
+										'type' => 0,
+										'name' => 'sections.0',
+										'value' => 6
+									]
+								]
 							]
 						]
 					]
@@ -677,13 +721,11 @@ class testDashboardHostCardWidget extends testWidgets {
 		$this->assertEquals(['Host', 'Widget', 'Dashboard'], $menu_button->getMenu()->getItems()->asText());
 
 		// After selecting Dashboard from dropdown menu, check hint and field value.
-		if ($label === 'Host') {
-			$menu_button->select('Dashboard');
-			$form->checkValue(['Host' => 'Dashboard']);
-			$this->assertTrue($label->query('xpath:.//span[@data-hintbox-contents="Dashboard is used as data source."]')
-					->one()->isVisible()
-			);
-		}
+		$menu_button->select('Dashboard');
+		$form->checkValue(['Host' => 'Dashboard']);
+		$this->assertTrue($label->query('xpath', './/span[@data-hintbox-contents="Dashboard is used as data source."]')
+				->one()->isVisible()
+		);
 
 		// After selecting Widget from dropdown menu, check overlay dialog appearance and title.
 		$menu_button->select('Widget');
@@ -692,30 +734,50 @@ class testDashboardHostCardWidget extends testWidgets {
 		$dialogs->last()->close(true);
 
 		// After clicking on Select button, check overlay dialog appearance and title.
-		$label = ['Host', 'Hosts'];
-		$field = $form->getField($label[0]);
-		$field->query('button:Select')->waitUntilCLickable()->one()->click();
+		$label->query('button:Select')->waitUntilCLickable()->one()->click();
 		$dialogs = COverlayDialogElement::find()->all();
-		$this->assertEquals($label[1], $dialogs->last()->waitUntilReady()->getTitle());
+		$this->assertEquals('Hosts', $dialogs->last()->waitUntilReady()->getTitle());
 		$dialogs->last()->close(true);
 
 		// Check default and available options in 'Show' section.
 		$show_options = ['Host groups', 'Description', 'Monitoring', 'Availability', 'Monitored by', 'Templates', 'Inventory', 'Tags'];
-		$show_form = $form->query("xpath", "//div[contains(@class, 'form-field')]//table[@id='sections-table']")->one();
+		$show_form = $form->getFieldContainer('Show');
 
 		// Clear all default options
 		$show_form->query('button:Remove')->all()->click();
 
-		for($i = 0; $i <= 7; $i++) {
+		$disabled_result = [];
+		foreach ($show_options as $i => $option) {
 			$show_form->query('button:Add')->one()->click();
-			// Inventory option.
-			if($i == 7){
+
+			// Check that added correct option by default.
+			$this->assertEquals($option, $show_form->query('xpath', '//z-select[@id="sections_'.$i.'"]'.
+				'/button[contains(@class, "focusable")]')->one()->getText()
+			);
+
+			// Check that added options are disabled in dropdown menu.
+			$disabled = $show_form->query('xpath', '//z-select[@id="sections_'.$i.'"]')->one()->asDropdown()
+					->getOptions()->filter(new CElementFilter(CElementFilter::ATTRIBUTES_PRESENT, ['disabled'])
+					)->asText();
+
+			$this->assertEquals($disabled_result, $disabled);
+			$disabled_result[] = $option;
+		}
+
+		// Check that Add button became disabled.
+		$this->assertFalse($show_form->query('button:Add')->one()->isEnabled());
+
+		// If the Inventory option was selected, the Inventory fields field becomes visible.
+		$show_form->query('button:Remove')->all()->click();
+		$show_form->query('button:Add')->one()->click();
+		foreach ($show_options as $option) {
+			$show_form->query('xpath', './/z-select[@id="sections_0"]')->one()->asDropdown()->select($option);
+			if ($option === 'Inventory') {
 				$this->assertTrue($form->getField('Inventory fields')->isVisible());
 			}
-
-			$this->assertEquals($show_options[$i], $show_form->query("xpath", "//z-select[@id='sections_".$i."']"
-					. "/button[contains(@class, 'focusable')]")->one()->getText()
-			);
+			else {
+				$this->assertFalse($form->getField('Inventory fields')->isVisible());
+			}
 		}
 
 		COverlayDialogElement::find()->one()->close();
@@ -743,8 +805,11 @@ class testDashboardHostCardWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Host' => 'Display',
-						'Name' => '',
+						'Name' => '🙂🙂🙂🙂🙂🙂🙂🙂',
 						'Show header' => false
+					],
+					'Show' => [
+
 					]
 				]
 			],
@@ -753,7 +818,8 @@ class testDashboardHostCardWidget extends testWidgets {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Host' => 'Display'
+						'Host' => 'Display',
+						'Name' => '"],*,a[x=": "],*,a[x="/\|',
 					]
 				]
 			],
@@ -763,7 +829,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Host' => 'Display',
-						'Name' => 'Host card for "Display" host',
+						'Name' => '<img src=\"x\" onerror=\"alert("ERROR");\"/>',
 						'Show header' => true,
 						'Show suppressed problems' => true,
 					],
@@ -778,7 +844,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Host' => 'Display',
-						'Name' => 'Host card for "Display" host',
+						'Name' => '<script>alert("ERROR")</script>',
 						'Show header' => true,
 						'Show suppressed problems' => true,
 					],
@@ -794,7 +860,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Host' => 'Display',
-						'Name' => 'Host card for "Display" host',
+						'Name' => 'Simple name for Host Card widget',
 						'Show header' => true,
 						'Show suppressed problems' => true,
 					],
@@ -811,7 +877,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Host' => 'Display',
-						'Name' => 'Host card for "Display" host',
+						'Name' => 'trimming and    leading spaces',
 						'Show header' => true,
 						'Show suppressed problems' => true,
 					],
@@ -829,7 +895,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Host' => 'Display',
-						'Name' => 'Host card for "Display" host',
+						'Name' => 'Наименование карточки Виджета',
 						'Show header' => true,
 						'Show suppressed problems' => true,
 					],
@@ -848,7 +914,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Host' => 'Display',
-						'Name' => 'Host card for "Display" host',
+						'Name' => '105\'; --DROP TABLE Users',
 						'Show header' => true,
 						'Show suppressed problems' => true,
 					],
@@ -868,7 +934,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Host' => 'Host with full inventory list',
-						'Name' => 'Host card for "Host with full inventory list" host',
+						'Name' => '127.0.0.1',
 						'Show header' => true,
 						'Show suppressed problems' => true,
 					],
@@ -912,7 +978,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Host' => 'Display',
-						'Name' => '😅😅😅Name of Host card widget 😅😅😅',
+						'Name' => '😅😅😅 TESThostCARD 😅😅😅',
 						'Show header' => true,
 						'Show suppressed problems' => true,
 					],
@@ -929,7 +995,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Host' => 'Display',
-						'Name' => 'Наименование виджета для карточки хоста',
+						'Name' => 'HostMixedCase',
 						'Show header' => false,
 						'Show suppressed problems' => true,
 					],
@@ -963,7 +1029,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Host' => 'Host with full inventory list',
-						'Name' => 'Few inventory fields is selected',
+						'Name' => 'Test-テスト-01',
 						'Show header' => false,
 						'Show suppressed problems' => false,
 					],
@@ -982,16 +1048,6 @@ class testDashboardHostCardWidget extends testWidgets {
 					'fields' => [
 						'Host' => 'Host with full inventory list',
 						'Name' => 'test<s><\x3cscript>alert(\'XSS\')</script><s>',
-					]
-				]
-			],
-			// #16.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'Host' => 'Host with full inventory list',
-						'Name' => '"; DROP TABLE users; --"'
 					]
 				]
 			]
@@ -1063,7 +1119,8 @@ class testDashboardHostCardWidget extends testWidgets {
 					'fields' => [
 						'Name' => 'Changed widget name and host',
 						'Host' => 'Display'
-					]
+					],
+					'Show' => []
 				]
 			],
 			// 2.
@@ -1289,7 +1346,55 @@ class testDashboardHostCardWidget extends testWidgets {
 						.'Description Long Description Long Description Long Description Long Description Long '
 						.'Description Long Description Long Description Long Description Long Description Long '
 						.'Description',
-					'Host groups' => ['Zabbix servers']
+					'Host groups' => ['Zabbix servers'],
+					'Inventory' => [
+						'Type' => 'Server',
+						'Type (Full details)' => 'Physical Server',
+						'Name' => 'My Server',
+						'Alias' => 'ZabbixOwl',
+						'OS' => 'Ubuntu 22.04',
+						'OS (Full details)' => 'Ubuntu 22.04 LTS',
+						'OS (Short)' => 'Ubuntu',
+						'Serial number A' => 'SN1234567890',
+						'Serial number B' => 'SN0987654321',
+						'Tag' => 'Critical',
+						'Asset tag' => 'AT-12345',
+						'MAC address A' => '00:1A:2B:3C:4D:5E',
+						'MAC address B' => '00:1A:2B:3C:4D:5F',
+						'Hardware' => 'Hardware 7.2',
+						'Hardware (Full details)' => 'Full hardware details',
+						'Software' => 'Zabbix Agent 7.2',
+						'Software application A' => 'App1',
+						'Software application B' => 'App2',
+						'Software application C' => 'App3',
+						'Contact' => 'owl@zabbix.com',
+						'Location' => 'Data Center 1',
+						'Location latitude' => '37.7749',
+						'Location longitude' => '-122.4194',
+						'Notes' => 'This is a critical server.',
+						'Chassis' => '1234-5678-9101',
+						'Model' => 'Model Owl',
+						'HW architecture' => 'x86_64',
+						'Vendor' => 'Vendor',
+						'Contract number' => 'C-123456',
+						'Installer name' => 'John Smith',
+						'Deployment status' => 'In production',
+						'URL A' => 'http://localhost.com',
+						'URL B' => 'http://localhost.org',
+						'URL C' => 'http://localhost.org',
+						'Host networks' => '111.111.11',
+						'Host subnet mask' => '255.255.255.0',
+						'Host router' => '111.111.1.1',
+						'OOB IP address' => '100.100.100.10',
+						'OOB subnet mask' => '255.255.255.0',
+						'OOB router' => '100.100.100.10',
+						'Date HW purchased' => '2023-01-01',
+						'Date HW installed' => '2023-12-18',
+						'Date HW maintenance expires' => '2025-12-18',
+						'Date HW decommissioned' => '2024-12-18',
+						'Site address A' => 'Riga',
+						'Site address B' => 'Riga'
+					]
 				]
 			],
 			// #3.
@@ -1309,6 +1414,20 @@ class testDashboardHostCardWidget extends testWidgets {
 					'Sections' => ['monitored-by'],
 					'Monitored by' => ['Proxy Group', 'Proxy group for host card widget']
 				]
+			],
+			// #5.
+			[
+				[
+					'Header' => 'Disabled host',
+					'Host' => 'Disabled host',
+					'Sections' => ['monitored-by'],
+					'Monitored by' => ['Zabbix server'],
+					'Disabled' => true,
+					'Inventory' => [
+						'Location latitude' => '10',
+						'Location longitude' => '10'
+					]
+				]
 			]
 		];
 	}
@@ -1324,121 +1443,155 @@ class testDashboardHostCardWidget extends testWidgets {
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard::find()->one()->getWidget($data['Header']);
 
-		$this->assertEquals($data['Host'], $widget->query('xpath:.//div[@class="host-name"]')
-				->one()->getText());
+		if (array_key_exists('Disabled', $data)) {
+			$status = $widget->query('xpath', './/div[@class="red"]')->one();
+			$this->assertTrue($status->isVisible());
+			$this->assertEquals('rgba(227, 55, 52, 1)', $status->getCSSValue('color'));
+			$this->assertEquals(trim($status->getText()), '(Disabled)');
+		}
+		else {
+			$this->assertEquals($data['Host'], $widget->query('xpath', './/div[@class="host-name"]')->one()->getText());
+		}
 
 		if (array_key_exists('Availability', $data)) {
-			$availabilities = $widget->query('xpath:.//div[@class="section section-availability"]//span')->all();
+			$availabilities = $widget->query('xpath', './/div[@class="section section-availability"]//span')->all();
 			foreach ($availabilities as $available) {
-				$this->AssertTrue(in_array($available->getText(), $data['Availability']));
+				$this->assertTrue(in_array($available->getText(), $data['Availability']));
 			}
 		}
-		if (array_key_exists('Monitored by', $data)) {
-			// TODO: Finish when ZBX-25709 will be done.
-		}
+		// TODO: Finish when ZBX-25709 will be done.
+		// if (array_key_exists('Monitored by', $data)) {
+		//
+		// }
 		if (array_key_exists('Tags', $data)) {
-			$tag_elements = $widget->query('xpath:.//div[@class="section section-tags"]'
+			$tag_elements = $widget->query('xpath', './/div[@class="section section-tags"]'
 					. '//div[@class="tags"]//span[@class="tag"]');
 			$tags = $tag_elements->all();
 			foreach ($tags as $tag) {
-				$this->AssertTrue(in_array($tag->getText(), $data['Tags']));
+				$this->assertTrue(in_array($tag->getText(), $data['Tags']));
 			}
 		}
 		if (array_key_exists('Monitoring', $data)) {
 			foreach ($data['Monitoring'] as $entity => $value) {
-				$this->assertEquals($value, $widget->query('xpath:.//div[@class="monitoring-item" '
+				$this->assertEquals($value, $widget->query('xpath', './/div[@class="monitoring-item" '
 						. 'and .//a[@class="monitoring-item-name" '
 						. 'and normalize-space(text())="'.$entity.'"]]//span[@class="entity-count"]')->one()->getText()
-					);
+				);
 			}
 		}
 		if (array_key_exists('Templates', $data)) {
-			$templates = $widget->query('xpath:.//div[@class="section section-templates"]//span[@class="template-name"]');
-			$templateElements = $templates->all();
+			$templateElements = $widget->query('xpath', './/div[@class="section section-templates"]'
+					. '//span[@class="template-name"]')->all()
+			;
 			foreach ($templateElements as $templateElement) {
-				$template = $templateElement->getText();
-				$this->AssertTrue(in_array($template, $data['Templates']));
+				$this->assertTrue(in_array($templateElement->getText(), $data['Templates']));
 			}
 		}
 		if (array_key_exists('Description', $data)) {
-			$this->assertEquals($data['Description'], $widget->query('xpath:.//div[@class="section section-description"]')
+			$this->assertEquals($data['Description'], $widget->query('xpath', './/div[@class="section section-description"]')
 					->one()->getText()
 			);
 		}
 		if (array_key_exists('Host groups', $data)) {
-			$host_groups = $widget->query('xpath:.//div[@class="section section-host-groups"]//span[@class="host-group-name"]');
+			$host_groups = $widget->query('xpath', './/div[@class="section section-host-groups"]//span[@class="host-group-name"]');
 			$host_groups_elements = $host_groups->all();
 			foreach ($host_groups_elements as $host_groups_element) {
-				$host_group = $host_groups_element->getText();
-				$this->AssertTrue(in_array($host_group, $data['Host groups']));
+				$this->assertTrue(in_array($host_groups_element->getText(), $data['Host groups']));
+			}
+		}
+		if (array_key_exists('Inventory', $data)){
+			foreach ($data['Inventory'] as $name => $value) {
+				$this->assertTrue( $widget->query('xpath', './/div[@class="inventory-field-name" and @title="'.$name.'"]')
+						->one()->isVisible()
+				);
+				$this->assertTrue( $widget->query('xpath', './/div[@class="inventory-field-value" and @title="'.$value.'"]')
+						->one()->isVisible()
+				);
 			}
 		}
 	}
 
+	public static function getLinkData() {
+		return [
+			// #0.
+			[
+				[
+					'Header' => 'Problems',
+					'Title' => 'Problems'
+				]
+			],
+			// #1.
+			[
+				[
+					'Class'  => 'section-name',
+					'Link' => 'Inventory',
+					'Header' => 'Host inventory',
+					'Title' => 'Host inventory'
+				]
+			],
+			// #2.
+			[
+				[
+					'Class'  => 'monitoring-item',
+					'Link'   => 'Dashboards',
+					'Header' => 'Host dashboards',
+					'Title'  => 'Dashboards'
+				]
+			],
+			// #3.
+			[
+				[
+					'Class'  => 'monitoring-item',
+					'Link'   => 'Latest data',
+					'Header' => 'Latest data',
+					'Title'  => 'Latest data'
+				]
+			],
+			// #4.
+			[
+				[
+					'Class'  => 'monitoring-item',
+					'Link'   => 'Graphs',
+					'Header' => 'Graphs',
+					'Title'  => 'Custom graphs'
+				]
+			],
+			// #5.
+			[
+				[
+					'Class'  => 'monitoring-item',
+					'Link'   => 'Web',
+					'Header' => 'Web monitoring',
+					'Title'  => 'Web monitoring'
+				]
+			]
+		];
+	}
+
 	/**
 	 * Check correct links in Host Card widget.
+	 *
+	 * @dataProvider getLinkData
 	 */
-	public function testDashboardHostCardWidget_DisplayLinks() {
+	public function testDashboardHostCardWidget_CheckLinks($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
 				self::$dashboardid['Dashboard for HostCard widget display check'])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard::find()->one()->getWidget('Display host card with 3 column layout');
 
-		// Problem link.
-		$widget->query('xpath://div[@class="sections-header"]//a[@class="problem-icon-link"]')->one()->click();
-		$this->page->waitUntilReady();
-		$this->page->assertHeader('Problems');
-		$this->page->assertTitle('Problems');
+		if ($data['Header'] === 'Problems') {
+			$widget->query('xpath', '//div[@class="sections-header"]//a[@class="problem-icon-link"]')->one()->click();
+		}
+		else {
+			$widget->query('xpath', './/div[@class="section section-'
+					.(($data['Link'] == 'Inventory') ? 'inventory' : 'monitoring').'"]'
+					.'//div[@class="'.(($data['Link'] == 'Inventory') ? 'section-name' : 'monitoring-item').'"]'
+					.'/a[text()="' . $data['Link'] . '"]')->one()->click();
+		}
 
-		// Inventory link.
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-				self::$dashboardid['Dashboard for HostCard widget display check'])->waitUntilReady();
-		$widget->query('xpath:.//div[@class="section section-inventory"]'
-				. '//div[@class="section-name"]'
-				. '/a[text()="Inventory"]')->one()->click();
 		$this->page->waitUntilReady();
-		$this->page->assertHeader('Host inventory');
-		$this->page->assertTitle('Host inventory');
-
-		// Dashboard link.
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-				self::$dashboardid['Dashboard for HostCard widget display check'])->waitUntilReady();
-		$widget->query('xpath:.//div[@class="section section-monitoring"]'
-				. '//div[@class="monitoring-item"]'
-				. '/a[text()="Dashboards"]')->one()->click();
-		$this->page->waitUntilReady();
-		$this->page->assertHeader('Host dashboards');
-		$this->page->assertTitle('Dashboards');
-
-		// Latest data link.
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-				self::$dashboardid['Dashboard for HostCard widget display check'])->waitUntilReady();
-		$widget->query('xpath:.//div[@class="section section-monitoring"]'
-				. '//div[@class="monitoring-item"]'
-				. '/a[text()="Latest data"]')->one()->click();
-		$this->page->waitUntilReady();
-		$this->page->assertHeader('Latest data');
-		$this->page->assertTitle('Latest data');
-
-		// Graphs link.
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-				self::$dashboardid['Dashboard for HostCard widget display check'])->waitUntilReady();
-		$widget->query('xpath:.//div[@class="section section-monitoring"]'
-				. '//div[@class="monitoring-item"]'
-				. '/a[text()="Graphs"]')->one()->click();
-		$this->page->waitUntilReady();
-		$this->page->assertHeader('Graphs');
-		$this->page->assertTitle('Custom graphs');
-
-		// Web link.
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-				self::$dashboardid['Dashboard for HostCard widget display check'])->waitUntilReady();
-		$widget->query('xpath:.//div[@class="section section-monitoring"]'
-				. '//div[@class="monitoring-item"]'
-				. '/a[text()="Web"]')->one()->click();
-		$this->page->waitUntilReady();
-		$this->page->assertHeader('Web monitoring');
-		$this->page->assertTitle('Web monitoring');
+		$this->page->assertHeader($data['Header']);
+		$this->page->assertTitle($data['Title']);
 	}
 
 	public function getCancelData() {
@@ -1600,13 +1753,39 @@ class testDashboardHostCardWidget extends testWidgets {
 		$form->submit();
 	}
 
+	/**
+	 * Fill Show options.
+	 *
+	 * @param array             $data         data provider
+	 * @param CFormElement      $form         place, where you need to select Show options
+	 */
 	protected function fillShowOptions($data, $form) {
-		$show_form = $form->query("xpath", "//div[contains(@class, 'form-field')]//table[@id='sections-table']")->one();
+		$show_form = $form->getFieldContainer('Show');
 		$show_form->query('button:Remove')->all()->click();
 
 		foreach($data as $fieldid => $option){
 			$form->getFieldContainer('Show')->query('button:Add')->one()->waitUntilClickable()->click();
-			$show_form->query('id:'.$fieldid)->asDropdown()->one()->fill($option);
+			$show_form->query('id', $fieldid)->asDropdown()->one()->fill($option);
+		}
+	}
+
+	/**
+	 * Check selected Show options.
+	 *
+	 * @param array             $data         data provider
+	 * @param CFormElement      $form         place, where you need to check selected Show options
+	 */
+	protected function checkShowOptions($data, $form) {
+		$select_buttons = $form->getFieldContainer('Show')->query('xpath', './/z-select/button')->all();
+		$selected_options = [];
+		foreach ($select_buttons as $button) {
+			$selected_options[] = $button->getText();
+		}
+		if (array_key_exists('Show', $data)) {
+			$this->assertEquals(array_values($data['Show']), $selected_options);
+		}
+		else {
+			$this->assertEquals($selected_options, ['Monitoring', 'Availability', 'Monitored by']);
 		}
 	}
 
@@ -1645,6 +1824,7 @@ class testDashboardHostCardWidget extends testWidgets {
 			$form = $dashboard->getWidget($header)->edit()->asForm();
 
 			$form->checkValue($data['fields']);
+			$this->checkShowOptions($data, $form);
 			COverlayDialogElement::find()->one()->close();
 			$dashboard->save();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
