@@ -1177,7 +1177,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Host' => 'Host with full inventory list',
-						'Name' => 'test<s><\x3cscript>alert(\'XSS\')</script><s>',
+						'Name' => 'test<s><\x3cscript>alert(\'XSS\')</script><s>'
 					]
 				]
 			],
@@ -1192,7 +1192,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'sections_0' => 'Inventory',
 						'sections_1' => 'Description',
 						'sections_2' => 'Templates'
-					],
+					]
 				]
 			],
 			// 8.
@@ -1231,7 +1231,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'sections_7' => 'Tags'
 					]
 				]
-			],
+			]
 		];
 	}
 
