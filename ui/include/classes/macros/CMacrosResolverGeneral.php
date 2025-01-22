@@ -912,7 +912,7 @@ class CMacrosResolverGeneral {
 	 *
 	 * @return array
 	 */
-	protected static function getItemMacrosByItemId(array $macros, array $macro_values) {
+	protected static function getItemMacrosByItemId(array $macros, array $macro_values): array {
 		if (!$macros) {
 			return $macro_values;
 		}
@@ -965,7 +965,7 @@ class CMacrosResolverGeneral {
 	 *
 	 * @return array
 	 */
-	protected static function getItemValueMacrosByItemId(array $macros, array $macro_values) {
+	protected static function getItemValueMacrosByItemId(array $macros, array $macro_values): array {
 		if (!$macros) {
 			return $macro_values;
 		}
@@ -1041,19 +1041,23 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Get item time macros by itemid.
+	 * Get item time macros by item ID.
 	 *
-	 * @param array  $macros
-	 * @param array  $macros[<itemid>]
-	 * @param array  $macros[<itemid>][<macro>]
-	 * @param array  $macros[<itemid>][<macro>][]
-	 * @param string $macros[<itemid>][<macro>][]['token']
-	 * @param array  $macros[<itemid>][<macro>][]['macrofunc']
-	 * @param array  $macro_values
+	 * @param array $macros
+	 * @param array $macro_values
+	 *
+	 * $macros = [
+	 *     <itemid> => [
+	 *         <macro> => [[
+	 *             'token' => (string) Macro token.
+	 *             'macrofunc' => (array) Macro function.
+	 *         ]]
+	 *     ]
+	 * ]
 	 *
 	 * @return array
 	 */
-	protected static function getItemTimeMacrosByItemId(array $macros, array $macro_values) {
+	protected static function getItemTimeMacrosByItemId(array $macros, array $macro_values): array {
 		if (!$macros) {
 			return $macro_values;
 		}
@@ -1073,11 +1077,6 @@ class CMacrosResolverGeneral {
 		foreach ($history as $itemid => $item_history) {
 			foreach ($macros[$itemid] as $macro => $tokens) {
 				switch ($macro) {
-					case 'ITEM.VALUE':
-					case 'ITEM.LASTVALUE':
-						$value = $item_history[0]['value'];
-						break;
-
 					case 'ITEM.VALUE.DATE':
 					case 'ITEM.LASTVALUE.DATE':
 						$value = date('Y.m.d', $history[$itemid][0]['clock']);
@@ -1180,7 +1179,8 @@ class CMacrosResolverGeneral {
 	 *
 	 * @return array
 	 */
-	protected static function getItemMacros(array $macros, array $macro_values, array $triggers = [], array $options = []) {
+	protected static function getItemMacros(array $macros, array $macro_values, array $triggers = [],
+		array $options = []): array {
 		if (!$macros) {
 			return $macro_values;
 		}
@@ -1297,28 +1297,33 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Get item macros.
+	 * Get item time macros.
 	 *
 	 * @param array $macros
-	 * @param array $macros[<functionid>]
-	 * @param array $macros[<functionid>][<macro>]  An array of the tokens.
 	 * @param array $macro_values
 	 * @param array $triggers
 	 * @param array $options
-	 * @param bool  $options['events']              Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
-	 * @param bool  $options['html']
+	 *
+	 * $macros = [
+	 *     <functionid> => [
+	 *         'macro' => (array) List of tokens.
+	 *     ]
+	 * ]
+	 *
+	 * $options = [
+	 *      'events' => (boolean) Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
+	 * ]
 	 *
 	 * @return array
 	 */
 	protected static function getItemTimeMacros(array $macros, array $macro_values, array $triggers = [],
-			array $options = []) {
+			array $options = []): array {
 		if (!$macros) {
 			return $macro_values;
 		}
 
 		$options += [
-			'events' => false,
-			'html' => false
+			'events' => false
 		];
 
 		$functions = DBfetchArray(DBselect(
@@ -1329,11 +1334,8 @@ class CMacrosResolverGeneral {
 			' WHERE '.dbConditionInt('f.functionid', array_keys($macros))
 		));
 
-		$functions = self::getItemsValueMaps($functions);
-
-		// False passed to DBfetch to get data without null converted to 0, which is done by default.
 		foreach ($functions as $function) {
-			foreach ($macros[$function['functionid']] as $m => $tokens) {
+			foreach ($macros[$function['functionid']] as $macro => $tokens) {
 				$clock = null;
 				$value = null;
 				$history = null;
@@ -1344,11 +1346,11 @@ class CMacrosResolverGeneral {
 					'ITEM.LASTVALUE.TIMESTAMP', 'ITEM.LASTVALUE.AGE'
 				];
 
-				if (in_array($m, $item_value_macros) && $options['events']) {
+				if (in_array($macro, $item_value_macros) && $options['events']) {
 					$trigger = $triggers[$function['triggerid']];
 					$history = Manager::History()->getValueAt($function, $trigger['clock'], $trigger['ns']);
 				}
-				elseif (in_array($m, $item_lastvalue_macros) || !$history) {
+				elseif (in_array($macro, $item_lastvalue_macros) || !$history) {
 					$history = Manager::History()->getLastValues([$function], 1, timeUnitToSeconds(
 						CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)
 					));
@@ -1361,31 +1363,31 @@ class CMacrosResolverGeneral {
 					$clock = $history[$function['itemid']][0]['clock'];
 				}
 
-				switch ($m) {
+				switch ($macro) {
 					case 'ITEM.VALUE.DATE':
 					case 'ITEM.LASTVALUE.DATE':
-						if ($clock) {
+						if ($clock !== null) {
 							$value = date('Y.m.d', $clock);
 						}
 						break;
 
 					case 'ITEM.VALUE.TIME':
 					case 'ITEM.LASTVALUE.TIME':
-						if ($clock) {
+						if ($clock !== null) {
 							$value = date('H:i:s', $clock);
 						}
 						break;
 
 					case 'ITEM.VALUE.TIMESTAMP':
 					case 'ITEM.LASTVALUE.TIMESTAMP':
-						if ($clock) {
+						if ($clock !== null) {
 							$value = $clock;
 						}
 						break;
 
 					case 'ITEM.VALUE.AGE':
 					case 'ITEM.LASTVALUE.AGE':
-						if ($clock) {
+						if ($clock !== null) {
 							$value = zbx_date2age($clock);
 						}
 						break;

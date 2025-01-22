@@ -277,7 +277,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = self::getHostMacros($macros['host'], $macro_values);
 		$macro_values = self::getIpMacros($macros['interface'], $macro_values);
 		$macro_values = self::getItemMacros($macros['item'], $macro_values, $triggers, $options);
-		$macro_values = self::getItemTimeMacros($macros['item_time'], $macro_values);
+		$macro_values = self::getItemTimeMacros($macros['item_time'], $macro_values, $triggers, $options);
 		$macro_values = self::getItemLogMacros($macros['log'], $macro_values);
 		$macro_values = self::getTriggerUserMacros($macros['usermacros'], $macro_values);
 
