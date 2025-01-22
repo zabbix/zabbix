@@ -111,16 +111,6 @@ $triggers_table = (new CTable())
 		]
 	]);
 
-$msg_visibility = ['1' => [
-	'messages[timeout]',
-	'messages[sounds.repeat]',
-	'messages[sounds.recovery]',
-	'messages[triggers.recovery]',
-	'timeout_row',
-	'repeat_row',
-	'triggers_row'
-]];
-
 // trigger sounds
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 	$triggers_table->addRow([
@@ -145,9 +135,6 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 				->removeId()
 		]
 	]);
-
-	zbx_subarray_push($msg_visibility, 1, 'messages[triggers.severities]['.$severity.']');
-	zbx_subarray_push($msg_visibility, 1, 'messages[sounds.'.$severity.']');
 }
 
 $messaging_form_list
