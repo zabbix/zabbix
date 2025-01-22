@@ -10,7 +10,9 @@ SERVER_tests = \
 	zbx_eval_get_constant \
 	zbx_eval_prepare_filter \
 	zbx_eval_get_group_filter \
-	zbx_eval_parse_query
+	zbx_eval_parse_query \
+	zbx_eval_get_functionids \
+	zbx_eval_get_functionids_ordered
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -144,5 +146,34 @@ zbx_eval_parse_query_LDADD += @SERVER_LIBS@
 zbx_eval_parse_query_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_eval_parse_query_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+#zbx_eval_get_functionids
+
+zbx_eval_get_functionids_SOURCES = \
+	zbx_eval_get_functionids.c \
+	mock_eval.c mock_eval.h
+
+zbx_eval_get_functionids_LDADD = $(EVAL_LIBS)
+
+zbx_eval_get_functionids_LDADD += @SERVER_LIBS@
+
+zbx_eval_get_functionids_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
+zbx_eval_get_functionids_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+#zbx_eval_get_functionids_ordered
+
+zbx_eval_get_functionids_ordered_SOURCES = \
+	zbx_eval_get_functionids_ordered.c \
+	mock_eval.c mock_eval.h
+
+zbx_eval_get_functionids_ordered_LDADD = $(EVAL_LIBS)
+
+zbx_eval_get_functionids_ordered_LDADD += @SERVER_LIBS@
+
+zbx_eval_get_functionids_ordered_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
+zbx_eval_get_functionids_ordered_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
 
 endif

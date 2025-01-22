@@ -1,0 +1,5 @@
+--- # numeric variables
+test case: Succeed '0'
+in:
+  rules: [ZBX_EVAL_PARSE_USERMACRO,ZBX_EVAL_PARSE_COMPOUND_CONST,ZBX_EVAL_PARSE_VAR_NUM]
+  expression: '1{$MACRO}'

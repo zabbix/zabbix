@@ -1,0 +1,5 @@
+--- # numeric variables
+test case: Succeed '1{{#LLD}.function()}'
+in:
+  rules: [ZBX_EVAL_PARSE_COMPOUND_CONST,ZBX_EVAL_PARSE_LLDMACRO,ZBX_EVAL_PARSE_VAR_NUM]
+  expression: '{function}'
