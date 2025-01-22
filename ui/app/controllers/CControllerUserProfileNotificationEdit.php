@@ -19,7 +19,7 @@
  */
 class CControllerUserProfileNotificationEdit extends CControllerUserEditGeneral {
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'messages' =>		'array',
 			'form_refresh' =>	'int32'
@@ -73,7 +73,7 @@ class CControllerUserProfileNotificationEdit extends CControllerUserEditGeneral 
 		return !$validator->isError();
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (CWebUser::isGuest() || !CWebUser::isLoggedIn()) {
 			return false;
 		}
@@ -99,7 +99,7 @@ class CControllerUserProfileNotificationEdit extends CControllerUserEditGeneral 
 	/**
 	 * Set user medias if user is at least admin and set messages in data.
 	 */
-	protected function doAction() {
+	protected function doAction(): void {
 		$data = [
 			'userid' => CWebUser::$data['userid'],
 			'messages' => $this->getInput('messages', []) + getMessageSettings(),

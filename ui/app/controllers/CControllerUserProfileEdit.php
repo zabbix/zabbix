@@ -19,7 +19,7 @@
  */
 class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$locales = array_keys(getLocales());
 		$locales[] = LANG_DEFAULT;
 		$themes = array_keys(APP::getThemes());
@@ -59,7 +59,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (CWebUser::isGuest() || !CWebUser::isLoggedIn()) {
 			return false;
 		}
@@ -84,8 +84,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 	/**
 	 * Set user medias if user is at least admin and set messages in data.
 	 */
-	protected function doAction() {
-
+	protected function doAction(): void {
 		$data = [
 			'userid' => CWebUser::$data['userid'],
 			'username' => $this->user['username'],

@@ -19,7 +19,7 @@
  */
 class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$locales = array_keys(getLocales());
 		$locales[] = LANG_DEFAULT;
 		$themes = array_keys(APP::getThemes());
@@ -43,7 +43,7 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		];
 
 		$ret = $this->validateInput($fields);
-		$error = $this->GetValidationError();
+		$error = $this->getValidationError();
 
 		if ($ret && !$this->validateCurrentPassword()) {
 			$error = self::VALIDATION_ERROR;
@@ -73,7 +73,7 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return (bool) API::User()->get([
 			'output' => [],
 			'userids' => $this->getInput('userid'),
@@ -81,7 +81,7 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		]);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$user = [];
 
 		$this->getInputs($user, ['lang', 'timezone', 'theme', 'autologin', 'autologout', 'refresh', 'rows_per_page',

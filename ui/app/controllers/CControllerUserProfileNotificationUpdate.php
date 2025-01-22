@@ -19,7 +19,7 @@
  */
 class CControllerUserProfileNotificationUpdate extends CControllerUserUpdateGeneral {
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'userid' =>				'fatal|required|db users.userid',
 			'messages' =>			'array',
@@ -28,7 +28,7 @@ class CControllerUserProfileNotificationUpdate extends CControllerUserUpdateGene
 		];
 
 		$ret = $this->validateInput($fields);
-		$error = $this->GetValidationError();
+		$error = $this->getValidationError();
 
 		if (!$ret) {
 			switch ($error) {
@@ -48,14 +48,14 @@ class CControllerUserProfileNotificationUpdate extends CControllerUserUpdateGene
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return (bool) API::User()->get([
 			'userids' => $this->getInput('userid'),
 			'editable' => true
 		]);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$user = [];
 
 		$user['userid'] = CWebUser::$data['userid'];
