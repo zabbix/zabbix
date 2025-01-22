@@ -1,6 +1,7 @@
 Changes for 7.4.0alpha1
 
 New features:
+..F....... [ZBXNEXT-9614] implemented scrolling down to bottom in Item history widget if new values are set to bottom (dfofanovs)
 ...G...... [ZBXNEXT-9508] added custom query path to mysql and oracle plugins for Zabbix agent 2 (esneiders)
 ...G...... [ZBXNEXT-9686] improved Zabbix agent 2 smart plugin error handling with missing privileges (esneiders)
 .........T [ZBXNEXT-9545] added Nvidia by Zabbix agent 2 templates (abrosimovs)
@@ -8,6 +9,8 @@ New features:
 .......PS. [ZBXNEXT-9622] added top.peak in diaginfo to identify items with highest task queue (vso)
 
 Bug fixes:
+.......PS. [ZBX-25903] fixed usmStatsNotInTimeWindows value being used when received and not handled by Net-SNMP library (vso)
+...G...... [ZBX-25382] applied pkgsrc patch to restore builds on NetBSD >= 8.2 (jxl)
 .......PS. [ZBX-25876] fixed escaping in script item parameters (askolmeisters)
 ..F....... [ZBX-24936] fixed button positioning in button split of multiselect (dfofanovs)
 ..F....... [ZBX-25467] fixed tabulation in Item history widget, Top hosts widget and latest data last value hintbox (dfofanovs)
@@ -89,6 +92,7 @@ New features:
 ...G...... [ZBXNEXT-9686] improved Zabbix agent 2 Smart plugin error handling with missing privileges (esneiders)
 
 Bug fixes:
+.......PS. [ZBX-25903] fixed usmStatsNotInTimeWindows value being used when received and not handled by Net-SNMP library (vso)
 .......PS. [ZBX-25876] fixed escaping in script item parameters (askolmeisters)
 ..F....... [ZBX-24936] fixed button positioning in button split of multiselect (dfofanovs)
 ..F....... [ZBX-25467] fixed tabulation in Item history widget, Top hosts widget and latest data last value hintbox (dfofanovs)
@@ -327,6 +331,7 @@ Changes for 7.0.9rc2
 New features:
 
 Bug fixes:
+.......PS. [ZBX-25903] fixed usmStatsNotInTimeWindows value being used when received and not handled by Net-SNMP library (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.9rc1
