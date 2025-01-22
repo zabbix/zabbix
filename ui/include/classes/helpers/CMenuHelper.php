@@ -473,8 +473,13 @@ class CMenuHelper {
 			$menu->add(
 				(new CMenuItem(_('User settings')))
 					->setIcon(ZBX_ICON_USER_SETTINGS)
-					->setAction('userprofile.edit')
 					->setTitle(getUserFullname($user))
+					->setSubMenu(new CMenu([
+						(new CMenuItem(_('Profile')))
+							->setAction('userprofile.edit'),
+						(new CMenuItem(_('Notifications')))
+							->setAction('userprofile.notification.edit'),
+					]))
 			);
 		}
 

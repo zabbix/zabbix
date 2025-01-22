@@ -854,10 +854,6 @@ function makePageFooter(bool $with_version = true): CTag {
  * @return array  Menu definition for CHtmlPage::setTitleSubmenu.
  */
 function getUserSettingsSubmenu(): array {
-	if (!CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)) {
-		return [];
-	}
-
 	$profile_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'userprofile.edit')
 		->getUrl();
@@ -866,17 +862,22 @@ function getUserSettingsSubmenu(): array {
 		->setArgument('action', 'userprofile.notification.edit')
 		->getUrl();
 
-	$tokens_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'user.token.list')
-		->getUrl();
+	$items = [
+		$profile_url => _('Profile'),
+		$notification => _('Notifications')
+	];
+
+	if (CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)) {
+		$tokens_url = (new CUrl('zabbix.php'))
+			->setArgument('action', 'user.token.list')
+			->getUrl();
+
+		$items[$tokens_url] = _('API tokens');
+	}
 
 	return [
 		'main_section' => [
-			'items' => array_filter([
-				$profile_url => _('Profile'),
-				$notification => _('Notifications'),
-				$tokens_url  => _('API tokens')
-			])
+			'items' => array_filter($items)
 		]
 	];
 }
