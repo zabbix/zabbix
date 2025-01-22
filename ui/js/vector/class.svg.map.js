@@ -992,7 +992,7 @@ SVGMapElement.prototype.toggleLabel = function(show) {
 	const label = document.querySelector(`text[data-parent=selement_${this.options.selementid}]`);
 
 	if (label === null) {
-		return
+		return;
 	}
 
 	const trigger_label = label.querySelector('tspan[data-type=trigger]');
@@ -1001,9 +1001,10 @@ SVGMapElement.prototype.toggleLabel = function(show) {
 		const label_parts = label.querySelectorAll('tspan[data-type=label]');
 
 		if (label_parts.length > 0) {
-			for (const label_part of label_parts) {
+			label_parts.forEach((label_part, index) => {
 				label_part.style.display = show ? '' : 'none';
-			}
+				label_part.setAttribute('dy', show ? (index === 0 ? '0.9em' : '1.2em') : '0');
+			});
 
 			trigger_label.setAttribute('dy', show ? '1.2em' : '0.9em');
 		}

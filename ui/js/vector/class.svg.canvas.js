@@ -521,8 +521,7 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 	this.offset = 0;
 	this.element = this.canvas.createElement('g', {}, parent);
 
-	var parse_links = attributes['parse-links'],
-		size;
+	const parse_links = attributes['parse-links'];
 
 	['x', 'y', 'anchor', 'background', 'clip', 'parse-links'].forEach(function (key) {
 		delete attributes[key];
@@ -541,6 +540,7 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 	}
 
 	this.initial_x = this.x;
+	this.initial_y = this.y;
 
 	this.parseContent(content, parse_links);
 	this.text = this.element.add('text', attributes, this.lines);
@@ -550,15 +550,13 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 			return;
 		}
 
+		this.y = this.initial_y;
+
 		const size = this.ZBX_getBBox();
 		this.width = Math.ceil(size.width);
 		this.height = Math.ceil(size.height + size.y);
 
-		// Workaround for EDGE for proper text height calculation.
-		if (ED && this.lines.length > 0
-				&& typeof attributes['font-size'] !== 'undefined' && parseInt(attributes['font-size']) > 16) {
-			this.height = Math.ceil(this.lines.length * parseInt(attributes['font-size']) * 1.2);
-		}
+		this.alignToAnchor();
 
 		if (this.background !== null) {
 			this.background.update({
@@ -566,6 +564,8 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 				height: this.height + (this.canvas.textPadding * 2)
 			});
 		}
+
+		this.createClipping();
 
 		this.text.element.setAttribute('transform',
 			'translate(' + this.getHorizontalOffset() + ' ' + this.offset + ')'
@@ -581,9 +581,6 @@ SVGTextArea.prototype.create = function(attributes, parent, content) {
 	}
 
 	onResize();
-
-	this.alignToAnchor();
-	this.createClipping();
 
 	return this.element;
 };
