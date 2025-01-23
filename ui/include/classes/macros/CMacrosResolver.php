@@ -41,7 +41,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * Macros examples:
 	 * user: {$MACRO1}, {$MACRO2}, ...
 	 * host: {HOSTNAME}, {HOST.HOST}, {HOST.NAME}
-	 * ip: {IPADDRESS}, {HOST.IP}, {HOST.DNS}, {HOST.CONN}
 	 *
 	 * @param array  $options
 	 * @param string $options['config']
