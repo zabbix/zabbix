@@ -2034,23 +2034,17 @@ class CMap extends CMapElement {
 			}
 
 			foreach ($map['links'] as &$link) {
-				if (!array_key_exists('linkid', $link)) {
+				if (!array_key_exists('linkid', $link) || $link['indicator_type'] != MAP_INDICATOR_TYPE_ITEM_VALUE) {
 					continue;
 				}
 
 				$db_link = $db_maps[$map['sysmapid']]['links'][$link['linkid']];
 
-				if ($link['indicator_type'] != $db_link['indicator_type']
-						&& $link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER) {
-					$link += ['linktriggers' => $db_link['linktriggers']];
+				if (in_array($link['item_value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+					$link += ['thresholds' => $db_link['thresholds']];
 				}
-				elseif ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
-					if (in_array($link['item_value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
-						$link += ['thresholds' => $db_link['thresholds']];
-					}
-					else {
-						$link += ['highlights' => $db_link['highlights']];
-					}
+				else {
+					$link += ['highlights' => $db_link['highlights']];
 				}
 			}
 			unset($link);
