@@ -34,6 +34,7 @@ class Yaml
     const PARSE_CUSTOM_TAGS = 512;
     const DUMP_EMPTY_ARRAY_AS_SEQUENCE = 1024;
     const DUMP_NULL_AS_TILDE = 2048;
+    public const DUMP_COMPACT_NESTED_MAPPING = 16384;
 
     /**
      * Parses a YAML file into a PHP value.

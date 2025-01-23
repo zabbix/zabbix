@@ -72,11 +72,10 @@ class CSvgGraphLine extends CSvgPath {
 	public function toString($destroy = true): string {
 		if ($this->path) {
 			if ($this->add_labels) {
-				$line_values = '';
-
-				foreach ($this->path as $point) {
-					$line_values .= ($line_values === '') ? $point[2] : ','.$point[2];
-				}
+				// Create a label for each point, including stacked graph blank "points".
+				$line_values = implode(',', array_map(static function ($point): string {
+					return $point[2];
+				}, $this->path));
 
 				$this->setAttribute('label', $line_values);
 			}

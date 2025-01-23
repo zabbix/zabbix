@@ -360,7 +360,6 @@ if ($data['single_host_selected'] && ($data['context'] === 'template' || !$data[
 			'object_name' => $data['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
 			'multiselect_id' => 'valuemapid-field',
 			'multiple' => false,
-			'data' => [],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
@@ -399,7 +398,6 @@ if ($data['single_host_selected']) {
 				'object_name' => 'items',
 				'multiselect_id' => 'master-item-field',
 				'multiple' => false,
-				'data' => [],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'items',
