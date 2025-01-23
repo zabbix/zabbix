@@ -1165,14 +1165,6 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value), NULL))
 			return FAIL;
 
-		if (ZBX_GIBIBYTE < bytes_received && 0 != strcmp(value, ZBX_PROTO_VALUE_PROXY_CONFIG))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "message size " ZBX_FS_I64 " exceeds the maximum size "
-					ZBX_FS_UI64 " for request \"%s\" received from \"%s\"", bytes_received,
-					(zbx_uint64_t)ZBX_GIBIBYTE, value, sock->peer);
-			return FAIL;
-		}
-
 		if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA))
 		{
 			recv_agenthistory(sock, &jp, ts, config_comms->config_timeout);
@@ -1258,14 +1250,6 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		zbx_history_recv_item_t	item;
 		int			errcode;
 
-		if (ZBX_GIBIBYTE < bytes_received)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "message size " ZBX_FS_I64 " exceeds the maximum size "
-					ZBX_FS_UI64 " for XML protocol received from \"%s\"", bytes_received,
-					(zbx_uint64_t)ZBX_GIBIBYTE, sock->peer);
-			return FAIL;
-		}
-
 		if (SUCCEED == zbx_vps_monitor_capped())
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot accept data: data collection has been paused.");
@@ -1338,7 +1322,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 {
 	ssize_t	bytes_received;
 
-	if (FAIL == (bytes_received = zbx_tcp_recv_ext(sock, config_comms->config_trapper_timeout, ZBX_TCP_LARGE)))
+	if (FAIL == (bytes_received = zbx_tcp_recv_to(sock, config_comms->config_trapper_timeout)))
 		return;
 
 	process_trap(sock, sock->buffer, bytes_received, ts, config_comms, config_vault, config_startup_time,
