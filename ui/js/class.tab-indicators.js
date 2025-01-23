@@ -702,6 +702,18 @@ class IpmiTabIndicatorItem extends TabIndicatorItem {
 
 class EncryptionTabIndicatorItem extends TabIndicatorItem {
 
+	/**
+	 * Connection encryption PSK
+	 * @type {number}
+	 */
+	static PSK = 2;
+
+	/**
+	 * Connection encryption certificate
+	 * @type {number}
+	 */
+	static CERTIFICATE = 4;
+
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
 	}
@@ -709,17 +721,29 @@ class EncryptionTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const tls_connect = document.querySelector('[name=tls_connect]:checked');
 
-		if (tls_connect !== null && (tls_connect.value === '2' || tls_connect.value === '4')) {
+		if (tls_connect !== null
+			&& (tls_connect.value === EncryptionTabIndicatorItem.PSK.toString()
+				|| tls_connect.value === EncryptionTabIndicatorItem.CERTIFICATE.toString())) {
 			return true;
 		}
 
+		const tls_in_none = !!document.querySelector('[name=tls_in_none]:checked');
 		const tls_in_psk = !!document.querySelector('[name=tls_in_psk]:checked');
 		const tls_in_cert = !!document.querySelector('[name=tls_in_cert]:checked');
+		const no_tls_selected =  !tls_in_none && !tls_in_psk && !tls_in_cert
 
-		return tls_in_psk || tls_in_cert;
+		return no_tls_selected || tls_in_psk || tls_in_cert;
 	}
 
 	initObserver() {
+		const tls_in_none_node = document.querySelector('[name=tls_in_none]');
+
+		if (tls_in_none_node !== null) {
+			['click', 'change'].forEach(event =>
+				tls_in_none_node.addEventListener(event, () => this.addAttributes())
+			);
+		}
+
 		const tls_in_psk_node = document.querySelector('[name=tls_in_psk]');
 
 		if (tls_in_psk_node !== null) {
@@ -776,6 +800,18 @@ class PreprocessingTabIndicatorItem extends TabIndicatorItem {
 
 class ProxyEncryptionTabIndicatorItem extends TabIndicatorItem {
 
+	/**
+	 * Connection encryption PSK
+	 * @type {number}
+	 */
+	static PSK = 2;
+
+	/**
+	 * Connection encryption certificate
+	 * @type {number}
+	 */
+	static CERTIFICATE = 4;
+
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
 	}
@@ -783,19 +819,23 @@ class ProxyEncryptionTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		const tls_connect = document.querySelector('[name="tls_connect"]:checked');
 
-		if (tls_connect !== null && (tls_connect.value === '2' || tls_connect.value === '4')) {
+		if (tls_connect !== null
+			&& (tls_connect.value === ProxyEncryptionTabIndicatorItem.PSK.toString()
+				|| tls_connect.value === ProxyEncryptionTabIndicatorItem.CERTIFICATE.toString())) {
 			return true;
 		}
 
+		const tls_accept_none = !!document.querySelector('[name=tls_accept_none]:checked');
 		const tls_accept_psk = document.querySelector('[name="tls_accept_psk"]').checked;
 		const tls_accept_certificate = document.querySelector('[name="tls_accept_certificate"]').checked;
+		const no_tls_selected =  !tls_accept_none && !tls_accept_psk && ! tls_accept_certificate
 
-		return tls_accept_psk || tls_accept_certificate;
+		return no_tls_selected || tls_accept_psk || tls_accept_certificate;
 	}
 
 	initObserver(element) {
 		for (const _element of document.querySelectorAll(
-				'#tls_connect input, #tls_accept_psk, #tls_accept_certificate')) {
+				'#tls_connect input, #tls_accept_psk, #tls_accept_certificate, #tls_accept_none')) {
 			_element.addEventListener('change', () => this.addAttributes(element));
 		}
 	}
@@ -1472,8 +1512,23 @@ class GraphTimePeriodTabIndicatorItem extends TabIndicatorItem {
 
 class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 
+	/**
+	 * Legend lines minimum
+	 * @type {number}
+	 */
 	static SVG_GRAPH_LEGEND_LINES_MIN = 1;
+
+	/**
+	 * Legend columns maximum
+	 * @type {number}
+	 */
 	static SVG_GRAPH_LEGEND_COLUMNS_MAX = 4;
+
+	/**
+	 * Default legend mode
+	 * @type {number}
+	 */
+	static LEGEND_LINES_MODE_FIXED = 0;
 
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
@@ -1495,6 +1550,13 @@ class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 		const legend_aggregation = document.getElementById('legend_aggregation');
 
 		if (legend_aggregation !== null && legend_aggregation.checked && !legend_aggregation.disabled) {
+			return true;
+		}
+
+		const legend_lines_mode = document.querySelector('[name=legend_lines_mode]:checked');
+
+		if (legend_lines_mode !== null
+			&& legend_lines_mode.value != GraphLegendTabIndicatorItem.LEGEND_LINES_MODE_FIXED) {
 			return true;
 		}
 
@@ -1771,8 +1833,23 @@ class PieTimePeriodTabIndicatorItem extends TabIndicatorItem {
 
 class PieLegendTabIndicatorItem extends TabIndicatorItem {
 
+	/**
+	 * Legend lines minimum
+	 * @type {number}
+	 */
 	static PIE_CHART_LEGEND_LINES_MIN = 1;
+
+	/**
+	 * Legend columns maximum
+	 * @type {number}
+	 */
 	static PIE_CHART_LEGEND_COLUMNS_MAX = 4;
+
+	/**
+	 * Default legend mode value
+	 * @type {number}
+	 */
+	static LEGEND_LINES_MODE_FIXED = 0;
 
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
@@ -1794,6 +1871,13 @@ class PieLegendTabIndicatorItem extends TabIndicatorItem {
 		const legend_aggregation = document.getElementById('legend_aggregation');
 
 		if (legend_aggregation !== null && legend_aggregation.checked) {
+			return true;
+		}
+
+		const legend_lines_mode = document.querySelector('[name=legend_lines_mode]:checked');
+
+		if (legend_lines_mode !== null
+			&& legend_lines_mode.value != PieLegendTabIndicatorItem.LEGEND_LINES_MODE_FIXED) {
 			return true;
 		}
 
