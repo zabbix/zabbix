@@ -217,7 +217,7 @@ class CSettings extends CApiService {
 			'geomaps_max_zoom' =>				['type' => API_INT32, 'in' => '0:'.ZBX_GEOMAP_MAX_ZOOM],
 			'geomaps_attribution' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'geomaps_attribution')],
 			'vault_provider' =>					['type' => API_INT32, 'flags' => API_NOT_EMPTY, 'in' => ZBX_VAULT_TYPE_HASHICORP.','.ZBX_VAULT_TYPE_CYBERARK],
-			'proxy_secrets_provider' =>			['type' => API_INT32, 'in' => '0,1'],
+			'proxy_secrets_provider' =>			['type' => API_INT32, 'in' => ZBX_PROXY_SECRETS_PROVIDER_SERVER.','.ZBX_PROXY_SECRETS_PROVIDER_PROXY],
 			'timeout_zabbix_agent' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600'],
 			'timeout_simple_check' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600'],
 			'timeout_snmp_agent' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600'],

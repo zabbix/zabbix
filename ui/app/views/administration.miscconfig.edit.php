@@ -96,17 +96,17 @@ $from_list = (new CFormList())
 		(new CRadioButtonList('vault_provider', (int) $data['vault_provider']))
 			->addValue(_('HashiCorp Vault'), ZBX_VAULT_TYPE_HASHICORP)
 			->addValue(_('CyberArk Vault'), ZBX_VAULT_TYPE_CYBERARK)
-			->setModern(true)
+			->setModern()
 	)
 	->addRow(
-			new CLabel([
-				_('Resolve secret vault macros by'),
-				makeHelpIcon([
-					_('Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed.'),
-					BR(),
-					_('Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently.')
-				])
-			], 'proxy_secrets_provider'),
+		new CLabel([
+			_('Resolve secret vault macros by'),
+			makeHelpIcon([
+				_('Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed.'),
+				BR(),
+				_('Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently.')
+			])
+		]),
 		(new CRadioButtonList('proxy_secrets_provider', (int) $data['proxy_secrets_provider']))
 			->addValue(_('Zabbix server'), ZBX_PROXY_SECRETS_PROVIDER_SERVER)
 			->addValue(_('Zabbix server and proxy'), ZBX_PROXY_SECRETS_PROVIDER_PROXY)
