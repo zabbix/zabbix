@@ -101,20 +101,15 @@ class CControllerUserProfileNotificationEdit extends CControllerUserEditGeneral 
 	 */
 	protected function doAction(): void {
 		$data = [
-			'userid' => CWebUser::$data['userid'],
-			'messages' => $this->getInput('messages', []) + getMessageSettings(),
-			'form_refresh' => 0,
-			'action' => $this->getAction()
+			'form_refresh' => 0
 		];
-
-		$data['internal_auth'] = CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL;
 
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
 			$data['medias'] = $this->user['medias'];
 		}
 
 		// Overwrite with input variables.
-		$this->getInputs($data, ['form_refresh']);
+		$this->getInputs($data, array_keys($data));
 
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
 			if ($data['form_refresh'] != 0) {
@@ -124,8 +119,11 @@ class CControllerUserProfileNotificationEdit extends CControllerUserEditGeneral 
 			$data = $this->setUserMedias($data);
 		}
 
-		$data = [
-			...$data,
+		$data += [
+			'userid' => CWebUser::$data['userid'],
+			'messages' => $this->getInput('messages', []) + getMessageSettings(),
+			'action' => $this->getAction(),
+			'internal_auth' => CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL,
 			'readonly' => $this->user['provisioned'] == CUser::PROVISION_STATUS_YES,
 			'mediatypes' => API::MediaType()->get([
 				'output' => ['status'],

@@ -219,7 +219,7 @@ $userprofile_form_list
 	->addRow(new CLabel(_('Theme'), $theme_select->getFocusableElementId()), $theme_select);
 
 // Append auto-login & auto-logout to form list.
-if ($data['db_user']['username'] !== ZBX_GUEST_USER) {
+if ($data['username'] !== ZBX_GUEST_USER) {
 	$autologout = ($data['autologout'] !== '0') ? $data['autologout'] : DB::getDefault('users', 'autologout');
 
 	$userprofile_form_list->addRow(_('Auto-login'),

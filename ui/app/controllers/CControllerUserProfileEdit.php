@@ -86,39 +86,32 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 	 */
 	protected function doAction(): void {
 		$data = [
-			'userid' => CWebUser::$data['userid'],
-			'username' => $this->user['username'],
-			'name' => $this->user['name'],
-			'surname' => $this->user['surname'],
-			'change_password' => $this->hasInput('change_password') || $this->hasInput('password1'),
 			'current_password' => '',
 			'password1' => '',
 			'password2' => '',
 			'lang' => $this->user['lang'],
 			'timezone' => $this->user['timezone'],
-			'timezones' => $this->timezones,
 			'theme' => $this->user['theme'],
 			'autologin' => $this->user['autologin'],
 			'autologout' => $this->user['autologout'],
 			'refresh' => $this->user['refresh'],
 			'rows_per_page' => $this->user['rows_per_page'],
 			'url' => $this->user['url'],
-			'messages' => $this->getInput('messages', []) + getMessageSettings(),
 			'form_refresh' => 0,
-			'db_user' => ['username' => ''],
-			'action' => $this->getAction()
 		];
 
-		$data['internal_auth'] = CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL;
-
 		// Overwrite with input variables.
-		$this->getInputs($data, ['current_password', 'password1', 'password2', 'lang', 'timezone', 'theme', 'autologin',
-			'autologout', 'refresh', 'rows_per_page', 'url', 'form_refresh'
-		]);
+		$this->getInputs($data, array_keys($data));
 
-		$data = [
-			...$data,
-			'db_user' => ['username' => $this->user['username']],
+		$data += [
+			'userid' => CWebUser::$data['userid'],
+			'username' => $this->user['username'],
+			'name' => $this->user['name'],
+			'surname' => $this->user['surname'],
+			'change_password' => $this->hasInput('change_password') || $this->hasInput('password1'),
+			'timezones' => $this->timezones,
+			'action' => $this->getAction(),
+			'internal_auth' => CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL,
 			'password_requirements' => $this->getPasswordRequirements(),
 			'readonly' => $this->user['provisioned'] == CUser::PROVISION_STATUS_YES
 		];

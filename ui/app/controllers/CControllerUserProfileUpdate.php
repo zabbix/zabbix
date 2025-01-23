@@ -58,7 +58,9 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		if (!$ret) {
 			switch ($error) {
 				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('zabbix.php?action=userprofile.edit');
+					$response = (new CControllerResponseRedirect((new CUrl('zabbix.php'))
+						->setArgument('action', 'userprofile.edit')
+					));
 					$response->setFormData($this->getInputAll());
 					CMessageHelper::setErrorTitle(_('Cannot update user'));
 					$this->setResponse($response);
@@ -100,8 +102,7 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		}
 
 		DBstart();
-		$result = updateMessageSettings($this->getInput('messages', []));
-		$result = $result && (bool) API::User()->update($user);
+		$result = (bool) API::User()->update($user);
 		$result = DBend($result);
 
 		if ($result) {
@@ -112,7 +113,9 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 			CMessageHelper::setSuccessTitle(_('User updated'));
 		}
 		else {
-			$response = new CControllerResponseRedirect('zabbix.php?action=userprofile.edit');
+			$response = (new CControllerResponseRedirect((new CUrl('zabbix.php'))
+				->setArgument('action', 'userprofile.edit')
+			));
 			$response->setFormData($this->getInputAll());
 			CMessageHelper::setErrorTitle(_('Cannot update user'));
 		}
