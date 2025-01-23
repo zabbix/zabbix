@@ -1397,6 +1397,7 @@ class testDashboardHostCardWidget extends testWidgets {
 		}
 
 		// TODO: Finish when ZBX-25709 will be done.
+		// Need to check icon type, link to proxy/proxy group configuration form, no link for Zabbix server.
 		// if (array_key_exists('Monitored by', $data)) {
 		//
 		// }
