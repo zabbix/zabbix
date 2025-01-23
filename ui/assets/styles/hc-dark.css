@@ -7255,6 +7255,13 @@ svg {
     padding: 0;
     border: 0; }
 
+.map-link-hintbox-row {
+  display: flex;
+  align-items: center;
+  white-space: pre;
+  line-height: 18px;
+  min-height: 18px; }
+
 .lld-overrides-operations-table,
 .confirmation-msg {
   white-space: normal;
@@ -7891,13 +7898,6 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   color: #ffa20d; }
   .yellow.btn-link:not([disabled]), .btn-link.yellow.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.yellow.link-alt:not([disabled]):not(:hover):not(:focus) {
     border-color: #ffa20d; }
-
-.map-link-hintbox-row {
-  display: flex;
-  align-items: center;
-  white-space: pre;
-  line-height: 18px;
-  min-height: 18px; }
 
 .sidebar .logo:focus .zabbix-logo-sidebar {
   box-shadow: 0 0 0 2px #000000; }
