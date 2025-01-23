@@ -50,7 +50,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 
 	public static function getLinkUnlinkTemplateData() {
 		return [
-				// #0 Attach Template to Template
+			// #0 Attach template to template
 			[
 				[
 					'link' => 'templates.php?form=update&templateid=',
@@ -58,25 +58,22 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 					'standalone' => 'true'
 				]
 			],
-					// #1 Attach Template to Host from Configuration -> Hosts
+			// #1 Attach template to host from Configuration -> Hosts
 			[
 				[
-					'link' => 'zabbix.php?action=host.list',
-					'entity' => 'Host'
+					'link' => 'zabbix.php?action=host.list'
 				]
 			],
-					// #2 Attach Template to Host from Monitoring -> Hosts
+			// #2 Attach template to host from Monitoring -> Hosts
 			[
 				[
-					'link' => 'zabbix.php?action=host.view',
-					'entity' => 'Host'
+					'link' => 'zabbix.php?action=host.view'
 				]
 			],
-					// #3 Attach Template to Host from Standalone view
+			// #3 Attach template to host from Standalone view
 			[
 				[
 					'link' => 'zabbix.php?action=host.edit&hostid=',
-					'entity' => 'Host',
 					'standalone' => 'true'
 				]
 			]
@@ -196,29 +193,28 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 	 * @dataProvider getLinkUnlinkTemplateData
 	 */
 	public function testFormHostLinkTemplates_HostTemplateRelinkage($data) {
+		$entity = CTestArrayHelper::get($data, 'entity', 'Host');
+		$name = ($entity === 'Template') ? self::$template : self::$host;
+
 		// Open corresponding configuration form.
 		if (CTestArrayHelper::get($data, 'standalone')) {
-			if ($data['entity'] === 'Host') {
+			if ($entity === 'Host') {
 				$entity_id = self::$hostid;
 				$form_id = 'host-form';
-				$name = self::$template;
 			}
 			else {
 				$entity_id = self::$templateid;
 				$form_id = 'templates-form';
-				$name = self::$host;
 			}
 			$this->page->login()->open($data['link'].$entity_id)->waitUntilReady();
 			$form = $this->query('id', $form_id)->asForm()->waitUntilVisible()->one();
 		}
 		elseif ($data['link'] === 'zabbix.php?action=host.view') {
-			$name = self::$host;
 			$this->page->login()->open($data['link'])->waitUntilReady();
 			$this->query('link', self::$host)->waitUntilVisible()->asPopupButton()->one()->select('Configuration');
 			$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 		}
 		else {
-			$name = self::$host;
 			$this->page->login()->open($data['link'])->waitUntilReady();
 			$this->query('link', self::$host)->waitUntilVisible()->one()->click();
 			$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
@@ -229,7 +225,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 			$form->getField('Templates')->asMultiselect()->fill(self::$template);
 			$this->assertEquals(self::$template, $form->query('class:subfilter-enabled')->one()->getText());
 			$form->submit();
-			$this->assertMessage(TEST_GOOD, $data['entity'].' updated');
+			$this->assertMessage(TEST_GOOD, $entity.' updated');
 		}
 
 		// Open host configuration again, remove template link.
@@ -250,7 +246,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$form->getField('Templates')->asMultiselect()->fill(self::$template);
 		$this->assertEquals(self::$template, $form->query('class:subfilter-enabled')->one()->getText());
 		$form->submit();
-		$this->assertMessage(TEST_GOOD, $data['entity'].' updated');
+		$this->assertMessage(TEST_GOOD, $entity.' updated');
 
 		// Check that template is linked successfully.
 		if (CTestArrayHelper::get($data, 'standalone')) {
@@ -263,5 +259,8 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 			$this->query('link', $name)->waitUntilVisible()->one()->click();
 		}
 		$this->assertTrue($form->query('link', self::$template)->exists());
+		if ($this->query('button:Cancel')->exists()) {
+			$this->query('button:Cancel')->one()->click();
+		}
 	}
 }
