@@ -77,7 +77,7 @@
 			}
 
 			this.#updateForm();
-			this.#setSubmitCallback();
+			this.#initPopupListeners();
 		}
 
 		#initTemplates() {
@@ -237,28 +237,23 @@
 			}
 		}
 
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				let curl = null;
+		#initPopupListeners() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
+				},
+				callback: ({data, event}) => {
+					if (data.submit.success.action === 'delete') {
+						const url = new URL('httpconf.php', location.href);
 
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
+						url.searchParams.set('context', this.#context);
 
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
+						event.setRedirectUrl(url.href);
 					}
-
-					if ('action' in e.detail.success && e.detail.success.action === 'delete') {
-						curl = new Curl('httpconf.php');
-						curl.setArgument('context', this.#context);
+					else {
+						this.refresh();
 					}
-				}
-
-				if (curl === null) {
-					view.refresh();
-				}
-				else {
-					location.href = curl.getUrl();
 				}
 			});
 		}

@@ -758,10 +758,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 		$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
 		$problem_update_link = ($allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
 				|| $can_be_closed || $allowed['suppress'])
-			? (new CLink(_('Update'), $problem_update_url))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->setAttribute('data-eventids[]', $problem['eventid'])
-				->setAttribute('data-action', 'acknowledge.edit')
+			? (new CLink(_('Update'), $problem_update_url))->addClass(ZBX_STYLE_LINK_ALT)
 			: new CSpan(_('Update'));
 
 		$table->addRow(array_merge($row, [
