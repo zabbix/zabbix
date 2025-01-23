@@ -16,6 +16,9 @@
 
 require_once dirname(__FILE__).'/../common/testFormAuthentication.php';
 
+/**
+ * @backup config, usrgrp
+ */
 class testUsersAuthenticationMfa extends testFormAuthentication {
 
 	public function testUsersAuthenticationMfa_Layout() {
@@ -44,9 +47,9 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 
 		// Check the fields in the method modal.
 		$mfa_form->getFieldContainer('Methods')->query('button:Add')->waitUntilClickable()->one()->click();
-		$method_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$this->assertEquals('New MFA method', $method_dialog->getTitle());
-		$method_form = $method_dialog->asForm();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$this->assertEquals('New MFA method', $dialog->getTitle());
+		$dialog_form = $dialog->asForm();
 
 		$method_fields = [
 			'Type' => ['visible' => true, 'value' => 'TOTP' ],
@@ -59,7 +62,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		];
 
 		foreach ($method_fields as $label => $attributes) {
-			$field = $method_form->getField($label);
+			$field = $dialog_form->getField($label);
 			$this->assertTrue($field->isEnabled());
 			$this->assertEquals($attributes['visible'], $field->isVisible());
 
@@ -73,23 +76,23 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		}
 
 		// Check dropdown options.
-		$this->assertEquals(['TOTP', 'Duo Universal Prompt'], $method_form->getField('Type')->getOptions()->asText());
+		$this->assertEquals(['TOTP', 'Duo Universal Prompt'], $dialog_form->getField('Type')->getOptions()->asText());
 		$this->assertEquals(['SHA-1', 'SHA-256', 'SHA-512'],
-				$method_form->getField('Hash function')->getOptions()->asText()
+				$dialog_form->getField('Hash function')->getOptions()->asText()
 		);
-		$this->assertEquals(['6', '8'], $method_form->getField('Code length')->getOptions()->asText());
+		$this->assertEquals(['6', '8'], $dialog_form->getField('Code length')->getOptions()->asText());
 
 		// Check mandatory fields when MFA type = TOTP.
-		$this->assertEquals(['Name'], $method_form->getRequiredLabels());
+		$this->assertEquals(['Name'], $dialog_form->getRequiredLabels());
 
 		// Check the hintbox.
-		$method_form->getLabel('Name')->query('xpath:./button[@data-hintbox]')->one()->click();
+		$dialog_form->getLabel('Name')->query('xpath:./button[@data-hintbox]')->one()->click();
 		$hintbox = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->all()->last();
 		$this->assertEquals('Shown as the label to all MFA users in authenticator apps.', $hintbox->getText());
 		$hintbox->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
 
 		// Check fields when MFA type = DUO.
-		$method_form->fill(['Type' => 'Duo Universal Prompt']);
+		$dialog_form->fill(['Type' => 'Duo Universal Prompt']);
 
 		$field_visibility = [
 			'Type' => true,
@@ -102,9 +105,60 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		];
 
 		foreach ($field_visibility as $field => $visible) {
-			$this->assertTrue($method_form->getField($field)->isVisible($visible));
+			$this->assertTrue($dialog_form->getField($field)->isVisible($visible));
 		}
 
-		$this->assertEquals(['Name', 'API hostname', 'Client ID', 'Client secret'], $method_form->getRequiredLabels());
+		$this->assertEquals(['Name', 'API hostname', 'Client ID', 'Client secret'], $dialog_form->getRequiredLabels());
+	}
+
+	public function getCreateData() {
+		return [
+			[
+				[
+					'fields' => [
+						'Type' => 'TOTP',
+						'Name' => 'Default TOTP'
+					]
+				]
+			],
+		];
+	}
+
+	/**
+	 * Test MFA method creation.
+	 *
+	 * @dataProvider  getCreateData
+	 */
+	public function testUsersAuthenticationMfa_Create($data) {
+		$mfa_form = $this->openMfaForm();
+		$mfa_form->fill(['Enable multi-factor authentication' => true]);
+		$mfa_form->getFieldContainer('Methods')->query('button:Add')->waitUntilClickable()->one()->click();
+
+		// Fill in data and save changes.
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog_form = $dialog->asForm();
+		if (CTestArrayHelper::get($data, 'fields', false)) {
+			$dialog_form->fill($data['fields']);
+		}
+		$dialog->query('button:Add')->one()->click();
+		$mfa_form->query('button:Update')->one()->click();
+
+		// ToDo: verify the data before saving. In the table AND in the form.
+
+		// Verify data.
+		$this->page->waitUntilReady();
+		$mfa_form->invalidate();
+		$mfa_form->selectTab('MFA settings');
+
+	}
+
+	/**
+	 * Logs in and opens the MFA configuration form.
+	 */
+	protected function openMfaForm() {
+		$this->page->login()->open('zabbix.php?action=authentication.edit');
+		$form = $this->query('id:authentication-form')->asForm()->one();
+		$form->selectTab('MFA settings');
+		return $form;
 	}
 }
