@@ -35,7 +35,8 @@ foreach ($data['medias'] as $index => $media) {
 	if (!array_key_exists($media['mediatypeid'], $data['mediatypes'])) {
 		$media_name = (new CSpan(_('Unknown')))->addClass(ZBX_STYLE_DISABLED);
 		$status = (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED);
-	} elseif ($data['mediatypes'][$media['mediatypeid']]['status'] == MEDIA_TYPE_STATUS_ACTIVE) {
+	}
+	elseif ($data['mediatypes'][$media['mediatypeid']]['status'] == MEDIA_TYPE_STATUS_ACTIVE) {
 		$media_name = $media['name'];
 
 		if ($media['active'] == MEDIA_STATUS_ACTIVE) {
@@ -43,13 +44,15 @@ foreach ($data['medias'] as $index => $media) {
 				->addClass(ZBX_STYLE_GREEN)
 				->addClass('js-status')
 				->setAttribute('data-status_type', 'disable_media');
-		} else {
+		}
+		else {
 			$status = (new CButtonLink(_('Disabled')))
 				->addClass(ZBX_STYLE_RED)
 				->addClass('js-status')
 				->setAttribute('data-status_type', 'enable_media');
 		}
-	} else {
+	}
+	else {
 		$media_name = [
 			new CSpan($media['name']),
 			makeWarningIcon(_('Media type disabled by Administration.'))
@@ -69,7 +72,8 @@ foreach ($data['medias'] as $index => $media) {
 
 	if ($media['mediatype'] === MEDIA_TYPE_EMAIL) {
 		$parameters['sendto_emails'] = $media['sendto'];
-	} else {
+	}
+	else {
 		if (is_array($media['sendto'])) {
 			$media['sendto'] = implode(', ', $media['sendto']);
 		}
