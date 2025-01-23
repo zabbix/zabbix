@@ -812,16 +812,21 @@ SVGMapElement.prototype.updateImage = function() {
 			this.removeItem('image');
 			this.image = image;
 
-			if (this.map.can_select_element && (this.options.elementtype == SYSMAP_ELEMENT_TYPE_HOST
-					|| this.options.elementtype == SYSMAP_ELEMENT_TYPE_HOST_GROUP)) {
-				this.image.element.addEventListener('mouseover', e => this.toggleSelected(e, true));
-				this.image.element.addEventListener('mouseout', e => this.toggleSelected(e, false));
-				this.image.element.addEventListener('click', () => this.onClick());
-			}
+			const is_selectable = this.map.can_select_element && (this.options.elementtype == SYSMAP_ELEMENT_TYPE_HOST
+					|| this.options.elementtype == SYSMAP_ELEMENT_TYPE_HOST_GROUP);
+			const label_auto_hide = this.options.show_label == MAP_SHOW_LABEL_AUTO_HIDE;
 
-			if (this.options.show_label == MAP_SHOW_LABEL_AUTO_HIDE) {
-				this.image.element.addEventListener('mouseover', () => this.toggleLabel(true));
-				this.image.element.addEventListener('mouseout', () => this.toggleLabel(false));
+			if (is_selectable || label_auto_hide) {
+				this.image.element.addEventListener('mouseover', e => this.onMouseOver(e, is_selectable,
+					label_auto_hide
+				));
+				this.image.element.addEventListener('mouseout', e => this.onMouseOut(e, is_selectable,
+					label_auto_hide
+				));
+
+				if (is_selectable) {
+					this.image.element.addEventListener('click', () => this.onClick());
+				}
 			}
 		}
 		else {
@@ -958,16 +963,37 @@ SVGMapElement.prototype.update = function(options) {
 	this.updateLabel();
 };
 
-SVGMapElement.prototype.toggleSelected = function(e, selected = true) {
-	if (e.target.classList.contains('selected')) {
-		return;
-	}
+/**
+ * Element mouse over event.
+ */
+SVGMapElement.prototype.onMouseOver = function(e, is_selectable, label_auto_hide) {
+	if (is_selectable) {
+		if (e.target.classList.contains('selected')) {
+			return;
+		}
 
-	if (selected) {
 		this.selection.element.classList.remove('display-none');
 	}
-	else {
+
+	if (label_auto_hide) {
+		this.toggleLabel(true);
+	}
+};
+
+/**
+ * Element mouse out event.
+ */
+SVGMapElement.prototype.onMouseOut = function(e, is_selectable, has_auto_hide) {
+	if (is_selectable) {
+		if (e.target.classList.contains('selected')) {
+			return;
+		}
+
 		this.selection.element.classList.add('display-none');
+	}
+
+	if (has_auto_hide) {
+		this.toggleLabel(false);
 	}
 };
 
