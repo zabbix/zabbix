@@ -82,6 +82,7 @@ class testFormTotpValidate extends testFormTotp {
 		$totp = CTestArrayHelper::get($data, 'totp',
 			CMfaTotpHelper::generateTotp($totp_secret, $totp_code_length, $totp_algo, $time_step_offset)
 		);
+		$totp = CTestArrayHelper::get($data, 'totp_pre', '').$totp.CTestArrayHelper::get($data, 'totp_after', '');
 
 		$form->getField('id:verification_code')->fill($totp);
 		$form->query('button:Sign in')->one()->click();
