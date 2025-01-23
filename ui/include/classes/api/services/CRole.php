@@ -58,6 +58,10 @@ class CRole extends CApiService {
 	 * @throws APIException
 	 */
 	public function get(array $options = []) {
+		$user_output_fields = self::$userData['type'] == USER_TYPE_SUPER_ADMIN
+			? CUser::OUTPUT_FIELDS
+			: CUser::OWN_LIMITED_OUTPUT_FIELDS;
+
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'roleids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
@@ -71,7 +75,7 @@ class CRole extends CApiService {
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			'selectRules' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['ui', 'ui.default_access', 'services.read.mode', 'services.read.list', 'services.read.tag', 'services.write.mode', 'services.write.list', 'services.write.tag', 'modules', 'modules.default_access', 'api.access', 'api.mode', 'api', 'actions', 'actions.default_access']), 'default' => null],
-			'selectUsers' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid']), 'default' => null],
+			'selectUsers' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $user_output_fields), 'default' => null],
 			// sort and limit
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
@@ -1284,19 +1288,31 @@ class CRole extends CApiService {
 				$output = ['userid', 'roleid'];
 			}
 			elseif ($options['selectUsers'] === API_OUTPUT_EXTEND) {
-				$output = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-					'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid'
-				];
+				$output = self::$userData['type'] == USER_TYPE_SUPER_ADMIN
+					? CUser::OUTPUT_FIELDS
+					: CUser::OWN_LIMITED_OUTPUT_FIELDS;
 			}
 			else {
 				$output = array_unique(array_merge(['userid', 'roleid'], $options['selectUsers']));
 			}
 
-			$users = DB::select('users', [
-				'output' => $output,
-				'filter' => ['roleid' => $roleids],
-				'preservekeys' => true
-			]);
+			if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+				$users = API::User()->get([
+					'output' => $output,
+					'filter' => ['roleid' => $roleids],
+					'preservekeys' => true
+				]);
+			}
+			else {
+				$users = array_key_exists(self::$userData['roleid'], $result)
+					? API::User()->get([
+						'output' => $output,
+						'userids' => self::$userData['userid'],
+						'preservekeys' => true
+					])
+					: [];
+			}
+
 			$relation_map = $this->createRelationMap($users, 'roleid', 'userid');
 			$users = $this->unsetExtraFields($users, ['userid', 'roleid'], $options['selectUsers']);
 			$result = $relation_map->mapMany($result, $users, 'users');

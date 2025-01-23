@@ -1697,8 +1697,7 @@ int	zbx_hc_check_proxy(zbx_uint64_t proxyid)
 
 	zbx_dbcache_lock();
 
-	hc_pused = 100 * (double)(zbx_dbcache_get_hc_mem()->total_size - zbx_dbcache_get_hc_mem()->free_size) /
-			zbx_dbcache_get_hc_mem()->total_size;
+	hc_pused = zbx_hc_mem_pused();
 
 	if (20 >= hc_pused)
 	{
