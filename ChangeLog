@@ -1,8 +1,7 @@
 Changes for 7.0.9rc2
 
-New features:
-
 Bug fixes:
+.......PS. [ZBX-25903] fixed usmStatsNotInTimeWindows value being used when received and not handled by Net-SNMP library (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.9rc1
