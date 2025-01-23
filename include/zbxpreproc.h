@@ -28,7 +28,7 @@
 
 #define ZBX_PREPROCESSING_BATCH_SIZE	256
 
-typedef void (*zbx_pp_notify_cb_t)(void *data);
+typedef void (*zbx_pp_finished_task_cb_t)(void *data);
 
 /* preprocessing step execution result */
 typedef struct
