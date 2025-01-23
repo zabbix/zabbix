@@ -52,6 +52,7 @@ class CControllerUserProfileNotificationUpdate extends CControllerUserUpdateGene
 
 	protected function checkPermissions(): bool {
 		return (bool) API::User()->get([
+			'output' => [],
 			'userids' => $this->getInput('userid'),
 			'editable' => true
 		]);
