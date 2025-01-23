@@ -42,6 +42,7 @@ require_once dirname(__FILE__).'/authentication/testUsersAuthentication.php';
 require_once dirname(__FILE__).'/authentication/testUsersAuthenticationHttp.php';
 require_once dirname(__FILE__).'/authentication/testUsersAuthenticationLdap.php';
 require_once dirname(__FILE__).'/authentication/testUsersAuthenticationSaml.php';
+require_once dirname(__FILE__).'/authentication/testUsersAuthenticationMfa.php';
 require_once dirname(__FILE__).'/authentication/testUsersPasswordComplexity.php';
 
 // Connectors.
@@ -379,6 +380,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testUsersAuthenticationHttp');
 		$suite->addTestSuite('testUsersAuthenticationLdap');
 		$suite->addTestSuite('testUsersAuthenticationSaml');
+		$suite->addTestSuite('testUsersAuthenticationMfa');
 		$suite->addTestSuite('testUsersPasswordComplexity');
 
 		// Connectors.
