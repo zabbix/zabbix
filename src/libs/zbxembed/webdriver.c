@@ -1220,7 +1220,7 @@ int	webdriver_dismiss_alert(zbx_webdriver_t *wd, char **error)
  * Purpose: switch to frame                                                   *
  *                                                                            *
  * Parameters: wd    - [IN] webdriver object                                  *
- *             frame - [OUT] target frame                                     *
+ *             frame - [IN] target frame                                      *
  *             error - [OUT] error message                                    *
  *                                                                            *
  * Return value: SUCCEED - operation was performed successfully               *
