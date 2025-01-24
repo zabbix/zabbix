@@ -56,10 +56,10 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * Enable media types before test.
 	 */
 	public function prepareJitMedia() {
-		$mediatypeids = CDBHelper::getAll("SELECT mediatypeid FROM media_type WHERE name IN ('iTop', 'SMS',".
-				" 'MS Teams Workflow', 'Slack', 'OTRS', 'Opsgenie', 'Brevis.one', 'Discord', 'iLert', 'Jira', 'Line', 'Email',".
-				" 'SysAid', 'Pushover', 'Telegram', 'Redmine', 'SIGNL4', 'PagerDuty', 'Zammad', 'Github', 'VictorOps',".
-				" 'ServiceNow')"
+		$mediatypeids = CDBHelper::getAll("SELECT mediatypeid FROM media_type WHERE name IN ('iTop', 'SMS', ".
+				"'MS Teams Workflow', 'Slack', 'OTRS', 'Opsgenie', 'Brevis.one', 'Discord', 'iLert', 'Jira', 'Line', 'Email', ".
+				"'SysAid', 'Pushover', 'Telegram', 'Redmine', 'SIGNL4', 'PagerDuty', 'Zammad', 'Github', 'VictorOps', ".
+				"'ServiceNow')"
 		);
 
 		foreach ($mediatypeids as $mediatype) {
@@ -161,7 +161,8 @@ class testFormUserLdapMediaJit extends CWebTest {
 	public function testFormUserLdapMediaJit_CheckProvisionedMediaLayout() {
 
 		// Media types to appear after the provisioning.
-		$media_types = ['MantisBT', 'MS Teams Workflow', 'Opsgenie', 'OTRS', 'OTRS CE', 'Rocket.Chat', 'ServiceNow', 'VictorOps', 'Zammad', 'Zendesk'];
+		$media_types = ['MantisBT', 'MS Teams Workflow', 'Opsgenie', 'OTRS', 'OTRS CE', 'Rocket.Chat', 'ServiceNow',
+				'VictorOps', 'Zammad', 'Zendesk'];
 
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
 		$this->page->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
@@ -717,9 +718,9 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$form = $this->openLdapForm();
 		$table = $form->query('id:ldap-servers')->asTable()->one();
 		$table->query('link:'.self::LDAP_SERVER_NAME)->one()->click();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 
 		foreach ($data['media_types'] as $media_type) {
-			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 			$media_table = $dialog->query('id:ldap-media-type-mapping-table')->asTable()->one();
 			$media_table->query('link', $media_type['name'])->one()->click();
 			$media_form = COverlayDialogElement::find()->all()->last()->asForm();
@@ -736,7 +737,8 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$this->assertEquals(10, $this->getUserMediaTable()->getRows()->count());
 
 		foreach ($data['media_types'] as $media_type) {
-			$this->checkMediaConfiguration($media_type['configuration'], $media_type['configuration']['fields']['Type'], PHPUNIT_LDAP_USERNAME);
+			$this->checkMediaConfiguration($media_type['configuration'], $media_type['configuration']['fields']['Type'],
+					PHPUNIT_LDAP_USERNAME);
 		}
 
 		// Provision the LDAP user.
@@ -753,7 +755,8 @@ class testFormUserLdapMediaJit extends CWebTest {
 				$this->assertEquals(9, $user_media_table->getRows()->count());
 			}
 			else {
-				$this->checkMediaConfiguration($media_type['expected'], $media_type['expected']['fields']['Type'], PHPUNIT_LDAP_USERNAME);
+				$this->checkMediaConfiguration($media_type['expected'], $media_type['expected']['fields']['Type'],
+						PHPUNIT_LDAP_USERNAME);
 			}
 		}
 	}
@@ -1188,8 +1191,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 	private function getUserMediaTable() {
 		$user_form = $this->query('id:user-form')->waitUntilVisible()->asForm()->one();
 		$user_form->selectTab('Media');
-		$user_media_table = $this->query('id:media-table')->asTable()->one();
 
-		return $user_media_table;
+		return $this->query('id:media-table')->asTable()->one();
 	}
 }
