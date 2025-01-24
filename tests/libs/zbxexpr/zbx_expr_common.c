@@ -23,7 +23,7 @@
 
 time_t	human_time_to_unix_time(const char *time_str)
 {
-	struct tm tm = {0};
+	struct tm	tm= {0};
 
 	if (sscanf(time_str, "%d-%d-%dT%d:%d:%d", &tm.tm_year, &tm.tm_mon, &tm.tm_mday, &tm.tm_hour, &tm.tm_min,
 			&tm.tm_sec) != 6)

@@ -33,4 +33,76 @@ in:
   time_zone: "EST"
 out:
   return: FAIL
+---
+test case: "5. Time period only day"
+in:
+  period: "1"
+  time: "2024-12-16T9:30:00"
+  time_zone: "EST"
+out:
+  return: FAIL
+---
+test case: "6. Time period 1-"
+in:
+  period: "1-"
+  time: "2024-12-16T9:30:00"
+  time_zone: "EST"
+out:
+  return: FAIL
+---
+test case: "7. Time period 1-5,9"
+in:
+  period: "1-5,9"
+  time: "2024-12-16T9:30:00"
+  time_zone: "EST"
+out:
+  return: FAIL
+---
+test case: "8. Time period 1-"
+in:
+  period: "1-5"
+  time: "2024-12-16T9:30:00"
+  time_zone: "EST"
+out:
+  return: FAIL
+---
+test case: "9. Time period -5"
+in:
+  period: "-5"
+  time: "2024-12-16T9:30:00"
+  time_zone: "EST"
+out:
+  return: FAIL
+---
+test case: "10. Time period ,9"
+in:
+  period: ",9"
+  time: "2024-12-16T9:30:00"
+  time_zone: "EST"
+out:
+  return: FAIL
+---
+test case: "11. Time period reverse"
+in:
+  period: "1,17:00-9:00"
+  time: "2024-12-16T9:30:00"
+  time_zone: "EST"
+out:
+  return: FAIL
+---
+test case: "11. Time period monday first minute"
+in:
+  period: "1-1,00:00-00:01"
+  time: "2024-12-16T00:00:30"
+  time_zone: "EST"
+out:
+  return: SUCCEED
+---
+test case: "11. Time period max"
+in:
+  period: "1-7,00:00-24:00"
+  time: "2024-12-16T9:00:30"
+  time_zone: "UTC"
+out:
+  return: SUCCEED
 ...

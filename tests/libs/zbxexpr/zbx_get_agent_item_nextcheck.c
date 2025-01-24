@@ -35,7 +35,6 @@ void	zbx_mock_test_entry(void **state)
 	int	result = 0;
 
 #ifdef TIME_IS_32INT
-
 	if (SUCCEED != zbx_mock_parameter_exists("in.time_over_jan2038"))
 	{
 		int	nextcheck;
@@ -44,15 +43,12 @@ void	zbx_mock_test_entry(void **state)
 		zbx_mock_assert_int_eq("return value", exp_result, result);
 		zbx_mock_assert_uint64_eq("return value", exp_nextcheck, (uint64_t)nextcheck);
 	}
-
 #else
-
 	time_t	nextcheck;
 	time_t	time = human_time_to_unix_time(now);
 	result = zbx_get_agent_item_nextcheck(itemid, delay, time, &nextcheck, &scheduling, &error);
 	zbx_mock_assert_int_eq("return value", exp_result, result);
 	zbx_mock_assert_uint64_eq("return value", exp_nextcheck, nextcheck);
-
 #endif
 	if (FAIL == result)
 		zbx_free(error);

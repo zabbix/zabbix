@@ -27,5 +27,14 @@ void	zbx_mock_test_entry(void **state)
 	ZBX_UNUSED(state);
 
 	int	result = zbx_function_validate_parameters(expr, &length);
+
 	zbx_mock_assert_int_eq("return value", out, result);
+
+	if (SUCCEED == result)
+	{
+		size_t	exp_length = zbx_mock_get_parameter_uint64("out.length");
+
+		zbx_mock_assert_uint64_eq("return length", exp_length, length);
+	}
+
 }

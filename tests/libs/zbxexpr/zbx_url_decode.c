@@ -17,25 +17,56 @@
 #include "zbxmockassert.h"
 
 #include "zbxexpr.h"
+#include "zbxstr.h"
 
 void	zbx_mock_test_entry(void **state)
 {
 	const char	*source = zbx_mock_get_parameter_string("in.source");
-	int		exp_return = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
-	char		*result = NULL;
+	const char	*func_type =  zbx_mock_get_parameter_string("in.func_type");
+	const char	*exp_result, *exp_final_result;
+	char		*result_decode = NULL;
+	char		*result_encode = NULL;
+	int		decode_return, exp_return;
 
 	ZBX_UNUSED(state);
 
-	result = zbx_malloc(result, MAX_STRING_LEN);
-	int	freturn = zbx_url_decode(source, &result);
-
-	zbx_mock_assert_int_eq("return value", exp_return, freturn);
-
-	if (SUCCEED == zbx_mock_parameter_exists("out.result"))
+	if (SUCCEED == zbx_strcmp_natural(func_type, "encode"))
 	{
-		const char	*exp_result = zbx_mock_get_parameter_string("out.result");
-		zbx_mock_assert_str_eq("return value str", exp_result, result);
+		result_encode = zbx_malloc(result_encode, MAX_STRING_LEN);
+		zbx_url_encode(source, &result_encode);
+		exp_result = zbx_mock_get_parameter_string("out.result");
+		zbx_mock_assert_str_eq("return value encode", exp_result, result_encode);
+		zbx_free(result_encode);
 	}
 
-	zbx_free(result);
+	if (SUCCEED == zbx_strcmp_natural(func_type, "decode"))
+	{
+		result_decode = zbx_malloc(result_decode, MAX_STRING_LEN);
+		decode_return = zbx_url_decode(source, &result_decode);
+		exp_return = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
+		zbx_mock_assert_int_eq("return value", exp_return, decode_return);
+
+		if (SUCCEED == zbx_mock_parameter_exists("out.result"))
+		{
+			exp_result = zbx_mock_get_parameter_string("out.result");
+			zbx_mock_assert_str_eq("return value decode str", exp_result, result_decode);
+		}
+
+		zbx_free(result_decode);
+	}
+
+	if (SUCCEED == zbx_strcmp_natural(func_type, "encode_decode"))
+	{
+		result_encode = zbx_malloc(result_encode, MAX_STRING_LEN);
+		zbx_url_encode(source, &result_encode);
+		exp_result = zbx_mock_get_parameter_string("out.result");
+		zbx_mock_assert_str_eq("return value encode", exp_result, result_encode);
+		result_decode = zbx_malloc(result_decode, MAX_STRING_LEN);
+		decode_return = zbx_url_decode(source, &result_decode);
+		exp_final_result = zbx_mock_get_parameter_string("out.final_result");
+		zbx_mock_assert_str_eq("return value decode", exp_final_result, result_decode);
+		zbx_free(result_encode);
+		zbx_free(result_decode);
+	}
+
 }

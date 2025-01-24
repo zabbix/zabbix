@@ -22,6 +22,22 @@ in:
   host: "lin'ux"
 out:
   host_out: "lin_ux"
+---
+test case: "5. some ASCII"
+in:
+  host: "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
+out:
+  host_out: "___________-._0123456789_______ABCDEFGHIJKLMNOPQRSTUVWXYZ_____abcdefghijklmnopqrstuvwxyz___"
+---
+test case: "7. empty"
+in:
+  host: ""
+out:
+  host_out: ""
+---
+test case: "8. special characters"
+in:
+  host: "\n\r\t"
+out:
+  host_out: "___"
 ...
-
-

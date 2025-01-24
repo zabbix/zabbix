@@ -22,4 +22,16 @@ in:
   func: "something"
 out:
   func: "history"
+---
+test case: "5. Some ASCII"
+in:
+  func: "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
+out:
+  func: "history"
+---
+test case: "6. Empty"
+in:
+  func: ""
+out:
+  func: "history"
 ...

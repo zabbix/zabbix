@@ -1,29 +1,86 @@
 ---
-test case: "macro_name"
+test case: "1. macro_name"
 in:
   context: "macro_name"
   force_quote: 0
 out:
   exp_result: "macro_name"
 ---
-test case: "Space"
+test case: "2. Space"
 in:
   context: " "
   force_quote: 0
 out:
   exp_result: '" "'
 ---
-test case: "Double quotes"
+test case: "3. Double quotes"
 in:
   context: '"'
   force_quote: 0
 out:
   exp_result: '"\""'
 ---
-test case: 'end with \\'
+test case: '4. end with \\'
 in:
   context: "macro_name\\"
   force_quote: 1
 out:
   exp_result: " "
+---
+test case: '5. {MACRO}'
+in:
+  context: "{MACRO}"
+  force_quote: 0
+out:
+  exp_result: '"{MACRO}"'
+---
+test case: '6. {<macro>.<func>(<params>)}'
+in:
+  context: "{<macro>.<func>(<params>)}"
+  force_quote: 0
+out:
+  exp_result: '"{<macro>.<func>(<params>)}"'
+---
+test case: '7. {<macro>.<func>(<params>)}'
+in:
+  context: "{<macro>.<func>(<params>)}"
+  force_quote: 0
+out:
+  exp_result: '"{<macro>.<func>(<params>)}"'
+---
+test case: '8. {$MACRO}}'
+in:
+  context: "{$MACRO}"
+  force_quote: 0
+out:
+  exp_result: '"{$MACRO}"'
+---
+test case: '9. {#MACRO}'
+in:
+  context: "{#MACRO}"
+  force_quote: 0
+out:
+  exp_result: '"{#MACRO}"'
+---
+test case: '10. {?EXPRESSION}'
+in:
+  context: "{?EXPRESSION}"
+  force_quote: 0
+out:
+  exp_result: '"{?EXPRESSION}"'
+---
+test case: '11. Empty space'
+in:
+  context: ""
+  force_quote: 0
+out:
+  exp_result: ""
+---
+test case: '12. some ASCII'
+in:
+  context: "!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
+  force_quote: 0
+out:
+  exp_result: '"!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"'
 ...
+

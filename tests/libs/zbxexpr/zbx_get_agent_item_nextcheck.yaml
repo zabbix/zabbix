@@ -1,3 +1,4 @@
+# Zabbix API validates delay to be 1-86400 seconds
 ---
 test case: "1. Delay 1s"
 in:
@@ -50,7 +51,7 @@ in:
   time_over_jan2038: 1
   itemid: 1000
   delay: "10s"
-  now: "2023-12-18T14:30:00"
+  now: "2040-12-18T14:30:00"
 out:
   return: SUCCEED
   nextcheck: 2239450230
@@ -60,7 +61,7 @@ in:
   time_over_jan2038: 1
   itemid: 1000
   delay: "1d"
-  now: "2023-12-18T14:30:00"
+  now: "2040-12-18T14:30:00"
 out:
   return: SUCCEED
   nextcheck: 2239533030

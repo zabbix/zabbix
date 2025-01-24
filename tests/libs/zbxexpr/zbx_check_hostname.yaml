@@ -34,4 +34,28 @@ in:
   host: ""
 out:
   return: FAIL
+---
+test case: "7. some ASCII"
+in:
+  host: "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
+out:
+  return: FAIL
+---
+test case: "8. only numbers"
+in:
+  host: "0123456789"
+out:
+  return: SUCCEED
+---
+test case: "9. chars with space"
+in:
+  host: "abc abc"
+out:
+  return: SUCCEED
+---
+test case: "10. Capitals"
+in:
+  host: "CAPITAL"
+out:
+  return: SUCCEED
 ...

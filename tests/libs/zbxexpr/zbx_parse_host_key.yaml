@@ -7,13 +7,53 @@ out:
   exp_host: "hostname"
   exp_key: "[test]"
 ---
-test case: "2. Empty"
+test case: "2. hostname:[test"
+in:
+  exp: "hostname:[test"
+out:
+  return: SUCCEED
+  exp_host: "hostname"
+  exp_key: "[test"
+---
+test case: "3. hostname:"
+in:
+  exp: "hostname:"
+out:
+  return: SUCCEED
+  exp_host: "hostname"
+  exp_key: ""
+---
+test case: "4. :[]"
+in:
+  exp: ":[]"
+out:
+  return: SUCCEED
+  exp_host: ""
+  exp_key: "[]"
+---
+test case: "5. :"
+in:
+  exp: ":"
+out:
+  return: SUCCEED
+  exp_host: ""
+  exp_key: ""
+---
+test case: "6. :[test]"
+in:
+  exp: ":[test]"
+out:
+  return: SUCCEED
+  exp_host: ""
+  exp_key: "[test]"
+---
+test case: "7. Empty"
 in:
   exp: ""
 out:
   return: FAIL
 ---
-test case: "3. Newlines"
+test case: "8. Newlines"
 in:
   exp: "hostname:\n\n\n"
 out:
@@ -21,7 +61,7 @@ out:
   exp_host: "hostname"
   exp_key: "\n\n\n"
 ---
-test case: "4. some ASCII"
+test case: "9. some ASCII"
 in:
   exp: "hostname:\n!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
 out:

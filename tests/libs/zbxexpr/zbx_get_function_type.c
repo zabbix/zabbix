@@ -20,9 +20,9 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char		*func = zbx_mock_get_parameter_string("in.func");
-	const char		*func_out = zbx_mock_get_parameter_string("out.func");
-	const char		*func_return;
+	const char	*func = zbx_mock_get_parameter_string("in.func");
+	const char	*func_out = zbx_mock_get_parameter_string("out.func");
+	const char	*func_return;
 
 	ZBX_UNUSED(state);
 
