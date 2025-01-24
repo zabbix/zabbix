@@ -787,11 +787,25 @@ void	zbx_dc_config_get_triggers_by_triggerids(zbx_dc_trigger_t *triggers, const 
 void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num);
 int	zbx_dc_get_host_by_hostid(zbx_dc_host_t *host, zbx_uint64_t hostid);
 
-#define ZBX_REQUEST_HOST_ID			101
-#define ZBX_REQUEST_HOST_HOST			102
-#define ZBX_REQUEST_HOST_NAME			103
+#define ZBX_DC_REQUEST_HOST_ID			101
+#define ZBX_DC_REQUEST_HOST_HOST		102
+#define ZBX_DC_REQUEST_HOST_NAME		103
 
 int	zbx_dc_get_host_value(zbx_uint64_t itemid, char **replace_to, int request);
+
+/* zbx_dc_get_history_log_value() */
+#define ZBX_DC_REQUEST_ITEM_LOG_DATE		201
+#define ZBX_DC_REQUEST_ITEM_LOG_TIME		202
+#define ZBX_DC_REQUEST_ITEM_LOG_AGE		203
+#define ZBX_DC_REQUEST_ITEM_LOG_SOURCE		204
+#define ZBX_DC_REQUEST_ITEM_LOG_SEVERITY	205
+#define ZBX_DC_REQUEST_ITEM_LOG_NSEVERITY	206
+#define ZBX_DC_REQUEST_ITEM_LOG_EVENTID		207
+
+int	zbx_dc_get_history_log_value(zbx_uint64_t itemid, char **replace_to, int request, int clock, int ns,
+		const char *tz);
+
+int	zbx_dc_get_host_host(zbx_uint64_t itemid, char **replace_to);
 void	zbx_dc_config_get_hosts_by_itemids(zbx_dc_host_t *hosts, const zbx_uint64_t *itemids, int *errcodes, size_t num);
 void	zbx_dc_config_get_hosts_by_hostids(zbx_dc_host_t *hosts, const zbx_uint64_t *hostids, int *errcodes, int num);
 void	zbx_dc_config_get_items_by_keys(zbx_dc_item_t *items, zbx_host_key_t *keys, int *errcodes, size_t num);
@@ -870,12 +884,13 @@ int	zbx_dc_config_get_suggested_snmp_vars(zbx_uint64_t interfaceid, int *bulk);
 int	zbx_dc_config_get_interface_by_type(zbx_dc_interface_t *interface, zbx_uint64_t hostid, unsigned char type);
 int	zbx_dc_config_get_interface(zbx_dc_interface_t *interface, zbx_uint64_t hostid, zbx_uint64_t itemid);
 
-#define ZBX_REQUEST_HOST_IP			1
-#define ZBX_REQUEST_HOST_DNS			2
-#define ZBX_REQUEST_HOST_CONN			3
-#define ZBX_REQUEST_HOST_PORT			4
+#define ZBX_DC_REQUEST_HOST_IP			1
+#define ZBX_DC_REQUEST_HOST_DNS			2
+#define ZBX_DC_REQUEST_HOST_CONN		3
+#define ZBX_DC_REQUEST_HOST_PORT		4
 
 int	zbx_dc_get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char **replace_to, int request);
+int	zbx_dc_get_interface_value_itemid(zbx_uint64_t itemid, char **replace_to, int request);
 
 int	zbx_dc_config_get_poller_nextcheck(unsigned char poller_type);
 int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout, int processing,
@@ -1244,6 +1259,7 @@ void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macr
 
 int	zbx_dc_expand_user_and_func_macros(const zbx_dc_um_handle_t *um_handle, char **text,
 		const zbx_uint64_t *hostids, int hostids_num, char **error);
+int	zbx_dc_expand_user_and_func_macros_itemid(zbx_uint64_t itemid, char **replace_to);
 int	zbx_dc_expand_user_and_func_macros_from_cache(zbx_um_cache_t *um_cache, char **text,
 		const zbx_uint64_t *hostids, int hostids_num, unsigned char env, char **error);
 
