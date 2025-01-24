@@ -1885,7 +1885,7 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
 					nbytes = ZBX_PROTO_ERROR;
 					goto out;
 				}
-	
+
 				s->buf_type = ZBX_BUF_TYPE_DYN;
 				s->buffer = buffer;
 				buf_dyn_bytes = buf_stat_bytes - offset;
