@@ -148,9 +148,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => [], 'item' => [], 'references' => [], 'log' => [],
-			'usermacros' => []
-		];
+		$macros = ['host' => [], 'interface' => [], 'item' => [], 'references' => [], 'log' => [], 'usermacros' => []];
 
 		$original_triggers = $triggers;
 		$triggers = self::resolveTriggerExpressions($triggers,
@@ -1013,9 +1011,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => [], 'item' => [], 'item_value' => [], 'inventory' => [],
-			'usermacros' => []
-		];
+		$macros =
+			['host' => [], 'interface' => [], 'item' => [], 'item_value' => [], 'inventory' => [], 'usermacros' => []];
 
 		foreach ($items as $itemid => $item) {
 			$matched_macros = self::extractMacros(array_intersect_key($item, $fields), $types);
