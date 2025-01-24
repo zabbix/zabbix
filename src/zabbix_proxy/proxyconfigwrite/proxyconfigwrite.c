@@ -1657,6 +1657,12 @@ static int	proxyconfig_sync_data(zbx_vector_table_data_ptr_t *config_tables, int
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	if (SUCCEED != zbx_db_sync_start())
+	{
+		*error = zbx_strdup(NULL, "skip proxy config sync, already in progress");
+		return FAIL;
+	}
+
 	/* first sync isolated tables without relations to other tables */
 
 	if (SUCCEED != proxyconfig_sync_table(config_tables, "globalmacro", error))
@@ -1682,7 +1688,7 @@ static int	proxyconfig_sync_data(zbx_vector_table_data_ptr_t *config_tables, int
 		{
 			*error = zbx_strdup(NULL, "cannot find host template data");
 			return FAIL;
-		}
+			}
 
 		proxyconfig_prepare_hostmacros(hostmacro, hosts_templates, full_sync);
 
@@ -1713,6 +1719,8 @@ static int	proxyconfig_sync_data(zbx_vector_table_data_ptr_t *config_tables, int
 		if (SUCCEED != proxyconfig_update_rows(hostmacro, error))
 			return FAIL;
 	}
+
+	zbx_db_sync_stop();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 

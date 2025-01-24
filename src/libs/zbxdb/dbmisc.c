@@ -63,6 +63,9 @@ static zbx_mutex_t	idcache_mutex = ZBX_MUTEX_NULL;
 zbx_shmem_info_t	*idcache_mem;
 static zbx_db_idcache_t	*idcache = NULL;
 
+zbx_shmem_info_t	*sync_status_mem;
+static zbx_uint32_t	*sync_status = NULL;
+
 int	zbx_db_init(char **error)
 {
 	qsort(idcache_tables, ZBX_IDS_SIZE, sizeof(idcache_tables[0]), compare_table_names);
@@ -79,6 +82,12 @@ int	zbx_db_init(char **error)
 	idcache = idcache_mem->base;
 	memset(idcache, 0, sizeof(zbx_db_idcache_t));
 
+	if (SUCCEED != zbx_shmem_create_min(&sync_status_mem, sizeof(zbx_uint32_t), "sync status", NULL, 0, error))
+		return FAIL;
+
+	sync_status = (zbx_uint32_t*)sync_status_mem->base;
+	*sync_status = 0;
+
 	return SUCCEED;
 }
 
@@ -90,6 +99,9 @@ void	zbx_db_deinit(void)
 	idcache_mem = NULL;
 
 	zbx_mutex_destroy(&idcache_mutex);
+
+	zbx_shmem_destroy(sync_status_mem);
+	sync_status = NULL;
 }
 
 /******************************************************************************
@@ -1370,4 +1382,32 @@ const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
 	zbx_snprintf(buf, sizeof(buf), "=" ZBX_FS_UI64, id);
 
 	return buf;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: locks proxy database sync                                                *
+ *                                                                            *
+ * Return value: SUCCEED - successfully locked                                *
+ *               FAIL    - already locked                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_sync_lock()
+{
+	if (sync_status == NULL || 0 != *sync_status)
+		return FAIL;
+
+	*sync_status = 1;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: unlocks proxy database sync                                                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_sync_unlock(void)
+{
+	*sync_status = 0;
 }

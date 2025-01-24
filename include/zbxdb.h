@@ -480,6 +480,7 @@ void	zbx_db_large_query_prepare_uint(zbx_db_large_query_t *query, char **sql,
 void	zbx_db_large_query_prepare_str(zbx_db_large_query_t *query, char **sql,
 		size_t *sql_alloc, size_t *sql_offset, const char *field, const zbx_vector_str_t *ids);
 void	zbx_db_large_query_append_sql(zbx_db_large_query_t *query, const char *sql);
-
+int	zbx_db_sync_lock();
+void	zbx_db_sync_unlock(void);
 
 #endif
