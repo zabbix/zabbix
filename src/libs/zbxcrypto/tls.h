@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@
 #	include <openssl/rand.h>
 #endif
 
-#if defined(HAVE_OPENSSL) && OPENSSL_VERSION_NUMBER < 0x1010000fL || defined(LIBRESSL_VERSION_NUMBER)
+#if defined(HAVE_OPENSSL) && OPENSSL_VERSION_NUMBER < 0x1010000fL
 #	if !defined(LIBRESSL_VERSION_NUMBER)
 #		define OPENSSL_INIT_LOAD_SSL_STRINGS			0
 #		define OPENSSL_INIT_LOAD_CRYPTO_STRINGS		0
