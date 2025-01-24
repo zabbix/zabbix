@@ -1181,40 +1181,31 @@ class CMacrosResolverGeneral {
 		foreach ($functions as $function) {
 			foreach ($macros[$function['functionid']] as $macro => $tokens) {
 				$value = null;
-				$history = null;
+				$clock = null;
 
 				if (substr($macro, 0, 10) === 'ITEM.VALUE' && $options['events']) {
 					$trigger = $triggers[$function['triggerid']];
 					$history = Manager::History()->getValueAt($function, $trigger['clock'], $trigger['ns']);
 
-					$clock = $history !== null ? $history['clock'] : null;
+					if ($history !== null) {
+						$clock = $history['clock'];
+
+						if ($function['value_type'] != ITEM_VALUE_TYPE_BINARY) {
+							$value = $history['value'];
+						}
+					}
 				}
 				else {
 					$history = Manager::History()->getLastValues([$function], 1, timeUnitToSeconds(
 						CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)
 					));
 
-					$clock = $history !== null && array_key_exists($function['itemid'], $history)
-						? $history[$function['itemid']][0]['clock']
-						: null;
-				}
+					if ($history !== null && array_key_exists($function['itemid'], $history)) {
+						$clock = $history[$function['itemid']][0]['clock'];
 
-				if ($history !== null) {
-					switch ($macro) {
-						case 'ITEM.VALUE':
-							if (array_key_exists('value', $history)
-									&& $function['value_type'] != ITEM_VALUE_TYPE_BINARY) {
-								$value = $history['value'];
-							}
-						// break; is not missing here
-
-						case 'ITEM.LASTVALUE':
-							if (array_key_exists($function['itemid'], $history)) {
-								if ($function['value_type'] != ITEM_VALUE_TYPE_BINARY) {
-									$value = $history[$function['itemid']][0]['value'];
-								}
-							}
-							break;
+						if ($function['value_type'] != ITEM_VALUE_TYPE_BINARY) {
+							$value = $history[$function['itemid']][0]['value'];
+						}
 					}
 				}
 
@@ -1241,10 +1232,6 @@ class CMacrosResolverGeneral {
 							break;
 					}
 				}
-
-				$value = $value !== null && in_array($macro, ['ITEM.VALUE', 'ITEM.LASTVALUE'])
-					? formatHistoryValue($value, $function)
-					: $value;
 
 				foreach ($tokens as $token) {
 					if ($value !== null) {
