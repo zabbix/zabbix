@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-12-19 18:54+0000\n"
+"PO-Revision-Date: 2025-01-17 22:25+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -7231,7 +7231,7 @@ msgstr "Mostra l'hora local"
 
 #: widgets/itemhistory/views/column.edit.php:240
 msgid "Display log time"
-msgstr ""
+msgstr "Veure l'hora del registre"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -9399,7 +9399,7 @@ msgstr "Històric de funcions"
 
 #: app/views/administration.housekeeping.edit.php:218
 msgid "History, trends and audit log compression"
-msgstr ""
+msgstr "Història, tendències i compressió del registre d'auditoria"
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -20462,7 +20462,7 @@ msgstr "Aquesta configuració ensenya l'hora local en lloc de la marca de temps.
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
-msgstr ""
+msgstr "Aquesta configuració ensenya l'hora del registre en lloc de la marca de temps de l'element. També s'ha de marcar \"Veure marca de temps\" a la configuració avançada."
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
