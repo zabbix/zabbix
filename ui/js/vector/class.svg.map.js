@@ -967,11 +967,7 @@ SVGMapElement.prototype.update = function(options) {
  * Element mouse over event.
  */
 SVGMapElement.prototype.onMouseOver = function(e, is_selectable, label_auto_hide) {
-	if (is_selectable) {
-		if (e.target.classList.contains('selected')) {
-			return;
-		}
-
+	if (is_selectable && !e.target.classList.contains('selected')) {
 		this.selection.element.classList.remove('display-none');
 	}
 
@@ -984,11 +980,7 @@ SVGMapElement.prototype.onMouseOver = function(e, is_selectable, label_auto_hide
  * Element mouse out event.
  */
 SVGMapElement.prototype.onMouseOut = function(e, is_selectable, label_auto_hide) {
-	if (is_selectable) {
-		if (e.target.classList.contains('selected')) {
-			return;
-		}
-
+	if (is_selectable && !e.target.classList.contains('selected')) {
 		this.selection.element.classList.add('display-none');
 	}
 
