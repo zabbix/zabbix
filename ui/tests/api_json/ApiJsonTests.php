@@ -22,6 +22,7 @@ require_once dirname(__FILE__).'/testAuditlogAction.php';
 require_once dirname(__FILE__).'/testAuditlogAutoregistration.php';
 require_once dirname(__FILE__).'/testAuditlogDashboard.php';
 require_once dirname(__FILE__).'/testAuditlogEventCorrelation.php';
+require_once dirname(__FILE__).'/testAuditlogHousekeeping.php';
 require_once dirname(__FILE__).'/testAuditlogIconMap.php';
 require_once dirname(__FILE__).'/testAuditlogMaintenance.php';
 require_once dirname(__FILE__).'/testAuditlogMediaType.php';
@@ -95,6 +96,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testAuditlogAutoregistration');
 		$suite->addTestSuite('testAuditlogDashboard');
 		$suite->addTestSuite('testAuditlogEventCorrelation');
+		$suite->addTestSuite('testAuditlogHousekeeping');
 		$suite->addTestSuite('testAuditlogIconMap');
 		$suite->addTestSuite('testAuditlogMaintenance');
 		$suite->addTestSuite('testAuditlogMediaType');
