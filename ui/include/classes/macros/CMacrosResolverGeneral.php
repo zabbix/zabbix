@@ -1002,7 +1002,8 @@ class CMacrosResolverGeneral {
 							: formatHistoryValue($value, $db_items[$itemid]);
 					}
 				}
-				elseif ($db_items[$itemid]['value_type'] == ITEM_VALUE_TYPE_LOG) {
+				elseif ($db_items[$itemid]['value_type'] == ITEM_VALUE_TYPE_LOG
+						&& substr($macro, 0, 8) === 'ITEM.LOG') {
 					switch ($macro) {
 						case 'ITEM.LOG.DATE':
 							$value = date('Y.m.d', $history[$itemid][0]['timestamp']);
@@ -1043,7 +1044,7 @@ class CMacrosResolverGeneral {
 							: $value;
 					}
 				}
-				elseif (substr($macro, 0, 11) === 'ITEM.VALUE.' || substr($macro, 0, 15) === 'ITEM.LASTVALUE.') {
+				elseif (substr($macro, 0, 10) === 'ITEM.VALUE' || substr($macro, 0, 14) === 'ITEM.LASTVALUE') {
 					switch ($macro) {
 						case 'ITEM.VALUE.DATE':
 						case 'ITEM.LASTVALUE.DATE':
