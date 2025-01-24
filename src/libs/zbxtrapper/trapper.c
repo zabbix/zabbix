@@ -1133,7 +1133,7 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 	return ret;
 }
 
-static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx_timespec_t *ts,
+static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault,
 		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
 		zbx_get_config_forks_f get_config_forks, const char *config_stats_allowed_ip, const char *progname,
@@ -1320,12 +1320,10 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		zbx_trapper_process_request_func_t trapper_process_request_cb,
 		zbx_autoreg_update_host_func_t autoreg_update_host_cb)
 {
-	ssize_t	bytes_received;
-
-	if (FAIL == (bytes_received = zbx_tcp_recv_to(sock, config_comms->config_trapper_timeout)))
+	if (FAIL == zbx_tcp_recv_to(sock, config_comms->config_trapper_timeout))
 		return;
 
-	process_trap(sock, sock->buffer, bytes_received, ts, config_comms, config_vault, config_startup_time,
+	process_trap(sock, sock->buffer, ts, config_comms, config_vault, config_startup_time,
 			events_cbs, proxydata_frequency, get_config_forks, config_stats_allowed_ip, progname,
 			config_java_gateway, config_java_gateway_port, config_externalscripts,
 			config_enable_global_scripts, zbx_get_value_internal_ext_cb, config_ssh_key_location,
