@@ -101,9 +101,6 @@ void	zbx_db_deinit(void)
 	idcache_mem = NULL;
 
 	zbx_mutex_destroy(&idcache_mutex);
-
-	zbx_shmem_destroy(sync_status_mem);
-	sync_status = NULL;
 }
 
 /******************************************************************************
