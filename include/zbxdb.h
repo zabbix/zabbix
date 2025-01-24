@@ -483,7 +483,7 @@ void	zbx_db_large_query_append_sql(zbx_db_large_query_t *query, const char *sql)
 
 int	zbx_db_sync_init(char **error);
 void	zbx_db_sync_deinit(void);
-int	zbx_db_sync_lock();
+int	zbx_db_sync_lock(void);
 void	zbx_db_sync_unlock(void);
 
 #endif

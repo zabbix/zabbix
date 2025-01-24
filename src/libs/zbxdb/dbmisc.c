@@ -1431,7 +1431,7 @@ void	zbx_db_sync_locker_deinit(void)
  *               FAIL    - already locked                                     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_sync_lock()
+int	zbx_db_sync_lock(void)
 {
 	int		ret = FAIL;
 
