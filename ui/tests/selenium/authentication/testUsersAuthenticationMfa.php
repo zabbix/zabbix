@@ -21,6 +21,15 @@ require_once dirname(__FILE__).'/../common/testFormAuthentication.php';
  */
 class testUsersAuthenticationMfa extends testFormAuthentication {
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
 	public function testUsersAuthenticationMfa_Layout() {
 		$mfa_form = $this->openFormAndCheckBasics('MFA', 'multi-factor');
 		$this->assertEquals(['Methods'], $mfa_form->getRequiredLabels());
@@ -115,12 +124,38 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		return [
 			[
 				[
+					// TOTP with default values.
 					'fields' => [
-						'Type' => 'TOTP',
-						'Name' => 'Default TOTP'
+						'Name' => 'TOTP defaults'
 					]
 				]
 			],
+			[
+				[
+					// TOTP with Name field missing.
+					'expected' => TEST_BAD,
+					'error' => 'Incorrect value for field "name": cannot be empty.'
+				]
+			],
+			[
+				[
+					// TOTP SHA-256.
+					'fields' => [
+						'Name' => 'TOTP SHA-256',
+						'Hash function' => 'SHA-256'
+					]
+				]
+			],
+			[
+				[
+					// TOTP SHA-512, code length 8.
+					'fields' => [
+						'Name' => 'TOTP SHA-512',
+						'Hash function' => 'SHA-512',
+						'Code length' => '8'
+					]
+				]
+			]
 		];
 	}
 
@@ -134,22 +169,77 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$mfa_form->fill(['Enable multi-factor authentication' => true]);
 		$mfa_form->getFieldContainer('Methods')->query('button:Add')->waitUntilClickable()->one()->click();
 
-		// Fill in data and save changes.
+		// Fill in data.
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$dialog_form = $dialog->asForm();
-		if (CTestArrayHelper::get($data, 'fields', false)) {
-			$dialog_form->fill($data['fields']);
-		}
+		$fields = CTestArrayHelper::get($data, 'fields', []);
+		$dialog_form->fill($fields);
+
+		// Fields array with any missing default values.
+		$fields_full = $this->setDefaultFields($fields);
 		$dialog->query('button:Add')->one()->click();
-		$mfa_form->query('button:Update')->one()->click();
 
-		// ToDo: verify the data before saving. In the table AND in the form.
+		// If a validation error expected.
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$this->assertMessage(TEST_BAD, 'Invalid MFA configuration', $data['error']);
+			$dialog->close();
+		} else {
+			// Verify data before saving.
+			$this->checkMethodsTableAndMethodForm($mfa_form, $dialog, $fields_full);
 
-		// Verify data.
-		$this->page->waitUntilReady();
-		$mfa_form->invalidate();
-		$mfa_form->selectTab('MFA settings');
+			// Save changes to authentication configuration.
+			$mfa_form->query('button:Update')->waitUntilClickable()->one()->click();
 
+			// Verify data after saving.
+			$this->page->waitUntilReady();
+			$mfa_form->invalidate();
+			$mfa_form->selectTab('MFA settings');
+			$this->checkMethodsTableAndMethodForm($mfa_form, $dialog, $fields_full);
+		}
+	}
+
+	/**
+	 * Checks that data is displayed as expected in the MFA methods table.
+	 *
+	 * @param CFormElement          $mfa_form       The form element that contains the method table.
+	 * @param COverlayDialogElement $dialog         The dialog that contains the edit form.
+	 * @param array                 $fields_full    Expected fields data for the record.
+	 */
+	protected function checkMethodsTableAndMethodForm($mfa_form, $dialog, $fields_full) {
+		// Check data in the table.
+		$table = $mfa_form->getFieldContainer('Methods')->query('xpath:.//table')->one()->asTable();
+		$row = $table->findRow('Name', $fields_full['Name']);
+		$expected_table_data = [
+			'Name' => $fields_full['Name'],
+			'Type' => $fields_full['Type'],
+			'User groups' => "0",
+			'Action' => 'Remove'
+		];
+		$row->assertValues($expected_table_data);
+
+		// Open the edit form and verify fields.
+		$row->getColumn('Name')->query('xpath:.//a')->one()->click();
+		$dialog_form = $dialog->asForm();
+		$dialog_form->invalidate();
+		$dialog_form->checkValue($fields_full);
+		$dialog->close();
+	}
+
+	/**
+	 * Returns a fields array populated with default values, used for verifying data.
+	 *
+	 * @param array $fields    Fields data from data provider.
+	 */
+	protected function setDefaultFields($fields) {
+		$fields['Type'] = CTestArrayHelper::get($fields, 'Type', 'TOTP');
+
+		// Set the defaults if MFA type is TOTP.
+		if ($fields['Type'] === 'TOTP') {
+			$fields['Hash function'] = CTestArrayHelper::get($fields, 'Hash function', 'SHA-1');
+			$fields['Code length'] = CTestArrayHelper::get($fields, 'Code length', '6');
+		}
+
+		return $fields;
 	}
 
 	/**
