@@ -2899,8 +2899,6 @@ class CMap extends CMapElement {
 	public function update(array $maps): array {
 		$this->validateUpdate($maps, $db_maps);
 
-		self::addFieldDefaultsByLinkIndicatorType($maps, $db_maps);
-
 		$update_maps = [];
 		$url_ids_to_delete = [];
 		$urls_to_update = [];
@@ -3168,6 +3166,14 @@ class CMap extends CMapElement {
 		return ['sysmapids' => array_column($maps, 'sysmapid')];
 	}
 
+	public function updateForce(array $maps, array $db_maps): void {
+		self::addFieldDefaultsByLinkIndicatorType($maps, $db_maps);
+
+		self::updateLinks($maps, $db_maps);
+
+		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MAP, $maps, $db_maps);
+	}
+
 	private static function addFieldDefaultsByLinkIndicatorType(array &$maps, array $db_maps): void {
 		$defaults = [
 			'itemid' => 0,
@@ -3223,15 +3229,13 @@ class CMap extends CMapElement {
 		unset($map);
 	}
 
-	public function updateForce(array $maps, array $db_maps): void {
-		self::updateLinks($maps, $db_maps);
-
-		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MAP, $maps, $db_maps);
+	public function unlinkTriggers(array $triggerids): void {
+		$this->unlinkLinkTriggers($triggerids);
 	}
 
-	public function unlinkTriggers(array $triggerids): void {
+	private function unlinkLinkTriggers(array $triggerids): void {
 		$resource = DBselect(
-			'SELECT slt.linktriggerid,slt.linkid,sl.indicator_type,s.sysmapid,s.name as map_name'.
+			'SELECT slt.linktriggerid,slt.linkid,slt.triggerid,sl.indicator_type,sl.sysmapid,s.name'.
 			' FROM sysmaps_link_triggers slt'.
 			' LEFT JOIN sysmaps_links sl ON slt.linkid=sl.linkid'.
 			' LEFT JOIN sysmaps s ON sl.sysmapid=s.sysmapid'.
@@ -3239,67 +3243,88 @@ class CMap extends CMapElement {
 		);
 
 		$db_maps = [];
-		$db_links = [];
+		$db_link_triggers = [];
 
-		while ($db_link_trigger = DBfetch($resource)) {
-			if (!array_key_exists($db_link_trigger['sysmapid'], $db_maps)) {
-				$db_maps[$db_link_trigger['sysmapid']] = [
-					'sysmapid' => $db_link_trigger['sysmapid'],
-					'name' => $db_link_trigger['map_name'],
+		while ($row = DBfetch($resource)) {
+			if (!array_key_exists($row['sysmapid'], $db_maps)) {
+				$db_maps[$row['sysmapid']] = [
+					'sysmapid' => $row['sysmapid'],
+					'name' => $row['name'],
 					'links' => []
 				];
 			}
 
-			if (!array_key_exists($db_link_trigger['linkid'], $db_maps[$db_link_trigger['sysmapid']]['links'])) {
-				$db_maps[$db_link_trigger['sysmapid']]['links'][$db_link_trigger['linkid']] = [
-					'linkid' => $db_link_trigger['linkid'],
-					'indicator_type' => $db_link_trigger['indicator_type']
+			if (!array_key_exists($row['linkid'], $db_maps[$row['sysmapid']]['links'])) {
+				$db_maps[$row['sysmapid']]['links'][$row['linkid']] = [
+					'linkid' => $row['linkid'],
+					'indicator_type' => $row['indicator_type'],
+					'linktriggers' => []
 				];
+
+				$db_link_triggers[$row['linkid']] =
+					&$db_maps[$row['sysmapid']]['links'][$row['linkid']]['linktriggers'];
 			}
 
-			$db_links[$db_link_trigger['linkid']] =
-				&$db_maps[$db_link_trigger['sysmapid']]['links'][$db_link_trigger['linkid']];
-		}
-
-		if (!$db_links) {
-			return;
-		}
-
-		self::addAffectedLinkTriggers($db_links);
-
-		$maps = [];
-
-		foreach ($db_maps as $db_map) {
-			$links = [];
-
-			foreach ($db_map['links'] as $db_link) {
-				$link_triggers = [];
-
-				foreach ($db_link['linktriggers'] as $link_trigger) {
-					if (!in_array($link_trigger['triggerid'], $triggerids)) {
-						$link_triggers[] = $link_trigger;
-					}
-				}
-
-				$links[] = [
-					'linkid' => $db_link['linkid'],
-					'indicator_type' => $link_triggers ? $db_link['indicator_type'] : MAP_INDICATOR_TYPE_STATIC_LINK,
-					'linktriggers' => $link_triggers
-				];
-		}
-
-			$maps[] = [
-				'sysmapid' => $db_map['sysmapid'],
-				'links' => $links
+			$db_maps[$row['sysmapid']]['links'][$row['linkid']]['linktriggers'][$row['linktriggerid']] = [
+				'linktriggerid' => $row['linktriggerid'],
+				'triggerid' => $row['triggerid']
 			];
 		}
+
+		$maps = [];
+		$link_triggers = [];
+		$i1 = 0;
+
+		foreach ($db_maps as $db_map) {
+			$maps[$i1] = ['sysmapid' => $db_map['sysmapid']];
+
+			$i2 = 0;
+
+			foreach ($db_map['links'] as $db_link) {
+				$maps[$i1]['links'][$i2] = [
+					'linkid' => $db_link['linkid'],
+					'linktriggers' => []
+				];
+
+				$link_triggers[$db_link['linkid']] = &$maps[$i1]['links'][$i2]['linktriggers'];
+
+				$i2++;
+			}
+
+			$i1++;
+		}
+
+		$resource = DBselect(
+			'SELECT slt.linktriggerid,slt.linkid,slt.triggerid'.
+			' FROM sysmaps_link_triggers slt'.
+			' WHERE '.dbConditionId('slt.linkid', array_keys($db_link_triggers)).
+				' AND '.dbConditionId('slt.triggerid', $triggerids, true)
+		);
+
+		while ($row = DBfetch($resource)) {
+			$link_triggers[$row['linkid']][] = ['linktriggerid' => $row['linktriggerid']];
+			$db_link_triggers[$row['linkid']][$row['linktriggerid']] = [
+				'linktriggerid' => $row['linktriggerid'],
+				'triggerid' => $row['triggerid']
+			];
+		}
+
+		foreach ($maps as &$map) {
+			foreach ($map['links'] as &$link) {
+				if (!$link['linktriggers']) {
+					$link['indicator_type'] = MAP_INDICATOR_TYPE_STATIC_LINK;
+				}
+			}
+			unset($link);
+		}
+		unset($map);
 
 		$this->updateForce($maps, $db_maps);
 	}
 
-	public function unlinkItems(array $itemids): void {
+	public function unlinkLinkItems(array $itemids): void {
 		$resource = DBselect(
-			'SELECT sl.linkid,sl.sysmapid,sl.indicator_type,sl.itemid,s.name AS map_name'.
+			'SELECT sl.linkid,sl.sysmapid,sl.indicator_type,sl.itemid,s.name'.
 			' FROM sysmaps_links sl'.
 			' LEFT JOIN sysmaps s ON sl.sysmapid=s.sysmapid'.
 			' WHERE '.dbConditionId('sl.itemid', $itemids)
@@ -3308,22 +3333,22 @@ class CMap extends CMapElement {
 		$db_maps = [];
 		$db_links = [];
 
-		while ($db_link = DBfetch($resource)) {
-			if (!array_key_exists($db_link['sysmapid'], $db_maps)) {
-				$db_maps[$db_link['sysmapid']] = [
-					'sysmapid' => $db_link['sysmapid'],
-					'name' => $db_link['map_name'],
+		while ($row = DBfetch($resource)) {
+			if (!array_key_exists($row['sysmapid'], $db_maps)) {
+				$db_maps[$row['sysmapid']] = [
+					'sysmapid' => $row['sysmapid'],
+					'name' => $row['name'],
 					'links' => []
 				];
 			}
 
-			$db_maps[$db_link['sysmapid']]['links'][$db_link['linkid']] = [
-				'linkid' => $db_link['linkid'],
-				'indicator_type' => $db_link['indicator_type'],
-				'itemid' => $db_link['itemid']
+			$db_maps[$row['sysmapid']]['links'][$row['linkid']] = [
+				'linkid' => $row['linkid'],
+				'indicator_type' => $row['indicator_type'],
+				'itemid' => $row['itemid']
 			];
 
-			$db_links[$db_link['linkid']] = &$db_maps[$db_link['sysmapid']]['links'][$db_link['linkid']];
+			$db_links[$row['linkid']] = &$db_maps[$row['sysmapid']]['links'][$row['linkid']];
 		}
 
 		if (!$db_links) {
@@ -3334,24 +3359,22 @@ class CMap extends CMapElement {
 		self::addAffectedLinkHighlights($db_links);
 
 		$maps = [];
+		$i = 0;
 
 		foreach ($db_maps as $db_map) {
-			$links = [];
+			$maps[$i] = [
+				'sysmapid' => $db_map['sysmapid'],
+				'links' => []
+			];
 
 			foreach ($db_map['links'] as $db_link) {
-				$links[] = [
+				$maps[$i]['links'][] = [
 					'linkid' => $db_link['linkid'],
-					'indicator_type' => MAP_INDICATOR_TYPE_STATIC_LINK,
-					'itemid' => 0,
-					'thresholds' => [],
-					'highlights' => []
+					'indicator_type' => MAP_INDICATOR_TYPE_STATIC_LINK
 				];
 			}
 
-			$maps[] = [
-				'sysmapid' => $db_map['sysmapid'],
-				'links' => $links
-			];
+			$i++;
 		}
 
 		$this->updateForce($maps, $db_maps);
