@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -179,25 +179,6 @@ func CounterName(id int) (name string) {
 
 func CounterPath(object int, counter int) (path string) {
 	return fmt.Sprintf(`\%s\%s`, sysCounters[object].index, sysCounters[counter].index)
-}
-
-func GetCounterDouble(path string) (value *float64, err error) {
-	var query win32.PDH_HQUERY
-	if query, err = win32.PdhOpenQuery(nil, 0); err != nil {
-		return
-	}
-	defer func() {
-		_ = win32.PdhCloseQuery(query)
-	}()
-
-	var counter win32.PDH_HCOUNTER
-	if counter, err = win32.PdhAddCounter(query, path, 0); err != nil {
-		return
-	}
-	if err = win32.PdhCollectQueryData(query); err != nil {
-		return
-	}
-	return win32.PdhGetFormattedCounterValueDouble(counter, 2)
 }
 
 func GetCounterInt64(path string) (value *int64, err error) {
