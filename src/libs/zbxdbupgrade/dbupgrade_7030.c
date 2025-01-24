@@ -113,30 +113,27 @@ const char	*target_column[ZBX_SETTING_TYPE_MAX - 1] = {
 
 static int	DBpatch_7030009(void)
 {
-	if (0 != (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+	const zbx_setting_entry_t	*table = zbx_settings_desc_table_get();
+
+	for (size_t i = 0; i < zbx_settings_descr_table_size(); i++)
 	{
-		const zbx_setting_entry_t	*table = zbx_settings_desc_table_get();
+		const zbx_setting_entry_t	*e = &table[i];
+		const char			*target_field = target_column[e->type - 1];
 
-		for (size_t i = 0; i < zbx_settings_descr_table_size(); i++)
+		if (ZBX_SETTING_TYPE_STR != e->type)
 		{
-			const zbx_setting_entry_t	*e = &table[i];
-			const char			*target_field = target_column[e->type - 1];
-
-			if (ZBX_SETTING_TYPE_STR != e->type)
-			{
-				if (ZBX_DB_OK > zbx_db_execute("insert into settings (name, type, %s, value_str) "
-						" values ('%s', %d, (select %s from config), '')",
-						target_field, e->name, e->type, e->name))
-				{
-					return FAIL;
-				}
-			}
-			else if (ZBX_DB_OK > zbx_db_execute("insert into settings (name, type, %s) "
-					" values ('%s', %d, (select %s from config))",
-					target_field, e->name, ZBX_SETTING_TYPE_STR, e->name))
+			if (ZBX_DB_OK > zbx_db_execute("insert into settings (name, type, %s, value_str) "
+					" values ('%s', %d, coalesce ((select %s from config), %s), '')",
+					target_field, e->name, e->type, e->name, e->default_value))
 			{
 				return FAIL;
 			}
+		}
+		else if (ZBX_DB_OK > zbx_db_execute("insert into settings (name, type, %s) "
+				" values ('%s', %d, coalesce ((select %s from config), '%s'))",
+				target_field, e->name, ZBX_SETTING_TYPE_STR, e->name, e->default_value))
+		{
+			return FAIL;
 		}
 	}
 
