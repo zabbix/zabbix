@@ -1654,10 +1654,11 @@ out:
 static int	proxyconfig_sync_data(zbx_vector_table_data_ptr_t *config_tables, int full_sync, char **error)
 {
 	zbx_table_data_t	*hostmacro, *hosts_templates;
+	int			ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != zbx_db_sync_start())
+	if (SUCCEED != zbx_db_sync_lock())
 	{
 		*error = zbx_strdup(NULL, "skip proxy config sync, already in progress");
 		return FAIL;
@@ -1666,65 +1667,66 @@ static int	proxyconfig_sync_data(zbx_vector_table_data_ptr_t *config_tables, int
 	/* first sync isolated tables without relations to other tables */
 
 	if (SUCCEED != proxyconfig_sync_table(config_tables, "globalmacro", error))
-		return FAIL;
+		goto out;
 
 	if (SUCCEED != proxyconfig_sync_table(config_tables, "config_autoreg_tls", error))
-		return FAIL;
+		goto out;
 
 	if (SUCCEED != proxyconfig_sync_table(config_tables, "config", error))
-		return FAIL;
+		goto out;
 
 	/* process related tables by scope */
 
 	if (SUCCEED != proxyconfig_sync_network_discovery(config_tables, error))
-		return FAIL;
+		goto out;
 
 	if (SUCCEED != proxyconfig_sync_regexps(config_tables, error))
-		return FAIL;
+		goto out;
 
 	if (NULL != (hostmacro = proxyconfig_get_table(config_tables, "hostmacro")))
 	{
 		if (NULL == (hosts_templates = proxyconfig_get_table(config_tables, "hosts_templates")))
 		{
 			*error = zbx_strdup(NULL, "cannot find host template data");
-			return FAIL;
-			}
+			goto out;
+		}
 
 		proxyconfig_prepare_hostmacros(hostmacro, hosts_templates, full_sync);
 
 		if (SUCCEED != proxyconfig_prepare_rows(hostmacro, error))
-			return FAIL;
+			goto out;
 
 		if (SUCCEED != proxyconfig_delete_rows(hostmacro, error))
-			return FAIL;
+			goto out;
 
 		if (SUCCEED != proxyconfig_prepare_rows(hosts_templates, error))
-			return FAIL;
+			goto out;
 
 		if (SUCCEED != proxyconfig_delete_rows(hosts_templates, error))
-			return FAIL;
+			goto out;
 	}
 
 	if (SUCCEED != proxyconfig_sync_hosts(config_tables, full_sync, error))
-		return FAIL;
+		goto out;
 
 	if (NULL != hostmacro)
 	{
 		if (SUCCEED != proxyconfig_sync_templates(hosts_templates, hostmacro, error))
-			return FAIL;
+			goto out;
 
 		if (SUCCEED != proxyconfig_insert_rows(hostmacro, error))
-			return FAIL;
+			goto out;
 
 		if (SUCCEED != proxyconfig_update_rows(hostmacro, error))
-			return FAIL;
+			goto out;
 	}
 
-	zbx_db_sync_stop();
+	ret = SUCCEED;
 
+out:
+	zbx_db_sync_unlock();
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************

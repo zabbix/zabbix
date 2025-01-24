@@ -63,7 +63,15 @@ static zbx_mutex_t	idcache_mutex = ZBX_MUTEX_NULL;
 zbx_shmem_info_t	*idcache_mem;
 static zbx_db_idcache_t	*idcache = NULL;
 
+static zbx_mutex_t	sync_status_mutex = ZBX_MUTEX_NULL;
 zbx_shmem_info_t	*sync_status_mem;
+
+typedef enum
+{
+	ZBX_DB_SYNC_STATUS_UNLOCKED,
+	ZBX_DB_SYNC_STATUS_LOCKED
+}
+zbx_db_sync_status_t;
 static zbx_uint32_t	*sync_status = NULL;
 
 int	zbx_db_init(char **error)
@@ -81,12 +89,6 @@ int	zbx_db_init(char **error)
 
 	idcache = idcache_mem->base;
 	memset(idcache, 0, sizeof(zbx_db_idcache_t));
-
-	if (SUCCEED != zbx_shmem_create_min(&sync_status_mem, sizeof(zbx_uint32_t), "sync status", NULL, 0, error))
-		return FAIL;
-
-	sync_status = (zbx_uint32_t*)sync_status_mem->base;
-	*sync_status = 0;
 
 	return SUCCEED;
 }
@@ -1386,7 +1388,44 @@ const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: locks proxy database sync                                                *
+ * Purpose: initialize proxy database sync                                    *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     error      - [OUT] dynamically allocated memory with error message     *
+ *                                                                            *
+ * Return value: SUCCEED - successfully locked                                *
+ *               FAIL    - already locked                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_sync_locker_init(char **error)
+{
+	if (SUCCEED != zbx_mutex_create(&sync_status_mutex, ZBX_MUTEX_PROXY_CONFIG_SYNC, error))
+		return FAIL;
+
+	if (SUCCEED != zbx_shmem_create_min(&sync_status_mem, sizeof(zbx_uint32_t), "sync status", NULL, 0, error))
+		return FAIL;
+
+	sync_status = (zbx_uint32_t*)sync_status_mem->base;
+	*sync_status = 0;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: clean up proxy database sync variables                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_sync_locker_deinit(void)
+{
+	zbx_mutex_destroy(&sync_status_mutex);
+	zbx_shmem_destroy(sync_status_mem);
+	sync_status = NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: locks proxy database sync                                         *
  *                                                                            *
  * Return value: SUCCEED - successfully locked                                *
  *               FAIL    - already locked                                     *
@@ -1394,20 +1433,27 @@ const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
  ******************************************************************************/
 int	zbx_db_sync_lock()
 {
-	if (sync_status == NULL || 0 != *sync_status)
-		return FAIL;
+	int		ret = FAIL;
 
-	*sync_status = 1;
+	zbx_mutex_lock(sync_status_mutex);
+	if (sync_status == NULL || ZBX_DB_SYNC_STATUS_UNLOCKED != *sync_status)
+		goto out;
 
-	return SUCCEED;
+	*sync_status = ZBX_DB_SYNC_STATUS_LOCKED;
+	ret = SUCCEED;
+out:
+	zbx_mutex_unlock(sync_status_mutex);
+	return ret;
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: unlocks proxy database sync                                                *
+ * Purpose: unlocks proxy database sync                                       *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_sync_unlock(void)
 {
-	*sync_status = 0;
+	zbx_mutex_lock(sync_status_mutex);
+	*sync_status = ZBX_DB_SYNC_STATUS_UNLOCKED;
+	zbx_mutex_unlock(sync_status_mutex);
 }
