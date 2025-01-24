@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,9 @@ class testAuditlogHousekeeping extends testAuditlogCommon {
 			'hk_history' => '69d',
 			'hk_trends_mode' => 1,
 			'hk_trends_global' => 1,
-			'hk_trends' => '200d'
+			'hk_trends' => '200d',
+			'compression_status' => 1,
+			'compress_older' => 788400000
 		]);
 
 		$updated = json_encode([
@@ -60,7 +62,9 @@ class testAuditlogHousekeeping extends testAuditlogCommon {
 			'housekeeping.hk_history_global' => ['update', '1', '0'],
 			'housekeeping.hk_history' => ['update', '69d', '90d'],
 			'housekeeping.hk_trends_global' => ['update', '1', '0'],
-			'housekeeping.hk_trends' => ['update', '200d', '365d']
+			'housekeeping.hk_trends' => ['update', '200d', '365d'],
+			'housekeeping.compression_status' => ['update', '1', '0'],
+			'housekeeping.compress_older' => ['update', '788400000', '7d']
 		]);
 
 		$this->getAuditDetails('details', $this->update_actionid, $updated, 1);
