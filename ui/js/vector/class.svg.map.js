@@ -983,7 +983,7 @@ SVGMapElement.prototype.onMouseOver = function(e, is_selectable, label_auto_hide
 /**
  * Element mouse out event.
  */
-SVGMapElement.prototype.onMouseOut = function(e, is_selectable, has_auto_hide) {
+SVGMapElement.prototype.onMouseOut = function(e, is_selectable, label_auto_hide) {
 	if (is_selectable) {
 		if (e.target.classList.contains('selected')) {
 			return;
@@ -992,7 +992,7 @@ SVGMapElement.prototype.onMouseOut = function(e, is_selectable, has_auto_hide) {
 		this.selection.element.classList.add('display-none');
 	}
 
-	if (has_auto_hide) {
+	if (label_auto_hide) {
 		this.toggleLabel(false);
 	}
 };
