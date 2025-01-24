@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-11-21 10:54+0000\n"
+"PO-Revision-Date: 2025-01-23 21:08+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -2942,12 +2942,12 @@ msgstr[1] "No es poden pas esborrar els grups d'usuaris"
 #: include/classes/api/services/CUserGroup.php:1330
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
-msgstr ""
+msgstr "No es pot esborrar el grup d'usuaris \"%1$s\", perquè l'empra el directori d'usuaris LDAP \"%2$s\"."
 
 #: include/classes/api/services/CUserGroup.php:1325
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
-msgstr ""
+msgstr "No es pot esborrar el grup d'usuaris \"%1$s\", perquè l'empra el directori d'usuaris de SAML."
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
@@ -7260,7 +7260,7 @@ msgstr "Mostra l'hora local"
 
 #: widgets/itemhistory/views/column.edit.php:240
 msgid "Display log time"
-msgstr ""
+msgstr "Veure l'hora del registre"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -9432,7 +9432,7 @@ msgstr "Històric de funcions"
 
 #: app/views/administration.housekeeping.edit.php:218
 msgid "History, trends and audit log compression"
-msgstr ""
+msgstr "Història, tendències i compressió del registre d'auditoria"
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -20603,7 +20603,7 @@ msgstr "Aquesta configuració ensenya l'hora local en lloc de la marca de temps.
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
-msgstr ""
+msgstr "Aquesta configuració ensenya l'hora del registre en lloc de la marca de temps de l'element. També s'ha de marcar \"Veure marca de temps\" a la configuració avançada."
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -22826,7 +22826,7 @@ msgstr "Estat d'energia de la màquina virtual de VMware, \"url\" - URL del serv
 
 #: include/classes/data/CItemData.php:2498
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Mida de memòria privada de la màquina virtual de VMware, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de la màquina virtual de VMware"
 
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
