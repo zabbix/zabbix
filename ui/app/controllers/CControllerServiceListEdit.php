@@ -119,7 +119,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			->removeArgument('filter_without_problem_tags')
 			->removeArgument('filter_tag_source');
 
-		$back_curl = (clone $paging_curl)
+		$return_curl = (clone $paging_curl)
 			->setArgument('action', 'service.list.edit')
 			->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null);
 
@@ -137,7 +137,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			'active_tab' => CProfile::get('web.service.filter.active', 1),
 			'reset_curl' => $reset_curl,
 			'view_mode_url' => $view_mode_curl->getUrl(),
-			'back_url' => $back_curl->getUrl(),
+			'return_url' => $return_curl->getUrl(),
 			'refresh_url' => $refresh_curl->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE),

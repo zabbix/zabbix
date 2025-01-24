@@ -268,12 +268,16 @@ function makeValueCell(array $column, array $item_value, bool $text_wordbreak = 
 
 			$cell = new CCol();
 
+			$formatted_value = zbx_nl2br($item_value['value']);
+
 			switch ($column['display']) {
 				case CWidgetFieldColumnsList::DISPLAY_AS_IS:
 					$cell
 						->addItem(
-							(new CSpan(zbx_nl2br($item_value['value'])))->setHint(
-								(new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
+							(new CPre($formatted_value))->setHint(
+								(new CDiv($formatted_value))
+									->addClass(ZBX_STYLE_HINTBOX_RAW_DATA)
+									->addClass(ZBX_STYLE_HINTBOX_WRAP)
 							)
 						)
 						->addClass($text_wordbreak ? ZBX_STYLE_WORDBREAK : ZBX_STYLE_NOWRAP);
@@ -289,7 +293,9 @@ function makeValueCell(array $column, array $item_value, bool $text_wordbreak = 
 					$cell
 						->addItem(
 							(new CSpan($single_line_value))->setHint(
-								(new CDiv($item_value['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP)
+								(new CDiv($formatted_value))
+									->addClass(ZBX_STYLE_HINTBOX_RAW_DATA)
+									->addClass(ZBX_STYLE_HINTBOX_WRAP)
 							)
 						)
 						->addClass(ZBX_STYLE_NOWRAP);

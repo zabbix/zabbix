@@ -298,11 +298,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			->setArgument('templateid', $db_host['templateid'])
 			->getUrl();
 
-		$template = new CSpan(
-			(new CLink($db_host['name'], $template_url))
-				->setAttribute('data-templateid', $db_host['templateid'])
-				->setAttribute('data-action', 'template.edit')
-		);
+		$template = new CSpan((new CLink($db_host['name'], $template_url)));
 
 		if ($current_element === '') {
 			$template->addClass(ZBX_STYLE_SELECTED);
@@ -339,11 +335,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			->setArgument('hostid', $db_host['hostid'])
 			->getUrl();
 
-		$host = new CSpan(
-			(new CLink($db_host['name'], $host_url))
-				->setAttribute('data-hostid', $db_host['hostid'])
-				->setAttribute('data-action', 'host.edit')
-		);
+		$host = new CSpan((new CLink($db_host['name'], $host_url)));
 
 		if ($current_element === '') {
 			$host->addClass(ZBX_STYLE_SELECTED);

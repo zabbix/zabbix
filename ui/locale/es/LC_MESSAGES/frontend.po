@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-11-15 21:39+0000\n"
+"PO-Revision-Date: 2024-12-16 19:22+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -696,7 +696,7 @@ msgstr[1] "Acciones deshabilitadas"
 
 #: app/controllers/CControllerPopup.php:42
 msgid "Action edit"
-msgstr ""
+msgstr "Editar acción"
 
 #: app/controllers/CControllerActionEnable.php:84
 msgid "Action enabled"
@@ -1292,7 +1292,7 @@ msgstr "Todo"
 #: app/views/mediatype.list.php:79 app/views/mediatype.list.php:81
 #: app/views/mediatype.list.php:90 app/views/popup.operation.edit.php:160
 msgid "All available"
-msgstr ""
+msgstr "Todo lo disponible"
 
 #: app/views/monitoring.dashboard.view.php:189
 msgid "All dashboards"
@@ -2939,6 +2939,16 @@ msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
 msgstr[0] "No es posible eliminar el grupo de usuarios"
 msgstr[1] "No se pueden eliminar los grupos de usuarios"
+
+#: include/classes/api/services/CUserGroup.php:1330
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CUserGroup.php:1325
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
+msgstr ""
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
@@ -5084,7 +5094,7 @@ msgstr[1] "Conectores deshabilitados"
 
 #: app/controllers/CControllerPopup.php:43
 msgid "Connector edit"
-msgstr ""
+msgstr "Editar conector"
 
 #: app/controllers/CControllerConnectorEnable.php:69
 msgid "Connector enabled"
@@ -5246,7 +5256,7 @@ msgstr "Copiar al portapapeles"
 
 #: app/controllers/CControllerPopup.php:44
 msgid "Correlation edit"
-msgstr ""
+msgstr "Editar correlación"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:52
 #: app/controllers/CControllerPopupTriggerExpr.php:693
@@ -7186,7 +7196,7 @@ msgstr[1] "Reglas de descubrimiento desactivadas"
 
 #: app/controllers/CControllerPopup.php:45
 msgid "Discovery rule edit"
-msgstr ""
+msgstr "Editar regla de descubrimiento"
 
 #: app/controllers/CControllerDiscoveryEnable.php:68 host_discovery.php:580
 msgid "Discovery rule enabled"
@@ -7235,7 +7245,7 @@ msgstr "Mostrar iniciadores OK durante"
 
 #: app/views/mediatype.list.php:75
 msgid "Display actions"
-msgstr ""
+msgstr "Mostrar acciones"
 
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
@@ -7248,6 +7258,10 @@ msgstr "Mostrar el valor de la métrica como"
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
 msgstr "Mostrar hora local"
+
+#: widgets/itemhistory/views/column.edit.php:240
+msgid "Display log time"
+msgstr ""
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -7267,7 +7281,7 @@ msgstr "Mostrar gráfico apilado"
 
 #: widgets/topitems/views/column.edit.php:90
 msgid "Display value as"
-msgstr ""
+msgstr "Mostrar valor como"
 
 #: app/controllers/CControllerHintboxActionlist.php:99
 #: app/views/administration.queue.details.php:86
@@ -8576,7 +8590,7 @@ msgstr "Filtro"
 
 #: app/views/mediatype.list.php:76
 msgid "Filter actions by the scope of media type usage:"
-msgstr ""
+msgstr "Filtrar acciones según el alcance del uso del tipo de medio:"
 
 #: app/views/js/popup.tabfilter.edit.js.php:63
 msgid "Filter deleted"
@@ -9417,6 +9431,10 @@ msgstr "Selección de datos históricos"
 msgid "History functions"
 msgstr "Funciones de historia"
 
+#: app/views/administration.housekeeping.edit.php:218
+msgid "History, trends and audit log compression"
+msgstr ""
+
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
 msgstr "Inicio"
@@ -9564,7 +9582,7 @@ msgstr[1] "Equipos deshabilitados"
 
 #: app/controllers/CControllerPopup.php:46
 msgid "Host edit"
-msgstr ""
+msgstr "Editar equipo"
 
 #: app/controllers/CControllerHostGroupEnable.php:76
 #: app/controllers/CControllerPopupMassupdateHost.php:491
@@ -9627,7 +9645,7 @@ msgstr[1] "Grupos de equipos eliminados"
 
 #: app/controllers/CControllerPopup.php:47
 msgid "Host group edit"
-msgstr ""
+msgstr "Editar grupo de equipos"
 
 #: include/views/js/monitoring.sysmaps.js.php:112
 msgid "Host group elements"
@@ -9765,7 +9783,7 @@ msgstr "Redes del equipo"
 #: widgets/topitems/includes/WidgetForm.php:128
 #: widgets/topitems/views/widget.edit.php:63
 msgid "Host ordering"
-msgstr ""
+msgstr "Ordenación de equipos"
 
 #: widgets/hostnavigator/includes/WidgetForm.php:65
 msgid "Host patterns"
@@ -11937,7 +11955,7 @@ msgstr[1] "Métricas desactivadas"
 
 #: app/controllers/CControllerPopup.php:48
 msgid "Item edit"
-msgstr ""
+msgstr "Editar métrica"
 
 #: items.php:707
 msgid "Item enabled"
@@ -11978,7 +11996,7 @@ msgstr "Métrica no seleccionada"
 #: widgets/topitems/includes/WidgetForm.php:157
 #: widgets/topitems/views/widget.edit.php:81
 msgid "Item ordering"
-msgstr ""
+msgstr "Ordenación de métricas"
 
 #: widgets/piechart/views/widget.edit.js.php:203
 #: widgets/svggraph/views/widget.edit.js.php:281
@@ -12014,7 +12032,7 @@ msgstr[1] "Prototipos de métrica eliminados"
 
 #: app/controllers/CControllerPopup.php:49
 msgid "Item prototype edit"
-msgstr ""
+msgstr "Editar prototipo de métrica"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:286
 #: disc_prototypes.php:457 disc_prototypes.php:483 disc_prototypes.php:522
@@ -12534,11 +12552,11 @@ msgstr "Licenciado bajo"
 #: widgets/topitems/includes/WidgetForm.php:125
 #: widgets/topitems/includes/WidgetForm.php:154
 msgid "Limit"
-msgstr ""
+msgstr "Límite"
 
 #: widgets/topitems/views/widget.edit.php:95
 msgid "Limit applies to each \"Item pattern\" separately"
-msgstr ""
+msgstr "El límite se aplica a cada \"Patrón de métrica\" por separado"
 
 #: app/views/administration.gui.edit.php:93
 msgid "Limit for search and filter results"
@@ -12947,7 +12965,7 @@ msgstr "El mantenimiento \"%1$s\" ya existe."
 
 #: app/controllers/CControllerPopup.php:50
 msgid "Maintenance edit"
-msgstr ""
+msgstr "Editar mantenimiento"
 
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:238
@@ -13378,7 +13396,7 @@ msgstr "El tipo de medio \"%1$s\" ya existe."
 #: include/classes/api/services/CMediatype.php:878
 #, c-format
 msgid "Media type \"%1$s\" is used by action \"%2$s\"."
-msgstr ""
+msgstr "El tipo de medio \"%1$s\" es utilizado por la acción \"%2$s\"."
 
 #: app/controllers/CControllerMediatypeCreate.php:187
 msgid "Media type added"
@@ -13402,7 +13420,7 @@ msgstr "Tipo de medio desactivado por el administrador."
 
 #: app/controllers/CControllerPopup.php:51
 msgid "Media type edit"
-msgstr ""
+msgstr "Editar tipo de medio"
 
 #: app/controllers/CControllerMediatypeEnable.php:87
 #: app/controllers/CControllerMediatypeEnable.php:94
@@ -13752,7 +13770,7 @@ msgstr[1] "Módulos desactivados"
 
 #: app/controllers/CControllerPopup.php:52
 msgid "Module edit"
-msgstr ""
+msgstr "Editar módulo"
 
 #: app/controllers/CControllerModuleEnable.php:91
 msgid "Module enabled"
@@ -16136,7 +16154,7 @@ msgstr "Patrón"
 
 #: widgets/topitems/includes/CWidgetFieldColumnsListView.php:58
 msgid "Patterns"
-msgstr ""
+msgstr "Patrones"
 
 #: app/views/popup.action.edit.php:238
 msgid "Pause operations for suppressed problems"
@@ -16799,7 +16817,7 @@ msgstr[1] "Proxies borrados"
 
 #: app/controllers/CControllerPopup.php:53
 msgid "Proxy edit"
-msgstr ""
+msgstr "Editar proxy"
 
 #: app/controllers/CControllerAuditLogList.php:239
 #: app/partials/configuration.host.edit.html.php:266
@@ -16837,7 +16855,7 @@ msgstr[1] "Grupos de proxies eliminados"
 
 #: app/controllers/CControllerPopup.php:54
 msgid "Proxy group edit"
-msgstr ""
+msgstr "Editar grupo de proxy"
 
 #: app/controllers/CControllerProxyGroupUpdate.php:74
 msgid "Proxy group updated"
@@ -17949,7 +17967,7 @@ msgstr[1] "SLAs desactivados"
 
 #: app/controllers/CControllerPopup.php:58
 msgid "SLA edit"
-msgstr ""
+msgstr "Editar SLA"
 
 #: app/controllers/CControllerSlaEnable.php:73
 msgid "SLA enabled"
@@ -18392,7 +18410,7 @@ msgstr "El comando no tiene parámetros."
 
 #: app/controllers/CControllerPopup.php:56
 msgid "Script edit"
-msgstr ""
+msgstr "Editar script"
 
 #: app/views/administration.timeouts.edit.php:168
 msgid "Script execution"
@@ -18608,7 +18626,7 @@ msgstr "Enviar al fondo"
 
 #: app/views/popup.operation.edit.php:189
 msgid "Send to media type"
-msgstr ""
+msgstr "Enviar a tipo de medio"
 
 #: app/views/popup.operation.edit.php:108
 msgid "Send to user groups"
@@ -18729,7 +18747,7 @@ msgstr[1] "Servicios eliminados"
 
 #: app/controllers/CControllerPopup.php:57
 msgid "Service edit"
-msgstr ""
+msgstr "Editar servicio"
 
 #: app/views/administration.userrole.edit.php:166
 #: app/views/administration.userrole.edit.php:207
@@ -19377,7 +19395,7 @@ msgstr "Minigráfico"
 
 #: app/views/mediatype.list.php:83 app/views/mediatype.list.php:91
 msgid "Specific"
-msgstr ""
+msgstr "Específico"
 
 #: include/classes/helpers/CRoleHelper.php:199
 msgid "Specified role was not found."
@@ -20128,7 +20146,7 @@ msgstr[1] "Plantillas borradas"
 
 #: app/controllers/CControllerPopup.php:59
 msgid "Template edit"
-msgstr ""
+msgstr "Editar plantilla"
 
 #: app/controllers/CControllerAuditLogList.php:259
 #: app/partials/configuration.templategroup.edit.html.php:52
@@ -20155,7 +20173,7 @@ msgstr[1] "Grupos de plantillas eliminados"
 
 #: app/controllers/CControllerPopup.php:55
 msgid "Template group edit"
-msgstr ""
+msgstr "Editar grupo de plantillas"
 
 #: app/controllers/CControllerTemplateGroupUpdate.php:86
 msgid "Template group updated"
@@ -20584,6 +20602,10 @@ msgstr "Esta configuración debe estar habilitada porque las tablas de tendencia
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
 msgstr "Esta configuración mostrará la hora local en lugar de la marca de tiempo. También se debe marcar \"Mostrar marca de tiempo\" en la configuración avanzada."
 
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
 msgid "This type of information may not match the key."
@@ -20826,7 +20848,7 @@ msgstr "Hoy hasta ahora"
 
 #: app/controllers/CControllerPopup.php:60
 msgid "Token edit"
-msgstr ""
+msgstr "Editar token"
 
 #: include/views/js/monitoring.sysmaps.js.php:40
 #: include/views/js/monitoring.sysmaps.js.php:159
@@ -20859,7 +20881,7 @@ msgstr "Equipos principales"
 
 #: widgets/topitems/Widget.php:32
 msgid "Top items"
-msgstr ""
+msgstr "Métricas destacadas"
 
 #: widgets/toptriggers/Widget.php:29
 msgid "Top triggers"
@@ -21091,7 +21113,7 @@ msgstr "Opciones de visualización de iniciadores"
 
 #: app/controllers/CControllerPopup.php:61
 msgid "Trigger edit"
-msgstr ""
+msgstr "Editar iniciador"
 
 #: app/controllers/CControllerTriggerEnable.php:67
 msgid "Trigger enabled"
@@ -21234,7 +21256,7 @@ msgstr[1] "Prototipos de iniciador eliminados"
 
 #: app/controllers/CControllerPopup.php:62
 msgid "Trigger prototype edit"
-msgstr ""
+msgstr "Editar prototipo de iniciador"
 
 #: app/controllers/CControllerTriggerMassupdate.php:219
 #: app/controllers/CControllerTriggerPrototypeDisable.php:76
@@ -22802,6 +22824,10 @@ msgstr "Contador de rendimiento de la máquina virtual de VMware, \"url\": URL d
 #: include/classes/data/CItemData.php:2443
 msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "Estado de energía de la máquina virtual VMware, \"url\": URL del servicio VMware, \"uuid\": identificador único global de la máquina virtual VMware"
+
+#: include/classes/data/CItemData.php:2498
+msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
@@ -24706,15 +24732,15 @@ msgstr "la regla de descubrimiento \"%1$s\" en el equipo \"%2$s\" no está monit
 
 #: app/views/mediatype.list.php:78
 msgid "display all actions"
-msgstr ""
+msgstr "mostrar todas las acciones"
 
 #: app/views/mediatype.list.php:80
 msgid "display only actions where All available media types are used in action operation"
-msgstr ""
+msgstr "mostrar solo las acciones donde se utilizan todos los tipos de medios disponibles en la operación de la acción"
 
 #: app/views/mediatype.list.php:84
 msgid "display only actions where specific media type is used in action operation"
-msgstr ""
+msgstr "mostrar solo las acciones donde se utiliza un tipo de medio específico en la operación de la acción"
 
 #: app/views/popup.lldoperation.php:65 include/actions.inc.php:27
 #: include/classes/helpers/CCorrelationHelper.php:37

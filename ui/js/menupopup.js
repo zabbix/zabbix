@@ -226,15 +226,7 @@ function getMenuPopupHost(options, trigger_element) {
 			configuration.push({
 				label: t('Host'),
 				disabled: !options.isWriteable,
-				url: url.getUrl(),
-				clickCallback: function(e) {
-					e.preventDefault();
-					jQuery(this).closest('.menu-popup').menuPopup('close', null);
-				},
-				dataAttributes: {
-					action: 'host.edit',
-					hostid: options.hostid
-				}
+				url: url.getUrl()
 			});
 
 			// items
@@ -523,12 +515,7 @@ function getMenuPopupMapElementTrigger(options) {
 
 			trigger_urls.push({
 				label: value.description,
-				url: url.getUrl(),
-				dataAttributes: {
-					action: 'trigger.edit',
-					triggerid: value.triggerid,
-					context: 'host'
-				}
+				url: url.getUrl()
 			})
 		}
 
@@ -554,12 +541,7 @@ function getMenuPopupMapElementTrigger(options) {
 
 					item_urls.push({
 						label: item.name,
-						url: url.getUrl(),
-						dataAttributes: {
-							action: 'item.edit',
-							itemid: item.params.itemid,
-							context: 'host'
-						}
+						url: url.getUrl()
 					});
 				}
 			}
@@ -811,14 +793,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 			label: t('Actions'),
 			items: [{
 				label: t('Update problem'),
-				clickCallback: function() {
-					jQuery(this).closest('.menu-popup-top').menuPopup('close', null);
-				},
-				url: url.getUrl(),
-				dataAttributes: {
-					action: 'acknowledge.edit',
-					eventid: options.eventid
-				}
+				url: url.getUrl()
 			}]
 		});
 	}
@@ -836,12 +811,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 
 		config_urls.push({
 			label: t('Trigger'),
-			url: url.getUrl(),
-			dataAttributes: {
-				action: 'trigger.edit',
-				triggerid: options.triggerid,
-				context: 'host'
-			}
+			url: url.getUrl()
 		});
 
 		if (options.items.length) {
@@ -861,12 +831,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 
 					item_urls.push({
 						label: item.name,
-						url: url.getUrl(),
-						dataAttributes: {
-							action: 'item.edit',
-							itemid: item.params.itemid,
-							context: 'host'
-						}
+						url: url.getUrl()
 					});
 				}
 			}
@@ -1109,13 +1074,7 @@ function getMenuPopupItem(options) {
 
 			config_urls.push({
 				label: t('Item'),
-				url: url.getUrl(),
-				class: 'js-item-edit',
-				dataAttributes: {
-					action: 'item.edit',
-					context: options.context,
-					itemid: options.itemid
-				}
+				url: url.getUrl()
 			});
 		}
 
@@ -1128,11 +1087,7 @@ function getMenuPopupItem(options) {
 			config_urls.push({
 				label: t('Host'),
 				disabled: !options.isWriteable,
-				url: url.getUrl(),
-				dataAttributes: {
-					action: 'host.edit',
-					hostid: options.hostid,
-				}
+				url: url.getUrl()
 			});
 		}
 		else {
@@ -1143,11 +1098,7 @@ function getMenuPopupItem(options) {
 
 			config_urls.push({
 				label: t('Template'),
-				url: url.getUrl(),
-				dataAttributes: {
-					action: 'template.edit',
-					templateid: options.hostid,
-				}
+				url: url.getUrl()
 			});
 		}
 
@@ -1164,13 +1115,7 @@ function getMenuPopupItem(options) {
 
 				trigger_items.push({
 					label: value.description,
-					url: url.getUrl(),
-					dataAttributes: {
-						action: 'trigger.edit',
-						triggerid: value.triggerid,
-						hostid: options.hostid,
-						context: options.context
-					}
+					url: url.getUrl()
 				});
 			}
 
@@ -1182,10 +1127,8 @@ function getMenuPopupItem(options) {
 		config_urls.push({
 			label: t('Create trigger'),
 			disabled: options.binary_value_type,
-			clickCallback: function(e) {
-				jQuery(this).closest('.menu-popup').menuPopup('close', null);
-
-				window.popupManagerInstance.openPopup('trigger.edit', {
+			clickCallback: function() {
+				ZABBIX.PopupManager.open('trigger.edit', {
 					hostid: options.hostid,
 					name: options.name,
 					expression: 'func(/' + options.host + '/' + options.key + ')',
@@ -1204,7 +1147,7 @@ function getMenuPopupItem(options) {
 			config_urls.push({
 				label: t('Create dependent item'),
 				clickCallback: () => {
-					window.popupManagerInstance.openPopup('item.edit', {
+					ZABBIX.PopupManager.open('item.edit', {
 						context: options.context,
 						hostid: options.hostid,
 						master_itemid: options.itemid,
@@ -1294,13 +1237,7 @@ function getMenuPopupItemPrototype(options) {
 
 	config_urls.push({
 		label: t('Item prototype'),
-		url: url.getUrl(),
-		dataAttributes: {
-			action: 'item.prototype.edit',
-			context: options.context,
-			itemid: options.itemid,
-			parent_discoveryid: options.parent_discoveryid
-		}
+		url: url.getUrl()
 	});
 
 	if (options.trigger_prototypes.length) {
@@ -1315,13 +1252,7 @@ function getMenuPopupItemPrototype(options) {
 
 			trigger_prototypes.push({
 				label: value.description,
-				url: url.getUrl(),
-				dataAttributes: {
-					action: 'trigger.prototype.edit',
-					context: options.context,
-					triggerid: value.triggerid,
-					parent_discoveryid: options.parent_discoveryid
-				}
+				url: url.getUrl()
 			});
 		}
 
@@ -1334,11 +1265,8 @@ function getMenuPopupItemPrototype(options) {
 
 	config_urls.push({
 		label: t('Create trigger prototype'),
-		clickCallback: function(e) {
-			e.preventDefault();
-			jQuery(this).closest('.menu-popup').menuPopup('close', null);
-
-			window.popupManagerInstance.openPopup('trigger.prototype.edit', {
+		clickCallback: function() {
+			ZABBIX.PopupManager.open('trigger.prototype.edit', {
 				parent_discoveryid: options.parent_discoveryid,
 				name: options.name,
 				hostid: options.hostid,
@@ -1351,7 +1279,7 @@ function getMenuPopupItemPrototype(options) {
 	config_urls.push({
 		label: t('Create dependent item'),
 		clickCallback: () => {
-			window.popupManagerInstance.openPopup('item.prototype.edit', {
+			ZABBIX.PopupManager.open('item.prototype.edit', {
 				context: options.context,
 				master_itemid: options.itemid,
 				parent_discoveryid: options.parent_discoveryid,
@@ -1724,11 +1652,8 @@ function getMenuPopupDRule(options) {
 
 	config_urls.push({
 		label: t('Discovery rule'),
-		url: url.getUrl(),
-		dataAttributes: {
-			action: 'discovery.edit',
-			druleid: options.druleid
-		}
+		disabled: !options.allowed_ui_conf_drules,
+		url: url.getUrl()
 	});
 
 	sections.push({

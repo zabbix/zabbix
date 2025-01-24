@@ -1886,7 +1886,6 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bo
 
 				$name = (new CLink($template['name'], $trigger_url))
 					->addClass('js-related-trigger-edit')
-					->setAttribute('data-action', $prototype === '1' ? 'trigger.prototype.edit' : 'trigger.edit')
 					->setAttribute('data-triggerid', $parent_templates['links'][$triggerid]['triggerid'])
 					->setAttribute('data-context', 'template')
 					->setAttribute($attribute_name, $attribute_value);
