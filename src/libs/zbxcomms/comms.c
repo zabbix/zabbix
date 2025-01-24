@@ -2147,7 +2147,7 @@ ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, u
 					zbx_set_socket_strerror("cannot allocate memory: out of memory");
 					zabbix_log(LOG_LEVEL_WARNING, "Message size " ZBX_FS_UI64
 							" from %s exceeds the available memory size."
-							" Message ignored.", context->reserved, s->peer);
+							" Message ignored.", context->expected_len, s->peer);
 					nbytes = ZBX_PROTO_ERROR;
 					goto out;
 				}
