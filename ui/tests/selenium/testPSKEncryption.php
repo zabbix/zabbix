@@ -149,7 +149,7 @@ class testPSKEncryption extends CWebTest {
 	public static function getAutoregistrationData() {
 		return [
 			// Same identity as host, different PSK.
-			'Host identity, new PSK' => [
+			'Host idendity, new PSK' => [
 				[
 					'expected' => TEST_BAD,
 					'object' => 'configuration',
@@ -163,7 +163,7 @@ class testPSKEncryption extends CWebTest {
 				]
 			],
 			// Same identity as host, same PSK.
-			'Host identity, host PSK' => [
+			'Host idendity, host PSK' => [
 				[
 					'object' => 'configuration',
 					'url' => 'zabbix.php?action=autoreg.edit',
@@ -175,7 +175,7 @@ class testPSKEncryption extends CWebTest {
 				]
 			],
 			// Different identity as host, same PSK.
-			'New identity, host PSK' => [
+			'New idendity, host PSK' => [
 				[
 					'object' => 'configuration',
 					'url' => 'zabbix.php?action=autoreg.edit',
@@ -187,7 +187,7 @@ class testPSKEncryption extends CWebTest {
 				]
 			],
 			// Same identity as proxy, different PSK.
-			'Proxy identity, new PSK' => [
+			'Proxy idendity, new PSK' => [
 				[
 					'expected' => TEST_BAD,
 					'object' => 'configuration',
@@ -201,7 +201,7 @@ class testPSKEncryption extends CWebTest {
 				]
 			],
 			// Same identity as proxy, same PSK.
-			'Proxy identity, proxy PSK' => [
+			'Proxy idendity, proxy PSK' => [
 				[
 					'object' => 'configuration',
 					'url' => 'zabbix.php?action=autoreg.edit',
@@ -213,7 +213,7 @@ class testPSKEncryption extends CWebTest {
 				]
 			],
 			// New proxy identity, same PSK.
-			'New identity, proxy PSK' => [
+			'New idendity, proxy PSK' => [
 				[
 					'object' => 'configuration',
 					'url' => 'zabbix.php?action=autoreg.edit',
@@ -225,7 +225,7 @@ class testPSKEncryption extends CWebTest {
 				]
 			],
 			// Unique identity and PSK.
-			'New identity, new PSK' => [
+			'New idendity, new PSK' => [
 				[
 					'object' => 'configuration',
 					'url' => 'zabbix.php?action=autoreg.edit',
@@ -240,7 +240,7 @@ class testPSKEncryption extends CWebTest {
 	}
 
 	/**
-	 * Test for creating new Autoregistration PSK config. Configuration resets after every data case.
+	 * Test for creating new Autoregistration PSK confing. Configuration resets after every data case.
 	 *
 	 * @dataProvider getAutoregistrationData
 	 *
@@ -501,7 +501,7 @@ class testPSKEncryption extends CWebTest {
 					]
 				]
 			],
-			'Proxy: identity as on host but different PSK' => [
+			'Proxy: dentity as on host but different PSK' => [
 				[
 					'expected' => TEST_BAD,
 					'object' => 'proxy',
