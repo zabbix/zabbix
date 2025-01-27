@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,12 @@ func init() {
 	}
 }
 
-func (p *Plugin) getCpuLoad(params []string) (result interface{}, err error) {
+// Period returns 1, for a required interface call for interface Collector.
+func (*Plugin) Period() int {
+	return 1
+}
+
+func (*Plugin) getCPULoad(_ []string) (any, error) {
 	return nil, plugin.UnsupportedMetricError
 }
 
@@ -143,6 +148,10 @@ func (p *Plugin) addCpu(index int) {
 			p.cpus = append(p.cpus, &cpuUnit{index: idx + 1, status: cpuStatusOffline})
 		}
 	}
+}
+
+func (*Plugin) getCounterAverage(cpu *cpuUnit, counter cpuCounter, period historyIndex) any {
+	return cpu.counterAverage(counter, period, 1)
 }
 
 func numCPUConf() int {
