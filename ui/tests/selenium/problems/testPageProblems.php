@@ -166,8 +166,8 @@ class testPageProblems extends CWebTest {
 				[self::$time - 2, self::$time - 1, self::$time]
 			],
 			'Host for Problems Page:trapXSS' => [['<script>alert("TEST");</script>'], self::$time],
-			'Host for Problems Page:trapSQL' => [['105\'; --DROP TABLE Users'],       self::$time],
-			'Host for Problems Page:trap2'   => [['"],*,a[x=": "],*,a[x="/\|\'/æ㓴♥"'],      self::$time]
+			'Host for Problems Page:trapSQL' => [['105\'; --DROP TABLE Users'], self::$time],
+			'Host for Problems Page:trap2'   => [['"],*,a[x=": "],*,a[x="/\|\'/æ㓴♥"'], self::$time]
 		];
 		foreach ($items_data as $item_name => $values) {
 			CDataHelper::addItemData($result['itemids'][$item_name], $values[0], $values[1]);
