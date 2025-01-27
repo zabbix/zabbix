@@ -285,8 +285,8 @@ zabbix_export:
             			return;
             		}
             
-            		buffer[request['usage']] = disks.map(function (drive) {
-            			return dell.extractData(dell.executeRequest(drive['@odata.id']), keys);
+            		disks.forEach(function (drive) {
+            			buffer[request['usage']].push(dell.extractData(dell.executeRequest(drive['@odata.id']), keys));
             		});
             	});
             });
