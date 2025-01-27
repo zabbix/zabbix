@@ -927,6 +927,7 @@ class testFormTags extends CWebTest {
 
 		// Navigate to host or template for cloning.
 		$this->query('link', ($parent === 'Host') ? $this->host : $this->template)->waitUntilClickable()->one()->click();
+
 		$host_modal = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		$host_modal->asForm()->fill([$parent.' name' => $new_name]);
