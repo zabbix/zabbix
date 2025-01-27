@@ -42,7 +42,7 @@ type Exchanger interface {
 	Close()
 }
 
-func (c *Client) Request() (cmmand string) {
+func (c *Client) Request() (command string) {
 	return c.request
 }
 

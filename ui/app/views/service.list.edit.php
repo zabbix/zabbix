@@ -20,9 +20,6 @@
  */
 
 $this->addJsFile('layout.mode.js');
-$this->addJsFile('class.tagfilteritem.js');
-$this->addJsFile('class.calendar.js');
-$this->addJsFile('class.form.fieldset.collapsible.js');
 
 $this->includeJsFile('service.list.js.php');
 
@@ -123,14 +120,7 @@ $filter->addFilterTab(_('Filter'), [
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())
-				->addItem(
-					(new CSimpleButton(_('Create service')))
-						->addClass('js-create-service')
-						->setAttribute('data-serviceid', $data['service'] !== null
-							? $data['service']['serviceid']
-							: null
-						)
-				)
+				->addItem((new CSimpleButton(_('Create service')))->addClass('js-create-service'))
 				->addItem(
 					(new CRadioButtonList('list_mode', ZBX_LIST_MODE_EDIT))
 						->addValue(_('View'), ZBX_LIST_MODE_VIEW)
@@ -146,7 +136,7 @@ $filter->addFilterTab(_('Filter'), [
 	->addItem($filter)
 	->addItem(new CPartial('service.list.edit', array_intersect_key($data, array_flip([
 		'can_monitor_problems', 'path', 'is_filtered', 'max_in_table', 'service', 'services', 'events', 'tags',
-		'paging', 'back_url'
+		'paging', 'return_url'
 	]))))
 	->show();
 
@@ -159,7 +149,7 @@ $filter->addFilterTab(_('Filter'), [
 		'parent_url' => $data['parent_url'],
 		'refresh_url' => $data['refresh_url'],
 		'refresh_interval' => $data['refresh_interval'],
-		'back_url' => $data['back_url']
+		'return_url' => $data['return_url']
 	]).');
 '))
 	->setOnDocumentReady()
