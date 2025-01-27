@@ -166,10 +166,7 @@ else {
 					->setArgument('templateid', $macro['template']['templateid'])
 					->getUrl();
 
-				$link = (new CLink($macro['template']['name'], $template_url))
-					->setAttribute('data-templateid', $macro['template']['templateid'])
-					->setAttribute('data-action', 'template.edit')
-					->addClass('js-edit-template');
+				$link = new CLink($macro['template']['name'], $template_url);
 			}
 			else {
 				$link = new CSpan($macro['template']['name']);

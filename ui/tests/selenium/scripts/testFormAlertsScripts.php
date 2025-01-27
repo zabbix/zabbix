@@ -2178,7 +2178,8 @@ class testFormAlertsScripts extends CWebTest {
 		}
 
 		if ($id) {
-			$this->query('xpath://a[@data-scriptid='.CXPathHelper::escapeQuotes($id).']')->waitUntilClickable()->one()->click();
+			$this->query('xpath://a[@href="zabbix.php?action=popup&popup=script.edit&scriptid='.$id.'"]')
+					->waitUntilClickable()->one()->click();
 		}
 		else {
 			$this->query('button:Create script')->waitUntilClickable()->one()->click();

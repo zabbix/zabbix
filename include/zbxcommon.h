@@ -95,6 +95,7 @@ const char	*zbx_result_string(int result);
 
 #define ZBX_MAX_UINT64		(~__UINT64_C(0))
 #define ZBX_MAX_UINT64_LEN	21
+#define ZBX_MAX_UINT32_LEN	11
 #define ZBX_MAX_DOUBLE_LEN	24
 
 #define ZBX_SIZE_T_MAX	(~(size_t)0)
@@ -589,7 +590,7 @@ int	zbx_vsnprintf_check_len(const char *fmt, va_list args);
 char	*zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
 
 /* used by zbxcommon, setproctitle */
-size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
+size_t	zbx_strlcpy(char *dst, const char *src, size_t size);
 
 /* used by dsprintf, which is used by log */
 char	*zbx_dvsprintf(char *dest, const char *f, va_list args);

@@ -72,6 +72,7 @@ $available_js = [
 	'component.z-select.js' => '',
 	'component.z-sparkline.js' => '',
 	'class.event-hub.js' => '',
+	'class.event-hub.event.js' => '',
 	'class.base-component.js' => '',
 	'class.calendar.js' => '',
 	'class.cdate.js' => '',
@@ -114,7 +115,8 @@ $available_js = [
 	'class.navigationtree.js' => '',
 	'init.js' => '',
 	'class.tab-indicators.js' => '',
-	'class.popupmanager.js' => '',
+	'class.popup-manager.js' => '',
+	'class.popup-manager.event.js' => '',
 	// templates
 	'sysmap.tpl.js' => 'templates/',
 	// page-specific scripts
@@ -482,8 +484,11 @@ if (empty($_GET['files'])) {
 		'component.z-select.js',
 		'component.z-sparkline.js',
 		'class.event-hub.js',
+		'class.event-hub.event.js',
 		'class.base-component.js',
+		'class.calendar.js',
 		'class.cdebug.js',
+		'class.form.fieldset.collapsible.js',
 		'class.overlaycollection.js',
 		'class.overlay.js',
 		'class.cdate.js',
@@ -504,15 +509,19 @@ if (empty($_GET['files'])) {
 		'menupopup.js',
 		'inputsecret.js',
 		'macrovalue.js',
+		'multilineinput.js',
 		'multiselect.js',
 		'class.cverticalaccordion.js',
 		'class.cviewswitcher.js',
 		'class.tab-indicators.js',
+		'class.tagfilteritem.js',
 		'hostinterfacemanager.js',
 		'hostmacrosmanager.js',
 		'textareaflexible.js',
-		'init.js',
-		'class.popupmanager.js'
+		'class.popup-manager.js',
+		'class.popup-manager.event.js',
+		'items.js',
+		'init.js'
 	];
 
 	if (CCookieHelper::has(ZBX_SESSION_NAME)) {

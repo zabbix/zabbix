@@ -16,6 +16,7 @@
 #define ZABBIX_MOCK_UTIL_H
 
 #include "zbxmockdata.h"
+#include "zbxalgo.h"
 
 const char	*zbx_mock_get_parameter_string(const char *path);
 const char	*zbx_mock_get_optional_parameter_string(const char *path);
@@ -27,6 +28,7 @@ zbx_mock_handle_t	zbx_mock_get_object_member_handle(zbx_mock_handle_t object, co
 zbx_uint64_t	zbx_mock_get_parameter_uint64(const char *path);
 int		zbx_mock_get_parameter_int(const char *path);
 zbx_uint64_t	zbx_mock_get_object_member_uint64(zbx_mock_handle_t object, const char *name);
+zbx_uint32_t	zbx_mock_get_parameter_uint32(const char *path);
 
 double	zbx_mock_get_parameter_float(const char *path);
 double	zbx_mock_get_object_member_float(zbx_mock_handle_t object, const char *name);
@@ -39,5 +41,8 @@ void	zbx_mock_str_to_token_type(const char *str, int *out);
 void	zbx_mock_str_to_token_search(const char *str, int *out);
 int	zbx_mock_str_to_item_type(const char *str);
 int	zbx_mock_str_to_family(const char *str);
+
+void	zbx_mock_extract_yaml_values_str(const char *path, zbx_vector_str_t *values);
+void	zbx_mock_extract_yaml_values_ptr (zbx_mock_handle_t hdata, zbx_vector_ptr_t *values);
 
 #endif

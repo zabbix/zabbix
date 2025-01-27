@@ -507,9 +507,8 @@ class CTrigger extends CTriggerGeneral {
 			}
 		}
 
-		// removing keys (hash -> array)
 		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
+			$result = array_values($result);
 		}
 
 		$result = $this->unsetExtraFields($result, ['state', 'expression'], $options['output']);

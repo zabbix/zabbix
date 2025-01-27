@@ -11,6 +11,7 @@ libzbxcacheconfig_a_SOURCES = \
 	dbsync.c \
 	dbsync.h \
 	inventory.c \
+	item.c \
 	lld_macro.c \
 	trigger.c \
 	user_macro.c \

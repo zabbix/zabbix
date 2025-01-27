@@ -136,8 +136,15 @@ src/libs/test_zbxcommon/test_libzbxcommon_bin
 src/go/bin/zabbix_web_service
 tests/libs/zbxalgo/evaluate
 tests/libs/zbxalgo/evaluate_unknown
-tests/libs/zbxalgo/list
 tests/libs/zbxalgo/queue
+tests/libs/zbxalgo/zbx_algo_common
+tests/libs/zbxalgo/zbx_binary_heap_direct
+tests/libs/zbxalgo/zbx_binary_heap
+tests/libs/zbxalgo/zbx_compare_tags_natural
+tests/libs/zbxalgo/zbx_list
+tests/libs/zbxalgo/zbx_mode_code
+tests/libs/zbxalgo/zbx_int128
+tests/libs/zbxalgo/zbx_vector
 tests/libs/zbxcfg/parse_cfg_file
 tests/libs/zbxcommon/init_library_common
 tests/libs/zbxcomms/zbx_tcp_check_allowed_peers

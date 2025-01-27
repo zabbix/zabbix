@@ -97,7 +97,7 @@ else {
 $item_select = (new CPatternSelect([
 	'name' => 'item',
 	'object_name' => 'items',
-	'data' => $data['item'] === '' ? '' : [$data['item']],
+	'data' => $data['item'] === '' ? [] : [$data['item']],
 	'multiple' => false,
 	'popup' => [
 		'parameters' => $parameters

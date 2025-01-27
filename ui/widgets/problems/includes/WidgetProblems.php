@@ -467,10 +467,7 @@ class WidgetProblems extends CTableInfo {
 			$problem_update_link = ($data['allowed']['add_comments'] || $data['allowed']['change_severity']
 					|| $data['allowed']['acknowledge'] || $can_be_closed || $data['allowed']['suppress_problems']
 					|| $data['allowed']['rank_change'])
-				? (new CLink(_('Update'), $problem_update_url))
-					->addClass(ZBX_STYLE_LINK_ALT)
-					->setAttribute('data-eventids[]', $problem['eventid'])
-					->setAttribute('data-action', 'acknowledge.edit')
+				? (new CLink(_('Update'), $problem_update_url))->addClass(ZBX_STYLE_LINK_ALT)
 				: new CSpan(_('Update'));
 
 			$row

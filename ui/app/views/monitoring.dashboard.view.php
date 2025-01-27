@@ -22,8 +22,6 @@
 $this->addJsFile('class.dashboard.js');
 $this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
-$this->addJsFile('class.form.fieldset.collapsible.js');
-$this->addJsFile('class.tagfilteritem.js');
 $this->addJsFile('class.widgets-data.js');
 $this->addJsFile('class.widget-base.js');
 $this->addJsFile('class.widget.js');
@@ -43,7 +41,6 @@ if (array_key_exists('error', $data)) {
 }
 
 $this->addJsFile('d3.js');
-$this->addJsFile('class.calendar.js');
 $this->addJsFile('class.cnavtree.js');
 $this->addJsFile('class.coverride.js');
 $this->addJsFile('class.crangecontrol.js');
@@ -53,12 +50,10 @@ $this->addJsFile('class.svg.map.js');
 $this->addJsFile('colorpicker.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
-$this->addJsFile('items.js');
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('leaflet.js');
 $this->addJsFile('leaflet.markercluster.js');
 $this->addJsFile('class.geomaps.js');
-$this->addJsFile('multilineinput.js');
 
 $this->includeJsFile('monitoring.dashboard.view.js.php');
 

@@ -188,9 +188,7 @@ foreach ($data['graphs'] as $graph) {
 				->setArgument($data['context'] === 'host' ? 'hostid' : 'templateid', $host['hostid'])
 				->getUrl();
 
-			$host_link = (new CLink($host['name'], $host_url))
-				->setAttribute($data['context'] === 'host' ? 'data-hostid' : 'data-templateid', $host['hostid'])
-				->setAttribute('data-action', $data['context'] === 'host' ? 'host.edit' : 'template.edit');
+			$host_link = new CLink($host['name'], $host_url);
 
 			if ($data['context'] ==='host') {
 				$hosts[] = in_array($host['hostid'], $data['editable_hosts']) ? $host_link : $host['name'];

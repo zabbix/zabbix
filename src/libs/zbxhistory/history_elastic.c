@@ -26,7 +26,6 @@
 #include "zbxjson.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
-#include "zbxtime.h"
 #include "zbxvariant.h"
 #include "zbxcurl.h"
 #include "zbxcacheconfig.h"
@@ -906,7 +905,7 @@ out:
  *              step            - [IN] period step                                  *
  *              clock_from      - [IN/OUT] period start timestamp                   *
  *              clock_to        - [IN] period end timestamp (including)             *
- *              clock_to_shift  - [OUT] next period end timestmap                   *
+ *              clock_to_shift  - [OUT] next period end timestamp                   *
  *                                                                                  *
  * Return value: period - current period                                            *
  *               FAIL - otherwise                                                   *

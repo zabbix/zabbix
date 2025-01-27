@@ -1,4 +1,3 @@
-<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2025 Zabbix SIA
 **
@@ -13,31 +12,17 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+package oracle
 
-/**
- * @var CView $this
- */
-?>
+import (
+	"fmt"
+	"os"
+)
 
-<script>
-	const view = new class {
-
-		init() {
-			this.#setSubmitCallback();
-		}
-
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				location.href = location.href;
-			}, {once: true});
-		}
-	};
-</script>
+func (pc *PluginOptions) setCustomQueriesPathDefault() {
+	if pc.CustomQueriesEnabled && pc.CustomQueriesPath == "" {
+		pc.CustomQueriesPath = fmt.Sprintf(
+			"%s\\Zabbix Agent 2\\Custom Queries\\Oracle", os.Getenv("ProgramFiles"),
+		)
+	}
+}

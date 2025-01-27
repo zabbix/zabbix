@@ -34,7 +34,6 @@
 #define ZBX_MACRO_TYPE_SCRIPT			0x00000400
 #define ZBX_MACRO_TYPE_SNMP_OID			0x00000800
 #define ZBX_MACRO_TYPE_LLD_FILTER		0x00002000
-#define ZBX_MACRO_TYPE_TRIGGER_TAG		0x00004000
 #define ZBX_MACRO_TYPE_JMX_ENDPOINT		0x00008000
 #define ZBX_MACRO_TYPE_MESSAGE_UPDATE		0x00010000
 #define ZBX_MACRO_TYPE_HTTP_RAW			0x00020000
@@ -181,4 +180,7 @@ void	zbx_count_dbl_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, cha
 		zbx_vector_dbl_t *values, int *count);
 
 const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
+
+int	zbx_get_history_log_value(const char *m, const zbx_db_trigger *trigger, char **replace_to, int N_functionid,
+		int clock, int ns, const char *tz);
 #endif
