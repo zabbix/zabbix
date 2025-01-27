@@ -140,20 +140,20 @@ zabbix_export:
             	}
             ];
             
-            if (Array.isArray(controllers)) {
-            	var buffer = { 'arrayControllers': [], 'batteryControllers': [] };
-            
-            	controllers.forEach(function (controller) {
-            		if (controller['Id'].search('RAID') > -1) {
-            			buffer['arrayControllers'].push(dell.extractData(controller, arrControllerKeys, true));
-            			buffer['batteryControllers'].push(dell.extractData(controller, battControllerKeys, true));
-            		}
-            	});
-            
-            	return JSON.stringify(buffer);
-            } else {
-            	throw 'Unexpected type for sensors.';
+            if (!Array.isArray(controllers)) {
+            	throw 'Unexpected type for controllers.';
             }
+            
+            var buffer = { 'arrayControllers': [], 'batteryControllers': [] };
+            
+            controllers.forEach(function (controller) {
+            	if (controller['Id'].search('RAID') > -1) {
+            		buffer['arrayControllers'].push(dell.extractData(controller, arrControllerKeys, true));
+            		buffer['batteryControllers'].push(dell.extractData(controller, battControllerKeys, true));
+            	}
+            });
+            
+            return JSON.stringify(buffer);
           description: 'Returns array controller resources.'
           timeout: '{$DELL.HTTP.REQUEST.TIMEOUT}'
           parameters:
@@ -269,27 +269,29 @@ zabbix_export:
             	}
             ];
             
-            if (Array.isArray(disks)) {
-            	var buffer = { 'physicalDisks': [], 'virtualDisks': [] };
+            if (!Array.isArray(disks)) {
+            	throw 'Unexpected type for disks.';
+            }
             
-            	disks.forEach(function (disk) {
-            		var requests = [{ 'usage': 'physicalDisks', 'path': '', 'target': 'Drives' }, { 'usage': 'virtualDisks', 'path': '/Volumes', 'target': 'Members' }];
+            var buffer = { 'physicalDisks': [], 'virtualDisks': [] };
             
-            		requests.forEach(function (request) {
-            			const disks = dell.extractData(dell.executeRequest(disk['@odata.id'] + request['path']), request['target']);
+            disks.forEach(function (disk) {
+            	var requests = [{ 'usage': 'physicalDisks', 'path': '', 'target': 'Drives' }, { 'usage': 'virtualDisks', 'path': '/Volumes', 'target': 'Members' }];
             
-            			if (Array.isArray(disks) && disks.length > 0) {
-            				disks.forEach(function (drive) {
-            					buffer[request['usage']].push(dell.extractData(dell.executeRequest(drive['@odata.id']), keys));
-            				});
-            			}
+            	requests.forEach(function (request) {
+            		const disks = dell.extractData(dell.executeRequest(disk['@odata.id'] + request['path']), request['target']);
+            
+            		if (!Array.isArray(disks) || disks.length <= 0) {
+            			return;
+            		}
+            
+            		buffer[request['usage']] = disks.map(function (drive) {
+            			return dell.extractData(dell.executeRequest(drive['@odata.id']), keys);
             		});
             	});
+            });
             
-            	return JSON.stringify(buffer);
-            } else {
-            	throw 'Unexpected type for sensors.';
-            }
+            return JSON.stringify(buffer);
           description: 'Returns storage resources.'
           timeout: '{$DELL.HTTP.REQUEST.TIMEOUT}'
           parameters:
@@ -483,23 +485,25 @@ zabbix_export:
             	}
             ];
             
-            if (Array.isArray(netAdapters)) {
-            	var buffer = [];
-            
-            	netAdapters.forEach(function (netAdapter) {
-            		const netPorts = dell.extractData(dell.executeRequest(netAdapter["@odata.id"] + '/NetworkPorts'), 'Members');
-            
-            		if (Array.isArray(netPorts)) {
-            			netPorts.forEach(function (netPort) {
-            				buffer.push(dell.extractData(dell.executeRequest(netPort["@odata.id"]), keys));
-            			});
-            		}
-            	});
-            
-            	return JSON.stringify(buffer);
-            } else {
-            	throw 'Unexpected type for sensors.';
+            if (!Array.isArray(netAdapters)) {
+            	throw 'Unexpected type for network adapters.';
             }
+            
+            var buffer = [];
+            
+            netAdapters.forEach(function (netAdapter) {
+            	const netPorts = dell.extractData(dell.executeRequest(netAdapter["@odata.id"] + '/NetworkPorts'), 'Members');
+            
+            	if (!Array.isArray(netPorts)) {
+            		return;
+            	}
+            
+            	netPorts.forEach(function (netPort) {
+            		buffer.push(dell.extractData(dell.executeRequest(netPort["@odata.id"]), keys));
+            	})
+            });
+            
+            return JSON.stringify(buffer);
           description: 'Returns network interfaces.'
           timeout: '{$DELL.HTTP.REQUEST.TIMEOUT}'
           parameters:
@@ -666,57 +670,56 @@ zabbix_export:
             
             const sensors = dell.extractData(dell.executeRequest('/redfish/v1/Chassis/System.Embedded.1/Sensors?$expand=.($levels=1)'), 'Members');
             
-            if (Array.isArray(sensors)) {
-            	const keys = [
-            		{
-            			'name': 'id',
-            			'path': 'Id'
-            		},
-            		{
-            			'name': 'name',
-            			'path': 'Name'
-            		},
-            		{
-            			'name': 'context',
-            			'path': 'PhysicalContext'
-            		},
-            		{
-            			'name': 'reading',
-            			'path': 'Reading'
-            		},
-            		{
-            			'name': 'type',
-            			'path': 'ReadingType'
-            		},
-            		{
-            			'name': 'health',
-            			'path': 'Status.Health'
-            		}
-            	];
-            
-            	var buffer = { 'fan': [], 'psu': [], 'temperature': [], 'sysBoard': [] };
-            
-            	sensors.forEach(function (sensor) {
-            		if (sensor['Name'].substring(0, 2) === 'PS' && sensor['PhysicalContext'] === 'PowerSupply') {
-            			buffer['psu'].push(dell.extractData(sensor, keys, true));
-            		} else if (sensor['ReadingType'] === 'Temperature') {
-            			buffer['temperature'].push(dell.extractData(sensor, keys, true));
-            		} else if (sensor['Name'].includes('Fan') && sensor['ReadingType'] === 'Rotational') {
-            			buffer['fan'].push(dell.extractData(sensor, keys, true));
-            		} else if (sensor['Name'].includes('System Board') && sensor['ReadingType'] === 'Percent') {
-            			buffer['sysBoard'].push(dell.extractData(sensor, keys, true));
-            		}
-            	});
-            
-            	buffer['psu'] = formatPSU(buffer['psu']);
-            	buffer['temperature'] = formatTemp(buffer['temperature']);
-            	buffer['sysBoard'] = formatSysBoard(buffer['sysBoard']);
-            
-            	return JSON.stringify(buffer);
-            } else {
+            if (!Array.isArray(sensors)) {
             	throw 'Unexpected type for sensors.';
             }
             
+            const keys = [
+            	{
+            		'name': 'id',
+            		'path': 'Id'
+            	},
+            	{
+            		'name': 'name',
+            		'path': 'Name'
+            	},
+            	{
+            		'name': 'context',
+            		'path': 'PhysicalContext'
+            	},
+            	{
+            		'name': 'reading',
+            		'path': 'Reading'
+            	},
+            	{
+            		'name': 'type',
+            		'path': 'ReadingType'
+            	},
+            	{
+            		'name': 'health',
+            		'path': 'Status.Health'
+            	}
+            ];
+            
+            var buffer = { 'fan': [], 'psu': [], 'temperature': [], 'sysBoard': [] };
+            
+            sensors.forEach(function (sensor) {
+            	if (sensor['Name'].substring(0, 2) === 'PS' && sensor['PhysicalContext'] === 'PowerSupply') {
+            		buffer['psu'].push(dell.extractData(sensor, keys, true));
+            	} else if (sensor['ReadingType'] === 'Temperature') {
+            		buffer['temperature'].push(dell.extractData(sensor, keys, true));
+            	} else if (sensor['Name'].includes('Fan') && sensor['ReadingType'] === 'Rotational') {
+            		buffer['fan'].push(dell.extractData(sensor, keys, true));
+            	} else if (sensor['Name'].includes('System Board') && sensor['ReadingType'] === 'Percent') {
+            		buffer['sysBoard'].push(dell.extractData(sensor, keys, true));
+            	}
+            });
+            
+            buffer['psu'] = formatPSU(buffer['psu']);
+            buffer['temperature'] = formatTemp(buffer['temperature']);
+            buffer['sysBoard'] = formatSysBoard(buffer['sysBoard']);
+            
+            return JSON.stringify(buffer);
           description: 'Returns sensors.'
           timeout: '{$DELL.HTTP.REQUEST.TIMEOUT}'
           parameters:

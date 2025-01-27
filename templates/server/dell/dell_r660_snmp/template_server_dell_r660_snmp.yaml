@@ -1202,7 +1202,7 @@ zabbix_export:
                   value: storage
               trigger_prototypes:
                 - uuid: 48741d6a36484dfba7edc893d1f06f68
-                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDrive"} or last(/DELL PowerEdge R660 by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}'
+                  expression: 'last(/DELL PowerEdge R660 by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DELL.SNMP.DISK.SMART.STATUS.FAIL:"replaceDrive"} or last(/DELL PowerEdge R660 by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DELL.SNMP.DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}'
                   name: 'Dell R660: Physical disk [{#DISK_NAME}]: S.M.A.R.T. failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH

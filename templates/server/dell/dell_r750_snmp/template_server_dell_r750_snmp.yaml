@@ -1202,7 +1202,7 @@ zabbix_export:
                   value: storage
               trigger_prototypes:
                 - uuid: 8bbead4d14754d9b88bf8304176c7bff
-                  expression: 'last(/DELL PowerEdge R750 by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDrive"} or last(/DELL PowerEdge R750 by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}'
+                  expression: 'last(/DELL PowerEdge R750 by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DELL.SNMP.DISK.SMART.STATUS.FAIL:"replaceDrive"} or last(/DELL PowerEdge R750 by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DELL.SNMP.DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}'
                   name: 'Dell R750: Physical disk [{#DISK_NAME}]: S.M.A.R.T. failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH

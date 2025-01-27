@@ -1202,7 +1202,7 @@ zabbix_export:
                   value: storage
               trigger_prototypes:
                 - uuid: 075f00325b144501b2aeb8c8cf60fae4
-                  expression: 'last(/Dell iDRAC by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDrive"} or last(/Dell iDRAC by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}'
+                  expression: 'last(/Dell iDRAC by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DELL.SNMP.DISK.SMART.STATUS.FAIL:"replaceDrive"} or last(/Dell iDRAC by SNMP/dell.server.hw.physicaldisk.smart_status[physicalDiskSmartAlertIndication.{#SNMPINDEX}])={$DELL.SNMP.DISK.SMART.STATUS.FAIL:"replaceDriveSSDWearOut"}'
                   name: 'Dell iDRAC: Physical disk [{#DISK_NAME}]: S.M.A.R.T. failed'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
