@@ -1465,13 +1465,12 @@ class testDashboardPieChartWidget extends testWidgets {
 		$delete = CTestArrayHelper::get($fields, 'delete_data_set');
 		$remake = CTestArrayHelper::get($fields, 'remake_data_set');
 
-		// Index of data set changes if it is deleted or remade.
+		// Index of data set.
 		$j = 0;
 		if ($delete || $remake) {
 			$form->query('xpath:.//button[@title="Delete"]')->one()->click();
 			if ($remake) {
-				$form->query('button:Add new data set')->one()->click();
-				$form->invalidate();
+				// Increment index of data set if it is deleted and remade.
 				$j = 1;
 			}
 		}
@@ -1496,7 +1495,7 @@ class testDashboardPieChartWidget extends testWidgets {
 	 * @param array        $data_sets    array of data sets to be filled
 	 * @param integer      $j            increment for data set index
 	 */
-	protected function fillDatasets($form, $data_sets, $j) {
+	protected function fillDatasets($form, $data_sets, $j = 0) {
 		// Count of data sets that already exist (needed for updating).
 		$count_sets = $form->query('xpath:.//li[contains(@class, "list-accordion-item")]')->all()->count();
 
