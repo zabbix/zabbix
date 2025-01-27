@@ -99,12 +99,15 @@ class CSettings extends CApiService {
 		$output_fields = [
 			// GUI.
 			'default_lang', 'default_timezone', 'default_theme', 'server_check_interval', 'show_technical_errors',
+
 			// Trigger displaying options.
 			'custom_color', 'problem_unack_color', 'problem_ack_color', 'ok_unack_color', 'ok_ack_color',
 			'severity_color_0', 'severity_color_1', 'severity_color_2', 'severity_color_3', 'severity_color_4',
 			'severity_color_5',
+
 			// Other configuration parameters.
 			'login_attempts', 'login_block', 'x_frame_options',
+
 			// Audit log.
 			'auditlog_enabled'
 		];
@@ -194,11 +197,7 @@ class CSettings extends CApiService {
 			'history_period' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 7 * SEC_PER_DAY])],
 			'period_default' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [SEC_PER_MIN, 10 * SEC_PER_YEAR])],
 			'max_period' =>						['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [SEC_PER_YEAR, 10 * SEC_PER_YEAR])],
-			'socket_timeout' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
-			'connect_timeout' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:30'],
-			'media_type_test_timeout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
-			'script_timeout' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
-			'item_test_timeout' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:600'],
+
 			// Timeouts.
 			'timeout_zabbix_agent' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600'],
 			'timeout_simple_check' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600'],
@@ -210,7 +209,13 @@ class CSettings extends CApiService {
 			'timeout_telnet_agent' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600'],
 			'timeout_script' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600'],
 			'timeout_browser' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600'],
+			'socket_timeout' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
+			'connect_timeout' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:30'],
+			'media_type_test_timeout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
+			'script_timeout' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
+			'item_test_timeout' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:600'],
 			'report_test_timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300'],
+
 			// Trigger displaying options.
 			'custom_color' =>					['type' => API_INT32, 'in' => EVENT_CUSTOM_COLOR_DISABLED.','.EVENT_CUSTOM_COLOR_ENABLED],
 			'problem_unack_color' =>			['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
@@ -235,11 +240,13 @@ class CSettings extends CApiService {
 			'severity_color_4' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
 			'severity_name_5' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'severity_name_5')],
 			'severity_color_5' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
+
 			// Geographical maps.
 			'geomaps_tile_provider' =>			['type' => API_STRING_UTF8, 'in' => ','.implode(',', array_keys(getTileProviders()))],
 			'geomaps_tile_url' =>				['type' => API_URL, 'length' => DB::getFieldLength('config', 'geomaps_tile_url')],
 			'geomaps_attribution' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'geomaps_attribution')],
 			'geomaps_max_zoom' =>				['type' => API_INT32, 'in' => '0:'.ZBX_GEOMAP_MAX_ZOOM],
+
 			// Other configuration parameters.
 			'url' =>							['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'url')],
 			'discovery_groupid' =>				['type' => API_ID],
@@ -255,6 +262,7 @@ class CSettings extends CApiService {
 			'x_frame_options' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'x_frame_options')],
 			'iframe_sandboxing_enabled' =>		['type' => API_INT32, 'in' => '0,1'],
 			'iframe_sandboxing_exceptions' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'iframe_sandboxing_exceptions')],
+
 			// Audit log.
 			'auditlog_enabled' =>				['type' => API_INT32, 'in' => '0,1'],
 			'auditlog_mode' =>					['type' => API_INT32, 'in' => '0,1']
