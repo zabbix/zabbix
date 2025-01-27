@@ -856,7 +856,20 @@ int	zbx_dbconn_check_extension(zbx_dbconn_t *db, struct zbx_db_version_info_t *i
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (NULL == (result = zbx_dbconn_select(db, "select value_str from settings where name='db_extension'")))
+	if (SUCCEED == (ret = zbx_db_table_exists("settings")))
+	{
+		if (NULL == (result = zbx_dbconn_select(db,
+				"select value_str from settings where name='db_extension'")))
+		{
+			goto out;
+		}
+	}
+	else if (SUCCEED == (ret = zbx_db_field_exists("config", "db_extension")))
+	{
+		if (NULL == (result = zbx_dbconn_select(db, "select db_extension from config")))
+			goto out;
+	}
+	else
 		goto out;
 
 	if (NULL == (row = zbx_db_fetch(result)) || '\0' == *row[0])
