@@ -334,11 +334,11 @@ static int	pinger_parse_key_params(const char *key, const char *host_addr, zbx_p
 			goto out;
 		}
 
-		if (SUCCEED != zbx_is_double(tmp, &pinger->backoff) || '\0' == *tmp)
+		if (NULL == (tmp = get_rparam(&request, 2)) || '\0' == *tmp)
 		{
 			pinger->backoff = DEFAULT_BACKOFF;
 		}
-		else if (FAIL == zbx_is_uint31(tmp, &pinger->backoff) || MIN_BACKOFF > pinger->backoff ||
+		else if (SUCCEED != zbx_is_double(tmp, &pinger->backoff) || MIN_BACKOFF > pinger->backoff ||
 				MAX_BACKOFF < pinger->backoff)
 		{
 			*error = zbx_dsprintf(NULL, "Backoff \"%s\" is not between %.1f and %.1f.", tmp,
