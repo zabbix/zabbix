@@ -78,12 +78,12 @@ static int	pinger_compare(const void *d1, const void *d2)
 	const zbx_pinger_t	*pinger1 = (const zbx_pinger_t *)d1;
 	const zbx_pinger_t	*pinger2 = (const zbx_pinger_t *)d2;
 
-	ZBX_RETURN_IF_DBL_NOT_EQUAL(pinger1->allow_redirect, pinger2->allow_redirect);
-	ZBX_RETURN_IF_DBL_NOT_EQUAL(pinger1->count, pinger2->count);
-	ZBX_RETURN_IF_DBL_NOT_EQUAL(pinger1->interval, pinger2->interval);
-	ZBX_RETURN_IF_DBL_NOT_EQUAL(pinger1->size, pinger2->size);
-	ZBX_RETURN_IF_DBL_NOT_EQUAL(pinger1->timeout, pinger2->timeout);
-	ZBX_RETURN_IF_DBL_NOT_EQUAL(pinger1->retries, pinger2->retries);
+	ZBX_RETURN_IF_NOT_EQUAL(pinger1->allow_redirect, pinger2->allow_redirect);
+	ZBX_RETURN_IF_NOT_EQUAL(pinger1->count, pinger2->count);
+	ZBX_RETURN_IF_NOT_EQUAL(pinger1->interval, pinger2->interval);
+	ZBX_RETURN_IF_NOT_EQUAL(pinger1->size, pinger2->size);
+	ZBX_RETURN_IF_NOT_EQUAL(pinger1->timeout, pinger2->timeout);
+	ZBX_RETURN_IF_NOT_EQUAL(pinger1->retries, pinger2->retries);
 	ZBX_RETURN_IF_DBL_NOT_EQUAL(pinger1->backoff, pinger2->backoff);
 
 	return 0;
