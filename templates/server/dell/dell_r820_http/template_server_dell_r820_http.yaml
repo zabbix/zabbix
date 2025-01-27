@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2025-01-27T10:14:21Z'
+  date: '2025-01-27T15:04:48Z'
   groups:
     - uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
@@ -285,8 +285,8 @@ zabbix_export:
             			return;
             		}
             
-            		buffer[request['usage']] = disks.map(function (drive) {
-            			return dell.extractData(dell.executeRequest(drive['@odata.id']), keys);
+            		disks.forEach(function (drive) {
+            			buffer[request['usage']].push(dell.extractData(dell.executeRequest(drive['@odata.id']), keys));
             		});
             	});
             });
