@@ -71,13 +71,13 @@ type perfCounter struct {
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	mutex        sync.Mutex
-	historyMutex sync.Mutex
+	perfmonMu    sync.Mutex
 	counters     map[perfCounterIndex]*perfCounter
 	countersErr  map[perfCounterIndex]*perfCounterErrorInfo
 	addCounters  []perfCounterAddInfo
 	query        win32.PDH_HQUERY
 	collectError error
+	stop         chan struct{}
 }
 
 type historyIndex int
@@ -91,6 +91,35 @@ func init() {
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
+}
+
+func (p *Plugin) Start() {
+	p.stop = make(chan struct{})
+
+	go func() {
+		t := time.NewTicker(1 * time.Second)
+		defer t.Stop()
+		for {
+			select {
+			case <-p.stop:
+				return
+			case <-t.C:
+				p.Debugf("starting to collect performance counters data")
+
+				err := p.collectPerfCounterData()
+				if err != nil {
+					p.Warningf("failed to get performance counters data: '%s'", err)
+					continue
+				}
+
+				p.Debugf("collected performance counters data")
+			}
+		}
+	}()
+}
+
+func (p *Plugin) Stop() {
+	p.stop <- struct{}{}
 }
 
 // Export -
@@ -136,8 +165,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	index := perfCounterIndex{path, lang}
-	p.historyMutex.Lock()
-	defer p.historyMutex.Unlock()
+	p.perfmonMu.Lock()
+	defer p.perfmonMu.Unlock()
 	counter, ok := p.counters[index]
 	if !ok {
 		counterErr, ok := p.countersErr[index]
@@ -149,8 +178,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		for _, addCnt := range p.addCounters {
 			if addCnt.index == index {
-				addCnt.interval = interval
-
 				return nil, nil
 			}
 		}
@@ -167,13 +194,13 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	return counter.getHistory(int(interval))
 }
 
-func (p *Plugin) Collect() error {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
-
+func (p *Plugin) collectPerfCounterData() error {
+	p.perfmonMu.Lock()
 	if len(p.counters) == 0 && len(p.addCounters) == 0 {
+		p.perfmonMu.Unlock()
 		return nil
 	}
+	p.perfmonMu.Unlock()
 
 	var err error
 	if p.query == 0 {
@@ -185,7 +212,7 @@ func (p *Plugin) Collect() error {
 
 	expireTime := time.Now().Add(-maxInactivityPeriod)
 
-	p.historyMutex.Lock()
+	p.perfmonMu.Lock()
 	addCountersLocal := p.addCounters
 	p.addCounters = nil
 	p.collectError = nil
@@ -195,13 +222,13 @@ func (p *Plugin) Collect() error {
 			delete(p.countersErr, index)
 		}
 	}
-	p.historyMutex.Unlock()
+	p.perfmonMu.Unlock()
 
 	for i := len(addCountersLocal) - 1; i >= 0; i-- {
 		addInfo := addCountersLocal[i]
 		err = p.addCounter(addInfo.index, addInfo.interval)
 		if err != nil {
-			p.historyMutex.Lock()
+			p.perfmonMu.Lock()
 
 			p.countersErr[addInfo.index] = &perfCounterErrorInfo{
 				lastAccess: time.Now(),
@@ -209,7 +236,7 @@ func (p *Plugin) Collect() error {
 					addInfo.index.lang)),
 			}
 
-			p.historyMutex.Unlock()
+			p.perfmonMu.Unlock()
 		}
 	}
 
@@ -221,9 +248,9 @@ func (p *Plugin) Collect() error {
 	if err != nil {
 		p.Debugf("reset counter query: '%s'", err)
 
-		p.historyMutex.Lock()
+		p.perfmonMu.Lock()
 		p.collectError = err
-		p.historyMutex.Unlock()
+		p.perfmonMu.Unlock()
 
 		err2 := win32.PdhCloseQuery(p.query)
 		if err2 != nil {
@@ -236,16 +263,6 @@ func (p *Plugin) Collect() error {
 	}
 
 	return nil
-}
-
-func (p *Plugin) Period() int {
-	return 1
-}
-
-func (p *Plugin) Start() {
-}
-
-func (p *Plugin) Stop() {
 }
 
 func (p *Plugin) setCounterData() error {
@@ -263,9 +280,9 @@ func (p *Plugin) setCounterData() error {
 				p.Warningf("error while removing counter '%s': %s", index.path, err2)
 			}
 
-			p.historyMutex.Lock()
+			p.perfmonMu.Lock()
 			delete(p.counters, index)
-			p.historyMutex.Unlock()
+			p.perfmonMu.Unlock()
 
 			continue
 		}
@@ -273,7 +290,7 @@ func (p *Plugin) setCounterData() error {
 		c.err = nil
 
 		histValue, err := win32.PdhGetFormattedCounterValueDouble(c.handle, 1)
-		p.historyMutex.Lock()
+		p.perfmonMu.Lock()
 		if err != nil {
 			zbxErr := zbxerr.New(
 				fmt.Sprintf("failed to retrieve pdh counter value double for index %s", index.path),
@@ -290,7 +307,7 @@ func (p *Plugin) setCounterData() error {
 		if c.tail = c.tail.inc(c.interval); c.tail == c.head {
 			c.head = c.head.inc(c.interval)
 		}
-		p.historyMutex.Unlock()
+		p.perfmonMu.Unlock()
 	}
 
 	return errCollect

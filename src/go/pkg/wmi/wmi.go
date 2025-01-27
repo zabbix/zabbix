@@ -171,8 +171,21 @@ type tableResult struct {
 
 func variantToValue(v *ole.VARIANT) (result interface{}) {
 	if (v.VT & ole.VT_ARRAY) == 0 {
-		return v.Value()
+		ret := v.Value()
+
+		if dispatch, ok := ret.(*ole.IDispatch); ok {
+			prop, err := oleutil.GetProperty(dispatch, "Value")
+			if err == nil {
+				defer prop.Clear()
+				return prop.Value()
+			}
+
+			return nil
+		}
+
+		return ret
 	}
+
 	return v.ToArray().ToValueArray()
 }
 

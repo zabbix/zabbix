@@ -7230,6 +7230,10 @@ msgstr "Afficher le graphique"
 msgid "Display local time"
 msgstr "Afficher l'heure locale"
 
+#: widgets/itemhistory/views/column.edit.php:240
+msgid "Display log time"
+msgstr ""
+
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
 msgstr "Afficher min/moy/max"
@@ -9393,6 +9397,10 @@ msgstr "Sélection des données d'historique"
 #: app/views/popup.triggerexpr.php:129
 msgid "History functions"
 msgstr "Fonctions d'historique"
+
+#: app/views/administration.housekeeping.edit.php:218
+msgid "History, trends and audit log compression"
+msgstr ""
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -20452,6 +20460,10 @@ msgstr "Ce paramètre doit être activé, car les tableaux de tendance contienne
 #: widgets/itemhistory/views/column.edit.php:242
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
 msgstr "Ce paramètre affichera l'heure locale au lieu de l'horodatage. \"Afficher l'horodatage\" doit également être coché dans la configuration avancée."
+
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114

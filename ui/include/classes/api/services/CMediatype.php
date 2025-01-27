@@ -101,6 +101,7 @@ class CMediatype extends CApiService {
 			return [];
 		}
 
+		// output
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			if ($options['output'] === API_OUTPUT_EXTEND) {
 				$options['output'] = self::LIMITED_OUTPUT_FIELDS;
@@ -189,9 +190,10 @@ class CMediatype extends CApiService {
 
 		if (!$options['countOutput']) {
 			$add_content_type = $options['output'] === API_OUTPUT_EXTEND
-				|| in_array('content_type', $options['output']);
-			$remove_message_format = $options['output'] !== API_OUTPUT_EXTEND
-				&& !in_array('message_format', $options['output']);
+				|| (is_array($options['output']) && in_array('content_type', $options['output']));
+
+			$remove_message_format = $options['output'] !== API_OUTPUT_EXTEND || !is_array($options['output'])
+				|| !in_array('message_format', $options['output']);
 		}
 
 		while ($mediatype = DBfetch($res)) {
