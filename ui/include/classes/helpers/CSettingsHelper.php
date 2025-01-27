@@ -64,23 +64,23 @@ class CSettingsHelper {
 	public const OK_PERIOD = 'ok_period';
 	public const BLINK_PERIOD = 'blink_period';
 	public const SEVERITY_NAME_0 = 'severity_name_0';
-	public const SEVERITY_NAME_1 = 'severity_name_1';
-	public const SEVERITY_NAME_2 = 'severity_name_2';
-	public const SEVERITY_NAME_3 = 'severity_name_3';
-	public const SEVERITY_NAME_4 = 'severity_name_4';
-	public const SEVERITY_NAME_5 = 'severity_name_5';
 	public const SEVERITY_COLOR_0 = 'severity_color_0';
+	public const SEVERITY_NAME_1 = 'severity_name_1';
 	public const SEVERITY_COLOR_1 = 'severity_color_1';
+	public const SEVERITY_NAME_2 = 'severity_name_2';
 	public const SEVERITY_COLOR_2 = 'severity_color_2';
+	public const SEVERITY_NAME_3 = 'severity_name_3';
 	public const SEVERITY_COLOR_3 = 'severity_color_3';
+	public const SEVERITY_NAME_4 = 'severity_name_4';
 	public const SEVERITY_COLOR_4 = 'severity_color_4';
+	public const SEVERITY_NAME_5 = 'severity_name_5';
 	public const SEVERITY_COLOR_5 = 'severity_color_5';
 
 	// Geographical maps.
 	public const GEOMAPS_TILE_PROVIDER = 'geomaps_tile_provider';
 	public const GEOMAPS_TILE_URL = 'geomaps_tile_url';
-	public const GEOMAPS_MAX_ZOOM = 'geomaps_max_zoom';
 	public const GEOMAPS_ATTRIBUTION = 'geomaps_attribution';
+	public const GEOMAPS_MAX_ZOOM = 'geomaps_max_zoom';
 
 	// Other configuration parameters.
 	public const URL = 'url';
@@ -141,12 +141,12 @@ class CSettingsHelper {
 					// Trigger displaying options.
 					'custom_color', 'problem_unack_color', 'problem_unack_style', 'problem_ack_color',
 					'problem_ack_style', 'ok_unack_color', 'ok_unack_style', 'ok_ack_color', 'ok_ack_style',
-					'ok_period', 'blink_period', 'severity_name_0', 'severity_name_1', 'severity_name_2',
-					'severity_name_3', 'severity_name_4', 'severity_name_5', 'severity_color_0', 'severity_color_1',
-					'severity_color_2', 'severity_color_3', 'severity_color_4', 'severity_color_5',
+					'ok_period', 'blink_period', 'severity_name_0', 'severity_color_0', 'severity_name_1',
+					'severity_color_1', 'severity_name_2', 'severity_color_2', 'severity_name_3', 'severity_color_3',
+					'severity_name_4', 'severity_color_4', 'severity_name_5', 'severity_color_5',
 
 					// Geographical maps.
-					'geomaps_tile_provider', 'geomaps_tile_url', 'geomaps_max_zoom', 'geomaps_attribution',
+					'geomaps_tile_provider', 'geomaps_tile_url', 'geomaps_attribution', 'geomaps_max_zoom',
 
 					// Other configuration parameters.
 					'url',  'discovery_groupid', 'default_inventory_mode', 'alert_usrgrpid', 'snmptrap_logging',

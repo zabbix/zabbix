@@ -42,12 +42,12 @@ class CSettings extends CApiService {
 		// Trigger displaying options.
 		'custom_color', 'problem_unack_color', 'problem_unack_style', 'problem_ack_color', 'problem_ack_style',
 		'ok_unack_color', 'ok_unack_style', 'ok_ack_color', 'ok_ack_style', 'ok_period', 'blink_period',
-		'severity_name_0', 'severity_name_1', 'severity_name_2', 'severity_name_3', 'severity_name_4',
-		'severity_name_5', 'severity_color_0',  'severity_color_1', 'severity_color_2', 'severity_color_3',
-		'severity_color_4', 'severity_color_5',
+		'severity_name_0', 'severity_color_0', 'severity_name_1', 'severity_color_1', 'severity_name_2',
+		'severity_color_2', 'severity_name_3', 'severity_color_3', 'severity_name_4', 'severity_color_4',
+		'severity_name_5', 'severity_color_5',
 
 		// Geographical maps.
-		'geomaps_tile_provider', 'geomaps_tile_url', 'geomaps_max_zoom', 'geomaps_attribution',
+		'geomaps_tile_provider', 'geomaps_tile_url', 'geomaps_attribution', 'geomaps_max_zoom',
 
 		// Other configuration parameters.
 		'url', 'discovery_groupid', 'default_inventory_mode', 'alert_usrgrpid', 'snmptrap_logging', 'login_attempts',
@@ -224,22 +224,22 @@ class CSettings extends CApiService {
 			'ok_period' =>						['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [0, SEC_PER_DAY])],
 			'blink_period' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [0, SEC_PER_DAY])],
 			'severity_name_0' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'severity_name_0')],
-			'severity_name_1' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'severity_name_1')],
-			'severity_name_2' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'severity_name_2')],
-			'severity_name_3' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'severity_name_3')],
-			'severity_name_4' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'severity_name_4')],
-			'severity_name_5' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'severity_name_5')],
 			'severity_color_0' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
+			'severity_name_1' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'severity_name_1')],
 			'severity_color_1' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
+			'severity_name_2' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'severity_name_2')],
 			'severity_color_2' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
+			'severity_name_3' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'severity_name_3')],
 			'severity_color_3' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
+			'severity_name_4' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'severity_name_4')],
 			'severity_color_4' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
+			'severity_name_5' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('config', 'severity_name_5')],
 			'severity_color_5' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
 			// Geographical maps.
 			'geomaps_tile_provider' =>			['type' => API_STRING_UTF8, 'in' => ','.implode(',', array_keys(getTileProviders()))],
 			'geomaps_tile_url' =>				['type' => API_URL, 'length' => DB::getFieldLength('config', 'geomaps_tile_url')],
-			'geomaps_max_zoom' =>				['type' => API_INT32, 'in' => '0:'.ZBX_GEOMAP_MAX_ZOOM],
 			'geomaps_attribution' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'geomaps_attribution')],
+			'geomaps_max_zoom' =>				['type' => API_INT32, 'in' => '0:'.ZBX_GEOMAP_MAX_ZOOM],
 			// Other configuration parameters.
 			'url' =>							['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config', 'url')],
 			'discovery_groupid' =>				['type' => API_ID],
