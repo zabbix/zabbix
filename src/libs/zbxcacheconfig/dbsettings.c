@@ -516,10 +516,8 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 	store_int_setting(values, "default_inventory_mode", &config->config->default_inventory_mode, revision);
 	store_str_setting(values, "default_timezone", found, &config->config->default_timezone, revision);
 
-	if (SUCCEED != setting_get_str(values, "discovery_groupid", &value_str) || NULL == value_str)
+	if (SUCCEED != setting_get_uint64(values, "discovery_groupid", &value_uint64))
 		value_uint64 = ZBX_DISCOVERY_GROUPID_UNDEFINED;
-	else
-		ZBX_STR2UINT64(value_uint64, value_str);
 
 	if (config->config->discovery_groupid != value_uint64)
 	{
