@@ -149,7 +149,7 @@ class CSettingsHelper {
 					'geomaps_tile_provider', 'geomaps_tile_url', 'geomaps_attribution', 'geomaps_max_zoom',
 
 					// Other configuration parameters.
-					'url',  'discovery_groupid', 'default_inventory_mode', 'alert_usrgrpid', 'snmptrap_logging',
+					'url', 'discovery_groupid', 'default_inventory_mode', 'alert_usrgrpid', 'snmptrap_logging',
 					'login_attempts', 'login_block', 'vault_provider', 'proxy_secrets_provider', 'validate_uri_schemes',
 					'uri_valid_schemes', 'x_frame_options', 'iframe_sandboxing_enabled', 'iframe_sandboxing_exceptions',
 
