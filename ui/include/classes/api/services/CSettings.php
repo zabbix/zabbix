@@ -57,7 +57,7 @@ class CSettings extends CApiService {
 		// Audit log.
 		'auditlog_enabled', 'auditlog_mode',
 
-		// Other.
+		// Read-only parameters.
 		'ha_failover_delay'
 	];
 

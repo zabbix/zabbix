@@ -102,7 +102,7 @@ class CSettingsHelper {
 	public const AUDITLOG_ENABLED = 'auditlog_enabled';
 	public const AUDITLOG_MODE = 'auditlog_mode';
 
-	// Other.
+	// Read-only parameters.
 	public const SESSION_KEY = 'session_key';
 	public const DBVERSION_STATUS = 'dbversion_status';
 	public const SERVER_STATUS = 'server_status';
@@ -156,7 +156,7 @@ class CSettingsHelper {
 					// Audit log.
 					'auditlog_enabled', 'auditlog_mode',
 
-					// Other.
+					// Read-only parameters.
 					'ha_failover_delay'
 				]
 			]);
