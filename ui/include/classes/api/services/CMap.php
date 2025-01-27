@@ -1051,29 +1051,6 @@ class CMap extends CMapElement {
 					$this->validateSelementTags($selement, '/'.($map_index + 1).'/selements/'.($selement_index + 1));
 				}
 			}
-
-			// Map selement links.
-			if (array_key_exists('links', $map) && $map['links']) {
-				$selementids = zbx_objectValues($map['selements'], 'selementid');
-
-				foreach ($map['links'] as $link) {
-					if (!in_array($link['selementid1'], $selementids)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Link "selementid1" field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
-							$link['selementid1'],
-							$map['name']
-						));
-					}
-
-					if (!in_array($link['selementid2'], $selementids)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Link "selementid2" field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
-							$link['selementid2'],
-							$map['name']
-						));
-					}
-				}
-			}
 		}
 	}
 
@@ -1551,29 +1528,6 @@ class CMap extends CMapElement {
 					$this->validateSelementTags($selement, '/'.($map_index + 1).'/selements/'.($selement_index + 1));
 				}
 			}
-
-			// Map selement links.
-			if (array_key_exists('links', $map) && $map['links']) {
-				$selementids = zbx_objectValues($map['selements'], 'selementid');
-
-				foreach ($map['links'] as $link) {
-					if (!in_array($link['selementid1'], $selementids)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Link "selementid1" field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
-							$link['selementid1'],
-							$map['name']
-						));
-					}
-
-					if (!in_array($link['selementid2'], $selementids)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Link "selementid2" field is pointing to a nonexistent map selement ID "%1$s" for map "%2$s".',
-							$link['selementid2'],
-							$map['name']
-						));
-					}
-				}
-			}
 		}
 
 		// Validate circular reference.
@@ -1857,6 +1811,11 @@ class CMap extends CMapElement {
 
 		self::validateLinkFields($maps);
 
+		if ($db_maps !== null) {
+			self::addLinkSelementids($maps, $db_maps);
+		}
+
+		self::checkLinkSelementids($maps, $db_maps);
 		self::checkLinkTriggers($maps, $db_maps);
 	}
 
@@ -2074,6 +2033,24 @@ class CMap extends CMapElement {
 		unset($map);
 	}
 
+	private static function addLinkSelementids(array &$maps, array $db_maps): void {
+		foreach ($maps as &$map) {
+			if (!array_key_exists('links', $map)) {
+				continue;
+			}
+
+			foreach ($map['links'] as &$link) {
+				if (array_key_exists('linkid', $link)) {
+					$link += array_intersect_key($db_maps[$map['sysmapid']]['links'][$link['linkid']],
+						array_flip(['selementid1', 'selementid2'])
+					);
+				}
+			}
+			unset($link);
+		}
+		unset($map);
+	}
+
 	private static function getLinkValidationFields(bool $is_update = false): array {
 		$api_required = $is_update ? 0 : API_REQUIRED;
 
@@ -2118,6 +2095,33 @@ class CMap extends CMapElement {
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]]
 		];
+	}
+
+	private static function checkLinkSelementids(array $maps, ?array $db_maps): void {
+		foreach ($maps as $i1 => $map) {
+			if (!array_key_exists('links', $map) || !$map['links']) {
+				continue;
+			}
+
+			$selementids = array_key_exists('selements', $map)
+				? array_column($map['selements'], 'selementid')
+				: array_column($db_maps[$map['sysmapid']]['selements'], 'selementid');
+			$path = '/'.($i1 + 1).'/links';
+
+			foreach ($map['links'] as $i2 => $link) {
+				if (!in_array($link['selementid1'], $selementids)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						$path.'/'.($i2 + 1).'/selementid1', _('object does not exist or belongs to another object')
+					));
+				}
+
+				if (!in_array($link['selementid2'], $selementids)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						$path.'/'.($i2 + 1).'/selementid2', _('object does not exist or belongs to another object')
+					));
+				}
+			}
+		}
 	}
 
 	private static function checkLinkTriggers(array $maps, ?array $db_maps): void {
@@ -3195,32 +3199,22 @@ class CMap extends CMapElement {
 				}
 
 				if ($link['indicator_type'] != $db_links[$link['linkid']]['indicator_type']) {
-					switch ($link['indicator_type']) {
-						case MAP_INDICATOR_TYPE_STATIC_LINK:
-							$link += $defaults;
-							break;
-
-						case MAP_INDICATOR_TYPE_TRIGGER:
-							$link += array_intersect_key($defaults, array_flip(['itemid', 'thresholds', 'highlights']));
-							break;
-
-						case MAP_INDICATOR_TYPE_ITEM_VALUE:
-							$link += array_intersect_key($defaults, array_flip(['linktriggers']));
-							break;
+					if ($link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER) {
+						$link += array_intersect_key($defaults, array_flip(['itemid', 'thresholds', 'highlights']));
+					}
+					elseif ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+						$link += array_intersect_key($defaults, array_flip(['linktriggers']));
+					}
+					else {
+						$link += $defaults;
 					}
 				}
 				elseif ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
-					switch ($link['item_value_type']) {
-						case ITEM_VALUE_TYPE_FLOAT:
-						case ITEM_VALUE_TYPE_UINT64:
-							$link['highlights'] = [];
-							break;
-
-						case ITEM_VALUE_TYPE_STR:
-						case ITEM_VALUE_TYPE_LOG:
-						case ITEM_VALUE_TYPE_TEXT:
-							$link['thresholds'] = [];
-							break;
+					if (in_array($link['item_value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+						$link += array_intersect_key($defaults, array_flip(['highlights']));
+					}
+					else {
+						$link += array_intersect_key($defaults, array_flip(['thresholds']));
 					}
 				}
 			}
