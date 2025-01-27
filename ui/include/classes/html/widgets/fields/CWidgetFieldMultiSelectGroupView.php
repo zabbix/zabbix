@@ -34,7 +34,7 @@ class CWidgetFieldMultiSelectGroupView extends CWidgetFieldMultiSelectView {
 		return $this->popup_parameters + [
 			'srctbl' => 'host_groups',
 			'srcfld1' => 'groupid',
-			'real_hosts' => true,
+			'with_hosts' => true,
 			'enrich_parent_groups' => true
 		];
 	}

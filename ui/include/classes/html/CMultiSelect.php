@@ -313,7 +313,7 @@ class CMultiSelect extends CTag {
 				}
 
 				if (array_key_exists('with_hosts', $parameters) && $parameters['with_hosts']) {
-					$popup_parameters['real_hosts'] = '1';
+					$popup_parameters['with_hosts'] = '1';
 					$autocomplete_parameters['with_hosts'] = true;
 				}
 

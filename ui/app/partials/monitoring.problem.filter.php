@@ -550,7 +550,7 @@ if (array_key_exists('render_html', $data)) {
 					dstfrm: 'zbx_filter',
 					dstfld1: 'groupids_' + data.uniqid,
 					multiselect: 1,
-					real_hosts: 1,
+					with_hosts: 1,
 					enrich_parent_groups: 1
 				}
 			}
