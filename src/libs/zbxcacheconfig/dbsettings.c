@@ -756,7 +756,6 @@ void	dc_sync_settings(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	store_settings(values, found, revision);
 
-out:
 	for (size_t i = 0; i < ARRSIZE(settings_description_table); i++)
 	{
 		if (ZBX_SETTING_TYPE_STR == settings_description_table[i].type && 1 == values[i].found)
