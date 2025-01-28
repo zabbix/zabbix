@@ -3506,7 +3506,7 @@ out:
 
 	zbx_free_agent_request(&request);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()%s itemid:" ZBX_FS_UI64, __func__, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s itemid:" ZBX_FS_UI64, __func__, zbx_result_string(ret),
 			item->itemid);
 
 	return ret;
