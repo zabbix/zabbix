@@ -391,7 +391,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$this->assertEquals('New column', $column_overlay->getTitle());
 		$column_form = $column_overlay->asForm();
 		$this->assertEquals(['Name', 'Item', 'Base colour', 'Highlights', 'Display', 'Min', 'Max', 'Thresholds',
-				'History data', 'Use monospace font', 'Display local time', 'Show thumbnail'],
+				'History data', 'Use monospace font', 'Display log time', 'Show thumbnail'],
 				$column_form->getLabels()->asText()
 		);
 		$this->assertEquals(['Name', 'Item'], $column_form->getRequiredLabels());
@@ -406,7 +406,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			'History data' => ['value' => 'Auto', 'lables' => ['Auto', 'History', 'Trends']],
 			'id:max_length' => ['value' => 100, 'maxlength' => 3],
 			'Use monospace font' => ['value' => false],
-			'Display local time' => ['value' => false],
+			'Display log time' => ['value' => false],
 			'Show thumbnail' => ['value' => false]
 		];
 
@@ -452,7 +452,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			$this->assertEquals('Host for all item value types: '.$item, $column_form->getField('Name')->getValue());
 
 			$labels = ($item === 'Log item')
-				? ['Name', 'Item', 'Base colour', 'Highlights', 'Display', 'Use monospace font', 'Display local time']
+				? ['Name', 'Item', 'Base colour', 'Highlights', 'Display', 'Use monospace font', 'Display log time']
 				: ['Name', 'Item', 'Base colour', 'Highlights', 'Display', 'Use monospace font'];
 
 			$this->assertEquals($labels, array_values($column_form->getLabels()->filter(CElementFilter::VISIBLE)->asText()));
@@ -474,8 +474,9 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			}
 
 			if ($item === 'Log item') {
-				$this->checkHint($column_form, 'Display local time', 'This setting will display local time'.
-						' instead of the timestamp. "Show timestamp" must also be checked in the advanced configuration.'
+				$this->checkHint($column_form, 'Display log time', 'This setting will display log time'.
+						' instead of item\'s timestamp. "Show timestamp" must also be checked in the advanced'.
+						' configuration.'
 				);
 			}
 		}
@@ -1601,7 +1602,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 									'context' => ['values' => 'Host for all item value types']
 								],
 								'Use monospace font' => true,
-								'Display local time' => true
+								'Display log time' => true
 							]
 						]
 					]

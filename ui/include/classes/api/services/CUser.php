@@ -41,34 +41,101 @@ class CUser extends CApiService {
 	protected $tableAlias = 'u';
 	protected $sortColumns = ['userid', 'username'];
 
-	public const OUTPUT_FIELDS = ['userid', 'username', 'name', 'surname', 'passwd', 'url', 'autologin', 'autologout',
+	public const OUTPUT_FIELDS = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout',
 		'lang', 'refresh', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone',
-		'roleid', 'userdirectoryid', 'ts_provisioned'
+		'roleid', 'userdirectoryid', 'ts_provisioned', 'provisioned'
+	];
+
+	public const OWN_LIMITED_OUTPUT_FIELDS = ['userid', 'username', 'name', 'surname', 'url', 'autologin',
+		'autologout', 'lang', 'refresh', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page',
+		'timezone', 'roleid', 'provisioned'
+	];
+
+	public const LIMITED_OUTPUT_FIELDS = ['userid', 'username', 'name', 'surname'];
+
+	public const OUTPUT_MEDIA_FIELDS = ['mediaid', 'mediatypeid', 'sendto', 'active', 'severity', 'period',
+		'userdirectory_mediaid', 'provisioned'
+	];
+
+	public const LIMITED_OUTPUT_MEDIA_FIELDS = ['mediaid', 'mediatypeid', 'sendto', 'active', 'severity', 'period',
+		'provisioned'
 	];
 
 	private const PROVISIONED_FIELDS = ['username', 'name', 'surname', 'usrgrps', 'medias', 'roleid'];
+
+	public const PROVISION_STATUS_YES = 1;
+	public const PROVISION_STATUS_NO = 0;
+
+	/**
+	 * Acceptable execution time of user verification process in seconds and nanoseconds.
+	 *
+	 * @var array
+	 */
+	private const ACCEPTABLE_USER_VERIFICATION_TIME = [1, 0];
+
+	private static $user_verification_start_time;
 
 	/**
 	 * Get users data.
 	 *
 	 * @param array  $options
-	 * @param array  $options['usrgrpids']		filter by UserGroup IDs
-	 * @param array  $options['userids']		filter by User IDs
-	 * @param bool   $options['type']			filter by User type [USER_TYPE_ZABBIX_USER: 1, USER_TYPE_ZABBIX_ADMIN: 2, USER_TYPE_SUPER_ADMIN: 3]
-	 * @param bool   $options['selectUsrgrps']	extend with UserGroups data for each User
-	 * @param bool   $options['getAccess']		extend with access data for each User
-	 * @param bool   $options['count']			output only count of objects in result. (result returned in property 'rowscount')
-	 * @param string $options['pattern']		filter by Host name containing only give pattern
-	 * @param int    $options['limit']			output will be limited to given number
-	 * @param string $options['sortfield']		output will be sorted by given property ['userid', 'username']
-	 * @param string $options['sortorder']		output will be sorted in given order ['ASC', 'DESC']
 	 *
 	 * @return array
 	 */
 	public function get($options = []) {
-		$result = [];
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+			$user_output_fields = self::OUTPUT_FIELDS;
+			$usrgrps_output_fields = CUserGroup::OUTPUT_FIELDS;
+			$mediatype_output_fields = CMediatype::OUTPUT_FIELDS;
+			$media_output_fields = self::OUTPUT_MEDIA_FIELDS;
+		}
+		else {
+			$user_output_fields = self::OWN_LIMITED_OUTPUT_FIELDS;
+			$usrgrps_output_fields = CUserGroup::LIMITED_OUTPUT_FIELDS;
+			$mediatype_output_fields = CMediatype::LIMITED_OUTPUT_FIELDS;
+			$media_output_fields = self::LIMITED_OUTPUT_MEDIA_FIELDS;
 
-		$sqlParts = [
+			$limited_output_fields = array_flip(self::LIMITED_OUTPUT_FIELDS);
+		}
+
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			// filter
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_merge(DB::getFilterFields($this->tableName, $user_output_fields), ['provisioned'])],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => DB::getSearchFields($this->tableName, $user_output_fields)],
+			'userids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'usrgrpids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'mediaids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'mediatypeids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
+			'startSearch' =>			['type' => API_FLAG, 'default' => false],
+			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
+			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
+			// output
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', $user_output_fields), 'default' => API_OUTPUT_EXTEND],
+			'selectUsrgrps' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $usrgrps_output_fields), 'default' => null],
+			'selectMedias' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $media_output_fields), 'default' => null],
+			'selectMediatypes' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $mediatype_output_fields), 'default' => null],
+			'selectRole' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CRole::OUTPUT_FIELDS), 'default' => null],
+			'countOutput' =>			['type' => API_FLAG, 'default' => false],
+			// sort and limit
+			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
+			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],
+			'limit' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			// flags
+			'editable' =>				['type' => API_BOOLEAN, 'default' => false],
+			'getAccess' =>				['type' => API_BOOLEAN, 'default' => false],
+			'preservekeys' =>			['type' => API_BOOLEAN, 'default' => false]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		if (!$options['countOutput'] && $options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = $user_output_fields;
+		}
+
+		$sql_parts = [
 			'select'	=> ['users' => 'u.userid'],
 			'from'		=> ['users' => 'users u'],
 			'where'		=> [],
@@ -76,86 +143,54 @@ class CUser extends CApiService {
 			'limit'		=> null
 		];
 
-		$defOptions = [
-			'usrgrpids'					=> null,
-			'userids'					=> null,
-			'mediaids'					=> null,
-			'mediatypeids'				=> null,
-			// filter
-			'filter'					=> null,
-			'search'					=> null,
-			'searchByAny'				=> null,
-			'startSearch'				=> false,
-			'excludeSearch'				=> false,
-			'searchWildcardsEnabled'	=> null,
-			// output
-			'output'					=> API_OUTPUT_EXTEND,
-			'editable'					=> false,
-			'selectUsrgrps'				=> null,
-			'selectMedias'				=> null,
-			'selectMediatypes'			=> null,
-			'selectRole'				=> null,
-			'getAccess'					=> null,
-			'countOutput'				=> false,
-			'preservekeys'				=> false,
-			'sortfield'					=> '',
-			'sortorder'					=> '',
-			'limit'						=> null
-		];
-		$options = zbx_array_merge($defOptions, $options);
-
-		// permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			if (!$options['editable']) {
-				$sqlParts['from']['users_groups'] = 'users_groups ug';
-				$sqlParts['where']['uug'] = 'u.userid=ug.userid';
-				$sqlParts['where'][] = 'ug.usrgrpid IN ('.
+				$sql_parts['from']['users_groups'] = 'users_groups ug';
+				$sql_parts['where']['uug'] = 'u.userid=ug.userid';
+				$sql_parts['where'][] = 'ug.usrgrpid IN ('.
 					' SELECT uug.usrgrpid'.
 					' FROM users_groups uug'.
 					' WHERE uug.userid='.self::$userData['userid'].
 				')';
 			}
 			else {
-				$sqlParts['where'][] = 'u.userid='.self::$userData['userid'];
+				$sql_parts['where']['userid'] = 'u.userid='.self::$userData['userid'];
 			}
 		}
 
-		// userids
 		if ($options['userids'] !== null) {
-			zbx_value2array($options['userids']);
-
-			$sqlParts['where'][] = dbConditionInt('u.userid', $options['userids']);
+			if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN || !$options['editable']) {
+				$sql_parts['where']['userid'] = dbConditionId('u.userid', $options['userids']);
+			}
 		}
 
-		// usrgrpids
 		if ($options['usrgrpids'] !== null) {
-			zbx_value2array($options['usrgrpids']);
-
-			$sqlParts['from']['users_groups'] = 'users_groups ug';
-			$sqlParts['where'][] = dbConditionInt('ug.usrgrpid', $options['usrgrpids']);
-			$sqlParts['where']['uug'] = 'u.userid=ug.userid';
+			$sql_parts['from']['users_groups'] = 'users_groups ug';
+			$sql_parts['where'][] = dbConditionId('ug.usrgrpid', $options['usrgrpids']);
+			$sql_parts['where']['uug'] = 'u.userid=ug.userid';
 		}
 
-		// mediaids
 		if ($options['mediaids'] !== null) {
-			zbx_value2array($options['mediaids']);
+			$sql_parts['from']['media'] = 'media m';
+			$sql_parts['where'][] = dbConditionId('m.mediaid', $options['mediaids']);
+			$sql_parts['where']['mu'] = 'm.userid=u.userid';
 
-			$sqlParts['from']['media'] = 'media m';
-			$sqlParts['where'][] = dbConditionInt('m.mediaid', $options['mediaids']);
-			$sqlParts['where']['mu'] = 'm.userid=u.userid';
+			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+				$sql_parts['where']['userid'] = 'u.userid='.self::$userData['userid'];
+			}
 		}
 
-		// mediatypeids
 		if ($options['mediatypeids'] !== null) {
-			zbx_value2array($options['mediatypeids']);
+			$sql_parts['from']['media'] = 'media m';
+			$sql_parts['where'][] = dbConditionId('m.mediatypeid', $options['mediatypeids']);
+			$sql_parts['where']['mu'] = 'm.userid=u.userid';
 
-			$sqlParts['from']['media'] = 'media m';
-			$sqlParts['where'][] = dbConditionInt('m.mediatypeid', $options['mediatypeids']);
-			$sqlParts['where']['mu'] = 'm.userid=u.userid';
+			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+				$sql_parts['where']['userid'] = 'u.userid='.self::$userData['userid'];
+			}
 		}
 
-		// filter
-		if (is_array($options['filter'])) {
+		if ($options['filter'] !== null) {
 			if (array_key_exists('autologout', $options['filter']) && $options['filter']['autologout'] !== null) {
 				$options['filter']['autologout'] = getTimeUnitFilters($options['filter']['autologout']);
 			}
@@ -164,89 +199,165 @@ class CUser extends CApiService {
 				$options['filter']['refresh'] = getTimeUnitFilters($options['filter']['refresh']);
 			}
 
-			if (isset($options['filter']['passwd'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to filter by user password.'));
+			$provisioned_condition = null;
+
+			if (array_key_exists('provisioned', $options['filter']) && $options['filter']['provisioned'] !== null) {
+				$provisioned_condition = $options['filter']['provisioned'] == self::PROVISION_STATUS_YES
+					? 'u.userdirectoryid IS NOT NULL'
+					: 'u.userdirectoryid IS NULL';
+
+				if ($options['searchByAny'] && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+					$provisioned_condition =
+						'(u.userid='.self::$userData['userid'].' AND '.$provisioned_condition.')';
+				}
+
+				unset($options['filter']['provisioned']);
 			}
 
-			$this->dbFilter('users u', $options, $sqlParts);
-		}
+			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+				$private_fields_filter = array_diff_key($options['filter'], $limited_output_fields);
 
-		// search
-		if (is_array($options['search'])) {
-			if (isset($options['search']['passwd'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('It is not possible to search by user password.'));
+				if ($private_fields_filter) {
+					if ($options['searchByAny']) {
+						$options['filter'] = array_intersect_key($options['filter'], $limited_output_fields);
+
+						$this->dbFilter('users u', ['filter' => $private_fields_filter] + $options, $sql_parts);
+
+						if (array_key_exists('filter', $sql_parts['where'])) {
+							$sql_parts['where']['filter'] =
+								'(u.userid='.self::$userData['userid'].' AND '.$sql_parts['where']['filter'].')';
+						}
+					}
+					else {
+						$sql_parts['where']['userid'] = 'u.userid='.self::$userData['userid'];
+					}
+				}
 			}
 
-			zbx_db_search('users u', $options, $sqlParts);
-		}
+			$this->dbFilter('users u', $options, $sql_parts);
 
-		// limit
-		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sqlParts['limit'] = $options['limit'];
-		}
-
-		$userIds = [];
-
-		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
-		$res = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
-
-		while ($user = DBfetch($res)) {
-			unset($user['passwd']);
-
-			if ($options['countOutput']) {
-				$result = $user['rowscount'];
-			}
-			else {
-				$userIds[$user['userid']] = $user['userid'];
-
-				$result[$user['userid']] = $user;
+			if ($provisioned_condition !== null) {
+				if ($options['searchByAny'] && array_key_exists('filter', $sql_parts['where'])) {
+					$sql_parts['where']['filter'] =
+						'('. $sql_parts['where']['filter'].' OR '.$provisioned_condition.')';
+				}
+				else {
+					$sql_parts['where'][] = $provisioned_condition;
+				}
 			}
 		}
+
+		if ($options['search'] !== null) {
+			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+				$private_fields_search = array_diff_key($options['search'], $limited_output_fields);
+
+				if ($private_fields_search) {
+					if ($options['searchByAny']) {
+						$options['search'] = array_intersect_key($options['search'], $limited_output_fields);
+
+						zbx_db_search('users u', ['search' => $private_fields_search] + $options, $sql_parts);
+
+						if (array_key_exists('search', $sql_parts['where'])) {
+							$sql_parts['where']['search'] =
+								'(u.userid='.self::$userData['userid'].' AND '.$sql_parts['where']['search'].')';
+						}
+					}
+					else {
+						$sql_parts['where']['userid'] = 'u.userid='.self::$userData['userid'];
+					}
+				}
+			}
+
+			zbx_db_search('users u', $options, $sql_parts);
+		}
+
+		if ($options['limit'] !== null) {
+			$sql_parts['limit'] = $options['limit'];
+		}
+
+		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
+		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
+		$resource = DBselect(self::createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
 
 		if ($options['countOutput']) {
-			return $result;
+			return DBfetch($resource)['rowscount'];
 		}
 
-		/*
-		 * Adding objects
-		 */
-		if ($options['getAccess'] !== null) {
-			foreach ($result as $userid => $user) {
-				$result[$userid] += ['gui_access' => 0, 'debug_mode' => 0, 'users_status' => 0];
+		$db_users = [];
+
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+			while ($user = DBfetch($resource)) {
+				$db_users[$user['userid']] = $user;
 			}
-
-			$access = DBselect(
-				'SELECT ug.userid,MAX(g.gui_access) AS gui_access,'.
-					' MAX(g.debug_mode) AS debug_mode,MAX(g.users_status) AS users_status'.
-					' FROM usrgrp g,users_groups ug'.
-					' WHERE '.dbConditionInt('ug.userid', $userIds).
-						' AND g.usrgrpid=ug.usrgrpid'.
-					' GROUP BY ug.userid'
-			);
-
-			while ($userAccess = DBfetch($access)) {
-				$result[$userAccess['userid']] = zbx_array_merge($result[$userAccess['userid']], $userAccess);
+		}
+		else {
+			while ($user = DBfetch($resource)) {
+				$db_users[$user['userid']] = bccomp($user['userid'], self::$userData['userid']) == 0
+					? $user
+					: array_intersect_key($user, $limited_output_fields);
 			}
 		}
 
-		if ($result) {
-			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['roleid'], $options['output']);
+		if ($db_users) {
+			self::addRelatedAccessFields($options, $db_users);
 
-			if (!$options['preservekeys']) {
-				$result = array_values($result);
-			}
+			$db_users = $this->addRelatedObjects($options, $db_users);
+
+			$db_users = $this->unsetExtraFields($db_users, ['userid', 'roleid'], $options['output']);
 		}
 
-		return $result;
+		return $options['preservekeys'] ? $db_users : array_values($db_users);
+	}
+
+	private static function addRelatedAccessFields(array $options, array &$db_users): void {
+		if (!$options['getAccess']
+				|| (self::$userData['type'] != USER_TYPE_SUPER_ADMIN
+					&& !array_key_exists(self::$userData['userid'], $db_users))) {
+			return;
+		}
+
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+			foreach ($db_users as $userid => $foo) {
+				$db_users[$userid] += ['gui_access' => 0, 'debug_mode' => 0, 'users_status' => 0];
+			}
+			$userids = array_keys($db_users);
+		}
+		else {
+			$db_users[self::$userData['userid']] += ['gui_access' => 0, 'debug_mode' => 0, 'users_status' => 0];
+			$userids = [self::$userData['userid']];
+		}
+
+		$resource = DBselect(
+			'SELECT ug.userid,MAX(g.gui_access) AS gui_access,MAX(g.debug_mode) AS debug_mode,'.
+				' MAX(g.users_status) AS users_status'.
+			' FROM usrgrp g'.
+			' JOIN users_groups ug ON g.usrgrpid=ug.usrgrpid'.
+			' WHERE '.dbConditionId('ug.userid', $userids).
+			' GROUP BY ug.userid'
+		);
+
+		while ($access = DBfetch($resource)) {
+			$db_users[$access['userid']] = array_merge($db_users[$access['userid']], $access);
+		}
 	}
 
 	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
-		if (!$options['countOutput'] && $options['selectRole'] !== null) {
-			$sql_parts = $this->addQuerySelect($this->fieldId('roleid'), $sql_parts);
+		if ($options['countOutput']) {
+			return $sql_parts;
+		}
+
+		if ($options['selectRole'] !== null && !in_array('u.roleid', $sql_parts['select'])) {
+			$sql_parts['select'][] = 'u.roleid';
+		}
+
+		if (in_array('provisioned', $options['output'])) {
+			$sql_parts['select'][] =
+				'CASE WHEN u.userdirectoryid IS NOT NULL'.
+				' THEN '.self::PROVISION_STATUS_YES.
+				' ELSE '.self::PROVISION_STATUS_NO.
+				' END AS provisioned';
 		}
 
 		return $sql_parts;
@@ -1878,7 +1989,7 @@ class CUser extends CApiService {
 			' FROM opmessage_usr om,operations o,actions a'.
 			' WHERE om.operationid=o.operationid'.
 				' AND o.actionid=a.actionid'.
-				' AND '.dbConditionInt('om.userid', $userids),
+				' AND '.dbConditionId('om.userid', $userids),
 			1
 		);
 
@@ -1925,10 +2036,10 @@ class CUser extends CApiService {
 			' FROM report r'.
 				' LEFT JOIN report_user ru ON r.reportid=ru.reportid'.
 				' LEFT JOIN report_usrgrp rug ON r.reportid=rug.reportid'.
-			' WHERE '.dbConditionInt('r.userid', $userids).
-				' OR '.dbConditionInt('ru.userid', $userids).
-				' OR '.dbConditionInt('ru.access_userid', $userids).
-				' OR '.dbConditionInt('rug.access_userid', $userids),
+			' WHERE '.dbConditionId('r.userid', $userids).
+				' OR '.dbConditionId('ru.userid', $userids).
+				' OR '.dbConditionId('ru.access_userid', $userids).
+				' OR '.dbConditionId('rug.access_userid', $userids),
 			1
 		);
 
@@ -2048,6 +2159,8 @@ class CUser extends CApiService {
 	 * @return string|array
 	 */
 	public function login(array $data) {
+		self::$user_verification_start_time = hrtime();
+
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'username' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
 			'password' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
@@ -2064,30 +2177,40 @@ class CUser extends CApiService {
 			? $this->tryToCreateLdapProvisionedUser($data, $db_users)
 			: false;
 
-		self::checkSingleUserExists($data['username'], $db_users);
+		try {
+			self::checkSingleUserExists($data['username'], $db_users);
 
-		$db_user = $db_users[0];
+			$db_user = $db_users[0];
 
-		if (!$created && $db_user['userdirectoryid'] != 0) {
-			self::checkUserProvisionedByLdap($db_user);
+			if (!$created && $db_user['userdirectoryid'] != 0) {
+				self::checkUserProvisionedByLdap($db_user);
+			}
+
+			self::addUserGroupFields($db_user, $group_status, $group_auth_type, $group_userdirectoryid);
+
+			$db_user['auth_type'] = $db_user['userdirectoryid'] == 0 ? $group_auth_type : ZBX_AUTH_LDAP;
+
+			if (!$created) {
+				self::checkLoginTemporarilyBlocked($db_user);
+
+				if ($db_user['auth_type'] == ZBX_AUTH_LDAP) {
+					self::checkLdapAuthenticationEnabled($db_user);
+
+					$idp_user_data = self::verifyLdapCredentials($data, $db_user, $group_userdirectoryid);
+				}
+				else {
+					self::verifyPassword($data, $db_user);
+				}
+			}
+		}
+		catch (APIException $e) {
+			self::equalizeUserVerificationTime();
+
+			throw $e;
 		}
 
-		self::addUserGroupFields($db_user, $group_status, $group_auth_type, $group_userdirectoryid);
-
-		$db_user['auth_type'] = $db_user['userdirectoryid'] == 0 ? $group_auth_type : ZBX_AUTH_LDAP;
-
-		if (!$created) {
-			self::checkLoginTemporarilyBlocked($db_user);
-
-			if ($db_user['auth_type'] == ZBX_AUTH_LDAP) {
-				self::checkLdapAuthenticationEnabled($db_user);
-
-				$idp_user_data = self::verifyLdapCredentials($data, $db_user, $group_userdirectoryid);
-				$this->tryToUpdateLdapProvisionedUser($db_user, $group_status, $idp_user_data);
-			}
-			else {
-				self::verifyPassword($data, $db_user);
-			}
+		if (!$created && $db_user['auth_type'] == ZBX_AUTH_LDAP) {
+			$this->tryToUpdateLdapProvisionedUser($db_user, $group_status, $idp_user_data);
 		}
 
 		self::checkGroupStatus($db_user, $group_status);
@@ -2436,7 +2559,9 @@ class CUser extends CApiService {
 				);
 			}
 
-			throw $e;
+			self::exception(ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect user name or password or account is temporarily blocked.')
+			);
 		}
 	}
 
@@ -2506,6 +2631,37 @@ class CUser extends CApiService {
 			self::loginException($db_user['userid'], $db_user['username'], ZBX_API_ERROR_PARAMETERS,
 				_('No permissions for system access.')
 			);
+		}
+	}
+
+	/**
+	 * Equalizes user verification time to mitigate timing attacks.
+	 */
+	private static function equalizeUserVerificationTime(): void {
+		[$start_sec, $start_nsec] = self::$user_verification_start_time;
+		[$end_sec, $end_nsec] = hrtime();
+
+		$actual_time_sec = $end_sec - $start_sec;
+		$actual_time_nsec = $end_nsec - $start_nsec;
+
+		if ($actual_time_nsec < 0) {
+			$actual_time_sec -= 1;
+			$actual_time_nsec += 10**9;
+		}
+
+		[$acceptable_time_sec, $acceptable_time_nsec] = self::ACCEPTABLE_USER_VERIFICATION_TIME;
+
+		if ($actual_time_sec < $acceptable_time_sec
+				|| ($actual_time_sec == $acceptable_time_sec && $actual_time_nsec < $acceptable_time_nsec)) {
+			$delay_time_sec = $acceptable_time_sec - $actual_time_sec;
+			$delay_time_nsec = $acceptable_time_nsec - $actual_time_nsec;
+
+			if ($delay_time_nsec < 0) {
+				$delay_time_sec -= 1;
+				$delay_time_nsec += 10**9;
+			}
+
+			time_nanosleep($delay_time_sec, $delay_time_nsec);
 		}
 	}
 
@@ -3032,95 +3188,167 @@ class CUser extends CApiService {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$userIds = zbx_objectValues($result, 'userid');
-
-		// adding usergroups
-		if ($options['selectUsrgrps'] !== null && $options['selectUsrgrps'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'userid', 'usrgrpid', 'users_groups');
-
-			$dbUserGroups = API::UserGroup()->get([
-				'output' => $options['selectUsrgrps'],
-				'usrgrpids' => $relationMap->getRelatedIds(),
-				'preservekeys' => true
-			]);
-
-			$result = $relationMap->mapMany($result, $dbUserGroups, 'usrgrps');
-		}
-
-		// adding medias
-		if ($options['selectMedias'] !== null && $options['selectMedias'] != API_OUTPUT_COUNT) {
-			$db_medias = API::getApiService()->select('media', [
-				'output' => $this->outputExtend($options['selectMedias'], ['userid', 'mediaid', 'mediatypeid']),
-				'filter' => ['userid' => $userIds],
-				'preservekeys' => true
-			]);
-
-			// 'sendto' parameter in media types with 'type' == MEDIA_TYPE_EMAIL are returned as array.
-			if (($options['selectMedias'] === API_OUTPUT_EXTEND || in_array('sendto', $options['selectMedias']))
-					&& $db_medias) {
-				$db_email_medias = DB::select('media_type', [
-					'output' => [],
-					'filter' => [
-						'mediatypeid' => zbx_objectValues($db_medias, 'mediatypeid'),
-						'type' => MEDIA_TYPE_EMAIL
-					],
-					'preservekeys' => true
-				]);
-
-				foreach ($db_medias as &$db_media) {
-					if (array_key_exists($db_media['mediatypeid'], $db_email_medias)) {
-						$db_media['sendto'] = explode("\n", $db_media['sendto']);
-					}
-				}
-				unset($db_media);
-			}
-
-			$relationMap = $this->createRelationMap($db_medias, 'userid', 'mediaid');
-
-			$db_medias = $this->unsetExtraFields($db_medias, ['userid', 'mediaid', 'mediatypeid'],
-				$options['selectMedias']
-			);
-			$result = $relationMap->mapMany($result, $db_medias, 'medias');
-		}
-
-		// adding media types
-		if ($options['selectMediatypes'] !== null && $options['selectMediatypes'] != API_OUTPUT_COUNT) {
-			$mediaTypes = [];
-			$relationMap = $this->createRelationMap($result, 'userid', 'mediatypeid', 'media');
-			$related_ids = $relationMap->getRelatedIds();
-
-			if ($related_ids) {
-				$mediaTypes = API::Mediatype()->get([
-					'output' => $options['selectMediatypes'],
-					'mediatypeids' => $related_ids,
-					'preservekeys' => true
-				]);
-			}
-
-			$result = $relationMap->mapMany($result, $mediaTypes, 'mediatypes');
-		}
-
-		$this->addRelatedRole($options, $result);
+		$this->addRelatedUsergroups($options, $result);
+		$this->addRelatedMedias($options, $result);
+		$this->addRelatedMediatypes($options, $result);
+		$this->addRelatedRoles($options, $result);
 
 		return $result;
 	}
 
-	private function addRelatedRole(array $options, array &$result): void {
-		if ($options['selectRole'] === null) {
+	private function addRelatedUsergroups(array $options, array &$result): void {
+		if ($options['selectUsrgrps'] === null || $options['selectUsrgrps'] == API_OUTPUT_COUNT) {
 			return;
 		}
 
-		$relation_map = $this->createRelationMap($result, 'userid', 'roleid');
+		$relation_map = $this->createRelationMap($result, 'userid', 'usrgrpid', 'users_groups');
 
-		$db_roles = API::Role()->get([
-			'output' => $options['selectRole'] === API_OUTPUT_EXTEND
-				? CRole::OUTPUT_FIELDS
-				: $options['selectRole'],
-			'roleids' => $relation_map->getRelatedIds(),
+		$db_user_groups = API::UserGroup()->get([
+			'output' => $options['selectUsrgrps'],
+			'usrgrpids' => $relation_map->getRelatedIds(),
 			'preservekeys' => true
 		]);
 
-		$result = $relation_map->mapOne($result, $db_roles, 'role');
+		$result = $relation_map->mapMany($result, $db_user_groups, 'usrgrps');
+	}
+
+	private function addRelatedMedias(array $options, array &$result): void {
+		if ($options['selectMedias'] === null
+				|| (self::$userData['type'] != USER_TYPE_SUPER_ADMIN
+					&& !array_key_exists(self::$userData['userid'], $result))) {
+			return;
+		}
+
+		if ($options['selectMedias'] == API_OUTPUT_EXTEND) {
+			$options['selectMedias'] = self::$userData['type'] == USER_TYPE_SUPER_ADMIN
+				? self::OUTPUT_MEDIA_FIELDS
+				: self::LIMITED_OUTPUT_MEDIA_FIELDS;
+		}
+
+		$userids = self::$userData['type'] == USER_TYPE_SUPER_ADMIN
+			? array_keys($result)
+			: [self::$userData['userid']];
+
+		$db_medias = API::getApiService()->select('media', [
+			'output' => $this->outputExtend($options['selectMedias'],
+				['userid', 'mediaid', 'mediatypeid', 'userdirectory_mediaid']),
+			'filter' => ['userid' => $userids],
+			'preservekeys' => true
+		]);
+
+		// 'sendto' parameter in media types with 'type' == MEDIA_TYPE_EMAIL are returned as array.
+		if ($this->outputIsRequested('sendto', $options['selectMedias']) && $db_medias) {
+			$db_email_medias = DB::select('media_type', [
+				'output' => [],
+				'filter' => [
+					'mediatypeid' => array_unique(array_column($db_medias, 'mediatypeid')),
+					'type' => MEDIA_TYPE_EMAIL
+				],
+				'preservekeys' => true
+			]);
+
+			foreach ($db_medias as &$db_media) {
+				if (array_key_exists($db_media['mediatypeid'], $db_email_medias)) {
+					$db_media['sendto'] = explode("\n", $db_media['sendto']);
+				}
+			}
+			unset($db_media);
+		}
+
+		// 'provisioned' parameter is returned if requested.
+		if ($this->outputIsRequested('provisioned', $options['selectMedias']) && $db_medias) {
+			foreach ($db_medias as &$db_media) {
+				$db_media['provisioned'] = $db_media['userdirectory_mediaid'] == 0
+					? self::PROVISION_STATUS_NO
+					: self::PROVISION_STATUS_YES;
+			}
+			unset($db_media);
+		}
+
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+			$relation_map = $this->createRelationMap($db_medias, 'userid', 'mediaid');
+
+			$db_medias = $this->unsetExtraFields($db_medias,
+				['userid', 'mediaid', 'mediatypeid', 'userdirectory_mediaid'],
+				$options['selectMedias']
+			);
+
+			$result = $relation_map->mapMany($result, $db_medias, 'medias');
+		}
+		else {
+			$db_medias = $this->unsetExtraFields($db_medias,
+				['userid', 'mediaid', 'mediatypeid', 'userdirectory_mediaid'],
+				$options['selectMedias']
+			);
+
+			$result[self::$userData['userid']]['medias'] = array_values($db_medias);
+		}
+	}
+
+	private function addRelatedMediatypes(array $options, array &$result) {
+		if ($options['selectMediatypes'] === null
+				|| (self::$userData['type'] != USER_TYPE_SUPER_ADMIN
+					&& !array_key_exists(self::$userData['userid'], $result))) {
+			return;
+		}
+
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+			$relation_map = $this->createRelationMap($result, 'userid', 'mediatypeid', 'media');
+
+			$media_types = API::Mediatype()->get([
+				'output' => $options['selectMediatypes'],
+				'mediatypeids' => $relation_map->getRelatedIds(),
+				'preservekeys' => true
+			]);
+
+			$result = $relation_map->mapMany($result, $media_types, 'mediatypes');
+		}
+		else {
+			$media_types = API::Mediatype()->get([
+				'output' => $options['selectMediatypes'],
+				'userids' => self::$userData['userid'],
+				'preservekeys' => true
+			]);
+
+			$result[self::$userData['userid']]['mediatypes'] = [];
+
+			foreach ($media_types as $media_type) {
+				$result[self::$userData['userid']]['mediatypes'][] = $media_type;
+			}
+		}
+	}
+
+	private function addRelatedRoles(array $options, array &$result): void {
+		if ($options['selectRole'] === null
+				|| (self::$userData['type'] != USER_TYPE_SUPER_ADMIN
+					&& !array_key_exists(self::$userData['userid'], $result))) {
+			return;
+		}
+
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
+			$relation_map = $this->createRelationMap($result, 'userid', 'roleid');
+
+			$db_roles = API::Role()->get([
+				'output' => $options['selectRole'] === API_OUTPUT_EXTEND
+					? CRole::OUTPUT_FIELDS
+					: $options['selectRole'],
+				'roleids' => $relation_map->getRelatedIds(),
+				'preservekeys' => true
+			]);
+
+			$result = $relation_map->mapOne($result, $db_roles, 'role');
+		}
+		else {
+			$db_roles = API::Role()->get([
+				'output' => $options['selectRole'] === API_OUTPUT_EXTEND
+					? CRole::OUTPUT_FIELDS
+					: $options['selectRole'],
+				'roleids' => $result[self::$userData['userid']]['roleid'],
+				'preservekeys' => true
+			]);
+
+			$result[self::$userData['userid']]['role'] = reset($db_roles);
+		}
 	}
 
 	/**

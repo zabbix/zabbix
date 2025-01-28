@@ -20,7 +20,6 @@
  */
 
 $this->addJsFile('gtlc.js');
-$this->addJsFile('class.calendar.js');
 
 $this->includeJsFile('reports.availabilityreport.list.js.php');
 

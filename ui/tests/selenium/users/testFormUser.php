@@ -65,7 +65,7 @@ class testFormUser extends CWebTest {
 		]);
 		$usergrpids = CDataHelper::getIds('name');
 
-		// Create user with frontent access -> LDAP.
+		// Create user with frontend access -> LDAP.
 		CDataHelper::call('user.create', [
 			[
 				'username' => self::ZABBIX_LDAP_USER,
