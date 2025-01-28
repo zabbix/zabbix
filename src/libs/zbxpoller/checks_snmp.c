@@ -2688,7 +2688,7 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 		{
 			ret = snmp_get_value_from_var(var, results, results_alloc, results_offset, error,
 					max_error_len);
-			
+
 			if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE) && SUCCEED == ret)
 			{
 				zabbix_log(LOG_LEVEL_TRACE, "itemid:" ZBX_FS_UI64 " var type:%d name '%s'", itemid,
