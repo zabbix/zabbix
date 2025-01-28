@@ -20,6 +20,7 @@
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxtime.h"
+#include "zbxcacheconfig.h"
 
 /******************************************************************************
  *                                                                            *
