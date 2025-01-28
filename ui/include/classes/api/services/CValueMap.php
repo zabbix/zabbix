@@ -104,7 +104,7 @@ class CValueMap extends CApiService {
 			$db_valuemaps = $this->unsetExtraFields($db_valuemaps, ['valuemapid'], $options['output']);
 
 			if (!$options['preservekeys']) {
-				$db_valuemaps = zbx_cleanHashes($db_valuemaps);
+				$db_valuemaps = array_values($db_valuemaps);
 			}
 		}
 

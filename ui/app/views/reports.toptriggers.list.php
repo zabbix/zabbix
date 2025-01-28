@@ -20,10 +20,6 @@
  */
 
 $this->addJsFile('gtlc.js');
-$this->addJsFile('class.calendar.js');
-$this->addJsFile('class.tagfilteritem.js');
-$this->addJsFile('items.js');
-$this->addJsFile('multilineinput.js');
 
 $this->includeJsFile('reports.toptriggers.list.js.php');
 
@@ -97,6 +93,7 @@ $filter = (new CFilter())
 						->setChecked($data['filter']['severities'])
 						->setColumns(3)
 						->setVertical()
+						->showTitles()
 				)
 			]),
 		(new CFormGrid())

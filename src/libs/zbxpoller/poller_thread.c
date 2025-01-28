@@ -286,7 +286,7 @@ static int	macro_jmx_endpoint_resolv(zbx_macro_resolv_data_t *p, va_list args, c
 			else
 			{
 				ret = zbx_dc_get_interface_value(dc_item->host.hostid, dc_item->itemid, replace_with,
-						ZBX_REQUEST_HOST_IP);
+						ZBX_DC_REQUEST_HOST_IP);
 			}
 		}
 		else if	(0 == strcmp(p->macro, MVAR_HOST_DNS))
@@ -298,7 +298,7 @@ static int	macro_jmx_endpoint_resolv(zbx_macro_resolv_data_t *p, va_list args, c
 			else
 			{
 				ret = zbx_dc_get_interface_value(dc_item->host.hostid, dc_item->itemid, replace_with,
-						ZBX_REQUEST_HOST_DNS);
+						ZBX_DC_REQUEST_HOST_DNS);
 			}
 		}
 		else if (0 == strcmp(p->macro, MVAR_HOST_CONN))
@@ -310,7 +310,7 @@ static int	macro_jmx_endpoint_resolv(zbx_macro_resolv_data_t *p, va_list args, c
 			else
 			{
 				ret = zbx_dc_get_interface_value(dc_item->host.hostid, dc_item->itemid, replace_with,
-						ZBX_REQUEST_HOST_CONN);
+						ZBX_DC_REQUEST_HOST_CONN);
 			}
 		}
 		else if (0 == strcmp(p->macro, MVAR_HOST_PORT))
@@ -322,7 +322,7 @@ static int	macro_jmx_endpoint_resolv(zbx_macro_resolv_data_t *p, va_list args, c
 			else
 			{
 				ret = zbx_dc_get_interface_value(dc_item->host.hostid, dc_item->itemid, replace_with,
-					ZBX_REQUEST_HOST_PORT);
+						ZBX_DC_REQUEST_HOST_PORT);
 			}
 		}
 	}

@@ -19,7 +19,6 @@
  * @var array $data
  */
 
-$this->addJsFile('class.tagfilteritem.js');
 $this->includeJsFile('template.list.js.php');
 
 if ($data['uncheck']) {
@@ -153,9 +152,7 @@ foreach ($data['templates'] as $template) {
 		->setArgument('templateid', $template['templateid'])
 		->getUrl();
 
-	$name = (new CLink($template['name'], $template_url))
-		->setAttribute('data-templateid', $template['templateid'])
-		->setAttribute('data-action', 'template.edit');
+	$name = new CLink($template['name'], $template_url);
 
 	$linked_templates_output = [];
 	$linked_to_output = [];
@@ -183,9 +180,7 @@ foreach ($data['templates'] as $template) {
 
 			$linked_templates_output[] = (new CLink($parent_template['name'], $linked_template_url))
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREY)
-				->setAttribute('data-templateid', $parent_template['templateid'])
-				->setAttribute('data-action', 'template.edit');
+				->addClass(ZBX_STYLE_GREY);
 		}
 		else {
 			$linked_templates_output[] = (new CSpan($parent_template['name']))
@@ -216,9 +211,7 @@ foreach ($data['templates'] as $template) {
 
 			$linked_to_output[] = (new CLink($child_template['name'], $linked_to_url))
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREY)
-				->setAttribute('data-templateid', $child_template['templateid'])
-				->setAttribute('data-action', 'template.edit');
+				->addClass(ZBX_STYLE_GREY);
 		}
 		else {
 			$linked_to_output[] = (new CSpan($child_template['name']))

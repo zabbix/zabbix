@@ -719,8 +719,7 @@ typedef enum
 	MODE_MAX,
 	MODE_MIN,
 	MODE_DELTA,
-	MODE_AVG,
-	MODE_INVALID
+	MODE_AVG
 }
 zbx_mode_t;
 
