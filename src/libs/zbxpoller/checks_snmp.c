@@ -2604,7 +2604,7 @@ out:
 #undef TYPE_STR_STRING
 }
 
-static	void	snmp_bulkwalk_trace_variable(zbx_uint64_t itemid, const struct variable_list *var)
+static void	snmp_bulkwalk_trace_variable(zbx_uint64_t itemid, const struct variable_list *var)
 {
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		{
