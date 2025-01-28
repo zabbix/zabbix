@@ -3065,7 +3065,7 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 	int			ret, task_ret = ZBX_ASYNC_TASK_STOP;
 	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)snmp_context->arg_action;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " %s event:%d fd:%d ", __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " %s event:%d fd:%d", __func__,
 			snmp_context->item.itemid, zbx_get_event_string(event), event, *fd);
 
 	bulkwalk_context = snmp_context->bulkwalk_contexts.values[snmp_context->i];
@@ -3182,7 +3182,7 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 			int		numfds = 0, block = 0;
 			struct timeval	timeout = {0};
 
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() itemid:" ZBX_FS_UI64 " cannot process PDU result", __func__,
+			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " cannot process PDU result",
 					snmp_context->item.itemid);
 
 			if (1 > snmp_sess_select_info2(snmp_context->ssp, &numfds, &bulkwalk_context->fdset, &timeout,
@@ -3506,8 +3506,8 @@ out:
 
 	zbx_free_agent_request(&request);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() itemid:" ZBX_FS_UI64 " result:%s", __func__, item->itemid,
-			zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()%s itemid:" ZBX_FS_UI64, __func__, zbx_result_string(ret),
+			item->itemid);
 
 	return ret;
 }
