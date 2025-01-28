@@ -7137,6 +7137,10 @@ msgstr "그래프 표시"
 msgid "Display local time"
 msgstr ""
 
+#: widgets/itemhistory/views/column.edit.php:240
+msgid "Display log time"
+msgstr ""
+
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
 msgstr ""
@@ -9294,6 +9298,10 @@ msgstr "이력 데이터의 선택"
 
 #: app/views/popup.triggerexpr.php:129
 msgid "History functions"
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:218
+msgid "History, trends and audit log compression"
 msgstr ""
 
 #: include/classes/html/CTabFilter.php:167
@@ -20311,6 +20319,10 @@ msgstr "트렌드 테이블에는 압축된 청크가 포함되어 있으므로 
 
 #: widgets/itemhistory/views/column.edit.php:242
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
+
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
 msgstr ""
 
 #: include/views/configuration.item.edit.php:129
