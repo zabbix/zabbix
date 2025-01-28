@@ -1033,14 +1033,14 @@ end:
 #undef ITEM_SNMPV3_PRIVPROTOCOL_AES256C
 }
 
-static void	zbx_snmp_close_session(zbx_snmp_sess_t	session)
+static void	zbx_snmp_close_session(zbx_snmp_sess_t session, zbx_uint64_t itemid)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __func__, itemid);
 
 	snmp_sess_close(session);
 	SOCK_CLEANUP;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() itemid:" ZBX_FS_UI64, __func__, itemid);
 }
 
 static char	*zbx_sprint_asn_octet_str_dyn(const struct variable_list *var)
@@ -3321,7 +3321,7 @@ void	*zbx_async_check_snmp_get_arg(zbx_snmp_context_t *snmp_context)
 void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context)
 {
 	if (NULL != snmp_context->ssp)
-		zbx_snmp_close_session(snmp_context->ssp);
+		zbx_snmp_close_session(snmp_context->ssp, snmp_context->item.itemid);
 
 	zbx_free(snmp_context->snmp_community);
 	zbx_free(snmp_context->snmpv3_securityname);
@@ -3948,7 +3948,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 		err = zbx_snmp_process_discovery(ssp, &items[j], &results[j], &errcodes[j], error, sizeof(error),
 				&max_succeed, &min_fail, max_vars, bulk);
 
-		zbx_snmp_close_session(ssp);
+		zbx_snmp_close_session(ssp, item->itemid);
 	}
 	else if (NULL != strchr(items[j].snmp_oid, '['))
 	{
@@ -3972,7 +3972,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 		err = zbx_snmp_process_dynamic(ssp, items + j, results + j, errcodes + j, num - j, error, sizeof(error),
 				&max_succeed, &min_fail, bulk, poller_type);
 
-		zbx_snmp_close_session(ssp);
+		zbx_snmp_close_session(ssp, item->itemid);
 	}
 	else
 	{
@@ -3994,7 +3994,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 		err = zbx_snmp_process_standard(ssp, items + j, results + j, errcodes + j, num - j, error,
 				sizeof(error), &max_succeed, &min_fail, poller_type);
 
-		zbx_snmp_close_session(ssp);
+		zbx_snmp_close_session(ssp, item->itemid);
 	}
 exit:
 	if (SUCCEED != err)
