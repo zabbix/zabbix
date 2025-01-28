@@ -263,7 +263,7 @@ static void	resolve_opdata(const zbx_db_event *event, char **replace_to, const c
 			if (NULL != *replace_to)
 				*replace_to = zbx_strdcat(*replace_to, ", ");
 
-			if (SUCCEED == zbx_db_item_get_value(itemids.values[i], 0, &ts, &val, NULL))
+			if (SUCCEED == zbx_db_item_get_value(itemids.values[i], &val, 0, &ts, NULL))
 			{
 				*replace_to = zbx_strdcat(*replace_to, val);
 				zbx_free(val);
