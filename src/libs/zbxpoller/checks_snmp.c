@@ -15,6 +15,7 @@
 #include "checks_snmp.h"
 #include "zbxcacheconfig.h"
 #include "zbxip.h"
+#include "zbxtypes.h"
 
 #ifdef HAVE_NETSNMP
 
@@ -2603,6 +2604,18 @@ out:
 #undef TYPE_STR_STRING
 }
 
+static	void	snmp_bulkwalk_trace_variable(zbx_uint64_t itemid, const struct variable_list *var)
+{
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+		{
+			char	oid_resp[MAX_OID_LEN] = {0};
+
+			snprint_objid(oid_resp, sizeof(oid_resp), var->name, var->name_length);
+			zabbix_log(LOG_LEVEL_TRACE, "itemid:" ZBX_FS_UI64 " var type:%d name '%s'", itemid, var->type,
+					oid_resp);
+		}
+}
+
 static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 		zbx_bulkwalk_context_t *bulkwalk_context, char **results, size_t *results_alloc,
 		size_t *results_offset, const zbx_snmp_sess_t ssp, const zbx_dc_interface_t *interface,
@@ -2618,8 +2631,7 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 		ret = zbx_get_snmp_response_error(ssp, interface, status, response, error, max_error_len,
 				(int)*results_offset);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() itemid:" ZBX_FS_UI64 " response error: %s", __func__,
-				itemid, error);
+		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " response error: %s", itemid, error);
 
 		bulkwalk_context->running = 0;
 		goto out;
@@ -2627,8 +2639,8 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 
 	if (NULL == response->variables)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() itemid:" ZBX_FS_UI64 " response contains no variables, status: %i",
-				__func__, itemid, status);
+		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " response contains no variables, status: %i",
+				itemid, status);
 
 		if (ZBX_SNMP_GET == snmp_oid_type)
 		{
@@ -2643,18 +2655,6 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 
 	for (var = response->variables; NULL != var; var = var->next_variable)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() itemid:" ZBX_FS_UI64 " processing var type:%d", __func__, itemid,
-				var->type);
-
-		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
-		{
-			char	oid_resp[MAX_OID_LEN] = {0};
-
-			snprint_objid(oid_resp, sizeof(oid_resp), var->name, var->name_length);
-			zabbix_log(LOG_LEVEL_TRACE, "%s() itemid:" ZBX_FS_UI64 " name"
-					" walk", __func__, itemid, oid_resp);
-		}
-
 		if (var->name_length < bulkwalk_context->p_oid->root_oid_len ||
 				0 != memcmp(bulkwalk_context->p_oid->root_oid, var->name,
 				bulkwalk_context->p_oid->root_oid_len * sizeof(oid)))
@@ -2676,8 +2676,9 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() itemid:" ZBX_FS_UI64 " received OID is shorter than"
-						" requested", __func__, itemid);
+				snmp_bulkwalk_trace_variable(itemid, var);
+				zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " received OID is shorter than"
+						" requested", itemid);
 				bulkwalk_context->running = 0;
 				break;
 			}
@@ -2688,8 +2689,7 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 			ret = snmp_get_value_from_var(var, results, results_alloc, results_offset, error,
 					max_error_len);
 
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() itemid:" ZBX_FS_UI64 " received GET response",
-					__func__, itemid);
+			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " received GET response", itemid);
 
 			bulkwalk_context->running = 0;
 			break;
@@ -2707,16 +2707,17 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 				if (0 <= snmp_oid_compare(bulkwalk_context->name, bulkwalk_context->name_length,
 						var->name, var->name_length))
 				{
-					zabbix_log(LOG_LEVEL_DEBUG, "%s() itemid:" ZBX_FS_UI64 " received variable"
-							" name mismatch request", __func__, itemid);
+					zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " received variable"
+							" name mismatch request", itemid);
+					snmp_bulkwalk_trace_variable(itemid, var);
 					bulkwalk_context->running = 0;
 					break;
 				}
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() itemid:" ZBX_FS_UI64 " retrieved GET response for"
-						" walk", __func__, itemid);
+				zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " retrieved GET response for walk",
+						itemid);
 				bulkwalk_context->running = 0;
 			}
 
@@ -2724,8 +2725,8 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 
 			if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 			{
-				zabbix_log(LOG_LEVEL_TRACE, "%s() itemid:" ZBX_FS_UI64 " value '%s'", __func__, itemid,
-						buffer);
+				zabbix_log(LOG_LEVEL_TRACE, "itemid:" ZBX_FS_UI64 " type:%d value '%s'", itemid,
+						var->type, buffer);
 			}
 
 			if (ASN_OCTET_STR == var->type)
@@ -2784,14 +2785,16 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 		return 0;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() itemid:" ZBX_FS_UI64 " operation:%d response id:%d command:%d probe:%d"
-			ZBX_FS_UI64, __func__, snmp_context->item.itemid, operation, reqid, pdu ? pdu->command : -1,
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() itemid:" ZBX_FS_UI64 " operation:%d response id:%d command:%d probe:%d",
+			__func__, snmp_context->item.itemid, operation, reqid, pdu ? pdu->command : -1,
 			snmp_context->probe);
 
 	bulkwalk_context->waiting = 0;
 
 	if (1 == snmp_context->probe)
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() itemid:" ZBX_FS_UI64 " probe response", __func__,
+				snmp_context->item.itemid);
 		ret = SUCCEED;
 		goto out;
 	}
@@ -2800,33 +2803,42 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 	{
 		case NETSNMP_CALLBACK_OP_RECEIVED_MESSAGE:
 			if (NULL != pdu && SNMP_MSG_REPORT == pdu->command)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " report received instead of message",
+						snmp_context->item.itemid);
 				goto out;
+			}
 
 			stat = STAT_SUCCESS;
 			break;
 		case NETSNMP_CALLBACK_OP_TIMED_OUT:
 			stat = STAT_TIMEOUT;
-			zabbix_log(LOG_LEVEL_DEBUG, "operation:%d response id:%d timed out, snmp_error:%s",
-					operation, reqid, snmp_api_errstring(SNMPERR_TIMEOUT));
+			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " timed out, snmp_error:%s",
+					snmp_context->item.itemid, snmp_api_errstring(SNMPERR_TIMEOUT));
 			break;
 		case NETSNMP_CALLBACK_OP_SEND_FAILED:
 			stat = STAT_ERROR;
-			zabbix_log(LOG_LEVEL_DEBUG, "operation:%d response id:%d sending failed, snmp_error:%s",
-					operation, reqid, snmp_api_errstring(SNMPERR_GENERR));
+			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " sending failed, snmp_error:%s",
+					snmp_context->item.itemid, snmp_api_errstring(SNMPERR_GENERR));
 			break;
 		case NETSNMP_CALLBACK_OP_DISCONNECT:
 			stat = STAT_ERROR;
-			zabbix_log(LOG_LEVEL_DEBUG, "operation:%d response id:%d disconnected, snmp_error:%s",
-					operation, reqid, snmp_api_errstring(SNMPERR_GENERR));
+			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " disconnected, snmp_error:%s",
+					snmp_context->item.itemid, snmp_api_errstring(SNMPERR_GENERR));
 			break;
 		case NETSNMP_CALLBACK_OP_SEC_ERROR:
 			stat = STAT_ERROR;
-			zabbix_log(LOG_LEVEL_DEBUG, "operation:%d response id:%d security error, snmp_error:%s",
-					operation, reqid, snmp_api_errstring(SNMPERR_GENERR));
+			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " security error, snmp_error:%s",
+					snmp_context->item.itemid, snmp_api_errstring(SNMPERR_GENERR));
 			break;
 		case NETSNMP_CALLBACK_OP_RESEND:
+			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " resend, snmp_error:%s",
+					snmp_context->item.itemid, snmp_api_errstring(SNMPERR_GENERR));
 			bulkwalk_context->reqid = reqid;
+			goto out;
 		case NETSNMP_CALLBACK_OP_CONNECT:
+			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " connect, snmp_error:%s",
+					snmp_context->item.itemid, snmp_api_errstring(SNMPERR_GENERR));
 		default:
 			goto out;
 	}
@@ -2914,9 +2926,6 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, int *fd, char *er
 	{
 		netsnmp_session	*session = snmp_sess_session(snmp_context->ssp);
 
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() itemid:" ZBX_FS_UI64 " probe");
-
 		session->flags |= SNMP_FLAGS_DONT_PROBE;
 
 		if (NULL == (pdu = usm_probe_pdu_create()))
@@ -2925,6 +2934,8 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, int *fd, char *er
 			ret = CONFIG_ERROR;
 			goto out;
 		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " sending probe", snmp_context->item.itemid);
 	}
 	else
 	{
@@ -2959,9 +2970,9 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, int *fd, char *er
 			snmp_free_pdu(pdu);
 			goto out;
 		}
-	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 ", sending", __func__, snmp_context->item.itemid);
+		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " sending PDU", snmp_context->item.itemid);
+	}
 
 	bulkwalk_context->reqid = -1;
 	bulkwalk_context->operation = 0;
@@ -2975,8 +2986,8 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, int *fd, char *er
 		goto out;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() itemid:" ZBX_FS_UI64 " send completed reqid:%d", __func__,
-			snmp_context->item.itemid, bulkwalk_context->reqid);
+	zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " send completed reqid:%d", snmp_context->item.itemid,
+			bulkwalk_context->reqid);
 
 	FD_ZERO(&fdset);
 
@@ -3052,7 +3063,7 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)snmp_context->arg_action;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " %s event:%d fd:%d ", __func__,
-			zbx_get_event_string(event), event, *fd, snmp_context->item.itemid);
+			snmp_context->item.itemid, zbx_get_event_string(event), event, *fd);
 
 	bulkwalk_context = snmp_context->bulkwalk_contexts.values[snmp_context->i];
 
@@ -3106,7 +3117,6 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 		const char	*err_detail;
 
 		snprint_objid(buffer, sizeof(buffer), bulkwalk_context->name, bulkwalk_context->name_length);
-
 
 		if (SNMP_MSG_GETBULK == bulkwalk_context->pdu_type && 0 < snmp_context->results_offset)
 		{
@@ -3188,10 +3198,6 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 		if (1 == snmp_context->probe)
 		{
 			netsnmp_session	*session = snmp_sess_session(snmp_context->ssp);
-
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() itemid:" ZBX_FS_UI64 " engine boots:%u"
-						" engine time:%u", __func__, snmp_context->item.itemid,
-						session->engineBoots, session->engineTime);
 
 			if (0 != session->engineBoots || 0 != session->engineTime)
 			{
