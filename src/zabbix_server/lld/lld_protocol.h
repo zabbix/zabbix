@@ -23,15 +23,18 @@
 
 /* poller -> manager */
 #define ZBX_IPC_LLD_REGISTER		1000
-#define ZBX_IPC_LLD_DONE		1001
+#define ZBX_IPC_LLD_NEXT		1001
+#define ZBX_IPC_LLD_DONE		1002
 
 /* manager -> poller */
-#define ZBX_IPC_LLD_TASK		1100
+#define ZBX_IPC_LLD_PREPARE_VALUE	1100
+#define ZBX_IPC_LLD_CHECK_VALUE		1101
+#define ZBX_IPC_LLD_PROCESS		1102
 
-/* manager -> poller */
+/* process -> manager */
 #define ZBX_IPC_LLD_REQUEST		1200
 
-/* poller -> poller */
+/* process -> poller */
 #define ZBX_IPC_LLD_QUEUE		1300
 
 /* process -> manager */
@@ -53,6 +56,10 @@ zbx_uint32_t	zbx_lld_serialize_item_value(unsigned char **data, zbx_uint64_t ite
 void	zbx_lld_deserialize_item_value(const unsigned char *data, zbx_uint64_t *itemid, zbx_uint64_t *hostid,
 		char **value, zbx_timespec_t *ts, unsigned char *meta, zbx_uint64_t *lastlogsize, int *mtime,
 		char **error);
+
+zbx_uint32_t	zbx_lld_serialize_value(unsigned char **data, const char *value);
+
+void	zbx_lld_deserialize_value(const unsigned char *data, char **value);
 
 zbx_uint32_t	zbx_lld_serialize_diag_stats(unsigned char **data, zbx_uint64_t items_num, zbx_uint64_t values_num);
 
