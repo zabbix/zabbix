@@ -2639,7 +2639,7 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 
 	if (NULL == response->variables)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " response contains no variables, status: %i",
+		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " response contains no variables, status:%i",
 				itemid, status);
 
 		if (ZBX_SNMP_GET == snmp_oid_type)
@@ -2745,8 +2745,14 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() itemid:" ZBX_FS_UI64 ": %s", __func__, itemid,
-					zbx_get_snmp_type_error(var->type));
+			if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+			{
+				char	*errmsg = zbx_get_snmp_type_error(var->type);
+
+				zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " cannot retrieve OID: %s",
+						itemid, errmsg);
+				zbx_free(errmsg);
+			}
 
 			bulkwalk_context->running = 0;
 			break;
