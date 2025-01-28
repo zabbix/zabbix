@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-10-16 08:48+0000\n"
-"Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
+"PO-Revision-Date: 2024-12-16 09:22+0000\n"
+"Last-Translator: Tomáš Skočdopole <tomas.skocdopole@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -718,7 +718,7 @@ msgstr[2] "Akce vypnuty"
 
 #: app/controllers/CControllerPopup.php:42
 msgid "Action edit"
-msgstr ""
+msgstr "Úprava akce"
 
 #: app/controllers/CControllerActionEnable.php:84
 msgid "Action enabled"
@@ -1315,7 +1315,7 @@ msgstr "Vše"
 #: app/views/mediatype.list.php:79 app/views/mediatype.list.php:81
 #: app/views/mediatype.list.php:90 app/views/popup.operation.edit.php:160
 msgid "All available"
-msgstr ""
+msgstr "Vše k dispozici"
 
 #: app/views/monitoring.dashboard.view.php:189
 msgid "All dashboards"
@@ -3000,6 +3000,16 @@ msgid_plural "Cannot delete user groups"
 msgstr[0] "Nelze smazat skupinu uživatelů"
 msgstr[1] "Nelze smazat skupiny uživatelů"
 msgstr[2] "Nelze smazat skupiny uživatelů"
+
+#: include/classes/api/services/CUserGroup.php:1330
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CUserGroup.php:1325
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
+msgstr ""
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
@@ -5189,7 +5199,7 @@ msgstr[2] "Konektory zakázány"
 
 #: app/controllers/CControllerPopup.php:43
 msgid "Connector edit"
-msgstr ""
+msgstr "Úprava konektoru"
 
 #: app/controllers/CControllerConnectorEnable.php:69
 msgid "Connector enabled"
@@ -5355,7 +5365,7 @@ msgstr "Zkopírovat do schránky"
 
 #: app/controllers/CControllerPopup.php:44
 msgid "Correlation edit"
-msgstr ""
+msgstr "Úprava korelace"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:52
 #: app/controllers/CControllerPopupTriggerExpr.php:693
@@ -7298,7 +7308,7 @@ msgstr[2] " Pravidlo nálezu vypnuta"
 
 #: app/controllers/CControllerPopup.php:45
 msgid "Discovery rule edit"
-msgstr ""
+msgstr "Upravit pravidlo zjišťování"
 
 #: app/controllers/CControllerDiscoveryEnable.php:68 host_discovery.php:580
 msgid "Discovery rule enabled"
@@ -7348,7 +7358,7 @@ msgstr "Zobrazovat spouštěče v stavu OK po dobu"
 
 #: app/views/mediatype.list.php:75
 msgid "Display actions"
-msgstr ""
+msgstr "Zobrazit akce"
 
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
@@ -7356,11 +7366,15 @@ msgstr "Zobrazit graf"
 
 #: widgets/tophosts/views/column.edit.php:136
 msgid "Display item value as"
-msgstr ""
+msgstr "Zobrazit hodnotu itemu jako"
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
 msgstr "Zobrazení místního času"
+
+#: widgets/itemhistory/views/column.edit.php:240
+msgid "Display log time"
+msgstr ""
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -7380,7 +7394,7 @@ msgstr "Zobrazit skládaný graf"
 
 #: widgets/topitems/views/column.edit.php:90
 msgid "Display value as"
-msgstr ""
+msgstr "Zobrazit hodnotu jako"
 
 #: app/controllers/CControllerHintboxActionlist.php:99
 #: app/views/administration.queue.details.php:86
@@ -8693,7 +8707,7 @@ msgstr "Filtr"
 
 #: app/views/mediatype.list.php:76
 msgid "Filter actions by the scope of media type usage:"
-msgstr ""
+msgstr "Filtrovat akce podle rozsahu použití média typu:"
 
 #: app/views/js/popup.tabfilter.edit.js.php:63
 msgid "Filter deleted"
@@ -9537,6 +9551,10 @@ msgstr "Výběr historických dat"
 msgid "History functions"
 msgstr "Funkce historie"
 
+#: app/views/administration.housekeeping.edit.php:218
+msgid "History, trends and audit log compression"
+msgstr ""
+
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
 msgstr "Domů"
@@ -9658,7 +9676,7 @@ msgstr "Host nemůže mít více než jedno předvolené rozhraní daného typu.
 
 #: widgets/hostcard/Widget.php:32
 msgid "Host card"
-msgstr ""
+msgstr "Karta hosta"
 
 #: app/views/administration.proxy.list.php:91 hostinventoriesoverview.php:85
 #: widgets/tophosts/includes/WidgetForm.php:159
@@ -9687,7 +9705,7 @@ msgstr[2] "Hosty vypnuté"
 
 #: app/controllers/CControllerPopup.php:46
 msgid "Host edit"
-msgstr ""
+msgstr "Úprava hosta"
 
 #: app/controllers/CControllerHostGroupEnable.php:76
 #: app/controllers/CControllerPopupMassupdateHost.php:491
@@ -9752,7 +9770,7 @@ msgstr[2] "Hostitelské skupiny byly smazány"
 
 #: app/controllers/CControllerPopup.php:47
 msgid "Host group edit"
-msgstr ""
+msgstr "Úprava skupiny hostů"
 
 #: include/views/js/monitoring.sysmaps.js.php:112
 msgid "Host group elements"
@@ -9890,7 +9908,7 @@ msgstr "Sítě hosta"
 #: widgets/topitems/includes/WidgetForm.php:128
 #: widgets/topitems/views/widget.edit.php:63
 msgid "Host ordering"
-msgstr ""
+msgstr "Řazení hostů"
 
 #: widgets/hostnavigator/includes/WidgetForm.php:65
 msgid "Host patterns"
@@ -11986,7 +12004,7 @@ msgstr "Pole inventáře"
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectHostInventory.php:48
 #: widgets/hostcard/includes/WidgetForm.php:50
 msgid "Inventory fields"
-msgstr ""
+msgstr "Pole inventáře"
 
 #: app/views/popup.massupdate.host.php:175
 #: app/views/popup.operation.edit.php:402
@@ -12070,7 +12088,7 @@ msgstr[2] "Položky vypnuté"
 
 #: app/controllers/CControllerPopup.php:48
 msgid "Item edit"
-msgstr ""
+msgstr "Úprava itemu"
 
 #: items.php:707
 msgid "Item enabled"
@@ -12112,7 +12130,7 @@ msgstr "Položka nevybraná"
 #: widgets/topitems/includes/WidgetForm.php:157
 #: widgets/topitems/views/widget.edit.php:81
 msgid "Item ordering"
-msgstr ""
+msgstr "Řazení itemů"
 
 #: widgets/piechart/views/widget.edit.js.php:203
 #: widgets/svggraph/views/widget.edit.js.php:281
@@ -12149,7 +12167,7 @@ msgstr[2] "Prototypy itemů byly smazány"
 
 #: app/controllers/CControllerPopup.php:49
 msgid "Item prototype edit"
-msgstr ""
+msgstr "Úprava prototypu itemu"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:286
 #: disc_prototypes.php:457 disc_prototypes.php:483 disc_prototypes.php:522
@@ -12677,11 +12695,11 @@ msgstr "Licencováno pod"
 #: widgets/topitems/includes/WidgetForm.php:125
 #: widgets/topitems/includes/WidgetForm.php:154
 msgid "Limit"
-msgstr ""
+msgstr "Limit"
 
 #: widgets/topitems/views/widget.edit.php:95
 msgid "Limit applies to each \"Item pattern\" separately"
-msgstr ""
+msgstr "Limit platí pro každý \"Vzor itemu\" samostatně"
 
 #: app/views/administration.gui.edit.php:93
 msgid "Limit for search and filter results"
@@ -12712,7 +12730,7 @@ msgstr "Šířka řádku"
 #: widgets/svggraph/includes/WidgetForm.php:301
 #: widgets/svggraph/includes/WidgetForm.php:333
 msgid "Linear"
-msgstr ""
+msgstr "Lineární"
 
 #: app/views/popup.massupdate.host.php:42 app/views/template.massupdate.php:45
 #: include/views/monitoring.sysmap.constructor.php:43
@@ -12926,7 +12944,7 @@ msgstr "Logovat i nenastavené SNMP trapy"
 #: widgets/svggraph/includes/WidgetForm.php:302
 #: widgets/svggraph/includes/WidgetForm.php:334
 msgid "Logarithmic"
-msgstr ""
+msgstr "Logaritmické"
 
 #: app/controllers/CControllerAuditLogList.php:201
 #: app/views/administration.user.list.php:135
@@ -13090,7 +13108,7 @@ msgstr "Údržba \"%1$s\" již existuje."
 
 #: app/controllers/CControllerPopup.php:50
 msgid "Maintenance edit"
-msgstr ""
+msgstr "Úprava servisního okna"
 
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:238
@@ -13523,7 +13541,7 @@ msgstr "Media type \"%1$s\" již existuje."
 #: include/classes/api/services/CMediatype.php:878
 #, c-format
 msgid "Media type \"%1$s\" is used by action \"%2$s\"."
-msgstr ""
+msgstr "Média typ \"%1$s\" je používán akcí \"%2$s\"."
 
 #: app/controllers/CControllerMediatypeCreate.php:187
 msgid "Media type added"
@@ -13549,7 +13567,7 @@ msgstr "Typ médií zakázané v administraci."
 
 #: app/controllers/CControllerPopup.php:51
 msgid "Media type edit"
-msgstr ""
+msgstr "Úprava média typu"
 
 #: app/controllers/CControllerMediatypeEnable.php:87
 #: app/controllers/CControllerMediatypeEnable.php:94
@@ -13904,7 +13922,7 @@ msgstr[2] "Moduly zakázány"
 
 #: app/controllers/CControllerPopup.php:52
 msgid "Module edit"
-msgstr ""
+msgstr "Úprava modulu"
 
 #: app/controllers/CControllerModuleEnable.php:91
 msgid "Module enabled"
@@ -15345,7 +15363,7 @@ msgstr "Číselné systémy"
 
 #: widgets/tophosts/views/column.edit.php:139
 msgid "Numeric"
-msgstr ""
+msgstr "Numerický"
 
 #: app/partials/configuration.filter.items.php:143
 #: app/views/popup.massupdate.item.php:148 include/items.inc.php:125
@@ -16291,7 +16309,7 @@ msgstr "Vzorec"
 
 #: widgets/topitems/includes/CWidgetFieldColumnsListView.php:58
 msgid "Patterns"
-msgstr ""
+msgstr "Vzorce"
 
 #: app/views/popup.action.edit.php:238
 msgid "Pause operations for suppressed problems"
@@ -16955,7 +16973,7 @@ msgstr[2] "Proxy byla smazána"
 
 #: app/controllers/CControllerPopup.php:53
 msgid "Proxy edit"
-msgstr ""
+msgstr "Upravit proxy"
 
 #: app/controllers/CControllerAuditLogList.php:239
 #: app/partials/configuration.host.edit.html.php:266
@@ -16994,7 +17012,7 @@ msgstr[2] "Skupiny proxy byly smazány"
 
 #: app/controllers/CControllerPopup.php:54
 msgid "Proxy group edit"
-msgstr ""
+msgstr "Úprava skupiny proxy"
 
 #: app/controllers/CControllerProxyGroupUpdate.php:74
 msgid "Proxy group updated"
@@ -18109,7 +18127,7 @@ msgstr[2] "SLA zakázána"
 
 #: app/controllers/CControllerPopup.php:58
 msgid "SLA edit"
-msgstr ""
+msgstr "Úprava SLA"
 
 #: app/controllers/CControllerSlaEnable.php:73
 msgid "SLA enabled"
@@ -18557,7 +18575,7 @@ msgstr "Skript nemá parametry."
 
 #: app/controllers/CControllerPopup.php:56
 msgid "Script edit"
-msgstr ""
+msgstr "Úprava skriptu"
 
 #: app/views/administration.timeouts.edit.php:168
 msgid "Script execution"
@@ -18773,7 +18791,7 @@ msgstr "Odeslat nazpátek"
 
 #: app/views/popup.operation.edit.php:189
 msgid "Send to media type"
-msgstr ""
+msgstr "Odeslat na média typ"
 
 #: app/views/popup.operation.edit.php:108
 msgid "Send to user groups"
@@ -18895,7 +18913,7 @@ msgstr[2] "Služby byly smazány"
 
 #: app/controllers/CControllerPopup.php:57
 msgid "Service edit"
-msgstr ""
+msgstr "Úprava služby"
 
 #: app/views/administration.userrole.edit.php:166
 #: app/views/administration.userrole.edit.php:207
@@ -19539,11 +19557,11 @@ msgstr "Španělsky (es_ES)"
 #: widgets/tophosts/views/column.edit.php:155
 #: widgets/tophosts/views/column.edit.php:162
 msgid "Sparkline"
-msgstr ""
+msgstr "Sparkline"
 
 #: app/views/mediatype.list.php:83 app/views/mediatype.list.php:91
 msgid "Specific"
-msgstr ""
+msgstr "Konkrétní"
 
 #: include/classes/helpers/CRoleHelper.php:199
 msgid "Specified role was not found."
@@ -20295,7 +20313,7 @@ msgstr[2] "Šablony byly smazány"
 
 #: app/controllers/CControllerPopup.php:59
 msgid "Template edit"
-msgstr ""
+msgstr "Upravit šablonu"
 
 #: app/controllers/CControllerAuditLogList.php:259
 #: app/partials/configuration.templategroup.edit.html.php:52
@@ -20323,7 +20341,7 @@ msgstr[2] "Skupiny šablon odebrány"
 
 #: app/controllers/CControllerPopup.php:55
 msgid "Template group edit"
-msgstr ""
+msgstr "Úprava skupiny šablon"
 
 #: app/controllers/CControllerTemplateGroupUpdate.php:86
 msgid "Template group updated"
@@ -20756,6 +20774,10 @@ msgstr "Toto nastavení by mělo být povoleno, protože tabulky trendů obsahuj
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
 msgstr "Toto nastavení zobrazí místo časového razítka místní čas. V pokročilé konfiguraci je nutné zaškrtnout \"Zobrazit časové razítko\"."
 
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
 msgid "This type of information may not match the key."
@@ -20998,7 +21020,7 @@ msgstr "Dnes prozatím"
 
 #: app/controllers/CControllerPopup.php:60
 msgid "Token edit"
-msgstr ""
+msgstr "Úprava tokenu"
 
 #: include/views/js/monitoring.sysmaps.js.php:40
 #: include/views/js/monitoring.sysmaps.js.php:159
@@ -21031,7 +21053,7 @@ msgstr "Top hosté"
 
 #: widgets/topitems/Widget.php:32
 msgid "Top items"
-msgstr ""
+msgstr "Top itemy"
 
 #: widgets/toptriggers/Widget.php:29
 msgid "Top triggers"
@@ -21266,7 +21288,7 @@ msgstr "Zobrazovací možnosti spouštěčů"
 
 #: app/controllers/CControllerPopup.php:61
 msgid "Trigger edit"
-msgstr ""
+msgstr "Úprava triggeru"
 
 #: app/controllers/CControllerTriggerEnable.php:67
 msgid "Trigger enabled"
@@ -21411,7 +21433,7 @@ msgstr[2] "Prototypy triggerů byly smazány"
 
 #: app/controllers/CControllerPopup.php:62
 msgid "Trigger prototype edit"
-msgstr ""
+msgstr "Úprava prototypu triggeru"
 
 #: app/controllers/CControllerTriggerMassupdate.php:219
 #: app/controllers/CControllerTriggerPrototypeDisable.php:76
@@ -22987,6 +23009,10 @@ msgstr "Čítač výkonu virtuálního stroje VMware, \"url\" - URL služby VMwa
 #: include/classes/data/CItemData.php:2443
 msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "Stav spuštění virtuálního stroje hypervisoru VMWare, \"url\" - URL služby VMware služby, \"uuid\" - globální unikátní identifikátor virtuálního stroje VMware"
+
+#: include/classes/data/CItemData.php:2498
+msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
@@ -24894,15 +24920,15 @@ msgstr "pravidlo objevování \"%1$s\" na hostu \"%2$s\" není monitorováno"
 
 #: app/views/mediatype.list.php:78
 msgid "display all actions"
-msgstr ""
+msgstr "zobrazit všechny akce"
 
 #: app/views/mediatype.list.php:80
 msgid "display only actions where All available media types are used in action operation"
-msgstr ""
+msgstr "zobrazit pouze akce, kde jsou v operaci akce použity všechny dostupné média typy"
 
 #: app/views/mediatype.list.php:84
 msgid "display only actions where specific media type is used in action operation"
-msgstr ""
+msgstr "zobrazit pouze akce, kde je v operaci akce použit specifický typ média"
 
 #: app/views/popup.lldoperation.php:65 include/actions.inc.php:27
 #: include/classes/helpers/CCorrelationHelper.php:37
@@ -25265,7 +25291,7 @@ msgstr "neplatné jméno hosta"
 
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectHostInventory.php:48
 msgid "invalid inventory field"
-msgstr ""
+msgstr "neplatné pole inventáře"
 
 #: include/classes/validators/CHistFunctionValidator.php:82
 #: include/classes/validators/CMathFunctionValidator.php:86
@@ -25593,7 +25619,7 @@ msgstr "monoinc() - Kontrola nepřetržitého růstu hodnoty položky (1 - pdaje
 #: widgets/hostcard/views/widget.view.php:157
 #: widgets/hostcard/views/widget.view.php:338
 msgid "more"
-msgstr ""
+msgstr "více"
 
 #: include/func.inc.php:571
 msgctxt "millisecond short"

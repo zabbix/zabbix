@@ -18,7 +18,6 @@ class CWidgetHostCard extends CWidget {
 	setContents(response) {
 		super.setContents(response);
 
-		this.#updateSectionMonitoredBy();
 		this.#adjustSections();
 	}
 
@@ -26,53 +25,6 @@ class CWidgetHostCard extends CWidget {
 		super.onResize();
 
 		this.#adjustSections();
-	}
-
-	#updateSectionMonitoredBy() {
-		const section = this._contents.querySelector('.section-monitored-by');
-
-		if (section === null) {
-			return;
-		}
-
-		section.addEventListener('click', e => {
-			if (e.target.classList.contains('js-edit-proxy')) {
-				this.#editProxy(e.target.dataset.proxyid);
-			}
-			else if (e.target.classList.contains('js-edit-proxy-group')) {
-				this.#editProxyGroup(e.target.dataset.proxy_groupid);
-			}
-		});
-	}
-
-	#editProxy(proxyid) {
-		const overlay = PopUp('popup.proxy.edit', {proxyid}, {
-			dialogueid: 'proxy_edit',
-			dialogue_class: 'modal-popup-static',
-			prevent_navigation: true
-		});
-
-		overlay.$dialogue[0].addEventListener('dialogue.submit', e => this.#reloadPage(e.detail.success));
-	}
-
-	#editProxyGroup(proxy_groupid) {
-		const overlay = PopUp('popup.proxygroup.edit', {proxy_groupid}, {
-			dialogueid: 'proxy-group-edit',
-			dialogue_class: 'modal-popup-static',
-			prevent_navigation: true
-		});
-
-		overlay.$dialogue[0].addEventListener('dialogue.submit', e => this.#reloadPage(e.detail.success));
-	}
-
-	#reloadPage(success) {
-		postMessageOk(success.title);
-
-		if ('messages' in success) {
-			postMessageDetails('success', success.messages);
-		}
-
-		location.href = location.href;
 	}
 
 	#adjustSections() {

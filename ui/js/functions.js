@@ -438,35 +438,33 @@ function overlayPreloaderDestroy(id) {
 }
 
 /**
- * Function to close overlay dialogue and moves focus to IU element that was clicked to open it.
+ * Close and destroy overlay dialogue and move focus to IU element that was clicked to open it.
  *
- * @param string   dialogueid  Dialogue identifier to identify dialogue.
- * @param boolean  close       Flag for dispatching close event.
+ * @param {string} dialogueid
+ * @param {string} close_by    Indicates the initiator of closing action.
  */
-function overlayDialogueDestroy(dialogueid, close = false) {
-	if (typeof dialogueid !== 'undefined') {
-		var overlay = overlays_stack.getById(dialogueid);
-		if (!overlay) {
-			return;
-		}
+function overlayDialogueDestroy(dialogueid, close_by = Overlay.prototype.CLOSE_BY_SCRIPT) {
+	const overlay = overlays_stack.getById(dialogueid);
 
-		if (typeof overlay.xhr !== 'undefined') {
-			overlay.xhr.abort();
-			delete overlay.xhr;
-		}
-
-		if (overlay instanceof Overlay) {
-			overlay.unmount();
-		}
-
-		jQuery('[data-dialogueid="'+dialogueid+'"]').remove();
-
-		removeFromOverlaysStack(dialogueid);
-
-		if (close) {
-			overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.close', {detail: {dialogueid}}));
-		}
+	if (overlay === undefined) {
+		return;
 	}
+
+	if (overlay.xhr !== undefined) {
+		overlay.xhr.abort();
+
+		delete overlay.xhr;
+	}
+
+	if (overlay instanceof Overlay) {
+		overlay.unmount();
+	}
+
+	jQuery(`[data-dialogueid="${dialogueid}"]`).remove();
+
+	removeFromOverlaysStack(dialogueid);
+
+	overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.close', {detail: {dialogueid, close_by}}));
 }
 
 /**
@@ -854,12 +852,23 @@ function urlEncodeData(parameters, prefix = '') {
  *
  * @param {HTMLFormElement} form
  *
- * @return {object}
+ * @return {Object}
  */
 function getFormFields(form) {
+	return searchParamsToObject(new FormData(form));
+}
+
+/**
+ * Convert URL search parameters into nested object.
+ *
+ * @param search_params  An object implementing iterator protocol (URLSearchParams).
+ *
+ * @returns {Object}
+ */
+function searchParamsToObject(search_params) {
 	const fields = {};
 
-	for (let [key, value] of new FormData(form)) {
+	for (let [key, value] of search_params) {
 		value = value.replace(/\r?\n/g, '\r\n');
 
 		const key_parts = [...key.matchAll(/[^\[\]]+|\[\]/g)];
@@ -897,6 +906,35 @@ function getFormFields(form) {
 	}
 
 	return fields;
+}
+
+/**
+ * Convert nested data object into URL search parameters object.
+ *
+ * @param {Object|Array} object
+ *
+ * @returns {URLSearchParams}
+ */
+function objectToSearchParams(object) {
+	const combine = (data, search_params = new URLSearchParams(), name_prefix = '') => {
+		if (Array.isArray(data)) {
+			for (const [index, datum] of data.entries()) {
+				combine(datum, search_params, name_prefix !== '' ? `${name_prefix}[${index}]` : index);
+			}
+		}
+		else if (typeof data === 'object') {
+			for (const [name, datum] of Object.entries(data)) {
+				combine(datum, search_params, name_prefix !== '' ? `${name_prefix}[${name}]` : name);
+			}
+		}
+		else {
+			search_params.append(name_prefix, data);
+		}
+
+		return search_params;
+	};
+
+	return combine(object);
 }
 
 /**

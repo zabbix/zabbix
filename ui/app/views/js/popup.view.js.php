@@ -22,10 +22,8 @@
 <script>
 	const view = new class {
 
-	init({action, options}) {
-		const popup_manager = new Popupmanager();
-
-		popup_manager.openPopup(action, options, true);
-	}
-};
+		init({action, action_parameters}) {
+			ZABBIX.PopupManager.open(action, action_parameters, {supports_standalone: true});
+		}
+	};
 </script>

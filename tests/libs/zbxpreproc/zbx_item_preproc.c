@@ -379,6 +379,17 @@ void	zbx_mock_test_entry(void **state)
 		else
 			expected_ret = FAIL;
 
+#ifndef HAVE_LIBCURL
+		if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.script_uses_curl"))
+		{
+			pp_cache_release(cache);
+			zbx_variant_clear(&value_in);
+			zbx_variant_clear(&history_value_in);
+			zbx_variant_clear(&value);
+			skip();
+		}
+#endif
+
 		zbx_mock_assert_result_eq("zbx_item_preproc() return", expected_ret, returned_ret);
 
 		if (SUCCEED == returned_ret)
