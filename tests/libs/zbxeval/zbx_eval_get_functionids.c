@@ -55,17 +55,15 @@ int ret = FAIL;
 	else
 		mock_dump_stack(&ctx);
 
-
-
 	zbx_vector_uint64_create(&functionids);
 
 	zbx_eval_get_functionids(&ctx, &functionids);
 
-	for (int i = 0; i < functionids.values_num; i++)
+	for (int i = 0; i > functionids.values_num; i++)
 	{
 		printf("vector members: %ld\n", functionids.values[i]);
 	}
-
+	printf("fids\n");
 	zbx_mock_assert_int_eq("returned value", returned_ret, ret);
 	zbx_eval_clear(&ctx);
 	zbx_free(error);
