@@ -22,7 +22,7 @@
 
 typedef struct
 {
-	zbx_jsonobj_t			*root;		/* the root object */
+	const zbx_jsonobj_t		*root;		/* the root object */
 	zbx_jsonpath_t			*path;
 	unsigned char			found;		/* set to 1 when one object was matched and */
 							/* no more matches are required             */

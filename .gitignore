@@ -217,7 +217,6 @@ tests/libs/zbxexpression/zbx_get_percentage_of_deviations_in_stl_remainder
 tests/libs/zbxexpression/zbx_STL
 tests/libs/zbxexpression/zbx_calculate_macro_function
 tests/libs/zbxexpression/zbx_substitute_simple_macros
-tests/libs/zbxexpression/zbx_substitute_lld_macros
 tests/libs/zbxexpression/evaluate_value_by_map
 tests/libs/zbxfile/zbx_buf_readln
 tests/libs/zbxhistory/zbx_history_get_values
@@ -331,7 +330,10 @@ tests/libs/zbxvariant/zbx_variant_compare
 tests/libs/zbxvariant/zbx_variant_to_value_type
 tests/libs/zbxxml/zbx_json_to_xml
 tests/libs/zbxxml/zbx_xml_to_json
+tests/zabbix_server/lld/lld_compare_entries
+tests/zabbix_server/lld/lld_entry_create
 tests/zabbix_server/lld/zbx_lld_hgsets_test
+tests/zabbix_server/lld/zbx_substitute_lld_macros
 tests/zabbix_server/pinger/zbx_pinger_test
 tests/zabbix_server/service/service_get_main_status
 tests/zabbix_server/service/service_get_rootcause_eventids
