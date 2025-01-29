@@ -1169,7 +1169,6 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	zbx_db_close();
 
 	zbx_db_deinit();
-	zbx_db_sync_locker_deinit();
 	zbx_deinit_remote_commands_cache();
 
 	/* free vmware support */
@@ -1391,13 +1390,6 @@ static void	proxy_db_init(void)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_db_sync_locker_init(&error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize db sync: %s", error);
-		zbx_free(error);
-		goto out;
-	}
-
 	zbx_db_init_autoincrement_options();
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
@@ -1427,7 +1419,6 @@ static void	proxy_db_init(void)
 		zbx_db_close();
 		zabbix_log(LOG_LEVEL_WARNING, "removing database file: \"%s\"", zbx_db_config->dbname);
 		zbx_db_deinit();
-		zbx_db_sync_locker_deinit();
 
 		if (0 != unlink(zbx_db_config->dbname))
 		{

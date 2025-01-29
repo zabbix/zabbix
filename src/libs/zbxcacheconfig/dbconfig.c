@@ -80,6 +80,12 @@ typedef struct
 }
 zbx_dc_item_tag_link;
 
+typedef enum
+{
+	ZBX_DB_SYNC_STATUS_UNLOCKED,
+	ZBX_DB_SYNC_STATUS_LOCKED
+};
+
 typedef struct
 {
 	zbx_hashset_t	item_tag_links;
@@ -17474,4 +17480,36 @@ int	zbx_dc_get_proxy_version(zbx_uint64_t proxyid)
 	UNLOCK_CACHE;
 
 	return version;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update sync_status in configuration cache                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_sync_unlock()
+{
+	WRLOCK_CACHE;
+	config->sync_status = ZBX_DB_SYNC_STATUS_UNLOCKED;
+	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get sync_status in configuration cache                            *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_sync_lock(void)
+{
+	int		ret = FAIL;
+
+	RDLOCK_CACHE;
+	if(ZBX_DB_SYNC_STATUS_UNLOCKED != config->sync_status)
+		goto out;
+	config->sync_status = ZBX_DB_SYNC_STATUS_LOCKED;
+
+	ret = SUCCEED;
+out:
+	UNLOCK_CACHE;
+	return ret;
 }

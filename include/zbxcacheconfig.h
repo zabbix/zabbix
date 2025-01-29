@@ -1543,6 +1543,9 @@ zbx_uint64_t	zbx_dc_get_proxy_groupid(zbx_uint64_t proxyid);
 void	zbx_dc_set_itservices_num(int num);
 int	zbx_dc_get_itservices_num(void);
 
+void	zbx_dc_sync_unlock();
+int	zbx_dc_sync_lock(void);
+
 int	zbx_dc_get_proxy_version(zbx_uint64_t proxyid);
 
 #endif

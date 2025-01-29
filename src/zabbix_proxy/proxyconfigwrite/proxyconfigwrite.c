@@ -1658,7 +1658,7 @@ static int	proxyconfig_sync_data(zbx_vector_table_data_ptr_t *config_tables, int
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != zbx_db_sync_lock())
+	if (SUCCEED != zbx_dc_sync_lock())
 	{
 		*error = zbx_strdup(NULL, "skip proxy config sync, already in progress");
 		return FAIL;
@@ -1724,7 +1724,7 @@ static int	proxyconfig_sync_data(zbx_vector_table_data_ptr_t *config_tables, int
 	ret = SUCCEED;
 
 out:
-	zbx_db_sync_unlock();
+	zbx_dc_sync_unlock();
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 	return ret;
 }
