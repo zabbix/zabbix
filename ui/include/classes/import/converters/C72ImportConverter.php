@@ -38,30 +38,23 @@ class C72ImportConverter extends CConverter {
 
 	private static function convertMaps(array $maps): array {
 		foreach ($maps as &$map) {
-			$map['show_element_label'] = (string) MAP_SHOW_LABEL_ALWAYS;
-			$map['show_link_label'] = (string) MAP_SHOW_LABEL_ALWAYS;
-			$map['background_scale'] = (string) SYSMAP_BACKGROUND_SCALE_COVER;
-
-			foreach ($map['selements'] as &$selement) {
-				$selement['show_label'] = (string) MAP_SHOW_LABEL_DEFAULT;
-			}
-			unset($selement);
+			$map['background_scale'] = CXmlConstantName::MAP_BACKGROUND_SCALE_NONE;
 
 			foreach ($map['links'] as &$link) {
 				switch ($link['drawtype']) {
-					case MAP_LINK_DRAWTYPE_LINE:
+					case DRAWTYPE_LINE:
 						$link['drawtype'] = CXmlConstantName::SINGLE_LINE;
 						break;
 
-					case MAP_LINK_DRAWTYPE_BOLD_LINE:
+					case DRAWTYPE_BOLD_LINE:
 						$link['drawtype'] = CXmlConstantName::BOLD_LINE;
 						break;
 
-					case MAP_LINK_DRAWTYPE_DOT:
+					case DRAWTYPE_DOT:
 						$link['drawtype'] = CXmlConstantName::DOTTED_LINE;
 						break;
 
-					case MAP_LINK_DRAWTYPE_DASHED_LINE:
+					case DRAWTYPE_DASHED_LINE:
 						$link['drawtype'] = CXmlConstantName::DASHED_LINE;
 				}
 
@@ -70,19 +63,19 @@ class C72ImportConverter extends CConverter {
 
 					foreach ($link['linktriggers'] as &$link_trigger) {
 						switch ($link_trigger['drawtype']) {
-							case MAP_LINK_DRAWTYPE_LINE:
+							case DRAWTYPE_LINE:
 								$link_trigger['drawtype'] = CXmlConstantName::SINGLE_LINE;
 								break;
 
-							case MAP_LINK_DRAWTYPE_BOLD_LINE:
+							case DRAWTYPE_BOLD_LINE:
 								$link_trigger['drawtype'] = CXmlConstantName::BOLD_LINE;
 								break;
 
-							case MAP_LINK_DRAWTYPE_DOT:
+							case DRAWTYPE_DOT:
 								$link_trigger['drawtype'] = CXmlConstantName::DOTTED_LINE;
 								break;
 
-							case MAP_LINK_DRAWTYPE_DASHED_LINE:
+							case DRAWTYPE_DASHED_LINE:
 								$link_trigger['drawtype'] = CXmlConstantName::DASHED_LINE;
 								break;
 						}

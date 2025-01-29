@@ -188,7 +188,7 @@
 			<input type="hidden" id="items_#{number}_flags" name="items[#{number}][flags]" value="#{flags}">
 			<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="#{type}">
 			<input type="hidden" id="items_#{number}_calc_fnc" name="items[#{number}][calc_fnc]" value="#{calc_fnc}">
-			<input type="hidden" id="items_#{number}_drawtype" name="items[#{number}][drawtype]" value="<?= GRAPH_ITEM_DRAWTYPE_LINE ?>">
+			<input type="hidden" id="items_#{number}_drawtype" name="items[#{number}][drawtype]" value="<?= DRAWTYPE_LINE ?>">
 			<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="<?= GRAPH_YAXIS_SIDE_LEFT ?>">
 		</td>
 
@@ -261,7 +261,7 @@
 			<input type="hidden" id="items_#{number}_flags" name="items[#{number}][flags]" value="#{flags}">
 			<input type="hidden" id="items_#{number}_type" name="items[#{number}][type]" value="#{type}">
 			<input type="hidden" id="items_#{number}_calc_fnc" name="items[#{number}][calc_fnc]" value="#{calc_fnc}">
-			<input type="hidden" id="items_#{number}_drawtype" name="items[#{number}][drawtype]" value="<?= GRAPH_ITEM_DRAWTYPE_LINE ?>">
+			<input type="hidden" id="items_#{number}_drawtype" name="items[#{number}][drawtype]" value="<?= DRAWTYPE_LINE ?>">
 			<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="<?= GRAPH_YAXIS_SIDE_LEFT ?>">
 		</td>
 

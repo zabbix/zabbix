@@ -382,6 +382,10 @@ class CXmlConstantName {
 	const MAPPING_REGEXP = 'REGEXP';
 	const MAPPING_DEFAULT = 'DEFAULT';
 
+	// Constants for map background scale.
+	public const MAP_BACKGROUND_SCALE_NONE = 'NONE';
+	public const MAP_BACKGROUND_SCALE_COVER = 'PROPORTIONALLY';
+
 	// Constants for map element label appearance.
 	public const SHOW_LABEL_DEFAULT = 'DEFAULT';
 	public const SHOW_LABEL_AUTO_HIDE = 'AUTO_HIDE';

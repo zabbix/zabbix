@@ -2065,13 +2065,13 @@ class CMap extends CMapElement {
 			'selementid2' =>		['type' => API_SELEMENTID, 'flags' => $api_required],
 			'label' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmaps_links', 'label')],
 			'show_label' =>			['type' => API_INT32, 'in' => implode(',', [MAP_SHOW_LABEL_DEFAULT, MAP_SHOW_LABEL_AUTO_HIDE, MAP_SHOW_LABEL_ALWAYS])],
-			'drawtype' =>			['type' => API_INT32, 'in' => implode(',', [MAP_LINK_DRAWTYPE_LINE, MAP_LINK_DRAWTYPE_BOLD_LINE, MAP_LINK_DRAWTYPE_DOT, MAP_LINK_DRAWTYPE_DASHED_LINE])],
+			'drawtype' =>			['type' => API_INT32, 'in' => implode(',', [DRAWTYPE_LINE, DRAWTYPE_BOLD_LINE, DRAWTYPE_DOT, DRAWTYPE_DASHED_LINE])],
 			'color' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY],
 			'indicator_type' =>		['type' => API_ANY],
 			'linktriggers' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'indicator_type', 'in' => MAP_INDICATOR_TYPE_TRIGGER], 'type' => API_OBJECTS, 'flags' => $api_required | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['triggerid']], 'fields' => [
 											'triggerid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-											'drawtype' =>	['type' => API_INT32, 'in' => implode(',', [MAP_LINK_DRAWTYPE_LINE, MAP_LINK_DRAWTYPE_BOLD_LINE, MAP_LINK_DRAWTYPE_DOT, MAP_LINK_DRAWTYPE_DASHED_LINE])],
+											'drawtype' =>	['type' => API_INT32, 'in' => implode(',', [DRAWTYPE_LINE, DRAWTYPE_BOLD_LINE, DRAWTYPE_DOT, DRAWTYPE_DASHED_LINE])],
 											'color' =>		['type' => API_COLOR, 'flags' => API_NOT_EMPTY]
 										]],
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
@@ -2081,7 +2081,7 @@ class CMap extends CMapElement {
 			'thresholds' =>			['type' => API_MULTIPLE, 'rules' => [
 										['if' => static fn($data): bool => $data['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE && in_array($data['item_value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]), 'type' => API_OBJECTS, 'flags' => $api_required | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['threshold']], 'fields' => [
 											'threshold' =>	['type' => API_NUMERIC, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('sysmap_link_threshold', 'threshold')],
-											'drawtype' =>	['type' => API_INT32, 'in' => implode(',', [MAP_LINK_DRAWTYPE_LINE, MAP_LINK_DRAWTYPE_BOLD_LINE, MAP_LINK_DRAWTYPE_DOT, MAP_LINK_DRAWTYPE_DASHED_LINE])],
+											'drawtype' =>	['type' => API_INT32, 'in' => implode(',', [DRAWTYPE_LINE, DRAWTYPE_BOLD_LINE, DRAWTYPE_DOT, DRAWTYPE_DASHED_LINE])],
 											'color' =>		['type' => API_COLOR, 'flags' => API_NOT_EMPTY]
 										]],
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
@@ -2089,7 +2089,7 @@ class CMap extends CMapElement {
 			'highlights' =>			['type' => API_MULTIPLE, 'rules' => [
 										['if' => static fn($data): bool => $data['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE && in_array($data['item_value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]), 'type' => API_OBJECTS, 'flags' => $api_required | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['pattern']], 'fields' => [
 											'pattern' =>	['type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('sysmap_link_threshold', 'pattern')],
-											'drawtype' =>	['type' => API_INT32, 'in' => implode(',', [MAP_LINK_DRAWTYPE_LINE, MAP_LINK_DRAWTYPE_BOLD_LINE, MAP_LINK_DRAWTYPE_DOT, MAP_LINK_DRAWTYPE_DASHED_LINE])],
+											'drawtype' =>	['type' => API_INT32, 'in' => implode(',', [DRAWTYPE_LINE, DRAWTYPE_BOLD_LINE, DRAWTYPE_DOT, DRAWTYPE_DASHED_LINE])],
 											'color' =>		['type' => API_COLOR, 'flags' => API_NOT_EMPTY]
 										]],
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]

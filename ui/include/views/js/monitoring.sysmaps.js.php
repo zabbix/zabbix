@@ -827,10 +827,10 @@ function createFontSelect(string $name): CSelect {
 						(new CSelect('drawtype'))
 							->setFocusableElementId('label-drawtype')
 							->addOptions(CSelect::createOptionsFromArray([
-								GRAPH_ITEM_DRAWTYPE_LINE => _('Line'),
-								GRAPH_ITEM_DRAWTYPE_BOLD_LINE => _('Bold line'),
-								GRAPH_ITEM_DRAWTYPE_DOT => _('Dot'),
-								GRAPH_ITEM_DRAWTYPE_DASHED_LINE => _('Dashed line')
+								DRAWTYPE_LINE => _('Line'),
+								DRAWTYPE_BOLD_LINE => _('Bold line'),
+								DRAWTYPE_DOT => _('Dot'),
+								DRAWTYPE_DASHED_LINE => _('Dashed line')
 							]))
 					)
 					->addRow(_('Color (OK)'),
@@ -967,10 +967,10 @@ function createFontSelect(string $name): CSelect {
 				(new CSelect('linktrigger_#{index}_drawtype'))
 					->setId('linktrigger_#{index}_drawtype')
 					->addOptions(CSelect::createOptionsFromArray([
-						GRAPH_ITEM_DRAWTYPE_LINE => _('Line'),
-						GRAPH_ITEM_DRAWTYPE_BOLD_LINE => _('Bold line'),
-						GRAPH_ITEM_DRAWTYPE_DOT => _('Dot'),
-						GRAPH_ITEM_DRAWTYPE_DASHED_LINE => _('Dashed line')
+						DRAWTYPE_LINE => _('Line'),
+						DRAWTYPE_BOLD_LINE => _('Bold line'),
+						DRAWTYPE_DOT => _('Dot'),
+						DRAWTYPE_DASHED_LINE => _('Dashed line')
 					]))
 			],
 			(new CCol(
@@ -993,10 +993,10 @@ function createFontSelect(string $name): CSelect {
 		(new CSelect('threshold_#{index}_drawtype'))
 			->setId('threshold_#{index}_drawtype')
 			->addOptions(CSelect::createOptionsFromArray([
-				GRAPH_ITEM_DRAWTYPE_LINE => _('Line'),
-				GRAPH_ITEM_DRAWTYPE_BOLD_LINE => _('Bold line'),
-				GRAPH_ITEM_DRAWTYPE_DOT => _('Dot'),
-				GRAPH_ITEM_DRAWTYPE_DASHED_LINE => _('Dashed line')
+				DRAWTYPE_LINE => _('Line'),
+				DRAWTYPE_BOLD_LINE => _('Bold line'),
+				DRAWTYPE_DOT => _('Dot'),
+				DRAWTYPE_DASHED_LINE => _('Dashed line')
 			])),
 		(new CCol(
 			(new CButtonLink(_('Remove')))
@@ -1018,10 +1018,10 @@ function createFontSelect(string $name): CSelect {
 		(new CSelect('highlight_#{index}_drawtype'))
 			->setId('highlight_#{index}_drawtype')
 			->addOptions(CSelect::createOptionsFromArray([
-				GRAPH_ITEM_DRAWTYPE_LINE => _('Line'),
-				GRAPH_ITEM_DRAWTYPE_BOLD_LINE => _('Bold line'),
-				GRAPH_ITEM_DRAWTYPE_DOT => _('Dot'),
-				GRAPH_ITEM_DRAWTYPE_DASHED_LINE => _('Dashed line')
+				DRAWTYPE_LINE => _('Line'),
+				DRAWTYPE_BOLD_LINE => _('Bold line'),
+				DRAWTYPE_DOT => _('Dot'),
+				DRAWTYPE_DASHED_LINE => _('Dashed line')
 			])),
 		(new CCol(
 			(new CButtonLink(_('Remove')))
