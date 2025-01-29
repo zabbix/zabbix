@@ -440,7 +440,7 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
               - macro: '{#TYPE}'
                 value: ^Microsoft.DocumentDB/databaseAccounts
-          description: 'The list of the Cosmos databases is provided by the subscription.'
+          description: 'The list of Cosmos databases provided by the subscription.'
           host_prototypes:
             - uuid: 16eec30e921e4627b3599b4d06e48072
               host: 'Azure Cosmos DB {#NAME}'
@@ -519,7 +519,7 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
               - macro: '{#TYPE}'
                 value: ^Microsoft.Sql/servers/databases
-          description: 'The list of the Microsoft SQL databases is provided by the subscription.'
+          description: 'The list of Microsoft SQL databases provided by the subscription.'
           host_prototypes:
             - uuid: 2aaf7dc7e9f04ccf9dd91fcd803fa076
               host: 'Azure Microsoft SQL database {#NAME}'
@@ -610,7 +610,7 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
               - macro: '{#TYPE}'
                 value: ^Microsoft.DBforMySQL
-          description: 'The list of the MySQL servers is provided by the subscription.'
+          description: 'The list of MySQL servers provided by the subscription.'
           host_prototypes:
             - uuid: 55b87078c14c4561b53e64af5ed77d61
               host: 'Azure MySQL server {#NAME}'
@@ -701,7 +701,7 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
               - macro: '{#TYPE}'
                 value: ^Microsoft.DBforPostgreSQL
-          description: 'The list of the PostgreSQL servers is provided by the subscription.'
+          description: 'The list of PostgreSQL servers provided by the subscription.'
           host_prototypes:
             - uuid: 54f0e0ec288f4feb9a2dc58a8726bd1d
               host: 'Azure PostgreSQL server {#NAME}'
@@ -792,7 +792,7 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
               - macro: '{#TYPE}'
                 value: ^Microsoft.Compute/virtualMachineScaleSets$
-          description: 'The list of the virtual machine scale sets provided by the subscription.'
+          description: 'The list of virtual machine scale sets provided by the subscription.'
           host_prototypes:
             - uuid: 1cbeb513fe3648b6829836800952c9c7
               host: 'Azure VM scale set {#NAME}'
@@ -862,7 +862,7 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
               - macro: '{#TYPE}'
                 value: ^Microsoft.Sql/managedInstances$
-          description: 'The list of the Azure SQL managed instances provided by the subscription.'
+          description: 'The list of Azure SQL managed instances provided by the subscription.'
           host_prototypes:
             - uuid: 5211d232275145598294fc35bac96075
               host: 'Azure SQL managed instance {#NAME}'
@@ -871,7 +871,7 @@ zabbix_export:
                 - group:
                     name: Databases
               templates:
-                - name: 'Azure SQL managed instance by HTTP'
+                - name: 'Azure SQL Managed Instance by HTTP'
               macros:
                 - macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
@@ -2355,7 +2355,7 @@ zabbix_export:
                 operator: NOT_EXISTS
               - macro: '{#TYPE}'
                 value: ^Microsoft.Compute/virtualMachines$
-          description: 'The list of the virtual machines is provided by the subscription.'
+          description: 'The list of virtual machines provided by the subscription.'
           host_prototypes:
             - uuid: d08c0ee33c924b28bf1fed571da6c7f4
               host: 'Azure virtual machine {#NAME}'
@@ -2490,16 +2490,16 @@ zabbix_export:
           description: 'This macro is used in virtual machine scale sets discovery rule.'
         - macro: '{$AZURE.SQL.INST.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Azure SQL managed instance discovery rule.'
+          description: 'This macro is used in Azure SQL Managed Instance discovery rule.'
         - macro: '{$AZURE.SQL.INST.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Azure SQL managed instance discovery rule.'
+          description: 'This macro is used in Azure SQL Managed Instance discovery rule.'
         - macro: '{$AZURE.SQL.INST.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Azure SQL managed instance discovery rule.'
+          description: 'This macro is used in Azure SQL Managed Instance discovery rule.'
         - macro: '{$AZURE.SQL.INST.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Azure SQL managed instance discovery rule.'
+          description: 'This macro is used in Azure SQL Managed Instance discovery rule.'
         - macro: '{$AZURE.STORAGE.ACC.AVAILABILITY}'
           value: '70'
           description: 'The warning threshold of the storage account availability.'
@@ -10462,10 +10462,10 @@ zabbix_export:
             - value: '3'
               newvalue: Unknown
     - uuid: a93f57ccc68e442da79bf4a20fe46570
-      template: 'Azure SQL managed instance by HTTP'
-      name: 'Azure SQL managed instance by HTTP'
+      template: 'Azure SQL Managed Instance by HTTP'
+      name: 'Azure SQL Managed Instance by HTTP'
       description: |
-        This template is designed to monitor Azure SQL managed instance by HTTP.
+        This template is designed to monitor Azure SQL Managed Instance by HTTP.
         It works without any external scripts and uses the script item.
         
         Setup:
@@ -10489,7 +10489,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.sql_inst.availability.details
           value_type: CHAR
-          description: 'The summary description of availability status.'
+          description: 'The summary description of the availability status.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -10553,7 +10553,7 @@ zabbix_export:
               value: health
           triggers:
             - uuid: 68d6f9d594f64579a7c6be464e126629
-              expression: 'last(/Azure SQL managed instance by HTTP/azure.sql_inst.availability.state)=1'
+              expression: 'last(/Azure SQL Managed Instance by HTTP/azure.sql_inst.availability.state)=1'
               name: 'Azure SQL instance: Azure SQL managed instance is degraded'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -10562,7 +10562,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
             - uuid: 9a7ebcccf4684fad8523866fb489e06b
-              expression: 'last(/Azure SQL managed instance by HTTP/azure.sql_inst.availability.state)=3'
+              expression: 'last(/Azure SQL Managed Instance by HTTP/azure.sql_inst.availability.state)=3'
               name: 'Azure SQL instance: Azure SQL managed instance is in unknown state'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
@@ -10571,7 +10571,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
             - uuid: 4a08e72f744e4a0faee2d2e29714d8b8
-              expression: 'last(/Azure SQL managed instance by HTTP/azure.sql_inst.availability.state)=2'
+              expression: 'last(/Azure SQL Managed Instance by HTTP/azure.sql_inst.availability.state)=2'
               name: 'Azure SQL instance: Azure SQL managed instance is unavailable'
               opdata: '{ITEM.LASTVALUE1}'
               priority: HIGH
@@ -10632,7 +10632,7 @@ zabbix_export:
               value: database
           triggers:
             - uuid: 5c8068386b0a47438713d2b4bd54954a
-              expression: 'change(/Azure SQL managed instance by HTTP/azure.sql_inst.collation)=1'
+              expression: 'change(/Azure SQL Managed Instance by HTTP/azure.sql_inst.collation)=1'
               name: 'Azure SQL instance: Instance collation has changed'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -10644,7 +10644,7 @@ zabbix_export:
           name: 'Virtual core count'
           type: DEPENDENT
           key: azure.sql_inst.core.count
-          description: 'Virtual core count available to managed instance.'
+          description: 'Virtual core count available to the managed instance.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -10677,7 +10677,7 @@ zabbix_export:
               value: cpu
           triggers:
             - uuid: 553333ffdbf142539799e7a7b6e8af2b
-              expression: 'min(/Azure SQL managed instance by HTTP/azure.sql_inst.cpu, 10m)>={$AZURE.SQL.INST.CPU.CRIT}'
+              expression: 'min(/Azure SQL Managed Instance by HTTP/azure.sql_inst.cpu, 10m)>={$AZURE.SQL.INST.CPU.CRIT}'
               name: 'Azure SQL instance: Critically high CPU utilization'
               event_name: 'Azure SQL instance: Critically high CPU utilization: (over >= {$AZURE.SQL.INST.CPU.CRIT}% over last 10m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
@@ -10685,12 +10685,12 @@ zabbix_export:
               description: 'CPU utilization is critically high.'
               dependencies:
                 - name: 'Azure SQL instance: High CPU utilization'
-                  expression: 'min(/Azure SQL managed instance by HTTP/azure.sql_inst.cpu, 10m)>={$AZURE.SQL.INST.CPU.WARN}'
+                  expression: 'min(/Azure SQL Managed Instance by HTTP/azure.sql_inst.cpu, 10m)>={$AZURE.SQL.INST.CPU.WARN}'
               tags:
                 - tag: scope
                   value: performance
             - uuid: 7c5876872c644f8598a1fd275d4763d2
-              expression: 'min(/Azure SQL managed instance by HTTP/azure.sql_inst.cpu, 10m)>={$AZURE.SQL.INST.CPU.WARN}'
+              expression: 'min(/Azure SQL Managed Instance by HTTP/azure.sql_inst.cpu, 10m)>={$AZURE.SQL.INST.CPU.WARN}'
               name: 'Azure SQL instance: High CPU utilization'
               event_name: 'Azure SQL instance: High CPU utilization: (over >= {$AZURE.SQL.INST.CPU.WARN}% over last 10m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
@@ -10720,7 +10720,7 @@ zabbix_export:
               value: error
           triggers:
             - uuid: 35ec346076ca4c979897e91389d23eb7
-              expression: 'length(last(/Azure SQL managed instance by HTTP/azure.sql_inst.data.errors))>0'
+              expression: 'length(last(/Azure SQL Managed Instance by HTTP/azure.sql_inst.data.errors))>0'
               name: 'Azure SQL instance: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
@@ -10928,7 +10928,7 @@ zabbix_export:
               value: health
           triggers:
             - uuid: 08a59eccbb854b6db1711c9141231e94
-              expression: 'change(/Azure SQL managed instance by HTTP/azure.sql_inst.provision)=1'
+              expression: 'change(/Azure SQL Managed Instance by HTTP/azure.sql_inst.provision)=1'
               name: 'Azure SQL instance: Instance provisioning state has changed'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
@@ -10937,10 +10937,10 @@ zabbix_export:
                 - tag: scope
                   value: notice
         - uuid: d311532917fa409e909c34f3a2d9032b
-          name: 'IO requests count'
+          name: 'IO request count'
           type: DEPENDENT
           key: azure.sql_inst.requests
-          description: 'IO requests count by the managed instance.'
+          description: 'IO request count by the managed instance.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -10972,7 +10972,7 @@ zabbix_export:
               value: health
           triggers:
             - uuid: 9a51e2286f354820b89cd0d35586b99a
-              expression: 'change(/Azure SQL managed instance by HTTP/azure.sql_inst.state)=1'
+              expression: 'change(/Azure SQL Managed Instance by HTTP/azure.sql_inst.state)=1'
               name: 'Azure SQL instance: Instance state has changed'
               opdata: '{ITEM.LASTVALUE1}'
               priority: WARNING
@@ -10985,7 +10985,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.sql_inst.storage.reserved
           units: B
-          description: 'Storage space reserved by managed instance.'
+          description: 'Storage space reserved by the managed instance.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -11007,7 +11007,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.sql_inst.storage.used
           units: B
-          description: 'Storage space used by managed instance.'
+          description: 'Storage space used by the managed instance.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -11033,26 +11033,26 @@ zabbix_export:
               value: storage
           triggers:
             - uuid: ed8c37e4f62b471385402e0bcf6cc47e
-              expression: 'min(/Azure SQL managed instance by HTTP/azure.sql_inst.storage.utilization,5m)>{$AZURE.SQL.INST.SPACE.CRIT}'
+              expression: 'min(/Azure SQL Managed Instance by HTTP/azure.sql_inst.storage.utilization,5m)>{$AZURE.SQL.INST.SPACE.CRIT}'
               name: 'Azure SQL instance: Storage free space is critically low'
-              event_name: 'Azure SQL instance: Storage free space is critically low (below {$AZURE.SQL.INST.SPACE.CRIT}% for 5m)'
+              event_name: 'Azure SQL instance: The free storage space is critically low (below {$AZURE.SQL.INST.SPACE.CRIT}% for 5m)'
               opdata: 'Space free: {ITEM.LASTVALUE}'
               priority: AVERAGE
-              description: 'The storage free space has been less than `{$AZURE.SQL.INST.SPACE.CRIT}`% for 5m.'
+              description: 'The free storage space has been less than `{$AZURE.SQL.INST.SPACE.CRIT}`% for 5m.'
               manual_close: 'YES'
               dependencies:
                 - name: 'Azure SQL instance: Storage free space is low'
-                  expression: 'min(/Azure SQL managed instance by HTTP/azure.sql_inst.storage.utilization,5m)>{$AZURE.SQL.INST.SPACE.WARN}'
+                  expression: 'min(/Azure SQL Managed Instance by HTTP/azure.sql_inst.storage.utilization,5m)>{$AZURE.SQL.INST.SPACE.WARN}'
               tags:
                 - tag: scope
                   value: capacity
             - uuid: bf8c527a0566490d829ae7654057a1ec
-              expression: 'min(/Azure SQL managed instance by HTTP/azure.sql_inst.storage.utilization,5m)>{$AZURE.SQL.INST.SPACE.WARN}'
+              expression: 'min(/Azure SQL Managed Instance by HTTP/azure.sql_inst.storage.utilization,5m)>{$AZURE.SQL.INST.SPACE.WARN}'
               name: 'Azure SQL instance: Storage free space is low'
-              event_name: 'Azure SQL instance: Storage free space is low (below {$AZURE.SQL.INST.SPACE.WARN}% for 5m)'
+              event_name: 'Azure SQL instance: The free storage space is low (below {$AZURE.SQL.INST.SPACE.WARN}% for 5m)'
               opdata: 'Space free: {ITEM.LASTVALUE}'
               priority: WARNING
-              description: 'The storage free space has been less than `{$AZURE.SQL.INST.SPACE.WARN}`% for 5m.'
+              description: 'The free storage space has been less than `{$AZURE.SQL.INST.SPACE.WARN}`% for 5m.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -11093,7 +11093,7 @@ zabbix_export:
           description: 'Microsoft Azure tenant ID.'
       dashboards:
         - uuid: 28e6b463ca7b429ca356cb61b5394841
-          name: Overview
+          name: 'Azure SQL managed instance'
           pages:
             - name: Overview
               widgets:
@@ -11104,7 +11104,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Azure SQL managed instance by HTTP'
+                        host: 'Azure SQL Managed Instance by HTTP'
                         key: azure.sql_inst.availability.state
                     - type: INTEGER
                       name: show.0
@@ -11130,7 +11130,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Azure SQL managed instance by HTTP'
+                        host: 'Azure SQL Managed Instance by HTTP'
                         key: azure.sql_inst.cpu
                     - type: INTEGER
                       name: show.0
@@ -11162,7 +11162,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Azure SQL managed instance by HTTP'
+                        host: 'Azure SQL Managed Instance by HTTP'
                         key: azure.sql_inst.storage.utilization
                     - type: INTEGER
                       name: show.0
@@ -11194,7 +11194,7 @@ zabbix_export:
                     - type: ITEM
                       name: ds.0.itemids.0
                       value:
-                        host: 'Azure SQL managed instance by HTTP'
+                        host: 'Azure SQL Managed Instance by HTTP'
                         key: azure.sql_inst.bytes.read
                     - type: INTEGER
                       name: ds.0.missingdatafunc
@@ -11214,7 +11214,7 @@ zabbix_export:
                     - type: ITEM
                       name: ds.1.itemids.0
                       value:
-                        host: 'Azure SQL managed instance by HTTP'
+                        host: 'Azure SQL Managed Instance by HTTP'
                         key: azure.sql_inst.bytes.write
                     - type: INTEGER
                       name: ds.1.missingdatafunc
@@ -11239,7 +11239,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Azure SQL managed instance by HTTP'
+                        host: 'Azure SQL Managed Instance by HTTP'
                         key: azure.sql_inst.state
                     - type: INTEGER
                       name: show.0
@@ -11266,7 +11266,7 @@ zabbix_export:
                     - type: ITEM
                       name: ds.0.itemids.0
                       value:
-                        host: 'Azure SQL managed instance by HTTP'
+                        host: 'Azure SQL Managed Instance by HTTP'
                         key: azure.sql_inst.cpu
                     - type: INTEGER
                       name: ds.0.missingdatafunc
@@ -11305,7 +11305,7 @@ zabbix_export:
                     - type: ITEM
                       name: ds.0.itemids.0
                       value:
-                        host: 'Azure SQL managed instance by HTTP'
+                        host: 'Azure SQL Managed Instance by HTTP'
                         key: azure.sql_inst.storage.utilization
                     - type: INTEGER
                       name: ds.0.missingdatafunc
@@ -11328,7 +11328,7 @@ zabbix_export:
                     - type: ITEM
                       name: ds.1.itemids.0
                       value:
-                        host: 'Azure SQL managed instance by HTTP'
+                        host: 'Azure SQL Managed Instance by HTTP'
                         key: azure.sql_inst.storage.used
                     - type: INTEGER
                       name: ds.1.missingdatafunc
@@ -11359,7 +11359,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Azure SQL managed instance by HTTP'
+                        host: 'Azure SQL Managed Instance by HTTP'
                         key: azure.sql_inst.provision
                     - type: INTEGER
                       name: show.0
@@ -11368,7 +11368,7 @@ zabbix_export:
                       name: value_size
                       value: '50'
                 - type: item
-                  name: 'IO requests count'
+                  name: 'IO request count'
                   x: '54'
                   width: '18'
                   fields:
@@ -11378,7 +11378,7 @@ zabbix_export:
                     - type: ITEM
                       name: itemid.0
                       value:
-                        host: 'Azure SQL managed instance by HTTP'
+                        host: 'Azure SQL Managed Instance by HTTP'
                         key: azure.sql_inst.requests
                     - type: INTEGER
                       name: show.0
@@ -14778,7 +14778,7 @@ zabbix_export:
       graph_items:
         - color: 199C0D
           item:
-            host: 'Azure SQL managed instance by HTTP'
+            host: 'Azure SQL Managed Instance by HTTP'
             key: azure.sql_inst.cpu
     - uuid: 781dd83ed494465bbf2c16efbc753a51
       name: 'Azure: Data disk read/write Bps'
@@ -15325,19 +15325,19 @@ zabbix_export:
       graph_items:
         - color: 199C0D
           item:
-            host: 'Azure SQL managed instance by HTTP'
+            host: 'Azure SQL Managed Instance by HTTP'
             key: azure.sql_inst.bytes.read
         - sortorder: '1'
           color: F63100
           item:
-            host: 'Azure SQL managed instance by HTTP'
+            host: 'Azure SQL Managed Instance by HTTP'
             key: azure.sql_inst.bytes.write
     - uuid: ac14ada6a3164e26b81686912e0b10a9
-      name: 'IO requests count'
+      name: 'IO request count'
       graph_items:
         - color: 199C0D
           item:
-            host: 'Azure SQL managed instance by HTTP'
+            host: 'Azure SQL Managed Instance by HTTP'
             key: azure.sql_inst.requests
     - uuid: 9109c16ec3b540118aff0e458fb00580
       name: 'Network traffic, bytes'
@@ -15403,26 +15403,26 @@ zabbix_export:
       name: 'Storage space used'
       ymax_type_1: ITEM
       ymax_item_1:
-        host: 'Azure SQL managed instance by HTTP'
+        host: 'Azure SQL Managed Instance by HTTP'
         key: azure.sql_inst.storage.reserved
       graph_items:
         - color: 199C0D
           item:
-            host: 'Azure SQL managed instance by HTTP'
+            host: 'Azure SQL Managed Instance by HTTP'
             key: azure.sql_inst.storage.used
     - uuid: 2e1c34a01d3a4501be1ed64d45332424
       name: 'Storage space utilization'
       graph_items:
         - color: 199C0D
           item:
-            host: 'Azure SQL managed instance by HTTP'
+            host: 'Azure SQL Managed Instance by HTTP'
             key: azure.sql_inst.storage.utilization
     - uuid: 4f14da1ce6d041ff8bdcc06a172f2734
       name: 'Virtual core count'
       graph_items:
         - color: 199C0D
           item:
-            host: 'Azure SQL managed instance by HTTP'
+            host: 'Azure SQL Managed Instance by HTTP'
             key: azure.sql_inst.core.count
     - uuid: 8d04afa2c9d2459e926a9c20af37e4f8
       name: 'Virtual machine count'
