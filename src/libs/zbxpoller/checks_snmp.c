@@ -2846,6 +2846,7 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " resend, snmp_error:%s",
 					snmp_context->item.itemid, snmp_api_errstring(SNMPERR_GENERR));
 			bulkwalk_context->reqid = reqid;
+			bulkwalk_context->waiting = 1;
 			goto out;
 		case NETSNMP_CALLBACK_OP_CONNECT:
 			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " connect, snmp_error:%s",
