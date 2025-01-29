@@ -13,6 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
 require_once dirname(__FILE__).'/../common/testFormAuthentication.php';
 
 /**
@@ -21,11 +22,12 @@ require_once dirname(__FILE__).'/../common/testFormAuthentication.php';
  */
 class testUsersAuthenticationMfa extends testFormAuthentication {
 
-	protected const DUO_DEFAULT_API_HOSTNAME = 'api-3edf651c.test.test';
-	protected const DUO_DEFAULT_CLIENT_ID = 'DI6GX0DNF2J21PXVLXBB';
-	protected const DUO_DEFAULT_CLIENT_SECRET = 'SNkg6BvonVsNn2EYzAUC';
+	protected const DUO_API_HOSTNAME = 'api-3edf651c.test.test';
+	protected const DUO_CLIENT_ID = 'DI6GX0DNF2J21PXVLXBB';
+	protected const DUO_CLIENT_SECRET = 'SNkg6BvonVsNn2EYzAUC';
 
 	protected static $edit_totp_id;
+	protected static $edit_duo_id;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -47,18 +49,26 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			[
 				'type' => MFA_TYPE_DUO,
 				'name' => 'Pre-existing Duo',
-				'api_hostname' => self::DUO_DEFAULT_API_HOSTNAME,
-				'clientid' => self::DUO_DEFAULT_CLIENT_ID,
-				'client_secret' => self::DUO_DEFAULT_CLIENT_SECRET
+				'api_hostname' => self::DUO_API_HOSTNAME,
+				'clientid' => self::DUO_CLIENT_ID,
+				'client_secret' => self::DUO_CLIENT_SECRET
 			],
 			[
 				'type' => MFA_TYPE_TOTP,
-				'name' => 'Method for editing',
+				'name' => 'TOTP for editing',
 				'hash_function' => TOTP_HASH_SHA1,
 				'code_length' => TOTP_CODE_LENGTH_6
+			],
+			[
+				'type' => MFA_TYPE_DUO,
+				'name' => 'Duo for editing',
+				'api_hostname' => self::DUO_API_HOSTNAME,
+				'clientid' => self::DUO_CLIENT_ID,
+				'client_secret' => self::DUO_CLIENT_SECRET
 			]
 		]);
 		self::$edit_totp_id = $result['mfaids'][2];
+		self::$edit_duo_id = $result['mfaids'][3];
 	}
 
 	public function testUsersAuthenticationMfa_Layout() {
@@ -238,6 +248,19 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					],
 					'skip_name_append' => true
 				]
+			],
+			// ToDo: Move the missing secret test to the generic data provider when ZBX-25952 is fixed.
+			[
+				[
+					// Duo with Client secret field missing.
+					'expected_method_form' => TEST_BAD,
+					'error' => 'Incorrect value for field "client_secret": cannot be empty.',
+					'fields' => [
+						'Type' => 'Duo Universal Prompt',
+						'Name' => 'Duo missing API',
+						'Client secret' => ''
+					]
+				]
 			]
 		];
 
@@ -309,9 +332,17 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			[
 				'mfaid' => self::$edit_totp_id,
 				'type' => MFA_TYPE_TOTP,
-				'name' => 'Method for editing',
+				'name' => 'TOTP for editing',
 				'hash_function' => TOTP_HASH_SHA1,
 				'code_length' => TOTP_CODE_LENGTH_6
+			],
+			[
+				'mfaid' => self::$edit_duo_id,
+				'type' => MFA_TYPE_DUO,
+				'name' => 'Duo for editing',
+				'api_hostname' => self::DUO_API_HOSTNAME,
+				'clientid' => self::DUO_CLIENT_ID,
+				'client_secret' => self::DUO_CLIENT_SECRET
 			]
 		]);
 	}
@@ -349,7 +380,10 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$mfa_form = $this->openMfaForm();
 		$mfa_form->fill(['Enable multi-factor authentication' => true]);
 
-		$action = $update ? 'link:Method for editing' : 'button:Add';
+		// Open the correct MFA method form.
+		$mfa_type = CTestArrayHelper::get($data, 'fields.Type', 'TOTP');
+		$update_action = ($mfa_type === 'TOTP') ? 'link:TOTP for editing' : 'link:Duo for editing';
+		$action = $update ? $update_action : 'button:Add';
 		$mfa_form->getFieldContainer('Methods')->query($action)->waitUntilClickable()->one()->click();
 
 		// Fill in data.
@@ -364,12 +398,15 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			unset($fields['Client secret']);
 		}
 		$dialog_form->fill($fields);
-		// ToDo: there is a bug where the secret is not validated when changing from TOTP to Duo.
-		/* if (isset($secret)) {
-		 * $dialog_form->query('button:Change client secret')->one()->click();
-		 * $dialog_form->fill(['Client secret' => $secret]);
-		 * }
+		/*
+		 * Note, there is a bug where the client secred is not validated here when updating.
+		 * ToDo: remove this comment when ZBX-25952 is fixed (the logic should not change,
+		 * just something to be aware of).
 		 */
+		if (isset($secret)) {
+			$dialog_form->query('button:Change client secret')->one()->click();
+			$dialog_form->fill(['Client secret' => $secret]);
+		}
 
 		$button = $update ? 'Update' : 'Add';
 		$dialog->query('button', $button)->one()->click();
@@ -490,20 +527,6 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					]
 				]
 			]
-				// ToDo: There is a bug where client secret is not validated when changing from TOTP to Duo
-				/* [
-				 * 	[
-				 * 		// Duo with Client secret field missing.
-				 * 		'expected_method_form' => TEST_BAD,
-				 * 		'error' => 'Incorrect value for field "client_secret": cannot be empty.',
-				 * 		'fields' => [
-				 * 			'Type' => 'Duo Universal Prompt',
-				 * 			'Name' => 'Duo missing API',
-				 * 			'Client secret' => ''
-				 * 		]
-				 * 	]
-				 * ]
-				 */
 		];
 	}
 
@@ -566,10 +589,11 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	 * @param bool  $skip_name_append    Skips appending the name field if set to true.
 	 */
 	protected function setDefaultFieldsData($fields, $update, $skip_name_append) {
-		if (CTestArrayHelper::get($fields, 'Type', '') === 'Duo Universal Prompt') {
-			$fields['API hostname'] = CTestArrayHelper::get($fields, 'API hostname', self::DUO_DEFAULT_API_HOSTNAME);
-			$fields['Client ID'] = CTestArrayHelper::get($fields, 'Client ID', self::DUO_DEFAULT_CLIENT_ID);
-			$fields['Client secret'] = CTestArrayHelper::get($fields, 'Client secret', self::DUO_DEFAULT_CLIENT_SECRET);
+		// When creating a Duo method, avoid having to input the field values each time.
+		if (!$update && CTestArrayHelper::get($fields, 'Type', '') === 'Duo Universal Prompt') {
+			$fields['API hostname'] = CTestArrayHelper::get($fields, 'API hostname', self::DUO_API_HOSTNAME);
+			$fields['Client ID'] = CTestArrayHelper::get($fields, 'Client ID', self::DUO_CLIENT_ID);
+			$fields['Client secret'] = CTestArrayHelper::get($fields, 'Client secret', self::DUO_CLIENT_SECRET);
 		}
 
 		/*
