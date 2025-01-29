@@ -7343,6 +7343,10 @@ msgstr "Показать график"
 msgid "Display local time"
 msgstr "Локальное время"
 
+#: widgets/itemhistory/views/column.edit.php:240
+msgid "Display log time"
+msgstr ""
+
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
 msgstr "Отображение мин/сред/макс"
@@ -9513,6 +9517,10 @@ msgstr "Выбор данных истории"
 #: app/views/popup.triggerexpr.php:129
 msgid "History functions"
 msgstr "Функции истории"
+
+#: app/views/administration.housekeeping.edit.php:218
+msgid "History, trends and audit log compression"
+msgstr ""
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -20624,6 +20632,10 @@ msgstr "Эта настройка должна быть активирована
 #: widgets/itemhistory/views/column.edit.php:242
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
 msgstr "Эта настройка отобразит локальное время вместо метки времени. Также необходимо выбрать \"Отображение метки времени\" в расширенных настройках."
+
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
