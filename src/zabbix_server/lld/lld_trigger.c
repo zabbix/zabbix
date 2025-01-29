@@ -717,15 +717,12 @@ static void	lld_functions_get(zbx_vector_lld_trigger_prototype_ptr_t *trigger_pr
 	zbx_hashset_create(&trigger_functions, triggers_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	if (NULL != trigger_prototypes)
+	for (int i = 0; i < trigger_prototypes->values_num; i++)
 	{
-		for (int i = 0; i < trigger_prototypes->values_num; i++)
-		{
-			trigger_prototype = trigger_prototypes->values[i];
-			tfuncs_local.triggerid = trigger_prototype->triggerid;
-			tfuncs_local.functions = &trigger_prototype->functions;
-			zbx_hashset_insert(&trigger_functions, &tfuncs_local, sizeof(tfuncs_local));
-		}
+		trigger_prototype = trigger_prototypes->values[i];
+		tfuncs_local.triggerid = trigger_prototype->triggerid;
+		tfuncs_local.functions = &trigger_prototype->functions;
+		zbx_hashset_insert(&trigger_functions, &tfuncs_local, sizeof(tfuncs_local));
 	}
 
 	for (int i = 0; i < triggers->values_num; i++)
