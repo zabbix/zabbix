@@ -1363,7 +1363,7 @@ zabbix_export:
           description: 'Filter to exclude GPUs by UUID in discovery.'
       dashboards:
         - uuid: bc2dc6cc58984a20829499823a3c84fa
-          name: Overview
+          name: 'Nvidia: Overview'
           pages:
             - name: Summary
               widgets:
