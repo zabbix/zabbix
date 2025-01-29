@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../common/testWidgets.php';
 /**
  * Test for checking Item Value Widget.
  *
- * @backup dashboard
+ * @backup dashboard, globalmacro
  *
  * @dataSource WebScenarios, AllItemValueTypes, ItemValueWidget
  *
@@ -51,6 +51,7 @@ class testDashboardItemValueWidget extends testWidgets {
 	const DASHBOARD_THRESHOLD = 'Dashboard for threshold(s) check';
 	const DASHBOARD_AGGREGATION = 'Dashboard for aggregation function data check';
 	const DATA_WIDGET = 'Widget for aggregation function data check';
+	const MACRO_FUNCTION_WIDGET = 'Widget for macro function check';
 
 	/**
 	 * Get threshold table element with mapping set.
@@ -77,6 +78,38 @@ class testDashboardItemValueWidget extends testWidgets {
 	public static function prepareData() {
 		self::$dashboardids = CDataHelper::get('ItemValueWidget.dashboardids');
 		self::$itemids = CDataHelper::get('ItemValueWidget.itemids');
+
+		CDataHelper::call('usermacro.createglobal', [
+			[
+				'macro' => self::USER_MACRO,
+				'value' => self::USER_MACRO_VALUE
+			],
+			[
+				'macro' => self::USER_SECRET_MACRO,
+				'type' => 1,
+				'value' => self::USER_MACRO_VALUE
+			],
+			[
+				'macro' => self::MACRO_CHAR,
+				'value' => self::MACRO_CHAR_VALUE
+			],
+			[
+				'macro' => self::MACRO_HTML_ENCODE,
+				'value' => self::MACRO_HTML_ENCODE_VALUE
+			],
+			[
+				'macro' => self::MACRO_HTML_DECODE,
+				'value' => self::MACRO_HTML_DECODE_VALUE
+			],
+			[
+				'macro' => self::MACRO_URL_ENCODE,
+				'value' => self::MACRO_URL_ENCODE_VALUE
+			],
+			[
+				'macro' => self::MACRO_URL_DECODE,
+				'value' => self::MACRO_URL_DECODE_VALUE
+			]
+		]);
 	}
 
 	/**
@@ -4229,6 +4262,165 @@ class testDashboardItemValueWidget extends testWidgets {
 	public function testDashboardItemValueWidget_CheckAvailableItems() {
 		$this->checkAvailableItems('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardids[self::DASHBOARD],
 				'Item value'
+		);
+	}
+
+	public static function getMacroFunctions() {
+		return [
+			'Incorrectly added parameter for non-argument macro functions' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{{ITEM.NAME}.btoa(\)}, {'.self::USER_MACRO.'.htmldecode(test)}, '.
+							'{'.self::USER_MACRO.'.htmlencode(test)}, {{ITEM.NAME}.lowercase([test])}, '.
+							'{{ITEM.NAME}.uppercase([test])}, {{ITEM.NAME}.urldecode([test])}, '.
+							'{'.self::USER_SECRET_MACRO.'.urlencode(\/)}',
+						'id:desc_size' => 5
+					],
+					'result' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*'
+				]
+			],
+			'Secret macro value is not exposed when using macro functions' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_SECRET_MACRO.'.btoa()}, {'.self::USER_SECRET_MACRO.'.htmldecode()}, '.
+							'{'.self::USER_SECRET_MACRO.'.htmlencode()}, {'.self::USER_SECRET_MACRO.'.lowercase()}, '.
+							'{'.self::USER_SECRET_MACRO.'.uppercase()}, {'.self::USER_SECRET_MACRO.'.regrepl(a, b)}, '.
+							'{'.self::USER_SECRET_MACRO.'.tr(a-z, b)}, {'.self::USER_SECRET_MACRO.'.urldecode()}, '.
+							'{'.self::USER_SECRET_MACRO.'.urlencode()}',
+						'id:desc_size' => 5
+					],
+					'result' => 'KioqKioq, ******, ******, ******, ******, ******, ******, ******, %2A%2A%2A%2A%2A%2A'
+				]
+			],
+			'Built-in macros with non-argument macro functions' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{{ITEM.NAME}.btoa()}, {{ITEM.NAME}.htmldecode()}, {{ITEM.NAME}.htmlencode()}, '.
+							'{{ITEM.NAME}.lowercase()}, {{ITEM.NAME}.uppercase()}, {{ITEM.NAME}.urlencode()}, '.
+							'{{ITEM.NAME}.urldecode()}',
+						'id:desc_size' => 5
+					],
+					'result' => 'Q1BVIHVzZXIgdGltZQ==, CPU user time, CPU user time, cpu user time, CPU USER TIME, '.
+						'CPU%20user%20time, CPU user time'
+				]
+			],
+			'User macros with non-argument macro functions' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_MACRO.'.btoa()}, {'.self::MACRO_HTML_ENCODE.'.htmlencode()}, '.
+							'{'.self::MACRO_HTML_DECODE.'.htmldecode()}, {'.self::MACRO_URL_ENCODE.'.urlencode()}, '.
+							'{'.self::MACRO_URL_DECODE.'.urldecode()}, {'.self::USER_MACRO.'.uppercase()}, '.
+							'{'.self::USER_MACRO.'.lowercase()}',
+						'id:desc_size' => 5
+					],
+					'result' => base64_encode(self::USER_MACRO_VALUE).', '.self::MACRO_HTML_DECODE_VALUE.', '.
+						self::MACRO_HTML_ENCODE_VALUE.', '.self::MACRO_URL_DECODE_VALUE.', '.self::MACRO_URL_ENCODE_VALUE.
+						', MACRO FUNCTION TEST 12345, macro function test 12345'
+				]
+			],
+			'Incorrectly used parameters in regrepl(), tr(), regsub(), iregsub() macro functions' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_MACRO.'.regrepl()}, {'.self::MACRO_CHAR.'.regrepl(,[a]~,\\\1)}, '.
+							'{'.self::USER_MACRO.'.tr()}, {'.self::USER_MACRO.'.tr(z-a,Z-A)}, {'.self::USER_MACRO.'.tr(1,2,3)}'.
+							', {'.self::USER_MACRO.'.regsub()}, {'.self::USER_MACRO.'.iregsub()}',
+						'id:desc_size' => 5
+					],
+					'result' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*'
+				]
+			],
+			'Regrepl function - multibyte characters and case sensitive check' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_MACRO.'.regrepl("[^a-z]", /, [A-Z], \)}, '.
+							'{'.self::MACRO_CHAR.'.regrepl(🌴, 🌝, [а-я], Q, \d, 🌞, ₰, *)}',
+						'id:desc_size' => 5
+					],
+					'result' => '/acro/function//est//////, 🌞🌞🌞 ЙQQQQЖŽzŠsšĒĀīī🌝 ***'
+				]
+			],
+			'Regrepl function with big amount of processed data' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_MACRO.''.
+							'.regrepl(1{0}, test, 1{0}, test, 1{0},test, 1{0}, test, 1{0}, test, 1{0}, test)}',
+						'id:desc_size' => 5
+					],
+					'result' => '*UNKNOWN*'
+				]
+			],
+			'Macro functions tr(), uppercase(), lowercase() with non-ascii characters' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::MACRO_CHAR.'.tr(0-9, Ī)}, {'.self::MACRO_CHAR.'.lowercase()}, '.
+							'{'.self::MACRO_CHAR.'.uppercase()}',
+						'id:desc_size' => 5
+					],
+					'result' => '??? ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰, 000 ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰, 000 ЙщфхжЖŽZŠSšĒĀīī🌴 ₰₰₰'
+				]
+			],
+			'Macro function tr() - use of escaping and range' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::MACRO_URL_ENCODE.'.tr("\/","\"")}, {'.self::MACRO_CHAR.'.tr(0-9A-Cabc,*)}',
+						'id:desc_size' => 5
+					],
+					'result' => 'h:""test.com"macro?functions=urlencode&urld=a🎸, *** ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰'
+				]
+			],
+			'Macro functions regsub(), iregsub() - successful scenarios' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_MACRO.'.regsub(^[0-9]+, Problem)}, '.
+							'{'.self::USER_MACRO.'.iregsub(^[0-9]+, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.regsub(^[0-9]+, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.iregsub(^[0-9]+, Problem)}, '.
+							'{{ITEM.NAME}.regsub(CPU, test)}, {{ITEM.NAME}.iregsub(CPU, test)}',
+						'id:desc_size' => 5
+					],
+					'result' => 'Problem, Problem, Problem, Problem, test, test'
+				]
+			]
+			// TODO: Uncomment and check the test case, after ZBX-25420 fix.
+//			'Macro functions regsub(), iregsub() - empty value in case of no match' => [
+//				[
+//					'fields' => [
+//						'Advanced configuration' => true,
+//						'id:description' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
+//							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, '.
+//							'{'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
+//							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '.
+//							'{{ITEM.NAME}.regsub(0, test)}, {{ITEM.NAME}.iregsub(0, test)}',
+//						'id:desc_size' => 5
+//					],
+//					'result' => ', , , , ,'
+//				]
+//			]
+		];
+	}
+
+	/**
+	 * @dataProvider getMacroFunctions
+	 */
+	public function testDashboardItemValueWidget_CheckMacroFunctions($data) {
+		$this->setWidgetConfiguration(self::$dashboardids[self::DASHBOARD_THRESHOLD].'&page=2',
+				self::MACRO_FUNCTION_WIDGET, $data['fields']
+		);
+		CDashboardElement::find()->one()->save()->waitUntilReady();
+
+		// Check the resolution of macrofunction.
+		$this->assertEquals($data['result'], $this->query('xpath://div[@class="bottom center item-description"]')
+				->one()->getText()
 		);
 	}
 }

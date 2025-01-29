@@ -33,6 +33,7 @@
 #include "zbxdb.h"
 #include "zbxcacheconfig.h"
 #include "zbxalgo.h"
+#include "zbxdbwrap.h"
 
 #define ZBX_ITEM_QUERY_UNSET		0x0000
 
@@ -2133,8 +2134,11 @@ static void	macro_index_free(zbx_macro_index_t *index)
 	zbx_free(index);
 }
 
-static int	resolve_expression_query_macro(const zbx_db_trigger *trigger, int request, int func_num,
-		zbx_expression_query_t *query, char **entity, zbx_vector_macro_index_t *indices)
+typedef int (*resolv_func_t)(uint64_t itemid, char **replace_to);
+
+static int	resolve_expression_query_macro(const zbx_db_trigger *trigger, resolv_func_t resolv_func,
+		const char *name, int func_num, zbx_expression_query_t *query, char **entity,
+		zbx_vector_macro_index_t *indices)
 {
 	int			id;
 	zbx_macro_index_t	*index;
@@ -2144,7 +2148,14 @@ static int	resolve_expression_query_macro(const zbx_db_trigger *trigger, int req
 		index = (zbx_macro_index_t *)zbx_malloc(NULL, sizeof(zbx_macro_index_t));
 		index->num = func_num;
 		index->macro = NULL;
-		expr_db_get_trigger_value(trigger, &index->macro, func_num, request);
+
+		uint64_t	itemid;
+
+		if (SUCCEED == zbx_db_trigger_get_itemid(trigger, func_num, &itemid))
+		{
+			resolv_func(itemid, &index->macro);
+		}
+
 		zbx_vector_macro_index_append(indices, index);
 	}
 	else
@@ -2153,8 +2164,7 @@ static int	resolve_expression_query_macro(const zbx_db_trigger *trigger, int req
 	if (NULL == index->macro)
 	{
 		query->flags = ZBX_ITEM_QUERY_ERROR;
-		query->error = zbx_dsprintf(NULL, ZBX_REQUEST_HOST_HOST == request ? "invalid host \"%s\"" :
-				"invalid item key \"%s\"", ZBX_NULL2EMPTY_STR(*entity));
+		query->error = zbx_dsprintf(NULL, "invalid %s \"%s\"", name, ZBX_NULL2EMPTY_STR(*entity));
 		return FAIL;
 	}
 
@@ -2195,8 +2205,8 @@ void	zbx_expression_eval_resolve_trigger_hosts_items(zbx_expression_eval_t *eval
 		else
 			func_num = -1;
 
-		if (-1 != func_num && FAIL == resolve_expression_query_macro(trigger, ZBX_REQUEST_HOST_HOST, func_num,
-				query, &query->ref.host, &hosts))
+		if (-1 != func_num && FAIL == resolve_expression_query_macro(trigger, &zbx_dc_get_host_host, "host",
+				func_num, query, &query->ref.host, &hosts))
 		{
 			continue;
 		}
@@ -2206,8 +2216,8 @@ void	zbx_expression_eval_resolve_trigger_hosts_items(zbx_expression_eval_t *eval
 		if (0 != (ZBX_ITEM_QUERY_KEY_ONE & query->flags) &&
 				-1 != (func_num = zbx_expr_macro_index(query->ref.key)))
 		{
-			resolve_expression_query_macro(trigger, ZBX_REQUEST_ITEM_KEY, func_num, query, &query->ref.key,
-					&item_keys);
+			resolve_expression_query_macro(trigger, &expr_get_item_key, "item key", func_num, query,
+					&query->ref.key, &item_keys);
 		}
 	}
 

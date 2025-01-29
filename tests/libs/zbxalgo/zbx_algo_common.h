@@ -1,4 +1,3 @@
-<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2025 Zabbix SIA
 **
@@ -13,33 +12,16 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#ifndef ZBX_ALGO_COMMON
+#define ZBX_ALGO_COMMON
 
-/**
- * @var CView $this
- */
-?>
+#include "zbxmockdata.h"
 
-<script>
-	const view = new class {
+void	vector_to_list(zbx_list_t *list, zbx_vector_ptr_t values);
+void	extract_yaml_values_uint64(const char *path, zbx_vector_uint64_t *values);
+int	binary_heap_elem_compare(const void *d1, const void *d2);
+void	dump_binary_heap(const char *name, const zbx_binary_heap_t *heap_in);
+int	binary_heaps_are_same(const zbx_binary_heap_t *heap1_in, const zbx_binary_heap_t *heap2_in);
+void	extract_binary_heap_from_yaml_int(zbx_binary_heap_t *heap, zbx_mock_handle_t *handle);
 
-		init() {
-			this.#setSubmitCallback();
-		}
-
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
-					}
-				}
-
-				location.href = location.href;
-			});
-		}
-	}
-</script>
+#endif

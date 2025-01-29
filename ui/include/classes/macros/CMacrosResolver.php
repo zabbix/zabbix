@@ -604,10 +604,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 										? (new CLink('/'.$function['host'].'/'.$function['key_'], $item_url))
 											->addClass($style)
 											->addClass(ZBX_STYLE_LINK_ALT)
-											->setAttribute('data-context', $options['context'])
-											->setAttribute('data-itemid', $function['itemid'])
-											->setAttribute('data-parent_discoveryid', $function['parent_itemid'])
-											->setAttribute('data-action', 'item.prototype.edit')
 										: (new CSpan('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style);
 								}
@@ -623,9 +619,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 										? (new CLink('/'.$function['host'].'/'.$function['key_'], $item_url))
 											->addClass($style)
 											->addClass(ZBX_STYLE_LINK_ALT)
-											->setAttribute('data-itemid', $function['itemid'])
-											->setAttribute('data-context', $options['context'])
-											->setAttribute('data-action', 'item.edit')
 										: (new CSpan('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style);
 								}

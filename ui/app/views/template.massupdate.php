@@ -48,7 +48,6 @@ $template_tab->addRow(
 		(new CMultiSelect([
 			'name' => 'linked_templates[]',
 			'object_name' => 'templates',
-			'data' => [],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'templates',
@@ -83,7 +82,6 @@ $template_tab
 				'name' => 'groups[]',
 				'object_name' => 'templateGroup',
 				'add_new' => (CWebUser::getType() == USER_TYPE_SUPER_ADMIN),
-				'data' => [],
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'template_groups',

@@ -21,7 +21,7 @@
 #include "zbxmockdata.h"
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
-
+#include "../../../src/zabbix_server/lld/lld_entry.c"
 
 static void	get_macros(const char *path, zbx_vector_lld_macro_path_ptr_t *macros)
 {
@@ -93,7 +93,8 @@ void	zbx_mock_test_entry(void **state)
 	char				*expression;
 	const char			*expected_expression, *lld_row;
 	zbx_vector_lld_macro_path_ptr_t	macros;
-	struct zbx_json_parse		jp;
+	zbx_jsonobj_t			obj;
+	zbx_lld_entry_t			entry;
 
 	ZBX_UNUSED(state);
 
@@ -105,12 +106,14 @@ void	zbx_mock_test_entry(void **state)
 	expected_expression = zbx_mock_get_parameter_string("out.expression");
 
 	lld_row = zbx_mock_get_parameter_string("in.lld");
-	if (SUCCEED != zbx_json_open(lld_row, &jp))
+	if (SUCCEED != zbx_jsonobj_open(lld_row, &obj))
 		fail_msg("invalid lld row parameter: %s", zbx_json_strerror());
 
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
-	returned_ret = zbx_substitute_lld_macros(&expression, &jp, &macros, flags, NULL, 0);
+	lld_entry_create(&entry, &obj, &macros);
+
+	returned_ret = zbx_substitute_lld_macros(&expression, &entry, flags, NULL, 0);
 
 	zbx_mock_assert_result_eq("return value", expected_ret, returned_ret);
 	zbx_mock_assert_str_eq("resulting expression", expected_expression, expression);
@@ -118,4 +121,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_free(expression);
 	zbx_vector_lld_macro_path_ptr_clear_ext(&macros, zbx_lld_macro_path_free);
 	zbx_vector_lld_macro_path_ptr_destroy(&macros);
+
+	zbx_jsonobj_clear(&obj);
+	lld_entry_clear(&entry);
 }

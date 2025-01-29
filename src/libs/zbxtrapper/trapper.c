@@ -1358,7 +1358,7 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 	double			sec = 0.0;
 	zbx_socket_t		s;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
-	int			ret, server_num = ((zbx_thread_args_t *)args)->info.server_num,
+	int			ret = SUCCEED, server_num = ((zbx_thread_args_t *)args)->info.server_num,
 				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 #ifdef HAVE_NETSNMP
@@ -1396,8 +1396,12 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 		int		snmp_reload = 0;
 #endif
 
-		zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection%s]",
-				get_process_type_string(process_type), process_num, sec, zbx_vps_monitor_status());
+		if (TIMEOUT_ERROR != ret)
+		{
+			zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection%s]",
+					get_process_type_string(process_type), process_num, sec,
+					zbx_vps_monitor_status());
+		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
