@@ -33,7 +33,7 @@
 			this.form = document.forms[form_name];
 
 			this.initEvents();
-			this.setSubmitCallback();
+			this.initPopupListeners();
 		},
 
 		initEvents() {
@@ -118,21 +118,13 @@
 				});
 		},
 
-		setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
-					}
-				}
-
-				uncheckTableRows('host_discovery_' + view.checkbox_hash, [], false);
-
-				location.href = location.href;
+		initPopupListeners() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
+				},
+				callback: () => uncheckTableRows('host_discovery_' + view.checkbox_hash, [], false)
 			});
 		}
 	};
