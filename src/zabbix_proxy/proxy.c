@@ -1171,6 +1171,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	zbx_db_deinit();
 	zbx_deinit_remote_commands_cache();
 
+
 	/* free vmware support */
 	zbx_vmware_destroy();
 
