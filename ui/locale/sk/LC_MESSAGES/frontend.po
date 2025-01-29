@@ -7344,6 +7344,10 @@ msgstr "Zobraziť graf"
 msgid "Display local time"
 msgstr "Zobraz miestny čas"
 
+#: widgets/itemhistory/views/column.edit.php:240
+msgid "Display log time"
+msgstr ""
+
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
 msgstr "Zobrazenie min/priemer/max"
@@ -9514,6 +9518,10 @@ msgstr "Výber údajov z histórie"
 #: app/views/popup.triggerexpr.php:129
 msgid "History functions"
 msgstr "Funkcie histórie"
+
+#: app/views/administration.housekeeping.edit.php:218
+msgid "History, trends and audit log compression"
+msgstr ""
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -20625,6 +20633,10 @@ msgstr "Toto nastavenie by malo byť povolené, pretože tabulky trendov obsahuj
 #: widgets/itemhistory/views/column.edit.php:242
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
 msgstr "Toto nastavenie zobrazí miestny čas namiesto časovej pečiatky. V rozšírenej konfigurácii je potrebné zaškrtnúť aj \"Zobraziť časovú pečiatku\"."
+
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114

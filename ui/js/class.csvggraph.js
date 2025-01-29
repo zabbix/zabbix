@@ -402,7 +402,7 @@
 				case 'staircase':
 				case 'line':
 					var direction_string = '',
-						label = [],
+						labels = [],
 						data_set = nodes[i].getAttribute('data-set'),
 						data_nodes = nodes[i].childNodes,
 						elmnt_label,
@@ -411,8 +411,9 @@
 
 					for (var index = 0, len = data_nodes.length; index < len; index++) {
 						elmnt_label = data_nodes[index].getAttribute('label');
+
 						if (elmnt_label) {
-							label.push(elmnt_label);
+							labels.push(elmnt_label);
 
 							if (data_nodes[index].tagName.toLowerCase() === 'circle') {
 								cx = data_nodes[index].getAttribute('cx');
@@ -425,7 +426,7 @@
 						}
 					}
 
-					label = label.join(',').split(',');
+					labels = labels.join(',').split(',');
 
 					var direction = ED // Edge transforms 'd' attribute.
 							? direction_string.substr(1).replace(/([ML])\s(\d+)\s(\d+)/g, '$1$2\,$3').split(' ')
@@ -437,7 +438,7 @@
 					while (index) {
 						index--;
 						point = direction[index].substr(1).split(',');
-						point_label = label[data_set === 'line' ? index : Math.ceil(index / 2)];
+						point_label = labels[data_set === 'line' ? index : Math.ceil(index / 2)];
 
 						if (x >= parseInt(point[0]) && point_label !== '') {
 							px = point[0];

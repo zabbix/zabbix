@@ -52,7 +52,7 @@ abstract class CControllerUserEditGeneral extends CController {
 	 */
 	protected function setUserMedias(array $data) {
 		if ($this->hasInput('new_media')) {
-			$data['medias'][] = ['userdirectory_mediaid' => 0] + $this->getInput('new_media');
+			$data['medias'][] = ['provisioned' => CUser::PROVISION_STATUS_NO] + $this->getInput('new_media');
 		}
 		elseif ($this->hasInput('enable_media')) {
 			if (array_key_exists($this->getInput('enable_media'), $data['medias'])) {
