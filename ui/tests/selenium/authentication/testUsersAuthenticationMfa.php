@@ -647,7 +647,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	}
 
 	/**
-	 * Populates field data array with needed defaults before filling the form.
+	 * Populates fields data array with needed defaults before filling the form.
 	 *
 	 * @param array $fields              Fields data array to populate.
 	 * @param bool  $update              Adds suffix to name when updating.
