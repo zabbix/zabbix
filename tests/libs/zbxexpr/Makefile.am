@@ -28,7 +28,7 @@ BINARIES_tests = \
 	zbx_function_validate_parameters \
 	zbx_check_time_period \
 	zbx_get_agent_item_nextcheck \
-	zbx_url_decode \
+	zbx_url_encode_decode \
 	zbx_custom_interval_is_scheduling \
 	zbx_user_macro_quote_context_dyn
 
@@ -533,20 +533,20 @@ zbx_get_agent_item_nextcheck_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_get_agent_item_nextcheck_CFLAGS = $(EXPR_COMPILER_FLAGS)
 
-#zbx_url_decode
+#zbx_url_encode_decode
 
-zbx_url_decode_SOURCES = \
-	zbx_url_decode.c \
+zbx_url_encode_decode_SOURCES = \
+	zbx_url_encode_decode.c \
 	$(COMMON_SRC_FILES)
 
-zbx_url_decode_LDADD = \
+zbx_url_encode_decode_LDADD = \
 	$(EXPR_LIBS)
 
-zbx_url_decode_LDADD += @SERVER_LIBS@
+zbx_url_encode_decode_LDADD += @SERVER_LIBS@
 
-zbx_url_decode_LDFLAGS = @SERVER_LDFLAGS@
+zbx_url_encode_decode_LDFLAGS = @SERVER_LDFLAGS@
 
-zbx_url_decode_CFLAGS = $(EXPR_COMPILER_FLAGS)
+zbx_url_encode_decode_CFLAGS = $(EXPR_COMPILER_FLAGS)
 
 #zbx_custom_interval_is_scheduling
 

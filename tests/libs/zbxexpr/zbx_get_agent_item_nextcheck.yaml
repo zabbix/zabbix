@@ -1,42 +1,42 @@
 # Zabbix API validates delay to be 1-86400 seconds
 ---
-test case: "1. Delay 1s"
+test case: "Delay 1s"
 in:
   itemid: 1000
   delay: "1s"
   now: "2023-12-18T14:30:00"
 out:
   return: SUCCEED
-  nextcheck: 1702902601
+  nextcheck: 1702909801
 ---
-test case: "2. Delay 10s"
+test case: "Delay 10s"
 in:
-  itemid: 1000
+  itemid: 1
   delay: "10s"
   now: "2023-12-18T14:30:00"
 out:
   return: SUCCEED
-  nextcheck: 1702902610
+  nextcheck: 1702909801
 ---
-test case: "3. Delay 1d"
+test case: "Delay 1d"
 in:
-  itemid: 1000
+  itemid: 123
   delay: "1d"
   now: "2023-12-18T14:30:00"
 out:
   return: SUCCEED
-  nextcheck: 1702945000
+  nextcheck: 1702944123
 ---
-test case: "4. Delay 1w"
+test case: "Delay 1w"
 in:
   itemid: 1000
   delay: "1w"
   now: "2023-12-18T14:30:00"
 out:
   return: FAIL
-  nextcheck: 2145916800
+  nextcheck: 2145916800 #if FAIL than ZBX_JAN_2038
 ---
-test case: "5. Delay 1s over Jan 2038"
+test case: "Delay 1s over Jan 2038"
 in:
   time_over_jan2038: 1
   itemid: 1000
@@ -44,9 +44,9 @@ in:
   now: "2040-12-18T14:30:00"
 out:
   return: SUCCEED
-  nextcheck:  2239446631
+  nextcheck: 2239446631
 ---
-test case: "6. Delay 10s over Jan 2038"
+test case: "Delay 10s over Jan 2038"
 in:
   time_over_jan2038: 1
   itemid: 1000
@@ -54,15 +54,25 @@ in:
   now: "2040-12-18T14:30:00"
 out:
   return: SUCCEED
-  nextcheck: 2239450230
+  nextcheck: 2239453810
 ---
-test case: "7. Delay 1d over Jan 2038"
+test case: "Delay 1d over Jan 2038"
+in:
+  time_over_jan2038: 1
+  itemid: 1
+  delay: "1d"
+  now: "2040-12-18T14:30:00"
+out:
+  return: SUCCEED
+  nextcheck: 2239488001
+---
+test case: "Delay 1w over Jan 2038"
 in:
   time_over_jan2038: 1
   itemid: 1000
   delay: "1d"
   now: "2040-12-18T14:30:00"
 out:
-  return: SUCCEED
-  nextcheck: 2239533030
+  return: FAIL
+  nextcheck: 1844674407370955161 #max uint64 value
 ...

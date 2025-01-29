@@ -1,86 +1,155 @@
 ---
-test case: "1. macro_name"
+test case: "macro_name"
 in:
   context: "macro_name"
-  force_quote: 0
+  force_quote: 1
 out:
-  exp_result: "macro_name"
+  exp_result: '"macro_name"'
 ---
-test case: "2. Space"
+test case: "Space"
 in:
   context: " "
-  force_quote: 0
+  force_quote: 1
 out:
   exp_result: '" "'
 ---
-test case: "3. Double quotes"
+test case: "Double quotes"
 in:
   context: '"'
-  force_quote: 0
+  force_quote: 1
 out:
   exp_result: '"\""'
 ---
-test case: '4. end with \\'
+test case: 'end with \\'
 in:
   context: "macro_name\\"
   force_quote: 1
 out:
   exp_result: " "
 ---
-test case: '5. {MACRO}'
+test case: '{MACRO}'
 in:
   context: "{MACRO}"
-  force_quote: 0
+  force_quote: 1
 out:
   exp_result: '"{MACRO}"'
 ---
-test case: '6. {<macro>.<func>(<params>)}'
+test case: '{<macro>.<func>(<params>)}'
 in:
   context: "{<macro>.<func>(<params>)}"
-  force_quote: 0
+  force_quote: 1
 out:
   exp_result: '"{<macro>.<func>(<params>)}"'
 ---
-test case: '7. {<macro>.<func>(<params>)}'
+test case: '{<macro>.<func>(<params>)}'
 in:
   context: "{<macro>.<func>(<params>)}"
-  force_quote: 0
+  force_quote: 1
 out:
   exp_result: '"{<macro>.<func>(<params>)}"'
 ---
-test case: '8. {$MACRO}}'
+test case: '{$MACRO}}'
 in:
   context: "{$MACRO}"
-  force_quote: 0
+  force_quote: 1
 out:
   exp_result: '"{$MACRO}"'
 ---
-test case: '9. {#MACRO}'
+test case: '{#MACRO}'
 in:
   context: "{#MACRO}"
-  force_quote: 0
+  force_quote: 1
 out:
   exp_result: '"{#MACRO}"'
 ---
-test case: '10. {?EXPRESSION}'
+test case: '{?EXPRESSION}'
 in:
   context: "{?EXPRESSION}"
-  force_quote: 0
+  force_quote: 1
 out:
   exp_result: '"{?EXPRESSION}"'
 ---
-test case: '11. Empty space'
+test case: 'Empty space'
 in:
   context: ""
   force_quote: 0
 out:
-  exp_result: ""
+  exp_result: ''
 ---
-test case: '12. some ASCII'
+test case: 'Empty space force quote'
+in:
+  context: ""
+  force_quote: 1
+out:
+  exp_result: '""'
+---
+test case: 'some ASCII'
 in:
   context: "!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
   force_quote: 0
 out:
   exp_result: '"!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"'
+---
+test case: '{$MACRO:"static text"}'
+in:
+  context: '{$MACRO:"static text"}'
+  force_quote: 1
+out:
+  exp_result: '"{$MACRO:\"static text\"}"'
+---
+test case: '{$MACRO:regex:"regular expression"}'
+in:
+  context: '{$MACRO:regex:"regular expression"}'
+  force_quote: 1
+out:
+  exp_result: '"{$MACRO:regex:\"regular expression\"}"'
+---
+test case: '{$LOW_SPACE_LIMIT:/tmp}'
+in:
+  context: '{$LOW_SPACE_LIMIT:/tmp}'
+  force_quote: 1
+out:
+  exp_result: '"{$LOW_SPACE_LIMIT:/tmp}"'
+---
+test case: '{$LOW_SPACE_LIMIT:regex:"^/tmp$"}'
+in:
+  context: '{$LOW_SPACE_LIMIT:regex:"^/tmp$"}'
+  force_quote: 1
+out:
+  exp_result: '"{$LOW_SPACE_LIMIT:regex:\"^/tmp$\"}"'
+---
+test case: '{$LOW_SPACE_LIMIT:regex:"^/var/log/.*$"}'
+in:
+  context: '{$LOW_SPACE_LIMIT:regex:"^/var/log/.*$"}'
+  force_quote: 1
+out:
+  exp_result: '"{$LOW_SPACE_LIMIT:regex:\"^/var/log/.*$\"}"'
+---
+test case: 'Newline and tab'
+in:
+  context: "\n\t"
+  force_quote: 0
+out:
+  exp_result: "\n\t"
+---
+test case: 'Newline and tab force quoted'
+in:
+  context: "\n\t"
+  force_quote: 1
+out:
+  exp_result: "\"\n\t\""
+---
+test case: 'Quote'
+in:
+  context: "'"
+  force_quote: 1
+out:
+  exp_result: "\"'\""
+---
+test case: 'Double Quote'
+in:
+  context: '"'
+  force_quote: 1
+out:
+  exp_result: '"\""'
 ...
-

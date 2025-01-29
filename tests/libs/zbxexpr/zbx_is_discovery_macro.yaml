@@ -1,91 +1,103 @@
 ---
-test case: "1. {#MACRO}"
+test case: "{#MACRO}"
 in:
   name: "{#MACRO}"
 out:
   result: SUCCEED
 ---
-test case: "2. #MACRO"
+test case: "#MACRO"
 in:
   name: "#MACRO"
 out:
   result: FAIL
 ---
-test case: "3. {#MACRO"
+test case: "{#MACRO"
 in:
   name: "{#MACRO"
 out:
   result: FAIL
 ---
-test case: "4. {MACRO}"
+test case: "MACRO}"
 in:
   name: "{MACRO}"
 out:
   result: FAIL
 ---
-test case: "5. {#"
+test case: "{#"
 in:
   name: "{#"
 out:
   result: FAIL
 ---
-test case: "6. {MACRO#}"
+test case: "{MACRO#}"
 in:
   name: "{MACRO#}"
 out:
   result: FAIL
 ---
-test case: "7. MACRO}#"
+test case: "MACRO}#"
 in:
   name: "MACRO}#"
 out:
   result: FAIL
 ---
-test case: "8. #"
+test case: "#"
 in:
   name: "#"
 out:
   result: FAIL
 ---
-test case: "9. #{}"
+test case: "#{}"
 in:
   name: "#{}"
 out:
   result: FAIL
 ---
-test case: "10. MACRO#{MACRO}"
+test case: "MACRO#{MACRO}"
 in:
   name: "MACRO#{MACRO}"
 out:
   result: FAIL
 ---
-test case: "11. #{MACRO}#{MACRO}"
+test case: "#{MACRO}#{MACRO}"
 in:
   name: "#{MACRO}#{MACRO}"
 out:
   result: FAIL
 ---
-test case: "12. {MACRO} - built-in macro"
+test case: "{MACRO} - built-in macro"
 in:
   name: "{MACRO}"
 out:
   result: FAIL
 ---
-test case: "13. {<macro>.<func>(<params>)} - macro functions"
+test case: "{<macro>.<func>(<params>)} - macro functions"
 in:
   name: "{<macro>.<func>(<params>)}"
 out:
   result: FAIL
 ---
-test case: "14. {$MACRO} - user-defined macro"
+test case: "{$MACRO} - user-defined macro"
 in:
   name: "{$MACRO}"
 out:
   result: FAIL
 ---
-test case: "15. {?EXPRESSION}"
+test case: "{?EXPRESSION}"
 in:
   name: "{?EXPRESSION}"
+out:
+  result: FAIL
+---
+test case: '{$LOW_SPACE_LIMIT:regex:"^/var/log/.*$"}'
+in:
+  name: '{$LOW_SPACE_LIMIT:regex:"^/var/log/.*$"}'
+out:
+  result: FAIL
+---
+test case: '{$MACRO:""\n""}'
+in:
+  name: "{$MACRO:\"\"\n\"\"}"
 out:
   result: FAIL
 ...

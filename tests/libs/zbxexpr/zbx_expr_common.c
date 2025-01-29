@@ -32,5 +32,5 @@ time_t	human_time_to_unix_time(const char *time_str)
 	tm.tm_year -= 1900;
 	tm.tm_mon -= 1;
 
-	return mktime(&tm);
+	return timegm(&tm);
 }

@@ -1,41 +1,41 @@
 ---
-test case: "1. linux-w7x1"
+test case: "linux-w7x1"
 in:
   host: "linux-w7x1"
 out:
   host_out: "linux-w7x1"
 ---
-test case: "2. linux-w7x1$$"
+test case: "linux-w7x1$$"
 in:
   host: "linux-w7x1$$"
 out:
   host_out: "linux-w7x1__"
 ---
-test case: "3. linux with newline"
+test case: "linux with newline"
 in:
   host: "linux\n"
 out:
   host_out: "linux_"
 ---
-test case: "4. linux with quotes"
+test case: "linux with quotes"
 in:
   host: "lin'ux"
 out:
   host_out: "lin_ux"
 ---
-test case: "5. some ASCII"
+test case: "some ASCII"
 in:
   host: "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
 out:
   host_out: "___________-._0123456789_______ABCDEFGHIJKLMNOPQRSTUVWXYZ_____abcdefghijklmnopqrstuvwxyz___"
 ---
-test case: "7. empty"
+test case: "empty"
 in:
   host: ""
 out:
   host_out: ""
 ---
-test case: "8. special characters"
+test case: "special characters"
 in:
   host: "\n\r\t"
 out:

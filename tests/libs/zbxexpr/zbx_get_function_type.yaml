@@ -1,37 +1,43 @@
 ---
-test case: "1. Trends"
+test case: "Trends"
 in:
   func: "trend"
 out:
   func: "trends"
 ---
-test case: "2. Baseline"
+test case: "Baseline"
 in:
   func: "baseline"
 out:
   func: "trends"
 ---
-test case: "3. Nodata"
+test case: "Nodata"
 in:
   func: "nodata"
 out:
   func: "timer"
 ---
-test case: "4. Something -> history"
+test case: "Something -> history"
 in:
   func: "something"
 out:
   func: "history"
 ---
-test case: "5. Some ASCII"
+test case: "Some ASCII"
 in:
   func: "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
 out:
   func: "history"
 ---
-test case: "6. Empty"
+test case: "Empty"
 in:
   func: ""
+out:
+  func: "history"
+---
+test case: "Newlines and tabs"
+in:
+  func: "\n\t\n\t"
 out:
   func: "history"
 ...

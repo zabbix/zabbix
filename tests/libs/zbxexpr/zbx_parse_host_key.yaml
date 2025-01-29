@@ -1,5 +1,5 @@
 ---
-test case: "1. hostname:[test]"
+test case: "hostname:[test]"
 in:
   exp: "hostname:[test]"
 out:
@@ -7,7 +7,7 @@ out:
   exp_host: "hostname"
   exp_key: "[test]"
 ---
-test case: "2. hostname:[test"
+test case: "hostname:[test"
 in:
   exp: "hostname:[test"
 out:
@@ -15,7 +15,7 @@ out:
   exp_host: "hostname"
   exp_key: "[test"
 ---
-test case: "3. hostname:"
+test case: "hostname:"
 in:
   exp: "hostname:"
 out:
@@ -23,7 +23,7 @@ out:
   exp_host: "hostname"
   exp_key: ""
 ---
-test case: "4. :[]"
+test case: ":[]"
 in:
   exp: ":[]"
 out:
@@ -31,7 +31,7 @@ out:
   exp_host: ""
   exp_key: "[]"
 ---
-test case: "5. :"
+test case: ":"
 in:
   exp: ":"
 out:
@@ -39,7 +39,7 @@ out:
   exp_host: ""
   exp_key: ""
 ---
-test case: "6. :[test]"
+test case: ":[test]"
 in:
   exp: ":[test]"
 out:
@@ -47,13 +47,13 @@ out:
   exp_host: ""
   exp_key: "[test]"
 ---
-test case: "7. Empty"
+test case: "Empty"
 in:
   exp: ""
 out:
   return: FAIL
 ---
-test case: "8. Newlines"
+test case: "Newlines"
 in:
   exp: "hostname:\n\n\n"
 out:
@@ -61,7 +61,7 @@ out:
   exp_host: "hostname"
   exp_key: "\n\n\n"
 ---
-test case: "9. some ASCII"
+test case: "some ASCII"
 in:
   exp: "hostname:\n!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
 out:
