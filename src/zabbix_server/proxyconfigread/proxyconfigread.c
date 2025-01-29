@@ -402,12 +402,13 @@ static int	proxyconfig_get_settings_table_data(const zbx_dc_proxy_t *proxy, stru
 			if (0 == (table->fields[i].flags & ZBX_PROXY))
 				continue;
 
-			if (0 == strncmp(table->fields[i].name, "timeout_", ZBX_CONST_STRLEN("timeout_")))
+			if (0 == strncmp(name, "timeout_", ZBX_CONST_STRLEN("timeout_")) &&
+				0 == strcmp(table->fields[i].name, "value_str"))
 			{
 				char		*timeout_value;
 				const char	*item_type;
 
-				item_type = table->fields[i].name + ZBX_CONST_STRLEN("timeout_");
+				item_type = name + ZBX_CONST_STRLEN("timeout_");
 
 				if (0 == strcmp(item_type, "zabbix_agent"))
 				{
