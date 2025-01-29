@@ -65,6 +65,19 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 				'api_hostname' => self::DUO_API_HOSTNAME,
 				'clientid' => self::DUO_CLIENT_ID,
 				'client_secret' => self::DUO_CLIENT_SECRET
+			],
+			[
+				'type' => MFA_TYPE_TOTP,
+				'name' => 'TOTP for deletion',
+				'hash_function' => TOTP_HASH_SHA1,
+				'code_length' => TOTP_CODE_LENGTH_6
+			],
+			[
+				'type' => MFA_TYPE_DUO,
+				'name' => 'Duo for deletion',
+				'api_hostname' => self::DUO_API_HOSTNAME,
+				'clientid' => self::DUO_CLIENT_ID,
+				'client_secret' => self::DUO_CLIENT_SECRET
 			]
 		]);
 		self::$edit_totp_id = $result['mfaids'][2];
@@ -357,17 +370,69 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$this->testCreateUpdate($data, true);
 	}
 
+	/**
+	 * Test MFA method deletion.
+	 */
 	public function testUsersAuthenticationMfa_Remove() {
-		// ToDo - test MFA method removal.
+		$sql_total = 'SELECT NULL FROM mfa';
+		$method_count_before = CDBHelper::getCount($sql_total);
+
+		$sql_specific = "SELECT NULL FROM mfa WHERE name in ('TOTP for deletion', 'Duo for deletion')";
+		$this->assertEquals(2, CDBHelper::getCount($sql_specific));
+
+		$mfa_form = $this->openMfaForm();
+		$mfa_form->fill(['Enable multi-factor authentication' => true]);
+
+		// Remove the records.
+		$table = $this->selectMethodTable($mfa_form);
+		foreach(['TOTP for deletion', 'Duo for deletion'] as $method_name) {
+			$row = $table->findRow('Name', $method_name);
+			$row->query('button:Remove')->one()->click();
+
+			// Get a list of methods displayed in UI.
+			$method_list = [];
+			foreach($table->getRows() as $row) {
+				$method_list[] = $row->getColumn('Name')->getText();
+			}
+
+			// Assert that the deleted method is not visible anymore.
+			$this->assertFalse(in_array($method_name, $method_list));
+		}
+
+		// Save and open MFA settings again.
+		$mfa_form->query('button:Update')->one()->click();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+		$mfa_form->invalidate();
+		$mfa_form->selectTab('MFA settings');
+
+		// Check that the deleted methods are not present.
+		$method_list = [];
+		$table = $this->selectMethodTable($mfa_form);
+
+		foreach($table->getRows() as $row) {
+			$method_list[] = $row->getColumn('Name')->getText();
+		}
+
+		foreach(['TOTP for deletion', 'Duo for deletion'] as $method_name) {
+			$this->assertFalse(in_array($method_name, $method_list));
+		}
+
+		// Verify DB records deleted.
+		$this->assertEquals($method_count_before - 2, CDBHelper::getCount($sql_total));
+		$this->assertEquals(0, CDBHelper::getCount($sql_specific));
+	}
+
+	public function testUsersAuthenticationMfa_Cancel() {
+		// ToDo - test creating a configuration and not saving.
+	}
+
+	public function testUsersAuthenticationMfa_SimpleUpdate() {
+		// ToDo - opening a record and saving without making any changes.
 	}
 
 	public function testUsersAuthenticationMfa_Default() {
 		// ToDo - test setting the default MFA method.
-	}
-
-	public function testUsersAuthenticationMfa_SecretReset() {
-		// ToDo - test the functionality that resets user secrets when changing certain configuration.
-		// Also test the warning appears correctly.
 	}
 
 	/**
@@ -553,7 +618,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		}
 
 		// Check data in the table.
-		$table = $mfa_form->getFieldContainer('Methods')->query('xpath:.//table')->one()->asTable();
+		$table = $this->selectMethodTable($mfa_form);
 		$row = $table->findRow('Name', $fields['Name']);
 		$expected_table_data = [
 			'Name' => $fields['Name'],
@@ -616,5 +681,14 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$form = $this->query('id:authentication-form')->asForm()->one();
 		$form->selectTab('MFA settings');
 		return $form;
+	}
+
+	/**
+	 * This is to only have this selector once.
+	 *
+	 * @param CFormElement $mfa_form    Container element, the MFA form.
+	 */
+	protected function selectMethodTable($mfa_form) {
+		return $mfa_form->getFieldContainer('Methods')->query('xpath:.//table')->one()->asTable();
 	}
 }
