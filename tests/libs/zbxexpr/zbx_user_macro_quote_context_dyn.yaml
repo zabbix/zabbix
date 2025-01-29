@@ -152,4 +152,11 @@ in:
   force_quote: 1
 out:
   exp_result: '"\""'
+---
+test case: 'Long macro string'
+in:
+  context: '{$MACRO:regex:"\.+\\"[a-z]+"} {{#MACRO}.iregsub("\.+\\"([a-z]+)", \1)} {$MACRO:"{{#MACRO}.iregsub(\"\.+\\\"[a-z]+\", \1)}"}  concat("abc", "\\.\\\"[a-z]+") concat("abc, "{$MACRO:regex:\"\\.+\\\\\"[a-z]+\"}") {$MACRO:regex:"\.+\\"[a-z]+"}'
+  force_quote: 1
+out:
+  exp_result: '"{$MACRO:regex:\"\.+\\\"[a-z]+\"} {{#MACRO}.iregsub(\"\.+\\\"([a-z]+)\", \1)} {$MACRO:\"{{#MACRO}.iregsub(\\"\.+\\\\"[a-z]+\\", \1)}\"}  concat(\"abc\", \"\\.\\\\"[a-z]+\") concat(\"abc, \"{$MACRO:regex:\\"\\.+\\\\\\"[a-z]+\\"}\") {$MACRO:regex:\"\.+\\\"[a-z]+\"}"'
 ...

@@ -100,4 +100,10 @@ in:
   name: "{$MACRO:\"\"\n\"\"}"
 out:
   result: FAIL
+---
+test case: 'Different macro long string'
+in:
+  name: '{$MACRO:regex:"\.+\\"[a-z]+"} {{#MACRO}.iregsub("\.+\\"([a-z]+)", \1)} {$MACRO:"{{#MACRO}.iregsub(\"\.+\\\"[a-z]+\", \1)}"}  concat("abc", "\\.\\\"[a-z]+") concat("abc, "{$MACRO:regex:\"\\.+\\\\\"[a-z]+\"}") {$MACRO:regex:"\.+\\"[a-z]+"}'
+out:
+  result: FAIL
 ...

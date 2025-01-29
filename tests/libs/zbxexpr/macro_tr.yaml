@@ -298,12 +298,12 @@ out:
   value: "\t\t\t\t"
   return: SUCCEED
 ---
-test case: characters to  vertical space characters
+test case: characters to zeros long macro string
 in:
-  data: "TEST"
+  data: '{$MACRO:regex:"\.+\\"[a-z]+"} {{#MACRO}.iregsub("\.+\\"([a-z]+)", \1)} {$MACRO:"{{#MACRO}.iregsub(\"\.+\\\"[a-z]+\", \1)}"}  concat("abc", "\\.\\\"[a-z]+") concat("abc, "{$MACRO:regex:\"\\.+\\\\\"[a-z]+\"}") {$MACRO:regex:"\.+\\"[a-z]+"}'
   param1: "A-Z"
-  param2: "\\v"
+  param2: "0"
 out:
-  value: "\v\v\v\v"
+  value: '{$00000:regex:"\.+\\"[a-z]+"} {{#00000}.iregsub("\.+\\"([a-z]+)", \1)} {$00000:"{{#00000}.iregsub(\"\.+\\\"[a-z]+\", \1)}"}  concat("abc", "\\.\\\"[a-z]+") concat("abc, "{$00000:regex:\"\\.+\\\\\"[a-z]+\"}") {$00000:regex:"\.+\\"[a-z]+"}'
   return: SUCCEED
 ...
