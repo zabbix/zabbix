@@ -1010,10 +1010,7 @@ function makeParentTemplatesList(array $parent_templates): array {
 				->setArgument('templateid', $templateid)
 				->getUrl();
 
-			$template_list[] = (new CLink($template['name'], $template_url))
-				->setAttribute('data-templateid', $templateid)
-				->setAttribute('data-action', 'template.edit')
-				->addClass('js-edit-template');
+			$template_list[] = new CLink($template['name'], $template_url);
 		}
 		else {
 			$template_list[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);

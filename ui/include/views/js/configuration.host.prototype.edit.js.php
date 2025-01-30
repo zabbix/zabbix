@@ -39,14 +39,7 @@
 			this.initMacrosTab();
 			this.initInventoryTab();
 			this.initEncryptionTab();
-			this.setSubmitCallback();
-			this.setPopupOpeningCallback();
-		}
-
-		setPopupOpeningCallback() {
-			window.popupManagerInstance.setPopupOpeningCallback((action) => {
-				return action !== 'host.edit';
-			});
+			this.#initPopupListeners();
 		}
 
 		initHostTab() {
@@ -210,6 +203,48 @@
 			jQuery('input[name=tls_connect]').trigger('change');
 		}
 
+		#initPopupListeners() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_OPEN,
+					action: 'host.edit'
+				},
+				callback: ({data, event}) => {
+					event.preventDefault();
+
+					const standalone_url_params = objectToSearchParams({
+						action: CPopupManager.STANDALONE_ACTION,
+						popup: 'host.edit',
+						...data.action_parameters
+					}).toString();
+
+					const standalone_url = new URL(`zabbix.php?${standalone_url_params}`, location.href);
+
+					location.href = standalone_url.href;
+				}
+			});
+
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
+				},
+				callback: ({data, event}) => {
+					if (data.submit.success.action === 'delete') {
+						const url = new URL('host_discovery.php', location.href);
+
+						url.searchParams.set('context', 'template');
+
+						event.setRedirectUrl(url.href);
+					}
+					else {
+						this.refresh();
+					}
+				}
+			});
+		}
+
 		addGroupPrototypeRow(groupPrototype) {
 			const addButton = jQuery('#group_prototype_add');
 
@@ -269,32 +304,6 @@
 			const fields = getFormFields(form);
 
 			post(url.getUrl(), fields);
-		}
-
-		setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				let curl = null;
-
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-
-					if ('action' in e.detail.success && e.detail.success.action === 'delete') {
-						curl = new Curl('host_discovery.php');
-						curl.setArgument('context', 'template');
-					}
-				}
-
-				if (curl) {
-					location.href = curl.getUrl();
-				}
-				else {
-					view.refresh();
-				}
-			});
 		}
 	}
 </script>

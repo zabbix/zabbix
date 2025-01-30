@@ -45,9 +45,8 @@
 					parent_discoveryid: '<?= $data['parent_discoveryid'] ?>',
 					context: '<?= $data['context'] ?>',
 					name: value.name,
-					prototype: prototype,
-					trigger_url: this.constructTriggerUrl(value.triggerid, prototype === '1'),
-					action: prototype === '1' ? 'trigger.prototype.edit' : 'trigger.edit'
+					prototype,
+					trigger_url: this.constructTriggerUrl(value.triggerid, prototype === '1')
 				}));
 		}
 	}
@@ -71,16 +70,42 @@
 		jQuery('#dependencies_' + triggerid).remove();
 	}
 
-	document.getElementById('massupdate-form').addEventListener('click', (e) => {
-		if (e.target.classList.contains('js-edit-dependency')) {
-			e.preventDefault();
+	(() => {
+		const massupdate_overlay = overlays_stack.end();
 
-			if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
-				return;
-			}
+		const subscriptions = [];
 
-			const massupdate_overlay = overlays_stack.end();
-			overlayDialogueDestroy(massupdate_overlay.dialogueid);
+		for (const action of ['trigger.edit', 'trigger.prototype.edit']) {
+			subscriptions.push(
+				ZABBIX.EventHub.subscribe({
+					require: {
+						context: CPopupManager.EVENT_CONTEXT,
+						event: CPopupManagerEvent.EVENT_OPEN,
+						action
+					},
+					callback: ({event}) => {
+						if (!window.confirm(
+								<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
+							event.preventDefault();
+
+							return;
+						}
+
+						overlayDialogueDestroy(massupdate_overlay.dialogueid);
+					}
+				})
+			);
 		}
-	})
+
+		subscriptions.push(
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_END_SCRIPTING,
+					action: massupdate_overlay.dialogueid
+				},
+				callback: () => ZABBIX.EventHub.unsubscribeAll(subscriptions)
+			})
+		);
+	})();
 </script>

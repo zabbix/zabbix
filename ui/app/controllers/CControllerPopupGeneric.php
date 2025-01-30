@@ -1268,7 +1268,7 @@ class CControllerPopupGeneric extends CController {
 
 			case 'users':
 				$options += [
-					'output' => ['userid', 'username', 'name', 'surname', 'type', 'theme', 'lang']
+					'output' => ['userid', 'username', 'name', 'surname']
 				];
 
 				if ($this->hasInput('exclude_provisioned')) {

@@ -2136,7 +2136,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #23 Data overview widget.
+			// #23 Top items widget.
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('Top items'),
@@ -2157,7 +2157,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						[
 							'field' => 'Items',
 							'type' => 'table',
-							'headers' => ['', 'Patterns', 'Actions'],
+							'headers' => ['Patterns', 'Actions'],
 							'buttons' => ['Add'],
 							'mandatory' => true
 						]

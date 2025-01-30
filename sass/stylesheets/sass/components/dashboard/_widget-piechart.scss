@@ -36,8 +36,15 @@ form.dashboard-widget-piechart {
 	}
 
 	.dataset-head {
-		.multiselect {
-			width: 100%;
+		.multiselect-control {
+			overflow: hidden;
+			margin: -2px;
+			padding: 2px;
+
+			.multiselect {
+				overflow: hidden;
+				flex-grow: 1;
+			}
 		}
 	}
 
