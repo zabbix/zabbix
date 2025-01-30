@@ -21,11 +21,9 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char	*source = zbx_mock_get_parameter_string("in.source");
-	const char	*func_type =  zbx_mock_get_parameter_string("in.func_type");
-	const char	*exp_result, *exp_final_result;
-	char		*result_decode = NULL;
-	char		*result_encode = NULL;
+	const char	*exp_result, *exp_final_result, *source = zbx_mock_get_parameter_string("in.source"),
+			*func_type =  zbx_mock_get_parameter_string("in.func_type");
+	char		*result_decode = NULL, *result_encode = NULL;
 	int		decode_return, exp_return;
 
 	ZBX_UNUSED(state);
@@ -68,5 +66,4 @@ void	zbx_mock_test_entry(void **state)
 		zbx_free(result_encode);
 		zbx_free(result_decode);
 	}
-
 }

@@ -22,9 +22,9 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char	*period = zbx_mock_get_parameter_string("in.period");
-	const char	*time_str = zbx_mock_get_parameter_string("in.time");
-	const char	*tz = zbx_mock_get_parameter_string("in.time_zone");
+	const char	*period = zbx_mock_get_parameter_string("in.period"),
+			*time_str = zbx_mock_get_parameter_string("in.time"),
+			*tz = zbx_mock_get_parameter_string("in.time_zone");
 	int		out = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
 	ZBX_UNUSED(state);

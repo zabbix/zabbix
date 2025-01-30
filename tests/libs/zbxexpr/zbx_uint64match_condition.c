@@ -20,13 +20,14 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	zbx_uint64_t	value = zbx_mock_get_parameter_uint64("in.value");
-	zbx_uint64_t	pattern = zbx_mock_get_parameter_uint64("in.pattern");
+	zbx_uint64_t	value = zbx_mock_get_parameter_uint64("in.value"),
+			pattern = zbx_mock_get_parameter_uint64("in.pattern");
 	unsigned char	op = (unsigned char)zbx_mock_get_parameter_uint64("in.op");
 	int		exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
 	ZBX_UNUSED(state);
 
 	int	result = zbx_uint64match_condition(value, pattern, op);
+
 	zbx_mock_assert_int_eq("return value", exp_result, result);
 }

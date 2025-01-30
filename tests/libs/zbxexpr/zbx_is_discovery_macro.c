@@ -26,6 +26,7 @@ void	zbx_mock_test_entry(void **state)
 	ZBX_UNUSED(state);
 
 	int		result = zbx_is_discovery_macro(name);
+
 	zbx_mock_assert_int_eq("return value", exp_result, result);
 }
 

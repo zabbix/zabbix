@@ -21,9 +21,9 @@
 void	zbx_mock_test_entry(void **state)
 {
 	const char	*delay = zbx_mock_get_parameter_string("in.params");
-	int		exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
+	int		exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result")),
+			simple_interval;
 	char		*error = NULL;
-	int		simple_interval;
 
 	ZBX_UNUSED(state);
 
@@ -33,6 +33,7 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("Value of 'delay' is not a valid update interval: %s.", error);
 
 	int	result = zbx_custom_interval_is_scheduling(custom_intervals);
+
 	zbx_custom_interval_free(custom_intervals);
 
 	zbx_mock_assert_int_eq("return value:", exp_result, result);

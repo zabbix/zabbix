@@ -1,4 +1,4 @@
-# Zabbix API validates delay to be 1-86400 seconds
+# Zabbix API validates delay to be between 1-86400 seconds
 ---
 test case: "Delay 1s"
 in:

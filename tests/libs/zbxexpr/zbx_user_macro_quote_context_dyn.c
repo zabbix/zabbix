@@ -20,9 +20,9 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	const char	*context = zbx_mock_get_parameter_string("in.context");
+	const char	*context = zbx_mock_get_parameter_string("in.context"),
+			*exp_result = zbx_mock_get_parameter_string("out.exp_result");
 	int		force_quote = zbx_mock_get_parameter_int("in.force_quote");
-	const char	*exp_result = zbx_mock_get_parameter_string("out.exp_result");
 	char		*error = NULL;
 
 	ZBX_UNUSED(state);

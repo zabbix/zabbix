@@ -23,8 +23,8 @@
 void	zbx_mock_test_entry(void **state)
 {
 	uint64_t	itemid = zbx_mock_get_parameter_uint64("in.itemid");
-	const char	*delay = zbx_mock_get_parameter_string("in.delay");
-	const char	*now = zbx_mock_get_parameter_string("in.now");
+	const char	*delay = zbx_mock_get_parameter_string("in.delay"),
+			*now = zbx_mock_get_parameter_string("in.now");
 	int		exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	zbx_uint64_t	exp_nextcheck = zbx_mock_get_parameter_uint64("out.nextcheck");
 
