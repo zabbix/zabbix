@@ -81,7 +81,6 @@ $tags = (new CTable())
 				->addValue(_('And/Or'), MAINTENANCE_TAG_EVAL_TYPE_AND_OR)
 				->addValue(_('Or'), MAINTENANCE_TAG_EVAL_TYPE_OR)
 				->setModern()
-				->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
 				->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
 		))
 	)
@@ -98,23 +97,19 @@ $tag_template = new CTemplateTag('tag-row-tmpl',
 		(new CTextBox('tags[#{rowNum}][tag]', '#{tag}', false, DB::getFieldLength('maintenance_tag', 'tag')))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			->setAttribute('placeholder', _('tag'))
-			->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
 			->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL),
 		(new CRadioButtonList('tags[#{rowNum}][operator]', MAINTENANCE_TAG_OPERATOR_LIKE))
 			->addValue(_('Contains'), MAINTENANCE_TAG_OPERATOR_LIKE)
 			->addValue(_('Equals'), MAINTENANCE_TAG_OPERATOR_EQUAL)
 			->setModern()
-			->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
 			->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL),
 		(new CTextBox('tags[#{rowNum}][value]', '#{value}', false, DB::getFieldLength('maintenance_tag', 'value')))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			->setAttribute('placeholder',  _('value'))
-			->setEnabled($data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)
 			->setReadonly(!$data['allowed_edit'] && $data['maintenance_type'] == MAINTENANCE_TYPE_NORMAL),
 		(new CButton('tags[#{rowNum}][remove]', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
-			->setEnabled($data['allowed_edit'])
 	]))->addClass('form_row')
 );
 

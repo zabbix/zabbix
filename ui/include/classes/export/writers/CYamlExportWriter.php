@@ -31,8 +31,6 @@ class CYamlExportWriter extends CExportWriter {
 	 * @return string
 	 */
 	public function write($input): string {
-		$output = Yaml::dump($input, 100, 2, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
-
-		return preg_replace('/^(\s*-)\n\s+/m', '${1} ', $output);
+		return Yaml::dump($input, 100, 2, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK | Yaml::DUMP_COMPACT_NESTED_MAPPING);
 	}
 }

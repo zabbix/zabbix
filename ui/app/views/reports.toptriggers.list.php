@@ -97,6 +97,7 @@ $filter = (new CFilter())
 						->setChecked($data['filter']['severities'])
 						->setColumns(3)
 						->setVertical()
+						->showTitles()
 				)
 			]),
 		(new CFormGrid())

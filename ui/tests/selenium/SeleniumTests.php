@@ -175,7 +175,7 @@ require_once dirname(__FILE__).'/macros/testFormMacrosHostPrototype.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosTemplate.php';
 
 // Maps.
-require_once dirname(__FILE__).'/maps/testFormMap.php';
+require_once dirname(__FILE__).'/maps/testFormMapConstructor.php';
 require_once dirname(__FILE__).'/maps/testFormSysmap.php';
 require_once dirname(__FILE__).'/maps/testPageMaps.php';
 
@@ -519,7 +519,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMaintenance');
 
 		// Maps.
-		$suite->addTestSuite('testFormMap');
+		$suite->addTestSuite('testFormMapConstructor');
 		$suite->addTestSuite('testFormSysmap');
 		$suite->addTestSuite('testPageMaps');
 
