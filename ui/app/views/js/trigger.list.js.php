@@ -34,7 +34,7 @@
 
 			this.#initFilter();
 			this.#initActions();
-			this.#setSubmitCallback();
+			this.#initPopupListeners();
 		}
 
 		#initFilter() {
@@ -70,7 +70,7 @@
 		}
 
 		#initActions() {
-			this.form.addEventListener('click', (e) => {
+			this.form.addEventListener('click', e => {
 				const target = e.target;
 
 				if (target.classList.contains('js-enable-trigger')) {
@@ -81,10 +81,8 @@
 				}
 			});
 
-			document.getElementById('js-create')?.addEventListener('click', (e) => {
-				window.popupManagerInstance.openPopup('trigger.edit',
-					{'hostid': e.target.dataset.hostid, 'context': this.context}
-				);
+			document.getElementById('js-create')?.addEventListener('click', e => {
+				ZABBIX.PopupManager.open('trigger.edit', {hostid: e.target.dataset.hostid, context: this.context});
 			});
 			document.getElementById('js-copy').addEventListener('click', () => this.#copy());
 			document.getElementById('js-massenable-trigger').addEventListener('click', (e) => {
@@ -101,17 +99,13 @@
 			});
 		}
 
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				location.href = location.href;
+		#initPopupListeners() {
+			ZABBIX.EventHub.subscribe({
+				require: {
+					context: CPopupManager.EVENT_CONTEXT,
+					event: CPopupManagerEvent.EVENT_SUBMIT
+				},
+				callback: () => uncheckTableRows('trigger')
 			});
 		}
 
@@ -256,29 +250,6 @@
 				dialogueid: 'copy',
 				dialogue_class: 'modal-popup-static'
 			});
-		}
-
-		elementSuccess(context, e) {
-			const data = e.detail;
-			let curl = null;
-
-			if ('success' in data) {
-				postMessageOk(data.success.title);
-
-				if ('messages' in data.success) {
-					postMessageDetails('success', data.success.messages);
-				}
-
-				if ('action' in data.success && data.success.action === 'delete') {
-					curl = new Curl('zabbix.php');
-					curl.setArgument('action', 'trigger.list');
-					curl.setArgument('context', context);
-				}
-			}
-
-			uncheckTableRows('triggers_' + this.checkbox_hash, [], false);
-
-			location.href = curl === null ? location.href : curl.getUrl();
 		}
 	};
 </script>

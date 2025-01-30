@@ -1943,6 +1943,10 @@ div {
 		}
 	}
 
+	.hintbox-raw-data {
+		white-space: pre-wrap;
+	}
+
 	.hintbox-wrap,
 	.hintbox-wrap-horizontal {
 		overflow: auto;
@@ -3629,11 +3633,11 @@ svg {
 
 .btn-split {
 	position: relative;
-	display: inline-block;
+	display: inline-flex;
 	margin-right: 10px;
 
 	li {
-		display: inline-block;
+		display: inline-flex;
 
 		&:first-child {
 			button {

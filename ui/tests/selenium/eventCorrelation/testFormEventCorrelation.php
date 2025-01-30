@@ -1283,7 +1283,7 @@ class testFormEventCorrelation extends CWebTest {
 	 * Resets the update correlation to the starting state.
 	 */
 	public function resetUpdateCorrelation() {
-		// Data is the inital state + the id of the Correlation that is going to be reset.
+		// Data is the initial state + the id of the Correlation that is going to be reset.
 		$data = self::$update_correlation_initial;
 		$data['correlationid'] = self::$update_correlation_id;
 		CDataHelper::call('correlation.update', [$data]);

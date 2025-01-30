@@ -44,7 +44,7 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("failed to parse iprange2");
 
 	zbx_vector_str_create(&ip_out);
-	extract_yaml_values("out.ip", &ip_out);
+	zbx_mock_extract_yaml_values_str("out.ip", &ip_out);
 
 	int			ip[IPV6_ARR_ELM_COUNT];
 

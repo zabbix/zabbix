@@ -10,7 +10,7 @@ You can extend it or create your own template to cater specific needs.
 ## Requirements
 
 * Zabbix Agent 2
-* Go >= 1.18 (required only to build from source)
+* Go >= 1.21 (required only to build from source)
 * Oracle Instant Client >= 12
 
 ## Supported versions
@@ -154,8 +154,15 @@ To configure plugins, Zabbix agent 2 configuration file is used.
 *Default value:* equals the global Timeout configuration parameter.  
 *Limits:* 1-30
 
-**Plugins.Oracle.CustomQueriesPath** — the full pathname of a directory containing *.sql* files with custom queries.  
-*Default value:* —  the feature is disabled by default.
+**Plugins.Oracle.CustomQueriesPath** — Full pathname of a directory containing *.sql* files with custom queries.  
+*Default value:*: `/usr/local/share/zabbix/custom-queries/oracle` for unix systems
+
+*Default value:* `*:\Program Files\Zabbix Agent 2\Custom Queries\Oracle` for windows systems,
+where * is drive name taken from `ProgramFiles` environment variable
+
+**Plugins.Oracle.CustomQueriesEnabled** — If set enables the execution of the `mysql.custom.query`item key.
+If disabled, will not load any queries from custom query dir path.
+*Default value:* false   
 
 **Plugins.Oracle.KeepAlive** — sets the time for waiting before unused connections will be closed.
 *Default value:* 300 sec.  
@@ -254,7 +261,7 @@ Note: session names are case-sensitive.
 
 **oracle.instance.info[\<commonParams\>]** — returns instance statistics.
 
-**oracle.pdb.info[\<commonParams\>,\<database\>]** — returns the Plugable Databases (PDBs) information.
+**oracle.pdb.info[\<commonParams\>,\<database\>]** — returns the Pluggable Databases (PDBs) information.
 *Parameters:*  
 `database` (optional) — the name of the database.
 

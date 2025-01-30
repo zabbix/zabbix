@@ -611,11 +611,7 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $pr
 					->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
 					->getUrl();
 
-				$name = (new CLink($template['name'], $item_url))
-					->setAttribute('data-action', 'item.prototype.edit')
-					->setAttribute('data-itemid', $parent_templates['links'][$itemid]['itemid'])
-					->setAttribute('data-parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
-					->setAttribute('data-context', 'template');
+				$name = new CLink($template['name'], $item_url);
 			}
 			// ZBX_FLAG_DISCOVERY_NORMAL
 			else {
@@ -623,15 +619,11 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $pr
 					->setArgument('action', 'popup')
 					->setArgument('popup', 'item.edit')
 					->setArgument('context', 'template')
-					->setArgument('data-hostid', $parent_templates['links'][$itemid]['hostid'])
+					->setArgument('hostid', $parent_templates['links'][$itemid]['hostid'])
 					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
 					->getUrl();
 
-				$name = (new CLink($template['name'], $item_url))
-					->setAttribute('data-action', 'item.edit')
-					->setAttribute('data-hostid', $parent_templates['links'][$itemid]['hostid'])
-					->setAttribute('data-itemid', $parent_templates['links'][$itemid]['itemid'])
-					->setAttribute('data-context', 'template');
+				$name = new CLink($template['name'], $item_url);
 			}
 		}
 		else {
