@@ -3203,7 +3203,7 @@ class C72XmlValidator extends CXmlValidatorGeneral {
 							'selementid1' =>			['type' => XML_STRING | XML_REQUIRED],
 							'selementid2' =>			['type' => XML_STRING | XML_REQUIRED],
 							'linktriggers' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'linktrigger', 'rules' => [
-								'linktrigger' =>			['type' => XML_ARRAY, 'rules' => [
+								'linktrigger' =>            ['type' => XML_ARRAY, 'rules' => [
 									'drawtype' =>				['type' => XML_STRING | XML_REQUIRED],
 									'color' =>					['type' => XML_STRING | XML_REQUIRED],
 									'trigger' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
