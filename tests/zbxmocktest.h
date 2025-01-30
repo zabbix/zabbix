@@ -24,6 +24,8 @@
 #include <cmocka.h>
 #include "zbxtypes.h"
 
+#define TIME_IS_32INT
+
 /* hint to a compiler that cmocka _fail returns immediately, so it does not raise 'uninitialized variable' warnings */
 #if defined(__GNUC__) || defined(__clang__)
 #	define ZBX_NO_RETURN	__attribute__((noreturn))
