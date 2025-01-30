@@ -122,15 +122,15 @@ static int	DBpatch_7030009(void)
 
 		if (ZBX_SETTING_TYPE_STR != e->type)
 		{
-			if (ZBX_DB_OK > zbx_db_execute("insert into settings (name, type, %s, value_str) "
-					" values ('%s', %d, coalesce ((select %s from config), %s), '')",
+			if (ZBX_DB_OK > zbx_db_execute("insert into settings (name, type, %s, value_str)"
+					" values ('%s', %d, coalesce((select %s from config), %s), '')",
 					target_field, e->name, e->type, e->name, e->default_value))
 			{
 				return FAIL;
 			}
 		}
-		else if (ZBX_DB_OK > zbx_db_execute("insert into settings (name, type, %s) "
-				" values ('%s', %d, coalesce ((select %s from config), '%s'))",
+		else if (ZBX_DB_OK > zbx_db_execute("insert into settings (name, type, %s)"
+				" values ('%s', %d, coalesce((select %s from config), '%s'))",
 				target_field, e->name, ZBX_SETTING_TYPE_STR, e->name, e->default_value))
 		{
 			return FAIL;
