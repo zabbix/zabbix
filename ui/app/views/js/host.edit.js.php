@@ -31,6 +31,7 @@ window.host_edit_popup = {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.initial_proxy_groupid = proxy_groupid;
 		this.macros_templateids = null;
+		this.show_inherited_macros = false;
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'host.list');
@@ -256,49 +257,33 @@ window.host_edit_popup = {
 	 */
 	initMacrosTab() {
 		this.macros_manager = new HostMacrosManager({
-			'container': $('#macros_container .table-forms-td-right')
+			container: $('#macros_container .table-forms-td-right')
 		});
 
-		$('#host-tabs', this.form).on('tabscreate tabsactivate', (e, ui) => {
-			const panel = (e.type === 'tabscreate') ? ui.panel : ui.newPanel;
-			const show_inherited_macros = this.form
-				.querySelector('input[name=show_inherited_macros]:checked').value == 1;
+		const show_inherited_macros_element = document.getElementById('show_inherited_macros');
+		this.show_inherited_macros = show_inherited_macros_element.querySelector('input:checked').value == 1;
 
-			if (panel.attr('id') === 'macros-tab') {
-				// Please note that macro initialization must take place once and only when the tab is visible.
-				if (e.type === 'tabsactivate') {
-					const templateids = this.getAllTemplates();
+		this.macros_manager.initMacroTable(this.show_inherited_macros);
 
-					// First time always load inherited macros.
-					if (this.macros_templateids === null) {
-						this.macros_templateids = templateids;
+		const observer = new IntersectionObserver(entries => {
+			if (entries[0].isIntersecting && this.show_inherited_macros) {
+				const templateids = this.getAllTemplates();
 
-						if (show_inherited_macros) {
-							this.macros_manager.load(show_inherited_macros, templateids);
-							this.macros_initialized = true;
-						}
-					}
-					// Other times load inherited macros only if templates changed.
-					else if (show_inherited_macros && this.macros_templateids.xor(templateids).length > 0) {
-						this.macros_templateids = templateids;
-						this.macros_manager.load(show_inherited_macros, templateids);
-					}
+				if (this.macros_templateids === null || this.macros_templateids.xor(templateids).length > 0) {
+					this.macros_templateids = templateids;
+
+					this.macros_manager.load(this.show_inherited_macros, templateids);
 				}
-
-				if (this.macros_initialized) {
-					return;
-				}
-
-				// Initialize macros.
-				this.macros_manager.initMacroTable(show_inherited_macros);
-
-				this.macros_initialized = true;
 			}
 		});
+		observer.observe(document.getElementById('macros-tab'));
 
-		this.form.querySelector('#show_inherited_macros').onchange = (e) => {
-			this.macros_manager.load(e.target.value == 1, this.getLinkedTemplates().concat(this.getNewTemplates()));
-		};
+		show_inherited_macros_element.addEventListener('change', e => {
+			this.show_inherited_macros = e.target.value == 1;
+			this.macros_templateids = this.getAllTemplates();
+
+			this.macros_manager.load(this.show_inherited_macros, this.macros_templateids);
+		});
 	},
 
 	/**
