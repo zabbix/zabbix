@@ -21,8 +21,9 @@
 void	zbx_mock_test_entry(void **state)
 {
 	const char	*delay = zbx_mock_get_parameter_string("in.params");
-	int		exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result")),
-			simple_interval;
+	int		simple_interval,
+			exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
+
 	char		*error = NULL;
 
 	ZBX_UNUSED(state);
