@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -168,15 +168,9 @@ class CAlert extends CApiService {
 			')';
 		}
 
-		// Allow user to get alerts sent only by users with same user group.
+		// For non-super admin users only own alerts are accessible.
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			// Filter by userid only if userid IS NOT NULL.
-			$sqlParts['where'][] = '(a.userid IS NULL OR EXISTS ('.
-				'SELECT NULL'.
-				' FROM users_groups ug'.
-				' WHERE ug.userid=a.userid'.
-					' AND '.dbConditionInt('ug.usrgrpid', getUserGroupsByUserId(self::$userData['userid'])).
-			'))';
+			$sqlParts['where'][] = '(a.userid IS NULL OR a.userid='.self::$userData['userid'].')';
 		}
 
 		// groupids

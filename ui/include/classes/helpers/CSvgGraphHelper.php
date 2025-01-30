@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,6 +50,8 @@ class CSvgGraphHelper {
 		self::getMetrics($metrics, $options['data_sets']);
 		// Apply overrides for previously selected $metrics.
 		self::applyOverrides($metrics, $options['overrides']);
+		// Reset unused Y-scale axes while taking overrides into account.
+		self::resetUnusedAxes($metrics, $options['left_y_axis'], $options['right_y_axis']);
 		self::applyUnits($metrics, $options['left_y_axis'], $options['right_y_axis']);
 		// Apply time periods for each $metric, based on graph/dashboard time as well as metric level timeshifts.
 		self::getTimePeriods($metrics, $options['time_period']);
@@ -695,6 +697,29 @@ class CSvgGraphHelper {
 				}
 				unset($metric);
 			}
+		}
+	}
+
+	private static function resetUnusedAxes(array $metrics, array &$left_y_axis, array &$right_y_axis): void {
+		$left_side_has_metrics = false;
+		$right_side_has_metrics = false;
+
+		foreach ($metrics as $metric) {
+			if ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_LEFT) {
+				$left_side_has_metrics = true;
+			}
+
+			if ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT) {
+				$right_side_has_metrics = true;
+			}
+		}
+
+		if (!$left_side_has_metrics) {
+			$left_y_axis['show'] = false;
+		}
+
+		if (!$right_side_has_metrics) {
+			$right_y_axis['show'] = false;
 		}
 	}
 

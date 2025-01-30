@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -129,18 +129,25 @@ func getFsInfo(path string) (fsname, fstype, drivetype, drivelabel string, err e
 }
 
 func getFsStats(path string) (stats *FsStats, err error) {
-	var totalFree, callerFree, total uint64
-	if err = windows.GetDiskFreeSpaceEx(windows.StringToUTF16Ptr(path), &callerFree, &total, &totalFree); err != nil {
+	var callerFree, total uint64
+
+	err = windows.GetDiskFreeSpaceEx(windows.StringToUTF16Ptr(path), &callerFree, &total, nil)
+	if err != nil {
 		return
 	}
-	totalUsed := total - totalFree
+
+	totalUsed := total - callerFree
 	stats = &FsStats{
 		Total: total,
-		Free:  totalFree,
+		Free:  callerFree,
 		Used:  totalUsed,
-		PFree: float64(totalFree) / float64(total) * 100,
-		PUsed: float64(totalUsed) / float64(total) * 100,
 	}
+
+	if total != 0 {
+		stats.PFree = float64(callerFree) * 100.0 / float64(total)
+		stats.PUsed = float64(totalUsed) * 100.0 / float64(total)
+	}
+
 	return
 }
 
