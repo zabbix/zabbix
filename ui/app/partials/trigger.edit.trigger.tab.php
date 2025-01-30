@@ -39,7 +39,6 @@ if ($discovered_trigger) {
 
 	$trigger_form_grid->addItem([new CLabel(_('Discovered by')), new CFormField(
 		(new CLink($data['discoveryRule']['name'], $discovered_trigger_url))
-			->setAttribute('data-action', 'trigger.prototype.edit')
 			->setAttribute('data-parent_discoveryid', $data['discoveryRule']['itemid'])
 			->setAttribute('data-triggerid', $data['triggerDiscovery']['parent_triggerid'])
 			->setAttribute('data-context', $data['context'])

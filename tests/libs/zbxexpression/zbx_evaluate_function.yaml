@@ -4267,4 +4267,303 @@ in:
 out:
   return: FAIL
   value: 0
+---
+    test case: Evaluate forecast (1h,30m,"logarithmic","max")
+    in:
+      history:
+      - itemid: 1
+        value type: ITEM_VALUE_TYPE_UINT64
+        data:
+        - value: 1
+          ts: 2017-01-10 10:01:00.000000000 +00:00
+        - value: 2
+          ts: 2017-01-10 10:02:00.000000000 +00:00
+        - value: 3
+          ts: 2017-01-10 10:03:00.000000000 +00:00
+        - value: 4
+          ts: 2017-01-10 10:04:00.000000000 +00:00
+        - value: 5
+          ts: 2017-01-10 10:05:00.000000000 +00:00
+      time: 2017-01-10 10:05:00.000000000 +00:00
+      function: forecast
+      params: '1h,30m,"logarithmic","max"'
+    out:
+      return: SUCCEED
+      value: 3.799161
+---
+    test case: Evaluate forecast (1h,30m,"polynomial1","avg")
+    in:
+      history:
+      - itemid: 1
+        value type: ITEM_VALUE_TYPE_UINT64
+        data:
+        - value: 1
+          ts: 2017-01-10 10:01:00.000000000 +00:00
+        - value: 2
+          ts: 2017-01-10 10:02:00.000000000 +00:00
+        - value: 3
+          ts: 2017-01-10 10:03:00.000000000 +00:00
+        - value: 4
+          ts: 2017-01-10 10:04:00.000000000 +00:00
+        - value: 5
+          ts: 2017-01-10 10:05:00.000000000 +00:00
+      time: 2017-01-10 10:05:00.000000000 +00:00
+      function: forecast
+      params: '1h,30m,"polynomial1","avg"'
+    out:
+      return: SUCCEED
+      value: 20
+---
+    test case: Evaluate forecast (1h,30m,"polynomial2","min")
+    in:
+      history:
+      - itemid: 1
+        value type: ITEM_VALUE_TYPE_UINT64
+        data:
+        - value: 1
+          ts: 2017-01-10 10:01:00.000000000 +00:00
+        - value: 2
+          ts: 2017-01-10 10:02:00.000000000 +00:00
+        - value: 3
+          ts: 2017-01-10 10:03:00.000000000 +00:00
+        - value: 4
+          ts: 2017-01-10 10:04:00.000000000 +00:00
+        - value: 5
+          ts: 2017-01-10 10:05:00.000000000 +00:00
+      time: 2017-01-10 10:05:00.000000000 +00:00
+      function: forecast
+      params: '1h,30m,"polynomial2","min"'
+    out:
+      return: SUCCEED
+      value: 5.000000
+---
+    test case: Evaluate forecast (1h,30m,"polynomial3","max")
+    in:
+      history:
+      - itemid: 1
+        value type: ITEM_VALUE_TYPE_UINT64
+        data:
+        - value: 1
+          ts: 2017-01-10 10:01:00.000000000 +00:00
+        - value: 2
+          ts: 2017-01-10 10:02:00.000000000 +00:00
+        - value: 3
+          ts: 2017-01-10 10:03:00.000000000 +00:00
+        - value: 4
+          ts: 2017-01-10 10:04:00.000000000 +00:00
+        - value: 5
+          ts: 2017-01-10 10:05:00.000000000 +00:00
+      time: 2017-01-10 10:05:00.000000000 +00:00
+      function: forecast
+      params: '1h,30m,"polynomial3","max"'
+    out:
+      return: SUCCEED
+      value: 35
+---
+    test case: Evaluate forecast (1h,30m,"polynomial4","delta")
+    in:
+      history:
+      - itemid: 1
+        value type: ITEM_VALUE_TYPE_UINT64
+        data:
+        - value: 1
+          ts: 2017-01-10 10:01:00.000000000 +00:00
+        - value: 2
+          ts: 2017-01-10 10:02:00.000000000 +00:00
+        - value: 3
+          ts: 2017-01-10 10:03:00.000000000 +00:00
+        - value: 4
+          ts: 2017-01-10 10:04:00.000000000 +00:00
+        - value: 5
+          ts: 2017-01-10 10:05:00.000000000 +00:00
+      time: 2017-01-10 10:05:00.000000000 +00:00
+      function: forecast
+      params: '1h,30m,"polynomial4","delta"'
+    out:
+      return: SUCCEED
+      value: 30.00000
+---
+    test case: Evaluate forecast (1h,30m,"linear","avg")
+    in:
+      history:
+      - itemid: 1
+        value type: ITEM_VALUE_TYPE_UINT64
+        data:
+        - value: 1
+          ts: 2017-01-10 10:01:00.000000000 +00:00
+        - value: 2
+          ts: 2017-01-10 10:02:00.000000000 +00:00
+        - value: 3
+          ts: 2017-01-10 10:03:00.000000000 +00:00
+        - value: 4
+          ts: 2017-01-10 10:04:00.000000000 +00:00
+        - value: 5
+          ts: 2017-01-10 10:05:00.000000000 +00:00
+      time: 2017-01-10 10:05:00.000000000 +00:00
+      function: forecast
+      params: '1h,30m,"linear","avg"'
+    out:
+      return: SUCCEED
+      value: 20
+---
+    test case: Evaluate forecast (1h,30m,"logarithmic","avg")
+    in:
+      history:
+      - itemid: 1
+        value type: ITEM_VALUE_TYPE_UINT64
+        data:
+        - value: 1
+          ts: 2017-01-10 10:01:00.000000000 +00:00
+        - value: 2
+          ts: 2017-01-10 10:02:00.000000000 +00:00
+        - value: 3
+          ts: 2017-01-10 10:03:00.000000000 +00:00
+        - value: 4
+          ts: 2017-01-10 10:04:00.000000000 +00:00
+        - value: 5
+          ts: 2017-01-10 10:05:00.000000000 +00:00
+      time: 2017-01-10 10:05:00.000000000 +00:00
+      function: forecast
+      params: '1h,30m,"logarithmic","avg"'
+    out:
+      return: SUCCEED
+      value: 3.726446
+---
+    test case: Evaluate forecast (1h,30m,"power","avg")
+    in:
+      history:
+      - itemid: 1
+        value type: ITEM_VALUE_TYPE_UINT64
+        data:
+        - value: 1
+          ts: 2017-01-10 10:01:00.000000000 +00:00
+        - value: 2
+          ts: 2017-01-10 10:02:00.000000000 +00:00
+        - value: 3
+          ts: 2017-01-10 10:03:00.000000000 +00:00
+        - value: 4
+          ts: 2017-01-10 10:04:00.000000000 +00:00
+        - value: 5
+          ts: 2017-01-10 10:05:00.000000000 +00:00
+      time: 2017-01-10 10:05:00.000000000 +00:00
+      function: forecast
+      params: '1h,30m,"power","avg"'
+    out:
+      return: SUCCEED
+      value: 3.671013
+---
+test case: Evaluate timeleft(5m,65,power)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: timeleft
+  params: '5m,65,"power"'
+out:
+  return: SUCCEED
+  value: 102684041197174725458320687104.000000
+---
+test case: Evaluate timeleft(5m,65,linear)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: timeleft
+  params: '5m,65,"linear"'
+out:
+  return: SUCCEED
+  value: 3600
+---
+test case: Evaluate timeleft(5m,65,polynomial2)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: timeleft
+  params: '5m,65,"polynomial2"'
+out:
+  return: SUCCEED
+  value: 3600
+---
+test case: Evaluate timeleft(5m,65,exponential)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: timeleft
+  params: '5m,65,"exponential"'
+out:
+  return: SUCCEED
+  value: 373.384970
+---
+test case: Evaluate timeleft(5m,65,logarithmic)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_UINT64
+    data:
+    - value: 1
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 2
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 3
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+    - value: 4
+      ts: 2017-01-10 10:04:00.000000000 +00:00
+    - value: 5
+      ts: 2017-01-10 10:05:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: timeleft
+  params: '5m,5,"logarithmic"'
+out:
+  return: SUCCEED
+  value: 272384191.768584
 ...

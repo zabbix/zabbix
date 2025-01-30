@@ -187,7 +187,6 @@
 			});
 
 			jqBlink.blink();
-			this.#setSubmitCallback();
 		}
 
 		#edit() {
@@ -550,20 +549,6 @@
 					clearMessages();
 					addMessage(makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]));
 				});
-		}
-
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				location.href = location.href;
-			});
 		}
 	}
 </script>

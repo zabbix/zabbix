@@ -4635,6 +4635,8 @@ form.dashboard-widget-itemhistory #list_columns .overflow-ellipsis {
 form.dashboard-widget-itemhistory #list_columns .inaccessible {
   color: #7d7d7d; }
 
+div.dashboard-widget-itemhistory .list-table pre {
+  font-family: inherit; }
 div.dashboard-widget-itemhistory .list-table.show-thumbnail tbody td {
   height: 56px;
   vertical-align: middle; }
@@ -4939,8 +4941,13 @@ form.dashboard-widget-piechart {
   form.dashboard-widget-piechart .dataset-head,
   form.dashboard-widget-piechart .dataset-body.list-accordion-item-body {
     display: contents; }
-  form.dashboard-widget-piechart .dataset-head .multiselect {
-    width: 100%; }
+  form.dashboard-widget-piechart .dataset-head .multiselect-control {
+    overflow: hidden;
+    margin: -2px;
+    padding: 2px; }
+    form.dashboard-widget-piechart .dataset-head .multiselect-control .multiselect {
+      overflow: hidden;
+      flex-grow: 1; }
   form.dashboard-widget-piechart .dataset-body .form-grid {
     padding-top: 0; }
     form.dashboard-widget-piechart .dataset-body .form-grid:first-child {
@@ -5201,8 +5208,13 @@ form.dashboard-widget-svggraph .overrides-list-item {
     top: 5px;
     left: -17px;
     height: 24px; }
-  form.dashboard-widget-svggraph .overrides-list-item .multiselect {
-    width: 100%; }
+  form.dashboard-widget-svggraph .overrides-list-item .multiselect-control {
+    overflow: hidden;
+    margin: -2px;
+    padding: 2px; }
+    form.dashboard-widget-svggraph .overrides-list-item .multiselect-control .multiselect {
+      overflow: hidden;
+      flex-grow: 1; }
 form.dashboard-widget-svggraph .overrides-foot {
   padding: 5px 0; }
 form.dashboard-widget-svggraph .overrides-options-list {
@@ -6447,6 +6459,8 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     .overlay-dialogue.modal-popup.modal-popup-fullscreen {
       width: calc(100vw - 40px);
       max-width: calc(100vw - 40px); }
+  .overlay-dialogue .hintbox-raw-data {
+    white-space: pre-wrap; }
   .overlay-dialogue .hintbox-wrap,
   .overlay-dialogue .hintbox-wrap-horizontal {
     overflow: auto;
@@ -7580,10 +7594,10 @@ svg {
 
 .btn-split {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
   margin-right: 10px; }
   .btn-split li {
-    display: inline-block; }
+    display: inline-flex; }
     .btn-split li:first-child button {
       border-top-right-radius: 0;
       border-bottom-right-radius: 0; }

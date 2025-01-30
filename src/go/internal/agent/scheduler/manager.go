@@ -258,7 +258,7 @@ func ParseItemTimeoutAny(timeoutIn any) (int, error) {
 }
 
 // processUpdateRequest processes client update request. It's being used for multiple requests
-// (active checks on a server) and also for direct requets (single passive and internal checks).
+// (active checks on a server) and also for direct requests (single passive and internal checks).
 func (m *Manager) processUpdateRequestRun(update *updateRequest) {
 	var c *client
 	var ok bool

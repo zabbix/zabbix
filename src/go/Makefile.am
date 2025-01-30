@@ -95,6 +95,10 @@ install-bin/zabbix_agent2: bin/zabbix_agent2
 	for _f in *.conf; do \
 		$(INSTALL_DATA) $${_f} "$(DESTDIR)$(AGENT2_PLUGIN_CONFIG_DIR)"; \
 	done)
+	(cd conf/zabbix_agent2.d/plugins.d/nix && \
+	for _f in *.conf; do \
+		$(INSTALL_DATA) $${_f} "$(DESTDIR)$(AGENT2_PLUGIN_CONFIG_DIR)"; \
+	done)
 
 install-bin/zabbix_web_service: bin/zabbix_web_service
 	$(INSTALL_PROGRAM) bin/zabbix_web_service "$(DESTDIR)$(sbindir)"

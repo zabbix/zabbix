@@ -218,6 +218,10 @@ class testPageMaps extends CWebTest {
 
 		// Get filter element.
 		$filter = CFilterElement::find()->one();
+
+		// Expand filter if it is collapsed.
+		$filter->setContext(CFilterElement::CONTEXT_RIGHT)->expand();
+
 		$form = $filter->getForm();
 
 		$this->assertEquals(['Name'], $form->getLabels()->asText());
@@ -467,7 +471,12 @@ class testPageMaps extends CWebTest {
 	 */
 	public function testPageMaps_Filter($data) {
 		$this->page->login()->open('sysmaps.php?sort=name&sortorder=ASC');
-		$form = CFilterElement::find()->one()->getForm();
+		$filter = CFilterElement::find()->one();
+
+		// Expand filter if it is collapsed.
+		$filter->setContext(CFilterElement::CONTEXT_RIGHT)->expand();
+
+		$form = $filter->getForm();
 
 		// Fill filter fields if such present in data provider.
 		$form->fill(CTestArrayHelper::get($data, 'filter'));

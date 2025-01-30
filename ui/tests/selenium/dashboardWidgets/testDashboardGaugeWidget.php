@@ -19,7 +19,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
- * @backup config, widget
+ * @backup config, widget, globalmacro
  *
  * @dataSource AllItemValueTypes, GlobalMacros
  *
@@ -42,6 +42,7 @@ class testDashboardGaugeWidget extends testWidgets {
 	const HOST = 'Host for all item value types';
 	const DELETE_GAUGE = 'Gauge for deleting';
 	const GAUGE_ITEM = 'Float item';
+	const GAUGE_MACROFUNCTIONS = 'Gauge for macrofunctions';
 
 	/**
 	 * Id of the dashboard where gauge widget is created and updated.
@@ -49,6 +50,7 @@ class testDashboardGaugeWidget extends testWidgets {
 	 * @var integer
 	 */
 	protected static $dashboardid;
+	protected static $macrofunction_dashboardid;
 
 	protected static $update_gauge = 'Gauge for updating';
 
@@ -81,53 +83,114 @@ class testDashboardGaugeWidget extends testWidgets {
 		CDataHelper::addItemData($float_item_id, 50);
 
 		$dashboards = CDataHelper::call('dashboard.create', [
-			'name' => 'Gauge widget dashboard',
-			'auto_start' => 0,
-			'pages' => [
-				[
-					'name' => 'Gauge test page',
-					'widgets' => [
-						[
-							'type' => 'gauge',
-							'name' => self::$update_gauge,
-							'x' => 0,
-							'y' => 0,
-							'width' => 11,
-							'height' => 5,
-							'fields' => [
-								[
-									'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
-									'name' => 'itemid',
-									'value' => $float_item_id
+			[
+				'name' => 'Gauge widget dashboard',
+				'auto_start' => 0,
+				'pages' => [
+					[
+						'name' => 'Gauge test page',
+						'widgets' => [
+							[
+								'type' => 'gauge',
+								'name' => self::$update_gauge,
+								'x' => 0,
+								'y' => 0,
+								'width' => 11,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid',
+										'value' => $float_item_id
+									]
+								]
+							],
+							[
+								'type' => 'gauge',
+								'name' => self::DELETE_GAUGE,
+								'x' => 11,
+								'y' => 0,
+								'width' => 11,
+								'height' => 5,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid',
+										'value' => $float_item_id
+									]
 								]
 							]
-						],
-						[
-							'type' => 'gauge',
-							'name' => self::DELETE_GAUGE,
-							'x' => 11,
-							'y' => 0,
-							'width' => 11,
-							'height' => 5,
-							'view_mode' => 0,
-							'fields' => [
-								[
-									'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
-									'name' => 'itemid',
-									'value' => $float_item_id
+						]
+					],
+					[
+						'name' => 'Screenshot page'
+					]
+				]
+			],
+			[
+				'name' => 'Dashboard for macrofunctions',
+				'auto_start' => 0,
+				'pages' => [
+					[
+						'name' => 'Gauge for testing macrofunctions',
+						'widgets' => [
+							[
+								'type' => 'gauge',
+								'name' => self::GAUGE_MACROFUNCTIONS,
+								'x' => 0,
+								'y' => 0,
+								'width' => 20,
+								'height' => 6,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid',
+										'value' => $float_item_id
+									]
 								]
 							]
 						]
 					]
-				],
-				[
-					'name' => 'Screenshot page'
 				]
 			]
 		]);
 
 		$this->assertArrayHasKey('dashboardids', $dashboards);
 		self::$dashboardid = $dashboards['dashboardids'][0];
+		self::$macrofunction_dashboardid = $dashboards['dashboardids'][1];
+
+		CDataHelper::call('usermacro.createglobal', [
+			[
+				'macro' => self::USER_MACRO,
+				'value' => self::USER_MACRO_VALUE
+			],
+			[
+				'macro' => self::USER_SECRET_MACRO,
+				'type' => 1,
+				'value' => self::USER_MACRO_VALUE
+			],
+			[
+				'macro' => self::MACRO_CHAR,
+				'value' => self::MACRO_CHAR_VALUE
+			],
+			[
+				'macro' => self::MACRO_HTML_ENCODE,
+				'value' => self::MACRO_HTML_ENCODE_VALUE
+			],
+			[
+				'macro' => self::MACRO_HTML_DECODE,
+				'value' => self::MACRO_HTML_DECODE_VALUE
+			],
+			[
+				'macro' => self::MACRO_URL_ENCODE,
+				'value' => self::MACRO_URL_ENCODE_VALUE
+			],
+			[
+				'macro' => self::MACRO_URL_DECODE,
+				'value' => self::MACRO_URL_DECODE_VALUE
+			]
+		]);
 	}
 
 	public function testDashboardGaugeWidget_Layout() {
@@ -1270,5 +1333,161 @@ class testDashboardGaugeWidget extends testWidgets {
 		// Wait until the gauge is animated.
 		$this->query('xpath://div['.CXPathHelper::fromClass('is-ready').']')->waitUntilVisible();
 		$this->assertScreenshot($widget->query('class:dashboard-grid-widget-container')->one(), $data['screenshot_id']);
+	}
+
+	public static function getMacroFunctions() {
+		return [
+			'Incorrectly added parameter for non-argument macro functions' => [
+					[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{{ITEM.NAME}.btoa(\)}, {'.self::USER_MACRO.'.htmldecode(test)}, '.
+							'{'.self::USER_MACRO.'.htmlencode(test)}, {{ITEM.NAME}.lowercase([test])}, '.
+							'{{ITEM.NAME}.uppercase([test])}, {{ITEM.NAME}.urldecode([test])}, '.
+							'{'.self::USER_SECRET_MACRO.'.urlencode(\/)}',
+						'id:desc_size' => 5
+					],
+					'result' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*'
+				]
+			],
+			'Secret macro value is not exposed when using macro functions' => [
+					[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_SECRET_MACRO.'.btoa()}, {'.self::USER_SECRET_MACRO.'.htmldecode()}, '.
+							'{'.self::USER_SECRET_MACRO.'.htmlencode()}, {'.self::USER_SECRET_MACRO.'.lowercase()}, '.
+							'{'.self::USER_SECRET_MACRO.'.uppercase()}, {'.self::USER_SECRET_MACRO.'.regrepl(a, b)}, '.
+							'{'.self::USER_SECRET_MACRO.'.tr(a-z, b)}, {'.self::USER_SECRET_MACRO.'.urldecode()}, '.
+							'{'.self::USER_SECRET_MACRO.'.urlencode()}',
+						'id:desc_size' => 5
+					],
+					'result' => 'KioqKioq, ******, ******, ******, ******, ******, ******, ******, %2A%2A%2A%2A%2A%2A'
+				]
+			],
+			'Built-in macros with non-argument macro functions' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{{ITEM.NAME}.btoa()}, {{ITEM.NAME}.htmldecode()}, {{ITEM.NAME}.htmlencode()}, '.
+							'{{ITEM.NAME}.lowercase()}, {{ITEM.NAME}.uppercase()}, {{ITEM.NAME}.urlencode()}, '.
+							'{{ITEM.NAME}.urldecode()}',
+						'id:desc_size' => 5
+					],
+					'result' => 'RmxvYXQgaXRlbQ==, Float item, Float item, float item, FLOAT ITEM, Float%20item, Float item'
+				]
+			],
+			'User macros with non-argument macro functions' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_MACRO.'.btoa()}, {'.self::MACRO_HTML_ENCODE.'.htmlencode()}, '.
+							'{'.self::MACRO_HTML_DECODE.'.htmldecode()}, {'.self::MACRO_URL_ENCODE.'.urlencode()}, '.
+							'{'.self::MACRO_URL_DECODE.'.urldecode()}, {'.self::USER_MACRO.'.uppercase()}, '.
+							'{'.self::USER_MACRO.'.lowercase()}',
+						'id:desc_size' => 5
+					],
+					'result' => base64_encode(self::USER_MACRO_VALUE).', '.self::MACRO_HTML_DECODE_VALUE.', '.
+						self::MACRO_HTML_ENCODE_VALUE.', '.self::MACRO_URL_DECODE_VALUE.', '.self::MACRO_URL_ENCODE_VALUE.
+						', MACRO FUNCTION TEST 12345, macro function test 12345'
+				]
+			],
+			'Incorrectly used parameters in regrepl(), tr(), regsub(), iregsub() macro functions' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_MACRO.'.regrepl()}, {'.self::MACRO_CHAR.'.regrepl([a])}, '.
+							'{'.self::USER_MACRO.'.tr()}, {'.self::USER_MACRO.'.tr(z-a,Z-A)}, {'.self::USER_MACRO.'.tr(1,2,3)}'.
+							', {'.self::USER_MACRO.'.regsub()}, {'.self::USER_MACRO.'.iregsub()}',
+						'id:desc_size' => 5
+					],
+					'result' => '*UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*, *UNKNOWN*'
+				]
+			],
+			'Regrepl function - multibyte characters and case sensitive check' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_MACRO.'.regrepl([[:digit:]], /, [A-Z], \)}, '.
+							'{'.self::MACRO_CHAR.'.regrepl(🌴, 🌝, [а-я], Q, \d, 🌞)}',
+						'id:desc_size' => 5
+					],
+					'result' => '\acro function \est /////, 🌞🌞🌞 ЙQQQQЖŽzŠsšĒĀīī🌝 ₰₰₰'
+				]
+			],
+			'Regrepl function with big amount of processed data' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_MACRO.''.
+							'.regrepl(1{0}, test, 1{0}, test, 1{0},test, 1{0}, test, 1{0}, test, 1{0}, test)}',
+						'id:desc_size' => 5
+					],
+					'result' => '*UNKNOWN*'
+				]
+			],
+			'Macro functions tr(), uppercase(), lowercase() with non-ascii characters' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::MACRO_CHAR.'.tr(0-9, Ī)}, {'.self::MACRO_CHAR.'.lowercase()}, '.
+							'{'.self::MACRO_CHAR.'.uppercase()}',
+						'id:desc_size' => 5
+					],
+					'result' => '??? ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰, 000 ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰, 000 ЙщфхжЖŽZŠSšĒĀīī🌴 ₰₰₰'
+				]
+			],
+			'Macro function tr() - use of escaping and range' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::MACRO_URL_ENCODE.'.tr("\/","\"")}, {'.self::MACRO_CHAR.'.tr(0-9abcA-L,*)}',
+						'id:desc_size' => 5
+					],
+					'result' => 'h:""test.com"macro?functions=urlencode&urld=a🎸, *** ЙщфхжЖŽzŠsšĒĀīī🌴 ₰₰₰'
+				]
+			],
+			'Macro functions regsub() / iregsub() - successful scenarios' => [
+				[
+					'fields' => [
+						'Advanced configuration' => true,
+						'id:description' => '{'.self::USER_MACRO.'.regsub(^[0-9]+, Problem)}, '.
+							'{'.self::USER_MACRO.'.iregsub(^[0-9]+, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.regsub(^[0-9]+, Problem)}, '.
+							'{'.self::USER_SECRET_MACRO.'.iregsub(^[0-9]+, Problem)}, '.
+							'{{ITEM.NAME}.regsub(Float, test)}, {{ITEM.NAME}.iregsub(Float, test)}',
+						'id:desc_size' => 5
+					],
+					'result' => 'Problem, Problem, Problem, Problem, test, test'
+				]
+			]
+			// TODO: Uncomment and check the test case, after ZBX-25420 fix.
+//			'Macro functions regsub() / iregsub() - successful scenarios' => [
+//				[
+//					'fields' => [
+//						'Advanced configuration' => true,
+//						'id:description' => '{'.self::USER_MACRO.'.regsub(0, Problem)}, '.
+//							'{'.self::USER_MACRO.'.iregsub(0, Problem)}, '.
+//							'{'.self::USER_SECRET_MACRO.'.regsub(0, Problem)}, '.
+//							'{'.self::USER_SECRET_MACRO.'.iregsub(0, Problem)}, '.
+//							'{{ITEM.NAME}.regsub(0, test)}, {{ITEM.NAME}.iregsub(0, test)}',
+//						'id:desc_size' => 5
+//					],
+//					'result' => ', , , , ,'
+//				]
+//			]
+		];
+	}
+
+	/**
+	 * @dataProvider getMacroFunctions
+	 */
+	public function testDashboardGaugeWidget_CheckMacroFunctions($data) {
+		$this->setWidgetConfiguration(self::$macrofunction_dashboardid,
+				self::GAUGE_MACROFUNCTIONS, $data['fields']
+		);
+		CDashboardElement::find()->one()->save()->waitUntilReady();
+
+		// Check the resolution of macrofunction.
+		$this->assertEquals($data['result'], $this->query('css:.svg-gauge-description')->one()->getText());
 	}
 }

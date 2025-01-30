@@ -463,7 +463,7 @@ static void	substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_dc_tr
 		if (NULL != tr->new_error)
 			continue;
 
-		if( SUCCEED != substitute_expression_functions_results(ifuncs, tr->eval_ctx, &tr->new_error))
+		if (SUCCEED != substitute_expression_functions_results(ifuncs, tr->eval_ctx, &tr->new_error))
 		{
 			tr->new_value = TRIGGER_VALUE_UNKNOWN;
 			continue;

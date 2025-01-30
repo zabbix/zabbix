@@ -256,10 +256,7 @@ foreach ($data['discoveries'] as $discovery) {
 
 			$description[] = (new CLink($discovery['master_item']['name'], $item_url))
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_TEAL)
-				->setAttribute('data-itemid', $discovery['master_item']['itemid'])
-				->setAttribute('data-context', $data['context'])
-				->setAttribute('data-action', 'item.edit');
+				->addClass(ZBX_STYLE_TEAL);
 		}
 
 		$description[] = NAME_DELIMITER;
@@ -324,13 +321,7 @@ foreach ($data['discoveries'] as $discovery) {
 		->setArgument($data['context'] === 'host' ? 'hostid' : 'templateid', $discovery['hosts'][0]['hostid'])
 		->getUrl();
 
-	$host = (new CLink($discovery['hosts'][0]['name'], $host_url))
-		->setAttribute($data['context'] === 'host'
-			? 'data-hostid'
-			: 'data-templateid', $discovery['hosts'][0]['hostid']
-		)
-		->setAttribute('data-action', $data['context'] === 'host' ? 'host.edit' : 'template.edit')
-		->addClass(ZBX_STYLE_WORDBREAK);
+	$host = (new CLink($discovery['hosts'][0]['name'], $host_url))->addClass(ZBX_STYLE_WORDBREAK);
 
 	$discoveryTable->addRow([
 		$checkbox,

@@ -2114,8 +2114,7 @@ class testFormHost extends CWebTest {
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$table->waitUntilReloaded();
 
-		$host_link = $table->findRow('Name', $host, true)->getColumn('Name')
-				->query($this->monitoring ? 'tag:a' : 'xpath:.//a[@data-action="host.edit"]')->waitUntilClickable();
+		$host_link = $table->findRow('Name', $host, true)->getColumn('Name')->query('tag:a')->waitUntilClickable();
 
 		if ($this->monitoring) {
 			$host_link->asPopupButton()->one()->select('Host');
@@ -2139,13 +2138,10 @@ class testFormHost extends CWebTest {
 	}
 
 	public function checkDiscoveredHostLayout() {
-		$form = $this->openForm((
-				($this->standalone)
-					? $this->link.CDataHelper::get('DiscoveredHosts.discovered_hostid')
-					: $this->link
-				), self::DISCOVERED_HOST
-		);
-		$form_type = ($this->standalone) ? $form : COverlayDialogElement::find()->waitUntilReady()->one();
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr(self::DISCOVERED_HOST));
+		$this->page->login()->open('zabbix.php?action=popup&popup=host.edit&hostid='.$hostid)->waitUntilReady();
+		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
+		$form_type = COverlayDialogElement::find()->waitUntilReady()->one();
 
 		// Check tabs available in the form.
 		$tabs = ['Host', 'IPMI', 'Tags', 'Macros', 'Inventory', 'Encryption'];

@@ -281,26 +281,40 @@ function makeSectionMonitoredBy(array $host): CDiv {
 			break;
 
 		case ZBX_MONITORED_BY_PROXY:
+			$proxy_url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', 'proxy.edit')
+				->setArgument('proxyid', $host['proxyid'])
+				->getUrl();
+
+			$proxy = CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
+				? new CLink($host['proxy']['name'], $proxy_url)
+				: new CSpan($host['proxy']['name']);
+
+			$proxy->setTitle($host['proxy']['name']);
+
 			$monitored_by = [
 				new CIcon(ZBX_ICON_PROXY, _('Proxy')),
-				CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
-					? (new CLink($host['proxy']['name']))
-						->setTitle($host['proxy']['name'])
-						->addClass('js-edit-proxy')
-						->setAttribute('data-proxyid', $host['proxyid'])
-					: (new CSpan($host['proxy']['name']))->setTitle($host['proxy']['name'])
-				];
+				$proxy
+			];
 			break;
 
 		case ZBX_MONITORED_BY_PROXY_GROUP:
+			$proxy_group_url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', 'proxygroup.edit')
+				->setArgument('proxy_groupid', $host['proxy_groupid'])
+				->getUrl();
+
+			$proxy_group = CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXY_GROUPS)
+				? new CLink($host['proxy_group']['name'], $proxy_group_url)
+				: new CSpan($host['proxy_group']['name']);
+
+			$proxy_group->setTitle($host['proxy_group']['name']);
+
 			$monitored_by = [
 				new CIcon(ZBX_ICON_PROXY_GROUP, _('Proxy group')),
-				CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXY_GROUPS)
-					? (new CLink($host['proxy_group']['name']))
-						->setTitle($host['proxy_group']['name'])
-						->addClass('js-edit-proxy-group')
-						->setAttribute('data-proxy_groupid', $host['proxy_groupid'])
-					: (new CSpan($host['proxy_group']['name']))->setTitle($host['proxy_group']['name'])
+				$proxy_group
 			];
 	}
 

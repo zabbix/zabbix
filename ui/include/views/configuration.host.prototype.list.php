@@ -105,9 +105,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 
 				$caption[] = (new CLink($template['name'], $template_url))
 					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_GREY)
-					->setAttribute('data-templateid', $template['templateid'])
-					->setAttribute('data-action', 'template.edit');
+					->addClass(ZBX_STYLE_GREY);
 			}
 			else {
 				$caption[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
@@ -127,8 +125,6 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 
 					if (array_key_exists($tpl['templateid'], $data['writable_templates'])) {
 						$caption[] = (new CLink($tpl['name'], $tpl_url))
-							->setAttribute('data-templateid', $tpl['templateid'])
-							->setAttribute('data-action', 'template.edit')
 							->addClass(ZBX_STYLE_LINK_ALT)
 							->addClass(ZBX_STYLE_GREY);
 					}

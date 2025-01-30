@@ -17,6 +17,8 @@
 
 #include "zbxdbhigh.h"
 
+#include "zbxcacheconfig.h"
+
 void	zbx_autoreg_update_host_proxy(const zbx_dc_proxy_t *proxy, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flags,
 		int clock, const zbx_events_funcs_t *events_cbs);

@@ -182,18 +182,14 @@ class CMacroFunction {
 					}
 				}
 
-				$replacement = static function(array $matches) use ($replacement) {
-					$result = $replacement;
+				$replacement = static function (array $matches) use ($replacement) {
+					$repl = [];
 
-					// Replace \0 with the entire matched string (backreference to a full match).
-					$result = str_replace('\\0', $matches[0], $result);
-
-					// Replace /1 - /9 with the capturing group values.
-					for ($i = 1; $i <= 9; $i++) {
-						$result = str_replace('\\'.$i, $matches[$i] ?? '', $result);
+					for ($i = 0; $i <= 9; $i++) {
+						$repl['\\'.$i] = array_key_exists($i, $matches) ? $matches[$i] : '';
 					}
 
-					return $result;
+					return strtr($replacement, $repl);
 				};
 
 				$value = preg_replace_callback($pattern, $replacement, $value);
