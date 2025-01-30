@@ -37,48 +37,24 @@ class C72ImportConverter extends CConverter {
 	}
 
 	private static function convertMaps(array $maps): array {
+		$drawtypes = [
+			DRAWTYPE_LINE => CXmlConstantName::SINGLE_LINE,
+			DRAWTYPE_BOLD_LINE => CXmlConstantName::BOLD_LINE,
+			DRAWTYPE_DOT => CXmlConstantName::DOTTED_LINE,
+			DRAWTYPE_DASHED_LINE => CXmlConstantName::DASHED_LINE
+		];
+
 		foreach ($maps as &$map) {
 			$map['background_scale'] = CXmlConstantName::MAP_BACKGROUND_SCALE_NONE;
 
 			foreach ($map['links'] as &$link) {
-				switch ($link['drawtype']) {
-					case DRAWTYPE_LINE:
-						$link['drawtype'] = CXmlConstantName::SINGLE_LINE;
-						break;
-
-					case DRAWTYPE_BOLD_LINE:
-						$link['drawtype'] = CXmlConstantName::BOLD_LINE;
-						break;
-
-					case DRAWTYPE_DOT:
-						$link['drawtype'] = CXmlConstantName::DOTTED_LINE;
-						break;
-
-					case DRAWTYPE_DASHED_LINE:
-						$link['drawtype'] = CXmlConstantName::DASHED_LINE;
-				}
+				$link['drawtype'] = $drawtypes[$link['drawtype']];
 
 				if ($link['linktriggers']) {
 					$link['indicator_type'] = CXmlConstantName::INDICATOR_TYPE_TRIGGER;
 
 					foreach ($link['linktriggers'] as &$link_trigger) {
-						switch ($link_trigger['drawtype']) {
-							case DRAWTYPE_LINE:
-								$link_trigger['drawtype'] = CXmlConstantName::SINGLE_LINE;
-								break;
-
-							case DRAWTYPE_BOLD_LINE:
-								$link_trigger['drawtype'] = CXmlConstantName::BOLD_LINE;
-								break;
-
-							case DRAWTYPE_DOT:
-								$link_trigger['drawtype'] = CXmlConstantName::DOTTED_LINE;
-								break;
-
-							case DRAWTYPE_DASHED_LINE:
-								$link_trigger['drawtype'] = CXmlConstantName::DASHED_LINE;
-								break;
-						}
+						$link_trigger['drawtype'] = $drawtypes[$link_trigger['drawtype']];
 					}
 					unset($link_trigger);
 				}
