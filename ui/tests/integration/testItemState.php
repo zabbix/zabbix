@@ -260,7 +260,7 @@ class testItemState extends CIntegrationTest {
 		$itemid = self::$items[$scenario['name']]['itemid'];
 
 		// Wait for item to be checked
-		$first_check = $this->getLogLineTimestamp(self::COMPONENT_SERVER, ["In process_async_result() key:'".$key."'"], $wait);
+		$first_check = $this->getLogLineTimestamp(self::COMPONENT_SERVER, ["In process_async_result() itemid:".$itemid." key:'".$key."'"], $wait);
 
 		// Wait for item state to be flushed (once per second in preprocessing manager and in poller)
 		sleep(2);
