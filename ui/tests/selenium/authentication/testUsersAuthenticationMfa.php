@@ -22,6 +22,8 @@ require_once dirname(__FILE__).'/../common/testFormAuthentication.php';
  */
 class testUsersAuthenticationMfa extends testFormAuthentication {
 
+	protected const TOTP_HASH = 'SHA-1';
+	protected const TOTP_LENGTH = '6';
 	protected const DUO_API_HOSTNAME = 'api-3edf651c.test.test';
 	protected const DUO_CLIENT_ID = 'DI6GX0DNF2J21PXVLXBB';
 	protected const DUO_CLIENT_SECRET = 'SNkg6BvonVsNn2EYzAUC';
@@ -117,8 +119,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$method_fields = [
 			'Type' => ['visible' => true, 'value' => 'TOTP'],
 			'Name' => ['visible' => true, 'maxlength' => 128, 'value' => ''],
-			'Hash function' => ['visible' => true, 'value' => 'SHA-1'],
-			'Code length' => ['visible' => true, 'value' => '6'],
+			'Hash function' => ['visible' => true, 'value' => self::TOTP_HASH],
+			'Code length' => ['visible' => true, 'value' => self::TOTP_LENGTH],
 			'API hostname' => ['visible' => false, 'maxlength' => 1024, 'value' => ''],
 			'Client ID' => ['visible' => false, 'maxlength' => 32, 'value' => ''],
 			'Client secret' => ['visible' => false, 'maxlength' => 64, 'value' => '',
@@ -389,13 +391,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			$row = $table->findRow('Name', $method_name);
 			$row->query('button:Remove')->one()->click();
 
-			// Get a list of methods displayed in UI.
-			$method_list = [];
-			foreach($table->getRows() as $row) {
-				$method_list[] = $row->getColumn('Name')->getText();
-			}
-
 			// Assert that the deleted method is not visible anymore.
+			$method_list = $this->getMfaNamesFromTable($table);
 			$this->assertFalse(in_array($method_name, $method_list));
 		}
 
@@ -423,8 +420,179 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$this->assertEquals(0, CDBHelper::getCount($sql_specific));
 	}
 
-	public function testUsersAuthenticationMfa_Cancel() {
-		// ToDo - test creating a configuration and not saving.
+	public function getCancelData() {
+		return [
+			[
+				[
+					// Cancel MFA method form: TOTP creation.
+					'fields' => [
+						'Name' => 'TOTP create cancel'
+					]
+				]
+			],
+			[
+				[
+					// Cancel MFA method form: Duo creation.
+					'fields' => [
+						'Type' => 'Duo Universal Prompt',
+						'Name' => 'Duo create cancel'
+					]
+				]
+			],
+			[
+				[
+					// Cancel MFA method form: TOTP update.
+					'fields' => [
+						'Name' => 'TOTP update cancel',
+						'Hash function' => 'SHA-512',
+						'Code length' => '8'
+					],
+					'update' => true
+				]
+			],
+			[
+				[
+					// Cancel MFA method form: Duo update.
+					'fields' => [
+						'Type' => 'Duo Universal Prompt',
+						'Name' => 'Duo update cancel',
+						'API hostname' => 'test value',
+						'Client ID' => 'some ID'
+					],
+					'update' => true
+				]
+			],
+			[
+				[
+					// Cancel Authentication form: TOTP creation.
+					'fields' => [
+						'Name' => 'TOTP create cancel'
+					],
+					'save_mfa_method' => true
+				]
+			],
+			[
+				[
+					// Cancel Authentication form: Duo creation.
+					'fields' => [
+						'Type' => 'Duo Universal Prompt',
+						'Name' => 'Duo create cancel'
+					],
+					'save_mfa_method' => true
+				]
+			],
+			[
+				[
+					// Cancel Authentication form: TOTP update.
+					'fields' => [
+						'Name' => 'TOTP update cancel',
+						'Hash function' => 'SHA-512',
+						'Code length' => '8'
+					],
+					'update' => true,
+					'save_mfa_method' => true
+				]
+			],
+			[
+				[
+					// Cancel Authentication form: Duo update.
+					'fields' => [
+						'Type' => 'Duo Universal Prompt',
+						'Name' => 'Duo update cancel',
+						'API hostname' => 'test value',
+						'Client ID' => 'some ID'
+					],
+					'update' => true,
+					'save_mfa_method' => true
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test scenarios where either MFA configuration is cancelled, or authentication configuration is not saved.
+	 *
+	 * @dataProvider getCancelData
+	 */
+	public function testUsersAuthenticationMfa_Cancel($data) {
+		$mfa_form = $this->openMfaForm();
+		$mfa_form->fill(['Enable multi-factor authentication' => true]);
+
+		// For assertions later.
+		$hash_before = CDBHelper::getHash('SELECT * FROM mfa');
+		$table = $this->selectMethodTable($mfa_form);
+		$ui_rows_before = $table->getRows()->count();
+
+		// Open the create or edit form.
+		$update = CTestArrayHelper::get($data, 'update', false);
+		$mfa_type = CTestArrayHelper::get($data, 'fields.Type', 'TOTP');
+		$update_action = ($mfa_type === 'TOTP') ? 'link:Pre-existing TOTP' : 'link:Pre-existing Duo';
+		$create_update_action = $update ? $update_action : 'button:Add';
+		$mfa_form->getFieldContainer('Methods')->query($create_update_action)->waitUntilClickable()->one()->click();
+
+		// Fill in data.
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog_form = $dialog->asForm();
+		$fields = $this->setDefaultFieldsData(CTestArrayHelper::get($data, 'fields', []), $update, true);
+		$dialog_form->fill($fields);
+
+		// Two different paths depending on if cancelling inside the MFA method form or Authentication form.
+		if (CTestArrayHelper::get($data, 'save_mfa_method', false)) {
+			// Create/Update the MFA method, but reload the page without saving.
+			$button = $update ? 'Update' : 'Add';
+			$dialog->query('button', $button)->one()->click();
+
+			// In case of update a warning popup might appear.
+			if ($update && $this->page->isAlertPresent()) {
+				$this->page->acceptAlert();
+			}
+
+			$this->page->refresh()->waitUntilReady();
+		} else {
+			// When cancelling the MFA edit form, but saving the Authentication as a whole.
+			$dialog->query('button:Cancel')->one()->click();
+
+			// Check the table before saving.
+			$this->assertEquals($ui_rows_before, $table->getRows()->count());
+			$method_list = $this->getMfaNamesFromTable($table);
+			$this->assertFalse(in_array($data['fields']['Name'], $method_list));
+
+			// In the update scenario reopen and check that the values are not updated.
+			if ($update) {
+				$mfa_form->getFieldContainer('Methods')->query($create_update_action)->waitUntilClickable()
+						->one()->click();
+				$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+				$dialog_form->invalidate();
+
+				$values = ($mfa_type === 'TOTP')
+				? [
+					'Type' => 'TOTP',
+					'Name' => 'Pre-existing TOTP',
+					'Hash function' => self::TOTP_HASH,
+					'Code length' => self::TOTP_LENGTH
+				]
+				: [
+					'Type' => 'Duo Universal Prompt',
+					'Name' => 'Pre-existing Duo',
+					'API hostname' => self::DUO_API_HOSTNAME,
+					'Client ID' => self::DUO_CLIENT_ID
+				];
+				$dialog_form->checkValue($values);
+				$dialog->close();
+			}
+
+			// Save Authentication config and assert that nothing has changed.
+			$mfa_form->query('button:Update')->waitUntilClickable()->one()->click();
+			$this->page->waitUntilReady();
+			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+		}
+
+		// The final verification steps are the same for all types of cancellations.
+		$mfa_form->invalidate();
+		$mfa_form->selectTab('MFA settings');
+		$table = $this->selectMethodTable($mfa_form);
+		$this->assertEquals($ui_rows_before, $table->getRows()->count());
+		$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM mfa'));
 	}
 
 	public function testUsersAuthenticationMfa_SimpleUpdate() {
@@ -606,8 +774,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		// Transform the field data to what is expected in UI.
 		$fields['Type'] = CTestArrayHelper::get($fields, 'Type', 'TOTP');
 		if ($fields['Type'] === 'TOTP') {
-			$fields['Hash function'] = CTestArrayHelper::get($fields, 'Hash function', 'SHA-1');
-			$fields['Code length'] = CTestArrayHelper::get($fields, 'Code length', '6');
+			$fields['Hash function'] = CTestArrayHelper::get($fields, 'Hash function', self::TOTP_HASH);
+			$fields['Code length'] = CTestArrayHelper::get($fields, 'Code length', self::TOTP_LENGTH);
 		}
 
 		// Trim text fields.
@@ -652,6 +820,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	 * @param array $fields              Fields data array to populate.
 	 * @param bool  $update              Adds suffix to name when updating.
 	 * @param bool  $skip_name_append    Skips appending the name field if set to true.
+	 *
+	 * @return array    The modified fields data.
 	 */
 	protected function setDefaultFieldsData($fields, $update, $skip_name_append) {
 		// When creating a Duo method, avoid having to input the field values each time.
@@ -662,7 +832,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		}
 
 		/*
-		 * When updating the 'Name' field should be appended to avoid name conflicts with create scenarios.
+		 * When updating, the 'Name' field should be appended to avoid name conflicts with create scenarios.
 		 * But don't append when 'Name' is not set or explicitly set to empty.
 		 * Also don't append when the flag 'skip_name_append' is set.
 		 */
@@ -675,6 +845,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 
 	/**
 	 * Logs in and opens the MFA configuration form.
+	 *
+	 * @return CFormElement    The MFA configuration form.
 	 */
 	protected function openMfaForm() {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
@@ -690,5 +862,21 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	 */
 	protected function selectMethodTable($mfa_form) {
 		return $mfa_form->getFieldContainer('Methods')->query('xpath:.//table')->one()->asTable();
+	}
+
+	/**
+	 * Gets all the MFA method names from the table.
+	 *
+	 * @param CTableElement $table    MFA method table inside the MFA form.
+	 *
+	 * @return array    Names of the methods in the table.
+	 */
+	protected function getMfaNamesFromTable($table) {
+		$method_list = [];
+		foreach($table->getRows() as $row) {
+			$method_list[] = $row->getColumn('Name')->getText();
+		}
+
+		return $method_list;
 	}
 }

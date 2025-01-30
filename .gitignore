@@ -342,3 +342,4 @@ ui/locale/frontend.pot
 ui/tests/bootstrap.php
 ui/tests/composer.*
 ui/tests/vendor
+ui/tests/.phpunit.result.cache
