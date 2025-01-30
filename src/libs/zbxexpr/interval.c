@@ -1645,8 +1645,6 @@ int	zbx_check_time_period(const char *period, time_t time, const char *tz, int *
  *                                                                            *
  * Purpose: calculates item nextcheck for Zabbix agent type items             *
  *                                                                            *
- * Comment: Function calculates the nexctcheck based on itemid in delay       *
- *          interval                                                          *
  ******************************************************************************/
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
 		int *nextcheck, int *scheduling, char **error)
