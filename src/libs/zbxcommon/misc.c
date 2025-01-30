@@ -12,6 +12,13 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include <fcntl.h>
+#include <stdlib.h>
+
+#if defined(_WINDOWS) || defined(__MINGW32__)
+#	include <stddef.h>
+#endif
+
 #include "zbxcommon.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
@@ -81,7 +88,6 @@ const char	*get_program_name(const char *path)
  ******************************************************************************/
 void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_t size)
 {
-	int	max_attempts;
 	void	*ptr = NULL;
 
 	/* old pointer must be NULL */
@@ -92,12 +98,16 @@ void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_
 				filename, line);
 	}
 
-	for (
-		max_attempts = 10, nmemb = MAX(nmemb, 1), size = MAX(size, 1);
-		0 < max_attempts && NULL == ptr;
-		ptr = calloc(nmemb, size), max_attempts--
-	);
+	if (0 == nmemb || 0 == size)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_calloc: allocating %zu memory objects of size %zu. "
+				"Please report this to Zabbix developers.",
+				filename, line, nmemb, size);
+	}
+	nmemb = MAX(nmemb, 1);
+	size = MAX(size, 1);
 
+	ptr = calloc(nmemb, size);
 	if (NULL != ptr)
 		return ptr;
 
@@ -116,7 +126,6 @@ void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_
  ******************************************************************************/
 void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
 {
-	int	max_attempts;
 	void	*ptr = NULL;
 
 	/* old pointer must be NULL */
@@ -127,12 +136,15 @@ void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
 				filename, line);
 	}
 
-	for (
-		max_attempts = 10, size = MAX(size, 1);
-		0 < max_attempts && NULL == ptr;
-		ptr = malloc(size), max_attempts--
-	);
+	if (0 == size)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_calloc: allocating memory object of size %zu. "
+				"Please report this to Zabbix developers.",
+				filename, line, size);
+	}
+	size = MAX(size, 1);
 
+	ptr = malloc(size);
 	if (NULL != ptr)
 		return ptr;
 
@@ -152,15 +164,17 @@ void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
  ******************************************************************************/
 void	*zbx_realloc2(const char *filename, int line, void *old, size_t size)
 {
-	int	max_attempts;
 	void	*ptr = NULL;
 
-	for (
-		max_attempts = 10, size = MAX(size, 1);
-		0 < max_attempts && NULL == ptr;
-		ptr = realloc(old, size), max_attempts--
-	);
+	if (0 == size)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_calloc: allocating memory object of size %zu. "
+				"Please report this to Zabbix developers.",
+				filename, line, size);
+	}
+	size = MAX(size, 1);
 
+	ptr = realloc(old, size);
 	if (NULL != ptr)
 		return ptr;
 
@@ -172,14 +186,11 @@ void	*zbx_realloc2(const char *filename, int line, void *old, size_t size)
 
 char	*zbx_strdup2(const char *filename, int line, char *old, const char *str)
 {
-	int	retry;
 	char	*ptr = NULL;
 
 	zbx_free(old);
 
-	for (retry = 10; 0 < retry && NULL == ptr; ptr = strdup(str), retry--)
-		;
-
+	ptr = strdup(str);
 	if (NULL != ptr)
 		return ptr;
 
