@@ -17503,7 +17503,7 @@ int	zbx_dc_sync_lock(void)
 {
 	int		ret = FAIL;
 
-	RDLOCK_CACHE;
+	WRLOCK_CACHE;
 	if(ZBX_DB_SYNC_STATUS_UNLOCKED != config->sync_status)
 		goto out;
 	config->sync_status = ZBX_DB_SYNC_STATUS_LOCKED;

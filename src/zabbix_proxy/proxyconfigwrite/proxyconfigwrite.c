@@ -1658,12 +1658,6 @@ static int	proxyconfig_sync_data(zbx_vector_table_data_ptr_t *config_tables, int
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != zbx_dc_sync_lock())
-	{
-		*error = zbx_strdup(NULL, "skip proxy config sync, already in progress");
-		return FAIL;
-	}
-
 	/* first sync isolated tables without relations to other tables */
 
 	if (SUCCEED != proxyconfig_sync_table(config_tables, "globalmacro", error))
@@ -1724,7 +1718,6 @@ static int	proxyconfig_sync_data(zbx_vector_table_data_ptr_t *config_tables, int
 	ret = SUCCEED;
 
 out:
-	zbx_dc_sync_unlock();
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 	return ret;
 }
@@ -2293,6 +2286,12 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 		goto out;
 	}
 
+	if (SUCCEED != zbx_dc_sync_lock())
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy onfiguration data, already in progress");
+		goto out;
+	}
+
 	if (SUCCEED == (ret = zbx_proxyconfig_process(sock->peer, &jp_config, &status, &error)))
 	{
 		if (SUCCEED == zbx_rtc_reload_config_cache(&error))
@@ -2318,6 +2317,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 		zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy onfiguration data received from server at"
 				" \"%s\": %s", sock->peer, error);
 	}
+	zbx_dc_sync_unlock();
 	zbx_send_proxy_response(sock, ret, error, config_timeout);
 	zbx_free(error);
 out:
