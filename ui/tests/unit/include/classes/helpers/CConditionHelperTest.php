@@ -325,7 +325,7 @@ class CConditionHelperTest extends TestCase {
 	 * @dataProvider dataProviderSortConditionsByFormula
 	 *
 	 * @param string $formula
-	 * @param array  $condtions
+	 * @param array  $conditions
 	 * @param array  $expected_conditions
 	 */
 	public function testSortConditionsByFormula($formula, array $conditions, array $expected_conditions): void {
