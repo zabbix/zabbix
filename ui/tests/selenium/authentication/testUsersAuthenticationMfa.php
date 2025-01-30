@@ -291,6 +291,44 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$this->testCreateUpdate($data, false);
 	}
 
+	public function getSimpleUpdateData() {
+		return [
+			[
+				[
+					// Simple update TOTP.
+					'name' => 'Pre-existing TOTP'
+				]
+			],
+			[
+				[
+					// Simple update Duo.
+					'name' => 'Pre-existing Duo'
+				]
+			]
+		];
+	}
+
+	/**
+	 * Open an MFA form and save it without making any changes.
+	 *
+	 * @dataProvider getSimpleUpdateData
+	 */
+	public function testUsersAuthenticationMfa_SimpleUpdate() {
+		$mfa_form = $this->openMfaForm();
+		$mfa_form->fill(['Enable multi-factor authentication' => true]);
+
+		// For assertions later.
+		$hash_before = CDBHelper::getHash('SELECT * FROM mfa');
+		$table = $this->selectMethodTable($mfa_form);
+
+		// Open the create or edit form.
+		$mfa_form->getFieldContainer('Methods')->query('button:Add')->waitUntilClickable()->one()->click();
+
+		// Open MFA method form for editing and save without making changes.
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog_form = $dialog->asForm();
+	}
+
 	public function getUpdateData() {
 		$update_data = [
 			[
@@ -593,10 +631,6 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$table = $this->selectMethodTable($mfa_form);
 		$this->assertEquals($ui_rows_before, $table->getRows()->count());
 		$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM mfa'));
-	}
-
-	public function testUsersAuthenticationMfa_SimpleUpdate() {
-		// ToDo - opening a record and saving without making any changes.
 	}
 
 	public function testUsersAuthenticationMfa_Default() {
