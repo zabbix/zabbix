@@ -52,7 +52,7 @@ func init() {
 		panic(zbxerr.New("failed to register metrics").Wrap(err))
 	}
 
-	impl.SetCapacity(1)
+	impl.SetMaxCapacity(1)
 }
 
 // Export -
