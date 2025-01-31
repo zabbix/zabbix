@@ -1,4 +1,3 @@
-<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2025 Zabbix SIA
 **
@@ -13,33 +12,21 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxmocktest.h"
+#include "zbxmockutil.h"
+#include "zbxmockassert.h"
 
-/**
- * @var CView $this
- */
-?>
+#include "zbxexpr.h"
 
-<script>
-	const view = new class {
+void	zbx_mock_test_entry(void **state)
+{
+	const char	*name = zbx_mock_get_parameter_string("in.name");
+	int		exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
 
-		init() {
-			this.#setSubmitCallback();
-		}
+	ZBX_UNUSED(state);
 
-		#setSubmitCallback() {
-			window.popupManagerInstance.setSubmitCallback((e) => {
-				const data = e.detail;
+	int		result = zbx_is_discovery_macro(name);
 
-				if ('success' in data) {
-					postMessageOk(data.success.title);
+	zbx_mock_assert_int_eq("return value", exp_result, result);
+}
 
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
-					}
-				}
-
-				location.href = location.href;
-			});
-		}
-	}
-</script>

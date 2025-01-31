@@ -177,9 +177,7 @@ if ($data['allowed_ui_conf_hosts'] && $data['rwHost']) {
 		->setArgument('hostid', $data['host']['hostid'])
 		->getUrl();
 
-	$hostLink = (new CLink(_('Host'), $host_url))
-		->setAttribute('data-hostid', $data['host']['hostid'])
-		->setAttribute('data-action', 'host.edit');
+	$hostLink = new CLink(_('Host'), $host_url);
 
 	$itemsLink = new CLink(_('Items'),
 		(new CUrl('zabbix.php'))

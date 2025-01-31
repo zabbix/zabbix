@@ -24,7 +24,6 @@ if ($data['uncheck']) {
 }
 
 $this->includeJsFile('administration.token.list.js.php');
-$this->addJsFile('class.calendar.js');
 
 $filter = (new CFilter())
 	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'token.list'))
@@ -161,10 +160,7 @@ foreach ($data['tokens'] as $token) {
 		->setArgument('admin_mode', 1)
 		->getUrl();
 
-	$name = (new CLink($token['name'], $token_url))
-		->setAttribute('data-tokenid', $token['tokenid'])
-		->setAttribute('data-action', 'token.edit')
-		->setAttribute('data-admin_mode', '1');
+	$name = new CLink($token['name'], $token_url);
 
 	$token_table->addRow([
 		new CCheckBox('tokenids['.$token['tokenid'].']', $token['tokenid']),
