@@ -275,6 +275,7 @@ static int	setup_entry_table(zbx_dbsync_t *sync, zbx_setting_value_t *values)
 		if (type != entry->type)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Setting '%s' types do not match: %d/%d", name, type, entry->type);
+			continue;
 		}
 
 		index = entry - settings_description_table;
@@ -304,7 +305,7 @@ static int	setup_entry_table(zbx_dbsync_t *sync, zbx_setting_value_t *values)
 				zbx_is_uint64(row[7], &values[index].value.ui64);
 				break;
 			default:
-				THIS_SHOULD_NEVER_HAPPEN;
+				zabbix_log(LOG_LEVEL_CRIT, "Unreconised setting type %d", entry->type);
 				continue;
 		}
 
