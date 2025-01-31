@@ -3304,9 +3304,9 @@ class CMap extends CMapElement {
 
 		foreach ($maps as &$map) {
 			foreach ($map['links'] as &$link) {
-				if (!$link['linktriggers']) {
-					$link['indicator_type'] = MAP_INDICATOR_TYPE_STATIC_LINK;
-				}
+				$link['indicator_type'] = $link['linktriggers']
+					? MAP_INDICATOR_TYPE_TRIGGER
+					: MAP_INDICATOR_TYPE_STATIC_LINK;
 			}
 			unset($link);
 		}
