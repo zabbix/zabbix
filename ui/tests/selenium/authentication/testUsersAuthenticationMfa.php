@@ -663,8 +663,30 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM mfa'));
 	}
 
+	/**
+	 * Tests that setting the default MFA method method works.
+	 */
 	public function testUsersAuthenticationMfa_Default() {
-		// ToDo - test setting the default MFA method.
+		$mfa_form = $this->openMfaForm();
+		$mfa_form->fill(['Enable multi-factor authentication' => true]);
+		$table = $this->selectMethodTable($mfa_form);
+
+		// Detect which method is currently set as the default.
+		$current_default = $this->getDefaultMethodName($table);
+		$method_to_set = ($current_default === 'Pre-existing TOTP') ? 'Pre-existing Duo' : 'Pre-existing TOTP';
+
+		// Click the 'default' radio for the new method.
+		$table->findRow('Name', $method_to_set)->getColumn('Default')->query('tag:input')->one()->click();
+
+		//Save and check.
+		$mfa_form->query('button:Update')->one()->click();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+		$mfa_form->invalidate();
+		$mfa_form->selectTab('MFA settings');
+		$table = $this->selectMethodTable($mfa_form);
+		$new_default = $this->getDefaultMethodName($table);
+		$this->assertEquals($method_to_set, $new_default);
 	}
 
 	/**
@@ -944,5 +966,13 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		}
 
 		return $method_list;
+	}
+
+	/**
+	 * Returns the name of the currently set default MFA method.
+	 */
+	protected function getDefaultMethodName($table) {
+		return $table->query("xpath:.//tr[.//input[@type='radio' and @checked]]")->one()->asTableRow()
+				->getColumn('Name')->getText();
 	}
 }
