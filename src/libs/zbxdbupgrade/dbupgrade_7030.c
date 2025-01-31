@@ -26,6 +26,13 @@
 
 static int	DBpatch_7030000(void)
 {
+	const zbx_db_field_t	field = {"proxy_secrets_provider", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_7030001(void)
+{
 	const zbx_db_table_t	table =
 			{"settings", "name", 0,
 				{
@@ -45,7 +52,7 @@ static int	DBpatch_7030000(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7030001(void)
+static int	DBpatch_7030002(void)
 {
 	if (FAIL == zbx_db_index_exists("settings", "settings_2"))
 		return DBcreate_index("settings", "settings_2", "value_usrgrpid", 0);
@@ -53,7 +60,7 @@ static int	DBpatch_7030001(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7030002(void)
+static int	DBpatch_7030003(void)
 {
 	if (FAIL == zbx_db_index_exists("settings", "settings_3"))
 		return DBcreate_index("settings", "settings_3", "value_hostgroupid", 0);
@@ -61,7 +68,7 @@ static int	DBpatch_7030002(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7030003(void)
+static int	DBpatch_7030004(void)
 {
 	if (FAIL == zbx_db_index_exists("settings", "settings_4"))
 		return DBcreate_index("settings", "settings_4", "value_userdirectoryid", 0);
@@ -69,7 +76,7 @@ static int	DBpatch_7030003(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7030004(void)
+static int	DBpatch_7030005(void)
 {
 	if (FAIL == zbx_db_index_exists("settings", "settings_5"))
 		return DBcreate_index("settings", "settings_5", "value_mfaid", 0);
@@ -77,21 +84,21 @@ static int	DBpatch_7030004(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7030005(void)
+static int	DBpatch_7030006(void)
 {
 	const zbx_db_field_t	field = {"value_usrgrpid", NULL, "usrgrp", "usrgrpid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("settings", 2, &field);
 }
 
-static int	DBpatch_7030006(void)
+static int	DBpatch_7030007(void)
 {
 	const zbx_db_field_t	field = {"value_hostgroupid", NULL, "hstgrp", "groupid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("settings", 3, &field);
 }
 
-static int	DBpatch_7030007(void)
+static int	DBpatch_7030008(void)
 {
 	const zbx_db_field_t	field = {"value_userdirectoryid", NULL, "userdirectory", "userdirectoryid", 0,
 			ZBX_TYPE_ID, 0, 0};
@@ -99,7 +106,7 @@ static int	DBpatch_7030007(void)
 	return DBadd_foreign_key("settings", 4, &field);
 }
 
-static int	DBpatch_7030008(void)
+static int	DBpatch_7030009(void)
 {
 	const zbx_db_field_t	field = {"value_mfaid", NULL, "mfa", "mfaid", 0, ZBX_TYPE_ID, 0, 0};
 
@@ -111,7 +118,7 @@ const char	*target_column[ZBX_SETTING_TYPE_MAX - 1] = {
 	"value_userdirectoryid", "value_mfaid"
 };
 
-static int	DBpatch_7030009(void)
+static int	DBpatch_7030010(void)
 {
 	const zbx_setting_entry_t	*table = zbx_settings_desc_table_get();
 
@@ -140,29 +147,9 @@ static int	DBpatch_7030009(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7030010(void)
-{
-	return DBdrop_table("config");
-}
-
 static int	DBpatch_7030011(void)
 {
-	int	ret = FAIL;
-
-	if (NULL == zbx_db_select("select value_int from settings where name='proxy_secrets_provider'"))
-	{
-		if (ZBX_DB_OK > zbx_db_execute("insert into setting (name, type, value_int)"
-				" values ('proxy_secrets_provider', 2, 0)"))
-		{
-			ret = SUCCEED;
-		}
-	}
-	else
-	{
-		ret = SUCCEED;
-	}
-
-	return ret;
+	return DBdrop_table("config");
 }
 
 #endif
