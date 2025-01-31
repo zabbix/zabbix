@@ -464,46 +464,35 @@ function overlayDialogueDestroy(dialogueid, close_by = Overlay.prototype.CLOSE_B
 
 	removeFromOverlaysStack(dialogueid);
 
-	overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.close', {detail: {dialogueid, close_by}}));
+	overlay.$dialogue[0].dispatchEvent(
+		new CustomEvent('dialogue.close', {
+			detail: {
+				dialogueid,
+				position: overlay.getPosition(),
+				position_fix: overlay.getPositionFix(),
+				close_by
+			}
+		})
+	);
 }
 
 /**
- * Display modal window.
+ * Create and display stacked popup dialogue.
  *
- * @param {object} params                                   Modal window params.
- * @param {string} params.title                             Modal window title.
- * @param {string} params.class                             Modal window CSS class, often based on .modal-popup*.
- * @param {object} params.content                           Window content.
- * @param {object} params.footer                           	Window footer content.
- * @param {object} params.controls                          Window controls.
- * @param {array}  params.buttons                           Window buttons.
- * @param {string} params.debug                             Debug HTML displayed in modal window.
- * @param {string} params.buttons[]['title']                Text on the button.
- * @param {object}|{string} params.buttons[]['action']      Function object or executable string that will be executed
- *                                                          on click.
- * @param {string} params.buttons[]['class']    (optional)  Button class.
- * @param {bool}   params.buttons[]['cancel']   (optional)  It means what this button has cancel action.
- * @param {bool}   params.buttons[]['focused']  (optional)  Focus this button.
- * @param {bool}   params.buttons[]['enabled']  (optional)  Should the button be enabled? Default: true.
- * @param {bool}   params.buttons[]['keepOpen'] (optional)  Prevent dialogue closing, if button action returned false.
- * @param string   params.dialogueid            (optional)  Unique dialogue identifier to reuse existing overlay dialog
- *                                                          or create a new one if value is not set.
- * @param string   params.script_inline         (optional)  Custom javascript code to execute when initializing dialog.
- * @param {Node|null} trigger_elmnt                         UI element which triggered opening of overlay dialogue.
+ * @param {Object} properties  Mutable properties of dialogue.
+ * @param {Object} options     Overlay options.
  *
- * @return {Overlay}
+ * Will reuse existing overlay object, if "options.dialogueid" is specified.
+ *
+ * @see Overlay for supported options.
+ * @see Overlay.prototype.setProperties for supported properties.
+ *
+ * @returns {Overlay}
  */
-function overlayDialogue(params, trigger_elmnt) {
-	params.element = params.element || trigger_elmnt;
-	params.type = params.type || 'popup';
+function overlayDialogue(properties, options = {}) {
+	const overlay = overlays_stack.getById(options.dialogueid) || new Overlay({...options, type: 'popup'});
 
-	var overlay = overlays_stack.getById(params.dialogueid);
-
-	if (!overlay) {
-		overlay = new Overlay(params.type, params.dialogueid);
-	}
-
-	overlay.setProperties(params);
+	overlay.setProperties(properties);
 	overlay.mount();
 	overlay.recoverFocus();
 	overlay.containFocus();

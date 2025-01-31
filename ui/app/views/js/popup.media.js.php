@@ -44,7 +44,7 @@ jQuery(document).ready(function($) {
 
 	document.getElementById('media_form').style.display = '';
 
-	overlays_stack.end().centerDialog();
+	overlays_stack.end().fixPosition();
 	overlays_stack.end().recoverFocus();
 });
 

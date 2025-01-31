@@ -45,6 +45,8 @@ class CDashboard {
 
 	#edit_widget_cache = null;
 
+	#widget_properties_overlay_position_fix = null;
+
 	constructor(target, {
 		containers,
 		buttons,
@@ -1477,6 +1479,9 @@ class CDashboard {
 		}, {
 			dialogueid: 'widget_properties',
 			dialogue_class: 'modal-widget-configuration',
+			is_modal: true,
+			is_draggable: true,
+			position_fix: this.#widget_properties_overlay_position_fix,
 			prevent_navigation: true
 		});
 
@@ -2472,7 +2477,9 @@ class CDashboard {
 				);
 			},
 
-			editWidgetPropertiesClose: () => {
+			editWidgetPropertiesClose: e => {
+				this.#widget_properties_overlay_position_fix = e.detail.position_fix;
+
 				this._selected_dashboard_page.resetWidgetPlaceholder();
 			},
 
