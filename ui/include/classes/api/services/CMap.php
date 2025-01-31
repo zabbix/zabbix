@@ -1836,7 +1836,7 @@ class CMap extends CMapElement {
 				}
 
 				$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-					'indicator_type' =>		['type' => API_INT32, 'in' => implode(',', [MAP_INDICATOR_TYPE_STATIC_LINK, MAP_INDICATOR_TYPE_TRIGGER, MAP_INDICATOR_TYPE_ITEM_VALUE])] + ($is_update ? [] : ['default' => DB::getDefault('sysmaps_links', 'indicator_type')])
+					'indicator_type' =>	['type' => API_INT32, 'in' => implode(',', [MAP_INDICATOR_TYPE_STATIC_LINK, MAP_INDICATOR_TYPE_TRIGGER, MAP_INDICATOR_TYPE_ITEM_VALUE])] + ($is_update ? [] : ['default' => DB::getDefault('sysmaps_links', 'indicator_type')])
 				]];
 
 				if (!CApiInputValidator::validate($api_input_rules, $link, $path.'/'.($i2 + 1), $error)) {
@@ -2198,11 +2198,11 @@ class CMap extends CMapElement {
 		}
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'evaltype'	=>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]), 'default' => DB::getDefault('sysmaps_elements', 'evaltype')],
-			'tags'		=>		['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
-				'tag'		=>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('sysmaps_element_tag', 'tag')],
-				'value'		=>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmaps_element_tag', 'value'), 'default' => DB::getDefault('sysmaps_element_tag', 'value')],
-				'operator'	=>		['type' => API_STRING_UTF8, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => DB::getDefault('sysmaps_element_tag', 'operator')]
+			'evaltype' =>	['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_OR]), 'default' => DB::getDefault('sysmaps_elements', 'evaltype')],
+			'tags' =>		['type' => API_OBJECTS, 'uniq' => [['tag', 'value']], 'fields' => [
+				'tag' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('sysmaps_element_tag', 'tag')],
+				'value' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('sysmaps_element_tag', 'value'), 'default' => DB::getDefault('sysmaps_element_tag', 'value')],
+				'operator' =>	['type' => API_STRING_UTF8, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS]), 'default' => DB::getDefault('sysmaps_element_tag', 'operator')]
 			]]
 		]];
 
