@@ -1915,7 +1915,7 @@ class CItem extends CItemGeneral {
 		self::resetGraphsYAxis($del_itemids);
 		self::deleteFromFavoriteGraphs($del_itemids);
 
-		API::Map()->unlinkLinkItems($del_itemids);
+		API::Map()->unlinkItems($del_itemids);
 
 		self::deleteAffectedTriggers($del_itemids);
 

@@ -3342,7 +3342,7 @@ class CMap extends CMapElement {
 		$this->updateForce($maps, $db_maps);
 	}
 
-	public function unlinkLinkItems(array $itemids): void {
+	public function unlinkItems(array $itemids): void {
 		$resource = DBselect(
 			'SELECT sl.linkid,sl.sysmapid,sl.indicator_type,sl.itemid,s.name'.
 			' FROM sysmaps_links sl'.
