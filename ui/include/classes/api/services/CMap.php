@@ -1906,7 +1906,7 @@ class CMap extends CMapElement {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 
-				if ($is_update) {
+				if ($is_update && $link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
 					$link += ['itemid' => $db_maps[$map['sysmapid']]['links'][$link['linkid']]['itemid']];
 				}
 			}
