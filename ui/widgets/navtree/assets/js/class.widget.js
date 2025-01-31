@@ -134,7 +134,7 @@ class CWidgetNavTree extends CWidget {
 
 		if (new_item_id != 0 && this.#markTreeItemSelected(new_item_id)) {
 			this.#openBranch(this.#navtree_item_selected);
-			this.#updateUserProfile();
+			this.#updateUserProfileItemSelected();
 
 			return true;
 		}
@@ -418,9 +418,7 @@ class CWidgetNavTree extends CWidget {
 				}
 
 				if (this.getWidgetId() !== null) {
-					updateUserProfile(`web.dashboard.widget.navtree.item-${branch.getAttribute('data-id')}.toggle`,
-						closed_state, [this.getWidgetId()]
-					);
+					this.#updateUserProfileItemToggle(branch.getAttribute('data-id'), closed_state);
 
 					const index = this.#navtree_items_opened.indexOf(branch.getAttribute('data-id'));
 
@@ -488,12 +486,12 @@ class CWidgetNavTree extends CWidget {
 			this.#parseProblems();
 
 			if (!this.hasEverUpdated() && this.isReferred()) {
-				const item_selected = this.#getDefaultSelectable();
-
-				if (this.#markTreeItemSelected(item_selected)) {
-					this.#updateUserProfile();
-					this.#broadcast();
+				if (!this.#markTreeItemSelected(this.#navtree_item_selected)) {
+					this.#markTreeItemSelected(this.#getDefaultSelectable());
+					this.#updateUserProfileItemSelected();
 				}
+
+				this.#broadcast();
 			}
 			else if (this.#navtree_item_selected !== null) {
 				this.#markTreeItemSelected(this.#navtree_item_selected);
@@ -502,7 +500,7 @@ class CWidgetNavTree extends CWidget {
 	}
 
 	#getDefaultSelectable() {
-		return jQuery('.tree-item:visible', jQuery(this._target))
+		return jQuery('.tree-item[data-sysmapid]', jQuery(this._target))
 			.not('[data-sysmapid="0"]')
 			.first()
 			.data('id');
@@ -514,9 +512,15 @@ class CWidgetNavTree extends CWidget {
 		});
 	}
 
-	#updateUserProfile() {
+	#updateUserProfileItemSelected() {
 		updateUserProfile('web.dashboard.widget.navtree.item.selected',
 			this.#navtree_item_selected, [this.getWidgetId()]
+		);
+	}
+
+	#updateUserProfileItemToggle(itemid, closed_state) {
+		updateUserProfile(`web.dashboard.widget.navtree.item-${itemid}.toggle`,
+			closed_state, [this.getWidgetId()]
 		);
 	}
 
@@ -594,16 +598,15 @@ class CWidgetNavTree extends CWidget {
 			let $branch_to_open = jQuery(`.tree-item[data-id=${itemid}]`).closest('.tree-list').not('.root');
 
 			while ($branch_to_open.length) {
-				$branch_to_open.closest('.tree-item.is-parent')
-					.removeClass('closed')
-					.addClass('opened');
+				let $parent_item = $branch_to_open.closest('.tree-item.is-parent');
 
-				jQuery(selector, $branch_to_open.closest('.tree-item.is-parent'))
-					.removeClass('arrow-right')
-					.addClass('arrow-down');
+				$parent_item.removeClass('closed').addClass('opened');
 
-				$branch_to_open = $branch_to_open.closest('.tree-item.is-parent')
-					.closest('.tree-list').not('.root');
+				jQuery(selector, $parent_item).removeClass('arrow-right').addClass('arrow-down');
+
+				this.#updateUserProfileItemToggle($parent_item.data('id'), '0');
+
+				$branch_to_open = $parent_item.closest('.tree-list').not('.root');
 			}
 		}
 	}
@@ -1040,7 +1043,7 @@ class CWidgetNavTree extends CWidget {
 				if (this.#markTreeItemSelected(itemid)) {
 					this.#openBranch(this.#navtree_item_selected);
 
-					this.#updateUserProfile();
+					this.#updateUserProfileItemSelected();
 					this.#broadcast();
 				}
 
