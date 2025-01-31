@@ -152,6 +152,30 @@ int	zbx_get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_tim
 int	zbx_get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **user_timezone);
 int	zbx_get_host_permission(const zbx_user_t *user, zbx_uint64_t hostid);
 
+int	zbx_db_get_proxy_value(zbx_uint64_t proxyid, char **replace_to, const char *field_name);
+int	zbx_db_item_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_timespec_t *ts);
+int	zbx_db_item_lastvalue(const zbx_db_trigger *trigger, char **lastvalue, int N_functionid, int raw);
+int	zbx_db_item_value(const zbx_db_trigger *trigger, char **value, int N_functionid, int clock, int ns, int raw);
+
+/* zbx_db_get_item_value() */
+/* Request values to get valued from this library. These values SHOULD NOT be used in other data libraries! */
+#define ZBX_DB_REQUEST_HOST_DESCRIPTION		104
+#define ZBX_DB_REQUEST_ITEM_ID			105
+#define ZBX_DB_REQUEST_ITEM_NAME		106
+#define ZBX_DB_REQUEST_ITEM_NAME_ORIG		107
+#define ZBX_DB_REQUEST_ITEM_KEY_ORIG		109
+#define ZBX_DB_REQUEST_ITEM_DESCRIPTION_ORIG	111
+#define ZBX_DB_REQUEST_PROXY_NAME		112
+#define ZBX_DB_REQUEST_PROXY_DESCRIPTION	113
+#define ZBX_DB_REQUEST_ITEM_VALUETYPE		114
+#define	ZBX_DB_REQUEST_ITEM_ERROR		115
+
+typedef int (zbx_db_with_itemid_func_t)(zbx_uint64_t itemid, char **replace_to, int request);
+
+int	zbx_db_get_item_value(zbx_uint64_t itemid, char **replace_to, int request);
+int	zbx_db_with_trigger_itemid(const zbx_db_trigger *trigger, char **replace_to, int N_functionid,
+		zbx_db_with_itemid_func_t cb, int request);
+
 /* data resolvers */
 
 int	zbx_macro_event_trigger_expr_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to,

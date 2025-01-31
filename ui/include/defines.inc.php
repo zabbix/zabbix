@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'7.4.0alpha1');
 define('ZABBIX_API_VERSION',	'7.4.0');
 define('ZABBIX_EXPORT_VERSION',	'7.4');
 
-define('ZABBIX_DB_VERSION',		7020000);
+define('ZABBIX_DB_VERSION',		7030000);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -1675,6 +1675,9 @@ define('ZBX_VAULT_TYPE_UNKNOWN', -1);
 define('ZBX_VAULT_TYPE_HASHICORP', 0);
 define('ZBX_VAULT_TYPE_CYBERARK',  1);
 
+define('ZBX_PROXY_SECRETS_PROVIDER_SERVER', 0);
+define('ZBX_PROXY_SECRETS_PROVIDER_PROXY', 1);
+
 define('ZBX_SECRET_MASK', '******'); // Placeholder for secret values.
 
 // Layout
@@ -2047,6 +2050,7 @@ define('ZBX_STYLE_HOST_DASHBOARD_NAVIGATION', 'host-dashboard-navigation');
 define('ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_CONTROLS', 'host-dashboard-navigation-controls');
 define('ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_TABS', 'host-dashboard-navigation-tabs');
 define('ZBX_STYLE_HOVER_NOBG', 'hover-nobg');
+define('ZBX_STYLE_HINTBOX_RAW_DATA', 'hintbox-raw-data');
 define('ZBX_STYLE_HINTBOX_WRAP', 'hintbox-wrap');
 define('ZBX_STYLE_HINTBOX_WRAP_HORIZONTAL', 'hintbox-wrap-horizontal');
 define('ZBX_STYLE_ICON', 'icon');

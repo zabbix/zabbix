@@ -2742,8 +2742,6 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 				" operation:%d snmp_error:%s", reqid, bulkwalk_context->reqid, pdu->command, operation,
 				snmp_api_errstring(SNMPERR_GENERR));
 
-		zbx_free(bulkwalk_context->error);
-		bulkwalk_context->error = zbx_dsprintf(bulkwalk_context->error, "unexpected response");
 		return 0;
 	}
 
@@ -2761,6 +2759,9 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 	switch (operation)
 	{
 		case NETSNMP_CALLBACK_OP_RECEIVED_MESSAGE:
+			if (NULL != pdu && SNMP_MSG_REPORT == pdu->command)
+				goto out;
+
 			stat = STAT_SUCCESS;
 			break;
 		case NETSNMP_CALLBACK_OP_TIMED_OUT:
