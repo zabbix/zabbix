@@ -127,88 +127,85 @@ if (isset($_REQUEST['favobj'])) {
 						: [];
 
 					foreach ($sysmapUpdate['links'] as &$link) {
-						if (array_key_exists('linkid', $link) && substr($link['linkid'], 0, 3) === 'new') {
-							unset($link['linkid']);
+						$link_fields = ['selementid1', 'selementid2', 'label', 'show_label', 'drawtype', 'color',
+							'indicator_type'
+						];
+
+						if (array_key_exists('linkid', $link) && substr($link['linkid'], 0, 3) !== 'new') {
+							$link_fields[] = 'linkid';
 						}
 
-						$link = array_intersect_key($link, array_flip(['linkid', 'selementid1', 'selementid2', 'label',
-							'show_label', 'drawtype', 'color', 'indicator_type', 'linktriggers', 'itemid', 'thresholds',
-							'highlights'
-						]));
-
-						if (!array_key_exists('indicator_type', $link)) {
-							$link['indicator_type'] = MAP_INDICATOR_TYPE_STATIC_LINK;
-						}
+						$link += ['indicator_type' => MAP_INDICATOR_TYPE_STATIC_LINK];
 
 						switch ($link['indicator_type']) {
-							case MAP_INDICATOR_TYPE_STATIC_LINK:
-								unset($link['linktriggers'], $link['itemid'], $link['thresholds'],
-									$link['highlights']
-								);
-								break;
-
 							case MAP_INDICATOR_TYPE_TRIGGER:
-								unset($link['itemid'], $link['thresholds'], $link['highlights']);
-
-								if (array_key_exists('linktriggers', $link)) {
-									$link['linktriggers'] = array_values($link['linktriggers']);
-
-									foreach ($link['linktriggers'] as &$link_trigger) {
-										$link_trigger = array_intersect_key($link_trigger, array_flip(['triggerid',
-											'drawtype', 'color'
-										]));
-									}
-									unset($link_trigger);
+								if (!array_key_exists('linktriggers', $link)) {
+									break;
 								}
+
+								$link_fields[] = 'linktriggers';
+
+								$link['linktriggers'] = array_values($link['linktriggers']);
+
+								foreach ($link['linktriggers'] as &$link_trigger) {
+									$link_trigger = array_intersect_key($link_trigger,
+										array_flip(['triggerid', 'drawtype', 'color'])
+									);
+								}
+								unset($link_trigger);
 
 								break;
 
 							case MAP_INDICATOR_TYPE_ITEM_VALUE:
-								unset($link['linktriggers']);
-
 								if (!array_key_exists('itemid', $link) || $link['itemid'] === null
 										|| !array_key_exists($link['itemid'], $db_items)
 										|| $db_items[$link['itemid']]['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-									unset($link['itemid'], $link['thresholds'], $link['highlights']);
-
 									break;
 								}
+
+								$link_fields[] = 'itemid';
 
 								switch ($db_items[$link['itemid']]['value_type']) {
 									case ITEM_VALUE_TYPE_FLOAT:
 									case ITEM_VALUE_TYPE_UINT64:
-										unset($link['highlights']);
-
-										if (array_key_exists('thresholds', $link)) {
-											$link['thresholds'] = array_values($link['thresholds']);
-
-											foreach ($link['thresholds'] as &$threshold) {
-												$threshold = array_intersect_key($threshold, array_flip(['threshold',
-													'drawtype', 'color'
-												]));
-											}
-											unset($threshold);
+										if (!array_key_exists('thresholds', $link)) {
+											break;
 										}
+
+										$link_fields[] = 'thresholds';
+
+										$link['thresholds'] = array_values($link['thresholds']);
+
+										foreach ($link['thresholds'] as &$threshold) {
+											$threshold = array_intersect_key($threshold,
+												array_flip(['threshold', 'drawtype', 'color'])
+											);
+										}
+										unset($threshold);
 
 										break;
 
 									case ITEM_VALUE_TYPE_STR:
 									case ITEM_VALUE_TYPE_LOG:
 									case ITEM_VALUE_TYPE_TEXT:
-										unset($link['thresholds']);
-
-										if (array_key_exists('highlights', $link)) {
-											$link['highlights'] = array_values($link['highlights']);
-
-											foreach ($link['highlights'] as &$highlight) {
-												$highlight = array_intersect_key($highlight, array_flip(['pattern',
-													'drawtype', 'color'
-												]));
-											}
-											unset($highlight);
+										if (!array_key_exists('highlights', $link)) {
+											break;
 										}
+
+										$link_fields[] = 'highlights';
+
+										$link['highlights'] = array_values($link['highlights']);
+
+										foreach ($link['highlights'] as &$highlight) {
+											$highlight = array_intersect_key($highlight,
+												array_flip(['pattern', 'drawtype', 'color'])
+											);
+										}
+										unset($highlight);
 								}
 						}
+
+						$link = array_intersect_key($link, array_flip($link_fields));
 					}
 					unset($link);
 				}
