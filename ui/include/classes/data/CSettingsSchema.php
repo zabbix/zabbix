@@ -361,6 +361,10 @@ final class CSettingsSchema {
 			'column' => 'value_int',
 			'default' => 1
 		],
+		'proxy_secrets_provider' => [
+			'column' => 'value_int',
+			'default' => 0
+		],
 		'report_test_timeout' => [
 			'column' => 'value_str',
 			'default' => '60s',

@@ -37,7 +37,8 @@ class CSettings extends CApiService {
 		'report_test_timeout', 'auditlog_enabled', 'auditlog_mode', 'ha_failover_delay', 'geomaps_tile_provider',
 		'geomaps_tile_url', 'geomaps_max_zoom', 'geomaps_attribution', 'vault_provider', 'timeout_zabbix_agent',
 		'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor',
-		'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'proxy_secrets_provider'
+		'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser',
+		'proxy_secrets_provider'
 	];
 
 	/**
@@ -184,7 +185,7 @@ class CSettings extends CApiService {
 			'geomaps_max_zoom' =>				['type' => API_INT32, 'in' => '0:'.ZBX_GEOMAP_MAX_ZOOM],
 			'geomaps_attribution' =>			['type' => API_STRING_UTF8, 'length' => CSettingsSchema::getFieldLength('geomaps_attribution')],
 			'vault_provider' =>					['type' => API_INT32, 'flags' => API_NOT_EMPTY, 'in' => ZBX_VAULT_TYPE_HASHICORP.','.ZBX_VAULT_TYPE_CYBERARK],
-			'proxy_secrets_provider' => 			['type' => API_INT32, 'in' => ZBX_PROXY_SECRETS_PROVIDER_SERVER.','.ZBX_PROXY_SECRETS_PROVIDER_PROXY],
+			'proxy_secrets_provider' => 		['type' => API_INT32, 'in' => ZBX_PROXY_SECRETS_PROVIDER_SERVER.','.ZBX_PROXY_SECRETS_PROVIDER_PROXY],
 			'timeout_zabbix_agent' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => CSettingsSchema::getFieldLength('timeout_zabbix_agent')],
 			'timeout_simple_check' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => CSettingsSchema::getFieldLength('timeout_simple_check')],
 			'timeout_snmp_agent' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => CSettingsSchema::getFieldLength('timeout_snmp_agent')],

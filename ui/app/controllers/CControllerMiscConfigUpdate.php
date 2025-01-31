@@ -32,7 +32,7 @@ class CControllerMiscConfigUpdate extends CController {
 			'iframe_sandboxing_enabled' =>		'required|setting iframe_sandboxing_enabled|in 0,1',
 			'iframe_sandboxing_exceptions' =>	'setting iframe_sandboxing_exceptions',
 			'vault_provider' =>					'setting vault_provider|in '.ZBX_VAULT_TYPE_HASHICORP.','.ZBX_VAULT_TYPE_CYBERARK,
-			'proxy_secrets_provider' =>			'settings proxy_secrets_provider|in '.ZBX_PROXY_SECRETS_PROVIDER_SERVER.','.ZBX_PROXY_SECRETS_PROVIDER_PROXY
+			'proxy_secrets_provider' =>			'setting proxy_secrets_provider|in '.ZBX_PROXY_SECRETS_PROVIDER_SERVER.','.ZBX_PROXY_SECRETS_PROVIDER_PROXY
 		];
 
 		$ret = $this->validateInput($fields);

@@ -36,7 +36,7 @@ class CControllerMiscConfigEdit extends CController {
 			'iframe_sandboxing_enabled' =>		'setting iframe_sandboxing_enabled',
 			'iframe_sandboxing_exceptions' =>	'setting iframe_sandboxing_exceptions',
 			'vault_provider' =>					'setting vault_provider',
-			'proxy_secrets_provider' =>				'setting proxy_secrets_provider'
+			'proxy_secrets_provider' =>			'setting proxy_secrets_provider'
 		];
 
 		$ret = $this->validateInput($fields);
