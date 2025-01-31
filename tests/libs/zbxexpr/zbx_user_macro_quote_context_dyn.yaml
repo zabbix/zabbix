@@ -1,0 +1,162 @@
+---
+test case: "macro_name"
+in:
+  context: "macro_name"
+  force_quote: 1
+out:
+  exp_result: '"macro_name"'
+---
+test case: "Space"
+in:
+  context: " "
+  force_quote: 1
+out:
+  exp_result: '" "'
+---
+test case: "Double quotes"
+in:
+  context: '"'
+  force_quote: 1
+out:
+  exp_result: '"\""'
+---
+test case: 'end with \\'
+in:
+  context: "macro_name\\"
+  force_quote: 1
+out:
+  exp_result: " "
+---
+test case: '{MACRO}'
+in:
+  context: "{MACRO}"
+  force_quote: 1
+out:
+  exp_result: '"{MACRO}"'
+---
+test case: '{<macro>.<func>(<params>)}'
+in:
+  context: "{<macro>.<func>(<params>)}"
+  force_quote: 1
+out:
+  exp_result: '"{<macro>.<func>(<params>)}"'
+---
+test case: '{<macro>.<func>(<params>)}'
+in:
+  context: "{<macro>.<func>(<params>)}"
+  force_quote: 1
+out:
+  exp_result: '"{<macro>.<func>(<params>)}"'
+---
+test case: '{$MACRO}}'
+in:
+  context: "{$MACRO}"
+  force_quote: 1
+out:
+  exp_result: '"{$MACRO}"'
+---
+test case: '{#MACRO}'
+in:
+  context: "{#MACRO}"
+  force_quote: 1
+out:
+  exp_result: '"{#MACRO}"'
+---
+test case: '{?EXPRESSION}'
+in:
+  context: "{?EXPRESSION}"
+  force_quote: 1
+out:
+  exp_result: '"{?EXPRESSION}"'
+---
+test case: 'Empty space'
+in:
+  context: ""
+  force_quote: 0
+out:
+  exp_result: ''
+---
+test case: 'Empty space force quote'
+in:
+  context: ""
+  force_quote: 1
+out:
+  exp_result: '""'
+---
+test case: 'some ASCII'
+in:
+  context: "!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
+  force_quote: 0
+out:
+  exp_result: '"!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"'
+---
+test case: '{$MACRO:"static text"}'
+in:
+  context: '{$MACRO:"static text"}'
+  force_quote: 1
+out:
+  exp_result: '"{$MACRO:\"static text\"}"'
+---
+test case: '{$MACRO:regex:"regular expression"}'
+in:
+  context: '{$MACRO:regex:"regular expression"}'
+  force_quote: 1
+out:
+  exp_result: '"{$MACRO:regex:\"regular expression\"}"'
+---
+test case: '{$LOW_SPACE_LIMIT:/tmp}'
+in:
+  context: '{$LOW_SPACE_LIMIT:/tmp}'
+  force_quote: 1
+out:
+  exp_result: '"{$LOW_SPACE_LIMIT:/tmp}"'
+---
+test case: '{$LOW_SPACE_LIMIT:regex:"^/tmp$"}'
+in:
+  context: '{$LOW_SPACE_LIMIT:regex:"^/tmp$"}'
+  force_quote: 1
+out:
+  exp_result: '"{$LOW_SPACE_LIMIT:regex:\"^/tmp$\"}"'
+---
+test case: '{$LOW_SPACE_LIMIT:regex:"^/var/log/.*$"}'
+in:
+  context: '{$LOW_SPACE_LIMIT:regex:"^/var/log/.*$"}'
+  force_quote: 1
+out:
+  exp_result: '"{$LOW_SPACE_LIMIT:regex:\"^/var/log/.*$\"}"'
+---
+test case: 'Newline and tab'
+in:
+  context: "\n\t"
+  force_quote: 0
+out:
+  exp_result: "\n\t"
+---
+test case: 'Newline and tab force quoted'
+in:
+  context: "\n\t"
+  force_quote: 1
+out:
+  exp_result: "\"\n\t\""
+---
+test case: 'Quote'
+in:
+  context: "'"
+  force_quote: 1
+out:
+  exp_result: "\"'\""
+---
+test case: 'Double Quote'
+in:
+  context: '"'
+  force_quote: 1
+out:
+  exp_result: '"\""'
+---
+test case: 'Long macro string'
+in:
+  context: '{$MACRO:regex:"\.+\\"[a-z]+"} {{#MACRO}.iregsub("\.+\\"([a-z]+)", \1)} {$MACRO:"{{#MACRO}.iregsub(\"\.+\\\"[a-z]+\", \1)}"}  concat("abc", "\\.\\\"[a-z]+") concat("abc, "{$MACRO:regex:\"\\.+\\\\\"[a-z]+\"}") {$MACRO:regex:"\.+\\"[a-z]+"}'
+  force_quote: 1
+out:
+  exp_result: '"{$MACRO:regex:\"\.+\\\"[a-z]+\"} {{#MACRO}.iregsub(\"\.+\\\"([a-z]+)\", \1)} {$MACRO:\"{{#MACRO}.iregsub(\\"\.+\\\\"[a-z]+\\", \1)}\"}  concat(\"abc\", \"\\.\\\\"[a-z]+\") concat(\"abc, \"{$MACRO:regex:\\"\\.+\\\\\\"[a-z]+\\"}\") {$MACRO:regex:\"\.+\\\"[a-z]+\"}"'
+...

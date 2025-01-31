@@ -33,7 +33,7 @@ func init() {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 
-	impl.SetCapacity(1)
+	impl.SetMaxCapacity(1)
 }
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {

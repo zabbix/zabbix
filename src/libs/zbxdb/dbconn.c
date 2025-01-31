@@ -2200,7 +2200,7 @@ int	zbx_dbconn_pk_exists(zbx_dbconn_t *db, const char *table_name)
 
 /******************************************************************************
  *                                                                            *
- * Parameters: sql - [IN] sql statement                                       *
+ * Parameters: sql - [IN] SQL statement                                       *
  *             ids - [OUT] sorted list of selected uint64 values              *
  *                                                                            *
  ******************************************************************************/
@@ -2354,16 +2354,16 @@ static void	db_large_query_prepare(zbx_db_large_query_t *query, zbx_dbconn_t *db
  *             db         - [IN] database connection object                   *
  *             sql        - [IN/OUT] first part of the query, can be modified *
  *                              or reallocated                                *
- *             sql_alloc  - [IN/OUT] size of allocated sql string             *
- *             sql_offset - [IN/OUT] length of the sql string                 *
+ *             sql_alloc  - [IN/OUT] size of allocated SQL string             *
+ *             sql_offset - [IN/OUT] length of the SQL string                 *
  *             field      - [IN] ID field name                                *
  *             ids        - [IN] vector of IDs                                *
  *                                                                            *
- * Comments: Large query object 'borrows' the sql buffer with the query part, *
+ * Comments: Large query object 'borrows' the SQL buffer with the query part, *
  *           meaning:                                                         *
- *             - caller must not free/modify this sql buffer while the        *
+ *             - caller must not free/modify this SQL buffer while the        *
  *               prepared large query object is being used                    *
- *             - caller must free this sql buffer afterwards - it's not freed *
+ *             - caller must free this SQL buffer afterwards - it's not freed *
  *               when large query object is cleared.                          *
  *                                                                            *
  ******************************************************************************/
@@ -2384,16 +2384,16 @@ void	zbx_dbconn_large_query_prepare_uint(zbx_db_large_query_t *query, zbx_dbconn
  *             db         - [IN] database connection object                   *
  *             sql        - [IN/OUT] first part of the query, can be modified *
  *                              or reallocated                                *
- *             sql_alloc  - [IN/OUT] size of allocated sql string             *
- *             sql_offset - [IN/OUT] length of the sql string                 *
+ *             sql_alloc  - [IN/OUT] size of allocated SQL string             *
+ *             sql_offset - [IN/OUT] length of the SQL string                 *
  *             field      - [IN] ID field name                                *
  *             ids        - [IN] vector of IDs                                *
  *                                                                            *
- * Comments: Large query object 'borrows' the sql buffer with the query part, *
+ * Comments: Large query object 'borrows' the SQL buffer with the query part, *
  *           meaning:                                                         *
- *             - caller must not free/modify this sql buffer while the        *
+ *             - caller must not free/modify this SQL buffer while the        *
  *               prepared large query object is being used                    *
- *             - caller must free this sql buffer afterwards - it's not freed *
+ *             - caller must free this SQL buffer afterwards - it's not freed *
  *               when large query object is cleared.                          *
  *                                                                            *
  ******************************************************************************/
@@ -2459,10 +2459,10 @@ void	zbx_db_large_query_clear(zbx_db_large_query_t *query)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: set sql statement to be appended to each batch                    *
+ * Purpose: set SQL statement to be appended to each batch                    *
  *                                                                            *
  * Parameters: query      - [IN] large query object                           *
- *             sql        - [IN] sql statement to append                      *
+ *             sql        - [IN] SQL statement to append                      *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dbconn_large_query_append_sql(zbx_db_large_query_t *query, const char *sql)

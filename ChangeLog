@@ -86,6 +86,18 @@ A......... [ZBX-25350] prohibited deleting user groups which are used in userdir
 ..F....... [ZBX-25525] fixed parent template changes affecting linked template overrides in trigger and trigger prototype forms (esekace)
 
 --------------------------------------------------------------------------------
+Changes for 7.2.4rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.2.3
+
+7.2.3rc1 was released as 7.2.3 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.2.3rc1
 
 New features:
@@ -324,6 +336,18 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.10rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.0.9
+
+7.0.9rc2 was released as 7.0.9 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.0.9rc2
@@ -1656,6 +1680,11 @@ Bug fixes:
 ...G...... [ZBX-22147] updated default buffer size to 1000 in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out-of-bounds access with JSONPath on invalid unicode character (vso)
 A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issues with provisioning (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.4.21
+
+6.4.21rc1 was released as 6.4.21 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.4.21rc1
@@ -3624,6 +3653,18 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.39rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.38
+
+6.0.38rc1 was released as 6.0.38 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.38rc1
@@ -6997,6 +7038,18 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.47rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.46
+
+5.0.46rc1 was released as 5.0.46 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.46rc1
