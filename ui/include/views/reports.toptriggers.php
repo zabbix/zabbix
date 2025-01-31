@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,7 +77,8 @@ $filter_column = (new CFormList())
 			->setOptions(CSeverityHelper::getSeverities())
 			->setChecked($data['filter']['severities'])
 			->setColumns(3)
-			->setVertical(true)
+			->setVertical()
+			->showTitles()
 	);
 
 $filterForm

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@
 
 class CWidgetIterator extends CWidget {
 
+	#ready_callback = () => {};
+
 	_init() {
 		super._init();
 
@@ -36,6 +38,7 @@ class CWidgetIterator extends CWidget {
 		};
 
 		this._widgets = new Map();
+		this._widgets_data = new Map();
 		this._placeholders = [];
 
 		this._grid_pos = [];
@@ -58,6 +61,18 @@ class CWidgetIterator extends CWidget {
 		}
 
 		super._doDeactivate();
+	}
+
+	_promiseReady() {
+		return new Promise(resolve => {
+			const parent_ready_promise = super._promiseReady();
+
+			this.#ready_callback = () => resolve(parent_ready_promise);
+
+			if (this._widgets.size === 0) {
+				resolve(parent_ready_promise);
+			}
+		});
 	}
 
 	getNumHeaderLines() {
@@ -289,6 +304,7 @@ class CWidgetIterator extends CWidget {
 	_addWidget(data) {
 		const widget = this._createWidget(data);
 
+		widget.on(WIDGET_EVENT_READY, this._events.widgetReady);
 		widget.start();
 
 		this._content_body.append(widget.getView());
@@ -296,6 +312,7 @@ class CWidgetIterator extends CWidget {
 		this._truncateWidget(widget);
 
 		this._widgets.set(data.widgetid, widget);
+		this._widgets_data.set(data.widgetid, {is_ready: false});
 
 		return widget;
 	}
@@ -334,9 +351,11 @@ class CWidgetIterator extends CWidget {
 		this._content_body.removeChild(widget.getView());
 
 		this._removeWidgetEventListeners(widget);
+		widget.off(WIDGET_EVENT_READY, this._events.widgetReady);
 		widget.destroy();
 
 		this._widgets.delete(widgetid);
+		this._widgets_data.delete(widgetid);
 	}
 
 	_updateWidget(widget) {
@@ -522,6 +541,25 @@ class CWidgetIterator extends CWidget {
 
 		this._events = {
 			...this._events,
+
+			widgetReady: e => {
+				const widget = e.detail.target;
+
+				this._widgets_data.get(widget._widgetid).is_ready = true;
+
+				let is_ready = true;
+
+				for (const data of this._widgets_data.values()) {
+					if (!data.is_ready) {
+						is_ready = false;
+						break;
+					}
+				}
+
+				if (is_ready) {
+					this.#ready_callback();
+				}
+			},
 
 			widgetEnter: (e) => {
 				const widget = e.detail.target;

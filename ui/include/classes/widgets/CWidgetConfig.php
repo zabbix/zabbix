@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -387,6 +387,7 @@ class CWidgetConfig {
 				case WIDGET_PROBLEMS_BY_SV:
 					return $fields['show_type'] != WIDGET_PROBLEMS_BY_SV_SHOW_TOTALS;
 
+				case WIDGET_GEOMAP:
 				case WIDGET_GRAPH_PROTOTYPE:
 				case WIDGET_ITEM:
 				case WIDGET_URL:

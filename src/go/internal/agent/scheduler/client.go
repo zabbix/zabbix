@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -166,7 +166,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 					output:   sink,
 				}
 
-				if scheduling == false && firstActiveChecksRefreshed == false && p.forceActiveChecksOnStart != 0 {
+				if !scheduling && !firstActiveChecksRefreshed && p.forceActiveChecksOnStart {
 					task.scheduled = time.Unix(now.Unix(), priorityExporterTaskNs)
 				} else if err = task.reschedule(now); err != nil {
 					return

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -95,7 +95,7 @@ int	get_value_db(const DC_ITEM *item, AGENT_RESULT *result)
 	if (NULL != (data_source = zbx_odbc_connect(dsn, connection, item->username, item->password, CONFIG_TIMEOUT,
 			&error)))
 	{
-		if (NULL != (query_result = zbx_odbc_select(data_source, item->params, &error)))
+		if (NULL != (query_result = zbx_odbc_select(data_source, item->params, CONFIG_TIMEOUT, &error)))
 		{
 			char	*text = NULL;
 

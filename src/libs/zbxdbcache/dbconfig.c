@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2874,6 +2874,7 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 
 			if (0 == found)
 			{
+				zbx_trim_str_list(row[9], ',');
 				item->itemtype.trapitem = (ZBX_DC_TRAPITEM *)__config_mem_malloc_func(NULL,
 						sizeof(ZBX_DC_TRAPITEM));
 			}
@@ -3003,6 +3004,7 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 		case ITEM_TYPE_HTTPAGENT:
 			if (0 == found)
 			{
+				zbx_trim_str_list(row[9], ',');
 				item->itemtype.httpitem = (ZBX_DC_HTTPITEM *)__config_mem_malloc_func(NULL,
 						sizeof(ZBX_DC_HTTPITEM));
 			}

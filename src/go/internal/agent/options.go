@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,10 +25,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"slices"
 	"strings"
 	"unicode"
 
 	"golang.zabbix.com/agent2/pkg/tls"
+	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 )
 
@@ -37,6 +40,40 @@ var Options AgentOptions
 const HostNameLen = 128
 const hostNameListLen = 2048
 
+// PluginSystemOptions collection of system options for all plugins, map key are plugin names.
+type PluginSystemOptions map[string]SystemOptions
+
+// SystemOptions holds reserved plugin options.
+type SystemOptions struct {
+	Path                     *string `conf:"optional"`
+	ForceActiveChecksOnStart *int    `conf:"optional,range=0:1"`
+	Capacity                 int     `conf:"optional,range=1:1000"`
+}
+
+type pluginOptions struct {
+	System SystemOptions `conf:"optional"`
+}
+
+// RemovePluginSystemOptions removes system configuration from plugin options and returns them as separate
+// PluginSystemOptions that is a map where map key is the option name and map value is the corresponding value.
+func (a *AgentOptions) RemovePluginSystemOptions() (PluginSystemOptions, error) {
+	out := make(PluginSystemOptions)
+
+	for name, p := range a.Plugins {
+		var o pluginOptions
+		if err := conf.Unmarshal(p, &o); err != nil {
+			return nil, errs.Wrapf(err, "failed to unmarshal options for plugin %s ", name)
+		}
+
+		a.Plugins[name] = removeSystem(p)
+		out[name] = o.System
+	}
+
+	return out, nil
+}
+
+// CutAfterN returns the whole string s, if it is not longer then n runes (not bytes). Otherwise it returns the
+// beginning of the string s, which is cut after the fist n runes.
 func CutAfterN(s string, n int) string {
 	var i int
 	for pos := range s {
@@ -248,4 +285,26 @@ func ValidateOptions(options *AgentOptions) error {
 	}
 
 	return nil
+}
+
+func removeSystem(privateOptions any) any {
+	root, ok := privateOptions.(*conf.Node)
+	if !ok {
+		return privateOptions
+	}
+
+	for i, v := range root.Nodes {
+		node, ok := v.(*conf.Node)
+		if !ok {
+			continue
+		}
+
+		if node.Name == "System" {
+			root.Nodes = slices.Delete(root.Nodes, i, i+1)
+
+			return root
+		}
+	}
+
+	return privateOptions
 }
