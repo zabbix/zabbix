@@ -1621,7 +1621,7 @@ class testUserRolesPermissions extends CWebTest {
 
 		$services_mode = $this->query('id:list_mode')->asSegmentedRadio()->one(false);
 
-		// Check that table service list content and edit mode in not available if the user doest have permissions.
+		// Check that table service list content and edit mode in not available if the user does not have permissions.
 		if ($data['services'] === null) {
 			$this->assertTableData();
 			$this->assertFalse($services_mode->isValid());

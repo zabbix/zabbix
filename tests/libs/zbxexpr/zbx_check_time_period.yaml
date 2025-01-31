@@ -1,0 +1,108 @@
+---
+test case: "Time in range"
+in:
+  period: "1-5,09:00-17:00;6,10:00-14:00"
+  time: "2024-12-18T15:30:00"
+  time_zone: "UTC"
+out:
+  return: SUCCEED
+  res: SUCCEED
+---
+test case: "Time outside range"
+in:
+  period: "1,09:00-17:00"
+  time: "2024-12-18T18:30:00"
+  time_zone: "UTC"
+out:
+  return: SUCCEED
+  res: FAIL
+---
+test case: "Time outside range because of time zone"
+in:
+  period: "1,09:00-10:00"
+  time: "2024-12-16T9:30:00"
+  time_zone: "EST"
+out:
+  return: SUCCEED
+  res: FAIL
+---
+test case: "Time period with typo"
+in:
+  period: "1,0900-10:00"
+  time: "2024-12-16T9:30:00"
+  time_zone: "EST"
+out:
+  return: FAIL
+---
+test case: "Time period only day"
+in:
+  period: "1"
+  time: "2024-12-16T9:30:00"
+  time_zone: "EST"
+out:
+  return: FAIL
+---
+test case: "Time period 1-"
+in:
+  period: "1-"
+  time: "2024-12-16T9:30:00"
+  time_zone: "EST"
+out:
+  return: FAIL
+---
+test case: "Time period 1-5,9"
+in:
+  period: "1-5,9"
+  time: "2024-12-16T9:30:00"
+  time_zone: "EST"
+out:
+  return: FAIL
+---
+test case: "Time period 1-"
+in:
+  period: "1-5"
+  time: "2024-12-16T9:30:00"
+  time_zone: "EST"
+out:
+  return: FAIL
+---
+test case: "Time period -5"
+in:
+  period: "-5"
+  time: "2024-12-16T9:30:00"
+  time_zone: "EST"
+out:
+  return: FAIL
+---
+test case: "Time period ,9"
+in:
+  period: ",9"
+  time: "2024-12-16T9:30:00"
+  time_zone: "EST"
+out:
+  return: FAIL
+---
+test case: "Time period reverse"
+in:
+  period: "1,17:00-9:00"
+  time: "2024-12-16T9:30:00"
+  time_zone: "EST"
+out:
+  return: FAIL
+---
+test case: "Time period monday first minute"
+in:
+  period: "1-1,00:00-00:01"
+  time: "2024-12-16T00:00:30"
+  time_zone: "EST"
+out:
+  return: SUCCEED
+---
+test case: "Time period max"
+in:
+  period: "1-7,00:00-24:00"
+  time: "2024-12-16T9:00:30"
+  time_zone: "UTC"
+out:
+  return: SUCCEED
+...

@@ -25,6 +25,7 @@
 #include "zbxvariant.h"
 #include "zbx_expression_constants.h"
 #include "zbxexpression.h"
+#include "zbxdb.h"
 
 /* temporary cache of trigger related data */
 typedef struct
@@ -489,6 +490,157 @@ int	zbx_db_trigger_get_itemid(const zbx_db_trigger *trigger, int index, zbx_uint
 		zbx_dc_config_clean_functions(&function, &errcode, 1);
 		break;
 	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: request proxy field value by proxyid.                               *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_get_proxy_value(zbx_uint64_t proxyid, char **replace_to, const char *field_name)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	int		ret = FAIL;
+
+	result = zbx_db_select(
+			"select %s"
+			" from proxy"
+			" where proxyid=" ZBX_FS_UI64,
+			field_name, proxyid);
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		*replace_to = zbx_strdup(*replace_to, row[0]);
+		ret = SUCCEED;
+	}
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve a particular value associated with the item.             *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_get_item_value(zbx_uint64_t itemid, char **replace_to, int request)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	zbx_uint64_t	proxyid;
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	result = zbx_db_select(
+			"select h.proxyid,h.description,i.itemid,i.name,i.key_,i.description,i.value_type,ir.error,"
+					"irn.name_resolved"
+			" from items i"
+				" join hosts h on h.hostid=i.hostid"
+				" left join item_rtdata ir on ir.itemid=i.itemid"
+				" left join item_rtname irn on irn.itemid=i.itemid"
+			" where i.itemid=" ZBX_FS_UI64, itemid);
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		switch (request)
+		{
+			case ZBX_DB_REQUEST_HOST_DESCRIPTION:
+				*replace_to = zbx_strdup(*replace_to, row[1]);
+				ret = SUCCEED;
+				break;
+			case ZBX_DB_REQUEST_ITEM_ID:
+				*replace_to = zbx_strdup(*replace_to, row[2]);
+				ret = SUCCEED;
+				break;
+			case ZBX_DB_REQUEST_ITEM_NAME:
+				if (FAIL == zbx_db_is_null(row[8]))
+					*replace_to = zbx_strdup(*replace_to, row[8]);
+				else
+					*replace_to = zbx_strdup(*replace_to, row[3]);
+				ret = SUCCEED;
+				break;
+			case ZBX_DB_REQUEST_ITEM_NAME_ORIG:
+				*replace_to = zbx_strdup(*replace_to, row[3]);
+				ret = SUCCEED;
+				break;
+			case ZBX_DB_REQUEST_ITEM_KEY_ORIG:
+				*replace_to = zbx_strdup(*replace_to, row[4]);
+				ret = SUCCEED;
+				break;
+			case ZBX_DB_REQUEST_ITEM_DESCRIPTION_ORIG:
+				*replace_to = zbx_strdup(*replace_to, row[5]);
+				ret = SUCCEED;
+				break;
+			case ZBX_DB_REQUEST_PROXY_NAME:
+				ZBX_DBROW2UINT64(proxyid, row[0]);
+
+				if (0 == proxyid)
+				{
+					*replace_to = zbx_strdup(*replace_to, "");
+					ret = SUCCEED;
+				}
+				else
+					ret = zbx_db_get_proxy_value(proxyid, replace_to, "name");
+				break;
+			case ZBX_DB_REQUEST_PROXY_DESCRIPTION:
+				ZBX_DBROW2UINT64(proxyid, row[0]);
+
+				if (0 == proxyid)
+				{
+					*replace_to = zbx_strdup(*replace_to, "");
+					ret = SUCCEED;
+				}
+				else
+					ret = zbx_db_get_proxy_value(proxyid, replace_to, "description");
+				break;
+			case ZBX_DB_REQUEST_ITEM_VALUETYPE:
+				*replace_to = zbx_strdup(*replace_to, row[6]);
+				ret = SUCCEED;
+				break;
+			case ZBX_DB_REQUEST_ITEM_ERROR:
+				*replace_to = zbx_strdup(*replace_to, FAIL == zbx_db_is_null(row[7]) ? row[7] : "");
+				ret = SUCCEED;
+				break;
+		}
+	}
+	zbx_db_free_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve a particular value associated with the trigger's         *
+ *          N_functionid'th function.                                         *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_with_trigger_itemid(const zbx_db_trigger *trigger, char **replace_to, int N_functionid,
+		zbx_db_with_itemid_func_t cb, int request)
+{
+	zbx_uint64_t	itemid;
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED == zbx_db_trigger_get_itemid(trigger, N_functionid, &itemid))
+		ret = cb(itemid, replace_to, request);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }

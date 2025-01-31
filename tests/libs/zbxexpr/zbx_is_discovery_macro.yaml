@@ -1,0 +1,109 @@
+---
+test case: "{#MACRO}"
+in:
+  name: "{#MACRO}"
+out:
+  result: SUCCEED
+---
+test case: "#MACRO"
+in:
+  name: "#MACRO"
+out:
+  result: FAIL
+---
+test case: "{#MACRO"
+in:
+  name: "{#MACRO"
+out:
+  result: FAIL
+---
+test case: "MACRO}"
+in:
+  name: "{MACRO}"
+out:
+  result: FAIL
+---
+test case: "{#"
+in:
+  name: "{#"
+out:
+  result: FAIL
+---
+test case: "{MACRO#}"
+in:
+  name: "{MACRO#}"
+out:
+  result: FAIL
+---
+test case: "MACRO}#"
+in:
+  name: "MACRO}#"
+out:
+  result: FAIL
+---
+test case: "#"
+in:
+  name: "#"
+out:
+  result: FAIL
+---
+test case: "#{}"
+in:
+  name: "#{}"
+out:
+  result: FAIL
+---
+test case: "MACRO#{MACRO}"
+in:
+  name: "MACRO#{MACRO}"
+out:
+  result: FAIL
+---
+test case: "#{MACRO}#{MACRO}"
+in:
+  name: "#{MACRO}#{MACRO}"
+out:
+  result: FAIL
+---
+test case: "{MACRO} - built-in macro"
+in:
+  name: "{MACRO}"
+out:
+  result: FAIL
+---
+test case: "{<macro>.<func>(<params>)} - macro functions"
+in:
+  name: "{<macro>.<func>(<params>)}"
+out:
+  result: FAIL
+---
+test case: "{$MACRO} - user-defined macro"
+in:
+  name: "{$MACRO}"
+out:
+  result: FAIL
+---
+test case: "{?EXPRESSION}"
+in:
+  name: "{?EXPRESSION}"
+out:
+  result: FAIL
+---
+test case: '{$LOW_SPACE_LIMIT:regex:"^/var/log/.*$"}'
+in:
+  name: '{$LOW_SPACE_LIMIT:regex:"^/var/log/.*$"}'
+out:
+  result: FAIL
+---
+test case: '{$MACRO:""\n""}'
+in:
+  name: "{$MACRO:\"\"\n\"\"}"
+out:
+  result: FAIL
+---
+test case: 'Different macro long string'
+in:
+  name: '{$MACRO:regex:"\.+\\"[a-z]+"} {{#MACRO}.iregsub("\.+\\"([a-z]+)", \1)} {$MACRO:"{{#MACRO}.iregsub(\"\.+\\\"[a-z]+\", \1)}"}  concat("abc", "\\.\\\"[a-z]+") concat("abc, "{$MACRO:regex:\"\\.+\\\\\"[a-z]+\"}") {$MACRO:regex:"\.+\\"[a-z]+"}'
+out:
+  result: FAIL
+...

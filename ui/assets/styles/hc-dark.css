@@ -4941,8 +4941,13 @@ form.dashboard-widget-piechart {
   form.dashboard-widget-piechart .dataset-head,
   form.dashboard-widget-piechart .dataset-body.list-accordion-item-body {
     display: contents; }
-  form.dashboard-widget-piechart .dataset-head .multiselect {
-    width: 100%; }
+  form.dashboard-widget-piechart .dataset-head .multiselect-control {
+    overflow: hidden;
+    margin: -2px;
+    padding: 2px; }
+    form.dashboard-widget-piechart .dataset-head .multiselect-control .multiselect {
+      overflow: hidden;
+      flex-grow: 1; }
   form.dashboard-widget-piechart .dataset-body .form-grid {
     padding-top: 0; }
     form.dashboard-widget-piechart .dataset-body .form-grid:first-child {
@@ -5203,8 +5208,13 @@ form.dashboard-widget-svggraph .overrides-list-item {
     top: 5px;
     left: -17px;
     height: 24px; }
-  form.dashboard-widget-svggraph .overrides-list-item .multiselect {
-    width: 100%; }
+  form.dashboard-widget-svggraph .overrides-list-item .multiselect-control {
+    overflow: hidden;
+    margin: -2px;
+    padding: 2px; }
+    form.dashboard-widget-svggraph .overrides-list-item .multiselect-control .multiselect {
+      overflow: hidden;
+      flex-grow: 1; }
 form.dashboard-widget-svggraph .overrides-foot {
   padding: 5px 0; }
 form.dashboard-widget-svggraph .overrides-options-list {

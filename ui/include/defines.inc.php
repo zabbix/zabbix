@@ -1675,6 +1675,9 @@ define('ZBX_VAULT_TYPE_UNKNOWN', -1);
 define('ZBX_VAULT_TYPE_HASHICORP', 0);
 define('ZBX_VAULT_TYPE_CYBERARK',  1);
 
+define('ZBX_PROXY_SECRETS_PROVIDER_SERVER', 0);
+define('ZBX_PROXY_SECRETS_PROVIDER_PROXY', 1);
+
 define('ZBX_SECRET_MASK', '******'); // Placeholder for secret values.
 
 // Layout

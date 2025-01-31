@@ -13,7 +13,7 @@
 **/
 
 #include "dbupgrade.h"
-
+#include "zbxdbschema.h"
 #include "zbxdb.h"
 #include "zbxalgo.h"
 #include "zbxnum.h"
@@ -26,6 +26,13 @@
 #ifndef HAVE_SQLITE3
 
 static int	DBpatch_7030000(void)
+{
+	const zbx_db_field_t	field = {"proxy_secrets_provider", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_7030001(void)
 {
 	int			ret = SUCCEED;
 	char			*sql = NULL;
@@ -104,5 +111,6 @@ DBPATCH_START(7030)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(7030000, 0, 1)
+DBPATCH_ADD(7030001, 0, 1)
 
 DBPATCH_END()
