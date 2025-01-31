@@ -1792,7 +1792,7 @@ class CMap extends CMapElement {
 		}
 	}
 
-	private static function validateLinks(array &$maps, array $db_maps = null): void {
+	private static function validateLinks(array &$maps, ?array $db_maps = null): void {
 		self::validateLinkIndicatorTypes($maps, $db_maps);
 
 		if ($db_maps !== null) {
@@ -1915,8 +1915,8 @@ class CMap extends CMapElement {
 		unset($map);
 	}
 
-	private static function checkLinkItems(array $maps, ?array $db_maps, array &$db_items = null,
-			array &$link_indexes = null): void {
+	private static function checkLinkItems(array $maps, ?array $db_maps, ?array &$db_items = null,
+			?array &$link_indexes = null): void {
 		$db_items = [];
 		$link_indexes = [];
 
@@ -2481,7 +2481,7 @@ class CMap extends CMapElement {
 		return ['sysmapids' => $sysmapids];
 	}
 
-	private function updateSelements(array &$maps, array $db_maps = null): void {
+	private function updateSelements(array &$maps, ?array $db_maps = null): void {
 		$ins_selements = [];
 		$upd_selements = [];
 		$del_selementids = [];
@@ -2565,7 +2565,7 @@ class CMap extends CMapElement {
 		unset($map);
 	}
 
-	private static function updateLinks(array &$maps, array $db_maps = null): void {
+	private static function updateLinks(array &$maps, ?array $db_maps = null): void {
 		$ins_links = [];
 		$upd_links = [];
 		$del_linkids = [];
