@@ -103,6 +103,15 @@
 					.off('input keydown paste', update)
 					.on('input keydown paste', update)
 					.trigger('input');
+
+				const intersection = new IntersectionObserver(entries => {
+					if (entries[0].isIntersecting) {
+						$textarea.trigger('input');
+						intersection.disconnect();
+					}
+				});
+
+				intersection.observe(this);
 			});
 		},
 		updateHeight: function() {

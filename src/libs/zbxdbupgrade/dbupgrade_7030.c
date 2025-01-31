@@ -13,6 +13,7 @@
 **/
 
 #include "dbupgrade.h"
+#include "zbxdbschema.h"
 
 /*
  * 7.4 development database patches
@@ -20,10 +21,12 @@
 
 #ifndef HAVE_SQLITE3
 
-/*static int	DBpatch_7030000(void)
+static int	DBpatch_7030000(void)
 {
-	*** first upgrade patch ***
-}*/
+	const zbx_db_field_t	field = {"proxy_secrets_provider", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
 
 #endif
 
@@ -31,6 +34,6 @@ DBPATCH_START(7030)
 
 /* version, duplicates flag, mandatory flag */
 
-/*DBPATCH_ADD(7030000, 0, 1)*/
+DBPATCH_ADD(7030000, 0, 1)
 
 DBPATCH_END()
