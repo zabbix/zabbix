@@ -305,7 +305,7 @@ static int	setup_entry_table(zbx_dbsync_t *sync, zbx_setting_value_t *values)
 				zbx_is_uint64(row[7], &values[index].value.ui64);
 				break;
 			default:
-				zabbix_log(LOG_LEVEL_CRIT, "Unreconised setting type %d", entry->type);
+				zabbix_log(LOG_LEVEL_CRIT, "Unknown setting type %d", entry->type);
 				continue;
 		}
 
