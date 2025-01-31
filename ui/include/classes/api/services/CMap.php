@@ -1829,12 +1829,10 @@ class CMap extends CMapElement {
 			foreach ($map['links'] as $i2 => &$link) {
 				$is_update = array_key_exists('linkid', $link);
 
-				if ($is_update) {
-					if (!array_key_exists($link['linkid'], $db_maps[$map['sysmapid']]['links'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-							$path.'/'.($i2 + 1).'/linkid', _('object does not exist or belongs to another object')
-						));
-					}
+				if ($is_update && !array_key_exists($link['linkid'], $db_maps[$map['sysmapid']]['links'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						$path.'/'.($i2 + 1).'/linkid', _('object does not exist or belongs to another object')
+					));
 				}
 
 				$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
@@ -1846,8 +1844,9 @@ class CMap extends CMapElement {
 				}
 
 				if ($is_update) {
-					$link +=
-						['indicator_type' => $db_maps[$map['sysmapid']]['links'][$link['linkid']]['indicator_type']];
+					$link += [
+						'indicator_type' => $db_maps[$map['sysmapid']]['links'][$link['linkid']]['indicator_type']
+					];
 				}
 			}
 			unset($link);
@@ -1868,13 +1867,12 @@ class CMap extends CMapElement {
 
 				$db_link = $db_maps[$map['sysmapid']]['links'][$link['linkid']];
 
-				if ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
-					$link += array_intersect_key($db_link, array_flip(['itemid', 'item_value_type']));
-				}
-
 				if ($link['indicator_type'] != $db_link['indicator_type']
 						&& $link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER) {
 					$link += ['linktriggers' => $db_link['linktriggers']];
+				}
+				elseif ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+					$link += array_intersect_key($db_link, array_flip(['itemid', 'item_value_type']));
 				}
 			}
 			unset($link);
@@ -1998,12 +1996,9 @@ class CMap extends CMapElement {
 
 				$db_link = $db_maps[$map['sysmapid']]['links'][$link['linkid']];
 
-				if (in_array($link['item_value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
-					$link += ['thresholds' => $db_link['thresholds']];
-				}
-				else {
-					$link += ['highlights' => $db_link['highlights']];
-				}
+				$link += in_array($link['item_value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
+					? ['thresholds' => $db_link['thresholds']]
+					: ['highlights' => $db_link['highlights']];
 			}
 			unset($link);
 		}
@@ -3209,12 +3204,9 @@ class CMap extends CMapElement {
 					}
 				}
 				elseif ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
-					if (in_array($link['item_value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
-						$link += array_intersect_key($defaults, array_flip(['highlights']));
-					}
-					else {
-						$link += array_intersect_key($defaults, array_flip(['thresholds']));
-					}
+					$link += in_array($link['item_value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
+						? array_intersect_key($defaults, array_flip(['highlights']))
+						: array_intersect_key($defaults, array_flip(['thresholds']));
 				}
 			}
 			unset($link);
