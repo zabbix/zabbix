@@ -755,7 +755,7 @@ void	dc_sync_settings(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	init_shared_cache(&found);
 
-	if (0 >= setup_entry_table(sync, values))
+	if (0 == setup_entry_table(sync, values))
 		zabbix_log(LOG_LEVEL_WARNING, "no records in \"settings\" table");
 
 	store_settings(values, found, revision);
