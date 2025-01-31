@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-01-11 14:56+0000\n"
+"PO-Revision-Date: 2025-01-30 02:49+0000\n"
 "Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -9280,7 +9280,7 @@ msgstr "履歴関数"
 
 #: app/views/administration.housekeeping.edit.php:218
 msgid "History, trends and audit log compression"
-msgstr ""
+msgstr "ヒストリ、トレンド、監査ログの圧縮"
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
