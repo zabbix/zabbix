@@ -2027,24 +2027,6 @@ class CMap extends CMapElement {
 		unset($map);
 	}
 
-	private static function addLinkSelementids(array &$maps, array $db_maps): void {
-		foreach ($maps as &$map) {
-			if (!array_key_exists('links', $map)) {
-				continue;
-			}
-
-			foreach ($map['links'] as &$link) {
-				if (array_key_exists('linkid', $link)) {
-					$link += array_intersect_key($db_maps[$map['sysmapid']]['links'][$link['linkid']],
-						array_flip(['selementid1', 'selementid2'])
-					);
-				}
-			}
-			unset($link);
-		}
-		unset($map);
-	}
-
 	private static function getLinkValidationFields(bool $is_update = false): array {
 		$api_required = $is_update ? 0 : API_REQUIRED;
 
@@ -2089,6 +2071,24 @@ class CMap extends CMapElement {
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]]
 		];
+	}
+
+	private static function addLinkSelementids(array &$maps, array $db_maps): void {
+		foreach ($maps as &$map) {
+			if (!array_key_exists('links', $map)) {
+				continue;
+			}
+
+			foreach ($map['links'] as &$link) {
+				if (array_key_exists('linkid', $link)) {
+					$link += array_intersect_key($db_maps[$map['sysmapid']]['links'][$link['linkid']],
+						array_flip(['selementid1', 'selementid2'])
+					);
+				}
+			}
+			unset($link);
+		}
+		unset($map);
 	}
 
 	private static function checkLinkSelementids(array $maps, ?array $db_maps): void {
