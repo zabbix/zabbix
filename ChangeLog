@@ -1,8 +1,13 @@
 Changes for 6.0.39rc1
 
 New features:
+.........T [ZBXNEXT-9654] added Azure SQL managed instance template (abrosimovs)
 
 Bug fixes:
+...G...... [ZBX-25382] applied pkgsrc patch to restore builds on NetBSD >= 8.2 (jxl)
+...G...... [ZBX-22522] fixed web.page.get curl header (sboidenko)
+.........T [ZBX-25601] fixed HTTP proxy parameter name in MS 365 reports by HTTP template (drasikhov)
+..F....... [ZBX-25666] fixed maintenance status display for submap elements when trigger elements are used (esekace)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.38
