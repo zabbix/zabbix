@@ -305,7 +305,7 @@ static int	setup_entry_table(zbx_dbsync_t *sync, zbx_setting_value_t *values)
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
-				return -1;
+				continue;
 		}
 
 		values[index].found = 1;
