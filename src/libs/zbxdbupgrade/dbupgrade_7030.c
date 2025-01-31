@@ -145,6 +145,26 @@ static int	DBpatch_7030010(void)
 	return DBdrop_table("config");
 }
 
+static int	DBpatch_7030011(void)
+{
+	int	ret = FAIL;
+
+	if (NULL == zbx_db_select("select value_int from settings where name='proxy_secrets_provider'"))
+	{
+		if (ZBX_DB_OK > zbx_db_execute("insert into setting (name, type, value_int)"
+				" values ('proxy_secrets_provider', 2, 0)"))
+		{
+			ret = SUCCEED;
+		}
+	}
+	else
+	{
+		ret = SUCCEED;
+	}
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(7030)
@@ -162,5 +182,6 @@ DBPATCH_ADD(7030007, 0, 1)
 DBPATCH_ADD(7030008, 0, 1)
 DBPATCH_ADD(7030009, 0, 1)
 DBPATCH_ADD(7030010, 0, 1)
+DBPATCH_ADD(7030011, 0, 1)
 
 DBPATCH_END()

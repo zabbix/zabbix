@@ -97,6 +97,7 @@ class CSettingsHelper {
 	public const URL = 'url';
 	public const VALIDATE_URI_SCHEMES = 'validate_uri_schemes';
 	public const VAULT_PROVIDER = 'vault_provider';
+	public const PROXY_SECRETS_PROVIDER = 'proxy_secrets_provider';
 	public const WORK_PERIOD = 'work_period';
 	public const X_FRAME_OPTIONS = 'x_frame_options';
 
@@ -132,7 +133,7 @@ class CSettingsHelper {
 					'geomaps_tile_url', 'geomaps_max_zoom', 'geomaps_attribution', 'vault_provider',
 					'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check',
 					'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent',
-					'timeout_script', 'timeout_browser'
+					'timeout_script', 'timeout_browser', 'proxy_secrets_provider'
 				]
 			]);
 

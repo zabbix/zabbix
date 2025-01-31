@@ -31,7 +31,8 @@ class CControllerMiscConfigUpdate extends CController {
 			'x_frame_options' =>				'setting x_frame_options',
 			'iframe_sandboxing_enabled' =>		'required|setting iframe_sandboxing_enabled|in 0,1',
 			'iframe_sandboxing_exceptions' =>	'setting iframe_sandboxing_exceptions',
-			'vault_provider' =>					'setting vault_provider|in '.ZBX_VAULT_TYPE_HASHICORP.','.ZBX_VAULT_TYPE_CYBERARK
+			'vault_provider' =>					'setting vault_provider|in '.ZBX_VAULT_TYPE_HASHICORP.','.ZBX_VAULT_TYPE_CYBERARK,
+			'proxy_secrets_provider' =>			'settings proxy_secrets_provider|in '.ZBX_PROXY_SECRETS_PROVIDER_SERVER.','.ZBX_PROXY_SECRETS_PROVIDER_PROXY
 		];
 
 		$ret = $this->validateInput($fields);
@@ -83,7 +84,10 @@ class CControllerMiscConfigUpdate extends CController {
 			CSettingsHelper::LOGIN_BLOCK => $this->getInput('login_block'),
 			CSettingsHelper::VALIDATE_URI_SCHEMES => $this->getInput('validate_uri_schemes'),
 			CSettingsHelper::IFRAME_SANDBOXING_ENABLED => $this->getInput('iframe_sandboxing_enabled'),
-			CSettingsHelper::VAULT_PROVIDER => $this->getInput('vault_provider', ZBX_VAULT_TYPE_HASHICORP)
+			CSettingsHelper::VAULT_PROVIDER => $this->getInput('vault_provider', ZBX_VAULT_TYPE_HASHICORP),
+			CSettingsHelper::PROXY_SECRETS_PROVIDER => $this->getInput('proxy_secrets_provider',
+				ZBX_PROXY_SECRETS_PROVIDER_SERVER
+			)
 		];
 
 		$settings[CSettingsHelper::ALERT_USRGRPID] = $this->getInput('alert_usrgrpid', 0);

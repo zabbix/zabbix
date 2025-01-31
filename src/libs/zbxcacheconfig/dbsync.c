@@ -32,6 +32,30 @@
 #define ZBX_CORRELATION_ENABLED				0
 /*#define ZBX_CORRELATION_DISABLED			1*/
 
+#define ZBX_DBSYNC_OBJ_HOST		1
+#define ZBX_DBSYNC_OBJ_HOST_TAG		2
+#define ZBX_DBSYNC_OBJ_ITEM		3
+#define ZBX_DBSYNC_OBJ_ITEM_TAG		4
+#define ZBX_DBSYNC_OBJ_TRIGGER		5
+#define ZBX_DBSYNC_OBJ_TRIGGER_TAG	6
+#define ZBX_DBSYNC_OBJ_FUNCTION		7
+#define ZBX_DBSYNC_OBJ_ITEM_PREPROC	8
+#define ZBX_DBSYNC_OBJ_DRULE		9
+#define ZBX_DBSYNC_OBJ_DCHECK		10
+#define ZBX_DBSYNC_OBJ_HTTPTEST		11
+#define ZBX_DBSYNC_OBJ_HTTPTEST_FIELD	12
+#define ZBX_DBSYNC_OBJ_HTTPTEST_ITEM	13
+#define ZBX_DBSYNC_OBJ_HTTPSTEP		14
+#define ZBX_DBSYNC_OBJ_HTTPSTEP_FIELD	15
+#define ZBX_DBSYNC_OBJ_HTTPSTEP_ITEM	16
+#define ZBX_DBSYNC_OBJ_CONNECTOR	17
+#define ZBX_DBSYNC_OBJ_CONNECTOR_TAG	18
+#define ZBX_DBSYNC_OBJ_PROXY		19
+#define ZBX_DBSYNC_OBJ_PROXY_GROUP	20
+#define ZBX_DBSYNC_OBJ_HOST_PROXY	21
+/* number of dbsync objects - keep in sync with above defines */
+#define ZBX_DBSYNC_OBJ_COUNT		21
+
 #define ZBX_DBSYNC_JOURNAL(X)		(X - 1)
 
 #define ZBX_DBSYNC_CHANGELOG_PRUNE_INTERVAL	SEC_PER_MIN * 10
@@ -40,9 +64,7 @@
 #define ZBX_DBSYNC_BATCH_SIZE			1000
 
 ZBX_VECTOR_IMPL(dbsync_changelog, zbx_dbsync_changelog_t)
-
 ZBX_VECTOR_IMPL(dbsync_obj_changelog, zbx_dbsync_obj_changelog_t)
-
 ZBX_PTR_VECTOR_IMPL(dbsync, zbx_dbsync_t *)
 
 static zbx_dbsync_env_t	dbsync_env;

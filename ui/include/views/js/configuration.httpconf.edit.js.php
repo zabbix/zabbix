@@ -43,9 +43,6 @@
 		/** @type {HTMLTableElement} */
 		#headers;
 
-		/** @type {boolean} */
-		#variables_headers_initialized = false;
-
 		/** @type {HTMLTableElement} */
 		#steps;
 
@@ -58,18 +55,8 @@
 			this.#steps = document.getElementById('steps');
 
 			this.#initTemplates();
-
-			jQuery('#tabs').on('tabscreate tabsactivate', (e, ui) => {
-				const panel = e.type === 'tabscreate' ? ui.panel : ui.newPanel;
-
-				if (panel.attr('id') === 'scenario-tab' && !this.#variables_headers_initialized) {
-					this.#initVariables(variables);
-					this.#initHeaders(headers);
-
-					this.#variables_headers_initialized = true;
-				}
-			});
-
+			this.#initVariables(variables);
+			this.#initHeaders(headers);
 			this.#initSteps(steps);
 
 			for (const id of ['agent', 'authentication']) {

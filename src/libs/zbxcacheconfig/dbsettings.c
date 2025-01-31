@@ -152,6 +152,7 @@ static const zbx_setting_entry_t	settings_description_table[] = {
 	{"vault_provider",		ZBX_SETTING_TYPE_INT, 		0,			"0"},
 	{"work_period",			ZBX_SETTING_TYPE_STR, 		0,			"1-5,09:00-18:00"},
 	{"x_frame_options",		ZBX_SETTING_TYPE_STR, 		0,			"SAMEORIGIN"},
+	{"proxy_secrets_provider",	ZBX_SETTING_TYPE_INT,		ZBX_SERVER | ZBX_PROXY, "0"},
 };
 
 const zbx_setting_entry_t	*zbx_settings_desc_table_get(void)
@@ -696,6 +697,8 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 	store_str_setting(values, "timeout_ssh_agent", found, &config->config->item_timeouts.ssh, revision);
 	store_str_setting(values, "timeout_telnet_agent", found, &config->config->item_timeouts.telnet, revision);
 	store_str_setting(values, "timeout_zabbix_agent", found, &config->config->item_timeouts.agent , revision);
+
+	store_int_setting(values, "proxy_secrets_provider", &config->config->proxy_secrets_provider, revision);
 
 	/*
 	 * Final checks

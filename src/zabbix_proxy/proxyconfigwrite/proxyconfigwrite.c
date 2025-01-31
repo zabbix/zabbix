@@ -2400,6 +2400,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 	char				*error = NULL;
 	zbx_uint64_t			config_revision, hostmap_revision;
 	zbx_proxyconfig_write_status_t	status = ZBX_PROXYCONFIG_WRITE_STATUS_DATA;
+	zbx_config_t			cfg;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2415,6 +2416,8 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CONFIG_REVISION, config_revision);
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_PROXY_SECRETS_PROVIDER);
+	zbx_json_adduint64(&j, ZBX_PROTO_TAG_PROXY_SECRETS_PROVIDER, (zbx_uint64_t)cfg.proxy_secrets_provider);
 
 	if (0 != hostmap_revision)
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_HOSTMAP_REVISION, hostmap_revision);

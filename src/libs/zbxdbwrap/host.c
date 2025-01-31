@@ -1321,7 +1321,7 @@ static void	DBdelete_graphs_by_itemids(const zbx_vector_uint64_t *itemids, int a
 		goto out;
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
-	zbx_hashset_create(&graph_index, itemids->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&graph_index, (size_t)itemids->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_uint64_create(&graphids);
 
@@ -1347,7 +1347,7 @@ static void	DBdelete_graphs_by_itemids(const zbx_vector_uint64_t *itemids, int a
 
 	/* filter out graphs with other items */
 
-	zbx_hashset_create(&item_index, itemids->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+	zbx_hashset_create(&item_index, (size_t)itemids->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	for (int i = 0; i < itemids->values_num; i++)
