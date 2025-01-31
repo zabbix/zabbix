@@ -64,6 +64,7 @@ static int	DBpatch_7030001(void)
 	if (FAIL == ret || 0 == hgsetids.values_num)
 		goto out;
 
+	zbx_vector_uint64_sort(&hgsetids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_db_insert_prepare(&db_insert, "permission", "ugsetid", "hgsetid", "permission", (char*)NULL);
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "h.hgsetid", hgsetids.values, hgsetids.values_num);
 
