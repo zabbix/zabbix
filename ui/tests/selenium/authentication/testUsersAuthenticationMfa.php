@@ -178,6 +178,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		}
 
 		$this->assertEquals(['Name', 'API hostname', 'Client ID', 'Client secret'], $dialog_form->getRequiredLabels());
+		$dialog->close();
+		$dialog->ensureNotPresent();
 	}
 
 	public function getCreateData() {
@@ -296,13 +298,25 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			[
 				[
 					// Simple update TOTP.
-					'name' => 'Pre-existing TOTP'
+					'method' => 'Pre-existing TOTP',
+					'expected_values' => [
+						'Type' => 'TOTP',
+						'Name' => 'Pre-existing TOTP',
+						'Hash function' => self::TOTP_HASH,
+						'Code length' => self::TOTP_LENGTH
+					]
 				]
 			],
 			[
 				[
 					// Simple update Duo.
-					'name' => 'Pre-existing Duo'
+					'method' => 'Pre-existing Duo',
+					'expected_values' => [
+						'Type' => 'Duo Universal Prompt',
+						'Name' => 'Pre-existing Duo',
+						'API hostname' => self::DUO_API_HOSTNAME,
+						'Client ID' => self::DUO_CLIENT_ID
+					]
 				]
 			]
 		];
@@ -313,20 +327,34 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	 *
 	 * @dataProvider getSimpleUpdateData
 	 */
-	public function testUsersAuthenticationMfa_SimpleUpdate() {
+	public function testUsersAuthenticationMfa_SimpleUpdate($data) {
 		$mfa_form = $this->openMfaForm();
 		$mfa_form->fill(['Enable multi-factor authentication' => true]);
 
 		// For assertions later.
 		$hash_before = CDBHelper::getHash('SELECT * FROM mfa');
-		$table = $this->selectMethodTable($mfa_form);
 
-		// Open the create or edit form.
-		$mfa_form->getFieldContainer('Methods')->query('button:Add')->waitUntilClickable()->one()->click();
+		// Open the edit form.
+		$mfa_form->getFieldContainer('Methods')->query('link', $data['method'])->waitUntilClickable()->one()->click();
 
-		// Open MFA method form for editing and save without making changes.
+		// Open MFA method form for editing and save without making any changes.
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$dialog_form = $dialog->asForm();
+		$dialog->query('button:Update')->one()->click();
+		$dialog->ensureNotPresent();
+
+		$mfa_form->query('button:Update')->one()->click();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+
+		// Check nothing has changed.
+		$mfa_form->invalidate();
+		$mfa_form->selectTab('MFA settings');
+		$mfa_form->getFieldContainer('Methods')->query('link', $data['method'])->waitUntilClickable()->one()->click();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog->asForm()->checkValue($data['expected_values']);
+		$dialog->close();
+
+		$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM mfa'));
 	}
 
 	public function getUpdateData() {
@@ -589,6 +617,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		} else {
 			// When cancelling the MFA edit form, but saving the Authentication as a whole.
 			$dialog->query('button:Cancel')->one()->click();
+			$dialog->ensureNotPresent();
 
 			// Check the table before saving.
 			$this->assertEquals($ui_rows_before, $table->getRows()->count());
@@ -617,6 +646,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 				];
 				$dialog_form->checkValue($values);
 				$dialog->close();
+				$dialog->ensureNotPresent();
 			}
 
 			// Save Authentication config and assert that nothing has changed.
@@ -687,8 +717,10 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		if (CTestArrayHelper::get($data, 'expected_method_form', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, 'Invalid MFA configuration', $data['error']);
 			$dialog->close();
+			$dialog->ensureNotPresent();
 		} else {
 			// Open the Method edit for to verify data is still there.
+			$dialog->ensureNotPresent();
 			$this->checkMethodsTableAndMethodForm($mfa_form, $dialog, $fields);
 
 			// Save changes to authentication configuration.
