@@ -3287,10 +3287,7 @@ class CMap extends CMapElement {
 		);
 
 		while ($row = DBfetch($resource)) {
-			$link_triggers[$row['linkid']][] = [
-				'linktriggerid' => $row['linktriggerid'],
-				'triggerid' => $row['triggerid']
-			];
+			$link_triggers[$row['linkid']][] = ['triggerid' => $row['triggerid']];
 			$db_link_triggers[$row['linkid']][$row['linktriggerid']] = [
 				'linktriggerid' => $row['linktriggerid'],
 				'triggerid' => $row['triggerid']
