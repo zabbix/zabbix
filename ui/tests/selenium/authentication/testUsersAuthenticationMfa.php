@@ -202,10 +202,10 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			],
 			[
 				[
-					// Duo standart case.
+					// Duo standard case.
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
-						'Name' => 'Duo standart'
+						'Name' => 'Duo standard'
 					]
 				]
 			],
@@ -723,7 +723,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			$this->page->acceptAlert();
 		}
 
-		// If a validation error expected in the Mehod edit form.
+		// If a validation error expected in the Method edit form.
 		if (CTestArrayHelper::get($data, 'expected_method_form', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, 'Invalid MFA configuration', $data['error']);
 			$dialog->close();
