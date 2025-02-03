@@ -81,7 +81,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 						'User' => 'Admin',
 						'Resource' => 'Autoregistration',
 						'Action' => 'Update',
-						'ID' => '',
+						'ID' => 0,
 						'Details' => [
 							'Details',
 							'autoregistration.tls_accept: 1 => 2',
@@ -105,7 +105,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 						'User' => 'Admin',
 						'Resource' => 'Autoregistration',
 						'Action' => 'Update',
-						'ID' => '',
+						'ID' => 0,
 						'Details' => ['autoregistration.tls_accept: 2 => 3']
 					]
 				]
@@ -120,7 +120,7 @@ class testFormAdministrationGeneralAutoregistration extends CWebTest {
 						'User' => 'Admin',
 						'Resource' => 'Autoregistration',
 						'Action' => 'Update',
-						'ID' => '',
+						'ID' => 0,
 						'Details' => [
 							'Details',
 							'autoregistration.tls_accept: 3 => 1',
