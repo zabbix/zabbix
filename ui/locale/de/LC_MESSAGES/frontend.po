@@ -2951,6 +2951,16 @@ msgid_plural "Cannot delete user groups"
 msgstr[0] "Kann Benutzergruppe nicht löschen"
 msgstr[1] "Kann Benutzergruppen nicht löschen"
 
+#: include/classes/api/services/CUserGroup.php:1330
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CUserGroup.php:1325
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
+msgstr ""
+
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by provisioned user \"%2$s\"."
@@ -7270,6 +7280,10 @@ msgstr ""
 msgid "Display local time"
 msgstr ""
 
+#: widgets/itemhistory/views/column.edit.php:240
+msgid "Display log time"
+msgstr ""
+
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
 msgstr ""
@@ -9444,6 +9458,10 @@ msgstr "Historiedaten Selektion"
 #: app/views/popup.triggerexpr.php:129
 msgid "History functions"
 msgstr "Historienfunktionen"
+
+#: app/views/administration.housekeeping.edit.php:218
+msgid "History, trends and audit log compression"
+msgstr ""
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -17659,6 +17677,10 @@ msgstr "Auf Standardwerte zurücksetzen"
 msgid "Reset to initial view"
 msgstr "Auf Ausgangsansicht zurücksetzen"
 
+#: app/views/administration.miscconfig.edit.php:103
+msgid "Resolve secret vault macros by"
+msgstr ""
+
 #: jsLoader.php:283
 msgid "Resolved"
 msgstr "Wiederhergestellt"
@@ -20641,6 +20663,10 @@ msgstr ""
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
 msgstr ""
 
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
 msgid "This type of information may not match the key."
@@ -22860,6 +22886,10 @@ msgstr ""
 msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
 
+#: include/classes/data/CItemData.php:2498
+msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
 msgstr ""
@@ -23921,6 +23951,14 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr "Zabbix Server (Proxy)"
 
+#: app/views/administration.miscconfig.edit.php:112
+msgid "Zabbix server and proxy"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:107
+msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
+msgstr ""
+
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Zabbix-Server läuft nicht: Angezeigte Informationen sind womöglich nicht aktuell."
@@ -23937,6 +23975,10 @@ msgstr "Name des Zabbix-Servers"
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
 msgstr "Zabbix Serverversion"
+
+#: app/views/administration.miscconfig.edit.php:105
+msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
+msgstr ""
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"

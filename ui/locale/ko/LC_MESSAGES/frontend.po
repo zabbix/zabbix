@@ -2879,6 +2879,16 @@ msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
 msgstr[0] "사용자 그룹을 삭제할 수 없습니다."
 
+#: include/classes/api/services/CUserGroup.php:1330
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CUserGroup.php:1325
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
+msgstr ""
+
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by provisioned user \"%2$s\"."
@@ -7137,6 +7147,10 @@ msgstr ""
 msgid "Display local time"
 msgstr "현지 시간 표시"
 
+#: widgets/itemhistory/views/column.edit.php:240
+msgid "Display log time"
+msgstr ""
+
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
 msgstr "최소/평균/최대 표시"
@@ -9297,6 +9311,10 @@ msgstr "이력 데이터의 선택"
 #: app/views/popup.triggerexpr.php:129
 msgid "History functions"
 msgstr "내역 기능"
+
+#: app/views/administration.housekeeping.edit.php:218
+msgid "History, trends and audit log compression"
+msgstr ""
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -17457,6 +17475,10 @@ msgstr "기본값으로 설정"
 msgid "Reset to initial view"
 msgstr "초기 보기로 재설정"
 
+#: app/views/administration.miscconfig.edit.php:103
+msgid "Resolve secret vault macros by"
+msgstr ""
+
 #: jsLoader.php:283
 msgid "Resolved"
 msgstr "해결됨"
@@ -20413,6 +20435,10 @@ msgstr "트렌드 테이블에는 압축된 청크가 포함되어 있으므로 
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
 msgstr "이 설정은 타임스탬프 대신 현지 시간을 표시합니다. 고급 구성에서는 \"타임스탬프 표시\"도 선택해야 합니다."
 
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
 msgid "This type of information may not match the key."
@@ -22619,6 +22645,10 @@ msgstr "VMware 가상 머신 성능 카운터, \"url\" - VMware 서비스 URL, \
 msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "VMware 가상 머신 전원 상태, \"url\" - VMware 서비스 URL, \"uuid\" - VMware 가상 머신 전역 고유 식별자"
 
+#: include/classes/data/CItemData.php:2498
+msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
 msgstr "VMware 가상 머신 프라이빗 메모리 크기, \"url\" - VMware 서비스 URL, \"uuid\" - VMware 가상 머신 전역 고유 식별자"
@@ -23678,6 +23708,14 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr "Zabbix 서버 (프록시)"
 
+#: app/views/administration.miscconfig.edit.php:112
+msgid "Zabbix server and proxy"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:107
+msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
+msgstr ""
+
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Zabbix 서버가 실행되고 있지 않습니다. 표시된 정보가 최신 정보가 아닐 수 있습니다."
@@ -23694,6 +23732,10 @@ msgstr "Zabbix 서버 이름"
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
 msgstr "Zabbix 서버 버전"
+
+#: app/views/administration.miscconfig.edit.php:105
+msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
+msgstr ""
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"

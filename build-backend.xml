@@ -218,7 +218,7 @@
 			and configuration title: cmocka-<number>-<title> -->
 		<property name="cmocka-1-default" value="-q CFLAGS='${COMP_FLAGS}' ${ZBX_BASE_FLAGS} --enable-ipv6 --with-mysql --with-openipmi --with-openssl --with-iconv --with-libpcre"/>
 		<property name="cmocka-2-agent-only" value="-q CFLAGS='${COMP_FLAGS}' --enable-agent"/>
-		<property name="cmocka-3-server-only" value="-q CFLAGS='${COMP_FLAGS}' --enable-server --with-mysql --with-libcurl"/>
+		<property name="cmocka-3-server-only" value="-q CFLAGS='${COMP_FLAGS}' --enable-server --with-mysql --with-libcurl --with-libpcre2"/>
 		<property name="cmocka-4-proxy-only" value="-q CFLAGS='${COMP_FLAGS}' --enable-proxy --with-sqlite3 --with-libcurl"/>
 		<property name="cmocka-5-sanitizer" value="CC=clang CFLAGS='${COMP_FLAGS} -Wenum-conversion -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q ${ZBX_BASE_FLAGS} --with-openssl --with-openipmi --enable-ipv6 --with-mysql --with-iconv --with-libpcre"/>
 	</target>

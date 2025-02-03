@@ -1,0 +1,43 @@
+---
+test case: "Trends"
+in:
+  func: "trend"
+out:
+  func: "trends"
+---
+test case: "Baseline"
+in:
+  func: "baseline"
+out:
+  func: "trends"
+---
+test case: "Nodata"
+in:
+  func: "nodata"
+out:
+  func: "timer"
+---
+test case: "Something -> history"
+in:
+  func: "something"
+out:
+  func: "history"
+---
+test case: "Some ASCII"
+in:
+  func: "!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
+out:
+  func: "history"
+---
+test case: "Empty"
+in:
+  func: ""
+out:
+  func: "history"
+---
+test case: "Newlines and tabs"
+in:
+  func: "\n\t\n\t"
+out:
+  func: "history"
+...
