@@ -90,7 +90,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$mfa_form = $this->openFormAndCheckBasics('MFA', 'multi-factor');
 		$this->assertEquals(['Methods'], $mfa_form->getRequiredLabels());
 
-		// Check method table headers.
+		// Check Method table headers.
 		$methods_table = [
 			'Methods' => [
 				'id' => 'mfa-methods',
@@ -99,24 +99,24 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		];
 		$this->checkTablesHeaders($methods_table, $mfa_form);
 
-		// Check that the add button gets enabled.
+		// Check that the Add button gets enabled.
 		$add_button = $mfa_form->getFieldContainer('Methods')->query('button:Add')->one();
 		$update_button = $mfa_form->query('button:Update')->one();
 
 		foreach ([false, true] as $status) {
 			$mfa_form->fill(['Enable multi-factor authentication' => $status]);
 			$this->assertTrue($add_button->isEnabled($status));
-			// The update button should be enabled regardless of whether MFA is enabled.
+			// The Update button should be enabled regardless of whether MFA is enabled.
 			$this->assertTrue($update_button->isEnabled());
 		}
 
-		// Check the fields in the method modal.
+		// Check the fields in the Method modal.
 		$mfa_form->getFieldContainer('Methods')->query('button:Add')->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->assertEquals('New MFA method', $dialog->getTitle());
 		$dialog_form = $dialog->asForm();
 
-		$method_fields = [
+		$method_field_attributes = [
 			'Type' => ['visible' => true, 'value' => 'TOTP'],
 			'Name' => ['visible' => true, 'maxlength' => 128, 'value' => ''],
 			'Hash function' => ['visible' => true, 'value' => self::TOTP_HASH],
@@ -128,8 +128,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			]
 		];
 
-		foreach ($method_fields as $label => $attributes) {
-			$field = $dialog_form->getField($label);
+		foreach ($method_field_attributes as $field_label => $attributes) {
+			$field = $dialog_form->getField($field_label);
 			$this->assertTrue($field->isEnabled());
 			$this->assertEquals($attributes['visible'], $field->isVisible());
 
@@ -144,23 +144,23 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			}
 		}
 
-		// Check dropdown options.
+		// Check options in dropdowns.
 		$this->assertEquals(['TOTP', 'Duo Universal Prompt'], $dialog_form->getField('Type')->getOptions()->asText());
 		$this->assertEquals(['SHA-1', 'SHA-256', 'SHA-512'],
 				$dialog_form->getField('Hash function')->getOptions()->asText()
 		);
 		$this->assertEquals(['6', '8'], $dialog_form->getField('Code length')->getOptions()->asText());
 
-		// Check mandatory fields when MFA type = TOTP.
+		// Check the mandatory fields when MFA type = TOTP.
 		$this->assertEquals(['Name'], $dialog_form->getRequiredLabels());
 
-		// Check the hintbox.
+		// Check the hintbox next to the Name fieldS.
 		$dialog_form->getLabel('Name')->query('xpath:./button[@data-hintbox]')->one()->click();
 		$hintbox = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->all()->last();
 		$this->assertEquals('Shown as the label to all MFA users in authenticator apps.', $hintbox->getText());
 		$hintbox->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
 
-		// Check fields when MFA type = DUO.
+		// Check fields when MFA type = Duo.
 		$dialog_form->fill(['Type' => 'Duo Universal Prompt']);
 
 		$field_visibility = [
@@ -211,7 +211,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			],
 			[
 				[
-					// Duo whitespaces.
+					// Duo fields contain leading and trailing spaces.
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
 						'Name' => '  Duo whitespace  ',
@@ -239,8 +239,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					'error' => 'MFA method "Pre-existing TOTP" already exists.',
 					'fields' => [
 						'Name' => 'Pre-existing TOTP'
-					],
-					'skip_name_append' => true
+					]
 				]
 			],
 			[
@@ -250,8 +249,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					'error' => 'MFA method "Pre-existing TOTP" already exists.',
 					'fields' => [
 						'Name' => '  Pre-existing TOTP  '
-					],
-					'skip_name_append' => true
+					]
 				]
 			],
 			[
@@ -262,11 +260,13 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
 						'Name' => 'Pre-existing Duo'
-					],
-					'skip_name_append' => true
+					]
 				]
 			],
-			// ToDo: Move the missing secret test to the generic data provider when ZBX-25952 is fixed.
+			/*
+			 * There is a bug where the Client secret field is only validated when creating a new record.
+			 * ToDo: Move the missing Clien secret test to the generic data provider when ZBX-25952 is fixed.
+			 */
 			[
 				[
 					// Duo with Client secret field missing.
@@ -337,7 +337,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		// Open the edit form.
 		$mfa_form->getFieldContainer('Methods')->query('link', $data['method'])->waitUntilClickable()->one()->click();
 
-		// Open MFA method form for editing and save without making any changes.
+		// Open the MFA method form for editing and save without making any changes.
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$dialog->query('button:Update')->one()->click();
 		$dialog->ensureNotPresent();
@@ -469,19 +469,11 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$mfa_form->invalidate();
 		$mfa_form->selectTab('MFA settings');
 
-		// Check that the deleted methods are not present.
-		$method_list = [];
-		$table = $this->selectMethodTable($mfa_form);
+		// Check that the deleted methods are not present anymore.
+		$method_list = $this->getMfaNamesFromTable($this->selectMethodTable($mfa_form));
+		$this->assertEmpty(array_intersect(['TOTP for deletion', 'Duo for deletion'], $method_list));
 
-		foreach($table->getRows() as $row) {
-			$method_list[] = $row->getColumn('Name')->getText();
-		}
-
-		foreach(['TOTP for deletion', 'Duo for deletion'] as $method_name) {
-			$this->assertFalse(in_array($method_name, $method_list));
-		}
-
-		// Verify DB records deleted.
+		// Verify DB records are deleted.
 		$this->assertEquals($method_count_before - 2, CDBHelper::getCount($sql_total));
 		$this->assertEquals(0, CDBHelper::getCount($sql_specific));
 	}
@@ -584,12 +576,12 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$mfa_form = $this->openMfaForm();
 		$mfa_form->fill(['Enable multi-factor authentication' => true]);
 
-		// For assertions later.
+		// Save the starting state for assertions later.
 		$hash_before = CDBHelper::getHash('SELECT * FROM mfa');
 		$table = $this->selectMethodTable($mfa_form);
 		$ui_rows_before = $table->getRows()->count();
 
-		// Open the create or edit form.
+		// Open the create/edit form.
 		$update = CTestArrayHelper::get($data, 'update', false);
 		$mfa_type = CTestArrayHelper::get($data, 'fields.Type', 'TOTP');
 		$update_action = ($mfa_type === 'TOTP') ? 'link:Pre-existing TOTP' : 'link:Pre-existing Duo';
@@ -604,7 +596,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 
 		// Two different paths depending on if cancelling inside the MFA method form or Authentication form.
 		if (CTestArrayHelper::get($data, 'save_mfa_method', false)) {
-			// Create/Update the MFA method, but reload the page without saving.
+			// Create/Update the MFA method without cancelling, but reload the Authentication page without saving.
 			$button = $update ? 'Update' : 'Add';
 			$dialog->query('button', $button)->one()->click();
 
@@ -615,7 +607,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 
 			$this->page->refresh()->waitUntilReady();
 		} else {
-			// When cancelling the MFA edit form, but saving the Authentication as a whole.
+			// When cancelling in the Method create/edit form, but saving the Authentication configuration.
 			$dialog->query('button:Cancel')->one()->click();
 			$dialog->ensureNotPresent();
 
@@ -624,27 +616,28 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			$method_list = $this->getMfaNamesFromTable($table);
 			$this->assertFalse(in_array($data['fields']['Name'], $method_list));
 
-			// In the update scenario reopen and check that the values are not updated.
+			// In the update scenario reopen the create/edit form and check that the values have not been updated.
 			if ($update) {
 				$mfa_form->getFieldContainer('Methods')->query($create_update_action)->waitUntilClickable()
 						->one()->click();
 				$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 				$dialog_form->invalidate();
 
-				$values = ($mfa_type === 'TOTP')
-				? [
-					'Type' => 'TOTP',
-					'Name' => 'Pre-existing TOTP',
-					'Hash function' => self::TOTP_HASH,
-					'Code length' => self::TOTP_LENGTH
-				]
-				: [
-					'Type' => 'Duo Universal Prompt',
-					'Name' => 'Pre-existing Duo',
-					'API hostname' => self::DUO_API_HOSTNAME,
-					'Client ID' => self::DUO_CLIENT_ID
+				$values = [
+					'TOTP' => [
+						'Type' => 'TOTP',
+						'Name' => 'Pre-existing TOTP',
+						'Hash function' => self::TOTP_HASH,
+						'Code length' => self::TOTP_LENGTH
+					],
+					'Duo Universal Prompt' => [
+						'Type' => 'Duo Universal Prompt',
+						'Name' => 'Pre-existing Duo',
+						'API hostname' => self::DUO_API_HOSTNAME,
+						'Client ID' => self::DUO_CLIENT_ID
+					]
 				];
-				$dialog_form->checkValue($values);
+				$dialog_form->checkValue($values[$mfa_type]);
 				$dialog->close();
 				$dialog->ensureNotPresent();
 			}
@@ -664,7 +657,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	}
 
 	/**
-	 * Tests that setting the default MFA method method works.
+	 * Tests that setting the default MFA method works.
 	 */
 	public function testUsersAuthenticationMfa_Default() {
 		$mfa_form = $this->openMfaForm();
@@ -675,10 +668,10 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$current_default = $this->getDefaultMethodName($table);
 		$method_to_set = ($current_default === 'Pre-existing TOTP') ? 'Pre-existing Duo' : 'Pre-existing TOTP';
 
-		// Click the 'default' radio for the new method.
+		// Click the 'default' radio for a different method.
 		$table->findRow('Name', $method_to_set)->getColumn('Default')->query('tag:input')->one()->click();
 
-		//Save and check.
+		// Save and check.
 		$mfa_form->query('button:Update')->one()->click();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
@@ -690,7 +683,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	}
 
 	/**
-	 * Since create and update tests are similar, use the same code for both.
+	 * Performs the testing of create and update scenarios.
 	 *
 	 * @param array $data      Data from data provider.
 	 * @param bool  $update    True if the test performed is an update.
@@ -717,11 +710,6 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			unset($fields['Client secret']);
 		}
 		$dialog_form->fill($fields);
-		/*
-		 * Note, there is a bug where the client secred is not validated here when updating.
-		 * ToDo: remove this comment when ZBX-25952 is fixed (the logic should not change,
-		 * just something to be aware of).
-		 */
 		if (isset($secret)) {
 			$dialog_form->query('button:Change client secret')->one()->click();
 			$dialog_form->fill(['Client secret' => $secret]);
@@ -730,7 +718,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$button = $update ? 'Update' : 'Add';
 		$dialog->query('button', $button)->one()->click();
 
-		// In case of update a warning popup might appear.
+		// In the case of update, a warning popup might appear.
 		if ($update && $this->page->isAlertPresent()) {
 			$this->page->acceptAlert();
 		}
@@ -741,18 +729,18 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			$dialog->close();
 			$dialog->ensureNotPresent();
 		} else {
-			// Open the Method edit for to verify data is still there.
+			// Open the Method edit form to verify data is still there.
 			$dialog->ensureNotPresent();
 			$this->checkMethodsTableAndMethodForm($mfa_form, $dialog, $fields);
 
-			// Save changes to authentication configuration.
+			// Save changes to the Authentication configuration.
 			$mfa_form->query('button:Update')->waitUntilClickable()->one()->click();
 
-			// Check if an error is expected when saving authentication configuration as a whole.
+			// If an error is expected only when saving the Authentication configuration.
 			if (CTestArrayHelper::get($data, 'expected_authentication_form', TEST_GOOD) === TEST_BAD) {
 				$this->assertMessage(TEST_BAD, 'Cannot update authentication', $data['error']);
 			} else {
-				// Verify data after saving.
+				// If no error expected, verify the data after saving.
 				$this->page->waitUntilReady();
 				$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 				$mfa_form->invalidate();
@@ -803,7 +791,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			],
 			[
 				[
-					// Duo special characters.
+					// Duo with special characters.
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
 						'Name' => 'Name: 👍©æ<script>alert("hi!")</script>&nbsp;',
@@ -852,7 +840,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	}
 
 	/**
-	 * Checks that data is displayed as expected in the MFA methods table.
+	 * Checks that data is displayed as expected in the MFA methods table and inside the Method edit form.
 	 *
 	 * @param CFormElement          $mfa_form    The form element that contains the method table.
 	 * @param COverlayDialogElement $dialog      The dialog that contains the edit form.
@@ -866,14 +854,14 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			$fields['Code length'] = CTestArrayHelper::get($fields, 'Code length', self::TOTP_LENGTH);
 		}
 
-		// Trim text fields.
+		// Trim text fields, it is expected that any leading and trailing spaces are not saved.
 		foreach (['Name', 'API hostname', 'Client ID'] as $field) {
 			if (array_key_exists($field, $fields)) {
 				$fields[$field] = trim($fields[$field]);
 			}
 		}
 
-		// Check data in the table.
+		// Check data in the Method table.
 		$table = $this->selectMethodTable($mfa_form);
 		$row = $table->findRow('Name', $fields['Name']);
 		$expected_table_data = [
@@ -884,12 +872,12 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		];
 		$row->assertValues($expected_table_data);
 
-		// Open the edit form.
+		// Open the Method edit form.
 		$row->getColumn('Name')->query('xpath:.//a')->one()->click();
 		$dialog_form = $dialog->asForm();
 		$dialog_form->invalidate();
 
-		// Special check in the case of DUO client secret.
+		// Special case - Duo Client secret field.
 		if (array_key_exists('Client secret', $fields)) {
 			$this->assertTrue($dialog_form->getFieldContainer('Client secret')
 					->query('button:Change client secret')->one()->isClickable()
@@ -903,7 +891,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	}
 
 	/**
-	 * Populates fields data array with needed defaults before filling the form.
+	 * Populates fields data array with defaults for filling the Method form.
 	 *
 	 * @param array $fields              Fields data array to populate.
 	 * @param bool  $update              Adds suffix to name when updating.
@@ -920,9 +908,9 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		}
 
 		/*
-		 * When updating, the 'Name' field should be appended to avoid name conflicts with create scenarios.
-		 * But don't append when 'Name' is not set or explicitly set to empty.
-		 * Also don't append when the flag 'skip_name_append' is set.
+		 * When updating, the Name field is appended to avoid name conflicts with create scenarios.
+		 * But don't append th when the name is not set or explicitly set to empty.
+		 * Also don't append when the flag 'skip_name_append' is set - this is for duplicate name scenarios.
 		 */
 		if ($update && array_key_exists('Name', $fields) && $fields['Name'] !== '' && !$skip_name_append) {
 			$fields['Name'] = CTestArrayHelper::get($fields, 'Name', '').' - updated';
@@ -934,7 +922,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	/**
 	 * Logs in and opens the MFA configuration form.
 	 *
-	 * @return CFormElement    The MFA configuration form.
+	 * @return CFormElement    The MFA form.
 	 */
 	protected function openMfaForm() {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
@@ -944,16 +932,18 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	}
 
 	/**
-	 * This is to only have this selector once.
+	 * A common selector in the test.
 	 *
 	 * @param CFormElement $mfa_form    Container element, the MFA form.
+	 *
+	 * @return CTableElement    The Method table.
 	 */
 	protected function selectMethodTable($mfa_form) {
 		return $mfa_form->getFieldContainer('Methods')->query('xpath:.//table')->one()->asTable();
 	}
 
 	/**
-	 * Gets all the MFA method names from the table.
+	 * Gets all MFA method names from the Method table.
 	 *
 	 * @param CTableElement $table    MFA method table inside the MFA form.
 	 *
@@ -970,6 +960,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 
 	/**
 	 * Returns the name of the currently set default MFA method.
+	 *
+	 * @return string    Name of the MFA method that is set as default in the UI.
 	 */
 	protected function getDefaultMethodName($table) {
 		return $table->query("xpath:.//tr[.//input[@type='radio' and @checked]]")->one()->asTableRow()
