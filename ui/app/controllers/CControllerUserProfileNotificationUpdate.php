@@ -78,7 +78,7 @@ class CControllerUserProfileNotificationUpdate extends CControllerUserUpdateGene
 		}
 		else {
 			$response = (new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'action=userprofile.notification.edit')
+				->setArgument('action', 'userprofile.notification.edit')
 			));
 			$response->setFormData($this->getInputAll());
 			CMessageHelper::setErrorTitle(_('Cannot update user'));
