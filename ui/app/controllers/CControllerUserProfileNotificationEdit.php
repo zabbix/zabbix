@@ -126,7 +126,7 @@ class CControllerUserProfileNotificationEdit extends CControllerUserEditGeneral 
 			'internal_auth' => CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL,
 			'readonly' => $this->user['provisioned'] == CUser::PROVISION_STATUS_YES,
 			'mediatypes' => API::MediaType()->get([
-				'output' => ['status'],
+				'output' => ['status', 'name'],
 				'preservekeys' => true
 			])
 		];

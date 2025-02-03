@@ -291,7 +291,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
 
 		$data['mediatypes'] = API::MediaType()->get([
-			'output' => ['status'],
+			'output' => ['status', 'name'],
 			'preservekeys' => true
 		]);
 
