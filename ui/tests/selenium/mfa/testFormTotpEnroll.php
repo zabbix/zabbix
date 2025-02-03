@@ -64,7 +64,7 @@ class testFormTotpEnroll extends testFormTotp {
 	}
 
 	public function getEnrollData() {
-		// Many test cases overlap with verify form, so reuse the data provider.
+		// Most of the test cases come from the parent class.
 		return array_merge($this->getGenericTotpData(), [
 			[
 				[
@@ -76,7 +76,7 @@ class testFormTotpEnroll extends testFormTotp {
 			],
 			[
 				[
-					// MFA method name has special characters.
+					// MFA method name with special characters.
 					'mfa_data' => [
 						'name' => '<script>alert("hi!")</script>&nbsp;👍'
 					]
@@ -99,8 +99,8 @@ class testFormTotpEnroll extends testFormTotp {
 	/**
 	 * Test different enrollment scenarios.
 	 *
-	 * @dataProvider  getEnrollData
-	 * @onBefore      prepareEnrollData
+	 * @dataProvider getEnrollData
+	 * @onBefore     prepareEnrollData
 	 */
 	public function testFormTotpEnroll_Enroll($data) {
 		// Open the enroll form.
@@ -116,12 +116,14 @@ class testFormTotpEnroll extends testFormTotp {
 		$qr_code = $form->query('class:qr-code')->one();
 
 		// Assert the QR code and get the secret.
-		$totp_secret = $this->validateQrCodeAndExtractSecret($qr_code, $totp_name, self::USER_NAME, $totp_algo, $totp_code_length);
+		$totp_secret = $this->validateQrCodeAndExtractSecret($qr_code, $totp_name, self::USER_NAME, $totp_algo,
+			$totp_code_length
+		);
 
 		// Assert the description text.
 		$this->assertEnrollDescription($form, $totp_algo, $totp_secret);
 
-		// Get the verification code (the TOTP itself). Generate if not defined in the data provider.
+		// Get the TOTP. Generate only if a custom values is not defined in the data provider.
 		CMfaTotpHelper::waitForSafeTotpWindow();
 		$time_step_offset = CTestArrayHelper::get($data, 'time_step_offset', 0);
 		$totp = CTestArrayHelper::get($data, 'totp',
@@ -149,10 +151,10 @@ class testFormTotpEnroll extends testFormTotp {
 	 * It is important for a secret to change each time to ensure no one else has seen the secret before.
 	 */
 	public function testFormTotpEnroll_Regeneration() {
-		// Reset TOTP secret to make sure user has not already been enrolled.
+		// Reset TOTP secret to make sure the user has not already been enrolled.
 		$this->resetTotpConfiguration();
 
-		// Open the enroll form and get the secret.
+		// Open the the enroll form and get the secret.
 		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
 		$old_totp_secret = $this->validateQrCodeAndExtractSecret();
 
@@ -160,7 +162,8 @@ class testFormTotpEnroll extends testFormTotp {
 		$this->page->refresh()->waitUntilReady();
 		$new_totp_secret = $this->validateQrCodeAndExtractSecret();
 		$this->assertNotEquals($old_totp_secret, $new_totp_secret,
-				'The TOTP secret seems to have stayed the same after reload, when it should have changed.');
+			'The TOTP secret seems to have stayed the same after reload, when it should have changed.'
+		);
 	}
 
 	/**
@@ -224,7 +227,7 @@ class testFormTotpEnroll extends testFormTotp {
 	}
 
 	/**
-	 * Takes screenshot of the enroll form.
+	 * Takes a screenshot of the enroll form.
 	 */
 	public function testFormTotpEnroll_Screenshot() {
 		$this->resetTotpConfiguration();
@@ -232,9 +235,9 @@ class testFormTotpEnroll extends testFormTotp {
 		$this->page->removeFocus();
 		$this->assertScreenshotExcept($this->page->query('class:signin-container')->one(),
 			[
-				// Hide the QR code and the secret string.
+				// Hide the QR code.
 				$this->page->query('class:qr-code')->one(),
-				// The secret string does not have a good selector, sadly.
+				// Hide the secret string. It does not have a good selector, sadly.
 				$this->page->query('xpath://form/div[last()]')->one()
 			],
 			'TOTP enroll form'
@@ -242,10 +245,10 @@ class testFormTotpEnroll extends testFormTotp {
 	}
 
 	/**
-	 * Validates if QR code displays the correct data and extracts the TOTP secret string.
+	 * Validates if the QR code is displaying the correct data and extracts the TOTP secret string.
 	 * This is done by looking at the QR code's HTML 'title' attribute, no visual inspection is done.
 	 *
-	 * @param CElement $qr_code        Element of the QR code.
+	 * @param CElement $qr_code        QR code element.
 	 * @param string   $method_name    The expected TOTP method name.
 	 * @param string   $user_name      User that is trying to enroll.
 	 * @param int      $algorithm      The expected TOTP Cryptographic algorithm.
@@ -277,7 +280,7 @@ class testFormTotpEnroll extends testFormTotp {
 	}
 
 	/**
-	 * Performs the repetitive enrollment steps.
+	 * Performs the enrollment steps.
 	 *
 	 * @param CElement $form        Enroll form element.
 	 * @param string   $mfa_name    Override for the expected MFA method name.
@@ -305,7 +308,7 @@ class testFormTotpEnroll extends testFormTotp {
 			->one()->isVisible()
 		);
 
-		// Assert the secret is visible.
+		// Assert that the secret is visible.
 		$this->assertTrue($container->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($secret).']')
 			->one()->isVisible());
 	}
