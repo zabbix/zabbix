@@ -53,23 +53,18 @@ class CWidgetMap extends CWidget {
 	}
 
 	promiseUpdate() {
-		const fields_data = this.getFieldsData();
-
-		fields_data.sysmapid = fields_data.sysmapid ? fields_data.sysmapid[0] : fields_data.sysmapid;
+		const sysmapid = this.getFieldsData().sysmapid[0];
 
 		if (this.isFieldsReferredDataUpdated('sysmapid')) {
 			this.#previous_maps = [];
-		}
-
-		if (this.#map_svg !== null || this.isFieldsReferredDataUpdated('sysmapid')) {
-			if (this.#sysmapid != fields_data.sysmapid) {
-				this.#sysmapid = fields_data.sysmapid;
-			}
-
+			this.#sysmapid = sysmapid;
 			this.#map_svg = null;
 		}
+		else if (this.#sysmapid !== null && sysmapid != this.#sysmapid) {
+			this.feedback({sysmapid: [this.#sysmapid]});
+		}
 
-		if (this.#map_svg === null || this.#sysmapid !== fields_data.sysmapid) {
+		if (this.#map_svg === null) {
 			return super.promiseUpdate();
 		}
 
@@ -80,11 +75,13 @@ class CWidgetMap extends CWidget {
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
 			},
-			body: JSON.stringify(this.getUpdateRequestData())
+			body: JSON.stringify(this.getUpdateRequestData()),
+			signal: this._update_abort_controller.signal
 		})
-			.then((response) => response.json())
-			.then((response) => {
-				if (response.mapid != 0 && this.#map_svg !== null) {
+			.then(response => response.json())
+			.then(response => {
+				if (response.mapid != 0) {
+					this.#map_svg.selected_element_id = this.#selected_element_id;
 					this.#map_svg.update(response);
 				}
 				else {

@@ -42,9 +42,8 @@ var impl Plugin
 
 // Options -
 type Options struct {
-	plugin.SystemOptions `conf:"optional,name=System"`
-	Timeout              int    `conf:"optional,range=1:30"`
-	Path                 string `conf:"optional"`
+	Timeout int    `conf:"optional,range=1:30"`
+	Path    string `conf:"optional"`
 }
 
 // Plugin -
@@ -77,7 +76,7 @@ func init() {
 
 // Configure -
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-	if err := conf.Unmarshal(options, &p.options); err != nil {
+	if err := conf.UnmarshalStrict(options, &p.options); err != nil {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
 
@@ -91,7 +90,13 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 // Validate -
 func (p *Plugin) Validate(options interface{}) error {
 	var o Options
-	return conf.Unmarshal(options, &o)
+
+	err := conf.UnmarshalStrict(options, &o)
+	if err != nil {
+		return errs.Wrap(err, "plugin config validation failed")
+	}
+
+	return nil
 }
 
 // Export -

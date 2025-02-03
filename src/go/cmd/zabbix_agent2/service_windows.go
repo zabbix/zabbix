@@ -263,7 +263,7 @@ func setHostname() error {
 
 	var m *scheduler.Manager
 	var err error
-	if m, err = scheduler.NewManager(&agent.Options); err != nil {
+	if m, err = scheduler.NewManager(&agent.Options, make(agent.PluginSystemOptions)); err != nil {
 		return fmt.Errorf("cannot create scheduling manager: %s", err)
 	}
 	m.Start()
