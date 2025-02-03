@@ -141,7 +141,7 @@ $form_grid
 			(new CCheckBoxList('weekdays'))
 				->setOptions($weekdays)
 				->setColumns(3)
-				->setVertical(true)
+				->setVertical()
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setReadonly(!$data['allowed_edit'])
 		))

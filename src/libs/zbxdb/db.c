@@ -889,7 +889,8 @@ out:
 	ZBX_UNUSED(cipher_13);
 	ZBX_UNUSED(read_only_recoverable);
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
-	if (SQLITE_OK != sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE, NULL))
+	if (SQLITE_OK != sqlite3_open_v2(dbname, &conn, SQLITE_OPEN_READWRITE |
+		SQLITE_OPEN_CREATE, NULL))
 #else
 	if (SQLITE_OK != sqlite3_open(dbname, &conn))
 #endif
