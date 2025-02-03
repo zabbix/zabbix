@@ -294,7 +294,7 @@ int	zbx_mock_get_parameter_int(const char *path)
 {
 	zbx_mock_error_t	err;
 	zbx_mock_handle_t	handle;
-	int		parameter;
+	int			parameter;
 
 	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_parameter(path, &handle)) ||
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_int(handle, &parameter)))
