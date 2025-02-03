@@ -169,8 +169,8 @@ foreach ($data['mediatypes'] as $mediaType) {
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		media_type2str($mediaType['typeid']),
 		$status,
-		new CCol($actionLinks),
-		new CCol($details),
+		$actionLinks,
+		$details,
 		$test_link
 	]);
 }

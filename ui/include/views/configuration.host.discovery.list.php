@@ -280,27 +280,27 @@ foreach ($data['discoveries'] as $discovery) {
 		$discovery['hosts'][0]['name'],
 		$description,
 		[
-			(new CLink(_('Item prototypes'),
+			new CLink(_('Item prototypes'),
 				(new CUrl('disc_prototypes.php'))
 					->setArgument('parent_discoveryid', $discovery['itemid'])
 					->setArgument('context', $data['context'])
-			))->addClass(ZBX_STYLE_NOWRAP),
+			),
 			CViewHelper::showNum($discovery['items'])
 		],
 		[
-			(new CLink(_('Trigger prototypes'),
+			new CLink(_('Trigger prototypes'),
 				(new CUrl('trigger_prototypes.php'))
 					->setArgument('parent_discoveryid', $discovery['itemid'])
 					->setArgument('context', $data['context'])
-			))->addClass(ZBX_STYLE_NOWRAP),
+			),
 			CViewHelper::showNum($discovery['triggers'])
 		],
 		[
-			(new CLink(_('Graph prototypes'),
+			new CLink(_('Graph prototypes'),
 				(new CUrl('graphs.php'))
 					->setArgument('parent_discoveryid', $discovery['itemid'])
 					->setArgument('context', $data['context'])
-			))->addClass(ZBX_STYLE_NOWRAP),
+			),
 			CViewHelper::showNum($discovery['graphs'])
 		],
 		$discovery['hosts'][0]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL
