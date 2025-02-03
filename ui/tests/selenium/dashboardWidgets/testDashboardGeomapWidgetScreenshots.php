@@ -329,7 +329,7 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 
 			$count = count($this->errors);
 			/*
-			 * Zoom in and zoom out icons in the geomap widget are not centred on refrence screenshots due to script
+			 * Zoom in and zoom out icons in the geomap widget are not centred on reference screenshots due to script
 			 * execution in the assertScreenshotExcept() method for text and image rendering. This is expected beahavior
 			 * and can only be reproduced by running a test.
 			 */

@@ -402,7 +402,7 @@ int	expr_db_get_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 	zbx_dc_item_t	dc_item;
-	zbx_uint64_t	proxyid;
+	zbx_dc_host_t	dc_host;
 	int		ret = FAIL, errcode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -430,10 +430,29 @@ int	expr_db_get_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 			zbx_dc_config_clean_items(&dc_item, &errcode, 1);
 
 			return ret;
+		case ZBX_REQUEST_PROXY_NAME:
+		case ZBX_REQUEST_PROXY_DESCRIPTION:
+			zbx_dc_config_get_hosts_by_itemids(&dc_host, &itemid, &errcode, 1);
+
+			if (SUCCEED == errcode)
+			{
+				if (0 == dc_host.proxyid)
+				{
+					*replace_to = zbx_strdup(*replace_to, "");
+					ret = SUCCEED;
+				}
+				else
+				{
+					ret = expr_db_get_proxy_value(dc_host.proxyid, replace_to,
+							ZBX_REQUEST_PROXY_NAME == request ? "name" : "description");
+				}
+			}
+
+			return ret;
 	}
 
 	result = zbx_db_select(
-			"select h.proxyid,h.description,i.itemid,i.name,i.key_,i.description,i.value_type,ir.error,"
+			"select h.description,i.itemid,i.name,i.key_,i.description,i.value_type,ir.error,"
 					"irn.name_resolved"
 			" from items i"
 				" join hosts h on h.hostid=i.hostid"
@@ -446,18 +465,18 @@ int	expr_db_get_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 		switch (request)
 		{
 			case ZBX_REQUEST_HOST_DESCRIPTION:
-				*replace_to = zbx_strdup(*replace_to, row[1]);
+				*replace_to = zbx_strdup(*replace_to, row[0]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_ID:
-				*replace_to = zbx_strdup(*replace_to, row[2]);
+				*replace_to = zbx_strdup(*replace_to, row[1]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_NAME:
-				if (FAIL == zbx_db_is_null(row[8]))
-					*replace_to = zbx_strdup(*replace_to, row[8]);
+				if (FAIL == zbx_db_is_null(row[7]))
+					*replace_to = zbx_strdup(*replace_to, row[7]);
 				else
-					*replace_to = zbx_strdup(*replace_to, row[3]);
+					*replace_to = zbx_strdup(*replace_to, row[2]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_DESCRIPTION:
@@ -468,7 +487,7 @@ int	expr_db_get_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 					zbx_dc_um_handle_t	*um_handle;
 
 					um_handle = zbx_dc_open_user_macros();
-					*replace_to = zbx_strdup(NULL, row[5]);
+					*replace_to = zbx_strdup(NULL, row[4]);
 
 					(void)zbx_dc_expand_user_and_func_macros(um_handle, replace_to,
 							&dc_item.host.hostid, 1, NULL);
@@ -480,45 +499,23 @@ int	expr_db_get_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				zbx_dc_config_clean_items(&dc_item, &errcode, 1);
 				break;
 			case ZBX_REQUEST_ITEM_NAME_ORIG:
-				*replace_to = zbx_strdup(*replace_to, row[3]);
+				*replace_to = zbx_strdup(*replace_to, row[2]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_KEY_ORIG:
-				*replace_to = zbx_strdup(*replace_to, row[4]);
+				*replace_to = zbx_strdup(*replace_to, row[3]);
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_ITEM_DESCRIPTION_ORIG:
+				*replace_to = zbx_strdup(*replace_to, row[4]);
+				ret = SUCCEED;
+				break;
+			case ZBX_REQUEST_ITEM_VALUETYPE:
 				*replace_to = zbx_strdup(*replace_to, row[5]);
 				ret = SUCCEED;
 				break;
-			case ZBX_REQUEST_PROXY_NAME:
-				ZBX_DBROW2UINT64(proxyid, row[0]);
-
-				if (0 == proxyid)
-				{
-					*replace_to = zbx_strdup(*replace_to, "");
-					ret = SUCCEED;
-				}
-				else
-					ret = expr_db_get_proxy_value(proxyid, replace_to, "name");
-				break;
-			case ZBX_REQUEST_PROXY_DESCRIPTION:
-				ZBX_DBROW2UINT64(proxyid, row[0]);
-
-				if (0 == proxyid)
-				{
-					*replace_to = zbx_strdup(*replace_to, "");
-					ret = SUCCEED;
-				}
-				else
-					ret = expr_db_get_proxy_value(proxyid, replace_to, "description");
-				break;
-			case ZBX_REQUEST_ITEM_VALUETYPE:
-				*replace_to = zbx_strdup(*replace_to, row[6]);
-				ret = SUCCEED;
-				break;
 			case ZBX_REQUEST_ITEM_ERROR:
-				*replace_to = zbx_strdup(*replace_to, FAIL == zbx_db_is_null(row[7]) ? row[7] : "");
+				*replace_to = zbx_strdup(*replace_to, FAIL == zbx_db_is_null(row[6]) ? row[6] : "");
 				ret = SUCCEED;
 				break;
 		}

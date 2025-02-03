@@ -1,8 +1,18 @@
 Changes for 7.0.10rc1
 
 New features:
+.........T [ZBXNEXT-9654] added Azure SQL managed instance template (abrosimovs)
 
 Bug fixes:
+..F....... [ZBX-25471] fixed emptying of Web scenario variables and headers data (wczerneha)
+...G...... [ZBX-22522] fixed web.page.get curl header (sboidenko)
+...G...... [ZBX-25382] applied pkgsrc patch to restore builds on NetBSD >= 8.2 (jxl)
+..F....... [ZBX-25758] fixed the saving of filter state in trigger list (esekace)
+..F....... [ZBX-25681] fixed newly added tag field state in maintenance form after changing type (esekace)
+..F....... [ZBX-25511] fixed overriding Y-axes in Graph widget; fixed long names in datasets of Graph and Pie Chart widgets (averza)
+..F....... [ZBX-25666] fixed maintenance status display for submap elements when trigger elements are used (esekace)
+.........T [ZBX-25601] fixed HTTP proxy parameter name in MS 365 reports by HTTP template (drasikhov)
+..F....... [ZBX-25730] fixed target for URLs in menu popup (esekace)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.9
@@ -3318,8 +3328,13 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.39rc1
 
 New features:
+.........T [ZBXNEXT-9654] added Azure SQL managed instance template (abrosimovs)
 
 Bug fixes:
+...G...... [ZBX-25382] applied pkgsrc patch to restore builds on NetBSD >= 8.2 (jxl)
+...G...... [ZBX-22522] fixed web.page.get curl header (sboidenko)
+.........T [ZBX-25601] fixed HTTP proxy parameter name in MS 365 reports by HTTP template (drasikhov)
+..F....... [ZBX-25666] fixed maintenance status display for submap elements when trigger elements are used (esekace)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.38
