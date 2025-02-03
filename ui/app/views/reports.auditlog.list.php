@@ -83,9 +83,8 @@ $html_page = (new CHtmlPage())
 				->addRow(new CLabel(_('Resource'), $filter_resourcetype->getFocusableElementId()),
 					$filter_resourcetype
 				)
-				->addRow(_('Resource ID'),
-					(new CTextBox('filter_resourceid', $data['resourceid'] == 0 ? '' : $data['resourceid']))
-						->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+				->addRow(_('Resource ID'), (new CTextBox('filter_resourceid', $data['resourceid']))
+					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 				)
 				->addRow(_('Recordset ID'), (new CTextBox('filter_recordsetid', $data['recordsetid']))
 					->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
@@ -124,7 +123,7 @@ foreach ($data['auditlogs'] as $auditlog) {
 		array_key_exists($auditlog['resourcetype'], $data['resources'])
 			? $data['resources'][$auditlog['resourcetype']]
 			: _('Unknown resource'),
-		$auditlog['resourceid'] == 0 ? '' : new CLink($auditlog['resourceid'],
+		new CLink($auditlog['resourceid'],
 			(new CUrl('zabbix.php'))
 				->setArgument('action', $data['action'])
 				->setArgument('filter_resourceid', $auditlog['resourceid'])
