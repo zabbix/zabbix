@@ -15,7 +15,7 @@
 
 
 /**
- * Class for generating MFA TOTP tokens. This helper simulates a phone's authenticator app.
+ * Class for generating MFA TOTP tokens. This helper simulates an authenticator app a user would have on their phone.
  */
 class CMfaTotpHelper {
 	// TOTP window time in seconds.
@@ -41,7 +41,8 @@ class CMfaTotpHelper {
 	 * @return string                      The TOTP of specified digit length.
 	 * @throws InvalidArgumentException    If the number of digits is not 6 or 8, or if an unsupported hash provided.
 	 */
-	public static function generateTotp($secret, $digits = TOTP_CODE_LENGTH_6, $algorithm = TOTP_HASH_SHA1, $time_step_offset = 0) {
+	public static function generateTotp($secret, $digits = TOTP_CODE_LENGTH_6, $algorithm = TOTP_HASH_SHA1,
+			$time_step_offset = 0) {
 		// Validate the number of digits.
 		if (!in_array($digits, [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8])) {
 			throw new InvalidArgumentException('TOTP length must be either 6 or 8, unsupported value: '.$digits);
@@ -80,25 +81,25 @@ class CMfaTotpHelper {
 
 	/**
 	 * Waits until the current TOTP window is safely far from changing.
-	 * This prevents issues where a TOTP is generated too close to a window change and becomes invalid by the time it's used.
-	 * It also prevents a scenario where server and client time mismatches slightly and the client generates a future code
-	 * that the server rejects.
+	 * This prevents issues where a TOTP is generated too close to a window change and becomes
+	 * invalid by the time it's used. It also prevents a scenario where server and client time mismatches
+	 * slightly and the client generates a future code that the server rejects.
 	 *
-	 * @param float $tolerance    Minimum allowed time from a window change (seconds).
+	 * @param float $buffer    Minimum time in seconds from a time window change.
 	 */
-	public static function waitForSafeTotpWindow($tolerance = 1) {
+	public static function waitForSafeTotpWindow($buffer = 1) {
 		// Calculate the remaining time in the current TOTP window.
 		$time_in_window = fmod(microtime(true), self::TOTP_WINDOW_SIZE);
 		$remaining_time = self::TOTP_WINDOW_SIZE - $time_in_window;
 
-		// Check if within tolerance, wait otherwise.
-		if ($remaining_time < $tolerance) {
-			// Sleep until next window starts and another tolerance amount to safely be in a TOTP window.
-			usleep(($remaining_time + $tolerance) * 1000000);
+		// Wait if in the buffer zone.
+		if ($remaining_time < $buffer) {
+			// Sleep until next window starts, and then another buffer amount, to safely be in a TOTP window.
+			usleep(($remaining_time + $buffer) * 1000000);
 		}
-		else if ($time_in_window < $tolerance) {
-			// Second case - the window has just started, wait the time to safely be in tolerance.
-			usleep(($tolerance - $time_in_window) * 1000000);
+		else if ($time_in_window < $buffer) {
+			// Second case - the window has just started, wait to be outside the buffer zone.
+			usleep(($buffer - $time_in_window) * 1000000);
 		}
 	}
 
