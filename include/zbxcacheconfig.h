@@ -474,6 +474,7 @@ typedef struct
 	char		*default_timezone;
 	int		auditlog_enabled;
 	int		auditlog_mode;
+	int		proxy_secrets_provider;
 
 	/* database configuration data for ZBX_CONFIG_DB_EXTENSION_* extensions */
 	zbx_config_db_t	db;
@@ -493,6 +494,7 @@ zbx_config_t;
 #define ZBX_CONFIG_FLAGS_DEFAULT_TIMEZONE		__UINT64_C(0x0000000000000100)
 #define ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED		__UINT64_C(0x0000000000000200)
 #define ZBX_CONFIG_FLAGS_AUDITLOG_MODE			__UINT64_C(0x0000000000000400)
+#define ZBX_CONFIG_FLAGS_PROXY_SECRETS_PROVIDER		__UINT64_C(0x0000000000000800)
 
 typedef struct
 {
@@ -1025,6 +1027,10 @@ unsigned int	zbx_dc_get_auto_registration_action_count(void);
 
 /* global configuration support */
 #define ZBX_DISCOVERY_GROUPID_UNDEFINED	0
+
+#define ZBX_PROXY_SECRETS_PROVIDER_SERVER	0
+#define ZBX_PROXY_SECRETS_PROVIDER_PROXY	1
+
 void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags);
 void	zbx_config_clean(zbx_config_t *cfg);
 void	zbx_config_get_hk_mode(unsigned char *history_mode, unsigned char *trends_mode);

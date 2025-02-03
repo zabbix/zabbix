@@ -17468,6 +17468,10 @@ msgstr "بازنشانی پیش‌فرضها"
 msgid "Reset to initial view"
 msgstr ""
 
+#: app/views/administration.miscconfig.edit.php:103
+msgid "Resolve secret vault macros by"
+msgstr ""
+
 #: jsLoader.php:283
 msgid "Resolved"
 msgstr "رفع شد"
@@ -23694,6 +23698,14 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr ""
 
+#: app/views/administration.miscconfig.edit.php:112
+msgid "Zabbix server and proxy"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:107
+msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
+msgstr ""
+
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr ""
@@ -23709,6 +23721,10 @@ msgstr "نام سرور زبیکس"
 
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:105
+msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
 msgstr ""
 
 #: include/items.inc.php:92

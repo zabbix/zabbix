@@ -72,9 +72,16 @@ div.dashboard-widget-hostcard {
 
 						.host-group {
 							display: inline-block;
+							max-width: 100%;
 
 							&:not(:first-of-type) {
 								margin-left: 4px;
+							}
+
+							.host-group-name {
+								@extend %overflow-ellipsis;
+
+								max-width: 100%;
 							}
 
 							.host-group-name,
@@ -91,7 +98,6 @@ div.dashboard-widget-hostcard {
 						&.has-ellipsis {
 
 							.host-group-name {
-								@extend %overflow-ellipsis;
 								max-width: 75px;
 							}
 						}
@@ -100,6 +106,7 @@ div.dashboard-widget-hostcard {
 
 				&.section-description {
 					grid-template-columns: 1fr;
+					word-break: break-word;
 					--line-clamp: 2;
 				}
 
@@ -152,9 +159,16 @@ div.dashboard-widget-hostcard {
 
 						.template {
 							display: inline-block;
+							max-width: 100%;
 
 							&:not(:first-of-type) {
 								margin-left: 4px;
+							}
+
+							.template-name {
+								@extend %overflow-ellipsis;
+
+								max-width: 100%;
 							}
 
 							.template-name,
@@ -171,7 +185,6 @@ div.dashboard-widget-hostcard {
 						&.has-ellipsis {
 
 							.template-name {
-								@extend %overflow-ellipsis;
 								max-width: 75px;
 							}
 						}
