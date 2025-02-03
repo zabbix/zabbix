@@ -832,7 +832,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
 						'Name' => 'Duo missing API',
-						'Client ID' => '',
+						'Client ID' => ''
 					]
 				]
 			]
