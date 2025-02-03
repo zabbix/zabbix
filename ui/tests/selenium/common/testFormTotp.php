@@ -14,11 +14,6 @@
 **/
 
 
-/**
- * @backup mfa, users
- *
- * @onBefore prepareData
- */
 class testFormTotp extends CWebTest {
 
 	// User for testing TOTP.
@@ -31,10 +26,10 @@ class testFormTotp extends CWebTest {
 	protected const DEFAULT_TOTP_CODE_LENGTH = TOTP_CODE_LENGTH_6;
 	protected const DEFAULT_ERROR = 'The verification code was incorrect, please try again.';
 
-	// Number of times after which a user is blocked when a wrong TOTP is entered.
+	// Number of TOTP verification attempts, after which a user is blocked.
 	protected const BLOCK_COUNT = 5;
 
-	// For storing the objects created with API.
+	// For storing object IDs created with API.
 	protected static $user_id;
 	protected static $mfa_id;
 	protected static $usergroup_id;
@@ -82,9 +77,9 @@ class testFormTotp extends CWebTest {
 
 	/**
 	 * The Enroll and Verify forms share a lot of elements.
-	 * This is for reusing code.
+	 * This is for reusing Layout test code.
 	 */
-	protected function testTotpLayout () {
+	protected function testTotpLayout() {
 		// Container of most elements.
 		$container = $this->page->query('class:signin-container')->one();
 
