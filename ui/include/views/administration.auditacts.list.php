@@ -120,10 +120,10 @@ foreach ($this->data['alerts'] as $alert) {
 
 	$auditTable->addRow([
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
-		(new CCol($this->data['actions'][$alert['actionid']]['name']))->addClass(ZBX_STYLE_WORDBREAK),
-		($mediatype) ? (new CCol($mediatype['name']))->addClass(ZBX_STYLE_WORDBREAK) : '',
-		(new CCol($recipient))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($message))->addClass(ZBX_STYLE_WORDBREAK),
+		new CCol($this->data['actions'][$alert['actionid']]['name']),
+		($mediatype) ? $mediatype['name'] : '',
+		$recipient,
+		$message,
 		$status,
 		makeInformationList($info_icons)
 	]);

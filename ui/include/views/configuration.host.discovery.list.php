@@ -277,8 +277,8 @@ foreach ($data['discoveries'] as $discovery) {
 
 	$discoveryTable->addRow([
 		new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', $discovery['itemid']),
-		(new CCol($discovery['hosts'][0]['name']))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
+		$discovery['hosts'][0]['name'],
+		$description,
 		[
 			(new CLink(_('Item prototypes'),
 				(new CUrl('disc_prototypes.php'))
@@ -303,19 +303,19 @@ foreach ($data['discoveries'] as $discovery) {
 			))->addClass(ZBX_STYLE_NOWRAP),
 			CViewHelper::showNum($discovery['graphs'])
 		],
-		($discovery['hosts'][0]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL)
+		$discovery['hosts'][0]['flags'] == ZBX_FLAG_DISCOVERY_NORMAL
 			? [
-				(new CLink(_('Host prototypes'),
+				new CLink(_('Host prototypes'),
 					(new CUrl('host_prototypes.php'))
 						->setArgument('parent_discoveryid', $discovery['itemid'])
 						->setArgument('context', $data['context'])
-				))->addClass(ZBX_STYLE_NOWRAP),
+				),
 				CViewHelper::showNum($discovery['hostPrototypes'])
 			]
 			: '',
-		(new CDiv($discovery['key_']))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CDiv($discovery['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$discovery['delay'],
-		(new CCol(item_type2str($discovery['type'])))->addClass(ZBX_STYLE_NOWRAP),
+		item_type2str($discovery['type']),
 		$status,
 		($data['context'] === 'host') ? makeInformationList($info_icons) : null
 	]);
