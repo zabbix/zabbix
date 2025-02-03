@@ -223,7 +223,7 @@ class testFormTotp extends CWebTest {
 	/**
 	 * Blocking logic is shared in Enroll and Verify forms.
 	 */
-	public function testTotpBlocking() {
+	protected function testTotpBlocking() {
 		// Open the form.
 		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
 		$form = $this->page->query('class:signin-container')->asForm()->one();
@@ -262,8 +262,9 @@ class testFormTotp extends CWebTest {
 			'code_length' => $code_length
 		]);
 
-		// Makes sure the user is not already enrolled.
+		// Makes sure the user is not already enrolled or blocked.
 		CDataHelper::call('user.resettotp', [self::$user_id]);
+		CDataHelper::call('user.unblock', [self::$user_id]);
 	}
 
 	/**

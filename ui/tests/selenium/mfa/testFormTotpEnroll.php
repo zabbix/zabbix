@@ -208,7 +208,7 @@ class testFormTotpEnroll extends testFormTotp {
 			'mfaid' => self::$mfa_id
 		]);
 
-		// Check that the user has to enroll the inital MFA method again.
+		// Check that the user has to enroll the initial MFA method again.
 		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
 		$this->performEnroll($form);
 		$this->verifyLoggedIn();
