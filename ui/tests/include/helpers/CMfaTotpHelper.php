@@ -95,11 +95,11 @@ class CMfaTotpHelper {
 		// Wait if in the buffer zone.
 		if ($remaining_time < $buffer) {
 			// Sleep until next window starts, and then another buffer amount, to safely be in a TOTP window.
-			usleep(($remaining_time + $buffer) * 1000000);
+			usleep((int)(($remaining_time + $buffer) * 1000000));
 		}
 		else if ($time_in_window < $buffer) {
 			// Second case - the window has just started, wait to be outside the buffer zone.
-			usleep(($buffer - $time_in_window) * 1000000);
+			usleep((int)(($buffer - $time_in_window) * 1000000));
 		}
 	}
 
