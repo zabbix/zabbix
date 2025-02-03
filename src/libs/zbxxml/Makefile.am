@@ -3,6 +3,7 @@
 noinst_LIBRARIES = libzbxxml.a
 
 libzbxxml_a_SOURCES = \
-	xml.c
+	xml.c \
+	traverse.c
 
 libzbxxml_a_CFLAGS = $(LIBXML2_CFLAGS)
