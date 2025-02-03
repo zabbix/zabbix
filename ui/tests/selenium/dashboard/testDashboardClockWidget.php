@@ -273,6 +273,7 @@ class testDashboardClockWidget extends CWebTest {
 		$this->page->waitUntilReady();
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		$dashboard->waitUntilReady();
 		$this->assertTrue($dashboard->getWidget('Host for clock widget')->isValid());
 		$dashboard->getWidget('Host for clock widget')->edit()->fill(['Name' => 'LayoutClock']);
 		$this->query('button', 'Apply')->waitUntilClickable()->one()->click();
