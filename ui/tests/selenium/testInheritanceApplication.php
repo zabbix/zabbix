@@ -267,7 +267,7 @@ class testInheritanceApplication extends CLegacyWebTest {
 			$sql = 'SELECT NULL FROM applications WHERE name='.zbx_dbstr($data['application']);
 
 			if (array_key_exists('items', $data)) {
-				$this->zbxTestAssertElementPresentXpath('//tbody//a[text()="'.$data['application'].'"]');
+				$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath('//tbody//a[text()="'.$data['application'].'"]'));
 
 				$this->assertEquals(1, CDBHelper::getCount($sql));
 			}

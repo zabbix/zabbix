@@ -90,6 +90,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of trigger displaying options');
 		$this->zbxTestCheckHeader('Trigger displaying options');
 		$this->query('id:page-title-general')->asPopupButton()->one()->select('Trigger displaying options');
+		$this->page->waitUntilReady();
 		$this->zbxTestTextPresent(['Trigger displaying options', 'blinking', 'Unacknowledged PROBLEM events', 'Acknowledged PROBLEM events', 'Unacknowledged RESOLVED events', 'Acknowledged RESOLVED events', 'Display OK triggers for', 'On status change triggers blink for']);
 
 		// hash calculation for not-changed DB fields
