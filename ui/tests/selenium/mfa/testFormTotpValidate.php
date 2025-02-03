@@ -34,8 +34,8 @@ class testFormTotpValidate extends testFormTotp {
 		$this->testTotpLayout();
 	}
 
-	public function getCalidateData() {
-		// Many test cases overlap with enroll form, so reuse the data provider.
+	public function getValidateData() {
+		// Many test cases overlap with the enroll form, so reuse the data provider.
 		return array_merge($this->getGenericTotpData(), [
 			[
 				[
@@ -69,14 +69,14 @@ class testFormTotpValidate extends testFormTotp {
 		// Open the validation form.
 		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
 
-		// Get the used TOTP parameters.
+		// Get TOTP parameters.
 		$totp_algo = CTestArrayHelper::get($data, 'mfa_data.hash_function', self::DEFAULT_ALGO);
 		$totp_code_length = CTestArrayHelper::get($data, 'mfa_data.code_length', self::DEFAULT_TOTP_CODE_LENGTH);
 		$totp_secret = CTestArrayHelper::get($data, 'totp_secret', self::TOTP_SECRET_32);
 
 		$form = $this->page->query('class:signin-container')->asForm()->one();
 
-		// Get the verification code (the TOTP itself). Generate if not defined in the data provider.
+		// Get the verification code (the TOTP itself). Generate only if it is not defined in the data provider.
 		CMfaTotpHelper::waitForSafeTotpWindow();
 		$time_step_offset = CTestArrayHelper::get($data, 'time_step_offset', 0);
 		$totp = CTestArrayHelper::get($data, 'totp',
@@ -100,8 +100,8 @@ class testFormTotpValidate extends testFormTotp {
 	}
 
 	/**
-	 * Test that it is not possible to use the same TOTP twice. It is a security feature, so that a stolen TOTP is not
-	 * useful.
+	 * Test that it is not possible to use the same TOTP twice.
+	 * It is a security feature for making sure that a stolen TOTP is not useful.
 	 */
 	public function testFormTotpValidate_ReuseTotp() {
 		$this->resetTotpConfiguration();
@@ -156,7 +156,7 @@ class testFormTotpValidate extends testFormTotp {
 	 *
 	 * @param string $secret TOTP secret to set in DB.
 	 *
-	 * @throws Exception    Fails the test if the secret given is not valid.
+	 * @throws Exception    If the TOTP secret is not valid, the test will fail.
 	 */
 	protected function quickEnrollUser($secret = self::TOTP_SECRET_32) {
 		if (!CMfaTotpHelper::isValidSecretString($secret)) {
