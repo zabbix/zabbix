@@ -1,5 +1,5 @@
 --- # numeric variables
-test case: Succeed '0'
+test case: Test
 in:
-  rules: [ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_COMPARE]
-  expression: '3 > 2 <> 1'
+  rules: [ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH]
+  expression: 'not 1 + 2'
