@@ -16,10 +16,6 @@
 #include "expression.h"
 #include "datafunc.h"
 
-#ifdef HAVE_LIBXML2
-#	include "zbxxml.h"
-#endif
-
 #include "zbxdb.h"
 #include "zbxvariant.h"
 #include "zbxeval.h"
