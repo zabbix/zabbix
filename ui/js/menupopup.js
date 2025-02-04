@@ -1682,8 +1682,6 @@ function getMenuPopupDRule(options) {
 	return sections;
 }
 
-const WRAPPER_PADDING_RIGHT = 10;
-
 jQuery(function($) {
 	const MENU_BORDER = 1;
 
