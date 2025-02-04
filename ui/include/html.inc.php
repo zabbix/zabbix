@@ -264,8 +264,6 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 	$db_host = reset($db_host);
 
 	if (!$is_template) {
-		$items_count = getEnabledItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, [$hostid]);
-
 		$interface_enabled_items_count = getEnabledItemsCountByInterfaceIds(
 			array_column($db_host['interfaces'], 'interfaceid')
 		);
@@ -278,7 +276,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		}
 		unset($interface);
 
-		if ($items_count) {
+		if (getEnabledItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, [$hostid])) {
 			// Add active checks interface if host have items with type ITEM_TYPE_ZABBIX_ACTIVE (7).
 			$db_host['interfaces'][] = [
 				'type' => INTERFACE_TYPE_AGENT_ACTIVE,
