@@ -42,7 +42,7 @@ class testPageProblems extends CWebTest {
 		];
 	}
 
-	public static $time;
+	protected static $time;
 
 	public function prepareProblemsData() {
 		/**
@@ -149,7 +149,7 @@ class testPageProblems extends CWebTest {
 				'description' => 'No operational data popup',
 				'expression' => 'last(/Host for Problems Page/trap1)<>"" and last(/Host for Problems Page/trapSQL)<>""',
 				'priority' => TRIGGER_SEVERITY_AVERAGE,
-				'opdata' => 'No popup'
+				'opdata' => 'No popup "],*,a[x=": "],*,a[x="/\|\'/æ㓴🍭🍭'
 			]
 		]);
 
@@ -167,31 +167,24 @@ class testPageProblems extends CWebTest {
 			],
 			'Host for Problems Page:trapXSS' => [['<script>alert("TEST");</script>'], self::$time],
 			'Host for Problems Page:trapSQL' => [['105\'; --DROP TABLE Users'], self::$time],
-			'Host for Problems Page:trap2'   => [['"],*,a[x=": "],*,a[x="/\|\'/æ㓴♥"'], self::$time]
+			'Host for Problems Page:trap2' => [['"],*,a[x=": "],*,a[x="/\|\'/æ㓴♥"'], self::$time]
 		];
 		foreach ($items_data as $item_name => $values) {
 			CDataHelper::addItemData($result['itemids'][$item_name], $values[0], $values[1]);
 		}
 
 		$trigger_data = [
-			'Trigger for Age problem'         => ['clock' => self::$time],
-			'Trigger for Age problem 1 day'   => ['clock' => self::$time - 86400],
+			'Trigger for Age problem' => ['clock' => self::$time],
+			'Trigger for Age problem 1 day' => ['clock' => self::$time - 86400],
 			'Trigger for Age problem 1 month' => ['clock' => self::$time - 2.628e+6],
-			'No operational data popup'       => ['clock' => self::$time]
+			'No operational data popup' => ['clock' => self::$time]
 		];
 		foreach ($trigger_data as $trigger_name => $clock) {
 			CDBHelper::setTriggerProblem($trigger_name, TRIGGER_VALUE_TRUE, $clock);
 		}
-		CDBHelper::setTriggerProblem(
-			[
-				'Symbols in Item metric',
-				'Filled opdata with macros',
-				'XSS code in Item metric',
-				'SQL Injection Item metric',
-				'Trigger for String problem',
-				'Two trigger expressions'
-			]
-		);
+		CDBHelper::setTriggerProblem(['Symbols in Item metric', 'Filled opdata with macros', 'XSS code in Item metric',
+				'SQL Injection Item metric', 'Trigger for String problem', 'Two trigger expressions'
+		]);
 
 		$dayid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Trigger for Age problem 1 day'));
 		$monthid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Trigger for Age problem 1 month'));
@@ -1861,7 +1854,7 @@ class testPageProblems extends CWebTest {
 					'popup rows' => [
 						[
 							'item' => 'SQL Injection',
-							'metric' =>  '105\'; --DROP TABLE Users',
+							'metric' => '105\'; --DROP TABLE Users',
 							'truncated' => '105\'; --DROP TABLE U...',
 							'button' => 'History',
 							'header' => 'Host for Problems Page: SQL Injection'
@@ -1912,17 +1905,16 @@ class testPageProblems extends CWebTest {
 			],
 			'Operational data with problem name, no popup' => [
 				[
-					'custom data' => 'No popup',
 					'filter' => [
-						'Problem' => 'No operational data popup',
-						'Show operational data' => 'Separately'
+						'Problem' => 'Two trigger expressions',
+						'Show operational data' => 'With problem name'
 					],
 					'popup rows' => []
 				]
 			],
 			'No popup in operaional data column' => [
 				[
-					'custom data' => 'No popup',
+					'custom data' => 'No popup "],*,a[x=": "],*,a[x="/\|\'/æ㓴🍭🍭',
 					'filter' => [
 						'Problem' => 'No operational data popup',
 						'Show operational data' => 'Separately'
