@@ -43,7 +43,7 @@ class CControllerUserCreate extends CControllerUserUpdateGeneral {
 		];
 
 		$ret = $this->validateInput($fields);
-		$result = $this->GetValidationResult();
+		$result = $this->getValidationResult();
 
 		if ($ret && (!$this->validatePassword() || !$this->validateUserRole())) {
 			$result = self::VALIDATION_ERROR;

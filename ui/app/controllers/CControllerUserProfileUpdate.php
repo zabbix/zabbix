@@ -44,7 +44,7 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 		];
 
 		$ret = $this->validateInput($fields);
-		$result = $this->GetValidationResult();
+		$result = $this->getValidationResult();
 
 		if ($ret && !$this->validateCurrentPassword()) {
 			$result = self::VALIDATION_ERROR;
