@@ -946,13 +946,25 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
-					ret = zbx_db_with_trigger_itemid(&c_event->trigger, &replace_to, N_functionid,
-							&zbx_db_get_item_value, ZBX_DB_REQUEST_PROXY_NAME);
+					uint64_t	itemid;
+
+					if (SUCCEED == (ret = zbx_db_trigger_get_itemid(&c_event->trigger,
+							N_functionid, &itemid)))
+					{
+						ret = expr_get_proxy_name_description(itemid,
+								ZBX_DB_REQUEST_PROXY_NAME, &replace_to);
+					}
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_DESCRIPTION))
 				{
-					ret = zbx_db_with_trigger_itemid(&c_event->trigger, &replace_to, N_functionid,
-							&zbx_db_get_item_value, ZBX_DB_REQUEST_PROXY_DESCRIPTION);
+					uint64_t	itemid;
+
+					if (SUCCEED == (ret = zbx_db_trigger_get_itemid(&c_event->trigger,
+							N_functionid, &itemid)))
+					{
+						ret = expr_get_proxy_name_description(itemid,
+								ZBX_DB_REQUEST_PROXY_DESCRIPTION, &replace_to);
+					}
 				}
 				else if (0 == indexed_macro && 0 == strcmp(m, MVAR_TIME))
 				{
@@ -1267,13 +1279,25 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
-					ret = zbx_db_with_trigger_itemid(&c_event->trigger, &replace_to, N_functionid,
-							&zbx_db_get_item_value, ZBX_DB_REQUEST_PROXY_NAME);
+					uint64_t	itemid;
+
+					if (SUCCEED == (ret = zbx_db_trigger_get_itemid(&c_event->trigger,
+							N_functionid, &itemid)))
+					{
+						ret = expr_get_proxy_name_description(itemid,
+								ZBX_DB_REQUEST_PROXY_NAME, &replace_to);
+					}
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_DESCRIPTION))
 				{
-					ret = zbx_db_with_trigger_itemid(&c_event->trigger, &replace_to, N_functionid,
-							&zbx_db_get_item_value, ZBX_DB_REQUEST_PROXY_DESCRIPTION);
+					uint64_t	itemid;
+
+					if (SUCCEED == (ret = zbx_db_trigger_get_itemid(&c_event->trigger,
+							N_functionid, &itemid)))
+					{
+						ret = expr_get_proxy_name_description(itemid,
+								ZBX_DB_REQUEST_PROXY_DESCRIPTION, &replace_to);
+					}
 				}
 				else if (0 == indexed_macro && 0 == strcmp(m, MVAR_TIME))
 				{
@@ -1794,13 +1818,13 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
-					ret = zbx_db_get_item_value(c_event->objectid, &replace_to,
-							ZBX_DB_REQUEST_PROXY_NAME);
+					ret = expr_get_proxy_name_description(c_event->objectid,
+							ZBX_DB_REQUEST_PROXY_NAME, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_DESCRIPTION))
 				{
-					ret = zbx_db_get_item_value(c_event->objectid, &replace_to,
-							ZBX_DB_REQUEST_PROXY_DESCRIPTION);
+					ret = expr_get_proxy_name_description(c_event->objectid,
+							ZBX_DB_REQUEST_PROXY_DESCRIPTION, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_TIME))
 				{
@@ -1957,13 +1981,13 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
-					ret = zbx_db_get_item_value(c_event->objectid, &replace_to,
-							ZBX_DB_REQUEST_PROXY_NAME);
+					ret = expr_get_proxy_name_description(c_event->objectid,
+							ZBX_DB_REQUEST_PROXY_NAME, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_DESCRIPTION))
 				{
-					ret = zbx_db_get_item_value(c_event->objectid, &replace_to,
-							ZBX_DB_REQUEST_PROXY_DESCRIPTION);
+					ret = expr_get_proxy_name_description(c_event->objectid,
+							ZBX_DB_REQUEST_PROXY_DESCRIPTION, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_TIME))
 				{
