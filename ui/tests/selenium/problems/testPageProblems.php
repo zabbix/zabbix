@@ -1966,7 +1966,7 @@ class testPageProblems extends CWebTest {
 
 			$row = $popup_table->getRow($i);
 			$row->assertValues([$popup_row['item'], date('Y-m-d H:i:s', self::$time),
-					$popup_row['metric'], $popup_row['button']]
+					CTestArrayHelper::get($popup_row, 'truncated', $popup_row['metric']), $popup_row['button']]
 			);
 
 			// Check correct graph or history link.
