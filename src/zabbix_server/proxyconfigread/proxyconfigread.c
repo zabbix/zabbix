@@ -361,7 +361,7 @@ static int	proxyconfig_get_settings_table_data(const zbx_dc_proxy_t *proxy, stru
 	const zbx_db_table_t		*table;
 	char				*sql = NULL;
 	size_t				sql_alloc =  4 * ZBX_KIBIBYTE, sql_offset = 0;
-	int				ret = FAIL, fld = 0;
+	int				ret = FAIL;
 	const char			*alias = "t.", *alias_from = " t";
 	zbx_dc_item_type_timeouts_t	timeouts;
 
@@ -402,17 +402,15 @@ static int	proxyconfig_get_settings_table_data(const zbx_dc_proxy_t *proxy, stru
 		{
 			if (0 == (table->fields[i].flags & ZBX_PROXY))
 				continue;
-			// TODO
-			if (0 == strncmp(table->fields[i].name, ZBX_PROTO_TAG_PROXY_SECRETS_PROVIDER,
-					ZBX_CONST_STRLEN(ZBX_PROTO_TAG_PROXY_SECRETS_PROVIDER)))
+
+			if (0 == strncmp(name, ZBX_PROTO_TAG_PROXY_SECRETS_PROVIDER,
+					ZBX_CONST_STRLEN(ZBX_PROTO_TAG_PROXY_SECRETS_PROVIDER)) &&
+					0 == strcmp(table->fields[i].name, "value_int"))
 			{
 				zbx_json_adduint64(j, NULL, proxy_secrets_provider);
-				fld++;
-				continue;
 			}
-
-			if (0 == strncmp(name, "timeout_", ZBX_CONST_STRLEN("timeout_")) &&
-				0 == strcmp(table->fields[i].name, "value_str"))
+			else if (0 == strncmp(name, "timeout_", ZBX_CONST_STRLEN("timeout_")) &&
+					0 == strcmp(table->fields[i].name, "value_str"))
 			{
 				char		*timeout_value;
 				const char	*item_type;
