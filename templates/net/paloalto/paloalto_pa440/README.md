@@ -39,52 +39,57 @@ Limited privileges user (no access to device certificate data):
 4. Enter the necessary details. Set the `Administrator Type` to `Role Based` and select the profile that was created in previous steps. Commit the changes.
 
 Set the host macros:
-1. Set the firewall XML API endpoint URL in the `{$PAN.API.URL}` macro in the format `<scheme>://<host>[:port]/api` (port is optional).
-2. Set the name of the user that you created in the `{$PAN.USER}` macro.
-3. Set the password of the user that you created in the `{$PAN.PASSWORD}` macro.
+1. Set the firewall XML API endpoint URL in the `{$PAN.PA440.API.URL}` macro in the format `<scheme>://<host>[:port]/api` (port is optional).
+2. Set the name of the user that you created in the `{$PAN.PA440.USER}` macro.
+3. Set the password of the user that you created in the `{$PAN.PA440.PASSWORD}` macro.
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$PAN.API.URL}|<p>The firewall XML API endpoint in the format "<scheme>://<host>[:port]/api" (port is optional).</p>||
-|{$PAN.HTTP_PROXY}|<p>The HTTP proxy for HTTP agent items (set if needed). If the macro is empty, then no proxy is used.</p>||
-|{$PAN.TIMEOUT}|<p>The timeout threshold for the HTTP items that retrieve data from API.</p>|`15s`|
-|{$PAN.USER}|<p>The name of the user that is used for monitoring.</p>|`zbx_monitor`|
-|{$PAN.PASSWORD}|<p>The password of the user that is used for monitoring.</p>||
-|{$PAN.HA.CONFIG_SYNC.THRESH}|<p>The threshold for configuration synchronization trigger. Can be set to evaluation period in seconds (time suffixes can be used) or evaluation range of latest collected values (if preceded by a hash mark).</p>|`#1`|
-|{$PAN.HA.STATE.IGNORE_USER_SUSPENDED}|<p>Controls whether the HA "suspended" state trigger should fire if the state is caused by the user request. "1" - ignored, "0" - not ignored.</p>|`1`|
-|{$PAN.IF.HW.IFNAME.MATCHES}|<p>The interface name regex filter to use in hardware interfaces discovery - for including.</p>|`.+`|
-|{$PAN.IF.HW.IFNAME.NOT_MATCHES}|<p>The interface name regex filter to use in hardware interfaces discovery - for excluding.</p>|`^(?:tunnel\|vlan\|loopback)$`|
-|{$PAN.IF.HW.CONTROL}|<p>The link status triggers will be fired only for hardware interfaces where the context macro equals "1".</p>|`1`|
-|{$PAN.IF.HW.ERRORS.WARN}|<p>The warning threshold of packet error rate for hardware interfaces. Can be used with hardware interface name as context.</p>|`2`|
-|{$PAN.IF.HW.UTIL.MAX}|<p>The threshold in the hardware interface utilization triggers.</p>|`90`|
-|{$PAN.IF.SW.IFNAME.MATCHES}|<p>The interface name regex filter to use in logical interfaces discovery - for including.</p>|`.+`|
-|{$PAN.IF.SW.IFNAME.NOT_MATCHES}|<p>The interface name regex filter to use in logical interfaces discovery - for excluding.</p>|`^(?:tunnel\|vlan\|loopback)$`|
-|{$PAN.IF.SW.IFZONE.MATCHES}|<p>The interface zone name regex filter to use in logical interfaces discovery - for including.</p>|`.+`|
-|{$PAN.IF.SW.IFZONE.NOT_MATCHES}|<p>The interface zone name regex filter to use in logical interfaces discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|
-|{$PAN.IF.SW.VSYS.MATCHES}|<p>The interface virtual system name regex filter to use in logical interfaces discovery - for including.</p>|`.+`|
-|{$PAN.IF.SW.VSYS.NOT_MATCHES}|<p>The interface virtual system name regex filter to use in logical interfaces discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|
-|{$PAN.IF.SW.ERRORS.WARN}|<p>The warning threshold of packet error rate for logical interfaces. Can be used with logical interface name as context.</p>|`2`|
-|{$PAN.BGP.PEER.NAME.MATCHES}|<p>The BGP peer name regex filter to use in BGP peers discovery - for including.</p>|`.+`|
-|{$PAN.BGP.PEER.NAME.NOT_MATCHES}|<p>The BGP peer name regex filter to use in BGP peers discovery - for including.</p>|`CHANGE_IF_NEEDED`|
-|{$PAN.BGP.PEER.GROUP.MATCHES}|<p>The BGP peer group regex filter to use in BGP peers discovery - for including.</p>|`.+`|
-|{$PAN.BGP.PEER.GROUP.NOT_MATCHES}|<p>The BGP peer group regex filter to use in BGP peers discovery - for including.</p>|`CHANGE_IF_NEEDED`|
-|{$PAN.BGP.CONTROL}|<p>The BGP session triggers will be fired only for peers where the context macro equals "1".</p>|`1`|
-|{$PAN.OSPF.NEIGHBOR.ADDR.MATCHES}|<p>The OSPF neighbor address regex filter to use in OSPF neighbors discovery - for including.</p>|`.+`|
-|{$PAN.OSPF.NEIGHBOR.ADDR.NOT_MATCHES}|<p>The OSPF neighbor address regex filter to use in OSPF neighbors discovery - for including.</p>|`CHANGE_IF_NEEDED`|
-|{$PAN.OSPF.NEIGHBOR.AREA.MATCHES}|<p>The OSPF neighbor area regex filter to use in OSPF neighbors discovery - for including.</p>|`.+`|
-|{$PAN.OSPF.NEIGHBOR.AREA.NOT_MATCHES}|<p>The OSPF neighbor area regex filter to use in OSPF neighbors discovery - for including.</p>|`CHANGE_IF_NEEDED`|
-|{$PAN.OSPF.CONTROL}|<p>The OSPF neighbor triggers will be fired only for neighbors where the context macro equals "1".</p>|`1`|
-|{$PAN.LICENSE.FEATURE.MATCHES}|<p>The license feature name regex filter to use in licenses discovery - for including.</p>|`.+`|
-|{$PAN.LICENSE.FEATURE.NOT_MATCHES}|<p>The license feature name regex filter to use in licenses discovery - for including.</p>|`CHANGE_IF_NEEDED`|
-|{$PAN.LICENSE.DESC.MATCHES}|<p>The license feature description regex filter to use in licenses discovery - for including.</p>|`.+`|
-|{$PAN.LICENSE.DESC.NOT_MATCHES}|<p>The license feature description regex filter to use in licenses discovery - for including.</p>|`CHANGE_IF_NEEDED`|
-|{$PAN.LICENSE.EXPIRY.WARN}|<p>The time threshold until the license expires used in the licenses expiry trigger. Can be set to evaluation period in seconds (time suffixes can be used). Can be used with license feature name as context.</p>|`7d`|
-|{$PAN.CERT.DEVICE.EXPIRY.WARN}|<p>The time threshold until the device certificate expires used in the device certificate expiry trigger. Can be set to evaluation period in seconds (time suffixes can be used).</p>|`7d`|
-|{$PAN.CERT.NAME.MATCHES}|<p>The certificate name regex filter to use in certificates discovery - for including.</p>|`.+`|
-|{$PAN.CERT.NAME.NOT_MATCHES}|<p>The certificate name regex filter to use in certificates discovery - for including.</p>|`CHANGE_IF_NEEDED`|
-|{$PAN.CERT.EXPIRY.WARN}|<p>The time threshold until the certificate expires used in the certificate expiry trigger. Can be set to evaluation period in seconds (time suffixes can be used). Can be used with certificate name as context.</p>|`7d`|
+|{$PAN.PA440.API.URL}|<p>The firewall XML API endpoint in the format "<scheme>://<host>[:port]/api" (port is optional).</p>||
+|{$PAN.PA440.HTTP_PROXY}|<p>The HTTP proxy for HTTP agent items (set if needed). If the macro is empty, then no proxy is used.</p>||
+|{$PAN.PA440.TIMEOUT}|<p>The timeout threshold for the HTTP items that retrieve data from API.</p>|`15s`|
+|{$PAN.PA440.USER}|<p>The name of the user that is used for monitoring.</p>|`zbx_monitor`|
+|{$PAN.PA440.PASSWORD}|<p>The password of the user that is used for monitoring.</p>||
+|{$PAN.PA440.HA.CONFIG_SYNC.THRESH}|<p>The threshold for configuration synchronization trigger. Can be set to evaluation period in seconds (time suffixes can be used) or evaluation range of latest collected values (if preceded by a hash mark).</p>|`#1`|
+|{$PAN.PA440.HA.STATE.IGNORE_USER_SUSPENDED}|<p>Controls whether the HA "suspended" state trigger should fire if the state is caused by the user request. "1" - ignored, "0" - not ignored.</p>|`1`|
+|{$PAN.PA440.IF.HW.IFNAME.MATCHES}|<p>The interface name regex filter to use in hardware interfaces discovery - for including.</p>|`.+`|
+|{$PAN.PA440.IF.HW.IFNAME.NOT_MATCHES}|<p>The interface name regex filter to use in hardware interfaces discovery - for excluding.</p>|`^(?:tunnel\|vlan\|loopback)$`|
+|{$PAN.PA440.IF.HW.CONTROL}|<p>The link status triggers will be fired only for hardware interfaces where the context macro equals "1".</p>|`1`|
+|{$PAN.PA440.IF.HW.ERRORS.WARN}|<p>The warning threshold of packet error rate for hardware interfaces. Can be used with hardware interface name as context.</p>|`2`|
+|{$PAN.PA440.IF.HW.UTIL.MAX}|<p>The threshold in the hardware interface utilization triggers.</p>|`90`|
+|{$PAN.PA440.IF.SW.IFNAME.MATCHES}|<p>The interface name regex filter to use in logical interfaces discovery - for including.</p>|`.+`|
+|{$PAN.PA440.IF.SW.IFNAME.NOT_MATCHES}|<p>The interface name regex filter to use in logical interfaces discovery - for excluding.</p>|`^(?:tunnel\|vlan\|loopback)$`|
+|{$PAN.PA440.IF.SW.IFZONE.MATCHES}|<p>The interface zone name regex filter to use in logical interfaces discovery - for including.</p>|`.+`|
+|{$PAN.PA440.IF.SW.IFZONE.NOT_MATCHES}|<p>The interface zone name regex filter to use in logical interfaces discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|
+|{$PAN.PA440.IF.SW.VSYS.MATCHES}|<p>The interface virtual system name regex filter to use in logical interfaces discovery - for including.</p>|`.+`|
+|{$PAN.PA440.IF.SW.VSYS.NOT_MATCHES}|<p>The interface virtual system name regex filter to use in logical interfaces discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|
+|{$PAN.PA440.IF.SW.ERRORS.WARN}|<p>The warning threshold of packet error rate for logical interfaces. Can be used with logical interface name as context.</p>|`2`|
+|{$PAN.PA440.BGP.PEER.NAME.MATCHES}|<p>The BGP peer name regex filter to use in BGP peers discovery - for including.</p>|`.+`|
+|{$PAN.PA440.BGP.PEER.NAME.NOT_MATCHES}|<p>The BGP peer name regex filter to use in BGP peers discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|
+|{$PAN.PA440.BGP.PEER.GROUP.MATCHES}|<p>The BGP peer group regex filter to use in BGP peers discovery - for including.</p>|`.+`|
+|{$PAN.PA440.BGP.PEER.GROUP.NOT_MATCHES}|<p>The BGP peer group regex filter to use in BGP peers discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|
+|{$PAN.PA440.BGP.CONTROL}|<p>The BGP session triggers will be fired only for peers where the context macro equals "1".</p>|`1`|
+|{$PAN.PA440.OSPF.NEIGHBOR.ADDR.MATCHES}|<p>The OSPF neighbor address regex filter to use in OSPF neighbors discovery - for including.</p>|`.+`|
+|{$PAN.PA440.OSPF.NEIGHBOR.ADDR.NOT_MATCHES}|<p>The OSPF neighbor address regex filter to use in OSPF neighbors discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|
+|{$PAN.PA440.OSPF.NEIGHBOR.AREA.MATCHES}|<p>The OSPF neighbor area regex filter to use in OSPF neighbors discovery - for including.</p>|`.+`|
+|{$PAN.PA440.OSPF.NEIGHBOR.AREA.NOT_MATCHES}|<p>The OSPF neighbor area regex filter to use in OSPF neighbors discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|
+|{$PAN.PA440.OSPF.CONTROL}|<p>The OSPF neighbor triggers will be fired only for neighbors where the context macro equals "1".</p>|`1`|
+|{$PAN.PA440.OSPFV3.NEIGHBOR.ADDR.MATCHES}|<p>The OSPFv3 neighbor address regex filter to use in OSPFv3 neighbors discovery - for including.</p>|`.+`|
+|{$PAN.PA440.OSPFV3.NEIGHBOR.ADDR.NOT_MATCHES}|<p>The OSPFv3 neighbor address regex filter to use in OSPFv3 neighbors discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|
+|{$PAN.PA440.OSPFV3.NEIGHBOR.AREA.MATCHES}|<p>The OSPFv3 neighbor area regex filter to use in OSPFv3 neighbors discovery - for including.</p>|`.+`|
+|{$PAN.PA440.OSPFV3.NEIGHBOR.AREA.NOT_MATCHES}|<p>The OSPFv3 neighbor area regex filter to use in OSPFv3 neighbors discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|
+|{$PAN.PA440.OSPFV3.CONTROL}|<p>The OSPFv3 neighbor triggers will be fired only for neighbors where the context macro equals "1".</p>|`1`|
+|{$PAN.PA440.LICENSE.FEATURE.MATCHES}|<p>The license feature name regex filter to use in licenses discovery - for including.</p>|`.+`|
+|{$PAN.PA440.LICENSE.FEATURE.NOT_MATCHES}|<p>The license feature name regex filter to use in licenses discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|
+|{$PAN.PA440.LICENSE.DESC.MATCHES}|<p>The license feature description regex filter to use in licenses discovery - for including.</p>|`.+`|
+|{$PAN.PA440.LICENSE.DESC.NOT_MATCHES}|<p>The license feature description regex filter to use in licenses discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|
+|{$PAN.PA440.LICENSE.EXPIRY.WARN}|<p>The time threshold until the license expires used in the licenses expiry trigger. Can be set to evaluation period in seconds (time suffixes can be used). Can be used with license feature name as context.</p>|`7d`|
+|{$PAN.PA440.CERT.DEVICE.EXPIRY.WARN}|<p>The time threshold until the device certificate expires used in the device certificate expiry trigger. Can be set to evaluation period in seconds (time suffixes can be used).</p>|`7d`|
+|{$PAN.PA440.CERT.NAME.MATCHES}|<p>The certificate name regex filter to use in certificates discovery - for including.</p>|`.+`|
+|{$PAN.PA440.CERT.NAME.NOT_MATCHES}|<p>The certificate name regex filter to use in certificates discovery - for excluding.</p>|`CHANGE_IF_NEEDED`|
+|{$PAN.PA440.CERT.EXPIRY.WARN}|<p>The time threshold until the certificate expires used in the certificate expiry trigger. Can be set to evaluation period in seconds (time suffixes can be used). Can be used with certificate name as context.</p>|`7d`|
 
 ### Items
 
@@ -96,6 +101,7 @@ Set the host macros:
 |Get system environmentals|<p>Get the system environment state information.</p>|HTTP agent|pan.pa440.environmentals.get<p>**Preprocessing**</p><ul><li>XML to JSON</li></ul>|
 |Get HA info|<p>Get the high availability information.</p>|HTTP agent|pan.pa440.ha.get<p>**Preprocessing**</p><ul><li>XML to JSON</li></ul>|
 |Get OSPF neighbors|<p>Get the OSPF neighbors information.</p>|HTTP agent|pan.pa440.ospf.neighbors.get<p>**Preprocessing**</p><ul><li>XML to JSON</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Get OSPFv3 neighbors|<p>Get the OSPFv3 neighbors information.</p>|HTTP agent|pan.pa440.ospfv3.neighbors.get<p>**Preprocessing**</p><ul><li>XML to JSON</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Get licenses|<p>Get the information about installed licenses.</p>|HTTP agent|pan.pa440.licenses.get<p>**Preprocessing**</p><ul><li>XML to JSON</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Get device certificate|<p>Get the information about device certificate. Note that superuser privileges are required to obtain the device certificate data.</p>|HTTP agent|pan.pa440.certificate.device.get<p>**Preprocessing**</p><ul><li>XML to JSON</li></ul>|
 |Get certificates|<p>Get the information about certificates on device.</p>|HTTP agent|pan.pa440.certificate.get<p>**Preprocessing**</p><ul><li>XML to JSON</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
@@ -105,6 +111,7 @@ Set the host macros:
 |Get system environmentals check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|pan.pa440.environmentals.get.check<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Get HA info check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|pan.pa440.ha.get.check<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Get OSPF neighbors check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|pan.pa440.ospf.neighbors.get.check<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Get OSPFv3 neighbors check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|pan.pa440.ospfv3.neighbors.get.check<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Get licenses check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|pan.pa440.licenses.get.check<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Get device certificate check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|pan.pa440.certificate.device.get.check<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Get certificates check|<p>Data collection check. Check the latest values for details.</p>|Dependent item|pan.pa440.certificate.get.check<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
@@ -137,6 +144,7 @@ Set the host macros:
 |PA-440: Failed to get environmentals data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Palo Alto PA-440 by HTTP/pan.pa440.environmentals.get.check))>0`|High||
 |PA-440: Failed to get HA data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Palo Alto PA-440 by HTTP/pan.pa440.ha.get.check))>0`|High||
 |PA-440: Failed to get OSPF neighbors data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Palo Alto PA-440 by HTTP/pan.pa440.ospf.neighbors.get.check))>0`|High||
+|PA-440: Failed to get OSPFv3 neighbors data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Palo Alto PA-440 by HTTP/pan.pa440.ospfv3.neighbors.get.check))>0`|High||
 |PA-440: Failed to get licenses data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Palo Alto PA-440 by HTTP/pan.pa440.licenses.get.check))>0`|High||
 |PA-440: Failed to get device certificate data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Palo Alto PA-440 by HTTP/pan.pa440.certificate.device.get.check))>0`|High||
 |PA-440: Failed to get certificates data from the API|<p>Failed to get data from the API. Check the latest values for details.</p>|`length(last(/Palo Alto PA-440 by HTTP/pan.pa440.certificate.get.check))>0`|High||
@@ -164,8 +172,8 @@ Set the host macros:
 |PA-440: HA state has been changed|<p>The high availability state has changed. The following state transitions are checked:<br><br>1. Active-Passive HA mode:<br>- "passive" -> "active"<br>- "active" -> "passive"<br><br>2. Active-Active HA mode:<br>- "active-secondary" -> "active-primary"<br>- "active-primary" -> "active-secondary"<br><br>Information about high availability states:<br>https://docs.paloaltonetworks.com/pan-os/11-1/pan-os-admin/high-availability/ha-firewall-states</p>|`(last(/Palo Alto PA-440 by HTTP/pan.pa440.ha.local[state{#SINGLETON}])=1 and last(/Palo Alto PA-440 by HTTP/pan.pa440.ha.local[state{#SINGLETON}],#2)=2) or (last(/Palo Alto PA-440 by HTTP/pan.pa440.ha.local[state{#SINGLETON}])=2 and last(/Palo Alto PA-440 by HTTP/pan.pa440.ha.local[state{#SINGLETON}],#2)=1) or (last(/Palo Alto PA-440 by HTTP/pan.pa440.ha.local[state{#SINGLETON}])=3 and last(/Palo Alto PA-440 by HTTP/pan.pa440.ha.local[state{#SINGLETON}],#2)=4) or (last(/Palo Alto PA-440 by HTTP/pan.pa440.ha.local[state{#SINGLETON}])=4 and last(/Palo Alto PA-440 by HTTP/pan.pa440.ha.local[state{#SINGLETON}],#2)=3)`|High||
 |PA-440: HA is in "non-functional" state|<p>Error state due to a dataplane failure or a configuration mismatch, such as only one firewall configured for packet forwarding, VR sync or QoS sync.<br><br>In active/passive mode, all of the causes listed for Tentative state cause non-functional state:<br>- Failure of a firewall.<br>- Failure of a monitored object (a link or path).<br>- The firewall leaves suspended or non-functional state.<br><br>Information about high availability states:<br>https://docs.paloaltonetworks.com/pan-os/11-1/pan-os-admin/high-availability/ha-firewall-states</p>|`last(/Palo Alto PA-440 by HTTP/pan.pa440.ha.local[state{#SINGLETON}])=6 and length(last(/Palo Alto PA-440 by HTTP/pan.pa440.ha.local[state_reason{#SINGLETON}]))>0`|High||
 |PA-440: HA is in "tentative" state|<p>State of a firewall (in an active/active configuration) caused by one of the following:<br>- Failure of a firewall.<br>- Failure of a monitored object (a link or path).<br>- The firewall leaves suspended or non-functional state.<br><br>A firewall in tentative state synchronizes sessions and configurations from the peer.<br><br>Information about high availability states:<br>https://docs.paloaltonetworks.com/pan-os/11-1/pan-os-admin/high-availability/ha-firewall-states</p>|`last(/Palo Alto PA-440 by HTTP/pan.pa440.ha.local[state{#SINGLETON}])=5 and length(last(/Palo Alto PA-440 by HTTP/pan.pa440.ha.local[state_reason{#SINGLETON}]))>0`|Average||
-|PA-440: HA is in "suspended" state|<p>The device is disabled so won't pass data traffic and although HA communications still occur, the device doesn't participate in the HA election process. It can't move to an HA functional state without user intervention.<br><br>The following case is excluded from trigger's logic by default (can be changed by setting the "{$PAN.HA.STATE.IGNORE_USER_SUSPENDED}" macro value to 0): the user suspends the device for HA manually.<br><br>Information about high availability states:<br>https://docs.paloaltonetworks.com/pan-os/11-1/pan-os-admin/high-availability/ha-firewall-states</p>|`last(/Palo Alto PA-440 by HTTP/pan.pa440.ha.local[state{#SINGLETON}])=7 and not (find(/Palo Alto PA-440 by HTTP/pan.pa440.ha.local[state_reason{#SINGLETON}],,"iregexp","^User requested$")=1 and {$PAN.HA.STATE.IGNORE_USER_SUSPENDED}=1)`|Average||
-|PA-440: Configuration is not synchronized with HA peer|<p>This trigger indicates that the configuration cannot be synchronized with the HA peer. Please debug this manually by checking the logs (Monitor -> Logs -> System).</p>|`count(/Palo Alto PA-440 by HTTP/pan.pa440.ha[config_sync_status{#SINGLETON}],{$PAN.HA.CONFIG_SYNC.THRESH},"iregexp","^(?:synchronized\|synchronization in progress)$")=0`|High||
+|PA-440: HA is in "suspended" state|<p>The device is disabled so won't pass data traffic and although HA communications still occur, the device doesn't participate in the HA election process. It can't move to an HA functional state without user intervention.<br><br>The following case is excluded from trigger's logic by default (can be changed by setting the "{$PAN.PA440.HA.STATE.IGNORE_USER_SUSPENDED}" macro value to 0): the user suspends the device for HA manually.<br><br>Information about high availability states:<br>https://docs.paloaltonetworks.com/pan-os/11-1/pan-os-admin/high-availability/ha-firewall-states</p>|`last(/Palo Alto PA-440 by HTTP/pan.pa440.ha.local[state{#SINGLETON}])=7 and not (find(/Palo Alto PA-440 by HTTP/pan.pa440.ha.local[state_reason{#SINGLETON}],,"iregexp","^User requested$")=1 and {$PAN.PA440.HA.STATE.IGNORE_USER_SUSPENDED}=1)`|Average||
+|PA-440: Configuration is not synchronized with HA peer|<p>This trigger indicates that the configuration cannot be synchronized with the HA peer. Please debug this manually by checking the logs (Monitor -> Logs -> System).</p>|`count(/Palo Alto PA-440 by HTTP/pan.pa440.ha[config_sync_status{#SINGLETON}],{$PAN.PA440.HA.CONFIG_SYNC.THRESH},"iregexp","^(?:synchronized\|synchronization in progress)$")=0`|High||
 
 ### LLD rule HA links discovery
 
@@ -198,19 +206,19 @@ Set the host macros:
 |Interface [{#IFNAME}]: Get data|<p>Get the interface statistics.</p>|HTTP agent|pan.pa440.if.hw.get[{#IFNAME}]<p>**Preprocessing**</p><ul><li>XML to JSON</li></ul>|
 |Interface [{#IFNAME}]: Status|<p>The current state of the interface.</p>|Dependent item|pan.pa440.if.hw.status[{#IFNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.response.result.hw.state`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Interface [{#IFNAME}]: Speed|<p>The current bandwidth of the interface. The item is created only for interfaces that report actual speed in units of 1,000,000 bits.</p>|Dependent item|pan.pa440.if.hw.speed[{#IFNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.response.result.hw.speed`</p></li><li><p>Custom multiplier: `1000000`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Interface [{#IFNAME}]: Bits received|<p>The number of bits received by the interface.</p>|Dependent item|pan.pa440.if.hw.bits.in[{#IFNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.response.result.ifnet.counters.hw.entry.port['rx-bytes']`</p></li><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
-|Interface [{#IFNAME}]: Bits sent|<p>The number of bits sent by the interface.</p>|Dependent item|pan.pa440.if.hw.bits.out[{#IFNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.response.result.ifnet.counters.hw.entry.port['tx-bytes']`</p></li><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
-|Interface [{#IFNAME}]: Inbound packets discarded|<p>The number of inbound packets which were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.</p>|Dependent item|pan.pa440.if.hw.packets.in.discards[{#IFNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
-|Interface [{#IFNAME}]: Inbound packets with errors|<p>The number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.</p>|Dependent item|pan.pa440.if.hw.packets.in.errors[{#IFNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.response.result.ifnet.counters.hw.entry.port['rx-error']`</p></li><li>Change per second</li></ul>|
-|Interface [{#IFNAME}]: Outbound packets with errors|<p>The number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.</p>|Dependent item|pan.pa440.if.hw.packets.out.errors[{#IFNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.response.result.ifnet.counters.hw.entry.port['tx-error']`</p></li><li>Change per second</li></ul>|
+|Interface [{#IFNAME}]: Bits received, per second|<p>The number of bits received per second by the interface.</p>|Dependent item|pan.pa440.if.hw.bits.in.rate[{#IFNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.response.result.ifnet.counters.hw.entry.port['rx-bytes']`</p></li><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
+|Interface [{#IFNAME}]: Bits sent, per second|<p>The number of bits sent per second by the interface.</p>|Dependent item|pan.pa440.if.hw.bits.out.rate[{#IFNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.response.result.ifnet.counters.hw.entry.port['tx-bytes']`</p></li><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
+|Interface [{#IFNAME}]: Inbound packets discarded, per second|<p>The number of inbound packets per second which were chosen to be discarded even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.</p>|Dependent item|pan.pa440.if.hw.packets.in.discards.rate[{#IFNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
+|Interface [{#IFNAME}]: Inbound packets with errors, per second|<p>The number of inbound packets per second that contained errors preventing them from being deliverable to a higher-layer protocol.</p>|Dependent item|pan.pa440.if.hw.packets.in.errors.rate[{#IFNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.response.result.ifnet.counters.hw.entry.port['rx-error']`</p></li><li>Change per second</li></ul>|
+|Interface [{#IFNAME}]: Outbound packets with errors, per second|<p>The number of outbound packets per second that contained errors preventing them from being deliverable to a higher-layer protocol.</p>|Dependent item|pan.pa440.if.hw.packets.out.errors.rate[{#IFNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.response.result.ifnet.counters.hw.entry.port['tx-error']`</p></li><li>Change per second</li></ul>|
 
 ### Trigger prototypes for Hardware network interfaces discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|PA-440: Interface [{#IFNAME}]: Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operational status is down.<br>2. `{$PAN.IF.HW.CONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.<br>3. `last(/TEMPLATE_NAME/METRIC)<>last(/TEMPLATE_NAME/METRIC,#2)` - the trigger fires only if the operational status has changed to "down" from some other state (so, does not fire for "eternal off" interfaces).<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of `last(/TEMPLATE_NAME/METRIC)<>last(/TEMPLATE_NAME/METRIC,#2)`.</p>|`{$PAN.IF.HW.CONTROL:"{#IFNAME}"}=1 and last(/Palo Alto PA-440 by HTTP/pan.pa440.if.hw.status[{#IFNAME}])="down" and (last(/Palo Alto PA-440 by HTTP/pan.pa440.if.hw.status[{#IFNAME}])<>last(/Palo Alto PA-440 by HTTP/pan.pa440.if.hw.status[{#IFNAME}],#2))`|Average|**Manual close**: Yes|
-|PA-440: Interface [{#IFNAME}]: High bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/Palo Alto PA-440 by HTTP/pan.pa440.if.hw.bits.in[{#IFNAME}],15m)>({$PAN.IF.HW.UTIL.MAX:"{#IFNAME}"}/100)*last(/Palo Alto PA-440 by HTTP/pan.pa440.if.hw.speed[{#IFNAME}]) or avg(/Palo Alto PA-440 by HTTP/pan.pa440.if.hw.bits.out[{#IFNAME}],15m)>({$PAN.IF.HW.UTIL.MAX:"{#IFNAME}"}/100)*last(/Palo Alto PA-440 by HTTP/pan.pa440.if.hw.speed[{#IFNAME}])) and last(/Palo Alto PA-440 by HTTP/pan.pa440.if.hw.speed[{#IFNAME}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>PA-440: Interface [{#IFNAME}]: Link down</li></ul>|
-|PA-440: Interface [{#IFNAME}]: High error rate|<p>It recovers when it is below 80% of the `{$PAN.IF.HW.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/Palo Alto PA-440 by HTTP/pan.pa440.if.hw.packets.in.errors[{#IFNAME}],5m)>{$PAN.IF.HW.ERRORS.WARN:"{#IFNAME}"} or min(/Palo Alto PA-440 by HTTP/pan.pa440.if.hw.packets.out.errors[{#IFNAME}],5m)>{$PAN.IF.HW.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>PA-440: Interface [{#IFNAME}]: Link down</li></ul>|
+|PA-440: Interface [{#IFNAME}]: Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operational status is down.<br>2. `{$PAN.PA440.IF.HW.CONTROL:"{#IFNAME}"}=1` - a user can redefine the context macro to "0", marking this interface as not important. No new trigger will be fired if this interface is down.<br>3. `last(/TEMPLATE_NAME/METRIC)<>last(/TEMPLATE_NAME/METRIC,#2)` - the trigger fires only if the operational status has changed to "down" from some other state (so, does not fire for "eternal off" interfaces).<br><br>WARNING: if closed manually - it will not fire again on the next poll, because of `last(/TEMPLATE_NAME/METRIC)<>last(/TEMPLATE_NAME/METRIC,#2)`.</p>|`{$PAN.PA440.IF.HW.CONTROL:"{#IFNAME}"}=1 and last(/Palo Alto PA-440 by HTTP/pan.pa440.if.hw.status[{#IFNAME}])="down" and (last(/Palo Alto PA-440 by HTTP/pan.pa440.if.hw.status[{#IFNAME}])<>last(/Palo Alto PA-440 by HTTP/pan.pa440.if.hw.status[{#IFNAME}],#2))`|Average|**Manual close**: Yes|
+|PA-440: Interface [{#IFNAME}]: High bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/Palo Alto PA-440 by HTTP/pan.pa440.if.hw.bits.in.rate[{#IFNAME}],15m)>({$PAN.PA440.IF.HW.UTIL.MAX:"{#IFNAME}"}/100)*last(/Palo Alto PA-440 by HTTP/pan.pa440.if.hw.speed[{#IFNAME}]) or avg(/Palo Alto PA-440 by HTTP/pan.pa440.if.hw.bits.out.rate[{#IFNAME}],15m)>({$PAN.PA440.IF.HW.UTIL.MAX:"{#IFNAME}"}/100)*last(/Palo Alto PA-440 by HTTP/pan.pa440.if.hw.speed[{#IFNAME}])) and last(/Palo Alto PA-440 by HTTP/pan.pa440.if.hw.speed[{#IFNAME}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>PA-440: Interface [{#IFNAME}]: Link down</li></ul>|
+|PA-440: Interface [{#IFNAME}]: High error rate|<p>It recovers when it is below 80% of the `{$PAN.PA440.IF.HW.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/Palo Alto PA-440 by HTTP/pan.pa440.if.hw.packets.in.errors.rate[{#IFNAME}],5m)>{$PAN.PA440.IF.HW.ERRORS.WARN:"{#IFNAME}"} or min(/Palo Alto PA-440 by HTTP/pan.pa440.if.hw.packets.out.errors.rate[{#IFNAME}],5m)>{$PAN.PA440.IF.HW.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>PA-440: Interface [{#IFNAME}]: Link down</li></ul>|
 
 ### LLD rule Logical network interfaces discovery
 
@@ -223,16 +231,16 @@ Set the host macros:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |VSYS [{#VSYS}]: Interface [{#IFNAME}]: Get data|<p>Get the interface statistics.</p>|HTTP agent|pan.pa440.if.sw.get[{#VSYS}, {#IFNAME}]<p>**Preprocessing**</p><ul><li>XML to JSON</li></ul>|
-|VSYS [{#VSYS}]: Interface [{#IFNAME}]: Bits received|<p>The number of bits received by the interface.</p>|Dependent item|pan.pa440.if.sw.bits.in[{#VSYS}, {#IFNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.response.result.ifnet.counters.ifnet.entry.ibytes`</p></li><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
-|VSYS [{#VSYS}]: Interface [{#IFNAME}]: Bits sent|<p>The number of bits sent by the interface.</p>|Dependent item|pan.pa440.if.sw.bits.out[{#VSYS}, {#IFNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.response.result.ifnet.counters.ifnet.entry.obytes`</p></li><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
-|VSYS [{#VSYS}]: Interface [{#IFNAME}]: Inbound packets dropped|<p>The number of inbound packets which were chosen to be dropped even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.</p>|Dependent item|pan.pa440.if.sw.packets.in.drops[{#VSYS}, {#IFNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.response.result.ifnet.counters.ifnet.entry.idrops`</p></li><li>Change per second</li></ul>|
-|VSYS [{#VSYS}]: Interface [{#IFNAME}]: Inbound packets with errors|<p>The number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.</p>|Dependent item|pan.pa440.if.sw.packets.in.errors[{#VSYS}, {#IFNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.response.result.ifnet.counters.ifnet.entry.ierrors`</p></li><li>Change per second</li></ul>|
+|VSYS [{#VSYS}]: Interface [{#IFNAME}]: Bits received, per second|<p>The number of bits received per second by the interface.</p>|Dependent item|pan.pa440.if.sw.bits.in.rate[{#VSYS}, {#IFNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.response.result.ifnet.counters.ifnet.entry.ibytes`</p></li><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
+|VSYS [{#VSYS}]: Interface [{#IFNAME}]: Bits sent, per second|<p>The number of bits sent by the interface.</p>|Dependent item|pan.pa440.if.sw.bits.out.rate[{#VSYS}, {#IFNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.response.result.ifnet.counters.ifnet.entry.obytes`</p></li><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
+|VSYS [{#VSYS}]: Interface [{#IFNAME}]: Inbound packets dropped, per second|<p>The number of inbound packets per second which were chosen to be dropped even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.</p>|Dependent item|pan.pa440.if.sw.packets.in.drops.rate[{#VSYS}, {#IFNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.response.result.ifnet.counters.ifnet.entry.idrops`</p></li><li>Change per second</li></ul>|
+|VSYS [{#VSYS}]: Interface [{#IFNAME}]: Inbound packets with errors, per second|<p>The number of inbound packets per second that contained errors preventing them from being deliverable to a higher-layer protocol.</p>|Dependent item|pan.pa440.if.sw.packets.in.errors.rate[{#VSYS}, {#IFNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.response.result.ifnet.counters.ifnet.entry.ierrors`</p></li><li>Change per second</li></ul>|
 
 ### Trigger prototypes for Logical network interfaces discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|PA-440: VSYS [{#VSYS}]: Interface [{#IFNAME}]: High error rate|<p>It recovers when it is below 80% of the `{$PAN.IF.SW.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/Palo Alto PA-440 by HTTP/pan.pa440.if.sw.packets.in.errors[{#VSYS}, {#IFNAME}],5m)>{$PAN.IF.SW.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes|
+|PA-440: VSYS [{#VSYS}]: Interface [{#IFNAME}]: High error rate|<p>It recovers when it is below 80% of the `{$PAN.PA440.IF.SW.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/Palo Alto PA-440 by HTTP/pan.pa440.if.sw.packets.in.errors.rate[{#VSYS}, {#IFNAME}],5m)>{$PAN.PA440.IF.SW.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes|
 
 ### LLD rule BGP peers discovery
 
@@ -245,15 +253,15 @@ Set the host macros:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |BGP peer [{#PEER}]: Get data|<p>Get the information about peer.</p>|HTTP agent|pan.pa440.bgp.peer.get[{#PEERGROUP}, {#PEERADDR}, {#PEER}]<p>**Preprocessing**</p><ul><li>XML to JSON</li></ul>|
-|BGP peer [{#PEER}]: Status|<p>The current state of BGP peer.</p>|Dependent item|pan.pa440.bgp.peer.status[{#PEERGROUP}, {#PEERADDR}, {#PEER}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.response.result.entry.status`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|BGP peer [{#PEER}]: Status|<p>The current state of BGP peer.</p>|Dependent item|pan.pa440.bgp.peer.status[{#PEERGROUP}, {#PEERADDR}, {#PEER}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.response.result.entry.status`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |BGP peer [{#PEER}]: Status duration|<p>The duration of the current state of BGP peer.</p>|Dependent item|pan.pa440.bgp.peer.status.duration[{#PEERGROUP}, {#PEERADDR}, {#PEER}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.response.result.entry['status-duration']`</p></li></ul>|
 
 ### Trigger prototypes for BGP peers discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|PA-440: BGP peer [{#PEER}]: Session is not Established or Idle|<p>The session with the peer is not "Established" or "Idle".</p>|`{$PAN.BGP.CONTROL:"{#PEER}"}=1 and last(/Palo Alto PA-440 by HTTP/pan.pa440.bgp.peer.status[{#PEERGROUP}, {#PEERADDR}, {#PEER}])<>"Established" and last(/Palo Alto PA-440 by HTTP/pan.pa440.bgp.peer.status[{#PEERGROUP}, {#PEERADDR}, {#PEER}])<>"Idle"`|High||
-|PA-440: BGP peer [{#PEER}]: Session status duration has been reset|<p>The duration of the session status with the peer has been reset.</p>|`{$PAN.BGP.CONTROL:"{#PEER}"}=1 and last(/Palo Alto PA-440 by HTTP/pan.pa440.bgp.peer.status.duration[{#PEERGROUP}, {#PEERADDR}, {#PEER}])<10m`|Average||
+|PA-440: BGP peer [{#PEER}]: Session is not Established or Idle|<p>The session with the peer is not "Established" or "Idle".</p>|`{$PAN.PA440.BGP.CONTROL:"{#PEER}"}=1 and last(/Palo Alto PA-440 by HTTP/pan.pa440.bgp.peer.status[{#PEERGROUP}, {#PEERADDR}, {#PEER}])<>5 and last(/Palo Alto PA-440 by HTTP/pan.pa440.bgp.peer.status[{#PEERGROUP}, {#PEERADDR}, {#PEER}])<>0`|High||
+|PA-440: BGP peer [{#PEER}]: Session status duration has been reset|<p>The duration of the session status with the peer has been reset.</p>|`{$PAN.PA440.BGP.CONTROL:"{#PEER}"}=1 and last(/Palo Alto PA-440 by HTTP/pan.pa440.bgp.peer.status.duration[{#PEERGROUP}, {#PEERADDR}, {#PEER}])<10m`|Average||
 
 ### LLD rule OSPF neighbors discovery
 
@@ -271,8 +279,27 @@ Set the host macros:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|PA-440: OSPF neighbor [{#NEIGHBORADDR}]: Neighbor is not found anymore|<p>The neighbor is not found anymore and thus the neighborship is gone. Please investigate if this is planned.</p>|`{$PAN.OSPF.CONTROL:"{#PEER}"}=1 and nodata(/Palo Alto PA-440 by HTTP/pan.pa440.ospf.neighbor.status[{#NEIGHBORAREA}, {#NEIGHBORADDR}],5m)=1`|High||
-|PA-440: OSPF neighbor [{#NEIGHBORADDR}]: Status is not full or 2way|<p>The status of the neighbor is not "full" or "2way". This may indicate issues with the OSPF session.</p>|`{$PAN.OSPF.CONTROL:"{#PEER}"}=1 and last(/Palo Alto PA-440 by HTTP/pan.pa440.ospf.neighbor.status[{#NEIGHBORAREA}, {#NEIGHBORADDR}])<>"full" and last(/Palo Alto PA-440 by HTTP/pan.pa440.ospf.neighbor.status[{#NEIGHBORAREA}, {#NEIGHBORADDR}])<>"2way"`|High||
+|PA-440: OSPF neighbor [{#NEIGHBORADDR}]: Neighbor is not found anymore|<p>The neighbor is not found anymore and thus the neighborship is gone. Please investigate if this is planned.</p>|`{$PAN.PA440.OSPF.CONTROL:"{#NEIGHBORADDR}"}=1 and nodata(/Palo Alto PA-440 by HTTP/pan.pa440.ospf.neighbor.status[{#NEIGHBORAREA}, {#NEIGHBORADDR}],5m)=1`|High||
+|PA-440: OSPF neighbor [{#NEIGHBORADDR}]: Status is not full or 2way|<p>The status of the neighbor is not "full" or "2way". This may indicate issues with the OSPF session.</p>|`{$PAN.PA440.OSPF.CONTROL:"{#NEIGHBORADDR}"}=1 and last(/Palo Alto PA-440 by HTTP/pan.pa440.ospf.neighbor.status[{#NEIGHBORAREA}, {#NEIGHBORADDR}])<>"full" and last(/Palo Alto PA-440 by HTTP/pan.pa440.ospf.neighbor.status[{#NEIGHBORAREA}, {#NEIGHBORADDR}])<>"2way"`|High||
+
+### LLD rule OSPFv3 neighbors discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|OSPFv3 neighbors discovery|<p>Discovers OSPFv3 neighbors.</p>|Dependent item|pan.pa440.ospfv3.neighbor.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+
+### Item prototypes for OSPFv3 neighbors discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|OSPFv3 neighbor [{#NEIGHBORADDR}]: Status|<p>The current status of OSPFv3 neighbor.</p>|Dependent item|pan.pa440.ospfv3.neighbor.status[{#NEIGHBORAREA}, {#NEIGHBORADDR}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+
+### Trigger prototypes for OSPFv3 neighbors discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|PA-440: OSPFv3 neighbor [{#NEIGHBORADDR}]: Neighbor is not found anymore|<p>The neighbor is not found anymore and thus the neighborship is gone. Please investigate if this is planned.</p>|`{$PAN.PA440.OSPFV3.CONTROL:"{#NEIGHBORADDR}"}=1 and nodata(/Palo Alto PA-440 by HTTP/pan.pa440.ospfv3.neighbor.status[{#NEIGHBORAREA}, {#NEIGHBORADDR}],5m)=1`|High||
+|PA-440: OSPFv3 neighbor [{#NEIGHBORADDR}]: Status is not full or 2way|<p>The status of the neighbor is not "full" or "2way". This may indicate issues with the OSPF session.</p>|`{$PAN.PA440.OSPFV3.CONTROL:"{#NEIGHBORADDR}"}=1 and last(/Palo Alto PA-440 by HTTP/pan.pa440.ospfv3.neighbor.status[{#NEIGHBORAREA}, {#NEIGHBORADDR}])<>"full" and last(/Palo Alto PA-440 by HTTP/pan.pa440.ospfv3.neighbor.status[{#NEIGHBORAREA}, {#NEIGHBORADDR}])<>"2way"`|High||
 
 ### LLD rule Licenses discovery
 
@@ -285,13 +312,13 @@ Set the host macros:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |License [{#FEATURE}]: Expires on|<p>The expiration date for the license "{#DESCRIPTION}".</p>|Dependent item|pan.pa440.license.expires[{#FEATURE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|License [{#FEATURE}]: Expired|<p>The expiration date for the license "{#DESCRIPTION}".</p>|Dependent item|pan.pa440.license.expired[{#FEATURE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|License [{#FEATURE}]: Expired|<p>Indicates whether the license "{#DESCRIPTION}" has expired.</p>|Dependent item|pan.pa440.license.expired[{#FEATURE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 
 ### Trigger prototypes for Licenses discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|PA-440: License [{#FEATURE}]: Expires soon|<p>The license will be expired in less than {$PAN.LICENSE.EXPIRY.WARN:"{#FEATURE}"}.</p>|`(last(/Palo Alto PA-440 by HTTP/pan.pa440.license.expires[{#FEATURE}]) - now())<{$PAN.LICENSE.EXPIRY.WARN:"{#FEATURE}"}`|Warning||
+|PA-440: License [{#FEATURE}]: Expires soon|<p>The license will be expired in less than {$PAN.PA440.LICENSE.EXPIRY.WARN:"{#FEATURE}"}.</p>|`(last(/Palo Alto PA-440 by HTTP/pan.pa440.license.expires[{#FEATURE}]) - now())<{$PAN.PA440.LICENSE.EXPIRY.WARN:"{#FEATURE}"}`|Warning||
 |PA-440: License [{#FEATURE}]: Has expired|<p>The license "{#DESCRIPTION}" has expired.</p>|`last(/Palo Alto PA-440 by HTTP/pan.pa440.license.expired[{#FEATURE}])=1`|High|**Manual close**: Yes|
 
 ### LLD rule Device certificate discovery
@@ -311,7 +338,7 @@ Set the host macros:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|PA-440: Device certificate: Expires soon|<p>The device certificate will be expired in less than {$PAN.CERT.DEVICE.EXPIRY.WARN}.</p>|`last(/Palo Alto PA-440 by HTTP/pan.pa440.certificate.device.expires_in[{#SINGLETON}])<{$PAN.CERT.DEVICE.EXPIRY.WARN}`|Warning||
+|PA-440: Device certificate: Expires soon|<p>The device certificate will be expired in less than {$PAN.PA440.CERT.DEVICE.EXPIRY.WARN}.</p>|`last(/Palo Alto PA-440 by HTTP/pan.pa440.certificate.device.expires_in[{#SINGLETON}])<{$PAN.PA440.CERT.DEVICE.EXPIRY.WARN}`|Warning||
 
 ### LLD rule Certificates discovery
 
@@ -329,7 +356,7 @@ Set the host macros:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|PA-440: Certificate [{#CERTNAME}]: Expires soon|<p>The certificate will be expired in less than {$PAN.CERT.EXPIRY.WARN:"{#CERTNAME}"}.</p>|`(last(/Palo Alto PA-440 by HTTP/pan.pa440.certificate.expires[{#CERTNAME}]) - now())<{$PAN.CERT.EXPIRY.WARN:"{#CERTNAME}"}`|Warning|**Depends on**:<br><ul><li>PA-440: Certificate [{#CERTNAME}]: Has expired</li></ul>|
+|PA-440: Certificate [{#CERTNAME}]: Expires soon|<p>The certificate will be expired in less than {$PAN.PA440.CERT.EXPIRY.WARN:"{#CERTNAME}"}.</p>|`(last(/Palo Alto PA-440 by HTTP/pan.pa440.certificate.expires[{#CERTNAME}]) - now())<{$PAN.PA440.CERT.EXPIRY.WARN:"{#CERTNAME}"}`|Warning|**Depends on**:<br><ul><li>PA-440: Certificate [{#CERTNAME}]: Has expired</li></ul>|
 |PA-440: Certificate [{#CERTNAME}]: Has expired|<p>The certificate has expired.</p>|`(last(/Palo Alto PA-440 by HTTP/pan.pa440.certificate.expires[{#CERTNAME}]) - now())<0`|High||
 
 ## Feedback
