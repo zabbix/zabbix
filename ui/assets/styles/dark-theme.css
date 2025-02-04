@@ -4612,6 +4612,7 @@ z-select[readonly] .focusable,
   box-sizing: border-box;
   min-width: 166px;
   max-width: 250px;
+  max-height: calc(100vh - 20px);
   overflow-y: auto;
   background-color: #2b2b2b;
   border: 1px solid #383838;
