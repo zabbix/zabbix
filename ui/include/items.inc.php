@@ -2677,7 +2677,7 @@ function getEnabledItemTypeCountByHostId(int $item_type, array $hostids): array 
 		'countOutput' => true,
 		'groupCount' => true,
 		'hostids' => $hostids,
-		'filter' => ['type' => $item_type, 'status' => [ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED]]
+		'filter' => ['type' => $item_type, 'status' => ITEM_STATUS_ACTIVE]
 	]);
 
 	return $items_count ? array_column($items_count, 'rowscount', 'hostid') : [];
@@ -2697,7 +2697,7 @@ function getEnabledItemsCountByInterfaceIds(array $interfaceids): array {
 		'countOutput' => true,
 		'groupCount' => true,
 		'interfaceids' => $interfaceids,
-		'filter' => ['status' => [ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED]]
+		'filter' => ['status' => ITEM_STATUS_ACTIVE]
 	]);
 
 	return $items_count ? array_column($items_count, 'rowscount', 'interfaceid') : [];
