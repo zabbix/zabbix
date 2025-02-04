@@ -103,9 +103,9 @@ static int	xml_traverse_elements(xmlNode *node, zbx_xml_resolv_func_t resolver, 
  *          substitute them validates XML.                                    *
  *                                                                            *
  * Parameters: data      - [IN/OUT] pointer to buffer that contains xml       *
- *             error     - [OUT] reson for xml parsing failure                *
+ *             error     - [OUT] reason for xml parsing failure               *
  *             maxerrlen - [IN] size of error buffer                          *
- *             resolver  - [IN] function callback to perform substituion on   *
+ *             resolver  - [IN] function callback to perform substitution on  *
  *             ...       - [IN] variadic arguments passed to resolver         *
  *                              callback                                      *
  *                                                                            *
