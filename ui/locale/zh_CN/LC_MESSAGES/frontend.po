@@ -17477,6 +17477,10 @@ msgstr "重设预设"
 msgid "Reset to initial view"
 msgstr "重置为初始视图"
 
+#: app/views/administration.miscconfig.edit.php:103
+msgid "Resolve secret vault macros by"
+msgstr ""
+
 #: jsLoader.php:283
 msgid "Resolved"
 msgstr "已解决"
@@ -23706,6 +23710,14 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr "Zabbix server (Proxy)"
 
+#: app/views/administration.miscconfig.edit.php:112
+msgid "Zabbix server and proxy"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:107
+msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
+msgstr ""
+
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Zabbix server is not running: the information displayed may not be current."
@@ -23722,6 +23734,10 @@ msgstr "Zabbix主机名称"
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
 msgstr "zabbix服务端版本"
+
+#: app/views/administration.miscconfig.edit.php:105
+msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
+msgstr ""
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"

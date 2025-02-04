@@ -33,6 +33,7 @@ window.host_edit_popup = {
 		this.form = new CForm(this.form_element, rules);
 		this.initial_proxy_groupid = proxy_groupid;
 		this.macros_templateids = null;
+		this.show_inherited_macros = false;
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'host.list');
