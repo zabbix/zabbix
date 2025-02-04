@@ -11676,7 +11676,6 @@ zabbix_export:
             	result[metrics[i][0]] = oci.extractData('post', oci.executeRequest('post', '/20180401/metrics/actions/summarizeMetricsData', '?compartmentId=' + encodeURIComponent(params['compartment_id']), metrics[i][0] + metrics[i][1] + '()', 'oci_objectstorage'), 'aggregatedDatapoints');
             }
             return JSON.stringify(result);
-            
           description: 'Gets all metrics related to a specific bucket that have frequent update time (100 milliseconds).'
           timeout: 30s
           parameters:
@@ -11883,7 +11882,6 @@ zabbix_export:
             	result[metrics[i][0]] = oci.extractData('post', oci.executeRequest('post', '/20180401/metrics/actions/summarizeMetricsData', '?compartmentId=' + encodeURIComponent(params['compartment_id']), metrics[i][0] + metrics[i][1] + '()', 'oci_objectstorage'), 'aggregatedDatapoints');
             }
             return JSON.stringify(result);
-            
           description: 'Gets all metrics related to specific bucket that have update time of 1 hour.'
           timeout: 30s
           parameters:
