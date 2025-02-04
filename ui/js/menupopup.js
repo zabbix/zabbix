@@ -1287,10 +1287,7 @@ jQuery(function($) {
 					at: 'left bottom',
 					using: (pos, data) => {
 						const menu = data.element.element[0];
-						const margin_right = Math.max(WRAPPER_PADDING_RIGHT,
-							wrapper_rect.width - $wrapper.outerWidth()
-						);
-
+						const margin_right = Math.max(WRAPPER_PADDING_RIGHT,wrapper_rect.width - $wrapper.outerWidth());
 						const max_left = wrapper_rect.right - margin_right - menu.offsetWidth;
 
 						pos.left = Math.max(wrapper_rect.left, Math.min(max_left, pos.left));

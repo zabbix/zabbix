@@ -264,7 +264,6 @@ jQuery(function($) {
 						const menu = data.element.element[0];
 						const wrapper_rect = document.querySelector('.wrapper').getBoundingClientRect();
 						const margin_right = Math.max(WRAPPER_PADDING_RIGHT, wrapper_rect.width - wrapper.clientWidth);
-
 						const max_left = wrapper_rect.right - menu.offsetWidth - margin_right;
 
 						pos.left = Math.max(wrapper_rect.left, Math.min(max_left, pos.left));
