@@ -326,7 +326,9 @@
 					position: {
 						of: e.target,
 						my: 'right top',
-						at: 'right bottom'
+						at: 'right bottom',
+						within: '.wrapper',
+						collision: 'fit flip'
 					}
 				});
 			},
