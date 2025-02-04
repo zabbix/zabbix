@@ -552,8 +552,10 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 
 	// Prepare host groups data including nested host groups.
 	$nested_hostgroups = [];
+
 	if ($selement_hostgroupids) {
 		$nested_selement_hostgroupids = [];
+
 		foreach ($selement_hostgroupids as $selement_hostgroupid) {
 			$sub_groups = getSubGroups([$selement_hostgroupid]);
 			$nested_hostgroups[$selement_hostgroupid] = $sub_groups;
