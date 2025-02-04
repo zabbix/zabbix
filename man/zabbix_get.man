@@ -176,7 +176,7 @@ Display this help and exit.
 .IP "\fB\-V\fR, \fB\-\-version\fR"
 Output version information and exit.
 .SH EXIT STATUS
-The exit status is 0 if zabbix_get successfully retrieves a value from the Zabbix agent. If value retrieve failed, the exit status is 1.
+The exit status is 0 if zabbix_get successfully retrieves a value from the Zabbix agent. If value retrieval failed, the exit status is 1.
 .SH "EXAMPLES"
 \fBzabbix_get \-s 127.0.0.1 \-p 10050 \-k "system.cpu.load[all,avg1]"\fR
 .br
