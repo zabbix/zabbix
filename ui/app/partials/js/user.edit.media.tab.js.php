@@ -22,7 +22,7 @@
 			this.medias = medias;
 			this.severity_config = severity_config;
 			this.row_index = 1;
-			this.mediatypes = mediatypes
+			this.mediatypes = mediatypes;
 
 			this._handleAction();
 			this._initMedias();
@@ -53,7 +53,7 @@
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', ({detail}) => {
 				this._generateRow(detail);
-			})
+			});
 		}
 
 		_editMedia(parameters) {
@@ -65,7 +65,7 @@
 			overlay.$dialogue[0].addEventListener('dialogue.submit', ({detail}) => {
 				this._removeRow(parameters.media);
 				this._generateRow(detail, parameters.media, true);
-			})
+			});
 		}
 
 		_removeMedia(target) {
@@ -99,67 +99,8 @@
 		}
 
 		_generateRow(data, index = undefined, edit = false) {
-			const template = new Template(document.getElementById('media-row-tmpl').innerHTML);
 			const table_body = document.querySelector('#media-table tbody');
-
-			data.row_index = index === undefined ? ++this.row_index : index;
-			data.dstfrm =  this.form_name;
-			data.media = data.row_index;
-			data.parameters = structuredClone(data);
-			data.sendto_short = this._truncateText(data.sendto);
-
-			if (data.name === undefined) {
-				data.name = this.mediatypes[data.mediatypeid].name;
-			}
-
-			console.log(this.mediatypes[data.mediatypeid])
-
-			if (this.mediatypes[data.mediatypeid] === undefined) {
-				data.name = 'Unknown';
-			}
-
-			if (data.mediatype == <?= MEDIA_TYPE_EMAIL ?>) {
-				data.parameters.sendto_emails = data.sendto;
-			} else {
-				if (Array.isArray(data.sendto)) {
-					data.sendto = data.sendto.join(', ');
-				}
-				data.parameters.sendto = data.sendto;
-			}
-
-			data.parameters = JSON.stringify(data.parameters)
-
-			const temp = template.evaluateToElement(data);
-
-			if (data.sendto.length <= 50) {
-				temp.querySelector('[data-hintbox]').dataset.hintbox = '0';
-			}
-
-			const button = temp.querySelector('button.js-status');
-
-			if (this.mediatypes[data.mediatypeid] === undefined) {
-				temp.querySelector('td').classList.add('<?= ZBX_STYLE_DISABLED ?>')
-				this._createButtonDisabled(button);
-				button.classList.remove('js-status')
-			}
-			else if (this.mediatypes[data.mediatypeid].status == <?= MEDIA_TYPE_STATUS_ACTIVE ?>) {
-				if (data.active == <?= MEDIA_STATUS_ACTIVE ?>) {
-					this._createButtonEnabled(button);
-				}
-				else {
-					this._createButtonDisabled(button);
-				}
-			}
-			else {
-				this._createButtonDisabled(button);
-				button.classList.remove('js-status');
-				const warning_button = this._createWarningButton('Media type disabled by Administration.');
-
-				temp.querySelector('td').appendChild(warning_button);
-			}
-
-			this._createSeverity(data, temp.querySelectorAll('.status-container span'));
-			this._createHiddenInputs(data);
+			const temp = this._createTemplate(data, index);
 
 			if (edit === false) {
 				table_body.prepend(temp);
@@ -171,14 +112,16 @@
 
 		_createButtonEnabled(button) {
 			button.classList.replace('<?= ZBX_STYLE_RED ?>', '<?= ZBX_STYLE_GREEN ?>');
-			button.dataset.status_type = 'disable_media';
 			button.textContent = 'Enabled';
+
+			Object.assign(button.dataset, {status_type: 'disable_media'});
 		}
 
 		_createButtonDisabled(button) {
 			button.classList.replace('<?= ZBX_STYLE_GREEN ?>', '<?= ZBX_STYLE_RED ?>');
-			button.dataset.status_type = 'enable_media';
 			button.textContent = 'Disabled';
+
+			Object.assign(button.dataset, {status_type: 'enable_media'});
 		}
 
 		_createInput(index, key, value) {
@@ -198,16 +141,17 @@
 			for (;severity < <?= TRIGGER_SEVERITY_COUNT ?>; severity++) {
 				const media_active = (data.severity & (1 << severity)) !== 0;
 				const span = severities_span[severity];
+				const hintboxData = {hintbox: 1, hintboxContents: this.severity_config.names[severity]};
 
 				if (media_active) {
 					span.classList.replace('<?= ZBX_STYLE_STATUS_DISABLED ?>', this.severity_config.colors[severity]);
-					span.dataset.hintboxContents = `${this.severity_config.names[severity]} (on)`;
-					span.dataset.hintbox = '1';
+					hintboxData.hintboxContents += ' (on)';
 				} else {
 					span.classList.replace(this.severity_config.colors[severity], '<?= ZBX_STYLE_STATUS_DISABLED ?>');
-					span.dataset.hintboxContents = `${this.severity_config.names[severity]} (off)`;
-					span.dataset.hintbox = '1';
+					hintboxData.hintboxContents += ' (off)';
 				}
+
+				Object.assign(span.dataset, hintboxData);
 			}
 		}
 
@@ -225,11 +169,13 @@
 			button.type = 'button';
 			button.classList.add('btn-icon', 'zi-i-warning', 'btn-small');
 
-			button.dataset.hintboxContents = text;
-			button.dataset.hintbox = '1';
-			button.dataset.hintboxClass = 'hintbox-wrap';
-			button.dataset.hintboxStatic = '1';
-			button.dataset.expanded = 'true';
+			Object.assign(button.dataset, {
+				hintboxContents: text,
+				hintbox: 1,
+				hintboxClass: 'hintbox-wrap',
+				hintboxStatic: 1,
+				expanded: 'true'
+			});
 
 			return button;
 		}
@@ -244,6 +190,73 @@
 			if (!only_inputs) {
 				document.querySelector(`#medias_${index}`).remove();
 			}
+		}
+
+		_createDataTemplate(data, index) {
+			data.row_index = index === undefined ? ++this.row_index : index;
+			data.dstfrm =  this.form_name;
+			data.media = data.row_index;
+			data.parameters = structuredClone(data);
+			data.sendto_short = this._truncateText(data.sendto);
+
+			if (data.name === undefined) {
+				data.name = this.mediatypes[data.mediatypeid].name;
+			}
+
+			if (this.mediatypes[data.mediatypeid] === undefined) {
+				data.name = 'Unknown';
+			}
+
+			if (data.mediatype == <?= MEDIA_TYPE_EMAIL ?>) {
+				data.parameters.sendto_emails = data.sendto;
+			} else {
+				if (Array.isArray(data.sendto)) {
+					data.sendto = data.sendto.join(', ');
+				}
+				data.parameters.sendto = data.sendto;
+			}
+
+			data.parameters = JSON.stringify(data.parameters);
+		}
+
+		_createTemplate(data, index) {
+			this._createDataTemplate(data, index);
+
+			const template = new Template(document.getElementById('media-row-tmpl').innerHTML);
+			const temp = template.evaluateToElement(data);
+
+			if (data.sendto.length <= 50) {
+				temp.querySelector('[data-hintbox]').dataset.hintbox = '0';
+			}
+
+			const button = temp.querySelector('button.js-status');
+
+			if (this.mediatypes[data.mediatypeid] === undefined) {
+				temp.querySelector('td').classList.add('<?= ZBX_STYLE_DISABLED ?>');
+				this._createButtonDisabled(button);
+				button.classList.remove('js-status');
+			}
+			else if (this.mediatypes[data.mediatypeid].status == <?= MEDIA_TYPE_STATUS_ACTIVE ?>) {
+				if (data.active == <?= MEDIA_STATUS_ACTIVE ?>) {
+					this._createButtonEnabled(button);
+				}
+				else {
+					this._createButtonDisabled(button);
+				}
+			}
+			else {
+				this._createButtonDisabled(button);
+				button.classList.remove('js-status');
+
+				const warning_button = this._createWarningButton('Media type disabled by Administration.');
+
+				temp.querySelector('td').appendChild(warning_button);
+			}
+
+			this._createSeverity(data, temp.querySelectorAll('.status-container span'));
+			this._createHiddenInputs(data);
+
+			return temp;
 		}
 	}
 </script>
