@@ -1965,8 +1965,8 @@ class testPageProblems extends CWebTest {
 			$this->assertEquals(count($data['popup rows']), $popup_table->getRows()->count());
 
 			$row = $popup_table->getRow($i);
-			$row->assertValues([$popup_row['item'], date('Y-m-d H:i:s', self::$time),
-					CTestArrayHelper::get($popup_row, 'truncated', $popup_row['metric']), $popup_row['button']]
+			$row->assertValues([$popup_row['item'], date('Y-m-d H:i:s', self::$time), $metric_in_column,
+					$popup_row['button']]
 			);
 
 			// Check correct graph or history link.
