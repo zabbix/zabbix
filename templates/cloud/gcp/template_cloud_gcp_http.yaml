@@ -5061,7 +5061,6 @@ zabbix_export:
           description: |
             The current serving state of replication.
             This metric is only available for the MySQL/PostgreSQL instances.
-            
           valuemap:
             name: 'Replication state'
           preprocessing:
@@ -6909,7 +6908,6 @@ zabbix_export:
           description: |
             The current serving state of replication.
             This metric is only available for the MySQL/PostgreSQL instances.
-            
           valuemap:
             name: 'Replication state'
           preprocessing:
