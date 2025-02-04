@@ -501,7 +501,7 @@ void	lld_flush_discoveries(zbx_hashset_t *discoveries, const char *id_field, con
 	}
 
 	/* prepare updates */
-	zbx_vector_lld_discovery_ptr_reserve(&discovery_updates, discoveries->num_data);
+	zbx_vector_lld_discovery_ptr_reserve(&discovery_updates, (size_t)discoveries->num_data);
 	zbx_hashset_iter_reset(discoveries, &iter);
 	while (NULL != (discovery = (zbx_lld_discovery_t *)zbx_hashset_iter_next(&iter)))
 	{
