@@ -1682,6 +1682,8 @@ function getMenuPopupDRule(options) {
 	return sections;
 }
 
+const WRAPPER_PADDING_RIGHT = 10;
+
 jQuery(function($) {
 	const MENU_BORDER = 1;
 
@@ -1689,10 +1691,9 @@ jQuery(function($) {
 	const MENU_PADDING_RIGHT = 15;
 	const MENU_PADDING_Y = 5;
 
-	const DELTA_Y = 15;
-
 	const WRAPPER_PADDING_Y = 10;
-	const WRAPPER_PADDING_RIGHT = 5;
+
+	const SUBMENU_DELTA_Y = 15;
 
 	const SUBMENU_DELAY = 600;
 
@@ -1765,7 +1766,7 @@ jQuery(function($) {
 		background_layer: true
 	};
 
-	var methods = {
+	const methods = {
 		init: function(sections, event, options) {
 			// Don't display empty menu.
 			if (!sections.length || !sections[0]['items'].length) {
@@ -1773,8 +1774,8 @@ jQuery(function($) {
 			}
 
 			const $opener = $(this);
-			const wrapper = $('.wrapper');
-			const wrapper_rect = wrapper[0].getBoundingClientRect();
+			const $wrapper = $('.wrapper');
+			const wrapper_rect = $wrapper[0].getBoundingClientRect();
 
 			options = $.extend({
 				position: {
@@ -1790,23 +1791,15 @@ jQuery(function($) {
 					using: (pos, data) => {
 						const menu = data.element.element[0];
 						const margin_right = Math.max(WRAPPER_PADDING_RIGHT,
-							wrapper_rect.width - wrapper[0].clientWidth
+							wrapper_rect.width - $wrapper.outerWidth()
 						);
-						const margin_bottom = Math.max(WRAPPER_PADDING_Y,
-							wrapper_rect.height - wrapper[0].clientHeight
-						);
-
-						menu.style.maxHeight = `calc(100vh - ${WRAPPER_PADDING_Y + margin_bottom}px)`;
 
 						const max_left = wrapper_rect.right - margin_right - menu.offsetWidth;
 
-						pos.top = Math.max(WRAPPER_PADDING_Y,
-							Math.min(pos.top, wrapper_rect.bottom - margin_bottom - data.element.height)
-						);
 						pos.left = Math.max(wrapper_rect.left, Math.min(max_left, pos.left));
 
-						menu.style.top = `${pos.top}px`;
 						menu.style.left = `${pos.left}px`;
+						menu.style.top = `${pos.top}px`;
 					}
 				}
 			}, defaultOptions, options || {});
@@ -1837,14 +1830,19 @@ jQuery(function($) {
 			$menu_popup.data('menu_popup', options);
 
 			if (options.background_layer) {
-				$('.wrapper').append($('<div>', {class: 'menu-popup-overlay'}).append($menu_popup));
+				$wrapper.append($('<div>', {class: 'menu-popup-overlay'}));
 			}
-			else {
-				$('.wrapper').append($menu_popup);
-			}
+
+			$wrapper.append($menu_popup);
 
 			// Position the menu (before hiding).
 			$menu_popup.position(options.position);
+
+			const pos_top = Math.max(WRAPPER_PADDING_Y, Math.min($menu_popup.position().top,
+				wrapper_rect.bottom - WRAPPER_PADDING_Y - $menu_popup.outerHeight()
+			));
+
+			$menu_popup.css('top', `${pos_top}px`);
 
 			// Hide all action menu sub-levels, including the topmost, for fade effect to work.
 			$menu_popup.add('.menu-popup', $menu_popup).hide();
@@ -1865,7 +1863,7 @@ jQuery(function($) {
 
 			$menu_popup.focus();
 
-			$menu_popup.on('scroll', (e) => {
+			$menu_popup.on('scroll', e => {
 				e.stopPropagation();
 
 				$menu_popup.actionMenuItemCollapse();
@@ -1998,7 +1996,7 @@ jQuery(function($) {
 	/**
 	 * Calculates and sets submenu position based on <li> parent element.
 	 *
-	 * @param {object}  $submenu
+	 * @param {Object}  $submenu
 	 * @param {DOMRect} li_pos
 	 */
 	function setSubmenuPosition($submenu, li_pos) {
@@ -2013,9 +2011,7 @@ jQuery(function($) {
 		const wrapper = document.querySelector('.wrapper');
 		const wrapper_rect = wrapper.getBoundingClientRect();
 		const margin_right = Math.max(WRAPPER_PADDING_RIGHT, wrapper_rect.width - wrapper.clientWidth);
-		const margin_bottom = Math.max(WRAPPER_PADDING_Y,
-			wrapper_rect.height - wrapper.clientHeight
-		);
+		const margin_bottom = Math.max(WRAPPER_PADDING_Y, wrapper_rect.height - wrapper.clientHeight);
 		const max_height = `calc(100vh - ${WRAPPER_PADDING_Y + margin_bottom}px)`;
 
 		// Change of max height to determine the height of the element.
@@ -2040,13 +2036,13 @@ jQuery(function($) {
 		}
 
 		const submenu_data = {
-			'top': li_pos.top - (MENU_PADDING_Y + MENU_BORDER),
-			'left': submenu_direction_x === 1
+			top: li_pos.top - (MENU_PADDING_Y + MENU_BORDER),
+			left: submenu_direction_x === 1
 				? li_pos.right + MENU_PADDING_RIGHT
 				: li_pos.left - ($submenu.outerWidth() + MENU_PADDING_LEFT),
-			'direction_x': submenu_direction_x,
-			'direction_y': submenu_direction_y,
-			'maxHeight': max_height
+			direction_x: submenu_direction_x,
+			direction_y: submenu_direction_y,
+			maxHeight: max_height
 		};
 
 		if (submenu_data.left < wrapper_rect.left || submenu_data.left > max_relative_left) {
@@ -2062,15 +2058,15 @@ jQuery(function($) {
 				: Math.max(submenu_data.left, wrapper_rect.left);
 
 			if (!is_first_child
-					&& Math.abs($submenu_parents[1].getBoundingClientRect().top - submenu_data.top) < DELTA_Y) {
-				const pos_top = submenu_data.top + (submenu_data.direction_y * DELTA_Y);
+					&& Math.abs($submenu_parents[1].getBoundingClientRect().top - submenu_data.top) < SUBMENU_DELTA_Y) {
+				const pos_top = submenu_data.top + (submenu_data.direction_y * SUBMENU_DELTA_Y);
 
 				if (max_relative_top < pos_top || WRAPPER_PADDING_Y > pos_top) {
 					// Reverse the direction on Y axis.
 					submenu_data.direction_y *= -1;
 				}
 
-				submenu_data.top += submenu_data.direction_y * DELTA_Y;
+				submenu_data.top += submenu_data.direction_y * SUBMENU_DELTA_Y;
 			}
 		}
 
@@ -2090,20 +2086,20 @@ jQuery(function($) {
 		$('[aria-expanded]', parent_menu).attr({'aria-expanded': 'false'});
 		$('.menu-popup', parent_menu)
 			.css({
-				'top': '',
-				'left': '',
-				'display': 'none',
-				'maxHeight': ''
+				top: '',
+				left: '',
+				display: 'none',
+				maxHeight: ''
 			})
 			.removeData('pos');
 
 		// Close actual menu level.
 		parent_menu.not('.menu-popup-top')
 			.css({
-				'top': '',
-				'left': '',
-				'display': 'none',
-				'maxHeight': ''
+				top: '',
+				left: '',
+				display: 'none',
+				maxHeight: ''
 			})
 			.removeData('pos');
 
@@ -2328,7 +2324,7 @@ jQuery(function($) {
 
 			item.append(menu);
 
-			menu.on('scroll', (e) => {
+			menu.on('scroll', e => {
 				e.stopPropagation();
 
 				$('ul', menu).actionMenuItemCollapse();

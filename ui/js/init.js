@@ -256,20 +256,14 @@ jQuery(function($) {
 						const wrapper = document.querySelector('.wrapper');
 						const menu = data.element.element[0];
 						const wrapper_rect = document.querySelector('.wrapper').getBoundingClientRect();
-						const margin_right = Math.max(10, wrapper_rect.width - wrapper.clientWidth);
-						const margin_bottom = Math.max(10, wrapper_rect.height - wrapper.clientHeight);
-
-						menu.style.maxHeight = `calc(100vh - ${10 + margin_bottom}px)`;
+						const margin_right = Math.max(WRAPPER_PADDING_RIGHT, wrapper_rect.width - wrapper.clientWidth);
 
 						const max_left = wrapper_rect.right - menu.offsetWidth - margin_right;
 
-						pos.top = Math.max(10,
-							Math.min(pos.top, wrapper_rect.bottom - margin_bottom - data.element.height)
-						);
 						pos.left = Math.max(wrapper_rect.left, Math.min(max_left, pos.left));
 
-						menu.style.top = `${pos.top}px`;
 						menu.style.left = `${pos.left}px`;
+						menu.style.top = `${pos.top}px`;
 					}
 				};
 		}
