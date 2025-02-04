@@ -694,23 +694,23 @@ void	zbx_strsplit_last(const char *src, char delimiter, char **left, char **righ
 	zbx_string_split(src, delimiter, 1, left, right);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: Appends src to string dst of size siz (unlike strncat, size is    *
- *          the full size of dst, not space left). At most siz - 1 characters *
- *          will be copied. Always null terminates (unless                    *
- *          siz <= strlen(dst)).                                              *
- *                                                                            *
- ******************************************************************************/
-void	zbx_strlcat(char *dst, const char *src, size_t siz)
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: Appends src to string dst of size size (unlike strncat, size is    *
+ *          the full size of dst, not space left). At most size - 1 characters *
+ *          will be copied. Always null terminates (unless                     *
+ *          size <= strlen(dst)).                                              *
+ *                                                                             *
+ *******************************************************************************/
+void	zbx_strlcat(char *dst, const char *src, size_t size)
 {
 	while ('\0' != *dst)
 	{
 		dst++;
-		siz--;
+		size--;
 	}
 
-	zbx_strlcpy(dst, src, siz);
+	zbx_strlcpy(dst, src, size);
 }
 
 /******************************************************************************

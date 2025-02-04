@@ -3626,11 +3626,11 @@ svg {
 
 .btn-split {
 	position: relative;
-	display: inline-block;
+	display: inline-flex;
 	margin-right: 10px;
 
 	li {
-		display: inline-block;
+		display: inline-flex;
 
 		&:first-child {
 			button {
