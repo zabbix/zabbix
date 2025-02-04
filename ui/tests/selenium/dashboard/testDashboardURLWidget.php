@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -779,7 +779,7 @@ class testDashboardURLWidget extends CWebTest {
 		$this->query('button:Save changes')->one()->click();
 
 		// Check that Dashboard can't be saved and returns error regarding invalid parameter.
-		$message = CMessageElement::find('xpath://div[@class="wrapper"]', true)->one();
+		$message = CMessageElement::find('xpath://div[@class="wrapper"]', true)->one()->waitUntilVisible();
 		$this->assertMessage(TEST_BAD, null, 'Cannot save widget "'.self::$default_widget.'". Invalid parameter "URL": unacceptable URL.');
 		$message->close();
 

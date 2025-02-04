@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,7 +62,6 @@ type AgentOptions struct {
 	TLSKeyFile               string   `conf:"optional"`
 	TLSServerCertIssuer      string   `conf:"optional"`
 	TLSServerCertSubject     string   `conf:"optional"`
-	ExternalPlugins          []string `conf:"optional,name=PluginPath"`
 	ExternalPluginTimeout    int      `conf:"optional,name=PluginTimeout,range=1:30"`
 	ExternalPluginsSocket    string   `conf:"optional,name=PluginSocket,default=/tmp/agent.plugin.sock"`
 	ForceActiveChecksOnStart int      `conf:"optional,range=0:1,default=0"`
@@ -70,5 +69,5 @@ type AgentOptions struct {
 	AllowKey interface{} `conf:"optional"`
 	DenyKey  interface{} `conf:"optional"`
 
-	Plugins map[string]interface{} `conf:"optional"`
+	Plugins map[string]any `conf:"optional"`
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -538,9 +538,9 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 #endif
 
 	if (ZBX_MODBUS_DATATYPE_BIT == type)
-		dst8 = zbx_malloc(NULL, sizeof(uint8_t) * total_count);
+		dst8 = zbx_calloc(NULL, total_count, sizeof(uint8_t));
 	else
-		dst16 = zbx_malloc(NULL, sizeof(uint16_t) * total_count);
+		dst16 = zbx_calloc(NULL, total_count, sizeof(uint16_t));
 
 	LOCK_MODBUS;
 

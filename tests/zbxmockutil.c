@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -231,6 +231,23 @@ zbx_uint64_t	zbx_mock_get_parameter_uint64(const char *path)
 
 	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_parameter(path, &handle)) ||
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_uint64(handle, &parameter)))
+	{
+		fail_msg("Cannot read parameter at \"%s\": %s", path, zbx_mock_error_string(err));
+
+		return 0;
+	}
+
+	return parameter;
+}
+
+int	zbx_mock_get_parameter_int(const char *path)
+{
+	zbx_mock_error_t	err;
+	zbx_mock_handle_t	handle;
+	int			parameter;
+
+	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_parameter(path, &handle)) ||
+			ZBX_MOCK_SUCCESS != (err = zbx_mock_int(handle, &parameter)))
 	{
 		fail_msg("Cannot read parameter at \"%s\": %s", path, zbx_mock_error_string(err));
 

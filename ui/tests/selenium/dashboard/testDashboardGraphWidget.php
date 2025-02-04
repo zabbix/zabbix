@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2249,7 +2249,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$this->assertEquals('Dashboard updated', $message->getTitle());
 
 		// Check that widget is not present on dashboard and in DB.
-		$this->assertTrue(!$dashboard->getWidget($name, false)->isValid());
+		$this->assertFalse($dashboard->getWidget($name, false)->isValid());
 		$sql = 'SELECT * FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
 				' WHERE w.name='.zbx_dbstr($name);
 		$this->assertEquals(0, CDBHelper::getCount($sql));

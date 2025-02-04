@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -141,7 +141,7 @@ $form_grid
 			(new CCheckBoxList('weekdays'))
 				->setOptions($weekdays)
 				->setColumns(3)
-				->setVertical(true)
+				->setVertical()
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setReadonly(!$data['allowed_edit'])
 		))

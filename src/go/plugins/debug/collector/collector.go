@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,8 +28,7 @@ import (
 var impl Plugin
 
 type Options struct {
-	plugin.SystemOptions `conf:"optional,name=System"`
-	Interval             int
+	Interval int
 }
 
 // Plugin -
@@ -65,7 +64,7 @@ func (p *Plugin) Period() int {
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, private interface{}) {
 	p.options.Interval = 10
-	if err := conf.Unmarshal(private, &p.options); err != nil {
+	if err := conf.UnmarshalStrict(private, &p.options); err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
 	}
 	p.Debugf("configure: interval=%d", p.options.Interval)

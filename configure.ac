@@ -1,6 +1,6 @@
 dnl
 dnl Zabbix
-dnl Copyright (C) 2001-2024 Zabbix SIA
+dnl Copyright (C) 2001-2025 Zabbix SIA
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[6.0.37rc1])
+AC_INIT([Zabbix],[6.0.39rc1])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -1339,9 +1339,11 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 			saved_CPPFLAGS="$CPPFLAGS"
 			saved_LDFLAGS="$LDFLAGS"
+			saved_LIBS="$LIBS"
 
 			CPPFLAGS="$CPPFLAGS $SQLITE3_CPPFLAGS"
-			LDFLAGS="$LDFLAGS $SQLITE3_LDFLAGS $SQLITE3_LIBS"
+			LDFLAGS="$LDFLAGS $SQLITE3_LDFLAGS"
+			LIBS="$LIBS $SQLITE3_LIBS"
 
 			AC_MSG_CHECKING([for function sqlite3_open_v2() in sqlite3.h])
 			AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <sqlite3.h>]], [[sqlite3 *conn = 0;
@@ -1351,6 +1353,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 			CPPFLAGS="$saved_CPPFLAGS"
 			LDFLAGS="$saved_LDFLAGS"
+			LIBS="$saved_LIBS"
 		else
 			AC_MSG_ERROR([SQLite3 library not found])
 		fi
@@ -1929,8 +1932,15 @@ AC_CONFIG_FILES([
 	Makefile
 	database/Makefile
 	database/mysql/Makefile
+	database/mysql/option-patches/Makefile
 	database/oracle/Makefile
+	database/oracle/option-patches/Makefile
 	database/postgresql/Makefile
+	database/postgresql/option-patches/Makefile
+	database/postgresql/timescaledb/Makefile
+	database/postgresql/timescaledb/option-patches/Makefile
+	database/postgresql/timescaledb/option-patches/with-compression/Makefile
+	database/postgresql/timescaledb/option-patches/without-compression/Makefile
 	database/sqlite3/Makefile
 	misc/Makefile
 	src/Makefile

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -497,7 +497,7 @@ class testDashboardPages extends CWebTest {
 				->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit()->addPage();
-		$this->assertMessage(TEST_BAD, 'Cannot add dashboard page: maximum number of 50 dashboard pages has been added.');
+		$this->assertMessage('warning', 'Cannot add dashboard page: maximum number of 50 dashboard pages has been added.');
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		$this->assertEquals(CDBHelper::getHash($sql), $hash);

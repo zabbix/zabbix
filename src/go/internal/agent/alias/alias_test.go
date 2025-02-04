@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@ func TestGetAlias(t *testing.T) {
 
 	_ = log.Open(log.Console, log.Debug, "", 0)
 	var options agent.AgentOptions
-	_ = conf.Unmarshal([]byte{}, &options)
+	_ = conf.UnmarshalStrict([]byte{}, &options)
 	options.Alias = aliases
 
 	if manager, err := NewManager(&options); err == nil {

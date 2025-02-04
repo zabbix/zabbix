@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -62,7 +62,8 @@ func (m *Manager) getStatus() (result string) {
 			ext := info.ref.impl.(*external.Plugin)
 			extInfo = fmt.Sprintf("path: %s\n", ext.Path)
 		}
-		status.WriteString(fmt.Sprintf("[%s]\nactive: %t\n%scapacity: %d/%d\ncheck on start: %d\ntasks: %d\n",
+
+		status.WriteString(fmt.Sprintf("[%s]\nactive: %t\n%scapacity: %d/%d\ncheck on start: %t\ntasks: %d\n",
 			info.ref.name(), info.ref.active(), extInfo, info.ref.usedCapacity, info.ref.maxCapacity,
 			info.ref.forceActiveChecksOnStart, len(info.ref.tasks)))
 		sort.Slice(info.metrics, func(l, r int) bool { return info.metrics[l].Key < info.metrics[r].Key })

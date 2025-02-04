@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -79,10 +79,6 @@ type cpuUnit struct {
 type cpuDiscovery struct {
 	Number int    `json:"{#CPU.NUMBER}"`
 	Status string `json:"{#CPU.STATUS}"`
-}
-
-func (p *Plugin) Period() int {
-	return 1
 }
 
 func (p *Plugin) getCpuDiscovery(params []string) (result interface{}, err error) {
@@ -173,7 +169,7 @@ func (p *Plugin) getCpuUtil(params []string) (result interface{}, err error) {
 		return nil, errors.New("CPU is offline.")
 	}
 
-	return cpu.counterAverage(counter, period, 1), nil
+	return p.getCounterAverage(cpu, counter, period), nil
 }
 
 func (p *Plugin) newCpus(num int) (cpus []*cpuUnit) {

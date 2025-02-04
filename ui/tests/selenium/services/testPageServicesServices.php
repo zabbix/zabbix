@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2024 Zabbix SIA
+** Copyright (C) 2001-2025 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -940,6 +940,7 @@ class testPageServicesServices extends CWebTest {
 			$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 			$form->fill(['Sort order (0->999)' => $order]);
 			$form->submit();
+			$table->waitUntilReloaded();
 			$this->page->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Service updated');
 		}
