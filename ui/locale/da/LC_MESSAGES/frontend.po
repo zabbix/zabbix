@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.4\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-12-20 13:26+0000\n"
+"PO-Revision-Date: 2025-01-07 07:59+0000\n"
 "Last-Translator: Ryan Skov <rsk@capmon.dk>\n"
 "Language-Team: none\n"
 "Language: da\n"
@@ -7228,6 +7228,10 @@ msgstr "Vis graf"
 msgid "Display local time"
 msgstr "Vis lokal tid"
 
+#: widgets/itemhistory/views/column.edit.php:240
+msgid "Display log time"
+msgstr ""
+
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
 msgstr "Vis min/gennemsnit/maks"
@@ -9391,6 +9395,10 @@ msgstr "Valg af historikdata"
 #: app/views/popup.triggerexpr.php:129
 msgid "History functions"
 msgstr "Historie funktioner"
+
+#: app/views/administration.housekeeping.edit.php:218
+msgid "History, trends and audit log compression"
+msgstr ""
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -20451,6 +20459,10 @@ msgstr "Denne indstilling bør være aktiveret, fordi trendtabeller indeholder k
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
 msgstr "Denne kontrol kan ikke fjernes, da den bruges som en betingelse i %1$s opdagelseshandling."
 
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
 msgid "This type of information may not match the key."
@@ -23475,7 +23487,7 @@ msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:448
 msgid "Y1"
-msgstr ""
+msgstr "Y1"
 
 #: include/views/js/monitoring.sysmaps.js.php:472
 msgid "Y2"
@@ -24190,7 +24202,7 @@ msgstr "beregnet"
 
 #: app/views/administration.geomaps.edit.php:52
 msgid "can be used to add \"@2x\" to the URL to load retina tiles."
-msgstr ""
+msgstr "kan bruges til at tilføje \"@2x\" til URL'en for at indlæse retina."
 
 #: include/classes/api/services/CItemGeneral.php:2624
 msgid "cannot be a value map ID from another host or template"
@@ -24336,7 +24348,7 @@ msgstr "kan ikke angive værdien af parameteren \"%1$s\""
 
 #: include/classes/api/services/CItemGeneral.php:1895
 msgid "cannot be the host interface ID from another host"
-msgstr ""
+msgstr "kan ikke være Interface-id'et fra en anden vært"
 
 #: include/classes/api/services/CHostBase.php:111
 msgid "cannot be unlinked"
@@ -24360,7 +24372,7 @@ msgstr "kan ikke slette skabelon værtsprototype"
 
 #: include/classes/api/services/CHostPrototype.php:1411
 msgid "cannot have more than one default interface of the same type"
-msgstr ""
+msgstr "kan ikke have mere end én standard interface af samme type."
 
 #: include/classes/helpers/CElasticsearchHelper.php:87
 msgid "cannot perform Scroll API request, data could be truncated"
@@ -24557,11 +24569,11 @@ msgstr "vise alle handlinger"
 
 #: app/views/mediatype.list.php:80
 msgid "display only actions where All available media types are used in action operation"
-msgstr ""
+msgstr "vis kun handlinger, hvor Alle tilgængelige medietyper bruges i handlingsoperation"
 
 #: app/views/mediatype.list.php:84
 msgid "display only actions where specific media type is used in action operation"
-msgstr ""
+msgstr "vis kun handlinger, hvor specifik medietype bruges i handlingsoperation"
 
 #: app/views/popup.lldoperation.php:65 include/actions.inc.php:27
 #: include/classes/helpers/CCorrelationHelper.php:37
@@ -24741,7 +24753,7 @@ msgstr "er blevet manuelt deaktiveret"
 #: include/classes/import/validators/C10XmlValidator.php:340
 msgctxt "XML time format"
 msgid "hh.mm"
-msgstr ""
+msgstr "tt.mm"
 
 #: include/classes/api/services/CMap.php:853
 #: include/classes/api/services/CMap.php:1321
@@ -25298,13 +25310,13 @@ msgstr "skal have mindst et interval større end 0"
 #: app/views/administration.user.edit.php:157
 #: include/classes/validators/CPasswordComplexityValidator.php:108
 msgid "must not be one of common or context-specific passwords"
-msgstr ""
+msgstr "må ikke være en af almindelige eller kontekstspecifikke adgangskoder"
 
 #: app/views/administration.authentication.edit.php:135
 #: app/views/administration.user.edit.php:156
 #: include/classes/validators/CPasswordComplexityValidator.php:102
 msgid "must not contain user's name, surname or username"
-msgstr ""
+msgstr "må ikke indeholde brugers navn, efternavn eller brugernavn"
 
 #: include/translateDefines.inc.php:41
 msgid "n-d"
@@ -25327,64 +25339,64 @@ msgstr "n-d H:i"
 #: include/views/configuration.item.prototype.edit.php:245
 #: include/views/configuration.item.prototype.edit.php:381
 msgid "name"
-msgstr ""
+msgstr "navn"
 
 #: include/classes/html/CMultiSelect.php:69 jsLoader.php:331
 msgid "new"
-msgstr ""
+msgstr "ny"
 
 #: app/controllers/CControllerHostEdit.php:368
 #: app/controllers/CControllerTemplateEdit.php:316
 msgctxt "new element in multiselect"
 msgid "new"
-msgstr ""
+msgstr "ny"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1515
 #: include/classes/graphdraw/CPieGraphDraw.php:347
 #: include/classes/html/svg/CSvgGraphLegend.php:116
 msgid "no data"
-msgstr ""
+msgstr "ingen data"
 
 #: include/classes/api/services/CHostPrototype.php:1419
 #, c-format
 msgid "no default interface for \"%1$s\" type"
-msgstr ""
+msgstr "ingen standardinterface for typen \"%1$s\"."
 
 #: include/classes/api/services/CEvent.php:1557
 msgid "no permissions to acknowledge problems"
-msgstr ""
+msgstr "ingen tilladelser til at anerkende problemer"
 
 #: include/classes/api/services/CEvent.php:1544
 msgid "no permissions to add problem comments"
-msgstr ""
+msgstr "ingen tilladelser til at tilføje problemkommentarer"
 
 #: include/classes/api/services/CEvent.php:1550
 msgid "no permissions to change problem severity"
-msgstr ""
+msgstr "ingen tilladelser til at ændre problemets alvorlighedsgrad"
 
 #: include/classes/api/services/CEvent.php:1538
 msgid "no permissions to close problems"
-msgstr ""
+msgstr "ingen tilladelser til at lukke problemer"
 
 #: include/classes/api/services/CEvent.php:1577
 msgid "no permissions to convert cause problems to symptom problems"
-msgstr ""
+msgstr "ingen tilladelser til at konvertere forårsager problemer til symptomproblemer"
 
 #: include/classes/api/services/CEvent.php:1576
 msgid "no permissions to convert symptom problems to cause problems"
-msgstr ""
+msgstr "ingen tilladelser til at konvertere symptomproblemer til at forårsage problemer"
 
 #: include/classes/api/services/CConfiguration.php:221
 msgid "no permissions to create and edit maps"
-msgstr ""
+msgstr "ingen tilladelser til at oprette og redigere kort"
 
 #: include/classes/api/services/CEvent.php:1566
 msgid "no permissions to suppress problems"
-msgstr ""
+msgstr "ingen tilladelser til at undertrykke problemer"
 
 #: include/classes/api/services/CEvent.php:1558
 msgid "no permissions to unacknowledge problems"
-msgstr ""
+msgstr "ingen tilladelser til at fjerne anerkendelsen af problemer"
 
 #: include/classes/api/services/CEvent.php:1567
 msgid "no permissions to unsuppress problems"
@@ -25392,7 +25404,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:865
 msgid "nodata() - No data received during period of time T (1 - true, 0 - false), Mode (strict - ignore proxy time delay in sending data)"
-msgstr ""
+msgstr "nodata() - Ingen data modtaget i tidsrummet T (1 - sand, 0 - falsk), tilstand (streng - ignorer proxy tidsforsinkelse i afsendelse af data)"
 
 #: include/classes/validators/CApiInputValidator.php:3781
 msgid "non-active intervals cannot fill the entire time"
@@ -25404,40 +25416,40 @@ msgstr ""
 #: widgets/tophosts/views/column.edit.php:130
 #: widgets/tophosts/views/column.edit.php:151
 msgid "none"
-msgstr ""
+msgstr "ingen"
 
 #: include/classes/api/services/CItemGeneral.php:275
 #: include/classes/api/services/CItemGeneral.php:293
 msgid "nonempty key and value pair expected"
-msgstr ""
+msgstr "ikke-tom nøgle og værdipar forventes"
 
 #: include/actions.inc.php:31
 msgid "not in"
-msgstr ""
+msgstr "ikke i"
 
 #: hostinventoriesoverview.php:142 include/forms.inc.php:946
 msgid "not selected"
-msgstr ""
+msgstr "ikke valgt"
 
 #: include/classes/helpers/CItemHelper.php:261
 msgid "not used"
-msgstr ""
+msgstr "ikke brugt"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:872
 msgid "now() - Number of seconds since the Epoch"
-msgstr ""
+msgstr "now() - Antal sekunder siden epoken"
 
 #: include/forms.inc.php:1311 include/views/js/item.preprocessing.js.php:293
 msgid "number"
-msgstr ""
+msgstr "nummer"
 
 #: include/classes/api/services/CUser.php:852
 msgid "object does not exist"
-msgstr ""
+msgstr "objekt eksisterer ikke"
 
 #: include/classes/api/services/CHostPrototype.php:836
 msgid "object does not exist or belongs to another object"
-msgstr ""
+msgstr "objekt eksisterer ikke eller tilhører et andet objekt"
 
 #: include/classes/api/services/CHostBase.php:146
 #: include/classes/api/services/CHostBase.php:174
@@ -25453,15 +25465,15 @@ msgstr ""
 #: include/classes/api/services/CTemplate.php:986
 #: include/classes/api/services/CTemplate.php:1066
 msgid "object does not exist, or you have no permissions to it"
-msgstr ""
+msgstr "objektet eksisterer ikke, eller du har ingen tilladelser til det"
 
 #: include/classes/api/services/CUser.php:823
 msgid "object of TOTP type is expected"
-msgstr ""
+msgstr "objekt af TOTP-typen forventes"
 
 #: include/blocks.inc.php:506 widgets/problemhosts/views/widget.view.php:136
 msgid "of"
-msgstr ""
+msgstr "af"
 
 #: app/views/administration.user.edit.php:381
 #: include/classes/setup/CFrontendSetup.php:238
@@ -25509,15 +25521,15 @@ msgstr ""
 #: include/classes/validators/CApiInputValidator.php:2420
 #, c-format
 msgid "only one object can exist within the combinations of %1$s"
-msgstr ""
+msgstr "kun ét objekt kan eksistere inden for kombinationerne af %1$s"
 
 #: app/controllers/CControllerPopupItemTestSend.php:202
 msgid "only one time unit is allowed"
-msgstr ""
+msgstr "kun én tidsenhed er tilladt"
 
 #: include/views/general.login.php:41
 msgid "or"
-msgstr ""
+msgstr "eller"
 
 #: include/views/configuration.httpconf.edit.php:99
 msgid "other"
@@ -25533,28 +25545,28 @@ msgstr ""
 #: include/views/js/item.preprocessing.js.php:322
 #: include/views/js/item.preprocessing.js.php:337
 msgid "pattern"
-msgstr ""
+msgstr "mønster"
 
 #: include/classes/html/widgets/fields/CWidgetFieldHostPatternSelectView.php:32
 #: include/classes/html/widgets/fields/CWidgetFieldPatternSelectView.php:36
 msgid "patterns"
-msgstr ""
+msgstr "mønstre"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:878
 msgid "percentile() - Percentile P of a period T"
-msgstr ""
+msgstr "percentil() - Percentil P af en periode T"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:885
 msgid "pi() - Returns the Pi constant"
-msgstr ""
+msgstr "pi() - Returnerer Pi-konstanten"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:890
 msgid "power() - The power of a base value to a power value"
-msgstr ""
+msgstr "power() - Potensen af en basisværdi til en potensværdi"
 
 #: widgets/svggraph/views/widget.edit.php:292
 msgid "problem pattern"
-msgstr ""
+msgstr "problemmønster"
 
 #: include/forms.inc.php:508 include/views/js/item.preprocessing.js.php:381
 msgid "qualifier"
@@ -25562,51 +25574,51 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:903
 msgid "radians() - Converts a value from degrees to radians"
-msgstr ""
+msgstr "radians() - Konverterer en værdi fra grader til radianer"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:910
 msgid "rand() - A random integer value"
-msgstr ""
+msgstr "rand() - En tilfældig heltalsværdi"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:915
 msgid "rate() - Returns per-second average rate for monotonically increasing counters"
-msgstr ""
+msgstr "rate() - Returnerer gennemsnitshastighed pr. sekund for monotont stigende tællere"
 
 #: include/classes/api/services/CService.php:2422
 #, c-format
 msgid "read-write access to the child service \"%1$s\" is required"
-msgstr ""
+msgstr "læse- og skriveadgang til underordnet tjeneste \"%1$s\" er påkrævet"
 
 #: include/classes/api/services/CService.php:467
 #, c-format
 msgid "read-write access to the child service \"%1$s\" must be retained"
-msgstr ""
+msgstr "læse- og skriveadgang til underordnet tjeneste \"%1$s\" skal bevares"
 
 #: include/classes/api/services/CService.php:454
 #: include/classes/api/services/CService.php:2339
 #: include/classes/api/services/CService.php:2399
 msgid "read-write access to the service is required"
-msgstr ""
+msgstr "læse- og skriveadgang til tjenesten er påkrævet"
 
 #: include/classes/api/services/CService.php:2398
 #: include/classes/api/services/CService.php:2459
 msgid "read-write access to the service must be retained"
-msgstr ""
+msgstr "læse- og skriveadgang til tjenesten skal bevares"
 
 #: include/classes/widgets/fields/CWidgetFieldNavTree.php:64
 msgid "reference to a non-existent tree element"
-msgstr ""
+msgstr "henvisning til et ikke-eksisterende træelement"
 
 #: include/classes/api/services/CAuthentication.php:167
 #: include/classes/api/services/CUserDirectory.php:877
 #: include/classes/api/services/CUserGroup.php:1332
 msgid "referred object does not exist"
-msgstr ""
+msgstr "refererede objekt eksisterer ikke"
 
 #: include/classes/widgets/fields/CWidgetFieldMultiSelect.php:81
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:99
 msgid "referred widget is unavailable"
-msgstr ""
+msgstr "henvist widget er ikke tilgængelig"
 
 #: app/controllers/CControllerQueueDetails.php:104
 #: app/controllers/CControllerQueueOverview.php:82
@@ -25614,31 +25626,31 @@ msgstr ""
 #: include/page_header.php:125 include/views/general.warning.php:27
 #, c-format
 msgid "refreshed every %1$s sec."
-msgstr ""
+msgstr "opdateres hvert %1$s sek."
 
 #: app/views/js/popup.valuemap.edit.js.php:33
 #: app/views/popup.valuemap.edit.php:78
 msgid "regexp"
-msgstr ""
+msgstr "regexp"
 
 #: app/views/popup.lldoverride.php:135
 #: include/views/configuration.host.discovery.edit.php:848
 #: include/views/js/configuration.host.discovery.edit.js.php:57
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:86
 msgid "regular expression"
-msgstr ""
+msgstr "regulære udtryk"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:922
 msgid "repeat() - Returns a string composed of value repeated count times"
-msgstr ""
+msgstr "repeat() - Returnerer en streng sammensat af værdi gentagne tæller gange"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:935
 msgid "replace() - Search value for occurrences of pattern, and replace with replacement"
-msgstr ""
+msgstr "replace() - Søg værdi for forekomster af mønster, og erstat med erstatning"
 
 #: include/forms.inc.php:1438 include/views/js/item.preprocessing.js.php:391
 msgid "replacement"
-msgstr ""
+msgstr "erstatning"
 
 #: app/views/administration.geomaps.edit.php:48
 msgid "represent tile coordinates;"
@@ -25646,31 +25658,31 @@ msgstr ""
 
 #: app/views/administration.geomaps.edit.php:40
 msgid "represents one of the available subdomains;"
-msgstr ""
+msgstr "repræsenterer et af de tilgængelige underdomæner;"
 
 #: app/views/administration.geomaps.edit.php:44
 msgid "represents zoom level parameter in the URL;"
-msgstr ""
+msgstr "repræsenterer zoomniveauparameter i URL'en;"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1557
 msgid "right"
-msgstr ""
+msgstr "højre"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:953
 msgid "right() - Returns the rightmost count characters"
-msgstr ""
+msgstr "right() - Returnerer tælletegnene længst til højre"
 
 #: widgets/navtree/Widget.php:41
 msgid "root"
-msgstr ""
+msgstr "rod"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:966
 msgid "round() - Rounds a value to decimal places"
-msgstr ""
+msgstr "round() - Afrunder en værdi til decimaler"
 
 #: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:74
 msgid "rows must be unique"
-msgstr ""
+msgstr "rækker skal være unikke"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:979
 msgid "rtrim() - Removes specified characters from the end of a string"
@@ -25693,7 +25705,7 @@ msgstr ""
 
 #: include/forms.inc.php:1437 include/views/js/item.preprocessing.js.php:390
 msgid "search string"
-msgstr ""
+msgstr "søgestreng"
 
 #: include/classes/helpers/CMaintenanceHelper.php:45
 msgctxt "adjective"
@@ -25702,19 +25714,19 @@ msgstr ""
 
 #: include/forms.inc.php:1355 include/views/js/item.preprocessing.js.php:343
 msgid "seconds"
-msgstr ""
+msgstr "sekunder"
 
 #: include/classes/html/CActionButtonList.php:159
 msgid "selected"
-msgstr ""
+msgstr "valgt"
 
 #: include/classes/api/services/CService.php:1415
 msgid "service with the same UUID already exists"
-msgstr ""
+msgstr "tjeneste med samme UUID findes allerede"
 
 #: app/views/popup.sla.excludeddowntime.edit.php:44
 msgid "short description"
-msgstr ""
+msgstr "kort beskrivelse"
 
 #: include/classes/api/services/CAutoregistration.php:170
 #: include/classes/api/services/CHost.php:1978
@@ -25730,69 +25742,69 @@ msgstr ""
 #: include/classes/validators/CApiInputValidator.php:1449
 #: include/classes/validators/CApiInputValidator.php:1762
 msgid "should be empty"
-msgstr ""
+msgstr "skal være tom"
 
 #: app/controllers/CControllerPopupItemTestSend.php:217
 msgid "should be less than current time"
-msgstr ""
+msgstr "skal være mindre end det nuværende tidspunkt"
 
 #: include/views/monitoring.sysmap.edit.php:137
 msgid "show icon mappings"
-msgstr ""
+msgstr "vis ikonkortlægninger"
 
 #: include/views/general.login.php:41
 msgid "sign in as guest"
-msgstr ""
+msgstr "logge ind som gæst"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:992
 msgid "signum() - Returns -1 if a value is negative, 0 if a value is zero, 1 if a value is positive"
-msgstr ""
+msgstr "signum() - Returnerer -1 hvis en værdi er negativ, 0 hvis en værdi er nul, 1 hvis en værdi er positiv"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:999
 msgid "sin() - The sine of a value, where the value is an angle expressed in radians"
-msgstr ""
+msgstr "sin() - Sinus for en værdi, hvor værdien er en vinkel udtrykt i radianer"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1006
 msgid "sinh() - The hyperbolic sine of a value"
-msgstr ""
+msgstr "sinh() - Den hyperbolske sinus af en værdi"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1013
 msgid "skewness() - Measures the asymmetry of the probability distribution"
-msgstr ""
+msgstr "skewness() - Måler asymmetrien i sandsynlighedsfordelingen"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1020
 msgid "sqrt() - Square root of a value"
-msgstr ""
+msgstr "sqrt() - Kvadratroden af en værdi"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1027
 msgid "stddevpop() - Population standard deviation"
-msgstr ""
+msgstr "stddevpop() - Populationsstandardafvigelse"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1034
 msgid "stddevsamp() - Sample standard deviation"
-msgstr ""
+msgstr "stddevsamp() - Eksempel på standardafvigelse"
 
 #: widgets/actionlog/views/widget.edit.php:43
 msgid "subject or body text"
-msgstr ""
+msgstr "emne eller brødtekst"
 
 #: include/graphs.inc.php:84 widgets/piechart/actions/WidgetView.php:666
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:397
 #: widgets/tophosts/views/column.edit.php:156
 msgid "sum"
-msgstr ""
+msgstr "sum"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1041
 msgid "sum() - Sum of values of a period T"
-msgstr ""
+msgstr "sum() - Summen af værdierne af en periode T"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1048
 msgid "sumofsquares() - The sum of squares"
-msgstr ""
+msgstr "sumofsquares() - Summen af kvadrater"
 
 #: include/classes/api/services/CUser.php:2347
 msgid "supplied credentials are not unique"
-msgstr ""
+msgstr "medfølgende legitimationsoplysninger er ikke unikke"
 
 #: app/partials/configuration.tags.tab.php:65
 #: app/partials/monitoring.host.filter.php:45
@@ -25813,48 +25825,48 @@ msgstr ""
 #: include/classes/html/widgets/fields/CWidgetFieldTagsView.php:90
 #: include/forms.inc.php:1823
 msgid "tag"
-msgstr ""
+msgstr "tag"
 
 #: widgets/hostnavigator/includes/CWidgetFieldHostGrouping.php:61
 msgid "tag cannot be empty"
-msgstr ""
+msgstr "tag må ikke være tomt"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1055
 msgid "tan() - The tangent of a value"
-msgstr ""
+msgstr "tan() - Tangens af en værdi"
 
 #: include/classes/api/services/CHostBase.php:1557
 #, c-format
 msgid "template ID \"%1$s\" is passed %2$s times"
-msgstr ""
+msgstr "skabelon-id \"%1$s\" er bestået %2$s gange"
 
 #: include/classes/api/services/CTemplateDashboard.php:395
 msgid "template dashboard with the same UUID already exists"
-msgstr ""
+msgstr "skabelondashboard med samme UUID findes allerede"
 
 #: include/classes/api/services/CTemplateGroup.php:594
 msgid "template group with the same UUID already exists"
-msgstr ""
+msgstr "skabelongruppe med samme UUID findes allerede"
 
 #: include/classes/api/services/CTemplate.php:458
 msgid "template with the same UUID already exists"
-msgstr ""
+msgstr "skabelon med samme UUID findes allerede"
 
 #: include/classes/api/services/CItemGeneral.php:1814
 #: include/classes/api/services/CItemGeneral.php:1831
 #: include/classes/api/services/CItemGeneral.php:1849
 #: include/classes/api/services/CItemGeneral.php:1889
 msgid "the host interface ID is expected"
-msgstr ""
+msgstr "værtsinterface-id'et forventes"
 
 #: include/classes/api/services/CItemGeneral.php:1905
 #, c-format
 msgid "the host interface ID of type \"%1$s\" is expected"
-msgstr ""
+msgstr "værtsinterface-id'et af typen \"%1$s\" forventes"
 
 #: include/classes/validators/CApiInputValidator.php:3284
 msgid "the last new line feed is missing"
-msgstr ""
+msgstr "den sidste nye linjeføring mangler"
 
 #: app/controllers/CControllerDashboardUpdate.php:260
 #: app/controllers/CControllerDashboardUpdate.php:269
@@ -25879,14 +25891,14 @@ msgstr ""
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:109
 #, c-format
 msgid "the parameter \"%1$s\" is missing"
-msgstr ""
+msgstr "parameteren \"%1$s\" mangler"
 
 #: include/classes/db/MysqlDbBackend.php:36
 #: include/classes/db/OracleDbBackend.php:37
 #: include/classes/db/PostgresqlDbBackend.php:62
 #, c-format
 msgid "the table \"%1$s\" was not found"
-msgstr ""
+msgstr "tabellen \"%1$s\" blev ikke fundet"
 
 #: include/classes/export/CConfigurationExportBuilder.php:82
 #: include/classes/import/validators/C44XmlValidator.php:1961
@@ -25901,95 +25913,95 @@ msgstr ""
 #: include/classes/import/validators/CXmlValidatorGeneral.php:200
 #, c-format
 msgid "the tag \"%1$s\" is missing"
-msgstr ""
+msgstr "tagget \"%1$s\" mangler"
 
 #: include/classes/helpers/CMaintenanceHelper.php:46
 msgid "third"
-msgstr ""
+msgstr "tredje"
 
 #: include/classes/api/services/CSettings.php:288
 msgid "time filter default period exceeds the max period"
-msgstr ""
+msgstr "tidsfilterets standardperiode overstiger den maksimale periode"
 
 #: jsLoader.php:296
 msgid "time shift"
-msgstr ""
+msgstr "tidsforskydning"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1062
 msgid "time() - Current time"
-msgstr ""
+msgstr "time() - Aktuel tid"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1068
 msgid "timeleft() - Time to reach threshold estimated based on period T"
-msgstr ""
+msgstr "timeleft() - Tid til at nå tærskel estimeret baseret på periode T"
 
 #: include/classes/api/services/CProxy.php:835
 msgid "timeouts are disabled because the proxy and server versions do not match"
-msgstr ""
+msgstr "timeouts er deaktiveret, fordi proxy- og serverversionerne ikke stemmer overens"
 
 #: include/views/configuration.item.edit.php:643
 #: include/views/configuration.item.prototype.edit.php:614
 msgid "to retrieve a single value"
-msgstr ""
+msgstr "for at hente en enkelt værdi"
 
 #: include/views/configuration.host.discovery.edit.php:548
 #: include/views/configuration.item.edit.php:638
 #: include/views/configuration.item.prototype.edit.php:609
 msgid "to retrieve a subtree"
-msgstr ""
+msgstr "for at hente et undertræ"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1075
 msgid "trendavg() - Average value of a period T with exact period shift"
-msgstr ""
+msgstr "trendavg() - Gennemsnitsværdi af en periode T med nøjagtigt periodeskift"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1096
 msgid "trendcount() - Number of successfully retrieved values for period T"
-msgstr ""
+msgstr "trendcount() - Antallet af succesfulde hentede værdier for periode T"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1103
 msgid "trendmax() - Maximum value for period T with exact period shift"
-msgstr ""
+msgstr "trendmax() - Maksimal værdi for periode T med nøjagtigt periodeskift"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1110
 msgid "trendmin() - Minimum value for period T with exact period shift"
-msgstr ""
+msgstr "trendmin() - Minimumværdi for periode T med nøjagtigt periodeskift"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1117
 msgid "trendstl() - Anomaly detection for period T"
-msgstr ""
+msgstr "trendstl() - Anomalidetektion for periode T"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1160
 msgid "trendsum() - Sum of values of a period T with exact period shift"
-msgstr ""
+msgstr "trendsum() - Summen af værdier af en periode T med nøjagtigt periodeskift"
 
 #: include/classes/api/services/CMap.php:857
 #: include/classes/api/services/CMap.php:1325
 msgid "trigger"
-msgstr ""
+msgstr "udløser"
 
 #: include/classes/api/services/CEvent.php:1684
 msgid "trigger does not allow manual closing"
-msgstr ""
+msgstr "udløseren tillader ikke manuel lukning"
 
 #: include/classes/validators/CExpressionValidator.php:116
 msgid "trigger expression must contain at least one /host/key reference"
-msgstr ""
+msgstr "udløser-udtryk skal indeholde mindst én /host/key reference"
 
 #: include/classes/api/services/CTriggerGeneral.php:2141
 msgid "trigger prototype cannot be moved to another template or host"
-msgstr ""
+msgstr "udløser prototype kan ikke flyttes til en anden skabelon eller vært"
 
 #: include/classes/api/services/CTriggerGeneral.php:686
 msgid "trigger prototype with the same UUID already exists"
-msgstr ""
+msgstr "udløser prototype med samme UUID findes allerede"
 
 #: include/classes/api/services/CTriggerGeneral.php:2307
 msgid "trigger with linkages cannot be moved to another template or host"
-msgstr ""
+msgstr "trigger med koblinger kan ikke flyttes til en anden skabelon eller vært"
 
 #: include/classes/api/services/CTriggerGeneral.php:680
 msgid "trigger with the same UUID already exists"
-msgstr ""
+msgstr "udløser med samme UUID findes allerede"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1167
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
@@ -25997,28 +26009,28 @@ msgstr "trim() - Fjern specificerede tegn fra begyndelsen og slutningen af en st
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1180
 msgid "truncate() - Truncates a value to decimal places"
-msgstr ""
+msgstr "truncate() - Afkorter en værdi til decimaler"
 
 #: app/partials/layout.htmlpage.aside.php:74
 #: include/classes/html/CMultiSelect.php:68 jsLoader.php:330
 msgid "type here to search"
-msgstr ""
+msgstr "skriv her for at søge"
 
 #: app/controllers/CControllerWebScenarioStepCheck.php:79
 #: include/classes/validators/CApiInputValidator.php:2602
 msgid "unacceptable URL"
-msgstr ""
+msgstr "uacceptabel URL"
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:296
 #, c-format
 msgid "unexpected constant \"%1$s\""
-msgstr ""
+msgstr "uventet konstant \"%1$s\""
 
 #: include/classes/export/CConfigurationExportBuilder.php:106
 #: include/classes/import/converters/CConstantImportConverter.php:60
 #, c-format
 msgid "unexpected constant value \"%1$s\""
-msgstr ""
+msgstr "uventet konstant værdi \"%1$s\""
 
 #: include/classes/parsers/CExpressionMacroParser.php:113
 msgid "unexpected end of expression macro"
@@ -26026,11 +26038,11 @@ msgstr ""
 
 #: include/classes/parsers/CItemKey.php:55
 msgid "unexpected end of key"
-msgstr ""
+msgstr "uventet slutning af nøglen"
 
 #: include/classes/parsers/CUserMacroParser.php:38
 msgid "unexpected end of macro"
-msgstr ""
+msgstr "uventet afslutning på makro"
 
 #: include/classes/api/services/CHttpTest.php:575
 #: include/classes/api/services/CHttpTest.php:599
@@ -26039,20 +26051,20 @@ msgstr ""
 #: include/classes/validators/CApiInputValidator.php:3522
 #, c-format
 msgid "unexpected parameter \"%1$s\""
-msgstr ""
+msgstr "uventet parameter \"%1$s\""
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:162
 #: include/classes/import/validators/CXmlValidatorGeneral.php:228
 #, c-format
 msgid "unexpected tag \"%1$s\""
-msgstr ""
+msgstr "uventet tag \"%1$s\""
 
 #: include/classes/import/readers/CXmlImportReader.php:85
 #: include/classes/import/readers/CXmlImportReader.php:124
 #: include/classes/import/readers/CXmlImportReader.php:142
 #, c-format
 msgid "unexpected text \"%1$s\""
-msgstr ""
+msgstr "uventet tekst \"%1$s\""
 
 #: include/classes/api/services/CEvent.php:1519
 #: include/classes/api/services/CEvent.php:1714
@@ -26062,26 +26074,26 @@ msgstr ""
 #: include/classes/api/services/CTriggerGeneral.php:930
 #, c-format
 msgid "unexpected value \"%1$s\""
-msgstr ""
+msgstr "uventet værdi \"%1$s\""
 
 #: include/classes/setup/CFrontendSetup.php:366
 #: include/classes/setup/CFrontendSetup.php:475
 msgid "unknown"
-msgstr ""
+msgstr "ukendt"
 
 #: include/classes/validators/CHistFunctionValidator.php:73
 #: include/classes/validators/CMathFunctionValidator.php:55
 #, c-format
 msgid "unknown function \"%1$s\""
-msgstr ""
+msgstr "ukendt funktion \"%1$s\""
 
 #: app/controllers/CControllerPopupItemTestSend.php:212
 msgid "unsupported time suffix"
-msgstr ""
+msgstr "ikke-understøttet tidssuffiks"
 
 #: include/classes/import/validators/CXmlValidator.php:64
 msgid "unsupported version number"
-msgstr ""
+msgstr "ikke-understøttet versionsnummer"
 
 #: include/classes/validators/CApiInputValidator.php:3726
 #, c-format
@@ -26137,13 +26149,13 @@ msgstr ""
 #: widgets/svggraph/views/widget.edit.php:171
 #: widgets/svggraph/views/widget.edit.php:184
 msgid "value"
-msgstr ""
+msgstr "værdi"
 
 #: app/controllers/CControllerActionOperationCheck.php:217
 #: app/controllers/CControllerUsergroupTagFilterCheck.php:119
 #, c-format
 msgid "value \"%1$s\" already exists"
-msgstr ""
+msgstr "værdien \"%1$s\" findes allerede"
 
 #: include/classes/import/CConfigurationImport.php:957
 #: include/classes/import/CConfigurationImport.php:996

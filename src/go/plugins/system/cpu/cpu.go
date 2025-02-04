@@ -76,10 +76,6 @@ type cpuDiscovery struct {
 	Status string `json:"{#CPU.STATUS}"`
 }
 
-func (p *Plugin) Period() int {
-	return 1
-}
-
 func (p *Plugin) getCpuDiscovery(params []string) (result interface{}, err error) {
 	if len(params) > 0 {
 		return nil, errors.New("Too many parameters.")
@@ -168,7 +164,7 @@ func (p *Plugin) getCpuUtil(params []string) (result interface{}, err error) {
 		return nil, errors.New("CPU is offline.")
 	}
 
-	return cpu.counterAverage(counter, period, 1), nil
+	return p.getCounterAverage(cpu, counter, period), nil
 }
 
 func (p *Plugin) newCpus(num int) (cpus []*cpuUnit) {

@@ -131,7 +131,12 @@ int	zbx_trigger_dep_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
-int	sync_in_progress = 0;
+static int	sync_in_progress = 0;
+
+int	zbx_get_sync_in_progress(void)
+{
+	return sync_in_progress;
+}
 
 #define START_SYNC	do { WRLOCK_CACHE_CONFIG_HISTORY; WRLOCK_CACHE; sync_in_progress = 1; } while(0)
 #define FINISH_SYNC	do { sync_in_progress = 0; UNLOCK_CACHE; UNLOCK_CACHE_CONFIG_HISTORY; } while(0)
@@ -201,41 +206,18 @@ void	set_dc_config(zbx_dc_config_t *in)
 	config = in;
 }
 
-zbx_rwlock_t		config_lock = ZBX_RWLOCK_NULL;
+static zbx_rwlock_t	config_lock = ZBX_RWLOCK_NULL;
 
-void	rdlock_cache(void)
+zbx_rwlock_t	zbx_get_config_lock(void)
 {
-	if (0 == sync_in_progress)
-		zbx_rwlock_rdlock(config_lock);
+	return config_lock;
 }
 
-void	wrlock_cache(void)
-{
-	if (0 == sync_in_progress)
-		zbx_rwlock_wrlock(config_lock);
-}
+static zbx_rwlock_t	config_history_lock = ZBX_RWLOCK_NULL;
 
-void	unlock_cache(void)
+zbx_rwlock_t	zbx_get_config_history_lock(void)
 {
-	if (0 == sync_in_progress)
-		zbx_rwlock_unlock(config_lock);
-}
-
-zbx_rwlock_t		config_history_lock = ZBX_RWLOCK_NULL;
-
-void	rdlock_cache_config_history(void)
-{
-	zbx_rwlock_rdlock(config_history_lock);
-}
-
-void	wrlock_cache_config_history(void)
-{
-	zbx_rwlock_wrlock(config_history_lock);
-}
-
-void	unlock_cache_config_history(void)
-{
-	zbx_rwlock_unlock(config_history_lock);
+	return config_history_lock;
 }
 
 static zbx_shmem_info_t	*config_mem;
@@ -1217,30 +1199,27 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 		config->revision.config_table = revision;
 	}
 
-	if (ZBX_HK_OPTION_ENABLED == (value_int = atoi(row[15])) &&
+	unsigned char	hk_audit_mode = (unsigned char)atoi(row[15]);
+
+	if (ZBX_HK_OPTION_ENABLED == hk_audit_mode &&
 			SUCCEED != set_hk_opt(&config->config->hk.audit, 1, SEC_PER_DAY, row[16], revision))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "audit data housekeeping will be disabled due to invalid"
 				" settings");
-		value_int = ZBX_HK_OPTION_DISABLED;
+		hk_audit_mode = ZBX_HK_OPTION_DISABLED;
 	}
-	if (config->config->hk.audit_mode != value_int)
-	{
-		config->config->hk.audit_mode = value_int;
-		config->revision.config_table = revision;
-	}
-
 #ifdef HAVE_POSTGRESQL
-	if (ZBX_HK_MODE_DISABLED != config->config->hk.audit_mode &&
+	if (ZBX_HK_MODE_DISABLED != hk_audit_mode &&
 			0 == zbx_strcmp_null(config->config->db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 	{
-		if (ZBX_HK_MODE_PARTITION != config->config->hk.audit_mode)
-		{
-			config->config->hk.audit_mode = ZBX_HK_MODE_PARTITION;
-			config->revision.config_table = revision;
-		}
+		hk_audit_mode = ZBX_HK_MODE_PARTITION;
 	}
 #endif
+	if (config->config->hk.audit_mode != hk_audit_mode)
+	{
+		config->config->hk.audit_mode = hk_audit_mode;
+		config->revision.config_table = revision;
+	}
 
 	if (ZBX_HK_OPTION_ENABLED == (value_int = atoi(row[17])) &&
 			SUCCEED != set_hk_opt(&config->config->hk.sessions, 1, SEC_PER_DAY, row[18], revision))
@@ -1255,22 +1234,14 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 		config->revision.config_table = revision;
 	}
 
-	if (config->config->hk.history_mode != (value_int = atoi(row[19])))
-	{
-		config->config->hk.history_mode = value_int;
-		config->revision.config_table = revision;
-	}
+	unsigned char	hk_history_mode = (unsigned char)atoi(row[19]);
 
 	if (ZBX_HK_OPTION_ENABLED == (value_int = atoi(row[20])) &&
 			SUCCEED != set_hk_opt(&config->config->hk.history, 0, ZBX_HK_HISTORY_MIN, row[21], revision))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "history data housekeeping will be disabled and all items will"
 				" store their history due to invalid global override settings");
-		if (ZBX_HK_MODE_DISABLED != config->config->hk.history_mode)
-		{
-			config->config->hk.history_mode = ZBX_HK_MODE_DISABLED;
-			config->revision.config_table = revision;
-		}
+		hk_history_mode = ZBX_HK_MODE_DISABLED;
 
 		if (1 != config->config->hk.history)
 		{
@@ -1285,34 +1256,27 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 	}
 
 #ifdef HAVE_POSTGRESQL
-	if (ZBX_HK_MODE_DISABLED != config->config->hk.history_mode &&
-			ZBX_HK_OPTION_ENABLED == config->config->hk.history_global &&
+	if (ZBX_HK_MODE_DISABLED != hk_history_mode && ZBX_HK_OPTION_ENABLED == config->config->hk.history_global &&
 			0 == zbx_strcmp_null(config->config->db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 	{
-		if (ZBX_HK_MODE_PARTITION != config->config->hk.history_mode)
-		{
-			config->config->hk.history_mode = ZBX_HK_MODE_PARTITION;
-			config->revision.config_table = revision;
-		}
+		hk_history_mode = ZBX_HK_MODE_PARTITION;
 	}
 #endif
-
-	if (config->config->hk.trends_mode != (value_int = atoi(row[22])))
+	if (config->config->hk.history_mode != hk_history_mode)
 	{
-		config->config->hk.trends_mode = value_int;
+		config->config->hk.history_mode = hk_history_mode;
 		config->revision.config_table = revision;
 	}
+
+	unsigned char	hk_trends_mode = (unsigned char)atoi(row[22]);
 
 	if (ZBX_HK_OPTION_ENABLED == (value_int = atoi(row[23])) &&
 			SUCCEED != set_hk_opt(&config->config->hk.trends, 0, ZBX_HK_TRENDS_MIN, row[24], revision))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "trends data housekeeping will be disabled and all numeric items"
 				" will store their history due to invalid global override settings");
-		if (ZBX_HK_MODE_DISABLED != config->config->hk.trends_mode)
-		{
-			config->config->hk.trends_mode = ZBX_HK_MODE_DISABLED;
-			config->revision.config_table = revision;
-		}
+		hk_trends_mode = ZBX_HK_MODE_DISABLED;
+
 		if (1 != config->config->hk.trends)
 		{
 			config->config->hk.trends = 1;	/* just enough to make 0 == items[i].trends condition fail */
@@ -1324,19 +1288,19 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 		config->config->hk.trends_global = value_int;
 		config->revision.config_table = revision;
 	}
-
 #ifdef HAVE_POSTGRESQL
-	if (ZBX_HK_MODE_DISABLED != config->config->hk.trends_mode &&
+	if (ZBX_HK_MODE_DISABLED != hk_trends_mode &&
 			ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global &&
 			0 == zbx_strcmp_null(config->config->db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 	{
-		if (ZBX_HK_MODE_PARTITION != config->config->hk.trends_mode)
-		{
-			config->config->hk.trends_mode = ZBX_HK_MODE_PARTITION;
-			config->revision.config_table = revision;
-		}
+		hk_trends_mode = ZBX_HK_MODE_PARTITION;
 	}
 #endif
+	if (config->config->hk.trends_mode != hk_trends_mode)
+	{
+		config->config->hk.trends_mode = hk_trends_mode;
+		config->revision.config_table = revision;
+	}
 
 	if (NULL == config->config->default_timezone || 0 != strcmp(config->config->default_timezone, row[31]))
 	{

@@ -97,10 +97,10 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 
 		$users = API::User()->get([
 			'output' => ['username', 'name', 'surname', 'lang', 'theme', 'autologin', 'autologout', 'refresh',
-				'rows_per_page', 'url', 'timezone', 'userdirectoryid'
+				'rows_per_page', 'url', 'timezone', 'provisioned'
 			],
 			'selectMedias' => (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER)
-				? ['mediaid', 'mediatypeid', 'period', 'sendto', 'severity', 'active', 'userdirectory_mediaid']
+				? ['mediaid', 'mediatypeid', 'period', 'sendto', 'severity', 'active', 'provisioned']
 				: null,
 			'userids' => CWebUser::$data['userid'],
 			'selectUsrgrps' => ['userdirectoryid'],
@@ -144,14 +144,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'action' => $this->getAction()
 		];
 
-		$data['internal_auth'] = true;
-
-		foreach ($this->user['usrgrps'] as $group) {
-			if ($group['userdirectoryid'] != 0) {
-				$data['internal_auth'] = false;
-				break;
-			}
-		}
+		$data['internal_auth'] = CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL;
 
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
 			$data['medias'] = $this->user['medias'];
@@ -173,9 +166,8 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 		}
 
 		$data['readonly'] = false;
-		$data['userdirectoryid'] = $this->user['userdirectoryid'];
 
-		if ($this->user['userdirectoryid'] != 0) {
+		if ($this->user['provisioned'] == CUser::PROVISION_STATUS_YES) {
 			$data['readonly'] = true;
 		}
 

@@ -1408,8 +1408,8 @@ INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (9
 
 -- testPageTriggerUrl
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1020, 'Dashboard for Trigger overview widget', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (15670, 1020);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100003, 15670, 'trigover', 'Group to check Overview', 0, 0, 12, 7);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (156700, 1020);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100003, 156700, 'trigover', 'Group to check Overview', 0, 0, 12, 7);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (1345, 100003, 0, 'style', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (1346, 100003, 2, 'groupids', 0, 50011);
 
@@ -1422,9 +1422,9 @@ INSERT INTO dashboard_user (dashboard_userid, dashboardid, userid, permission) V
 
 -- Dashboard for graph widget
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1030, 'Dashboard for graph widgets', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (15680, 1030);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100004, 15680, 'svggraph', 'Test cases for update', 0, 0, 6, 5);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100005, 15680, 'svggraph', 'Test cases for simple update and deletion', 6, 0, 6, 5);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (156800, 1030);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100004, 156800, 'svggraph', 'Test cases for update', 0, 0, 6, 5);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100005, 156800, 'svggraph', 'Test cases for simple update and deletion', 6, 0, 6, 5);
 -- widget "Test cases for simple update and deletion"
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (910006, 100005, 1, 'ds.0.color', 0, 'FF465C');
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_str) VALUES (910007, 100005, 0, 'righty', 0, '');
