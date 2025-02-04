@@ -268,8 +268,6 @@ class CControllerHostList extends CController {
 		order_result($hosts, $sort_field, $sort_order);
 
 		$hostids = array_column($hosts, 'hostid');
-
-		// Get count for every host with item type ITEM_TYPE_ZABBIX_ACTIVE (7) and ITEM_TYPE_ZABBIX (0).
 		$active_item_count_by_hostid = getEnabledItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, $hostids);
 
 		// Selecting linked templates to templates linked to hosts.
