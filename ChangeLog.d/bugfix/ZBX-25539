@@ -1,1 +1,1 @@
-..F....... [ZBX-25539] fixed console error when configuring Top hosts widget to display the same thumbnail in more than one column (rgontarski)
+..F....... [ZBX-25539] fixed console error when configuring Top hosts or Item history widget to display the same thumbnail in more than one column (rgontarski)
