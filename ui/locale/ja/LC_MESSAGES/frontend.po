@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-01-11 14:55+0000\n"
+"PO-Revision-Date: 2025-01-30 02:46+0000\n"
 "Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -9313,7 +9313,7 @@ msgstr "履歴関数"
 
 #: app/views/administration.housekeeping.edit.php:218
 msgid "History, trends and audit log compression"
-msgstr ""
+msgstr "ヒストリ、トレンド、監査ログの圧縮"
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -17474,6 +17474,10 @@ msgstr "デフォルトにリセット"
 msgid "Reset to initial view"
 msgstr "初期表示にリセット"
 
+#: app/views/administration.miscconfig.edit.php:103
+msgid "Resolve secret vault macros by"
+msgstr ""
+
 #: jsLoader.php:283
 msgid "Resolved"
 msgstr "解決済"
@@ -23703,6 +23707,14 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr "Zabbixサーバーまたはプロキシ"
 
+#: app/views/administration.miscconfig.edit.php:112
+msgid "Zabbix server and proxy"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:107
+msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
+msgstr ""
+
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Zabbixサーバーが動作していません (画面のリフレッシュを行ってステータスを再確認してください)"
@@ -23719,6 +23731,10 @@ msgstr "Zabbixサーバー名"
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
 msgstr "Zabbixサーバーのバージョン"
+
+#: app/views/administration.miscconfig.edit.php:105
+msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
+msgstr ""
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"

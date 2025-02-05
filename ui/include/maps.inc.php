@@ -550,6 +550,21 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 		'hosts_to_get_inventories' => $hosts_to_get_inventories
 	] = getSysmapResourceIds($sysmap['selements'], $sysmaps_data, $sysmap['iconmapid'] != 0);
 
+	// Prepare host groups data including nested host groups.
+	$nested_hostgroups = [];
+
+	if ($selement_hostgroupids) {
+		$nested_selement_hostgroupids = [];
+
+		foreach ($selement_hostgroupids as $selement_hostgroupid) {
+			$sub_groups = getSubGroups([$selement_hostgroupid]);
+			$nested_hostgroups[$selement_hostgroupid] = $sub_groups;
+			$nested_selement_hostgroupids += array_combine($sub_groups, $sub_groups);
+		}
+
+		$selement_hostgroupids = $nested_selement_hostgroupids;
+	}
+
 	// Prepare hosts data.
 	$selement_hosts = $selement_hostids
 		? API::Host()->get([
@@ -569,17 +584,22 @@ function getSelementsInfo(array $sysmap, array $options = []): array {
 		: [];
 
 	$hosts = $selement_hostgroup_hosts + $selement_hosts;
-
 	$hosts_by_groupids = array_fill_keys($selement_hostgroupids, []);
+
 	foreach ($selement_hostgroup_hosts as $host) {
 		foreach ($host['hostgroups'] as $group) {
 			$groupid = $group['groupid'];
 			$hostid = $host['hostid'];
-
 			$hosts_by_groupids[$groupid][$hostid] = $hostid;
+
+			foreach ($nested_hostgroups as $top_hostgroupid => $nested_hostgroupids) {
+				if (in_array($groupid, $nested_hostgroupids)) {
+					$hosts_by_groupids[$top_hostgroupid][$hostid] = $hostid;
+				}
+			}
 		}
 	}
-	unset($selement_hostgroup_hosts, $selement_hosts);
+	unset($selement_hostgroup_hosts, $selement_hosts, $nested_hostgroups);
 
 	// Prepare triggers data.
 	$selement_triggers = $selement_triggerids

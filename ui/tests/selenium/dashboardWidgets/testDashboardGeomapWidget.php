@@ -575,7 +575,7 @@ class testDashboardGeomapWidget extends CWebTest {
 			$values = $form->getFields()->asValues();
 		}
 		else {
-			$form->fill(['Type' => 'Geomap']);
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Geomap')]);
 		}
 
 		if ($cancel || !$save_dashboard) {
