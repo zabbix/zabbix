@@ -18,6 +18,7 @@
 
 #include "zbxregexp.h"
 #include "zbxcachevalue.h"
+#include "zbxcachehistory.h"
 #include "zbxtrends.h"
 #include "anomalystl.h"
 #include "zbxnum.h"
@@ -1719,7 +1720,8 @@ static int	evaluate_NODATA(zbx_variant_t *value, const zbx_dc_evaluate_item_t *i
 			goto out;
 		}
 
-		if (0 != (nodata_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE))
+		if (0 != (nodata_win.flags & ZBX_PROXY_SUPPRESS_ACTIVE) || (0 != item->proxyid && 0 != lazy &&
+				SUCCEED == zbx_hc_is_itemid_cached(item->itemid)))
 		{
 			*error = zbx_strdup(*error, "historical data transfer from proxy is still in progress");
 			goto out;
