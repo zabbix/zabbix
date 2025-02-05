@@ -19,6 +19,7 @@ class CForm {
 		'array': CFieldArray,
 		'checkbox': CFieldCheckBox,
 		'hidden': CFieldHidden,
+		'multiline': CFieldMultiline,
 		'multiselect': CFieldMultiselect,
 		'radio-list': CFieldRadioList,
 		'set': CFieldSet,
