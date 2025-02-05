@@ -32,6 +32,7 @@ require_once dirname(__FILE__).'/testServiceRoles.php';
 require_once dirname(__FILE__).'/testExpressionMacros.php';
 require_once dirname(__FILE__).'/testExpressionTriggerMacros.php';
 require_once dirname(__FILE__).'/testAgentItems.php';
+require_once dirname(__FILE__).'/testScriptItems.php';
 require_once dirname(__FILE__).'/testItemRate.php';
 require_once dirname(__FILE__).'/testHistoryValueDuplicates.php';
 require_once dirname(__FILE__).'/testHighAvailability.php';
@@ -79,7 +80,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testServiceRoles');
 		$suite->addTestSuite('testExpressionMacros');
 		$suite->addTestSuite('testExpressionTriggerMacros');
-		$suite->addTestSuite('testAgentItems');
+		$suite->addTestSuite('testScriptItems');
 		$suite->addTestSuite('testItemRate');
 		$suite->addTestSuite('testHistoryValueDuplicates');
 		$suite->addTestSuite('testHighAvailability');
