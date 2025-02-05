@@ -920,7 +920,7 @@ int	zbx_is_time_suffix(const char *str, int *value, int length)
 	int		len = length;
 	int		value_tmp = 0, c, factor = 1;
 
-	if (NULL == str || '\0' == *str || 0 >= len || 0 == isdigit(*str))
+	if ('\0' == *str || 0 >= len || 0 == isdigit(*str))
 		return FAIL;
 
 	while ('\0' != *str && 0 < len && 0 != isdigit(*str))
