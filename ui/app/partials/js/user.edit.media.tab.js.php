@@ -112,14 +112,14 @@
 
 		_createButtonEnabled(button) {
 			button.classList.replace('<?= ZBX_STYLE_RED ?>', '<?= ZBX_STYLE_GREEN ?>');
-			button.textContent = 'Enabled';
+			button.textContent = t('Enabled');
 
 			Object.assign(button.dataset, {status_type: 'disable_media'});
 		}
 
 		_createButtonDisabled(button) {
 			button.classList.replace('<?= ZBX_STYLE_GREEN ?>', '<?= ZBX_STYLE_RED ?>');
-			button.textContent = 'Disabled';
+			button.textContent = t('Disabled');
 
 			Object.assign(button.dataset, {status_type: 'enable_media'});
 		}
@@ -151,6 +151,7 @@
 					hintboxData.hintboxContents += ' (off)';
 				}
 
+				hintboxData.hintboxContents = t(hintboxData.hintboxContents)
 				Object.assign(span.dataset, hintboxData);
 			}
 		}
@@ -170,7 +171,7 @@
 			button.classList.add('btn-icon', 'zi-i-warning', 'btn-small');
 
 			Object.assign(button.dataset, {
-				hintboxContents: text,
+				hintboxContents: t(text),
 				hintbox: 1,
 				hintboxClass: 'hintbox-wrap',
 				hintboxStatic: 1,
@@ -204,7 +205,7 @@
 			}
 
 			if (this.mediatypes[data.mediatypeid] === undefined) {
-				data.name = 'Unknown';
+				data.name = t('Unknown');
 			}
 
 			if (data.mediatype == <?= MEDIA_TYPE_EMAIL ?>) {
