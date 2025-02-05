@@ -716,6 +716,7 @@ class testDashboardURLWidget extends CWebTest {
 		// Update host in widget.
 		foreach ([true, false] as $state) {
 			$this->page->switchTo($widget->query('id:iframe')->one());
+			COverlayDialogElement::find()->waitUntilReady();
 			$this->query('button:Update')->one()->click();
 			CMessageElement::find()->one()->waitUntilVisible();
 			$this->assertTrue($this->query('class:msg-good')->one()->isVisible());
@@ -771,7 +772,7 @@ class testDashboardURLWidget extends CWebTest {
 		$this->query('button:Save changes')->one()->click();
 
 		// Check that Dashboard can't be saved and returns error regarding invalid parameter.
-		$message = CMessageElement::find('xpath://div[@class="wrapper"]', true)->one();
+		$message = CMessageElement::find('xpath://div[@class="wrapper"]', true)->one()->waitUntilVisible();
 		$this->assertMessage(TEST_BAD, null, 'Cannot save widget "'.self::$default_widget.'". Invalid parameter "URL": cannot be empty.');
 		$message->close();
 
@@ -903,7 +904,7 @@ class testDashboardURLWidget extends CWebTest {
 		}
 		else {
 			// Assert the iframe with Host form loaded.
-			$this->assertEquals('Host', COverlayDialogElement::find()->one()->getTitle());
+			$this->assertEquals('Host', COverlayDialogElement::find()->waitUntilReady()->one()->getTitle());
 		}
 
 		$this->page->switchTo();

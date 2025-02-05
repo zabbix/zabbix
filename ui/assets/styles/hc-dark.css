@@ -1,5 +1,5 @@
 @charset "UTF-8";
-.sidebar .server-name, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups.has-ellipsis .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates.has-ellipsis .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
+.sidebar .server-name, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-hostcard .host-card .sections-header .host-name .link-action, div.dashboard-widget-hostcard .host-card .sections .section .section-name, div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring .monitoring .monitoring-item .monitoring-item-name, div.dashboard-widget-hostcard .host-card .sections .section.section-monitored-by .section-body, div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name, div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-name,
 div.dashboard-widget-hostcard .host-card .sections .section.section-inventory .section-body .inventory-field-value, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, form.dashboard-widget-topitems #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a, .totals-list.totals-list-horizontal .count,
 .totals-list.totals-list-horizontal .name {
   overflow: hidden;
@@ -4421,9 +4421,12 @@ div.dashboard-widget-hostcard .host-card {
         max-height: 36px;
         overflow: hidden; }
         div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group {
-          display: inline-block; }
+          display: inline-block;
+          max-width: 100%; }
           div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group:not(:first-of-type) {
             margin-left: 4px; }
+          div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name {
+            max-width: 100%; }
           div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .host-group-name,
           div.dashboard-widget-hostcard .host-card .sections .section.section-host-groups .host-groups .host-group .delimiter {
             display: inline-block;
@@ -4434,6 +4437,7 @@ div.dashboard-widget-hostcard .host-card {
           max-width: 75px; }
       div.dashboard-widget-hostcard .host-card .sections .section.section-description {
         grid-template-columns: 1fr;
+        word-break: break-word;
         --line-clamp: 2; }
       div.dashboard-widget-hostcard .host-card .sections .section.section-monitoring {
         container-type: inline-size; }
@@ -4458,9 +4462,12 @@ div.dashboard-widget-hostcard .host-card {
         max-height: 36px;
         overflow: hidden; }
         div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template {
-          display: inline-block; }
+          display: inline-block;
+          max-width: 100%; }
           div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template:not(:first-of-type) {
             margin-left: 4px; }
+          div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name {
+            max-width: 100%; }
           div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .template-name,
           div.dashboard-widget-hostcard .host-card .sections .section.section-templates .templates .template .delimiter {
             display: inline-block;
