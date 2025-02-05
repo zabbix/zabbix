@@ -43,7 +43,7 @@ class testConfigVariables extends CIntegrationTest {
 		'${var 123}', // variable name contains a space
 		'${EnvVar', // unclosed variable name
 		'echo ${EnvVar}', // variable mixed with text
-		'${EnvVar1}${EnvVar2}', // multiple variables
+		'${EnvVar1}${EnvVar2}' // multiple variables
 	];
 
 	private static $include_files = [
