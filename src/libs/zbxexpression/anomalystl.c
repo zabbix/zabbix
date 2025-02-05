@@ -781,6 +781,7 @@ int	zbx_STL(const zbx_vector_history_record_t *values_in, int freq, int is_robus
 		{
 			zbx_history_record_t	x;
 
+			x.timestamp = {0, 0};
 			x.value.dbl = 0;
 			zbx_vector_history_record_append_ptr(work_temp, &x);
 		}
