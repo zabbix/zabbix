@@ -149,9 +149,10 @@ class CAction extends CApiService {
 					' AND '.dbConditionId('r.groupid', $usrgrpids).
 				' WHERE a.actionid=c.actionid'.
 					' AND c.conditiontype='.ZBX_CONDITION_TYPE_HOST_GROUP.
+					' AND c.value!='.zbx_dbstr('0').
 				' GROUP BY c.value'.
-				' HAVING '.dbConditionString('c.value', ['0'], true).
-					' AND (MIN(r.permission) IS NULL OR MIN(r.permission)='.PERM_DENY.')'.
+				' HAVING MIN(r.permission) IS NULL'.
+					' OR MIN(r.permission)='.PERM_DENY.
 			')';
 
 			// Check permissions of hosts and templates used in filter conditions.
@@ -162,7 +163,7 @@ class CAction extends CApiService {
 				' LEFT JOIN permission p ON hh.hgsetid=p.hgsetid'.
 					' AND p.ugsetid='.self::$userData['ugsetid'].
 				' WHERE a.actionid=c.actionid'.
-					' AND '.dbConditionString('c.value', ['0'], true).
+					' AND c.value!='.zbx_dbstr('0').
 					' AND c.conditiontype IN ('.ZBX_CONDITION_TYPE_HOST.','.ZBX_CONDITION_TYPE_TEMPLATE.')'.
 					' AND p.permission IS NULL'.
 			')';
@@ -177,7 +178,7 @@ class CAction extends CApiService {
 				' LEFT JOIN permission p ON hh.hgsetid=p.hgsetid'.
 					' AND p.ugsetid='.self::$userData['ugsetid'].
 				' WHERE a.actionid=c.actionid'.
-					' AND '.dbConditionString('c.value', ['0'], true).
+					' AND c.value!='.zbx_dbstr('0').
 					' AND c.conditiontype='.ZBX_CONDITION_TYPE_TRIGGER.
 					' AND p.permission IS NULL'.
 			')';
