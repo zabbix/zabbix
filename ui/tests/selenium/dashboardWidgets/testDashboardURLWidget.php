@@ -716,6 +716,7 @@ class testDashboardURLWidget extends CWebTest {
 		// Update host in widget.
 		foreach ([true, false] as $state) {
 			$this->page->switchTo($widget->query('id:iframe')->one());
+			COverlayDialogElement::find()->waitUntilReady();
 			$this->query('button:Update')->one()->click();
 			CMessageElement::find()->one()->waitUntilVisible();
 			$this->assertTrue($this->query('class:msg-good')->one()->isVisible());
@@ -903,7 +904,7 @@ class testDashboardURLWidget extends CWebTest {
 		}
 		else {
 			// Assert the iframe with Host form loaded.
-			$this->assertEquals('Host', COverlayDialogElement::find()->one()->getTitle());
+			$this->assertEquals('Host', COverlayDialogElement::find()->waitUntilReady()->one()->getTitle());
 		}
 
 		$this->page->switchTo();
