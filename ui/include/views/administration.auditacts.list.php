@@ -71,7 +71,7 @@ $auditTable = (new CTableInfo())
 		_('Info')
 	]);
 
-foreach ($this->data['alerts'] as $alert) {
+foreach ($data['alerts'] as $alert) {
 	$mediatype = array_pop($alert['mediatypes']);
 
 	if ($alert['status'] == ALERT_STATUS_SENT) {
@@ -120,7 +120,7 @@ foreach ($this->data['alerts'] as $alert) {
 
 	$auditTable->addRow([
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
-		$this->data['actions'][$alert['actionid']]['name'],
+		$data['actions'][$alert['actionid']]['name'],
 		$mediatype ? $mediatype['name'] : '',
 		$recipient,
 		$message,
@@ -130,7 +130,7 @@ foreach ($this->data['alerts'] as $alert) {
 }
 
 // append table to form
-$auditForm->addItem([$auditTable, $this->data['paging']]);
+$auditForm->addItem([$auditTable, $data['paging']]);
 
 // append navigation bar js
 $objData = [

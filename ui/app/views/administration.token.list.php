@@ -166,9 +166,7 @@ foreach ($data['tokens'] as $token) {
 			$token['is_expired'] ? ZBX_STYLE_RED : ZBX_STYLE_GREEN
 		),
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $token['created_at']),
-		($token['creator'] === null)
-			? italic(_('Unknown'))
-			: $token['creator'],
+		$token['creator'] === null ? italic(_('Unknown')) : $token['creator'],
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $token['lastaccess']),
 		($token['status'] == ZBX_AUTH_TOKEN_ENABLED)
 			? (new CLink(_('Enabled'), (new CUrl('zabbix.php'))
