@@ -296,7 +296,7 @@ class Proxies {
 				'name' => '⭐️😀⭐Smiley प्रॉक्सी 团体⭐️😀⭐ - unknown',
 				'failover_delay' => '123s',
 				'min_online' => '123',
-				'description' => 'Proxy group that has special utf8mb4 simbols in its name and has unknown state'
+				'description' => 'Proxy group that has special utf8mb4 symbols in its name and has unknown state'
 			],
 			[
 				'name' => 'Group without proxies',

@@ -34,6 +34,8 @@ class CUserGroup extends CApiService {
 		'mfa_status', 'mfaid'
 	];
 
+	public const LIMITED_OUTPUT_FIELDS = ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode', 'mfa_status'];
+
 	/**
 	 * Get user groups.
 	 *
@@ -106,6 +108,20 @@ class CUserGroup extends CApiService {
 			}
 		}
 
+		// output
+		if (!$options['countOutput']) {
+			$usrgrps_output_fields = self::$userData['type'] == USER_TYPE_SUPER_ADMIN
+				? self::OUTPUT_FIELDS
+				: self::LIMITED_OUTPUT_FIELDS;
+
+			if (is_array($options['output'])) {
+				$options['output'] = array_intersect($options['output'], $usrgrps_output_fields);
+			}
+			elseif ($options['output'] === API_OUTPUT_EXTEND) {
+				$options['output'] = $usrgrps_output_fields;
+			}
+		}
+
 		// usrgrpids
 		if (!is_null($options['usrgrpids'])) {
 			zbx_value2array($options['usrgrpids']);
@@ -123,6 +139,10 @@ class CUserGroup extends CApiService {
 		}
 
 		if (!is_null($options['mfaids'])) {
+			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+				return [];
+			}
+
 			zbx_value2array($options['mfaids']);
 
 			$sqlParts['where'][] = dbConditionId('g.mfaid', $options['mfaids']);
@@ -139,8 +159,26 @@ class CUserGroup extends CApiService {
 			$sqlParts['where'][] = dbConditionInt('g.mfa_status', $options['mfa_status']);
 		}
 
+		$limited_output_fields = array_flip(self::LIMITED_OUTPUT_FIELDS);
+
 		// filter
 		if (is_array($options['filter'])) {
+			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+				if ($options['searchByAny'] !== null && $options['searchByAny'] !== false) {
+					$options['filter'] = array_diff_key($options['filter'], array_flip(['userdirectoryid', 'mfaid']));
+				}
+				else {
+					$has_private_fields = array_intersect_key(
+						array_diff_key($options['filter'], $limited_output_fields),
+						array_flip(['userdirectoryid', 'mfaid'])
+					);
+
+					if($has_private_fields) {
+						return [];
+					}
+				}
+			}
+
 			$this->dbFilter('usrgrp g', $options, $sqlParts);
 		}
 
