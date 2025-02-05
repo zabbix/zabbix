@@ -268,7 +268,7 @@ var hintBox = {
 				: jQuery(this);
 
 			if (e.type === 'keydown') {
-				if (e.keyCode !== KEY_ENTER && e.keyCode !== KEY_SPACE) {
+				if (e.key !== " " && e.key !== 'Enter') {
 					return;
 				}
 
