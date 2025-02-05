@@ -911,7 +911,6 @@ void	zbx_eval_get_functionids(zbx_eval_context_t *ctx, zbx_vector_uint64_t *func
 
 	for (i = 0; i < ctx->stack.values_num; i++)
 	{
-		printf("is anything happening\n");
 		zbx_eval_token_t	*token = &ctx->stack.values[i];
 		zbx_uint64_t		functionid;
 

@@ -1,5 +1,15 @@
---- # numeric variables
-test case: Test
+---
+test case: Some ids
 in:
-  rules: [ZBX_EVAL_PARSE_LOGIC,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_MATH]
-  expression: 'not 1 + 2'
+  rules: [ZBX_EVAL_PARSE_FUNCTIONID]
+  expression:
+  - '{3}'
+  - '{100}'
+  - '{200}'
+  - '{1}'
+out:
+  ids:
+  - 3
+  - 100
+  - 200
+  - 1

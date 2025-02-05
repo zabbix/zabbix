@@ -1,0 +1,5 @@
+---
+test case: 'last(/host/key)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
+  expression: 'last(/host/key)'
