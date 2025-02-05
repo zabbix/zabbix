@@ -20,9 +20,9 @@
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 #include "zbxself.h"
-#include "zbxstr.h"
 #include "zbxthreads.h"
 #include "zbxjson.h"
+#include "zbxnum.h"
 
 /******************************************************************************
  *                                                                            *
