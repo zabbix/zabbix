@@ -3408,6 +3408,22 @@ svg {
 	}
 }
 
+.item-final-result {
+	.table-forms-separator {
+		line-height: 24px;
+	}
+
+	.final-result-row {
+		display: flex;
+		align-items: center;
+		width: 675px;
+
+		.final-result-action {
+			margin-right : auto;
+		}
+	}
+}
+
 #preprocessing-test-form {
 	.table-forms-separator {
 		margin-top: -2px;
@@ -4071,6 +4087,18 @@ z-select {
 
 	.audit-show-details-btn-wrapper {
 		margin: 0 5px 0 5px;
+	}
+}
+
+button.copy-button {
+	&::before {
+		color: $icon-color;
+		border: 1px solid $form-border-color;
+		background: $form-bg-color !important;
+		border-radius: 2px;
+		font-size: 12px;
+		line-height: 24px;
+		width: 24px;
 	}
 }
 

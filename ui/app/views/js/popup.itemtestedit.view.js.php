@@ -240,12 +240,12 @@ function itemGetValueTest(overlay) {
  * @param {object} overlay  Overlay dialog object.
  */
 function itemCompleteTest(overlay) {
-	var $body = overlay.$dialogue.$body,
-		$form = overlay.$dialogue.find('form'),
-		form_data = $form.serializeJSON(),
-		post_data = getItemTestProperties('#preprocessing-test-form'),
-		interface = (typeof form_data['interface'] !== 'undefined') ? form_data['interface'] : null,
-		url = new Curl('zabbix.php');
+	const $body = overlay.$dialogue.$body;
+	const $form = overlay.$dialogue.find('form');
+	const form_data = $form.serializeJSON();
+	let post_data = getItemTestProperties('#preprocessing-test-form');
+	const interface = (typeof form_data['interface'] !== 'undefined') ? form_data['interface'] : null;
+	const url = new Curl('zabbix.php');
 
 	url.setArgument('action', 'popup.itemtest.send');
 	url.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('itemtest')) ?>);
@@ -333,21 +333,35 @@ function itemCompleteTest(overlay) {
 				jQuery('#runtime_error', $form).multilineInput('value', ret.runtime_error);
 			}
 
-			if (typeof ret.eol !== 'undefined') {
+			if (ret.eol !== undefined) {
 				jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
 			}
 
-			if (typeof ret.final !== 'undefined') {
-				var result = makeStepResult(ret.final);
+			if (ret.final !== undefined) {
+				let result = makeStepResult(ret.final);
 
 				if (result !== null) {
-					$result = result.css('float', 'right');
+					$result = result;
 				}
 
-				$result_row = jQuery('<div>', {'class': '<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>'})
-					.css({whiteSpace: 'normal'})
-					.append(jQuery('<div>').append(ret.final.action, $result))
-					.css({display: 'block', width: '675px'});
+				if (ret.final.error === undefined && ret.final.result) {
+					let copy_button = document.createElement('button');
+
+					copy_button.type = 'button';
+					copy_button.title = t('Copy to clipboard');
+					copy_button.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_COPY, 'copy-button');
+
+					$copy_button = jQuery(copy_button);
+
+					copy_button.addEventListener('click', () => writeTextClipboard(ret.final.result));
+				}
+
+				$result_row = jQuery('<div>', {'class': '<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?> final-result-row'})
+					.append(
+						$(ret.final.action).addClass('final-result-action'),
+						$result,
+						$copy_button ?? ''
+					);
 
 				if (typeof ret.mapped_value !== 'undefined') {
 					$mapped_value = makeStepResult({result: ret.mapped_value});
@@ -382,11 +396,13 @@ function itemCompleteTest(overlay) {
  * @param {array} steps  Array of objects containing details about each preprocessing step test results.
  */
 function processItemPreprocessingTestResults(steps) {
-	var tmpl_gray_label = new Template(jQuery('#preprocessing-gray-label').html()),
-		tmpl_act_done = new Template(jQuery('#preprocessing-step-action-done').html());
+	const tmpl_gray_label = new Template(jQuery('#preprocessing-gray-label').html());
+	const tmpl_act_done = new Template(jQuery('#preprocessing-step-action-done').html());
 
 	steps.forEach(function(step, i) {
-		if (typeof step.action !== 'undefined') {
+		const result = step.result;
+
+		if (step.action !== undefined) {
 			switch (step.action) {
 				case <?= ZBX_PREPROC_FAIL_DEFAULT ?>:
 					step.action = null;
@@ -413,9 +429,24 @@ function processItemPreprocessingTestResults(steps) {
 			}
 		}
 
+		for (const element of document.querySelectorAll('.result-copy')) {
+			if (step.error === undefined && result) {
+				element.style.display = '';
+			}
+			else {
+				element.style.display = 'none';
+			}
+		}
+
+		document.addEventListener('click', e => {
+			if (e.target.classList.contains('copy-' + i)) {
+				writeTextClipboard(result);
+			}
+		});
+
 		step.result = makeStepResult(step);
 
-		if (typeof step.action !== 'undefined' && step.action !== null) {
+		if (step.action !== undefined && step.action !== null) {
 			jQuery('#preproc-test-step-' + i + '-name').append(jQuery(tmpl_gray_label.evaluate(<?= json_encode([
 				'label' => _('Custom on fail')
 			]) ?>)));

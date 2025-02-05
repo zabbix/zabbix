@@ -7466,6 +7466,15 @@ svg {
   top: 4px;
   margin-left: 3px; }
 
+.item-final-result .table-forms-separator {
+  line-height: 24px; }
+.item-final-result .final-result-row {
+  display: flex;
+  align-items: center;
+  width: 675px; }
+  .item-final-result .final-result-row .final-result-action {
+    margin-right: auto; }
+
 #preprocessing-test-form .table-forms-separator {
   margin-top: -2px; }
 #preprocessing-test-form .runtime-error-fields {
@@ -7852,6 +7861,15 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   justify-content: space-between; }
   .audit-details-wrapper .audit-show-details-btn-wrapper {
     margin: 0 5px 0 5px; }
+
+button.copy-button::before {
+  color: #dddddd;
+  border: 1px solid #666666;
+  background: #383838 !important;
+  border-radius: 2px;
+  font-size: 12px;
+  line-height: 24px;
+  width: 24px; }
 
 .color-accent, .color-accent.btn-icon:not([disabled]), .color-accent.btn-link:not([disabled]), .color-accent.link-action:not(:hover):not(:focus), .color-accent.link-alt:not(:hover):not(:focus) {
   color: #ff7800; }

@@ -43,7 +43,8 @@ $token_from_grid = (new CFormGrid())
 			makeWarningIcon(
 				_("Make sure to copy the auth token as you won't be able to view it after the page is closed.")
 			),
-			(new CButtonLink(_('Copy to clipboard')))
+			(new CButtonIcon(ZBX_ICON_COPY, _('Copy to clipboard')))
+				->addClass('copy-button')
 				->onClick('writeTextClipboard(this.dataset.auth_token);')
 				->setAttribute('data-auth_token', $data['auth_token'])
 				->setAttribute('autofocus', 'autofocus')
