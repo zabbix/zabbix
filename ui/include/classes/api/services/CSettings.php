@@ -24,21 +24,38 @@ class CSettings extends CApiService {
 		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
-	private array $output_fields = ['default_theme', 'search_limit', 'max_in_table', 'server_check_interval',
-		'work_period', 'show_technical_errors', 'history_period', 'period_default', 'max_period', 'severity_color_0',
-		'severity_color_1', 'severity_color_2', 'severity_color_3', 'severity_color_4', 'severity_color_5',
-		'severity_name_0', 'severity_name_1', 'severity_name_2', 'severity_name_3', 'severity_name_4',
-		'severity_name_5', 'custom_color', 'ok_period', 'blink_period', 'problem_unack_color', 'problem_ack_color',
-		'ok_unack_color', 'ok_ack_color', 'problem_unack_style', 'problem_ack_style', 'ok_unack_style', 'ok_ack_style',
-		'discovery_groupid', 'default_inventory_mode', 'alert_usrgrpid', 'snmptrap_logging', 'default_lang',
-		'default_timezone', 'login_attempts', 'login_block', 'validate_uri_schemes', 'uri_valid_schemes',
-		'x_frame_options', 'iframe_sandboxing_enabled', 'iframe_sandboxing_exceptions', 'max_overview_table_size',
-		'connect_timeout', 'socket_timeout', 'media_type_test_timeout', 'script_timeout', 'item_test_timeout', 'url',
-		'report_test_timeout', 'auditlog_enabled', 'auditlog_mode', 'ha_failover_delay', 'geomaps_tile_provider',
-		'geomaps_tile_url', 'geomaps_max_zoom', 'geomaps_attribution', 'vault_provider', 'timeout_zabbix_agent',
-		'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor',
-		'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'timeout_browser',
-		'proxy_secrets_provider'
+	private array $output_fields = [
+		// GUI.
+		'default_lang', 'default_timezone', 'default_theme', 'search_limit', 'max_overview_table_size', 'max_in_table',
+		'server_check_interval', 'work_period', 'show_technical_errors', 'history_period', 'period_default',
+		'max_period',
+
+		// Timeouts.
+		'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check',
+		'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script',
+		'timeout_browser', 'socket_timeout', 'connect_timeout', 'media_type_test_timeout', 'script_timeout',
+		'item_test_timeout', 'report_test_timeout',
+
+		// Trigger displaying options.
+		'custom_color', 'problem_unack_color', 'problem_unack_style', 'problem_ack_color', 'problem_ack_style',
+		'ok_unack_color', 'ok_unack_style', 'ok_ack_color', 'ok_ack_style', 'ok_period', 'blink_period',
+		'severity_name_0', 'severity_color_0', 'severity_name_1', 'severity_color_1', 'severity_name_2',
+		'severity_color_2', 'severity_name_3', 'severity_color_3', 'severity_name_4', 'severity_color_4',
+		'severity_name_5', 'severity_color_5',
+
+		// Geographical maps.
+		'geomaps_tile_provider', 'geomaps_tile_url', 'geomaps_attribution', 'geomaps_max_zoom',
+
+		// Other configuration parameters.
+		'url', 'discovery_groupid', 'default_inventory_mode', 'alert_usrgrpid', 'snmptrap_logging', 'login_attempts',
+		'login_block', 'vault_provider', 'proxy_secrets_provider', 'validate_uri_schemes', 'uri_valid_schemes',
+		'x_frame_options', 'iframe_sandboxing_enabled', 'iframe_sandboxing_exceptions',
+
+		// Audit log.
+		'auditlog_enabled', 'auditlog_mode',
+
+		// Read-only parameters.
+		'ha_failover_delay'
 	];
 
 	/**
@@ -69,10 +86,19 @@ class CSettings extends CApiService {
 	 */
 	public static function getPublic(): array {
 		return CApiSettingsHelper::getParameters([
-			'default_theme', 'server_check_interval', 'show_technical_errors', 'severity_color_0', 'severity_color_1',
-			'severity_color_2', 'severity_color_3', 'severity_color_4', 'severity_color_5', 'custom_color',
-			'problem_unack_color', 'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'default_lang',
-			'default_timezone', 'login_attempts', 'login_block', 'x_frame_options', 'auditlog_enabled'
+			// GUI.
+			'default_lang', 'default_timezone', 'default_theme', 'server_check_interval', 'show_technical_errors',
+
+			// Trigger displaying options.
+			'custom_color', 'problem_unack_color', 'problem_ack_color', 'ok_unack_color', 'ok_ack_color',
+			'severity_color_0', 'severity_color_1', 'severity_color_2', 'severity_color_3', 'severity_color_4',
+			'severity_color_5',
+
+			// Other configuration parameters.
+			'login_attempts', 'login_block', 'x_frame_options',
+
+			// Audit log.
+			'auditlog_enabled'
 		]);
 	}
 
@@ -123,10 +149,14 @@ class CSettings extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected function validateUpdate(array &$settings, ?array &$db_settings): void {
+	protected function validateUpdate(array &$settings, ?array &$db_settings = null): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			// GUI.
+			'default_lang' =>					['type' => API_STRING_UTF8, 'in' => implode(',', array_keys(getLocales())), 'length' => CSettingsSchema::getFieldLength('default_lang')],
+			'default_timezone' =>				['type' => API_STRING_UTF8, 'in' => ZBX_DEFAULT_TIMEZONE.','.implode(',', array_keys(CTimezoneHelper::getList())), 'length' => CSettingsSchema::getFieldLength('default_timezone')],
 			'default_theme' =>					['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'in' => implode(',', array_keys(APP::getThemes())), 'length' => CSettingsSchema::getFieldLength('default_theme')],
 			'search_limit' =>					['type' => API_INT32, 'in' => '1:999999'],
+			'max_overview_table_size' =>		['type' => API_INT32, 'in' => '5:999999'],
 			'max_in_table' =>					['type' => API_INT32, 'in' => '1:99999'],
 			'server_check_interval' =>			['type' => API_INT32, 'in' => '0,'.SERVER_CHECK_INTERVAL],
 			'work_period' =>					['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => CSettingsSchema::getFieldLength('work_period')],
@@ -134,58 +164,8 @@ class CSettings extends CApiService {
 			'history_period' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 7 * SEC_PER_DAY])],
 			'period_default' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [SEC_PER_MIN, 10 * SEC_PER_YEAR]), 'length' => CSettingsSchema::getFieldLength('period_default')],
 			'max_period' =>						['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [SEC_PER_YEAR, 10 * SEC_PER_YEAR]), 'length' => CSettingsSchema::getFieldLength('period_default')],
-			'severity_color_0' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_color_0')],
-			'severity_color_1' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_color_1')],
-			'severity_color_2' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_color_2')],
-			'severity_color_3' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_color_3')],
-			'severity_color_4' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_color_4')],
-			'severity_color_5' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_color_5')],
-			'severity_name_0' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_name_0')],
-			'severity_name_1' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_name_1')],
-			'severity_name_2' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_name_2')],
-			'severity_name_3' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_name_3')],
-			'severity_name_4' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_name_4')],
-			'severity_name_5' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_name_5')],
-			'custom_color' =>					['type' => API_INT32, 'in' => EVENT_CUSTOM_COLOR_DISABLED.','.EVENT_CUSTOM_COLOR_ENABLED],
-			'ok_period' =>						['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [0, SEC_PER_DAY]), 'length' => CSettingsSchema::getFieldLength('ok_period')],
-			'blink_period' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [0, SEC_PER_DAY]), 'length' => CSettingsSchema::getFieldLength('blink_period')],
-			'problem_unack_color' =>			['type' => API_COLOR, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('problem_unack_color')],
-			'problem_ack_color' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('problem_ack_color')],
-			'ok_unack_color' =>					['type' => API_COLOR, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('ok_unack_color')],
-			'ok_ack_color' =>					['type' => API_COLOR, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('ok_ack_color')],
-			'problem_unack_style' =>			['type' => API_INT32, 'in' => '0,1'],
-			'problem_ack_style' =>				['type' => API_INT32, 'in' => '0,1'],
-			'ok_unack_style' =>					['type' => API_INT32, 'in' => '0,1'],
-			'ok_ack_style' =>					['type' => API_INT32, 'in' => '0,1'],
-			'discovery_groupid' =>				['type' => API_ID],
-			'default_inventory_mode' =>			['type' => API_INT32, 'in' => HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC],
-			'alert_usrgrpid' =>					['type' => API_ID],
-			'snmptrap_logging' =>				['type' => API_INT32, 'in' => '0,1'],
-			'default_lang' =>					['type' => API_STRING_UTF8, 'in' => implode(',', array_keys(getLocales())), 'length' => CSettingsSchema::getFieldLength('default_lang')],
-			'default_timezone' =>				['type' => API_STRING_UTF8, 'in' => ZBX_DEFAULT_TIMEZONE.','.implode(',', array_keys(CTimezoneHelper::getList())), 'length' => CSettingsSchema::getFieldLength('default_timezone')],
-			'login_attempts' =>					['type' => API_INT32, 'in' => '1:32'],
-			'login_block' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [30, SEC_PER_HOUR]), 'length' => CSettingsSchema::getFieldLength('login_block')],
-			'validate_uri_schemes' =>			['type' => API_INT32, 'in' => '0,1'],
-			'uri_valid_schemes' =>				['type' => API_STRING_UTF8, 'length' => CSettingsSchema::getFieldLength('uri_valid_schemes')],
-			'x_frame_options' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('x_frame_options')],
-			'iframe_sandboxing_enabled' =>		['type' => API_INT32, 'in' => '0,1'],
-			'iframe_sandboxing_exceptions' =>	['type' => API_STRING_UTF8, 'length' => CSettingsSchema::getFieldLength('iframe_sandboxing_exceptions')],
-			'max_overview_table_size' =>		['type' => API_INT32, 'in' => '5:999999'],
-			'connect_timeout' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:30', 'length' => CSettingsSchema::getFieldLength('connect_timeout')],
-			'socket_timeout' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300', 'length' => CSettingsSchema::getFieldLength('socket_timeout')],
-			'media_type_test_timeout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300', 'length' => CSettingsSchema::getFieldLength('media_type_test_timeout')],
-			'script_timeout' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300', 'length' => CSettingsSchema::getFieldLength('script_timeout')],
-			'item_test_timeout' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:600', 'length' => CSettingsSchema::getFieldLength('item_test_timeout')],
-			'url' =>							['type' => API_STRING_UTF8, 'length' => CSettingsSchema::getFieldLength('url')],
-			'report_test_timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300', 'length' => CSettingsSchema::getFieldLength('url')],
-			'auditlog_enabled' =>				['type' => API_INT32, 'in' => '0,1'],
-			'auditlog_mode' =>					['type' => API_INT32, 'in' => '0,1'],
-			'geomaps_tile_provider' =>			['type' => API_STRING_UTF8, 'in' => ','.implode(',', array_keys(getTileProviders())), 'length' => CSettingsSchema::getFieldLength('geomaps_tile_provider')],
-			'geomaps_tile_url' =>				['type' => API_URL, 'length' => CSettingsSchema::getFieldLength('geomaps_tile_url')],
-			'geomaps_max_zoom' =>				['type' => API_INT32, 'in' => '0:'.ZBX_GEOMAP_MAX_ZOOM],
-			'geomaps_attribution' =>			['type' => API_STRING_UTF8, 'length' => CSettingsSchema::getFieldLength('geomaps_attribution')],
-			'vault_provider' =>					['type' => API_INT32, 'flags' => API_NOT_EMPTY, 'in' => ZBX_VAULT_TYPE_HASHICORP.','.ZBX_VAULT_TYPE_CYBERARK],
-			'proxy_secrets_provider' => 		['type' => API_INT32, 'in' => ZBX_PROXY_SECRETS_PROVIDER_SERVER.','.ZBX_PROXY_SECRETS_PROVIDER_PROXY],
+
+			// Timeouts.
 			'timeout_zabbix_agent' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => CSettingsSchema::getFieldLength('timeout_zabbix_agent')],
 			'timeout_simple_check' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => CSettingsSchema::getFieldLength('timeout_simple_check')],
 			'timeout_snmp_agent' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => CSettingsSchema::getFieldLength('timeout_snmp_agent')],
@@ -195,7 +175,64 @@ class CSettings extends CApiService {
 			'timeout_ssh_agent' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => CSettingsSchema::getFieldLength('timeout_ssh_agent')],
 			'timeout_telnet_agent' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => CSettingsSchema::getFieldLength('timeout_telnet_agent')],
 			'timeout_script' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => CSettingsSchema::getFieldLength('timeout_script')],
-			'timeout_browser' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => CSettingsSchema::getFieldLength('timeout_browser')]
+			'timeout_browser' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '1:600', 'length' => CSettingsSchema::getFieldLength('timeout_browser')],
+			'socket_timeout' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300', 'length' => CSettingsSchema::getFieldLength('socket_timeout')],
+			'connect_timeout' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:30', 'length' => CSettingsSchema::getFieldLength('connect_timeout')],
+			'media_type_test_timeout' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300', 'length' => CSettingsSchema::getFieldLength('media_type_test_timeout')],
+			'script_timeout' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300', 'length' => CSettingsSchema::getFieldLength('script_timeout')],
+			'item_test_timeout' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:600', 'length' => CSettingsSchema::getFieldLength('item_test_timeout')],
+			'report_test_timeout' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '1:300', 'length' => CSettingsSchema::getFieldLength('url')],
+
+			// Trigger displaying options.
+			'custom_color' =>					['type' => API_INT32, 'in' => EVENT_CUSTOM_COLOR_DISABLED.','.EVENT_CUSTOM_COLOR_ENABLED],
+			'problem_unack_color' =>			['type' => API_COLOR, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('problem_unack_color')],
+			'problem_unack_style' =>			['type' => API_INT32, 'in' => '0,1'],
+			'problem_ack_color' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('problem_ack_color')],
+			'problem_ack_style' =>				['type' => API_INT32, 'in' => '0,1'],
+			'ok_unack_color' =>					['type' => API_COLOR, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('ok_unack_color')],
+			'ok_unack_style' =>					['type' => API_INT32, 'in' => '0,1'],
+			'ok_ack_color' =>					['type' => API_COLOR, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('ok_ack_color')],
+			'ok_ack_style' =>					['type' => API_INT32, 'in' => '0,1'],
+			'ok_period' =>						['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [0, SEC_PER_DAY]), 'length' => CSettingsSchema::getFieldLength('ok_period')],
+			'blink_period' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [0, SEC_PER_DAY]), 'length' => CSettingsSchema::getFieldLength('blink_period')],
+			'severity_name_0' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_name_0')],
+			'severity_color_0' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_color_0')],
+			'severity_name_1' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_name_1')],
+			'severity_color_1' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_color_1')],
+			'severity_name_2' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_name_2')],
+			'severity_color_2' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_color_2')],
+			'severity_name_3' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_name_3')],
+			'severity_color_3' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_color_3')],
+			'severity_name_4' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_name_4')],
+			'severity_color_4' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_color_4')],
+			'severity_name_5' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_name_5')],
+			'severity_color_5' =>				['type' => API_COLOR, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('severity_color_5')],
+
+			// Geographical maps.
+			'geomaps_tile_provider' =>			['type' => API_STRING_UTF8, 'in' => ','.implode(',', array_keys(getTileProviders())), 'length' => CSettingsSchema::getFieldLength('geomaps_tile_provider')],
+			'geomaps_tile_url' =>				['type' => API_URL, 'length' => CSettingsSchema::getFieldLength('geomaps_tile_url')],
+			'geomaps_attribution' =>			['type' => API_STRING_UTF8, 'length' => CSettingsSchema::getFieldLength('geomaps_attribution')],
+			'geomaps_max_zoom' =>				['type' => API_INT32, 'in' => '0:'.ZBX_GEOMAP_MAX_ZOOM],
+
+			// Other configuration parameters.
+			'url' =>							['type' => API_STRING_UTF8, 'length' => CSettingsSchema::getFieldLength('url')],
+			'discovery_groupid' =>				['type' => API_ID],
+			'default_inventory_mode' =>			['type' => API_INT32, 'in' => HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC],
+			'alert_usrgrpid' =>					['type' => API_ID],
+			'snmptrap_logging' =>				['type' => API_INT32, 'in' => '0,1'],
+			'login_attempts' =>					['type' => API_INT32, 'in' => '1:32'],
+			'login_block' =>					['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [30, SEC_PER_HOUR]), 'length' => CSettingsSchema::getFieldLength('login_block')],
+			'vault_provider' =>					['type' => API_INT32, 'flags' => API_NOT_EMPTY, 'in' => ZBX_VAULT_TYPE_HASHICORP.','.ZBX_VAULT_TYPE_CYBERARK],
+			'proxy_secrets_provider' =>			['type' => API_INT32, 'in' => ZBX_PROXY_SECRETS_PROVIDER_SERVER.','.ZBX_PROXY_SECRETS_PROVIDER_PROXY],
+			'validate_uri_schemes' =>			['type' => API_INT32, 'in' => '0,1'],
+			'uri_valid_schemes' =>				['type' => API_STRING_UTF8, 'length' => CSettingsSchema::getFieldLength('uri_valid_schemes')],
+			'x_frame_options' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => CSettingsSchema::getFieldLength('x_frame_options')],
+			'iframe_sandboxing_enabled' =>		['type' => API_INT32, 'in' => '0,1'],
+			'iframe_sandboxing_exceptions' =>	['type' => API_STRING_UTF8, 'length' => CSettingsSchema::getFieldLength('iframe_sandboxing_exceptions')],
+
+			// Audit log.
+			'auditlog_enabled' =>				['type' => API_INT32, 'in' => '0,1'],
+			'auditlog_mode' =>					['type' => API_INT32, 'in' => '0,1']
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $settings, '/', $error)) {
@@ -268,7 +305,7 @@ class CSettings extends CApiService {
 		CApiSettingsHelper::checkUndeclaredParameters($settings, $db_settings);
 	}
 
-	public static function updatePrivate(array $settings): bool {
+	public static function updatePrivate(array $settings): array {
 		$json_fields = ['dbversion_status', 'server_status', 'software_update_check_data'];
 
 		foreach ($json_fields as $json_field) {
@@ -279,6 +316,6 @@ class CSettings extends CApiService {
 
 		CApiSettingsHelper::updateParameters($settings);
 
-		return true;
+		return array_keys($settings);
 	}
 }
