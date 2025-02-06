@@ -803,6 +803,17 @@ int	zbx_dc_get_host_value(zbx_uint64_t itemid, char **replace_to, int request);
 #define ZBX_DC_REQUEST_ITEM_LOG_SEVERITY	205
 #define ZBX_DC_REQUEST_ITEM_LOG_NSEVERITY	206
 #define ZBX_DC_REQUEST_ITEM_LOG_EVENTID		207
+#define ZBX_DC_REQUEST_ITEM_LOG_TIMESTAMP	208
+
+typedef enum
+{
+	ZBX_VALUE_PROPERTY_VALUE,
+	ZBX_VALUE_PROPERTY_TIME,
+	ZBX_VALUE_PROPERTY_DATE,
+	ZBX_VALUE_PROPERTY_AGE,
+	ZBX_VALUE_PROPERTY_TIMESTAMP
+}
+zbx_expr_db_item_value_property_t;
 
 int	zbx_dc_get_history_log_value(zbx_uint64_t itemid, char **replace_to, int request, int clock, int ns,
 		const char *tz);
