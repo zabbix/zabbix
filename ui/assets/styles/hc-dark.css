@@ -7473,9 +7473,10 @@ svg {
   margin-left: 5px; }
 
 .item-final-result .table-forms-separator {
-  line-height: 24px;
   display: inline-grid;
   width: 675px; }
+  .item-final-result .table-forms-separator .copy-button {
+    line-height: 24px; }
 .item-final-result .final-result-row {
   display: flex;
   align-items: center; }

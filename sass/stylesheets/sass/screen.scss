@@ -3422,9 +3422,12 @@ svg {
 
 .item-final-result {
 	.table-forms-separator {
-		line-height: 24px;
 		display: inline-grid;
 		width: 675px;
+
+		.copy-button {
+			line-height: 24px;
+		}
 	}
 
 	.final-result-row {
