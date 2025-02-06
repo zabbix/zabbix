@@ -284,7 +284,7 @@ static void	permission_groupsets_destroy(zbx_hashset_t *group_sets)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculates hashes and adds new group sets for hosts               *
+ * Purpose: calculates hashes and adds new group sets for specified hosts     *
  *                                                                            *
  * Parameters: ids      - [IN] host IDs                                       *
  *             hgsetids - [IN/OUT] added host group sets IDs, optional        *
@@ -293,8 +293,11 @@ static void	permission_groupsets_destroy(zbx_hashset_t *group_sets)
  *                           or not needed                                    *
  *               FAIL    - otherwise                                          *
  *                                                                            *
- * Comments: If hgsetids parameter was specified, then function checks if     *
- *           hgset already exists before adding new one.                      *
+ * Comments: If hgsetids parameter was specified, then:                       *
+ *           - function checks if hgset already exists then does not create   *
+ *              new hgset and skips creating link between groupid and hgsetid *
+ *           - adds only new host group set IDs to hgsetids                   *
+ *             (e.g. for 'permission' table update)                           *
  *                                                                            *
 ******************************************************************************/
 int	permission_hgsets_add(zbx_vector_uint64_t *ids, zbx_vector_uint64_t *hgsetids)
