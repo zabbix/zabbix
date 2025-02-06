@@ -2144,8 +2144,8 @@ jQuery(function($) {
 		}
 
 		// Perform action based on keydown event.
-		switch (event.which) {
-			case KEY_ARROW_LEFT:
+		switch (event.key) {
+			case 'ArrowLeft':
 				if (selected !== undefined && selected.has('.menu-popup')) {
 					if (level !== menu_popup) {
 						selected.actionMenuItemCollapse();
@@ -2155,7 +2155,7 @@ jQuery(function($) {
 				}
 				break;
 
-			case KEY_ARROW_UP:
+			case 'ArrowUp':
 				if (selected === undefined) {
 					$(link_selector + ':last', level).addClass('highlighted').focus();
 				}
@@ -2173,14 +2173,14 @@ jQuery(function($) {
 				event.preventDefault();
 				break;
 
-			case KEY_ARROW_RIGHT:
+			case 'ArrowRight':
 				if (selected !== undefined && selected.has('.menu-popup')) {
 					selected.actionMenuItemExpand();
 					$('ul > li ' + link_selector + ':first', selected).addClass('highlighted').focus();
 				}
 				break;
 
-			case KEY_ARROW_DOWN:
+			case 'ArrowDown':
 				if (selected === undefined) {
 					$(link_selector + ':first', items[0]).addClass('highlighted').focus();
 				}
@@ -2198,17 +2198,17 @@ jQuery(function($) {
 				event.preventDefault();
 				break;
 
-			case KEY_ESCAPE:
+			case 'Escape':
 				$(menu_popup).menuPopup('close', null);
 				break;
 
-			case KEY_ENTER:
+			case 'Enter':
 				if (selected !== undefined) {
 					$('>' + link_selector, selected)[0].click();
 				}
 				break;
 
-			case KEY_TAB:
+			case 'Tab':
 				event.preventDefault();
 				break;
 		}
