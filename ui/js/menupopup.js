@@ -1287,7 +1287,9 @@ jQuery(function($) {
 					at: 'left bottom',
 					using: (pos, data) => {
 						const menu = data.element.element[0];
-						const margin_right = Math.max(WRAPPER_PADDING_RIGHT,wrapper_rect.width - $wrapper.outerWidth());
+						const margin_right = Math.max(WRAPPER_PADDING_RIGHT,
+							wrapper_rect.width - $wrapper.outerWidth()
+						);
 						const max_left = wrapper_rect.right - margin_right - menu.offsetWidth;
 
 						pos.left = Math.max(wrapper_rect.left, Math.min(max_left, pos.left));
@@ -1464,8 +1466,8 @@ jQuery(function($) {
 			}
 			else {
 				// Remove activity from item that has been selected by keyboard and now is deselected using mouse.
-				if ($('>a', item[0]).hasClass('highlighted')) {
-					$('>a', item[0])
+				if ($('> a', item[0]).hasClass('highlighted')) {
+					$('> a', item[0])
 						.removeClass('highlighted')
 						.blur();
 				}
