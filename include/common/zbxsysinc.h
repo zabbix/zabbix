@@ -333,6 +333,10 @@
 #	include <math.h>
 #endif
 
+#ifdef HAVE_PCRE_H
+#	include <pcre.h>
+#endif
+
 #ifdef HAVE_PCRE2_H
 #	define PCRE2_CODE_UNIT_WIDTH 8
 #	include <pcre2.h>

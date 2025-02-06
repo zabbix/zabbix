@@ -1535,9 +1535,11 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 			saved_CPPFLAGS="$CPPFLAGS"
 			saved_LDFLAGS="$LDFLAGS"
+			saved_LIBS="$LIBS"
 
 			CPPFLAGS="$CPPFLAGS $SQLITE3_CPPFLAGS"
-			LDFLAGS="$LDFLAGS $SQLITE3_LDFLAGS $SQLITE3_LIBS"
+			LDFLAGS="$LDFLAGS $SQLITE3_LDFLAGS"
+			LIBS="$LIBS $SQLITE3_LIBS"
 
 			AC_MSG_CHECKING([for function sqlite3_open_v2() in sqlite3.h])
 			AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <sqlite3.h>]], [[sqlite3 *conn = 0;
@@ -1547,6 +1549,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 			CPPFLAGS="$saved_CPPFLAGS"
 			LDFLAGS="$saved_LDFLAGS"
+			LIBS="$saved_LIBS"
 		else
 			AC_MSG_ERROR([SQLite3 library not found])
 		fi
@@ -1946,6 +1949,37 @@ ZBXJS_LDFLAGS="$ZBXJS_LDFLAGS $LIBCURL_LDFLAGS"
 ZBXJS_LIBS="$ZBXJS_LIBS $LIBCURL_LIBS"
 
 if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes" || test "x$agent2" = "xyes"; then
+LIBPCRE_CHECK_CONFIG([flags-only])
+LIBPCRE2_CHECK_CONFIG([flags-only])
+
+if test "x$want_libpcre2" = "xno"; then # default to old pcre
+	if test "x$want_libpcre" = "xno"; then
+		AC_MSG_NOTICE([using old pcre library by default])
+	fi
+
+	LIBPCRE_CHECK_CONFIG([mandatory])
+
+	if test "x$found_libpcre" != "xyes"; then
+		AC_MSG_ERROR([unable to use libpcre (libpcre check failed)])
+	fi
+
+	LIBPCRE_CHECK_CONFIG([no])
+
+	CFLAGS="$CFLAGS $LIBPCRE_CFLAGS"
+	LDFLAGS="$LDFLAGS $LIBPCRE_LDFLAGS"
+	if test "x$ARCH" = "xosx"; then
+		LIBS="$LIBPCRE_LIBS $LIBS"
+	else
+		LIBS="$LIBS $LIBPCRE_LIBS"
+	fi
+
+	AC_DEFINE([HAVE_PCRE_H], 1, [Define to 1 if you have the 'libpcre' library (-lpcre)])
+	have_pcre=1
+else
+	if test "x$want_libpcre" != "xno"; then
+		AC_MSG_ERROR([cannot use both pcre and pcre2 at the same time])
+	fi
+
 	LIBPCRE2_CHECK_CONFIG([mandatory])
 
 	if test "x$found_libpcre2" != "xyes"; then
@@ -1964,6 +1998,12 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes
 	have_pcre2=1
 fi
 
+if test "x$have_pcre" != "x1" && test "x$have_pcre2" != "x1"; then
+    AC_MSG_ERROR([cannot build with libpcre or libpcre2])
+fi
+fi
+
+AM_CONDITIONAL([HAVE_PCRE], [test "x$have_pcre" = "x1"])
 AM_CONDITIONAL([HAVE_PCRE2], [test "x$have_pcre2" = "x1"])
 
 found_iconv="no"
@@ -2025,7 +2065,7 @@ if test "x$HAVE_START_GROUP" = "xyes"; then
 fi
 
 if test "x$agent2" = "xyes"; then
-	CGO_CFLAGS="$TLS_CFLAGS $LIBPCRE2_CFLAGS"
+	CGO_CFLAGS="$TLS_CFLAGS $LIBPCRE_CFLAGS $LIBPCRE2_CFLAGS"
 	CGO_LDFLAGS="$AGENT2_LDFLAGS $LD_START_GROUP \
 		\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
 		\${abs_top_builddir}/src/libs/zbxinterface/libzbxinterface.a \
@@ -2363,6 +2403,10 @@ Configuration:
 
 if test "x$DB_CFLAGS" != "x"; then
 	echo "    database:              ${DB_CFLAGS}"
+fi
+
+if test "x$LIBPCRE_CFLAGS" != "x"; then
+	echo "    libpcre:               ${LIBPCRE_CFLAGS}"
 fi
 
 if test "x$LIBPCRE2_CFLAGS" != "x"; then

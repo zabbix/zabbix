@@ -1,6 +1,11 @@
 Changes for 7.4.0alpha1
 
 New features:
+A.F....PS. [ZBXNEXT-9564] implemented Vault macro resolution on proxies (esekace, sboidenko)
+.........T [ZBXNEXT-9654] added Azure SQL managed instance template (abrosimovs)
+.........T [ZBXNEXT-9545] fixed proofreading findings in Nvidia by Zabbix agent templates (abrosimovs)
+........S. [ZBXNEXT-9582] added discarding of queued duplicate LLD rule values based on embedded and LLD macros (wiper)
+..F....... [ZBXNEXT-9614] implemented scrolling down to bottom in Item history widget if new values are set to bottom (dfofanovs)
 ...G...... [ZBXNEXT-9508] added custom query path to mysql and oracle plugins for Zabbix agent 2 (esneiders)
 ...G...... [ZBXNEXT-9686] improved Zabbix agent 2 smart plugin error handling with missing privileges (esneiders)
 .........T [ZBXNEXT-9545] added Nvidia by Zabbix agent 2 templates (abrosimovs)
@@ -8,6 +13,17 @@ New features:
 .......PS. [ZBXNEXT-9622] added top.peak in diaginfo to identify items with highest task queue (vso)
 
 Bug fixes:
+..F....... [ZBX-25471] fixed emptying of Web scenario variables and headers data (wczerneha)
+...G...... [ZBX-22522] fixed web.page.get curl header (sboidenko)
+..F....... [ZBX-25758] fixed the saving of filter state in trigger list (esekace)
+..F....... [ZBX-25681] fixed newly added tag field state in maintenance form after changing type (esekace)
+..F....... [ZBX-25666] fixed maintenance status display for submap elements when trigger elements are used (esekace)
+.........T [ZBX-25601] fixed HTTP proxy parameter name in MS 365 reports by HTTP template (drasikhov)
+..F....... [ZBX-25730] fixed target for URLs in menu popup (esekace)
+..F....... [ZBX-25511] fixed overriding Y-axes in Graph widget; fixed long names in datasets of Graph and Pie Chart widgets (averza)
+.......PS. [ZBX-25704] fixed custom libssh version check in configure script (askolmeisters)
+.......PS. [ZBX-25903] fixed usmStatsNotInTimeWindows value being used when received and not handled by Net-SNMP library (vso)
+...G...... [ZBX-25382] applied pkgsrc patch to restore builds on NetBSD >= 8.2 (jxl)
 .......PS. [ZBX-25876] fixed escaping in script item parameters (askolmeisters)
 ..F....... [ZBX-24936] fixed button positioning in button split of multiselect (dfofanovs)
 ..F....... [ZBX-25467] fixed tabulation in Item history widget, Top hosts widget and latest data last value hintbox (dfofanovs)
@@ -83,12 +99,37 @@ A......... [ZBX-25350] prohibited deleting user groups which are used in userdir
 ..F....... [ZBX-25525] fixed parent template changes affecting linked template overrides in trigger and trigger prototype forms (esekace)
 
 --------------------------------------------------------------------------------
+Changes for 7.2.4rc1
+
+New features:
+.........T [ZBXNEXT-9654] added Azure SQL managed instance template (abrosimovs)
+.........T [ZBXNEXT-9545] fixed proofreading findings in Nvidia by Zabbix agent templates (abrosimovs)
+
+Bug fixes:
+..F....... [ZBX-25471] fixed emptying of Web scenario variables and headers data (wczerneha)
+...G...... [ZBX-22522] fixed web.page.get curl header (sboidenko)
+.......PS. [ZBX-25704] fixed custom libssh version check in configure script (askolmeisters)
+...G...... [ZBX-25382] applied pkgsrc patch to restore builds on NetBSD >= 8.2 (jxl)
+..F....... [ZBX-25758] fixed the saving of filter state in trigger list (esekace)
+..F....... [ZBX-25681] fixed newly added tag field state in maintenance form after changing type (esekace)
+..F....... [ZBX-25511] fixed overriding Y-axes in Graph widget; fixed long names in datasets of Graph and Pie Chart widgets (averza)
+..F....... [ZBX-25666] fixed maintenance status display for submap elements when trigger elements are used (esekace)
+.........T [ZBX-25601] fixed HTTP proxy parameter name in MS 365 reports by HTTP template (drasikhov)
+..F....... [ZBX-25730] fixed target for URLs in menu popup (esekace)
+
+--------------------------------------------------------------------------------
+Changes for 7.2.3
+
+7.2.3rc1 was released as 7.2.3 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 7.2.3rc1
 
 New features:
 ...G...... [ZBXNEXT-9686] improved Zabbix agent 2 Smart plugin error handling with missing privileges (esneiders)
 
 Bug fixes:
+.......PS. [ZBX-25903] fixed usmStatsNotInTimeWindows value being used when received and not handled by Net-SNMP library (vso)
 .......PS. [ZBX-25876] fixed escaping in script item parameters (askolmeisters)
 ..F....... [ZBX-24936] fixed button positioning in button split of multiselect (dfofanovs)
 ..F....... [ZBX-25467] fixed tabulation in Item history widget, Top hosts widget and latest data last value hintbox (dfofanovs)
@@ -322,11 +363,32 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
 
 --------------------------------------------------------------------------------
-Changes for 7.0.9rc2
+Changes for 7.0.10rc1
 
 New features:
+.........T [ZBXNEXT-9654] added Azure SQL managed instance template (abrosimovs)
 
 Bug fixes:
+..F....... [ZBX-25471] fixed emptying of Web scenario variables and headers data (wczerneha)
+...G...... [ZBX-22522] fixed web.page.get curl header (sboidenko)
+...G...... [ZBX-25382] applied pkgsrc patch to restore builds on NetBSD >= 8.2 (jxl)
+..F....... [ZBX-25758] fixed the saving of filter state in trigger list (esekace)
+..F....... [ZBX-25681] fixed newly added tag field state in maintenance form after changing type (esekace)
+..F....... [ZBX-25511] fixed overriding Y-axes in Graph widget; fixed long names in datasets of Graph and Pie Chart widgets (averza)
+..F....... [ZBX-25666] fixed maintenance status display for submap elements when trigger elements are used (esekace)
+.........T [ZBX-25601] fixed HTTP proxy parameter name in MS 365 reports by HTTP template (drasikhov)
+..F....... [ZBX-25730] fixed target for URLs in menu popup (esekace)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.9
+
+7.0.9rc2 was released as 7.0.9 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 7.0.9rc2
+
+Bug fixes:
+.......PS. [ZBX-25903] fixed usmStatsNotInTimeWindows value being used when received and not handled by Net-SNMP library (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.9rc1
@@ -1653,6 +1715,11 @@ Bug fixes:
 ...G...... [ZBX-22147] updated default buffer size to 1000 in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out-of-bounds access with JSONPath on invalid unicode character (vso)
 A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issues with provisioning (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.4.21
+
+6.4.21rc1 was released as 6.4.21 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.4.21rc1
@@ -3621,6 +3688,23 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.39rc1
+
+New features:
+.........T [ZBXNEXT-9654] added Azure SQL managed instance template (abrosimovs)
+
+Bug fixes:
+...G...... [ZBX-25382] applied pkgsrc patch to restore builds on NetBSD >= 8.2 (jxl)
+...G...... [ZBX-22522] fixed web.page.get curl header (sboidenko)
+.........T [ZBX-25601] fixed HTTP proxy parameter name in MS 365 reports by HTTP template (drasikhov)
+..F....... [ZBX-25666] fixed maintenance status display for submap elements when trigger elements are used (esekace)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.38
+
+6.0.38rc1 was released as 6.0.38 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.38rc1
@@ -6994,6 +7078,18 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.47rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.46
+
+5.0.46rc1 was released as 5.0.46 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.46rc1

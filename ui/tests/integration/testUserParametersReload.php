@@ -29,6 +29,9 @@ class testUserParametersReload extends CIntegrationTest {
 	const ITEM_NAME_01		= 'usrprm01';
 	const ITEM_NAME_02		= 'usrprm02';
 	const ITEM_NAME_03		= 'usrprm03';
+	const ITEM_NAME_04		= 'usrprm04';
+	const ITEM_NAME_05		= 'usrprm05';
+	const ITEM_NAME_ENV_TEST	= 'usrprm_env_var_test';
 
 	private static $hostids = [];
 	private static $itemids = [];
@@ -48,6 +51,18 @@ class testUserParametersReload extends CIntegrationTest {
 			'component' => self::COMPONENT_AGENT
 		],
 		[
+			'key' => self::ITEM_NAME_04,
+			'component' => self::COMPONENT_AGENT
+		],
+		[
+			'key' => self::ITEM_NAME_05,
+			'component' => self::COMPONENT_AGENT
+		],
+		[
+			'key' => self::ITEM_NAME_ENV_TEST,
+			'component' => self::COMPONENT_AGENT
+		],
+		[
 			'key' => self::ITEM_NAME_01,
 			'component' => self::COMPONENT_AGENT2
 		],
@@ -57,6 +72,18 @@ class testUserParametersReload extends CIntegrationTest {
 		],
 		[
 			'key' => self::ITEM_NAME_03,
+			'component' => self::COMPONENT_AGENT2
+		],
+		[
+			'key' => self::ITEM_NAME_04,
+			'component' => self::COMPONENT_AGENT2
+		],
+		[
+			'key' => self::ITEM_NAME_05,
+			'component' => self::COMPONENT_AGENT2
+		],
+		[
+			'key' => self::ITEM_NAME_ENV_TEST,
 			'component' => self::COMPONENT_AGENT2
 		]
 	];
@@ -257,7 +284,80 @@ class testUserParametersReload extends CIntegrationTest {
 			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NOTSUPPORTED);
 			$this->checkItemState($component.':'.self::ITEM_NAME_03, ITEM_STATE_NOTSUPPORTED);
 		}
+	}
 
+	/**
+	 * Component configuration provider for tests with variables in configuration files.
+	 *
+	 * @return array
+	 */
+	public function configurationWithVariablesProvider() {
+		$config = $this->configurationProvider();
+
+		$config[self::COMPONENT_AGENT]['Include'] = PHPUNIT_CONFIG_DIR.self::COMPONENT_AGENT.'_usrprm_with_vars.conf';
+		$config[self::COMPONENT_AGENT2]['Include'] = PHPUNIT_CONFIG_DIR.self::COMPONENT_AGENT2.'_usrprm_with_vars.conf';
+
+		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
+			if (file_put_contents(PHPUNIT_CONFIG_DIR.'/'.$component.'_usrprm_with_vars.conf',
+						'UserParameter=${UsrParamEnv1}'.PHP_EOL.
+						'UserParameter=${UsrParamEnv2}'.PHP_EOL.
+						'UserParameter='.self::ITEM_NAME_03.',echo usr.prm.var.3'.PHP_EOL.
+						'UserParameter='.self::ITEM_NAME_ENV_TEST.',echo UsrParamEnv1=${UsrParamEnv1} UsrParamEnv2=${UsrParamEnv2}'.PHP_EOL) === false) {
+				throw new Exception('Failed to create include configuration file');
+			}
+		}
+
+		putenv('UsrParamEnv1='.self::ITEM_NAME_01.',echo usr.prm.var.1');
+		putenv('UsrParamEnv2='.self::ITEM_NAME_02.',echo usr.prm.var.2');
+
+		return $config;
+	}
+
+	/**
+	 * Check initial and reloaded user parameters with variables in configuration files
+	 *
+	 * @configurationDataProvider configurationWithVariablesProvider
+	 */
+	public function testUserParametersWithVariablesReload() {
+		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
+			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NORMAL, 'usr.prm.var.1');
+			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NORMAL, 'usr.prm.var.2');
+			$this->checkItemState($component.':'.self::ITEM_NAME_03, ITEM_STATE_NORMAL, 'usr.prm.var.3');
+			$this->checkItemState($component.':'.self::ITEM_NAME_04, ITEM_STATE_NOTSUPPORTED);
+			$this->checkItemState($component.':'.self::ITEM_NAME_05, ITEM_STATE_NOTSUPPORTED);
+			// Make sure that environment variables were unset by Zabbix agent processes
+			// so that they are not available to their child processes.
+			$this->checkItemState($component.':'.self::ITEM_NAME_ENV_TEST, ITEM_STATE_NORMAL, 'UsrParamEnv1= UsrParamEnv2=');
+			$this->assertTrue(@unlink(PHPUNIT_CONFIG_DIR.'/'.$component.'_usrprm_with_vars.conf'));
+		}
+
+		$config = [
+			self::COMPONENT_AGENT => [
+				'Include' => PHPUNIT_CONFIG_DIR.self::COMPONENT_AGENT.'_usrprm_with_vars.conf'
+			],
+			self::COMPONENT_AGENT2 => [
+				'Include' => PHPUNIT_CONFIG_DIR.self::COMPONENT_AGENT2.'_usrprm_with_vars.conf'
+			]
+		];
+
+		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
+			if (file_put_contents(PHPUNIT_CONFIG_DIR.'/'.$component.'_usrprm_with_vars.conf',
+					'UserParameter='.self::ITEM_NAME_04.',echo usr.prm.var.4'.PHP_EOL.
+					'UserParameter='.self::ITEM_NAME_05.',echo usr.prm.var.5') === false) {
+				throw new Exception('Failed to create include configuration file');
+			}
+		}
+
+		$this->executeUserParamReload($config);
+
+		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
+			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NOTSUPPORTED);
+			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NOTSUPPORTED);
+			$this->checkItemState($component.':'.self::ITEM_NAME_03, ITEM_STATE_NOTSUPPORTED);
+			$this->checkItemState($component.':'.self::ITEM_NAME_04, ITEM_STATE_NORMAL, 'usr.prm.var.4');
+			$this->checkItemState($component.':'.self::ITEM_NAME_05, ITEM_STATE_NORMAL, 'usr.prm.var.5');
+			$this->assertTrue(@unlink(PHPUNIT_CONFIG_DIR.'/'.$component.'_usrprm_with_vars.conf'));
+		}
 	}
 
 	/**

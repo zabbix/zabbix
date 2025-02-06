@@ -72,6 +72,7 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/process_eventslog6.o
 #cgo openssl LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/tls_version.o
 #cgo LDFLAGS: -lDbghelp -lpsapi -lws2_32 -lWevtapi -ldnsapi
+#cgo pcre  LDFLAGS: -lpcre
 #cgo pcre2 LDFLAGS: -lpcre2-8
 #cgo openssl LDFLAGS: -lssl -lcrypto
 #cgo LDFLAGS: -Wl,--end-group

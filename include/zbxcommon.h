@@ -590,7 +590,7 @@ int	zbx_vsnprintf_check_len(const char *fmt, va_list args);
 char	*zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
 
 /* used by zbxcommon, setproctitle */
-size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
+size_t	zbx_strlcpy(char *dst, const char *src, size_t size);
 
 /* used by dsprintf, which is used by log */
 char	*zbx_dvsprintf(char *dest, const char *f, va_list args);

@@ -97,6 +97,12 @@ ifneq ("$(OPENSSL)", "")
 	endif
 endif
 
+ifneq ("$(PCRE)", "")
+	CFLAGS := $(CFLAGS) -DPCRE_STATIC -I$(PCRE)\include -DHAVE_PCRE_H=1
+	LDFLAGS := $(LDFLAGS) -L$(PCRE)\lib
+	TAGS := $(TAGS) pcre
+endif
+
 ifneq ("$(PCRE2)", "")
 	CFLAGS := $(CFLAGS) -DPCRE2_STATIC -I$(PCRE2)\include -DHAVE_PCRE2_H=1
 	LDFLAGS := $(LDFLAGS) -L$(PCRE2)\lib
