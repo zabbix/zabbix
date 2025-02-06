@@ -1432,12 +1432,12 @@ jQuery(function($) {
 
 		for (let item = $('li:first-child', menu); item.length > 0; item = item.next()) {
 			if (item[0] === li[0]) {
-				$('>a', li[0]).addClass('highlighted');
-
 				if (!$('ul', item[0]).is(':visible')) {
 					const $submenu = $('ul:first', item[0]);
 
 					if ($submenu.length) {
+						$('> a', li[0]).addClass('highlighted');
+
 						setSubmenuPosition($submenu, li_pos);
 
 						$submenu.prev('[role="menuitem"]').attr({'aria-expanded': 'true'});
