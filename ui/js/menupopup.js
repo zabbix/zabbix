@@ -1834,14 +1834,10 @@ jQuery(function($) {
 
 			const $current_item = $(this);
 
-			menu_timer = setTimeout(() => {
-				$current_item.actionMenuItemExpand();
-			}, SUBMENU_DELAY);
+			menu_timer = setTimeout(() => $current_item.actionMenuItemExpand(), SUBMENU_DELAY);
 		});
 
-		item.on('mouseleave', () => {
-			clearTimeout(menu_timer);
-		});
+		item.on('mouseleave', () => clearTimeout(menu_timer));
 
 		return item;
 	}
