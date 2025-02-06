@@ -782,6 +782,12 @@ function downloadPngImage(img, file_name) {
  * @param {string} text  Text to write.
  */
 function writeTextClipboard(text) {
+	const max_text_size = 512 * 1024; // 512 KB
+
+	if (new Blob([text]).size > max_text_size) {
+		text = text.slice(0, max_text_size);
+	}
+
 	if (window.isSecureContext) {
 		return window.navigator.clipboard.writeText(text);
 	}

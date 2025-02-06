@@ -7523,18 +7523,27 @@ svg {
 
 .preprocessing-test-results td {
   vertical-align: top !important; }
+.preprocessing-test-results .right {
+  padding-right: 0 !important; }
+.preprocessing-test-results td.display-icon {
+  line-height: 24px; }
 .preprocessing-test-results .rel-container {
   top: 4px;
   margin-left: 3px; }
+.preprocessing-test-results .copy-button {
+  margin-left: 5px; }
 
 .item-final-result .table-forms-separator {
-  line-height: 24px; }
+  line-height: 24px;
+  display: inline-grid;
+  width: 675px; }
 .item-final-result .final-result-row {
   display: flex;
-  align-items: center;
-  width: 675px; }
+  align-items: center; }
   .item-final-result .final-result-row .final-result-action {
     margin-right: auto; }
+  .item-final-result .final-result-row:not(:first-child) {
+    margin-top: 5px; }
 
 #preprocessing-test-form .table-forms-separator {
   margin-top: -2px; }

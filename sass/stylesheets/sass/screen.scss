@@ -3402,24 +3402,41 @@ svg {
 		vertical-align: top !important;
 	}
 
+	.right {
+		padding-right: 0 !important;
+	}
+
+	td.display-icon {
+		line-height: 24px;
+	}
+
 	.rel-container {
 		top: 4px;
 		margin-left: 3px;
+	}
+
+	.copy-button {
+		margin-left: 5px;
 	}
 }
 
 .item-final-result {
 	.table-forms-separator {
 		line-height: 24px;
+		display: inline-grid;
+		width: 675px;
 	}
 
 	.final-result-row {
 		display: flex;
 		align-items: center;
-		width: 675px;
 
 		.final-result-action {
 			margin-right : auto;
+		}
+
+		&:not(:first-child) {
+			margin-top: 5px;
 		}
 	}
 }

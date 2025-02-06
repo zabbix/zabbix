@@ -45,7 +45,7 @@ $token_from_grid = (new CFormGrid())
 			),
 			(new CButtonIcon(ZBX_ICON_COPY, _('Copy to clipboard')))
 				->addClass('copy-button')
-				->onClick('writeTextClipboard(this.dataset.auth_token);')
+				->onClick('writeTextClipboard(this.dataset.auth_token);this.focus();')
 				->setAttribute('data-auth_token', $data['auth_token'])
 				->setAttribute('autofocus', 'autofocus')
 		])

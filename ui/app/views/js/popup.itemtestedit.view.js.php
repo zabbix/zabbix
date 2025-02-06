@@ -142,6 +142,11 @@ function cleanPreviousTestResults() {
 		.next()
 		.empty()
 		.hide();
+
+	for (const element of document.querySelectorAll('.result-copy')) {
+		element.style.display = 'none';
+		element.closest('td').classList.remove('display-icon');
+	}
 }
 
 /**
@@ -244,7 +249,7 @@ function itemCompleteTest(overlay) {
 	const $form = overlay.$dialogue.find('form');
 	const form_data = $form.serializeJSON();
 	let post_data = getItemTestProperties('#preprocessing-test-form');
-	const interface = (typeof form_data['interface'] !== 'undefined') ? form_data['interface'] : null;
+	const interface = (form_data['interface'] !== undefined) ? form_data['interface'] : null;
 	const url = new Curl('zabbix.php');
 
 	url.setArgument('action', 'popup.itemtest.send');
@@ -337,49 +342,61 @@ function itemCompleteTest(overlay) {
 				jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
 			}
 
+			let $mapping_row;
+
 			if (ret.final !== undefined) {
-				let result = makeStepResult(ret.final);
+				const result = makeStepResult(ret.final);
+				let copy_button;
 
 				if (result !== null) {
 					$result = result;
 				}
 
 				if (ret.final.error === undefined && ret.final.result) {
-					let copy_button = document.createElement('button');
-
-					copy_button.type = 'button';
-					copy_button.title = t('Copy to clipboard');
-					copy_button.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_COPY, 'copy-button');
-
-					$copy_button = jQuery(copy_button);
-
-					copy_button.addEventListener('click', () => writeTextClipboard(ret.final.result));
+					copy_button = jQuery(createCopyButton(ret.final.result));
+				}
+				else {
+					copy_button = null;
 				}
 
-				$result_row = jQuery('<div>', {'class': '<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?> final-result-row'})
+				$result_field = jQuery('<div>', {'class': '<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>'});
+
+				$result_row = jQuery('<div>', {'class': 'final-result-row'})
 					.append(
 						$(ret.final.action).addClass('final-result-action'),
 						$result,
-						$copy_button ?? ''
+						copy_button
 					);
 
-				if (typeof ret.mapped_value !== 'undefined') {
+				if (ret.mapped_value !== undefined) {
+					if (ret.final.error === undefined && ret.final.result) {
+						copy_button = jQuery(createCopyButton(ret.final.result));
+					}
+					else {
+						copy_button = null;
+					}
+
 					$mapped_value = makeStepResult({result: ret.mapped_value});
-					$mapped_value.css('float', 'right');
 
-					$result_row.append(jQuery('<div>')
+					$mapping_row = jQuery('<div>', {'class': 'final-result-row'})
 						.append(
-							jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'})
+							jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?> final-result-action'})
 								.text(<?= json_encode(_('Result with value map applied')) ?>),
-							$mapped_value
-						)
-					);
+							$mapped_value,
+							copy_button
+						);
+				}
+
+				$result_field.append($result_row);
+
+				if ($mapping_row) {
+					$result_field.append($mapping_row);
 				}
 
 				jQuery('.js-final-result')
 					.show()
 					.next()
-					.append($result_row)
+					.append($result_field)
 					.show();
 			}
 		},
@@ -388,6 +405,21 @@ function itemCompleteTest(overlay) {
 	});
 
 	return false;
+}
+
+function createCopyButton(result) {
+	const copy_button = document.createElement('button');
+
+	copy_button.type = 'button';
+	copy_button.setAttribute('title', <?= json_encode(_('Copy to clipboard')) ?>);
+	copy_button.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_COPY, 'copy-button');
+
+	copy_button.addEventListener('click', () => {
+		writeTextClipboard(result);
+		copy_button.focus();
+	});
+
+	return copy_button;
 }
 
 /**
@@ -432,15 +464,14 @@ function processItemPreprocessingTestResults(steps) {
 		for (const element of document.querySelectorAll('.result-copy')) {
 			if (step.error === undefined && result) {
 				element.style.display = '';
-			}
-			else {
-				element.style.display = 'none';
+				element.closest('td').classList.add('display-icon');
 			}
 		}
 
 		document.addEventListener('click', e => {
 			if (e.target.classList.contains('copy-' + i)) {
 				writeTextClipboard(result);
+				e.target.focus();
 			}
 		});
 
