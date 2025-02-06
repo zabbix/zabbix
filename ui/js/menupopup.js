@@ -1718,7 +1718,7 @@ jQuery(function($) {
 	 * @param string options['css']            Item class.
 	 * @param array  options['data']           Item data ("key" => "value").
 	 * @param array  options['items']          Item sub menu.
-	 * @param bool   options['disabled']       Item disable status.
+	 * @param {bool} options['disabled']       Item disable status.
 	 * @param object options['clickCallback']  Item click callback.
 	 *
 	 * @return object
