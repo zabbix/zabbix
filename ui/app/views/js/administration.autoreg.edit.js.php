@@ -21,18 +21,33 @@
 
 <script>
 	window.autoreg_edit = new class {
+
+		/**
+		 * @type {CForm}
+		 */
+		form;
+
+		/**
+		 * @type {HTMLElement}
+		 */
+		form_element;
+
+		/**
+		 * @type {HTMLElement}
+		 */
+		#psk_required;
+
 		init({rules}) {
 			this.form_element = document.getElementById('autoreg-form');
 			this.form = new CForm(this.form_element, rules);
-			this.psk_required = document.getElementById('psk_required');
+			this.#psk_required = document.getElementById('psk_required');
 			this.#addEventListeners();
 		}
 
 		#addEventListeners() {
 			this.form_element.addEventListener('submit', (e) => {
-				if (!this.submit()) {
-					e.preventDefault();
-				}
+				e.preventDefault();
+				this.submit();
 			});
 
 			document.getElementById('tls_in_psk').addEventListener('change', () => this.#updateFormFields());
@@ -41,20 +56,14 @@
 
 			if (change_psk) {
 				change_psk.addEventListener('click', () => {
-					this.psk_required.value = 1;
+					this.#psk_required.value = 1;
 					this.#updateFormFields();
 				});
 			}
 		}
 
 		submit() {
-			this.#removePopupMessages();
-
-			for (const el of this.form_element.parentNode.children) {
-				if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
-					el.parentNode.removeChild(el);
-				}
-			}
+			clearMessages();
 
 			const fields = this.form.getAllValues();
 			const curl = new Curl(this.form_element.getAttribute('action'));
@@ -70,30 +79,30 @@
 						headers: {'Content-Type': 'application/json'},
 						body: JSON.stringify(fields)
 					})
-					.then((response) => response.json())
-					.then((response) => {
-						if ('error' in response) {
-							throw {error: response.error};
-						}
-
-						if ('form_errors' in response) {
-							this.form.setErrors(response.form_errors, true, true);
-							this.form.renderErrors();
-
-							return;
-						}
-
-						if ('success' in response) {
-							postMessageOk(response.success.title);
-
-							if ('messages' in response.success) {
-								postMessageDetails('success', response.success.messages);
+						.then((response) => response.json())
+						.then((response) => {
+							if ('error' in response) {
+								throw {error: response.error};
 							}
 
-							location.href = location.href;
-						}
-					})
-					.catch(this.ajaxExceptionHandler.bind(this));
+							if ('form_errors' in response) {
+								this.form.setErrors(response.form_errors, true, true);
+								this.form.renderErrors();
+
+								return;
+							}
+
+							if ('success' in response) {
+								postMessageOk(response.success.title);
+
+								if ('messages' in response.success) {
+									postMessageDetails('success', response.success.messages);
+								}
+
+								location.href = location.href;
+							}
+						})
+						.catch(this.ajaxExceptionHandler.bind(this));
 				});
 		}
 
@@ -101,10 +110,10 @@
 			const tls_in_psk = document.getElementById('tls_in_psk').checked;
 
 			if (tls_in_psk) {
-				this.#toggle('change_psk', this.psk_required.value == 0);
+				this.#toggle('change_psk', this.#psk_required.value == 0);
 
 				for (const field of ['tls_psk_identity', 'tls_psk']) {
-					this.#toggle(field, this.psk_required.value == 1, true);
+					this.#toggle(field, this.#psk_required.value == 1, true);
 				}
 			}
 			else {
@@ -145,21 +154,7 @@
 				messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 			}
 
-			const message_box = makeMessageBox('bad', messages, title)[0];
-
-			this.form_element.parentNode.insertBefore(message_box, this.form_element);
-		}
-
-		#removePopupMessages() {
-			// Clear (mostly success) messages that reside outside the <main> tag.
-			clearMessages();
-
-			// Clear (mostly error) messages from controller (if any).
-			for (const el of this.form_element.parentNode.children) {
-				if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
-					el.parentNode.removeChild(el);
-				}
-			}
+			addMessage(makeMessageBox('bad', messages, title)[0]);
 		}
 	};
 </script>
