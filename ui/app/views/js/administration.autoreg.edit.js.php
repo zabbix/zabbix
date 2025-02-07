@@ -40,13 +40,13 @@
 		/**
 		 * @type {HTMLElement}
 		 */
-		#upd_btn;
+		#update_btn;
 
 		init({rules}) {
 			this.form_element = document.getElementById('autoreg-form');
 			this.form = new CForm(this.form_element, rules);
 			this.#psk_required = document.getElementById('psk_required');
-			this.#upd_btn = document.getElementById('update');
+			this.#update_btn = document.getElementById('update');
 			this.#addEventListeners();
 		}
 
@@ -69,7 +69,7 @@
 		}
 
 		submit() {
-			this.#setIsLoading(this.#upd_btn);
+			this.#setIsLoading(this.#update_btn);
 			clearMessages();
 
 			const fields = this.form.getAllValues();
@@ -78,7 +78,7 @@
 			this.form.validateSubmit(fields)
 				.then((result) => {
 					if (!result) {
-						this.#unsetIsLoading(this.#upd_btn);
+						this.#unsetIsLoading(this.#update_btn);
 
 						return;
 					}
@@ -97,7 +97,7 @@
 							if ('form_errors' in response) {
 								this.form.setErrors(response.form_errors, true, true);
 								this.form.renderErrors();
-								this.#unsetIsLoading(this.#upd_btn);
+								this.#unsetIsLoading(this.#update_btn);
 
 								return;
 							}
@@ -165,7 +165,7 @@
 			}
 
 			addMessage(makeMessageBox('bad', messages, title)[0]);
-			this.#unsetIsLoading(this.#upd_btn);
+			this.#unsetIsLoading(this.#update_btn);
 		}
 
 		#setIsLoading(target) {
