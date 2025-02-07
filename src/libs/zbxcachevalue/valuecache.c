@@ -2539,7 +2539,7 @@ int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, int *ret_flush, int 
 					.itemid = h->itemid,
 					.value_type = h->value_type,
 					.last_accessed = (int)time(NULL),
-					.active_range = SEC_PER_MIN
+					.active_range = VC_MIN_RANGE
 
 			};
 
@@ -2910,7 +2910,7 @@ void	zbx_vc_add_new_items(const zbx_vector_uint64_pair_t *items)
 					.itemid = items->values[i].first,
 					.value_type = (unsigned char)items->values[i].second,
 					.status = ZBX_ITEM_STATUS_CACHED_ALL,
-					.active_range = SEC_PER_MIN,
+					.active_range = VC_MIN_RANGE,
 					.last_accessed = (int)time(NULL)
 
 			};
