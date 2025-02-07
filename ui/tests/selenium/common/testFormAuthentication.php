@@ -110,48 +110,58 @@ class testFormAuthentication extends CWebTest {
 		$this->assertEquals($title, $mapping_dialog->getTitle());
 		$mapping_form = $mapping_dialog->asForm();
 
+		if ($field === 'Media type mapping') {
+			$labels = ['Name', 'Media type', 'Attribute', 'User media', 'When active', 'Use if severity', 'Create enabled'];
+			$required = ['Name', 'Media type', 'Attribute', 'When active'];
+			$values = [
+				'Name' => '',
+				'Media type' => 'Brevis.one',
+				'Attribute' => '',
+				'When active' => '1-7,00:00-24:00',
+				'class:checkbox-list' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+				'Create enabled' => true
+			];
+			$field_maxlength = [
+				'Name' => 64,
+				'Attribute' => 255,
+				'When active' => 1024
+			];
+		}
+		else {
+			$labels = [
+				$auth_type.' group pattern', 'User groups', 'User role'];
+			$required = $labels;
+			$values = [
+				$auth_type.' group pattern' => '',
+				'User groups' => '',
+				'User role' => ''
+			];
+			$field_maxlength = [
+				'LDAP group pattern' => 255
+			];
+		}
+
 		foreach ($labels as $label) {
 			$mapping_field = $mapping_form->getField($label);
 			$this->assertTrue($mapping_field->isVisible());
 			$this->assertTrue($mapping_field->isEnabled());
 		}
 
-		$this->assertEquals($labels, $mapping_form->getRequiredLabels());
-
-		$values = ($field === 'Media type mapping')
-			? ['Name' => '', 'Media type' => 'Brevis.one', 'Attribute' => '', 'When active' => '1-7,00:00-24:00', 'Create enabled' => true]
-			: [$auth_type.' group pattern' => '', 'User groups' => '', 'User role' => ''];
-
+		$this->assertEquals($required, $mapping_form->getRequiredLabels());
 		$mapping_form->checkValue($values);
 
-		// Check the pressence of severity checkboxes for media type mapping and attributes of period field.
-		if ($field === 'Media type mapping') {
-			foreach (['Use if severity', 'User media'] as $fields) {
-				$this->assertTrue($mapping_form->getField($fields)->isPresent());
-			}
-
-			$severity = $mapping_form->query('xpath://div/ul[@class="checkbox-list vertical"]')->asCheckboxList()->one();
-
-			$this->assertEquals($severity->getValue(), [
-					'Not classified',
-					'Information',
-					'Warning',
-					'Average',
-					'High',
-					'Disaster'
-			]);
-
-			$this->assertEquals(['1-7,00:00-24:00', '1024'], [
-					$mapping_form->getField('When active')->getAttribute('placeholder'),
-					$mapping_form->getField('When active')->getAttribute('maxlength')
-			]);
+		foreach ($field_maxlength as $field => $maxlength) {
+			$this->assertEquals($maxlength, $mapping_form->getField($field)->getAttribute('maxlength'));
 		}
 
-		// Check group mapping popup footer buttons.
-		$this->assertTrue($mapping_dialog->getFooter()->query('button:Add')->one()->isClickable());
+		if ($field === 'Media type mapping') {
+			$this->assertEquals('1-7,00:00-24:00', $mapping_form->getField('When active')->getAttribute('placeholder'));
+		}
 
-		// Check mapping dialog footer buttons.
-		$footer = $this->checkFooterButtons($mapping_dialog, ['Add', 'Cancel']);
+		// Check popup footer buttons.
+		$this->assertEquals(['Add', 'Cancel'], $mapping_dialog->getFooter()
+				->query('button')->all()->filter(CElementFilter::CLICKABLE)->asText()
+		);
 
 		// Check hint in group mapping popup.
 		if ($field === 'User group mapping') {
@@ -161,7 +171,7 @@ class testFormAuthentication extends CWebTest {
 		}
 
 		// Close mapping dialog.
-		$footer->query('button:Cancel')->waitUntilClickable()->one()->click();
+		$mapping_dialog->query('button:Cancel')->waitUntilClickable()->one()->click();
 	}
 
 	/**
