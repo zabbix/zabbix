@@ -80,14 +80,12 @@ class CFormValidator {
 		foreach ($rules as $key => $value) {
 			if (is_int($key)) {
 				if (!is_string($value)) {
-					// For numeric keys, rule value should be a string.
-					throw new Exception('Internal error.');
+					throw new Exception('[RULES ERROR] For numeric keys, rule value should be a string: (Path: '.$rule_path.', Key: '.$key.')');
 				}
 
 				if (in_array($value, ['required', 'not_empty', 'allow_macro'], true)) {
 					if (array_key_exists($value, $result)) {
-						// Option is specified multiple times.
-						throw new Exception('Internal error.');
+						throw new Exception('[RULES ERROR] Option "'.$value.'" is specified multiple times (Path: '.$rule_path.')');
 					}
 
 					$result[$value] = true;
@@ -95,14 +93,14 @@ class CFormValidator {
 				elseif (in_array($value, ['id', 'integer', 'float', 'string', 'object', 'objects', 'array'], true)) {
 					if (array_key_exists('type', $result)) {
 						// "type" is specified multiple times.
-						throw new Exception('Internal error.');
+						throw new Exception('[RULES ERROR] Rule "type" is specified multiple times (Path: '.$rule_path.')');
 					}
 
 					$result['type'] = $value;
 				}
 				elseif ($value === 'boolean') {
 					if (array_key_exists('type', $result)) {
-						throw new Exception('Internal error.');
+						throw new Exception('[RULES ERROR] Rule "type" is specified multiple times (Path: '.$rule_path.')');
 					}
 
 					$result['type'] = 'integer';
@@ -110,8 +108,7 @@ class CFormValidator {
 				}
 				elseif (strncmp($value, 'db ', 3) === 0) {
 					if (array_key_exists('type', $result)) {
-						// "type" is specified multiple times.
-						throw new Exception('Internal error.');
+						throw new Exception('[RULES ERROR] Rule "type" is specified multiple times (Path: '.$rule_path.')');
 					}
 
 					[$db_table, $db_field] = explode('.', substr($value, 3));
@@ -129,8 +126,7 @@ class CFormValidator {
 						case DB::FIELD_TYPE_CHAR:
 						case DB::FIELD_TYPE_TEXT:
 							if (array_key_exists('length', $result)) {
-								// "length" is specified multiple times.
-								throw new Exception('Internal error.');
+								throw new Exception('[RULES ERROR] Rule "length" is specified multiple times (Path: '.$rule_path.')');
 							}
 
 							$result['type'] = 'string';
@@ -138,28 +134,25 @@ class CFormValidator {
 							break;
 
 						default:
-							throw new Exception('Internal error.');
+							throw new Exception('[RULES ERROR] Unknown field type in db schema (Path: '.$rule_path.')');
 					}
 				}
 				elseif (strncmp($value, 'in ', 3) === 0) {
 					if (array_key_exists('in', $result) || array_key_exists('not_in', $result)) {
-						// Conflicting rules.
-						throw new Exception('Internal error.');
+						throw new Exception('[RULES ERROR] Rule "in" or "not_in" is specified multiple times (Path: '.$rule_path.')');
 					}
 
 					$result['in'] = self::parseIn(substr($value, 3));
 				}
 				elseif (strncmp($value, 'not_in ', 7) === 0) {
 					if (array_key_exists('in', $result) || array_key_exists('not_in', $result)) {
-						// Conflicting rules.
-						throw new Exception('Internal error.');
+						throw new Exception('[RULES ERROR] Rule "in" or "not_in" is specified multiple times (Path: '.$rule_path.')');
 					}
 
 					$result['not_in'] = self::parseIn(substr($value, 7));
 				}
 				else {
-					// Unrecognized option.
-					throw new Exception('Internal error.');
+					throw new Exception('[RULES ERROR] Unknown rule "'.$value.'" (Path: '.$rule_path.')');
 				}
 			}
 			else {
@@ -167,12 +160,11 @@ class CFormValidator {
 					case 'not_in':
 					case 'in':
 						if (array_key_exists('in', $result) || array_key_exists('not_in', $result)) {
-							// Conflicting rules.
-							throw new Exception('Internal error.');
+							throw new Exception('[RULES ERROR] Rule "in" or "not_in" is specified multiple times (Path: '.$rule_path.')');
 						}
 
 						if (!is_array($value) || !$value) {
-							throw new Exception('Internal error.');
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain non-empty array (Path: '.$rule_path.')');
 						}
 
 						$result[$key] = $value;
@@ -182,8 +174,7 @@ class CFormValidator {
 					case 'field':
 					case 'messages':
 						if (!is_array($value) || !$value) {
-							// An array is compatible for this parameter, and it can't be empty.
-							throw new Exception('Internal error.');
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain non-empty array (Path: '.$rule_path.')');
 						}
 
 						if ($key === 'fields') {
@@ -208,7 +199,7 @@ class CFormValidator {
 					case 'max':
 						if (!is_int($value) && !is_float($value)) {
 							// Value should be a number.
-							throw new Exception('Internal error.');
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain a number (Path: '.$rule_path.')');
 						}
 
 						$result[$key] = $value;
@@ -216,13 +207,11 @@ class CFormValidator {
 
 					case 'length':
 						if (array_key_exists($key, $result)) {
-							// Duplicate entry.
-							throw new Exception('Internal error.');
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" is specified multiple times (Path: '.$rule_path.')');
 						}
 
 						if (!is_int($value)) {
-							// Value should be an integer.
-							throw new Exception('Internal error.');
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain an integer (Path: '.$rule_path.')');
 						}
 
 						$result[$key] = $value;
@@ -238,7 +227,7 @@ class CFormValidator {
 
 					case 'api_uniq':
 						if (!is_array($value) || !array_key_exists(0, $value)) {
-							throw new Exception('Internal error.');
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain non-empty array (Path: '.$rule_path.')');
 						}
 
 						if (!is_array($value[0])) {
@@ -254,82 +243,74 @@ class CFormValidator {
 						break;
 
 					case 'regex':
-						if (array_key_exists($key, $result) || preg_match($value, '') === false) {
-							throw new Exception('Internal error.');
+						if (array_key_exists($key, $result)) {
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" is specified multiple times (Path: '.$rule_path.')');
+						}
+
+						if (preg_match($value, '') === false) {
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" should not be empty (Path: '.$rule_path.')');
 						}
 
 						$result[$key] = $value;
 						break;
 
 					default:
-						// Unrecognized option.
-						throw new Exception('Internal error.');
+						throw new Exception('[RULES ERROR] Unknown rule "'.$key.'" (Path: '.$rule_path.')');
 				}
 			}
 		}
 
 		// Some rule checking.
 		if (!array_key_exists('type', $result)) {
-			// Type is mandatory.
-			throw new Exception('Internal error.');
+			throw new Exception('[RULES ERROR] Rule "type" is mandatory (Path: '.$rule_path.')');
 		}
 
 		if (array_key_exists('not_empty', $result)) {
 			if (!in_array($result['type'], ['string', 'objects', 'array'])) {
-				// "not_empty" is compatible only with "string", "objects", "array" data types.
-				throw new Exception('Internal error.');
+				throw new Exception('[RULES ERROR] Rule "not_empty" is not compatible with type "'.$result['type'].'" (Path: '.$rule_path.')');
 			}
 		}
 
 		if (array_key_exists('in', $result) || array_key_exists('not_in', $result)) {
 			if (!in_array($result['type'], ['integer', 'float', 'string'])) {
-				// in/not_in is compatible with "numeric" and "string" data types only.
-				throw new Exception('Internal error.');
+				throw new Exception('[RULES ERROR] Rule "in" and "not_in" is not compatible with type "'.$result['type'].'" (Path: '.$rule_path.')');
 			}
 
 			$options = array_key_exists('in', $result) ? $result['in'] : $result['not_in'];
 
 			if (self::validateInOptions($options, $result['type']) === false) {
-				// Invalid in/not_in options passed.
-				throw new Exception('Internal error.');
+				throw new Exception('[RULES ERROR] Invalid value for rule "in" or "not_in" (Path: '.$rule_path.')');
 			}
 		}
 
 		if (array_key_exists('fields', $result) && !in_array($result['type'], ['objects', 'object'])) {
-			// 'fields' is supported only by 'objects' and 'object'.
-			throw new Exception('Internal error.');
+			throw new Exception('[RULES ERROR] Rule "fields" is not compatible with type "'.$result['type'].'" (Path: '.$rule_path.')');
 		}
 
 		if (in_array($result['type'], ['objects', 'object'])
 				&& !array_key_exists('fields', $result) && !array_key_exists('when', $result)) {
-			// For object/objects in non-conditional rule row 'fields' rule must be present.
-			throw new Exception('Internal error.');
+			throw new Exception('[RULES ERROR] For object/objects in non-conditional rule row "fields" rule must be present (Path: '.$rule_path.')');
 		}
 
 		if (array_key_exists('field', $result) && $result['type'] !== 'array') {
-			// 'field' is supported only by 'array'.
-			throw new Exception('Internal error.');
+			throw new Exception('[RULES ERROR] Rule "field" is supported only by type "array" (Path: '.$rule_path.')');
 		}
 
 		if (array_key_exists('api_uniq', $result) && $result['type'] !== 'object') {
-			// 'api_uniq' is supported only for 'object'.
-			throw new Exception('Internal error.');
+			throw new Exception('[RULES ERROR] Rule "api_uniq" is supported only by type "object" (Path: '.$rule_path.')');
 		}
 
 		if ((array_key_exists('min', $result) || array_key_exists('max', $result))
 				&& !in_array($result['type'], ['integer', 'float'])) {
-			// Field type 'integer' or 'float' is required for these rules.
-			throw new Exception('Internal error.');
+			throw new Exception('[RULES ERROR] Rule "min" or "max" is not compatible with type "'.$result['type'].'" (Path: '.$rule_path.')');
 		}
 
-		if (array_key_exists('length', $result) && !in_array($result['type'], ['string'])) {
-			// Field type 'string' is required for this rule.
-			throw new Exception('Internal error.');
+		if (array_key_exists('length', $result) && $result['type'] !== 'string') {
+			throw new Exception('[RULES ERROR] Rule "length" is supported only by type "string" (Path: '.$rule_path.')');
 		}
 
-		if (array_key_exists('allow_macro', $result) && !in_array($result['type'], ['string'])) {
-			// Field type 'string' is required for this rule.
-			throw new Exception('Internal error.');
+		if (array_key_exists('allow_macro', $result) && $result['type'] !== 'string') {
+			throw new Exception('[RULES ERROR] Rule "length" is supported only by type "string" (Path: '.$rule_path.')');
 		}
 
 		if (array_key_exists('when', $result)) {
@@ -338,8 +319,7 @@ class CFormValidator {
 
 				if (($when_function === 'in' || $when_function === 'not_in')
 						&& self::validateInOptions($when[$when_function]) === false) {
-					// Invalid in/not_in options passed to 'when' condition.
-					throw new Exception('Internal error.');
+					throw new Exception('[RULES ERROR] Invalid value for rule "in" or "not_in" in "when" condition (Path: '.$rule_path.')');
 				}
 			}
 		}
@@ -347,8 +327,7 @@ class CFormValidator {
 		if (array_key_exists('messages', $result)) {
 			foreach (array_keys($result['messages']) as $key) {
 				if (!array_key_exists($key, $result)) {
-					// Only messages for defined checks can be set.
-					throw new Exception('Internal error.');
+					throw new Exception('[RULES ERROR] Message is defined for non-existing rule "'.$key.'" (Path: '.$rule_path.')');
 				}
 			}
 		}
@@ -384,7 +363,7 @@ class CFormValidator {
 			$result[$field] = [];
 
 			if (!is_array($field_rules)) {
-				throw new Exception('Internal error.');
+				throw new Exception('[RULES ERROR] Field "'.$field.'" should have an array of rule rows (Path: '.$rule_path.')');
 			}
 
 			if ($field_rules
@@ -411,8 +390,7 @@ class CFormValidator {
 	 */
 	private function normalizeWhenRule(array $when_rules, string $rule_path): array {
 		if (!is_array($when_rules)) {
-			// When rule is invalid format.
-			throw new Exception('Internal error.');
+			throw new Exception('[RULES ERROR] When condition should be an array (Path: '.$rule_path.')');
 		}
 
 		if (!is_array($when_rules[0])) {
@@ -421,20 +399,17 @@ class CFormValidator {
 
 		foreach ($when_rules as &$when_rule) {
 			if (!is_array($when_rule) || count($when_rule) !== 2) {
-				// When rule is invalid format.
-				throw new Exception('Internal error.');
+				throw new Exception('[RULES ERROR] When condition should be an array with at least two elements (Path: '.$rule_path.')');
 			}
 
 			if (!is_int(array_keys($when_rule)[0]) || !is_string($when_rule[0]) || $when_rule[0] === '') {
-				// Missing or invalid comparison field.
-				throw new Exception('Internal error.');
+				throw new Exception('[RULES ERROR] Missing or invalid comparison field. (Path: '.$rule_path.')');
 			}
 
 			$when_field_path = self::getWhenFieldAbsolutePath($when_rule[0], $rule_path);
 
 			if (!in_array($when_field_path, $this->existing_rule_paths)) {
-				// Only fields defined prior to this can be used for 'when' checks.
-				throw new Exception('Internal error.');
+				throw new Exception('[RULES ERROR] Only fields defined prior to this can be used for "when" checks (Path: '.$rule_path.')');
 			}
 
 			$result = [$when_rule[0]];
@@ -447,8 +422,7 @@ class CFormValidator {
 			}
 			elseif (is_int($key)) {
 				if (!is_string($value)) {
-					// For numeric keys, rule value should be a string.
-					throw new Exception('Internal error.');
+					throw new Exception('[RULES ERROR] For numeric keys, when rule value should be a string: (Path: '.$rule_path.', Key: '.$key.')');
 				}
 
 				if (in_array($value, ['empty', 'not_empty', 'exist', 'not_exist'], true)) {
@@ -464,8 +438,7 @@ class CFormValidator {
 					$result['not_in'] = self::parseIn(substr($value, 7));
 				}
 				else {
-					// Unrecognized option.
-					throw new Exception('Internal error.');
+					throw new Exception('[RULES ERROR] Unknown when rule "'.$value.'" (Path: '.$rule_path.')');
 				}
 			}
 			else {
@@ -476,8 +449,7 @@ class CFormValidator {
 						break;
 
 					default:
-						// Unrecognized option.
-						throw new Exception('Internal error.');
+						throw new Exception('[RULES ERROR] Unknown when rule "'.$key.'" (Path: '.$rule_path.')');
 				}
 			}
 
@@ -525,8 +497,7 @@ class CFormValidator {
 		$values = explode(',', $rule);
 
 		if (!$values) {
-			// "in" should not be empty.
-			throw new Exception('Internal error.');
+			throw new Exception('[RULES ERROR] Rule "in" or "not_in" should contain non-empty value');
 		}
 
 		foreach ($values as $val) {
