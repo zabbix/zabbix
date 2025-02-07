@@ -394,7 +394,7 @@ class CMaintenance extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$maintenances, array &$db_maintenances = null): void {
+	protected function validateUpdate(array &$maintenances, ?array &$db_maintenances = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['maintenanceid']], 'fields' => [
 			'maintenanceid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'groupids' =>		['type' => API_IDS, 'flags' => API_DEPRECATED, 'uniq' => true],
@@ -587,7 +587,7 @@ class CMaintenance extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDelete(array $maintenanceids, array &$db_maintenances = null): void {
+	private function validateDelete(array $maintenanceids, ?array &$db_maintenances = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $maintenanceids, '/', $error)) {
@@ -662,7 +662,7 @@ class CMaintenance extends CApiService {
 	 *
 	 * @throws APIException if maintenance names are not unique.
 	 */
-	protected static function checkDuplicates(array $maintenances, array $db_maintenances = null): void {
+	protected static function checkDuplicates(array $maintenances, ?array $db_maintenances = null): void {
 		$names = [];
 
 		foreach ($maintenances as $maintenance) {
@@ -699,7 +699,7 @@ class CMaintenance extends CApiService {
 	 *
 	 * @throws APIException if groups are not valid.
 	 */
-	private static function checkGroups(array $maintenances, array $db_maintenances = null): void {
+	private static function checkGroups(array $maintenances, ?array $db_maintenances = null): void {
 		$edit_groupids = [];
 
 		foreach ($maintenances as $maintenance) {
@@ -745,7 +745,7 @@ class CMaintenance extends CApiService {
 	 *
 	 * @throws APIException if hosts are not valid.
 	 */
-	private static function checkHosts(array $maintenances, array $db_maintenances = null): void {
+	private static function checkHosts(array $maintenances, ?array $db_maintenances = null): void {
 		$edit_hostids = [];
 
 		foreach ($maintenances as $maintenance) {
@@ -790,7 +790,7 @@ class CMaintenance extends CApiService {
 	 * @param array      $maintenances
 	 * @param array|null $db_maintenances
 	 */
-	private static function updateTags(array &$maintenances, array $db_maintenances = null): void {
+	private static function updateTags(array &$maintenances, ?array $db_maintenances = null): void {
 		$ins_maintenance_tags = [];
 		$del_maintenancetagids = [];
 
@@ -858,7 +858,7 @@ class CMaintenance extends CApiService {
 	 * @param array      $maintenances
 	 * @param array|null $db_maintenances
 	 */
-	private static function updateGroups(array &$maintenances, array $db_maintenances = null): void {
+	private static function updateGroups(array &$maintenances, ?array $db_maintenances = null): void {
 		$ins_groups = [];
 		$del_groupids = [];
 
@@ -920,7 +920,7 @@ class CMaintenance extends CApiService {
 	 * @param array      $maintenances
 	 * @param array|null $db_maintenances
 	 */
-	private static function updateHosts(array &$maintenances, array $db_maintenances = null): void {
+	private static function updateHosts(array &$maintenances, ?array $db_maintenances = null): void {
 		$ins_maintenances_hosts = [];
 		$del_maintenance_hostids = [];
 
@@ -984,7 +984,7 @@ class CMaintenance extends CApiService {
 	 * @param array      $maintenances
 	 * @param array|null $db_maintenances
 	 */
-	private static function updateTimeperiods(array &$maintenances, array $db_maintenances = null): void {
+	private static function updateTimeperiods(array &$maintenances, ?array $db_maintenances = null): void {
 		$ins_timeperiods = [];
 		$ins_maintenances_windows = [];
 		$del_timeperiodids = [];
