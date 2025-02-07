@@ -1,64 +1,46 @@
 zabbix_export:
   version: '7.4'
   media_types:
-    -
-      name: PagerDuty
+    - name: PagerDuty
       type: WEBHOOK
       parameters:
-        -
-          name: alert_message
+        - name: alert_message
           value: '{ALERT.MESSAGE}'
-        -
-          name: eventack
+        - name: eventack
           value: '{EVENT.ACK.STATUS}'
-        -
-          name: eventdate
+        - name: eventdate
           value: '{EVENT.DATE}'
-        -
-          name: eventid
+        - name: eventid
           value: '{EVENT.ID}'
-        -
-          name: eventname
+        - name: eventname
           value: '{ALERT.SUBJECT}'
-        -
-          name: eventtags
+        - name: eventtags
           value: '{EVENT.TAGS}'
-        -
-          name: eventtime
+        - name: eventtime
           value: '{EVENT.TIME}'
-        -
-          name: eventupdate
+        - name: eventupdate
           value: '{EVENT.UPDATE.STATUS}'
-        -
-          name: eventvalue
+        - name: eventvalue
           value: '{EVENT.VALUE}'
-        -
-          name: event_source
+        - name: event_source
           value: '{EVENT.SOURCE}'
-        -
-          name: hostip
+        - name: hostip
           value: '{HOST.IP}'
-        -
-          name: hostname
+        - name: hostname
           value: '{HOST.NAME}'
-        -
-          name: severity
+        - name: severity
           value: '{EVENT.NSEVERITY}'
-        -
-          name: token
+        - name: token
           value: '<put your key>'
-        -
-          name: triggerdesc
+        - name: triggerdesc
           value: '{TRIGGER.DESCRIPTION}'
-        -
-          name: triggerid
+        - name: triggerid
           value: '{TRIGGER.ID}'
-        -
-          name: triggeropdata
+        - name: triggeropdata
           value: '{EVENT.OPDATA}'
-        -
-          name: url
+        - name: url
           value: '{$ZABBIX.URL}'
+      status: DISABLED
       script: |
         try {
         
@@ -167,7 +149,7 @@ zabbix_export:
                     source: (params.event_source === '1') ? 'Discovery' : params.hostname + ' : ' + params.hostip,
                     severity: severityMapping[params.severity],
                 };
-
+        
                 if (params.event_source === '0') {
                     fields.payload.custom_details = {
                         'Event date': params.eventdate,
@@ -221,8 +203,7 @@ zabbix_export:
         Set global macro {$ZABBIX.URL} with your Zabbix server URL.
         Add a dedicated user with the media type "PagerDuty" and place the integration key in the "token" parameter to integrate into the service.
       message_templates:
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: PROBLEM
           subject: 'Problem: {EVENT.NAME}'
           message: |
@@ -233,8 +214,7 @@ zabbix_export:
             Operational data: {EVENT.OPDATA}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: RECOVERY
           subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
           message: |
@@ -245,8 +225,7 @@ zabbix_export:
             Severity: {EVENT.SEVERITY}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: UPDATE
           subject: 'Updated problem in {EVENT.AGE}: {EVENT.NAME}'
           message: |
@@ -254,8 +233,7 @@ zabbix_export:
             {EVENT.UPDATE.MESSAGE}
             
             Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}.
-        -
-          event_source: DISCOVERY
+        - event_source: DISCOVERY
           operation_mode: PROBLEM
           subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
           message: |
@@ -270,8 +248,7 @@ zabbix_export:
             Device service port: {DISCOVERY.SERVICE.PORT}
             Device service status: {DISCOVERY.SERVICE.STATUS}
             Device service uptime: {DISCOVERY.SERVICE.UPTIME}
-        -
-          event_source: AUTOREGISTRATION
+        - event_source: AUTOREGISTRATION
           operation_mode: PROBLEM
           subject: 'Autoregistration: {HOST.HOST}'
           message: |
