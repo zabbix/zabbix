@@ -852,7 +852,8 @@ int	zbx_db_connect_basic(const zbx_config_dbhigh_t *cfg)
 out:
 #elif defined(HAVE_SQLITE3)
 #ifdef HAVE_FUNCTION_SQLITE3_OPEN_V2
-	if (SQLITE_OK != sqlite3_open_v2(cfg->config_dbname, &conn, SQLITE_OPEN_READWRITE, NULL))
+	if (SQLITE_OK != sqlite3_open_v2(cfg->config_dbname, &conn, SQLITE_OPEN_READWRITE |
+		SQLITE_OPEN_CREATE, NULL))
 #else
 	if (SQLITE_OK != sqlite3_open(cfg->config_dbname, &conn))
 #endif

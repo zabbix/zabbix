@@ -217,7 +217,7 @@ func (p *Plugin) startPlugin(initial bool) (<-chan error, error) {
 
 	go func() {
 		defer func() {
-			p.Debugf("stoping communications broker")
+			p.Debugf("stopping communications broker")
 			p.broker.close()
 		}()
 

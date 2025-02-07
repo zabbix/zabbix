@@ -1,0 +1,1 @@
+.........T [ZBX-25458] fixed LLD rule for organization discovery, changed host prototype "host" field to avoid special characters (abiba)

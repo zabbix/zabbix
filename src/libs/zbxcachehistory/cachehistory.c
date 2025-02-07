@@ -3067,6 +3067,30 @@ int	zbx_hc_get_history_compression_age(void)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: calculate usage percentage of hc memory buffer                    *
+ *                                                                            *
+ ******************************************************************************/
+double	zbx_hc_mem_pused(void)
+{
+	return 100 * (double)(zbx_dbcache_get_hc_mem()->total_size - zbx_dbcache_get_hc_mem()->free_size) /
+			zbx_dbcache_get_hc_mem()->total_size;
+}
+
+double	zbx_hc_mem_pused_lock(void)
+{
+	double	pused;
+
+	zbx_dbcache_lock();
+
+	pused = zbx_hc_mem_pused();
+
+	zbx_dbcache_unlock();
+
+	return pused;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: Allocate shared memory for trend cache (part of database cache)   *
  *                                                                            *
  * Comments: Is optionally called from zbx_init_database_cache()              *
@@ -3375,6 +3399,25 @@ void	zbx_hc_get_mem_stats(zbx_shmem_stats_t *data, zbx_shmem_stats_t *index)
 		zbx_shmem_get_stats(hc_index_mem, index);
 
 	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if item is present in history cache                        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_hc_is_itemid_cached(zbx_uint64_t itemid)
+{
+	int	ret = FAIL;
+
+	LOCK_CACHE;
+
+	if (NULL != zbx_hashset_search(&cache->history_items, &itemid))
+		ret = SUCCEED;
+
+	UNLOCK_CACHE;
+
+	return ret;
 }
 
 /******************************************************************************

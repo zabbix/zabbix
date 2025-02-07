@@ -39,7 +39,7 @@ class LintCommand extends Command
     private $directoryIteratorProvider;
     private $isReadableProvider;
 
-    public function __construct(string $name = null, callable $directoryIteratorProvider = null, callable $isReadableProvider = null)
+    public function __construct(?string $name = null, ?callable $directoryIteratorProvider = null, ?callable $isReadableProvider = null)
     {
         parent::__construct($name);
 
@@ -109,7 +109,7 @@ EOF
         return $this->display($io, $filesInfo);
     }
 
-    private function validate(string $content, int $flags, string $file = null)
+    private function validate(string $content, int $flags, ?string $file = null)
     {
         $prevErrorHandler = set_error_handler(function ($level, $message, $file, $line) use (&$prevErrorHandler) {
             if (E_USER_DEPRECATED === $level) {

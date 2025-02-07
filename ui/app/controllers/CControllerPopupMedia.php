@@ -30,7 +30,7 @@ class CControllerPopupMedia extends CController {
 			'period' =>					'time_periods',
 			'active' =>					'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]),
 			'severity' =>				'',
-			'userdirectory_mediaid' =>	'id',
+			'provisioned' =>			'in '.CUser::PROVISION_STATUS_YES.','.CUser::PROVISION_STATUS_NO,
 			'add' =>					'in 1'
 		];
 
@@ -68,7 +68,7 @@ class CControllerPopupMedia extends CController {
 			'active' => $this->getInput('active', MEDIA_STATUS_ACTIVE),
 			'period' => $this->getInput('period', ZBX_DEFAULT_INTERVAL),
 			'sendto_emails' => array_values($this->getInput('sendto_emails', [''])),
-			'userdirectory_mediaid' => $this->getInput('userdirectory_mediaid', 0)
+			'provisioned' => $this->getInput('provisioned', CUser::PROVISION_STATUS_NO)
 		];
 
 		// Validation before adding Media to user's Media tab.

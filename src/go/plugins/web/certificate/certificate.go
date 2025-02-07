@@ -25,7 +25,6 @@ import (
 	"strings"
 	"time"
 
-	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/uri"
@@ -71,13 +70,8 @@ type ValidationResult struct {
 	Message string `json:"message"`
 }
 
-type Options struct {
-	plugin.SystemOptions `conf:"optional,name=System"`
-}
-
 type Plugin struct {
 	plugin.Base
-	options Options
 }
 
 func init() {
@@ -85,15 +79,6 @@ func init() {
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
-}
-
-func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-}
-
-func (p *Plugin) Validate(options interface{}) error {
-	var o Options
-
-	return conf.Unmarshal(options, &o)
 }
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (interface{}, error) {
