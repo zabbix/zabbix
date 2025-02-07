@@ -2910,6 +2910,7 @@ void	zbx_vc_add_new_items(const zbx_vector_uint64_pair_t *items)
 					.itemid = items->values[i].first,
 					.value_type = (unsigned char)items->values[i].second,
 					.status = ZBX_ITEM_STATUS_CACHED_ALL,
+					.active_range = SEC_PER_MIN,
 					.last_accessed = (int)time(NULL)
 
 			};
