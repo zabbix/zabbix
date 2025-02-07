@@ -1499,7 +1499,7 @@ class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 			return true;
 		}
 
-		const legend_lines_mode = document.querySelector('[name=legend_lines_mode]:checked');
+		const legend_lines_mode = document.querySelector('[name="legend_lines_mode"]:checked');
 
 		if (legend_lines_mode !== null
 				&& legend_lines_mode.value != GraphLegendTabIndicatorItem.SVG_GRAPH_LEGEND_LINES_MODE_FIXED) {
@@ -1806,7 +1806,7 @@ class PieLegendTabIndicatorItem extends TabIndicatorItem {
 			return true;
 		}
 
-		const legend_lines_mode = document.querySelector('[name=legend_lines_mode]:checked');
+		const legend_lines_mode = document.querySelector('[name="legend_lines_mode"]:checked');
 
 		if (legend_lines_mode !== null
 				&& legend_lines_mode.value != PieLegendTabIndicatorItem.PIE_CHART_LEGEND_LINES_MODE_FIXED) {
