@@ -46,7 +46,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	private ?DateTimeZone $timezone = null;
 	private bool $is_date_only = false;
 
-	public function __construct(string $name, string $label = null) {
+	public function __construct(string $name, ?string $label = null) {
 		parent::__construct($name, $label);
 
 		$this

@@ -447,7 +447,7 @@ class CMediatype extends CApiService {
 	 *
 	 * @throws APIException if a media type name is not unique.
 	 */
-	private static function checkDuplicates(array $mediatypes, array $db_mediatypes = null): void {
+	private static function checkDuplicates(array $mediatypes, ?array $db_mediatypes = null): void {
 		$names = [];
 
 		foreach ($mediatypes as $mediatype) {
@@ -483,7 +483,7 @@ class CMediatype extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function validateByType(array &$mediatypes, array $db_mediatypes = null): void {
+	private static function validateByType(array &$mediatypes, ?array $db_mediatypes = null): void {
 		$method = ($db_mediatypes === null) ? 'create' : 'update';
 
 		$db_defaults = DB::getDefaults('media_type');
@@ -728,7 +728,7 @@ class CMediatype extends CApiService {
 	 * @param string     $method
 	 * @param array|null $db_mediatypes
 	 */
-	private static function updateParameters(array &$mediatypes, string $method, array $db_mediatypes = null): void {
+	private static function updateParameters(array &$mediatypes, string $method, ?array $db_mediatypes = null): void {
 		$ins_params = [];
 		$upd_params = [];
 		$del_paramids = [];
@@ -807,7 +807,8 @@ class CMediatype extends CApiService {
 	 * @param string     $method
 	 * @param array|null $db_mediatypes
 	 */
-	private static function updateMessageTemplates(array &$mediatypes, string $method, array $db_mediatypes = null): void {
+	private static function updateMessageTemplates(array &$mediatypes, string $method,
+			?array $db_mediatypes = null): void {
 		$ins_messages = [];
 		$upd_messages = [];
 		$del_messageids = [];
