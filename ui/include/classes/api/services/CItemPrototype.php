@@ -865,7 +865,7 @@ class CItemPrototype extends CItemGeneral {
 	/**
 	 * @inheritDoc
 	 */
-	protected static function inherit(array $items, array $db_items = [], array $hostids = null,
+	protected static function inherit(array $items, array $db_items = [], ?array $hostids = null,
 			bool $is_dep_items = false): void {
 		$tpl_links = self::getTemplateLinks($items, $hostids);
 
