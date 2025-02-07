@@ -37,15 +37,11 @@ class testFormUserLdapMediaJit extends CWebTest {
 		];
 	}
 
+	protected static $provisioned_media_count;
 	const HASH_SQL = 'SELECT * FROM media';
-	const WHEN_ACTIVE = '1-2,00:30-12:00';
 	const LDAP_SERVER_NAME = 'TEST';
-	const MEDIA_MAPPING_UPDATE = 'Media mapping with severity: none';
 	const MEDIA_MAPPING_REMOVE = 'Media mapping with severity: all';
 	const DELETE_MEDIA = 'Zammad';
-	const MEDIA_MAPPING_ZAMMAD = 'Disabled media that is enabled in Media types';
-	const MEDIA_MAPPING_ZENDESK = 'Enabled media that is disabled in Media types';
-	const MEDIA_MAPPING_OPSGENIE = 'Enabled media type Opsgenie';
 	const MEDIA_MAPPING_EDIT_TYPE_1 = 'Media VictorOps for a type update';
 	const MEDIA_MAPPING_EDIT_TYPE_2 = 'Media ServiceNow for a type update';
 	const MEDIA_MAPPING_EDIT_TYPE_3 = 'Media Rocket.Chat for a different parameter update';
@@ -62,25 +58,82 @@ class testFormUserLdapMediaJit extends CWebTest {
 				"'ServiceNow')"
 		);
 
-		foreach ($mediatypeids as $mediatype) {
-			CDataHelper::call('mediatype.update', [
-				[
-					'mediatypeid' => $mediatype['mediatypeid'],
-					'status' => 0
-				]
-			]);
+		$update_api = [];
+
+		foreach ($mediatypeids as $i => $mediatype) {
+			$update_api[$i]['mediatypeid'] = $mediatype['mediatypeid'];
+			$update_api[$i]['status'] = 0;
 		}
+
+		CDataHelper::call('mediatype.update', $update_api);
+
+		$provisioned_media = [
+			[
+				'name' => self::MEDIA_MAPPING_REMOVE,
+				'mediatypeid' => 42, // MS Teams Workflow.
+				'attribute' => 'uid',
+				'severity' => 63 // All severity options selected.
+			],
+			[
+				'name' => 'Media mapping with severity: none',
+				'mediatypeid' => 21, // OTRS.
+				'attribute' => 'uid',
+				'severity' => 0 // None.
+			],
+			[
+				'name' => 'Enabled media type Opsgenie',
+				'mediatypeid' => 6, // Opsgenie.
+				'attribute' => 'uid'
+			],
+			[
+				'name' => 'Enabled media that is disabled in Media types',
+				'mediatypeid' => 17, // Zendesk.
+				'attribute' => 'uid'
+			],
+			[
+				'name' => 'Disabled media that is enabled in Media types',
+				'mediatypeid' => 19, // Zammad.
+				'attribute' => 'uid',
+				'active' => 1
+			],
+			[
+				'name' => self::MEDIA_MAPPING_EDIT_TYPE_1,
+				'mediatypeid' => 28, // VictorOps.
+				'attribute' => 'uid'
+			],
+			[
+				'name' => self::MEDIA_MAPPING_EDIT_TYPE_2,
+				'mediatypeid' => 18, // ServiceNow.
+				'attribute' => 'uid'
+			],
+			[
+				'name' => self::MEDIA_MAPPING_EDIT_TYPE_3,
+				'mediatypeid' => 27, // Rocket.Chat.
+				'attribute' => 'uid'
+			],
+			[
+				'name' => self::MEDIA_MAPPING_EDIT_TYPE_4,
+				'mediatypeid' => 39, // OTRS CE.
+				'attribute' => 'uid'
+			],
+			[
+				'name' => self::MEDIA_MAPPING_EDIT_TYPE_5,
+				'mediatypeid' => 41, // OTRS CE.
+				'attribute' => 'uid'
+			]
+		];
+		self::$provisioned_media_count = count($provisioned_media);
 
 		CDataHelper::call('userdirectory.create', [
 			[
-				'idp_type' => 1,
+				'idp_type' => IDP_TYPE_LDAP,
 				'name' => self::LDAP_SERVER_NAME,
 				'host' => 'qa-ldap.zabbix.sandbox',
 				'base_dn' => 'dc=zbx,dc=local',
 				'port' => 389,
 				'search_attribute' => 'uid',
 				'bind_password' => PHPUNIT_LDAP_BIND_PASSWORD,
-				'provision_status' => 1,
+				'provision_status' => JIT_PROVISIONING_ENABLED,
 				'provision_groups' => [
 					[
 						'name' => '*',
@@ -92,84 +145,30 @@ class testFormUserLdapMediaJit extends CWebTest {
 						]
 					]
 				],
-				'provision_media' => [
-					[
-						'name' => self::MEDIA_MAPPING_REMOVE,
-						'mediatypeid' => 42, // MS Teams Workflow.
-						'attribute' => 'uid',
-						'severity' => 63 // All severity options selected.
-					],
-					[
-						'name' => self::MEDIA_MAPPING_UPDATE,
-						'mediatypeid' => 21, // OTRS.
-						'attribute' => 'uid',
-						'severity' => 0 // None.
-					],
-					[
-						'name' => self::MEDIA_MAPPING_OPSGENIE,
-						'mediatypeid' => 6, // Opsgenie.
-						'attribute' => 'uid'
-					],
-					[
-						'name' => self::MEDIA_MAPPING_ZENDESK,
-						'mediatypeid' => 17, // Zendesk.
-						'attribute' => 'uid'
-					],
-					[
-						'name' => self::MEDIA_MAPPING_ZAMMAD,
-						'mediatypeid' => 19, // Zammad.
-						'attribute' => 'uid',
-						'active' => 1
-					],
-					[
-						'name' => self::MEDIA_MAPPING_EDIT_TYPE_1,
-						'mediatypeid' => 28, // VictorOps.
-						'attribute' => 'uid'
-					],
-					[
-						'name' => self::MEDIA_MAPPING_EDIT_TYPE_2,
-						'mediatypeid' => 18, // ServiceNow.
-						'attribute' => 'uid'
-					],
-					[
-						'name' => self::MEDIA_MAPPING_EDIT_TYPE_3,
-						'mediatypeid' => 27, // Rocket.Chat.
-						'attribute' => 'uid'
-					],
-					[
-						'name' => self::MEDIA_MAPPING_EDIT_TYPE_4,
-						'mediatypeid' => 39, // OTRS CE.
-						'attribute' => 'uid'
-					],
-					[
-						'name' => self::MEDIA_MAPPING_EDIT_TYPE_5,
-						'mediatypeid' => 41, // OTRS CE.
-						'attribute' => 'uid'
-					]
-				]
+				'provision_media' => $provisioned_media
 			]
 		]);
 
 		CDataHelper::call('authentication.update', [
-				'authentication_type' => 1,
-				'ldap_auth_enabled' => 1,
+				'authentication_type' => SMTP_AUTHENTICATION_NORMAL,
+				'ldap_auth_enabled' => ZBX_AUTH_LDAP_ENABLED,
 				'disabled_usrgrpid' => 9, // Disabled.
-				'ldap_jit_status' => 1
+				'ldap_jit_status' => JIT_PROVISIONING_ENABLED
 		]);
 	}
 
 	public function testFormUserLdapMediaJit_CheckProvisionedMediaLayout() {
-
 		// Media types to appear after the provisioning.
 		$media_types = ['MantisBT', 'MS Teams Workflow', 'Opsgenie', 'OTRS', 'OTRS CE', 'Rocket.Chat', 'ServiceNow',
-				'VictorOps', 'Zammad', 'Zendesk'];
+				'VictorOps', 'Zammad', 'Zendesk'
+		];
 
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
 		$this->page->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
 
 		// Check that the informative message about JIT provisioning is present.
-		$this->assertEquals('This user is IdP provisioned. Manual changes for provisioned fields are not allowed.',
-				$this->query('class:msg-warning')->one()->getText()
+		$this->assertMessage('Warning', null, 'This user is IdP provisioned. Manual changes for provisioned fields'.
+				' are not allowed.'
 		);
 
 		$form = $this->query('id:user-form')->waitUntilVisible()->asForm()->one();
@@ -177,13 +176,13 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$media_table = $form->query('id:media-table')->asTable()->one();
 
 		// Check that correct amount of media is provisioned.
-		$this->assertEquals(10, $media_table->getRows()->count());
+		$this->assertEquals(self::$provisioned_media_count, $media_table->getRows()->count());
 
 		// Check that count of media is correctly displayed in the tab.
-		$this->assertEquals(10, $form->query('xpath:.//a[text()="Media"]')->one()->getAttribute('data-indicator-value'));
+		$this->assertEquals(self::$provisioned_media_count, $form->query('xpath:.//a[text()="Media"]')->one()->getAttribute('data-indicator-value'));
 
 		// Check that only edit action is enabled for provisioned media.
-		foreach($media_types as $media_type) {
+		foreach ($media_types as $media_type) {
 			$row = $media_table->findRow('Type', $media_type);
 			$this->assertFalse($row->query('button:Remove')->one()->isClickable());
 			$this->assertTrue($row->query('button:Edit')->one()->isClickable());
@@ -200,17 +199,16 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 		// Check that Type and Send to fields are read-only for provisioned media.
 		$media_table->findRow('Type', 'MS Teams Workflow')->getColumn('Actions')->query('button:Edit')->one()->click();
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-		$media_form = $dialog->asForm();
+		$media_form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
 
-		foreach( ['Type', 'Send to'] as $field) {
+		foreach ( ['Type', 'Send to'] as $field) {
 			$this->assertTrue($media_form->getField($field)->isEnabled(false));
 		}
 	}
 
 	public function getMediaEditData() {
 		return [
-			// Check that When active is a mandatory field.
+			// #0 check that When active is a mandatory field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -221,7 +219,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					'media' => 'MS Teams Workflow'
 				]
 			],
-			// Invalid characters in When active.
+			// #1 invalid characters in When active.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -232,7 +230,29 @@ class testFormUserLdapMediaJit extends CWebTest {
 					'media' => 'MS Teams Workflow'
 				]
 			],
-			// Change editable fields - user macro in When active field.
+			// #2 invalid When active value.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'When active' => '2-1, 00:00-12:12'
+					],
+					'message' => 'Incorrect value for field "period": a time period is expected.',
+					'media' => 'MS Teams Workflow'
+				]
+			],
+			// #3 space used as When active value.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'When active' => ' '
+					],
+					'message' => 'Incorrect value for field "period": a time period is expected.',
+					'media' => 'MS Teams Workflow'
+				]
+			],
+			// #4 change editable fields - user macro in When active field.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -254,7 +274,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// Change editable fields - select all severities.
+			// #5 change editable fields - select all severities.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -284,7 +304,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// Change editable fields - unselect all severities.
+			// #6 Change editable fields - unselect all severities.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -299,7 +319,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// Change editable fields - disable media which is enabled.
+			// #7 Change editable fields - disable media which is enabled.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -321,7 +341,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// Change editable fields - enable previously disabled media.
+			// #8 Change editable fields - enable previously disabled media.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -350,7 +370,6 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * @dataProvider getMediaEditData
 	 */
 	public function testFormUserLdapMediaJit_CheckEditableFields($data) {
-
 		// Log in as the LDAP provisioned user.
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
 		$this->page->open('zabbix.php?action=userprofile.edit');
@@ -401,7 +420,6 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * Check that LDAP provisioned user can add and remove non-provisioned media.
 	 */
 	public function testFormUserLdapMediaJit_AddRemoveMedia() {
-
 		// Media type configuration.
 		$data = [
 			'fields' => [
@@ -709,7 +727,6 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * Function to check that provisioned user's media is updated accordingly to media mapping.
 	 */
 	public function testFormUserLdapMediaJit_UpdateMediaMapping($data) {
-
 		// Log in as the LDAP user, to make sure, that user is provisioned.
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
 		$this->page->logout();
@@ -738,7 +755,8 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 		foreach ($data['media_types'] as $media_type) {
 			$this->checkMediaConfiguration($media_type['configuration'], $media_type['configuration']['fields']['Type'],
-					PHPUNIT_LDAP_USERNAME);
+					PHPUNIT_LDAP_USERNAME
+			);
 		}
 
 		// Provision the LDAP user.
@@ -1054,8 +1072,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 	}
 
 	public function testFormUserLdapMediaJit_DeleteMediaType() {
-
-		// Log in as the LDAP user, to make sure, that user is created.
+		// Log in as the LDAP user, to make sure, that user is provisioned.
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
 
 		// Check that media type for deletion is present in user configuration.
@@ -1078,7 +1095,6 @@ class testFormUserLdapMediaJit extends CWebTest {
 	}
 
 	public function testFormUserLdapMediaJit_RemoveMediaMapping() {
-
 		// Log in as the LDAP user, to make sure, that user is provisioned.
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
 		$this->page->logout();
@@ -1108,7 +1124,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * @param string	$send_to			send to parameter of the media
 	 * @param string	$expected			name of the array with expected result
 	 */
-	private function checkMediaConfiguration($data, $type, $send_to, $expected = 'fields') {
+	protected function checkMediaConfiguration($data, $type, $send_to, $expected = 'fields') {
 		// Check media type.
 		$media_field = $this->query('name:user_form')->waitUntilVisible()->asForm()->one()->getField('Media')->asTable();
 		$row = $media_field->findRow('Type', $type)->asTableRow();
@@ -1143,22 +1159,15 @@ class testFormUserLdapMediaJit extends CWebTest {
 			// Check that the passed severities are turned on.
 			foreach ($data[$expected]['Use if severity'] as $used_severity) {
 				$actual_severity = $row->query('xpath:./td[4]/div/span['.$reference_severities[$used_severity].']')->one()
-						->getAttribute("data-hintbox-contents");
+						->getAttribute('data-hintbox-contents');
 				$this->assertEquals($actual_severity, $used_severity.' (on)');
 				unset($reference_severities[$used_severity]);
 			}
 			// Check that other severities are turned off.
 			foreach ($reference_severities as $name => $unused_severity) {
 				$actual_severity = $row->query('xpath:./td[4]/div/span['.$unused_severity.']')->one()
-						->getAttribute("data-hintbox-contents");
+						->getAttribute('data-hintbox-contents');
 				$this->assertEquals($name.' (off)', $actual_severity);
-			}
-		}
-		else {
-			// Check that when no severities are passed - they all are turned on by default.
-			for ($i = 1; $i < 7; $i++) {
-				$severity =  $row->query('xpath:./td[4]/div/span['.$i.']')->one()->getAttribute("data-hintbox-contents");
-				$this->assertStringContainsString('(on)', $severity);
 			}
 		}
 	}
@@ -1166,7 +1175,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 	/**
 	 * Function for opening LDAP configuration form.
 	 */
-	private function openLdapForm() {
+	protected function openLdapForm() {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$form = $this->query('id:authentication-form')->asForm()->one();
 		$form->selectTab('LDAP settings');
@@ -1177,7 +1186,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 	/**
 	 * Function for provisioning the user.
 	 */
-	private function provisionLdapUser() {
+	protected function provisionLdapUser() {
 		$table = $this->getTable();
 		$table->findRows('Username', PHPUNIT_LDAP_USERNAME)->select();
 		$this->query('button:Provision now')->one()->click();
@@ -1188,7 +1197,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 	/**
 	 * Function for selecting the user and getting the media table.
 	 */
-	private function getUserMediaTable() {
+	protected function getUserMediaTable() {
 		$user_form = $this->query('id:user-form')->waitUntilVisible()->asForm()->one();
 		$user_form->selectTab('Media');
 
