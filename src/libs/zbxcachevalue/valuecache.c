@@ -1297,6 +1297,7 @@ static void	vch_item_update_range(zbx_vc_item_t *item, int range, int now)
 	if (item->active_range < item->daily_range || (ZBX_VC_RANGE_SYNC_PERIOD < diff &&
 			(now - last_value_timestamp) / SEC_PER_HOUR < ZBX_VC_RANGE_SYNC_PERIOD))
 	{
+		
 		item->active_range = item->daily_range;
 		item->daily_range = range;
 		item->range_sync_hour = hour;
@@ -2538,7 +2539,8 @@ int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, int *ret_flush, int 
 			zbx_vc_item_t	item_local = {
 					.itemid = h->itemid,
 					.value_type = h->value_type,
-					.last_accessed = (int)time(NULL)
+					.last_accessed = (int)time(NULL),
+					.active_range = SEC_PER_MIN
 
 			};
 
