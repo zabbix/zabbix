@@ -409,7 +409,7 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$groups, array &$db_groups = null): void {
+	protected function validateUpdate(array &$groups, ?array &$db_groups = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['groupid'], ['name']], 'fields' => [
 			'uuid' => 		['type' => API_UUID],
 			'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
@@ -443,7 +443,7 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDelete(array $groupids, array &$db_groups = null): void {
+	private function validateDelete(array $groupids, ?array &$db_groups = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $groupids, '/', $error)) {
@@ -483,7 +483,7 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @throws APIException if template group names are not unique.
 	 */
-	private static function checkDuplicates(array $groups, array $db_groups = null): void {
+	private static function checkDuplicates(array $groups, ?array $db_groups = null): void {
 		$names = [];
 
 		foreach ($groups as $group) {
@@ -535,7 +535,7 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkUuidDuplicates(array $groups, array $db_groups = null): void {
+	private static function checkUuidDuplicates(array $groups, ?array $db_groups = null): void {
 		$group_indexes = [];
 
 		foreach ($groups as $i => $group) {
@@ -920,7 +920,7 @@ class CTemplateGroup extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validatePropagate(array &$data, array &$db_groups = null): void {
+	private function validatePropagate(array &$data, ?array &$db_groups = null): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'groups' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
