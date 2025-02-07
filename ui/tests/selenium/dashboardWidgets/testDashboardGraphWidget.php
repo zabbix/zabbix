@@ -2259,7 +2259,7 @@ class testDashboardGraphWidget extends testWidgets {
 		$this->assertEquals('Dashboard updated', $message->getTitle());
 
 		// Check that widget is not present on dashboard and in DB.
-		$this->assertTrue(!$dashboard->getWidget($name, false)->isValid());
+		$this->assertFalse($dashboard->getWidget($name, false)->isValid());
 		$sql = 'SELECT * FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
 				' WHERE w.name='.zbx_dbstr($name);
 		$this->assertEquals(0, CDBHelper::getCount($sql));

@@ -647,6 +647,9 @@ class testAlarmNotification extends CWebTest {
 			// Check close button.
 			$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click()->waitUntilNotVisible();
 		}
+
+		// Delete the events so they don't appear in the next test case.
+		DB::delete('events', ['eventid' => self::$eventids]);
 	}
 
 	/**
