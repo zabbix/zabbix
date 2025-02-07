@@ -49,11 +49,8 @@ static int	DBpatch_7030001(void)
 	zbx_vector_uint64_create(&hgsetids);
 
 	/* 3 - HOST_STATUS_TEMPLATE */
-	/* 0 - ZBX_FLAG_DISCOVERY_NORMAL */
-	/* 4 - ZBX_FLAG_DISCOVERY_CREATED */
 	zbx_db_select_uint64("select hostid from hosts"
 			" where status=3"
-				" and flags in (0,4)"
 				" and hostid not in (select hostid from host_hgset)", &ids);
 
 	if (0 == ids.values_num)
