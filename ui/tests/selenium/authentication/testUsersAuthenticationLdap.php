@@ -1550,7 +1550,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Host' => 'test',
 								'Port' => '001',
 								'Base DN' => 'test',
-								'Search attribute' => 'tets',
+								'Search attribute' => 'test',
 								'Configure JIT provisioning' => true
 							]
 						]
@@ -1571,7 +1571,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Name' => 'LDAP',
 								'Host' => 'test',
 								'Base DN' => 'test',
-								'Search attribute' => 'tets',
+								'Search attribute' => 'test',
 								'Configure JIT provisioning' => true
 							],
 							'User group mapping' => [[]]
@@ -1599,7 +1599,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Name' => 'LDAP',
 								'Host' => 'test no media',
 								'Base DN' => 'test no media',
-								'Search attribute' => 'tets no media',
+								'Search attribute' => 'test no media',
 								'Configure JIT provisioning' => true
 							],
 							'Media type mapping' => [[]]
@@ -1626,7 +1626,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Name' => 'LDAP',
 								'Host' => 'test no media',
 								'Base DN' => 'test no media',
-								'Search attribute' => 'tets no media',
+								'Search attribute' => 'test no media',
 								'Configure JIT provisioning' => true
 							],
 							'Media type mapping' => [
@@ -1649,7 +1649,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'error' => 'At least one LDAP server must exist.'
 				]
 			],
-			// #11 Media mapping dialog form validation with missing time period only.
+			// #11 Media mapping dialog form validation with spaces in name, attribute, time period fields.
 			[
 				[
 					'servers_settings' => [
@@ -1658,7 +1658,41 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Name' => 'LDAP',
 								'Host' => 'test no media',
 								'Base DN' => 'test no media',
-								'Search attribute' => 'tets no media',
+								'Search attribute' => 'test no media',
+								'Configure JIT provisioning' => true
+							],
+							'Media type mapping' => [
+								[
+									'Name' => ' ',
+									'Attribute' => ' ',
+									'When active' => ' '
+								]
+							]
+						]
+					],
+					'mapping_error' => 'Invalid media type mapping configuration.',
+					'mapping_error_details' => [
+						'Incorrect value for field "name": cannot be empty.',
+						'Incorrect value for field "attribute": cannot be empty.',
+						'Incorrect value for field "period": a time period is expected.'
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Invalid user group mapping configuration.'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
+			],
+			// #12 Media mapping dialog form validation with missing time period only.
+			[
+				[
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'LDAP',
+								'Host' => 'test no media',
+								'Base DN' => 'test no media',
+								'Search attribute' => 'test no media',
 								'Configure JIT provisioning' => true
 							],
 							'Media type mapping' => [
@@ -1681,7 +1715,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'error' => 'At least one LDAP server must exist.'
 				]
 			],
-			// #12 Media mapping dialog form validation with invalid characters in time period field.
+			// #13 Media mapping dialog form validation with invalid characters in time period field.
 			[
 				[
 					'servers_settings' => [
@@ -1690,7 +1724,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Name' => 'LDAP',
 								'Host' => 'test no media',
 								'Base DN' => 'test no media',
-								'Search attribute' => 'tets no media',
+								'Search attribute' => 'test no media',
 								'Configure JIT provisioning' => true
 							],
 							'Media type mapping' => [
@@ -1713,7 +1747,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'error' => 'At least one LDAP server must exist.'
 				]
 			],
-			// #13 Media mapping validation with two mappings, that contain same type and attribute.
+			// #14 Media mapping dialog form validation with invalid time period field.
 			[
 				[
 					'servers_settings' => [
@@ -1722,7 +1756,39 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Name' => 'LDAP',
 								'Host' => 'test no media',
 								'Base DN' => 'test no media',
-								'Search attribute' => 'tets no media',
+								'Search attribute' => 'test no media',
+								'Configure JIT provisioning' => true
+							],
+							'Media type mapping' => [
+								[
+									'Name' => 'Media mapping with incorrect time period',
+									'Attribute' => 'wrongtimeperiod',
+									'When active' => '1-7, 00:00-24:01'
+								]
+							]
+						]
+					],
+					'mapping_error' => 'Invalid media type mapping configuration.',
+					'mapping_error_details' => [
+						'Incorrect value for field "period": a time period is expected.'
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Invalid user group mapping configuration.'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
+			],
+			// #15 Media mapping validation with two mappings, that contain same type and attribute.
+			[
+				[
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'LDAP',
+								'Host' => 'test no media',
+								'Base DN' => 'test no media',
+								'Search attribute' => 'test no media',
 								'Configure JIT provisioning' => true
 							],
 							'Media type mapping' => [
