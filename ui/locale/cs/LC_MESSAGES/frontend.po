@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-01-14 09:52+0000\n"
+"PO-Revision-Date: 2025-02-03 13:05+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -7345,7 +7345,7 @@ msgstr "Zobrazení místního času"
 
 #: widgets/itemhistory/views/column.edit.php:240
 msgid "Display log time"
-msgstr ""
+msgstr "Zobrazit čas protokolu"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -9520,7 +9520,7 @@ msgstr "Funkce historie"
 
 #: app/views/administration.housekeeping.edit.php:218
 msgid "History, trends and audit log compression"
-msgstr ""
+msgstr "Komprese historie, trendov a protokolu auditu"
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -20635,7 +20635,7 @@ msgstr "Toto nastavení zobrazí místo časového razítka místní čas. V pok
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
-msgstr ""
+msgstr "Toto nastavení zobrazí čas protokolu namísto časového razítka položky. V pokročilé konfiguraci je také nutné zaškrtnout \"Zobrazit časové razítko\"."
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
