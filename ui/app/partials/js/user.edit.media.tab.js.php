@@ -57,6 +57,7 @@
 		}
 
 		#editMedia(parameters) {
+			parameters.sendto = parameters.sendto.toString();
 			const overlay = PopUp('popup.media', parameters, {
 				dialogueid: 'user-media-edit',
 				dialogue_class: 'modal-popup-generic'
@@ -149,7 +150,7 @@
 					span.classList.replace(this.severity_config.colors[severity], '<?= ZBX_STYLE_STATUS_DISABLED ?>');
 					hintboxData.hintboxContents += ` (${t('off')})`;
 				}
-                
+
 				Object.assign(span.dataset, hintboxData);
 			}
 		}
