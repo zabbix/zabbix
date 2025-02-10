@@ -1,55 +1,40 @@
 zabbix_export:
   version: '7.0'
   media_types:
-    -
-      name: Github
+    - name: Github
       type: WEBHOOK
       parameters:
-        0:
-          name: alert_message
+        - name: alert_message
           value: '{ALERT.MESSAGE}'
-        1:
-          name: alert_subject
+        - name: alert_subject
           value: '{ALERT.SUBJECT}'
-        14:
-          name: event_id
+        - name: event_id
           value: '{EVENT.ID}'
-        2:
-          name: event_recovery_value
+        - name: event_recovery_value
           value: '{EVENT.RECOVERY.VALUE}'
-        3:
-          name: event_severity
+        - name: event_severity
           value: '{EVENT.SEVERITY}'
-        4:
-          name: event_source
+        - name: event_source
           value: '{EVENT.SOURCE}'
-        5:
-          name: event_update_status
+        - name: event_update_status
           value: '{EVENT.UPDATE.STATUS}'
-        6:
-          name: event_value
+        - name: event_value
           value: '{EVENT.VALUE}'
-        11:
-          name: github_issue_number
+        - name: github_issue_number
           value: '{EVENT.TAGS.__zbx_github_issue_number}'
-        7:
-          name: github_repo
+        - name: github_repo
           value: '{ALERT.SENDTO}'
-        8:
-          name: github_token
+        - name: github_token
           value: '<PLACE GITHUB TOKEN>'
-        9:
-          name: github_url
+        - name: github_url
           value: 'https://api.github.com'
-        10:
-          name: github_user_agent
+        - name: github_user_agent
           value: Zabbix/6.0
-        12:
-          name: trigger_id
+        - name: trigger_id
           value: '{TRIGGER.ID}'
-        13:
-          name: zabbix_url
+        - name: zabbix_url
           value: '{$ZABBIX.URL}'
+      status: DISABLED
       script: |
         var Github = {
             params: {},
@@ -266,8 +251,7 @@ zabbix_export:
       event_menu_url: '{EVENT.TAGS.__zbx_github_link}'
       event_menu_name: 'Github: Issue {EVENT.TAGS.__zbx_github_issue_number}'
       message_templates:
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: PROBLEM
           subject: '[{EVENT.STATUS}] {EVENT.NAME}'
           message: |
@@ -278,8 +262,7 @@ zabbix_export:
             Operational data: {EVENT.OPDATA}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: RECOVERY
           subject: '[{EVENT.STATUS}] {EVENT.NAME}'
           message: |
@@ -289,8 +272,7 @@ zabbix_export:
             Severity: {EVENT.SEVERITY}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: UPDATE
           subject: '[{EVENT.STATUS}] {EVENT.NAME}'
           message: |
@@ -298,8 +280,7 @@ zabbix_export:
             {EVENT.UPDATE.MESSAGE}
             
             Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
-        -
-          event_source: DISCOVERY
+        - event_source: DISCOVERY
           operation_mode: PROBLEM
           subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
           message: |
@@ -314,8 +295,7 @@ zabbix_export:
             Device service port: {DISCOVERY.SERVICE.PORT}
             Device service status: {DISCOVERY.SERVICE.STATUS}
             Device service uptime: {DISCOVERY.SERVICE.UPTIME}
-        -
-          event_source: AUTOREGISTRATION
+        - event_source: AUTOREGISTRATION
           operation_mode: PROBLEM
           subject: 'Autoregistration: {HOST.HOST}'
           message: |
