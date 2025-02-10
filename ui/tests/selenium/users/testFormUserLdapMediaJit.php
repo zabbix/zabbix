@@ -190,7 +190,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 			$this->assertTrue($row->query('button:Edit')->one()->isClickable());
 		}
 
-		// Check the pressence and amount of hintboxes media table for disabled media.
+		// Check the pressence and amount of hintboxes in media table for disabled media.
 		foreach (['MantisBT', 'OTRS CE', 'Rocket.Chat','Zendesk'] as $media_type) {
 			$row = $media_table->findRow('Type', $media_type, true);
 			$this->assertTrue($row->getColumn('Type')->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')
