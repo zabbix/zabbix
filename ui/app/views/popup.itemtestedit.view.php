@@ -400,7 +400,7 @@ if (count($data['steps']) > 0) {
 					->addClass('copy-button')
 					->addClass('copy-'.$i)
 			))
-				->addStyle('display: none')
+				->addClass(ZBX_STYLE_DISPLAY_NONE)
 				->addClass('result-copy')
 		]);
 	}

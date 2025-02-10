@@ -7517,7 +7517,7 @@ svg {
   vertical-align: top !important; }
 .preprocessing-test-results .right {
   padding-right: 0 !important; }
-.preprocessing-test-results td.display-icon {
+.preprocessing-test-results tr.display-icon {
   line-height: 24px; }
 .preprocessing-test-results .rel-container {
   top: 4px;
@@ -7926,14 +7926,26 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   .audit-details-wrapper .audit-show-details-btn-wrapper {
     margin: 0 5px 0 5px; }
 
-button.copy-button::before {
-  color: #768d99;
+button.copy-button {
+  color: #768d99 !important;
   border: 1px solid #acbbc2;
-  background: #ffffff !important;
+  background: #ffffff;
   border-radius: 2px;
-  font-size: 12px;
   line-height: 24px;
-  width: 24px; }
+  width: 24px;
+  height: 24px !important; }
+  button.copy-button:hover {
+    background-color: #e8f5ff;
+    color: #768d99; }
+  button.copy-button:hover:not(:focus) {
+    border: 1px solid #acbbc2; }
+  button.copy-button:focus {
+    box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35);
+    border: 1px solid #acbbc2; }
+  button.copy-button:focus:not(:hover) {
+    background: #ffffff; }
+  button.copy-button::before {
+    font-size: 12px; }
 
 .color-accent, .color-accent.btn-icon:not([disabled]), .color-accent.btn-link:not([disabled]), .color-accent.link-action:not(:hover):not(:focus), .color-accent.link-alt:not(:hover):not(:focus) {
   color: #f24f1d; }

@@ -143,9 +143,9 @@ function cleanPreviousTestResults() {
 		.empty()
 		.hide();
 
-	for (const element of document.querySelectorAll('.result-copy')) {
-		element.style.display = 'none';
-		element.closest('td').classList.remove('display-icon');
+	for (const element of document.getElementById('preprocessing-test-form').querySelectorAll('.result-copy')) {
+		element.classList.add('<?= ZBX_STYLE_DISPLAY_NONE ?>');
+		element.closest('tr').classList.remove('display-icon');
 	}
 }
 
@@ -353,7 +353,7 @@ function itemCompleteTest(overlay) {
 				}
 
 				if (ret.final.error === undefined && ret.final.result) {
-					copy_button = jQuery(createCopyButton(ret.final.result));
+					copy_button = createCopyButton(ret.final.result);
 				}
 				else {
 					copy_button = null;
@@ -430,6 +430,7 @@ function createCopyButton(result) {
 function processItemPreprocessingTestResults(steps) {
 	const tmpl_gray_label = new Template(jQuery('#preprocessing-gray-label').html());
 	const tmpl_act_done = new Template(jQuery('#preprocessing-step-action-done').html());
+	const form = document.getElementById('preprocessing-test-form');
 
 	steps.forEach(function(step, i) {
 		const result = step.result;
@@ -462,16 +463,16 @@ function processItemPreprocessingTestResults(steps) {
 		}
 
 		if (step.error === undefined && result) {
-			document.getElementById('preprocessing-test-form').querySelector('.copy-' + i).parentElement.style.display = '';
-			document.querySelector('.copy-' + i).closest('td').classList.add('display-icon');
-		}
+			const copy_element = form.querySelector('.copy-' + i).closest('td');
 
-		document.addEventListener('click', e => {
-			if (e.target.classList.contains('copy-' + i)) {
+			copy_element.closest('tr').classList.add('display-icon')
+			copy_element.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
+
+			copy_element.addEventListener('click', e => {
 				writeTextClipboard(result);
 				e.target.focus();
-			}
-		});
+			});
+		}
 
 		step.result = makeStepResult(step);
 

@@ -45,7 +45,6 @@ $token_from_grid = (new CFormGrid())
 			),
 			(new CButtonIcon(ZBX_ICON_COPY, _('Copy to clipboard')))
 				->addClass('copy-button')
-				->onClick('writeTextClipboard(this.dataset.auth_token);this.focus();')
 				->setAttribute('data-auth_token', $data['auth_token'])
 				->setAttribute('autofocus', 'autofocus')
 		])
@@ -73,6 +72,12 @@ $token_from_grid = (new CFormGrid())
 
 $token_form->addItem($token_from_grid);
 
+$token_form->addItem(
+	(new CScriptTag(
+		'token_view_popup.init();'
+	))->setOnDocumentReady()
+);
+
 $output = [
 	'title' => ('API token'),
 	'content' => $token_form->toString(),
@@ -82,7 +87,8 @@ $output = [
 		'keepOpen' => true,
 		'isSubmit' => true,
 		'action' => 'token_edit_popup.close();'
-	]]
+	]],
+	'script_inline' => getPagePostJs().$this->readJsFile('popup.token.view.js.php'),
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
