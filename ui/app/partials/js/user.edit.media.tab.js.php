@@ -193,7 +193,7 @@
 
 		#createDataTemplate(data, index) {
 			data.row_index = index === undefined ? ++this.row_index : index;
-			data.dstfrm =  this.form_name;
+			data.dstfrm = this.form_name;
 			data.media = data.row_index;
 			data.parameters = structuredClone(data);
 			data.sendto_short = this.#truncateText(data.sendto);
