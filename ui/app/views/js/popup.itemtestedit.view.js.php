@@ -461,11 +461,9 @@ function processItemPreprocessingTestResults(steps) {
 			}
 		}
 
-		for (const element of document.querySelectorAll('.result-copy')) {
-			if (step.error === undefined && result) {
-				element.style.display = '';
-				element.closest('td').classList.add('display-icon');
-			}
+		if (step.error === undefined && result) {
+			document.getElementById('preprocessing-test-form').querySelector('.copy-' + i).parentElement.style.display = '';
+			document.querySelector('.copy-' + i).closest('td').classList.add('display-icon');
 		}
 
 		document.addEventListener('click', e => {
