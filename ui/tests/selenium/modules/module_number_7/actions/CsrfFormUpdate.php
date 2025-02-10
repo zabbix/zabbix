@@ -29,7 +29,6 @@ class CsrfFormUpdate extends CController {
 		$response = new CControllerResponseData([]);
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'csrftoken.form')
-			->getUrl()
 		);
 		$response->setFormData($data);
 		CMessageHelper::setSuccessTitle('CSRF token validation succeeded.');
