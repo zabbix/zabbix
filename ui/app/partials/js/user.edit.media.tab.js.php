@@ -65,7 +65,7 @@
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', ({detail}) => {
 				this.#removeRow(parameters.media);
-				this.#generateRow(detail, parameters.media, true);
+				this.#generateRow(Object.assign({}, parameters, detail), parameters.media, true);
 			});
 		}
 
@@ -215,6 +215,8 @@
 				}
 				data.parameters.sendto = data.sendto;
 			}
+
+			console.log(data.parameters)
 
 			data.parameters = JSON.stringify(data.parameters);
 		}
