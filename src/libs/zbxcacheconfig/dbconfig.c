@@ -453,7 +453,8 @@ static unsigned char	poller_by_item(unsigned char type, const char *key, unsigne
 		case ITEM_TYPE_SIMPLE:
 			if (SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPING_KEY) ||
 					SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGSEC_KEY) ||
-					SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGLOSS_KEY))
+					SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGLOSS_KEY) ||
+					SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGRETRY_KEY))
 			{
 				if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_PINGER))
 					break;
@@ -595,7 +596,8 @@ static zbx_uint64_t	get_item_nextcheck_seed(ZBX_DC_ITEM *item, zbx_uint64_t inte
 	{
 		if (SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPING_KEY) ||
 				SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGSEC_KEY) ||
-				SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGLOSS_KEY))
+				SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGLOSS_KEY) ||
+				SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGRETRY_KEY))
 		{
 			return interfaceid;
 		}
