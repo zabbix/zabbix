@@ -114,7 +114,7 @@ class CAbsoluteTimeParser extends CParser {
 	 *
 	 * @return DateTime|null
 	 */
-	public function getDateTime(bool $is_start, DateTimeZone $timezone = null): ?DateTime {
+	public function getDateTime(bool $is_start, ?DateTimeZone $timezone = null): ?DateTime {
 		if ($this->date === '') {
 			return null;
 		}

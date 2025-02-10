@@ -205,7 +205,7 @@ func run() error {
 
 		// create default configuration for testing options
 		// pass empty string to config arg to trigger this
-		err = conf.Unmarshal([]byte{}, &agent.Options)
+		err = conf.UnmarshalStrict([]byte{}, &agent.Options)
 		if err != nil {
 			return errs.Wrap(err, "failed to create default configuration")
 		}
@@ -255,7 +255,12 @@ func run() error {
 		return nil
 	}
 
-	pluginSocket, err = initExternalPlugins(&agent.Options)
+	systemOpt, err := agent.Options.RemovePluginSystemOptions()
+	if err != nil {
+		return errs.Wrap(err, "cannot initialize plugin system option")
+	}
+
+	pluginSocket, err = initExternalPlugins(&agent.Options, systemOpt)
 	if err != nil {
 		return errs.Wrap(err, "cannot register plugins")
 	}
@@ -263,7 +268,9 @@ func run() error {
 	defer cleanUpExternal()
 
 	if args.test != "" || args.print || args.testConfig {
-		m, err := prepareMetricPrintManager(args.verbose)
+		var m *scheduler.Manager
+
+		m, err = prepareMetricPrintManager(args.verbose, systemOpt)
 		if err != nil {
 			return errs.Wrap(err, "failed to prepare metric print manager")
 		}
@@ -289,7 +296,7 @@ func run() error {
 		return errs.New("verbose parameter can be specified only with test or print parameters")
 	}
 
-	err = runAgent(args.foreground, args.configPath)
+	err = runAgent(args.foreground, args.configPath, systemOpt)
 	if err != nil {
 		if agent.Options.LogType == "file" {
 			log.Critf("%s", err.Error())
@@ -302,7 +309,7 @@ func run() error {
 }
 
 //nolint:gocognit,gocyclo,cyclop,maintidx
-func runAgent(isForeground bool, configPath string) error {
+func runAgent(isForeground bool, configPath string, systemOpt agent.PluginSystemOptions) error {
 	var logType int
 
 	switch agent.Options.LogType {
@@ -368,7 +375,7 @@ func runAgent(isForeground bool, configPath string) error {
 		return errs.Wrap(err, "cannot initialize user parameters")
 	}
 
-	manager, err = scheduler.NewManager(&agent.Options)
+	manager, err = scheduler.NewManager(&agent.Options, systemOpt)
 	if err != nil {
 		return errs.Wrap(err, "cannot create scheduling manager")
 	}
@@ -647,7 +654,7 @@ func helpMessage(flagsUsage string) string {
 	)
 }
 
-func prepareMetricPrintManager(verbose bool) (*scheduler.Manager, error) {
+func prepareMetricPrintManager(verbose bool, pluginSysOpt agent.PluginSystemOptions) (*scheduler.Manager, error) {
 	level := log.None
 
 	if verbose {
@@ -678,7 +685,7 @@ func prepareMetricPrintManager(verbose bool) (*scheduler.Manager, error) {
 		return nil, zbxerr.New("cannot load os dependent items").Wrap(err)
 	}
 
-	m, err := scheduler.NewManager(&agent.Options)
+	m, err := scheduler.NewManager(&agent.Options, pluginSysOpt)
 	if err != nil {
 		return nil, zbxerr.New("failed to create scheduling manager").Wrap(err)
 	}
