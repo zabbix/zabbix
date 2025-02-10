@@ -24677,6 +24677,10 @@ msgstr "제1"
 msgid "first() - The oldest value in the specified time interval"
 msgstr "first() - 지정된 시간 간격에서 가장 오래된 값"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:626
+msgid "firstclock() - Timestamp of the oldest value in the specified time interval"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
 msgstr "floor() - 가장 가까운 작은 정수로 내림"
@@ -25074,6 +25078,10 @@ msgstr "최신값"
 msgid "last() - Last (most recent) T value"
 msgstr "last() - 최신값"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:733
+msgid "lastclock() - Timestamp of the last (most recent) T value"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1557
 msgid "left"
 msgstr "왼쪽"
@@ -25109,6 +25117,10 @@ msgstr "logseverity() - 기간 T에 대한 마지막 로그 항목의 로그 심
 #: app/controllers/CControllerPopupTriggerExpr.php:779
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr "logsource() - 기간 T에 대한 매개변수 V와 일치하는 마지막 로그 항목의 로그 소스(1 - 일치, 0 - 일치하지 않음)"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:795
+msgid "logtimestamp() - Timestamp of the last (most recent) T log message"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "ltrim() - Remove specified characters from the beginning of a string"

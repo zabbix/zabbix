@@ -1,6 +1,13 @@
 Changes for 7.4.0alpha1
 
 New features:
+A.F....... [ZBXNEXT-9624] added support for php 8.4 (talbergs)
+..F.....S. [ZBXNEXT-9603] added new built-in macros and functions for timestamp tracking (esekace, sboidenko)
+.......PS. [ZBXNEXT-9719] added history_cache_clear runtime command; improved disabled item to be cleared from history cache immediately; improved history cache message to log items with most values (vso)
+...G...... [ZBXNEXT-7121] added user parameter to Zabbix agent 2 redis items (esneiders)
+..F....... [ZBXNEXT-9626] implemented the support of nested host groups problems for the Map elements of "Host group" and "Map" types (wczerneha)
+.........T [ZBXNEXT-9460] added service type macros and filter for Service units discovery in Systemd by Zabbix agent 2 template (akotsegubov)
+.........T [ZBXNEXT-9584] added improvements and fixes to Dell HTTP and SNMP templates (abrosimovs, knaglis)
 A.F....PS. [ZBXNEXT-9564] implemented Vault macro resolution on proxies (esekace, sboidenko)
 .........T [ZBXNEXT-9654] added Azure SQL managed instance template (abrosimovs)
 .........T [ZBXNEXT-9545] fixed proofreading findings in Nvidia by Zabbix agent templates (abrosimovs)
@@ -13,6 +20,23 @@ A.F....PS. [ZBXNEXT-9564] implemented Vault macro resolution on proxies (esekace
 .......PS. [ZBXNEXT-9622] added top.peak in diaginfo to identify items with highest task queue (vso)
 
 Bug fixes:
+..F....... [ZBX-25778] fixed incorrect style of dropdowns in frontend notification section (isharha)
+..F....... [ZBX-25844] fixed console errors in Graph widgets when rendering data as points (isharha)
+...G...... [ZBX-25442] fixed Zabbix agent interpretation of Modbus result data for mixed endianness modes (asestakovs)
+..F....... [ZBX-25902] fixed excess column in Top items widget (talbergs)
+...G...... [ZBX-25543] fixed crash when global regular expression is updated on Zabbix agent2 (vso)
+..F....... [ZBX-25862] fixed inability to update discovered trigger status (esekace)
+..F....... [ZBX-25220] fixed Top hosts widget not loading in case of inaccessible maintenance (dfofanovs)
+.......PS. [ZBX-22580] reduced nodata trigger false-positives after Zabbix proxy connection disruption (arimdjonoks)
+..F....... [ZBX-25539] fixed console error when configuring Top hosts or Item history widget to display the same thumbnail in more than one column (rgontarski)
+.........T [ZBX-25458] fixed LLD rule for organization discovery, changed host prototype "host" field to avoid special characters (abiba)
+........S. [ZBX-25748] fixed DNS refresh on configuration change (sboidenko)
+.........T [ZBX-25504] updated quorum and quorum member discoveries for family of MSSQL templates (akotsegubov)
+........S. [ZBX-25244] fixed {PROXY.NAME} and {PROXY.DESCRIPTION} macros to be resolved when proxy group is used (asestakovs)
+...G...... [ZBX-25530] fixed Zabbix agent 2 startup failures caused by insufficient buffer size for performance counters (asestakovs)
+..F....... [ZBX-25120] fixed Map widget flickering on refresh (apoga, averza)
+..F....... [ZBX-25579] fixed long word truncation for template, description and host group sections in Host card widget (dfofanovs)
+..F....... [ZBX-25513] fixed value not being cleared in Gauge widget after item data history is cleared (dfofanovs)
 ..F....... [ZBX-25471] fixed emptying of Web scenario variables and headers data (wczerneha)
 ...G...... [ZBX-22522] fixed web.page.get curl header (sboidenko)
 ..F....... [ZBX-25758] fixed the saving of filter state in trigger list (esekace)
@@ -102,10 +126,31 @@ A......... [ZBX-25350] prohibited deleting user groups which are used in userdir
 Changes for 7.2.4rc1
 
 New features:
+A.F....... [ZBXNEXT-9624] added support for php 8.4 (talbergs)
+...G...... [ZBXNEXT-7121] added user parameter to Zabbix agent 2 redis items (esneiders)
+.........T [ZBXNEXT-9460] added service type macros and filter for Service units discovery in Systemd by Zabbix agent 2 template (akotsegubov)
+.........T [ZBXNEXT-9584] added improvements and fixes to Dell HTTP and SNMP templates (abrosimovs, knaglis)
 .........T [ZBXNEXT-9654] added Azure SQL managed instance template (abrosimovs)
 .........T [ZBXNEXT-9545] fixed proofreading findings in Nvidia by Zabbix agent templates (abrosimovs)
 
 Bug fixes:
+..F....... [ZBX-25778] fixed incorrect style of dropdowns in frontend notification section (isharha)
+..F....... [ZBX-25844] fixed console errors in Graph widgets when rendering data as points (isharha)
+...G...... [ZBX-25442] fixed Zabbix agent interpretation of Modbus result data for mixed endianness modes (asestakovs)
+..F....... [ZBX-25902] fixed excess column in Top items widget (talbergs)
+...G...... [ZBX-25543] fixed crash when global regular expression is updated on Zabbix agent2 (vso)
+..F....... [ZBX-25862] fixed inability to update discovered trigger status (esekace)
+..F....... [ZBX-25220] fixed Top hosts widget not loading in case of inaccessible maintenance (dfofanovs)
+.......PS. [ZBX-22580] reduced nodata trigger false-positives after Zabbix proxy connection disruption (arimdjonoks)
+..F....... [ZBX-25539] fixed console error when configuring Top hosts or Item history widget to display the same thumbnail in more than one column (rgontarski)
+.........T [ZBX-25458] fixed LLD rule for organization discovery, changed host prototype "host" field to avoid special characters (abiba)
+........S. [ZBX-25748] fixed DNS refresh on configuration change (sboidenko)
+.........T [ZBX-25504] updated quorum and quorum member discoveries for family of MSSQL templates (akotsegubov)
+...G...... [ZBX-25530] fixed Zabbix agent 2 startup failures caused by insufficient buffer size for performance counters (asestakovs)
+..F....... [ZBX-25120] fixed Map widget flickering on refresh (apoga, averza)
+..F....... [ZBX-25579] fixed long word truncation for template, description and host group sections in Host card widget (dfofanovs)
+........S. [ZBX-25244] fixed {PROXY.NAME} and {PROXY.DESCRIPTION} macros to be resolved when proxy group is used (asestakovs)
+..F....... [ZBX-25513] fixed value not being cleared in Gauge widget after item data history is cleared (dfofanovs)
 ..F....... [ZBX-25471] fixed emptying of Web scenario variables and headers data (wczerneha)
 ...G...... [ZBX-22522] fixed web.page.get curl header (sboidenko)
 .......PS. [ZBX-25704] fixed custom libssh version check in configure script (askolmeisters)
@@ -366,9 +411,27 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.10rc1
 
 New features:
+A.F....... [ZBXNEXT-9624] added support for php 8.4 (talbergs)
+...G...... [ZBXNEXT-7121] added user parameter to Zabbix agent 2 redis items (esneiders)
+.........T [ZBXNEXT-9584] added improvements and fixes to Dell HTTP and SNMP templates (abrosimovs, knaglis)
 .........T [ZBXNEXT-9654] added Azure SQL managed instance template (abrosimovs)
 
 Bug fixes:
+..F....... [ZBX-25778] fixed incorrect style of dropdowns in frontend notification section (isharha)
+..F....... [ZBX-25844] fixed console errors in Graph widgets when rendering data as points (isharha)
+...G...... [ZBX-25442] fixed Zabbix agent interpretation of Modbus result data for mixed endianness modes (asestakovs)
+...G...... [ZBX-25543] fixed crash when global regular expression is updated on Zabbix agent2 (vso)
+..F....... [ZBX-25862] fixed inability to update discovered trigger status (esekace)
+..F....... [ZBX-25220] fixed Top hosts widget not loading in case of inaccessible maintenance (dfofanovs)
+.......PS. [ZBX-22580] reduced nodata trigger false-positives after Zabbix proxy connection disruption (arimdjonoks)
+..F....... [ZBX-25539] fixed console error when configuring Top hosts or Item history widget to display the same thumbnail in more than one column (rgontarski)
+.........T [ZBX-25458] fixed LLD rule for organization discovery, changed host prototype "host" field to avoid special characters (abiba)
+........S. [ZBX-25748] fixed DNS refresh on configuration change (sboidenko)
+.........T [ZBX-25504] updated quorum and quorum member discoveries for family of MSSQL templates (akotsegubov)
+...G...... [ZBX-25530] fixed Zabbix agent 2 startup failures caused by insufficient buffer size for performance counters (asestakovs)
+..F....... [ZBX-25120] fixed Map widget flickering on refresh (apoga, averza)
+........S. [ZBX-25244] fixed {PROXY.NAME} and {PROXY.DESCRIPTION} macros to be resolved when proxy group is used (asestakovs)
+..F....... [ZBX-25513] fixed value not being cleared in Gauge widget after item data history is cleared (dfofanovs)
 ..F....... [ZBX-25471] fixed emptying of Web scenario variables and headers data (wczerneha)
 ...G...... [ZBX-22522] fixed web.page.get curl header (sboidenko)
 ...G...... [ZBX-25382] applied pkgsrc patch to restore builds on NetBSD >= 8.2 (jxl)
@@ -3693,9 +3756,17 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.39rc1
 
 New features:
+.........T [ZBXNEXT-9584] added improvements and fixes to Dell HTTP and SNMP templates (abrosimovs, knaglis)
 .........T [ZBXNEXT-9654] added Azure SQL managed instance template (abrosimovs)
 
 Bug fixes:
+.......PS. [ZBX-25867] fixed crash in preprocessing manager when unlinking dependent items from frequently collected master item (vso)
+...G...... [ZBX-25543] fixed crash when global regular expression is updated on Zabbix agent2 (vso)
+.......PS. [ZBX-22580] reduced nodata trigger false-positives after Zabbix proxy connection disruption (arimdjonoks)
+.........T [ZBX-25458] fixed LLD rule for organization discovery, changed host prototype "host" field to avoid special characters (abiba)
+.........T [ZBX-25504] updated quorum and quorum member discoveries for family of MSSQL templates (akotsegubov)
+...G...... [ZBX-25442] fixed Zabbix agent interpretation of Modbus result data for mixed endianness modes (asestakovs)
+...G...... [ZBX-25530] fixed Zabbix agent 2 startup failures caused by insufficient buffer size for performance counters (asestakovs)
 ...G...... [ZBX-25382] applied pkgsrc patch to restore builds on NetBSD >= 8.2 (jxl)
 ...G...... [ZBX-22522] fixed web.page.get curl header (sboidenko)
 .........T [ZBX-25601] fixed HTTP proxy parameter name in MS 365 reports by HTTP template (drasikhov)

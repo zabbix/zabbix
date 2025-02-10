@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-01-23 21:08+0000\n"
+"PO-Revision-Date: 2025-02-01 08:45+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -17633,7 +17633,7 @@ msgstr "Restableix a la vista inicial"
 
 #: app/views/administration.miscconfig.edit.php:103
 msgid "Resolve secret vault macros by"
-msgstr ""
+msgstr "Resol les macros secretes de la caixa forta per"
 
 #: jsLoader.php:283
 msgid "Resolved"
@@ -23896,11 +23896,11 @@ msgstr "Servidor Zabbix (servidor intermediari)"
 
 #: app/views/administration.miscconfig.edit.php:112
 msgid "Zabbix server and proxy"
-msgstr ""
+msgstr "Servidor i proxy Zabbix"
 
 #: app/views/administration.miscconfig.edit.php:107
 msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
-msgstr ""
+msgstr "Servidor i proxy Zabbix: els secrets són recuperats de Vault tant pel servidor com pels proxys Zabbix, cosa que els permet resoldre les macros de manera independent."
 
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
@@ -23921,7 +23921,7 @@ msgstr "Versió del servidor Zabbix"
 
 #: app/views/administration.miscconfig.edit.php:105
 msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
-msgstr ""
+msgstr "Servidor Zabbix: el servidor Zabbix recupera els secrets de Vault i l'envia als proxys quan cal."
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -24862,6 +24862,10 @@ msgstr "primer"
 msgid "first() - The oldest value in the specified time interval"
 msgstr "first() - El valor més antic de l'interval de temps especificat"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:626
+msgid "firstclock() - Timestamp of the oldest value in the specified time interval"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
 msgstr "floor() - Arrodoneix cap avall a l'enter més proper"
@@ -25259,6 +25263,10 @@ msgstr "darrer"
 msgid "last() - Last (most recent) T value"
 msgstr "last() - Darrer valor T (més recent)."
 
+#: app/controllers/CControllerPopupTriggerExpr.php:733
+msgid "lastclock() - Timestamp of the last (most recent) T value"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1557
 msgid "left"
 msgstr "esquerra"
@@ -25294,6 +25302,10 @@ msgstr "logseverity() - Registre de gravetats de lla darrera entrada al registre
 #: app/controllers/CControllerPopupTriggerExpr.php:779
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr "logsource() - Font de registre de la darrera entrada de registre que coincideix amb el paràmetre V per al període T (1 - coincidència, 0 - sense coincidència)"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:795
+msgid "logtimestamp() - Timestamp of the last (most recent) T log message"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "ltrim() - Remove specified characters from the beginning of a string"
