@@ -413,7 +413,7 @@ Overlay.prototype.load = function(action, options) {
 Overlay.prototype.unmount = function() {
 	this.unsetProperty('prevent_navigation');
 
-	if (this.cancel_action !== null) {
+	if (this.cancel_action !== null && !this._block_cancel_action) {
 		this.cancel_action();
 	}
 
@@ -506,6 +506,8 @@ Overlay.prototype.mount = function() {
 	this._is_dragging = false;
 
 	this.fixPosition();
+
+	this._block_cancel_action = false;
 };
 
 /**
@@ -535,7 +537,7 @@ Overlay.prototype.makeButton = function(obj) {
 		}
 
 		if (obj.action && obj.action(this) !== false) {
-			this.cancel_action = null;
+			this._block_cancel_action = true;
 
 			if (!obj.keepOpen) {
 				overlayDialogueDestroy(this.dialogueid, this.CLOSE_BY_USER);
@@ -566,6 +568,7 @@ Overlay.prototype.makeButton = function(obj) {
 Overlay.prototype.makeButtons = function(arr) {
 	var buttons = [];
 
+	this.cancel_action = null;
 	this.$btn_submit = null;
 	this.$btn_focus = null;
 
