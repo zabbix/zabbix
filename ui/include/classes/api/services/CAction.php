@@ -163,8 +163,8 @@ class CAction extends CApiService {
 				' LEFT JOIN permission p ON hh.hgsetid=p.hgsetid'.
 					' AND p.ugsetid='.self::$userData['ugsetid'].
 				' WHERE a.actionid=c.actionid'.
-					' AND c.value!='.zbx_dbstr('0').
 					' AND c.conditiontype IN ('.ZBX_CONDITION_TYPE_HOST.','.ZBX_CONDITION_TYPE_TEMPLATE.')'.
+					' AND c.value!='.zbx_dbstr('0').
 					' AND p.permission IS NULL'.
 			')';
 
@@ -178,8 +178,8 @@ class CAction extends CApiService {
 				' LEFT JOIN permission p ON hh.hgsetid=p.hgsetid'.
 					' AND p.ugsetid='.self::$userData['ugsetid'].
 				' WHERE a.actionid=c.actionid'.
-					' AND c.value!='.zbx_dbstr('0').
 					' AND c.conditiontype='.ZBX_CONDITION_TYPE_TRIGGER.
+					' AND c.value!='.zbx_dbstr('0').
 					' AND p.permission IS NULL'.
 			')';
 
