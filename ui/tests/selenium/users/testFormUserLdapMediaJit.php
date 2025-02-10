@@ -53,9 +53,9 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 */
 	public function prepareJitMedia() {
 		$mediatypeids = CDBHelper::getAll("SELECT mediatypeid FROM media_type WHERE name IN ('iTop', 'SMS', ".
-				"'MS Teams Workflow', 'Slack', 'OTRS', 'Opsgenie', 'Brevis.one', 'Discord', 'iLert', 'Jira', 'Line', 'Email', ".
-				"'SysAid', 'Pushover', 'Telegram', 'Redmine', 'SIGNL4', 'PagerDuty', 'Zammad', 'Github', 'VictorOps', ".
-				"'ServiceNow')"
+				"'MS Teams Workflow', 'Slack', 'OTRS', 'Opsgenie', 'Brevis.one', 'Discord', 'iLert', 'Jira', ".
+				"'Line', 'Email', 'SysAid', 'Pushover', 'Telegram', 'Redmine', 'SIGNL4', 'PagerDuty', ".
+				"'Zammad', 'Github', 'VictorOps', 'ServiceNow')"
 		);
 
 		$update_api = [];
@@ -179,7 +179,9 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$this->assertEquals(self::$provisioned_media_count, $media_table->getRows()->count());
 
 		// Check that count of media is correctly displayed in the tab.
-		$this->assertEquals(self::$provisioned_media_count, $form->query('xpath:.//a[text()="Media"]')->one()->getAttribute('data-indicator-value'));
+		$this->assertEquals(self::$provisioned_media_count, $form->query('xpath:.//a[text()="Media"]')->one()
+				->getAttribute('data-indicator-value')
+		);
 
 		// Check that only edit action is enabled for provisioned media.
 		foreach ($media_types as $media_type) {
@@ -188,14 +190,17 @@ class testFormUserLdapMediaJit extends CWebTest {
 			$this->assertTrue($row->query('button:Edit')->one()->isClickable());
 		}
 
-		// Check hintbox and status for media that is disabled in Media types.
-		$row = $media_table->findRow('Type', 'Zendesk', true);
-		$this->assertTrue($row->getColumn('Type')->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')
-				->one()->isValid()
-		);
+		// Check the pressence and amount of hintboxes media table for disabled media.
+		foreach (['MantisBT', 'OTRS CE', 'Rocket.Chat','Zendesk'] as $media_type) {
+			$row = $media_table->findRow('Type', $media_type, true);
+			$this->assertTrue($row->getColumn('Type')->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')
+					->one()->isValid()
+			);
+		}
 
-		// Check that correct amount of hintboxes is present in the media table for disabled media.
-		$this->assertEquals(4, $media_table->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')->count());
+		$this->assertEquals(4, $media_table->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')
+				->count()
+		);
 
 		// Check that Type and Send to fields are read-only for provisioned media.
 		$media_table->findRow('Type', 'MS Teams Workflow')->getColumn('Actions')->query('button:Edit')->one()->click();
@@ -374,14 +379,12 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
 		$this->page->open('zabbix.php?action=userprofile.edit');
 
-		$old_hash = CDBHelper::getHash(self::HASH_SQL);
-
 		// Close the warning message, to not affect further message check.
 		$this->query('class:btn-overlay-close')->one()->click();
 
 		$form = $this->query('id:user-form')->waitUntilVisible()->asForm()->one();
 		$form->selectTab('Media');
-		$media_field = $this->query('name:user_form')->waitUntilVisible()->asForm()->one()->getField('Media')->asTable();
+		$media_field = $form->getField('Media')->asTable();
 		$row = $media_field->findRow('Type', $data['media']);
 		$row->getColumn('Actions')->query('button:Edit')->one()->click();
 
@@ -393,6 +396,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 		if ($data['expected'] === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, null, $data['message']);
 			$dialog->close();
+			$old_hash = CDBHelper::getHash(self::HASH_SQL);
 		}
 
 		$form->query('button:Update')->one()->click();
@@ -447,7 +451,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$this->query('button:Add')->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$media_form = $dialog->asForm();
-		$media_form->fill(['Type' => 'SMS', 'Send to' => 'test']);
+		$media_form->fill(['Type' => $data['fields']['Type'], 'Send to' => $data['fields']['Send to']]);
 
 		$media_form->submit();
 		$form->query('button:Update')->one()->click();
@@ -471,7 +475,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 		// Check that media can be removed by LDAP provisioned user.
 		$form->selectTab('Media');
 		$media_field = $this->query('name:user_form')->waitUntilVisible()->asForm()->one()->getField('Media')->asTable();
-		$row = $media_field->findRow('Type', $data['fields']['Type'])->asTableRow();
+		$row = $media_field->findRow('Type', $data['fields']['Type']);
 		$row->getColumn('Actions')->query('button:Remove')->one()->click();
 		$form->query('button:Update')->one()->click();
 		$this->assertMessage(TEST_GOOD, 'User updated');
@@ -479,13 +483,12 @@ class testFormUserLdapMediaJit extends CWebTest {
 		// Check that media is no longer present in the list.
 		$this->page->open('zabbix.php?action=userprofile.edit');
 		$form->selectTab('Media');
-		$media_updated = $this->query('name:user_form')->waitUntilVisible()->asForm()->one()->getField('Media')->asTable();
-		$this->assertFalse($media_updated->findRow('Type', $data['fields']['Type'])->isPresent());
+		$this->assertFalse($form->getField('Media')->asTable()->findRow('Type', $data['fields']['Type'])->isPresent());
 	}
 
 	public function getUpdateMediaMappings() {
 		return [
-			// Media type update to other enabled media type.
+			// #0 Media type update to other enabled media type.
 			[
 				[
 					'media_types' => [
@@ -496,7 +499,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 									'Type' => 'VictorOps',
 									'Send to' => PHPUNIT_LDAP_USERNAME,
 									'When active' => '1-7,00:00-24:00',
-									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Use if severity' => [
+										'Not classified',
+										'Information',
+										'Warning',
+										'Average',
+										'High',
+										'Disaster'
+									],
 									'Enabled' => true
 								]
 							],
@@ -508,7 +518,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 									'Type' => 'Github',
 									'Send to' => PHPUNIT_LDAP_USERNAME,
 									'When active' => '1-7,00:00-24:00',
-									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Use if severity' => [
+										'Not classified',
+										'Information',
+										'Warning',
+										'Average',
+										'High',
+										'Disaster'
+									],
 									'Enabled' => true
 								]
 							]
@@ -516,7 +533,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// Media type update to other disabled media type.
+			// #1 Media type update to other disabled media type.
 			[
 				[
 					'media_types' => [
@@ -527,7 +544,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 									'Type' => 'ServiceNow',
 									'Send to' => PHPUNIT_LDAP_USERNAME,
 									'When active' => '1-7,00:00-24:00',
-									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Use if severity' => [
+										'Not classified',
+										'Information',
+										'Warning',
+										'Average',
+										'High',
+										'Disaster'
+									],
 									'Enabled' => true
 								]
 							],
@@ -539,7 +563,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 									'Type' => 'Mattermost',
 									'Send to' => PHPUNIT_LDAP_USERNAME,
 									'When active' => '1-7,00:00-24:00',
-									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Use if severity' => [
+										'Not classified',
+										'Information',
+										'Warning',
+										'Average',
+										'High',
+										'Disaster'
+									],
 									'Enabled' => false
 								]
 							]
@@ -547,7 +578,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// Media type severity update: severity.
+			// #2 Media type severity update: severity.
 			[
 				[
 					'media_types' => [
@@ -558,7 +589,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 									'Type' => 'Rocket.Chat',
 									'Send to' => PHPUNIT_LDAP_USERNAME,
 									'When active' => '1-7,00:00-24:00',
-									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Use if severity' => [
+										'Not classified',
+										'Information',
+										'Warning',
+										'Average',
+										'High',
+										'Disaster'
+									],
 									'Enabled' => false
 								]
 							],
@@ -570,7 +608,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 									'Type' => 'Rocket.Chat',
 									'Send to' => PHPUNIT_LDAP_USERNAME,
 									'When active' => '1-7,00:00-24:00',
-									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Use if severity' => [
+										'Not classified',
+										'Information',
+										'Warning',
+										'Average',
+										'High',
+										'Disaster'
+									],
 									'Enabled' => false
 								]
 							]
@@ -578,7 +623,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// Media type status update.
+			// #3 Media type status update.
 			[
 				[
 					'media_types' => [
@@ -589,7 +634,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 									'Type' => 'Rocket.Chat',
 									'Send to' => PHPUNIT_LDAP_USERNAME,
 									'When active' => '1-7,00:00-24:00',
-									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Use if severity' => [
+										'Not classified',
+										'Information',
+										'Warning',
+										'Average',
+										'High',
+										'Disaster'
+									],
 									'Enabled' => false
 								]
 							],
@@ -601,7 +653,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 									'Type' => 'Rocket.Chat',
 									'Send to' => PHPUNIT_LDAP_USERNAME,
 									'When active' => '1-7,00:00-24:00',
-									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Use if severity' => [
+										'Not classified',
+										'Information',
+										'Warning',
+										'Average',
+										'High',
+										'Disaster'
+									],
 									'Enabled' => false
 								]
 							]
@@ -609,7 +668,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// Media type update When active update.
+			// #4 Media type update When active update.
 			[
 				[
 					'media_types' => [
@@ -620,7 +679,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 									'Type' => 'Rocket.Chat',
 									'Send to' => PHPUNIT_LDAP_USERNAME,
 									'When active' => '1-7,00:00-24:00',
-									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Use if severity' => [
+										'Not classified',
+										'Information',
+										'Warning',
+										'Average',
+										'High',
+										'Disaster'
+									],
 									'Enabled' => false
 								]
 							],
@@ -632,7 +698,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 									'Type' => 'Rocket.Chat',
 									'Send to' => PHPUNIT_LDAP_USERNAME,
 									'When active' => '1-7,00:00-24:00',
-									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Use if severity' => [
+										'Not classified',
+										'Information',
+										'Warning',
+										'Average',
+										'High',
+										'Disaster'
+									],
 									'Enabled' => false
 								]
 							]
@@ -640,7 +713,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// Several media type mapping update.
+			// #5 Several media type mapping update.
 			[
 				[
 					'media_types' => [
@@ -651,7 +724,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 									'Type' => 'OTRS CE',
 									'Send to' => PHPUNIT_LDAP_USERNAME,
 									'When active' => '1-7,00:00-24:00',
-									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Use if severity' => [
+										'Not classified',
+										'Information',
+										'Warning',
+										'Average',
+										'High',
+										'Disaster'
+									],
 									'Enabled' => false
 								]
 							],
@@ -663,7 +743,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 									'Type' => 'SysAid',
 									'Send to' => PHPUNIT_LDAP_USERNAME,
 									'When active' => '1-7,00:00-24:00',
-									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Use if severity' => [
+										'Not classified',
+										'Information',
+										'Warning',
+										'Average',
+										'High',
+										'Disaster'
+									],
 									'Enabled' => true
 								]
 							]
@@ -675,7 +762,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 									'Type' => 'Rocket.Chat',
 									'Send to' => PHPUNIT_LDAP_USERNAME,
 									'When active' => '1-7,00:00-24:00',
-									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Use if severity' => [
+										'Not classified',
+										'Information',
+										'Warning',
+										'Average',
+										'High',
+										'Disaster'
+									],
 									'Enabled' => false
 								]
 							],
@@ -688,7 +782,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 									'Type' => 'MS Teams',
 									'Send to' => PHPUNIT_LDAP_USERNAME,
 									'When active' => '1-7,00:00-24:00',
-									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Use if severity' => [
+										'Not classified',
+										'Information',
+										'Warning',
+										'Average',
+										'High',
+										'Disaster'
+									],
 									'Enabled' => false
 								]
 							]
@@ -696,7 +797,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// Media type attribute change.
+			// #6 Media type attribute change.
 			[
 				[
 					'media_types' => [
@@ -707,7 +808,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 									'Type' => 'MantisBT',
 									'Send to' => PHPUNIT_LDAP_USERNAME,
 									'When active' => '1-7,00:00-24:00',
-									'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+									'Use if severity' => [
+										'Not classified',
+										'Information',
+										'Warning',
+										'Average',
+										'High',
+										'Disaster'
+									],
 									'Enabled' => false
 								]
 							],
@@ -751,7 +859,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 		// Check that no changes are present until user is provisioned.
 		$this->page->open('zabbix.php?action=user.list')->waitUntilReady();
 		$this->query('link:'.PHPUNIT_LDAP_USERNAME)->one()->click();
-		$this->assertEquals(10, $this->getUserMediaTable()->getRows()->count());
+		$this->assertEquals(self::$provisioned_media_count, $this->getUserMediaTable()->getRows()->count());
 
 		foreach ($data['media_types'] as $media_type) {
 			$this->checkMediaConfiguration($media_type['configuration'], $media_type['configuration']['fields']['Type'],
@@ -770,7 +878,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 		foreach ($data['media_types'] as $media_type) {
 			if (array_key_exists('Attribute', $media_type['update'])) {
 				$this->assertFalse($user_media_table->findRow('Type', '	MantisBT', true)->isPresent());
-				$this->assertEquals(9, $user_media_table->getRows()->count());
+				$this->assertEquals(self::$provisioned_media_count-1, $user_media_table->getRows()->count());
 			}
 			else {
 				$this->checkMediaConfiguration($media_type['expected'], $media_type['expected']['fields']['Type'],
@@ -781,7 +889,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 	public function getNewMediaMappings() {
 		return [
-			// Media type severity - Not classified.
+			// #0 Media type severity - Not classified.
 			[
 				[
 					'provisioned' => true,
@@ -802,7 +910,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// Media type severity - Information.
+			// #1 Media type severity - Information.
 			[
 				[
 					'provisioned' => true,
@@ -823,7 +931,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// Media type severity - Warning.
+			// #2 Media type severity - Warning.
 			[
 				[
 					'provisioned' => true,
@@ -844,7 +952,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// Media type severity - Average.
+			// #3 Media type severity - Average.
 			[
 				[
 					'provisioned' => true,
@@ -865,7 +973,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// Media type severity - High.
+			// #4 Media type severity - High.
 			[
 				[
 					'provisioned' => true,
@@ -886,7 +994,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// Media type severity - Disaster.
+			// #5 Media type severity - Disaster.
 			[
 				[
 					'provisioned' => true,
@@ -907,7 +1015,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// Media type severity - No severity.
+			// #6 Media type severity - No severity.
 			[
 				[
 					'provisioned' => true,
@@ -928,7 +1036,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// Media type severity - All severity.
+			// #7 Media type severity - All severity.
 			[
 				[
 					'provisioned' => true,
@@ -949,7 +1057,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// When active - custom value.
+			// #8 When active - custom value.
 			[
 				[
 					'provisioned' => true,
@@ -970,7 +1078,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// When active - user macro syntax.
+			// #9 When active - user macro syntax.
 			[
 				[
 					'provisioned' => true,
@@ -992,7 +1100,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// Create enabled: false.
+			// #10 Create enabled: false.
 			[
 				[
 					'provisioned' => true,
@@ -1013,7 +1121,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// Email type media, which won't be added due to email validation.
+			// #11 Email type media, which won't be added due to email validation.
 			[
 				[
 					'provisioned' => false,
@@ -1025,7 +1133,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// Media type with non existing attribute.
+			// #12 Media type with non existing attribute.
 			[
 				[
 					'provisioned' => false,
@@ -1041,9 +1149,9 @@ class testFormUserLdapMediaJit extends CWebTest {
 	}
 
 	/**
-	 * @dataProvider getNewMediaMappings
-	 *
 	 * Function to check that new media is added to the user after updating the mapping and provisioning.
+	 *
+	 * @dataProvider getNewMediaMappings
 	 */
 	public function testFormUserLdapMediaJit_AddMediaMapping($data) {
 		$form = $this->openLdapForm();
@@ -1120,16 +1228,15 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * Check media type configuration in user configuration form.
 	 *
 	 * @param array		$data				data provider
-	 * @param string	$type				type of the media
+	 * @param string	$media_type				type of the media
 	 * @param string	$send_to			send to parameter of the media
 	 * @param string	$expected			name of the array with expected result
 	 */
-	protected function checkMediaConfiguration($data, $type, $send_to, $expected = 'fields') {
+	protected function checkMediaConfiguration($data, $media_type, $send_to, $expected = 'fields') {
 		// Check media type.
-		$media_field = $this->query('name:user_form')->waitUntilVisible()->asForm()->one()->getField('Media')->asTable();
-		$row = $media_field->findRow('Type', $type)->asTableRow();
+		$row = $this->query('id:media-table')->asTable()->one()->findRow('Type', $media_type);
 
-		$this->assertEquals($row->getColumn('Type')->getText(), $type);
+		$this->assertEquals($row->getColumn('Type')->getText(), $media_type);
 
 		// Check the value of the "Send to" field.
 		$this->assertFalse($row->query('xpath:./td[2]/span[@data-hintbox]')->one(false)->isValid());
@@ -1174,6 +1281,8 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 	/**
 	 * Function for opening LDAP configuration form.
+	 *
+	 * @return CFormElement
 	 */
 	protected function openLdapForm() {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
@@ -1196,6 +1305,8 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 	/**
 	 * Function for selecting the user and getting the media table.
+	 *
+	 * @return CTableElement
 	 */
 	protected function getUserMediaTable() {
 		$user_form = $this->query('id:user-form')->waitUntilVisible()->asForm()->one();
