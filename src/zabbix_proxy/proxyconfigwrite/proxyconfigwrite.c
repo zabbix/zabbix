@@ -1654,72 +1654,69 @@ out:
 static int	proxyconfig_sync_data(zbx_vector_table_data_ptr_t *config_tables, int full_sync, char **error)
 {
 	zbx_table_data_t	*hostmacro, *hosts_templates;
-	int			ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	/* first sync isolated tables without relations to other tables */
 
 	if (SUCCEED != proxyconfig_sync_table(config_tables, "globalmacro", error))
-		goto out;
+		return FAIL;
 
 	if (SUCCEED != proxyconfig_sync_table(config_tables, "config_autoreg_tls", error))
-		goto out;
+		return FAIL;
 
 	if (SUCCEED != proxyconfig_sync_table(config_tables, "config", error))
-		goto out;
+		return FAIL;
 
 	/* process related tables by scope */
 
 	if (SUCCEED != proxyconfig_sync_network_discovery(config_tables, error))
-		goto out;
+		return FAIL;
 
 	if (SUCCEED != proxyconfig_sync_regexps(config_tables, error))
-		goto out;
+		return FAIL;
 
 	if (NULL != (hostmacro = proxyconfig_get_table(config_tables, "hostmacro")))
 	{
 		if (NULL == (hosts_templates = proxyconfig_get_table(config_tables, "hosts_templates")))
 		{
 			*error = zbx_strdup(NULL, "cannot find host template data");
-			goto out;
+			return FAIL;
 		}
 
 		proxyconfig_prepare_hostmacros(hostmacro, hosts_templates, full_sync);
 
 		if (SUCCEED != proxyconfig_prepare_rows(hostmacro, error))
-			goto out;
+			return FAIL;
 
 		if (SUCCEED != proxyconfig_delete_rows(hostmacro, error))
-			goto out;
+			return FAIL;
 
 		if (SUCCEED != proxyconfig_prepare_rows(hosts_templates, error))
-			goto out;
+			return FAIL;
 
 		if (SUCCEED != proxyconfig_delete_rows(hosts_templates, error))
-			goto out;
+			return FAIL;
 	}
 
 	if (SUCCEED != proxyconfig_sync_hosts(config_tables, full_sync, error))
-		goto out;
+		return FAIL;
 
 	if (NULL != hostmacro)
 	{
 		if (SUCCEED != proxyconfig_sync_templates(hosts_templates, hostmacro, error))
-			goto out;
+			return FAIL;
 
 		if (SUCCEED != proxyconfig_insert_rows(hostmacro, error))
-			goto out;
+			return FAIL;
 
 		if (SUCCEED != proxyconfig_update_rows(hostmacro, error))
-			goto out;
+			return FAIL;
 	}
 
-	ret = SUCCEED;
-
-out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-	return ret;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -2317,6 +2314,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 		zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy onfiguration data received from server at"
 				" \"%s\": %s", sock->peer, error);
 	}
+
 	zbx_dc_sync_unlock();
 	zbx_send_proxy_response(sock, ret, error, config_timeout);
 	zbx_free(error);

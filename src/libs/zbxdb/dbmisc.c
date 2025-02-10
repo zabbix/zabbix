@@ -1371,4 +1371,3 @@ const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
 
 	return buf;
 }
-
