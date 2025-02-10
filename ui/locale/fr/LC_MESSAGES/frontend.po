@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-12-29 13:53+0000\n"
+"PO-Revision-Date: 2025-02-01 12:40+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -1292,7 +1292,7 @@ msgstr "Tous"
 #: app/views/mediatype.list.php:79 app/views/mediatype.list.php:81
 #: app/views/mediatype.list.php:90 app/views/popup.operation.edit.php:160
 msgid "All available"
-msgstr ""
+msgstr "Tous disponibles"
 
 #: app/views/monitoring.dashboard.view.php:189
 msgid "All dashboards"
@@ -2943,12 +2943,12 @@ msgstr[1] "Impossible de supprimer les groupes d'utilisateurs"
 #: include/classes/api/services/CUserGroup.php:1330
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
-msgstr ""
+msgstr "Impossible de supprimer le groupe d'utilisateur \"%1$s\", car il est utilisé par le provisionnement LDAP \"%2$s\"."
 
 #: include/classes/api/services/CUserGroup.php:1325
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
-msgstr ""
+msgstr "Impossible de supprimer le groupe d'utilisateur \"%1$s\", car il est utilisé par un userdirectory SAML."
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
@@ -8590,7 +8590,7 @@ msgstr "Filtre"
 
 #: app/views/mediatype.list.php:76
 msgid "Filter actions by the scope of media type usage:"
-msgstr ""
+msgstr "Filtrer les actions en fonction de l'étendue de l'utilisation du type de média :"
 
 #: app/views/js/popup.tabfilter.edit.js.php:63
 msgid "Filter deleted"
@@ -9433,7 +9433,7 @@ msgstr "Fonctions d'historique"
 
 #: app/views/administration.housekeeping.edit.php:218
 msgid "History, trends and audit log compression"
-msgstr ""
+msgstr "Historique, tendances et compression des journaux d'audit"
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -9555,7 +9555,7 @@ msgstr "Un hôte ne peut pas avoir plus d'une interface par défaut du même typ
 
 #: widgets/hostcard/Widget.php:32
 msgid "Host card"
-msgstr ""
+msgstr "Carte d'hôte"
 
 #: app/views/administration.proxy.list.php:91 hostinventoriesoverview.php:85
 #: widgets/tophosts/includes/WidgetForm.php:159
@@ -12556,7 +12556,7 @@ msgstr "Limite"
 
 #: widgets/topitems/views/widget.edit.php:95
 msgid "Limit applies to each \"Item pattern\" separately"
-msgstr ""
+msgstr "La limite s'applique à chaque « modèle d'élément » séparément"
 
 #: app/views/administration.gui.edit.php:93
 msgid "Limit for search and filter results"
@@ -16154,7 +16154,7 @@ msgstr "Motif"
 
 #: widgets/topitems/includes/CWidgetFieldColumnsListView.php:58
 msgid "Patterns"
-msgstr ""
+msgstr "Modèles"
 
 #: app/views/popup.action.edit.php:238
 msgid "Pause operations for suppressed problems"
@@ -19399,7 +19399,7 @@ msgstr "Sparkline"
 
 #: app/views/mediatype.list.php:83 app/views/mediatype.list.php:91
 msgid "Specific"
-msgstr ""
+msgstr "Spécifique"
 
 #: include/classes/helpers/CRoleHelper.php:199
 msgid "Specified role was not found."
@@ -20608,7 +20608,7 @@ msgstr "Ce paramètre affichera l'heure locale au lieu de l'horodatage. \"Affich
 
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
-msgstr ""
+msgstr "Ce paramètre affichera l'heure du journal au lieu de l'horodatage de l'élément. L'option « Afficher l'horodatage » doit également être cochée dans la configuration avancée."
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -22831,7 +22831,7 @@ msgstr "État d'alimentation de la machine virtuelle VMware, \"url\" - URL du se
 
 #: include/classes/data/CItemData.php:2498
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Taille de la mémoire privée de la machine virtuelle VMware, \"url\" - URL du service VMware, \"uuid\" - Identifiant global unique de la machine virtuelle VMware"
 
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
@@ -23897,11 +23897,11 @@ msgstr "Serveur Zabbix (proxy)"
 
 #: app/views/administration.miscconfig.edit.php:112
 msgid "Zabbix server and proxy"
-msgstr ""
+msgstr "Serveur et proxy Zabbix"
 
 #: app/views/administration.miscconfig.edit.php:107
 msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
-msgstr ""
+msgstr "Serveur et proxy Zabbix : les secrets sont récupérés depuis Vault à la fois par le serveur Zabbix et les proxys, ce qui leur permet de résoudre les macros de manière indépendante."
 
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
@@ -23922,7 +23922,7 @@ msgstr "Version du serveur Zabbix"
 
 #: app/views/administration.miscconfig.edit.php:105
 msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
-msgstr ""
+msgstr "Serveur Zabbix : les secrets sont récupérés depuis Vault par le serveur Zabbix et transmis aux proxys si nécessaire."
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -24748,15 +24748,15 @@ msgstr "la règle de découverte \"%1$s\" sur l'hôte \"%2$s\" n'est pas surveil
 
 #: app/views/mediatype.list.php:78
 msgid "display all actions"
-msgstr ""
+msgstr "afficher toutes les actions"
 
 #: app/views/mediatype.list.php:80
 msgid "display only actions where All available media types are used in action operation"
-msgstr ""
+msgstr "afficher uniquement les actions où Tous les types de médias disponibles sont utilisés dans l'opération d'action"
 
 #: app/views/mediatype.list.php:84
 msgid "display only actions where specific media type is used in action operation"
-msgstr ""
+msgstr "afficher uniquement les actions où un type de média spécifique est utilisé dans l'opération d'action"
 
 #: app/views/popup.lldoperation.php:65 include/actions.inc.php:27
 #: include/classes/helpers/CCorrelationHelper.php:37
@@ -24862,6 +24862,10 @@ msgstr "premier"
 #: app/controllers/CControllerPopupTriggerExpr.php:624
 msgid "first() - The oldest value in the specified time interval"
 msgstr "first() - La valeur la plus ancienne dans l'intervalle de temps spécifié"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:626
+msgid "firstclock() - Timestamp of the oldest value in the specified time interval"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
@@ -25260,6 +25264,10 @@ msgstr "dernier"
 msgid "last() - Last (most recent) T value"
 msgstr "last () - Dernière valeur T la plus récente"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:733
+msgid "lastclock() - Timestamp of the last (most recent) T value"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1557
 msgid "left"
 msgstr "gauche"
@@ -25295,6 +25303,10 @@ msgstr "logseverity() - Retourne la gravité de la dernière entrée du journal 
 #: app/controllers/CControllerPopupTriggerExpr.php:779
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr "logsource() - Source du dernier paramètre de correspondance de l'entrée de journal V pour la période T (1 - correspondance, 0 - pas de correspondance)"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:795
+msgid "logtimestamp() - Timestamp of the last (most recent) T log message"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "ltrim() - Remove specified characters from the beginning of a string"
