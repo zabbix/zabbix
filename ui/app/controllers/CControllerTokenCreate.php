@@ -117,8 +117,8 @@ class CControllerTokenCreate extends CController {
 			[['token' => $auth_token]] = API::Token()->generate($tokenids);
 
 			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', $this->getInput('action_dst'))
 				->setArgumentSID()
+				->setArgument('action', $this->getInput('action_dst'))
 			);
 
 			[$user] = (CWebUser::$data['userid'] != $token['userid'])
