@@ -34,6 +34,7 @@ typedef struct
 	char				*error;
 	struct evdns_base		*dnsbase;
 	struct evutil_addrinfo		*ai;
+	struct evutil_addrinfo		*current_ai;
 	char				*address;
 }
 zbx_async_task_t;
@@ -86,7 +87,8 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	ret = task->process_cb(what, task->data, &fd, task->address, task->error, task->timeout_event);
+	ret = task->process_cb(what, task->data, &fd, &task->current_ai, task->address, task->error,
+			task->timeout_event);
 
 	switch (ret)
 	{
@@ -204,6 +206,7 @@ static void	async_dns_event(int err, struct evutil_addrinfo *ai, void *arg)
 			ip[0] = '\0';
 
 		task->ai = ai;
+		task->current_ai = ai;
 		task->address = zbx_strdup(task->address, ip);
 		evtimer_add(task->timeout_event, &tv);
 		async_event(-1, 0, task);
@@ -263,6 +266,7 @@ void	zbx_async_poller_add_task(struct event_base *ev, struct evdns_base *dnsbase
 	task->error = NULL;
 	task->dnsbase = dnsbase;
 	task->ai = NULL;
+	task->current_ai = NULL;
 	task->address = NULL;
 
 	memset(&hints, 0, sizeof(hints));

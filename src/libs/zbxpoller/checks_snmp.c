@@ -2991,8 +2991,8 @@ void	zbx_unset_snmp_bulkwalk_options(void)
 	snmp_bulkwalk_set_options(&default_opts);
 }
 
-static int	snmp_task_process(short event, void *data, int *fd, const char *addr, char *dnserr,
-		struct event *timeout_event)
+static int	snmp_task_process(short event, void *data, int *fd, struct evutil_addrinfo **current_ai,
+	const char *addr, char *dnserr, struct event *timeout_event)
 {
 	zbx_bulkwalk_context_t	*bulkwalk_context;
 	zbx_snmp_context_t	*snmp_context = (zbx_snmp_context_t *)data;
@@ -3000,6 +3000,8 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 	const char		*snmp_error;
 	int			ret, task_ret = ZBX_ASYNC_TASK_STOP;
 	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)snmp_context->arg_action;
+
+	ZBX_UNUSED(current_ai);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %s event:%d fd:%d itemid:" ZBX_FS_UI64, __func__,
 			zbx_get_event_string(event), event, *fd, snmp_context->item.itemid);
