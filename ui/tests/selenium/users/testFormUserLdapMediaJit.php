@@ -1051,7 +1051,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 							'Type' => 'Redmine',
 							'Send to' => PHPUNIT_LDAP_USERNAME,
 							'When active' => '1-7,00:00-24:00',
-							'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+							'Use if severity' => [
+								'Not classified',
+								'Information',
+								'Warning',
+								'Average',
+								'High',
+								'Disaster'
+							],
 							'Enabled' => true
 						]
 					]
@@ -1072,7 +1079,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 							'Type' => 'SIGNL4',
 							'Send to' => PHPUNIT_LDAP_USERNAME,
 							'When active' => '5-7,01:00-23:30',
-							'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+							'Use if severity' => [
+								'Not classified',
+								'Information',
+								'Warning',
+								'Average',
+								'High',
+								'Disaster'
+							],
 							'Enabled' => true
 						]
 					]
@@ -1094,7 +1108,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 							'Type' => 'Discord',
 							'Send to' => PHPUNIT_LDAP_USERNAME,
 							'When active' => '{$TEST}',
-							'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+							'Use if severity' => [
+								'Not classified',
+								'Information',
+								'Warning',
+								'Average',
+								'High',
+								'Disaster'
+							],
 							'Enabled' => true
 						]
 					]
@@ -1115,7 +1136,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 							'Type' => 'PagerDuty',
 							'Send to' => PHPUNIT_LDAP_USERNAME,
 							'When active' => '1-7,00:00-24:00',
-							'Use if severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+							'Use if severity' => [
+								'Not classified',
+								'Information',
+								'Warning',
+								'Average',
+								'High',
+								'Disaster'
+							],
 							'Enabled' => false
 						]
 					]
@@ -1265,8 +1293,8 @@ class testFormUserLdapMediaJit extends CWebTest {
 		if (array_key_exists('Use if severity', $data[$expected])) {
 			// Check that the passed severities are turned on.
 			foreach ($data[$expected]['Use if severity'] as $used_severity) {
-				$actual_severity = $row->query('xpath:./td[4]/div/span['.$reference_severities[$used_severity].']')->one()
-						->getAttribute('data-hintbox-contents');
+				$actual_severity = $row->query('xpath:./td[4]/div/span['.$reference_severities[$used_severity].']')
+						->one()->getAttribute('data-hintbox-contents');
 				$this->assertEquals($actual_severity, $used_severity.' (on)');
 				unset($reference_severities[$used_severity]);
 			}
