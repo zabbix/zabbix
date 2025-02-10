@@ -3406,7 +3406,7 @@ svg {
 		padding-right: 0 !important;
 	}
 
-	td.display-icon {
+	tr.display-icon {
 		line-height: 24px;
 	}
 
@@ -4111,16 +4111,37 @@ z-select {
 }
 
 button.copy-button {
-	&::before {
-		color: $icon-color;
+	color: $icon-color !important;
+	border: 1px solid $form-border-color;
+	background: $form-bg-color;
+	border-radius: 2px;
+	line-height: 24px;
+	width: 24px;
+	height: 24px !important;
+
+	&:hover {
+		background-color: $btn-form-hover-bg-color;
+		color: $btn-icon-hover-color;
+	}
+
+	&:hover:not(:focus) {
 		border: 1px solid $form-border-color;
-		background: $form-bg-color !important;
-		border-radius: 2px;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px $btn-focus-outline-color;
+		border: 1px solid $form-border-color;
+	}
+
+	&:focus:not(:hover) {
+		background: $form-bg-color;
+	}
+
+	&::before {
 		font-size: 12px;
-		line-height: 24px;
-		width: 24px;
 	}
 }
+
 
 // Dynamically generated classes:
 //  .color-accent
