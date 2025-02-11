@@ -216,8 +216,6 @@
 				data.parameters.sendto = data.sendto;
 			}
 
-			console.log(data.parameters)
-
 			data.parameters = JSON.stringify(data.parameters);
 		}
 
