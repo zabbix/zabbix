@@ -49,7 +49,7 @@ $condition_tag_template = (new CTemplateTag('condition-tag-row-tmpl'))
 		(new CRow([
 			(new CCol('#{label}'))
 				->addClass('label')
-				->setAttribute('data-conditiontype', '#{conditiontype}')
+				->setAttribute('data-conditiontype', '#{type}')
 				->setAttribute('data-formulaid', '#{label}'),
 			(new CCol([
 				'#{condition_name}', ' ', new CTag('em', true, '#{data}')
@@ -59,11 +59,13 @@ $condition_tag_template = (new CTemplateTag('condition-tag-row-tmpl'))
 			(new CCol([
 				$remove_button,
 				(new CInput('hidden'))
-					->setAttribute('value', '#{conditiontype}')
-					->setName('conditions[#{row_index}][type]'),
+					->setAttribute('value', '#{type}')
+					->setName('conditions[#{row_index}][type]')
+					->setAttribute('data-field-type', 'hidden'),
 				(new CInput('hidden'))
 					->setAttribute('value', '#{operator}')
-					->setName('conditions[#{row_index}][operator]'),
+					->setName('conditions[#{row_index}][operator]')
+					->setAttribute('data-field-type', 'hidden'),
 				(new CInput('hidden'))
 					->setAttribute('value', '#{tag}')
 					->setName('conditions[#{row_index}][tag]')
@@ -99,10 +101,12 @@ $condition_hostgroup_template = (new CTemplateTag('condition-hostgr-row-tmpl'))-
 				->setAttribute('data-field-type', 'hidden'),
 			(new CInput('hidden'))
 				->setAttribute('value', '#{groupid}')
-				->setName('conditions[#{row_index}][groupid]'),
+				->setName('conditions[#{row_index}][groupid]')
+				->setAttribute('data-field-type', 'hidden'),
 			(new CInput('hidden'))
 				->setAttribute('value', '#{label}')
 				->setName('conditions[#{row_index}][formulaid]')
+				->setAttribute('data-field-type', 'hidden')
 		]))
 	]))->setId('conditions_#{row_index}')
 );
@@ -308,7 +312,7 @@ $form
 		))->setOnDocumentReady()
 	);
 
-if ($data['correlationid'] === null) {
+if ($data['correlation']['correlationid'] === null) {
 	$buttons = [
 		[
 			'title' => _('Add'),

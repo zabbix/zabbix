@@ -185,7 +185,6 @@ window.correlation_edit_popup = new class {
 
 					case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE ?>:
 					case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE ?>:
-						condition.condition_name = this.#getConditionData(condition)[0];
 						condition.condition_operator = this.#getConditionData(condition)[1];
 						condition.tag = this.#getConditionData(condition)[2];
 						condition.value = this.#getConditionData(condition)[3];
