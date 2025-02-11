@@ -22,5 +22,6 @@ void	mock_eval_read_values(zbx_eval_context_t *ctx, const char *path);
 
 void	mock_compare_stack(const zbx_eval_context_t *ctx, const char *path);
 void	mock_dump_stack(const zbx_eval_context_t *ctx);
+int	compare_vectors_uint64(zbx_vector_uint64_t *v1, zbx_vector_uint64_t *v2);
 
 #endif

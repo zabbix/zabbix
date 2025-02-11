@@ -24,32 +24,23 @@
 void	zbx_mock_test_entry(void **state)
 {
 	int			returned_ret;
-	zbx_eval_context_t	ctx;
+	zbx_eval_context_t	ctx, dst;
 	char			*error = NULL;
 	zbx_uint64_t		rules;
-	zbx_vector_uint64_t	functionids, functionids_out;
+	const char		*expression;
+
 	ZBX_UNUSED(state);
 
+	expression = zbx_mock_get_parameter_string("in.expression");
 	rules = mock_eval_read_rules("in.rules");
-	zbx_vector_uint64_create(&functionids);
-	returned_ret = zbx_eval_parse_expression(&ctx, zbx_mock_get_parameter_string("in.expression"), rules, &error);
+	returned_ret = zbx_eval_parse_expression(&ctx, expression, rules, &error);
 
 	if (SUCCEED != returned_ret)
 		printf("ERROR: %s\n", error);
 	else
 		mock_dump_stack(&ctx);
 
-	zbx_eval_get_functionids(&ctx, &functionids);
-	zbx_eval_clear(&ctx);
-
-	zbx_vector_uint64_create(&functionids_out);
-	zbx_mock_extract_yaml_values_uint64(zbx_mock_get_parameter_handle("out.ids"), &functionids_out);
-
-	zbx_mock_assert_int_eq("returned value", SUCCEED, compare_vectors_uint64(&functionids, &functionids_out));
-	zbx_vector_uint64_clear(&functionids);
-	zbx_vector_uint64_destroy(&functionids);
-	zbx_vector_uint64_clear(&functionids_out);
-	zbx_vector_uint64_destroy(&functionids_out);
+	zbx_eval_copy(&dst, &ctx, expression);
 
 	zbx_free(error);
 }

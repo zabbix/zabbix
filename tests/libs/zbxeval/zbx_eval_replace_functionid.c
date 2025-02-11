@@ -23,15 +23,15 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	int			returned_ret;
+	int			returned_ret, result,
+				exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
 	zbx_eval_context_t	ctx;
 	char			*error = NULL;
-	zbx_uint64_t		rules;
-	zbx_vector_uint64_t	functionids, functionids_out;
+	zbx_vector_str_t	expressions;
+	zbx_uint64_t		rules = mock_eval_read_rules("in.rules");
+
 	ZBX_UNUSED(state);
 
-	rules = mock_eval_read_rules("in.rules");
-	zbx_vector_uint64_create(&functionids);
 	returned_ret = zbx_eval_parse_expression(&ctx, zbx_mock_get_parameter_string("in.expression"), rules, &error);
 
 	if (SUCCEED != returned_ret)
@@ -39,17 +39,10 @@ void	zbx_mock_test_entry(void **state)
 	else
 		mock_dump_stack(&ctx);
 
-	zbx_eval_get_functionids(&ctx, &functionids);
-	zbx_eval_clear(&ctx);
+	zbx_eval_replace_functionid(&ctx,zbx_mock_get_parameter_uint64("in.oldid"),
+			zbx_mock_get_parameter_uint64("in.newid"));
+	result = zbx_eval_validate_replaced_functionids(&ctx,&error);
 
-	zbx_vector_uint64_create(&functionids_out);
-	zbx_mock_extract_yaml_values_uint64(zbx_mock_get_parameter_handle("out.ids"), &functionids_out);
-
-	zbx_mock_assert_int_eq("returned value", SUCCEED, compare_vectors_uint64(&functionids, &functionids_out));
-	zbx_vector_uint64_clear(&functionids);
-	zbx_vector_uint64_destroy(&functionids);
-	zbx_vector_uint64_clear(&functionids_out);
-	zbx_vector_uint64_destroy(&functionids_out);
-
+	zbx_mock_assert_int_eq("return", exp_result, result);
 	zbx_free(error);
 }

@@ -14,7 +14,9 @@ SERVER_tests = \
 	zbx_eval_get_functionids \
 	zbx_eval_get_functionids_ordered \
 	zbx_eval_check_timer_functions \
-	zbx_eval_extract_item_refs
+	zbx_eval_extract_item_refs \
+	zbx_eval_replace_functionid \
+	zbx_eval_copy
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -204,5 +206,33 @@ zbx_eval_extract_item_refs_LDADD += @SERVER_LIBS@
 zbx_eval_extract_item_refs_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_eval_extract_item_refs_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+#zbx_eval_replace_functionid
+
+zbx_eval_replace_functionid_SOURCES = \
+	zbx_eval_replace_functionid.c \
+	mock_eval.c mock_eval.h
+
+zbx_eval_replace_functionid_LDADD = $(EVAL_LIBS)
+
+zbx_eval_replace_functionid_LDADD += @SERVER_LIBS@
+
+zbx_eval_replace_functionid_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
+zbx_eval_replace_functionid_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+#zbx_eval_copy
+
+zbx_eval_copy_SOURCES = \
+	zbx_eval_copy.c \
+	mock_eval.c mock_eval.h
+
+zbx_eval_copy_LDADD = $(EVAL_LIBS)
+
+zbx_eval_copy_LDADD += @SERVER_LIBS@
+
+zbx_eval_copy_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
+zbx_eval_copy_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

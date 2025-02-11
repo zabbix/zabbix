@@ -1,0 +1,10 @@
+---
+test case: "{3}+{100}+{200}+{1}"
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTIONID,ZBX_EVAL_PARSE_MATH]
+  expression: "{3}+{100}+{200}+{1}"
+---
+test case: Some ids
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP]
+  expression: 'last(/host/key,#1:now-1h)'
