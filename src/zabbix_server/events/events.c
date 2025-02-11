@@ -217,12 +217,13 @@ static int	macro_trigger_tag_resolv(zbx_macro_resolv_data_t *p, va_list args, ch
 		{
 			if (0 == strcmp(p->macro, MVAR_ITEM_LASTVALUE))
 			{
-				ret = zbx_db_item_lastvalue(&event->trigger, replace_with, p->index, p->raw_value);
+				ret = zbx_db_item_lastvalue(&event->trigger, replace_with, p->index, p->raw_value, tz,
+						ZBX_VALUE_PROPERTY_VALUE);
 			}
 			else if (0 == strcmp(p->macro, MVAR_ITEM_VALUE))
 			{
 				ret = zbx_db_item_value(&event->trigger, replace_with, p->index, event->clock,
-						event->ns, p->raw_value);
+						event->ns, p->raw_value, tz, ZBX_VALUE_PROPERTY_VALUE);
 			}
 			else if (0 == strncmp(p->macro, MVAR_ITEM_LOG, ZBX_CONST_STRLEN(MVAR_ITEM_LOG)))
 			{

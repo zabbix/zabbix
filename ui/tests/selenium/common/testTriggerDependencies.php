@@ -212,6 +212,7 @@ class testTriggerDependencies extends CWebTest {
 
 		if ($button_selector === 'Add host trigger') {
 			$initial_dialog->asForm(['normalized' => true])->fill(['Host' => $host_name]);
+			$initial_dialog->query('class:no-data-message')->waitUntilNotVisible();
 			$table->waitUntilReloaded();
 		}
 

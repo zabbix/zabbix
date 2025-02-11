@@ -142,14 +142,22 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #8 Host update.
+			// #8 Host create.
+			[
+				[
+					'db' => 'SELECT * FROM hosts',
+					'link' => 'zabbix.php?action=host.list',
+					'overlay' => 'create'
+				]
+			],
+			// #9 Host update.
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
 					'link' => 'zabbix.php?action=popup&popup=host.edit&hostid=99062'
 				]
 			],
-			// #9 Item update.
+			// #10 Item update.
 			[
 				[
 					'db' => 'SELECT * FROM items',
@@ -157,7 +165,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'item_update'
 				]
 			],
-			// #10 Item create.
+			// #11 Item create.
 			[
 				[
 					'db' => 'SELECT * FROM items',
@@ -165,7 +173,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'create'
 				]
 			],
-			// #11 Trigger update.
+			// #12 Trigger update.
 			[
 				[
 					'db' => 'SELECT * FROM triggers',
@@ -173,7 +181,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'trigger_update'
 				]
 			],
-			// #12 Trigger create.
+			// #13 Trigger create.
 			[
 				[
 					'db' => 'SELECT * FROM triggers',
@@ -181,7 +189,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'create'
 				]
 			],
-			// #13 Graph update.
+			// #14 Graph update.
 			[
 				[
 					'db' => 'SELECT * FROM graphs',
@@ -189,7 +197,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'incorrect_request' => true
 				]
 			],
-			// #14 Graph create.
+			// #15 Graph create.
 			[
 				[
 					'db' => 'SELECT * FROM graphs',
@@ -197,7 +205,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'incorrect_request' => true
 				]
 			],
-			// #15 Discovery rule update.
+			// #16 Discovery rule update.
 			[
 				[
 					'db' => 'SELECT * FROM host_discovery',
@@ -205,7 +213,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'incorrect_request' => true
 				]
 			],
-			// #16 Discovery rule create.
+			// #17 Discovery rule create.
 			[
 				[
 					'db' => 'SELECT * FROM host_discovery',
@@ -213,7 +221,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'incorrect_request' => true
 				]
 			],
-			// #17 Web scenario update.
+			// #18 Web scenario update.
 			[
 				[
 					'db' => 'SELECT * FROM httptest',
@@ -221,7 +229,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'incorrect_request' => true
 				]
 			],
-			// #18 Web scenario create.
+			// #19 Web scenario create.
 			[
 				[
 					'db' => 'SELECT * FROM httptest',
@@ -229,7 +237,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'incorrect_request' => true
 				]
 			],
-			// #19 Maintenance create.
+			// #20 Maintenance create.
 			[
 				[
 					'db' => 'SELECT * FROM maintenances',
@@ -237,7 +245,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'create'
 				]
 			],
-			// #20 Maintenance update.
+			// #21 Maintenance update.
 			[
 				[
 					'db' => 'SELECT * FROM maintenances',
@@ -245,7 +253,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #21 Action create.
+			// #22 Action create.
 			[
 				[
 					'db' => 'SELECT * FROM actions',
@@ -253,7 +261,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'create'
 				]
 			],
-			// #22 Action update.
+			// #23 Action update.
 			[
 				[
 					'db' => 'SELECT * FROM actions',
@@ -261,7 +269,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #23 Event correlation create.
+			// #24 Event correlation create.
 			[
 				[
 					'db' => 'SELECT * FROM correlation',
@@ -269,7 +277,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'create'
 				]
 			],
-			// #24 Event correlation update.
+			// #25 Event correlation update.
 			[
 				[
 					'db' => 'SELECT * FROM correlation',
@@ -277,7 +285,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #25 Discovery create.
+			// #26 Discovery create.
 			[
 				[
 					'db' => 'SELECT * FROM drules',
@@ -285,7 +293,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'create'
 				]
 			],
-			// #26 Discovery update.
+			// #27 Discovery update.
 			[
 				[
 					'db' => 'SELECT * FROM drules',
@@ -293,7 +301,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #27 GUI update.
+			// #28 GUI update.
 			[
 				[
 					'db' => 'SELECT * FROM config',
@@ -301,7 +309,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #28 Autoregistration update.
+			// #29 Autoregistration update.
 			[
 				[
 					'db' => 'SELECT * FROM autoreg_host',
@@ -309,7 +317,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #29 Housekeeping update.
+			// #30 Housekeeping update.
 			[
 				[
 					'db' => 'SELECT * FROM housekeeper',
@@ -317,7 +325,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #30 Image update.
+			// #31 Image update.
 			[
 				[
 					'db' => 'SELECT * FROM images',
@@ -325,7 +333,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #31 Image create.
+			// #32 Image create.
 			[
 				[
 					'db' => 'SELECT * FROM images',
@@ -333,7 +341,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #32 Icon map update.
+			// #33 Icon map update.
 			[
 				[
 					'db' => 'SELECT * FROM icon_map',
@@ -341,7 +349,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #33 Icon map create.
+			// #34 Icon map create.
 			[
 				[
 					'db' => 'SELECT * FROM icon_map',
@@ -349,7 +357,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #34 Regular expression update.
+			// #35 Regular expression update.
 			[
 				[
 					'db' => 'SELECT * FROM regexps',
@@ -357,7 +365,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #35 Regular expression create.
+			// #36 Regular expression create.
 			[
 				[
 					'db' => 'SELECT * FROM regexps',
@@ -365,7 +373,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #36 Macros update.
+			// #37 Macros update.
 			[
 				[
 					'db' => 'SELECT * FROM globalmacro',
@@ -373,7 +381,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #37 Trigger displaying options update.
+			// #38 Trigger displaying options update.
 			[
 				[
 					'db' => 'SELECT * FROM config',
@@ -381,7 +389,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #38 API token create.
+			// #39 API token create.
 			[
 				[
 					'db' => 'SELECT * FROM token',
@@ -389,7 +397,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'create'
 				]
 			],
-			// #39 API token update.
+			// #40 API token update.
 			[
 				[
 					'db' => 'SELECT * FROM token',
@@ -397,7 +405,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #40 Other parameters update.
+			// #41 Other parameters update.
 			[
 				[
 					'db' => 'SELECT * FROM config',
@@ -405,7 +413,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #41 Proxy update.
+			// #42 Proxy update.
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
@@ -413,7 +421,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #42 Proxy create.
+			// #43 Proxy create.
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
@@ -421,7 +429,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'create'
 				]
 			],
-			// #43 Authentication update.
+			// #44 Authentication update.
 			[
 				[
 					'db' => 'SELECT * FROM config',
@@ -429,7 +437,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			//#44 User group update.
+			//#45 User group update.
 			[
 				[
 					'db' => 'SELECT * FROM users_groups',
@@ -437,7 +445,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #45 User group create.
+			// #46 User group create.
 			[
 				[
 					'db' => 'SELECT * FROM users_groups',
@@ -445,7 +453,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #46 User update.
+			// #47 User update.
 			[
 				[
 					'db' => 'SELECT * FROM users',
@@ -453,7 +461,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #47 User create.
+			// #48 User create.
 			[
 				[
 					'db' => 'SELECT * FROM users',
@@ -461,7 +469,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #48 Media update.
+			// #49 Media update.
 			[
 				[
 					'db' => 'SELECT * FROM media',
@@ -469,7 +477,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #49 Media create.
+			// #50 Media create.
 			[
 				[
 					'db' => 'SELECT * FROM media',
@@ -477,7 +485,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'create'
 				]
 			],
-			// #50 Script update.
+			// #51 Script update.
 			[
 				[
 					'db' => 'SELECT * FROM scripts',
@@ -485,7 +493,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #51 Script create.
+			// #52 Script create.
 			[
 				[
 					'db' => 'SELECT * FROM scripts',
@@ -493,7 +501,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'create'
 				]
 			],
-			// #52 User profile update.
+			// #53 User profile update.
 			[
 				[
 					'db' => 'SELECT * FROM profiles',
@@ -501,7 +509,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #53 User role update.
+			// #54 User role update.
 			[
 				[
 					'db' => 'SELECT * FROM role',
@@ -509,7 +517,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #54 User role create.
+			// #55 User role create.
 			[
 				[
 					'db' => 'SELECT * FROM role',
@@ -517,7 +525,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #55 User API token create.
+			// #56 User API token create.
 			[
 				[
 					'db' => 'SELECT * FROM token',
@@ -525,7 +533,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'create'
 				]
 			],
-			// #56 User API token update.
+			// #57 User API token update.
 			[
 				[
 					'db' => 'SELECT * FROM token',
@@ -533,7 +541,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #57 Scheduled report create.
+			// #58 Scheduled report create.
 			[
 				[
 					'db' => 'SELECT * FROM report',
@@ -541,7 +549,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #58 Scheduled report update.
+			// #59 Scheduled report update.
 			[
 				[
 					'db' => 'SELECT * FROM report',
@@ -549,7 +557,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #59 Connector create.
+			// #60 Connector create.
 			[
 				[
 					'db' => 'SELECT * FROM connector',
@@ -557,7 +565,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'create'
 				]
 			],
-			// #60 Connector update.
+			// #61 Connector update.
 			[
 				[
 					'db' => 'SELECT * FROM connector',
@@ -565,7 +573,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #61 Problem update.
+			// #62 Problem update.
 			[
 				[
 					'db' => 'SELECT * FROM problem, events, acknowledges',
@@ -573,7 +581,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'problem'
 				]
 			],
-			// #62 Service create.
+			// #63 Service create.
 			[
 				[
 					'db' => 'SELECT * FROM services',
@@ -581,7 +589,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'create'
 				]
 			],
-			// #63 Service update.
+			// #64 Service update.
 			[
 				[
 					'db' => 'SELECT * FROM services',
@@ -589,7 +597,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'service'
 				]
 			],
-			// #64 SLA create.
+			// #65 SLA create.
 			[
 				[
 					'db' => 'SELECT * FROM sla',
@@ -597,7 +605,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'create'
 				]
 			],
-			// #65 SLA update.
+			// #66 SLA update.
 			[
 				[
 					'db' => 'SELECT * FROM sla',
@@ -605,7 +613,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #66 Geomap update.
+			// #67 Geomap update.
 			[
 				[
 					'db' => 'SELECT * FROM config',
@@ -613,7 +621,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #67 Module update.
+			// #68 Module update.
 			[
 				[
 					'db' => 'SELECT * FROM module',
@@ -621,7 +629,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #68 Audit log administration update.
+			// #69 Audit log administration update.
 			[
 				[
 					'db' => 'SELECT * FROM module',
@@ -629,7 +637,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #69 Timeout options update.
+			// #70 Timeout options update.
 			[
 				[
 					'db' => 'SELECT * FROM config',

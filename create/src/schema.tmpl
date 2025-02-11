@@ -675,6 +675,7 @@ FIELD		|mfaid			|t_id		|	|NULL		|0		|5|mfa	|	|RESTRICT
 FIELD		|software_update_checkid|t_varchar(32)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|software_update_check_data	|t_text	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|timeout_browser	|t_varchar(255)	|'60s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|proxy_secrets_provider	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 INDEX		|3		|ldap_userdirectoryid
@@ -2347,4 +2348,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|7030012	|7030012
+ROW		|1		|7030013	|7030013

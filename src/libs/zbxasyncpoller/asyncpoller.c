@@ -229,15 +229,15 @@ void	zbx_async_dns_update_host_addresses(struct evdns_base *dnsbase)
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() update host addresses", __func__);
 
-#if defined(LIBEVENT_VERSION_NUMBER) && LIBEVENT_VERSION_NUMBER >= 0x02010600
-			evdns_base_clear_host_addresses(dnsbase);
-#endif
+			evdns_base_clear_nameservers_and_suspend(dnsbase);
 
 			if (0 != (ret = evdns_base_resolv_conf_parse(dnsbase, DNS_OPTIONS_ALL, ZBX_RES_CONF_FILE)))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "cannot parse resolv.conf result: %s",
 					zbx_resolv_conf_errstr(ret));
 			}
+
+			evdns_base_resume(dnsbase);
 		}
 		time_r = buf_r.st_mtime;
 		time_h = buf_h.st_mtime;

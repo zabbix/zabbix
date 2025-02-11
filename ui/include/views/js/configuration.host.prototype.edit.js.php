@@ -34,6 +34,7 @@
 			this.parent_host_interfaces = parent_host_interfaces;
 			this.parent_host_status = parent_host_status;
 			this.macros_templateids = null;
+			this.show_inherited_macros = false;
 
 			this.initHostTab();
 			this.initMacrosTab();
@@ -101,58 +102,35 @@
 
 		initMacrosTab() {
 			this.macros_manager = new HostMacrosManager({
-				'container':$('#macros_container .table-forms-td-right'),
-				'readonly': this.readonly,
-				'parent_hostid': this.parent_hostid
+				container: $('#macros_container .table-forms-td-right'),
+				readonly: this.readonly,
+				parent_hostid: this.parent_hostid
 			});
-			let macros_initialized = false;
 
-			$('#tabs').on('tabscreate tabsactivate', (event, ui) => {
-				let panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
-				const show_inherited_macros = this.form
-					.querySelector('input[name=show_inherited_macros]:checked').value == 1;
+			const show_inherited_macros_element = document.getElementById('show_inherited_macros');
+			this.show_inherited_macros = show_inherited_macros_element.querySelector('input:checked').value == 1;
 
-				if (panel.attr('id') === 'macro-tab') {
+			this.macros_manager.initMacroTable(this.show_inherited_macros);
 
-					// Please note that macro initialization must take place once and only when the tab is visible.
-					if (event.type === 'tabsactivate') {
-						const templateids = this.getAllTemplates();
+			const observer = new IntersectionObserver(entries => {
+				if (entries[0].isIntersecting && this.show_inherited_macros) {
+					const templateids = this.getAllTemplates();
 
-						// First time always load inherited macros.
-						if (this.macros_templateids === null) {
-							this.macros_templateids = templateids;
+					if (this.macros_templateids === null || this.macros_templateids.xor(templateids).length > 0) {
+						this.macros_templateids = templateids;
 
-							if (show_inherited_macros) {
-								this.macros_manager.load(show_inherited_macros, templateids);
-								macros_initialized = true;
-							}
-						}
-						// Other times load inherited macros only if templates changed.
-						else if (show_inherited_macros && this.macros_templateids.xor(templateids).length > 0) {
-							this.macros_templateids = templateids;
-							this.macros_manager.load(show_inherited_macros, templateids);
-						}
+						this.macros_manager.load(this.show_inherited_macros, templateids);
 					}
-
-					if (macros_initialized) {
-						return;
-					}
-
-					// Initialize macros.
-					if (this.readonly) {
-						$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
-					}
-					else {
-						this.macros_manager.initMacroTable(show_inherited_macros);
-					}
-
-					macros_initialized = true;
 				}
 			});
+			observer.observe(document.getElementById('macro-tab'));
 
-			this.form.querySelector('#show_inherited_macros').onchange = (e) => {
-				this.macros_manager.load(e.target.value == 1, this.getAllTemplates());
-			}
+			show_inherited_macros_element.addEventListener('change', e => {
+				this.show_inherited_macros = e.target.value == 1;
+				this.macros_templateids = this.getAllTemplates();
+
+				this.macros_manager.load(this.show_inherited_macros, this.macros_templateids);
+			});
 		}
 
 		initInventoryTab() {

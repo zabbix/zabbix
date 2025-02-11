@@ -227,6 +227,7 @@
 #define ZBX_PROTO_TAG_AUTH			"auth"
 #define ZBX_PROTO_TAG_LEASE_DURATION		"lease_duration"
 #define ZBX_PROTO_TAG_PREPROC			"preproc"
+#define ZBX_PROTO_TAG_PROXY_SECRETS_PROVIDER	"proxy_secrets_provider"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
