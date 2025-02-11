@@ -28,6 +28,13 @@ static int	DBpatch_7030000(void)
 	return DBadd_field("config", &field);
 }
 
+static int	DBpatch_7030001(void)
+{
+	const zbx_db_field_t	field = {"zindex", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps_elements", &field);
+}
+
 #endif
 
 DBPATCH_START(7030)
@@ -35,5 +42,6 @@ DBPATCH_START(7030)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(7030000, 0, 1)
+DBPATCH_ADD(7030001, 0, 1)
 
 DBPATCH_END()
