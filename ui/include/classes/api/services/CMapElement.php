@@ -36,7 +36,7 @@ abstract class CMapElement extends CApiService {
 			$selements = $this->extendFromObjects(zbx_toHash($selements, 'selementid'), $db_selements, ['elementtype', 'elements']);
 		}
 
-		foreach ($selements as &$selement) {
+		foreach ($selements as $key => &$selement) {
 			if (!is_array($selement)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
@@ -180,6 +180,15 @@ abstract class CMapElement extends CApiService {
 
 			if ($create) {
 				$selement['urls'] = array_key_exists('urls', $selement) ? $selement['urls'] : [];
+			}
+
+			// Additional "selements" validation rules.
+			$api_selement_rules = ['type' => API_OBJECT, 'fields' => [
+				'zindex' => ['type' => API_INT32]
+			]];
+			$data = array_intersect_key($selement, $api_selement_rules['fields']);
+			if (!CApiInputValidator::validate($api_selement_rules, $data, '/'.($key + 1), $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}
 		unset($selement);
