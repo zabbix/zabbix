@@ -1,0 +1,1 @@
+A......... [ZBX-26023] restored ability for users to get all alerts within same user group; fixed type of medias `provisioned` property in user.get (jfreibergs)
