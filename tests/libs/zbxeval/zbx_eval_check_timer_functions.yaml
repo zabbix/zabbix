@@ -40,3 +40,4 @@ in:
   expression: '1w + 2G + 3h + 4K + 5s '
 out:
   return: FAIL
+...
