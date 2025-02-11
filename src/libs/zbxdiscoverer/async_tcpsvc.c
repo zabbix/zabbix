@@ -296,7 +296,7 @@ static int	async_check_service_validate(zbx_tcpsvc_context_t *context, const cha
 }
 
 int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, unsigned char svc_type, AGENT_RESULT *result,
-		zbx_async_task_process_result_cb_t async_task_process_process_result_cb, void *arg, void *arg_action,
+		zbx_async_task_process_result_cb_t async_task_process_result_cb, void *arg, void *arg_action,
 		struct event_base *base, struct evdns_base *dnsbase, const char *config_source_ip,
 		zbx_async_resolve_reverse_dns_t resolve_reverse_dns)
 {
@@ -351,7 +351,7 @@ int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, unsigned char svc_type, AGENT_RE
 			&tcpsvc_context->tcp_send_context, result)))
 	{
 		zbx_async_poller_add_task(base, dnsbase, tcpsvc_context->item.interface.addr, tcpsvc_context,
-				item->timeout + 1, tcpsvc_task_process, async_task_process_process_result_cb);
+				item->timeout + 1, tcpsvc_task_process, async_task_process_result_cb);
 	}
 	else
 		zbx_async_check_tcpsvc_free(tcpsvc_context);
