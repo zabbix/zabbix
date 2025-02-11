@@ -75,7 +75,19 @@ $media_table_info_template = new CTemplateTag('media-row-tmpl',
 				->addClass('js-edit'),
 			(new CButtonLink(_('Remove')))
 				->setEnabled(true)
-				->addClass('js-remove')
+				->addClass('js-remove'),
+			(new CDiv([
+				new CInput('hidden', 'medias[#{row_index}][dstfrm]', '#{dstfrm}'),
+				new CInput('hidden', 'medias[#{row_index}][mediaid]', '#{mediaid}'),
+				new CInput('hidden', 'medias[#{row_index}][mediatypeid]', '#{mediatypeid}'),
+				new CInput('hidden', 'medias[#{row_index}][period]', '#{period}'),
+				new CInput('hidden', 'medias[#{row_index}][sendto]', '#{sendto}'),
+				new CInput('hidden', 'medias[#{row_index}][severity]', '#{severity}'),
+				new CInput('hidden', 'medias[#{row_index}][active]', '#{active}'),
+				new CInput('hidden', 'medias[#{row_index}][provisioned]', '#{provisioned}'),
+				new CInput('hidden', 'medias[#{row_index}][name]', '#{name}'),
+				new CInput('hidden', 'medias[#{row_index}][mediatype]', '#{mediatype}')
+			]))
 		]))
 	]))->setAttribute('data-row_index', '#{row_index}')
 		->setId('medias_#{row_index}')

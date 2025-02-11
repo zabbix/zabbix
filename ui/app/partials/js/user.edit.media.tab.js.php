@@ -21,7 +21,7 @@
 			this.form_name = form_name;
 			this.medias = medias;
 			this.severity_config = severity_config;
-			this.row_index = 1;
+			this.row_index = 0;
 			this.mediatypes = mediatypes;
 
 			this.#initActions();
@@ -125,16 +125,6 @@
 			Object.assign(button.dataset, {status_type: 'enable_media'});
 		}
 
-		#createHiddenInput(index, key, value) {
-			const input = document.createElement('input');
-
-			input.type = 'hidden';
-			input.name = `medias[${index}][${key}]`;
-			input.value = value;
-
-			return input;
-		}
-
 		#createSeverity(data, severities_span) {
 			let severity = <?= TRIGGER_SEVERITY_NOT_CLASSIFIED ?>;
 
@@ -152,14 +142,6 @@
 				}
 
 				Object.assign(span.dataset, hintboxData);
-			}
-		}
-
-		#createHiddenInputs(data) {
-			const form = document.querySelector(`[name="${this.form_name}"]`);
-
-			for (const key in data) {
-				form.appendChild(this.#createHiddenInput(data.row_index, key, data[key]));
 			}
 		}
 
@@ -193,7 +175,7 @@
 		}
 
 		#createDataTemplate(data, index) {
-			data.row_index = index === undefined ? ++this.row_index : index;
+			data.row_index = index === undefined ? this.row_index : index;
 			data.dstfrm = this.form_name;
 			data.media = data.row_index;
 			data.parameters = structuredClone(data);
@@ -217,6 +199,7 @@
 			}
 
 			data.parameters = JSON.stringify(data.parameters);
+			this.row_index++
 		}
 
 		#createTemplate(data, index) {
@@ -254,7 +237,6 @@
 			}
 
 			this.#createSeverity(data, temp.querySelectorAll('.status-container span'));
-			this.#createHiddenInputs(data);
 
 			return temp;
 		}
