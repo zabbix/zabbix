@@ -33,7 +33,7 @@ $condition_type = (int) $data['last_type'];
 $form_grid = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Type'), 'label-condition-type'),
-		new CFormField((new CSelect('conditiontype'))
+		new CFormField((new CSelect('type'))
 			->setFocusableElementId('label-condition-type')
 			->setValue($condition_type)
 			->setId('condition-type')
@@ -76,19 +76,18 @@ switch ($condition_type) {
 		}
 
 		$hostgroup_multiselect = (new CMultiSelect([
-			'name' => 'groupids[]',
+			'name' => 'groupid[]',
 			'object_name' => 'hostGroup',
-			'default_value' => 0,
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
-					'dstfld1' => 'groupids_'
+					'dstfld1' => 'groupid_'
 				]
 			]
 		]))
-			->setId('groupids_')
+			->setId('groupid_')
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
 		$form_grid
@@ -97,7 +96,7 @@ switch ($condition_type) {
 				new CFormField($operator)
 			])
 			->addItem([
-				(new CLabel(_('Host groups'), 'groupids__ms'))->setAsteriskMark(),
+				(new CLabel(_('Host groups'), 'groupid__ms'))->setAsteriskMark(),
 				new CFormField($hostgroup_multiselect)
 			]);
 		break;
@@ -169,7 +168,9 @@ switch ($condition_type) {
 $form
 	->addItem($form_grid)
 	->addItem(
-		(new CScriptTag('correlation_condition_popup.init();'))->setOnDocumentReady()
+		(new CScriptTag('correlation_condition_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules']
+		]).');'))->setOnDocumentReady()
 	);
 
 $output = [

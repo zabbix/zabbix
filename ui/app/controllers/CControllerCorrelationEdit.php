@@ -22,15 +22,14 @@ class CControllerCorrelationEdit extends CController {
 	private $correlation = [];
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
-		$fields = [
-			'correlationid' => 'db correlation.correlationid'
-		];
-
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput(['object', 'fields' => [
+			'correlationid' => ['db correlation.correlationid']
+		]]);
 
 		if (!$ret) {
 			$this->setResponse(
@@ -87,12 +86,9 @@ class CControllerCorrelationEdit extends CController {
 			$condition += [
 				'operator' => array_key_exists('operator', $condition)
 					? (int) $condition['operator']
-					: CONDITION_OPERATOR_EQUAL,
-				'conditiontype' => (int) $condition['type']
+					: CONDITION_OPERATOR_EQUAL
 			];
 			$condition['operator_name'] = CCorrelationHelper::getLabelByOperator($condition['operator']);
-
-			unset($condition['type']);
 		}
 		unset($condition);
 

@@ -25,7 +25,6 @@ window.correlation_edit_popup = new class {
 		this.overlay = overlays_stack.getById('correlation.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
-		this.form_class = new Form(this.form_element, rules);
 		this.form = new CForm(this.form_element, rules);
 		this.correlation = correlation;
 		this.correlationid = correlation.correlationid;
@@ -103,7 +102,7 @@ window.correlation_edit_popup = new class {
 		[...labels].forEach((label) => {
 			conditions.push({
 				id: label.dataset.formulaid,
-				type: label.dataset.conditiontype
+				type: label.dataset.type
 			});
 		});
 
@@ -118,25 +117,16 @@ window.correlation_edit_popup = new class {
 	#addConditionRow(condition) {
 		const row_ids = [];
 
-		this.form_element.querySelectorAll('#condition_table tr[id^=conditions_]').forEach((row) => row_ids.push(row.id));
+		this.form_element.querySelectorAll('#condition_table tr[id^=conditions_]')
+			.forEach((row) => row_ids.push(row.id));
 
 		condition.row_index ??= 0;
 
-		/*
-		 * When controller passes data ir gives only one group ID for each condition. Condition popup can give multiple
-		 * IDs and then they are split into rows.
-		 */
-		if (condition.groupid) {
-			condition.groupids = condition.groupid;
-		}
-
-		if (condition.groupids) {
-			Object.keys(condition.groupids).forEach((key) => {
-				let element = {...condition, name: condition.groupids[key], value: key};
-
-				element.groupid = key;
-
+		if ('groupid' in condition && condition.groupid) {
+			Object.entries(condition.groupid).forEach(([groupid, name]) => {
+				let element = {...condition, name, groupid};
 				let has_row = this.#checkConditionRow(element);
+
 				const result = [has_row.some((element) => element === true)];
 
 				if (result[0] === true) {
@@ -150,12 +140,13 @@ window.correlation_edit_popup = new class {
 
 					element.condition_name = this.#getConditionData(condition);
 					element.data = element.name;
-					element.conditiontype = condition.conditiontype;
+					element.type = condition.type;
 					element.label = num2letter(element.row_index);
-					element.groupid = key;
 					condition.row_index++;
 
-					const template = new Template(this.form_element.querySelector('#condition-hostgr-row-tmpl').innerHTML);
+					const template = new Template(
+						this.form_element.querySelector('#condition-hostgr-row-tmpl').innerHTML
+					);
 
 					this.form_element
 						.querySelector('#condition_table tbody')
@@ -178,7 +169,7 @@ window.correlation_edit_popup = new class {
 
 				condition.label = num2letter(condition.row_index);
 
-				switch (parseInt(condition.conditiontype)) {
+				switch (parseInt(condition.type)) {
 					case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG ?>:
 					case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG ?>:
 						template = new Template(this.form_element.querySelector('#condition-tag-row-tmpl').innerHTML);
@@ -204,7 +195,6 @@ window.correlation_edit_popup = new class {
 
 				condition.condition_name = this.#getConditionData(condition)[0];
 				condition.data = this.#getConditionData(condition)[1];
-				condition.conditiontype = condition.conditiontype;
 
 				this.form_element
 					.querySelector('#condition_table tbody')
@@ -230,7 +220,7 @@ window.correlation_edit_popup = new class {
 		let value;
 		let value2;
 
-		switch (parseInt(condition.conditiontype)) {
+		switch (parseInt(condition.type)) {
 			case <?= ZBX_CORR_CONDITION_EVENT_TAG_PAIR ?>:
 				condition_name = <?= json_encode(_('Value of old event tag')) ?>;
 				condition_name2 = <?= json_encode(_('value of new event tag')) ?>;
@@ -287,32 +277,31 @@ window.correlation_edit_popup = new class {
 
 		[...this.form_element.querySelectorAll('#condition_table tr[id^=conditions_]')].forEach((element) => {
 			const type = element.querySelector('input[name*="type"]').value;
+			const same_type = parseInt(condition.type, 10) == parseInt(type, 10);
 
 			switch (parseInt(type)) {
 				case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG ?>:
 				case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG ?>:
-					result.push(condition.conditiontype === type
-						&& condition.tag === element.querySelector('input[name*="tag"]').value
-					);
+					result.push(same_type && condition.tag === element.querySelector('input[name*="tag"]').value);
 					break;
 
 				case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE ?>:
 				case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE ?>:
-					result.push(condition.conditiontype === type
+					result.push(same_type
 						&& condition.tag === element.querySelector('input[name*="tag"]').value
 						&& condition.value === element.querySelector('input[name*="value"]').value
 					);
 					break;
 
 				case <?= ZBX_CORR_CONDITION_EVENT_TAG_PAIR ?>:
-					result.push(condition.conditiontype === type
+					result.push(same_type
 						&& condition.oldtag === element.querySelector('input[name*="oldtag"]').value
 						&& condition.newtag === element.querySelector('input[name*="newtag"]').value
 					);
 					break;
 
 				case <?= ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP ?>:
-					result.push(condition.conditiontype === type
+					result.push(same_type
 						&& condition.groupid === element.querySelector('input[name*="groupid"]').value
 					);
 					break;
@@ -322,7 +311,7 @@ window.correlation_edit_popup = new class {
 		return result;
 	}
 
-	clone({title, buttons}) {
+	clone({title, buttons, rules}) {
 		this.correlationid = null;
 
 		this.form.reload(rules);

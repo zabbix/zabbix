@@ -18,6 +18,7 @@ class CControllerCorrelationConditionCheck extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
@@ -30,13 +31,13 @@ class CControllerCorrelationConditionCheck extends CController {
 			$validator = new CEventCorrCondValidator();
 
 			$is_valid = $validator->validate([
-				'type' => $this->getInput('conditiontype'),
+				'type' => $this->getInput('type'),
 				'operator' => $this->getInput('operator'),
 				'tag' => $this->getInput('tag', ''),
 				'oldtag' => $this->getInput('oldtag', ''),
 				'newtag' => $this->getInput('newtag', ''),
 				'value' => $this->getInput('value', ''),
-				'groupids' => $this->getInput('groupids', '')
+				'groupids' => $this->getInput('groupid', '')
 			]);
 
 			if (!$is_valid) {
@@ -46,13 +47,12 @@ class CControllerCorrelationConditionCheck extends CController {
 		}
 
 		if (!$ret) {
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])]))->disableView()
-			);
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode(array_filter([
+				'form_errors' => $form_errors ?? null,
+				'error' => !$form_errors
+					? ['messages' => array_column(get_and_clear_messages(), 'message')]
+					: null
+			]))]));
 		}
 
 		return $ret;
@@ -64,13 +64,13 @@ class CControllerCorrelationConditionCheck extends CController {
 
 	protected function doAction(): void {
 		$output = [
-			'conditiontype' => $this->getInput('conditiontype'),
+			'type' => $this->getInput('type'),
 			'operator' => $this->getInput('operator'),
 			'tag' => $this->getInput('tag', ''),
 			'oldtag' => $this->getInput('oldtag', ''),
 			'newtag' => $this->getInput('newtag', ''),
 			'value' => $this->getInput('value', ''),
-			'groupids' => $this->hasInput('groupids') ? $this->getGroups($this->getInput('groupids')) : '',
+			'groupid' => $this->hasInput('groupid') ? $this->getGroups($this->getInput('groupid')) : '',
 			'operator_name' => CCorrelationHelper::getLabelByOperator($this->getInput('operator')),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

@@ -22,14 +22,20 @@
 $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('correlation')))->removeId())
 	->setId('correlation-form')
-	->addVar('correlationid', $data['correlationid'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
+
+if ($data['correlation']['correlationid']) {
+	$form->addItem(
+		(new CInput('hidden', 'correlationid', $data['correlation']['correlationid']))
+			->setAttribute('data-field-type', 'hidden')
+	);
+}
 
 $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('name', $data['name']))
+			(new CTextBox('name', $data['correlation']['name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
@@ -60,10 +66,12 @@ $condition_tag_template = (new CTemplateTag('condition-tag-row-tmpl'))
 					->setName('conditions[#{row_index}][operator]'),
 				(new CInput('hidden'))
 					->setAttribute('value', '#{tag}')
-					->setName('conditions[#{row_index}][tag]'),
+					->setName('conditions[#{row_index}][tag]')
+					->setAttribute('data-field-type', 'hidden'),
 				(new CInput('hidden'))
 					->setAttribute('value', '#{label}')
 					->setName('conditions[#{row_index}][formulaid]')
+					->setAttribute('data-field-type', 'hidden')
 			]))
 		]))->setId('conditions_#{row_index}')
 	);
@@ -72,7 +80,7 @@ $condition_hostgroup_template = (new CTemplateTag('condition-hostgr-row-tmpl'))-
 	(new CRow([
 		(new CCol('#{label}'))
 			->addClass('label')
-			->setAttribute('data-conditiontype', '#{conditiontype}')
+			->setAttribute('data-conditiontype', '#{type}')
 			->setAttribute('data-formulaid', '#{label}'),
 		(new CCol([
 			'#{condition_name}', ' ', new CTag('em', true, '#{data}')
@@ -82,11 +90,13 @@ $condition_hostgroup_template = (new CTemplateTag('condition-hostgr-row-tmpl'))-
 		(new CCol([
 			$remove_button,
 			(new CInput('hidden'))
-				->setAttribute('value', '#{conditiontype}')
-				->setName('conditions[#{row_index}][type]'),
+				->setAttribute('value', '#{type}')
+				->setName('conditions[#{row_index}][type]')
+				->setAttribute('data-field-type', 'hidden'),
 			(new CInput('hidden'))
 				->setAttribute('value', '#{operator}')
-				->setName('conditions[#{row_index}][operator]'),
+				->setName('conditions[#{row_index}][operator]')
+				->setAttribute('data-field-type', 'hidden'),
 			(new CInput('hidden'))
 				->setAttribute('value', '#{groupid}')
 				->setName('conditions[#{row_index}][groupid]'),
@@ -101,7 +111,7 @@ $condition_tag_pair_template = (new CTemplateTag('condition-tag-pair-row-tmpl'))
 	(new CRow([
 		(new CCol('#{label}'))
 			->addClass('label')
-			->setAttribute('data-conditiontype', '#{conditiontype}')
+			->setAttribute('data-conditiontype', '#{type}')
 			->setAttribute('data-formulaid', '#{label}'),
 		(new CCol([
 			'#{condition_name}', ' ', new CTag('em', true, '#{data_old_tag}'), ' ', '#{condition_operator}', ' ',
@@ -112,20 +122,25 @@ $condition_tag_pair_template = (new CTemplateTag('condition-tag-pair-row-tmpl'))
 		(new CCol([
 			$remove_button,
 			(new CInput('hidden'))
-				->setAttribute('value', '#{conditiontype}')
-				->setName('conditions[#{row_index}][type]'),
+				->setAttribute('value', '#{type}')
+				->setName('conditions[#{row_index}][type]')
+				->setAttribute('data-field-type', 'hidden'),
 			(new CInput('hidden'))
 				->setAttribute('value', '#{operator}')
-				->setName('conditions[#{row_index}][operator]'),
+				->setName('conditions[#{row_index}][operator]')
+				->setAttribute('data-field-type', 'hidden'),
 			(new CInput('hidden'))
 				->setAttribute('value', '#{oldtag}')
-				->setName('conditions[#{row_index}][oldtag]'),
+				->setName('conditions[#{row_index}][oldtag]')
+				->setAttribute('data-field-type', 'hidden'),
 			(new CInput('hidden'))
 				->setAttribute('value', '#{newtag}')
-				->setName('conditions[#{row_index}][newtag]'),
+				->setName('conditions[#{row_index}][newtag]')
+				->setAttribute('data-field-type', 'hidden'),
 			(new CInput('hidden'))
 				->setAttribute('value', '#{label}')
 				->setName('conditions[#{row_index}][formulaid]')
+				->setAttribute('data-field-type', 'hidden')
 		]))
 	]))->setId('conditions_#{row_index}')
 );
@@ -134,7 +149,7 @@ $condition_old_new_tag_template = (new CTemplateTag('condition-old-new-tag-row-t
 	(new CRow([
 		(new CCol('#{label}'))
 			->addClass('label')
-			->setAttribute('data-conditiontype', '#{conditiontype}')
+			->setAttribute('data-conditiontype', '#{type}')
 			->setAttribute('data-formulaid', '#{label}'),
 		(new CCol([
 			'#{condition_name}', ' ', new CTag('em', true, '#{tag}'), ' ',
@@ -145,20 +160,25 @@ $condition_old_new_tag_template = (new CTemplateTag('condition-old-new-tag-row-t
 		(new CCol([
 			$remove_button,
 			(new CInput('hidden'))
-				->setAttribute('value', '#{conditiontype}')
-				->setName('conditions[#{row_index}][type]'),
+				->setAttribute('value', '#{type}')
+				->setName('conditions[#{row_index}][type]')
+				->setAttribute('data-field-type', 'hidden'),
 			(new CInput('hidden'))
 				->setAttribute('value', '#{operator}')
-				->setName('conditions[#{row_index}][operator]'),
+				->setName('conditions[#{row_index}][operator]')
+				->setAttribute('data-field-type', 'hidden'),
 			(new CInput('hidden'))
 				->setAttribute('value', '#{tag}')
-				->setName('conditions[#{row_index}][tag]'),
+				->setName('conditions[#{row_index}][tag]')
+				->setAttribute('data-field-type', 'hidden'),
 			(new CInput('hidden'))
 				->setAttribute('value', '#{value}')
-				->setName('conditions[#{row_index}][value]'),
+				->setName('conditions[#{row_index}][value]')
+				->setAttribute('data-field-type', 'hidden'),
 			(new CInput('hidden'))
 				->setAttribute('value', '#{label}')
 				->setName('conditions[#{row_index}][formulaid]')
+				->setAttribute('data-field-type', 'hidden')
 		]))
 	]))->setId('conditions_#{row_index}')
 );
@@ -194,20 +214,20 @@ $form_grid
 			[
 				(new CDiv(
 					(new CSelect('evaltype'))
-					->setId('evaltype')
-					->setValue($data['evaltype'])
-					->setFocusableElementId('evaltype_select')
-					->addOptions(CSelect::createOptionsFromArray([
-						CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
-						CONDITION_EVAL_TYPE_AND => _('And'),
-						CONDITION_EVAL_TYPE_OR => _('Or'),
-						CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
-					]))
-					->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
+						->setId('evaltype')
+						->setValue($data['correlation']['evaltype'])
+						->setFocusableElementId('evaltype_select')
+						->addOptions(CSelect::createOptionsFromArray([
+							CONDITION_EVAL_TYPE_AND_OR => _('And/Or'),
+							CONDITION_EVAL_TYPE_AND => _('And'),
+							CONDITION_EVAL_TYPE_OR => _('Or'),
+							CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
+						]))
+						->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
 				))->addClass(ZBX_STYLE_CELL),
 				(new CDiv([
 					(new CSpan())->setId('expression'),
-					(new CTextBox('formula', $data['formula']))
+					(new CTextBox('formula', $data['correlation']['formula']))
 						->addStyle('width: 100%;')
 						->setId('formula')
 						->setAttribute('placeholder', 'A or (B and C) ...')
@@ -231,7 +251,7 @@ $form_grid
 	->addItem([
 		new CLabel(_('Description'), 'description'),
 		new CFormField(
-			(new CTextArea('description', $data['description']))
+			(new CTextArea('description', $data['correlation']['description']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setMaxlength(DB::getFieldLength('hosts', 'description'))
 		)
@@ -243,7 +263,7 @@ $form_grid
 				->setOptions([
 					[
 						'label' => _('Close old events'),
-						'checked' => $data['op_close_old'],
+						'checked' => $data['correlation']['op_close_old'],
 						'name' => 'op_close_old',
 						'id' => 'operation_0_type',
 						'value' => '1',
@@ -252,7 +272,7 @@ $form_grid
 					],
 					[
 						'label' => _('Close new event'),
-						'checked' => $data['op_close_new'],
+						'checked' => $data['correlation']['op_close_new'],
 						'name' => 'op_close_new',
 						'id' => 'operation_1_type',
 						'value' => '1',
@@ -272,7 +292,7 @@ $form_grid
 		new CLabel(_('Enabled'), 'status'),
 		new CFormField(
 			(new CCheckBox('status', ZBX_CORRELATION_ENABLED))
-				->setChecked($data['status'] == ZBX_CORRELATION_ENABLED)
+				->setChecked($data['correlation']['status'] == ZBX_CORRELATION_ENABLED)
 				->setUncheckedValue(ZBX_CORRELATION_DISABLED)
 		)
 	]);
@@ -282,7 +302,8 @@ $form
 	->addItem(
 		(new CScriptTag(
 			'correlation_edit_popup.init('.json_encode([
-				'correlation' => $data
+				'correlation' => $data['correlation'],
+				'rules' => $data['js_validation_rules']
 			], JSON_THROW_ON_ERROR).');'
 		))->setOnDocumentReady()
 	);

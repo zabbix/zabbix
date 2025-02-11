@@ -122,11 +122,11 @@ class CControllerCorrelationUpdate extends CController {
 		}
 		unset($condition);
 
-		if ($this->hasInput('op_close_old')) {
+		if ($this->getInput('op_close_old', 0)) {
 			$correlation['operations'][] = ['type' => ZBX_CORR_OPERATION_CLOSE_OLD];
 		}
 
-		if ($this->hasInput('op_close_new')) {
+		if ($this->getInput('op_close_new', 0)) {
 			$correlation['operations'][] = ['type' => ZBX_CORR_OPERATION_CLOSE_NEW];
 		}
 

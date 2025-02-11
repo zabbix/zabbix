@@ -21,7 +21,7 @@
 
 window.correlation_condition_popup = new class {
 
-	init() {
+	init({rules}) {
 		this.overlay = overlays_stack.getById('correlation-condition-form');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');

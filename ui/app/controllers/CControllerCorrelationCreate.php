@@ -74,22 +74,20 @@ class CControllerCorrelationCreate extends CController {
 		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
-<<<<<<< HEAD
-			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-=======
 			$form_errors = $this->getValidationError();
 
 			$response = array_filter([
 				'form_errors' => $form_errors ?? null,
 				'error' => !$form_errors
 					? [
->>>>>>> 762e65405ca (..F....... [ZBXNEXT-8791] fixed silent conflicts in event correlation form)
 						'title' => _('Cannot create event correlation'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				], JSON_THROW_ON_ERROR)])
+					: null
+			]);
+
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode($response, JSON_THROW_ON_ERROR)])
 			);
 		}
 
@@ -132,11 +130,11 @@ class CControllerCorrelationCreate extends CController {
 		}
 		unset($condition);
 
-		if ($this->hasInput('op_close_old')) {
+		if ($this->getInput('op_close_old', 0)) {
 			$correlation['operations'][] = ['type' => ZBX_CORR_OPERATION_CLOSE_OLD];
 		}
 
-		if ($this->hasInput('op_close_new')) {
+		if ($this->getInput('op_close_new', 0)) {
 			$correlation['operations'][] = ['type' => ZBX_CORR_OPERATION_CLOSE_NEW];
 		}
 
