@@ -38,7 +38,7 @@ class CControllerExport extends CController {
 		}
 
 		if (!CHtmlUrlValidator::validateSameSite($this->getInput('backurl'))) {
-			access_deny(ACCESS_DENY_PAGE);
+			throw new CAccessDeniedException();
 		}
 
 		return $ret;

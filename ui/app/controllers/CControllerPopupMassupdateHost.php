@@ -90,7 +90,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 		}
 
 		if ($this->hasInput('backurl') && !CHtmlUrlValidator::validateSameSite($this->getInput('backurl'))) {
-			access_deny(ACCESS_DENY_PAGE);
+			throw new CAccessDeniedException();
 		}
 
 		return $ret;
