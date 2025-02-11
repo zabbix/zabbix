@@ -40,7 +40,7 @@ zbx_async_task_t;
 
 static void	async_reverse_dns_event(int err, char type, int count, int ttl, void *addresses, void *arg);
 
-static void	async_task_remove(zbx_async_task_t *task)
+static void	async_task_process_result_and_remove(zbx_async_task_t *task)
 {
 	task->async_task_process_result_cb(task->data);
 
@@ -91,7 +91,7 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 	switch (ret)
 	{
 		case ZBX_ASYNC_TASK_STOP:
-			async_task_remove(task);
+			async_task_process_result_and_remove(task);
 			break;
 		case ZBX_ASYNC_TASK_RESOLVE_REVERSE:
 			event_free(task->timeout_event);
