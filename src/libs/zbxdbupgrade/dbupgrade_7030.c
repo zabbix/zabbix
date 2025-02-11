@@ -119,19 +119,33 @@ static int	DBpatch_7030010(void)
 
 static int	DBpatch_7030011(void)
 {
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("update sysmaps_links sl set indicator_type = 1 "
+			"where exists (select null from sysmaps_link_triggers slt where slt.linkid = sl.linkid)"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7030012(void)
+{
 	const zbx_db_field_t	field = {"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("sysmaps_links", &field);
 }
 
-static int	DBpatch_7030012(void)
+static int	DBpatch_7030013(void)
 {
 	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("sysmaps_links", 4, &field);
 }
 
-static int	DBpatch_7030013(void)
+static int	DBpatch_7030014(void)
 {
 	if (FAIL == zbx_db_index_exists("sysmaps_links", "sysmaps_links_4"))
 		return DBcreate_index("sysmaps_links", "sysmaps_links_4", "itemid", 0);
@@ -159,5 +173,6 @@ DBPATCH_ADD(7030010, 0, 1)
 DBPATCH_ADD(7030011, 0, 1)
 DBPATCH_ADD(7030012, 0, 1)
 DBPATCH_ADD(7030013, 0, 1)
+DBPATCH_ADD(7030014, 0, 1)
 
 DBPATCH_END()
