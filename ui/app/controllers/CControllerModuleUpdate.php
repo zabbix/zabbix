@@ -21,7 +21,7 @@ class CControllerModuleUpdate extends CController {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	static function getValidationRules() {
+	static function getValidationRules(): array {
 		return ['object', 'fields' => [
 			'moduleid' => ['db module.moduleid', 'required'],
 			'status' => ['db module.status', 'in' => [MODULE_STATUS_ENABLED]]
@@ -29,15 +29,23 @@ class CControllerModuleUpdate extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput($this->getValidationRules());
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
-			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
+			$form_errors = $this->getValidationError();
+
+			$response = array_filter([
+				'form_errors' => $form_errors ?? null,
+				'error' => !$form_errors
+					? [
+						'title' => _('Cannot update module'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])])
+					: null
+			]);
+
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode($response, JSON_THROW_ON_ERROR)])
 			);
 		}
 

@@ -17,22 +17,20 @@
 
 window.module_edit = new class {
 
-	init() {
+	init({rules}) {
 		this.overlay = overlays_stack.getById('module.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
-		this.form = new Form(this.form_element, rules);
+		this.form = new CForm(this.form_element, rules);
 
 		const return_url = new URL('zabbix.php', location.href);
+
 		return_url.searchParams.set('action', 'module.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 	}
 
 	submit() {
 		const fields = getFormFields(this.form_element);
-		const curl = new Curl('zabbix.php');
-
-		curl.setArgument('action', 'module.update');
 
 		this.form.validateSubmit(fields)
 			.then((result) => {
@@ -40,12 +38,21 @@ window.module_edit = new class {
 					return;
 				}
 
-				this._post(curl.getUrl(), fields, (response) => {
-					overlayDialogueDestroy(this.overlay.dialogueid);
-				}
+				const curl = new Curl('zabbix.php');
 
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+				curl.setArgument('action', 'module.update');
+
+				this._post(curl.getUrl(), fields, (response) => {
+					if (!response) {
+						return;
+					}
+
+					overlayDialogueDestroy(this.overlay.dialogueid);
+
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+				});
+			})
+			.finally(() => this.overlay.unsetLoading());
 	}
 
 	_post(url, data, success_callback) {
