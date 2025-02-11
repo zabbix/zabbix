@@ -1009,6 +1009,11 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initializes zbxdiag library with component-specific callback      *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_diag_init(zbx_diag_add_section_info_func_t diag_add_section_info_func)
 {
 	diag_add_section_info_cb = diag_add_section_info_func;
