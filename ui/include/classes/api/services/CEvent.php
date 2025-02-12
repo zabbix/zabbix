@@ -1333,7 +1333,7 @@ class CEvent extends CApiService {
 		if ($tag_conditions) {
 			if ($value == TRIGGER_VALUE_TRUE) {
 				$sqlParts['left_join'][] = ['alias' => 'et', 'table' => 'event_tag', 'using' => 'eventid'];
-				$sqlParts['left_table'] = ['alias' => 'e', 'table' => 'event'];
+				$sqlParts['left_table'] = ['alias' => 'e', 'table' => 'events'];
 			}
 			else {
 				$sqlParts['from']['er'] = 'event_recovery er';
