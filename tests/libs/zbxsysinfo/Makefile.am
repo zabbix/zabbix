@@ -1,5 +1,6 @@
 SUBDIRS = \
 	common \
+	agent \
 	@ARCH@
 
 if SERVER

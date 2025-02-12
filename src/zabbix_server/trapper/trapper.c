@@ -49,7 +49,8 @@ extern unsigned char			program_type;
 extern ZBX_THREAD_LOCAL int		server_num, process_num;
 extern size_t				(*find_psk_in_cache)(const unsigned char *, unsigned char *, unsigned int *);
 
-extern int	CONFIG_CONFSYNCER_FORKS;
+extern int		CONFIG_CONFSYNCER_FORKS;
+extern unsigned int	configured_tls_accept_modes;
 
 typedef struct
 {
@@ -1248,9 +1249,16 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 
 static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts)
 {
-	ssize_t	bytes_received;
+	ssize_t		bytes_received;
+	unsigned char	flags = 0;
 
-	if (FAIL == (bytes_received = zbx_tcp_recv_ext(sock, CONFIG_TRAPPER_TIMEOUT, ZBX_TCP_LARGE)))
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
+	{
+		if (0 != (configured_tls_accept_modes & sock->connection_type))
+			flags = ZBX_TCP_LARGE;
+	}
+
+	if (FAIL == (bytes_received = zbx_tcp_recv_ext(sock, CONFIG_TRAPPER_TIMEOUT, flags)))
 		return;
 
 	process_trap(sock, sock->buffer, bytes_received, ts);

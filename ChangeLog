@@ -1,3 +1,28 @@
+Changes for 6.0.39rc1
+
+New features:
+.........T [ZBXNEXT-9584] added improvements and fixes to Dell HTTP and SNMP templates (abrosimovs, knaglis)
+.........T [ZBXNEXT-9654] added Azure SQL managed instance template (abrosimovs)
+
+Bug fixes:
+.......PS. [ZBX-25867] fixed crash in preprocessing manager when unlinking dependent items from frequently collected master item (vso)
+...G...... [ZBX-25543] fixed crash when global regular expression is updated on Zabbix agent2 (vso)
+.......PS. [ZBX-22580] reduced nodata trigger false-positives after Zabbix proxy connection disruption (arimdjonoks)
+.........T [ZBX-25458] fixed LLD rule for organization discovery, changed host prototype "host" field to avoid special characters (abiba)
+.........T [ZBX-25504] updated quorum and quorum member discoveries for family of MSSQL templates (akotsegubov)
+...G...... [ZBX-25442] fixed Zabbix agent interpretation of Modbus result data for mixed endianness modes (asestakovs)
+...G...... [ZBX-25530] fixed Zabbix agent 2 startup failures caused by insufficient buffer size for performance counters (asestakovs)
+...G...... [ZBX-25382] applied pkgsrc patch to restore builds on NetBSD >= 8.2 (jxl)
+...G...... [ZBX-22522] fixed web.page.get curl header (sboidenko)
+.........T [ZBX-25601] fixed HTTP proxy parameter name in MS 365 reports by HTTP template (drasikhov)
+..F....... [ZBX-25666] fixed maintenance status display for submap elements when trigger elements are used (esekace)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.38
+
+6.0.38rc1 was released as 6.0.38 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.38rc1
 
 Bug fixes:
@@ -3369,6 +3394,18 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.47rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.46
+
+5.0.46rc1 was released as 5.0.46 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.46rc1
