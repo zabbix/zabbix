@@ -25,7 +25,7 @@ $html_page = new CHtmlPage();
 
 $widget_name = _('Notifications');
 $html_page->setTitleSubmenu(getUserSettingsSubmenu());
-$doc_url = CDocHelper::USERS_USERPROFILE_EDIT;
+$doc_url = CDocHelper::USERS_USERPROFILE_NOTIFICATION_EDIT;
 $csrf_token = CCsrfTokenHelper::get('userprofile');
 
 $html_page
