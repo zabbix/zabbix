@@ -567,8 +567,8 @@ static int	expression_item_check_tag(zbx_expression_item_t *item, const char *ta
  *           calls that are evaluated by this callback.                       *
  *                                                                            *
  ******************************************************************************/
-static int	eval_function_filter_expression(const char *name, size_t len, int args_num, zbx_variant_t *args,
-		void *data, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
+static int	eval_function_filter(const char *name, size_t len, int args_num, zbx_variant_t *args, void *data,
+		const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
 {
 	zbx_expression_eval_many_t	*many = (zbx_expression_eval_many_t *)data;
 
@@ -687,7 +687,7 @@ static void	expression_init_query_many(zbx_expression_eval_t *eval, zbx_expressi
 			eval_data.itemid = itemhosts.values[i].first;
 			eval_data.hostid = itemhosts.values[i].second;
 
-			if (SUCCEED != zbx_eval_execute_ext(&ctx, NULL, eval_function_filter_expression, NULL,
+			if (SUCCEED != zbx_eval_execute_ext(&ctx, NULL, eval_function_filter, NULL,
 					(void *)&eval_data, &filter_value, &errmsg))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "failed to evaluate item query filter: %s", errmsg);
@@ -1849,8 +1849,8 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	eval_function_history_expression(const char *name, size_t len, int args_num, zbx_variant_t *args,
-		void *data, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
+static int	eval_function_history(const char *name, size_t len, int args_num, zbx_variant_t *args, void *data,
+		const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
 {
 	int			ret = FAIL;
 	zbx_expression_eval_t	*eval;
@@ -1930,8 +1930,8 @@ out:
  *           it's used to check for /host/key query quoting errors instead.   *
  *                                                                            *
  ******************************************************************************/
-static int	eval_function_common_expression(const char *name, size_t len, int args_num, zbx_variant_t *args,
-		void *data, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
+static int	eval_function_common(const char *name, size_t len, int args_num, zbx_variant_t *args, void *data,
+		const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
 {
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(ts);
@@ -2279,7 +2279,7 @@ int	zbx_expression_eval_execute(zbx_expression_eval_t *eval, const zbx_timespec_
 
 	zbx_variant_set_none(value);
 
-	ret = zbx_eval_execute_ext(eval->ctx, ts, eval_function_common_expression, eval_function_history_expression,
+	ret = zbx_eval_execute_ext(eval->ctx, ts, eval_function_common, eval_function_history,
 			(void *)eval, value, error);
 
 	zbx_vc_flush_stats();
