@@ -100,7 +100,7 @@ func (p *Plugin) Validate(options interface{}) error {
 }
 
 // Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (result interface{}, err error) {
 	if len(params) > 0 && key != diskGet {
 		return nil, zbxerr.ErrorTooManyParameters
 	}
@@ -296,7 +296,7 @@ func setSingleDiskFields(dev []byte) (out map[string]interface{}, err error) {
 		out["power_on_time"] = sd.HealthLog.PowerOnTime
 		out["critical_warning"] = sd.HealthLog.CriticalWarning
 		out["media_errors"] = sd.HealthLog.MediaErrors
-		out["percentage_used"] = sd.HealthLog.Percentage_used
+		out["percentage_used"] = sd.HealthLog.PercentageUsed
 	} else {
 		out["temperature"] = sd.Temperature.Current
 		out["power_on_time"] = sd.PowerOnTime.Hours
@@ -310,7 +310,7 @@ func setSingleDiskFields(dev []byte) (out map[string]interface{}, err error) {
 			continue
 		}
 
-		out[strings.ToLower(a.Name)] = singleRequestAttribute{a.Raw.Value, a.Raw.Str}
+		out[strings.ToLower(a.Name)] = singleRequestAttribute{a.Raw.Value, a.Raw.Str, a.NormalizedValue}
 	}
 
 	return
