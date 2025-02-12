@@ -210,10 +210,8 @@ static int	diag_compare_pair_second_desc(const void *d1, const void *d2)
 	const zbx_uint64_pair_t	*p1 = (const zbx_uint64_pair_t *)d1;
 	const zbx_uint64_pair_t	*p2 = (const zbx_uint64_pair_t *)d2;
 
-	if (p1->second < p2->second)
-		return 1;
-	if (p1->second > p2->second)
-		return -1;
+	ZBX_RETURN_IF_NOT_EQUAL(p2->second, p1->second);
+
 	return 0;
 }
 

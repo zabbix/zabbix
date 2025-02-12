@@ -126,7 +126,7 @@ class CAutoregistration extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$autoreg, array &$db_autoreg = null): void {
+	protected function validateUpdate(array &$autoreg, ?array &$db_autoreg = null): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'tls_accept' =>			['type' => API_INT32, 'in' => HOST_ENCRYPTION_NONE.':'.(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK)],
 			'tls_psk_identity' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('config_autoreg_tls', 'tls_psk_identity')],

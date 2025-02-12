@@ -55,8 +55,8 @@ static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_
 	zbx_timespec_t		timespec;
 	zbx_interface_status_t	*interface_status;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s'", __func__, item->key, item->host,
-			item->interface.addr);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " key:'%s' host:'%s' addr:'%s'", __func__,
+			item->itemid, item->key, item->host, item->interface.addr);
 
 	zbx_timespec(&timespec);
 

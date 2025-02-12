@@ -722,9 +722,6 @@ int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsu
 void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info);
 void	zbx_db_flush_version_requirements(const char *version);
 
-#define ZBX_MAX_HRECORDS	1000
-#define ZBX_MAX_HRECORDS_TOTAL	10000
-
 #define ZBX_PROXY_DATA_DONE	0
 #define ZBX_PROXY_DATA_MORE	1
 

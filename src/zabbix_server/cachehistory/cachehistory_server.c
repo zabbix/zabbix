@@ -35,6 +35,7 @@
 #include "zbxstr.h"
 #include "zbxvariant.h"
 #include "zbxescalations.h"
+#include "zbxprof.h"
 
 /******************************************************************************
  *                                                                            *
@@ -934,6 +935,7 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 		if (SUCCEED != errcodes[i])
 		{
 			h->flags |= ZBX_DC_FLAG_UNDEF;
+			zbx_hc_clear_item_middle(h->itemid);
 			continue;
 		}
 
@@ -941,6 +943,7 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 
 		if (ITEM_STATUS_ACTIVE != item->status || HOST_STATUS_MONITORED != item->host.status)
 		{
+			zbx_hc_clear_item_middle(h->itemid);
 			h->flags |= ZBX_DC_FLAG_UNDEF;
 			continue;
 		}
@@ -1404,7 +1407,7 @@ void	zbx_sync_history_cache_server(int *values_num, int *triggers_num, const zbx
 				{
 					if (0 == item_diff.values_num && 0 == inventory_values.values_num)
 						break;
-
+					zbx_prof_start("update items", ZBX_PROF_PROCESSING);
 					zbx_db_begin();
 
 					zbx_db_mass_update_items(&item_diff, &inventory_values);
@@ -1420,6 +1423,7 @@ void	zbx_sync_history_cache_server(int *values_num, int *triggers_num, const zbx
 						if (NULL != events_cbs->reset_event_recovery_cb)
 							events_cbs->reset_event_recovery_cb();
 					}
+					zbx_prof_end();
 				}
 				while (ZBX_DB_DOWN == txn_error);
 			}
@@ -1449,6 +1453,7 @@ void	zbx_sync_history_cache_server(int *values_num, int *triggers_num, const zbx
 
 			if (0 != history_num || 0 != timers_num)
 			{
+				zbx_prof_start("process triggers", ZBX_PROF_PROCESSING);
 				for (i = 0; i < trigger_timers.values_num; i++)
 				{
 					zbx_trigger_timer_t	*timer = trigger_timers.values[i];
@@ -1501,6 +1506,7 @@ void	zbx_sync_history_cache_server(int *values_num, int *triggers_num, const zbx
 
 				if (ZBX_DB_OK == txn_error && NULL != events_cbs->events_update_itservices_cb)
 					events_cbs->events_update_itservices_cb();
+				zbx_prof_end();
 			}
 		}
 

@@ -153,9 +153,11 @@ int	zbx_get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **use
 int	zbx_get_host_permission(const zbx_user_t *user, zbx_uint64_t hostid);
 
 int	zbx_db_get_proxy_value(zbx_uint64_t proxyid, char **replace_to, const char *field_name);
-int	zbx_db_item_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_timespec_t *ts);
-int	zbx_db_item_lastvalue(const zbx_db_trigger *trigger, char **lastvalue, int N_functionid, int raw);
-int	zbx_db_item_value(const zbx_db_trigger *trigger, char **value, int N_functionid, int clock, int ns, int raw);
+int	zbx_db_item_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_timespec_t *ts, time_t *tstamp);
+int	zbx_db_item_lastvalue(const zbx_db_trigger *trigger, char **lastvalue, int N_functionid, int raw,
+		const char *tz, zbx_expr_db_item_value_property_t value_property);
+int	zbx_db_item_value(const zbx_db_trigger *trigger, char **value, int N_functionid, int clock, int ns, int raw,
+		const char *tz, zbx_expr_db_item_value_property_t value_property);
 
 /* zbx_db_get_item_value() */
 /* Request values to get valued from this library. These values SHOULD NOT be used in other data libraries! */

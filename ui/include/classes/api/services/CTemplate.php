@@ -417,7 +417,7 @@ class CTemplate extends CHostGeneral {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkUuidDuplicates(array $templates, array $db_templates = null): void {
+	private static function checkUuidDuplicates(array $templates, ?array $db_templates = null): void {
 		$template_indexes = [];
 
 		foreach ($templates as $i => $template) {
@@ -470,7 +470,7 @@ class CTemplate extends CHostGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$templates, array &$db_templates = null) {
+	protected function validateUpdate(array &$templates, ?array &$db_templates = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['templateid'], ['host'], ['name']], 'fields' => [
 			'uuid' => 				['type' => API_UUID],
 			'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
@@ -535,7 +535,7 @@ class CTemplate extends CHostGeneral {
 	 *
 	 * @throws Exception
 	 */
-	private static function checkVendorFields(array $templates, array $db_templates = null): void {
+	private static function checkVendorFields(array $templates, ?array $db_templates = null): void {
 		$vendor_fields = array_fill_keys(['vendor_name', 'vendor_version'], '');
 
 		foreach ($templates as $i => $template) {
@@ -784,7 +784,7 @@ class CTemplate extends CHostGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDelete(array &$templateids, array &$db_templates = null): void {
+	private function validateDelete(array &$templateids, ?array &$db_templates = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $templateids, '/', $error)) {
