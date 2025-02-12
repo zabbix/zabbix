@@ -46,7 +46,7 @@ if ($data['readonly'] == true) {
 }
 
 // Create form.
-$userprofile_form = (new CForm())
+$form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('userprofile-form')
@@ -68,7 +68,7 @@ $userprofile_form_list
 	);
 
 if ($data['change_password']) {
-	$userprofile_form->disablePasswordAutofill();
+	$form->disablePasswordAutofill();
 
 	$password_requirements = [];
 
@@ -153,7 +153,7 @@ else {
 		(new CSimpleButton(_('Change password')))
 			->setEnabled($change_password_enabled)
 			->setAttribute('autofocus', 'autofocus')
-			->onClick('submitFormWithParam("'.$userprofile_form->getName().'", "change_password", "1");')
+			->onClick('submitFormWithParam("'.$form->getName().'", "change_password", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY),
 		$hint
 	]);
@@ -262,7 +262,7 @@ $tabs->setFooter(makeFormFooter(
 // Append tab to form.
 $userprofile_form->addItem($tabs);
 $html_page
-	->addItem($userprofile_form)
+	->addItem($form)
 	->show();
 
 (new CScriptTag('view.init();'))

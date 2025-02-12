@@ -46,7 +46,7 @@ if ($data['readonly'] == true) {
 }
 
 // Create form.
-$userprofile_notification_form = (new CForm())
+$form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setName('userprofile_notification_form')
@@ -56,7 +56,7 @@ $userprofile_notification_form = (new CForm())
 
 // Media tab.
 if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-	$media = new CPartial('user.edit.media.tab', ['form' => $userprofile_notification_form] + $data);
+	$media = new CPartial('user.edit.media.tab', ['form' => $form] + $data);
 	$tabs->addTab('mediaTab', _('Media'), $media, TAB_INDICATOR_MEDIA);
 }
 
@@ -157,9 +157,9 @@ $tabs->setFooter(makeFormFooter(
 ));
 
 // Append tab to form.
-$userprofile_notification_form->addItem($tabs);
+$form->addItem($tabs);
 $html_page
-	->addItem($userprofile_notification_form)
+	->addItem($form)
 	->show();
 
 (new CScriptTag('view.init();'))
