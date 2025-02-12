@@ -402,7 +402,7 @@ class CHttpTest extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkUuidDuplicates(array $httptests, array $db_httptests = null): void {
+	private static function checkUuidDuplicates(array $httptests, ?array $db_httptests = null): void {
 		$httptest_indexes = [];
 
 		foreach ($httptests as $i => $httptest) {
@@ -462,7 +462,7 @@ class CHttpTest extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$httptests, array &$db_httptests = null) {
+	protected function validateUpdate(array &$httptests, ?array &$db_httptests = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['httptestid']], 'fields' => [
 			'uuid' => 				['type' => API_ANY],
 			'httptestid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
@@ -785,8 +785,8 @@ class CHttpTest extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected static function checkHostsAndTemplates(array $httptests, array &$db_hosts = null,
-			array &$db_templates = null): void {
+	protected static function checkHostsAndTemplates(array $httptests, ?array &$db_hosts = null,
+			?array &$db_templates = null): void {
 		$hostids = array_unique(array_column($httptests, 'hostid'));
 
 		$db_templates = API::Template()->get([
@@ -862,7 +862,7 @@ class CHttpTest extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected function validateSteps(array &$httptests, $method, array $db_httptests = null) {
+	protected function validateSteps(array &$httptests, $method, ?array $db_httptests = null) {
 		if ($method === 'validateUpdate') {
 			foreach ($httptests as $httptest) {
 				if (!array_key_exists('steps', $httptest)) {
@@ -1107,7 +1107,7 @@ class CHttpTest extends CApiService {
 	 *
 	 * @throws APIException  if auth parameters are invalid.
 	 */
-	private function validateAuthParameters(array &$httptests, $method, array $db_httptests = null) {
+	private function validateAuthParameters(array &$httptests, $method, ?array $db_httptests = null) {
 		foreach ($httptests as &$httptest) {
 			if (array_key_exists('authentication', $httptest) || array_key_exists('http_user', $httptest)
 					|| array_key_exists('http_password', $httptest)) {
@@ -1140,7 +1140,7 @@ class CHttpTest extends CApiService {
 	 *
 	 * @throws APIException if SSL cert is present but SSL key is not.
 	 */
-	private function validateSslParameters(array &$httptests, $method, array $db_httptests = null) {
+	private function validateSslParameters(array &$httptests, $method, ?array $db_httptests = null) {
 		foreach ($httptests as &$httptest) {
 			if (array_key_exists('ssl_key_password', $httptest)
 					|| array_key_exists('ssl_key_file', $httptest)
@@ -1184,7 +1184,7 @@ class CHttpTest extends CApiService {
 	 *
 	 * @throws APIException if parameters is invalid.
 	 */
-	private function validateRetrieveMode(array &$httptests, $method, array $db_httptests = null) {
+	private function validateRetrieveMode(array &$httptests, $method, ?array $db_httptests = null) {
 		foreach ($httptests as &$httptest) {
 			if (!array_key_exists('steps', $httptest)) {
 				continue;
@@ -1234,7 +1234,7 @@ class CHttpTest extends CApiService {
 	 * @param array      $templateids
 	 * @param array|null $hostids
 	 */
-	public static function unlinkTemplateObjects(array $templateids, array $hostids = null): void {
+	public static function unlinkTemplateObjects(array $templateids, ?array $hostids = null): void {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('hht.hostid', $hostids) : '';
 
 		$result = DBselect(
@@ -1271,7 +1271,7 @@ class CHttpTest extends CApiService {
 	 * @param array      $templateids
 	 * @param array|null $hostids
 	 */
-	public static function clearTemplateObjects(array $templateids, array $hostids = null): void {
+	public static function clearTemplateObjects(array $templateids, ?array $hostids = null): void {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('hht.hostid', $hostids) : '';
 
 		$db_httptests = DBfetchArrayAssoc(DBselect(
