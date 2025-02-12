@@ -770,8 +770,8 @@ class CDRule extends CApiService {
 			);
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-				'Cannot delete check "%1$s" of discovery rule "%2$s" because it is used in action "%3$s".',
-				$db_dcheck_name, $db_drule['name'], $row['name']
+				'Cannot delete discovery check "%1$s" of discovery rule "%2$s": %3$s.', $db_dcheck_name,
+				$db_drule['name'], _s('action "%1$s" uses this discovery check.', $row['name'])
 			));
 		}
 	}
@@ -977,9 +977,8 @@ class CDRule extends CApiService {
 		));
 
 		if ($row) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-				'Cannot delete discovery rule "%1$s" because it is used in action "%2$s".',
-				$db_drules[$row['druleid']]['name'], $row['name']
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete discovery rule "%1$s": %2$s.',
+				$db_drules[$row['druleid']]['name'], _s('action "%1$s" uses this discovery rule', $row['name'])
 			));
 		}
 	}

@@ -123,8 +123,8 @@ class CTriggerManager {
 		));
 
 		if ($row) {
-			throw new APIException(ZBX_API_ERROR_PARAMETERS, _s(
-				'Cannot delete trigger "%1$s" because it is used in action "%2$s".', $row['description'], $row['name']
+			throw new APIException(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete trigger "%1$s": %2$s.',
+				$row['description'], _s('action "%1$s" uses this trigger', $row['name'])
 			));
 		}
 	}
