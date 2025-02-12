@@ -58,14 +58,12 @@ $userprofile_form = (new CForm())
 // Create form list and user tab.
 $userprofile_form_list = new CFormList('user_form_list');
 
-$user_full_name = $data['username'];
-
-if (strlen($data['name']) > 0 && strlen($data['surname']) > 0) {
-	$user_full_name = $data['name'] . ' ' . $data['surname'];
-}
+$user_full_name = ($data['name'] !== '' || $data['surname'] !== '')
+	? $data['name'].' '.$data['surname']
+	: $data['username'];
 
 $userprofile_form_list
-	->addRow(_x('Name', 'user full name'),
+	->addRow(_('Name'),
 		(new CSpan($user_full_name))
 	);
 
