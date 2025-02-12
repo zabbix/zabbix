@@ -47,8 +47,8 @@ typedef enum
 }
 zbx_async_resolve_reverse_dns_t;
 
-typedef int (*zbx_async_task_process_cb_t)(short event, void *data, int *fd, const char *addr, char *dnserr,
-		struct event *timeout_event);
+typedef int (*zbx_async_task_process_cb_t)(short event, void *data, int *fd, struct evutil_addrinfo **current_ai,
+		const char *addr, char *dnserr, struct event *timeout_event);
 typedef void (*zbx_async_task_clear_cb_t)(void *data);
 
 zbx_async_task_state_t	zbx_async_poller_get_task_state_for_event(short event);
