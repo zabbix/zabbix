@@ -474,20 +474,20 @@ class CService extends CApiService {
 		}
 	}
 
-	private static function checkUsedInActions(array $services): void {
-		$db_actions = DBfetchArray(DBselect(
-			'SELECT a.name,c.value AS serviceid'.
-			' FROM actions a,conditions c'.
-			' WHERE a.actionid=c.actionid'.
-				' AND c.conditiontype='.ZBX_CONDITION_TYPE_SERVICE.
-				' AND '.dbConditionString('c.value', array_keys($services)),
+	private static function checkUsedInActions(array $db_services): void {
+		$row = DBfetch(DBselect(
+			'SELECT c.value AS serviceid,a.name'.
+			' FROM conditions c'.
+			' JOIN actions a ON c.actionid=a.actionid'.
+			' WHERE c.conditiontype='.ZBX_CONDITION_TYPE_SERVICE.
+				' AND '.dbConditionString('c.value', array_keys($db_services)),
 			1
 		));
 
-		if ($db_actions) {
+		if ($row) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 				'Cannot delete service "%1$s" because it is used in action "%2$s".',
-				$services[$db_actions[0]['serviceid']]['name'], $db_actions[0]['name']
+				$db_services[$row['serviceid']]['name'], $row['name']
 			));
 		}
 	}

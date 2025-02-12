@@ -1609,33 +1609,33 @@ class CHost extends CHostGeneral {
 		self::checkMaintenances(array_keys($db_hosts));
 	}
 
-	private static function checkUsedInActions(array $hosts): void {
-		$hostids = array_keys($hosts);
+	private static function checkUsedInActions(array $db_hosts): void {
+		$hostids = array_keys($db_hosts);
 
-		$db_actions = DBfetchArray(DBselect(
-			'SELECT a.name,c.value AS hostid'.
-			' FROM actions a,conditions c'.
-			' WHERE a.actionid=c.actionid'.
-				' AND c.conditiontype='.ZBX_CONDITION_TYPE_HOST.
+		$row = DBfetch(DBselect(
+			'SELECT c.value AS hostid,a.name'.
+			' FROM conditions c'.
+			' JOIN actions a ON c.actionid=a.actionid'.
+			' WHERE c.conditiontype='.ZBX_CONDITION_TYPE_HOST.
 				' AND '.dbConditionString('c.value', $hostids),
 			1
 		));
 
-		if (!$db_actions) {
-			$db_actions = DBfetchArray(DBselect(
-				'SELECT a.name,och.hostid'.
-				' FROM actions a,operations o,opcommand_hst och'.
-				' WHERE a.actionid=o.actionid'.
-					' AND o.operationid=och.operationid'.
-					' AND '.dbConditionId('och.hostid', $hostids),
+		if (!$row) {
+			$row = DBfetch(DBselect(
+				'SELECT och.hostid,a.name'.
+				' FROM opcommand_hst och'.
+				' JOIN operations o ON och.operationid=o.operationid'.
+				' JOIN actions a ON o.actionid=a.actionid'.
+				' WHERE '.dbConditionId('och.hostid', $hostids),
 				1
 			));
 		}
 
-		if ($db_actions) {
+		if ($row) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 				'Cannot delete host "%1$s" because it is used in action "%2$s".',
-				$hosts[$db_actions[0]['hostid']]['host'], $db_actions[0]['name']
+				$db_hosts[$row['hostid']]['host'], $row['name']
 			));
 		}
 	}

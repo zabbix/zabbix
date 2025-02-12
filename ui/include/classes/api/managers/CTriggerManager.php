@@ -111,21 +111,20 @@ class CTriggerManager {
 	/**
 	 * @throws APIException
 	 */
-	private static function checkUsedInActions(array $triggerids): void {
-		$db_actions = DBfetchArray(DBselect(
-			'SELECT a.name,t.description AS trigger_name'.
-			' FROM actions a,conditions c,triggers t'.
-			' WHERE a.actionid=c.actionid'.
-				' AND c.conditiontype='.ZBX_CONDITION_TYPE_TRIGGER.
-				' AND '.zbx_dbcast_2bigint('c.value').'=t.triggerid'.
-				' AND '.dbConditionString('c.value', $triggerids),
+	private static function checkUsedInActions(array $del_triggerids): void {
+		$row = DBfetch(DBselect(
+			'SELECT a.name,t.description'.
+			' FROM conditions c'.
+			' JOIN actions a ON c.actionid=a.actionid'.
+			' JOIN triggers t ON '.zbx_dbcast_2bigint('c.value').'=t.triggerid'.
+			' WHERE c.conditiontype='.ZBX_CONDITION_TYPE_TRIGGER.
+				' AND '.dbConditionString('c.value', $del_triggerids),
 			1
 		));
 
-		if ($db_actions) {
+		if ($row) {
 			throw new APIException(ZBX_API_ERROR_PARAMETERS, _s(
-				'Cannot delete trigger "%1$s" because it is used in action "%2$s".', $db_actions[0]['trigger_name'],
-				$db_actions[0]['name']
+				'Cannot delete trigger "%1$s" because it is used in action "%2$s".', $row['description'], $row['name']
 			));
 		}
 	}

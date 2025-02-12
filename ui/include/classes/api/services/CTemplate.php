@@ -782,33 +782,33 @@ class CTemplate extends CHostGeneral {
 		self::checkUsedInActions($db_templates);
 	}
 
-	private static function checkUsedInActions(array $templates): void {
-		$templateids = array_keys($templates);
+	private static function checkUsedInActions(array $db_templates): void {
+		$templateids = array_keys($db_templates);
 
-		$db_actions = DBfetchArray(DBselect(
-			'SELECT a.name,c.value AS templateid'.
-			' FROM actions a,conditions c'.
-			' WHERE a.actionid=c.actionid'.
-				' AND c.conditiontype='.ZBX_CONDITION_TYPE_TEMPLATE.
+		$row = DBfetch(DBselect(
+			'SELECT c.value AS templateid,a.name'.
+			' FROM conditions c'.
+			' JOIN actions a ON c.actionid=a.actionid'.
+			' WHERE c.conditiontype='.ZBX_CONDITION_TYPE_TEMPLATE.
 				' AND '.dbConditionString('c.value', $templateids),
 			1
 		));
 
-		if (!$db_actions) {
-			$db_actions = DBfetchArray(DBselect(
-				'SELECT a.name,ot.templateid'.
-				' FROM actions a,operations o,optemplate ot'.
-				' WHERE a.actionid=o.actionid'.
-					' AND o.operationid=ot.operationid'.
-					' AND '.dbConditionId('ot.templateid', $templateids),
+		if (!$row) {
+			$row = DBfetch(DBselect(
+				'SELECT ot.templateid,a.name'.
+				' FROM optemplate ot'.
+				' JOIN operations o ON ot.operationid=o.operationid'.
+				' JOIN actions a ON o.actionid=a.actionid'.
+				' WHERE '.dbConditionId('ot.templateid', $templateids),
 				1
 			));
 		}
 
-		if ($db_actions) {
+		if ($row) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 				'Cannot delete template "%1$s" because it is used in action "%2$s".',
-				$templates[$db_actions[0]['templateid']]['host'], $db_actions[0]['name']
+				$db_templates[$row['templateid']]['host'], $row['name']
 			));
 		}
 	}

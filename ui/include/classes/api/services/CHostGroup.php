@@ -731,44 +731,44 @@ class CHostGroup extends CApiService {
 		}
 	}
 
-	private static function checkUsedInActions(array $groups): void {
-		$groupids = array_keys($groups);
+	private static function checkUsedInActions(array $db_groups): void {
+		$groupids = array_keys($db_groups);
 
-		$db_actions = DBfetchArray(DBselect(
-			'SELECT a.name,c.value AS groupid'.
-			' FROM actions a,conditions c'.
-			' WHERE a.actionid=c.actionid'.
-				' AND c.conditiontype='.ZBX_CONDITION_TYPE_HOST_GROUP.
+		$row = DBfetch(DBselect(
+			'SELECT c.value AS groupid,a.name'.
+			' FROM conditions c'.
+			' JOIN actions a ON c.actionid=a.actionid'.
+			' WHERE c.conditiontype='.ZBX_CONDITION_TYPE_HOST_GROUP.
 				' AND '.dbConditionString('c.value', $groupids),
 			1
 		));
 
-		if (!$db_actions) {
-			$db_actions = DBfetchArray(DBselect(
-				'SELECT a.name,og.groupid'.
-				' FROM actions a,operations o,opgroup og'.
-				' WHERE a.actionid=o.actionid'.
-					' AND o.operationid=og.operationid'.
-					' AND '.dbConditionId('og.groupid', $groupids),
+		if (!$row) {
+			$row = DBfetch(DBselect(
+				'SELECT og.groupid,a.name'.
+				' FROM opgroup og'.
+				' JOIN operations o ON og.operationid=o.operationid'.
+				' JOIN actions a ON o.actionid=a.actionid'.
+				' WHERE '.dbConditionId('og.groupid', $groupids),
 				1
 			));
 		}
 
-		if (!$db_actions) {
-			$db_actions = DBfetchArray(DBselect(
-				'SELECT a.name,ocg.groupid'.
-				' FROM actions a,operations o,opcommand_grp ocg'.
-				' WHERE a.actionid=o.actionid'.
-					' AND o.operationid=ocg.operationid'.
-					' AND '.dbConditionId('ocg.groupid', $groupids),
+		if (!$row) {
+			$row = DBfetch(DBselect(
+				'SELECT ocg.groupid,a.name'.
+				' FROM opcommand_grp ocg'.
+				' JOIN operations o ON ocg.operationid=o.operationid'.
+				' JOIN actions a ON o.actionid=a.actionid'.
+				' WHERE '.dbConditionId('ocg.groupid', $groupids),
 				1
 			));
 		}
 
-		if ($db_actions) {
+		if ($row) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 				'Cannot delete host group "%1$s" because it is used in action "%2$s".',
-				$groups[$db_actions[0]['groupid']]['name'], $db_actions[0]['name']
+				$db_groups[$row['groupid']]['name'], $row['name']
 			));
 		}
 	}

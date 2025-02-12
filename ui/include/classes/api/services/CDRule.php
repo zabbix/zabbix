@@ -485,7 +485,7 @@ class CDRule extends CApiService {
 
 		self::addAffectedObjects($drules, $db_drules);
 
-		self::checkDChecksUsedInActions($drules, $db_drules);
+		self::checkDiscoveryChecksUsedInActions($drules, $db_drules);
 	}
 
 	/**
@@ -734,44 +734,44 @@ class CDRule extends CApiService {
 		}
 	}
 
-	private static function checkDChecksUsedInActions(array $drules, array $db_drules): void {
-		$dcheckids = [];
+	private static function checkDiscoveryChecksUsedInActions(array $drules, array $db_drules): void {
+		$del_dcheckids = [];
 
 		foreach ($drules as $drule) {
 			if (!array_key_exists('dchecks', $drule)) {
 				continue;
 			}
 
-			$dcheckids = array_merge($dcheckids, array_diff(
+			$del_dcheckids = array_merge($del_dcheckids, array_diff(
 				array_column($db_drules[$drule['druleid']]['dchecks'], 'dcheckid'),
 				array_column($drule['dchecks'], 'dcheckid')
 			));
 		}
 
-		if (!$dcheckids) {
+		if (!$del_dcheckids) {
 			return;
 		}
 
-		$db_actions = DBfetchArray(DBselect(
+		$row = DBfetch(DBselect(
 			'SELECT a.name,dc.dcheckid,dc.druleid'.
-			' FROM actions a,conditions c,dchecks dc'.
-			' WHERE a.actionid=c.actionid'.
-				' AND c.conditiontype='.ZBX_CONDITION_TYPE_DCHECK.
-				' AND '.zbx_dbcast_2bigint('c.value').'=dc.dcheckid'.
-				' AND '.dbConditionString('c.value', $dcheckids),
+			' FROM conditions c'.
+			' JOIN actions a ON c.actionid=a.actionid'.
+			' JOIN dchecks dc ON '.zbx_dbcast_2bigint('c.value').'=dc.dcheckid'.
+			' WHERE c.conditiontype='.ZBX_CONDITION_TYPE_DCHECK.
+				' AND '.dbConditionString('c.value', $del_dcheckids),
 			1
 		));
 
-		if ($db_actions) {
-			$db_rule = $db_drules[$db_actions[0]['druleid']];
-			$db_check = $db_rule['dchecks'][$db_actions[0]['dcheckid']];
-			$db_check_name = discovery_check2str($db_check['type'], $db_check['key_'], $db_check['ports'],
-				$db_check['allow_redirect']
+		if ($row) {
+			$db_drule = $db_drules[$row['druleid']];
+			$db_dcheck = $db_drule['dchecks'][$row['dcheckid']];
+			$db_dcheck_name = discovery_check2str($db_dcheck['type'], $db_dcheck['key_'], $db_dcheck['ports'],
+				$db_dcheck['allow_redirect']
 			);
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-				'Cannot delete discovery check "%1$s" because it is used in action "%2$s".',
-				_s('%1$s: %2$s', $db_rule['name'], $db_check_name), $db_actions[0]['name']
+				'Cannot delete check "%1$s" of discovery rule "%2$s" because it is used in action "%3$s".',
+				$db_dcheck_name, $db_drule['name'], $row['name']
 			));
 		}
 	}
@@ -949,36 +949,37 @@ class CDRule extends CApiService {
 		}
 
 		self::checkUsedInActions($db_drules);
+
+		$drules = [];
+
+		foreach ($db_drules as $db_drule) {
+			$drules[] = [
+				'druleid' => $db_drule['druleid'],
+				'dchecks' => []
+			];
+		}
+
+		self::addAffectedObjects($drules, $db_drules);
+
+		self::checkDiscoveryChecksUsedInActions($drules, $db_drules);
 	}
 
-	private static function checkUsedInActions(array $drules): void {
-		$druleids = array_keys($drules);
+	private static function checkUsedInActions(array $db_drules): void {
+		$druleids = array_keys($db_drules);
 
-		$db_actions = DBfetchArray(DBselect(
-			'SELECT a.name,c.value AS druleid'.
-			' FROM actions a,conditions c'.
-			' WHERE a.actionid=c.actionid'.
-				' AND c.conditiontype='.ZBX_CONDITION_TYPE_DRULE.
+		$row = DBfetch(DBselect(
+			'SELECT c.value AS druleid,a.name'.
+			' FROM conditions c'.
+			' JOIN actions a ON c.actionid=a.actionid'.
+			' WHERE c.conditiontype='.ZBX_CONDITION_TYPE_DRULE.
 				' AND '.dbConditionString('c.value', $druleids),
 			1
 		));
 
-		if (!$db_actions) {
-			$db_actions = DBfetchArray(DBselect(
-				'SELECT a.name,dc.druleid'.
-				' FROM actions a,conditions c,dchecks dc'.
-				' WHERE a.actionid=c.actionid'.
-					' AND c.conditiontype='.ZBX_CONDITION_TYPE_DCHECK.
-					' AND '.zbx_dbcast_2bigint('c.value').'=dc.dcheckid'.
-					' AND '.dbConditionString('dc.druleid', $druleids),
-				1
-			));
-		}
-
-		if ($db_actions) {
+		if ($row) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 				'Cannot delete discovery rule "%1$s" because it is used in action "%2$s".',
-				$drules[$db_actions[0]['druleid']]['name'], $db_actions[0]['name']
+				$db_drules[$row['druleid']]['name'], $row['name']
 			));
 		}
 	}
