@@ -580,6 +580,36 @@ out:
 	return ret;
 }
 
+extern "C" static void	get_idispatch_value(VARIANT *arProp, BYTE *pbData)
+{
+	HRESULT hres;
+	IDispatch *pDispatch = *((IDispatch**)pbData);
+
+	if (pDispatch)
+	{
+		DISPID dispid;
+		OLECHAR *propName = L"Value";
+		hres = pDispatch->GetIDsOfNames(IID_NULL, &propName, 1, LOCALE_USER_DEFAULT, &dispid);
+
+		if (SUCCEEDED(hres))
+		{
+			DISPPARAMS dispParams = {NULL, NULL, 0, 0};
+			hres = pDispatch->Invoke(dispid, IID_NULL, LOCALE_USER_DEFAULT, DISPATCH_PROPERTYGET,
+				&dispParams, arProp, NULL, NULL);
+		}
+		else
+		{
+			VariantClear(arProp);
+			V_VT(arProp) = VT_EMPTY;
+		}
+
+		pDispatch->Release();
+	}
+	else
+		V_VT(arProp) = VT_EMPTY;
+}
+
+
 /******************************************************************************
  *                                                                            *
  * Purpose: takes one element from array and puts value to JSON document      *
@@ -686,6 +716,12 @@ extern "C" int	proc_arr_element(SAFEARRAY *sa, LONG *index, const char *prop_err
 			break;
 		case VT_BSTR:
 			V_BSTR(&arProp) = *((BSTR*)pbData);
+			break;
+		case VT_UNKNOWN:
+			V_VT(&arProp) = VT_EMPTY;
+			break;
+		case VT_DISPATCH:
+			get_idispatch_value(&arProp, pbData);
 			break;
 		case VT_VARIANT:
 			hres = VariantCopy(&arProp, (VARIANT*)pbData);
@@ -841,6 +877,9 @@ extern "C" int	put_variant_json(const char *prop_json, const char *prop_err, VAR
 				zbx_json_addfloat(jdoc, prop_json, vtProp->dblVal);
 
 			break;
+		case VT_EMPTY:
+			zbx_json_addraw(jdoc, prop_json, "null");
+			break;
 		default:
 			char *str;
 
@@ -856,9 +895,7 @@ extern "C" int	put_variant_json(const char *prop_json, const char *prop_err, VAR
 
 			if (FAILED(hres))
 			{
-				*error = zbx_dsprintf(*error, "Cannot convert WMI property '%s' of "
-						"type %d to VT_BSTR", prop_err, V_VT(vtProp));
-				ret = SYSINFO_RET_FAIL;
+				zbx_json_addraw(jdoc, prop_json, "null");
 			}
 			else
 			{

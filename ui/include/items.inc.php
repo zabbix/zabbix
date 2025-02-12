@@ -2411,7 +2411,7 @@ function getInheritedTimeouts(string $proxyid): array {
  *
  * @return array
  */
-function getItemTypeCountByHostId(int $item_type, array $hostids): array {
+function getEnabledItemTypeCountByHostId(int $item_type, array $hostids): array {
 	if (!$hostids) {
 		return [];
 	}
@@ -2420,8 +2420,28 @@ function getItemTypeCountByHostId(int $item_type, array $hostids): array {
 		'countOutput' => true,
 		'groupCount' => true,
 		'hostids' => $hostids,
-		'filter' => ['type' => $item_type]
+		'filter' => ['type' => $item_type, 'status' => ITEM_STATUS_ACTIVE]
 	]);
 
 	return $items_count ? array_column($items_count, 'rowscount', 'hostid') : [];
+}
+
+/**
+ * @param array $interfaceids
+ *
+ * @return array
+ */
+function getEnabledItemsCountByInterfaceIds(array $interfaceids): array {
+	if (!$interfaceids) {
+		return [];
+	}
+
+	$items_count = API::Item()->get([
+		'countOutput' => true,
+		'groupCount' => true,
+		'interfaceids' => $interfaceids,
+		'filter' => ['status' => ITEM_STATUS_ACTIVE]
+	]);
+
+	return $items_count ? array_column($items_count, 'rowscount', 'interfaceid') : [];
 }

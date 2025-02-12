@@ -1,0 +1,1 @@
+........S. [ZBX-25777] reduced load on history syncers after startup by delaying trigger timer functions calculation by one minute (vso)

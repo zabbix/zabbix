@@ -25051,6 +25051,10 @@ msgstr "первый"
 msgid "first() - The oldest value in the specified time interval"
 msgstr "first() - Самое старое значение за указанный период времени"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:626
+msgid "firstclock() - Timestamp of the oldest value in the specified time interval"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
 msgstr "floor() - Округление до ближайшего меньшего целого числа"
@@ -25448,6 +25452,10 @@ msgstr "посл"
 msgid "last() - Last (most recent) T value"
 msgstr "last() - Последнее (наиболее новое) значение Т"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:733
+msgid "lastclock() - Timestamp of the last (most recent) T value"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1557
 msgid "left"
 msgstr "слева"
@@ -25483,6 +25491,10 @@ msgstr "logseverity() - Важность журнала последней за�
 #: app/controllers/CControllerPopupTriggerExpr.php:779
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr "logsource() - Соответствие источника журнала последней записи журнала параметру V за период Е (1 - соответствует, 0 - не соответствует)"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:795
+msgid "logtimestamp() - Timestamp of the last (most recent) T log message"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "ltrim() - Remove specified characters from the beginning of a string"
