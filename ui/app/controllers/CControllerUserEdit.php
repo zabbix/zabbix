@@ -167,6 +167,20 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['medias'] = $this->getInput('medias', []);
 		}
 
+		$mediatypes = API::MediaType()->get([
+			'output' => ['status', 'name'],
+			'preservekeys' => true
+		]);
+
+		foreach ($data['medias'] as $row_index => &$media) {
+			$mediatype = $mediatypes[$media['mediatypeid']];
+
+			$media['row_index'] = $row_index;
+			$media['mediatype_name'] = $mediatype['name'];
+			$media['mediatype_status'] = $mediatype['status'];
+		}
+		unset($media);
+
 		$data['password_requirements'] = $this->getPasswordRequirements();
 		$data = $this->setUserMedias($data);
 
@@ -289,11 +303,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		);
 
 		$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
-
-		$data['mediatypes'] = API::MediaType()->get([
-			'output' => ['status', 'name'],
-			'preservekeys' => true
-		]);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of users'));

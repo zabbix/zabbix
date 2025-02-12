@@ -28,10 +28,9 @@ class CControllerUserProfileNotificationUpdate extends CControllerUserUpdateGene
 		];
 
 		$ret = $this->validateInput($fields);
-		$error = $this->getValidationError();
 
 		if (!$ret) {
-			switch ($error) {
+			switch ($this->getValidationError()) {
 				case self::VALIDATION_ERROR:
 					$response = (new CControllerResponseRedirect((new CUrl('zabbix.php'))
 						->setArgument('action', 'action=userprofile.notification.edit')
@@ -60,7 +59,6 @@ class CControllerUserProfileNotificationUpdate extends CControllerUserUpdateGene
 
 	protected function doAction(): void {
 		$user = [];
-
 		$user['userid'] = CWebUser::$data['userid'];
 
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {

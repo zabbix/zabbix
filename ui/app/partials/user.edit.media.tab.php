@@ -40,44 +40,39 @@ $media_table_info = (new CTable())
 	);
 
 $media_severity = [];
-$severity_config = [
-	'names' => [],
-	'colors' => [],
-];
 
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$severity_config['names'][$severity] = CSeverityHelper::getName($severity);
-	$severity_config['colors'][$severity] = CSeverityHelper::getStatusStyle($severity);
-
 	$severity_name = CSeverityHelper::getName($severity);
 	$media_severity[$severity] = (new CSpan(mb_substr($severity_name, 0, 1)))
-		->setHint($severity_name . ' (' . _('on') . ')', '', false)
+		->setHint($severity_name, '', false)
 		->addClass(CSeverityHelper::getStatusStyle($severity));
 }
 
 $media_table_info_template = new CTemplateTag('media-row-tmpl',
 	(new CRow([
-		(new CSpan('#{name}')),
+		[
+			new CSpan('#{mediatype_name}'),
+			makeWarningIcon(_('Media type disabled by Administration.'))
+		],
 		(new CSpan('#{sendto_short}'))->setHint('#{sendto}'),
-		(new CCol(
 		(new CDiv('#{period}'))
 			->setAttribute('style', 'max-width: ' . ZBX_TEXTAREA_STANDARD_WIDTH . 'px;')
-			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
-		)),
+			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
 		(new CDiv($media_severity))->addClass(ZBX_STYLE_STATUS_CONTAINER),
-		(new CButtonLink(_('Enabled')))
-			->addClass(ZBX_STYLE_GREEN)
-			->addClass('js-status')
-			->setAttribute('data-status_type', 'disable_media'),
+		[
+			(new CButtonLink(_('Enabled')))
+				->addClass(ZBX_STYLE_GREEN)
+				->addClass('js-status')
+				->setAttribute('data-status_type', 'disable_media'),
+			(new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED)
+		],
 		(new CHorList([
 			(new CButtonLink(_('Edit')))
-				->setAttribute('data-parameters', "#{parameters}")
 				->addClass('js-edit'),
 			(new CButtonLink(_('Remove')))
 				->setEnabled(true)
 				->addClass('js-remove'),
 			(new CDiv([
-				new CInput('hidden', 'medias[#{row_index}][dstfrm]', '#{dstfrm}'),
 				new CInput('hidden', 'medias[#{row_index}][mediaid]', '#{mediaid}'),
 				new CInput('hidden', 'medias[#{row_index}][mediatypeid]', '#{mediatypeid}'),
 				new CInput('hidden', 'medias[#{row_index}][period]', '#{period}'),
@@ -85,9 +80,9 @@ $media_table_info_template = new CTemplateTag('media-row-tmpl',
 				new CInput('hidden', 'medias[#{row_index}][severity]', '#{severity}'),
 				new CInput('hidden', 'medias[#{row_index}][active]', '#{active}'),
 				new CInput('hidden', 'medias[#{row_index}][provisioned]', '#{provisioned}'),
-				new CInput('hidden', 'medias[#{row_index}][name]', '#{name}'),
-				new CInput('hidden', 'medias[#{row_index}][mediatype]', '#{mediatype}')
+				new CInput('hidden', 'medias[#{row_index}][mediatype_name]', '#{mediatype_name}'),
 			]))
+
 		]))
 	]))->setAttribute('data-row_index', '#{row_index}')
 		->setId('medias_#{row_index}')
@@ -100,10 +95,7 @@ $media_form_list->addRow(_('Media'),
 );
 
 (new CScriptTag('mediaView.init('.json_encode([
-		'form_name' => $form->getName(),
-		'medias' => $data['medias'],
-		'severity_config' => $severity_config,
-		'mediatypes' => $data['mediatypes']
+		'medias' => $data['medias']
 	]).');'))
 	->setOnDocumentReady()
 	->show();

@@ -119,16 +119,26 @@ class CControllerUserProfileNotificationEdit extends CControllerUserEditGeneral 
 			$data = $this->setUserMedias($data);
 		}
 
+		$mediatypes = API::MediaType()->get([
+			'output' => ['status', 'name'],
+			'preservekeys' => true
+		]);
+
+		foreach ($data['medias'] as $row_index => &$media) {
+			$mediatype = $mediatypes[$media['mediatypeid']];
+
+			$media['row_index'] = $row_index;
+			$media['mediatype_name'] = $mediatype['name'];
+			$media['mediatype_status'] = $mediatype['status'];
+		}
+		unset($media);
+
 		$data += [
 			'userid' => CWebUser::$data['userid'],
 			'messages' => $this->getInput('messages', []) + getMessageSettings(),
 			'action' => $this->getAction(),
 			'internal_auth' => CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL,
-			'readonly' => $this->user['provisioned'] == CUser::PROVISION_STATUS_YES,
-			'mediatypes' => API::MediaType()->get([
-				'output' => ['status', 'name'],
-				'preservekeys' => true
-			])
+			'readonly' => $this->user['provisioned'] == CUser::PROVISION_STATUS_YES
 		];
 
 		$response = new CControllerResponseData($data);

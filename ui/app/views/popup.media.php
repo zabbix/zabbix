@@ -102,10 +102,10 @@ $media_form = (new CFormList(_('Media')))
 
 $form = (new CForm())
 	->setName('media_form')
+	->addVar('row_index', $options['row_index'])
 	->addVar('action', 'popup.media')
-	->addVar('add', '1')
-	->addVar('media', $options['media'])
-	->addVar('dstfrm', $options['dstfrm'])
+	->addVar('validate', '1')
+	->addVar('mediaid', $options['mediaid'])
 	->setId('media_form')
 	->addStyle('display: none;');
 
@@ -140,7 +140,7 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => [
 		[
-			'title' => ($options['media'] !== -1) ? _('Update') : _('Add'),
+			'title' => ($options['edit'] === 1) ? _('Update') : _('Add'),
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
