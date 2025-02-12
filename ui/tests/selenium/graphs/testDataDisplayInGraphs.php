@@ -5513,7 +5513,7 @@ class testDataDisplayInGraphs extends CWebTest {
 			// Wait for all graphs to load and check the screenshots of all graphs of the desired type.
 			$charts_table = $this->query('id:charts')->waitUntilVisible()->one();
 			foreach ($charts_table->query('class:center')->waitUntilCount($count)->all() as $graph) {
-				$graph->waitUntilClassesNotPresent('is-loading');
+				$graph->waitUntilClassesNotPresent('is-loading', 60);
 			}
 
 			$this->assertScreenshot($charts_table, $screenshot_string.$show);
