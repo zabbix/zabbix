@@ -55,14 +55,13 @@ $form = (new CForm())
 	->addVar('action', $data['action'])
 	->addVar('userid', $data['userid']);
 
-// Create form list and user tab.
-$userprofile_form_list = new CFormList('user_form_list');
+$form_list = new CFormList('user_form_list');
 
 $user_full_name = ($data['name'] !== '' || $data['surname'] !== '')
 	? $data['name'].' '.$data['surname']
 	: $data['username'];
 
-$userprofile_form_list
+$form_list
 	->addRow(_('Name'),
 		(new CSpan($user_full_name))
 	);
@@ -120,11 +119,11 @@ if ($data['change_password']) {
 	$current_password->setAttribute('autofocus', 'autofocus');
 
 	if (CWebUser::$data['userid'] == $data['userid']) {
-		$userprofile_form_list
+		$form_list
 			->addRow((new CLabel(_('Current password'), 'current_password'))->setAsteriskMark(), $current_password);
 	}
 
-	$userprofile_form_list
+	$form_list
 		->addRow((new CLabel([_('Password'), $password_hint_icon], 'password1'))->setAsteriskMark(), [
 			// Hidden dummy login field for protection against chrome error when password autocomplete.
 			(new CInput('text', null, null))
@@ -149,7 +148,7 @@ else {
 		? $hint = makeErrorIcon(_('Password can only be changed for users using the internal Zabbix authentication.'))
 		: null;
 
-	$userprofile_form_list->addRow(_('Password'), [
+	$form_list->addRow(_('Password'), [
 		(new CSimpleButton(_('Change password')))
 			->setEnabled($change_password_enabled)
 			->setAttribute('autofocus', 'autofocus')
@@ -211,7 +210,7 @@ $timezone_select
 	->setValue($data['timezone']);
 $theme_select->addOptions(CSelect::createOptionsFromArray(APP::getThemes()));
 
-$userprofile_form_list
+$form_list
 	->addRow(new CLabel(_('Language'), $lang_select->getFocusableElementId()), [$lang_select, $language_error])
 	->addRow(new CLabel(_('Time zone'), $timezone_select->getFocusableElementId()), $timezone_select)
 	->addRow(new CLabel(_('Theme'), $theme_select->getFocusableElementId()), $theme_select);
@@ -220,12 +219,12 @@ $userprofile_form_list
 if ($data['username'] !== ZBX_GUEST_USER) {
 	$autologout = ($data['autologout'] !== '0') ? $data['autologout'] : DB::getDefault('users', 'autologout');
 
-	$userprofile_form_list->addRow(_('Auto-login'),
+	$form_list->addRow(_('Auto-login'),
 		(new CCheckBox('autologin'))
 			->setUncheckedValue('0')
 			->setChecked($data['autologin'])
 	);
-	$userprofile_form_list->addRow(_('Auto-logout'), [
+	$form_list->addRow(_('Auto-logout'), [
 		(new CCheckBox(null))
 			->setId('autologout_visible')
 			->setChecked($data['autologout'] !== '0'),
@@ -235,7 +234,7 @@ if ($data['username'] !== ZBX_GUEST_USER) {
 	]);
 }
 
-$userprofile_form_list
+$form_list
 	->addRow((new CLabel(_('Refresh'), 'refresh'))->setAsteriskMark(),
 		(new CTextBox('refresh', $data['refresh'], false, DB::getFieldLength('users', 'refresh')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
@@ -251,7 +250,7 @@ $userprofile_form_list
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
-$tabs->addTab('userTab', _('User'), $userprofile_form_list);
+$tabs->addTab('userTab', _('User'), $form_list);
 
 // Append buttons to form.
 $tabs->setFooter(makeFormFooter(
@@ -260,7 +259,7 @@ $tabs->setFooter(makeFormFooter(
 ));
 
 // Append tab to form.
-$userprofile_form->addItem($tabs);
+$form->addItem($tabs);
 $html_page
 	->addItem($form)
 	->show();
