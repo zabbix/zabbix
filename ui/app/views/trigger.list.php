@@ -19,9 +19,6 @@
  * @var array $data
  */
 
-$this->addJsFile('items.js');
-$this->addJsFile('multilineinput.js');
-$this->addJsFile('class.tagfilteritem.js');
 $this->includeJsFile('trigger.list.js.php');
 
 if ($data['uncheck']) {
@@ -264,12 +261,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		->setArgument('context', $data['context'])
 		->getUrl();
 
-	$description[] = (new CLink($trigger['description'], $trigger_url))
-		->setAttribute('data-action', 'trigger.edit')
-		->setAttribute('data-triggerid', $triggerid)
-		->setAttribute('data-hostid', $data['single_selected_hostid'])
-		->setAttribute('data-context', $data['context'])
-		->addClass(ZBX_STYLE_WORDBREAK);
+	$description[] = (new CLink($trigger['description'], $trigger_url))->addClass(ZBX_STYLE_WORDBREAK);
 
 	if ($trigger['dependencies']) {
 		$description[] = [BR(), bold(_('Depends on').':')];
@@ -289,11 +281,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 				->setArgument('context', $data['context'])
 				->getUrl();
 
-			$trigger_deps[] = (new CLink($dep_trigger_desc, $trigger_url))
-				->setAttribute('data-action', 'trigger.edit')
-				->setAttribute('data-triggerid', $dep_trigger['triggerid'])
-				->setAttribute('data-hostid', $data['single_selected_hostid'])
-				->setAttribute('data-context', $data['context'])
+			$trigger_deps[] = (new CLink($dep_trigger_desc, $dep_trigger_url))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(triggerIndicatorStyle($dep_trigger['status']));
 
@@ -346,9 +334,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 				->getUrl();
 
 			$hosts[] = in_array($host['hostid'], $data['editable_hosts'])
-				? (new CLink($host['name'], $host_url))
-					->setAttribute($data['context'] === 'host' ? 'data-hostid' : 'data-templateid', $host['hostid'])
-					->setAttribute('data-action', $data['context'] === 'host' ? 'host.edit' : 'template.edit')
+				? new CLink($host['name'], $host_url)
 				: $host['name'];
 		}
 

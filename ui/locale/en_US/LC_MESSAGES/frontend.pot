@@ -2942,6 +2942,16 @@ msgid_plural "Cannot delete user groups"
 msgstr[0] ""
 msgstr[1] ""
 
+#: include/classes/api/services/CUserGroup.php:1330
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CUserGroup.php:1325
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
+msgstr ""
+
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by provisioned user \"%2$s\"."
@@ -7240,6 +7250,10 @@ msgstr ""
 msgid "Display local time"
 msgstr ""
 
+#: widgets/itemhistory/views/column.edit.php:240
+msgid "Display log time"
+msgstr ""
+
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
 msgstr ""
@@ -9406,6 +9420,10 @@ msgstr ""
 
 #: app/views/popup.triggerexpr.php:129
 msgid "History functions"
+msgstr ""
+
+#: app/views/administration.housekeeping.edit.php:218
+msgid "History, trends and audit log compression"
 msgstr ""
 
 #: include/classes/html/CTabFilter.php:167
@@ -17605,6 +17623,10 @@ msgstr ""
 msgid "Reset to initial view"
 msgstr ""
 
+#: app/views/administration.miscconfig.edit.php:103
+msgid "Resolve secret vault macros by"
+msgstr ""
+
 #: jsLoader.php:283
 msgid "Resolved"
 msgstr ""
@@ -20575,6 +20597,10 @@ msgstr ""
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
 msgstr ""
 
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
+
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
 msgid "This type of information may not match the key."
@@ -22794,6 +22820,10 @@ msgstr ""
 msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
 
+#: include/classes/data/CItemData.php:2498
+msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
 msgstr ""
@@ -23853,6 +23883,14 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr ""
 
+#: app/views/administration.miscconfig.edit.php:112
+msgid "Zabbix server and proxy"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:107
+msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
+msgstr ""
+
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr ""
@@ -23868,6 +23906,10 @@ msgstr ""
 
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:105
+msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
 msgstr ""
 
 #: include/items.inc.php:92
@@ -24809,6 +24851,10 @@ msgstr ""
 msgid "first() - The oldest value in the specified time interval"
 msgstr ""
 
+#: app/controllers/CControllerPopupTriggerExpr.php:626
+msgid "firstclock() - Timestamp of the oldest value in the specified time interval"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
 msgstr ""
@@ -25206,6 +25252,10 @@ msgstr ""
 msgid "last() - Last (most recent) T value"
 msgstr ""
 
+#: app/controllers/CControllerPopupTriggerExpr.php:733
+msgid "lastclock() - Timestamp of the last (most recent) T value"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1557
 msgid "left"
 msgstr ""
@@ -25240,6 +25290,10 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:779
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:795
+msgid "logtimestamp() - Timestamp of the last (most recent) T log message"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:786

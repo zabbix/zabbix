@@ -148,7 +148,12 @@ static int	dc_item_ref_compare(const void *d1, const void *d2)
 	return 0;
 }
 
-int	sync_in_progress = 0;
+static int	sync_in_progress = 0;
+
+int	zbx_get_sync_in_progress(void)
+{
+	return sync_in_progress;
+}
 
 #define START_SYNC	do { WRLOCK_CACHE_CONFIG_HISTORY; WRLOCK_CACHE; sync_in_progress = 1; } while(0)
 #define FINISH_SYNC	do { sync_in_progress = 0; UNLOCK_CACHE; UNLOCK_CACHE_CONFIG_HISTORY; } while(0)
@@ -218,41 +223,18 @@ void	set_dc_config(zbx_dc_config_t *in)
 	config = in;
 }
 
-zbx_rwlock_t		config_lock = ZBX_RWLOCK_NULL;
+static zbx_rwlock_t	config_lock = ZBX_RWLOCK_NULL;
 
-void	rdlock_cache(void)
+zbx_rwlock_t	zbx_get_config_lock(void)
 {
-	if (0 == sync_in_progress)
-		zbx_rwlock_rdlock(config_lock);
+	return config_lock;
 }
 
-void	wrlock_cache(void)
-{
-	if (0 == sync_in_progress)
-		zbx_rwlock_wrlock(config_lock);
-}
+static zbx_rwlock_t	config_history_lock = ZBX_RWLOCK_NULL;
 
-void	unlock_cache(void)
+zbx_rwlock_t	zbx_get_config_history_lock(void)
 {
-	if (0 == sync_in_progress)
-		zbx_rwlock_unlock(config_lock);
-}
-
-zbx_rwlock_t		config_history_lock = ZBX_RWLOCK_NULL;
-
-void	rdlock_cache_config_history(void)
-{
-	zbx_rwlock_rdlock(config_history_lock);
-}
-
-void	wrlock_cache_config_history(void)
-{
-	zbx_rwlock_wrlock(config_history_lock);
-}
-
-void	unlock_cache_config_history(void)
-{
-	zbx_rwlock_unlock(config_history_lock);
+	return config_history_lock;
 }
 
 static zbx_shmem_info_t	*config_mem;
@@ -471,7 +453,8 @@ static unsigned char	poller_by_item(unsigned char type, const char *key, unsigne
 		case ITEM_TYPE_SIMPLE:
 			if (SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPING_KEY) ||
 					SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGSEC_KEY) ||
-					SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGLOSS_KEY))
+					SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGLOSS_KEY) ||
+					SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGRETRY_KEY))
 			{
 				if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_PINGER))
 					break;
@@ -613,7 +596,8 @@ static zbx_uint64_t	get_item_nextcheck_seed(ZBX_DC_ITEM *item, zbx_uint64_t inte
 	{
 		if (SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPING_KEY) ||
 				SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGSEC_KEY) ||
-				SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGLOSS_KEY))
+				SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGLOSS_KEY) ||
+				SUCCEED == cmp_key_id(key, ZBX_SERVER_ICMPPINGRETRY_KEY))
 		{
 			return interfaceid;
 		}
@@ -1087,7 +1071,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 					"timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent",
 					"timeout_external_check", "timeout_db_monitor", "timeout_http_agent",
 					"timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "auditlog_mode",
-					"timeout_browser"};
+					"timeout_browser", "proxy_secrets_provider"};
 
 	const char	*row[ARRSIZE(selected_fields)];
 	size_t		i;
@@ -1408,6 +1392,12 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 			row[44]))
 	{
 		dc_strpool_replace(found, (const char **)&config->config->item_timeouts.browser, row[44]);
+		config->revision.config_table = revision;
+	}
+
+	if (config->config->proxy_secrets_provider != (value_int = atoi(row[45])))
+	{
+		config->config->proxy_secrets_provider = value_int;
 		config->revision.config_table = revision;
 	}
 
@@ -4692,6 +4682,7 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 	zbx_trigger_timer_t	*timer, *old;
 	zbx_timespec_t		ts;
 	zbx_hashset_iter_t	iter;
+	time_t			offset;
 
 	ts.ns = 0;
 
@@ -4700,6 +4691,12 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 	{
 		if (ZBX_FUNCTION_TYPE_TIMER != function->type && ZBX_FUNCTION_TYPE_TRENDS != function->type)
 			continue;
+
+		/* schedule evaluation later to reduce server startup load */
+		if (NULL != trend_queue && ZBX_FUNCTION_TYPE_TIMER == function->type)
+			offset = SEC_PER_MIN;
+		else
+			offset = 0;
 
 		if (function->timer_revision == function->revision)
 			continue;
@@ -4730,15 +4727,22 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 		}
 		else
 		{
-			if (0 == (ts.sec = (int)dc_function_calculate_nextcheck(NULL, timer, now, timer->triggerid)))
+			if (0 == (ts.sec = (int)dc_function_calculate_nextcheck(NULL, timer, now + offset,
+					timer->triggerid)))
 			{
 				dc_trigger_timer_free(timer);
 				function->timer_revision = 0;
 			}
 			else
-				dc_schedule_trigger_timer(timer, now, NULL, &ts);
+				dc_schedule_trigger_timer(timer, now + offset, NULL, &ts);
 		}
 	}
+
+	/* schedule evaluation later to reduce server startup load */
+	if (NULL != trend_queue)
+		offset = SEC_PER_MIN;
+	else
+		offset = 0;
 
 	zbx_hashset_iter_reset(&config->triggers, &iter);
 	while (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_iter_next(&iter)))
@@ -4758,13 +4762,13 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now)
 		if (NULL == (timer = dc_trigger_timer_create(trigger)))
 			continue;
 
-		if (0 == (ts.sec = (int)dc_function_calculate_nextcheck(NULL, timer, now, timer->triggerid)))
+		if (0 == (ts.sec = (int)dc_function_calculate_nextcheck(NULL, timer, now + offset, timer->triggerid)))
 		{
 			dc_trigger_timer_free(timer);
 			trigger->timer_revision = 0;
 		}
 		else
-			dc_schedule_trigger_timer(timer, now, NULL, &ts);
+			dc_schedule_trigger_timer(timer, now + offset, NULL, &ts);
 	}
 }
 
@@ -8059,14 +8063,16 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	START_SYNC;
 
 	config->um_cache = um_cache_sync(config->um_cache, new_revision, &gmacro_sync, &hmacro_sync, &htmpl_sync,
-			config_vault, get_program_type_cb());
+			config_vault);
 
 	DCsync_host_tags(&host_tag_sync);
 
 	FINISH_SYNC;
 
 	/* postpone configuration sync until macro secrets are received from Zabbix server */
-	if (0 == (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER) && 0 != config->kvs_paths.values_num &&
+	if (0 == (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER) &&
+			ZBX_PROXY_SECRETS_PROVIDER_SERVER == config->config->proxy_secrets_provider &&
+			0 != config->kvs_paths.values_num &&
 			ZBX_DBSYNC_INIT == mode)
 	{
 		goto clean;
@@ -10481,19 +10487,44 @@ int	zbx_dc_get_host_value(zbx_uint64_t itemid, char **replace_to, int request)
 
 	switch (request)
 	{
-		case ZBX_REQUEST_HOST_ID:
+		case ZBX_DC_REQUEST_HOST_ID:
 			*replace_to = zbx_dsprintf(*replace_to, ZBX_FS_UI64, host.hostid);
 			break;
-		case ZBX_REQUEST_HOST_HOST:
+		case ZBX_DC_REQUEST_HOST_HOST:
 			*replace_to = zbx_strdup(*replace_to, host.host);
 			break;
-		case ZBX_REQUEST_HOST_NAME:
+		case ZBX_DC_REQUEST_HOST_NAME:
 			*replace_to = zbx_strdup(*replace_to, host.name);
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			ret = FAIL;
 	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: gets host hostname from itemid                                    *
+ *                                                                            *
+ * Parameters: itemid     - [IN]                                              *
+ *             replace_to - [OUT] buffer where to put hostname                *
+ *                                                                            *
+ * Return value: FAIL when item is not found                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_get_host_host(zbx_uint64_t itemid, char **replace_to)
+{
+	int		ret;
+	zbx_dc_host_t	host;
+
+	zbx_dc_config_get_hosts_by_itemids(&host, &itemid, &ret, 1);
+
+	if (FAIL == ret)
+		return FAIL;
+
+	*replace_to = zbx_strdup(*replace_to, host.host);
 
 	return ret;
 }
@@ -11418,13 +11449,13 @@ int	zbx_dc_get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char **
 
 	switch (request)
 	{
-		case ZBX_REQUEST_HOST_IP:
+		case ZBX_DC_REQUEST_HOST_IP:
 			if ('\0' != *interface.ip_orig && FAIL == zbx_is_ip(interface.ip_orig))
 				return FAIL;
 
 			*replace_to = zbx_strdup(*replace_to, interface.ip_orig);
 			break;
-		case ZBX_REQUEST_HOST_DNS:
+		case ZBX_DC_REQUEST_HOST_DNS:
 			if ('\0' != *interface.dns_orig && FAIL == zbx_is_ip(interface.dns_orig) &&
 					FAIL == zbx_validate_hostname(interface.dns_orig))
 			{
@@ -11433,7 +11464,7 @@ int	zbx_dc_get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char **
 
 			*replace_to = zbx_strdup(*replace_to, interface.dns_orig);
 			break;
-		case ZBX_REQUEST_HOST_CONN:
+		case ZBX_DC_REQUEST_HOST_CONN:
 			if (FAIL == zbx_is_ip(interface.addr) &&
 					FAIL == zbx_validate_hostname(interface.addr))
 			{
@@ -11442,7 +11473,7 @@ int	zbx_dc_get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char **
 
 			*replace_to = zbx_strdup(*replace_to, interface.addr);
 			break;
-		case ZBX_REQUEST_HOST_PORT:
+		case ZBX_DC_REQUEST_HOST_PORT:
 			*replace_to = zbx_strdup(*replace_to, interface.port_orig);
 			break;
 		default:
@@ -11451,6 +11482,25 @@ int	zbx_dc_get_interface_value(zbx_uint64_t hostid, zbx_uint64_t itemid, char **
 	}
 
 	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve a particular value associated with the interface.        *
+ *                                                                            *
+ * Parameters: itemid     - [IN]                                              *
+ *             replace_to - [OUT] place to put value                          *
+ *             request    - [IN] type of value to get                         *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ * Comments: This function is used as callback in zbx_db_with_trigger_itemid  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_get_interface_value_itemid(zbx_uint64_t itemid, char **replace_to, int request)
+{
+	return zbx_dc_get_interface_value(0, itemid, replace_to, request);
 }
 
 /******************************************************************************
@@ -13960,6 +14010,9 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 
 	if (0 != (flags & ZBX_CONFIG_FLAGS_AUDITLOG_MODE))
 		cfg->auditlog_mode = config->config->auditlog_mode;
+
+	if (0 != (flags & ZBX_CONFIG_FLAGS_PROXY_SECRETS_PROVIDER))
+		cfg->proxy_secrets_provider = config->config->proxy_secrets_provider;
 
 	UNLOCK_CACHE;
 
@@ -16472,6 +16525,38 @@ int	zbx_dc_expand_user_and_func_macros(const zbx_dc_um_handle_t *um_handle, char
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s() '%s'", __func__, *text);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: expand user and func macros in specified text value from itemid   *
+ *                                                                            *
+ * Parameters: itemid     - [IN]                                              *
+ *             replace_to - [IN/OUT] text value with macros to expand         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_expand_user_and_func_macros_itemid(zbx_uint64_t itemid, char **replace_to)
+{
+	zbx_dc_item_t	dc_item;
+	int		ret = FAIL, errcode;
+
+	zbx_dc_config_get_items_by_itemids(&dc_item, &itemid, &errcode, 1);
+
+	if (SUCCEED == errcode)
+	{
+		zbx_dc_um_handle_t	*um_handle;
+
+		um_handle = zbx_dc_open_user_macros();
+
+		(void)zbx_dc_expand_user_and_func_macros(um_handle, replace_to, &dc_item.host.hostid, 1, NULL);
+
+		zbx_dc_close_user_macros(um_handle);
+		ret = SUCCEED;
+	}
+
+	zbx_dc_config_clean_items(&dc_item, &errcode, 1);
 
 	return ret;
 }

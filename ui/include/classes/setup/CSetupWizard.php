@@ -1164,7 +1164,7 @@ class CSetupWizard extends CForm {
 		return $list;
 	}
 
-	private function dbConnect(string $username = null, string $password = null) {
+	private function dbConnect(?string $username = null, ?string $password = null) {
 		global $DB;
 
 		if (!$this->getConfig('check_fields_result')) {

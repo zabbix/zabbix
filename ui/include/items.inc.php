@@ -611,11 +611,7 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $pr
 					->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
 					->getUrl();
 
-				$name = (new CLink($template['name'], $item_url))
-					->setAttribute('data-action', 'item.prototype.edit')
-					->setAttribute('data-itemid', $parent_templates['links'][$itemid]['itemid'])
-					->setAttribute('data-parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
-					->setAttribute('data-context', 'template');
+				$name = new CLink($template['name'], $item_url);
 			}
 			// ZBX_FLAG_DISCOVERY_NORMAL
 			else {
@@ -623,15 +619,11 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $pr
 					->setArgument('action', 'popup')
 					->setArgument('popup', 'item.edit')
 					->setArgument('context', 'template')
-					->setArgument('data-hostid', $parent_templates['links'][$itemid]['hostid'])
+					->setArgument('hostid', $parent_templates['links'][$itemid]['hostid'])
 					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
 					->getUrl();
 
-				$name = (new CLink($template['name'], $item_url))
-					->setAttribute('data-action', 'item.edit')
-					->setAttribute('data-hostid', $parent_templates['links'][$itemid]['hostid'])
-					->setAttribute('data-itemid', $parent_templates['links'][$itemid]['itemid'])
-					->setAttribute('data-context', 'template');
+				$name = new CLink($template['name'], $item_url);
 			}
 		}
 		else {
@@ -2419,7 +2411,7 @@ function getInheritedTimeouts(string $proxyid): array {
  *
  * @return array
  */
-function getItemTypeCountByHostId(int $item_type, array $hostids): array {
+function getEnabledItemTypeCountByHostId(int $item_type, array $hostids): array {
 	if (!$hostids) {
 		return [];
 	}
@@ -2428,8 +2420,28 @@ function getItemTypeCountByHostId(int $item_type, array $hostids): array {
 		'countOutput' => true,
 		'groupCount' => true,
 		'hostids' => $hostids,
-		'filter' => ['type' => $item_type]
+		'filter' => ['type' => $item_type, 'status' => ITEM_STATUS_ACTIVE]
 	]);
 
 	return $items_count ? array_column($items_count, 'rowscount', 'hostid') : [];
+}
+
+/**
+ * @param array $interfaceids
+ *
+ * @return array
+ */
+function getEnabledItemsCountByInterfaceIds(array $interfaceids): array {
+	if (!$interfaceids) {
+		return [];
+	}
+
+	$items_count = API::Item()->get([
+		'countOutput' => true,
+		'groupCount' => true,
+		'interfaceids' => $interfaceids,
+		'filter' => ['status' => ITEM_STATUS_ACTIVE]
+	]);
+
+	return $items_count ? array_column($items_count, 'rowscount', 'interfaceid') : [];
 }

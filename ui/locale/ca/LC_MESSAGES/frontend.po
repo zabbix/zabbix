@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-11-21 10:54+0000\n"
+"PO-Revision-Date: 2025-02-01 08:45+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -2938,6 +2938,16 @@ msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
 msgstr[0] "No es pot pas esborrar el grup d'usuaris"
 msgstr[1] "No es poden pas esborrar els grups d'usuaris"
+
+#: include/classes/api/services/CUserGroup.php:1330
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
+msgstr "No es pot esborrar el grup d'usuaris \"%1$s\", perquè l'empra el directori d'usuaris LDAP \"%2$s\"."
+
+#: include/classes/api/services/CUserGroup.php:1325
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
+msgstr "No es pot esborrar el grup d'usuaris \"%1$s\", perquè l'empra el directori d'usuaris de SAML."
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
@@ -7248,6 +7258,10 @@ msgstr "Mostra el valor de l'element com a"
 msgid "Display local time"
 msgstr "Mostra l'hora local"
 
+#: widgets/itemhistory/views/column.edit.php:240
+msgid "Display log time"
+msgstr "Veure l'hora del registre"
+
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
 msgstr "Mostra min/mitjana/max"
@@ -9415,6 +9429,10 @@ msgstr "Selecció de dades de l'historial"
 #: app/views/popup.triggerexpr.php:129
 msgid "History functions"
 msgstr "Històric de funcions"
+
+#: app/views/administration.housekeeping.edit.php:218
+msgid "History, trends and audit log compression"
+msgstr "Història, tendències i compressió del registre d'auditoria"
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -17613,6 +17631,10 @@ msgstr "Restableix els valors per defecte"
 msgid "Reset to initial view"
 msgstr "Restableix a la vista inicial"
 
+#: app/views/administration.miscconfig.edit.php:103
+msgid "Resolve secret vault macros by"
+msgstr "Resol les macros secretes de la caixa forta per"
+
 #: jsLoader.php:283
 msgid "Resolved"
 msgstr "Resolt"
@@ -20583,6 +20605,10 @@ msgstr "Aquesta configuració hauria d'ésser actives, doncs les taules de tend�
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
 msgstr "Aquesta configuració ensenya l'hora local en lloc de la marca de temps. També s'ha de marcar \"Veure marca de temps\" a la configuració avançada."
 
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr "Aquesta configuració ensenya l'hora del registre en lloc de la marca de temps de l'element. També s'ha de marcar \"Veure marca de temps\" a la configuració avançada."
+
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
 msgid "This type of information may not match the key."
@@ -22802,6 +22828,10 @@ msgstr "Comptador de rendiment de la màquina virtual de VMware, \"url\" - URL d
 msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "Estat d'energia de la màquina virtual de VMware, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de la màquina virtual de VMware"
 
+#: include/classes/data/CItemData.php:2498
+msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr "Mida de memòria privada de la màquina virtual de VMware, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de la màquina virtual de VMware"
+
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
 msgstr "Mida de memòria privada de la màquina virtual de VMware, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de la màquina virtual de VMware"
@@ -23864,6 +23894,14 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr "Servidor Zabbix (servidor intermediari)"
 
+#: app/views/administration.miscconfig.edit.php:112
+msgid "Zabbix server and proxy"
+msgstr "Servidor i proxy Zabbix"
+
+#: app/views/administration.miscconfig.edit.php:107
+msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
+msgstr "Servidor i proxy Zabbix: els secrets són recuperats de Vault tant pel servidor com pels proxys Zabbix, cosa que els permet resoldre les macros de manera independent."
+
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "El servidor Zabbix no s'està executant: és possible que la informació mostrada no sigui l'actual."
@@ -23880,6 +23918,10 @@ msgstr "Nom del servidor Zabbix"
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
 msgstr "Versió del servidor Zabbix"
+
+#: app/views/administration.miscconfig.edit.php:105
+msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
+msgstr "Servidor Zabbix: el servidor Zabbix recupera els secrets de Vault i l'envia als proxys quan cal."
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -24820,6 +24862,10 @@ msgstr "primer"
 msgid "first() - The oldest value in the specified time interval"
 msgstr "first() - El valor més antic de l'interval de temps especificat"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:626
+msgid "firstclock() - Timestamp of the oldest value in the specified time interval"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
 msgstr "floor() - Arrodoneix cap avall a l'enter més proper"
@@ -25217,6 +25263,10 @@ msgstr "darrer"
 msgid "last() - Last (most recent) T value"
 msgstr "last() - Darrer valor T (més recent)."
 
+#: app/controllers/CControllerPopupTriggerExpr.php:733
+msgid "lastclock() - Timestamp of the last (most recent) T value"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1557
 msgid "left"
 msgstr "esquerra"
@@ -25252,6 +25302,10 @@ msgstr "logseverity() - Registre de gravetats de lla darrera entrada al registre
 #: app/controllers/CControllerPopupTriggerExpr.php:779
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr "logsource() - Font de registre de la darrera entrada de registre que coincideix amb el paràmetre V per al període T (1 - coincidència, 0 - sense coincidència)"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:795
+msgid "logtimestamp() - Timestamp of the last (most recent) T log message"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "ltrim() - Remove specified characters from the beginning of a string"

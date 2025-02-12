@@ -32,6 +32,7 @@ require_once dirname(__FILE__).'/testServiceRoles.php';
 require_once dirname(__FILE__).'/testExpressionMacros.php';
 require_once dirname(__FILE__).'/testExpressionTriggerMacros.php';
 require_once dirname(__FILE__).'/testAgentItems.php';
+require_once dirname(__FILE__).'/testScriptItems.php';
 require_once dirname(__FILE__).'/testItemRate.php';
 require_once dirname(__FILE__).'/testHistoryValueDuplicates.php';
 require_once dirname(__FILE__).'/testHighAvailability.php';
@@ -52,6 +53,7 @@ require_once dirname(__FILE__).'/testFunctionChangeCount.php';
 require_once dirname(__FILE__).'/testProxyHa.php';
 require_once dirname(__FILE__).'/testBrowserMonitoring.php';
 require_once dirname(__FILE__).'/testHostConnMacroValidation.php';
+require_once dirname(__FILE__).'/testConfigVariables.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -79,7 +81,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testServiceRoles');
 		$suite->addTestSuite('testExpressionMacros');
 		$suite->addTestSuite('testExpressionTriggerMacros');
-		$suite->addTestSuite('testAgentItems');
+		$suite->addTestSuite('testScriptItems');
 		$suite->addTestSuite('testItemRate');
 		$suite->addTestSuite('testHistoryValueDuplicates');
 		$suite->addTestSuite('testHighAvailability');
@@ -100,6 +102,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testProxyHa');
 		$suite->addTestSuite('testBrowserMonitoring');
 		$suite->addTestSuite('testHostConnMacroValidation');
+		$suite->addTestSuite('testConfigVariables');
 
 		return $suite;
 	}

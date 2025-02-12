@@ -62,4 +62,17 @@ zbx_poller_test_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(T
 
 zbx_poller_test_CFLAGS = \
 	-I@top_srcdir@/tests @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
+
+if HAVE_SSH
+zbx_poller_test_LDADD += $(SSH_LIBS)
+zbx_poller_test_LDFLAGS += $(SSH_LDFLAGS)
+zbx_poller_test_CFLAGS += $(SSH_CFLAGS)
+endif
+
+if HAVE_SSH2
+zbx_poller_test_LDADD += $(SSH2_LIBS)
+zbx_poller_test_LDFLAGS += $(SSH2_LDFLAGS)
+zbx_poller_test_CFLAGS += $(SSH2_CFLAGS)
+endif
+
 endif

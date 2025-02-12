@@ -1230,8 +1230,8 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 	double			sec;
 	zbx_history_recv_item_t	*items;
 	char			*error = NULL;
-	zbx_uint64_t		itemids[ZBX_HISTORY_VALUES_MAX], last_valueid = 0;
-	zbx_agent_value_t	values[ZBX_HISTORY_VALUES_MAX];
+	zbx_uint64_t		itemids[ZBX_HISTORY_VALUES_MAX] = {0}, last_valueid = 0;
+	zbx_agent_value_t	values[ZBX_HISTORY_VALUES_MAX] = {0};
 	zbx_timespec_t		unique_shift = {0, 0};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);

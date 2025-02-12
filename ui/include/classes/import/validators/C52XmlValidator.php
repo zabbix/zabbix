@@ -1995,7 +1995,7 @@ class C52XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @return bool
 	 */
-	public function requiredMapElement(array $parent_data = null) {
+	public function requiredMapElement(?array $parent_data = null) {
 		if (zbx_is_int($parent_data['elementtype'])) {
 			switch ($parent_data['elementtype']) {
 				case SYSMAP_ELEMENT_TYPE_HOST:

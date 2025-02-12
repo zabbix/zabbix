@@ -27,10 +27,9 @@ window.hostgroup_edit_popup = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
 
-		const backurl = new Curl('zabbix.php');
-
-		backurl.setArgument('action', 'hostgroup.list');
-		this.overlay.backurl = backurl.getUrl();
+		const return_url = new URL('zabbix.php', location.href);
+		return_url.searchParams.set('action', 'hostgroup.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 	}
 
 	submit() {
@@ -49,15 +48,11 @@ window.hostgroup_edit_popup = new class {
 		});
 	}
 
-	cancel() {
-		overlayDialogueDestroy(this.overlay.dialogueid);
-	}
-
 	clone() {
 		this.overlay.setLoading();
 		const parameters = getFormFields(this.form);
 
-		this.overlay = window.popupManagerInstance.openPopup('hostgroup.edit', {name: parameters.name});
+		this.overlay = ZABBIX.PopupManager.open('hostgroup.edit', {name: parameters.name});
 	}
 
 	delete() {

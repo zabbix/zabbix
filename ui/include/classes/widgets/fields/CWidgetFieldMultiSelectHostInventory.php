@@ -24,7 +24,7 @@ class CWidgetFieldMultiSelectHostInventory extends CWidgetFieldMultiSelect {
 
 	private array $inventory_fields;
 
-	public function __construct(string $name, string $label = null) {
+	public function __construct(string $name, ?string $label = null) {
 		parent::__construct($name, $label);
 
 		$this->inventory_fields = getHostInventories();

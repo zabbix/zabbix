@@ -19,6 +19,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\Exception\UnexpectedAlertOpenException;
+use Facebook\WebDriver\Exception\NoSuchElementException;
 
 /**
  * @backup dashboard, hosts
@@ -676,7 +677,14 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 
 			switch ($selector) {
 				case 'id:dashboard-config':
-					$controls->query($selector)->waitUntilClickable()->one()->click();
+					// TODO: unstable test on Jenkins, sometimes click does not work properly and overlay does not open
+					try {
+						$controls->query($selector)->waitUntilClickable()->one()->click();
+						COverlayDialogElement::find()->one();
+					}
+					catch (NoSuchElementException $e) {
+						$controls->query($selector)->waitUntilClickable()->one()->click();
+					}
 					$this->checkDialogue('Dashboard properties');
 					break;
 
@@ -2136,7 +2144,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					]
 				]
 			],
-			// #23 Data overview widget.
+			// #23 Top items widget.
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('Top items'),
@@ -2157,7 +2165,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						[
 							'field' => 'Items',
 							'type' => 'table',
-							'headers' => ['', 'Patterns', 'Actions'],
+							'headers' => ['Patterns', 'Actions'],
 							'buttons' => ['Add'],
 							'mandatory' => true
 						]
