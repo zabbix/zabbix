@@ -7870,25 +7870,20 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
     margin: 0 5px 0 5px; }
 
 button.copy-button {
-  color: #555555 !important;
-  border: 1px solid #888888;
-  background: #ffffff;
   border-radius: 2px;
   line-height: 24px;
-  width: 24px;
-  height: 24px !important; }
-  button.copy-button:hover {
-    background-color: #f4f4f4;
-    color: #000000; }
-  button.copy-button:hover:not(:focus) {
-    border: 1px solid #888888; }
-  button.copy-button:focus {
-    box-shadow: 0 0 0 2px #111111;
-    border: 1px solid #888888; }
-  button.copy-button:focus:not(:hover) {
+  width: 24px; }
+  button.copy-button.btn-icon {
+    height: 24px;
+    border: 1px solid #888888;
     background: #ffffff; }
-  button.copy-button::before {
-    font-size: 12px; }
+    button.copy-button.btn-icon::before {
+      color: #555555;
+      font-size: 12px; }
+    button.copy-button.btn-icon:hover {
+      background-color: #f4f4f4; }
+    button.copy-button.btn-icon:focus {
+      box-shadow: 0 0 0 2px #111111; }
 
 .color-accent, .color-accent.btn-icon:not([disabled]), .color-accent.btn-link:not([disabled]), .color-accent.link-action:not(:hover):not(:focus), .color-accent.link-alt:not(:hover):not(:focus) {
   color: #ed3400; }

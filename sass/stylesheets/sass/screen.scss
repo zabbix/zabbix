@@ -4111,34 +4111,27 @@ z-select {
 }
 
 button.copy-button {
-	color: $icon-color !important;
-	border: 1px solid $form-border-color;
-	background: $form-bg-color;
 	border-radius: 2px;
 	line-height: 24px;
 	width: 24px;
-	height: 24px !important;
 
-	&:hover {
-		background-color: $btn-form-hover-bg-color;
-		color: $btn-icon-hover-color;
-	}
-
-	&:hover:not(:focus) {
+	&.btn-icon {
+		height: 24px;
 		border: 1px solid $form-border-color;
-	}
-
-	&:focus {
-		box-shadow: 0 0 0 2px $btn-focus-outline-color;
-		border: 1px solid $form-border-color;
-	}
-
-	&:focus:not(:hover) {
 		background: $form-bg-color;
-	}
 
-	&::before {
-		font-size: 12px;
+		&::before {
+			color: $icon-color;
+			font-size: 12px;
+		}
+
+		&:hover {
+			background-color: $btn-form-hover-bg-color;
+		}
+
+		&:focus {
+			box-shadow: 0 0 0 2px $btn-focus-outline-color;
+		}
 	}
 }
 

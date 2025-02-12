@@ -463,7 +463,7 @@ function processItemPreprocessingTestResults(steps) {
 		}
 
 		if (step.error === undefined && result) {
-			const copy_button = form.querySelector('.copy-' + i);
+			const copy_button = form.querySelector(`.copy-button[data-index="${i}"]`);
 			const copy_element = copy_button.closest('td');
 
 			copy_element.closest('tr').classList.add('display-icon')
