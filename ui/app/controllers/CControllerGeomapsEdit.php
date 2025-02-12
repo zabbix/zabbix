@@ -20,6 +20,7 @@
 class CControllerGeomapsEdit extends CController {
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
@@ -33,9 +34,7 @@ class CControllerGeomapsEdit extends CController {
 
 	protected function doAction(): void {
 		$data = [
-			'geomaps_tile_provider' => $this->getInput('geomaps_tile_provider', CSettingsHelper::get(
-				CSettingsHelper::GEOMAPS_TILE_PROVIDER
-			)),
+			'geomaps_tile_provider' => CSettingsHelper::get(CSettingsHelper::GEOMAPS_TILE_PROVIDER),
 			'tile_providers' => getTileProviders(),
 			'js_validation_rules' => (new CFormValidator(
 				CControllerGeomapsUpdate::getValidationRules()
@@ -45,15 +44,9 @@ class CControllerGeomapsEdit extends CController {
 		$data += (array_key_exists($data['geomaps_tile_provider'], $data['tile_providers']))
 			? $data['tile_providers'][$data['geomaps_tile_provider']]
 			: [
-				'geomaps_tile_url' => $this->getInput('geomaps_tile_url', CSettingsHelper::get(
-					CSettingsHelper::GEOMAPS_TILE_URL
-				)),
-				'geomaps_max_zoom' => $this->getInput('geomaps_max_zoom', CSettingsHelper::get(
-					CSettingsHelper::GEOMAPS_MAX_ZOOM
-				)),
-				'geomaps_attribution' => $this->getInput('geomaps_attribution', CSettingsHelper::get(
-					CSettingsHelper::GEOMAPS_ATTRIBUTION
-				))
+				'geomaps_tile_url' => CSettingsHelper::get(CSettingsHelper::GEOMAPS_TILE_URL),
+				'geomaps_max_zoom' => CSettingsHelper::get(CSettingsHelper::GEOMAPS_MAX_ZOOM),
+				'geomaps_attribution' => CSettingsHelper::get(CSettingsHelper::GEOMAPS_ATTRIBUTION)
 			];
 
 		$response = new CControllerResponseData($data);
