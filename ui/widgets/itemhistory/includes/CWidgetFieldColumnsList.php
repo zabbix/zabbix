@@ -49,7 +49,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 		'6AC8FF', 'EE2B29', '3CA20D', '6F4BBC', '00A1FF', 'F3601B', '1CAE59', '45CFDB', '894BBC', '6D6D6D'
 	];
 
-	public function __construct(string $name, string $label = null) {
+	public function __construct(string $name, ?string $label = null) {
 		parent::__construct($name, $label);
 
 		$this->setDefault(self::DEFAULT_VALUE);

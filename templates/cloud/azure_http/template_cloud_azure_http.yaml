@@ -11198,7 +11198,6 @@ zabbix_export:
             	Zabbix.log(3, '[ Azure SQL instance ] ERROR: ' + error);
             	return JSON.stringify({ 'error': error });
             }
-            
           description: 'Gathers data of the Azure SQL managed instance.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:
@@ -14141,7 +14140,6 @@ zabbix_export:
             	Zabbix.log(3, '[ AzureVMSS ] ERROR: ' + error);
             	return JSON.stringify({ 'error': error });
             }
-            
           description: 'Gathers data of the virtual machine scale set.'
           timeout: '{$AZURE.DATA.TIMEOUT}'
           parameters:

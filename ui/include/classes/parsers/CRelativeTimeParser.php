@@ -215,7 +215,7 @@ class CRelativeTimeParser extends CParser {
 	 *
 	 * @return DateTime|null
 	 */
-	public function getDateTime(bool $is_start, DateTimeZone $timezone = null, ?int $timestamp = null): ?DateTime {
+	public function getDateTime(bool $is_start, ?DateTimeZone $timezone = null, ?int $timestamp = null): ?DateTime {
 		if ($this->match === '') {
 			return null;
 		}
