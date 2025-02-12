@@ -488,7 +488,7 @@ class CAction extends CApiService {
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 */
-	private static function updateFilter(array &$actions, array $db_actions = null): void {
+	private static function updateFilter(array &$actions, ?array $db_actions = null): void {
 		$is_update = ($db_actions !== null);
 
 		$ins_conditions = [];
@@ -605,7 +605,7 @@ class CAction extends CApiService {
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 */
-	private static function updateOperations(array &$actions, array $db_actions = null): void {
+	private static function updateOperations(array &$actions, ?array $db_actions = null): void {
 		$is_update = ($db_actions !== null);
 
 		$ins_operations = [];
@@ -693,7 +693,7 @@ class CAction extends CApiService {
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 */
-	private static function updateOperationConditions(array &$actions, array $db_actions = null): void {
+	private static function updateOperationConditions(array &$actions, ?array $db_actions = null): void {
 		$is_update = ($db_actions !== null);
 
 		$ins_opconditions = [];
@@ -792,7 +792,7 @@ class CAction extends CApiService {
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 */
-	private static function updateOperationMessages(array &$actions, array $db_actions = null): void {
+	private static function updateOperationMessages(array &$actions, ?array $db_actions = null): void {
 		$is_update = ($db_actions !== null);
 
 		$ins_opmessages = [];
@@ -951,7 +951,7 @@ class CAction extends CApiService {
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 */
-	private static function updateOperationCommands(array &$actions, array $db_actions = null): void {
+	private static function updateOperationCommands(array &$actions, ?array $db_actions = null): void {
 		$is_update = ($db_actions !== null);
 
 		$ins_opcommands = [];
@@ -1107,7 +1107,7 @@ class CAction extends CApiService {
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 */
-	private static function updateOperationGroups(array &$actions, array $db_actions = null): void {
+	private static function updateOperationGroups(array &$actions, ?array $db_actions = null): void {
 		$is_update = ($db_actions !== null);
 
 		$ins_opgroups = [];
@@ -1190,7 +1190,7 @@ class CAction extends CApiService {
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 */
-	private static function updateOperationTemplates(array &$actions, array $db_actions = null): void {
+	private static function updateOperationTemplates(array &$actions, ?array $db_actions = null): void {
 		$is_update = ($db_actions !== null);
 
 		$ins_optemplates = [];
@@ -1273,7 +1273,7 @@ class CAction extends CApiService {
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 */
-	private static function updateOperationInventories(array $actions, array $db_actions = null): void {
+	private static function updateOperationInventories(array $actions, ?array $db_actions = null): void {
 		$is_update = ($db_actions !== null);
 
 		$ins_opinventories = [];
@@ -1331,7 +1331,7 @@ class CAction extends CApiService {
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 */
-	private static function updateOperationTags(array &$actions, array $db_actions = null): void {
+	private static function updateOperationTags(array &$actions, ?array $db_actions = null): void {
 		$is_update = ($db_actions !== null);
 
 		$ins_optags = [];
@@ -2664,7 +2664,7 @@ class CAction extends CApiService {
 	 *
 	 * @throws APIException if action name is not unique.
 	 */
-	private static function checkDuplicates(array $actions, array $db_actions = null): void {
+	private static function checkDuplicates(array $actions, ?array $db_actions = null): void {
 		$names = [];
 
 		foreach ($actions as $action) {
@@ -2757,7 +2757,7 @@ class CAction extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkOperations(array &$actions, array $db_actions = null): void {
+	private static function checkOperations(array &$actions, ?array $db_actions = null): void {
 		$is_update = ($db_actions !== null);
 
 		foreach ($actions as &$action) {
@@ -3402,7 +3402,7 @@ class CAction extends CApiService {
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 */
-	private static function addAffectedObjects(array $actions, array &$db_actions = null): void {
+	private static function addAffectedObjects(array $actions, ?array &$db_actions = null): void {
 		$actionids = ['filter' => [], 'operations' => []];
 
 		foreach ($actions as $action) {

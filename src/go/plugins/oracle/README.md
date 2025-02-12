@@ -254,7 +254,7 @@ Note: session names are case-sensitive.
 
 **oracle.instance.info[\<commonParams\>]** — returns instance statistics.
 
-**oracle.pdb.info[\<commonParams\>,\<database\>]** — returns the Plugable Databases (PDBs) information.
+**oracle.pdb.info[\<commonParams\>,\<database\>]** — returns the Pluggable Databases (PDBs) information.
 *Parameters:*  
 `database` (optional) — the name of the database.
 
