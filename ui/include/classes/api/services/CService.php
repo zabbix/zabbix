@@ -441,37 +441,35 @@ class CService extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		self::checkUsedInActions($db_services);
+		if ($permissions['rw_services'] !== null) {
+			foreach ($db_services as $db_service) {
+				if ($db_service['readonly'] == 1) {
+					$error_detail = _('read-write access to the service is required');
+					$error = _s('Cannot delete service "%1$s": %2$s.', $db_service['name'], $error_detail);
 
-		if ($permissions['rw_services'] === null) {
-			return;
-		}
-
-		foreach ($db_services as $db_service) {
-			if ($db_service['readonly'] == 1) {
-				$error_detail = _('read-write access to the service is required');
-				$error = _s('Cannot delete service "%1$s": %2$s.', $db_service['name'], $error_detail);
-
-				self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+					self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+				}
 			}
-		}
 
-		foreach ($db_services as $db_service) {
-			foreach ($db_service['children'] as $child_service) {
-				if ($permissions['rw_services'][$child_service['serviceid']] !== null) {
-					$permissions['rw_services'][$child_service['serviceid']]--;
+			foreach ($db_services as $db_service) {
+				foreach ($db_service['children'] as $child_service) {
+					if ($permissions['rw_services'][$child_service['serviceid']] !== null) {
+						$permissions['rw_services'][$child_service['serviceid']]--;
 
-					if ($permissions['rw_services'][$child_service['serviceid']] == 0) {
-						$error_detail = _s('read-write access to the child service "%1$s" must be retained',
-							$child_service['name']
-						);
-						$error = _s('Cannot delete service "%1$s": %2$s.', $db_service['name'], $error_detail);
+						if ($permissions['rw_services'][$child_service['serviceid']] == 0) {
+							$error_detail = _s('read-write access to the child service "%1$s" must be retained',
+								$child_service['name']
+							);
+							$error = _s('Cannot delete service "%1$s": %2$s.', $db_service['name'], $error_detail);
 
-						self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+							self::exception(ZBX_API_ERROR_PERMISSIONS, $error);
+						}
 					}
 				}
 			}
 		}
+
+		self::checkUsedInActions($db_services);
 	}
 
 	private static function checkUsedInActions(array $db_services): void {
