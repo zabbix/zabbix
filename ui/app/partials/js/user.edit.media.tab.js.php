@@ -16,7 +16,7 @@
 ?>
 
 <script>
-	const mediaView = new class {
+	const media_tab = new class {
 		init({medias}) {
 			this.#initMedias(medias);
 			this.#initActions();

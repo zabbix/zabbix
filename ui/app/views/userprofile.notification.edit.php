@@ -61,7 +61,6 @@ if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
 }
 
 // Frontend notifications tab.
-
 $messaging_form_list = (new CFormList())
 	->addRow(_('Frontend notifications'),
 		(new CCheckBox('messages[enabled]'))

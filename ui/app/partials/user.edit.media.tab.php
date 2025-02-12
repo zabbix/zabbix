@@ -28,16 +28,16 @@ $media_form_list = new CFormList('userMediaFormList');
 $media_table_info = (new CTable())
 	->setId('media-table')
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Type'), _('Send to'), _('When active'), _('Use if severity'), _('Status'), _('Actions')])
-	->addItem(
-		(new CTag('tfoot', true))
-			->addItem(
-				(new CCol(
-					(new CButtonLink(_('Add')))
-						->addClass('js-add')
-				))
-			)
-	);
+	->setHeader([_('Type'), _('Send to'), _('When active'), _('Use if severity'), _('Status'), _('Actions')]);
+
+$media_add_button = (new CButtonLink(_('Add')))
+	->addClass('js-add');
+
+$media_form_list->addRow(_('Media'),
+	(new CDiv([$media_table_info, $media_add_button]))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: ' . ZBX_TEXTAREA_BIG_WIDTH . 'px;')
+);
 
 $media_severity = [];
 
@@ -88,13 +88,7 @@ $media_table_info_template = new CTemplateTag('media-row-tmpl',
 		->setId('medias_#{row_index}')
 );
 
-$media_form_list->addRow(_('Media'),
-	(new CDiv($media_table_info))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: ' . ZBX_TEXTAREA_BIG_WIDTH . 'px;'),
-);
-
-(new CScriptTag('mediaView.init('.json_encode([
+(new CScriptTag('media_tab.init('.json_encode([
 		'medias' => $data['medias']
 	]).');'))
 	->setOnDocumentReady()

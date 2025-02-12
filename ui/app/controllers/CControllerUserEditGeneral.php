@@ -91,6 +91,7 @@ abstract class CControllerUserEditGeneral extends CController {
 		unset($media);
 
 		CArrayHelper::sort($data['medias'], ['name', 'send_to_sort_field']);
+		$data['medias'] = array_values($data['medias']);
 
 		foreach ($data['medias'] as &$media) {
 			unset($media['send_to_sort_field']);
