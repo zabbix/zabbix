@@ -20,7 +20,6 @@
 class CControllerGeomapsEdit extends CController {
 
 	protected function init(): void {
-		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
