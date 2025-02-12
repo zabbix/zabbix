@@ -1532,7 +1532,7 @@ static int	proxyconfig_sync_templates(zbx_table_data_t *hosts_templates, zbx_tab
 	zbx_hashset_iter_t	iter;
 	zbx_table_row_t		*row;
 	zbx_vector_uint64_t	templateids;
-	int			ret;
+	int			ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

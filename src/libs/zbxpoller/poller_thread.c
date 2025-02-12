@@ -334,7 +334,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 		unsigned char expand_macros)
 {
 	char			error[ZBX_ITEM_ERROR_LEN_MAX], *timeout = NULL;
-	zbx_dc_um_handle_t	*um_handle;
+	zbx_dc_um_handle_t	*um_handle = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d", __func__, num);
 
