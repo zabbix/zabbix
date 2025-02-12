@@ -169,7 +169,7 @@ class CRouter {
 		'latest.view'								=> ['CControllerLatestView',							'layout.htmlpage',		'monitoring.latest.view'],
 		'latest.view.refresh'						=> ['CControllerLatestViewRefresh',						'layout.json',			'monitoring.latest.view.refresh'],
 		'macros.edit'								=> ['CControllerMacrosEdit',							'layout.htmlpage',		'administration.macros.edit'],
-		'macros.update'								=> ['CControllerMacrosUpdate',							null,					null],
+		'macros.update'								=> ['CControllerMacrosUpdate',							'layout.json',			null],
 		'maintenance.create'						=> ['CControllerMaintenanceCreate',						'layout.json',			null],
 		'maintenance.delete'						=> ['CControllerMaintenanceDelete',						'layout.json',			null],
 		'maintenance.edit'							=> ['CControllerMaintenanceEdit',						'layout.json',			'maintenance.edit'],

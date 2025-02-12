@@ -68,7 +68,7 @@
 		let removed = 0;
 
 		const form_element = document.forms.macrosForm;
-		const form = new Form(form_element, <?= json_encode($data['js_validation_rules']) ?>);
+		const form = new CForm(form_element, <?= json_encode($data['js_validation_rules']) ?>);
 
 		form_element.addEventListener('submit', (e) => {
 			e.preventDefault();
@@ -157,13 +157,5 @@
 			})
 			.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
 			.textareaFlexible();
-
-		$('#update').click(function() {
-			if (removed) {
-				return confirm(<?= json_encode(_('Are you sure you want to delete?')) ?> + ' ' + removed + ' '
-					+ <?= json_encode(_('macro(s)')) ?> + '?'
-				);
-			}
-		});
 	});
 </script>

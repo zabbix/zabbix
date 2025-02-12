@@ -16,6 +16,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('administration.macros.edit.js.php');
@@ -33,7 +34,9 @@ $table = (new CTable())
 		(new CTableColumn(_('Value')))->addClass('table-col-value'),
 		(new CTableColumn(_('Description')))->addClass('table-col-description'),
 		(new CTableColumn())->addClass('table-col-action')
-	]);
+	])
+	->setAttribute('data-field-type', 'set')
+	->setAttribute('data-field-name', 'macros');
 
 foreach ($data['macros'] as $i => $macro) {
 	$macro_input = (new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
