@@ -342,62 +342,55 @@ function itemCompleteTest(overlay) {
 				jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
 			}
 
-			let $mapping_row;
-
 			if (ret.final !== undefined) {
 				const result = makeStepResult(ret.final);
-				let copy_button;
+				const result_row = document.createElement('div');
 
-				if (result !== null) {
-					$result = result;
-				}
+				result_row.classList.add('final-result-row');
+
+				const action_cell = document.createElement('span');
+				action_cell.innerHTML = ret.final.action;
+
+				const action_element = action_cell.firstChild;
+				action_element.classList.add('final-result-action');
+
+				result_row.append(action_element, result[0]);
 
 				if (ret.final.error === undefined && ret.final.result) {
-					copy_button = createCopyButton(ret.final.result);
-				}
-				else {
-					copy_button = null;
+					result_row.append(createCopyButton(ret.final.result));
 				}
 
-				$result_field = jQuery('<div>', {'class': '<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>'});
-
-				$result_row = jQuery('<div>', {'class': 'final-result-row'})
-					.append(
-						$(ret.final.action).addClass('final-result-action'),
-						$result,
-						copy_button
-					);
+				let mapping_row;
 
 				if (ret.mapped_value !== undefined) {
+					const mapped_value = makeStepResult({result: ret.mapped_value});
+
+					mapping_row = document.createElement('div');
+					mapping_row.classList.add('final-result-row');
+
+					const action_element = document.createElement('span');
+
+					action_element.classList.add('<?= ZBX_STYLE_GREY ?>', 'final-result-action');
+					action_element.textContent = <?= json_encode(_('Result with value map applied')) ?>;
+
+					mapping_row.append(action_element, mapped_value[0]);
+
 					if (ret.final.error === undefined && ret.final.result) {
-						copy_button = jQuery(createCopyButton(ret.final.result));
+						mapping_row.append(createCopyButton(ret.final.result));
 					}
-					else {
-						copy_button = null;
-					}
-
-					$mapped_value = makeStepResult({result: ret.mapped_value});
-
-					$mapping_row = jQuery('<div>', {'class': 'final-result-row'})
-						.append(
-							jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?> final-result-action'})
-								.text(<?= json_encode(_('Result with value map applied')) ?>),
-							$mapped_value,
-							copy_button
-						);
 				}
 
-				$result_field.append($result_row);
+				const result_field = document.createElement('div');
 
-				if ($mapping_row) {
-					$result_field.append($mapping_row);
-				}
+				result_field.classList.add('<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>');
+				result_field.append(result_row);
+				result_field.append(mapping_row ?? '');
 
-				jQuery('.js-final-result')
-					.show()
-					.next()
-					.append($result_field)
-					.show();
+				const final_result = document.querySelector('.js-final-result');
+
+				final_result.style.display = '';
+				final_result.nextElementSibling.append(result_field);
+				final_result.nextElementSibling.style.display = '';
 			}
 		},
 		dataType: 'json',
