@@ -23,14 +23,14 @@
 	const view = new class {
 		init() {
 			document.getElementById('messages_enabled').addEventListener('click', () => {
-				this._updateForm();
+				this.#updateForm();
 			});
 
-			this._updateForm();
-			this._handleAction();
+			this.#updateForm();
+			this.#initAction();
 		}
 
-		_updateForm() {
+		#updateForm() {
 			document
 				.getElementById('notificationsTab')
 				.querySelectorAll('input:not([name="messages[enabled]"]),button,z-select')
@@ -39,23 +39,15 @@
 				});
 		}
 
-		_handleAction() {
+		#initAction() {
 			document.querySelector('#notificationsTab').addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-test_sound')) {
-					this._userSoundHandler(e.target.dataset.message_sounds);
+					testUserSound(`messages_sounds.${e.target.dataset.message_sounds}`);
 				}
 				else if (e.target.classList.contains('js-audio_stop')) {
-					this._stopAudioHandler();
+					AudioControl.stop();
 				}
 			});
-		}
-
-		_userSoundHandler(message_sounds) {
-			testUserSound(`messages_sounds.${message_sounds}`);
-		}
-
-		_stopAudioHandler() {
-			AudioControl.stop();
 		}
 	}
 </script>
