@@ -214,7 +214,7 @@ class CTableBehavior extends CBehavior {
 		if ($total === null) {
 			$total = $count;
 		}
-		$this->test->assertEquals('Displaying '.$count.' of '.$count.' found',
+		$this->test->assertEquals('Displaying '.$count.' of '.$total.' found',
 				$this->test->query('xpath://div[@class="table-stats"]')->one()->getText()
 		);
 	}
