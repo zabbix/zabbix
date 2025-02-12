@@ -183,11 +183,11 @@
 				const span = severities_span[severity];
 
 				if (media_active) {
-					span.dataset.hintboxContents += ' (<?= json_encode(_('on')) ?>)';
+					span.dataset.hintboxContents += ' (' + <?= json_encode(_('on')) ?> + ')';
 				}
 				else {
 					span.className = '<?= ZBX_STYLE_STATUS_DISABLED ?>';
-					span.dataset.hintboxContents += ' (<?= json_encode(_('off')) ?>)';
+					span.dataset.hintboxContents += ' (' + <?= json_encode(_('off')) ?> + ')';
 				}
 
 				span.dataset.hintbox = '1';
