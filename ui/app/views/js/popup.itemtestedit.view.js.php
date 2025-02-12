@@ -463,12 +463,13 @@ function processItemPreprocessingTestResults(steps) {
 		}
 
 		if (step.error === undefined && result) {
-			const copy_element = form.querySelector('.copy-' + i).closest('td');
+			const copy_button = form.querySelector('.copy-' + i);
+			const copy_element = copy_button.closest('td');
 
 			copy_element.closest('tr').classList.add('display-icon')
 			copy_element.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 
-			copy_element.addEventListener('click', e => {
+			copy_button.addEventListener('click', e => {
 				writeTextClipboard(result);
 				e.target.focus();
 			});
