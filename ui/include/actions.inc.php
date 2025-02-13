@@ -440,8 +440,10 @@ function getActionOperationData(array $operations): array {
 
 			case OPERATION_TYPE_GROUP_ADD:
 			case OPERATION_TYPE_GROUP_REMOVE:
-				foreach ($operation['opgroup'] as $groupid) {
-					$data['groupids'][$groupid['groupid']] = true;
+				if (array_key_exists('opgroup', $operation)) {
+					foreach ($operation['opgroup'] as $groupid) {
+						$data['groupids'][$groupid['groupid']] = true;
+					}
 				}
 				break;
 
@@ -693,13 +695,15 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 			case OPERATION_TYPE_GROUP_REMOVE:
 				$host_group_list = [];
 
-				foreach ($operation['opgroup'] as $groupid) {
-					if (array_key_exists($groupid['groupid'], $host_groups)) {
-						$host_group_list[] = $host_groups[$groupid['groupid']]['name'];
+				if (array_key_exists('opgroup', $operation)) {
+					foreach ($operation['opgroup'] as $groupid) {
+						if (array_key_exists($groupid['groupid'], $host_groups)) {
+							$host_group_list[] = $host_groups[$groupid['groupid']]['name'];
+						}
 					}
-				}
 
-				order_result($host_group_list);
+					order_result($host_group_list);
+				}
 
 				$host_group_list = $host_group_list
 					? implode(', ', $host_group_list)
