@@ -72,8 +72,8 @@ static int	tcpsvc_send_context_init(const unsigned char svc_type, unsigned char 
 	return SUCCEED;
 }
 
-static int	tcpsvc_task_process(short event, void *data, int *fd, const char *addr, char *dnserr,
-		struct event *timeout_event)
+static int	tcpsvc_task_process(short event, void *data, int *fd, struct evutil_addrinfo **current_ai,
+			const char *addr, char *dnserr, struct event *timeout_event)
 {
 #	define	SET_RESULT_SUCCEED								\
 		SET_UI64_RESULT(&tcpsvc_context->item.result, 1);				\
@@ -99,6 +99,7 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 
 	ZBX_UNUSED(dnserr);
 	ZBX_UNUSED(timeout_event);
+	ZBX_UNUSED(current_ai);
 
 	if (NULL != poller_config && ZBX_PROCESS_STATE_IDLE == poller_config->state)
 	{
