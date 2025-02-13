@@ -433,9 +433,9 @@ static int	discovery_tcpsvc(discovery_poller_config_t *poller_config, const zbx_
 	item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
 	item.timeout = dcheck->timeout;
 
-	if (SUCCEED != (ret = zbx_async_check_tcpsvc(&item, dcheck->type, &result, async_task_process_result_tcpsvc, async_result,
-			NULL, poller_config->base, poller_config->dnsbase, poller_config->config_source_ip,
-			ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES)))
+	if (SUCCEED != (ret = zbx_async_check_tcpsvc(&item, dcheck->type, &result, async_task_process_result_tcpsvc,
+			async_result, NULL, poller_config->base, poller_config->dnsbase,
+			poller_config->config_source_ip, ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES)))
 	{
 		if (ZBX_ISSET_MSG(&result))
 			*error = zbx_strdup(*error, *ZBX_GET_MSG_RESULT(&result));
