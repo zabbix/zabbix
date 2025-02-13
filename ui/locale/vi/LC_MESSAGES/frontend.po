@@ -17475,6 +17475,10 @@ msgstr "Phục hồi mặc định"
 msgid "Reset to initial view"
 msgstr ""
 
+#: app/views/administration.miscconfig.edit.php:103
+msgid "Resolve secret vault macros by"
+msgstr ""
+
 #: jsLoader.php:283
 msgid "Resolved"
 msgstr "Đã giải quyết"
@@ -23708,6 +23712,14 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr "Máy chủ zabbix (proxy)"
 
+#: app/views/administration.miscconfig.edit.php:112
+msgid "Zabbix server and proxy"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:107
+msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
+msgstr ""
+
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Máy chủ Zabbix đang không hoạt động: Thông tin được hiển thị có thể không tồn tại."
@@ -23723,6 +23735,10 @@ msgstr "Tên máy chủ Zabbix"
 
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:105
+msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
 msgstr ""
 
 #: include/items.inc.php:92
@@ -24664,6 +24680,10 @@ msgstr "đầu tiên"
 msgid "first() - The oldest value in the specified time interval"
 msgstr ""
 
+#: app/controllers/CControllerPopupTriggerExpr.php:626
+msgid "firstclock() - Timestamp of the oldest value in the specified time interval"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
 msgstr ""
@@ -25061,6 +25081,10 @@ msgstr "Cuối cùng"
 msgid "last() - Last (most recent) T value"
 msgstr "last() - Giá trị T cuối cùng (gần đây nhất)"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:733
+msgid "lastclock() - Timestamp of the last (most recent) T value"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1557
 msgid "left"
 msgstr "bên trái"
@@ -25095,6 +25119,10 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:779
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:795
+msgid "logtimestamp() - Timestamp of the last (most recent) T log message"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:786

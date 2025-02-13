@@ -301,7 +301,7 @@ class CScript extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid
 	 */
-	protected function validateUpdate(array &$scripts, array &$db_scripts = null) {
+	protected function validateUpdate(array &$scripts, ?array &$db_scripts = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['scriptid']], 'fields' => [
 			'scriptid' => ['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
@@ -826,7 +826,7 @@ class CScript extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid
 	 */
-	private static function validateDelete(array &$scriptids, array &$db_scripts = null) {
+	private static function validateDelete(array &$scriptids, ?array &$db_scripts = null) {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $scriptids, '/', $error)) {
@@ -1412,7 +1412,7 @@ class CScript extends CApiService {
 	 *
 	 * @return array $result
 	 */
-	private function addRelatedGroupsAndHosts(array $options, array $result, array $hostids = null) {
+	private function addRelatedGroupsAndHosts(array $options, array $result, ?array $hostids = null) {
 		$is_hostgroups_select = $options['selectHostGroups'] !== null;
 		$is_hosts_select = $options['selectHosts'] !== null;
 
@@ -1563,7 +1563,7 @@ class CScript extends CApiService {
 	 *
 	 * @throws APIException if script names within menu paths are not unique.
 	 */
-	private static function checkUniqueness(array $scripts, array $db_scripts = null): void {
+	private static function checkUniqueness(array $scripts, ?array $db_scripts = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['name', 'menu_path']], 'fields' => [
 			'name' =>		['type' => API_STRING_UTF8],
 			'menu_path' =>	['type' => API_SCRIPT_MENU_PATH]
@@ -1657,7 +1657,7 @@ class CScript extends CApiService {
 	 * @param string     $method
 	 * @param array|null $db_scripts
 	 */
-	private static function updateParams(array &$scripts, string $method, array $db_scripts = null): void {
+	private static function updateParams(array &$scripts, string $method, ?array $db_scripts = null): void {
 		$ins_params = [];
 		$upd_params = [];
 		$del_paramids = [];

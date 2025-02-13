@@ -22,8 +22,8 @@
 #include "zbxip.h"
 #include "zbx_discoverer_constants.h"
 
-static int	http_task_process(short event, void *data, int *fd, const char *addr, char *dnserr,
-		struct event *timeout_event)
+static int	http_task_process(short event, void *data, int *fd, struct evutil_addrinfo **current_ai,
+		const char *addr, char *dnserr, struct event *timeout_event)
 {
 	int					 task_ret = ZBX_ASYNC_TASK_STOP;
 	zbx_discovery_async_http_context_t	*http_context = (zbx_discovery_async_http_context_t *)data;
@@ -31,6 +31,7 @@ static int	http_task_process(short event, void *data, int *fd, const char *addr,
 	ZBX_UNUSED(fd);
 	ZBX_UNUSED(dnserr);
 	ZBX_UNUSED(timeout_event);
+	ZBX_UNUSED(current_ai);
 
 	if (ZBX_ASYNC_HTTP_STEP_RDNS == http_context->step)
 	{

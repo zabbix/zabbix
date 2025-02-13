@@ -160,8 +160,8 @@ static zbx_telnet_protocol_step_t	async_telnet_recv(zbx_telnet_context_t *telnet
 #undef OPT_SGA
 }
 
-static int	telnet_task_process(short event, void *data, int *fd, const char *addr, char *dnserr,
-		struct event *timeout_event)
+static int	telnet_task_process(short event, void *data, int *fd, struct evutil_addrinfo **current_ai,
+		const char *addr, char *dnserr, struct event *timeout_event)
 {
 #	define	SET_RESULT_SUCCEED								\
 		SET_UI64_RESULT(&telnet_context->item.result, 1);				\
@@ -187,6 +187,7 @@ static int	telnet_task_process(short event, void *data, int *fd, const char *add
 
 	ZBX_UNUSED(dnserr);
 	ZBX_UNUSED(timeout_event);
+	ZBX_UNUSED(current_ai);
 
 	if (NULL != poller_config && ZBX_PROCESS_STATE_IDLE == poller_config->state)
 	{

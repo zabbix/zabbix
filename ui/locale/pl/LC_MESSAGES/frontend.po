@@ -17790,6 +17790,10 @@ msgstr "Przywróć domyślne"
 msgid "Reset to initial view"
 msgstr "Przywróć widok początkowy"
 
+#: app/views/administration.miscconfig.edit.php:103
+msgid "Resolve secret vault macros by"
+msgstr ""
+
 #: jsLoader.php:283
 msgid "Resolved"
 msgstr "Rozwiązane"
@@ -24079,6 +24083,14 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr "Zabbix serwer (proxy)"
 
+#: app/views/administration.miscconfig.edit.php:112
+msgid "Zabbix server and proxy"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:107
+msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
+msgstr ""
+
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Serwer Zabbix nie działa: wyświetlane informacje mogą być nieaktualne."
@@ -24095,6 +24107,10 @@ msgstr "Nazwa serwera Zabbix"
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
 msgstr "Wersja serwera Zabbix"
+
+#: app/views/administration.miscconfig.edit.php:105
+msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
+msgstr ""
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -25035,6 +25051,10 @@ msgstr "pierwszy"
 msgid "first() - The oldest value in the specified time interval"
 msgstr "first() - Najstarsza wartość we wskazanym przedziale czasu"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:626
+msgid "firstclock() - Timestamp of the oldest value in the specified time interval"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
 msgstr "floor() - Zaokrąglenie w dół do najbliższej liczby całkowitej"
@@ -25432,6 +25452,10 @@ msgstr "ostatni"
 msgid "last() - Last (most recent) T value"
 msgstr "last() - Ostatnia (najnowsza) wartość T"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:733
+msgid "lastclock() - Timestamp of the last (most recent) T value"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1557
 msgid "left"
 msgstr "lewy"
@@ -25467,6 +25491,10 @@ msgstr "logseverity() - Poziom zdarzenia z ostatniego wpisu dziennika w okresie 
 #: app/controllers/CControllerPopupTriggerExpr.php:779
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr "logsource() - Źródło zdarzenia dla ostatniego wpisu dziennika w okresie T pasującego do wyrażenia V (1 - pasuje, 0 - nie pasuje)"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:795
+msgid "logtimestamp() - Timestamp of the last (most recent) T log message"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "ltrim() - Remove specified characters from the beginning of a string"
