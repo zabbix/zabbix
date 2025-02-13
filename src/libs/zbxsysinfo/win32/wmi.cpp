@@ -14,6 +14,9 @@
 
 #include "zbxsysinc.h"
 
+#include <comdef.h>
+#include <Wbemidl.h>
+
 extern "C"
 {
 #	include "../sysinfo.h"
@@ -22,9 +25,6 @@ extern "C"
 #	include "zbxalgo.h"
 #	include "zbxjson.h"
 }
-
-#include <comdef.h>
-#include <Wbemidl.h>
 
 #pragma comment(lib, "wbemuuid.lib")
 
