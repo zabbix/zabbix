@@ -1007,7 +1007,11 @@ SVGMapElement.prototype.onClick = function() {
 };
 
 SVGMapElement.prototype.toggleLabel = function(show) {
-	const label = document.querySelector(`text[data-parent=selement_${this.options.selementid}]`);
+	if (this.map.container === null) {
+		return;
+	}
+
+	const label = this.map.container.querySelector(`text[data-parent=selement_${this.options.selementid}]`);
 
 	if (label === null) {
 		return;
