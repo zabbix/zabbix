@@ -825,7 +825,8 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		exit(EXIT_FAILURE);
 }
 
-static int	add_serveractive_host_proxy_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
+static int	add_serveractive_host_proxy_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames,
+		void *data)
 {
 	ZBX_UNUSED(hostnames);
 	ZBX_UNUSED(data);
