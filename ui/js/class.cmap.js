@@ -3707,8 +3707,10 @@ ZABBIX.apps.map = (function($) {
 					object_name: 'items',
 					name: 'itemid',
 					selectedLimit: 1,
-					real_hosts: true,
-					resolve_macros: true,
+					objectOptions: {
+						real_hosts: true,
+						resolve_macros: true
+					},
 					popup: {
 						parameters: {
 							srctbl: 'items',
@@ -3719,6 +3721,8 @@ ZABBIX.apps.map = (function($) {
 								ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_LOG,
 								ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_STR
 							],
+							real_hosts: 1,
+							resolve_macros: 1
 						}
 					}
 				})
