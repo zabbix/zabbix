@@ -24,25 +24,26 @@
 #include <event2/util.h>
 typedef struct
 {
-	void				*data;
-	zbx_async_task_process_cb_t	process_cb;
-	zbx_async_task_clear_cb_t	free_cb;
-	struct event			*tx_event;
-	struct event			*rx_event;
-	struct event			*timeout_event;
-	int				timeout;
-	char				*error;
-	struct evdns_base		*dnsbase;
-	struct evutil_addrinfo		*ai;
-	char				*address;
+	void					*data;
+	zbx_async_task_process_task_cb_t	async_task_process_task_cb;
+	zbx_async_task_process_result_cb_t	async_task_process_result_cb;
+	struct event				*tx_event;
+	struct event				*rx_event;
+	struct event				*timeout_event;
+	int					timeout;
+	char					*error;
+	struct evdns_base			*dnsbase;
+	struct evutil_addrinfo			*ai;
+	struct evutil_addrinfo			*current_ai;
+	char					*address;
 }
 zbx_async_task_t;
 
 static void	async_reverse_dns_event(int err, char type, int count, int ttl, void *addresses, void *arg);
 
-static void	async_task_remove(zbx_async_task_t *task)
+static void	async_task_process_result_and_remove(zbx_async_task_t *task)
 {
-	task->free_cb(task->data);
+	task->async_task_process_result_cb(task->data);
 
 	if (NULL != task->rx_event)
 		event_free(task->rx_event);
@@ -86,12 +87,13 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	ret = task->process_cb(what, task->data, &fd, task->address, task->error, task->timeout_event);
+	ret = task->async_task_process_task_cb(what, task->data, &fd, &task->current_ai, task->address, task->error,
+			task->timeout_event);
 
 	switch (ret)
 	{
 		case ZBX_ASYNC_TASK_STOP:
-			async_task_remove(task);
+			async_task_process_result_and_remove(task);
 			break;
 		case ZBX_ASYNC_TASK_RESOLVE_REVERSE:
 			event_free(task->timeout_event);
@@ -204,6 +206,7 @@ static void	async_dns_event(int err, struct evutil_addrinfo *ai, void *arg)
 			ip[0] = '\0';
 
 		task->ai = ai;
+		task->current_ai = ai;
 		task->address = zbx_strdup(task->address, ip);
 		evtimer_add(task->timeout_event, &tv);
 		async_event(-1, 0, task);
@@ -246,15 +249,16 @@ void	zbx_async_dns_update_host_addresses(struct evdns_base *dnsbase)
 }
 
 void	zbx_async_poller_add_task(struct event_base *ev, struct evdns_base *dnsbase, const char *addr,
-		void *data, int timeout, zbx_async_task_process_cb_t process_cb, zbx_async_task_clear_cb_t clear_cb)
+		void *data, int timeout, zbx_async_task_process_task_cb_t async_task_process_task_func,
+		zbx_async_task_process_result_cb_t async_task_process_result_func)
 {
 	zbx_async_task_t	*task;
 	struct evutil_addrinfo	hints;
 
 	task = (zbx_async_task_t *)zbx_malloc(NULL, sizeof(zbx_async_task_t));
 	task->data = data;
-	task->process_cb = process_cb;
-	task->free_cb = clear_cb;
+	task->async_task_process_task_cb = async_task_process_task_func;
+	task->async_task_process_result_cb = async_task_process_result_func;
 	task->timeout_event = evtimer_new(ev, async_event, (void *)task);
 	task->timeout = timeout;
 
@@ -263,6 +267,7 @@ void	zbx_async_poller_add_task(struct event_base *ev, struct evdns_base *dnsbase
 	task->error = NULL;
 	task->dnsbase = dnsbase;
 	task->ai = NULL;
+	task->current_ai = NULL;
 	task->address = NULL;
 
 	memset(&hints, 0, sizeof(hints));

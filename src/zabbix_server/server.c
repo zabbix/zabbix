@@ -1781,8 +1781,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			.config_service_manager_sync_frequency = config_service_manager_sync_frequency
 		};
 
-	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_server_history, config_history_cache_size,
-			config_history_index_cache_size, &config_trends_cache_size, &error))
+	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_history_cache_server,
+			config_history_cache_size, config_history_index_cache_size, &config_trends_cache_size, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
@@ -2447,8 +2447,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		goto out;
 	}
 
-	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_server_history, config_history_cache_size,
-			config_history_index_cache_size, &config_trends_cache_size, &error))
+	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_history_cache_server,
+			config_history_cache_size, config_history_index_cache_size, &config_trends_cache_size, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
@@ -2531,7 +2531,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_register_stats_ext_func(zbx_vmware_stats_ext_get, NULL);
 	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_PREPROCESSOR, zbx_preprocessor_get_worker_info);
 	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_DISCOVERER, zbx_discovery_get_worker_info);
-	zbx_diag_init(diag_add_section_info);
+	zbx_diag_init(diag_add_section_info_server);
 
 	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
 	{
