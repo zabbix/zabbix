@@ -807,7 +807,7 @@ class CTemplate extends CHostGeneral {
 
 		if ($row) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete template "%1$s": %2$s.',
-				$db_templates[$row['templateid']]['host'], _s('action "%1$s" uses this template.', $row['name'])
+				$db_templates[$row['templateid']]['host'], _s('action "%1$s" uses this template', $row['name'])
 			));
 		}
 	}

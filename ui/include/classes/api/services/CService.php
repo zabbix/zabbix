@@ -484,7 +484,7 @@ class CService extends CApiService {
 
 		if ($row) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete service "%1$s": %2$s.',
-				$db_services[$row['serviceid']]['name'], _s('action "%1$s" uses this service.', $row['name'])
+				$db_services[$row['serviceid']]['name'], _s('action "%1$s" uses this service', $row['name'])
 			));
 		}
 	}

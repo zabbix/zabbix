@@ -771,7 +771,7 @@ class CDRule extends CApiService {
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 				'Cannot delete discovery check "%1$s" of discovery rule "%2$s": %3$s.', $db_dcheck_name,
-				$db_drule['name'], _s('action "%1$s" uses this discovery check.', $row['name'])
+				$db_drule['name'], _s('action "%1$s" uses this discovery check', $row['name'])
 			));
 		}
 	}
