@@ -96,7 +96,7 @@
  *             value    - [IN] OID value                                      *
  *                                                                            *
  ******************************************************************************/
-typedef void (zbx_snmp_walk_cb_func)(void *arg, const char *snmp_oid, const char *index, const char *value);
+typedef void (zbx_snmp_walk_cb_t)(void *arg, const char *snmp_oid, const char *index, const char *value);
 
 typedef enum
 {
@@ -1441,32 +1441,32 @@ static int	zbx_oid_is_new(zbx_hashset_t *hs, size_t root_len, const oid *p_oid, 
 #undef ZBX_OIDS_MAX_NUM
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieves information by walking OID tree                         *
- *                                                                            *
- * Parameters: ssp           - [IN] SNMP session handle                       *
- *             item          - [IN] configuration of Zabbix item              *
- *             snmp_oid      - [IN] OID of table with values of interest      *
- *             error         - [OUT] buffer to store error message            *
- *             max_error_len - [IN] maximum error message length              *
- *             max_succeed   - [OUT] value of "max_repetitions" that succeeded*
- *             min_fail      - [OUT] value of "max_repetitions" that failed   *
- *             max_vars      - [IN] suggested value of "max_repetitions"      *
- *             bulk          - [IN] whether GetBulkRequest-PDU should be used *
- *             walk_cb_func  - [IN] callback function to process discovered   *
- *                                  OIDs and their values                     *
- *             walk_cb_arg   - [IN] argument to pass to callback function     *
- *                                                                            *
- * Return value: NOTSUPPORTED - OID does not exist, any other critical error  *
- *               NETWORK_ERROR - recoverable network error                    *
- *               CONFIG_ERROR - item configuration error                      *
- *               SUCCEED - if function successfully completed                 *
- *                                                                            *
- ******************************************************************************/
+/************************************************************************************
+ *                                                                                  *
+ * Purpose: retrieves information by walking OID tree                               *
+ *                                                                                  *
+ * Parameters: ssp                - [IN] SNMP session handle                        *
+ *             item               - [IN] configuration of Zabbix item               *
+ *             snmp_oid           - [IN] OID of table with values of interest       *
+ *             error              - [OUT] buffer to store error message             *
+ *             max_error_len      - [IN] maximum error message length               *
+ *             max_succeed        - [OUT] value of "max_repetitions" that succeeded *
+ *             min_fail           - [OUT] value of "max_repetitions" that failed    *
+ *             max_vars           - [IN] suggested value of "max_repetitions"       *
+ *             bulk               - [IN] whether GetBulkRequest-PDU should be used  *
+ *             snmp_walk_cb       - [IN] callback function to process discovered    *
+ *                                       OIDs and their values                      *
+ *             snmp_walk_cb_arg   - [IN] argument to pass to callback function      *
+ *                                                                                  *
+ * Return value: NOTSUPPORTED - OID does not exist, any other critical error        *
+ *               NETWORK_ERROR - recoverable network error                          *
+ *               CONFIG_ERROR - item configuration error                            *
+ *               SUCCEED - if function successfully completed                       *
+ *                                                                                  *
+ ************************************************************************************/
 static int	zbx_snmp_walk(zbx_snmp_sess_t ssp, const zbx_dc_item_t *item, const char *snmp_oid, char *error,
 		size_t max_error_len, int *max_succeed, int *min_fail, int max_vars, int bulk,
-		zbx_snmp_walk_cb_func walk_cb_func, void *walk_cb_arg)
+		zbx_snmp_walk_cb_t snmp_walk_cb, void *snmp_walk_cb_arg)
 {
 	struct snmp_pdu		*pdu, *response;
 	oid			anOID[MAX_OID_LEN], rootOID[MAX_OID_LEN];
@@ -1688,7 +1688,7 @@ reduce_max_vars:
 							oid_index, NULL != msg && NULL != *msg ? *msg : "(null)");
 				}
 				else
-					walk_cb_func(walk_cb_arg, snmp_oid, oid_index, snmp_result.str);
+					snmp_walk_cb(snmp_walk_cb_arg, snmp_oid, oid_index, snmp_result.str);
 
 				zbx_free_agent_result(&snmp_result);
 
