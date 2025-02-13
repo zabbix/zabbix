@@ -21,7 +21,7 @@
 
 <script type="text/javascript">
 	const view = new class {
-		init({userid}) {
+		init({userid, is_guest}) {
 			this.userid = userid;
 
 			document.getElementById('user-form').addEventListener('submit', (e) => {
@@ -41,8 +41,10 @@
 				}
 			}).observe(roleid_elem, {childList: true});
 
-			this.#changeVisibilityAutoLoginLogout();
-			this.#autologoutHandler();
+			if (!is_guest) {
+				this.#changeVisibilityAutoLoginLogout();
+				this.#autologoutHandler();
+			}
 		}
 
 		#confirmSubmit() {
