@@ -1595,7 +1595,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_thread_pinger_args			pinger_args = {.config_timeout = zbx_config_timeout};
 #ifdef HAVE_OPENIPMI
-	zbx_thread_ipmi_manager_args		ipmimanager_args =
+	zbx_thread_ipmi_manager_args		ipmi_manager_args =
 		{
 			.config_timeout = zbx_config_timeout,
 			.config_unavailable_delay = config_unavailable_delay,
@@ -1960,7 +1960,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 #ifdef HAVE_OPENIPMI
 			case ZBX_PROCESS_TYPE_IPMIMANAGER:
-				thread_args.args = &ipmimanager_args;
+				thread_args.args = &ipmi_manager_args;
 				zbx_thread_start(zbx_ipmi_manager_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_IPMIPOLLER:
