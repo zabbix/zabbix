@@ -1830,10 +1830,11 @@ jQuery(function($) {
 			$menu_popup.data('menu_popup', options);
 
 			if (options.background_layer) {
-				$wrapper.append($('<div>', {class: 'menu-popup-overlay'}));
+				$wrapper.append($('<div>', {class: 'menu-popup-overlay'}).append($menu_popup));
 			}
-
-			$wrapper.append($menu_popup);
+			else {
+				$wrapper.append($menu_popup);
+			}
 
 			// Position the menu (before hiding).
 			$menu_popup.position(options.position);
