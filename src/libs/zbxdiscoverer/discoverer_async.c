@@ -334,7 +334,7 @@ static int	discovery_agent(discovery_poller_config_t *poller_config, const zbx_d
 	return ret;
 }
 
-static void	process_tcpsvc_result(void *data)
+static void	async_task_process_result_tcpsvc(void *data)
 {
 	zbx_tcpsvc_context_t		*tcpsvc_context = (zbx_tcpsvc_context_t *)data;
 	discovery_async_result_t	*async_result = (discovery_async_result_t *)tcpsvc_context->arg;
@@ -433,9 +433,9 @@ static int	discovery_tcpsvc(discovery_poller_config_t *poller_config, const zbx_
 	item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
 	item.timeout = dcheck->timeout;
 
-	if (SUCCEED != (ret = zbx_async_check_tcpsvc(&item, dcheck->type, &result, process_tcpsvc_result, async_result,
-			NULL, poller_config->base, poller_config->dnsbase, poller_config->config_source_ip,
-			ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES)))
+	if (SUCCEED != (ret = zbx_async_check_tcpsvc(&item, dcheck->type, &result, async_task_process_result_tcpsvc,
+			async_result, NULL, poller_config->base, poller_config->dnsbase,
+			poller_config->config_source_ip, ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES)))
 	{
 		if (ZBX_ISSET_MSG(&result))
 			*error = zbx_strdup(*error, *ZBX_GET_MSG_RESULT(&result));
@@ -526,7 +526,7 @@ static int	discovery_telnet(discovery_poller_config_t *poller_config, const zbx_
 }
 
 #ifdef HAVE_LIBCURL
-void	process_http_result(void *data)
+void	process_result_http(void *data)
 {
 	zbx_discovery_async_http_context_t	*http_context = (zbx_discovery_async_http_context_t *)data;
 	discovery_async_result_t		*async_result = (discovery_async_result_t *)http_context->async_result;

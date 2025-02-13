@@ -2030,8 +2030,8 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param string     $base_table
 	 * @param string     $condition_table
 	 */
-	private static function updateFilterConditions(array &$objects, ?array &$db_objects = null,
-			?array &$upd_objectids = null, string $base_table, string $condition_table): void {
+	private static function updateFilterConditions(array &$objects, ?array &$db_objects, ?array &$upd_objectids,
+			string $base_table, string $condition_table): void {
 		$base_pk = DB::getPk($base_table);
 		$condition_pk = DB::getPk($condition_table);
 

@@ -3061,8 +3061,8 @@ void	zbx_unset_snmp_bulkwalk_options(void)
 	snmp_bulkwalk_set_options(&default_opts);
 }
 
-static int	snmp_task_process(short event, void *data, int *fd, const char *addr, char *dnserr,
-		struct event *timeout_event)
+static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, struct evutil_addrinfo **current_ai,
+		const char *addr, char *dnserr, struct event *timeout_event)
 {
 	zbx_bulkwalk_context_t	*bulkwalk_context;
 	zbx_snmp_context_t	*snmp_context = (zbx_snmp_context_t *)data;
@@ -3070,6 +3070,8 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 	const char		*snmp_error;
 	int			ret, task_ret = ZBX_ASYNC_TASK_STOP;
 	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)snmp_context->arg_action;
+
+	ZBX_UNUSED(current_ai);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " %s event:%d fd:%d", __func__,
 			snmp_context->item.itemid, zbx_get_event_string(event), event, *fd);
@@ -3354,7 +3356,8 @@ void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context)
 	zbx_free(snmp_context);
 }
 
-int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_task_clear_cb_t clear_cb,
+int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result,
+		zbx_async_task_process_result_cb_t async_task_process_result_snmp_cb,
 		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
 		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries)
 {
@@ -3503,7 +3506,7 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 	}
 
 	zbx_async_poller_add_task(base, dnsbase, snmp_context->item.interface.addr, snmp_context, item->timeout,
-			snmp_task_process, clear_cb);
+			async_task_process_task_snmp_cb, async_task_process_result_snmp_cb);
 
 	ret = SUCCEED;
 out:
