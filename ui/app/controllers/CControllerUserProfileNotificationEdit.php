@@ -117,21 +117,20 @@ class CControllerUserProfileNotificationEdit extends CControllerUserEditGeneral 
 			}
 
 			$data = $this->setUserMedias($data);
+			$mediatypes = API::MediaType()->get([
+				'output' => ['status', 'name'],
+				'preservekeys' => true
+			]);
+
+			foreach ($data['medias'] as $row_index => &$media) {
+				$mediatype = $mediatypes[$media['mediatypeid']];
+
+				$media['row_index'] = $row_index;
+				$media['mediatype_name'] = $mediatype['name'];
+				$media['mediatype_status'] = $mediatype['status'];
+			}
+			unset($media);
 		}
-
-		$mediatypes = API::MediaType()->get([
-			'output' => ['status', 'name'],
-			'preservekeys' => true
-		]);
-
-		foreach ($data['medias'] as $row_index => &$media) {
-			$mediatype = $mediatypes[$media['mediatypeid']];
-
-			$media['row_index'] = $row_index;
-			$media['mediatype_name'] = $mediatype['name'];
-			$media['mediatype_status'] = $mediatype['status'];
-		}
-		unset($media);
 
 		$data += [
 			'userid' => CWebUser::$data['userid'],
