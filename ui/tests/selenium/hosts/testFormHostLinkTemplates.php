@@ -221,8 +221,8 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 
 		// Open host configuration again, remove template link.
 		$this->openConfigurationForm($data);
-		$form->query('id:linked-templates')->asTable()->one()->findRow('Name', self::LINKED_TEMPLATE)->getColumn('Action')
-				->query('button:Unlink')->one()->click();
+		$form->query('id:linked-templates')->waitUntilVisible()->asTable()->one()->findRow('Name', self::LINKED_TEMPLATE)
+				->getColumn('Action')->query('button:Unlink')->one()->click();
 		$selector = ($entity === 'Template') ? 'id:template_add_templates__ms' : 'id:add_templates__ms';
 		$this->assertEquals('', $form->query($selector)->one()->getText());
 
