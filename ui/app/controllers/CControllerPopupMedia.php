@@ -130,7 +130,7 @@ class CControllerPopupMedia extends CController {
 					'severity' => $severity,
 					'provisioned' => $this->getInput('provisioned', CUser::PROVISION_STATUS_NO),
 					'mediatype_name' => $db_mediatypes[0]['name'],
-					'mediatype_status' => $db_mediatypes[0]['status'],
+					'mediatype_status' => $db_mediatypes[0]['status']
 				];
 
 				if ($this->hasInput('mediaid')) {

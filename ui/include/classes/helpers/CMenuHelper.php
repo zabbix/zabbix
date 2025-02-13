@@ -478,7 +478,7 @@ class CMenuHelper {
 						(new CMenuItem(_('Profile')))
 							->setAction('userprofile.edit'),
 						(new CMenuItem(_('Notifications')))
-							->setAction('userprofile.notification.edit'),
+							->setAction('userprofile.notification.edit')
 					]))
 			);
 		}

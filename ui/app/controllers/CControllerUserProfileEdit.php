@@ -97,7 +97,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 			'refresh' => $this->user['refresh'],
 			'rows_per_page' => $this->user['rows_per_page'],
 			'url' => $this->user['url'],
-			'form_refresh' => 0,
+			'form_refresh' => 0
 		];
 
 		// Overwrite with input variables.

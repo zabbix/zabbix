@@ -80,7 +80,7 @@ $media_table_info_template = new CTemplateTag('media-row-tmpl',
 				new CInput('hidden', 'medias[#{row_index}][severity]', '#{severity}'),
 				new CInput('hidden', 'medias[#{row_index}][active]', '#{active}'),
 				new CInput('hidden', 'medias[#{row_index}][provisioned]', '#{provisioned}'),
-				new CInput('hidden', 'medias[#{row_index}][mediatype_name]', '#{mediatype_name}'),
+				new CInput('hidden', 'medias[#{row_index}][mediatype_name]', '#{mediatype_name}')
 			]))
 
 		]))
