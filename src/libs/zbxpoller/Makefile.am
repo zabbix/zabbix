@@ -50,7 +50,8 @@ libzbxpoller_a_SOURCES = \
 libzbxpoller_a_CFLAGS = \
 	$(TLS_CFLAGS) \
 	$(LIBXML2_CFLAGS) \
-	$(SNMP_CFLAGS)
+	$(SNMP_CFLAGS) \
+	$(ARES_CFLAGS)
 
 if HAVE_SSH
 libzbxpoller_a_SOURCES += ssh_run.c
