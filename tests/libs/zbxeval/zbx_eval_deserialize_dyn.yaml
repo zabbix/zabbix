@@ -18,3 +18,4 @@ test case: '{$MACRO:"context:\"context\""}'
 in:
   rules: [ZBX_EVAL_PARSE_USERMACRO]
   expression: '{$MACRO:"context:\"context\""}'
+...
