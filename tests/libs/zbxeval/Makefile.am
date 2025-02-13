@@ -16,7 +16,10 @@ SERVER_tests = \
 	zbx_eval_check_timer_functions \
 	zbx_eval_extract_item_refs \
 	zbx_eval_replace_functionid \
-	zbx_eval_copy
+	zbx_eval_copy \
+	zbx_eval_format_function_error \
+	zbx_get_serialized_expression_functionids\
+	zbx_eval_deserialize_dyn
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -234,5 +237,47 @@ zbx_eval_copy_LDADD += @SERVER_LIBS@
 zbx_eval_copy_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_eval_copy_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+#zbx_eval_format_function_error
+
+zbx_eval_format_function_error_SOURCES = \
+	zbx_eval_format_function_error.c \
+	mock_eval.c mock_eval.h
+
+zbx_eval_format_function_error_LDADD = $(EVAL_LIBS)
+
+zbx_eval_format_function_error_LDADD += @SERVER_LIBS@
+
+zbx_eval_format_function_error_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
+zbx_eval_format_function_error_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+#zbx_get_serialized_expression_functionids
+
+zbx_get_serialized_expression_functionids_SOURCES = \
+	zbx_get_serialized_expression_functionids.c \
+	mock_eval.c mock_eval.h
+
+zbx_get_serialized_expression_functionids_LDADD = $(EVAL_LIBS)
+
+zbx_get_serialized_expression_functionids_LDADD += @SERVER_LIBS@
+
+zbx_get_serialized_expression_functionids_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
+zbx_get_serialized_expression_functionids_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+#zbx_eval_deserialize_dyn
+
+zbx_eval_deserialize_dyn_SOURCES = \
+	zbx_eval_deserialize_dyn.c \
+	mock_eval.c mock_eval.h
+
+zbx_eval_deserialize_dyn_LDADD = $(EVAL_LIBS)
+
+zbx_eval_deserialize_dyn_LDADD += @SERVER_LIBS@
+
+zbx_eval_deserialize_dyn_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
+zbx_eval_deserialize_dyn_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

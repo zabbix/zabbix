@@ -344,3 +344,53 @@ int	compare_vectors_uint64(zbx_vector_uint64_t *v1, zbx_vector_uint64_t *v2)
 
 	return SUCCEED;
 }
+
+int	compare_ctx(zbx_eval_context_t *ctx1, zbx_eval_context_t *ctx2)
+{
+	if (SUCCEED != zbx_strcmp_natural(ctx1->expression, ctx2->expression))
+		return FAIL;
+
+	if (ctx1->rules != ctx2->rules)
+		return FAIL;
+
+	if (ctx1->stack.values_num != ctx2->stack.values_num)
+		return FAIL;
+
+	for (int i = 0; i < ctx1->stack.values_num; i++)
+	{
+		if (ctx1->stack.values[i].loc.l != ctx2->stack.values[i].loc.l)
+			return FAIL;
+
+		if (ctx1->stack.values[i].loc.r != ctx2->stack.values[i].loc.r)
+			return FAIL;
+
+		if (ctx1->stack.values[i].opt != ctx2->stack.values[i].opt)
+			return FAIL;
+
+		if (ctx1->stack.values[i].type != ctx2->stack.values[i].type)
+			return FAIL;
+
+		if (ctx1->stack.values[i].value.type != ctx2->stack.values[i].value.type)
+			return FAIL;
+
+		if (ZBX_VARIANT_STR == ctx1->stack.values[i].value.type)
+		{
+			if (FAIL == zbx_strcmp_natural(ctx1->stack.values[i].value.data.str,
+					ctx2->stack.values[i].value.data.str))
+				return FAIL;
+		}
+
+		if (ZBX_VARIANT_UI64 == ctx1->stack.values[i].value.type)
+		{
+			if (ctx1->stack.values[i].value.data.ui64 != ctx2->stack.values[i].value.data.ui64)
+				return FAIL;
+		}
+
+		if (ZBX_VARIANT_DBL == ctx1->stack.values[i].value.type)
+		{
+			if (ctx1->stack.values[i].value.data.dbl != ctx2->stack.values[i].value.data.dbl)
+				return FAIL;
+		}
+	}
+	return SUCCEED;
+}

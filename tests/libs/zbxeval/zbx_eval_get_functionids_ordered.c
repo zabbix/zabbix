@@ -42,13 +42,6 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_eval_get_functionids_ordered(&ctx, &functionids);
 	zbx_eval_clear(&ctx);
-
-	for (int i = 0; i < functionids.values_num; i++)
-	{
-		printf("hello\n");
-		printf("vector members: %ld\n", functionids.values[i]);
-	}
-
 	zbx_vector_uint64_create(&functionids_out);
 	zbx_mock_extract_yaml_values_uint64(zbx_mock_get_parameter_handle("out.ids"), &functionids_out);
 

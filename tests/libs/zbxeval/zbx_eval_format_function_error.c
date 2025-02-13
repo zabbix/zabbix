@@ -23,27 +23,23 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	int			returned_ret;
-	zbx_eval_context_t	ctx, dst;
-	char			*error = NULL;
-	zbx_uint64_t		rules;
-	const char		*expression;
+	char		*result, *exp_result = zbx_strdup(NULL, zbx_mock_get_parameter_string("out.result"));
+	const char	*function = zbx_mock_get_parameter_string("in.func"),
+			*parameter = zbx_mock_get_parameter_string("in.param"),
+			*error = zbx_mock_get_parameter_string("in.error");
 
 	ZBX_UNUSED(state);
 
-	expression = zbx_mock_get_parameter_string("in.expression");
-	rules = mock_eval_read_rules("in.rules");
-	returned_ret = zbx_eval_parse_expression(&ctx, expression, rules, &error);
+	if (SUCCEED == zbx_mock_parameter_exists("in.host"))
+	{
+		const char	*host = zbx_mock_get_parameter_string("in.host"),
+				*key = zbx_mock_get_parameter_string("in.key");
 
-	if (SUCCEED != returned_ret)
-		printf("ERROR: %s\n", error);
+		result = zbx_eval_format_function_error(function, host, key, parameter, error);
+	}
 	else
-		mock_dump_stack(&ctx);
+		result = zbx_eval_format_function_error(function, NULL, NULL, parameter, error);
 
-	zbx_eval_copy(&dst, &ctx, expression);
-
-	zbx_mock_assert_int_eq("return value:", SUCCEED, compare_ctx(&ctx, &dst));
-	zbx_eval_clear(&ctx);
-	zbx_eval_clear(&dst);
-	zbx_free(error);
+	zbx_mock_assert_str_eq("returned value:", exp_result, result);
+	zbx_free(exp_result);
 }
