@@ -67,8 +67,7 @@ class CControllerPopupMedia extends CController {
 			'active' => $this->getInput('active', MEDIA_STATUS_ACTIVE),
 			'period' => $this->getInput('period', ZBX_DEFAULT_INTERVAL),
 			'sendto_emails' => array_values($this->getInput('sendto_emails', [''])),
-			'provisioned' => $this->getInput('provisioned', CUser::PROVISION_STATUS_NO),
-			'edit' => (int)$this->hasInput('edit')
+			'provisioned' => $this->getInput('provisioned', CUser::PROVISION_STATUS_NO)
 		];
 
 		// Validation before adding Media to user's Media tab.
@@ -182,6 +181,7 @@ class CControllerPopupMedia extends CController {
 				'db_mediatypes' => $db_mediatypes,
 				'mediatypes' => $mediatypes,
 				'severities' => $severities,
+				'is_edit' => $this->hasInput('edit'),
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				]

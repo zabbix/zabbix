@@ -140,7 +140,7 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => [
 		[
-			'title' => ($options['edit'] === 1) ? _('Update') : _('Add'),
+			'title' => ($data['is_edit']) ? _('Update') : _('Add'),
 			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
