@@ -1860,8 +1860,8 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param array|null $db_items
 	 * @param array|null $upd_itemids
 	 */
-	private static function updateLldMacroPaths(array &$items, array &$db_items = null,
-			array &$upd_itemids = null): void {
+	private static function updateLldMacroPaths(array &$items, ?array &$db_items = null,
+			?array &$upd_itemids = null): void {
 		$ins_lld_macro_paths = [];
 		$upd_lld_macro_paths = [];
 		$del_lld_macro_pathids = [];
@@ -1948,7 +1948,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param array|null $db_items
 	 * @param array|null $upd_itemids
 	 */
-	private static function updateItemFilters(array &$items, array &$db_items = null, array &$upd_itemids = null): void {
+	private static function updateItemFilters(array &$items, ?array &$db_items = null, ?array &$upd_itemids = null): void {
 		self::updateFilters($items, $db_items, $upd_itemids, 'items', 'item_condition');
 	}
 
@@ -2030,8 +2030,8 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param string     $base_table
 	 * @param string     $condition_table
 	 */
-	private static function updateFilterConditions(array &$objects, array &$db_objects = null,
-			array &$upd_objectids = null, string $base_table, string $condition_table): void {
+	private static function updateFilterConditions(array &$objects, ?array &$db_objects = null,
+			?array &$upd_objectids = null, string $base_table, string $condition_table): void {
 		$base_pk = DB::getPk($base_table);
 		$condition_pk = DB::getPk($condition_table);
 
@@ -2145,7 +2145,8 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param array|null $db_items
 	 * @param array|null $upd_itemids
 	 */
-	private static function updateOverrides(array &$items, array &$db_items = null, array &$upd_itemids = null): void {
+	private static function updateOverrides(array &$items, ?array &$db_items = null,
+			?array &$upd_itemids = null): void {
 		$ins_overrides = [];
 		$upd_overrides = [];
 		$del_overrideids = [];
@@ -3080,7 +3081,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 *
 	 * @throws APIException
 	 */
-	private function validateDelete(array $itemids, array &$db_items = null): void {
+	private function validateDelete(array $itemids, ?array &$db_items = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $itemids, '/', $error)) {
@@ -3200,7 +3201,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param array      $templateids
 	 * @param array|null $hostids
 	 */
-	public static function unlinkTemplateObjects(array $templateids, array $hostids = null): void {
+	public static function unlinkTemplateObjects(array $templateids, ?array $hostids = null): void {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
 
 		$result = DBselect(
@@ -3244,7 +3245,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param array      $templateids
 	 * @param array|null $hostids
 	 */
-	public static function clearTemplateObjects(array $templateids, array $hostids = null): void {
+	public static function clearTemplateObjects(array $templateids, ?array $hostids = null): void {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
 
 		$db_items = DBfetchArrayAssoc(DBselect(

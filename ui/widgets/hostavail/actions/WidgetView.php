@@ -44,10 +44,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$interface_type_count = array_fill_keys($interface_types, array_fill_keys(self::INTERFACE_STATUSES, 0));
 		$total_hosts = array_fill_keys(self::INTERFACE_STATUSES, 0);
 
-		if (!$this->isTemplateDashboard() || ($this->isTemplateDashboard() && $this->fields_values['override_hostid'])) {
+		if (!$this->isTemplateDashboard() || $this->isTemplateDashboard() && $this->fields_values['override_hostid']) {
 			$options = [
 				'output' => in_array(INTERFACE_TYPE_AGENT_ACTIVE, $interface_types) ? ['active_available'] : [],
-				'selectInterfaces' => ['type', 'available'],
+				'selectInterfaces' => ['interfaceid', 'type', 'available'],
 				'monitored_hosts' => true,
 				'preservekeys' => true
 			];
@@ -67,23 +67,36 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$db_hosts = API::Host()->get($options);
 
 			$db_items_active_count = in_array(INTERFACE_TYPE_AGENT_ACTIVE, $interface_types)
-				? API::Item()->get([
-					'groupCount' => true,
-					'countOutput' => true,
-					'filter' => ['type' => ITEM_TYPE_ZABBIX_ACTIVE],
-					'hostids' => array_keys($db_hosts)
-				])
+				? array_filter(getEnabledItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, array_keys($db_hosts)))
 				: [];
 
-			$db_items_active_count = array_filter(array_column($db_items_active_count, 'rowscount', 'hostid'));
+			$interfaceids = [];
+
+			foreach ($db_hosts as &$host) {
+				$interfaces_to_keep = [];
+
+				foreach ($host['interfaces'] as $interface) {
+					if (in_array($interface['type'], $interface_types)) {
+						$interfaces_to_keep[] = $interface;
+						$interfaceids[] = $interface['interfaceid'];
+					}
+				}
+
+				$host['interfaces'] = $interfaces_to_keep;
+			}
+			unset($host);
+
+			$interface_enabled_items_count = getEnabledItemsCountByInterfaceIds($interfaceids);
 
 			foreach ($db_hosts as $hostid => $host) {
 				$host_interfaces = array_fill_keys($interface_types, []);
 
 				foreach ($host['interfaces'] as $interface) {
-					if (in_array($interface['type'], $interface_types)) {
-						$host_interfaces[$interface['type']][] = $interface;
-					}
+					$interfaceid = $interface['interfaceid'];
+					$interface['has_enabled_items'] = array_key_exists($interfaceid, $interface_enabled_items_count)
+						&& $interface_enabled_items_count[$interfaceid] > 0;
+
+					$host_interfaces[$interface['type']][] = $interface;
 				}
 
 				if (array_key_exists('active_available', $host)) {
@@ -97,17 +110,21 @@ class WidgetView extends CControllerDashboardWidgetView {
 					if ($type == INTERFACE_TYPE_AGENT_ACTIVE) {
 						if (array_key_exists($hostid, $db_items_active_count)) {
 							$status = $interfaces[0];
+							$has_enabled_items = true;
 						}
 						else {
 							continue;
 						}
 					} else {
 						$status = getInterfaceAvailabilityStatus($interfaces);
+						$has_enabled_items = array_filter(array_column($interfaces, 'has_enabled_items'));
 					}
 
 					$interface_type_count[$type][$status]++;
 					$interface_totals[$type]++;
-					$host_interfaces_status[$type] = ['available' => $status];
+					$host_interfaces_status[$type] = ['available' => $status,
+						'has_enabled_items' => $has_enabled_items
+					];
 				}
 
 				$host_interfaces_status = array_filter($host_interfaces_status);

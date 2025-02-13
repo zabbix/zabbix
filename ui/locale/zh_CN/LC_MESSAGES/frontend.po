@@ -24678,6 +24678,10 @@ msgstr "第一"
 msgid "first() - The oldest value in the specified time interval"
 msgstr "first() - 指定时间间隔内最早的值"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:626
+msgid "firstclock() - Timestamp of the oldest value in the specified time interval"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
 msgstr "floor() - 向下舍入到最接近的较小整数"
@@ -25075,6 +25079,10 @@ msgstr "最新"
 msgid "last() - Last (most recent) T value"
 msgstr "last() - 最后（最近）的 T 值"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:733
+msgid "lastclock() - Timestamp of the last (most recent) T value"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1557
 msgid "left"
 msgstr "左侧"
@@ -25110,6 +25118,10 @@ msgstr "logseverity() - 周期 T 的最后一个日志条目的日志严重性"
 #: app/controllers/CControllerPopupTriggerExpr.php:779
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr "logsource() - 周期 T 的最后一个日志条目匹配参数 V 的日志源（1 - 匹配，0 - 不匹配）"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:795
+msgid "logtimestamp() - Timestamp of the last (most recent) T log message"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "ltrim() - Remove specified characters from the beginning of a string"

@@ -355,7 +355,8 @@ class testDashboardClockWidget extends testWidgets {
 		$this->page->waitUntilReady();
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-		$this->assertTrue($dashboard->getWidget('Host for clock widget', false)->isValid());
+		$dashboard->waitUntilReady();
+		$this->assertTrue($dashboard->getWidget('Host for clock widget')->isValid());
 		$dashboard->getWidget('Host for clock widget')->edit()->fill(['Name' => 'LayoutClock']);
 		$this->query('button', 'Apply')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();

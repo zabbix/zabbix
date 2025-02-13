@@ -112,6 +112,7 @@ static const char	*help_message[] = {
 	"      " ZBX_DIAGINFO "=section           Log internal diagnostic information of the",
 	"                                 section (historycache, preprocessing, locks) or",
 	"                                 everything if section is not specified",
+	"      " ZBX_HISTORY_CACHE_CLEAR "=target Clear history cache for item specified by its ID",
 	"      " ZBX_PROF_ENABLE "=target         Enable profiling, affects all processes if",
 	"                                   target is not specified",
 	"      " ZBX_PROF_DISABLE "=target        Disable profiling, affects all processes if",
