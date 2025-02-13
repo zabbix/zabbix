@@ -44,10 +44,7 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
 			$fields += [
-				'medias' =>			'array',
-				'new_media' =>		'array',
-				'enable_media' =>	'int32',
-				'disable_media' =>	'int32'
+				'medias' =>			'array'
 			];
 		}
 

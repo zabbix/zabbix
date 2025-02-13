@@ -44,9 +44,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'rows_per_page' =>		'db users.rows_per_page',
 			'url' =>				'db users.url',
 			'medias' =>				'array',
-			'new_media' =>			'array',
-			'enable_media' =>		'int32',
-			'disable_media' =>		'int32',
 			'roleid' =>				'id',
 			'form_refresh' =>		'int32'
 		];
@@ -110,7 +107,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'rows_per_page' => $db_defaults['rows_per_page'],
 			'url' => '',
 			'medias' => [],
-			'new_media' => [],
 			'roleid' => '',
 			'role' => [],
 			'modules_rules' => [],
@@ -166,20 +162,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$user_groups = $this->getInput('user_groups', []);
 			$data['medias'] = $this->getInput('medias', []);
 		}
-
-		$mediatypes = API::MediaType()->get([
-			'output' => ['status', 'name'],
-			'preservekeys' => true
-		]);
-
-		foreach ($data['medias'] as $row_index => &$media) {
-			$mediatype = $mediatypes[$media['mediatypeid']];
-
-			$media['row_index'] = $row_index;
-			$media['mediatype_name'] = $mediatype['name'];
-			$media['mediatype_status'] = $mediatype['status'];
-		}
-		unset($media);
 
 		$data['password_requirements'] = $this->getPasswordRequirements();
 		$data = $this->setUserMedias($data);

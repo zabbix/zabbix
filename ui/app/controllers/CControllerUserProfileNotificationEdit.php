@@ -27,10 +27,7 @@ class CControllerUserProfileNotificationEdit extends CControllerUserEditGeneral 
 
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
 			$fields += [
-				'medias' =>			'array',
-				'new_media' =>		'array',
-				'enable_media' =>	'int32',
-				'disable_media' =>	'int32'
+				'medias' =>			'array'
 			];
 		}
 
@@ -61,16 +58,7 @@ class CControllerUserProfileNotificationEdit extends CControllerUserEditGeneral 
 			}
 		}
 
-		$new_media = $this->getInput('new_media', []);
-
-		if (!$new_media) {
-			return true;
-		}
-
-		unset($validation_rules['mediaid']);
-		$validator = new CNewValidator($new_media, $validation_rules);
-
-		return !$validator->isError();
+		return true;
 	}
 
 	protected function checkPermissions(): bool {
@@ -104,32 +92,15 @@ class CControllerUserProfileNotificationEdit extends CControllerUserEditGeneral 
 			'form_refresh' => 0
 		];
 
-		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-			$data['medias'] = $this->user['medias'];
-		}
-
 		// Overwrite with input variables.
 		$this->getInputs($data, array_keys($data));
 
 		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-			if ($data['form_refresh'] != 0) {
-				$data['medias'] = $this->getInput('medias', []);
-			}
+			$data['medias'] = $data['form_refresh'] != 0
+				? $this->getInput('medias', [])
+				: $this->user['medias'];
 
 			$data = $this->setUserMedias($data);
-			$mediatypes = API::MediaType()->get([
-				'output' => ['status', 'name'],
-				'preservekeys' => true
-			]);
-
-			foreach ($data['medias'] as $row_index => &$media) {
-				$mediatype = $mediatypes[$media['mediatypeid']];
-
-				$media['row_index'] = $row_index;
-				$media['mediatype_name'] = $mediatype['name'];
-				$media['mediatype_status'] = $mediatype['status'];
-			}
-			unset($media);
 		}
 
 		$data += [

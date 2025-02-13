@@ -61,7 +61,7 @@ class CControllerPopupMedia extends CController {
 	protected function doAction() {
 		$page_options = [
 			'row_index' => $this->getInput('row_index', 0),
-			'mediaid' => $this->getInput('mediaid', 0),
+			'mediaid' => $this->hasInput('mediaid') ? $this->getInput('mediaid') : null,
 			'sendto' => $this->getInput('sendto', ''),
 			'mediatypeid' => $this->getInput('mediatypeid', 0),
 			'active' => $this->getInput('active', MEDIA_STATUS_ACTIVE),

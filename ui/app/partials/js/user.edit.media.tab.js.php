@@ -54,14 +54,17 @@
 				popup_params = {
 					edit: 1,
 					row_index,
-					mediaid: row.querySelector(`[name="medias[${row_index}][mediaid]"`).value,
 					mediatypeid: row.querySelector(`[name="medias[${row_index}][mediatypeid]"`).value,
 					period: row.querySelector(`[name="medias[${row_index}][period]"`).value,
 					severity: row.querySelector(`[name="medias[${row_index}][severity]"`).value,
 					active: row.querySelector(`[name="medias[${row_index}][active]"`).value,
-					provisioned: row.querySelector(`[name="medias[${row_index}][provisioned]"`).value,
-					mediatype_name: row.querySelector(`[name="medias[${row_index}][mediatype_name]"`).value
+					provisioned: row.querySelector(`[name="medias[${row_index}][provisioned]"`).value
 				};
+
+				const mediaid_input = row.querySelector(`[name$="medias[${row_index}][mediaid]"`);
+				if (mediaid_input !== null) {
+					popup_params.mediaid = mediaid_input.value;
+				}
 
 				const sendto_input = row.querySelector(`[name$="medias[${row_index}][sendto]"`);
 
@@ -130,8 +133,16 @@
 			const template = new Template(document.getElementById('media-row-tmpl').innerHTML);
 			const row = template.evaluateToElement(media);
 
-			if (media.mediaid == 0) {
+			if (!('mediaid' in media)) {
 				row.querySelector(`[name="medias[${media.row_index}][mediaid]"`).remove();
+			}
+
+			if (media.mediatype_name === null) {
+				const mediatype_name_span = row.querySelector('td:nth-child(1) span');
+				mediatype_name_span.textContent = <?= json_encode(_('Unknown')) ?>;
+				mediatype_name_span.classList.add('<?= ZBX_STYLE_DISABLED ?>');
+				row.querySelector('button[data-hintbox]').remove();
+				row.querySelector('.js-edit').disabled = true;
 			}
 
 			if (media.sendto_short.length <= 50) {
