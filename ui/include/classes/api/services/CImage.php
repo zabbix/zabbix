@@ -290,7 +290,7 @@ class CImage extends CApiService {
 	 * @param string     $images[]['image']
 	 * @param array|null $db_images
 	 */
-	private static function updateOracleImagesData(array $images, array $db_images = null): void {
+	private static function updateOracleImagesData(array $images, ?array $db_images = null): void {
 		global $DB;
 
 		foreach ($images as $image) {
@@ -329,7 +329,7 @@ class CImage extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid
 	 */
-	private static function validateUpdate(array &$images, array &$db_images = null): void {
+	private static function validateUpdate(array &$images, ?array &$db_images = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['imageid'], ['name']], 'fields' => [
 			'imageid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('images', 'name')],
@@ -382,7 +382,7 @@ class CImage extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid
 	 */
-	private static function validateDelete(array &$imageids, array &$db_images = null): void {
+	private static function validateDelete(array &$imageids, ?array &$db_images = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $imageids, '/', $error)) {
@@ -457,7 +457,7 @@ class CImage extends CApiService {
 	 *
 	 * @throws APIException if image names are not unique.
 	 */
-	private static function checkDuplicates(array $images, array $db_images = null): void {
+	private static function checkDuplicates(array $images, ?array $db_images = null): void {
 		$names = [];
 
 		foreach ($images as $image) {

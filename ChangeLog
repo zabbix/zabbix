@@ -1,9 +1,27 @@
 Changes for 7.0.10rc1
 
 New features:
+A.F....... [ZBXNEXT-9624] added support for php 8.4 (talbergs)
+...G...... [ZBXNEXT-7121] added user parameter to Zabbix agent 2 redis items (esneiders)
+.........T [ZBXNEXT-9584] added improvements and fixes to Dell HTTP and SNMP templates (abrosimovs, knaglis)
 .........T [ZBXNEXT-9654] added Azure SQL managed instance template (abrosimovs)
 
 Bug fixes:
+..F....... [ZBX-25778] fixed incorrect style of dropdowns in frontend notification section (isharha)
+..F....... [ZBX-25844] fixed console errors in Graph widgets when rendering data as points (isharha)
+...G...... [ZBX-25442] fixed Zabbix agent interpretation of Modbus result data for mixed endianness modes (asestakovs)
+...G...... [ZBX-25543] fixed crash when global regular expression is updated on Zabbix agent2 (vso)
+..F....... [ZBX-25862] fixed inability to update discovered trigger status (esekace)
+..F....... [ZBX-25220] fixed Top hosts widget not loading in case of inaccessible maintenance (dfofanovs)
+.......PS. [ZBX-22580] reduced nodata trigger false-positives after Zabbix proxy connection disruption (arimdjonoks)
+..F....... [ZBX-25539] fixed console error when configuring Top hosts or Item history widget to display the same thumbnail in more than one column (rgontarski)
+.........T [ZBX-25458] fixed LLD rule for organization discovery, changed host prototype "host" field to avoid special characters (abiba)
+........S. [ZBX-25748] fixed DNS refresh on configuration change (sboidenko)
+.........T [ZBX-25504] updated quorum and quorum member discoveries for family of MSSQL templates (akotsegubov)
+...G...... [ZBX-25530] fixed Zabbix agent 2 startup failures caused by insufficient buffer size for performance counters (asestakovs)
+..F....... [ZBX-25120] fixed Map widget flickering on refresh (apoga, averza)
+........S. [ZBX-25244] fixed {PROXY.NAME} and {PROXY.DESCRIPTION} macros to be resolved when proxy group is used (asestakovs)
+..F....... [ZBX-25513] fixed value not being cleared in Gauge widget after item data history is cleared (dfofanovs)
 ..F....... [ZBX-25471] fixed emptying of Web scenario variables and headers data (wczerneha)
 ...G...... [ZBX-22522] fixed web.page.get curl header (sboidenko)
 ...G...... [ZBX-25382] applied pkgsrc patch to restore builds on NetBSD >= 8.2 (jxl)
@@ -3328,9 +3346,17 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.39rc1
 
 New features:
+.........T [ZBXNEXT-9584] added improvements and fixes to Dell HTTP and SNMP templates (abrosimovs, knaglis)
 .........T [ZBXNEXT-9654] added Azure SQL managed instance template (abrosimovs)
 
 Bug fixes:
+.......PS. [ZBX-25867] fixed crash in preprocessing manager when unlinking dependent items from frequently collected master item (vso)
+...G...... [ZBX-25543] fixed crash when global regular expression is updated on Zabbix agent2 (vso)
+.......PS. [ZBX-22580] reduced nodata trigger false-positives after Zabbix proxy connection disruption (arimdjonoks)
+.........T [ZBX-25458] fixed LLD rule for organization discovery, changed host prototype "host" field to avoid special characters (abiba)
+.........T [ZBX-25504] updated quorum and quorum member discoveries for family of MSSQL templates (akotsegubov)
+...G...... [ZBX-25442] fixed Zabbix agent interpretation of Modbus result data for mixed endianness modes (asestakovs)
+...G...... [ZBX-25530] fixed Zabbix agent 2 startup failures caused by insufficient buffer size for performance counters (asestakovs)
 ...G...... [ZBX-25382] applied pkgsrc patch to restore builds on NetBSD >= 8.2 (jxl)
 ...G...... [ZBX-22522] fixed web.page.get curl header (sboidenko)
 .........T [ZBX-25601] fixed HTTP proxy parameter name in MS 365 reports by HTTP template (drasikhov)
