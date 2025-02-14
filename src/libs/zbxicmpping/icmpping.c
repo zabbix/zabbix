@@ -21,6 +21,7 @@
 #include "zbxstr.h"
 #include "zbxip.h"
 #include "zbxfile.h"
+#include "zbxalgo.h"
 
 #include <signal.h>
 

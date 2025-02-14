@@ -3259,8 +3259,8 @@ class CUser extends CApiService {
 		if ($this->outputIsRequested('provisioned', $options['selectMedias']) && $db_medias) {
 			foreach ($db_medias as &$db_media) {
 				$db_media['provisioned'] = $db_media['userdirectory_mediaid'] == 0
-					? self::PROVISION_STATUS_NO
-					: self::PROVISION_STATUS_YES;
+					? (string) self::PROVISION_STATUS_NO
+					: (string) self::PROVISION_STATUS_YES;
 			}
 			unset($db_media);
 		}
