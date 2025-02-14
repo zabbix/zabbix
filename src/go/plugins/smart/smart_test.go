@@ -98,6 +98,7 @@ const (
 				{
 					"id": 1,
 					"name": "Raw_Read_Error_Rate",
+					"value": 182786912,
 					"raw": {
 						"value": 182786912,
 						"string": "182786912"
@@ -106,6 +107,7 @@ const (
 				{
 					"id": 3,
 					"name": "Spin_Up_Time",
+					"value": 0,
 					"raw": {
 						"value": 0,
 						"string": "0"
@@ -160,6 +162,7 @@ const (
 		"ata_smart_attributes": {
  		  "table": [
 			{
+ 			  "id": 1,
  			  "name": "Raw_Read_Error_Rate",
 			  "value": 100,
 			  "raw": {
@@ -168,10 +171,21 @@ const (
 			  }
 			},
 			{
+ 			  "id": 5,
+ 			  "value": 10,
  			  "name": "Reallocated_Sector_Ct",
 			  "raw": {
 				"value": 10,
 				"string": "10"
+			  }
+			},
+              {
+ 			  "id": 177,
+ 			  "name": "Wear_Leveling_Count",
+ 			  "value": 98,
+ 			  "raw": {
+				"value": 357,
+				"string": "357"
 			  }
 			}
 		  ]
@@ -223,6 +237,7 @@ const (
 		  "ata_smart_attributes": {
 			 "table": [
 			  {
+				 "id": 1,
 				 "name": "Raw_Read_Error_Rate",
 				"value": 100,
 				"raw": {
@@ -239,6 +254,8 @@ const (
 			   }
 			 },
 			  {
+				 "id": 5,
+				 "value": 10,
 				 "name": "Reallocated_Sector_Ct",
 				"raw": {
 				  "value": 10,
@@ -315,12 +332,16 @@ func Test_setSingleDiskFields(t *testing.T) {
 				"serial_number":    "Z4Y7SJBD",
 				"temperature":      30,
 				"raw_read_error_rate": singleRequestAttribute{
-					Value: 182786912,
-					Raw:   "182786912",
+					Id:              1,
+					NormalizedValue: 182786912,
+					Value:           182786912,
+					Raw:             "182786912",
 				},
 				"spin_up_time": singleRequestAttribute{
-					Value: 0,
-					Raw:   "0",
+					Id:              3,
+					NormalizedValue: 0,
+					Value:           0,
+					Raw:             "0",
 				},
 			},
 			false,
@@ -341,13 +362,23 @@ func Test_setSingleDiskFields(t *testing.T) {
 				"self_test_passed": &selftestSuccess,
 				"serial_number":    "D486530350",
 				"temperature":      18,
+				"wear_leveling_count": singleRequestAttribute{
+					Id:              177,
+					NormalizedValue: 98,
+					Value:           357,
+					Raw:             "357",
+				},
 				"raw_read_error_rate": singleRequestAttribute{
-					Value: 0,
-					Raw:   "0",
+					Id:              1,
+					NormalizedValue: 100,
+					Value:           0,
+					Raw:             "0",
 				},
 				"reallocated_sector_ct": singleRequestAttribute{
-					Value: 10,
-					Raw:   "10",
+					Id:              5,
+					NormalizedValue: 10,
+					Value:           10,
+					Raw:             "10",
 				},
 			},
 			false,
@@ -369,12 +400,16 @@ func Test_setSingleDiskFields(t *testing.T) {
 				"serial_number":    "D486530350",
 				"temperature":      18,
 				"raw_read_error_rate": singleRequestAttribute{
-					Value: 0,
-					Raw:   "0",
+					Id:              1,
+					NormalizedValue: 100,
+					Value:           0,
+					Raw:             "0",
 				},
 				"reallocated_sector_ct": singleRequestAttribute{
-					Value: 10,
-					Raw:   "10",
+					Id:              5,
+					NormalizedValue: 10,
+					Value:           10,
+					Raw:             "10",
 				},
 			},
 			false,
