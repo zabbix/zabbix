@@ -34,7 +34,7 @@ class CControllerMacrosEdit extends CController {
 				'output' => ['globalmacroid', 'macro', 'value', 'type', 'description'],
 				'globalmacro' => true
 			]), 'macro')),
-			'js_validation_rules' => (new CFormValidator(CControllerMacrosUpdate::getValidationRules()))->getRules(),
+			'js_validation_rules' => (new CFormValidator(CControllerMacrosUpdate::getValidationRules()))->getRules()
 		];
 
 		if (!$data['macros']) {

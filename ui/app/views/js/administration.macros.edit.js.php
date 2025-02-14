@@ -74,7 +74,7 @@
 			e.preventDefault();
 
 			const fields = form.getAllValues();
-			const curl = new Curl(form.action);
+			const curl = new Curl(form_element.action);
 
 			form.validateSubmit(fields)
 				.then((result) => {
