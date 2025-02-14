@@ -633,8 +633,7 @@ $html_page
 	->show();
 
 (new CScriptTag('view.init('.json_encode([
-	'userid' => $data['userid'] ?: null,
-	'is_guest' => $data['db_user']['username'] === ZBX_GUEST_USER
+	'userid' => $data['userid'] ?: null
 ]).');'))
 	->setOnDocumentReady()
 	->show();

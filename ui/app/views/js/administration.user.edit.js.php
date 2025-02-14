@@ -21,7 +21,7 @@
 
 <script type="text/javascript">
 	const view = new class {
-		init({userid, is_guest}) {
+		init({userid}) {
 			this.userid = userid;
 
 			document.getElementById('user-form').addEventListener('submit', (e) => {
@@ -41,10 +41,8 @@
 				}
 			}).observe(roleid_elem, {childList: true});
 
-			if (!is_guest) {
-				this.#changeVisibilityAutoLoginLogout();
-				this.#autologoutHandler();
-			}
+			this.#changeVisibilityAutoLoginLogout();
+			this.#autologoutHandler();
 		}
 
 		#confirmSubmit() {
@@ -71,6 +69,10 @@
 			const autologin_cbx = document.querySelector('#autologin');
 			const autologout_cbx = document.querySelector('#autologout_visible');
 
+			if (autologin_cbx === null || autologout_cbx === null) {
+				return;
+			}
+
 			autologin_cbx.addEventListener('click', (e) => {
 				if (e.target.checked) {
 					autologout_cbx.checked = false;
@@ -87,9 +89,14 @@
 		}
 
 		#autologoutHandler() {
+			const autologout = document.querySelector('#autologout');
+
+			if (autologout === null) {
+				return;
+			}
+
 			const autologout_visible = document.querySelector('#autologout_visible');
 			const disabled = !autologout_visible.checked;
-			const autologout = document.querySelector('#autologout');
 			const hidden = autologout.parentElement.
 				querySelector(`input[type=hidden][name=${autologout.getAttribute('name')}]`);
 
