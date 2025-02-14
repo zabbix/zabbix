@@ -399,8 +399,8 @@ if (count($data['steps']) > 0) {
 				(new CButtonIcon(ZBX_ICON_COPY, _('Copy to clipboard')))
 					->addClass('copy-button')
 					->setAttribute('data-index', $i)
+					->addClass(ZBX_STYLE_DISPLAY_NONE)
 			))
-				->addClass(ZBX_STYLE_DISPLAY_NONE)
 				->addClass('result-copy')
 		]);
 	}

@@ -143,7 +143,8 @@ function cleanPreviousTestResults() {
 		.empty()
 		.hide();
 
-	for (const element of document.getElementById('preprocessing-test-form').querySelectorAll('.result-copy')) {
+	for (const element of document.getElementById('preprocessing-test-form')
+			.querySelectorAll('.result-copy > .copy-button')) {
 		element.classList.add('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 		element.closest('tr').classList.remove('display-icon');
 	}
@@ -457,10 +458,9 @@ function processItemPreprocessingTestResults(steps) {
 
 		if (step.error === undefined && result) {
 			const copy_button = form.querySelector(`.copy-button[data-index="${i}"]`);
-			const copy_element = copy_button.closest('td');
 
-			copy_element.closest('tr').classList.add('display-icon')
-			copy_element.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
+			copy_button.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
+			copy_button.closest('tr').classList.add('display-icon');
 
 			copy_button.addEventListener('click', e => {
 				writeTextClipboard(result);

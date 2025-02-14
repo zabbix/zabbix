@@ -208,6 +208,10 @@ button {
 	@extend %button;
 	@extend %button-icon-colors;
 
+	&.display-none {
+		@extend .display-none;
+	}
+
 	display: inline-block;
 	line-height: 24px;
 
