@@ -102,7 +102,7 @@ void	*zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, size_
 
 	if (0 == nmemb || 0 == size)
 	{
-		zabbix_log(LOG_LEVEL_CRIT,
+		zabbix_log(LOG_LEVEL_DEBUG,
 				"[file:%s,line:%d] zbx_calloc: "
 				"allocating " ZBX_FS_SIZE_T " memory objects of size " ZBX_FS_SIZE_T ". "
 				"Please report this to Zabbix developers.",
@@ -144,7 +144,7 @@ void	*zbx_malloc2(const char *filename, int line, void *old, size_t size)
 
 	if (0 == size)
 	{
-		zabbix_log(LOG_LEVEL_CRIT,
+		zabbix_log(LOG_LEVEL_DEBUG,
 				"[file:%s,line:%d] zbx_calloc: "
 				"allocating memory object of size " ZBX_FS_SIZE_T " bytes. "
 				"Please report this to Zabbix developers.",
@@ -178,7 +178,7 @@ void	*zbx_realloc2(const char *filename, int line, void *old, size_t size)
 
 	if (0 == size)
 	{
-		zabbix_log(LOG_LEVEL_CRIT,
+		zabbix_log(LOG_LEVEL_DEBUG,
 				"[file:%s,line:%d] zbx_calloc: "
 				"allocating memory object of size " ZBX_FS_SIZE_T " bytes. "
 				"Please report this to Zabbix developers.",
