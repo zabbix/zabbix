@@ -544,8 +544,9 @@ class CHostGroup extends CApiService {
 		$db_operations = DBselect(
 			'SELECT DISTINCT o.operationid'.
 			' FROM operations o'.
-			' WHERE '.dbConditionInt('o.operationid', $operationids).
+			' WHERE '.dbConditionId('o.operationid', $operationids).
 				' AND NOT EXISTS (SELECT NULL FROM opgroup og WHERE o.operationid=og.operationid)'.
+				' AND NOT EXISTS (SELECT NULL FROM opcommand_hst och WHERE o.operationid=och.operationid)'.
 				' AND NOT EXISTS (SELECT NULL FROM opcommand_grp ocg WHERE o.operationid=ocg.operationid)'
 		);
 		while ($db_operation = DBfetch($db_operations)) {
