@@ -1,1 +1,0 @@
-A.F.....S. [ZBX-23760] added prevention of deleting host groups, templates, hosts, triggers, services, discovery rules and discovery checks if they are used in action conditions or operations (agriscenko, dgoloscapov)
