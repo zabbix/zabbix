@@ -999,7 +999,7 @@ class testUsersPasswordComplexity extends CWebTest {
 		}
 
 		// Check user password creation accordingly to complexity settings.
-		$user_form = $this->query('name:user_form')->asForm()->waitUntilPresent()->one();
+		$user_form = $this->query('name:userprofile_form')->asForm()->waitUntilPresent()->one();
 		$username = ($userid === 1)
 			? 'Admin'
 			: ($update ? 'update-user' : 'username'.time());
