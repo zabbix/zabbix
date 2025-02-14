@@ -168,9 +168,15 @@ class CAlert extends CApiService {
 			')';
 		}
 
-		// For non-super admin users only own alerts are accessible.
+		// Allow user to get alerts sent only by users with same user group.
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			$sqlParts['where'][] = '(a.userid IS NULL OR a.userid='.self::$userData['userid'].')';
+			// Filter by userid only if userid IS NOT NULL.
+			$sqlParts['where'][] = '(a.userid IS NULL OR EXISTS ('.
+				'SELECT NULL'.
+				' FROM users_groups ug'.
+				' WHERE ug.userid=a.userid'.
+					' AND '.dbConditionId('ug.usrgrpid', getUserGroupsByUserId(self::$userData['userid'])).
+			'))';
 		}
 
 		// groupids
