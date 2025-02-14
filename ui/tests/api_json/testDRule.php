@@ -141,11 +141,11 @@ class testDRule extends CAPITest {
 			],
 			'DRule used in action' => [
 				'drule' => [':drule:drule.used.in.action.1'],
-				'expected_error' => 'Cannot delete discovery rule "drule.used.in.action.1" because it is used in action "drule.discovery.action".'
+				'expected_error' => 'Cannot delete discovery rule "drule.used.in.action.1": action "drule.discovery.action" uses this discovery rule.'
 			],
 			'DRule used in another action' => [
 				'drule' => [':drule:drule.used.in.action.2'],
-				'expected_error' => 'Cannot delete discovery rule "drule.used.in.action.2" because it is used in action "drule.discovery.action".'
+				'expected_error' => 'Cannot delete discovery rule "drule.used.in.action.2": action "drule.discovery.action" uses this discovery rule.'
 			],
 			'Delete discovery rule without proxy' => [
 				'drule' => [':drule:drule.del.1'],
