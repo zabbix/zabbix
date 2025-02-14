@@ -139,13 +139,14 @@ type singelRequestTables struct {
 type singelRequestRaw struct {
 	Name            string   `json:"name"`
 	Raw             rawField `json:"raw"`
-	NormalizedValue *int     `json:"value"` //pointer type because it may not be present in raw json
+	NormalizedValue *int     `json:"value"` // pointer type because it may not be present in raw json
 }
 
 type singleRequestAttribute struct {
-	Value           int    `json:"value"`
-	Raw             string `json:"raw"`
-	NormalizedValue *int   `json:"normalized_value,omitempty"` //pointer type w/ omitempty because if it is not present in raw json, then omitting in the result
+	Value int    `json:"value"`
+	Raw   string `json:"raw"`
+
+	NormalizedValue *int `json:"normalized_value,omitempty"` // if it isn't present in raw json, omit in the result
 }
 
 type rawField struct {

@@ -100,13 +100,14 @@ func (p *Plugin) Validate(options interface{}) error {
 }
 
 // Export -
+//
+//nolint:cyclop
 func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (any, error) {
 	if len(params) > 0 && key != diskGet {
 		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	var err error
-
 	if err = p.checkVersion(); err != nil {
 		return nil, err
 	}
@@ -267,6 +268,7 @@ func (p *Plugin) attributeDiscovery() (jsonArray []byte, err error) {
 // It returns an error if there is an issue with unmarshal for the provided input JSON map.
 func setSingleDiskFields(dev []byte) (map[string]any, error) {
 	attr := make(map[string]any)
+
 	var err error
 	if err = json.Unmarshal(dev, &attr); err != nil {
 		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
@@ -316,7 +318,7 @@ func setSingleDiskFields(dev []byte) (map[string]any, error) {
 		out[strings.ToLower(a.Name)] = singleRequestAttribute{a.Raw.Value, a.Raw.Str, a.NormalizedValue}
 	}
 
-	return out, err
+	return out, nil
 }
 
 // setSelfTest determines if device is self test capable and if the test is passed.
