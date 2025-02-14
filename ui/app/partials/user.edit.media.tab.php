@@ -76,7 +76,7 @@ $media_table_info_template = new CTemplateTag('media-row-tmpl',
 				new CInput('hidden', 'medias[#{row_index}][mediaid]', '#{mediaid}'),
 				new CInput('hidden', 'medias[#{row_index}][mediatypeid]', '#{mediatypeid}'),
 				new CInput('hidden', 'medias[#{row_index}][period]', '#{period}'),
-				new CInput('hidden', 'medias[#{row_index}][sendto]', '#{sendto_full}'),
+				new CInput('hidden', 'medias[#{row_index}][sendto]', '#{sendto}'),
 				new CInput('hidden', 'medias[#{row_index}][severity]', '#{severity}'),
 				new CInput('hidden', 'medias[#{row_index}][active]', '#{active}'),
 				new CInput('hidden', 'medias[#{row_index}][provisioned]', '#{provisioned}')
