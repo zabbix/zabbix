@@ -1,0 +1,1 @@
+A......... [ZBX-18432] fixed inability to view a part of problems and events by users with specific permissions on tags when permissions on all tags is given to specific host group (dpankins)
