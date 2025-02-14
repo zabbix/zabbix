@@ -143,10 +143,9 @@ type singelRequestRaw struct {
 }
 
 type singleRequestAttribute struct {
-	Value int    `json:"value"`
-	Raw   string `json:"raw"`
-
-	NormalizedValue *int `json:"normalized_value,omitempty"` // if it isn't present in raw json, omit in the result
+	Value           int    `json:"value"`
+	Raw             string `json:"raw"`
+	NormalizedValue *int   `json:"normalized_value,omitempty"` // if it isn't present in raw json, omit in the result
 }
 
 type rawField struct {
