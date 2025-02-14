@@ -488,13 +488,20 @@ class CWidgetNavTree extends CWidget {
 			if (!this.hasEverUpdated() && this.isReferred()) {
 				if (!this.#markTreeItemSelected(this.#navtree_item_selected)) {
 					this.#markTreeItemSelected(this.#getDefaultSelectable());
+					this.#openBranch(this.#navtree_item_selected);
+
 					this.#updateUserProfileItemSelected();
 				}
 
 				this.#broadcast();
 			}
-			else if (this.#navtree_item_selected !== null) {
-				this.#markTreeItemSelected(this.#navtree_item_selected);
+			else if (this.#navtree_item_selected !== null
+					&& !this.#markTreeItemSelected(this.#navtree_item_selected) && this.isReferred()) {
+				this.#markTreeItemSelected(this.#getDefaultSelectable());
+				this.#openBranch(this.#navtree_item_selected);
+
+				this.#updateUserProfileItemSelected();
+				this.#broadcast();
 			}
 		}
 	}
@@ -571,7 +578,8 @@ class CWidgetNavTree extends CWidget {
 		const selected_item = document.getElementById(`${this.getUniqueId()}_tree-item-${itemid}`);
 		const item = this.#navtree[itemid];
 
-		if (item === undefined || selected_item === null) {
+		if (item === undefined || selected_item === null
+				|| !selected_item.dataset.sysmapid || selected_item.dataset.sysmapid == 0) {
 			return false;
 		}
 
