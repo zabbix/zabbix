@@ -3,6 +3,7 @@ Changes for 5.0.47rc1
 New features:
 
 Bug fixes:
+A......... [ZBX-26023] restored ability for users to get all alerts within same user group (jfreibergs)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.46
