@@ -620,7 +620,7 @@ static char	*connect_callback(void *data)
 static	ZBX_THREAD_ENTRY(send_value, args)
 {
 	zbx_thread_sendval_args	*sendval_args = (zbx_thread_sendval_args *)((zbx_thread_args_t *)args)->args;
-	int			ret;
+	int			ret, ret_resp;
 	char			*data = NULL;
 #if !defined(_WINDOWS)
 	zbx_addr_t		*last_addr;
@@ -642,10 +642,13 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 			config_timeout, 0, LOG_LEVEL_DEBUG, sendval_args->zbx_config_tls, sendval_args->json->buffer,
 			connect_callback, sendval_args->json, &data, NULL);
 
+
 	if (SUCCEED == ret)
 	{
-		if (FAIL == check_response(data, sendval_args->addrs->values[0]->ip,
-				sendval_args->addrs->values[0]->port))
+		ret_resp = check_response(data, sendval_args->addrs->values[0]->ip,
+						sendval_args->addrs->values[0]->port);
+
+		if (FAIL == ret_resp)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "incorrect answer from \"%s:%hu\": [%s]",
 					sendval_args->addrs->values[0]->ip, sendval_args->addrs->values[0]->port,
@@ -653,6 +656,8 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 
 			zbx_addrs_failover(sendval_args->addrs);
 		}
+		else if (SUCCEED_PARTIAL == ret_resp)
+			ret = ret_resp;
 
 		zbx_free(data);
 	}

@@ -1,0 +1,1 @@
+...G...... [ZBX-25932] fixed Zabbix sender returning incorrect exit code when having partial success (dgoloscapov)
