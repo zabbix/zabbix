@@ -28,7 +28,7 @@
 
 #define ZBX_PREPROCESSING_BATCH_SIZE	256
 
-typedef void (*zbx_pp_notify_cb_t)(void *data);
+typedef void (*zbx_pp_finished_task_cb_t)(void *data);
 
 /* preprocessing step execution result */
 typedef struct
@@ -114,7 +114,7 @@ int	zbx_preprocessor_get_top_peak(int limit, zbx_vector_pp_top_stats_ptr_t *stat
 int	zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
 		unsigned char state, const zbx_vector_pp_step_ptr_t *steps, zbx_vector_pp_result_ptr_t *results,
 		zbx_pp_history_t *history, char **error);
-int	zbx_preprocessor_get_usage_stats(zbx_vector_dbl_t *usage, int *count, char **error);
+int	zbx_get_usage_stats_preprocessor(zbx_vector_dbl_t *usage, int *count, char **error);
 
 ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args);
 

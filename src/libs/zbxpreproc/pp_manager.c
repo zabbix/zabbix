@@ -115,18 +115,18 @@ zbx_get_progname_f	preproc_get_progname_cb(void)
  *                                                                            *
  * Purpose: create preprocessing manager                                      *
  *                                                                            *
- * Parameters: workers_num      - [IN] number of workers to create            *
- *             finished_cb      - [IN] callback to call after finishing       *
- *                                     task (optional)                        *
- *             finished_data    - [IN] callback data (optional)               *
- *             config_source_ip - [IN]                                        *
- *             config_timeout   - [IN]                                        *
- *             error            - [OUT]                                       *
+ * Parameters: workers_num         - [IN] number of workers to create         *
+ *             pp_finished_task_cb - [IN] callback to call after finishing    *
+ *                                        task (optional)                     *
+ *             finished_data       - [IN] callback data (optional)            *
+ *             config_source_ip    - [IN]                                     *
+ *             config_timeout      - [IN]                                     *
+ *             error               - [OUT]                                    *
  *                                                                            *
  * Return value: The created manager or NULL on error.                        *
  *                                                                            *
  ******************************************************************************/
-static zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb_t finished_cb,
+static zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_finished_task_cb_t pp_finished_task_cb,
 		void *finished_data, const char *config_source_ip, int config_timeout, char **error)
 {
 	int			i, ret = FAIL, started_num = 0;
@@ -160,7 +160,7 @@ static zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb
 			goto out;
 		}
 
-		pp_worker_set_finished_cb(&manager->workers[i], finished_cb, finished_data);
+		pp_worker_set_finished_task_cb(&manager->workers[i], pp_finished_task_cb, finished_data);
 	}
 
 	zbx_hashset_create_ext(&manager->items, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
@@ -1153,7 +1153,7 @@ static void	preprocessor_reply_usage_stats(zbx_pp_manager_t *manager, int worker
 	zbx_vector_dbl_destroy(&usage);
 }
 
-static void	preprocessor_finished_task_cb(void *data)
+static void	pp_finished_task_cb(void *data)
 {
 	zbx_ipc_service_alert((zbx_ipc_service_t *)data);
 }
@@ -1254,7 +1254,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
-	if (NULL == (manager = zbx_pp_manager_create(pp_args->workers_num, preprocessor_finished_task_cb,
+	if (NULL == (manager = zbx_pp_manager_create(pp_args->workers_num, pp_finished_task_cb,
 			(void *)&service, pp_manager_args_in->config_source_ip, pp_manager_args_in->config_timeout,
 			&error)))
 	{
