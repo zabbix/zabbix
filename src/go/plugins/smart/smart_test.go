@@ -352,7 +352,7 @@ func Test_setSingleDiskFields(t *testing.T) {
 				"raw_read_error_rate": singleRequestAttribute{
 					Value:           0,
 					Raw:             "0",
-					NormalizedValue: intToPtr(100),
+					NormalizedValue: func(v int) *int { return &v }(100),
 				},
 				"reallocated_sector_ct": singleRequestAttribute{
 					Value: 10,
@@ -361,7 +361,7 @@ func Test_setSingleDiskFields(t *testing.T) {
 				"zero_norm_value": singleRequestAttribute{
 					Value:           15,
 					Raw:             "15",
-					NormalizedValue: intToPtr(0),
+					NormalizedValue: func(v int) *int { return &v }(0),
 				},
 			},
 			false,
@@ -385,7 +385,7 @@ func Test_setSingleDiskFields(t *testing.T) {
 				"raw_read_error_rate": singleRequestAttribute{
 					Value:           0,
 					Raw:             "0",
-					NormalizedValue: intToPtr(100),
+					NormalizedValue: func(v int) *int { return &v }(100),
 				},
 				"reallocated_sector_ct": singleRequestAttribute{
 					Value: 10,
