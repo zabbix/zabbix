@@ -787,6 +787,7 @@ class CScript extends CApiService {
 		$db_groups = API::HostGroup()->get([
 			'output' => [],
 			'groupids' => $groupids,
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'preservekeys' => true
 		]);
 
