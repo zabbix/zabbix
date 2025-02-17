@@ -294,8 +294,13 @@ class testSidebarMenu extends CWebTest {
 			[
 				[
 					'section' => 'User settings',
-					'page' => 'Profile',
-					'header' => 'User profile: Zabbix Administrator'
+					'page' => 'Profile'
+				]
+			],
+			[
+				[
+					'section' => 'User settings',
+					'page' => 'Notifications'
 				]
 			],
 			[

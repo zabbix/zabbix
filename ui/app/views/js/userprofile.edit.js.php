@@ -21,11 +21,9 @@
 
 <script type="text/javascript">
 	const view = new class {
-		init({userid}) {
-			this.userid = userid;
-
-			document.getElementById('user-form').addEventListener('submit', (e) => {
-				document.querySelectorAll('#username, #name, #surname, #autologout, #refresh, #url').forEach((elem) => {
+		init() {
+			document.getElementById('userprofile-form').addEventListener('submit', (e) => {
+				document.querySelectorAll('#autologout, #refresh, #url').forEach((elem) => {
 					elem.value = elem.value.trim();
 				});
 
@@ -34,26 +32,21 @@
 				}
 			});
 
-			const roleid_elem = document.getElementById('roleid');
-			new MutationObserver(() => {
-				if (roleid_elem.querySelectorAll('[name="roleid"]').length > 0) {
-					document.getElementById('user-form').submit();
-				}
-			}).observe(roleid_elem, {childList: true});
-
 			this.#changeVisibilityAutoLoginLogout();
 			this.#autologoutHandler();
 		}
 
 		#confirmSubmit() {
+			const elem_current = document.getElementById('current_password');
 			const elem_password1 = document.getElementById('password1');
 			const elem_password2 = document.getElementById('password2');
 
-			if (elem_password1 && elem_password2) {
+			if (elem_current && elem_password1 && elem_password2) {
+				const current_password = elem_current.value;
 				const password1 = elem_password1.value;
 				const password2 = elem_password2.value;
 
-				if (this.userid !== null && password1 !== '' && password2 !== '') {
+				if (password1 !== '' && password2 !== '' && current_password !== '') {
 					const warning_msg = <?= json_encode(
 						_('In case of successful password change user will be logged out of all active sessions. Continue?')
 					) ?>;
@@ -68,10 +61,6 @@
 		#changeVisibilityAutoLoginLogout() {
 			const autologin_cbx = document.querySelector('#autologin');
 			const autologout_cbx = document.querySelector('#autologout_visible');
-
-			if (autologin_cbx === null || autologout_cbx === null) {
-				return;
-			}
 
 			autologin_cbx.addEventListener('click', (e) => {
 				if (e.target.checked) {
@@ -89,14 +78,9 @@
 		}
 
 		#autologoutHandler() {
-			const autologout = document.querySelector('#autologout');
-
-			if (autologout === null) {
-				return;
-			}
-
 			const autologout_visible = document.querySelector('#autologout_visible');
 			const disabled = !autologout_visible.checked;
+			const autologout = document.querySelector('#autologout');
 			const hidden = autologout.parentElement.
 				querySelector(`input[type=hidden][name=${autologout.getAttribute('name')}]`);
 

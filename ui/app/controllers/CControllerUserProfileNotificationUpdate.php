@@ -15,51 +15,25 @@
 
 
 /**
- * Class containing operations for updating user profile.
+ * Class containing operations for updating user profile notification.
  */
-class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
+class CControllerUserProfileNotificationUpdate extends CControllerUserUpdateGeneral {
 
 	protected function checkInput(): bool {
-		$locales = array_keys(getLocales());
-		$locales[] = LANG_DEFAULT;
-		$themes = array_keys(APP::getThemes());
-		$themes[] = THEME_DEFAULT;
-
 		$fields = [
 			'userid' =>				'fatal|required|db users.userid',
-			'current_password' =>	'string',
-			'password1' =>			'string',
-			'password2' =>			'string',
-			'lang' =>				'db users.lang|in '.implode(',', $locales),
-			'timezone' =>			'db users.timezone|in '.implode(',', $this->timezones),
-			'theme' =>				'db users.theme|in '.implode(',', $themes),
-			'autologin' =>			'db users.autologin|in 0,1',
-			'autologout' =>			'db users.autologout|not_empty',
-			'refresh' =>			'db users.refresh|not_empty',
-			'rows_per_page' =>		'db users.rows_per_page',
-			'url' =>				'db users.url',
 			'messages' =>			'array',
+			'medias' =>				'array',
 			'form_refresh' =>		'int32'
 		];
 
 		$ret = $this->validateInput($fields);
-		$error = $this->getValidationError();
-
-		if ($ret && !$this->validateCurrentPassword()) {
-			$error = self::VALIDATION_ERROR;
-			$ret = false;
-		}
-
-		if ($ret && !$this->validatePassword()) {
-			$error = self::VALIDATION_ERROR;
-			$ret = false;
-		}
 
 		if (!$ret) {
-			switch ($error) {
+			switch ($this->getValidationError()) {
 				case self::VALIDATION_ERROR:
 					$response = (new CControllerResponseRedirect((new CUrl('zabbix.php'))
-						->setArgument('action', 'userprofile.edit')
+						->setArgument('action', 'userprofile.notification.edit')
 					));
 					$response->setFormData($this->getInputAll());
 					CMessageHelper::setErrorTitle(_('Cannot update user'));
@@ -85,36 +59,24 @@ class CControllerUserProfileUpdate extends CControllerUserUpdateGeneral {
 
 	protected function doAction(): void {
 		$user = [];
-
-		$this->getInputs($user, ['lang', 'timezone', 'theme', 'autologin', 'autologout', 'refresh', 'rows_per_page',
-			'url'
-		]);
 		$user['userid'] = CWebUser::$data['userid'];
 
-		if ($this->getInput('current_password', '') !== ''
-				|| ($this->hasInput('current_password') && CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL)) {
-			$user['current_passwd'] = $this->getInput('current_password');
-		}
-
-		if ($this->getInput('password1', '') !== ''
-				|| ($this->hasInput('password1') && CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL)) {
-			$user['passwd'] = $this->getInput('password1');
+		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
+			$user['medias'] = $this->getInputUserMedia();
 		}
 
 		DBstart();
-		$result = (bool) API::User()->update($user);
+		$result = updateMessageSettings($this->getInput('messages', []));
+		$result = $result && (bool) API::User()->update($user);
 		$result = DBend($result);
 
 		if ($result) {
-			if (array_key_exists('passwd', $user)) {
-				redirect('index.php');
-			}
 			$response = new CControllerResponseRedirect(CMenuHelper::getFirstUrl());
 			CMessageHelper::setSuccessTitle(_('User updated'));
 		}
 		else {
 			$response = (new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'userprofile.edit')
+				->setArgument('action', 'userprofile.notification.edit')
 			));
 			$response->setFormData($this->getInputAll());
 			CMessageHelper::setErrorTitle(_('Cannot update user'));
