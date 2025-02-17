@@ -404,7 +404,7 @@ $data['sysmap']['items'] = [];
 
 if ($itemids) {
 	$items = API::Item()->get([
-		'output' => ['name', 'value_type'],
+		'output' => ['name_resolved', 'value_type'],
 		'selectHosts' => ['name'],
 		'itemids' => $itemids,
 		'webitems' => true,
@@ -418,7 +418,7 @@ if ($itemids) {
 
 		$data['sysmap']['items'][$itemid] = [
 			'id' => $itemid,
-			'name' => $item['name'],
+			'name' => $item['name_resolved'],
 			'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
 		];
 	}
