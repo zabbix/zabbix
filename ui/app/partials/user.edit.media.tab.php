@@ -54,7 +54,7 @@ $media_table_info_template = new CTemplateTag('media-row-tmpl',
 			new CSpan('#{mediatype_name}'),
 			makeWarningIcon(_('Media type disabled by Administration.'))
 		],
-		(new CSpan('#{sendto_short}'))->setHint('#{sendto_full}'),
+		(new CSpan('#{sendto_short}')),
 		(new CDiv('#{period}'))
 			->setAttribute('style', 'max-width: ' . ZBX_TEXTAREA_STANDARD_WIDTH . 'px;')
 			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),

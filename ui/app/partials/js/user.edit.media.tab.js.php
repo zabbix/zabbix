@@ -126,7 +126,6 @@
 				sendto_full = media.sendto;
 			}
 
-			media.sendto_full = escapeHtml(sendto_full);
 			media.sendto_short = sendto_full.length > 50
 				? `${sendto_full.substring(0, 50)}...`
 				: sendto_full;
@@ -146,12 +145,12 @@
 				row.querySelector('.js-edit').disabled = true;
 			}
 
-			if (media.sendto_short.length <= 50) {
-				const hint = row.querySelector('td:nth-child(2) span[data-hintbox]');
+			if (media.sendto_short.length > 50) {
+				const hint = row.querySelector('td:nth-child(2) span');
 
-				for (const key in hint.dataset) {
-					delete hint.dataset[key];
-				}
+				hint.setAttribute('data-hintbox-contents', escapeHtml(sendto_full));
+				hint.setAttribute('data-hintbox', '1');
+				hint.setAttribute('data-hintbox-static', '1');
 			}
 
 			if (sendto_array !== null) {
