@@ -147,7 +147,11 @@
 			}
 
 			if (media.sendto_short.length <= 50) {
-				row.querySelector('td:nth-child(2) span[data-hintbox]').dataset.hintbox = '0';
+				const hint = row.querySelector('td:nth-child(2) span[data-hintbox]');
+
+				for (const key in hint.dataset) {
+					delete hint.dataset[key];
+				}
 			}
 
 			if (sendto_array !== null) {
