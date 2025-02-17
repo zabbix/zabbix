@@ -60,7 +60,7 @@ $service_tab = (new CFormGrid())
 	])
 	->addItem([
 		new CLabel(_('Problem tags')),
-		new CFormField(
+		(new CFormField(
 			(new CDiv([
 				(new CTable())
 					->setId('problem_tags')
@@ -69,15 +69,13 @@ $service_tab = (new CFormGrid())
 						(new CRowHeader([_('Name'), _('Operation'), _('Value'), '']))
 							->addClass(ZBX_STYLE_GREY)
 					)
-					->setAttribute('data-field-type', 'set')
-					->setAttribute('data-field-name', 'problem_tags')
 					->setFooter(
 						(new CCol(
 							(new CButtonLink(_('Add')))->addClass('element-table-add')
 						))
 					),
 				(new CTemplateTag('problem-tag-row-tmpl'))
-					->addItem(
+					->addItem([
 						(new CRow([
 							(new CTextBox('problem_tags[#{rowNum}][tag]', '#{tag}', false,
 								DB::getFieldLength('service_problem_tag', 'tag')
@@ -85,7 +83,8 @@ $service_tab = (new CFormGrid())
 								->addClass('js-problem-tag-input')
 								->addClass('js-problem-tag-tag')
 								->setAttribute('placeholder', _('tag'))
-								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+								->setErrorContainer('problem_tags_#{rowNum}_error_container'),
 							(new CSelect('problem_tags[#{rowNum}][operator]'))
 								->addClass('js-problem-tag-input')
 								->addOptions(CSelect::createOptionsFromArray([
@@ -99,11 +98,19 @@ $service_tab = (new CFormGrid())
 								->addClass('js-problem-tag-input')
 								->setAttribute('placeholder', _('value'))
 								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
-						]))->addClass('form_row')
-					)
+							(new CButtonLink(_('Remove')))->addClass('element-table-remove'),
+						]))->addClass('form_row'),
+						(new CRow([
+							(new CCol())
+								->setId('problem_tags_#{rowNum}_error_container')
+								->addClass(ZBX_STYLE_ERROR_CONTAINER)
+								->setColSpan(3)
+						]))->addClass('error-container-row')
+					])
 			]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		)
+		))
+			->setAttribute('data-field-type', 'set')
+			->setAttribute('data-field-name', 'problem_tags')
 	])
 	->addItem([
 		(new CLabel(_('Sort order (0->999)'), 'sortorder'))->setAsteriskMark(),
