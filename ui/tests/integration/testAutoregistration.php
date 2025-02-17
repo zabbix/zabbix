@@ -444,8 +444,6 @@ class testAutoregistration extends CIntegrationTest {
 				'status' => HOST_STATUS_MONITORED,
 				'tls_connect' => HOST_ENCRYPTION_PSK,
 				'tls_accept' => HOST_ENCRYPTION_PSK,
-				'tls_issuer' => 'iss',
-				'tls_subject' => 'sub',
 				'tls_psk_identity' => self::PSK_IDENTITY,
 				'tls_psk' => self::PSK_KEY_LOWER_CASE
 			]
