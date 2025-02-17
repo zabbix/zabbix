@@ -25,11 +25,7 @@ class CControllerResponseRedirect extends CControllerResponse {
 		$url = $location->getUrl();
 		$url_parts = parse_url($url);
 
-		if (!$url_parts || array_key_exists('host', $url_parts)) {
-			throw new CAccessDeniedException();
-		}
-
-		if (!CHtmlUrlValidator::validateSameSite($url)) {
+		if (!$url_parts || array_key_exists('host', $url_parts) || !CHtmlUrlValidator::validateSameSite($url)) {
 			throw new CAccessDeniedException();
 		}
 
