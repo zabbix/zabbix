@@ -2411,25 +2411,25 @@ out:
  *                                                                            *
  * Purpose: evaluates function by calling custom callback (if configured)     *
  *                                                                            *
- * Parameters: ctx         - [IN] evaluation context                          *
- *             token       - [IN] function token                              *
- *             function_cb - [IN] callback function                           *
- *             output      - [IN/OUT] output value stack                      *
- *             error       - [OUT] error message in case of failure           *
+ * Parameters: ctx              - [IN] evaluation context                     *
+ *             token            - [IN] function token                         *
+ *             eval_function_cb - [IN]                                        *
+ *             output           - [IN/OUT] output value stack                 *
+ *             error            - [OUT] error message in case of failure      *
  *                                                                            *
  * Return value: SUCCEED - function was executed successfully                 *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 static int	eval_execute_cb_function(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
-		zbx_eval_function_cb_t function_cb, zbx_vector_var_t *output, char **error)
+		zbx_eval_function_cb_t eval_function_cb, zbx_vector_var_t *output, char **error)
 {
 	zbx_variant_t	value, *args;
 	char		*errmsg = NULL;
 
 	args = (0 == token->opt ? NULL : &output->values[output->values_num - token->opt]);
 
-	if (SUCCEED != function_cb(ctx->expression + token->loc.l, token->loc.r - token->loc.l + 1,
+	if (SUCCEED != eval_function_cb(ctx->expression + token->loc.l, token->loc.r - token->loc.l + 1,
 			token->opt, args, ctx->eval_function_data_cb, &ctx->ts, &value, &errmsg))
 	{
 		char	*composed_expr = NULL;
