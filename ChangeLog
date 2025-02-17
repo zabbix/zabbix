@@ -1,6 +1,7 @@
 Changes for 7.4.0alpha1
 
 New features:
+..F....... [ZBXNEXT-9644] moved "Media" and "Frontend notifications" tabs from "Profile" page into a new "Notifications" page (rgontarski)
 .........T [ZBXNEXT-9606] added Palo Alto PA-440 by HTTP template (drasikhov)
 ........S. [ZBXNEXT-9771] updated max supported TimescaleDB version to 2.18 (mprihodko)
 .......PS. [ZBXNEXT-9497] added icmppingretry item key (wiper)
