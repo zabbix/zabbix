@@ -100,7 +100,7 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	autoreg_update_host_func_cb(NULL, host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag,
 			now, events_cbs);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__,);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static int	zbx_autoreg_host_check_permissions(const char *host, const char *ip, unsigned short port,
