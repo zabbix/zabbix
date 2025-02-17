@@ -26,7 +26,7 @@ class CFieldMultiline extends CField {
 	}
 
 	getValue() {
-		return jQuery(this._field).multilineInput('value');
+		return this._field.querySelector(`input[name="${this.getName()}"]`).value;
 	}
 
 	getName() {
