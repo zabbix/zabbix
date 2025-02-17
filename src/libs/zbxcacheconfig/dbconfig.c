@@ -1630,7 +1630,7 @@ ZBX_DC_PSK	*dc_psk_sync(char *tls_psk_identity, char *tls_psk, const char *name,
 
 	/* new PSKid and value non-empty */
 
-	/*zbx_strlower(tls_psk);*/
+	zbx_strlower(tls_psk);
 
 	if (1 == found && NULL != tls_dc_psk)	/* 'host/proxy' record has non-empty PSK */
 	{
@@ -9602,7 +9602,7 @@ size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned ch
 
 	UNLOCK_CACHE;
 
-	if (0 == strcmp((const char *)psk_buf, (const char *)autoreg_psk_tmp))
+	if (0 == strcasecmp((const char *)psk_buf, (const char *)autoreg_psk_tmp))
 	{
 		*psk_usage |= ZBX_PSK_FOR_AUTOREG;
 		return psk_len;
