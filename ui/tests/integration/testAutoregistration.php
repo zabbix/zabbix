@@ -366,4 +366,92 @@ class testAutoregistration extends CIntegrationTest {
 		]);
 	}
 
+	/* test Autoregstration with PSK */
+
+	const PSK_IDENTITY = "535D2244f31e82fcee2cd9b7964413b797af3d2271e68a7ac2e94e102b2dcb31";
+	const PSK_KEY_UPPER_CASE = "53E79a76526473c982eab32473e9e1643ead36cc5cfe693a7955b1b0527ec7fe";
+	const PSK_KEY_LOWER_CASE = "53e79a76526473c982eab32473e9e1643ead36cc5cfe693a7955b1b0527ec7fe";
+	const PSK_FILE_UPPER_CASE = "zabbix_agent_upper_case_psk.txt";
+	const PSK_FILE_LOWER_CASE = "zabbix_agent_lower_case_psk.txt";
+
+
+	/**
+	 * Component configuration provider for agent related tests.
+	 *
+	 * @return array
+	 */
+	public function agentConfigurationProvider_LowerCasePSK() {
+		if (file_put_contents(self::PSK_FILE_LOWER_CASE, self::PSK_KEY_LOWER_CASE) === false) {
+			throw new Exception('Failed to create lower case PSK file for agent');
+		}
+
+		return [
+			self::COMPONENT_AGENT => [
+				'Hostname' => self::COMPONENT_AGENT,
+				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
+				'HostMetadata' => self::$HOST_METADATA,
+				'TLSPSKIdentity' => self::PSK_IDENTITY,
+				'TLSPSKFile' => self::PSK_FILE_LOWER_CASE
+			]
+		];
+	}
+
+	/**
+	 * Component configuration provider for agent related tests.
+	 *
+	 * @return array
+	 */
+	public function agentConfigurationProvider_UpperCasePSK() {
+		if (file_put_contents(self::PSK_FILE_UPPER_CASE, self::PSK_KEY_UPPER_CASE) === false) {
+			throw new Exception('Failed to create upper case PSK file for agent');
+		}
+
+		return [
+			self::COMPONENT_AGENT => [
+				'Hostname' => self::COMPONENT_AGENT,
+				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
+				'HostMetadata' => self::$HOST_METADATA,
+				'TLSPSKIdentity' => self::PSK_IDENTITY,
+				'TLSPSKFile' => self::PSK_FILE_UPPER_CASE
+			]
+		];
+	}
+
+
+
+	/**
+	 * @required-components agent
+	 * @configurationDataProvider agentConfigurationProvider_LowerCasePSK
+	 */
+	public function testAutoregistration_withLowerCasePSK()
+	{
+		$response = $this->call('host.create', [
+			[
+				'host' => 'trapper_host',
+				'interfaces' => [
+					'type' => 1,
+					'main' => 1,
+					'useip' => 1,
+					'ip' => '127.0.0.1',
+					'dns' => '',
+					'port' => $this->getConfigurationValue(self::COMPONENT_AGENT, 'ListenPort')
+				],
+				'groups' => [['groupid' => 4]],
+				'status' => HOST_STATUS_MONITORED,
+				'tls_connect' => HOST_ENCRYPTION_PSK,
+				'tls_accept' => HOST_ENCRYPTION_PSK,
+				'tls_issuer' => 'iss',
+				'tls_subject' => 'sub',
+				'tls_psk_identity' => self::PSK_IDENTITY,
+				'tls_psk' => self::PSK_KEY_LOWER_CASE
+			]
+		]);
+
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['hostids']);
+		$hostid = $response['result']['hostids'][0];
+
+		$hostid = $this->waitForAutoreg([]);
+
+	}
 }
