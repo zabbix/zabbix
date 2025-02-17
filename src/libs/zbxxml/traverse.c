@@ -147,7 +147,7 @@ int	zbx_xml_traverse(char **data, char *error, int maxerrlen, zbx_xml_resolv_fun
 		goto clean;
 
 	zbx_free(*data);
-	*data = zbx_malloc(NULL, size + 1);
+	*data = zbx_malloc(NULL, (size_t)(size + 1));
 	memcpy(*data, (const char *)mem, size + 1);
 	xmlFree(mem);
 	ret = SUCCEED;

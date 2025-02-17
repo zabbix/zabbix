@@ -175,7 +175,7 @@ static int	macro_http_raw_resolv(zbx_macro_resolv_data_t *p, va_list args, char 
 			0 == strncmp(p->macro, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
 	{
 		zbx_dc_get_user_macro(um_handle, p->macro, &dc_host->hostid, 1, replace_with);
-		p->pos = p->token.loc.r;
+		p->pos = (int)p->token.loc.r;
 	}
 	else if (0 == strcmp(p->macro, MVAR_HOST_HOST) || 0 == strcmp(p->macro, MVAR_HOSTNAME))
 	{
@@ -224,9 +224,7 @@ static int	macro_http_raw_resolv(zbx_macro_resolv_data_t *p, va_list args, char 
 static int	macro_http_json_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_with, char **data,
 		char *error, size_t maxerrlen)
 {
-	int	ret = SUCCEED;
-
-	ret = macro_http_raw_resolv(p, args, replace_with, data, error, maxerrlen);
+	int	ret = macro_http_raw_resolv(p, args, replace_with, data, error, maxerrlen);
 
 	if (NULL != *replace_with)
 		zbx_json_escape(replace_with);
@@ -270,6 +268,7 @@ static int	parse_query_fields(const zbx_dc_item_t *item, char **query_fields, un
 		{
 			if (ZBX_MACRO_EXPAND_YES == expand_macros)
 				zbx_dc_close_user_macros(um_handle);
+
 			zabbix_log(LOG_LEVEL_ERR, "cannot parse query fields: %s", zbx_json_strerror());
 			zbx_free(str);
 			return FAIL;
@@ -285,6 +284,7 @@ static int	parse_query_fields(const zbx_dc_item_t *item, char **query_fields, un
 		{
 			zbx_substitute_macros(&data, NULL, 0, macro_http_raw_resolv, um_handle, &item->host, item);
 		}
+
 		zbx_url_encode(data, &data);
 		zbx_strcpy_alloc(&str, &alloc_len, &offset, data);
 		zbx_chrcpy_alloc(&str, &alloc_len, &offset, '=');
@@ -353,7 +353,7 @@ static int	macro_jmx_endpoint_resolv(zbx_macro_resolv_data_t *p, va_list args, c
 				0 == strncmp(p->macro, MVAR_USER_MACRO, ZBX_CONST_STRLEN(MVAR_USER_MACRO))))
 		{
 			zbx_dc_get_user_macro(um_handle, p->macro, &dc_item->host.hostid, 1, replace_with);
-			p->pos = p->token.loc.r;
+			p->pos = (int)p->token.loc.r;
 		}
 		else if (0 == strcmp(p->macro, MVAR_HOST_HOST) || 0 == strcmp(p->macro, MVAR_HOSTNAME))
 		{
