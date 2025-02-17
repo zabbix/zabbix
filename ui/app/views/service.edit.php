@@ -28,6 +28,13 @@ $form = (new CForm('post'))
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
+if ($data['serviceid'] !== null) {
+	$form->addItem(
+		(new CInput('hidden', 'serviceid', $data['serviceid']))
+			->setAttribute('data-field-type', 'hidden')
+	);
+}
+
 // Service tab.
 
 $parent_services = (new CMultiSelect([
@@ -62,6 +69,8 @@ $service_tab = (new CFormGrid())
 						(new CRowHeader([_('Name'), _('Operation'), _('Value'), '']))
 							->addClass(ZBX_STYLE_GREY)
 					)
+					->setAttribute('data-field-type', 'set')
+					->setAttribute('data-field-name', 'problem_tags')
 					->setFooter(
 						(new CCol(
 							(new CButtonLink(_('Add')))->addClass('element-table-add')
@@ -178,11 +187,13 @@ $service_tab->addItem(
 		->setId('advanced-configuration')
 		->addItem([
 			new CLabel(_('Additional rules')),
-			new CFormField(
+			(new CFormField(
 				(new CDiv($additional_rules))
 					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-					->addStyle('min-width: '.(ZBX_TEXTAREA_BIG_WIDTH - 27).'px;')
-			)
+				->addStyle('min-width: '.(ZBX_TEXTAREA_BIG_WIDTH - 27).'px;')
+			))
+				->setAttribute('data-field-type', 'set')
+				->setAttribute('data-field-name', 'additional_rules')
 		])
 		->addItem([
 			new CLabel(_('Status propagation rule'), 'propagation_rule_focusable'),
@@ -215,7 +226,7 @@ $service_tab->addItem(
 $tags_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Tags')),
-		new CFormField(
+		(new CFormField(
 			(new CDiv())
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -224,10 +235,14 @@ $tags_tab = (new CFormGrid())
 						->addClass('tags-table')
 						->setHeader((new CRowHeader([_('Name'), _('Value'), '']))->addClass(ZBX_STYLE_GREY)),
 					(new CTemplateTag('tag-row-tmpl'))->addItem(
-						renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => ''], ['add_post_js' => false])
+						renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => ''], ['add_post_js' => false,
+							'has_inline_validation' => true
+						])
 					)
 				])
-		)
+		))
+			->setAttribute('data-field-type', 'set')
+			->setAttribute('data-field-name', 'tags')
 	]);
 
 // Child services tab.
@@ -263,7 +278,7 @@ $child_services_filter = (new CList())
 	->addClass(ZBX_STYLE_INLINE_FILTER)
 	->addItem(new CLabel(_('Name'), 'children-filter-name'), ZBX_STYLE_INLINE_FILTER_LABEL)
 	->addItem(
-		(new CTextBox(null))
+		(new CTextBox('children-filter-name'))
 			->setId('children-filter-name')
 			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH))
 	->addItem(
@@ -281,11 +296,13 @@ $child_services_tab = [
 		->addItem(new CFormField($child_services_filter))
 		->addItem([
 			new CLabel(_('Child services')),
-			new CFormField(
+			(new CFormField(
 				(new CDiv($child_services))
 					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 					->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-			)
+			))
+				->setAttribute('data-field-type', 'set')
+				->setAttribute('data-field-name', 'child-services')
 		])
 ];
 
@@ -308,7 +325,8 @@ $form
 				'children_problem_tags_html' => $data['form']['children_problem_tags_html'],
 				'problem_tags' => $data['form']['problem_tags'],
 				'status_rules' => $data['form']['status_rules'],
-				'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+				'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT),
+				'rules' => $data['js_validation_rules']
 			]).');
 		'))->setOnDocumentReady()
 	);
@@ -344,7 +362,8 @@ if ($data['serviceid'] !== null) {
 						'cancel' => true,
 						'action' => ''
 					]
-				]
+				],
+				'rules' => (new CFormValidator(CControllerServiceCreate::getValidationRules()))->getRules()
 			]).');'
 		],
 		[

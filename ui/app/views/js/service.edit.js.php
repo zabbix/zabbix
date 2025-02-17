@@ -17,16 +17,16 @@
 
 window.service_edit_popup = new class {
 
-	init({tabs_id, serviceid, children, children_problem_tags_html, problem_tags, status_rules, search_limit}) {
+	init({tabs_id, serviceid, children, children_problem_tags_html, problem_tags, status_rules, search_limit, rules}) {
 		this.#initTemplates();
-
 		this.serviceid = serviceid;
 
 		this.search_limit = search_limit;
 
 		this.overlay = overlays_stack.getById('service.edit');
 		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
 		this.footer = this.overlay.$dialogue.$footer[0];
 
 		const return_url = new URL('zabbix.php', location.href);
@@ -300,7 +300,7 @@ window.service_edit_popup = new class {
 	}
 
 	#removeChild(serviceid) {
-		const child = this.form.querySelector(`#children tbody tr[data-serviceid="${serviceid}"]`);
+		const child = this.form_element.querySelector(`#children tbody tr[data-serviceid="${serviceid}"]`);
 
 		if (child !== null) {
 			child.remove();
@@ -369,7 +369,7 @@ window.service_edit_popup = new class {
 			exclude_serviceids.push(this.serviceid);
 		}
 
-		for (const input of this.form.querySelectorAll('#children tbody input')) {
+		for (const input of this.form_element.querySelectorAll('#children tbody input')) {
 			exclude_serviceids.push(input.value);
 		}
 
@@ -419,10 +419,12 @@ window.service_edit_popup = new class {
 		});
 	}
 
-	clone({title, buttons}) {
+	clone({title, buttons, rules}) {
 		this.serviceid = null;
 
-		this.#removeAllChildren();
+		this.form.reload(rules)
+
+		this.#removeAllChildren()
 
 		this.overlay.unsetLoading();
 		this.overlay.setProperties({title, buttons});
@@ -445,7 +447,7 @@ window.service_edit_popup = new class {
 	}
 
 	submit() {
-		const fields = getFormFields(this.form);
+		const fields = this.form.getAllValues();
 
 		if (this.serviceid !== null) {
 			fields.serviceid = this.serviceid;
@@ -473,11 +475,29 @@ window.service_edit_popup = new class {
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', this.serviceid !== null ? 'service.update' : 'service.create');
 
-		this.#post(curl.getUrl(), fields, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				this.overlay.unsetLoading();
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+				if (!result) {
+					return;
+				}
+
+				this.#post(curl.getUrl(), fields, (response) => {
+					if ('form_errors' in response) {
+						this.form.renderErrors(response.form_errors, true, true);
+
+						return;
+					}
+					else if ('error' in response) {
+						throw {error: response.error};
+					}
+					else {
+						overlayDialogueDestroy(this.overlay.dialogueid);
+						this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+					}
+				});
+			});
 	}
 
 	#post(url, data, success_callback) {
@@ -488,15 +508,22 @@ window.service_edit_popup = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				if ('error' in response) {
+				if ('form_errors' in response) {
+					this.form.renderErrors(response.form_errors, true, true);
+				}
+				else if ('error' in response) {
 					throw {error: response.error};
+				}
+				else {
+					overlayDialogueDestroy(this.overlay.dialogueid, true);
+					this.dialogue.dispatchEvent(new CustomEvent('condition.dialogue.submit', {detail: response}));
 				}
 
 				return response;
 			})
 			.then(success_callback)
 			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
+				for (const element of this.form_element.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
 					}
@@ -514,7 +541,7 @@ window.service_edit_popup = new class {
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
-				this.form.parentNode.insertBefore(message_box, this.form);
+				this.form_element.parentNode.insertBefore(message_box, this.form);
 			})
 			.finally(() => {
 				this.overlay.unsetLoading();
