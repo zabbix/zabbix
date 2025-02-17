@@ -439,7 +439,7 @@ class testAutoregistration extends CIntegrationTest {
 				'TLSPSKFile' => self::PSK_FILE_UPPER_CASE,
 				'TLSConnect' => 'psk',
 				'TLSAccept' => 'psk',
-				'HostMetadata' => self::$HOST_METADATA_PSK_UPPER_CASE
+				'HostMetadata' => self::HOST_METADATA_PSK_UPPER_CASE
 			],
 
 			self::COMPONENT_AGENT2 => [
@@ -449,7 +449,7 @@ class testAutoregistration extends CIntegrationTest {
 				'TLSPSKFile' => self::PSK_FILE_LOWER_CASE,
 				'TLSConnect' => 'psk',
 				'TLSAccept' => 'psk',
-				'HostMetadata' => self::$HOST_METADATA_PSK_LOWER_CASE
+				'HostMetadata' => self::HOST_METADATA_PSK_LOWER_CASE
 			]
 		];
 	}
