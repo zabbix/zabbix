@@ -52,9 +52,9 @@ foreach ($data['regex']['expressions'] as $index => $expression) {
 		->addRow(getExpressionEntryErrorView($index));
 }
 
-$table->addRow((new CRow((new CCol((new CButton('add', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)))->setColSpan(5)))
-	->setId('expression-list-footer')
-);
+$table->addRow((new CRow((new CCol(
+	(new CButton('add', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)->removeId()
+))->setColSpan(5)))->setId('expression-list-footer'));
 
 $tabs = (new CTabView())
 	->addTab('expr', _('Expressions'), (new CFormGrid())
@@ -202,6 +202,7 @@ function getExpressionEntryView(string $index, string $case_sensitive, string $t
 			->addItem((new CButton('remove', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
+				->removeId()
 			)
 		);
 }
