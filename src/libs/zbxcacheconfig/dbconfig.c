@@ -1630,7 +1630,7 @@ ZBX_DC_PSK	*dc_psk_sync(char *tls_psk_identity, char *tls_psk, const char *name,
 
 	/* new PSKid and value non-empty */
 
-	zbx_strlower(tls_psk);
+	/*zbx_strlower(tls_psk);*/
 
 	if (1 == found && NULL != tls_dc_psk)	/* 'host/proxy' record has non-empty PSK */
 	{
