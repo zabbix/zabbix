@@ -1929,7 +1929,7 @@ class CMap extends CMapElement {
 				if ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE
 						&& (!array_key_exists('linkid', $link)
 							|| bccomp($link['itemid'], $db_links[$link['linkid']]['itemid']) != 0)) {
-					$link_indexes[$link['itemid']][$i1] = $i2;
+					$link_indexes[$link['itemid']][$i1][] = $i2;
 				}
 			}
 		}
@@ -1950,7 +1950,7 @@ class CMap extends CMapElement {
 
 		foreach ($link_indexes as $itemid => $indexes) {
 			$i1 = key($indexes);
-			$i2 = $indexes[$i1];
+			$i2 = reset($indexes[$i1]);
 			$path = '/'.($i1 + 1).'/links/'.($i2 + 1).'/itemid';
 
 			if (!array_key_exists($itemid, $db_items)) {
@@ -1976,9 +1976,11 @@ class CMap extends CMapElement {
 	}
 
 	private static function addLinkItemValueType(array &$maps, array $db_items, array $link_indexes): void {
-		foreach ($link_indexes as $itemid => $indexes) {
-			foreach ($indexes as $i1 => $i2) {
-				$maps[$i1]['links'][$i2]['item_value_type'] = $db_items[$itemid]['value_type'];
+		foreach ($link_indexes as $itemid => $map_indexes) {
+			foreach ($map_indexes as $i1 => $indexes) {
+				foreach ($indexes as $i2) {
+					$maps[$i1]['links'][$i2]['item_value_type'] = $db_items[$itemid]['value_type'];
+				}
 			}
 		}
 	}
