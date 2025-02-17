@@ -17640,6 +17640,10 @@ msgstr "איפוס לבררות המחדל"
 msgid "Reset to initial view"
 msgstr "איפוס לתצוגה הראשונית"
 
+#: app/views/administration.miscconfig.edit.php:103
+msgid "Resolve secret vault macros by"
+msgstr ""
+
 #: jsLoader.php:283
 msgid "Resolved"
 msgstr "נפתר"
@@ -23905,6 +23909,14 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr "שרת Zabbix (מתווך)"
 
+#: app/views/administration.miscconfig.edit.php:112
+msgid "Zabbix server and proxy"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:107
+msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
+msgstr ""
+
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "שרת ה־Zabbix אינו פעיל: יכול להיות שהמידע המוצג אינו עדכני."
@@ -23921,6 +23933,10 @@ msgstr "שם שרת ה־Zabbix"
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
 msgstr "גרסת שרת של Zabbix"
+
+#: app/views/administration.miscconfig.edit.php:105
+msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
+msgstr ""
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -24861,6 +24877,10 @@ msgstr "ראשון"
 msgid "first() - The oldest value in the specified time interval"
 msgstr "first()‎ - הערך הישן ביותר במשך זמן מסוים"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:626
+msgid "firstclock() - Timestamp of the oldest value in the specified time interval"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
 msgstr "floor()‎ - מעגלת למטה למספר השלם הקרוב"
@@ -25258,6 +25278,10 @@ msgstr "אחרון"
 msgid "last() - Last (most recent) T value"
 msgstr "last()‎ - ערך ה־T (העדכני ביותר)"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:733
+msgid "lastclock() - Timestamp of the last (most recent) T value"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1557
 msgid "left"
 msgstr "שמאל"
@@ -25293,6 +25317,10 @@ msgstr "logseverity()‎ - חומרת היומן של רשומת היומן הא
 #: app/controllers/CControllerPopupTriggerExpr.php:779
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr "logsource()‎ - מקור היומן של רשומת היומן האחרונה שתואמת לביטוי הרגולרי V למשך T (1 - תואם, 0 - לא תואם)"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:795
+msgid "logtimestamp() - Timestamp of the last (most recent) T log message"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "ltrim() - Remove specified characters from the beginning of a string"

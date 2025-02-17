@@ -439,14 +439,18 @@ class testPageHosts extends CLegacyWebTest {
 
 	public function testPageHosts_FilterNone() {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
+		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
+		$table->waitUntilReloaded();
 		$filter->getField('Name')->fill('1928379128ksdhksdjfh');
 		$filter->submit();
+		$table->waitUntilReloaded();
 		$this->assertTableStats();
 		$filter->invalidate();
 		$filter->getField('Name')->fill('%');
 		$filter->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$this->assertTableStats();
 	}

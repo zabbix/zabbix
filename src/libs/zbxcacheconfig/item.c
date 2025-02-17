@@ -82,6 +82,9 @@ int	zbx_dc_get_history_log_value(zbx_uint64_t itemid, char **replace_to, int req
 		case ZBX_DC_REQUEST_ITEM_LOG_AGE:
 			*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - value.value.log->timestamp));
 			goto success;
+		case ZBX_DC_REQUEST_ITEM_LOG_TIMESTAMP:
+			*replace_to = zbx_dsprintf(*replace_to, "%d", value.value.log->timestamp);
+			goto success;
 	}
 
 	/* the following attributes are set only for windows eventlog items */
