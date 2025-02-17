@@ -55,8 +55,8 @@ class CControllerAutoregUpdate extends CController {
 
 		$result = (bool) API::Autoregistration()->update($autoreg);
 
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'autoreg.edit')
+		$response = new CControllerResponseRedirect(
+			(new CUrl('zabbix.php'))->setArgument('action', 'autoreg.edit')
 		);
 
 		if ($result) {

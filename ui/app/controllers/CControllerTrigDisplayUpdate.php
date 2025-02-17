@@ -46,8 +46,8 @@ class CControllerTrigDisplayUpdate extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'trigdisplay.edit')
+			$response = new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))->setArgument('action', 'trigdisplay.edit')
 			);
 
 			$response->setFormData($this->getInputAll());
@@ -95,8 +95,8 @@ class CControllerTrigDisplayUpdate extends CController {
 
 		$result = API::Settings()->update($settings);
 
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'trigdisplay.edit')
+		$response = new CControllerResponseRedirect(
+			(new CUrl('zabbix.php'))->setArgument('action', 'trigdisplay.edit')
 		);
 
 		if ($result) {

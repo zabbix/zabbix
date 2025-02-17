@@ -132,9 +132,10 @@ class CControllerUsergroupUpdate extends CController {
 		$result = (bool) API::UserGroup()->update($user_group);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'usergroup.list')
-				->setArgument('page', CPagerHelper::loadPage('usergroup.list', null))
+			$response = new CControllerResponseRedirect(
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'usergroup.list')
+					->setArgument('page', CPagerHelper::loadPage('usergroup.list', null))
 			);
 			$response->setFormData(['uncheck' => '1']);
 			CMessageHelper::setSuccessTitle(_('User group updated'));
@@ -153,9 +154,10 @@ class CControllerUsergroupUpdate extends CController {
 	 * @param bool $add_message  Optional flag for adding a specific error message.
 	 */
 	private function getErrorResponse(bool $add_message = false): void {
-		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-			->setArgument('action', 'usergroup.edit')
-			->setArgument('usrgrpid', $this->getInput('usrgrpid'))
+		$response = new CControllerResponseRedirect(
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'usergroup.edit')
+				->setArgument('usrgrpid', $this->getInput('usrgrpid'))
 		);
 		CMessageHelper::setErrorTitle(_('Cannot update user group'));
 
