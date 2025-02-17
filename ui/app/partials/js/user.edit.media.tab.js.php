@@ -126,7 +126,7 @@
 				sendto_full = media.sendto;
 			}
 
-			media.sendto_full = sendto_full;
+			media.sendto_full = escapeHtml(sendto_full);
 			media.sendto_short = sendto_full.length > 50
 				? `${sendto_full.substring(0, 50)}...`
 				: sendto_full;
