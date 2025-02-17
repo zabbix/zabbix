@@ -1510,18 +1510,17 @@ function getMapLinkItemInfo(array $sysmap): array {
 
 	$history = Manager::History();
 
+	$db_items = CItemHelper::addDataSource($db_items, time() - $history_period);
+
 	foreach ($db_items as &$db_item) {
-		[$item] = CItemHelper::addDataSource([$db_item], time() - $history_period);
-
-		if ($item['source'] === 'trends') {
-			$item_value = $history->getAggregatedValues([$item], AGGREGATE_LAST, time() - $history_period);
-			$db_item['value'] = $item_value ? reset($item_value) : null;
-
-			continue;
+		if ($db_item['source'] === 'trends') {
+			$item_value = $history->getAggregatedValues([$db_item], AGGREGATE_LAST, time() - $history_period);
+		}
+		else {
+			$item_value = $history->getLastValues([$db_item], 1, $history_period);
 		}
 
-		$item_value = $history->getLastValues([$item], 1, $history_period);
-		$db_item['value'] = $item_value ? reset($item_value) : null;
+		$db_item['value'] = $item_value ? reset($item_value) : [];
 	}
 	unset($db_item);
 
