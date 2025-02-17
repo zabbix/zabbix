@@ -2430,7 +2430,7 @@ static int	eval_execute_cb_function(const zbx_eval_context_t *ctx, const zbx_eva
 	args = (0 == token->opt ? NULL : &output->values[output->values_num - token->opt]);
 
 	if (SUCCEED != function_cb(ctx->expression + token->loc.l, token->loc.r - token->loc.l + 1,
-			token->opt, args, ctx->data_cb, &ctx->ts, &value, &errmsg))
+			token->opt, args, ctx->eval_function_data_cb, &ctx->ts, &value, &errmsg))
 	{
 		char	*composed_expr = NULL;
 
@@ -3330,17 +3330,17 @@ out:
  *             ts                         - [IN] timestamp of execution time             *
  *             eval_function_common_func  - [IN] common function callback (optional)     *
  *             eval_function_history_func - [IN] history function callback (optional)    *
- *             data_cb                    - [IN] caller data to be passed to callback    *
+ *             eval_function_data_cb      - [IN] caller data to be passed to callback    *
  *                                               functions                               *
  *                                                                                       *
  *****************************************************************************************/
 static void	eval_init_execute_context(zbx_eval_context_t *ctx, const zbx_timespec_t *ts,
 		zbx_eval_function_cb_t eval_function_common_func, zbx_eval_function_cb_t eval_function_history_func,
-		void *data_cb)
+		void *eval_function_data_cb)
 {
 	ctx->eval_function_common_cb = eval_function_common_func;
 	ctx->eval_function_history_cb = eval_function_history_func;
-	ctx->data_cb = data_cb;
+	ctx->eval_function_data_cb = eval_function_data_cb;
 
 	if (NULL == ts)
 		ctx->ts.sec = ctx->ts.ns = 0;
