@@ -392,7 +392,8 @@ class testAutoregistration extends CIntegrationTest {
 				'HostMetadata' => self::$HOST_METADATA,
 				'TLSPSKIdentity' => self::PSK_IDENTITY,
 				'TLSPSKFile' => self::PSK_FILE_LOWER_CASE,
-				'TLSConnect' => 'psk'
+				'TLSConnect' => 'psk',
+				'TLSAccept' => 'psk'
 			]
 		];
 	}
@@ -414,7 +415,8 @@ class testAutoregistration extends CIntegrationTest {
 				'HostMetadata' => self::$HOST_METADATA,
 				'TLSPSKIdentity' => self::PSK_IDENTITY,
 				'TLSPSKFile' => self::PSK_FILE_UPPER_CASE,
-				'TLSConnect' => 'psk'
+				'TLSConnect' => 'psk',
+				'TLSAccept' => 'psk'
 			]
 		];
 	}
