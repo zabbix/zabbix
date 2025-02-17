@@ -391,7 +391,8 @@ class testAutoregistration extends CIntegrationTest {
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'HostMetadata' => self::$HOST_METADATA,
 				'TLSPSKIdentity' => self::PSK_IDENTITY,
-				'TLSPSKFile' => self::PSK_FILE_LOWER_CASE
+				'TLSPSKFile' => self::PSK_FILE_LOWER_CASE,
+				'TLSConnect' => 'psk'
 			]
 		];
 	}
@@ -412,7 +413,8 @@ class testAutoregistration extends CIntegrationTest {
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'HostMetadata' => self::$HOST_METADATA,
 				'TLSPSKIdentity' => self::PSK_IDENTITY,
-				'TLSPSKFile' => self::PSK_FILE_UPPER_CASE
+				'TLSPSKFile' => self::PSK_FILE_UPPER_CASE,
+				'TLSConnect' => 'psk'
 			]
 		];
 	}
