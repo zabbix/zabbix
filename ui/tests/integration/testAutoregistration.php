@@ -371,8 +371,8 @@ class testAutoregistration extends CIntegrationTest {
 	const PSK_IDENTITY = "535D2244f31e82fcee2cd9b7964413b797af3d2271e68a7ac2e94e102b2dcb31";
 	const PSK_KEY_UPPER_CASE = "53E79a76526473c982eab32473e9e1643ead36cc5cfe693a7955b1b0527ec7fe";
 	const PSK_KEY_LOWER_CASE = "53e79a76526473c982eab32473e9e1643ead36cc5cfe693a7955b1b0527ec7fe";
-	const PSK_FILE_UPPER_CASE = "zabbix_agent_upper_case_psk.txt";
-	const PSK_FILE_LOWER_CASE = "zabbix_agent_lower_case_psk.txt";
+	const PSK_FILE_UPPER_CASE = "/tmp/zabbix_agent_upper_case_psk.txt";
+	const PSK_FILE_LOWER_CASE = "/tmp/zabbix_agent_lower_case_psk.txt";
 
 
 	/**
