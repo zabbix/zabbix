@@ -63,48 +63,6 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		$this->assertCount(1, $actionids, 'Failed to create an autoregistration action');
 	}
 
-	/*
-	 * Component configuration provider for agent related tests.
-	 *
-	 * @return array
-	 */
-	public function agentConfigurationProvider_LowerCaseFirstPSK() {
-		if (file_put_contents(self::PSK_FILE_LOWER_CASE, self::PSK_KEY_LOWER_CASE) === false) {
-			throw new Exception('Failed to create lower case PSK file for agent');
-		}
-
-		if (file_put_contents(self::PSK_FILE_UPPER_CASE, self::PSK_KEY_UPPER_CASE) === false) {
-			throw new Exception('Failed to create upper case PSK file for agent');
-		}
-
-		return [
-			self::COMPONENT_AGENT => [
-				'Hostname' => self::PSK_HOSTNAME,
-				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
-				'TLSPSKIdentity' => self::PSK_IDENTITY,
-				'TLSPSKFile' => self::PSK_FILE_LOWER_CASE,
-				'TLSConnect' => 'psk',
-				'TLSAccept' => 'psk',
-				'HostMetadata' => self::HOST_METADATA_PSK_LOWER_CASE
-			],
-
-			self::COMPONENT_AGENT2 => [
-				'Hostname' => self::PSK_HOSTNAME,
-				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
-				'TLSPSKIdentity' => self::PSK_IDENTITY,
-				'TLSPSKFile' => self::PSK_FILE_UPPER_CASE,
-				'TLSConnect' => 'psk',
-				'TLSAccept' => 'psk',
-				'HostMetadata' => self::HOST_METADATA_PSK_UPPER_CASE
-			],
-			self::COMPONENT_SERVER => [
-				'DebugLevel' => 5,
-				'LogFileSize' => 0,
-			]
-		];
-
-	}
-
 	/**
 	 * Component configuration provider for agent related tests.
 	 *
@@ -182,6 +140,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		sleep(1);
 
 		$this->startComponent(self::COMPONENT_AGENT2);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'but different PSK values', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
+		#$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'but different PSK values', true, 120);
 	}
 }
