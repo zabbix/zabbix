@@ -98,7 +98,7 @@ $service_tab = (new CFormGrid())
 								->addClass('js-problem-tag-input')
 								->setAttribute('placeholder', _('value'))
 								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-							(new CButtonLink(_('Remove')))->addClass('element-table-remove'),
+							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						]))->addClass('form_row'),
 						(new CRow([
 							(new CCol())
