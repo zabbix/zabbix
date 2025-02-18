@@ -412,6 +412,10 @@ class testAutoregistration extends CIntegrationTest {
 				'TLSConnect' => 'psk',
 				'TLSAccept' => 'psk',
 				'HostMetadata' => self::HOST_METADATA_PSK_UPPER_CASE
+			],
+			self::COMPONENT_SERVER => [
+				'DebugLevel' => 5,
+				'LogFileSize' => 0,
 			]
 		];
 
@@ -450,6 +454,12 @@ class testAutoregistration extends CIntegrationTest {
 				'TLSConnect' => 'psk',
 				'TLSAccept' => 'psk',
 				'HostMetadata' => self::HOST_METADATA_PSK_LOWER_CASE
+			],
+			self::COMPONENT_SERVER => [
+				'DebugLevel' => 5,
+				'LogFileSize' => 0,
+				'UnavailableDelay' => 5,
+				'UnreachableDelay' => 1
 			]
 		];
 	}
