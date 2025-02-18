@@ -2322,7 +2322,7 @@ static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_p
 		ZBX_POST_VSPHERE_FOOTER
 
 	size_t	offset;
-	char	*error, tmp[MAX_STRING_LEN], criteria[MAX_STRING_LEN];
+	char	*error = NULL, tmp[MAX_STRING_LEN], criteria[MAX_STRING_LEN];
 	int	count = 0;
 	xmlDoc	*doc = NULL;
 

@@ -20,23 +20,17 @@
 ?>
 
 <script type="text/javascript">
-
 	const view = new class {
 		init() {
-			document.getElementById('user-form').addEventListener('submit', (e) => {
-				if (!this._userFormSubmit()) {
-					e.preventDefault();
-				}
-			});
-
 			document.getElementById('messages_enabled').addEventListener('click', () => {
-				this._updateForm();
+				this.#updateForm();
 			});
 
-			this._updateForm();
+			this.#updateForm();
+			this.#initAction();
 		}
 
-		_updateForm() {
+		#updateForm() {
 			document
 				.getElementById('notificationsTab')
 				.querySelectorAll('input:not([name="messages[enabled]"]),button,z-select')
@@ -45,30 +39,15 @@
 				});
 		}
 
-		_userFormSubmit() {
-			document.querySelectorAll('#autologout, #refresh, #url').forEach((elem) => {
-				elem.value = elem.value.trim();
-			});
-
-			const elem_current = document.getElementById('current_password');
-			const elem_password1 = document.getElementById('password1');
-			const elem_password2 = document.getElementById('password2');
-
-			if (elem_current && elem_password1 && elem_password2) {
-				const current_password = elem_current.value;
-				const password1 = elem_password1.value;
-				const password2 = elem_password2.value;
-
-				if (password1 !== '' && password2 !== '' && current_password !== '') {
-					const warning_msg = <?= json_encode(
-						_('In case of successful password change user will be logged out of all active sessions. Continue?')
-					) ?>;
-
-					return confirm(warning_msg);
+		#initAction() {
+			document.querySelector('#notificationsTab').addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-test_sound')) {
+					testUserSound(`messages_sounds.${e.target.dataset.message_sounds}`);
 				}
-			}
-
-			return true;
+				else if (e.target.classList.contains('js-audio_stop')) {
+					AudioControl.stop();
+				}
+			});
 		}
 	}
 </script>
