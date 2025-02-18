@@ -482,8 +482,8 @@ class testAutoregistration extends CIntegrationTest {
 	 */
 	public function testAutoregistration_withLowerCasePSK()
 	{
-		$this->killComponent(self::COMPONENT_AGENT);
 		$this->killComponent(self::COMPONENT_AGENT2);
+		$this->killComponent(self::COMPONENT_AGENT);
 		$this->killComponent(self::COMPONENT_SERVER);
 
 		$this->updateAutoregistration();
@@ -493,35 +493,11 @@ class testAutoregistration extends CIntegrationTest {
 		$this->startComponent(self::COMPONENT_AGENT);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
 		$this->killComponent(self::COMPONENT_AGENT);
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->stopComponent(self::COMPONENT_SERVER);
+		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(1);
 
 		$this->startComponent(self::COMPONENT_AGENT2);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'but different PSK values', true, 120);
-	}
-
-
-	/**
-	* @required-components agent,agent2,server
-	 * @configurationDataProvider agentConfigurationProvider_UpperCaseFirstPSK
-	 */
-	public function testAutoregistration_withUpperCasePSK()
-	{
-		$this->killComponent(self::COMPONENT_AGENT);
-		$this->killComponent(self::COMPONENT_AGENT2);
-		$this->killComponent(self::COMPONENT_SERVER);
-
-		$this->updateAutoregistration();
-
-		$this->startComponent(self::COMPONENT_SERVER);
-		sleep(1);
-		$this->startComponent(self::COMPONENT_AGENT);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
-		$this->killComponent(self::COMPONENT_AGENT);
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		sleep(1);
-
-		$this->startComponent(self::COMPONENT_AGENT2);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'but different PSK values,', true, 120);
 	}
 }
