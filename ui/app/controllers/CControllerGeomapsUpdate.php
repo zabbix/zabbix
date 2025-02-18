@@ -30,8 +30,8 @@ class CControllerGeomapsUpdate extends CController {
 			'geomaps_tile_url' => ['db config.geomaps_tile_url', 'required', 'not_empty',
 				'when' => ['geomaps_tile_provider', 'in' => ['']]
 			],
-			'geomaps_max_zoom' => ['db config.geomaps_max_zoom', 'required', 'min' => 1, 'max' => ZBX_GEOMAP_MAX_ZOOM,
-				'when' => ['geomaps_tile_provider', 'in' => ['']]
+			'geomaps_max_zoom' => [['db config.geomaps_max_zoom', 'min' => 1, 'max' => ZBX_GEOMAP_MAX_ZOOM],
+				['db config.geomaps_max_zoom', 'required', 'when' => ['geomaps_tile_provider', 'in' => ['']]]
 			],
 			'geomaps_attribution' => ['db config.geomaps_attribution',
 				'when' => ['geomaps_tile_provider', 'in' => ['']]

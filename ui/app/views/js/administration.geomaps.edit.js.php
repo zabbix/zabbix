@@ -27,7 +27,7 @@
 		tile_providers: {},
 		defaults: {},
 
-		init({tile_providers, rules}) {
+		init({rules, tile_providers}) {
 			this.form_element = document.getElementById('geomaps-form');
 			this.form = new CForm(this.form_element, rules);
 			this.tile_url = document.getElementById('geomaps_tile_url');
