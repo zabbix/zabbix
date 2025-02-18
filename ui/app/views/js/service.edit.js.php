@@ -73,7 +73,7 @@ window.service_edit_popup = new class {
 			if (e.target.classList.contains('element-table-add')) {
 				this.form.validateSubmit(this.form.getAllValues());
 
-				this.#update()
+				this.#update();
 			}
 		});
 
@@ -430,9 +430,9 @@ window.service_edit_popup = new class {
 	clone({title, buttons, rules}) {
 		this.serviceid = null;
 
-		this.form.reload(rules)
+		this.form.reload(rules);
 
-		this.#removeAllChildren()
+		this.#removeAllChildren();
 
 		this.overlay.unsetLoading();
 		this.overlay.setProperties({title, buttons});
