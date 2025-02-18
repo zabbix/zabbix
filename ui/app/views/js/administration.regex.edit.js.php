@@ -95,9 +95,12 @@
 		submit() {
 			const fields = this.form.getAllValues();
 
+			this.#setLoadingStatus();
 			this.form.validateSubmit(fields)
 				.then((result) => {
 					if (!result) {
+						this.#unsetLoadingStatus();
+
 						return;
 					}
 
@@ -126,9 +129,8 @@
 								location.href = this.#list_action;
 							}
 						})
-						.catch((exception) => {
-							addMessage(makeMessageBox('bad', [exception.message]));
-						});
+						.catch((exception) => addMessage(makeMessageBox('bad', [exception.message])))
+						.finally(() => this.#unsetLoadingStatus());
 				});
 		}
 
@@ -175,7 +177,7 @@
 		#testExpression() {
 			const {expressions, test_string} = this.form.getAllValues();
 
-			this.#setLoadingStatus();
+			this.#setTestLoadingStatus();
 
 			fetch(this.#test_action, {
 				method: 'POST',
@@ -185,10 +187,40 @@
 				.then((response) => response.json())
 				.then((response) => this.#showTestResult(response, expressions))
 				.catch((exception) => addMessage(makeMessageBox('bad', [exception.message])))
-				.finally(() => this.#unsetLoadingStatus());
+				.finally(() => this.#unsetTestLoadingStatus());
 		}
 
 		#setLoadingStatus() {
+			[
+				document.getElementById('add'),
+				document.getElementById('clone'),
+				document.getElementById('delete'),
+				document.getElementById('update')
+			].forEach(button => {
+				if (button) {
+					button.classList.add('is-loading');
+					button.classList.add('is-loading-fadein');
+					button.setAttribute('disabled', true);
+				}
+			});
+		}
+
+		#unsetLoadingStatus() {
+			[
+				document.getElementById('add'),
+				document.getElementById('clone'),
+				document.getElementById('delete'),
+				document.getElementById('update')
+			].forEach(button => {
+				if (button) {
+					button.classList.remove('is-loading');
+					button.classList.remove('is-loading-fadein');
+					button.removeAttribute('disabled');
+				}
+			});
+		}
+
+		#setTestLoadingStatus() {
 			const button = document.getElementById('test-expression'),
 				textarea = document.getElementById('test-string');
 
@@ -197,7 +229,7 @@
 			textarea.setAttribute('disabled', true);
 		}
 
-		#unsetLoadingStatus() {
+		#unsetTestLoadingStatus() {
 			const button = document.getElementById('test-expression'),
 				textarea = document.getElementById('test-string');
 
@@ -265,6 +297,7 @@
 				default: return '';
 			}
 		}
+
 		#updateRow({target}) {
 			if (target instanceof ZSelect && target.classList.contains('js-expression-type-select')) {
 				const delimeter = target.closest('tr').querySelector('.js-expression-delimiter-select');
