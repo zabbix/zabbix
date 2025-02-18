@@ -41,7 +41,7 @@ class CControllerRegExUpdate extends CController {
 		]];
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {

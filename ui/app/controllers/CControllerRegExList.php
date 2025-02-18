@@ -33,7 +33,7 @@ class CControllerRegExList extends CController {
 
 	protected function doAction() {
 		$data = [
-			'regexs' => API::Regexp()->get([
+			'regexps' => API::Regexp()->get([
 				'output' => ['regexpid', 'name'],
 				'selectExpressions' => ['expression', 'expression_type'],
 				'preservekeys' => true
@@ -41,7 +41,7 @@ class CControllerRegExList extends CController {
 			'uncheck' => $this->hasInput('uncheck')
 		];
 
-		order_result($data['regexs'], 'name');
+		order_result($data['regexps'], 'name');
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of regular expressions'));

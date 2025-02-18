@@ -75,7 +75,7 @@
 		#combined_result_template;
 
 		init({rules, action}) {
-			this.form_element = document.getElementById('regex');
+			this.form_element = document.getElementById('regexp');
 			this.form = new CForm(this.form_element, rules);
 			this.form_element.addEventListener('submit', (e) => {
 				e.preventDefault();
@@ -155,16 +155,16 @@
 				{name, expressions, test_string} = this.form.getAllValues(),
 				indexes = Object.keys(expressions);
 
-			curl.setArgument('regex[name]', name);
-			curl.setArgument('regex[test_string]', test_string);
+			curl.setArgument('regexp[name]', name);
+			curl.setArgument('regexp[test_string]', test_string);
 
 			for (let index of indexes) {
 				const {case_sensitive, exp_delimiter, expression, expression_type} = expressions[index];
 
-				curl.setArgument(`regex[expressions][${index}][case_sensitive]`, case_sensitive);
-				curl.setArgument(`regex[expressions][${index}][exp_delimiter]`, exp_delimiter);
-				curl.setArgument(`regex[expressions][${index}][expression]`, expression);
-				curl.setArgument(`regex[expressions][${index}][expression_type]`, expression_type);
+				curl.setArgument(`regexp[expressions][${index}][case_sensitive]`, case_sensitive);
+				curl.setArgument(`regexp[expressions][${index}][exp_delimiter]`, exp_delimiter);
+				curl.setArgument(`regexp[expressions][${index}][expression]`, expression);
+				curl.setArgument(`regexp[expressions][${index}][expression_type]`, expression_type);
 			}
 
 			redirect(curl.getUrl(), 'post', 'action', undefined, true);

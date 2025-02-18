@@ -15,7 +15,7 @@
 
 class CControllerRegExEdit extends CController {
 
-	protected array $db_regex = [];
+	protected array $db_regexp = [];
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
@@ -23,8 +23,8 @@ class CControllerRegExEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'regexid' => 'db regexps.regexpid',
-			'regex' => 'array'
+			'regexpid' => 'db regexps.regexpid',
+			'regexp' => 'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -41,25 +41,25 @@ class CControllerRegExEdit extends CController {
 			return false;
 		}
 
-		if ($this->hasInput('regexid')) {
-			$db_regexs = API::Regexp()->get([
+		if ($this->hasInput('regexpid')) {
+			$db_regexps = API::Regexp()->get([
 				'output' => ['regexpid', 'name', 'test_string'],
 				'selectExpressions' => ['expression_type', 'expression', 'exp_delimiter', 'case_sensitive'],
-				'regexpids' => [$this->getInput('regexid')]
+				'regexpids' => $this->getInput('regexpid')
 			]);
 
-			if (!$db_regexs) {
+			if (!$db_regexps) {
 				return false;
 			}
 
-			$this->db_regex = $db_regexs[0];
+			$this->db_regexp = $db_regexps[0];
 		}
 
 		return true;
 	}
 
 	protected function doAction() {
-		$regex_default = [
+		$regexp_default = [
 			'regexpid' => '0',
 			'name' => '',
 			'test_string' => '',
@@ -69,19 +69,19 @@ class CControllerRegExEdit extends CController {
 			]]
 		];
 
-		$regex = array_replace($regex_default, $this->getInput('regex', []), $this->db_regex);
+		$regexp = array_replace($regexp_default, $this->getInput('regexp', []), $this->db_regexp);
 
-		foreach ($regex['expressions'] as &$expression) {
+		foreach ($regexp['expressions'] as &$expression) {
 			$expression += ['exp_delimiter' => ',', 'case_sensitive' => 0];
 		}
 		unset($expression);
 
-		$js_validation_rules = $this->hasInput('regexid')
+		$js_validation_rules = $this->hasInput('regexpid')
 			? CControllerRegExUpdate::getValidationRules()
 			: CControllerRegExCreate::getValidationRules();
 
 		$data = [
-			'regex' => $regex,
+			'regexp' => $regexp,
 			'js_validation_rules' => (new CFormValidator($js_validation_rules))->getRules()
 		];
 

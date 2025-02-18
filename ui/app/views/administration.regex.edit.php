@@ -27,8 +27,8 @@ $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setAction((new CUrl('zabbix.php'))->getUrl())
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-	->setId('regex')
-	->addItem($data['regex']['regexpid'] != 0 ? new CVar('regexpid', $data['regex']['regexpid']) : null);
+	->setId('regexp')
+	->addItem($data['regexp']['regexpid'] != 0 ? new CVar('regexpid', $data['regexp']['regexpid']) : null);
 
 $table = (new CTable())
 	->setId('regular-expressions-table')
@@ -44,7 +44,7 @@ $table = (new CTable())
 $options_delimiter = CSelect::createOptionsFromArray(CRegexHelper::expressionDelimiters());
 $options_expression_type = CSelect::createOptionsFromArray(CRegexHelper::expression_type2str());
 
-foreach ($data['regex']['expressions'] as $index => $expression) {
+foreach ($data['regexp']['expressions'] as $index => $expression) {
 	$table
 		->addRow(getExpressionEntryView($index, $expression['case_sensitive'],
 			$expression['expression_type'], $expression['expression'], $expression['exp_delimiter'], $options_delimiter,
@@ -61,7 +61,7 @@ $tabs = (new CTabView())
 	->addTab('expr', _('Expressions'), (new CFormGrid())
 		->addItem((new CLabel(_('Name'), 'name'))->setAsteriskMark())
 		->addItem((new CFormField())
-			->addItem((new CTextBox('name', $data['regex']['name'], false,
+			->addItem((new CTextBox('name', $data['regexp']['name'], false,
 				DB::getFieldLength('regexps', 'name'))
 			)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -81,7 +81,7 @@ $tabs = (new CTabView())
 	->addTab('test', _('Test'), (new CFormGrid())
 		->addItem(new CLabel(_('Test string')))
 		->addItem((new CFormField())
-			->addItem((new CTextArea('test_string', $data['regex']['test_string']))
+			->addItem((new CTextArea('test_string', $data['regexp']['test_string']))
 				->setMaxlength(DB::getFieldLength('regexps', 'test_string'))
 				->setId('test-string')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -105,13 +105,13 @@ $tabs = (new CTabView())
 			)
 		)
 	)
-	->setFooter($data['regex']['regexpid'] != 0
+	->setFooter($data['regexp']['regexpid'] != 0
 		? makeFormFooter(new CSubmit('update', _('Update')), [
 			(new CSimpleButton(_('Clone')))->setId('clone'),
 			(new CRedirectButton(_('Delete'),
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'regex.delete')
-					->setArgument('regexids', (array) $data['regex']['regexpid'])
+					->setArgument('regexpids', (array) $data['regexp']['regexpid'])
 					->setArgument(CSRF_TOKEN_NAME, $csrf_token),
 				_('Delete regular expression?')
 			))->setId('delete'),
@@ -151,7 +151,7 @@ $form
 	->addItem(
 		(new CScriptTag('regular_expression_edit.init('.json_encode([
 			'rules' => $data['js_validation_rules'],
-			'action' => $data['regex']['regexpid'] ? 'regex.update' : 'regex.create'
+			'action' => $data['regexp']['regexpid'] ? 'regex.update' : 'regex.create'
 		]).');'))->setOnDocumentReady()
 	);
 
