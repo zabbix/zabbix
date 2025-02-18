@@ -64,10 +64,18 @@ window.service_edit_popup = new class {
 		$problem_tags.dynamicRows({
 			template: '#problem-tag-row-tmpl',
 			allow_empty: true,
-			rows: problem_tags,
+			rows: problem_tags
 		});
 
-		$problem_tags.on('tableupdate.dynamicRows', () => this.#update());
+		const table = document.getElementById('problem_tags');
+
+		table.addEventListener('click', e => {
+			if (e.target.classList.contains('element-table-add')) {
+				this.form.validateSubmit(this.form.getAllValues());
+
+				this.#update()
+			}
+		});
 
 		document.getElementById('problem_tags').addEventListener('change', () => this.#update());
 
