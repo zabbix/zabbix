@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @backup ids,hosts,items,actions,operations,optag,host_tag
  * @backup auditlog,changelog,config,ha_node
  */
-class testAutoregistration extends CIntegrationTest {
+class testAutoregistrationPSK extends CIntegrationTest {
 
 	/* test Autoregstration with PSK */
 
