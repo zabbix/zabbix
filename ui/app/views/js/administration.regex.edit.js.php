@@ -172,7 +172,7 @@
 			fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({ajaxdata: {expressions, test_string}})
+				body: JSON.stringify({expressions, test_string})
 			})
 				.then((response) => response.json())
 				.then((response) => this.#showTestResult(response, expressions))
