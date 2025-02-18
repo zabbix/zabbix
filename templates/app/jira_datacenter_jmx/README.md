@@ -139,56 +139,56 @@ Metrics are collected by JMX.
 |----|-----------|----------|--------|--------------------------------|
 |Jira Data Center: Mail [{#JMXCATEGORY01}-{#JMXNAME}]: Server disconnected|<p>Trigger is fired when discovered mail server `{#JMXCATEGORY01}-{#JMXNAME}` becomes unavailable</p>|`max(/Jira Data Center by JMX/jmx["{#JMXOBJ}",Connected],5m)=0`|Average|**Manual close**: Yes|
 
-### LLD rule  Indexing latency discovery
+### LLD rule Indexing latency discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Indexing latency discovery|<p>Discovery of the Jira indexing metrics.</p>|JMX agent|jmx.discovery[beans,"com.atlassian.jira:type=metrics,category00=indexing,name=*"]|
 
-### Item prototypes for  Indexing latency discovery
+### Item prototypes for Indexing latency discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Indexing [{#JMXNAME}]: Latency|<p>Average time spent on indexing operations.</p>|JMX agent|jmx["com.atlassian.jira:type=metrics,category00=indexing,name={#JMXNAME}",Mean]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li></ul>|
 
-### Trigger prototypes for  Indexing latency discovery
+### Trigger prototypes for Indexing latency discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Jira Data Center: Indexing [{#JMXNAME}]: Slow performance|<p>Fires when latency grows above the threshold: `{$JIRA_DC.INDEXING.LATENCY.WARN:"{#JMXNAME}"}`s</p>|`min(/Jira Data Center by JMX/jmx["com.atlassian.jira:type=metrics,category00=indexing,name={#JMXNAME}",Mean],5m)>{$JIRA_DC.INDEXING.LATENCY.WARN:"{#JMXNAME}"}`|Warning|**Manual close**: Yes|
 
-### LLD rule  Issue latency discovery
+### LLD rule Issue latency discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Issue latency discovery|<p>Discovery of the Jira issue latency metrics.</p>|JMX agent|jmx.discovery[beans,"com.atlassian.jira:type=metrics,category00=issue,name=*"]|
 
-### Item prototypes for  Issue latency discovery
+### Item prototypes for Issue latency discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Issue [{#JMXNAME}]: Latency|<p>Average time spent on issue `{#JMXNAME}` operations.</p>|JMX agent|jmx["{#JMXOBJ}",Mean]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.001`</p></li></ul>|
 
-### Trigger prototypes for  Issue latency discovery
+### Trigger prototypes for Issue latency discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Jira Data Center: Issue [{#JMXNAME}]: Slow operations|<p>Fires when latency grows above the threshold: `{$JIRA_DC.ISSUE.LATENCY.WARN:"{#JMXNAME}"}`s</p>|`min(/Jira Data Center by JMX/jmx["{#JMXOBJ}",Mean],5m)>{$JIRA_DC.ISSUE.LATENCY.WARN:"{#JMXNAME}"}`|Warning|**Manual close**: Yes|
 
-### LLD rule  License discovery
+### LLD rule License discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |License discovery|<p>Discovery of the Jira licenses.</p>|Dependent item|jmx.license.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
-### Item prototypes for  License discovery
+### Item prototypes for License discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |License [{#LICENSE.TYPE}]: Users: Current|<p>Current user count for `{#LICENSE.TYPE}`.</p>|Dependent item|jmx.license.get.user.current["{#LICENSE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.{#LICENSE.TYPE}.properties.current_user_count`</p></li></ul>|
 |License [{#LICENSE.TYPE}]: Users: Maximum|<p>User count limit for `{#LICENSE.TYPE}`.</p><p>`-1` = No limits for the license type.</p>|Dependent item|jmx.license.get.user.max["{#LICENSE.TYPE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.{#LICENSE.TYPE}.properties.max_user_count`</p></li></ul>|
 
-### Trigger prototypes for  License discovery
+### Trigger prototypes for License discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|

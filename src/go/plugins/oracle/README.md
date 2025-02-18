@@ -254,7 +254,7 @@ Note: session names are case-sensitive.
 
 **oracle.instance.info[\<commonParams\>]** — returns instance statistics.
 
-**oracle.pdb.info[\<commonParams\>,\<database\>]** — returns the Plugable Databases (PDBs) information.
+**oracle.pdb.info[\<commonParams\>,\<database\>]** — returns the Pluggable Databases (PDBs) information.
 *Parameters:*  
 `database` (optional) — the name of the database.
 
@@ -342,6 +342,10 @@ WHERE
 ``` 
 
     oracle.custom.query[<commonParams>,payment,"John Doe",1,"10/25/2020"]
+
+### Notes:
+ * Returned data is automatically converted into JSON.
+ * Avoid returning JSON directly from queries, as it will become corrupted when the plugin attempts to convert it into JSON again.
 
 ## Current limitations
 
