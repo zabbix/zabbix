@@ -442,7 +442,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 
 	if (ZBX_MACRO_EXPAND_YES == expand_macros)
 	{
-		um_handle = zbx_dc_open_user_macros();
+		um_handle = zbx_dc_open_user_macros_masked();
 		um_handle_secure = zbx_dc_open_user_macros_secure();
 	}
 
