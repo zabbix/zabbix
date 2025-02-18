@@ -464,7 +464,7 @@ class CValueMap extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkUuidDuplicates(array $valuemaps, array $db_valuemaps = null): void {
+	private static function checkUuidDuplicates(array $valuemaps, ?array $db_valuemaps = null): void {
 		$valuemap_indexes = [];
 
 		foreach ($valuemaps as $i => $valuemap) {
@@ -504,7 +504,7 @@ class CValueMap extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateUpdate(array &$valuemaps, array &$db_valuemaps = null) {
+	private function validateUpdate(array &$valuemaps, ?array &$db_valuemaps = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['valuemapid']], 'fields' => [
 			'uuid' => 		['type' => API_ANY],
 			'valuemapid' =>	['type' => API_ID, 'flags' => API_REQUIRED],

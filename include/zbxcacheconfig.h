@@ -829,6 +829,17 @@ int	zbx_dc_get_host_value(zbx_uint64_t itemid, char **replace_to, int request);
 #define ZBX_DC_REQUEST_ITEM_LOG_SEVERITY	205
 #define ZBX_DC_REQUEST_ITEM_LOG_NSEVERITY	206
 #define ZBX_DC_REQUEST_ITEM_LOG_EVENTID		207
+#define ZBX_DC_REQUEST_ITEM_LOG_TIMESTAMP	208
+
+typedef enum
+{
+	ZBX_VALUE_PROPERTY_VALUE,
+	ZBX_VALUE_PROPERTY_TIME,
+	ZBX_VALUE_PROPERTY_DATE,
+	ZBX_VALUE_PROPERTY_AGE,
+	ZBX_VALUE_PROPERTY_TIMESTAMP
+}
+zbx_expr_db_item_value_property_t;
 
 int	zbx_dc_get_history_log_value(zbx_uint64_t itemid, char **replace_to, int request, int clock, int ns,
 		const char *tz);
@@ -1332,6 +1343,8 @@ int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **n
 #define ZBX_SERVER_ICMPPINGSEC_KEY	"icmppingsec"
 /* special item key used for ICMP ping loss packages */
 #define ZBX_SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
+/* special item key used for ICMP pings with retry options */
+#define ZBX_SERVER_ICMPPINGRETRY_KEY	"icmppingretry"
 
 void	zbx_dc_drules_get(time_t now, zbx_vector_dc_drule_ptr_t *drules, time_t *nextcheck);
 void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);

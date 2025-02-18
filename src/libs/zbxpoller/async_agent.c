@@ -49,8 +49,8 @@ static const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)
 	}
 }
 
-static int	agent_task_process(short event, void *data, int *fd, const char *addr, char *dnserr,
-		struct event *timeout_event)
+static int	async_task_process_task_agent_cb(short event, void *data, int *fd, struct evutil_addrinfo **current_ai,
+		const char *addr, char *dnserr, struct event *timeout_event)
 {
 	zbx_agent_context	*agent_context = (zbx_agent_context *)data;
 	short			event_new = 0;
@@ -100,6 +100,18 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 						agent_context->item.interface.port));
 				return ZBX_ASYNC_TASK_STOP;
 			case ZABBIX_AGENT_STEP_CONNECT_WAIT:
+				if (NULL != (*current_ai)->ai_next)
+				{
+					/* reset timeout and retry with next address */
+					struct timeval	tv = {agent_context->config_timeout, 0};
+
+					evtimer_add(timeout_event, &tv);
+
+					agent_context->step = ZABBIX_AGENT_STEP_CONNECT_INIT;
+					*current_ai = (*current_ai)->ai_next;
+					break;
+				}
+
 				SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent"
 						" failed: cannot establish TCP connection to [[%s]:%hu]:"
 						" timed out", agent_context->item.interface.addr,
@@ -146,8 +158,19 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 					ZBX_TCP_PROTOCOL, &agent_context->tcp_send_context);
 			}
 
+			char	ip[65];
+
+			if (FAIL == zbx_inet_ntop(*current_ai, ip, (socklen_t)sizeof(ip)))
+			{
+				agent_context->item.ret = NETWORK_ERROR;
+				SET_MSG_RESULT(&agent_context->item.result,
+						zbx_dsprintf(NULL, "Get value from agent failed during %s: invalid"
+						" address", get_agent_step_string(agent_context->step)));
+				goto out;
+			}
+
 			if (SUCCEED != zbx_socket_connect(&agent_context->s, SOCK_STREAM,
-					agent_context->config_source_ip, addr, agent_context->item.interface.port,
+					agent_context->config_source_ip, ip, agent_context->item.interface.port,
 					agent_context->config_timeout))
 			{
 				agent_context->item.ret = NETWORK_ERROR;
@@ -164,6 +187,13 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 			if (0 == getsockopt(agent_context->s.socket, SOL_SOCKET, SO_ERROR, &errnum, &optlen) &&
 					0 != errnum)
 			{
+				if (NULL != (*current_ai)->ai_next)
+				{
+					agent_context->step = ZABBIX_AGENT_STEP_CONNECT_INIT;
+					*current_ai =(*current_ai)->ai_next;
+					break;
+				}
+
 				SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent"
 						" failed: Cannot establish TCP connection to [[%s]:%hu]: %s",
 						agent_context->item.interface.addr, agent_context->item.interface.port,
@@ -289,7 +319,7 @@ stop:
 out:
 	zbx_tcp_send_context_clear(&agent_context->tcp_send_context);
 	if (ZABBIX_AGENT_STEP_CONNECT_INIT == agent_context->step)
-		return agent_task_process(0, data, fd, addr, dnserr, NULL);
+		return async_task_process_task_agent_cb(0, data, fd, current_ai, addr, dnserr, NULL);
 
 	return ZBX_ASYNC_TASK_STOP;
 }
@@ -305,7 +335,8 @@ void	zbx_async_check_agent_clean(zbx_agent_context *agent_context)
 	zbx_free_agent_result(&agent_context->item.result);
 }
 
-int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_task_clear_cb_t clear_cb,
+int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,
+		zbx_async_task_process_result_cb_t async_task_process_result_agent_cb,
 		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
 		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns)
 {
@@ -396,7 +427,7 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 	agent_context->step = ZABBIX_AGENT_STEP_CONNECT_INIT;
 
 	zbx_async_poller_add_task(base, dnsbase, agent_context->item.interface.addr, agent_context, item->timeout + 1,
-			agent_task_process, clear_cb);
+			async_task_process_task_agent_cb, async_task_process_result_agent_cb);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(SUCCEED));
 

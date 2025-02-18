@@ -1026,7 +1026,7 @@ class CItem extends CItemGeneral {
 	/**
 	 * @inheritDoc
 	 */
-	protected static function inherit(array $items, array $db_items = [], array $hostids = null,
+	protected static function inherit(array $items, array $db_items = [], ?array $hostids = null,
 			bool $is_dep_items = false): void {
 		$tpl_links = self::getTemplateLinks($items, $hostids);
 
@@ -1370,7 +1370,7 @@ class CItem extends CItemGeneral {
 	 * @param array      $templateids
 	 * @param array|null $hostids
 	 */
-	public static function unlinkTemplateObjects(array $templateids, array $hostids = null): void {
+	public static function unlinkTemplateObjects(array $templateids, ?array $hostids = null): void {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
 
 		$result = DBselect(
@@ -1434,7 +1434,7 @@ class CItem extends CItemGeneral {
 	 * @param array      $templateids
 	 * @param array|null $hostids
 	 */
-	public static function clearTemplateObjects(array $templateids, array $hostids = null): void {
+	public static function clearTemplateObjects(array $templateids, ?array $hostids = null): void {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
 
 		$db_items = DBfetchArrayAssoc(DBselect(
@@ -1944,8 +1944,8 @@ class CItem extends CItemGeneral {
 	 * @param array|null $db_lld_rules
 	 * @param array|null $db_item_prototypes
 	 */
-	protected static function addDependentItems(array &$db_items, array &$db_lld_rules = null,
-			array &$db_item_prototypes = null): void {
+	protected static function addDependentItems(array &$db_items, ?array &$db_lld_rules = null,
+			?array &$db_item_prototypes = null): void {
 		$db_lld_rules = [];
 		$db_item_prototypes = [];
 

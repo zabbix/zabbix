@@ -1672,6 +1672,7 @@ class testInitialConfSync extends CIntegrationTest
 	 */
 	public function testInitialConfSync_Insert()
 	{
+		$this->purgeExisting('action', 'actionids');
 		$this->purgeExisting('host', 'hostids');
 		$this->purgeExisting('proxy', 'extend');
 		$this->purgeExisting('proxygroup', 'extend');
@@ -1679,7 +1680,6 @@ class testInitialConfSync extends CIntegrationTest
 		$this->purgeExisting('item', 'itemids');
 		$this->purgeExisting('trigger', 'triggerids');
 		$this->purgeExisting('regexp', 'extend');
-		$this->purgeExisting('action', 'actionids');
 		$this->purgeHostGroups();
 		$this->purgeGlobalMacros();
 
@@ -1796,6 +1796,7 @@ class testInitialConfSync extends CIntegrationTest
 
 	public function testInitialConfSync_Delete()
 	{
+		$this->purgeExisting('action', 'actionids');
 		$this->purgeExisting('maintenance', 'maintenanceids');
 		$this->purgeExisting('host', 'hostids');
 		$this->purgeExisting('proxy', 'extend');
@@ -1803,7 +1804,6 @@ class testInitialConfSync extends CIntegrationTest
 		$this->purgeExisting('template', 'templateids');
 		$this->purgeExisting('correlation', 'correlationids');
 		$this->purgeExisting('regexp', 'extend');
-		$this->purgeExisting('action', 'actionids');
 		$this->purgeExisting('item', 'itemids');
 		$this->purgeHostGroups();
 

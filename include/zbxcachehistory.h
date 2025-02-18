@@ -146,12 +146,12 @@ int	zbx_hc_get_history_compression_age(void);
 double	zbx_hc_mem_pused(void);
 double	zbx_hc_mem_pused_lock(void);
 
-typedef void (*zbx_history_sync_f)(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
+typedef void (*zbx_sync_history_cache_f)(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
 		zbx_ipc_async_socket_t *rtc, int config_history_storage_pipelines, int *more);
 
-int	zbx_init_database_cache(zbx_get_program_type_f get_program_type, zbx_history_sync_f sync_history,
-		zbx_uint64_t history_cache_size, zbx_uint64_t history_index_cache_size, zbx_uint64_t *trends_cache_size,
-		char **error);
+int	zbx_init_database_cache(zbx_get_program_type_f get_program_type,
+		zbx_sync_history_cache_f sync_history_cache_func, zbx_uint64_t history_cache_size,
+		zbx_uint64_t history_index_cache_size, zbx_uint64_t *trends_cache_size, char **error);
 
 void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs, int config_history_storage_pipelines);
 
@@ -160,6 +160,7 @@ zbx_uint64_t	zbx_dc_get_nextid(const char *table_name, int num);
 void	zbx_dc_update_interfaces_availability(void);
 void	zbx_hc_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num);
 void	zbx_hc_get_mem_stats(zbx_shmem_stats_t *data, zbx_shmem_stats_t *index);
+int	zbx_hc_is_itemid_cached(zbx_uint64_t itemid);
 void	zbx_hc_get_items(zbx_vector_uint64_pair_t *items);
 int	zbx_db_trigger_queue_locked(void);
 void	zbx_db_trigger_queue_unlock(void);

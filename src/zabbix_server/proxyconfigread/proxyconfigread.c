@@ -96,7 +96,7 @@ static void	get_macro_secrets(const zbx_vector_keys_path_ptr_t *keys_paths, stru
 		char			*error = NULL, **ptr;
 		zbx_hashset_iter_t	iter;
 
-		if (FAIL == zbx_vault_kvs_get(keys_path->path, &kvs, config_vault, config_source_ip,
+		if (FAIL == zbx_vault_get_kvs(keys_path->path, &kvs, config_vault, config_source_ip,
 				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", keys_path->path, error);

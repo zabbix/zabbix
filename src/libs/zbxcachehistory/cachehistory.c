@@ -58,7 +58,7 @@ static char		*sql = NULL;
 static size_t		sql_alloc = 4 * ZBX_KIBIBYTE;
 
 static zbx_get_program_type_f	get_program_type_cb = NULL;
-static zbx_history_sync_f	sync_history_cb = NULL;
+static zbx_sync_history_cache_f	sync_history_cache_cb = NULL;
 
 #define ZBX_IDS_SIZE	14
 
@@ -1841,8 +1841,8 @@ static void	sync_history_cache_full(const zbx_events_funcs_t *events_cbs, int co
 
 		do
 		{
-			sync_history_cb(&values_num, &triggers_num, events_cbs, NULL, config_history_storage_pipelines,
-					&more);
+			sync_history_cache_cb(&values_num, &triggers_num, events_cbs, NULL,
+					config_history_storage_pipelines, &more);
 
 			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
 					(double)values_num / (cache->history_num + values_num) * 100);
@@ -1930,7 +1930,7 @@ void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_
 	*values_num = 0;
 	*triggers_num = 0;
 
-	sync_history_cb(values_num, triggers_num, events_cbs, rtc, config_history_storage_pipelines, more);
+	sync_history_cache_cb(values_num, triggers_num, events_cbs, rtc, config_history_storage_pipelines, more);
 }
 
 /******************************************************************************
@@ -3241,16 +3241,16 @@ out:
  * Purpose: Allocate shared memory for database cache                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_init_database_cache(zbx_get_program_type_f get_program_type, zbx_history_sync_f sync_history,
-		zbx_uint64_t history_cache_size, zbx_uint64_t history_index_cache_size,zbx_uint64_t *trends_cache_size,
-		char **error)
+int	zbx_init_database_cache(zbx_get_program_type_f get_program_type,
+		zbx_sync_history_cache_f sync_history_cache_func, zbx_uint64_t history_cache_size,
+		zbx_uint64_t history_index_cache_size, zbx_uint64_t *trends_cache_size, char **error)
 {
 	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	get_program_type_cb = get_program_type;
-	sync_history_cb = sync_history;
+	sync_history_cache_cb = sync_history_cache_func;
 
 	if (NULL != cache)
 	{
@@ -3500,6 +3500,25 @@ void	zbx_hc_get_mem_stats(zbx_shmem_stats_t *data, zbx_shmem_stats_t *index)
 		zbx_shmem_get_stats(hc_index_mem, index);
 
 	UNLOCK_CACHE;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if item is present in history cache                        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_hc_is_itemid_cached(zbx_uint64_t itemid)
+{
+	int	ret = FAIL;
+
+	LOCK_CACHE;
+
+	if (NULL != zbx_hashset_search(&cache->history_items, &itemid))
+		ret = SUCCEED;
+
+	UNLOCK_CACHE;
+
+	return ret;
 }
 
 /******************************************************************************

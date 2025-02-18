@@ -903,9 +903,6 @@ static zbx_discoverer_results_t	*discoverer_results_host_reg(zbx_hashset_t *hr_d
 	return dst;
 }
 
-ZBX_PTR_VECTOR_DECL(fping_host, zbx_fping_host_t)
-ZBX_PTR_VECTOR_IMPL(fping_host, zbx_fping_host_t)
-
 static int	discoverer_icmp_result_merge(zbx_hashset_t *incomplete_checks_count, zbx_hashset_t *results,
 		const zbx_uint64_t druleid, const zbx_uint64_t dcheckid, const zbx_uint64_t unique_dcheckid,
 		const zbx_vector_fping_host_t *hosts)
@@ -983,7 +980,7 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 			continue;
 
 		if (SUCCEED != (ret = zbx_ping(&hosts.values[0], hosts.values_num, 3, 0, 0, dcheck->timeout * 1000,
-				dcheck->allow_redirect, 1, err, sizeof(err))))
+				-1, -1, dcheck->allow_redirect, 1, err, sizeof(err))))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() %d icmp checks failed with err:%s",
 					log_worker_id, __func__, concurrency_max, err);
@@ -1015,7 +1012,7 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 	if (0 == *stop && 0 != hosts.values_num && ret == SUCCEED)
 	{
 		if (SUCCEED != (ret = zbx_ping(&hosts.values[0], hosts.values_num, 3, 0, 0, dcheck->timeout * 1000,
-				dcheck->allow_redirect, 1, err, sizeof(err))))
+				-1, -1, dcheck->allow_redirect, 1, err, sizeof(err))))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() %d icmp checks failed with err:%s", log_worker_id,
 					__func__, concurrency_max, err);
