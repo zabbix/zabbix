@@ -748,15 +748,11 @@ static int	perform_data_sending(zbx_thread_sendval_args *sendval_args, int old_s
  *                                                                            *
  * Purpose: add server or proxy to the list of destinations                   *
  *                                                                            *
- * Parameters:                                                                *
- *      host - [IN] IP or hostname                                            *
- *      port - [IN] port number                                               *
- *                                                                            *
  * Return value:  SUCCEED - destination added successfully                    *
  *                FAIL - destination has been already added                   *
  *                                                                            *
  ******************************************************************************/
-static int	sender_add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames,
+static int	add_serveractive_host_sender_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames,
 		void *data)
 {
 	ZBX_UNUSED(hostnames);
@@ -873,7 +869,7 @@ static void	zbx_load_config(const char *config_file_in)
 
 			if (FAIL == zbx_set_data_destination_hosts(cfg_active_hosts,
 					(unsigned short)ZBX_DEFAULT_SERVER_PORT, "ServerActive",
-					sender_add_serveractive_host_cb, NULL, NULL, &error))
+					add_serveractive_host_sender_cb, NULL, NULL, &error))
 			{
 				zbx_error("%s", error);
 				exit(EXIT_FAILURE);
@@ -1078,7 +1074,7 @@ static void	parse_commandline(int argc, char **argv)
 			port = (unsigned short)ZBX_DEFAULT_SERVER_PORT;
 
 		if (FAIL == zbx_set_data_destination_hosts(ZABBIX_SERVER, port, "-z",
-				sender_add_serveractive_host_cb, NULL, NULL, &error))
+				add_serveractive_host_sender_cb, NULL, NULL, &error))
 		{
 			zbx_error("%s", error);
 			exit(EXIT_FAILURE);
