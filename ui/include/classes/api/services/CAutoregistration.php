@@ -92,7 +92,7 @@ class CAutoregistration extends CApiService {
 	 * @throws APIException
 	 */
 	protected function validateUpdate(array &$autoreg, ?array &$db_settings = null,
-			array &$db_autoreg_tls = null): void {
+			?array &$db_autoreg_tls = null): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'tls_accept' =>	['type' => API_INT32, 'in' => HOST_ENCRYPTION_NONE.':'.(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK)]
 		]];
