@@ -1034,8 +1034,8 @@ out:
  ******************************************************************************/
 void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 {
-	char			*sql = NULL;
-	size_t			sql_alloc = 256, sql_offset;
+	char			*sql = NULL, *sql_trig = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	int			i;
 	zbx_vector_uint64_t	selementids;
 	const char		*event_tables[] = {"events"};
@@ -1043,6 +1043,10 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	if (0 == triggerids->values_num)
 		return;
 
+	DBadd_condition_alloc(&sql_trig, &sql_alloc, &sql_offset, "triggerid", triggerids->values,
+			triggerids->values_num);
+
+	sql_alloc = 256;
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_vector_uint64_create(&selementids);
@@ -1050,23 +1054,22 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	sql_offset = 0;
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	DBget_sysmapelements_by_element_type_ids(&selementids, SYSMAP_ELEMENT_TYPE_TRIGGER, triggerids);
-	if (0 != selementids.values_num)
-	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from sysmaps_elements where");
-		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "selementid", selementids.values,
-				selementids.values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-	}
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from sysmaps_elements"
+			" where selementid in ("
+				" select distinct selementid from sysmap_element_trigger"
+					" where%s"
+						" and selementid not in ("
+							" select distinct selementid from sysmap_element_trigger"
+								" where not%s"
+							")"
+			");\n", sql_trig, sql_trig);
 
 	for (i = 0; i < triggerids->values_num; i++)
 		DBdelete_action_conditions(CONDITION_TYPE_TRIGGER, triggerids->values[i]);
 
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from triggers"
-			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids->values, triggerids->values_num);
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+			" where%s;\n", sql_trig);
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1078,6 +1081,7 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	zbx_vector_uint64_destroy(&selementids);
 
 	zbx_free(sql);
+	zbx_free(sql_trig);
 }
 
 /******************************************************************************
