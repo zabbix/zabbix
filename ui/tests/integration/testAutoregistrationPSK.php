@@ -68,7 +68,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	 *
 	 * @return array
 	 */
-	public function agentConfigurationProvider_UpperCaseFirstPSK() {
+	public function agentConfigurationProvider_LowerCaseFirstPSK() {
 		if (file_put_contents(self::PSK_FILE_LOWER_CASE, self::PSK_KEY_LOWER_CASE) === false) {
 			throw new Exception('Failed to create lower case PSK file for agent');
 		}
@@ -82,7 +82,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 				'Hostname' => self::PSK_HOSTNAME,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'TLSPSKIdentity' => self::PSK_IDENTITY,
-				'TLSPSKFile' => self::PSK_FILE_UPPER_CASE,
+				'TLSPSKFile' => self::PSK_FILE_LOWER_CASE,
 				'TLSConnect' => 'psk',
 				'TLSAccept' => 'psk',
 				'HostMetadata' => self::HOST_METADATA_PSK_UPPER_CASE
@@ -92,7 +92,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 				'Hostname' => self::PSK_HOSTNAME,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'TLSPSKIdentity' => self::PSK_IDENTITY,
-				'TLSPSKFile' => self::PSK_FILE_LOWER_CASE,
+				'TLSPSKFile' => self::PSK_FILE_UPPER_CASE,
 				'TLSConnect' => 'psk',
 				'TLSAccept' => 'psk',
 				'HostMetadata' => self::HOST_METADATA_PSK_LOWER_CASE
@@ -120,9 +120,9 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 	/**
 	 * @required-components agent,agent2,server
-	 * @configurationDataProvider agentConfigurationProvider_UpperCaseFirstPSK
+	 * @configurationDataProvider agentConfigurationProvider_LowerCaseFirstPSK
 	 */
-	public function testAutoregistration_withUpperCasePSK()
+	public function testAutoregistration_withLowerCasePSK()
 	{
 		$this->killComponent(self::COMPONENT_AGENT2);
 		$this->killComponent(self::COMPONENT_AGENT);
