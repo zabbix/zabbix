@@ -13,7 +13,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-
 class CControllerRegExUpdate extends CController {
 
 	protected function init(): void {
@@ -21,7 +20,7 @@ class CControllerRegExUpdate extends CController {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	public static function getValidationRules() {
+	public static function getValidationRules(): array {
 		$api_uniq = [
 			['regexp.get', ['name' => '{name}'], 'regexpid']
 		];

@@ -13,14 +13,13 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-
 class CControllerRegExList extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'uncheck' => 'in 1'
 		];

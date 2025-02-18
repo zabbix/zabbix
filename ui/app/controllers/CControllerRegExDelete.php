@@ -13,10 +13,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-
 class CControllerRegExDelete extends CController {
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'regexids' => 'required|array_db regexps.regexpid'
 		];

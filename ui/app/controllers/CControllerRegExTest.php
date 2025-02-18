@@ -13,15 +13,14 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-
 class CControllerRegExTest extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'ajaxdata' => 'array'
 		];

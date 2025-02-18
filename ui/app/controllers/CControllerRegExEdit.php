@@ -17,11 +17,11 @@ class CControllerRegExEdit extends CController {
 
 	protected array $db_regex = [];
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'regexid' => 'db regexps.regexpid',
 			'regex' => 'array'
