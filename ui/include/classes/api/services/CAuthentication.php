@@ -110,7 +110,7 @@ class CAuthentication extends CApiService {
 			'passwd_min_length' =>			['type' => API_INT32, 'in' => '1:70'],
 			'passwd_check_rules' =>			['type' => API_INT32, 'in' => '0:'.(PASSWD_CHECK_CASE | PASSWD_CHECK_DIGITS | PASSWD_CHECK_SPECIAL | PASSWD_CHECK_SIMPLE)],
 			'disabled_usrgrpid' =>			['type' => API_ID],
-			'jit_provision_interval' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => CSettingsSchema::getFieldLength('jit_provision_interval')],
+			'jit_provision_interval' =>		['type' => API_TIME_UNIT, 'flags' => API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR])],
 			'saml_jit_status' =>			['type' => API_INT32, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED])],
 			'ldap_jit_status' =>			['type' => API_INT32, 'in' => implode(',', [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED])],
 			'mfa_status' =>					['type' => API_INT32, 'in' => implode(',', [MFA_DISABLED, MFA_ENABLED])],

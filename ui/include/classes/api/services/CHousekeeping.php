@@ -82,25 +82,25 @@ class CHousekeeping extends CApiService {
 	private function validateUpdate(array $housekeeping, ?array &$db_housekeeping): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'hk_events_mode' =>			['type' => API_INT32, 'in' => '0,1'],
-			'hk_events_trigger' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]), 'length' => CSettingsSchema::getFieldLength('hk_events_trigger')],
-			'hk_events_service' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]), 'length' => CSettingsSchema::getFieldLength('hk_events_service')],
-			'hk_events_internal' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]), 'length' => CSettingsSchema::getFieldLength('hk_events_internal')],
-			'hk_events_discovery' =>	['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]), 'length' => CSettingsSchema::getFieldLength('hk_events_discovery')],
-			'hk_events_autoreg' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]), 'length' => CSettingsSchema::getFieldLength('hk_events_autoreg')],
+			'hk_events_trigger' =>		['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_events_service' =>		['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_events_internal' =>		['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_events_discovery' =>	['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
+			'hk_events_autoreg' =>		['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
 			'hk_services_mode' =>		['type' => API_INT32, 'in' => '0,1'],
-			'hk_services' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]), 'length' => CSettingsSchema::getFieldLength('hk_services')],
+			'hk_services' =>			['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
 			'hk_audit_mode' =>			['type' => API_INT32, 'in' => '0,1'],
-			'hk_audit' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]), 'length' => CSettingsSchema::getFieldLength('hk_audit')],
+			'hk_audit' =>				['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
 			'hk_sessions_mode' =>		['type' => API_INT32, 'in' => '0,1'],
-			'hk_sessions' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]), 'length' => CSettingsSchema::getFieldLength('hk_sessions')],
+			'hk_sessions' =>			['type' => API_TIME_UNIT, 'in' => implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
 			'hk_history_mode' =>		['type' => API_INT32, 'in' => '0,1'],
 			'hk_history_global' =>		['type' => API_INT32, 'in' => '0,1'],
-			'hk_history' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => CSettingsSchema::getFieldLength('hk_history')],
+			'hk_history' =>				['type' => API_TIME_UNIT, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR])],
 			'hk_trends_mode' =>			['type' => API_INT32, 'in' => '0,1'],
 			'hk_trends_global' =>		['type' => API_INT32, 'in' => '0,1'],
-			'hk_trends' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => '0,'.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]), 'length' => CSettingsSchema::getFieldLength('hk_trends')],
+			'hk_trends' =>				['type' => API_TIME_UNIT, 'in' => '0,'.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])],
 			'compression_status' =>		['type' => API_INT32, 'in' => '0,1'],
-			'compress_older' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY, 'in' => implode(':', [7 * SEC_PER_DAY, 25 * SEC_PER_YEAR]), 'length' => CSettingsSchema::getFieldLength('compress_older')]
+			'compress_older' =>			['type' => API_TIME_UNIT, 'in' => implode(':', [7 * SEC_PER_DAY, 25 * SEC_PER_YEAR])]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $housekeeping, '/', $error)) {
