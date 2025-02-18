@@ -137,7 +137,7 @@ class testFormAuthentication extends CWebTest {
 				'User role' => ''
 			];
 			$field_maxlength = [
-				'LDAP group pattern' => 255
+				$auth_type.' group pattern' => 255
 			];
 		}
 
