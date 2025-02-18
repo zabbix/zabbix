@@ -146,7 +146,7 @@ static const zbx_setting_entry_t	settings_description_table[] = {
 	{"timeout_ssh_agent",		ZBX_SETTING_TYPE_STR, 		ZBX_SERVER | ZBX_PROXY,	"3s"},
 	{"timeout_telnet_agent",	ZBX_SETTING_TYPE_STR, 		ZBX_SERVER | ZBX_PROXY,	"3s"},
 	{"timeout_zabbix_agent",	ZBX_SETTING_TYPE_STR, 		ZBX_SERVER | ZBX_PROXY,	"3s"},
-	{"uri_valid_schemes",		ZBX_SETTING_TYPE_STR, 		0,			"http,https,ftp,file,mailto,tel,ssh"},
+	{"uri_valid_schemes",		ZBX_SETTING_TYPE_STR, 		0,	"http,https,ftp,file,mailto,tel,ssh"},
 	{"url",				ZBX_SETTING_TYPE_STR, 		0,			""},
 	{"validate_uri_schemes",	ZBX_SETTING_TYPE_INT, 		0,			"1"},
 	{"vault_provider",		ZBX_SETTING_TYPE_INT, 		0,			"0"},
@@ -401,7 +401,8 @@ static int	setting_get_uint64(const zbx_setting_value_t *values, const char *nam
 	return FAIL;
 }
 
-static void	store_int_setting(const zbx_setting_value_t *values, const char *name, int *target, zbx_uint64_t revision)
+static void	store_int_setting(const zbx_setting_value_t *values, const char *name, int *target,
+		zbx_uint64_t revision)
 {
 	int	value_int;
 
