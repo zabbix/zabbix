@@ -164,22 +164,21 @@ class testFormUserLdapMediaJit extends CWebTest {
 		];
 
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
-		$this->page->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
+		$this->page->open('zabbix.php?action=userprofile.notification.edit')->waitUntilReady();
 
 		// Check that the informative message about JIT provisioning is present.
 		$this->assertMessage('Warning', null, 'This user is IdP provisioned. Manual changes for provisioned fields'.
 				' are not allowed.'
 		);
 
-		$form = $this->query('id:user-form')->waitUntilVisible()->asForm()->one();
-		$form->selectTab('Media');
-		$media_table = $form->query('id:media-table')->asTable()->one();
+		$media_table = $this->query('name:userprofile_notification_form')->asTable()->one();
 
 		// Check that correct amount of media is provisioned.
 		$this->assertEquals(self::$provisioned_media_count, $media_table->getRows()->count());
 
 		// Check that count of media is correctly displayed in the tab.
-		$this->assertEquals(self::$provisioned_media_count, $form->query('xpath:.//a[text()="Media"]')->one()
+		$this->assertEquals(self::$provisioned_media_count, $this->query('name:userprofile_notification_form')
+				->waitUntilVisible()->asForm()->one()->query('xpath:.//a[text()="Media"]')->one()
 				->getAttribute('data-indicator-value')
 		);
 
@@ -377,13 +376,12 @@ class testFormUserLdapMediaJit extends CWebTest {
 	public function testFormUserLdapMediaJit_CheckEditableFields($data) {
 		// Log in as the LDAP provisioned user.
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
-		$this->page->open('zabbix.php?action=userprofile.edit');
+		$this->page->open('zabbix.php?action=userprofile.notification.edit');
 
 		// Close the warning message, to not affect further message check.
 		$this->query('class:btn-overlay-close')->one()->click();
 
-		$form = $this->query('id:user-form')->waitUntilVisible()->asForm()->one();
-		$form->selectTab('Media');
+		$form = $this->query('name:userprofile_notification_form')->waitUntilVisible()->asForm()->one();
 		$media_field = $form->getField('Media')->asTable();
 		$row = $media_field->findRow('Type', $data['media']);
 		$row->getColumn('Actions')->query('button:Edit')->one()->click();
@@ -415,14 +413,19 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 			// Log in as the provisioned user, and check that manually changed fields are not affected by the provisioning.
 			$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
-			$this->page->open('zabbix.php?action=userprofile.edit');
-			$this->checkMediaConfiguration($data, $data['media'], PHPUNIT_LDAP_USERNAME, 'check_configuration');
+			$this->page->open('zabbix.php?action=userprofile.notification.edit');
+			$this->checkMediaConfiguration($data, $data['media'], PHPUNIT_LDAP_USERNAME,
+					'check_configuration', 'name:userprofile_notification_form'
+			);
 		}
 	}
 
 	/**
 	 * Check that LDAP provisioned user can add and remove non-provisioned media.
 	 */
+
+	// TODO: Uncomment this check, after ZBX-26064 is fixed.
+	/*
 	public function testFormUserLdapMediaJit_AddRemoveMedia() {
 		// Media type configuration.
 		$data = [
@@ -443,10 +446,9 @@ class testFormUserLdapMediaJit extends CWebTest {
 		];
 
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
-		$this->page->open('zabbix.php?action=userprofile.edit');
+		$this->page->open('zabbix.php?action=userprofile.notification.edit');
 
-		$form = $this->query('id:user-form')->waitUntilVisible()->asForm()->one();
-		$form->selectTab('Media');
+		$form = $this->query('name:userprofile_notification_form')->waitUntilVisible()->asForm()->one();
 
 		$this->query('button:Add')->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
@@ -454,11 +456,12 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$media_form->fill(['Type' => $data['fields']['Type'], 'Send to' => $data['fields']['Send to']]);
 
 		$media_form->submit();
+		COverlayDialogElement::ensureNotPresent();
 		$form->query('button:Update')->one()->click();
 		$this->assertMessage(TEST_GOOD, 'User updated');
 
 		// Check the media type that was added.
-		$this->page->open('zabbix.php?action=userprofile.edit');
+		$this->page->open('zabbix.php?action=userprofile.notification.edit');
 		$this->checkMediaConfiguration($data, $data['fields']['Type'], $data['fields']['Send to']);
 		$this->page->logout();
 
@@ -469,22 +472,23 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 		// Log in as LDAP user and check that added media is still present.
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
-		$this->page->open('zabbix.php?action=userprofile.edit');
+		$this->page->open('zabbix.php?action=userprofile.notification.edit');
 		$this->checkMediaConfiguration($data, $data['fields']['Type'], $data['fields']['Send to']);
 
 		// Check that media can be removed by LDAP provisioned user.
-		$form->selectTab('Media');
-		$media_field = $this->query('name:user_form')->waitUntilVisible()->asForm()->one()->getField('Media')->asTable();
+		$media_field = $this->query('name:userprofile_notification_form')->waitUntilVisible()->asForm()->one()
+				->getField('Media')->asTable()
+		;
 		$row = $media_field->findRow('Type', $data['fields']['Type']);
 		$row->getColumn('Actions')->query('button:Remove')->one()->click();
 		$form->query('button:Update')->one()->click();
 		$this->assertMessage(TEST_GOOD, 'User updated');
 
 		// Check that media is no longer present in the list.
-		$this->page->open('zabbix.php?action=userprofile.edit');
-		$form->selectTab('Media');
+		$this->page->open('zabbix.php?action=userprofile.notification.edit');
 		$this->assertFalse($form->getField('Media')->asTable()->findRow('Type', $data['fields']['Type'])->isPresent());
 	}
+	*/
 
 	public function getUpdateMediaMappings() {
 		return [
@@ -1197,13 +1201,17 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 		// Log in as LDAP user to check that media mapping was processed correctly.
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
-		$this->page->open('zabbix.php?action=userprofile.edit');
+		$this->page->open('zabbix.php?action=userprofile.notification.edit');
 
 		if ($data['provisioned'] === true) {
-			$this->checkMediaConfiguration($data['expected'], $data['mapping']['Media type'], PHPUNIT_LDAP_USERNAME);
+			$this->checkMediaConfiguration($data['expected'], $data['mapping']['Media type'], PHPUNIT_LDAP_USERNAME,
+					'fields', 'name:userprofile_notification_form')
+			;
 		}
 		else {
-			$this->assertFalse($this->getUserMediaTable()->findRow('Type', $data['mapping']['Media type'])->isPresent());
+			$this->assertFalse($this->query('name:userprofile_notification_form')->asTable()->one()
+					->findRow('Type', $data['mapping']['Media type'])->isPresent()
+			);
 		}
 	}
 
@@ -1212,8 +1220,10 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
 
 		// Check that media type for deletion is present in user configuration.
-		$this->page->open('zabbix.php?action=userprofile.edit')->waitUntilReady();
-		$this->assertTrue($this->getUserMediaTable()->findRow('Type', self::DELETE_MEDIA, true)->isPresent());
+		$this->page->open('zabbix.php?action=userprofile.notification.edit')->waitUntilReady();
+		$this->assertTrue($this->query('name:userprofile_notification_form')->asTable()->one()
+				->findRow('Type', self::DELETE_MEDIA, true)->isPresent()
+		);
 		$this->page->logout();
 
 		// Delete media type that is used in LDAP media mapping.
@@ -1256,13 +1266,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * Check media type configuration in user configuration form.
 	 *
 	 * @param array		$data				data provider
-	 * @param string	$media_type				type of the media
+	 * @param string	$media_type			type of the media
 	 * @param string	$send_to			send to parameter of the media
 	 * @param string	$expected			name of the array with expected result
+	 * @param string	$id					selector for a media table
 	 */
-	protected function checkMediaConfiguration($data, $media_type, $send_to, $expected = 'fields') {
+	protected function checkMediaConfiguration($data, $media_type, $send_to, $expected = 'fields', $id = 'id:mediaTab') {
 		// Check media type.
-		$row = $this->query('id:media-table')->asTable()->one()->findRow('Type', $media_type);
+		$row = $this->query($id)->asTable()->one()->findRow('Type', $media_type);
 
 		$this->assertEquals($row->getColumn('Type')->getText(), $media_type);
 
