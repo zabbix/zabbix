@@ -481,9 +481,9 @@ class testAutoregistration extends CIntegrationTest {
 	 */
 	public function testAutoregistration_withLowerCasePSK()
 	{
-		$this->killComponent(self::COMPONENT_AGENT);
-		$this->killComponent(self::COMPONENT_AGENT2);
-		$this->killComponent(self::COMPONENT_SERVER);
+#		$this->killComponent(self::COMPONENT_AGENT);
+#		$this->killComponent(self::COMPONENT_AGENT2);
+#		$this->killComponent(self::COMPONENT_SERVER);
 
 		$this->updateAutoregistration();
 
@@ -505,9 +505,9 @@ class testAutoregistration extends CIntegrationTest {
 	 */
 	public function testAutoregistration_withUpperCasePSK()
 	{
-		$this->killComponent(self::COMPONENT_AGENT);
-		$this->killComponent(self::COMPONENT_AGENT2);
-		$this->killComponent(self::COMPONENT_SERVER);
+#		$this->killComponent(self::COMPONENT_AGENT);
+#		$this->killComponent(self::COMPONENT_AGENT2);
+#		$this->killComponent(self::COMPONENT_SERVER);
 
 		$this->updateAutoregistration();
 
