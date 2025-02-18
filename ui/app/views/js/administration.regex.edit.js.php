@@ -77,13 +77,13 @@
 		init({rules, action}) {
 			this.form_element = document.getElementById('regex');
 			this.form = new CForm(this.form_element, rules);
-			this.form_element.addEventListener('submit', e => {
+			this.form_element.addEventListener('submit', (e) => {
 				e.preventDefault();
 				this.submit();
 			});
 
-			document.getElementById('regular-expressions-table').addEventListener('change', e => this.#updateRow(e));
-			document.getElementById('regular-expressions-table').addEventListener('click', e => this.#processAction(e));
+			document.getElementById('regular-expressions-table').addEventListener('change', (e) => this.#updateRow(e));
+			document.getElementById('regular-expressions-table').addEventListener('click', (e) => this.#processAction(e));
 			document.getElementById('test-expression').addEventListener('click', () => this.#testExpression());
 			document.getElementById('tab_test').addEventListener('click', () => this.#testExpression());
 
@@ -124,8 +124,8 @@
 						headers: {'Content-Type': 'application/json'},
 						body: JSON.stringify(fields)
 					})
-						.then(response => response.json())
-						.then(response => {
+						.then((response) => response.json())
+						.then((response) => {
 							clearMessages();
 
 							if ('form_errors' in response) {
@@ -144,7 +144,7 @@
 								location.href = this.#list_action;
 							}
 						})
-						.catch(exception => {
+						.catch((exception) => {
 							addMessage(makeMessageBox('bad', [exception.message]));
 						});
 			});
@@ -200,9 +200,9 @@
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({ajaxdata: {expressions, test_string}})
 			})
-				.then(response => response.json())
-				.then(response => this.#showTestResult(response, expressions))
-				.catch(exception => addMessage(makeMessageBox('bad', [exception.message])))
+				.then((response) => response.json())
+				.then((response) => this.#showTestResult(response, expressions))
+				.catch((exception) => addMessage(makeMessageBox('bad', [exception.message])))
 				.finally(() => this.#testLoading(false));
 		}
 
