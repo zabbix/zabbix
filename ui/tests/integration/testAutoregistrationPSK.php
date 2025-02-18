@@ -19,7 +19,6 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * Test suite for autoregistration
  *
  * @required-components server, agent
- * @configurationDataProvider agentConfigurationProvider
  * @backup ids,hosts,items,actions,operations,optag,host_tag
  * @backup auditlog,changelog,config,ha_node
  */
