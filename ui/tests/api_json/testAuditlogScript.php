@@ -64,7 +64,12 @@ class testAuditlogScript extends testAuditlogCommon {
 				'confirmation' => 'created_confirmation',
 				'description' => 'created description',
 				'groupid' => 2,
-				'usrgrpid' => 7
+				'usrgrpid' => 7,
+				'manualinput' => 1,
+				'manualinput_prompt' => 'test_promt',
+				'manualinput_validator' => 'test_validator',
+				'manualinput_validator_type' => 0,
+				'manualinput_default_value' => 'test_validator'
 			]
 		]);
 
@@ -87,6 +92,10 @@ class testAuditlogScript extends testAuditlogCommon {
 			'script.description' => ['add', 'created description'],
 			'script.groupid' => ['add', '2'],
 			'script.usrgrpid' => ['add', '7'],
+			'script.manualinput' => ['add', '1'],
+			'script.manualinput_prompt' => ['add', 'test_promt'],
+			'script.manualinput_validator' => ['add', 'test_validator'],
+			'script.manualinput_default_value' => ['add', 'test_validator'],
 			'script.scriptid' => ['add', self::$resourceid_ssh]
 		]);
 
@@ -112,7 +121,8 @@ class testAuditlogScript extends testAuditlogCommon {
 				'usrgrpid' => '8',
 				'host_access' => 2,
 				'confirmation' => 'updated_confirmation',
-				'description' => 'updated description'
+				'description' => 'updated description',
+				'manualinput' => 0
 			]
 		]);
 
@@ -130,9 +140,13 @@ class testAuditlogScript extends testAuditlogCommon {
 			'script.host_access' => ['update', '2', '3'],
 			'script.confirmation' => ['update', 'updated_confirmation', 'created_confirmation'],
 			'script.description' => ['update', 'updated description', 'created description'],
+			'script.manualinput' => ['update', '0', '1'],
 			'script.authtype' => ['update', '0', '1'],
 			'script.publickey' => ['update', '', 'created_public_key'],
-			'script.privatekey' => ['update', '', 'created_private_key']
+			'script.privatekey' => ['update', '', 'created_private_key'],
+			'script.manualinput_prompt' => ['update', '', 'test_promt'],
+			'script.manualinput_validator' => ['update', '', 'test_validator'],
+			'script.manualinput_default_value' => ['update', '', 'test_validator']
 		]);
 
 		$this->getAuditDetails('details', $this->update_actionid, $updated, self::$resourceid_ssh);
