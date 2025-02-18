@@ -475,8 +475,8 @@ class testAutoregistration extends CIntegrationTest {
 		$this->assertEquals(true, $response['result']);
 	}
 
+
 	/**
-	 * @required-components agent,agent2,server
 	 * @configurationDataProvider agentConfigurationProvider_LowerCaseFirstPSK
 	 */
 	public function testAutoregistration_withLowerCasePSK()
@@ -491,16 +491,16 @@ class testAutoregistration extends CIntegrationTest {
 		sleep(1);
 		$this->startComponent(self::COMPONENT_AGENT);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
+		$this->killComponent(self::COMPONENT_AGENT);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		sleep(1);
 
 		$this->startComponent(self::COMPONENT_AGENT2);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'but different PSK values', true, 120);
 	}
 
 
 	/**
-	 * @required-components agent,agent2,server
 	 * @configurationDataProvider agentConfigurationProvider_UpperCaseFirstPSK
 	 */
 	public function testAutoregistration_withUpperCasePSK()
@@ -515,10 +515,11 @@ class testAutoregistration extends CIntegrationTest {
 		sleep(1);
 		$this->startComponent(self::COMPONENT_AGENT);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
+		$this->killComponent(self::COMPONENT_AGENT);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		sleep(1);
 
 		$this->startComponent(self::COMPONENT_AGENT2);
-		#$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'but different PSK values,', true, 120);
 	}
 }
