@@ -37,6 +37,32 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 	const PSK_HOSTNAME = "PSK_HOSTNAME";
 
+	/**
+	 * @inheritdoc
+	 */
+	public function prepareData() {
+
+		$response = $this->call('action.create', [
+		[
+			'name' => self::AUTOREG_ACTION_NAME1,
+			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
+			'status' => ACTION_STATUS_ENABLED,
+			'operations' => [
+				/* OPERATION_TYPE_HOST_ADD is intentionally missing. It is expected to be run by */
+				/* Zabbix server, because OPERATION_TYPE_HOST_TAGS_ADD is present.               */
+				[
+					'operationtype' => OPERATION_TYPE_HOST_ADD,
+				],
+			]
+		],]);
+
+		$this->assertArrayHasKey('result', $response, 'Failed to create an autoregistration action');
+		$this->assertArrayHasKey('actionids', $response['result'],
+				'Failed to create an autoregistration action');
+		$actionids = $response['result']['actionids'];
+		$this->assertCount(1, $actionids, 'Failed to create an autoregistration action');
+	}
+
 	/*
 	 * Component configuration provider for agent related tests.
 	 *
