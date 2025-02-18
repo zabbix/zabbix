@@ -91,6 +91,10 @@ class CControllerRegExUpdate extends CController {
 
 		if ($result) {
 			$output['success']['title'] = _('Regular expression updated');
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
 		}
 		else {
 			$output['error'] = [

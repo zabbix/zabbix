@@ -135,6 +135,10 @@
 								addMessage(makeMessageBox('bad', response.error.messages, response.error.title));
 							}
 							else {
+								if ('messages' in response.success) {
+									postMessageDetails('success', response.success.messages);
+								}
+
 								postMessageOk(response.success.title);
 								location.href = this.#list_action;
 							}

@@ -86,6 +86,10 @@ class CControllerRegExCreate extends CController {
 
 		if ($result) {
 			$output['success']['title'] = _('Regular expression added');
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
 		}
 		else {
 			$output['error'] = [
