@@ -281,20 +281,24 @@
 
 			this.#test_results.append(template.evaluateToElement({
 				expression: expression,
-				type: this.#expressionTypeString(expression_type),
+				type: this.#expressionTypeToString(expression_type),
 				result: message,
 				result_class: result ? '<?= ZBX_STYLE_GREEN ?>' : '<?= ZBX_STYLE_RED ?>'
 			}));
 		}
 
-		#expressionTypeString(type) {
+		#expressionTypeToString(type) {
 			switch (type) {
-				case '<?= EXPRESSION_TYPE_INCLUDED ?>': return t('Character string included');
-				case '<?= EXPRESSION_TYPE_ANY_INCLUDED ?>': return t('Any character string included');
-				case '<?= EXPRESSION_TYPE_NOT_INCLUDED ?>': return t('Character string not included');
-				case '<?= EXPRESSION_TYPE_TRUE ?>': return t('Result is TRUE');
-				case '<?= EXPRESSION_TYPE_FALSE ?>': return t('Result is FALSE');
-				default: return '';
+				case '<?= EXPRESSION_TYPE_INCLUDED ?>':
+					return t('Character string included');
+				case '<?= EXPRESSION_TYPE_ANY_INCLUDED ?>':
+					return t('Any character string included');
+				case '<?= EXPRESSION_TYPE_NOT_INCLUDED ?>':
+					return t('Character string not included');
+				case '<?= EXPRESSION_TYPE_TRUE ?>':
+					return t('Result is TRUE');
+				case '<?= EXPRESSION_TYPE_FALSE ?>':
+					return t('Result is FALSE');
 			}
 		}
 
