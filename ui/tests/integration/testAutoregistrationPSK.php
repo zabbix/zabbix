@@ -111,7 +111,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		$response = $this->call('autoregistration.update', [
 			'tls_accept' => HOST_ENCRYPTION_PSK,
 			'tls_psk_identity' => self::PSK_IDENTITY,
-			'tls_psk' => self::PSK_KEY_LOWER_CASE
+			'tls_psk' => self::PSK_KEY_UPPER_CASE
 		]);
 		$this->assertArrayHasKey('result', $response);
 		$this->assertEquals(true, $response['result']);

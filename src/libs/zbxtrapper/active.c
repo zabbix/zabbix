@@ -219,8 +219,7 @@ static int	get_hostid_by_host_or_autoregister(const zbx_socket_t *sock, const ch
 		autoreg = AUTOREG_DISABLED;
 	}
 	zabbix_log(LOG_LEVEL_INFORMATION, "DDD DEBUG, autoreg: %d, zbx_dc_is_autoreg_host_changed: %d", autoreg,
-	zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag,
-	interface, (int)time(NULL)));
+	zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag, interface, (int)time(NULL)));
 	if (AUTOREG_ENABLED == autoreg && SUCCEED == zbx_dc_is_autoreg_host_changed(host, port, host_metadata, flag,
 			interface, (int)time(NULL)))
 	{
