@@ -326,14 +326,14 @@ $form
 	->addItem(
 		(new CScriptTag('
 			service_edit_popup.init('.json_encode([
+				'rules' => $data['js_validation_rules'],
 				'tabs_id' => $tabs->getId(),
 				'serviceid' => $data['serviceid'],
 				'children' => $data['form']['children'],
 				'children_problem_tags_html' => $data['form']['children_problem_tags_html'],
 				'problem_tags' => $data['form']['problem_tags'],
 				'status_rules' => $data['form']['status_rules'],
-				'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT),
-				'rules' => $data['js_validation_rules']
+				'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
 			]).');
 		'))->setOnDocumentReady()
 	);

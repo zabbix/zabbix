@@ -17,7 +17,7 @@
 
 window.service_edit_popup = new class {
 
-	init({tabs_id, serviceid, children, children_problem_tags_html, problem_tags, status_rules, search_limit, rules}) {
+	init({rules, tabs_id, serviceid, children, children_problem_tags_html, problem_tags, status_rules, search_limit}) {
 		this.#initTemplates();
 		this.serviceid = serviceid;
 
