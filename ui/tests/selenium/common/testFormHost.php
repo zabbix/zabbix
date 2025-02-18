@@ -320,11 +320,11 @@ class testFormHost extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
-						'Host name' => 'Empty template',
+						'Host name' => '1Empty template',
 						'Groups' => 'Zabbix servers'
 					],
 					'error_title' => 'Cannot add host',
-					'error' => 'Template with the same name "Empty template" already exists.'
+					'error' => 'Template with the same name "1Empty template" already exists.'
 				]
 			],
 			[
@@ -929,10 +929,10 @@ class testFormHost extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
-						'Host name' => 'Empty template'
+						'Host name' => '1Empty template'
 					],
 					'error_title' => 'Cannot update host',
-					'error' => 'Template with the same name "Empty template" already exists.'
+					'error' => 'Template with the same name "1Empty template" already exists.'
 				]
 			],
 			[
