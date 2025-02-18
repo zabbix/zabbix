@@ -3886,8 +3886,6 @@ ZABBIX.apps.map = (function($) {
 						thresholds: {},
 						highlights: {}
 					},
-					i,
-					ln,
 					link_trigger_pattern = /^linktrigger_(\w+)_(triggerid|drawtype|color|desc_exp)$/,
 					link_threshold_pattern = /^threshold_(\w+)_(linkid|drawtype|color|threshold)$/,
 					link_highlights_pattern = /^highlight_(\w+)_(linkid|drawtype|color|pattern)$/,
@@ -3901,50 +3899,68 @@ ZABBIX.apps.map = (function($) {
 					this.sysmap.items[ms_data[0].id] = ms_data[0];
 				}
 
-				for (i = 0, ln = values.length; i < ln; i++) {
+				for (let i = 0, ln = values.length; i < ln; i++) {
 					link_trigger = link_trigger_pattern.exec(values[i].name);
 					link_threshold = link_threshold_pattern.exec(values[i].name);
 					link_highlight = link_highlights_pattern.exec(values[i].name);
 
 					if (link_highlight !== null) {
-						if (link_highlight[2] == 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
-							throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
-						}
-
-						if (link_highlight[2] == 'pattern' && !values[i].value) {
-							throw t('S_PATTERN_IS_EMPTY');
-						}
-
 						if (data.highlights[link_highlight[1]] === undefined) {
 							data.highlights[link_highlight[1]] = {};
+						}
+
+						if (link_highlight[2] === 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
+							throw sprintf(t('S_INCORRECT_VALUE'),
+								`/highlights/${Object.keys(data.highlights).length}/color`,
+								t('S_EXPECTING_COLOR_CODE')
+							);
+						}
+
+						if (link_highlight[2] === 'pattern' && !values[i].value) {
+							throw sprintf(t('S_INCORRECT_VALUE'),
+								`/highlights/${Object.keys(data.highlights).length}/pattern`,
+								t('S_CANNOT_BE_EMPTY')
+							);
 						}
 
 						data.highlights[link_highlight[1]][link_highlight[2]] = values[i].value.toString();
 					}
 					else if (link_threshold !== null) {
-						if (link_threshold[2] == 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
-							throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
+						if (data.thresholds[link_threshold[1]] === undefined) {
+							data.thresholds[link_threshold[1]] = {};
 						}
 
-						if (link_threshold[2] == 'threshold') {
+						if (link_threshold[2] === 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
+							throw sprintf(t('S_INCORRECT_VALUE'),
+								`/thresholds/${Object.keys(data.thresholds).length}/color`,
+								t('S_EXPECTING_COLOR_CODE')
+							);
+						}
+
+						if (link_threshold[2] === 'threshold') {
 							if (!values[i].value) {
-								throw t('S_THRESHOLD_IS_EMPTY');
+								throw sprintf(t('S_INCORRECT_VALUE'),
+									`/thresholds/${Object.keys(data.thresholds).length}/threshold`,
+									t('S_CANNOT_BE_EMPTY')
+								);
 							}
 
 							if (isNaN(values[i].value)) {
-								throw sprintf(t('S_THRESHOLD_IS_NOT_CORRECT'), values[i].value);
+								throw sprintf(t('S_INCORRECT_VALUE'),
+									`/thresholds/${Object.keys(data.thresholds).length}/threshold`,
+									t('S_EXPECTING_A_NUMERIC_VALUE')
+								);
 							}
-						}
-
-						if (data.thresholds[link_threshold[1]] === undefined) {
-							data.thresholds[link_threshold[1]] = {};
 						}
 
 						data.thresholds[link_threshold[1]][link_threshold[2]] = values[i].value.toString();
 					}
 					else if (link_trigger !== null) {
-						if (link_trigger[2] == 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
-							throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
+						if (link_trigger[2] === 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
+							throw sprintf(t('S_INCORRECT_VALUE'),
+								`/linktriggers/${Object.keys(data.linktriggers).length}/color`,
+								t('S_EXPECTING_COLOR_CODE')
+							);
 						}
 
 						if (data.linktriggers[link_trigger[1]] === undefined) {
@@ -3954,7 +3970,7 @@ ZABBIX.apps.map = (function($) {
 						data.linktriggers[link_trigger[1]][link_trigger[2]] = values[i].value.toString();
 					}
 					else {
-						if (values[i].name == 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
+						if (values[i].name === 'color' && !isColorHex(`#${values[i].value.toString()}`)) {
 							throw sprintf(t('S_COLOR_IS_NOT_CORRECT'), values[i].value);
 						}
 
@@ -3964,27 +3980,37 @@ ZABBIX.apps.map = (function($) {
 
 				if (data.indicator_type == MAP_INDICATOR_TYPE_TRIGGER) {
 					if (Object.keys(data.linktriggers).length === 0) {
-						throw t('S_LINK_TRIGGER_IS_REQUIRED');
+						throw sprintf(t('S_INVALID_PARAMETER'), t('S_INDICATORS'),
+							t('S_LINK_TRIGGER_IS_REQUIRED')
+						);
 					}
 				}
 				else if (data.indicator_type == MAP_INDICATOR_TYPE_ITEM_VALUE) {
 					if (data.itemid == null) {
-						throw t('S_ITEM_IS_REQUIRED');
+						throw sprintf(t('S_INVALID_PARAMETER'), t('S_ITEM'),
+							t('S_CANNOT_BE_EMPTY')
+						);
 					}
 
 					if (this.item_type == ITEM_VALUE_TYPE_LOG || this.item_type == ITEM_VALUE_TYPE_TEXT
 							|| this.item_type == ITEM_VALUE_TYPE_STR) {
 						if (Object.keys(data.highlights).length === 0) {
-							throw t('S_PATTERN_IS_REQUIRED');
+							throw sprintf(t('S_INVALID_PARAMETER'), t('S_INDICATORS'),
+								t('S_LINK_HIGHLIGHT_IS_REQUIRED')
+							);
 						}
 					}
 					else if (this.item_type == ITEM_VALUE_TYPE_FLOAT || this.item_type == ITEM_VALUE_TYPE_UINT64) {
 						if (Object.keys(data.thresholds).length === 0) {
-							throw t('S_THRESHOLD_IS_REQUIRED');
+							throw sprintf(t('S_INVALID_PARAMETER'), t('S_INDICATORS'),
+								t('S_LINK_THRESHOLD_IS_REQUIRED')
+							);
 						}
 					}
 					else {
-						throw t('S_ITEM_TYPE_UNSUPPORTED');
+						throw sprintf(t('S_INVALID_PARAMETER'), t('S_ITEM'),
+							t('S_INCORRECT_ITEM_VALUE_TYPE')
+						);
 					}
 				}
 
