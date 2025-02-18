@@ -9425,36 +9425,46 @@ int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const 
 	int				ret;
 
 	RDLOCK_CACHE;
-
+	zabbix_log(LOG_LEVEL_INFORMATION , "DDD 1");
 	if (NULL == (dc_autoreg_host = DCfind_autoreg_host(host)))
 	{
+	zabbix_log(LOG_LEVEL_INFORMATION , "DDD 2");
 		ret = SUCCEED;
 	}
 	else if (0 != strcmp(dc_autoreg_host->host_metadata, host_metadata))
 	{
+	zabbix_log(LOG_LEVEL_INFORMATION , "DDD 3");
 		ret = SUCCEED;
 	}
 	else if (dc_autoreg_host->flags != (int)flag)
 	{
+		zabbix_log(LOG_LEVEL_INFORMATION , "DDD 4");
+
 		ret = SUCCEED;
 	}
 	else if (ZBX_CONN_IP == flag && (0 != strcmp(dc_autoreg_host->listen_ip, interface) ||
 			dc_autoreg_host->listen_port != port))
 	{
+		zabbix_log(LOG_LEVEL_INFORMATION , "DDD 5");
+
 		ret = SUCCEED;
 	}
 	else if (ZBX_CONN_DNS == flag && (0 != strcmp(dc_autoreg_host->listen_dns, interface) ||
 			dc_autoreg_host->listen_port != port))
 	{
+		zabbix_log(LOG_LEVEL_INFORMATION , "DDD 6");
+
 		ret = SUCCEED;
 	}
 	else if (AUTO_REGISTRATION_HEARTBEAT < now - dc_autoreg_host->timestamp)
 	{
+		zabbix_log(LOG_LEVEL_INFORMATION , "DDD 7");
 		ret = SUCCEED;
 	}
 	else
 		ret = FAIL;
 
+	zabbix_log(LOG_LEVEL_INFORMATION , "DDD 8");
 	UNLOCK_CACHE;
 
 	return ret;
