@@ -104,6 +104,7 @@
 						return;
 					}
 
+					clearMessages();
 					fetch(this.#form_action, {
 						method: 'POST',
 						headers: {'Content-Type': 'application/json'},
@@ -111,8 +112,6 @@
 					})
 						.then((response) => response.json())
 						.then((response) => {
-							clearMessages();
-
 							if ('form_errors' in response) {
 								this.form.setErrors(response.form_errors, true, true);
 								this.form.renderErrors();
