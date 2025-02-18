@@ -149,7 +149,6 @@ $form
 	->addItem(
 		(new CScriptTag('regular_expression_edit.init('.json_encode([
 			'rules' => $data['js_validation_rules'],
-			'action' => $data['regexp']['regexpid'] ? 'regex.update' : 'regex.create'
 		]).');'))->setOnDocumentReady()
 	);
 

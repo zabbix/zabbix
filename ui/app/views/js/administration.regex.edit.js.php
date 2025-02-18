@@ -39,27 +39,7 @@
 		 */
 		#test_results;
 
-		/**
-		 * @type {string}
-		 */
-		#form_action;
-
-		/**
-		 * @type {string}
-		 */
-		#clone_action;
-
-		/**
-		 * @type {string}
-		 */
-		#list_action;
-
-		/**
-		 * @type {string}
-		 */
-		#test_action;
-
-		init({rules, action}) {
+		init({rules}) {
 			this.form_element = document.getElementById('regexp');
 			this.form = new CForm(this.form_element, rules);
 			this.form_element.addEventListener('submit', (e) => {
@@ -71,17 +51,6 @@
 			document.getElementById('regular-expressions-table').addEventListener('click', (e) => this.#processAction(e));
 			document.getElementById('test-expression').addEventListener('click', () => this.#testExpression());
 			document.getElementById('tab_test').addEventListener('click', () => this.#testExpression());
-
-			const curl = new Curl(this.form_element.getAttribute('action'));
-
-			curl.setArgument('action', action);
-			this.#form_action = curl.getUrl();
-			curl.setArgument('action', 'regex.list');
-			this.#list_action = curl.getUrl();
-			curl.setArgument('action', 'regex.test');
-			this.#test_action = curl.getUrl();
-			curl.setArgument('action', 'regex.edit');
-			this.#clone_action = curl.getUrl();
 
 			this.#test_results = document.getElementById('test-result-table').querySelector('tbody');
 
@@ -105,7 +74,11 @@
 					}
 
 					clearMessages();
-					fetch(this.#form_action, {
+
+					const curl = new Curl(this.form_element.getAttribute('action'));
+					curl.setArgument('action', document.getElementById('regexpid') ? 'regex.update' : 'regex.create');
+
+					fetch(curl.getUrl(), {
 						method: 'POST',
 						headers: {'Content-Type': 'application/json'},
 						body: JSON.stringify(fields)
@@ -125,7 +98,8 @@
 								}
 
 								postMessageOk(response.success.title);
-								location.href = this.#list_action;
+								curl.setArgument('action', 'regex.list');
+								location.href = curl.getUrl();
 							}
 						})
 						.catch((exception) => this.#ajaxExceptionHandler(exception))
@@ -148,10 +122,11 @@
 		}
 
 		#clone() {
-			const curl = new Curl(this.#clone_action),
+			const curl = new Curl(this.form_element.getAttribute('action')),
 				{name, expressions, test_string} = this.form.getAllValues(),
 				indexes = Object.keys(expressions);
 
+			curl.setArgument('action', 'regex.edit');
 			curl.setArgument('regexp[name]', name);
 			curl.setArgument('regexp[test_string]', test_string);
 
@@ -189,10 +164,12 @@
 
 		#testExpression() {
 			const {expressions, test_string} = this.form.getAllValues();
+			const curl = new Curl(this.form_element.getAttribute('action'));
+			curl.setArgument('action', 'regex.test');
 
 			this.#setTestLoadingStatus();
 
-			fetch(this.#test_action, {
+			fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({ajaxdata: {expressions, test_string}})
