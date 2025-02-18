@@ -1928,7 +1928,8 @@ class CMap extends CMapElement {
 			foreach ($map['links'] as $i2 => $link) {
 				if ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE
 						&& (!array_key_exists('linkid', $link)
-							|| bccomp($link['itemid'], $db_links[$link['linkid']]['itemid']) != 0)) {
+							|| bccomp($link['itemid'], $db_links[$link['linkid']]['itemid']) != 0
+							|| $link['itemid'] == 0)) {
 					$link_indexes[$link['itemid']][$i1][] = $i2;
 				}
 			}
@@ -1998,9 +1999,26 @@ class CMap extends CMapElement {
 
 				$db_link = $db_maps[$map['sysmapid']]['links'][$link['linkid']];
 
-				$link += in_array($link['item_value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
-					? ['thresholds' => $db_link['thresholds']]
-					: ['highlights' => $db_link['highlights']];
+				if (in_array($link['item_value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+					if (!array_key_exists('thresholds', $link)) {
+						$link['thresholds'] = [];
+
+						foreach ($db_link['thresholds'] as $db_threshold) {
+							$link['thresholds'][] = array_intersect_key($db_threshold,
+								array_flip(['threshold', 'drawtype', 'color'])
+							);
+						}
+					}
+				}
+				elseif (!array_key_exists('highlights', $link)) {
+					$link['highlights'] = [];
+
+					foreach ($db_link['highlights'] as $db_highlight) {
+						$link['highlights'][] = array_intersect_key($db_highlight,
+							array_flip(['pattern', 'drawtype', 'color'])
+						);
+					}
+				}
 			}
 			unset($link);
 		}
