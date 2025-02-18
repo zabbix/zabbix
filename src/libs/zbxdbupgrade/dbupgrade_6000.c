@@ -691,6 +691,24 @@ static int	DBpatch_6000054(void)
 	return DBcreate_index("dashboard", "dashboard_3", "uuid", 0);
 }
 
+static int	DBpatch_6000055(void)
+{
+	if (ZBX_PROGRAM_TYPE_SERVER != program_type)
+		return SUCCEED;
+
+	/* 2 - SYSMAP_ELEMENT_TYPE_TRIGGER */
+	if (ZBX_DB_OK > DBexecute("delete from sysmaps_elements"
+			" where elementtype=2"
+				" and selementid not in ("
+					"select distinct selementid from sysmap_element_trigger"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6000)
@@ -752,5 +770,6 @@ DBPATCH_ADD(6000051, 0, 0)
 DBPATCH_ADD(6000052, 0, 0)
 DBPATCH_ADD(6000053, 0, 0)
 DBPATCH_ADD(6000054, 0, 0)
+DBPATCH_ADD(6000055, 0, 0)
 
 DBPATCH_END()
