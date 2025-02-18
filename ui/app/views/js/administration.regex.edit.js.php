@@ -302,24 +302,24 @@
 
 		#expressionTypeToString(type) {
 			switch (type) {
-				case '<?= EXPRESSION_TYPE_INCLUDED ?>':
+				case <?= EXPRESSION_TYPE_INCLUDED ?>:
 					return t('Character string included');
-				case '<?= EXPRESSION_TYPE_ANY_INCLUDED ?>':
+				case <?= EXPRESSION_TYPE_ANY_INCLUDED ?>:
 					return t('Any character string included');
-				case '<?= EXPRESSION_TYPE_NOT_INCLUDED ?>':
+				case <?= EXPRESSION_TYPE_NOT_INCLUDED ?>:
 					return t('Character string not included');
-				case '<?= EXPRESSION_TYPE_TRUE ?>':
+				case <?= EXPRESSION_TYPE_TRUE ?>:
 					return t('Result is TRUE');
-				case '<?= EXPRESSION_TYPE_FALSE ?>':
+				case <?= EXPRESSION_TYPE_FALSE ?>:
 					return t('Result is FALSE');
 			}
 		}
 
 		#updateRow({target}) {
-			if (target instanceof ZSelect && target.classList.contains('js-expression-type-select')) {
+			if (target.classList.contains('js-expression-type-select')) {
 				const delimeter = target.closest('tr').querySelector('.js-expression-delimiter-select');
 
-				if (target.value === '<?= EXPRESSION_TYPE_ANY_INCLUDED ?>') {
+				if (target.value == <?= EXPRESSION_TYPE_ANY_INCLUDED ?>) {
 					delimeter.removeAttribute('disabled');
 					delimeter.classList.remove(ZBX_STYLE_DISPLAY_NONE);
 				}
