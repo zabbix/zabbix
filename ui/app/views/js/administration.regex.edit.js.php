@@ -107,7 +107,9 @@
 
 			const clone = document.getElementById('clone');
 
-			clone && clone.addEventListener('click', () => this.#clone());
+			if (clone) {
+				clone.addEventListener('click', () => this.#clone());
+			}
 		}
 
 		submit() {
@@ -147,7 +149,7 @@
 						.catch((exception) => {
 							addMessage(makeMessageBox('bad', [exception.message]));
 						});
-			});
+				});
 		}
 
 		#clone() {
@@ -174,7 +176,7 @@
 			const action = e.target.getAttribute('name');
 
 			if (action === 'remove')  {
-				const row = e.target.closest('tr')
+				const row = e.target.closest('tr');
 
 				row.nextSibling.remove();
 				row.remove();
@@ -183,10 +185,9 @@
 				const indexes = Object.keys(this.form.findFieldByName('expressions').getValue()),
 					next_index = indexes.length ? Math.max(...indexes) + 1 : 0;
 
-				document.getElementById('expression-list-footer')
-					.insertAdjacentHTML('beforebegin', this.#row_template.evaluate({
-						index: next_index
-					}));
+				document
+					.getElementById('expression-list-footer')
+					.insertAdjacentHTML('beforebegin', this.#row_template.evaluate({index: next_index}));
 			}
 		}
 
@@ -253,7 +254,7 @@
 
 		#addTestResultCombined(result, message) {
 			this.#test_results.append(this.#combined_result_template.evaluateToElement({
-				resultClass: result ? '<?= ZBX_STYLE_GREEN ?>' : '<?= ZBX_STYLE_RED ?>',
+				result_class: result ? '<?= ZBX_STYLE_GREEN ?>' : '<?= ZBX_STYLE_RED ?>',
 				result: message
 			}));
 		}
@@ -263,7 +264,7 @@
 				expression: expression,
 				type: this.#expressionTypeString(expression_type),
 				result: message,
-				resultClass: result ? '<?= ZBX_STYLE_GREEN ?>' : '<?= ZBX_STYLE_RED ?>'
+				result_class: result ? '<?= ZBX_STYLE_GREEN ?>' : '<?= ZBX_STYLE_RED ?>'
 			}));
 		}
 
@@ -291,6 +292,5 @@
 				}
 			}
 		}
-	}
-
+	};
 </script>

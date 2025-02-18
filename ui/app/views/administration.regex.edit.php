@@ -32,7 +32,6 @@ $form = (new CForm())
 
 $table = (new CTable())
 	->setId('regular-expressions-table')
-	->setAttribute('style', 'width: 100%;')
 	->setHeader([
 		_('Expression type'),
 		_('Expression'),
@@ -61,13 +60,12 @@ $tabs = (new CTabView())
 	->addTab('expr', _('Expressions'), (new CFormGrid())
 		->addItem((new CLabel(_('Name'), 'name'))->setAsteriskMark())
 		->addItem((new CFormField())
-			->addItem((new CTextBox('name', $data['regexp']['name'], false,
-				DB::getFieldLength('regexps', 'name'))
-			)
+			->addItem((new CTextBox('name', $data['regexp']['name'], false, DB::getFieldLength('regexps', 'name')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('autofocus', 'autofocus')
 				->setAriaRequired()
-		))
+			)
+		)
 		->addItem((new CLabel(_('Expressions'), 'regular-expressions-table'))->setAsteriskMark())
 		->addItem((new CFormField())
 			->addItem((new CDiv($table))
@@ -139,14 +137,14 @@ $form
 		->addItem((new CRow())
 			->addClass('js-expression-result-row')
 			->addItem((new CCol(_('Combined result')))->setColspan(2))
-			->addItem((new CSpan('#{result}'))->addClass('#{resultClass}'))
+			->addItem((new CSpan('#{result}'))->addClass('#{result_class}'))
 	))
 	->addItem((new CTemplateTag('result-row-template'))
 		->addItem((new CRow())
 			->addClass('js-expression-result-row')
 			->addItem(new CCol('#{type}'))
 			->addItem(new CCol('#{expression}'))
-			->addItem(new CCol((new CSpan('#{result}'))->addClass('#{resultClass}')))
+			->addItem(new CCol((new CSpan('#{result}'))->addClass('#{result_class}')))
 	))
 	->addItem(
 		(new CScriptTag('regular_expression_edit.init('.json_encode([
