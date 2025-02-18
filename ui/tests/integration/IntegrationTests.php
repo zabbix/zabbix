@@ -67,6 +67,7 @@ class IntegrationTests {
 		}
 		$suite->addTestSuite('testDiscoveryRules');
 		$suite->addTestSuite('testAutoregistration');
+		$suite->addTestSuite('testAutoregistrationPSK');
 		$suite->addTestSuite('testDataCollection');
 		$suite->addTestSuite('testBinaryValueTypeDataCollection');
 		$suite->addTestSuite('testDiagnosticDataTask');
