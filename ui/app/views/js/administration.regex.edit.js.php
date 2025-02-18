@@ -175,7 +175,7 @@
 		#testExpression() {
 			const {expressions, test_string} = this.form.getAllValues();
 
-			this.#testLoading(true);
+			this.#setLoadingStatus();
 
 			fetch(this.#test_action, {
 				method: 'POST',
@@ -185,23 +185,25 @@
 				.then((response) => response.json())
 				.then((response) => this.#showTestResult(response, expressions))
 				.catch((exception) => addMessage(makeMessageBox('bad', [exception.message])))
-				.finally(() => this.#testLoading(false));
+				.finally(() => this.#unsetLoadingStatus());
 		}
 
-		#testLoading(state) {
+		#setLoadingStatus() {
 			const button = document.getElementById('test-expression'),
 				textarea = document.getElementById('test-string');
 
-			if (state === true) {
-				button.classList.add('is-loading');
-				button.setAttribute('disabled', true);
-				textarea.setAttribute('disabled', true);
-			}
-			else {
-				button.classList.remove('is-loading');
-				button.removeAttribute('disabled');
-				textarea.removeAttribute('disabled');
-			}
+			button.classList.add('is-loading');
+			button.setAttribute('disabled', true);
+			textarea.setAttribute('disabled', true);
+		}
+
+		#unsetLoadingStatus() {
+			const button = document.getElementById('test-expression'),
+				textarea = document.getElementById('test-string');
+
+			button.classList.remove('is-loading');
+			button.removeAttribute('disabled');
+			textarea.removeAttribute('disabled');
 		}
 
 		#showTestResult(response, expressions) {
