@@ -44,7 +44,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 		$response = $this->call('action.create', [
 		[
-			'name' => self::AUTOREG_ACTION_NAME1,
+			'name' => "action",
 			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 			'status' => ACTION_STATUS_ENABLED,
 			'operations' => [
