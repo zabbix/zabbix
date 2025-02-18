@@ -59,21 +59,6 @@
 		 */
 		#test_action;
 
-		/**
-		 * @type {Template}
-		 */
-		#row_template;
-
-		/**
-		 * @type {Template}
-		 */
-		#result_row_template;
-
-		/**
-		 * @type {Template}
-		 */
-		#combined_result_template;
-
 		init({rules, action}) {
 			this.form_element = document.getElementById('regexp');
 			this.form = new CForm(this.form_element, rules);
@@ -99,11 +84,6 @@
 			this.#clone_action = curl.getUrl();
 
 			this.#test_results = document.getElementById('test-result-table').querySelector('tbody');
-			this.#row_template = new Template(document.getElementById('row-expression-template').innerHTML);
-			this.#result_row_template = new Template(document.getElementById('result-row-template').innerHTML);
-			this.#combined_result_template = new Template(
-				document.getElementById('combined-result-template').innerHTML
-			);
 
 			const clone = document.getElementById('clone');
 
@@ -182,12 +162,13 @@
 				row.remove();
 			}
 			else if (action === 'add')  {
-				const indexes = Object.keys(this.form.findFieldByName('expressions').getValue()),
-					next_index = indexes.length ? Math.max(...indexes) + 1 : 0;
+				const indexes = Object.keys(this.form.findFieldByName('expressions').getValue());
+				const next_index = indexes.length ? Math.max(...indexes) + 1 : 0;
+				const template = new Template(document.getElementById('row-expression-template').innerHTML);
 
 				document
 					.getElementById('expression-list-footer')
-					.insertAdjacentHTML('beforebegin', this.#row_template.evaluate({index: next_index}));
+					.insertAdjacentHTML('beforebegin', template.evaluate({index: next_index}));
 			}
 		}
 
@@ -253,14 +234,18 @@
 		}
 
 		#addTestResultCombined(result, message) {
-			this.#test_results.append(this.#combined_result_template.evaluateToElement({
+			const template = new Template(document.getElementById('combined-result-template').innerHTML);
+
+			this.#test_results.append(template.evaluateToElement({
 				result_class: result ? '<?= ZBX_STYLE_GREEN ?>' : '<?= ZBX_STYLE_RED ?>',
 				result: message
 			}));
 		}
 
 		#addTestResult({expression_type, expression}, result, message) {
-			this.#test_results.append(this.#result_row_template.evaluateToElement({
+			const template = new Template(document.getElementById('result-row-template').innerHTML);
+
+			this.#test_results.append(template.evaluateToElement({
 				expression: expression,
 				type: this.#expressionTypeString(expression_type),
 				result: message,
