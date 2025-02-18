@@ -118,7 +118,7 @@
 								this.form.renderErrors();
 							}
 							else if ('error' in response) {
-								addMessage(makeMessageBox('bad', response.error.messages, response.error.title));
+								throw {error: response.error};
 							}
 							else {
 								if ('messages' in response.success) {
@@ -129,9 +129,23 @@
 								location.href = this.#list_action;
 							}
 						})
-						.catch((exception) => addMessage(makeMessageBox('bad', [exception.message])))
+						.catch((exception) => this.#ajaxExceptionHandler(exception))
 						.finally(() => this.#unsetLoadingStatus());
 				});
+		}
+
+		#ajaxExceptionHandler(exception) {
+			let title, messages;
+
+			if (typeof exception === 'object' && 'error' in exception) {
+				title = exception.error.title;
+				messages = exception.error.messages;
+			}
+			else {
+				messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+			}
+
+			addMessage(makeMessageBox('bad', messages, title));
 		}
 
 		#clone() {
@@ -186,7 +200,7 @@
 			})
 				.then((response) => response.json())
 				.then((response) => this.#showTestResult(response, expressions))
-				.catch((exception) => addMessage(makeMessageBox('bad', [exception.message])))
+				.catch((exception) => this.#ajaxExceptionHandler(exception))
 				.finally(() => this.#unsetTestLoadingStatus());
 		}
 
