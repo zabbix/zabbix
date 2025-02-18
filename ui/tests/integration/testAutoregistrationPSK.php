@@ -120,9 +120,9 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 	/**
 	 * @required-components agent,agent2,server
-	 * @configurationDataProvider agentConfigurationProvider_LowerCaseFirstPSK
+	 * @configurationDataProvider agentConfigurationProvider_UpperCaseFirstPSK
 	 */
-	public function testAutoregistration_withLowerCasePSK()
+	public function testAutoregistration_withUpperCasePSK()
 	{
 		$this->killComponent(self::COMPONENT_AGENT2);
 		$this->killComponent(self::COMPONENT_AGENT);
