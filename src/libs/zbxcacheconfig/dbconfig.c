@@ -9583,7 +9583,7 @@ size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned ch
 	psk_i_local.tls_psk_identity = (const char *)psk_identity;
 
 	RDLOCK_CACHE;
-
+zabbix_log(LOG_LEVEL_INFORMATION, "PPP 1");
 	/* Is it among host PSKs? */
 	if (NULL != (psk_i = (ZBX_DC_PSK *)zbx_hashset_search(&config->psks, &psk_i_local)))
 	{
@@ -9591,6 +9591,7 @@ size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned ch
 		*psk_usage |= ZBX_PSK_FOR_HOST;
 	}
 
+zabbix_log(LOG_LEVEL_INFORMATION, "PPP 2");
 	/* Does it match autoregistration PSK? */
 	if (0 != strcmp(config->autoreg_psk_identity, (const char *)psk_identity))
 	{
@@ -9598,6 +9599,7 @@ size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned ch
 		return psk_len;
 	}
 
+zabbix_log(LOG_LEVEL_INFORMATION, "PPP 3");
 	if (0 == *psk_usage)	/* only as autoregistration PSK */
 	{
 		psk_len = zbx_strlcpy((char *)psk_buf, config->autoreg_psk, HOST_TLS_PSK_LEN_MAX);
@@ -9607,6 +9609,7 @@ size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned ch
 		return psk_len;
 	}
 
+zabbix_log(LOG_LEVEL_INFORMATION, "PPP 4");
 	/* the requested PSK is used as host PSK and as autoregistration PSK */
 	zbx_strlcpy((char *)autoreg_psk_tmp, config->autoreg_psk, sizeof(autoreg_psk_tmp));
 
@@ -9619,6 +9622,7 @@ size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned ch
 		return psk_len;
 	}
 
+zabbix_log(LOG_LEVEL_INFORMATION, "PPP 7");
 	zabbix_log(LOG_LEVEL_WARNING, "host PSK and autoregistration PSK have the same identity \"%s\" but"
 			" different PSK values, autoregistration will not be allowed", psk_identity);
 	return psk_len;
