@@ -28,23 +28,6 @@ static int	xml_traverse_elements(xmlNode *node, zbx_xml_resolv_func_t resolver, 
 		switch (node->type)
 		{
 			case XML_TEXT_NODE:
-				if (NULL == (value = xmlNodeGetContent(node)))
-					break;
-
-				value_tmp = zbx_strdup(NULL, (const char *)value);
-
-				va_copy(pargs, args); /* copy current argument position */
-
-				ret = resolver(&value_tmp, NULL, 0, pargs);
-
-				va_end(pargs);
-
-				xmlNodeSetContent(node, NULL);
-				xmlNodeAddContent(node, (xmlChar *)value_tmp);
-
-				zbx_free(value_tmp);
-				xmlFree(value);
-				break;
 			case XML_CDATA_SECTION_NODE:
 				if (NULL == (value = xmlNodeGetContent(node)))
 					break;
@@ -53,7 +36,7 @@ static int	xml_traverse_elements(xmlNode *node, zbx_xml_resolv_func_t resolver, 
 
 				va_copy(pargs, args); /* copy current argument position */
 
-				ret = resolver(&value_tmp, NULL, 0, args);
+				ret = resolver(&value_tmp, NULL, 0, pargs);
 
 				va_end(pargs);
 
@@ -73,7 +56,7 @@ static int	xml_traverse_elements(xmlNode *node, zbx_xml_resolv_func_t resolver, 
 
 					va_copy(pargs, args); /* copy current argument position */
 
-					ret = resolver(&value_tmp, NULL, 0, args);
+					ret = resolver(&value_tmp, NULL, 0, pargs);
 
 					va_end(pargs);
 
