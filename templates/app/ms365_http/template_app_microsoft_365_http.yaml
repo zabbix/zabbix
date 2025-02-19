@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-10-14T07:33:28Z'
+  date: '2025-01-29T10:59:46Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -805,10 +805,10 @@ zabbix_export:
           parameters:
             - name: app_id
               value: '{$MS365.APP.ID}'
+            - name: http_proxy
+              value: '{$MS365.HTTP.PROXY}'
             - name: password
               value: '{$MS365.PASSWORD}'
-            - name: proxy
-              value: '{$MS365.HTTP.PROXY}'
             - name: tenant_id
               value: '{$MS365.TENANT.ID}'
           tags:
@@ -1364,10 +1364,10 @@ zabbix_export:
           parameters:
             - name: app_id
               value: '{$MS365.APP.ID}'
+            - name: http_proxy
+              value: '{$MS365.HTTP.PROXY}'
             - name: password
               value: '{$MS365.PASSWORD}'
-            - name: proxy
-              value: '{$MS365.HTTP.PROXY}'
             - name: tenant_id
               value: '{$MS365.TENANT.ID}'
           tags:
@@ -2018,10 +2018,10 @@ zabbix_export:
           parameters:
             - name: app_id
               value: '{$MS365.APP.ID}'
+            - name: http_proxy
+              value: '{$MS365.HTTP.PROXY}'
             - name: password
               value: '{$MS365.PASSWORD}'
-            - name: proxy
-              value: '{$MS365.HTTP.PROXY}'
             - name: tenant_id
               value: '{$MS365.TENANT.ID}'
           tags:
@@ -2591,10 +2591,10 @@ zabbix_export:
           parameters:
             - name: app_id
               value: '{$MS365.APP.ID}'
+            - name: http_proxy
+              value: '{$MS365.HTTP.PROXY}'
             - name: password
               value: '{$MS365.PASSWORD}'
-            - name: proxy
-              value: '{$MS365.HTTP.PROXY}'
             - name: tenant_id
               value: '{$MS365.TENANT.ID}'
           tags:
@@ -3071,10 +3071,10 @@ zabbix_export:
           parameters:
             - name: app_id
               value: '{$MS365.APP.ID}'
+            - name: http_proxy
+              value: '{$MS365.HTTP.PROXY}'
             - name: password
               value: '{$MS365.PASSWORD}'
-            - name: proxy
-              value: '{$MS365.HTTP.PROXY}'
             - name: tenant_id
               value: '{$MS365.TENANT.ID}'
           tags:
@@ -4696,10 +4696,10 @@ zabbix_export:
           parameters:
             - name: app_id
               value: '{$MS365.APP.ID}'
+            - name: http_proxy
+              value: '{$MS365.HTTP.PROXY}'
             - name: password
               value: '{$MS365.PASSWORD}'
-            - name: proxy
-              value: '{$MS365.HTTP.PROXY}'
             - name: tenant_id
               value: '{$MS365.TENANT.ID}'
           tags:

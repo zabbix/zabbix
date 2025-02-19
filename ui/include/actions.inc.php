@@ -639,7 +639,18 @@ function getActionOperationDescriptions(int $eventsource, array $actions, int $t
 							break;
 						}
 
-						if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
+						$operation += ['opcommand_hst' => [], 'opcommand_grp' => []];
+
+						if (!$operation['opcommand_hst'] && !$operation['opcommand_grp']) {
+							$result[$i][$j][] = [
+								bold(_s('Run script "%1$s" on deleted object(s)', $scripts[$scriptid]['name'])),
+								BR()
+							];
+
+							break;
+						}
+
+						if ($operation['opcommand_hst']) {
 							$host_list = [];
 
 							foreach ($operation['opcommand_hst'] as $host) {
@@ -664,7 +675,7 @@ function getActionOperationDescriptions(int $eventsource, array $actions, int $t
 							}
 						}
 
-						if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
+						if ($operation['opcommand_grp']) {
 							$host_group_list = [];
 
 							foreach ($operation['opcommand_grp'] as $host_group) {
@@ -817,7 +828,18 @@ function getActionOperationDescriptions(int $eventsource, array $actions, int $t
 							break;
 						}
 
-						if (array_key_exists('opcommand_hst', $operation) && $operation['opcommand_hst']) {
+						$operation += ['opcommand_hst' => [], 'opcommand_grp' => []];
+
+						if (!$operation['opcommand_hst'] && !$operation['opcommand_grp']) {
+							$result[$i][$j][] = [
+								bold(_s('Run script "%1$s" on deleted object(s)', $scripts[$scriptid]['name'])),
+								BR()
+							];
+
+							break;
+						}
+
+						if ($operation['opcommand_hst']) {
 							$host_list = [];
 
 							foreach ($operation['opcommand_hst'] as $host) {
@@ -842,7 +864,7 @@ function getActionOperationDescriptions(int $eventsource, array $actions, int $t
 							}
 						}
 
-						if (array_key_exists('opcommand_grp', $operation) && $operation['opcommand_grp']) {
+						if ($operation['opcommand_grp']) {
 							$host_group_list = [];
 
 							foreach ($operation['opcommand_grp'] as $host_group) {

@@ -80,7 +80,7 @@ class testFormTagsTrigger extends testFormTags {
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			[
-				'hostid' => '99014', // Empty template
+				'hostid' => '99014', // 1Empty template
 				'name' => 'Item to test trigger copy',
 				'key_' => 'tags.clone',
 				'type' => ITEM_TYPE_TRAPPER,
@@ -127,7 +127,7 @@ class testFormTagsTrigger extends testFormTags {
 	public function testFormTagsTrigger_CopyToTemplate() {
 		$hostid = CDataHelper::get('EntitiesTags.hostids.Host with tags for cloning');
 		$this->link = 'triggers.php?filter_set=1&context=host&filter_hostids%5B0%5D='.$hostid;
-		$this->executeCopy('trigger', 'Template', 'Empty template');
+		$this->executeCopy('trigger', 'Template', '1Empty template');
 	}
 
 	/**

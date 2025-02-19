@@ -36,6 +36,6 @@ class testAPIInfo extends CAPITest {
 		$this->disableAuthorization();
 		$result = $this->call('apiinfo.version', []);
 
-		$this->assertSame('6.0.38', $result['result']);
+		$this->assertSame('6.0.39', $result['result']);
 	}
 }

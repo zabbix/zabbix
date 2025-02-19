@@ -24,6 +24,16 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
  * @backup usrgrp
  */
 class testPageUserGroups extends CLegacyWebTest {
+
+	/**
+	 * Attach MessageBehavior, TableBehavior and TagBehavior to the test.
+	 */
+	public function getBehaviors() {
+		return [
+			CTableBehavior::class
+		];
+	}
+
 	public static function allGroups() {
 		return CDBHelper::getDataProvider("select * from usrgrp where name<>'Disabled' order by usrgrpid");
 	}
@@ -196,6 +206,7 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestInputTypeOverwrite('filter_name', 'Zabbix administrators');
 		$this->zbxTestClickButtonText('Apply');
 		$this->zbxTestAssertElementText("//tbody/tr[1]/td[2]/a", 'Zabbix administrators');
+		$this->page->waitUntilReady();
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
 
@@ -203,10 +214,12 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
 		$this->zbxTestInputTypeOverwrite('filter_name', '1928379128ksdhksdjfh');
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
+		$this->page->waitUntilReady();
+		$this->assertTableStats(0);
 		$this->zbxTestInputTypeOverwrite('filter_name', '%');
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementText("//div[@class='table-stats']", 'Displaying 0 of 0 found');
+		$this->page->waitUntilReady();
+		$this->assertTableStats(0);
 	}
 
 	public function testPageUserGroups_FilterByStatus() {
@@ -214,13 +227,15 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestInputTypeOverwrite('filter_name', 'Zabbix administrators');
 		$this->zbxTestClickXpathWait("//label[@for='filter_user_status_1']");
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
+		$this->page->waitUntilReady();
+		$this->assertTableStats(1);
 	}
 
 	public function testPageUserGroups_FilterReset() {
 		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestClickButtonText('Apply');
+		$this->page->waitUntilReady();
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
 }

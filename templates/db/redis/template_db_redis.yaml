@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-12T14:37:25Z'
+  date: '2025-02-12T10:00:41Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -159,7 +159,6 @@ zabbix_export:
             - uuid: 819b379b51c34616820f86d21c703b27
               expression: 'last(/Redis by Zabbix agent 2/redis.config["{$REDIS.CONN.URI}"],#1)<>last(/Redis by Zabbix agent 2/redis.config["{$REDIS.CONN.URI}"],#2) and length(last(/Redis by Zabbix agent 2/redis.config["{$REDIS.CONN.URI}"]))>0'
               name: 'Redis: Configuration has changed'
-              event_name: 'Redis: Version has changed (new version: {ITEM.VALUE})'
               priority: INFO
               description: 'Redis configuration has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'

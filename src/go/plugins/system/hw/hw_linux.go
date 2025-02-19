@@ -95,8 +95,7 @@ type Plugin struct {
 
 // Options -
 type Options struct {
-	plugin.SystemOptions `conf:"optional,name=System"`
-	Timeout              int
+	Timeout int
 }
 
 func init() {
