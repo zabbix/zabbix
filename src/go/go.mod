@@ -1,6 +1,6 @@
 module golang.zabbix.com/agent2
 
-go 1.19
+go 1.21
 
 require (
 	github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69
@@ -12,7 +12,7 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.4.2
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/go-ldap/ldap v3.0.3+incompatible
-	github.com/go-ole/go-ole v1.2.4
+	github.com/go-ole/go-ole v1.3.0
 	github.com/go-sql-driver/mysql v1.7.1
 	github.com/goburrow/modbus v0.1.0
 	github.com/godbus/dbus/v5 v5.1.0
@@ -24,11 +24,11 @@ require (
 	github.com/miekg/dns v1.1.43
 	github.com/omeid/go-yarn v0.0.1
 	github.com/sokurenko/go-netstat v1.0.0
-	golang.org/x/net v0.30.0
-	golang.org/x/sync v0.8.0
-	golang.org/x/sys v0.26.0
-	golang.org/x/text v0.19.0
-	golang.zabbix.com/sdk v1.2.2-0.20240905095956-0fbaca641faa
+	golang.org/x/net v0.34.0
+	golang.org/x/sync v0.10.0
+	golang.org/x/sys v0.30.0
+	golang.org/x/text v0.21.0
+	golang.zabbix.com/sdk v1.2.2-0.20250214072518-dd7b5f86464b
 )
 
 require (

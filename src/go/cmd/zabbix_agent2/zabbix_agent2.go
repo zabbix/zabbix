@@ -333,7 +333,10 @@ func main() {
 		}
 		// create default configuration for testing options
 		if !argConfig {
-			_ = conf.Unmarshal([]byte{}, &agent.Options)
+			err = conf.UnmarshalStrict([]byte{}, &agent.Options)
+			if err != nil {
+				fatalExit("failed to create test configuration", err)
+			}
 		}
 	}
 
@@ -369,7 +372,12 @@ func main() {
 		os.Exit(0)
 	}
 
-	pluginSocket, err = initExternalPlugins(&agent.Options)
+	systemOpt, err := agent.Options.RemovePluginSystemOptions()
+	if err != nil {
+		fatalExit("cannot initialize plugin system option", err)
+	}
+
+	pluginSocket, err = initExternalPlugins(&agent.Options, systemOpt)
 	if err != nil {
 		fatalExit("cannot register plugins", err)
 	}
@@ -391,8 +399,11 @@ func main() {
 			fatalExit("failed to load key access rules", err)
 		}
 
-		if _, err = agent.InitUserParameterPlugin(agent.Options.UserParameter, agent.Options.UnsafeUserParameters,
-			agent.Options.UserParameterDir); err != nil {
+		if _, err = agent.InitUserParameterPlugin(
+			agent.Options.UserParameter,
+			agent.Options.UnsafeUserParameters,
+			agent.Options.UserParameterDir,
+		); err != nil {
 			fatalExit("cannot initialize user parameters", err)
 		}
 
@@ -401,7 +412,8 @@ func main() {
 		}
 
 		var m *scheduler.Manager
-		if m, err = scheduler.NewManager(&agent.Options); err != nil {
+
+		if m, err = scheduler.NewManager(&agent.Options, systemOpt); err != nil {
 			fatalExit("cannot create scheduling manager", err)
 		}
 
@@ -507,7 +519,7 @@ func main() {
 		fatalExit("cannot initialize user parameters", err)
 	}
 
-	if manager, err = scheduler.NewManager(&agent.Options); err != nil {
+	if manager, err = scheduler.NewManager(&agent.Options, systemOpt); err != nil {
 		fatalExit("cannot create scheduling manager", err)
 	}
 

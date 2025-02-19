@@ -354,9 +354,9 @@ class testPageHostGraph extends CLegacyWebTest {
 					'target_type' => 'Templates',
 					'group' => 'Templates',
 					'targets' => [
-						'Empty template'
+						'1Empty template'
 					],
-					'error' => 'Missing key "graph[1]" for host "Empty template".'
+					'error' => 'Missing key "graph[1]" for host "1Empty template".'
 				]
 			],
 			// Copy several graphs to template.
@@ -663,7 +663,7 @@ class testPageHostGraph extends CLegacyWebTest {
 			[
 				[
 					'group' => 'Templates',
-					'host' => 'Empty template',
+					'host' => '1Empty template',
 					'context' => 'template'
 				]
 			],
