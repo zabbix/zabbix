@@ -73,7 +73,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 			throw new Exception('Failed to create lower case PSK file for agent');
 		}
 
-		if (file_put_contents(self::PSK_FILE_UPPER_CASE, self::PSK_KEY_UPPER_CASE) === false) {
+		if (file_put_contents(self::PSK_FILE_UPPER_CASE, self::PSK_IDENTITY) === false) {
 			throw new Exception('Failed to create upper case PSK file for agent');
 		}
 
