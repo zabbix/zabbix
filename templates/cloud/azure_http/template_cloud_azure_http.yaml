@@ -4464,6 +4464,12 @@ zabbix_export:
                     - type: STRING
                       name: group_by.0.tag_name
                       value: service
+                    - type: INTEGER
+                      name: group_by.1.attribute
+                      value: '3'
+                    - type: STRING
+                      name: group_by.1.tag_name
+                      value: resource-group
                     - type: STRING
                       name: items.0
                       value: 'Service ["*"]: Meter ["*"]: Subcategory ["*"] daily cost'
