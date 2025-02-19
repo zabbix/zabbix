@@ -22,17 +22,17 @@ class CControllerMiscConfigUpdate extends CController {
 			'discovery_groupid' =>				'required|setting discovery_groupid',
 			'default_inventory_mode' =>			'required|in '.HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC,
 			'alert_usrgrpid' =>					'setting alert_usrgrpid',
-			'snmptrap_logging' =>				'required|setting snmptrap_logging|in 0,1',
-			'login_attempts' =>					'required|setting login_attempts|ge 1|le 32',
-			'login_block' =>					'required|setting login_block|time_unit '.implode(':', [30, SEC_PER_HOUR]),
-			'validate_uri_schemes' =>			'required|setting validate_uri_schemes|in 0,1',
+			'snmptrap_logging' =>				'required|in 0,1',
+			'login_attempts' =>					'required|ge 1|le 32',
+			'login_block' =>					'required|time_unit '.implode(':', [30, SEC_PER_HOUR]),
+			'validate_uri_schemes' =>			'required|in 0,1',
 			'uri_valid_schemes' =>				'setting uri_valid_schemes',
 			'x_frame_header_enabled' =>			'required|in 0,1',
 			'x_frame_options' =>				'setting x_frame_options',
-			'iframe_sandboxing_enabled' =>		'required|setting iframe_sandboxing_enabled|in 0,1',
+			'iframe_sandboxing_enabled' =>		'required|in 0,1',
 			'iframe_sandboxing_exceptions' =>	'setting iframe_sandboxing_exceptions',
-			'vault_provider' =>					'setting vault_provider|in '.ZBX_VAULT_TYPE_HASHICORP.','.ZBX_VAULT_TYPE_CYBERARK,
-			'proxy_secrets_provider' =>			'setting proxy_secrets_provider|in '.ZBX_PROXY_SECRETS_PROVIDER_SERVER.','.ZBX_PROXY_SECRETS_PROVIDER_PROXY
+			'vault_provider' =>					'in '.ZBX_VAULT_TYPE_HASHICORP.','.ZBX_VAULT_TYPE_CYBERARK,
+			'proxy_secrets_provider' =>			'in '.ZBX_PROXY_SECRETS_PROVIDER_SERVER.','.ZBX_PROXY_SECRETS_PROVIDER_PROXY
 		];
 
 		$ret = $this->validateInput($fields);

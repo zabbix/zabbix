@@ -18,10 +18,10 @@ class CControllerAuditSettingsUpdate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'auditlog_enabled'	=> 'setting auditlog_enabled|in 1',
-			'auditlog_mode'		=> 'setting auditlog_mode|in 1',
-			'hk_audit_mode'		=> 'setting hk_audit_mode|in 1',
-			'hk_audit'			=> 'setting hk_audit|time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])
+			'auditlog_enabled'	=> 'in 1',
+			'auditlog_mode'		=> 'in 1',
+			'hk_audit_mode'		=> 'in 1',
+			'hk_audit'			=> 'time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])
 		];
 
 		$ret = $this->validateInput($fields);

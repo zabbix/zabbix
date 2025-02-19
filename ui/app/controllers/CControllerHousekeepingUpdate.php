@@ -18,24 +18,24 @@ class CControllerHousekeepingUpdate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'hk_trends'				=> 'setting hk_trends|time_unit 0,'.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
-			'hk_trends_global'		=> 'setting hk_trends_global|in 1',
+			'hk_trends'				=> 'time_unit 0,'.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
+			'hk_trends_global'		=> 'in 1',
 			'hk_trends_mode'		=> 'setting hk_trends_mode',
-			'hk_history'			=> 'setting hk_history|time_unit 0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]),
-			'hk_history_global'		=> 'setting hk_history_global|in 1',
+			'hk_history'			=> 'time_unit 0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]),
+			'hk_history_global'		=> 'in 1',
 			'hk_history_mode'		=> 'setting hk_history_mode',
-			'hk_sessions'			=> 'setting hk_sessions|time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
-			'hk_sessions_mode'		=> 'setting hk_sessions_mode|in 1',
-			'hk_services'			=> 'setting hk_services|time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
-			'hk_services_mode'		=> 'setting hk_services_mode|in 1',
-			'hk_events_autoreg'		=> 'setting hk_events_autoreg|time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
-			'hk_events_discovery'	=> 'setting hk_events_discovery|time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
-			'hk_events_internal'	=> 'setting hk_events_internal|time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
-			'hk_events_trigger'		=> 'setting hk_events_trigger|time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
-			'hk_events_service'		=> 'setting hk_events_service|time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
-			'hk_events_mode'		=> 'setting hk_events_mode|in 1',
-			'compression_status'	=> 'setting compression_status|in 1',
-			'compress_older'		=> 'setting compress_older|time_unit '.implode(':', [7 * SEC_PER_DAY, 25 * SEC_PER_YEAR])
+			'hk_sessions'			=> 'time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
+			'hk_sessions_mode'		=> 'in 1',
+			'hk_services'			=> 'time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
+			'hk_services_mode'		=> 'in 1',
+			'hk_events_autoreg'		=> 'time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
+			'hk_events_discovery'	=> 'time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
+			'hk_events_internal'	=> 'time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
+			'hk_events_trigger'		=> 'time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
+			'hk_events_service'		=> 'time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR]),
+			'hk_events_mode'		=> 'in 1',
+			'compression_status'	=> 'in 1',
+			'compress_older'		=> 'time_unit '.implode(':', [7 * SEC_PER_DAY, 25 * SEC_PER_YEAR])
 		];
 
 		$ret = $this->validateInput($fields);

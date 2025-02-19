@@ -32,7 +32,7 @@ class CControllerGuiEdit extends CController {
 	protected function checkInput() {
 		$fields = [
 			'default_lang' =>				'setting default_lang',
-			'default_timezone' =>			'setting default_timezone|in '.implode(',', array_keys($this->timezones)),
+			'default_timezone' =>			'in '.implode(',', array_keys($this->timezones)),
 			'default_theme' =>				'setting default_theme',
 			'search_limit' =>				'setting search_limit',
 			'max_overview_table_size' =>	'setting max_overview_table_size',

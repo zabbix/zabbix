@@ -21,18 +21,18 @@ class CControllerGuiUpdate extends CController {
 		$timezones = array_keys(CTimezoneHelper::getList());
 
 		$fields = [
-			'default_lang' =>				'setting default_lang|in '.implode(',', array_keys(getLocales())),
-			'default_timezone' =>			'required|in '.ZBX_DEFAULT_TIMEZONE.','.implode(',', $timezones).'|setting default_timezone',
-			'default_theme' =>				'required|setting default_theme|in '.implode(',', $themes),
-			'search_limit' =>				'required|setting search_limit|ge 1|le 999999',
-			'max_overview_table_size' =>	'required|setting max_overview_table_size|ge 5|le 999999',
-			'max_in_table' =>				'required|setting max_in_table|ge 1|le 99999',
-			'server_check_interval' =>		'required|setting server_check_interval|in 0,'.SERVER_CHECK_INTERVAL,
-			'work_period' =>				'required|setting work_period|time_periods',
-			'show_technical_errors' =>		'setting show_technical_errors|in 0,1',
-			'history_period' =>				'required|setting history_period|time_unit '.implode(':', [SEC_PER_DAY, 7 * SEC_PER_DAY]),
-			'period_default' =>				'required|setting period_default|time_unit_year '.implode(':', [SEC_PER_MIN, 10 * SEC_PER_YEAR]),
-			'max_period' =>					'required|setting max_period|time_unit_year '.implode(':', [SEC_PER_YEAR, 10 * SEC_PER_YEAR])
+			'default_lang' =>				'in '.implode(',', array_keys(getLocales())),
+			'default_timezone' =>			'required|in '.ZBX_DEFAULT_TIMEZONE.','.implode(',', $timezones),
+			'default_theme' =>				'required|in '.implode(',', $themes),
+			'search_limit' =>				'required|ge 1|le 999999',
+			'max_overview_table_size' =>	'required|ge 5|le 999999',
+			'max_in_table' =>				'required|ge 1|le 99999',
+			'server_check_interval' =>		'required|in 0,'.SERVER_CHECK_INTERVAL,
+			'work_period' =>				'required|time_periods',
+			'show_technical_errors' =>		'in 0,1',
+			'history_period' =>				'required|time_unit '.implode(':', [SEC_PER_DAY, 7 * SEC_PER_DAY]),
+			'period_default' =>				'required|time_unit_year '.implode(':', [SEC_PER_MIN, 10 * SEC_PER_YEAR]),
+			'max_period' =>					'required|time_unit_year '.implode(':', [SEC_PER_YEAR, 10 * SEC_PER_YEAR])
 		];
 
 		$ret = $this->validateInput($fields);

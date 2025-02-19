@@ -18,29 +18,29 @@ class CControllerTrigDisplayUpdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'custom_color' =>			'required|setting custom_color|in '.EVENT_CUSTOM_COLOR_DISABLED.','.EVENT_CUSTOM_COLOR_ENABLED,
-			'problem_unack_color' =>	'setting problem_unack_color|rgb',
-			'problem_ack_color' =>		'setting problem_ack_color|rgb',
-			'ok_unack_color' =>			'setting ok_unack_color|rgb',
-			'ok_ack_color' =>			'setting ok_ack_color|rgb',
-			'problem_unack_style' =>	'required|setting problem_unack_style|in 0,1',
-			'problem_ack_style' =>		'required|setting problem_ack_style|in 0,1',
-			'ok_unack_style' =>			'required|setting ok_unack_style|in 0,1',
-			'ok_ack_style' =>			'required|setting ok_ack_style|in 0,1',
-			'ok_period' =>				'required|setting ok_period|not_empty|time_unit '.implode(':', [0, SEC_PER_DAY]),
-			'blink_period' =>			'required|setting blink_period|not_empty|time_unit '.implode(':', [0, SEC_PER_DAY]),
+			'custom_color' =>			'required|in '.EVENT_CUSTOM_COLOR_DISABLED.','.EVENT_CUSTOM_COLOR_ENABLED,
+			'problem_unack_color' =>	'rgb',
+			'problem_ack_color' =>		'rgb',
+			'ok_unack_color' =>			'rgb',
+			'ok_ack_color' =>			'rgb',
+			'problem_unack_style' =>	'required|in 0,1',
+			'problem_ack_style' =>		'required|in 0,1',
+			'ok_unack_style' =>			'required|in 0,1',
+			'ok_ack_style' =>			'required|in 0,1',
+			'ok_period' =>				'required|not_empty|time_unit '.implode(':', [0, SEC_PER_DAY]),
+			'blink_period' =>			'required|not_empty|time_unit '.implode(':', [0, SEC_PER_DAY]),
 			'severity_name_0' =>		'required|setting severity_name_0|not_empty',
-			'severity_color_0' =>		'required|setting severity_color_0|rgb',
+			'severity_color_0' =>		'required|rgb',
 			'severity_name_1' =>		'required|setting severity_name_1|not_empty',
-			'severity_color_1' =>		'required|setting severity_color_1|rgb',
+			'severity_color_1' =>		'required|rgb',
 			'severity_name_2' =>		'required|setting severity_name_2|not_empty',
-			'severity_color_2' =>		'required|setting severity_color_2|rgb',
+			'severity_color_2' =>		'required|rgb',
 			'severity_name_3' =>		'required|setting severity_name_3|not_empty',
-			'severity_color_3' =>		'required|setting severity_color_3|rgb',
+			'severity_color_3' =>		'required|rgb',
 			'severity_name_4' =>		'required|setting severity_name_4|not_empty',
-			'severity_color_4' =>		'required|setting severity_color_4|rgb',
+			'severity_color_4' =>		'required|rgb',
 			'severity_name_5' =>		'required|setting severity_name_5|not_empty',
-			'severity_color_5' =>		'required|setting severity_color_5|rgb'
+			'severity_color_5' =>		'required|rgb'
 		];
 
 		$ret = $this->validateInput($fields);
