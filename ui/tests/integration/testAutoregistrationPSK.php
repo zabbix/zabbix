@@ -162,9 +162,6 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		$actionids = $response['result']['actionids'];
 		$this->assertCount(1, $actionids, 'Failed to create an autoregistration action');
 
-
-
-
 		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(1);
 
@@ -193,7 +190,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 		$expectedTags = ['tag' => 'PSK_TAG', 'value' => 'PSK_VALUE'];
 
-		$this->assertCount(count($expectedTags), $tags, 'Unexpected tags count was detected');
+		$this->assertCount(1, $tags, 'Unexpected tags count was detected: '. json_encode($tags));
 
 		$this->assertContains($expectedTags, $tags, json_encode($tags));
 
