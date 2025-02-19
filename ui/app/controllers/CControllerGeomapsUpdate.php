@@ -23,7 +23,7 @@ class CControllerGeomapsUpdate extends CController {
 		$fields = [
 			'geomaps_tile_provider'		=> 'required|setting geomaps_tile_provider',
 			'geomaps_tile_url'			=> 'required|not_empty|setting geomaps_tile_url',
-			'geomaps_max_zoom'			=> 'required|not_empty|ge 1|le '.ZBX_GEOMAP_MAX_ZOOM,
+			'geomaps_max_zoom'			=> 'required|ge 1|le '.ZBX_GEOMAP_MAX_ZOOM,
 			'geomaps_attribution'		=> 'setting geomaps_attribution'
 		];
 

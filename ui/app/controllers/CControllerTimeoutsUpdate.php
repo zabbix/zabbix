@@ -28,12 +28,12 @@ class CControllerTimeoutsUpdate extends CController {
 			'timeout_telnet_agent' =>		'required|not_empty|setting timeout_telnet_agent',
 			'timeout_script' =>				'required|not_empty|setting timeout_script',
 			'timeout_browser' =>			'required|not_empty|setting timeout_browser',
-			'socket_timeout' =>				'required|not_empty|time_unit 1:300',
-			'connect_timeout' =>			'required|not_empty|time_unit 1:30',
-			'media_type_test_timeout' =>	'required|not_empty|time_unit 1:300',
-			'script_timeout' =>				'required|not_empty|time_unit 1:300',
-			'item_test_timeout' =>			'required|not_empty|time_unit 1:600',
-			'report_test_timeout' =>		'required|not_empty|time_unit 1:300'
+			'socket_timeout' =>				'required|time_unit 1:300',
+			'connect_timeout' =>			'required|time_unit 1:30',
+			'media_type_test_timeout' =>	'required|time_unit 1:300',
+			'script_timeout' =>				'required|time_unit 1:300',
+			'item_test_timeout' =>			'required|time_unit 1:600',
+			'report_test_timeout' =>		'required|time_unit 1:300'
 		];
 
 		$ret = $this->validateInput($fields);
