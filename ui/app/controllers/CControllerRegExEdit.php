@@ -60,12 +60,12 @@ class CControllerRegExEdit extends CController {
 
 	protected function doAction() {
 		$regexp_default = [
-			'regexpid' => '0',
-			'name' => '',
-			'test_string' => '',
+			'regexpid' => DB::getDefault('regexps', 'regexpid'),
+			'name' => DB::getDefault('regexps', 'name'),
+			'test_string' => DB::getDefault('regexps', 'test_string'),
 			'expressions' => [[
-				'expression_type' => EXPRESSION_TYPE_INCLUDED,
-				'expression' => ''
+				'expression_type' => DB::getDefault('expressions', 'expression_type'),
+				'expression' => DB::getDefault('expressions', 'expression')
 			]]
 		];
 
