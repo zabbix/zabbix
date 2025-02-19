@@ -136,12 +136,64 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->stopComponent(self::COMPONENT_SERVER);
+
+
+		$response = $this->call('action.create', [
+		[
+			'name' => "action",
+			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
+			'status' => ACTION_STATUS_ENABLED,
+			'operations' => [
+				[
+					'operationtype' => OPERATION_TYPE_HOST_TAGS_ADD,
+					'optag' => [
+						[
+							'tag' => 'PSK_TAG',
+							'value' => 'PSK_VALUE'
+						],
+					]
+				],
+			]
+		],]);
+
+		$this->assertArrayHasKey('result', $response, 'Failed to create an autoregistration action');
+		$this->assertArrayHasKey('actionids', $response['result'],
+				'Failed to create an autoregistration action');
+		$actionids = $response['result']['actionids'];
+		$this->assertCount(1, $actionids, 'Failed to create an autoregistration action');
+
+
+
+
 		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(1);
 
 		$this->startComponent(self::COMPONENT_AGENT2);
-		#$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_autoreg_flush_hosts_server()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
+		#$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_autoreg_flush_hosts_server()', true, 120);
 		#$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'but different PSK values', true, 120);
+
+		$response = $this->call('host.get', [
+			'selectTags' => ['tag', 'value']
+		]);
+
+		$this->assertArrayHasKey('result', $response, 'Failed to autoregister host before timeout');
+		$this->assertCount(1, $response['result'], 'Failed to autoregister host before timeout, response result: '.
+			json_encode($response['result']));
+		$this->assertArrayHasKey('tags', $response['result'][0], 'Failed to autoregister host before timeout: response result: '.
+			json_encode($response['result']));
+
+		$autoregHost = $response['result'][0];
+		$this->assertArrayHasKey('hostid', $autoregHost, 'Failed to get host ID of the autoregistered host');
+
+		$tags = $autoregHost['tags'];
+		$this->assertCount(count($expectedTags), $tags, 'Unexpected tags count was detected');
+
+		$expected_tag = [
+			['tag' => 'PSK_TAG', 'value' => 'PSK_VALUE'],
+		];
+
+		$this->assertContains($expected_tag, $tags);
+
 	}
 }
