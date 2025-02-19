@@ -85,7 +85,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 				'TLSPSKFile' => self::PSK_FILE_LOWER_CASE,
 				'TLSConnect' => 'psk',
 				'TLSAccept' => 'psk',
-				'HostMetadata' => self::HOST_METADATA_PSK_UPPER_CASE
+				'HostMetadata' => self::HOST_METADATA_PSK_LOWER_CASE
 			],
 
 			self::COMPONENT_AGENT2 => [
@@ -95,7 +95,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 				'TLSPSKFile' => self::PSK_FILE_UPPER_CASE,
 				'TLSConnect' => 'psk',
 				'TLSAccept' => 'psk',
-				'HostMetadata' => self::HOST_METADATA_PSK_LOWER_CASE
+				'HostMetadata' => self::HOST_METADATA_PSK_UPPER_CASE
 			],
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 5,
@@ -140,7 +140,8 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		sleep(1);
 
 		$this->startComponent(self::COMPONENT_AGENT2);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
+		#$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_autoreg_flush_hosts_server()', true, 120);
 		#$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'but different PSK values', true, 120);
 	}
 }
