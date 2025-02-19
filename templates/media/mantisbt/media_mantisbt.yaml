@@ -42,6 +42,7 @@ zabbix_export:
           value: '{TRIGGER.ID}'
         - name: zabbix_url
           value: '{$ZABBIX.URL}'
+      status: DISABLED
       attempts: '1'
       script: |
         var Mantisbt = {
