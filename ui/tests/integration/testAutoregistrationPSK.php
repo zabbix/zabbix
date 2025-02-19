@@ -244,7 +244,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 		$expectedTags = ['tag' => 'PSK_TAG22', 'value' => 'PSK_VALUE22'];
 
-		$this->assertCount(1, $tags, 'Unexpected tags count was detected: '. json_encode($tags));
+		$this->assertCount(2, $tags, 'Unexpected tags count was detected: '. json_encode($tags));
 
 		$this->assertContains($expectedTags, $tags, json_encode($tags));
 	}
