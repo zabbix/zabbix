@@ -171,13 +171,13 @@ class testFormUserLdapMediaJit extends CWebTest {
 				' are not allowed.'
 		);
 
-		$media_table = $this->query('name:userprofile_notification_form')->asTable()->one();
+		$media_table = $this->query('id:userprofile-notification-form')->asTable()->one();
 
 		// Check that correct amount of media is provisioned.
 		$this->assertEquals(self::$provisioned_media_count, $media_table->getRows()->count());
 
 		// Check that count of media is correctly displayed in the tab.
-		$this->assertEquals(self::$provisioned_media_count, $this->query('name:userprofile_notification_form')
+		$this->assertEquals(self::$provisioned_media_count, $this->query('id:userprofile-notification-form')
 				->waitUntilVisible()->asForm()->one()->query('xpath:.//a[text()="Media"]')->one()
 				->getAttribute('data-indicator-value')
 		);
@@ -381,7 +381,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 		// Close the warning message, to not affect further message check.
 		$this->query('class:btn-overlay-close')->one()->click();
 
-		$form = $this->query('name:userprofile_notification_form')->waitUntilVisible()->asForm()->one();
+		$form = $this->query('id:userprofile-notification-form')->waitUntilVisible()->asForm()->one();
 		$media_field = $form->getField('Media')->asTable();
 		$row = $media_field->findRow('Type', $data['media']);
 		$row->getColumn('Actions')->query('button:Edit')->one()->click();
@@ -415,7 +415,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 			$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
 			$this->page->open('zabbix.php?action=userprofile.notification.edit');
 			$this->checkMediaConfiguration($data, $data['media'], PHPUNIT_LDAP_USERNAME,
-					'check_configuration', 'name:userprofile_notification_form'
+					'check_configuration', 'id:userprofile-notification-form'
 			);
 		}
 	}
@@ -448,7 +448,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
 		$this->page->open('zabbix.php?action=userprofile.notification.edit');
 
-		$form = $this->query('name:userprofile_notification_form')->waitUntilVisible()->asForm()->one();
+		$form = $this->query('id:userprofile-notification-form')->waitUntilVisible()->asForm()->one();
 
 		$this->query('button:Add')->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
@@ -476,7 +476,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$this->checkMediaConfiguration($data, $data['fields']['Type'], $data['fields']['Send to']);
 
 		// Check that media can be removed by LDAP provisioned user.
-		$media_field = $this->query('name:userprofile_notification_form')->waitUntilVisible()->asForm()->one()
+		$media_field = $this->query('id:userprofile-notification-form')->waitUntilVisible()->asForm()->one()
 				->getField('Media')->asTable()
 		;
 		$row = $media_field->findRow('Type', $data['fields']['Type']);
@@ -1205,11 +1205,11 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 		if ($data['provisioned'] === true) {
 			$this->checkMediaConfiguration($data['expected'], $data['mapping']['Media type'], PHPUNIT_LDAP_USERNAME,
-					'fields', 'name:userprofile_notification_form')
+					'fields', 'id:userprofile-notification-form')
 			;
 		}
 		else {
-			$this->assertFalse($this->query('name:userprofile_notification_form')->asTable()->one()
+			$this->assertFalse($this->query('id:userprofile-notification-form')->asTable()->one()
 					->findRow('Type', $data['mapping']['Media type'])->isPresent()
 			);
 		}
@@ -1221,7 +1221,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 		// Check that media type for deletion is present in user configuration.
 		$this->page->open('zabbix.php?action=userprofile.notification.edit')->waitUntilReady();
-		$this->assertTrue($this->query('name:userprofile_notification_form')->asTable()->one()
+		$this->assertTrue($this->query('id:userprofile-notification-form')->asTable()->one()
 				->findRow('Type', self::DELETE_MEDIA, true)->isPresent()
 		);
 		$this->page->logout();
