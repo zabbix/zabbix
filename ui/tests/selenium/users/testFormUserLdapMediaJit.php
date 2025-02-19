@@ -454,6 +454,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$media_form->fill(['Type' => $data['fields']['Type'], 'Send to' => $data['fields']['Send to']]);
 
 		$media_form->submit();
+		COverlayDialogElement::ensureNotPresent();
 		$form->query('button:Update')->one()->click();
 		$this->assertMessage(TEST_GOOD, 'User updated');
 
