@@ -45,11 +45,16 @@ $options_expression_type = CSelect::createOptionsFromArray(CRegexHelper::express
 
 foreach ($data['regexp']['expressions'] as $index => $expression) {
 	$table
-		->addRow(getExpressionEntryView($index, $expression['case_sensitive'],
-			$expression['expression_type'], $expression['expression'], $expression['exp_delimiter'], $options_delimiter,
-			$options_expression_type
-		))
-		->addRow(getExpressionEntryErrorView($index));
+		->addItem(new CPartial('administration.regex.entry', [
+			'index' => $index,
+			'case_sensitive' => $expression['case_sensitive'],
+			'type' => $expression['expression_type'],
+			'expression' => $expression['expression'],
+			'delimiter' => $expression['exp_delimiter'],
+			'options_delimiter' => $options_delimiter,
+			'options_expression_type' => $options_expression_type
+		]))
+		->addItem(new CPartial('administration.regex.entry.error', ['index' => $index]));
 }
 
 $table->addRow((new CRow((new CCol(
@@ -126,10 +131,16 @@ $tabs = (new CTabView())
 $form
 	->addItem($tabs)
 	->addItem((new CTemplateTag('row-expression-template'))
-		->addItem(getExpressionEntryView('#{index}', '0', '#{type}', '#{expression}', '#{delimiter}',
-			$options_delimiter, $options_expression_type
-		))
-		->addItem(getExpressionEntryErrorView('#{index}'))
+		->addItem(new CPartial('administration.regex.entry', [
+			'index' => '#{index}',
+			'case_sensitive' => '0',
+			'type' => '#{type}',
+			'expression' => '#{expression}',
+			'delimiter' => '#{delimiter}',
+			'options_delimiter' => $options_delimiter,
+			'options_expression_type' => $options_expression_type
+		]))
+		->addItem(new CPartial('administration.regex.entry.error', ['index' => '#{index}']))
 	)
 	->addItem((new CTemplateTag('combined-result-template'))
 		->addItem((new CRow())
@@ -156,56 +167,3 @@ $form
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ADMINISTRATION_REGEX_EDIT))
 	->addItem($form)
 	->show();
-
-function getExpressionEntryView(string $index, string $case_sensitive, string $type, string $expression,
-		string $delimiter, array $options_delimiter, array $options_expression_type): CRow {
-
-	return (new CRow())
-		->addItem((new CSelect('expressions['.$index.'][expression_type]'))
-			->setId('expressions_'.$index.'_expression_type')
-			->addClass('js-expression-type-select')
-			->addOptions($options_expression_type)
-			->setValue($type)
-			->setErrorContainer('expressions-'.$index.'-error-container')
-			->setErrorLabel(_('Expression type'))
-		)
-		->addItem((new CTextBox('expressions['.$index.'][expression]', $expression, false,
-			DB::getFieldLength('expressions', 'expression'))
-		)
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			->setAriaRequired()
-			->setErrorContainer('expressions-'.$index.'-error-container')
-			->setErrorLabel(_('Expression'))
-		)
-		->addItem((new CSelect('expressions['.$index.'][exp_delimiter]'))
-			->setValue($delimiter)
-			->setId('expressions_'.$index.'_exp_delimiter')
-			->addClass('js-expression-delimiter-select')
-			->addOptions($options_delimiter)
-			->addClass($type != EXPRESSION_TYPE_ANY_INCLUDED ? ZBX_STYLE_DISPLAY_NONE : null)
-			->setDisabled($type != EXPRESSION_TYPE_ANY_INCLUDED)
-			->setErrorContainer('expressions-'.$index.'-error-container')
-			->setErrorLabel(_('Delimiter'))
-		)
-		->addItem((new CCheckBox('expressions['.$index.'][case_sensitive]'))
-			->setChecked($case_sensitive == 1)
-			->setUncheckedValue('0')
-			->setErrorContainer('expressions-'.$index.'-error-container')
-			->setErrorLabel(_('Case sensitive'))
-		)
-		->addItem((new CCol())
-			->addClass(ZBX_STYLE_NOWRAP)
-			->addItem((new CButton('remove', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-				->removeId()
-			)
-		);
-}
-
-function getExpressionEntryErrorView(string $index): CRow {
-	return (new CRow())->addItem((new CCol())
-		->setId('expressions-'.$index.'-error-container')
-		->addClass(ZBX_STYLE_ERROR_CONTAINER)
-		->setAttribute('colspan', 5));
-}
