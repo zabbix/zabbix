@@ -239,10 +239,10 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User group updated');
 				$this->zbxTestCheckTitle('Configuration of user groups');
 				$this->zbxTestCheckHeader('User groups');
 				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot update user group']);
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User group updated');
 				$sql = "SELECT usrgrpid FROM usrgrp WHERE name='".$data['name']."'";
 				$this->assertEquals(1, CDBHelper::getCount($sql));
 

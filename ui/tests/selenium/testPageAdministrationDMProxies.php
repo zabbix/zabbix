@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 class testPageAdministrationDMProxies extends CLegacyWebTest {
 
@@ -30,6 +31,15 @@ class testPageAdministrationDMProxies extends CLegacyWebTest {
 	private $oldHashHosts = '';
 	private $sqlHashDRules = '';
 	private $oldHashDRules = '';
+
+	/**
+	 * Attach Behaviors to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
 
 	private function calculateHash($proxy_hostid) {
 		$this->sqlHashProxy = 'SELECT * FROM hosts WHERE hostid='.$proxy_hostid;
@@ -79,8 +89,9 @@ class testPageAdministrationDMProxies extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=proxy.list');
 		$this->zbxTestClickLinkText($proxy['host']);
 		$this->zbxTestClickButtonText('Update');
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Proxy updated');
 		$this->zbxTestCheckTitle('Configuration of proxies');
-		$this->zbxTestTextPresent('Proxy updated');
 		$this->zbxTestTextPresent($proxy['host']);
 
 		$this->verifyHash();

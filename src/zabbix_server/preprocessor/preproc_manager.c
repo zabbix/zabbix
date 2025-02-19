@@ -490,7 +490,7 @@ static void	*preprocessor_get_next_task(zbx_preprocessing_manager_t *manager, zb
 				if (0 == preprocessor_create_dep_message(manager,
 						(zbx_preprocessing_dep_request_t *)base))
 				{
-					base->state = REQUEST_STATE_DONE;
+					preprocessor_set_request_state_done(manager, base, iterator.current);
 					continue;
 				}
 				(void)preprocessor_dep_request_next_message((zbx_preprocessing_dep_request_t *)base,

@@ -224,7 +224,7 @@ class testPageHostGroups extends CWebTest {
 		$this->assertTrue($filter->isExpanded());
 		foreach ([false, true] as $state) {
 			$filter->expand($state);
-			// Leave the page and reopen the previous page to make sure the filter state is still saved..
+			// Leave the page and reopen the previous page to make sure the filter state is still saved.
 			$this->page->open('zabbix.php?action=report.status')->waitUntilReady();
 			$this->page->open(self::LINK)->waitUntilReady();
 			$this->assertTrue($filter->isExpanded($state));
