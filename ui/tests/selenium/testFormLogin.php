@@ -168,7 +168,7 @@ class testFormLogin extends CWebTest {
 	 **/
 	public function testFormLogin_LoginWithRequest() {
 		foreach (['index.php?request=zabbix.php%3Faction%3Dhost.list', 'index.php?request=zabbix.php%3Faction%3Dproxy.list'] as $url) {
-			$this->page->userLogin('Admin', 'zabbix', $url);
+			$this->page->userLogin('Admin', 'zabbix', TEST_GOOD, $url);
 			$header = ($url === 'index.php?request=zabbix.php%3Faction%3Dhost.list') ? 'Hosts' : 'Proxies';
 			$this->page->assertHeader($header);
 		}
