@@ -10,7 +10,7 @@ You can extend it or create your own template to cater specific needs.
 ## Requirements
 
 * Zabbix Agent 2
-* Go >= 1.18 (required only to build from source)
+* Go >= 1.21 (required only to build from source)
 * Oracle Instant Client >= 12
 
 ## Supported versions
@@ -306,6 +306,10 @@ WHERE
 ``` 
 
     oracle.custom.query[<commonParams>,payment,"John Doe",1,"10/25/2020"]
+
+### Notes:
+ * Returned data is automatically converted into JSON.
+ * Avoid returning JSON directly from queries, as it will become corrupted when the plugin attempts to convert it into JSON again.
 
 ## Current limitations
 

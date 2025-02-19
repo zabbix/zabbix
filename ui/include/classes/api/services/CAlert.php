@@ -175,7 +175,7 @@ class CAlert extends CApiService {
 				'SELECT NULL'.
 				' FROM users_groups ug'.
 				' WHERE ug.userid=a.userid'.
-					' AND '.dbConditionInt('ug.usrgrpid', getUserGroupsByUserId(self::$userData['userid'])).
+					' AND '.dbConditionId('ug.usrgrpid', getUserGroupsByUserId(self::$userData['userid'])).
 			'))';
 		}
 

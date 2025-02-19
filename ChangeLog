@@ -1,13 +1,54 @@
-Changes for 6.0.38rc1
+Changes for 6.0.39rc1
 
 New features:
+........S. [ZBXNEXT-9771] updated maximum supported TimescaleDB version to 2.18 (mprihodko)
+.........T [ZBXNEXT-9584] added improvements and fixes to Dell HTTP and SNMP templates (abrosimovs, knaglis)
+.........T [ZBXNEXT-9654] added Azure SQL Managed Instance by HTTP template (abrosimovs)
 
 Bug fixes:
+A.F.....S. [ZBX-23760] fixed ability to enable disabled action with invalid custom formula due to missing action conditions (agriscenko, dgoloscapov)
+A......... [ZBX-18432] fixed inability to view certain problems and events by users with specific permissions on tags when permissions on all tags are given to specific host group (dpankins)
+A......... [ZBX-26023] restored ability for users to get all alerts within same user group (jfreibergs)
+...G...... [ZBX-25962] fixed incorrect serialization of complex objects leading to crashes in wmi.getall (dgoloscapov)
+...G...... [ZBX-21205] added information about JSON in oracle.custom.query response (sjurgensons)
+...G...... [ZBX-23750] added README to Zabbix agent 2 Smart plugin (sjurgensons)
+.........T [ZBX-26024] removed event name from configuration change trigger in Redis by Zabbix agent 2 template (drasikhov)
+.......PS. [ZBX-25994] fixed value cache filling up if trigger is disabled (vso)
+...G...... [ZBX-25236] corrected MQTT message handler not to block (sjurgensons)
+.......PS. [ZBX-25867] fixed crash in preprocessing manager when unlinking dependent items from frequently collected master item (vso)
+...G...... [ZBX-25543] fixed crash when global regular expression is updated on Zabbix agent 2 (vso)
+.......PS. [ZBX-22580] reduced nodata trigger false positives after Zabbix proxy connection disruption (arimdjonoks)
+.........T [ZBX-25458] fixed LLD rule for organization discovery; changed host prototype Host field to avoid special characters (abiba)
+.........T [ZBX-25504] updated quorum and quorum member discoveries for family of MSSQL templates (akotsegubov)
+...G...... [ZBX-25442] fixed Zabbix agent interpretation of Modbus result data for mixed endianness modes (asestakovs)
+...G...... [ZBX-25530] fixed Zabbix agent 2 startup failures caused by insufficient buffer size for performance counters (asestakovs)
+...G...... [ZBX-25382] applied pkgsrc patch to restore builds on NetBSD >= 8.2 (jxl)
+...G...... [ZBX-22522] fixed web.page.get curl header (sboidenko)
+.........T [ZBX-25601] fixed HTTP proxy parameter name in Microsoft 365 reports by HTTP template (drasikhov)
+..F....... [ZBX-25666] fixed maintenance status display for submap elements when trigger elements are used (esekace)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.38
+
+6.0.38rc1 was released as 6.0.38 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.38rc1
+
+Bug fixes:
+..F....... [ZBX-25466] removed title from item mass update preprocessing steps checkbox (dpankins)
+..F....... [ZBX-25535] fixed overriding Y-axes in Graph widget (dpankins)
+...G...... [ZBX-24672] replaced collector interface with runner interface in Zabbix agent 2 perfmon plugin (asestakovs)
+...G...... [ZBX-25439] added MariaDB specific info to MySQL plugin Readme (sjurgensons)
+A......... [ZBX-24690] fixed YAML generation in compact nested mapping mode (gcalenko)
+...G...... [ZBX-25443] updated Go version requirement to 1.21 (esneiders)
+..F....... [ZBX-22979] added focus traps to popups SLA edit and Service edit (rgontarski)
+.......P.. [ZBX-25782] fixed Zabbix proxy failing to create database on RHEL (dgoloscapov)
 ...G...... [ZBX-25460] fixed inconsistent report of free disk space by Zabbix agent 2 in response to vfs.fs.get on Windows (mprihodko)
 ...G...PS. [ZBX-25296] removed overzealous preprocessor tests for LIBRESSL_VERSION_NUMBER (jxl)
 .......PS. [ZBX-25373] fixed possibility to insert duplicate triggers via LLD (dgoloscapov)
 ....I..... [ZBX-22307] fixed automake templates producing broken Makefiles on OpenBSD (jxl)
-..F.....S. [ZBX-24916] fixed date/time calculation for numeric (unsigned) item values with unixtime units after the year 2038 (dfofanovs, sboidenko)
+..F.....S. [ZBX-24916] fixed date/time calculation for numeric (unsigned) item values with unix time units after the year 2038 (dfofanovs, sboidenko)
 ........S. [ZBX-25363] fixed connector error spam to log (sboidenko)
 ..F....... [ZBX-25206] removed padding in Geomap widget (apoga)
 ........S. [ZBX-23103] fixed parsing of JSONPath containing dollar sign (arimdjonoks)
@@ -3365,9 +3406,20 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
-Changes for 5.0.46rc1
+Changes for 5.0.47rc1
 
 New features:
+
+Bug fixes:
+A......... [ZBX-26023] restored ability for users to get all alerts within same user group (jfreibergs)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.46
+
+5.0.46rc1 was released as 5.0.46 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.46rc1
 
 Bug fixes:
 ...G...PS. [ZBX-25296] removed overzealous preprocessor tests for LIBRESSL_VERSION_NUMBER (jxl)
