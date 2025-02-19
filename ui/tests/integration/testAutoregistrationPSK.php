@@ -174,7 +174,10 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		#$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'but different PSK values', true, 120);
 
 		$response = $this->call('host.get', [
-			'selectTags' => ['PSK_TAG', 'PSK_VALUE']
+			'filter' => [
+				'host' => self::PSK_HOSTNAME
+				],
+			'selectTags' => ['tag', 'value']
 		]);
 
 		$this->assertArrayHasKey('result', $response, 'Failed to autoregister host before timeout');
