@@ -137,19 +137,14 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		$timestamp = time();
 
 		// Resolve one of existing problems to create a recent problem.
-		$triggerids = CDBHelper::getColumn('SELECT triggerid FROM triggers WHERE description IN ('.
-				zbx_dbstr(self::$resolved_trigger).', '.zbx_dbstr(self::$dependency_trigger).')', 'triggerid'
-		);
-		DBexecute('UPDATE triggers SET value=0 WHERE triggerid='.zbx_dbstr($triggerids[0]));
-		DBexecute('UPDATE triggers SET lastchange='.zbx_dbstr($timestamp).' WHERE triggerid='.zbx_dbstr($triggerids[0]));
-		DBexecute('UPDATE problem SET r_eventid=9001 WHERE objectid='.zbx_dbstr($triggerids[0]));
-		DBexecute('UPDATE problem SET r_clock='.zbx_dbstr($timestamp).' WHERE objectid='.zbx_dbstr($triggerids[0]));
+		CDBHelper::setTriggerProblem(self::$resolved_trigger, TRIGGER_VALUE_FALSE, ['clock' => $timestamp]);
+		$triggerid = CDBHelper::getValue('SELECT triggerid FROM triggers WHERE description='.zbx_dbstr(self::$dependency_trigger));
 
 		// Change the resolved triggers blinking period as the default value is too small for this test.
 		CDataHelper::call('settings.update', ['blink_period' => '5m']);
 
 		// Enable the trigger that other triggers depend on.
-		CDataHelper::call('trigger.update', [['triggerid' => $triggerids[1], 'status' => 0]]);
+		CDataHelper::call('trigger.update', [['triggerid' => $triggerid, 'status' => TRIGGER_STATUS_ENABLED]]);
 
 		// Delete some hosts and problems from previous tests and data source, not to interfere this test.
 		$rows = CDBHelper::getAll('SELECT * FROM hosts WHERE host='.zbx_dbstr('Host for tag permissions'));
