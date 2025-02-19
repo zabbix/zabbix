@@ -56,6 +56,10 @@ $table->addRow((new CRow((new CCol(
 	(new CButton('add', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)->removeId()
 ))->setColSpan(5)))->setId('expression-list-footer'));
 
+$cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
+	->setArgument('action', 'regex.list')
+))->setId('cancel');
+
 $tabs = (new CTabView())
 	->addTab('expr', _('Expressions'), (new CFormGrid())
 		->addItem((new CLabel(_('Name'), 'name'))->setAsteriskMark())
@@ -113,15 +117,9 @@ $tabs = (new CTabView())
 					->setArgument(CSRF_TOKEN_NAME, $csrf_token),
 				_('Delete regular expression?')
 			))->setId('delete'),
-			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
-				->setArgument('action', 'regex.list')
-			))->setId('cancel')
+			$cancel_button
 		])
-		: makeFormFooter(new CSubmit('add', _('Add')), [
-			(new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
-				->setArgument('action', 'regex.list')
-			))->setId('cancel')
-		])
+		: makeFormFooter(new CSubmit('add', _('Add')), [$cancel_button])
 	)
 	->setSelected(0);
 
