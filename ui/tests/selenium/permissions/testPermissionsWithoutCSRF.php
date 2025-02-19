@@ -147,7 +147,11 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM hosts',
 					'link' => 'zabbix.php?action=host.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:host' => 'CSRF validation host create',
+						'xpath://div[@id="groups_"]/..' => 'Zabbix servers'
+					]
 				]
 			],
 			// #9 Host update.
@@ -156,7 +160,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'db' => 'SELECT * FROM hosts',
 					'link' => 'zabbix.php?action=popup&popup=host.edit&hostid=99062',
 					'fields' => [
-						'id:host' => 'CSRF validation host',
+						'id:host' => 'CSRF validation host update',
 						'xpath://div[@id="groups_"]/..' => 'Zabbix servers'
 					]
 				]
