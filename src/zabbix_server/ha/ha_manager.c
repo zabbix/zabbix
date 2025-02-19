@@ -1429,7 +1429,8 @@ static void	ha_set_failover_delay(zbx_ha_info_t *info, zbx_ipc_client_t *client,
 	memcpy(&delay, message->data, sizeof(delay));
 
 	if (NULL != (row = zbx_db_fetch(result)) &&
-		SUCCEED == ha_db_execute(info, "update settings set value_str='%ds' where name='ha_failover_delay'", delay))
+		SUCCEED == ha_db_execute(info, "update settings set value_str='%ds' where name='ha_failover_delay'",
+		delay))
 	{
 #define DELAY_STR_BUFSZ		32
 		char	delay_str[DELAY_STR_BUFSZ] = {0};
