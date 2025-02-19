@@ -29,7 +29,7 @@ class CControllerRegExUpdate extends CController {
 			'name' => ['db regexps.name', 'required', 'not_empty'],
 			'test_string' => ['db regexps.test_string'],
 			'expressions' => ['objects', 'required', 'not_empty', 'uniq' => [['expression_type', 'expression']],
-				'messages' => ['not_empty' => _('At least one expression must me added.')], 'fields' => [
+				'messages' => ['not_empty' => _('At least one expression must be added.')], 'fields' => [
 					'expression_type' => ['db expressions.expression_type', 'required',
 						'in' => [EXPRESSION_TYPE_INCLUDED, EXPRESSION_TYPE_ANY_INCLUDED, EXPRESSION_TYPE_NOT_INCLUDED,
 							EXPRESSION_TYPE_TRUE, EXPRESSION_TYPE_FALSE
