@@ -35,7 +35,7 @@ static int	xml_traverse_elements(xmlNode *node, zbx_xml_resolv_func_t resolver, 
 
 				va_copy(pargs, args); /* copy current argument position */
 
-				ret = resolver(&value_tmp, NULL, 0, args);
+				ret = resolver(&value_tmp, NULL, 0, pargs);
 
 				va_end(pargs);
 
