@@ -1,25 +1,19 @@
 zabbix_export:
   version: '7.0'
   media_types:
-    -
-      name: Telegram
+    - name: Telegram
       type: WEBHOOK
       parameters:
-        -
-          name: Message
+        - name: Message
           value: '{ALERT.MESSAGE}'
-        -
-          name: ParseMode
-          value: ''
-        -
-          name: Subject
+        - name: ParseMode
+        - name: Subject
           value: '{ALERT.SUBJECT}'
-        -
-          name: To
+        - name: To
           value: '{ALERT.SENDTO}'
-        -
-          name: Token
+        - name: Token
           value: '<PLACE YOUR TOKEN>'
+      status: DISABLED
       script: |
         var Telegram = {
             token: null,
@@ -35,7 +29,7 @@ zabbix_export:
         
                     case 'markdownv2':
                         return str.replace(/([_*\[\]()~`>#+\-=|{}.!])/g, '\\$&');
-
+        
                     case 'html':
                         return str.replace(/<(\s|[^a-z\/])/g, '&lt;$1');
         
@@ -141,8 +135,7 @@ zabbix_export:
             4.3. Copy returned group id save it in the "Telegram Webhook" media for the user you created for  group notifications
             4.4. Send "/start@your_bot_name_here" in your group (Telegram bot won't send anything to the group without it)
       message_templates:
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: PROBLEM
           subject: 'Problem: {EVENT.NAME}'
           message: |
@@ -153,8 +146,7 @@ zabbix_export:
             Operational data: {EVENT.OPDATA}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: RECOVERY
           subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
           message: |
@@ -164,8 +156,7 @@ zabbix_export:
             Severity: {EVENT.SEVERITY}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: UPDATE
           subject: 'Updated problem: {EVENT.NAME}'
           message: |
@@ -173,8 +164,7 @@ zabbix_export:
             {EVENT.UPDATE.MESSAGE}
             
             Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
-        -
-          event_source: DISCOVERY
+        - event_source: DISCOVERY
           operation_mode: PROBLEM
           subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
           message: |
@@ -189,8 +179,7 @@ zabbix_export:
             Device service port: {DISCOVERY.SERVICE.PORT}
             Device service status: {DISCOVERY.SERVICE.STATUS}
             Device service uptime: {DISCOVERY.SERVICE.UPTIME}
-        -
-          event_source: AUTOREGISTRATION
+        - event_source: AUTOREGISTRATION
           operation_mode: PROBLEM
           subject: 'Autoregistration: {HOST.HOST}'
           message: |

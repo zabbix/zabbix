@@ -57,6 +57,8 @@
 #	define ZBX_ROW_DL	";\n"
 #endif
 
+#define ZBX_MAX_IDS	950
+
 ZBX_PTR_VECTOR_IMPL(db_event, zbx_db_event *)
 ZBX_PTR_VECTOR_IMPL(events_ptr, zbx_event_t *)
 ZBX_PTR_VECTOR_IMPL(escalation_new_ptr, zbx_escalation_new_t *)
@@ -2293,10 +2295,9 @@ void	zbx_db_select_uint64(const char *sql, zbx_vector_uint64_t *ids)
 	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
-int	zbx_db_prepare_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids, char **sql,
-		size_t	*sql_alloc, size_t *sql_offset)
+static int	db_prepare_multiple_query(const char *query, const char *field_name, const zbx_vector_uint64_t *ids,
+		char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
-#define ZBX_MAX_IDS	950
 	int	i, ret = SUCCEED;
 
 	for (i = 0; i < ids->values_num; i += ZBX_MAX_IDS)
@@ -2313,7 +2314,45 @@ int	zbx_db_prepare_multiple_query(const char *query, const char *field_name, zbx
 	return ret;
 }
 
-int	zbx_db_execute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids)
+static int	db_prepare_multiple_query_str(const char *query, const char *field_name, const zbx_vector_uint64_t *ids,
+		char **sql, size_t *sql_alloc, size_t *sql_offset)
+{
+	int			i, j, ret = SUCCEED;
+	zbx_vector_str_t	str_ids;
+
+	zbx_vector_str_create(&str_ids);
+
+	for (i = 0; i < ids->values_num; i += ZBX_MAX_IDS)
+	{
+		int	batch_size = MIN(ZBX_MAX_IDS, ids->values_num - i);
+
+		for (j = i; j < i + batch_size; j++)
+			zbx_vector_str_append(&str_ids, zbx_dsprintf(NULL, ZBX_FS_UI64, ids->values[j]));
+
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, query);
+		zbx_db_add_str_condition_alloc(sql, sql_alloc, sql_offset, field_name, (const char**)str_ids.values,
+				batch_size);
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
+
+		zbx_vector_str_clear_ext(&str_ids, zbx_str_free);
+
+		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset)))
+			break;
+	}
+
+	zbx_vector_str_destroy(&str_ids);
+
+	return ret;
+}
+
+int	zbx_db_prepare_multiple_query(const char *query, const char *field_name, const zbx_vector_uint64_t *ids,
+		char **sql, size_t *sql_alloc, size_t *sql_offset)
+{
+	return db_prepare_multiple_query(query, field_name, ids, sql, sql_alloc, sql_offset);
+}
+
+static int	db_execute_multiple_query(const char *query, const char *field_name, const zbx_vector_uint64_t *ids,
+		int as_str)
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
@@ -2323,7 +2362,12 @@ int	zbx_db_execute_multiple_query(const char *query, const char *field_name, zbx
 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	ret = zbx_db_prepare_multiple_query(query, field_name, ids, &sql, &sql_alloc, &sql_offset);
+	if (1 == as_str)
+	{
+		ret = db_prepare_multiple_query_str(query, field_name, ids, &sql, &sql_alloc, &sql_offset);
+	}
+	else
+		ret = db_prepare_multiple_query(query, field_name, ids, &sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && sql_offset > 16)	/* in ORACLE always present begin..end; */
 	{
@@ -2336,6 +2380,16 @@ int	zbx_db_execute_multiple_query(const char *query, const char *field_name, zbx
 	zbx_free(sql);
 
 	return ret;
+}
+
+int	zbx_db_execute_multiple_query(const char *query, const char *field_name, const zbx_vector_uint64_t *ids)
+{
+	return db_execute_multiple_query(query, field_name, ids, 0);
+}
+
+int	zbx_db_execute_multiple_query_str(const char *query, const char *field_name, const zbx_vector_uint64_t *ids)
+{
+	return db_execute_multiple_query(query, field_name, ids, 1);
 }
 
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
@@ -3788,3 +3842,5 @@ clean:
 	return ret;
 }
 #endif /* defined(HAVE_ORACLE) */
+
+#undef ZBX_MAX_IDS

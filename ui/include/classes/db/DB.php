@@ -966,7 +966,7 @@ class DB {
 	 *
 	 * @return string
 	 */
-	public static function uppercaseField(string $field_name, string $table_name, string $table_alias = null): string {
+	public static function uppercaseField(string $field_name, string $table_name, ?string $table_alias = null): string {
 		if ($table_alias === null) {
 			$table_alias = $table_name;
 		}

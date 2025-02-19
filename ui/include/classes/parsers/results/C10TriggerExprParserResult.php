@@ -75,7 +75,7 @@ class C10TriggerExprParserResult extends CParserResult {
 	 * @param string        $length     length of the token
 	 * @param array|null    $data       additional token information
 	 */
-	public function addToken($type, $value, $pos, $length, array $data = null) {
+	public function addToken($type, $value, $pos, $length, ?array $data = null) {
 		$this->tokens[] = [
 			'type' => $type,
 			'value' => $value,

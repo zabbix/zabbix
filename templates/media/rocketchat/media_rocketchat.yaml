@@ -1,85 +1,60 @@
 zabbix_export:
   version: '7.0'
   media_types:
-    -
-      name: Rocket.Chat
+    - name: Rocket.Chat
       type: WEBHOOK
       parameters:
-        -
-          name: alert_message
+        - name: alert_message
           value: '{ALERT.MESSAGE}'
-        -
-          name: alert_subject
+        - name: alert_subject
           value: '{ALERT.SUBJECT}'
-        -
-          name: event_nseverity
+        - name: event_nseverity
           value: '{EVENT.NSEVERITY}'
-        -
-          name: event_source
+        - name: event_source
           value: '{EVENT.SOURCE}'
-        -
-          name: event_update_action
+        - name: event_update_action
           value: '{EVENT.UPDATE.ACTION}'
-        -
-          name: event_update_message
+        - name: event_update_message
           value: '{EVENT.UPDATE.MESSAGE}'
-        -
-          name: event_update_status
+        - name: event_update_status
           value: '{EVENT.UPDATE.STATUS}'
-        -
-          name: event_update_user
+        - name: event_update_user
           value: '{USER.FULLNAME}'
-        -
-          name: event_value
+        - name: event_value
           value: '{EVENT.VALUE}'
-        -
-          name: 'field_1_full:Host'
+        - name: 'field_1_full:Host'
           value: '{HOST.NAME} [{HOST.IP}]'
-        -
-          name: 'field_2_short:Severity'
+        - name: 'field_2_short:Severity'
           value: '{EVENT.SEVERITY}'
-        -
-          name: 'field_3_short:Event time'
+        - name: 'field_3_short:Event time'
           value: '{EVENT.DATE} {EVENT.TIME}'
-        -
-          name: 'field_3_short_r:Recovery time'
+        - name: 'field_3_short_r:Recovery time'
           value: '{EVENT.RECOVERY.DATE} {EVENT.RECOVERY.TIME}'
-        -
-          name: 'field_4_short_r:Event duration'
+        - name: 'field_4_short_r:Event duration'
           value: '{EVENT.DURATION}'
-        -
-          name: 'field_5_short:Operational data'
+        - name: 'field_5_short:Operational data'
           value: '{EVENT.OPDATA}'
-        -
-          name: 'field_999_full_p:Trigger description'
+        - name: 'field_999_full_p:Trigger description'
           value: '{TRIGGER.DESCRIPTION}'
-        -
-          name: rc_api_url
+        - name: rc_api_url
           value: api/v1/
-        -
-          name: rc_msg_id
+        - name: rc_msg_id
           value: '{EVENT.TAGS.__zbx_rc_id}'
-        -
-          name: rc_room_id
+        - name: rc_room_id
           value: '{EVENT.TAGS.__zbx_rc_rid}'
-        -
-          name: rc_send_to
+        - name: rc_send_to
           value: '{ALERT.SENDTO}'
-        -
-          name: rc_title_link
+        - name: rc_title_link
           value: '{$ZABBIX.URL}/tr_events.php?triggerid={TRIGGER.ID}&eventid={EVENT.ID}'
-        -
-          name: rc_url
+        - name: rc_url
           value: '<PLACE YOUR INSTANCE URL HERE>'
-        -
-          name: rc_user_id
+        - name: rc_user_id
           value: '<PLACE USER ID HERE>'
-        -
-          name: rc_user_token
+        - name: rc_user_token
           value: '<PLACE TOKEN HERE>'
-        -
-          name: use_default_message
+        - name: use_default_message
           value: 'false'
+      status: DISABLED
       script: |
         var RocketChat = {
             params: {},
@@ -409,8 +384,7 @@ zabbix_export:
       event_menu_url: '{EVENT.TAGS.__zbx_rc_msg_url}'
       event_menu_name: Rocket.Chat
       message_templates:
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: PROBLEM
           subject: '[{EVENT.STATUS}] {EVENT.NAME}'
           message: |
@@ -421,8 +395,7 @@ zabbix_export:
             Operational data: {EVENT.OPDATA}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: RECOVERY
           subject: '[{EVENT.STATUS}] {EVENT.NAME}'
           message: |
@@ -432,8 +405,7 @@ zabbix_export:
             Severity: {EVENT.SEVERITY}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: UPDATE
           subject: '[{EVENT.STATUS}] {EVENT.NAME}'
           message: |
@@ -441,8 +413,7 @@ zabbix_export:
             {EVENT.UPDATE.MESSAGE}
             
             Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
-        -
-          event_source: DISCOVERY
+        - event_source: DISCOVERY
           operation_mode: PROBLEM
           subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
           message: |
@@ -457,8 +428,7 @@ zabbix_export:
             Device service port: {DISCOVERY.SERVICE.PORT}
             Device service status: {DISCOVERY.SERVICE.STATUS}
             Device service uptime: {DISCOVERY.SERVICE.UPTIME}
-        -
-          event_source: AUTOREGISTRATION
+        - event_source: AUTOREGISTRATION
           operation_mode: PROBLEM
           subject: 'Autoregistration: {HOST.HOST}'
           message: |

@@ -49,7 +49,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 
 	private array $time_period_fields = [];
 
-	public function __construct(string $name, string $label = null) {
+	public function __construct(string $name, ?string $label = null) {
 		parent::__construct($name, $label);
 
 		$this->setDefault(self::DEFAULT_VALUE);
