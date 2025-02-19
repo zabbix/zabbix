@@ -190,13 +190,14 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		$this->assertArrayHasKey('hostid', $autoregHost, 'Failed to get host ID of the autoregistered host');
 
 		$tags = $autoregHost['tags'];
-		$this->assertCount(count($expectedTags), $tags, 'Unexpected tags count was detected');
 
-		$expected_tag = [
+		$expectedTags = [
 			['tag' => 'PSK_TAG', 'value' => 'PSK_VALUE'],
 		];
 
-		$this->assertContains($expected_tag, $tags);
+		$this->assertCount(count($expectedTags), $tags, 'Unexpected tags count was detected');
+
+		$this->assertContains($expectedTags, $tags);
 
 	}
 }
