@@ -26,6 +26,7 @@ import (
 	"golang.zabbix.com/agent2/pkg/itemutil"
 	"golang.zabbix.com/agent2/pkg/zbxlib"
 	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
 )
@@ -33,8 +34,7 @@ import (
 var impl Plugin
 
 type Options struct {
-	plugin.SystemOptions `conf:"optional,name=System"`
-	MaxLinesPerSecond    int `conf:"range=1:1000,default=20"`
+	MaxLinesPerSecond int `conf:"range=1:1000,default=20"`
 }
 
 // Plugin -
@@ -63,15 +63,23 @@ func init() {
 }
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-	if err := conf.Unmarshal(options, &p.options); err != nil {
+	err := conf.UnmarshalStrict(options, &p.options)
+	if err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
 	}
+
 	zbxlib.SetEventlogMaxLinesPerSecond(p.options.MaxLinesPerSecond)
 }
 
 func (p *Plugin) Validate(options interface{}) error {
 	var o Options
-	return conf.Unmarshal(options, &o, false)
+
+	err := conf.Unmarshal(options, &o)
+	if err != nil {
+		return errs.Wrap(err, "plugin config validation failed")
+	}
+
+	return nil
 }
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
@@ -125,6 +133,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 	grxp := ctx.GlobalRegexp().(*glexpr.Bundle)
 	zbxlib.ProcessEventLogCheck(data.blob, &logitem, nextcheck, grxp.Cblob, isCountItem)
+	runtime.KeepAlive(grxp)
 
 	if len(logitem.Results) != 0 {
 		results := make([]plugin.Result, len(logitem.Results))

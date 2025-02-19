@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-10-20 11:03+0000\n"
+"PO-Revision-Date: 2025-01-11 16:35+0000\n"
 "Last-Translator: NoYoWiFi <1284524409@qq.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -1268,7 +1268,7 @@ msgstr "所有"
 #: app/views/mediatype.list.php:79 app/views/mediatype.list.php:81
 #: app/views/mediatype.list.php:90 app/views/popup.operation.edit.php:160
 msgid "All available"
-msgstr ""
+msgstr "全部可用"
 
 #: app/views/monitoring.dashboard.view.php:189
 msgid "All dashboards"
@@ -2652,11 +2652,21 @@ msgstr "无法删除默认 MFA 方法。"
 msgid "Cannot delete default user directory."
 msgstr "无法删除默认用户目录"
 
+#: include/classes/api/services/CDRule.php:773
+#, c-format
+msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "无法删除自动发现规则"
+
+#: include/classes/api/services/CDRule.php:980
+#, c-format
+msgid "Cannot delete discovery rule \"%1$s\": %2$s."
+msgstr ""
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2678,6 +2688,11 @@ msgid "Cannot delete host"
 msgid_plural "Cannot delete hosts"
 msgstr[0] "无法删除主机"
 
+#: include/classes/api/services/CHost.php:1636
+#, c-format
+msgid "Cannot delete host \"%1$s\": %2$s."
+msgstr ""
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2688,6 +2703,11 @@ msgstr[0] "无法删除主机 %1$s 因为维护 \"%2$s\" 必须包含至少一�
 msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
 msgstr[0] "无法删除主机组"
+
+#: include/classes/api/services/CHostGroup.php:769
+#, c-format
+msgid "Cannot delete host group \"%1$s\": %2$s."
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2816,6 +2836,11 @@ msgid "Cannot delete template"
 msgid_plural "Cannot delete templates"
 msgstr[0] "无法删除模板"
 
+#: include/classes/api/services/CTemplate.php:809
+#, c-format
+msgid "Cannot delete template \"%1$s\": %2$s."
+msgstr ""
+
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
@@ -2849,6 +2874,11 @@ msgid "Cannot delete trigger"
 msgid_plural "Cannot delete triggers"
 msgstr[0] "无法删除触发器"
 
+#: include/classes/api/managers/CTriggerManager.php:126
+#, c-format
+msgid "Cannot delete trigger \"%1$s\": %2$s."
+msgstr ""
+
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
 msgid_plural "Cannot delete trigger prototypes"
@@ -2872,12 +2902,12 @@ msgstr[0] "无法删除用户组"
 #: include/classes/api/services/CUserGroup.php:1340
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
-msgstr ""
+msgstr "无法删除用户组 \"%1$s\", 因为它正被LDAP用户目录 \"%2$s\" 使用。"
 
 #: include/classes/api/services/CUserGroup.php:1335
 #, c-format
 msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
-msgstr ""
+msgstr "无法删除用户组 \"%1$s\", 因为它正被SAML用户目录使用。"
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
@@ -6500,6 +6530,22 @@ msgstr "删除 web 场景？"
 msgid "Deleted"
 msgstr "已删除"
 
+#: include/actions.inc.php:143
+msgid "Deleted host"
+msgstr ""
+
+#: include/actions.inc.php:125
+msgid "Deleted host group"
+msgstr ""
+
+#: include/actions.inc.php:710
+msgid "Deleted host group(s)"
+msgstr ""
+
+#: include/actions.inc.php:134
+msgid "Deleted trigger"
+msgstr ""
+
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
 msgstr "分隔符"
@@ -7110,7 +7156,7 @@ msgstr "显示OK触发器予"
 
 #: app/views/mediatype.list.php:75
 msgid "Display actions"
-msgstr ""
+msgstr "显示操作"
 
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
@@ -7119,6 +7165,10 @@ msgstr "显示图表"
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
 msgstr "显示本地时间"
+
+#: widgets/itemhistory/views/column.edit.php:240
+msgid "Display log time"
+msgstr ""
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -8439,7 +8489,7 @@ msgstr "条件检索"
 
 #: app/views/mediatype.list.php:76
 msgid "Filter actions by the scope of media type usage:"
-msgstr ""
+msgstr "按媒体类型使用范围筛选操作:"
 
 #: app/views/js/popup.tabfilter.edit.js.php:63
 msgid "Filter deleted"
@@ -9276,6 +9326,10 @@ msgstr "选择历史数据"
 #: app/views/popup.triggerexpr.php:129
 msgid "History functions"
 msgstr "历史数据函数"
+
+#: app/views/administration.housekeeping.edit.php:218
+msgid "History, trends and audit log compression"
+msgstr ""
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -13152,7 +13206,7 @@ msgstr "媒体类型 \"%1$s\" 已经存在。"
 #: include/classes/api/services/CMediatype.php:927
 #, c-format
 msgid "Media type \"%1$s\" is used by action \"%2$s\"."
-msgstr ""
+msgstr "媒体类型 \"%1$s\" 使用了 \"%2$s\" 操作."
 
 #: app/controllers/CControllerMediatypeCreate.php:187
 msgid "Media type added"
@@ -17607,6 +17661,11 @@ msgstr "在 Zabbix 服务器上运行脚本\"%1$s\""
 msgid "Run script \"%1$s\" on current host"
 msgstr "在当前主机上运行脚本“%1$s”"
 
+#: include/actions.inc.php:601
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr ""
+
 #: include/actions.inc.php:622
 #, c-format
 msgid "Run script \"%1$s\" on host groups"
@@ -18334,7 +18393,7 @@ msgstr "发回"
 
 #: app/views/popup.operation.edit.php:189
 msgid "Send to media type"
-msgstr ""
+msgstr "发送至媒体类型"
 
 #: app/views/popup.operation.edit.php:108
 msgid "Send to user groups"
@@ -19091,7 +19150,7 @@ msgstr "西班牙语 (es_ES)"
 
 #: app/views/mediatype.list.php:83 app/views/mediatype.list.php:91
 msgid "Specific"
-msgstr ""
+msgstr "具体的"
 
 #: include/classes/helpers/CRoleHelper.php:199
 msgid "Specified role was not found."
@@ -20235,6 +20294,14 @@ msgstr "主题"
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "这些参数将按指定顺序作为命令行参数传递给脚本。"
 
+#: app/views/action.list.php:156
+msgid "This action has conditions or operations referencing deleted object(s)."
+msgstr ""
+
+#: app/views/action.list.php:151
+msgid "This action has missing conditions or operations due to previously deleted object(s)."
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
@@ -20283,6 +20350,10 @@ msgstr "应启用此设置，因为趋势表包含压缩块。"
 #: widgets/itemhistory/views/column.edit.php:242
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
 msgstr "此设置将显示本地时间而不是时间戳。在高级配置中也必须选中\"显示时间戳\"."
+
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -22468,7 +22539,7 @@ msgstr "VMware 虚拟机电源状态，“url”-VMware 服务 URL，“uuid”-
 
 #: include/classes/data/CItemData.php:2490
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机私有内存大小, <url> - VMware 服务 URL, <uuid> - VMware 虚拟机全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
@@ -23714,6 +23785,41 @@ msgstr "abs() - 绝对值"
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() - 以角度表示的值的反余弦值，以弧度表示"
 
+#: include/classes/api/services/CDRule.php:774
+#, c-format
+msgid "action \"%1$s\" uses this discovery check"
+msgstr ""
+
+#: include/classes/api/services/CDRule.php:981
+#, c-format
+msgid "action \"%1$s\" uses this discovery rule"
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1637
+#, c-format
+msgid "action \"%1$s\" uses this host"
+msgstr ""
+
+#: include/classes/api/services/CHostGroup.php:770
+#, c-format
+msgid "action \"%1$s\" uses this host group"
+msgstr ""
+
+#: include/classes/api/services/CService.php:487
+#, c-format
+msgid "action \"%1$s\" uses this service"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:810
+#, c-format
+msgid "action \"%1$s\" uses this template"
+msgstr ""
+
+#: include/classes/api/managers/CTriggerManager.php:127
+#, c-format
+msgid "action \"%1$s\" uses this trigger"
+msgstr ""
+
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144
 msgid "affects only filtered data"
@@ -24370,15 +24476,15 @@ msgstr "主机“%2$s”上的自动发现规则“%1$s”不受监控"
 
 #: app/views/mediatype.list.php:78
 msgid "display all actions"
-msgstr ""
+msgstr "显示所有操作"
 
 #: app/views/mediatype.list.php:80
 msgid "display only actions where All available media types are used in action operation"
-msgstr ""
+msgstr "仅显示在操作运行中使用了所有可用媒体类型的操作。"
 
 #: app/views/mediatype.list.php:84
 msgid "display only actions where specific media type is used in action operation"
-msgstr ""
+msgstr "仅显示在操作运行中使用了特定媒体类型的操作。"
 
 #: app/views/popup.lldoperation.php:65 include/actions.inc.php:27
 #: include/classes/helpers/CCorrelationHelper.php:37

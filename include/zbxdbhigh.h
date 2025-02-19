@@ -664,9 +664,10 @@ int	zbx_db_index_exists(const char *table_name, const char *index_name);
 int	zbx_db_pk_exists(const char *table_name);
 #endif
 
-int	zbx_db_prepare_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids, char **sql,
-		size_t	*sql_alloc, size_t *sql_offset);
-int	zbx_db_execute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids);
+int	zbx_db_prepare_multiple_query(const char *query, const char *field_name, const zbx_vector_uint64_t *ids,
+		char **sql, size_t *sql_alloc, size_t *sql_offset);
+int	zbx_db_execute_multiple_query(const char *query, const char *field_name, const zbx_vector_uint64_t *ids);
+int	zbx_db_execute_multiple_query_str(const char *query, const char *field_name, const zbx_vector_uint64_t *ids);
 int	zbx_db_lock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx_uint64_t add_id);
 int	zbx_db_lock_records(const char *table, const zbx_vector_uint64_t *ids);
 int	zbx_db_lock_ids(const char *table_name, const char *field_name, zbx_vector_uint64_t *ids);
@@ -903,9 +904,6 @@ void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, ch
 int	zbx_db_check_version_info(struct zbx_db_version_info_t *info, int allow_unsupported,
 		unsigned char program_type);
 void	zbx_db_version_info_clear(struct zbx_db_version_info_t *version_info);
-
-#define ZBX_MAX_HRECORDS	1000
-#define ZBX_MAX_HRECORDS_TOTAL	10000
 
 #define ZBX_PROXY_DATA_DONE	0
 #define ZBX_PROXY_DATA_MORE	1

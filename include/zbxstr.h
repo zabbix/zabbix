@@ -55,7 +55,7 @@ void	zbx_strsplit_last(const char *src, char delimiter, char **left, char **righ
 /* secure string copy */
 #define zbx_strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
 #define zbx_strscat(x, y)	zbx_strlcat(x, y, sizeof(x))
-void	zbx_strlcat(char *dst, const char *src, size_t siz);
+void	zbx_strlcat(char *dst, const char *src, size_t size);
 size_t	zbx_strlcpy_utf8(char *dst, const char *src, size_t size);
 
 char	*zbx_strdcat(char *dest, const char *src);

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-01-05 19:27+0000\n"
+"PO-Revision-Date: 2025-02-09 22:13+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -2683,12 +2683,22 @@ msgstr "No se puede eliminar el método MFA predeterminado."
 msgid "Cannot delete default user directory."
 msgstr "No se puede borrar el directorio del usuario por defecto."
 
+#: include/classes/api/services/CDRule.php:773
+#, c-format
+msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "No es posible eliminar la regla de descubrimiento"
 msgstr[1] "No es posible eliminar las reglas de descubrimiento"
+
+#: include/classes/api/services/CDRule.php:980
+#, c-format
+msgid "Cannot delete discovery rule \"%1$s\": %2$s."
+msgstr ""
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2714,6 +2724,11 @@ msgid_plural "Cannot delete hosts"
 msgstr[0] "No se puede eliminar el equipo"
 msgstr[1] "No se pueden eliminar los equipos"
 
+#: include/classes/api/services/CHost.php:1636
+#, c-format
+msgid "Cannot delete host \"%1$s\": %2$s."
+msgstr ""
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2726,6 +2741,11 @@ msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
 msgstr[0] "No se puede eliminar el grupo de equipos"
 msgstr[1] "No se pueden eliminar los grupos de equipos"
+
+#: include/classes/api/services/CHostGroup.php:769
+#, c-format
+msgid "Cannot delete host group \"%1$s\": %2$s."
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2869,6 +2889,11 @@ msgid_plural "Cannot delete templates"
 msgstr[0] "No se puede eliminar la plantilla"
 msgstr[1] "No se pueden eliminar las plantillas"
 
+#: include/classes/api/services/CTemplate.php:809
+#, c-format
+msgid "Cannot delete template \"%1$s\": %2$s."
+msgstr ""
+
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
@@ -2903,6 +2928,11 @@ msgid "Cannot delete trigger"
 msgid_plural "Cannot delete triggers"
 msgstr[0] "No se puede eliminar el iniciador"
 msgstr[1] "No se pueden eliminar los iniciadores"
+
+#: include/classes/api/managers/CTriggerManager.php:126
+#, c-format
+msgid "Cannot delete trigger \"%1$s\": %2$s."
+msgstr ""
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
@@ -6607,6 +6637,22 @@ msgstr "¿Desea eliminar el escenario web?"
 msgid "Deleted"
 msgstr "Eliminado"
 
+#: include/actions.inc.php:143
+msgid "Deleted host"
+msgstr ""
+
+#: include/actions.inc.php:125
+msgid "Deleted host group"
+msgstr ""
+
+#: include/actions.inc.php:710
+msgid "Deleted host group(s)"
+msgstr ""
+
+#: include/actions.inc.php:134
+msgid "Deleted trigger"
+msgstr ""
+
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
 msgstr "Delimitador"
@@ -7229,6 +7275,10 @@ msgstr "Mostrar gráfica"
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
 msgstr "Mostrar hora local"
+
+#: widgets/itemhistory/views/column.edit.php:240
+msgid "Display log time"
+msgstr "Mostrar el tiempo de registro"
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -9393,6 +9443,10 @@ msgstr "Selección de datos históricos"
 #: app/views/popup.triggerexpr.php:129
 msgid "History functions"
 msgstr "Funciones de historia"
+
+#: app/views/administration.housekeeping.edit.php:218
+msgid "History, trends and audit log compression"
+msgstr "Historial, tendencias y compresión de registros de auditoría"
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -17762,6 +17816,11 @@ msgstr "Ejecutar el comando \"%1$s\" en el servidor Zabbix"
 msgid "Run script \"%1$s\" on current host"
 msgstr "Ejecutar el comando \"%1$s\" en el equipo actual"
 
+#: include/actions.inc.php:601
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr ""
+
 #: include/actions.inc.php:622
 #, c-format
 msgid "Run script \"%1$s\" on host groups"
@@ -20403,6 +20462,14 @@ msgstr "Tema"
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "Estos parámetros se pasarán al script como argumentos de línea de comandos en el orden especificado."
 
+#: app/views/action.list.php:156
+msgid "This action has conditions or operations referencing deleted object(s)."
+msgstr ""
+
+#: app/views/action.list.php:151
+msgid "This action has missing conditions or operations due to previously deleted object(s)."
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
@@ -20452,6 +20519,10 @@ msgstr "Esta configuración debe estar habilitada porque las tablas de tendencia
 #: widgets/itemhistory/views/column.edit.php:242
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
 msgstr "Esta configuración mostrará la hora local en lugar de la marca de tiempo. También se debe marcar \"Mostrar marca de tiempo\" en la configuración avanzada."
+
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr "Esta configuración mostrará la hora del registro en lugar de la marca de tiempo de la métrica. La opción \"Mostrar marca de tiempo\" también debe estar marcada en la configuración avanzada."
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -23898,6 +23969,41 @@ msgstr "abs() - Valor absoluto"
 #: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() - El arcocoseno de un valor como ángulo, expresado en radianes"
+
+#: include/classes/api/services/CDRule.php:774
+#, c-format
+msgid "action \"%1$s\" uses this discovery check"
+msgstr ""
+
+#: include/classes/api/services/CDRule.php:981
+#, c-format
+msgid "action \"%1$s\" uses this discovery rule"
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1637
+#, c-format
+msgid "action \"%1$s\" uses this host"
+msgstr ""
+
+#: include/classes/api/services/CHostGroup.php:770
+#, c-format
+msgid "action \"%1$s\" uses this host group"
+msgstr ""
+
+#: include/classes/api/services/CService.php:487
+#, c-format
+msgid "action \"%1$s\" uses this service"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:810
+#, c-format
+msgid "action \"%1$s\" uses this template"
+msgstr ""
+
+#: include/classes/api/managers/CTriggerManager.php:127
+#, c-format
+msgid "action \"%1$s\" uses this trigger"
+msgstr ""
 
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144

@@ -16,7 +16,7 @@
 
 class CButtonIcon extends CSimpleButton {
 
-	public function __construct(string $icon_class, string $title = null) {
+	public function __construct(string $icon_class, ?string $title = null) {
 		parent::__construct();
 
 		$this
