@@ -215,10 +215,10 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		],]);
 
 
-		$this->killComponent(self::COMPONENT_AGENT);
+		$this->killComponent(self::COMPONENT_AGENT2);
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_SERVER);
-		$this->startComponent(self::COMPONENT_AGENT2);
+		$this->startComponent(self::COMPONENT_AGENT);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
 
