@@ -1,67 +1,48 @@
 zabbix_export:
   version: '7.0'
   media_types:
-    -
-      name: OTRS CE
+    - name: 'OTRS CE'
       type: WEBHOOK
       parameters:
-        -
-          name: alert_message
+        - name: alert_message
           value: '{ALERT.MESSAGE}'
-        -
-          name: alert_subject
+        - name: alert_subject
           value: '{ALERT.SUBJECT}'
-        -
-          name: event_id
+        - name: event_id
           value: '{EVENT.ID}'
-        -
-          name: event_nseverity
+        - name: event_nseverity
           value: '{EVENT.NSEVERITY}'
-        -
-          name: event_source
+        - name: event_source
           value: '{EVENT.SOURCE}'
-        -
-          name: event_update_message
+        - name: event_update_message
           value: '{EVENT.UPDATE.MESSAGE}'
-        -
-          name: event_update_status
+        - name: event_update_status
           value: '{EVENT.UPDATE.STATUS}'
-        -
-          name: event_value
+        - name: event_value
           value: '{EVENT.VALUE}'
-        -
-          name: otrs_auth_password
+        - name: otrs_auth_password
           value: '<PUT YOUR USER PASSWORD>'
-        -
-          name: otrs_auth_user
+        - name: otrs_auth_user
           value: '<PUT YOUR USER NAME>'
-        -
-          name: otrs_customer
+        - name: otrs_customer
           value: '<PUT YOUR CUSTOMER EMAIL>'
-        -
-          name: otrs_default_priority_id
+        - name: otrs_default_priority_id
           value: '3'
-        -
-          name: otrs_queue
+        - name: otrs_queue
           value: '<PUT YOUR QUEUE NAME>'
-        -
-          name: otrs_ticket_id
+        - name: otrs_ticket_id
           value: '{EVENT.TAGS.__zbx_otrs_ticket_id}'
-        -
-          name: otrs_ticket_state
+        - name: otrs_ticket_state
           value: new
-        -
-          name: otrs_time_unit
+        - name: otrs_time_unit
           value: '0'
-        -
-          name: otrs_url
+        - name: otrs_url
           value: '<PUT YOUR ((OTRS)) CE URL>'
-        -
-          name: trigger_id
+        - name: trigger_id
           value: '{TRIGGER.ID}'
-        -
-          name: zabbix_url
+        - name: zabbix_url
           value: '{$ZABBIX.URL}'
+      status: DISABLED
       script: |
         var OTRS = {
             params: {},
@@ -339,8 +320,7 @@ zabbix_export:
       event_menu_url: '{EVENT.TAGS.__zbx_otrs_ticketlink}'
       event_menu_name: '((OTRS)) CE: ticket #{EVENT.TAGS.__zbx_otrs_ticket_id}'
       message_templates:
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: PROBLEM
           subject: 'Problem: {EVENT.NAME}'
           message: |
@@ -351,8 +331,7 @@ zabbix_export:
             Operational data: {EVENT.OPDATA}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: RECOVERY
           subject: 'Resolved: {EVENT.NAME}'
           message: |
@@ -362,8 +341,7 @@ zabbix_export:
             Severity: {EVENT.SEVERITY}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
-        -
-          event_source: TRIGGERS
+        - event_source: TRIGGERS
           operation_mode: UPDATE
           subject: 'Updated problem: {EVENT.NAME}'
           message: |
@@ -371,8 +349,7 @@ zabbix_export:
             {EVENT.UPDATE.MESSAGE}
             
             Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
-        -
-          event_source: DISCOVERY
+        - event_source: DISCOVERY
           operation_mode: PROBLEM
           subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
           message: |
@@ -387,8 +364,7 @@ zabbix_export:
             Device service port: {DISCOVERY.SERVICE.PORT}
             Device service status: {DISCOVERY.SERVICE.STATUS}
             Device service uptime: {DISCOVERY.SERVICE.UPTIME}
-        -
-          event_source: AUTOREGISTRATION
+        - event_source: AUTOREGISTRATION
           operation_mode: PROBLEM
           subject: 'Autoregistration: {HOST.HOST}'
           message: |

@@ -391,7 +391,7 @@ function getSystemStatusTotals(array $data) {
  *
  * @return CTableInfo
  */
-function makeSeverityTable(array $data, $hide_empty_groups = false, CUrl $groupurl = null) {
+function makeSeverityTable(array $data, $hide_empty_groups = false, ?CUrl $groupurl = null) {
 	$table = new CTableInfo();
 
 	foreach ($data['data']['groups'] as $group) {

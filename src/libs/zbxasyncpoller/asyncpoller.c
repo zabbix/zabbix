@@ -33,6 +33,7 @@ typedef struct
 	char				*error;
 	struct evdns_base		*dnsbase;
 	struct evutil_addrinfo		*ai;
+	struct evutil_addrinfo		*current_ai;
 	char				*address;
 }
 zbx_async_task_t;
@@ -85,7 +86,8 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	ret = task->process_cb(what, task->data, &fd, task->address, task->error, task->timeout_event);
+	ret = task->process_cb(what, task->data, &fd, &task->current_ai, task->address, task->error,
+			task->timeout_event);
 
 	switch (ret)
 	{
@@ -203,6 +205,7 @@ static void	async_dns_event(int err, struct evutil_addrinfo *ai, void *arg)
 			ip[0] = '\0';
 
 		task->ai = ai;
+		task->current_ai = ai;
 		task->address = zbx_strdup(task->address, ip);
 		evtimer_add(task->timeout_event, &tv);
 		async_event(-1, 0, task);
@@ -228,15 +231,15 @@ void	zbx_async_dns_update_host_addresses(struct evdns_base *dnsbase)
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() update host addresses", __func__);
 
-#if defined(LIBEVENT_VERSION_NUMBER) && LIBEVENT_VERSION_NUMBER >= 0x02010600
-			evdns_base_clear_host_addresses(dnsbase);
-#endif
+			evdns_base_clear_nameservers_and_suspend(dnsbase);
 
 			if (0 != (ret = evdns_base_resolv_conf_parse(dnsbase, DNS_OPTIONS_ALL, ZBX_RES_CONF_FILE)))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "cannot parse resolv.conf result: %s",
 					zbx_resolv_conf_errstr(ret));
 			}
+
+			evdns_base_resume(dnsbase);
 		}
 		time_r = buf_r.st_mtime;
 		time_h = buf_h.st_mtime;
@@ -262,6 +265,7 @@ void	zbx_async_poller_add_task(struct event_base *ev, struct evdns_base *dnsbase
 	task->error = NULL;
 	task->dnsbase = dnsbase;
 	task->ai = NULL;
+	task->current_ai = NULL;
 	task->address = NULL;
 
 	memset(&hints, 0, sizeof(hints));
