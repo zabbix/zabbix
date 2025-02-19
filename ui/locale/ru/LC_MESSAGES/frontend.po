@@ -2717,6 +2717,11 @@ msgstr "Невозможно удалить MFA метод по умолчани
 msgid "Cannot delete default user directory."
 msgstr "Не получилось удалить каталог пользователя по умолчанию."
 
+#: include/classes/api/services/CDRule.php:773
+#, c-format
+msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
 msgid "Cannot delete discovery rule"
@@ -2724,6 +2729,11 @@ msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Не удалось удалить правило обнаружения"
 msgstr[1] "Не удалось удалить правила обнаружения"
 msgstr[2] "Не удалось удалить правила обнаружения"
+
+#: include/classes/api/services/CDRule.php:980
+#, c-format
+msgid "Cannot delete discovery rule \"%1$s\": %2$s."
+msgstr ""
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2753,6 +2763,11 @@ msgstr[0] "Не удалось удалить узел сети"
 msgstr[1] "Не удалось удалить узелы сети"
 msgstr[2] "Не удалось удалить узелы сети"
 
+#: include/classes/api/services/CHost.php:1636
+#, c-format
+msgid "Cannot delete host \"%1$s\": %2$s."
+msgstr ""
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2767,6 +2782,11 @@ msgid_plural "Cannot delete host groups"
 msgstr[0] "Не удалось удалить группу узлов сети"
 msgstr[1] "Не удалось удалить группы узлов сети"
 msgstr[2] "Не удалось удалить групп узлов сети"
+
+#: include/classes/api/services/CHostGroup.php:769
+#, c-format
+msgid "Cannot delete host group \"%1$s\": %2$s."
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2925,6 +2945,11 @@ msgstr[0] "Не удалось удалить шаблон"
 msgstr[1] "Не удалось удалить шаблоны"
 msgstr[2] "Не удалось удалить шаблоны"
 
+#: include/classes/api/services/CTemplate.php:809
+#, c-format
+msgid "Cannot delete template \"%1$s\": %2$s."
+msgstr ""
+
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
@@ -2961,6 +2986,11 @@ msgid_plural "Cannot delete triggers"
 msgstr[0] "Не удалось удалить триггер"
 msgstr[1] "Не удалось удалить триггеры"
 msgstr[2] "Не удалось удалить триггеры"
+
+#: include/classes/api/managers/CTriggerManager.php:126
+#, c-format
+msgid "Cannot delete trigger \"%1$s\": %2$s."
+msgstr ""
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
@@ -6716,6 +6746,22 @@ msgstr "Удалить веб-сценарий?"
 #: app/controllers/CControllerAuditLogList.php:382
 msgid "Deleted"
 msgstr "Удалено"
+
+#: include/actions.inc.php:143
+msgid "Deleted host"
+msgstr ""
+
+#: include/actions.inc.php:125
+msgid "Deleted host group"
+msgstr ""
+
+#: include/actions.inc.php:710
+msgid "Deleted host group(s)"
+msgstr ""
+
+#: include/actions.inc.php:134
+msgid "Deleted trigger"
+msgstr ""
 
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
@@ -17928,6 +17974,11 @@ msgstr "Выполнение скрипта \"%1$s\" на Zabbix сервере"
 msgid "Run script \"%1$s\" on current host"
 msgstr "Выполнение скрипта \"%1$s\" на текущем узле сети"
 
+#: include/actions.inc.php:601
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr ""
+
 #: include/actions.inc.php:622
 #, c-format
 msgid "Run script \"%1$s\" on host groups"
@@ -20581,6 +20632,14 @@ msgstr "Тема"
 #: app/views/mediatype.edit.php:189 app/views/mediatype.test.edit.php:48
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "Эти параметры будут переданы в скрипт аргументами командной строки в указанном порядке."
+
+#: app/views/action.list.php:156
+msgid "This action has conditions or operations referencing deleted object(s)."
+msgstr ""
+
+#: app/views/action.list.php:151
+msgid "This action has missing conditions or operations due to previously deleted object(s)."
+msgstr ""
 
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
@@ -24098,6 +24157,41 @@ msgstr "abs() - Абсолютное значение"
 #: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() - Арккосинус значения в виде угла, в радианах."
+
+#: include/classes/api/services/CDRule.php:774
+#, c-format
+msgid "action \"%1$s\" uses this discovery check"
+msgstr ""
+
+#: include/classes/api/services/CDRule.php:981
+#, c-format
+msgid "action \"%1$s\" uses this discovery rule"
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1637
+#, c-format
+msgid "action \"%1$s\" uses this host"
+msgstr ""
+
+#: include/classes/api/services/CHostGroup.php:770
+#, c-format
+msgid "action \"%1$s\" uses this host group"
+msgstr ""
+
+#: include/classes/api/services/CService.php:487
+#, c-format
+msgid "action \"%1$s\" uses this service"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:810
+#, c-format
+msgid "action \"%1$s\" uses this template"
+msgstr ""
+
+#: include/classes/api/managers/CTriggerManager.php:127
+#, c-format
+msgid "action \"%1$s\" uses this trigger"
+msgstr ""
 
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144

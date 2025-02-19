@@ -575,7 +575,7 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @throws APIException
 	 */
-	protected function validateUpdate(array &$hosts, array &$db_hosts = null): void {
+	protected function validateUpdate(array &$hosts, ?array &$db_hosts = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['hostid']], 'fields' => [
 			'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 			'groupPrototypes' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['group_prototypeid']], 'fields' => [
@@ -1068,7 +1068,7 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkDuplicates(array $hosts, array $db_hosts = null, bool $inherited = false): void {
+	private static function checkDuplicates(array $hosts, ?array $db_hosts = null, bool $inherited = false): void {
 		$h_names = [];
 		$v_names = [];
 
@@ -1210,7 +1210,7 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkUuidDuplicates(array $hosts, array $db_hosts = null): void {
+	private static function checkUuidDuplicates(array $hosts, ?array $db_hosts = null): void {
 		$host_indexes = [];
 
 		foreach ($hosts as $i => $host) {
@@ -1251,7 +1251,7 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkDiscoveryRules(array $hosts, array &$db_lld_rules = null): void {
+	private static function checkDiscoveryRules(array $hosts, ?array &$db_lld_rules = null): void {
 		$ruleids = array_unique(array_column($hosts, 'ruleid'));
 
 		$count = API::DiscoveryRule()->get([
@@ -1324,7 +1324,7 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkGroupLinks(array $hosts, array $db_hosts = null): void {
+	private static function checkGroupLinks(array $hosts, ?array $db_hosts = null): void {
 		$edit_groupids = [];
 
 		foreach ($hosts as $host) {
@@ -1439,7 +1439,7 @@ class CHostPrototype extends CHostBase {
 	 * @param array|null $db_hosts
 	 * @param array|null $upd_hostids
 	 */
-	private static function updateInterfaces(array &$hosts, array &$db_hosts = null, array &$upd_hostids = null): void {
+	private static function updateInterfaces(array &$hosts, ?array &$db_hosts = null, ?array &$upd_hostids = null): void {
 		$ins_interfaces = [];
 		$del_interfaceids = [];
 
@@ -1583,7 +1583,7 @@ class CHostPrototype extends CHostBase {
 	 * @param array|null $db_hosts
 	 * @param array|null $upd_hostids
 	 */
-	private static function updateGroupLinks(array &$hosts, array &$db_hosts = null, array &$upd_hostids = null): void {
+	private static function updateGroupLinks(array &$hosts, ?array &$db_hosts = null, ?array &$upd_hostids = null): void {
 		$ins_group_links = [];
 		$upd_group_links = []; // Used to update templateid value upon inheritance.
 		$del_group_prototypeids = [];
@@ -1672,8 +1672,8 @@ class CHostPrototype extends CHostBase {
 	 * @param array|null $db_hosts
 	 * @param array|null $upd_hostids
 	 */
-	private static function updateGroupPrototypes(array &$hosts, array &$db_hosts = null,
-			array &$upd_hostids = null): void {
+	private static function updateGroupPrototypes(array &$hosts, ?array &$db_hosts = null,
+			?array &$upd_hostids = null): void {
 		$ins_group_prototypes = [];
 		$upd_group_prototypes = []; // Used to update templateid value upon inheritance.
 		$del_group_prototypeids = [];
@@ -1757,8 +1757,8 @@ class CHostPrototype extends CHostBase {
 	 * @param array|null $db_hosts
 	 * @param array|null $upd_hostids
 	 */
-	private static function updateHostInventories(array $hosts, array $db_hosts = null,
-			array &$upd_hostids = null): void {
+	private static function updateHostInventories(array $hosts, ?array $db_hosts = null,
+			?array &$upd_hostids = null): void {
 		$ins_inventories = [];
 		$upd_inventories = [];
 		$del_hostids = [];
@@ -1932,7 +1932,7 @@ class CHostPrototype extends CHostBase {
 	 * @param array      $db_hosts
 	 * @param array|null $lld_links
 	 */
-	private function inherit(array $hosts, array $db_hosts = [], array $lld_links = null): void {
+	private function inherit(array $hosts, array $db_hosts = [], ?array $lld_links = null): void {
 		if ($lld_links === null) {
 			$lld_links = self::getLldLinks(array_unique(array_column($hosts, 'ruleid')));
 
@@ -1960,7 +1960,7 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @param array
 	 */
-	private static function getLldLinks(array $ruleids, array $hostids = null): array {
+	private static function getLldLinks(array $ruleids, ?array $hostids = null): array {
 		$hostids_condition = $hostids !== null
 			? ' AND '.dbConditionId('i.hostid', $hostids)
 			: '';
@@ -2355,8 +2355,8 @@ class CHostPrototype extends CHostBase {
 	 * @param array|null $inh_db_host
 	 * @param array|null $db_host
 	 */
-	private static function addInheritedFields(array &$inh_host, array $host, array $inh_db_host = null,
-			array $db_host = null): void {
+	private static function addInheritedFields(array &$inh_host, array $host, ?array $inh_db_host = null,
+			?array $db_host = null): void {
 		$inh_host += array_intersect_key($host,
 			array_flip(['host', 'name', 'custom_interfaces', 'status', 'discover', 'inventory_mode'])
 		);
@@ -2473,7 +2473,7 @@ class CHostPrototype extends CHostBase {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDelete(array &$hostids, array &$db_hosts = null): void {
+	private function validateDelete(array &$hostids, ?array &$db_hosts = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $hostids, '/', $error)) {

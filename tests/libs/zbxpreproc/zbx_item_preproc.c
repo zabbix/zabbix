@@ -95,7 +95,7 @@ static int	str_to_preproc_type(const char *str)
 	if (0 == strcmp(str, "ZBX_PREPROC_VALIDATE_NOT_SUPPORTED"))
 		return ZBX_PREPROC_VALIDATE_NOT_SUPPORTED;
 
-	fail_msg("unknow preprocessing step type: %s", str);
+	fail_msg("unknown preprocessing step type: %s", str);
 	return FAIL;
 }
 
@@ -110,7 +110,7 @@ static int	str_to_preproc_error_handler(const char *str)
 	if (0 == strcmp(str, "ZBX_PREPROC_FAIL_SET_ERROR"))
 		return ZBX_PREPROC_FAIL_SET_ERROR;
 
-	fail_msg("unknow preprocessing error handler: %s", str);
+	fail_msg("unknown preprocessing error handler: %s", str);
 	return FAIL;
 }
 

@@ -3403,6 +3403,25 @@ void	zbx_hc_get_mem_stats(zbx_shmem_stats_t *data, zbx_shmem_stats_t *index)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: checks if item is present in history cache                        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_hc_is_itemid_cached(zbx_uint64_t itemid)
+{
+	int	ret = FAIL;
+
+	LOCK_CACHE;
+
+	if (NULL != zbx_hashset_search(&cache->history_items, &itemid))
+		ret = SUCCEED;
+
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get statistics of cached items                                    *
  *                                                                            *
  ******************************************************************************/

@@ -1594,6 +1594,9 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 				}
 				else {
 					item.url = data.params.url;
+					if (data.params.target !== '') {
+						item.target = data.params.target;
+					}
 				}
 			}
 
