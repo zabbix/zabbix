@@ -20,6 +20,10 @@
 final class CSettingsSchema {
 
 	public const DB_FIELD_TYPES = [
+		/*
+		 * Mismatch with TEXT column type intentional. Since fields configurable by the API don't contain long values,
+		 * they are validated as CHARs and length is checked.
+		 */
 		'value_str' => DB::FIELD_TYPE_CHAR,
 		'value_int' => DB::FIELD_TYPE_INT,
 		'value_usrgrpid' => DB::FIELD_TYPE_ID,

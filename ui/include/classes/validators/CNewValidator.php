@@ -238,7 +238,7 @@ class CNewValidator {
 				case 'setting':
 					$field_schema = ['type' => CSettingsSchema::getDbType($params['field'])];
 
-					if ($field_schema['type'] & (DB::FIELD_TYPE_CHAR | DB::FIELD_TYPE_TEXT)) {
+					if ($field_schema['type'] == DB::FIELD_TYPE_CHAR) {
 						$field_schema['length'] = CSettingsSchema::getFieldLength($params['field']);
 					}
 
