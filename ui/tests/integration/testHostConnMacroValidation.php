@@ -62,13 +62,16 @@ class testHostConnMacroValidation extends CIntegrationTest {
 	 *
 	 */
 	private function updateServerStatus() {
-		CSettings::updatePrivate(['server_status' => [
-			"version" => ZABBIX_VERSION,
-			"configuration" => [
-				"enable_global_scripts" => true,
-				"allow_software_update_check" => true
-			]
-		]]);
+		DB::update('settings', [
+			'values' => ['value_str' => json_encode([
+				'version' => ZABBIX_VERSION,
+				'configuration' => [
+					'enable_global_scripts' => true,
+					'allow_software_update_check' => true
+				]
+			])],
+			'where' => ['name' => 'server_status']
+		]);
 	}
 
 	/**
@@ -192,7 +195,10 @@ class testHostConnMacroValidation extends CIntegrationTest {
 		$this->assertArrayHasKey('scriptids', $response['result']);
 		self::$scriptid_action = $response['result']['scriptids'][0];
 
-		CSettings::updatePrivate(['server_status' => '']);
+		DB::update('settings', [
+			'values' => ['value_str' => ''],
+			'where' => ['name' => 'server_status']
+		]);
 
 		$response = $this->call('action.create', [
 			'esc_period' => '1m',
