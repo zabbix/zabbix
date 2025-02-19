@@ -65,7 +65,7 @@ class testFormSetup extends CWebTest {
 		$this->assertScreenshotExcept($form, $this->query('id:default-lang')->one(), 'Welcome_Rus');
 	}
 
-// Commented until Jenkins issue investigated.
+// TODO: Commented until Jenkins issue investigated.
 //	public function testFormSetup_prerequisitesSectionLayout() {
 //		$this->page->login()->open('setup.php')->waitUntilReady();
 //		$this->query('button:Next step')->one()->click();
@@ -277,8 +277,9 @@ class testFormSetup extends CWebTest {
 		$timezones_field = $form->getField('Default time zone');
 		$timezones = $timezones_field->getOptions()->asText();
 
-		// Note that count of available timezones may differ based on the local environment configuration.
-		$this->assertEquals(420, count($timezones));
+		// Note that count of available timezones may differ based on the local environment configuration and php version.
+		$this->assertGreaterThan(415, count($timezones));
+		$this->assertContains(CDateTimeHelper::getTimeZoneFormat('Europe/Riga'), $timezones);
 
 		foreach (['System', 'Europe/Riga'] as $timezone_value) {
 			$timezone = CDateTimeHelper::getTimeZoneFormat($timezone_value);
