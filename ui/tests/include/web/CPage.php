@@ -623,7 +623,7 @@ class CPage {
 		$this->waitUntilReady();
 
 		if ($scenario === TEST_GOOD) {
-			if (!$this->query('link:Dashboards')->exists()) {
+			if (!$this->query('class:zi-dashboards')->exists()) {
 				throw new \Exception('"Dashboards" menu is not found on the page. Probably user is not logged in.');
 			}
 		}
