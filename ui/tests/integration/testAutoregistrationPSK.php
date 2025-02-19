@@ -140,7 +140,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 		$response = $this->call('action.create', [
 		[
-			'name' => "action",
+			'name' => "action2",
 			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 			'status' => ACTION_STATUS_ENABLED,
 			'operations' => [
