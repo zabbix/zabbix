@@ -34,6 +34,8 @@ class CUserGroup extends CApiService {
 		'mfa_status', 'mfaid'
 	];
 
+	public const LIMITED_OUTPUT_FIELDS = ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode', 'mfa_status'];
+
 	/**
 	 * Get user groups.
 	 *
@@ -106,6 +108,20 @@ class CUserGroup extends CApiService {
 			}
 		}
 
+		// output
+		if (!$options['countOutput']) {
+			$usrgrps_output_fields = self::$userData['type'] == USER_TYPE_SUPER_ADMIN
+				? self::OUTPUT_FIELDS
+				: self::LIMITED_OUTPUT_FIELDS;
+
+			if (is_array($options['output'])) {
+				$options['output'] = array_intersect($options['output'], $usrgrps_output_fields);
+			}
+			elseif ($options['output'] === API_OUTPUT_EXTEND) {
+				$options['output'] = $usrgrps_output_fields;
+			}
+		}
+
 		// usrgrpids
 		if (!is_null($options['usrgrpids'])) {
 			zbx_value2array($options['usrgrpids']);
@@ -123,6 +139,10 @@ class CUserGroup extends CApiService {
 		}
 
 		if (!is_null($options['mfaids'])) {
+			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+				return [];
+			}
+
 			zbx_value2array($options['mfaids']);
 
 			$sqlParts['where'][] = dbConditionId('g.mfaid', $options['mfaids']);
@@ -139,8 +159,26 @@ class CUserGroup extends CApiService {
 			$sqlParts['where'][] = dbConditionInt('g.mfa_status', $options['mfa_status']);
 		}
 
+		$limited_output_fields = array_flip(self::LIMITED_OUTPUT_FIELDS);
+
 		// filter
 		if (is_array($options['filter'])) {
+			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+				if ($options['searchByAny'] !== null && $options['searchByAny'] !== false) {
+					$options['filter'] = array_diff_key($options['filter'], array_flip(['userdirectoryid', 'mfaid']));
+				}
+				else {
+					$has_private_fields = array_intersect_key(
+						array_diff_key($options['filter'], $limited_output_fields),
+						array_flip(['userdirectoryid', 'mfaid'])
+					);
+
+					if($has_private_fields) {
+						return [];
+					}
+				}
+			}
+
 			$this->dbFilter('usrgrp g', $options, $sqlParts);
 		}
 
@@ -313,7 +351,7 @@ class CUserGroup extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateUpdate(array &$usrgrps, array &$db_usrgrps = null) {
+	private function validateUpdate(array &$usrgrps, ?array &$db_usrgrps = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['usrgrpid']], 'fields' => [
 			'usrgrpid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
@@ -450,7 +488,7 @@ class CUserGroup extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkUsers(array $user_groups, array &$db_user_groups = null) {
+	private function checkUsers(array $user_groups, ?array &$db_user_groups = null) {
 		$user_indexes = [];
 
 		foreach ($user_groups as $i1 => $user_group) {
@@ -616,7 +654,7 @@ class CUserGroup extends CApiService {
 	 *
 	 * @return bool
 	 */
-	private static function userGroupDisabled(array $usrgrp, $method, array $db_usrgrps = null) {
+	private static function userGroupDisabled(array $usrgrp, $method, ?array $db_usrgrps = null) {
 		$gui_access = array_key_exists('gui_access', $usrgrp)
 			? $usrgrp['gui_access']
 			: ($method === 'validateCreate' ? GROUP_GUI_ACCESS_SYSTEM : $db_usrgrps[$usrgrp['usrgrpid']]['gui_access']);
@@ -636,7 +674,7 @@ class CUserGroup extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private function checkOneself(array $usrgrps, $method, array $db_usrgrps = null) {
+	private function checkOneself(array $usrgrps, $method, ?array $db_usrgrps = null) {
 		if ($method === 'validateUpdate') {
 			$groups_users = [];
 
@@ -725,7 +763,7 @@ class CUserGroup extends CApiService {
 	 * @param array      $usrgrps
 	 * @param null|array $db_usrgrps
 	 */
-	private static function updateRights(array &$usrgrps, array $db_usrgrps = null): void {
+	private static function updateRights(array &$usrgrps, ?array $db_usrgrps = null): void {
 		$ins_rights = [];
 		$upd_rights = [];
 		$del_rightids = [];
@@ -1054,7 +1092,7 @@ class CUserGroup extends CApiService {
 	 * @param array      $usrgrps
 	 * @param null|array $db_usrgrps
 	 */
-	private static function updateTagFilters(array &$usrgrps, array $db_usrgrps = null): void {
+	private static function updateTagFilters(array &$usrgrps, ?array $db_usrgrps = null): void {
 		$ins_tag_filters = [];
 		$del_tag_filterids = [];
 
@@ -1129,7 +1167,7 @@ class CUserGroup extends CApiService {
 	 * @param array      $groups
 	 * @param null|array $db_groups
 	 */
-	private static function updateUsers(array &$groups, array &$db_groups = null): void {
+	private static function updateUsers(array &$groups, ?array &$db_groups = null): void {
 		$users = [];
 		$del_user_usrgrpids = [];
 
@@ -1211,7 +1249,7 @@ class CUserGroup extends CApiService {
 	 * @param array $usrgrpids
 	 * @param array $db_usrgrps
 	 */
-	protected function validateDelete(array &$usrgrpids, array &$db_usrgrps = null) {
+	protected function validateDelete(array &$usrgrpids, ?array &$db_usrgrps = null) {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 		if (!CApiInputValidator::validate($api_input_rules, $usrgrpids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -1624,7 +1662,7 @@ class CUserGroup extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkMfaIds(array $user_groups, array $db_user_groups = null): void {
+	private static function checkMfaIds(array $user_groups, ?array $db_user_groups = null): void {
 		foreach ($user_groups as $i => $user_group) {
 			if (!array_key_exists('mfaid', $user_group) || $user_group['mfaid'] == 0
 					|| ($db_user_groups !== null

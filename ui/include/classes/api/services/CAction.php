@@ -149,6 +149,7 @@ class CAction extends CApiService {
 					' AND '.dbConditionId('r.groupid', $usrgrpids).
 				' WHERE a.actionid=c.actionid'.
 					' AND c.conditiontype='.ZBX_CONDITION_TYPE_HOST_GROUP.
+					' AND c.value!='.zbx_dbstr('0').
 				' GROUP BY c.value'.
 				' HAVING MIN(r.permission) IS NULL'.
 					' OR MIN(r.permission)='.PERM_DENY.
@@ -163,6 +164,7 @@ class CAction extends CApiService {
 					' AND p.ugsetid='.self::$userData['ugsetid'].
 				' WHERE a.actionid=c.actionid'.
 					' AND c.conditiontype IN ('.ZBX_CONDITION_TYPE_HOST.','.ZBX_CONDITION_TYPE_TEMPLATE.')'.
+					' AND c.value!='.zbx_dbstr('0').
 					' AND p.permission IS NULL'.
 			')';
 
@@ -177,6 +179,7 @@ class CAction extends CApiService {
 					' AND p.ugsetid='.self::$userData['ugsetid'].
 				' WHERE a.actionid=c.actionid'.
 					' AND c.conditiontype='.ZBX_CONDITION_TYPE_TRIGGER.
+					' AND c.value!='.zbx_dbstr('0').
 					' AND p.permission IS NULL'.
 			')';
 
@@ -485,7 +488,7 @@ class CAction extends CApiService {
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 */
-	private static function updateFilter(array &$actions, array $db_actions = null): void {
+	private static function updateFilter(array &$actions, ?array $db_actions = null): void {
 		$is_update = ($db_actions !== null);
 
 		$ins_conditions = [];
@@ -602,7 +605,7 @@ class CAction extends CApiService {
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 */
-	private static function updateOperations(array &$actions, array $db_actions = null): void {
+	private static function updateOperations(array &$actions, ?array $db_actions = null): void {
 		$is_update = ($db_actions !== null);
 
 		$ins_operations = [];
@@ -690,7 +693,7 @@ class CAction extends CApiService {
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 */
-	private static function updateOperationConditions(array &$actions, array $db_actions = null): void {
+	private static function updateOperationConditions(array &$actions, ?array $db_actions = null): void {
 		$is_update = ($db_actions !== null);
 
 		$ins_opconditions = [];
@@ -789,7 +792,7 @@ class CAction extends CApiService {
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 */
-	private static function updateOperationMessages(array &$actions, array $db_actions = null): void {
+	private static function updateOperationMessages(array &$actions, ?array $db_actions = null): void {
 		$is_update = ($db_actions !== null);
 
 		$ins_opmessages = [];
@@ -948,7 +951,7 @@ class CAction extends CApiService {
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 */
-	private static function updateOperationCommands(array &$actions, array $db_actions = null): void {
+	private static function updateOperationCommands(array &$actions, ?array $db_actions = null): void {
 		$is_update = ($db_actions !== null);
 
 		$ins_opcommands = [];
@@ -1104,7 +1107,7 @@ class CAction extends CApiService {
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 */
-	private static function updateOperationGroups(array &$actions, array $db_actions = null): void {
+	private static function updateOperationGroups(array &$actions, ?array $db_actions = null): void {
 		$is_update = ($db_actions !== null);
 
 		$ins_opgroups = [];
@@ -1187,7 +1190,7 @@ class CAction extends CApiService {
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 */
-	private static function updateOperationTemplates(array &$actions, array $db_actions = null): void {
+	private static function updateOperationTemplates(array &$actions, ?array $db_actions = null): void {
 		$is_update = ($db_actions !== null);
 
 		$ins_optemplates = [];
@@ -1270,7 +1273,7 @@ class CAction extends CApiService {
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 */
-	private static function updateOperationInventories(array $actions, array $db_actions = null): void {
+	private static function updateOperationInventories(array $actions, ?array $db_actions = null): void {
 		$is_update = ($db_actions !== null);
 
 		$ins_opinventories = [];
@@ -1328,7 +1331,7 @@ class CAction extends CApiService {
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 */
-	private static function updateOperationTags(array &$actions, array $db_actions = null): void {
+	private static function updateOperationTags(array &$actions, ?array $db_actions = null): void {
 		$is_update = ($db_actions !== null);
 
 		$ins_optags = [];
@@ -2661,7 +2664,7 @@ class CAction extends CApiService {
 	 *
 	 * @throws APIException if action name is not unique.
 	 */
-	private static function checkDuplicates(array $actions, array $db_actions = null): void {
+	private static function checkDuplicates(array $actions, ?array $db_actions = null): void {
 		$names = [];
 
 		foreach ($actions as $action) {
@@ -2754,7 +2757,7 @@ class CAction extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkOperations(array &$actions, array $db_actions = null): void {
+	private static function checkOperations(array &$actions, ?array $db_actions = null): void {
 		$is_update = ($db_actions !== null);
 
 		foreach ($actions as &$action) {
@@ -3290,7 +3293,7 @@ class CAction extends CApiService {
 
 			foreach ($action['filter']['conditions'] as $condition) {
 				if ($condition['conditiontype'] == ZBX_CONDITION_TYPE_DCHECK) {
-					$druleids[$condition['value']] = true;
+					$dcheckids[$condition['value']] = true;
 				}
 			}
 		}
@@ -3375,7 +3378,7 @@ class CAction extends CApiService {
 			}
 		}
 
-		if ($serviceids) {
+		if (!$serviceids) {
 			return;
 		}
 
@@ -3399,14 +3402,13 @@ class CAction extends CApiService {
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 */
-	private static function addAffectedObjects(array $actions, array &$db_actions = null): void {
+	private static function addAffectedObjects(array $actions, ?array &$db_actions = null): void {
 		$actionids = ['filter' => [], 'operations' => []];
 
 		foreach ($actions as $action) {
 			if (array_key_exists('filter', $action)) {
 				$actionids['filter'][] = $action['actionid'];
 				$db_actions[$action['actionid']]['filter'] = [];
-				$db_actions[$action['actionid']]['filter']['conditions'] = [];
 			}
 
 			if (!array_intersect_key(array_flip(self::OPERATION_GROUPS), $action)) {
@@ -3428,7 +3430,8 @@ class CAction extends CApiService {
 			$db_filters = DBselect(DB::makeSql('actions', $options));
 
 			while ($db_filter = DBfetch($db_filters)) {
-				$db_actions[$db_filter['actionid']]['filter'] += array_diff_key($db_filter, array_flip(['actionid']));
+				$db_actions[$db_filter['actionid']]['filter'] =
+					array_diff_key($db_filter, array_flip(['actionid'])) + ['conditions' => []];
 			}
 
 			$options = [
@@ -3447,6 +3450,12 @@ class CAction extends CApiService {
 					CConditionHelper::addFormulaIds($db_action['filter']['conditions'],
 						$db_action['filter']['formula']
 					);
+				}
+				else {
+					foreach ($db_action['filter']['conditions'] as &$condition) {
+						$condition['formulaid'] = '';
+					}
+					unset($condition);
 				}
 			}
 			unset($db_action);

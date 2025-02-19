@@ -13,7 +13,12 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-error_reporting(E_ALL | E_STRICT); // because in some PHP versions E_ALL does not include E_STRICT
+if (PHP_VERSION_ID >= 80400) {
+	error_reporting(E_ALL);
+}
+else {
+	error_reporting(E_ALL | E_STRICT);
+}
 
 require_once __DIR__.'/../../include/defines.inc.php';
 require_once __DIR__.'/../../include/func.inc.php';
@@ -28,6 +33,7 @@ require_once __DIR__.'/../../include/db.inc.php';
 
 // register autoloader
 require_once __DIR__.'/../../include/classes/core/CAutoloader.php';
+require_once __DIR__.'/../../vendor/autoload.php';
 
 $autoloader = new CAutoloader;
 $autoloader->addNamespace('', [

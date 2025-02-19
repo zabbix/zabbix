@@ -2624,14 +2624,16 @@ button {
       background: #092637;
       border-left-color: #ffffff;
       color: #ffffff; }
-.menu-main .has-submenu > a::after {
-  position: relative;
-  float: right;
-  top: 4px;
-  font-size: 8px;
-  content: "";
-  transform: rotate(0deg);
-  transition: transform 0.3s; }
+.menu-main .has-submenu > a {
+  padding-right: 34px; }
+  .menu-main .has-submenu > a::after {
+    position: absolute;
+    top: 17px;
+    right: 13px;
+    font-size: 8px;
+    content: "";
+    transform: rotate(0deg);
+    transition: transform 0.3s; }
 .menu-main .has-submenu.is-expanded > a[class^="zi-"]::before, .menu-main .has-submenu.is-expanded > a[class*=" zi-"]::before {
   color: #8cb2ca; }
 .menu-main .has-submenu.is-expanded > a[class^="zi-"]:hover::before, .menu-main .has-submenu.is-expanded > a[class^="zi-"]:focus::before, .menu-main .has-submenu.is-expanded > a[class*=" zi-"]:hover::before, .menu-main .has-submenu.is-expanded > a[class*=" zi-"]:focus::before {
@@ -2722,7 +2724,8 @@ button {
     .menu-main .submenu .submenu::before, .menu-main .submenu .submenu::after {
       display: none; }
   .menu-main .submenu .has-submenu > a::after {
-    transform: rotate(90deg); }
+    transform: rotate(90deg);
+    top: 11px; }
   .menu-main .submenu .has-submenu:not(.is-expanded) a::after {
     transform: rotate(-90deg); }
   .menu-main .submenu .has-submenu:not(.is-expanded) .submenu {
@@ -2741,7 +2744,7 @@ button {
   .menu-user span {
     position: relative;
     display: block;
-    padding: 12px 14px 12px 45px;
+    padding: 12px 14px 12px 44px;
     font-size: 12px;
     white-space: nowrap;
     border-left: 3px solid transparent;
@@ -2772,14 +2775,16 @@ button {
     color: #8cb2ca; }
   .menu-user > li:not(.is-expanded) .submenu {
     max-height: 0 !important; }
-  .menu-user .has-submenu > a::after {
-    position: relative;
-    float: right;
-    top: 4px;
-    font-size: 8px;
-    content: "";
-    transform: rotate(0deg);
-    transition: transform 0.3s; }
+  .menu-user .has-submenu > a {
+    padding-right: 34px; }
+    .menu-user .has-submenu > a::after {
+      position: absolute;
+      top: 17px;
+      right: 13px;
+      font-size: 8px;
+      content: "";
+      transform: rotate(0deg);
+      transition: transform 0.3s; }
   .menu-user .has-submenu.is-expanded > a::after {
     transform: rotate(-180deg); }
   .menu-user .submenu {
@@ -2843,7 +2848,8 @@ button {
       .menu-user .submenu .submenu::before, .menu-user .submenu .submenu::after {
         display: none; }
     .menu-user .submenu .has-submenu > a::after {
-      transform: rotate(90deg); }
+      transform: rotate(90deg);
+      top: 11px; }
     .menu-user .submenu .has-submenu:not(.is-expanded) a::after {
       transform: rotate(-90deg); }
     .menu-user .submenu .has-submenu:not(.is-expanded) .submenu {
@@ -4826,8 +4832,13 @@ form.dashboard-widget-piechart {
   form.dashboard-widget-piechart .dataset-head,
   form.dashboard-widget-piechart .dataset-body.list-accordion-item-body {
     display: contents; }
-  form.dashboard-widget-piechart .dataset-head .multiselect {
-    width: 100%; }
+  form.dashboard-widget-piechart .dataset-head .multiselect-control {
+    overflow: hidden;
+    margin: -2px;
+    padding: 2px; }
+    form.dashboard-widget-piechart .dataset-head .multiselect-control .multiselect {
+      overflow: hidden;
+      flex-grow: 1; }
   form.dashboard-widget-piechart .dataset-body .form-grid {
     padding-top: 0; }
     form.dashboard-widget-piechart .dataset-body .form-grid:first-child {
@@ -4972,8 +4983,13 @@ form.dashboard-widget-svggraph {
   form.dashboard-widget-svggraph .dataset-head,
   form.dashboard-widget-svggraph .dataset-body.list-accordion-item-body {
     display: contents; }
-  form.dashboard-widget-svggraph .dataset-head .multiselect {
-    width: 100%; }
+  form.dashboard-widget-svggraph .dataset-head .multiselect-control {
+    overflow: hidden;
+    margin: -2px;
+    padding: 2px; }
+    form.dashboard-widget-svggraph .dataset-head .multiselect-control .multiselect {
+      overflow: hidden;
+      flex-grow: 1; }
   form.dashboard-widget-svggraph .dataset-body .form-grid {
     padding-top: 0; }
     form.dashboard-widget-svggraph .dataset-body .form-grid:first-child {
@@ -5056,6 +5072,13 @@ form.dashboard-widget-svggraph {
     color: #acbbc2; }
   form.dashboard-widget-svggraph .single-item-table .unavailable-widget a {
     color: #acbbc2; }
+  form.dashboard-widget-svggraph .override-host-field-view {
+    overflow: hidden;
+    margin: -2px;
+    padding: 2px; }
+    form.dashboard-widget-svggraph .override-host-field-view .multiselect {
+      overflow: hidden;
+      flex-grow: 1; }
   form.dashboard-widget-svggraph .overrides-list {
     position: relative;
     margin: -5px 0 -5px 15px; }
@@ -5074,8 +5097,13 @@ form.dashboard-widget-svggraph {
       top: 5px;
       left: -17px;
       height: 24px; }
-    form.dashboard-widget-svggraph .overrides-list-item .multiselect {
-      width: 100%; }
+    form.dashboard-widget-svggraph .overrides-list-item .multiselect-control {
+      overflow: hidden;
+      margin: -2px;
+      padding: 2px; }
+      form.dashboard-widget-svggraph .overrides-list-item .multiselect-control .multiselect {
+        overflow: hidden;
+        flex-grow: 1; }
   form.dashboard-widget-svggraph .overrides-foot {
     padding: 5px 0; }
   form.dashboard-widget-svggraph .overrides-options-list {
@@ -7396,10 +7424,10 @@ svg {
 
 .btn-split {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
   margin-right: 10px; }
   .btn-split li {
-    display: inline-block; }
+    display: inline-flex; }
     .btn-split li:first-child button {
       border-top-right-radius: 0;
       border-bottom-right-radius: 0; }
