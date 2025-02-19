@@ -65,17 +65,13 @@ class CControllerRegExEdit extends CController {
 			'test_string' => DB::getDefault('regexps', 'test_string'),
 			'expressions' => [[
 				'expression_type' => DB::getDefault('expressions', 'expression_type'),
-				'expression' => DB::getDefault('expressions', 'expression')
+				'expression' => DB::getDefault('expressions', 'expression'),
+				'exp_delimiter' => ',',
+				'case_sensitive' => DB::getDefault('expressions', 'case_sensitive')
 			]]
 		];
 
 		$regexp = array_replace($regexp_default, $this->getInput('regexp', []), $this->db_regexp);
-
-		foreach ($regexp['expressions'] as &$expression) {
-			$expression += ['exp_delimiter' => ',', 'case_sensitive' => 0];
-		}
-		unset($expression);
-
 		$js_validation_rules = $this->hasInput('regexpid')
 			? CControllerRegExUpdate::getValidationRules()
 			: CControllerRegExCreate::getValidationRules();

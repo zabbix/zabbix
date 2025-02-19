@@ -79,10 +79,6 @@ class CControllerRegExUpdate extends CController {
 		$expressions = $this->getInput('expressions');
 
 		foreach ($expressions as &$expression) {
-			if (!array_key_exists('case_sensitive', $expression)) {
-				$expression['case_sensitive'] = 0;
-			}
-
 			if ($expression['expression_type'] != EXPRESSION_TYPE_ANY_INCLUDED) {
 				$expression['exp_delimiter'] = '';
 			}
