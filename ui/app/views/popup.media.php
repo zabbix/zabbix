@@ -106,6 +106,7 @@ $form = (new CForm())
 	->addVar('action', 'popup.media')
 	->addVar('validate', '1')
 	->addVar('mediaid', $options['mediaid'])
+	->addVar('provisioned', $options['provisioned'])
 	->setId('media_form')
 	->addStyle('display: none;');
 

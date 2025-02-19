@@ -183,6 +183,10 @@
 				row.querySelector('.js-status').remove();
 			}
 
+			if (media.provisioned == <?= CUser::PROVISION_STATUS_YES ?>) {
+				row.querySelector('.js-remove').setAttribute('disabled', 'disabled');
+			}
+
 			this.#evaluateSeverity(media, row);
 
 			return row.outerHTML;
