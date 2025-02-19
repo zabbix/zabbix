@@ -82,17 +82,17 @@ class testAutoregistrationPSK extends CIntegrationTest {
 				'Hostname' => self::PSK_HOSTNAME,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'TLSPSKIdentity' => self::PSK_IDENTITY,
-				'TLSPSKFile' => self::PSK_FILE_LOWER_CASE,
+				'TLSPSKFile' => self::PSK_FILE_UPPER_CASE,
 				'TLSConnect' => 'psk',
 				'TLSAccept' => 'psk',
-				'HostMetadata' => self::HOST_METADATA_PSK_LOWER_CASE
+				'HostMetadata' => self::HOST_METADATA_PSK_UPPER_CASE
 			],
 
 			self::COMPONENT_AGENT2 => [
 				'Hostname' => self::PSK_HOSTNAME,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'TLSPSKIdentity' => self::PSK_IDENTITY,
-				'TLSPSKFile' => self::PSK_FILE_UPPER_CASE,
+				'TLSPSKFile' => self::PSK_FILE_LOWER_CASE,
 				'TLSConnect' => 'psk',
 				'TLSAccept' => 'psk',
 				'HostMetadata' => self::HOST_METADATA_PSK_UPPER_CASE
