@@ -40,7 +40,7 @@
 		#test_results;
 
 		init({rules}) {
-			this.form_element = document.getElementById('regexp');
+			this.form_element = document.getElementById('regexp-form');
 			this.form = new CForm(this.form_element, rules);
 			this.form_element.addEventListener('submit', (e) => {
 				e.preventDefault();

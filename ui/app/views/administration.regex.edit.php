@@ -27,7 +27,7 @@ $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setAction((new CUrl('zabbix.php'))->getUrl())
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-	->setId('regexp')
+	->setId('regexp-form')
 	->addItem($data['regexp']['regexpid'] != 0 ? new CVar('regexpid', $data['regexp']['regexpid']) : null);
 
 $table = (new CTable())
