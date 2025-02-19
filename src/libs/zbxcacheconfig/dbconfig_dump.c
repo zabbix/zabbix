@@ -1614,14 +1614,13 @@ static void	DCdump_proxy_groups(void)
 	zbx_hashset_iter_reset(&config->proxy_groups, &iter);
 	while (NULL != (pg = (zbx_dc_proxy_group_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zabbix_log(LOG_LEVEL_TRACE, "proxy_groupid:" ZBX_FS_UI64 " failover_delay:%d min_online:%d"
+		zabbix_log(LOG_LEVEL_TRACE, "proxy_groupid:" ZBX_FS_UI64 " failover_delay:%s min_online:%s"
 				" revision:" ZBX_FS_UI64,
 				pg->proxy_groupid, pg->failover_delay, pg->min_online, pg->revision);
 	}
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }
-
 
 static void	DCdump_host_proxy_index(void)
 {

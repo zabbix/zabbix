@@ -208,7 +208,7 @@ try_again:
 	if (ZBX_MAX_HRECORDS != rows->values_num)
 		*more = ZBX_PROXY_DATA_DONE;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:" ZBX_FS_SIZE_T, __func__, rows->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:%d", __func__, rows->values_num);
 
 	return rows->values_num;
 }
@@ -595,7 +595,6 @@ static void	pb_history_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zbx_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d", __func__, rows_num);
 }
-
 
 void	pb_history_flush(zbx_pb_t *pb)
 {

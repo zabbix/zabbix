@@ -285,7 +285,7 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 						zbx_variant_type_desc(value),
 						zbx_get_variant_type_desc(ZBX_VARIANT_DBL));
 
-				zabbix_log(LOG_LEVEL_CRIT, *errmsg);
+				zabbix_log(LOG_LEVEL_CRIT, "%s", *errmsg);
 				THIS_SHOULD_NEVER_HAPPEN;
 				return FAIL;
 			}
@@ -296,7 +296,7 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 						zbx_variant_type_desc(history_value_out),
 						zbx_get_variant_type_desc(ZBX_VARIANT_DBL));
 
-				zabbix_log(LOG_LEVEL_CRIT, *errmsg);
+				zabbix_log(LOG_LEVEL_CRIT, "%s", *errmsg);
 				THIS_SHOULD_NEVER_HAPPEN;
 				return FAIL;
 			}
@@ -311,7 +311,7 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 						zbx_variant_type_desc(value),
 						zbx_get_variant_type_desc(ZBX_VARIANT_UI64));
 
-				zabbix_log(LOG_LEVEL_CRIT, *errmsg);
+				zabbix_log(LOG_LEVEL_CRIT, "%s", *errmsg);
 				THIS_SHOULD_NEVER_HAPPEN;
 				return FAIL;
 			}
@@ -322,7 +322,7 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 						zbx_variant_type_desc(history_value_out),
 						zbx_get_variant_type_desc(ZBX_VARIANT_UI64));
 
-				zabbix_log(LOG_LEVEL_CRIT, *errmsg);
+				zabbix_log(LOG_LEVEL_CRIT, "%s", *errmsg);
 				THIS_SHOULD_NEVER_HAPPEN;
 				return FAIL;
 			}
