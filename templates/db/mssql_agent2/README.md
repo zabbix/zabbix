@@ -20,7 +20,10 @@ This template has been tested on:
 
 ## Setup
 
-1. Deploy Zabbix agent 2 with the MSSQL plugin. You can use this template starting with Zabbix versions 6.0.27 / 6.4.12. For more information, see [MSSQL plugin documentation](https://git.zabbix.com/projects/AP/repos/mssql/browse?at=release%2F6.0).
+1. Deploy Zabbix agent 2 with the MSSQL plugin. You can use this template starting with version 6.0.27 of Zabbix and 6.0.39 of the MSSQL plugin. For more information, see [MSSQL plugin documentation](https://git.zabbix.com/projects/AP/repos/mssql/browse?at=release%2F6.0).
+
+**Important!** Starting with Zabbix 6.0.39, the MSSQL plugin must be updated to a version equal to or above 6.0.39.
+
 Loadable plugin requires installation of a separate [package](https://repo.zabbix.com/zabbix/6.0/) or [binary file](https://cdn.zabbix.com/zabbix/binaries/stable/6.0/) or [compilation from sources](https://www.zabbix.com/documentation/6.0/manual/config/items/plugins/build).
 
 2. Create an MSSQL user for monitoring. For example, "zbx_monitor".
@@ -97,6 +100,8 @@ Note: Since version 6.0.36, you can also connect to the MSSQL instance using its
 |{$MSSQL.BACKUP_FULL.USED}|<p>The flag for checking the age of a full backup. If set to a value other than "1", the trigger expression for the full backup age will not fire. Can be used with context for database name.</p>|`1`|
 |{$MSSQL.BACKUP_LOG.USED}|<p>The flag for checking the age of a log backup. If set to a value other than "1", the trigger expression for the log backup age will not fire. Can be used with context for database name.</p>|`1`|
 |{$MSSQL.BACKUP_DIFF.USED}|<p>The flag for checking the age of a differential backup. If set to a value other than "1", the trigger expression for the differential backup age will not fire. Can be used with context for database name.</p>|`1`|
+|{$MSSQL.QUORUM.MEMBER.DISCOVERY.NAME.MATCHES}|<p>Filter to include discovered quorum member by name.</p>|`.*`|
+|{$MSSQL.QUORUM.MEMBER.DISCOVERY.NAME.NOT_MATCHES}|<p>Filter to exclude discovered quorum member by name.</p>|`CHANGE_IF_NEEDED`|
 
 ### Items
 

@@ -1332,14 +1332,15 @@ class CEvent extends CApiService {
 
 		if ($tag_conditions) {
 			if ($value == TRIGGER_VALUE_TRUE) {
-				$sqlParts['from']['et'] = 'event_tag et';
-				$sqlParts['where']['e-et'] = 'e.eventid=et.eventid';
+				$sqlParts['left_join'][] = ['alias' => 'et', 'table' => 'event_tag', 'using' => 'eventid'];
+				$sqlParts['left_table'] = ['alias' => 'e', 'table' => 'events'];
 			}
 			else {
 				$sqlParts['from']['er'] = 'event_recovery er';
-				$sqlParts['from']['et'] = 'event_tag et';
 				$sqlParts['where']['e-er'] = 'e.eventid=er.r_eventid';
-				$sqlParts['where']['er-et'] = 'er.eventid=et.eventid';
+
+				$sqlParts['left_join'][] = ['alias' => 'et', 'table' => 'event_tag', 'using' => 'eventid'];
+				$sqlParts['left_table'] = ['alias' => 'er', 'table' => 'event_recovery'];
 			}
 
 			if ($full_access_groupids || count($tag_conditions) > 1) {

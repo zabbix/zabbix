@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-02 17:26+0300\n"
-"PO-Revision-Date: 2024-11-18 07:27+0000\n"
+"PO-Revision-Date: 2025-02-17 01:22+0000\n"
 "Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -192,12 +192,12 @@ msgstr[0] "%2$s台中%1$s台の要素で障害発生中"
 #: app/views/administration.miscconfig.edit.php:119
 #, c-format
 msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
-msgstr ""
+msgstr "%1$s または %2$s - フレーム内では同一オリジンページのみ表示できます"
 
 #: app/views/administration.miscconfig.edit.php:122
 #, c-format
 msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
-msgstr ""
+msgstr "%1$s または %2$s - サイトがフレーム内に表示しようとしたかどうかに関係なく、ページがフレーム内に表示されないようにします"
 
 #: jsLoader.php:353
 #, c-format
@@ -7716,7 +7716,7 @@ msgstr "ヒストリ"
 
 #: httpconf.php:189 httpconf.php:436 items.php:908 items.php:987
 msgid "History and trends cleared"
-msgstr ""
+msgstr "ヒストリとトレンドを削除しました"
 
 #: app/views/administration.housekeeping.edit.php:232
 msgid "History and trends compression"
@@ -15281,6 +15281,11 @@ msgstr "Zabbixサーバー上でスクリプト\"%1$s\"を実行"
 #, c-format
 msgid "Run script \"%1$s\" on current host"
 msgstr "このホスト上でスクリプト\"%1$s\"を実行"
+
+#: include/actions.inc.php:646 include/actions.inc.php:835
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr ""
 
 #: include/actions.inc.php:679 include/actions.inc.php:857
 #, c-format

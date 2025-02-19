@@ -1558,9 +1558,10 @@ class CHost extends CHostGeneral {
 		// delete empty operations
 		$delOperationids = [];
 		$sql = 'SELECT DISTINCT o.operationid'.
-				' FROM operations o'.
-				' WHERE '.dbConditionInt('o.operationid', $operationids).
-				' AND NOT EXISTS(SELECT oh.opcommand_hstid FROM opcommand_hst oh WHERE oh.operationid=o.operationid)';
+			' FROM operations o'.
+			' WHERE '.dbConditionId('o.operationid', $operationids).
+				' AND NOT EXISTS(SELECT NULL FROM opcommand_hst och WHERE o.operationid=och.operationid)'.
+				' AND NOT EXISTS(SELECT NULL FROM opcommand_grp ocg WHERE o.operationid=ocg.operationid)';
 		$dbOperations = DBselect($sql);
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
