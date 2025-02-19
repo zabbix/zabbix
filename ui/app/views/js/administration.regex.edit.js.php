@@ -234,10 +234,11 @@
 			}
 
 			const indexes = Object.keys(expressions),
-				combined_result = {message: response.final ? t('TRUE') : t('FALSE'), result: response.final};
+				message = response.final ? <?= json_encode(_('TRUE')) ?> : <?= json_encode(_('FALSE')) ?>,
+				combined_result = {message, result: response.final};
 
 			if (indexes.length == 0) {
-				return this.#addTestResultCombined(false, t('UNKNOWN'));
+				return this.#addTestResultCombined(false, <?= json_encode(_('UNKNOWN')) ?>);
 			}
 
 			for (let index of indexes) {
@@ -246,11 +247,14 @@
 					expression = expressions[index];
 
 				if (error !== undefined) {
-					combined_result.message = t('UNKNOWN');
+					combined_result.message = <?= json_encode(_('UNKNOWN')) ?>;
 					this.#addTestResult(expression, result, error);
 				}
 				else {
-					this.#addTestResult(expression, result, result ? t('TRUE') : t('FALSE'));
+					this.#addTestResult(expression, result, result
+						? <?= json_encode(_('TRUE')) ?>
+						: <?= json_encode(_('FALSE')) ?>
+					);
 				}
 			}
 
@@ -280,15 +284,15 @@
 		#expressionTypeToString(type) {
 			switch (type) {
 				case <?= EXPRESSION_TYPE_INCLUDED ?>:
-					return t('Character string included');
+					return <?= json_encode(_('Character string included')) ?>;
 				case <?= EXPRESSION_TYPE_ANY_INCLUDED ?>:
-					return t('Any character string included');
+					return <?= json_encode(_('Any character string included')) ?>;
 				case <?= EXPRESSION_TYPE_NOT_INCLUDED ?>:
-					return t('Character string not included');
+					return <?= json_encode(_('Character string not included')) ?>;
 				case <?= EXPRESSION_TYPE_TRUE ?>:
-					return t('Result is TRUE');
+					return <?= json_encode(_('Result is TRUE')) ?>;
 				case <?= EXPRESSION_TYPE_FALSE ?>:
-					return t('Result is FALSE');
+					return <?= json_encode(_('Result is FALSE')) ?>;
 			}
 		}
 
