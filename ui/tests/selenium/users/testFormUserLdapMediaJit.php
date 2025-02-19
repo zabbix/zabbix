@@ -423,7 +423,6 @@ class testFormUserLdapMediaJit extends CWebTest {
 	/**
 	 * Check that LDAP provisioned user can add and remove non-provisioned media.
 	 */
-
 	// TODO: Uncomment this check, after ZBX-26064 is fixed.
 	/*
 	public function testFormUserLdapMediaJit_AddRemoveMedia() {
