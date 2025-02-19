@@ -20,6 +20,7 @@
  */
 
 (new CRow())
+	->setAttribute('data-index', $data['index'])
 	->addItem((new CSelect('expressions['.$data['index'].'][expression_type]'))
 		->setId('expressions_'.$data['index'].'_expression_type')
 		->addClass('js-expression-type-select')
@@ -56,8 +57,13 @@
 		->addClass(ZBX_STYLE_NOWRAP)
 		->addItem((new CButton('remove', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-remove')
 			->removeId()
 		)
 	)
+	->show();
+
+(new CRow())->addItem((new CCol())
+	->setId('expressions-'.$data['index'].'-error-container')
+	->addClass(ZBX_STYLE_ERROR_CONTAINER)
+	->setAttribute('colspan', 5))
 	->show();

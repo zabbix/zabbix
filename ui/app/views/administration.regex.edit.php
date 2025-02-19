@@ -53,8 +53,7 @@ foreach ($data['regexp']['expressions'] as $index => $expression) {
 			'delimiter' => $expression['exp_delimiter'],
 			'options_delimiter' => $options_delimiter,
 			'options_expression_type' => $options_expression_type
-		]))
-		->addItem(new CPartial('administration.regex.entry.error', ['index' => $index]));
+		]));
 }
 
 $table->addRow((new CRow((new CCol(
@@ -140,7 +139,6 @@ $form
 			'options_delimiter' => $options_delimiter,
 			'options_expression_type' => $options_expression_type
 		]))
-		->addItem(new CPartial('administration.regex.entry.error', ['index' => '#{index}']))
 	)
 	->addItem((new CTemplateTag('combined-result-template'))
 		->addItem((new CRow())

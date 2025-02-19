@@ -47,10 +47,18 @@
 				this.submit();
 			});
 
-			document.getElementById('regular-expressions-table').addEventListener('change', (e) => this.#updateRow(e));
-			document.getElementById('regular-expressions-table').addEventListener('click', (e) => this.#processAction(e));
 			document.getElementById('test-expression').addEventListener('click', () => this.#testExpression());
 			document.getElementById('tab_test').addEventListener('click', () => this.#testExpression());
+
+			const table = document.getElementById('regular-expressions-table');
+
+			table.querySelector('button[name="add"]').addEventListener('click', () => this.#addRow());
+			table.querySelectorAll('button[name="remove"]').forEach((node) => {
+				node.addEventListener('click', (e) => this.#removeRow(e));
+			})
+			table.querySelectorAll('.js-expression-type-select').forEach((node) => {
+				node.addEventListener('change', (e) => this.#updateRow(e));
+			})
 
 			this.#test_results = document.getElementById('test-result-table').querySelector('tbody');
 
@@ -142,24 +150,28 @@
 			redirect(curl.getUrl(), 'post', 'action', undefined, true);
 		}
 
-		#processAction(e) {
-			const action = e.target.getAttribute('name');
+		#removeRow(e) {
+			const row = e.target.closest('tr');
 
-			if (action === 'remove')  {
-				const row = e.target.closest('tr');
+			row.nextSibling.remove();
+			row.remove();
+		}
 
-				row.nextSibling.remove();
-				row.remove();
-			}
-			else if (action === 'add')  {
-				const indexes = Object.keys(this.form.findFieldByName('expressions').getValue());
-				const next_index = indexes.length ? Math.max(...indexes) + 1 : 0;
-				const template = new Template(document.getElementById('row-expression-template').innerHTML);
+		#addRow() {
+			const indexes = Object.keys(this.form.findFieldByName('expressions').getValue());
+			const next_index = indexes.length ? Math.max(...indexes) + 1 : 0;
+			const template = new Template(document.getElementById('row-expression-template').innerHTML);
 
-				document
-					.getElementById('expression-list-footer')
-					.insertAdjacentHTML('beforebegin', template.evaluate({index: next_index}));
-			}
+			document
+				.getElementById('expression-list-footer')
+				.insertAdjacentHTML('beforebegin', template.evaluate({index: next_index}));
+
+			const row = document
+				.getElementById('regular-expressions-table')
+				.querySelector(`tr[data-index="${next_index}"]`);
+
+			row.querySelector('button[name="remove"]').addEventListener('click', (e) => this.#removeRow(e));
+			row.querySelector('.js-expression-type-select').addEventListener('change', (e) => this.#updateRow(e));
 		}
 
 		#testExpression() {
