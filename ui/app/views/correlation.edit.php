@@ -306,8 +306,8 @@ $form
 	->addItem(
 		(new CScriptTag(
 			'correlation_edit_popup.init('.json_encode([
-				'correlation' => $data['correlation'],
-				'rules' => $data['js_validation_rules']
+				'rules' => $data['js_validation_rules'],
+				'correlation' => $data['correlation']
 			], JSON_THROW_ON_ERROR).');'
 		))->setOnDocumentReady()
 	);

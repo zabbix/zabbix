@@ -21,7 +21,7 @@
 
 window.correlation_edit_popup = new class {
 
-	init({correlation, rules}) {
+	init({rules, correlation}) {
 		this.overlay = overlays_stack.getById('correlation.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
