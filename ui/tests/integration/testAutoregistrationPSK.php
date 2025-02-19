@@ -73,7 +73,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 			throw new Exception('Failed to create lower case PSK file for agent');
 		}
 
-		if (file_put_contents(self::PSK_FILE_UPPER_CASE, self::PSK_IDENTITY) === false) {
+		if (file_put_contents(self::PSK_FILE_UPPER_CASE, self::PSK_KEY_UPPER_CASE) === false) {
 			throw new Exception('Failed to create upper case PSK file for agent');
 		}
 
@@ -191,7 +191,61 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 		$this->assertCount(1, $tags, 'Unexpected tags count was detected: '. json_encode($tags));
 
+
+
 		$this->assertContains($expectedTags, $tags, json_encode($tags));
 
+
+		$response = $this->call('action.create', [
+		[
+			'name' => "action3",
+			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
+			'status' => ACTION_STATUS_ENABLED,
+			'operations' => [
+				[
+					'operationtype' => OPERATION_TYPE_HOST_TAGS_ADD,
+					'optag' => [
+						[
+							'tag' => 'PSK_TAG22',
+							'value' => 'PSK_VALUE22'
+						],
+					]
+				],
+			]
+		],]);
+
+
+		$this->killComponent(self::COMPONENT_AGENT);
+		$this->stopComponent(self::COMPONENT_SERVER);
+		$this->startComponent(self::COMPONENT_SERVER);
+		$this->startComponent(self::COMPONENT_AGENT2);
+
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
+
+
+
+				$response = $this->call('host.get', [
+			'filter' => [
+				'host' => self::PSK_HOSTNAME
+				],
+			'selectTags' => ['tag', 'value']
+		]);
+
+		$this->assertArrayHasKey('result', $response, 'Failed to autoregister host before timeout');
+		$this->assertCount(1, $response['result'], 'Failed to autoregister host before timeout, response result: '.
+			json_encode($response['result']));
+		$this->assertArrayHasKey('tags', $response['result'][0], 'Failed to autoregister host before timeout: response result: '.
+			json_encode($response['result']));
+
+		$autoregHost = $response['result'][0];
+		$this->assertArrayHasKey('hostid', $autoregHost, 'Failed to get host ID of the autoregistered host');
+
+		$tags = $autoregHost['tags'];
+
+		$expectedTags = ['tag' => 'PSK_TAG22', 'value' => 'PSK_VALUE22'];
+
+		$this->assertCount(1, $tags, 'Unexpected tags count was detected: '. json_encode($tags));
+
+		$this->assertContains($expectedTags, $tags, json_encode($tags));
 	}
 }
