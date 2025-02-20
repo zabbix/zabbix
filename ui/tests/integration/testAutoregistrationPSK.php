@@ -44,10 +44,6 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	 */
 	public function prepareData() {
 
-		#if (file_exists(self::METADATA_FILE)) {
-		#	unlink(self::METADATA_FILE);
-		#}
-
 		if (file_put_contents(self::PSK_FILE_LOWER_CASE, self::PSK_KEY_LOWER_CASE) === false) {
 			throw new Exception('Failed to create lower case PSK file for agent');
 		}
@@ -91,10 +87,16 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		$this->assertEquals(true, $response['result']);
 	}
 
+	/**
+	 * Autoregisters agent1, then agent2 and then agent1 again. (by changing metada item).
+	 * Checks resulting tags on host to make sure that autoregistration was successful.
+	 */
 	private function coreTestCase() {
+
 		if (file_exists(self::METADATA_FILE)) {
 			unlink(self::METADATA_FILE);
 		}
+
 		if (file_put_contents(self::METADATA_FILE, "\\".time()) === false) {
 			throw new Exception('Failed to create metadata_file');
 		}
@@ -104,9 +106,10 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		$this->killComponent(self::COMPONENT_SERVER);
 
 		$this->updateAutoregistrationWithUpperCasePSK();
-
 		$this->startComponent(self::COMPONENT_SERVER);
+
 		sleep(1);
+
 		$this->startComponent(self::COMPONENT_AGENT);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
 		$this->killComponent(self::COMPONENT_AGENT);
@@ -138,7 +141,6 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(1);
-
 		$this->startComponent(self::COMPONENT_AGENT2);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
 
@@ -157,14 +159,11 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 		$autoregHost = $response['result'][0];
 		$this->assertArrayHasKey('hostid', $autoregHost, 'Failed to get host ID of the autoregistered host');
-
 		$tags = $autoregHost['tags'];
-
 		$expectedTags = ['tag' => 'PSK_TAG', 'value' => 'PSK_VALUE'];
 
 		$this->assertCount(1, $tags, 'Unexpected tags count was detected: '. json_encode($tags));
 		$this->assertContains($expectedTags, $tags, json_encode($tags));
-
 
 		$response = $this->call('action.create', [
 		[
@@ -208,14 +207,10 @@ class testAutoregistrationPSK extends CIntegrationTest {
 			json_encode($response['result']));
 		$this->assertArrayHasKey('tags', $response['result'][0], 'Failed to autoregister host before timeout: response result: '.
 			json_encode($response['result']));
-
 		$autoregHost = $response['result'][0];
 		$this->assertArrayHasKey('hostid', $autoregHost, 'Failed to get host ID of the autoregistered host');
-
 		$tags = $autoregHost['tags'];
-
 		$expectedTags = ['tag' => 'PSK_TAG22', 'value' => 'PSK_VALUE22'];
-
 		$this->assertCount(2, $tags, 'Unexpected tags count was detected: '. json_encode($tags));
 		$this->assertContains($expectedTags, $tags, json_encode($tags));
 	}
@@ -226,7 +221,6 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	 * @return array
 	 */
 	public function agentConfigurationProvider_UpperCasePSK() {
-
 		return [
 			self::COMPONENT_AGENT => [
 				'Hostname' => self::PSK_HOSTNAME,
@@ -237,7 +231,6 @@ class testAutoregistrationPSK extends CIntegrationTest {
 				'TLSAccept' => 'psk',
 				'HostMetadataItem' => 'vfs.file.contents['.self::METADATA_FILE.']'
 			],
-
 			self::COMPONENT_AGENT2 => [
 				'Hostname' => self::PSK_HOSTNAME2,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
@@ -247,7 +240,6 @@ class testAutoregistrationPSK extends CIntegrationTest {
 				'TLSAccept' => 'psk',
 				'HostMetadataItem' => 'vfs.file.contents['.self::METADATA_FILE.']'
 			],
-
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 5,
 				'LogFileSize' => 0,
@@ -316,8 +308,6 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	}
 
 	/**
-	 * Component configuration provider for agent related tests.
-	 *
 	 * @backup actions,hosts,host_tag,autoreg_host
 	 *
 	 * @return array
@@ -353,6 +343,9 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	}
 
 	/**
+	 * Makes sure autoregistration does not happen when wrong PSK is used.
+	 * Checks the resulting tags on host to make sure the autoregistration did not happen.
+	 *
 	 * @required-components agent,agent2,server
 	 * @configurationDataProvider agentConfigurationProvider_secondTimeWrongPSK
 	 */
@@ -365,12 +358,13 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		$this->updateAutoregistrationWithUpperCasePSK();
 
 		$this->startComponent(self::COMPONENT_SERVER);
+
 		sleep(1);
+
 		$this->startComponent(self::COMPONENT_AGENT);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->stopComponent(self::COMPONENT_SERVER);
-
 
 		$response = $this->call('action.create', [
 		[
@@ -394,9 +388,10 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		$this->assertArrayHasKey('actionids', $response['result'], 'Failed to create an autoregistration action');
 		$actionids = $response['result']['actionids'];
 		$this->assertCount(1, $actionids, 'Failed to create an autoregistration action');
-
 		$this->startComponent(self::COMPONENT_SERVER);
+
 		sleep(1);
+
 		$this->startComponent(self::COMPONENT_AGENT2);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'failed to accept an incoming connection', true, 120);
