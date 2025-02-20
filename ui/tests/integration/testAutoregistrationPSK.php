@@ -34,6 +34,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	const PSK_FILE_UPPER_CASE = "/tmp/zabbix_agent_upper_case_psk.txt";
 	const PSK_FILE_LOWER_CASE = "/tmp/zabbix_agent_lower_case_psk.txt";
 	const PSK_FILE_WRONG = "/tmp/zabbix_agent_wrong_psk.txt";
+	const METADATA_FILE = "/tmp/zabbix_agent_metadata_file.txt";
 
 	const HOST_METADATA_PSK_LOWER_CASE = "METADATA_PSK_LOWER_CASE";
 	const HOST_METADATA_PSK_UPPER_CASE = "METADATA_PSK_UPPER_CASE";
@@ -41,6 +42,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 	const PSK_HOSTNAME = "PSK_HOSTNAME";
 	const PSK_HOSTNAME2 = "PSK_HOSTNAME2";
+
 
 	/**
 	 * @inheritdoc
@@ -87,6 +89,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	 */
 	public function agentConfigurationProvider_LowerCaseFirstPSK() {
 
+		#'HostMetadata' Vx=> self::HOST_METADATA_PSK_LOWER_CASE
 		return [
 			self::COMPONENT_AGENT => [
 				'Hostname' => self::PSK_HOSTNAME,
@@ -95,7 +98,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 				'TLSPSKFile' => self::PSK_FILE_UPPER_CASE,
 				'TLSConnect' => 'psk',
 				'TLSAccept' => 'psk',
-				'HostMetadata' => self::HOST_METADATA_PSK_LOWER_CASE
+				'HostMetadataItem' => 'vfs.file.contents['.self::METADATA_FILE.']'
 			],
 
 			self::COMPONENT_AGENT2 => [
@@ -130,6 +133,9 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 	/**
 	 * @required-components agent,agent2,server
+	 *
+	 * @backup actions
+	 *
 	 * @configurationDataProvider agentConfigurationProvider_LowerCaseFirstPSK
 	 */
 	public function testAutoregistration_withLowerCasePSK()
@@ -226,14 +232,18 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 		$this->killComponent(self::COMPONENT_AGENT2);
 		$this->stopComponent(self::COMPONENT_SERVER);
+
+		if (file_put_contents(self::METADATA_FILE, "badger") === false) {
+			throw new Exception('Failed to create metadata_file');
+		}
+
 		$this->startComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
 
 
-
-				$response = $this->call('host.get', [
+		$response = $this->call('host.get', [
 			'filter' => [
 				'host' => self::PSK_HOSTNAME
 				],
@@ -263,7 +273,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 	/**
 	 * Component configuration provider for agent related tests.
-	 *
+	 * @backup actions
 	 * @return array
 	 */
 	public function agentConfigurationProvider_secondTimeWrongPSK() {
