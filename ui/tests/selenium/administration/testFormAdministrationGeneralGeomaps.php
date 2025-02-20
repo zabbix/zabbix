@@ -209,7 +209,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 					],
 					'error' => [
 						'Incorrect value for field "geomaps_tile_url": cannot be empty.',
-						'Incorrect value for field "geomaps_max_zoom": cannot be empty.'
+						'Incorrect value for field "geomaps_max_zoom": value must be no less than "1".'
 					]
 				]
 			],
@@ -222,7 +222,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 						'Tile URL' => '123',
 						'Max zoom level' => ''
 					],
-					'error' => 'Incorrect value for field "geomaps_max_zoom": cannot be empty.'
+					'error' => 'Incorrect value for field "geomaps_max_zoom": value must be no less than "1".'
 				]
 			],
 			// #6.
