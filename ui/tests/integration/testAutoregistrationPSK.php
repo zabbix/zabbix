@@ -96,7 +96,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	}
 
 	/**
-	 * Component configuration provider for agent related tests.
+	 * Both agent 1 and agent 2 have the same UPPER case PSK
 	 *
 	 * @return array
 	 */
@@ -145,7 +145,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->killComponent(self::COMPONENT_SERVER);
 
-		$this->withLowerAndThenUpperCasePSK();
+		$this->updateAutoregistrationWithUpperCasePSK();
 
 		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(1);
@@ -183,7 +183,6 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 		$this->startComponent(self::COMPONENT_AGENT2);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
-		#$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'but different PSK values', true, 120);
 
 		$response = $this->call('host.get', [
 			'filter' => [
@@ -264,12 +263,11 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	}
 
 	/**
-	 * Component configuration provider for agent related tests.
+	 * Both agent 1 and agent 2 have the same LOWER case PSK
 	 *
 	 * @return array
 	 */
 	public function agentConfigurationProvider_withLowerCasePSK() {
-
 		return [
 			self::COMPONENT_AGENT => [
 				'Hostname' => self::PSK_HOSTNAME,
@@ -280,7 +278,6 @@ class testAutoregistrationPSK extends CIntegrationTest {
 				'TLSAccept' => 'psk',
 				'HostMetadataItem' => 'vfs.file.contents['.self::METADATA_FILE.']'
 			],
-
 			self::COMPONENT_AGENT2 => [
 				'Hostname' => self::PSK_HOSTNAME2,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
@@ -290,7 +287,6 @@ class testAutoregistrationPSK extends CIntegrationTest {
 				'TLSAccept' => 'psk',
 				'HostMetadata' => self::HOST_METADATA_PSK_LOWER_CASE
 			],
-
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 5,
 				'LogFileSize' => 0,
@@ -468,7 +464,6 @@ class testAutoregistrationPSK extends CIntegrationTest {
 			]
 		];
 	}
-
 
 	/**
 	 * @required-components agent,agent2,server

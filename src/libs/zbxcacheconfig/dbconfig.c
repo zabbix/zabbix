@@ -9573,6 +9573,7 @@ size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned ch
 	psk_i_local.tls_psk_identity = (const char *)psk_identity;
 
 	RDLOCK_CACHE;
+
 	/* Is it among host PSKs? */
 	if (NULL != (psk_i = (ZBX_DC_PSK *)zbx_hashset_search(&config->psks, &psk_i_local)))
 	{
@@ -9608,9 +9609,10 @@ size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned ch
 		return psk_len;
 	}
 
-zabbix_log(LOG_LEVEL_INFORMATION, "PPP 7");
+	/* stricter API validation for PSK identities is expected to make this use-case impossible */
 	zabbix_log(LOG_LEVEL_CRIT, "host PSK and autoregistration PSK have the same identity \"%s\" but"
 			" different PSK values, autoregistration will not be allowed", psk_identity);
+	zabbix_log(LOG_LEVEL_CRIT, "PSK values, psk_buf: \"%s\" and autoreg_psk_tmp: \"%s\"", psk_buf, autoreg_psk_tmp);
 	THIS_SHOULD_NEVER_HAPPEN;
 
 	return psk_len;
