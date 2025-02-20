@@ -607,9 +607,10 @@ class CPage {
 	 *
 	 * @param string $alias     Username on login screen
 	 * @param string $password  Password on login screen
+	 * @param int $scenario  	Scenario TEST_BAD means that passed credentials are invalid, TEST_GOOD - user successfully logged in
 	 * @param string $url		Direct link to certain Zabbix page
 	 */
-	public function userLogin($alias, $password, $url = 'index.php') {
+	public function userLogin($alias, $password, $scenario = TEST_GOOD, $url = 'index.php') {
 		if (self::$cookie === null) {
 			$this->driver->get(PHPUNIT_URL);
 		}
@@ -621,12 +622,14 @@ class CPage {
 		$this->query('id:enter')->one()->click();
 		$this->waitUntilReady();
 
-		// Make sure that logged in page is opened.
-		try {
-			$this->query('xpath://aside[@class="sidebar"]//a[text()="User settings"]')->exists();
+		// Check login result.
+		$sign_out = $this->query('class:zi-sign-out')->exists();
+
+		if ($scenario === TEST_GOOD && !$sign_out) {
+			throw new \Exception('"Sign out" button is not found on the page. Probably user is not logged in.');
 		}
-		catch (\Exception $ex) {
-			throw new \Exception('"User settings" menu is not found on page. Probably user is not logged in.');
+		elseif ($scenario === TEST_BAD && $sign_out) {
+			throw new \Exception('"Sign out" button is found on the page. Probably user is logged in, but shouldn\'t.');
 		}
 	}
 
