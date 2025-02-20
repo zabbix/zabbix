@@ -34,8 +34,8 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	const PSK_FILE_WRONG = "/tmp/zabbix_agent_wrong_psk.txt";
 	const METADATA_FILE = "/tmp/zabbix_agent_metadata_file.txt";
 
-	const HOST_METADATA_PSK_LOWER_CASE = "METADATA_PSK_LOWER_CASE";
-	const HOST_METADATA_PSK_UPPER_CASE = "METADATA_PSK_UPPER_CASE";
+	//const HOST_METADATA_PSK_LOWER_CASE = "METADATA_PSK_LOWER_CASE";
+	//const HOST_METADATA_PSK_UPPER_CASE = "METADATA_PSK_UPPER_CASE";
 	const HOST_METADATA_PSK_WRONG = "METADATA_PSK_WRONG";
 
 	const PSK_HOSTNAME = "PSK_HOSTNAME";
@@ -46,9 +46,9 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	 */
 	public function prepareData() {
 
-		if (file_exists(self::METADATA_FILE)) {
-			unlink(self::METADATA_FILE);
-		}
+		#if (file_exists(self::METADATA_FILE)) {
+		#	unlink(self::METADATA_FILE);
+		#}
 
 		if (file_put_contents(self::PSK_FILE_LOWER_CASE, self::PSK_KEY_LOWER_CASE) === false) {
 			throw new Exception('Failed to create lower case PSK file for agent');
@@ -68,8 +68,6 @@ class testAutoregistrationPSK extends CIntegrationTest {
 			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 			'status' => ACTION_STATUS_ENABLED,
 			'operations' => [
-				/* OPERATION_TYPE_HOST_ADD is intentionally missing. It is expected to be run by */
-				/* Zabbix server, because OPERATION_TYPE_HOST_TAGS_ADD is present.               */
 				[
 					'operationtype' => OPERATION_TYPE_HOST_ADD,
 				],
@@ -97,6 +95,13 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 
 	private function coreTestCase() {
+		if (file_exists(self::METADATA_FILE)) {
+			unlink(self::METADATA_FILE);
+		}
+		if (file_put_contents(self::METADATA_FILE, "\\".time()) === false) {
+			throw new Exception('Failed to create metadata_file');
+		}
+
 		$this->killComponent(self::COMPONENT_AGENT2);
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->killComponent(self::COMPONENT_SERVER);
@@ -185,7 +190,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		$this->killComponent(self::COMPONENT_AGENT2);
 		$this->stopComponent(self::COMPONENT_SERVER);
 
-		if (file_put_contents(self::METADATA_FILE, "\\") === false) {
+		if (file_put_contents(self::METADATA_FILE, "\\".time()) === false) {
 			throw new Exception('Failed to create metadata_file');
 		}
 
@@ -243,7 +248,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 				'TLSPSKFile' => self::PSK_FILE_UPPER_CASE,
 				'TLSConnect' => 'psk',
 				'TLSAccept' => 'psk',
-				'HostMetadata' => self::HOST_METADATA_PSK_UPPER_CASE
+				'HostMetadataItem' => 'vfs.file.contents['.self::METADATA_FILE.']'
 			],
 
 			self::COMPONENT_SERVER => [
@@ -290,7 +295,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 				'TLSPSKFile' => self::PSK_FILE_LOWER_CASE,
 				'TLSConnect' => 'psk',
 				'TLSAccept' => 'psk',
-				'HostMetadata' => self::HOST_METADATA_PSK_LOWER_CASE
+				'HostMetadataItem' => 'vfs.file.contents['.self::METADATA_FILE.']'
 			],
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 5,
@@ -331,7 +336,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 				'TLSPSKFile' => self::PSK_FILE_UPPER_CASE,
 				'TLSConnect' => 'psk',
 				'TLSAccept' => 'psk',
-				'HostMetadata' => self::HOST_METADATA_PSK_UPPER_CASE
+				'HostMetadataItem' => 'vfs.file.contents['.self::METADATA_FILE.']'
 			],
 			self::COMPONENT_AGENT2 => [
 				'Hostname' => self::PSK_HOSTNAME,
@@ -340,7 +345,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 				'TLSPSKFile' => self::PSK_FILE_WRONG,
 				'TLSConnect' => 'psk',
 				'TLSAccept' => 'psk',
-				'HostMetadata' => self::HOST_METADATA_PSK_WRONG
+				'HostMetadataItem' => 'vfs.file.contents['.self::METADATA_FILE.']'
 			],
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 5,
