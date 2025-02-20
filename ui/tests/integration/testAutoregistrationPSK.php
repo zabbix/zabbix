@@ -367,7 +367,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		$actionids = $response['result']['actionids'];
 		$this->assertCount(1, $actionids, 'Failed to create an autoregistration action');
 
-		updateAutoregistration2();
+		$this->updateAutoregistration2();
 
 		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(1);
