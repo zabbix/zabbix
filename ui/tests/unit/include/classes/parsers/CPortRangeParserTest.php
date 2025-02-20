@@ -30,12 +30,6 @@ class CPortRangeParserTest extends TestCase {
 				]
 			],
 			[
-				'0', [
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '0'
-				]
-			],
-			[
 				'123456', [
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
@@ -121,6 +115,48 @@ class CPortRangeParserTest extends TestCase {
 			],
 			[
 				'123,123,abc', [
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				sprintf('%s', ZBX_MIN_PORT_NUMBER), [
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => sprintf('%s', ZBX_MIN_PORT_NUMBER)
+				]
+			],
+			[
+				sprintf('%s', ZBX_MIN_PORT_NUMBER - 1), [
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				sprintf('%s-%s', ZBX_MIN_PORT_NUMBER, ZBX_MAX_PORT_NUMBER), [
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => sprintf('%s-%s', ZBX_MIN_PORT_NUMBER, ZBX_MAX_PORT_NUMBER)
+				]
+			],
+			[
+				sprintf('%s', ZBX_MAX_PORT_NUMBER), [
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => sprintf('%s', ZBX_MAX_PORT_NUMBER)
+				]
+			],
+			[
+				sprintf('%s', ZBX_MAX_PORT_NUMBER + 1), [
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				sprintf('%s-%s', ZBX_MIN_PORT_NUMBER - 1, ZBX_MAX_PORT_NUMBER), [
+					'rc' => CParser::PARSE_FAIL,
+					'match' => ''
+				]
+			],
+			[
+				sprintf('%s-%s', ZBX_MIN_PORT_NUMBER, ZBX_MAX_PORT_NUMBER + 1), [
 					'rc' => CParser::PARSE_FAIL,
 					'match' => ''
 				]
