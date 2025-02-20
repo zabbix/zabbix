@@ -9425,46 +9425,36 @@ int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const 
 	int				ret;
 
 	RDLOCK_CACHE;
-	zabbix_log(LOG_LEVEL_INFORMATION , "DDD 1");
+
 	if (NULL == (dc_autoreg_host = DCfind_autoreg_host(host)))
 	{
-	zabbix_log(LOG_LEVEL_INFORMATION , "DDD 2");
 		ret = SUCCEED;
 	}
 	else if (0 != strcmp(dc_autoreg_host->host_metadata, host_metadata))
 	{
-	zabbix_log(LOG_LEVEL_INFORMATION , "DDD 3");
 		ret = SUCCEED;
 	}
 	else if (dc_autoreg_host->flags != (int)flag)
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION , "DDD 4");
-
 		ret = SUCCEED;
 	}
 	else if (ZBX_CONN_IP == flag && (0 != strcmp(dc_autoreg_host->listen_ip, interface) ||
 			dc_autoreg_host->listen_port != port))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION , "DDD 5");
-
 		ret = SUCCEED;
 	}
 	else if (ZBX_CONN_DNS == flag && (0 != strcmp(dc_autoreg_host->listen_dns, interface) ||
 			dc_autoreg_host->listen_port != port))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION , "DDD 6");
-
 		ret = SUCCEED;
 	}
 	else if (AUTO_REGISTRATION_HEARTBEAT < now - dc_autoreg_host->timestamp)
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION , "DDD 7");
 		ret = SUCCEED;
 	}
 	else
 		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_INFORMATION , "DDD 8");
 	UNLOCK_CACHE;
 
 	return ret;
@@ -9583,7 +9573,6 @@ size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned ch
 	psk_i_local.tls_psk_identity = (const char *)psk_identity;
 
 	RDLOCK_CACHE;
-zabbix_log(LOG_LEVEL_INFORMATION, "PPP 1");
 	/* Is it among host PSKs? */
 	if (NULL != (psk_i = (ZBX_DC_PSK *)zbx_hashset_search(&config->psks, &psk_i_local)))
 	{
@@ -9591,7 +9580,6 @@ zabbix_log(LOG_LEVEL_INFORMATION, "PPP 1");
 		*psk_usage |= ZBX_PSK_FOR_HOST;
 	}
 
-zabbix_log(LOG_LEVEL_INFORMATION, "PPP 2");
 	/* Does it match autoregistration PSK? */
 	if (0 != strcmp(config->autoreg_psk_identity, (const char *)psk_identity))
 	{
@@ -9599,7 +9587,6 @@ zabbix_log(LOG_LEVEL_INFORMATION, "PPP 2");
 		return psk_len;
 	}
 
-zabbix_log(LOG_LEVEL_INFORMATION, "PPP 3");
 	if (0 == *psk_usage)	/* only as autoregistration PSK */
 	{
 		psk_len = zbx_strlcpy((char *)psk_buf, config->autoreg_psk, HOST_TLS_PSK_LEN_MAX);
@@ -9609,16 +9596,14 @@ zabbix_log(LOG_LEVEL_INFORMATION, "PPP 3");
 		return psk_len;
 	}
 
-zabbix_log(LOG_LEVEL_INFORMATION, "PPP 4");
 	/* the requested PSK is used as host PSK and as autoregistration PSK */
 	zbx_strlcpy((char *)autoreg_psk_tmp, config->autoreg_psk, sizeof(autoreg_psk_tmp));
 
 	UNLOCK_CACHE;
 
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "PPP comparing: ->%s<- and ->%s<-", psk_buf, autoreg_psk_tmp);
-	if (0 == strcasecmp((const char *)psk_buf, (const char *)autoreg_psk_tmp))
-	/*if (0 == strcmp((const char *)psk_buf, (const char *)autoreg_psk_tmp))*/
+	/*if (0 == strcasecmp((const char *)psk_buf, (const char *)autoreg_psk_tmp))*/
+	if (0 == strcmp((const char *)psk_buf, (const char *)autoreg_psk_tmp))
 	{
 		*psk_usage |= ZBX_PSK_FOR_AUTOREG;
 		return psk_len;
