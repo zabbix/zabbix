@@ -133,6 +133,16 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		$this->assertArrayHasKey('result', $response);
 		$this->assertEquals(true, $response['result']);
 	}
+	private function updateAutoregistration2()
+	{
+		$response = $this->call('autoregistration.update', [
+			'tls_accept' => HOST_ENCRYPTION_PSK,
+			'tls_psk_identity' => self::PSK_IDENTITY,
+			'tls_psk' => self::PSK_KEY_WRONG
+		]);
+		$this->assertArrayHasKey('result', $response);
+		$this->assertEquals(true, $response['result']);
+	}
 
 
 	/**
@@ -357,6 +367,8 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		$actionids = $response['result']['actionids'];
 		$this->assertCount(1, $actionids, 'Failed to create an autoregistration action');
 
+		updateAutoregistration2();
+
 		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(1);
 
@@ -366,7 +378,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 		$response = $this->call('host.get', [
 			'filter' => [
-				'host' => self::PSK_HOSTNAME2
+				'host' => self::PSK_HOSTNAME
 				],
 			'selectTags' => ['tag', 'value']
 		]);
