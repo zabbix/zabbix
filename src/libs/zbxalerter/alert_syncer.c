@@ -1080,7 +1080,7 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 					results_num = am_db_flush_results(&amdb.mediatypes, message->data);
 					break;
 				default:
-					zabbix_log(LOG_LEVEL_WARNING, "unrecognized message in alert syncer %d",
+					zabbix_log(LOG_LEVEL_WARNING, "unrecognized message in alert syncer %u",
 							message->code);
 					break;
 			}

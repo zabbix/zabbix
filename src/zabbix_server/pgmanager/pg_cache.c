@@ -1347,7 +1347,7 @@ static void	pg_cache_dump_proxy(zbx_pg_proxy_t *proxy)
 		groupid = proxy->group->proxy_groupid;
 
 	zabbix_log(LOG_LEVEL_TRACE, "    state:%d version:%x lastaccess:%d firstaccess:%d groupid:" ZBX_FS_UI64,
-			proxy->state, proxy->version, proxy->lastaccess, proxy->firstaccess, groupid);
+		proxy->state, (unsigned int)proxy->version, proxy->lastaccess, proxy->firstaccess, groupid);
 
 	zabbix_log(LOG_LEVEL_TRACE, "    hostids: [%d]", proxy->hosts.num_data);
 
