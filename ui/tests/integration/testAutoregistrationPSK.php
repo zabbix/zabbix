@@ -134,7 +134,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	/**
 	 * @required-components agent,agent2,server
 	 *
-	 * @backup actions
+	 * @backup actions,hosts,host_tag
 	 *
 	 * @configurationDataProvider agentConfigurationProvider_LowerCaseFirstPSK
 	 */
@@ -273,7 +273,9 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 	/**
 	 * Component configuration provider for agent related tests.
-	 * @backup actions
+	 *
+	 * @backup actions,hosts,host_tag
+	 *
 	 * @return array
 	 */
 	public function agentConfigurationProvider_secondTimeWrongPSK() {
@@ -290,7 +292,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 			],
 
 			self::COMPONENT_AGENT2 => [
-				'Hostname' => self::PSK_HOSTNAME2,
+				'Hostname' => self::PSK_HOSTNAME,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'TLSPSKIdentity' => self::PSK_IDENTITY,
 				'TLSPSKFile' => self::PSK_FILE_WRONG,
