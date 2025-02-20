@@ -358,7 +358,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 		$this->startComponent(self::COMPONENT_AGENT2);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'host PSK and autoregistration PSK have the same identity "'.
-			PSK_HOSTNAME.'" but different PSK values, autoregistration will not be allowed', true, 120);
+			self::PSK_HOSTNAME.'" but different PSK values, autoregistration will not be allowed', true, 120);
 
 		$response = $this->call('host.get', [
 			'filter' => [
