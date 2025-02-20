@@ -33,6 +33,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 	const PSK_FILE_UPPER_CASE = "/tmp/zabbix_agent_upper_case_psk.txt";
 	const PSK_FILE_LOWER_CASE = "/tmp/zabbix_agent_lower_case_psk.txt";
+	const PSK_FILE_WRONG = "/tmp/zabbix_agent_wrong_psk.txt";
 
 	const HOST_METADATA_PSK_LOWER_CASE = "METADATA_PSK_LOWER_CASE";
 	const HOST_METADATA_PSK_UPPER_CASE = "METADATA_PSK_UPPER_CASE";
@@ -45,6 +46,18 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData() {
+
+		if (file_put_contents(self::PSK_FILE_LOWER_CASE, self::PSK_KEY_LOWER_CASE) === false) {
+			throw new Exception('Failed to create lower case PSK file for agent');
+		}
+
+		if (file_put_contents(self::PSK_FILE_UPPER_CASE, self::PSK_KEY_UPPER_CASE) === false) {
+			throw new Exception('Failed to create upper case PSK file for agent');
+		}
+
+		if (file_put_contents(self::PSK_FILE_WRONG, self::PSK_KEY_WRONG) === false) {
+			throw new Exception('Failed to create wrong PSK file for agent');
+		}
 
 		$response = $this->call('action.create', [
 		[
@@ -73,13 +86,6 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	 * @return array
 	 */
 	public function agentConfigurationProvider_LowerCaseFirstPSK() {
-		if (file_put_contents(self::PSK_FILE_LOWER_CASE, self::PSK_KEY_LOWER_CASE) === false) {
-			throw new Exception('Failed to create lower case PSK file for agent');
-		}
-
-		if (file_put_contents(self::PSK_FILE_UPPER_CASE, self::PSK_KEY_UPPER_CASE) === false) {
-			throw new Exception('Failed to create upper case PSK file for agent');
-		}
 
 		return [
 			self::COMPONENT_AGENT => [
@@ -261,17 +267,6 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	 * @return array
 	 */
 	public function agentConfigurationProvider_secondTimeWrongPSK() {
-		if (file_put_contents(self::PSK_FILE_LOWER_CASE, self::PSK_KEY_LOWER_CASE) === false) {
-			throw new Exception('Failed to create lower case PSK file for agent');
-		}
-
-		if (file_put_contents(self::PSK_FILE_UPPER_CASE, self::PSK_KEY_UPPER_CASE) === false) {
-			throw new Exception('Failed to create upper case PSK file for agent');
-		}
-
-		if (file_put_contents(self::PSK_FILE_WRONG, self::PSK_KEY_WRONG) === false) {
-			throw new Exception('Failed to create wrong PSK file for agent');
-		}
 
 		return [
 			self::COMPONENT_AGENT => [
