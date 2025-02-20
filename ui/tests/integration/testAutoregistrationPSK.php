@@ -295,7 +295,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 				'Hostname' => self::PSK_HOSTNAME,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'TLSPSKIdentity' => self::PSK_IDENTITY,
-				'TLSPSKFile' => self::PSK_FILE_WRONG,
+				'TLSPSKFile' => self::PSK_FILE_LOWER_CASE,
 				'TLSConnect' => 'psk',
 				'TLSAccept' => 'psk',
 				'HostMetadata' => self::HOST_METADATA_PSK_WRONG
@@ -415,8 +415,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
 
 
-
-				$response = $this->call('host.get', [
+		$response = $this->call('host.get', [
 			'filter' => [
 				'host' => self::PSK_HOSTNAME
 				],
