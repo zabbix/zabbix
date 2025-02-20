@@ -140,7 +140,7 @@ class CFieldSet extends CField {
 				name_parts.shift();
 			}
 
-			result = objectSetDeepValue(result, name_parts, trim_value ? field.getValue() : field.getValueTrimmed());
+			result = objectSetDeepValue(result, name_parts, trim_value ? field.getValueTrimmed() : field.getValue());
 		}
 
 		return result;
