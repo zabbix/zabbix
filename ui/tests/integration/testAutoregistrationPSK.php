@@ -32,10 +32,8 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	const PSK_FILE_UPPER_CASE = "/tmp/zabbix_agent_upper_case_psk.txt";
 	const PSK_FILE_LOWER_CASE = "/tmp/zabbix_agent_lower_case_psk.txt";
 	const PSK_FILE_WRONG = "/tmp/zabbix_agent_wrong_psk.txt";
-	const METADATA_FILE = "/tmp/zabbix_agent_metadata_file.txt";
 
-	//const HOST_METADATA_PSK_LOWER_CASE = "METADATA_PSK_LOWER_CASE";
-	//const HOST_METADATA_PSK_UPPER_CASE = "METADATA_PSK_UPPER_CASE";
+	const METADATA_FILE = "/tmp/zabbix_agent_metadata_file.txt";
 	const HOST_METADATA_PSK_WRONG = "METADATA_PSK_WRONG";
 
 	const PSK_HOSTNAME = "PSK_HOSTNAME";
@@ -81,7 +79,6 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		$this->assertCount(1, $actionids, 'Failed to create an autoregistration action');
 	}
 
-
 	private function updateAutoregistrationWithUpperCasePSK()
 	{
 		$response = $this->call('autoregistration.update', [
@@ -89,10 +86,10 @@ class testAutoregistrationPSK extends CIntegrationTest {
 			'tls_psk_identity' => self::PSK_IDENTITY,
 			'tls_psk' => self::PSK_KEY_UPPER_CASE
 		]);
+
 		$this->assertArrayHasKey('result', $response);
 		$this->assertEquals(true, $response['result']);
 	}
-
 
 	private function coreTestCase() {
 		if (file_exists(self::METADATA_FILE)) {
@@ -305,7 +302,6 @@ class testAutoregistrationPSK extends CIntegrationTest {
 			]
 		];
 	}
-
 
 	/**
 	 * @required-components agent,agent2,server
