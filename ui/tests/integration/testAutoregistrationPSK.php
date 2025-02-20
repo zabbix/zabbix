@@ -63,8 +63,8 @@ class testAutoregistrationPSK extends CIntegrationTest {
 			'status' => ACTION_STATUS_ENABLED,
 			'operations' => [
 				[
-					'operationtype' => OPERATION_TYPE_HOST_ADD,
-				],
+					'operationtype' => OPERATION_TYPE_HOST_ADD
+				]
 			]
 		],]);
 
@@ -127,9 +127,9 @@ class testAutoregistrationPSK extends CIntegrationTest {
 						[
 							'tag' => 'PSK_TAG',
 							'value' => 'PSK_VALUE'
-						],
+						]
 					]
-				],
+				]
 			]
 		],]);
 
@@ -177,9 +177,9 @@ class testAutoregistrationPSK extends CIntegrationTest {
 						[
 							'tag' => 'PSK_TAG22',
 							'value' => 'PSK_VALUE22'
-						],
+						]
 					]
-				],
+				]
 			]
 		],]);
 
@@ -378,9 +378,9 @@ class testAutoregistrationPSK extends CIntegrationTest {
 						[
 							'tag' => 'PSK_TAG',
 							'value' => 'PSK_VALUE'
-						],
+						]
 					]
-				],
+				]
 			]
 		],]);
 
