@@ -9625,8 +9625,10 @@ zabbix_log(LOG_LEVEL_INFORMATION, "PPP 4");
 	}
 
 zabbix_log(LOG_LEVEL_INFORMATION, "PPP 7");
-	zabbix_log(LOG_LEVEL_WARNING, "host PSK and autoregistration PSK have the same identity \"%s\" but"
+	zabbix_log(LOG_LEVEL_CRIT, "host PSK and autoregistration PSK have the same identity \"%s\" but"
 			" different PSK values, autoregistration will not be allowed", psk_identity);
+	THIS_SHOULD_NEVER_HAPPEN;
+
 	return psk_len;
 }
 #endif

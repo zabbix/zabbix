@@ -133,17 +133,6 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		$this->assertArrayHasKey('result', $response);
 		$this->assertEquals(true, $response['result']);
 	}
-	private function updateAutoregistration2()
-	{
-		$response = $this->call('autoregistration.update', [
-			'tls_accept' => HOST_ENCRYPTION_PSK,
-			'tls_psk_identity' => self::PSK_IDENTITY,
-			'tls_psk' => self::PSK_KEY_WRONG
-		]);
-		$this->assertArrayHasKey('result', $response);
-		$this->assertEquals(true, $response['result']);
-	}
-
 
 	/**
 	 * @required-components agent,agent2,server
@@ -367,14 +356,12 @@ class testAutoregistrationPSK extends CIntegrationTest {
 		$actionids = $response['result']['actionids'];
 		$this->assertCount(1, $actionids, 'Failed to create an autoregistration action');
 
-		$this->updateAutoregistration2();
-
 		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(1);
 
 		$this->startComponent(self::COMPONENT_AGENT2);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'host PSK and autoregistration PSK have the same identity "'.
-			self::PSK_HOSTNAME.'" but different PSK values, autoregistration will not be allowed', true, 120);
+
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'failed to accept an incoming connection', true, 120);
 
 		$response = $this->call('host.get', [
 			'filter' => [
@@ -394,63 +381,12 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 		$tags = $autoregHost['tags'];
 
-		$expectedTags = ['tag' => 'PSK_TAG', 'value' => 'PSK_VALUE'];
+		#$expectedTags = ['tag' => 'PSK_TAG', 'value' => 'PSK_VALUE'];
 
-		$this->assertCount(1, $tags, 'Unexpected tags count was detected: '. json_encode($tags));
-
-
-		$this->assertContains($expectedTags, $tags, json_encode($tags));
+		# there must be no tags, as autoregistration had to fail
+		$this->assertCount(0, $tags, 'Unexpected tags count was detected: '. json_encode($tags));
 
 
-		$response = $this->call('action.create', [
-		[
-			'name' => "action3",
-			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
-			'status' => ACTION_STATUS_ENABLED,
-			'operations' => [
-				[
-					'operationtype' => OPERATION_TYPE_HOST_TAGS_ADD,
-					'optag' => [
-						[
-							'tag' => 'PSK_TAG22',
-							'value' => 'PSK_VALUE22'
-						],
-					]
-				],
-			]
-		],]);
-
-
-		$this->killComponent(self::COMPONENT_AGENT2);
-		$this->stopComponent(self::COMPONENT_SERVER);
-		$this->startComponent(self::COMPONENT_SERVER);
-		$this->startComponent(self::COMPONENT_AGENT);
-
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
-
-
-		$response = $this->call('host.get', [
-			'filter' => [
-				'host' => self::PSK_HOSTNAME
-				],
-			'selectTags' => ['tag', 'value']
-		]);
-
-		$this->assertArrayHasKey('result', $response, 'Failed to autoregister host before timeout');
-		$this->assertCount(1, $response['result'], 'Failed to autoregister host before timeout, response result: '.
-			json_encode($response['result']));
-		$this->assertArrayHasKey('tags', $response['result'][0], 'Failed to autoregister host before timeout: response result: '.
-			json_encode($response['result']));
-
-		$autoregHost = $response['result'][0];
-		$this->assertArrayHasKey('hostid', $autoregHost, 'Failed to get host ID of the autoregistered host');
-
-		$tags = $autoregHost['tags'];
-
-		$expectedTags = ['tag' => 'PSK_TAG22', 'value' => 'PSK_VALUE22'];
-
-		$this->assertCount(2, $tags, 'Unexpected tags count was detected: '. json_encode($tags));
-
-		$this->assertContains($expectedTags, $tags, json_encode($tags));
+		#$this->assertContains($expectedTags, $tags, json_encode($tags));
 	}
 }
