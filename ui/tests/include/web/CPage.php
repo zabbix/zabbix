@@ -622,16 +622,14 @@ class CPage {
 		$this->query('id:enter')->one()->click();
 		$this->waitUntilReady();
 
-		// Throw an exception when expected scenario fails.
-		if ($scenario === TEST_GOOD) {
-			if (!$this->query('class:zi-sign-out')->exists()) {
-				throw new \Exception('"Sign out" button is not found on the page. Probably user is not logged in.');
-			}
+		// Check login result.
+		$sign_out = $this->query('class:zi-sign-out')->exists();
+
+		if ($scenario === TEST_GOOD && !$sign_out) {
+			throw new \Exception('"Sign out" button is not found on the page. Probably user is not logged in.');
 		}
-		else {
-			if (!$this->query('class:signin-container')->exists()) {
-				throw new \Exception('Unexpected behavior. User successfully passed login screen with invalid credentials');
-			}
+		elseif ($scenario === TEST_BAD && $sign_out) {
+			throw new \Exception('"Sign out" button is found on the page. Probably user is logged in, but shouldn\'t.');
 		}
 	}
 
