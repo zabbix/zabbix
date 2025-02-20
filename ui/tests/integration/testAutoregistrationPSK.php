@@ -36,6 +36,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	const HOST_METADATA_PSK_UPPER_CASE = "METADATA_PSK_UPPER_CASE";
 
 	const PSK_HOSTNAME = "PSK_HOSTNAME";
+	const PSK_HOSTNAME2 = "PSK_HOSTNAME2";
 
 	/**
 	 * @inheritdoc
@@ -89,7 +90,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 			],
 
 			self::COMPONENT_AGENT2 => [
-				'Hostname' => self::PSK_HOSTNAME,
+				'Hostname' => self::PSK_HOSTNAME2,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'TLSPSKIdentity' => self::PSK_IDENTITY,
 				'TLSPSKFile' => self::PSK_FILE_UPPER_CASE,
