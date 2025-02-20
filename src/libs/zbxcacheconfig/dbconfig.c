@@ -9617,8 +9617,8 @@ zabbix_log(LOG_LEVEL_INFORMATION, "PPP 4");
 
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "PPP comparing: ->%s<- and ->%s<-", psk_buf, autoreg_psk_tmp);
-	/*if (0 == strcasecmp((const char *)psk_buf, (const char *)autoreg_psk_tmp))*/
-	if (0 == strcmp((const char *)psk_buf, (const char *)autoreg_psk_tmp))
+	if (0 == strcasecmp((const char *)psk_buf, (const char *)autoreg_psk_tmp))
+	/*if (0 == strcmp((const char *)psk_buf, (const char *)autoreg_psk_tmp))*/
 	{
 		*psk_usage |= ZBX_PSK_FOR_AUTOREG;
 		return psk_len;

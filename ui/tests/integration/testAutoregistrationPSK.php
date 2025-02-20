@@ -29,11 +29,14 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	const PSK_IDENTITY = "535D2244f31e82fcee2cd9b7964413b797af3d2271e68a7ac2e94e102b2dcb31";
 	const PSK_KEY_UPPER_CASE = "53E79a76526473c982eab32473e9e1643ead36cc5cfe693a7955b1b0527ec7fe";
 	const PSK_KEY_LOWER_CASE = "53e79a76526473c982eab32473e9e1643ead36cc5cfe693a7955b1b0527ec7fe";
+	const PSK_KEY_WRONG = "53X79a76526473c982eab32473e9e1643ead36cc5cfe693a7955b1b0527ec7fe";
+
 	const PSK_FILE_UPPER_CASE = "/tmp/zabbix_agent_upper_case_psk.txt";
 	const PSK_FILE_LOWER_CASE = "/tmp/zabbix_agent_lower_case_psk.txt";
 
 	const HOST_METADATA_PSK_LOWER_CASE = "METADATA_PSK_LOWER_CASE";
 	const HOST_METADATA_PSK_UPPER_CASE = "METADATA_PSK_UPPER_CASE";
+	const HOST_METADATA_PSK_WRONG = "METADATA_PSK_WRONG";
 
 	const PSK_HOSTNAME = "PSK_HOSTNAME";
 	const PSK_HOSTNAME2 = "PSK_HOSTNAME2";
@@ -172,7 +175,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 		$response = $this->call('host.get', [
 			'filter' => [
-				'host' => self::PSK_HOSTNAME
+				'host' => self::PSK_HOSTNAME2
 				],
 			'selectTags' => ['tag', 'value']
 		]);
@@ -192,6 +195,187 @@ class testAutoregistrationPSK extends CIntegrationTest {
 
 		$this->assertCount(1, $tags, 'Unexpected tags count was detected: '. json_encode($tags));
 
+
+		$this->assertContains($expectedTags, $tags, json_encode($tags));
+
+
+		$response = $this->call('action.create', [
+		[
+			'name' => "action3",
+			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
+			'status' => ACTION_STATUS_ENABLED,
+			'operations' => [
+				[
+					'operationtype' => OPERATION_TYPE_HOST_TAGS_ADD,
+					'optag' => [
+						[
+							'tag' => 'PSK_TAG22',
+							'value' => 'PSK_VALUE22'
+						],
+					]
+				],
+			]
+		],]);
+
+
+		$this->killComponent(self::COMPONENT_AGENT2);
+		$this->stopComponent(self::COMPONENT_SERVER);
+		$this->startComponent(self::COMPONENT_SERVER);
+		$this->startComponent(self::COMPONENT_AGENT);
+
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
+
+
+
+				$response = $this->call('host.get', [
+			'filter' => [
+				'host' => self::PSK_HOSTNAME
+				],
+			'selectTags' => ['tag', 'value']
+		]);
+
+		$this->assertArrayHasKey('result', $response, 'Failed to autoregister host before timeout');
+		$this->assertCount(1, $response['result'], 'Failed to autoregister host before timeout, response result: '.
+			json_encode($response['result']));
+		$this->assertArrayHasKey('tags', $response['result'][0], 'Failed to autoregister host before timeout: response result: '.
+			json_encode($response['result']));
+
+		$autoregHost = $response['result'][0];
+		$this->assertArrayHasKey('hostid', $autoregHost, 'Failed to get host ID of the autoregistered host');
+
+		$tags = $autoregHost['tags'];
+
+		$expectedTags = ['tag' => 'PSK_TAG22', 'value' => 'PSK_VALUE22'];
+
+		$this->assertCount(2, $tags, 'Unexpected tags count was detected: '. json_encode($tags));
+
+		$this->assertContains($expectedTags, $tags, json_encode($tags));
+	}
+
+
+
+
+	/**
+	 * Component configuration provider for agent related tests.
+	 *
+	 * @return array
+	 */
+	public function agentConfigurationProvider_secondTimeWrongPSK() {
+		if (file_put_contents(self::PSK_FILE_LOWER_CASE, self::PSK_KEY_LOWER_CASE) === false) {
+			throw new Exception('Failed to create lower case PSK file for agent');
+		}
+
+		if (file_put_contents(self::PSK_FILE_UPPER_CASE, self::PSK_KEY_UPPER_CASE) === false) {
+			throw new Exception('Failed to create upper case PSK file for agent');
+		}
+
+		if (file_put_contents(self::PSK_FILE_WRONG, self::PSK_KEY_WRONG) === false) {
+			throw new Exception('Failed to create wrong PSK file for agent');
+		}
+
+		return [
+			self::COMPONENT_AGENT => [
+				'Hostname' => self::PSK_HOSTNAME,
+				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
+				'TLSPSKIdentity' => self::PSK_IDENTITY,
+				'TLSPSKFile' => self::PSK_FILE_UPPER_CASE,
+				'TLSConnect' => 'psk',
+				'TLSAccept' => 'psk',
+				'HostMetadata' => self::HOST_METADATA_PSK_LOWER_CASE
+			],
+
+			self::COMPONENT_AGENT2 => [
+				'Hostname' => self::PSK_HOSTNAME2,
+				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
+				'TLSPSKIdentity' => self::PSK_IDENTITY,
+				'TLSPSKFile' => self::PSK_FILE_WRONG,
+				'TLSConnect' => 'psk',
+				'TLSAccept' => 'psk',
+				'HostMetadata' => self::HOST_METADATA_PSK_WRONG
+			],
+			self::COMPONENT_SERVER => [
+				'DebugLevel' => 5,
+				'LogFileSize' => 0,
+				'UnavailableDelay' => 5,
+				'UnreachableDelay' => 1
+			]
+		];
+	}
+
+
+
+	/**
+	 * @required-components agent,agent2,server
+	 * @configurationDataProvider agentConfigurationProvider_secondTimeWrongPSK
+	 */
+	public function testAutoregistration_secondTimeWrongPSK()
+	{
+		$this->killComponent(self::COMPONENT_AGENT2);
+		$this->killComponent(self::COMPONENT_AGENT);
+		$this->killComponent(self::COMPONENT_SERVER);
+
+		$this->updateAutoregistration();
+
+		$this->startComponent(self::COMPONENT_SERVER);
+		sleep(1);
+		$this->startComponent(self::COMPONENT_AGENT);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of db_register_host()', true, 120);
+		$this->killComponent(self::COMPONENT_AGENT);
+		$this->stopComponent(self::COMPONENT_SERVER);
+
+
+		$response = $this->call('action.create', [
+		[
+			'name' => "action2",
+			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
+			'status' => ACTION_STATUS_ENABLED,
+			'operations' => [
+				[
+					'operationtype' => OPERATION_TYPE_HOST_TAGS_ADD,
+					'optag' => [
+						[
+							'tag' => 'PSK_TAG',
+							'value' => 'PSK_VALUE'
+						],
+					]
+				],
+			]
+		],]);
+
+		$this->assertArrayHasKey('result', $response, 'Failed to create an autoregistration action');
+		$this->assertArrayHasKey('actionids', $response['result'],
+				'Failed to create an autoregistration action');
+		$actionids = $response['result']['actionids'];
+		$this->assertCount(1, $actionids, 'Failed to create an autoregistration action');
+
+		$this->startComponent(self::COMPONENT_SERVER);
+		sleep(1);
+
+		$this->startComponent(self::COMPONENT_AGENT2);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'host PSK and autoregistration PSK have the same identity "'.
+			PSK_HOSTNAME.'" but different PSK values, autoregistration will not be allowed', true, 120);
+
+		$response = $this->call('host.get', [
+			'filter' => [
+				'host' => self::PSK_HOSTNAME2
+				],
+			'selectTags' => ['tag', 'value']
+		]);
+
+		$this->assertArrayHasKey('result', $response, 'Failed to autoregister host before timeout');
+		$this->assertCount(1, $response['result'], 'Failed to autoregister host before timeout, response result: '.
+			json_encode($response['result']));
+		$this->assertArrayHasKey('tags', $response['result'][0], 'Failed to autoregister host before timeout: response result: '.
+			json_encode($response['result']));
+
+		$autoregHost = $response['result'][0];
+		$this->assertArrayHasKey('hostid', $autoregHost, 'Failed to get host ID of the autoregistered host');
+
+		$tags = $autoregHost['tags'];
+
+		$expectedTags = ['tag' => 'PSK_TAG', 'value' => 'PSK_VALUE'];
+
+		$this->assertCount(1, $tags, 'Unexpected tags count was detected: '. json_encode($tags));
 
 
 		$this->assertContains($expectedTags, $tags, json_encode($tags));
