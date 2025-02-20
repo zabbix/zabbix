@@ -622,9 +622,10 @@ class CPage {
 		$this->query('id:enter')->one()->click();
 		$this->waitUntilReady();
 
+		// Throw an exception when expected scenario fails.
 		if ($scenario === TEST_GOOD) {
-			if (!$this->query('class:zi-dashboards')->exists()) {
-				throw new \Exception('"Dashboards" menu is not found on the page. Probably user is not logged in.');
+			if (!$this->query('class:zi-sign-out')->exists()) {
+				throw new \Exception('"Sign out" button is not found on the page. Probably user is not logged in.');
 			}
 		}
 		else {
