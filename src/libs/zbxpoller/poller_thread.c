@@ -239,6 +239,7 @@ static int	parse_query_fields(const zbx_dc_item_t *item, char **query_fields, un
 	const char		*member, *element = NULL;
 	size_t			alloc_len, offset;
 	zbx_dc_um_handle_t	*um_handle;
+	zbx_dc_um_handle_t	*um_handle_unmasked;
 
 	if ('\0' == **query_fields)
 		return SUCCEED;
@@ -256,7 +257,10 @@ static int	parse_query_fields(const zbx_dc_item_t *item, char **query_fields, un
 	}
 
 	if (ZBX_MACRO_EXPAND_YES == expand_macros)
-		um_handle = zbx_dc_open_user_macros();
+	{
+		um_handle = zbx_dc_open_user_macros_masked();
+		um_handle_unmasked = zbx_dc_open_user_macros_secure();
+	}
 
 	do
 	{
@@ -267,7 +271,10 @@ static int	parse_query_fields(const zbx_dc_item_t *item, char **query_fields, un
 				NULL == zbx_json_decodevalue(member, value, sizeof(value), NULL))
 		{
 			if (ZBX_MACRO_EXPAND_YES == expand_macros)
+			{
+				zbx_dc_close_user_macros(um_handle_unmasked);
 				zbx_dc_close_user_macros(um_handle);
+			}
 
 			zabbix_log(LOG_LEVEL_ERR, "cannot parse query fields: %s", zbx_json_strerror());
 			zbx_free(str);
@@ -292,7 +299,8 @@ static int	parse_query_fields(const zbx_dc_item_t *item, char **query_fields, un
 		data = zbx_strdup(data, value);
 		if (ZBX_MACRO_EXPAND_YES == expand_macros)
 		{
-			zbx_substitute_macros(&data, NULL, 0, macro_http_raw_resolv, um_handle, &item->host, item);
+			zbx_substitute_macros(&data, NULL, 0, macro_http_raw_resolv, um_handle_unmasked, &item->host,
+					item);
 		}
 
 		zbx_url_encode(data, &data);
@@ -303,7 +311,10 @@ static int	parse_query_fields(const zbx_dc_item_t *item, char **query_fields, un
 	while (NULL != (element = zbx_json_next(&jp_array, element)));
 
 	if (ZBX_MACRO_EXPAND_YES == expand_macros)
+	{
+		zbx_dc_close_user_macros(um_handle_unmasked);
 		zbx_dc_close_user_macros(um_handle);
+	}
 
 	zbx_free(*query_fields);
 	*query_fields = str;
@@ -708,9 +719,9 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 						NULL, NULL, NULL, NULL, NULL, NULL, &items[i].http_proxy,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
 				zbx_substitute_macros(&items[i].ssl_cert_file, NULL, 0, macro_http_raw_resolv,
-							um_handle_secure, &items[i].host, &items[i]);
+							um_handle, &items[i].host, &items[i]);
 				zbx_substitute_macros(&items[i].ssl_key_file, NULL, 0, macro_http_raw_resolv,
-							um_handle_secure, &items[i].host, &items[i]);
+							um_handle, &items[i].host, &items[i]);
 				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
 						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].ssl_key_password,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
