@@ -1037,7 +1037,6 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	char			*sql = NULL, *sql_trig = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	int			i;
-	zbx_vector_uint64_t	selementids;
 	const char		*event_tables[] = {"events"};
 
 	if (0 == triggerids->values_num)
@@ -1048,8 +1047,6 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 
 	sql_alloc = 256;
 	sql = (char *)zbx_malloc(sql, sql_alloc);
-
-	zbx_vector_uint64_create(&selementids);
 
 	sql_offset = 0;
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -1077,8 +1074,6 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 
 	/* add housekeeper task to delete problems associated with trigger, this allows old events to be deleted */
 	DBadd_to_housekeeper(triggerids, "triggerid", event_tables, ARRSIZE(event_tables));
-
-	zbx_vector_uint64_destroy(&selementids);
 
 	zbx_free(sql);
 	zbx_free(sql_trig);
