@@ -46,9 +46,9 @@
 #	include "preproc_snmp.h"
 #endif
 
-static zbx_prepare_value_func_t	prepare_value_func_cb = NULL;
+static zbx_preproc_prepare_value_func_t	preproc_prepare_value_func_cb = NULL;
 static zbx_preproc_flush_value_func_t	preproc_flush_value_func_cb = NULL;
-static zbx_get_progname_f	get_progname_func_cb = NULL;
+static zbx_get_progname_f		get_progname_func_cb = NULL;
 
 /******************************************************************************
  *                                                                            *
@@ -98,10 +98,10 @@ static void	pp_curl_destroy(void)
 #endif
 }
 
-void	zbx_init_library_preproc(zbx_prepare_value_func_t prepare_value_cb,
+void	zbx_init_library_preproc(zbx_preproc_prepare_value_func_t preproc_prepare_value_cb,
 		zbx_preproc_flush_value_func_t preproc_flush_value_cb, zbx_get_progname_f get_progname_cb)
 {
-	prepare_value_func_cb = prepare_value_cb;
+	preproc_prepare_value_func_cb = preproc_prepare_value_cb;
 	preproc_flush_value_func_cb = preproc_flush_value_cb;
 	get_progname_func_cb = get_progname_cb;
 }
@@ -942,7 +942,7 @@ static void	prpeprocessor_flush_value_result(zbx_pp_manager_t *manager, zbx_pp_t
 
 	zbx_pp_value_task_get_data(task, &value_type, &flags, &value, &ts, &value_opt);
 
-	if (SUCCEED == prepare_value_func_cb(value, value_opt))
+	if (SUCCEED == preproc_prepare_value_func_cb(value, value_opt))
 		preproc_flush_value_func_cb(manager, task->itemid, value_type, flags, value, ts, value_opt);
 }
 
