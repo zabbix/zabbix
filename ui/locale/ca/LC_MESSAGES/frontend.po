@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-01-17 22:25+0000\n"
+"PO-Revision-Date: 2025-02-18 12:07+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -2685,7 +2685,7 @@ msgstr "No es pot pas esborrar el directori d'usuaris per defecte."
 #: include/classes/api/services/CDRule.php:773
 #, c-format
 msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
-msgstr ""
+msgstr "No es pot esborrar la comprovació de descoberta \"%1$s\" de la regla de descoberta \"%2$s\": %3$s."
 
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
@@ -2697,7 +2697,7 @@ msgstr[1] "No es poden pas esborrar les regles de descoberta"
 #: include/classes/api/services/CDRule.php:980
 #, c-format
 msgid "Cannot delete discovery rule \"%1$s\": %2$s."
-msgstr ""
+msgstr "No es pot pas esborrar la regla de descoberta \"%1$s\": %2$s."
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2726,7 +2726,7 @@ msgstr[1] "No es poden pas esborrar els equips"
 #: include/classes/api/services/CHost.php:1636
 #, c-format
 msgid "Cannot delete host \"%1$s\": %2$s."
-msgstr ""
+msgstr "No es pot pas esborrar l'equip \"%1$s\": %2$s."
 
 #: include/classes/api/services/CHost.php:1461
 #, c-format
@@ -2744,7 +2744,7 @@ msgstr[1] "No es poden pas esborrar els grups d'equips"
 #: include/classes/api/services/CHostGroup.php:769
 #, c-format
 msgid "Cannot delete host group \"%1$s\": %2$s."
-msgstr ""
+msgstr "No es pot pas esborrar el grup d'equips \"%1$s\": %2$s."
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2891,7 +2891,7 @@ msgstr[1] "No es poden pas esborrar les plantilles"
 #: include/classes/api/services/CTemplate.php:809
 #, c-format
 msgid "Cannot delete template \"%1$s\": %2$s."
-msgstr ""
+msgstr "No es pot pas esborrar la plantilla \"%1$s\": %2$s."
 
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
@@ -2931,7 +2931,7 @@ msgstr[1] "No es poden pas esborrar els triggers"
 #: include/classes/api/managers/CTriggerManager.php:126
 #, c-format
 msgid "Cannot delete trigger \"%1$s\": %2$s."
-msgstr ""
+msgstr "No es pot pas esborrar el trigger \"%1$s\": %2$s."
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
@@ -6638,19 +6638,19 @@ msgstr "Esborrat"
 
 #: include/actions.inc.php:143
 msgid "Deleted host"
-msgstr ""
+msgstr "Equip esborrat"
 
 #: include/actions.inc.php:125
 msgid "Deleted host group"
-msgstr ""
+msgstr "Grup d'equips esborrat"
 
 #: include/actions.inc.php:710
 msgid "Deleted host group(s)"
-msgstr ""
+msgstr "Grup(s) d'equips esborrat(s)"
 
 #: include/actions.inc.php:134
 msgid "Deleted trigger"
-msgstr ""
+msgstr "Trigger esborrat"
 
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
@@ -17818,7 +17818,7 @@ msgstr "Executeu l'script \"%1$s\" a l'equip actual"
 #: include/actions.inc.php:601
 #, c-format
 msgid "Run script \"%1$s\" on deleted object(s)"
-msgstr ""
+msgstr "Executa l'script \"%1$s\" als objectes esborrats"
 
 #: include/actions.inc.php:622
 #, c-format
@@ -20463,11 +20463,11 @@ msgstr "Els paràmetre es passaran a l'script com arguments de línia de comande
 
 #: app/views/action.list.php:156
 msgid "This action has conditions or operations referencing deleted object(s)."
-msgstr ""
+msgstr "Aquesta acció té condicions o operacions que fan referència a objectes esborrats."
 
 #: app/views/action.list.php:151
 msgid "This action has missing conditions or operations due to previously deleted object(s)."
-msgstr ""
+msgstr "Aquesta acció té condicions o operacions que manquen a causa d'objectes esborrats anteriorment."
 
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
@@ -23972,37 +23972,37 @@ msgstr "acos() - L'arccosinus d'un valor com a angle, expressat en radians"
 #: include/classes/api/services/CDRule.php:774
 #, c-format
 msgid "action \"%1$s\" uses this discovery check"
-msgstr ""
+msgstr "l'acció \"%1$s\" empra aquesta comprovació de descoberta"
 
 #: include/classes/api/services/CDRule.php:981
 #, c-format
 msgid "action \"%1$s\" uses this discovery rule"
-msgstr ""
+msgstr "l'acció \"%1$s\" empra aquesta regla de descoberta"
 
 #: include/classes/api/services/CHost.php:1637
 #, c-format
 msgid "action \"%1$s\" uses this host"
-msgstr ""
+msgstr "l'acció \"%1$s\" empra aquest equip"
 
 #: include/classes/api/services/CHostGroup.php:770
 #, c-format
 msgid "action \"%1$s\" uses this host group"
-msgstr ""
+msgstr "l'acció \"%1$s\" empra aquest grup d'equips"
 
 #: include/classes/api/services/CService.php:487
 #, c-format
 msgid "action \"%1$s\" uses this service"
-msgstr ""
+msgstr "l'acció \"%1$s\" empra aquest servei"
 
 #: include/classes/api/services/CTemplate.php:810
 #, c-format
 msgid "action \"%1$s\" uses this template"
-msgstr ""
+msgstr "l'acció \"%1$s\" empra aquesta plantilla"
 
 #: include/classes/api/managers/CTriggerManager.php:127
 #, c-format
 msgid "action \"%1$s\" uses this trigger"
-msgstr ""
+msgstr "l'acció \"%1$s\" empra aquest trigger"
 
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144
