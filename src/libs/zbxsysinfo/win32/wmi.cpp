@@ -335,8 +335,9 @@ extern "C" static int	parse_wmi_value_all(IEnumWbemClassObject *pEnumerator, dou
  *           intended format using VariantChangeType()                         *
  *                                                                             *
  *******************************************************************************/
-extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_query, zbx_parse_wmi_value_t parse_wmi_value_cb,
-		double timeout, zbx_vector_wmi_instance_t *wmi_values, char **error)
+extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_query,
+		zbx_parse_wmi_value_t parse_wmi_value_cb, double timeout, zbx_vector_wmi_instance_t *wmi_values,
+		char **error)
 {
 	IWbemLocator		*pLoc = 0;
 	IWbemServices		*pService = 0;
@@ -438,8 +439,8 @@ extern "C" void	zbx_wmi_get(const char *wmi_namespace, const char *wmi_query, do
 		goto out;
 	}
 
-	if (SYSINFO_RET_FAIL == zbx_wmi_get_variant(wmi_namespace, wmi_query, parse_wmi_value_first_first, timeout, &wmi_values,
-			&error))
+	if (SYSINFO_RET_FAIL == zbx_wmi_get_variant(wmi_namespace, wmi_query, parse_wmi_value_first_first, timeout,
+			&wmi_values, &error))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, error);
 		goto out;
@@ -996,8 +997,8 @@ extern "C" int	wmi_getall(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_vector_wmi_instance_create(&wmi_values);
 
-	if (SYSINFO_RET_OK == zbx_wmi_get_variant(wmi_namespace, wmi_query, parse_wmi_value_all, sysinfo_get_config_timeout(),
-			&wmi_values, &error))
+	if (SYSINFO_RET_OK == zbx_wmi_get_variant(wmi_namespace, wmi_query, parse_wmi_value_all,
+			sysinfo_get_config_timeout(), &wmi_values, &error))
 	{
 		ret = convert_wmi_json(&wmi_values, &jd, &error);
 	}
