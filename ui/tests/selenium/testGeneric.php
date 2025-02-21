@@ -100,7 +100,7 @@ class testGeneric extends CLegacyWebTest {
 
 			// Misc
 			['zabbix.php?action=search&search=server',		'Search'],
-			['zabbix.php?action=userprofile.edit',			'User profile']
+			['zabbix.php?action=userprofile.edit',			'Profile']
 		];
 	}
 

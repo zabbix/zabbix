@@ -49,7 +49,7 @@ static const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)
 	}
 }
 
-static int	agent_task_process(short event, void *data, int *fd, struct evutil_addrinfo **current_ai,
+static int	async_task_process_task_agent_cb(short event, void *data, int *fd, struct evutil_addrinfo **current_ai,
 		const char *addr, char *dnserr, struct event *timeout_event)
 {
 	zbx_agent_context	*agent_context = (zbx_agent_context *)data;
@@ -319,7 +319,7 @@ stop:
 out:
 	zbx_tcp_send_context_clear(&agent_context->tcp_send_context);
 	if (ZABBIX_AGENT_STEP_CONNECT_INIT == agent_context->step)
-		return agent_task_process(0, data, fd, current_ai, addr, dnserr, NULL);
+		return async_task_process_task_agent_cb(0, data, fd, current_ai, addr, dnserr, NULL);
 
 	return ZBX_ASYNC_TASK_STOP;
 }
@@ -335,7 +335,8 @@ void	zbx_async_check_agent_clean(zbx_agent_context *agent_context)
 	zbx_free_agent_result(&agent_context->item.result);
 }
 
-int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_task_clear_cb_t clear_cb,
+int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,
+		zbx_async_task_process_result_cb_t async_task_process_result_agent_cb,
 		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
 		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns)
 {
@@ -426,7 +427,7 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 	agent_context->step = ZABBIX_AGENT_STEP_CONNECT_INIT;
 
 	zbx_async_poller_add_task(base, dnsbase, agent_context->item.interface.addr, agent_context, item->timeout + 1,
-			agent_task_process, clear_cb);
+			async_task_process_task_agent_cb, async_task_process_result_agent_cb);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(SUCCEED));
 

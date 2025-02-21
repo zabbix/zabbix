@@ -1215,7 +1215,7 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
  *            b) less than 500 (full batch) timer triggers were processed              *
  *                                                                                     *
  ***************************************************************************************/
-void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
+void	zbx_sync_history_cache_server(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
 		zbx_ipc_async_socket_t *rtc, int config_history_storage_pipelines, int *more)
 {
 /* the minimum processed item percentage of item candidates to continue synchronizing */
