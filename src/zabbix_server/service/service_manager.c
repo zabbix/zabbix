@@ -23,7 +23,6 @@
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
-#include "zbxdbschema.h"
 #include "zbxipcservice.h"
 #include "zbxself.h"
 #include "zbxnix.h"
@@ -1159,27 +1158,43 @@ static void	sync_config(zbx_service_manager_t *service_manager)
 {
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
+	const char	*severities[TRIGGER_SEVERITY_COUNT] = {0};
 
-	result = zbx_db_select("select severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,"
-				"severity_name_5 from config");
+	result = zbx_db_select(
+			"select name, value_str from settings"
+			" where name in ('severity_name_0','severity_name_1','severity_name_2','severity_name_3',"
+			"'severity_name_4','severity_name_5')");
 
-	if (NULL != (row = zbx_db_fetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		for (int i = 0; i < TRIGGER_SEVERITY_COUNT; i++)
-			service_manager->severities[i] = zbx_strdup(service_manager->severities[i], row[i]);
+		int	index = -1;
+
+		if (1 != sscanf(row[0], "severity_name_%d", &index))
+			continue;
+
+		severities[index] = row[1];
 	}
-	else
+
+	for (int i = 0; i < TRIGGER_SEVERITY_COUNT; i++)
 	{
-		const zbx_db_table_t	*table;
-		char			field[16];
-
-		table = zbx_db_get_table("config");
-
-		for (int i = 0; i < TRIGGER_SEVERITY_COUNT; i++)
+		if (NULL != severities[i])
 		{
+			service_manager->severities[i] = zbx_strdup(service_manager->severities[i], severities[i]);
+		}
+		else
+		{
+			char				field[16]; /* buffer length to fit "severity_name_1" + '\0' */
+			const zbx_setting_entry_t	*e;
+
 			zbx_snprintf(field, sizeof(field), "severity_name_%d", i);
-			service_manager->severities[i] = zbx_strdup(service_manager->severities[i],
-					zbx_db_get_field(table, field)->default_value);
+
+			if (NULL == (e = zbx_settings_descr_get(field, NULL)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			service_manager->severities[i] = zbx_strdup(service_manager->severities[i], e->default_value);
 		}
 	}
 

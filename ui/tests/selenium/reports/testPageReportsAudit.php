@@ -20,7 +20,7 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 require_once dirname(__FILE__).'/../../include/CAPITest.php';
 
 /**
- * @backup media_type, auditlog, config, profiles
+ * @backup media_type, auditlog, settings, profiles
  *
  * @onBefore deleteAuditlog
  *

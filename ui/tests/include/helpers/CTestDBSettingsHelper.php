@@ -1,3 +1,4 @@
+<?php
 /*
 ** Copyright (C) 2001-2025 Zabbix SIA
 **
@@ -12,15 +13,23 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_AUDIT_SERVER_H
-#define ZABBIX_AUDIT_SERVER_H
 
-#include "zbxtypes.h"
+require_once __DIR__.'/../../../include/classes/api/helpers/CApiSettingsHelper.php';
+require_once __DIR__.'/../../../include/classes/data/CSettingsSchema.php';
 
-void	zbx_audit_proxy_config_reload(int audit_context_mode, zbx_uint64_t proxyid, const char *name);
+/**
+ * Class for getting parameters from the DB settings table
+ */
+class CTestDBSettingsHelper extends CApiSettingsHelper {
 
-void	zbx_audit_settings_create_entry(int audit_context_mode, int audit_action);
-void	zbx_audit_settings_update_field_str(int audit_context_mode, const char *key, const char *old_value,
-		const char *new_value);
-
-#endif
+	/**
+	 * Return value for a single setting parameter.
+	 *
+	 * @param string $parameter_name    name of setting table parameter
+	 *
+	 * @return mixed
+	 */
+	public static function getParameterValue($parameter_name) {
+		return current(self::getParameters([$parameter_name]));
+	}
+}

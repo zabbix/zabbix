@@ -353,7 +353,7 @@ out:
 	return ret;
 }
 
-static int	proxyconfig_get_config_table_data(const zbx_dc_proxy_t *proxy, struct zbx_json *j, char **error,
+static int	proxyconfig_get_settings_table_data(const zbx_dc_proxy_t *proxy, struct zbx_json *j, char **error,
 		zbx_uint64_t proxy_secrets_provider)
 {
 	zbx_db_result_t			result;
@@ -361,16 +361,17 @@ static int	proxyconfig_get_config_table_data(const zbx_dc_proxy_t *proxy, struct
 	const zbx_db_table_t		*table;
 	char				*sql = NULL;
 	size_t				sql_alloc =  4 * ZBX_KIBIBYTE, sql_offset = 0;
-	int				ret = FAIL, fld = 0;
+	int				ret = FAIL;
 	const char			*alias = "t.", *alias_from = " t";
 	zbx_dc_item_type_timeouts_t	timeouts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	table = zbx_db_get_table("config");
+	table = zbx_db_get_table("settings");
 	zbx_json_addobject(j, table->table);
 
 	sql = (char *)zbx_malloc(NULL, sql_alloc);
+
 	proxyconfig_get_fields(&sql, &sql_alloc, &sql_offset, table, alias, j);
 
 	zbx_json_addarray(j, ZBX_PROTO_TAG_DATA);
@@ -379,37 +380,42 @@ static int	proxyconfig_get_config_table_data(const zbx_dc_proxy_t *proxy, struct
 
 	if (NULL == (result = zbx_db_select("%s", sql)))
 	{
-		*error = zbx_dsprintf(*error, "failed to get data from table \"config\"");
+		*error = zbx_dsprintf(*error, "failed to get data from table \"settings\"");
 		goto out;
 	}
 
 	zbx_dc_get_proxy_timeouts(proxy->proxyid, &timeouts);
 
-	if (NULL != (row = zbx_db_fetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
+		const char			*name = row[0];
+		const zbx_setting_entry_t	*e = zbx_settings_descr_get(name, NULL);
+
+		if (NULL == e || 0 == (e->flags & ZBX_PROXY))
+			continue;
+
 		zbx_json_addarray(j, NULL);
 
-		zbx_json_addstring(j, NULL, row[fld++], ZBX_JSON_TYPE_INT);
+		zbx_json_addstring(j, NULL, row[0], ZBX_JSON_TYPE_STRING);
 
 		for (int i = 0; 0 != table->fields[i].name; i++)
 		{
 			if (0 == (table->fields[i].flags & ZBX_PROXY))
 				continue;
 
-			if (0 == strncmp(table->fields[i].name, ZBX_PROTO_TAG_PROXY_SECRETS_PROVIDER,
-					ZBX_CONST_STRLEN(ZBX_PROTO_TAG_PROXY_SECRETS_PROVIDER)))
+			if (0 == strncmp(name, ZBX_PROTO_TAG_PROXY_SECRETS_PROVIDER,
+					ZBX_CONST_STRLEN(ZBX_PROTO_TAG_PROXY_SECRETS_PROVIDER)) &&
+					0 == strcmp(table->fields[i].name, "value_int"))
 			{
 				zbx_json_adduint64(j, NULL, proxy_secrets_provider);
-				fld++;
-				continue;
 			}
-
-			if (0 == strncmp(table->fields[i].name, "timeout_", ZBX_CONST_STRLEN("timeout_")))
+			else if (0 == strncmp(name, "timeout_", ZBX_CONST_STRLEN("timeout_")) &&
+					0 == strcmp(table->fields[i].name, "value_str"))
 			{
 				char		*timeout_value;
 				const char	*item_type;
 
-				item_type = table->fields[i].name + ZBX_CONST_STRLEN("timeout_");
+				item_type = name + ZBX_CONST_STRLEN("timeout_");
 
 				if (0 == strcmp(item_type, "zabbix_agent"))
 				{
@@ -460,26 +466,24 @@ static int	proxyconfig_get_config_table_data(const zbx_dc_proxy_t *proxy, struct
 				}
 
 				zbx_json_addstring(j, NULL, timeout_value, ZBX_JSON_TYPE_STRING);
-				fld++;
-				continue;
 			}
-
-			switch (table->fields[i].type)
+			else
 			{
-				case ZBX_TYPE_INT:
-				case ZBX_TYPE_UINT:
-				case ZBX_TYPE_ID:
-					if (SUCCEED != zbx_db_is_null(row[fld]))
-						zbx_json_addstring(j, NULL, row[fld], ZBX_JSON_TYPE_INT);
-					else
-						zbx_json_addstring(j, NULL, NULL, ZBX_JSON_TYPE_NULL);
-					break;
-				default:
-					zbx_json_addstring(j, NULL, row[fld], ZBX_JSON_TYPE_STRING);
-					break;
+				switch (table->fields[i].type)
+				{
+					case ZBX_TYPE_INT:
+					case ZBX_TYPE_UINT:
+					case ZBX_TYPE_ID:
+						if (SUCCEED != zbx_db_is_null(row[i]))
+							zbx_json_addstring(j, NULL, row[i], ZBX_JSON_TYPE_INT);
+						else
+							zbx_json_addstring(j, NULL, NULL, ZBX_JSON_TYPE_NULL);
+						break;
+					default:
+						zbx_json_addstring(j, NULL, row[i], ZBX_JSON_TYPE_STRING);
+						break;
+				}
 			}
-
-			fld++;
 		}
 
 		zbx_json_close(j);
@@ -1279,7 +1283,7 @@ static int	proxyconfig_get_tables(zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_conf
 		if (proxy_config_revision < dc_revision->expression)
 			flags |= ZBX_PROXYCONFIG_SYNC_EXPRESSIONS;
 
-		if (proxy_config_revision < dc_revision->config_table)
+		if (proxy_config_revision < dc_revision->settings_table)
 			flags |= ZBX_PROXYCONFIG_SYNC_CONFIG;
 
 		if (0 != httptestids.values_num)
@@ -1347,7 +1351,7 @@ static int	proxyconfig_get_tables(zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_conf
 		}
 
 		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_CONFIG) &&
-				SUCCEED != proxyconfig_get_config_table_data(proxy, j, error, proxy_secrets_provider))
+				SUCCEED != proxyconfig_get_settings_table_data(proxy, j, error, proxy_secrets_provider))
 		{
 			goto out;
 		}

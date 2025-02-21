@@ -12,15 +12,21 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_AUDIT_SERVER_H
-#define ZABBIX_AUDIT_SERVER_H
+#include "zbxdbhigh.h"
 
-#include "zbxtypes.h"
+#include "zbxdb.h"
 
-void	zbx_audit_proxy_config_reload(int audit_context_mode, zbx_uint64_t proxyid, const char *name);
+int	zbx_db_setting_exists(const char *config_name)
+{
+	int		ret = SUCCEED;
+	zbx_db_result_t	result;
 
-void	zbx_audit_settings_create_entry(int audit_context_mode, int audit_action);
-void	zbx_audit_settings_update_field_str(int audit_context_mode, const char *key, const char *old_value,
-		const char *new_value);
+	result = zbx_db_select("select 1 from settings where name='%s'", config_name);
 
-#endif
+	if (NULL == zbx_db_fetch(result))
+		ret = FAIL;
+
+	zbx_db_free_result(result);
+
+	return ret;
+}

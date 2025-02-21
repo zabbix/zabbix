@@ -16,7 +16,7 @@
 require_once dirname(__FILE__).'/../common/testSystemInformation.php';
 
 /**
- * @backup ha_node, config
+ * @backup ha_node, settings
  *
  * @backupConfig
  */
