@@ -3253,7 +3253,9 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 
 			item_prototype = item_prototypes->values[index];
 
-			lld_item_prepare_update(item_prototype, item, &itemids_value_type_diff, &sql, &sql_alloc, &sql_offset);
+			lld_item_prepare_update(item_prototype, item, &itemids_value_type_diff, &sql, &sql_alloc,
+					&sql_offset);
+
 			lld_item_discovery_prepare_update(item_prototype, item, &sql, &sql_alloc, &sql_offset);
 		}
 
