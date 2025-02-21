@@ -625,7 +625,7 @@ class CPage {
 		$this->waitUntilReady();
 
 		// Check login result.
-		$sign_out = $this->query('class:zi-sign-out')->exists();
+		$sign_out = $this->query('class:icon-signout')->exists();
 
 		if ($scenario === TEST_GOOD && !$sign_out) {
 			throw new \Exception('"Sign out" button is not found on the page. Probably user is not logged in.');
