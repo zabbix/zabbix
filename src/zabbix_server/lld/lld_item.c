@@ -2600,6 +2600,29 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 	}
 }
 
+static int	lld_item_update_link_by_type_change(const zbx_lld_item_prototype_t *item_prototype,
+		const zbx_lld_item_full_t *item)
+{
+	if (item_prototype->value_type == ITEM_VALUE_TYPE_BIN)
+		return SUCCEED;
+
+	if (item_prototype->value_type == ITEM_VALUE_TYPE_TEXT &&
+			(item->value_type_orig == ITEM_VALUE_TYPE_UINT64 ||
+			item->value_type_orig == ITEM_VALUE_TYPE_FLOAT))
+	{
+		return SUCCEED;
+	}
+
+	if ((item_prototype->value_type == ITEM_VALUE_TYPE_UINT64 ||
+			item_prototype->value_type == ITEM_VALUE_TYPE_FLOAT) &&
+			item->value_type_orig == ITEM_VALUE_TYPE_TEXT)
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: prepares SQL to update LLD item                                   *
@@ -2615,7 +2638,7 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
  *                                                                            *
  ******************************************************************************/
 static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototype, const zbx_lld_item_full_t *item,
-		char **sql, size_t *sql_alloc, size_t *sql_offset)
+		zbx_vector_uint64_t *itemids_value_type_diff, char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
 	char				*value_esc;
 	const char			*d = "";
@@ -2654,6 +2677,9 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 		zbx_audit_item_update_json_update_value_type(ZBX_AUDIT_LLD_CONTEXT, item->itemid,
 				(int)ZBX_FLAG_DISCOVERY_CREATED, item->value_type_orig,
 				(int)item_prototype->value_type);
+
+		if (SUCCEED == lld_item_update_link_by_type_change(item_prototype, item))
+			zbx_vector_uint64_append(itemids_value_type_diff, item->itemid);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_DELAY))
 	{
@@ -3200,9 +3226,11 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 
 	if (0 != upd_items)
 	{
-		int	index;
+		int			index;
+		zbx_vector_uint64_t	itemids_value_type_diff;
 
 		sql_offset = 0;
+		zbx_vector_uint64_create(&itemids_value_type_diff);
 
 		for (int i = 0; i < items->values_num; i++)
 		{
@@ -3225,11 +3253,15 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 
 			item_prototype = item_prototypes->values[index];
 
-			lld_item_prepare_update(item_prototype, item, &sql, &sql_alloc, &sql_offset);
+			lld_item_prepare_update(item_prototype, item, &itemids_value_type_diff, &sql, &sql_alloc, &sql_offset);
 			lld_item_discovery_prepare_update(item_prototype, item, &sql, &sql_alloc, &sql_offset);
 		}
 
+		zbx_db_update_item_map_links(&itemids_value_type_diff, 0);
+
 		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
+
+		zbx_vector_uint64_destroy(&itemids_value_type_diff);
 	}
 out:
 	zbx_free(sql);
@@ -4152,6 +4184,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	zbx_db_commit();
 
 	lld_items_make(&item_prototypes, lld_rows, &items, &items_index, lastcheck, error);
+
 	lld_items_preproc_make(&item_prototypes, &items);
 	lld_items_param_make(&item_prototypes, &items, error);
 	lld_items_tags_make(&item_prototypes, &items, error);

@@ -280,6 +280,69 @@ static void	DBget_sysmapelements_by_element_type_ids(zbx_vector_uint64_t *seleme
 	zbx_vector_uint64_uniq(selementids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
+static void	DBupdate_trigger_map_links(const zbx_vector_uint64_t *triggerids, int host_removed)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
+	zbx_vector_uint64_t	linkids;
+
+	zbx_vector_uint64_create(&linkids);
+
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select linkid from sysmaps_link_triggers where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid",
+			triggerids->values, triggerids->values_num);
+
+	if (0 == host_removed)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				" group by linkid"
+				" having count(*)=1");
+	}
+
+	zbx_db_select_uint64(sql, &linkids);
+
+	if (linkids.values_num != 0)
+	{
+		sql_offset = 0;
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update sysmaps_links set indicator_type = 0 where");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "linkid",
+				linkids.values, linkids.values_num);
+		zbx_db_execute("%s", sql);
+	}
+
+	zbx_vector_uint64_destroy(&linkids);
+	zbx_free(sql);
+}
+
+void	zbx_db_update_item_map_links(const zbx_vector_uint64_t *itemids, int item_removed)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
+
+	if (0 == itemids->values_num)
+		return;
+
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+
+	if (1 == item_removed)
+	{
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update sysmaps_links "
+				"set itemid=null,indicator_type=0 where");
+	}
+	else
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update sysmaps_links set indicator_type=0 where");
+
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid",
+			itemids->values, itemids->values_num);
+
+	zbx_db_execute("%s", sql);
+	zbx_free(sql);
+}
+
 /******************************************************************************
  *                                                                            *
  * Description: Check collisions between linked templates                     *
@@ -1081,6 +1144,8 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 	if (0 == triggerids->values_num)
 		return;
 
+	DBupdate_trigger_map_links(triggerids, 0);
+
 	zbx_vector_uint64_create(&selementids);
 
 	DBget_sysmapelements_by_element_type_ids(&selementids, SYSMAP_ELEMENT_TYPE_TRIGGER, triggerids);
@@ -1456,6 +1521,8 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 
 	db_get_linked_items(itemids, "item_discovery i where", "i.parent_itemid");
 	db_get_linked_items(itemids, "items i where", "i.master_itemid");
+
+	zbx_db_update_item_map_links(itemids, 1);
 
 	zbx_audit_item_delete(audit_context_mode, itemids);
 
