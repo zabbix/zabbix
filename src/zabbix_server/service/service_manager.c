@@ -1167,12 +1167,18 @@ static void	sync_config(zbx_service_manager_t *service_manager)
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		int	index = -1;
-
-		if (1 != sscanf(row[0], "severity_name_%d", &index))
-			continue;
-
-		severities[index] = row[1];
+		if (0 == strcmp("severity_name_0", row[0]))
+			severities[0] = row[1];
+		else if (0 == strcmp("severity_name_1", row[0]))
+			severities[1] = row[1];
+		else if (0 == strcmp("severity_name_2", row[0]))
+			severities[2] = row[1];
+		else if (0 == strcmp("severity_name_3", row[0]))
+			severities[3] = row[1];
+		else if (0 == strcmp("severity_name_4", row[0]))
+			severities[4] = row[1];
+		else if (0 == strcmp("severity_name_5", row[0]))
+			severities[5] = row[1];
 	}
 
 	for (int i = 0; i < TRIGGER_SEVERITY_COUNT; i++)
