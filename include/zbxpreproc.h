@@ -75,7 +75,7 @@ zbx_thread_pp_manager_args;
 typedef struct zbx_pp_manager	zbx_pp_manager_t;
 
 typedef void(*zbx_preproc_flush_value_func_t)(zbx_pp_manager_t *manager, zbx_uint64_t itemid, unsigned char value_type,
-	unsigned char flags, zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_value_opt_t *value_opt);
+		unsigned char flags, zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_value_opt_t *value_opt);
 
 typedef int(*zbx_preproc_prepare_value_func_t)(const zbx_variant_t *value, const zbx_pp_value_opt_t *value_opt);
 
