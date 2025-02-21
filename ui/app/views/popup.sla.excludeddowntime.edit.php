@@ -22,7 +22,7 @@
 $form = (new CForm())
 	->setId('sla-excluded-downtime-form')
 	->setName('sla_excluded_downtime_form')
-	->addVar('edit', $data['is_edit'] ? '1' : null)
+	->addVar('edit', $data['is_edit'] ? '1' : '0')
 	->addVar('row_index', $data['row_index'])
 	->addItem(getMessages());
 
@@ -51,30 +51,38 @@ $form_grid = (new CFormGrid())
 	])
 	->addItem([
 		(new CLabel(_('Duration'), 'duration_days'))->setAsteriskMark(),
-		new CFormField(
+		new CFormField([
 			(new CDiv([
 				(new CNumericBox('duration_days', $data['form']['duration_days'], 4))
-					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+					->setErrorContainer('duration_length_error_container'),
 				new CLabel(_('Days'), 'duration_days'),
 				(new CSelect('duration_hours'))
 					->setFocusableElementId('duration-hours-focusable')
 					->setValue($data['form']['duration_hours'])
-					->addOptions(CSelect::createOptionsFromArray(range(0, 23))),
+					->addOptions(CSelect::createOptionsFromArray(range(0, 23)))
+					->setErrorContainer('duration_length_error_container'),
 				new CLabel(_('Hours'), 'duration-hours-focusable'),
 				(new CSelect('duration_minutes'))
 					->setFocusableElementId('duration-minutes-focusable')
 					->setValue($data['form']['duration_minutes'])
-					->addOptions(CSelect::createOptionsFromArray(range(0, 59))),
+					->addOptions(CSelect::createOptionsFromArray(range(0, 59)))
+					->setErrorContainer('duration_length_error_container'),
 				new CLabel(_('Minutes'), 'duration-minutes-focusable')
-			]))->addClass(ZBX_STYLE_FORM_FIELDS_INLINE)
-		)
+			]))->addClass(ZBX_STYLE_FORM_FIELDS_INLINE),
+			(new CDiv())
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
+				->setId('duration_length_error_container')
+		])
 	]);
 
 $form
 	->addItem($form_grid)
 	->addItem(
 		(new CScriptTag('
-			sla_excluded_downtime_edit_popup.init();
+			sla_excluded_downtime_edit_popup.init('.json_encode([
+				'rules' => $data['js_validation_rules']
+			]).');
 		'))->setOnDocumentReady()
 	);
 

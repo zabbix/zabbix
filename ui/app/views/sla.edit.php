@@ -26,6 +26,13 @@ $form = (new CForm('post'))
 	->addItem(getMessages())
 	->addStyle('display: none;');
 
+if ($data['slaid'] !== null) {
+	$form->addItem(
+		(new CInput('hidden', 'slaid', $data['slaid']))
+			->setAttribute('data-field-type', 'hidden')
+	);
+}
+
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
@@ -34,13 +41,23 @@ $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 $schedule = (new CTable())->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
 
 for ($weekday = 0; $weekday < 7; $weekday++) {
+	$enabled = $data['form']['schedule_periods'][$weekday] !== '';
+
 	$schedule->addRow(new CRow([
-		(new CCheckBox('schedule_enabled['.$weekday.']', $weekday))
+		(new CCheckBox('schedule_enabled_'.$weekday, $enabled ? '1' : '0'))
 			->setLabel(getDayOfWeekCaption($weekday))
-			->setChecked($data['form']['schedule_periods'][$weekday] !== ''),
-		(new CTextBox('schedule_periods['.$weekday.']', $data['form']['schedule_periods'][$weekday]))
+			->setChecked($enabled)
+			->setUncheckedValue('0')
+			->setErrorContainer('schedule_period_'.$weekday.'_'.'error_container'),
+		(new CTextBox('schedule_period_'.$weekday, $data['form']['schedule_periods'][$weekday]))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			->setAttribute('placeholder', '8:00-17:00, ...')
+			->setAttribute('placeholder', '8:00-17:00, ...'),
+		(new CRow([
+			(new CCol())
+				->setId('schedule_period_'.$weekday.'_'.'error_container')
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
+				->setColSpan(3)
+		]))->addClass('error-container-row')
 	]));
 }
 
@@ -132,13 +149,14 @@ $sla_tab = (new CFormGrid())
 						))
 					),
 				(new CTemplateTag('service-tag-row-tmpl'))
-					->addItem(
+					->addItem([
 						(new CRow([
 							(new CTextBox('service_tags[#{rowNum}][tag]', '#{tag}', false,
 								DB::getFieldLength('sla_service_tag', 'tag')
 							))
 								->setAttribute('placeholder', _('tag'))
-								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+								->setErrorContainer('service_tags_#{rowNum}_error_container'),
 							(new CSelect('service_tags[#{rowNum}][operator]'))
 								->addOptions(CSelect::createOptionsFromArray([
 									ZBX_SLA_SERVICE_TAG_OPERATOR_EQUAL => _('Equals'),
@@ -151,9 +169,18 @@ $sla_tab = (new CFormGrid())
 								->setAttribute('placeholder', _('value'))
 								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
-						]))->addClass('form_row')
-					)
-			]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+						]))->addClass('form_row'),
+						(new CRow([
+							(new CCol())
+								->setId('service_tags_#{rowNum}_error_container')
+								->addClass(ZBX_STYLE_ERROR_CONTAINER)
+								->setColSpan(3)
+						]))->addClass('error-container-row')
+					])
+			]))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('data-field-type', 'set')
+				->setAttribute('data-field-name', 'service_tags')
 		)
 	])
 	->addItem([
@@ -211,6 +238,7 @@ $form
 	->addItem(
 		(new CScriptTag('
 			sla_edit_popup.init('.json_encode([
+				'rules' => $data['js_validation_rules'],
 				'slaid' => $data['slaid'],
 				'service_tags' => $data['form']['service_tags'],
 				'excluded_downtimes' => $data['form']['excluded_downtimes']
@@ -249,7 +277,8 @@ if ($data['slaid'] !== null) {
 						'cancel' => true,
 						'action' => ''
 					]
-				]
+				],
+				'rules' => (new CFormValidator(CControllerSlaCreate::getValidationRules()))->getRules()
 			]).');'
 		],
 		[

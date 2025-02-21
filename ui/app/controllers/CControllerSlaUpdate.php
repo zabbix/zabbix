@@ -22,50 +22,127 @@ class CControllerSlaUpdate extends CControllerSlaCreateUpdate {
 	private $schedule = [];
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	protected function checkInput(): bool {
-		$fields = [
-			'slaid' =>				'required|id',
-			'name' =>				'required|string|not_empty',
-			'slo' =>				'required|string|not_empty',
-			'period' =>				'required|in '.implode(',', [ZBX_SLA_PERIOD_DAILY, ZBX_SLA_PERIOD_WEEKLY, ZBX_SLA_PERIOD_MONTHLY, ZBX_SLA_PERIOD_QUARTERLY, ZBX_SLA_PERIOD_ANNUALLY]),
-			'timezone' =>			'required|in '.implode(',', array_merge([ZBX_DEFAULT_TIMEZONE], array_keys(CTimezoneHelper::getList()))),
-			'schedule_mode' =>		'required|in '.implode(',', [CSlaHelper::SCHEDULE_MODE_24X7, CSlaHelper::SCHEDULE_MODE_CUSTOM]),
-			'schedule_enabled' =>	'array',
-			'schedule_periods' =>	'array',
-			'effective_date' =>		'required|abs_date',
-			'service_tags' =>		'required|array',
-			'description' =>		'required|string',
-			'status' =>				'in '.ZBX_SLA_STATUS_ENABLED,
-			'excluded_downtimes' =>	'array'
+	static function getValidationRules(): array {
+		$api_uniq = [
+			['sla.get', ['name' => '{name}'], 'slaid']
 		];
 
-		$ret = $this->validateInput($fields);
+		$schedule_period_regex = '/^\s*(\b([01]?\d|2[0-3]):([0-5]?\d)\s*-\s*([01]?\d|2[0-3]):([0-5]?\d)\b)(\s*,\s*(\b([01]?\d|2[0-3]):([0-5]?\d)\s*-\s*([01]?\d|2[0-3]):([0-5]?\d)\b))*\s*$/';
 
-		if ($ret) {
-			if ($this->getInput('schedule_mode') == CSlaHelper::SCHEDULE_MODE_CUSTOM) {
-				try {
-					$this->schedule = self::validateCustomSchedule($this->getInput('schedule_enabled', []),
-						$this->getInput('schedule_periods', [])
-					);
-				}
-				catch (InvalidArgumentException $e) {
-					info($e->getMessage());
-					$ret = false;
-				}
-			}
-		}
+		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
+			'slaid' => ['db sla.slaid', 'required'],
+			'name' => ['db sla.name', 'required', 'not_empty'],
+			'slo' => ['integer', 'required'],
+			'period' => ['db sla.period', 'required', 'in' => [
+				ZBX_SLA_PERIOD_DAILY, ZBX_SLA_PERIOD_WEEKLY, ZBX_SLA_PERIOD_MONTHLY, ZBX_SLA_PERIOD_QUARTERLY, ZBX_SLA_PERIOD_ANNUALLY
+			]],
+			'timezone' => ['db sla.timezone', 'required','not_empty', 'in' => array_merge([ZBX_DEFAULT_TIMEZONE], array_keys(CTimezoneHelper::getList()))],
+			'schedule_mode' => ['integer', 'required', 'in' => [CSlaHelper::SCHEDULE_MODE_24X7, CSlaHelper::SCHEDULE_MODE_CUSTOM]],
+			'schedule_enabled_0' => ['integer', 'in' => ['0', '1']],
+			'schedule_period_0' => [
+				['string'],
+				['string', 'not_empty', 'required',
+					'use' => [CSlaSchedulePeriodParser::class, []],
+					'messages' => ['use' => _('comma separated list of time periods is expected for scheduled week days')],
+					'when' => ['schedule_enabled_0', 'in' => ['1']]]
+			],
+			'schedule_enabled_1' => ['integer', 'in' => [0, 1]],
+			'schedule_period_1' => [
+				['string'],
+				['string', 'not_empty', 'required',
+					'use' => [CSlaSchedulePeriodParser::class, []],
+					'messages' => ['use' => _('comma separated list of time periods is expected for scheduled week days')],
+					'when' => ['schedule_enabled_1', 'in' => ['1']]]
+			],
+			'schedule_enabled_2' => ['integer', 'in' => [0, 1]],
+			'schedule_period_2' => [
+				['string'],
+				['string', 'not_empty', 'required',
+					'use' => [CSlaSchedulePeriodParser::class, []],
+					'messages' => ['use' => _('comma separated list of time periods is expected for scheduled week days')],
+					'when' => ['schedule_enabled_2', 'in' => ['1']]]
+			],
+			'schedule_enabled_3' => ['integer', 'in' => [0, 1]],
+			'schedule_period_3' => [
+				['string'],
+				['string', 'not_empty', 'required',
+					'use' => [CSlaSchedulePeriodParser::class, []],
+					'messages' => ['use' => _('comma separated list of time periods is expected for scheduled week days')],
+					'when' => ['schedule_enabled_3', 'in' => ['1']]]
+			],
+			'schedule_enabled_4' => ['integer', 'in' => [0, 1]],
+			'schedule_period_4' => [
+				['string'],
+				['string', 'not_empty', 'required',
+					'use' => [CSlaSchedulePeriodParser::class, []],
+					'messages' => ['use' => _('comma separated list of time periods is expected for scheduled week days')],
+					'when' => ['schedule_enabled_4', 'in' => ['1']]]
+			],
+			'schedule_enabled_5' => ['integer', 'in' => [0, 1]],
+			'schedule_period_5' => [
+				['string'],
+				['string', 'not_empty', 'required',
+					'use' => [CSlaSchedulePeriodParser::class, []],
+					'messages' => ['use' => _('comma separated list of time periods is expected for scheduled week days')],
+					'when' => ['schedule_enabled_5', 'in' => ['1']]]
+			],
+			'schedule_enabled_6' => ['integer', 'in' => [0, 1]],
+			'schedule_period_6' => [
+				['string'],
+				['string', 'not_empty', 'required',
+					'use' => [CSlaSchedulePeriodParser::class, []],
+					'messages' => ['use' => _('comma separated list of time periods is expected for scheduled week days')],
+					'when' => ['schedule_enabled_6', 'in' => ['1']]]
+			],
+			'schedule_enabled_7' => ['integer', 'in' => [0, 1]],
+			'schedule_period_7' => [
+				['string'],
+				['string', 'not_empty', 'required',
+					'use' => [CSlaSchedulePeriodParser::class, []],
+					'messages' => ['use' => _('comma separated list of time periods is expected for scheduled week days')],
+					'when' => ['schedule_enabled_7', 'in' => ['1']]]
+			],
+			'effective_date' => ['string', 'required', 'not_empty',
+				'use' => [CAbsoluteDateParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]],
+				'messages' => ['use' => _('Invalid date.')]
+			],
+			'service_tags' =>  ['objects', 'required', 'not_empty', 'uniq' => ['tag', 'value'],
+				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
+				'fields' => [
+					'value' => ['db sla_service_tag.value'],
+					'operator' => ['db sla_service_tag.operator', 'in' => [
+						ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE
+					]],
+					'tag' => ['db sla_service_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+				]
+			],
+			'description' => ['db sla.description', 'required'],
+			'excluded_downtimes' => ['array']
+		]];
+	}
+
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
-			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'title' => _('Cannot update SLA'),
+			$form_errors = $this->getValidationError();
+
+			$response = array_filter([
+				'form_errors' => $form_errors ?? null,
+				'error' => !$form_errors
+					? [
+						'title' => _('Cannot create event correlation'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])])
+					: null
+			]);
+
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode($response, JSON_THROW_ON_ERROR)])
 			);
 		}
 

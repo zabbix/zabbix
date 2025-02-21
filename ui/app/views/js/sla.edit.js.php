@@ -21,15 +21,17 @@
 
 window.sla_edit_popup = new class {
 
-	init({slaid, service_tags, excluded_downtimes}) {
+	init({rules, slaid, service_tags, excluded_downtimes}) {
 		this._initTemplates();
 
 		this.slaid = slaid;
 
 		this.overlay = overlays_stack.getById('sla.edit');
 		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
+
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'sla.list');
@@ -50,13 +52,21 @@ window.sla_edit_popup = new class {
 		}
 
 		// Setup Problem tags.
+		const table = document.getElementById('service-tags');
 
-		const $service_tags = jQuery(document.getElementById('service-tags'));
+		const $service_tags = jQuery(table);
 
 		$service_tags.dynamicRows({
 			template: '#service-tag-row-tmpl',
 			rows: service_tags,
 			allow_empty: true
+		});
+
+
+		table.addEventListener('click', e => {
+			if (e.target.classList.contains('element-table-add')) {
+				this.form.validateSubmit(this.form.getAllValues());
+			}
 		});
 
 		// Setup Excluded downtimes.
@@ -76,7 +86,7 @@ window.sla_edit_popup = new class {
 
 		this._update();
 
-		this.form.style.display = '';
+		this.form_element.style.display = '';
 		this.overlay.recoverFocus();
 	}
 
@@ -111,9 +121,10 @@ window.sla_edit_popup = new class {
 
 		schedule.style.display = schedule_mode == <?= CSlaHelper::SCHEDULE_MODE_CUSTOM ?> ? '' : 'none';
 
-		for (const element of schedule.querySelectorAll('input[type="checkbox"]')) {
-			schedule.querySelector(`input[name="schedule_periods[${element.value}]"]`).disabled = !element.checked;
-		}
+		schedule.querySelectorAll('input[type="checkbox"]').forEach((element, i) => {
+			element.value = element.checked ? 1 : element.value;
+			schedule.querySelector(`input[name="schedule_period_${i}"]`).disabled = element.checked ? '' : 'disabled';
+		});
 	}
 
 	_editExcludedDowntime(row = null) {
@@ -187,7 +198,7 @@ window.sla_edit_popup = new class {
 	}
 
 	submit() {
-		const fields = getFormFields(this.form);
+		const fields = this.form.getAllValues();
 
 		if (this.slaid !== null) {
 			fields.slaid = this.slaid;
@@ -197,9 +208,15 @@ window.sla_edit_popup = new class {
 		fields.slo = fields.slo.trim();
 
 		if ('service_tags' in fields) {
-			for (const service_tag of Object.values(fields.service_tags)) {
+			for (const key in fields.service_tags) {
+				const service_tag = fields.service_tags[key];
+
 				service_tag.tag = service_tag.tag.trim();
 				service_tag.value = service_tag.value.trim();
+
+				if (service_tag.tag === '' && service_tag.value === '') {
+					delete fields.service_tags[key];
+				}
 			}
 		}
 
@@ -208,11 +225,29 @@ window.sla_edit_popup = new class {
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', this.slaid !== null ? 'sla.update' : 'sla.create');
 
-		this._post(curl.getUrl(), fields, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				this.overlay.unsetLoading();
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+				if (!result) {
+					return;
+				}
+
+				this._post(curl.getUrl(), fields, (response) => {
+					if ('form_errors' in response) {
+						this.form.renderErrors(response.form_errors, true, true);
+
+						return;
+					}
+					else if ('error' in response) {
+						throw {error: response.error};
+					}
+					else {
+						overlayDialogueDestroy(this.overlay.dialogueid);
+						this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+					}
+				});
+			});
 	}
 
 	_post(url, data, success_callback) {
@@ -231,7 +266,7 @@ window.sla_edit_popup = new class {
 			})
 			.then(success_callback)
 			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
+				for (const element of this.form_element.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
 					}
@@ -249,7 +284,7 @@ window.sla_edit_popup = new class {
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
-				this.form.parentNode.insertBefore(message_box, this.form);
+				this.form_element.parentNode.insertBefore(message_box, this.form_element);
 			})
 			.finally(() => {
 				this.overlay.unsetLoading();

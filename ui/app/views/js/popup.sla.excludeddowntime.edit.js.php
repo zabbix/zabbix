@@ -17,27 +17,45 @@
 
 window.sla_excluded_downtime_edit_popup = new class {
 
-	init() {
+	init({rules}) {
 		this.overlay = overlays_stack.getById('sla_excluded_downtime_edit');
 		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
 	}
 
 	submit() {
-		const fields = getFormFields(this.form);
+		const fields = this.form.getAllValues();
 
 		fields.name = fields.name.trim();
 
 		this.overlay.setLoading();
 
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'sla.excludeddowntime.validate');
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.overlay.unsetLoading();
 
-		this._post(curl.getUrl(), fields, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
+					return;
+				}
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
-		});
+				const curl = new Curl('zabbix.php');
+				curl.setArgument('action', 'sla.excludeddowntime.validate');
+
+				this._post(curl.getUrl(), fields, (response) => {
+					if ('form_errors' in response) {
+						this.form.setErrors(response.form_errors, true, true);
+						this.form.renderErrors();
+					}
+					else if ('error' in response) {
+						throw {error: response.error};
+					}
+					else {
+						overlayDialogueDestroy(this._overlay.dialogueid);
+						this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
+					}
+				});
+			});
 	}
 
 	_post(url, data, success_callback) {
@@ -56,7 +74,7 @@ window.sla_excluded_downtime_edit_popup = new class {
 			})
 			.then(success_callback)
 			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
+				for (const element of this.form_element.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
 					}
@@ -74,7 +92,7 @@ window.sla_excluded_downtime_edit_popup = new class {
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
-				this.form.parentNode.insertBefore(message_box, this.form);
+				this.form_element.parentNode.insertBefore(message_box, this.form_element);
 			})
 			.finally(() => {
 				this.overlay.unsetLoading();

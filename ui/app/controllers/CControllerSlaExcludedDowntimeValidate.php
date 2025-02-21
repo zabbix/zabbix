@@ -17,33 +17,40 @@
 class CControllerSlaExcludedDowntimeValidate extends CController {
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 		$this->disableCsrfValidation();
+	}
+
+	public static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'row_index' => ['integer', 'required'],
+			'name' => ['db sla.name', 'required', 'not_empty'],
+			'start_time' => ['string', 'required', 'not_empty',
+				'use' => [CAbsoluteTimeParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]],
+				'messages' => ['use' => _('Invalid date.')]
+			],
+			'duration_days' => ['integer', 'required', 'min' => 0],
+			'duration_hours' => ['integer', 'required', 'min' => 0, 'max' => 23],
+			'duration_minutes' => ['integer', 'required', 'min' => 0, 'max' => 59]
+		]];
 	}
 
 	/**
 	 * @throws Exception
 	 */
 	protected function checkInput(): bool {
-		$fields = [
-			'row_index' =>			'required|int32',
-			'name' =>				'required|db sla.name|not_empty',
-			'start_time' =>			'required|abs_time',
-			'duration_days' =>		'required|ge 0',
-			'duration_hours' =>		'required|in '.implode(',', range(0, 23)),
-			'duration_minutes' =>	'required|in '.implode(',', range(0, 59))
-		];
-
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
-			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])])
-			);
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
 		}
 
 		return $ret;

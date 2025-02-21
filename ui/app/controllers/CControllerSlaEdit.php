@@ -22,15 +22,14 @@ class CControllerSlaEdit extends CController {
 	private $sla;
 
 	protected function init() {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
-		$fields = [
-			'slaid' => 'db services.serviceid'
-		];
-
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput(['object', 'fields' => [
+			'slaid' => ['db sla.slaid']
+		]]);
 
 		if (!$ret) {
 			$this->setResponse(
@@ -138,6 +137,12 @@ class CControllerSlaEdit extends CController {
 		}
 
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
+
+		$js_validation_rules = $data['slaid']
+			? CControllerSlaUpdate::getValidationRules()
+			: CControllerSlaCreate::getValidationRules();
+
+		$data['js_validation_rules'] = (new CFormValidator($js_validation_rules))->getRules();
 
 		$this->setResponse(new CControllerResponseData($data));
 	}
