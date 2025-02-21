@@ -924,6 +924,7 @@ class CItem extends CItemGeneral {
 		$itemids = [];
 
 		$num_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64];
+		$text_types = [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT];
 
 		foreach ($items as $item) {
 			$db_item = $db_items[$item['itemid']];
@@ -932,8 +933,8 @@ class CItem extends CItemGeneral {
 				continue;
 			}
 
-			if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY
-					|| in_array($item['value_type'], $num_types) !== in_array($db_item['value_type'], $num_types)) {
+			if ((in_array($db_item['value_type'], $num_types) && !in_array($item['value_type'], $num_types))
+					|| (in_array($db_item['value_type'], $text_types) && !in_array($item['value_type'], $text_types))) {
 				$itemids[] = $item['itemid'];
 			}
 		}
