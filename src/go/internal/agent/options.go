@@ -30,6 +30,7 @@ import (
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/zbxnet"
 )
 
 var Options AgentOptions
@@ -380,6 +381,10 @@ func ValidateOptions(options *AgentOptions) error {
 	if utf8.RuneCountInString(options.HostInterface) > HostInterfaceLen {
 		return fmt.Errorf("the value of \"HostInterface\" configuration parameter cannot be longer than %d"+
 			" characters", HostInterfaceLen)
+	}
+
+	if _, err = zbxnet.GetAllowedPeers(options.Server); err != nil {
+		return fmt.Errorf("invalid \"Server\" configuration parameter: %s", err.Error())
 	}
 
 	return nil
