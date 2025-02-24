@@ -83,7 +83,7 @@ class CControllerSlaCreate extends CController {
 						'use' => [CSlaSchedulePeriodParser::class, []],
 						'messages' => ['use' => _('Time period format is expected.')],
 						'when' => ['schedule_enabled_7', 'in 1']
-					],
+					]
 				],
 				'messages' => ['not_empty' => _('At least one schedule must be added.')],
 				'when' => ['schedule_mode', 'in' => [CSlaHelper::SCHEDULE_MODE_CUSTOM]]

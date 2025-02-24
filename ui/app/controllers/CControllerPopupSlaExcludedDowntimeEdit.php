@@ -89,7 +89,7 @@ class CControllerPopupSlaExcludedDowntimeEdit extends CController {
 			],
 			'js_validation_rules' => (new CFormValidator(
 				CControllerSlaExcludedDowntimeValidate::getValidationRules()
-			))->getRules(),
+			))->getRules()
 		];
 
 		$this->setResponse(new CControllerResponseData($data));
