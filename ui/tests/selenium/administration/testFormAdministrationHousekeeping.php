@@ -17,7 +17,7 @@
 require_once dirname(__FILE__).'/../common/testFormAdministrationGeneral.php';
 
 /**
- * @backup config
+ * @backup settings
  */
 class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 
@@ -1597,7 +1597,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 
 	/**
 	 * Backup in needed because of DEV-1673, and can be removed after bug is fixed.
-	 * @backup config
+	 * @backup settings
 	 *
 	 * @dataProvider getCheckFormData
 	 */

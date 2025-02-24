@@ -17,7 +17,7 @@
 require_once dirname(__FILE__).'/../common/testFormMacros.php';
 
 /**
- * @backup hosts, config
+ * @backup hosts, settings
  *
  * @onBefore prepareHostPrototypeMacrosData
  */

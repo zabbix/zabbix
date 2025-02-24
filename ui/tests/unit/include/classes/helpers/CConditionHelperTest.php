@@ -189,7 +189,8 @@ class CConditionHelperTest extends TestCase {
 			['1', [1 => ['formulaid' => 'A']]],
 			['1 and 2', [1 => ['formulaid' => 'A'], 2 => ['formulaid' => 'B']]],
 			['1 and 2 and 1', [1 => ['formulaid' => 'A'], 2 => ['formulaid' => 'B']]],
-			['(1 and 2) and 3', [1 => ['formulaid' => 'A'], 2 => ['formulaid' => 'B'], 3 => ['formulaid' => 'C']]]
+			['(1 and 2) and 3', [1 => ['formulaid' => 'A'], 2 => ['formulaid' => 'B'], 3 => ['formulaid' => 'C']]],
+			['(1 and 2) and 3', [1 => ['formulaid' => 'A'], 3 => ['formulaid' => 'B']]]
 		];
 	}
 
@@ -200,7 +201,7 @@ class CConditionHelperTest extends TestCase {
 	 * @param array $expectedIds
 	 */
 	public function testAddFormulaIds($formula, array $expected_conditions) {
-		$conditions = [];
+		$conditions = array_fill_keys(array_keys($expected_conditions), []);
 		CConditionHelper::addFormulaIds($conditions, $formula);
 
 		$this->assertSame($expected_conditions, $conditions);

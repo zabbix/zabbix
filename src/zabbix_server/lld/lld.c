@@ -1120,6 +1120,7 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __func__, item->itemid);
 
 	um_handle = zbx_dc_open_user_macros();
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED | ZBX_CONFIG_FLAGS_AUDITLOG_MODE);
 
 	zbx_vector_lld_row_ptr_create(&lld_rows);
 	zbx_vector_lld_override_ptr_create(&overrides);
@@ -1174,7 +1175,6 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 
 	now = time(NULL);
 
-	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED | ZBX_CONFIG_FLAGS_AUDITLOG_MODE);
 	zbx_audit_init(cfg.auditlog_enabled, cfg.auditlog_mode, ZBX_AUDIT_LLD_CONTEXT);
 
 	if (SUCCEED != lld_update_items(hostid, item->itemid, &lld_rows, error, &lifetime, &enabled_lifetime, now))
@@ -1206,6 +1206,7 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 	if (NULL != info)
 		*error = zbx_strdcat(*error, info);
 out:
+	zbx_config_clean(&cfg);
 	zbx_audit_flush(ZBX_AUDIT_LLD_CONTEXT);
 	zbx_free(info);
 	zbx_free(discovery_key);
