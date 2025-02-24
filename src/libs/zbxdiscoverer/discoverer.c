@@ -954,8 +954,8 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 	const zbx_dc_dcheck_t		*dcheck = &task->ds_dchecks.values[dcheck_idx]->dcheck;
 	zbx_fping_host_t		host;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() ranges:%d range id:%d dcheck_idx:%d task state count:%d",
-			log_worker_id, __func__, task->range.ipranges->values_num, task->range.id,
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() ranges:%d range id:" ZBX_FS_UI64 " dcheck_idx:%d task state count:"
+			ZBX_FS_UI64, log_worker_id, __func__, task->range.ipranges->values_num, task->range.id,
 			dcheck_idx, task->range.state.count);
 
 	zbx_vector_fping_host_create(&hosts);
@@ -1036,7 +1036,7 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 	(void)discovery_pending_checks_count_decrease(queue, concurrency_max, 0, (zbx_uint64_t)hosts.values_num);
 	zbx_vector_fping_host_destroy(&hosts);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() task state count:%d", log_worker_id, __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() task state count:" ZBX_FS_UI64, log_worker_id, __func__,
 			task->range.state.count);
 
 	return ret;
@@ -1186,7 +1186,7 @@ err:
 
 int	dcheck_is_async(zbx_ds_dcheck_t *ds_dcheck)
 {
-	switch(ds_dcheck->dcheck.type)
+	switch (ds_dcheck->dcheck.type)
 	{
 		case SVC_AGENT:
 		case SVC_ICMPPING:
