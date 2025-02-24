@@ -518,8 +518,8 @@ func Test_removeSystem(t *testing.T) {
 func Test_ValidateOptions(t *testing.T) {
 	t.Parallel()
 
-	invalidServerConfigurationError := "Invalid \"Server\" configuration parameter: invalid \"Server\" configuration: " +
-		"incorrect address parameter: "
+	invalidServerConfigurationError := "Invalid \"Server\" configuration parameter: invalid \"Server\" " +
+		"configuration: incorrect address parameter: "
 
 	type args struct {
 		options *AgentOptions
@@ -632,16 +632,19 @@ func Test_ValidateOptions(t *testing.T) {
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ValidateOptions() returned unexpected error:\n%v\n", err)
+
 				return
 			}
 
 			if (err == nil) == tt.wantErr {
 				t.Errorf("ValidateOptions() did not return expected error:\n%v\n", tt.err)
+
 				return
 			}
 
 			if tt.wantErr && err.Error() != tt.err.Error() {
 				t.Errorf("ValidateOptions() unexpected error:\n%v\nexpected error:\n%v\n", err, tt.err)
+
 				return
 			}
 		})
