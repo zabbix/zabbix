@@ -280,13 +280,10 @@ static void	DBget_sysmapelements_by_element_type_ids(zbx_vector_uint64_t *seleme
 	zbx_vector_uint64_uniq(selementids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
-static void	DBupdate_trigger_map_links(const zbx_vector_uint64_t *triggerids, int host_removed)
+static void	DBget_trigger_map_links(const zbx_vector_uint64_t *triggerids, zbx_vector_uint64_t *linkids)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
-	zbx_vector_uint64_t	linkids;
-
-	zbx_vector_uint64_create(&linkids);
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
@@ -295,52 +292,79 @@ static void	DBupdate_trigger_map_links(const zbx_vector_uint64_t *triggerids, in
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid",
 			triggerids->values, triggerids->values_num);
 
-	if (0 == host_removed)
-	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				" group by linkid"
-				" having count(*)=1");
-	}
+	zbx_db_select_uint64(sql, linkids);
 
-	zbx_db_select_uint64(sql, &linkids);
-
-	if (linkids.values_num != 0)
-	{
-		sql_offset = 0;
-
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update sysmaps_links set indicator_type = 0 where");
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "linkid",
-				linkids.values, linkids.values_num);
-		zbx_db_execute("%s", sql);
-	}
-
-	zbx_vector_uint64_destroy(&linkids);
 	zbx_free(sql);
 }
 
-void	zbx_db_update_item_map_links(const zbx_vector_uint64_t *itemids, int item_removed)
+static void	DBupdate_trigger_map_links(const zbx_vector_uint64_t *linkids)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
 
-	if (0 == itemids->values_num)
+	if (0 == linkids->values_num)
 		return;
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
-	if (1 == item_removed)
-	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update sysmaps_links "
-				"set itemid=null,indicator_type=0 where");
-	}
-	else
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update sysmaps_links set indicator_type=0 where");
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update sysmaps_links sl set indicator_type=0 where "
+			"not exists ("
+			" select null from sysmaps_link_triggers slt where slt.linkid=sl.linkid"
+			") and");
+
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "sl.linkid",
+			linkids->values, linkids->values_num);
+
+	zbx_db_execute("%s", sql);
+	zbx_free(sql);
+}
+
+void	zbx_db_update_item_map_links(const zbx_vector_uint64_t *itemids)
+{
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
+	zbx_vector_uint64_t	linkids;
+
+	if (0 == itemids->values_num)
+		return;
+
+	zbx_vector_uint64_create(&linkids);
+
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select linkid"
+			" from sysmaps_links"
+			" where");
 
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid",
 			itemids->values, itemids->values_num);
 
+	zbx_db_select_uint64(sql, &linkids);
+
+	if (0 == linkids.values_num)
+		goto clean;
+
+	sql_offset = 0;
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update sysmaps_links "
+				"set itemid=null,indicator_type=0 where");
+
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "linkid",
+			linkids.values, linkids.values_num);
+
 	zbx_db_execute("%s", sql);
+
+	sql_offset = 0;
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from sysmap_link_threshold where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "linkid",
+			linkids.values, linkids.values_num);
+
+	zbx_db_execute("%s", sql);
+clean:
 	zbx_free(sql);
+	zbx_vector_uint64_destroy(&linkids);
 }
 
 /******************************************************************************
@@ -1138,13 +1162,16 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 {
 	zbx_vector_uint64_t	selementids;
 	const char		*event_tables[] = {"events"};
+	zbx_vector_uint64_t	linkids;
 
 	ZBX_UNUSED(audit_context_mode);
 
 	if (0 == triggerids->values_num)
 		return;
 
-	DBupdate_trigger_map_links(triggerids, 0);
+	zbx_vector_uint64_create(&linkids);
+
+	DBget_trigger_map_links(triggerids, &linkids);
 
 	zbx_vector_uint64_create(&selementids);
 
@@ -1164,7 +1191,10 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 	/* add housekeeper task to delete problems associated with trigger, this allows old events to be deleted */
 	DBadd_to_housekeeper(triggerids, "triggerid", event_tables, ARRSIZE(event_tables));
 
+	DBupdate_trigger_map_links(&linkids);
+
 	zbx_vector_uint64_destroy(&selementids);
+	zbx_vector_uint64_destroy(&linkids);
 }
 
 /******************************************************************************
@@ -1522,7 +1552,7 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 	db_get_linked_items(itemids, "item_discovery i where", "i.parent_itemid");
 	db_get_linked_items(itemids, "items i where", "i.master_itemid");
 
-	zbx_db_update_item_map_links(itemids, 1);
+	zbx_db_update_item_map_links(itemids);
 
 	zbx_audit_item_delete(audit_context_mode, itemids);
 

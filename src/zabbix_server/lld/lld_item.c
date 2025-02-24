@@ -2623,20 +2623,23 @@ static int	lld_item_update_link_by_type_change(const zbx_lld_item_prototype_t *i
 	return FAIL;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: prepares SQL to update LLD item                                   *
- *                                                                            *
- * Parameters: item_prototype       - [IN]                                    *
- *             item                 - [IN] item to be updated                 *
- *             sql                  - [IN/OUT] SQL buffer pointer used for    *
- *                                             update operations              *
- *             sql_alloc            - [IN/OUT] SQL buffer already allocated   *
- *                                             memory                         *
- *             sql_offset           - [IN/OUT] offset for writing within SQL  *
- *                                             buffer                         *
- *                                                                            *
- ******************************************************************************/
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: prepares SQL to update LLD item                                      *
+ *                                                                               *
+ * Parameters: item_prototype          - [IN]                                    *
+ *             item                    - [IN] item to be updated                 *
+ *             itemids_value_type_diff - [OUT] items with changed type requiring *
+ *                                             sysmap link indicator to be set   *
+ *                                             to 'static' type                  *
+ *             sql                     - [IN/OUT] SQL buffer pointer used for    *
+ *                                             update operations                 *
+ *             sql_alloc               - [IN/OUT] SQL buffer already allocated   *
+ *                                             memory                            *
+ *             sql_offset              - [IN/OUT] offset for writing within SQL  *
+ *                                             buffer                            *
+ *                                                                               *
+ *********************************************************************************/
 static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototype, const zbx_lld_item_full_t *item,
 		zbx_vector_uint64_t *itemids_value_type_diff, char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
@@ -3259,7 +3262,7 @@ static int	lld_items_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 			lld_item_discovery_prepare_update(item_prototype, item, &sql, &sql_alloc, &sql_offset);
 		}
 
-		zbx_db_update_item_map_links(&itemids_value_type_diff, 0);
+		zbx_db_update_item_map_links(&itemids_value_type_diff);
 
 		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
 
