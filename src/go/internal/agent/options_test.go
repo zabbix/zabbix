@@ -632,14 +632,10 @@ func Test_ValidateOptions(t *testing.T) {
 
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("ValidateOptions() error expectation failed: wantErr=%v, got err=%v", tt.wantErr, err)
-
-				return
 			}
 
 			if tt.wantErr && err.Error() != tt.err.Error() {
-				t.Errorf("ValidateOptions() unexpected error:\n%v\nexpected error:\n%v\n", err, tt.err)
-
-				return
+				t.Fatalf("ValidateOptions() unexpected error:\n%v\nexpected error:\n%v\n", err, tt.err)
 			}
 		})
 	}
