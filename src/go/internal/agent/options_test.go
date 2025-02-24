@@ -528,10 +528,9 @@ func Test_ValidateOptions(t *testing.T) {
 		err     error
 		wantErr bool
 	}{
-
 		{"+WRONG IP", args{&AgentOptions{Server: "999.999.999.999"}}, nil, false},
-		{"+basic", args{&AgentOptions{Server: "127.0.0.1"}}, nil, false},
-		{"+basic2", args{&AgentOptions{Server: "localhost,127.0.0.1"}}, nil, false},
+		{"+base", args{&AgentOptions{Server: "127.0.0.1"}}, nil, false},
+		{"+base2", args{&AgentOptions{Server: "localhost,127.0.0.1"}}, nil, false},
 		{"+empty", args{&AgentOptions{Server: ""}}, nil, false},
 		{"-newline", args{&AgentOptions{Server: "\n"}}, errors.New("Invalid \"Server\" configuration " +
 			"parameter: invalid \"Server\" configuration: incorrect address parameter: \"\n\"."), true},
@@ -540,7 +539,7 @@ func Test_ValidateOptions(t *testing.T) {
 		{"-trailing coma", args{&AgentOptions{Server: "localhost,"}}, errors.New("Invalid \"Server\" " +
 			"configuration parameter: invalid \"Server\" configuration: incorrect address " +
 			"parameter: \"\"."), true},
-		{"+semicolon1", args{&AgentOptions{Server: ";"}}, errors.New("Invalid \"Server\" configuration " +
+		{"-semicolon1", args{&AgentOptions{Server: ";"}}, errors.New("Invalid \"Server\" configuration " +
 			"parameter: invalid \"Server\" configuration: incorrect address parameter: \";\"."), true},
 		{"-semicolon2", args{&AgentOptions{Server: "127.0.0.1;localhost"}}, errors.New("Invalid \"Server\" " +
 			"configuration parameter: invalid \"Server\" configuration: incorrect address parameter: " +
@@ -555,10 +554,17 @@ func Test_ValidateOptions(t *testing.T) {
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ValidateOptions() returned unexpected error:\n%v\n", err)
-			} else if (err == nil) == tt.wantErr {
+				return
+			}
+
+			if (err == nil) == tt.wantErr {
 				t.Errorf("ValidateOptions() did not return expected error:\n%v\n", tt.err)
-			} else if tt.wantErr && err.Error() != tt.err.Error() {
+				return
+			}
+
+			if tt.wantErr && err.Error() != tt.err.Error() {
 				t.Errorf("ValidateOptions() unexpected error:\n%v\nexpected error:\n%v\n", err, tt.err)
+				return
 			}
 		})
 	}
