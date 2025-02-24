@@ -384,7 +384,7 @@ func ValidateOptions(options *AgentOptions) error {
 	}
 
 	if _, err = zbxnet.GetAllowedPeers(options.Server); err != nil {
-		return fmt.Errorf("invalid \"Server\" configuration parameter: %s", err.Error())
+		return errs.Wrapf(err, "invalid \"Server\" configuration parameter")
 	}
 
 	return nil
