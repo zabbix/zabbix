@@ -518,6 +518,9 @@ func Test_removeSystem(t *testing.T) {
 func Test_ValidateOptions(t *testing.T) {
 	t.Parallel()
 
+	invalidServerConfigurationError := "Invalid \"Server\" configuration parameter: invalid \"Server\" configuration: " +
+		"incorrect address parameter: "
+
 	type args struct {
 		options *AgentOptions
 	}
@@ -528,23 +531,98 @@ func Test_ValidateOptions(t *testing.T) {
 		err     error
 		wantErr bool
 	}{
-		{"+WRONG IP", args{&AgentOptions{Server: "999.999.999.999"}}, nil, false},
-		{"+base", args{&AgentOptions{Server: "127.0.0.1"}}, nil, false},
-		{"+base2", args{&AgentOptions{Server: "localhost,127.0.0.1"}}, nil, false},
-		{"+empty", args{&AgentOptions{Server: ""}}, nil, false},
-		{"-newline", args{&AgentOptions{Server: "\n"}}, errors.New("Invalid \"Server\" configuration " +
-			"parameter: invalid \"Server\" configuration: incorrect address parameter: \"\n\"."), true},
-		{"-coma", args{&AgentOptions{Server: ","}}, errors.New("Invalid \"Server\" configuration " +
-			"parameter: invalid \"Server\" configuration: incorrect address parameter: \"\"."), true},
-		{"-trailing coma", args{&AgentOptions{Server: "localhost,"}}, errors.New("Invalid \"Server\" " +
-			"configuration parameter: invalid \"Server\" configuration: incorrect address " +
-			"parameter: \"\"."), true},
-		{"-semicolon1", args{&AgentOptions{Server: ";"}}, errors.New("Invalid \"Server\" configuration " +
-			"parameter: invalid \"Server\" configuration: incorrect address parameter: \";\"."), true},
-		{"-semicolon2", args{&AgentOptions{Server: "127.0.0.1;localhost"}}, errors.New("Invalid \"Server\" " +
-			"configuration parameter: invalid \"Server\" configuration: incorrect address parameter: " +
-			"\"127.0.0.1;localhost\"."), true},
+		{
+			"+WRONG IP",
+			args{
+				&AgentOptions{
+					Server: "999.999.999.999",
+				},
+			},
+			nil,
+			false,
+		},
+		{
+			"+base",
+			args{
+				&AgentOptions{
+					Server: "127.0.0.1",
+				},
+			},
+			nil,
+			false,
+		},
+		{
+			"+base2",
+			args{
+				&AgentOptions{
+					Server: "localhost,127.0.0.1",
+				},
+			},
+			nil,
+			false,
+		},
+		{
+			"+empty",
+			args{
+				&AgentOptions{
+					Server: "",
+				},
+			},
+			nil,
+			false,
+		},
+		{
+			"-newline",
+			args{
+				&AgentOptions{
+					Server: "\n",
+				},
+			},
+			errors.New(invalidServerConfigurationError + "\"\n\"."),
+			true,
+		},
+		{
+			"-coma",
+			args{
+				&AgentOptions{
+					Server: ",",
+				},
+			},
+			errors.New(invalidServerConfigurationError + "\"\"."),
+			true,
+		},
+		{
+			"-trailing coma",
+			args{
+				&AgentOptions{
+					Server: "localhost,",
+				},
+			},
+			errors.New(invalidServerConfigurationError + "\"\"."),
+			true,
+		},
+		{
+			"-semicolon1",
+			args{
+				&AgentOptions{
+					Server: ";",
+				},
+			},
+			errors.New(invalidServerConfigurationError + "\";\"."),
+			true,
+		},
+		{
+			"-semicolon2",
+			args{
+				&AgentOptions{
+					Server: "127.0.0.1;localhost",
+				},
+			},
+			errors.New(invalidServerConfigurationError + "\"127.0.0.1;localhost\"."),
+			true,
+		},
 	}
+
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
