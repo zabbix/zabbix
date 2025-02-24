@@ -2744,6 +2744,23 @@ class testUsers extends CAPITest {
 	}
 
 	/**
+	 * There should be minimum 1sec delay/timeout when your login failed with - correct and incorrect username.
+	 **/
+	public function testUser_checkFailedLoginTimeout() {
+		$this->disableAuthorization();
+		foreach (['incorrect_name' => 'incorrect_password', 'Admin' => 'incorrect_password'] as $login => $password) {
+			$start_time = microtime(true);
+			$this->call('user.login', [
+				'username' => $login,
+				'password' => $password
+			], 'Incorrect user name or password or account is temporarily blocked.');
+
+			$end_time = microtime(true);
+			$this->assertTrue(round($end_time-$start_time, 3) >= 1);
+		}
+	}
+
+	/**
 	 * Data provider for user.checkAuthentication testing. Array contains various valid extend parameter options.
 	 *
 	 * @return array

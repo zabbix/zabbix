@@ -168,28 +168,6 @@ class testFormLogin extends CWebTest {
 	}
 
 	/**
-	 * There should be minimum 1sec delay/timeout when your login failed with - correct and incorrect username.
-	 **/
-	public function testFormLogin_FailedLoginTimeout() {
-		foreach (['incorrect_name' => 'incorrect_password', 'Admin' => 'incorrect_password'] as $login => $password) {
-			$this->page->open('index.php');
-			$this->query('id:name')->waitUntilVisible()->one()->fill($login);
-			$this->query('id:password')->one()->fill($password);
-
-			// Time before clicking on Login button.
-			$start_time = microtime(true);
-			$this->query('id:enter')->one()->click();
-			$this->query('class:red')->waitUntilVisible()->one();
-
-			// Time after page loaded and error message visible.
-			$end_time = microtime(true);
-
-			// Time should be equal or more than 1 sec.
-			$this->assertTrue(round($end_time-$start_time, 3) >= 1);
-		}
-	}
-
-	/**
 	 * Function makes two authentifications with different data to different Zabbix views, separately clicking on
 	 * sign in button and checking by views header, if correct url is opened.
 	 **/
