@@ -52,18 +52,15 @@ window.sla_edit_popup = new class {
 		}
 
 		// Setup Problem tags.
-		const table = document.getElementById('service-tags');
+		const tag_table = document.getElementById('service-tags');
 
-		const $service_tags = jQuery(table);
-
-		$service_tags.dynamicRows({
+		jQuery(tag_table).dynamicRows({
 			template: '#service-tag-row-tmpl',
 			rows: service_tags,
 			allow_empty: true
 		});
 
-
-		table.addEventListener('click', e => {
+		tag_table.addEventListener('click', e => {
 			if (e.target.classList.contains('element-table-add')) {
 				this.form.validateSubmit(this.form.getAllValues());
 			}
@@ -122,8 +119,7 @@ window.sla_edit_popup = new class {
 		schedule.style.display = schedule_mode == <?= CSlaHelper::SCHEDULE_MODE_CUSTOM ?> ? '' : 'none';
 
 		schedule.querySelectorAll('input[type="checkbox"]').forEach((element, i) => {
-			element.value = element.checked ? 1 : element.value;
-			schedule.querySelector(`input[name="schedule_period_${i}"]`).disabled = element.checked ? '' : 'disabled';
+			schedule.querySelector(`input[name="schedule[schedule_period_${i}]"]`).disabled = element.checked ? '' : 'disabled';
 		});
 	}
 
@@ -176,8 +172,10 @@ window.sla_edit_popup = new class {
 		row.remove();
 	}
 
-	clone({title, buttons}) {
+	clone({title, buttons, rules}) {
 		this.slaid = null;
+
+		this.form.reload(rules);
 
 		this.overlay.unsetLoading();
 		this.overlay.setProperties({title, buttons});
@@ -206,6 +204,15 @@ window.sla_edit_popup = new class {
 
 		fields.name = fields.name.trim();
 		fields.slo = fields.slo.trim();
+
+		Object.keys(fields.schedule).forEach(key => {
+			if (key.startsWith("schedule_enabled_") && fields.schedule[key] == null) {
+				delete fields.schedule[key];
+			}
+			if (key.startsWith("schedule_period_") && fields.schedule[key] == null) {
+				delete fields.schedule[key];
+			}
+		});
 
 		if ('service_tags' in fields) {
 			for (const key in fields.service_tags) {

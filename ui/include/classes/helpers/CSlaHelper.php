@@ -264,4 +264,56 @@ final class CSlaHelper {
 				->setHint($hint)
 		];
 	}
+
+	public static function prepareSchedulePeriods(array $schedule): array {
+		$result = [];
+
+		$schedule_periods = [];
+
+		foreach ($schedule as $key => $value) {
+			if (strpos($key, 'schedule_enabled_') == 0 && $value == '1') {
+				$index = substr($key, strrpos($key, '_') + 1);
+
+				if ($schedule["schedule_period_$index"]) {
+					$schedule_periods[$index] = $schedule["schedule_period_$index"];
+				}
+			}
+		}
+
+		if (!$schedule) {
+			return [];
+		}
+
+		foreach ($schedule as $key => $value) {
+			$schedule_periods[substr($key, -1)] = $value;
+		}
+
+		foreach (range(0, 6) as $weekday) {
+			if (!array_key_exists($weekday, $schedule_periods)) {
+				continue;
+			}
+
+			$weekday_schedule_periods = trim($schedule_periods[$weekday]);
+
+			foreach (explode(',', $weekday_schedule_periods) as $schedule_period) {
+				preg_match('/^\s*(?<from_h>\d{1,2}):(?<from_m>\d{2})\s*-\s*(?<to_h>\d{1,2}):(?<to_m>\d{2})\s*$/',
+					$schedule_period, $matches);
+
+				$from_h = $matches['from_h'];
+				$from_m = $matches['from_m'];
+				$to_h = $matches['to_h'];
+				$to_m = $matches['to_m'];
+
+				$day_period_from = SEC_PER_HOUR * $from_h + SEC_PER_MIN * $from_m;
+				$day_period_to = SEC_PER_HOUR * $to_h + SEC_PER_MIN * $to_m;
+
+				$result[] = [
+					'period_from' => SEC_PER_DAY * $weekday + $day_period_from,
+					'period_to' => SEC_PER_DAY * $weekday + $day_period_to
+				];
+			}
+		}
+
+		return $result;
+	}
 }

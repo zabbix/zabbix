@@ -43,22 +43,26 @@ $schedule = (new CTable())->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'
 for ($weekday = 0; $weekday < 7; $weekday++) {
 	$enabled = $data['form']['schedule_periods'][$weekday] !== '';
 
-	$schedule->addRow(new CRow([
-		(new CCheckBox('schedule_enabled_'.$weekday, $enabled ? '1' : '0'))
-			->setLabel(getDayOfWeekCaption($weekday))
-			->setChecked($enabled)
-			->setUncheckedValue('0')
-			->setErrorContainer('schedule_period_'.$weekday.'_'.'error_container'),
-		(new CTextBox('schedule_period_'.$weekday, $data['form']['schedule_periods'][$weekday]))
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			->setAttribute('placeholder', '8:00-17:00, ...'),
-		(new CRow([
-			(new CCol())
-				->setId('schedule_period_'.$weekday.'_'.'error_container')
-				->addClass(ZBX_STYLE_ERROR_CONTAINER)
-				->setColSpan(3)
-		]))->addClass('error-container-row')
-	]));
+	$schedule
+		->addRow(
+			new CRow([
+				(new CCheckBox('schedule[schedule_enabled_'.$weekday.']'))
+					->setLabel(getDayOfWeekCaption($weekday))
+					->setChecked($data['form']['schedule_periods'][$weekday] !== '')
+					->setErrorContainer('schedule_'.$weekday.'_error_container'),
+				(new CTextBox('schedule[schedule_period_'.$weekday.']', $data['form']['schedule_periods'][$weekday]))
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					->setAttribute('placeholder', '8:00-17:00, ...')
+			])
+		)
+		->addRow(
+			(new CRow([
+				(new CCol())
+					->setId('schedule_'.$weekday.'_error_container')
+					->addClass(ZBX_STYLE_ERROR_CONTAINER)
+					->setColSpan(2),
+			]))->addClass('error-container-row')
+		);
 }
 
 $sla_tab = (new CFormGrid())
@@ -118,7 +122,12 @@ $sla_tab = (new CFormGrid())
 	])
 	->addItem([
 		(new CFormField(
-			(new CDiv($schedule))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			(new CDiv($schedule))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setId('schedule-table')
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('data-field-type', 'set')
+				->setAttribute('data-field-name', 'schedule')
 		))
 			->setId('schedule')
 			->addStyle('display: none;')

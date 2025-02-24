@@ -261,7 +261,7 @@ class CFormValidator {
 		}
 
 		if (array_key_exists('not_empty', $result)) {
-			if (!in_array($result['type'], ['string', 'objects', 'array'])) {
+			if (!in_array($result['type'], ['string', 'objects', 'object', 'array'])) {
 				throw new Exception('[RULES ERROR] Rule "not_empty" is not compatible with type "'.$result['type'].'" (Path: '.$rule_path.')');
 			}
 		}
@@ -1046,6 +1046,7 @@ class CFormValidator {
 	 * @param array  $rules
 	 * @param array  $rules['fields']
 	 * @param string $rules['fields'][<field_name>][<role_name>]
+	 * @param bool   $rules['not_empty']
 	 * @param mixed  $value
 	 * @param string $error
 	 * @param string $path
@@ -1055,6 +1056,12 @@ class CFormValidator {
 	public function validateObject(array $rules, &$value, ?string &$error = null, string &$path = ''): bool {
 		if (!is_array($value)) {
 			$error = self::getMessage($rules, 'type', _('An array is expected.'));
+
+			return false;
+		}
+
+		if (array_key_exists('not_empty', $rules) && count($value) == 0) {
+			$error = self::getMessage($rules, 'not_empty', _('This field cannot be empty.'));
 
 			return false;
 		}
