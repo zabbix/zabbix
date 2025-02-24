@@ -51,7 +51,7 @@ window.sla_excluded_downtime_edit_popup = new class {
 						throw {error: response.error};
 					}
 					else {
-						overlayDialogueDestroy(this._overlay.dialogueid);
+						overlayDialogueDestroy(this.overlay.dialogueid);
 						this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
 					}
 				});

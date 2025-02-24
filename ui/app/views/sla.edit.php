@@ -53,6 +53,7 @@ for ($weekday = 0; $weekday < 7; $weekday++) {
 				(new CTextBox('schedule[schedule_period_'.$weekday.']', $data['form']['schedule_periods'][$weekday]))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setAttribute('placeholder', '8:00-17:00, ...')
+					->setErrorContainer('schedule_'.$weekday.'_error_container')
 			])
 		)
 		->addRow(
@@ -60,7 +61,7 @@ for ($weekday = 0; $weekday < 7; $weekday++) {
 				(new CCol())
 					->setId('schedule_'.$weekday.'_error_container')
 					->addClass(ZBX_STYLE_ERROR_CONTAINER)
-					->setColSpan(2),
+					->setColSpan(3)
 			]))->addClass('error-container-row')
 		);
 }
@@ -223,15 +224,65 @@ $excluded_downtimes->addItem(
 		)
 );
 
+$excluded_downtimes_row = (new CTemplateTag('excluded-downtime-tmpl'))->addItem([
+	(new CRow([
+		new CCol([
+			new CSpan('#{start_time}'),
+			(new CInput('hidden'))
+				->setAttribute('name', 'excluded_downtimes[#{row_index}][name]')
+				->setAttribute('value', '#{name}')
+				->setAttribute('data-field-type', 'hidden'),
+			(new CInput('hidden'))
+				->setAttribute('name', 'excluded_downtimes[#{row_index}][period_from]')
+				->setAttribute('value', '#{period_from}')
+				->setAttribute('data-field-type', 'hidden')
+				->setErrorContainer('excluded_downtime_error_container_#{row_index}'),
+			(new CInput('hidden'))
+				->setAttribute('name', 'excluded_downtimes[#{row_index}][period_to]')
+				->setAttribute('value', '#{period_to}')
+				->setAttribute('data-field-type', 'hidden')
+				->setErrorContainer('excluded_downtime_error_container_#{row_index}')
+		]),
+		new CCol(
+			(new CSpan('#{duration}'))
+				->addStyle(ZBX_TEXTAREA_BIG_WIDTH)
+				->addClass(ZBX_STYLE_WORDWRAP)
+		),
+		new CCol(new CSpan('#{name}')),
+		new CCol([
+			(new CList([
+				(new CButton('edit', _('Edit')))
+					->addClass('js-edit')
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->removeId(),
+				(new CButton('remove', _('Remove')))
+					->addClass('js-remove')
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->removeId()
+			]))->addClass(ZBX_STYLE_HOR_LIST)
+		])
+	]))->setAttribute('data-row_index', '#{row_index}'),
+	(new CRow([
+		(new CCol())
+			->setId('excluded_downtime_error_container_#{row_index}')
+			->addClass(ZBX_STYLE_ERROR_CONTAINER)
+			->setColSpan(4)
+	]))->addClass('error-container-row')
+]);
+
 $excluded_downtimes_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Excluded downtimes')),
 		new CFormField([
 			(new CDiv($excluded_downtimes))
+				->setAttribute('data-field-type', 'set')
+				->setAttribute('data-field-name', 'excluded_downtimes')
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+			$excluded_downtimes_row
 		])
-	]);
+	])
+	->setId('excluded_downtimes');
 
 $tabs = (new CTabView())
 	->setSelected(0)

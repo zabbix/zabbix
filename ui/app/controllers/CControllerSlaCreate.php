@@ -145,8 +145,9 @@ class CControllerSlaCreate extends CController {
 			->getDateTime(true, new DateTimeZone('UTC'))
 			->getTimestamp();
 
-		$schedule = CSlaHelper::prepareSchedulePeriods($this->getInput('schedule'));
-
+		$schedule = $this->getInput('schedule_mode') == CSlaHelper::SCHEDULE_MODE_CUSTOM
+			? CSlaHelper::prepareSchedulePeriods($this->getInput('schedule'))
+			: [];
 		$sla = [
 			'effective_date' => $effective_date,
 			'status' => $this->hasInput('status') ? ZBX_SLA_STATUS_ENABLED : ZBX_SLA_STATUS_DISABLED,

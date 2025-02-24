@@ -22,8 +22,6 @@
 window.sla_edit_popup = new class {
 
 	init({rules, slaid, service_tags, excluded_downtimes}) {
-		this._initTemplates();
-
 		this.slaid = slaid;
 
 		this.overlay = overlays_stack.getById('sla.edit');
@@ -87,31 +85,6 @@ window.sla_edit_popup = new class {
 		this.overlay.recoverFocus();
 	}
 
-	_initTemplates() {
-		this.excluded_downtime_template = new Template(`
-			<tr data-row_index="#{row_index}">
-				<td>
-					#{start_time}
-					<input type="hidden" name="excluded_downtimes[#{row_index}][name]" value="#{name}">
-					<input type="hidden" name="excluded_downtimes[#{row_index}][period_from]" value="#{period_from}">
-					<input type="hidden" name="excluded_downtimes[#{row_index}][period_to]" value="#{period_to}">
-				</td>
-				<td>#{duration}</td>
-				<td class="wordwrap" style="max-width: <?= ZBX_TEXTAREA_BIG_WIDTH ?>px;">#{name}</td>
-				<td>
-					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit"><?= _('Edit') ?></button>
-						</li>
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-						</li>
-					</ul>
-				</td>
-			</tr>
-		`);
-	}
-
 	_update() {
 		const schedule = document.getElementById('schedule');
 		const schedule_mode = document.querySelector('#schedule_mode input:checked').value;
@@ -162,13 +135,21 @@ window.sla_edit_popup = new class {
 	}
 
 	_addExcludedDowntime(excluded_downtime) {
+		const excluded_downtime_template = new Template(
+			this.form_element.querySelector('#excluded-downtime-tmpl').innerHTML
+		);
+
 		document
 			.querySelector('#excluded-downtimes tbody')
-			.insertAdjacentHTML('beforeend', this.excluded_downtime_template.evaluate(excluded_downtime));
+			.insertAdjacentHTML('beforeend', excluded_downtime_template.evaluate(excluded_downtime));
 	}
 
 	_updateExcludedDowntime(row, excluded_downtime) {
-		row.insertAdjacentHTML('afterend', this.excluded_downtime_template.evaluate(excluded_downtime));
+		const excluded_downtime_template = new Template(
+			this.form_element.querySelector('#excluded-downtime-tmpl').innerHTML
+		);
+
+		row.insertAdjacentHTML('afterend', excluded_downtime_template.evaluate(excluded_downtime));
 		row.remove();
 	}
 

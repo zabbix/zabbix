@@ -1086,7 +1086,7 @@ class ExcludedDowntimesTabIndicatorItem extends TabIndicatorItem {
 
 	getValue() {
 		return document
-			.querySelectorAll('#excluded-downtimes tbody tr')
+			.querySelectorAll('#excluded-downtimes tbody tr:not(.error-container-row)')
 			.length;
 	}
 

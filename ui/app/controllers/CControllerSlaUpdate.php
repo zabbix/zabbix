@@ -104,7 +104,14 @@ class CControllerSlaUpdate extends CController {
 				]
 			],
 			'description' => ['db sla.description', 'required'],
-			'excluded_downtimes' => ['array']
+			'excluded_downtimes' => ['objects', 'uniq' => ['period_from', 'period_to'],
+				'messages' => ['uniq' => _('Period from and period to combination is not unique.')],
+				'fields' => [
+					'name' => ['string'],
+					'period_from' => ['string'],
+					'period_to' => ['string']
+				]
+			]
 		]];
 	}
 
@@ -156,7 +163,9 @@ class CControllerSlaUpdate extends CController {
 			->getDateTime(true, new DateTimeZone('UTC'))
 			->getTimestamp();
 
-		$schedule = CSlaHelper::prepareSchedulePeriods($this->getInput('schedule'));
+		$schedule = $this->getInput('schedule_mode') == CSlaHelper::SCHEDULE_MODE_CUSTOM
+			? CSlaHelper::prepareSchedulePeriods($this->getInput('schedule'))
+			: [];
 
 		$sla = [
 			'effective_date' => $effective_date,
