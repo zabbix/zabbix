@@ -125,7 +125,7 @@ class CControllerSlaUpdate extends CController {
 				'form_errors' => $form_errors ?? null,
 				'error' => !$form_errors
 					? [
-						'title' => _('Cannot create event correlation'),
+						'title' => _('Cannot update SLA'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
 					: null

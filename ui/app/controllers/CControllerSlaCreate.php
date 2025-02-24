@@ -103,7 +103,14 @@ class CControllerSlaCreate extends CController {
 				]
 			],
 			'description' => ['db sla.description', 'required'],
-			'excluded_downtimes' => ['array']
+			'excluded_downtimes' => ['objects', 'uniq' => ['period_from', 'period_to'],
+				'messages' => ['uniq' => _('Period from and period to combination is not unique.')],
+				'fields' => [
+					'name' => ['string'],
+					'period_from' => ['string'],
+					'period_to' => ['string']
+				]
+			]
 		]];
 	}
 
@@ -117,7 +124,7 @@ class CControllerSlaCreate extends CController {
 				'form_errors' => $form_errors ?? null,
 				'error' => !$form_errors
 					? [
-						'title' => _('Cannot create event correlation'),
+						'title' => _('Cannot create SLA'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
 					: null
