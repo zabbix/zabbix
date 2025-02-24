@@ -800,7 +800,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 							[
 								'name' => 'Your profile',
 								'action' => 'userprofile.edit',
-								'message' => 'User profile: Zabbix Administrator',
+								'message' => 'Profile',
 								'check_disabled' => false
 							],
 							[

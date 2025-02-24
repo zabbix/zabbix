@@ -24,7 +24,6 @@
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxhistory.h"
-#include "zbxshmem.h"
 #include "zbxtime.h"
 #include "zbxtrends.h"
 #include "zbx_item_constants.h"
@@ -36,6 +35,7 @@
 #include "zbxstr.h"
 #include "zbxvariant.h"
 #include "zbxescalations.h"
+#include "zbxprof.h"
 
 /******************************************************************************
  *                                                                            *
@@ -935,6 +935,7 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 		if (SUCCEED != errcodes[i])
 		{
 			h->flags |= ZBX_DC_FLAG_UNDEF;
+			zbx_hc_clear_item_middle(h->itemid);
 			continue;
 		}
 
@@ -942,6 +943,7 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 
 		if (ITEM_STATUS_ACTIVE != item->status || HOST_STATUS_MONITORED != item->host.status)
 		{
+			zbx_hc_clear_item_middle(h->itemid);
 			h->flags |= ZBX_DC_FLAG_UNDEF;
 			continue;
 		}
@@ -1213,7 +1215,7 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
  *            b) less than 500 (full batch) timer triggers were processed              *
  *                                                                                     *
  ***************************************************************************************/
-void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
+void	zbx_sync_history_cache_server(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs,
 		zbx_ipc_async_socket_t *rtc, int config_history_storage_pipelines, int *more)
 {
 /* the minimum processed item percentage of item candidates to continue synchronizing */
@@ -1405,7 +1407,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 				{
 					if (0 == item_diff.values_num && 0 == inventory_values.values_num)
 						break;
-
+					zbx_prof_start("update items", ZBX_PROF_PROCESSING);
 					zbx_db_begin();
 
 					zbx_db_mass_update_items(&item_diff, &inventory_values);
@@ -1421,6 +1423,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 						if (NULL != events_cbs->reset_event_recovery_cb)
 							events_cbs->reset_event_recovery_cb();
 					}
+					zbx_prof_end();
 				}
 				while (ZBX_DB_DOWN == txn_error);
 			}
@@ -1450,6 +1453,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 
 			if (0 != history_num || 0 != timers_num)
 			{
+				zbx_prof_start("process triggers", ZBX_PROF_PROCESSING);
 				for (i = 0; i < trigger_timers.values_num; i++)
 				{
 					zbx_trigger_timer_t	*timer = trigger_timers.values[i];
@@ -1502,6 +1506,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 
 				if (ZBX_DB_OK == txn_error && NULL != events_cbs->events_update_itservices_cb)
 					events_cbs->events_update_itservices_cb();
+				zbx_prof_end();
 			}
 		}
 
@@ -1697,8 +1702,7 @@ int	zbx_hc_check_proxy(zbx_uint64_t proxyid)
 
 	zbx_dbcache_lock();
 
-	hc_pused = 100 * (double)(zbx_dbcache_get_hc_mem()->total_size - zbx_dbcache_get_hc_mem()->free_size) /
-			zbx_dbcache_get_hc_mem()->total_size;
+	hc_pused = zbx_hc_mem_pused();
 
 	if (20 >= hc_pused)
 	{

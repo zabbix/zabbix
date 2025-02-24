@@ -36,12 +36,12 @@ window.maintenance_edit = new class {
 		this._dialogue = this._overlay.$dialogue[0];
 		this.form_element = this._overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
+		this._allowed_edit = allowed_edit;
 		this.rules_for_clone = rules_for_clone;
 
-		const backurl = new Curl('zabbix.php');
-
-		backurl.setArgument('action', 'maintenance.list');
-		this._overlay.backurl = backurl.getUrl();
+		const return_url = new URL('zabbix.php', location.href);
+		return_url.searchParams.set('action', 'maintenance.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		timeperiods.forEach((timeperiod, row_index) => {
 			this.#addTimePeriod({row_index, ...timeperiod});
@@ -81,11 +81,10 @@ window.maintenance_edit = new class {
 			this.#updateMultiselect($hostids);
 
 			// Update form field state according to the form data.
-
 			document.getElementById('maintenance_type').addEventListener('change', () => this.#update());
-
-			this.#update();
 		}
+
+		this.#update();
 
 		this.form_element.style.display = '';
 		this._overlay.recoverFocus();
@@ -111,11 +110,11 @@ window.maintenance_edit = new class {
 		const tags_operators = tags_container.querySelectorAll('[name$="[operator]"]');
 
 		[...tags_evaltypes, ...tags_operators].forEach((radio_button) => {
-			radio_button.disabled = !tags_enabled;
+			radio_button.disabled = !tags_enabled || !this._allowed_edit;
 		});
 
 		tags_container.querySelectorAll('.element-table-add, .element-table-remove').forEach((button) => {
-			button.disabled = !tags_enabled;
+			button.disabled = !tags_enabled || !this._allowed_edit;
 		});
 
 		tags_container.querySelectorAll('[name$="[tag]"]').forEach((tag_text_input) => {

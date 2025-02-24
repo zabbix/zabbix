@@ -1198,7 +1198,7 @@ class CHistoryManager {
 	 *
 	 * @return array  Aggregation data of items. Each entry will contain 'value', 'clock' and 'itemid' properties.
 	 */
-	public function getAggregatedValues(array $items, int $function, int $time_from, int $time_to = null): ?array {
+	public function getAggregatedValues(array $items, int $function, int $time_from, ?int $time_to = null): ?array {
 		$is_numeric_aggregation = in_array($function, [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_SUM]);
 
 		$items_valid = [];

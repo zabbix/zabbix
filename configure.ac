@@ -1088,10 +1088,14 @@ dnl *****************************************************************
 AC_FUNC_FORK
 AC_FUNC_GETMNTENT
 AC_FUNC_LSTAT_FOLLOWS_SLASHED_SYMLINK
-AC_FUNC_MALLOC
+dnl Macros AC_FUNC_MALLOC and AC_FUNC_REALLOC are commented out because their checks
+dnl whether malloc() and realloc() are GNU libc compatible break compilation on AIX.
+dnl zbx_malloc2() and zbx_realloc2() provide a protection similar to rpl_malloc() and
+dnl rpl_realloc() required by AC_FUNC_MALLOC and AC_FUNC_REALLOC on AIX.
+dnl AC_FUNC_MALLOC
 AC_FUNC_MKTIME
 AC_FUNC_MMAP
-AC_FUNC_REALLOC
+dnl AC_FUNC_REALLOC
 AC_FUNC_STRTOD
 
 AC_CHECK_FUNCS([alarm atexit clock_gettime dup2 fesetround floor getcwd       \
@@ -1531,9 +1535,11 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 			saved_CPPFLAGS="$CPPFLAGS"
 			saved_LDFLAGS="$LDFLAGS"
+			saved_LIBS="$LIBS"
 
 			CPPFLAGS="$CPPFLAGS $SQLITE3_CPPFLAGS"
-			LDFLAGS="$LDFLAGS $SQLITE3_LDFLAGS $SQLITE3_LIBS"
+			LDFLAGS="$LDFLAGS $SQLITE3_LDFLAGS"
+			LIBS="$LIBS $SQLITE3_LIBS"
 
 			AC_MSG_CHECKING([for function sqlite3_open_v2() in sqlite3.h])
 			AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <sqlite3.h>]], [[sqlite3 *conn = 0;
@@ -1543,6 +1549,7 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 			CPPFLAGS="$saved_CPPFLAGS"
 			LDFLAGS="$saved_LDFLAGS"
+			LIBS="$saved_LIBS"
 		else
 			AC_MSG_ERROR([SQLite3 library not found])
 		fi

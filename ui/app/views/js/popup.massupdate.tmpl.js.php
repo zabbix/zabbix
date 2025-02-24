@@ -98,13 +98,12 @@
 		(new CRow([
 			[
 				new CVar('dependencies[]', '#{triggerid}', 'dependencies_#{triggerid}'),
-				(new CLink('#{name}', '#{trigger_url}')) // TODO VM: #{trigger_url}, #{action} does it work?
-				->addClass('js-edit-dependency')
-					->setAttribute('data-triggerid', '#{triggerid}')
-					->setAttribute('data-context', '#{context}')
-					->setAttribute('data-parent_discoveryid', '#{parent_discoveryid}')
-					->setAttribute('data-prototype', '#{prototype}')
-					->setAttribute('data-action', '#{action}')
+				(new CLink('#{name}', '#{trigger_url}'))
+					->addClass('js-edit-dependency')
+						->setAttribute('data-triggerid', '#{triggerid}')
+						->setAttribute('data-context', '#{context}')
+						->setAttribute('data-parent_discoveryid', '#{parent_discoveryid}')
+						->setAttribute('data-prototype', '#{prototype}')
 			],
 
 			(new CCol(

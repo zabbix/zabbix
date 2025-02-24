@@ -31,7 +31,7 @@ class CWidgetFieldThresholds extends CWidgetField {
 	/**
 	 * Create widget field for Thresholds selection.
 	 */
-	public function __construct(string $name, string $label = null, bool $is_binary_units = false) {
+	public function __construct(string $name, ?string $label = null, bool $is_binary_units = false) {
 		parent::__construct($name, $label);
 
 		$this->is_binary_units = $is_binary_units;

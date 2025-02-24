@@ -293,11 +293,10 @@ class CGraphPrototype extends CGraphGeneral {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-		}
 
-		// removing keys (hash -> array)
-		if (!$options['preservekeys']) {
-			$result = zbx_cleanHashes($result);
+			if (!$options['preservekeys']) {
+				$result = array_values($result);
+			}
 		}
 
 		return $result;
@@ -328,7 +327,7 @@ class CGraphPrototype extends CGraphGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDelete(array &$graphids, array &$db_graphs = null) {
+	private function validateDelete(array &$graphids, ?array &$db_graphs = null) {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 		if (!CApiInputValidator::validate($api_input_rules, $graphids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);

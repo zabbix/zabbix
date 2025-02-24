@@ -875,8 +875,8 @@ class testFormUpdateProblem extends CWebTest {
 		$row = $table->findRow('Problem', 'Trigger for icon test');
 		$row->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
 
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-		$form = $dialog->query('id:acknowledge_form')->asForm()->one();
+		$dialog = COverlayDialogElement::find()->one();
+		$form = $dialog->waitUntilReady()->query('id:acknowledge_form')->asForm()->one();
 		$form->fill(['id:suppress_problem' => true, 'id:suppress_time_option' => 'Indefinitely']);
 		$form->submit();
 		$dialog->ensureNotPresent();
@@ -899,6 +899,7 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Unsuppress problem.
 		$row->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
+		$dialog->waitUntilReady();
 		$form->fill(['id:unsuppress_problem' => true]);
 		$form->submit();
 		$dialog->ensureNotPresent();
@@ -907,6 +908,10 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Check unsuppressed icon and hint.
 		$this->checkIconAndHint($row, 'zi-eye', 'Unsuppressed by: Admin (Zabbix Administrator)');
+
+		// TODO: Unstable test on Jenkins. Sometimes suppress and unsuppress events have the same acknowledege time and
+		// are displayed in the wrong order in history table in the acknowlge popup. Failure in checkHistoryTable()
+		// sleep(1);
 
 		// Unsuppress the problem in DB: 'Trigger for icon test'.
 		DBexecute('DELETE FROM event_suppress WHERE event_suppressid=10051');

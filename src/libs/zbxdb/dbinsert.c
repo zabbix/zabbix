@@ -58,9 +58,9 @@ static void	db_insert_clear_rows(zbx_db_insert_t *db_insert)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: releases resources allocated by bulk insert operations            *
+ * Purpose: release resources allocated by bulk insert operations             *
  *                                                                            *
- * Parameters: self        - [IN] the bulk insert data                        *
+ * Parameters: db_insert   - [IN] the bulk insert data                        *
  *                                                                            *
  ******************************************************************************/
 void	zbx_db_insert_clean(zbx_db_insert_t *db_insert)
