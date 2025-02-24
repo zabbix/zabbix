@@ -532,7 +532,7 @@ func Test_ValidateOptions(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			"+WRONG IP",
+			"+wrongIP",
 			args{
 				&AgentOptions{
 					Server: "999.999.999.999",
@@ -542,7 +542,7 @@ func Test_ValidateOptions(t *testing.T) {
 			false,
 		},
 		{
-			"+base",
+			"+singleAddr",
 			args{
 				&AgentOptions{
 					Server: "127.0.0.1",
@@ -552,7 +552,7 @@ func Test_ValidateOptions(t *testing.T) {
 			false,
 		},
 		{
-			"+base2",
+			"+multipleAddr",
 			args{
 				&AgentOptions{
 					Server: "localhost,127.0.0.1",
@@ -592,7 +592,7 @@ func Test_ValidateOptions(t *testing.T) {
 			true,
 		},
 		{
-			"-trailing coma",
+			"-trailingComa",
 			args{
 				&AgentOptions{
 					Server: "localhost,",
@@ -602,7 +602,7 @@ func Test_ValidateOptions(t *testing.T) {
 			true,
 		},
 		{
-			"-semicolon1",
+			"-semicolonOnly",
 			args{
 				&AgentOptions{
 					Server: ";",
@@ -612,7 +612,7 @@ func Test_ValidateOptions(t *testing.T) {
 			true,
 		},
 		{
-			"-semicolon2",
+			"-semicolonWithMultipleAddr",
 			args{
 				&AgentOptions{
 					Server: "127.0.0.1;localhost",
@@ -631,13 +631,7 @@ func Test_ValidateOptions(t *testing.T) {
 			err := ValidateOptions(tt.args.options)
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateOptions() returned unexpected error:\n%v\n", err)
-
-				return
-			}
-
-			if (err == nil) == tt.wantErr {
-				t.Errorf("ValidateOptions() did not return expected error:\n%v\n", tt.err)
+				t.Fatalf("ValidateOptions() error expectation failed: wantErr=%v, got err=%v", tt.wantErr, err)
 
 				return
 			}

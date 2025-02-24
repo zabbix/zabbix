@@ -383,8 +383,10 @@ func ValidateOptions(options *AgentOptions) error {
 			" characters", HostInterfaceLen)
 	}
 
-	if _, err = zbxnet.GetAllowedPeers(options.Server); err != nil {
-		return errs.Wrapf(err, "invalid \"Server\" configuration parameter")
+	_, err = zbxnet.GetAllowedPeers(options.Server);
+
+	if err != nil {
+		return errs.Wrapf(err, `invalid "Server" configuration parameter`)
 	}
 
 	return nil
