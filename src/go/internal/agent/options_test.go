@@ -16,6 +16,7 @@ package agent
 
 import (
 	"testing"
+	"errors"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
@@ -506,6 +507,45 @@ func Test_removeSystem(t *testing.T) {
 			got := removeSystem(tt.args.privateOptions)
 			if diff := cmp.Diff(tt.want, got, cmpopts.IgnoreUnexported(conf.Node{})); diff != "" {
 				t.Fatalf("removeSystem() = %s", diff)
+			}
+		})
+	}
+}
+
+/*
+* only for the 'Server' parameter (for now)
+*/
+func TestValidateOptions(t *testing.T) {
+	type args struct {
+		options *AgentOptions
+	}
+	tests := []struct {
+		name string
+		args args
+		err error
+		wantErr bool
+	}{
+
+		{"+WRONG IP", args{&AgentOptions{Server:"999.999.999.999"}}, nil, false},
+		{"+basic", args{&AgentOptions{Server:"127.0.0.1"}}, nil, false},
+		{"+basic2", args{&AgentOptions{Server:"localhost,127.0.0.1"}}, nil, false},
+		{"+empty", args{&AgentOptions{Server:""}}, nil, false},
+		{"-newline", args{&AgentOptions{Server:"\n"}}, errors.New("invalid \"Server\" configuration parameter: invalid \"Server\" configuration: incorrect address parameter: \"\n\""), true},
+		{"-coma", args{&AgentOptions{Server:","}}, errors.New("invalid \"Server\" configuration parameter: invalid \"Server\" configuration: incorrect address parameter: \"\""), true},
+		{"-trailing coma", args{&AgentOptions{Server:"localhost,"}}, errors.New("invalid \"Server\" configuration parameter: invalid \"Server\" configuration: incorrect address parameter: \"\""), true},
+		{"+semicolon1", args{&AgentOptions{Server:";"}}, errors.New("invalid \"Server\" configuration parameter: invalid \"Server\" configuration: incorrect address parameter: \";\""), true},
+		{"-semicolon2", args{&AgentOptions{Server:"127.0.0.1;localhost"}}, errors.New("invalid \"Server\" configuration parameter: invalid \"Server\" configuration: incorrect address parameter: \"127.0.0.1;localhost\""), true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := ValidateOptions(tt.args.options)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ValidateOptions() returned unexpected error:\n%v\n", err)
+			} else if (err == nil) == tt.wantErr {
+				t.Errorf("ValidateOptions() did not return expected error:\n%v\n", tt.err)
+			} else if (tt.wantErr && err.Error() != tt.err.Error()) {
+				t.Errorf("ValidateOptions() unexpected error:\n%v\nexpected error:\n%v\n", err, tt.err)
 			}
 		})
 	}
