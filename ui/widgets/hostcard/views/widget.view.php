@@ -48,7 +48,7 @@ elseif ($data['host']) {
 				break;
 
 			case CWidgetFieldHostSections::SECTION_AVAILABILITY:
-				$sections[] = makeSectionAvailability($host['interfaces'], $host['has_passive_checks']);
+				$sections[] = makeSectionAvailability($host['interfaces']);
 				break;
 
 			case CWidgetFieldHostSections::SECTION_MONITORED_BY:
@@ -262,10 +262,10 @@ function makeSectionMonitoring(string $hostid, int $dashboard_count, int $item_c
 		->addClass('section-monitoring');
 }
 
-function makeSectionAvailability(array $interfaces, bool $has_passive_checks): CDiv {
+function makeSectionAvailability(array $interfaces): CDiv {
 	return (new CDiv([
 		(new CDiv(_('Availability')))->addClass(Widget::ZBX_STYLE_SECTION_NAME),
-		(new CDiv(getHostAvailabilityTable($interfaces, $has_passive_checks)))->addClass(Widget::ZBX_STYLE_SECTION_BODY)
+		(new CDiv(getHostAvailabilityTable($interfaces)))->addClass(Widget::ZBX_STYLE_SECTION_BODY)
 	]))
 		->addClass(Widget::ZBX_STYLE_SECTION)
 		->addClass('section-availability');

@@ -13,7 +13,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
+require_once __DIR__.'/../include/CIntegrationTest.php';
+require_once __DIR__.'/../../include/classes/api/services/CSettings.php';
 
 class CAutoregClient extends CZabbixClient {
 	public function sendRequest($host, $ip) {
@@ -61,15 +62,16 @@ class testHostConnMacroValidation extends CIntegrationTest {
 	 *
 	 */
 	private function updateServerStatus() {
-		$server_status = [
-			"version" => ZABBIX_VERSION,
-			"configuration" => [
-				"enable_global_scripts" => true,
-				"allow_software_update_check" => true
-			]
-		];
-
-		DBexecute("update config set server_status='".json_encode($server_status)."'");
+		DB::update('settings', [
+			'values' => ['value_str' => json_encode([
+				'version' => ZABBIX_VERSION,
+				'configuration' => [
+					'enable_global_scripts' => true,
+					'allow_software_update_check' => true
+				]
+			])],
+			'where' => ['name' => 'server_status']
+		]);
 	}
 
 	/**
@@ -193,7 +195,10 @@ class testHostConnMacroValidation extends CIntegrationTest {
 		$this->assertArrayHasKey('scriptids', $response['result']);
 		self::$scriptid_action = $response['result']['scriptids'][0];
 
-		DBexecute("update config set server_status=''");
+		DB::update('settings', [
+			'values' => ['value_str' => ''],
+			'where' => ['name' => 'server_status']
+		]);
 
 		$response = $this->call('action.create', [
 			'esc_period' => '1m',
@@ -765,23 +770,6 @@ class testHostConnMacroValidation extends CIntegrationTest {
 		$data = explode("\n", $log);
 		$synced_ifs = preg_grep("/interfaceid:[0-9]+ hostid:[0-9]+ ip:'' dns:'zabbix.com' /", $data);
 		$this->assertCount(8, $synced_ifs);
-	}
-
-	/**
-	 * Test injection via running an action operation for discovery.
-	 *
-	 * @required-components server, agent
-	 * @configurationDataProvider defaultConfigurationProvider
-	 */
-	public function testHostConnMacroValidation_testInvalidMacroDruleAction() {
-		CDataHelper::call('host.delete', [self::$hostid]);
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-
-		$response = $this->callUntilDataIsPresent('alert.get', [
-			'actionids' => [self::$trigger_actionid_neg]
-		], 30, 2);
-		$this->assertArrayHasKey(0, $response['result']);
-		$this->assertEquals("Invalid macro '{HOST.CONN}' value", $response['result'][0]['error']);
 	}
 
 	/**

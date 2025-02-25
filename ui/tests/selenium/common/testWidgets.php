@@ -64,7 +64,7 @@ class testWidgets extends CWebTest {
 		// Assign the dialog from where the last Select button will be clicked.
 		$select_dialog = $widget_dialog;
 
-		// Item types expected in items table. For the most cases theses are all items except of Binary and dependent.
+		// Item types expected in items table. For the most cases these are all items except of Binary and dependent.
 		$item_types = (in_array($widget, ['Item navigator', 'Item history', 'Honeycomb', 'Top hosts']))
 			? ['Binary item', 'Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item']
 			: ['Character item', 'Float item', 'Log item', 'Text item', 'Unsigned item', 'Unsigned_dependent item'];

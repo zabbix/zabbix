@@ -710,8 +710,8 @@ class testFormTabIndicators extends CWebTest {
 			// #16 User profile configuration form tab data.
 			[
 				[
-					'url' => 'zabbix.php?action=userprofile.edit',
-					'form' => 'name:user_form',
+					'url' => 'zabbix.php?action=userprofile.notification.edit',
+					'form' => 'id:userprofile-notification-form',
 					'tabs' => [
 						[
 							'name' => 'Media',
