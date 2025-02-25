@@ -237,6 +237,25 @@ static void	DBget_sysmapelements_by_element_type_ids(zbx_vector_uint64_t *seleme
 	zbx_vector_uint64_sort(selementids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
+static void	DBget_sysmapelements_triggers_by_ids(zbx_vector_uint64_t *selementids,
+		const zbx_vector_uint64_t *triggerids)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select distinct selementid"
+			" from sysmap_element_trigger"
+			" where");
+
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids->values, triggerids->values_num);
+	DBselect_uint64(sql, selementids);
+
+	zbx_free(sql);
+
+	zbx_vector_uint64_sort(selementids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+}
+
 /******************************************************************************
  *                                                                            *
  * Description: Check collisions between linked templates                     *
@@ -1034,39 +1053,45 @@ out:
  ******************************************************************************/
 void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 {
-	char			*sql = NULL, *sql_trig = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset;
 	int			i;
+	zbx_vector_uint64_t	selementids;
 	const char		*event_tables[] = {"events"};
 
 	if (0 == triggerids->values_num)
 		return;
 
-	DBadd_condition_alloc(&sql_trig, &sql_alloc, &sql_offset, "triggerid", triggerids->values,
-			triggerids->values_num);
-
-	sql_alloc = 256;
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
-	sql_offset = 0;
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from sysmaps_elements"
-			" where selementid in ("
-				" select distinct selementid from sysmap_element_trigger"
-					" where%s"
-						" and selementid not in ("
-							" select distinct selementid from sysmap_element_trigger"
-								" where not%s"
-							")"
-			");\n", sql_trig, sql_trig);
+	zbx_vector_uint64_create(&selementids);
+	DBget_sysmapelements_triggers_by_ids(&selementids, triggerids);
 
 	for (i = 0; i < triggerids->values_num; i++)
 		DBdelete_action_conditions(CONDITION_TYPE_TRIGGER, triggerids->values[i]);
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+	sql_offset = 0;
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"delete from triggers"
-			" where%s;\n", sql_trig);
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid", triggerids->values, triggerids->values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+	if (0 != selementids.values_num)
+	{
+		/* this query to delete map trigger elements must be executed after the query to delete trigger */
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"delete from sysmaps_elements"
+				" where selementid not in ("
+					"select selementid from sysmap_element_trigger"
+				")"
+					" and");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "selementid", selementids.values,
+				selementids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1075,8 +1100,9 @@ void	DBdelete_triggers(zbx_vector_uint64_t *triggerids)
 	/* add housekeeper task to delete problems associated with trigger, this allows old events to be deleted */
 	DBadd_to_housekeeper(triggerids, "triggerid", event_tables, ARRSIZE(event_tables));
 
+	zbx_vector_uint64_destroy(&selementids);
+
 	zbx_free(sql);
-	zbx_free(sql_trig);
 }
 
 /******************************************************************************
