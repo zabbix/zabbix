@@ -2745,7 +2745,7 @@ class testUsers extends CAPITest {
 
 	/**
 	 * There should be minimum 1sec delay/timeout when your login failed with - correct and incorrect username.
-	 **/
+	 */
 	public function testUsers_checkFailedLoginTimeout() {
 		$this->disableAuthorization();
 		foreach (['incorrect_name' => 'incorrect_password', 'Admin' => 'incorrect_password'] as $login => $password) {
