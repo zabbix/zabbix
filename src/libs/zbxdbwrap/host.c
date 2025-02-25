@@ -1076,7 +1076,7 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 	zbx_db_execute_multiple_query("delete from functions where", "triggerid", triggerids);
 	zbx_db_execute_multiple_query("delete from triggers where", "triggerid", triggerids);
 
-	if (0 < selementids.values_num)
+	if (0 != selementids.values_num)
 	{
 		zbx_db_execute_multiple_query(
 				"delete from sysmaps_elements"
