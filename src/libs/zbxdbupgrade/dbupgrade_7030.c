@@ -140,7 +140,7 @@ static int	DBpatch_7030012(void)
 
 static int	DBpatch_7030013(void)
 {
-	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("sysmaps_links", 4, &field);
 }
