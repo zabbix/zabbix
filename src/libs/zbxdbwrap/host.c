@@ -284,23 +284,34 @@ static void	DBget_trigger_map_links(const zbx_vector_uint64_t *triggerids, zbx_v
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
+	zbx_db_row_t		row;
+	zbx_db_large_query_t	query;
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select linkid from sysmaps_link_triggers where");
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "triggerid",
-			triggerids->values, triggerids->values_num);
+			"select distinct linkid from sysmaps_link_triggers where");
 
-	zbx_db_select_uint64(sql, linkids);
+	zbx_db_large_query_prepare_uint(&query, &sql, &sql_alloc, &sql_offset, "triggerid", triggerids);
 
+	while (NULL != (row = zbx_db_large_query_fetch(&query)))
+	{
+		zbx_uint64_t	linkid;
+
+		ZBX_STR2UINT64(linkid, row[0]);
+		zbx_vector_uint64_append(linkids, linkid);
+	}
+	zbx_db_large_query_clear(&query);
 	zbx_free(sql);
+
+	zbx_vector_uint64_sort(linkids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(linkids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
 static void	DBupdate_trigger_map_links(const zbx_vector_uint64_t *linkids)
 {
-	char			*sql = NULL;
-	size_t			sql_alloc = 256, sql_offset = 0;
+	char	*sql = NULL;
+	size_t	sql_alloc = 256, sql_offset = 0;
 
 	if (0 == linkids->values_num)
 		return;
@@ -324,6 +335,8 @@ void	zbx_db_update_item_map_links(const zbx_vector_uint64_t *itemids)
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset = 0;
 	zbx_vector_uint64_t	linkids;
+	zbx_db_row_t		row;
+	zbx_db_large_query_t	query;
 
 	if (0 == itemids->values_num)
 		return;
@@ -333,17 +346,26 @@ void	zbx_db_update_item_map_links(const zbx_vector_uint64_t *itemids)
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select linkid"
+			"select distinct linkid"
 			" from sysmaps_links"
 			" where");
 
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid",
-			itemids->values, itemids->values_num);
+	zbx_db_large_query_prepare_uint(&query, &sql, &sql_alloc, &sql_offset, "itemid", itemids);
 
-	zbx_db_select_uint64(sql, &linkids);
+	while (NULL != (row = zbx_db_large_query_fetch(&query)))
+	{
+		zbx_uint64_t	linkid;
+
+		ZBX_STR2UINT64(linkid, row[0]);
+		zbx_vector_uint64_append(&linkids, linkid);
+	}
+	zbx_db_large_query_clear(&query);
 
 	if (0 == linkids.values_num)
 		goto clean;
+
+	zbx_vector_uint64_sort(&linkids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&linkids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	sql_offset = 0;
 
