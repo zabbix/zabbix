@@ -935,31 +935,32 @@ func peekTask(tasks performerHeap) performer {
 }
 
 func getPluginCapacity(
-	pluginCapacity, defaultCapacity, pluginMaxCapacity, defaultMaxCapacity int, pluginName string,
+	pluginCapacity, defaultCapacity, pluginMaxCapacity, defaultMaxCapacity int,
+	pluginName string,
 ) int {
-	capacity := pluginCapacity
-	if capacity == 0 {
-		capacity = defaultCapacity
+	maxCapacity := pluginMaxCapacity
+	if maxCapacity == 0 {
+		maxCapacity = defaultMaxCapacity
 	}
 
-	maxCapacity := defaultMaxCapacity
-
-	if pluginMaxCapacity > 0 {
-		maxCapacity = pluginMaxCapacity
-	}
-
-	if capacity > maxCapacity {
+	if pluginCapacity > maxCapacity {
 		log.Warningf(
 			"lowering the plugin %s capacity to hard limit %d as the configured capacity %d exceeds limits",
-			pluginName,
-			maxCapacity,
-			capacity,
+			pluginName, maxCapacity, pluginCapacity,
 		)
 
 		return maxCapacity
 	}
 
-	return capacity
+	if pluginCapacity != 0 {
+		return pluginCapacity
+	}
+
+	if defaultCapacity < maxCapacity {
+		return defaultCapacity
+	}
+
+	return maxCapacity
 }
 
 func getPluginForceActiveChecks(
