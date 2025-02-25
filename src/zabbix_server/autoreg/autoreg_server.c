@@ -79,6 +79,9 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 			if (0 != strcmp(autoreg_host->host, row[0]))
 				continue;
 
+			if (SUCCEED == zbx_db_is_null(row[3]))
+				break;
+
 			ZBX_STR2UINT64(autoreg_host->hostid, row[1]);
 
 			if (0 != strcmp(autoreg_host->host_metadata, row[3]) ||
