@@ -1908,7 +1908,7 @@ class testUsers extends CAPITest {
 	/**
 	 * @dataProvider user_properties
 	 */
-	public function testUser_NotRequiredPropertiesAndMedias($user, $expected_error) {
+	public function testUsers_NotRequiredPropertiesAndMedias($user, $expected_error) {
 		$methods = ['user.create', 'user.update'];
 
 		foreach ($methods as $method) {
@@ -2649,7 +2649,7 @@ class testUsers extends CAPITest {
 	 *
 	 * @dataProvider getUsersCheckAuthenticationDataInvalidParameters
 	 */
-	public function testUser_checkAuthentication_InvalidParameters(array $params, string $expected_error) {
+	public function testUsers_checkAuthentication_InvalidParameters(array $params, string $expected_error) {
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'user.checkAuthentication',
@@ -2726,7 +2726,7 @@ class testUsers extends CAPITest {
 	 * @dataProvider getUsersCheckAuthenticationDataInvalidAuthorization
 	 * @dataProvider getUsersCheckAuthenticationDataValidAuthorization
 	 */
-	public function testUser_checkAuthentication_Authorization(array $data, ?string $expected_error) {
+	public function testUsers_checkAuthentication_Authorization(array $data, ?string $expected_error) {
 		foreach ($data as $parameter => $name) {
 			$parameter_key = $parameter === 'sessionids' ? 'sessionid' : 'token';
 
@@ -2781,7 +2781,7 @@ class testUsers extends CAPITest {
 	 *
 	 * @dataProvider getUsersCheckAuthenticationDataValidSessionIDWithExtend
 	 */
-	public function testUser_checkAuthentication_SessionIDWithExtend(bool $extend) {
+	public function testUsers_checkAuthentication_SessionIDWithExtend(bool $extend) {
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'user.checkAuthentication',
