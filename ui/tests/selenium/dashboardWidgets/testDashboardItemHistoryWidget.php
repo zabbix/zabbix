@@ -2761,7 +2761,8 @@ class testDashboardItemHistoryWidget extends testWidgets {
 $this->assertScreenshot($form, 'clicked advanced config');
 		$form->fill(['New values' => 'Top']);
 $this->assertScreenshot($form, 'selected TOP');
-		$form->submit();
+		$form->query('button:Apply')->one()->waitUntilClickable()->click();
+		COverlayDialogElement::ensureNotPresent();
 		$dashboard->save();
 		$dashboard->waitUntilReady();
 
