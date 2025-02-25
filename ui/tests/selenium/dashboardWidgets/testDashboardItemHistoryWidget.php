@@ -2764,6 +2764,7 @@ $this->assertScreenshot($form, 'selected TOP');
 		$dialog = COverlayDialogElement::find()->one();
 		$dialog->query('button:Apply')->one()->waitUntilClickable()->click();
 		$dialog->ensureNotPresent();
+sleep(4);
 		$dashboard->save();
 		$dashboard->waitUntilReady();
 
