@@ -37,7 +37,7 @@ class testFormSetup extends CWebTest {
 	}
 
 	/**
-	 * @backup config
+	 * @backup settings
 	 */
 	public function testFormSetup_welcomeSectionLayout() {
 		$this->page->login()->open('setup.php')->waitUntilReady();
@@ -65,7 +65,7 @@ class testFormSetup extends CWebTest {
 		$this->assertScreenshotExcept($form, $this->query('id:default-lang')->one(), 'Welcome_Rus');
 	}
 
-// Commented until Jenkins issue investigated.
+// TODO: Commented until Jenkins issue investigated.
 //	public function testFormSetup_prerequisitesSectionLayout() {
 //		$this->page->login()->open('setup.php')->waitUntilReady();
 //		$this->query('button:Next step')->one()->click();
@@ -256,7 +256,7 @@ class testFormSetup extends CWebTest {
 	}
 
 	/**
-	 * @backup config
+	 * @backup settings
 	 */
 	public function testFormSetup_settingsSection() {
 		// Open the Pre-installation summary section.
@@ -277,8 +277,9 @@ class testFormSetup extends CWebTest {
 		$timezones_field = $form->getField('Default time zone');
 		$timezones = $timezones_field->getOptions()->asText();
 
-		// Note that count of available timezones may differ based on the local environment configuration.
-		$this->assertEquals(420, count($timezones));
+		// Note that count of available timezones may differ based on the local environment configuration and php version.
+		$this->assertGreaterThan(415, count($timezones));
+		$this->assertContains(CDateTimeHelper::getTimeZoneFormat('Europe/Riga'), $timezones);
 
 		foreach (['System', 'Europe/Riga'] as $timezone_value) {
 			$timezone = CDateTimeHelper::getTimeZoneFormat($timezone_value);
@@ -304,7 +305,10 @@ class testFormSetup extends CWebTest {
 		$this->query('button:Next step')->one()->click();
 		$this->query('button:Next step')->one()->click();
 		$this->query('button:Finish')->one()->click();
-		$db_values = CDBHelper::getRow('SELECT default_theme, default_timezone FROM config');
+
+		$db_values = CDBHelper::getColumn('SELECT name, value_str FROM settings WHERE name IN (\'default_theme\','.
+				' \'default_timezone\') ORDER BY name', 'value_str'
+		);
 		$this->assertEquals(['dark-theme', 'Europe/Riga'], array_values($db_values));
 	}
 

@@ -259,12 +259,8 @@ class CDBHelper {
 		$suffix = '_tmp'.count(self::$backups);
 
 		if ($DB['TYPE'] === ZBX_DB_POSTGRESQL) {
-			if (self::$db_extension == null) {
-				$res = DBfetch(DBselect('SELECT db_extension FROM config'));
-
-				if ($res) {
-					self::$db_extension = $res['db_extension'];
-				}
+			if (self::$db_extension === null) {
+				self::$db_extension = self::getValue('SELECT value_str FROM settings WHERE name=\'db_extension\'');
 			}
 
 			if ($DB['PASSWORD'] !== '') {
@@ -285,7 +281,7 @@ class CDBHelper {
 			$cmd .= ' --username='.$DB['USER'].' --format=d --jobs=9 --dbname='.$DB['DATABASE'];
 			$cmd .= ' --table='.implode(' --table=', $tables).' --file='.$file;
 
-			if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
+			if (self::$db_extension === ZBX_DB_EXTENSION_TIMESCALEDB) {
 				$cmd .= ' 2>/dev/null';
 			}
 
@@ -358,7 +354,7 @@ class CDBHelper {
 			$cmd .= ' --username='.$DB['USER'].' --format=d --jobs=1 --clean --dbname='.$DB['DATABASE'];
 			$cmd .= ' '.$file;
 
-			if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
+			if (self::$db_extension === ZBX_DB_EXTENSION_TIMESCALEDB) {
 				$cmd_tdb = 'psql --username='.$DB['USER'].$server.$port.' --dbname='.$DB['DATABASE'].' --command="SELECT timescaledb_pre_restore();"; ';
 				$cmd_tdb .= $cmd .' 2>/dev/null; ';
 				$cmd_tdb .= 'psql --username='.$DB['USER'].$server.$port.' --dbname='.$DB['DATABASE'].' --command="SELECT timescaledb_post_restore();" ';

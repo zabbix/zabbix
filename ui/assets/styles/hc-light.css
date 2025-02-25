@@ -2124,8 +2124,10 @@ button {
   border-color: #555555; }
 
 .overlay-dialogue.modal-popup.modal-widget-configuration {
-  max-width: 1120px;
+  max-width: calc(100vw - 40px);
   min-width: 650px; }
+  .overlay-dialogue.modal-popup.modal-widget-configuration .overlay-dialogue-body {
+    overflow-x: auto; }
 
 .dashboard-widget-form {
   position: relative; }
@@ -2579,13 +2581,15 @@ button {
       background: #e6e6e6;
       border-left-color: transparent;
       color: #000000; }
-.menu-main .has-submenu > a::after {
-  position: relative;
-  float: right;
-  top: 4px;
-  font-size: 8px;
-  content: "";
-  transform: rotate(0deg); }
+.menu-main .has-submenu > a {
+  padding-right: 34px; }
+  .menu-main .has-submenu > a::after {
+    position: absolute;
+    top: 17px;
+    right: 13px;
+    font-size: 8px;
+    content: "";
+    transform: rotate(0deg); }
 .menu-main .has-submenu.is-expanded > a[class^="zi-"]::before, .menu-main .has-submenu.is-expanded > a[class*=" zi-"]::before {
   color: #000000; }
 .menu-main .has-submenu.is-expanded > a[class^="zi-"]:hover::before, .menu-main .has-submenu.is-expanded > a[class^="zi-"]:focus::before, .menu-main .has-submenu.is-expanded > a[class*=" zi-"]:hover::before, .menu-main .has-submenu.is-expanded > a[class*=" zi-"]:focus::before {
@@ -2671,7 +2675,8 @@ button {
     .menu-main .submenu .submenu::before, .menu-main .submenu .submenu::after {
       display: none; }
   .menu-main .submenu .has-submenu > a::after {
-    transform: rotate(90deg); }
+    transform: rotate(90deg);
+    top: 11px; }
   .menu-main .submenu .has-submenu:not(.is-expanded) a::after {
     transform: rotate(-90deg); }
   .menu-main .submenu .has-submenu:not(.is-expanded) .submenu {
@@ -2689,7 +2694,7 @@ button {
   .menu-user span {
     position: relative;
     display: block;
-    padding: 12px 14px 12px 45px;
+    padding: 12px 14px 12px 44px;
     font-size: 12px;
     white-space: nowrap;
     border-left: 3px solid transparent; }
@@ -2719,13 +2724,15 @@ button {
     color: #000000; }
   .menu-user > li:not(.is-expanded) .submenu {
     max-height: 0 !important; }
-  .menu-user .has-submenu > a::after {
-    position: relative;
-    float: right;
-    top: 4px;
-    font-size: 8px;
-    content: "";
-    transform: rotate(0deg); }
+  .menu-user .has-submenu > a {
+    padding-right: 34px; }
+    .menu-user .has-submenu > a::after {
+      position: absolute;
+      top: 17px;
+      right: 13px;
+      font-size: 8px;
+      content: "";
+      transform: rotate(0deg); }
   .menu-user .has-submenu.is-expanded > a::after {
     transform: rotate(-180deg); }
   .menu-user .submenu {
@@ -2786,7 +2793,8 @@ button {
       .menu-user .submenu .submenu::before, .menu-user .submenu .submenu::after {
         display: none; }
     .menu-user .submenu .has-submenu > a::after {
-      transform: rotate(90deg); }
+      transform: rotate(90deg);
+      top: 11px; }
     .menu-user .submenu .has-submenu:not(.is-expanded) a::after {
       transform: rotate(-90deg); }
     .menu-user .submenu .has-submenu:not(.is-expanded) .submenu {
@@ -4124,7 +4132,7 @@ z-sparkline {
 
 form.dashboard-widget-clock .fields-group.fields-group-date, form.dashboard-widget-clock .fields-group.fields-group-time, form.dashboard-widget-clock .fields-group.fields-group-tzone {
   display: grid;
-  grid-template-columns: 60px 120px 60px auto;
+  grid-template-columns: repeat(2, minmax(80px, max-content) 1fr);
   align-items: center;
   column-gap: 10px;
   row-gap: 5px; }
@@ -4926,7 +4934,9 @@ div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
   min-width: 378px; }
 
 form.dashboard-widget-piechart {
-  width: 1110px; }
+  max-width: 1330px;
+  min-width: 1110px;
+  width: 100vw; }
   form.dashboard-widget-piechart .pie-chart-widget-config-tabs {
     grid-column: 1 / -1; }
   form.dashboard-widget-piechart .pie-chart-widget-config-tabs > .tabs-nav {
@@ -5043,6 +5053,8 @@ form.dashboard-widget-piechart {
     display: none;
     line-height: 24px;
     color: #333333; }
+  form.dashboard-widget-piechart #merge_percent {
+    margin-left: 5px; }
 
 div.dashboard-widget-piechart {
   overflow-x: hidden; }
@@ -5066,200 +5078,204 @@ div.dashboard-widget-problemsbysv .by-severity-widget > div {
     flex-direction: column;
     justify-content: center; }
 
-form.dashboard-widget-svggraph .svg-graph-preview,
-form.dashboard-widget-svggraph .graph-widget-config-tabs {
-  grid-column: 1 / -1; }
-form.dashboard-widget-svggraph .svg-graph-preview {
-  position: relative;
+form.dashboard-widget-svggraph {
+  max-width: 1330px;
   min-width: 1110px;
-  height: 300px; }
-  form.dashboard-widget-svggraph .svg-graph-preview > div {
-    position: absolute;
+  width: 100vw; }
+  form.dashboard-widget-svggraph .svg-graph-preview,
+  form.dashboard-widget-svggraph .graph-widget-config-tabs {
+    grid-column: 1 / -1; }
+  form.dashboard-widget-svggraph .svg-graph-preview {
+    position: relative;
+    min-width: 1110px;
+    height: 300px; }
+    form.dashboard-widget-svggraph .svg-graph-preview > div {
+      position: absolute;
+      top: 0;
+      right: 0;
+      left: 0;
+      margin: 0 -10px;
+      height: 300px;
+      background: #ffffff;
+      z-index: 3; }
+  form.dashboard-widget-svggraph .graph-widget-config-tabs > .tabs-nav {
+    border-top: 1px solid #9f9f9f; }
+  form.dashboard-widget-svggraph .graph-widget-config-tabs .ui-tabs-nav {
+    position: sticky;
     top: 0;
-    right: 0;
-    left: 0;
-    margin: 0 -10px;
-    height: 300px;
-    background: #ffffff;
+    background: #f3f3f3;
     z-index: 3; }
-form.dashboard-widget-svggraph .graph-widget-config-tabs > .tabs-nav {
-  border-top: 1px solid #9f9f9f; }
-form.dashboard-widget-svggraph .graph-widget-config-tabs .ui-tabs-nav {
-  position: sticky;
-  top: 0;
-  background: #f3f3f3;
-  z-index: 3; }
-form.dashboard-widget-svggraph .table-forms-container, form.dashboard-widget-svggraph .browser-warning-container {
-  margin: -10px 0 0 0;
-  border: 1px solid #9f9f9f;
-  border-top: none; }
-form.dashboard-widget-svggraph .table-forms-separator {
-  padding: 0; }
-form.dashboard-widget-svggraph .dataset-head,
-form.dashboard-widget-svggraph .dataset-body.list-accordion-item-body {
-  display: contents; }
-form.dashboard-widget-svggraph .dataset-head .multiselect-control {
-  overflow: hidden;
-  margin: -2px;
-  padding: 2px; }
-  form.dashboard-widget-svggraph .dataset-head .multiselect-control .multiselect {
-    overflow: hidden;
-    flex-grow: 1; }
-form.dashboard-widget-svggraph .dataset-body .form-grid {
-  padding-top: 0; }
-  form.dashboard-widget-svggraph .dataset-body .form-grid:first-child {
-    grid-column-start: 5; }
-form.dashboard-widget-svggraph .list-item-actions {
-  grid-column: span 1 / -1;
-  text-align: right; }
-form.dashboard-widget-svggraph .items-list {
-  grid-column: 4 / span 3; }
-form.dashboard-widget-svggraph .list-vertical-accordion {
-  position: relative;
-  overflow: visible;
-  margin-top: -5px;
-  margin-bottom: 5px; }
-  form.dashboard-widget-svggraph .list-vertical-accordion .sortable:not(.sortable-disabled) .list-accordion-item > .drag-icon + label {
-    cursor: grab; }
-form.dashboard-widget-svggraph .list-accordion-item {
-  position: relative;
-  display: grid;
-  grid-template-columns: 5px 100px 24px 24px 1fr 1fr 24px;
-  grid-gap: 10px;
-  align-items: start;
-  padding: 5px 0; }
-  form.dashboard-widget-svggraph .list-accordion-item > .drag-icon {
-    height: 24px;
-    margin-left: -2px; }
-  form.dashboard-widget-svggraph .list-accordion-item > label {
-    pointer-events: initial;
-    overflow: hidden;
-    line-height: 24px;
-    text-align: left;
-    text-overflow: ellipsis; }
-  form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-opened::before {
-    content: ' ';
-    position: absolute;
-    top: 24px;
-    bottom: 0;
-    left: 136px;
-    width: 2px;
-    background: #9f9f9f; }
-  form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .multiselect {
-    height: 24px;
-    overflow: hidden; }
-  form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .table-forms-separator {
-    border: none; }
-  form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table thead,
-  form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table tfoot,
-  form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-handle,
-  form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-action {
-    display: none; }
-  form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-body {
-    display: none; }
-  form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .items-list {
-    padding-left: 0; }
-form.dashboard-widget-svggraph .single-item-table .table-col-handle {
-  width: 12px; }
-form.dashboard-widget-svggraph .single-item-table .table-col-no {
-  width: 20px; }
-form.dashboard-widget-svggraph .single-item-table .table-col-color {
-  width: 24px; }
-form.dashboard-widget-svggraph .single-item-table .table-col-action {
-  width: 55px; }
-form.dashboard-widget-svggraph .single-item-table th {
-  padding: 5px 5px 5px 0; }
-form.dashboard-widget-svggraph .single-item-table .single-item-table-row td {
-  padding: 0 5px 5px 0; }
-form.dashboard-widget-svggraph .single-item-table th:first-child,
-form.dashboard-widget-svggraph .single-item-table td:first-child {
-  padding-left: 5px; }
-form.dashboard-widget-svggraph .single-item-table tfoot td {
-  padding: 5px 5px 5px 10px; }
-form.dashboard-widget-svggraph .single-item-table tbody:not(:empty) + tfoot td {
-  padding-top: 0; }
-form.dashboard-widget-svggraph .single-item-table .reference-hint {
-  margin-right: 4px; }
-  form.dashboard-widget-svggraph .single-item-table .reference-hint::before {
-    font-size: 16px;
-    color: #555555; }
-form.dashboard-widget-svggraph .single-item-table .unavailable-widget .reference-hint::before {
-  color: #9f9f9f; }
-form.dashboard-widget-svggraph .single-item-table .unavailable-widget a {
-  color: #9f9f9f; }
-form.dashboard-widget-svggraph .override-host-field-view {
-  overflow: hidden;
-  margin: -2px;
-  padding: 2px; }
-  form.dashboard-widget-svggraph .override-host-field-view .multiselect {
-    overflow: hidden;
-    flex-grow: 1; }
-form.dashboard-widget-svggraph .overrides-list {
-  position: relative;
-  margin: -5px 0 -5px 15px; }
-form.dashboard-widget-svggraph .overrides-list-item {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr 1fr 24px;
-  grid-gap: 5px 10px;
-  align-items: start;
-  padding: 5px 0;
-  overflow: visible;
-  margin-top: -5px;
-  margin-bottom: -5px; }
-  form.dashboard-widget-svggraph .overrides-list-item .drag-icon {
-    position: absolute;
-    top: 5px;
-    left: -17px;
-    height: 24px; }
-  form.dashboard-widget-svggraph .overrides-list-item .multiselect-control {
+  form.dashboard-widget-svggraph .table-forms-container, form.dashboard-widget-svggraph .browser-warning-container {
+    margin: -10px 0 0 0;
+    border: 1px solid #9f9f9f;
+    border-top: none; }
+  form.dashboard-widget-svggraph .table-forms-separator {
+    padding: 0; }
+  form.dashboard-widget-svggraph .dataset-head,
+  form.dashboard-widget-svggraph .dataset-body.list-accordion-item-body {
+    display: contents; }
+  form.dashboard-widget-svggraph .dataset-head .multiselect-control {
     overflow: hidden;
     margin: -2px;
     padding: 2px; }
-    form.dashboard-widget-svggraph .overrides-list-item .multiselect-control .multiselect {
+    form.dashboard-widget-svggraph .dataset-head .multiselect-control .multiselect {
       overflow: hidden;
       flex-grow: 1; }
-form.dashboard-widget-svggraph .overrides-foot {
-  padding: 5px 0; }
-form.dashboard-widget-svggraph .overrides-options-list {
-  grid-column: 1 / -1;
-  padding: 0 24px 8px 0;
-  border-bottom: 1px solid #888888;
-  white-space: normal; }
-  form.dashboard-widget-svggraph .overrides-options-list li {
-    display: inline-block;
-    margin-bottom: 2px;
-    vertical-align: middle;
-    white-space: nowrap; }
-    form.dashboard-widget-svggraph .overrides-options-list li > div {
-      padding: 1px 0 1px 1px;
-      background-color: #333333;
-      border-radius: 2px;
-      line-height: 22px; }
-      form.dashboard-widget-svggraph .overrides-options-list li > div span {
-        padding-left: 8px;
-        color: #fff; }
-      form.dashboard-widget-svggraph .overrides-options-list li > div input[type=text] {
-        width: 85px;
-        min-height: 22px;
-        border-style: none; }
-    form.dashboard-widget-svggraph .overrides-options-list li:not(:last-child) {
-      margin-right: 5px; }
-  form.dashboard-widget-svggraph .overrides-options-list .btn-icon {
-    min-width: 18px;
-    margin: -1px 0;
-    color: #fff; }
-    form.dashboard-widget-svggraph .overrides-options-list .btn-icon:hover, form.dashboard-widget-svggraph .overrides-options-list .btn-icon:focus {
-      color: #dfe4e7; }
-  form.dashboard-widget-svggraph .overrides-options-list .color-picker .color-picker-preview {
-    width: 20px;
-    min-width: 20px;
-    height: 20px;
-    margin: 1px 0 1px 1px; }
-form.dashboard-widget-svggraph .no-items-message {
-  display: none;
-  line-height: 24px;
-  color: #333333; }
+  form.dashboard-widget-svggraph .dataset-body .form-grid {
+    padding-top: 0; }
+    form.dashboard-widget-svggraph .dataset-body .form-grid:first-child {
+      grid-column-start: 5; }
+  form.dashboard-widget-svggraph .list-item-actions {
+    grid-column: span 1 / -1;
+    text-align: right; }
+  form.dashboard-widget-svggraph .items-list {
+    grid-column: 4 / span 3; }
+  form.dashboard-widget-svggraph .list-vertical-accordion {
+    position: relative;
+    overflow: visible;
+    margin-top: -5px;
+    margin-bottom: 5px; }
+    form.dashboard-widget-svggraph .list-vertical-accordion .sortable:not(.sortable-disabled) .list-accordion-item > .drag-icon + label {
+      cursor: grab; }
+  form.dashboard-widget-svggraph .list-accordion-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 5px 100px 24px 24px 1fr 1fr 24px;
+    grid-gap: 10px;
+    align-items: start;
+    padding: 5px 0; }
+    form.dashboard-widget-svggraph .list-accordion-item > .drag-icon {
+      height: 24px;
+      margin-left: -2px; }
+    form.dashboard-widget-svggraph .list-accordion-item > label {
+      pointer-events: initial;
+      overflow: hidden;
+      line-height: 24px;
+      text-align: left;
+      text-overflow: ellipsis; }
+    form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-opened::before {
+      content: ' ';
+      position: absolute;
+      top: 24px;
+      bottom: 0;
+      left: 136px;
+      width: 2px;
+      background: #9f9f9f; }
+    form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .multiselect {
+      height: 24px;
+      overflow: hidden; }
+    form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .table-forms-separator {
+      border: none; }
+    form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table thead,
+    form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table tfoot,
+    form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-handle,
+    form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-action {
+      display: none; }
+    form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .dataset-body {
+      display: none; }
+    form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .items-list {
+      padding-left: 0; }
+  form.dashboard-widget-svggraph .single-item-table .table-col-handle {
+    width: 12px; }
+  form.dashboard-widget-svggraph .single-item-table .table-col-no {
+    width: 20px; }
+  form.dashboard-widget-svggraph .single-item-table .table-col-color {
+    width: 24px; }
+  form.dashboard-widget-svggraph .single-item-table .table-col-action {
+    width: 55px; }
+  form.dashboard-widget-svggraph .single-item-table th {
+    padding: 5px 5px 5px 0; }
+  form.dashboard-widget-svggraph .single-item-table .single-item-table-row td {
+    padding: 0 5px 5px 0; }
+  form.dashboard-widget-svggraph .single-item-table th:first-child,
+  form.dashboard-widget-svggraph .single-item-table td:first-child {
+    padding-left: 5px; }
+  form.dashboard-widget-svggraph .single-item-table tfoot td {
+    padding: 5px 5px 5px 10px; }
+  form.dashboard-widget-svggraph .single-item-table tbody:not(:empty) + tfoot td {
+    padding-top: 0; }
+  form.dashboard-widget-svggraph .single-item-table .reference-hint {
+    margin-right: 4px; }
+    form.dashboard-widget-svggraph .single-item-table .reference-hint::before {
+      font-size: 16px;
+      color: #555555; }
+  form.dashboard-widget-svggraph .single-item-table .unavailable-widget .reference-hint::before {
+    color: #9f9f9f; }
+  form.dashboard-widget-svggraph .single-item-table .unavailable-widget a {
+    color: #9f9f9f; }
+  form.dashboard-widget-svggraph .override-host-field-view {
+    overflow: hidden;
+    margin: -2px;
+    padding: 2px; }
+    form.dashboard-widget-svggraph .override-host-field-view .multiselect {
+      overflow: hidden;
+      flex-grow: 1; }
+  form.dashboard-widget-svggraph .overrides-list {
+    position: relative;
+    margin: -5px 0 -5px 15px; }
+  form.dashboard-widget-svggraph .overrides-list-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr 24px;
+    grid-gap: 5px 10px;
+    align-items: start;
+    padding: 5px 0;
+    overflow: visible;
+    margin-top: -5px;
+    margin-bottom: -5px; }
+    form.dashboard-widget-svggraph .overrides-list-item .drag-icon {
+      position: absolute;
+      top: 5px;
+      left: -17px;
+      height: 24px; }
+    form.dashboard-widget-svggraph .overrides-list-item .multiselect-control {
+      overflow: hidden;
+      margin: -2px;
+      padding: 2px; }
+      form.dashboard-widget-svggraph .overrides-list-item .multiselect-control .multiselect {
+        overflow: hidden;
+        flex-grow: 1; }
+  form.dashboard-widget-svggraph .overrides-foot {
+    padding: 5px 0; }
+  form.dashboard-widget-svggraph .overrides-options-list {
+    grid-column: 1 / -1;
+    padding: 0 24px 8px 0;
+    border-bottom: 1px solid #888888;
+    white-space: normal; }
+    form.dashboard-widget-svggraph .overrides-options-list li {
+      display: inline-block;
+      margin-bottom: 2px;
+      vertical-align: middle;
+      white-space: nowrap; }
+      form.dashboard-widget-svggraph .overrides-options-list li > div {
+        padding: 1px 0 1px 1px;
+        background-color: #333333;
+        border-radius: 2px;
+        line-height: 22px; }
+        form.dashboard-widget-svggraph .overrides-options-list li > div span {
+          padding-left: 8px;
+          color: #fff; }
+        form.dashboard-widget-svggraph .overrides-options-list li > div input[type=text] {
+          width: 85px;
+          min-height: 22px;
+          border-style: none; }
+      form.dashboard-widget-svggraph .overrides-options-list li:not(:last-child) {
+        margin-right: 5px; }
+    form.dashboard-widget-svggraph .overrides-options-list .btn-icon {
+      min-width: 18px;
+      margin: -1px 0;
+      color: #fff; }
+      form.dashboard-widget-svggraph .overrides-options-list .btn-icon:hover, form.dashboard-widget-svggraph .overrides-options-list .btn-icon:focus {
+        color: #dfe4e7; }
+    form.dashboard-widget-svggraph .overrides-options-list .color-picker .color-picker-preview {
+      width: 20px;
+      min-width: 20px;
+      height: 20px;
+      margin: 1px 0 1px 1px; }
+  form.dashboard-widget-svggraph .no-items-message {
+    display: none;
+    line-height: 24px;
+    color: #333333; }
 
 div.dashboard-widget-svggraph {
   overflow-x: hidden; }

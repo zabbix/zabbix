@@ -21,10 +21,10 @@ class CControllerGeomapsUpdate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'geomaps_tile_provider'		=> 'required|db config.geomaps_tile_provider',
-			'geomaps_tile_url'			=> 'required|not_empty|db config.geomaps_tile_url',
-			'geomaps_max_zoom'			=> 'required|not_empty|db config.geomaps_max_zoom|ge 1|le '.ZBX_GEOMAP_MAX_ZOOM,
-			'geomaps_attribution'		=> 'db config.geomaps_attribution'
+			'geomaps_tile_provider'		=> 'required|setting geomaps_tile_provider',
+			'geomaps_tile_url'			=> 'required|not_empty|setting geomaps_tile_url',
+			'geomaps_max_zoom'			=> 'required|ge 1|le '.ZBX_GEOMAP_MAX_ZOOM,
+			'geomaps_attribution'		=> 'setting geomaps_attribution'
 		];
 
 		$ret = $this->validateInput($fields);

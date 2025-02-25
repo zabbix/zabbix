@@ -269,7 +269,7 @@ int	__wrap_zbx_db_execute(const char *fmt, ...)
 	return 0;
 }
 
-int	__wrap_zbx_db_execute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids)
+int	__wrap_zbx_db_execute_multiple_query(const char *query, const char *field_name, const zbx_vector_uint64_t *ids)
 {
 	ZBX_UNUSED(query);
 	ZBX_UNUSED(field_name);

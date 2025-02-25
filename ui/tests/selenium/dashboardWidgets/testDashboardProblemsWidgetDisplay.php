@@ -17,7 +17,7 @@
 require_once dirname(__FILE__).'/../common/testWidgets.php';
 
 /**
- * @backup config, hstgrp, widget
+ * @backup settings, hstgrp, widget
  *
  * @dataSource UserPermissions
  *
