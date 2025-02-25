@@ -2760,7 +2760,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$form = $widget->edit()->asForm();
 		$form->fill(['Advanced configuration' => true, 'New values' => 'Top']);
 		$form->submit();
-		$dashboard->getWidget(self::SCROLLING_WIDGET);
+		$widget->query('class:list-table')->waitUntilVisible();
 		$dashboard->save();
 		$dashboard->waitUntilReady();
 
