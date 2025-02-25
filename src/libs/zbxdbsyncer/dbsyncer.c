@@ -183,6 +183,8 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
+			zbx_history_sync_stats_t	sync_stats_reset = {.more = sync_stats.more};
+
 			stats_offset = 0;
 			zbx_snprintf_alloc(&stats, &stats_alloc, &stats_offset, "processed %d values",
 					sync_stats.values_num);
@@ -217,7 +219,7 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 						sleeptime);
 			}
 
-			memset(&sync_stats, 0, sizeof(sync_stats));
+			sync_stats = sync_stats_reset;
 			total_sec = 0.0;
 			last_stat_time = time(NULL);
 		}
