@@ -63,7 +63,7 @@ static zbx_telnet_protocol_step_t	async_telnet_recv(zbx_telnet_context_t *telnet
 	zbx_socket_t		*s = &telnet_context->s;
 	zbx_recv_context_t	*r = &telnet_context->recv_context;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s():%d", __func__, r->state);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s():%u", __func__, r->state);
 
 	if (ZABBIX_TELNET_PROTOCOL_SEND == r->state)
 		r->state = ZABBIX_TELNET_PROTOCOL_RECV_FIRST;
@@ -148,7 +148,7 @@ static zbx_telnet_protocol_step_t	async_telnet_recv(zbx_telnet_context_t *telnet
 	}
 	while (0 < nbytes);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() state:%d buff:%d", __func__, r->state, r->buff.values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() state:%u buff:%d", __func__, r->state, r->buff.values_num);
 
 	return r->state;
 

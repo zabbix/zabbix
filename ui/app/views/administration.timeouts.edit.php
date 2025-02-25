@@ -39,7 +39,7 @@ $form_grid = (new CFormGrid())
 				(new CLabel(_('Zabbix agent'), 'timeout_zabbix_agent'))->setAsteriskMark(),
 				new CFormField(
 					(new CTextBox('timeout_zabbix_agent', $data['timeout_zabbix_agent'], false,
-						DB::getFieldLength('config', 'timeout_zabbix_agent')
+						CSettingsSchema::getFieldLength('timeout_zabbix_agent')
 					))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
@@ -50,7 +50,7 @@ $form_grid = (new CFormGrid())
 				(new CLabel(_('Simple check'), 'timeout_simple_check'))->setAsteriskMark(),
 				new CFormField(
 					(new CTextBox('timeout_simple_check', $data['timeout_simple_check'], false,
-						DB::getFieldLength('config', 'timeout_simple_check')
+						CSettingsSchema::getFieldLength('timeout_simple_check')
 					))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
@@ -60,7 +60,7 @@ $form_grid = (new CFormGrid())
 				(new CLabel(_('SNMP agent'), 'timeout_snmp_agent'))->setAsteriskMark(),
 				new CFormField(
 					(new CTextBox('timeout_snmp_agent', $data['timeout_snmp_agent'], false,
-						DB::getFieldLength('config', 'timeout_snmp_agent')
+						CSettingsSchema::getFieldLength('timeout_snmp_agent')
 					))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
@@ -70,7 +70,7 @@ $form_grid = (new CFormGrid())
 				(new CLabel(_('External check'), 'timeout_external_check'))->setAsteriskMark(),
 				new CFormField(
 					(new CTextBox('timeout_external_check', $data['timeout_external_check'], false,
-						DB::getFieldLength('config', 'timeout_external_check')
+						CSettingsSchema::getFieldLength('timeout_external_check')
 					))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
@@ -80,7 +80,7 @@ $form_grid = (new CFormGrid())
 				(new CLabel(_('Database monitor'), 'timeout_db_monitor'))->setAsteriskMark(),
 				new CFormField(
 					(new CTextBox('timeout_db_monitor', $data['timeout_db_monitor'], false,
-						DB::getFieldLength('config', 'timeout_db_monitor')
+						CSettingsSchema::getFieldLength('timeout_db_monitor')
 					))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
@@ -90,7 +90,7 @@ $form_grid = (new CFormGrid())
 				(new CLabel(_('HTTP agent'), 'timeout_http_agent'))->setAsteriskMark(),
 				new CFormField(
 					(new CTextBox('timeout_http_agent', $data['timeout_http_agent'], false,
-						DB::getFieldLength('config', 'timeout_http_agent')
+						CSettingsSchema::getFieldLength('timeout_http_agent')
 					))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
@@ -100,7 +100,7 @@ $form_grid = (new CFormGrid())
 				(new CLabel(_('SSH agent'), 'timeout_ssh_agent'))->setAsteriskMark(),
 				new CFormField(
 					(new CTextBox('timeout_ssh_agent', $data['timeout_ssh_agent'], false,
-						DB::getFieldLength('config', 'timeout_ssh_agent')
+						CSettingsSchema::getFieldLength('timeout_ssh_agent')
 					))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
@@ -110,7 +110,7 @@ $form_grid = (new CFormGrid())
 				(new CLabel(_('TELNET agent'), 'timeout_telnet_agent'))->setAsteriskMark(),
 				new CFormField(
 					(new CTextBox('timeout_telnet_agent', $data['timeout_telnet_agent'], false,
-						DB::getFieldLength('config', 'timeout_telnet_agent')
+						CSettingsSchema::getFieldLength('timeout_telnet_agent')
 					))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
@@ -120,7 +120,7 @@ $form_grid = (new CFormGrid())
 				(new CLabel(_('Script'), 'timeout_script'))->setAsteriskMark(),
 				new CFormField(
 					(new CTextBox('timeout_script', $data['timeout_script'], false,
-						DB::getFieldLength('config', 'timeout_script')
+						CSettingsSchema::getFieldLength('timeout_script')
 					))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
@@ -130,7 +130,7 @@ $form_grid = (new CFormGrid())
 				(new CLabel(_('Browser'), 'timeout_browser'))->setAsteriskMark(),
 				new CFormField(
 					(new CTextBox('timeout_browser', $data['timeout_browser'], false,
-						DB::getFieldLength('config', 'timeout_browser')
+						CSettingsSchema::getFieldLength('timeout_browser')
 					))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
@@ -143,7 +143,7 @@ $form_grid = (new CFormGrid())
 				(new CLabel(_('Communication'), 'socket_timeout'))->setAsteriskMark(),
 				new CFormField(
 					(new CTextBox('socket_timeout', $data['socket_timeout'], false,
-						DB::getFieldLength('config', 'socket_timeout')
+						CSettingsSchema::getFieldLength('socket_timeout')
 					))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
@@ -153,7 +153,7 @@ $form_grid = (new CFormGrid())
 				(new CLabel(_('Connection'), 'connect_timeout'))->setAsteriskMark(),
 				new CFormField(
 					(new CTextBox('connect_timeout', $data['connect_timeout'], false,
-						DB::getFieldLength('config', 'connect_timeout')
+						CSettingsSchema::getFieldLength('connect_timeout')
 					))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
@@ -163,7 +163,7 @@ $form_grid = (new CFormGrid())
 				(new CLabel(_('Media type test'), 'media_type_test_timeout'))->setAsteriskMark(),
 				new CFormField(
 					(new CTextBox('media_type_test_timeout', $data['media_type_test_timeout'], false,
-						DB::getFieldLength('config', 'media_type_test_timeout')
+						CSettingsSchema::getFieldLength('media_type_test_timeout')
 					))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
@@ -173,7 +173,7 @@ $form_grid = (new CFormGrid())
 				(new CLabel(_('Script execution'), 'script_timeout'))->setAsteriskMark(),
 				new CFormField(
 					(new CTextBox('script_timeout', $data['script_timeout'], false,
-						DB::getFieldLength('config', 'script_timeout')
+						CSettingsSchema::getFieldLength('script_timeout')
 					))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
@@ -183,7 +183,7 @@ $form_grid = (new CFormGrid())
 				(new CLabel(_('Item test'), 'item_test_timeout'))->setAsteriskMark(),
 				new CFormField(
 					(new CTextBox('item_test_timeout', $data['item_test_timeout'], false,
-						DB::getFieldLength('config', 'item_test_timeout')
+						CSettingsSchema::getFieldLength('item_test_timeout')
 					))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
@@ -193,7 +193,7 @@ $form_grid = (new CFormGrid())
 				(new CLabel(_('Scheduled report test'), 'report_test_timeout'))->setAsteriskMark(),
 				new CFormField(
 					(new CTextBox('report_test_timeout', $data['report_test_timeout'], false,
-						DB::getFieldLength('config', 'report_test_timeout')
+						CSettingsSchema::getFieldLength('report_test_timeout')
 					))
 						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 						->setAriaRequired()
@@ -218,22 +218,22 @@ $form->addItem(
 (new CScriptTag('
 	view.init('.json_encode([
 		'default_timeouts' => [
-			'timeout_zabbix_agent' => DB::getDefault('config', 'timeout_zabbix_agent'),
-			'timeout_simple_check' => DB::getDefault('config', 'timeout_simple_check'),
-			'timeout_snmp_agent' => DB::getDefault('config', 'timeout_snmp_agent'),
-			'timeout_external_check' => DB::getDefault('config', 'timeout_external_check'),
-			'timeout_db_monitor' => DB::getDefault('config', 'timeout_db_monitor'),
-			'timeout_http_agent' => DB::getDefault('config', 'timeout_http_agent'),
-			'timeout_ssh_agent' => DB::getDefault('config', 'timeout_ssh_agent'),
-			'timeout_telnet_agent' => DB::getDefault('config', 'timeout_telnet_agent'),
-			'timeout_script' => DB::getDefault('config', 'timeout_script'),
-			'timeout_browser' => DB::getDefault('config', 'timeout_browser'),
-			'socket_timeout' => DB::getDefault('config', 'socket_timeout'),
-			'connect_timeout' => DB::getDefault('config', 'connect_timeout'),
-			'media_type_test_timeout' => DB::getDefault('config', 'media_type_test_timeout'),
-			'script_timeout' => DB::getDefault('config', 'script_timeout'),
-			'item_test_timeout' => DB::getDefault('config', 'item_test_timeout'),
-			'report_test_timeout' => DB::getDefault('config', 'report_test_timeout')
+			'timeout_zabbix_agent' => CSettingsSchema::getDefault('timeout_zabbix_agent'),
+			'timeout_simple_check' => CSettingsSchema::getDefault('timeout_simple_check'),
+			'timeout_snmp_agent' => CSettingsSchema::getDefault('timeout_snmp_agent'),
+			'timeout_external_check' => CSettingsSchema::getDefault('timeout_external_check'),
+			'timeout_db_monitor' => CSettingsSchema::getDefault('timeout_db_monitor'),
+			'timeout_http_agent' => CSettingsSchema::getDefault('timeout_http_agent'),
+			'timeout_ssh_agent' => CSettingsSchema::getDefault('timeout_ssh_agent'),
+			'timeout_telnet_agent' => CSettingsSchema::getDefault('timeout_telnet_agent'),
+			'timeout_script' => CSettingsSchema::getDefault('timeout_script'),
+			'timeout_browser' => CSettingsSchema::getDefault('timeout_browser'),
+			'socket_timeout' => CSettingsSchema::getDefault('socket_timeout'),
+			'connect_timeout' => CSettingsSchema::getDefault('connect_timeout'),
+			'media_type_test_timeout' => CSettingsSchema::getDefault('media_type_test_timeout'),
+			'script_timeout' => CSettingsSchema::getDefault('script_timeout'),
+			'item_test_timeout' => CSettingsSchema::getDefault('item_test_timeout'),
+			'report_test_timeout' => CSettingsSchema::getDefault('report_test_timeout')
 		]
 	]).');
 '))

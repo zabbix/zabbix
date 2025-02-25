@@ -700,6 +700,7 @@ class testDashboardURLWidget extends CWebTest {
 		// Check widget content when the host match dynamic option criteria.
 		$widget = $dashboard->getWidget($data['fields']['Name'])->getContent();
 		$this->page->switchTo($widget->query('id:iframe')->one());
+		COverlayDialogElement::find()->waitUntilReady();
 		$this->assertEquals($data['result']['value'], $this->query($data['result']['element'])->one()->getValue());
 
 		// Check iframe source link.

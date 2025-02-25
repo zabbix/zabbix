@@ -1047,66 +1047,22 @@ out:
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: delete action conditions by condition type and id                 *
- *                                                                            *
- ******************************************************************************/
-static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid)
+static void	DBupdate_action_conditions(int conditiontype, const zbx_vector_uint64_t *elementids)
 {
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
-	zbx_uint64_t		id;
-	zbx_vector_uint64_t	actionids, conditionids;
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
+	char	*query;
 
-	zbx_vector_uint64_create(&actionids);
-	zbx_vector_uint64_create(&conditionids);
+	if (0 == elementids->values_num)
+		return;
 
-	/* disable actions */
-	result = zbx_db_select("select actionid,conditionid from conditions where conditiontype=%d and"
-			" value='" ZBX_FS_UI64 "'", conditiontype, elementid);
+	query = zbx_dsprintf(NULL, "update conditions set value='0' where conditiontype=%d and", conditiontype);
 
-	while (NULL != (row = zbx_db_fetch(result)))
+	if (SUCCEED != zbx_db_execute_multiple_query_str(query, "value", elementids))
 	{
-		ZBX_STR2UINT64(id, row[0]);
-		zbx_vector_uint64_append(&actionids, id);
-
-		ZBX_STR2UINT64(id, row[1]);
-		zbx_vector_uint64_append(&conditionids, id);
+		zabbix_log(LOG_LEVEL_WARNING, "failed to update action condition(s) while removing "
+				"groups discovered by LLD");
 	}
 
-	zbx_db_free_result(result);
-
-	if (0 != actionids.values_num)
-	{
-		zbx_vector_uint64_sort(&actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_uint64_uniq(&actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update actions set status=%d where",
-				ZBX_ACTION_STATUS_DISABLED);
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "actionid", actionids.values,
-				actionids.values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-	}
-
-	if (0 != conditionids.values_num)
-	{
-		zbx_vector_uint64_sort(&conditionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from conditions where");
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "conditionid", conditionids.values,
-				conditionids.values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
-	}
-
-	(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
-
-	zbx_free(sql);
-
-	zbx_vector_uint64_destroy(&conditionids);
-	zbx_vector_uint64_destroy(&actionids);
+	zbx_free(query);
 }
 
 /******************************************************************************
@@ -1181,8 +1137,7 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 
 	zbx_audit_trigger_delete(audit_context_mode, triggerids);
 
-	for (int i = 0; i < triggerids->values_num; i++)
-		DBdelete_action_conditions(ZBX_CONDITION_TYPE_TRIGGER, triggerids->values[i]);
+	DBupdate_action_conditions(ZBX_CONDITION_TYPE_TRIGGER, triggerids);
 
 	zbx_db_execute_multiple_query("delete from trigger_tag where", "triggerid", triggerids);
 	zbx_db_execute_multiple_query("delete from functions where", "triggerid", triggerids);
@@ -1541,7 +1496,7 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 	zbx_vector_uint64_t	profileids;
 	const char		*event_tables[] = {"events"};
 	const char		*profile_idx = "web.favorite.graphids";
-	unsigned char		history_mode, trends_mode;
+	int			history_mode, trends_mode;
 	zbx_vector_str_t	hk_history;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __func__, itemids->values_num);
@@ -6010,8 +5965,13 @@ void	zbx_db_delete_hosts(const zbx_vector_uint64_t *hostids, const zbx_vector_st
 	}
 
 	/* delete action conditions */
-	for (i = 0; i < hostids->values_num; i++)
-		DBdelete_action_conditions(ZBX_CONDITION_TYPE_HOST, hostids->values[i]);
+	DBupdate_action_conditions(ZBX_CONDITION_TYPE_HOST, hostids);
+
+	/* delete host opcommands */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from opcommand_hst where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+	zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 
 	/* delete host tags */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_tag where");
@@ -6411,9 +6371,26 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
 	zbx_vector_uint64_t	hostids;
 	zbx_uint64_t		groupid;
 	int			index;
+	uint64_t		discovery_groupid;
 
 	if (0 == groupids->values_num)
 		return;
+
+	if (NULL == (result = zbx_db_select("select value_hostgroupid from settings where name='discovery_groupid'")))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+
+	if (NULL == (row = zbx_db_fetch(result)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		zbx_db_free_result(result);
+		return;
+	}
+
+	ZBX_STR2UINT64(discovery_groupid, row[0]);
+	zbx_db_free_result(result);
 
 	zbx_vector_uint64_create(&hostids);
 
@@ -6440,25 +6417,25 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
 
 	sql_offset = 0;
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select g.groupid,g.name,c.discovery_groupid"
-			" from hstgrp g,config c"
+			"select g.groupid,g.name"
+			" from hstgrp g"
 			" where");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.groupid", groupids->values, groupids->values_num);
 	if (0 < hostids.values_num)
 	{
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-				" and (g.groupid=c.discovery_groupid"
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				" and (g.groupid=" ZBX_FS_UI64
 					" or exists ("
 						"select null"
 						" from hosts_groups hg"
 						" where g.groupid=hg.groupid"
-							" and");
+							" and", discovery_groupid);
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.hostid", hostids.values,
 				hostids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "))");
 	}
 	else
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and g.groupid=c.discovery_groupid");
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and g.groupid=" ZBX_FS_UI64, discovery_groupid);
 
 	result = zbx_db_select("%s", sql);
 
@@ -6469,7 +6446,7 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
 		if (FAIL != (index = zbx_vector_uint64_bsearch(groupids, groupid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			zbx_vector_uint64_remove(groupids, index);
 
-		if (0 == hostids.values_num || 0 == strcmp(row[0], row[2]))
+		if (0 == hostids.values_num || groupid == discovery_groupid)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "host group \"%s\" is used for network discovery"
 					" and cannot be deleted", row[1]);
@@ -6482,7 +6459,7 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
 	}
 	zbx_db_free_result(result);
 
-	/* check if groups is used in the groups prototypes */
+	/* check if groups are used in the groups prototypes */
 
 	if (0 != groupids->values_num)
 	{
@@ -6514,6 +6491,35 @@ static void	DBdelete_groups_validate(zbx_vector_uint64_t *groupids)
 
 			zabbix_log(LOG_LEVEL_WARNING, "host group \"%s\" cannot be deleted,"
 					" because it is used by a host prototype", row[1]);
+		}
+		zbx_db_free_result(result);
+	}
+
+	/* check if groups are used in the event correlation conditions */
+	if (0 != groupids->values_num)
+	{
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				"select distinct(g.groupid),g.name"
+				" from hstgrp g, corr_condition_group c"
+				" where g.groupid=c.groupid and");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.groupid",
+				groupids->values, groupids->values_num);
+
+		result = zbx_db_select("%s", sql);
+
+		while (NULL != (row = zbx_db_fetch(result)))
+		{
+			ZBX_STR2UINT64(groupid, row[0]);
+
+			if (FAIL != (index = zbx_vector_uint64_bsearch(groupids, groupid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			{
+				zbx_vector_uint64_remove(groupids, index);
+			}
+
+			zabbix_log(LOG_LEVEL_WARNING, "host group \"%s\" cannot be deleted,"
+					" because it is used by an event correlation condition", row[1]);
 		}
 		zbx_db_free_result(result);
 	}
@@ -6610,8 +6616,7 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 	if (0 == groupids->values_num)
 		goto out;
 
-	for (i = 0; i < groupids->values_num; i++)
-		DBdelete_action_conditions(ZBX_CONDITION_TYPE_HOST_GROUP, groupids->values[i]);
+	DBupdate_action_conditions(ZBX_CONDITION_TYPE_HOST_GROUP, groupids);
 
 	zbx_vector_uint64_create(&ids);
 	zbx_vector_uint64_create(&hgsetids);
@@ -6901,6 +6906,17 @@ skip_permissions:
 				ids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
+
+
+	/* delete opcommands */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from opcommand_grp where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+	/* delete opgroups */
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from opgroup where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
 	/* delete groups */
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from hstgrp where");
