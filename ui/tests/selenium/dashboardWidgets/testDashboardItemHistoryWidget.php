@@ -20,7 +20,6 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 require_once dirname(__FILE__).'/../common/testWidgets.php';
 
 /**
- * @backup dashboard
  *
  * @onBefore prepareData
  *
@@ -2759,11 +2758,12 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		// Set "New values" to "Top" and check the screenshot of the widget.
 		$form = $widget->edit()->asForm();
 		$form->fill(['Advanced configuration' => true, 'New values' => 'Top']);
+sleep(2);
 		$form->submit();
 		$dashboard->save();
 		$dashboard->waitUntilReady();
 
-		$this->assertScreenshot($dashboard->getWidget(self::SCROLLING_WIDGET), 'new_values_top');
+		$this->assertScreenshot($widget, 'new_values_top');
 	}
 
 	/**
