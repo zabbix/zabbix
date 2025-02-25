@@ -2604,23 +2604,18 @@ static int	lld_item_update_link_by_type_change(const zbx_lld_item_prototype_t *i
 		const zbx_lld_item_full_t *item)
 {
 	if (item_prototype->value_type == ITEM_VALUE_TYPE_BIN)
-		return SUCCEED;
+		return 1;
 
-	if (item_prototype->value_type == ITEM_VALUE_TYPE_TEXT &&
-			(item->value_type_orig == ITEM_VALUE_TYPE_UINT64 ||
-			item->value_type_orig == ITEM_VALUE_TYPE_FLOAT))
+	if (item_prototype->value_type == ITEM_VALUE_TYPE_UINT64 ||
+			item_prototype->value_type == ITEM_VALUE_TYPE_FLOAT)
 	{
-		return SUCCEED;
+		return !(item->value_type_orig == ITEM_VALUE_TYPE_UINT64 ||
+				item->value_type_orig == ITEM_VALUE_TYPE_FLOAT);
 	}
 
-	if ((item_prototype->value_type == ITEM_VALUE_TYPE_UINT64 ||
-			item_prototype->value_type == ITEM_VALUE_TYPE_FLOAT) &&
-			item->value_type_orig == ITEM_VALUE_TYPE_TEXT)
-	{
-		return SUCCEED;
-	}
-
-	return FAIL;
+	return !(item->value_type_orig == ITEM_VALUE_TYPE_TEXT ||
+			item->value_type_orig == ITEM_VALUE_TYPE_LOG ||
+			item->value_type_orig == ITEM_VALUE_TYPE_STR);
 }
 
 /*********************************************************************************
@@ -2681,7 +2676,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 				(int)ZBX_FLAG_DISCOVERY_CREATED, item->value_type_orig,
 				(int)item_prototype->value_type);
 
-		if (SUCCEED == lld_item_update_link_by_type_change(item_prototype, item))
+		if (1 == lld_item_update_link_by_type_change(item_prototype, item))
 			zbx_vector_uint64_append(itemids_value_type_diff, item->itemid);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_DELAY))
