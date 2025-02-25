@@ -2757,13 +2757,8 @@ class testDashboardItemHistoryWidget extends testWidgets {
 
 		// Set "New values" to "Top" and check the screenshot of the widget.
 		$form = $widget->edit()->asForm();
-		$form->fill(['Advanced configuration' => true]);
-$this->assertScreenshot($form, 'clicked advanced config');
-		$form->fill(['New values' => 'Top']);
-$this->assertScreenshot($form, 'selected TOP');
-		$dialog = COverlayDialogElement::find()->one();
-		$dialog->query('button:Apply')->one()->waitUntilClickable()->click();
-		$dialog->ensureNotPresent();
+		$form->fill(['Advanced configuration' => true, 'New values' => 'Top']);
+		$form->submit();
 sleep(4);
 		$dashboard->save();
 		$dashboard->waitUntilReady();
