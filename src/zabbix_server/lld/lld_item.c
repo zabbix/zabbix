@@ -2658,8 +2658,11 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 				(int)ZBX_FLAG_DISCOVERY_CREATED, item->value_type_orig,
 				(int)item_prototype->value_type);
 
-		if (SUCCEED == zbx_db_item_value_type_changed_category(item_prototype->value_type, item->value_type_orig))
+		if (SUCCEED == zbx_db_item_value_type_changed_category(item_prototype->value_type,
+				item->value_type_orig))
+		{
 			zbx_vector_uint64_append(itemids_value_type_diff, item->itemid);
+		}
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_DELAY))
 	{
