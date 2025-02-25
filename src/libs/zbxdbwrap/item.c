@@ -163,10 +163,10 @@ int	zbx_db_item_value_type_changed_category(unsigned char value_type_new, unsign
 
 	if (value_type_new == ITEM_VALUE_TYPE_UINT64 || value_type_new == ITEM_VALUE_TYPE_FLOAT)
 	{
-		if (value_type_old != ITEM_VALUE_TYPE_UINT64 && value_type_old != ITEM_VALUE_TYPE_FLOAT)
-			return SUCCEED;
-		else
+		if (value_type_old == ITEM_VALUE_TYPE_UINT64 || value_type_old == ITEM_VALUE_TYPE_FLOAT)
 			return FAIL;
+
+		return SUCCEED;
 	}
 
 	if (value_type_old == ITEM_VALUE_TYPE_TEXT || value_type_old == ITEM_VALUE_TYPE_LOG ||
