@@ -196,13 +196,13 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 			}
 
 			zbx_snprintf_alloc(&stats, &stats_alloc, &stats_offset, " in " ZBX_FS_DBL
-					" (" ZBX_FS_DBL "," ZBX_FS_DBL, total_sec, sync_stats.time_write_history,
+					" (%.3f,%.3f", total_sec, sync_stats.time_write_history,
 					sync_stats.time_update_items);
 
 			if (0 != (info->program_type & ZBX_PROGRAM_TYPE_SERVER))
 			{
 				zbx_snprintf_alloc(&stats, &stats_alloc, &stats_offset,
-						"," ZBX_FS_DBL "," ZBX_FS_DBL "," ZBX_FS_DBL,
+						",%.3f,%.3f,%.3f",
 						sync_stats.time_write_trends, sync_stats.time_calculate_triggers,
 						sync_stats.time_process_events);
 			}
