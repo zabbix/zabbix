@@ -20,6 +20,7 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 require_once dirname(__FILE__).'/../common/testWidgets.php';
 
 /**
+ * @backup dashboard
  *
  * @onBefore prepareData
  *
@@ -2759,7 +2760,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$form = $widget->edit()->asForm();
 		$form->fill(['Advanced configuration' => true, 'New values' => 'Top']);
 		$form->submit();
-sleep(4);
+		$widget->waitUntilReady();
 		$dashboard->save();
 		$dashboard->waitUntilReady();
 
