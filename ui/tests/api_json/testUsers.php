@@ -2425,7 +2425,7 @@ class testUsers extends CAPITest {
 	/**
 	 * @dataProvider user_properties
 	 */
-	public function testUser_NotRequiredPropertiesAndMedias($user, $expected_error) {
+	public function testUsers_NotRequiredPropertiesAndMedias($user, $expected_error) {
 		$methods = ['user.create', 'user.update'];
 
 		foreach ($methods as $method) {
@@ -3164,7 +3164,7 @@ class testUsers extends CAPITest {
 	 *
 	 * @dataProvider getUsersCheckAuthenticationDataInvalidParameters
 	 */
-	public function testUser_checkAuthentication_InvalidParameters(array $params, string $expected_error) {
+	public function testUsers_checkAuthentication_InvalidParameters(array $params, string $expected_error) {
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'user.checkAuthentication',
@@ -3241,7 +3241,7 @@ class testUsers extends CAPITest {
 	 * @dataProvider getUsersCheckAuthenticationDataInvalidAuthorization
 	 * @dataProvider getUsersCheckAuthenticationDataValidAuthorization
 	 */
-	public function testUser_checkAuthentication_Authorization(array $data, ?string $expected_error) {
+	public function testUsers_checkAuthentication_Authorization(array $data, ?string $expected_error) {
 		foreach ($data as $parameter => $name) {
 			$parameter_key = $parameter === 'sessionids' ? 'sessionid' : 'token';
 
@@ -3255,6 +3255,23 @@ class testUsers extends CAPITest {
 			]);
 
 			$this->checkResult($res, $expected_error);
+		}
+	}
+
+	/**
+	 * There should be minimum 1sec delay/timeout when your login failed with - correct and incorrect username.
+	 */
+	public function testUsers_checkFailedLoginTimeout() {
+		$this->disableAuthorization();
+		foreach (['incorrect_name' => 'incorrect_password', 'Admin' => 'incorrect_password'] as $login => $password) {
+			$start_time = microtime(true);
+			$this->call('user.login', [
+				'username' => $login,
+				'password' => $password
+			], 'Incorrect user name or password or account is temporarily blocked.');
+
+			$end_time = microtime(true);
+			$this->assertTrue($end_time - $start_time >= 1);
 		}
 	}
 
@@ -3279,7 +3296,7 @@ class testUsers extends CAPITest {
 	 *
 	 * @dataProvider getUsersCheckAuthenticationDataValidSessionIDWithExtend
 	 */
-	public function testUser_checkAuthentication_SessionIDWithExtend(bool $extend) {
+	public function testUsers_checkAuthentication_SessionIDWithExtend(bool $extend) {
 		$res = $this->callRaw([
 			'jsonrpc' => '2.0',
 			'method' => 'user.checkAuthentication',
