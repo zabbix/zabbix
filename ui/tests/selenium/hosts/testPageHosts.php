@@ -888,6 +888,7 @@ class testPageHosts extends CLegacyWebTest {
 			$this->assertMessage(TEST_GOOD, 'Host '.strtolower($status));
 			$this->assertEquals($status, $host_row->getColumn('Status')->getText());
 			$this->assertEquals($id, CDBHelper::getValue('SELECT status FROM hosts WHERE host='.zbx_dbstr('Enabled status')));
+			CMessageElement::find()->one()->close();
 		}
 	}
 }
