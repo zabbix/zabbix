@@ -1010,7 +1010,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Name' => 'HostCard host maintenance [Maintenance with data collection]',
 						'Description' => 'Maintenance for checking Icon and maintenance status in Host Card widget'
 					],
-					'Availability' => ['ZBXSNMPIPMIJMX'],
+					'Availability' => ['ZBX', 'SNMP', 'IPMI', 'JMX'],
 					'Monitored by' => [
 						'Server' => 'Zabbix server'
 					],
@@ -1101,7 +1101,7 @@ class testDashboardHostCardWidget extends testWidgets {
 				[
 					'Header' => 'Empty host card widget',
 					'Host' => 'Empty filled host',
-					'Availability' => [''],
+					'Availability' => [],
 					'Monitored by' => [
 						'Proxy group' => 'Proxy group for host card widget'
 					],
@@ -1189,8 +1189,8 @@ class testDashboardHostCardWidget extends testWidgets {
 		}
 
 		if (array_key_exists('Availability', $data)) {
-			$availability = $widget->query('class:section-availability')->query('class:status-container')->all()->asText();
-			$this->assertEquals($data['Availability'], array_values($availability));
+			$availability = $widget->query('class:section-availability')->query('class:status-container')->query('xpath:.//span')->all()->asText();
+			$this->assertEquals($data['Availability'], $availability);
 		}
 
 		if (array_key_exists('Monitored by', $data)) {
