@@ -230,7 +230,7 @@ class testPageReportsAudit extends CWebTest {
 	 * Check that Login, Logout and Failed login works and displayed correctly.
 	 */
 	public function testPageReportsAudit_LoginLogoutFailed() {
-		$this->page->userLogin('Admin', 'zabbixaaa');
+		$this->page->userLogin('Admin', 'zabbixaaa', TEST_BAD);
 		$this->page->userLogin('Admin', 'zabbix');
 		$this->query('link:Sign out')->waitUntilVisible()->one()->click();
 		$this->page->login();
