@@ -2763,8 +2763,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$dashboard->save();
 		$dashboard->waitUntilReady();
 
-sleep(3);
-		$this->assertScreenshot($widget, 'new_values_top');
+		$this->assertScreenshot($dashboard->getWidget(self::SCROLLING_WIDGET), 'new_values_top');
 	}
 
 	/**
