@@ -2865,7 +2865,6 @@ clean:
 	return ret;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: evaluates xmlxpath() function                                     *
@@ -3193,7 +3192,7 @@ static void	eval_throw_exception(zbx_vector_var_t *output, char **error)
 	{
 		*error = zbx_dsprintf(*error, "unknown exception of type '%s'", zbx_variant_type_desc(arg));
 
-		zabbix_log(LOG_LEVEL_CRIT, *error);
+		zabbix_log(LOG_LEVEL_CRIT, "%s", *error);
 		THIS_SHOULD_NEVER_HAPPEN;
 	}
 	else

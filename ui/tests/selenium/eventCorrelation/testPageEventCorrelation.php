@@ -331,14 +331,16 @@ class testPageEventCorrelation extends CWebTest {
 		);
 
 		// Check displaying and hiding the filter.
-		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
-		$filter_tab = $this->query('link:Filter')->one();
-		$filter = $filter_form->query('id:tab_0')->one();
-		$this->assertTrue($filter->isDisplayed());
-		$filter_tab->click();
-		$this->assertFalse($filter->isDisplayed());
-		$filter_tab->click();
-		$this->assertTrue($filter->isDisplayed());
+		$filter = CFilterElement::find()->one();
+		$filter_form = $filter->getForm();
+		$this->assertEquals('Filter', $filter->getSelectedTabName());
+		// Check that filter is expanded by default.
+		$this->assertTrue($filter->isExpanded());
+		// Check that filter is collapsing/expanding on click.
+		foreach ([false, true] as $status) {
+			$filter->expand($status);
+			$this->assertTrue($filter->isExpanded($status));
+		}
 
 		// Check filter labels and default values.
 		$this->assertEquals(['Name', 'Status'], $filter_form->getLabels()->asText());

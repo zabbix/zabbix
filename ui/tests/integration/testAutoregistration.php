@@ -21,7 +21,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @required-components server, agent
  * @configurationDataProvider agentConfigurationProvider
  * @backup ids,hosts,items,actions,operations,optag,host_tag
- * @backup auditlog,changelog,config,ha_node
+ * @backup auditlog,changelog,settings,ha_node
  */
 class testAutoregistration extends CIntegrationTest {
 	const HOST_METADATA1 = "autoreg 1";
