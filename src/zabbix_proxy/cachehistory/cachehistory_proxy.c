@@ -415,7 +415,7 @@ void	zbx_sync_history_cache_proxy(const zbx_events_funcs_t *events_cbs, zbx_ipc_
 		}
 
 		sec2 = zbx_time();
-		stats->time_write_history += sec2 - sec1;
+		stats->time_update_items += sec2 - sec1;
 
 		zbx_dbcache_lock();
 
