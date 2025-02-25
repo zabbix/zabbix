@@ -38,6 +38,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 	}
 
 	protected static $provisioned_media_count;
+
 	const HASH_SQL = 'SELECT * FROM media';
 	const LDAP_SERVER_NAME = 'TEST';
 	const MEDIA_MAPPING_REMOVE = 'Media mapping with severity: all';
@@ -52,10 +53,13 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * Enable media types before test.
 	 */
 	public function prepareJitMedia() {
-		$mediatypeids = CDBHelper::getAll("SELECT mediatypeid FROM media_type WHERE name IN ('iTop', 'SMS', ".
-				"'MS Teams Workflow', 'Slack', 'OTRS', 'Opsgenie', 'Brevis.one', 'Discord', 'iLert', 'Jira', ".
-				"'Line', 'Email', 'SysAid', 'Pushover', 'Telegram', 'Redmine', 'SIGNL4', 'PagerDuty', ".
-				"'Zammad', 'Github', 'VictorOps', 'ServiceNow')"
+		$mediatypeids = CDBHelper::getAll('SELECT mediatypeid FROM media_type WHERE name IN ('.zbx_dbstr('iTop').', '
+				.zbx_dbstr('SMS').', '.zbx_dbstr('MS Teams Workflow').', '.zbx_dbstr('Slack').', '
+				.zbx_dbstr('OTRS').', '.zbx_dbstr('Opsgenie').', '.zbx_dbstr('Brevis.one').', '.zbx_dbstr('Github').', '
+				.zbx_dbstr('Discord').', '.zbx_dbstr('iLert').', '.zbx_dbstr('SIGNL4').', '.zbx_dbstr('SysAid').', '
+				.zbx_dbstr('Jira').', '.zbx_dbstr('Line').', '.zbx_dbstr('Email').', '.zbx_dbstr('PagerDuty').', '
+				.zbx_dbstr('Pushover').', '.zbx_dbstr('Telegram').', '.zbx_dbstr('Redmine').', '
+				.zbx_dbstr('Zammad').', '.zbx_dbstr('VictorOps').', '.zbx_dbstr('ServiceNow').')'
 		);
 
 		$update_api = [];
@@ -190,29 +194,35 @@ class testFormUserLdapMediaJit extends CWebTest {
 		}
 
 		// Check the pressence and amount of hintboxes in media table for disabled media.
-		foreach (['MantisBT', 'OTRS CE', 'Rocket.Chat','Zendesk'] as $media_type) {
+		$media_with_hints = ['MantisBT', 'OTRS CE', 'Rocket.Chat', 'Zendesk'];
+
+		foreach ($media_with_hints as $media_type) {
 			$row = $media_table->findRow('Type', $media_type, true);
-			$this->assertTrue($row->getColumn('Type')->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')
-					->one()->isValid()
+			$this->assertTrue($row->getColumn('Type')
+					->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')->one()->isValid()
 			);
 		}
 
-		$this->assertEquals(4, $media_table->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')
-				->count()
+		$this->assertEquals('Media type disabled by Administration.', $row->getColumn('Type')
+				->query('tag:button')->one()->getAttribute('data-hintbox-contents')
+		);
+
+		$this->assertEquals(count($media_with_hints),
+				$media_table->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')->count()
 		);
 
 		// Check that Type and Send to fields are read-only for provisioned media.
 		$media_table->findRow('Type', 'MS Teams Workflow')->getColumn('Actions')->query('button:Edit')->one()->click();
 		$media_form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
 
-		foreach ( ['Type', 'Send to'] as $field) {
+		foreach (['Type', 'Send to'] as $field) {
 			$this->assertTrue($media_form->getField($field)->isEnabled(false));
 		}
 	}
 
 	public function getMediaEditData() {
 		return [
-			// #0 check that When active is a mandatory field.
+			// #0 Check that When active is a mandatory field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -223,7 +233,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					'media' => 'MS Teams Workflow'
 				]
 			],
-			// #1 invalid characters in When active.
+			// #1 Invalid characters in When active.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -234,18 +244,62 @@ class testFormUserLdapMediaJit extends CWebTest {
 					'media' => 'MS Teams Workflow'
 				]
 			],
-			// #2 invalid When active value.
+			// #2 Invalid When active value.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'When active' => '2-1, 00:00-12:12'
+						'When active' => '1-8,11:11-22:22'
 					],
 					'message' => 'Incorrect value for field "period": a time period is expected.',
 					'media' => 'MS Teams Workflow'
 				]
 			],
-			// #3 space used as When active value.
+			// #3 Invalid When active value.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'When active' => '6-5, 11:11-22:22'
+					],
+					'message' => 'Incorrect value for field "period": a time period is expected.',
+					'media' => 'MS Teams Workflow'
+				]
+			],
+			// #4 Invalid When active value.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'When active' => '0-1, 00:00-11:11'
+					],
+					'message' => 'Incorrect value for field "period": a time period is expected.',
+					'media' => 'MS Teams Workflow'
+				]
+			],
+			// #5 Invalid When active value.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'When active' => '1-7, 22:22-22:21'
+					],
+					'message' => 'Incorrect value for field "period": a time period is expected.',
+					'media' => 'MS Teams Workflow'
+				]
+			],
+			// #6 Invalid When active value.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'When active' => '1-7, 00:00-24:01'
+					],
+					'message' => 'Incorrect value for field "period": a time period is expected.',
+					'media' => 'MS Teams Workflow'
+				]
+			],
+			// #7 Space used as When active value.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -256,7 +310,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					'media' => 'MS Teams Workflow'
 				]
 			],
-			// #4 change editable fields - user macro in When active field.
+			// #8 Change editable fields - user macro in When active field.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -278,7 +332,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// #5 change editable fields - select all severities.
+			// #9 Change editable fields - select all severities.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -308,7 +362,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// #6 Change editable fields - unselect all severities.
+			// #10 Change editable fields - unselect all severities.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -323,7 +377,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// #7 Change editable fields - disable media which is enabled.
+			// #11 Change editable fields - disable media which is enabled.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -345,7 +399,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					]
 				]
 			],
-			// #8 Change editable fields - enable previously disabled media.
+			// #12 Change editable fields - enable previously disabled media.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -374,6 +428,11 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * @dataProvider getMediaEditData
 	 */
 	public function testFormUserLdapMediaJit_CheckEditableFields($data) {
+
+		if ($data['expected'] === TEST_BAD) {
+			$old_hash = CDBHelper::getHash(self::HASH_SQL);
+		}
+
 		// Log in as the LDAP provisioned user.
 		$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
 		$this->page->open('zabbix.php?action=userprofile.notification.edit');
@@ -394,7 +453,6 @@ class testFormUserLdapMediaJit extends CWebTest {
 		if ($data['expected'] === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, null, $data['message']);
 			$dialog->close();
-			$old_hash = CDBHelper::getHash(self::HASH_SQL);
 		}
 
 		$form->query('button:Update')->one()->click();
@@ -455,7 +513,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$media_form->fill(['Type' => $data['fields']['Type'], 'Send to' => $data['fields']['Send to']]);
 
 		$media_form->submit();
-		COverlayDialogElement::ensureNotPresent();
+		$dialog->ensureNotPresent();
 		$form->query('button:Update')->one()->click();
 		$this->assertMessage(TEST_GOOD, 'User updated');
 
@@ -476,8 +534,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 		// Check that media can be removed by LDAP provisioned user.
 		$media_field = $this->query('id:userprofile-notification-form')->waitUntilVisible()->asForm()->one()
-				->getField('Media')->asTable()
-		;
+				->getField('Media')->asTable();
 		$row = $media_field->findRow('Type', $data['fields']['Type']);
 		$row->getColumn('Actions')->query('button:Remove')->one()->click();
 		$form->query('button:Update')->one()->click();
@@ -881,11 +938,12 @@ class testFormUserLdapMediaJit extends CWebTest {
 		foreach ($data['media_types'] as $media_type) {
 			if (array_key_exists('Attribute', $media_type['update'])) {
 				$this->assertFalse($user_media_table->findRow('Type', '	MantisBT', true)->isPresent());
-				$this->assertEquals(self::$provisioned_media_count-1, $user_media_table->getRows()->count());
+				$this->assertEquals(self::$provisioned_media_count - 1, $user_media_table->getRows()->count());
 			}
 			else {
 				$this->checkMediaConfiguration($media_type['expected'], $media_type['expected']['fields']['Type'],
-						PHPUNIT_LDAP_USERNAME);
+						PHPUNIT_LDAP_USERNAME
+				);
 			}
 		}
 	}
@@ -1204,8 +1262,8 @@ class testFormUserLdapMediaJit extends CWebTest {
 
 		if ($data['provisioned'] === true) {
 			$this->checkMediaConfiguration($data['expected'], $data['mapping']['Media type'], PHPUNIT_LDAP_USERNAME,
-					'fields', 'id:userprofile-notification-form')
-			;
+					'fields', 'id:userprofile-notification-form'
+			);
 		}
 		else {
 			$this->assertFalse($this->query('id:userprofile-notification-form')->asTable()->one()
@@ -1268,11 +1326,11 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * @param string	$media_type			type of the media
 	 * @param string	$send_to			send to parameter of the media
 	 * @param string	$expected			name of the array with expected result
-	 * @param string	$id					selector for a media table
+	 * @param string	$selector			selector for a media table
 	 */
-	protected function checkMediaConfiguration($data, $media_type, $send_to, $expected = 'fields', $id = 'id:mediaTab') {
+	protected function checkMediaConfiguration($data, $media_type, $send_to, $expected = 'fields', $selector = 'id:mediaTab') {
 		// Check media type.
-		$row = $this->query($id)->asTable()->one()->findRow('Type', $media_type);
+		$row = $this->query($selector)->asTable()->one()->findRow('Type', $media_type);
 
 		$this->assertEquals($row->getColumn('Type')->getText(), $media_type);
 

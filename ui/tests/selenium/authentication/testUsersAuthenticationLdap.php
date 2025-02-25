@@ -1753,7 +1753,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'error' => 'At least one LDAP server must exist.'
 				]
 			],
-			// #14 Media mapping dialog form validation with invalid time period field.
+			// #14 Media mapping dialog form validation with invalid time used in time period field #1.
 			[
 				[
 					'servers_settings' => [
@@ -1785,7 +1785,135 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'error' => 'At least one LDAP server must exist.'
 				]
 			],
-			// #15 Media mapping validation with two mappings, that contain same type and attribute.
+			// #15 Media mapping dialog form validation with invalid time used in time period field #2.
+			[
+				[
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'LDAP',
+								'Host' => 'test no media',
+								'Base DN' => 'test no media',
+								'Search attribute' => 'test no media',
+								'Configure JIT provisioning' => true
+							],
+							'Media type mapping' => [
+								[
+									'Name' => 'Media mapping with incorrect time period',
+									'Attribute' => 'wrongtimeperiod',
+									'When active' => '1-8,11:11-22:22'
+								]
+							]
+						]
+					],
+					'mapping_error' => 'Invalid media type mapping configuration.',
+					'mapping_error_details' => [
+						'Incorrect value for field "period": a time period is expected.'
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Invalid user group mapping configuration.'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
+			],
+			// #16 Media mapping dialog form validation with invalid time used in time period field #3.
+			[
+				[
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'LDAP',
+								'Host' => 'test no media',
+								'Base DN' => 'test no media',
+								'Search attribute' => 'test no media',
+								'Configure JIT provisioning' => true
+							],
+							'Media type mapping' => [
+								[
+									'Name' => 'Media mapping with incorrect time period',
+									'Attribute' => 'wrongtimeperiod',
+									'When active' => '6-5, 11:11-22:22'
+								]
+							]
+						]
+					],
+					'mapping_error' => 'Invalid media type mapping configuration.',
+					'mapping_error_details' => [
+						'Incorrect value for field "period": a time period is expected.'
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Invalid user group mapping configuration.'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
+			],
+			// #17 Media mapping dialog form validation with invalid time used in time period field #4.
+			[
+				[
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'LDAP',
+								'Host' => 'test no media',
+								'Base DN' => 'test no media',
+								'Search attribute' => 'test no media',
+								'Configure JIT provisioning' => true
+							],
+							'Media type mapping' => [
+								[
+									'Name' => 'Media mapping with incorrect time period',
+									'Attribute' => 'wrongtimeperiod',
+									'When active' => '0-1, 00:00-11:11'
+								]
+							]
+						]
+					],
+					'mapping_error' => 'Invalid media type mapping configuration.',
+					'mapping_error_details' => [
+						'Incorrect value for field "period": a time period is expected.'
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Invalid user group mapping configuration.'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
+			],
+			// #18 Media mapping dialog form validation with invalid time used in time period field #5.
+			[
+				[
+					'servers_settings' => [
+						[
+							'fields' => [
+								'Name' => 'LDAP',
+								'Host' => 'test no media',
+								'Base DN' => 'test no media',
+								'Search attribute' => 'test no media',
+								'Configure JIT provisioning' => true
+							],
+							'Media type mapping' => [
+								[
+									'Name' => 'Media mapping with incorrect time period',
+									'Attribute' => 'wrongtimeperiod',
+									'When active' => '1-7, 22:22-22:21'
+								]
+							]
+						]
+					],
+					'mapping_error' => 'Invalid media type mapping configuration.',
+					'mapping_error_details' => [
+						'Incorrect value for field "period": a time period is expected.'
+					],
+					'ldap_error' => 'Invalid LDAP configuration',
+					'ldap_error_details' => [
+						'Invalid user group mapping configuration.'
+					],
+					'error' => 'At least one LDAP server must exist.'
+				]
+			],
+			// #19 Media mapping validation with two mappings, that contain same type and attribute.
 			[
 				[
 					'servers_settings' => [

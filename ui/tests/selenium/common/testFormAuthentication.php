@@ -101,10 +101,9 @@ class testFormAuthentication extends CWebTest {
 	 * @param string          $field	    field which mapping is checked
 	 * @param string          $title        title in dialog
 	 * @param CFormElement    $form         given LDAP or SAML form
-	 * @param array           $labels       labels in mapping form
 	 * @param string          $auth_type    LDAP or SAML
 	 */
-	protected function checkMappingDialog($field, $title, $form, $labels, $auth_type) {
+	protected function checkMappingDialog($field, $title, $form, $auth_type) {
 		$form->getFieldContainer($field)->query('button:Add')->waitUntilClickable()->one()->click();
 		$mapping_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
 		$this->assertEquals($title, $mapping_dialog->getTitle());
