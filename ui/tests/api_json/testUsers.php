@@ -2756,7 +2756,7 @@ class testUsers extends CAPITest {
 			], 'Incorrect user name or password or account is temporarily blocked.');
 
 			$end_time = microtime(true);
-			$this->assertTrue($end_time-$start_time >= 1);
+			$this->assertTrue($end_time - $start_time >= 1);
 		}
 	}
 
