@@ -2600,24 +2600,6 @@ static void	lld_item_save(zbx_uint64_t hostid, const zbx_vector_lld_item_prototy
 	}
 }
 
-static int	lld_item_update_link_by_type_change(const zbx_lld_item_prototype_t *item_prototype,
-		const zbx_lld_item_full_t *item)
-{
-	if (item_prototype->value_type == ITEM_VALUE_TYPE_BIN)
-		return 1;
-
-	if (item_prototype->value_type == ITEM_VALUE_TYPE_UINT64 ||
-			item_prototype->value_type == ITEM_VALUE_TYPE_FLOAT)
-	{
-		return !(item->value_type_orig == ITEM_VALUE_TYPE_UINT64 ||
-				item->value_type_orig == ITEM_VALUE_TYPE_FLOAT);
-	}
-
-	return !(item->value_type_orig == ITEM_VALUE_TYPE_TEXT ||
-			item->value_type_orig == ITEM_VALUE_TYPE_LOG ||
-			item->value_type_orig == ITEM_VALUE_TYPE_STR);
-}
-
 /*********************************************************************************
  *                                                                               *
  * Purpose: prepares SQL to update LLD item                                      *
@@ -2676,7 +2658,7 @@ static void	lld_item_prepare_update(const zbx_lld_item_prototype_t *item_prototy
 				(int)ZBX_FLAG_DISCOVERY_CREATED, item->value_type_orig,
 				(int)item_prototype->value_type);
 
-		if (1 == lld_item_update_link_by_type_change(item_prototype, item))
+		if (SUCCEED == zbx_db_item_value_type_changed_category(item_prototype->value_type, item->value_type_orig))
 			zbx_vector_uint64_append(itemids_value_type_diff, item->itemid);
 	}
 	if (0 != (item->flags & ZBX_FLAG_LLD_ITEM_UPDATE_DELAY))

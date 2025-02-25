@@ -187,6 +187,7 @@ int	zbx_db_trigger_recovery_user_and_func_macro_eval_resolv(zbx_token_type_t tok
 		char **error, va_list args);
 int	zbx_db_trigger_supplement_eval_resolv(zbx_token_type_t token_type, char **value, char **error, va_list args);
 
+int	zbx_db_item_value_type_changed_category(unsigned char value_type_new, unsigned char value_type_old);
 void	zbx_db_update_item_map_links(const zbx_vector_uint64_t *itemids);
 
 #endif /* ZABBIX_DBWRAP_H */
