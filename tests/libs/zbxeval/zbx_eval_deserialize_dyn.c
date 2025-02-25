@@ -74,4 +74,5 @@ void	zbx_mock_test_entry(void **state)
 	zbx_free(data);
 	zbx_eval_clear(&ctx1);
 	zbx_eval_clear(ctx2);
+	zbx_free(ctx2);
 }

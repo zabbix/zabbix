@@ -37,7 +37,7 @@ static int	compare_vectors_str(zbx_vector_str_t *v1, zbx_vector_str_t *v2)
 
 void	zbx_mock_test_entry(void **state)
 {
-	int			returned_ret, result;
+	int			returned_ret;
 	zbx_eval_context_t	ctx;
 	char			*error = NULL;
 	zbx_uint64_t		rules;

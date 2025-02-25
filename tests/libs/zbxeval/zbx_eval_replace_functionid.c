@@ -27,7 +27,6 @@ void	zbx_mock_test_entry(void **state)
 				exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
 	zbx_eval_context_t	ctx;
 	char			*error = NULL;
-	zbx_vector_str_t	expressions;
 	zbx_uint64_t		rules = mock_eval_read_rules("in.rules");
 
 	ZBX_UNUSED(state);
@@ -44,5 +43,6 @@ void	zbx_mock_test_entry(void **state)
 	result = zbx_eval_validate_replaced_functionids(&ctx,&error);
 
 	zbx_mock_assert_int_eq("return", exp_result, result);
+	zbx_eval_clear(&ctx);
 	zbx_free(error);
 }

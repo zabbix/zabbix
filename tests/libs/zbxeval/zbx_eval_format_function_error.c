@@ -42,4 +42,5 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_mock_assert_str_eq("returned value:", exp_result, result);
 	zbx_free(exp_result);
+	zbx_free(result);
 }

@@ -21,7 +21,7 @@
 #include "zbxeval.h"
 #include "mock_eval.h"
 
-int	macro_resolver(unsigned int type, char **value, char **error, va_list args)
+static int	macro_resolver(zbx_token_type_t type, char **value, char **error, va_list args)
 {
 	if (*value == NULL)
 		return FAIL;
