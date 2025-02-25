@@ -2763,6 +2763,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$dashboard->save();
 		$dashboard->waitUntilReady();
 
+		$widget->invalidate();
 		$this->assertScreenshot($widget, 'new_values_top');
 	}
 
