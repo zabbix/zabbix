@@ -447,8 +447,8 @@ class testDashboardHostCardWidget extends testWidgets {
 								'name' => 'Fully filled host card widget',
 								'x' => 0,
 								'y' => 0,
-								'width' => 18,
-								'height' => 8,
+								'width' => 19,
+								'height' => 9,
 								'fields' => [
 									[
 										'type' => 3,
@@ -499,10 +499,10 @@ class testDashboardHostCardWidget extends testWidgets {
 							],
 							[
 								'type' => 'hostcard',
-								'x' => 18,
+								'x' => 19,
 								'y' => 0,
-								'width' => 18,
-								'height' => 8,
+								'width' => 19,
+								'height' => 9,
 								'fields' => [
 									[
 										'type' => 3,
@@ -554,10 +554,10 @@ class testDashboardHostCardWidget extends testWidgets {
 							[
 								'type' => 'hostcard',
 								'name' => 'Empty host card widget',
-								'x' => 36,
+								'x' => 38,
 								'y' => 0,
-								'width' => 18,
-								'height' => 6,
+								'width' => 17,
+								'height' => 8,
 								'fields' => [
 									[
 										'type' => 3,
@@ -609,7 +609,7 @@ class testDashboardHostCardWidget extends testWidgets {
 							[
 								'type' => 'hostcard',
 								'name' => 'Default host card widget',
-								'x' => 54,
+								'x' => 55,
 								'y' => 0,
 								'width' => 17,
 								'height' => 4,
@@ -1045,6 +1045,29 @@ class testDashboardHostCardWidget extends testWidgets {
 						'Average' => 1,
 						'High' => 1,
 						'Disaster' => 1
+					],
+					'Context menu' => [
+						'VIEW' => [
+							'Dashboards' => 'zabbix.php?action=host.dashboard.view&hostid={hostid}',
+							'Problems' => 'zabbix.php?action=problem.view&hostids%5B%5D={hostid}&filter_set=1',
+							'Latest data' => 'zabbix.php?action=latest.view&hostids%5B%5D={hostid}&filter_set=1',
+							'Graphs' => 'zabbix.php?action=charts.view&filter_hostids%5B%5D={hostid}&filter_set=1',
+							'Web' => 'zabbix.php?action=web.view&filter_hostids%5B%5D={hostid}&filter_set=1',
+							'Inventory' => 'hostinventories.php?hostid={hostid}'
+						],
+						'CONFIGURATION' => [
+							'Host' => 'zabbix.php?action=popup&popup=host.edit&hostid={hostid}',
+							'Items' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
+							'Triggers' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
+							'Graphs' => 'graphs.php?filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
+							'Discovery' => 'host_discovery.php?filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
+							'Web' => 'httpconf.php?filter_set=1&filter_hostids%5B%5D={hostid}&context=host'
+						],
+						'SCRIPTS' => [
+							'Detect operating system' => 'menu-popup-item',
+							'Ping' => 'menu-popup-item',
+							'Traceroute' => 'menu-popup-item'
+						]
 					]
 				]
 			],
@@ -1138,6 +1161,11 @@ class testDashboardHostCardWidget extends testWidgets {
 			$this->assertTrue($status->isVisible());
 			$this->assertEquals('rgba(227, 55, 52, 1)', $status->getCSSValue('color'));
 			$this->assertEquals(trim($status->getText()), '(Disabled)');
+		}
+
+		if (array_key_exists('Context menu', $data)) {
+			$widget->query('class:host-name')->one()->click();
+			$this->checkContextMenuLinks($data['Context menu']);
 		}
 
 		if (array_key_exists('Maintenance', $data)) {
@@ -1248,6 +1276,86 @@ class testDashboardHostCardWidget extends testWidgets {
 			}
 			$this->assertEquals($data['Inventory'], $get_inventory);
 		}
+	}
+
+	public function getContextMenuData() {
+		return [
+			'VIEW' => [
+				[
+					'Dashboards' => 'zabbix.php?action=host.dashboard.view&hostid={$hostid}',
+					'Problems' => 'zabbix.php?action=problem.view&hostids%5B%5D={$hostid}&filter_set=1',
+					'Latest data' => 'zabbix.php?action=latest.view&hostids%5B%5D={$hostid}&filter_set=1',
+					'Graphs' => 'zabbix.php?action=charts.view&filter_hostids%5B%5D={$hostid}&filter_set=1',
+					'Web' => 'zabbix.php?action=web.view&filter_hostids%5B%5D={$hostid}&filter_set=1',
+					'Inventory' => 'hostinventories.php?hostid={$hostid}'
+				]
+			],
+			'CONFIGURATION' => [
+				[
+					'Host' => 'zabbix.php?action=popup&popup=host.edit&hostid={$hostid}',
+					'Items' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B%5D={$hostid}&context=host',
+					'Triggers' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B%5D={$hostid}&context=host',
+					'Graphs' => 'graphs.php?filter_set=1&filter_hostids%5B%5D={$hostid}&context=host',
+					'Discovery' => 'host_discovery.php?filter_set=1&filter_hostids%5B%5D={$hostid}&context=host',
+					'Web' => 'httpconf.php?filter_set=1&filter_hostids%5B%5D={$hostid}&context=host'
+				]
+			],
+			'SCRIPTS' => [
+				[
+					'Detect operating system' => 'menu-popup-item',
+					'Ping' => 'menu-popup-item',
+					'Traceroute' => 'menu-popup-item'
+				]
+			]
+		];
+	}
+
+	/**
+	 * Check context menu links.
+	 *
+	 * @param array $data	data provider with fields values
+	 */
+	protected function checkContextMenuLinks($data) {
+		// Check popup menu.
+		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
+		$this->assertTrue($popup->hasTitles(array_keys($data)));
+
+		$menu_level1_items = [];
+		foreach (array_values($data) as $menu_items) {
+			foreach ($menu_items as $menu_level1 => $link) {
+				$menu_level1_items[] = $menu_level1;
+
+				if (is_array($link)) {
+					foreach ($link as $menu_level2 => $attribute) {
+						// Check 2-level menu links.
+						$item_link = $popup->getItem($menu_level1)->query('xpath:./../ul//a')->one();
+
+						if (str_contains($attribute, 'menu-popup-item')) {
+							$this->assertEquals($attribute, $item_link->getAttribute('class'));
+						}
+						else {
+							$this->assertEquals($menu_level2, $item_link->getText());
+							$this->assertStringContainsString($attribute, $item_link->getAttribute('href'));
+						}
+					}
+				}
+				else {
+					// Check 1-level menu links.
+					if (str_contains($link, 'menu-popup-item')) {
+						$this->assertEquals($link, $popup->getItem($menu_level1)->getAttribute('class'));
+					}
+					else {
+						$link = str_replace('{hostid}', self::$hostid, $link);
+						$this->assertTrue($popup->query("xpath:.//a[text()=".CXPathHelper::escapeQuotes($menu_level1).
+								" and contains(@href, ".CXPathHelper::escapeQuotes($link).")]")->exists()
+						);
+					}
+				}
+			}
+		}
+
+		$this->assertTrue($popup->hasItems($menu_level1_items));
+		$popup->close();
 	}
 
 	public static function getLinkData() {
