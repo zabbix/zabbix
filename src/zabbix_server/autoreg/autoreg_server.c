@@ -51,6 +51,7 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 	char			*sql = NULL;
 	size_t			sql_alloc = 512, sql_offset;
 	zbx_autoreg_host_t	*autoreg_host;
+
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 	zbx_vector_str_create(&hosts);
 
@@ -58,7 +59,7 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 
 	/* delete from vector if already exist in hosts table */
 	sql_offset = 0;
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select h.host,h.hostid,h.proxyid,a.host_metadata,a.listen_ip,a.listen_dns,"
 				"a.listen_port,a.flags,a.proxyid,h.monitored_by,h.proxy_groupid"
 			" from hosts h"
@@ -156,15 +157,15 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 	}
 
 	zbx_db_free_result(result);
-	hosts.values_num = 0;
 
 	if (0 != autoreg_hosts->values_num)
 	{
+		zbx_vector_str_clear(&hosts);
 		autoreg_get_hosts_server(autoreg_hosts, &hosts);
 
 		/* update autoreg_id in vector if already exists in autoreg_host table */
 		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				"select autoreg_hostid,host"
 				" from autoreg_host"
 				" where");
@@ -188,7 +189,6 @@ static void	autoreg_process_hosts_server(zbx_vector_autoreg_host_ptr_t *autoreg_
 		}
 
 		zbx_db_free_result(result);
-		hosts.values_num = 0;
 	}
 
 	zbx_vector_str_destroy(&hosts);
