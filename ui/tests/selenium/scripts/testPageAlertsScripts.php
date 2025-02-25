@@ -279,6 +279,10 @@ class testPageAlertsScripts extends CWebTest {
 
 		// Check Script table content.
 		$this->assertTableHasData($data);
+
+		// Check that the filter is still expanded after page refresh.
+		$this->page->refresh()->waitUntilReady();
+		$this->assertTrue($filter->isExpanded());
 	}
 
 	public function getFilterData() {
