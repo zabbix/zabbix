@@ -1059,6 +1059,7 @@ typedef struct
 								/* until it is parsed/converted to integer    */
 								/* value during next configuration sync	      */
 	int			proxy_lastonline;	/* last server connection timestamp - proxy only */
+	zbx_uint32_t		sync_status;
 }
 zbx_dc_config_t;
 

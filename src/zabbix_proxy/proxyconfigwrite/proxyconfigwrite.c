@@ -2250,6 +2250,14 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 		goto out;
 	}
 
+	if (SUCCEED != (ret = zbx_dc_sync_lock()))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy configuration data received from server at"
+			" \"%s\": configuration sync is already in progress", sock->peer);
+		zbx_send_proxy_response(sock, ret, "configuration sync is already in progress", config_timeout);
+		goto out;
+	}
+
 	zbx_dc_get_upstream_revision(&config_revision, &hostmap_revision);
 
 	zbx_json_init(&j, 1024);
@@ -2316,6 +2324,8 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 		zabbix_log(LOG_LEVEL_WARNING, "cannot process proxy onfiguration data received from server at"
 				" \"%s\": %s", sock->peer, error);
 	}
+
+	zbx_dc_sync_unlock();
 	zbx_send_proxy_response(sock, ret, error, config_timeout);
 	zbx_free(error);
 out:
