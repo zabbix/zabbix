@@ -32,12 +32,4 @@ in:
 out:
   result: SUCCEED
   out: '/host/key?["!#$%&()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"]'
----
-test case: 'TEST'
-in:
-  itemquery: 'min(/Zabbix server/system.cpu.util,5m)'
-  macro: "{$MACRO}"
-  macro_replace: "Zabbix server"
-out:
-  result: SUCCEED
-  out: '/host/key?["1.1.1.1"]'
+...
