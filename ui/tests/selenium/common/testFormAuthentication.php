@@ -123,8 +123,7 @@ class testFormAuthentication extends CWebTest {
 			];
 		}
 		else {
-			$labels = [
-				$auth_type.' group pattern', 'User groups', 'User role'];
+			$labels = [$auth_type.' group pattern', 'User groups', 'User role'];
 			$required = $labels;
 			$values = [
 				$auth_type.' group pattern' => '',
