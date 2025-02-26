@@ -113,7 +113,7 @@ static int	discovery_async_poller_init(zbx_discoverer_manager_t *dmanager,
 	if (FAIL == (ret = discovery_async_poller_dns_init(poller_config)))
 		event_base_free(poller_config->base);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()", log_worker_id, __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() error:'%s'", log_worker_id, __func__, zbx_result_string(ret));
 
 	return ret;
 }

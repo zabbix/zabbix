@@ -20,7 +20,7 @@ require_once dirname(__FILE__).'/../common/testFormMacros.php';
 use Facebook\WebDriver\WebDriverBy;
 
 /**
- * @backup globalmacro, config
+ * @backup globalmacro, settings
  *
  * @dataSource GlobalMacros
  *
