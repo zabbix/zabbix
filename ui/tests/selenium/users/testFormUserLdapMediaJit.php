@@ -199,11 +199,10 @@ class testFormUserLdapMediaJit extends CWebTest {
 			$this->assertTrue($row->getColumn('Type')
 					->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')->one()->isValid()
 			);
+			$this->assertEquals('Media type disabled by Administration.', $row->getColumn('Type')
+					->query('tag:button')->one()->getAttribute('data-hintbox-contents')
+			);
 		}
-
-		$this->assertEquals('Media type disabled by Administration.', $row->getColumn('Type')
-				->query('tag:button')->one()->getAttribute('data-hintbox-contents')
-		);
 
 		$this->assertEquals(count($media_with_hints),
 				$media_table->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')->count()
@@ -426,7 +425,6 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * @dataProvider getMediaEditData
 	 */
 	public function testFormUserLdapMediaJit_CheckEditableFields($data) {
-
 		if ($data['expected'] === TEST_BAD) {
 			$old_hash = CDBHelper::getHash(self::HASH_SQL);
 		}
@@ -468,7 +466,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 			$this->provisionLdapUser();
 			$this->page->logout();
 
-			// Log in as the provisioned user, and check that manually changed fields are not affected by the provisioning.
+			// Log in as the provisioned user, to check that changed fields are not affected by the provisioning.
 			$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
 			$this->page->open('zabbix.php?action=userprofile.edit');
 			$this->checkMediaConfiguration($data, $data['media'], PHPUNIT_LDAP_USERNAME, 'check_configuration');
@@ -1260,7 +1258,9 @@ class testFormUserLdapMediaJit extends CWebTest {
 			$this->checkMediaConfiguration($data['expected'], $data['mapping']['Media type'], PHPUNIT_LDAP_USERNAME);
 		}
 		else {
-			$this->assertFalse($this->getUserMediaTable()->findRow('Type', $data['mapping']['Media type'])->isPresent());
+			$this->assertFalse($this->getUserMediaTable()->findRow('Type', $data['mapping']['Media type'])
+					->isPresent()
+			);
 		}
 	}
 
