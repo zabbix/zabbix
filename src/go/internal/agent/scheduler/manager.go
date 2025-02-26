@@ -939,7 +939,7 @@ func getPluginCapacity(
 	pluginName string,
 ) int {
 	maxCapacity := pluginMaxCapacity
-	if maxCapacity == 0 {
+	if maxCapacity < 1 {
 		maxCapacity = defaultMaxCapacity
 	}
 
