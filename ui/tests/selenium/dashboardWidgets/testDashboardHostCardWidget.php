@@ -329,6 +329,7 @@ class testDashboardHostCardWidget extends testWidgets {
 		);
 
 		$zabbix_server = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('ЗАББИКС Сервер'));
+		$suppression_host = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('Host for suppression'));
 
 		CDataHelper::call('dashboard.create', [
 			[
@@ -501,7 +502,7 @@ class testDashboardHostCardWidget extends testWidgets {
 								'type' => 'hostcard',
 								'x' => 19,
 								'y' => 0,
-								'width' => 19,
+								'width' => 18,
 								'height' => 9,
 								'fields' => [
 									[
@@ -554,7 +555,7 @@ class testDashboardHostCardWidget extends testWidgets {
 							[
 								'type' => 'hostcard',
 								'name' => 'Empty host card widget',
-								'x' => 38,
+								'x' => 37,
 								'y' => 0,
 								'width' => 17,
 								'height' => 8,
@@ -609,9 +610,9 @@ class testDashboardHostCardWidget extends testWidgets {
 							[
 								'type' => 'hostcard',
 								'name' => 'Default host card widget',
-								'x' => 55,
+								'x' => 54,
 								'y' => 0,
-								'width' => 17,
+								'width' => 18,
 								'height' => 4,
 								'fields' => [
 									[
@@ -643,6 +644,26 @@ class testDashboardHostCardWidget extends testWidgets {
 										'type' => 0,
 										'name' => 'sections.2',
 										'value' => 4
+									]
+								]
+							],
+							[
+								'type' => 'hostcard',
+								'name' => 'Show suppressed problems',
+								'x' => 54,
+								'y' => 4,
+								'width' => 18,
+								'height' => 2,
+								'fields' => [
+									[
+										'type' => 3,
+										'name' => 'hostid.0',
+										'value' => $suppression_host
+									],
+									[
+										'type' => 0,
+										'name' => 'show_suppressed',
+										'value' => 1
 									]
 								]
 							]
@@ -1115,7 +1136,30 @@ class testDashboardHostCardWidget extends testWidgets {
 					'Tags' => [],
 					'Description' => '',
 					'Host groups' => ['Zabbix servers'],
-					'Inventory' => []
+					'Inventory' => [],
+					'Context menu' => [
+						'VIEW' => [
+							'Dashboards' => 'menu-popup-item disabled',
+							'Problems' => 'zabbix.php?action=problem.view&hostids%5B%5D={hostid}&filter_set=1',
+							'Latest data' => 'zabbix.php?action=latest.view&hostids%5B%5D={hostid}&filter_set=1',
+							'Graphs' => 'menu-popup-item disabled',
+							'Web' => 'menu-popup-item disabled',
+							'Inventory' => 'hostinventories.php?hostid={hostid}'
+						],
+						'CONFIGURATION' => [
+							'Host' => 'zabbix.php?action=popup&popup=host.edit&hostid={hostid}',
+							'Items' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
+							'Triggers' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
+							'Graphs' => 'graphs.php?filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
+							'Discovery' => 'host_discovery.php?filter_set=1&filter_hostids%5B%5D={hostid}&context=host',
+							'Web' => 'httpconf.php?filter_set=1&filter_hostids%5B%5D={hostid}&context=host'
+						],
+						'SCRIPTS' => [
+							'Detect operating system' => 'menu-popup-item',
+							'Ping' => 'menu-popup-item',
+							'Traceroute' => 'menu-popup-item'
+						]
+					]
 				]
 			],
 			// #3.
@@ -1136,6 +1180,16 @@ class testDashboardHostCardWidget extends testWidgets {
 					'Severity' => [
 						'Average' => 1,
 						'Warning' => 5
+					]
+				]
+			],
+			// #4.
+			[
+				[
+					'Header' => 'Show suppressed problems',
+					'Host' => 'Host for suppression',
+					'Severity' => [
+						'Average' => 1
 					]
 				]
 			]
@@ -1164,8 +1218,9 @@ class testDashboardHostCardWidget extends testWidgets {
 		}
 
 		if (array_key_exists('Context menu', $data)) {
-			$widget->query('class:host-name')->one()->click();
-			$this->checkContextMenuLinks($data['Context menu']);
+			$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($data['Host']));
+			$widget->query('link:'.$data['Host'])->one()->waitUntilClickable()->click();
+			$this->checkContextMenuLinks($data['Context menu'], $hostid);
 		}
 
 		if (array_key_exists('Maintenance', $data)) {
@@ -1315,8 +1370,7 @@ class testDashboardHostCardWidget extends testWidgets {
 	 *
 	 * @param array $data	data provider with fields values
 	 */
-	protected function checkContextMenuLinks($data) {
-		// Check popup menu.
+	protected function checkContextMenuLinks($data, $hostid) {
 		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 		$this->assertTrue($popup->hasTitles(array_keys($data)));
 
@@ -1345,7 +1399,7 @@ class testDashboardHostCardWidget extends testWidgets {
 						$this->assertEquals($link, $popup->getItem($menu_level1)->getAttribute('class'));
 					}
 					else {
-						$link = str_replace('{hostid}', self::$hostid, $link);
+						$link = str_replace('{hostid}', $hostid, $link);
 						$this->assertTrue($popup->query("xpath:.//a[text()=".CXPathHelper::escapeQuotes($menu_level1).
 								" and contains(@href, ".CXPathHelper::escapeQuotes($link).")]")->exists()
 						);
