@@ -53,10 +53,10 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * Enable media types before test.
 	 */
 	public function prepareJitMedia() {
-		$mediatypeids = CDBHelper::getAll('SELECT mediatypeid FROM media_type WHERE name IN (\'iTop\', \'SMS\', '
-				.'\'MS Teams Workflow\', \'Slack\', \'OTRS\', \'Opsgenie\', \'Brevis.one\', \'Github\', \'Discord\', '
-				.'\'iLert\', \'SIGNL4\', \'SysAid\', \'Jira\', \'Line\', \'Email\', \'PagerDuty\', \'Pushover\', '
-				.'\'Telegram\', \'Redmine\', \'Zammad\', \'VictorOps\', \'ServiceNow\')'
+		$mediatypeids = CDBHelper::getAll('SELECT mediatypeid FROM media_type WHERE name IN (\'iTop\', \'SMS\','.
+				' \'MS Teams Workflow\', \'Slack\', \'OTRS\', \'Opsgenie\', \'Brevis.one\', \'Github\', \'Discord\','.
+				' \'iLert\', \'SIGNL4\', \'SysAid\', \'Jira\', \'Line\', \'Email\', \'PagerDuty\', \'Pushover\','.
+				' \'Telegram\', \'Redmine\', \'Zammad\', \'VictorOps\', \'ServiceNow\')'
 		);
 
 		$update_api = [];
