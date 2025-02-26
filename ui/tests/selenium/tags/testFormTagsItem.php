@@ -108,7 +108,7 @@ class testFormTagsItem extends testFormTags {
 	public function testFormTagsItem_CopyToTemplate() {
 		$hostid = CDataHelper::get('EntitiesTags.hostids.Host with tags for cloning');
 		$this->link = 'items.php?filter_set=1&filter_hostids[0]='.$hostid.'&context=host';
-		$this->executeCopy('item', 'Template', 'Empty template');
+		$this->executeCopy('item', 'Template', '1Empty template');
 	}
 
 	/**

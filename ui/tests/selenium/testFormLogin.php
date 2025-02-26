@@ -116,7 +116,7 @@ class testFormLogin extends CWebTest {
 	 * @dataProvider getLoginLogoutData
 	 **/
 	public function testFormLogin_LoginLogout($data) {
-		$this->page->userLogin($data['login'], $data['password']);
+		$this->page->userLogin($data['login'], $data['password'], $data['expected']);
 
 		if ($data['expected'] === TEST_BAD) {
 			$this->assertEquals($data['error_message'], $this->query('class:red')->waitUntilVisible()->one()->getText());
@@ -144,18 +144,18 @@ class testFormLogin extends CWebTest {
 
 		$this->page->open('index.php');
 		for ($i = 1; $i < 5; $i++) {
-			$this->page->userLogin($user, '!@$#%$&^*(\"\'\\*;:');
-			$this->assertEquals('Incorrect user name or password or account is temporarily blocked.',
-					$this->query('class:red')->waitUntilVisible()->one()->getText()
+			$this->page->userLogin($user, '!@$#%$&^*(\"\'\\*;:', TEST_BAD);
+			$this->assertEquals('Incorrect user name or password or account is temporarily blocked.', $this->query('class:red')
+					->waitUntilVisible()->one()->getText()
 			);
 			$this->assertEquals($i, CDBHelper::getValue('SELECT attempt_failed FROM users WHERE username='.zbx_dbstr($user)));
 			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM users WHERE username='.zbx_dbstr($user).' AND attempt_clock>0'));
 			$this->assertEquals(1, CDBHelper::getCount("SELECT NULL FROM users WHERE username=".zbx_dbstr($user)." AND attempt_ip<>''"));
 		}
 
-		$this->page->userLogin($user, '!@$#%$&^*(\"\'\\*;:');
-		$this->assertEquals('Incorrect user name or password or account is temporarily blocked.',
-				$this->query('class:red')->waitUntilVisible()->one()->getText()
+		$this->page->userLogin($user, '!@$#%$&^*(\"\'\\*;:', TEST_BAD);
+		$this->assertEquals('Incorrect user name or password or account is temporarily blocked.', $this->query('class:red')
+				->waitUntilVisible()->one()->getText()
 		);
 
 		// Account is blocked, waiting 30 sec and trying to login.
@@ -173,7 +173,7 @@ class testFormLogin extends CWebTest {
 	 **/
 	public function testFormLogin_LoginWithRequest() {
 		foreach (['index.php?request=zabbix.php%3Faction%3Dhost.list', 'index.php?request=zabbix.php%3Faction%3Dproxy.list'] as $url) {
-			$this->page->userLogin('Admin', 'zabbix', $url);
+			$this->page->userLogin('Admin', 'zabbix', TEST_GOOD, $url);
 			$header = ($url === 'index.php?request=zabbix.php%3Faction%3Dhost.list') ? 'Hosts' : 'Proxies';
 			$this->page->assertHeader($header);
 		}

@@ -15514,6 +15514,11 @@ msgstr "Выполнение скрипта \"%1$s\" на Zabbix сервере"
 msgid "Run script \"%1$s\" on current host"
 msgstr "Выполнение скрипта \"%1$s\" на текущем узле сети"
 
+#: include/actions.inc.php:646 include/actions.inc.php:835
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr ""
+
 #: include/actions.inc.php:679 include/actions.inc.php:857
 #, c-format
 msgid "Run script \"%1$s\" on host groups"
