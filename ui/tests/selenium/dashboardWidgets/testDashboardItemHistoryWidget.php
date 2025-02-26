@@ -2757,10 +2757,11 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$this->assertScreenshot($widget, 'new_values_bottom');
 
 		// Set "New values" to "Top" and check the screenshot of the widget.
+		$table = $widget->query('class:list-table')->waitUntilVisible()->one();
 		$form = $widget->edit()->asForm();
 		$form->fill(['Advanced configuration' => true, 'New values' => 'Top']);
 		$form->submit();
-		$widget->query('class:list-table')->waitUntilVisible();
+		$table->waitUntilReloaded();
 		$dashboard->save();
 		$dashboard->waitUntilReady();
 
