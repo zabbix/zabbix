@@ -280,6 +280,15 @@ static void	DBget_sysmapelements_by_element_type_ids(zbx_vector_uint64_t *seleme
 	zbx_vector_uint64_uniq(selementids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Description: gets a vector of sysmap element identifiers used with the     *
+ *              trigger identifiers                                           *
+ *                                                                            *
+ * Parameters: selementids - [OUT] the sysmap element identifiers             *
+ *             triggerids  - [IN] the trigger identifiers                     *
+ *                                                                            *
+ ******************************************************************************/
 static void	DBget_sysmapelements_triggers_by_ids(zbx_vector_uint64_t *selementids,
 		const zbx_vector_uint64_t *triggerids)
 {
