@@ -431,15 +431,13 @@ class testPageLowLevelDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Key' => 'array.cache.discovery',
+						'Key' => 'jenkins',
 						'Type' => 'HTTP agent'
 					],
 					'context' => 'template',
 					'expected' => [
-						'Array controller cache discovery',
-						'Array controller cache discovery',
-						'Array controller cache discovery',
-						'Array controller cache discovery'
+						'Computers discovery',
+						'Jobs discovery'
 					]
 				]
 			],
