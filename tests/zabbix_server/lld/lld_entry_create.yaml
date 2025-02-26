@@ -1,0 +1,107 @@
+---
+test case: LLD entry parse full
+in:
+  entry: |
+    {
+      "id": 1,
+      "name": "One",
+      "{#INDEX}": "1.2",
+      "data": {
+        "tag": "sub",
+        "value": "xyz" 
+      },
+      "{#DESC}": "lld entry"
+    }
+  macros:
+  - macro: "{#NAME}"
+    path: "$.name"
+  - macro: "{#ID}"
+    path: "$.id"
+  - macro: "{#VALUE}"
+    path: "$.data.value"
+  - macro: "{#TAG}"
+    path: "$.data.tag"
+out:
+  macros:
+  - macro: "{#DESC}"
+    value: "lld entry"
+  - macro: "{#ID}"
+    value: "1"
+  - macro: "{#INDEX}"
+    value: "1.2"
+  - macro: "{#NAME}"
+    value: "One"
+  - macro: "{#TAG}"
+    value: "sub"
+  - macro: "{#VALUE}"
+    value: "xyz"
+---
+test case: LLD entry parse only embedded
+in:
+  entry: |
+    {
+      "id": 1,
+      "name": "One",
+      "{#INDEX}": "1.2",
+      "data": {
+        "tag": "sub",
+        "value": "xyz" 
+      },
+      "{#DESC}": "lld entry"
+    }
+  macros: []
+out:
+  macros:
+  - macro: "{#DESC}"
+    value: "lld entry"
+  - macro: "{#INDEX}"
+    value: "1.2"
+---
+test case: LLD entry parse only defined
+in:
+  entry: |
+    {
+      "id": 1,
+      "name": "One",
+      "{INDEX}": "1.2",
+      "data": {
+        "tag": "sub",
+        "value": "xyz" 
+      },
+      "{DESC}": "lld entry"
+    }
+  macros:
+  - macro: "{#NAME}"
+    path: "$.name"
+  - macro: "{#ID}"
+    path: "$.id"
+  - macro: "{#VALUE}"
+    path: "$.data.value"
+  - macro: "{#TAG}"
+    path: "$.data.tag"
+out:
+  macros:
+  - macro: "{#ID}"
+    value: "1"
+  - macro: "{#NAME}"
+    value: "One"
+  - macro: "{#TAG}"
+    value: "sub"
+  - macro: "{#VALUE}"
+    value: "xyz"
+---
+test case: LLD entry with no macros
+in:
+  entry: |
+    {
+      "id": 1,
+      "name": "One",
+      "data": {
+        "tag": "sub",
+        "value": "xyz" 
+      }
+    }
+  macros: []
+out:
+  macros: []
+...

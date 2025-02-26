@@ -417,7 +417,7 @@ class CTemplate extends CHostGeneral {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkUuidDuplicates(array $templates, array $db_templates = null): void {
+	private static function checkUuidDuplicates(array $templates, ?array $db_templates = null): void {
 		$template_indexes = [];
 
 		foreach ($templates as $i => $template) {
@@ -470,7 +470,7 @@ class CTemplate extends CHostGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$templates, array &$db_templates = null) {
+	protected function validateUpdate(array &$templates, ?array &$db_templates = null) {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['templateid'], ['host'], ['name']], 'fields' => [
 			'uuid' => 				['type' => API_UUID],
 			'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
@@ -535,7 +535,7 @@ class CTemplate extends CHostGeneral {
 	 *
 	 * @throws Exception
 	 */
-	private static function checkVendorFields(array $templates, array $db_templates = null): void {
+	private static function checkVendorFields(array $templates, ?array $db_templates = null): void {
 		$vendor_fields = array_fill_keys(['vendor_name', 'vendor_version'], '');
 
 		foreach ($templates as $i => $template) {
@@ -633,70 +633,6 @@ class CTemplate extends CHostGeneral {
 			DB::delete('sysmaps_elements', ['elementtype' => SYSMAP_ELEMENT_TYPE_HOST, 'elementid' => $templateids]);
 		}
 
-		// disable actions
-		// actions from conditions
-		$actionids = [];
-		$sql = 'SELECT DISTINCT actionid'.
-			' FROM conditions'.
-			' WHERE conditiontype='.ZBX_CONDITION_TYPE_TEMPLATE.
-			' AND '.dbConditionString('value', $templateids);
-		$dbActions = DBselect($sql);
-		while ($dbAction = DBfetch($dbActions)) {
-			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
-		}
-
-		// actions from operations
-		$sql = 'SELECT DISTINCT o.actionid'.
-			' FROM operations o,optemplate ot'.
-			' WHERE o.operationid=ot.operationid'.
-			' AND '.dbConditionInt('ot.templateid', $templateids);
-		$dbActions = DBselect($sql);
-		while ($dbAction = DBfetch($dbActions)) {
-			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
-		}
-
-		if (!empty($actionids)) {
-			DB::update('actions', [
-				'values' => ['status' => ACTION_STATUS_DISABLED],
-				'where' => ['actionid' => $actionids]
-			]);
-		}
-
-		// delete action conditions
-		DB::delete('conditions', [
-			'conditiontype' => ZBX_CONDITION_TYPE_TEMPLATE,
-			'value' => $templateids
-		]);
-
-		// delete action operation commands
-		$operationids = [];
-		$sql = 'SELECT DISTINCT ot.operationid'.
-			' FROM optemplate ot'.
-			' WHERE '.dbConditionInt('ot.templateid', $templateids);
-		$dbOperations = DBselect($sql);
-		while ($dbOperation = DBfetch($dbOperations)) {
-			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
-		}
-
-		DB::delete('optemplate', [
-			'templateid'=>$templateids
-		]);
-
-		// delete empty operations
-		$delOperationids = [];
-		$sql = 'SELECT DISTINCT o.operationid'.
-			' FROM operations o'.
-			' WHERE '.dbConditionInt('o.operationid', $operationids).
-			' AND NOT EXISTS(SELECT NULL FROM optemplate ot WHERE ot.operationid=o.operationid)';
-		$dbOperations = DBselect($sql);
-		while ($dbOperation = DBfetch($dbOperations)) {
-			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
-		}
-
-		DB::delete('operations', [
-			'operationid'=>$delOperationids
-		]);
-
 		// delete web scenarios
 		$db_httptests = DB::select('httptest', [
 			'output' => ['httptestid', 'name'],
@@ -773,7 +709,7 @@ class CTemplate extends CHostGeneral {
 		DB::delete('host_tag', ['hostid' => $templateids]);
 		DB::delete('hosts', ['hostid' => $templateids]);
 
-		$this->addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_TEMPLATE, $db_templates);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_TEMPLATE, $db_templates);
 
 		return ['templateids' => $templateids];
 	}
@@ -784,7 +720,7 @@ class CTemplate extends CHostGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDelete(array &$templateids, array &$db_templates = null): void {
+	private function validateDelete(array &$templateids, ?array &$db_templates = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $templateids, '/', $error)) {
@@ -837,6 +773,38 @@ class CTemplate extends CHostGeneral {
 
 		if ($del_links_clear) {
 			$this->checkTriggerDependenciesOfHostTriggers($del_links_clear);
+		}
+
+		self::checkUsedInActions($db_templates);
+	}
+
+	private static function checkUsedInActions(array $db_templates): void {
+		$templateids = array_keys($db_templates);
+
+		$row = DBfetch(DBselect(
+			'SELECT c.value AS templateid,a.name'.
+			' FROM conditions c'.
+			' JOIN actions a ON c.actionid=a.actionid'.
+			' WHERE c.conditiontype='.ZBX_CONDITION_TYPE_TEMPLATE.
+				' AND '.dbConditionString('c.value', $templateids),
+			1
+		));
+
+		if (!$row) {
+			$row = DBfetch(DBselect(
+				'SELECT ot.templateid,a.name'.
+				' FROM optemplate ot'.
+				' JOIN operations o ON ot.operationid=o.operationid'.
+				' JOIN actions a ON o.actionid=a.actionid'.
+				' WHERE '.dbConditionId('ot.templateid', $templateids),
+				1
+			));
+		}
+
+		if ($row) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete template "%1$s": %2$s.',
+				$db_templates[$row['templateid']]['host'], _s('action "%1$s" uses this template', $row['name'])
+			));
 		}
 	}
 

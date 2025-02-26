@@ -13,11 +13,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-define('ZABBIX_VERSION',		'7.4.0alpha1');
+define('ZABBIX_VERSION',		'7.4.0beta1');
 define('ZABBIX_API_VERSION',	'7.4.0');
 define('ZABBIX_EXPORT_VERSION',	'7.4');
 
-define('ZABBIX_DB_VERSION',		7020000);
+define('ZABBIX_DB_VERSION',		7030011);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -1674,6 +1674,9 @@ define('ZBX_USERMACRO_AUTOMATIC', 1); // Macro value updated by discovery rule.
 define('ZBX_VAULT_TYPE_UNKNOWN', -1);
 define('ZBX_VAULT_TYPE_HASHICORP', 0);
 define('ZBX_VAULT_TYPE_CYBERARK',  1);
+
+define('ZBX_PROXY_SECRETS_PROVIDER_SERVER', 0);
+define('ZBX_PROXY_SECRETS_PROVIDER_PROXY', 1);
 
 define('ZBX_SECRET_MASK', '******'); // Placeholder for secret values.
 

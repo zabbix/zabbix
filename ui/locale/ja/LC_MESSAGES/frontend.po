@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-11-21 12:47+0000\n"
-"Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
+"PO-Revision-Date: 2025-02-17 01:54+0000\n"
+"Last-Translator: Akira <g42getd@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -1269,7 +1269,7 @@ msgstr "すべて"
 #: app/views/mediatype.list.php:79 app/views/mediatype.list.php:81
 #: app/views/mediatype.list.php:90 app/views/popup.operation.edit.php:160
 msgid "All available"
-msgstr ""
+msgstr "すべて利用可能"
 
 #: app/views/monitoring.dashboard.view.php:189
 msgid "All dashboards"
@@ -2662,11 +2662,21 @@ msgstr "デフォルトの多要素認証(MFA)方式を削除できません。"
 msgid "Cannot delete default user directory."
 msgstr "デフォルトのユーザーディレクトリを削除できません。"
 
+#: include/classes/api/services/CDRule.php:772
+#, c-format
+msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "ディスカバリルールを削除できません"
+
+#: include/classes/api/services/CDRule.php:979
+#, c-format
+msgid "Cannot delete discovery rule \"%1$s\": %2$s."
+msgstr ""
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2688,6 +2698,11 @@ msgid "Cannot delete host"
 msgid_plural "Cannot delete hosts"
 msgstr[0] "ホストを削除できません"
 
+#: include/classes/api/services/CHost.php:1631
+#, c-format
+msgid "Cannot delete host \"%1$s\": %2$s."
+msgstr ""
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2698,6 +2713,11 @@ msgstr[0] "メンテナンス\"%2$s\"が少なくとも1つのホストかホス
 msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
 msgstr[0] "ホストグループを削除できません"
+
+#: include/classes/api/services/CHostGroup.php:767
+#, c-format
+msgid "Cannot delete host group \"%1$s\": %2$s."
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2826,6 +2846,11 @@ msgid "Cannot delete template"
 msgid_plural "Cannot delete templates"
 msgstr[0] "テンプレートを削除できません"
 
+#: include/classes/api/services/CTemplate.php:805
+#, c-format
+msgid "Cannot delete template \"%1$s\": %2$s."
+msgstr ""
+
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
@@ -2859,6 +2884,11 @@ msgid "Cannot delete trigger"
 msgid_plural "Cannot delete triggers"
 msgstr[0] "トリガーを削除できません"
 
+#: include/classes/api/managers/CTriggerManager.php:126
+#, c-format
+msgid "Cannot delete trigger \"%1$s\": %2$s."
+msgstr ""
+
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
 msgid_plural "Cannot delete trigger prototypes"
@@ -2878,6 +2908,16 @@ msgstr "ユーザーディレクトリ\"%1$s\"を削除できません。"
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
 msgstr[0] "ユーザーグループを削除できません"
+
+#: include/classes/api/services/CUserGroup.php:1330
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CUserGroup.php:1325
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
+msgstr ""
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
@@ -3833,6 +3873,11 @@ msgstr "テンプレートのトリガー\"%2$s\"の\"%1$s\"を更新できま�
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr "テンプレートのトリガーのプロトタイプ\"%2$s\"の\"%1$s\"を更新できません。"
 
+#: include/classes/api/helpers/CApiSettingsHelper.php:94
+#, c-format
+msgid "Cannot update \"%1$s\" parameter because currently it is read-only. Consider upgrading Zabbix to remove this limitation."
+msgstr ""
+
 #: include/classes/api/services/CHost.php:2344
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
@@ -4320,6 +4365,10 @@ msgstr "DNSサービス起動チェック。DNSがダウン(サーバーが応�
 #: include/classes/data/CItemData.php:1623
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
 msgstr "ファイル存在チェック。ファイルが存在しない場合は「0」を返し、指定したタイプのファイルが存在すれば「1」を返す。"
+
+#: include/classes/data/CItemData.php:1115
+msgid "Checks if host is accessible by ICMP ping with retries. 0 - ICMP ping fails. 1 - ICMP ping successful."
+msgstr ""
 
 #: include/classes/data/CItemData.php:969
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
@@ -6508,6 +6557,22 @@ msgstr "Webシナリオを削除しますか？"
 msgid "Deleted"
 msgstr "削除しました"
 
+#: include/actions.inc.php:143
+msgid "Deleted host"
+msgstr ""
+
+#: include/actions.inc.php:125
+msgid "Deleted host group"
+msgstr ""
+
+#: include/actions.inc.php:710
+msgid "Deleted host group(s)"
+msgstr ""
+
+#: include/actions.inc.php:134
+msgid "Deleted trigger"
+msgstr ""
+
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
 msgstr "区切り文字"
@@ -7135,6 +7200,10 @@ msgstr ""
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
 msgstr "ローカル時間を表示"
+
+#: widgets/itemhistory/views/column.edit.php:240
+msgid "Display log time"
+msgstr ""
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -9296,6 +9365,10 @@ msgstr "履歴データの選択"
 #: app/views/popup.triggerexpr.php:129
 msgid "History functions"
 msgstr "履歴関数"
+
+#: app/views/administration.housekeeping.edit.php:218
+msgid "History, trends and audit log compression"
+msgstr "ヒストリ、トレンド、監査ログの圧縮"
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -13360,6 +13433,10 @@ msgstr "メニューエントリ名は、イベントコンテキストメニュ
 #: app/views/administration.script.edit.php:90
 msgid "Menu path"
 msgstr "メニューパス"
+
+#: widgets/piechart/includes/WidgetForm.php:149
+msgid "Merge sectors smaller than"
+msgstr ""
 
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
@@ -17456,6 +17533,10 @@ msgstr "デフォルトにリセット"
 msgid "Reset to initial view"
 msgstr "初期表示にリセット"
 
+#: app/views/administration.miscconfig.edit.php:103
+msgid "Resolve secret vault macros by"
+msgstr ""
+
 #: jsLoader.php:283
 msgid "Resolved"
 msgstr "解決済"
@@ -17707,6 +17788,11 @@ msgstr "Zabbixサーバー上でスクリプト\"%1$s\"を実行"
 #, c-format
 msgid "Run script \"%1$s\" on current host"
 msgstr "このホスト上でスクリプト\"%1$s\"を実行"
+
+#: include/actions.inc.php:601
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr ""
 
 #: include/actions.inc.php:622
 #, c-format
@@ -18443,7 +18529,7 @@ msgstr "再後面へ"
 
 #: app/views/popup.operation.edit.php:189
 msgid "Send to media type"
-msgstr ""
+msgstr "送信メディアタイプ"
 
 #: app/views/popup.operation.edit.php:108
 msgid "Send to user groups"
@@ -20363,6 +20449,14 @@ msgstr "テーマ"
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "これらのパラメーターは、指定された順序でコマンドライン引数としてスクリプトに渡されます。"
 
+#: app/views/action.list.php:163
+msgid "This action has conditions or operations referencing deleted object(s)."
+msgstr ""
+
+#: app/views/action.list.php:158
+msgid "This action has missing conditions or operations due to previously deleted object(s)."
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
@@ -20410,6 +20504,10 @@ msgstr "トレンド テーブルには圧縮されたチャンクが含まれ�
 
 #: widgets/itemhistory/views/column.edit.php:242
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
+
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
 msgstr ""
 
 #: include/views/configuration.item.edit.php:129
@@ -22618,6 +22716,10 @@ msgstr ""
 msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr ""
 
+#: include/classes/data/CItemData.php:2498
+msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
 msgstr ""
@@ -23677,6 +23779,14 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr "Zabbixサーバーまたはプロキシ"
 
+#: app/views/administration.miscconfig.edit.php:112
+msgid "Zabbix server and proxy"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:107
+msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
+msgstr ""
+
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Zabbixサーバーが動作していません (画面のリフレッシュを行ってステータスを再確認してください)"
@@ -23693,6 +23803,10 @@ msgstr "Zabbixサーバー名"
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
 msgstr "Zabbixサーバーのバージョン"
+
+#: app/views/administration.miscconfig.edit.php:105
+msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
+msgstr ""
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -23861,6 +23975,41 @@ msgstr "abs() - 絶対値"
 #: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() - 角度の値のアークコサイン、ラジアンで示す"
+
+#: include/classes/api/services/CDRule.php:773
+#, c-format
+msgid "action \"%1$s\" uses this discovery check"
+msgstr ""
+
+#: include/classes/api/services/CDRule.php:980
+#, c-format
+msgid "action \"%1$s\" uses this discovery rule"
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1632
+#, c-format
+msgid "action \"%1$s\" uses this host"
+msgstr ""
+
+#: include/classes/api/services/CHostGroup.php:768
+#, c-format
+msgid "action \"%1$s\" uses this host group"
+msgstr ""
+
+#: include/classes/api/services/CService.php:487
+#, c-format
+msgid "action \"%1$s\" uses this service"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:806
+#, c-format
+msgid "action \"%1$s\" uses this template"
+msgstr ""
+
+#: include/classes/api/managers/CTriggerManager.php:127
+#, c-format
+msgid "action \"%1$s\" uses this trigger"
+msgstr ""
 
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144
@@ -24633,6 +24782,10 @@ msgstr "第1"
 msgid "first() - The oldest value in the specified time interval"
 msgstr "first() - 指定された時間間隔で最も古い値"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:626
+msgid "firstclock() - Timestamp of the oldest value in the specified time interval"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
 msgstr "floor() - 最も近くて小さな整数に切り捨てる"
@@ -25030,6 +25183,10 @@ msgstr "最終"
 msgid "last() - Last (most recent) T value"
 msgstr "last() - 最新値"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:733
+msgid "lastclock() - Timestamp of the last (most recent) T value"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1557
 msgid "left"
 msgstr "左"
@@ -25065,6 +25222,10 @@ msgstr "logseverity() - 期間T内の最終ログエントリの深刻度"
 #: app/controllers/CControllerPopupTriggerExpr.php:779
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr "logsource() - 期間T内の最終ログエントリのソースが引数Vに一致するか (1 - 一致する, 0 - 一致しない)"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:795
+msgid "logtimestamp() - Timestamp of the last (most recent) T log message"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "ltrim() - Remove specified characters from the beginning of a string"

@@ -107,7 +107,7 @@ static int	zbx_autoreg_host_check_permissions(const char *host, const char *ip, 
 
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUTOREG_TLS_ACCEPT);
 
-	if (0 == (cfg.autoreg_tls_accept & sock->connection_type))
+	if (0 == ((unsigned int)cfg.autoreg_tls_accept & sock->connection_type))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "autoregistration from \"%s\" denied (host:\"%s\" ip:\"%s\""
 				" port:%hu): connection type \"%s\" is not allowed for autoregistration",
@@ -618,7 +618,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, zbx_json_parse_t *jp,
 			}
 
 			dc_items[i].key = zbx_strdup(dc_items[i].key, dc_items[i].key_orig);
-			zbx_substitute_key_macros_unmasked(&dc_items[i].key, NULL, &dc_items[i], NULL, NULL,
+			zbx_substitute_key_macros_unmasked(&dc_items[i].key, NULL, &dc_items[i],
 					ZBX_MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 			zbx_json_addobject(&json, NULL);

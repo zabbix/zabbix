@@ -41,22 +41,22 @@ typedef int	(*zbx_get_value_internal_ext_f)(const zbx_dc_item_t *item, const cha
 
 typedef struct
 {
-	zbx_config_comms_args_t	*config_comms;
-	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
-	const char		*progname;
-	unsigned char		poller_type;
-	int			config_startup_time;
-	int			config_unavailable_delay;
-	int			config_unreachable_period;
-	int			config_unreachable_delay;
-	int			config_max_concurrent_checks_per_poller;
-	zbx_get_config_forks_f	get_config_forks;
-	const char		*config_java_gateway;
-	int			config_java_gateway_port;
-	const char		*config_externalscripts;
+	zbx_config_comms_args_t		*config_comms;
+	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
+	const char			*progname;
+	unsigned char			poller_type;
+	int				config_startup_time;
+	int				config_unavailable_delay;
+	int				config_unreachable_period;
+	int				config_unreachable_delay;
+	int				config_max_concurrent_checks_per_poller;
+	zbx_get_config_forks_f		get_config_forks;
+	const char			*config_java_gateway;
+	int				config_java_gateway_port;
+	const char			*config_externalscripts;
 	zbx_get_value_internal_ext_f	zbx_get_value_internal_ext_cb;
-	const char		*config_ssh_key_location;
-	const char		*config_webdriver_url;
+	const char			*config_ssh_key_location;
+	const char			*config_webdriver_url;
 }
 zbx_thread_poller_args;
 
@@ -102,7 +102,9 @@ zbx_dc_item_context_t	*zbx_async_check_snmp_get_item_context(zbx_snmp_context_t 
 
 char	*zbx_async_check_snmp_get_reverse_dns(zbx_snmp_context_t *snmp_context);
 void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context);
-int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_task_clear_cb_t clear_cb,
+
+int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result,
+		zbx_async_task_process_result_cb_t async_task_process_result_snmp_cb,
 		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
 		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries);
 
@@ -133,7 +135,8 @@ zbx_agent_context;
 
 void	zbx_async_check_agent_clean(zbx_agent_context *agent_context);
 
-int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_task_clear_cb_t clear_cb,
+int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,
+		zbx_async_task_process_result_cb_t async_task_process_result_agent_cb,
 		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
 		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns);
 

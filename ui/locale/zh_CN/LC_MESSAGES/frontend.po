@@ -2665,11 +2665,21 @@ msgstr "无法删除默认 MFA 方法。"
 msgid "Cannot delete default user directory."
 msgstr "无法删除默认用户目录"
 
+#: include/classes/api/services/CDRule.php:772
+#, c-format
+msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "无法删除自动发现规则"
+
+#: include/classes/api/services/CDRule.php:979
+#, c-format
+msgid "Cannot delete discovery rule \"%1$s\": %2$s."
+msgstr ""
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2691,6 +2701,11 @@ msgid "Cannot delete host"
 msgid_plural "Cannot delete hosts"
 msgstr[0] "无法删除主机"
 
+#: include/classes/api/services/CHost.php:1631
+#, c-format
+msgid "Cannot delete host \"%1$s\": %2$s."
+msgstr ""
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2701,6 +2716,11 @@ msgstr[0] "无法删除主机 %1$s 因为维护 \"%2$s\" 必须包含至少一�
 msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
 msgstr[0] "无法删除主机组"
+
+#: include/classes/api/services/CHostGroup.php:767
+#, c-format
+msgid "Cannot delete host group \"%1$s\": %2$s."
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2829,6 +2849,11 @@ msgid "Cannot delete template"
 msgid_plural "Cannot delete templates"
 msgstr[0] "无法删除模板"
 
+#: include/classes/api/services/CTemplate.php:805
+#, c-format
+msgid "Cannot delete template \"%1$s\": %2$s."
+msgstr ""
+
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
@@ -2862,6 +2887,11 @@ msgid "Cannot delete trigger"
 msgid_plural "Cannot delete triggers"
 msgstr[0] "无法删除触发器"
 
+#: include/classes/api/managers/CTriggerManager.php:126
+#, c-format
+msgid "Cannot delete trigger \"%1$s\": %2$s."
+msgstr ""
+
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
 msgid_plural "Cannot delete trigger prototypes"
@@ -2881,6 +2911,16 @@ msgstr "无法删除默认用户目录 %1$s"
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
 msgstr[0] "无法删除用户组"
+
+#: include/classes/api/services/CUserGroup.php:1330
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CUserGroup.php:1325
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
+msgstr ""
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
@@ -3836,6 +3876,11 @@ msgstr "无法对模板触发器 \"%2$s\" 更新 \"%1$s\"。"
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr "无法对模板触发器原型 \"%2$s\" 更新 \"%1$s\"。"
 
+#: include/classes/api/helpers/CApiSettingsHelper.php:94
+#, c-format
+msgid "Cannot update \"%1$s\" parameter because currently it is read-only. Consider upgrading Zabbix to remove this limitation."
+msgstr ""
+
 #: include/classes/api/services/CHost.php:2344
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
@@ -4323,6 +4368,10 @@ msgstr "检查 DNS 服务是否开启。返回 0 - DNS 服务关闭（服务未�
 #: include/classes/data/CItemData.php:1623
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
 msgstr "检查文件是否存在。返回 0 - 文件不存在；1 - 存在指定类型的文件"
+
+#: include/classes/data/CItemData.php:1115
+msgid "Checks if host is accessible by ICMP ping with retries. 0 - ICMP ping fails. 1 - ICMP ping successful."
+msgstr ""
 
 #: include/classes/data/CItemData.php:969
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
@@ -6511,6 +6560,22 @@ msgstr "删除 web 场景？"
 msgid "Deleted"
 msgstr "已删除"
 
+#: include/actions.inc.php:143
+msgid "Deleted host"
+msgstr ""
+
+#: include/actions.inc.php:125
+msgid "Deleted host group"
+msgstr ""
+
+#: include/actions.inc.php:710
+msgid "Deleted host group(s)"
+msgstr ""
+
+#: include/actions.inc.php:134
+msgid "Deleted trigger"
+msgstr ""
+
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
 msgstr "分隔符"
@@ -7138,6 +7203,10 @@ msgstr ""
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
 msgstr "显示本地时间"
+
+#: widgets/itemhistory/views/column.edit.php:240
+msgid "Display log time"
+msgstr ""
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -9299,6 +9368,10 @@ msgstr "选择历史数据"
 #: app/views/popup.triggerexpr.php:129
 msgid "History functions"
 msgstr "历史数据函数"
+
+#: app/views/administration.housekeeping.edit.php:218
+msgid "History, trends and audit log compression"
+msgstr ""
 
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
@@ -13363,6 +13436,10 @@ msgstr "菜单条目名称在事件内容菜单中用作触发器 URL 的标签�
 #: app/views/administration.script.edit.php:90
 msgid "Menu path"
 msgstr "菜单路径"
+
+#: widgets/piechart/includes/WidgetForm.php:149
+msgid "Merge sectors smaller than"
+msgstr ""
 
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
@@ -17459,6 +17536,10 @@ msgstr "重设预设"
 msgid "Reset to initial view"
 msgstr "重置为初始视图"
 
+#: app/views/administration.miscconfig.edit.php:103
+msgid "Resolve secret vault macros by"
+msgstr ""
+
 #: jsLoader.php:283
 msgid "Resolved"
 msgstr "已解决"
@@ -17710,6 +17791,11 @@ msgstr "在 Zabbix 服务器上运行脚本\"%1$s\""
 #, c-format
 msgid "Run script \"%1$s\" on current host"
 msgstr "在当前主机上运行脚本“%1$s”"
+
+#: include/actions.inc.php:601
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr ""
 
 #: include/actions.inc.php:622
 #, c-format
@@ -20366,6 +20452,14 @@ msgstr "主题"
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "这些参数将按指定顺序作为命令行参数传递给脚本。"
 
+#: app/views/action.list.php:163
+msgid "This action has conditions or operations referencing deleted object(s)."
+msgstr ""
+
+#: app/views/action.list.php:158
+msgid "This action has missing conditions or operations due to previously deleted object(s)."
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
@@ -20414,6 +20508,10 @@ msgstr "应启用此设置，因为趋势表包含压缩块。"
 #: widgets/itemhistory/views/column.edit.php:242
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
 msgstr "此设置将显示本地时间而不是时间戳。在高级配置中也必须选中\"显示时间戳\"."
+
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -22621,6 +22719,10 @@ msgstr "VMware 虚拟机性能计数器，“url”- VMware 服务 URL，“uuid
 msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "VMware 虚拟机电源状态，“url”-VMware 服务 URL，“uuid”-VMware 虚拟机全局唯一标识符"
 
+#: include/classes/data/CItemData.php:2498
+msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
 msgstr "VMware 虚拟机私有内存大小，“url”-VMware 服务 URL，“uuid”-VMware 虚拟机全局唯一标识符"
@@ -23680,6 +23782,14 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr "Zabbix server (Proxy)"
 
+#: app/views/administration.miscconfig.edit.php:112
+msgid "Zabbix server and proxy"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:107
+msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
+msgstr ""
+
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Zabbix server is not running: the information displayed may not be current."
@@ -23696,6 +23806,10 @@ msgstr "Zabbix主机名称"
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
 msgstr "zabbix服务端版本"
+
+#: app/views/administration.miscconfig.edit.php:105
+msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
+msgstr ""
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -23864,6 +23978,41 @@ msgstr "abs() - 绝对值"
 #: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() - 以角度表示的值的反余弦值，以弧度表示"
+
+#: include/classes/api/services/CDRule.php:773
+#, c-format
+msgid "action \"%1$s\" uses this discovery check"
+msgstr ""
+
+#: include/classes/api/services/CDRule.php:980
+#, c-format
+msgid "action \"%1$s\" uses this discovery rule"
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1632
+#, c-format
+msgid "action \"%1$s\" uses this host"
+msgstr ""
+
+#: include/classes/api/services/CHostGroup.php:768
+#, c-format
+msgid "action \"%1$s\" uses this host group"
+msgstr ""
+
+#: include/classes/api/services/CService.php:487
+#, c-format
+msgid "action \"%1$s\" uses this service"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:806
+#, c-format
+msgid "action \"%1$s\" uses this template"
+msgstr ""
+
+#: include/classes/api/managers/CTriggerManager.php:127
+#, c-format
+msgid "action \"%1$s\" uses this trigger"
+msgstr ""
 
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144
@@ -24636,6 +24785,10 @@ msgstr "第一"
 msgid "first() - The oldest value in the specified time interval"
 msgstr "first() - 指定时间间隔内最早的值"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:626
+msgid "firstclock() - Timestamp of the oldest value in the specified time interval"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
 msgstr "floor() - 向下舍入到最接近的较小整数"
@@ -25033,6 +25186,10 @@ msgstr "最新"
 msgid "last() - Last (most recent) T value"
 msgstr "last() - 最后（最近）的 T 值"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:733
+msgid "lastclock() - Timestamp of the last (most recent) T value"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1557
 msgid "left"
 msgstr "左侧"
@@ -25068,6 +25225,10 @@ msgstr "logseverity() - 周期 T 的最后一个日志条目的日志严重性"
 #: app/controllers/CControllerPopupTriggerExpr.php:779
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr "logsource() - 周期 T 的最后一个日志条目匹配参数 V 的日志源（1 - 匹配，0 - 不匹配）"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:795
+msgid "logtimestamp() - Timestamp of the last (most recent) T log message"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "ltrim() - Remove specified characters from the beginning of a string"

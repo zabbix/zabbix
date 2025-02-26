@@ -20,7 +20,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../common/testFormAuthentication.php';
 
 /**
- * @backup config, userdirectory, usrgrp
+ * @backup settings, userdirectory, usrgrp
  *
  * @dataSource LoginUsers
  */
@@ -98,14 +98,20 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			'Group name attribute' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
 			'Group member attribute' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
 			'Reference attribute' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
-			'Group filter' => ['visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => '(%{groupattr}=%{user})'],
-			'User group membership attribute' => ['visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => 'memberOf'],
+			'Group filter' => [
+				'visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => '(%{groupattr}=%{user})'
+			],
+			'User group membership attribute' => [
+				'visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => 'memberOf'
+			],
 			'User name attribute' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
 			'User last name attribute' => ['visible' => false, 'maxlength' => 255, 'value' => ''],
 			'User group mapping' => ['visible' => false],
 			'Media type mapping' => ['visible' => false ],
 			'StartTLS' => ['visible'  => false, 'value' => false],
-			'Search filter' => ['visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => '(%{attr}=%{user})']
+			'Search filter' => [
+				'visible' => false, 'maxlength' => 255, 'value' => '', 'placeholder' => '(%{attr}=%{user})'
+			]
 		];
 
 		foreach ($server_fields as $label => $attributes) {
@@ -553,6 +559,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			$form->selectTab('LDAP settings');
 		}
 
+		$userdirectory_sql = 'SELECT value_userdirectoryid FROM settings WHERE name=\'ldap_userdirectoryid\'';
 		foreach ($table->getRows() as $row) {
 			$radio = $row->getColumn('Default');
 			$user_directoryid = CDBHelper::getValue('SELECT userdirectoryid FROM userdirectory_ldap WHERE host='
@@ -561,22 +568,20 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 
 			// Check if LDAP server is set as Default.
 			if ($radio->query('name:ldap_default_row_index')->one()->isAttributePresent('checked') === true) {
-				$this->assertEquals($user_directoryid, CDBHelper::getValue('SELECT ldap_userdirectoryid FROM config'));
+				$this->assertEquals($user_directoryid, CDBHelper::getValue($userdirectory_sql));
 			}
 			else {
 				// Set another LDAP server as default.
-				$this->assertNotEquals($user_directoryid, CDBHelper::getValue('SELECT ldap_userdirectoryid FROM config'));
+				$this->assertNotEquals($user_directoryid, CDBHelper::getValue($userdirectory_sql));
 				$radio->query('name:ldap_default_row_index')->one()->click();
 				$form->submit();
 				$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
-				$this->assertEquals($user_directoryid, CDBHelper::getValue('SELECT ldap_userdirectoryid FROM config'));
+				$this->assertEquals($user_directoryid, CDBHelper::getValue($userdirectory_sql));
 			}
 		}
 
 		// Default LDAP server host name.
-		$hostname = CDBHelper::getValue('SELECT host FROM userdirectory_ldap WHERE userdirectoryid IN '.
-				'(SELECT ldap_userdirectoryid FROM config)'
-		);
+		$hostname = CDBHelper::getValue('SELECT host FROM userdirectory_ldap WHERE userdirectoryid IN ('.$userdirectory_sql.')');
 
 		$form->selectTab('LDAP settings');
 
@@ -584,8 +589,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		$table->findRow('Host', $hostname)->getColumn('Action')->query('button:Remove')->one()->click();
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
-		$new_hostname = CDBHelper::getValue('SELECT host FROM userdirectory_ldap udl INNER JOIN config co ON '.
-				'udl.userdirectoryid = co.ldap_userdirectoryid');
+		$new_hostname = CDBHelper::getValue('SELECT host FROM userdirectory_ldap WHERE userdirectoryid=('.
+				'SELECT value_userdirectoryid FROM settings WHERE name=\'ldap_userdirectoryid\')'
+		);
 
 		// Check that old LDAP server (by host name) is not default now.
 		$this->assertNotEquals($hostname, $new_hostname);
@@ -1963,7 +1969,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	}
 
 	/**
-	 * @backup config
+	 * @backup settings
 	 *
 	 * @dataProvider getCreateData
 	 */

@@ -17,7 +17,7 @@ require_once dirname(__FILE__).'/../common/testSystemInformation.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
- * @backup dashboard, ha_node, config
+ * @backup dashboard, ha_node, settings
  *
  * @backupConfig
  *

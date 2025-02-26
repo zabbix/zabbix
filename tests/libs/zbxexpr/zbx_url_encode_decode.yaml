@@ -1,0 +1,106 @@
+---
+test case: "encode - URL with special characters"
+in:
+  func_type: "encode"
+  source: "https://example.com/search?q=helloworld&lang=en"
+out:
+  result:  "https%3A%2F%2Fexample.com%2Fsearch%3Fq%3Dhelloworld%26lang%3Den"
+---
+test case: "encode - some ASCII"
+in:
+  func_type: "encode"
+  source: "\n!#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}"
+out:
+  result:  "%0A%21%23%24%25%26%27%28%29%2A%2B%2C-.%2F0123456789%3A%3B%3C%3D%3E%3F%40ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D"
+---
+test case: "encode - URL safe characters"
+in:
+  func_type: "encode"
+  source: "-._~"
+out:
+  result:  "-._~"
+---
+test case: "encode - Empty string"
+in:
+  func_type: "encode"
+  source: ""
+out:
+  result:  ""
+---
+test case: "encode - none ASCII characters"
+in:
+  func_type: "encode"
+  source: "こんにちは"
+out:
+  result:  "%E3%81%93%E3%82%93%E3%81%AB%E3%81%A1%E3%81%AF"
+---
+test case: "decode - URL"
+in:
+  func_type: "decode"
+  source: "http://127.0.0.1/ui/zabbix.php?show=1&name=&acknowledgement_status=0&inventory%5B0%5D%5Bfield%5D=type&inventory%5B0%5D%5Bvalue%5D=&evaltype=0&tags%5B0%5D%5Btag%5D=&tags%5B0%5D%5Boperator%5D=0&tags%5B0%5D%5Bvalue%5D=&show_tags=3&tag_name_format=0&tag_priority=&show_opdata=0&show_timeline=1&filter_name=&filter_show_counter=0&filter_custom_time=0&sort=clock&sortorder=DESC&age_state=0&show_symptoms=0&show_suppressed=0&acknowledged_by_me=0&compact_view=0&details=0&highlight_row=0&action=problem.view&hostids%5B%5D=10667"
+out:
+  return: SUCCEED
+  result:  "http://127.0.0.1/ui/zabbix.php?show=1&name=&acknowledgement_status=0&inventory[0][field]=type&inventory[0][value]=&evaltype=0&tags[0][tag]=&tags[0][operator]=0&tags[0][value]=&show_tags=3&tag_name_format=0&tag_priority=&show_opdata=0&show_timeline=1&filter_name=&filter_show_counter=0&filter_custom_time=0&sort=clock&sortorder=DESC&age_state=0&show_symptoms=0&show_suppressed=0&acknowledged_by_me=0&compact_view=0&details=0&highlight_row=0&action=problem.view&hostids[]=10667"
+---
+test case: "decode - Empty string"
+in:
+  func_type: "decode"
+  source: ""
+out:
+  return: SUCCEED
+  result: ""
+---
+test case: "decode - Invalid Encoding"
+in:
+  func_type: "decode"
+  source: "Invalid%2GEncoding"
+out:
+  return: FAIL
+---
+test case: "decode -  No Encoding"
+in:
+  func_type: "decode"
+  source: "NoEncoding"
+out:
+  return: SUCCEED
+  result: "NoEncoding"
+---
+test case: "decode - Input With % Only"
+in:
+  func_type: "decode"
+  source: "%"
+out:
+  return: FAIL
+---
+test case: "encode-decode - URL with special characters"
+in:
+  func_type: "encode_decode"
+  source: "https://test.com/search?q=test&lang=ru"
+out:
+  result:  "https%3A%2F%2Ftest.com%2Fsearch%3Fq%3Dtest%26lang%3Dru"
+  final_result:  "https://test.com/search?q=test&lang=ru"
+---
+test case: "encode-decode - some ASCII without URL unsafe characters"
+in:
+  func_type: "encode_decode"
+  source: "-._0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz~:/?#[]@"
+out:
+  result:  "-._0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz~%3A%2F%3F%23%5B%5D%40"
+  final_result: "-._0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz~:/?#[]@"
+---
+test case: "encode-decode - Empty string"
+in:
+  func_type: "encode_decode"
+  source: ""
+out:
+  result:  ""
+  final_result: ""
+---
+test case: "encode-decode - {MACRO}"
+in:
+  func_type: "encode_decode"
+  source: "{MACRO} {<macro>.<func>(<params>)} {$MACRO} {#MACRO} {?EXPRESSION} {$MACRO:static text} {$MACRO:regex:regular expression} {$LOW_SPACE_LIMIT:/tmp} {$LOW_SPACE_LIMIT:regex:^/tmp$} {$LOW_SPACE_LIMIT:regex:^/var/log/.*$}"
+out:
+  result:  "%7BMACRO%7D%20%7B%3Cmacro%3E.%3Cfunc%3E%28%3Cparams%3E%29%7D%20%7B%24MACRO%7D%20%7B%23MACRO%7D%20%7B%3FEXPRESSION%7D%20%7B%24MACRO%3Astatic%20text%7D%20%7B%24MACRO%3Aregex%3Aregular%20expression%7D%20%7B%24LOW_SPACE_LIMIT%3A%2Ftmp%7D%20%7B%24LOW_SPACE_LIMIT%3Aregex%3A%5E%2Ftmp%24%7D%20%7B%24LOW_SPACE_LIMIT%3Aregex%3A%5E%2Fvar%2Flog%2F.%2A%24%7D"
+  final_result: "{MACRO} {<macro>.<func>(<params>)} {$MACRO} {#MACRO} {?EXPRESSION} {$MACRO:static text} {$MACRO:regex:regular expression} {$LOW_SPACE_LIMIT:/tmp} {$LOW_SPACE_LIMIT:regex:^/tmp$} {$LOW_SPACE_LIMIT:regex:^/var/log/.*$}"
+...

@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-10-14 08:44+0000\n"
-"Last-Translator: Grzegorz Deja <deg@best.pl>\n"
+"PO-Revision-Date: 2025-01-23 14:13+0000\n"
+"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +19,7 @@ msgstr ""
 #: app/controllers/CControllerSlaReportList.php:182
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
-msgstr "Data \"%1$s\" musi być mniejsza niż data \"%2$s\"."
+msgstr "Data \"%1$s\" musi poprzedzać datę \"%2$s\"."
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -1721,7 +1721,7 @@ msgstr "Przynajmniej jedna aktualizacja operacji jest obowiązkowa"
 
 #: app/views/popup.acknowledge.edit.php:147
 msgid "At least one update operation or message must exist."
-msgstr "Przynajmniej jedna aktualizacja operacji lub wiaodmości musi istnieć."
+msgstr "Przynajmniej jedna aktualizacja operacji lub wiadomości musi istnieć."
 
 #: app/views/popup.operation.edit.php:102
 msgid "At least one user or user group must be selected."
@@ -2730,6 +2730,11 @@ msgstr "Nie można usunąć domyślnej metody MFA."
 msgid "Cannot delete default user directory."
 msgstr "Nie można usunąć domyślnego katalogu użytkownika."
 
+#: include/classes/api/services/CDRule.php:772
+#, c-format
+msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
 msgid "Cannot delete discovery rule"
@@ -2737,6 +2742,11 @@ msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Nie można usunąć reguły wykrywania"
 msgstr[1] "Nie można usunąć reguł wykrywania"
 msgstr[2] "Nie można usunąć reguł wykrywania"
+
+#: include/classes/api/services/CDRule.php:979
+#, c-format
+msgid "Cannot delete discovery rule \"%1$s\": %2$s."
+msgstr ""
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2766,6 +2776,11 @@ msgstr[0] "Nie można usunąć hosta"
 msgstr[1] "Nie można usunąć hostów"
 msgstr[2] "Nie można usunąć hostów"
 
+#: include/classes/api/services/CHost.php:1631
+#, c-format
+msgid "Cannot delete host \"%1$s\": %2$s."
+msgstr ""
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2780,6 +2795,11 @@ msgid_plural "Cannot delete host groups"
 msgstr[0] "Nie można usunąć grupy hostów"
 msgstr[1] "Nie można usunąć grup hostów"
 msgstr[2] "Nie można usunąć grup hostów"
+
+#: include/classes/api/services/CHostGroup.php:767
+#, c-format
+msgid "Cannot delete host group \"%1$s\": %2$s."
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2938,6 +2958,11 @@ msgstr[0] "Nie można usunąć szablonu"
 msgstr[1] "Nie można usunąć szablonów"
 msgstr[2] "Nie można usunąć szablonów"
 
+#: include/classes/api/services/CTemplate.php:805
+#, c-format
+msgid "Cannot delete template \"%1$s\": %2$s."
+msgstr ""
+
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
@@ -2975,6 +3000,11 @@ msgstr[0] "Nie można usunąć wyzwalacza"
 msgstr[1] "Nie można usunąć wyzwalaczy"
 msgstr[2] "Nie można usunąć wyzwalaczy"
 
+#: include/classes/api/managers/CTriggerManager.php:126
+#, c-format
+msgid "Cannot delete trigger \"%1$s\": %2$s."
+msgstr ""
+
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
 msgid_plural "Cannot delete trigger prototypes"
@@ -3000,6 +3030,16 @@ msgid_plural "Cannot delete user groups"
 msgstr[0] "Nie można usunąć grupy użytkowników"
 msgstr[1] "Nie można usunąć grup użytkowników"
 msgstr[2] "Nie można usunąć grup użytkowników"
+
+#: include/classes/api/services/CUserGroup.php:1330
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by LDAP userdirectory \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CUserGroup.php:1325
+#, c-format
+msgid "Cannot delete user group \"%1$s\", because it is used by SAML userdirectory."
+msgstr ""
 
 #: include/classes/api/services/CUserGroup.php:1397
 #, c-format
@@ -4021,6 +4061,11 @@ msgstr "Nie można zaktualizować \"%1$s\" w szablonowym wyzwalaczu \"%2$s\"."
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr "Nie można zaktualizować \"%1$s\" w szablonowym prototypie wyzwalacza \"%2$s\"."
 
+#: include/classes/api/helpers/CApiSettingsHelper.php:94
+#, c-format
+msgid "Cannot update \"%1$s\" parameter because currently it is read-only. Consider upgrading Zabbix to remove this limitation."
+msgstr ""
+
 #: include/classes/api/services/CHost.php:2344
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
@@ -4526,6 +4571,10 @@ msgstr "Sprawdza, czy usługa DNS działa. Zwraca 0 - DNS nie działa (serwer ni
 #: include/classes/data/CItemData.php:1623
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
 msgstr "Sprawdza, czy plik istnieje. Zwraca 0 - nie znaleziono; 1 - plik określonego typu istnieje"
+
+#: include/classes/data/CItemData.php:1115
+msgid "Checks if host is accessible by ICMP ping with retries. 0 - ICMP ping fails. 1 - ICMP ping successful."
+msgstr ""
 
 #: include/classes/data/CItemData.php:969
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
@@ -6728,6 +6777,22 @@ msgstr "Usunąć scenariusz sieci www?"
 msgid "Deleted"
 msgstr "Usunięto"
 
+#: include/actions.inc.php:143
+msgid "Deleted host"
+msgstr ""
+
+#: include/actions.inc.php:125
+msgid "Deleted host group"
+msgstr ""
+
+#: include/actions.inc.php:710
+msgid "Deleted host group(s)"
+msgstr ""
+
+#: include/actions.inc.php:134
+msgid "Deleted trigger"
+msgstr ""
+
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
 msgstr "Ogranicznik"
@@ -7348,7 +7413,7 @@ msgstr "Wyświetlanie wyzwalaczy w stanie OK przez"
 
 #: app/views/mediatype.list.php:75
 msgid "Display actions"
-msgstr ""
+msgstr "Wyświetl akcje"
 
 #: app/partials/monitoring.latest.view.html.php:309
 msgid "Display graph"
@@ -7361,6 +7426,10 @@ msgstr ""
 #: widgets/itemhistory/views/column.edit.php:241
 msgid "Display local time"
 msgstr "Wyświetl czas lokalny"
+
+#: widgets/itemhistory/views/column.edit.php:240
+msgid "Display log time"
+msgstr ""
 
 #: widgets/svggraph/includes/WidgetForm.php:364
 msgid "Display min/avg/max"
@@ -9537,6 +9606,10 @@ msgstr "Wybór danych historii"
 msgid "History functions"
 msgstr "Funkcje historyczne"
 
+#: app/views/administration.housekeeping.edit.php:218
+msgid "History, trends and audit log compression"
+msgstr ""
+
 #: include/classes/html/CTabFilter.php:167
 msgid "Home"
 msgstr "Początek"
@@ -9687,7 +9760,7 @@ msgstr[2] "Wyłączono hosty"
 
 #: app/controllers/CControllerPopup.php:46
 msgid "Host edit"
-msgstr ""
+msgstr "Edytuj hosta"
 
 #: app/controllers/CControllerHostGroupEnable.php:76
 #: app/controllers/CControllerPopupMassupdateHost.php:491
@@ -9752,7 +9825,7 @@ msgstr[2] "Usunięto grupy hostów"
 
 #: app/controllers/CControllerPopup.php:47
 msgid "Host group edit"
-msgstr ""
+msgstr "Edytuj grupę hostów"
 
 #: include/views/js/monitoring.sysmaps.js.php:112
 msgid "Host group elements"
@@ -11986,7 +12059,7 @@ msgstr "Pole inwentarza"
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectHostInventory.php:48
 #: widgets/hostcard/includes/WidgetForm.php:50
 msgid "Inventory fields"
-msgstr ""
+msgstr "Pola inwentarza"
 
 #: app/views/popup.massupdate.host.php:175
 #: app/views/popup.operation.edit.php:402
@@ -12070,7 +12143,7 @@ msgstr[2] "Wyłączono pozycje"
 
 #: app/controllers/CControllerPopup.php:48
 msgid "Item edit"
-msgstr ""
+msgstr "Edytuj pozycję"
 
 #: items.php:707
 msgid "Item enabled"
@@ -12677,7 +12750,7 @@ msgstr "Uprawniony do"
 #: widgets/topitems/includes/WidgetForm.php:125
 #: widgets/topitems/includes/WidgetForm.php:154
 msgid "Limit"
-msgstr ""
+msgstr "Limit"
 
 #: widgets/topitems/views/widget.edit.php:95
 msgid "Limit applies to each \"Item pattern\" separately"
@@ -12712,7 +12785,7 @@ msgstr "Szerokość linii"
 #: widgets/svggraph/includes/WidgetForm.php:301
 #: widgets/svggraph/includes/WidgetForm.php:333
 msgid "Linear"
-msgstr ""
+msgstr "Liniowy"
 
 #: app/views/popup.massupdate.host.php:42 app/views/template.massupdate.php:45
 #: include/views/monitoring.sysmap.constructor.php:43
@@ -12926,7 +12999,7 @@ msgstr "Logowanie niedopasowanych pułapek SNMP"
 #: widgets/svggraph/includes/WidgetForm.php:302
 #: widgets/svggraph/includes/WidgetForm.php:334
 msgid "Logarithmic"
-msgstr ""
+msgstr "Logarytmiczny"
 
 #: app/controllers/CControllerAuditLogList.php:201
 #: app/views/administration.user.list.php:135
@@ -13656,6 +13729,10 @@ msgstr "Nazwa elementu menu jest używana jako etykieta adresu URL wyzwalacza w 
 #: app/views/administration.script.edit.php:90
 msgid "Menu path"
 msgstr "Ścieżka menu"
+
+#: widgets/piechart/includes/WidgetForm.php:149
+msgid "Merge sectors smaller than"
+msgstr ""
 
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
@@ -15345,7 +15422,7 @@ msgstr "Systemy liczbowe"
 
 #: widgets/tophosts/views/column.edit.php:139
 msgid "Numeric"
-msgstr ""
+msgstr "Numeryczny"
 
 #: app/partials/configuration.filter.items.php:143
 #: app/views/popup.massupdate.item.php:148 include/items.inc.php:125
@@ -17772,6 +17849,10 @@ msgstr "Przywróć domyślne"
 msgid "Reset to initial view"
 msgstr "Przywróć widok początkowy"
 
+#: app/views/administration.miscconfig.edit.php:103
+msgid "Resolve secret vault macros by"
+msgstr ""
+
 #: jsLoader.php:283
 msgid "Resolved"
 msgstr "Rozwiązane"
@@ -18023,6 +18104,11 @@ msgstr "Uruchom skrypt \"%1$s\" na serwerze Zabbix"
 #, c-format
 msgid "Run script \"%1$s\" on current host"
 msgstr "Uruchom skrypt \"%1$s\" na bieżącym hoście"
+
+#: include/actions.inc.php:601
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr ""
 
 #: include/actions.inc.php:622
 #, c-format
@@ -20295,7 +20381,7 @@ msgstr[2] "Usunięto szablony"
 
 #: app/controllers/CControllerPopup.php:59
 msgid "Template edit"
-msgstr ""
+msgstr "Edycja szablonu"
 
 #: app/controllers/CControllerAuditLogList.php:259
 #: app/partials/configuration.templategroup.edit.html.php:52
@@ -20705,6 +20791,14 @@ msgstr "Motyw"
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "Parametry zostaną przekazane do skryptu jako argumenty wiersza poleceń, zgodnie z podaną kolejnością."
 
+#: app/views/action.list.php:163
+msgid "This action has conditions or operations referencing deleted object(s)."
+msgstr ""
+
+#: app/views/action.list.php:158
+msgid "This action has missing conditions or operations due to previously deleted object(s)."
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
 msgid "This check cannot be removed, as it is used as a condition in %1$s discovery action."
@@ -20755,6 +20849,10 @@ msgstr "To ustawienie powinno być włączone, ponieważ tabele trendu zawieraj�
 #: widgets/itemhistory/views/column.edit.php:242
 msgid "This setting will display local time instead of the timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
 msgstr "To ustawienie spowoduje wyświetlenie czasu lokalnego zamiast znacznika czasu. W konfiguracji zaawansowanej należy także zaznaczyć opcję \"Pokaż znacznik czasu\"."
+
+#: widgets/itemhistory/views/column.edit.php:241
+msgid "This setting will display log time instead of item's timestamp. \"Show timestamp\" must also be checked in the advanced configuration."
+msgstr ""
 
 #: include/views/configuration.item.edit.php:129
 #: include/views/configuration.item.prototype.edit.php:114
@@ -22988,6 +23086,10 @@ msgstr "Licznik wydajności maszyny wirtualnej VMware, \"url\" - URL usługi VMw
 msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
 msgstr "Status zasilania maszyny wirtualnej VMware, \"url\" - URL usługi VMware, \"uuid\" - globalny unikalny identyfikator maszyny wirtualnej VMware"
 
+#: include/classes/data/CItemData.php:2498
+msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
 msgstr "Rozmiar prywatnej pamięci maszyny wirtualnej VMware, \"url\" - URL usługi VMware, \"uuid\" - globalny unikalny identyfikator maszyny wirtualnej VMware"
@@ -24053,6 +24155,14 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr "Zabbix serwer (proxy)"
 
+#: app/views/administration.miscconfig.edit.php:112
+msgid "Zabbix server and proxy"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:107
+msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
+msgstr ""
+
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Serwer Zabbix nie działa: wyświetlane informacje mogą być nieaktualne."
@@ -24069,6 +24179,10 @@ msgstr "Nazwa serwera Zabbix"
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
 msgstr "Wersja serwera Zabbix"
+
+#: app/views/administration.miscconfig.edit.php:105
+msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
+msgstr ""
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -24237,6 +24351,41 @@ msgstr "abs() - Wartość bezwzględna"
 #: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() - arcus cosinus z wartości jako kąta wyrażonego w radianach"
+
+#: include/classes/api/services/CDRule.php:773
+#, c-format
+msgid "action \"%1$s\" uses this discovery check"
+msgstr ""
+
+#: include/classes/api/services/CDRule.php:980
+#, c-format
+msgid "action \"%1$s\" uses this discovery rule"
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1632
+#, c-format
+msgid "action \"%1$s\" uses this host"
+msgstr ""
+
+#: include/classes/api/services/CHostGroup.php:768
+#, c-format
+msgid "action \"%1$s\" uses this host group"
+msgstr ""
+
+#: include/classes/api/services/CService.php:487
+#, c-format
+msgid "action \"%1$s\" uses this service"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:806
+#, c-format
+msgid "action \"%1$s\" uses this template"
+msgstr ""
+
+#: include/classes/api/managers/CTriggerManager.php:127
+#, c-format
+msgid "action \"%1$s\" uses this trigger"
+msgstr ""
 
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144
@@ -24894,7 +25043,7 @@ msgstr "reguła wykrywania \"%1$s\" nie jest monitorowana na hoście \"%2$s\""
 
 #: app/views/mediatype.list.php:78
 msgid "display all actions"
-msgstr ""
+msgstr "wyświetl wszystkie akcje"
 
 #: app/views/mediatype.list.php:80
 msgid "display only actions where All available media types are used in action operation"
@@ -25008,6 +25157,10 @@ msgstr "pierwszy"
 #: app/controllers/CControllerPopupTriggerExpr.php:624
 msgid "first() - The oldest value in the specified time interval"
 msgstr "first() - Najstarsza wartość we wskazanym przedziale czasu"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:626
+msgid "firstclock() - Timestamp of the oldest value in the specified time interval"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
@@ -25265,7 +25418,7 @@ msgstr "niepoprawna nazwa hosta"
 
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectHostInventory.php:48
 msgid "invalid inventory field"
-msgstr ""
+msgstr "nieprawidłowe pole inwentarza"
 
 #: include/classes/validators/CHistFunctionValidator.php:82
 #: include/classes/validators/CMathFunctionValidator.php:86
@@ -25406,6 +25559,10 @@ msgstr "ostatni"
 msgid "last() - Last (most recent) T value"
 msgstr "last() - Ostatnia (najnowsza) wartość T"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:733
+msgid "lastclock() - Timestamp of the last (most recent) T value"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1557
 msgid "left"
 msgstr "lewy"
@@ -25441,6 +25598,10 @@ msgstr "logseverity() - Poziom zdarzenia z ostatniego wpisu dziennika w okresie 
 #: app/controllers/CControllerPopupTriggerExpr.php:779
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr "logsource() - Źródło zdarzenia dla ostatniego wpisu dziennika w okresie T pasującego do wyrażenia V (1 - pasuje, 0 - nie pasuje)"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:795
+msgid "logtimestamp() - Timestamp of the last (most recent) T log message"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "ltrim() - Remove specified characters from the beginning of a string"
@@ -25593,7 +25754,7 @@ msgstr "monoinc() - Sprawdza czy wartość pozycji wzrasta w sposób ciągły (1
 #: widgets/hostcard/views/widget.view.php:157
 #: widgets/hostcard/views/widget.view.php:338
 msgid "more"
-msgstr ""
+msgstr "więcej"
 
 #: include/func.inc.php:571
 msgctxt "millisecond short"
