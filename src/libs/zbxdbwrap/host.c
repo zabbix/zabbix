@@ -1078,6 +1078,7 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 
 	if (0 != selementids.values_num)
 	{
+		/* this query to delete map trigger elements must be executed after the query to delete trigger */
 		zbx_db_execute_multiple_query(
 				"delete from sysmaps_elements"
 				" where selementid not in ("
