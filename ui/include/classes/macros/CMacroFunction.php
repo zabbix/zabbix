@@ -39,6 +39,10 @@ class CMacroFunction {
 			return UNRESOLVED_MACRO_STRING;
 		}
 
+		if (!$matches) {
+			return '';
+		}
+
 		$macro_values = [];
 		for ($i = 0; $i <= 9; $i++) {
 			$macro_values['\\'.$i] = array_key_exists($i, $matches) ? $matches[$i] : '';
