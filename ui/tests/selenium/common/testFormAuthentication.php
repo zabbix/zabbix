@@ -71,14 +71,10 @@ class testFormAuthentication extends CWebTest {
 		$this->checkTablesHeaders($mapping_tables, $form);
 
 		// Check group mapping popup.
-		$this->checkMappingDialog('User group mapping', 'New user group mapping', $form,
-				[$auth_type.' group pattern', 'User groups', 'User role'], $auth_type
-		);
+		$this->checkMappingDialog('User group mapping', 'New user group mapping', $form, $auth_type);
 
 		// Check media type mapping popup.
-		$this->checkMappingDialog('Media type mapping', 'New media type mapping',
-				$form, ['Name', 'Media type', 'Attribute', 'When active'], $auth_type
-		);
+		$this->checkMappingDialog('Media type mapping', 'New media type mapping', $form, $auth_type);
 	}
 
 	/**
