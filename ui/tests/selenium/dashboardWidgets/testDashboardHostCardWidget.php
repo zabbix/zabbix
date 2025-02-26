@@ -93,7 +93,7 @@ class testDashboardHostCardWidget extends testWidgets {
 		// Create Proxy groups.
 		CDataHelper::call('proxygroup.create', [
 			[
-				'name' => 'Proxy group for host card widget',
+				'name' => 'Proxy group',
 				'failover_delay' => '10',
 				'min_online' => '1'
 			]
@@ -246,7 +246,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					['groupid' => $host_groups['groupid']['Zabbix servers']]
 				],
 				'monitored_by' => ZBX_MONITORED_BY_PROXY_GROUP,
-				'proxy_groupid' => $proxie_group['Proxy group for host card widget']
+				'proxy_groupid' => $proxie_group['Proxy group']
 			],
 			[
 				'host' => 'XSS in visible host name field',
@@ -1124,7 +1124,7 @@ class testDashboardHostCardWidget extends testWidgets {
 					'Host' => 'Empty filled host',
 					'Availability' => [],
 					'Monitored by' => [
-						'Proxy group' => 'Proxy group for host card widget'
+						'Proxy group' => 'Proxy group'
 					],
 					'Monitoring' => [
 						'Dashboards' => 0,
@@ -1643,11 +1643,6 @@ class testDashboardHostCardWidget extends testWidgets {
 			[
 				[
 					'Name' => 'Host card'
-				]
-			],
-			[
-				[
-					'Name' => 'Empty host card widget'
 				]
 			],
 			[
