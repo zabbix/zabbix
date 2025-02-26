@@ -1313,7 +1313,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * Check media type configuration in user configuration form.
 	 *
 	 * @param array		$data				data provider
-	 * @param string	$media_type				type of the media
+	 * @param string	$media_type			type of the media
 	 * @param string	$send_to			send to parameter of the media
 	 * @param string	$expected			name of the array with expected result
 	 */
