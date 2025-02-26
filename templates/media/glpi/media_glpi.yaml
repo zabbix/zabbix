@@ -12,10 +12,14 @@ zabbix_export:
           value: '{EVENT.ID}'
         - name: event_nseverity
           value: '{EVENT.NSEVERITY}'
-        - name: event_recovery_value
-          value: '{EVENT.RECOVERY.VALUE}'
+        - name: event_severity
+          value: '{EVENT.SEVERITY}'
         - name: event_source
           value: '{EVENT.SOURCE}'
+        - name: event_update_nseverity
+          value: '{EVENT.UPDATE.NSEVERITY}'
+        - name: event_update_severity
+          value: '{EVENT.UPDATE.SEVERITY}'
         - name: event_update_status
           value: '{EVENT.UPDATE.STATUS}'
         - name: event_value
@@ -30,327 +34,610 @@ zabbix_export:
           value: '{TRIGGER.ID}'
         - name: zabbix_url
           value: '{$ZABBIX.URL}'
-      status: DISABLED
       attempts: '1'
       script: |
-        var GLPi = {
-            params: {},
+        const CLogger = function(serviceName) {
+        	this.serviceName = serviceName;
+        	this.INFO = 4
+        	this.WARN = 3
+        	this.ERROR = 2
+        	this.log = function(level, msg) {
+        		Zabbix.log(level, '[' + this.serviceName + '] ' + msg);
+        	}
+        }
         
-            setParams: function (params) {
-                if (typeof params !== 'object') {
-                    return;
-                }
-                GLPi.params = params;
-            },
+        const CWebhook = function(value) {
+        	try {
+        		params = JSON.parse(value);
         
-            setProxy: function (HTTPProxy) {
-                GLPi.HTTPProxy = HTTPProxy;
-            },
+        		if (['0', '1', '2', '3', '4'].indexOf(params.event_source) === -1) {
+        			throw 'Incorrect "event_source" parameter given: ' + params.event_source + '.\nMust be 0-4.';
+        		}
         
-            urlCheckFormat: function (url) {
-                if (typeof url === 'string' && !url.endsWith('/')) {
-                    url += '/';
-                }
+        		if (['0', '3', '4'].indexOf(params.event_source) !== -1 && ['0', '1'].indexOf(params.event_value) === -1) {
+        			throw 'Incorrect "event_value" parameter given: ' + params.event_value + '.\nMust be 0 or 1.';
+        		}
         
-                if (url.indexOf('http://') === -1 && url.indexOf('https://') === -1) {
-                    url = 'https://' + url;
-                }
+        		if (['0', '3', '4'].indexOf(params.event_source) !== -1) {
+        			if (params.event_source === '1' && ['0', '1', '2', '3'].indexOf(params.event_value) === -1) {
+        				throw 'Incorrect "event_value" parameter given: ' + params.event_value + '.\nMust be 0-3.';
+        			}
         
-                return url;
-            },
+        			if (params.event_source === '0' && ['0', '1'].indexOf(params.event_update_status) === -1) {
+        				throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '.\nMust be 0 or 1.';
+        			}
         
-            getAuthToken: function (url, token) {
-                var response,
-                    request = new HttpRequest();
+        			if (params.event_source === '4') {
+        				if (['0', '1', '2', '3', '4', '5'].indexOf(params.event_update_nseverity) !== -1 && params.event_update_nseverity != params.event_nseverity) {
+        					params.event_nseverity = params.event_update_nseverity;
+        					params.event_severity = params.event_update_severity;
+        					params.event_update_status = '1';
+        				}
+        			}
+        		}
         
-                request.addHeader('Content-Type: application/json');
-                request.addHeader('Authorization: user_token ' + token);
+        		this.runCallback = function(name, params) {
+        			if (typeof this[name] === 'function') {
+        				return this[name].apply(this, [params]);
+        			}
+        		}
         
-                response = request.get(url + "apirest.php/initSession");
+        		this.handleEvent = function(source, event) {
+        			const alert = { source: source, event: event };
+        			return [
+        				this.runCallback('on' + source + event, alert),
+        				this.runCallback('on' + event, alert),
+        				this.runCallback('onEvent', alert)
+        			];
+        		}
         
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        Zabbix.log(4, '[ GLPi Webhook ] Failed to receive authentication token from GLPi.');
-                        response = null;
-                    }
-                }
+        		this.handleEventless = function(source) {
+        			const alert = { source: source, event: null };
+        			return [
+        				this.runCallback('on' + source, alert),
+        				this.runCallback('onEvent', alert)
+        			];
+        		}
         
-                if (Array.isArray(response)) {
-                    if (response[1]) {
-                        throw 'Error received from GLPi: ' + response[1];
-                    } else {
-                        throw 'Failed to receive authentication token from GLPi.';
-                    }
-                }
+        		this.run = function() {
+        			var results = [];
+        			if (typeof this.httpProxy === 'string' && this.httpProxy.trim() !== '') {
+        				this.request.setProxy(this.httpProxy);
+        			}
+        			const types = { '0': 'Trigger', '1': 'Discovery', '2': 'Autoreg', '3': 'Internal', '4': 'Service' };
         
-                if (typeof response !== 'object' || !response.session_token) {
-                    throw 'Failed to process response received from getting GLPi authentication token. Check debug log for more information.';
-                }
+        			if (['0', '3', '4'].indexOf(this.params.event_source) !== -1) {
+        				var event = (this.params.event_update_status === '1')
+        					? 'Update'
+        					: ((this.params.event_value === '1') ? 'Problem' : 'Resolve');
         
-                return response.session_token;
-            },
+        				results = this.handleEvent(types[this.params.event_source], event);
+        			}
+        			else if (typeof types[this.params.event_source] !== 'undefined') {
+        				results = this.handleEventless(types[this.params.event_source]);
+        			}
+        			else {
+        				throw 'Unexpected "event_source": ' + this.params.event_source;
+        			}
         
-            getProblemUrl: function (zabbix_url, triggerid, eventid, event_source) {
-                var problem_url = zabbix_url;
+        			for (idx in results) {
+        				if (typeof results[idx] !== 'undefined') {
+        					return JSON.stringify(results[idx]);
+        				}
+        			}
+        		}
+        		this.httpProxy = params.http_proxy;
+        		this.params = params;
+        		this.runCallback('onCheckParams', {});
+        	} catch (error) {
+        		throw 'Webhook processing failed: ' + error;
+        	}
+        }
         
-                if (event_source === '0') {
-                    problem_url += 'tr_events.php?triggerid=' + triggerid + '&eventid=' + eventid;
-                }
+        const CParamValidator = {
         
-                return problem_url;
-            },
+        	isType: function(value, type) {
+        		if (type === 'array') {
+        			return Array.isArray(value);
+        		}
+        		if (type === 'integer') {
+        			return CParamValidator.isInteger(value);
+        		}
+        		if (type === 'float') {
+        			return CParamValidator.isFloat(value);
+        		}
         
-            request: function (method, url, data) {
-                if (typeof GLPi.params !== 'object' || typeof GLPi.params.authToken === 'undefined' || GLPi.params.authToken === '') {
-                    throw 'Required GLPi param authToken is not set.';
-                }
+        		return (typeof value === type);
+        	},
         
-                var response,
-                    request = new HttpRequest();
+        	isInteger: function(value) {
+        		if (!CParamValidator.ifMatch(value, /^-?\d+$/)) {
+        			return false;
+        		}
         
-                request.addHeader('Content-Type: application/json');
-                request.addHeader('Session-Token:' + GLPi.params.authToken);
+        		return !isNaN(parseInt(value));
+        	},
         
-                if (typeof GLPi.HTTPProxy !== 'undefined' && GLPi.HTTPProxy !== '') {
-                    request.setProxy(GLPi.HTTPProxy);
-                }
+        	isFloat: function(value) {
+        		if (!CParamValidator.ifMatch(value, /^-?\d+\.\d+$/)) {
+        			return false;
+        		}
         
-                if (typeof data !== 'undefined') {
-                    data = JSON.stringify(data);
-                }
+        		return !isNaN(parseFloat(value));
+        	},
         
-                Zabbix.log(4, '[ GLPi Webhook ] Sending request: ' + url + ((typeof data === 'string')
-                    ? ('\n' + data)
-                    : ''));
+        	isDefined: function(value) {
+        		return !CParamValidator.isType(value, 'undefined');
+        	},
         
-                switch (method) {
-                    case 'post':
-                        response = request.post(url, data);
-                        break;
+        	isEmpty: function(value) {
+        		if (!CParamValidator.isType(value, 'string')) {
+        			throw 'Value "' + value + '" must be a string to be checked for emptiness.';
+        		}
         
-                    case 'put':
-                        response = request.put(url, data);
-                        break;
+        		return (value.trim() === '');
+        	},
         
-                    default:
-                        throw 'Unsupported HTTP request method: ' + method;
-                }
+        	isMacroSet: function(value, macro) {
+        		if (CParamValidator.isDefined(macro)) {
+        			return !(CParamValidator.ifMatch(value, '^\{' + macro + '\}$'))
+        		}
         
-                Zabbix.log(4, '[ GLPi Webhook ] Received response with status code ' +
-                    request.getStatus() + '\n' + response);
+        		return !(CParamValidator.ifMatch(value, '^\{[$#]{0,1}[A-Z_\.]+[\:]{0,1}["]{0,1}.*["]{0,1}\}$') || value === '*UNKNOWN*')
+        	},
         
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        Zabbix.log(4, '[ GLPi Webhook ] Failed to parse response received from GLPi');
-                        response = null;
-                    }
-                }
+        	withinRange: function(value, min, max) {
+        		if (!CParamValidator.isType(value, 'number')) {
+        			throw 'Value "' + value + '" must be a number to be checked for range.';
+        		}
+        		if (value < ((CParamValidator.isDefined(min)) ? min : value)
+        			|| value > ((CParamValidator.isDefined(max)) ? max : value)) {
+        			return false;
+        		}
         
-                if (typeof response !== 'object' || typeof response === 'undefined' || response === null) {
-                    throw 'Failed to process response received from GLPi. Check debug log for more information.';
-                }
+        		return true;
+        	},
         
-                if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                    var message = 'Request failed with status code ' + request.getStatus();
+        	inArray: function(value, array) {
+        		if (!CParamValidator.isType(array, 'array')) {
+        			throw 'The array must be an array to check the value for existing in it.';
+        		}
         
-                    if (response.message) {
-                        message += ': ' + response.message;
-                    }
+        		return (array.indexOf((typeof value === 'string') ? value.toLowerCase() : value) !== -1);
+        	},
         
-                    throw message + ' Check debug log for more information.';
-                }
+        	ifMatch: function(value, regex) {
+        		return (new RegExp(regex)).test(value);
+        	},
         
-                return response;
-            }
+        	match: function(value, regex) {
+        		if (!CParamValidator.isType(value, 'string')) {
+        			throw 'Value "' + value + '" must be a string to be matched with the regular expression.';
+        		}
+        
+        		return value.match(new RegExp(regex));
+        	},
+        
+        	checkURL: function(value) {
+        		if (CParamValidator.isEmpty(value)) {
+        			throw 'URL value "' + value + '" must be a non-empty string.';
+        		}
+        		if (!CParamValidator.ifMatch(value, '^(http|https):\/\/.+')) {
+        			throw 'URL value "' + value + '" must contain a schema.';
+        		}
+        
+        		return value.endsWith('/') ? value.slice(0, -1) : value;
+        	},
+        
+        	check: function(key, rule, params) {
+        		if (!CParamValidator.isDefined(rule.type)) {
+        			throw 'Mandatory attribute "type" has not been defined for parameter "' + key + '".';
+        		}
+        		if (!CParamValidator.isDefined(params[key])) {
+        			throw 'Checked parameter "' + key + '" was not found in the list of input parameters.';
+        		}
+        		var value = params[key],
+        			error_message = null;
+        		switch (rule.type) {
+        			case 'string':
+        				if (!CParamValidator.isType(value, 'string')) {
+        					throw 'Value "' + key + '" must be a string.';
+        				}
+        				if (CParamValidator.isEmpty(value)) {
+        					error_message = 'Value "' + key + '" must be a non-empty string';
+        					break;
+        				}
+        				if (CParamValidator.isDefined(rule.len) && value.length < rule.len) {
+        					error_message = 'Value "' + key + '" must be a string with a length > ' + rule.len;
+        				}
+        				if (CParamValidator.isDefined(rule.regex) && !CParamValidator.ifMatch(value, rule.regex)) {
+        					error_message = 'Value "' + key + '" must match the regular expression "' + rule.regex + '"';
+        				}
+        				if (CParamValidator.isDefined(rule.url) && rule.url === true) {
+        					value = CParamValidator.checkURL(value);
+        				}
+        				break;
+        			case 'integer':
+        				if (!CParamValidator.isInteger(value)) {
+        					error_message = 'Value "' + key + '" must be an integer';
+        					break;
+        				}
+        				value = parseInt(value);
+        				break;
+        			case 'float':
+        				if (!CParamValidator.isFloat(value)) {
+        					error_message = 'Value "' + key + '" must be a floating-point number';
+        					break;
+        				}
+        				value = parseFloat(value);
+        				break;
+        			case 'boolean':
+        				if (CParamValidator.inArray(value, ['1', 'true', 'yes', 'on'])) {
+        					value = true;
+        				}
+        				else if (CParamValidator.inArray(value, ['0', 'false', 'no', 'off'])) {
+        					value = false;
+        				}
+        				else {
+        					error_message = 'Value "' + key + '" must be a boolean-like.';
+        				}
+        				break;
+        			case 'array':
+        				try {
+        					value = JSON.parse(value);
+        				} catch (error) {
+        					throw 'Value "' + key + '" contains invalid JSON.';
+        				}
+        				if (!CParamValidator.isType(value, 'array')) {
+        					error_message = 'Value "' + key + '" must be an array.';
+        				}
+        				if (CParamValidator.isDefined(rule.tags) && rule.tags === true) {
+        					value = value.reduce(function(acc, obj) {
+        						acc[obj.tag] = obj.value || null;
+        						return acc;
+        					}, {});
+        				}
+        				break;
+        			case 'object':
+        				value = JSON.parse(value);
+        				if (!CParamValidator.isType(value, 'object')) {
+        					error_message = 'Value "' + key + '" must be an object.';
+        				}
+        				break;
+        			default:
+        				throw 'Unexpected attribute type "' + rule.type + '" for value "' + key + '". Available: ' +
+        				['integer', 'float', 'string', 'boolean', 'array', 'object'].join(', ');
+        		}
+        		params[key] = value;
+        		if (CParamValidator.inArray(rule.type, ['integer', 'float']) && error_message === null && (CParamValidator.isDefined(rule.min)
+        			|| CParamValidator.isDefined(rule.max)) && !CParamValidator.withinRange(value, rule.min, rule.max)) {
+        			error_message = 'Value "' + key + '" must be a number ' + ((CParamValidator.isDefined(rule.min) && CParamValidator.isDefined(rule.max))
+        				? (rule.min + '..' + rule.max) : ((CParamValidator.isDefined(rule.min)) ? '>' + rule.min : '<' + rule.max));
+        		}
+        		else if (CParamValidator.isDefined(rule.array) && !CParamValidator.inArray(value, rule.array)) {
+        			error_message = 'Value "' + key + '" must be in the array ' + JSON.stringify(rule.array);
+        		}
+        		else if (CParamValidator.isDefined(rule.macro) && !CParamValidator.isMacroSet(value.toString(), rule.macro)) {
+        			error_message = 'The macro ' + ((CParamValidator.isDefined(rule.macro)) ? '{' + rule.macro + '} ' : ' ') + 'is not set';
+        		}
+        		if (error_message !== null) {
+        			if (CParamValidator.isDefined(rule.default) && CParamValidator.isType(rule.default, rule.type)) {
+        				params[key] = rule.default;
+        			}
+        			else {
+        				Zabbix.log(4, 'Default value for "' + key + '" must be a ' + rule.type + '. Skipped.');
+        				throw 'Incorrect value for variable "' + key + '". ' + error_message;
+        			}
+        		}
+        
+        		return this;
+        	},
+        
+        	validate: function(rules, params) {
+        		if (!CParamValidator.isType(params, 'object') || CParamValidator.isType(params, 'array')) {
+        			throw 'Incorrect parameters value. The value must be an object.';
+        		}
+        		for (var key in rules) {
+        			CParamValidator.check(key, rules[key], params);
+        		}
+        	}
+        }
+        
+        const CHttpRequest = function(logger) {
+        	this.request = new HttpRequest();
+        	if (typeof logger !== 'object' || logger === null) {
+        		this.logger = Zabbix;
+        	}
+        	else {
+        		this.logger = logger;
+        	}
+        
+        	this.clearHeader = function() {
+        		this.request.clearHeader();
+        	}
+        
+        	this.addHeaders = function(value) {
+        		var headers = [];
+        
+        		if (typeof value === 'object' && value !== null) {
+        			if (!Array.isArray(value)) {
+        				Object.keys(value).forEach(function(key) {
+        					headers.push(key + ': ' + value[key]);
+        				});
+        			}
+        			else {
+        				headers = value;
+        			}
+        		}
+        		else if (typeof value === 'string') {
+        			value.split('\r\n').forEach(function(header) {
+        				headers.push(header);
+        			});
+        		}
+        
+        		for (var idx in headers) {
+        			this.request.addHeader(headers[idx]);
+        		}
+        	}
+        
+        	this.setProxy = function(proxy) {
+        		this.request.setProxy(proxy);
+        	}
+        
+        	this.plainRequest = function(method, url, data) {
+        		var resp = null;
+        		method = method.toLowerCase();
+        		this.logger.log(4, 'Sending ' + method + ' request:' + JSON.stringify(data));
+        		if (['get', 'post', 'put', 'patch', 'delete', 'trace'].indexOf(method) !== -1) {
+        			resp = this.request[method](url, data);
+        		}
+        		else if (['connect', 'head', 'options'].indexOf(method) !== -1) {
+        			resp = this.request[method](url);
+        		}
+        		else {
+        			throw 'Unexpected method. Method ' + method + ' is not supported.';
+        		}
+        		this.logger.log(4, 'Response has been received: ' + resp);
+        
+        		return resp;
+        	}
+        
+        	this.jsonRequest = function(method, url, data) {
+        		this.addHeaders('Content-Type: application/json');
+        		var resp = this.plainRequest(method, url, JSON.stringify(data));
+        		try {
+        			resp = JSON.parse(resp);
+        		}
+        		catch (error) {
+        			throw 'Failed to parse response: not well-formed JSON was received';
+        		}
+        
+        		return resp;
+        	}
+        
+        	this.getStatus = function() {
+        		return this.request.getStatus();
+        	}
+        }
+        
+        const CWebhookHelper = {
+        
+        	createProblemURL: function(event_source, zabbix_url, trigger_id, event_id) {
+        		if (event_source === '0') {
+        			return zabbix_url + '/tr_events.php?triggerid=' + trigger_id + '&eventid=' + event_id;
+        		} else if (event_source === '4') {
+        			return zabbix_url + '/zabbix.php?action=service.list';
+        		}
+        
+        		return zabbix_url;
+        	},
+        
         };
         
+        const serviceLogName = 'GLPi Webhook',
+        	Logger = new CLogger(serviceLogName),
+        	GLPi = CWebhook;
+        
+        GLPi.prototype.onCheckParams = function () {
+        	CParamValidator.validate({
+        		alert_message: { type: 'string' },
+        		alert_subject: { type: 'string' },
+        		zabbix_url: { type: 'string', url: true },
+        		glpi_url: { type: 'string', url: true },
+        		glpi_token: { type: 'string' }
+        	}, this.params);
+        
+        	if (this.params.event_source === '0') {
+        		CParamValidator.validate({ trigger_id: { type: 'integer' }, event_id: { type: 'integer' } }, this.params);
+        		this.params.zabbix_url = CWebhookHelper.createProblemURL(this.params.event_source, this.params.zabbix_url, this.params.trigger_id, this.params.event_id);
+        	}
+        
+        	if (params.event_value != '0' && CParamValidator.isMacroSet(this.params.glpi_problem_id)) {
+        		this.params.event_update_status = '1';
+        	}
+        
+        	this.data = {
+        		input: {
+        			name: this.params.alert_subject,
+        			urgency: (this.params.event_nseverity = isNaN(Number(this.params.event_nseverity)) ? 2 : this.params.event_nseverity)
+        		}
+        	};
+        
+        	this.dataFollowup = {
+        		input: {
+        			items_id: this.params.glpi_problem_id,
+        			itemtype: 'Problem',
+        			content: this.params.alert_message + '<br> <a href=' + this.params.zabbix_url + '>Link to problem in Zabbix</a>',
+        		}
+        	};
+        
+        	this.result = { tags: {} };
+        }
+        
+        GLPi.prototype.getAuthToken = function () {
+        
+        	this.request.addHeaders('Authorization: user_token ' + this.params.glpi_token);
+        	var response = this.request.jsonRequest('post', this.params.glpi_url + '/apirest.php/initSession');
+        
+        	if ((this.request.getStatus() !== 200 && this.request.getStatus() !== 201)) {
+        		Logger.log(Logger.INFO, 'HTTP code: ' + this.request.getStatus());
+        		if (CParamValidator.isType(response.description, 'string')) {
+        			throw response.description;
+        		}
+        		else {
+        			Logger.log(Logger.INFO, 'Request not successful. Received response: ' + JSON.stringify(response));
+        			throw 'Unknown INFO. Check debug log for more information.';
+        		}
+        	}
+        	if (!CParamValidator.isType(response.session_token, 'string') || CParamValidator.isEmpty(response.session_token)) {
+        		Logger.log(Logger.INFO, 'Check getting GLPi sessionToken: ' + response.session_token);
+        		throw 'Required GLPi sessionToken is not received.';
+        	}
+        
+        	return response.session_token;
+        }
+        
+        GLPi.prototype.sendRequest = function (method, path, data) {
+        
+        	this.request.clearHeader();
+        	this.request.addHeaders('Session-Token:' + this.params.authToken);
+        	var response = this.request.jsonRequest(method, this.params.glpi_url + path, data);
+        
+        	if ((this.request.getStatus() !== 200 && this.request.getStatus() !== 201)) {
+        		Logger.log(Logger.INFO, 'HTTP code: ' + this.request.getStatus());
+        		if (CParamValidator.isType(response.description, 'string')) {
+        			throw response.description;
+        		}
+        		else {
+        			Logger.log(Logger.INFO, 'Request not successful. Received response: ' + JSON.stringify(response));
+        			throw 'Unknown INFO. Check debug log for more information.';
+        		}
+        	}
+        
+        	return response;
+        }
+        
+        GLPi.prototype.createProblem = function (status) {
+        	this.data.input.content = this.params.alert_message + '<br> <a href=' + this.params.zabbix_url + '>Link to problem in Zabbix</a>';
+        
+        	if (CParamValidator.isDefined(status)) {
+        		this.data.input.status = status;
+        	}
+        
+        	var response = this.sendRequest('post', '/apirest.php/Problem/', this.data);
+        
+        	if (!CParamValidator.isDefined(response.id)) {
+        		throw 'Cannot create GPLi problem. Check debug log for more information.';
+        	}
+        
+        	return response.id
+        }
+        
+        GLPi.prototype.updateProblem = function (status) {
+        	CParamValidator.validate({ glpi_problem_id: { type: 'string' } }, this.params);
+        	this.data.id = this.params.glpi_problem_id;
+        
+        	if (CParamValidator.isDefined(status)) {
+        		this.data.input.status = status;
+        	}
+        
+        	this.sendRequest('put', '/apirest.php/Problem/' + this.params.glpi_problem_id, this.data);
+        	this.sendRequest('post', '/apirest.php/Problem/' + this.params.glpi_problem_id + '/ITILFollowup', this.dataFollowup);
+        }
+        
+        GLPi.prototype.onProblem = function (alert) {
+        	Logger.log(Logger.INFO, 'Source: ' + alert.source + '; Event: ' + alert.event);
+        	const problem_id = this.createProblem(1)
+        
+        	this.result.tags.__zbx_glpi_problem_id = problem_id;
+        	this.result.tags.__zbx_glpi_link = this.params.glpi_url + '/front/problem.form.php?id=' + problem_id;
+        
+        	return this.result;
+        }
+        
+        GLPi.prototype.onUpdate = function (alert) {
+        	Logger.log(Logger.INFO, 'Source: ' + alert.source + '; Event: ' + alert.event);
+        	this.updateProblem();
+        
+        	return this.result;
+        }
+        
+        GLPi.prototype.onResolve = function (alert) {
+        	Logger.log(Logger.INFO, 'Source: ' + alert.source + '; Event: ' + alert.event);
+        	this.updateProblem(5);
+        
+        	return this.result;
+        }
+        
+        GLPi.prototype.onDiscovery = function () {
+        	return this.createProblem();
+        }
+        
+        GLPi.prototype.onAutoreg = function () {
+        	return this.createProblem();
+        }
+        
         try {
-            var params = JSON.parse(value),
-                glpi = {},
-                url = '',
-                data = {},
-                comment_data,
-                result = { tags: {} },
-                required_params = [
-                    'alert_subject', 'alert_message', 'event_source', 'event_value',
-                    'event_update_status', 'event_recovery_value',
-                    'event_id', 'trigger_id', 'zabbix_url',
-                    'glpi_token', 'glpi_url'
-                ],
-                method = 'post',
-                process_tags = true,
-                response;
-        
-            Object.keys(params)
-                .forEach(function (key) {
-                    if (key.startsWith('glpi_')) {
-                        glpi[key.substring(5)] = params[key];
-                    }
-                    else if (required_params.indexOf(key) !== -1 && params[key] === '') {
-                        throw 'Parameter "' + key + '" can\'t be empty.';
-                    }
-                });
-        
-            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
-                throw 'Incorrect "event_source" parameter given: ' + params.event_source + '\nMust be 0-3.';
-            }
-        
-            // Check {EVENT.VALUE} for trigger-based and internal events.
-            if (params.event_value !== '0' && params.event_value !== '1'
-                && (params.event_source === '0' || params.event_source === '3')) {
-                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
-            }
-        
-            // Check {EVENT.UPDATE.STATUS} only for trigger-based events.
-            if (params.event_update_status !== '0' && params.event_update_status !== '1' && params.event_source === '0') {
-                throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
-            }
-        
-            if (params.event_source !== '0' && params.event_recovery_value === '0') {
-                throw 'Recovery operations are supported only for trigger-based actions.';
-            }
-        
-            if (typeof params.zabbix_url !== 'string' || params.zabbix_url.trim() === '' || params.zabbix_url === '{$ZABBIX.URL}') {
-                throw 'Field "zabbix_url" cannot be empty.';
-            }
-        
-            // Check for backslash in the end of url and schema.
-            glpi.url = GLPi.urlCheckFormat(glpi.url);
-            params.zabbix_url = GLPi.urlCheckFormat(params.zabbix_url);
-        
-            glpi.authToken = GLPi.getAuthToken(glpi.url, glpi.token);
-            GLPi.setParams(glpi);
-        
-            data = {
-                'input': {
-                    'name': params.alert_subject,
-                    'content': params.alert_message + '\n<a href=' + GLPi.getProblemUrl(params.zabbix_url, params.trigger_id, params.event_id, params.event_source) + '>Link to problem in Zabbix</a>',
-                    'status': 1,  // Set status "New"
-                    'urgency': params.event_nseverity
-                }
-            };
-        
-            // In case of resolve
-            if (params.event_source === '0' && params.event_value === '0') {
-                process_tags = false;
-                dataFollowup = {
-                    'input': {
-                        'items_id': glpi.problem_id,
-                        'itemtype': 'Problem',
-                        'content': params.alert_message + '\n<a href=' + GLPi.getProblemUrl(params.zabbix_url, params.trigger_id, params.event_id, params.event_source) + '>Link to problem in Zabbix</a>'
-                    }
-                };
-                dataProblem = {
-                    'id': glpi.problem_id,
-                    'input': {
-                        'name': params.alert_subject,
-                        'status': 5,  // Set status "Solved"
-                        'urgency': params.event_nseverity
-                    }
-                };
-        
-                GLPi.request('put', glpi.url + 'apirest.php/Problem/' + glpi.problem_id, dataProblem);
-                GLPi.request('post', glpi.url + 'apirest.php/Problem/' + glpi.problem_id + '/ITILFollowup', dataFollowup);
-            }
-        
-            // In case of update
-            else if (params.event_source === '0' && params.event_update_status === '1') {
-                process_tags = false;
-                dataFollowup = {
-                    'input': {
-                        'items_id': glpi.problem_id,
-                        'itemtype': 'Problem',
-                        'content': params.alert_message + '\n<a href=' + GLPi.getProblemUrl(params.zabbix_url, params.trigger_id, params.event_id, params.event_source) + '>Link to problem in Zabbix</a>'
-                    }
-                };
-                dataProblem = {
-                    'id': glpi.problem_id,
-                    'input': {
-                        'name': params.alert_subject,
-                        'urgency': params.event_nseverity
-                    }
-                };
-        
-                GLPi.request('put', glpi.url + 'apirest.php/Problem/' + glpi.problem_id, dataProblem);
-                GLPi.request('post', glpi.url + 'apirest.php/Problem/' + glpi.problem_id + '/ITILFollowup', dataFollowup);
-            }
-        
-            // In case of problem
-            else {
-                response = GLPi.request('post', glpi.url + 'apirest.php/Problem/', data);
-            }
-        
-            if (process_tags) {
-                result.tags.__zbx_glpi_problem_id = response.id;
-                result.tags.__zbx_glpi_link = glpi.url + 'front/problem.form.php?id=' + response.id;
-            }
-        
-            Zabbix.log(4, '[ GLPi Webhook ] Result: ' + JSON.stringify(result));
-            return JSON.stringify(result);
+        	var hook = new GLPi(value);
+        	hook.request = new CHttpRequest(Logger);
+        	hook.params.authToken = hook.getAuthToken();
+        	return hook.run();
         }
         catch (error) {
-            Zabbix.log(4, '[ GLPi Webhook ] ERROR: ' + error);
-            throw 'Sending failed: ' + error;
+        	Logger.log(Logger.WARN, 'notification failed: ' + error);
+        	throw 'Sending failed: ' + error;
         }
       process_tags: 'YES'
       show_event_menu: 'YES'
       event_menu_url: '{EVENT.TAGS.__zbx_glpi_link}'
       event_menu_name: 'GLPi: Problem {EVENT.TAGS.__zbx_glpi_problem_id}'
+      description: |
+        https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/glpi
+        
+        1. To make this integration work, you will need the following from GLPi:
+          * GLPi instance URL;
+          * GLPi user token. API token obtained by going to Administration → Users → create or use existing user → Remote access keys → Regenerate API token.
+        2. In the Zabbix web interface, go to Administration → Macros section. Set up the global macro "{$ZABBIX.URL}" which will contain the URL to the Zabbix frontend.
+        3. On this page replace the placeholder '<...>' values with the ones from the step #1.
+        4. In Zabbix, you need to have a Zabbix user and add Media with the GLPi media type. Make sure this user has access to all hosts for which you would like problem issues to be created in GLPi.
       message_templates:
         - event_source: TRIGGERS
           operation_mode: PROBLEM
-          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
-          message: |
-            Problem started at {EVENT.TIME} on {EVENT.DATE}
-            Problem name: {EVENT.NAME}
-            Host: {HOST.NAME}
-            Severity: {EVENT.SEVERITY}
-            Operational data: {EVENT.OPDATA}
-            Original problem ID: {EVENT.ID}
-            {TRIGGER.URL}
+          subject: 'Problem: {EVENT.NAME}'
+          message: '<dl><dd><b>Problem started at</b> {EVENT.TIME} <b>on</b> {EVENT.DATE}</b></dd><dd><b>Problem name:</b> {EVENT.NAME}</dd><dd><b>Host:</b> {HOST.NAME}</dd><dd><b>Severity:</b> {EVENT.SEVERITY}</dd><dd><b>Operational data:</b> {EVENT.OPDATA}</dd><dd><b>Original problem ID:</b> {EVENT.ID}</dd></dl>{TRIGGER.URL}'
         - event_source: TRIGGERS
           operation_mode: RECOVERY
-          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
-          message: |
-            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
-            Problem name: {EVENT.NAME}
-            Host: {HOST.NAME}
-            Severity: {EVENT.SEVERITY}
-            Original problem ID: {EVENT.ID}
-            {TRIGGER.URL}
+          subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: '<dl><dd><b>Problem has been resolved in</b> {EVENT.DURATION} <b>at</b> {EVENT.RECOVERY.TIME} <b>on</b> {EVENT.RECOVERY.DATE}</dd><dd><b>Problem name:</b> {EVENT.NAME}</dd><dd><b>Host:</b> {HOST.NAME}</dd><dd><b>Severity:</b> {EVENT.SEVERITY}</dd><dd><b>Operational data:</b> {EVENT.OPDATA}</dd><dd><b>Original problem ID:</b> {EVENT.ID}</dd></dl>{TRIGGER.URL}'
         - event_source: TRIGGERS
           operation_mode: UPDATE
-          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
-          message: |
-            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
-            {EVENT.UPDATE.MESSAGE}
-            
-            Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
+          subject: 'Updated problem in {EVENT.AGE}: {EVENT.NAME}'
+          message: '{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at at {EVENT.UPDATE.TIME} on {EVENT.UPDATE.DATE}. <br><br>{EVENT.UPDATE.MESSAGE}<br><br>Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}.<br><br>'
         - event_source: DISCOVERY
           operation_mode: PROBLEM
           subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
-          message: |
-            Discovery rule: {DISCOVERY.RULE.NAME}
-            
-            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
-            Device DNS: {DISCOVERY.DEVICE.DNS}
-            Device status: {DISCOVERY.DEVICE.STATUS}
-            Device uptime: {DISCOVERY.DEVICE.UPTIME}
-            
-            Device service name: {DISCOVERY.SERVICE.NAME}
-            Device service port: {DISCOVERY.SERVICE.PORT}
-            Device service status: {DISCOVERY.SERVICE.STATUS}
-            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+          message: '<dl><dd><b>Discovery rule:</b> {DISCOVERY.RULE.NAME}</dd><br><dd><b>Device IP:</b> {DISCOVERY.DEVICE.IPADDRESS}</dd><dd><b>Device DNS:</b> {DISCOVERY.DEVICE.DNS}</dd><br><dd><b>Device status:</b> {DISCOVERY.DEVICE.STATUS}</dd><br><dd><b>Device uptime:</b> {DISCOVERY.DEVICE.UPTIME}</dd><br><dd><b>Device service name:</b> {DISCOVERY.SERVICE.NAME}</dd><dd><b>Device service port:</b> {DISCOVERY.SERVICE.PORT}</dd><dd><b>Device service status:</b> {DISCOVERY.SERVICE.STATUS}</dd><dd><b>Device service uptime:</b> {DISCOVERY.SERVICE.UPTIME}</dd></dl>'
         - event_source: AUTOREGISTRATION
           operation_mode: PROBLEM
           subject: 'Autoregistration: {HOST.HOST}'
-          message: |
-            Host name: {HOST.HOST}
-            Host IP: {HOST.IP}
-            Agent port: {HOST.PORT}
+          message: '<dl><dd><b>Host name:</b> {HOST.HOST}</dd><dd><b>Host IP:</b> {HOST.IP}</dd><dd><b>Agent port:</b> {HOST.PORT}</dd></dl>'
+        - event_source: INTERNAL
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: '<dl><dd><b>Problem started at</b> {EVENT.TIME} <b>on</b> {EVENT.DATE}</b></dd><dd><b>Problem name:</b> {EVENT.NAME}</dd><dd><b>Host:</b> {HOST.NAME}</dd><dd><b>Original problem ID:</b> {EVENT.ID}</dd></dl>'
+        - event_source: INTERNAL
+          operation_mode: RECOVERY
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: '<dl><dd><b>Problem has been resolved in</b> {EVENT.DURATION} <b>at</b> {EVENT.RECOVERY.TIME} <b>on</b> {EVENT.RECOVERY.DATE}</dd><dd><b>Problem name:</b> {EVENT.NAME}</dd><dd><b>Host:</b> {HOST.NAME}</dd><dd><b>Original problem ID:</b> {EVENT.ID}</dd></dl>'
+        - event_source: SERVICE
+          operation_mode: PROBLEM
+          subject: 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}'
+          message: '<dl><dd><b>Service problem started at</b> {EVENT.TIME} <b>on</b> {EVENT.DATE}</dd><dd><b>Service problem name:</b> {EVENT.NAME}</dd><dd><b>Service:</b> {SERVICE.NAME}</dd><dd><b>Severity:</b> {EVENT.SEVERITY}</dd><dd><b>Original problem ID:</b> {EVENT.ID}</dd><dd><b>Service description:</b> {SERVICE.DESCRIPTION}</dd><dd><b><br>{SERVICE.ROOTCAUSE}</dd></dl>'
+        - event_source: SERVICE
+          operation_mode: RECOVERY
+          subject: 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: '<dl><dd><b>Service {SERVICE.NAME} <b>has been resolved at</b> {EVENT.RECOVERY.TIME} <b>on</b> {EVENT.RECOVERY.DATE}</dd><dd><b>Problem name:</b> {EVENT.NAME}</dd><dd><b>Problem duration:</b> {EVENT.DURATION}</dd><dd><b>Severity:</b> {EVENT.SEVERITY}</dd><dd><b>Original problem ID:</b> {EVENT.ID}</dd><dd><b>Service description:</b {SERVICE.DESCRIPTION}</dd></dl>'
+        - event_source: SERVICE
+          operation_mode: UPDATE
+          subject: 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}'
+          message: '<dl><dd><b>Changed {SERVICE.NAME} <b>service status to</b> {EVENT.UPDATE.SEVERITY} <b>at</b> {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.</dd><dd><b>Current problem age is</b> {EVENT.AGE}.</dd><dd><b>Service description:</b> {SERVICE.DESCRIPTION}</dd><br>{SERVICE.ROOTCAUSE}</dd></dl>'
