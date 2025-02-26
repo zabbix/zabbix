@@ -40,7 +40,6 @@ void	zbx_mock_test_entry(void **state)
 		mock_dump_stack(&ctx);
 
 	result = zbx_eval_check_timer_functions(&ctx);
-
 	zbx_mock_assert_int_eq("return value", exp_result, result);
 	zbx_eval_clear(&ctx);
 	zbx_free(error);
