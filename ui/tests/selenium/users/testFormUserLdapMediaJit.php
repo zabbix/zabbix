@@ -198,11 +198,10 @@ class testFormUserLdapMediaJit extends CWebTest {
 			$this->assertTrue($row->getColumn('Type')
 					->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')->one()->isValid()
 			);
+			$this->assertEquals('Media type disabled by Administration.', $row->getColumn('Type')
+					->query('tag:button')->one()->getAttribute('data-hintbox-contents')
+			);
 		}
-
-		$this->assertEquals('Media type disabled by Administration.', $row->getColumn('Type')
-				->query('tag:button')->one()->getAttribute('data-hintbox-contents')
-		);
 
 		$this->assertEquals(count($media_with_hints),
 				$media_table->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')->count()
@@ -425,7 +424,6 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * @dataProvider getMediaEditData
 	 */
 	public function testFormUserLdapMediaJit_CheckEditableFields($data) {
-
 		if ($data['expected'] === TEST_BAD) {
 			$old_hash = CDBHelper::getHash(self::HASH_SQL);
 		}
@@ -466,7 +464,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 			$this->provisionLdapUser();
 			$this->page->logout();
 
-			// Log in as the provisioned user, and check that manually changed fields are not affected by the provisioning.
+			// Log in as the provisioned user, to check that changed fields are not affected by the provisioning.
 			$this->page->userLogin(PHPUNIT_LDAP_USERNAME, PHPUNIT_LDAP_USER_PASSWORD);
 			$this->page->open('zabbix.php?action=userprofile.notification.edit');
 			$this->checkMediaConfiguration($data, $data['media'], PHPUNIT_LDAP_USERNAME,
@@ -1325,7 +1323,8 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * @param string	$expected			name of the array with expected result
 	 * @param string	$selector			selector for a media table
 	 */
-	protected function checkMediaConfiguration($data, $media_type, $send_to, $expected = 'fields', $selector = 'id:mediaTab') {
+	protected function checkMediaConfiguration($data, $media_type, $send_to, $expected = 'fields',
+			$selector = 'id:mediaTab') {
 		// Check media type.
 		$row = $this->query($selector)->asTable()->one()->findRow('Type', $media_type);
 
