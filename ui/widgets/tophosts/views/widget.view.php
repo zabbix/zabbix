@@ -166,7 +166,9 @@ else {
 							->setTimePeriodFrom($column_config['sparkline']['time_period']['from_ts'])
 							->setTimePeriodTo($column_config['sparkline']['time_period']['to_ts'])
 						);
-						$row[] = createTextColumn($formatted_value, $column['value'] ?? '', $color);
+						$row[] = createTextColumn($formatted_value, $column['value'] ?? '', $color)
+							->addStyle('width: 0;')
+							->addClass(ZBX_STYLE_NOWRAP);
 					}
 					else {
 						$bar_gauge = createBarGauge($column, $column_config, $color);
@@ -176,7 +178,6 @@ else {
 							->addStyle('width: 0;')
 							->addItem(
 								(new CDiv($formatted_value))
-									->addClass(ZBX_STYLE_CURSOR_POINTER)
 									->addClass(ZBX_STYLE_NOWRAP)
 									->setHint((new CDiv($column['value']))->addClass(ZBX_STYLE_HINTBOX_WRAP))
 							);
@@ -257,7 +258,6 @@ function createTextColumn(string $formatted_value, string $hint_value, string $c
 		->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
 		->addItem(
 			(new CDiv($formatted_value))
-				->addClass(ZBX_STYLE_CURSOR_POINTER)
 				->setHint($hint)
 		);
 }
