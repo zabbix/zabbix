@@ -57,7 +57,7 @@ extern "C" static void	wmi_instance_clear(zbx_vector_wmi_prop_t *wmi_inst_value)
 	zbx_free(wmi_inst_value);
 }
 
-typedef int	(*zbx_parse_wmi_value_t)(IEnumWbemClassObject *pEnumerator, double timeout,
+typedef int	(*zbx_parse_wmi_value_func_t)(IEnumWbemClassObject *pEnumerator, double timeout,
 		zbx_vector_wmi_instance_t *wmi_values, char **error);
 
 extern "C" int	put_variant_json(const char *prop_json, const char *prop_err, VARIANT *vtProp, struct zbx_json *jdoc,
@@ -336,7 +336,7 @@ extern "C" static int	parse_wmi_value_all(IEnumWbemClassObject *pEnumerator, dou
  *                                                                             *
  *******************************************************************************/
 extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_query,
-		zbx_parse_wmi_value_t parse_wmi_value_cb, double timeout, zbx_vector_wmi_instance_t *wmi_values,
+		zbx_parse_wmi_value_func_t parse_wmi_value_cb, double timeout, zbx_vector_wmi_instance_t *wmi_values,
 		char **error)
 {
 	IWbemLocator		*pLoc = 0;
