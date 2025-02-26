@@ -53,13 +53,10 @@ class testFormUserLdapMediaJit extends CWebTest {
 	 * Enable media types before test.
 	 */
 	public function prepareJitMedia() {
-		$mediatypeids = CDBHelper::getAll('SELECT mediatypeid FROM media_type WHERE name IN ('.zbx_dbstr('iTop').', '
-				.zbx_dbstr('SMS').', '.zbx_dbstr('MS Teams Workflow').', '.zbx_dbstr('Slack').', '
-				.zbx_dbstr('OTRS').', '.zbx_dbstr('Opsgenie').', '.zbx_dbstr('Brevis.one').', '.zbx_dbstr('Github').', '
-				.zbx_dbstr('Discord').', '.zbx_dbstr('iLert').', '.zbx_dbstr('SIGNL4').', '.zbx_dbstr('SysAid').', '
-				.zbx_dbstr('Jira').', '.zbx_dbstr('Line').', '.zbx_dbstr('Email').', '.zbx_dbstr('PagerDuty').', '
-				.zbx_dbstr('Pushover').', '.zbx_dbstr('Telegram').', '.zbx_dbstr('Redmine').', '
-				.zbx_dbstr('Zammad').', '.zbx_dbstr('VictorOps').', '.zbx_dbstr('ServiceNow').')'
+		$mediatypeids = CDBHelper::getAll('SELECT mediatypeid FROM media_type WHERE name IN (\'iTop\', \'SMS\', '
+				.'\'MS Teams Workflow\', \'Slack\', \'OTRS\', \'Opsgenie\', \'Brevis.one\', \'Github\', \'Discord\', '
+				.'\'iLert\', \'SIGNL4\', \'SysAid\', \'Jira\', \'Line\', \'Email\', \'PagerDuty\', \'Pushover\', '
+				.'\'Telegram\', \'Redmine\', \'Zammad\', \'VictorOps\', \'ServiceNow\')'
 		);
 
 		$update_api = [];
