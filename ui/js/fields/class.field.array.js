@@ -47,7 +47,7 @@ class CFieldArray extends CField {
 		const result = [];
 
 		for (const field of this.#fields) {
-			const value = trim_value ? field.getValue() : field.getValueTrimmed();
+			const value = trim_value ? field.getValueTrimmed() : field.getValue();
 
 			if (value !== null) {
 				result.push(value);

@@ -143,6 +143,11 @@ class CConditionHelper {
 
 		$i = 0;
 		foreach ($conditionids as $conditionid) {
+			// Custom formula may contain deleted condition IDs.
+			if (!array_key_exists($conditionid, $conditions)) {
+				continue;
+			}
+
 			$conditions[$conditionid]['formulaid'] = num2letter($i);
 
 			$i++;
@@ -169,6 +174,16 @@ class CConditionHelper {
 	public static function replaceConditionIds(string &$formula, array $conditions): void {
 		foreach ($conditions as $conditionid => $condition) {
 			$formula = str_replace('{'.$conditionid.'}', $condition['formulaid'], $formula);
+		}
+
+		// Replace each deleted condition ID with the next letter.
+
+		preg_match_all('/\d+/', $formula, $matches);
+
+		$i = count($conditions);
+
+		foreach (array_keys(array_flip($matches[0])) as $conditionid) {
+			$formula = str_replace('{'.$conditionid.'}', num2letter($i++), $formula);
 		}
 	}
 

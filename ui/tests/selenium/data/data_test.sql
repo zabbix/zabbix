@@ -465,10 +465,10 @@ INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid
 INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (300003,'testFormGraph4',900,200,0.0,100.0,NULL,1,0,1,1,0,0.0,0.0,1,1,NULL,NULL,0);
 
 -- testFormGraph.LayoutCheck testFormGraph.SimpleUpdate
-INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (300000, 300000, 99102, 1, 1, 'FF5555', 0, 2, 0);
-INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (300001, 300001, 99102, 1, 1, 'FF5555', 0, 2, 0);
-INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (300002, 300002, 99102, 1, 1, 'FF5555', 0, 2, 0);
-INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (300003, 300003, 99102, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (1300000, 300000, 99102, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (1300001, 300001, 99102, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (1300002, 300002, 99102, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (1300003, 300003, 99102, 1, 1, 'FF5555', 0, 2, 0);
 
 -- testFormDiscoveryRule.SimpleUpdate
 INSERT INTO items (name, key_, hostid, value_type, itemid, flags, delay, params, description,query_fields, interfaceid, posts, headers) VALUES ('testFormDiscoveryRule1', 'discovery-rule-form1', 40001, 4, 10080, 1,  50, '', '','', 40011, '', '');
@@ -812,9 +812,9 @@ INSERT INTO icon_mapping (iconmappingid, iconmapid, iconid, inventory_link, expr
 -- Create two triggers with event
 INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('Test trigger to check tag filter on problem page','{100185}>100','0','0','','3','','1','0','0','','','99250');
 INSERT INTO functions (functionid,triggerid,itemid,name,parameter) VALUES ('100185','99250','42253','avg','$,5m');
-INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Service','abc','99250','8997');
-INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('service','abcdef','99250','8998');
-INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Database','','99250','8999');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Service','abc','99250','98997');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('service','abcdef','99250','98998');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Database','','99250','98999');
 INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name,severity) VALUES (92,0,0,99250,1603456428,128786843,1,'Test trigger to check tag filter on problem page',3);
 INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (90,92,'Service','abc'),(91,92,'service','abcdef'),(92,92,'Database',''),(98,92,'Tag4',''),(99,92,'Tag5','5');
 INSERT INTO problem (eventid,source,object,objectid,clock,ns,name,severity) VALUES (92,0,0,99250,1603456428,128786843,'Test trigger to check tag filter on problem page',3);
@@ -822,7 +822,7 @@ INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (90,92,'Service'
 
 INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('Test trigger with tag','{100186}>100','0','0','','2','','1','0','0','','','99251');
 INSERT INTO functions (functionid,triggerid,itemid,name,parameter) VALUES ('100186','99251','42253','avg','$,5m');
-INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Service','abc','99251','9000');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Service','abc','99251','99000');
 INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name,severity) VALUES (93,0,0,99251,1603466628,128786843,1,'Test trigger with tag',2);
 INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (93,93,'Service','abc');
 INSERT INTO problem (eventid,source,object,objectid,clock,ns,name,severity) VALUES (93,0,0,99251,1603466628,128786843,'Test trigger with tag',2);
@@ -918,10 +918,10 @@ INSERT INTO host_discovery (hostid, parent_hostid, parent_itemid, host, lastchec
 -- testPageProblems_TagPriority
 INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('First test trigger with tag priority','{100181}>100','0','1','','2','','1','0','0','','','99252');
 INSERT INTO functions (functionid,triggerid,itemid,name,parameter) VALUES ('100181','99252','42253','avg','$,5m');
-INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Delta','d','99252','9005');
-INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Beta','b','99252','9006');
-INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Alpha','a','99252','9007');
-INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Gamma','g','99252','9008');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Delta','d','99252','99005');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Beta','b','99252','99006');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Alpha','a','99252','99007');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Gamma','g','99252','99008');
 INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name,severity) VALUES (96,0,0,99252,1534495628,128786843,1,'First test trigger with tag priority',2);
 INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (100,96,'Delta','d');
 INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (101,96,'Beta','b');
@@ -935,10 +935,10 @@ INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (103,96,'Gamma',
 
 INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('Second test trigger with tag priority','{100182}>100','0','1','','2','','1','0','0','','','99253');
 INSERT INTO functions (functionid,triggerid,itemid,name,parameter) VALUES ('100182','99253','42253','avg','$,5m');
-INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Zeta','z','99253','9009');
-INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Beta','b','99253','9010');
-INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Epsilon','e','99253','9011');
-INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Eta','e','99253','9012');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Zeta','z','99253','99009');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Beta','b','99253','99010');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Epsilon','e','99253','99011');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Eta','e','99253','99012');
 INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name,severity) VALUES (97,0,0,99253,1534495628,128786843,1,'Second test trigger with tag priority',2);
 INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (104,97,'Zeta','z');
 INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (105,97,'Beta','b');
@@ -952,10 +952,10 @@ INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (107,97,'Eta','e
 
 INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('Third test trigger with tag priority','{100183}>100','0','1','','2','','1','0','0','','','99254');
 INSERT INTO functions (functionid,triggerid,itemid,name,parameter) VALUES ('100183','99254','42253','avg','$,5m');
-INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Kappa','k','99254','9013');
-INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Iota','i','99254','9014');
-INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Alpha','a','99254','9015');
-INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Theta','t','99254','9016');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Kappa','k','99254','99013');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Iota','i','99254','99014');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Alpha','a','99254','99015');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Theta','t','99254','99016');
 INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name,severity) VALUES (98,0,0,99254,1534495628,128786843,1,'Third test trigger with tag priority',2);
 INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (108,98,'Kappa','k');
 INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (109,98,'Iota','i');
@@ -969,10 +969,10 @@ INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (111,98,'Theta',
 
 INSERT INTO triggers (description,expression,recovery_mode,type,url,priority,comments,manual_close,status,correlation_mode,recovery_expression,correlation_tag,triggerid) VALUES ('Fourth test trigger with tag priority','{100184}>100','0','1','','2','','1','0','0','','','99255');
 INSERT INTO functions (functionid,triggerid,itemid,name,parameter) VALUES ('100184','99255','42253','avg','$,5m');
-INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Eta','e','99255','9017');
-INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Gamma','g','99255','9018');
-INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Theta','t','99255','9019');
-INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Delta','d','99255','9020');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Eta','e','99255','99017');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Gamma','g','99255','99018');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Theta','t','99255','99019');
+INSERT INTO trigger_tag (tag,value,triggerid,triggertagid) VALUES ('Delta','d','99255','99020');
 INSERT INTO events (eventid,source,object,objectid,clock,ns,value,name,severity) VALUES (99,0,0,99254,1534495628,128786843,1,'Fourth test trigger with tag priority',2);
 INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (112,99,'Eta','e');
 INSERT INTO event_tag (eventtagid,eventid,tag,value) VALUES (113,99,'Gamma','g');
@@ -993,7 +993,7 @@ INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfa
 INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (99087, 'Trapper_for_suppression', 'TRAPPER_FOR_SUPPRESSION');
 INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100031, 'Trigger_for_suppression', '{100031}>0', 1, 3, 0, '1535012391', '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100031, 99087, 100031, 'last', '$,#1');
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9004, 'SupTag','A', 100031);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99004, 'SupTag','A', 100031);
 
 INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till,tags_evaltype) VALUES (4,'Maintenance for suppression test',0,'',1534971600,2147378400,2);
 INSERT INTO maintenances_hosts (maintenance_hostid, maintenanceid, hostid) VALUES (3,4,99011);
@@ -1120,31 +1120,31 @@ INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (990
 
 INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100060, 'First trigger for tag filtering', '{100060}>0', 0, 1, 0, '0', '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100060, 99090, 100060, 'last', '$');
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9030, 'TagA','A', 100060);
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9031, 'TagB','b', 100060);
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9032, 'TagD','d', 100060);
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9033, 'TagG','g', 100060);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99030, 'TagA','A', 100060);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99031, 'TagB','b', 100060);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99032, 'TagD','d', 100060);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99033, 'TagG','g', 100060);
 
 INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100061, 'Second trigger for tag filtering', '{100061}>0', 0, 2, 0, '0', '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100061, 99090, 100061, 'last', '$');
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9034, 'TagB','b', 100061);
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9035, 'TagE','e', 100061);
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9036, 'TagE1','e', 100061);
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9037, 'TagZ','z', 100061);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99034, 'TagB','b', 100061);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99035, 'TagE','e', 100061);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99036, 'TagE1','e', 100061);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99037, 'TagZ','z', 100061);
 
 INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100062, 'Third trigger for tag filtering', '{100062}>0', 0, 3, 0, '0', '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100062, 99090, 100062, 'last', '$');
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9038, 'TagA','a', 100062);
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9039, 'TagI','i', 100062);
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9040, 'TagK','k', 100062);
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9041, 'TagT','t', 100062);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99038, 'TagA','a', 100062);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99039, 'TagI','i', 100062);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99040, 'TagK','k', 100062);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99041, 'TagT','t', 100062);
 
 INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100063, 'Fourth trigger for tag filtering', '{100063}>0', 0, 4, 0, '0', '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100063, 99090, 100063, 'last', '$');
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9042, 'TagD','d', 100063);
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9043, 'TagE1','e', 100063);
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9044, 'TagG','g', 100063);
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9045, 'TagT','t', 100063);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99042, 'TagD','d', 100063);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99043, 'TagE1','e', 100063);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99044, 'TagG','g', 100063);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99045, 'TagT','t', 100063);
 
 INSERT INTO triggers (triggerid, description, expression, value, priority, state, lastchange, comments) VALUES (100064, 'Fifth trigger for tag filtering (no tags)', '{100064}>0', 0, 5, 0, '0', '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100064, 99090, 100064, 'last', '$');
@@ -1248,8 +1248,8 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99913, 99061, 1)
 INSERT INTO items (itemid, type, hostid, name, description, key_, interfaceid,query_fields, params, posts, headers) VALUES (99092, 2, 99061, 'Inheritance item for triggers filtering', '', 'trap', NULL,'', '', '', '');
 INSERT INTO triggers (triggerid, description, expression, priority, state, comments) VALUES (100065, 'Inheritance trigger with tags', '{100065}>0',3, 1, '');
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100065, 99092, 100065, 'last', '$');
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9046, 'server','selenium', 100065);
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9047, 'Street','dzelzavas', 100065);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99046, 'server','selenium', 100065);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99047, 'Street','dzelzavas', 100065);
 
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (99062, 'Host for triggers filtering', 'Host for triggers filtering', 0, '');
 INSERT INTO hstgrp (groupid, name, type) VALUES (50014,'Group to check triggers filtering',0);
@@ -1264,8 +1264,8 @@ INSERT INTO item_rtname (itemid, name_resolved, name_resolved_upper) VALUES (990
 
 INSERT INTO triggers (triggerid, description, expression, value, comments, templateid, state, error) VALUES (100066, 'Inheritance trigger with tags', '{100067}=0', 1,'', 100065, 1, 'selenium trigger cannot be evaluated for some reason');
 INSERT INTO functions (functionid, triggerid, itemid, name, parameter) VALUES (100067, 100066, 99093, 'last', '$');
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9048, 'server','selenium', 100066);
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9049, 'Street','Dzelzavas', 100066);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99048, 'server','selenium', 100066);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99049, 'Street','Dzelzavas', 100066);
 INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (9008, 0, 0, 100066, 1535012391, 445429746,1, 'Inheritance trigger with tags', 3);
 INSERT INTO event_tag (eventtagid, eventid, tag, value) VALUES (116, 9008, 'server', 'selenium');
 INSERT INTO event_tag (eventtagid, eventid, tag, value) VALUES (117, 9008, 'Street', 'Dzelzavas');
@@ -1274,8 +1274,8 @@ INSERT INTO problem_tag (problemtagid, eventid, tag, value) VALUES (116, 9008, '
 INSERT INTO problem_tag (problemtagid, eventid, tag, value) VALUES (117, 9008, 'Street', 'Dzelzavas');
 INSERT INTO triggers (triggerid, description, expression, status, value, priority, comments, state) VALUES (100067, 'Trigger disabled with tags', '{100067}>0', 1, 0, 3, '', 0);
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100068, 99094, 100067, 'last', '$');
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9050, 'Street','Dzelzavas', 100067);
-INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (9051, 'country','latvia', 100067);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99050, 'Street','Dzelzavas', 100067);
+INSERT INTO trigger_tag (triggertagid, tag, value, triggerid) VALUES (99051, 'country','latvia', 100067);
 INSERT INTO trigger_depends (triggerdepid, triggerid_down, triggerid_up) VALUES (99000, 100066, 100067);
 INSERT INTO triggers (triggerid, description, expression, status, value, priority, comments, state) VALUES (100070, 'Dependent trigger ONE', '{100067}>0', 0, 0, 4, '', 0);
 INSERT INTO functions (functionid, itemid, triggerid, name, parameter) VALUES (100071, 99094, 100070, 'last', '$');
@@ -1367,8 +1367,8 @@ INSERT INTO hostmacro (hostmacroid, hostid, macro, value, description) VALUES (9
 
 -- testPageTriggerUrl
 INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1020, 'Dashboard for Trigger overview widget', 1, 1);
-INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (15670, 1020);
-INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100003, 15670, 'trigover', 'Group to check Overview', 0, 0, 12, 7);
+INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (156700, 1020);
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100003, 156700, 'trigover', 'Group to check Overview', 0, 0, 12, 7);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (1345, 100003, 0, 'layout', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_groupid) VALUES (1346, 100003, 2, 'groupids', 0, 50011);
 

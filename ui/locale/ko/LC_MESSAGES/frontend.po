@@ -2662,11 +2662,21 @@ msgstr "기본 MFA 방법을 삭제할 수 없습니다."
 msgid "Cannot delete default user directory."
 msgstr "기본 사용자 디렉터리를 삭제할 수 없습니다."
 
+#: include/classes/api/services/CDRule.php:772
+#, c-format
+msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "디스커버리 규칙을 삭제할 수 없습니다"
+
+#: include/classes/api/services/CDRule.php:979
+#, c-format
+msgid "Cannot delete discovery rule \"%1$s\": %2$s."
+msgstr ""
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2688,6 +2698,11 @@ msgid "Cannot delete host"
 msgid_plural "Cannot delete hosts"
 msgstr[0] "호스트를 삭제할 수 없습니다"
 
+#: include/classes/api/services/CHost.php:1631
+#, c-format
+msgid "Cannot delete host \"%1$s\": %2$s."
+msgstr ""
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2698,6 +2713,11 @@ msgstr[0] "유지 관리 \"%2$s\"에 하나 이상의 호스트 또는 호스트
 msgid "Cannot delete host group"
 msgid_plural "Cannot delete host groups"
 msgstr[0] "호스트 그룹을 삭제할 수 없습니다."
+
+#: include/classes/api/services/CHostGroup.php:767
+#, c-format
+msgid "Cannot delete host group \"%1$s\": %2$s."
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2826,6 +2846,11 @@ msgid "Cannot delete template"
 msgid_plural "Cannot delete templates"
 msgstr[0] ""
 
+#: include/classes/api/services/CTemplate.php:805
+#, c-format
+msgid "Cannot delete template \"%1$s\": %2$s."
+msgstr ""
+
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
@@ -2858,6 +2883,11 @@ msgstr "템플릿의 \"%1$s\" 웹 시나리오를 삭제할 수 없습니다."
 msgid "Cannot delete trigger"
 msgid_plural "Cannot delete triggers"
 msgstr[0] ""
+
+#: include/classes/api/managers/CTriggerManager.php:126
+#, c-format
+msgid "Cannot delete trigger \"%1$s\": %2$s."
+msgstr ""
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
@@ -4330,6 +4360,10 @@ msgstr "DNS서비스 기동 체크. DNS가 다운(서버가 응답하지 않거�
 #: include/classes/data/CItemData.php:1623
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
 msgstr "파일이 존재하는지 확인합니다. 0을 반환합니다 - 찾을 수 없습니다. 1 - 지정된 유형의 파일이 존재합니다."
+
+#: include/classes/data/CItemData.php:1115
+msgid "Checks if host is accessible by ICMP ping with retries. 0 - ICMP ping fails. 1 - ICMP ping successful."
+msgstr ""
 
 #: include/classes/data/CItemData.php:969
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
@@ -6517,6 +6551,22 @@ msgstr "웹 시나리오를 삭제하시겠습니까?"
 #: app/controllers/CControllerAuditLogList.php:382
 msgid "Deleted"
 msgstr "삭제됨"
+
+#: include/actions.inc.php:143
+msgid "Deleted host"
+msgstr ""
+
+#: include/actions.inc.php:125
+msgid "Deleted host group"
+msgstr ""
+
+#: include/actions.inc.php:710
+msgid "Deleted host group(s)"
+msgstr ""
+
+#: include/actions.inc.php:134
+msgid "Deleted trigger"
+msgstr ""
 
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
@@ -13380,6 +13430,10 @@ msgstr "메뉴 항목 이름은 이벤트 컨텍스트 메뉴에서 트리거 UR
 msgid "Menu path"
 msgstr "메뉴 경로"
 
+#: widgets/piechart/includes/WidgetForm.php:149
+msgid "Merge sectors smaller than"
+msgstr ""
+
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
 msgstr "다음보다 작은 섹터 병합"
@@ -17731,6 +17785,11 @@ msgstr "Zabbix 서버에서 스크립트 \"%1$s\" 실행"
 msgid "Run script \"%1$s\" on current host"
 msgstr "현재 호스트에서 스크립트 \"%1$s\" 실행"
 
+#: include/actions.inc.php:601
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr ""
+
 #: include/actions.inc.php:622
 #, c-format
 msgid "Run script \"%1$s\" on host groups"
@@ -20385,6 +20444,14 @@ msgstr "테마"
 #: app/views/mediatype.edit.php:189 app/views/mediatype.test.edit.php:48
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "이러한 매개변수는 지정된 순서에 따라 명령줄 인수로 스크립트에 전달됩니다."
+
+#: app/views/action.list.php:163
+msgid "This action has conditions or operations referencing deleted object(s)."
+msgstr ""
+
+#: app/views/action.list.php:158
+msgid "This action has missing conditions or operations due to previously deleted object(s)."
+msgstr ""
 
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
@@ -23904,6 +23971,41 @@ msgstr "abs() - 절대값"
 #: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() - 라디안으로 표현되는 각도 값의 아크코사인"
+
+#: include/classes/api/services/CDRule.php:773
+#, c-format
+msgid "action \"%1$s\" uses this discovery check"
+msgstr ""
+
+#: include/classes/api/services/CDRule.php:980
+#, c-format
+msgid "action \"%1$s\" uses this discovery rule"
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1632
+#, c-format
+msgid "action \"%1$s\" uses this host"
+msgstr ""
+
+#: include/classes/api/services/CHostGroup.php:768
+#, c-format
+msgid "action \"%1$s\" uses this host group"
+msgstr ""
+
+#: include/classes/api/services/CService.php:487
+#, c-format
+msgid "action \"%1$s\" uses this service"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:806
+#, c-format
+msgid "action \"%1$s\" uses this template"
+msgstr ""
+
+#: include/classes/api/managers/CTriggerManager.php:127
+#, c-format
+msgid "action \"%1$s\" uses this trigger"
+msgstr ""
 
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144
