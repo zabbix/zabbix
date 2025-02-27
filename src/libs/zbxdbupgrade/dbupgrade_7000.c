@@ -157,6 +157,26 @@ static int	DBpatch_7000015(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7000016(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* 1 - ZBX_FLAG_DISCOVERY */
+	/* 2 - LIFETIME_TYPE_IMMEDIATELY */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update items"
+				" set enabled_lifetime_type=2"
+				" where flags=1"
+					" and lifetime_type=2"
+					" and enabled_lifetime_type<>2"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7000)
@@ -179,5 +199,6 @@ DBPATCH_ADD(7000012, 0, 0)
 DBPATCH_ADD(7000013, 0, 0)
 DBPATCH_ADD(7000014, 0, 0)
 DBPATCH_ADD(7000015, 0, 0)
+DBPATCH_ADD(7000016, 0, 0)
 
 DBPATCH_END()
