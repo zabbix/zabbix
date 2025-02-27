@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/CastableTrait.php';
 use Facebook\WebDriver\WebDriverExpectedCondition;
 use Facebook\WebDriver\Remote\RemoteWebElement;
 use Facebook\WebDriver\WebDriverKeys;
+use Facebook\WebDriver\Interactions\WebDriverActions;
 
 /**
  * Generic web page element.
@@ -567,6 +568,18 @@ class CElement extends CBaseElement implements IWaitable {
 			$this->reload();
 			CElementQuery::getDriver()->executeScript('arguments[0].click();', [$this]);
 		}
+
+		return $this;
+	}
+
+	/**
+	 * Double-click on element.
+	 *
+	 * @return $this
+	 */
+	public function doubleClick() {
+		$actions = new WebDriverActions(CElementQuery::getDriver());
+		$actions->doubleClick($this)->perform();
 
 		return $this;
 	}
