@@ -19,7 +19,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
- * @dataSource Maps, CopyWidgetsDashboards
+ * @dataSource Maps, CopyWidgetsDashboards, WidgetCommunication
  *
  * @backup sysmaps
  *
@@ -296,6 +296,8 @@ class testPageMaps extends CWebTest {
 						self::SYSMAP_FIRST_A,
 						'Local network',
 						'Map for form testing',
+						'Map for testing feedback',
+						'Map for widget communication test',
 						'Map for widget copies',
 						self::SYSMAP_SPACES_NAME,
 						self::SYSMAP_HIGH_HEIGHT,

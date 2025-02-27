@@ -1256,7 +1256,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 
 	for (int i = 0; i < preproc->steps_num; i++)
 	{
-		zbx_variant_t		history_value_out, history_none;
+		zbx_variant_t		history_value_out, history_none = {0};
 		const zbx_variant_t	*history_value_in;
 		zbx_timespec_t		history_ts;
 

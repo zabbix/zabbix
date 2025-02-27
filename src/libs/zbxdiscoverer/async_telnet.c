@@ -14,6 +14,7 @@
 
 #include "async_telnet.h"
 
+#include "zbxasyncpoller.h"
 #include "zbxpoller.h"
 #include "zbxtimekeeper.h"
 #include "zbxcomms.h"
@@ -63,7 +64,7 @@ static zbx_telnet_protocol_step_t	async_telnet_recv(zbx_telnet_context_t *telnet
 	zbx_socket_t		*s = &telnet_context->s;
 	zbx_recv_context_t	*r = &telnet_context->recv_context;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s():%d", __func__, r->state);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s():%u", __func__, r->state);
 
 	if (ZABBIX_TELNET_PROTOCOL_SEND == r->state)
 		r->state = ZABBIX_TELNET_PROTOCOL_RECV_FIRST;
@@ -148,7 +149,7 @@ static zbx_telnet_protocol_step_t	async_telnet_recv(zbx_telnet_context_t *telnet
 	}
 	while (0 < nbytes);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() state:%d buff:%d", __func__, r->state, r->buff.values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() state:%u buff:%d", __func__, r->state, r->buff.values_num);
 
 	return r->state;
 
@@ -160,8 +161,8 @@ static zbx_telnet_protocol_step_t	async_telnet_recv(zbx_telnet_context_t *telnet
 #undef OPT_SGA
 }
 
-static int	telnet_task_process(short event, void *data, int *fd, const char *addr, char *dnserr,
-		struct event *timeout_event)
+static int	async_task_process_task_telnet_cb(short event, void *data, int *fd, zbx_vector_address_t *addresses,
+		const char *reverse_dns, char *dnserr, struct event *timeout_event)
 {
 #	define	SET_RESULT_SUCCEED								\
 		SET_UI64_RESULT(&telnet_context->item.result, 1);				\
@@ -184,6 +185,7 @@ static int	telnet_task_process(short event, void *data, int *fd, const char *add
 	short				event_new = 0;
 	zbx_async_task_state_t		state;
 	zbx_telnet_protocol_step_t	rc;
+	const char			*addr = 0 != addresses->values_num ? addresses->values[0].ip : NULL;
 
 	ZBX_UNUSED(dnserr);
 	ZBX_UNUSED(timeout_event);
@@ -195,13 +197,12 @@ static int	telnet_task_process(short event, void *data, int *fd, const char *add
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64 " addr:%s", __func__,
-				get_telnet_step_string(telnet_context->step), event, telnet_context->item.itemid, addr);
-
+			get_telnet_step_string(telnet_context->step), event, telnet_context->item.itemid, addr);
 
 	if (ZABBIX_ASYNC_STEP_REVERSE_DNS == telnet_context->rdns_step)
 	{
-		if (NULL != addr)
-			telnet_context->reverse_dns = zbx_strdup(NULL, addr);
+		if (NULL != reverse_dns)
+			telnet_context->reverse_dns = zbx_strdup(NULL, reverse_dns);
 
 		goto stop;
 	}
@@ -331,7 +332,8 @@ void	zbx_async_check_telnet_free(zbx_telnet_context_t *telnet_context)
 	zbx_free(telnet_context);
 }
 
-void	zbx_async_check_telnet(zbx_dc_item_t *item, zbx_async_task_clear_cb_t clear_cb, void *arg,
+void	zbx_async_check_telnet(zbx_dc_item_t *item,
+		zbx_async_task_process_result_cb_t async_task_process_result_telnet_cb, void *arg,
 		void *arg_action, struct event_base *base, struct evdns_base *dnsbase, const char *config_source_ip,
 		zbx_async_resolve_reverse_dns_t resolve_reverse_dns)
 {
@@ -374,8 +376,8 @@ void	zbx_async_check_telnet(zbx_dc_item_t *item, zbx_async_task_clear_cb_t clear
 
 	telnet_context->step = ZABBIX_TELNET_STEP_CONNECT_INIT;
 
-	zbx_async_poller_add_task(base, dnsbase, telnet_context->item.interface.addr, telnet_context,
-			item->timeout + 1, telnet_task_process, clear_cb);
+	zbx_async_poller_add_task(base, NULL, dnsbase, telnet_context->item.interface.addr, telnet_context,
+			item->timeout + 1, async_task_process_task_telnet_cb, async_task_process_result_telnet_cb);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

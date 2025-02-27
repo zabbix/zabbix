@@ -2730,6 +2730,11 @@ msgstr "Невозможно удалить MFA метод по умолчани
 msgid "Cannot delete default user directory."
 msgstr "Не получилось удалить каталог пользователя по умолчанию."
 
+#: include/classes/api/services/CDRule.php:772
+#, c-format
+msgid "Cannot delete discovery check \"%1$s\" of discovery rule \"%2$s\": %3$s."
+msgstr ""
+
 #: app/controllers/CControllerDiscoveryDelete.php:68 host_discovery.php:390
 #: host_discovery.php:597
 msgid "Cannot delete discovery rule"
@@ -2737,6 +2742,11 @@ msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Не удалось удалить правило обнаружения"
 msgstr[1] "Не удалось удалить правила обнаружения"
 msgstr[2] "Не удалось удалить правила обнаружения"
+
+#: include/classes/api/services/CDRule.php:979
+#, c-format
+msgid "Cannot delete discovery rule \"%1$s\": %2$s."
+msgstr ""
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
@@ -2766,6 +2776,11 @@ msgstr[0] "Не удалось удалить узел сети"
 msgstr[1] "Не удалось удалить узелы сети"
 msgstr[2] "Не удалось удалить узелы сети"
 
+#: include/classes/api/services/CHost.php:1631
+#, c-format
+msgid "Cannot delete host \"%1$s\": %2$s."
+msgstr ""
+
 #: include/classes/api/services/CHost.php:1461
 #, c-format
 msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at least one host or host group."
@@ -2780,6 +2795,11 @@ msgid_plural "Cannot delete host groups"
 msgstr[0] "Не удалось удалить группу узлов сети"
 msgstr[1] "Не удалось удалить группы узлов сети"
 msgstr[2] "Не удалось удалить групп узлов сети"
+
+#: include/classes/api/services/CHostGroup.php:767
+#, c-format
+msgid "Cannot delete host group \"%1$s\": %2$s."
+msgstr ""
 
 #: include/classes/api/services/CHostGroup.php:858
 #, c-format
@@ -2938,6 +2958,11 @@ msgstr[0] "Не удалось удалить шаблон"
 msgstr[1] "Не удалось удалить шаблоны"
 msgstr[2] "Не удалось удалить шаблоны"
 
+#: include/classes/api/services/CTemplate.php:805
+#, c-format
+msgid "Cannot delete template \"%1$s\": %2$s."
+msgstr ""
+
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
 msgid_plural "Cannot delete template groups"
@@ -2974,6 +2999,11 @@ msgid_plural "Cannot delete triggers"
 msgstr[0] "Не удалось удалить триггер"
 msgstr[1] "Не удалось удалить триггеры"
 msgstr[2] "Не удалось удалить триггеры"
+
+#: include/classes/api/managers/CTriggerManager.php:126
+#, c-format
+msgid "Cannot delete trigger \"%1$s\": %2$s."
+msgstr ""
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
 msgid "Cannot delete trigger prototype"
@@ -4031,6 +4061,11 @@ msgstr "Не удалось обновить \"%1$s\" для шаблонног�
 msgid "Cannot update \"%1$s\" for templated trigger prototype \"%2$s\"."
 msgstr "Не удалось обновить \"%1$s\" для шаблонного прототипа графика \"%2$s\"."
 
+#: include/classes/api/helpers/CApiSettingsHelper.php:94
+#, c-format
+msgid "Cannot update \"%1$s\" parameter because currently it is read-only. Consider upgrading Zabbix to remove this limitation."
+msgstr ""
+
 #: include/classes/api/services/CHost.php:2344
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
@@ -4536,6 +4571,10 @@ msgstr "Проверка доступности DNS сервиса. Возвра
 #: include/classes/data/CItemData.php:1623
 msgid "Checks if file exists. Returns 0 - not found; 1 - file of the specified type exists"
 msgstr "Проверка существования файла. Возвращает 0 - не найден; 1 - файл указанного типа существует"
+
+#: include/classes/data/CItemData.php:1115
+msgid "Checks if host is accessible by ICMP ping with retries. 0 - ICMP ping fails. 1 - ICMP ping successful."
+msgstr ""
 
 #: include/classes/data/CItemData.php:969
 msgid "Checks if host is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful."
@@ -6737,6 +6776,22 @@ msgstr "Удалить веб-сценарий?"
 #: app/controllers/CControllerAuditLogList.php:382
 msgid "Deleted"
 msgstr "Удалено"
+
+#: include/actions.inc.php:143
+msgid "Deleted host"
+msgstr ""
+
+#: include/actions.inc.php:125
+msgid "Deleted host group"
+msgstr ""
+
+#: include/actions.inc.php:710
+msgid "Deleted host group(s)"
+msgstr ""
+
+#: include/actions.inc.php:134
+msgid "Deleted trigger"
+msgstr ""
 
 #: app/views/administration.regex.edit.php:54
 msgid "Delimiter"
@@ -13675,6 +13730,10 @@ msgstr "Имя пункта меню используется подписью �
 msgid "Menu path"
 msgstr "Путь в меню"
 
+#: widgets/piechart/includes/WidgetForm.php:149
+msgid "Merge sectors smaller than"
+msgstr ""
+
 #: widgets/piechart/includes/WidgetForm.php:138
 msgid "Merge sectors smaller than "
 msgstr "Объединение секторов меньших чем"
@@ -17790,6 +17849,10 @@ msgstr "Сбросить по умолчанию"
 msgid "Reset to initial view"
 msgstr "Сброс к начальному виду"
 
+#: app/views/administration.miscconfig.edit.php:103
+msgid "Resolve secret vault macros by"
+msgstr ""
+
 #: jsLoader.php:283
 msgid "Resolved"
 msgstr "Решено"
@@ -18041,6 +18104,11 @@ msgstr "Выполнение скрипта \"%1$s\" на Zabbix сервере"
 #, c-format
 msgid "Run script \"%1$s\" on current host"
 msgstr "Выполнение скрипта \"%1$s\" на текущем узле сети"
+
+#: include/actions.inc.php:601
+#, c-format
+msgid "Run script \"%1$s\" on deleted object(s)"
+msgstr ""
 
 #: include/actions.inc.php:622
 #, c-format
@@ -20722,6 +20790,14 @@ msgstr "Тема"
 #: app/views/mediatype.edit.php:189 app/views/mediatype.test.edit.php:48
 msgid "These parameters will be passed to the script as command-line arguments in the specified order."
 msgstr "Эти параметры будут переданы в скрипт аргументами командной строки в указанном порядке."
+
+#: app/views/action.list.php:163
+msgid "This action has conditions or operations referencing deleted object(s)."
+msgstr ""
+
+#: app/views/action.list.php:158
+msgid "This action has missing conditions or operations due to previously deleted object(s)."
+msgstr ""
 
 #: app/controllers/CControllerDiscoveryEdit.php:175
 #, c-format
@@ -24079,6 +24155,14 @@ msgstr ""
 msgid "Zabbix server (proxy)"
 msgstr "Zabbix сервер (прокси)"
 
+#: app/views/administration.miscconfig.edit.php:112
+msgid "Zabbix server and proxy"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:107
+msgid "Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server and proxies, allowing them to resolve macros independently."
+msgstr ""
+
 #: jsrpc.php:91
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr "Zabbix сервер не запущен: отображаемая информация может быть не актуальной."
@@ -24095,6 +24179,10 @@ msgstr "Имя сервера Zabbix"
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
 msgstr "Версия Zabbix сервера"
+
+#: app/views/administration.miscconfig.edit.php:105
+msgid "Zabbix server: secrets are retrieved from Vault by Zabbix server and forwarded to proxies when needed."
+msgstr ""
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -24263,6 +24351,41 @@ msgstr "abs() - Абсолютное значение"
 #: app/controllers/CControllerPopupTriggerExpr.php:339
 msgid "acos() - The arccosine of a value as an angle, expressed in radians"
 msgstr "acos() - Арккосинус значения в виде угла, в радианах."
+
+#: include/classes/api/services/CDRule.php:773
+#, c-format
+msgid "action \"%1$s\" uses this discovery check"
+msgstr ""
+
+#: include/classes/api/services/CDRule.php:980
+#, c-format
+msgid "action \"%1$s\" uses this discovery rule"
+msgstr ""
+
+#: include/classes/api/services/CHost.php:1632
+#, c-format
+msgid "action \"%1$s\" uses this host"
+msgstr ""
+
+#: include/classes/api/services/CHostGroup.php:768
+#, c-format
+msgid "action \"%1$s\" uses this host group"
+msgstr ""
+
+#: include/classes/api/services/CService.php:487
+#, c-format
+msgid "action \"%1$s\" uses this service"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:806
+#, c-format
+msgid "action \"%1$s\" uses this template"
+msgstr ""
+
+#: include/classes/api/managers/CTriggerManager.php:127
+#, c-format
+msgid "action \"%1$s\" uses this trigger"
+msgstr ""
 
 #: app/partials/monitoring.charts.subfilter.php:182
 #: app/partials/monitoring.latest.subfilter.php:186 include/forms.inc.php:144
@@ -25035,6 +25158,10 @@ msgstr "первый"
 msgid "first() - The oldest value in the specified time interval"
 msgstr "first() - Самое старое значение за указанный период времени"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:626
+msgid "firstclock() - Timestamp of the oldest value in the specified time interval"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:631
 msgid "floor() - Rounds down to the nearest smaller integer"
 msgstr "floor() - Округление до ближайшего меньшего целого числа"
@@ -25432,6 +25559,10 @@ msgstr "посл"
 msgid "last() - Last (most recent) T value"
 msgstr "last() - Последнее (наиболее новое) значение Т"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:733
+msgid "lastclock() - Timestamp of the last (most recent) T value"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:1557
 msgid "left"
 msgstr "слева"
@@ -25467,6 +25598,10 @@ msgstr "logseverity() - Важность журнала последней за�
 #: app/controllers/CControllerPopupTriggerExpr.php:779
 msgid "logsource() - Log source of the last log entry matching parameter V for period T (1 - match, 0 - no match)"
 msgstr "logsource() - Соответствие источника журнала последней записи журнала параметру V за период Е (1 - соответствует, 0 - не соответствует)"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:795
+msgid "logtimestamp() - Timestamp of the last (most recent) T log message"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:786
 msgid "ltrim() - Remove specified characters from the beginning of a string"

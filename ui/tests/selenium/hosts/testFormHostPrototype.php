@@ -795,7 +795,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->assertMessage(TEST_GOOD, 'Host updated');
 
 		// Go back to prototype and check changes.
-		$this->zbxTestLogin('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.
+		$this->zbxTestOpen('host_prototypes.php?form=update&parent_discoveryid='.self::DISCOVERY_RULE_ID.
 				'&hostid='.self::HOST_PROTOTYPE_ID.'&context=host');
 		$this->zbxTestTabSwitch('Encryption');
 		$this->zbxTestWaitForPageToLoad();

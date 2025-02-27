@@ -1577,7 +1577,7 @@ class CHost extends CHostGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	private function validateDelete(array &$hostids, array &$db_hosts = null): void {
+	private function validateDelete(array &$hostids, ?array &$db_hosts = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $hostids, '/', $error)) {
@@ -1600,7 +1600,38 @@ class CHost extends CHostGeneral {
 	 * @param array $db_hosts
 	 */
 	public static function validateDeleteForce(array $db_hosts): void {
+		self::checkUsedInActions($db_hosts);
 		self::checkMaintenances(array_keys($db_hosts));
+	}
+
+	private static function checkUsedInActions(array $db_hosts): void {
+		$hostids = array_keys($db_hosts);
+
+		$row = DBfetch(DBselect(
+			'SELECT c.value AS hostid,a.name'.
+			' FROM conditions c'.
+			' JOIN actions a ON c.actionid=a.actionid'.
+			' WHERE c.conditiontype='.ZBX_CONDITION_TYPE_HOST.
+				' AND '.dbConditionString('c.value', $hostids),
+			1
+		));
+
+		if (!$row) {
+			$row = DBfetch(DBselect(
+				'SELECT och.hostid,a.name'.
+				' FROM opcommand_hst och'.
+				' JOIN operations o ON och.operationid=o.operationid'.
+				' JOIN actions a ON o.actionid=a.actionid'.
+				' WHERE '.dbConditionId('och.hostid', $hostids),
+				1
+			));
+		}
+
+		if ($row) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete host "%1$s": %2$s.',
+				$db_hosts[$row['hostid']]['host'], _s('action "%1$s" uses this host', $row['name'])
+			));
+		}
 	}
 
 	/**
@@ -1714,72 +1745,6 @@ class CHost extends CHostGeneral {
 				'elementid' => $hostids
 			]);
 		}
-
-		// disable actions
-		// actions from conditions
-		$actionids = [];
-		$sql = 'SELECT DISTINCT actionid'.
-				' FROM conditions'.
-				' WHERE conditiontype='.ZBX_CONDITION_TYPE_HOST.
-				' AND '.dbConditionString('value', $hostids);
-		$dbActions = DBselect($sql);
-		while ($dbAction = DBfetch($dbActions)) {
-			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
-		}
-
-		// actions from operations
-		$sql = 'SELECT DISTINCT o.actionid'.
-				' FROM operations o, opcommand_hst oh'.
-				' WHERE o.operationid=oh.operationid'.
-				' AND '.dbConditionInt('oh.hostid', $hostids);
-		$dbActions = DBselect($sql);
-		while ($dbAction = DBfetch($dbActions)) {
-			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
-		}
-
-		if (!empty($actionids)) {
-			$update = [];
-			$update[] = [
-				'values' => ['status' => ACTION_STATUS_DISABLED],
-				'where' => ['actionid' => $actionids]
-			];
-			DB::update('actions', $update);
-		}
-
-		// delete action conditions
-		DB::delete('conditions', [
-			'conditiontype' => ZBX_CONDITION_TYPE_HOST,
-			'value' => $hostids
-		]);
-
-		// delete action operation commands
-		$operationids = [];
-		$sql = 'SELECT DISTINCT oh.operationid'.
-				' FROM opcommand_hst oh'.
-				' WHERE '.dbConditionInt('oh.hostid', $hostids);
-		$dbOperations = DBselect($sql);
-		while ($dbOperation = DBfetch($dbOperations)) {
-			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
-		}
-
-		DB::delete('opcommand_hst', [
-			'hostid' => $hostids
-		]);
-
-		// delete empty operations
-		$delOperationids = [];
-		$sql = 'SELECT DISTINCT o.operationid'.
-				' FROM operations o'.
-				' WHERE '.dbConditionInt('o.operationid', $operationids).
-				' AND NOT EXISTS(SELECT oh.opcommand_hstid FROM opcommand_hst oh WHERE oh.operationid=o.operationid)';
-		$dbOperations = DBselect($sql);
-		while ($dbOperation = DBfetch($dbOperations)) {
-			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
-		}
-
-		DB::delete('operations', [
-			'operationid' => $delOperationids
-		]);
 
 		// delete host inventory
 		DB::delete('host_inventory', ['hostid' => $hostids]);
@@ -2263,8 +2228,8 @@ class CHost extends CHostGeneral {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkProxiesAndProxyGroups(array $hosts, array $db_hosts = null,
-			string $path = null): void {
+	private static function checkProxiesAndProxyGroups(array $hosts, ?array $db_hosts = null,
+			?string $path = null): void {
 		$host_indexes = [
 			'proxyids' => [],
 			'proxy_groupids' => []
@@ -2358,7 +2323,7 @@ class CHost extends CHostGeneral {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateUpdate(array &$hosts, array &$db_hosts = null): void {
+	protected function validateUpdate(array &$hosts, ?array &$db_hosts = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['hostid']], 'fields' => [
 			'hostid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
@@ -2708,7 +2673,7 @@ class CHost extends CHostGeneral {
 	 *
 	 * @throws APIException
 	 */
-	private static function checkTlsPskPairs(array $hosts, array $db_hosts = null): void {
+	private static function checkTlsPskPairs(array $hosts, ?array $db_hosts = null): void {
 		$psk_pairs = [];
 		$tls_psk_fields = array_flip(['tls_psk_identity', 'tls_psk']);
 		$psk_hostids = $db_hosts !== null ? [] : null;

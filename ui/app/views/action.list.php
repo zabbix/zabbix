@@ -110,7 +110,8 @@ $action_list = (new CTableInfo())
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $current_url->getUrl()),
 		_('Conditions'),
 		_('Operations'),
-		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $current_url->getUrl())
+		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $current_url->getUrl()),
+		_('Info')
 	])
 	->setPageNavigation($data['paging']);
 
@@ -150,6 +151,19 @@ if ($data['actions']) {
 			->setArgument('eventsource', $data['eventsource'])
 			->getUrl();
 
+		$warning = '';
+
+		if ($action['has_missing_conditions'] || $action['has_missing_operations']) {
+			$warning = makeWarningIcon(
+				_('This action has missing conditions or operations due to previously deleted object(s).')
+			);
+		}
+		elseif ($action['references_deleted_objects']) {
+			$warning = makeWarningIcon(
+				_('This action has conditions or operations referencing deleted object(s).')
+			);
+		}
+
 		$action_list->addRow([
 			new CCheckBox('actionids['.$action['actionid'].']', $action['actionid']),
 			(new CCol(
@@ -157,7 +171,8 @@ if ($data['actions']) {
 			))->addClass(ZBX_STYLE_WORDBREAK),
 			(new CCol($conditions))->addClass(ZBX_STYLE_WORDBREAK),
 			(new CCol($operations))->addClass(ZBX_STYLE_WORDBREAK),
-			$status
+			$status,
+			$warning
 		]);
 	}
 }
