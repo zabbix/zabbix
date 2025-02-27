@@ -595,7 +595,9 @@ void	zbx_discovery_update_service_down_server(const zbx_uint64_t dhostid, const 
 			DOBJECT_STATUS_DOWN, 0, now, DOBJECT_STATUS_UP, dhostid);
 
 	zbx_vector_uint64_sort(dserviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 	zbx_db_prepare_multiple_query(buffer, "dserviceid", dserviceids, &sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 		zbx_db_execute("%s", sql);

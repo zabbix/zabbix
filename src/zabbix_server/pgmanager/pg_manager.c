@@ -171,9 +171,8 @@ static void	pgm_db_flush_group_updates(char **sql, size_t *sql_alloc, size_t *sq
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
 				"update proxy_group_rtdata set state=%d where proxy_groupid=" ZBX_FS_UI64 ";\n",
 				group_updates->values[i].state, group_updates->values[i].objectid);
+		zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
 	}
-
-	zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
 }
 
 /******************************************************************************
