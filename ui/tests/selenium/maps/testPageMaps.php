@@ -23,6 +23,7 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
  *
  * @onBefore prepareMapsData
  *
+ * @dataSource WidgetCommunication
  */
 class testPageMaps extends CWebTest {
 
@@ -294,6 +295,8 @@ class testPageMaps extends CWebTest {
 						self::SYSMAP_NAME_HIGH_NUMBER,
 						self::SYSMAP_FIRST_A,
 						'Local network',
+						'Map for testing feedback',
+						'Map for widget communication test',
 						self::SYSMAP_SPACES_NAME,
 						self::SYSMAP_HIGH_HEIGHT,
 						self::SYSMAP_HIGH_WIDTH,
