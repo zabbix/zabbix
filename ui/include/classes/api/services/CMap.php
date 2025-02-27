@@ -3265,7 +3265,7 @@ class CMap extends CMapElement {
 
 	private function unlinkLinkTriggers(array $triggerids): void {
 		$resource = DBselect(
-			'SELECT slt.linktriggerid,slt.linkid,slt.triggerid,sl.indicator_type,sl.itemid,sl.sysmapid,s.name'.
+			'SELECT slt.linktriggerid,slt.linkid,slt.triggerid,sl.indicator_type,sl.sysmapid,s.name'.
 			' FROM sysmaps_link_triggers slt'.
 			' LEFT JOIN sysmaps_links sl ON slt.linkid=sl.linkid'.
 			' LEFT JOIN sysmaps s ON sl.sysmapid=s.sysmapid'.
@@ -3288,10 +3288,7 @@ class CMap extends CMapElement {
 				$db_maps[$row['sysmapid']]['links'][$row['linkid']] = [
 					'linkid' => $row['linkid'],
 					'indicator_type' => $row['indicator_type'],
-					'itemid' => $row['itemid'],
-					'linktriggers' => [],
-					'thresholds' => [],
-					'highlights' => []
+					'linktriggers' => []
 				];
 
 				$db_link_triggers[$row['linkid']] =
@@ -3378,8 +3375,7 @@ class CMap extends CMapElement {
 			$db_maps[$row['sysmapid']]['links'][$row['linkid']] = [
 				'linkid' => $row['linkid'],
 				'indicator_type' => $row['indicator_type'],
-				'itemid' => $row['itemid'],
-				'linktriggers' => []
+				'itemid' => $row['itemid']
 			];
 
 			$db_links[$row['linkid']] = &$db_maps[$row['sysmapid']]['links'][$row['linkid']];
