@@ -387,24 +387,28 @@ func ParseServerActive(optionServerActive string) ([][]string, error) {
 				return nil, fmt.Errorf("%w address \"%s\": empty value", errServerActive, addresses[j])
 			}
 
-			if ip != nil {
+			switch {
+			case ip != nil:
 				checkAddr = net.JoinHostPort(addresses[j], "10051")
-			} else if u.Port() == "" {
+			case u.Port() == "":
 				checkAddr = net.JoinHostPort(u.Hostname(), "10051")
-			} else {
+			default:
 				checkAddr = addresses[j]
 			}
 
-			if h, p, err := net.SplitHostPort(checkAddr); err != nil {
-				return nil, fmt.Errorf("%w address \"%s\": %s", errServerActive, addresses[j], err)
-			} else {
-				addresses[j] = net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p))
+			h, p, err := net.SplitHostPort(checkAddr)
+
+			if err != nil {
+				return nil, fmt.Errorf("%w address \"%s\": %w", errServerActive, addresses[j], err)
 			}
+
+			addresses[j] = net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p))
 
 			for k := 0; k < len(addrs); k++ {
 				for l := 0; l < len(addrs[k]); l++ {
 					if addrs[k][l] == addresses[j] {
-						return nil, fmt.Errorf("%w address \"%s\" specified more than once", errServerActive, addresses[j])
+						return nil, fmt.Errorf("%w address \"%s\" specified more than once",
+							errServerActive, addresses[j])
 					}
 				}
 			}
@@ -444,7 +448,7 @@ func ValidateOptions(options *AgentOptions) error {
 	_, err = zbxnet.GetAllowedPeers(options.Server)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("%w", err)
 	}
 
 	_, err = ParseServerActive(options.ServerActive)
