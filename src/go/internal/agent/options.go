@@ -362,14 +362,63 @@ func GlobalOptions(all *AgentOptions) (options *plugin.GlobalOptions) {
 	return
 }
 
+func checkIfAddressesSpecifiedMoreThanOnce(addrs [][]string, addresses []string, j int) error {
+	for k := 0; k < len(addrs); k++ {
+		for l := 0; l < len(addrs[k]); l++ {
+			if addrs[k][l] == addresses[j] {
+				return fmt.Errorf("%w address \"%s\" specified more than once",
+					errServerActive, addresses[j])
+			}
+		}
+	}
+
+	return nil
+}
+
+func checkAddress(addresses []string, j, i int, addrs [][]string) ([][]string, error) {
+	var checkAddr string
+
+	addresses[j] = strings.TrimSpace(addresses[j])
+	u := url.URL{Host: addresses[j]}
+	ip := net.ParseIP(addresses[j])
+
+	if ip == nil && strings.TrimSpace(u.Hostname()) == "" {
+		return nil, fmt.Errorf("%w address \"%s\": empty value", errServerActive, addresses[j])
+	}
+
+	switch {
+	case ip != nil:
+		checkAddr = net.JoinHostPort(addresses[j], "10051")
+	case u.Port() == "":
+		checkAddr = net.JoinHostPort(u.Hostname(), "10051")
+	default:
+		checkAddr = addresses[j]
+	}
+
+	h, p, err := net.SplitHostPort(checkAddr)
+
+	if err != nil {
+		return nil, fmt.Errorf("%w address \"%s\": %w", errServerActive, addresses[j], err)
+	}
+
+	addresses[j] = net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p))
+
+	err = checkIfAddressesSpecifiedMoreThanOnce(addrs, addresses, j)
+
+	if err != nil {
+		return nil, err
+	}
+
+	addrs[i] = append(addrs[i], addresses[j])
+
+	return addrs, nil
+}
+
 // ParseServerActive validates address list of zabbix Server or Proxy for ActiveCheck.
 func ParseServerActive(optionServerActive string) ([][]string, error) {
-
 	if strings.TrimSpace(optionServerActive) == "" {
 		return [][]string{}, nil
 	}
-
-	var checkAddr string
 
 	clusters := strings.Split(optionServerActive, ",")
 
@@ -379,41 +428,13 @@ func ParseServerActive(optionServerActive string) ([][]string, error) {
 		addresses := strings.Split(clusters[i], ";")
 
 		for j := 0; j < len(addresses); j++ {
-			addresses[j] = strings.TrimSpace(addresses[j])
-			u := url.URL{Host: addresses[j]}
-			ip := net.ParseIP(addresses[j])
+			var err error
 
-			if ip == nil && strings.TrimSpace(u.Hostname()) == "" {
-				return nil, fmt.Errorf("%w address \"%s\": empty value", errServerActive, addresses[j])
-			}
-
-			switch {
-			case ip != nil:
-				checkAddr = net.JoinHostPort(addresses[j], "10051")
-			case u.Port() == "":
-				checkAddr = net.JoinHostPort(u.Hostname(), "10051")
-			default:
-				checkAddr = addresses[j]
-			}
-
-			h, p, err := net.SplitHostPort(checkAddr)
+			addrs, err = checkAddress(addresses, j, i, addrs)
 
 			if err != nil {
-				return nil, fmt.Errorf("%w address \"%s\": %w", errServerActive, addresses[j], err)
+				return nil, err
 			}
-
-			addresses[j] = net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p))
-
-			for k := 0; k < len(addrs); k++ {
-				for l := 0; l < len(addrs[k]); l++ {
-					if addrs[k][l] == addresses[j] {
-						return nil, fmt.Errorf("%w address \"%s\" specified more than once",
-							errServerActive, addresses[j])
-					}
-				}
-			}
-
-			addrs[i] = append(addrs[i], addresses[j])
 		}
 	}
 
