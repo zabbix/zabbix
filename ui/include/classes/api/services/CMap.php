@@ -3193,40 +3193,30 @@ class CMap extends CMapElement {
 	}
 
 	private static function addFieldDefaultsByLinkIndicatorType(array &$maps, array $db_maps): void {
-		$defaults = [
-			'itemid' => 0,
-			'linktriggers' => [],
-			'thresholds' => [],
-			'highlights' => []
-		];
-
 		foreach ($maps as &$map) {
 			if (!array_key_exists('links', $map)) {
 				continue;
 			}
-
-			$db_links = $db_maps[$map['sysmapid']]['links'];
 
 			foreach ($map['links'] as &$link) {
 				if (!array_key_exists('linkid', $link)) {
 					continue;
 				}
 
-				if ($link['indicator_type'] != $db_links[$link['linkid']]['indicator_type']) {
-					if ($link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER) {
-						$link += array_intersect_key($defaults, array_flip(['itemid', 'thresholds', 'highlights']));
+				$db_link = $db_maps[$map['sysmapid']]['links'][$link['linkid']];
+
+				if ($link['indicator_type'] != $db_link['indicator_type']) {
+					if ($db_link['indicator_type'] == MAP_INDICATOR_TYPE_TRIGGER) {
+						$link += ['linktriggers' => []];
 					}
-					elseif ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
-						$link += array_intersect_key($defaults, array_flip(['linktriggers']));
-					}
-					else {
-						$link += $defaults;
+					elseif ($db_link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
+						$link += ['itemid' => 0, 'thresholds' => [], 'highlights' => []];
 					}
 				}
 				elseif ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE) {
 					$link += in_array($link['item_value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
-						? array_intersect_key($defaults, array_flip(['highlights']))
-						: array_intersect_key($defaults, array_flip(['thresholds']));
+						? ['highlights' => []]
+						: ['thresholds' => []];
 				}
 			}
 			unset($link);
