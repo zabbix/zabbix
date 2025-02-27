@@ -1494,6 +1494,9 @@ function getMapLinkItemInfo(array $sysmap): array {
 			'output' => ['itemid', 'name_resolved', 'value_type', 'history', 'trends'],
 			'selectHosts' => ['name'],
 			'itemids' => $itemids,
+			'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG,
+				ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT
+			]],
 			'preservekeys' => true
 		])
 		: [];
@@ -1502,29 +1505,20 @@ function getMapLinkItemInfo(array $sysmap): array {
 		return [];
 	}
 
-	$db_items = array_filter($db_items, function ($item) {
-		return $item['value_type'] != ITEM_VALUE_TYPE_BINARY;
-	});
-
 	$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 
-	$history = Manager::History();
+	$items = CItemHelper::addDataSource($db_items, time() - $history_period);
 
-	$db_items = CItemHelper::addDataSource($db_items, time() - $history_period);
+	foreach ($items as &$item) {
+		$values = $item['source'] === 'history'
+			? Manager::History()->getLastValues([$item], 1, $history_period)
+			: Manager::History()->getAggregatedValues([$item], AGGREGATE_LAST, time() - $history_period);
 
-	foreach ($db_items as &$db_item) {
-		if ($db_item['source'] === 'trends') {
-			$item_value = $history->getAggregatedValues([$db_item], AGGREGATE_LAST, time() - $history_period);
-		}
-		else {
-			$item_value = $history->getLastValues([$db_item], 1, $history_period);
-		}
-
-		$db_item['value'] = $item_value ? reset($item_value) : [];
+		$item['value'] = $values ? reset($values)[0]['value'] : null;
 	}
-	unset($db_item);
+	unset($item);
 
-	return $db_items;
+	return $items;
 }
 
 /**

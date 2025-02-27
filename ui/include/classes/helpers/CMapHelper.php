@@ -402,13 +402,12 @@ class CMapHelper {
 
 					$item_value = $link_items_info[$link['itemid']]['value'];
 
-					if ($item_value) {
-						$item_value = reset($item_value);
+					if ($item_value !== null) {
 						$value_type = $link_items_info[$link['itemid']]['value_type'];
 
 						if (in_array($value_type, [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 							foreach ($link['highlights'] as $highlight) {
-								if (@preg_match('('.$highlight['pattern'].')', $item_value['value'])) {
+								if (@preg_match('('.$highlight['pattern'].')', $item_value)) {
 									$link['color'] = $highlight['color'];
 									$link['drawtype'] = $highlight['drawtype'];
 
@@ -418,7 +417,7 @@ class CMapHelper {
 						}
 						elseif ($value_type == ITEM_VALUE_TYPE_FLOAT || $value_type == ITEM_VALUE_TYPE_UINT64) {
 							foreach ($link['thresholds'] as $threshold) {
-								if ($item_value['value'] < $threshold['threshold']) {
+								if ($item_value < $threshold['threshold']) {
 									break;
 								}
 
