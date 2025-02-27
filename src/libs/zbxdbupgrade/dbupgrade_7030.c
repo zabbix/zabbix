@@ -152,6 +152,26 @@ static int	DBpatch_7030011(void)
 	return DBdrop_table("config");
 }
 
+static int	DBpatch_7030012(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* 1 - ZBX_FLAG_DISCOVERY */
+	/* 2 - LIFETIME_TYPE_IMMEDIATELY */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update items"
+				" set enabled_lifetime_type=2"
+				" where flags=1"
+					" and lifetime_type=2"
+					" and enabled_lifetime_type<>2"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7030)
@@ -170,5 +190,6 @@ DBPATCH_ADD(7030008, 0, 1)
 DBPATCH_ADD(7030009, 0, 1)
 DBPATCH_ADD(7030010, 0, 1)
 DBPATCH_ADD(7030011, 0, 1)
+DBPATCH_ADD(7030012, 0, 1)
 
 DBPATCH_END()
