@@ -116,11 +116,12 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 
 	public function testDashboardSystemInformationWidget_checkDisabledHA() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 		// Remove zabbix version due to unstable screenshot which depends on column width with different version length.
 		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
 				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]
 		);
-		$this->assertScreenshot(CDashboardElement::find()->one()->waitUntilReady(), 'widget_without_ha');
+		$this->assertScreenshot($dashboard, 'widget_without_ha');
 	}
 
 	public function testDashboardSystemInformationWidget_Create() {
