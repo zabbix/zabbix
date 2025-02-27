@@ -16,8 +16,8 @@ package agent
 
 import (
 	"errors"
-	"testing"
 	"reflect"
+	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
@@ -648,56 +648,292 @@ func TestParseServerActive(t *testing.T) {
 	invalidServerActiveConfigurationErrorEmptyValue := `address "": empty value`
 	invalidServerActiveConfigurationErrorEmptyValueWithFooPort10051 := `address "foo:10051" specified more than once`
 
-	type ParseServerActiveParams struct {
+	tests := []struct {
 		name         string
 		serverActive string
 		err          error
 		wantErr      bool
 		result       [][]string
-	}
-
-	var tests = []ParseServerActiveParams{
-		{"+IPv6", "fe80::72d5:8d8b:b2ca:206", nil, false, [][]string{{"[fe80::72d5:8d8b:b2ca:206]:10051"}}},
-		{"+emptyString", "", nil, false, [][]string{}},
-		{"-squareBrackets", " [ ]:80 ", errors.New(`address "[ ]:80": empty value`), true, nil},
-		{"-emptySpaceAddressAndValidPort", " :80 ", errors.New(`address ":80": empty value`), true, nil},
-		{"+zero", " 0 ", nil, false, [][]string{{"0:10051"}}},
-		{"+loopbackAddress", "127.0.0.1", nil, false, [][]string{{"127.0.0.1:10051"}}},
-		{"+loopbackAddressIPv6", "::1", nil, false, [][]string{{"[::1]:10051"}}},
-		{"+stringThatShouldNotBeValidIPAddress", "aaa", nil, false, [][]string{{"aaa:10051"}}},
-		{"+loopbackAddressAndPort", "127.0.0.1:123", nil, false, [][]string{{"127.0.0.1:123"}}},
-		{"+loopbackAddressIPv6AndPort", "::1:123", nil, false, [][]string{{"[::1:123]:10051"}}},
-		{"+stringThatShouldNotBeValidIPAddressAndPort", "aaa:123", nil, false, [][]string{{"aaa:123"}}},
-		{"+defaultIPAddressInSquareBracketsAndPort", "[127.0.0.1]:123", nil, false, [][]string{{"127.0.0.1:123"}}},
-		{"+loopbackIPv6AddressInSquareBracketsAndPort", "[::1]:123", nil, false, [][]string{{"[::1]:123"}}},
-		{"+stringThatShouldNotBeValidIPAddressInSquareBracketsAndPort", "[aaa]:123", nil, false, [][]string{{"aaa:123"}}},
-		{"+loopbackIPv^AddressInSquareBracketsWithSpaces", "[ ::1 ]", nil, false, [][]string{{"[::1]:10051"}}},
-		{"+twoIPv6AddressesSecondIsInSquareBrackets", "fe80::72d5:8d8b:b2ca:206, [fe80::72d5:8d8b:b2ca:207]:10052", nil, false,
-			[][]string{{"[fe80::72d5:8d8b:b2ca:206]:10051"}, {"[fe80::72d5:8d8b:b2ca:207]:10052"}}},
-		{"-coma", ",", errors.New(invalidServerActiveConfigurationErrorEmptyValue), true, nil},
-		{"-comaWithEmptySpacesAround", " , ", errors.New(invalidServerActiveConfigurationErrorEmptyValue), true, nil},
-		{"+twoLoopbackAddressesEmptySpaceBeforeComa", "127.0.0.1 , 127.0.0.2:10052 ", nil, false, [][]string{{"127.0.0.1:10051"}, {"127.0.0.2:10052"}}},
-		{"+twoLoopbackAddresses", "127.0.0.1,127.0.0.2:10052", nil, false, [][]string{{"127.0.0.1:10051"}, {"127.0.0.2:10052"}}},
-		{"+twoIPv6CompressedAddresses", "::1, ::2", nil, false, [][]string{{"[::1]:10051"}, {"[::2]:10051"}}},
-		{"+twoStringsThatShouldNotBeValidIPAddressesWithEmptySpace", "aaa, aab", nil, false, [][]string{{"aaa:10051"}, {"aab:10051"}}},
-		{"+stringThatShouldNotBeValidIPAddressWithPort", "aaa:10052,aab", nil, false, [][]string{{"aaa:10052"}, {"aab:10051"}}},
-		{"+twoIPAddressesWithPorts", "127.0.0.1:123,127.0.0.2:123", nil, false, [][]string{{"127.0.0.1:123"}, {"127.0.0.2:123"}}},
-		{"+twoCompressedIPv6AddressesWithPorts", "::2:123,[::1:123]:10052", nil, false, [][]string{{"[::2:123]:10051"}, {"[::1:123]:10052"}}},
-		{"+twoStringsThatShouldNotBeValidIPAddressesWithPorts", "aaa:123,aab:123", nil, false, [][]string{{"aaa:123"}, {"aab:123"}}},
-		{"+twoIPAddressesInSquareBracketsWithPorts", "[127.0.0.1]:123,[127.0.0.2]:123", nil, false, [][]string{{"127.0.0.1:123"}, {"127.0.0.2:123"}}},
-		{"+twoIPv6CompressedAddressesWithPorts", "[::1]:123,[::2]:123", nil, false, [][]string{{"[::1]:123"}, {"[::2]:123"}}},
-		{"+twoStringsThatShouldNotBeValidIPAddressesInSquareBracketsWithPorts", "[aaa]:123,[aab]:123", nil, false, [][]string{{"aaa:123"}, {"aab:123"}}},
-		{"+twoStringsThatShouldNotBeValidIPAddresses", "abc,aaa", nil, false, [][]string{{"abc:10051"}, {"aaa:10051"}}},
-		{"+clusterConfigurationSeparatedBySemicolon", "foo;bar,baz", nil, false, [][]string{{"foo:10051", "bar:10051"}, {"baz:10051"}}},
-		{"+clusterConfigurationSeparatedBySemicolonWithPorts", "foo:10051;bar:10052,baz:10053", nil, false, [][]string{{"foo:10051", "bar:10052"}, {"baz:10053"}}},
-		{"-twoStringsSeparatedByComa", "foo,foo", errors.New(invalidServerActiveConfigurationErrorEmptyValueWithFooPort10051), true, nil},
-		{"-twoStringsSeparatedBySemicolon", "foo;foo", errors.New(invalidServerActiveConfigurationErrorEmptyValueWithFooPort10051), true, nil},
-		{"-threeClustersWithStringThatShouldNotBeValidIPAddresses", "foo;bar,foo2;foo", errors.New(invalidServerActiveConfigurationErrorEmptyValueWithFooPort10051), true, nil},
-		{"-semicolon", ";", errors.New(invalidServerActiveConfigurationErrorEmptyValue), true, nil},
-		{"-semicolonWithEmptySpaceBefore", " ;", errors.New(invalidServerActiveConfigurationErrorEmptyValue), true, nil},
-		{"-semicolonWithEmptySpaceAfter", "; ", errors.New(invalidServerActiveConfigurationErrorEmptyValue), true, nil},
-		{"-semicolonWithEmptySpacesBeforeAndAfter", " ; ", errors.New(invalidServerActiveConfigurationErrorEmptyValue), true, nil},
-		{"-newline", "\n", nil, false, [][]string{}},
+	}{
+		{
+			"+IPv6",
+			"fe80::72d5:8d8b:b2ca:206", nil,
+			false,
+			[][]string{{"[fe80::72d5:8d8b:b2ca:206]:10051"}},
+		},
+		{
+			"+emptyString",
+			"",
+			nil,
+			false,
+			[][]string{},
+		},
+		{
+			"-squareBrackets",
+			" [ ]:80 ",
+			errors.New(`address "[ ]:80": empty value`),
+			true,
+			nil,
+		},
+		{
+			"-emptySpaceAddressAndValidPort",
+			" :80 ",
+			errors.New(`address ":80": empty value`),
+			true,
+			nil,
+		},
+		{
+			"+zero",
+			" 0 ",
+			nil,
+			false,
+			[][]string{{"0:10051"}},
+		},
+		{
+			"+loopbackAddress",
+			"127.0.0.1",
+			nil,
+			false,
+			[][]string{{"127.0.0.1:10051"}},
+		},
+		{
+			"+loopbackAddressIPv6",
+			"::1",
+			nil,
+			false,
+			[][]string{{"[::1]:10051"}},
+		},
+		{
+			"+stringThatShouldNotBeValidIPAddress",
+			"aaa",
+			nil,
+			false,
+			[][]string{{"aaa:10051"}},
+		},
+		{
+			"+loopbackAddressAndPort",
+			"127.0.0.1:123",
+			nil,
+			false,
+			[][]string{{"127.0.0.1:123"}},
+		},
+		{
+			"+loopbackAddressIPv6AndPort",
+			"::1:123",
+			nil,
+			false,
+			[][]string{{"[::1:123]:10051"}},
+		},
+		{
+			"+stringThatShouldNotBeValidIPAddressAndPort",
+			"aaa:123",
+			nil,
+			false,
+			[][]string{{"aaa:123"}},
+		},
+		{
+			"+defaultIPAddressInSquareBracketsAndPort",
+			"[127.0.0.1]:123",
+			nil,
+			false,
+			[][]string{{"127.0.0.1:123"}},
+		},
+		{
+			"+loopbackIPv6AddressInSquareBracketsAndPort",
+			"[::1]:123",
+			nil,
+			false,
+			[][]string{{"[::1]:123"}},
+		},
+		{
+			"+stringThatShouldNotBeValidIPAddressInSquareBracketsAndPort",
+			"[aaa]:123",
+			nil,
+			false,
+			[][]string{{"aaa:123"}},
+		},
+		{
+			"+loopbackIPv6AddressInSquareBracketsWithSpaces",
+			"[ ::1 ]",
+			nil,
+			false,
+			[][]string{{"[::1]:10051"}},
+		},
+		{
+			"+twoIPv6AddressesSecondIsInSquareBrackets",
+			"fe80::72d5:8d8b:b2ca:206, [fe80::72d5:8d8b:b2ca:207]:10052",
+			nil,
+			false,
+			[][]string{{"[fe80::72d5:8d8b:b2ca:206]:10051"}, {"[fe80::72d5:8d8b:b2ca:207]:10052"}},
+		},
+		{
+			"-coma",
+			",",
+			errors.New(invalidServerActiveConfigurationErrorEmptyValue),
+			true,
+			nil,
+		},
+		{
+			"-comaWithEmptySpacesAround",
+			" , ",
+			errors.New(invalidServerActiveConfigurationErrorEmptyValue),
+			true,
+			nil,
+		},
+		{
+			"+twoLoopbackAddressesEmptySpaceBeforeComa",
+			"127.0.0.1 , 127.0.0.2:10052 ",
+			nil,
+			false,
+			[][]string{{"127.0.0.1:10051"}, {"127.0.0.2:10052"}},
+		},
+		{
+			"+twoLoopbackAddresses",
+			"127.0.0.1,127.0.0.2:10052",
+			nil,
+			false,
+			[][]string{{"127.0.0.1:10051"}, {"127.0.0.2:10052"}},
+		},
+		{
+			"+twoIPv6CompressedAddresses",
+			"::1, ::2",
+			nil,
+			false,
+			[][]string{{"[::1]:10051"}, {"[::2]:10051"}},
+		},
+		{
+			"+twoStringsThatShouldNotBeValidIPAddressesWithEmptySpace",
+			"aaa, aab",
+			nil,
+			false,
+			[][]string{{"aaa:10051"}, {"aab:10051"}},
+		},
+		{
+			"+stringThatShouldNotBeValidIPAddressWithPort",
+			"aaa:10052,aab",
+			nil,
+			false,
+			[][]string{{"aaa:10052"}, {"aab:10051"}},
+		},
+		{
+			"+twoIPAddressesWithPorts",
+			"127.0.0.1:123,127.0.0.2:123",
+			nil,
+			false,
+			[][]string{{"127.0.0.1:123"}, {"127.0.0.2:123"}},
+		},
+		{
+			"+twoCompressedIPv6AddressesWithPorts",
+			"::2:123,[::1:123]:10052",
+			nil,
+			false,
+			[][]string{{"[::2:123]:10051"}, {"[::1:123]:10052"}},
+		},
+		{
+			"+twoStringsThatShouldNotBeValidIPAddressesWithPorts",
+			"aaa:123,aab:123",
+			nil,
+			false,
+			[][]string{{"aaa:123"}, {"aab:123"}},
+		},
+		{
+			"+twoIPAddressesInSquareBracketsWithPorts",
+			"[127.0.0.1]:123,[127.0.0.2]:123",
+			nil,
+			false,
+			[][]string{{"127.0.0.1:123"}, {"127.0.0.2:123"}},
+		},
+		{
+			"+twoIPv6CompressedAddressesWithPorts",
+			"[::1]:123,[::2]:123",
+			nil,
+			false,
+			[][]string{{"[::1]:123"}, {"[::2]:123"}},
+		},
+		{
+			"+twoStringsThatShouldNotBeValidIPAddressesInSquareBracketsWithPorts",
+			"[aaa]:123,[aab]:123",
+			nil,
+			false,
+			[][]string{{"aaa:123"}, {"aab:123"}},
+		},
+		{
+			"+twoStringsThatShouldNotBeValidIPAddresses",
+			"abc,aaa",
+			nil,
+			false,
+			[][]string{{"abc:10051"}, {"aaa:10051"}},
+		},
+		{
+			"+clusterConfigurationSeparatedBySemicolon",
+			"foo;bar,baz",
+			nil,
+			false,
+			[][]string{{"foo:10051", "bar:10051"}, {"baz:10051"}},
+		},
+		{
+			"+clusterConfigurationSeparatedBySemicolonWithPorts",
+			"foo:10051;bar:10052,baz:10053",
+			nil,
+			false,
+			[][]string{{"foo:10051", "bar:10052"}, {"baz:10053"}},
+		},
+		{
+			"-twoStringsSeparatedByComa",
+			"foo,foo",
+			errors.New(invalidServerActiveConfigurationErrorEmptyValueWithFooPort10051),
+			true,
+			nil,
+		},
+		{
+			"-twoStringsSeparatedBySemicolon",
+			"foo;foo",
+			errors.New(invalidServerActiveConfigurationErrorEmptyValueWithFooPort10051),
+			true,
+			nil,
+		},
+		{
+			"-threeClustersWithStringThatShouldNotBeValidIPAddresses",
+			"foo;bar,foo2;foo",
+			errors.New(invalidServerActiveConfigurationErrorEmptyValueWithFooPort10051),
+			true,
+			nil,
+		},
+		{
+			"-semicolon",
+			";",
+			errors.New(invalidServerActiveConfigurationErrorEmptyValue),
+			true,
+			nil,
+		},
+		{
+			"-semicolonWithEmptySpaceBefore",
+			" ;",
+			errors.New(invalidServerActiveConfigurationErrorEmptyValue),
+			true,
+			nil,
+		},
+		{
+			"-semicolonWithEmptySpaceAfter",
+			"; ",
+			errors.New(invalidServerActiveConfigurationErrorEmptyValue),
+			true,
+			nil,
+		},
+		{
+			"-semicolonWithEmptySpacesBeforeAndAfter",
+			" ; ",
+			errors.New(invalidServerActiveConfigurationErrorEmptyValue),
+			true,
+			nil,
+		},
+		{
+			"-newline",
+			"\n",
+			nil,
+			false,
+			[][]string{},
+		},
 	}
 
 	for _, tt := range tests {
@@ -705,7 +941,7 @@ func TestParseServerActive(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			al, err := ParseServerActive(tt.serverActive);
+			al, err := ParseServerActive(tt.serverActive)
 
 			if (err != nil) != tt.wantErr {
 				t.Fatalf("ValidateOptions() error expectation failed: wantErr=%v, got err=%v", tt.wantErr, err)
@@ -716,10 +952,10 @@ func TestParseServerActive(t *testing.T) {
 			}
 
 			if len(al) != len(tt.result) {
-				t.Errorf("ParseServerActive failed for ServerActive input: %s, expect: %d got: %d " +
+				t.Errorf("ParseServerActive failed for ServerActive input: %s, expect: %d got: %d "+
 					"address in the list\n", tt.serverActive, len(tt.result), len(al))
 			} else if !reflect.DeepEqual(al, tt.result) {
-				t.Errorf("ParseServerActive failed for ServerActive input: %s, received value: %s " +
+				t.Errorf("ParseServerActive failed for ServerActive input: %s, received value: %s "+
 					"does not match expected value: %s\n", tt.serverActive, al, tt.result)
 			}
 		})
