@@ -25,10 +25,11 @@ class testPageReportsSystemInformation extends testSystemInformation {
 // Commented until Jenkins issue investigated.
 //	public function testPageReportsSystemInformation_checkDisabledHA() {
 //		$this->page->login()->open('zabbix.php?action=report.status')->waitUntilReady();
-//		$this->assertScreenshotExcept(null,
-//				[$this->query('xpath://footer')->one(),
-//				$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()],
-//				'report_without_ha');
+//		// Remove zabbix version due to unstable screenshot which depends on column width with different version length.
+//		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
+//				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]
+//		);
+//		$this->assertScreenshotExcept(null, $this->query('xpath://footer')->one(), 'report_without_ha');
 //	}
 //
 //	/**
