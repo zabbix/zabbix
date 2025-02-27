@@ -32,7 +32,7 @@ function getMenuPopupHistory(options) {
 	url.setArgument('itemids[]', options.itemid);
 
 	// latest graphs
-	if (typeof options.hasLatestGraphs !== 'undefined' && options.hasLatestGraphs) {
+	if (options.hasLatestGraphs !== undefined && options.hasLatestGraphs) {
 		url.setArgument('action', 'showgraph');
 		url.setArgument('to', 'now');
 
@@ -354,9 +354,11 @@ function getMenuPopupMapElementSubmap(options) {
 		const submap_url = new Curl('zabbix.php');
 		submap_url.setArgument('action', 'map.view');
 		submap_url.setArgument('sysmapid', options.sysmapid);
-		if (typeof options.severity_min !== 'undefined') {
+
+		if (options.severity_min !== undefined) {
 			submap_url.setArgument('severity_min', options.severity_min);
 		}
+
 		item.url = submap_url.getUrl();
 	}
 
@@ -366,7 +368,7 @@ function getMenuPopupMapElementSubmap(options) {
 	});
 
 	// urls
-	if (typeof options.urls !== 'undefined') {
+	if (options.urls !== undefined) {
 		sections.push({
 			label: t('Links'),
 			items: options.urls
@@ -404,13 +406,16 @@ function getMenuPopupMapElementGroup(options) {
 	problems_url.setArgument('action', 'problem.view');
 	problems_url.setArgument('filter_set', '1');
 	problems_url.setArgument('groupids[]', options.groupid);
-	if (typeof options.severities !== 'undefined') {
+
+	if (options.severities !== undefined) {
 		problems_url.setArgument('severities[]', options.severities);
 	}
-	if (typeof options.show_suppressed !== 'undefined' && options.show_suppressed) {
+
+	if (options.show_suppressed !== undefined && options.show_suppressed) {
 		problems_url.setArgument('show_suppressed', '1');
 	}
-	if (typeof options.tags !== 'undefined') {
+
+	if (options.tags !== undefined) {
 		problems_url.setArgument('tags', options.tags);
 		problems_url.setArgument('evaltype', options.evaltype);
 	}
@@ -424,7 +429,7 @@ function getMenuPopupMapElementGroup(options) {
 	});
 
 	// urls
-	if (typeof options.urls !== 'undefined') {
+	if (options.urls !== undefined) {
 		sections.push({
 			label: t('Links'),
 			items: options.urls
@@ -580,7 +585,7 @@ function getMenuPopupMapElementTrigger(options) {
  */
 function getMenuPopupMapElementImage(options) {
 	// urls
-	if (typeof options.urls !== 'undefined') {
+	if (options.urls !== undefined) {
 		return [{
 			label: t('Links'),
 			items: options.urls
@@ -1668,6 +1673,17 @@ function getMenuPopupDRule(options) {
 }
 
 jQuery(function($) {
+	const MENU_BORDER = 1;
+
+	const MENU_PADDING_LEFT = 25;
+	const MENU_PADDING_RIGHT = 15;
+	const MENU_PADDING_Y = 5;
+
+	const WRAPPER_PADDING_Y = 10;
+
+	const SUBMENU_DELTA_Y = 15;
+
+	const SUBMENU_DELAY = 600;
 
 	/**
 	 * Menu popup.
@@ -1705,7 +1721,7 @@ jQuery(function($) {
 				$menu_popup.append($('<li>').append($('<div>')));
 			}
 
-			var section_label = null;
+			let section_label = null;
 
 			if (typeof section.label === 'string' && section.label.length) {
 				section_label = section.label;
@@ -1726,26 +1742,28 @@ jQuery(function($) {
 			});
 		});
 
-		if (sections.length == 1) {
+		if (sections.length === 1) {
 			if (typeof sections[0].label === 'string' && sections[0].label.length) {
 				$menu_popup.attr({'aria-label': sections[0].label});
 			}
 		}
 	}
 
-	var defaultOptions = {
-		closeCallback: function(){},
+	const defaultOptions = {
+		closeCallback: function() {},
 		background_layer: true
 	};
 
-	var methods = {
+	const methods = {
 		init: function(sections, event, options) {
 			// Don't display empty menu.
 			if (!sections.length || !sections[0]['items'].length) {
 				return;
 			}
 
-			var $opener = $(this);
+			const $opener = $(this);
+			const $wrapper = $('.wrapper');
+			const wrapper_rect = $wrapper[0].getBoundingClientRect();
 
 			options = $.extend({
 				position: {
@@ -1759,15 +1777,16 @@ jQuery(function($) {
 					my: 'left top',
 					at: 'left bottom',
 					using: (pos, data) => {
-						let max_left = data.horizontal === 'left'
-							? document.querySelector('.wrapper').clientWidth
-							: document.querySelector('.wrapper').clientWidth - data.element.width;
+						const menu = data.element.element[0];
+						const margin_right = Math.max(WRAPPER_PADDING_RIGHT,
+							wrapper_rect.width - $wrapper.outerWidth()
+						);
+						const max_left = wrapper_rect.right - margin_right - menu.offsetWidth;
 
-						pos.top = Math.max(0, pos.top);
-						pos.left = Math.max(0, Math.min(max_left, pos.left));
+						pos.left = Math.max(wrapper_rect.left, Math.min(max_left, pos.left));
 
-						data.element.element[0].style.top = `${pos.top}px`;
-						data.element.element[0].style.left = `${pos.left}px`;
+						menu.style.left = `${pos.left}px`;
+						menu.style.top = `${pos.top}px`;
 					}
 				}
 			}, defaultOptions, options || {});
@@ -1792,19 +1811,26 @@ jQuery(function($) {
 				sections: sections,
 				menu_popup: $menu_popup
 			});
+
 			addMenuPopupItems($menu_popup, sections);
 
 			$menu_popup.data('menu_popup', options);
 
 			if (options.background_layer) {
-				$('.wrapper').append($('<div>', {class: 'menu-popup-overlay'}).append($menu_popup));
+				$wrapper.append($('<div>', {class: 'menu-popup-overlay'}).append($menu_popup));
 			}
 			else {
-				$('.wrapper').append($menu_popup);
+				$wrapper.append($menu_popup);
 			}
 
 			// Position the menu (before hiding).
 			$menu_popup.position(options.position);
+
+			const pos_top = Math.max(WRAPPER_PADDING_Y, Math.min($menu_popup.position().top,
+				wrapper_rect.bottom - WRAPPER_PADDING_Y - $menu_popup.outerHeight()
+			));
+
+			$menu_popup.css('top', `${pos_top}px`);
 
 			// Hide all action menu sub-levels, including the topmost, for fade effect to work.
 			$menu_popup.add('.menu-popup', $menu_popup).hide();
@@ -1824,10 +1850,18 @@ jQuery(function($) {
 			});
 
 			$menu_popup.focus();
+
+			$menu_popup.on('scroll', e => {
+				e.stopPropagation();
+
+				$menu_popup.actionMenuItemCollapse();
+			});
+
+			$(window).on('resize', handleWindowResize);
 		},
 
 		close: function(trigger_elem, return_focus) {
-			var menu_popup = $(this),
+			const menu_popup = $(this),
 				options = $(menu_popup).data('menu_popup') || {};
 
 			if (!menu_popup.is(trigger_elem) && menu_popup.has(trigger_elem).length === 0) {
@@ -1841,9 +1875,11 @@ jQuery(function($) {
 					.off('click dragstart', menuPopupDocumentCloseHandler)
 					.off('keydown', menuPopupKeyDownHandler);
 
-				var overlay = removeFromOverlaysStack('menu-popup', return_focus);
+				$(window).off('resize', handleWindowResize);
 
-				if (overlay && typeof overlay['element'] !== undefined) {
+				const overlay = removeFromOverlaysStack('menu-popup', return_focus);
+
+				if (overlay && overlay['element'] !== undefined) {
 					// Remove expanded attribute of the original opener.
 					$(overlay['element']).attr({'aria-expanded': 'false'});
 				}
@@ -1864,7 +1900,7 @@ jQuery(function($) {
 		 * Refresh popup menu, call refreshCallback for every item if defined. Refresh recreate item dom nodes.
 		 */
 		refresh: function(widget) {
-			var $opener = $(this),
+			const $opener = $(this),
 				sections = $opener.data('sections'),
 				$menu_popup = $opener.data('menu_popup');
 
@@ -1872,7 +1908,9 @@ jQuery(function($) {
 			sections.forEach(
 				section => section.items && section.items.forEach(
 					item => item.refreshCallback && item.refreshCallback.call(item, widget)
-			));
+				)
+			);
+
 			addMenuPopupItems($menu_popup, sections);
 		}
 	};
@@ -1881,48 +1919,61 @@ jQuery(function($) {
 	 * Expends hovered/selected context menu item.
 	 */
 	$.fn.actionMenuItemExpand = function() {
-		var li = $(this),
-			pos = li.position(),
+		const li = $(this),
+			li_pos = li[0].getBoundingClientRect(),
 			menu = li.closest('.menu-popup');
 
-		for (var item = $('li:first-child', menu); item.length > 0; item = item.next()) {
-			if (item[0] == li[0]) {
-				$('>a', li[0]).addClass('highlighted');
-
+		for (let item = $('li:first-child', menu); item.length > 0; item = item.next()) {
+			if (item[0] === li[0]) {
 				if (!$('ul', item[0]).is(':visible')) {
 					const $submenu = $('ul:first', item[0]);
 
 					if ($submenu.length) {
-						const position = {
-							'top': pos.top - 6,
-							'left': pos.left + li.outerWidth() + 14,
-						};
+						$('> a', li[0]).addClass('highlighted');
 
-						$submenu
-							.css('display' ,'block')
-							.prev('[role="menuitem"]').attr({'aria-expanded': 'true'});
+						setSubmenuPosition($submenu, li_pos);
 
-						let max_relative_left = $(window).outerWidth(true) - $submenu.outerWidth(true)
-							- menu[0].getBoundingClientRect().left - 14 * 2;
+						$submenu.prev('[role="menuitem"]').attr({'aria-expanded': 'true'});
+					}
+				}
+				else {
+					// Collapses the submenus deeper than +2 level of targeted submenu.
+					const $submenu_link = $('ul:visible > li > a', item[0]);
 
-						position.top = Math.max(0, position.top);
-						position.left = Math.max(0, Math.min(max_relative_left, position.left));
+					if ($submenu_link.hasClass('highlighted')) {
+						$submenu_link
+							.removeClass('highlighted')
+							.blur();
+					}
 
-						$submenu.css(position);
+					const $submenu_child = $('ul:visible > li > ul:visible', item[0]);
+
+					if ($submenu_child.length) {
+						$submenu_child.prev('[role="menuitem"]')
+							.removeClass('highlighted')
+							.attr({'aria-expanded': 'false'});
+
+						$submenu_child.css({'display': 'none'});
 					}
 				}
 			}
 			else {
 				// Remove activity from item that has been selected by keyboard and now is deselected using mouse.
 				if ($('>a', item[0]).hasClass('highlighted')) {
-					$('>a', item[0]).removeClass('highlighted').blur();
+					$('>a', item[0])
+						.removeClass('highlighted')
+						.blur();
 				}
 
 				// Closes all other submenus from this level, if they were open.
-				if ($('ul', item[0]).is(':visible')) {
-					$('ul', item[0]).prev('[role="menuitem"]').removeClass('highlighted');
-					$('ul', item[0]).prev('[role="menuitem"]').attr({'aria-expanded': 'false'});
-					$('ul', item[0]).css({'display': 'none'});
+				const $submenu = $('ul', item[0]);
+
+				if ($submenu.is(':visible')) {
+					$submenu.prev('[role="menuitem"]')
+						.removeClass('highlighted')
+						.attr({'aria-expanded': 'false'});
+
+					$submenu.css({'display': 'none'});
 				}
 			}
 		}
@@ -1931,30 +1982,132 @@ jQuery(function($) {
 	};
 
 	/**
+	 * Calculates and sets submenu position based on <li> parent element.
+	 *
+	 * @param {Object}  $submenu
+	 * @param {DOMRect} li_pos
+	 */
+	function setSubmenuPosition($submenu, li_pos) {
+		$submenu.css('display', '');
+
+		if ($submenu.data('pos')) {
+			$submenu.css($submenu.data('pos'));
+
+			return;
+		}
+
+		const wrapper = document.querySelector('.wrapper');
+		const wrapper_rect = wrapper.getBoundingClientRect();
+		const margin_right = Math.max(WRAPPER_PADDING_RIGHT, wrapper_rect.width - wrapper.clientWidth);
+		const margin_bottom = Math.max(WRAPPER_PADDING_Y, wrapper_rect.height - wrapper.clientHeight);
+		const max_height = `calc(100vh - ${WRAPPER_PADDING_Y + margin_bottom}px)`;
+
+		// Change of max height to determine the height of the element.
+		$submenu.css('maxHeight', max_height);
+
+		const max_relative_top = wrapper_rect.bottom - $submenu.outerHeight() - margin_bottom;
+		const max_relative_left = wrapper_rect.right - $submenu.outerWidth() - margin_right;
+
+		// Will use parent directions, if the parent is not menu-popup-top.
+		// If the directions are not defined, will use default direction: x - right, y - down.
+		let submenu_direction_x = 1;
+		let submenu_direction_y = 1;
+
+		const $submenu_parents = $submenu.parents('ul');
+		const is_first_child = $submenu_parents.first().hasClass('menu-popup-top');
+
+		if (!is_first_child) {
+			const parent_menu_data = $submenu_parents.first().data('pos');
+
+			submenu_direction_x = parent_menu_data.direction_x;
+			submenu_direction_y = parent_menu_data.direction_y;
+		}
+
+		const submenu_data = {
+			top: li_pos.top - (MENU_PADDING_Y + MENU_BORDER),
+			left: submenu_direction_x === 1
+				? li_pos.right + MENU_PADDING_RIGHT
+				: li_pos.left - ($submenu.outerWidth() + MENU_PADDING_LEFT),
+			direction_x: submenu_direction_x,
+			direction_y: submenu_direction_y,
+			maxHeight: max_height
+		};
+
+		if (submenu_data.left < wrapper_rect.left || submenu_data.left > max_relative_left) {
+			// Reverse the direction on X axis.
+			submenu_data.direction_x *= -1;
+
+			submenu_data.left = submenu_data.direction_x === 1
+				? li_pos.right + MENU_PADDING_RIGHT
+				: li_pos.left - ($submenu.outerWidth() + MENU_PADDING_LEFT);
+
+			submenu_data.left = submenu_data.direction_x === 1
+				? Math.min(max_relative_left, submenu_data.left)
+				: Math.max(submenu_data.left, wrapper_rect.left);
+
+			if (!is_first_child
+					&& Math.abs($submenu_parents[1].getBoundingClientRect().top - submenu_data.top) < SUBMENU_DELTA_Y) {
+				const pos_top = submenu_data.top + (submenu_data.direction_y * SUBMENU_DELTA_Y);
+
+				if (max_relative_top < pos_top || WRAPPER_PADDING_Y > pos_top) {
+					// Reverse the direction on Y axis.
+					submenu_data.direction_y *= -1;
+				}
+
+				submenu_data.top += submenu_data.direction_y * SUBMENU_DELTA_Y;
+			}
+		}
+
+		submenu_data.top = Math.max(WRAPPER_PADDING_Y, Math.min(submenu_data.top, max_relative_top));
+
+		$submenu.css(submenu_data);
+		$submenu.data('pos', submenu_data);
+	}
+
+	/**
 	 * Collapses context menu item that has lost focus or is not selected anymore.
 	 */
 	$.fn.actionMenuItemCollapse = function() {
 		// Remove style and close sub-menus in deeper levels.
-		var parent_menu = $(this).closest('.menu-popup');
+		const parent_menu = $(this).closest('.menu-popup');
 		$('.highlighted', parent_menu).removeClass('highlighted');
 		$('[aria-expanded]', parent_menu).attr({'aria-expanded': 'false'});
-		$('.menu-popup', parent_menu).css({'display': 'none'});
+		$('.menu-popup', parent_menu)
+			.css({
+				top: '',
+				left: '',
+				display: 'none',
+				maxHeight: ''
+			})
+			.removeData('pos');
 
 		// Close actual menu level.
-		parent_menu.not('.menu-popup-top').css({'display': 'none'});
+		parent_menu.not('.menu-popup-top')
+			.css({
+				top: '',
+				left: '',
+				display: 'none',
+				maxHeight: ''
+			})
+			.removeData('pos');
+
 		parent_menu.prev('[role="menuitem"]').attr({'aria-expanded': 'false'});
 
 		return this;
 	};
+
+	function handleWindowResize() {
+		$('.menu-popup-top').menuPopup('close', null, false);
+	}
 
 	function menuPopupDocumentCloseHandler(event) {
 		$(event.data.menu[0]).menuPopup('close', event.data.opener);
 	}
 
 	function menuPopupKeyDownHandler(event) {
-		var link_selector = '.menu-popup-item',
-			menu_popup = $(event.data.menu[0]),
-			level = menu_popup,
+		const link_selector = '.menu-popup-item',
+			menu_popup = $(event.data.menu[0]);
+		let	level = menu_popup,
 			selected,
 			items;
 
@@ -1973,31 +2126,30 @@ jQuery(function($) {
 			selected = $(link_selector + '.highlighted', level).closest('li');
 		}
 		else if ($('.menu-popup-item', level).filter(function() {
-			return this == document.activeElement;
+			return this === document.activeElement;
 		}).length) {
 			selected = $(document.activeElement).closest('li');
 		}
 
 		// Perform action based on keydown event.
-		switch (event.which) {
-			case 37: // arrow left
-				if (typeof selected !== 'undefined' && selected.has('.menu-popup')) {
-					if (level != menu_popup) {
+		switch (event.key) {
+			case 'ArrowLeft':
+				if (selected !== undefined && selected.has('.menu-popup')) {
+					if (level !== menu_popup) {
 						selected.actionMenuItemCollapse();
-
 						// Must focus previous element, otherwise screen reader will exit menu.
 						selected.closest('.menu-popup').prev('[role="menuitem"]').addClass('highlighted').focus();
 					}
 				}
 				break;
 
-			case 38: // arrow up
-				if (typeof selected === 'undefined') {
+			case 'ArrowUp':
+				if (selected === undefined) {
 					$(link_selector + ':last', level).addClass('highlighted').focus();
 				}
 				else {
-					var prev = items[items.index(selected) - 1];
-					if (typeof prev === 'undefined') {
+					let prev = items[items.index(selected) - 1];
+					if (prev === undefined) {
 						prev = items[items.length - 1];
 					}
 
@@ -2009,20 +2161,20 @@ jQuery(function($) {
 				event.preventDefault();
 				break;
 
-			case 39: // arrow right
-				if (typeof selected !== 'undefined' && selected.has('.menu-popup')) {
+			case 'ArrowRight':
+				if (selected !== undefined && selected.has('.menu-popup')) {
 					selected.actionMenuItemExpand();
 					$('ul > li ' + link_selector + ':first', selected).addClass('highlighted').focus();
 				}
 				break;
 
-			case 40: // arrow down
-				if (typeof selected === 'undefined') {
+			case 'ArrowDown':
+				if (selected === undefined) {
 					$(link_selector + ':first', items[0]).addClass('highlighted').focus();
 				}
 				else {
-					var next = items[items.index(selected) + 1];
-					if (typeof next === 'undefined') {
+					let next = items[items.index(selected) + 1];
+					if (next === undefined) {
 						next = items[0];
 					}
 
@@ -2034,17 +2186,17 @@ jQuery(function($) {
 				event.preventDefault();
 				break;
 
-			case 27: // ESC
+			case 'Escape':
 				$(menu_popup).menuPopup('close', null);
 				break;
 
-			case 13: // Enter
-				if (typeof selected !== 'undefined') {
+			case 'Enter':
+				if (selected !== undefined) {
 					$('>' + link_selector, selected)[0].click();
 				}
 				break;
 
-			case 9: // Tab
+			case 'Tab':
 				event.preventDefault();
 				break;
 		}
@@ -2074,23 +2226,23 @@ jQuery(function($) {
 			class: false
 		}, options);
 
-		var item = $('<li>'),
+		const item = $('<li>'),
 			link = $('<a>', {
 				role: 'menuitem',
 				tabindex: '-1',
 				'aria-label': options.selected ? sprintf(t('S_SELECTED_SR'), options.ariaLabel) : options.ariaLabel
 			}).data('aria-label', options.ariaLabel);
 
-		if (typeof options.label !== 'undefined') {
+		if (options.label !== undefined) {
 			link.text(options.label);
 
-			if (typeof options.items !== 'undefined' && options.items.length > 0) {
+			if (options.items !== undefined && options.items.length > 0) {
 				// if submenu exists
 				link.append($('<span>', {'class': 'arrow-right'}));
 			}
 		}
 
-		if (typeof options.data !== 'undefined' && objectSize(options.data) > 0) {
+		if (options.data !== undefined && objectSize(options.data) > 0) {
 			$.each(options.data, function(key, value) {
 				link.data(key, value);
 			});
@@ -2102,7 +2254,7 @@ jQuery(function($) {
 			link.addClass('disabled');
 		}
 		else {
-			if (typeof options.url !== 'undefined') {
+			if (options.url !== undefined) {
 				link.attr('href', options.url);
 
 				if ('target' in options) {
@@ -2114,7 +2266,7 @@ jQuery(function($) {
 				}
 			}
 
-			if (typeof options.clickCallback !== 'undefined') {
+			if (options.clickCallback !== undefined) {
 				link.on('click', options.clickCallback);
 			}
 		}
@@ -2133,11 +2285,10 @@ jQuery(function($) {
 			});
 		}
 
-		if (typeof options.items !== 'undefined' && options.items.length > 0) {
+		if (options.items !== undefined && options.items.length > 0) {
 			link.attr({
 				'aria-haspopup': 'true',
-				'aria-expanded': 'false',
-				'aria-hidden': 'true'
+				'aria-expanded': 'false'
 			});
 			link.on('click', function(e) {
 				e.stopPropagation();
@@ -2146,27 +2297,40 @@ jQuery(function($) {
 
 		item.append(link);
 
-		if (typeof options.items !== 'undefined' && options.items.length > 0) {
-			var menu = $('<ul>', {
-					class : 'menu-popup',
-					role: 'menu'
-				})
-				.on('mouseenter', function(e) {
-					// Prevent 'mouseenter' event in parent item, that would call actionMenuItemExpand() for parent.
-					e.stopPropagation();
-				});
+		if (options.items !== undefined && options.items.length > 0) {
+			const menu = $('<ul>', {
+				class : 'menu-popup',
+				role: 'menu'
+			}).on('mouseover', function(e) {
+				// Prevent 'mouseover' event in parent item, that would call actionMenuItemExpand() for parent.
+				e.stopPropagation();
+			});
 
 			$.each(options.items, function(i, item) {
 				menu.append(createMenuItem(item));
 			});
 
 			item.append(menu);
+
+			menu.on('scroll', e => {
+				e.stopPropagation();
+
+				$('ul', menu).actionMenuItemCollapse();
+			});
 		}
 
-		item.on('mouseenter', function(e) {
+		let menu_timer;
+
+		item.on('mouseover', function(e) {
+			// Prevent 'mouseover' event in parent item, that would call actionMenuItemExpand() for parent.
 			e.stopPropagation();
-			$(this).actionMenuItemExpand();
+
+			const $current_item = $(this);
+
+			menu_timer = setTimeout(() => $current_item.actionMenuItemExpand(), SUBMENU_DELAY);
 		});
+
+		item.on('mouseleave', () => clearTimeout(menu_timer));
 
 		return item;
 	}

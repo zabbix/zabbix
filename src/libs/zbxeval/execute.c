@@ -2865,7 +2865,6 @@ clean:
 	return ret;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: evaluates xmlxpath() function                                     *
@@ -3132,8 +3131,8 @@ static int	eval_execute_common_function(const zbx_eval_context_t *ctx, const zbx
 	if (SUCCEED == eval_compare_token(ctx, &token->loc, "xmlxpath", ZBX_CONST_STRLEN("xmlxpath")))
 		return eval_execute_function_xmlxpath(ctx, token, output, error);
 
-	if (NULL != ctx->common_func_cb)
-		return eval_execute_cb_function(ctx, token, ctx->common_func_cb, output, error);
+	if (NULL != ctx->eval_function_common_cb)
+		return eval_execute_cb_function(ctx, token, ctx->eval_function_common_cb, output, error);
 
 	*error = zbx_dsprintf(*error, "Unknown function at \"%s\".", ctx->expression + token->loc.l);
 	return FAIL;
@@ -3162,8 +3161,8 @@ static int	eval_execute_history_function(const zbx_eval_context_t *ctx, const zb
 		return FAIL;
 	}
 
-	if (NULL != ctx->history_func_cb)
-		return eval_execute_cb_function(ctx, token, ctx->history_func_cb, output, error);
+	if (NULL != ctx->eval_function_history_cb)
+		return eval_execute_cb_function(ctx, token, ctx->eval_function_history_cb, output, error);
 
 	*error = zbx_dsprintf(*error, "Unknown function at \"%s\".", ctx->expression + token->loc.l);
 	return FAIL;
@@ -3193,7 +3192,7 @@ static void	eval_throw_exception(zbx_vector_var_t *output, char **error)
 	{
 		*error = zbx_dsprintf(*error, "unknown exception of type '%s'", zbx_variant_type_desc(arg));
 
-		zabbix_log(LOG_LEVEL_CRIT, *error);
+		zabbix_log(LOG_LEVEL_CRIT, "%s", *error);
 		THIS_SHOULD_NEVER_HAPPEN;
 	}
 	else
@@ -3322,23 +3321,24 @@ out:
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: initializes execution context                                     *
- *                                                                            *
- * Parameters: ctx             - [IN] evaluation context                      *
- *             ts              - [IN] timestamp of execution time             *
- *             common_func_cb  - [IN] common function callback (optional)     *
- *             history_func_cb - [IN] history function callback (optional)    *
- *             data_cb         - [IN] caller data to be passed to callback    *
- *                                    functions                               *
- *                                                                            *
- ******************************************************************************/
+/*****************************************************************************************
+ *                                                                                       *
+ * Purpose: initializes execution context                                                *
+ *                                                                                       *
+ * Parameters: ctx                        - [IN] evaluation context                      *
+ *             ts                         - [IN] timestamp of execution time             *
+ *             eval_function_common_func  - [IN] common function callback (optional)     *
+ *             eval_function_history_func - [IN] history function callback (optional)    *
+ *             data_cb                    - [IN] caller data to be passed to callback    *
+ *                                               functions                               *
+ *                                                                                       *
+ *****************************************************************************************/
 static void	eval_init_execute_context(zbx_eval_context_t *ctx, const zbx_timespec_t *ts,
-		zbx_eval_function_cb_t common_func_cb, zbx_eval_function_cb_t history_func_cb, void *data_cb)
+		zbx_eval_function_cb_t eval_function_common_func, zbx_eval_function_cb_t eval_function_history_func,
+		void *data_cb)
 {
-	ctx->common_func_cb = common_func_cb;
-	ctx->history_func_cb = history_func_cb;
+	ctx->eval_function_common_cb = eval_function_common_func;
+	ctx->eval_function_history_cb = eval_function_history_func;
 	ctx->data_cb = data_cb;
 
 	if (NULL == ts)
@@ -3367,30 +3367,31 @@ int	zbx_eval_execute(zbx_eval_context_t *ctx, const zbx_timespec_t *ts, zbx_vari
 	return eval_execute(ctx, value, error);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: evaluates parsed expression with callback for custom function     *
- *          processing                                                        *
- *                                                                            *
- * Parameters: ctx             - [IN] evaluation context                      *
- *             ts              - [IN] timestamp of execution time             *
- *             common_func_cb  - [IN] common function callback (optional)     *
- *             history_func_cb - [IN] history function callback (optional)    *
- *             data            - [IN]                                         *
- *             value           - [OUT] resulting value                        *
- *             error           - [OUT] error message                          *
- *                                                                            *
- * Return value: SUCCEED - expression was evaluated successfully              *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- * Comments: The callback will be called for unsupported math and all history *
- *           functions.                                                       *
- *                                                                            *
- ******************************************************************************/
-int	zbx_eval_execute_ext(zbx_eval_context_t *ctx, const zbx_timespec_t *ts, zbx_eval_function_cb_t common_func_cb,
-		zbx_eval_function_cb_t history_func_cb, void *data, zbx_variant_t *value, char **error)
+/************************************************************************************
+ *                                                                                  *
+ * Purpose: evaluates parsed expression with callback for custom function           *
+ *          processing                                                              *
+ *                                                                                  *
+ * Parameters: ctx                      - [IN] evaluation context                   *
+ *             ts                       - [IN] timestamp of execution time          *
+ *             eval_function_common_cb  - [IN] common function callback (optional)  *
+ *             eval_function_history_cb - [IN] history function callback (optional) *
+ *             data                     - [IN]                                      *
+ *             value                    - [OUT] resulting value                     *
+ *             error                    - [OUT] error message                       *
+ *                                                                                  *
+ * Return value: SUCCEED - expression was evaluated successfully                    *
+ *               FAIL    - otherwise                                                *
+ *                                                                                  *
+ * Comments: The callback will be called for unsupported math and all history       *
+ *           functions.                                                             *
+ *                                                                                  *
+ ************************************************************************************/
+int	zbx_eval_execute_ext(zbx_eval_context_t *ctx, const zbx_timespec_t *ts,
+		zbx_eval_function_cb_t eval_function_common_cb, zbx_eval_function_cb_t eval_function_history_cb,
+		void *data, zbx_variant_t *value, char **error)
 {
-	eval_init_execute_context(ctx, ts, common_func_cb, history_func_cb, data);
+	eval_init_execute_context(ctx, ts, eval_function_common_cb, eval_function_history_cb, data);
 
 	return eval_execute(ctx, value, error);
 }

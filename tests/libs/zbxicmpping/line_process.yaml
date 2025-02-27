@@ -9,6 +9,7 @@ in:
   allow_redirect: 0
   fping_existence: 3
   host_up: 1
+  retries: -1
 out:
   min: 0.000610
   sum: 0.001940
@@ -25,6 +26,7 @@ in:
   allow_redirect: 0
   fping_existence: 3
   host_up: 0
+  retries: -1
 out:
   min: 0.0
   sum: 0.0
@@ -39,6 +41,7 @@ in:
   requests_count: 1
   allow_redirect: 0
   fping_existence: 3
+  retries: -1
 out:
   host_up: 1
 ---
@@ -50,6 +53,7 @@ in:
   requests_count: 1
   allow_redirect: 1
   fping_existence: 3
+  retries: -1
 out:
   host_up: 1
 ---
@@ -61,6 +65,7 @@ in:
   requests_count: 1
   allow_redirect: 0
   fping_existence: 3
+  retries: -1
 out:
   host_up: 0
 ---
@@ -72,6 +77,7 @@ in:
   requests_count: 1
   allow_redirect: 1
   fping_existence: 3
+  retries: -1
 out:
   host_up: 1
 ---
@@ -83,6 +89,39 @@ in:
   requests_count: 1
   allow_redirect: 0
   fping_existence: 3
+  retries: -1
 out:
   host_up: 0
+---
+test case: "icmppingretry alive"
+in:
+  test_type: "test_process_fping_statistics_line"
+  ipaddr: "192.168.1.1"
+  linebuf: "192.168.1.1 is alive"
+  requests_count: 1
+  allow_redirect: 0
+  fping_existence: 3
+  host_up: 1
+  retries: 1
+out:
+  min: 0.0
+  sum: 0.0
+  max: 0.0
+  rcv: 1
+---
+test case: "icmppingretry unreachable"
+in:
+  test_type: "test_process_fping_statistics_line"
+  ipaddr: "192.168.1.1"
+  linebuf: "192.168.1.1 is unreachable"
+  requests_count: 1
+  allow_redirect: 0
+  fping_existence: 3
+  host_up: 1
+  retries: 1
+out:
+  min: 0.0
+  sum: 0.0
+  max: 0.0
+  rcv: 0
 ...

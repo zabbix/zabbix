@@ -71,14 +71,10 @@ class testFormAuthentication extends CWebTest {
 		$this->checkTablesHeaders($mapping_tables, $form);
 
 		// Check group mapping popup.
-		$this->checkMappingDialog('User group mapping', 'New user group mapping', $form,
-				[$auth_type.' group pattern', 'User groups', 'User role'], $auth_type
-		);
+		$this->checkMappingDialog('User group mapping', 'New user group mapping', $form, $auth_type);
 
 		// Check media type mapping popup.
-		$this->checkMappingDialog('Media type mapping', 'New media type mapping',
-				$form, ['Name', 'Media type', 'Attribute', 'When active'], $auth_type
-		);
+		$this->checkMappingDialog('Media type mapping', 'New media type mapping', $form, $auth_type);
 	}
 
 	/**
@@ -101,14 +97,43 @@ class testFormAuthentication extends CWebTest {
 	 * @param string          $field	    field which mapping is checked
 	 * @param string          $title        title in dialog
 	 * @param CFormElement    $form         given LDAP or SAML form
-	 * @param array           $labels       labels in mapping form
 	 * @param string          $auth_type    LDAP or SAML
 	 */
-	protected function checkMappingDialog($field, $title, $form, $labels, $auth_type) {
+	protected function checkMappingDialog($field, $title, $form, $auth_type) {
 		$form->getFieldContainer($field)->query('button:Add')->waitUntilClickable()->one()->click();
 		$mapping_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
 		$this->assertEquals($title, $mapping_dialog->getTitle());
 		$mapping_form = $mapping_dialog->asForm();
+
+		if ($field === 'Media type mapping') {
+			$labels = ['Name', 'Media type', 'Attribute', 'User media', 'When active', 'Use if severity', 'Create enabled'];
+			$required = ['Name', 'Media type', 'Attribute', 'When active'];
+			$values = [
+				'Name' => '',
+				'Media type' => 'Brevis.one',
+				'Attribute' => '',
+				'When active' => '1-7,00:00-24:00',
+				'class:checkbox-list' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+				'Create enabled' => true
+			];
+			$field_maxlength = [
+				'Name' => 64,
+				'Attribute' => 255,
+				'When active' => 1024
+			];
+		}
+		else {
+			$labels = [$auth_type.' group pattern', 'User groups', 'User role'];
+			$required = $labels;
+			$values = [
+				$auth_type.' group pattern' => '',
+				'User groups' => '',
+				'User role' => ''
+			];
+			$field_maxlength = [
+				$auth_type.' group pattern' => 255
+			];
+		}
 
 		foreach ($labels as $label) {
 			$mapping_field = $mapping_form->getField($label);
@@ -116,19 +141,21 @@ class testFormAuthentication extends CWebTest {
 			$this->assertTrue($mapping_field->isEnabled());
 		}
 
-		$this->assertEquals($labels, $mapping_form->getRequiredLabels());
-
-		$values = ($field === 'Media type mapping')
-			? ['Name' => '', 'Media type' => 'Brevis.one', 'Attribute' => '']
-			: [$auth_type.' group pattern' => '', 'User groups' => '', 'User role' => ''];
-
+		$this->assertEquals($required, $mapping_form->getRequiredLabels());
 		$mapping_form->checkValue($values);
 
-		// Check group mapping popup footer buttons.
-		$this->assertTrue($mapping_dialog->getFooter()->query('button:Add')->one()->isClickable());
+		foreach ($field_maxlength as $field => $maxlength) {
+			$this->assertEquals($maxlength, $mapping_form->getField($field)->getAttribute('maxlength'));
+		}
 
-		// Check mapping dialog footer buttons.
-		$footer = $this->checkFooterButtons($mapping_dialog, ['Add', 'Cancel']);
+		if ($field === 'Media type mapping') {
+			$this->assertEquals('1-7,00:00-24:00', $mapping_form->getField('When active')->getAttribute('placeholder'));
+		}
+
+		// Check popup footer buttons.
+		$this->assertEquals(['Add', 'Cancel'], $mapping_dialog->getFooter()
+				->query('button')->all()->filter(CElementFilter::CLICKABLE)->asText()
+		);
 
 		// Check hint in group mapping popup.
 		if ($field === 'User group mapping') {
@@ -138,7 +165,7 @@ class testFormAuthentication extends CWebTest {
 		}
 
 		// Close mapping dialog.
-		$footer->query('button:Cancel')->waitUntilClickable()->one()->click();
+		$mapping_dialog->query('button:Cancel')->waitUntilClickable()->one()->click();
 	}
 
 	/**

@@ -624,8 +624,8 @@ void	zbx_db_select_uint64(const char *sql, zbx_vector_uint64_t *ids)
  *          batches (last batch is not executed)                              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_prepare_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids, char **sql,
-		size_t	*sql_alloc, size_t *sql_offset)
+int	zbx_db_prepare_multiple_query(const char *query, const char *field_name, const zbx_vector_uint64_t *ids,
+		char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
 	if (NULL == dbconn)
 	{
@@ -642,7 +642,7 @@ int	zbx_db_prepare_multiple_query(const char *query, const char *field_name, zbx
  *          batches                                                           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_execute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids)
+int	zbx_db_execute_multiple_query(const char *query, const char *field_name, const zbx_vector_uint64_t *ids)
 {
 	if (NULL == dbconn)
 	{
@@ -651,6 +651,24 @@ int	zbx_db_execute_multiple_query(const char *query, const char *field_name, zbx
 	}
 
 	return zbx_dbconn_execute_multiple_query(dbconn, query, field_name, ids);
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute query with large number of primary key matches in smaller *
+ *          batches, values will be supplied as strings                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_execute_multiple_query_str(const char *query, const char *field_name, const zbx_vector_uint64_t *ids)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return ZBX_DB_FAIL;
+	}
+
+	return zbx_dbconn_execute_multiple_query_str(dbconn, query, field_name, ids);
 }
 
 /******************************************************************************
