@@ -16,6 +16,7 @@ package agent
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -519,7 +520,7 @@ func Test_removeSystem(t *testing.T) {
 func Test_ValidateOptions(t *testing.T) {
 	t.Parallel()
 
-	invalidServerConfigurationError := "Invalid \"Server\" configuration parameter: invalid \"Server\" " +
+	invalidServerConfigurationError := "invalid \"Server\" " +
 		"configuration: incorrect address parameter: "
 
 	type args struct {
@@ -579,7 +580,7 @@ func Test_ValidateOptions(t *testing.T) {
 					Server: "\n",
 				},
 			},
-			errors.New(invalidServerConfigurationError + "\"\n\"."),
+			errors.New(invalidServerConfigurationError + "\"\n\""),
 			true,
 		},
 		{
@@ -589,7 +590,7 @@ func Test_ValidateOptions(t *testing.T) {
 					Server: ",",
 				},
 			},
-			errors.New(invalidServerConfigurationError + "\"\"."),
+			errors.New(invalidServerConfigurationError + "\"\""),
 			true,
 		},
 		{
@@ -599,7 +600,7 @@ func Test_ValidateOptions(t *testing.T) {
 					Server: "localhost,",
 				},
 			},
-			errors.New(invalidServerConfigurationError + "\"\"."),
+			errors.New(invalidServerConfigurationError + "\"\""),
 			true,
 		},
 		{
@@ -609,7 +610,7 @@ func Test_ValidateOptions(t *testing.T) {
 					Server: ";",
 				},
 			},
-			errors.New(invalidServerConfigurationError + "\";\"."),
+			errors.New(invalidServerConfigurationError + "\";\""),
 			true,
 		},
 		{
@@ -619,7 +620,7 @@ func Test_ValidateOptions(t *testing.T) {
 					Server: "127.0.0.1;localhost",
 				},
 			},
-			errors.New(invalidServerConfigurationError + "\"127.0.0.1;localhost\"."),
+			errors.New(invalidServerConfigurationError + "\"127.0.0.1;localhost\""),
 			true,
 		},
 	}
@@ -645,9 +646,6 @@ func Test_ValidateOptions(t *testing.T) {
 func TestParseServerActive(t *testing.T) {
 	t.Parallel()
 
-	invalidServerActiveConfigurationErrorEmptyValue := `address "": empty value`
-	invalidServerActiveConfigurationErrorEmptyValueWithFooPort10051 := `address "foo:10051" specified more than once`
-
 	tests := []struct {
 		name         string
 		serverActive string
@@ -671,14 +669,14 @@ func TestParseServerActive(t *testing.T) {
 		{
 			"-squareBrackets",
 			" [ ]:80 ",
-			errors.New(`address "[ ]:80": empty value`),
+			fmt.Errorf("%w %s", errServerActive, `address "[ ]:80": empty value`),
 			true,
 			nil,
 		},
 		{
 			"-emptySpaceAddressAndValidPort",
 			" :80 ",
-			errors.New(`address ":80": empty value`),
+			fmt.Errorf("%w %s", errServerActive, `address ":80": empty value`),
 			true,
 			nil,
 		},
@@ -769,14 +767,14 @@ func TestParseServerActive(t *testing.T) {
 		{
 			"-coma",
 			",",
-			errors.New(invalidServerActiveConfigurationErrorEmptyValue),
+			fmt.Errorf("%w %s", errServerActive, `address "": empty value`),
 			true,
 			nil,
 		},
 		{
 			"-comaWithEmptySpacesAround",
 			" , ",
-			errors.New(invalidServerActiveConfigurationErrorEmptyValue),
+			fmt.Errorf("%w %s", errServerActive, `address "": empty value`),
 			true,
 			nil,
 		},
@@ -881,49 +879,50 @@ func TestParseServerActive(t *testing.T) {
 		{
 			"-twoStringsSeparatedByComa",
 			"foo,foo",
-			errors.New(invalidServerActiveConfigurationErrorEmptyValueWithFooPort10051),
+
+			fmt.Errorf("%w %s", errServerActive, `address "foo:10051" specified more than once`),
 			true,
 			nil,
 		},
 		{
 			"-twoStringsSeparatedBySemicolon",
 			"foo;foo",
-			errors.New(invalidServerActiveConfigurationErrorEmptyValueWithFooPort10051),
+			fmt.Errorf("%w %s", errServerActive, `address "foo:10051" specified more than once`),
 			true,
 			nil,
 		},
 		{
 			"-threeClustersWithStringThatShouldNotBeValidIPAddresses",
 			"foo;bar,foo2;foo",
-			errors.New(invalidServerActiveConfigurationErrorEmptyValueWithFooPort10051),
+			fmt.Errorf("%w %s", errServerActive, `address "foo:10051" specified more than once`),
 			true,
 			nil,
 		},
 		{
 			"-semicolon",
 			";",
-			errors.New(invalidServerActiveConfigurationErrorEmptyValue),
+			fmt.Errorf("%w %s", errServerActive, `address "": empty value`),
 			true,
 			nil,
 		},
 		{
 			"-semicolonWithEmptySpaceBefore",
 			" ;",
-			errors.New(invalidServerActiveConfigurationErrorEmptyValue),
+			fmt.Errorf("%w %s", errServerActive, `address "": empty value`),
 			true,
 			nil,
 		},
 		{
 			"-semicolonWithEmptySpaceAfter",
 			"; ",
-			errors.New(invalidServerActiveConfigurationErrorEmptyValue),
+			fmt.Errorf("%w %s", errServerActive, `address "": empty value`),
 			true,
 			nil,
 		},
 		{
 			"-semicolonWithEmptySpacesBeforeAndAfter",
 			" ; ",
-			errors.New(invalidServerActiveConfigurationErrorEmptyValue),
+			fmt.Errorf("%w %s", errServerActive, `address "": empty value`),
 			true,
 			nil,
 		},

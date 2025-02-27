@@ -19,13 +19,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
+	"net/url"
 	"os"
 	"slices"
 	"strings"
 	"unicode"
 	"unicode/utf8"
-	"net"
-	"net/url"
 
 	"golang.zabbix.com/agent2/pkg/tls"
 	"golang.zabbix.com/sdk/conf"
@@ -82,6 +82,8 @@ var (
 	errCipherCert13WithoutCert = errors.New("TLSCipherCert13 configuration parameter set without certificates being" +
 		" used")
 	errInvalidTLSPSKFile = errors.New("invalid TLSPSKFile configuration parameter")
+
+	errServerActive = errors.New(`invalid "ServerActive" configuration parameter`)
 )
 
 // PluginSystemOptions collection of system options for all plugins, map key are plugin names.
@@ -360,15 +362,15 @@ func GlobalOptions(all *AgentOptions) (options *plugin.GlobalOptions) {
 	return
 }
 
-
-// ParseServerActive validates address list of zabbix Server or Proxy for ActiveCheck
+// ParseServerActive validates address list of zabbix Server or Proxy for ActiveCheck.
 func ParseServerActive(optionServerActive string) ([][]string, error) {
 
-	if 0 == len(strings.TrimSpace(optionServerActive)) {
+	if strings.TrimSpace(optionServerActive) == "" {
 		return [][]string{}, nil
 	}
 
 	var checkAddr string
+
 	clusters := strings.Split(optionServerActive, ",")
 
 	addrs := make([][]string, len(clusters))
@@ -380,20 +382,21 @@ func ParseServerActive(optionServerActive string) ([][]string, error) {
 			addresses[j] = strings.TrimSpace(addresses[j])
 			u := url.URL{Host: addresses[j]}
 			ip := net.ParseIP(addresses[j])
-			if nil == ip && 0 == len(strings.TrimSpace(u.Hostname())) {
-				return nil, fmt.Errorf("address \"%s\": empty value", addresses[j])
+
+			if ip == nil && strings.TrimSpace(u.Hostname()) == "" {
+				return nil, fmt.Errorf("%w address \"%s\": empty value", errServerActive, addresses[j])
 			}
 
-			if nil != ip {
+			if ip != nil {
 				checkAddr = net.JoinHostPort(addresses[j], "10051")
-			} else if 0 == len(u.Port()) {
+			} else if u.Port() == "" {
 				checkAddr = net.JoinHostPort(u.Hostname(), "10051")
 			} else {
 				checkAddr = addresses[j]
 			}
 
 			if h, p, err := net.SplitHostPort(checkAddr); err != nil {
-				return nil, fmt.Errorf("address \"%s\": %s", addresses[j], err)
+				return nil, fmt.Errorf("%w address \"%s\": %s", errServerActive, addresses[j], err)
 			} else {
 				addresses[j] = net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p))
 			}
@@ -401,7 +404,7 @@ func ParseServerActive(optionServerActive string) ([][]string, error) {
 			for k := 0; k < len(addrs); k++ {
 				for l := 0; l < len(addrs[k]); l++ {
 					if addrs[k][l] == addresses[j] {
-						return nil, fmt.Errorf("address \"%s\" specified more than once", addresses[j])
+						return nil, fmt.Errorf("%w address \"%s\" specified more than once", errServerActive, addresses[j])
 					}
 				}
 			}
@@ -441,13 +444,13 @@ func ValidateOptions(options *AgentOptions) error {
 	_, err = zbxnet.GetAllowedPeers(options.Server)
 
 	if err != nil {
-		return errs.Wrapf(err, `invalid "Server" configuration parameter`)
+		return err
 	}
 
 	_, err = ParseServerActive(options.ServerActive)
 
 	if err != nil {
-		return errs.Wrapf(err, `invalid "ServerActive" configuration parameter`)
+		return err
 	}
 
 	return nil
