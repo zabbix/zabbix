@@ -587,7 +587,7 @@ int	dc_get_host_redirect(const char *host, const zbx_tls_conn_attr_t *attr, zbx_
 
 	if (0 == ((unsigned int)tls_accept & attr->connection_type))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot perform host \"host\" redirection: connection of type \"%s\""
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot perform host \"%s\" redirection: connection of type \"%s\""
 				" is not allowed",
 				host, zbx_tcp_connection_type_name(attr->connection_type));
 
