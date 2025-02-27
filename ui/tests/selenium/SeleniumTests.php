@@ -309,6 +309,7 @@ require_once dirname(__FILE__).'/triggers/testTriggerExpressions.php';
 require_once dirname(__FILE__).'/users/testFormUser.php';
 require_once dirname(__FILE__).'/users/testFormUserGroups.php';
 require_once dirname(__FILE__).'/users/testFormUserMedia.php';
+require_once dirname(__FILE__).'/users/testFormUserLdapMediaJit.php';
 require_once dirname(__FILE__).'/users/testFormUserPermissions.php';
 require_once dirname(__FILE__).'/users/testFormUserProfile.php';
 require_once dirname(__FILE__).'/users/testAlarmNotification.php';
@@ -646,6 +647,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormUser');
 		$suite->addTestSuite('testFormUserGroups');
 		$suite->addTestSuite('testFormUserMedia');
+		$suite->addTestSuite('testFormUserLdapMediaJit');
 		$suite->addTestSuite('testFormUserPermissions');
 		$suite->addTestSuite('testAlarmNotification');
 		$suite->addTestSuite('testFormUserProfile');
