@@ -20,6 +20,17 @@ class CControllerTriggerPrototypeCreate extends CController {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
+	public static function getValidationRules():array {
+		$api_uniq = [
+			['trigger.get', ['description' => '{description}']]
+		];
+
+		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
+			'description' => ['db triggers.description', 'required', 'not_empty'],
+			'expression' => ['db triggers.expression', 'required', 'not_empty']
+		]];
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'name' =>					'required|db triggers.description|not_empty',

@@ -21,7 +21,7 @@
 ?>
 window.trigger_edit_popup = new class {
 
-	init({triggerid, expression_popup_parameters, recovery_popup_parameters, readonly, dependencies, action,
+	init({rules, triggerid, expression_popup_parameters, recovery_popup_parameters, readonly, dependencies, action,
 			context, db_trigger, return_url, overlayid, parent_discoveryid
 	}) {
 		this.triggerid = triggerid;
@@ -36,6 +36,7 @@ window.trigger_edit_popup = new class {
 		this.parent_discoveryid = parent_discoveryid;
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
 		this.expression = this.form_element.querySelector('#expression');
 		this.expr_temp = this.form_element.querySelector('#expr_temp');
 		this.name = this.form_element.querySelector('#name');

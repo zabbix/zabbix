@@ -204,6 +204,10 @@ class CControllerTriggerPrototypeEdit extends CController {
 			? CTriggerGeneralHelper::convertApiInputForForm($this->trigger_prototype)
 			: [];
 
+		$data['js_validation_rules'] = $this->hasInput('triggerid')
+			? (new CFormValidator(CControllerTriggerPrototypeUpdate::getValidationRules()))->getRules()
+			: (new CFormValidator(CControllerTriggerPrototypeCreate::getValidationRules()))->getRules();
+
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);
 	}

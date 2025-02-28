@@ -193,6 +193,9 @@ class CControllerTriggerEdit extends CController {
 		$data['recovery_expr_temp'] = $data['recovery_expression'];
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 		$data['db_trigger'] = $this->trigger ? CTriggerGeneralHelper::convertApiInputForForm($this->trigger) : [];
+		$data['js_validation_rules'] = $this->hasInput('triggerid')
+			? (new CFormValidator(CControllerTriggerUpdate::getValidationRules()))->getRules()
+			: (new CFormValidator(CControllerTriggerCreate::getValidationRules()))->getRules();
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);

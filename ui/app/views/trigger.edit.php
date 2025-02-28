@@ -131,6 +131,7 @@ $return_url = (new CUrl('zabbix.php'))
 $trigger_form
 	->addItem($triggers_tab)
 	->addItem((new CScriptTag('trigger_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
 			'triggerid' => $data['triggerid'],
 			'expression_popup_parameters' => $popup_parameters,
 			'readonly' => $readonly,
