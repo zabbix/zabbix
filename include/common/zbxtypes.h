@@ -20,11 +20,7 @@
 #if defined(_WINDOWS)
 #	define ZBX_THREAD_LOCAL __declspec(thread)
 #else
-#	if defined(HAVE_THREAD_LOCAL) && (defined(__GNUC__) || defined(__clang__) || defined(__MINGW32__))
-#		define ZBX_THREAD_LOCAL __thread
-#	else
-#		error "C compiler is not compatible with agent2 assembly"
-#	endif
+#	define ZBX_THREAD_LOCAL __thread
 #endif
 
 #if defined(_WINDOWS)
