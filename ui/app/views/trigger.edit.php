@@ -62,7 +62,7 @@ $triggers_tab = (new CTabView())
 			'readonly' => $discovered_trigger,
 			'tabs_id' => 'tabs',
 			'tags_tab_id' => 'tags-tab',
-			'has_inline_validation' => false
+			'has_inline_validation' => true
 		]),
 		TAB_INDICATOR_TAGS
 	)
