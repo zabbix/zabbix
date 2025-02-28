@@ -86,7 +86,9 @@ class CWidgetGeoMap extends CWidget {
 		this._addMarkers(this.#hosts);
 
 		if (this.isReferred() && (this.isFieldsReferredDataUpdated() || !this.hasEverUpdated())) {
-			this.#selected_hostid = this.#getDefaultSelectable();
+			if (this.#selected_hostid === null || !this.#hasSelectable()) {
+				this.#selected_hostid = this.#getDefaultSelectable();
+			}
 
 			if (this.#selected_hostid !== null) {
 				this.#updateHintboxes();
@@ -124,6 +126,12 @@ class CWidgetGeoMap extends CWidget {
 				? current
 				: closest;
 		}).properties.hostid;
+	}
+
+	#hasSelectable() {
+		const hostids = this.#hosts.map(host => host.properties.hostid);
+
+		return hostids.includes(this.#selected_hostid);
 	}
 
 	onReferredUpdate() {

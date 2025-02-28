@@ -41,19 +41,17 @@ class CWidgetProblemHosts extends CWidget {
 		this.#table_body.addEventListener('click', e => this.#onTableBodyClick(e));
 
 		if (this.isReferred() && (this.isFieldsReferredDataUpdated() || !this.hasEverUpdated())) {
-			this.#selected_hostgroupid = this.#getDefaultSelectable();
+			if (this.#selected_hostgroupid === null || !this.#hasSelectable()) {
+				this.#selected_hostgroupid = this.#getDefaultSelectable();
+			}
 
 			if (this.#selected_hostgroupid !== null) {
 				this.#selectHostGroup();
 				this.#broadcast();
 			}
 		}
-		else if (this.#selected_hostgroupid !== null) {
-			const row = this.#table_body.querySelector(`[data-hostgroupid="${this.#selected_hostgroupid}"]`);
-
-			if (row !== null) {
-				this.#selectHostGroup();
-			}
+		else if (this.#selected_hostgroupid !== null && this.#hasSelectable()) {
+			this.#selectHostGroup();
 		}
 	}
 
@@ -68,6 +66,10 @@ class CWidgetProblemHosts extends CWidget {
 			this.#selectHostGroup();
 			this.#broadcast();
 		}
+	}
+
+	#hasSelectable() {
+		return this.#table_body.querySelector(`[data-hostgroupid="${this.#selected_hostgroupid}"]`) !== null;
 	}
 
 	#getDefaultSelectable() {

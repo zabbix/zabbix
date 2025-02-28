@@ -23,6 +23,11 @@ class CWidgetHostNavigator extends CWidget {
 	#host_navigator = null;
 
 	/**
+	 * @type {Array}
+	 */
+	#hosts = [];
+
+	/**
 	 * Listeners of host navigator widget.
 	 *
 	 * @type {Object}
@@ -81,6 +86,7 @@ class CWidgetHostNavigator extends CWidget {
 		}
 
 		this.#csrf_token = response[CSRF_TOKEN_NAME];
+		this.#hosts = response.hosts;
 
 		if (this.#host_navigator === null) {
 			this.clearContents();
@@ -100,7 +106,9 @@ class CWidgetHostNavigator extends CWidget {
 		});
 
 		if (this.isReferred() && (this.isFieldsReferredDataUpdated() || !this.hasEverUpdated())) {
-			this.#selected_hostid = this.#getDefaultSelectable();
+			if (this.#selected_hostid === null || !this.#hasSelectable()) {
+				this.#selected_hostid = this.#getDefaultSelectable();
+			}
 
 			if (this.#selected_hostid !== null) {
 				this.#host_navigator.selectItem(this.#selected_hostid);
@@ -119,6 +127,12 @@ class CWidgetHostNavigator extends CWidget {
 		const selected_element = this._body.querySelector(`.${CNavigationTree.ZBX_STYLE_NODE_IS_ITEM}`);
 
 		return selected_element !== null ? selected_element.dataset.id : null;
+	}
+
+	#hasSelectable() {
+		const hostids = this.#hosts.map(host => host.id);
+
+		return hostids.includes(this.#selected_hostid);
 	}
 
 	onReferredUpdate() {
