@@ -164,14 +164,15 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		$this->executeWidgetAction($widgets, 'update');
 	}
 
-// Commented until Jenkins issue investigated.
-//	/**
-//	 * @onBefore prepareHANodeData
-//	 */
-//	public function testDashboardSystemInformationWidget_checkEnabledHA() {
-//		$this->assertEnabledHACluster(self::$dashboardid);
-//		$this->assertScreenshotExcept(CDashboardElement::find()->one(), self::$skip_fields, 'widgets_with_ha');
-//	}
+	/**
+	 * @onBefore prepareHANodeData
+	 */
+	public function testDashboardSystemInformationWidget_checkEnabledHA() {
+		$this->assertEnabledHACluster(self::$dashboardid);
+		// TODO: Incorrect screenshot on Jenkins due to Chrome - need to remove mouse hover on second widget name.
+		$this->query('id:page-title-general')->one()->hoverMouse();
+		$this->assertScreenshotExcept(CDashboardElement::find()->one(), self::$skip_fields, 'widgets_with_ha');
+	}
 
 	/**
 	 * Function checks that Zabbix server status is updated after failover delay passes and frontend config is re-validated.
