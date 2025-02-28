@@ -121,6 +121,8 @@ class testDashboardSystemInformationWidget extends testSystemInformation {
 		CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
 				[$this->query('xpath://table[@class="list-table sticky-header"]/tbody/tr[3]/td[1]')->one()]
 		);
+		// TODO: Incorrect screenshot on Jenkins due to Chrome - need to remove mouse hover on second widget name.
+		$this->query('id:page-title-general')->one()->hoverMouse();
 		$this->assertScreenshot($dashboard, 'widget_without_ha');
 	}
 
