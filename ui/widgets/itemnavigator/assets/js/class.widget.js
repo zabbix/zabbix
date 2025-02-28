@@ -116,7 +116,7 @@ class CWidgetItemNavigator extends CWidget {
 			selected_itemid: this.#selected_itemid
 		});
 
-		if (!this.hasEverUpdated() && this.isReferred()) {
+		if (this.isReferred() && (this.isFieldsReferredDataUpdated() || !this.hasEverUpdated())) {
 			this.#selected_itemid = this.#getDefaultSelectable();
 
 			if (this.#selected_itemid !== null) {

@@ -21,9 +21,14 @@
  * @var array $data
  */
 
-(new CWidgetView($data))
+$view = (new CWidgetView($data))
 	->addItem(
 		(new CDiv())->setId($data['unique_id'])
 	)
-	->setVar('geomap', array_intersect_key($data, array_flip(['config', 'hosts'])))
-	->show();
+	->setVar('hosts', $data['hosts']);
+
+if ($data['initial_load'] == 1) {
+	$view->setVar('config', $data['config']);
+}
+
+$view->show();

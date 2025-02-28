@@ -99,7 +99,7 @@ class CWidgetHostNavigator extends CWidget {
 			selected_hostid: this.#selected_hostid
 		});
 
-		if (!this.hasEverUpdated() && this.isReferred()) {
+		if (this.isReferred() && (this.isFieldsReferredDataUpdated() || !this.hasEverUpdated())) {
 			this.#selected_hostid = this.#getDefaultSelectable();
 
 			if (this.#selected_hostid !== null) {

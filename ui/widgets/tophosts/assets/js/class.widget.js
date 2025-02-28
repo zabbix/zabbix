@@ -40,7 +40,7 @@ class CWidgetTopHosts extends CWidget {
 
 		this.#table_body.addEventListener('click', e => this.#onTableBodyClick(e));
 
-		if (!this.hasEverUpdated() && this.isReferred()) {
+		if (this.isReferred() && (this.isFieldsReferredDataUpdated() || !this.hasEverUpdated())) {
 			this.#selected_hostid = this.#getDefaultSelectable();
 
 			if (this.#selected_hostid !== null) {

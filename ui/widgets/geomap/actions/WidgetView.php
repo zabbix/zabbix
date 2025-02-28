@@ -57,7 +57,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
-			'unique_id' => $this->getInput('unique_id')
+			'unique_id' => $this->getInput('unique_id'),
+			'initial_load' => $this->getInput('initial_load', 0)
 		];
 
 		if ($this->getInput('initial_load', 0)) {

@@ -162,7 +162,7 @@ class CWidgetHoneycomb extends CWidget {
 		this.#cells_data.clear();
 		response.cells.forEach(cell => this.#cells_data.set(cell.itemid, cell));
 
-		if (!this.hasEverUpdated() && this.isReferred()) {
+		if (this.isReferred() && (this.isFieldsReferredDataUpdated() || !this.hasEverUpdated())) {
 			const selected_cell = this.#getDefaultSelectable();
 
 			if (selected_cell !== null) {

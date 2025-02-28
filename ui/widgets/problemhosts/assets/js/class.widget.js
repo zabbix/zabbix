@@ -40,7 +40,7 @@ class CWidgetProblemHosts extends CWidget {
 
 		this.#table_body.addEventListener('click', e => this.#onTableBodyClick(e));
 
-		if (!this.hasEverUpdated() && this.isReferred()) {
+		if (this.isReferred() && (this.isFieldsReferredDataUpdated() || !this.hasEverUpdated())) {
 			this.#selected_hostgroupid = this.#getDefaultSelectable();
 
 			if (this.#selected_hostgroupid !== null) {

@@ -75,7 +75,7 @@ class CWidgetProblems extends CWidget {
 
 		this.#activateContentsEvents();
 
-		if (!this.hasEverUpdated() && this.isReferred()) {
+		if (this.isReferred() && (this.isFieldsReferredDataUpdated() || !this.hasEverUpdated())) {
 			this.#selected_eventid = this.#getDefaultSelectable();
 
 			if (this.#selected_eventid !== null) {
