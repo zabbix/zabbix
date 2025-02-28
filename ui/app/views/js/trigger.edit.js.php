@@ -653,21 +653,7 @@ window.trigger_edit_popup = new class {
 	}
 
 	#getFormFields() {
-		const fields = getFormFields(this.form_element);
-
-		for (let key in fields) {
-			if (typeof fields[key] === 'string' && key !== 'confirmation') {
-				fields[key] = fields[key].trim();
-			}
-			else if (key === 'tags') {
-				for (let tag in fields['tags'] ) {
-					fields['tags'][tag].tag = fields['tags'][tag].tag.trim();
-					fields['tags'][tag].value = fields['tags'][tag].value.trim();
-				}
-			}
-		}
-
-		return fields;
+		return this.form.getAllValues();
 	}
 
 	#isConfirmed() {
@@ -815,7 +801,14 @@ window.trigger_edit_popup = new class {
 			);
 		}
 
-		this.#post(curl.getUrl(), fields);
+		this.form.validateSubmit(fields).then((result) => {
+			if (!result) {
+				this.overlay.unsetLoading();
+				return;
+			}
+
+			this.#post(curl.getUrl(), fields);
+		});
 	}
 
 	clone() {
