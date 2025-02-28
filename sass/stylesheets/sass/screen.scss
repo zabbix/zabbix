@@ -3402,10 +3402,6 @@ svg {
 		vertical-align: top !important;
 	}
 
-	.right {
-		padding-right: 0 !important;
-	}
-
 	tr.display-icon {
 		line-height: 24px;
 	}
@@ -3414,20 +3410,12 @@ svg {
 		top: 4px;
 		margin-left: 3px;
 	}
-
-	.copy-button {
-		margin-left: 5px;
-	}
 }
 
 .item-final-result {
 	.table-forms-separator {
 		display: inline-grid;
 		width: 675px;
-
-		.copy-button {
-			line-height: 24px;
-		}
 	}
 
 	.final-result-row {
@@ -3436,6 +3424,10 @@ svg {
 
 		.final-result-action {
 			margin-right : auto;
+		}
+
+		.btn-grey-icon {
+			margin-left: 5px;
 		}
 
 		&:not(:first-child) {
@@ -4107,31 +4099,6 @@ z-select {
 
 	.audit-show-details-btn-wrapper {
 		margin: 0 5px 0 5px;
-	}
-}
-
-button.copy-button {
-	border-radius: 2px;
-	line-height: 24px;
-	width: 24px;
-
-	&.btn-icon {
-		height: 24px;
-		border: 1px solid $form-border-color;
-		background: $form-bg-color;
-
-		&::before {
-			color: $icon-color;
-			font-size: 12px;
-		}
-
-		&:hover {
-			background-color: $btn-form-hover-bg-color;
-		}
-
-		&:focus {
-			box-shadow: 0 0 0 2px $btn-focus-outline-color;
-		}
 	}
 }
 
