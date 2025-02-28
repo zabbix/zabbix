@@ -422,10 +422,12 @@ func ParseServerActive(optionServerActive string) ([][]string, error) {
 
 	clusters := strings.Split(optionServerActive, ",")
 
-	addrs := make([][]string, len(clusters))
+	addrs := make([][]string, 0, len(clusters))
 
 	for i := 0; i < len(clusters); i++ {
 		addresses := strings.Split(clusters[i], ";")
+
+		addrs = append(addrs, make([]string, 0))
 
 		for j := 0; j < len(addresses); j++ {
 			var err error
