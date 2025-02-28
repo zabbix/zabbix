@@ -659,6 +659,7 @@ class testDashboardsPages extends CWebTest {
 			$properties = COverlayDialogElement::find()->waitUntilReady()->one();
 			$properties->query('name:dashboard_properties_form')->asForm()->one()->fill(['Default page display period' => $default]);
 			$properties->query('button:Apply')->one()->click();
+			COverlayDialogElement::ensureNotPresent();
 			$dashboard->waitUntilReady();
 
 			// Check that default time for page changed in edit mode and after dashboard save.
@@ -667,7 +668,7 @@ class testDashboardsPages extends CWebTest {
 				$page_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 				$page_dialog->query('name:dashboard_page_properties_form')->asForm()->one()
 						->checkValue(['Page display period' => 'Default ('.$default.')']);
-				$page_dialog->query('button:Cancel')->one()->click();
+				$page_dialog->close(true);
 
 				if ($save_dashboard) {
 					$dashboard->save();
@@ -691,7 +692,8 @@ class testDashboardsPages extends CWebTest {
 		if ($value !== 'selected-tab') {
 			CDashboardElement::find()->one()->selectPage($page_name, $index);
 		}
-		$this->query('xpath:('.$selector.']/following-sibling::button)['.$index.']')->waitUntilClickable()->one()->click();
+		// Unstable test on Jenkins - hoverMouse() required
+		$this->query('xpath:('.$selector.']/following-sibling::button)['.$index.']')->waitUntilClickable()->one()->hoverMouse()->click();
 
 		return CPopupMenuElement::find()->waitUntilVisible()->one();
 	}
