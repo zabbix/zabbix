@@ -749,7 +749,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		uncheckTableRows($checkbox_hash);
 
 		if (hasRequest('backurl')) {
-			$response = new CControllerResponseRedirect(getRequest('backurl'));
+			$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 			$response->redirect();
 		}
 	}
@@ -785,7 +785,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['discoveryru
 	}
 
 	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 		$response->redirect();
 	}
 }

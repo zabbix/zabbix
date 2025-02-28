@@ -77,6 +77,7 @@ class CControllerTokenUpdate extends CController {
 					CMessageHelper::setErrorTitle(_('Cannot update API token'));
 					$this->setResponse($response);
 					break;
+
 				case self::VALIDATION_FATAL_ERROR:
 					$this->setResponse(new CControllerResponseFatal());
 					break;
@@ -120,9 +121,10 @@ class CControllerTokenUpdate extends CController {
 				]);
 				[['token' => $auth_token]] = API::Token()->generate($tokenids);
 
-				$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-					->setArgumentSID()
-					->setArgument('action', $this->getInput('action_dst'))
+				$response = new CControllerResponseRedirect(
+					(new CUrl('zabbix.php'))
+						->setArgumentSID()
+						->setArgument('action', $this->getInput('action_dst'))
 				);
 
 				[$user] = (CWebUser::$data['userid'] != $userid)

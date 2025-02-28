@@ -371,7 +371,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		uncheckTableRows(getRequest('parent_discoveryid'));
 
 		if (hasRequest('backurl')) {
-			$response = new CControllerResponseRedirect(getRequest('backurl'));
+			$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 			$response->redirect();
 		}
 	}
@@ -385,7 +385,7 @@ elseif (hasRequest('delete') && hasRequest('triggerid')) {
 		uncheckTableRows(getRequest('parent_discoveryid'));
 
 		if (hasRequest('backurl')) {
-			$response = new CControllerResponseRedirect(getRequest('backurl'));
+			$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 			$response->redirect();
 		}
 	}
@@ -442,7 +442,7 @@ elseif (getRequest('action') && str_in_array(getRequest('action'), ['triggerprot
 	}
 
 	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 		$response->redirect();
 	}
 }
@@ -497,7 +497,7 @@ elseif (getRequest('action') && hasRequest('g_triggerid')
 	}
 
 	if (hasRequest('backurl')) {
-		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response = new CControllerResponseRedirect(new CUrl(getRequest('backurl')));
 		$response->redirect();
 	}
 }

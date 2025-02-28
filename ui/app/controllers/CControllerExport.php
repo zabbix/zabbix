@@ -38,6 +38,10 @@ class CControllerExport extends CController {
 			$this->setResponse(new CControllerResponseFatal());
 		}
 
+		if (!CHtmlUrlValidator::validateSameSite($this->getInput('backurl'))) {
+			access_deny(ACCESS_DENY_PAGE);
+		}
+
 		return $ret;
 	}
 
@@ -101,7 +105,9 @@ class CControllerExport extends CController {
 			]);
 		}
 		else {
-			$response = new CControllerResponseRedirect($this->getInput('backurl', 'zabbix.php?action=dashboard.view'));
+			$response = new CControllerResponseRedirect(
+				new CUrl($this->getInput('backurl', 'zabbix.php?action=dashboard.view'))
+			);
 			CMessageHelper::setErrorTitle(_('Export failed'));
 		}
 
