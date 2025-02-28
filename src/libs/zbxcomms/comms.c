@@ -1874,8 +1874,20 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
 			}
 			else
 			{
+				char	*buffer;
+
+				if (NULL == (buffer = (char *)malloc(expected_len + 1)))
+				{
+					zbx_set_socket_strerror("cannot allocate memory: out of memory");
+					zabbix_log(LOG_LEVEL_WARNING, "Message size " ZBX_FS_UI64
+							" from %s exceeds the available memory size."
+							" Message ignored.", expected_len, s->peer);
+					nbytes = ZBX_PROTO_ERROR;
+					goto out;
+				}
+
 				s->buf_type = ZBX_BUF_TYPE_DYN;
-				s->buffer = (char *)zbx_malloc(NULL, expected_len + 1);
+				s->buffer = buffer;
 				buf_dyn_bytes = buf_stat_bytes - offset;
 				buf_stat_bytes = 0;
 				memcpy(s->buffer, s->buf_stat + offset, buf_dyn_bytes);
@@ -1897,7 +1909,17 @@ ssize_t	zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags)
 				char	*out;
 				size_t	out_size = reserved;
 
-				out = (char *)zbx_malloc(NULL, reserved + 1);
+				if (NULL == (out = (char *)malloc(reserved + 1)))
+				{
+					zbx_set_socket_strerror("cannot allocate memory to uncompress data:"
+							" out of memory");
+					zabbix_log(LOG_LEVEL_WARNING, "Uncompressed message size " ZBX_FS_UI64
+							" from %s exceeds the available memory size."
+							" Message ignored.", reserved, s->peer);
+					nbytes = ZBX_PROTO_ERROR;
+					goto out;
+				}
+
 				if (FAIL == zbx_uncompress(s->buffer, buf_stat_bytes + buf_dyn_bytes, out, &out_size))
 				{
 					zbx_free(out);

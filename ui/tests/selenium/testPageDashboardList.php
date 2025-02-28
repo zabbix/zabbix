@@ -45,14 +45,18 @@ class testPageDashboardList extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$this->assertEquals(['', 'Name'], $table->getHeadersText());
 
-		// Check filter collapse/expand.
-		foreach (['true', 'false'] as $status) {
-			$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one();
-			$filter_tab->parents('xpath:/li[@aria-expanded="'.$status.'"]')->one()->click();
+		// Check if filter collapses/ expands.
+		$filter_tab = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_RIGHT);
+		$filter_tab->isExpanded();
+
+		// Check that filter is collapsing/expanding on click.
+		foreach ([false, true] as $status) {
+			$filter_tab->expand($status);
+			$this->assertTrue($filter_tab->isExpanded($status));
 		}
 
 		// Check filter fields.
-		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
+		$filter_form = $filter_tab->getForm();;
 		$this->assertEquals(['Name', 'Show'], $filter_form->getLabels()->asText());
 		foreach (['All', 'Created by me'] as $show_tag) {
 			$this->assertTrue($filter_form->query('xpath://ul[@id="filter_show"]/li/label[text()="'.$show_tag.'"]')->exists());
@@ -69,6 +73,10 @@ class testPageDashboardList extends CWebTest {
 		// Check header buttons.
 		$this->assertTrue($this->query('button:Create dashboard')->exists());
 		$this->assertTrue($this->query('xpath://button[@title="Kiosk mode"]')->exists());
+
+		// Check that the filter is still expanded after page refresh.
+		$this->page->refresh()->waitUntilReady();
+		$this->assertTrue($filter_tab->isExpanded());
 	}
 
 	public static function getCheckFilterData() {

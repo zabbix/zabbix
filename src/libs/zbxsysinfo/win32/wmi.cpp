@@ -19,6 +19,9 @@
 
 #include "sysinc.h"
 
+#include <comdef.h>
+#include <Wbemidl.h>
+
 extern "C"
 {
 #	include "common.h"
@@ -29,9 +32,6 @@ extern "C"
 #	include "zbxjson.h"
 #	include "cfg.h"
 }
-
-#include <comdef.h>
-#include <Wbemidl.h>
 
 #pragma comment(lib, "wbemuuid.lib")
 
