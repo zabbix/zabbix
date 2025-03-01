@@ -653,7 +653,12 @@ window.trigger_edit_popup = new class {
 	}
 
 	#getFormFields() {
-		return this.form.getAllValues();
+		// TODO: this is a temporary workaround, any reason these fields are not picked up by CForm.js?
+		const dependencies = [];
+		this.form_element.querySelectorAll('input[name="dependencies[]"]')
+			.forEach((input) => dependencies.push(input.value));
+
+		return Object.assign(this.form.getAllValues(), {dependencies});
 	}
 
 	#isConfirmed() {

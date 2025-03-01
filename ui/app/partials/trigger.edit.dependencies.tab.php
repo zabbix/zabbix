@@ -94,6 +94,8 @@ elseif (array_key_exists('parent_discoveryid', $data)) {
 
 $dependencies_table = (new CTable())
 	->setId('dependency-table')
+	->setAttribute('data-field-type', 'array')
+	->setAttribute('data-field-name', 'dependencies')
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Name'), $discovered_trigger ? null : _('Action')])
 	->addItem((new CTag('tfoot', true))->addItem((new CCol($buttons))->setColSpan(4)))
