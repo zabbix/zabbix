@@ -1,8 +1,22 @@
 Changes for 7.0.11rc1
 
 New features:
+.........T [ZBXNEXT-9400] fixed preprocessing step for monthly costs; added triggers for raw data; update dashboard in Azure Cost Management by HTTP template (egordymov)
 
 Bug fixes:
+........S. [ZBX-25731] fixed host interface going to unknown state when switching proxies due to proxy HA (dgoloscapov)
+.........T [ZBX-26016] fixed network device and mounted fs LLD rules in VMware Guest template; updated datastore item prototypes for family of VMware templates (akotsegubov)
+.......PS. [ZBX-26014] added c-ares support for agent poller and snmp poller (vso)
+A......... [ZBX-25670] restored audit logging of host group links to hosts (jfreibergs)
+..F....... [ZBX-25911] fixed correlation form popup opening on event details page (rgontarski)
+...GI..PS. [ZBX-25140] made configure reject TLS unaware compilers (jxl)
+.........T [ZBX-26070] fixed macro in HashiCorp Consul Cluster by HTTP template (abrosimovs)
+....I..... [ZBX-25868] fixed missing permissions for built-in templates (asestakovs)
+..F....... [ZBX-22952] made matching of headers to be performed in case-insensitive way (agriscenko)
+A...I..... [ZBX-26010] fixed template cloning error caused by invalid enabled_lifetime_type value (asestakovs)
+.......PS. [ZBX-25991] fixed invalid SQL statement during network discovery when using Oracle database (asestakovs)
+..F....... [ZBX-25582] fixed approximation all for SVG graph widget with multiple entries and same timestamp on single item (dfofanovs)
+..F....... [ZBX-23687] added improvements and fixed bugs related to context menus (dfofanovs)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.10
@@ -3379,6 +3393,7 @@ Changes for 6.0.40rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-23687] added improvements and fixed bugs related to context menus (dfofanovs)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.39
