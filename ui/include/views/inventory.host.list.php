@@ -100,17 +100,15 @@ foreach ($this->data['hosts'] as $host) {
 	$hostGroups = implode(', ', $hostGroups);
 
 	$row = [
-		(new CCol(
-			(new CLink($host['name'], (new CUrl('hostinventories.php'))->setArgument('hostid', $host['hostid'])))
-				->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
-		))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol($hostGroups))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol(zbx_str2links($host['inventory']['name'])))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol(zbx_str2links($host['inventory']['type'])))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol(zbx_str2links($host['inventory']['os'])))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol(zbx_str2links($host['inventory']['serialno_a'])))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol(zbx_str2links($host['inventory']['tag'])))->addClass(ZBX_STYLE_WORDBREAK),
-		(new CCol(zbx_str2links($host['inventory']['macaddress_a'])))->addClass(ZBX_STYLE_WORDBREAK)
+		(new CLink($host['name'], (new CUrl('hostinventories.php'))->setArgument('hostid', $host['hostid'])))
+			->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null),
+		$hostGroups,
+		zbx_str2links($host['inventory']['name']),
+		zbx_str2links($host['inventory']['type']),
+		zbx_str2links($host['inventory']['os']),
+		zbx_str2links($host['inventory']['serialno_a']),
+		zbx_str2links($host['inventory']['tag']),
+		zbx_str2links($host['inventory']['macaddress_a'])
 	];
 
 	$table->addRow($row);
