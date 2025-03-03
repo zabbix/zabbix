@@ -18,6 +18,9 @@ require_once dirname(__FILE__).'/../common/testCalculatedFormula.php';
 
 /**
  * @backup items
+ *
+ * TODO: remove ignoreBrowserErrors after DEV-4233
+ * @ignoreBrowserErrors
  */
 class testFormulaCalculatedItemPrototype extends testCalculatedFormula {
 

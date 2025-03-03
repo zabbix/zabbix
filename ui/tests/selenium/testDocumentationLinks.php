@@ -2426,6 +2426,9 @@ class testDocumentationLinks extends CWebTest {
 
 	/**
 	 * @dataProvider getGeneralDocumentationLinkData
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testDocumentationLinks_checkGeneralLinks($data) {
 		if ($data['url'] === 'host_prototype') {
