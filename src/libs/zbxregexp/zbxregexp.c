@@ -406,6 +406,9 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	}
 	else
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() pcre_exec() returned error %d while matching against subject string"
+				" '%s'", __func__, r, string);
+
 		if (NULL != err_msg)
 		{
 			*err_msg = zbx_dsprintf(NULL, "pcre_exec() returned %d. See PCRE library documentation or"
@@ -467,6 +470,9 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 		}
 		else
 		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() pcre2_match() returned error %d while matching against"
+					" subject string '%s'", __func__, r, string);
+
 			if (NULL != err_msg)
 				*err_msg = decode_pcre2_match_error(r);
 
