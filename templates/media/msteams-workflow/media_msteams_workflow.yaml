@@ -30,7 +30,6 @@ zabbix_export:
           value: '{TRIGGER.ID}'
         - name: zabbix_url
           value: '{$ZABBIX.URL}'
-      status: DISABLED
       script: |
         const CLogger = function(serviceName) {
         	this.serviceName = serviceName;
@@ -38,7 +37,7 @@ zabbix_export:
         	this.WARN = 3
         	this.ERROR = 2
         	this.log = function(level, msg) {
-        		Zabbix.log(level, '['+this.serviceName+'] ' + msg);
+        		Zabbix.log(level, '[' + this.serviceName + '] ' + msg);
         	}
         }
         
@@ -79,17 +78,19 @@ zabbix_export:
         		}
         
         		this.handleEvent = function(source, event) {
+        			const alert = { source: source, event: event };
         			return [
-        				this.runCallback('on' + source + event, {}),
-        				this.runCallback('on' + event, {source: source}),
-        				this.runCallback('onEvent', {source: source, event: event})
+        				this.runCallback('on' + source + event, alert),
+        				this.runCallback('on' + event, alert),
+        				this.runCallback('onEvent', alert)
         			];
         		}
         
         		this.handleEventless = function(source) {
+        			const alert = { source: source, event: null };
         			return [
-        				this.runCallback('on' + source, {}),
-        				this.runCallback('onEvent', {source: source, event: null})
+        				this.runCallback('on' + source, alert),
+        				this.runCallback('onEvent', alert)
         			];
         		}
         
@@ -98,7 +99,7 @@ zabbix_export:
         			if (typeof this.httpProxy === 'string' && this.httpProxy.trim() !== '') {
         				this.request.setProxy(this.httpProxy);
         			}
-        			const types = {'0': 'Trigger', '1': 'Discovery', '2': 'Autoreg', '3': 'Internal', '4': 'Service'};
+        			const types = { '0': 'Trigger', '1': 'Discovery', '2': 'Autoreg', '3': 'Internal', '4': 'Service' };
         
         			if (['0', '3', '4'].indexOf(this.params.event_source) !== -1) {
         				var event = (this.params.event_update_status === '1')
@@ -131,7 +132,33 @@ zabbix_export:
         const CParamValidator = {
         
         	isType: function(value, type) {
-        		return ((type === 'array') ? Array.isArray(value) : (typeof value === type));
+        		if (type === 'array') {
+        			return Array.isArray(value);
+        		}
+        		if (type === 'integer') {
+        			return CParamValidator.isInteger(value);
+        		}
+        		if (type === 'float') {
+        			return CParamValidator.isFloat(value);
+        		}
+        
+        		return (typeof value === type);
+        	},
+        
+        	isInteger: function(value) {
+        		if (!CParamValidator.ifMatch(value, /^-?\d+$/)) {
+        			return false;
+        		}
+        
+        		return !isNaN(parseInt(value));
+        	},
+        
+        	isFloat: function(value) {
+        		if (!CParamValidator.ifMatch(value, /^-?\d+\.\d+$/)) {
+        			return false;
+        		}
+        
+        		return !isNaN(parseFloat(value));
         	},
         
         	isDefined: function(value) {
@@ -170,12 +197,12 @@ zabbix_export:
         		if (!CParamValidator.isType(array, 'array')) {
         			throw 'The array must be an array to check the value for existing in it.';
         		}
-        	
+        
         		return (array.indexOf((typeof value === 'string') ? value.toLowerCase() : value) !== -1);
         	},
         
         	ifMatch: function(value, regex) {
-        		return Boolean(CParamValidator.match(value, regex));
+        		return (new RegExp(regex)).test(value);
         	},
         
         	match: function(value, regex) {
@@ -186,7 +213,7 @@ zabbix_export:
         		return value.match(new RegExp(regex));
         	},
         
-        	checkURL: function (value) {
+        	checkURL: function(value) {
         		if (CParamValidator.isEmpty(value)) {
         			throw 'URL value "' + value + '" must be a non-empty string.';
         		}
@@ -202,19 +229,20 @@ zabbix_export:
         			throw 'Mandatory attribute "type" has not been defined for parameter "' + key + '".';
         		}
         		if (!CParamValidator.isDefined(params[key])) {
-        			throw 'Checked parameter "'+key+'" was not found in the list of input parameters.';
+        			throw 'Checked parameter "' + key + '" was not found in the list of input parameters.';
         		}
         		var value = params[key],
         			error_message = null;
-        		switch(rule.type) {
+        		switch (rule.type) {
         			case 'string':
         				if (!CParamValidator.isType(value, 'string')) {
         					throw 'Value "' + key + '" must be a string.';
         				}
         				if (CParamValidator.isEmpty(value)) {
         					error_message = 'Value "' + key + '" must be a non-empty string';
+        					break;
         				}
-        				else if (CParamValidator.isDefined(rule.len) && value.length < rule.len) {
+        				if (CParamValidator.isDefined(rule.len) && value.length < rule.len) {
         					error_message = 'Value "' + key + '" must be a string with a length > ' + rule.len;
         				}
         				if (CParamValidator.isDefined(rule.regex) && !CParamValidator.ifMatch(value, rule.regex)) {
@@ -224,16 +252,19 @@ zabbix_export:
         					value = CParamValidator.checkURL(value);
         				}
         				break;
-        			case 'number':
+        			case 'integer':
+        				if (!CParamValidator.isInteger(value)) {
+        					error_message = 'Value "' + key + '" must be an integer';
+        					break;
+        				}
         				value = parseInt(value);
-        				if (isNaN(value)) {
-        					error_message = 'Value "' + key + '" must be a number';
+        				break;
+        			case 'float':
+        				if (!CParamValidator.isFloat(value)) {
+        					error_message = 'Value "' + key + '" must be a floating-point number';
+        					break;
         				}
-        				else if ((CParamValidator.isDefined(rule.min) || CParamValidator.isDefined(rule.max))
-        					&& !CParamValidator.withinRange(value, rule.min, rule.max)) {
-        					error_message = 'Value "' + key + '" must be a number ' + ((CParamValidator.isDefined(rule.min) && CParamValidator.isDefined(rule.max))
-        						? (rule.min + '..' + rule.max) : ((CParamValidator.isDefined(rule.min)) ? '>' + rule.min : '<' + rule.max));
-        				}
+        				value = parseFloat(value);
         				break;
         			case 'boolean':
         				if (CParamValidator.inArray(value, ['1', 'true', 'yes', 'on'])) {
@@ -247,14 +278,17 @@ zabbix_export:
         				}
         				break;
         			case 'array':
-        				value = JSON.parse(value);
+        				try {
+        					value = JSON.parse(value);
+        				} catch (error) {
+        					throw 'Value "' + key + '" contains invalid JSON.';
+        				}
         				if (!CParamValidator.isType(value, 'array')) {
         					error_message = 'Value "' + key + '" must be an array.';
         				}
         				if (CParamValidator.isDefined(rule.tags) && rule.tags === true) {
         					value = value.reduce(function(acc, obj) {
-        						var key = Object.keys(obj)[0];
-        						acc[key] = obj[key];
+        						acc[obj.tag] = obj.value || null;
         						return acc;
         					}, {});
         				}
@@ -266,17 +300,23 @@ zabbix_export:
         				}
         				break;
         			default:
-        				throw 'Unexpected attribute type "' + rule.type + '" for value "' + key + '". Available: ' + ['number', 'string', 'boolean'].join(', ');
+        				throw 'Unexpected attribute type "' + rule.type + '" for value "' + key + '". Available: ' +
+        				['integer', 'float', 'string', 'boolean', 'array', 'object'].join(', ');
         		}
         		params[key] = value;
-        		if (!CParamValidator.isMacroSet(value.toString(), rule.macro)) {
-        			error_message = 'The macro ' + ((CParamValidator.isDefined(rule.macro)) ? '{' + rule.macro + '} ' : ' ' ) + 'is not set';
+        		if (CParamValidator.inArray(rule.type, ['integer', 'float']) && error_message === null && (CParamValidator.isDefined(rule.min)
+        			|| CParamValidator.isDefined(rule.max)) && !CParamValidator.withinRange(value, rule.min, rule.max)) {
+        			error_message = 'Value "' + key + '" must be a number ' + ((CParamValidator.isDefined(rule.min) && CParamValidator.isDefined(rule.max))
+        				? (rule.min + '..' + rule.max) : ((CParamValidator.isDefined(rule.min)) ? '>' + rule.min : '<' + rule.max));
         		}
-        		if (CParamValidator.isDefined(rule.array) && !CParamValidator.inArray(value, rule.array)) {
+        		else if (CParamValidator.isDefined(rule.array) && !CParamValidator.inArray(value, rule.array)) {
         			error_message = 'Value "' + key + '" must be in the array ' + JSON.stringify(rule.array);
         		}
+        		else if (CParamValidator.isDefined(rule.macro) && !CParamValidator.isMacroSet(value.toString(), rule.macro)) {
+        			error_message = 'The macro ' + ((CParamValidator.isDefined(rule.macro)) ? '{' + rule.macro + '} ' : ' ') + 'is not set';
+        		}
         		if (error_message !== null) {
-        			if (CParamValidator.isType(rule.default, rule.type)) {
+        			if (CParamValidator.isDefined(rule.default) && CParamValidator.isType(rule.default, rule.type)) {
         				params[key] = rule.default;
         			}
         			else {
@@ -316,7 +356,7 @@ zabbix_export:
         
         		if (typeof value === 'object' && value !== null) {
         			if (!Array.isArray(value)) {
-        				Object.keys(value).forEach(function (key) {
+        				Object.keys(value).forEach(function(key) {
         					headers.push(key + ': ' + value[key]);
         				});
         			}
@@ -325,7 +365,7 @@ zabbix_export:
         			}
         		}
         		else if (typeof value === 'string') {
-        			value.split('\r\n').forEach(function (header) {
+        			value.split('\r\n').forEach(function(header) {
         				headers.push(header);
         			});
         		}
@@ -377,15 +417,17 @@ zabbix_export:
         
         const CWebhookHelper = {
         
-        	createProblemURL: function (event_source, zabbix_url, trigger_id, event_id) {
+        	createProblemURL: function(event_source, zabbix_url, trigger_id, event_id) {
         		if (event_source === '0') {
         			return zabbix_url + '/tr_events.php?triggerid=' + trigger_id + '&eventid=' + event_id;
+        		} else if (event_source === '4') {
+        			return zabbix_url + '/zabbix.php?action=service.list';
         		}
         
         		return zabbix_url;
         	},
         
-        }
+        };
         
         
         var serviceLogName = 'MS Teams Webhook',
@@ -399,7 +441,7 @@ zabbix_export:
         	}, this.params);
         
         	if (this.params.event_source === '0') {
-        		CParamValidator.validate({ event_id: { type: 'number' }, trigger_id: { type: 'number' } }, this.params);
+        		CParamValidator.validate({ event_id: { type: 'integer' }, trigger_id: { type: 'integer' } }, this.params);
         	}
         
         	this.body = {

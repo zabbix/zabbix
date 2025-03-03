@@ -104,6 +104,11 @@ class CControllerMenuPopup extends CController {
 		$validator = new CNewValidator($this->input['data'], $rules);
 		array_map('error', $validator->getAllErrors());
 
+		if (array_key_exists('backurl', $this->input['data'])
+				&& !CHtmlUrlValidator::validateSameSite($this->input['data']['backurl'])) {
+			throw new CAccessDeniedException();
+		}
+
 		return !$validator->isError() && !$validator->isErrorFatal();
 	}
 

@@ -2246,7 +2246,7 @@ static int	dbconn_prepare_multiple_query_str(zbx_dbconn_t *db, const char *query
 
 		zbx_vector_str_clear_ext(&str_ids, zbx_str_free);
 
-		if (SUCCEED != (ret = zbx_dbconn_execute_overflowed_sql(db, sql, sql_alloc, sql_offset)))
+		if (SUCCEED != (ret = zbx_dbconn_execute_overflowed_sql(db, sql, sql_alloc, sql_offset, NULL)))
 			break;
 	}
 
@@ -2274,7 +2274,7 @@ int	zbx_dbconn_prepare_multiple_query(zbx_dbconn_t *db, const char *query, const
 				MIN(ZBX_DB_LARGE_QUERY_BATCH_SIZE, ids->values_num - i));
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 
-		if (SUCCEED != (ret = zbx_dbconn_execute_overflowed_sql(db, sql, sql_alloc, sql_offset)))
+		if (SUCCEED != (ret = zbx_dbconn_execute_overflowed_sql(db, sql, sql_alloc, sql_offset, NULL)))
 			break;
 	}
 

@@ -23,11 +23,10 @@
 #include "zbxregexp.h"
 #include "zbx_host_constants.h"
 #include "zbxstr.h"
-#include "zbxhash.h"
-#include "zbxcrypto.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxnum.h"
+#include "dbupgrade_common.h"
 
 /*
  * 7.0 development database patches
@@ -2878,188 +2877,20 @@ static int	DBpatch_6050200(void)
 	return DBadd_foreign_key("permission", 2, &field);
 }
 
-typedef struct
-{
-	char			hash_str[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
-	zbx_vector_uint64_t	groupids;
-	zbx_vector_uint64_t	ids;
-} zbx_dbu_group_set_t;
-
-static zbx_hash_t	dbupgrade_group_set_hash(const void *data)
-{
-	const zbx_dbu_group_set_t	*group_set = (const zbx_dbu_group_set_t *)data;
-
-	return ZBX_DEFAULT_STRING_HASH_FUNC(group_set->hash_str);
-}
-
-static int	dbupgrade_group_set_compare(const void *d1, const void *d2)
-{
-	const zbx_dbu_group_set_t	*group_set1 = (const zbx_dbu_group_set_t *)d1;
-	const zbx_dbu_group_set_t	*group_set2 = (const zbx_dbu_group_set_t *)d2;
-
-	return strcmp(group_set1->hash_str, group_set2->hash_str);
-}
-
-static int	dbupgrade_groupsets_make(zbx_vector_uint64_t *ids, const char *fld_name_id,
-		const char *fld_name_groupid, const char *tbl_name_groups, zbx_hashset_t *group_sets,
-		int allow_empty_groups)
-{
-	int			ret = SUCCEED;
-	char			id_str[MAX_ID_LEN + 2];
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
-	zbx_vector_uint64_t	groupids;
-	zbx_dbu_group_set_t	*gset_ptr;
-
-	id_str[0] = '|';
-	zbx_vector_uint64_create(&groupids);
-
-	for (int i = 0; i < ids->values_num; i++)
-	{
-		unsigned char		hash[ZBX_SHA256_DIGEST_SIZE];
-		char			*id_str_p = id_str + 1;
-		sha256_ctx		ctx;
-		zbx_dbu_group_set_t	gset;
-
-		zbx_sha256_init(&ctx);
-
-		result = zbx_db_select("select %s from %s where %s=" ZBX_FS_UI64 " order by %s",
-				fld_name_groupid, tbl_name_groups, fld_name_id, ids->values[i], fld_name_groupid);
-
-		while (NULL != (row = zbx_db_fetch(result)))
-		{
-			zbx_uint64_t	groupid;
-
-			ZBX_STR2UINT64(groupid, row[0]);
-
-			if (1 == groupids.values_num)
-				id_str_p = id_str;
-
-			zbx_snprintf(id_str + 1, MAX_ID_LEN + 1, "%s", row[0]);
-			zbx_sha256_process_bytes(id_str_p, strlen(id_str_p), &ctx);
-			zbx_vector_uint64_append(&groupids, groupid);
-		}
-		zbx_db_free_result(result);
-
-		if (0 == groupids.values_num)
-		{
-			if (0 == allow_empty_groups)
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "host or template [hostid=" ZBX_FS_UI64 "] is not"
-						" assigned to any group, permissions not granted", ids->values[i]);
-			}
-
-			continue;
-		}
-
-		zbx_sha256_finish(&ctx, hash);
-		(void)zbx_bin2hex(hash, ZBX_SHA256_DIGEST_SIZE, gset.hash_str,
-				ZBX_SHA256_DIGEST_SIZE * 2 + 1);
-
-		if (NULL == (gset_ptr = zbx_hashset_search(group_sets, &gset)))
-		{
-			zbx_vector_uint64_create(&gset.ids);
-			zbx_vector_uint64_create(&gset.groupids);
-			zbx_vector_uint64_append_array(&gset.groupids, groupids.values, groupids.values_num);
-
-			if (NULL == (gset_ptr = zbx_hashset_insert(group_sets, &gset, sizeof(zbx_dbu_group_set_t))))
-			{
-				ret = FAIL;
-				break;
-			}
-		}
-
-		zbx_vector_uint64_append(&gset_ptr->ids, ids->values[i]);
-		zbx_vector_uint64_clear(&groupids);
-	}
-
-	zbx_vector_uint64_destroy(&groupids);
-
-	return ret;
-}
-
-static int	dbupgrade_groupsets_insert(const char *tbl_name, zbx_hashset_t *group_sets,
-		zbx_db_insert_t *db_gset, zbx_db_insert_t *db_gset_groups, zbx_db_insert_t *db_gset_parents)
-{
-	zbx_uint64_t		gsetid;
-	zbx_hashset_iter_t	iter;
-	zbx_dbu_group_set_t	*gset_ptr;
-
-	if (0 == group_sets->num_data)
-		return SUCCEED;
-
-	gsetid = zbx_db_get_maxid_num(tbl_name, group_sets->num_data);
-
-	zbx_hashset_iter_reset(group_sets, &iter);
-
-	while (NULL != (gset_ptr = (zbx_dbu_group_set_t *)zbx_hashset_iter_next(&iter)))
-	{
-		int	i;
-
-		zbx_db_insert_add_values(db_gset, gsetid, gset_ptr->hash_str);
-
-		for (i = 0; i < gset_ptr->groupids.values_num; i++)
-			zbx_db_insert_add_values(db_gset_groups, gsetid, gset_ptr->groupids.values[i]);
-
-		for (i = 0; i < gset_ptr->ids.values_num; i++)
-			zbx_db_insert_add_values(db_gset_parents, gset_ptr->ids.values[i], gsetid);
-
-		gsetid++;
-	}
-
-	if (FAIL == zbx_db_insert_execute(db_gset) ||
-			FAIL == zbx_db_insert_execute(db_gset_groups) ||
-			FAIL == zbx_db_insert_execute(db_gset_parents))
-	{
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-static void	dbupgrade_groupsets_destroy(zbx_hashset_t *group_sets)
-{
-	zbx_hashset_iter_t	iter;
-	zbx_dbu_group_set_t	*gset_ptr;
-
-	zbx_hashset_iter_reset(group_sets, &iter);
-
-	while (NULL != (gset_ptr = (zbx_dbu_group_set_t *)zbx_hashset_iter_next(&iter)))
-	{
-		zbx_vector_uint64_destroy(&gset_ptr->groupids);
-		zbx_vector_uint64_destroy(&gset_ptr->ids);
-	}
-
-	zbx_hashset_destroy(group_sets);
-}
-
 static int	DBpatch_6050201(void)
 {
 	int			ret;
 	zbx_vector_uint64_t	ids;
-	zbx_hashset_t		group_sets;
-	zbx_db_insert_t		db_insert, db_insert_groups, db_insert_hosts;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_hashset_create(&group_sets, 1, dbupgrade_group_set_hash, dbupgrade_group_set_compare);
-	zbx_db_insert_prepare(&db_insert, "hgset", "hgsetid", "hash", (char*)NULL);
-	zbx_db_insert_prepare(&db_insert_groups, "hgset_group", "hgsetid", "groupid", (char*)NULL);
-	zbx_db_insert_prepare(&db_insert_hosts, "host_hgset", "hostid", "hgsetid", (char*)NULL);
-
 	zbx_vector_uint64_create(&ids);
 	zbx_db_select_uint64("select hostid from hosts where flags<>2", &ids);
 
-	if (SUCCEED == (ret = dbupgrade_groupsets_make(&ids, "hostid", "groupid", "hosts_groups", &group_sets, 0)))
-		ret = dbupgrade_groupsets_insert("hgset", &group_sets, &db_insert, &db_insert_groups, &db_insert_hosts);
-
-	zbx_db_insert_clean(&db_insert);
-	zbx_db_insert_clean(&db_insert_groups);
-	zbx_db_insert_clean(&db_insert_hosts);
+	ret = permission_hgsets_add(&ids, NULL);
 
 	zbx_vector_uint64_destroy(&ids);
-	dbupgrade_groupsets_destroy(&group_sets);
 
 	return ret;
 }
@@ -3068,29 +2899,16 @@ static int	DBpatch_6050202(void)
 {
 	int			ret;
 	zbx_vector_uint64_t	ids;
-	zbx_hashset_t		group_sets;
-	zbx_db_insert_t		db_insert, db_insert_groups, db_insert_users;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_hashset_create(&group_sets, 1, dbupgrade_group_set_hash, dbupgrade_group_set_compare);
-	zbx_db_insert_prepare(&db_insert, "ugset", "ugsetid", "hash", (char*)NULL);
-	zbx_db_insert_prepare(&db_insert_groups, "ugset_group", "ugsetid", "usrgrpid", (char*)NULL);
-	zbx_db_insert_prepare(&db_insert_users, "user_ugset", "userid", "ugsetid", (char*)NULL);
-
 	zbx_vector_uint64_create(&ids);
 	zbx_db_select_uint64("select u.userid from users u join role r on u.roleid=r.roleid where r.type<>3", &ids);
 
-	if (SUCCEED == (ret = dbupgrade_groupsets_make(&ids, "userid", "usrgrpid", "users_groups", &group_sets, 1)))
-		ret = dbupgrade_groupsets_insert("ugset", &group_sets, &db_insert, &db_insert_groups, &db_insert_users);
-
-	zbx_db_insert_clean(&db_insert);
-	zbx_db_insert_clean(&db_insert_groups);
-	zbx_db_insert_clean(&db_insert_users);
+	ret = permission_ugsets_add(&ids);
 
 	zbx_vector_uint64_destroy(&ids);
-	dbupgrade_groupsets_destroy(&group_sets);
 
 	return ret;
 }

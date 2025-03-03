@@ -20,6 +20,9 @@ require_once dirname(__FILE__).'/../common/testTimeoutsDisplay.php';
  * @onBefore prepareTimeoutsData
  *
  * @backup settings, hosts, proxy
+ *
+ * TODO: remove ignoreBrowserErrors after DEV-4233
+ * @ignoreBrowserErrors
  */
 class testTimeoutsLinkedTemplates extends testTimeoutsDisplay {
 

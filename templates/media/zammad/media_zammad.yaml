@@ -12,12 +12,16 @@ zabbix_export:
           value: '{EVENT.ID}'
         - name: event_nseverity
           value: '{EVENT.NSEVERITY}'
+        - name: event_severity
+          value: '{EVENT.SEVERITY}'
         - name: event_source
           value: '{EVENT.SOURCE}'
         - name: event_tags
           value: '{EVENT.TAGSJSON}'
-        - name: event_update_message
-          value: '{EVENT.UPDATE.MESSAGE}'
+        - name: event_update_nseverity
+          value: '{EVENT.UPDATE.NSEVERITY}'
+        - name: event_update_severity
+          value: '{EVENT.UPDATE.SEVERITY}'
         - name: event_update_status
           value: '{EVENT.UPDATE.STATUS}'
         - name: event_value
@@ -31,299 +35,624 @@ zabbix_export:
         - name: zammad_customer
           value: '<PUT YOUR CUSTOMER EMAIL>'
         - name: zammad_enable_tags
-          value: 'true'
-        - name: zammad_ticket_id
-          value: '{EVENT.TAGS.__zbx_zammad_ticket_id}'
+          value: 'false'
+        - name: zammad_group
+          value: Users
         - name: zammad_url
           value: '<PUT YOUR ZAMMAD URL>'
-      status: DISABLED
       script: |
-        var Zammad = {
-            params: {},
+        const CLogger = function(serviceName) {
+        	this.serviceName = serviceName;
+        	this.INFO = 4
+        	this.WARN = 3
+        	this.ERROR = 2
+        	this.log = function(level, msg) {
+        		Zabbix.log(level, '[' + this.serviceName + '] ' + msg);
+        	}
+        }
         
-            setParams: function (params) {
-                if (typeof params !== 'object') {
-                    return;
-                }
+        const CWebhook = function(value) {
+        	try {
+        		params = JSON.parse(value);
         
-                Zammad.params = params;
-                if (typeof Zammad.params.url === 'string') {
-                    if (!Zammad.params.url.endsWith('/')) {
-                        Zammad.params.url += '/';
-                    }
-                }
-            },
+        		if (['0', '1', '2', '3', '4'].indexOf(params.event_source) === -1) {
+        			throw 'Incorrect "event_source" parameter given: ' + params.event_source + '.\nMust be 0-4.';
+        		}
         
-            request: function (method, query, data) {
-                ['url', 'access_token'].forEach(function (field) {
-                    if (typeof Zammad.params !== 'object' || typeof Zammad.params[field] === 'undefined'
-                        || Zammad.params[field] === '' ) {
-                        throw 'Required param is not set: "' + field + '".';
-                    }
-                });
+        		if (['0', '3', '4'].indexOf(params.event_source) !== -1 && ['0', '1'].indexOf(params.event_value) === -1) {
+        			throw 'Incorrect "event_value" parameter given: ' + params.event_value + '.\nMust be 0 or 1.';
+        		}
         
-                var response,
-                    url = Zammad.params.url + query,
-                    request = new HttpRequest();
+        		if (['0', '3', '4'].indexOf(params.event_source) !== -1) {
+        			if (params.event_source === '1' && ['0', '1', '2', '3'].indexOf(params.event_value) === -1) {
+        				throw 'Incorrect "event_value" parameter given: ' + params.event_value + '.\nMust be 0-3.';
+        			}
         
-                if (typeof Zammad.HTTPProxy === 'string' && Zammad.HTTPProxy.trim() !== '') {
-                    request.setProxy(Zammad.HTTPProxy);
-                }
+        			if (params.event_source === '0' && ['0', '1'].indexOf(params.event_update_status) === -1) {
+        				throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '.\nMust be 0 or 1.';
+        			}
         
-                request.addHeader('Content-Type: application/json');
-                request.addHeader('Authorization: Token token=' + Zammad.params.access_token);
+        			if (params.event_source === '4') {
+        				if (['0', '1', '2', '3', '4', '5'].indexOf(params.event_update_nseverity) !== -1 && params.event_update_nseverity != params.event_nseverity) {
+        					params.event_nseverity = params.event_update_nseverity;
+        					params.event_severity = params.event_update_severity;
+        					params.event_update_status = '1';
+        				}
+        			}
+        		}
         
-                if (typeof data !== 'undefined') {
-                    data = JSON.stringify(data);
-                }
+        		this.runCallback = function(name, params) {
+        			if (typeof this[name] === 'function') {
+        				return this[name].apply(this, [params]);
+        			}
+        		}
         
-                Zabbix.log(4, '[ Zammad Webhook ] Sending request: ' +
-                    url + ((typeof data === 'string') ? (' ' + data) : ''));
+        		this.handleEvent = function(source, event) {
+        			const alert = { source: source, event: event };
+        			return [
+        				this.runCallback('on' + source + event, alert),
+        				this.runCallback('on' + event, alert),
+        				this.runCallback('onEvent', alert)
+        			];
+        		}
         
-                switch (method) {
-                    case 'get':
-                        response = request.get(url, data);
-                        break;
+        		this.handleEventless = function(source) {
+        			const alert = { source: source, event: null };
+        			return [
+        				this.runCallback('on' + source, alert),
+        				this.runCallback('onEvent', alert)
+        			];
+        		}
         
-                    case 'post':
-                        response = request.post(url, data);
-                        break;
+        		this.run = function() {
+        			var results = [];
+        			if (typeof this.httpProxy === 'string' && this.httpProxy.trim() !== '') {
+        				this.request.setProxy(this.httpProxy);
+        			}
+        			const types = { '0': 'Trigger', '1': 'Discovery', '2': 'Autoreg', '3': 'Internal', '4': 'Service' };
         
-                    case 'put':
-                        response = request.put(url, data);
-                        break;
+        			if (['0', '3', '4'].indexOf(this.params.event_source) !== -1) {
+        				var event = (this.params.event_update_status === '1')
+        					? 'Update'
+        					: ((this.params.event_value === '1') ? 'Problem' : 'Resolve');
         
-                    default:
-                        throw 'Unsupported HTTP request method: ' + method;
-                }
+        				results = this.handleEvent(types[this.params.event_source], event);
+        			}
+        			else if (typeof types[this.params.event_source] !== 'undefined') {
+        				results = this.handleEventless(types[this.params.event_source]);
+        			}
+        			else {
+        				throw 'Unexpected "event_source": ' + this.params.event_source;
+        			}
         
-                Zabbix.log(4, '[ Zammad Webhook ] Received response with status code ' + request.getStatus() + ': ' + response);
+        			for (idx in results) {
+        				if (typeof results[idx] !== 'undefined') {
+        					return JSON.stringify(results[idx]);
+        				}
+        			}
+        		}
+        		this.httpProxy = params.http_proxy;
+        		this.params = params;
+        		this.runCallback('onCheckParams', {});
+        	} catch (error) {
+        		throw 'Webhook processing failed: ' + error;
+        	}
+        }
         
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        Zabbix.log(4, '[ Zammad Webhook ] Failed to parse response received from Zammad');
-                        response = null;
-                    }
-                }
+        const CParamValidator = {
         
-                if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                    var message = 'Request failed with status code ' + request.getStatus();
+        	isType: function(value, type) {
+        		if (type === 'array') {
+        			return Array.isArray(value);
+        		}
+        		if (type === 'integer') {
+        			return CParamValidator.isInteger(value);
+        		}
+        		if (type === 'float') {
+        			return CParamValidator.isFloat(value);
+        		}
         
-                    if (response !== null && typeof response.errors !== 'undefined'
-                        && Object.keys(response.errors).length > 0) {
-                        message += ': ' + JSON.stringify(response.errors);
-                    }
-                    else if (response !== null && typeof response.errorMessages !== 'undefined'
-                        && Object.keys(response.errorMessages).length > 0) {
-                        message += ': ' + JSON.stringify(response.errorMessages);
-                    }
+        		return (typeof value === type);
+        	},
         
-                    throw message + ' Check debug log for more information.';
-                }
+        	isInteger: function(value) {
+        		if (!CParamValidator.ifMatch(value, /^-?\d+$/)) {
+        			return false;
+        		}
         
-                return {
-                    status: request.getStatus(),
-                    response: response
-                };
-            },
+        		return !isNaN(parseInt(value));
+        	},
         
-            setTicketTags: function (tags, ticket_id) {
-                var data = {
-                    item: '',
-                    object: 'Ticket',
-                    o_id: ticket_id
-                };
+        	isFloat: function(value) {
+        		if (!CParamValidator.ifMatch(value, /^-?\d+\.\d+$/)) {
+        			return false;
+        		}
         
-                try {
-                    var tags_json = JSON.parse(tags),
-                        result;
+        		return !isNaN(parseFloat(value));
+        	},
         
-                    for (var i in tags_json) {
+        	isDefined: function(value) {
+        		return !CParamValidator.isType(value, 'undefined');
+        	},
         
-                        if (tags_json[i].value) {
-                            data.item = tags_json[i].tag + ": " + tags_json[i].value;
-                        } else {
-                            data.item = tags_json[i].tag;
-                        }
-                        result = Zammad.request('post', 'api/v1/tags/add', data);
+        	isEmpty: function(value) {
+        		if (!CParamValidator.isType(value, 'string')) {
+        			throw 'Value "' + value + '" must be a string to be checked for emptiness.';
+        		}
         
-                        if (typeof result.response !== 'object' || result.status != 200) {
-                            Zabbix.log(4, '[ Zammad Webhook ] Cannot add ticket tag:' + tags_json[i].tag);
-                        }
-                    }
-                }
-                catch (error) {
-                    Zabbix.log(4, '[ Zammad Webhook ] Failed to add ticket tags:' + error);
-                }
+        		return (value.trim() === '');
+        	},
         
-                return;
-            },
+        	isMacroSet: function(value, macro) {
+        		if (CParamValidator.isDefined(macro)) {
+        			return !(CParamValidator.ifMatch(value, '^\{' + macro + '\}$'))
+        		}
         
-            createTicket: function(subject, message, priority) {
-                var data = {
-                        title: subject,
-                        group: 'Users',
-                        article: {
-                            subject: subject,
-                            body: message,
-                            type: 'note',
-                            internal: false
-                        },
-                        customer: Zammad.params.customer
-                    },
-                    result;
+        		return !(CParamValidator.ifMatch(value, '^\{[$#]{0,1}[A-Z_\.]+[\:]{0,1}["]{0,1}.*["]{0,1}\}$') || value === '*UNKNOWN*')
+        	},
         
-                if (priority) {
-                    data.priority_id = priority;
-                }
+        	withinRange: function(value, min, max) {
+        		if (!CParamValidator.isType(value, 'number')) {
+        			throw 'Value "' + value + '" must be a number to be checked for range.';
+        		}
+        		if (value < ((CParamValidator.isDefined(min)) ? min : value)
+        			|| value > ((CParamValidator.isDefined(max)) ? max : value)) {
+        			return false;
+        		}
         
-                result = Zammad.request('post', 'api/v1/tickets', data);
+        		return true;
+        	},
         
-                if (typeof result.response !== 'object'
-                    || typeof result.response.id === 'undefined'
-                    || result.status != 201) {
-                    throw 'Cannot create Zammad ticket. Check debug log for more information.';
-                }
+        	inArray: function(value, array) {
+        		if (!CParamValidator.isType(array, 'array')) {
+        			throw 'The array must be an array to check the value for existing in it.';
+        		}
         
-                return result.response.id;
-            },
+        		return (array.indexOf((typeof value === 'string') ? value.toLowerCase() : value) !== -1);
+        	},
         
-            updateTicket: function(subject, message) {
-                var data = {
-                    ticket_id: Zammad.params.ticket_id,
-                    subject: subject,
-                    body: message || '',
-                    type: 'note',
-                    internal: false
-                };
+        	ifMatch: function(value, regex) {
+        		return (new RegExp(regex)).test(value);
+        	},
         
-                result = Zammad.request('post', 'api/v1/ticket_articles', data);
+        	match: function(value, regex) {
+        		if (!CParamValidator.isType(value, 'string')) {
+        			throw 'Value "' + value + '" must be a string to be matched with the regular expression.';
+        		}
         
-                if (typeof result.response !== 'object'
-                    || typeof result.response.id === 'undefined'
-                    || result.status != 201) {
-                    throw 'Cannot update Zammad ticket. Check debug log for more information.';
-                }
-            }
+        		return value.match(new RegExp(regex));
+        	},
+        
+        	checkURL: function(value) {
+        		if (CParamValidator.isEmpty(value)) {
+        			throw 'URL value "' + value + '" must be a non-empty string.';
+        		}
+        		if (!CParamValidator.ifMatch(value, '^(http|https):\/\/.+')) {
+        			throw 'URL value "' + value + '" must contain a schema.';
+        		}
+        
+        		return value.endsWith('/') ? value.slice(0, -1) : value;
+        	},
+        
+        	check: function(key, rule, params) {
+        		if (!CParamValidator.isDefined(rule.type)) {
+        			throw 'Mandatory attribute "type" has not been defined for parameter "' + key + '".';
+        		}
+        		if (!CParamValidator.isDefined(params[key])) {
+        			throw 'Checked parameter "' + key + '" was not found in the list of input parameters.';
+        		}
+        		var value = params[key],
+        			error_message = null;
+        		switch (rule.type) {
+        			case 'string':
+        				if (!CParamValidator.isType(value, 'string')) {
+        					throw 'Value "' + key + '" must be a string.';
+        				}
+        				if (CParamValidator.isEmpty(value)) {
+        					error_message = 'Value "' + key + '" must be a non-empty string';
+        					break;
+        				}
+        				if (CParamValidator.isDefined(rule.len) && value.length < rule.len) {
+        					error_message = 'Value "' + key + '" must be a string with a length > ' + rule.len;
+        				}
+        				if (CParamValidator.isDefined(rule.regex) && !CParamValidator.ifMatch(value, rule.regex)) {
+        					error_message = 'Value "' + key + '" must match the regular expression "' + rule.regex + '"';
+        				}
+        				if (CParamValidator.isDefined(rule.url) && rule.url === true) {
+        					value = CParamValidator.checkURL(value);
+        				}
+        				break;
+        			case 'integer':
+        				if (!CParamValidator.isInteger(value)) {
+        					error_message = 'Value "' + key + '" must be an integer';
+        					break;
+        				}
+        				value = parseInt(value);
+        				break;
+        			case 'float':
+        				if (!CParamValidator.isFloat(value)) {
+        					error_message = 'Value "' + key + '" must be a floating-point number';
+        					break;
+        				}
+        				value = parseFloat(value);
+        				break;
+        			case 'boolean':
+        				if (CParamValidator.inArray(value, ['1', 'true', 'yes', 'on'])) {
+        					value = true;
+        				}
+        				else if (CParamValidator.inArray(value, ['0', 'false', 'no', 'off'])) {
+        					value = false;
+        				}
+        				else {
+        					error_message = 'Value "' + key + '" must be a boolean-like.';
+        				}
+        				break;
+        			case 'array':
+        				try {
+        					value = JSON.parse(value);
+        				} catch (error) {
+        					throw 'Value "' + key + '" contains invalid JSON.';
+        				}
+        				if (!CParamValidator.isType(value, 'array')) {
+        					error_message = 'Value "' + key + '" must be an array.';
+        				}
+        				if (CParamValidator.isDefined(rule.tags) && rule.tags === true) {
+        					value = value.reduce(function(acc, obj) {
+        						acc[obj.tag] = obj.value || null;
+        						return acc;
+        					}, {});
+        				}
+        				break;
+        			case 'object':
+        				value = JSON.parse(value);
+        				if (!CParamValidator.isType(value, 'object')) {
+        					error_message = 'Value "' + key + '" must be an object.';
+        				}
+        				break;
+        			default:
+        				throw 'Unexpected attribute type "' + rule.type + '" for value "' + key + '". Available: ' +
+        				['integer', 'float', 'string', 'boolean', 'array', 'object'].join(', ');
+        		}
+        		params[key] = value;
+        		if (CParamValidator.inArray(rule.type, ['integer', 'float']) && error_message === null && (CParamValidator.isDefined(rule.min)
+        			|| CParamValidator.isDefined(rule.max)) && !CParamValidator.withinRange(value, rule.min, rule.max)) {
+        			error_message = 'Value "' + key + '" must be a number ' + ((CParamValidator.isDefined(rule.min) && CParamValidator.isDefined(rule.max))
+        				? (rule.min + '..' + rule.max) : ((CParamValidator.isDefined(rule.min)) ? '>' + rule.min : '<' + rule.max));
+        		}
+        		else if (CParamValidator.isDefined(rule.array) && !CParamValidator.inArray(value, rule.array)) {
+        			error_message = 'Value "' + key + '" must be in the array ' + JSON.stringify(rule.array);
+        		}
+        		else if (CParamValidator.isDefined(rule.macro) && !CParamValidator.isMacroSet(value.toString(), rule.macro)) {
+        			error_message = 'The macro ' + ((CParamValidator.isDefined(rule.macro)) ? '{' + rule.macro + '} ' : ' ') + 'is not set';
+        		}
+        		if (error_message !== null) {
+        			if (CParamValidator.isDefined(rule.default) && CParamValidator.isType(rule.default, rule.type)) {
+        				params[key] = rule.default;
+        			}
+        			else {
+        				Zabbix.log(4, 'Default value for "' + key + '" must be a ' + rule.type + '. Skipped.');
+        				throw 'Incorrect value for variable "' + key + '". ' + error_message;
+        			}
+        		}
+        
+        		return this;
+        	},
+        
+        	validate: function(rules, params) {
+        		if (!CParamValidator.isType(params, 'object') || CParamValidator.isType(params, 'array')) {
+        			throw 'Incorrect parameters value. The value must be an object.';
+        		}
+        		for (var key in rules) {
+        			CParamValidator.check(key, rules[key], params);
+        		}
+        	}
+        }
+        
+        const CHttpRequest = function(logger) {
+        	this.request = new HttpRequest();
+        	if (typeof logger !== 'object' || logger === null) {
+        		this.logger = Zabbix;
+        	}
+        	else {
+        		this.logger = logger;
+        	}
+        
+        	this.clearHeader = function() {
+        		this.request.clearHeader();
+        	}
+        
+        	this.addHeaders = function(value) {
+        		var headers = [];
+        
+        		if (typeof value === 'object' && value !== null) {
+        			if (!Array.isArray(value)) {
+        				Object.keys(value).forEach(function(key) {
+        					headers.push(key + ': ' + value[key]);
+        				});
+        			}
+        			else {
+        				headers = value;
+        			}
+        		}
+        		else if (typeof value === 'string') {
+        			value.split('\r\n').forEach(function(header) {
+        				headers.push(header);
+        			});
+        		}
+        
+        		for (var idx in headers) {
+        			this.request.addHeader(headers[idx]);
+        		}
+        	}
+        
+        	this.setProxy = function(proxy) {
+        		this.request.setProxy(proxy);
+        	}
+        
+        	this.plainRequest = function(method, url, data) {
+        		var resp = null;
+        		method = method.toLowerCase();
+        		this.logger.log(4, 'Sending ' + method + ' request:' + JSON.stringify(data));
+        		if (['get', 'post', 'put', 'patch', 'delete', 'trace'].indexOf(method) !== -1) {
+        			resp = this.request[method](url, data);
+        		}
+        		else if (['connect', 'head', 'options'].indexOf(method) !== -1) {
+        			resp = this.request[method](url);
+        		}
+        		else {
+        			throw 'Unexpected method. Method ' + method + ' is not supported.';
+        		}
+        		this.logger.log(4, 'Response has been received: ' + resp);
+        
+        		return resp;
+        	}
+        
+        	this.jsonRequest = function(method, url, data) {
+        		this.addHeaders('Content-Type: application/json');
+        		var resp = this.plainRequest(method, url, JSON.stringify(data));
+        		try {
+        			resp = JSON.parse(resp);
+        		}
+        		catch (error) {
+        			throw 'Failed to parse response: not well-formed JSON was received';
+        		}
+        
+        		return resp;
+        	}
+        
+        	this.getStatus = function() {
+        		return this.request.getStatus();
+        	}
+        }
+        
+        const CWebhookHelper = {
+        
+        	createProblemURL: function(event_source, zabbix_url, trigger_id, event_id) {
+        		if (event_source === '0') {
+        			return zabbix_url + '/tr_events.php?triggerid=' + trigger_id + '&eventid=' + event_id;
+        		} else if (event_source === '4') {
+        			return zabbix_url + '/zabbix.php?action=service.list';
+        		}
+        
+        		return zabbix_url;
+        	},
+        
         };
         
+        var ZABBIX_SEVERITY_MAP = ["not_classified", "information", "warning", "average", "high", "disaster"],
+        	serviceLogName = 'Zammad Webhook',
+        	Logger = new CLogger(serviceLogName),
+        	Zammad = CWebhook;
+        
+        Zammad.prototype.onCheckParams = function () {
+        	CParamValidator.validate({
+        		alert_message: {type: 'string'},
+        		alert_subject: {type: 'string'},
+        		zammad_url: {type: 'string', url: true},
+        		zammad_customer: {type: 'string'},
+        		zammad_access_token: {type: 'string'},
+        		zammad_group: {type: 'string'},
+        		zammad_enable_tags: {type: 'boolean', default: false},
+        		event_nseverity: {type: 'integer', default: -1},
+        		zabbix_url: {type: 'string', url: true}
+        	}, this.params);
+        
+        	if (CParamValidator.inArray(this.params.event_source, ['0', '3', '4'])) {
+        		CParamValidator.validate({
+        			event_tags: {type: 'array', macro: 'EVENT.TAGSJSON', tags: true, default: {}}
+        		}, this.params);
+        	}
+        
+        	var priority;
+        
+        	if (this.params.event_nseverity >= 0 && this.params.event_nseverity < ZABBIX_SEVERITY_MAP.length) {
+        		priority = this.params['severity_' + ZABBIX_SEVERITY_MAP[this.params.event_nseverity]];
+        	}
+        	this.priority = (CParamValidator.isDefined(priority)) ? priority.trim() : null;
+        
+        	this.result = {tags: {}};
+        };
+        
+        Zammad.prototype.onProblem = function (alert) {
+        	if (CParamValidator.isDefined(this.params.event_tags['__zbx_zammad_ticket_id'])) {
+        		return this.onUpdate(alert);
+        	}
+        
+        	Logger.log(Logger.INFO, 'Source: ' + alert.source + '; Event: ' + alert.event);
+        
+        	this.request.addHeaders('Authorization: Token token=' + this.params.zammad_access_token);
+        
+        	var payload_data = {
+        		title: this.params.alert_subject,
+        		group: this.params.zammad_group,
+        		article: {
+        			subject: this.params.alert_subject,
+        			body: this.params.alert_message + '\n' + CWebhookHelper.createProblemURL(this.params.event_source, this.params.zabbix_url, this.params.trigger_id, this.params.event_id),
+        			type: 'note',
+        			internal: false
+        		},
+        		customer: this.params.zammad_customer
+        	};
+        
+        	if (this.priority) {
+        		payload_data.priority_id = this.priority;
+        	}
+        
+        	const response = this.request.jsonRequest('POST', this.params.zammad_url + '/api/v1/tickets', payload_data);
+        
+        	if (this.request.getStatus() != 201 || !CParamValidator.isDefined(response.id)) {
+        		var message = 'Cannot create Zammad ticket. Request failed with status code ' + this.request.getStatus();
+        
+        		if (CParamValidator.isDefined(response.error) && Object.keys(response.error).length > 0) {
+        			message += ': ' + response.error;
+        		}
+        
+        		throw message + ' Check debug log for more information.';
+        	}
+        
+        	this.result.tags = {
+        		__zbx_zammad_ticket_id: response.id,
+        		__zbx_zammad_ticketlink: this.params.zammad_url + '/#ticket/zoom/' + response.id
+        	};
+        
+        	if (this.params.zammad_enable_tags && Object.keys(this.params.event_tags).length > 0 && CParamValidator.inArray(this.params.event_source, ['0', '3', '4'])) {
+        		this.request.clearHeader();
+        		this.request.addHeaders({
+        			"Content-Type": "application/json",
+        			"Authorization": "Token token=" + this.params.zammad_access_token
+        		});
+        
+        		payload_data = {
+        			item: '',
+        			object: 'Ticket',
+        			o_id: response.id
+        		};
+        
+        		try {
+        			for (var tag in this.params.event_tags) {
+        				payload_data.item = tag;
+        
+        				if (this.params.event_tags[tag]) {
+        					payload_data.item += ": " + this.params.event_tags[tag];
+        				}
+        
+        				this.request.plainRequest('POST', this.params.zammad_url + '/api/v1/tags/add', JSON.stringify(payload_data));
+        
+        				if (this.request.getStatus() != 201) {
+        					Logger.log(Logger.INFO, 'Failed to set tag: ' + tag);
+        				}
+        			}
+        		}
+        		catch (error) {
+        			Logger.log(Logger.INFO, 'Failed to add ticket tags: ' + error);
+        		}
+        	}
+        
+        	return this.result;
+        }
+        
+        Zammad.prototype.onUpdate = function (alert) {
+        	Logger.log(Logger.INFO, 'Source: ' + alert.source + '; Event: ' + alert.event);
+        
+        	if (!CParamValidator.isDefined(this.params.event_tags['__zbx_zammad_ticket_id'])) {
+        		throw "Failed to update the existing ticket: no ticket ID was received."
+        	}
+        
+        
+        	this.request.addHeaders('Authorization: Token token=' + this.params.zammad_access_token);
+        
+        	const payload_data = {
+        		ticket_id: this.params.event_tags['__zbx_zammad_ticket_id'],
+        		subject: this.params.alert_subject,
+        		body: this.params.alert_message,
+        		type: 'note',
+        		internal: false
+        	};
+        
+        	const response = this.request.jsonRequest('POST', this.params.zammad_url + '/api/v1/ticket_articles', payload_data);
+        
+        	if (this.request.getStatus() != 201 || !CParamValidator.isDefined(response.id)) {
+        		var message = 'Cannot update Zammad ticket. Request failed with status code ' + this.request.getStatus();
+        
+        		if (CParamValidator.isDefined(response.error) && Object.keys(response.error).length > 0) {
+        			message += ': ' + response.error;
+        		}
+        
+        		throw message + ' Check debug log for more information.';
+        	}
+        
+        	return this.result;
+        }
+        
+        Zammad.prototype.onResolve = function (alert) {
+        	return this.onUpdate(alert);
+        }
+        
+        Zammad.prototype.onDiscovery = function (alert) {
+        	return this.onProblem(alert);
+        }
+        
+        Zammad.prototype.onAutoreg = function (alert) {
+        	return this.onProblem(alert);
+        }
+        
         try {
-            var params = JSON.parse(value),
-                params_zammad = {},
-                params_update = {},
-                result = {tags: {}},
-                required_params = [
-                    'alert_subject', 'customer',
-                    'event_source', 'event_value',
-                    'event_update_status'
-                ],
-                severities = [
-                    {name: 'not_classified', color: '#97AAB3'},
-                    {name: 'information', color: '#7499FF'},
-                    {name: 'warning', color: '#FFC859'},
-                    {name: 'average', color: '#FFA059'},
-                    {name: 'high', color: '#E97659'},
-                    {name: 'disaster', color: '#E45959'},
-                    {name: 'resolved', color: '#009900'},
-                    {name: null, color: '#000000'}
-                ],
-                priority;
-        
-            Object.keys(params)
-                .forEach(function (key) {
-                    if (key.startsWith('zammad_')) {
-                        params_zammad[key.substring(7)] = params[key].trim();
-                    }
-                    else if (key.startsWith('event_update_')) {
-                        params_update[key.substring(13)] = params[key];
-                    }
-                    else if (required_params.indexOf(key) !== -1 && params[key].trim() === '') {
-                        throw 'Parameter "' + key + '" cannot be empty.';
-                    }
-                });
-        
-            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
-                throw 'Incorrect "event_source" parameter given: ' + params.event_source + '\nMust be 0-3.';
-            }
-        
-            // Check {EVENT.VALUE} for trigger-based and internal events.
-            if (params.event_value !== '0' && params.event_value !== '1'
-                && (params.event_source === '0' || params.event_source === '3')) {
-                throw 'Incorrect "event_value" parameter given: ' + params.event_value + '\nMust be 0 or 1.';
-            }
-        
-            // Check {EVENT.UPDATE.STATUS} only for trigger-based events.
-            if (params.event_source === '0' && params.event_update_status !== '0' && params.event_update_status !== '1') {
-                throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '\nMust be 0 or 1.';
-            }
-        
-            if (params.event_source !== '0' && params.event_value === '0') {
-                throw 'Recovery operations are supported only for trigger-based actions.';
-            }
-        
-            if (params.event_source === '0'
-                && ((params.event_value === '1' && params.event_update_status === '1')
-                    || (params.event_value === '0'
-                        && (params.event_update_status === '0' || params.event_update_status === '1')))
-                && (isNaN(parseInt(params.zammad_ticket_id)) || parseInt(params.zammad_ticket_id) < 1 )) {
-                throw 'Incorrect "zammad_ticket_id" parameter given: ' + params.zammad_ticket_id +
-                    '\nMust be positive integer.';
-            }
-        
-            if ([0, 1, 2, 3, 4, 5].indexOf(parseInt(params.event_nseverity)) === -1) {
-                params.event_nseverity = '7';
-            }
-        
-            if (params.event_value === '0') {
-                params.event_nseverity = '6';
-            }
-        
-            priority = params['severity_' + severities[params.event_nseverity].name];
-            priority = priority && priority.trim() || severities[7].name;
-        
-            Zammad.setParams(params_zammad);
-            Zammad.HTTPProxy = params.HTTPProxy;
-        
-            // Create ticket for non trigger-based events.
-            if (params.event_source !== '0'
-                && params.event_value !== '0') {
-                Zammad.createTicket(params.alert_subject, params.alert_message, priority, params.event_tags);
-            }
-            // Create ticket for trigger-based events.
-            else if (params.event_value === '1' && params_update.status === '0'
-                     && Number.isInteger(parseInt(Zammad.params.ticket_id)) === false) {
-                var ticket_id = Zammad.createTicket(params.alert_subject,
-                    params.alert_subject + '\n' + params.alert_message + '\n' +
-                    params.zabbix_url + (params.zabbix_url.endsWith('/') ? '' : '/') +
-                    'tr_events.php?triggerid=' + params.trigger_id + '&eventid=' + params.event_id + '\n',
-                    priority);
-        
-                result.tags.__zbx_zammad_ticket_id = ticket_id;
-                result.tags.__zbx_zammad_ticketlink = params.zammad_url +
-                    (params.zammad_url.endsWith('/') ? '' : '/') + '#ticket/zoom/' + ticket_id;
-        
-                if (Zammad.params.enable_tags.toLowerCase() === 'true') {
-                    Zammad.setTicketTags(params.event_tags, ticket_id);
-                }
-            }
-            // Update created ticket for trigger-based event.
-            else {
-                Zammad.updateTicket(params.alert_subject, params.alert_message);
-            }
-        
-            return JSON.stringify(result);
+        	var hook = new Zammad(value);
+        	hook.request = new CHttpRequest(Logger);
+        	return hook.run();
         }
         catch (error) {
-            Zabbix.log(3, '[ Zammad Webhook ] ERROR: ' + error);
-            throw 'Sending failed: ' + error;
+        	Logger.log(Logger.WARN, 'notification failed: ' + error);
+        	throw 'Sending failed: ' + error;
         }
       process_tags: 'YES'
       show_event_menu: 'YES'
       event_menu_url: '{EVENT.TAGS.__zbx_zammad_ticketlink}'
-      event_menu_name: 'Zammad: ticket #{EVENT.TAGS.__zbx_zammad_ticket_id}'
+      event_menu_name: 'Zammad: Ticket #{EVENT.TAGS.__zbx_zammad_ticket_id}'
+      description: |
+        This media type integrates your Zabbix installation with your Zammad installation using the Zabbix webhook feature.
+        
+        Zammad configuration:
+        
+        1. Check that API Token Access is enabled in "Settings" → "System" → "API".
+        2. Open the profile settings of the customer user and create a new Personal User Token.
+        3. Set the "ticket.agent" permission for the token and press Create.
+        4. Copy and save the created token somewhere, as it will be shown only once for security reasons.
+        
+        Zabbix configuration:
+        
+        1. Before you can start using Zammad webhook, set up the global macro "{$ZABBIX.URL}":
+        - In the Zabbix web interface, go to "Administration" → "Macros" section in the dropdown menu in the top left corner.
+        - Set up the global macro "{$ZABBIX.URL}" which will contain the URL to the Zabbix frontend. The URL should be either an IP address, a fully qualified domain name, or localhost.
+        - Specifying a protocol is mandatory, whereas the port is optional. Depending on the web server configuration you might also need to append "/zabbix" to the end of URL. Good examples:
+          - http://zabbix.com
+          - https://zabbix.lan/zabbix
+          - http://server.zabbix.lan/
+          - http://localhost
+          - http://127.0.0.1:8080
+        - Bad examples:
+          - zabbix.com
+          - http://zabbix/
+        
+        2. Set the following webhook parameters:
+        - zammad_access_token - the access token that you created during Zammad configuration
+        - zammad_url - the frontend URL of your Zammad installation
+        - zammad_customer - the Zammad user email
+        - zammad_enable_tags - if you want to add the Zabbix event tags to the Zammad tickets that are created, you can set it to one of the following values: "1", "true", "yes", "on" (note, that if the tag support is enabled, each tag is sent via separate HTTP request and created tags will also remain in the Zammad when tickets are closed/deleted)
+        - zammad_group - if needed, you can change the Zammad user group
+        
+        3. If you want to prioritize issues according to the severity values in Zabbix, you can define mapping parameters (create them as additional webhook parameters):
+        - severity_<name> - the Zammad priority ID (<name> in the parameter name can be one of the following values: "not_classified", "information", "warning", "average", "high", "disaster")
+        
+        4. Create a Zabbix user and add media:
+        - If you want to create a new user, go to the "Users" → "Users" section, click the "Create user" button in the top right corner. In the "User" tab, fill in all required fields (marked with red asterisks).
+        - In the "Media" tab, add a new media and select "Zammad" type from the drop-down list. Add any value to the "Send to" field: it is required to be filled, but it is not used.
+        - Make sure this user has access to all hosts for which you would like problem notifications to be sent to Zammad.
+        
+        5. Great! You can now start using this media type in actions and create tickets!
+        
+        You can find the latest version of this media and additional information in the official Zabbix repository:
+        https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/zammad
       message_templates:
         - event_source: TRIGGERS
           operation_mode: PROBLEM
@@ -338,22 +667,22 @@ zabbix_export:
             {TRIGGER.URL}
         - event_source: TRIGGERS
           operation_mode: RECOVERY
-          subject: 'Resolved: {EVENT.RECOVERY.NAME}'
+          subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
           message: |
             Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
-            Problem name: {EVENT.RECOVERY.NAME}
+            Problem name: {EVENT.NAME}
             Host: {HOST.NAME}
             Severity: {EVENT.SEVERITY}
             Original problem ID: {EVENT.ID}
             {TRIGGER.URL}
         - event_source: TRIGGERS
           operation_mode: UPDATE
-          subject: 'Updated problem: {EVENT.NAME}'
+          subject: 'Updated problem in {EVENT.AGE}: {EVENT.NAME}'
           message: |
             {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
             {EVENT.UPDATE.MESSAGE}
             
-            Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
+            Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}.
         - event_source: DISCOVERY
           operation_mode: PROBLEM
           subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
@@ -376,3 +705,50 @@ zabbix_export:
             Host name: {HOST.HOST}
             Host IP: {HOST.IP}
             Agent port: {HOST.PORT}
+        - event_source: INTERNAL
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
+        - event_source: INTERNAL
+          operation_mode: RECOVERY
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
+        - event_source: SERVICE
+          operation_mode: PROBLEM
+          subject: 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}'
+          message: |
+            Service problem started at {EVENT.TIME} on {EVENT.DATE}
+            Service problem name: {EVENT.NAME}
+            Service: {SERVICE.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+            
+            {SERVICE.ROOTCAUSE}
+        - event_source: SERVICE
+          operation_mode: RECOVERY
+          subject: 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            Service "{SERVICE.NAME}" has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Problem duration: {EVENT.DURATION}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+        - event_source: SERVICE
+          operation_mode: UPDATE
+          subject: 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}'
+          message: |
+            Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            Current problem age is {EVENT.AGE}.
+            Service description: {SERVICE.DESCRIPTION}
+            
+            {SERVICE.ROOTCAUSE}
