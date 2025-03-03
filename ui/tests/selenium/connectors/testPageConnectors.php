@@ -204,6 +204,10 @@ class testPageConnectors extends CWebTest {
 
 		// Check Connectors table content.
 		$this->assertTableHasData($connectors_data);
+
+		// Check that the filter is still expanded after page refresh.
+		$this->page->refresh()->waitUntilReady();
+		$this->assertTrue($filter->isExpanded());
 	}
 
 	public function getFilterData() {

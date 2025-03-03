@@ -161,6 +161,10 @@ class testPageScheduledReport extends CWebTest {
 		foreach ($expired_report as $column => $value) {
 			$this->assertEquals($value, $row->getColumn($column)->getText());
 		}
+
+		// Check that the filter is still expanded after page refresh.
+		$this->page->refresh()->waitUntilReady();
+		$this->assertTrue($filter->isExpanded());
 	}
 
 	public static function getFilterData() {
