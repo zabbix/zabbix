@@ -17,7 +17,7 @@
 require_once dirname(__FILE__).'/../common/testFormTotp.php';
 
 /**
- * @backup mfa, users
+ * @backup mfa
  *
  * @onBefore prepareData
  */
