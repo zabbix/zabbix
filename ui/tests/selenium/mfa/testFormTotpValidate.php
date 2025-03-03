@@ -47,15 +47,7 @@ class testFormTotpValidate extends testFormTotp {
 	}
 
 	public function prepareValidateData() {
-		$providedData = $this->getProvidedData();
-		$data = reset($providedData);
-
-		$this->resetTotpConfiguration(
-			CTestArrayHelper::get($data, 'mfa_data.name', self::DEFAULT_METHOD_NAME),
-			CTestArrayHelper::get($data, 'mfa_data.hash_function', self::DEFAULT_ALGO),
-			CTestArrayHelper::get($data, 'mfa_data.code_length', self::DEFAULT_TOTP_CODE_LENGTH)
-		);
-
+		$data = $this->prepareMfaData();
 		$this->quickEnrollUser(CTestArrayHelper::get($data, 'totp_secret', self::TOTP_SECRET_32));
 	}
 

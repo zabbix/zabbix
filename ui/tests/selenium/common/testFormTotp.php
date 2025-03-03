@@ -221,6 +221,24 @@ class testFormTotp extends CWebTest {
 		];
 	}
 
+	/*
+	 * The prepare functions for enrollment and verification are similar, reuse code.
+	 *
+	 * @return array
+	 */
+	protected function prepareMfaData() {
+		$providedData = $this->getProvidedData();
+		$data = reset($providedData);
+
+		$this->resetTotpConfiguration(
+			CTestArrayHelper::get($data, 'mfa_data.name', self::DEFAULT_METHOD_NAME),
+			CTestArrayHelper::get($data, 'mfa_data.hash_function', self::DEFAULT_ALGO),
+			CTestArrayHelper::get($data, 'mfa_data.code_length', self::DEFAULT_TOTP_CODE_LENGTH)
+		);
+
+		return $data;
+	}
+
 	/**
 	 * Blocking logic is shared in Enroll and Verify forms.
 	 */
