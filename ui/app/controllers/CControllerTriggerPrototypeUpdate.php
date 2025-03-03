@@ -35,13 +35,13 @@ class CControllerTriggerPrototypeUpdate extends CController {
 				TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_WARNING, TRIGGER_SEVERITY_AVERAGE, TRIGGER_SEVERITY_HIGH,
 				TRIGGER_SEVERITY_DISASTER
 			]],
-			'expression' => ['db triggers.expression', 'required', 'not_empty',
+			'expression' => ['string', 'required', 'not_empty',
 				'use' => [CExpressionParser::class, ['usermacros' => true, 'lldmacros' => true]]
 			],
 			'recovery_mode' => ['db triggers.recovery_mode', 'in' => [ZBX_RECOVERY_MODE_EXPRESSION,
 				ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, ZBX_RECOVERY_MODE_NONE
 			]],
-			'recovery_expression' => ['db triggers.recovery_expression', 'required', 'not_empty', 'when' => [
+			'recovery_expression' => ['string', 'required', 'not_empty', 'when' => [
 				['recovery_mode', 'in' => [ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION]]
 			]],
 			'correlation_mode' => ['db triggers.correlation_mode', 'in' => [ZBX_TRIGGER_CORRELATION_NONE,
