@@ -45,7 +45,8 @@ class testFormTotpEnroll extends testFormTotp {
 		// Assert subtitle.
 		$subtitle = 'Please scan and get your verification code displayed in your authenticator app.';
 		$this->assertTrue($container->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($subtitle).']')
-			->one()->isVisible());
+			->one()->isVisible()
+		);
 
 		// Assert the QR code and get the secret.
 		$qr_code = $container->query('class:qr-code')->one();
@@ -310,6 +311,7 @@ class testFormTotpEnroll extends testFormTotp {
 
 		// Assert that the secret is visible.
 		$this->assertTrue($container->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($secret).']')
-			->one()->isVisible());
+			->one()->isVisible()
+		);
 	}
 }
