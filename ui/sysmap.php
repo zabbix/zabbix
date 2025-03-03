@@ -404,18 +404,17 @@ $data['sysmap']['items'] = [];
 
 if ($itemids) {
 	$items = API::Item()->get([
-		'output' => ['name_resolved', 'value_type'],
+		'output' => ['name_resolved'],
 		'selectHosts' => ['name'],
 		'itemids' => $itemids,
+		'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG,
+			ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT
+		]],
 		'webitems' => true,
 		'preservekeys' => true
 	]);
 
 	foreach ($items as $itemid => $item) {
-		if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-			continue;
-		}
-
 		$data['sysmap']['items'][$itemid] = [
 			'id' => $itemid,
 			'name' => $item['name_resolved'],
