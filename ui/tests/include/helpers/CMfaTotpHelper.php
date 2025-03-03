@@ -154,8 +154,10 @@ class CMfaTotpHelper {
 				throw new InvalidArgumentException('Invalid Base32 character in TOTP secret: '.$char);
 			}
 
-			// Each character in Base32 represents 5 bits.
-			// Shift the buffer 5 bits left and append the current character's numeric value.
+			/*
+			 * Each character in Base32 represents 5 bits.
+			 * Shift the buffer 5 bits left and append the current character's numeric value.
+			 */
 			$buffer = ($buffer << 5) | $index;
 			$buffer_bits += 5;
 

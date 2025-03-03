@@ -90,6 +90,7 @@ class testFormTotp extends CWebTest {
 		$label = $container->query('xpath:.//label[@for="verification_code"]')->one();
 		$this->assertTrue($label->isVisible());
 		$this->assertEquals('Verification code', $label->getText());
+
 		// Assert 'Verification code' field.
 		$code_field = $container->query('id:verification_code')->one();
 		$this->assertTrue($code_field->isVisible() && $code_field->isEnabled());
