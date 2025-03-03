@@ -33,7 +33,10 @@ class CControllerTriggerEdit extends CController {
 			$allow_any[$name] = [];
 		}
 
-		$ret = $this->validateInput(['object', 'fields' => $allow_any]);
+		$ret = $this->validateInput(['object', 'fields' => [
+			'show_inherited_tags' => ['integer', 'in' => [0, 1]],
+			'form_refresh' => ['integer', 'in' => [0, 1]]
+		] + $allow_any]);
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
