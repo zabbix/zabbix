@@ -77,17 +77,15 @@ func (p *Plugin) Validate(options interface{}) error {
 }
 
 // Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	if len(params) > 0 && key != diskGet {
-		return nil, zbxerr.ErrorTooManyParameters
-	}
+func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (any, error) {
+	var err error
 
-	if err = p.checkVersion(); err != nil {
-		return
+	err = p.validateExport(key, params)
+	if err != nil {
+		return nil, zbxerr.New("export validation failed").Wrap(err)
 	}
 
 	var jsonArray []byte
-
 	switch key {
 	case diskDiscovery:
 		jsonArray, err = p.diskDiscovery()
@@ -143,13 +141,6 @@ func (p *Plugin) diskDiscovery() (jsonArray []byte, err error) {
 }
 
 func (p *Plugin) diskGet(params []string) ([]byte, error) {
-	for _, v := range params {
-		err := clearString(v)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	switch len(params) {
 	case twoParameters:
 		return p.diskGetSingle(params[firstParameter], params[secondParameter])
@@ -450,4 +441,38 @@ func init() {
 		"smart.disk.get", "Returns JSON data of smart device.",
 		"smart.attribute.discovery", "Returns JSON array of smart device attributes.",
 	)
+}
+
+// validateExport function validates export params and key.
+func (p *Plugin) validateExport(key string, params []string) error {
+	// No params - nothing to validate
+	if len(params) == all {
+		return nil
+	}
+
+	// The params can only be for a specific function
+	if key != diskGet {
+		return zbxerr.ErrorTooManyParameters
+	}
+
+	// Disk descriptor sanitization
+	if err := validatePath(params[0]); err != nil {
+		return err
+	}
+
+	// smartctl version validation
+	return p.checkVersion()
+}
+
+// validatePath validates the key parameter path in the context of an input sanitization.
+func validatePath(p string) error {
+	const pattern = `^(?:\s*-|'*"*\s*-)`
+
+	var re = regexp.MustCompile(pattern)
+
+	if re.MatchString(p) {
+		return zbxerr.New("invalid disk descriptor format")
+	}
+
+	return nil
 }

@@ -675,3 +675,51 @@ func Test_getTypeByRateAndAttr(t *testing.T) {
 		})
 	}
 }
+
+func Test_validatePath(t *testing.T) {
+	t.Parallel()
+
+	type args struct {
+		diskPath string
+	}
+
+	tests := []struct {
+		name string
+		args args
+		// want    string
+		wantErr bool
+	}{
+		{"+valid path 1", args{"/dev/sda -B/some/file/path"}, false},
+		{"+valid path 2", args{"/dev/sda    -B/some/file/path"}, false},
+		{"+valid path 3", args{"/dev/sda\t-B/some/file/path"}, false},
+		{"+valid path 4", args{"/dev/sda-B/some/file/path"}, false},
+		{"+valid path 5", args{"/dev/sda - B/some/file/path"}, false},
+		{"+valid path 6", args{"/dev/sda-"}, false},
+		{"+valid path 7", args{"/dev/sda-"}, false},
+		{"+empty path1 9", args{""}, false},
+
+		{"-harmful param hyphen 1", args{"-B/some/file/path"}, true},
+		{"-harmful param hyphen 2", args{"- B/some/file/path"}, true},
+		{"-harmful param hyphen 3", args{"'-B/some/file/path'"}, true},
+		{"-harmful param hyphen 4", args{"'   -B/some/file/path'"}, true},
+		{"-harmful param hyphen 5", args{"'\t-B/some/file/path'"}, true},
+		{"-harmful param hyphen 6", args{"'\t -B/some/file/path'"}, true},
+		{"-harmful param double enclose 1", args{"''-B/some/file/path''"}, true},
+		{"-harmful param double enclose 2", args{"'''-B/some/file/path'''"}, true},
+		{"-harmful param double enclose 3", args{"\"-B/some/file/path\""}, true},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			err := validatePath(tt.args.diskPath)
+
+			// check if erroneous diskPath
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("NewDiskPath() error = %v, wantErr %t", err, tt.wantErr)
+			}
+		})
+	}
+}
