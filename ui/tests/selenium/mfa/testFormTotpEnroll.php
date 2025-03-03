@@ -254,23 +254,24 @@ class testFormTotpEnroll extends testFormTotp {
 	 * @param string   $method_name    The expected TOTP method name.
 	 * @param string   $user_name      User that is trying to enroll.
 	 * @param int      $algorithm      The expected TOTP Cryptographic algorithm.
-	 * @param int      $digits         The expected TOTP code length, number of digits.
+	 * @param int      $code_length    The expected TOTP code length, number of digits.
 	 *
 	 * @return string
 	 */
 	protected function validateQrCodeAndExtractSecret($qr_code = null, $method_name = self::DEFAULT_METHOD_NAME,
-			$user_name = self::USER_NAME, $algorithm = self::DEFAULT_ALGO, $digits = self::DEFAULT_TOTP_CODE_LENGTH) {
+			$user_name = self::USER_NAME, $algorithm = self::DEFAULT_ALGO,
+			$code_length = self::DEFAULT_TOTP_CODE_LENGTH) {
 		if ($qr_code === null) {
 			$qr_code = $this->page->query('class:qr-code')->one();
 		}
 
 		/*
 		 * The expected QR code's URL should follow this format:
-		 * otpauth://totp/{method-name}:{user-name}?secret={secret}&issuer={method-name}&algorithm={algo}&digits={digits}&period=30
+		 * otpauth://totp/{method-name}:{user-name}?secret={secret}&issuer={method-name}&algorithm={algo}&digits={digit_count}&period=30
 		 */
 		$regex = '@^otpauth:\/\/totp\/'.preg_quote($method_name).':'.$user_name.'\?secret=(['.
 				CMfaTotpHelper::VALID_BASE32_CHARS.']{32})&issuer='.preg_quote($method_name).'&algorithm='.
-				self::$algo_ui_map[$algorithm].'&digits='.$digits.'&period=30$@';
+				self::$algo_ui_map[$algorithm].'&digits='.$code_length.'&period=30$@';
 
 		$qr_title = urldecode($qr_code->getAttribute('title'));
 		$this->assertEquals(1, preg_match($regex, $qr_title, $matches),

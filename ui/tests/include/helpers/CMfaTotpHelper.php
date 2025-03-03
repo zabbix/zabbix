@@ -31,22 +31,22 @@ class CMfaTotpHelper {
 	];
 
 	/**
-	 * Generate a Time-based One-Time Password (TOTP) based on the provided secret.
+	 * Generates a Time-based One-Time Password (TOTP) based on the provided secret.
 	 *
 	 * @param string $secret              Base32-encoded secret used to generate the TOTP.
-	 * @param int    $digits              Number of digits for the TOTP (6 or 8).
+	 * @param int    $code_length         Number of digits for the TOTP (6 or 8).
 	 * @param int    $algorithm           Hash function in Zabbix API format (1 = sha1, 2 = sha256, 3 = sha512).
 	 * @param int    $time_step_offset    This is added to the time step. 1 means 30 seconds in the future.
 	 *
-	 * @return string    The TOTP of specified digit length.
+	 * @return string
 	 *
 	 * @throws InvalidArgumentException
 	 */
-	public static function generateTotp($secret, $digits = TOTP_CODE_LENGTH_6, $algorithm = TOTP_HASH_SHA1,
+	public static function generateTotp($secret, $code_length = TOTP_CODE_LENGTH_6, $algorithm = TOTP_HASH_SHA1,
 			$time_step_offset = 0) {
-		// Validate the number of digits.
-		if (!in_array($digits, [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8])) {
-			throw new InvalidArgumentException('TOTP length must be either 6 or 8, unsupported value: '.$digits);
+		// Validate the code length.
+		if (!in_array($code_length, [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8])) {
+			throw new InvalidArgumentException('TOTP length must be either 6 or 8, unsupported value: '.$code_length);
 		}
 
 		// Validate the provided hash function.
@@ -91,10 +91,10 @@ class CMfaTotpHelper {
 				(ord($hash_binary[$offset + 1]) & 0xff) << 16 |
 				(ord($hash_binary[$offset + 2]) & 0xff) << 8 |
 				(ord($hash_binary[$offset + 3]) & 0xff)
-			) % pow(10, $digits); // limit to the specified digit count
+			) % pow(10, $code_length); // limit to the specified code length
 
 		// Zero pad and return.
-		return str_pad($totp, $digits, '0', STR_PAD_LEFT);
+		return str_pad($totp, $code_length, '0', STR_PAD_LEFT);
 	}
 
 	/**
