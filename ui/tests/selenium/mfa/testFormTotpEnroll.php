@@ -247,7 +247,7 @@ class testFormTotpEnroll extends testFormTotp {
 	}
 
 	/**
-	 * Validates if the QR code is displaying the correct data and extracts the TOTP secret string.
+	 * Validates if the QR code is displaying the correct data and extracts the TOTP secret string and returns it.
 	 * This is done by looking at the QR code's HTML 'title' attribute, no visual inspection is done.
 	 *
 	 * @param CElement $qr_code        QR code element.
@@ -256,7 +256,7 @@ class testFormTotpEnroll extends testFormTotp {
 	 * @param int      $algorithm      The expected TOTP Cryptographic algorithm.
 	 * @param int      $digits         The expected TOTP code length, number of digits.
 	 *
-	 * @return string    The TOTP secret this QR code shows.
+	 * @return string
 	 */
 	protected function validateQrCodeAndExtractSecret($qr_code = null, $method_name = self::DEFAULT_METHOD_NAME,
 			$user_name = self::USER_NAME, $algorithm = self::DEFAULT_ALGO, $digits = self::DEFAULT_TOTP_CODE_LENGTH) {
