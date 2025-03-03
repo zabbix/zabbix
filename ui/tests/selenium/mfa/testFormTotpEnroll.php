@@ -192,6 +192,7 @@ class testFormTotpEnroll extends testFormTotp {
 			'hash_function' => self::DEFAULT_ALGO,
 			'code_length' => self::DEFAULT_TOTP_CODE_LENGTH
 		])['mfaids'][0];
+
 		// Set the new MFA method as the default.
 		CDataHelper::call('authentication.update', [
 			'mfa_status' => MFA_ENABLED,
