@@ -105,9 +105,11 @@ class CMfaTotpHelper {
 	}
 
 	/**
+	 * Checks if a string is a valid TOTP secret (in the context of Zabbix).
+	 *
 	 * @param string $secret    The secret string that must be validated.
 	 *
-	 * @return bool    True if the string is a valid TOTP secret (in the context of Zabbix).
+	 * @return bool    True if valid.
 	 */
 	public static function isValidSecretString($secret) {
 		$pattern = '/^['.self::VALID_BASE32_CHARS.']{16,32}$/';
