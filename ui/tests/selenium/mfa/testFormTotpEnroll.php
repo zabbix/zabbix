@@ -267,7 +267,7 @@ class testFormTotpEnroll extends testFormTotp {
 
 		/*
 		 * The expected QR code's URL should follow this format:
-		 * otpauth://totp/{method-name}:{user-name}?secret={secret}&issuer={method-name}&algorithm={algo}&digits={digit_count}&period=30
+		 * otpauth://totp/{method-name}:{user-name}?secret={secret}&issuer={method-name}&algorithm={algo}&digits={code_length}&period=30
 		 */
 		$regex = '@^otpauth:\/\/totp\/'.preg_quote($method_name).':'.$user_name.'\?secret=(['.
 				CMfaTotpHelper::VALID_BASE32_CHARS.']{32})&issuer='.preg_quote($method_name).'&algorithm='.
