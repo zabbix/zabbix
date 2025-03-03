@@ -53,6 +53,7 @@ class CControllerTriggerUpdate extends CController {
 			'correlation_tag' => ['db triggers.correlation_tag', 'required', 'not_empty', 'when' => [
 				['correlation_mode', 'in' => [ZBX_TRIGGER_CORRELATION_TAG]],
 			]],
+			'type' => ['db triggers.type', 'in' => [TRIGGER_MULT_EVENT_DISABLED, TRIGGER_MULT_EVENT_ENABLED]],
 			'manual_close' => ['db triggers.manual_close', 'in' => [ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 				ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
 			]],
