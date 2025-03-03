@@ -98,8 +98,7 @@ class testFormTotp extends CWebTest {
 		$this->assertEquals('', $code_field->getValue());
 
 		// Assert 'Sign in' button.
-		$button = $container->query('id:enter')->one();
-		$this->assertEquals('Sign in', $button->getText());
+		$button = $container->query('button:Sign in')->one();
 		$this->assertEquals('submit', $button->getAttribute('type'));
 		$this->assertTrue($button->isClickable());
 
