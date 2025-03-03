@@ -1,7 +1,6 @@
 Changes for 7.4.0beta1
 
 New features:
-.........T [ZBXNEXT-9400] fixed preprocessing step for monthly costs; added triggers for raw data; update dashboard in Azure Cost Management by HTTP template (egordymov)
 A.F.I..PS. [ZBXNEXT-7048] converted the settings table to a key-value format (askolmeisters, jfreibergs, vmaksimovs)
 
 Bug fixes:
@@ -17,6 +16,7 @@ A......... [ZBX-25670] restored audit logging of host group links to hosts (jfre
 A...I..... [ZBX-26010] fixed template cloning error caused by invalid enabled_lifetime_type value (asestakovs)
 ..F....... [ZBX-25582] fixed approximation all for SVG graph widget with multiple entries and same timestamp on single item (dfofanovs)
 ..F....... [ZBX-23687] added improvements and fixed bugs related to context menus (dfofanovs)
+.........T [ZBX-26122] fixed preprocessing step for monthly costs; added triggers for raw data; update dashboard in Azure Cost Management by HTTP template (egordymov)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.0alpha1
