@@ -11,6 +11,7 @@ zabbix_export:
         - name: api_chat_id
           value: '{ALERT.SENDTO}'
         - name: api_parse_mode
+          value: '<PLACE PARSE MODE>'
         - name: api_token
           value: '<PLACE YOUR TOKEN>'
         - name: event_nseverity

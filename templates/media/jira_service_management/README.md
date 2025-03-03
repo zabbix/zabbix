@@ -3,7 +3,7 @@
 
 ## Overview
 
-This guide describes how to integrate your Zabbix installation with with Jira Service Management using the Zabbix webhook feature, providing instructions on setting up a media type, user, and action in Zabbix.
+This guide describes how to integrate your Zabbix installation with Jira Service Management using the Zabbix webhook feature, providing instructions on setting up a media type, user, and action in Zabbix.
 
 > IMPORTANT! This webhook was previously named "Jira Servicedesk".
 

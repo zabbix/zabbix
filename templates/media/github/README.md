@@ -47,7 +47,7 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 |trigger_id|\{TRIGGER\.ID\}|Numeric ID of the trigger of this action.|
 |event_id|\{EVENT\.ID\}|Numeric ID of the event that triggered an action.|
 |github_issue_number|\{EVENT\.TAGS\.\_\_zbx\_github\_issue\_number\}|The issue number in GitHub.|
-|github_repo|\{ALERT\.SENDTO\}|The full name of the repository in the format `\<owner\>/\<repo\>`.|
+|github_repo|\{ALERT\.SENDTO\}|The full name of the repository in the format `owner/project name`.|
 
 > Please be aware that each webhook supports an HTTP proxy. To use this feature, add a new media type parameter with the name `http_proxy` and set its value to the proxy URL.
 

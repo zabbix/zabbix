@@ -23,7 +23,7 @@ The configurable parameters are intended to be changed according to the webhook 
 
 |Name|Value|Description|
 |----|-----|-----------|
-|api_parse_mode||Formatting mode applied for messages. Possible values: markdown, html, markdownv2.|
+|api_parse_mode|\<PLACE PARSE MODE\>|Formatting mode applied for messages. Possible values: markdown, html, markdownv2.|
 |api_token|\<PLACE YOUR TOKEN\>|Bot token that is used to access the Telegram HTTP API.|
 
 ### Internal parameters
@@ -49,6 +49,7 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 ## Service setup
 
 1\. Register a new Telegram bot: send `/newbot` to `@BotFather` and follow the instructions. The token provided by `@BotFather` in the final step will be needed for configuring the Zabbix webhook.
+
 [![](images/thumb.1.png?raw=true)](images/1.png)
 
 2\. If you want to send personal notifications, you need to obtain the chat ID of the user the bot should send messages to.
@@ -72,7 +73,9 @@ In the group chat, send: `/start@your_bot_name_here`. If you skip this step, the
 ## Zabbix configuration
 
 1\. In the Zabbix interface *Alerts* > *Media types* section, import the [`media_telegram.yaml`](media_telegram.yaml) file.
+
 2\. Configure the added media type: 
+
 Copy and paste your Telegram bot token into the *telegramToken* field.
 
 [![](images/thumb.2.png?raw=true)](images/2.png)
@@ -80,6 +83,7 @@ Copy and paste your Telegram bot token into the *telegramToken* field.
 In the `ParseMode` parameter, set the required option according to Telegram documentation.
 
 More on formatting action notification messages in Telegram Bot API documentation: [Markdown](https://core.telegram.org/bots/api#markdown-style) / [HTML](https://core.telegram.org/bots/api#html-style) / [MarkdownV2](https://core.telegram.org/bots/api#markdownv2-style).
+
 Note: Your Telegram-related actions should be separated from other notification actions (for example, SMS), otherwise you may get plain-text alerts with raw Markdown/HTML tags.
 
 Test the media type using your chat ID or group ID.
@@ -92,6 +96,7 @@ If you have forgotten to send `/start` to the Telegram bot, you will get the fol
 [![](images/thumb.8.png?raw=true)](images/8.png)
 
 3\.To receive notifications in Telegram, you need to create a Zabbix user and add **Media** with the **Telegram** media type.
+
 In the *Send to* field, enter the Telegram user chat ID or group ID obtained during Telegram setup.
 
 [![](images/thumb.4.png?raw=true)](images/4.png)

@@ -3,7 +3,7 @@
 
 ## Overview
 
-This guide describes how to integrate your Zabbix installation with with MS Teams using the Zabbix webhook feature, providing instructions on setting up a media type, user, and action in Zabbix.
+This guide describes how to integrate your Zabbix installation with MS Teams using the Zabbix webhook feature, providing instructions on setting up a media type, user, and action in Zabbix.
 
 This integration is supported only on Teams **as part of Office 365**.
 

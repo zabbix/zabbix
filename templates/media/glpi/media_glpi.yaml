@@ -612,7 +612,7 @@ zabbix_export:
         - event_source: TRIGGERS
           operation_mode: UPDATE
           subject: 'Updated problem in {EVENT.AGE}: {EVENT.NAME}'
-          message: '{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at at {EVENT.UPDATE.TIME} on {EVENT.UPDATE.DATE}. <br><br>{EVENT.UPDATE.MESSAGE}<br><br>Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}.<br><br>'
+          message: '{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.TIME} on {EVENT.UPDATE.DATE}. <br><br>{EVENT.UPDATE.MESSAGE}<br><br>Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}.<br><br>'
         - event_source: DISCOVERY
           operation_mode: PROBLEM
           subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'

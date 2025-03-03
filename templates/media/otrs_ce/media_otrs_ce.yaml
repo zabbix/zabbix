@@ -508,7 +508,7 @@ zabbix_export:
         	if (this.request.getStatus() < 200 || this.request.getStatus() >= 300) {
         		var message = 'status code ' + this.request.getStatus();
         		Logger.log(Logger.INFO, 'API response ERROR with ' + message + ': ' + response);
-        		throw 'Request failed with ' + message + '. Check debug log for more information';
+        		throw 'Request failed with ' + message + '. Check debug log for more information.';
         	}
         	if (CParamValidator.isDefined(response.Error) && Object.keys(response.Error).length > 0) {
         		Logger.log(Logger.INFO, 'API response ERROR: ' + JSON.stringify(response.Error));

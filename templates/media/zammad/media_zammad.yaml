@@ -470,7 +470,6 @@ zabbix_export:
         	}
         	this.priority = (CParamValidator.isDefined(priority)) ? priority.trim() : null;
         
-        
         	this.result = {tags: {}};
         };
         
@@ -480,7 +479,6 @@ zabbix_export:
         	}
         
         	Logger.log(Logger.INFO, 'Source: ' + alert.source + '; Event: ' + alert.event);
-        
         
         	this.request.addHeaders('Authorization: Token token=' + this.params.zammad_access_token);
         
