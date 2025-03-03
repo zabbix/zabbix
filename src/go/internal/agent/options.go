@@ -22,11 +22,11 @@ import (
 	"net"
 	"net/url"
 	"os"
+	"regexp"
 	"slices"
 	"strings"
 	"unicode"
 	"unicode/utf8"
-	"regexp"
 
 	"golang.zabbix.com/agent2/pkg/tls"
 	"golang.zabbix.com/sdk/conf"
@@ -384,13 +384,12 @@ func validateHost(host string) error {
 
 	if net.ParseIP(host) != nil {
 		return nil
-	} else if regexDNS.MatchString(host) == true {
-		return nil;
+	} else if regexDNS.MatchString(host) {
+		return nil
 	}
 
 	return fmt.Errorf("%w failed to validate host: %s", errServerActive, host)
 }
-
 
 func checkAddress(addresses []string, j, i int, addrs [][]string) ([][]string, error) {
 	var checkAddr string
