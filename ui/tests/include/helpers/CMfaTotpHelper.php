@@ -33,10 +33,10 @@ class CMfaTotpHelper {
 	/**
 	 * Generates a Time-based One-Time Password (TOTP) based on the provided secret.
 	 *
-	 * @param string $secret              Base32-encoded secret used to generate the TOTP.
-	 * @param int    $code_length         Number of digits for the TOTP (6 or 8).
-	 * @param int    $algorithm           Hash function in Zabbix API format (1 = sha1, 2 = sha256, 3 = sha512).
-	 * @param int    $time_step_offset    This is added to the time step. 1 means 30 seconds in the future.
+	 * @param string $secret            Base32-encoded secret used to generate the TOTP.
+	 * @param int    $code_length       Number of digits for the TOTP (6 or 8).
+	 * @param int    $algorithm         Hash function in Zabbix API format (1 = sha1, 2 = sha256, 3 = sha512).
+	 * @param int    $time_step_offset  This is added to the time step. 1 means 30 seconds in the future.
 	 *
 	 * @return string
 	 *
@@ -103,7 +103,7 @@ class CMfaTotpHelper {
 	 * invalid by the time it's used. It also prevents a scenario where server and client time mismatches
 	 * slightly and the client generates a future code that the server rejects.
 	 *
-	 * @param float $buffer    Minimum time in seconds from a time window change.
+	 * @param float $buffer  Minimum time in seconds from a time window change.
 	 */
 	public static function waitForSafeTotpWindow($buffer = 1) {
 		// Calculate the remaining time in the current TOTP window.
@@ -124,9 +124,9 @@ class CMfaTotpHelper {
 	/**
 	 * Checks if a string is a valid TOTP secret (in the context of Zabbix).
 	 *
-	 * @param string $secret    The secret string that must be validated.
+	 * @param string $secret  The secret string that must be validated.
 	 *
-	 * @return bool    True if valid.
+	 * @return bool
 	 */
 	public static function isValidSecretString($secret) {
 		$pattern = '/^['.self::VALID_BASE32_CHARS.']{16,32}$/';
@@ -134,11 +134,12 @@ class CMfaTotpHelper {
 	}
 
 	/**
-	 * TOTP secrets are encoded in Base32. To generate a token, the secret needs to be decoded.
+	 * TOTP secrets are encoded in Base32. This takes a Base32 encoded string,
+	 * converts it to a raw data string and returns it.
 	 *
-	 * @param string $base32_secret    Base32 secret string to be decoded.
+	 * @param string $base32_secret  Base32 secret string to be decoded.
 	 *
-	 * @return string    Decoded secret binary data.
+	 * @return string
 	 *
 	 * @throws InvalidArgumentException
 	 */

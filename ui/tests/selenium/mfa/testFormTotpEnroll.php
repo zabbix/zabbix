@@ -250,11 +250,11 @@ class testFormTotpEnroll extends testFormTotp {
 	 * Validates if the QR code is displaying the correct data and extracts the TOTP secret string and returns it.
 	 * This is done by looking at the QR code's HTML 'title' attribute, no visual inspection is done.
 	 *
-	 * @param CElement $qr_code        QR code element.
-	 * @param string   $method_name    The expected TOTP method name.
-	 * @param string   $user_name      User that is trying to enroll.
-	 * @param int      $algorithm      The expected TOTP Cryptographic algorithm.
-	 * @param int      $code_length    The expected TOTP code length, number of digits.
+	 * @param CElement $qr_code      QR code element.
+	 * @param string   $method_name  The expected TOTP method name.
+	 * @param string   $user_name    User that is trying to enroll.
+	 * @param int      $algorithm    The expected TOTP Cryptographic algorithm.
+	 * @param int      $code_length  The expected TOTP code length, number of digits.
 	 *
 	 * @return string
 	 */
@@ -286,8 +286,8 @@ class testFormTotpEnroll extends testFormTotp {
 	/**
 	 * Performs the enrollment steps.
 	 *
-	 * @param CElement $form        Enroll form element.
-	 * @param string   $mfa_name    Override for the expected MFA method name.
+	 * @param CElement $form      Enroll form element.
+	 * @param string   $mfa_name  Override for the expected MFA method name.
 	 */
 	protected function performEnroll($form, $mfa_name = null) {
 		$qr_code = $form->query('class:qr-code')->one();
@@ -301,9 +301,9 @@ class testFormTotpEnroll extends testFormTotp {
 	/**
 	 * Asserts the description text under the QR code.
 	 *
-	 * @param CElement $container    Container element that should contain the description.
-	 * @param int      $algorithm    The cryptographic algorithm that should be displayed.
-	 * @param string   $secret       The secret that should be displayed.
+	 * @param CElement $container  Container element that should contain the description.
+	 * @param int      $algorithm  The cryptographic algorithm that should be displayed.
+	 * @param string   $secret     The secret that should be displayed.
 	 */
 	protected function assertEnrollDescription($container, $algorithm, $secret) {
 		$description = 'Unable to scan? You can use '.self::$algo_ui_map[$algorithm].

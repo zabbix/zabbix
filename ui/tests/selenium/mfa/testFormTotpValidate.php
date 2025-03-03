@@ -155,7 +155,7 @@ class testFormTotpValidate extends testFormTotp {
 	 * The secret can only be decided server-side, it can't be set by API or frontend.
 	 * This method avoids having to manually enroll via UI by setting the secret in DB directly.
 	 *
-	 * @param string $secret TOTP secret to set in DB.
+	 * @param string $secret  TOTP secret to set in DB.
 	 *
 	 * @throws Exception    If the TOTP secret is not valid, the test will fail.
 	 */
