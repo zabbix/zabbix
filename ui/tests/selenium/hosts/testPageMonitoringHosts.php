@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 /**
  * @backup profiles
  *
- * @dataSource TagFilter, UserPermissions, WidgetCommunication
+ * @dataSource TagFilter, UserPermissions, WidgetCommunication, DynamicItemWidgets
  */
 class testPageMonitoringHosts extends CWebTest {
 
