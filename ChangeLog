@@ -1,7 +1,6 @@
 Changes for 7.0.11rc1
 
 New features:
-.........T [ZBXNEXT-9400] fixed preprocessing step for monthly costs; added triggers for raw data; update dashboard in Azure Cost Management by HTTP template (egordymov)
 
 Bug fixes:
 ........S. [ZBX-25731] fixed host interface going to unknown state when switching proxies due to proxy HA (dgoloscapov)
@@ -17,6 +16,7 @@ A...I..... [ZBX-26010] fixed template cloning error caused by invalid enabled_li
 .......PS. [ZBX-25991] fixed invalid SQL statement during network discovery when using Oracle database (asestakovs)
 ..F....... [ZBX-25582] fixed approximation all for SVG graph widget with multiple entries and same timestamp on single item (dfofanovs)
 ..F....... [ZBX-23687] added improvements and fixed bugs related to context menus (dfofanovs)
+.........T [ZBX-26122] fixed preprocessing step for monthly costs; added triggers for raw data; update dashboard in Azure Cost Management by HTTP template (egordymov)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.10
