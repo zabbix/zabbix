@@ -1711,7 +1711,7 @@ const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
  * Purpose: execute a set of SQL statements IF it is big enough               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
+static int	db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *clause)
 {
 	int	ret = SUCCEED;
 
@@ -1721,6 +1721,10 @@ int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_off
 		if (',' == (*sql)[*sql_offset - 1])
 		{
 			(*sql_offset)--;
+
+			if (NULL != clause)
+				zbx_strcpy_alloc(sql, sql_alloc, sql_offset, clause);
+
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 		}
 #else
@@ -1751,6 +1755,16 @@ int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_off
 	}
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute a set of SQL statements IF it is big enough               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
+{
+	return db_execute_overflowed_sql(sql, sql_alloc, sql_offset, NULL);
 }
 
 /******************************************************************************
@@ -2705,6 +2719,8 @@ static char	*zbx_db_format_values(zbx_db_field_t **fields, const zbx_db_value_t 
  ******************************************************************************/
 void	zbx_db_insert_clean(zbx_db_insert_t *self)
 {
+	zbx_free(self->clause);
+
 	for (int i = 0; i < self->rows.values_num; i++)
 	{
 		zbx_db_value_t	*row = self->rows.values[i];
@@ -2768,6 +2784,7 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const zbx_db_table_t *tabl
 
 	self->autoincrement = -1;
 	self->lastid = 0;
+	self->clause = NULL;
 
 	zbx_vector_db_field_ptr_create(&self->fields);
 	zbx_vector_db_value_ptr_create(&self->rows);
@@ -3240,7 +3257,7 @@ retry_oracle:
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ")" ZBX_ROW_DL);
 
-		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+		if (SUCCEED != (ret = db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset, self->clause)))
 			goto out;
 	}
 
@@ -3250,6 +3267,9 @@ retry_oracle:
 		if (',' == sql[sql_offset - 1])
 		{
 			sql_offset--;
+			if (NULL != self->clause)
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, self->clause);
+
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 		}
 #	endif
@@ -3299,6 +3319,18 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name)
 
 	THIS_SHOULD_NEVER_HAPPEN;
 	exit(EXIT_FAILURE);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: adds clause to insert statement                                   *
+ *                                                                            *
+ * Parameters: self - [IN] the bulk insert data                               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_db_insert_clause(zbx_db_insert_t *self, const char *clause)
+{
+	self->clause = zbx_strdup(self->clause, clause);
 }
 
 /******************************************************************************
