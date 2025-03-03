@@ -101,7 +101,8 @@ class testFormTotpEnroll extends testFormTotp {
 	 * Test different enrollment scenarios.
 	 *
 	 * @dataProvider getEnrollData
-	 * @onBefore     prepareEnrollData
+	 *
+	 * @onBefore prepareEnrollData
 	 */
 	public function testFormTotpEnroll_Enroll($data) {
 		// Open the enroll form.

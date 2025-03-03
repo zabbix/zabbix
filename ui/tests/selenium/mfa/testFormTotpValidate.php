@@ -62,8 +62,9 @@ class testFormTotpValidate extends testFormTotp {
 	/**
 	 * Test different validation scenarios.
 	 *
-	 * @dataProvider  getValidateData
-	 * @onBefore      prepareValidateData
+	 * @dataProvider getValidateData
+	 *
+	 * @onBefore prepareValidateData
 	 */
 	public function testFormTotpValidate_Validate($data) {
 		// Open the validation form.
