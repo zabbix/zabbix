@@ -425,11 +425,9 @@ if ($itemids) {
 }
 
 foreach ($data['sysmap']['links'] as &$link) {
-	if (array_key_exists('indicator_type', $link) && $link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE
-			&& array_key_exists('itemid', $link) && $link['itemid'] != null
-			&& !array_key_exists($link['itemid'], $data['sysmap']['items'])) {
-		$link['indicator_type'] = MAP_INDICATOR_TYPE_STATIC_LINK;
-		$link['itemid'] = null;
+	if ($link['indicator_type'] == MAP_INDICATOR_TYPE_ITEM_VALUE && $link['thresholds']) {
+		CArrayHelper::sort($link['thresholds'], ['threshold']);
+		$link['thresholds'] = array_values($link['thresholds']);
 	}
 }
 unset($link);

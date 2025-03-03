@@ -416,6 +416,8 @@ class CMapHelper {
 							}
 						}
 						elseif ($value_type == ITEM_VALUE_TYPE_FLOAT || $value_type == ITEM_VALUE_TYPE_UINT64) {
+							CArrayHelper::sort($link['thresholds'], ['threshold']);
+
 							foreach ($link['thresholds'] as $threshold) {
 								if ($item_value < $threshold['threshold']) {
 									break;
