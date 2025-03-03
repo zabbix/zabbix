@@ -660,6 +660,20 @@ func TestParseServerActive(t *testing.T) {
 			[][]string{{"[fe80::72d5:8d8b:b2ca:206]:10051"}},
 		},
 		{
+			"+IPv6WithEmptySpaceAround",
+			" fe80::72d5:8d8b:b2ca:206  ", nil,
+			false,
+			[][]string{{"[fe80::72d5:8d8b:b2ca:206]:10051"}},
+		},
+		{
+			"+IPv6WithEmptySpaceInside",
+			" fe80::72d5:8d8b: b2ca:206  ",
+			fmt.Errorf("%w %s", errServerActive,
+				`address "fe80::72d5:8d8b: b2ca:206": address fe80::72d5:8d8b: b2ca:206: too many colons in address`),
+			true,
+			nil,
+		},
+		{
 			"+emptyString",
 			"",
 			nil,
@@ -688,6 +702,13 @@ func TestParseServerActive(t *testing.T) {
 			[][]string{{"0:10051"}},
 		},
 		{
+			"+loopbackAddressWithEmptySpaceAround",
+			"  127.0.0.1 ",
+			nil,
+			false,
+			[][]string{{"127.0.0.1:10051"}},
+		},
+		{
 			"+loopbackAddress",
 			"127.0.0.1",
 			nil,
@@ -702,7 +723,14 @@ func TestParseServerActive(t *testing.T) {
 			[][]string{{"[::1]:10051"}},
 		},
 		{
-			"+stringThatShouldNotBeValidIPAddress",
+			"+loopbackAddressIPv6WithEmptySpaceAround",
+			"  ::1 ",
+			nil,
+			false,
+			[][]string{{"[::1]:10051"}},
+		},
+		{
+			"+DNSName",
 			"aaa",
 			nil,
 			false,
@@ -723,7 +751,7 @@ func TestParseServerActive(t *testing.T) {
 			[][]string{{"[::1:123]:10051"}},
 		},
 		{
-			"+stringThatShouldNotBeValidIPAddressAndPort",
+			"+DNSNameAndPort",
 			"aaa:123",
 			nil,
 			false,
@@ -744,7 +772,7 @@ func TestParseServerActive(t *testing.T) {
 			[][]string{{"[::1]:123"}},
 		},
 		{
-			"+stringThatShouldNotBeValidIPAddressInSquareBracketsAndPort",
+			"+DNSNameInSquareBracketsAndPort",
 			"[aaa]:123",
 			nil,
 			false,
@@ -800,14 +828,14 @@ func TestParseServerActive(t *testing.T) {
 			[][]string{{"[::1]:10051"}, {"[::2]:10051"}},
 		},
 		{
-			"+twoStringsThatShouldNotBeValidIPAddressesWithEmptySpace",
+			"+twoDNSNamesWithEmptySpace",
 			"aaa, aab",
 			nil,
 			false,
 			[][]string{{"aaa:10051"}, {"aab:10051"}},
 		},
 		{
-			"+stringThatShouldNotBeValidIPAddressWithPort",
+			"+DNSNameWithPortAndAnotherDNSNameWithPort",
 			"aaa:10052,aab",
 			nil,
 			false,
@@ -828,7 +856,7 @@ func TestParseServerActive(t *testing.T) {
 			[][]string{{"[::2:123]:10051"}, {"[::1:123]:10052"}},
 		},
 		{
-			"+twoStringsThatShouldNotBeValidIPAddressesWithPorts",
+			"+twoDNSNamesWithPorts",
 			"aaa:123,aab:123",
 			nil,
 			false,
@@ -849,14 +877,14 @@ func TestParseServerActive(t *testing.T) {
 			[][]string{{"[::1]:123"}, {"[::2]:123"}},
 		},
 		{
-			"+twoStringsThatShouldNotBeValidIPAddressesInSquareBracketsWithPorts",
+			"+twoDNSNamesInSquareBracketsWithPorts",
 			"[aaa]:123,[aab]:123",
 			nil,
 			false,
 			[][]string{{"aaa:123"}, {"aab:123"}},
 		},
 		{
-			"+twoStringsThatShouldNotBeValidIPAddresses",
+			"+twoDNSNames",
 			"abc,aaa",
 			nil,
 			false,
@@ -870,6 +898,13 @@ func TestParseServerActive(t *testing.T) {
 			[][]string{{"foo:10051", "bar:10051"}, {"baz:10051"}},
 		},
 		{
+			"+clusterConfigurationSeparatedBySemicolonWithPortsWithEmptySpacwAround",
+			"\t \n foo:10051;bar:10052,baz:10053   \n",
+			nil,
+			false,
+			[][]string{{"foo:10051", "bar:10052"}, {"baz:10053"}},
+		},
+		{
 			"+clusterConfigurationSeparatedBySemicolonWithPorts",
 			"foo:10051;bar:10052,baz:10053",
 			nil,
@@ -879,7 +914,6 @@ func TestParseServerActive(t *testing.T) {
 		{
 			"-twoStringsSeparatedByComa",
 			"foo,foo",
-
 			fmt.Errorf("%w %s", errServerActive, `address "foo:10051" specified more than once`),
 			true,
 			nil,
@@ -892,7 +926,7 @@ func TestParseServerActive(t *testing.T) {
 			nil,
 		},
 		{
-			"-threeClustersWithStringThatShouldNotBeValidIPAddresses",
+			"-threeClustersWithDNSNames",
 			"foo;bar,foo2;foo",
 			fmt.Errorf("%w %s", errServerActive, `address "foo:10051" specified more than once`),
 			true,
@@ -929,6 +963,20 @@ func TestParseServerActive(t *testing.T) {
 		{
 			"-newline",
 			"\n",
+			nil,
+			false,
+			[][]string{},
+		},
+		{
+			"-newlineSymbol",
+			"\\n",
+			fmt.Errorf("%w %s", errServerActive, `failed to validate host: \n`),
+			true,
+			nil,
+		},
+		{
+			"-newlineWithEmptySpaceAndTabs",
+			"    \n\t \n \n\n",
 			nil,
 			false,
 			[][]string{},

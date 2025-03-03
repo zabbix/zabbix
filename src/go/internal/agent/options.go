@@ -26,6 +26,7 @@ import (
 	"strings"
 	"unicode"
 	"unicode/utf8"
+	"regexp"
 
 	"golang.zabbix.com/agent2/pkg/tls"
 	"golang.zabbix.com/sdk/conf"
@@ -375,6 +376,22 @@ func checkIfAddressesSpecifiedMoreThanOnce(addrs [][]string, addresses []string,
 	return nil
 }
 
+func validateHost(host string) error {
+	const regexDNSString = `^([a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62}){1}(\.[a-zA-Z0-9_]{1}[a-zA-Z0-9_-]{0,62})*[\._]?$`
+	regexDNS := regexp.MustCompile(regexDNSString)
+
+	host = strings.TrimSpace(host)
+
+	if net.ParseIP(host) != nil {
+		return nil
+	} else if regexDNS.MatchString(host) == true {
+		return nil;
+	}
+
+	return fmt.Errorf("%w failed to validate host: %s", errServerActive, host)
+}
+
+
 func checkAddress(addresses []string, j, i int, addrs [][]string) ([][]string, error) {
 	var checkAddr string
 
@@ -399,6 +416,12 @@ func checkAddress(addresses []string, j, i int, addrs [][]string) ([][]string, e
 
 	if err != nil {
 		return nil, fmt.Errorf("%w address \"%s\": %w", errServerActive, addresses[j], err)
+	}
+
+	err = validateHost(h)
+
+	if err != nil {
+		return nil, err
 	}
 
 	addresses[j] = net.JoinHostPort(strings.TrimSpace(h), strings.TrimSpace(p))
