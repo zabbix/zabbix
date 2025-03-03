@@ -39,7 +39,8 @@ class CMfaTotpHelper {
 	 * @param int    $time_step_offset    This is added to the time step. 1 means 30 seconds in the future.
 	 *
 	 * @return string                      The TOTP of specified digit length.
-	 * @throws InvalidArgumentException    If the number of digits is not 6 or 8, or if an unsupported hash provided.
+	 *
+	 * @throws InvalidArgumentException
 	 */
 	public static function generateTotp($secret, $digits = TOTP_CODE_LENGTH_6, $algorithm = TOTP_HASH_SHA1,
 			$time_step_offset = 0) {
@@ -95,11 +96,11 @@ class CMfaTotpHelper {
 		// Wait if in the buffer zone.
 		if ($remaining_time < $buffer) {
 			// Sleep until next window starts, and then another buffer amount, to safely be in a TOTP window.
-			usleep((int)(($remaining_time + $buffer) * 1000000));
+			usleep((int) (($remaining_time + $buffer) * 1000000));
 		}
 		else if ($time_in_window < $buffer) {
 			// Second case - the window has just started, wait to be outside the buffer zone.
-			usleep((int)(($buffer - $time_in_window) * 1000000));
+			usleep((int) (($buffer - $time_in_window) * 1000000));
 		}
 	}
 
@@ -119,7 +120,8 @@ class CMfaTotpHelper {
 	 * @param string $base32_secret    Base32 secret string to be decoded.
 	 *
 	 * @return string                      Decoded secret binary data.
-	 * @throws InvalidArgumentException    If the input contains invalid Base32 characters.
+	 *
+	 * @throws InvalidArgumentException
 	 */
 	private static function base32Decode($base32_secret) {
 		$base32_secret = strtoupper($base32_secret);
