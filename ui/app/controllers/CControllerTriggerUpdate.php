@@ -23,7 +23,7 @@ class CControllerTriggerUpdate extends CController {
 
 	public static function getValidationRules(): array {
 		$api_uniq = [
-			['trigger.get', ['description' => '{name}'], 'triggerid']
+			['trigger.get', ['hostid' => '{hostid}', 'description' => '{name}'], 'triggerid']
 		];
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [

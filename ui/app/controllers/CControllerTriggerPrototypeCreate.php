@@ -23,7 +23,7 @@ class CControllerTriggerPrototypeCreate extends CController {
 
 	public static function getValidationRules(): array {
 		$api_uniq = [
-			['trigger.get', ['description' => '{name}']]
+			['triggerprototype.get', ['description' => '{name}']]
 		];
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
