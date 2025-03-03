@@ -622,7 +622,6 @@ class CPage {
 		$this->waitUntilReady();
 
 		// Make sure that logged in page is opened.
-		// ToDo: This code NEVER returns an exception, but fixing it would mean tests start failing.
 		try {
 			$this->query('xpath://aside[@class="sidebar"]//a[text()="User settings"]')->exists();
 		}
