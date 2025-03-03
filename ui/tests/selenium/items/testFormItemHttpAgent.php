@@ -21,6 +21,9 @@ use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup items
+ *
+ * TODO: remove ignoreBrowserErrors after DEV-4233
+ * @ignoreBrowserErrors
  */
 class testFormItemHttpAgent extends CLegacyWebTest {
 
