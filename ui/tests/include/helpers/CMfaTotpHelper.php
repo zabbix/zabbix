@@ -38,7 +38,7 @@ class CMfaTotpHelper {
 	 * @param int    $algorithm           Hash function in Zabbix API format (1 = sha1, 2 = sha256, 3 = sha512).
 	 * @param int    $time_step_offset    This is added to the time step. 1 means 30 seconds in the future.
 	 *
-	 * @return string                      The TOTP of specified digit length.
+	 * @return string    The TOTP of specified digit length.
 	 *
 	 * @throws InvalidArgumentException
 	 */
@@ -119,7 +119,7 @@ class CMfaTotpHelper {
 	 *
 	 * @param string $base32_secret    Base32 secret string to be decoded.
 	 *
-	 * @return string                      Decoded secret binary data.
+	 * @return string    Decoded secret binary data.
 	 *
 	 * @throws InvalidArgumentException
 	 */
