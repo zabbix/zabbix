@@ -55,7 +55,7 @@ class testFormTotpEnroll extends testFormTotp {
 		// Assert the QR code image.
 		$qr_img = $qr_code->query('tag:img')->one();
 		$this->assertTrue($qr_img->isVisible());
-		$this->assertEquals("Scan me!", $qr_img->getAttribute('alt'));
+		$this->assertEquals('Scan me!', $qr_img->getAttribute('alt'));
 
 		// Assert the description text.
 		$this->assertEnrollDescription($container, self::DEFAULT_ALGO, $totp_secret);
