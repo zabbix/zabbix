@@ -95,6 +95,7 @@ class testFormTotp extends CWebTest {
 		$code_field = $container->query('id:verification_code')->one();
 		$this->assertTrue($code_field->isVisible() && $code_field->isEnabled());
 		$this->assertEquals('255', $code_field->getAttribute('maxlength'));
+		$this->assertEquals('', $code_field->getValue());
 
 		// Assert 'Sign in' button.
 		$button = $container->query('id:enter')->one();
