@@ -36,6 +36,10 @@ zabbix_export:
           value: '{EVENT.UPDATE.DATE}'
         - name: event_update_message
           value: '{EVENT.UPDATE.MESSAGE}'
+        - name: event_update_nseverity
+          value: '{EVENT.UPDATE.NSEVERITY}'
+        - name: event_update_severity
+          value: '{EVENT.UPDATE.SEVERITY}'
         - name: event_update_status
           value: '{EVENT.UPDATE.STATUS}'
         - name: event_update_time
@@ -58,208 +62,572 @@ zabbix_export:
           value: 'false'
         - name: zabbix_url
           value: '{$ZABBIX.URL}'
-      status: DISABLED
       script: |
+        const CLogger = function(serviceName) {
+        	this.serviceName = serviceName;
+        	this.INFO = 4
+        	this.WARN = 3
+        	this.ERROR = 2
+        	this.log = function(level, msg) {
+        		Zabbix.log(level, '[' + this.serviceName + '] ' + msg);
+        	}
+        }
+        
+        const CWebhook = function(value) {
+        	try {
+        		params = JSON.parse(value);
+        
+        		if (['0', '1', '2', '3', '4'].indexOf(params.event_source) === -1) {
+        			throw 'Incorrect "event_source" parameter given: ' + params.event_source + '.\nMust be 0-4.';
+        		}
+        
+        		if (['0', '3', '4'].indexOf(params.event_source) !== -1 && ['0', '1'].indexOf(params.event_value) === -1) {
+        			throw 'Incorrect "event_value" parameter given: ' + params.event_value + '.\nMust be 0 or 1.';
+        		}
+        
+        		if (['0', '3', '4'].indexOf(params.event_source) !== -1) {
+        			if (params.event_source === '1' && ['0', '1', '2', '3'].indexOf(params.event_value) === -1) {
+        				throw 'Incorrect "event_value" parameter given: ' + params.event_value + '.\nMust be 0-3.';
+        			}
+        
+        			if (params.event_source === '0' && ['0', '1'].indexOf(params.event_update_status) === -1) {
+        				throw 'Incorrect "event_update_status" parameter given: ' + params.event_update_status + '.\nMust be 0 or 1.';
+        			}
+        
+        			if (params.event_source === '4') {
+        				if (['0', '1', '2', '3', '4', '5'].indexOf(params.event_update_nseverity) !== -1 && params.event_update_nseverity != params.event_nseverity) {
+        					params.event_nseverity = params.event_update_nseverity;
+        					params.event_severity = params.event_update_severity;
+        					params.event_update_status = '1';
+        				}
+        			}
+        		}
+        
+        		this.runCallback = function(name, params) {
+        			if (typeof this[name] === 'function') {
+        				return this[name].apply(this, [params]);
+        			}
+        		}
+        
+        		this.handleEvent = function(source, event) {
+        			const alert = { source: source, event: event };
+        			return [
+        				this.runCallback('on' + source + event, alert),
+        				this.runCallback('on' + event, alert),
+        				this.runCallback('onEvent', alert)
+        			];
+        		}
+        
+        		this.handleEventless = function(source) {
+        			const alert = { source: source, event: null };
+        			return [
+        				this.runCallback('on' + source, alert),
+        				this.runCallback('onEvent', alert)
+        			];
+        		}
+        
+        		this.run = function() {
+        			var results = [];
+        			if (typeof this.httpProxy === 'string' && this.httpProxy.trim() !== '') {
+        				this.request.setProxy(this.httpProxy);
+        			}
+        			const types = { '0': 'Trigger', '1': 'Discovery', '2': 'Autoreg', '3': 'Internal', '4': 'Service' };
+        
+        			if (['0', '3', '4'].indexOf(this.params.event_source) !== -1) {
+        				var event = (this.params.event_update_status === '1')
+        					? 'Update'
+        					: ((this.params.event_value === '1') ? 'Problem' : 'Resolve');
+        
+        				results = this.handleEvent(types[this.params.event_source], event);
+        			}
+        			else if (typeof types[this.params.event_source] !== 'undefined') {
+        				results = this.handleEventless(types[this.params.event_source]);
+        			}
+        			else {
+        				throw 'Unexpected "event_source": ' + this.params.event_source;
+        			}
+        
+        			for (idx in results) {
+        				if (typeof results[idx] !== 'undefined') {
+        					return JSON.stringify(results[idx]);
+        				}
+        			}
+        		}
+        		this.httpProxy = params.http_proxy;
+        		this.params = params;
+        		this.runCallback('onCheckParams', {});
+        	} catch (error) {
+        		throw 'Webhook processing failed: ' + error;
+        	}
+        }
+        
+        const CWebhookHelper = {
+        
+        	createProblemURL: function(event_source, zabbix_url, trigger_id, event_id) {
+        		if (event_source === '0') {
+        			return zabbix_url + '/tr_events.php?triggerid=' + trigger_id + '&eventid=' + event_id;
+        		} else if (event_source === '4') {
+        			return zabbix_url + '/zabbix.php?action=service.list';
+        		}
+        
+        		return zabbix_url;
+        	},
+        
+        };
+        
+        const CParamValidator = {
+        
+        	isType: function(value, type) {
+        		if (type === 'array') {
+        			return Array.isArray(value);
+        		}
+        		if (type === 'integer') {
+        			return CParamValidator.isInteger(value);
+        		}
+        		if (type === 'float') {
+        			return CParamValidator.isFloat(value);
+        		}
+        
+        		return (typeof value === type);
+        	},
+        
+        	isInteger: function(value) {
+        		if (!CParamValidator.ifMatch(value, /^-?\d+$/)) {
+        			return false;
+        		}
+        
+        		return !isNaN(parseInt(value));
+        	},
+        
+        	isFloat: function(value) {
+        		if (!CParamValidator.ifMatch(value, /^-?\d+\.\d+$/)) {
+        			return false;
+        		}
+        
+        		return !isNaN(parseFloat(value));
+        	},
+        
+        	isDefined: function(value) {
+        		return !CParamValidator.isType(value, 'undefined');
+        	},
+        
+        	isEmpty: function(value) {
+        		if (!CParamValidator.isType(value, 'string')) {
+        			throw 'Value "' + value + '" must be a string to be checked for emptiness.';
+        		}
+        
+        		return (value.trim() === '');
+        	},
+        
+        	isMacroSet: function(value, macro) {
+        		if (CParamValidator.isDefined(macro)) {
+        			return !(CParamValidator.ifMatch(value, '^\{' + macro + '\}$'))
+        		}
+        
+        		return !(CParamValidator.ifMatch(value, '^\{[$#]{0,1}[A-Z_\.]+[\:]{0,1}["]{0,1}.*["]{0,1}\}$') || value === '*UNKNOWN*')
+        	},
+        
+        	withinRange: function(value, min, max) {
+        		if (!CParamValidator.isType(value, 'number')) {
+        			throw 'Value "' + value + '" must be a number to be checked for range.';
+        		}
+        		if (value < ((CParamValidator.isDefined(min)) ? min : value)
+        			|| value > ((CParamValidator.isDefined(max)) ? max : value)) {
+        			return false;
+        		}
+        
+        		return true;
+        	},
+        
+        	inArray: function(value, array) {
+        		if (!CParamValidator.isType(array, 'array')) {
+        			throw 'The array must be an array to check the value for existing in it.';
+        		}
+        
+        		return (array.indexOf((typeof value === 'string') ? value.toLowerCase() : value) !== -1);
+        	},
+        
+        	ifMatch: function(value, regex) {
+        		return (new RegExp(regex)).test(value);
+        	},
+        
+        	match: function(value, regex) {
+        		if (!CParamValidator.isType(value, 'string')) {
+        			throw 'Value "' + value + '" must be a string to be matched with the regular expression.';
+        		}
+        
+        		return value.match(new RegExp(regex));
+        	},
+        
+        	checkURL: function(value) {
+        		if (CParamValidator.isEmpty(value)) {
+        			throw 'URL value "' + value + '" must be a non-empty string.';
+        		}
+        		if (!CParamValidator.ifMatch(value, '^(http|https):\/\/.+')) {
+        			throw 'URL value "' + value + '" must contain a schema.';
+        		}
+        
+        		return value.endsWith('/') ? value.slice(0, -1) : value;
+        	},
+        
+        	check: function(key, rule, params) {
+        		if (!CParamValidator.isDefined(rule.type)) {
+        			throw 'Mandatory attribute "type" has not been defined for parameter "' + key + '".';
+        		}
+        		if (!CParamValidator.isDefined(params[key])) {
+        			throw 'Checked parameter "' + key + '" was not found in the list of input parameters.';
+        		}
+        		var value = params[key],
+        			error_message = null;
+        		switch (rule.type) {
+        			case 'string':
+        				if (!CParamValidator.isType(value, 'string')) {
+        					throw 'Value "' + key + '" must be a string.';
+        				}
+        				if (CParamValidator.isEmpty(value)) {
+        					error_message = 'Value "' + key + '" must be a non-empty string';
+        					break;
+        				}
+        				if (CParamValidator.isDefined(rule.len) && value.length < rule.len) {
+        					error_message = 'Value "' + key + '" must be a string with a length > ' + rule.len;
+        				}
+        				if (CParamValidator.isDefined(rule.regex) && !CParamValidator.ifMatch(value, rule.regex)) {
+        					error_message = 'Value "' + key + '" must match the regular expression "' + rule.regex + '"';
+        				}
+        				if (CParamValidator.isDefined(rule.url) && rule.url === true) {
+        					value = CParamValidator.checkURL(value);
+        				}
+        				break;
+        			case 'integer':
+        				if (!CParamValidator.isInteger(value)) {
+        					error_message = 'Value "' + key + '" must be an integer';
+        					break;
+        				}
+        				value = parseInt(value);
+        				break;
+        			case 'float':
+        				if (!CParamValidator.isFloat(value)) {
+        					error_message = 'Value "' + key + '" must be a floating-point number';
+        					break;
+        				}
+        				value = parseFloat(value);
+        				break;
+        			case 'boolean':
+        				if (CParamValidator.inArray(value, ['1', 'true', 'yes', 'on'])) {
+        					value = true;
+        				}
+        				else if (CParamValidator.inArray(value, ['0', 'false', 'no', 'off'])) {
+        					value = false;
+        				}
+        				else {
+        					error_message = 'Value "' + key + '" must be a boolean-like.';
+        				}
+        				break;
+        			case 'array':
+        				try {
+        					value = JSON.parse(value);
+        				} catch (error) {
+        					throw 'Value "' + key + '" contains invalid JSON.';
+        				}
+        				if (!CParamValidator.isType(value, 'array')) {
+        					error_message = 'Value "' + key + '" must be an array.';
+        				}
+        				if (CParamValidator.isDefined(rule.tags) && rule.tags === true) {
+        					value = value.reduce(function(acc, obj) {
+        						acc[obj.tag] = obj.value || null;
+        						return acc;
+        					}, {});
+        				}
+        				break;
+        			case 'object':
+        				value = JSON.parse(value);
+        				if (!CParamValidator.isType(value, 'object')) {
+        					error_message = 'Value "' + key + '" must be an object.';
+        				}
+        				break;
+        			default:
+        				throw 'Unexpected attribute type "' + rule.type + '" for value "' + key + '". Available: ' +
+        				['integer', 'float', 'string', 'boolean', 'array', 'object'].join(', ');
+        		}
+        		params[key] = value;
+        		if (CParamValidator.inArray(rule.type, ['integer', 'float']) && error_message === null && (CParamValidator.isDefined(rule.min)
+        			|| CParamValidator.isDefined(rule.max)) && !CParamValidator.withinRange(value, rule.min, rule.max)) {
+        			error_message = 'Value "' + key + '" must be a number ' + ((CParamValidator.isDefined(rule.min) && CParamValidator.isDefined(rule.max))
+        				? (rule.min + '..' + rule.max) : ((CParamValidator.isDefined(rule.min)) ? '>' + rule.min : '<' + rule.max));
+        		}
+        		else if (CParamValidator.isDefined(rule.array) && !CParamValidator.inArray(value, rule.array)) {
+        			error_message = 'Value "' + key + '" must be in the array ' + JSON.stringify(rule.array);
+        		}
+        		else if (CParamValidator.isDefined(rule.macro) && !CParamValidator.isMacroSet(value.toString(), rule.macro)) {
+        			error_message = 'The macro ' + ((CParamValidator.isDefined(rule.macro)) ? '{' + rule.macro + '} ' : ' ') + 'is not set';
+        		}
+        		if (error_message !== null) {
+        			if (CParamValidator.isDefined(rule.default) && CParamValidator.isType(rule.default, rule.type)) {
+        				params[key] = rule.default;
+        			}
+        			else {
+        				Zabbix.log(4, 'Default value for "' + key + '" must be a ' + rule.type + '. Skipped.');
+        				throw 'Incorrect value for variable "' + key + '". ' + error_message;
+        			}
+        		}
+        
+        		return this;
+        	},
+        
+        	validate: function(rules, params) {
+        		if (!CParamValidator.isType(params, 'object') || CParamValidator.isType(params, 'array')) {
+        			throw 'Incorrect parameters value. The value must be an object.';
+        		}
+        		for (var key in rules) {
+        			CParamValidator.check(key, rules[key], params);
+        		}
+        	}
+        }
+        
+        const CHttpRequest = function(logger) {
+        	this.request = new HttpRequest();
+        	if (typeof logger !== 'object' || logger === null) {
+        		this.logger = Zabbix;
+        	}
+        	else {
+        		this.logger = logger;
+        	}
+        
+        	this.clearHeader = function() {
+        		this.request.clearHeader();
+        	}
+        
+        	this.addHeaders = function(value) {
+        		var headers = [];
+        
+        		if (typeof value === 'object' && value !== null) {
+        			if (!Array.isArray(value)) {
+        				Object.keys(value).forEach(function(key) {
+        					headers.push(key + ': ' + value[key]);
+        				});
+        			}
+        			else {
+        				headers = value;
+        			}
+        		}
+        		else if (typeof value === 'string') {
+        			value.split('\r\n').forEach(function(header) {
+        				headers.push(header);
+        			});
+        		}
+        
+        		for (var idx in headers) {
+        			this.request.addHeader(headers[idx]);
+        		}
+        	}
+        
+        	this.setProxy = function(proxy) {
+        		this.request.setProxy(proxy);
+        	}
+        
+        	this.plainRequest = function(method, url, data) {
+        		var resp = null;
+        		method = method.toLowerCase();
+        		this.logger.log(4, 'Sending ' + method + ' request:' + JSON.stringify(data));
+        		if (['get', 'post', 'put', 'patch', 'delete', 'trace'].indexOf(method) !== -1) {
+        			resp = this.request[method](url, data);
+        		}
+        		else if (['connect', 'head', 'options'].indexOf(method) !== -1) {
+        			resp = this.request[method](url);
+        		}
+        		else {
+        			throw 'Unexpected method. Method ' + method + ' is not supported.';
+        		}
+        		this.logger.log(4, 'Response has been received: ' + resp);
+        
+        		return resp;
+        	}
+        
+        	this.jsonRequest = function(method, url, data) {
+        		this.addHeaders('Content-Type: application/json');
+        		var resp = this.plainRequest(method, url, JSON.stringify(data));
+        		try {
+        			resp = JSON.parse(resp);
+        		}
+        		catch (error) {
+        			throw 'Failed to parse response: not well-formed JSON was received';
+        		}
+        
+        		return resp;
+        	}
+        
+        	this.getStatus = function() {
+        		return this.request.getStatus();
+        	}
+        }
+        
         var SEVERITY_COLORS = [
-            '#97AAB3', // Not classified.
-            '#7499FF', // Information.
-            '#FFC859', // Warning.
-            '#FFA059', // Average.
-            '#E97659', // High.
-            '#E45959', // Disaster.
-            '#009900', // Resolved.
-            '#000000'  // Default.
-        ];
+        	'#97AAB3',
+        	'#7499FF',
+        	'#FFC859',
+        	'#FFA059',
+        	'#E97659',
+        	'#E45959',
+        	'#009900',
+        	'#1F1F1F'
+        ],
+        	serviceLogName = 'MS Teams Webhook',
+        	Logger = new CLogger(serviceLogName),
+        	MSTeams = CWebhook;
+        
+        MSTeams.prototype.addBodyFact = function (name, value) {
+        	if (!CParamValidator.isDefined(this.data.sections[0].facts)) {
+        		this.data.sections[0].facts = [];
+        	}
+        	this.data.sections[0].facts.push({name: name, value: value});
+        }
+        
+        MSTeams.prototype.onCheckParams = function () {
+        	CParamValidator.validate({teams_endpoint: {type: 'string'}, event_source: {type: 'string'}, alert_subject: {type: 'string'},
+        		alert_message: {type: 'string'}, host_ip: {type: 'string', default: ''}, zabbix_url: {type: 'string', url: true},
+        		use_default_message: {type: 'boolean', default: false}, event_nseverity: {type: 'integer', default: 7}}, this.params);
+        	var actionName = 'Zabbix Home';
+        	if (!CParamValidator.inArray(this.params.event_source, ['0','3','4'])
+        		|| this.params.alert_message.startsWith("NOTE: Escalation canceled:")) {
+        		this.params['use_default_message'] = true;
+        	}
+        	if (this.params.event_source === '0') {
+        		CParamValidator.validate({event_id: {type: 'integer'}, trigger_id: {type: 'integer'}}, this.params);
+        		actionName = 'Event Info';
+        	}
+        	var actionURL = CWebhookHelper.createProblemURL(this.params.event_source, this.params.zabbix_url, this.params.trigger_id, this.params.event_id);
+        	if (this.params.event_value === '0') {
+        		this.params.event_nseverity = 6;
+        	}
+        	this.data = {
+        		themeColor: SEVERITY_COLORS[this.params.event_nseverity].replace('#', ''),
+        		summary: this.params.alert_subject,
+        		sections: [{
+        			markdown: 'false',
+        			activityTitle: this.params.alert_subject,
+        			text: (this.params.event_source === '0' && !this.params.use_default_message) ? this.params.trigger_description : this.params.alert_message
+        		}],
+        		potentialAction: [{
+        			'@type': 'OpenUri',
+        			name: actionName,
+        			targets: [{
+        				os: 'default',
+        				uri: actionURL
+        			}]
+        		}]
+        	};
+        };
+        
+        MSTeams.prototype.makeUpDefaultMessage = function () {
+        	if (!this.params.use_default_message) {
+        		if (!CParamValidator.isEmpty(this.params.host_name) && CParamValidator.isMacroSet(this.params.host_name, 'HOST.NAME')) {
+        			this.addBodyFact('Host', this.params.host_name + ((!CParamValidator.isEmpty(this.params.host_ip)) ? ' [' + this.params.host_ip + ']' : ''));
+        		}
+        		if (!CParamValidator.isEmpty(this.params.event_severity) && CParamValidator.isMacroSet(this.params.event_severity, 'EVENT.SEVERITY')) {
+        			this.addBodyFact('Severity', this.params.event_severity);
+        		}
+        		if (!CParamValidator.isEmpty(this.params.event_opdata) && CParamValidator.isMacroSet(this.params.event_opdata, 'EVENT.OPDATA')) {
+        			this.addBodyFact('Operational data', this.params.event_opdata);
+        		}
+        		if (!CParamValidator.isEmpty(this.params.event_tags) && CParamValidator.isMacroSet(this.params.event_tags, 'EVENT.TAGS')) {
+        			this.addBodyFact('Event tags', this.params.event_tags);
+        		}
+        
+        		Object.keys(this.params).forEach(function (key) {
+        			if (key.startsWith('fact_') && this.params[key] !== '') {
+        				this.addBodyFact(key.substring(5), this.params[key]);
+        			}
+        			else if (key.startsWith('openUri_') && this.params[key] !== '' && !this.params[key].startsWith('{')) {
+        				this.data.potentialAction.push({
+        					'@type': 'OpenUri',
+        					name: key.substring(8),
+        					targets: [{
+        						os: 'default',
+        						uri: this.params[key]
+        					}]
+        				});
+        			}
+        		});
+        	}
+        }
+        
+        const htmlMultiline = function (text) {
+        	return text.replace(/(?:\r\n|\r|\n)/g, '<br>');
+        }
+        
+        MSTeams.prototype.sendRequest = function () {
+        	this.request.addHeaders({"Content-Type": "application/json"});
+        	var response = this.request.plainRequest('POST', this.params.teams_endpoint, JSON.stringify(this.data));
+        
+        	if (response !== '1') {
+        		Logger.log(Logger.WARN, 'FAILED with response: ' + response);
+        		throw response;
+        	}
+        	return 'OK';
+        };
+        
+        MSTeams.prototype.onProblem = function (alert) {
+        	Logger.log(Logger.INFO, 'Source: ' + alert.source + '; Event: ' + alert.event);
+        	if (!this.params.use_default_message) {
+        		this.addBodyFact('Event time', this.params.event_time + ' ' + this.params.event_date);
+        		this.makeUpDefaultMessage();
+        	}
+        	this.data.sections[0].text = htmlMultiline(this.data.sections[0].text);
+        
+        	return this.sendRequest();
+        }
+        
+        MSTeams.prototype.onUpdate = function (alert) {
+        	Logger.log(Logger.INFO, 'Source: ' + alert.source + '; Event: ' + alert.event);
+        	if (!this.params.use_default_message) {
+        		this.data.sections[0].text = this.params.event_update_user + ' ' + this.params.event_update_action + '.';
+        		if (this.params.event_update_message) {
+        			this.data.sections[0].text += '<br>Message:<br>' + this.params.event_update_message;
+        		}
+        		this.addBodyFact('Event update time', this.params.event_update_time + ' ' + this.params.event_update_date);
+        		this.makeUpDefaultMessage();
+        	}
+        	this.data.sections[0].text = htmlMultiline(this.data.sections[0].text);
+        
+        	return this.sendRequest();
+        }
+        
+        MSTeams.prototype.onResolve = function (alert) {
+        	Logger.log(Logger.INFO, 'Source: ' + alert.source + '; Event: ' + alert.event);
+        	if (!this.params.use_default_message) {
+        		this.addBodyFact('Recovery time', this.params.event_recovery_time + ' ' + this.params.event_recovery_date);
+        		this.makeUpDefaultMessage();
+        	}
+        	this.data.sections[0].text = htmlMultiline(this.data.sections[0].text);
+        
+        	return this.sendRequest();
+        }
+        
+        MSTeams.prototype.onDiscovery = function (alert) {
+        	return this.onProblem(alert);
+        }
+        
+        MSTeams.prototype.onAutoreg = function (alert) {
+        	return this.onProblem(alert);
+        }
         
         try {
-            var params = JSON.parse(value);
-        
-            if (typeof params.teams_endpoint !== 'string' || params.teams_endpoint.trim() === '') {
-                throw 'Cannot get teams_endpoint';
-            }
-            else if (!params.teams_endpoint.startsWith('http')) {
-                throw 'Invalid MS Teams webhook URL: ' + params.teams_endpoint;
-            }
-        
-            params.zabbix_url = (params.zabbix_url.endsWith('/'))
-                ? params.zabbix_url.slice(0, -1) : params.zabbix_url;
-        
-            if ([0, 1, 2, 3, 4].indexOf(parseInt(params.event_source)) === -1) {
-                throw 'Incorrect "event_source" parameter given: "' + params.event_source + '".\nMust be 0-4.';
-            }
-        
-            // Set "use_default_message" to true for non trigger-based events.
-            if (params.event_source !== '0') {
-                params.use_default_message = 'true';
-            }
-        
-            // Check {EVENT.VALUE} for trigger-based and internal events.
-            if (params.event_value !== '0' && params.event_value !== '1'
-                    && (params.event_source === '0' || params.event_source === '3')) {
-                throw 'Incorrect "event_value" parameter given: "' + params.event_value + '".\nMust be 0 or 1.';
-            }
-        
-            // Check {EVENT.UPDATE.STATUS} only for trigger-based events.
-            if (params.event_update_status !== '0' && params.event_update_status !== '1' && params.event_source === '0') {
-                throw 'Incorrect "event_update_status" parameter given: "' + params.event_update_status + '".\nMust be 0 or 1.';
-            }
-        
-            if (params.event_value == 0) {
-                params.event_nseverity = '6';
-            }
-        
-            if (!SEVERITY_COLORS[params.event_nseverity]) {
-                params.event_nseverity = '7';
-            }
-        
-            var request = new HttpRequest(),
-                facts = [],
-                body = {
-                    themeColor: SEVERITY_COLORS[params.event_nseverity].replace('#', ''),
-                    summary: params.alert_subject,
-                    sections: [
-                        {
-                            markdown: 'false',
-                            activityTitle: params.alert_subject,
-                            text: (params.use_default_message.toLowerCase() == 'true')
-                                ? params.alert_message
-                                : params.trigger_description
-                        }
-                    ],
-                    potentialAction: [
-                        {
-                            '@type': 'OpenUri',
-                            name: (params.event_source === '0')
-                                ? 'Event Info'
-                                : 'Zabbix Home',
-                            targets: [
-                                {
-                                    os: 'default',
-                                    uri: (params.event_source === '0')
-                                        ? params.zabbix_url + '/tr_events.php?triggerid=' +
-                                            params.trigger_id + '&eventid=' + params.event_id
-                                        : params.zabbix_url
-                                }
-                            ]
-                        }
-                    ]
-                };
-        
-            if (params.use_default_message.toLowerCase() !== 'true') {
-                // Problem message.
-                if (params.event_value === '1' && params.event_update_status === '0') {
-                    facts.push({
-                        name: 'Event time',
-                        value: params.event_time + ' ' + params.event_date
-                    });
-                    facts.push({
-                        name: 'Host',
-                        value: params.host_name + ' [' + params.host_ip + ']'
-                    });
-        
-                }
-                // Update message.
-                else if (params.event_update_status === '1') {
-                    body.sections[0].text = params.event_update_user + ' ' + params.event_update_action + '.';
-        
-                    if (params.event_update_message) {
-                        body.sections[0].text += '<br>Message:<br>' + params.event_update_message;
-                    }
-        
-                    facts.push({
-                        name: 'Event update time',
-                        value: params.event_update_time + ' ' + params.event_update_date
-                    });
-                    facts.push({
-                        name: 'Host',
-                        value: params.host_name + ' [' + params.host_ip + ']'
-                    });
-        
-                }
-                // Resolved message.
-                else {
-                    facts.push({
-                        name: 'Recovery time',
-                        value: params.event_recovery_time + ' ' + params.event_recovery_date
-                    });
-                    facts.push({
-                        name: 'Host',
-                        value: params.host_name + ' [' + params.host_ip + ']'
-                    });
-                }
-        
-                if (params.event_severity && params.event_severity !== '{EVENT.SEVERITY}') {
-                    facts.push({
-                        name: 'Severity',
-                        value: params.event_severity
-                    });
-                }
-        
-        
-                if (params.event_opdata && params.event_opdata !== '{EVENT.OPDATA}') {
-                    facts.push({
-                        name: 'Operational data',
-                        value: params.event_opdata
-                    });
-                }
-        
-                if (params.event_tags && params.event_tags !== '{EVENT.TAGS}') {
-                    facts.push({
-                        name: 'Event tags',
-                        value: params.event_tags
-                    });
-                }
-        
-                Object.keys(params)
-                    .forEach(function (key) {
-                        if (key.startsWith('fact_') && params[key] !== '') {
-                            facts.push({
-                                name: key.substring(5),
-                                value: params[key]
-                            });
-                        }
-                        else if (key.startsWith('openUri_') && params[key] !== '' && !params[key].startsWith('{')) {
-                            body.potentialAction.push({
-                                '@type': 'OpenUri',
-                                name: key.substring(8),
-                                targets: [
-                                    {
-                                        os: 'default',
-                                        uri: params[key]
-                                    }
-                                ]
-                            });
-                        }
-                    });
-                body.sections[0].facts = facts;
-            }
-        
-            body.sections[0].text = body.sections[0].text.replace(/(?:\r\n|\r|\n)/g, '<br>');
-        
-            request.addHeader('Content-Type: application/json');
-        
-            if (typeof params.HTTPProxy === 'string' && params.HTTPProxy !== '') {
-                request.setProxy(params.HTTPProxy);
-            }
-        
-            Zabbix.log(4, '[ MS Teams Webhook ] JSON: ' + JSON.stringify(body));
-        
-            var response = request.post(params.teams_endpoint, JSON.stringify(body));
-        
-            Zabbix.log(4, '[ MS Teams Webhook ] Response: ' + response);
-        
-            if (response === '1') {
-                return 'OK';
-            }
-            else {
-                Zabbix.log(4, '[ MS Teams Webhook ] FAILED with response: ' + response);
-                throw response;
-            }
+        	var hook = new MSTeams(value);
+        	hook.request = new CHttpRequest(Logger);
+        	return hook.run();
         }
         catch (error) {
-            Zabbix.log(3, '[ MS Teams Webhook ] ERROR: ' + error);
-            throw 'Sending failed: ' + error;
+        	Logger.log(Logger.WARN, 'notification failed: ' + error);
+        	throw 'Sending failed: ' + error;
         }
+      description: |
+        https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/msteams
+        
+        1. Add official Zabbix webhook connector from MS Teams apps for the channel, where you want to receive notifications.
+        2. Create Incoming webhook for your channel.
+        3. In the Zabbix web interface go to Administration → Macros section. Setup the global macro "{$ZABBIX.URL}" which will contain the URL to the Zabbix frontend. 
+        4. On this page replace placeholder <PLACE WEBHOOK URL HERE> with the incoming webhook URL, created during the webhook setup in MS Teams.
+        5. To receive Zabbix notifications in MS Teams, you need to create a Zabbix user and add Media with the MS Teams media type. Make sure this user has access to all hosts for which you would like problem notifications to be sent to MS Teams.
       message_templates:
         - event_source: TRIGGERS
           operation_mode: PROBLEM
@@ -274,7 +642,7 @@ zabbix_export:
             {TRIGGER.URL}
         - event_source: TRIGGERS
           operation_mode: RECOVERY
-          subject: 'Resolved: {EVENT.NAME}'
+          subject: 'Resolved in {EVENT.DURATION}: {EVENT.NAME}'
           message: |
             Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
             Problem name: {EVENT.NAME}
@@ -284,12 +652,12 @@ zabbix_export:
             {TRIGGER.URL}
         - event_source: TRIGGERS
           operation_mode: UPDATE
-          subject: 'Updated problem: {EVENT.NAME}'
+          subject: 'Updated problem in {EVENT.AGE}: {EVENT.NAME}'
           message: |
             {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
             {EVENT.UPDATE.MESSAGE}
             
-            Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
+            Current problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}.
         - event_source: DISCOVERY
           operation_mode: PROBLEM
           subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
@@ -312,6 +680,22 @@ zabbix_export:
             Host name: {HOST.HOST}
             Host IP: {HOST.IP}
             Agent port: {HOST.PORT}
+        - event_source: INTERNAL
+          operation_mode: PROBLEM
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
+        - event_source: INTERNAL
+          operation_mode: RECOVERY
+          subject: '[{EVENT.STATUS}] {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Original problem ID: {EVENT.ID}
         - event_source: SERVICE
           operation_mode: PROBLEM
           subject: 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}'
