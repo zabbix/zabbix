@@ -56,7 +56,7 @@ class CMfaTotpHelper {
 
 		// Calculate the current time step. The TOTP changes every 30 seconds.
 		$time_step = floor(time() / self::TOTP_WINDOW_SIZE) + $time_step_offset;
-		// Convert time step to a 64-bit binary timestamp.
+		// Convert the time step to a binary string representing an "unsigned long long" (64-bit).
 		$time_step_binary = pack('J', $time_step);
 
 		// Convert the secret key from Base32 to binary.
@@ -65,16 +65,33 @@ class CMfaTotpHelper {
 		// Generate the hash that the TOTP is extracted from.
 		$hash_binary = hash_hmac(self::$algo_map[$algorithm], $time_step_binary, $secret_binary, true);
 
-		// Determine the offset for TOTP extraction.
+		/*
+		 * Determine the offset for TOTP extraction.
+		 *
+		 * The offset is determined by the last 4 bits of the hash and is dynamic.
+		 * This is done to add randomness to the TOTP generation, making it harder reverse-engineer the TOTP secret.
+		 *
+		 * The offset is a number from 0 to 15.
+		 *
+		 * For more information refer to the RFC 4226: https://datatracker.ietf.org/doc/html/rfc4226#section-5.3
+		 */
 		$offset = ord($hash_binary[strlen($hash_binary) - 1]) & 0xf;
 
-		// Extract the TOTP from the binary hash.
-		$totp = (((
+		/*
+		 * Extract the TOTP from the binary hash.
+		 *
+		 * The TOTP is contained in 4 bytes (32 bits) of the calculated hash.
+		 * The position of those bytes is determined by the offset calculated above.
+		 * These 4 bytes are extracted, combined into a single 32-bit integer and the last digits are used as the TOTP.
+		 *
+		 * For more information refer to the RFC 4226: https://datatracker.ietf.org/doc/html/rfc4226#section-5.3
+		 */
+		$totp = (
 				(ord($hash_binary[$offset + 0]) & 0x7f) << 24 |
 				(ord($hash_binary[$offset + 1]) & 0xff) << 16 |
 				(ord($hash_binary[$offset + 2]) & 0xff) << 8 |
 				(ord($hash_binary[$offset + 3]) & 0xff)
-			) % pow(10, $digits))); // limit to the specified digit count
+			) % pow(10, $digits); // limit to the specified digit count
 
 		// Zero pad and return.
 		return str_pad($totp, $digits, '0', STR_PAD_LEFT);
