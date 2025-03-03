@@ -220,8 +220,7 @@ class testFormTotpEnroll extends testFormTotp {
 	/**
 	 * Test that user gets blocked if TOTP is entered wrong n times.
 	 */
-	public function testFormTotpEnroll_Blocking()
-	{
+	public function testFormTotpEnroll_Blocking() {
 		// Reset TOTP secret to make sure user has not already been enrolled.
 		$this->resetTotpConfiguration();
 
