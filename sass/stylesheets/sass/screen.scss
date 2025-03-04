@@ -3423,7 +3423,7 @@ svg {
 		align-items: center;
 
 		.final-result-action {
-			margin-right : auto;
+			margin-right: auto;
 		}
 
 		.btn-grey-icon {
@@ -3432,6 +3432,10 @@ svg {
 
 		&:not(:first-child) {
 			margin-top: 5px;
+		}
+
+		&.display-icon {
+			line-height: 24px;
 		}
 	}
 }
@@ -3461,6 +3465,12 @@ svg {
 
 	.item-test-result {
 		display: inline-flex;
+	}
+}
+
+#token_form {
+	.btn-grey-icon {
+		margin-left: 5px;
 	}
 }
 

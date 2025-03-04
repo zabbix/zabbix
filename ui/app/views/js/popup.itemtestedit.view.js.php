@@ -144,8 +144,8 @@ function cleanPreviousTestResults() {
 		.hide();
 
 	for (const element of document.getElementById('preprocessing-test-form')
-			.querySelectorAll('.result-copy > .copy-button')) {
-		element.classList.add('<?= ZBX_STYLE_DISPLAY_NONE ?>');
+			.querySelectorAll('.result-copy > .js-copy-button')) {
+		element.style.display = 'none';
 		element.closest('tr').classList.remove('display-icon');
 	}
 }
@@ -358,7 +358,10 @@ function itemCompleteTest(overlay) {
 				result_row.append(action_element, result[0]);
 
 				if (ret.final.error === undefined && ret.final.result) {
-					result_row.append(createCopyButton(ret.final.result));
+					const copy_button = createCopyButton(ret.final.result);
+
+					result_row.append(copy_button);
+					copy_button.parentElement.classList.add('display-icon');
 				}
 
 				let mapping_row;
@@ -377,7 +380,10 @@ function itemCompleteTest(overlay) {
 					mapping_row.append(action_element, mapped_value[0]);
 
 					if (ret.final.error === undefined && ret.final.result) {
-						mapping_row.append(createCopyButton(ret.final.result));
+						const copy_button = createCopyButton(ret.final.result);
+
+						mapping_row.append(copy_button);
+						copy_button.parentElement.classList.add('display-icon');
 					}
 				}
 
@@ -406,7 +412,7 @@ function createCopyButton(result) {
 
 	copy_button.type = 'button';
 	copy_button.setAttribute('title', <?= json_encode(_('Copy to clipboard')) ?>);
-	copy_button.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_COPY, 'copy-button');
+	copy_button.classList.add(ZBX_STYLE_BTN_GREY_ICON, ZBX_ICON_COPY, 'js-copy-button');
 
 	copy_button.addEventListener('click', () => {
 		writeTextClipboard(result);
@@ -457,10 +463,10 @@ function processItemPreprocessingTestResults(steps) {
 		}
 
 		if (step.error === undefined && result) {
-			const copy_button = form.querySelector(`.copy-button[data-index="${i}"]`);
+			const copy_button = form.querySelector(`.js-copy-button[data-index="${i}"]`);
 
-			copy_button.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 			copy_button.closest('tr').classList.add('display-icon');
+			copy_button.style.display = '';
 
 			copy_button.addEventListener('click', e => {
 				writeTextClipboard(result);

@@ -16,6 +16,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $form = (new CForm())
@@ -396,12 +397,13 @@ if (count($data['steps']) > 0) {
 				->addClass(ZBX_STYLE_RIGHT)
 				->setId('preproc-test-step-'.$i.'-result'),
 			(new CCol(
-				(new CButtonIcon(ZBX_ICON_COPY, _('Copy to clipboard')))
-					->addClass('copy-button')
+				(new CButton('copy_button'))
+					->addClass(ZBX_ICON_COPY)
+					->addClass(ZBX_STYLE_BTN_GREY_ICON)
+					->addClass('js-copy-button')
 					->setAttribute('data-index', $i)
-					->addClass(ZBX_STYLE_DISPLAY_NONE)
-			))
-				->addClass('result-copy')
+					->addStyle('display: none')
+			))->addClass('result-copy')
 		]);
 	}
 

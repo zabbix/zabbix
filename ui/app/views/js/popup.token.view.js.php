@@ -24,7 +24,7 @@ window.token_view_popup = {
 	init() {
 		const form = document.getElementById('token_form');
 
-		form.querySelector('.copy-button').addEventListener('click', (e) => {
+		form.querySelector('.js-copy-button').addEventListener('click', (e) => {
 			writeTextClipboard(e.target.getAttribute('data-auth_token'));
 			e.target.focus();
 		});
