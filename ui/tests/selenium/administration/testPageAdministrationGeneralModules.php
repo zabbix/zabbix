@@ -509,6 +509,20 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				'Status' => 'Disabled'
 			],
 			[
+				'Name' => 'Test Broadcaster',
+				'Version' => '1.0',
+				'Author' => 'Zabbix',
+				'Description' => 'Allows to test listening functionality of other widgets.',
+				'Status' => 'Disabled'
+			],
+			[
+				'Name' => 'Test Listener',
+				'Version' => '1.0',
+				'Author' => 'Zabbix',
+				'Description' => 'Allows to test broadcasting functionality of other widgets.',
+				'Status' => 'Disabled'
+			],
+			[
 				'Name' => 'шестой модуль',
 				'Version' => 'бета 2',
 				'Author' => 'Работник Заббикса',
@@ -959,7 +973,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 						'5th Module',
 						'Clock2',
 						'Empty widget',
+						'Test Broadcaster',
 						'Test CSRF token',
+						'Test Listener',
 						'шестой модуль'
 					]
 				]

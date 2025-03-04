@@ -1566,7 +1566,7 @@ class testFormUser extends CWebTest {
 			$this->page->logout();
 
 			// Attempt to sign in with old password.
-			$this->page->userLogin($data['username'], $data['old_password']);
+			$this->page->userLogin($data['username'], $data['old_password'], TEST_BAD);
 			$message = $this->query('class:red')->one()->getText();
 			$this->assertEquals($message, $data['error_message']);
 

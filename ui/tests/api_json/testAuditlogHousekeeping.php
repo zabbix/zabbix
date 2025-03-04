@@ -17,7 +17,7 @@
 require_once dirname(__FILE__).'/common/testAuditlogCommon.php';
 
 /**
- * @backup config
+ * @backup settings
  */
 class testAuditlogHousekeeping extends testAuditlogCommon {
 
@@ -62,6 +62,6 @@ class testAuditlogHousekeeping extends testAuditlogCommon {
 			'housekeeping.compress_older' => ['update', '788400000', '7d']
 		]);
 
-		$this->getAuditDetails('details', $this->update_actionid, $updated, 1);
+		$this->getAuditDetails('details', $this->update_actionid, $updated, 0);
 	}
 }

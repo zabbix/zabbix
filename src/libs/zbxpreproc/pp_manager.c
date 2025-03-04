@@ -46,9 +46,9 @@
 #	include "preproc_snmp.h"
 #endif
 
-static zbx_prepare_value_func_t	prepare_value_func_cb = NULL;
-static zbx_flush_value_func_t	flush_value_func_cb = NULL;
-static zbx_get_progname_f	get_progname_func_cb = NULL;
+static zbx_preproc_prepare_value_func_t	preproc_prepare_value_func_cb = NULL;
+static zbx_preproc_flush_value_func_t	preproc_flush_value_func_cb = NULL;
+static zbx_get_progname_f		get_progname_func_cb = NULL;
 
 /******************************************************************************
  *                                                                            *
@@ -98,11 +98,11 @@ static void	pp_curl_destroy(void)
 #endif
 }
 
-void	zbx_init_library_preproc(zbx_prepare_value_func_t prepare_value_cb, zbx_flush_value_func_t flush_value_cb,
-		zbx_get_progname_f get_progname_cb)
+void	zbx_init_library_preproc(zbx_preproc_prepare_value_func_t preproc_prepare_value_cb,
+		zbx_preproc_flush_value_func_t preproc_flush_value_cb, zbx_get_progname_f get_progname_cb)
 {
-	prepare_value_func_cb = prepare_value_cb;
-	flush_value_func_cb = flush_value_cb;
+	preproc_prepare_value_func_cb = preproc_prepare_value_cb;
+	preproc_flush_value_func_cb = preproc_flush_value_cb;
 	get_progname_func_cb = get_progname_cb;
 }
 
@@ -831,25 +831,6 @@ static void	preproc_item_value_extract_data(zbx_preproc_item_value_t *value, zbx
 
 /******************************************************************************
  *                                                                            *
- * Purpose: flush preprocessed value                                          *
- *                                                                            *
- * Parameters: manager    - [IN] preprocessing manager                        *
- *             itemid     - [IN] item identifier                              *
- *             value_type - [IN] item value type                              *
- *             flags      - [IN] item flags                                   *
- *             value      - [IN] preprocessed item value                      *
- *             ts         - [IN] value timestamp                              *
- *             value_opt  - [IN] optional value data                          *
- *                                                                            *
- ******************************************************************************/
-static void	preprocessing_flush_value(zbx_pp_manager_t *manager, zbx_uint64_t itemid, unsigned char value_type,
-		unsigned char flags, zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_value_opt_t *value_opt)
-{
-	flush_value_func_cb(manager, itemid, value_type, flags, value, ts, value_opt);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: handle new preprocessing request                                  *
  *                                                                            *
  * Parameters: manager    - [IN] preprocessing manager                        *
@@ -888,7 +869,7 @@ static zbx_uint64_t	preprocessor_add_request(zbx_pp_manager_t *manager, zbx_ipc_
 		{
 			(*direct_num)++;
 			/* allow empty values */
-			preprocessing_flush_value(manager, value.itemid, value.item_value_type, value.item_flags,
+			preproc_flush_value_func_cb(manager, value.itemid, value.item_value_type, value.item_flags,
 					&var, ts, &var_opt);
 
 			zbx_variant_clear(&var);
@@ -961,8 +942,8 @@ static void	prpeprocessor_flush_value_result(zbx_pp_manager_t *manager, zbx_pp_t
 
 	zbx_pp_value_task_get_data(task, &value_type, &flags, &value, &ts, &value_opt);
 
-	if (SUCCEED == prepare_value_func_cb(value, value_opt))
-		preprocessing_flush_value(manager, task->itemid, value_type, flags, value, ts, value_opt);
+	if (SUCCEED == preproc_prepare_value_func_cb(value, value_opt))
+		preproc_flush_value_func_cb(manager, task->itemid, value_type, flags, value, ts, value_opt);
 }
 
 /******************************************************************************

@@ -195,6 +195,9 @@ class testPageItemPrototypes extends testPagePrototypes {
 	 * Dependent items has empty update interval column.
 	 *
 	 * @dataProvider getItemPrototypesNotDisplayedValuesData
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testPageItemPrototypes_NotDisplayedValues($data) {
 		$this->page->login()->open($this->link.self::$host_druleids)->waitUntilReady();
