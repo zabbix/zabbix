@@ -245,6 +245,30 @@ out:
 	return ret;
 }
 
+static int	DBpatch_7030014(void)
+{
+	const zbx_db_table_t	table =
+			{"lld_macro", "itemid", 0,
+				{
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"name", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7030015(void)
+{
+	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("lld_macro", 1, &field);
+}
+
 #endif
 
 DBPATCH_START(7030)
@@ -265,5 +289,7 @@ DBPATCH_ADD(7030010, 0, 1)
 DBPATCH_ADD(7030011, 0, 1)
 DBPATCH_ADD(7030012, 0, 1)
 DBPATCH_ADD(7030013, 0, 1)
+DBPATCH_ADD(7030014, 0, 1)
+DBPATCH_ADD(7030015, 0, 1)
 
 DBPATCH_END()
