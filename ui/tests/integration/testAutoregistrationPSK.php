@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  */
 class testAutoregistrationPSK extends CIntegrationTest {
 
-	const PSK_IDENTITY = "535D2244f31e82fcee2cd9b7964413b797af3d2271e68a7ac2e94e102b2dcb31";
+	const PSK_IDENTITY = "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz{|}";
 	const PSK_KEY_UPPER_CASE = "53E79a76526473c982eab32473e9e1643ead36cc5cfe693a7955b1b0527ec7fe";
 	const PSK_KEY_LOWER_CASE = "53e79a76526473c982eab32473e9e1643ead36cc5cfe693a7955b1b0527ec7fe";
 	const PSK_KEY_WRONG = "53D79a76526473c982eab32473e9e1643ead36cc5cfe693a7955b1b0527ec7fe";
@@ -88,7 +88,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 	}
 
 	/**
-	 * Autoregisters agent1, then agent2 and then agent1 again. (by changing metada item).
+	 * Autoregisters agent1, then agent2 and then agent1 again. (by changing metadata item).
 	 * Checks resulting tags on host to make sure that autoregistration was successful.
 	 */
 	private function coreTestCase() {

@@ -9611,7 +9611,6 @@ size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned ch
 	/* stricter API validation for PSK identities is expected to make this use-case impossible */
 	zabbix_log(LOG_LEVEL_CRIT, "host PSK and autoregistration PSK have the same identity \"%s\" but"
 			" different PSK values, autoregistration will not be allowed", psk_identity);
-	zabbix_log(LOG_LEVEL_CRIT, "PSK values, psk_buf: \"%s\" and autoreg_psk_tmp: \"%s\"", psk_buf, autoreg_psk_tmp);
 	THIS_SHOULD_NEVER_HAPPEN;
 
 	return psk_len;
