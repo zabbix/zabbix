@@ -29,6 +29,9 @@ class testFormTestItem extends testItemTest {
 	 * Check Test item Button enabled/disabled state depending on item type for Host.
 	 *
 	 * @backupOnce items
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testFormTestItem_CheckButtonStateHost() {
 		$this->checkTestButtonState($this->getItemTestButtonStateData(), 'Item for Test Button check', 'Item',
@@ -37,6 +40,9 @@ class testFormTestItem extends testItemTest {
 
 	/**
 	 * Check Test item Button enabled/disabled state depending on item type for Template.
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testFormTestItem_CheckButtonStateTemplate() {
 		$this->checkTestButtonState($this->getItemTestButtonStateData(), 'Item for Test Button check', 'Item',
