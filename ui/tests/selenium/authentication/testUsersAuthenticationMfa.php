@@ -17,7 +17,7 @@
 require_once dirname(__FILE__).'/../common/testFormAuthentication.php';
 
 /**
- * @backup config, usrgrp
+ * @backup settings
  *
  * @onBefore prepareData
  */
