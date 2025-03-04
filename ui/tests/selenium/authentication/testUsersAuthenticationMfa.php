@@ -179,6 +179,15 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		}
 
 		$this->assertEquals(['Name', 'API hostname', 'Client ID', 'Client secret'], $dialog_form->getRequiredLabels());
+
+		// Assert the Add and Cancel buttons.
+		$footer = $dialog->getFooter();
+		$this->assertEquals(2, $footer->query('tag:button')->all()->count());
+
+		foreach (['Add', 'Cancel'] as $button) {
+			$this->assertTrue($footer->query('button', $button)->one()->isClickable());
+		}
+
 		$dialog->close();
 		$dialog->ensureNotPresent();
 	}
