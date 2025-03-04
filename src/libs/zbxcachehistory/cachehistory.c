@@ -596,14 +596,15 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 		int itemids_num, int *inserts_num, int *upserts_num, unsigned char value_type, const char *table_name,
 		int clock)
 {
-	int		i, num, upsert = 0;
+	int		i, num;
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 	zbx_uint64_t	itemid;
 	ZBX_DC_TREND	*trend;
 	size_t		sql_offset;
-
 #ifdef HAVE_POSTGRESQL
+	int		upsert = 0;
+
 	if (0 != zbx_tsdb_get_version())
 		upsert = 1;
 #endif
@@ -616,10 +617,14 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "itemid", itemids, itemids_num);
 
+#ifdef HAVE_POSTGRESQL
 	if (1 == upsert)
 		result = zbx_db_select("%s", sql);
 	else
 		result = zbx_db_select("%s order by itemid,clock", sql);
+#else
+	result = zbx_db_select("%s order by itemid,clock", sql);
+#endif
 
 	sql_offset = 0;
 
@@ -653,12 +658,15 @@ static void	dc_trends_fetch_and_update(ZBX_DC_TREND *trends, int trends_num, zbx
 		else
 			dc_trends_update_uint(trend, row, num);
 
+#ifdef HAVE_POSTGRESQL
 		if (1 == upsert)
 		{
 			(*upserts_num)++;
 			continue;
 		}
-
+#else
+		ZBX_UNUSED(upserts_num);
+#endif
 		if (value_type == ITEM_VALUE_TYPE_FLOAT)
 			db_trends_update_float(trend, &sql_offset);
 		else
