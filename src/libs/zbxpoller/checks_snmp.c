@@ -3291,14 +3291,18 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 					{
 						char	*getrequest_err;
 
-						if (NULL != (getrequest_err = snmp_bulkwalk_get_getrequest_errors(snmp_context)))
+						if (NULL != (getrequest_err =
+								snmp_bulkwalk_get_getrequest_errors(snmp_context)))
 						{
 							snmp_context->item.ret = NOTSUPPORTED;
 							SET_MSG_RESULT(&snmp_context->item.result, getrequest_err);
 							goto stop;
 						}
 						else
-							SET_TEXT_RESULT(&snmp_context->item.result, zbx_strdup(NULL, ""));
+						{
+							SET_TEXT_RESULT(&snmp_context->item.result,
+									zbx_strdup(NULL, ""));
+						}
 					}
 					else
 						SET_TEXT_RESULT(&snmp_context->item.result, snmp_context->results);
