@@ -66,7 +66,7 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	const char	*p, *p_ip, *p_dns;
 	int		now;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' ip:'%s' connection_type:'%u' ", __func__, host, ip,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' ip:'%s' connection_type:%u ", __func__, host, ip,
 			connection_type);
 
 	p_ip = ip;
