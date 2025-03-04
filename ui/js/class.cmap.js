@@ -3701,6 +3701,10 @@ ZABBIX.apps.map = (function($) {
 				this.handleIndicatorTypeChange();
 			});
 
+			const allowed_item_value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_LOG,
+				ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_STR
+			];
+
 			$('#itemid')
 				.multiSelectHelper({
 					id: 'itemid',
@@ -3708,6 +3712,9 @@ ZABBIX.apps.map = (function($) {
 					name: 'itemid',
 					selectedLimit: 1,
 					objectOptions: {
+						filter: {
+							value_type: allowed_item_value_types
+						},
 						real_hosts: true,
 						resolve_macros: true
 					},
@@ -3717,10 +3724,7 @@ ZABBIX.apps.map = (function($) {
 							srcfld1: 'itemid',
 							dstfrm: 'linkForm',
 							dstfld1: 'itemid',
-							value_types: [
-								ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_LOG,
-								ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_STR
-							],
+							value_types: allowed_item_value_types,
 							real_hosts: 1,
 							resolve_macros: 1
 						}
