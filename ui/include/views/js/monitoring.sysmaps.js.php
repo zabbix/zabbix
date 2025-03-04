@@ -990,6 +990,7 @@ function createFontSelect(string $name): CSelect {
 	<?= (new CRow([
 		(new CColor('threshold_#{index}_color', '#{color}'))->appendColorPickerJs(false),
 		(new CTextBox('threshold_#{index}_threshold', '#{threshold}', false))
+			->addClass('js-threshold-input')
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired(),
 		(new CSelect('threshold_#{index}_drawtype'))

@@ -3701,6 +3701,14 @@ ZABBIX.apps.map = (function($) {
 				this.handleIndicatorTypeChange();
 			});
 
+			document.getElementById('link-thresholds-field').addEventListener('change', e => {
+				const input = e.target.closest('.js-threshold-input');
+
+				if (input !== null) {
+					input.value = input.value.trim();
+				}
+			});
+
 			const allowed_item_value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_LOG,
 				ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_STR
 			];
