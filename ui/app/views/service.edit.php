@@ -28,12 +28,9 @@ $form = (new CForm('post'))
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
-if ($data['serviceid'] !== null) {
-	$form->addItem(
-		(new CInput('hidden', 'serviceid', $data['serviceid']))
-			->setAttribute('data-field-type', 'hidden')
-	);
-}
+$form->addItem(
+	(new CInput('hidden', 'serviceid', $data['serviceid']))->setAttribute('data-field-type', 'hidden')
+);
 
 // Service tab.
 

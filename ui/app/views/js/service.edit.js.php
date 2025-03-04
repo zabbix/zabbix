@@ -69,7 +69,7 @@ window.service_edit_popup = new class {
 
 		const table = document.getElementById('problem_tags');
 
-		table.addEventListener('click', e => {
+		table.addEventListener('click', (e) => {
 			if (e.target.classList.contains('element-table-add')) {
 				this.form.validateSubmit(this.form.getAllValues());
 
@@ -457,11 +457,6 @@ window.service_edit_popup = new class {
 	submit() {
 		const fields = this.form.getAllValues();
 
-		if (this.serviceid !== null) {
-			fields.serviceid = this.serviceid;
-		}
-
-		fields.name = fields.name.trim();
 		fields.child_serviceids = [...this.children.keys()];
 
 		if ('tags' in fields) {
@@ -524,7 +519,8 @@ window.service_edit_popup = new class {
 				}
 				else {
 					overlayDialogueDestroy(this.overlay.dialogueid, true);
-					this.dialogue.dispatchEvent(new CustomEvent('condition.dialogue.submit', {detail: response}));
+
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 				}
 
 				return response;
@@ -549,7 +545,7 @@ window.service_edit_popup = new class {
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
-				this.form_element.parentNode.insertBefore(message_box, this.form);
+				this.form_element.parentNode.insertBefore(message_box, this.form_element);
 			})
 			.finally(() => {
 				this.overlay.unsetLoading();

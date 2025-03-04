@@ -78,7 +78,7 @@ class CControllerServiceUpdate extends CController {
 				'form_errors' => $form_errors ?? null,
 				'error' => !$form_errors
 					? [
-						'title' => _('Cannot update event correlation'),
+						'title' => _('Cannot update service'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
 					: null

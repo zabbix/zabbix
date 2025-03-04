@@ -46,7 +46,7 @@ class CControllerServiceCreate extends CController {
 			]],
 			'description' => ['db services.description'],
 			'status_rules' => ['array'],
-			'propagation_rule' => ['db services.propagation_rule', 'in' => array_keys(CServiceHelper::getStatusPropagationNames())],
+			'propagation_rule' => ['db services.propagation_rule', 'required', 'in' => array_keys(CServiceHelper::getStatusPropagationNames())],
 			'propagation_value_number' => ['integer', 'required', 'in 1:'.(TRIGGER_SEVERITY_COUNT - 1),
 				'when' => ['propagation_rule', 'in' => [
 					ZBX_SERVICE_STATUS_PROPAGATION_INCREASE, ZBX_SERVICE_STATUS_PROPAGATION_DECREASE
@@ -77,7 +77,7 @@ class CControllerServiceCreate extends CController {
 				'form_errors' => $form_errors ?? null,
 				'error' => !$form_errors
 					? [
-						'title' => _('Cannot create event correlation'),
+						'title' => _('Cannot create service'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
 					: null
