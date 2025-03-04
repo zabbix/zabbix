@@ -192,8 +192,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->page->waitUntilReady();
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host added');
-
-		COverlayDialogElement::ensureNotPresent();
+		$dialog->ensureNotPresent();
 
 		// DB check.
 		$hosts_templates = 'SELECT NULL'.

@@ -89,6 +89,10 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 			);
 		}
 
+		if ($this->hasInput('backurl') && !CHtmlUrlValidator::validateSameSite($this->getInput('backurl'))) {
+			throw new CAccessDeniedException();
+		}
+
 		return $ret;
 	}
 
@@ -506,7 +510,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					);
 				}
 
-				$this->setResponse(new CControllerResponseRedirect($backurl->getUrl()));
+				$this->setResponse(new CControllerResponseRedirect($backurl));
 			}
 			else {
 				if ($result) {

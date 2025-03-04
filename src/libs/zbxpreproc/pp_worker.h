@@ -35,9 +35,9 @@ typedef struct
 
 	zbx_timekeeper_t		*timekeeper;
 
-	zbx_pp_notify_cb_t		finished_cb;
+	zbx_pp_finished_task_cb_t	pp_finished_task_cb;
 
-	void				*finished_data;
+	void				*pp_finished_task_data;
 
 	zbx_log_component_t		logger;
 
@@ -47,7 +47,8 @@ zbx_pp_worker_t;
 
 int	pp_worker_init(zbx_pp_worker_t *worker, int id, zbx_pp_queue_t *queue, zbx_timekeeper_t *timekeeper,
 		const char *config_source_ip, char **error);
-void	pp_worker_set_finished_cb(zbx_pp_worker_t *worker, zbx_pp_notify_cb_t finished_cb, void *finished_data);
+void	pp_worker_set_finished_task_cb(zbx_pp_worker_t *worker, zbx_pp_finished_task_cb_t pp_finished_task_cb,
+		void *pp_finished_task_data);
 void	pp_worker_stop(zbx_pp_worker_t *worker);
 void	pp_worker_destroy(zbx_pp_worker_t *worker);
 

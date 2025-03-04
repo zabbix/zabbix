@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
  *
  * @onBefore prepareProblemsData
  *
- * @dataSource UserPermissions
+ * @dataSource UserPermissions, WidgetCommunication
  */
 class testPageProblems extends CWebTest {
 
@@ -42,6 +42,8 @@ class testPageProblems extends CWebTest {
 		];
 	}
 
+	protected static $time;
+
 	public function prepareProblemsData() {
 		/**
 		 * Change refresh interval so Problems page doesn't refresh automatically,
@@ -53,18 +55,43 @@ class testPageProblems extends CWebTest {
 		$hostgroups = CDataHelper::call('hostgroup.create', [['name' => 'Group for Problems Page']]);
 
 		// Create host.
-		$hosts = CDataHelper::call('host.create', [
-			'host' => 'Host for Problems Page',
-			'groups' => [['groupid' => $hostgroups['groupids'][0]]]
-		]);
-
-		// Create item on previously created host.
-		$items = CDataHelper::call('item.create',[
-			'hostid' => $hosts['hostids'][0],
-			'name' => 'Age problem item',
-			'key_' => 'trap',
-			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_FLOAT
+		$result = CDataHelper::createHosts([
+			[
+				'host' => 'Host for Problems Page',
+				'groups' => [['groupid' => $hostgroups['groupids'][0]]],
+				'items' => [
+					[
+						'name' => 'Age problem item',
+						'key_' => 'trap',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'String in operational data',
+						'key_' => 'trap1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_TEXT
+					],
+					[
+						'name' => 'Symbols in Item metric',
+						'key_' => 'trap2',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_TEXT
+					],
+					[
+						'name' => 'XSS text',
+						'key_' => 'trapXSS',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_TEXT
+					],
+					[
+						'name' => 'SQL Injection',
+						'key_' => 'trapSQL',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_TEXT
+					]
+				]
+			]
 		]);
 
 		// Create trigger based on item.
@@ -81,23 +108,83 @@ class testPageProblems extends CWebTest {
 				'manual_close' => 1
 			],
 			[
+				'description' => 'Filled opdata with macros',
+				'expression' => 'last(/Host for Problems Page/trap)=0',
+				'priority' => TRIGGER_SEVERITY_AVERAGE,
+				'opdata' => 'Operational data - {ITEM.LASTVALUE}, {ITEM.LASTVALUE1}, {ITEM.LASTVALUE2}'
+			],
+			[
+				'description' => 'Symbols in Item metric',
+				'expression' => 'last(/Host for Problems Page/trap2)<>""',
+				'priority' => TRIGGER_SEVERITY_AVERAGE
+			],
+			[
+				'description' => 'XSS code in Item metric',
+				'expression' => 'last(/Host for Problems Page/trapXSS)<>""',
+				'priority' => TRIGGER_SEVERITY_AVERAGE
+			],
+			[
+				'description' => 'SQL Injection Item metric',
+				'expression' => 'last(/Host for Problems Page/trapSQL)<>""',
+				'priority' => TRIGGER_SEVERITY_AVERAGE
+			],
+			[
 				'description' => 'Trigger for Age problem 1 month',
 				'expression' => 'last(/Host for Problems Page/trap)=0',
 				'priority' => TRIGGER_SEVERITY_AVERAGE,
 				'manual_close' => 1
+			],
+			[
+				'description' => 'Trigger for String problem',
+				'expression' => 'last(/Host for Problems Page/trap1)<>""',
+				'priority' => TRIGGER_SEVERITY_AVERAGE,
+				'manual_close' => 1
+			],
+			[
+				'description' => 'Two trigger expressions',
+				'expression' => 'last(/Host for Problems Page/trap1)<>"" and last(/Host for Problems Page/trapSQL)<>""',
+				'priority' => TRIGGER_SEVERITY_AVERAGE
+			],
+			[
+				'description' => 'No operational data popup',
+				'expression' => 'last(/Host for Problems Page/trap1)<>"" and last(/Host for Problems Page/trapSQL)<>""',
+				'priority' => TRIGGER_SEVERITY_AVERAGE,
+				'opdata' => 'No popup "],*,a[x=": "],*,a[x="/\|\'/æ㓴🍭🍭'
 			]
 		]);
 
 		// Create event with recent age.
-		$time = time();
-		CDataHelper::addItemData($items['itemids'][0], [0, 20, 150]);
-		CDBHelper::setTriggerProblem('Trigger for Age problem', TRIGGER_VALUE_TRUE, ['clock' => $time]);
-		CDBHelper::setTriggerProblem('Trigger for Age problem 1 day', TRIGGER_VALUE_TRUE,
-				['clock' => $time - 86400]
-		);
-		CDBHelper::setTriggerProblem('Trigger for Age problem 1 month', TRIGGER_VALUE_TRUE,
-				['clock' => $time - 2.628e+6]
-		);
+		self::$time = time();
+
+		$items_data = [
+			'Host for Problems Page:trap' => [
+				[0, 20, 150],
+				[self::$time - 2, self::$time - 1, self::$time]
+			],
+			'Host for Problems Page:trap1' => [
+				['Text', 'Essay', 'ParagraphParagraphParagraphParagraph'],
+				[self::$time - 2, self::$time - 1, self::$time]
+			],
+			'Host for Problems Page:trapXSS' => [['<script>alert("TEST");</script>'], self::$time],
+			'Host for Problems Page:trapSQL' => [['105\'; --DROP TABLE Users'], self::$time],
+			'Host for Problems Page:trap2' => [['"],*,a[x=": "],*,a[x="/\|\'/æ㓴♥"'], self::$time]
+		];
+		foreach ($items_data as $item_name => $values) {
+			CDataHelper::addItemData($result['itemids'][$item_name], $values[0], $values[1]);
+		}
+
+		$trigger_data = [
+			'Trigger for Age problem' => ['clock' => self::$time],
+			'Trigger for Age problem 1 day' => ['clock' => self::$time - 86400],
+			'Trigger for Age problem 1 month' => ['clock' => self::$time - 2.628e+6],
+			'No operational data popup' => ['clock' => self::$time]
+		];
+		foreach ($trigger_data as $trigger_name => $clock) {
+			CDBHelper::setTriggerProblem($trigger_name, TRIGGER_VALUE_TRUE, $clock);
+		}
+		CDBHelper::setTriggerProblem(['Symbols in Item metric', 'Filled opdata with macros', 'XSS code in Item metric',
+				'SQL Injection Item metric', 'Trigger for String problem', 'Two trigger expressions'
+		]);
 
 		$dayid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Trigger for Age problem 1 day'));
 		$monthid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Trigger for Age problem 1 month'));
@@ -833,7 +920,17 @@ class testPageProblems extends CWebTest {
 						]
 					],
 					'result' => [
+						['Problem' => 'Two trigger expressions'],
+						['Problem' => 'Trigger for String problem'],
+						['Problem' => 'SQL Injection Item metric'],
+						['Problem' => 'XSS code in Item metric'],
+						['Problem' => 'Filled opdata with macros'],
+						['Problem' => 'Symbols in Item metric'],
+						['Problem' => 'No operational data popup'],
 						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'trigger on host 3'],
+						['Problem' => 'trigger on host 2'],
+						['Problem' => 'trigger on host 1'],
 						['Problem' => 'Trigger for tag permissions Oracle'],
 						['Problem' => 'Trigger for tag permissions MySQL'],
 						['Problem' => 'Trigger for Age problem 1 day'],
@@ -1283,7 +1380,17 @@ class testPageProblems extends CWebTest {
 						'Show timeline' => false
 					],
 					'result' => [
+						['Problem' => 'Two trigger expressions'],
+						['Problem' => 'Trigger for String problem'],
+						['Problem' => 'SQL Injection Item metric'],
+						['Problem' => 'XSS code in Item metric'],
+						['Problem' => 'Filled opdata with macros'],
+						['Problem' => 'Symbols in Item metric'],
+						['Problem' => 'No operational data popup'],
 						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'trigger on host 3'],
+						['Problem' => 'trigger on host 2'],
+						['Problem' => 'trigger on host 1'],
 						['Problem' => 'Trigger for tag permissions Oracle'],
 						['Problem' => 'Trigger for tag permissions MySQL'],
 						['Problem' => 'Trigger for Age problem 1 day'],
@@ -1310,7 +1417,17 @@ class testPageProblems extends CWebTest {
 						'Show timeline' => false
 					],
 					'result' => [
+						['Problem' => 'Two trigger expressions'],
+						['Problem' => 'Trigger for String problem'],
+						['Problem' => 'SQL Injection Item metric'],
+						['Problem' => 'XSS code in Item metric'],
+						['Problem' => 'Filled opdata with macros'],
+						['Problem' => 'Symbols in Item metric'],
+						['Problem' => 'No operational data popup'],
 						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'trigger on host 3'],
+						['Problem' => 'trigger on host 2'],
+						['Problem' => 'trigger on host 1'],
 						['Problem' => 'Trigger for tag permissions Oracle'],
 						['Problem' => 'Trigger for tag permissions MySQL'],
 						['Problem' => 'Trigger for Age problem 1 day']
@@ -1328,7 +1445,17 @@ class testPageProblems extends CWebTest {
 						'link' => 'Last 1 day'
 					],
 					'result' => [
+						['Problem' => 'Two trigger expressions'],
+						['Problem' => 'Trigger for String problem'],
+						['Problem' => 'SQL Injection Item metric'],
+						['Problem' => 'XSS code in Item metric'],
+						['Problem' => 'Filled opdata with macros'],
+						['Problem' => 'Symbols in Item metric'],
+						['Problem' => 'No operational data popup'],
 						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'trigger on host 3'],
+						['Problem' => 'trigger on host 2'],
+						['Problem' => 'trigger on host 1'],
 						['Problem' => 'Trigger for tag permissions Oracle'],
 						['Problem' => 'Trigger for tag permissions MySQL']
 					]
@@ -1358,6 +1485,7 @@ class testPageProblems extends CWebTest {
 						'Show timeline' => false
 					],
 					'result' => [
+						['Problem' => 'trigger on host 2'],
 						['Problem' => 'Test trigger with tag'],
 						['Problem' => 'Fourth test trigger with tag priority'],
 						['Problem' => 'Third test trigger with tag priority'],
@@ -1433,6 +1561,13 @@ class testPageProblems extends CWebTest {
 						'id:to' => 'now'
 					],
 					'result' => [
+						['Problem' => 'Two trigger expressions'],
+						['Problem' => 'Trigger for String problem'],
+						['Problem' => 'SQL Injection Item metric'],
+						['Problem' => 'XSS code in Item metric'],
+						['Problem' => 'Filled opdata with macros'],
+						['Problem' => 'Symbols in Item metric'],
+						['Problem' => 'No operational data popup'],
 						['Problem' => 'Trigger for Age problem']
 					]
 				]
@@ -1450,6 +1585,13 @@ class testPageProblems extends CWebTest {
 						'id:to' => 'now'
 					],
 					'result' => [
+						['Problem' => 'Two trigger expressions'],
+						['Problem' => 'Trigger for String problem'],
+						['Problem' => 'SQL Injection Item metric'],
+						['Problem' => 'XSS code in Item metric'],
+						['Problem' => 'Filled opdata with macros'],
+						['Problem' => 'Symbols in Item metric'],
+						['Problem' => 'No operational data popup'],
 						['Problem' => 'Trigger for Age problem'],
 						['Problem' => 'Trigger for Age problem 1 day']
 					]
@@ -1467,6 +1609,13 @@ class testPageProblems extends CWebTest {
 						'link' => 'Last 1 year'
 					],
 					'result' => [
+						['Problem' => 'Two trigger expressions'],
+						['Problem' => 'Trigger for String problem'],
+						['Problem' => 'SQL Injection Item metric'],
+						['Problem' => 'XSS code in Item metric'],
+						['Problem' => 'Filled opdata with macros'],
+						['Problem' => 'Symbols in Item metric'],
+						['Problem' => 'No operational data popup'],
 						['Problem' => 'Trigger for Age problem'],
 						['Problem' => 'Trigger for Age problem 1 day'],
 						['Problem' => 'Trigger for Age problem 1 month']
@@ -1620,6 +1769,224 @@ class testPageProblems extends CWebTest {
 			$this->assertEquals($data['check_suppressed'], $suppressed_dialog->getText());
 			$suppressed_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
 			$suppressed_dialog->waitUntilNotPresent();
+		}
+	}
+
+	public static function getFilterForOperationalData() {
+		return [
+			'String in operational data' => [
+				[
+					'filter' => [
+						'Problem' => 'Trigger for String problem',
+						'Show operational data' => 'Separately'
+					],
+					'popup rows' => [
+						[
+							'item' => 'String in operational data',
+							'metric' => 'ParagraphParagraphParagraphParagraph',
+							'truncated' => 'ParagraphParagraphPa...',
+							'button' => 'History',
+							'header' => 'Host for Problems Page: String in operational data'
+						]
+					]
+				]
+			],
+			'Number in operational data' => [
+				[
+					'filter' => [
+						'Problem' => 'Trigger for Age problem',
+						'Show operational data' => 'Separately'
+					],
+					'popup rows' => [
+						[
+							'item' => 'Age problem item',
+							'metric' => '150',
+							'button' => 'Graph',
+							'header' => 'Host for Problems Page: Age problem item'
+						]
+					]
+				]
+			],
+			'Macro expansion and operational text' => [
+				[
+					'custom data' => 'Operational data - 150, 150, *UNKNOWN*',
+					'filter' => [
+						'Problem' => 'Filled opdata with macros',
+						'Show operational data' => 'Separately'
+					],
+					'popup rows' => [
+						[
+							'item' => 'Age problem item',
+							'metric' => '150',
+							'button' => 'Graph',
+							'header' => 'Host for Problems Page: Age problem item'
+						]
+					]
+				]
+			],
+			'ASCII symbols in metric' => [
+				[
+					'filter' => [
+						'Problem' => 'Symbols in Item metric',
+						'Show operational data' => 'Separately'
+					],
+					'popup rows' => [
+						[
+							'item' => 'Symbols in Item metric',
+							'metric' => '"],*,a[x=": "],*,a[x="/\|\'/æ㓴♥"',
+							'truncated' => '"],*,a[x=": "],*,a[x...',
+							'button' => 'History',
+							'header' => 'Host for Problems Page: Symbols in Item metric'
+						]
+					]
+				]
+			],
+			'XSS code in Item metric' => [
+				[
+					'filter' => [
+						'Problem' => 'XSS code in Item metric',
+						'Show operational data' => 'Separately'
+					],
+					'popup rows' => [
+						[
+							'item' => 'XSS text',
+							'metric' => '<script>alert("TEST");</script>',
+							'truncated' => '<script>alert("TEST"...',
+							'button' => 'History',
+							'header' => 'Host for Problems Page: XSS text'
+						]
+					]
+				]
+			],
+			'SQL injection in Item metric' => [
+				[
+					'filter' => [
+						'Problem' => 'SQL Injection Item metric',
+						'Show operational data' => 'Separately'
+					],
+					'popup rows' => [
+						[
+							'item' => 'SQL Injection',
+							'metric' => '105\'; --DROP TABLE Users',
+							'truncated' => '105\'; --DROP TABLE U...',
+							'button' => 'History',
+							'header' => 'Host for Problems Page: SQL Injection'
+						]
+					]
+				]
+			],
+			'Two metrics in operational data pop-up window' => [
+				[
+					'filter' => [
+						'Problem' => 'Two trigger expressions',
+						'Show operational data' => 'Separately'
+					],
+					'popup rows' => [
+						[
+							'item' => 'String in operational data',
+							'metric' => 'ParagraphParagraphParagraphParagraph',
+							'truncated' => 'ParagraphParagraphPa...',
+							'button' => 'History',
+							'header' => 'Host for Problems Page: String in operational data'
+						],
+						[
+							'item' => 'SQL Injection',
+							'metric' => '105\'; --DROP TABLE Users',
+							'truncated' => '105\'; --DROP TABLE U...',
+							'button' => 'History',
+							'header' => 'Host for Problems Page: SQL Injection'
+						]
+					]
+				]
+			],
+			'Filled opdata with macros' => [
+				[
+					'custom data' => 'Operational data - 150, 150, *UNKNOWN*',
+					'filter' => [
+						'Problem' => 'Filled opdata with macros',
+						'Show operational data' => 'Separately'
+					],
+					'popup rows' => [
+						[
+							'item' => 'Age problem item',
+							'metric' => '150',
+							'button' => 'Graph',
+							'header' => 'Host for Problems Page: Age problem item'
+						]
+					]
+				]
+			],
+			'Operational data with problem name, no popup' => [
+				[
+					'filter' => [
+						'Problem' => 'Two trigger expressions',
+						'Show operational data' => 'With problem name'
+					],
+					'popup rows' => []
+				]
+			],
+			'No popup in operational data column' => [
+				[
+					'custom data' => 'No popup "],*,a[x=": "],*,a[x="/\|\'/æ㓴🍭🍭',
+					'filter' => [
+						'Problem' => 'No operational data popup',
+						'Show operational data' => 'Separately'
+					],
+					'popup rows' => []
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getFilterForOperationalData
+	 */
+	public function testPageProblems_OperationalData($data){
+		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1&sort=clock&sortorder=ASC');
+		$form = CFilterElement::find()->one()->getForm();
+		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
+
+		$form->fill($data['filter'])->submit();
+		$table->waitUntilReloaded();
+
+		$column = ($data['filter']['Show operational data'] === 'With problem name') ? 'Problem' : 'Operational data';
+		$opdata_column = $table->findRow('Problem', CTestArrayHelper::get($data, 'Problem',
+				$data['filter']['Problem']))->getColumn($column);
+
+		// Collect metrics from all items in trigger expression.
+		$metrics = [];
+		foreach ($data['popup rows'] as $popup_row) {
+			$metrics[] = CTestArrayHelper::get($popup_row, 'truncated', $popup_row['metric']);
+		}
+
+		// Check operation data in table on page.
+		$data_in_column = CTestArrayHelper::get($data, 'custom data', implode(', ', $metrics));
+		if ($data['filter']['Show operational data'] === 'With problem name') {
+			$data_in_column = ($data_in_column === '')
+					? $data['filter']['Problem']
+					: $data['filter']['Problem'].' ('.$data_in_column.')';
+		}
+		$this->assertEquals($data_in_column, $opdata_column->getText());
+
+		// Check data in popup.
+		foreach ($data['popup rows'] as $i => $popup_row) {
+			$metric_in_column = CTestArrayHelper::get($popup_row, 'truncated', $popup_row['metric']);
+			$opdata_column->query('link', $metric_in_column)->waitUntilClickable()->one()->click();
+			$popup = $this->query('css:.overlay-dialogue.wordbreak')->asOverlayDialog()->one()->waitUntilVisible();
+			$popup_table = $popup->asTable();
+			// Check expected popup rows number.
+			$this->assertEquals(count($data['popup rows']), $popup_table->getRows()->count());
+
+			$row = $popup_table->getRow($i);
+			$row->assertValues([$popup_row['item'], date('Y-m-d H:i:s', self::$time),
+					$popup_row['metric'], $popup_row['button']]
+			);
+
+			// Check correct graph or history link.
+			$row->query('link', $popup_row['button'])->one()->click();
+			$this->page->waitUntilReady();
+			$this->page->assertHeader($popup_row['header']);
+			$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
 		}
 	}
 

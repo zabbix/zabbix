@@ -1096,6 +1096,7 @@ This template has been tested on:
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`60s`|
 |{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
+|{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
 |{$AZURE.BILLING.MONTH}|<p>Months to get historical data from Azure Cost Management API, no more than 11 (plus current month). The time period for pulling the data cannot exceed 1 year.</p>|`11`|
 |{$AZURE.LLD.FILTER.SERVICE.MATCHES}|<p>Filter of discoverable services by name.</p>|`.*`|
 |{$AZURE.LLD.FILTER.SERVICE.NOT_MATCHES}|<p>Filter to exclude discovered services by name.</p>|`CHANGE_IF_NEEDED`|
@@ -1110,6 +1111,15 @@ This template has been tested on:
 |----|-----------|----|-----------------------|
 |Get monthly costs|<p>The result of API requests is expressed in the JSON.</p>|Script|azure.get.monthly.costs|
 |Get daily costs|<p>The result of API requests is expressed in the JSON.</p>|Script|azure.get.daily.costs|
+|Azure Cost: Get monthly costs errors|<p>A list of errors from API requests.</p>|Dependent item|azure.get.monthly.costs.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Azure Cost: Get daily costs errors|<p>A list of errors from API requests.</p>|Dependent item|azure.get.daily.costs.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Triggers
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Azure Cost: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Cost Management by HTTP/azure.get.monthly.costs.errors))>0`|Average||
+|Azure Cost: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Cost Management by HTTP/azure.get.daily.costs.errors))>0`|Average||
 
 ### LLD rule Azure daily costs by services discovery
 

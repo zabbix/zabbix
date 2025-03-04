@@ -44,9 +44,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'rows_per_page' =>		'db users.rows_per_page',
 			'url' =>				'db users.url',
 			'medias' =>				'array',
-			'new_media' =>			'array',
-			'enable_media' =>		'int32',
-			'disable_media' =>		'int32',
 			'roleid' =>				'id',
 			'form_refresh' =>		'int32'
 		];
@@ -110,7 +107,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'rows_per_page' => $db_defaults['rows_per_page'],
 			'url' => '',
 			'medias' => [],
-			'new_media' => [],
 			'roleid' => '',
 			'role' => [],
 			'modules_rules' => [],
@@ -289,11 +285,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		);
 
 		$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
-
-		$data['mediatypes'] = API::MediaType()->get([
-			'output' => ['status'],
-			'preservekeys' => true
-		]);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of users'));
