@@ -143,11 +143,14 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		}
 
 		// Check options in dropdowns.
-		$this->assertEquals(['TOTP', 'Duo Universal Prompt'], $dialog_form->getField('Type')->getOptions()->asText());
-		$this->assertEquals(['SHA-1', 'SHA-256', 'SHA-512'],
-				$dialog_form->getField('Hash function')->getOptions()->asText()
-		);
-		$this->assertEquals(['6', '8'], $dialog_form->getField('Code length')->getOptions()->asText());
+		$dropdown_options = [
+			'Type' => ['TOTP', 'Duo Universal Prompt'],
+			'Hash function' => ['SHA-1', 'SHA-256', 'SHA-512'],
+			'Code length' => ['6', '8']
+		];
+		foreach ($dropdown_options as $field => $options) {
+			$this->assertEquals($options, $dialog_form->getField($field)->getOptions()->asText());
+		}
 
 		// Check the mandatory fields when MFA type = TOTP.
 		$this->assertEquals(['Name'], $dialog_form->getRequiredLabels());
