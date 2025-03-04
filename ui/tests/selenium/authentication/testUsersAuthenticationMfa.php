@@ -133,10 +133,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			$field = $dialog_form->getField($field_label);
 			$this->assertTrue($field->isEnabled());
 			$this->assertEquals($attributes['visible'], $field->isVisible());
-
-			if (array_key_exists('value', $attributes)) {
-				$this->assertEquals($attributes['value'], $field->getValue());
-			}
+			$this->assertEquals($attributes['value'], $field->getValue());
 
 			foreach (['maxlength', 'type', 'autocomplete'] as $attribute) {
 				if (array_key_exists($attribute, $attributes)) {
