@@ -3688,7 +3688,7 @@ ZABBIX.apps.map = (function($) {
 		/**
 		 * Form for editing links.
 		 *
-		 * @param {object} formContainer jQuesry object
+		 * @param {object} formContainer jQuery object
 		 * @param {object} sysmap
 		 */
 		function LinkForm(formContainer, sysmap) {
@@ -3791,22 +3791,21 @@ ZABBIX.apps.map = (function($) {
 			hide: function() {
 				$('#linkForm').hide();
 				$('.element-edit-control').prop('disabled', false);
-				$('#itemid').multiSelect('addData', [], true);
+				$('#itemid').multiSelect('addData', [], false);
 			},
 
 			handleIndicatorTypeChange: function() {
 				const indicator_type = document.getElementById('indicator-type-field')
 					.querySelector('[name=indicator_type]:checked').value;
 
-				if (indicator_type != MAP_INDICATOR_TYPE_ITEM_VALUE) {
-					this.toggleItemValueRelatedObjects();
-				}
-				else if (indicator_type != MAP_INDICATOR_TYPE_TRIGGER) {
+				if (indicator_type == MAP_INDICATOR_TYPE_ITEM_VALUE) {
 					this.onMultiSelectChange(this);
+				}
+				else {
+					this.toggleItemValueRelatedObjects();
 				}
 
 				const item_value_row = document.getElementById('item-value-field');
-
 				item_value_row.style.display = indicator_type == MAP_INDICATOR_TYPE_ITEM_VALUE ? '' : 'none';
 
 				for (const input of item_value_row.querySelectorAll('input')) {
@@ -3835,16 +3834,20 @@ ZABBIX.apps.map = (function($) {
 				const ms_item_data = $('#itemid').multiSelect('getData');
 
 				this.item_type = null;
+				this.toggleItemValueRelatedObjects();
 
 				if (ms_item_data.length > 0) {
+					const map_window = document.getElementById('map-window');
+					map_window.classList.add('is-loading', 'is-loading-fadein');
+
 					promiseGetItemType(ms_item_data[0].id)
 						.then(type => {
 							this.item_type = type;
-							this.toggleItemValueRelatedObjects(type);
+							this.toggleItemValueRelatedObjects(this.item_type);
+						})
+						.finally(() => {
+							map_window.classList.remove('is-loading', 'is-loading-fadein');
 						});
-				}
-				else {
-					this.toggleItemValueRelatedObjects();
 				}
 			},
 
@@ -4123,17 +4126,15 @@ ZABBIX.apps.map = (function($) {
 					$('[name=' + element_name + ']', this.domNode).val([link[element_name]]);
 				}
 
-				$('input[type=radio][name=indicator_type]:checked').change();
-
-				this.handleIndicatorTypeChange();
-
 				let item_data = [];
 
 				if ('itemid' in link && link.itemid !== '' && link.itemid in this.sysmap.items) {
 					item_data = [this.sysmap.items[link.itemid]];
 				}
 
-				$('#itemid').multiSelect('addData', item_data, true);
+				$('#itemid').multiSelect('addData', item_data, false);
+
+				this.handleIndicatorTypeChange();
 
 				// triggers
 				this.triggerids = {};
