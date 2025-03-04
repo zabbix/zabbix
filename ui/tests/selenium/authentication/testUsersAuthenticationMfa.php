@@ -18,6 +18,7 @@ require_once dirname(__FILE__).'/../common/testFormAuthentication.php';
 
 /**
  * @backup config, usrgrp
+ *
  * @onBefore prepareData
  */
 class testUsersAuthenticationMfa extends testFormAuthentication {
@@ -432,7 +433,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	 * Test MFA method editing.
 	 *
 	 * @dataProvider getUpdateData
-	 * @onBefore     prepareUpdateData
+	 *
+	 * @onBefore prepareUpdateData
 	 */
 	public function testUsersAuthenticationMfa_Update($data) {
 		$this->testCreateUpdate($data, true);
@@ -685,8 +687,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	/**
 	 * Performs the testing of create and update scenarios.
 	 *
-	 * @param array $data      Data from data provider.
-	 * @param bool  $update    True if the test performed is an update.
+	 * @param array $data    Data from data provider.
+	 * @param bool  $update  True if the test performed is an update.
 	 */
 	protected function testCreateUpdate($data, $update) {
 		$mfa_form = $this->openMfaForm();
@@ -842,9 +844,9 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	/**
 	 * Checks that data is displayed as expected in the MFA methods table and inside the Method edit form.
 	 *
-	 * @param CFormElement          $mfa_form    The form element that contains the method table.
-	 * @param COverlayDialogElement $dialog      The dialog that contains the edit form.
-	 * @param array                 $fields      Expected fields data for the record.
+	 * @param CFormElement          $mfa_form  The form element that contains the method table.
+	 * @param COverlayDialogElement $dialog    The dialog that contains the edit form.
+	 * @param array                 $fields    Expected fields data for the record.
 	 */
 	protected function checkMethodsTableAndMethodForm($mfa_form, $dialog, $fields) {
 		// Transform the field data to what is expected in UI.
@@ -893,11 +895,11 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	/**
 	 * Populates fields data array with defaults for filling the Method form.
 	 *
-	 * @param array $fields              Fields data array to populate.
-	 * @param bool  $update              Adds suffix to name when updating.
-	 * @param bool  $skip_name_append    Skips appending the name field if set to true.
+	 * @param array $fields            Fields data array to populate.
+	 * @param bool  $update            Adds suffix to name when updating.
+	 * @param bool  $skip_name_append  Skips appending the name field if set to true.
 	 *
-	 * @return array    The modified fields data.
+	 * @return array
 	 */
 	protected function setDefaultFieldsData($fields, $update, $skip_name_append) {
 		// When creating a Duo method, avoid having to input the field values each time.
@@ -922,7 +924,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	/**
 	 * Logs in and opens the MFA configuration form.
 	 *
-	 * @return CFormElement    The MFA form.
+	 * @return CFormElement
 	 */
 	protected function openMfaForm() {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
@@ -934,9 +936,9 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	/**
 	 * A common selector in the test.
 	 *
-	 * @param CFormElement $mfa_form    Container element, the MFA form.
+	 * @param CFormElement $mfa_form  Container element, the MFA form.
 	 *
-	 * @return CTableElement    The Method table.
+	 * @return CTableElement
 	 */
 	protected function selectMethodTable($mfa_form) {
 		return $mfa_form->getFieldContainer('Methods')->query('xpath:.//table')->one()->asTable();
@@ -945,9 +947,9 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	/**
 	 * Gets all MFA method names from the Method table.
 	 *
-	 * @param CTableElement $table    MFA method table inside the MFA form.
+	 * @param CTableElement $table  MFA method table inside the MFA form.
 	 *
-	 * @return array    Names of the methods in the table.
+	 * @return array
 	 */
 	protected function getMfaNamesFromTable($table) {
 		$method_list = [];
@@ -961,7 +963,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	/**
 	 * Returns the name of the currently set default MFA method.
 	 *
-	 * @return string    Name of the MFA method that is set as default in the UI.
+	 * @return string
 	 */
 	protected function getDefaultMethodName($table) {
 		return $table->query("xpath:.//tr[.//input[@type='radio' and @checked]]")->one()->asTableRow()
