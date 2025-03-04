@@ -277,6 +277,7 @@ typedef struct
 	int				batch_size;
 	/* the last id assigned by autoincrement */
 	zbx_uint64_t			lastid;
+	char				*clause;
 }
 zbx_db_insert_t;
 
@@ -318,6 +319,7 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *db_insert, ...);
 void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *db_insert, zbx_db_value_t **values, int values_num);
 int	zbx_db_insert_execute(zbx_db_insert_t *db_insert);
 void	zbx_db_insert_autoincrement(zbx_db_insert_t *db_insert, const char *field_name);
+void	zbx_db_insert_clause(zbx_db_insert_t *self, const char *clause);
 zbx_uint64_t	zbx_db_insert_get_lastid(zbx_db_insert_t *self);
 void	zbx_db_insert_clean(zbx_db_insert_t *db_insert);
 void	zbx_db_insert_set_batch_size(zbx_db_insert_t *self, int batch_size);
@@ -356,9 +358,11 @@ int	zbx_dbconn_pk_exists(zbx_dbconn_t *db, const char *table_name);
 
 void	zbx_dbconn_select_uint64(zbx_dbconn_t *db, const char *sql, zbx_vector_uint64_t *ids);
 int	zbx_dbconn_prepare_multiple_query(zbx_dbconn_t *db, const char *query, const char *field_name,
-		zbx_vector_uint64_t *ids, char **sql, size_t	*sql_alloc, size_t *sql_offset);
+		const zbx_vector_uint64_t *ids, char **sql, size_t *sql_alloc, size_t *sql_offset);
 int	zbx_dbconn_execute_multiple_query(zbx_dbconn_t *db, const char *query, const char *field_name,
-		zbx_vector_uint64_t *ids);
+		const zbx_vector_uint64_t *ids);
+int	zbx_dbconn_execute_multiple_query_str(zbx_dbconn_t *db, const char *query, const char *field_name,
+		const zbx_vector_uint64_t *ids);
 
 char	*zbx_db_dyn_escape_field(const char *table_name, const char *field_name, const char *src);
 char	*zbx_db_dyn_escape_string(const char *src);
@@ -385,7 +389,8 @@ int	zbx_db_is_null(const char *field);
 char	*zbx_db_get_schema_esc(void);
 #endif
 
-int	zbx_dbconn_execute_overflowed_sql(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset);
+int	zbx_dbconn_execute_overflowed_sql(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *clause);
 int	zbx_dbconn_flush_overflowed_sql(zbx_dbconn_t *db, char *sql, size_t sql_offset);
 
 const char	*zbx_db_sql_id_ins(zbx_uint64_t id);
@@ -471,9 +476,10 @@ int	zbx_db_index_exists(const char *table_name, const char *index_name);
 int	zbx_db_pk_exists(const char *table_name);
 #endif
 void	zbx_db_select_uint64(const char *sql, zbx_vector_uint64_t *ids);
-int	zbx_db_prepare_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids, char **sql,
-		size_t *sql_alloc, size_t *sql_offset);
-int	zbx_db_execute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids);
+int	zbx_db_prepare_multiple_query(const char *query, const char *field_name, const zbx_vector_uint64_t *ids,
+		char **sql, size_t *sql_alloc, size_t *sql_offset);
+int	zbx_db_execute_multiple_query(const char *query, const char *field_name, const zbx_vector_uint64_t *ids);
+int	zbx_db_execute_multiple_query_str(const char *query, const char *field_name, const zbx_vector_uint64_t *ids);
 
 void	zbx_db_large_query_prepare_uint(zbx_db_large_query_t *query, char **sql,
 		size_t *sql_alloc, size_t *sql_offset, const char *field, const zbx_vector_uint64_t *ids);

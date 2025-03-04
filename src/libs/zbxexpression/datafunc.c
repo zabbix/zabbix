@@ -313,6 +313,30 @@ int	expr_get_item_key(zbx_uint64_t itemid, char **replace_to)
 	return ret;
 }
 
+int	expr_get_proxy_name_description(zbx_uint64_t itemid, int request, char **replace_to)
+{
+	int		errcode, ret = FAIL;
+	zbx_dc_host_t	dc_host;
+
+	zbx_dc_config_get_hosts_by_itemids(&dc_host, &itemid, &errcode, 1);
+
+	if (SUCCEED == errcode)
+	{
+		if (0 == dc_host.proxyid)
+		{
+			*replace_to = zbx_strdup(*replace_to, "");
+			ret = SUCCEED;
+		}
+		else
+		{
+			ret = zbx_db_get_proxy_value(dc_host.proxyid, replace_to,
+					ZBX_DB_REQUEST_PROXY_NAME == request ? "name" : "description");
+		}
+	}
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve escalation history.                                      *

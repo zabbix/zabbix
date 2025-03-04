@@ -305,7 +305,7 @@ abstract class CDashboardGeneral extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function checkWidgets(array $dashboards, array $db_dashboards = null): void {
+	protected function checkWidgets(array $dashboards, ?array $db_dashboards = null): void {
 		$widget_defaults = DB::getDefaults('widget');
 
 		foreach ($dashboards as $dashboard) {
@@ -364,7 +364,7 @@ abstract class CDashboardGeneral extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function checkWidgetFields(array $dashboards, array $db_dashboards = null): void {
+	protected function checkWidgetFields(array $dashboards, ?array $db_dashboards = null): void {
 		$ids = [
 			ZBX_WIDGET_FIELD_TYPE_ITEM => [],
 			ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE => [],
@@ -697,7 +697,7 @@ abstract class CDashboardGeneral extends CApiService {
 	 * @param array      $dashboards
 	 * @param array|null $db_dashboards
 	 */
-	protected function updatePages(array &$dashboards, array $db_dashboards = null): void {
+	protected function updatePages(array &$dashboards, ?array $db_dashboards = null): void {
 		$db_dashboard_pages = [];
 
 		if ($db_dashboards !== null) {
@@ -777,7 +777,7 @@ abstract class CDashboardGeneral extends CApiService {
 	 * @param array      $dashboards
 	 * @param array|null $db_dashboards
 	 */
-	protected function updateWidgets(array &$dashboards, array $db_dashboards = null): void {
+	protected function updateWidgets(array &$dashboards, ?array $db_dashboards = null): void {
 		$db_widgets = [];
 
 		if ($db_dashboards !== null) {
@@ -878,7 +878,7 @@ abstract class CDashboardGeneral extends CApiService {
 	 * @param array      $dashboards
 	 * @param array|null $db_dashboards
 	 */
-	protected function updateWidgetFields(array &$dashboards, array $db_dashboards = null): void {
+	protected function updateWidgetFields(array &$dashboards, ?array $db_dashboards = null): void {
 		$ins_widget_fields = [];
 		$upd_widget_fields = [];
 		$del_widget_fieldids = [];

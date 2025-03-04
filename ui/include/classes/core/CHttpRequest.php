@@ -20,9 +20,10 @@
 class CHttpRequest {
 
 	/**
-	 * additional HTTP headers not prefixed with HTTP_ in $_SERVER superglobal
+	 * Additional HTTP headers not prefixed with HTTP_ in the $_SERVER super global variable.
+	 * Must be in upper case.
 	 */
-	private $add_headers = ['CONTENT_TYPE', 'CONTENT_LENGTH', 'Authorization', 'PATH-INFO'];
+	private array $extra_headers = ['CONTENT_TYPE', 'CONTENT_LENGTH', 'AUTHORIZATION', 'PATH_INFO'];
 
 	private $body;
 	private $method;
@@ -32,21 +33,25 @@ class CHttpRequest {
 	private $raw;
 
 	/**
-	 * Retrieve HTTP Body
-	 * @param Array Additional Headers to retrieve
+	 * Retrieve HTTP Body.
+	 *
+	 * @param array $extra_headers  Additional HTTP headers to retrieve.
 	 */
-	public function __construct($add_headers = false) {
-		$this->retrieve_headers($add_headers);
+	public function __construct(array $extra_headers = []) {
+		$this->retrieveHeaders($extra_headers);
 		$this->body = @file_get_contents('php://input');
 	}
 
 	/**
-	 * Retrieve the HTTP request headers from the $_SERVER superglobal
-	 * @param Array Additional Headers to retrieve
+	 * Retrieve HTTP request headers from the $_SERVER super global variable.
+	 *
+	 * @param array $extra_headers  Additional headers to retrieve.
 	 */
-	public function retrieve_headers($add_headers = false) {
-		if ($add_headers) {
-			$this->add_headers = array_merge($this->add_headers, $add_headers);
+	public function retrieveHeaders(array $extra_headers = []): void {
+		if ($extra_headers) {
+			$this->extra_headers = array_unique(
+				array_merge($this->extra_headers, array_map('strtoupper', $extra_headers))
+			);
 		}
 
 		if (isset($_SERVER['HTTP_METHOD'])) {
@@ -63,17 +68,17 @@ class CHttpRequest {
 		$this->headers = [];
 
 		if (function_exists('getallheaders')) {
-			$headers = getallheaders();
+			$headers = array_change_key_case(getallheaders(), CASE_UPPER);
 
-			if (array_key_exists('Authorization', $headers)) {
-				$this->headers['AUTHORIZATION'] = $headers['Authorization'];
+			if (array_key_exists('AUTHORIZATION', $headers)) {
+				$this->headers['AUTHORIZATION'] = $headers['AUTHORIZATION'];
 			}
 		}
 
-		foreach ($_SERVER as $i => $val) {
-			if (strpos($i, 'HTTP_') === 0 || in_array($i, $this->add_headers)) {
+		foreach (array_change_key_case($_SERVER, CASE_UPPER) as $i => $value) {
+			if (strpos($i, 'HTTP_') === 0 || in_array($i, $this->extra_headers)) {
 				$name = str_replace(['HTTP_', '_'], ['', '-'], $i);
-				$this->headers[strtoupper($name)] = $val;
+				$this->headers[$name] = $value;
 			}
 		}
 	}

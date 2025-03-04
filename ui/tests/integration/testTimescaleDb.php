@@ -51,16 +51,15 @@ class testTimescaleDb extends CIntegrationTest {
 		];
 	}
 
-	private function retrieveExtention() {
+	private function retrieveExtension() {
 		self::$db_extension = '';
 
-		$sql = 'SELECT db_extension'.
-			' FROM config';
+		$sql = 'SELECT value_str FROM settings WHERE name=\'db_extension\'';
 
 		$res = DBfetch(DBselect($sql));
 
 		if ($res) {
-			self::$db_extension = $res['db_extension'];
+			self::$db_extension = $res['value_str'];
 		}
 	}
 
@@ -90,7 +89,7 @@ class testTimescaleDb extends CIntegrationTest {
 	 */
 	public function prepareData() {
 
-		$this->retrieveExtention();
+		$this->retrieveExtension();
 
 		// Create host "test_timescale"
 		$response = $this->call('host.create', [

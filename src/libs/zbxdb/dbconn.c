@@ -2223,6 +2223,39 @@ void	zbx_dbconn_select_uint64(zbx_dbconn_t *db, const char *sql, zbx_vector_uint
 	zbx_vector_uint64_sort(ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
+static int	dbconn_prepare_multiple_query_str(zbx_dbconn_t *db, const char *query, const char *field_name,
+		const zbx_vector_uint64_t *ids, char **sql, size_t *sql_alloc, size_t *sql_offset)
+{
+#define ZBX_MAX_IDS	950
+	int			i, j, ret = SUCCEED;
+	zbx_vector_str_t	str_ids;
+
+	zbx_vector_str_create(&str_ids);
+
+	for (i = 0; i < ids->values_num; i += ZBX_MAX_IDS)
+	{
+		int	batch_size = MIN(ZBX_MAX_IDS, ids->values_num - i);
+
+		for (j = i; j < i + batch_size; j++)
+			zbx_vector_str_append(&str_ids, zbx_dsprintf(NULL, ZBX_FS_UI64, ids->values[j]));
+
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, query);
+		zbx_db_add_str_condition_alloc(sql, sql_alloc, sql_offset, field_name, (const char**)str_ids.values,
+				batch_size);
+		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
+
+		zbx_vector_str_clear_ext(&str_ids, zbx_str_free);
+
+		if (SUCCEED != (ret = zbx_dbconn_execute_overflowed_sql(db, sql, sql_alloc, sql_offset, NULL)))
+			break;
+	}
+
+	zbx_vector_str_destroy(&str_ids);
+
+	return ret;
+#undef ZBX_MAX_IDS
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: execute query with large number of primary key matches in smaller *
@@ -2230,7 +2263,7 @@ void	zbx_dbconn_select_uint64(zbx_dbconn_t *db, const char *sql, zbx_vector_uint
  *                                                                            *
  ******************************************************************************/
 int	zbx_dbconn_prepare_multiple_query(zbx_dbconn_t *db, const char *query, const char *field_name,
-		zbx_vector_uint64_t *ids, char **sql, size_t *sql_alloc, size_t *sql_offset)
+		const zbx_vector_uint64_t *ids, char **sql, size_t *sql_alloc, size_t *sql_offset)
 {
 	int	i, ret = SUCCEED;
 
@@ -2241,9 +2274,33 @@ int	zbx_dbconn_prepare_multiple_query(zbx_dbconn_t *db, const char *query, const
 				MIN(ZBX_DB_LARGE_QUERY_BATCH_SIZE, ids->values_num - i));
 		zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 
-		if (SUCCEED != (ret = zbx_dbconn_execute_overflowed_sql(db, sql, sql_alloc, sql_offset)))
+		if (SUCCEED != (ret = zbx_dbconn_execute_overflowed_sql(db, sql, sql_alloc, sql_offset, NULL)))
 			break;
 	}
+
+	return ret;
+}
+
+static int	dbconn_execute_multiple_query(zbx_dbconn_t *db, const char *query, const char *field_name,
+		const zbx_vector_uint64_t *ids, int as_str)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
+	int	ret = SUCCEED;
+
+	sql = (char *)zbx_malloc(sql, sql_alloc);
+
+	if (1 == as_str)
+	{
+		ret = dbconn_prepare_multiple_query_str(db, query, field_name, ids, &sql, &sql_alloc, &sql_offset);
+	}
+	else
+		ret = zbx_dbconn_prepare_multiple_query(db, query, field_name, ids, &sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && ZBX_DB_OK > zbx_dbconn_flush_overflowed_sql(db, sql, sql_offset))
+		ret = FAIL;
+
+	zbx_free(sql);
 
 	return ret;
 }
@@ -2255,22 +2312,21 @@ int	zbx_dbconn_prepare_multiple_query(zbx_dbconn_t *db, const char *query, const
  *                                                                            *
  ******************************************************************************/
 int	zbx_dbconn_execute_multiple_query(zbx_dbconn_t *db, const char *query, const char *field_name,
-		zbx_vector_uint64_t *ids)
+		const zbx_vector_uint64_t *ids)
 {
-	char	*sql = NULL;
-	size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
-	int	ret = SUCCEED;
+	return dbconn_execute_multiple_query(db, query, field_name, ids, 0);
+}
 
-	sql = (char *)zbx_malloc(sql, sql_alloc);
-
-	ret = zbx_dbconn_prepare_multiple_query(db, query, field_name, ids, &sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == ret && ZBX_DB_OK > zbx_dbconn_flush_overflowed_sql(db, sql, sql_offset))
-		ret = FAIL;
-
-	zbx_free(sql);
-
-	return ret;
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute query with large number of primary key matches in smaller *
+ *          batches, values will be passed as strings                         *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbconn_execute_multiple_query_str(zbx_dbconn_t *db, const char *query, const char *field_name,
+		const zbx_vector_uint64_t *ids)
+{
+	return dbconn_execute_multiple_query(db, query, field_name, ids, 1);
 }
 
 /******************************************************************************

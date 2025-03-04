@@ -67,7 +67,7 @@ class testMultiselects extends CWebTest {
 	public function testMultiselects_NotSuggestAlreadySelected() {
 		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
 		$this->page->updateViewport();
-		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$form = $this->query('name:zbx_filter')->asForm()->one()->waitUntilVisible();
 		$field = $form->getField('Host groups');
 		$field->select('Zabbix servers');
 		$element = $field->query('tag:input')->one();

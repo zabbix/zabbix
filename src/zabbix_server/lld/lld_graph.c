@@ -521,7 +521,7 @@ static void	lld_items_get(const zbx_vector_lld_gitem_ptr_t *gitems_proto, zbx_ui
 
 	zbx_vector_uint64_destroy(&itemids);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): items:" ZBX_FS_UI64 , __func__, items->values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): items:%d", __func__, items->values_num);
 }
 
 /******************************************************************************
