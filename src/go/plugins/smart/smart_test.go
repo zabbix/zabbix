@@ -718,7 +718,7 @@ func Test_validatePath(t *testing.T) {
 
 			// check if erroneous diskPath
 			if (err != nil) != tt.wantErr {
-				t.Fatalf("NewDiskPath() error = %v, wantErr %t", err, tt.wantErr)
+				t.Fatalf("NewDiskPath() error = %s, wantErr %t", err.Error(), tt.wantErr)
 			}
 		})
 	}

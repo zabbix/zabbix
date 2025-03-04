@@ -443,7 +443,7 @@ func init() {
 	)
 }
 
-// validateExport function validates export params and key.
+// validateExport function validates key, export params and version.
 func (p *Plugin) validateExport(key string, params []string) error {
 	// No params - nothing to validate
 	if len(params) == all {
@@ -464,7 +464,7 @@ func (p *Plugin) validateExport(key string, params []string) error {
 	return p.checkVersion()
 }
 
-// validatePath validates the key parameter path in the context of an input sanitization.
+// validatePath validates the key's argument disk path in the context of an input sanitization.
 func validatePath(p string) error {
 	const pattern = `^(?:\s*-|'*"*\s*-)`
 
