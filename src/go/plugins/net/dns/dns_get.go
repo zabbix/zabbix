@@ -206,7 +206,7 @@ func exportDnsGet(params []string) (result any, err error) {
 
 	timeDNSResponseReceived := time.Since(timeBeforeQuery).Seconds()
 	queryTimeSection := map[string]any{
-		"query_time": fmt.Sprintf("%.2f", timeDNSResponseReceived),
+		"query_time": fmt.Sprintf("%.6f", timeDNSResponseReceived),
 	}
 
 	// Now, resp from the DNS library is ready to be processed:
