@@ -20,7 +20,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  *
  * @required-components server, agent, agent2
  * @backup ids,hosts,items,actions,operations,optag,host_tag
- * @backup auditlog,changelog,config,ha_node
+ * @backup auditlog,changelog,settings,ha_node
  */
 class testAutoregistrationPSK extends CIntegrationTest {
 
@@ -66,7 +66,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 					'operationtype' => OPERATION_TYPE_HOST_ADD
 				]
 			]
-		],]);
+		]]);
 
 		$this->assertArrayHasKey('result', $response, 'Failed to create an autoregistration action');
 		$this->assertArrayHasKey('actionids', $response['result'],
@@ -131,7 +131,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 					]
 				]
 			]
-		],]);
+		]]);
 
 		$this->assertArrayHasKey('result', $response, 'Failed to create an autoregistration action');
 		$this->assertArrayHasKey('actionids', $response['result'],
@@ -181,7 +181,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 					]
 				]
 			]
-		],]);
+		]]);
 
 		$this->killComponent(self::COMPONENT_AGENT2);
 		$this->stopComponent(self::COMPONENT_SERVER);
@@ -382,7 +382,7 @@ class testAutoregistrationPSK extends CIntegrationTest {
 					]
 				]
 			]
-		],]);
+		]]);
 
 		$this->assertArrayHasKey('result', $response, 'Failed to create an autoregistration action');
 		$this->assertArrayHasKey('actionids', $response['result'], 'Failed to create an autoregistration action');
