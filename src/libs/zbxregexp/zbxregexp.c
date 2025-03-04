@@ -307,7 +307,7 @@ static unsigned long	compute_match_recursion_limit(void)
 
 	if (NULL == get_stack_limits)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s(): GetCurrentThreadStackLimits() is not available on this system,"
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): GetCurrentThreadStackLimits() is not available on this system,"
 			" %s", __func__, strerror_from_system(GetLastError()));
 
 		return WIN_DEFAULT_MATCH_RECURSION_LIMIT;
