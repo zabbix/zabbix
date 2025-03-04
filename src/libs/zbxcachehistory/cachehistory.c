@@ -1850,7 +1850,6 @@ void	zbx_db_mass_update_items(const zbx_vector_item_diff_ptr_t *item_diff,
  ******************************************************************************/
 static void	sync_history_cache_full(const zbx_events_funcs_t *events_cbs, int config_history_storage_pipelines)
 {
-	int			values_num = 0, triggers_num = 0, more;
 	zbx_hashset_iter_t	iter;
 	zbx_hc_item_t		*item;
 	zbx_binary_heap_t	tmp_history_queue;
@@ -1891,15 +1890,16 @@ static void	sync_history_cache_full(const zbx_events_funcs_t *events_cbs, int co
 
 	if (0 != zbx_hc_queue_get_size())
 	{
+		zbx_history_sync_stats_t	stats = {0};
+
 		zabbix_log(LOG_LEVEL_WARNING, "syncing history data...");
 
 		do
 		{
-			sync_history_cache_cb(&values_num, &triggers_num, events_cbs, NULL,
-					config_history_storage_pipelines, &more);
+			sync_history_cache_cb(events_cbs, NULL, config_history_storage_pipelines, &stats);
 
 			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
-					(double)values_num / (cache->history_num + values_num) * 100);
+					(double)stats.values_num / (cache->history_num + stats.values_num) * 100);
 		}
 		while (0 != zbx_hc_queue_get_size());
 
@@ -1977,14 +1977,11 @@ void	zbx_log_sync_history_cache_progress(void)
  *                                                                                     *
  ***************************************************************************************/
 void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
-		int config_history_storage_pipelines, int *values_num, int *triggers_num, int *more)
+		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __func__, cache->history_num);
 
-	*values_num = 0;
-	*triggers_num = 0;
-
-	sync_history_cache_cb(values_num, triggers_num, events_cbs, rtc, config_history_storage_pipelines, more);
+	sync_history_cache_cb(events_cbs, rtc, config_history_storage_pipelines, stats);
 }
 
 /******************************************************************************
