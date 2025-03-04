@@ -35,16 +35,15 @@ class testFormAuthentication extends CWebTest {
 	 * Open specific Authentication form tab and check basic common fields.
 	 *
 	 * @param string    $auth_type           LDAP, SAML or MFA
-	 * @param string    $alternative_name    MFA is sometimes displayed as 'multi-factor' in UI.
 	 */
-	protected function openFormAndCheckBasics($auth_type, $alternative_name = null) {
+	protected function openFormAndCheckBasics($auth_type) {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$form = $this->query('id:authentication-form')->asForm()->one();
 		$form->selectTab($auth_type.' settings');
 		$this->page->assertHeader('Authentication');
 		$this->page->assertTitle('Configuration of authentication');
 
-		$ui_name = $alternative_name !== null ? $alternative_name : $auth_type;
+		$ui_name = ($auth_type === 'MFA') ? 'multi-factor' : $auth_type;
 		$enable_auth_checkbox = $form->getField('Enable '.$ui_name.' authentication');
 		$this->assertTrue($enable_auth_checkbox->isEnabled());
 		$this->assertTrue($enable_auth_checkbox->isVisible());
