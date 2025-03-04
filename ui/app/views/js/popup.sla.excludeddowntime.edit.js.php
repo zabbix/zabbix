@@ -26,6 +26,8 @@ window.sla_excluded_downtime_edit_popup = new class {
 	submit() {
 		const fields = getFormFields(this.form);
 
+		fields.name = fields.name.trim();
+
 		this.overlay.setLoading();
 
 		const curl = new Curl('zabbix.php');
