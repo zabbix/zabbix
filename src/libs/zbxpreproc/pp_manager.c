@@ -625,7 +625,7 @@ static void	zbx_pp_manager_dump_items(zbx_pp_manager_t *manager)
 	while (NULL != (item = (zbx_pp_item_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "itemid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " revision:" ZBX_FS_UI64
-				" type:%u value_type:%u mode:%u flags:%u",
+				" type:%u value_type:%u mode:%u flags:%x",
 				item->itemid, item->preproc->hostid, item->revision, item->preproc->type,
 				item->preproc->value_type, item->preproc->mode, item->preproc->flags);
 

@@ -3315,11 +3315,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_synced_n
 		item_flags = (unsigned char)atoi(row[18]);
 
 		/* item prototype does not have item_rtdata and shouldn't be present in sync */
-		if (item_flags != ZBX_FLAG_DISCOVERY_NORMAL && item_flags != ZBX_FLAG_DISCOVERY_CREATED &&
-				item_flags != ZBX_FLAG_DISCOVERY_RULE)
-		{
+		if (0 != (item_flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
 			continue;
-		}
 
 		item = (ZBX_DC_ITEM *)DCfind_id_ext(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found, uniq);
 
@@ -10021,7 +10018,7 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 
 			if (NULL == dc_item->preproc_item && NULL == dc_item->master_item &&
 					ITEM_TYPE_INTERNAL != dc_item->type &&
-					ZBX_FLAG_DISCOVERY_RULE != dc_item->flags)
+					0 == (dc_item->flags & ZBX_FLAG_DISCOVERY_RULE))
 			{
 				continue;
 			}

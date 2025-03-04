@@ -45,7 +45,7 @@ static void	dump_item(const zbx_dc_item_t *item)
 		zbx_log_handle(LOG_LEVEL_TRACE, "  value_type: %u", item->value_type);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  snmpv3_securitylevel: %u", item->snmpv3_securitylevel);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  authtype: %u", item->authtype);
-		zbx_log_handle(LOG_LEVEL_TRACE, "  flags: %u", item->flags);
+		zbx_log_handle(LOG_LEVEL_TRACE, "  flags: %x", item->flags);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  snmpv3_authprotocol: %u", item->snmpv3_authprotocol);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  snmpv3_privprotocol: %u", item->snmpv3_privprotocol);
 		zbx_log_handle(LOG_LEVEL_TRACE, "  follow_redirects: %u", item->follow_redirects);
