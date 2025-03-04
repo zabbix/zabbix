@@ -194,34 +194,30 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 
 	public function getCreateData() {
 		$create_data = [
-			[
+			'TOTP with default values' => [
 				[
-					// TOTP with default values.
 					'fields' => [
 						'Name' => 'TOTP defaults'
 					]
 				]
 			],
-			[
+			'TOTP name contains leading and trailing spaces' => [
 				[
-					// TOTP name contains leading and trailing spaces.
 					'fields' => [
 						'Name' => '  TOTP whitespace  '
 					]
 				]
 			],
-			[
+			'Duo standard case' => [
 				[
-					// Duo standard case.
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
 						'Name' => 'Duo standard'
 					]
 				]
 			],
-			[
+			'Duo fields contain leading and trailing spaces' => [
 				[
-					// Duo fields contain leading and trailing spaces.
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
 						'Name' => '  Duo whitespace  ',
@@ -230,9 +226,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					]
 				]
 			],
-			[
+			'All fields max length.' => [
 				[
-					// All fields max length.
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
 						'Name' => STRING_128,
@@ -242,9 +237,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					]
 				]
 			],
-			[
+			'TOTP name already used.' => [
 				[
-					// TOTP name already used.
 					'expected_authentication_form' => TEST_BAD,
 					'error' => 'MFA method "Pre-existing TOTP" already exists.',
 					'fields' => [
@@ -252,9 +246,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					]
 				]
 			],
-			[
+			'TOTP name already used - leading and trailing spaces' => [
 				[
-					// TOTP name already used - leading and trailing spaces.
 					'expected_authentication_form' => TEST_BAD,
 					'error' => 'MFA method "Pre-existing TOTP" already exists.',
 					'fields' => [
@@ -262,9 +255,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					]
 				]
 			],
-			[
+			'Duo name already used' => [
 				[
-					// Duo name already used.
 					'expected_authentication_form' => TEST_BAD,
 					'error' => 'MFA method "Pre-existing Duo" already exists.',
 					'fields' => [
@@ -275,11 +267,10 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			],
 			/*
 			 * There is a bug where the Client secret field is only validated when creating a new record.
-			 * ToDo: Move the missing Clien secret test to the generic data provider when ZBX-25952 is fixed.
+			 * ToDo: Move the missing Client secret test to the generic data provider when ZBX-25952 is fixed.
 			 */
-			[
+			'Duo with Client secret field missing' => [
 				[
-					// Duo with Client secret field missing.
 					'expected_method_form' => TEST_BAD,
 					'error' => 'Incorrect value for field "client_secret": cannot be empty.',
 					'fields' => [
@@ -369,18 +360,16 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 
 	public function getUpdateData() {
 		$update_data = [
-			[
+			'TOTP name whitespace' => [
 				[
-					// TOTP name whitespace.
 					'fields' => [
 						'Name' => '  TOTP update with whitespace  '
 					],
 					'skip_name_append' => true
 				]
 			],
-			[
+			'Duo whitespaces' => [
 				[
-					// Duo whitespaces.
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
 						'Name' => '  Duo update with whitespace  ',
@@ -390,9 +379,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					'skip_name_append' => true
 				]
 			],
-			[
+			'TOTP name already used' => [
 				[
-					// TOTP name already used.
 					'expected_authentication_form' => TEST_BAD,
 					'error' => 'value (name)=(Pre-existing TOTP) already exists.',
 					'fields' => [
@@ -401,9 +389,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					'skip_name_append' => true
 				]
 			],
-			[
+			'Duo name already used' => [
 				[
-					// Duo name already used.
 					'expected_authentication_form' => TEST_BAD,
 					'error' => 'value (name)=(Pre-existing Duo) already exists.',
 					'fields' => [
@@ -491,26 +478,23 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 
 	public function getCancelData() {
 		return [
-			[
+			'Cancel MFA method form: TOTP creation' => [
 				[
-					// Cancel MFA method form: TOTP creation.
 					'fields' => [
 						'Name' => 'TOTP create cancel'
 					]
 				]
 			],
-			[
+			'Cancel MFA method form: Duo creation' => [
 				[
-					// Cancel MFA method form: Duo creation.
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
 						'Name' => 'Duo create cancel'
 					]
 				]
 			],
-			[
+			'Cancel MFA method form: TOTP update' => [
 				[
-					// Cancel MFA method form: TOTP update.
 					'fields' => [
 						'Name' => 'TOTP update cancel',
 						'Hash function' => 'SHA-512',
@@ -519,9 +503,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					'update' => true
 				]
 			],
-			[
+			'Cancel MFA method form: Duo update' => [
 				[
-					// Cancel MFA method form: Duo update.
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
 						'Name' => 'Duo update cancel',
@@ -531,18 +514,16 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					'update' => true
 				]
 			],
-			[
+			'Cancel Authentication form: TOTP creation' => [
 				[
-					// Cancel Authentication form: TOTP creation.
 					'fields' => [
 						'Name' => 'TOTP create cancel'
 					],
 					'save_mfa_method' => true
 				]
 			],
-			[
+			'Cancel Authentication form: Duo creation' => [
 				[
-					// Cancel Authentication form: Duo creation.
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
 						'Name' => 'Duo create cancel'
@@ -550,9 +531,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					'save_mfa_method' => true
 				]
 			],
-			[
+			'Cancel Authentication form: TOTP update' => [
 				[
-					// Cancel Authentication form: TOTP update.
 					'fields' => [
 						'Name' => 'TOTP update cancel',
 						'Hash function' => 'SHA-512',
@@ -562,9 +542,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					'save_mfa_method' => true
 				]
 			],
-			[
+			'Cancel Authentication form: Duo update' => [
 				[
-					// Cancel Authentication form: Duo update.
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
 						'Name' => 'Duo update cancel',
@@ -761,19 +740,20 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		}
 	}
 
+	/**
+	 * Generic data for create and update data providers.
+	 */
 	protected function getGenericData() {
 		return [
-			[
+			'TOTP name with special characters' => [
 				[
-					// TOTP name with special characters.
 					'fields' => [
 						'Name' => '👍©æ<script>alert("hi!")</script>&nbsp;'
 					]
 				]
 			],
-			[
+			'TOTP with Name field missing' => [
 				[
-					// TOTP with Name field missing.
 					'expected_method_form' => TEST_BAD,
 					'error' => 'Incorrect value for field "name": cannot be empty.',
 					'fields' => [
@@ -781,18 +761,16 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					]
 				]
 			],
-			[
+			'TOTP SHA-256' => [
 				[
-					// TOTP SHA-256.
 					'fields' => [
 						'Name' => 'TOTP SHA-256',
 						'Hash function' => 'SHA-256'
 					]
 				]
 			],
-			[
+			'TOTP SHA-512, code length 8' => [
 				[
-					// TOTP SHA-512, code length 8.
 					'fields' => [
 						'Name' => 'TOTP SHA-512',
 						'Hash function' => 'SHA-512',
@@ -800,9 +778,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					]
 				]
 			],
-			[
+			'Duo with special characters' => [
 				[
-					// Duo with special characters.
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
 						'Name' => 'Name: 👍©æ<script>alert("hi!")</script>&nbsp;',
@@ -812,9 +789,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					]
 				]
 			],
-			[
+			'Duo with Name field missing' => [
 				[
-					// Duo with Name field missing.
 					'expected_method_form' => TEST_BAD,
 					'error' => 'Incorrect value for field "name": cannot be empty.',
 					'fields' => [
@@ -823,9 +799,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					]
 				]
 			],
-			[
+			'Duo with API hostname field missing' => [
 				[
-					// Duo with API hostname field missing.
 					'expected_method_form' => TEST_BAD,
 					'error' => 'Incorrect value for field "api_hostname": cannot be empty.',
 					'fields' => [
@@ -835,9 +810,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					]
 				]
 			],
-			[
+			'Duo with Client ID field missing' => [
 				[
-					// Duo with Client ID field missing.
 					'expected_method_form' => TEST_BAD,
 					'error' => 'Incorrect value for field "clientid": cannot be empty.',
 					'fields' => [
