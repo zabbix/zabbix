@@ -155,7 +155,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		// Check the mandatory fields when MFA type = TOTP.
 		$this->assertEquals(['Name'], $dialog_form->getRequiredLabels());
 
-		// Check the hintbox next to the Name fieldS.
+		// Check the hintbox next to the Name fields.
 		$dialog_form->getLabel('Name')->query('xpath:./button[@data-hintbox]')->one()->click();
 		$hintbox = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->all()->last();
 		$this->assertEquals('Shown as the label to all MFA users in authenticator apps.', $hintbox->getText());
