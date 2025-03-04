@@ -395,6 +395,14 @@ func parseParamsGet(params []string) (*dnsGetOptions, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		if o.flags == nil {
+			err := o.setFlags("")
+			if err != nil {
+				return nil, err
+			}
+		}
+
 	default:
 		err := zbxerr.ErrorTooManyParameters
 

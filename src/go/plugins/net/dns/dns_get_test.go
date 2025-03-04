@@ -19,9 +19,191 @@ import (
 	"fmt"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/miekg/dns"
+	"golang.zabbix.com/sdk/zbxerr"
 )
+
+func Test_dnsGetOptions_parseParamsGet(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name     string
+		paramsIn []string
+		wantErr  bool
+		result   *dnsGetOptions
+		err      error
+	}{
+		{
+			"+emptyParams",
+			[]string{
+				"1.1.1.1",
+				"_nonexistant__.example.com",
+				"A",
+				"",
+				"",
+				"",
+				"",
+			},
+			false,
+			&dnsGetOptions{
+				options{
+					"1.1.1.1:53",
+					"_nonexistant__.example.com",
+					udpProtocol,
+					dns.TypeA,
+					defaultCount,
+					time.Second,
+				},
+				map[string]bool{
+					"aaflag": false,
+					"adflag": false,
+					"cdflag": false,
+					"dnssec": false,
+					"edns0":  true,
+					"nsid":   false,
+					"rdflag": true,
+				},
+			},
+			nil,
+		},
+		{
+			"+paramsNotSpecified",
+			[]string{
+				"1.1.1.1",
+				"_nonexistant__.example.com",
+				"A",
+			},
+			false,
+			&dnsGetOptions{
+				options{
+					"1.1.1.1:53",
+					"_nonexistant__.example.com",
+					udpProtocol,
+					dns.TypeA,
+					defaultCount,
+					time.Second,
+				},
+				map[string]bool{
+					"aaflag": false,
+					"adflag": false,
+					"cdflag": false,
+					"dnssec": false,
+					"edns0":  true,
+					"nsid":   false,
+					"rdflag": true,
+				},
+			},
+			nil,
+		},
+		{
+			"+paramsEmptyButFlagsSpecified",
+			[]string{
+				"1.1.1.1",
+				"_nonexistant__.example.com",
+				"A",
+				"",
+				"",
+				"",
+				"cdflag,rdflag,nsid",
+			},
+			false,
+			&dnsGetOptions{
+				options{
+					"1.1.1.1:53",
+					"_nonexistant__.example.com",
+					udpProtocol,
+					dns.TypeA,
+					defaultCount,
+					time.Second,
+				},
+				map[string]bool{
+					"aaflag": false,
+					"adflag": false,
+					"cdflag": true,
+					"dnssec": false,
+					"edns0":  true,
+					"nsid":   true,
+					"rdflag": true,
+				},
+			},
+			nil,
+		},
+		{
+			"+paramsEmptyAllFlagsNegative",
+			[]string{
+				"1.1.1.1",
+				"_nonexistant__.example.com",
+				"A",
+				"",
+				"",
+				"",
+				"nocdflag,nordflag,nodnssec,nonsid,noedns0,noaaflag,noadflag",
+			},
+			false,
+			&dnsGetOptions{
+				options{
+					"1.1.1.1:53",
+					"_nonexistant__.example.com",
+					udpProtocol,
+					dns.TypeA,
+					defaultCount,
+					time.Second,
+				},
+				map[string]bool{
+					"aaflag": false,
+					"adflag": false,
+					"cdflag": false,
+					"dnssec": false,
+					"edns0":  false,
+					"nsid":   false,
+					"rdflag": false,
+				},
+			},
+			nil,
+		},
+
+		{
+			"-tooManyParams",
+			[]string{
+				"1.1.1.1",
+				"_nonexistant__.example.com",
+				"A",
+				"",
+				"",
+				"",
+				"",
+				"",
+			},
+			true,
+			nil,
+			zbxerr.ErrorTooManyParameters,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+
+			res, err := parseParamsGet(tt.paramsIn)
+
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("ValidateOptions() error expectation failed: wantErr=%v, got err=%v", tt.wantErr, err)
+			}
+
+			if tt.wantErr && err.Error() != tt.err.Error() {
+				t.Fatalf("ValidateOptions() unexpected error:\n%v\nexpected error:\n%v\n", err, tt.err)
+			}
+
+			if fmt.Sprint(tt.result) != fmt.Sprint(res) {
+				t.Errorf("\nExpected options: ->%v<-\nFor input flags: ->%s<-\nBut received: ->%v<-\n",
+					tt.result, tt.paramsIn, res)
+			}
+		})
+	}
+}
 
 func Test_dnsGetOptions_setFlags(t *testing.T) {
 	tests := []struct {

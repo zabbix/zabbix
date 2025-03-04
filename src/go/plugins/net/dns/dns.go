@@ -36,6 +36,8 @@ const (
 
 	inAddrSuffix   = ".in-addr.arpa"
 	inAddrV6Suffix = ".ip6.arpa"
+
+	defaultCount = 2
 )
 
 const (
@@ -476,6 +478,7 @@ func (o *options) setDNSType(dnsType string) error {
 }
 
 func (o *options) setDefaults() error {
+
 	if o.ip == "" {
 		err := o.setDefaultIP()
 		if err != nil {
@@ -496,7 +499,7 @@ func (o *options) setDefaults() error {
 	}
 
 	if o.count < 1 {
-		o.count = 2
+		o.count = defaultCount
 	}
 
 	if o.protocol == "" {
