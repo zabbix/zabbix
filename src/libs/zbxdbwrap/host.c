@@ -2254,29 +2254,6 @@ static void	DBhost_prototypes_clean(zbx_vector_ptr_t *host_prototypes)
  * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
  *                                                                            *
  ******************************************************************************/
-static int	DBis_regular_host(zbx_uint64_t hostid)
-{
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	int		ret = FAIL;
-
-	result = zbx_db_select("select flags from hosts where hostid=" ZBX_FS_UI64, hostid);
-
-	if (NULL != (row = zbx_db_fetch(result)))
-	{
-		if (0 == atoi(row[0]))
-			ret = SUCCEED;
-	}
-	zbx_db_free_result(result);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Comments: auxiliary function for DBcopy_template_host_prototypes()         *
- *                                                                            *
- ******************************************************************************/
 static void	DBhost_prototypes_make(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids,
 		zbx_vector_ptr_t *host_prototypes)
 {
@@ -4046,10 +4023,6 @@ static void	DBcopy_template_host_prototypes(zbx_uint64_t hostid, zbx_vector_uint
 	zbx_vector_ptr_t	host_prototypes;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	/* only regular hosts can have host prototypes */
-	if (SUCCEED != DBis_regular_host(hostid))
-		return;
 
 	zbx_vector_ptr_create(&host_prototypes);
 
