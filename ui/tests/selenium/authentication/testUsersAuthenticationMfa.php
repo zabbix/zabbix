@@ -87,7 +87,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	}
 
 	public function testUsersAuthenticationMfa_Layout() {
-		$mfa_form = $this->openFormAndCheckBasics('MFA', 'multi-factor');
+		$mfa_form = $this->openFormAndCheckBasics('MFA');
 		$this->assertEquals(['Methods'], $mfa_form->getRequiredLabels());
 
 		// Check Method table headers.
