@@ -2214,13 +2214,15 @@ INDEX		|3		|value_hostgroupid
 INDEX		|4		|value_userdirectoryid
 INDEX		|5		|value_mfaid
 
-TABLE|lld_macro|itemid|0
+TABLE|lld_macro|lld_macroid|0
+FIELD		|lld_macroid	|t_id		|	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|1|items
 FIELD		|name		|t_varchar(255)	|	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|	|NOT NULL	|0
+INDEX		|1		|itemid
 
 TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|7030015	|7030015
+ROW		|1		|7030016	|7030016

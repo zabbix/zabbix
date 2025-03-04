@@ -248,9 +248,10 @@ out:
 static int	DBpatch_7030014(void)
 {
 	const zbx_db_table_t	table =
-			{"lld_macro", "itemid", 0,
+			{"lld_macro", "lld_macroid", 0,
 				{
-					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"lld_macroid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"name", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"value", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{0}
@@ -262,6 +263,11 @@ static int	DBpatch_7030014(void)
 }
 
 static int	DBpatch_7030015(void)
+{
+	return DBcreate_index("lld_macro", "lld_macro_1", "itemid", 0);
+}
+
+static int	DBpatch_7030016(void)
 {
 	const zbx_db_field_t	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
 			ZBX_FK_CASCADE_DELETE};
@@ -291,5 +297,6 @@ DBPATCH_ADD(7030012, 0, 1)
 DBPATCH_ADD(7030013, 0, 1)
 DBPATCH_ADD(7030014, 0, 1)
 DBPATCH_ADD(7030015, 0, 1)
+DBPATCH_ADD(7030016, 0, 1)
 
 DBPATCH_END()

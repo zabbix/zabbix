@@ -9887,8 +9887,13 @@ return [
 		]
 	],
 	'lld_macro' => [
-		'key' => 'itemid',
+		'key' => 'lld_macroid',
 		'fields' => [
+			'lld_macroid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
 			'itemid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
@@ -9899,14 +9904,12 @@ return [
 			'name' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
+				'length' => 255
 			],
 			'value' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
+				'length' => 255
 			]
 		]
 	],
