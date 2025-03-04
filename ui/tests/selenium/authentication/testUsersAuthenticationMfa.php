@@ -29,6 +29,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	protected const DUO_CLIENT_ID = 'DI6GX0DNF2J21PXVLXBB';
 	protected const DUO_CLIENT_SECRET = 'SNkg6BvonVsNn2EYzAUC';
 
+	protected const HASH_SQL = 'SELECT * FROM mfa';
+
 	protected static $edit_totp_id;
 	protected static $edit_duo_id;
 
@@ -333,7 +335,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$mfa_form->fill(['Enable multi-factor authentication' => true]);
 
 		// For assertions later.
-		$hash_before = CDBHelper::getHash('SELECT * FROM mfa');
+		$hash_before = CDBHelper::getHash(self::HASH_SQL);
 
 		// Open the edit form.
 		$mfa_form->getFieldContainer('Methods')->query('link', $data['method'])->waitUntilClickable()->one()->click();
@@ -355,7 +357,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$dialog->asForm()->checkValue($data['expected_values']);
 		$dialog->close();
 
-		$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM mfa'));
+		$this->assertEquals($hash_before, CDBHelper::getHash(self::HASH_SQL));
 	}
 
 	public function getUpdateData() {
@@ -567,7 +569,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$mfa_form->fill(['Enable multi-factor authentication' => true]);
 
 		// Save the starting state for assertions later.
-		$hash_before = CDBHelper::getHash('SELECT * FROM mfa');
+		$hash_before = CDBHelper::getHash(self::HASH_SQL);
 		$table = $this->selectMethodTable($mfa_form);
 		$ui_rows_before = $table->getRows()->count();
 
@@ -643,7 +645,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$mfa_form->selectTab('MFA settings');
 		$table = $this->selectMethodTable($mfa_form);
 		$this->assertEquals($ui_rows_before, $table->getRows()->count());
-		$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM mfa'));
+		$this->assertEquals($hash_before, CDBHelper::getHash(self::HASH_SQL));
 	}
 
 	/**
