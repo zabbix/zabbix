@@ -160,7 +160,7 @@ class testFormTotpValidate extends testFormTotp {
 			'mfaid' => self::$mfa_id,
 			'userid' => self::$user_id,
 			'totp_secret' => $secret,
-			'status' => 1
+			'status' => TOTP_SECRET_CONFIRMED
 		];
 		DB::insert('mfa_totp_secret', [$db_data]);
 	}
