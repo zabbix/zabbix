@@ -244,7 +244,7 @@ class testFormTotp extends CWebTest {
 	 */
 	protected function testTotpBlocking() {
 		// Open the form.
-		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
+		$this->userLogin();
 		$form = $this->page->query('class:signin-container')->asForm()->one();
 
 		// Enter the incorrect TOTP several times to get blocked.
@@ -287,9 +287,9 @@ class testFormTotp extends CWebTest {
 	}
 
 	/**
-	 * Checks that the user has successfully logged in.
+	 * This avoids having many arguments every time when logging in.
 	 */
-	protected function verifyLoggedIn() {
-		$this->assertTrue($this->query('xpath://aside[@class="sidebar"]//a[text()="User settings"]')->exists());
+	protected function userLogin() {
+		$this->page->userLogin(self::USER_NAME, self::USER_PASS, null, 'index.php', false);
 	}
 }

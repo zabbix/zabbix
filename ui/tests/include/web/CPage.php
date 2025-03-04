@@ -605,12 +605,13 @@ class CPage {
 	/**
 	 * Allows to login with user credentials.
 	 *
-	 * @param string $alias     Username on login screen
-	 * @param string $password  Password on login screen
-	 * @param int $scenario  	Scenario TEST_BAD means that passed credentials are invalid, TEST_GOOD - user successfully logged in
-	 * @param string $url		Direct link to certain Zabbix page
+	 * @param string $alias          Username on login screen
+	 * @param string $password       Password on login screen
+	 * @param int $scenario  	     TEST_BAD - expected bad credentials, TEST_GOOD - user successfully logged in
+	 * @param string $url		     Direct link to certain Zabbix page
+	 * @param bool $check_logged_in  Check if the user is logged in
 	 */
-	public function userLogin($alias, $password, $scenario = TEST_GOOD, $url = 'index.php') {
+	public function userLogin($alias, $password, $scenario = TEST_GOOD, $url = 'index.php', $check_logged_in = true) {
 		if (self::$cookie === null) {
 			$this->driver->get(PHPUNIT_URL);
 		}
@@ -622,7 +623,17 @@ class CPage {
 		$this->query('id:enter')->one()->click();
 		$this->waitUntilReady();
 
-		// Check login result.
+		if ($check_logged_in) {
+			$this->checkUserLoggedIn($scenario);
+		}
+	}
+
+	/**
+	 * Checks if currently any user is logged in.
+	 *
+	 * @param int $scenario  TEST_BAD - it is expected to not be logged in, TEST_GOOD - expected to be logged in
+	 */
+	public function checkUserLoggedIn($scenario = TEST_GOOD) {
 		$sign_out = $this->query('class:zi-sign-out')->exists();
 
 		if ($scenario === TEST_GOOD && !$sign_out) {

@@ -28,7 +28,7 @@ class testFormTotpValidate extends testFormTotp {
 
 	public function testFormTotpValidate_Layout() {
 		$this->quickEnrollUser();
-		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
+		$this->userLogin();
 
 		// All elements in the Validate form are also present in the enroll form, so reuse code from there.
 		$this->testTotpLayout();
@@ -60,7 +60,7 @@ class testFormTotpValidate extends testFormTotp {
 	 */
 	public function testFormTotpValidate_Validate($data) {
 		// Open the validation form.
-		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
+		$this->userLogin();
 
 		// Get TOTP parameters.
 		$totp_algo = CTestArrayHelper::get($data, 'mfa_data.hash_function', self::DEFAULT_ALGO);
@@ -84,7 +84,7 @@ class testFormTotpValidate extends testFormTotp {
 		$this->page->waitUntilReady();
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
 			// Successful login.
-			$this->verifyLoggedIn();
+			$this->page->checkUserLoggedIn();
 		}
 		else {
 			// Verify validation error.
@@ -101,18 +101,18 @@ class testFormTotpValidate extends testFormTotp {
 		$this->quickEnrollUser();
 
 		// Log in the first time, must be OK.
-		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
+		$this->userLogin();
 		CMfaTotpHelper::waitForSafeTotpWindow();
 		$totp = CMfaTotpHelper::generateTotp(self::TOTP_SECRET_32);
 		$form = $this->page->query('class:signin-container')->asForm()->one();
 		$form->getField('id:verification_code')->fill($totp);
 		$form->query('button:Sign in')->one()->click();
 		$this->page->waitUntilReady();
-		$this->verifyLoggedIn();
+		$this->page->checkUserLoggedIn();
 
 		// Log out and try to log in using the same code. Should fail.
 		$this->page->logout();
-		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
+		$this->userLogin();
 		$this->page->waitUntilReady();
 		$form->invalidate();
 		$form->getField('id:verification_code')->fill($totp);
@@ -137,7 +137,7 @@ class testFormTotpValidate extends testFormTotp {
 	public function testFormTotpValidate_Screenshot() {
 		$this->resetTotpConfiguration();
 		$this->quickEnrollUser();
-		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
+		$this->userLogin();
 		$this->page->removeFocus();
 		$this->assertScreenshot($this->page->query('class:signin-container')->one(), 'TOTP validation form');
 	}

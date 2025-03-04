@@ -35,7 +35,7 @@ class testFormTotpEnroll extends testFormTotp {
 	 */
 	public function testFormTotpEnroll_Layout() {
 		// Open the MFA enroll form.
-		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
+		$this->userLogin();
 
 		// Container of most elements.
 		$container = $this->page->query('class:signin-container')->one();
@@ -99,7 +99,7 @@ class testFormTotpEnroll extends testFormTotp {
 	 */
 	public function testFormTotpEnroll_Enroll($data) {
 		// Open the enroll form.
-		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
+		$this->userLogin();
 
 		// Get the used TOTP parameters.
 		$totp_name = CTestArrayHelper::get($data, 'mfa_data.name', self::DEFAULT_METHOD_NAME);
@@ -133,7 +133,7 @@ class testFormTotpEnroll extends testFormTotp {
 		$this->page->waitUntilReady();
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
 			// Successful login.
-			$this->verifyLoggedIn();
+			$this->page->checkUserLoggedIn();
 		}
 		else {
 			// Verify validation error.
@@ -150,7 +150,7 @@ class testFormTotpEnroll extends testFormTotp {
 		$this->resetTotpConfiguration();
 
 		// Open the the enroll form and get the secret.
-		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
+		$this->userLogin();
 		$old_totp_secret = $this->validateQrCodeAndExtractSecret();
 
 		// Reload the page and make sure the secret has changed.
@@ -171,10 +171,10 @@ class testFormTotpEnroll extends testFormTotp {
 		$this->resetTotpConfiguration();
 
 		// Log in and enroll, check that login successful.
-		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
+		$this->userLogin();
 		$form = $this->page->query('class:signin-container')->asForm()->one();
 		$this->performEnroll($form);
-		$this->verifyLoggedIn();
+		$this->page->checkUserLoggedIn();
 		$this->page->logout();
 
 		// Create a different MFA method and assign it to the user.
@@ -193,9 +193,9 @@ class testFormTotpEnroll extends testFormTotp {
 		]);
 
 		// Check that enrollment is required again.
-		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
+		$this->userLogin();
 		$this->performEnroll($form, $alternative_mfa_name);
-		$this->verifyLoggedIn();
+		$this->page->checkUserLoggedIn();
 		$this->page->logout();
 
 		// Change the default MFA method back to the original.
@@ -205,9 +205,9 @@ class testFormTotpEnroll extends testFormTotp {
 		]);
 
 		// Check that the user has to enroll the initial MFA method again.
-		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
+		$this->userLogin();
 		$this->performEnroll($form);
-		$this->verifyLoggedIn();
+		$this->page->checkUserLoggedIn();
 	}
 
 	/**
@@ -226,7 +226,7 @@ class testFormTotpEnroll extends testFormTotp {
 	 */
 	public function testFormTotpEnroll_Screenshot() {
 		$this->resetTotpConfiguration();
-		$this->page->userLogin(self::USER_NAME, self::USER_PASS);
+		$this->userLogin();
 		$this->page->removeFocus();
 		$this->assertScreenshotExcept($this->page->query('class:signin-container')->one(),
 			[
