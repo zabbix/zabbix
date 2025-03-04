@@ -32,6 +32,9 @@ class testFormTestItemPrototype extends testItemTest {
 	 * Check Test item prototype Button enabled/disabled state depending on item type for Host.
 	 *
 	 * @backupOnce items
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testFormTestItemPrototype_CheckButtonStateHost() {
 		$this->checkTestButtonState($this->getItemTestButtonStateData(), 'Item prototype for Test Button check',
@@ -40,6 +43,9 @@ class testFormTestItemPrototype extends testItemTest {
 
 	/**
 	 * Check Test item prototype Button enabled/disabled state depending on item type for Template.
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testFormTestItemPrototype_CheckButtonStateTemplate() {
 		$this->checkTestButtonState($this->getItemTestButtonStateData(), 'Item prototype for Test Button check',
