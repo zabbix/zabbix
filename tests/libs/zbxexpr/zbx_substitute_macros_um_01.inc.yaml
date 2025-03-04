@@ -14,6 +14,14 @@ hosts:
         macro: "{$VAULT_VALUE}"
         value: "a/b:k1"
         type: ZBX_MACRO_VALUE_VAULT
+      - macroid: 4
+        macro: "{$TEST_1}"
+        value: 2.56
+        type: ZBX_MACRO_VALUE_TEXT
+      - macroid: 5
+        macro: "{$TEST}"
+        value: 3.365
+        type: ZBX_MACRO_VALUE_TEXT
     templates: []
 vault:
   - path: a/b
