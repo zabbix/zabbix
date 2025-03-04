@@ -1729,6 +1729,7 @@ static int	db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_
 		}
 #else
 		ZBX_UNUSED(sql_alloc);
+		ZBX_UNUSED(clause);
 #endif
 #if defined(HAVE_ORACLE) && 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
 		/* make sure we are not called twice without */
