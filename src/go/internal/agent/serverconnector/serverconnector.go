@@ -192,6 +192,7 @@ func (c *Connector) refreshActiveChecks() bool {
 	request, err := json.Marshal(&a)
 	if err != nil {
 		log.Errf("[%d] cannot create active checks request to [%s]: %s", c.clientID, c.address.Get(), err)
+
 		return false
 	}
 
@@ -235,6 +236,7 @@ func (c *Connector) refreshActiveChecks() bool {
 	err = json.Unmarshal(data, &response)
 	if err != nil {
 		log.Errf("[%d] cannot parse list of active checks from [%s]: %s", c.clientID, c.address.Get(), err)
+
 		return false
 	}
 
@@ -242,24 +244,24 @@ func (c *Connector) refreshActiveChecks() bool {
 
 	if response.Response != "success" {
 		if !c.firstActiveChecksLog {
-			if len(response.Info) != 0 {
+			if response.Info != "" {
 				log.Errf("[%d] no active checks on server [%s]: %s", c.clientID, c.address.Get(),
 					response.Info)
 			} else {
 				log.Errf("[%d] no active checks on server [%s]", c.clientID, c.address.Get())
 			}
+
 			log.Errf("[%d] active checks on server started to fail", c.clientID)
 			c.firstActiveChecksLog = true
 		}
 		c.taskManager.UpdateTasks(c.clientID, c.resultCache.(resultcache.Writer), c.firstActiveChecksRefreshed,
 			[]*glexpr.Expression{}, []*scheduler.Request{}, now)
 		c.firstActiveChecksRefreshed = true
+
 		return false
-	} else {
-		if c.firstActiveChecksLog {
-			log.Errf("[%d] active checks on server are active again", c.clientID)
-			c.firstActiveChecksLog = false
-		}
+	} else if c.firstActiveChecksLog {
+		log.Errf("[%d] active checks on server are active again", c.clientID)
+		c.firstActiveChecksLog = false
 	}
 
 	if response.HistoryUpload == "disabled" {
@@ -279,45 +281,53 @@ func (c *Connector) refreshActiveChecks() bool {
 		} else {
 			parseSuccess = true
 		}
+
 		return false
 	}
 
 	c.configRevision = response.ConfigRevision
 
 	for i := 0; i < len(response.Data); i++ {
+
 		if len(response.Data[i].Key) == 0 {
 			if response.Data[i].Itemid == 0 {
 				log.Errf("[%d] cannot parse list of active checks from [%s]: key is missing",
 					c.clientID, c.address.Get())
+
 				return false
 			}
 
 			log.Errf("[%d] cannot parse list of active checks from [%s]: key is missing for itemid '%d'",
 				c.clientID, c.address.Get(), response.Data[i].Itemid)
+
 			return false
 		}
 
 		if response.Data[i].Itemid == 0 {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: itemid is missing for key '%s'",
 				c.clientID, c.address.Get(), response.Data[i].Key)
+
 			return false
 		}
 
 		if len(response.Data[i].Delay) == 0 {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: delay is missing for itemid '%d'",
 				c.clientID, c.address.Get(), response.Data[i].Itemid)
+
 			return false
 		}
 
 		if response.Data[i].LastLogsize == nil {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: lastlogsize is missing for itemid '%d'",
 				c.clientID, c.address.Get(), response.Data[i].Itemid)
+
 			return false
 		}
 
 		if response.Data[i].Mtime == nil {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: mtime is missing for itemid '%d'",
 				c.clientID, c.address.Get(), response.Data[i].Itemid)
+
 			return false
 		}
 	}
@@ -326,36 +336,42 @@ func (c *Connector) refreshActiveChecks() bool {
 		if len(response.Expressions[i].Name) == 0 {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "name"`,
 				c.clientID, c.address.Get())
+
 			return false
 		}
 
 		if len(response.Expressions[i].Body) == 0 {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "expression"`,
 				c.clientID, c.address.Get())
+
 			return false
 		}
 
 		if response.Expressions[i].Type == nil {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "expression_type"`,
 				c.clientID, c.address.Get())
+
 			return false
 		}
 
 		if response.Expressions[i].Delimiter == nil {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "exp_delimiter"`,
 				c.clientID, c.address.Get())
+
 			return false
 		}
 
 		if len(*response.Expressions[i].Delimiter) > 1 {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: invalid tag "exp_delimiter" value "%s"`,
 				c.clientID, c.address.Get(), *response.Expressions[i].Delimiter)
+
 			return false
 		}
 
 		if response.Expressions[i].Mode == nil {
 			log.Errf(`[%d] cannot parse list of active checks from [%s]: cannot retrieve value of tag "case_sensitive"`,
 				c.clientID, c.address.Get())
+
 			return false
 		}
 	}
@@ -430,10 +446,13 @@ run:
 				lastFlush = now
 			}
 			if now >= nextRefresh {
-				var ret bool = c.refreshActiveChecks()
-				nextRefresh = time.Now().Unix() + int64(c.options.RefreshActiveChecks)
+				var ret = c.refreshActiveChecks()
+
+				nextRefresh = time.Now().Unix()
 				if !ret {
 					nextRefresh += 60
+				} else {
+					nextRefresh += int64(c.options.RefreshActiveChecks)
 				}
 			}
 			if c.options.HeartbeatFrequency > 0 {
