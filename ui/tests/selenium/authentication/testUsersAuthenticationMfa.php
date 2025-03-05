@@ -584,7 +584,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			}
 
 			$this->page->refresh()->waitUntilReady();
-		} else {
+		}
+		else {
 			// When cancelling in the Method create/edit form, but saving the Authentication configuration.
 			$dialog->query('button:Cancel')->one()->click();
 			$dialog->ensureNotPresent();
@@ -704,7 +705,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			$this->assertMessage(TEST_BAD, 'Invalid MFA configuration', $data['error']);
 			$dialog->close();
 			$dialog->ensureNotPresent();
-		} else {
+		}
+		else {
 			// Open the Method edit form to verify data is still there.
 			$dialog->ensureNotPresent();
 			$this->checkMethodsTableAndMethodForm($mfa_form, $dialog, $fields);
@@ -715,7 +717,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			// If an error is expected only when saving the Authentication configuration.
 			if (CTestArrayHelper::get($data, 'expected_authentication_form', TEST_GOOD) === TEST_BAD) {
 				$this->assertMessage(TEST_BAD, 'Cannot update authentication', $data['error']);
-			} else {
+			}
+			else {
 				// If no error expected, verify the data after saving.
 				$this->page->waitUntilReady();
 				$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
