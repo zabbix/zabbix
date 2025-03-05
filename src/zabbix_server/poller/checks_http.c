@@ -386,8 +386,13 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 			}
 			else
 			{
-				SET_TEXT_RESULT(result, body.data);
-				body.data = NULL;
+				if (NULL != body.data)
+				{
+					SET_TEXT_RESULT(result, body.data);
+					body.data = NULL;
+				}
+				else
+					SET_TEXT_RESULT(result, zbx_strdup(NULL, ""));
 			}
 			break;
 		case ZBX_RETRIEVE_MODE_HEADERS:
@@ -422,8 +427,11 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 			}
 			else
 			{
-				zbx_strncpy_alloc(&header.data, &header.allocated, &header.offset,
+				if (NULL != body.data)
+				{
+					zbx_strncpy_alloc(&header.data, &header.allocated, &header.offset,
 						body.data, body.offset);
+				}
 				SET_TEXT_RESULT(result, header.data);
 				header.data = NULL;
 			}
