@@ -879,7 +879,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 
 		/*
 		 * When updating, the Name field is appended to avoid name conflicts with create scenarios.
-		 * But don't append th when the name is not set or explicitly set to empty.
+		 * But don't append it when the name is not set or explicitly set to empty.
 		 * Also don't append when the flag 'skip_name_append' is set - this is for duplicate name scenarios.
 		 */
 		if ($update && array_key_exists('Name', $fields) && $fields['Name'] !== '' && !$skip_name_append) {
