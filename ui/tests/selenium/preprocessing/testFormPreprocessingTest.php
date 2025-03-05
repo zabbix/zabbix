@@ -22,6 +22,9 @@ require_once dirname(__FILE__).'/../behaviors/CPreprocessingBehavior.php';
  * @backup items
  *
  * @dataSource GlobalMacros
+ *
+ * TODO: remove ignoreBrowserErrors after DEV-4233
+ * @ignoreBrowserErrors
  */
 class testFormPreprocessingTest extends CWebTest {
 

@@ -652,6 +652,9 @@ class testPermissionsWithoutCSRF extends CWebTest {
 	 * Test function for checking the "POST" form, but with the deleted CSRF token element.
 	 *
 	 * @dataProvider getElementRemoveData
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4233
+	 * @ignoreBrowserErrors
 	 */
 	public function testPermissionsWithoutCSRF_ElementRemove($data) {
 		$old_hash = CDBHelper::getHash($data['db']);

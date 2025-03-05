@@ -23,6 +23,9 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  * @backup items
  *
  * @dataSource AllItemValueTypes
+ *
+ * TODO: remove ignoreBrowserErrors after DEV-4233
+ * @ignoreBrowserErrors
  */
 class testItemTypeSelection extends CWebTest {
 

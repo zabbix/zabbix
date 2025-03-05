@@ -277,6 +277,7 @@ typedef struct
 	int				batch_size;
 	/* the last id assigned by autoincrement */
 	zbx_uint64_t			lastid;
+	char				*clause;
 }
 zbx_db_insert_t;
 
@@ -318,6 +319,7 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *db_insert, ...);
 void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *db_insert, zbx_db_value_t **values, int values_num);
 int	zbx_db_insert_execute(zbx_db_insert_t *db_insert);
 void	zbx_db_insert_autoincrement(zbx_db_insert_t *db_insert, const char *field_name);
+void	zbx_db_insert_clause(zbx_db_insert_t *self, const char *clause);
 zbx_uint64_t	zbx_db_insert_get_lastid(zbx_db_insert_t *self);
 void	zbx_db_insert_clean(zbx_db_insert_t *db_insert);
 void	zbx_db_insert_set_batch_size(zbx_db_insert_t *self, int batch_size);
@@ -387,7 +389,8 @@ int	zbx_db_is_null(const char *field);
 char	*zbx_db_get_schema_esc(void);
 #endif
 
-int	zbx_dbconn_execute_overflowed_sql(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset);
+int	zbx_dbconn_execute_overflowed_sql(zbx_dbconn_t *db, char **sql, size_t *sql_alloc, size_t *sql_offset,
+		const char *clause);
 int	zbx_dbconn_flush_overflowed_sql(zbx_dbconn_t *db, char *sql, size_t sql_offset);
 
 const char	*zbx_db_sql_id_ins(zbx_uint64_t id);
