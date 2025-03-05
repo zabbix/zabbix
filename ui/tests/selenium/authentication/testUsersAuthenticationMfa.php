@@ -482,7 +482,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 
 		// Remove the records.
 		$table = $this->selectMethodTable($mfa_form);
-		foreach(['TOTP for deletion', 'Duo for deletion'] as $method_name) {
+		foreach (['TOTP for deletion', 'Duo for deletion'] as $method_name) {
 			$row = $table->findRow('Name', $method_name);
 			$row->query('button:Remove')->one()->click();
 
