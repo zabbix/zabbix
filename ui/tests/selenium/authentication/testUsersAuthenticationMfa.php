@@ -574,8 +574,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		// Two different paths depending on if cancelling inside the MFA method form or Authentication form.
 		if (CTestArrayHelper::get($data, 'save_mfa_method', false)) {
 			// Create/Update the MFA method without cancelling, but reload the Authentication page without saving.
-			$button = $update ? 'Update' : 'Add';
-			$dialog->query('button', $button)->one()->click();
+			$dialog_form->submit();
 
 			// In case of update a warning popup might appear.
 			if ($update && $this->page->isAlertPresent()) {
@@ -691,8 +690,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			$dialog_form->fill(['Client secret' => $secret]);
 		}
 
-		$button = $update ? 'Update' : 'Add';
-		$dialog->query('button', $button)->one()->click();
+		$dialog_form->submit();
 
 		// In the case of update, a warning popup might appear.
 		if ($update && $this->page->isAlertPresent()) {
