@@ -332,7 +332,6 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	 */
 	public function testUsersAuthenticationMfa_SimpleUpdate($data) {
 		$mfa_form = $this->openMfaForm();
-		$mfa_form->fill(['Enable multi-factor authentication' => true]);
 
 		// For assertions later.
 		$hash_before = CDBHelper::getHash(self::HASH_SQL);
@@ -384,7 +383,6 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	 */
 	public function testUsersAuthenticationMfa_SaveEmpty() {
 		$mfa_form = $this->openMfaForm();
-		$mfa_form->fill(['Enable multi-factor authentication' => true]);
 		$mfa_form->query('button:Update')->one()->click();
 		$this->assertMessage(TEST_BAD, 'Cannot update authentication', 'Default MFA method must be specified.');
 	}
@@ -478,7 +476,6 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$this->assertEquals(2, CDBHelper::getCount($sql_specific));
 
 		$mfa_form = $this->openMfaForm();
-		$mfa_form->fill(['Enable multi-factor authentication' => true]);
 
 		// Remove the records.
 		$table = $this->selectMethodTable($mfa_form);
@@ -556,7 +553,6 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	 */
 	public function testUsersAuthenticationMfa_Cancel($data) {
 		$mfa_form = $this->openMfaForm();
-		$mfa_form->fill(['Enable multi-factor authentication' => true]);
 
 		// Save the starting state for assertions later.
 		$hash_before = CDBHelper::getHash(self::HASH_SQL);
@@ -643,7 +639,6 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	 */
 	public function testUsersAuthenticationMfa_Default() {
 		$mfa_form = $this->openMfaForm();
-		$mfa_form->fill(['Enable multi-factor authentication' => true]);
 		$table = $this->selectMethodTable($mfa_form);
 
 		// Detect which method is currently set as the default.
@@ -672,7 +667,6 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	 */
 	protected function testCreateUpdate($data, $update) {
 		$mfa_form = $this->openMfaForm();
-		$mfa_form->fill(['Enable multi-factor authentication' => true]);
 
 		// Open the correct MFA method form.
 		$mfa_type = CTestArrayHelper::get($data, 'fields.Type', 'TOTP');
@@ -905,6 +899,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$form = $this->query('id:authentication-form')->asForm()->one();
 		$form->selectTab('MFA settings');
+		$form->fill(['Enable multi-factor authentication' => true]);
 		return $form;
 	}
 
