@@ -296,7 +296,7 @@ static unsigned long	compute_match_recursion_limit(void)
 #define WIN_DEFAULT_MATCH_RECURSION_LIMIT	1000
 #define WIN_ASSUMED_BYTES_PER_RECURSION		800
 	typedef void (WINAPI *GetCurrentThreadStackLimits)(PULONG_PTR, PULONG_PTR);
-	ZBX_THREAD_LOCAL static GetCurrentThreadStackLimits	get_stack_limits;
+	static ZBX_THREAD_LOCAL GetCurrentThreadStackLimits	get_stack_limits;
 
 	if (NULL == get_stack_limits)
 	{
