@@ -1164,6 +1164,9 @@ footer {
       line-height: inherit; }
     .form-grid table td.sortable-item.wordbreak, .form-grid table td.sortable-item.wordwrap {
       line-height: 1.4em; }
+    .form-grid table .dynamic-row-control > td {
+      padding-bottom: 0;
+      line-height: 1.4; }
   .form-grid th {
     padding: 0 5px 0 0;
     color: #333333; }
@@ -4029,19 +4032,19 @@ z-select {
       background-color: #ffffff;
       border-color: #888888;
       box-shadow: none; }
-    .z-select .focusable.red, .z-select .focusable.red.link-action:not(:hover):not(:focus), .z-select .focusable.red.link-alt:not(:hover):not(:focus),
-    z-select .focusable.red,
-    z-select .focusable.red.btn-icon:not([disabled]),
-    z-select .focusable.red.btn-link:not([disabled]),
-    z-select .focusable.red.link-action:not(:hover):not(:focus),
-    z-select .focusable.red.link-alt:not(:hover):not(:focus) {
+    .z-select .focusable.color-negative, .z-select .focusable.color-negative.link-action:not(:hover):not(:focus), .z-select .focusable.color-negative.link-alt:not(:hover):not(:focus),
+    z-select .focusable.color-negative,
+    z-select .focusable.color-negative.btn-icon:not([disabled]),
+    z-select .focusable.color-negative.btn-link:not([disabled]),
+    z-select .focusable.color-negative.link-action:not(:hover):not(:focus),
+    z-select .focusable.color-negative.link-alt:not(:hover):not(:focus) {
       color: #990000; }
-      .z-select .focusable.red::after, .z-select .focusable.red.link-action:not(:focus):not(:hover)::after, .z-select .focusable.red.link-alt:not(:focus):not(:hover)::after,
-      z-select .focusable.red::after,
-      z-select .focusable.red.btn-icon:not([disabled])::after,
-      z-select .focusable.red.btn-link:not([disabled])::after,
-      z-select .focusable.red.link-action:not(:focus):not(:hover)::after,
-      z-select .focusable.red.link-alt:not(:focus):not(:hover)::after {
+      .z-select .focusable.color-negative::after, .z-select .focusable.color-negative.link-action:not(:focus):not(:hover)::after, .z-select .focusable.color-negative.link-alt:not(:focus):not(:hover)::after,
+      z-select .focusable.color-negative::after,
+      z-select .focusable.color-negative.btn-icon:not([disabled])::after,
+      z-select .focusable.color-negative.btn-link:not([disabled])::after,
+      z-select .focusable.color-negative.link-action:not(:focus):not(:hover)::after,
+      z-select .focusable.color-negative.link-alt:not(:focus):not(:hover)::after {
         color: #000000; }
   .z-select .list,
   z-select .list {
@@ -4072,12 +4075,12 @@ z-select {
       .z-select .list li.hover,
       z-select .list li.hover {
         background-color: #f4f4f4; }
-      .z-select .list li.red, .z-select .list li.red.link-action:not(:hover):not(:focus), .z-select .list li.red.link-alt:not(:hover):not(:focus),
-      z-select .list li.red,
-      z-select .list li.red.btn-icon:not([disabled]),
-      z-select .list li.red.btn-link:not([disabled]),
-      z-select .list li.red.link-action:not(:hover):not(:focus),
-      z-select .list li.red.link-alt:not(:hover):not(:focus) {
+      .z-select .list li.color-negative, .z-select .list li.color-negative.link-action:not(:hover):not(:focus), .z-select .list li.color-negative.link-alt:not(:hover):not(:focus),
+      z-select .list li.color-negative,
+      z-select .list li.color-negative.btn-icon:not([disabled]),
+      z-select .list li.color-negative.btn-link:not([disabled]),
+      z-select .list li.color-negative.link-action:not(:hover):not(:focus),
+      z-select .list li.color-negative.link-alt:not(:hover):not(:focus) {
         color: #990000; }
       .z-select .list li[disabled],
       z-select .list li[disabled] {
@@ -5828,11 +5831,6 @@ form.is-loading {
     margin-bottom: -5px; }
   .table-forms .hor-list li {
     display: inline-block; }
-  .table-forms .dynamic-row > td {
-    padding-top: 0; }
-  .table-forms .dynamic-row-control > td {
-    padding-top: 0;
-    padding-bottom: 0; }
   .table-forms .btn-icon:not(:first-child),
   .table-forms .icon:not(:first-child) {
     margin-left: 5px; }
