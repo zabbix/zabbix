@@ -35,6 +35,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		'Login blocking interval' => '30s',
 		// Storage of secrets
 		'Vault provider' => 'HashiCorp Vault',
+		'Resolve secret vault macros by' => 'Zabbix server',
 		// Security.
 		'id:validate_uri_schemes' => true,
 		'id:uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh',
@@ -55,6 +56,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		'login_block' => '30s',
 		// Storage of secrets
 		'vault_provider' => 0,
+		'proxy_secrets_provider' => 0,
 		// Security.
 		'validate_uri_schemes' => 1,
 		'uri_valid_schemes' => 'http,https,ftp,file,mailto,tel,ssh',
@@ -74,6 +76,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		'Login blocking interval' => '52s',
 		// Storage of secrets
 		'Vault provider' => 'CyberArk Vault',
+		'Resolve secret vault macros by' => 'Zabbix server and proxy',
 		// Security.
 		'id:validate_uri_schemes' => true,
 		'id:uri_valid_schemes' => 'custom_scheme',
@@ -84,59 +87,77 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 	];
 
 	/**
-	 * Test for checking form layout.
+	 * Label data for layout checks.
 	 */
-	public function testFormAdministrationGeneralOtherParams_CheckLayout() {
+	public function getLableData() {
+		return [
+			[
+				[
+					'headers' => ['Authorization', 'Storage of secrets', 'Security'],
+					'limits' => [
+						'url' => 2048,
+						'login_attempts' => 2,
+						'login_block' => 32,
+						'uri_valid_schemes' => 255,
+						'x_frame_options' => 255,
+						'iframe_sandboxing_exceptions' => 255
+					],
+					'checkboxes' => ['snmptrap_logging', 'validate_uri_schemes', 'x_frame_header_enabled', 'iframe_sandboxing_enabled'],
+					'checkbox_fields' => ['uri_valid_schemes','iframe_sandboxing_exceptions', 'x_frame_options'],
+					'hintboxes' => [
+						'Resolve secret vault macros by' => 'Zabbix server: secrets are retrieved from Vault by '.
+								'Zabbix server and forwarded to proxies when needed.'."\n".
+								'Zabbix server and proxy: secrets are retrieved from Vault by both Zabbix server '.
+								'and proxies, allowing them to resolve macros independently.',
+						'Use X-Frame-Options HTTP header' => 'X-Frame-Options HTTP header supported values:'."\n".
+								'SAMEORIGIN or \'self\' - allows the page to be displayed only in a frame on the '.
+								'same origin as the page itself'."\n".
+								'DENY or \'none\' - prevents the page from being displayed in a frame, regardless of '.
+								'the site attempting to do so'."\n".'a string of space-separated hostnames; adding '.
+								'\'self\' to the list allows the page to '.
+								'be displayed in a frame on the same origin as the page itself'."\n".
+								"\n".
+								'Note that \'self\' or \'none\' will be regarded as hostnames if used without single quotes.'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test for checking form layout.
+	 *
+	 * @dataProvider getLableData
+	 */
+	public function testFormAdministrationGeneralOtherParams_CheckLayout($data) {
 		$this->page->login()->open($this->config_link);
 		$this->page->assertTitle('Other configuration parameters');
 		$this->page->assertHeader('Other configuration parameters');
 		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 
-		foreach (['Authorization', 'Security'] as $header) {
+		foreach ($data['headers'] as $header) {
 			$this->assertTrue($this->query('xpath://h4[text()="'.$header.'"]')->one()->isVisible());
 		}
 
-		$limits = [
-			'url' => 2048,
-			'login_attempts' => 2,
-			'login_block' => 32,
-			'uri_valid_schemes' => 255,
-			'x_frame_options' => 255,
-			'iframe_sandboxing_exceptions' => 255
-		];
-		foreach ($limits as $id => $limit) {
+		foreach ($data['limits'] as $id => $limit) {
 			$this->assertEquals($limit, $this->query('id', $id)->one()->getAttribute('maxlength'));
 		}
 
 		foreach ([true, false] as $status) {
-			$checkboxes = [
-				'snmptrap_logging',
-				'validate_uri_schemes',
-				'x_frame_header_enabled',
-				'iframe_sandboxing_enabled'
-			];
-			foreach ($checkboxes as $checkbox) {
+			foreach ($data['checkboxes'] as $checkbox) {
 				$form->getField('id:'.$checkbox)->fill($status);
 			}
-
-			foreach (['uri_valid_schemes','iframe_sandboxing_exceptions', 'x_frame_options'] as $input) {
+			foreach ($data['checkbox_fields'] as $input) {
 				$this->assertTrue($this->query('id', $input)->one()->isEnabled($status));
 			}
 		}
 
-		// Check X-Frame-Options hintbox.
-		$form->getLabel('Use X-Frame-Options HTTP header')->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
-		$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
-
-		$hint_text = "X-Frame-Options HTTP header supported values:\n".
-				"SAMEORIGIN or 'self' - allows the page to be displayed only in a frame on the same origin as the page itself\n".
-				"DENY or 'none' - prevents the page from being displayed in a frame, regardless of the site attempting to do so\n".
-				"a string of space-separated hostnames; adding 'self' to the list allows the page to be displayed in a frame on the same origin as the page itself\n".
-				"\n".
-				"Note that 'self' or 'none' will be regarded as hostnames if used without single quotes.";
-
-		$this->assertEquals($hint_text, $hint->getText());
-		$hint->close();
+		foreach ($data['hintboxes'] as $label => $hint_text) {
+			$form->getLabel($label)->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
+			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
+			$this->assertEquals($hint_text, $hint->getText());
+			$hint->close();
+		}
 
 		foreach (['Update', 'Reset defaults'] as $button) {
 			$this->assertTrue($this->query('button', $button)->one()->isEnabled());
@@ -174,6 +195,9 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						// Authorization.
 						'Login attempts' => 1,
 						'Login blocking interval' => '30s',
+						// Storage of secrets.
+						'Vault provider' => 'CyberArk Vault',
+						'Resolve secret vault macros by' => 'Zabbix server and proxy',
 						// Security.
 						'id:validate_uri_schemes' => false,
 						'id:x_frame_header_enabled' => true,
@@ -189,6 +213,9 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						// Authorization.
 						'login_attempts' => 1,
 						'login_block' => '30s',
+						// Storage of secrets.
+						'vault_provider' => 1,
+						'proxy_secrets_provider' => 1,
 						// Security.
 						'validate_uri_schemes' => 0,
 						'x_frame_options' => 'X',
@@ -357,7 +384,10 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 					'fields' => [
 						// Authorization.
 						'Login attempts' => 'text',
-						'Login blocking interval' => 'text'
+						'Login blocking interval' => 'text',
+						// Storage of secrets.
+						'Vault provider' => 'CyberArk Vault',
+						'Resolve secret vault macros by' => 'Zabbix server and proxy',
 					],
 					'details' => [
 						'Incorrect value for field "login_attempts": value must be no less than "1".',
