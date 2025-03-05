@@ -93,6 +93,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		return [
 			[
 				[
+					'title' => 'Other configuration parameters',
 					'headers' => ['Authorization', 'Storage of secrets', 'Security'],
 					'limits' => [
 						'url' => 2048,
@@ -118,7 +119,8 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 								'be displayed in a frame on the same origin as the page itself'."\n".
 								"\n".
 								'Note that \'self\' or \'none\' will be regarded as hostnames if used without single quotes.'
-					]
+					],
+					'buttons' => ['Update', 'Reset defaults']
 				]
 			]
 		];
@@ -131,8 +133,8 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 	 */
 	public function testFormAdministrationGeneralOtherParams_CheckLayout($data) {
 		$this->page->login()->open($this->config_link);
-		$this->page->assertTitle('Other configuration parameters');
-		$this->page->assertHeader('Other configuration parameters');
+		$this->page->assertTitle($data['title']);
+		$this->page->assertHeader($data['title']);
 		$form = $this->query($this->form_selector)->waitUntilReady()->asForm()->one();
 
 		foreach ($data['headers'] as $header) {
@@ -159,7 +161,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 			$hint->close();
 		}
 
-		foreach (['Update', 'Reset defaults'] as $button) {
+		foreach ($data['buttons'] as $button) {
 			$this->assertTrue($this->query('button', $button)->one()->isEnabled());
 		}
 	}
@@ -295,10 +297,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 								' SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN'.
 								' SAMEORIGIN SAMEORIGIN SAMEORIGIN SA',
 						'id:iframe_sandboxing_enabled' => true,
-						'id:iframe_sandboxing_exceptions' => 'some-new-flag-some-new-flag-some-new-flag-some-new-'.
-								'flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-'.
-								'flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-'.
-								'flag-some-new-flag-some-new-flag-som'
+						'id:iframe_sandboxing_exceptions' => STRING_255
 					],
 					'db' => [
 						// Authorization.
@@ -315,10 +314,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 								' SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN SAMEORIGIN'.
 								' SAMEORIGIN SAMEORIGIN SAMEORIGIN SA',
 						'iframe_sandboxing_enabled' => 1,
-						'iframe_sandboxing_exceptions' => 'some-new-flag-some-new-flag-some-new-flag-some-new-flag-'.
-								'some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-'.
-								'flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-new-flag-some-'.
-								'new-flag-some-new-flag-some-new-flag-som'
+						'iframe_sandboxing_exceptions' => STRING_255
 					]
 				]
 			],
