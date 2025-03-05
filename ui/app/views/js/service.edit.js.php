@@ -18,20 +18,20 @@
 window.service_edit_popup = new class {
 
 	init({rules, tabs_id, serviceid, children, children_problem_tags_html, problem_tags, status_rules, search_limit}) {
-		this.#initTemplates();
 		this.serviceid = serviceid;
-
 		this.search_limit = search_limit;
-
 		this.overlay = overlays_stack.getById('service.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
 		this.footer = this.overlay.$dialogue.$footer[0];
+		this.status_rules = status_rules;
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'service.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
+
+		this.#initTemplates();
 
 		for (const status_rule of status_rules) {
 			this.#addStatusRule(status_rule);
@@ -77,7 +77,7 @@ window.service_edit_popup = new class {
 			}
 		});
 
-		document.getElementById('problem_tags').addEventListener('change', () => this.#update());
+		table.addEventListener('change', () => this.#update());
 
 		// Setup service rules.
 
@@ -167,27 +167,8 @@ window.service_edit_popup = new class {
 	}
 
 	#initTemplates() {
-		this.status_rule_template = new Template(`
-			<tr data-row_index="#{row_index}">
-				<td>
-					#{*name}
-					<input type="hidden" id="status_rules_#{row_index}_new_status" name="status_rules[#{row_index}][new_status]" value="#{new_status}">
-					<input type="hidden" id="status_rules_#{row_index}_type" name="status_rules[#{row_index}][type]" value="#{type}">
-					<input type="hidden" id="status_rules_#{row_index}_limit_value" name="status_rules[#{row_index}][limit_value]" value="#{limit_value}">
-					<input type="hidden" id="status_rules_#{row_index}_limit_status" name="status_rules[#{row_index}][limit_status]" value="#{limit_status}">
-				</td>
-				<td>
-					<ul class="<?= ZBX_STYLE_HOR_LIST ?>">
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-edit"><?= _('Edit') ?></button>
-						</li>
-						<li>
-							<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-						</li>
-					</ul>
-				</td>
-			</tr>
-		`);
+		this.status_rule_template = new Template(this.form_element.querySelector('#status-rule-tmpl').innerHTML);
+		//this.child_template = new Template(this.form_element.querySelector('#child-service-tmpl').innerHTML);
 
 		this.child_template = new Template(`
 			<tr data-serviceid="#{serviceid}">
@@ -467,6 +448,12 @@ window.service_edit_popup = new class {
 		}
 
 		if ('problem_tags' in fields) {
+			for (const key in fields.problem_tags) {
+				if (fields.problem_tags[key].tag === null) {
+					delete fields.problem_tags[key];
+				}
+			}
+
 			for (const problem_tag of Object.values(fields.problem_tags)) {
 				problem_tag.tag = problem_tag.tag.trim();
 				problem_tag.value = problem_tag.value.trim();
@@ -488,9 +475,8 @@ window.service_edit_popup = new class {
 
 				this.#post(curl.getUrl(), fields, (response) => {
 					if ('form_errors' in response) {
-						this.form.renderErrors(response.form_errors, true, true);
-
-						return;
+						this.form.setErrors(response.form_errors, true, true);
+						this.form.renderErrors();
 					}
 					else if ('error' in response) {
 						throw {error: response.error};

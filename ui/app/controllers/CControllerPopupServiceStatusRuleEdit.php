@@ -16,31 +16,35 @@
 
 class CControllerPopupServiceStatusRuleEdit extends CController {
 
-	protected function init() {
+	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput(): bool {
-		$fields = [
-			'form_refresh' => 	'int32',
-			'edit' => 			'in 1',
-			'row_index' =>		'required|int32',
-			'new_status' =>		'in '.implode(',', array_keys(CServiceHelper::getProblemStatusNames())),
-			'type' =>			'in '.implode(',', array_keys(CServiceHelper::getStatusRuleTypeOptions())),
-			'limit_value' =>	'int32',
-			'limit_status' =>	'in '.implode(',', array_keys(CServiceHelper::getStatusNames()))
-		];
+	private static function getValidationRules(): array {
+		return ['objects', 'fields' => [
+			'form_refresh' => ['integer', 'in' => ['0', '1']],
+			'edit' => ['integer', 'in 1'],
+			'row_index' => ['integer', 'required'],
+			'new_status' => ['integer', 'in' => array_keys(CServiceHelper::getProblemStatusNames())],
+			'type' => ['integer', 'in' => array_keys(CServiceHelper::getStatusRuleTypeOptions())],
+			'limit_value' => ['integer'],
+			'limit_status' => ['integer', 'in' => array_keys(CServiceHelper::getStatusNames())]
+		]];
+	}
 
-		$ret = $this->validateInput($fields);
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])]))->disableView()
-			);
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
+			(new CControllerResponseData(['main_block' => json_encode($response)]))->disableView();
 		}
 
 		return $ret;
@@ -64,7 +68,10 @@ class CControllerPopupServiceStatusRuleEdit extends CController {
 			'form' => $form,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'js_validation_rules' => (new CFormValidator(
+				CControllerServiceStatusRuleValidate::getValidationRules())
+			)->getRules()
 		];
 
 		$this->setResponse(new CControllerResponseData($data));

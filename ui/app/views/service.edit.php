@@ -172,6 +172,55 @@ $additional_rules->addItem(
 		)
 );
 
+$additional_rules_row = (new CTemplateTag('status-rule-tmpl'))->addItem([
+	(new CRow([
+		new CCol([
+			new CSpan('#{*name}'),
+			(new CInput('hidden'))
+				->setId('status_rules_#{row_index}_new_status')
+				->setAttribute('name', 'status_rules[#{row_index}][new_status]')
+				->setAttribute('value', '#{new_status}')
+				->setAttribute('data-field-type', 'hidden'),
+			(new CInput('hidden'))
+				->setId('status_rules_#{row_index}_type')
+				->setAttribute('name', 'status_rules[#{row_index}][type]')
+				->setAttribute('value', '#{type}')
+				->setAttribute('data-field-type', 'hidden')
+				->setErrorContainer('additional_rules_error_container_#{row_index}'),
+			(new CInput('hidden'))
+				->setId('status_rules_#{row_index}_limit_value')
+				->setAttribute('name', 'status_rules[#{row_index}][limit_value]')
+				->setAttribute('value', '#{limit_value}')
+				->setAttribute('data-field-type', 'hidden')
+				->setErrorContainer('additional_rules_error_container_#{row_index}'),
+			(new CInput('hidden'))
+				->setId('status_rules_#{row_index}_limit_status')
+				->setAttribute('name', 'status_rules[#{row_index}][limit_status]')
+				->setAttribute('value', '#{limit_status}')
+				->setAttribute('data-field-type', 'hidden')
+				->setErrorContainer('additional_rules_error_container_#{row_index}')
+		]),
+		new CCol([
+			(new CList([
+				(new CButton('edit', _('Edit')))
+					->addClass('js-edit')
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->removeId(),
+				(new CButton('remove', _('Remove')))
+					->addClass('js-remove')
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->removeId()
+			]))->addClass(ZBX_STYLE_HOR_LIST)
+		])
+	]))->setAttribute('data-row_index', '#{row_index}'),
+	(new CRow([
+		(new CCol())
+			->setId('additional_rules_error_container_#{row_index}')
+			->addClass(ZBX_STYLE_ERROR_CONTAINER)
+			->setColSpan(4)
+	]))->addClass('error-container-row')
+]);
+
 $propagation_value_number = (new CRadioButtonList('propagation_value_number',
 	$data['form']['propagation_value_number'] !== null ? (int) $data['form']['propagation_value_number'] : null
 ))
@@ -191,13 +240,17 @@ $service_tab->addItem(
 		->setId('advanced-configuration')
 		->addItem([
 			new CLabel(_('Additional rules')),
-			(new CFormField(
+			(new CFormField([
 				(new CDiv($additional_rules))
 					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->addStyle('min-width: '.(ZBX_TEXTAREA_BIG_WIDTH - 27).'px;')
-			))
-				->setAttribute('data-field-type', 'set')
-				->setAttribute('data-field-name', 'additional_rules')
+					->addStyle('min-width: '.(ZBX_TEXTAREA_BIG_WIDTH - 27).'px;')
+					->setAttribute('data-field-type', 'set')
+					->setAttribute('data-field-name', 'status_rules'),
+				(new CDiv())
+					->setId('status_rules_error_container')
+					->addClass(ZBX_STYLE_ERROR_CONTAINER),
+				$additional_rules_row
+			]))
 		])
 		->addItem([
 			new CLabel(_('Status propagation rule'), 'propagation_rule_focusable'),
