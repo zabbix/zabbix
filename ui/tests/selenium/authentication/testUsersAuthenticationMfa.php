@@ -935,7 +935,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 	 * @return string
 	 */
 	protected function getDefaultMethodName($table) {
-		return $table->query("xpath:.//tr[.//input[@type='radio' and @checked]]")->one()->asTableRow()
+		return $table->query('xpath:.//tr[.//input[@type="radio" and @checked]]')->one()->asTableRow()
 				->getColumn('Name')->getText();
 	}
 }
