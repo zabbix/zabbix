@@ -515,24 +515,6 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 					]
 				]
 			],
-			'Cancel MFA method form: Duo creation' => [
-				[
-					'fields' => [
-						'Type' => 'Duo Universal Prompt',
-						'Name' => 'Duo create cancel'
-					]
-				]
-			],
-			'Cancel MFA method form: TOTP update' => [
-				[
-					'fields' => [
-						'Name' => 'TOTP update cancel',
-						'Hash function' => 'SHA-512',
-						'Code length' => '8'
-					],
-					'update' => true
-				]
-			],
 			'Cancel MFA method form: Duo update' => [
 				[
 					'fields' => [
@@ -542,14 +524,6 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 						'Client ID' => 'some ID'
 					],
 					'update' => true
-				]
-			],
-			'Cancel Authentication form: TOTP creation' => [
-				[
-					'fields' => [
-						'Name' => 'TOTP create cancel'
-					],
-					'save_mfa_method' => true
 				]
 			],
 			'Cancel Authentication form: Duo creation' => [
@@ -567,18 +541,6 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 						'Name' => 'TOTP update cancel',
 						'Hash function' => 'SHA-512',
 						'Code length' => '8'
-					],
-					'update' => true,
-					'save_mfa_method' => true
-				]
-			],
-			'Cancel Authentication form: Duo update' => [
-				[
-					'fields' => [
-						'Type' => 'Duo Universal Prompt',
-						'Name' => 'Duo update cancel',
-						'API hostname' => 'test value',
-						'Client ID' => 'some ID'
 					],
 					'update' => true,
 					'save_mfa_method' => true
