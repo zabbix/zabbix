@@ -5815,6 +5815,114 @@ static void	lld_interfaces_validate(zbx_vector_lld_host_ptr_t *hosts, char **err
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+typedef struct
+{
+	zbx_lld_host_t	*host;
+}
+zbx_lld_host_ref_t;
+
+static zbx_hash_t	lld_host_ref_hash(const void *d)
+{
+	const zbx_lld_host_ref_t        *ref = (const zbx_lld_host_ref_t *)d;
+
+	return ZBX_DEFAULT_UINT64_HASH_FUNC(&ref->host->hostid);
+}
+
+static int	lld_host_ref_compare(const void *d1, const void *d2)
+{
+	const zbx_lld_host_ref_t        *ref1 = (const zbx_lld_host_ref_t *)d1;
+	const zbx_lld_host_ref_t        *ref2 = (const zbx_lld_host_ref_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(ref1->host->hostid, ref2->host->hostid);
+
+	return 0;
+}
+
+static void	lld_host_sync_macros(zbx_hashset_t *host_refs, zbx_uint64_t hostid, const zbx_vector_uint64_t *ruleids)
+{
+	zbx_lld_host_t		host;
+	zbx_lld_host_ref_t	*ref, ref_local = {.host = &host};
+
+	ref_local.host->hostid = hostid;
+
+	if (NULL != (ref = (zbx_lld_host_ref_t *)zbx_hashset_search(host_refs, &ref_local)))
+		lld_sync_exported_macros(ruleids, ref->host->data);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: export LLD macros for discovered host LLD rules                   *
+ *                                                                            *
+ * Parameters: hosts - [IN] vector of discovered hosts                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_host_export_lld_macros(const zbx_vector_lld_host_ptr_t *hosts)
+{
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
+	zbx_vector_uint64_t	hostids, ruleids;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_uint64_t		last_hostid = 0;
+	zbx_hashset_t		host_refs;
+
+	zbx_vector_uint64_create(&hostids);
+	zbx_vector_uint64_create(&ruleids);
+
+	zbx_hashset_create(&host_refs, (size_t)hosts->values_num, lld_host_ref_hash, lld_host_ref_compare);
+
+	for (int i = 0; i < hosts->values_num; i++)
+	{
+		zbx_lld_host_ref_t	ref_local;
+
+		if (0 == (hosts->values[i]->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
+			continue;
+
+		zbx_vector_uint64_append(&hostids, hosts->values[i]->hostid);
+
+		ref_local.host = hosts->values[i];
+		zbx_hashset_insert(&host_refs, &ref_local, sizeof(ref_local));
+	}
+
+	zbx_vector_uint64_sort(&hostids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select hostid,itemid from items where flags=%d and",
+			ZBX_FLAG_DISCOVERY_RULE);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids.values, hostids.values_num);
+
+	result = zbx_db_select("%s", sql);
+	zbx_free(sql);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	ruleid, hostid;
+
+		ZBX_STR2UINT64(hostid, row[0]);
+
+		if (hostid != last_hostid)
+		{
+			if (0 != ruleids.values_num)
+			{
+				lld_host_sync_macros(&host_refs, last_hostid, &ruleids);
+				zbx_vector_uint64_clear(&ruleids);
+			}
+
+			last_hostid = hostid;
+		}
+
+		ZBX_STR2UINT64(ruleid, row[1]);
+		zbx_vector_uint64_append(&ruleids, ruleid);
+	}
+	zbx_db_free_result(result);
+
+	if (0 != ruleids.values_num)
+		lld_host_sync_macros(&host_refs, last_hostid, &ruleids);
+
+	zbx_hashset_destroy(&host_refs);
+	zbx_vector_uint64_destroy(&ruleids);
+	zbx_vector_uint64_destroy(&hostids);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: adds or updates LLD hosts                                         *
@@ -6006,6 +6114,8 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *l
 
 		/* linking of the templates */
 		lld_templates_link(&hosts, error);
+
+		lld_host_export_lld_macros(&hosts);
 
 		lld_hosts_remove(&hosts, lifetime, enabled_lifetime, lastcheck);
 		lld_groups_remove(&groups_out, lifetime, lastcheck);

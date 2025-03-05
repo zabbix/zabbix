@@ -1116,6 +1116,7 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 	zbx_dc_um_handle_t		*um_handle;
 	zbx_vector_lld_override_ptr_t	overrides;
 	zbx_vector_lld_row_ptr_t	lld_rows;
+	zbx_vector_lld_macro_t		exported_macros;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64, __func__, item->itemid);
 
@@ -1125,8 +1126,9 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 	zbx_vector_lld_row_ptr_create(&lld_rows);
 	zbx_vector_lld_override_ptr_create(&overrides);
 
-	lld_filter_init(&filter);
+	zbx_vector_lld_macro_create(&exported_macros);
 
+	lld_filter_init(&filter);
 
 	result = zbx_db_select(
 			"select hostid,key_,evaltype,formula,lifetime_type,lifetime,enabled_lifetime_type,"
@@ -1161,9 +1163,12 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 		goto out;
 	}
 
-
 	if (SUCCEED != (ret = lld_overrides_load(&overrides, item, error)))
 		goto out;
+
+	lld_rule_get_exported_macros(item->itemid, &exported_macros);
+	for (int i = 0; i < lld_entries->values_num; i++)
+		lld_entries->values[i]->exported_macros = &exported_macros;
 
 	if (SUCCEED != lld_rows_get(lld_entries, &filter, &lld_rows, &overrides, &info))
 	{
@@ -1212,6 +1217,14 @@ out:
 	zbx_free(discovery_key);
 
 	lld_filter_clean(&filter);
+
+	for (int i = 0; i < lld_entries->values_num; i++)
+		lld_entries->values[i]->exported_macros = NULL;
+
+	for (int i = 0; i < exported_macros.values_num; i++)
+		lld_macro_clear(&exported_macros.values[i]);
+
+	zbx_vector_lld_macro_destroy(&exported_macros);
 
 	zbx_vector_lld_override_ptr_clear_ext(&overrides, lld_override_free);
 	zbx_vector_lld_override_ptr_destroy(&overrides);

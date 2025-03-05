@@ -36,7 +36,8 @@ static void	mock_clear_zbx_vector_lld_macro(zbx_vector_lld_macro_t *v);
 static void	mock_clear_zbx_lld_ext_macro(zbx_lld_ext_macro_t *v);
 static void	mock_clear_zbx_lld_macro(zbx_lld_macro_t *v);
 
-static void	mock_assert_eq_zbx_vector_lld_ext_macro(const char *prefix, zbx_vector_lld_ext_macro_t *v1, zbx_vector_lld_ext_macro_t *v2);
+static void	mock_assert_eq_zbx_vector_lld_ext_macro(const char *prefix, zbx_vector_lld_ext_macro_t *v1,
+		zbx_vector_lld_ext_macro_t *v2);
 static void	mock_assert_eq_zbx_lld_ext_macro(const char *prefix, zbx_lld_ext_macro_t *v1, zbx_lld_ext_macro_t *v2);
 
 static void	mock_dump_zbx_vector_lld_ext_macro(const char *name, zbx_vector_lld_ext_macro_t *v, int indent);
@@ -139,7 +140,8 @@ static void	mock_clear_zbx_lld_macro(zbx_lld_macro_t *v)
 	mock_clear_char_ptr(&v->value);
 }
 
-static void	mock_assert_eq_zbx_vector_lld_ext_macro(const char *prefix, zbx_vector_lld_ext_macro_t *v1, zbx_vector_lld_ext_macro_t *v2)
+static void	mock_assert_eq_zbx_vector_lld_ext_macro(const char *prefix, zbx_vector_lld_ext_macro_t *v1,
+		zbx_vector_lld_ext_macro_t *v2)
 {
 	char	buf[MAX_STRING_LEN];
 

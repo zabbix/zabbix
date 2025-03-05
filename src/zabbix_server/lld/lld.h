@@ -114,6 +114,7 @@ ZBX_VECTOR_DECL(lld_macro, zbx_lld_macro_t)
 typedef struct
 {
 	zbx_vector_lld_macro_t	macros;
+	zbx_vector_lld_macro_t	*exported_macros;
 }
 zbx_lld_entry_t;
 
@@ -132,6 +133,8 @@ void	lld_free_entries(zbx_hashset_t *entries);
 int	lld_compare_entries(const zbx_hashset_t *entries1, const zbx_hashset_t *entries2);
 
 int	lld_macro_value_by_name(const zbx_lld_entry_t *lld_obj, const char *macro, char **value);
+void	lld_macro_clear(zbx_lld_macro_t *macro);
+int	lld_macro_compare(const void *d1, const void *d2);
 
 /* lld rule lifetime */
 typedef struct
@@ -522,5 +525,8 @@ typedef struct
 zbx_lld_ext_macro_t;
 
 ZBX_VECTOR_DECL(lld_ext_macro, zbx_lld_ext_macro_t)
+
+void	lld_sync_exported_macros(const zbx_vector_uint64_t *ruleids, const zbx_lld_entry_t *entry);
+void	lld_rule_get_exported_macros(zbx_uint64_t ruleid, zbx_vector_lld_macro_t *macros);
 
 #endif

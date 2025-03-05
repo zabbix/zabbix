@@ -21,13 +21,13 @@
 
 ZBX_VECTOR_IMPL(lld_macro, zbx_lld_macro_t)
 
-static void	lld_macro_clear(zbx_lld_macro_t *macro)
+void	lld_macro_clear(zbx_lld_macro_t *macro)
 {
 	zbx_free(macro->macro);
 	zbx_free(macro->value);
 }
 
-static int	lld_macro_compare(const void *d1, const void *d2)
+int	lld_macro_compare(const void *d1, const void *d2)
 {
 	const zbx_lld_macro_t	*m1 = (const zbx_lld_macro_t *)d1;
 	const zbx_lld_macro_t	*m2 = (const zbx_lld_macro_t *)d2;
@@ -85,6 +85,8 @@ static void	lld_entry_create(zbx_lld_entry_t *entry, const zbx_jsonobj_t *obj,
 		const zbx_vector_lld_macro_path_ptr_t *lld_macro_paths)
 {
 	size_t	size;
+
+	entry->exported_macros = NULL;
 
 	if (0 < lld_macro_paths->values_num)
 		size = (size_t)lld_macro_paths->values_num;
@@ -169,10 +171,16 @@ const char        *lld_entry_get_macro(const zbx_lld_entry_t *entry, const char 
 	int			i;
 	zbx_lld_macro_t 	lld_macro = {.macro = (char *)macro};
 
-	if (FAIL == (i = zbx_vector_lld_macro_bsearch(&entry->macros, lld_macro, lld_macro_compare)))
-		return NULL;
+	if (FAIL != (i = zbx_vector_lld_macro_bsearch(&entry->macros, lld_macro, lld_macro_compare)))
+		return entry->macros.values[i].value;
 
-	return entry->macros.values[i].value;
+	if (NULL != entry->exported_macros)
+	{
+		if (FAIL != (i = zbx_vector_lld_macro_bsearch(entry->exported_macros, lld_macro, lld_macro_compare)))
+			return entry->exported_macros->values[i].value;
+	}
+
+	return NULL;
 }
 
 
@@ -270,5 +278,21 @@ void	lld_entry_snprintf_alloc(const zbx_lld_entry_t *entry, char **str, size_t *
 
 		zbx_snprintf_alloc(str, str_alloc, str_offset, "%s:%s", entry->macros.values[i].macro,
 				entry->macros.values[i].value);
+	}
+
+	if (NULL != entry->exported_macros && 0 != entry->exported_macros->values_num)
+	{
+		zbx_strcpy_alloc(str, str_alloc, str_offset, " (");
+
+		for (int i = 0; i < entry->exported_macros->values_num; i++)
+		{
+			if (0 != i)
+				zbx_strcpy_alloc(str, str_alloc, str_offset, ", ");
+
+			zbx_snprintf_alloc(str, str_alloc, str_offset, "%s:%s", entry->exported_macros->values[i].macro,
+					entry->exported_macros->values[i].value);
+		}
+
+		zbx_chrcpy_alloc(str, str_alloc, str_offset, ')');
 	}
 }
