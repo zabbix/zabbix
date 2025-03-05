@@ -671,8 +671,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$update_link = (CTestArrayHelper::get($data, 'fields.Type', 'TOTP') === 'TOTP')
 			? 'link:TOTP for editing'
 			: 'link:Duo for editing';
-		$action = $update ? $update_link : 'button:Add';
-		$mfa_form->getFieldContainer('Methods')->query($action)->waitUntilClickable()->one()->click();
+		$element = $update ? $update_link : 'button:Add';
+		$mfa_form->getFieldContainer('Methods')->query($element)->waitUntilClickable()->one()->click();
 
 		// Fill in data.
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
