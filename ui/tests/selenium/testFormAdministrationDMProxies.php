@@ -57,6 +57,7 @@ class testFormAdministrationDMProxies extends CLegacyWebTest  {
 		$this->zbxTestCheckHeader('Proxies');
 
 		$this->zbxTestClickButtonText('Create proxy');
+		$this->page->waitUntilReady();
 		$this->zbxTestTextPresent(['Proxy name', 'Proxy mode', 'Proxy address', 'Description']);
 
 		$this->zbxTestAssertElementPresentId('host');

@@ -3,6 +3,7 @@ Changes for 6.0.40rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-23687] added improvements and fixed bugs related to context menus (dfofanovs)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.39

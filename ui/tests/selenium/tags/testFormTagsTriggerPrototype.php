@@ -70,6 +70,9 @@ class testFormTagsTriggerPrototype extends testFormTags {
 
 	/**
 	 * Test host full cloning with Trigger prototype.
+	 *
+	 * TODO: remove ignoreBrowserErrors after DEV-4232
+	 * @ignoreBrowserErrors
 	 */
 	public function testFormTagsTriggerPrototype_HostFullClone() {
 		$this->host = 'Host with tags for cloning';

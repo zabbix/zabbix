@@ -240,7 +240,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			->setArgument('form', 'update')
 			->setArgument('triggerid', $triggerid)
 			->setArgument('context', $data['context'])
-	))->addClass(ZBX_STYLE_WORDBREAK);
+	))->addClass(ZBX_STYLE_WORDWRAP);
 
 	if ($trigger['dependencies']) {
 		$description[] = [BR(), bold(_('Depends on').':')];

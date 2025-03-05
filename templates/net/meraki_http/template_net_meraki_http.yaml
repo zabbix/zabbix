@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2025-02-04T15:59:30Z'
+  date: '2025-02-19T22:40:36Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -31,8 +31,8 @@ zabbix_export:
           params: |
             var params = JSON.parse(value);
             
-            var r_match = '{$MERAKI.ORGANIZATION.NAME.MATCHES}'
-            var r_not_match = '{$MERAKI.ORGANIZATION.NAME.NOT_MATCHES}'
+            var r_match = '{$MERAKI.ORGANIZATION.NAME.MATCHES}';
+            var r_not_match = '{$MERAKI.ORGANIZATION.NAME.NOT_MATCHES}';
             
             var request = new HttpRequest();
             
@@ -51,8 +51,7 @@ zabbix_export:
             	if (response !== null) {
             		try {
             			response = JSON.parse(response);
-            		}
-            		catch (error) {
+            		} catch (error) {
             			throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
             		}
             	}
@@ -65,15 +64,14 @@ zabbix_export:
             		}
             	}
             
-            	if (typeof (response) !== 'object' || response === null) {
+            	if (typeof response !== 'object' || response === null) {
             		throw 'Cannot process response data: received data is not an object.';
             	}
             
             	return response;
-            };
+            }
             
             try {
-            
             	if (params.token === '{' + '$MERAKI.TOKEN}') {
             		throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
             	}
@@ -93,37 +91,43 @@ zabbix_export:
             	organizations = getHttpData(params.url + 'organizations');
             
             	organizations = organizations.filter(function (x) {
-            		return (new RegExp(r_match)).test(x.name) & !(new RegExp(r_not_match)).test(x.name)
-            	})
+            		return new RegExp(r_match).test(x.name) & !new RegExp(r_not_match).test(x.name);
+            	});
             
             	if (Array.isArray(organizations) && organizations.length > 0) {
             		for (i in organizations) {
-            			if ('id' in organizations[i]) {
-            				organization_devices = getHttpData(params.url + 'organizations/' + encodeURIComponent(organizations[i].id) + '/devices/statuses');
+            			if ('id' in organizations[i] && 'name' in organizations[i]) {
+            				try {
+            					organization_devices = getHttpData(params.url + 'organizations/' + encodeURIComponent(organizations[i].id) + '/devices/statuses');
             
-            				if (Array.isArray(organization_devices) && organization_devices.length > 0) {
-            					for (j in organization_devices) {
-            						organization_devices[j].organizationId = organizations[i].id;
-            						organization_devices[j].organizationName = organizations[i].name;
-            						if (!organization_devices[j].name) {
-            							organization_devices[j].name = organization_devices[j].serial;
+            					if (Array.isArray(organization_devices) && organization_devices.length > 0) {
+            						for (j in organization_devices) {
+            							organization_devices[j].organizationId = organizations[i].id;
+            							organization_devices[j].organizationName = organizations[i].name;
+            							if (!organization_devices[j].name) {
+            								organization_devices[j].name = organization_devices[j].serial;
+            							}
+            							devices.push(organization_devices[j]);
             						}
-            						devices.push(organization_devices[j]);
             					}
+            				} catch (error) {
+            					error_msg += organizations[i].name + " organization's devices retrieval error: " + error + '\n';
             				}
+            			} else {
+            				error_msg += 'There is no ID or organization name in the API response.';
             			}
             		}
             	}
-            
             } catch (error) {
-            	error_msg = error;
-            };
+            	error_msg += 'Organizations data retrieval error: ' + error;
+            }
             
             return JSON.stringify({
-            	'organizations': organizations,
-            	'devices': devices,
-            	'error': error_msg.toString()
+            	organizations: organizations,
+            	devices: devices,
+            	error: error_msg.toString()
             });
+            
           description: 'Item for gathering all the organizations and devices from Meraki API.'
           timeout: '{$MERAKI.DATA.TIMEOUT}'
           parameters:
@@ -232,6 +236,8 @@ zabbix_export:
               path: $.networkId
             - lld_macro: '{#ORGANIZATION_ID}'
               path: $.organizationId
+            - lld_macro: '{#ORGANIZATION_NAME}'
+              path: $.organizationName
             - lld_macro: '{#PRODUCT_TYPE}'
               path: $.productType
             - lld_macro: '{#SERIAL}'
