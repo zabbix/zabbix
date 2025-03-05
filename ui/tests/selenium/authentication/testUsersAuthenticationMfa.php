@@ -487,8 +487,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			$row->query('button:Remove')->one()->click();
 
 			// Assert that the deleted method is not visible anymore.
-			$method_list = $this->getMfaNamesFromTable($table);
-			$this->assertFalse(in_array($method_name, $method_list));
+			$this->assertFalse(in_array($method_name, $this->getMfaNamesFromTable($table)));
 		}
 
 		// Save and open MFA settings again.
